@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">iPhoneSimulator</Platform>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{DB8508BB-9849-4CC2-BC0F-8EB5DACB3C47}</ProjectGuid>
+    <ProjectTypeGuids>{E613F3A2-FE9C-494F-B74E-F63BCB86FEA6};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <MainNibFile>MainWindow.xib</MainNibFile>
+    <AssemblyName>XnaToutch.Framework</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <Description>Xna implementation for MonoTouch</Description>
+    <RootNamespace>XnaTouch.Framework</RootNamespace>
+    <SynchReleaseVersion>false</SynchReleaseVersion>
+    <BundleDisplayName>XnaTouch</BundleDisplayName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhoneSimulator' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\iPhoneSimulator\Debug</OutputPath>
+    <DefineConstants>DEBUG</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CustomCommands>
+      <CustomCommands>
+        <Command type="Custom" />
+      </CustomCommands>
+    </CustomCommands>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\iPhoneSimulator\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhone' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\iPhone\Debug</OutputPath>
+    <DefineConstants>DEBUG</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\iPhone\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="monotouch" />
+    <Reference Include="OpenTK" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Content\ContentLoadException.cs" />
+    <Compile Include="Content\ContentManager.cs" />
+    <Compile Include="GamerServices\Gamer.cs" />
+    <Compile Include="GamerServices\GamerPrivileges.cs" />
+    <Compile Include="GamerServices\GamerServicesComponent.cs" />
+    <Compile Include="GamerServices\SignedInGamer.cs" />
+    <Compile Include="GamerServices\SignedInGamerCollection.cs" />
+    <Compile Include="Graphics\ClearOptions.cs" />
+    <Compile Include="Graphics\Color.cs" />
+    <Compile Include="Graphics\DisplayMode.cs" />
+    <Compile Include="Graphics\ESImage.cs" />
+    <Compile Include="Graphics\ESTexture2D.cs" />
+    <Compile Include="Graphics\GraphicsAdapter.cs" />
+    <Compile Include="Graphics\GraphicsDevice.cs" />
+    <Compile Include="Graphics\GraphicsDeviceCapabilities.cs" />
+    <Compile Include="Graphics\GraphicsDeviceStatus.cs" />
+    <Compile Include="Graphics\IGraphicsDeviceService.cs" />
+    <Compile Include="Graphics\MultiSampleType.cs" />
+    <Compile Include="Graphics\PresentationParameters.cs" />
+    <Compile Include="Graphics\RenderTargetUsage.cs" />
+    <Compile Include="Graphics\ResourceType.cs" />
+    <Compile Include="Graphics\SaveStateMode.cs" />
+    <Compile Include="Graphics\SetDataOptions.cs" />
+    <Compile Include="Graphics\SpriteBatch.cs" />
+    <Compile Include="Graphics\SpriteBlendMode.cs" />
+    <Compile Include="Graphics\SpriteEffects.cs" />
+    <Compile Include="Graphics\SpriteFont.cs" />
+    <Compile Include="Graphics\SpriteSortMode.cs" />
+    <Compile Include="Graphics\SurfaceFormat.cs" />
+    <Compile Include="Graphics\Texture2D.cs" />
+    <Compile Include="Graphics\TextureUsage.cs" />
+    <Compile Include="Graphics\Viewport.cs" />
+    <Compile Include="Input\ButtonDefinition.cs" />
+    <Compile Include="Input\Buttons.cs" />
+    <Compile Include="Input\ButtonState.cs" />
+    <Compile Include="Input\GamePad.cs" />
+    <Compile Include="Input\GamePadButtons.cs" />
+    <Compile Include="Input\GamePadCapabilities.cs" />
+    <Compile Include="Input\GamePadState.cs" />
+    <Compile Include="Input\GamePadThumbSticks.cs" />
+    <Compile Include="Storage\StorageContainer.cs" />
+    <Compile Include="Storage\StorageDevice.cs" />
+    <Compile Include="BatteryChargeStatus.cs" />
+    <Compile Include="Curve.cs" />
+    <Compile Include="CurveKey.cs" />
+    <Compile Include="CurveKeyCollection.cs" />
+    <Compile Include="DrawableGameComponent.cs" />
+    <Compile Include="Game.cs" />
+    <Compile Include="GameComponent.cs" />
+    <Compile Include="GameComponentCollection.cs" />
+    <Compile Include="GameServiceContainer.cs" />
+    <Compile Include="GameTime.cs" />
+    <Compile Include="GameWindow.cs" />
+    <Compile Include="GraphicsDeviceManager.cs" />
+    <Compile Include="IDrawable.cs" />
+    <Compile Include="IGameComponent.cs" />
+    <Compile Include="IGraphicsDeviceManager.cs" />
+    <Compile Include="IphoneWindow.cs" />
+    <Compile Include="MathHelper.cs" />
+    <Compile Include="Matrix.cs" />
+    <Compile Include="PlayerIndex.cs" />
+    <Compile Include="Point.cs" />
+    <Compile Include="PowerLineStatus.cs" />
+    <Compile Include="PowerStatus.cs" />
+    <Compile Include="Quaternion.cs" />
+    <Compile Include="Rectangle.cs" />
+    <Compile Include="Vector2.cs" />
+    <Compile Include="Vector3.cs" />
+    <Compile Include="Vector4.cs" />
+    <Compile Include="CurveLoopType.cs" />
+    <Compile Include="CurveContinuity.cs" />
+    <Compile Include="Graphics\DeviceType.cs" />
+    <Compile Include="Graphics\DepthFormat.cs" />
+    <Compile Include="Graphics\SwapEffect.cs" />
+    <Compile Include="Input\ThumbStickDefinition.cs" />
+    <Compile Include="Input\Mouse.cs" />
+    <Compile Include="Input\MouseState.cs" />
+    <Compile Include="Audio\SoundEffect.cs" />
+    <Compile Include="Audio\SoundState.cs" />
+    <Compile Include="Media\MediaPlayer.cs" />
+    <Compile Include="Media\MediaState.cs" />
+    <Compile Include="Media\Song.cs" />
+    <Compile Include="Content\ContentReader.cs" />
+    <Compile Include="Content\ContentTypeReader.cs" />
+    <Compile Include="Content\ContentTypeReaderManager.cs" />
+    <Compile Include="Content\ContentReaders\CharReader.cs" />
+    <Compile Include="Content\ContentReaders\ListReader.cs" />
+    <Compile Include="Content\ContentReaders\RectangleReader.cs" />
+    <Compile Include="Content\ContentReaders\SpriteFontReader.cs" />
+    <Compile Include="Content\ContentReaders\StringReader.cs" />
+    <Compile Include="Content\ContentReaders\Texture2DReader.cs" />
+    <Compile Include="Content\ContentReaders\Vector3Reader.cs" />
+    <Compile Include="Audio\Sound.cs" />
+    <Compile Include="Content\ContentReaders\SongReader.cs" />
+    <Compile Include="Content\ContentReaders\SoundEffectReader.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ProjectExtensions>
+    <MonoDevelop>
+      <Properties InternalTargetFrameworkVersion="IPhone">
+        <Policies>
+          <StandardHeader Text="#region License&#xD;&#xA;/*&#xD;&#xA;Microsoft Public License (Ms-PL)&#xD;&#xA;XnaTouch - Copyright © 2009 The XnaTouch Team&#xD;&#xA;&#xD;&#xA;All rights reserved.&#xD;&#xA;&#xD;&#xA;This license governs use of the accompanying software. If you use the software, you accept this license. If you do not&#xD;&#xA;accept the license, do not use the software.&#xD;&#xA;&#xD;&#xA;1. Definitions&#xD;&#xA;The terms &quot;reproduce,&quot; &quot;reproduction,&quot; &quot;derivative works,&quot; and &quot;distribution&quot; have the same meaning here as under &#xD;&#xA;U.S. copyright law.&#xD;&#xA;&#xD;&#xA;A &quot;contribution&quot; is the original software, or any additions or changes to the software.&#xD;&#xA;A &quot;contributor&quot; is any person that distributes its contribution under this license.&#xD;&#xA;&quot;Licensed patents&quot; are a contributor's patent claims that read directly on its contribution.&#xD;&#xA;&#xD;&#xA;2. Grant of Rights&#xD;&#xA;(A) Copyright Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, &#xD;&#xA;each contributor grants you a non-exclusive, worldwide, royalty-free copyright license to reproduce its contribution, prepare derivative works of its contribution, and distribute its contribution or any derivative works that you create.&#xD;&#xA;(B) Patent Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, &#xD;&#xA;each contributor grants you a non-exclusive, worldwide, royalty-free license under its licensed patents to make, have made, use, sell, offer for sale, import, and/or otherwise dispose of its contribution in the software or derivative works of the contribution in the software.&#xD;&#xA;&#xD;&#xA;3. Conditions and Limitations&#xD;&#xA;(A) No Trademark License- This license does not grant you rights to use any contributors' name, logo, or trademarks.&#xD;&#xA;(B) If you bring a patent claim against any contributor over patents that you claim are infringed by the software, &#xD;&#xA;your patent license from such contributor to the software ends automatically.&#xD;&#xA;(C) If you distribute any portion of the software, you must retain all copyright, patent, trademark, and attribution &#xD;&#xA;notices that are present in the software.&#xD;&#xA;(D) If you distribute any portion of the software in source code form, you may do so only under this license by including &#xD;&#xA;a complete copy of this license with your distribution. If you distribute any portion of the software in compiled or object &#xD;&#xA;code form, you may only do so under a license that complies with this license.&#xD;&#xA;(E) The software is licensed &quot;as-is.&quot; You bear the risk of using it. The contributors give no express warranties, guarantees&#xD;&#xA;or conditions. You may have additional consumer rights under your local laws which this license cannot change. To the extent&#xD;&#xA;permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular&#xD;&#xA;purpose and non-infringement.&#xD;&#xA;*/&#xD;&#xA;#endregion License&#xD;&#xA;" inheritsSet="MITX11License" />
+        </Policies>
+      </Properties>
+    </MonoDevelop>
+  </ProjectExtensions>
+  <ItemGroup>
+    <Folder Include="Content\ContentReaders\" />
+  </ItemGroup>
+</Project>
