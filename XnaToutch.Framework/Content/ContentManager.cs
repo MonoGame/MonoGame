@@ -84,7 +84,7 @@ namespace XnaTouch.Framework.Content
         }
 		
         public T Load<T>(string assetName)
-        {
+        {			
 			string originalAssetName = assetName;
 			object result = null;
 			
@@ -96,6 +96,8 @@ namespace XnaTouch.Framework.Content
                     throw new InvalidOperationException("No Graphics Device Service");
                 }
             }
+			
+			int i=0;
 			
 			if (string.IsNullOrEmpty(assetName))
 			{
@@ -129,7 +131,7 @@ namespace XnaTouch.Framework.Content
 			{	
 				throw new ContentLoadException("Could not load "  + originalAssetName + " asset!");
 			}
-						
+			
 			if (Path.GetExtension(assetName).ToUpper() !=".XNB")
 			{
 				if ((typeof(T) == typeof(Texture2D))) 
@@ -163,11 +165,12 @@ namespace XnaTouch.Framework.Content
 				reader.Close();
 				stream.Close();
 			}
-			
+						
 			if (result == null)
 			{	
 				throw new ContentLoadException("Could not load "  + originalAssetName + " asset!");
 			}
+			
 			return (T) result;
         }
 		

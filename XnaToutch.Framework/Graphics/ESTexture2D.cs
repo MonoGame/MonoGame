@@ -94,7 +94,6 @@ namespace XnaTouch.Framework.Graphics
 			info = image.AlphaInfo;
 			hasAlpha = ((info == CGImageAlphaInfo.PremultipliedLast) || (info == CGImageAlphaInfo.PremultipliedFirst) || (info == CGImageAlphaInfo.Last) || (info == CGImageAlphaInfo.First) ? true : false);
 			
-			
 			if (image.ColorSpace != null)
 			{
 				if (hasAlpha)
@@ -113,7 +112,6 @@ namespace XnaTouch.Framework.Graphics
 	
 			imageSize = new Size(image.Width,image.Height);
 			transform = CGAffineTransform.MakeIdentity();
-		
 			width = imageSize.Width;
 	
 			if((width != 1) && ((width & (width - 1))!=0)) {
@@ -129,7 +127,6 @@ namespace XnaTouch.Framework.Graphics
 					i *= 2;
 				height = i;
 			}
-			
 			// TODO: kMaxTextureSize = 1024
 			while((width > 1024) || (height > 1024)) 
 			{

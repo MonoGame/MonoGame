@@ -46,11 +46,11 @@ namespace XnaTouch.Framework.Input
 	public struct GamePadState
     {
         private GamePadThumbSticks _thumbs;
-        private GamePadButtons _buttons;
+        private Buttons _buttons;
 
 		internal GamePadState(Buttons buttons, Vector2 LeftStick, Vector2 RightStick)
 		{
-			_buttons = new GamePadButtons(buttons);
+			_buttons = buttons;
 			_thumbs = new GamePadThumbSticks(LeftStick,RightStick);
 		}
 		
@@ -58,7 +58,7 @@ namespace XnaTouch.Framework.Input
         {
             get
             {
-                return this._buttons;
+                return new GamePadButtons(_buttons);
             }
         }
  
@@ -80,7 +80,7 @@ namespace XnaTouch.Framework.Input
      
         public bool IsButtonDown(XnaTouch.Framework.Input.Buttons button)
         {
-            throw new NotImplementedException();
+            return ((_buttons & button) == button);
         }
 
         public bool IsButtonUp(XnaTouch.Framework.Input.Buttons button)

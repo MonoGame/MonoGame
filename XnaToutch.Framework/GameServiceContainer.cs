@@ -48,7 +48,9 @@ namespace XnaTouch.Framework
         {
             object service;
             if (services.TryGetValue(type, out service))
+			{
                 return service;
+			}
 
             return null;
         }
