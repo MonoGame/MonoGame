@@ -90,17 +90,19 @@ using MonoTouch.AudioToolbox;
 				Instance._useAccelerometer = value;
 				if (value)
 				{
-					UIAccelerometer.SharedAccelerometer.UpdateInterval = 1/30;
-					UIAccelerometer.SharedAccelerometer.Acceleration += delegate(object sender, UIAccelerometerEventArgs e) {						
-						Instance._leftStick = new Vector2((float)e.Acceleration.X,(float)e.Acceleration.Y);
-					};
-				}
-				else 
-				{
-					UIAccelerometer.SharedAccelerometer.Delegate = null;
+					_instance.SetupAccelerometer();
 				}
 			}
 		}
+		
+		private void SetupAccelerometer()
+		{
+			UIAccelerometer.SharedAccelerometer.UpdateInterval = 1/30;
+			UIAccelerometer.SharedAccelerometer.Acceleration += delegate(object sender, UIAccelerometerEventArgs e) {												
+				Instance._leftStick = new Vector2((float)e.Acceleration.X*2,(float)e.Acceleration.Y*2);
+			};
+		}
+		
 		public void Reset()
 		{
 			_buttons = 0;
@@ -363,6 +365,14 @@ using MonoTouch.AudioToolbox;
 			return hitInButton;
 		}
 		 
+		internal static void Update()
+		{
+			if (_instance._useAccelerometer)
+			{
+				_instance.SetupAccelerometer();
+			}
+		}
+		
 		#region render virtual gamepad
 		
 		public static float Transparency

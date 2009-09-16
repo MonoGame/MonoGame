@@ -40,6 +40,10 @@ purpose and non-infringement.
 
 ﻿using System;
 using System.IO;
+using XnaTouch;
+using XnaTouch.Framework;
+using XnaTouch.Framework.Storage;
+
 
 namespace XnaTouch.Framework.Storage
 {
@@ -53,7 +57,7 @@ namespace XnaTouch.Framework.Storage
         {
 			_device = device;
 			_name = name;
-			_path = System.AppDomain.CurrentDomain.BaseDirectory+System.IO.Path.DirectorySeparatorChar+name;
+			_path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)+System.IO.Path.DirectorySeparatorChar+name;
 			// Creathe the "device" if need
 			if (!Directory.Exists(_path))
 			{

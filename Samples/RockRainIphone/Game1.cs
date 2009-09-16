@@ -1,7 +1,9 @@
+using RockRainIphone;
+using RockRainIphone.Core;
+using System;
 using XnaTouch.Framework;
 using XnaTouch.Framework.Graphics;
 using XnaTouch.Framework.Input;
-using RockRainIphone.Core;
 
 namespace RockRainIphone
 {
@@ -88,8 +90,7 @@ namespace RockRainIphone
 			largeFont = Content.Load<SpriteFont>("menuLarge");
 			startElementsTexture = Content.Load<Texture2D>("startsceneelements.png");            
             startBackgroundTexture = Content.Load<Texture2D>("startbackground");
-            startScene = new StartScene(this, smallFont, largeFont,
-                startBackgroundTexture, startElementsTexture);
+            startScene = new StartScene(this, smallFont, largeFont,startBackgroundTexture, startElementsTexture);
             Components.Add(startScene);
 			
             // Start the game in the start Scene :)
@@ -103,8 +104,7 @@ namespace RockRainIphone
             actionElementsTexture = Content.Load<Texture2D>("rockrainenhanced.png");
             actionBackgroundTexture = Content.Load<Texture2D>("spacebackground.jpg");
             scoreFont = Content.Load<SpriteFont>("score");
-            actionScene = new ActionScene(this, actionElementsTexture,
-                actionBackgroundTexture, scoreFont, explosions);
+            actionScene = new ActionScene(this, actionElementsTexture,actionBackgroundTexture, scoreFont, explosions);
             Components.Add(actionScene);
 		}
 		
@@ -189,7 +189,7 @@ namespace RockRainIphone
                 }
                 else
                 {
-                    //audio.MenuBack.Play();
+                    audio.MenuBack.Play();
                     actionScene.Paused = !actionScene.Paused;
                 }
             }
@@ -208,7 +208,7 @@ namespace RockRainIphone
             if (startScene.MenuSelected)
             {
 				Mouse.SetPosition(0,0);
-                //audio.MenuSelect.Play();
+                audio.MenuSelect.Play();
                 switch (startScene.SelectedMenuIndex)
                 {
                     case 0:

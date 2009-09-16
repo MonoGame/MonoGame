@@ -95,8 +95,7 @@ namespace XnaTouch.Framework.Graphics
 
         public void SetData<T>(T[] data)
         {
-            throw new NotImplementedException();
-
+			throw new NotImplementedException();
         }
 
         public int Width

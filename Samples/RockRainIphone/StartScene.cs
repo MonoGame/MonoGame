@@ -57,8 +57,7 @@ namespace RockRainIphone
             Components.Add(menu);
 
             // Get the current spritebatch
-            spriteBatch = (SpriteBatch) Game.Services.GetService(
-                                            typeof (SpriteBatch));
+            spriteBatch = (SpriteBatch) Game.Services.GetService(typeof (SpriteBatch));
             // Get the current audiocomponent and play the background music
             audio = (AudioLibrary)Game.Services.GetService(typeof(AudioLibrary));
         }
@@ -109,7 +108,10 @@ namespace RockRainIphone
 		
 		public bool MenuSelected
         {
-            get { return menu.Selected; }
+            get 
+			{
+				return menu.Selected; 
+			}
         }
 
         /// <summary>

@@ -10,7 +10,6 @@ namespace RockRainIphone
         private SoundEffect newMeteor;
         private SoundEffect menuBack;
         private SoundEffect menuSelect;
-        private SoundEffect menuScroll;
         private SoundEffect powerGet;
         private SoundEffect powerShow;
         private Song backMusic;

@@ -49,7 +49,6 @@ namespace XnaTouch.Framework.Audio
     {
 		private Sound _sound;
 		private string _name;
-		private SoundState _state;
 		private float _volume = 1.0f;
 		
 		internal SoundEffect(string fileName)
@@ -61,7 +60,6 @@ namespace XnaTouch.Framework.Audio
         {
 			_sound = Sound.Create (_name, _volume, false);
 			_sound.Play();
-			_state = SoundState.Playing;
 			
 			return true;
         }

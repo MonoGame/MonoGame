@@ -47,8 +47,8 @@ namespace XnaTouch.Framework
 {
     public class GraphicsDeviceManager : IGraphicsDeviceService, IDisposable, IGraphicsDeviceManager
     {
-		private Game game;
-		private GraphicsDevice graphicsDevice;
+		private Game _game;
+		private GraphicsDevice _graphicsDevice;
 		private int _preferredBackBufferHeight;
 		private int _preferredBackBufferWidth;
 		private bool _preferMultiSampling;
@@ -63,7 +63,7 @@ namespace XnaTouch.Framework
 			// Set "full screen"  as default
 			UIApplication.SharedApplication.StatusBarHidden = true;
             
-			this.game = game;
+			_game = game;
 			_preferredBackBufferHeight = game.Window.ClientBounds.Height;
 			_preferredBackBufferWidth = game.Window.ClientBounds.Width;
 			
@@ -71,8 +71,11 @@ namespace XnaTouch.Framework
             {
                 throw new ArgumentException("Graphics Device Manager Already Present");
             }
+			
             game.Services.AddService(typeof(IGraphicsDeviceManager), this);
             game.Services.AddService(typeof(IGraphicsDeviceService), this);
+			
+			InitializeOpenGL();
         }
 		
 		public bool BeginDraw ()
@@ -112,17 +115,25 @@ namespace XnaTouch.Framework
         {
         }
 
-        void IGraphicsDeviceManager.CreateDevice()
-        {
-			graphicsDevice = new GraphicsDevice(game.Layer);
+		private void InitializeOpenGL()
+		{
+			_graphicsDevice = new GraphicsDevice(_game.Layer);
+			_graphicsDevice.InitializeOpenGL(_preferredBackBufferWidth, _preferredBackBufferHeight);
+			_graphicsDevice.Reset();
+
 			if (_preferMultiSampling) 
 			{
-				graphicsDevice.PreferedFilter = All.Linear;
+				_graphicsDevice.PreferedFilter = All.Linear;
 			}
 			else 
 			{
-				graphicsDevice.PreferedFilter = All.Nearest;
+				_graphicsDevice.PreferedFilter = All.Nearest;
 			}
+		}
+		
+        void IGraphicsDeviceManager.CreateDevice()
+        {
+			InitializeOpenGL();
         }		
 
         public void ToggleFullScreen()
@@ -134,7 +145,7 @@ namespace XnaTouch.Framework
         {
             get
             {
-                return graphicsDevice;
+                return _graphicsDevice;
             }
         }
 
@@ -159,6 +170,14 @@ namespace XnaTouch.Framework
             set
             {
 				_preferMultiSampling = value;
+				if (_preferMultiSampling) 
+				{
+					_graphicsDevice.PreferedFilter = All.Linear;
+				}
+				else 
+				{
+					_graphicsDevice.PreferedFilter = All.Nearest;
+				}
             }
         }
 

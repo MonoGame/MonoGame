@@ -160,6 +160,10 @@ using XnaTouch.Framework.Audio;
             set
             {
             	_volume = value;
+				if (_song != null)
+				{
+					_song.Volume = value;
+				}
 			}
         }
     }

@@ -43,73 +43,24 @@ using System;
 
 namespace XnaTouch.Framework.Graphics
 {
-    
     public struct Viewport
     {
-        public int X
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-            set
-            {
-            }
-        }
-        public int Y
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-            set
-            {
-            }
-        }
-        public int Width
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-            set
-            {
-            }
-        }
-        public int Height
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-            set
-            {
-            }
-        }
-        public float MinDepth
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-            set
-            {
-            }
-        }
-        public float MaxDepth
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-            set
-            {
-            }
-        }
-        public override string ToString()
-        {
-            throw new NotImplementedException();
-        }
+
+		public int X {get;set;}
+        public int Y {get;set;}
+        public int Width {get;set;}
+        public int Height {get;set;}
+        public float MinDepth {get;set;}
+        public float MaxDepth {get;set;}
+		public float AspectRatio 
+		{
+			get
+			{
+				return Width/Height;
+			}
+		}
+		
+		public Rectangle TitleSafeArea {get;set;}
 
         public Vector3 Project(Vector3 source, Matrix projection, Matrix view, Matrix world)
         {
@@ -121,20 +72,7 @@ namespace XnaTouch.Framework.Graphics
             throw new NotImplementedException();
         }
 
-        public float AspectRatio
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
-        public Rectangle TitleSafeArea
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+       
     }
 }
 

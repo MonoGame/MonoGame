@@ -22,6 +22,7 @@ namespace XnaTouch.Samples.VirtualGamePad
 		Texture2D texture, caracter;
 		Vector2 position = new Vector2();
 		Color caracterColor = Color.White;
+		SpriteFont font;
 
         public Game1()
         {
@@ -59,11 +60,12 @@ namespace XnaTouch.Samples.VirtualGamePad
             // TODO: use this.Content to load your game content here
             texture = Content.Load<Texture2D>("gamepad.png");
 			caracter = Content.Load<Texture2D>("xnatouchicon");
+			font = Content.Load<SpriteFont>("font");
 			
 			// Set the virtual GamePad
 			ButtonDefinition BButton = new ButtonDefinition();
 			BButton.Texture = texture;
-			BButton.Position = Vector2.Zero;
+			BButton.Position = new Vector2(200,150);
 			BButton.Type = Buttons.B;
 			BButton.TextureRect = new Rectangle(72,77,36,36);
 			
@@ -83,7 +85,7 @@ namespace XnaTouch.Samples.VirtualGamePad
 			
 			GamePad.LeftThumbStickDefinition = thumbStick;
 			
-			//GamePad.UseAccelerometer = true;
+			GamePad.UseAccelerometer = true;
         }
 
         /// <summary>
@@ -160,6 +162,7 @@ namespace XnaTouch.Samples.VirtualGamePad
 			
 			spriteBatch.Begin();
 			spriteBatch.Draw(caracter,position,caracterColor);
+			spriteBatch.DrawString(font,GamePad.GetState(PlayerIndex.One).ThumbSticks.Left.ToString(),Vector2.One,Color.Black);
 			spriteBatch.End();
 			
             base.Draw(gameTime);

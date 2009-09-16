@@ -19,6 +19,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XnaTouch.Samples.VirtualGam
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RockRainIphone", "Samples\RockRainIphone\RockRainIphone.csproj", "{6AD0E621-8D0C-42B1-A42C-B36F8537B234}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "StarterKits", "StarterKits", "{ED13CD83-F288-496C-B046-027FA7D36717}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlienGame", "StarterKits\AlienGame\AlienGame.csproj", "{A18E0228-936A-45CD-91CC-07E01F45677E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|iPhoneSimulator = Debug|iPhoneSimulator
@@ -59,6 +63,14 @@ Global
 		{6AD0E621-8D0C-42B1-A42C-B36F8537B234}.Release|iPhone.Build.0 = Release|iPhone
 		{6AD0E621-8D0C-42B1-A42C-B36F8537B234}.Release|iPhoneSimulator.ActiveCfg = Release|iPhoneSimulator
 		{6AD0E621-8D0C-42B1-A42C-B36F8537B234}.Release|iPhoneSimulator.Build.0 = Release|iPhoneSimulator
+		{A18E0228-936A-45CD-91CC-07E01F45677E}.Debug|iPhone.ActiveCfg = Debug|iPhone
+		{A18E0228-936A-45CD-91CC-07E01F45677E}.Debug|iPhone.Build.0 = Debug|iPhone
+		{A18E0228-936A-45CD-91CC-07E01F45677E}.Debug|iPhoneSimulator.ActiveCfg = Debug|iPhoneSimulator
+		{A18E0228-936A-45CD-91CC-07E01F45677E}.Debug|iPhoneSimulator.Build.0 = Debug|iPhoneSimulator
+		{A18E0228-936A-45CD-91CC-07E01F45677E}.Release|iPhone.ActiveCfg = Release|iPhone
+		{A18E0228-936A-45CD-91CC-07E01F45677E}.Release|iPhone.Build.0 = Release|iPhone
+		{A18E0228-936A-45CD-91CC-07E01F45677E}.Release|iPhoneSimulator.ActiveCfg = Release|iPhoneSimulator
+		{A18E0228-936A-45CD-91CC-07E01F45677E}.Release|iPhoneSimulator.Build.0 = Release|iPhoneSimulator
 		{B1E27EDB-2AC5-4A8A-8FD2-29CEEBDF3344}.Debug|iPhone.ActiveCfg = Debug|iPhone
 		{B1E27EDB-2AC5-4A8A-8FD2-29CEEBDF3344}.Debug|iPhone.Build.0 = Debug|iPhone
 		{B1E27EDB-2AC5-4A8A-8FD2-29CEEBDF3344}.Debug|iPhoneSimulator.ActiveCfg = Debug|iPhoneSimulator
@@ -100,6 +112,7 @@ Global
 		{51F298A3-5F21-4054-9CF8-96CA2601FF60} = {64ED246E-8579-4DF2-A50E-53CC3CCB0E6B}
 		{326DC8E8-649F-4F96-92BA-EE0EF51A32DB} = {64ED246E-8579-4DF2-A50E-53CC3CCB0E6B}
 		{6AD0E621-8D0C-42B1-A42C-B36F8537B234} = {64ED246E-8579-4DF2-A50E-53CC3CCB0E6B}
+		{A18E0228-936A-45CD-91CC-07E01F45677E} = {ED13CD83-F288-496C-B046-027FA7D36717}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = Samples\VirtualGamePad\XnaTouch.Samples.VirtualGamePad.csproj
