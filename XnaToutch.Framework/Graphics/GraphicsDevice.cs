@@ -55,6 +55,7 @@ namespace XnaTouch.Framework.Graphics
 		private CAEAGLLayer _eaglLayer;
 		private All _preferedFilter;
 		private static int _activeTexture = -1;
+		private Viewport _viewport;
 		internal All PreferedFilter 
 		{
 			get 
@@ -137,6 +138,14 @@ namespace XnaTouch.Framework.Graphics
 			//Set the frame buffer size
 			BackingWidth = backBufferWidth;
 			BackingHeight = backBufferHeight;
+
+			// Initialize the main viewport
+			_viewport = new Viewport();
+			_viewport.X = 0;
+			_viewport.Y = 0;						
+			_viewport.Width = BackingWidth;
+			_viewport.Height = BackingHeight;	
+			_viewport.TitleSafeArea = new Rectangle(0,0,BackingWidth,BackingHeight);	
 			
 			// Set up OpenGL projection matrix
 			GL.MatrixMode(All.Projection);
@@ -210,13 +219,10 @@ namespace XnaTouch.Framework.Graphics
         {
             get
             {
-                throw new NotImplementedException();
-            }
-            set
-            {
-            }
-        }
-		
+				return _viewport;
+			}
+			
+		}
 		private bool CreateFrameBuffer ()
 		{
 			GL.Oes.GenFramebuffers (1, ref ViewFrameBuffer);

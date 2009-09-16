@@ -161,6 +161,10 @@
     <Compile Include="Audio\Sound.cs" />
     <Compile Include="Content\ContentReaders\SongReader.cs" />
     <Compile Include="Content\ContentReaders\SoundEffectReader.cs" />
+    <Compile Include="Media\MediaSourceType.cs" />
+    <Compile Include="Media\MediaSource.cs" />
+    <Compile Include="Media\MediaLibrary.cs" />
+    <Compile Include="Media\Playlist.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>

@@ -37,42 +37,41 @@ permitted under your local laws, the contributors exclude the implied warranties
 purpose and non-infringement.
 */
 #endregion License
-
-using XnaTouch.Framework;
-using System;
-
-namespace XnaTouch.Framework.Graphics
+﻿
+namespace XnaTouch.Framework.Media
 {
-    public struct Viewport
+
+    public sealed class PlaylistCollection : IEnumerable<Playlist>, IEnumerable, IDisposable
     {
-
-		public int X {get;set;}
-        public int Y {get;set;}
-        public int Width {get;set;}
-        public int Height {get;set;}
-        public float MinDepth {get;set;}
-        public float MaxDepth {get;set;}
-		public float AspectRatio 
-		{
-			get
-			{
-				return Width/Height;
-			}
-		}
-		
-		public Rectangle TitleSafeArea {get;set;}
-
-        public Vector3 Project(Vector3 source, Matrix projection, Matrix view, Matrix world)
+        public void Dispose()
         {
-            throw new NotImplementedException();
         }
 
-        public Vector3 Unproject(Vector3 source, Matrix projection, Matrix view, Matrix world)
+        protected override void Finalize()
         {
-            throw new NotImplementedException();
         }
 
-       
+        public IEnumerator<Playlist> GetEnumerator()
+        {
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+        }
+
+        public int Count
+        {
+            get
+            {
+            }
+        }
+
+        public Playlist this[int index]
+        {
+            get
+            {
+            }
+        }
     }
 }
 

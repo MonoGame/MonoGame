@@ -125,8 +125,9 @@ namespace XnaTouch.Framework
 			{
 				return false;
 			}
-			set {
-				throw new System.NotSupportedException ();
+			set 
+			{
+				throw new NotSupportedException();
 			}
 		}
 		

@@ -38,41 +38,39 @@ purpose and non-infringement.
 */
 #endregion License
 
-using XnaTouch.Framework;
-using System;
+using System;﻿
 
-namespace XnaTouch.Framework.Graphics
+namespace XnaTouch.Framework.Media
 {
-    public struct Viewport
+    public sealed class Playlist : IDisposable
     {
+        public TimeSpan Duration
+        {
+            get
+            {
+				throw new NotImplementedException();
+            }
+        }
 
-		public int X {get;set;}
-        public int Y {get;set;}
-        public int Width {get;set;}
-        public int Height {get;set;}
-        public float MinDepth {get;set;}
-        public float MaxDepth {get;set;}
-		public float AspectRatio 
-		{
-			get
-			{
-				return Width/Height;
-			}
-		}
+        public string Name
+        {
+            get
+            {
+				throw new NotImplementedException();
+            }
+        }
+
+		public void Dispose()
+        {
+        }
+
 		
-		public Rectangle TitleSafeArea {get;set;}
-
-        public Vector3 Project(Vector3 source, Matrix projection, Matrix view, Matrix world)
+        /*public SongCollection Songs
         {
-            throw new NotImplementedException();
-        }
-
-        public Vector3 Unproject(Vector3 source, Matrix projection, Matrix view, Matrix world)
-        {
-            throw new NotImplementedException();
-        }
-
-       
+            get
+            {
+            }
+        }*/
     }
 }
 

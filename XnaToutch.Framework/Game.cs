@@ -51,12 +51,12 @@ namespace XnaTouch.Framework
 {
     public class Game : IDisposable
     {
-        private GameTime updateGameTime;
-        private GameTime drawGameTime;
-        private DateTime lastUpdate;
+        private GameTime _updateGameTime;
+        private GameTime _drawGameTime;
+        private DateTime _lastUpdate;
         private bool _initialized = false;
-        private GameComponentCollection _gameComponentCollection = new GameComponentCollection();
-        public GameServiceContainer _services = new GameServiceContainer();
+        private GameComponentCollection _gameComponentCollection;
+        public GameServiceContainer _services;
         private ContentManager _content;
         private GameWindow _window;
 		private bool _isFixedTimeStep = true;
@@ -69,6 +69,9 @@ namespace XnaTouch.Framework
 		
 		 public Game()
         {           
+			// Initialize collections
+			_services = new GameServiceContainer();
+			_gameComponentCollection = new GameComponentCollection();
 			//Create a full-screen window
 			_mainWindow = new UIWindow (UIScreen.MainScreen.Bounds);
 			_window = new IphoneWindow ();
@@ -81,8 +84,8 @@ namespace XnaTouch.Framework
 			OpenTK.Platform.Utilities.CreateGraphicsContext(MonoTouch.OpenGLES.EAGLRenderingAPI.OpenGLES1);
 		
 			// Initialize GameTime
-            updateGameTime = new GameTime();
-            drawGameTime = new GameTime();      
+            _updateGameTime = new GameTime();
+            _drawGameTime = new GameTime();      
         }
 		
 		public void Dispose ()
@@ -140,22 +143,13 @@ namespace XnaTouch.Framework
 		}
 
         public void Run()
-    	{
-            this.graphicsDeviceManager = this.Services.GetService(typeof(IGraphicsDeviceManager)) as IGraphicsDeviceManager;
-			if (this.graphicsDeviceManager != null)
-            {
-               	this.graphicsDeviceManager.CreateDevice();
-            }
-			
-			GraphicsDevice.InitializeOpenGL(_window.ClientBounds.Width, _window.ClientBounds.Height);
-			GraphicsDevice.Reset();
-			
-            this.Initialize();
+    	{			
+			this.Initialize();
 			
 			if (IsFixedTimeStep) 
 			{
-				lastUpdate = DateTime.Now;
-            	this.Update(updateGameTime);     
+				_lastUpdate = DateTime.Now;
+            	this.Update(_updateGameTime);     
 			
 				CreateTimer();
 			}
@@ -193,6 +187,12 @@ namespace XnaTouch.Framework
                 return _window;
             }
         }
+		
+		public void ResetElapsedTime()
+        {
+            _lastUpdate = DateTime.Now;
+        }
+
 
         public GameServiceContainer Services
         {
@@ -207,25 +207,25 @@ namespace XnaTouch.Framework
             DateTime now = DateTime.Now;
             if (IsFixedTimeStep)
             {
-                _timeSinceLast += now - lastUpdate;
+                _timeSinceLast += now - _lastUpdate;
                 while (_timeSinceLast >= _targetElapsedTime)
                 {
-                    updateGameTime.Update(_targetElapsedTime);
+                    _updateGameTime.Update(_targetElapsedTime);
                     _timeSinceLast -= _targetElapsedTime;
-                    Update(updateGameTime);
+                    Update(_updateGameTime);
                 }
             }
             else
             {
-                updateGameTime.Update(now - lastUpdate);
-                Update(updateGameTime);
+                _updateGameTime.Update(now - _lastUpdate);
+                Update(_updateGameTime);
             }
             
 			GraphicsDevice.StartPresentation();
 			
-            drawGameTime.Update(now - lastUpdate);
-            lastUpdate = now;
-            Draw(drawGameTime);       
+            _drawGameTime.Update(now - _lastUpdate);
+            _lastUpdate = now;
+            Draw(_drawGameTime);       
 			
 			GraphicsDevice.Present();
         }
@@ -270,7 +270,10 @@ namespace XnaTouch.Framework
 		
         protected virtual void Initialize()
         {            
-            if ((this.graphicsDeviceService != null) && (this.graphicsDeviceService.GraphicsDevice != null))
+			this.graphicsDeviceManager = this.Services.GetService(typeof(IGraphicsDeviceManager)) as IGraphicsDeviceManager;			
+			this.graphicsDeviceService = this.Services.GetService(typeof(IGraphicsDeviceService)) as IGraphicsDeviceService;			
+
+			if ((this.graphicsDeviceService != null) && (this.graphicsDeviceService.GraphicsDevice != null))
             {
                 LoadContent();
             }
@@ -283,6 +286,11 @@ namespace XnaTouch.Framework
 
         protected virtual void Update(GameTime gameTime)
         {
+			if (GamePad.UseAccelerometer)
+			{
+				GamePad.Update();
+			}
+			
             foreach (GameComponent gc in _gameComponentCollection)
             {
                 if (gc.Enabled)
