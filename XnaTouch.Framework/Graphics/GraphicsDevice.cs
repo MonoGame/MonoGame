@@ -43,9 +43,10 @@ using System;
 using MonoTouch.OpenGLES;
 using OpenTK.Graphics.ES11;
 using MonoTouch.CoreAnimation;
+using System.Collections.Generic;
 
 namespace XnaTouch.Framework.Graphics
-{
+{	
     public class GraphicsDevice : IDisposable
     {
 		private EAGLContext _context;
@@ -54,8 +55,10 @@ namespace XnaTouch.Framework.Graphics
 		private int BackingHeight;
 		private CAEAGLLayer _eaglLayer;
 		private All _preferedFilter;
-		private static int _activeTexture = -1;
+		private int _activeTexture = -1;
 		private Viewport _viewport;
+		private GraphicsDevice2D _spriteDevice;
+		
 		internal All PreferedFilter 
 		{
 			get 
@@ -69,7 +72,7 @@ namespace XnaTouch.Framework.Graphics
 		
 		}
 		
-		internal static int ActiveTexture
+		internal int ActiveTexture
 		{
 			get 
 			{
@@ -80,7 +83,7 @@ namespace XnaTouch.Framework.Graphics
 				_activeTexture = value;
 			}
 		}
-		
+				
 		public GraphicsDevice(CAEAGLLayer layer)
         {
 			_eaglLayer = layer;
@@ -89,6 +92,9 @@ namespace XnaTouch.Framework.Graphics
 			{
 				throw new Exception ("Unable to set EAGLContext!");
 			}
+			
+			// Create the Sprite Rendering engine
+			_spriteDevice = new GraphicsDevice2D(this);
         }
 
         public void Clear(Color color)
@@ -124,10 +130,10 @@ namespace XnaTouch.Framework.Graphics
 
         public void Present()
         {
+			// Draw the context to screen
 			_context.PresentRenderBuffer ((uint) All.RenderbufferOes);
         }
-
-
+		
         public void Present(Rectangle? sourceRectangle, Rectangle? destinationRectangle, IntPtr overrideWindowHandle)
         {
   			throw new NotImplementedException();
@@ -153,11 +159,13 @@ namespace XnaTouch.Framework.Graphics
 			GL.Ortho(0, BackingWidth, 0, BackingHeight, -1, 1);
 			GL.MatrixMode(All.Modelview);
 			GL.Viewport(0,0,BackingWidth,BackingHeight);
-					
+						
 			// Initialize OpenGL states			
 			GL.Disable(All.DepthTest);
 			GL.TexEnv(All.TextureEnv, All.TextureEnvMode,(int) All.BlendSrc);
 			GL.EnableClientState(All.VertexArray);
+			
+			Clear(Color.Black);
 		}
 		
 		internal void StartPresentation()
@@ -223,6 +231,7 @@ namespace XnaTouch.Framework.Graphics
 			}
 			
 		}
+		
 		private bool CreateFrameBuffer ()
 		{
 			GL.Oes.GenFramebuffers (1, ref ViewFrameBuffer);
@@ -258,82 +267,20 @@ namespace XnaTouch.Framework.Graphics
 			}
 		}
 		
-		internal static void RenderAtPoint(ESImage image, Vector2 point)
+		internal void StartSpriteBatch(SpriteBlendMode blendMode, SpriteSortMode sortMode)
 		{
-			// Use the textureOffset defined for X and Y along with the texture width and height to render the texture
-			Vector2 texOffsetPoint = new Vector2(image.TextureOffsetX, image.TextureOffsetY);
-			RenderSubImageAtPoint(image, point,texOffsetPoint,image.ImageWidth,image.ImageHeight);
+			_spriteDevice.StartSpriteBatch(blendMode,sortMode);
 		}
 		
-		internal static void RenderAt(ESImage image, Vector2 point, float[] texCoords, float[] quadVertices)
+		internal void EndSpriteBatch()
 		{
-			// Save the current matrix to the stack
-			GL.PushMatrix();
-	
-			// Move to where we want to draw the image
-			GL.Translate(point.X, point.Y+image.Origin.Y*2, 0.0f);
-	
-			// Rotate around the Z axis by the angle define for this image
-			// we cannot use radians
-			GL.Rotate(MathHelper.ToDegrees(-image.Rotation), 0.0f, 0.0f, 1.0f);
-	
-			// Set the glColor to apply alpha to the image
-			GL.Color4(image.FilterColor.X, image.FilterColor.Y, image.FilterColor.Z, image.FilterColor.W);
-	
-			// Set client states so that the Texture Coordinate Array will be used during rendering
-			GL.EnableClientState(All.TextureCoordArray);
-	
-			// Enable Texture_2D
-			GL.Enable(All.Texture2D);
-			
-			// Bind to the texture that is associated with this image
-			if (_activeTexture != image.Name) 
-			{
-				GL.BindTexture(All.Texture2D, image.Name);
-				_activeTexture = (int) image.Name;
-			}
-			
-			// Set up the VertexPointer to point to the vertices we have defined
-			GL.VertexPointer(2, All.Float, 0, quadVertices);
-			
-			// Set up the TexCoordPointer to point to the texture coordinates we want to use
-			GL.TexCoordPointer(2, All.Float, 0, texCoords);
-			
-			// Draw the vertices to the screen
-			GL.DrawArrays(All.TriangleStrip, 0, 4);
-			
-			// Disable as necessary
-			GL.Disable(All.Texture2D);
-			GL.DisableClientState(All.TextureCoordArray);
-			
-			// Restore the saved matrix from the stack
-			GL.PopMatrix();
+			_spriteDevice.EndSpriteBatch();
 		}
 		
-		internal static void RenderSubImageAtPoint(ESImage image, Vector2 point, Vector2 offsetPoint, float subImageWidth, float subImageHeight)
+		internal void AddToSpriteBuffer(RenderMode renderInfo, Vector2 point, Rectangle textureRect)
 		{
-	
-			// Calculate the texture coordinates using the offset point from which to start the image and then using the width and height
-			// passed in
-			float[]	textureCoordinates = new float[8];
-			image.GetTextureCoordinates(textureCoordinates,0,new Rectangle((int)offsetPoint.X,(int)offsetPoint.Y,(int)subImageWidth,(int)subImageHeight));		
-	
-			// Calculate the width and the height of the quad using the current image scale and the width and height
-			// of the image we are going to render
-			float quadWidth = subImageWidth * image.HorizontalScale;
-			float quadHeight = subImageHeight * image.VerticalScale;
-	
-			// Define the vertices for each corner of the quad which is going to contain our image.
-			// We calculate the size of the quad to match the size of the subimage which has been defined.
-			// If center is true, then make sure the point provided is in the center of the image else it will be
-			// the bottom left hand corner of the image
-			float[] quadVertices = new float[8];
-			image.GetTextureVertices(quadVertices,0,subImageWidth,subImageHeight);
-	
-			// Now that we have defined the texture coordinates and the quad vertices we can render to the screen 
-			// using them
-			RenderAt(image, point, textureCoordinates,quadVertices);
-		}		
+			_spriteDevice.AddToSpriteBuffer(renderInfo,point,textureRect);				
+		}
 	}
 }
 

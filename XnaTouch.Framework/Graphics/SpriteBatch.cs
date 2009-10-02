@@ -50,14 +50,12 @@ namespace XnaTouch.Framework.Graphics
 {
     public class SpriteBatch : IDisposable
     {
-		private	SpriteBlendMode _blendMode;
 		private XnaTouch.Framework.Graphics.GraphicsDevice _device;
 		private object _tag;
 		private string _name;
 
         public SpriteBatch(XnaTouch.Framework.Graphics.GraphicsDevice graphicsDevice)
         {
-			_blendMode = SpriteBlendMode.AlphaBlend;
 			_device = graphicsDevice;
         }
 		
@@ -68,48 +66,26 @@ namespace XnaTouch.Framework.Graphics
 
         public void Begin(SpriteBlendMode blendMode)
         {
-			if (_blendMode != blendMode)
-			{
-				_blendMode = blendMode;
-				GraphicsDevice.ActiveTexture = -1;
-			}
-			
-			switch (blendMode)
-			{
-				case SpriteBlendMode.Additive :					
-					GL.Enable(All.Blend);
-					GL.BlendFunc(All.SrcAlpha,All.One);
-					break;
-				case SpriteBlendMode.AlphaBlend :
-					GL.Enable(All.Blend);
-					GL.BlendFunc(All.SrcAlpha, All.OneMinusSrcAlpha);					
-					break;
-				case SpriteBlendMode.None :
-					break;
-			}
-        }
+			GraphicsDevice.StartSpriteBatch(blendMode, SpriteSortMode.Deferred);
+		}
 		
 		public void End()
         {
-			switch (_blendMode)
-			{
-				case SpriteBlendMode.Additive :
-				case SpriteBlendMode.AlphaBlend :
-					GL.Disable(All.Blend);
-					break;
-				case SpriteBlendMode.None :
-					break;
-			}
+			GraphicsDevice.EndSpriteBatch();
         }
 
         public void Begin(SpriteBlendMode blendMode, SpriteSortMode sortMode, SaveStateMode stateMode)
         {
-			throw new NotImplementedException();
+			Begin(blendMode, sortMode, SaveStateMode.None,Matrix.Identity);
         }
 
         public void Begin(SpriteBlendMode blendMode, SpriteSortMode sortMode, SaveStateMode stateMode, Matrix transformMatrix)
         {
-			throw new NotImplementedException();
+			if (stateMode != SaveStateMode.None)
+			{
+				throw new NotSupportedException();
+			}
+			GraphicsDevice.StartSpriteBatch(blendMode, sortMode);
         }
 
         public void Dispose()
@@ -136,17 +112,20 @@ namespace XnaTouch.Framework.Graphics
 			if (texture == null)
 			{
 				throw new ArgumentException("texture cannot be NULL");
-			}
+			}			
 			
 			if (sourceRectangle.HasValue) 
 			{
 				// adjust filter color
-				texture.Image.FilterColor = color.ToEAGLColor();
-				// adjust the Y axis				
+				RenderMode mode = new RenderMode();
+				mode.Texture = texture;
+				mode.FilterColor = color;	
+				mode.LayerDepth = 0.0f;
+				// Adjust vertical axis
 				position.Y = ((int)UIScreen.MainScreen.Bounds.Height - position.Y)-sourceRectangle.Value.Height;
-				
+
 				//render
-				GraphicsDevice.RenderSubImageAtPoint(texture.Image, position, new Vector2(sourceRectangle.Value.X,sourceRectangle.Value.Y),sourceRectangle.Value.Width,sourceRectangle.Value.Height);				
+				GraphicsDevice.AddToSpriteBuffer(mode, position, sourceRectangle.Value);				
 			}
 			else 
 			{
@@ -161,44 +140,41 @@ namespace XnaTouch.Framework.Graphics
 				throw new ArgumentException("texture cannot be NULL");
 			}
 			
+			RenderMode mode = new RenderMode();
+			mode.Texture = texture;
+			// set the layer
+			mode.LayerDepth = layerDepth;
 			// adjust origin
-			texture.Image.Origin = origin;
+			mode.Origin = origin;
 			// adjust Flip
-			texture.Image.FlipHorizontal = ((effects & SpriteEffects.FlipHorizontally) != SpriteEffects.None);
-			texture.Image.FlipVertical = ((effects & SpriteEffects.FlipVertically) != SpriteEffects.None);			
+			mode.FlipHorizontal = ((effects & SpriteEffects.FlipHorizontally) != SpriteEffects.None);
+			mode.FlipVertical = ((effects & SpriteEffects.FlipVertically) != SpriteEffects.None);			
 			// adjust rotation
-			texture.Image.Rotation = rotation;
+			mode.Rotation = rotation;
 			// adjust filter color
-			texture.Image.FilterColor = color.ToEAGLColor();
-			// adjust the Y axis				
-			destinationRectangle.Y = ((int)UIScreen.MainScreen.Bounds.Height - destinationRectangle.Y)-destinationRectangle.Height;
-			
+			mode.FilterColor = color;
+				
+			// Adjust vertical axis
+			destinationRectangle.Y = ((int)UIScreen.MainScreen.Bounds.Height - destinationRectangle.Y)-destinationRectangle.Height;			
 			
 			if (sourceRectangle.HasValue)
 			{
 				// adjust the scale
-				texture.Image.HorizontalScale = (float) destinationRectangle.Width / (float)sourceRectangle.Value.Width;
-				texture.Image.VerticalScale = (float)destinationRectangle.Height / (float)sourceRectangle.Value.Height;	
-				
-				Rectangle r= sourceRectangle.Value;																			
+				mode.HorizontalScale = (float) destinationRectangle.Width / (float)sourceRectangle.Value.Width;
+				mode.VerticalScale = (float)destinationRectangle.Height / (float)sourceRectangle.Value.Height;	
+																						
 				//render
-				GraphicsDevice.RenderSubImageAtPoint(texture.Image, new Vector2(destinationRectangle.X,destinationRectangle.Y), new Vector2(r.X,r.Y),r.Width,r.Height);
+				GraphicsDevice.AddToSpriteBuffer(mode,new Vector2(destinationRectangle.X,destinationRectangle.Y), sourceRectangle.Value);
 			}
 			else 
 			{
 				// adjust the scale
-				texture.Image.HorizontalScale = (float) destinationRectangle.Width / (float)texture.Width;
-				texture.Image.VerticalScale = (float)destinationRectangle.Height / (float)texture.Height;	
+				mode.HorizontalScale = (float) destinationRectangle.Width / (float)texture.Width;
+				mode.VerticalScale = (float)destinationRectangle.Height / (float)texture.Height;	
 				//render		
-				GraphicsDevice.RenderAtPoint(texture.Image, new Vector2(destinationRectangle.X, destinationRectangle.Y));
+				
+				GraphicsDevice.AddToSpriteBuffer(mode, new Vector2(destinationRectangle.X, destinationRectangle.Y),texture.SourceRect);
 			}
-			
-			// back to normal
-			texture.Image.HorizontalScale = 1.0f;
-			texture.Image.VerticalScale = 1.0f;
-			texture.Image.Rotation = 0.0f;
-			texture.Image.FlipHorizontal = false;
-			texture.Image.FlipVertical = false;			
         }
 
         public void Draw(Texture2D texture, Vector2 position, Rectangle? sourceRectangle, Color color, float rotation, Vector2 origin, Vector2 scale, SpriteEffects effects, float layerDepth)
@@ -229,35 +205,61 @@ namespace XnaTouch.Framework.Graphics
 			
 			Draw(texture, destination, sourceRectangle, color, rotation, origin, effects, layerDepth);
         }
-
+		
         public void DrawString(SpriteFont spriteFont, string text, Vector2 position, Color color)
         {
-			spriteFont.Draw(this,text,position,color,0.0f,Vector2.Zero,1.0f,SpriteEffects.None,0);
+			DrawString(spriteFont,text,position,color,0.0f,Vector2.Zero,1.0f,SpriteEffects.None,1);
         }
 
         public void DrawString(SpriteFont spriteFont, StringBuilder text, Vector2 position, Color color)
         {
-			spriteFont.Draw(this,text.ToString(),position,color,0.0f,Vector2.Zero,1.0f,SpriteEffects.None,0);
+			DrawString(spriteFont,text.ToString(),position,color,0.0f,Vector2.Zero,1.0f,SpriteEffects.None,1);
         }
 
         public void DrawString(SpriteFont spriteFont, string text, Vector2 position, Color color, float rotation, Vector2 origin, Vector2 scale, SpriteEffects effects, float layerDepth)
         {
-			spriteFont.Draw(this,text,position,color,rotation,origin,scale,effects,layerDepth);
+			Vector2 org = origin;
+            foreach (char c in text)
+            {
+                if (c == '\n')
+                {
+                    org.Y -= spriteFont.LineSpacing * scale.Y;
+                    org.X = origin.X;
+                    continue;
+                }
+                if (spriteFont.characterData.ContainsKey(c) == false) continue;
+                GlyphData g = spriteFont.characterData[c];
+                Draw(spriteFont._texture, position, g.Glyph, color, rotation, org - new Vector2(g.Cropping.X, g.Cropping.Y), scale, SpriteEffects.None, layerDepth);
+                org.X -= (g.Kerning.Y + g.Kerning.Z + spriteFont.Spacing) * scale.X;
+            }
         }
 
         public void DrawString(SpriteFont spriteFont, string text, Vector2 position, Color color, float rotation, Vector2 origin, float scale, SpriteEffects effects, float layerDepth)
         {
-			spriteFont.Draw(this,text,position,color,rotation,origin,scale,effects,layerDepth);
+			Vector2 org = origin;
+            foreach (char c in text)
+            {
+                if (c == '\n')
+                {
+                    org.Y -= spriteFont.LineSpacing * scale;
+                    org.X = origin.X;
+                    continue;
+                }
+                if (spriteFont.characterData.ContainsKey(c) == false) continue;
+                GlyphData g = spriteFont.characterData[c];
+                Draw(spriteFont._texture, position, g.Glyph, color, rotation, org - new Vector2(g.Cropping.X, g.Cropping.Y), scale, SpriteEffects.None, layerDepth);
+                org.X -= (g.Kerning.Y + g.Kerning.Z + spriteFont.Spacing) * scale;
+            }
         }
 
         public void DrawString(SpriteFont spriteFont, StringBuilder text, Vector2 position, Color color, float rotation, Vector2 origin, Vector2 scale, SpriteEffects effects, float layerDepth)
         {
-			spriteFont.Draw(this,text.ToString(),position,color,rotation,origin,scale,effects,layerDepth);
+			DrawString(spriteFont,text.ToString(),position,color,rotation,origin,scale,effects,layerDepth);
         }
 
         public void DrawString(SpriteFont spriteFont, StringBuilder text, Vector2 position, Color color, float rotation, Vector2 origin, float scale, SpriteEffects effects, float layerDepth)
         {
-			throw new NotImplementedException();
+			DrawString(spriteFont,text.ToString(),position,color,rotation,origin,scale,effects,layerDepth);
         }
 
         public XnaTouch.Framework.Graphics.GraphicsDevice GraphicsDevice
