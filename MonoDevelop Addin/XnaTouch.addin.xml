@@ -1,0 +1,26 @@
+<Addin id          = "XnaTouch"
+       namespace   = "MonoDevelop"
+       name        = "XnaTouch Project Template"
+       author      = "José Antonio Leal de Farias"
+       copyright   = "LGPL 2.1"
+       url         = "http://xnatouch.codeplex.com/"
+       description = "Templates for creating games with XnaTouch."
+       category    = "IPhone"
+       version     = "2.1.0">
+	
+	<Runtime>
+		<Import file = "XnaTouchGameProject.xpt.xml"/>
+        <Import file = "gameicon.png"/>
+        <Import file = "Default.png"/>
+    </Runtime>
+	
+	<Dependencies>
+		<Addin id = "Ide" version="2.1.0"/>
+		<Addin id = "CSharpBinding" version = "2.1.0" />
+	</Dependencies>
+
+	<Extension path = "/MonoDevelop/Ide/ProjectTemplates">
+		<ProjectTemplate id   = "XnaTouchGameProject"
+		                 file = "XnaTouchGameProject.xpt.xml"/>
+	</Extension>
+</Addin>

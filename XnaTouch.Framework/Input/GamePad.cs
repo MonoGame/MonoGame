@@ -51,13 +51,11 @@ using MonoTouch.AudioToolbox;
     public class GamePad
     {
 		private static GamePad _instance;
-		private float _transparency = 0.6f;
 		private float _thumbStickRadius = 20*20;	
 		private bool _visible;
 		private List<ButtonDefinition> _buttonsDefinitions;
 		private ThumbStickDefinition _leftThumbDefinition,_rightThumbDefinition;
-		private bool _useAccelerometer = false;
-		
+		private Color _alphaColor = Color.DarkGray;		
 		private int _buttons;
 		private Vector2 _leftStick, _rightStick;
 		
@@ -65,6 +63,10 @@ using MonoTouch.AudioToolbox;
 		{
 			_visible = true;
 			_buttonsDefinitions = new List<ButtonDefinition>();
+			
+			// Set the transparency Level
+			_alphaColor.A = 100;
+	
 			Reset();
 		}
 		
@@ -78,29 +80,6 @@ using MonoTouch.AudioToolbox;
 				}
 				return _instance;
 			}
-		}
-		
-		public static bool UseAccelerometer {
-			get 
-			{
-				return Instance._useAccelerometer;
-			}
-			set 
-			{
-				Instance._useAccelerometer = value;
-				if (value)
-				{
-					_instance.SetupAccelerometer();
-				}
-			}
-		}
-		
-		private void SetupAccelerometer()
-		{
-			UIAccelerometer.SharedAccelerometer.UpdateInterval = 1/30;
-			UIAccelerometer.SharedAccelerometer.Acceleration += delegate(object sender, UIAccelerometerEventArgs e) {												
-				Instance._leftStick = new Vector2((float)e.Acceleration.X*2,(float)e.Acceleration.Y*2);
-			};
 		}
 		
 		public void Reset()
@@ -161,8 +140,13 @@ using MonoTouch.AudioToolbox;
         }
 
         public static bool SetVibration(PlayerIndex playerIndex, float leftMotor, float rightMotor)
-        {		
-			//SystemSound.PlaySystemSound ( SystemSound.Vibrate();
+        {	
+			if (playerIndex != PlayerIndex.One) 
+			{
+				throw new NotSupportedException("Only one player!");
+			}
+			
+			SystemSound.Vibrate.PlaySystemSound();
             return true;
         }
 		
@@ -365,28 +349,8 @@ using MonoTouch.AudioToolbox;
 			return hitInButton;
 		}
 		 
-		internal static void Update()
-		{
-			if (_instance._useAccelerometer)
-			{
-				_instance.SetupAccelerometer();
-			}
-		}
-		
 		#region render virtual gamepad
 		
-		public static float Transparency
-		{
-			get
-			{
-				return Instance._transparency;
-			}
-			set
-			{
-				Instance._transparency = value;
-			}
-		}		
-
 		public static List<ButtonDefinition> ButtonsDefinitions
 		{
 			get 
@@ -395,54 +359,46 @@ using MonoTouch.AudioToolbox;
 			}
 		}
 		
-		public static void Draw(GameTime gameTime )
+		public static void Draw(GameTime gameTime, SpriteBatch batch )
 		{		
-			Instance.Render(gameTime);		
+			Instance.Render(gameTime,batch);		
 		}
 		
-		internal void Render(GameTime gameTime)
+		internal void Render(GameTime gameTime, SpriteBatch batch)
 		{
-			GL.Enable(All.Blend);
-			
 			// render buttons
 			foreach (ButtonDefinition button in _buttonsDefinitions)
 			{
-				RenderButton(button);
+				RenderButton(button, batch);
 			}			
 			
 			// Render the thumbsticks
 			if (_leftThumbDefinition != null)
 			{
-				RenderThumbStick(_leftThumbDefinition);
+				RenderThumbStick(_leftThumbDefinition, batch);
 			}
 			if (_rightThumbDefinition != null)
 			{
-				RenderThumbStick(_rightThumbDefinition);
+				RenderThumbStick(_rightThumbDefinition, batch);
 			}
-	
-			GL.Disable(All.Blend);
 		}
 		
-		private void RenderButton(ButtonDefinition theButton)
+		private void RenderButton(ButtonDefinition theButton, SpriteBatch batch)
 		{
-			Vector2 position = theButton.Position;
-			position.Y = (480 - position.Y)-theButton.TextureRect.Height;
-			
-			theButton.Texture.Image.FilterColor = Color.DarkGray.ToEAGLColor();
-			theButton.Texture.Image.SetAlpha(_transparency);			
-			GraphicsDevice.RenderSubImageAtPoint(theButton.Texture.Image, position,new Vector2(theButton.TextureRect.Left, theButton.TextureRect.Top),
-			                                              theButton.TextureRect.Width, theButton.TextureRect.Height);
+			if (batch == null)
+			{
+				throw new InvalidOperationException("SpriteBatch not set.");
+			}
+			batch.Draw(theButton.Texture,theButton.Position,theButton.TextureRect,_alphaColor);
 		}
 		
-		private void RenderThumbStick(ThumbStickDefinition theStick)
+		private void RenderThumbStick(ThumbStickDefinition theStick, SpriteBatch batch)
 		{
-			Vector2 position = theStick.Position + theStick.Offset;
-			position.Y = (480 - position.Y)-theStick.TextureRect.Height;
-			
-			theStick.Texture.Image.FilterColor = Color.DarkGray.ToEAGLColor();
-			theStick.Texture.Image.SetAlpha(_transparency);			
-			GraphicsDevice.RenderSubImageAtPoint(theStick.Texture.Image, position,new Vector2(theStick.TextureRect.Left, theStick.TextureRect.Top),
-			                                              theStick.TextureRect.Width, theStick.TextureRect.Height);
+			if (batch == null)
+			{
+				throw new InvalidOperationException("SpriteBatch not set.");
+			}
+			batch.Draw(theStick.Texture,theStick.Position + theStick.Offset,theStick.TextureRect,_alphaColor);
 		}
 		
 		#endregion

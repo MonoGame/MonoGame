@@ -109,8 +109,6 @@ namespace XnaTouch.Framework
 
         #endregion
 
-
-
         public void ApplyChanges()
         {
         }

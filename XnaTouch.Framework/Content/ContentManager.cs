@@ -97,8 +97,6 @@ namespace XnaTouch.Framework.Content
                 }
             }
 			
-			int i=0;
-			
 			if (string.IsNullOrEmpty(assetName))
 			{
 				throw new ArgumentException("assetname");
@@ -126,6 +124,10 @@ namespace XnaTouch.Framework.Content
 			{
 				assetName = SoundEffectReader.Normalize(assetName);
 			}
+			if ((typeof(T) == typeof(Video))) 
+			{
+				assetName = Video.Normalize(assetName);
+			}
 			
 			if (string.IsNullOrEmpty(assetName))
 			{	
@@ -142,6 +144,8 @@ namespace XnaTouch.Framework.Content
 					result = new Song (assetName);		
 				if ((typeof(T) == typeof(SoundEffect)))
 					result = new SoundEffect (assetName);		
+				if ((typeof(T) == typeof(Video)))
+					result = new Video (assetName);		
 			}
 			else 
 			{
