@@ -120,7 +120,8 @@ namespace XnaTouch.Samples.Draw2D
 			spriteBatch.Begin();
 			
 			// Normal draw
-			spriteBatch.Draw(ball,new Vector2(200,300),Color.White);		
+			spriteBatch.Draw(ball,new Vector2(200,300),Color.White);	
+			spriteBatch.Draw(ball,new Vector2(200,300),null,Color.Yellow,0.0f,new Vector2(5,5),1.0f,SpriteEffects.None,0);	
 
 			// Normal draw
 			spriteBatch.Draw(texture,new Vector2(10,390),Color.White);		

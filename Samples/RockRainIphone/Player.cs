@@ -97,31 +97,14 @@ namespace RockRainIphone
         /// </summary>
         protected void HandleInput()
         {
-            // Move the ship with xbox controller
-            GamePadState gamepadstatus = GamePad.GetState(PlayerIndex.One);
-            /*
-            =================================
-            DPAD IS NOT SUPPORTED IN XNATOUCH
-            =================================
-            if (gamepadstatus.DPad.Left == ButtonState.Pressed)
-            {
-                position.X -= 3;
-            }
-            if (gamepadstatus.DPad.Right == ButtonState.Pressed)
-            {
-                position.X += 3;
-            }
-            if (gamepadstatus.DPad.Down == ButtonState.Pressed)
-            {
-                position.Y += 3;
-            }
-            if (gamepadstatus.DPad.Up == ButtonState.Pressed)
-            {
-                position.Y -= 3;
-       			 }*/
-            // Check the thumbstick also
+			GamePadState gamepadstatus = GamePad.GetState(PlayerIndex.One);
+            // Check the thumbstick
             position.Y += (int)(gamepadstatus.ThumbSticks.Left.Y * -4);
             position.X += (int)(gamepadstatus.ThumbSticks.Left.X * 4);
+			
+			// Check the accelerometer
+			position.Y += (int)(Accelerometer.GetState().Acceleration.Y * -4);
+            position.X += (int)(Accelerometer.GetState().Acceleration.X * 4);
         }
 
         /// <summary>

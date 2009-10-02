@@ -3,6 +3,7 @@ using MonoTouch.UIKit;
 using XnaTouch;
 using XnaTouch.Samples;
 using XnaTouch.Samples.GameComponents;
+using XnaTouch.Framework;
 
 namespace XnaTouch.Samples.GameComponents
 {
@@ -15,12 +16,14 @@ namespace XnaTouch.Samples.GameComponents
 		{
 			// Fun begins..
 			game = new Game1();
-			game.Run();
+			game.Run();			
 		}
-
+		
 		static void Main (string [] args)
 		{
+			NSAutoreleasePool pool = new NSAutoreleasePool();
 			UIApplication.Main (args,null,"AppDelegate");
+			pool.Dispose();
 		}
 	}
 }

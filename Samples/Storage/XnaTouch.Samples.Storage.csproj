@@ -56,7 +56,7 @@
     <Compile Include="SaveGame.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\XnaToutch.Framework\XnaTouch.Framework.csproj">
+    <ProjectReference Include="..\..\XnaTouch.Framework\XnaTouch.Framework.csproj">
       <Project>{DB8508BB-9849-4CC2-BC0F-8EB5DACB3C47}</Project>
       <Name>XnaTouch.Framework</Name>
     </ProjectReference>

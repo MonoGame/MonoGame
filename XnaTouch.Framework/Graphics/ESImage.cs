@@ -56,10 +56,6 @@ namespace XnaTouch.Framework.Graphics
 		private int textureWidth;
 		// The texture coordinate height to use to find the image
 		private int textureHeight;
-		// The maximum texture coordinate width maximum 1.0f
-		private float maxTexWidth;
-		// The maximum texture coordinate height maximum 1.0f
-		private float maxTexHeight;
 		// The texture width to pixel ratio
 		private float texWidthRatio;
 		// The texture height to pixel ratio
@@ -68,19 +64,6 @@ namespace XnaTouch.Framework.Graphics
 		private int	textureOffsetX;
 		// The Y offset to use when looking for our image
 		private int textureOffsetY;
-		// Angle to which the image should be rotated
-		private float _rotation;
-		// Scale at which to draw the image
-		private float _vscale, _hscale;
-		// Colour Filter = Red, Green, Blue, Alpha
-		private Vector4 colourFilter;
-		// Horizontal Flip
-		private bool _flipHorizontal;
-		// Vertical Flip
-		private bool _flipVertical;
-		// Image origin
-		private Vector2 _origin;
-		
 		
 		public ESImage ()
 		{
@@ -90,122 +73,55 @@ namespace XnaTouch.Framework.Graphics
 			textureHeight = 0;
 			texWidthRatio = 0.0f;
 			texHeightRatio = 0.0f;
-			maxTexWidth = 0.0f;
-			maxTexHeight = 0.0f;
 			textureOffsetX = 0;
 			textureOffsetY = 0;
-			_rotation = 0.0f;
-			_hscale = 1.0f;
-			_vscale = 1.0f;
-			colourFilter.X = 1.0f;
-			colourFilter.Y = 1.0f;
-			colourFilter.Z = 1.0f;
-			colourFilter.W = 1.0f;
-			_flipVertical = false;
-			_flipHorizontal = false;
-			_origin = Vector2.Zero;
 		}
 		
-		private void initImpl()
+		private void Initialize()
 		{
 			imageWidth = texture.ContentSize.Width;
 			imageHeight = texture.ContentSize.Height;
 			textureWidth = texture.PixelsWide;
 			textureHeight = texture.PixelsHigh;
-			maxTexWidth = imageWidth / (float)textureWidth;
-			maxTexHeight = imageHeight / (float)textureHeight;
 			texWidthRatio = 1.0f / (float)textureWidth;
 			texHeightRatio = 1.0f / (float)textureHeight;
 			textureOffsetX = 0;
 			textureOffsetY = 0;
-			_rotation = 0.0f;
-			colourFilter.X = 1.0f;
-			colourFilter.Y = 1.0f;
-			colourFilter.Z = 1.0f;
-			colourFilter.W = 1.0f;
-			_origin = Vector2.Zero;
 		}
 
-		
 		public ESImage(ESTexture2D tex)
 		{
 			texture = tex;
-			_hscale = 1.0f;
-			_vscale = 1.0f;
-			initImpl();
+			Initialize();
 		}
 
 		public ESImage(ESTexture2D tex, float imageScale)
 		{
 			texture = tex;
-			_hscale = imageScale;
-			_vscale = imageScale;
-			initImpl();
+			Initialize();
 		}
 		
 		public ESImage(UIImage image)
 		{
 			// By default set the scale to 1.0f and the filtering to GL_NEAREST
 			texture = new ESTexture2D(image,All.Nearest);
-			_hscale = 1.0f;
-			_vscale = 1.0f;
-			initImpl();
+			Initialize();
 		}
 
 		public ESImage(UIImage image, All filter)
 		{			
 			// By default set the scale to 1.0f
 			texture = new ESTexture2D(image,filter);
-			_hscale = 1.0f;
-			_vscale = 1.0f;
-			initImpl();
+			Initialize();
 		}
 		
 		public ESImage(UIImage image, float imageScale, All filter)
 		{
 			texture = new ESTexture2D(image,filter);
-			_hscale = imageScale;
-			_vscale = imageScale;
-			initImpl();
+			Initialize();
 		}
 		
-		public float HorizontalScale 
-		{
-			get 
-			{
-				return _hscale;
-			}
-			set 
-			{
-				_hscale = value;
-			}
-		}
-		
-		public float VerticalScale 
-		{
-			get 
-			{
-				return _vscale;
-			}
-			set 
-			{
-				_vscale = value;
-			}
-		}
-		
-		public Vector2 Origin
-		{
-			get
-			{
-				return _origin;
-			}
-			
-			set 
-			{
-				_origin = value;
-			}
-		}
-		
+				
 		public int TextureOffsetX 
 		{
 			get 
@@ -241,31 +157,7 @@ namespace XnaTouch.Framework.Graphics
 				imageWidth = value;
 			}
 		}
-		
-		public bool FlipHorizontal
-		{
-			get
-			{
-				return _flipHorizontal;
-			}
-			set 
-			{
-				_flipHorizontal = value;
-			}
-		}
-		
-		public bool FlipVertical
-		{
-			get
-			{
-				return _flipVertical;
-			}
-			set 
-			{
-				_flipVertical = value;
-			}
-		}
-		
+				
 		public int ImageHeight
 		{
 			get 
@@ -277,19 +169,7 @@ namespace XnaTouch.Framework.Graphics
 				imageHeight = value;
 			}
 		}
-		
-		public float Rotation
-		{
-			get 
-			{
-				return _rotation;
-			}
-			set 
-			{
-				_rotation = value;
-			}
-		}
-	
+			
 		public ESImage GetSubImageAtPoint(Vector2 point, int subImageWidth, int subImageHeight, float subImageScale)
 		{
 			//Create a new Image instance using the texture which has been assigned to the current instance
@@ -302,57 +182,7 @@ namespace XnaTouch.Framework.Graphics
 			subImage.ImageWidth = subImageWidth;
 			subImage.ImageHeight = subImageHeight;
 	
-			// Set the rotatoin of the subImage to match the current images rotation
-			subImage.Rotation = _rotation;
-	
 			return subImage;
-		}
-		
-		public void GetTextureVertices (float[] quadVertices, int index, float subImageWidth, float subImageHeight)
-		{
-			float quadWidth = subImageWidth * _hscale;
-			float quadHeight = subImageHeight * _vscale;
-			
-			if (!_flipVertical && !_flipHorizontal) {
-				quadVertices[0+index] = quadWidth - _origin.X;
-				quadVertices[1+index] = quadHeight - _origin.Y;
-				quadVertices[2+index] = quadWidth - _origin.X;
-				quadVertices[3+index] = -_origin.Y;
-				quadVertices[4+index] = -_origin.X;
-				quadVertices[5+index] = quadHeight - _origin.Y;
-				quadVertices[6+index] = -_origin.X;
-				quadVertices[7+index] = -_origin.Y;
-			}
-			if (!_flipVertical && _flipHorizontal) {
-				quadVertices[0+index] = -_origin.X;
-				quadVertices[1+index] = quadHeight - _origin.Y;
-				quadVertices[2+index] = -_origin.X;
-				quadVertices[3+index] = -_origin.Y;
-				quadVertices[4+index] = quadWidth - _origin.X;
-				quadVertices[5+index] = quadHeight - _origin.Y;
-				quadVertices[6+index] = quadWidth - _origin.X;
-				quadVertices[7+index] = -_origin.Y;
-			}
-			if (_flipVertical && !_flipHorizontal) {
-				quadVertices[0+index] = quadWidth - _origin.X;
-				quadVertices[1+index] = -_origin.Y;
-				quadVertices[2+index] = quadWidth - _origin.X;
-				quadVertices[3+index] = quadHeight - _origin.Y;
-				quadVertices[4+index] = -_origin.X;
-				quadVertices[5+index] = -_origin.Y;
-				quadVertices[6+index] = -_origin.X;
-				quadVertices[7+index] = quadHeight - _origin.Y;
-			}
-			if (_flipVertical && _flipHorizontal) {
-				quadVertices[0+index] = -_origin.X;
-				quadVertices[1+index] = -_origin.Y;
-				quadVertices[2+index] = -_origin.X;
-				quadVertices[3+index] = quadHeight - _origin.Y;
-				quadVertices[4+index] = quadWidth - _origin.X;
-				quadVertices[5+index] = -_origin.Y;
-				quadVertices[6+index] = quadWidth - _origin.X;
-				quadVertices[7+index] = quadHeight - _origin.Y;
-			}			
 		}
 
 		public void GetTextureCoordinates (float[] textureCoordinates, int index, Rectangle TextureRect)
@@ -367,25 +197,9 @@ namespace XnaTouch.Framework.Graphics
 			textureCoordinates [7+index] = texHeightRatio * TextureRect.Height + (texHeightRatio * TextureRect.Top);
 		}
 
-		public Vector4 FilterColor
-		{
-			set 
-			{
-				colourFilter = value;
-			}
-			get 
-			{
-				return colourFilter;
-			}
-			
-		}
 		
-		public void SetAlpha(float alpha)
+		public uint Name 
 		{
-			colourFilter.W = alpha;
-		}
-		
-		public uint Name {
 			get
 			{
 				return texture.Name;

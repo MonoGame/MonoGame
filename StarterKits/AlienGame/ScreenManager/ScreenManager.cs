@@ -108,7 +108,6 @@ namespace AlienGameSample
             // Tell each of the screens to load their content.
             foreach (GameScreen screen in screens)
             {
-				Console.WriteLine("5");
                 screen.LoadContent();
             }
         }

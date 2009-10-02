@@ -9,12 +9,13 @@
     <ProjectTypeGuids>{E613F3A2-FE9C-494F-B74E-F63BCB86FEA6};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <MainNibFile>MainWindow.xib</MainNibFile>
-    <AssemblyName>XnaToutch.Framework</AssemblyName>
+    <AssemblyName>XnaTouch.Framework</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <Description>Xna implementation for MonoTouch</Description>
     <RootNamespace>XnaTouch.Framework</RootNamespace>
     <SynchReleaseVersion>false</SynchReleaseVersion>
     <BundleDisplayName>XnaTouch</BundleDisplayName>
+    <ReleaseVersion>0.3</ReleaseVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhoneSimulator' ">
     <DebugSymbols>true</DebugSymbols>
@@ -165,6 +166,15 @@
     <Compile Include="Media\MediaSource.cs" />
     <Compile Include="Media\MediaLibrary.cs" />
     <Compile Include="Media\Playlist.cs" />
+    <Compile Include="Graphics\GraphicsDevice2D.cs" />
+    <Compile Include="ReusableItemList.cs" />
+    <Compile Include="PerformanceCounter.cs" />
+    <Compile Include="Input\Accelerometer.cs" />
+    <Compile Include="Input\AccelerometerCapabilities.cs" />
+    <Compile Include="Input\AccelerometerState.cs" />
+    <Compile Include="Media\Video.cs" />
+    <Compile Include="Media\VideoPlayer.cs" />
+    <Compile Include="GameComponentCollectionEventArgs.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>

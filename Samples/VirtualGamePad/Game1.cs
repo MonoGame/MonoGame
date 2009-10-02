@@ -29,7 +29,7 @@ namespace XnaTouch.Samples.VirtualGamePad
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
 			
-			graphics.IsFullScreen = true;		
+			graphics.IsFullScreen = true;					
         }
 
         /// <summary>
@@ -84,8 +84,6 @@ namespace XnaTouch.Samples.VirtualGamePad
 			thumbStick.TextureRect = new Rectangle(2,2,68,68);
 			
 			GamePad.LeftThumbStickDefinition = thumbStick;
-			
-			GamePad.UseAccelerometer = true;
         }
 
         /// <summary>
@@ -116,7 +114,7 @@ namespace XnaTouch.Samples.VirtualGamePad
 						
 			if (GamePad.GetState(PlayerIndex.One).Buttons.B == ButtonState.Pressed)
 				caracterColor = Color.Red;
-			
+						
 			//  change the caracter position and center in touch
             //MouseState mouse = Mouse.GetState();
             //position.X = mouse.X - (caracter.Width/2);
@@ -126,6 +124,10 @@ namespace XnaTouch.Samples.VirtualGamePad
 			GamePadState gamepastatus = GamePad.GetState(PlayerIndex.One);
 			position.Y += (int) (gamepastatus.ThumbSticks.Left.Y * -4);
 			position.X += (int) (gamepastatus.ThumbSticks.Left.X * 4);
+			
+			// change the caracter position using accelerometer
+			//position.Y += (int)(Accelerometer.GetState().Acceleration.Y * -4);
+            //position.X += (int)(Accelerometer.GetState().Acceleration.X * 4);
 						
 			//  Keep inside the screen
             //  right
@@ -163,6 +165,11 @@ namespace XnaTouch.Samples.VirtualGamePad
 			spriteBatch.Begin();
 			spriteBatch.Draw(caracter,position,caracterColor);
 			spriteBatch.DrawString(font,GamePad.GetState(PlayerIndex.One).ThumbSticks.Left.ToString(),Vector2.One,Color.Black);
+			spriteBatch.DrawString(font,Accelerometer.GetState().Acceleration.ToString(),new Vector2(1,40),Color.Black);
+			
+			// Draw the virtual GamePad
+			GamePad.Draw(gameTime,spriteBatch);
+			
 			spriteBatch.End();
 			
             base.Draw(gameTime);

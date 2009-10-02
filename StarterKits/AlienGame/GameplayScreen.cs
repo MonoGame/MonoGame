@@ -284,8 +284,6 @@ namespace AlienGameSample
             {
                 if (gameOver == true)
                 {
-					// Disable accelerometer
-					GamePad.UseAccelerometer = false;
 					MediaPlayer.Stop();
 					
                     foreach (GameScreen screen in ScreenManager.GetScreens())
@@ -305,6 +303,9 @@ namespace AlienGameSample
                 // to occur at once so that touchpad devices don't get double hits.
                 player.Velocity.X = MathHelper.Min(input.CurrentGamePadStates.ThumbSticks.Left.X * 2.0f, 1.0f);
 
+				// Add the accelerometer support
+				//player.Velocity.X = MathHelper.Min(Accelerometer.GetState().Acceleration.X * 2.0f, 1.0f);
+				
                 // tap the screen to shot
                 //if ((Mouse.GetState().X != 0) || (Mouse.GetState().Y != 0))
 				if (input.MenuSelect)
@@ -529,8 +530,6 @@ namespace AlienGameSample
         /// </summary>
         void Start()
         {		
-			// Active the Accelerometer
-			GamePad.UseAccelerometer = true;
 			MediaPlayer.Volume = 0.2f;
 			MediaPlayer.Play(backMusic);
 			
@@ -767,6 +766,9 @@ namespace AlienGameSample
             DrawForeground(elapsedTime);
             
             DrawHud();
+			
+			// Draw the GamePad
+			GamePad.Draw(gameTime,ScreenManager.SpriteBatch);
 		
             ScreenManager.SpriteBatch.End();
         }

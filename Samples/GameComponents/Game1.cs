@@ -20,6 +20,8 @@ namespace XnaTouch.Samples.GameComponents
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;		
 		Texture2D texture;
+		Random randomizer;
+		SpriteFont font;
 
         public Game1()
         {
@@ -27,6 +29,8 @@ namespace XnaTouch.Samples.GameComponents
             Content.RootDirectory = "Content";
 			
 			graphics.IsFullScreen = true;		
+			
+			randomizer = new Random(DateTime.Now.TimeOfDay.Milliseconds);
         }
 
         /// <summary>
@@ -53,12 +57,21 @@ namespace XnaTouch.Samples.GameComponents
 
             // TODO: use this.Content to load your game content here
             texture = Content.Load<Texture2D>("xnatouchicon");
+			font = Content.Load<SpriteFont>("font");
+						
+			for (int i=0;i<50;i++)
+				AddSprite();
 			
-			Components.Add(new Sprite(this,texture,Vector2.Zero,new Vector2(15,10),spriteBatch));
-			Components.Add(new Sprite(this,texture,new Vector2(20,20),new Vector2(25,20),spriteBatch));
-			Components.Add(new Sprite(this,texture,new Vector2(120,120),new Vector2(5,2),spriteBatch));
+			Components.Add(new FPSCounterComponent(this,spriteBatch,font));
         }
 
+		private void AddSprite()
+		{
+			Vector2 speed = new Vector2(5+randomizer.Next(10),5+randomizer.Next(10));
+			Vector2 position = new Vector2(randomizer.Next(260),randomizer.Next(400));
+			Components.Add(new Sprite(this,texture,position, speed, spriteBatch));
+		}
+		
         /// <summary>
         /// UnloadContent will be called once per game and is the place to unload
         /// all content.
@@ -78,6 +91,11 @@ namespace XnaTouch.Samples.GameComponents
         {
             // TODO: Add your update logic here
 			
+			if ((Mouse.GetState().X != 0) || (Mouse.GetState().Y != 0))
+			{
+				AddSprite();
+				Mouse.SetPosition(0,0);
+			}
             base.Update(gameTime);
         }
 
@@ -90,10 +108,14 @@ namespace XnaTouch.Samples.GameComponents
            	graphics.GraphicsDevice.Clear(Color.CornflowerBlue);
 			
 			spriteBatch.Begin();
-			
+						
 			base.Draw(gameTime);
 			
-			spriteBatch.End();            
+			spriteBatch.DrawString(font,"Tap to add a new sprite",new Vector2(0,25),Color.White);
+			spriteBatch.DrawString(font,"Sprite count: " + (Components.Count-1).ToString(),new Vector2(150,0),Color.White);
+
+
+			spriteBatch.End();  			
         }
     }
 }

@@ -77,8 +77,7 @@ namespace RockRainIphone
 			ThumbStickDefinition thumbStick = new ThumbStickDefinition();
 			thumbStick.Position = new Vector2(220,400);
 			thumbStick.Texture = gamepadTexture;
-			thumbStick.TextureRect = new Rectangle(2,2,68,68);
-			
+			thumbStick.TextureRect = new Rectangle(2,2,68,68);	
 			GamePad.LeftThumbStickDefinition = thumbStick;
 			
             // Create the audio bank
@@ -242,6 +241,7 @@ namespace RockRainIphone
             // Draw all Game Components..
             base.Draw(gameTime);
 
+			GamePad.Draw(gameTime,spriteBatch);
             // End.
             spriteBatch.End();
 						

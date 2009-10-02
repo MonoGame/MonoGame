@@ -40,40 +40,89 @@
 // 
 
 using System;
-using System.Collections.Generic;
-using MonoTouch.UIKit;
+using XnaTouch.Framework.Graphics;
+using MonoTouch.MediaPlayer;
+using MonoTouch.Foundation;
 
 namespace XnaTouch.Framework.Media
 {
-	public sealed class MediaSource
+    public sealed class VideoPlayer
     {
-		private MediaSourceType _type;
-		private string _name;
-		internal MediaSource (string name, MediaSourceType type)
-		{
-			_type = type;
-		}
-				
-        public XnaTouch.Framework.Media.MediaSourceType MediaSourceType
+		private Video  _video;
+		private MediaState _state;
+		private bool _isLooped;
+		
+        public VideoPlayer()
+        {
+			_state = MediaState.Stopped;
+        }
+
+        public Texture2D GetTexture()
+        {
+			throw new NotImplementedException();
+        }
+
+        public void Pause()
+        {
+			throw new NotImplementedException();
+        }
+		
+		 public MediaState State
         {
             get
             {
-				return _type;
+				return _state;
+            }
+        }
+		
+		private void PlayVideo()
+		{
+			NSNotificationCenter.DefaultCenter.AddObserver("MPMoviePlayerPlaybackDidFinishNotification",(NSNotification) => OnStop(null),_video.Movie);			
+			_state = MediaState.Playing;
+			Game._playingVideo = true;
+			_video.Movie.Play();			 
+		}
+
+        public void Play(XnaTouch.Framework.Media.Video video)
+        {	
+			_video = video;
+			PlayVideo();		
+        }
+		
+		private void OnStop(NSNotification e)
+		{	
+			Stop();
+			if (_isLooped)
+				PlayVideo();
+		}
+
+        public void Stop()
+        {
+			_video.Movie.Stop();
+			_video.Reset();
+			_state = MediaState.Stopped;
+			Game._playingVideo = false;
+        }
+
+        public bool IsLooped
+        {
+            get
+            {
+				return _isLooped;
+            }
+            set
+            {
+				_isLooped = value;
             }
         }
 
-        public string Name
+        public XnaTouch.Framework.Media.Video Video
         {
             get
             {
-				return _name;
+                return _video;
             }
-        }
-	
-		public static IList<MediaSource> GetAvailableMediaSources()
-        {
-			MediaSource[] result = { new MediaSource(UIDevice.CurrentDevice.SystemName, MediaSourceType.LocalDevice) };
-			return result;
         }
     }
 }
+

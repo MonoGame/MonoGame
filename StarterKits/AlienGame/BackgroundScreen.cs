@@ -68,7 +68,6 @@ namespace AlienGameSample
 			thumbStick.TextureRect = new Rectangle(2,2,68,68);
 			
 			GamePad.LeftThumbStickDefinition = thumbStick;
-			
         }
 
         /// <summary>
@@ -104,6 +103,9 @@ namespace AlienGameSample
             // Title
             spriteBatch.Draw(title, new Vector2((320-title.Width)/2, 60), new Color(255, 255, 255, TransitionAlpha));
 
+			// Draw the GamePad
+			GamePad.Draw(gameTime,spriteBatch);
+			
             spriteBatch.End();
         }
     }

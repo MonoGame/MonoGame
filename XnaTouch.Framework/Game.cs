@@ -46,6 +46,7 @@ using MonoTouch.CoreAnimation;
 using MonoTouch.CoreFoundation;
 using MonoTouch.UIKit;
 using XnaTouch.Framework.Input;
+using System.Threading;
 
 namespace XnaTouch.Framework
 {
@@ -54,39 +55,44 @@ namespace XnaTouch.Framework
         private GameTime _updateGameTime;
         private GameTime _drawGameTime;
         private DateTime _lastUpdate;
+		private TimeSpan _timeSinceLast;
         private bool _initialized = false;
         private GameComponentCollection _gameComponentCollection;
         public GameServiceContainer _services;
         private ContentManager _content;
         private GameWindow _window;
 		private bool _isFixedTimeStep = true;
-        private TimeSpan _targetElapsedTime = TimeSpan.FromSeconds(1 / 60.0); // 60 frames per second
-        private TimeSpan _timeSinceLast = TimeSpan.Zero;
+        private TimeSpan _targetElapsedTime = TimeSpan.FromSeconds(1 / 60.0); // ~60 frames per second
+        
 		private NSTimer _animationTimer;
 		private IGraphicsDeviceManager graphicsDeviceManager;
 		private IGraphicsDeviceService graphicsDeviceService;
 		private UIWindow _mainWindow;
+		internal static bool _playingVideo = false;
 		
 		 public Game()
         {           
 			// Initialize collections
 			_services = new GameServiceContainer();
 			_gameComponentCollection = new GameComponentCollection();
+
+			// Initialize OpenGL funcionts
+			OpenTK.Platform.Utilities.CreateGraphicsContext(MonoTouch.OpenGLES.EAGLRenderingAPI.OpenGLES1);
+
 			//Create a full-screen window
 			_mainWindow = new UIWindow (UIScreen.MainScreen.Bounds);
 			_window = new IphoneWindow ();
+			_window.BackgroundColor = UIColor.Black;
+			_window.Opaque = true;
 			((IphoneWindow) _window).game = this;
 			_mainWindow.AddSubview (_window);			
 			//Show the window
-			_mainWindow.MakeKeyAndVisible ();			
-			
-			// Initialize OpenGL funcionts
-			OpenTK.Platform.Utilities.CreateGraphicsContext(MonoTouch.OpenGLES.EAGLRenderingAPI.OpenGLES1);
+			_mainWindow.MakeKeyAndVisible ();						
 		
 			// Initialize GameTime
             _updateGameTime = new GameTime();
-            _drawGameTime = new GameTime();      
-        }
+            _drawGameTime = new GameTime();  	
+		}
 		
 		public void Dispose ()
 		{
@@ -139,34 +145,72 @@ namespace XnaTouch.Framework
 		private void CreateTimer ()
 		{
 			_animationTimer = null;
-			_animationTimer = NSTimer.CreateRepeatingScheduledTimer (_targetElapsedTime, () => Tick ());
+			_animationTimer = NSTimer.CreateRepeatingScheduledTimer (_targetElapsedTime, () => DoStep ());
 		}
-
+		
         public void Run()
-    	{			
+    		{			
 			this.Initialize();
 			
+			_lastUpdate = DateTime.Now;
 			if (IsFixedTimeStep) 
-			{
-				_lastUpdate = DateTime.Now;
-            	this.Update(_updateGameTime);     
-			
-				CreateTimer();
+			{				
+            		this.Update(_updateGameTime); 												
+				CreateTimer();				
 			}
 			else {
-				// This is the heart of the game loop and will keep on looping until it is told otherwise
-				while(true) 
-				{	
-					// I found this trick on iDevGames.com.  The command below pumps events which take place
-					// such as screen touches etc so they are handled and then runs our code.  This means
-					// that we are always in sync with VBL rather than an NSTimer and VBL being out of sync					
-					//while(CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0, TRUE) == kCFRunLoopRunHandledSource);		
-					while(CFRunLoop.Main.RunInMode(CFRunLoop.ModeDefault,0.002f,true) == CFRunLoopExitReason.HandledSource);
-					// Go and update the game logic and then render the scene
-					Tick();		
-				}
+				//Thread workerThread = new Thread(this.RunGame);
+				//workerThread.Start();
+				
+				//RunGame();
+				//CreateTimer();
 			}
         }
+		
+		private void RunGame()
+		{
+			_animationTimer = null;
+			// This is the heart of the game loop and will keep on looping until it is told otherwise
+			while(true) 
+			{	
+				// I found this trick on iDevGames.com.  The command below pumps events which take place
+				// such as screen touches etc so they are handled and then runs our code.  This means
+				// that we are always in sync with VBL rather than an NSTimer and VBL being out of sync					
+				//while(CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0, TRUE) == kCFRunLoopRunHandledSource);		
+				while(CFRunLoop.Current.RunInMode(CFRunLoop.ModeDefault,0.002f,true) == CFRunLoopExitReason.HandledSource);
+				// Go and update the game logic and then render the scene;
+				DoStep();	
+			}
+		}
+		
+		private void DoStep()
+		{
+			// Update the game			
+            DateTime now = DateTime.Now;
+            if (IsFixedTimeStep)
+            {
+                _timeSinceLast += now - _lastUpdate;
+                
+				while (_timeSinceLast >= _targetElapsedTime)
+                {
+                    _updateGameTime.Update(_targetElapsedTime);
+                    _timeSinceLast -= _targetElapsedTime;
+                    Update(_updateGameTime);
+                }
+            }
+            else
+            {
+                _updateGameTime.Update(now - _lastUpdate);
+                Update(_updateGameTime);
+            }
+
+            // Draw the screen
+			GraphicsDevice.StartPresentation();			
+            _drawGameTime.Update(now - _lastUpdate);
+            _lastUpdate = now;
+            Draw(_drawGameTime);       			
+			GraphicsDevice.Present();
+		}
 
         public bool IsFixedTimeStep
         {
@@ -202,34 +246,6 @@ namespace XnaTouch.Framework
             }
 		}
 
-        void Tick()
-        {
-            DateTime now = DateTime.Now;
-            if (IsFixedTimeStep)
-            {
-                _timeSinceLast += now - _lastUpdate;
-                while (_timeSinceLast >= _targetElapsedTime)
-                {
-                    _updateGameTime.Update(_targetElapsedTime);
-                    _timeSinceLast -= _targetElapsedTime;
-                    Update(_updateGameTime);
-                }
-            }
-            else
-            {
-                _updateGameTime.Update(now - _lastUpdate);
-                Update(_updateGameTime);
-            }
-            
-			GraphicsDevice.StartPresentation();
-			
-            _drawGameTime.Update(now - _lastUpdate);
-            _lastUpdate = now;
-            Draw(_drawGameTime);       
-			
-			GraphicsDevice.Present();
-        }
-		
         public ContentManager Content
         {
             get
@@ -269,7 +285,9 @@ namespace XnaTouch.Framework
 		}
 		
         protected virtual void Initialize()
-        {            
+        {
+			Accelerometer.SetupAccelerometer();
+			
 			this.graphicsDeviceManager = this.Services.GetService(typeof(IGraphicsDeviceManager)) as IGraphicsDeviceManager;			
 			this.graphicsDeviceService = this.Services.GetService(typeof(IGraphicsDeviceService)) as IGraphicsDeviceService;			
 
@@ -285,15 +303,10 @@ namespace XnaTouch.Framework
         }
 
         protected virtual void Update(GameTime gameTime)
-        {
-			if (GamePad.UseAccelerometer)
+        {			
+			foreach (GameComponent gc in _gameComponentCollection)			
 			{
-				GamePad.Update();
-			}
-			
-            foreach (GameComponent gc in _gameComponentCollection)
-            {
-                if (gc.Enabled)
+				if (gc.Enabled)
                 {
                     gc.Update(gameTime);
                 }
@@ -302,22 +315,19 @@ namespace XnaTouch.Framework
 
         protected virtual void Draw(GameTime gameTime)
         {
-            foreach (GameComponent gc in _gameComponentCollection)
-            {
-                if (gc.Enabled && gc is DrawableGameComponent)
-                {
-                    DrawableGameComponent dc = gc as DrawableGameComponent;
-                    if (dc.Visible)
-                    {
-                        dc.Draw(gameTime);
-                    }
-                }
-            }
-			
-			// Draw the virtual gamepad
-			if (GamePad.Visible) 
+			if (!_playingVideo) 
 			{
-				GamePad.Draw(gameTime);
+	            foreach (GameComponent gc in _gameComponentCollection)
+	            {
+	                if (gc.Enabled && gc is DrawableGameComponent)
+	                {
+	                    DrawableGameComponent dc = gc as DrawableGameComponent;
+	                    if (dc.Visible)
+	                    {
+	                        dc.Draw(gameTime);
+	                    }
+	                }
+	            }
 			}
         }
 
