@@ -137,6 +137,17 @@ namespace XnaTouch.Framework
             X += offsetX;
             Y += offsetY;
         }
+		
+		public Point Center
+		{
+			get 
+			{ 
+				return new Point( (this.X + this.Width) / 2,(this.Y + this.Height) / 2 ); 
+			}
+		}
+
+
+
 
         public void Inflate(int horizontalValue, int verticalValue)
         {

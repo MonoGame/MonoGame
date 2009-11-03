@@ -38,12 +38,11 @@ purpose and non-infringement.
 */
 #endregion License
 	
-using XnaTouch.Framework;
-using System;
+using MonoTouch.CoreAnimation;
 using MonoTouch.OpenGLES;
 using OpenTK.Graphics.ES11;
-using MonoTouch.CoreAnimation;
-using System.Collections.Generic;
+using System;
+using XnaTouch.Framework;
 
 namespace XnaTouch.Framework.Graphics
 {	
@@ -126,6 +125,10 @@ namespace XnaTouch.Framework.Graphics
 
         public void Dispose()
         {
+			if (_context != null)
+			{
+				_context.Dispose();
+			}
         }
 
         public void Present()
@@ -277,9 +280,65 @@ namespace XnaTouch.Framework.Graphics
 			_spriteDevice.EndSpriteBatch();
 		}
 		
-		internal void AddToSpriteBuffer(RenderMode renderInfo, Vector2 point, Rectangle textureRect)
+		internal void AddToSpriteBuffer(SpriteBatchRenderItem sbItem)
 		{
-			_spriteDevice.AddToSpriteBuffer(renderInfo,point,textureRect);				
+			_spriteDevice.AddToSpriteBuffer(sbItem);				
+		}
+		
+		internal void RenderSprites(Vector2 point, float[] texCoords, float[] quadVertices, RenderMode renderMode)
+		{
+			if (texCoords.Length == 0) return;
+			
+			int itemCount = texCoords.Length / 8;
+		
+			// Enable Texture_2D
+			GL.Enable(All.Texture2D);
+			
+			// Set the glColor to apply alpha to the image
+			Vector4 color = renderMode.FilterColor.ToEAGLColor();			
+			GL.Color4(color.X, color.Y, color.Z, color.W);
+	
+			// Set client states so that the Texture Coordinate Array will be used during rendering
+			GL.EnableClientState(All.TextureCoordArray);
+							
+			// Bind to the texture that is associated with this image
+			if (ActiveTexture != renderMode.Texture.Image.Name) 
+			{
+				GL.BindTexture(All.Texture2D, renderMode.Texture.Image.Name);
+				ActiveTexture = (int) renderMode.Texture.Image.Name;
+			}
+			
+			// Set up the VertexPointer to point to the vertices we have defined
+			GL.VertexPointer(2, All.Float, 0, quadVertices);
+			
+			// Set up the TexCoordPointer to point to the texture coordinates we want to use
+			GL.TexCoordPointer(2, All.Float, 0, texCoords);
+
+			// Draw the vertices to the screen
+			if (itemCount > 1) 
+			{
+				ushort[] indices = new ushort[itemCount*6];
+				for (int i=0;i<itemCount;i++)
+				{
+					indices[i*6+0] = (ushort) (i*4+0);
+					indices[i*6+1] = (ushort) (i*4+1);
+					indices[i*6+2] = (ushort) (i*4+2);
+					indices[i*6+5] = (ushort) (i*4+1);
+					indices[i*6+4] = (ushort) (i*4+2);
+					indices[i*6+3] = (ushort) (i*4+3);			
+				}
+				// Draw triangles
+				GL.DrawElements(All.Triangles,itemCount*6,All.UnsignedShort,indices);
+			}
+			else {				
+				// Draw the vertices to the screen
+				GL.DrawArrays(All.TriangleStrip, 0, 4);
+			}
+			// Disable as necessary
+			GL.DisableClientState(All.TextureCoordArray);
+			
+			// Disable 2D textures
+			GL.Disable(All.Texture2D);
 		}
 	}
 }

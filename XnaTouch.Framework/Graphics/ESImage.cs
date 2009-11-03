@@ -185,18 +185,17 @@ namespace XnaTouch.Framework.Graphics
 			return subImage;
 		}
 
-		public void GetTextureCoordinates (float[] textureCoordinates, int index, Rectangle TextureRect)
-		{	
-			textureCoordinates [0+index] = texWidthRatio * TextureRect.Width + (texWidthRatio * TextureRect.Left);
-			textureCoordinates [1+index] = texHeightRatio * TextureRect.Top;
-			textureCoordinates [2+index] = texWidthRatio * TextureRect.Width + (texWidthRatio * TextureRect.Left);
-			textureCoordinates [3+index] = texHeightRatio * TextureRect.Height + (texHeightRatio * TextureRect.Top);
-			textureCoordinates [4+index] = texWidthRatio * TextureRect.Left;
-			textureCoordinates [5+index] = texHeightRatio * TextureRect.Top;
-			textureCoordinates [6+index] = texWidthRatio * TextureRect.Left;
-			textureCoordinates [7+index] = texHeightRatio * TextureRect.Height + (texHeightRatio * TextureRect.Top);
+		public Vector2[] GetTextureCoordinates(Rectangle textureRect)
+		{
+			Vector2[] coordinates = new Vector2[4];
+			
+			coordinates[0] = new Vector2(texWidthRatio * textureRect.Width + (texWidthRatio * textureRect.Left),texHeightRatio * textureRect.Top);
+			coordinates[1] = new Vector2(texWidthRatio * textureRect.Width + (texWidthRatio * textureRect.Left),texHeightRatio * textureRect.Height + (texHeightRatio * textureRect.Top));
+			coordinates[2] = new Vector2(texWidthRatio * textureRect.Left ,texHeightRatio * textureRect.Top);
+			coordinates[3] = new Vector2(texWidthRatio * textureRect.Left,texHeightRatio * textureRect.Height + (texHeightRatio * textureRect.Top));
+			
+			return coordinates;		
 		}
-
 		
 		public uint Name 
 		{
