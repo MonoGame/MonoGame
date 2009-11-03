@@ -104,7 +104,6 @@ namespace XnaTouch.Framework
 
         public void Dispose()
         {
-           
         }
 
         #endregion

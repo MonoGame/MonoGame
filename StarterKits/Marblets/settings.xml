@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<Settings>
+  <MediaPath>Content\</MediaPath>
+  <WindowTitle>Marblets</WindowTitle>
+  <MarbleColors>
+    <Color>
+      <PackedValue>4294901760</PackedValue>
+    </Color>
+    <Color>
+      <PackedValue>4280856575</PackedValue>
+    </Color>
+    <Color>
+      <PackedValue>4280876820</PackedValue>
+    </Color>
+    <Color>
+      <PackedValue>4294967040</PackedValue>
+    </Color>
+    <Color>
+      <PackedValue>4294907110</PackedValue>
+    </Color>
+  </MarbleColors>
+</Settings>

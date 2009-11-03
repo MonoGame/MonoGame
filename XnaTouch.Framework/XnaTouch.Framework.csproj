@@ -15,7 +15,7 @@
     <RootNamespace>XnaTouch.Framework</RootNamespace>
     <SynchReleaseVersion>false</SynchReleaseVersion>
     <BundleDisplayName>XnaTouch</BundleDisplayName>
-    <ReleaseVersion>0.3</ReleaseVersion>
+    <ReleaseVersion>0.5</ReleaseVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhoneSimulator' ">
     <DebugSymbols>true</DebugSymbols>
@@ -175,6 +175,11 @@
     <Compile Include="Media\Video.cs" />
     <Compile Include="Media\VideoPlayer.cs" />
     <Compile Include="GameComponentCollectionEventArgs.cs" />
+    <Compile Include="Input\TouchCollection.cs" />
+    <Compile Include="Input\TouchLocation.cs" />
+    <Compile Include="Input\TouchLocationState.cs" />
+    <Compile Include="Input\TouchPanel.cs" />
+    <Compile Include="Input\TouchPanelCapabilities.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>

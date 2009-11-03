@@ -11,6 +11,7 @@
     <BundleDisplayName>Storage</BundleDisplayName>
     <AssemblyName>Storage</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <RootNamespace>XnaTouch.Samples.Storage</RootNamespace>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhoneSimulator' ">
     <DebugSymbols>true</DebugSymbols>

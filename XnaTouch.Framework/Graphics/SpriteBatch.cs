@@ -45,6 +45,7 @@ using System.Text;
 using XnaTouch;
 using XnaTouch.Framework;
 using XnaTouch.Framework.Graphics;
+using System.Collections.Generic;
 
 namespace XnaTouch.Framework.Graphics
 {
@@ -121,18 +122,17 @@ namespace XnaTouch.Framework.Graphics
 				mode.Texture = texture;
 				mode.FilterColor = color;	
 				mode.LayerDepth = 0.0f;
-				// Adjust vertical axis
-				position.Y = ((int)UIScreen.MainScreen.Bounds.Height - position.Y)-sourceRectangle.Value.Height;
 
 				//render
-				GraphicsDevice.AddToSpriteBuffer(mode, position, sourceRectangle.Value);				
+				AddToSpriteRender(mode,position,sourceRectangle.Value);
+				
 			}
 			else 
 			{
 				Draw(texture,new Rectangle((int)position.X,(int)position.Y,texture.Width,texture.Height),sourceRectangle,color,0.0f,Vector2.Zero,SpriteEffects.None,0);
 			}
         }
-
+		
         public void Draw(Texture2D texture, Rectangle destinationRectangle, Rectangle? sourceRectangle, Color color, float rotation, Vector2 origin, SpriteEffects effects, float layerDepth)
         {
 			if (texture == null)
@@ -153,10 +153,7 @@ namespace XnaTouch.Framework.Graphics
 			mode.Rotation = rotation;
 			// adjust filter color
 			mode.FilterColor = color;
-				
-			// Adjust vertical axis
-			destinationRectangle.Y = ((int)UIScreen.MainScreen.Bounds.Height - destinationRectangle.Y)-destinationRectangle.Height;			
-			
+							
 			if (sourceRectangle.HasValue)
 			{
 				// adjust the scale
@@ -164,25 +161,20 @@ namespace XnaTouch.Framework.Graphics
 				mode.VerticalScale = (float)destinationRectangle.Height / (float)sourceRectangle.Value.Height;	
 																						
 				//render
-				GraphicsDevice.AddToSpriteBuffer(mode,new Vector2(destinationRectangle.X,destinationRectangle.Y), sourceRectangle.Value);
+				AddToSpriteRender(mode,new Vector2(destinationRectangle.X,destinationRectangle.Y), sourceRectangle.Value);
 			}
 			else 
 			{
 				// adjust the scale
 				mode.HorizontalScale = (float) destinationRectangle.Width / (float)texture.Width;
 				mode.VerticalScale = (float)destinationRectangle.Height / (float)texture.Height;	
-				//render		
 				
-				GraphicsDevice.AddToSpriteBuffer(mode, new Vector2(destinationRectangle.X, destinationRectangle.Y),texture.SourceRect);
+				//render		
+				AddToSpriteRender(mode, new Vector2(destinationRectangle.X, destinationRectangle.Y),texture.SourceRect);
 			}
         }
 
         public void Draw(Texture2D texture, Vector2 position, Rectangle? sourceRectangle, Color color, float rotation, Vector2 origin, Vector2 scale, SpriteEffects effects, float layerDepth)
-        {
-			throw new NotImplementedException();
-        }
-
-        public void Draw(Texture2D texture, Vector2 position, Rectangle? sourceRectangle, Color color, float rotation, Vector2 origin, float scale, SpriteEffects effects, float layerDepth)
         {
 			if (texture == null)
 			{
@@ -194,13 +186,37 @@ namespace XnaTouch.Framework.Graphics
 			destination.Y = (int)position.Y;
 			if (sourceRectangle.HasValue)
 			{
-				destination.Width = sourceRectangle.Value.Width;
-				destination.Height =sourceRectangle.Value.Height;				
+				destination.Width = (int)(sourceRectangle.Value.Width*scale.X);
+				destination.Height =(int)(sourceRectangle.Value.Height*scale.Y);				
 			}
 			else 
 			{
-				destination.Width = texture.Width;
-				destination.Height = texture.Height;
+				destination.Width = (int)(texture.Width*scale.X);
+				destination.Height = (int)(texture.Height*scale.Y);
+			}
+			
+			Draw(texture, destination, sourceRectangle, color, rotation, origin, effects, layerDepth);
+        }
+
+        public void Draw(Texture2D texture, Vector2 position, Rectangle? sourceRectangle, Color color, float rotation, Vector2 origin, float scale, SpriteEffects effects, float layerDepth)
+        {
+			if (texture == null)
+			{
+				throw new ArgumentException("texture cannot be NULL");
+				}
+			
+			Rectangle destination = new Rectangle();
+			destination.X = (int)position.X;
+			destination.Y = (int)position.Y;
+			if (sourceRectangle.HasValue)
+			{
+				destination.Width = (int)(sourceRectangle.Value.Width*scale);
+				destination.Height = (int)(sourceRectangle.Value.Height*scale);				
+			}
+			else 
+			{
+				destination.Width = (int)(texture.Width*scale);
+				destination.Height = (int)(texture.Height*scale);
 			}
 			
 			Draw(texture, destination, sourceRectangle, color, rotation, origin, effects, layerDepth);
@@ -219,6 +235,25 @@ namespace XnaTouch.Framework.Graphics
         public void DrawString(SpriteFont spriteFont, string text, Vector2 position, Color color, float rotation, Vector2 origin, Vector2 scale, SpriteEffects effects, float layerDepth)
         {
 			Vector2 org = origin;
+			
+			List<Vector2> spriteVertices = new List<Vector2>();
+			List<Vector2> textureVertices = new List<Vector2>();
+			
+			RenderMode mode = new RenderMode();
+			mode.Texture = spriteFont._texture;
+			// set the layer
+			mode.LayerDepth = layerDepth;
+			// adjust origin
+			mode.Origin = origin;
+			// adjust Flip
+			mode.FlipHorizontal = ((effects & SpriteEffects.FlipHorizontally) != SpriteEffects.None);
+			mode.FlipVertical = ((effects & SpriteEffects.FlipVertically) != SpriteEffects.None);			
+			// adjust rotation
+			mode.Rotation = rotation;
+			// adjust filter color
+			mode.FilterColor = color;
+			
+			float textWidth=0;
             foreach (char c in text)
             {
                 if (c == '\n')
@@ -229,27 +264,36 @@ namespace XnaTouch.Framework.Graphics
                 }
                 if (spriteFont.characterData.ContainsKey(c) == false) continue;
                 GlyphData g = spriteFont.characterData[c];
-                Draw(spriteFont._texture, position, g.Glyph, color, rotation, org - new Vector2(g.Cropping.X, g.Cropping.Y), scale, SpriteEffects.None, layerDepth);
-                org.X -= (g.Kerning.Y + g.Kerning.Z + spriteFont.Spacing) * scale.X;
+				
+				g.Glyph.Width = (int)(g.Glyph.Width*scale.X);
+				g.Glyph.Height =(int)(g.Glyph.Height*scale.Y);				
+				
+				textWidth += (g.Kerning.Y + g.Kerning.Z + spriteFont.Spacing)* scale.X;
+				
+				mode.Origin = new Vector2(org.X,g.Glyph.Height + g.Cropping.Y-org.Y);
+				
+				spriteVertices.AddRange(GetSpriteVertices(g.Glyph.Width,g.Glyph.Height,mode));
+				textureVertices.AddRange(mode.Texture.Image.GetTextureCoordinates(g.Glyph));
+                
+				org.X -= (g.Kerning.Y + g.Kerning.Z + spriteFont.Spacing) * scale.X;
             }
+			
+			Vector2[] temp = spriteVertices.ToArray();
+			mode.Origin  = origin;
+			ApplyTransformations(temp,position,textWidth,0,mode);			
+			
+			SpriteBatchRenderItem sbi = new SpriteBatchRenderItem();
+			sbi.Position = position;
+			sbi.RenderData = mode;
+			sbi.TextureCoordinates = textureVertices.ToArray();
+			sbi.Vertices = temp;
+			
+			GraphicsDevice.AddToSpriteBuffer(sbi);
         }
 
         public void DrawString(SpriteFont spriteFont, string text, Vector2 position, Color color, float rotation, Vector2 origin, float scale, SpriteEffects effects, float layerDepth)
         {
-			Vector2 org = origin;
-            foreach (char c in text)
-            {
-                if (c == '\n')
-                {
-                    org.Y -= spriteFont.LineSpacing * scale;
-                    org.X = origin.X;
-                    continue;
-                }
-                if (spriteFont.characterData.ContainsKey(c) == false) continue;
-                GlyphData g = spriteFont.characterData[c];
-                Draw(spriteFont._texture, position, g.Glyph, color, rotation, org - new Vector2(g.Cropping.X, g.Cropping.Y), scale, SpriteEffects.None, layerDepth);
-                org.X -= (g.Kerning.Y + g.Kerning.Z + spriteFont.Spacing) * scale;
-            }
+			DrawString(spriteFont,text,position,color,rotation,origin,new Vector2(scale,scale),effects,layerDepth);
         }
 
         public void DrawString(SpriteFont spriteFont, StringBuilder text, Vector2 position, Color color, float rotation, Vector2 origin, Vector2 scale, SpriteEffects effects, float layerDepth)
@@ -293,6 +337,91 @@ namespace XnaTouch.Framework.Graphics
 				_tag = value;
             }
         }
+		
+		private Vector2[] GetSpriteVertices(float Width, float Height, RenderMode renderMode)
+		{
+			Vector2[] SpriteVertices = new Vector2[4];
+			
+			float quadWidth = Width * renderMode.HorizontalScale;
+			float quadHeight = Height * renderMode.VerticalScale;
+			
+			if (!renderMode.FlipVertical && !renderMode.FlipHorizontal) 
+			{
+				SpriteVertices[0] = new Vector2(quadWidth,quadHeight);
+				SpriteVertices[1] = new Vector2(quadWidth,0);
+				SpriteVertices[2] = new Vector2(0,quadHeight);
+				SpriteVertices[3] = new Vector2(0,0);				
+			}
+			if (!renderMode.FlipVertical && renderMode.FlipHorizontal) 
+			{				
+				SpriteVertices[0] = new Vector2(0,quadHeight);
+				SpriteVertices[1] = new Vector2(0,0);
+				SpriteVertices[2] = new Vector2(quadWidth,quadHeight);
+				SpriteVertices[3] = new Vector2(quadWidth,0);	
+			}
+			if (renderMode.FlipVertical && !renderMode.FlipHorizontal) 
+			{				
+				SpriteVertices[0] = new Vector2(quadWidth,0);
+				SpriteVertices[1] = new Vector2(quadWidth,quadHeight);
+				SpriteVertices[2] = new Vector2(0,0);
+				SpriteVertices[3] = new Vector2(0,quadHeight);	
+			}
+			if (renderMode.FlipVertical && renderMode.FlipHorizontal) 
+			{
+				SpriteVertices[0] = new Vector2(0,0);
+				SpriteVertices[1] = new Vector2(0,quadHeight);
+				SpriteVertices[2] = new Vector2(quadWidth,0);
+				SpriteVertices[3] = new Vector2(quadWidth,quadHeight);	
+			}
+			
+			// Adjust origin
+			if (renderMode.Origin != Vector2.Zero)
+			{
+				for (int i = 0; i < 4; i++)
+	            		SpriteVertices[i] -= renderMode.Origin;
+			}
+			
+			return SpriteVertices;
+		}
+		
+		private Vector2[] ApplyTransformations(Vector2[] SpriteVertices, Vector2 position, float Width, float Height, RenderMode renderMode)
+		{				
+			float quadHeight = Height * renderMode.VerticalScale;
+			
+			// Rotate
+			if (renderMode.Rotation != 0.0f)
+			{				
+				Matrix rotation = Matrix.CreateRotationZ(-renderMode.Rotation);
+				for (int i = 0; i < SpriteVertices.Length; i++)
+				{
+					SpriteVertices[i] = Vector2.Transform(SpriteVertices[i], rotation);
+				}
+			}
+						
+			// Translate to sprite positon			
+			Matrix translation = Matrix.CreateTranslation(position.X, (_device.Viewport.Height-position.Y+renderMode.Origin.Y*2)-quadHeight,0);
+			for (int i = 0; i < SpriteVertices.Length; i++)
+            		SpriteVertices[i] = Vector2.Transform(SpriteVertices[i], translation);
+			
+			return SpriteVertices;
+		}
+	
+		private void AddToSpriteRender(RenderMode mode, Vector2 position, Rectangle rect)
+		{
+			// Get Vertices
+			Vector2[] spriteVertices = GetSpriteVertices(rect.Width, rect.Height,mode);
+			Vector2[] textureCoordinates = mode.Texture.Image.GetTextureCoordinates(rect);
+			// Apply Transformations
+			ApplyTransformations(spriteVertices, position,rect.Width,rect.Height,mode);
+
+			SpriteBatchRenderItem sbi = new SpriteBatchRenderItem();
+			sbi.Position = position;
+			sbi.RenderData = mode;
+			sbi.TextureCoordinates = textureCoordinates;
+			sbi.Vertices = spriteVertices;
+			
+			GraphicsDevice.AddToSpriteBuffer(sbi);
+		}
     }
 }
 

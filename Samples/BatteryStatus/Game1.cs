@@ -16,7 +16,7 @@ namespace XnaTouch.Samples.BatteryStatus
         SpriteBatch spriteBatch;		
 		SpriteFont font;
 
-        public Game1()
+		public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
@@ -66,7 +66,7 @@ namespace XnaTouch.Samples.BatteryStatus
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            // TODO: Add your update logic here			
+            // TODO: Add your update logic here							
             base.Update(gameTime);
         }
 

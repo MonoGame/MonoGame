@@ -12,6 +12,8 @@
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <BundleDisplayName>Draw2D</BundleDisplayName>
     <BundleIcon>xnatouchicon.png</BundleIcon>
+    <RootNamespace>XnaTouch.Samples.Draw2D</RootNamespace>
+    <MainNibFile>MainWindow.xib</MainNibFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhoneSimulator' ">
     <DebugSymbols>true</DebugSymbols>

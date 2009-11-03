@@ -12,6 +12,7 @@
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <BundleDisplayName>AlienGame</BundleDisplayName>
     <BundleIcon>GameThumbnail.png</BundleIcon>
+    <RootNamespace>AlienGame</RootNamespace>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhoneSimulator' ">
     <DebugSymbols>true</DebugSymbols>

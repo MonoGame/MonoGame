@@ -60,6 +60,7 @@ namespace XnaTouch.Framework
 			
 			// Enable multi-touch
 			MultipleTouchEnabled = true;
+			
 		}
 		
 		#region UIVIew Methods
@@ -75,32 +76,76 @@ namespace XnaTouch.Framework
 			return new Class (typeof (CAEAGLLayer));
 		}
 		
+		private void FillTouchCollection(NSSet touches)
+		{
+			UITouch []touchesArray = touches.ToArray<UITouch>();
+			TouchPanel.Collection = new TouchCollection();
+			TouchPanel.Collection.Capacity = touchesArray.Length;
+			
+			for (int i=0; i<touchesArray.Length;i++)
+			{
+				TouchLocationState state;				
+				UITouch touch = touchesArray[i];
+				switch (touch.Phase)
+				{
+					case UITouchPhase.Began	:	
+						state = TouchLocationState.Pressed;
+						break;
+					case UITouchPhase.Cancelled	:
+					case UITouchPhase.Ended	:
+						state = TouchLocationState.Released;
+						break;
+					default :
+						state = TouchLocationState.Moved;
+						break;					
+				}
+				if (state != TouchLocationState.Released)
+				{
+					TouchLocation touchLocation = new TouchLocation(i,state,new Vector2(touch.LocationInView(touch.View)),1.0f,
+				                                                TouchLocationState.Moved, new Vector2(touch.PreviousLocationInView(touch.View)), 1.0f);
+					TouchPanel.Collection.Add(touchLocation);
+				}
+			}
+		}
+		
 		public override void TouchesBegan (NSSet touches, UIEvent evt)
 		{
 			GamePad.Instance.TouchesBegan(touches,evt);
+			
+			FillTouchCollection(touches);
+			
 			base.TouchesBegan (touches, evt);
 		}
 		
 		public override void TouchesEnded (NSSet touches, UIEvent evt)
 		{
-			GamePad.Instance.TouchesEnded(touches,evt);
+			GamePad.Instance.TouchesEnded(touches,evt);			
+			
+			FillTouchCollection(touches);
+			
 			base.TouchesEnded (touches, evt);
 		}
 		
 		public override void TouchesMoved (NSSet touches, UIEvent evt)
 		{
 			GamePad.Instance.TouchesMoved(touches,evt);
+
+			FillTouchCollection(touches);
+			
 			base.TouchesMoved (touches, evt);
 		}
 
 		public override void TouchesCancelled (NSSet touches, UIEvent evt)
 		{
 			GamePad.Instance.TouchesCancelled(touches,evt);
+			
+			FillTouchCollection(touches);
+			
 			base.TouchesCancelled (touches, evt);
 		}
 
 		#endregion
-				
+						
 		#region GameWindow Methods
 		
 		public override string ScreenDeviceName 

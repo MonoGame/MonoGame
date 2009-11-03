@@ -12,6 +12,7 @@
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <BundleDisplayName>Battery Status</BundleDisplayName>
     <BundleIcon>xnatouchicon.png</BundleIcon>
+    <RootNamespace>XnaTouch.Samples.BatteryStatus</RootNamespace>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhoneSimulator' ">
     <DebugSymbols>true</DebugSymbols>

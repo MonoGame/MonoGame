@@ -46,9 +46,9 @@ using System.Diagnostics;
 
 namespace XnaTouch.Framework.Graphics
 {
-	internal class TextureComparer : IComparer<SpriteBuffer>
+	internal class TextureComparer : IComparer<SpriteBatchRenderItem>
     {
-        public int Compare(SpriteBuffer r1, SpriteBuffer r2)
+        public int Compare(SpriteBatchRenderItem r1, SpriteBatchRenderItem r2)
         {
             if (r1.RenderData.Texture.Image.Name > r2.RenderData.Texture.Image.Name)
             {
@@ -62,9 +62,9 @@ namespace XnaTouch.Framework.Graphics
         }
     }
 	
-	internal class BackToFrontComparer : IComparer<SpriteBuffer>
+	internal class BackToFrontComparer : IComparer<SpriteBatchRenderItem>
     {
-        public int Compare(SpriteBuffer r1, SpriteBuffer r2)
+        public int Compare(SpriteBatchRenderItem r1, SpriteBatchRenderItem r2)
         {
             if (r1.RenderData.LayerDepth > r2.RenderData.LayerDepth)
             {
@@ -78,9 +78,9 @@ namespace XnaTouch.Framework.Graphics
         }
     }
 
-    internal class FrontToBackComparer : IComparer<SpriteBuffer>
+    internal class FrontToBackComparer : IComparer<SpriteBatchRenderItem>
     {
-        public int Compare(SpriteBuffer r1, SpriteBuffer r2)
+        public int Compare(SpriteBatchRenderItem r1, SpriteBatchRenderItem r2)
         {
             if (r1.RenderData.LayerDepth > r2.RenderData.LayerDepth)
             {
@@ -127,159 +127,32 @@ namespace XnaTouch.Framework.Graphics
 		public Texture2D Texture {get;set;}
 	}
 	
-	internal class SpriteBuffer
+	internal class SpriteBatchRenderItem
 	{
-		public SpriteBuffer()
-		{
-		}
-					
 		public Vector2 Position {get;set;}
-		public Rectangle TextureRect {get;set;}
+		public Vector2[] Vertices {get;set;}
+		public Vector2[] TextureCoordinates {get;set;}
 		public RenderMode RenderData {get;set;}
 	}
 		
 	internal class GraphicsDevice2D
 	{
 		private GraphicsDevice _device;
-		private readonly ReusableItemList<SpriteBuffer> _sprites = new ReusableItemList<SpriteBuffer>();
-		private readonly ReusableItemList<SpriteBuffer> _sortedSprites = new ReusableItemList<SpriteBuffer>();
+		private readonly List<SpriteBatchRenderItem> _sprites = new List<SpriteBatchRenderItem>();
+		private readonly List<SpriteBatchRenderItem> _sortedSprites = new List<SpriteBatchRenderItem>();
 		private SpriteBlendMode _actualBlendMode, _previousBlendMode = SpriteBlendMode.None;
-		private SpriteSortMode _actualSortMode = SpriteSortMode.Deferred; 
-		private Vector2 []_spritVertices = new Vector2[4]; 
+		private SpriteSortMode _actualSortMode = SpriteSortMode.Deferred; 		
 		
 		public GraphicsDevice2D (GraphicsDevice Device)
 		{
 			_device = Device;
 		}
-		
-		public void GetSpriteVerticesToPoint(Vector2 position, int index, float[] quadVertices, float Width, float Height, RenderMode renderMode)
-		{
-			float quadWidth = Width * renderMode.HorizontalScale;
-			float quadHeight = Height * renderMode.VerticalScale;
 			
-			if (!renderMode.FlipVertical && !renderMode.FlipHorizontal) 
-			{
-				_spritVertices[0] = new Vector2(quadWidth,quadHeight);
-				_spritVertices[1] = new Vector2(quadWidth,0);
-				_spritVertices[2] = new Vector2(0,quadHeight);
-				_spritVertices[3] = new Vector2(0,0);				
-			}
-			if (!renderMode.FlipVertical && renderMode.FlipHorizontal) 
-			{				
-				_spritVertices[0] = new Vector2(0,quadHeight);
-				_spritVertices[1] = new Vector2(0,0);
-				_spritVertices[2] = new Vector2(quadWidth,quadHeight);
-				_spritVertices[3] = new Vector2(quadWidth,0);	
-			}
-			if (renderMode.FlipVertical && !renderMode.FlipHorizontal) 
-			{				
-				_spritVertices[0] = new Vector2(quadWidth,0);
-				_spritVertices[1] = new Vector2(quadWidth,quadHeight);
-				_spritVertices[2] = new Vector2(0,0);
-				_spritVertices[3] = new Vector2(0,quadHeight);	
-			}
-			if (renderMode.FlipVertical && renderMode.FlipHorizontal) 
-			{
-				_spritVertices[0] = new Vector2(0,0);
-				_spritVertices[1] = new Vector2(0,quadHeight);
-				_spritVertices[2] = new Vector2(quadWidth,0);
-				_spritVertices[3] = new Vector2(quadWidth,quadHeight);	
-			}
-			
-			// Adjusted origin
-			Vector2 adjustableOrigin;
-			
-			// Rotate
-			if (renderMode.Rotation != 0.0f) 
-			{				
-				Matrix rotation = Matrix.CreateRotationZ(renderMode.Rotation);
-				for (int i = 0; i < 4; i++)
-                	_spritVertices[i] = Vector2.Transform(_spritVertices[i]-renderMode.Origin, rotation);
-				
-				// Set the origin
-				adjustableOrigin = new Vector2(0,-renderMode.Origin.Y*2);					
-			}
-			else 
-			{
-				// Set the origin
-				adjustableOrigin = new Vector2(renderMode.Origin.X,-renderMode.Origin.Y);					
-			}
-						
-			// Translate to sprite positon
-			Matrix translation = Matrix.CreateTranslation(position.X-adjustableOrigin.X,position.Y-adjustableOrigin.Y,0);
-			for (int i = 0; i < 4; i++)
-                _spritVertices[i] = Vector2.Transform(_spritVertices[i], translation);
-			
-			// put in the array
-			quadVertices[0+index] = _spritVertices[0].X;
-			quadVertices[1+index] = _spritVertices[0].Y;
-			quadVertices[2+index] = _spritVertices[1].X;
-			quadVertices[3+index] = _spritVertices[1].Y;
-			quadVertices[4+index] = _spritVertices[2].X;
-			quadVertices[5+index] = _spritVertices[2].Y;
-			quadVertices[6+index] = _spritVertices[3].X;
-			quadVertices[7+index] = _spritVertices[3].Y;
-		}		
-			
-		public void RenderSprites(int itemCount, Vector2 point, float[] texCoords, float[] quadVertices, RenderMode renderMode)
-		{
-			if (itemCount == 0) return;
-		
-			// Enable Texture_2D
-			GL.Enable(All.Texture2D);
-
-			// Set the glColor to apply alpha to the image
-			Vector4 color = renderMode.FilterColor.ToEAGLColor();			
-			GL.Color4(color.X, color.Y, color.Z, color.W);
-	
-			// Set client states so that the Texture Coordinate Array will be used during rendering
-			GL.EnableClientState(All.TextureCoordArray);
-				
-			// Bind to the texture that is associated with this image
-			if (_device.ActiveTexture != renderMode.Texture.Image.Name) 
-			{
-				GL.BindTexture(All.Texture2D, renderMode.Texture.Image.Name);
-				_device.ActiveTexture = (int) renderMode.Texture.Image.Name;
-			}
-			
-			// Set up the VertexPointer to point to the vertices we have defined
-			GL.VertexPointer(2, All.Float, 0, quadVertices);
-			
-			// Set up the TexCoordPointer to point to the texture coordinates we want to use
-			GL.TexCoordPointer(2, All.Float, 0, texCoords);
-
-			// Draw the vertices to the screen
-			if (itemCount > 1) 
-			{
-				ushort[] indices = new ushort[itemCount*6];
-				for (int i=0;i<itemCount;i++)
-				{
-					indices[i*6+0] = (ushort) (i*4+0);
-					indices[i*6+1] = (ushort) (i*4+1);
-					indices[i*6+2] = (ushort) (i*4+2);
-					indices[i*6+5] = (ushort) (i*4+1);
-					indices[i*6+4] = (ushort) (i*4+2);
-					indices[i*6+3] = (ushort) (i*4+3);			
-				}
-				// Draw triangles
-				GL.DrawElements(All.Triangles,itemCount*6,All.UnsignedShort,indices);
-			}
-			else {				
-				// Draw the vertices to the screen
-				GL.DrawArrays(All.TriangleStrip, 0, 4);
-			}
-			// Disable as necessary
-			GL.DisableClientState(All.TextureCoordArray);
-			
-			// Disable 2D textures
-			GL.Disable(All.Texture2D);
-		}		
-		
 		public void StartSpriteBatch(SpriteBlendMode blendMode, SpriteSortMode sortMode)
 		{
 			if (_sprites.Count > 0)
 			{
-				throw new InvalidOperationException("SpriteBatch in incorrect state");
+				throw new InvalidOperationException("SpriteBatch is in incorrect state");
 			}
 			
 			_actualBlendMode = blendMode;
@@ -296,7 +169,7 @@ namespace XnaTouch.Framework.Graphics
 			_sprites.Clear();
 		}
 		
-		private void DrawSprites(ReusableItemList<SpriteBuffer> spritesToDraw)
+		private void DrawSprites(List<SpriteBatchRenderItem> spritesToDraw)
 		{
 			// Draw the current spritebatch
 			if (spritesToDraw.Count > 0)
@@ -330,50 +203,54 @@ namespace XnaTouch.Framework.Graphics
 						break;
 				}
 				
-				float[] Vertices = new float[spritesToDraw.Count*8];
-				float[] TextureCoords = new float[spritesToDraw.Count*8];
-				int i=0;
+				List<float> Vertices = new List<float>();
+				List<float> TextureCoords = new List<float>();
+				TextureCoords.Capacity = spritesToDraw.Count*4;
+				Vertices.Capacity = spritesToDraw.Count*4;
+				
 				RenderMode actualMode = spritesToDraw[0].RenderData;
 				
 				// Draw sprite vertices
-				foreach(SpriteBuffer sb in spritesToDraw)
+				for (int sbi = 0; sbi<spritesToDraw.Count; sbi++)
 				{
+					SpriteBatchRenderItem sb = spritesToDraw[sbi];
+					
 					if ((!actualMode.IsCompatible(sb.RenderData)) || (actualMode.Texture.Image.Name != sb.RenderData.Texture.Image.Name))
 					{
 						// Render sprites
-						RenderSprites(i/8,Vector2.Zero,TextureCoords,Vertices,actualMode);
-						i=0;
+						_device.RenderSprites(Vector2.Zero,TextureCoords.ToArray(),Vertices.ToArray(),actualMode);
+						Vertices.Clear();
+						TextureCoords.Clear();
 						actualMode = sb.RenderData;
 					}
-						    						
+							
 					// put the vertices in vertex array
-					GetSpriteVerticesToPoint(sb.Position,i,Vertices,sb.TextureRect.Width,sb.TextureRect.Height,sb.RenderData);
-					sb.RenderData.Texture.Image.GetTextureCoordinates(TextureCoords,i,sb.TextureRect);
-					i+=8;
+					AddToFloatList(sb.Vertices,Vertices);
+					AddToFloatList(sb.TextureCoordinates,TextureCoords);
 				}
 				
 				// Render the sprites
-				RenderSprites(i/8,Vector2.Zero,TextureCoords,Vertices,spritesToDraw[spritesToDraw.Count-1].RenderData);
+				_device.RenderSprites(Vector2.Zero,TextureCoords.ToArray(),Vertices.ToArray(),spritesToDraw[spritesToDraw.Count-1].RenderData);
 			}						
 		}
 		
-		public void AddToSpriteBuffer(RenderMode renderInfo, Vector2 point, Rectangle textureRect)
+		public void AddToFloatList(Vector2[] vectors, List<float> list)
 		{
-			SpriteBuffer sb = _sprites.GetNewItem();
-			if (sb == null) 
+			for (int i=0;i<vectors.Length;i++)
 			{
-				sb = new SpriteBuffer();
-				_sprites.Add(sb);
+				list.Add(vectors[i].X);
+				list.Add(vectors[i].Y);
 			}
-			
-			sb.Position = point;
-			sb.TextureRect = textureRect;
-			sb.RenderData = renderInfo;
+		}
+		
+		public void AddToSpriteBuffer(SpriteBatchRenderItem sbItem)
+		{
+			_sprites.Add(sbItem);
 		}
 		
 		private void SortSprites()
         {
-			IComparer<SpriteBuffer> comparer;
+			IComparer<SpriteBatchRenderItem> comparer;
 			
             switch (_actualSortMode)
             {

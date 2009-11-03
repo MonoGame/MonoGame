@@ -57,7 +57,7 @@ namespace XnaTouch.Samples.Draw2D
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             // TODO: use this.Content to load your game content here
-            texture = Content.Load<Texture2D>("xnatouchicon");
+			texture = Content.Load<Texture2D>("xnatouchicon");
 			ball = Content.Load<Texture2D>("purpleBall.xnb");
 			font = Content.Load<SpriteFont>("SpriteFont1");
 			
@@ -108,7 +108,7 @@ namespace XnaTouch.Samples.Draw2D
            	graphics.GraphicsDevice.Clear(Color.CornflowerBlue);
 			
 			// Draw without blend
-			spriteBatch.Begin(SpriteBlendMode.None);
+			spriteBatch.Begin(SpriteBlendMode.None);			
 			spriteBatch.Draw(texture,new Vector2(250,20),Color.White);	
 			spriteBatch.End();
 			
@@ -128,13 +128,13 @@ namespace XnaTouch.Samples.Draw2D
 			// Draw stretching
 			spriteBatch.Draw(texture,new Rectangle(0,0,(int) size,(int) size),Color.White);	
 			// Draw with Filter Color
-			spriteBatch.Draw(texture,new Vector2(120,120),Color.Red);	
+			spriteBatch.Draw(texture,new Vector2(120,120),Color.Red);
+			// Draw rotated
+			spriteBatch.Draw(texture,new Rectangle(100,300,texture.Width,texture.Height),null,Color.White,rotation,new Vector2(texture.Width/2,texture.Height/2),SpriteEffects.None,0);	
 			// Draw texture section
 			spriteBatch.Draw(texture,new Vector2(200,200), new Rectangle(20,20,40,40),Color.White);		
 			// Draw texture section and scale
 			spriteBatch.Draw(texture, new Rectangle(10,120,(int) size,(int) size), new Rectangle(20,20,40,40),Color.White);		
-			// Draw rotated
-			spriteBatch.Draw(texture,new Rectangle(100,300,texture.Width,texture.Height),null,Color.White,rotation,new Vector2(texture.Width/2,texture.Height/2),SpriteEffects.None,0);	
 			// Alpha blending
 			spriteBatch.Draw(texture,new Vector2(140,0),alphaColor);	
 			// Flip horizontaly
@@ -144,15 +144,8 @@ namespace XnaTouch.Samples.Draw2D
 			// Flip horizontaly and verticaly
 			spriteBatch.Draw(texture,new Rectangle(220,390,texture.Width,texture.Height),null,Color.White,0.0f,Vector2.Zero,SpriteEffects.FlipHorizontally | SpriteEffects.FlipVertically ,0);	
 			
-			// Font draw
-			spriteBatch.DrawString(font,"XnaTouch",new Vector2(101,99),Color.Black);
-			spriteBatch.DrawString(font,"XnaTouch",new Vector2(101,101),Color.Black);
-			spriteBatch.DrawString(font,"XnaTouch",new Vector2(99,99),Color.Black);
-			spriteBatch.DrawString(font,"XnaTouch",new Vector2(99,101),Color.Black);
-			spriteBatch.DrawString(font,"XnaTouch",new Vector2(100,100),Color.Red);
-		
 			base.Draw(gameTime);
-			
+									
 			spriteBatch.End();
 			            
         }

@@ -52,6 +52,8 @@ namespace XnaTouch.Framework.Graphics
 		private ESImage texture;
 		private string name;
 		
+		internal bool IsSpriteFontTexture {get;set;}
+		
 		internal ESImage Image
 		{
 			get 
