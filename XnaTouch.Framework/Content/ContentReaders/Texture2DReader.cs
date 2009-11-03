@@ -70,6 +70,10 @@ namespace XnaTouch.Framework.Content
 				return FileName+".jpeg";
 			if (File.Exists(FileName+".png"))
 				return FileName+".png";
+			if (File.Exists(FileName+".gif"))
+				return FileName+".gif";
+			if (File.Exists(FileName+".pict"))
+				return FileName+".pict";
 			
 			return null;
 		}

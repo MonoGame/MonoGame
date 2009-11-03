@@ -47,6 +47,7 @@ using MonoTouch.CoreFoundation;
 using MonoTouch.UIKit;
 using XnaTouch.Framework.Input;
 using System.Threading;
+using OpenTK.Graphics;
 
 namespace XnaTouch.Framework
 {
@@ -60,7 +61,7 @@ namespace XnaTouch.Framework
         private GameComponentCollection _gameComponentCollection;
         public GameServiceContainer _services;
         private ContentManager _content;
-        private GameWindow _window;
+        private IphoneWindow _view;
 		private bool _isFixedTimeStep = true;
         private TimeSpan _targetElapsedTime = TimeSpan.FromSeconds(1 / 60.0); // ~60 frames per second
         
@@ -68,27 +69,28 @@ namespace XnaTouch.Framework
 		private IGraphicsDeviceManager graphicsDeviceManager;
 		private IGraphicsDeviceService graphicsDeviceService;
 		private UIWindow _mainWindow;
+		private IGraphicsContext _context;
+
 		internal static bool _playingVideo = false;
 		
-		 public Game()
+		public Game()
         {           
 			// Initialize collections
 			_services = new GameServiceContainer();
 			_gameComponentCollection = new GameComponentCollection();
 
 			// Initialize OpenGL funcionts
-			OpenTK.Platform.Utilities.CreateGraphicsContext(MonoTouch.OpenGLES.EAGLRenderingAPI.OpenGLES1);
-
+			_context = OpenTK.Platform.Utilities.CreateGraphicsContext(MonoTouch.OpenGLES.EAGLRenderingAPI.OpenGLES1);
 			//Create a full-screen window
 			_mainWindow = new UIWindow (UIScreen.MainScreen.Bounds);
-			_window = new IphoneWindow ();
-			_window.BackgroundColor = UIColor.Black;
-			_window.Opaque = true;
-			((IphoneWindow) _window).game = this;
-			_mainWindow.AddSubview (_window);			
-			//Show the window
-			_mainWindow.MakeKeyAndVisible ();						
-		
+			_mainWindow.ExclusiveTouch = true;
+			
+			_view = new IphoneWindow ();
+			_view.BackgroundColor = UIColor.Black;
+			_view.Opaque = true;
+			((IphoneWindow) _view).game = this;			
+			_mainWindow.AddSubview (_view);	
+					
 			// Initialize GameTime
             _updateGameTime = new GameTime();
             _drawGameTime = new GameTime();  	
@@ -97,13 +99,14 @@ namespace XnaTouch.Framework
 		public void Dispose ()
 		{
 			_animationTimer = null;
+			_context.Dispose();
 		}
 
 		internal CAEAGLLayer Layer 
 		{
 			get 
 			{
-				return (CAEAGLLayer) _window.Layer;
+				return (CAEAGLLayer) _view.Layer;
 			}
 		}
 
@@ -165,6 +168,9 @@ namespace XnaTouch.Framework
 				//RunGame();
 				//CreateTimer();
 			}
+			
+			//Show the window
+			_mainWindow.MakeKeyAndVisible ();						
         }
 		
 		private void RunGame()
@@ -183,7 +189,7 @@ namespace XnaTouch.Framework
 			}
 		}
 		
-		private void DoStep()
+		internal void DoStep()
 		{
 			// Update the game			
             DateTime now = DateTime.Now;
@@ -228,7 +234,7 @@ namespace XnaTouch.Framework
         {
             get
             {
-                return _window;
+                return _view;
             }
         }
 		
