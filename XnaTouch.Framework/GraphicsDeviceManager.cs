@@ -73,11 +73,16 @@ namespace XnaTouch.Framework
             }
 			
             game.Services.AddService(typeof(IGraphicsDeviceManager), this);
-            game.Services.AddService(typeof(IGraphicsDeviceService), this);
+            game.Services.AddService(typeof(IGraphicsDeviceService), this);	
 			
-			InitializeOpenGL();
+			Initialize();
         }
 		
+		public void CreateDevice ()
+		{
+			throw new System.NotImplementedException ();
+		}
+
 		public bool BeginDraw ()
 		{
 			throw new NotImplementedException();
@@ -112,11 +117,9 @@ namespace XnaTouch.Framework
         {
         }
 
-		private void InitializeOpenGL()
+		private void Initialize()
 		{
-			_graphicsDevice = new GraphicsDevice(_game.Layer);
-			_graphicsDevice.InitializeOpenGL(_preferredBackBufferWidth, _preferredBackBufferHeight);
-			_graphicsDevice.Reset();
+			_graphicsDevice = new GraphicsDevice();
 
 			if (_preferMultiSampling) 
 			{
@@ -128,11 +131,6 @@ namespace XnaTouch.Framework
 			}
 		}
 		
-        void IGraphicsDeviceManager.CreateDevice()
-        {
-			InitializeOpenGL();
-        }		
-
         public void ToggleFullScreen()
         {
 			IsFullScreen = !IsFullScreen;

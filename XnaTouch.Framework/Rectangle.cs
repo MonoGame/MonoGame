@@ -156,6 +156,14 @@ namespace XnaTouch.Framework
             Width += horizontalValue * 2;
             Height += verticalValue * 2;
         }
+		
+		public bool IsEmpty
+        {
+            get
+            {
+                return ((((this.Width == 0) && (this.Height == 0)) && (this.X == 0)) && (this.Y == 0));
+            }
+        }
 
         public bool Equals(Rectangle other)
         {

@@ -46,13 +46,8 @@ using XnaTouch.Framework;
 
 namespace XnaTouch.Framework.Graphics
 {	
-    public class GraphicsDevice : IDisposable
+    public class GraphicsDevice
     {
-		private EAGLContext _context;
-		private uint ViewRenderBuffer, ViewFrameBuffer;
-		private int BackingWidth;
-		private int BackingHeight;
-		private CAEAGLLayer _eaglLayer;
 		private All _preferedFilter;
 		private int _activeTexture = -1;
 		private Viewport _viewport;
@@ -83,14 +78,15 @@ namespace XnaTouch.Framework.Graphics
 			}
 		}
 				
-		public GraphicsDevice(CAEAGLLayer layer)
-        {
-			_eaglLayer = layer;
-			_context = new EAGLContext (EAGLRenderingAPI.OpenGLES1);
-			if (!EAGLContext.SetCurrentContext (_context)) 
-			{
-				throw new Exception ("Unable to set EAGLContext!");
-			}
+		public GraphicsDevice()
+        {	
+			// Initialize the main viewport
+			_viewport = new Viewport();
+			_viewport.X = 0;
+			_viewport.Y = 0;						
+			_viewport.Width = 320;
+			_viewport.Height = 480;	
+			_viewport.TitleSafeArea = new Rectangle(0,0,320,480);	
 			
 			// Create the Sprite Rendering engine
 			_spriteDevice = new GraphicsDevice2D(this);
@@ -123,65 +119,18 @@ namespace XnaTouch.Framework.Graphics
 			throw new NotImplementedException();
         }
 
-        public void Dispose()
-        {
-			if (_context != null)
-			{
-				_context.Dispose();
-			}
-        }
-
         public void Present()
         {
-			// Draw the context to screen
-			_context.PresentRenderBuffer ((uint) All.RenderbufferOes);
         }
 		
         public void Present(Rectangle? sourceRectangle, Rectangle? destinationRectangle, IntPtr overrideWindowHandle)
         {
   			throw new NotImplementedException();
 		}
-		
-		internal void InitializeOpenGL(int backBufferWidth, int backBufferHeight)
-		{
-			//Set the frame buffer size
-			BackingWidth = backBufferWidth;
-			BackingHeight = backBufferHeight;
-
-			// Initialize the main viewport
-			_viewport = new Viewport();
-			_viewport.X = 0;
-			_viewport.Y = 0;						
-			_viewport.Width = BackingWidth;
-			_viewport.Height = BackingHeight;	
-			_viewport.TitleSafeArea = new Rectangle(0,0,BackingWidth,BackingHeight);	
-			
-			// Set up OpenGL projection matrix
-			GL.MatrixMode(All.Projection);
-			GL.LoadIdentity();
-			GL.Ortho(0, BackingWidth, 0, BackingHeight, -1, 1);
-			GL.MatrixMode(All.Modelview);
-			GL.Viewport(0,0,BackingWidth,BackingHeight);
-						
-			// Initialize OpenGL states			
-			GL.Disable(All.DepthTest);
-			GL.TexEnv(All.TextureEnv, All.TextureEnvMode,(int) All.BlendSrc);
-			GL.EnableClientState(All.VertexArray);
-			
-			Clear(Color.Black);
-		}
-		
-		internal void StartPresentation()
-		{						
-			EAGLContext.SetCurrentContext (_context);
-			GL.Oes.BindFramebuffer (All.FramebufferOes, ViewFrameBuffer);
-			GL.Viewport (0, 0, BackingWidth, BackingHeight);						
-		}
-
+				
         public void Reset()
         {
-			DestroyFrameBuffer ();
-			CreateFrameBuffer ();	
+			throw new NotImplementedException();
         }
 
         public void Reset(XnaTouch.Framework.Graphics.PresentationParameters presentationParameters)
@@ -233,43 +182,8 @@ namespace XnaTouch.Framework.Graphics
 				return _viewport;
 			}
 			
-		}
-		
-		private bool CreateFrameBuffer ()
-		{
-			GL.Oes.GenFramebuffers (1, ref ViewFrameBuffer);
-			GL.Oes.GenRenderbuffers (1, ref ViewRenderBuffer);
-	
-			GL.Oes.BindFramebuffer (All.FramebufferOes, ViewFrameBuffer);
-			GL.Oes.BindRenderbuffer (All.RenderbufferOes, ViewRenderBuffer);
-			_context.RenderBufferStorage ((uint) All.RenderbufferOes, _eaglLayer);
-			GL.Oes.FramebufferRenderbuffer (All.FramebufferOes,
-				All.ColorAttachment0Oes,
-				All.RenderbufferOes,
-				ViewRenderBuffer);
-	
-			GL.Oes.GetRenderbufferParameter (All.RenderbufferOes, All.RenderbufferWidthOes, ref BackingWidth);
-			GL.Oes.GetRenderbufferParameter (All.RenderbufferOes, All.RenderbufferHeightOes, ref BackingHeight);
-			
-			if (GL.Oes.CheckFramebufferStatus (All.FramebufferOes) != All.FramebufferCompleteOes) {
-				Console.Error.WriteLine("failed to make complete framebuffer object {0}",
-					GL.Oes.CheckFramebufferStatus (All.FramebufferOes));
-			}
-			
-			return true;
-		}
-		
-		private void DestroyFrameBuffer ()
-		{
-			if (ViewFrameBuffer != 0) 
-			{
-				GL.Oes.DeleteFramebuffers (1, ref ViewFrameBuffer);
-				ViewFrameBuffer = 0;
-				GL.Oes.DeleteRenderbuffers (1, ref ViewRenderBuffer);
-				ViewRenderBuffer = 0;
-			}
-		}
-		
+		}		
+				
 		internal void StartSpriteBatch(SpriteBlendMode blendMode, SpriteSortMode sortMode)
 		{
 			_spriteDevice.StartSpriteBatch(blendMode,sortMode);
