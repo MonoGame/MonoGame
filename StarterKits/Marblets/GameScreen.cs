@@ -84,24 +84,23 @@ namespace Marblets
             switch (MarbletsGame.screenOrientation)
             {
                 case MarbletsGame.ScreenOrientation.LandscapeRight:
-                    Font.Draw(SpriteBatch, FontStyle.Large, 48, 125,
+                    Font.Draw(SpriteBatch, FontStyle.Large, 83, 100,
                               String.Format("{0:###,##0}", MarbletsGame.Score));
 
                     if (board.GameOver)
                     {
-                        SpriteBatch.Draw(gameOver, new Vector2(100, 355), null, 
-                            Color.White, MarbletsGame.screenRotation, Vector2.Zero, 1.0f,
-                            SpriteEffects.None, 0.0f);
+                        SpriteBatch.Draw(gameOver, new Vector2(200, 265), null, 
+                            Color.White, MarbletsGame.screenRotation, Vector2.Zero, 1.0f,SpriteEffects.None, 0.0f);
                     }
                     break;
 
                 case MarbletsGame.ScreenOrientation.LandscapeLeft:
-                    Font.Draw(SpriteBatch, FontStyle.Large, (272 - 48 + 3), (480 - 125),
+                    Font.Draw(SpriteBatch, FontStyle.Large, (480 - 48 + 3), (320 - 125),
                               String.Format("{0:###,##0}", MarbletsGame.Score));
 
                     if (board.GameOver)
                     {
-                        SpriteBatch.Draw(gameOver, new Vector2((272 - 100), (480 - 355)), 
+                        SpriteBatch.Draw(gameOver, new Vector2((320 - 100), (480 - 355)), 
                             null, Color.White, MarbletsGame.screenRotation, Vector2.Zero,
                             1.0f, SpriteEffects.None, 0.0f);
                     }
