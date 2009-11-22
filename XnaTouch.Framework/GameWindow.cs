@@ -38,43 +38,166 @@ purpose and non-infringement.
 */
 #endregion License
 
+using MonoTouch.CoreAnimation;
+using MonoTouch.Foundation;
+using MonoTouch.ObjCRuntime;
+using MonoTouch.OpenGLES;
 using MonoTouch.UIKit;
+using OpenTK.Platform.iPhoneOS;
 using System;
 using System.Drawing;
-using OpenTK.Platform.iPhoneOS;
-using MonoTouch.OpenGLES;
+using XnaTouch.Framework.Input;
+using OpenTK.Graphics.ES11;
 
 namespace XnaTouch.Framework
 {
-    public abstract class GameWindow : UIView
+    public class GameWindow : iPhoneOSGameView
     {
-        protected abstract void SetTitle(string title);
-
-        public abstract bool AllowUserResizing { get; set; }
-
-        public abstract Rectangle ClientBounds { get; }
-
-        public abstract string ScreenDeviceName { get; }
-
-        public string Title
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-            set
-            {
-            }
-        }
-		
+		private readonly Rectangle clientBounds;
+		internal Game game;
+				
 		#region UIVIew Methods
 		
-		public GameWindow(RectangleF frame) : base (frame)
+		public GameWindow() : base (UIScreen.MainScreen.Bounds)
 		{
-			Tag = 1001;
+			LayerRetainsBacking = false; 
+			LayerColorFormat	= EAGLColorFormat.RGBA8; 
+			ContextRenderingApi = EAGLRenderingAPI.OpenGLES1;
+			
+			RectangleF rect = UIScreen.MainScreen.Bounds;
+			clientBounds = new Rectangle(0,0,(int) rect.Width,(int) rect.Height);
+			
+			// Enable multi-touch
+			MultipleTouchEnabled = true;
+		}
+		
+		[Export ("layerClass")]
+		static Class LayerClass() 
+		{
+			return iPhoneOSGameView.GetLayerClass ();
+		}
+		
+		protected override void ConfigureLayer(CAEAGLLayer eaglLayer) 
+		{
+			eaglLayer.Opaque = true;
 		}
 		
 		#endregion
+		
+		#region iPhoneOSGameView Methods
+		
+		protected override void OnRenderFrame (OpenTK.FrameEventArgs e)
+		{
+			base.OnRenderFrame (e);
+			
+			MakeCurrent();
+						
+			game.DoStep();
+						
+			SwapBuffers();
+		}
+		
+		#endregion
+				
+		#region UIVIew Methods
+						
+		private void FillTouchCollection(NSSet touches)
+		{
+			UITouch []touchesArray = touches.ToArray<UITouch>();
+			TouchPanel.Collection = new TouchCollection();
+			TouchPanel.Collection.Capacity = touchesArray.Length;
+			
+			for (int i=0; i<touchesArray.Length;i++)
+			{
+				TouchLocationState state;				
+				UITouch touch = touchesArray[i];
+				switch (touch.Phase)
+				{
+					case UITouchPhase.Began	:	
+						state = TouchLocationState.Pressed;
+						break;
+					case UITouchPhase.Cancelled	:
+					case UITouchPhase.Ended	:
+						state = TouchLocationState.Released;
+						break;
+					default :
+						state = TouchLocationState.Moved;
+						break;					
+				}
+				if (state != TouchLocationState.Released)
+				{
+					TouchLocation touchLocation = new TouchLocation(i,state,new Vector2(touch.LocationInView(touch.View)),1.0f,
+				                                                TouchLocationState.Moved, new Vector2(touch.PreviousLocationInView(touch.View)), 1.0f);
+					TouchPanel.Collection.Add(touchLocation);
+				}
+			}
+		}
+		
+		public override void TouchesBegan (NSSet touches, UIEvent evt)
+		{
+			GamePad.Instance.TouchesBegan(touches,evt);
+			
+			FillTouchCollection(touches);
+			
+			base.TouchesBegan (touches, evt);
+		}
+		
+		public override void TouchesEnded (NSSet touches, UIEvent evt)
+		{
+			GamePad.Instance.TouchesEnded(touches,evt);			
+			
+			FillTouchCollection(touches);
+			
+			base.TouchesEnded (touches, evt);
+		}
+		
+		public override void TouchesMoved (NSSet touches, UIEvent evt)
+		{
+			GamePad.Instance.TouchesMoved(touches,evt);
+
+			FillTouchCollection(touches);
+			
+			base.TouchesMoved (touches, evt);
+		}
+
+		public override void TouchesCancelled (NSSet touches, UIEvent evt)
+		{
+			GamePad.Instance.TouchesCancelled(touches,evt);
+			
+			FillTouchCollection(touches);
+			
+			base.TouchesCancelled (touches, evt);
+		}
+
+		#endregion
+						
+		public string ScreenDeviceName 
+		{
+			get 
+			{
+				throw new System.NotImplementedException ();
+			}
+		}
+
+		public Rectangle ClientBounds 
+		{
+			get 
+			{
+				return clientBounds;
+			}
+		}
+		
+		public bool AllowUserResizing 
+		{
+			get 
+			{
+				return false;
+			}
+			set 
+			{
+				throw new NotSupportedException();
+			}
+		}		
     }
 }
 

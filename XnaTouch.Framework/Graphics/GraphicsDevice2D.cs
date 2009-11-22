@@ -139,8 +139,7 @@ namespace XnaTouch.Framework.Graphics
 	{
 		private GraphicsDevice _device;
 		private readonly List<SpriteBatchRenderItem> _sprites = new List<SpriteBatchRenderItem>();
-		private readonly List<SpriteBatchRenderItem> _sortedSprites = new List<SpriteBatchRenderItem>();
-		private SpriteBlendMode _actualBlendMode, _previousBlendMode = SpriteBlendMode.None;
+		private SpriteBlendMode _actualBlendMode;
 		private SpriteSortMode _actualSortMode = SpriteSortMode.Deferred; 		
 		
 		public GraphicsDevice2D (GraphicsDevice Device)
@@ -157,6 +156,36 @@ namespace XnaTouch.Framework.Graphics
 			
 			_actualBlendMode = blendMode;
 			_actualSortMode = sortMode;
+			
+			// Set up OpenGL projection matrix
+			GL.MatrixMode(All.Projection);
+			GL.LoadIdentity();
+			GL.Ortho(0, 320, 0, 480, -1, 1);
+			GL.MatrixMode(All.Modelview);
+			GL.Viewport (0, 0, 320, 480);
+						
+			// Initialize OpenGL states			
+			GL.Disable(All.DepthTest);
+			GL.TexEnv(All.TextureEnv, All.TextureEnvMode,(int) All.BlendSrc);
+			GL.EnableClientState(All.VertexArray);
+			
+			_device.ActiveTexture = -1;
+			GL.Disable(All.Blend);
+			
+			// Set the current blend mode
+			switch (_actualBlendMode)
+			{
+				case SpriteBlendMode.Additive :					
+					GL.Enable(All.Blend);
+					GL.BlendFunc(All.SrcAlpha,All.One);
+					break;
+				case SpriteBlendMode.AlphaBlend :
+					GL.Enable(All.Blend);
+					GL.BlendFunc(All.SrcAlpha, All.OneMinusSrcAlpha);					
+					break;
+				case SpriteBlendMode.None :
+					break;
+			}
 		}
 		
 		public void EndSpriteBatch()
@@ -173,36 +202,7 @@ namespace XnaTouch.Framework.Graphics
 		{
 			// Draw the current spritebatch
 			if (spritesToDraw.Count > 0)
-			{				
-				if (_previousBlendMode != _actualBlendMode)
-				{
-					switch (_previousBlendMode)
-					{
-						case SpriteBlendMode.Additive :
-						case SpriteBlendMode.AlphaBlend :
-							GL.Disable(All.Blend);
-							break;
-						case SpriteBlendMode.None :
-							break;
-					}
-					_previousBlendMode = _actualBlendMode;
-					_device.ActiveTexture = -1;
-				}
-				// Set the current blend mode
-				switch (_actualBlendMode)
-				{
-					case SpriteBlendMode.Additive :					
-						GL.Enable(All.Blend);
-						GL.BlendFunc(All.SrcAlpha,All.One);
-						break;
-					case SpriteBlendMode.AlphaBlend :
-						GL.Enable(All.Blend);
-						GL.BlendFunc(All.SrcAlpha, All.OneMinusSrcAlpha);					
-						break;
-					case SpriteBlendMode.None :
-						break;
-				}
-				
+			{									
 				List<float> Vertices = new List<float>();
 				List<float> TextureCoords = new List<float>();
 				TextureCoords.Capacity = spritesToDraw.Count*4;

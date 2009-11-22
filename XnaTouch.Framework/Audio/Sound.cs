@@ -34,7 +34,7 @@ namespace XnaTouch.Framework.Audio
 	using System.Runtime.InteropServices;
 	using System.Collections.Generic;
 	using MonoTouch;
-	using MonoTouch.Foundation;
+	using MonoTouch.Foundation;	
 	using OSStatus = System.Int32;
 	using AudioFileTypeID = System.UInt32;
 	using AudioFileID = System.IntPtr;
@@ -276,9 +276,8 @@ namespace XnaTouch.Framework.Audio
 				return;
 		
 			Console.WriteLine("AudioStream API Failed: Status Code = " + API.ToHex((uint) status));
-			
-//			throw new Exception("AudioStream API Failed: Status Code = " + API.ToHex((uint) status));
 		}
+		
 
 		[ DllImport(Constants.AudioToolboxLibrary) ]
 		public static extern unsafe OSStatus AudioFileReadPackets(AudioFileID fileID, int useCache, int* numBytesReadFromFile, AudioStreamPacketDescription* packetDesc, long startPacket, int* numPackets, void* outputBuffer);

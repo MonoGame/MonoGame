@@ -55,9 +55,9 @@ namespace Marblets
             switch (MarbletsGame.screenOrientation)
             {
                 case MarbletsGame.ScreenOrientation.LandscapeRight:
-                    startButton.X = 225;
+                    startButton.X = 285;
                     startButton.Width = 25;
-                    startButton.Y = 45;
+                    startButton.Y = 35;
                     startButton.Height = 65;
                     break;
 
@@ -114,8 +114,8 @@ namespace Marblets
                         switch (MarbletsGame.screenOrientation)
                         {
                             case MarbletsGame.ScreenOrientation.LandscapeRight:
-                                xPosition = 160 + (int)(i * 48 * Font.ZuneFontScale);
-                                yPosition = 260;
+                                xPosition = 215 + (int)(i * 48 * Font.ZuneFontScale);
+                                yPosition = 230;
                                 break;
 
                             case MarbletsGame.ScreenOrientation.LandscapeLeft:
@@ -127,9 +127,8 @@ namespace Marblets
                             default:
                                 break;
                         }
-
-                        Font.Draw(SpriteBatch, FontStyle.Large, xPosition, yPosition,
-                                  MarbletsGame.HighScores[i]);
+						
+                        Font.Draw(SpriteBatch, FontStyle.Large, xPosition, yPosition,MarbletsGame.HighScores[i]);
                     }
                 }
 

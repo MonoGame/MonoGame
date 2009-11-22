@@ -27,6 +27,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "StarterKits", "StarterKits"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlienGame", "StarterKits\AlienGame\AlienGame.csproj", "{A18E0228-936A-45CD-91CC-07E01F45677E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Marblets", "StarterKits\Marblets\Marblets.csproj", "{A3BDF086-7EAA-486F-A90F-78938B7F0A69}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XnaTouch.Framework", "XnaTouch.Framework\XnaTouch.Framework.csproj", "{DB8508BB-9849-4CC2-BC0F-8EB5DACB3C47}"
 EndProject
 Global
@@ -93,6 +95,14 @@ Global
 		{A18E0228-936A-45CD-91CC-07E01F45677E}.Release|iPhone.Build.0 = Release|iPhone
 		{A18E0228-936A-45CD-91CC-07E01F45677E}.Release|iPhoneSimulator.ActiveCfg = Release|iPhoneSimulator
 		{A18E0228-936A-45CD-91CC-07E01F45677E}.Release|iPhoneSimulator.Build.0 = Release|iPhoneSimulator
+		{A3BDF086-7EAA-486F-A90F-78938B7F0A69}.Debug|iPhone.ActiveCfg = Debug|iPhone
+		{A3BDF086-7EAA-486F-A90F-78938B7F0A69}.Debug|iPhone.Build.0 = Debug|iPhone
+		{A3BDF086-7EAA-486F-A90F-78938B7F0A69}.Debug|iPhoneSimulator.ActiveCfg = Debug|iPhoneSimulator
+		{A3BDF086-7EAA-486F-A90F-78938B7F0A69}.Debug|iPhoneSimulator.Build.0 = Debug|iPhoneSimulator
+		{A3BDF086-7EAA-486F-A90F-78938B7F0A69}.Release|iPhone.ActiveCfg = Release|iPhone
+		{A3BDF086-7EAA-486F-A90F-78938B7F0A69}.Release|iPhone.Build.0 = Release|iPhone
+		{A3BDF086-7EAA-486F-A90F-78938B7F0A69}.Release|iPhoneSimulator.ActiveCfg = Release|iPhoneSimulator
+		{A3BDF086-7EAA-486F-A90F-78938B7F0A69}.Release|iPhoneSimulator.Build.0 = Release|iPhoneSimulator
 		{B1E27EDB-2AC5-4A8A-8FD2-29CEEBDF3344}.Debug|iPhone.ActiveCfg = Debug|iPhone
 		{B1E27EDB-2AC5-4A8A-8FD2-29CEEBDF3344}.Debug|iPhone.Build.0 = Debug|iPhone
 		{B1E27EDB-2AC5-4A8A-8FD2-29CEEBDF3344}.Debug|iPhoneSimulator.ActiveCfg = Debug|iPhoneSimulator
@@ -146,8 +156,9 @@ Global
 		{DF8DF5E3-2FF4-46DD-9EE0-AE3C9923C6BA} = {64ED246E-8579-4DF2-A50E-53CC3CCB0E6B}
 		{327EE711-BA4F-40DA-AD4A-F69DD0B2FCFB} = {64ED246E-8579-4DF2-A50E-53CC3CCB0E6B}
 		{A18E0228-936A-45CD-91CC-07E01F45677E} = {ED13CD83-F288-496C-B046-027FA7D36717}
+		{A3BDF086-7EAA-486F-A90F-78938B7F0A69} = {ED13CD83-F288-496C-B046-027FA7D36717}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = Samples\Draw2D\XnaTouch.Samples.Draw2D.csproj
+		StartupItem = Samples\RockRainIphone\RockRainIphone.csproj
 	EndGlobalSection
 EndGlobal

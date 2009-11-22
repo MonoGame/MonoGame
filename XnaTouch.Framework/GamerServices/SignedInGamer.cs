@@ -42,7 +42,7 @@ purpose and non-infringement.
 
 namespace XnaTouch.Framework.GamerServices
 {
-    public class SignedInGamer
+    public class SignedInGamer : Gamer
     {
         public string Gamertag
         {

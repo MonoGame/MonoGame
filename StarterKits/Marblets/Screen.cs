@@ -122,8 +122,8 @@ namespace Marblets
                 switch (MarbletsGame.screenOrientation)
                 {
                     case MarbletsGame.ScreenOrientation.LandscapeRight:
-                        drawPosition.X = 0;
-                        drawPosition.Y = 480;
+                        drawPosition.X = 320;
+                        drawPosition.Y = 160;
                         break;
 
                     case MarbletsGame.ScreenOrientation.LandscapeLeft:
@@ -135,9 +135,8 @@ namespace Marblets
                         break;
                 }
 
-                SpriteBatch.Draw(backgroundTexture, drawPosition, null, Color.White,
-                    MarbletsGame.screenRotation, Vector2.Zero, 1.0f, SpriteEffects.None,
-                    0.0f);
+				SpriteBatch.Draw(backgroundTexture, new Rectangle((int)drawPosition.X,(int)drawPosition.Y,480,320),null,
+				                 Color.White,MarbletsGame.screenRotation,Vector2.Zero,SpriteEffects.None,0.0f);
 
                 SpriteBatch.End();
             }

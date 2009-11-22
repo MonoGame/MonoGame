@@ -49,14 +49,14 @@ namespace Marblets
         /// <summary>
         /// Number if marbles in the x direction
         /// </summary>
-        public const int Width = 8;
+        public const int Width = 9;
         /// <summary>
         /// Number of marbles in the y direction
         /// </summary>
         public const int Height = 8;
 
-        private const int LeftEdge = 341;
-        private const int TopEdge = 37;
+        private const int LeftEdge = 315;
+        private const int TopEdge = 74;
 
         /// <summary>
         /// Marbles stores the set of marbles used on the game board
@@ -292,8 +292,8 @@ namespace Marblets
                    break;
 
                 case MarbletsGame.ScreenOrientation.LandscapeLeft:
-                   position.X = 272 - TopEdge - ((float)x * Marble.Height);
-                   position.Y = 480 - LeftEdge + ((float)y * Marble.Width);
+                   position.X = 480 - TopEdge - ((float)x * Marble.Height);
+                   position.Y = 320 - LeftEdge + ((float)y * Marble.Width);
                    break;
 
                 default:
@@ -380,7 +380,7 @@ namespace Marblets
                         // Finish slide in the bottom half of the screen.
                         if (startBurstSlide &&
                             touchCollection[0].Position.X > 146 &&
-                            touchCollection[0].Position.X < 272)
+                            touchCollection[0].Position.X < 320)
                         {
                             startBurstSlide = false;
                             burstPressed = true;
@@ -392,8 +392,8 @@ namespace Marblets
                     if (touchCollection.Count > 0)
                     {
                         // Start slide in the top half of the screen.
-                        if (touchCollection[0].Position.X > 272 - 126 &&
-                            touchCollection[0].Position.X < 272 &&
+                        if (touchCollection[0].Position.X > 320 - 126 &&
+                            touchCollection[0].Position.X < 320 &&
                             touchCollection[0].Position.Y > 480 - 100 &&
                             touchCollection[0].Position.Y < 480)
                         {
@@ -403,7 +403,7 @@ namespace Marblets
                         // Finish slide in the bottom half of the screen.
                         if (startBurstSlide &&
                             touchCollection[0].Position.X > 0 &&
-                            touchCollection[0].Position.X < 272 - 146)
+                            touchCollection[0].Position.X < 320 - 146)
                         {
                             startBurstSlide = false;
                             burstPressed = true;

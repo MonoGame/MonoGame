@@ -38,16 +38,15 @@ purpose and non-infringement.
 */
 #endregion License
     
-using XnaTouch.Framework.Content;
-using System;
-using XnaTouch.Framework.Graphics;
-using MonoTouch.Foundation;
 using MonoTouch.CoreAnimation;
 using MonoTouch.CoreFoundation;
+using MonoTouch.Foundation;
 using MonoTouch.UIKit;
-using XnaTouch.Framework.Input;
-using System.Threading;
 using OpenTK.Graphics;
+using System;
+using XnaTouch.Framework.Content;
+using XnaTouch.Framework.Graphics;
+using XnaTouch.Framework.Input;
 
 namespace XnaTouch.Framework
 {
@@ -56,20 +55,17 @@ namespace XnaTouch.Framework
         private GameTime _updateGameTime;
         private GameTime _drawGameTime;
         private DateTime _lastUpdate;
-		private TimeSpan _timeSinceLast;
         private bool _initialized = false;
         private GameComponentCollection _gameComponentCollection;
         public GameServiceContainer _services;
         private ContentManager _content;
-        private IphoneWindow _view;
+        private GameWindow _view;
 		private bool _isFixedTimeStep = true;
         private TimeSpan _targetElapsedTime = TimeSpan.FromSeconds(1 / 60.0); // ~60 frames per second
         
-		private NSTimer _animationTimer;
 		private IGraphicsDeviceManager graphicsDeviceManager;
 		private IGraphicsDeviceService graphicsDeviceService;
 		private UIWindow _mainWindow;
-		private IGraphicsContext _context;
 
 		internal static bool _playingVideo = false;
 		
@@ -79,17 +75,11 @@ namespace XnaTouch.Framework
 			_services = new GameServiceContainer();
 			_gameComponentCollection = new GameComponentCollection();
 
-			// Initialize OpenGL funcionts
-			_context = OpenTK.Platform.Utilities.CreateGraphicsContext(MonoTouch.OpenGLES.EAGLRenderingAPI.OpenGLES1);
 			//Create a full-screen window
-			_mainWindow = new UIWindow (UIScreen.MainScreen.Bounds);
-			_mainWindow.ExclusiveTouch = true;
-			
-			_view = new IphoneWindow ();
-			_view.BackgroundColor = UIColor.Black;
-			_view.Opaque = true;
-			((IphoneWindow) _view).game = this;			
-			_mainWindow.AddSubview (_view);	
+			_mainWindow = new UIWindow (UIScreen.MainScreen.Bounds);			
+			_view = new GameWindow ();
+			_view.game = this;			
+			_mainWindow.Add (_view);	
 					
 			// Initialize GameTime
             _updateGameTime = new GameTime();
@@ -98,18 +88,9 @@ namespace XnaTouch.Framework
 		
 		public void Dispose ()
 		{
-			_animationTimer = null;
-			_context.Dispose();
+			// do nothing
 		}
-
-		internal CAEAGLLayer Layer 
-		{
-			get 
-			{
-				return (CAEAGLLayer) _view.Layer;
-			}
-		}
-
+		
         public bool IsActive
         {
             get
@@ -140,82 +121,33 @@ namespace XnaTouch.Framework
             {
                 _targetElapsedTime = value;			
 				if(_initialized) {
-					CreateTimer ();
+					throw new NotSupportedException();
 				}
             }
         }
-
-		private void CreateTimer ()
-		{
-			_animationTimer = null;
-			_animationTimer = NSTimer.CreateRepeatingScheduledTimer (_targetElapsedTime, () => DoStep ());
-		}
 		
         public void Run()
     		{			
-			this.Initialize();
-			
 			_lastUpdate = DateTime.Now;
-			if (IsFixedTimeStep) 
-			{				
-            		this.Update(_updateGameTime); 												
-				CreateTimer();				
-			}
-			else {
-				//Thread workerThread = new Thread(this.RunGame);
-				//workerThread.Start();
-				
-				//RunGame();
-				//CreateTimer();
-			}
 			
-			//Show the window
+			_view.Run(60/(60*TargetElapsedTime.TotalSeconds));			
+			
+			Initialize();
+			
+			//Show the window			
 			_mainWindow.MakeKeyAndVisible ();						
         }
-		
-		private void RunGame()
-		{
-			_animationTimer = null;
-			// This is the heart of the game loop and will keep on looping until it is told otherwise
-			while(true) 
-			{	
-				// I found this trick on iDevGames.com.  The command below pumps events which take place
-				// such as screen touches etc so they are handled and then runs our code.  This means
-				// that we are always in sync with VBL rather than an NSTimer and VBL being out of sync					
-				//while(CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0, TRUE) == kCFRunLoopRunHandledSource);		
-				while(CFRunLoop.Current.RunInMode(CFRunLoop.ModeDefault,0.002f,true) == CFRunLoopExitReason.HandledSource);
-				// Go and update the game logic and then render the scene;
-				DoStep();	
-			}
-		}
 		
 		internal void DoStep()
 		{
 			// Update the game			
-            DateTime now = DateTime.Now;
-            if (IsFixedTimeStep)
-            {
-                _timeSinceLast += now - _lastUpdate;
-                
-				while (_timeSinceLast >= _targetElapsedTime)
-                {
-                    _updateGameTime.Update(_targetElapsedTime);
-                    _timeSinceLast -= _targetElapsedTime;
-                    Update(_updateGameTime);
-                }
-            }
-            else
-            {
-                _updateGameTime.Update(now - _lastUpdate);
-                Update(_updateGameTime);
-            }
+            _updateGameTime.Update(DateTime.Now - _lastUpdate);
+            Update(_updateGameTime);
 
             // Draw the screen
-			GraphicsDevice.StartPresentation();			
-            _drawGameTime.Update(now - _lastUpdate);
-            _lastUpdate = now;
+            _drawGameTime.Update(DateTime.Now - _lastUpdate);
+            _lastUpdate = DateTime.Now;
             Draw(_drawGameTime);       			
-			GraphicsDevice.Present();
 		}
 
         public bool IsFixedTimeStep
@@ -305,9 +237,11 @@ namespace XnaTouch.Framework
             foreach (GameComponent gc in _gameComponentCollection)
             {
                 gc.Initialize();
-            }			
+            }		
+			
+			_initialized = true;
         }
-
+		
         protected virtual void Update(GameTime gameTime)
         {			
 			foreach (GameComponent gc in _gameComponentCollection)			
@@ -339,9 +273,6 @@ namespace XnaTouch.Framework
 
         public void Exit()
         {
-			_animationTimer.Dispose();
-			_animationTimer = null;
-			
 			//TODO: Fix this
 			UIAlertView alert = new UIAlertView("Game Exit", "Hit Home Button to Exit",null,null,null);
 			alert.Show();		
