@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlatformeriPhone", "PlatformeriPhone.csproj", "{9964D44C-AD60-497E-8ED3-1DE22F53CEED}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|iPhoneSimulator = Debug|iPhoneSimulator
+		Release|iPhoneSimulator = Release|iPhoneSimulator
+		Debug|iPhone = Debug|iPhone
+		Release|iPhone = Release|iPhone
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9964D44C-AD60-497E-8ED3-1DE22F53CEED}.Debug|iPhone.ActiveCfg = Debug|iPhone
+		{9964D44C-AD60-497E-8ED3-1DE22F53CEED}.Debug|iPhone.Build.0 = Debug|iPhone
+		{9964D44C-AD60-497E-8ED3-1DE22F53CEED}.Debug|iPhoneSimulator.ActiveCfg = Debug|iPhoneSimulator
+		{9964D44C-AD60-497E-8ED3-1DE22F53CEED}.Debug|iPhoneSimulator.Build.0 = Debug|iPhoneSimulator
+		{9964D44C-AD60-497E-8ED3-1DE22F53CEED}.Release|iPhone.ActiveCfg = Release|iPhone
+		{9964D44C-AD60-497E-8ED3-1DE22F53CEED}.Release|iPhone.Build.0 = Release|iPhone
+		{9964D44C-AD60-497E-8ED3-1DE22F53CEED}.Release|iPhoneSimulator.ActiveCfg = Release|iPhoneSimulator
+		{9964D44C-AD60-497E-8ED3-1DE22F53CEED}.Release|iPhoneSimulator.Build.0 = Release|iPhoneSimulator
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = PlatformeriPhone.csproj
+	EndGlobalSection
+EndGlobal
