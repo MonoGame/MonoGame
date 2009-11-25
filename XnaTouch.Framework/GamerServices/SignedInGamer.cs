@@ -52,6 +52,22 @@ namespace XnaTouch.Framework.GamerServices
             }
         }
 
+		public bool IsGuest 
+		{ 
+			get
+			{
+				throw new NotSupportedException();
+			}
+		}
+		
+		public bool IsSignedInToLive 
+		{ 
+			get
+			{
+				throw new NotSupportedException();
+			}
+		}
+		
         public PlayerIndex PlayerIndex
         {
             get
