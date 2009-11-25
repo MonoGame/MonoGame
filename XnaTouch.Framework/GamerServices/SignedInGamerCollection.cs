@@ -45,6 +45,17 @@ namespace XnaTouch.Framework.GamerServices
 {
     public class SignedInGamerCollection : List<SignedInGamer>
     {
-
+		#region Properties
+		// Indexer to get and set words of the containing document:
+       	public SignedInGamer this [PlayerIndex index] 
+		{ 
+			get
+			{
+				throw new NotImplementedException();
+			}
+		}
+		#endregion
     }
+	
+	
 }

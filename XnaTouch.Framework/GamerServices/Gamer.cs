@@ -45,6 +45,63 @@ namespace XnaTouch.Framework.GamerServices
     public class Gamer
     {
         static SignedInGamerCollection _signedInGamers = new SignedInGamerCollection();
+        string _gamer;
+        bool _isDisposed;
+        Object _tag;
+
+        #region Methods
+        public IAsyncResult BeginGetProfile( AsyncCallback callback, Object asyncState )
+        {
+            throw new NotImplementedException();
+        }
+
+        public GamerProfile EndGetProfile(IAsyncResult result)
+        {
+            throw new NotImplementedException();
+        }
+
+        public GamerProfile GetProfile()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override string ToString()
+        {
+            return _gamer;
+        }
+        #endregion
+        #region Properties
+        public string Gamertag 
+        {
+            get
+            {
+                return _gamer;
+            }
+        }
+
+        public bool IsDisposed 
+        {
+            get
+            {
+                return _isDisposed;
+            }
+        }
+
+        public Object Tag 
+        {
+            get
+            {
+                return _tag;
+            }
+            set
+            {
+                if (_tag != value)
+                {
+                    _tag = value;
+                }
+            }
+        }
+
         public static SignedInGamerCollection SignedInGamers
         {
             get
@@ -52,6 +109,6 @@ namespace XnaTouch.Framework.GamerServices
                 return _signedInGamers;
             }
         }
-
+        #endregion
     }
 }

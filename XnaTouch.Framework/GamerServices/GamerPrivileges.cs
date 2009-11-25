@@ -39,12 +39,68 @@ purpose and non-infringement.
 #endregion License
 
 
-﻿using System;
+using System;
 
 namespace XnaTouch.Framework.GamerServices
 {
+	[SerializableAttribute]
+	public class GamerPrivilegeException : Exception
+	{
+		
+	}
+	
     public class GamerPrivileges
     {
-        public bool AllowPurchaseContent = false;
+		#region Properties
+		public GamerPrivilegeSetting AllowCommunication 
+		{ 
+			get
+			{
+				throw new NotSupportedException();
+			}
+		}
+		
+		public bool AllowOnlineSessions 
+		{ 
+			get
+			{
+				throw new NotSupportedException();
+			}
+		}
+		
+		public GamerPrivilegeSetting AllowProfileViewing 
+		{ 
+			get
+			{
+				throw new NotSupportedException();
+			}
+		}
+		
+		public bool AllowPurchaseContent
+		{ 
+			get
+			{
+				throw new NotSupportedException();
+			}
+		}
+		
+		public bool AllowTradeContent 
+		{ 
+			get
+			{
+				throw new NotSupportedException();
+			} 
+		}
+		
+		public GamerPrivilegeSetting AllowUserCreatedContent 
+		{ 
+			get
+			{
+				throw new NotSupportedException();
+			} 
+		}
+		#endregion
+		
+        
     }
 }
