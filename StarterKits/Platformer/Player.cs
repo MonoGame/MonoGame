@@ -184,9 +184,9 @@ namespace Platformer
             localBounds = new Rectangle(left, top, width, height);
 
             // Load sounds.            
-            // TODO killedSound = Level.Content.Load<SoundEffect>("Sounds/PlayerKilled");
-            // TODO jumpSound = Level.Content.Load<SoundEffect>("Sounds/PlayerJump");
-            // TODO fallSound = Level.Content.Load<SoundEffect>("Sounds/PlayerFall");
+            killedSound = Level.Content.Load<SoundEffect>("Sounds/PlayerKilled");
+            jumpSound = Level.Content.Load<SoundEffect>("Sounds/PlayerJump");
+            fallSound = Level.Content.Load<SoundEffect>("Sounds/PlayerFall");
         }
 
         /// <summary>
@@ -233,12 +233,8 @@ namespace Platformer
         private void GetInput(AccelerometerState accelState,  TouchCollection touchState)
         {
             // Get input state.
-            GamePadState gamePadState = GamePad.GetState(PlayerIndex.One);
-			#if ZUNE
-			#elif IPHONE
-			#else
-				KeyboardState keyboardState = Keyboard.GetState();
-			#endif
+            GamePadState gamePadState = GamePad.GetState(PlayerIndex.One);			
+			KeyboardState keyboardState = Keyboard.GetState();
 
             // Get analog horizontal movement.
             movement = gamePadState.ThumbSticks.Left.X * MoveStickScale;
@@ -247,7 +243,6 @@ namespace Platformer
             if (Math.Abs(movement) < 0.5f)
                 movement = 0.0f;
 
-			#if ZUNE
 			if (Math.Abs(accelState.Acceleration.X) > 0.10f)
 			{
 			    if (accelState.Acceleration.X > 0.0f)
@@ -272,32 +267,7 @@ namespace Platformer
 			            break;
 			    }
 			}
-			#elif IPHONE
-			if (Math.Abs(accelState.Acceleration.X) > 0.10f)
-			{
-			    if (accelState.Acceleration.X > 0.0f)
-			        movement = 1.0f;
-			    else
-			        movement = -1.0f;
-			}
 			
-			//override digital if touch input is found
-			// Process touch locations.
-			bool touchJump = false;
-			foreach (TouchLocation location in touchState)
-			{
-			    switch (location.State)
-			    {
-			        case TouchLocationState.Pressed:
-			            touchJump = true;
-			            break;
-			        case TouchLocationState.Moved:
-			            break;
-			        case TouchLocationState.Released:
-			            break;
-			    }
-			}
-			#else
 			// If any digital horizontal movement input is found, override the analog movement.
             if (gamePadState.IsButtonDown(Buttons.DPadLeft) ||
                 keyboardState.IsKeyDown(Keys.Left) ||
@@ -311,24 +281,15 @@ namespace Platformer
             {
                 movement = 1.0f;
             }
-			#endif
+			
 			
 			// Check if the player wants to jump.
-            #if ZUNE
-			isJumping =
-				gamePadState.IsButtonDown(JumpButton) ||
-                touchJump;
-			#elif IPHONE
-			isJumping =
-				gamePadState.IsButtonDown(JumpButton) ||
-                touchJump;
-			#else
             isJumping =
                 gamePadState.IsButtonDown(JumpButton) ||
                 keyboardState.IsKeyDown(Keys.Space) ||
                 keyboardState.IsKeyDown(Keys.Up) ||
-                keyboardState.IsKeyDown(Keys.W);
-			#endif
+                keyboardState.IsKeyDown(Keys.W) ||
+				touchJump;
         }
 
         /// <summary>
@@ -396,8 +357,8 @@ namespace Platformer
                 // Begin or continue a jump
                 if ((!wasJumping && IsOnGround) || jumpTime > 0.0f)
                 {
-                    /* TODO if (jumpTime == 0.0f)
-                        jumpSound.Play(); */
+                    if (jumpTime == 0.0f)
+                        jumpSound.Play();
 
                     jumpTime += (float)gameTime.ElapsedGameTime.TotalSeconds;
                     sprite.PlayAnimation(jumpAnimation);
@@ -505,10 +466,10 @@ namespace Platformer
         {
             isAlive = false;
 
-            /* TODO if (killedBy != null)
+            if (killedBy != null)
                 killedSound.Play();
             else
-                fallSound.Play(); */
+                fallSound.Play();
 
             sprite.PlayAnimation(dieAnimation);
         }
