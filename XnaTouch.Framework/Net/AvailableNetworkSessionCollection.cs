@@ -53,5 +53,10 @@ namespace XnaTouch.Framework.Net
 		public AvailableNetworkSessionCollection( IList<AvailableNetworkSession> list ) : base(list)
 		{
 		}
+		
+		public void Dispose()
+		{
+			
+		}
 	}
 }

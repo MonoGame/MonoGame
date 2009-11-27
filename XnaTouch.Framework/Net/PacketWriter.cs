@@ -50,8 +50,8 @@ namespace XnaTouch.Framework.Net
 
 	public class PacketWriter : BinaryWriter
 	{
-		private int length;
-		private int position;
+		private int length = 0;
+		private int position = 0;
 			
 		#region Constructors
 		public PacketWriter()

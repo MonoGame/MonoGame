@@ -52,8 +52,8 @@ namespace XnaTouch.Framework.Net
 	public class PacketReader : BinaryReader
 	{
 		
-		private int length;
-		private int position;
+		private int length = 0;
+		private int position = 0;
 
 		#region Constructors
 		public PacketReader() : base(null)

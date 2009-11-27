@@ -398,7 +398,8 @@ namespace Platformer
                 UpdateGems(gameTime);
 
                 // Falling off the bottom of the level kills the player.
-                if (Player.BoundingRectangle.Top >= Height * Tile.Height)
+                if ((Player.IsAlive ) 
+				    && (Player.BoundingRectangle.Top >= Height * Tile.Height))
                     OnPlayerKilled(null);
 
                 UpdateEnemies(gameTime);
@@ -540,7 +541,7 @@ namespace Platformer
 			#if ZUNE
 			Vector2 screenOffset = new Vector2(16, 80);
 			#elif IPHONE
-			Vector2 screenOffset = new Vector2(16, 80);
+			Vector2 screenOffset = new Vector2(40, 80);
 			#else
 			Vector2 screenOffset = new Vector2(0, 0);
             #endif

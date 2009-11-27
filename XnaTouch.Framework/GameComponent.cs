@@ -42,7 +42,7 @@ using System;
 
 namespace XnaTouch.Framework
 {   
-    public class GameComponent : IGameComponent, IComparable<GameComponent>
+    public class GameComponent : IGameComponent, IComparable<GameComponent>, IDisposable
     {
         Game _game;
         int _updateOrder;
@@ -137,6 +137,22 @@ namespace XnaTouch.Framework
 
         }
 
+		/// <summary>
+        /// Shuts down the component.
+        /// </summary>
+        protected virtual void Dispose(bool disposing)
+        {
+			
+		}
+		
+		/// <summary>
+        /// Shuts down the component.
+        /// </summary>
+        public virtual void Dispose()
+        {
+			
+		}
+		
         #region IComparable<GameComponent> Members
 
         public int CompareTo(GameComponent other)
