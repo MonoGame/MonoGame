@@ -203,6 +203,15 @@
     <Compile Include="Net\SendDataOptions.cs" />
     <Compile Include="Net\XnaTouchPeerPickerControllerDelegate.cs" />
     <Compile Include="Net\XnaTouchSessionDelegate.cs" />
+    <Compile Include="GamerServices\GamerProfile.cs" />
+    <Compile Include="GamerServices\GamerZone.cs" />
+    <Compile Include="GamerServices\GamerPrivilegeSetting.cs" />
+    <Compile Include="Input\KeyboardState.cs" />
+    <Compile Include="Input\Keys.cs" />
+    <Compile Include="Input\Keyboard.cs" />
+    <Compile Include="Audio\SoundEffectInstance.cs" />
+    <Compile Include="Input\KeyState.cs" />
+    <Compile Include="IUpdateable.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>

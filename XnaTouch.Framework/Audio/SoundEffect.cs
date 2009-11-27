@@ -38,6 +38,7 @@ purpose and non-infringement.
 */
 #endregion License
 ﻿
+using System;
 using System.IO;
 using XnaTouch;
 using XnaTouch.Framework;
@@ -48,12 +49,17 @@ namespace XnaTouch.Framework.Audio
     public sealed class SoundEffect
     {
 		private Sound _sound;
-		private string _name;
+		private string _name = "";
 		private float _volume = 1.0f;
 		
 		internal SoundEffect(string fileName)
 		{
-			_name = fileName;
+			_name = fileName;		
+			
+			if (_name == string.Empty )
+			{
+			  throw new FileNotFoundException("Supported Sound Effect formats are wav, mp3, acc, aiff");
+			}
 		}
 		
         public bool Play()
@@ -69,6 +75,14 @@ namespace XnaTouch.Framework.Audio
 			_volume = volume;
 			return Play();
         }
+		
+		public TimeSpan Duration 
+		{ 
+			get
+			{
+				return new TimeSpan(0);// _sound.Duration;
+			}
+		}
 
         public string Name
         {
