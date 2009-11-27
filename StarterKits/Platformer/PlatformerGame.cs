@@ -20,12 +20,8 @@ namespace Platformer
 {
     /// <summary>
     /// This is the main type for your game
-    /// </summary>
-    #if IPHONE
-    public class PlatformerGame : XnaTouch.Framework.Game
-	#else
-	public class PlatformerGame : Microsoft.Xna.Framework.Game
-	#endif
+    /// </summary>  
+	public class PlatformerGame : Game
     {
         // Resources for drawing.
         private GraphicsDeviceManager graphics;
@@ -48,7 +44,7 @@ namespace Platformer
 
 #if ZUNE
         private const int TargetFrameRate = 30;        
-        private const int BackBufferWidth = 270;
+        private const int BackBufferWidth = 272;
         private const int BackBufferHeight = 480;
         private const Buttons ContinueButton = Buttons.B;
 		
@@ -123,24 +119,16 @@ namespace Platformer
 
         private void HandleInput()
         {
-			#if ZUNE
 			accelState = Accelerometer.GetState();
 			touchState = TouchPanel.GetState();
-			bool buttonTouched = false;
-			#elif IPHONE
-			accelState = Accelerometer.GetState();
-			touchState = TouchPanel.GetState();
-			bool buttonTouched = false;
-			#else
-            KeyboardState keyboardState = Keyboard.GetState();
-			#endif
+			bool buttonTouched = false;			
+            KeyboardState keyboardState = Keyboard.GetState();		
             GamePadState gamepadState = GamePad.GetState(PlayerIndex.One);
 
             // Exit the game when back is pressed.
             if (gamepadState.Buttons.Back == ButtonState.Pressed)
                 Exit();
 			
-			#if ZUNE
 			//interpert touch screen presses
 			foreach (TouchLocation location in touchState)
 			{
@@ -155,35 +143,12 @@ namespace Platformer
 			            break;
 			    }
 			}
-			#elif IPHONE
-			//interpert touch screen presses
-			foreach (TouchLocation location in touchState)
-			{
-			    switch (location.State)
-			    {
-			        case TouchLocationState.Pressed:
-			            buttonTouched = true;
-			            break;
-			        case TouchLocationState.Moved:
-			            break;
-			        case TouchLocationState.Released:
-			            break;
-			    }
-			}
-			#else
-			#endif
 
 
             bool continuePressed =
 				gamepadState.IsButtonDown(ContinueButton) ||
-			#if ZUNE
-				buttonTouched
-			#elif IPHONE
-				buttonTouched
-			#else
-				keyboardState.IsKeyDown(Keys.Space)
-			#endif
-				;
+				keyboardState.IsKeyDown(Keys.Space) ||
+			    buttonTouched;
 
             // Perform the appropriate action to advance the game and
             // to get the player back to playing.
