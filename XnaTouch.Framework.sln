@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{64ED246E-8579-4DF2-A50E-53CC3CCB0E6B}"
@@ -19,15 +19,17 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XnaTouch.Samples.Video", "S
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XnaTouch.Samples.BouncingBox", "Samples\BouncingBox\XnaTouch.Samples.BouncingBox.csproj", "{F5FA28E2-53B2-482B-8723-71588DF50BB6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XnaTouch.Samples.MultiTouch", "Samples\MultiTouch\XnaTouch.Samples.MultiTouch.csproj", "{DF8DF5E3-2FF4-46DD-9EE0-AE3C9923C6BA}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XnaTouch.Samples.SpriteFont", "Samples\SpriteFont\XnaTouch.Samples.SpriteFont.csproj", "{327EE711-BA4F-40DA-AD4A-F69DD0B2FCFB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkStateManagementiPhone", "Samples\NetworkStateManagement\NetworkStateManagementiPhone.csproj", "{0AC36189-7961-4E97-812E-8CDDB03EEEC7}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "StarterKits", "StarterKits", "{ED13CD83-F288-496C-B046-027FA7D36717}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlienGame", "StarterKits\AlienGame\AlienGame.csproj", "{A18E0228-936A-45CD-91CC-07E01F45677E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Marblets", "StarterKits\Marblets\Marblets.csproj", "{A3BDF086-7EAA-486F-A90F-78938B7F0A69}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlatformeriPhone", "StarterKits\Platformer\PlatformeriPhone.csproj", "{9964D44C-AD60-497E-8ED3-1DE22F53CEED}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XnaTouch.Framework", "XnaTouch.Framework\XnaTouch.Framework.csproj", "{DB8508BB-9849-4CC2-BC0F-8EB5DACB3C47}"
 EndProject
@@ -39,6 +41,14 @@ Global
 		Release|iPhone = Release|iPhone
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0AC36189-7961-4E97-812E-8CDDB03EEEC7}.Debug|iPhone.ActiveCfg = Debug|iPhone
+		{0AC36189-7961-4E97-812E-8CDDB03EEEC7}.Debug|iPhone.Build.0 = Debug|iPhone
+		{0AC36189-7961-4E97-812E-8CDDB03EEEC7}.Debug|iPhoneSimulator.ActiveCfg = Debug|iPhoneSimulator
+		{0AC36189-7961-4E97-812E-8CDDB03EEEC7}.Debug|iPhoneSimulator.Build.0 = Debug|iPhoneSimulator
+		{0AC36189-7961-4E97-812E-8CDDB03EEEC7}.Release|iPhone.ActiveCfg = Release|iPhone
+		{0AC36189-7961-4E97-812E-8CDDB03EEEC7}.Release|iPhone.Build.0 = Release|iPhone
+		{0AC36189-7961-4E97-812E-8CDDB03EEEC7}.Release|iPhoneSimulator.ActiveCfg = Release|iPhoneSimulator
+		{0AC36189-7961-4E97-812E-8CDDB03EEEC7}.Release|iPhoneSimulator.Build.0 = Release|iPhoneSimulator
 		{21E42CAF-11B3-4A25-A771-189A61732F94}.Debug|iPhone.ActiveCfg = Debug|iPhone
 		{21E42CAF-11B3-4A25-A771-189A61732F94}.Debug|iPhone.Build.0 = Debug|iPhone
 		{21E42CAF-11B3-4A25-A771-189A61732F94}.Debug|iPhoneSimulator.ActiveCfg = Debug|iPhoneSimulator
@@ -87,6 +97,14 @@ Global
 		{6AD0E621-8D0C-42B1-A42C-B36F8537B234}.Release|iPhone.Build.0 = Release|iPhone
 		{6AD0E621-8D0C-42B1-A42C-B36F8537B234}.Release|iPhoneSimulator.ActiveCfg = Release|iPhoneSimulator
 		{6AD0E621-8D0C-42B1-A42C-B36F8537B234}.Release|iPhoneSimulator.Build.0 = Release|iPhoneSimulator
+		{9964D44C-AD60-497E-8ED3-1DE22F53CEED}.Debug|iPhone.ActiveCfg = Debug|iPhone
+		{9964D44C-AD60-497E-8ED3-1DE22F53CEED}.Debug|iPhone.Build.0 = Debug|iPhone
+		{9964D44C-AD60-497E-8ED3-1DE22F53CEED}.Debug|iPhoneSimulator.ActiveCfg = Debug|iPhoneSimulator
+		{9964D44C-AD60-497E-8ED3-1DE22F53CEED}.Debug|iPhoneSimulator.Build.0 = Debug|iPhoneSimulator
+		{9964D44C-AD60-497E-8ED3-1DE22F53CEED}.Release|iPhone.ActiveCfg = Release|iPhone
+		{9964D44C-AD60-497E-8ED3-1DE22F53CEED}.Release|iPhone.Build.0 = Release|iPhone
+		{9964D44C-AD60-497E-8ED3-1DE22F53CEED}.Release|iPhoneSimulator.ActiveCfg = Release|iPhoneSimulator
+		{9964D44C-AD60-497E-8ED3-1DE22F53CEED}.Release|iPhoneSimulator.Build.0 = Release|iPhoneSimulator
 		{A18E0228-936A-45CD-91CC-07E01F45677E}.Debug|iPhone.ActiveCfg = Debug|iPhone
 		{A18E0228-936A-45CD-91CC-07E01F45677E}.Debug|iPhone.Build.0 = Debug|iPhone
 		{A18E0228-936A-45CD-91CC-07E01F45677E}.Debug|iPhoneSimulator.ActiveCfg = Debug|iPhoneSimulator
@@ -127,14 +145,6 @@ Global
 		{DEC435F4-9E84-490B-9890-72E5F514B8D0}.Release|iPhone.Build.0 = Release|iPhone
 		{DEC435F4-9E84-490B-9890-72E5F514B8D0}.Release|iPhoneSimulator.ActiveCfg = Release|iPhoneSimulator
 		{DEC435F4-9E84-490B-9890-72E5F514B8D0}.Release|iPhoneSimulator.Build.0 = Release|iPhoneSimulator
-		{DF8DF5E3-2FF4-46DD-9EE0-AE3C9923C6BA}.Debug|iPhone.ActiveCfg = Debug|iPhone
-		{DF8DF5E3-2FF4-46DD-9EE0-AE3C9923C6BA}.Debug|iPhone.Build.0 = Debug|iPhone
-		{DF8DF5E3-2FF4-46DD-9EE0-AE3C9923C6BA}.Debug|iPhoneSimulator.ActiveCfg = Debug|iPhoneSimulator
-		{DF8DF5E3-2FF4-46DD-9EE0-AE3C9923C6BA}.Debug|iPhoneSimulator.Build.0 = Debug|iPhoneSimulator
-		{DF8DF5E3-2FF4-46DD-9EE0-AE3C9923C6BA}.Release|iPhone.ActiveCfg = Release|iPhone
-		{DF8DF5E3-2FF4-46DD-9EE0-AE3C9923C6BA}.Release|iPhone.Build.0 = Release|iPhone
-		{DF8DF5E3-2FF4-46DD-9EE0-AE3C9923C6BA}.Release|iPhoneSimulator.ActiveCfg = Release|iPhoneSimulator
-		{DF8DF5E3-2FF4-46DD-9EE0-AE3C9923C6BA}.Release|iPhoneSimulator.Build.0 = Release|iPhoneSimulator
 		{F5FA28E2-53B2-482B-8723-71588DF50BB6}.Debug|iPhone.ActiveCfg = Debug|iPhone
 		{F5FA28E2-53B2-482B-8723-71588DF50BB6}.Debug|iPhone.Build.0 = Debug|iPhone
 		{F5FA28E2-53B2-482B-8723-71588DF50BB6}.Debug|iPhoneSimulator.ActiveCfg = Debug|iPhoneSimulator
@@ -153,10 +163,11 @@ Global
 		{6AD0E621-8D0C-42B1-A42C-B36F8537B234} = {64ED246E-8579-4DF2-A50E-53CC3CCB0E6B}
 		{21E42CAF-11B3-4A25-A771-189A61732F94} = {64ED246E-8579-4DF2-A50E-53CC3CCB0E6B}
 		{F5FA28E2-53B2-482B-8723-71588DF50BB6} = {64ED246E-8579-4DF2-A50E-53CC3CCB0E6B}
-		{DF8DF5E3-2FF4-46DD-9EE0-AE3C9923C6BA} = {64ED246E-8579-4DF2-A50E-53CC3CCB0E6B}
 		{327EE711-BA4F-40DA-AD4A-F69DD0B2FCFB} = {64ED246E-8579-4DF2-A50E-53CC3CCB0E6B}
+		{0AC36189-7961-4E97-812E-8CDDB03EEEC7} = {64ED246E-8579-4DF2-A50E-53CC3CCB0E6B}
 		{A18E0228-936A-45CD-91CC-07E01F45677E} = {ED13CD83-F288-496C-B046-027FA7D36717}
 		{A3BDF086-7EAA-486F-A90F-78938B7F0A69} = {ED13CD83-F288-496C-B046-027FA7D36717}
+		{9964D44C-AD60-497E-8ED3-1DE22F53CEED} = {ED13CD83-F288-496C-B046-027FA7D36717}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = Samples\RockRainIphone\RockRainIphone.csproj
