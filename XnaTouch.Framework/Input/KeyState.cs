@@ -1,4 +1,4 @@
-// #region License
+#region License
 // /*
 // Microsoft Public License (Ms-PL)
 // XnaTouch - Copyright © 2009 The XnaTouch Team
@@ -9,7 +9,7 @@
 // accept the license, do not use the software.
 // 
 // 1. Definitions
-// The terms "reproduce," "reproduction," "derivative works," and "distribution" have the same meaning here as under 
+// The terms "reproduce, " "reproduction,  " "derivative works,  " and "distribution" have the same meaning here as under 
 // U.S. copyright law.
 // 
 // A "contribution" is the original software, or any additions or changes to the software.
@@ -17,10 +17,10 @@
 // "Licensed patents" are a contributor's patent claims that read directly on its contribution.
 // 
 // 2. Grant of Rights
-// (A) Copyright Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-// each contributor grants you a non-exclusive, worldwide, royalty-free copyright license to reproduce its contribution, prepare derivative works of its contribution, and distribute its contribution or any derivative works that you create.
-// (B) Patent Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-// each contributor grants you a non-exclusive, worldwide, royalty-free license under its licensed patents to make, have made, use, sell, offer for sale, import, and/or otherwise dispose of its contribution in the software or derivative works of the contribution in the software.
+// (A) Copyright Grant- Subject to the terms of this license, including the license conditions and limitations in section 3,  
+// each contributor grants you a non-exclusive, worldwide,  royalty-free copyright license to reproduce its contribution, prepare derivative works of its contribution, and distribute its contribution or any derivative works that you create.
+// (B) Patent Grant- Subject to the terms of this license, including the license conditions and limitations in section 3,  
+// each contributor grants you a non-exclusive, worldwide, royalty-free license under its licensed patents to make,  have made, use,  sell, offer for sale, import,  and/or otherwise dispose of its contribution in the software or derivative works of the contribution in the software.
 // 
 // 3. Conditions and Limitations
 // (A) No Trademark License- This license does not grant you rights to use any contributors' name, logo, or trademarks.
@@ -36,56 +36,17 @@
 // permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular
 // purpose and non-infringement.
 // */
-// #endregion License
-// 
+#endregion License
 
+#region Using Statements
 using System;
+#endregion Using Statements
 
 namespace XnaTouch.Framework.Input
 {
-
-	public struct KeyboardState
+	public enum KeyState
 	{
-		#region Methods
-		public KeyboardState( Keys[] keys )
-		{
-			// Never used on iPhone or Zune
-		}
-		
-		public override bool Equals(Object obj)
-		{
-			return false; // Never used on iPhone or Zune
-		}
-		
-		public override int GetHashCode()
-		{
-			return int.MinValue; // Never used on iPhone or Zune
-		}
-		
-		public Keys[] GetPressedKeys()
-		{
-			return null; // Never used on iPhone or Zune
-		}
-		
-		public bool IsKeyDown(Keys key)
-		{
-			return false; // Never used on iPhone or Zune
-		}
-		
-		public bool IsKeyUp(Keys key)
-		{
-			return false; // Never used on iPhone or Zune
-		}
-		#endregion
-		
-		#region Properties
-		public KeyState this [Keys key] 
-		{ 
-			get
-			{
-				return KeyState.Up; // Never used on iPhone or Zune
-			}			
-		}
-		#endregion
+		Down,	// The key is pressed.
+		Up, 	// The key is released.		
 	}
 }
