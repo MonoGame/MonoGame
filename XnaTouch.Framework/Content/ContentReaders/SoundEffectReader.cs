@@ -65,8 +65,8 @@ namespace XnaTouch.Framework
 				return FileName+".wav";
 			if (File.Exists(FileName+".ac3"))
 				return FileName+".ac3";
-			if (File.Exists(FileName+".mp4"))
-				return FileName+".mp4";
+			if (File.Exists(FileName+".mp3"))
+				return FileName+".mp3";
 			
 			return null;
 		}
