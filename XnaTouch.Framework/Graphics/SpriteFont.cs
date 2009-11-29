@@ -49,8 +49,18 @@ namespace XnaTouch.Framework.Graphics
 
         public char? DefaultCharacter
         {
-            set { throw new NotImplementedException(); }
-            get { throw new NotImplementedException(); }
+            get 
+			{ 
+				return _defaultCharacter;
+			}
+			
+			set 
+			{ 
+				if ( _defaultCharacter != value )
+				{
+					_defaultCharacter = value;
+				}
+			}
         }
 
         public Vector2 MeasureString(string text)

@@ -212,6 +212,13 @@
     <Compile Include="Audio\SoundEffectInstance.cs" />
     <Compile Include="Input\KeyState.cs" />
     <Compile Include="IUpdateable.cs" />
+    <Compile Include="Net\NetworkSessionJoinError.cs" />
+    <Compile Include="Net\NetworkSessionJoinException.cs" />
+    <Compile Include="Net\NetworkException.cs" />
+    <Compile Include="Net\NetworkNotAvailableException.cs" />
+    <Compile Include="GamerServices\GamerDefaults.cs" />
+    <Compile Include="GamerServices\GamerPresence.cs" />
+    <Compile Include="GamerServices\GamerPresenceMode.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
