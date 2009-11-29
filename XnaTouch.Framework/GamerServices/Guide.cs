@@ -57,11 +57,21 @@ namespace XnaTouch.Framework.GamerServices
 		private static bool isVisible;
 		private static bool simulateTrialMode;
 		
+		public static void ShowMarketplace (PlayerIndex player )
+		{
+			
+		}
+		
 		public static void Show ()
 		{
 			GKPeerPickerController ppc = new GKPeerPickerController();
 			ppc.ConnectionTypesMask = GKPeerPickerConnectionType.Nearby;
 			ppc.Show();
+		}
+		
+		public static void ShowSignIn (int paneCount, bool onlineOnly)
+		{
+			
 		}
 		
 		public static bool IsScreenSaverEnabled 

@@ -59,15 +59,15 @@ namespace XnaTouch.Framework.Input
         public override bool Equals(object obj)
         {
 			TouchLocation touchLocation = (TouchLocation)obj;
-    		if (touchLocation != null)
-    		{
-        		return Equals(touchLocation);
-    		}
-    		else
-    		{
-        		return false;
-   			 }
-        }
+	    		if (touchLocation != null)
+	    		{
+	        		return Equals(touchLocation);
+	    		}
+	    		else
+	    		{
+	        		return false;
+	        }
+		}
 
         public bool Equals(TouchLocation other)
         {

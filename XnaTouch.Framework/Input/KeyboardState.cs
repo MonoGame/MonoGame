@@ -46,9 +46,11 @@ namespace XnaTouch.Framework.Input
 
 	public struct KeyboardState
 	{
+		private Keys[] _keys;
 		#region Methods
 		public KeyboardState( Keys[] keys )
 		{
+			_keys = keys;
 			// Never used on iPhone or Zune
 		}
 		

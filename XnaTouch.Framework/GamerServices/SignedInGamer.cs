@@ -44,14 +44,34 @@ namespace XnaTouch.Framework.GamerServices
 {
     public class SignedInGamer : Gamer
     {
-        public string Gamertag
-        {
-            get
-            {
-                return "";
-            }
-        }
-
+		#region Methods
+		/*  TODO public FriendCollection GetFriends()
+		{
+			
+		} */
+		
+		public bool IsFriend (Gamer gamer)
+		{
+			if ( gamer == null ) 
+				throw new ArgumentNullException();
+			
+			if ( gamer.IsDisposed )
+				throw new ObjectDisposedException(gamer.ToString());
+			
+			return false; // Not supported under iPhone;
+						
+		}
+		#endregion
+			
+		#region Properties
+		public GameDefaults GameDefaults 
+		{ 
+			get
+			{
+				throw new NotSupportedException();
+			}
+		}
+		
 		public bool IsGuest 
 		{ 
 			get
@@ -68,6 +88,18 @@ namespace XnaTouch.Framework.GamerServices
 			}
 		}
 		
+		public int PartySize 
+		{ 
+			get
+			{
+				throw new NotSupportedException();
+			}
+			set
+			{
+				throw new NotSupportedException();
+			}
+		}
+		
         public PlayerIndex PlayerIndex
         {
             get
@@ -75,6 +107,14 @@ namespace XnaTouch.Framework.GamerServices
                 return PlayerIndex.One;
             }
         }
+		
+		public GamerPresence Presence 
+		{ 
+			get
+			{
+				throw new NotSupportedException();
+			}
+		}
 
         GamerPrivileges _privileges = new GamerPrivileges();
         public GamerPrivileges Privileges
@@ -84,6 +124,28 @@ namespace XnaTouch.Framework.GamerServices
                 return _privileges;
             }
         }
-
+		#endregion
+		
+		#region Events
+		public static event EventHandler<SignedInEventArgs> SignedIn;
+		
+		public static event EventHandler<SignedOutEventArgs> SignedOut;
+		#endregion
     }
+	
+	public class SignedInEventArgs : EventArgs
+	{
+		public SignedInEventArgs ( SignedInGamer gamer )
+		{
+			
+		}
+	}
+	
+	public class SignedOutEventArgs : EventArgs
+	{
+		public SignedOutEventArgs (SignedInGamer gamer )
+		{
+			
+		}
+	}
 }
