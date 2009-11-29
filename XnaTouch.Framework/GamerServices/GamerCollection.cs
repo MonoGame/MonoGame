@@ -56,10 +56,10 @@ namespace XnaTouch.Framework.GamerServices
 		{
 		}
 		
-		public IEnumerator<Gamer> GetEnumerator()
+		/*public IEnumerator<Gamer> GetEnumerator()
         {
             return this.GetEnumerator();
-        }
+        }*/
 		
 		IEnumerator IEnumerable.GetEnumerator()
         {

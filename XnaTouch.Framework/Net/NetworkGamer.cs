@@ -120,11 +120,17 @@ namespace XnaTouch.Framework.Net
 			}
 		}
 		
+		private bool _IsReady;
 		public bool IsReady 
 		{ 
 			get
 			{
-				return false;
+				return _IsReady;
+			}
+			set
+			{
+				if (_IsReady != value )
+					_IsReady = value;
 			}
 		}
 		
@@ -136,11 +142,17 @@ namespace XnaTouch.Framework.Net
 			}
 		}
 		
+		private NetworkMachine _Machine;
 		public NetworkMachine Machine 
 		{ 
 			get
 			{
-				return null;
+				return _Machine;
+			}
+			set
+			{
+				if (_Machine != value )
+					_Machine = value;
 			}
 		}
 		

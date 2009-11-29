@@ -195,7 +195,8 @@ namespace XnaTouch.Framework
             }
             set
             {
-				throw new NotSupportedException(); 
+				// throw new NotSupportedException(); 
+				// Don't throw exception, just don't set it in this case.
             }
         }
 
@@ -207,7 +208,8 @@ namespace XnaTouch.Framework
             }
             set
             {
-				throw new NotSupportedException();
+				// throw new NotSupportedException(); 
+				// Don't throw exception, just don't set it in this case as it
             }
         }
 

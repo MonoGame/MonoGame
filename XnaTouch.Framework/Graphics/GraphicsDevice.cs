@@ -46,12 +46,13 @@ using XnaTouch.Framework;
 
 namespace XnaTouch.Framework.Graphics
 {	
-    public class GraphicsDevice
+    public class GraphicsDevice : IDisposable
     {
 		private All _preferedFilter;
 		private int _activeTexture = -1;
 		private Viewport _viewport;
 		private GraphicsDevice2D _spriteDevice;
+		private bool _isDisposed = false;
 		
 		internal All PreferedFilter 
 		{
@@ -75,6 +76,14 @@ namespace XnaTouch.Framework.Graphics
 			set 
 			{
 				_activeTexture = value;
+			}
+		}
+		
+		public bool IsDisposed 
+		{ 
+			get
+			{
+				return _isDisposed;
 			}
 		}
 				
@@ -119,6 +128,21 @@ namespace XnaTouch.Framework.Graphics
 			throw new NotImplementedException();
         }
 
+		public void Dispose()
+		{
+			_isDisposed = true;
+		}
+		
+		protected virtual void Dispose(bool aReleaseEverything)
+		{
+			if (aReleaseEverything)
+			{
+				
+			}
+			
+			_isDisposed = true;
+		}
+		
         public void Present()
         {
         }

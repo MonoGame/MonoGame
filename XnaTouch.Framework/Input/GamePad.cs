@@ -131,10 +131,10 @@ using MonoTouch.AudioToolbox;
 
         public static GamePadState GetState(PlayerIndex playerIndex)
         {
-            if (playerIndex != PlayerIndex.One) 
+            /* if (playerIndex != PlayerIndex.One) 
 			{
 				throw new NotSupportedException("Only one player!");
-			}
+			}*/
 			
 			return new GamePadState((Buttons)GamePad.Instance._buttons,GamePad.Instance._leftStick,GamePad.Instance._rightStick);
         }

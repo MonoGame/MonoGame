@@ -51,5 +51,14 @@ namespace XnaTouch.Framework.Net
 		public AvailableNetworkSession ()
 		{
 		}
+		
+		private QualityOfService _QualityOfService;
+		public QualityOfService QualityOfService 
+		{ 
+			get
+			{
+				return _QualityOfService;
+			}
+		}
 	}
 }

@@ -1,4 +1,4 @@
-// #region License
+#region License
 // /*
 // Microsoft Public License (Ms-PL)
 // XnaTouch - Copyright © 2009 The XnaTouch Team
@@ -36,25 +36,28 @@
 // permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular
 // purpose and non-infringement.
 // */
-// #endregion License
-// 
+#endregion License
 
 using System;
 
-namespace XnaTouch.Framework.Input
+namespace XnaTouch.Framework.Net
 {
-
-
-	public static class Keyboard
-	{		
-		public static KeyboardState GetState()
+	[SerializableAttribute]
+	public class NetworkNotAvailableException : NetworkException
+	{
+		public NetworkNotAvailableException()
 		{
-			return new KeyboardState(new Keys[4]); // TODO Not used on iPhone or Zune
+			
 		}
 		
-		public static KeyboardState GetState(PlayerIndex playerIndex)
+		public NetworkNotAvailableException( string message ) : base(message)
 		{
-			return new KeyboardState(new Keys[4]);  // TODO Not used on iPhone or Zune
+			
+		}
+		
+		public NetworkNotAvailableException (string message, Exception innerException) : base(message, innerException)
+		{
+			
 		}
 	}
 }
