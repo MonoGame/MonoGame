@@ -42,6 +42,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.Remoting.Messaging;
 using MonoTouch.UIKit;
 using MonoTouch.GameKit;
 using XnaTouch.Framework.GamerServices;
@@ -49,12 +50,27 @@ using XnaTouch.Framework.GamerServices;
 
 namespace XnaTouch.Framework.Net
 {
-
+	// The delegate must have the same signature as the method
+    // it will call asynchronously.
+	public delegate NetworkSession NetworkSessionAsynchronousCreate(
+         NetworkSessionType sessionType, // Type of session being hosted.
+         int maxLocalGamers,             // Maximum number of local players on the same gaming machine in this network session.
+         int maxGamers                   // Maximum number of players allowed in this network session.  For Zune-based games, this value must be between 2 and 8; 8 is the maximum number of players supported in the session.
+		);
+    public delegate AvailableNetworkSessionCollection  NetworkSessionAsynchronousFind(
+         NetworkSessionType sessionType,
+         int maxLocalGamers,
+         NetworkSessionProperties searchProperties );
+	
+	public delegate NetworkSession NetworkSessionAsynchronousJoin(AvailableNetworkSession availableSession);
+	
+	public delegate NetworkSession NetworkSessionAsynchronousJoinInvited(int maxLocalGamers);
+	
 	public sealed class NetworkSession : IDisposable
 	{
 		private static NetworkSessionState networkSessionState;
 		private static NetworkSessionType networkSessionType;
-		private static GKSession gkSession;
+		private static GKSession gkSession;		
 
 		public NetworkSession()
 		{
@@ -204,7 +220,8 @@ namespace XnaTouch.Framework.Net
 			
 			try
 			{
-				throw new NotImplementedException();
+				NetworkSessionAsynchronousCreate AsynchronousCreate = new NetworkSessionAsynchronousCreate(Create);
+            	return AsynchronousCreate.BeginInvoke(sessionType, maxLocalGamers, maxGamers, callback, asyncState);
 			}
 			finally
 			{
@@ -272,7 +289,8 @@ namespace XnaTouch.Framework.Net
 			
 			try
 			{
-				throw new NotImplementedException();
+				NetworkSessionAsynchronousFind AsynchronousFind = new NetworkSessionAsynchronousFind(Find);
+            	return AsynchronousFind.BeginInvoke(sessionType, maxLocalGamers, searchProperties, callback, asyncState);
 			}
 			finally
 			{
@@ -286,11 +304,12 @@ namespace XnaTouch.Framework.Net
 )
 		{
 			if ( availableSession == null )
-				throw new ArgumentNullException();
+				throw new ArgumentNullException();			
 			
 			try
 			{
-				throw new NotImplementedException();
+				NetworkSessionAsynchronousJoin AsynchronousJoin  = new NetworkSessionAsynchronousJoin(Join);
+            	return AsynchronousJoin.BeginInvoke(sessionType, maxLocalGamers, maxGamers, callback, asyncState);
 			}
 			finally
 			{
@@ -312,7 +331,7 @@ namespace XnaTouch.Framework.Net
 			}
 		}
 		
-		public static IAsyncResult BeginJoinInvited (
+		public static IAsyncResult BeginJoinInvited(
          int maxLocalGamers,
          AsyncCallback callback,
          Object asyncState
@@ -323,34 +342,62 @@ namespace XnaTouch.Framework.Net
 			
 			try
 			{
-				throw new NotImplementedException();
+				NetworkSessionAsynchronousJoinInvited AsynchronousJoinInvited  = new NetworkSessionAsynchronousJoinInvited(JoinInvited);
+            	return AsynchronousJoinInvited.BeginInvoke(sessionType, maxLocalGamers, maxGamers, callback, asyncState);
 			}
 			finally
 			{
 			}
 		}
 		
-		public static NetworkSession EndCreate (
-         IAsyncResult result
-)
+		public static NetworkSession EndCreate (IAsyncResult result)
 		{
+			NetworkSession returnValue = null;
 			try
 			{
-				throw new NotImplementedException();
+				// Retrieve the delegate.
+            	AsyncResult asyncResult = (AsyncResult)result;
+								
+				// Wait for the WaitHandle to become signaled.
+	            result.AsyncWaitHandle.WaitOne();
+	            
+	            // Call EndInvoke to retrieve the results.
+				if(asyncResult.AsyncDelegate is NetworkSessionAsynchronousCreate)
+				{
+            		returnValue = ((NetworkSessionAsynchronousCreate)asyncResult.AsyncDelegate).EndInvoke(result);
+				}	            		                     
 			}
 			finally
 			{
+				// Close the wait handle.
+	            result.AsyncWaitHandle.Close();	 
+				return returnValue;
 			}
 		}
 		
-		public static AvailableNetworkSessionCollection EndFind (IAsyncResult result)
+		public static AvailableNetworkSessionCollection EndFind(IAsyncResult result)
 		{
+			AvailableNetworkSessionCollection returnValue = null;
 			try
 			{
-				throw new NotImplementedException();
+				// Retrieve the delegate.
+            	AsyncResult asyncResult = (AsyncResult)result;            	
+				
+				// Wait for the WaitHandle to become signaled.
+	            result.AsyncWaitHandle.WaitOne();
+	            
+	            // Call EndInvoke to retrieve the results.
+				if(asyncResult.AsyncDelegate is NetworkSessionAsynchronousFind)
+				{
+            		returnValue = ((NetworkSessionAsynchronousFind)asyncResult.AsyncDelegate).EndInvoke(result);
+				}		            	            
 			}
 			finally
 			{
+				// Close the wait handle.
+	            result.AsyncWaitHandle.Close();
+				
+				return returnValue;
 			}
 		}
 		
@@ -373,29 +420,57 @@ namespace XnaTouch.Framework.Net
 			{
 			}
 		}
+				
 		
-		public static NetworkSession EndJoin (
-         IAsyncResult result
-		){
+		public static NetworkSession EndJoin (IAsyncResult result)
+		{
+			NetworkSession returnValue = null;
 			try
 			{
-				throw new NotImplementedException();
+				// Retrieve the delegate.
+            	AsyncResult asyncResult = (AsyncResult)result;            	
+				
+				// Wait for the WaitHandle to become signaled.
+	            result.AsyncWaitHandle.WaitOne();
+	            
+	            // Call EndInvoke to retrieve the results.
+				if(asyncResult.AsyncDelegate is NetworkSessionAsynchronousJoin)
+				{
+            		returnValue = ((NetworkSessionAsynchronousJoin)asyncResult.AsyncDelegate).EndInvoke(result);
+				}		            	            
 			}
 			finally
 			{
+				// Close the wait handle.
+	            result.AsyncWaitHandle.Close();
+				
+				return returnValue;
 			}
 		}
 		
-		public static NetworkSession EndJoinInvited (
-         IAsyncResult result
-)
+		public static NetworkSession EndJoinInvited(IAsyncResult result)
 		{
+			NetworkSession returnValue = null;
 			try
 			{
-				throw new NotImplementedException();
+				// Retrieve the delegate.
+            	AsyncResult asyncResult = (AsyncResult)result;            	
+				
+				// Wait for the WaitHandle to become signaled.
+	            result.AsyncWaitHandle.WaitOne();
+	            
+	            // Call EndInvoke to retrieve the results.
+				if(asyncResult.AsyncDelegate is NetworkSessionAsynchronousJoinInvited)
+				{
+            		returnValue = ((NetworkSessionAsynchronousJoinInvited)asyncResult.AsyncDelegate).EndInvoke(result);
+				}		            	            
 			}
 			finally
 			{
+				// Close the wait handle.
+	            result.AsyncWaitHandle.Close();
+				
+				return returnValue;
 			}
 		}
 		
@@ -450,9 +525,7 @@ namespace XnaTouch.Framework.Net
 			}
 		}
 		
-		public NetworkGamer FindGamerById (
-         byte gamerId
-)
+		public NetworkGamer FindGamerById (byte gamerId)
 		{
 			try
 			{
@@ -463,9 +536,7 @@ namespace XnaTouch.Framework.Net
 			}
 		}
 		
-		public static NetworkSession Join (
-         AvailableNetworkSession availableSession
-)
+		public static NetworkSession Join (AvailableNetworkSession availableSession)
 		{
 			if ( availableSession == null )
 				throw new ArgumentNullException();
