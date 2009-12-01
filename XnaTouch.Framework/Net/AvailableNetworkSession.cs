@@ -52,12 +52,57 @@ namespace XnaTouch.Framework.Net
 		{
 		}
 		
+		int _currentGameCount;
+		public int CurrentGamerCount 
+		{ 
+			get
+			{
+				return _currentGameCount;
+			}
+		}
+		
+		string _hostGamertag;
+		public string HostGamertag 
+		{ 
+			get
+			{
+				return _hostGamertag;
+			}
+		}
+		
+		int _openPrivateGamerSlots;
+		public int OpenPrivateGamerSlots 
+		{ 
+			get
+			{
+				return _openPrivateGamerSlots;
+			}
+		}
+		
+		int _openPublicGamerSlots; 
+		public int OpenPublicGamerSlots 
+		{ 
+			get
+			{
+				return _openPublicGamerSlots;
+			}
+		}
+		
 		private QualityOfService _QualityOfService;
 		public QualityOfService QualityOfService 
 		{ 
 			get
 			{
 				return _QualityOfService;
+			}
+		}
+		
+		NetworkSessionProperties _sessionProperties;
+		public NetworkSessionProperties SessionProperties 
+		{ 
+			get
+			{
+				return _sessionProperties;
 			}
 		}
 	}

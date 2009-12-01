@@ -84,7 +84,7 @@ namespace XnaTouch.Framework.GamerServices
 		{ 
 			get
 			{
-				throw new NotSupportedException();
+				return true;
 			}
 		}
 		
