@@ -56,7 +56,7 @@ namespace XnaTouch.Framework.GamerServices
 		{ 
 			get
 			{
-				throw new NotSupportedException();
+				return GamerPrivilegeSetting.Everyone;
 			}
 		}
 		
@@ -64,7 +64,7 @@ namespace XnaTouch.Framework.GamerServices
 		{ 
 			get
 			{
-				throw new NotSupportedException();
+				return true;
 			}
 		}
 		
@@ -72,7 +72,7 @@ namespace XnaTouch.Framework.GamerServices
 		{ 
 			get
 			{
-				throw new NotSupportedException();
+				return GamerPrivilegeSetting.Blocked;
 			}
 		}
 		
@@ -80,7 +80,7 @@ namespace XnaTouch.Framework.GamerServices
 		{ 
 			get
 			{
-				throw new NotSupportedException();
+				return false;
 			}
 		}
 		
@@ -88,7 +88,7 @@ namespace XnaTouch.Framework.GamerServices
 		{ 
 			get
 			{
-				throw new NotSupportedException();
+				return false;
 			} 
 		}
 		
@@ -96,7 +96,7 @@ namespace XnaTouch.Framework.GamerServices
 		{ 
 			get
 			{
-				throw new NotSupportedException();
+				return GamerPrivilegeSetting.Blocked;
 			} 
 		}
 		#endregion
