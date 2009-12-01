@@ -51,7 +51,7 @@ namespace XnaTouch.Framework.GamerServices
 		{ 
 			get
 			{
-				throw new NotImplementedException();
+				return new SignedInGamer();
 			}
 		}
 		#endregion

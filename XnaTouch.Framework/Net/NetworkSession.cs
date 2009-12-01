@@ -173,6 +173,8 @@ namespace XnaTouch.Framework.Net
 
         public void Dispose()
         {
+			// TODO this.Dispose(true);
+    			GC.SuppressFinalize(this);
         }
 
         #endregion
@@ -261,8 +263,8 @@ namespace XnaTouch.Framework.Net
          Object asyncState
 )
 		{
-			if ( sessionType != NetworkSessionType.SystemLink )
-				throw new ArgumentException( "NetworkSessionType must be NetworkSessionType.SystemLink" );
+			if ( sessionType == NetworkSessionType.Local )
+				throw new ArgumentException( "NetworkSessionType cannot be NetworkSessionType.Local." );
 			
 			try
 			{
@@ -282,8 +284,8 @@ namespace XnaTouch.Framework.Net
          Object asyncState
 )
 		{
-			if ( sessionType != NetworkSessionType.SystemLink )
-				throw new ArgumentException( "NetworkSessionType must be NetworkSessionType.SystemLink" );
+			if ( sessionType == NetworkSessionType.Local )
+				throw new ArgumentException( "NetworkSessionType cannot be NetworkSessionType.Local" );
 			if ( maxLocalGamers < 1 ||   maxLocalGamers > 4 )
 				throw new ArgumentOutOfRangeException( "maxLocalGamers must be between 1 and 4." );
 			
@@ -309,7 +311,7 @@ namespace XnaTouch.Framework.Net
 			try
 			{
 				NetworkSessionAsynchronousJoin AsynchronousJoin  = new NetworkSessionAsynchronousJoin(Join);
-            	return AsynchronousJoin.BeginInvoke(sessionType, maxLocalGamers, maxGamers, callback, asyncState);
+            	return AsynchronousJoin.BeginInvoke(availableSession, callback, asyncState);
 			}
 			finally
 			{
@@ -343,7 +345,7 @@ namespace XnaTouch.Framework.Net
 			try
 			{
 				NetworkSessionAsynchronousJoinInvited AsynchronousJoinInvited  = new NetworkSessionAsynchronousJoinInvited(JoinInvited);
-            	return AsynchronousJoinInvited.BeginInvoke(sessionType, maxLocalGamers, maxGamers, callback, asyncState);
+            	return AsynchronousJoinInvited.BeginInvoke(maxLocalGamers, callback, asyncState);
 			}
 			finally
 			{
@@ -371,8 +373,8 @@ namespace XnaTouch.Framework.Net
 			{
 				// Close the wait handle.
 	            result.AsyncWaitHandle.Close();	 
-				return returnValue;
 			}
+			return returnValue;
 		}
 		
 		public static AvailableNetworkSessionCollection EndFind(IAsyncResult result)
@@ -396,9 +398,8 @@ namespace XnaTouch.Framework.Net
 			{
 				// Close the wait handle.
 	            result.AsyncWaitHandle.Close();
-				
-				return returnValue;
 			}
+			return returnValue;
 		}
 		
 		public void EndGame ()
@@ -443,9 +444,8 @@ namespace XnaTouch.Framework.Net
 			{
 				// Close the wait handle.
 	            result.AsyncWaitHandle.Close();
-				
-				return returnValue;
 			}
+			return returnValue;
 		}
 		
 		public static NetworkSession EndJoinInvited(IAsyncResult result)
@@ -469,9 +469,8 @@ namespace XnaTouch.Framework.Net
 			{
 				// Close the wait handle.
 	            result.AsyncWaitHandle.Close();
-				
-				return returnValue;
 			}
+			return returnValue;
 		}
 		
 		public static AvailableNetworkSessionCollection Find (
@@ -622,27 +621,35 @@ namespace XnaTouch.Framework.Net
 			}
 		}
 		
+		bool _AllowHostMigration = false;
 		public bool AllowHostMigration 
 		{ 
 			get
 			{
-				throw new NotImplementedException();
+				return _AllowHostMigration;
 			}
 			set
 			{
-				throw new NotImplementedException();
+				if (_AllowHostMigration != value)
+				{
+					_AllowHostMigration = value;
+				}
 			}
 		}
 		
+		bool _AllowJoinInProgress = false;
 		public bool AllowJoinInProgress 
 		{ 
 			get
 			{
-				throw new NotImplementedException();
+				return _AllowJoinInProgress;
 			}
 			set
 			{
-				throw new NotImplementedException();
+				if (_AllowJoinInProgress != value)
+				{
+					_AllowJoinInProgress = value;
+				}
 			}
 		}
 		
@@ -670,11 +677,12 @@ namespace XnaTouch.Framework.Net
 			}
 		}
 		
+		bool _isDisposed = false;
 		public bool IsDisposed 
 		{ 
 			get
 			{
-				throw new NotImplementedException();
+				return _isDisposed; // TODO (this.kernelHandle == 0);
 			}
 		}
 		
