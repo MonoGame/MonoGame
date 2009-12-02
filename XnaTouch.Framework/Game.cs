@@ -212,6 +212,16 @@ namespace XnaTouch.Framework
             }
         }
 		
+		protected virtual bool BeginDraw()
+		{
+			return true;
+		}
+		
+		protected virtual void EndDraw()
+		{
+			
+		}
+		
 		protected virtual void LoadContent()
 		{
 			// do nothing
