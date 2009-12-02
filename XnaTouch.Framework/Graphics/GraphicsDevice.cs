@@ -205,7 +205,10 @@ namespace XnaTouch.Framework.Graphics
             {
 				return _viewport;
 			}
-			
+			set
+			{
+				_viewport = value;
+			}
 		}		
 				
 		internal void StartSpriteBatch(SpriteBlendMode blendMode, SpriteSortMode sortMode)
@@ -277,6 +280,14 @@ namespace XnaTouch.Framework.Graphics
 			
 			// Disable 2D textures
 			GL.Disable(All.Texture2D);
+		}
+		
+		public void SetRenderTarget (
+         int renderTargetIndex,
+         RenderTarget2D renderTarget
+		                             )
+		{
+			throw new NotImplementedException();
 		}
 	}
 }
