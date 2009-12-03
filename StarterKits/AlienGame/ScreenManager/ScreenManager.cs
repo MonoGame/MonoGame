@@ -8,10 +8,17 @@
 using System;
 using System.Diagnostics;
 using System.Collections.Generic;
+#if IPHONE
 using XnaTouch.Framework;
 using XnaTouch.Framework.Content;
 using XnaTouch.Framework.Graphics;
 using XnaTouch.Framework.Media;
+#else
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Media;
+#endif
 
 namespace AlienGameSample
 {

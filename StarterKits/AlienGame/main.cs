@@ -1,20 +1,29 @@
+#region Using Statements
+using System;
+#if IPHONE
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
 using XnaTouch;
 using XnaTouch.Framework.Media;
+#else
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Media;
+#endif
+#endregion
 
 namespace AlienGameSample
 {
-	[Register ("AppDelegate")]
+#if IPHONE
+    [Register ("AppDelegate")]
 	class Program : UIApplicationDelegate 
 	{
-		private AlienGame game;
-
 		public override void FinishedLaunching (UIApplication app)
 		{
 			// Fun begins..
-			game = new AlienGame();
-			game.Run();
+			using (AlienGame game = new AlienGame())
+            {
+                game.Run();
+            }
 			
 			//MediaLibrary lib = new MediaLibrary();
 			//object result = lib.Playlists;
@@ -25,4 +34,19 @@ namespace AlienGameSample
 			UIApplication.Main (args,null,"AppDelegate");
 		}
 	}
+#else
+    static class Program
+    {
+        /// <summary>
+        /// The main entry point for the application.
+        /// </summary>
+        static void Main(string[] args)
+        {
+            using (AlienGame game = new AlienGame())
+            {
+                game.Run();
+            }
+        }
+    }
+#endif
 }

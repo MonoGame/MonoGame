@@ -11,10 +11,17 @@
 using System;
 using System.IO;
 using System.Xml.Serialization;
+#if IPHONE
 using XnaTouch.Framework;
 using XnaTouch.Framework.Graphics;
-using XnaTouch.Framework.GamerServices;
 using XnaTouch.Framework.Storage;
+using XnaTouch.Framework.GamerServices;
+#else
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Storage;
+using Microsoft.Xna.Framework.GamerServices;
+#endif
 #endregion
 
 namespace Marblets

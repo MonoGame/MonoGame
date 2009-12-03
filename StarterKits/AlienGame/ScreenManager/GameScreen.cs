@@ -6,7 +6,11 @@
 //-----------------------------------------------------------------------------
 
 using System;
+#if IPHONE
 using XnaTouch.Framework;
+#else
+using Microsoft.Xna.Framework;
+#endif
 
 namespace AlienGameSample
 {
