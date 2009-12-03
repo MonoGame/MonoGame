@@ -9,24 +9,30 @@
 
 #region Using Statements
 using System;
+#if IPHONE
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
 using XnaTouch;
 using XnaTouch.Framework.Media;
+#else
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Media;
+#endif
 #endregion
 
 namespace Marblets
 {
+#if IPHONE
     [Register ("AppDelegate")]
 	class Program : UIApplicationDelegate 
 	{
-		private MarbletsGame game;
-
 		public override void FinishedLaunching (UIApplication app)
 		{
 			// Fun begins..
-			game = new MarbletsGame();
-			game.Run();
+			using (MarbletsGame game = new MarbletsGame())
+            {
+                game.Run();
+            }
 			
 			//MediaLibrary lib = new MediaLibrary();
 			//object result = lib.Playlists;
@@ -37,5 +43,20 @@ namespace Marblets
 			UIApplication.Main (args,null,"AppDelegate");
 		}
 	}
+#else
+    static class Program
+    {
+        /// <summary>
+        /// The main entry point for the application.
+        /// </summary>
+        static void Main(string[] args)
+        {
+            using (MarbletsGame game = new MarbletsGame())
+            {
+                game.Run();
+            }
+        }
+    }
+#endif
 }
 
