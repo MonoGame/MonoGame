@@ -172,6 +172,15 @@ namespace XnaTouch.Framework
             return GetCurvePosition(position);
         }
 
+		public void ComputeTangents (CurveTangent tangentType )
+		{
+			throw new NotImplementedException();
+		}
+		
+		public void ComputeTangents( CurveTangent tangentInType, CurveTangent tangentOutType )
+		{
+			throw new NotImplementedException();
+		}
         #endregion Public Methods
 
 
