@@ -221,6 +221,7 @@
     <Compile Include="GamerServices\GamerPresenceMode.cs" />
     <Compile Include="Graphics\RenderTarget.cs" />
     <Compile Include="Graphics\RenderTarget2D.cs" />
+    <Compile Include="CurveTangent.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
