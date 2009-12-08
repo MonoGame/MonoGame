@@ -38,11 +38,14 @@ purpose and non-infringement.
 */
 #endregion License
 
+#region Using Statements
 ﻿using System;
 using System.IO;
+using System.Reflection;
 using XnaTouch;
 using XnaTouch.Framework;
 using XnaTouch.Framework.Storage;
+#endregion
 
 
 namespace XnaTouch.Framework.Storage
@@ -81,6 +84,14 @@ namespace XnaTouch.Framework.Storage
             }
         }
 
+		public static string TitleLocation 
+		{ 
+			get
+			{
+				return Directory.GetParent(Assembly.GetEntryAssembly().Location).ToString();
+			}
+		}
+		
         public string TitleName
         {
             get

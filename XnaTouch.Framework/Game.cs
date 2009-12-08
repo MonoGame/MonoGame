@@ -107,7 +107,7 @@ namespace XnaTouch.Framework
 			}
             set
 			{
-				throw new NotSupportedException();
+				// do nothing; ignore
 			}
         }
 
@@ -295,6 +295,13 @@ namespace XnaTouch.Framework
                 return _gameComponentCollection;
             }
         }
+		
+		#region Events
+		public event EventHandler Activated;
+		public event EventHandler Deactivated;
+		public event EventHandler Disposed;
+		public event EventHandler Exiting;
+		#endregion
     }
 }
 

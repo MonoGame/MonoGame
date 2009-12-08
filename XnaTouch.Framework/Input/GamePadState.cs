@@ -47,6 +47,8 @@ namespace XnaTouch.Framework.Input
     {
         private GamePadThumbSticks _thumbs;
         private Buttons _buttons;
+		private GamePadDPad _dPad;
+		private GamePadTriggers _triggers;
 
 		internal GamePadState(Buttons buttons, Vector2 LeftStick, Vector2 RightStick)
 		{
@@ -87,6 +89,22 @@ namespace XnaTouch.Framework.Input
         {
             return !this.IsButtonDown(button);
         }
+			
+		public GamePadDPad DPad 
+		{ 
+			get
+			{
+				return _dPad;
+			}
+		}
+		
+		public GamePadTriggers Triggers 
+		{ 
+			get
+			{
+				return _triggers;
+			}
+		}
     }
 
 }

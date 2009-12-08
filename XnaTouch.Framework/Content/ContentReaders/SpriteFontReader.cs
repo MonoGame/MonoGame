@@ -53,12 +53,12 @@ namespace XnaTouch.Framework.Content
 			}
 			
 			// Concat the file name with valid extensions
-			if (File.Exists(FileName+".spritefont"))
-				return FileName+".spritefont";
-			
-			// Concat the file name with valid extensions
 			if (File.Exists(FileName+".xnb"))
 				return FileName+".xnb";
+			
+			// Concat the file name with valid extensions
+			if (File.Exists(FileName+".spritefont"))
+				return FileName+".spritefont";
 			
 			return null;
 		}
