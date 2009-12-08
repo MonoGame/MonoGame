@@ -67,6 +67,54 @@ namespace XnaTouch.Framework.Input
                 return _y;
             }
         }
+		
+		public ButtonState LeftButton 
+		{ 
+			get
+			{
+				return ButtonState.Released;
+			}
+		}
+		
+		public ButtonState MiddleButton 
+		{ 
+			get
+			{
+				return ButtonState.Released;
+			}
+		}
+		
+		public ButtonState RightButton 
+		{ 
+			get
+			{
+				return ButtonState.Released;
+			}
+		}
+		
+		public int ScrollWheelValue 
+		{ 
+			get
+			{
+				return 0;
+			}
+		}
+		
+		public ButtonState XButton1
+		{ 
+			get
+			{
+				return ButtonState.Released;
+			}
+		}
+		
+		public ButtonState XButton2
+		{ 
+			get
+			{
+				return ButtonState.Released;
+			}
+		}
     }
 }
 

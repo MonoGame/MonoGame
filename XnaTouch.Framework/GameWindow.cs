@@ -195,9 +195,12 @@ namespace XnaTouch.Framework
 			}
 			set 
 			{
-				throw new NotSupportedException();
+				// Do nothing; Ignore rather than raising and exception
 			}
-		}		
+		}	
+		
+		public event EventHandler ClientSizeChanged;
+		public event EventHandler ScreenDeviceNameChanged;
     }
 }
 
