@@ -224,6 +224,15 @@
     <Compile Include="CurveTangent.cs" />
     <Compile Include="Input\GamePadDPad.cs" />
     <Compile Include="Input\GamePadTriggers.cs" />
+    <Compile Include="Graphics\VertexPositionColor.cs" />
+    <Compile Include="Graphics\VertexElement.cs" />
+    <Compile Include="Graphics\Effect.cs" />
+    <Compile Include="Graphics\CompilerOptions.cs" />
+    <Compile Include="Graphics\EffectPool.cs" />
+    <Compile Include="Graphics\BasicEffect.cs" />
+    <Compile Include="Graphics\PrimitiveType.cs" />
+    <Compile Include="Graphics\RenderState.cs" />
+    <Compile Include="Graphics\BlendFunction.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
