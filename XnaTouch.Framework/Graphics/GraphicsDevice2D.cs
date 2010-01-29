@@ -160,9 +160,9 @@ namespace XnaTouch.Framework.Graphics
 			// Set up OpenGL projection matrix
 			GL.MatrixMode(All.Projection);
 			GL.LoadIdentity();
-			GL.Ortho(0, 320, 0, 480, -1, 1);
+			GL.Ortho(0, _device.DisplayMode.Width, 0, _device.DisplayMode.Height, -1, 1);
 			GL.MatrixMode(All.Modelview);
-			GL.Viewport (0, 0, 320, 480);
+			GL.Viewport (0, 0, _device.DisplayMode.Width, _device.DisplayMode.Height);
 						
 			// Initialize OpenGL states			
 			GL.Disable(All.DepthTest);

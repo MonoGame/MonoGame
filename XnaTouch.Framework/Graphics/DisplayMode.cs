@@ -39,6 +39,7 @@ purpose and non-infringement.
 #endregion License
 
 using System;
+using MonoTouch.UIKit;
 
 namespace XnaTouch.Framework.Graphics
 {
@@ -48,7 +49,7 @@ namespace XnaTouch.Framework.Graphics
         {
             get
             {
-                return 4f / 3f;
+                return Width  / Height;
             }
         }
 
@@ -56,7 +57,7 @@ namespace XnaTouch.Framework.Graphics
         {
             get
             {
-                return 320;
+                return (int)UIScreen.MainScreen.Bounds.Width;
             }
         }
 
@@ -64,7 +65,7 @@ namespace XnaTouch.Framework.Graphics
         {
             get
             {
-                return 480;
+                return (int)UIScreen.MainScreen.Bounds.Height;
             }
         }
 
