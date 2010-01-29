@@ -53,6 +53,7 @@ namespace XnaTouch.Framework.Graphics
 		private Viewport _viewport;
 		private GraphicsDevice2D _spriteDevice;
 		private bool _isDisposed = false;
+		private readonly DisplayMode _displayMode = new DisplayMode();
 		
 		internal All PreferedFilter 
 		{
@@ -93,9 +94,9 @@ namespace XnaTouch.Framework.Graphics
 			_viewport = new Viewport();
 			_viewport.X = 0;
 			_viewport.Y = 0;						
-			_viewport.Width = 320;
-			_viewport.Height = 480;	
-			_viewport.TitleSafeArea = new Rectangle(0,0,320,480);	
+			_viewport.Width = DisplayMode.Width;
+			_viewport.Height = DisplayMode.Height;	
+			_viewport.TitleSafeArea = new Rectangle(0,0,DisplayMode.Width,DisplayMode.Height);	
 			
 			// Create the Sprite Rendering engine
 			_spriteDevice = new GraphicsDevice2D(this);
@@ -171,7 +172,7 @@ namespace XnaTouch.Framework.Graphics
         {
             get
             {
-                return new DisplayMode();
+                return _displayMode;
             }
         }
 
