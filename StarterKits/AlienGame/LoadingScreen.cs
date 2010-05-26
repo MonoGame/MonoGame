@@ -90,7 +90,7 @@ namespace AlienGameSample
             ScreenManager.Game.Content.Load<object>("tank_tire");
             ScreenManager.Game.Content.Load<object>("tank_top");            
             ScreenManager.Game.Content.Load<object>("title");
-            ScreenManager.Game.Content.Load<object>("titlefont");       */
+            ScreenManager.Game.Content.Load<object>("titlefont");*/
         }
 
         /// <summary>

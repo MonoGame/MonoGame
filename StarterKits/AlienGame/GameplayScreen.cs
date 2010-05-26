@@ -177,8 +177,6 @@ namespace AlienGameSample
         /// </summary>
         public override void UnloadContent()
         {
-            SaveHighscore();
-
             particles = null;
 
             base.UnloadContent();
@@ -272,7 +270,7 @@ namespace AlienGameSample
 
                 CheckHits();
 
-                if (player.IsAlive && player.Velocity.LengthSquared() > 0.0f)
+                if (player.IsAlive && player.Velocity.LengthSquared() > 0.1f)
                     particles.CreatePlayerDust(player);
 
                 particles.Update(elapsed);
@@ -311,16 +309,37 @@ namespace AlienGameSample
             }
             else
             {
+				bool touchShoot = false;
+				
+				#if TARGET_IPHONE_SIMULATOR
                 // This section handles tank movement.  We only allow one "movement" action
                 // to occur at once so that touchpad devices don't get double hits.
                 player.Velocity.X = MathHelper.Min(input.CurrentGamePadStates.ThumbSticks.Left.X * 2.0f, 1.0f);
-
+				touchShoot = input.MenuSelect;
+				#else
 				// Add the accelerometer support
-				//player.Velocity.X = MathHelper.Min(Accelerometer.GetState().Acceleration.X * 2.0f, 1.0f);
+				player.Velocity.X = MathHelper.Min(Accelerometer.GetState().Acceleration.X * 2.0f, 1.0f);
 				
-                // tap the screen to shot
-                //if ((Mouse.GetState().X != 0) || (Mouse.GetState().Y != 0))
-				if (input.MenuSelect)
+				// tap the screen to shoot				
+				foreach (TouchLocation location in input.TouchStates)
+				{
+				    switch (location.State)
+				    {
+				        case TouchLocationState.Pressed:
+				            touchShoot = true;
+				            break;
+				        case TouchLocationState.Moved:
+				            break;
+				        case TouchLocationState.Released:
+				            break;
+				    }
+				}
+				#endif
+				
+                
+				
+				        
+				if (touchShoot)
                 {
 					//Mouse.SetPosition(0,0);
                     if (player.FireTimer <= 0.0f && player.IsAlive && !gameOver)
@@ -531,6 +550,7 @@ namespace AlienGameSample
                     if (player.Lives <= 0)
                     {
                         gameOver = true;
+						SaveHighscore();
                     }
                 }
 
@@ -777,11 +797,13 @@ namespace AlienGameSample
 
             DrawForeground(elapsedTime);
             
-            DrawHud();
+            DrawHud();	
 			
+			#if TARGET_IPHONE_SIMULATOR
 			// Draw the GamePad
 			GamePad.Draw(gameTime,ScreenManager.SpriteBatch);
-		
+			#endif
+			
             ScreenManager.SpriteBatch.End();
         }
 
