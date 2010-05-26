@@ -139,9 +139,10 @@ namespace AlienGameSample
                 {
                     MenuEntry menuEntry = menuEntries[i];
 
-                    bool isSelected = IsActive && (i == selectedEntry);
-
                     position.X = 160 - font.MeasureString(menuEntry.Text).X / 2;
+					
+					bool isSelected = IsActive && (i == selectedEntry);
+					
                     menuEntry.Draw(this, position, isSelected, gameTime);
 
                     position.Y -= menuEntry.GetHeight(this);

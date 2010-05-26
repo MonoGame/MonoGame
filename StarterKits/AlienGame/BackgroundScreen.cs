@@ -52,7 +52,7 @@ namespace AlienGameSample
             title = ScreenManager.Game.Content.Load<Texture2D>("title");
             background = ScreenManager.Game.Content.Load<Texture2D>("background");
 			// Setup virtual gamepad
-			gamepadTexture = ScreenManager.Game.Content.Load<Texture2D>("gamepad.png");  
+			gamepadTexture = ScreenManager.Game.Content.Load<Texture2D>("gamepad");  
 			ButtonDefinition BButton = new ButtonDefinition();
 			BButton.Texture = gamepadTexture;
 			BButton.Position = new Vector2(270,240);
@@ -109,8 +109,10 @@ namespace AlienGameSample
             // Title
             spriteBatch.Draw(title, new Vector2((320-title.Width)/2, 60), new Color(255, 255, 255, TransitionAlpha));
 
+			#if TARGET_IPHONE_SIMULATOR
 			// Draw the GamePad
 			GamePad.Draw(gameTime,spriteBatch);
+			#endif
 			
             spriteBatch.End();
         }

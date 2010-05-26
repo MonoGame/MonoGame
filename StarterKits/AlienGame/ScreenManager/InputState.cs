@@ -25,6 +25,8 @@ namespace AlienGameSample
 	{
         public GamePadState CurrentGamePadStates;
         public GamePadState LastGamePadStates;
+		public TouchCollection TouchStates;
+		
 
         /// <summary>
         /// Constructs a new input state.
@@ -32,6 +34,7 @@ namespace AlienGameSample
         public InputState()
         {
 			CurrentGamePadStates = GamePad.GetState(PlayerIndex.One);
+			TouchStates = TouchPanel.GetState();
         }
 
         /// <summary>
@@ -102,6 +105,7 @@ namespace AlienGameSample
         {
             LastGamePadStates = CurrentGamePadStates;
             CurrentGamePadStates = GamePad.GetState(PlayerIndex.One);
+			TouchStates = TouchPanel.GetState();
         }
 
         /// <summary>
