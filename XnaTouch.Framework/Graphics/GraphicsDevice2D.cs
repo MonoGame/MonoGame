@@ -250,25 +250,28 @@ namespace XnaTouch.Framework.Graphics
 		
 		private void SortSprites()
         {
-			IComparer<SpriteBatchRenderItem> comparer;
-			
-            switch (_actualSortMode)
-            {
-                case SpriteSortMode.Texture:
-                    comparer = new TextureComparer();
-                    break;
-
-                case SpriteSortMode.BackToFront:
-                    comparer = new BackToFrontComparer();
-                    break;
-
-                case SpriteSortMode.FrontToBack:
-                    comparer = new FrontToBackComparer();
-                    break;
-                default:
-                    throw new NotSupportedException();
-            }
-			_sprites.Sort(comparer);
+			if ( _actualSortMode != SpriteSortMode.Immediate )
+			{
+				IComparer<SpriteBatchRenderItem> comparer;
+				
+	            switch (_actualSortMode)
+	            {
+	                case SpriteSortMode.Texture:
+	                    comparer = new TextureComparer();
+	                    break;
+	
+	                case SpriteSortMode.BackToFront:
+	                    comparer = new BackToFrontComparer();
+	                    break;
+	
+	                case SpriteSortMode.FrontToBack:
+	                    comparer = new FrontToBackComparer();
+	                    break;
+					default :
+						throw new NotImplementedException();
+	            }
+				_sprites.Sort(comparer);
+			}
         }
 	}
 }
