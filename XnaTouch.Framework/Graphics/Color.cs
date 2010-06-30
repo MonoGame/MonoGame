@@ -41,10 +41,10 @@ namespace XnaTouch.Framework.Graphics
         {
             packedValue = 0;
 			
-            R = Convert.ToByte(color.X*255);
-            G = Convert.ToByte(color.Y*255);
-            B = Convert.ToByte(color.Z*255);
-            A = Convert.ToByte(color.W * 255);
+			R = Convert.ToByte(color.X);
+            G = Convert.ToByte(color.Y);
+            B = Convert.ToByte(color.Z);
+            A = Convert.ToByte(color.W);
         }
 
         public Color(Vector3 color)
