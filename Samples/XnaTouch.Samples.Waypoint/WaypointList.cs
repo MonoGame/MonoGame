@@ -97,12 +97,11 @@ namespace Waypoint
                 {
                     // This creates a gradient between 0 for the first waypoint on 
                     // the list and 1 for the last, 0 creates a color that's 
-                    // completely red and 1 creates a color that's completely blue
-                    /* TODO Lerp not working correctly 
-                     * spriteBatch.Draw(waypointTexture, location, null, 
+                    // completely red and 1 creates a color that's completely blue    
+                    spriteBatch.Draw(waypointTexture, location, null, 
                         new Color(Vector4.Lerp(Color.Red.ToVector4(), 
                         Color.Blue.ToVector4(), i / numberPoints)), 
-                        0f, waypointCenter, 1f, SpriteEffects.None, 0f);*/
+                        0f, waypointCenter, 1f, SpriteEffects.None, 0f);
 					spriteBatch.Draw(waypointTexture, location, null, Color.Blue,
                     0f, waypointCenter, 1f, SpriteEffects.None, 0f);
 
