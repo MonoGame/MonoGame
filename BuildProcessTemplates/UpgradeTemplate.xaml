@@ -1,0 +1,76 @@
+﻿<Activity mc:Ignorable="sad" x:Class="TfsBuild.Process" xmlns="http://schemas.microsoft.com/netfx/2009/xaml/activities" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:mtbc="clr-namespace:Microsoft.TeamFoundation.Build.Client;assembly=Microsoft.TeamFoundation.Build.Client" xmlns:mtbw="clr-namespace:Microsoft.TeamFoundation.Build.Workflow;assembly=Microsoft.TeamFoundation.Build.Workflow" xmlns:mtbwa="clr-namespace:Microsoft.TeamFoundation.Build.Workflow.Activities;assembly=Microsoft.TeamFoundation.Build.Workflow" xmlns:mtbwt="clr-namespace:Microsoft.TeamFoundation.Build.Workflow.Tracking;assembly=Microsoft.TeamFoundation.Build.Workflow" xmlns:mtvc="clr-namespace:Microsoft.TeamFoundation.VersionControl.Client;assembly=Microsoft.TeamFoundation.VersionControl.Client" xmlns:mva="clr-namespace:Microsoft.VisualBasic.Activities;assembly=System.Activities" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:sad="http://schemas.microsoft.com/netfx/2009/xaml/activities/presentation" xmlns:sad1="clr-namespace:System.Activities.Debugger;assembly=System.Activities" xmlns:scg="clr-namespace:System.Collections.Generic;assembly=mscorlib" xmlns:this="clr-namespace:TfsBuild;" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <x:Members>
+    <x:Property Name="ConfigurationFolderPath" Type="InArgument(x:String)" />
+    <x:Property Name="AgentSettings" Type="InArgument(mtbwa:AgentSettings)" />
+    <x:Property Name="MSBuildArguments" Type="InArgument(x:String)" />
+    <x:Property Name="MSBuildPlatform" Type="InArgument(mtbwa:ToolPlatform)" />
+    <x:Property Name="DoNotDownloadBuildType" Type="InArgument(x:Boolean)" />
+    <x:Property Name="LogFilePerProject" Type="InArgument(x:Boolean)" />
+    <x:Property Name="SourcesSubdirectory" Type="InArgument(x:String)" />
+    <x:Property Name="BinariesSubdirectory" Type="InArgument(x:String)" />
+    <x:Property Name="TestResultsSubdirectory" Type="InArgument(x:String)" />
+    <x:Property Name="RecursionType" Type="InArgument(mtvc:RecursionType)" />
+    <x:Property Name="Verbosity" Type="InArgument(mtbw:BuildVerbosity)" />
+    <x:Property Name="Metadata" Type="mtbw:ProcessParameterMetadataCollection" />
+    <x:Property Name="SupportedReasons" Type="mtbc:BuildReason" />
+  </x:Members>
+  <this:Process.ConfigurationFolderPath>
+    <InArgument x:TypeArguments="x:String" />
+  </this:Process.ConfigurationFolderPath>
+  <this:Process.AgentSettings>[New Microsoft.TeamFoundation.Build.Workflow.Activities.AgentSettings() With {.MaxWaitTime = New System.TimeSpan(4, 0, 0), .MaxExecutionTime = New System.TimeSpan(0, 0, 0), .TagComparison = Microsoft.TeamFoundation.Build.Workflow.Activities.TagComparison.MatchExactly }]</this:Process.AgentSettings>
+  <this:Process.MSBuildArguments>
+    <InArgument x:TypeArguments="x:String" />
+  </this:Process.MSBuildArguments>
+  <this:Process.MSBuildPlatform>[Microsoft.TeamFoundation.Build.Workflow.Activities.ToolPlatform.Auto]</this:Process.MSBuildPlatform>
+  <this:Process.DoNotDownloadBuildType>[False]</this:Process.DoNotDownloadBuildType>
+  <this:Process.LogFilePerProject>[False]</this:Process.LogFilePerProject>
+  <this:Process.SourcesSubdirectory>
+    <InArgument x:TypeArguments="x:String" />
+  </this:Process.SourcesSubdirectory>
+  <this:Process.BinariesSubdirectory>
+    <InArgument x:TypeArguments="x:String" />
+  </this:Process.BinariesSubdirectory>
+  <this:Process.TestResultsSubdirectory>
+    <InArgument x:TypeArguments="x:String" />
+  </this:Process.TestResultsSubdirectory>
+  <this:Process.RecursionType>[Microsoft.TeamFoundation.VersionControl.Client.RecursionType.OneLevel]</this:Process.RecursionType>
+  <this:Process.Verbosity>[Microsoft.TeamFoundation.Build.Workflow.BuildVerbosity.Normal]</this:Process.Verbosity>
+  <this:Process.Metadata>
+    <mtbw:ProcessParameterMetadataCollection />
+  </this:Process.Metadata>
+  <this:Process.SupportedReasons>All</this:Process.SupportedReasons>
+  <mva:VisualBasic.Settings>Assembly references and imported namespaces serialized as XML namespaces</mva:VisualBasic.Settings>
+  <Sequence mtbwt:BuildTrackingParticipant.Importance="None">
+    <Sequence.Variables>
+      <Variable x:TypeArguments="mtbc:IBuildDetail" Name="BuildDetail" />
+    </Sequence.Variables>
+    <mtbwa:GetBuildDetail DisplayName="Get the Build" Result="[BuildDetail]" />
+    <mtbwa:InvokeForReason DisplayName="Update Build Number for Triggered Builds" Reason="Triggered">
+      <mtbwa:UpdateBuildNumber BuildNumberFormat="[&quot;$(BuildDefinitionName)_$(Date:yyyyMMdd)$(Rev:.r)&quot;]" DisplayName="Update Build Number" />
+    </mtbwa:InvokeForReason>
+    <mtbwa:AgentScope DisplayName="Run On Agent" MaxExecutionTime="[AgentSettings.MaxExecutionTime]" MaxWaitTime="[AgentSettings.MaxWaitTime]" ReservationSpec="[AgentSettings.GetAgentReservationSpec()]">
+      <mtbwa:AgentScope.Variables>
+        <Variable x:TypeArguments="x:String" Name="buildDirectory" />
+      </mtbwa:AgentScope.Variables>
+      <mtbwa:GetBuildDirectory DisplayName="Get the Build Directory" Result="[buildDirectory]" />
+      <If Condition="[Not String.IsNullOrEmpty(ConfigurationFolderPath)]" DisplayName="If Not String.IsNullOrEmpty(ConfigurationFolderPath)">
+        <If.Then>
+          <mtbwa:TfsBuild BinariesSubdirectory="[BinariesSubdirectory]" BuildDirectory="[buildDirectory]" CommandLineArguments="[MSBuildArguments]" ConfigurationFolderPath="[ConfigurationFolderPath]" DisplayName="Run TfsBuild for Configuration Folder" DoNotDownloadBuildType="[DoNotDownloadBuildType]" LogFilePerProject="[LogFilePerProject]" RecursionType="[RecursionType]" SourcesSubdirectory="[SourcesSubdirectory]" TestResultsSubdirectory="[TestResultsSubdirectory]" ToolPlatform="[MSBuildPlatform]" Verbosity="[Verbosity]" />
+        </If.Then>
+      </If>
+      <If Condition="[BuildDetail.CompilationStatus = Microsoft.TeamFoundation.Build.Client.BuildPhaseStatus.Unknown]" DisplayName="If CompilationStatus = Unknown">
+        <If.Then>
+           <mtbwa:SetBuildProperties CompilationStatus="[Microsoft.TeamFoundation.Build.Client.BuildPhaseStatus.Succeeded]" DisplayName="Set CompilationStatus to Succeeded" PropertiesToSet="CompilationStatus" />
+        </If.Then>
+      </If>
+      <If Condition="[BuildDetail.TestStatus = Microsoft.TeamFoundation.Build.Client.BuildPhaseStatus.Unknown]" DisplayName="If TestStatus = Unknown">
+        <If.Then>
+          <mtbwa:SetBuildProperties DisplayName="Set TestStatus to Succeeded" PropertiesToSet="TestStatus" TestStatus="[Microsoft.TeamFoundation.Build.Client.BuildPhaseStatus.Succeeded]" />
+        </If.Then>
+      </If>
+    </mtbwa:AgentScope>
+    <mtbwa:InvokeForReason Reason="CheckInShelveset">
+      <mtbwa:CheckInGatedChanges DisplayName="Check In Gated Changes" />
+    </mtbwa:InvokeForReason>
+  </Sequence>
+</Activity>
