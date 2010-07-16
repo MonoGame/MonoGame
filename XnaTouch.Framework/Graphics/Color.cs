@@ -1180,7 +1180,12 @@ namespace XnaTouch.Framework.Graphics
 
         public static Color Lerp(Color value1, Color value2, Single amount)
         {
-            throw new NotImplementedException();
+            byte Red   = (byte)MathHelper.Clamp(MathHelper.Lerp(value1.R, value2.R, amount), Byte.MinValue, Byte.MaxValue);   
+			byte Green = (byte)MathHelper.Clamp(MathHelper.Lerp(value1.G, value2.G, amount), Byte.MinValue, Byte.MaxValue);
+			byte Blue  = (byte)MathHelper.Clamp(MathHelper.Lerp(value1.B, value2.B, amount), Byte.MinValue, Byte.MaxValue);
+			byte Alpha = (byte)MathHelper.Clamp(MathHelper.Lerp(value1.A, value2.A, amount), Byte.MinValue, Byte.MaxValue);
+			
+            return new Color( Red, Green, Blue, Alpha );
         }
 
 
