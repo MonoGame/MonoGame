@@ -83,12 +83,12 @@ namespace XnaTouch.Framework.Net
 
 		public override void PeerConnectionRequest(GKSession session, string peerID)
 		{
-			
+			Console.WriteLine( " Session : " + session.SessionID + " PeerID : " + peerID );
 		}
 
-		public override void PeerConnectionFailed(GKSession session, NSError error)
+		public override void PeerConnectionFailed(GKSession session, string peerID, NSError error)
 		{
-			Console.WriteLine( " Session : " + session.SessionID + " PeerConnectionFailed : " + error );
+			Console.WriteLine( " Session : " + session.SessionID + " PeerID : " + peerID +" PeerConnectionFailed : " + error );
 		}
 
 		public override void FailedWithError(GKSession session, NSError error)
