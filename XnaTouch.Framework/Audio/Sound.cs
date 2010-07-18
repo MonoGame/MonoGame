@@ -701,19 +701,22 @@ namespace XnaTouch.Framework.Audio
 			get { return this._Looping; }
 			set
 			{
-				this._Looping = value;
-				
-				Sound.Enqueue(() =>
-				    {
-						lock (Sound.Map)
-						{
-							if (this.Stream == null)
-								return;
-							
-							this.Stream->Looping = value;
+				if (this._Looping != value )
+				{
+					this._Looping = value;
+					
+					Sound.Enqueue(() =>
+					    {
+							lock (Sound.Map)
+							{
+								if (this.Stream == null)
+									return;
+								
+								this.Stream->Looping = value;
+							}
 						}
-					}
-				);
+					);
+				}
 			}
 		}
 		

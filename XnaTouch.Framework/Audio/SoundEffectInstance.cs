@@ -76,7 +76,11 @@ namespace XnaTouch.Framework.Audio
 		
 		public void Play ()
 		{
-			soundState = SoundState.Playing;
+			if ( _sound != null )
+			{
+				_sound.Play();
+				soundState = SoundState.Playing;
+			}
 		}
 		
 		public void Resume ()
@@ -86,12 +90,20 @@ namespace XnaTouch.Framework.Audio
 		
 		public void Stop ()
 		{
-			soundState = SoundState.Stopped;
+			if ( _sound != null )
+			{
+				_sound.Stop();
+				soundState = SoundState.Stopped;
+			}
 		}
 		
 		public void Stop (bool immediate)
 		{
-			soundState = SoundState.Stopped;
+			if ( _sound != null )
+			{
+				_sound.Stop();
+				soundState = SoundState.Stopped;
+			}
 		}
 		
 		public bool IsDisposed 
@@ -102,11 +114,42 @@ namespace XnaTouch.Framework.Audio
 			}
 		}
 		
-		public bool IsLooped { get; set; }
+		public bool IsLooped 
+		{ 
+			get
+			{
+				return _sound.Looping;
+			}
+			
+			set
+			{
+				if ( _sound != null )
+				{
+					if ( _sound.Looping != value )
+					{
+						_sound.Looping = value;
+					}
+				}
+			}
+		}
 		
 		public float Pan { get; set; }
 		
 		public float Pitch { get; set; }
+		
+		private Sound _sound;
+		public Sound Sound 
+		{ 
+			get
+			{
+				return _sound;
+			} 
+			
+			set
+			{
+				_sound = value;
+			} 
+		}
 		
 		public SoundState State 
 		{ 
@@ -116,6 +159,23 @@ namespace XnaTouch.Framework.Audio
 			} 
 		}
 		
-		public float Volume { get; set; }		
+		public float Volume
+		{ 
+			get
+			{
+				return _sound.Volume;
+			}
+			
+			set
+			{
+				if ( _sound != null )
+				{
+					if ( _sound.Volume != value )
+					{
+						_sound.Volume = value;
+					}
+				}
+			}
+		}		
 	}
 }
