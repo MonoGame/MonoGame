@@ -46,12 +46,76 @@ namespace XnaTouch.Framework.Audio
 {
 	public sealed class SoundEffectInstance : IDisposable
 	{
+		private bool isDisposed = false;
+		private SoundState soundState = SoundState.Stopped;
+		
 		public SoundEffectInstance ()
 		{
+			
 		}
 		
 		public void Dispose ()
 		{
+			isDisposed = true;
 		}
+		
+		public void Apply3D (AudioListener listener, AudioEmitter emitter)
+		{
+			throw new NotImplementedException();
+		}
+		
+		public void Apply3D (AudioListener[] listeners,AudioEmitter emitter)
+		{
+			throw new NotImplementedException();
+		}		
+		
+		public void Pause ()
+		{
+			soundState = SoundState.Paused;
+		}
+		
+		public void Play ()
+		{
+			soundState = SoundState.Playing;
+		}
+		
+		public void Resume ()
+		{
+			Play();
+		}
+		
+		public void Stop ()
+		{
+			soundState = SoundState.Stopped;
+		}
+		
+		public void Stop (bool immediate)
+		{
+			soundState = SoundState.Stopped;
+		}
+		
+		public bool IsDisposed 
+		{ 
+			get
+			{
+				return isDisposed;
+			}
+		}
+		
+		public bool IsLooped { get; set; }
+		
+		public float Pan { get; set; }
+		
+		public float Pitch { get; set; }
+		
+		public SoundState State 
+		{ 
+			get
+			{
+				return soundState;
+			} 
+		}
+		
+		public float Volume { get; set; }		
 	}
 }

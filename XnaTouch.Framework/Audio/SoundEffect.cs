@@ -91,6 +91,11 @@ namespace XnaTouch.Framework.Audio
 				return Path.GetFileNameWithoutExtension(_name);
             }
         }
+		
+		public SoundEffectInstance CreateInstance ()
+		{
+			return new SoundEffectInstance();
+		}
     }
 }
 
