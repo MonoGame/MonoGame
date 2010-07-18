@@ -64,7 +64,7 @@ namespace XnaTouch.Framework.Audio
 		
         public bool Play()
         {
-			_sound = Sound.Create (_name, _volume, false);
+			_sound = Sound.Create(_name, _volume, false);
 			_sound.Play();
 			
 			return true;
@@ -94,7 +94,10 @@ namespace XnaTouch.Framework.Audio
 		
 		public SoundEffectInstance CreateInstance ()
 		{
-			return new SoundEffectInstance();
+			return new SoundEffectInstance()
+			{
+				Sound = _sound,
+			};
 		}
     }
 }
