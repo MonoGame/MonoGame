@@ -236,6 +236,7 @@
     <Compile Include="Graphics\BlendFunction.cs" />
     <Compile Include="Audio\AudioListener.cs" />
     <Compile Include="Audio\AudioEmitter.cs" />
+    <Compile Include="DisplayOrientation.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
