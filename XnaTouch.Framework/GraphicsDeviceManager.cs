@@ -234,6 +234,13 @@ namespace XnaTouch.Framework
             {
             }
         }
+		
+		public DisplayOrientation SupportedOrientations 
+		{ 
+			get; 
+			set; 
+		}
+
     }
 }
 
