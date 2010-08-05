@@ -38,16 +38,23 @@ purpose and non-infringement.
 */
 #endregion License
 
+#region Using Statements
+using System;
+using System.Drawing;
+using System.Collections.Generic;
+
 using MonoTouch.CoreAnimation;
 using MonoTouch.Foundation;
 using MonoTouch.ObjCRuntime;
 using MonoTouch.OpenGLES;
 using MonoTouch.UIKit;
+
+using OpenTK;
 using OpenTK.Platform.iPhoneOS;
-using System;
-using System.Drawing;
-using XnaTouch.Framework.Input;
 using OpenTK.Graphics.ES11;
+
+using XnaTouch.Framework.Input;
+#endregion Using Statements
 
 namespace XnaTouch.Framework
 {
@@ -55,6 +62,9 @@ namespace XnaTouch.Framework
     {
 		private readonly Rectangle clientBounds;
 		internal Game game;
+		private GameTime _updateGameTime;
+        private GameTime _drawGameTime;
+        private DateTime _lastUpdate;
 				
 		#region UIVIew Methods
 		
@@ -69,6 +79,10 @@ namespace XnaTouch.Framework
 			
 			// Enable multi-touch
 			MultipleTouchEnabled = true;
+			
+			// Initialize GameTime
+            _updateGameTime = new GameTime();
+            _drawGameTime = new GameTime();  	
 		}
 		
 		[Export ("layerClass")]
@@ -86,24 +100,87 @@ namespace XnaTouch.Framework
 		
 		#region iPhoneOSGameView Methods
 		
-		protected override void OnRenderFrame (OpenTK.FrameEventArgs e)
+		protected override void OnClosed(EventArgs e)
 		{
-			base.OnRenderFrame (e);
+			base.OnClosed(e);
+		}
+		
+		protected override void OnDisposed(EventArgs e)
+		{
+			base.OnDisposed(e);
+		}
+		
+		protected override void OnLoad (EventArgs e)
+		{
+			base.OnLoad(e);
+		}
+		
+		protected override void OnRenderFrame(FrameEventArgs e)
+		{
+			base.OnRenderFrame(e);
 			
 			MakeCurrent();
 						
-			game.DoStep();
+			// This code was commented to make the code base more iPhone like.
+			// More speed testing is required, to see if this is worse or better
+			// game.DoStep();	
+			
+			if (game != null )
+			{
+				_drawGameTime.Update(DateTime.Now - _lastUpdate);
+            	_lastUpdate = DateTime.Now;
+            	game.DoDraw(_drawGameTime);
+			}
 						
 			SwapBuffers();
+		}
+		
+		protected override void OnResize(EventArgs e)
+		{
+			base.OnResize(e);
+		}
+		
+		protected override void OnTitleChanged(EventArgs e)
+		{
+			base.OnTitleChanged(e);
+		}
+		
+		protected override void OnUnload(EventArgs e)
+		{
+			base.OnUnload(e);
+		}
+		
+		protected override void OnUpdateFrame(FrameEventArgs e)
+		{			
+			base.OnUpdateFrame(e);	
+			
+			if (game != null )
+			{
+				_updateGameTime.Update(DateTime.Now - _lastUpdate);
+            	game.DoUpdate(_updateGameTime);
+			}
+		}
+		
+		protected override void OnVisibleChanged(EventArgs e)
+		{			
+			base.OnVisibleChanged(e);	
+		}
+		
+		protected override void OnWindowStateChanged(EventArgs e)
+		{		
+			base.OnWindowStateChanged(e);	
 		}
 		
 		#endregion
 				
 		#region UIVIew Methods
 						
+		private readonly Dictionary<IntPtr, TouchLocation> previousTouches = new Dictionary<IntPtr, TouchLocation>();
+		
 		private void FillTouchCollection(NSSet touches)
 		{
 			UITouch []touchesArray = touches.ToArray<UITouch>();
+			
 			TouchPanel.Collection = new TouchCollection();
 			TouchPanel.Collection.Capacity = touchesArray.Length;
 			
@@ -124,49 +201,57 @@ namespace XnaTouch.Framework
 						state = TouchLocationState.Moved;
 						break;					
 				}
+				
+				TouchLocation tlocation;
+				TouchLocation previousTouch;
+				if (state != TouchLocationState.Pressed && previousTouches.TryGetValue (touch.Handle, out previousTouch))
+					tlocation = new TouchLocation(touch.Handle.ToInt32(), state, new Vector2 (touch.LocationInView (touch.View)), 1.0f, previousTouch.State, previousTouch.Position, previousTouch.Pressure);
+				else
+					tlocation = new TouchLocation(touch.Handle.ToInt32(), state, new Vector2 (touch.LocationInView (touch.View)), 1.0f);
+				
+				TouchPanel.Collection.Add (tlocation);
+				
 				if (state != TouchLocationState.Released)
-				{
-					TouchLocation touchLocation = new TouchLocation(i,state,new Vector2(touch.LocationInView(touch.View)),1.0f,
-				                                                TouchLocationState.Moved, new Vector2(touch.PreviousLocationInView(touch.View)), 1.0f);
-					TouchPanel.Collection.Add(touchLocation);
-				}
+					previousTouches[touch.Handle] = tlocation;
+				else
+					previousTouches.Remove(touch.Handle);
 			}
 		}
 		
 		public override void TouchesBegan (NSSet touches, UIEvent evt)
 		{
-			GamePad.Instance.TouchesBegan(touches,evt);
+			base.TouchesBegan (touches, evt);
 			
 			FillTouchCollection(touches);
 			
-			base.TouchesBegan (touches, evt);
+			GamePad.Instance.TouchesBegan(touches,evt);	
 		}
 		
 		public override void TouchesEnded (NSSet touches, UIEvent evt)
 		{
-			GamePad.Instance.TouchesEnded(touches,evt);			
-			
-			FillTouchCollection(touches);
-			
 			base.TouchesEnded (touches, evt);
+			
+			FillTouchCollection(touches);	
+			
+			GamePad.Instance.TouchesEnded(touches,evt);								
 		}
 		
 		public override void TouchesMoved (NSSet touches, UIEvent evt)
 		{
-			GamePad.Instance.TouchesMoved(touches,evt);
-
+			base.TouchesMoved (touches, evt);
+			
 			FillTouchCollection(touches);
 			
-			base.TouchesMoved (touches, evt);
+			GamePad.Instance.TouchesMoved(touches,evt);
 		}
 
 		public override void TouchesCancelled (NSSet touches, UIEvent evt)
 		{
-			GamePad.Instance.TouchesCancelled(touches,evt);
+			base.TouchesCancelled (touches, evt);
 			
 			FillTouchCollection(touches);
 			
-			base.TouchesCancelled (touches, evt);
+			GamePad.Instance.TouchesCancelled(touches,evt);
 		}
 
 		#endregion

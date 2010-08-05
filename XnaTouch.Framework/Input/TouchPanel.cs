@@ -59,7 +59,9 @@ namespace XnaTouch.Framework.Input
 
         public static TouchCollection GetState()
         {
-			return Collection;
+			var c = new TouchCollection(Collection);
+			Collection.Clear();
+			return c;
         }
     }
 }
