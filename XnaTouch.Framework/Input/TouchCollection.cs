@@ -49,5 +49,14 @@ namespace XnaTouch.Framework.Input
 {	
 	public class TouchCollection : List<TouchLocation>
 	{
+		public TouchCollection()
+		{
+			
+		}
+		
+		internal TouchCollection(IEnumerable<TouchLocation> locations)	: base (locations)
+		{
+			
+		}
 	}
 }
