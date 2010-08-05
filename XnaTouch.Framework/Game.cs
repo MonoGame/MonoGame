@@ -127,7 +127,7 @@ namespace XnaTouch.Framework
         }
 		
         public void Run()
-    		{			
+    	{			
 			_lastUpdate = DateTime.Now;
 			
 			_view.Run(60/(60*TargetElapsedTime.TotalSeconds));			
@@ -137,6 +137,16 @@ namespace XnaTouch.Framework
 			//Show the window			
 			_mainWindow.MakeKeyAndVisible ();						
         }
+		
+		internal void DoUpdate(GameTime aGameTime)
+		{
+			Update(aGameTime);
+		}
+		
+		internal void DoDraw(GameTime aGameTime)
+		{
+			Draw(aGameTime);
+		}
 		
 		internal void DoStep()
 		{
@@ -247,7 +257,7 @@ namespace XnaTouch.Framework
             foreach (GameComponent gc in _gameComponentCollection)
             {
                 gc.Initialize();
-            }		
+            }
 			
 			_initialized = true;
         }
