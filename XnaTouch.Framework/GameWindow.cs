@@ -50,8 +50,10 @@ using MonoTouch.OpenGLES;
 using MonoTouch.UIKit;
 
 using OpenTK;
+using OpenTK.Graphics;
 using OpenTK.Platform.iPhoneOS;
 using OpenTK.Graphics.ES11;
+using OpenTK.Graphics.ES20;
 
 using XnaTouch.Framework.Input;
 #endregion Using Statements
@@ -65,14 +67,18 @@ namespace XnaTouch.Framework
 		private GameTime _updateGameTime;
         private GameTime _drawGameTime;
         private DateTime _lastUpdate;
+		private DateTime _now;
+		
+		public EAGLContext MainContext;
+	    public EAGLContext BackgroundContext;
+	    public EAGLSharegroup ShareGroup; 
 				
 		#region UIVIew Methods
 		
 		public GameWindow() : base (UIScreen.MainScreen.Bounds)
 		{
 			LayerRetainsBacking = false; 
-			LayerColorFormat	= EAGLColorFormat.RGBA8; 
-			ContextRenderingApi = EAGLRenderingAPI.OpenGLES1;
+			LayerColorFormat	= EAGLColorFormat.RGBA8;
 			
 			RectangleF rect = UIScreen.MainScreen.Bounds;
 			clientBounds = new Rectangle(0,0,(int) rect.Width,(int) rect.Height);
@@ -94,6 +100,24 @@ namespace XnaTouch.Framework
 		protected override void ConfigureLayer(CAEAGLLayer eaglLayer) 
 		{
 			eaglLayer.Opaque = true;
+		}
+		
+		protected override void CreateFrameBuffer()
+		{	    
+			try
+			{
+		        // TODO ContextRenderingApi = EAGLRenderingAPI.OpenGLES2;
+				ContextRenderingApi = EAGLRenderingAPI.OpenGLES1;
+				base.CreateFrameBuffer();
+		    } 
+			catch (Exception) 
+			{
+		        // device doesn't support OpenGLES 2.0; retry with 1.1:
+		        ContextRenderingApi = EAGLRenderingAPI.OpenGLES1;
+				base.CreateFrameBuffer();
+		    }
+			
+			
 		}
 		
 		#endregion
@@ -127,8 +151,8 @@ namespace XnaTouch.Framework
 			
 			if (game != null )
 			{
-				_drawGameTime.Update(DateTime.Now - _lastUpdate);
-            	_lastUpdate = DateTime.Now;
+				_drawGameTime.Update(_now - _lastUpdate);
+            	_lastUpdate = _now;
             	game.DoDraw(_drawGameTime);
 			}
 						
@@ -156,7 +180,8 @@ namespace XnaTouch.Framework
 			
 			if (game != null )
 			{
-				_updateGameTime.Update(DateTime.Now - _lastUpdate);
+				_now = DateTime.Now;
+				_updateGameTime.Update(_now - _lastUpdate);
             	game.DoUpdate(_updateGameTime);
 			}
 		}
