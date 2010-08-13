@@ -49,10 +49,12 @@ namespace XnaTouch.Framework.Input
 		private static AccelerometerState _state;
 		private static AccelerometerCapabilities _capabilities = new AccelerometerCapabilities();
 		
+		private const int AccelerometerFrequency = 30;
+		
 		public static void SetupAccelerometer()
 		{
 			UIAccelerometer.SharedAccelerometer.Acceleration += UIAccelerometerSharedAccelerometerAcceleration;				
-			UIAccelerometer.SharedAccelerometer.UpdateInterval = 1/30;
+			UIAccelerometer.SharedAccelerometer.UpdateInterval = 1/AccelerometerFrequency;
         }
 
 		static void UIAccelerometerSharedAccelerometerAcceleration (object sender, UIAccelerometerEventArgs e)

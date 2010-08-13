@@ -37,13 +37,18 @@ permitted under your local laws, the contributors exclude the implied warranties
 purpose and non-infringement.
 */
 #endregion License
-    
+   
+using System;
+using System.IO;
+
 using MonoTouch.CoreAnimation;
 using MonoTouch.CoreFoundation;
 using MonoTouch.Foundation;
+using MonoTouch.OpenGLES;
 using MonoTouch.UIKit;
+
 using OpenTK.Graphics;
-using System;
+
 using XnaTouch.Framework.Content;
 using XnaTouch.Framework.Graphics;
 using XnaTouch.Framework.Input;
@@ -56,6 +61,7 @@ namespace XnaTouch.Framework
         private GameTime _drawGameTime;
         private DateTime _lastUpdate;
         private bool _initialized = false;
+		private bool _initializing = false;
         private GameComponentCollection _gameComponentCollection;
         public GameServiceContainer _services;
         private ContentManager _content;
@@ -68,6 +74,10 @@ namespace XnaTouch.Framework
 		private UIWindow _mainWindow;
 
 		internal static bool _playingVideo = false;
+		private SpriteBatch spriteBatch;
+		private Texture2D splashScreen;
+		
+		delegate void InitialiseGameComponentsDelegate();
 		
 		public Game()
         {           
@@ -130,12 +140,18 @@ namespace XnaTouch.Framework
     	{			
 			_lastUpdate = DateTime.Now;
 			
-			_view.Run(60/(60*TargetElapsedTime.TotalSeconds));			
+			_view.Run(60/(60*TargetElapsedTime.TotalSeconds));	
 			
-			Initialize();
+			_view.MainContext = _view.EAGLContext;
+			_view.ShareGroup = _view.MainContext.ShareGroup;
+			_view.BackgroundContext = new MonoTouch.OpenGLES.EAGLContext(_view.ContextRenderingApi, _view.ShareGroup);
 			
 			//Show the window			
-			_mainWindow.MakeKeyAndVisible ();						
+			_mainWindow.MakeKeyAndVisible();	
+			
+			// Get the Accelerometer going
+			Accelerometer.SetupAccelerometer();			
+			Initialize();
         }
 		
 		internal void DoUpdate(GameTime aGameTime)
@@ -150,13 +166,15 @@ namespace XnaTouch.Framework
 		
 		internal void DoStep()
 		{
+			var timeNow = DateTime.Now;
+			
 			// Update the game			
-            _updateGameTime.Update(DateTime.Now - _lastUpdate);
+            _updateGameTime.Update(timeNow - _lastUpdate);
             Update(_updateGameTime);
 
             // Draw the screen
-            _drawGameTime.Update(DateTime.Now - _lastUpdate);
-            _lastUpdate = DateTime.Now;
+            _drawGameTime.Update(timeNow - _lastUpdate);
+            _lastUpdate = timeNow;
             Draw(_drawGameTime);       			
 		}
 
@@ -233,8 +251,18 @@ namespace XnaTouch.Framework
 		}
 		
 		protected virtual void LoadContent()
-		{
-			// do nothing
+		{			
+			const string DefaultPath = "../Default.png";
+			if (File.Exists(DefaultPath))
+			{
+				spriteBatch = new SpriteBatch(GraphicsDevice);
+				splashScreen = Content.Load<Texture2D>(DefaultPath);
+			}
+			else
+			{
+				spriteBatch = null;
+				splashScreen = null;
+			}
 		}
 		
 		protected virtual void UnLoadContent()
@@ -244,8 +272,6 @@ namespace XnaTouch.Framework
 		
         protected virtual void Initialize()
         {
-			Accelerometer.SetupAccelerometer();
-			
 			this.graphicsDeviceManager = this.Services.GetService(typeof(IGraphicsDeviceManager)) as IGraphicsDeviceManager;			
 			this.graphicsDeviceService = this.Services.GetService(typeof(IGraphicsDeviceService)) as IGraphicsDeviceService;			
 
@@ -253,41 +279,85 @@ namespace XnaTouch.Framework
             {
                 LoadContent();
             }
-
-            foreach (GameComponent gc in _gameComponentCollection)
+        }
+		
+		private void InitializeGameComponents()
+		{
+			EAGLContext.SetCurrentContext(_view.BackgroundContext);
+			
+			foreach (GameComponent gc in _gameComponentCollection)
             {
                 gc.Initialize();
             }
 			
-			_initialized = true;
-        }
-		
+			EAGLContext.SetCurrentContext(_view.MainContext);
+		}
+
         protected virtual void Update(GameTime gameTime)
         {			
-			foreach (GameComponent gc in _gameComponentCollection)			
+			if ( _initialized )
 			{
-				if (gc.Enabled)
-                {
-                    gc.Update(gameTime);
-                }
-            }
-        }
-
-        protected virtual void Draw(GameTime gameTime)
-        {
-			if (!_playingVideo) 
-			{
-	            foreach (GameComponent gc in _gameComponentCollection)
-	            {
-	                if (gc.Enabled && gc is DrawableGameComponent)
+				foreach (GameComponent gc in _gameComponentCollection)			
+				{
+					if (gc.Enabled)
 	                {
-	                    DrawableGameComponent dc = gc as DrawableGameComponent;
-	                    if (dc.Visible)
-	                    {
-	                        dc.Draw(gameTime);
-	                    }
+	                    gc.Update(gameTime);
 	                }
 	            }
+			}
+			else
+			{
+				if (!_initializing) 
+				{
+					_initializing = true;
+					
+					// Use OpenGLES context switching as described here
+					// http://developer.apple.com/iphone/library/qa/qa2010/qa1612.html
+					InitialiseGameComponentsDelegate initD = new InitialiseGameComponentsDelegate(InitializeGameComponents);
+
+					// Invoke on thread from the pool
+        			initD.BeginInvoke( 
+						delegate (IAsyncResult iar) 
+					    {
+							// We must have finished initialising, so set our flag appropriately
+							// So that we enter the Update loop
+						    _initialized = true;
+							_initializing = false;
+						}, 
+					initD);
+				}
+			}
+        }
+		
+        protected virtual void Draw(GameTime gameTime)
+        {
+			if ( _initializing )
+			{
+				if ( spriteBatch != null )
+				{
+					spriteBatch.Begin();
+					
+					// We need to turn this into a progress bar or animation to give better user feedback
+					spriteBatch.Draw(splashScreen, new Vector2(0, 0), Color.White );
+					spriteBatch.End();
+				}
+			}
+			else
+			{
+				if (!_playingVideo) 
+				{
+		            foreach (GameComponent gc in _gameComponentCollection)
+		            {
+		                if (gc.Enabled && gc is DrawableGameComponent)
+		                {
+		                    DrawableGameComponent dc = gc as DrawableGameComponent;
+		                    if (dc.Visible)
+		                    {
+		                        dc.Draw(gameTime);
+		                    }
+		                }
+		            }
+				}
 			}
         }
 
