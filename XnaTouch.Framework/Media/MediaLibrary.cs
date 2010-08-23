@@ -46,6 +46,8 @@ namespace XnaTouch.Framework.Media
 {
 	public sealed class MediaLibrary : IDisposable
     {
+		private List<Playlist> _playLists;
+
         public MediaLibrary()
         {
         }
@@ -99,26 +101,26 @@ namespace XnaTouch.Framework.Media
             get
             {
 				
-				MPMediaQuery playlists = new MPMediaQuery();
-				playlists.GroupingType = MPMediaGrouping.Playlist; 
-				Console.WriteLine("Found " + playlists.Collections.Length);
-				for (int i=0;i<playlists.Collections.Length;i++)
+				if (_playLists == null)
 				{
-					MPMediaItemCollection item = playlists.Collections[i];					
-
-					//Console.WriteLine(item.Items[0].ValueForProperty(MPMediaPlaylistProperty.Name));
-					//Console.WriteLine(item.ValueForProperty(MPMediaItemProperty.Title));
-					//Console.WriteLine(item.ValueForProperty(MPMediaItemProperty.MediaType.ToString()));
+					_playLists = new List<Playlist>();
+					
+					MPMediaQuery playlists = new MPMediaQuery();
+					playlists.GroupingType = MPMediaGrouping.Playlist; 
+					for (int i=0;i<playlists.Collections.Length;i++)
+					{
+						MPMediaItemCollection item = playlists.Collections[i];					
+						Playlist list = new Playlist();
+						list.Name = playlists.Items[i].ValueForProperty(MPMediaPlaylistProperty.Name).ToString();
+						for (int k=0;k<item.Items.Length;k++)
+						{
+							TimeSpan time = TimeSpan.Parse(item.Items[k].ValueForProperty(MPMediaItemProperty.PlaybackDuration).ToString());
+							list.Duration += time;
+						}
+						_playLists.Add(list);
+					}
 				}
-				
-				return null;
-				/*MPMediaQuery *everything = [[MPMediaQuery alloc] init]; 
-  
-				NSLog(@"Logging items from a generic query..."); 
-				NSArray *itemsFromGenericQuery = [everything items]; 
-				for (MPMediaItem *song in itemsFromGenericQuery) { 
-    				NSString *songTitle = [song valueForProperty: MPMediaItemPropertyTitle]; 
-    			NSLog (@"%@", songTitle); */
+				return _playLists;
             }
         }
 

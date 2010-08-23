@@ -400,6 +400,24 @@ namespace XnaTouch.Framework
             result = new Vector2((position.X * matrix.M11) + (position.Y * matrix.M21) + matrix.M41,
                                  (position.X * matrix.M12) + (position.Y * matrix.M22) + matrix.M42);
         }
+		
+		public static void Transform (
+         Vector2[] sourceArray,
+         ref Matrix matrix,
+         Vector2[] destinationArray)
+		{
+		}
+
+		
+		public static void Transform (
+         Vector2[] sourceArray,
+         int sourceIndex,
+         ref Matrix matrix,
+         Vector2[] destinationArray,
+         int destinationIndex,
+         int length)
+		{
+		}
 
         public static Vector2 TransformNormal(Vector2 normal, Matrix matrix)
         {

@@ -84,6 +84,36 @@ namespace XnaTouch.Framework.Graphics
             this.DirectionalLight2.SpecularColor = color;
             this.DirectionalLight2.Enabled = true;*/
         }
+			
+		public bool LightingEnabled 
+		{ 
+			get; set; 
+		}
+		
+		public Matrix Projection
+		{ 
+			get; set; 
+		}
+		
+		public bool TextureEnabled 
+		{ 
+			get; set; 
+		}
+		
+		public bool VertexColorEnabled 
+		{ 
+			get; set; 
+		}
+		
+		public Matrix View
+		{ 
+			get; set; 
+		}
+
+		public Matrix World
+		{ 
+			get; set; 
+		}
 
 	}
 }

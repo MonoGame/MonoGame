@@ -38,96 +38,18 @@
 // */
 // #endregion License
 // 
-
 using System;
-using XnaTouch.Framework.Graphics;
-using MonoTouch.MediaPlayer;
-using MonoTouch.Foundation;
-
-namespace XnaTouch.Framework.Media
+namespace XnaTouch.Framework.Graphics
 {
-    public sealed class VideoPlayer
-    {
-		private Video  _video;
-		private MediaState _state;
-		private bool _isLooped;
-		private Game _game;		
+	public enum Blend
+	{
+		Zero,	 			// Each component of the color is multiplied by (0, 0, 0, 0).
+		One,				// Each component of the color is multiplied by (1, 1, 1, 1).
+		SourceColor,		// Each component of the color is multiplied by the source color. This can be represented as (Rs, Gs, Bs, As), where R, G, B, and A respectively stand for the red, green, blue, and alpha source values.
+		InverseSourceColor,	// Each component of the color is multiplied by the inverse of the source color. This can be represented as (1 − Rs, 1 − Gs, 1 − Bs, 1 − As) where R, G, B, and A respectively stand for the red, green, blue, and alpha destination values.
+		SourceAlpha,		// Each component of the color is multiplied by the alpha value of the source. This can be represented as (As, As, As, As), where As is the alpha source value. 
+		InverseSourceAlpha,
 		
-        public VideoPlayer(Game game)
-        {
-			_state = MediaState.Stopped;
-			_game = game;
-        }
-
-        public Texture2D GetTexture()
-        {
-			throw new NotImplementedException();
-        }
-
-        public void Pause()
-        {
-			throw new NotImplementedException();
-        }
-		
-		 public MediaState State
-        {
-            get
-            {
-				return _state;
-            }
-        }
-		
-		private void PlayVideo()
-		{				
-			_game.Window.AddSubview(_video.MovieView.View);			
-			
-			NSNotificationCenter.DefaultCenter.AddObserver("MPMoviePlayerPlaybackDidFinishNotification",(NSNotification) => OnStop(null),_video.MovieView.MoviePlayer);		
-
-			_video.MovieView.MoviePlayer.Play();
-			_state = MediaState.Playing;			
-			Game._playingVideo = true;			
-
-		}
-
-        public void Play(XnaTouch.Framework.Media.Video video)
-        {	
-			_video = video;
-			PlayVideo();		
-        }
-		
-		private void OnStop(NSNotification e)
-		{	
-			Stop();
-			if (_isLooped)
-				PlayVideo();
-		}
-
-        public void Stop()
-        {
-			_video.MovieView.MoviePlayer.Stop();
-			_state = MediaState.Stopped;
-			Game._playingVideo = false;
-			_video.MovieView.View.RemoveFromSuperview();
-        }
-
-        public bool IsLooped
-        {
-            get
-            {
-				return _isLooped;
-            }
-            set
-            {
-				_isLooped = value;
-            }
-        }
-
-        public XnaTouch.Framework.Media.Video Video
-        {
-            get
-            {
-                return _video;
-            }
-        }
 	}
 }
+
