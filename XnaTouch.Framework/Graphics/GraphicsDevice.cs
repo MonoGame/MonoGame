@@ -283,6 +283,18 @@ namespace XnaTouch.Framework.Graphics
 			GL.Disable(All.Texture2D);
 		}
 		
+		public VertexDeclaration VertexDeclaration 
+		{ 
+			get; 
+			set; 
+		}
+		
+		public RenderState RenderState 
+		{ 
+			get; 
+			set; 
+		}
+		
 		public void SetRenderTarget (
          int renderTargetIndex,
          RenderTarget2D renderTarget

@@ -45,7 +45,7 @@ namespace XnaTouch.Framework.GamerServices
     public class Gamer
     {
         static SignedInGamerCollection _signedInGamers = new SignedInGamerCollection();
-        string _gamer;
+        string _gamer = "XnaTouch";
         bool _isDisposed;
         Object _tag;
 

@@ -46,18 +46,14 @@ namespace XnaTouch.Framework.Media
     {
         public TimeSpan Duration
         {
-            get
-            {
-				throw new NotImplementedException();
-            }
+            get;
+			internal set;
         }
 
         public string Name
         {
-            get
-            {
-				throw new NotImplementedException();
-            }
+            get;
+			internal set;
         }
 
 		public void Dispose()

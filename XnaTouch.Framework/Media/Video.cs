@@ -48,33 +48,16 @@ namespace XnaTouch.Framework.Media
 {
     public sealed class Video : IDisposable
     {
-		private MPMoviePlayerController _movie;
 		private string _fileName;
 		private Color _backColor = Color.Black;
+		private MPMoviePlayerViewController _view;
 		
 		internal Video(string FileName)
 		{
-			_movie = null;
 			_fileName = FileName;
+			Prepare();
 		}
-		
-		internal void Reset()
-		{
-			_movie.Dispose();
-			_movie = null;
-		}
-
-		private void OpenMovie()
-		{
-			NSUrl url = new NSUrl(FileName,false);
-			_movie = new MPMoviePlayerController(url);
-			_movie.ScalingMode = MPMovieScalingMode.AspectFill;
-			_movie.MovieControlMode = MPMovieControlMode.Hidden;
-			
-			Vector4 color = _backColor.ToEAGLColor();
-			_movie.BackgroundColor = new MonoTouch.UIKit.UIColor(color.X,color.Y,color.Z,color.W);
-		}
-		
+				
 		public Color BackgroundColor
 		{
 			set
@@ -120,24 +103,32 @@ namespace XnaTouch.Framework.Media
 			return null;
 		}
 		
-		internal MPMoviePlayerController Movie
+		internal void Prepare()
 		{
-			get 
+			_view = new MPMoviePlayerViewController(new NSUrl(FileName));
+			_view.MoviePlayer.ScalingMode = MPMovieScalingMode.AspectFill;
+			_view.MoviePlayer.MovieControlMode = MPMovieControlMode.Hidden;
+			_view.MoviePlayer.PrepareToPlay();
+			
+			Vector4 color = BackgroundColor.ToEAGLColor();
+			_view.MoviePlayer.BackgroundColor = new MonoTouch.UIKit.UIColor(color.X,color.Y,color.Z,color.W);
+		}
+		
+		internal MPMoviePlayerViewController MovieView
+		{
+			get
 			{
-				if (_movie == null)
-				{
-					OpenMovie();
-				}
-				return _movie;
+				return _view;
 			}
 		}
 		
-		public void Dispose ()
+		public void Dispose()
 		{
-			
-			if (_movie != null)
-				_movie.Dispose();
+			if (_view != null)
+			{
+				_view.Dispose();
+				_view = null;
+			}
 		}
     }
 }
-
