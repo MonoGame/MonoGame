@@ -61,6 +61,19 @@ namespace XnaTouch.Framework.Graphics
          CompilerOptions options,
          EffectPool pool)
 		{
+			
+			if (graphicsDevice == null)
+            {
+                throw new ArgumentNullException("Graphics Device Cannot Be Null");
+            }
+			this.graphicsDevice = graphicsDevice;
+			
+			if (pool == null)
+            { 
+				return;
+                // TODO throw new ArgumentNullException("Effect Pool Cannot Be Null");
+            }
+			
 			int fragmentblocklength = BitConverter.ToInt32(effectCode, 0);
 
             int vertexblocklength = BitConverter.ToInt32(effectCode, fragmentblocklength + 4);
@@ -105,6 +118,10 @@ namespace XnaTouch.Framework.Graphics
 		
 		protected Effect(GraphicsDevice graphicsDevice, Effect cloneSource )
 		{
+			if (graphicsDevice == null)
+            {
+                throw new ArgumentNullException("Graphics Device Cannot Be Null");
+            }
 			this.graphicsDevice = graphicsDevice;
 		}
 		

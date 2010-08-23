@@ -68,8 +68,8 @@ namespace XnaTouch.Framework
         {
             if (!_initialized)
             {
-                _initialized = true;
                 LoadContent();
+				_initialized = true;
             }
         }
 

@@ -40,6 +40,7 @@
 // 
 
 using System;
+using XnaTouch.Framework.Graphics;
 
 namespace XnaTouch.Framework
 {
@@ -56,6 +57,18 @@ namespace XnaTouch.Framework
 			{
 				throw new NotImplementedException();
 			}
+		}
+		
+		public Blend DestinationBlend
+		{ 
+			get; 
+			set; 
+		}
+		
+		public Blend SourceBlend
+		{ 
+			get; 
+			set; 
 		}
 		
 		BlendFunction alphaBlendOperation;
