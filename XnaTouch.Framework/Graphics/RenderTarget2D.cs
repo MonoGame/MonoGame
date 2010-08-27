@@ -39,11 +39,15 @@
 #endregion License
 
 using System;
+using OpenTK.Graphics.ES20;
 
 namespace XnaTouch.Framework.Graphics
 {
 	public class RenderTarget2D : RenderTarget
 	{
+		private Texture2D texture = null;
+		private uint textureFrameBuffer;
+		
 		public RenderTarget2D (
          GraphicsDevice graphicsDevice,
          int width,
@@ -52,7 +56,27 @@ namespace XnaTouch.Framework.Graphics
          SurfaceFormat format
 		                       )
 		{
-			throw new NotImplementedException();
+			// throw new NotImplementedException();
+			
+			texture = new Texture2D( graphicsDevice, width, height, numberLevels, TextureUsage.None, format );
+
+			// create framebuffer
+			GL.GenFramebuffers(1, ref textureFrameBuffer);
+			GL.BindFramebuffer(All.Framebuffer, textureFrameBuffer);
+			
+			// attach renderbuffer
+			GL.FramebufferTexture2D(All.Framebuffer, All.ColorAttachment0, All.Texture2D, textureFrameBuffer, 0);
+			
+			// attach depth buffer
+			/* uint depthRenderbuffer;
+			GL.GenRenderbuffers(1, ref depthRenderbuffer);
+			GL.BindRenderbuffer(All.Renderbuffer, depthRenderbuffer);
+			GL.RenderbufferStorage(All.Renderbuffer, All.DepthComponent16, width, height);
+			GL.FramebufferRenderbuffer(All.Framebuffer, All.DepthAttachment, All.Renderbuffer, depthRenderbuffer);*/
+			
+			// unbind frame buffer
+			GL.BindFramebuffer(All.Framebuffer, 0);
+
 		}
 		
 		public RenderTarget2D (
@@ -95,7 +119,19 @@ namespace XnaTouch.Framework.Graphics
 		
 		public Texture2D GetTexture()
 		{
-			throw new NotImplementedException();
+			return texture;
+		}
+		
+		public int Width 
+		{ 
+			get; 
+			set; 
+		}
+		
+		public int Height 
+		{ 
+			get; 
+			set; 
 		}
 	}
 }

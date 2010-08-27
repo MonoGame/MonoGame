@@ -181,7 +181,7 @@ namespace XnaTouch.Framework.Graphics
 					break;
 				case SpriteBlendMode.AlphaBlend :
 					GL.Enable(All.Blend);
-					GL.BlendFunc(All.SrcAlpha, All.OneMinusSrcAlpha);					
+					GL.BlendFunc(All.SrcAlpha, All.OneMinusSrcAlpha);
 					break;
 				case SpriteBlendMode.None :
 					break;
