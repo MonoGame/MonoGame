@@ -57,6 +57,8 @@ namespace XnaTouch.Framework
 {
     public class Game : IDisposable
     {
+		private const float FramesPerSecond = 60.0f; // ~60 frames per second
+		
         private GameTime _updateGameTime;
         private GameTime _drawGameTime;
         private DateTime _lastUpdate;
@@ -67,7 +69,7 @@ namespace XnaTouch.Framework
         private ContentManager _content;
         private GameWindow _view;
 		private bool _isFixedTimeStep = true;
-        private TimeSpan _targetElapsedTime = TimeSpan.FromSeconds(1 / 60.0); // ~60 frames per second
+        private TimeSpan _targetElapsedTime = TimeSpan.FromSeconds(1 / FramesPerSecond); 
         
 		private IGraphicsDeviceManager graphicsDeviceManager;
 		private IGraphicsDeviceService graphicsDeviceService;
@@ -140,7 +142,7 @@ namespace XnaTouch.Framework
     	{			
 			_lastUpdate = DateTime.Now;
 			
-			_view.Run(60/(60*TargetElapsedTime.TotalSeconds));	
+			_view.Run(FramesPerSecond/(FramesPerSecond*TargetElapsedTime.TotalSeconds));	
 			
 			_view.MainContext = _view.EAGLContext;
 			_view.ShareGroup = _view.MainContext.ShareGroup;
@@ -252,11 +254,26 @@ namespace XnaTouch.Framework
 		
 		protected virtual void LoadContent()
 		{			
-			const string DefaultPath = "../Default.png";
+			string DefaultPath = "Default.png";
 			if (File.Exists(DefaultPath))
 			{
-				spriteBatch = new SpriteBatch(GraphicsDevice);
-				splashScreen = Content.Load<Texture2D>(DefaultPath);
+				// Store the RootDir for later 
+				string backup = Content.RootDirectory;
+				
+				try 
+				{
+					// Clear the RootDirectory for this operation
+					Content.RootDirectory = string.Empty;
+					
+					spriteBatch = new SpriteBatch(GraphicsDevice);
+					splashScreen = Content.Load<Texture2D>(DefaultPath);			
+				}
+				finally 
+				{
+					// Reset RootDir
+					Content.RootDirectory = backup;
+				}
+				
 			}
 			else
 			{
