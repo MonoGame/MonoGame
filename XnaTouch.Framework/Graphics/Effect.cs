@@ -103,15 +103,28 @@ namespace XnaTouch.Framework.Graphics
                 int[] vertexLength = new int[1] { vertexstring[0].Length };
                 GL.ShaderSource(vertex_handle, 1, vertexstring, vertexLength);
             }
+			
+			int compiled = 0;
 
             if (fragment)
             {
                 GL.CompileShader(fragment_handle);
+				
+				GL.GetShader(fragment_handle, All.CompileStatus, ref compiled );
+				if (compiled == (int)All.False)
+				{
+					Console.Write("Fragment Compilation Failed!");
+				}
             }
 
             if (vertex)
             {
-                GL.CompileShader(fragment_handle);
+                GL.CompileShader(vertex_handle);
+				GL.GetShader(vertex_handle, All.CompileStatus, ref compiled );
+				if (compiled == (int)All.False)
+				{
+					Console.Write("Vertex Compilation Failed!");
+				}
             }
 
 		}
@@ -147,5 +160,31 @@ namespace XnaTouch.Framework.Graphics
 		public void End()
 		{
 		}
+		
+		internal static string Normalize(string FileName)
+		{
+			if (File.Exists(FileName))
+				return FileName;
+			
+			// Check the file extension
+			if (!string.IsNullOrEmpty(Path.GetExtension(FileName)))
+			{
+				return null;
+			}
+			
+			// Concat the file name with valid extensions
+			if (File.Exists(FileName+".fsh"))
+				return FileName+".fsh";
+			if (File.Exists(FileName+".vsh"))
+				return FileName+".vsh";
+			
+			return null;
+		}
+		
+		public EffectTechnique CurrentTechnique 
+		{ 
+			get; set; 
+		}
+
 	}
 }

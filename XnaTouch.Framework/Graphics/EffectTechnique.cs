@@ -38,60 +38,24 @@
 // */
 // #endregion License
 // 
-
 using System;
-using XnaTouch.Framework.Graphics;
-using OpenTK.Graphics.ES11;
-
-namespace XnaTouch.Framework
+namespace XnaTouch.Framework.Graphics
 {
-	public sealed class RenderState
+	public class EffectTechnique
 	{
-
-		private bool _alphaBlendEnable;
-		
-		public bool AlphaBlendEnable 
-		{ 
-			get
-			{
-				return _alphaBlendEnable;
-			}
-			set
-			{
-				if ( _alphaBlendEnable != value )
-				{
-					_alphaBlendEnable = value;
-					
-					if (_alphaBlendEnable)
-					{
-						GL.Enable(All.Blend);
-						GL.BlendFunc(All.SrcAlpha, All.OneMinusSrcAlpha);
-					}
-					else
-					{
-						GL.Disable(All.Blend);
-					}
-				}
-			}
+		public EffectTechnique ()
+		{
 		}
 		
-		public Blend DestinationBlend
+		// TODO public EffectAnnotationCollection Annotations { get; }
+		
+		public string Name 
 		{ 
 			get; 
-			set; 
+			set;
 		}
 		
-		public Blend SourceBlend
-		{ 
-			get; 
-			set; 
-		}
-		
-		BlendFunction alphaBlendOperation;
-		public BlendFunction AlphaBlendOperation 
-		{ 
-		get { return alphaBlendOperation; } 
-		set { alphaBlendOperation = value; }
-		}
+		// TODO public EffectPassCollection Passes { get; }
 	}
 }
+

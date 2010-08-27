@@ -54,6 +54,7 @@ namespace XnaTouch.Framework.Graphics
 		private GraphicsDevice2D _spriteDevice;
 		private bool _isDisposed = false;
 		private readonly DisplayMode _displayMode = new DisplayMode();
+		private RenderState _renderState;
 		
 		internal All PreferedFilter 
 		{
@@ -100,6 +101,9 @@ namespace XnaTouch.Framework.Graphics
 			
 			// Create the Sprite Rendering engine
 			_spriteDevice = new GraphicsDevice2D(this);
+			
+			// Init RenderState
+			_renderState = new RenderState();
         }
 
         public void Clear(Color color)
@@ -291,8 +295,17 @@ namespace XnaTouch.Framework.Graphics
 		
 		public RenderState RenderState 
 		{ 
-			get; 
-			set; 
+			get
+			{
+				return _renderState;
+			}
+			set
+			{
+				if ( _renderState  != value )
+				{
+					_renderState = value;
+				}
+			}
 		}
 		
 		public void SetRenderTarget (
@@ -302,6 +315,19 @@ namespace XnaTouch.Framework.Graphics
 		{
 			throw new NotImplementedException();
 		}
+		
+		public void ResolveBackBuffer( ResolveTexture2D resolveTexture )
+		{
+		}
+		
+		public void DrawUserPrimitives<T> (
+			 PrimitiveType primitiveType,
+			 T[] vertexData,
+			 int vertexOffset,
+			 int primitiveCount) 
+		{
+		}
+
 	}
 }
 

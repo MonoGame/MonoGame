@@ -128,6 +128,10 @@ namespace XnaTouch.Framework.Content
 			{
 				assetName = Video.Normalize(assetName);
 			}
+			if ((typeof(T) == typeof(Effect))) 
+			{
+				assetName = Effect.Normalize(assetName);
+			}
 			
 			if (string.IsNullOrEmpty(assetName))
 			{	

@@ -38,60 +38,19 @@
 // */
 // #endregion License
 // 
-
 using System;
-using XnaTouch.Framework.Graphics;
-using OpenTK.Graphics.ES11;
-
-namespace XnaTouch.Framework
+namespace XnaTouch.Framework.Graphics
 {
-	public sealed class RenderState
+	public class ResolveTexture2D : Texture2D
 	{
-
-		private bool _alphaBlendEnable;
-		
-		public bool AlphaBlendEnable 
-		{ 
-			get
-			{
-				return _alphaBlendEnable;
-			}
-			set
-			{
-				if ( _alphaBlendEnable != value )
-				{
-					_alphaBlendEnable = value;
-					
-					if (_alphaBlendEnable)
-					{
-						GL.Enable(All.Blend);
-						GL.BlendFunc(All.SrcAlpha, All.OneMinusSrcAlpha);
-					}
-					else
-					{
-						GL.Disable(All.Blend);
-					}
-				}
-			}
+		public ResolveTexture2D(GraphicsDevice graphicsDevice, int width, int height, int numberLevels, SurfaceFormat surfaceformat)
+			:base(graphicsDevice, width, height, numberLevels, TextureUsage.None, surfaceformat)
+		{
 		}
 		
-		public Blend DestinationBlend
-		{ 
-			get; 
-			set; 
-		}
-		
-		public Blend SourceBlend
-		{ 
-			get; 
-			set; 
-		}
-		
-		BlendFunction alphaBlendOperation;
-		public BlendFunction AlphaBlendOperation 
-		{ 
-		get { return alphaBlendOperation; } 
-		set { alphaBlendOperation = value; }
+		public void Dispose()
+		{
 		}
 	}
 }
+
