@@ -80,7 +80,10 @@ namespace XnaTouch.Framework
 
 
         #region Private Members
-        private static Matrix identity = new Matrix(1f, 0f, 0f, 0f, 0f, 1f, 0f, 0f, 0f, 0f, 1f, 0f, 0f, 0f, 0f, 1f);
+        private static Matrix identity = new Matrix(1f, 0f, 0f, 0f, 
+		                                            0f, 1f, 0f, 0f, 
+		                                            0f, 0f, 1f, 0f, 
+		                                            0f, 0f, 0f, 1f);
         #endregion Private Members
 
 
@@ -136,6 +139,18 @@ namespace XnaTouch.Framework
             get { return identity; }
         }
 
+		
+		// required for OpenGL 2.0 projection matrix stuff
+		public static float[] ToFloatArray(Matrix mat)
+        {
+			float [] matarray = {
+									mat.M11, mat.M12, mat.M13, mat.M14,
+									mat.M21, mat.M22, mat.M23, mat.M24,
+									mat.M31, mat.M32, mat.M33, mat.M34,
+									mat.M41, mat.M42, mat.M43, mat.M44
+								};
+			return matarray;
+		}
         
         public Vector3 Left
         {
@@ -394,14 +409,40 @@ namespace XnaTouch.Framework
 
         public static Matrix CreateOrthographicOffCenter(float left, float right, float bottom, float top, float zNearPlane, float zFarPlane)
         {
-            throw new NotImplementedException();
+            float tx = - (right + left)/(right - left);
+			float ty = - (top + bottom)/(top - bottom);
+			float tz = - (zFarPlane + zNearPlane)/(zFarPlane - zNearPlane);
+			
+			Matrix m = identity;
+			
+			m.M11 = 2.0f/(right-left);
+			m.M12 = 0;
+			m.M13 = 0;
+			m.M14 = tx;
+			
+			m.M21 = 0;
+			m.M22 = 2.0f/(top-bottom);
+			m.M23 = 0;
+			m.M24 = ty;
+			
+			m.M31 = 0;
+			m.M32 = 0;
+			m.M33 = -2.0f/(zFarPlane - zNearPlane);
+			m.M34 = tz;
+			
+			m.M41 = 0;
+			m.M42 = 0;
+			m.M43 = 0;
+			m.M44 = 1;
+			
+			return m;
         }
 
         
         public static void CreateOrthographicOffCenter(float left, float right, float bottom, float top,
             float zNearPlane, float zFarPlane, out Matrix result)
         {
-            throw new NotImplementedException();
+            result = CreateOrthographicOffCenter( left, right, bottom, top, zNearPlane, zFarPlane);
         }
 
 
@@ -525,7 +566,7 @@ namespace XnaTouch.Framework
 
         public static void CreateScale(float scale, out Matrix result)
         {
-            throw new NotImplementedException();
+            result = CreateScale(scale);
         }
 
 
@@ -565,11 +606,7 @@ namespace XnaTouch.Framework
 
         public static void CreateTranslation(ref Vector3 position, out Matrix result)
         {
-            result = Matrix.Identity;
-
-            result.M41 = position.X;
-            result.M42 = position.Y;
-            result.M43 = position.Z;
+            result = CreateTranslation(position.X, position.Y, position.Z);
         }
 
 
@@ -581,11 +618,7 @@ namespace XnaTouch.Framework
 
         public static void CreateTranslation(float xPosition, float yPosition, float zPosition, out Matrix result)
         {
-            result = Matrix.Identity;
-
-            result.M41 = xPosition;
-            result.M42 = yPosition;
-            result.M43 = zPosition;
+            result = CreateTranslation(xPosition, yPosition, zPosition);
         }
 
 
@@ -804,7 +837,24 @@ namespace XnaTouch.Framework
 
         public static bool operator ==(Matrix matrix1, Matrix matrix2)
         {
-            throw new NotImplementedException();
+            return (
+                matrix1.M11 == matrix2.M11 &&
+                matrix1.M12 == matrix2.M12 &&
+                matrix1.M13 == matrix2.M13 &&
+                matrix1.M14 == matrix2.M14 &&
+                matrix1.M21 == matrix2.M21 &&
+                matrix1.M22 == matrix2.M22 &&
+                matrix1.M23 == matrix2.M23 &&
+                matrix1.M24 == matrix2.M24 &&
+                matrix1.M31 == matrix2.M31 &&
+                matrix1.M32 == matrix2.M32 &&
+                matrix1.M33 == matrix2.M33 &&
+                matrix1.M34 == matrix2.M34 &&
+                matrix1.M41 == matrix2.M41 &&
+                matrix1.M42 == matrix2.M42 &&
+                matrix1.M43 == matrix2.M43 &&
+                matrix1.M44 == matrix2.M44                  
+                );
         }
 
 
