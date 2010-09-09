@@ -64,12 +64,11 @@ namespace XnaTouch.Framework
 					
 					if (_alphaBlendEnable)
 					{
-						GL.Enable(All.Blend);
-						GL.BlendFunc(All.SrcAlpha, All.OneMinusSrcAlpha);
+						GL.Enable(All.AlphaTest);
 					}
 					else
 					{
-						GL.Disable(All.Blend);
+						GL.Disable(All.AlphaTest);
 					}
 				}
 			}

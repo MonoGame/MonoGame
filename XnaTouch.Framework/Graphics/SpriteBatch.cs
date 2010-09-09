@@ -387,27 +387,29 @@ namespace XnaTouch.Framework.Graphics
 		private Vector2[] ApplyTransformations(Vector2[] SpriteVertices, Vector2 position, float Width, float Height, RenderMode renderMode)
 		{				
 			float quadHeight = Height * renderMode.VerticalScale;
+			// translate origin first
+		    Matrix matrix = Matrix.CreateTranslation(0, renderMode.Origin.Y * 2 - quadHeight, 0);
 			
 			// Rotate
 			if (renderMode.Rotation != 0.0f)
 			{				
-				Matrix rotation = Matrix.CreateRotationZ(-renderMode.Rotation);
-				for (int i = 0; i < SpriteVertices.Length; i++)
-				{
-					SpriteVertices[i] = Vector2.Transform(SpriteVertices[i], rotation);
-				}
+				matrix *= Matrix.CreateRotationZ(-renderMode.Rotation);
 			}
-						
-			// Translate to sprite positon			
-			Matrix translation = Matrix.CreateTranslation(position.X, (_device.Viewport.Height-position.Y+renderMode.Origin.Y*2)-quadHeight,0);
-			for (int i = 0; i < SpriteVertices.Length; i++)
-            		SpriteVertices[i] = Vector2.Transform(SpriteVertices[i], translation);
 			
+			matrix *= Matrix.CreateTranslation(position.X, (_device.Viewport.Height-position.Y),0);
+		    for (int i = 0; i < SpriteVertices.Length; i++)
+			{
+		    	SpriteVertices[i] = Vector2.Transform(SpriteVertices[i], matrix);
+			}
 			return SpriteVertices;
+
 		}
 	
 		private void AddToSpriteRender(RenderMode mode, Vector2 position, Rectangle rect)
 		{
+			// Scale origin before rendering/transform
+			mode.Origin = new Vector2(mode.Origin.X * mode.HorizontalScale, mode.Origin.Y * mode.VerticalScale);
+
 			// Get Vertices
 			Vector2[] spriteVertices = GetSpriteVertices(rect.Width, rect.Height,mode);
 			Vector2[] textureCoordinates = mode.Texture.Image.GetTextureCoordinates(rect);
