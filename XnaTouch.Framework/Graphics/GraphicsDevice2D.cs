@@ -183,6 +183,10 @@ namespace XnaTouch.Framework.Graphics
 					GL.Enable(All.Blend);
 					GL.BlendFunc(All.SrcAlpha, All.OneMinusSrcAlpha);
 					break;
+				case SpriteBlendMode.PreMultiplied :
+					GL.Enable(All.Blend); 
+					GL.BlendFunc(All.One, All.OneMinusSrcAlpha);
+					break;
 				case SpriteBlendMode.None :
 					break;
 			}
