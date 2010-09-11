@@ -54,6 +54,7 @@ namespace XnaTouch.Framework.Graphics
 		private XnaTouch.Framework.Graphics.GraphicsDevice _device;
 		private object _tag;
 		private string _name;
+		private Matrix? _currentTransformMatrix;
 
         public SpriteBatch(XnaTouch.Framework.Graphics.GraphicsDevice graphicsDevice)
         {
@@ -72,6 +73,7 @@ namespace XnaTouch.Framework.Graphics
 		
 		public void End()
         {
+			_currentTransformMatrix = null;
 			GraphicsDevice.EndSpriteBatch();
         }
 
@@ -86,6 +88,7 @@ namespace XnaTouch.Framework.Graphics
 			{
 				throw new NotSupportedException();
 			}
+			_currentTransformMatrix = transformMatrix;
 			GraphicsDevice.StartSpriteBatch(blendMode, sortMode);
         }
 
@@ -395,8 +398,17 @@ namespace XnaTouch.Framework.Graphics
 			{				
 				matrix *= Matrix.CreateRotationZ(-renderMode.Rotation);
 			}
-			
+
 			matrix *= Matrix.CreateTranslation(position.X, (_device.Viewport.Height-position.Y),0);
+			
+			// Apply the SpriteBatch's transformMatrix if one was specified
+			if (_currentTransformMatrix.HasValue)
+			{
+				matrix *= _currentTransformMatrix.Value;	
+			}
+			
+			
+			// Apply the matrix transformation to each vertice
 		    for (int i = 0; i < SpriteVertices.Length; i++)
 			{
 		    	SpriteVertices[i] = Vector2.Transform(SpriteVertices[i], matrix);
@@ -426,4 +438,3 @@ namespace XnaTouch.Framework.Graphics
 		}
     }
 }
-
