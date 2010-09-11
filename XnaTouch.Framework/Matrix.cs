@@ -572,27 +572,43 @@ namespace XnaTouch.Framework
 
         public static Matrix CreateScale(float xScale, float yScale, float zScale)
         {
-            throw new NotImplementedException();
+            Matrix returnMatrix;
+			returnMatrix.M11 = xScale;
+			returnMatrix.M12 = 0;
+			returnMatrix.M13 = 0;
+			returnMatrix.M14 = 0;
+			returnMatrix.M21 = 0;
+			returnMatrix.M22 = yScale;
+			returnMatrix.M23 = 0;
+			returnMatrix.M24 = 0;
+			returnMatrix.M31 = 0;
+			returnMatrix.M32 = 0;
+			returnMatrix.M33 = zScale;
+			returnMatrix.M34 = 0;
+			returnMatrix.M41 = 0;
+			returnMatrix.M42 = 0;
+			returnMatrix.M43 = 0;
+			returnMatrix.M44 = 1;
+			return returnMatrix;
         }
 
 
         public static void CreateScale(float xScale, float yScale, float zScale, out Matrix result)
         {
-            throw new NotImplementedException();
+            result = CreateScale(xScale, yScale, zScale);
         }
 
 
         public static Matrix CreateScale(Vector3 scales)
         {
-            throw new NotImplementedException();
+            return CreateScale(scales.X, scales.Y, scales.Z);
         }
 
 
         public static void CreateScale(ref Vector3 scales, out Matrix result)
         {
-            throw new NotImplementedException();
+            result = CreateScale(scales.X, scales.Y, scales.Z);
         }
-
 
         public static Matrix CreateTranslation(float xPosition, float yPosition, float zPosition)
         {
