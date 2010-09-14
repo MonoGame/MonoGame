@@ -152,7 +152,19 @@ namespace XnaTouch.Framework.Graphics
 
         public static Texture2D FromFile(GraphicsDevice graphicsDevice, Stream textureStream)
         {
-            throw new NotImplementedException();
+            MonoTouch.Foundation.NSData nsData = MonoTouch.Foundation.NSData.FromStream(textureStream);
+
+			UIImage image = UIImage.LoadFromData(nsData);
+			
+			if (image == null)			
+			{
+				throw new ContentLoadException("Error loading Texture2D Stream");
+			}
+			
+			ESImage theTexture = new ESImage(image, graphicsDevice.PreferedFilter);			
+			Texture2D result = new Texture2D(theTexture);
+			
+			return result;
         }
 
         public static Texture2D FromFile(GraphicsDevice graphicsDevice, Stream textureStream, int numberBytes)
