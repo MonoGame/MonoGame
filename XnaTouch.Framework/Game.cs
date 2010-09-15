@@ -50,6 +50,7 @@ using MonoTouch.UIKit;
 using OpenTK.Graphics;
 
 using XnaTouch.Framework.Content;
+using XnaTouch.Framework.GamerServices;
 using XnaTouch.Framework.Graphics;
 using XnaTouch.Framework.Input;
 
@@ -312,7 +313,7 @@ namespace XnaTouch.Framework
 
         protected virtual void Update(GameTime gameTime)
         {			
-			if ( _initialized )
+			if ( _initialized  && !Guide.IsVisible )
 			{
 				foreach (GameComponent gc in _gameComponentCollection)			
 				{

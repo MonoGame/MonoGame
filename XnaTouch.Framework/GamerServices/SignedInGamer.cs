@@ -110,20 +110,6 @@ namespace XnaTouch.Framework.GamerServices
 						                );
 						
 						//GetAchievements();
-						/*lp.LoadFriends( delegate( GKPlayer[] friends, NSError error ) 
-						               		{
-												if (friends != null)
-												{
-													// We have friends
-												}
-												if (error != null)
-												{
-								
-												}
-											}
-						);*/
-						
-						//AwardAchievement("ConsoleWars_FirstHighscore");
 					}
 				}
 			}
@@ -248,12 +234,16 @@ namespace XnaTouch.Framework.GamerServices
 		}
 		
 		public void AwardAchievement ( string achievementId )
+		{			
+			AwardAchievement(achievementId, 100.0f);
+		}
+		
+		public void AwardAchievement( string achievementId, double percentageComplete )
 		{
 			if (IsSignedInToLive)
 			{
 				GKAchievement a = new GKAchievement(achievementId);
-							
-				a.Completed = true;
+				a.PercentComplete = percentageComplete;
 				a.ReportAchievement( delegate(NSError error){
 					if (error != null)
 					{
@@ -264,20 +254,33 @@ namespace XnaTouch.Framework.GamerServices
 			}
 		}
 		
-		public void AwardAchievement( string achievementId, double percentageComplete )
+		public void UpdateScore( string aCategory, long aScore )
 		{
 			if (IsSignedInToLive)
 			{
-				GKAchievement a = new GKAchievement(achievementId);
-							
-				a.PercentComplete = percentageComplete;
-				a.ReportAchievement( delegate(NSError error){
-					if (error != null)
+				GKScore score = new GKScore(aCategory);
+				score.Value = aScore;
+				score.ReportScore(delegate (NSError error)
 					{
-						// Retain the achievement object and try again later (not shown).
-					}
+						if (error != null)
+						{
+							// Oh oh something went wrong.
+						}
+				});
+			}
+		}
 		
-				} );
+		public void ResetAchievements()
+		{
+			if (IsSignedInToLive)
+			{
+				GKAchievement.ResetAchivements(delegate (NSError error)
+					{
+						if (error != null)
+						{
+							// Oh oh something went wrong.
+						}
+				});
 			}
 		}
 
@@ -304,7 +307,7 @@ namespace XnaTouch.Framework.GamerServices
 		{ 
 			get
 			{
-				return ( lp != null && lp.Authenticated );
+				return ( ( lp != null ) && ( lp.Authenticated ) );
 			}
 		}
 		
