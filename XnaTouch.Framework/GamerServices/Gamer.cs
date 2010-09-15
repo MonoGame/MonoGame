@@ -71,12 +71,23 @@ namespace XnaTouch.Framework.GamerServices
         }
         #endregion
         #region Properties
+		public string DisplayName 
+        {
+            get;
+			internal set;
+        }
+		
         public string Gamertag 
         {
             get
             {
                 return _gamer;
             }
+			
+			internal set
+			{
+				_gamer = value;
+			}
         }
 
         public bool IsDisposed 
