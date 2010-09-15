@@ -42,8 +42,8 @@ purpose and non-infringement.
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using MonoTouch.UIKit;
-using MonoTouch.GameKit;
+using System.Threading;
+using System.Runtime.Remoting.Messaging;
 #endregion Using clause
 
 namespace XnaTouch.Framework.GamerServices
@@ -57,6 +57,56 @@ namespace XnaTouch.Framework.GamerServices
 		private static bool isVisible;
 		private static bool simulateTrialMode;
 		
+		public static IAsyncResult BeginShowKeyboardInput (
+         PlayerIndex player,
+         string title,
+         string description,
+         string defaultText,
+         AsyncCallback callback,
+         Object state)
+		{
+			isVisible = true;
+			IAsyncResult ar = null;
+			return ar;
+			
+		}
+
+		public static IAsyncResult BeginShowKeyboardInput (
+         PlayerIndex player,
+         string title,
+         string description,
+         string defaultText,
+         AsyncCallback callback,
+         Object state,
+         bool usePasswordMode)
+		{
+			isVisible = true;
+			IAsyncResult ar = null;
+			return ar;
+		}
+
+		public static string EndShowKeyboardInput (IAsyncResult ar)
+		{
+			try 
+			{
+				// Retrieve the delegate.
+	            AsyncResult result = (AsyncResult) ar;
+	            // AsyncMethodCaller caller = (AsyncMethodCaller) result.AsyncDelegate;
+				
+				// Retrieve the format string that was passed as state 
+	            // information.
+	            string formatString = (string) ar.AsyncState;
+
+				return formatString;
+
+			} 
+			finally 
+			{
+				isVisible = false;
+			}			
+		}
+
+		
 		public static void ShowMarketplace (PlayerIndex player )
 		{
 			
@@ -64,14 +114,19 @@ namespace XnaTouch.Framework.GamerServices
 		
 		public static void Show ()
 		{
-			GKPeerPickerController ppc = new GKPeerPickerController();
+			/*GKPeerPickerController ppc = new GKPeerPickerController();
 			ppc.ConnectionTypesMask = GKPeerPickerConnectionType.Nearby;
-			ppc.Show();
+			ppc.Show();*/
+			ShowSignIn(1, false);
 		}
 		
 		public static void ShowSignIn (int paneCount, bool onlineOnly)
 		{
-			
+			if ( paneCount != 1 )
+			{
+				new ArgumentException("paneCount Can only be 1 on iPhone");
+				return;
+			}
 		}
 		
 		public static bool IsScreenSaverEnabled 
@@ -120,6 +175,18 @@ namespace XnaTouch.Framework.GamerServices
 			{
 				simulateTrialMode = value;
 			}
+		}
+		
+		public static bool Authenticating 
+		{ 
+			get;
+			set;
+		}
+		
+		public static bool Authenticated 
+		{ 
+			get;
+			set;
 		}
 	}
 }

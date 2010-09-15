@@ -38,15 +38,32 @@ purpose and non-infringement.
 */
 #endregion License
 
-
+#region Using Statements
 ﻿using System;
+
+using XnaTouch.Framework.Net;
+#endregion Statements
 
 namespace XnaTouch.Framework.GamerServices
 {
     public class GamerServicesComponent : GameComponent
     {
+		private LocalNetworkGamer lng;
+		
         public GamerServicesComponent(Game game) : base(game)
         {
+			lng = new LocalNetworkGamer();
         }
+		
+		protected override void LoadContent()
+        {
+			
+        }
+		
+		public override void Update (GameTime gameTime)
+		{
+			
+		}
+
     }
 }
