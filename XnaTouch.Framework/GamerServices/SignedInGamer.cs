@@ -38,17 +38,117 @@ purpose and non-infringement.
 */
 #endregion License
 
+#region Statement
 ﻿using System;
+
+using MonoTouch.Foundation;
+using MonoTouch.GameKit;
+using MonoTouch.UIKit;
+
+#endregion Statement
+
 
 namespace XnaTouch.Framework.GamerServices
 {
     public class SignedInGamer : Gamer
     {
-		#region Methods
-		/*  TODO public FriendCollection GetFriends()
+		private GKLocalPlayer lp;
+		
+		private AchievementCollection gamerAchievements;
+		private FriendCollection friendCollection;
+		
+		public SignedInGamer()
 		{
+			// Register to receive the GKPlayerAuthenticationDidChangeNotificationName so we are notified when 
+			// Authentication changes
+			NSNotificationCenter.DefaultCenter.AddObserver( "GKPlayerAuthenticationDidChangeNotificationName", (notification) => {   
+        													    if (lp !=null && lp.Authenticated)
+																{
+																	this.Gamertag = lp.Alias;
+																	this.DisplayName = lp.PlayerID;	
+														        	// Insert code here to handle a successful authentication.
+																	Gamer.SignedInGamers.Add(this);
+																	// Fire the SignedIn event
+																	OnSignedIn(new SignedInEventArgs(this) );
+																}
+														    	else
+																{
+														        	// Insert code here to clean up any outstanding Game Center-related classes.
+																	Gamer.SignedInGamers.Remove(this);
+																	// Fire the SignedOut event
+																	OnSignedOut(new SignedOutEventArgs(this) );
+																}
+	    													});	
 			
-		} */
+			try 
+			{
+				if (UIDevice.CurrentDevice.SystemVersion == "4.1")
+				{
+					
+					lp = GKLocalPlayer.LocalPlayer;
+			        if (lp != null)
+					{
+						Guide.IsVisible = true;
+						lp.Authenticate( delegate(NSError error) 
+						                	{  							              
+												try 
+												{
+													if ( error != null )
+													{
+									
+													}
+													else
+													{
+														
+													}
+												} 
+												finally 
+												{
+													Guide.IsVisible = false;
+												}
+											}
+						                );
+						
+						//GetAchievements();
+						/*lp.LoadFriends( delegate( GKPlayer[] friends, NSError error ) 
+						               		{
+												if (friends != null)
+												{
+													// We have friends
+												}
+												if (error != null)
+												{
+								
+												}
+											}
+						);*/
+						
+						//AwardAchievement("ConsoleWars_FirstHighscore");
+					}
+				}
+			}
+			catch (Exception) 
+			{
+				
+			}
+		}
+		
+		#region Methods
+		public FriendCollection GetFriends()
+		{
+			if(IsSignedInToLive)
+			{
+				lp.LoadFriends( delegate (string[] FriendsList, NSError error )
+				               	{
+									foreach(string Friend in FriendsList)
+									{
+										friendCollection.Add( new FriendGamer(){Gamertag = Friend} );
+									}
+				});
+			}
+			
+			return friendCollection;
+		}
 		
 		public bool IsFriend (Gamer gamer)
 		{
@@ -56,11 +156,131 @@ namespace XnaTouch.Framework.GamerServices
 				throw new ArgumentNullException();
 			
 			if ( gamer.IsDisposed )
-				throw new ObjectDisposedException(gamer.ToString());
+				throw new ObjectDisposedException(gamer.ToString());	
 			
-			return false; // Not supported under iPhone;
+			bool found = false;
+			foreach(FriendGamer f in friendCollection)
+			{
+				if ( f.Gamertag == gamer.Gamertag )
+				{
+					found = true;
+				}
+			}
+			return found;
 						
 		}
+		
+		delegate AchievementCollection GetAchievementsDelegate();
+		
+		public IAsyncResult BeginGetAchievements( AsyncCallback callback, Object asyncState)
+		{
+			// Go off and grab achievements
+			GetAchievementsDelegate gad = GetAchievements; 
+			
+			return gad.BeginInvoke(callback, gad);
+		}
+		
+		private void GetAchievementCompletedCallback( IAsyncResult result )
+		{
+			// get the delegate that was used to call that method
+			GetAchievementsDelegate gad = (GetAchievementsDelegate)result.AsyncState; 
+
+			// get the return value from that method call
+			gamerAchievements = gad.EndInvoke(result);
+		}
+		
+		public AchievementCollection EndGetAchievements( IAsyncResult result )
+		{
+			GetAchievementsDelegate gad = (GetAchievementsDelegate)result.AsyncState; 
+			
+			gamerAchievements = gad.EndInvoke(result);
+			
+			return gamerAchievements;
+		}
+		
+		public AchievementCollection GetAchievements()
+		{
+			if ( IsSignedInToLive )
+			{
+				/*GKAchievement.LoadAchievements( delegate(GKAchievement[] achievements, NSError error)
+				                               	{
+													if (achievements != null)
+													{
+														foreach(GKAchievement a in achievements)
+														{
+															//gamerAchievements.Add(new Achievement(Name = a.){});
+														}
+													}
+												} );*/
+				GKAchievementDescription.LoadAchievementDescriptions( delegate(GKAchievementDescription[] achievements, NSError error)
+				                                                    {
+																		if (achievements != null)
+																		{
+																			foreach(GKAchievementDescription a in achievements)
+																			{
+																				gamerAchievements.Add(new Achievement(){Name = a.Title, Key= a.Identifier});
+																			}
+																		}
+																	});
+			}
+			return gamerAchievements;
+		}
+		
+		delegate void AwardAchievementDelegate(string achievementId);
+		
+		public IAsyncResult BeginAwardAchievement(
+         string achievementId,
+         AsyncCallback callback,
+         Object state
+		)
+		{	
+			// Go off and award the achievement
+			AwardAchievementDelegate aad = AwardAchievement; 
+				
+			return aad.BeginInvoke(achievementId, callback, aad);
+		}
+		
+		public void EndAwardAchievement(IAsyncResult result)
+		{
+			AwardAchievementDelegate aad = (AwardAchievementDelegate)result.AsyncState; 
+			
+			aad.EndInvoke(result);
+		}
+		
+		public void AwardAchievement ( string achievementId )
+		{
+			if (IsSignedInToLive)
+			{
+				GKAchievement a = new GKAchievement(achievementId);
+							
+				a.Completed = true;
+				a.ReportAchievement( delegate(NSError error){
+					if (error != null)
+					{
+						// Retain the achievement object and try again later (not shown).
+					}
+		
+				} );
+			}
+		}
+		
+		public void AwardAchievement( string achievementId, double percentageComplete )
+		{
+			if (IsSignedInToLive)
+			{
+				GKAchievement a = new GKAchievement(achievementId);
+							
+				a.PercentComplete = percentageComplete;
+				a.ReportAchievement( delegate(NSError error){
+					if (error != null)
+					{
+						// Retain the achievement object and try again later (not shown).
+					}
+		
+				} );
+			}
+		}
+
 		#endregion
 			
 		#region Properties
@@ -84,7 +304,7 @@ namespace XnaTouch.Framework.GamerServices
 		{ 
 			get
 			{
-				return true;
+				return ( lp != null && lp.Authenticated );
 			}
 		}
 		
@@ -125,6 +345,26 @@ namespace XnaTouch.Framework.GamerServices
             }
         }
 		#endregion
+		
+		
+		protected virtual void OnSignedIn(SignedInEventArgs e)
+		{
+			 if (SignedIn != null) 
+			 {
+			    // Invokes the delegates. 
+			    SignedIn(this, e);
+			 }
+		}
+		
+		protected virtual void OnSignedOut(SignedOutEventArgs e)
+		{
+			 if (SignedOut != null) 
+			 {
+			    // Invokes the delegates. 
+			    SignedOut(this, e);
+			 }
+		}
+
 		
 		#region Events
 		public static event EventHandler<SignedInEventArgs> SignedIn;

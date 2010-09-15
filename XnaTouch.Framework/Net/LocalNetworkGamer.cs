@@ -50,10 +50,11 @@ namespace XnaTouch.Framework.Net
 	{
 
 		private bool isDataAvailable = false;
+		private SignedInGamer sig;
 		
 		public LocalNetworkGamer ()
 		{
-			
+			sig = new SignedInGamer();
 		}
 		
 		public void EnableSendVoice (
@@ -158,7 +159,7 @@ namespace XnaTouch.Framework.Net
 		{ 
 			get
 			{
-				return null;
+				return sig;
 			}
 		}
 	}
