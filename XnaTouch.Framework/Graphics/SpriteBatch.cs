@@ -256,7 +256,7 @@ namespace XnaTouch.Framework.Graphics
 			// adjust filter color
 			mode.FilterColor = color;
 			
-			float textWidth=0;
+			float textWidth = 0;
             foreach (char c in text)
             {
                 if (c == '\n')
@@ -271,7 +271,7 @@ namespace XnaTouch.Framework.Graphics
 				g.Glyph.Width = (int)(g.Glyph.Width*scale.X);
 				g.Glyph.Height =(int)(g.Glyph.Height*scale.Y);				
 				
-				textWidth += (g.Kerning.Y + g.Kerning.Z + spriteFont.Spacing)* scale.X;
+				textWidth += (g.Kerning.Y + g.Kerning.Z + spriteFont.Spacing) * scale.X;
 				
 				mode.Origin = new Vector2(org.X,g.Glyph.Height + g.Cropping.Y-org.Y);
 				
@@ -350,71 +350,62 @@ namespace XnaTouch.Framework.Graphics
 			
 			if (!renderMode.FlipVertical && !renderMode.FlipHorizontal) 
 			{
-				SpriteVertices[0] = new Vector2(quadWidth,quadHeight);
-				SpriteVertices[1] = new Vector2(quadWidth,0);
-				SpriteVertices[2] = new Vector2(0,quadHeight);
-				SpriteVertices[3] = new Vector2(0,0);				
+				SpriteVertices[0] = new Vector2(quadWidth,0);
+				SpriteVertices[1] = new Vector2(quadWidth,quadHeight);
+				SpriteVertices[2] = new Vector2(0,0);				
+				SpriteVertices[3] = new Vector2(0,quadHeight);
 			}
 			if (!renderMode.FlipVertical && renderMode.FlipHorizontal) 
 			{				
-				SpriteVertices[0] = new Vector2(0,quadHeight);
-				SpriteVertices[1] = new Vector2(0,0);
-				SpriteVertices[2] = new Vector2(quadWidth,quadHeight);
-				SpriteVertices[3] = new Vector2(quadWidth,0);	
+				SpriteVertices[0] = new Vector2(0,0);
+				SpriteVertices[1] = new Vector2(0,quadHeight);
+				SpriteVertices[2] = new Vector2(quadWidth,0);	
+				SpriteVertices[3] = new Vector2(quadWidth,quadHeight);
 			}
 			if (renderMode.FlipVertical && !renderMode.FlipHorizontal) 
 			{				
-				SpriteVertices[0] = new Vector2(quadWidth,0);
-				SpriteVertices[1] = new Vector2(quadWidth,quadHeight);
-				SpriteVertices[2] = new Vector2(0,0);
-				SpriteVertices[3] = new Vector2(0,quadHeight);	
+				SpriteVertices[0] = new Vector2(quadWidth,quadHeight);
+				SpriteVertices[1] = new Vector2(quadWidth,0);
+				SpriteVertices[2] = new Vector2(0,quadHeight);	
+				SpriteVertices[3] = new Vector2(0,0);
 			}
 			if (renderMode.FlipVertical && renderMode.FlipHorizontal) 
 			{
-				SpriteVertices[0] = new Vector2(0,0);
-				SpriteVertices[1] = new Vector2(0,quadHeight);
-				SpriteVertices[2] = new Vector2(quadWidth,0);
-				SpriteVertices[3] = new Vector2(quadWidth,quadHeight);	
-			}
-			
-			// Adjust origin
-			if (renderMode.Origin != Vector2.Zero)
+				SpriteVertices[0] = new Vector2(0,quadHeight);
+				SpriteVertices[1] = new Vector2(0,0);
+				SpriteVertices[2] = new Vector2(quadWidth,quadHeight);
+				SpriteVertices[3] = new Vector2(quadWidth,0);
+			}			
+			for (int i = 0; i < 4; i++)
 			{
-				for (int i = 0; i < 4; i++)
-	            		SpriteVertices[i] -= renderMode.Origin;
+				SpriteVertices[i] -= renderMode.Origin;
 			}
-			
 			return SpriteVertices;
 		}
 		
 		private Vector2[] ApplyTransformations(Vector2[] SpriteVertices, Vector2 position, float Width, float Height, RenderMode renderMode)
-		{				
-			float quadHeight = Height * renderMode.VerticalScale;
-			// translate origin first
-		    Matrix matrix = Matrix.CreateTranslation(0, renderMode.Origin.Y * 2 - quadHeight, 0);
-			
-			// Rotate
-			if (renderMode.Rotation != 0.0f)
-			{				
-				matrix *= Matrix.CreateRotationZ(-renderMode.Rotation);
+		{
+			// Translate origin
+			//Matrix matrix = Matrix.CreateTranslation (-renderMode.Origin.X, -renderMode.Origin.Y, 0);
+			Matrix matrix = Matrix.CreateTranslation (0, renderMode.Origin.Y * 2, 0);
+			// Rotate if needed
+			if (renderMode.Rotation != 0.0f) 
+			{
+				matrix *= Matrix.CreateRotationZ (renderMode.Rotation);
 			}
-
-			matrix *= Matrix.CreateTranslation(position.X, (_device.Viewport.Height-position.Y),0);
-			
+			// Translate location
+			matrix *= Matrix.CreateTranslation (position.X, position.Y, 0);
 			// Apply the SpriteBatch's transformMatrix if one was specified
-			if (_currentTransformMatrix.HasValue)
+			if (_currentTransformMatrix.HasValue) 
 			{
-				matrix *= _currentTransformMatrix.Value;	
-			}
-			
-			
+				matrix *= _currentTransformMatrix.Value;;
+			}		
 			// Apply the matrix transformation to each vertice
-		    for (int i = 0; i < SpriteVertices.Length; i++)
+			for (int i = 0; i < SpriteVertices.Length; i++) 
 			{
-		    	SpriteVertices[i] = Vector2.Transform(SpriteVertices[i], matrix);
-			}
+				SpriteVertices[i] = Vector2.Transform (SpriteVertices[i], matrix);
+			}			
 			return SpriteVertices;
-
 		}
 	
 		private void AddToSpriteRender(RenderMode mode, Vector2 position, Rectangle rect)
