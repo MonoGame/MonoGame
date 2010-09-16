@@ -268,8 +268,8 @@ namespace XnaTouch.Framework.Graphics
                 if (spriteFont.characterData.ContainsKey(c) == false) continue;
                 GlyphData g = spriteFont.characterData[c];
 				
-				g.Glyph.Width = (int)(g.Glyph.Width*scale.X);
-				g.Glyph.Height =(int)(g.Glyph.Height*scale.Y);				
+				g.Glyph.Width = (int)(g.Glyph.Width * scale.X);
+				g.Glyph.Height =(int)(g.Glyph.Height * scale.Y);				
 				
 				textWidth += (g.Kerning.Y + g.Kerning.Z + spriteFont.Spacing) * scale.X;
 				
