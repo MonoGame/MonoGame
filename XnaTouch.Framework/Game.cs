@@ -283,7 +283,7 @@ namespace XnaTouch.Framework
 			}
 		}
 		
-		protected virtual void UnLoadContent()
+		protected virtual void UnloadContent()
 		{
 			// do nothing
 		}
