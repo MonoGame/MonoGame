@@ -42,8 +42,15 @@ purpose and non-infringement.
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Runtime.Remoting.Messaging;
+
+#if IPHONE
+using MonoTouch.UIKit;
+using MonoTouch.Foundation;
+using MonoTouch.GameKit;
+#endif
 #endregion Using clause
 
 namespace XnaTouch.Framework.GamerServices
@@ -57,6 +64,43 @@ namespace XnaTouch.Framework.GamerServices
 		private static bool isVisible;
 		private static bool simulateTrialMode;
 		
+		delegate string ShowKeyboardInputDelegate(
+		 PlayerIndex player,           
+         string title,
+         string description,
+         string defaultText,
+		 bool usePasswordMode);
+		
+		public static string ShowKeyboardInput(
+		 PlayerIndex player,           
+         string title,
+         string description,
+         string defaultText,
+		 bool usePasswordMode)
+		{
+			string result = defaultText; 
+			#if IPHONE						
+			TextFieldAlertView myAlertView = new TextFieldAlertView(usePasswordMode, title, defaultText);
+		
+			
+			myAlertView.Title = title;
+			myAlertView.Message = " ";
+			
+			myAlertView.Clicked += delegate(object sender, UIButtonEventArgs e)
+					{
+						if (e.ButtonIndex == 1)
+						{
+								result = ((UIAlertView) sender).Subviews.OfType<UITextField>().Single().Text;
+						}
+					};
+			myAlertView.Transform = MonoTouch.CoreGraphics.CGAffineTransform.MakeTranslation (0f, 110f);
+			myAlertView.Show ();
+			#endif
+			#if ANDROID
+			#endif
+			return result;
+		}
+		
 		public static IAsyncResult BeginShowKeyboardInput (
          PlayerIndex player,
          string title,
@@ -65,10 +109,7 @@ namespace XnaTouch.Framework.GamerServices
          AsyncCallback callback,
          Object state)
 		{
-			isVisible = true;
-			IAsyncResult ar = null;
-			return ar;
-			
+			return BeginShowKeyboardInput(player, title, description, defaultText, callback, state, false );
 		}
 
 		public static IAsyncResult BeginShowKeyboardInput (
@@ -81,24 +122,19 @@ namespace XnaTouch.Framework.GamerServices
          bool usePasswordMode)
 		{
 			isVisible = true;
-			IAsyncResult ar = null;
-			return ar;
+			
+			ShowKeyboardInputDelegate ski = ShowKeyboardInput; 
+			
+			return ski.BeginInvoke(player, title, description, defaultText, usePasswordMode, callback, ski);
 		}
 
-		public static string EndShowKeyboardInput (IAsyncResult ar)
+		public static string EndShowKeyboardInput (IAsyncResult result)
 		{
 			try 
 			{
-				// Retrieve the delegate.
-	            AsyncResult result = (AsyncResult) ar;
-	            // AsyncMethodCaller caller = (AsyncMethodCaller) result.AsyncDelegate;
-				
-				// Retrieve the format string that was passed as state 
-	            // information.
-	            string formatString = (string) ar.AsyncState;
-
-				return formatString;
-
+				ShowKeyboardInputDelegate ski = (ShowKeyboardInputDelegate)result.AsyncState; 
+			
+				return ski.EndInvoke(result);
 			} 
 			finally 
 			{
@@ -106,10 +142,101 @@ namespace XnaTouch.Framework.GamerServices
 			}			
 		}
 
+		delegate Nullable<int> ShowMessageBoxDelegate( string title,
+         string text,
+         IEnumerable<string> buttons,
+         int focusButton,
+         MessageBoxIcon icon);
+		
+		public static Nullable<int> ShowMessageBox( string title,
+         string text,
+         IEnumerable<string> buttons,
+         int focusButton,
+         MessageBoxIcon icon)
+		{
+			Nullable<int> result = null;
+			#if IPHONE
+			UIAlertView alert = new UIAlertView();
+			alert.Title = title;
+			foreach( string btn in buttons )
+			{
+				alert.AddButton(btn);
+			}
+			alert.Message = text;
+			alert.Dismissed += delegate(object sender, UIButtonEventArgs e) 
+							{ 
+								result = e.ButtonIndex; 
+							};
+			alert.Clicked += delegate(object sender, UIButtonEventArgs e) 
+							{ 
+								result = e.ButtonIndex; 
+							};
+			isVisible = true;
+			
+			alert.Show();
+			#endif
+			
+			#if ANDROID
+			
+			#endif
+			return result;
+		}
+	
+		public static IAsyncResult BeginShowMessageBox(
+         PlayerIndex player,
+         string title,
+         string text,
+         IEnumerable<string> buttons,
+         int focusButton,
+         MessageBoxIcon icon,
+         AsyncCallback callback,
+         Object state
+		)
+		{	
+			isVisible = true;
+			
+			ShowMessageBoxDelegate smb = ShowMessageBox; 
+			
+			return smb.BeginInvoke(title, text, buttons, focusButton, icon, callback, smb);			
+		}
+
+		public static IAsyncResult BeginShowMessageBox (
+         string title,
+         string text,
+         IEnumerable<string> buttons,
+         int focusButton,
+         MessageBoxIcon icon,
+         AsyncCallback callback,
+         Object state
+		)
+		{
+			return BeginShowMessageBox(PlayerIndex.One, title, text, buttons, focusButton, icon, callback, state);
+		}
+
+		public static Nullable<int> EndShowMessageBox (
+         IAsyncResult result
+		)
+		{
+			try
+			{
+				ShowMessageBoxDelegate smbd = (ShowMessageBoxDelegate)result.AsyncState; 
+				
+				return smbd.EndInvoke(result);
+			} 
+			finally 
+			{
+				isVisible = false;
+			}
+		}
+
 		
 		public static void ShowMarketplace (PlayerIndex player )
 		{
-			
+			NSUrl url = new NSUrl("http://phobos.apple.com/WebObjects/MZStore.woa/wa/viewSoftware?id=306469222&mt=8");
+		            if (!UIApplication.SharedApplication.OpenUrl(url))
+		            {
+						// Error
+					}
 		}
 		
 		public static void Show ()
@@ -129,6 +256,41 @@ namespace XnaTouch.Framework.GamerServices
 			}
 		}
 		
+		public static void ShowLeaderboard()
+		{
+			if ( ( Gamer.SignedInGamers.Count > 0 ) && ( Gamer.SignedInGamers[0].IsSignedInToLive ) )
+			{
+			    GKLeaderboardViewController leaderboardController = new GKLeaderboardViewController();
+	
+			    if (leaderboardController != null)
+			
+			    {
+			        // leaderboardController.leaderboardDelegate = this;
+			
+			        // [self presentModalViewController: leaderboardController animated: YES];
+			
+			    }
+			}
+		}
+		
+		public static void ShowAchievements()
+		{
+			if ( ( Gamer.SignedInGamers.Count > 0 ) && ( Gamer.SignedInGamers[0].IsSignedInToLive ) )
+			{
+				GKAchievementViewController achievementController = new GKAchievementViewController();
+	
+			    if (achievementController != null)
+			
+			    {
+			        // leaderboardController.leaderboardDelegate = this;
+			
+			        // [self presentModalViewController: leaderboardController animated: YES];
+			
+			    }
+			}
+		}
+		
+		#region Properties
 		public static bool IsScreenSaverEnabled 
 		{ 
 			get
@@ -176,17 +338,6 @@ namespace XnaTouch.Framework.GamerServices
 				simulateTrialMode = value;
 			}
 		}
-		
-		public static bool Authenticating 
-		{ 
-			get;
-			set;
-		}
-		
-		public static bool Authenticated 
-		{ 
-			get;
-			set;
-		}
+		#endregion
 	}
 }
