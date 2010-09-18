@@ -273,7 +273,7 @@ namespace XnaTouch.Framework.Graphics
 				
 				textWidth += (g.Kerning.Y + g.Kerning.Z + spriteFont.Spacing) * scale.X;
 				
-				mode.Origin = new Vector2(org.X,g.Glyph.Height + g.Cropping.Y-org.Y);
+				mode.Origin = new Vector2(org.X, org.Y);
 				
 				spriteVertices.AddRange(GetSpriteVertices(g.Glyph.Width,g.Glyph.Height,mode));
 				textureVertices.AddRange(mode.Texture.Image.GetTextureCoordinates(g.Glyph));
