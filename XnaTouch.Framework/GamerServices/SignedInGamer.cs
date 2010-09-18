@@ -108,8 +108,6 @@ namespace XnaTouch.Framework.GamerServices
 												}
 											}
 						                );
-						
-						//GetAchievements();
 					}
 				}
 			}
