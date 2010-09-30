@@ -274,15 +274,24 @@ namespace XnaTouch.Framework.Graphics
 				textWidth += (g.Kerning.Y + g.Kerning.Z + spriteFont.Spacing) * scale.X;
 				
 				mode.Origin = new Vector2(org.X, org.Y - g.Cropping.Y);
-				
-				spriteVertices.AddRange(GetSpriteVertices(g.Glyph.Width,g.Glyph.Height,mode));
+		
+				Vector2[] glyphVertices = GetSpriteVertices(g.Glyph.Width,g.Glyph.Height,mode);	
+				// Scale origin before rendering/transform
+				Vector2 scaledOrigin = new Vector2(mode.Origin.X * mode.HorizontalScale, 
+			                                mode.Origin.Y * mode.VerticalScale);
+				for (int i = 0; i < 4; i++)
+				{
+					glyphVertices[i] -= scaledOrigin;
+				}
+				spriteVertices.AddRange(glyphVertices);
 				textureVertices.AddRange(mode.Texture.Image.GetTextureCoordinates(g.Glyph));
                 
 				org.X -= (g.Kerning.Y + g.Kerning.Z + spriteFont.Spacing) * scale.X;
             }
 			
 			Vector2[] temp = spriteVertices.ToArray();
-			mode.Origin  = origin;
+			
+			mode.Origin  = origin * new Vector2(mode.HorizontalScale, mode.VerticalScale);
 			ApplyTransformations(temp,position,textWidth,0,mode);			
 			
 			SpriteBatchRenderItem sbi = new SpriteBatchRenderItem();
@@ -375,19 +384,18 @@ namespace XnaTouch.Framework.Graphics
 				SpriteVertices[1] = new Vector2(0,0);
 				SpriteVertices[2] = new Vector2(quadWidth,quadHeight);
 				SpriteVertices[3] = new Vector2(quadWidth,0);
-			}			
-			for (int i = 0; i < 4; i++)
-			{
-				SpriteVertices[i] -= renderMode.Origin;
 			}
 			return SpriteVertices;
 		}
 		
 		private Vector2[] ApplyTransformations(Vector2[] SpriteVertices, Vector2 position, float Width, float Height, RenderMode renderMode)
 		{
+			// Scale origin before rendering/transform
+			renderMode.Origin = new Vector2(renderMode.Origin.X * renderMode.HorizontalScale, 
+			                                renderMode.Origin.Y * renderMode.VerticalScale);
 			// Translate origin
-			//Matrix matrix = Matrix.CreateTranslation (-renderMode.Origin.X, -renderMode.Origin.Y, 0);
-			Matrix matrix = Matrix.CreateTranslation (0, renderMode.Origin.Y * 2, 0);
+			Matrix matrix = Matrix.CreateTranslation (-renderMode.Origin.X, -renderMode.Origin.Y, 0);
+			//Matrix matrix = Matrix.CreateTranslation (0, renderMode.Origin.Y * 2, 0);
 			// Rotate if needed
 			if (renderMode.Rotation != 0.0f) 
 			{
@@ -410,9 +418,6 @@ namespace XnaTouch.Framework.Graphics
 	
 		private void AddToSpriteRender(RenderMode mode, Vector2 position, Rectangle rect)
 		{
-			// Scale origin before rendering/transform
-			mode.Origin = new Vector2(mode.Origin.X * mode.HorizontalScale, mode.Origin.Y * mode.VerticalScale);
-
 			// Get Vertices
 			Vector2[] spriteVertices = GetSpriteVertices(rect.Width, rect.Height,mode);
 			Vector2[] textureCoordinates = mode.Texture.Image.GetTextureCoordinates(rect);
