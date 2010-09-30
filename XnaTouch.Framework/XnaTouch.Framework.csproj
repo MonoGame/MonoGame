@@ -76,9 +76,14 @@
   <ItemGroup>
     <Compile Include="Content\ContentLoadException.cs" />
     <Compile Include="Content\ContentManager.cs" />
+    <Compile Include="GamerServices\Achievement.cs" />
+    <Compile Include="GamerServices\AchievementCollection.cs" />
+    <Compile Include="GamerServices\FriendCollection.cs" />
+    <Compile Include="GamerServices\FriendGamer.cs" />
     <Compile Include="GamerServices\Gamer.cs" />
     <Compile Include="GamerServices\GamerPrivileges.cs" />
     <Compile Include="GamerServices\GamerServicesComponent.cs" />
+    <Compile Include="GamerServices\MessageBoxIcon.cs" />
     <Compile Include="GamerServices\SignedInGamer.cs" />
     <Compile Include="GamerServices\SignedInGamerCollection.cs" />
     <Compile Include="Graphics\ClearOptions.cs" />
