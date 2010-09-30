@@ -11,11 +11,11 @@
     <MainNibFile>MainWindow.xib</MainNibFile>
     <AssemblyName>XnaTouch.Framework</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
-    <Description>Xna implementation for MonoTouch</Description>
+    <Description>XNA implementation for MonoTouch</Description>
     <RootNamespace>XnaTouch.Framework</RootNamespace>
     <SynchReleaseVersion>false</SynchReleaseVersion>
     <BundleDisplayName>XnaTouch</BundleDisplayName>
-    <ReleaseVersion>0.6</ReleaseVersion>
+    <ReleaseVersion>0.8</ReleaseVersion>
     <MtouchSdkVersion>3.0</MtouchSdkVersion>
     <MtouchMinimumOS>3.0</MtouchMinimumOS>
   </PropertyGroup>
@@ -24,7 +24,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\iPhoneSimulator\Debug</OutputPath>
-    <DefineConstants>DEBUG</DefineConstants>
+    <DefineConstants>DEBUG;IPHONE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CustomCommands>
@@ -44,13 +44,14 @@
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <MtouchDebug>False</MtouchDebug>
+    <DefineConstants>IPHONE</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhone' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\iPhone\Debug</OutputPath>
-    <DefineConstants>DEBUG</DefineConstants>
+    <DefineConstants>DEBUG;IPHONE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
@@ -65,6 +66,7 @@
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <MtouchDebug>False</MtouchDebug>
+    <DefineConstants>IPHONE</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -76,14 +78,9 @@
   <ItemGroup>
     <Compile Include="Content\ContentLoadException.cs" />
     <Compile Include="Content\ContentManager.cs" />
-    <Compile Include="GamerServices\Achievement.cs" />
-    <Compile Include="GamerServices\AchievementCollection.cs" />
-    <Compile Include="GamerServices\FriendCollection.cs" />
-    <Compile Include="GamerServices\FriendGamer.cs" />
     <Compile Include="GamerServices\Gamer.cs" />
     <Compile Include="GamerServices\GamerPrivileges.cs" />
     <Compile Include="GamerServices\GamerServicesComponent.cs" />
-    <Compile Include="GamerServices\MessageBoxIcon.cs" />
     <Compile Include="GamerServices\SignedInGamer.cs" />
     <Compile Include="GamerServices\SignedInGamerCollection.cs" />
     <Compile Include="Graphics\ClearOptions.cs" />
@@ -242,6 +239,17 @@
     <Compile Include="Audio\AudioListener.cs" />
     <Compile Include="Audio\AudioEmitter.cs" />
     <Compile Include="DisplayOrientation.cs" />
+    <Compile Include="GamerServices\Achievement.cs" />
+    <Compile Include="GamerServices\AchievementCollection.cs" />
+    <Compile Include="GamerServices\FriendCollection.cs" />
+    <Compile Include="GamerServices\FriendGamer.cs" />
+    <Compile Include="Graphics\VertexDeclaration.cs" />
+    <Compile Include="Graphics\GraphicsResource.cs" />
+    <Compile Include="Graphics\ResolveTexture2D.cs" />
+    <Compile Include="GamerServices\MessageBoxIcon.cs" />
+    <Compile Include="GamerServices\TextFieldAlertView.cs" />
+    <Compile Include="Graphics\Blend.cs" />
+    <Compile Include="Graphics\EffectTechnique.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
