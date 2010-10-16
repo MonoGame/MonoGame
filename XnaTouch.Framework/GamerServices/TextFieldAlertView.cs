@@ -61,13 +61,16 @@ namespace XnaTouch.Framework.GamerServices
 			// add the text field to the alert view
 			this.AddSubview(_tf);
 			
+			// We can only force it to become a First Responder after it has been added to the MainView.
+			_tf.BecomeFirstResponder();
+			
 			// shift the contents of the alert view around to accomodate the extra text field
 			AdjustControlSize();
 		}
 
 		private UITextField ComposeTextFieldControl(bool secureTextEntry)
 		{
-			UITextField textField = new UITextField (new System.Drawing.RectangleF (12f, 45f, 260f, 25f));
+			UITextField textField = new UITextField (new System.Drawing.RectangleF(12f, 45f, 260f, 25f));
 			textField.BackgroundColor = UIColor.White;
 			textField.UserInteractionEnabled = true;
 			textField.AutocorrectionType = UITextAutocorrectionType.No;

@@ -65,6 +65,7 @@ namespace XnaTouch.Framework
         private DateTime _lastUpdate;
         private bool _initialized = false;
 		private bool _initializing = false;
+		private bool _inbackground = false;
         private GameComponentCollection _gameComponentCollection;
         public GameServiceContainer _services;
         private ContentManager _content;
@@ -143,7 +144,7 @@ namespace XnaTouch.Framework
     	{			
 			_lastUpdate = DateTime.Now;
 			
-			_view.Run(FramesPerSecond/(FramesPerSecond*TargetElapsedTime.TotalSeconds));	
+			_view.Run( FramesPerSecond / ( FramesPerSecond * TargetElapsedTime.TotalSeconds ) );	
 			
 			_view.MainContext = _view.EAGLContext;
 			_view.ShareGroup = _view.MainContext.ShareGroup;
@@ -159,12 +160,18 @@ namespace XnaTouch.Framework
 		
 		internal void DoUpdate(GameTime aGameTime)
 		{
-			Update(aGameTime);
+			if (!_inbackground )
+			{
+				Update(aGameTime);
+			}
 		}
 		
 		internal void DoDraw(GameTime aGameTime)
 		{
-			Draw(aGameTime);
+			if (!_inbackground )
+			{
+				Draw(aGameTime);
+			}
 		}
 		
 		internal void DoStep()
@@ -242,6 +249,16 @@ namespace XnaTouch.Framework
                 return this.graphicsDeviceService.GraphicsDevice;
             }
         }
+		
+		public void EnterBackground()
+    	{
+			_inbackground = true;
+		}
+		
+		public void EnterForeground()
+    	{
+			_inbackground = false;
+		}
 		
 		protected virtual bool BeginDraw()
 		{
