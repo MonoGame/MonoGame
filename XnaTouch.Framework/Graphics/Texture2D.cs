@@ -174,12 +174,15 @@ namespace XnaTouch.Framework.Graphics
 
         public static Texture2D FromFile(GraphicsDevice graphicsDevice, string filename, int width, int height)
         {
-            throw new NotImplementedException();
+			throw new NotImplementedException();
+			
+            // return FromFile( graphicsDevice, filename);
+			// Resizing texture before returning it, not yet implemented			
         }
 
         public static Texture2D FromFile(GraphicsDevice graphicsDevice, string filename)
 		{
-			UIImage image = UIImage.FromFile(filename);
+			UIImage image = UIImage.FromBundle(filename);
 			if (image == null)
 			{
 				throw new ContentLoadException("Error loading file: " + filename);

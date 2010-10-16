@@ -63,6 +63,8 @@ namespace XnaTouch.Framework.GamerServices
 		private static bool isTrialMode;
 		private static bool isVisible;
 		private static bool simulateTrialMode;
+		private static GKLeaderboardViewController leaderboardController;
+		private static GKAchievementViewController achievementController;
 		
 		delegate string ShowKeyboardInputDelegate(
 		 PlayerIndex player,           
@@ -84,7 +86,7 @@ namespace XnaTouch.Framework.GamerServices
 		
 			
 			myAlertView.Title = title;
-			myAlertView.Message = " ";
+			myAlertView.Message = description;
 			
 			myAlertView.Clicked += delegate(object sender, UIButtonEventArgs e)
 					{
@@ -94,7 +96,7 @@ namespace XnaTouch.Framework.GamerServices
 						}
 					};
 			myAlertView.Transform = MonoTouch.CoreGraphics.CGAffineTransform.MakeTranslation (0f, 110f);
-			myAlertView.Show ();
+			myAlertView.Show();
 			#endif
 			#if ANDROID
 			#endif
@@ -213,9 +215,7 @@ namespace XnaTouch.Framework.GamerServices
 			return BeginShowMessageBox(PlayerIndex.One, title, text, buttons, focusButton, icon, callback, state);
 		}
 
-		public static Nullable<int> EndShowMessageBox (
-         IAsyncResult result
-		)
+		public static Nullable<int> EndShowMessageBox (IAsyncResult result)
 		{
 			try
 			{
@@ -260,7 +260,11 @@ namespace XnaTouch.Framework.GamerServices
 		{
 			if ( ( Gamer.SignedInGamers.Count > 0 ) && ( Gamer.SignedInGamers[0].IsSignedInToLive ) )
 			{
-			    GKLeaderboardViewController leaderboardController = new GKLeaderboardViewController();
+				// Lazy load it
+				if ( leaderboardController == null )
+				{
+			    	leaderboardController = new GKLeaderboardViewController(GKLeaderboardTimeScope.AllTime, GKLeaderboardPlayerScope.Global);
+				}
 	
 			    if (leaderboardController != null)
 			
@@ -277,7 +281,11 @@ namespace XnaTouch.Framework.GamerServices
 		{
 			if ( ( Gamer.SignedInGamers.Count > 0 ) && ( Gamer.SignedInGamers[0].IsSignedInToLive ) )
 			{
-				GKAchievementViewController achievementController = new GKAchievementViewController();
+				// Lazy load it
+				if ( achievementController == null )
+				{
+					achievementController = new GKAchievementViewController();
+				}
 	
 			    if (achievementController != null)
 			
