@@ -15,7 +15,7 @@
     <RootNamespace>XnaTouch.Framework</RootNamespace>
     <SynchReleaseVersion>false</SynchReleaseVersion>
     <BundleDisplayName>XnaTouch</BundleDisplayName>
-    <ReleaseVersion>0.8</ReleaseVersion>
+    <ReleaseVersion>1.0</ReleaseVersion>
     <MtouchSdkVersion>3.0</MtouchSdkVersion>
     <MtouchMinimumOS>3.0</MtouchMinimumOS>
   </PropertyGroup>

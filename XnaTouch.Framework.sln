@@ -181,6 +181,6 @@ Global
 		{9964D44C-AD60-497E-8ED3-1DE22F53CEED} = {ED13CD83-F288-496C-B046-027FA7D36717}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = Samples\Draw2D\XnaTouch.Samples.Draw2D.csproj
+		StartupItem = Samples\Video\XnaTouch.Samples.Video.csproj
 	EndGlobalSection
 EndGlobal

@@ -35,7 +35,7 @@ namespace XnaTouch.Samples.VideoSample
 		protected override void Initialize ()
 		{
 			// TODO: Add your initialization logic here
-			player = new VideoPlayer();
+			player = new VideoPlayer(this);
 			
 			base.Initialize ();
 
@@ -53,16 +53,6 @@ namespace XnaTouch.Samples.VideoSample
 			//TODO: use this.Content to load your game content here 
 			font = Content.Load<SpriteFont>("SpriteFont1");
 			video = Content.Load<Video>("XnaTouch.m4v");
-		}
-
-		/// <summary>
-		/// UnloadContent will be called once per game and is the place to unload
-		/// all content.
-		/// </summary>
-		protected override void UnLoadContent ()
-		{
-			// TODO: Unload any non ContentManager content here
-			base.UnLoadContent ();
 		}
 
 		/// <summary>

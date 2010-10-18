@@ -71,16 +71,7 @@ namespace XnaTouch.Samples.GameComponents
 			Vector2 position = new Vector2(randomizer.Next(260),randomizer.Next(400));
 			Components.Add(new Sprite(this,texture,position, speed, spriteBatch));
 		}
-		
-        /// <summary>
-        /// UnloadContent will be called once per game and is the place to unload
-        /// all content.
-        /// </summary>
-		protected override void UnLoadContent ()
-		{
-			// TODO: Unload any non ContentManager content here
-			base.UnLoadContent ();
-		}
+	
 
         /// <summary>
         /// Allows the game to run logic such as updating the world,

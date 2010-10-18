@@ -13,7 +13,7 @@
     <BundleDisplayName>AlienGame</BundleDisplayName>
     <BundleIcon>GameThumbnail.png</BundleIcon>
     <RootNamespace>AlienGame</RootNamespace>
-    <MtouchSdkVersion>3.0</MtouchSdkVersion>
+    <MtouchSdkVersion>4.0</MtouchSdkVersion>
     <MtouchMinimumOS>3.0</MtouchMinimumOS>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhoneSimulator' ">
@@ -36,6 +36,7 @@
     <WarningLevel>4</WarningLevel>
     <MtouchDebug>False</MtouchDebug>
     <DefineConstants>IPHONE;TARGET_IPHONE_SIMULATOR</DefineConstants>
+    <MtouchI18n />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhone' ">
     <DebugSymbols>true</DebugSymbols>
@@ -47,6 +48,7 @@
     <WarningLevel>4</WarningLevel>
     <MtouchDebug>True</MtouchDebug>
     <CodesignKey>iPhone Developer</CodesignKey>
+    <MtouchI18n />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
     <DebugType>none</DebugType>
@@ -57,6 +59,7 @@
     <MtouchDebug>False</MtouchDebug>
     <DefineConstants>IPHONE</DefineConstants>
     <CodesignKey>iPhone Developer</CodesignKey>
+    <MtouchI18n />
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
