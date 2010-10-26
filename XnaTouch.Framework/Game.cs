@@ -65,7 +65,7 @@ namespace XnaTouch.Framework
         private DateTime _lastUpdate;
         private bool _initialized = false;
 		private bool _initializing = false;
-		private bool _inbackground = false;
+		private bool _isActive = true;
         private GameComponentCollection _gameComponentCollection;
         public GameServiceContainer _services;
         private ContentManager _content;
@@ -108,9 +108,16 @@ namespace XnaTouch.Framework
         public bool IsActive
         {
             get
-            {
-                return true;
-            }
+			{
+				return _isActive;
+			}
+			protected set
+			{
+				if (_isActive != value )
+				{
+					_isActive = value;
+				}
+			}
         }
 
         public bool IsMouseVisible
@@ -160,7 +167,7 @@ namespace XnaTouch.Framework
 		
 		internal void DoUpdate(GameTime aGameTime)
 		{
-			if (!_inbackground )
+			if (_isActive)
 			{
 				Update(aGameTime);
 			}
@@ -168,7 +175,7 @@ namespace XnaTouch.Framework
 		
 		internal void DoDraw(GameTime aGameTime)
 		{
-			if (!_inbackground )
+			if (_isActive)
 			{
 				Draw(aGameTime);
 			}
@@ -252,12 +259,12 @@ namespace XnaTouch.Framework
 		
 		public void EnterBackground()
     	{
-			_inbackground = true;
+			_isActive = false;
 		}
 		
 		public void EnterForeground()
     	{
-			_inbackground = false;
+			_isActive = true;
 		}
 		
 		protected virtual bool BeginDraw()
