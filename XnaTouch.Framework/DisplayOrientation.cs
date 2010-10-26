@@ -47,7 +47,12 @@ namespace XnaTouch.Framework
 		Default,
 		LandscapeLeft,
 		LandscapeRight,
-		Portrait
+		Portrait,
+		// iPhone specific Orientations
+		FaceDown,
+		FaceUp,
+		PortraitUpsideDown,
+		Unknown,
 	}
 }
 
