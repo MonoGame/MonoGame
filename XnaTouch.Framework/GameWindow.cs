@@ -88,24 +88,35 @@ namespace XnaTouch.Framework
 			
 			// Listen out for rotation changes
 			NSNotificationCenter.DefaultCenter.AddObserver("UIDeviceOrientationDidChangeNotification", (notification) => { 
-				UIDeviceOrientation orientation = UIDevice.CurrentDevice.Orientation;	
+				UIDeviceOrientation orientation = UIDevice.CurrentDevice.Orientation;
 				
-				if (orientation == UIDeviceOrientation.Portrait )
+				switch (orientation)
 				{
-					CurrentOrientation = DisplayOrientation.Portrait;
-				}
-				else if (orientation == UIDeviceOrientation.LandscapeLeft )
-				{
-					CurrentOrientation = DisplayOrientation.LandscapeLeft;
-				}
-				else if (orientation == UIDeviceOrientation.LandscapeRight )
-				{
-					CurrentOrientation = DisplayOrientation.LandscapeRight;
-				}
-				else
-				{
-					CurrentOrientation = DisplayOrientation.Default;
-				}				  
+					case UIDeviceOrientation.Portrait :
+						CurrentOrientation = DisplayOrientation.Portrait;
+						break;
+					case UIDeviceOrientation.LandscapeLeft :
+						CurrentOrientation = DisplayOrientation.LandscapeLeft;
+						break;
+					case UIDeviceOrientation.LandscapeRight :
+						CurrentOrientation = DisplayOrientation.LandscapeRight;
+						break;
+					case UIDeviceOrientation.FaceDown :
+						CurrentOrientation = DisplayOrientation.FaceDown;
+						break;
+					case UIDeviceOrientation.FaceUp :
+						CurrentOrientation = DisplayOrientation.FaceUp;
+						break;
+					case UIDeviceOrientation.PortraitUpsideDown :
+						CurrentOrientation = DisplayOrientation.PortraitUpsideDown;
+						break;
+					case UIDeviceOrientation.Unknown :
+						CurrentOrientation = DisplayOrientation.Unknown;
+						break;
+					default:
+						CurrentOrientation = DisplayOrientation.Default;
+						break;
+				}					  
 			});
 			
 			UIDevice.CurrentDevice.BeginGeneratingDeviceOrientationNotifications();
