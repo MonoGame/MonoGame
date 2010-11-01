@@ -260,11 +260,15 @@ namespace XnaTouch.Framework
 		public void EnterBackground()
     	{
 			_isActive = false;
+			 if (Deactivated != null)
+                Deactivated.Invoke(this, null);
 		}
 		
 		public void EnterForeground()
     	{
 			_isActive = true;
+			if (Activated != null)
+                Activated.Invoke(this, null);
 		}
 		
 		protected virtual bool BeginDraw()
