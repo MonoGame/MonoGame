@@ -1187,7 +1187,21 @@ namespace XnaTouch.Framework.Graphics
 			
             return new Color( Red, Green, Blue, Alpha );
         }
-
+		
+		public static Color Multiply( Color value, float scale)
+		{
+			byte Red = (byte)(value.R * scale);
+			byte Green = (byte)(value.G * scale);
+			byte Blue = (byte)(value.B * scale);
+			byte Alpha = (byte)(value.A * scale);
+			
+			return new Color( Red, Green, Blue, Alpha );
+		}
+		
+		public static Color operator *(Color value, float scale)
+        {
+            return Multiply(value, scale);
+        }		
 
         public Vector3 ToVector3()
         {
