@@ -49,7 +49,7 @@ using System.Collections.Generic;
 
 namespace XnaTouch.Framework.Graphics
 {
-    public class SpriteBatch : IDisposable
+    public class SpriteBatch : GraphicsResource
     {
 		private XnaTouch.Framework.Graphics.GraphicsDevice _device;
 		private object _tag;
@@ -70,12 +70,6 @@ namespace XnaTouch.Framework.Graphics
         {
 			GraphicsDevice.StartSpriteBatch(blendMode, SpriteSortMode.Deferred);
 		}
-		
-		public void End()
-        {
-			_currentTransformMatrix = null;
-			GraphicsDevice.EndSpriteBatch();
-        }
 
         public void Begin(SpriteBlendMode blendMode, SpriteSortMode sortMode, SaveStateMode stateMode)
         {
@@ -91,10 +85,25 @@ namespace XnaTouch.Framework.Graphics
 			_currentTransformMatrix = transformMatrix;
 			GraphicsDevice.StartSpriteBatch(blendMode, sortMode);
         }
-
-        public void Dispose()
+		
+		public void Begin (
+         SpriteSortMode sortMode,
+         BlendState blendState,
+         SamplerState samplerState,
+         DepthStencilState depthStencilState,
+         RasterizerState rasterizerState,
+         Effect effect,
+         Matrix transformMatrix)
+		{
+			_currentTransformMatrix = transformMatrix;
+			// TODO GraphicsDevice.StartSpriteBatch(blendMode, sortMode);
+		}
+		
+		public void End()
         {
-        }
+			_currentTransformMatrix = null;
+			GraphicsDevice.EndSpriteBatch();
+		}
 
         public void Draw(Texture2D texture, Rectangle destinationRectangle, Color color)
         {
