@@ -250,6 +250,11 @@
     <Compile Include="GamerServices\TextFieldAlertView.cs" />
     <Compile Include="Graphics\Blend.cs" />
     <Compile Include="Graphics\EffectTechnique.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Graphics\BlendState.cs" />
+    <Compile Include="Graphics\SamplerState.cs" />
+    <Compile Include="Graphics\DepthStencilState.cs" />
+    <Compile Include="Graphics\RasterizerState.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
