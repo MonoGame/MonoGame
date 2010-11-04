@@ -53,6 +53,7 @@ namespace XnaTouch.Framework.GamerServices
         public GamerServicesComponent(Game game) : base(game)
         {
 			lng = new LocalNetworkGamer();
+			Guide.Window = game.Window;
         }
 		
 		protected override void LoadContent()

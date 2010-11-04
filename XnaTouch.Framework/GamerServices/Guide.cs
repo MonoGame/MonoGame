@@ -262,17 +262,25 @@ namespace XnaTouch.Framework.GamerServices
 			{
 				// Lazy load it
 				if ( leaderboardController == null )
-				{
-			    	leaderboardController = new GKLeaderboardViewController(GKLeaderboardTimeScope.AllTime, GKLeaderboardPlayerScope.Global);
+				{			    	
+					leaderboardController = new GKLeaderboardViewController();
 				}
-	
-			    if (leaderboardController != null)
-			
+				
+			    if (leaderboardController != null)			
 			    {
-			        // leaderboardController.leaderboardDelegate = this;
-			
-			        // [self presentModalViewController: leaderboardController animated: YES];
-			
+					leaderboardController.DidFinish += delegate(object sender, EventArgs e) {
+						// TODO leaderboardController.DismissModalViewControllerAnimated(true);
+						leaderboardController.View.RemoveFromSuperview();
+						isVisible = false;
+					};	
+					
+					if (Window !=null)
+					{
+						// Work out way to push these dialogs modally.
+						Window.AddSubview(leaderboardController.View);
+						leaderboardController.PopViewControllerAnimated(true);	
+						isVisible = true;
+					}
 			    }
 			}
 		}
@@ -287,13 +295,21 @@ namespace XnaTouch.Framework.GamerServices
 					achievementController = new GKAchievementViewController();
 				}
 	
-			    if (achievementController != null)
-			
+			    if (achievementController != null)		
 			    {
-			        // leaderboardController.leaderboardDelegate = this;
-			
-			        // [self presentModalViewController: leaderboardController animated: YES];
-			
+					achievementController.DidFinish += delegate(object sender, EventArgs e) {									 
+							// TODO achievementController.DismissModalViewControllerAnimated(true);
+							achievementController.View.RemoveFromSuperview();
+							isVisible = false;
+						};
+					
+					if (Window !=null)
+					{
+						// Work out way to push these dialogs modally.
+						Window.AddSubview(achievementController.View);
+						achievementController.PopViewControllerAnimated(true);
+						isVisible = true;
+					}
 			    }
 			}
 		}
@@ -345,6 +361,12 @@ namespace XnaTouch.Framework.GamerServices
 			{
 				simulateTrialMode = value;
 			}
+		}
+		
+		public static GameWindow Window 
+		{ 
+			get;
+			set;
 		}
 		#endregion
 	}
