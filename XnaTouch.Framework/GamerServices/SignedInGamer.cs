@@ -57,29 +57,25 @@ namespace XnaTouch.Framework.GamerServices
 		private AchievementCollection gamerAchievements;
 		private FriendCollection friendCollection;
 		
-		public SignedInGamer()
+		delegate void AuthenticationDelegate();
+		
+		public IAsyncResult BeginAuthentication(AsyncCallback callback, Object asyncState)
 		{
-			// Register to receive the GKPlayerAuthenticationDidChangeNotificationName so we are notified when 
-			// Authentication changes
-			NSNotificationCenter.DefaultCenter.AddObserver( "GKPlayerAuthenticationDidChangeNotificationName", (notification) => {   
-        													    if (lp !=null && lp.Authenticated)
-																{
-																	this.Gamertag = lp.Alias;
-																	this.DisplayName = lp.PlayerID;	
-														        	// Insert code here to handle a successful authentication.
-																	Gamer.SignedInGamers.Add(this);
-																	// Fire the SignedIn event
-																	OnSignedIn(new SignedInEventArgs(this) );
-																}
-														    	else
-																{
-														        	// Insert code here to clean up any outstanding Game Center-related classes.
-																	Gamer.SignedInGamers.Remove(this);
-																	// Fire the SignedOut event
-																	OnSignedOut(new SignedOutEventArgs(this) );
-																}
-	    													});	
+			// Go off authenticate
+			AuthenticationDelegate ad = DoAuthentication; 
 			
+			return ad.BeginInvoke(callback, ad);
+		}
+		
+		public void EndAuthentication( IAsyncResult result )
+		{
+			AuthenticationDelegate ad = (AuthenticationDelegate)result.AsyncState; 
+			
+			ad.EndInvoke(result);
+		}
+		
+		private void DoAuthentication()
+		{
 			try 
 			{
 				if (UIDevice.CurrentDevice.SystemVersion == "4.1")
@@ -115,6 +111,39 @@ namespace XnaTouch.Framework.GamerServices
 			{
 				
 			}
+		}
+		
+		public SignedInGamer()
+		{
+			
+			// Register to receive the GKPlayerAuthenticationDidChangeNotificationName so we are notified when 
+			// Authentication changes
+			NSNotificationCenter.DefaultCenter.AddObserver( "GKPlayerAuthenticationDidChangeNotificationName", (notification) => {   
+        													    if (lp !=null && lp.Authenticated)
+																{
+																	this.Gamertag = lp.Alias;
+																	this.DisplayName = lp.PlayerID;	
+														        	// Insert code here to handle a successful authentication.
+																	Gamer.SignedInGamers.Add(this);
+																	// Fire the SignedIn event
+																	OnSignedIn(new SignedInEventArgs(this) );
+																}
+														    	else
+																{
+														        	// Insert code here to clean up any outstanding Game Center-related classes.
+																	Gamer.SignedInGamers.Remove(this);
+																	// Fire the SignedOut event
+																	OnSignedOut(new SignedOutEventArgs(this) );
+																}
+	    													});	
+			
+			var result = BeginAuthentication(null, null);	
+			EndAuthentication( result );
+		}
+		
+		private void AuthenticationCompletedCallback( IAsyncResult result )
+		{
+			EndAuthentication(result);	
 		}
 		
 		#region Methods
@@ -210,18 +239,19 @@ namespace XnaTouch.Framework.GamerServices
 			return gamerAchievements;
 		}
 		
-		delegate void AwardAchievementDelegate(string achievementId);
+		delegate void AwardAchievementDelegate(string achievementId, double percentageComplete);
 		
 		public IAsyncResult BeginAwardAchievement(
          string achievementId,
+		 double percentageComplete,
          AsyncCallback callback,
          Object state
 		)
 		{	
 			// Go off and award the achievement
-			AwardAchievementDelegate aad = AwardAchievement; 
+			AwardAchievementDelegate aad = DoAwardAchievement; 
 				
-			return aad.BeginInvoke(achievementId, callback, aad);
+			return aad.BeginInvoke(achievementId, percentageComplete, callback, aad);
 		}
 		
 		public void EndAwardAchievement(IAsyncResult result)
@@ -231,16 +261,19 @@ namespace XnaTouch.Framework.GamerServices
 			aad.EndInvoke(result);
 		}
 		
-		public void AwardAchievement ( string achievementId )
+		private void AwardAchievementCompletedCallback( IAsyncResult result )
+		{
+			EndAwardAchievement(result);	
+		}
+		
+		public void AwardAchievement( string achievementId )
 		{			
 			AwardAchievement(achievementId, 100.0f);
 		}
 		
-		public void AwardAchievement( string achievementId, double percentageComplete )
+		public void DoAwardAchievement( string achievementId, double percentageComplete )
 		{
-			if (IsSignedInToLive)
-			{
-				GKAchievement a = new GKAchievement(achievementId);
+			GKAchievement a = new GKAchievement(achievementId);
 				a.PercentComplete = percentageComplete;
 				a.ReportAchievement( delegate(NSError error){
 					if (error != null)
@@ -249,6 +282,13 @@ namespace XnaTouch.Framework.GamerServices
 					}
 		
 				} );
+		}
+		
+		public void AwardAchievement( string achievementId, double percentageComplete )
+		{
+			if (IsSignedInToLive)
+			{
+				BeginAwardAchievement( achievementId, percentageComplete, AwardAchievementCompletedCallback, null );
 			}
 		}
 		
@@ -305,7 +345,8 @@ namespace XnaTouch.Framework.GamerServices
 		{ 
 			get
 			{
-				return ( ( lp != null ) && ( lp.Authenticated ) );
+				var SignedIn = ( ( lp != null ) && ( lp.Authenticated ) );
+				return SignedIn;
 			}
 		}
 		
