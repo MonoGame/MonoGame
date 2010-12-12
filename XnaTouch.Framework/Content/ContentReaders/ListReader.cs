@@ -43,7 +43,8 @@ namespace XnaTouch.Framework.Content
 
         protected internal override void Initialize(ContentTypeReaderManager manager)
         {
-            this.elementReader = manager.GetTypeReader(typeof(T));
+			Type readerType = typeof(T);
+			elementReader = manager.GetTypeReader(readerType);
         }
 
 
@@ -54,7 +55,18 @@ namespace XnaTouch.Framework.Content
             if (list == null) list = new List<T>();
             for (int i = 0; i < count; i++)
             {
-                list.Add(input.ReadObject<T>(elementReader));
+                // list.Add(input.ReadObject<T>(elementReader));
+				
+				Type objectType = typeof(T);
+				if(objectType.IsValueType)
+				{
+                	list.Add(input.ReadObject<T>(elementReader));
+				}
+				else
+				{
+					int readerType = input.ReadByte();
+                	list.Add(input.ReadObject<T>(input.TypeReaders[readerType - 1]));
+				}
             }
             return list;
         }

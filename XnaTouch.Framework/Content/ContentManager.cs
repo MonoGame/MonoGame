@@ -143,7 +143,10 @@ namespace XnaTouch.Framework.Content
 				if ((typeof(T) == typeof(Texture2D))) 
 					result = Texture2D.FromFile(graphicsDeviceService.GraphicsDevice,assetName);
 				if ((typeof(T) == typeof(SpriteFont)))
+				{
+					//result = new SpriteFont(Texture2D.FromFile(graphicsDeviceService.GraphicsDevice,assetName), null, null, null, 0, 0.0f, null, null);
 					throw new NotImplementedException();
+				}
 				if ((typeof(T) == typeof(Song)))
 					result = new Song (assetName);		
 				if ((typeof(T) == typeof(SoundEffect)))
