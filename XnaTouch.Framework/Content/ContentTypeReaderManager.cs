@@ -82,54 +82,39 @@ namespace XnaTouch.Framework.Content
             for (int i = 0; i < numberOfReaders; i++)
             {
                 // This string tells us what reader we need to decode the following data
-                string readerTypeString = reader.ReadString();
-
-                // I think the next 4 bytes refer to the "Version" of the type reader,
+                // string readerTypeString = reader.ReadString();
+				string originalReaderTypeString = reader.ReadString();
+ 
+				// Need to resolve namespace differences
+				string readerTypeString = originalReaderTypeString;
+				if(readerTypeString.IndexOf(", Microsoft.Xna.Framework") != -1)
+ 				{
+					string[] tokens = readerTypeString.Split(new char[] { ',' });
+					readerTypeString = "";
+					for(int j = 0; j < tokens.Length; j++)
+ 					{
+						if(j != 0)
+							readerTypeString += ",";
+						
+						if(j == 1)
+							readerTypeString += " XnaTouch.Framework";
+						else
+							readerTypeString += tokens[j];
+ 					}
+					readerTypeString = readerTypeString.Replace(", Microsoft.Xna.Framework", "@");
+				}
+					
+				readerTypeString = readerTypeString.Replace("Microsoft.Xna.Framework", "XnaTouch.Framework");
+				Type l_readerType = Type.GetType(readerTypeString);
+				
+            	if(l_readerType !=null)
+					contentReaders[i] = (ContentTypeReader)Activator.CreateInstance(l_readerType,true);
+            	else
+					throw new ContentLoadException("Could not find matching content reader of type " + originalReaderTypeString);
+				
+				// I think the next 4 bytes refer to the "Version" of the type reader,
                 // although it always seems to be zero
                 int typeReaderVersion = reader.ReadInt32();
- 
-				if (readerTypeString.IndexOf("Texture2DReader") != -1)
-				{
-					contentReaders[i] = new Texture2DReader();
-				}
-				if (readerTypeString.IndexOf("SpriteFontReader") != -1)
-				{
-					contentReaders[i] = new SpriteFontReader();
-				}
-				if (readerTypeString.IndexOf("CharReader") != -1)
-				{
-					contentReaders[i] = new CharReader();
-				}
-				if (readerTypeString.IndexOf("RectangleReader") != -1)
-				{
-					contentReaders[i] = new RectangleReader();
-				}
-				if (readerTypeString.IndexOf("ListReader") != -1)
-				{
-					// Ok..i need fix this later
-					if (readerTypeString.IndexOf("Rectangle")!= -1)
-					{
-						contentReaders[i] = new ListReader<Rectangle>();
-					}
-					
-					if (readerTypeString.IndexOf("Vector3") != -1)
-					{
-						contentReaders[i] = new ListReader<Vector3>();
-					}
-					
-					if (readerTypeString.IndexOf("Char") != -1)
-					{
-						contentReaders[i] = new ListReader<Char>();
-					}
-				}
-				if (readerTypeString.IndexOf("StringReader") != -1)
-				{
-					contentReaders[i] = new StringReader();
-				}
-				if (readerTypeString.IndexOf("Vector3Reader") != -1)
-				{
-					contentReaders[i] = new Vector3Reader();
-				}
             }
 
             return contentReaders;

@@ -34,15 +34,20 @@ using XnaTouch.Framework.Graphics;
 
 namespace XnaTouch.Framework.Content
 {
-    internal class CharReader : ContentTypeReader<char>
+	
+	internal class RectangleReader : ContentTypeReader<Rectangle>
     {
-        internal CharReader()
+        internal RectangleReader()
         {
         }
 
-        protected internal override char Read(ContentReader input, char existingInstance)
+        protected internal override Rectangle Read(ContentReader input, Rectangle existingInstance)
         {
-            return input.ReadChar();
+            int left = input.ReadInt32();
+            int top = input.ReadInt32();
+            int width = input.ReadInt32();
+            int height = input.ReadInt32();
+            return new Rectangle(left, top, width, height);
         }
     }
 }

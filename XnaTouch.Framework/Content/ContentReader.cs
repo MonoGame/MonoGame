@@ -61,7 +61,17 @@ namespace XnaTouch.Framework.Content
         {
             get { return this.contentManager; }
         }
-
+		
+		public string AssetName
+		{
+			get
+			{
+				if(BaseStream is FileStream)
+					return ((FileStream)(this.BaseStream)).Name.Replace("Content/",""); 
+				else
+					return string.Empty;
+			}
+		}
 
         public T ReadExternalReference<T>()
         {
@@ -131,7 +141,13 @@ namespace XnaTouch.Framework.Content
 
         public T ReadRawObject<T>(T existingInstance)
         {
-            throw new NotImplementedException();
+            Type objectType = typeof(T);
+			foreach(ContentTypeReader typeReader in TypeReaders)
+			{
+				if(typeReader.TargetType == objectType)
+					return (T)ReadObject<T>(typeReader,existingInstance);
+			}
+            throw new NotSupportedException();
         }
 
         public T ReadRawObject<T>(ContentTypeReader typeReader, T existingInstance)
