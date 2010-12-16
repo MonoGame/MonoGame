@@ -77,12 +77,12 @@ namespace XnaTouch.Framework.Graphics
 			textureOffsetY = 0;
 		}
 		
-		private void Initialize()
+		private void Initialize( float scale )
 		{
 			imageWidth = texture.ContentSize.Width;
 			imageHeight = texture.ContentSize.Height;
-			textureWidth = texture.PixelsWide;
-			textureHeight = texture.PixelsHigh;
+			textureWidth = (int)(texture.PixelsWide/scale);
+			textureHeight = (int)(texture.PixelsHigh/scale);
 			texWidthRatio = 1.0f / (float)textureWidth;
 			texHeightRatio = 1.0f / (float)textureHeight;
 			textureOffsetX = 0;
@@ -92,33 +92,33 @@ namespace XnaTouch.Framework.Graphics
 		public ESImage(ESTexture2D tex)
 		{
 			texture = tex;
-			Initialize();
+			Initialize(1.0f);
 		}
 
 		public ESImage(ESTexture2D tex, float imageScale)
 		{
 			texture = tex;
-			Initialize();
+			Initialize(1.0f);
 		}
 		
 		public ESImage(UIImage image)
 		{
 			// By default set the scale to 1.0f and the filtering to GL_NEAREST
 			texture = new ESTexture2D(image,All.Nearest);
-			Initialize();
+			Initialize(image.CurrentScale);			
 		}
 
 		public ESImage(UIImage image, All filter)
 		{			
 			// By default set the scale to 1.0f
 			texture = new ESTexture2D(image,filter);
-			Initialize();
+			Initialize(image.CurrentScale);
 		}
 		
 		public ESImage(UIImage image, float imageScale, All filter)
 		{
 			texture = new ESTexture2D(image,filter);
-			Initialize();
+			Initialize(image.CurrentScale);
 		}
 		
 				
@@ -184,7 +184,10 @@ namespace XnaTouch.Framework.Graphics
 	
 			return subImage;
 		}
-
+		public Vector2 GetTextureCoord ( int x, int y )
+		{
+			return new Vector2(x*texWidthRatio,y*texHeightRatio);
+		}
 		public Vector2[] GetTextureCoordinates(Rectangle textureRect)
 		{
 			Vector2[] coordinates = new Vector2[4];

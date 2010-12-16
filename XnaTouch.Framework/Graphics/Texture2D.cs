@@ -54,6 +54,16 @@ namespace XnaTouch.Framework.Graphics
 		
 		internal bool IsSpriteFontTexture {get;set;}
 		
+		// my change
+		// --------
+		public uint ID
+		{
+			get
+			{ 
+				return texture.Name;
+			}
+		}
+		// --------
 		internal ESImage Image
 		{
 			get 
@@ -144,7 +154,7 @@ namespace XnaTouch.Framework.Graphics
 			{ 
 				return name;
 			}
-			internal set 
+			set 
 			{
 				name = value;
 			}
@@ -205,8 +215,26 @@ namespace XnaTouch.Framework.Graphics
         }
 
         public void GetData<T>(T[] data)
-        {
-            throw new NotImplementedException();
+        {	
+			if (data == null )
+			{
+				throw new ArgumentException("data");
+			}	
+			
+			// 4 bytes per pixel
+		    if (data.Length < Width * Height * 4)
+			{
+		        throw new ArgumentException("data length is invalid");
+			}
+			
+			// Get the Color valuesk
+			if ((typeof(T) == typeof(Color))) 
+			{	
+				Color[] Pixel = new Color[Width * Height * 4];
+				//Color[] Pixel = (Color)data;
+				
+				GL.ReadPixels<Color>(0, 0, Width, Height, All.Rgba, All.UnsignedByte, Pixel );	
+			}	
         }
 
         public void GetData<T>(T[] data, int startIndex, int elementCount)

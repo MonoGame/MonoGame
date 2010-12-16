@@ -114,7 +114,7 @@ namespace XnaTouch.Framework.Graphics
             A = Convert.ToByte(alpha * 255);
         }
 
-        public byte R
+        public byte B
         {
             get
             {
@@ -137,7 +137,7 @@ namespace XnaTouch.Framework.Graphics
                 this.packedValue = (this.packedValue & 0xffff00ff) | ((uint)(value << 8));
             }
         }
-        public byte B
+        public byte R
         {
             get
             {

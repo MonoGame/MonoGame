@@ -145,6 +145,27 @@ namespace XnaTouch.Framework.Graphics
 		public GraphicsDevice2D (GraphicsDevice Device)
 		{
 			_device = Device;
+			
+			// TODO Initialise2DOpenGL();
+		}
+		
+		public void Initialise2DOpenGL()
+		{
+			// Set up OpenGL projection matrix
+			GL.MatrixMode(All.Projection);
+			GL.LoadIdentity();
+			GL.Ortho(0, _device.DisplayMode.Width, _device.DisplayMode.Height, 0, -1, 1);	
+			
+			GL.MatrixMode(All.Modelview);	
+			GL.Viewport(0, 0, _device.DisplayMode.Width, _device.DisplayMode.Height);	
+			
+			// Initialize OpenGL states			
+			GL.Disable(All.DepthTest);
+			GL.TexEnv(All.TextureEnv, All.TextureEnvMode,(int) All.BlendSrc);
+			GL.EnableClientState(All.VertexArray);
+			
+			_device.ActiveTexture = -1;
+			GL.Disable(All.Blend);
 		}
 			
 		public void StartSpriteBatch(SpriteBlendMode blendMode, SpriteSortMode sortMode)
@@ -157,20 +178,7 @@ namespace XnaTouch.Framework.Graphics
 			_actualBlendMode = blendMode;
 			_actualSortMode = sortMode;
 			
-			// Set up OpenGL projection matrix
-			GL.MatrixMode(All.Projection);
-			GL.LoadIdentity();
-			GL.Ortho(0, _device.DisplayMode.Width, _device.DisplayMode.Height, 0, -1, 1);
-			GL.MatrixMode(All.Modelview);
-			GL.Viewport (0, 0, _device.DisplayMode.Width, _device.DisplayMode.Height);
-						
-			// Initialize OpenGL states			
-			GL.Disable(All.DepthTest);
-			GL.TexEnv(All.TextureEnv, All.TextureEnvMode,(int) All.BlendSrc);
-			GL.EnableClientState(All.VertexArray);
-			
-			_device.ActiveTexture = -1;
-			GL.Disable(All.Blend);
+			Initialise2DOpenGL();			
 			
 			// Set the current blend mode
 			switch (_actualBlendMode)
