@@ -99,7 +99,6 @@
     <Compile Include="Graphics\ResourceType.cs" />
     <Compile Include="Graphics\SaveStateMode.cs" />
     <Compile Include="Graphics\SetDataOptions.cs" />
-    <Compile Include="Graphics\SpriteBatch.cs" />
     <Compile Include="Graphics\SpriteBlendMode.cs" />
     <Compile Include="Graphics\SpriteEffects.cs" />
     <Compile Include="Graphics\SpriteFont.cs" />
@@ -255,6 +254,12 @@
     <Compile Include="Graphics\SamplerState.cs" />
     <Compile Include="Graphics\DepthStencilState.cs" />
     <Compile Include="Graphics\RasterizerState.cs" />
+    <Compile Include="Graphics\SpriteBatch.cs" />
+    <Compile Include="Graphics\BatchItem.cs" />
+    <Compile Include="Graphics\SpriteBatcher.cs" />
+    <Compile Include="Graphics\VertexColorTexture.cs" />
+    <Compile Include="Graphics\SpriteBatchItem.cs" />
+    <Compile Include="Graphics\VertexPosition2ColorTexture.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
