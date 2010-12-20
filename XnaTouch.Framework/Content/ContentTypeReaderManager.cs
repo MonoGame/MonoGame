@@ -52,10 +52,23 @@ namespace XnaTouch.Framework.Content
 		
 		public ContentTypeReader[] LoadAssetReaders(ContentReader reader)
         {
+			// Dummy variables required for it to work on iDevices ** DO NOT DELETE ** 
+			// This forces the classes not to be optimized out when deploying to iDevices
+			ListReader<Char> hCharListReader = new ListReader<Char>();
+			ListReader<Rectangle> hRectangleListReader = new ListReader<Rectangle>();
+			ListReader<Vector3> hVector3ListReader = new ListReader<Vector3>();
+			ListReader<StringReader> hStringListReader = new ListReader<StringReader>();
+			SpriteFontReader hSpriteFontReader = new SpriteFontReader();
+			Texture2DReader hTexture2DReader = new Texture2DReader();
+			CharReader hCharReader = new CharReader();
+			RectangleReader hRectangleReader = new RectangleReader();
+			StringReader hStringReader = new StringReader();
+			Vector3Reader hVector3Reader = new Vector3Reader();
+					
             int numberOfReaders;
-            ContentTypeReader[] contentReaders;
+            ContentTypeReader[] contentReaders;		
+			
             // The first 4 bytes should be the "XNBw" header. i use that to detect an invalid file
-
             byte[] headerBuffer = new byte[4];
             reader.Read(headerBuffer, 0, 4);
             string headerString = Encoding.UTF8.GetString(headerBuffer, 0, 4);
@@ -103,14 +116,16 @@ namespace XnaTouch.Framework.Content
  					}
 					readerTypeString = readerTypeString.Replace(", Microsoft.Xna.Framework", "@");
 				}
-					
+				
 				readerTypeString = readerTypeString.Replace("Microsoft.Xna.Framework", "XnaTouch.Framework");
 				Type l_readerType = Type.GetType(readerTypeString);
-				
+			
             	if(l_readerType !=null)
 					contentReaders[i] = (ContentTypeReader)Activator.CreateInstance(l_readerType,true);
             	else
 					throw new ContentLoadException("Could not find matching content reader of type " + originalReaderTypeString);
+				
+				
 				
 				// I think the next 4 bytes refer to the "Version" of the type reader,
                 // although it always seems to be zero
