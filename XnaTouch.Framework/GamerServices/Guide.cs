@@ -50,6 +50,9 @@ using System.Runtime.Remoting.Messaging;
 using MonoTouch.UIKit;
 using MonoTouch.Foundation;
 using MonoTouch.GameKit;
+
+using XnaTouch.Framework.Net;
+using XnaTouch.Framework.Storage;
 #endif
 #endregion Using clause
 
@@ -254,6 +257,15 @@ namespace XnaTouch.Framework.GamerServices
 				new ArgumentException("paneCount Can only be 1 on iPhone");
 				return;
 			}
+			
+			if (GamerServicesComponent.LocalNetworkGamer == null)
+			{
+				GamerServicesComponent.LocalNetworkGamer = new LocalNetworkGamer();
+			}
+			else
+			{
+				GamerServicesComponent.LocalNetworkGamer.SignedInGamer.BeginAuthentication(null, null);
+			}
 		}
 		
 		public static void ShowLeaderboard()
@@ -312,6 +324,16 @@ namespace XnaTouch.Framework.GamerServices
 					}
 			    }
 			}
+		}
+		
+		public static IAsyncResult BeginShowStorageDeviceSelector( AsyncCallback callback, object state )
+		{
+			return null;
+		}
+		
+		public static StorageDevice EndShowStorageDeviceSelector( IAsyncResult result )
+		{
+			return null;
 		}
 		
 		#region Properties
