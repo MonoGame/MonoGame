@@ -16,7 +16,7 @@ namespace XnaTouch.Framework.Graphics
 		public VertexPosition2ColorTexture ( Vector2 position, Color color, Vector2 texCoord )
 		{
 			Position = position;
-			Color = color.PackedValue;
+			Color = color.GLPackedValue;
 			TextureCoordinate = texCoord;
 		}
 	}
