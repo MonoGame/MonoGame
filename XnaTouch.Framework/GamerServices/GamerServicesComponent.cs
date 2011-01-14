@@ -48,7 +48,9 @@ namespace XnaTouch.Framework.GamerServices
 {
     public class GamerServicesComponent : GameComponent
     {
-		private LocalNetworkGamer lng;
+		private static LocalNetworkGamer lng;
+		
+		internal static LocalNetworkGamer LocalNetworkGamer { get { return lng; } set { lng = value; } } 
 		
         public GamerServicesComponent(Game game) : base(game)
         {
