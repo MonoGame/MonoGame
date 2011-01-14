@@ -31,15 +31,24 @@ namespace XnaTouch.Framework.Graphics
 {
     public struct Color : IEquatable<Color>
     {
+		// ARGB
         private uint packedValue;
+		[NonSerialized]
+		private uint glPackedValue;
+		
         private Color(uint packedValue)
         {
             this.packedValue = packedValue;
+			// ARGB
+			// ABGR
+			//this.glPackedValue = (packedValue << 8) | ((packedValue & 0xff000000) >> 24);
+			this.glPackedValue = (packedValue & 0xff00ff00) | ((packedValue & 0x000000ff) << 16) | ((packedValue & 0x00ff0000) >> 16);
         }
 
         public Color(Vector4 color)
         {
             packedValue = 0;
+			glPackedValue = 0;
 			
 			R = Convert.ToByte(color.X);
             G = Convert.ToByte(color.Y);
@@ -50,6 +59,7 @@ namespace XnaTouch.Framework.Graphics
         public Color(Vector3 color)
         {
             packedValue = 0;
+			glPackedValue = 0;
 
             R = Convert.ToByte(color.X);
             G = Convert.ToByte(color.Y);
@@ -60,6 +70,7 @@ namespace XnaTouch.Framework.Graphics
         public Color(Color color, byte alpha)
         {
             packedValue = 0;
+			glPackedValue = 0;
 
             R = color.R;
             G = color.G;
@@ -70,6 +81,7 @@ namespace XnaTouch.Framework.Graphics
         public Color(Color color, float alpha)
         {
             packedValue = 0;
+			glPackedValue = 0;
 
             R = color.R;
             G = color.G;
@@ -80,6 +92,8 @@ namespace XnaTouch.Framework.Graphics
         public Color(float r, float g, float b)
         {
             packedValue = 0;
+			glPackedValue = 0;
+			
             R = Convert.ToByte(r * 255);
             G = Convert.ToByte(g * 255);
             B = Convert.ToByte(b * 255);
@@ -89,6 +103,7 @@ namespace XnaTouch.Framework.Graphics
         public Color(byte r, byte g, byte b)
         {
             packedValue = 0;
+			glPackedValue = 0;
             R = r;
             G = g;
             B = b;
@@ -99,6 +114,7 @@ namespace XnaTouch.Framework.Graphics
         public Color(byte r, byte g, byte b, byte alpha)
         {
             packedValue = 0;
+			glPackedValue = 0;
             R = r;
             G = g;
             B = b;
@@ -108,6 +124,8 @@ namespace XnaTouch.Framework.Graphics
         public Color(float r, float g, float b, float alpha)
         {
             packedValue = 0;
+			glPackedValue = 0;
+			
             R = Convert.ToByte(r * 255);
             G = Convert.ToByte(g * 255);
             B = Convert.ToByte(b * 255);
@@ -118,11 +136,13 @@ namespace XnaTouch.Framework.Graphics
         {
             get
             {
-                return (byte)(this.packedValue >> 0x10);
+                return (byte)this.packedValue;
             }
             set
             {
-                this.packedValue = (this.packedValue & 0xff00ffff) | ((uint)(value << 0x10));
+                this.packedValue = (this.packedValue & 0xffffff00) | value;
+				//this.glPackedValue = (this.glPackedValue & 0xffff00ff) | ((uint)value << 8);
+				//this.glPackedValue = (this.glPackedValue & 0xff00ffff) | ((uint)value << 16);
             }
         }
 
@@ -135,31 +155,41 @@ namespace XnaTouch.Framework.Graphics
             set
             {
                 this.packedValue = (this.packedValue & 0xffff00ff) | ((uint)(value << 8));
+				//this.glPackedValue = (this.glPackedValue & 0xff00ffff) | ((uint)(value << 16));
+				//this.glPackedValue = (this.glPackedValue & 0xffff00ff) | ((uint)(value << 8));
             }
         }
         public byte R
         {
             get
             {
-                return (byte)this.packedValue;
+                return (byte)(this.packedValue >> 16);
             }
             set
             {
-                this.packedValue = (this.packedValue & 0xffffff00) | value;
+                this.packedValue = (this.packedValue & 0xff00ffff) | ((uint)(value << 16 ));
+				//this.glPackedValue = (this.glPackedValue & 0xffffff00) | ((uint)(value));
             }
         }
         public byte A
         {
             get
             {
-                return (byte)(this.packedValue >> 0x18);
+                return (byte)(this.packedValue >> 24);
             }
             set
             {
-                this.packedValue = (this.packedValue & 0xffffff) | ((uint)(value << 0x18));
+                this.packedValue = (this.packedValue & 0x00ffffff) | ((uint)(value << 24));
+				//this.glPackedValue = (this.glPackedValue & 0x00ffffff) | ((uint)(value << 24));
             }
         }
-
+		
+		public uint GLPackedValue
+		{
+			get { return (packedValue & 0xff00ff00) | ((packedValue & 0x000000ff) << 16) | ((packedValue & 0x00ff0000) >> 16); }  
+		}
+		
+		
         public static bool operator ==(Color a, Color b)
         {
             return (a.A == b.A &&
