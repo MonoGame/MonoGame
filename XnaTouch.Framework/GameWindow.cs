@@ -87,7 +87,7 @@ namespace XnaTouch.Framework
 			MultipleTouchEnabled = true;
 			
 			// Listen out for rotation changes
-			NSNotificationCenter.DefaultCenter.AddObserver("UIDeviceOrientationDidChangeNotification", (notification) => { 
+			NSNotificationCenter.DefaultCenter.AddObserver( new NSString("UIDeviceOrientationDidChangeNotification"), (notification) => { 
 				UIDeviceOrientation orientation = UIDevice.CurrentDevice.Orientation;
 				
 				switch (orientation)
@@ -353,7 +353,7 @@ namespace XnaTouch.Framework
 		
 		public DisplayOrientation CurrentOrientation 
 		{ 
-			get; 
+			get;
 			protected set;
 		}
 
