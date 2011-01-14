@@ -8,7 +8,7 @@ using XnaTouch.Framework;
 
 namespace XnaTouch.Framework.Graphics
 {
-	public class SpriteBatch
+	public class SpriteBatch : GraphicsResource
 	{
 		SpriteSortMode _sortMode;
 		SpriteBlendMode _blendMode;
@@ -19,6 +19,11 @@ namespace XnaTouch.Framework.Graphics
 		
 		public SpriteBatch ( GraphicsDevice graphicsDevice )
 		{
+			if (graphicsDevice == null )
+			{
+				throw new ArgumentException("graphicsDevice");
+			}	
+			
 			_graphicsDevice = graphicsDevice;
 			
 			_batcher = new SpriteBatcher();
@@ -71,7 +76,7 @@ namespace XnaTouch.Framework.Graphics
 			
 			// set camera
 			GL.MatrixMode(All.Projection);
-			GL.LoadIdentity();
+			GL.LoadIdentity();			
 			GL.Ortho(0, _graphicsDevice.Viewport.Width, _graphicsDevice.Viewport.Height, 0, -1, 1);
 			GL.MatrixMode(All.Modelview);
 			GL.LoadMatrix( ref _matrix.M11 );
@@ -85,7 +90,9 @@ namespace XnaTouch.Framework.Graphics
 			GL.EnableClientState(All.ColorArray);
 			GL.EnableClientState(All.TextureCoordArray);
 			
-			GL.Disable(All.CullFace);
+			// Enable Culling for better performance
+			GL.Enable(All.CullFace);
+			GL.FrontFace(All.Cw);
 			GL.Color4(1.0f, 1.0f, 1.0f, 1.0f);
 			
 			_batcher.DrawBatch ( _sortMode );
@@ -104,6 +111,11 @@ namespace XnaTouch.Framework.Graphics
 			 float depth 
 			 )
 		{
+			if (texture == null )
+			{
+				throw new ArgumentException("texture");
+			}
+			
 			SpriteBatchItem item = _batcher.CreateBatchItem();
 			
 			item.Depth = depth;
@@ -160,6 +172,11 @@ namespace XnaTouch.Framework.Graphics
 			 float depth 
 			 )
 		{
+			if (texture == null )
+			{
+				throw new ArgumentException("texture");
+			}
+			
 			SpriteBatchItem item = _batcher.CreateBatchItem();
 			
 			item.Depth = depth;
@@ -213,6 +230,11 @@ namespace XnaTouch.Framework.Graphics
          	float depth
 			)
 		{
+			if (texture == null )
+			{
+				throw new ArgumentException("texture");
+			}
+			
 			SpriteBatchItem item = _batcher.CreateBatchItem();
 			
 			item.Depth = depth;
@@ -256,6 +278,11 @@ namespace XnaTouch.Framework.Graphics
 		
         public void Draw(Texture2D texture, Vector2 position, Rectangle? sourceRectangle, Color color)
 		{
+			if (texture == null )
+			{
+				throw new ArgumentException("texture");
+			}
+			
 			SpriteBatchItem item = _batcher.CreateBatchItem();
 			
 			item.Depth = 0.0f;
@@ -275,6 +302,11 @@ namespace XnaTouch.Framework.Graphics
 		
 		public void Draw(Texture2D texture, Rectangle destinationRectangle, Rectangle? sourceRectangle, Color color)
 		{
+			if (texture == null )
+			{
+				throw new ArgumentException("texture");
+			}
+			
 			SpriteBatchItem item = _batcher.CreateBatchItem();
 			
 			item.Depth = 0.0f;
@@ -307,6 +339,11 @@ namespace XnaTouch.Framework.Graphics
 			 Color color
 			 )
 		{
+			if (texture == null )
+			{
+				throw new ArgumentException("texture");
+			}
+			
 			SpriteBatchItem item = _batcher.CreateBatchItem();
 			
 			item.Depth = 0;
@@ -331,6 +368,11 @@ namespace XnaTouch.Framework.Graphics
 		
 		public void Draw (Texture2D texture, Rectangle rectangle, Color color)
 		{
+			if (texture == null )
+			{
+				throw new ArgumentException("texture");
+			}
+			
 			SpriteBatchItem item = _batcher.CreateBatchItem();
 			
 			item.Depth = 0;
@@ -354,6 +396,11 @@ namespace XnaTouch.Framework.Graphics
 		
 		public void DrawString(SpriteFont spriteFont, string text, Vector2 position, Color color)
 		{
+			if (spriteFont == null )
+			{
+				throw new ArgumentException("spriteFont");
+			}
+			
 			Vector2 p = position;
 			
             foreach (char c in text)
@@ -404,6 +451,11 @@ namespace XnaTouch.Framework.Graphics
 			float depth
 			)
 		{
+			if (spriteFont == null )
+			{
+				throw new ArgumentException("spriteFont");
+			}
+			
 			Vector2 p = new Vector2(-origin.X,-origin.Y);
 			
 			float sin = (float)Math.Sin(rotation);
@@ -473,7 +525,12 @@ namespace XnaTouch.Framework.Graphics
 			SpriteEffects effects,
 			float depth
 			)
-		{
+		{			
+			if (spriteFont == null )
+			{
+				throw new ArgumentException("spriteFont");
+			}
+			
 			Vector2 p = new Vector2(-origin.X,-origin.Y);
 			
 			float sin = (float)Math.Sin(rotation);
