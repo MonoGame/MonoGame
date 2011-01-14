@@ -118,7 +118,7 @@ namespace XnaTouch.Framework.GamerServices
 			
 			// Register to receive the GKPlayerAuthenticationDidChangeNotificationName so we are notified when 
 			// Authentication changes
-			NSNotificationCenter.DefaultCenter.AddObserver( "GKPlayerAuthenticationDidChangeNotificationName", (notification) => {   
+			NSNotificationCenter.DefaultCenter.AddObserver( new NSString("GKPlayerAuthenticationDidChangeNotificationName"), (notification) => {   
         													    if (lp !=null && lp.Authenticated)
 																{
 																	this.Gamertag = lp.Alias;
@@ -151,6 +151,11 @@ namespace XnaTouch.Framework.GamerServices
 		{
 			if(IsSignedInToLive)
 			{
+				if ( friendCollection == null )
+				{
+					friendCollection = new FriendCollection();
+				}
+				
 				lp.LoadFriends( delegate (string[] FriendsList, NSError error )
 				               	{
 									foreach(string Friend in FriendsList)
@@ -215,26 +220,39 @@ namespace XnaTouch.Framework.GamerServices
 		{
 			if ( IsSignedInToLive )
 			{
-				/*GKAchievement.LoadAchievements( delegate(GKAchievement[] achievements, NSError error)
-				                               	{
-													if (achievements != null)
-													{
-														foreach(GKAchievement a in achievements)
-														{
-															//gamerAchievements.Add(new Achievement(Name = a.){});
-														}
-													}
-												} );*/
+				if (gamerAchievements == null)
+				{
+					gamerAchievements = new AchievementCollection();
+				}
+				
 				GKAchievementDescription.LoadAchievementDescriptions( delegate(GKAchievementDescription[] achievements, NSError error)
 				                                                    {
 																		if (achievements != null)
 																		{
 																			foreach(GKAchievementDescription a in achievements)
 																			{
-																				gamerAchievements.Add(new Achievement(){Name = a.Title, Key= a.Identifier});
+																				gamerAchievements.Add(new Achievement(){Name = a.Title, Key= a.Identifier, Description = a.AchievedDescription, HowToEarn = a.UnachievedDescription, DisplayBeforeEarned = !a.Hidden});
 																			}
 																		}
 																	});
+				
+				GKAchievement.LoadAchievements( delegate(GKAchievement[] achievements, NSError error)
+				                               	{
+													if (achievements != null)
+													{
+														foreach(GKAchievement a in achievements)
+														{
+															foreach(Achievement ac in gamerAchievements)
+															{
+																if ( ac.Key == a.Identifier )
+																{
+																	ac.IsEarned = a.Completed;
+																	ac.EarnedDateTime = a.LastReportedDate;
+																}
+															}															
+														}
+													}
+												} );
 			}
 			return gamerAchievements;
 		}
