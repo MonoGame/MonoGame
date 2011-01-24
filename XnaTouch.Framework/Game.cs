@@ -91,13 +91,61 @@ namespace XnaTouch.Framework
 
 			//Create a full-screen window
 			_mainWindow = new UIWindow (UIScreen.MainScreen.Bounds);			
-			_view = new GameWindow ();
+			_view = new GameWindow();
 			_view.game = this;			
-			_mainWindow.Add (_view);	
+			_mainWindow.Add(_view);	
+			
+			// Listen out for rotation changes
+			ObserveDeviceRotation();
 					
 			// Initialize GameTime
             _updateGameTime = new GameTime();
             _drawGameTime = new GameTime();  	
+		}
+		
+		~Game()
+		{
+			UIDevice.CurrentDevice.EndGeneratingDeviceOrientationNotifications(); 
+		}
+		
+		private void ObserveDeviceRotation ()
+		{
+			NSNotificationCenter.DefaultCenter.AddObserver( new NSString("UIDeviceOrientationDidChangeNotification"), (notification) => { 
+				UIDeviceOrientation orientation = UIDevice.CurrentDevice.Orientation;
+				
+				switch (orientation)
+				{
+					case UIDeviceOrientation.Portrait :
+						_view.CurrentOrientation = DisplayOrientation.Portrait;
+						GraphicsDevice.PresentationParameters.DisplayOrientation = DisplayOrientation.Portrait;
+						break;
+					case UIDeviceOrientation.LandscapeLeft :
+						_view.CurrentOrientation = DisplayOrientation.LandscapeLeft;
+						GraphicsDevice.PresentationParameters.DisplayOrientation = DisplayOrientation.LandscapeLeft;
+						break;
+					case UIDeviceOrientation.LandscapeRight :
+						_view.CurrentOrientation = DisplayOrientation.LandscapeRight;
+						GraphicsDevice.PresentationParameters.DisplayOrientation = DisplayOrientation.LandscapeRight;
+						break;
+					case UIDeviceOrientation.FaceDown :
+						_view.CurrentOrientation = DisplayOrientation.FaceDown;
+						break;
+					case UIDeviceOrientation.FaceUp :
+						_view.CurrentOrientation = DisplayOrientation.FaceUp;
+						break;
+					case UIDeviceOrientation.PortraitUpsideDown :
+						_view.CurrentOrientation = DisplayOrientation.PortraitUpsideDown;
+						break;
+					case UIDeviceOrientation.Unknown :
+						_view.CurrentOrientation = DisplayOrientation.Unknown;
+						break;
+					default:
+						_view.CurrentOrientation = DisplayOrientation.Default;
+						break;
+				}					  
+			});
+			
+			UIDevice.CurrentDevice.BeginGeneratingDeviceOrientationNotifications();
 		}
 		
 		public void Dispose ()

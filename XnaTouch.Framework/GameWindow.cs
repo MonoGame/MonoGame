@@ -85,52 +85,15 @@ namespace XnaTouch.Framework
 			
 			// Enable multi-touch
 			MultipleTouchEnabled = true;
-			
-			// Listen out for rotation changes
-			NSNotificationCenter.DefaultCenter.AddObserver( new NSString("UIDeviceOrientationDidChangeNotification"), (notification) => { 
-				UIDeviceOrientation orientation = UIDevice.CurrentDevice.Orientation;
-				
-				switch (orientation)
-				{
-					case UIDeviceOrientation.Portrait :
-						CurrentOrientation = DisplayOrientation.Portrait;
-						break;
-					case UIDeviceOrientation.LandscapeLeft :
-						CurrentOrientation = DisplayOrientation.LandscapeLeft;
-						break;
-					case UIDeviceOrientation.LandscapeRight :
-						CurrentOrientation = DisplayOrientation.LandscapeRight;
-						break;
-					case UIDeviceOrientation.FaceDown :
-						CurrentOrientation = DisplayOrientation.FaceDown;
-						break;
-					case UIDeviceOrientation.FaceUp :
-						CurrentOrientation = DisplayOrientation.FaceUp;
-						break;
-					case UIDeviceOrientation.PortraitUpsideDown :
-						CurrentOrientation = DisplayOrientation.PortraitUpsideDown;
-						break;
-					case UIDeviceOrientation.Unknown :
-						CurrentOrientation = DisplayOrientation.Unknown;
-						break;
-					default:
-						CurrentOrientation = DisplayOrientation.Default;
-						break;
-				}					  
-			});
-			
-			UIDevice.CurrentDevice.BeginGeneratingDeviceOrientationNotifications();
-			
+						
 			// Initialize GameTime
             _updateGameTime = new GameTime();
             _drawGameTime = new GameTime();  	
-			
-			
 		}
 		
 		~GameWindow()
 		{
-			UIDevice.CurrentDevice.EndGeneratingDeviceOrientationNotifications(); 
+			//
 		}
 		
 		[Export ("layerClass")]
@@ -354,7 +317,7 @@ namespace XnaTouch.Framework
 		public DisplayOrientation CurrentOrientation 
 		{ 
 			get;
-			protected set;
+			set;
 		}
 
 		
