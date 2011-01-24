@@ -7,6 +7,7 @@ using XnaTouch.Framework.Graphics;
 using XnaTouch.Framework.Input;
 using XnaTouch.Framework.Storage;
 using XnaTouch.Framework.Media;
+using XnaTouch.Framework.Input.Touch;
 #else
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using XnaTouch.Framework;
 using XnaTouch.Framework.Graphics;
 using XnaTouch.Framework.Input;
+using XnaTouch.Framework.Input.Touch;
 
 namespace XnaTouch.Samples.MultiTouch
 {
@@ -106,11 +107,11 @@ namespace XnaTouch.Samples.MultiTouch
                 graphics.GraphicsDevice.Clear(Color.Black);
             }
 
-            spriteBatch.Begin(SpriteBlendMode.AlphaBlend);
+            spriteBatch.Begin(SpriteSortMode.Deferred,SpriteBlendMode.AlphaBlend);
 
 			foreach (TouchLocation t in touchStateCollection)
             {
-                TouchLocation PrevLocation = new TouchLocation();
+				TouchLocation PrevLocation = new TouchLocation();
                 if (t.TryGetPreviousLocation(out PrevLocation))
                 {
                     if (!LineColors.ContainsKey(t.Id))

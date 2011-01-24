@@ -347,7 +347,7 @@ namespace RockRainIphone.Core
         {
             // tell sprite batch to begin, using the spriteBlendMode specified in
             // initializeConstants
-            spriteBatch.Begin(spriteBlendMode);
+            spriteBatch.Begin(SpriteSortMode.Deferred, spriteBlendMode);
             
             foreach (Particle p in particles)
             {

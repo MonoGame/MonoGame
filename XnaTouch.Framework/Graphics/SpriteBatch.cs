@@ -44,7 +44,14 @@ namespace XnaTouch.Framework.Graphics
 			_matrix = Matrix.Identity;
 		}
 		
-		public void Begin(SpriteBlendMode blendMode, SpriteSortMode sortMode, SaveStateMode stateMode)
+		public void Begin(SpriteSortMode sortMode, SpriteBlendMode blendMode)
+		{
+			_sortMode = sortMode;
+			_blendMode = blendMode;
+			_matrix = Matrix.Identity;
+		}
+		
+		public void Begin(SpriteSortMode sortMode, SpriteBlendMode blendMode,  SaveStateMode stateMode)
 		{
 			_blendMode = blendMode;
 			_sortMode = sortMode;
@@ -52,7 +59,7 @@ namespace XnaTouch.Framework.Graphics
 			_matrix = Matrix.Identity;
 		}
 		
-		public void Begin(SpriteBlendMode blendMode, SpriteSortMode sortMode, SaveStateMode stateMode, Matrix transformMatrix)
+		public void Begin(SpriteSortMode sortMode, SpriteBlendMode blendMode, SaveStateMode stateMode, Matrix transformMatrix)
 		{
 			_blendMode = blendMode;
 			_sortMode = sortMode;

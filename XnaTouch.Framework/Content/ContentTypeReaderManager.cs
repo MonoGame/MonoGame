@@ -73,7 +73,7 @@ namespace XnaTouch.Framework.Content
             reader.Read(headerBuffer, 0, 4);
             string headerString = Encoding.UTF8.GetString(headerBuffer, 0, 4);
             if (string.Compare(headerString, "XNBw", StringComparison.InvariantCultureIgnoreCase) != 0)
-                throw new ContentLoadException("Asset does not appear to be a valid XNB file.  Did you process your content for Windows Live not XBOX?");
+                throw new ContentLoadException("Asset does not appear to be a valid XNB file.  Did you process your content for Windows?");
 
             // I think these two bytes are some kind of version number. Either for the XNB file or the type readers
             byte version = reader.ReadByte();

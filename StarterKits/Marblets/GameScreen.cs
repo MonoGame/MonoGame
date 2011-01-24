@@ -13,6 +13,7 @@ using System;
 using XnaTouch.Framework;
 using XnaTouch.Framework.Graphics;
 using XnaTouch.Framework.Input;
+using XnaTouch.Framework.Input.Touch;
 #else
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -79,7 +80,7 @@ namespace Marblets
         {
             base.Draw(gameTime);
 
-            SpriteBatch.Begin(SpriteBlendMode.AlphaBlend, SpriteSortMode.Deferred,
+            SpriteBatch.Begin(SpriteSortMode.Deferred,SpriteBlendMode.AlphaBlend, 
                               SaveStateMode.None);
 
             board.Draw(SpriteBatch);

@@ -33,6 +33,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Marblets", "StarterKits\Mar
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlatformeriPhone", "StarterKits\Platformer\PlatformeriPhone.csproj", "{9964D44C-AD60-497E-8ED3-1DE22F53CEED}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MemoryMadness", "StarterKits\MemoryMadness\MemoryMadness.csproj", "{296EBAC0-9658-474D-9A9E-5A8F52BA316F}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XnaTouch.Framework", "XnaTouch.Framework\XnaTouch.Framework.csproj", "{DB8508BB-9849-4CC2-BC0F-8EB5DACB3C47}"
 EndProject
 Global
@@ -51,6 +53,14 @@ Global
 		{21E42CAF-11B3-4A25-A771-189A61732F94}.Release|iPhone.Build.0 = Release|iPhone
 		{21E42CAF-11B3-4A25-A771-189A61732F94}.Release|iPhoneSimulator.ActiveCfg = Release|iPhoneSimulator
 		{21E42CAF-11B3-4A25-A771-189A61732F94}.Release|iPhoneSimulator.Build.0 = Release|iPhoneSimulator
+		{296EBAC0-9658-474D-9A9E-5A8F52BA316F}.Debug|iPhone.ActiveCfg = Debug|iPhone
+		{296EBAC0-9658-474D-9A9E-5A8F52BA316F}.Debug|iPhone.Build.0 = Debug|iPhone
+		{296EBAC0-9658-474D-9A9E-5A8F52BA316F}.Debug|iPhoneSimulator.ActiveCfg = Debug|iPhoneSimulator
+		{296EBAC0-9658-474D-9A9E-5A8F52BA316F}.Debug|iPhoneSimulator.Build.0 = Debug|iPhoneSimulator
+		{296EBAC0-9658-474D-9A9E-5A8F52BA316F}.Release|iPhone.ActiveCfg = Release|iPhone
+		{296EBAC0-9658-474D-9A9E-5A8F52BA316F}.Release|iPhone.Build.0 = Release|iPhone
+		{296EBAC0-9658-474D-9A9E-5A8F52BA316F}.Release|iPhoneSimulator.ActiveCfg = Release|iPhoneSimulator
+		{296EBAC0-9658-474D-9A9E-5A8F52BA316F}.Release|iPhoneSimulator.Build.0 = Release|iPhoneSimulator
 		{326DC8E8-649F-4F96-92BA-EE0EF51A32DB}.Debug|iPhone.ActiveCfg = Debug|iPhone
 		{326DC8E8-649F-4F96-92BA-EE0EF51A32DB}.Debug|iPhone.Build.0 = Debug|iPhone
 		{326DC8E8-649F-4F96-92BA-EE0EF51A32DB}.Debug|iPhoneSimulator.ActiveCfg = Debug|iPhoneSimulator
@@ -179,8 +189,9 @@ Global
 		{A18E0228-936A-45CD-91CC-07E01F45677E} = {ED13CD83-F288-496C-B046-027FA7D36717}
 		{A3BDF086-7EAA-486F-A90F-78938B7F0A69} = {ED13CD83-F288-496C-B046-027FA7D36717}
 		{9964D44C-AD60-497E-8ED3-1DE22F53CEED} = {ED13CD83-F288-496C-B046-027FA7D36717}
+		{296EBAC0-9658-474D-9A9E-5A8F52BA316F} = {ED13CD83-F288-496C-B046-027FA7D36717}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = Samples\Video\XnaTouch.Samples.Video.csproj
+		StartupItem = Samples\MultiTouch\XnaTouch.Samples.MultiTouch.csproj
 	EndGlobalSection
 EndGlobal
