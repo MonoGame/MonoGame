@@ -107,6 +107,9 @@ namespace XnaTouch.Framework.Content
 				assetName = _rootDirectory+Path.DirectorySeparatorChar+assetName;
 			}
 			
+			// Check for windows-style directory separator character
+			assetName = assetName.Replace('\\',Path.DirectorySeparatorChar);
+			
 			// Get the real file name
 			if ((typeof(T) == typeof(Texture2D))) 
 			{				
@@ -171,7 +174,8 @@ namespace XnaTouch.Framework.Content
 				
 				// Get the 1-based index of the typereader we should use to start decoding with
           		int index = reader.ReadByte();
-           		result = reader.ReadObject<T>(reader.TypeReaders[index - 1]);
+				ContentTypeReader contentReader = reader.TypeReaders[index - 1];
+           		result = reader.ReadObject<T>(contentReader);
 
 				reader.Close();
 				stream.Close();

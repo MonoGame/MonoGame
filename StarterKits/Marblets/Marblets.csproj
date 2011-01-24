@@ -59,6 +59,7 @@
     <MtouchDebug>False</MtouchDebug>
     <DefineConstants>IPHONE</DefineConstants>
     <MtouchI18n />
+    <CodesignKey>iPhone Developer</CodesignKey>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />

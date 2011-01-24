@@ -13,6 +13,7 @@ using System;
 using XnaTouch.Framework;
 using XnaTouch.Framework.Graphics;
 using XnaTouch.Framework.Input;
+using XnaTouch.Framework.Input.Touch;
 #else
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -106,7 +107,7 @@ namespace Marblets
             //will be null
             if (MarbletsGame.HighScores != null)
             {
-                SpriteBatch.Begin(SpriteBlendMode.AlphaBlend);
+                SpriteBatch.Begin(SpriteSortMode.Deferred,SpriteBlendMode.AlphaBlend);
 
                 int xPosition = 0;
                 int yPosition = 0;

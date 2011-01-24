@@ -20,6 +20,7 @@ using XnaTouch.Framework.Input;
 using XnaTouch.Framework.Storage;
 using XnaTouch.Framework.Content;
 using XnaTouch.Framework.GamerServices;
+using XnaTouch.Framework.Input.Touch;
 #else
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
