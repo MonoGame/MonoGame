@@ -32,23 +32,20 @@ namespace XnaTouch.Framework.Graphics
     public struct Color : IEquatable<Color>
     {
 		// ARGB
-        private uint packedValue;
-		[NonSerialized]
-		private uint glPackedValue;
+        private uint _packedValue;
 		
         private Color(uint packedValue)
         {
-            this.packedValue = packedValue;
+            _packedValue = packedValue;
 			// ARGB
-			// ABGR
-			//this.glPackedValue = (packedValue << 8) | ((packedValue & 0xff000000) >> 24);
-			this.glPackedValue = (packedValue & 0xff00ff00) | ((packedValue & 0x000000ff) << 16) | ((packedValue & 0x00ff0000) >> 16);
+			//_packedValue = (packedValue << 8) | ((packedValue & 0xff000000) >> 24);
+			// ABGR			
+			//_packedValue = (packedValue & 0xff00ff00) | ((packedValue & 0x000000ff) << 16) | ((packedValue & 0x00ff0000) >> 16);
         }
 
         public Color(Vector4 color)
         {
-            packedValue = 0;
-			glPackedValue = 0;
+            _packedValue = 0;
 			
 			R = Convert.ToByte(color.X);
             G = Convert.ToByte(color.Y);
@@ -58,8 +55,7 @@ namespace XnaTouch.Framework.Graphics
 
         public Color(Vector3 color)
         {
-            packedValue = 0;
-			glPackedValue = 0;
+            _packedValue = 0;
 
             R = Convert.ToByte(color.X);
             G = Convert.ToByte(color.Y);
@@ -69,8 +65,7 @@ namespace XnaTouch.Framework.Graphics
 
         public Color(Color color, byte alpha)
         {
-            packedValue = 0;
-			glPackedValue = 0;
+            _packedValue = 0;
 
             R = color.R;
             G = color.G;
@@ -80,8 +75,7 @@ namespace XnaTouch.Framework.Graphics
 
         public Color(Color color, float alpha)
         {
-            packedValue = 0;
-			glPackedValue = 0;
+            _packedValue = 0;
 
             R = color.R;
             G = color.G;
@@ -91,8 +85,7 @@ namespace XnaTouch.Framework.Graphics
 
         public Color(float r, float g, float b)
         {
-            packedValue = 0;
-			glPackedValue = 0;
+            _packedValue = 0;
 			
             R = Convert.ToByte(r * 255);
             G = Convert.ToByte(g * 255);
@@ -102,8 +95,7 @@ namespace XnaTouch.Framework.Graphics
 
         public Color(byte r, byte g, byte b)
         {
-            packedValue = 0;
-			glPackedValue = 0;
+            _packedValue = 0;
             R = r;
             G = g;
             B = b;
@@ -113,8 +105,7 @@ namespace XnaTouch.Framework.Graphics
 
         public Color(byte r, byte g, byte b, byte alpha)
         {
-            packedValue = 0;
-			glPackedValue = 0;
+            _packedValue = 0;
             R = r;
             G = g;
             B = b;
@@ -123,8 +114,7 @@ namespace XnaTouch.Framework.Graphics
 
         public Color(float r, float g, float b, float alpha)
         {
-            packedValue = 0;
-			glPackedValue = 0;
+            _packedValue = 0;
 			
             R = Convert.ToByte(r * 255);
             G = Convert.ToByte(g * 255);
@@ -136,13 +126,11 @@ namespace XnaTouch.Framework.Graphics
         {
             get
             {
-                return (byte)this.packedValue;
+                return (byte)this._packedValue;
             }
             set
             {
-                this.packedValue = (this.packedValue & 0xffffff00) | value;
-				//this.glPackedValue = (this.glPackedValue & 0xffff00ff) | ((uint)value << 8);
-				//this.glPackedValue = (this.glPackedValue & 0xff00ffff) | ((uint)value << 16);
+                this._packedValue = (this._packedValue & 0xffffff00) | value;
             }
         }
 
@@ -150,43 +138,39 @@ namespace XnaTouch.Framework.Graphics
         {
             get
             {
-                return (byte)(this.packedValue >> 8);
+                return (byte)(this._packedValue >> 8);
             }
             set
             {
-                this.packedValue = (this.packedValue & 0xffff00ff) | ((uint)(value << 8));
-				//this.glPackedValue = (this.glPackedValue & 0xff00ffff) | ((uint)(value << 16));
-				//this.glPackedValue = (this.glPackedValue & 0xffff00ff) | ((uint)(value << 8));
+                this._packedValue = (this._packedValue & 0xffff00ff) | ((uint)(value << 8));
             }
         }
         public byte R
         {
             get
             {
-                return (byte)(this.packedValue >> 16);
+                return (byte)(this._packedValue >> 16);
             }
             set
             {
-                this.packedValue = (this.packedValue & 0xff00ffff) | ((uint)(value << 16 ));
-				//this.glPackedValue = (this.glPackedValue & 0xffffff00) | ((uint)(value));
+                this._packedValue = (this._packedValue & 0xff00ffff) | ((uint)(value << 16 ));
             }
         }
         public byte A
         {
             get
             {
-                return (byte)(this.packedValue >> 24);
+                return (byte)(this._packedValue >> 24);
             }
             set
             {
-                this.packedValue = (this.packedValue & 0x00ffffff) | ((uint)(value << 24));
-				//this.glPackedValue = (this.glPackedValue & 0x00ffffff) | ((uint)(value << 24));
+                this._packedValue = (this._packedValue & 0x00ffffff) | ((uint)(value << 24));
             }
         }
 		
 		public uint GLPackedValue
 		{
-			get { return (packedValue & 0xff00ff00) | ((packedValue & 0x000000ff) << 16) | ((packedValue & 0x00ff0000) >> 16); }  
+			get { return (_packedValue & 0xff00ff00) | ((_packedValue & 0x000000ff) << 16) | ((_packedValue & 0x00ff0000) >> 16); }  
 		}
 		
 		
@@ -205,7 +189,7 @@ namespace XnaTouch.Framework.Graphics
 
         public override int GetHashCode()
         {
-            return this.packedValue.GetHashCode();
+            return this._packedValue.GetHashCode();
         }
 
         public override bool Equals(object obj)
@@ -1259,8 +1243,8 @@ namespace XnaTouch.Framework.Graphics
 
         public UInt32 PackedValue
         {
-            get { return packedValue; }
-            set { packedValue = value; }
+            get { return _packedValue; }
+            set { _packedValue = value; }
         }
 		
 		public override string ToString ()

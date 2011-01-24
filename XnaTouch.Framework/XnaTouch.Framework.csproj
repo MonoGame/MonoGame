@@ -182,11 +182,6 @@
     <Compile Include="Media\Video.cs" />
     <Compile Include="Media\VideoPlayer.cs" />
     <Compile Include="GameComponentCollectionEventArgs.cs" />
-    <Compile Include="Input\TouchCollection.cs" />
-    <Compile Include="Input\TouchLocation.cs" />
-    <Compile Include="Input\TouchLocationState.cs" />
-    <Compile Include="Input\TouchPanel.cs" />
-    <Compile Include="Input\TouchPanelCapabilities.cs" />
     <Compile Include="GamerServices\GamerCollection.cs" />
     <Compile Include="GamerServices\Guide.cs" />
     <Compile Include="Net\AvailableNetworkSession.cs" />
@@ -264,6 +259,20 @@
     <Compile Include="Graphics\GraphicsProfile.cs" />
     <Compile Include="PreparingDeviceSettingsEventArgs.cs" />
     <Compile Include="GraphicsDeviceInformation.cs" />
+    <Compile Include="Input\Touch\GestureSample.cs" />
+    <Compile Include="Input\Touch\GestureType.cs" />
+    <Compile Include="Input\Touch\TouchCollection.cs" />
+    <Compile Include="Input\Touch\TouchLocation.cs" />
+    <Compile Include="Input\Touch\TouchLocationState.cs" />
+    <Compile Include="Input\Touch\TouchPanel.cs" />
+    <Compile Include="Input\Touch\TouchPanelCapabilities.cs" />
+    <Compile Include="Ray.cs" />
+    <Compile Include="Plane.cs" />
+    <Compile Include="PlaneIntersectionType.cs" />
+    <Compile Include="BoundingFrustum.cs" />
+    <Compile Include="BoundingSphere.cs" />
+    <Compile Include="ContainmentType.cs" />
+    <Compile Include="BoundingBox.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>

@@ -56,6 +56,7 @@ using OpenTK.Graphics.ES11;
 using OpenTK.Graphics.ES20;
 
 using XnaTouch.Framework.Input;
+using XnaTouch.Framework.Input.Touch;
 #endregion Using Statements
 
 namespace XnaTouch.Framework
@@ -211,7 +212,7 @@ namespace XnaTouch.Framework
 		{
 			UITouch []touchesArray = touches.ToArray<UITouch>();
 			
-			TouchPanel.Collection = new TouchCollection();
+			TouchPanel.Collection.Clear();
 			TouchPanel.Collection.Capacity = touchesArray.Length;
 			
 			for (int i=0; i<touchesArray.Length;i++)
