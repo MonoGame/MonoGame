@@ -260,6 +260,10 @@
     <Compile Include="Graphics\VertexColorTexture.cs" />
     <Compile Include="Graphics\SpriteBatchItem.cs" />
     <Compile Include="Graphics\VertexPosition2ColorTexture.cs" />
+    <Compile Include="Graphics\GraphicsDeviceInformation.cs" />
+    <Compile Include="Graphics\GraphicsProfile.cs" />
+    <Compile Include="PreparingDeviceSettingsEventArgs.cs" />
+    <Compile Include="GraphicsDeviceInformation.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
