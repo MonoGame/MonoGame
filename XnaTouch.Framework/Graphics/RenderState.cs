@@ -86,6 +86,11 @@ namespace XnaTouch.Framework
 			set; 
 		}
 		
+		public bool ScissorTestEnable 
+		{ 
+			get; set; 
+		}
+		
 		BlendFunction alphaBlendOperation;
 		public BlendFunction AlphaBlendOperation 
 		{ 

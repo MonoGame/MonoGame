@@ -40,6 +40,8 @@ purpose and non-infringement.
 
 using System;
 
+using MonoTouch.UIKit;
+
 namespace XnaTouch.Framework.Graphics
 {
     public class PresentationParameters : IDisposable
@@ -60,7 +62,7 @@ namespace XnaTouch.Framework.Graphics
         private IntPtr deviceWindowHandle;
         private bool enableAutoDepthStencil;
         private int fullScreenRefreshRateInHz;
-        private bool isFullScreen;
+        // private bool isFullScreen;
         private int multiSampleQuality;
         private MultiSampleType multiSampleType;
         private SwapEffect swapEffect;
@@ -137,8 +139,14 @@ namespace XnaTouch.Framework.Graphics
 
         public bool IsFullScreen
         {
-            get { return isFullScreen; }
-            set { isFullScreen = value; }
+			get
+            {
+				 return UIApplication.SharedApplication.StatusBarHidden;
+            }
+            set
+            {
+				UIApplication.SharedApplication.StatusBarHidden = value;				
+            }
         }
 
         public int MultiSampleQuality
@@ -158,6 +166,14 @@ namespace XnaTouch.Framework.Graphics
             get { return swapEffect; }
             set { swapEffect = value; }
         }
+		
+		public DisplayOrientation DisplayOrientation 
+		{ 
+			get; 
+			set; 
+		}
+		
+		public RenderTargetUsage RenderTargetUsage { get; set; }
 
         #endregion Properties
 
@@ -169,15 +185,16 @@ namespace XnaTouch.Framework.Graphics
             autoDepthStencilFormat = DepthFormat.Unknown;
             backBufferCount = 0;
             backBufferFormat = SurfaceFormat.Unknown;
-            backBufferHeight = 600;
-            backBufferWidth = 800;
+			backBufferWidth = 320;
+            backBufferHeight = 480;            
             deviceWindowHandle = IntPtr.Zero;
             enableAutoDepthStencil = false;
             fullScreenRefreshRateInHz = 0;
-            isFullScreen = false;
+            // isFullScreen = false;
             multiSampleQuality = 0;
             multiSampleType = MultiSampleType.None;
             swapEffect = SwapEffect.Default;
+			this.DisplayOrientation = DisplayOrientation.Default;
         }
 
         public PresentationParameters Clone()
@@ -192,7 +209,7 @@ namespace XnaTouch.Framework.Graphics
             clone.disposed = this.disposed;
             clone.enableAutoDepthStencil = this.enableAutoDepthStencil;
             clone.fullScreenRefreshRateInHz = this.fullScreenRefreshRateInHz;
-            clone.isFullScreen = this.isFullScreen;
+            clone.IsFullScreen = this.IsFullScreen;
             clone.multiSampleQuality = this.multiSampleQuality;
             clone.multiSampleType = this.multiSampleType;
             clone.swapEffect = this.swapEffect;
