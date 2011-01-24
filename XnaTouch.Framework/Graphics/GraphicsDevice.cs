@@ -198,10 +198,8 @@ namespace XnaTouch.Framework.Graphics
 
         public XnaTouch.Framework.Graphics.PresentationParameters PresentationParameters
         {
-            get
-            {
-                throw new NotImplementedException();
-            }
+            get;
+			set;
         }
 
         public XnaTouch.Framework.Graphics.Viewport Viewport
@@ -214,7 +212,13 @@ namespace XnaTouch.Framework.Graphics
 			{
 				_viewport = value;
 			}
-		}		
+		}	
+		
+		public XnaTouch.Framework.Graphics.GraphicsProfile GraphicsProfile 
+		{ 
+			get; 
+			set;
+		}
 				
 		internal void StartSpriteBatch(SpriteBlendMode blendMode, SpriteSortMode sortMode)
 		{
@@ -288,6 +292,12 @@ namespace XnaTouch.Framework.Graphics
 		}
 		
 		public VertexDeclaration VertexDeclaration 
+		{ 
+			get; 
+			set; 
+		}
+		
+		public Rectangle ScissorRectangle 
 		{ 
 			get; 
 			set; 

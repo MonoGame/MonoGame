@@ -17,6 +17,14 @@ namespace XnaTouch.Framework.Graphics
 		Matrix _matrix;
 		GraphicsDevice _graphicsDevice;
 		
+		public GraphicsDevice GraphicsDevice 
+		{ 
+			get 
+			{
+				return _graphicsDevice;
+			}
+		}
+		
 		public SpriteBatch ( GraphicsDevice graphicsDevice )
 		{
 			if (graphicsDevice == null )
@@ -76,8 +84,32 @@ namespace XnaTouch.Framework.Graphics
 			
 			// set camera
 			GL.MatrixMode(All.Projection);
-			GL.LoadIdentity();			
-			GL.Ortho(0, _graphicsDevice.Viewport.Width, _graphicsDevice.Viewport.Height, 0, -1, 1);
+			GL.LoadIdentity();		
+			
+			// Switch on the flags.
+	        switch (_graphicsDevice.PresentationParameters.DisplayOrientation)
+	        {
+				case DisplayOrientation.LandscapeLeft:
+                {
+					GL.Rotate(-90, 0, 0, 1); 
+					GL.Ortho(0, _graphicsDevice.Viewport.Height, _graphicsDevice.Viewport.Width,  0, -1, 1);
+					break;
+				}
+				
+				case DisplayOrientation.LandscapeRight:
+                {
+					GL.Rotate(90, 0, 0, 1); 
+					GL.Ortho(0, _graphicsDevice.Viewport.Height, _graphicsDevice.Viewport.Width,  0, -1, 1);
+					break;
+				}
+				
+				default:
+				{
+					GL.Ortho(0, _graphicsDevice.Viewport.Width, _graphicsDevice.Viewport.Height, 0, -1, 1);
+					break;
+				}
+			}
+			
 			GL.MatrixMode(All.Modelview);
 			GL.LoadMatrix( ref _matrix.M11 );
 			GL.Viewport (0, 0, _graphicsDevice.Viewport.Width, _graphicsDevice.Viewport.Height);

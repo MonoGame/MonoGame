@@ -59,9 +59,6 @@ namespace XnaTouch.Framework
             {
                 throw new ArgumentNullException("Game Cannot Be Null");
             }
-			
-			// Set "full screen"  as default
-			UIApplication.SharedApplication.StatusBarHidden = true;
             
 			_game = game;
 			_preferredBackBufferHeight = game.Window.ClientBounds.Height;
@@ -102,6 +99,8 @@ namespace XnaTouch.Framework
         public event EventHandler DeviceReset;
 
         public event EventHandler DeviceResetting;
+		
+		public event EventHandler<PreparingDeviceSettingsEventArgs> PreparingDeviceSettings;
 
         #endregion
 
@@ -120,6 +119,10 @@ namespace XnaTouch.Framework
 		private void Initialize()
 		{
 			_graphicsDevice = new GraphicsDevice();
+			_graphicsDevice.PresentationParameters = new PresentationParameters();
+			
+			// Set "full screen"  as default
+			_graphicsDevice.PresentationParameters.IsFullScreen = true;
 
 			if (_preferMultiSampling) 
 			{
@@ -148,11 +151,11 @@ namespace XnaTouch.Framework
         {
             get
             {
-				 return UIApplication.SharedApplication.StatusBarHidden;
+				 return _graphicsDevice.PresentationParameters.IsFullScreen;
             }
             set
             {
-				UIApplication.SharedApplication.StatusBarHidden = value;				
+				_graphicsDevice.PresentationParameters.IsFullScreen = value;				
             }
         }
 
@@ -195,8 +198,7 @@ namespace XnaTouch.Framework
             }
             set
             {
-				// throw new NotSupportedException(); 
-				// Don't throw exception, just don't set it in this case.
+				_preferredBackBufferHeight = value;
             }
         }
 
@@ -208,8 +210,7 @@ namespace XnaTouch.Framework
             }
             set
             {
-				// throw new NotSupportedException(); 
-				// Don't throw exception, just don't set it in this case as it
+				_preferredBackBufferWidth = value;				
             }
         }
 

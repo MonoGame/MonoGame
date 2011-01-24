@@ -42,6 +42,7 @@ using System;
 
 namespace XnaTouch.Framework
 {
+	[FlagsAttribute]
 	public enum DisplayOrientation
 	{
 		Default,
