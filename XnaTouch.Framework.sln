@@ -192,6 +192,6 @@ Global
 		{296EBAC0-9658-474D-9A9E-5A8F52BA316F} = {ED13CD83-F288-496C-B046-027FA7D36717}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = Samples\MultiTouch\XnaTouch.Samples.MultiTouch.csproj
+		StartupItem = StarterKits\Platformer\PlatformeriPhone.csproj
 	EndGlobalSection
 EndGlobal

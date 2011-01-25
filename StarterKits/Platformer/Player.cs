@@ -5,6 +5,7 @@ using XnaTouch.Framework;
 using XnaTouch.Framework.Audio;
 using XnaTouch.Framework.Graphics;
 using XnaTouch.Framework.Input;
+using XnaTouch.Framework.Input.Touch;
 #else
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
