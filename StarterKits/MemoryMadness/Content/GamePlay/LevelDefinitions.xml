@@ -1,0 +1,105 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Levels>
+  <Level Number="1">
+    <Pattern Id="1">Red</Pattern>
+  </Level>
+  <Level Number="2">
+    <Pattern Id="1">Red</Pattern>
+    <Pattern Id="2">Green</Pattern>
+  </Level>
+  <Level Number="3">
+    <Pattern Id="1">Red</Pattern>
+    <Pattern Id="2">Green</Pattern>
+    <Pattern Id="3">Yellow</Pattern>
+  </Level>
+  <Level Number="4">
+    <Pattern Id="1">Red</Pattern>
+    <Pattern Id="2">Green</Pattern>
+    <Pattern Id="3">Yellow</Pattern>
+    <Pattern Id="4">Blue</Pattern>
+  </Level>
+  <Level Number="5">
+    <Pattern Id="1">Red</Pattern>
+    <Pattern Id="2">Green</Pattern>
+    <Pattern Id="3">Yellow</Pattern>
+    <Pattern Id="4">Blue</Pattern>
+    <Pattern Id="5">Green</Pattern>
+  </Level>
+  <Level Number="6">
+    <Pattern Id="1">Red</Pattern>
+    <Pattern Id="2">Green</Pattern>
+    <Pattern Id="3">Yellow</Pattern>
+    <Pattern Id="4">Blue</Pattern>
+    <Pattern Id="5">Green</Pattern>
+    <Pattern Id="6">Yellow</Pattern>
+  </Level>
+  <Level Number="7">
+    <Pattern Id="1">Red</Pattern>
+    <Pattern Id="2">Green</Pattern>
+    <Pattern Id="3">Yellow</Pattern>
+    <Pattern Id="4">Blue</Pattern>
+    <Pattern Id="5">Green</Pattern>
+    <Pattern Id="6">Yellow</Pattern>
+    <Pattern Id="7">Red</Pattern>
+  </Level>
+  <Level Number="8">
+    <Pattern Id="1">Red</Pattern>
+    <Pattern Id="2">Green</Pattern>
+    <Pattern Id="3">Yellow</Pattern>
+    <Pattern Id="4">Blue</Pattern>
+    <Pattern Id="5">Green</Pattern>
+    <Pattern Id="6">Yellow</Pattern>
+    <Pattern Id="7">Red</Pattern>
+    <Pattern Id="8">Blue</Pattern>
+  </Level>
+  <Level Number="9">
+    <Pattern Id="1">Red</Pattern>
+    <Pattern Id="2">Green</Pattern>
+    <Pattern Id="3">Yellow</Pattern>
+    <Pattern Id="4">Blue</Pattern>
+    <Pattern Id="5">Green</Pattern>
+    <Pattern Id="6">Yellow</Pattern>
+    <Pattern Id="7">Red</Pattern>
+    <Pattern Id="8">Blue</Pattern>
+    <Pattern Id="9">Yellow</Pattern>
+  </Level>
+  <Level Number="10">
+    <Pattern Id="1">Red</Pattern>
+    <Pattern Id="2">Green</Pattern>
+    <Pattern Id="3">Yellow</Pattern>
+    <Pattern Id="4">Blue</Pattern>
+    <Pattern Id="5">Green</Pattern>
+    <Pattern Id="6">Yellow</Pattern>
+    <Pattern Id="7">Red</Pattern>
+    <Pattern Id="8">Blue</Pattern>
+    <Pattern Id="9">Yellow</Pattern>
+    <Pattern Id="10">Green</Pattern>
+  </Level>
+
+  <!--<Level Number="1">
+        <Pattern Id="1">Red</Pattern>
+    </Level>
+    <Level Number="2">
+        <Pattern Id="1">Red</Pattern>
+        <Pattern Id="2">Red,Yellow</Pattern>
+    </Level>
+    <Level Number="3">
+        <Pattern Id="1">Red</Pattern>
+        <Pattern Id="2">Red,Yellow</Pattern>
+        <Pattern Id="3">Yellow,Green,Blue</Pattern>
+    </Level>
+    <Level Number="4">
+        <Pattern Id="1">Red</Pattern>
+        <Pattern Id="2">Red,Yellow</Pattern>
+        <Pattern Id="3">Yellow,Green,Blue</Pattern>
+        <Pattern Id="4">Green,Yellow</Pattern>
+    </Level>
+    <Level Number="5">
+        <Pattern Id="1">Red</Pattern>
+        <Pattern Id="2">Red,Yellow</Pattern>
+        <Pattern Id="3">Yellow,Green,Blue</Pattern>
+        <Pattern Id="4">Green,Yellow</Pattern>
+        <Pattern Id="5">Red,Green,Blue,Yellow</Pattern>
+    </Level>-->
+    
+</Levels>
