@@ -45,7 +45,7 @@ using System.Collections.Generic;
 using MonoTouch.UIKit;
 #endregion Using clause
 
-namespace XnaTouch.Framework.Input
+namespace XnaTouch.Framework.Input.Touch
 {	
 	public class TouchCollection : List<TouchLocation>
 	{
