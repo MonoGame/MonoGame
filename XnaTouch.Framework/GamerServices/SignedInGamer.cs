@@ -78,7 +78,7 @@ namespace XnaTouch.Framework.GamerServices
 		{
 			try 
 			{
-				if (UIDevice.CurrentDevice.SystemVersion == "4.1")
+				if ( float.Parse(UIDevice.CurrentDevice.SystemVersion.Substring(0,3)) > 4.1f)
 				{
 					
 					lp = GKLocalPlayer.LocalPlayer;
