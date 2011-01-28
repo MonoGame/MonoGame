@@ -47,25 +47,22 @@ namespace XnaTouch.Framework.Input.Touch
 {
     public static class TouchPanel
     {
-		private static TouchPanelCapabilities touchPanelCapabilities;
 		internal static TouchCollection Collection = new TouchCollection();
-		private static TouchCollection _state = new TouchCollection();
 		
         public static TouchPanelCapabilities GetCapabilities()
         {
-			// Go off and create an updated TouchPanelCapabilities with the latest state
-			touchPanelCapabilities = new TouchPanelCapabilities(false,true,8);
-            return touchPanelCapabilities;
+			// Go off and create an updated TouchPanelCapabilities with the latest state			
+            return new TouchPanelCapabilities(false,true,8);;
         }
 
         public static TouchCollection GetState()
         {
-			return _state;
+			return new TouchCollection(Collection);
         }
 		
 		internal static void Reset()
 		{
-			_state = new TouchCollection(Collection);
+			Collection.Clear();
 		}
 		
 		public static GestureSample ReadGesture()
