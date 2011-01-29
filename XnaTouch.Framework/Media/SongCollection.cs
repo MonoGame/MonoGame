@@ -1,4 +1,4 @@
- #region License
+// #region License
 // /*
 // Microsoft Public License (Ms-PL)
 // XnaTouch - Copyright © 2009 The XnaTouch Team
@@ -36,106 +36,109 @@
 // permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular
 // purpose and non-infringement.
 // */
-#endregion License 
-
+// #endregion License
+// 
 using System;
-using MonoTouch.MediaPlayer;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace XnaTouch.Framework.Media
 {
-	public sealed class MediaLibrary : IDisposable
-    {
-		private PlaylistCollection _playLists;
-
-        public MediaLibrary()
+	public class SongCollection : ICollection<Song>, IEnumerable<Song>, IEnumerable, IDisposable
+	{
+		private bool isReadOnly = false;
+		private List<Song> innerlist;
+		
+		public void Dispose()
         {
         }
-
-        public MediaLibrary(MediaSource mediaSource)
+		
+		public IEnumerator<Song> GetEnumerator()
         {
-	
+            return innerlist.GetEnumerator();
+        }
+		
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return innerlist.GetEnumerator();
         }
 
-        public void Dispose()
-        {
-        }
-
-/*        public AlbumCollection Albums
+        public int Count
         {
             get
             {
+				return innerlist.Count;
             }
         }
+		
+		public bool IsReadOnly
+        {
+            get { return this.isReadOnly; }
+        }
 
-        public ArtistCollection Artists
+        public Song this[int index]
         {
             get
             {
+				return this.innerlist[index];
             }
         }
-
-        public GenreCollection Genres
+		
+		public void Add(Song item)
         {
-            get
+            if (item == null)
+                throw new ArgumentNullException();
+
+            if (innerlist.Count == 0)
             {
+                this.innerlist.Add(item);
+                return;
             }
+
+            for (int i = 0; i < this.innerlist.Count; i++)
+            {
+                if (item.TrackNumber < this.innerlist[i].TrackNumber)
+                {
+                    this.innerlist.Insert(i, item);
+                    return;
+                }
+            }
+
+            this.innerlist.Add(item);
         }
-
-        public XnaTouch.Framework.Media.MediaSource MediaSource
+		
+		public void Clear()
         {
-            get
-            {
-            }
+            innerlist.Clear();
         }
-
-        public PictureCollection Pictures
+        
+        public SongCollection Clone()
         {
-            get
-            {
-            }
-        }*/
-
-        public PlaylistCollection Playlists
-        {
-            get
-            {				
-				if (_playLists == null)
-				{
-					_playLists = new PlaylistCollection();
-					
-					MPMediaQuery playlists = new MPMediaQuery();
-					playlists.GroupingType = MPMediaGrouping.Playlist; 
-					for (int i=0;i<playlists.Collections.Length;i++)
-					{
-						MPMediaItemCollection item = playlists.Collections[i];					
-						Playlist list = new Playlist();
-						list.Name = playlists.Items[i].ValueForProperty(MPMediaPlaylistProperty.Name).ToString();
-						for (int k=0;k<item.Items.Length;k++)
-						{
-							TimeSpan time = TimeSpan.Parse(item.Items[k].ValueForProperty(MPMediaItemProperty.PlaybackDuration).ToString());
-							list.Duration += time;
-						}
-						_playLists.Add(list);
-					}
-				}
-				return _playLists;
-            }
+            SongCollection sc = new SongCollection();
+            foreach (Song song in this.innerlist)
+                sc.Add(song);
+            return sc;
         }
-
-        /*public PictureAlbum RootPictureAlbum
+        
+        public bool Contains(Song item)
         {
-            get
-            {
-            }
-        }*/
-
-        public SongCollection Songs
-        {
-            get
-            {
-				return new SongCollection();
-            }
+            return innerlist.Contains(item);
         }
-    }
+        
+        public void CopyTo(Song[] array, int arrayIndex)
+        {
+            innerlist.CopyTo(array, arrayIndex);
+        }
+		
+		public int IndexOf(Song item)
+        {
+            return innerlist.IndexOf(item);
+        }
+        
+        public bool Remove(Song item)
+        {
+            return innerlist.Remove(item);
+        }
+	}
 }
+
