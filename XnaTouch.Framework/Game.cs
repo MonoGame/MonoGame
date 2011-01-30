@@ -93,10 +93,7 @@ namespace XnaTouch.Framework
 			_mainWindow = new UIWindow (UIScreen.MainScreen.Bounds);			
 			_view = new GameWindow();
 			_view.game = this;			
-			_mainWindow.Add(_view);	
-			
-			// Listen out for rotation changes
-			ObserveDeviceRotation();
+			_mainWindow.Add(_view);							
 					
 			// Initialize GameTime
             _updateGameTime = new GameTime();
@@ -197,6 +194,9 @@ namespace XnaTouch.Framework
 		
         public void Run()
     	{			
+			// Listen out for rotation changes
+			ObserveDeviceRotation();
+			
 			_lastUpdate = DateTime.Now;
 			
 			_view.Run( FramesPerSecond / ( FramesPerSecond * TargetElapsedTime.TotalSeconds ) );	
