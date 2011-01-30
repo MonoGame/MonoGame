@@ -44,7 +44,7 @@ using System.IO;
 ﻿
 namespace XnaTouch.Framework.Media
 {
-    public class Song
+    public class Song : IEquatable<Song>, IDisposable
     {
 		private Sound _sound;
 		private string _name;
@@ -54,6 +54,39 @@ namespace XnaTouch.Framework.Media
 		internal Song(string fileName)
 		{			
 			_name = fileName;
+		}
+		
+		public void Dispose()
+        {
+        }
+		
+		public bool Equals(Song other) 
+		{
+		  if (this.Name == other.Name)
+		     return true;
+		  else
+		     return false;
+		}
+		
+		public override bool Equals(Object obj)
+		{
+		  if (obj == null) 
+			return base.Equals(obj);
+		
+		  if (! (obj is Song))
+		     throw new InvalidCastException("The 'obj' argument is not a Person object.");
+		  else
+		     return Equals(obj as Song);   
+		}
+		
+		public static bool operator ==(Song song1, Song song2)
+		{
+		  return song1.Equals(song2);
+		}
+		
+		public static bool operator !=(Song song1, Song song2)
+		{
+		  return (! song1.Equals(song2));
 		}
 		
 		internal void Play()
