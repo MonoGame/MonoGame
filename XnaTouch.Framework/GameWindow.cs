@@ -89,7 +89,10 @@ namespace XnaTouch.Framework
 						
 			// Initialize GameTime
             _updateGameTime = new GameTime();
-            _drawGameTime = new GameTime();  	
+            _drawGameTime = new GameTime(); 
+			
+			// Initialize _lastUpdate
+			_lastUpdate = DateTime.Now;
 		}
 		
 		~GameWindow()
