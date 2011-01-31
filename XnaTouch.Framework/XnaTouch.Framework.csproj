@@ -273,6 +273,8 @@
     <Compile Include="BoundingSphere.cs" />
     <Compile Include="ContainmentType.cs" />
     <Compile Include="BoundingBox.cs" />
+    <Compile Include="Media\PlaylistCollection.cs" />
+    <Compile Include="Media\SongCollection.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
