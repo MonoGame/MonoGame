@@ -150,6 +150,14 @@ using XnaTouch.Framework.Audio;
 				return _mediaState;
             }
         }
+		
+		public static bool GameHasControl
+        {
+            get
+            {
+            	return true;
+			}
+		}
 
         public static float Volume
         {
