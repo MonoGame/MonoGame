@@ -56,6 +56,7 @@ namespace XnaTouch.Framework.Graphics
 		private int _width,_height;
 		private SurfaceFormat _format;
 		private float _maxS,_maxT;
+		private byte[] _pixelData;
 		
 		public ESTexture2D (IntPtr data, SurfaceFormat pixelFormat, int width, int height, Size size, All filter)
 		{
@@ -331,6 +332,12 @@ namespace XnaTouch.Framework.Graphics
 				case SurfaceFormat.Dxt3 :
 					GL.TexImage2D(All.Texture2D, 0, (int) All.Rgba, (int) width, (int) height, 0, All.Rgba, All.UnsignedByte, data);
 					break;
+				case SurfaceFormat.Bgra4444 /*kTexture2DPixelFormat_RGBA4444*/:
+					GL.TexImage2D(All.Texture2D, 0, (int) All.Rgba, (int) width, (int) height, 0, All.Rgba, All.UnsignedShort4444, data);
+					break;
+				case SurfaceFormat.Bgra5551 /*kTexture2DPixelFormat_RGB5A1*/:
+					GL.TexImage2D(All.Texture2D, 0, (int) All.Rgba, (int) width, (int) height, 0, All.Rgba, All.UnsignedShort5551, data);
+					break;
 				case SurfaceFormat.Rgb32 /*kTexture2DPixelFormat_RGB565*/:
 					GL.TexImage2D(All.Texture2D, 0, (int) All.Rgb, (int) width, (int) height, 0, All.Rgb, All.UnsignedShort565, data);
 					break;
@@ -347,6 +354,13 @@ namespace XnaTouch.Framework.Graphics
 			_format = pixelFormat;
 			_maxS = size.Width / (float)width;
 			_maxT = size.Height / (float)height;
+			
+			int mult = (pixelFormat == SurfaceFormat.Alpha8) ? 1 : 4;
+						
+			_pixelData = new byte[width * height * mult];
+			
+			//copy the date to a managed byte array.
+			Marshal.Copy(data, _pixelData, 0, width * height * mult);
 		}
 		
 		public void DrawAtPoint(Vector2 point)
@@ -386,7 +400,8 @@ namespace XnaTouch.Framework.Graphics
 		
 		public SurfaceFormat PixelFormat
 		{
-			get {
+			get 
+			{
 				return _format;
 			}
 		}
@@ -428,6 +443,14 @@ namespace XnaTouch.Framework.Graphics
 			get 
 			{
 				return _maxT;
+			}
+		}
+		
+		public byte[] PixelData 
+		{
+			get 
+			{
+				return _pixelData;
 			}
 		}
 	}
