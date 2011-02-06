@@ -95,12 +95,18 @@ namespace XnaTouch.Framework.Graphics
             throw new NotImplementedException();
         }
 
-        public Color GetPixel(int col, int row)
+        public Color GetPixel(int x, int y)
         {
-            throw new NotImplementedException();
+			
+            byte r = texture.PixelData[((y * texture.ImageWidth) + x)];
+			byte g = texture.PixelData[((y * texture.ImageWidth) + x) + 1];
+			byte b = texture.PixelData[((y * texture.ImageWidth) + x) + 2];
+			byte a = texture.PixelData[((y * texture.ImageWidth) + x) + 3];
+			
+			return new Color(r, g, b, a);
         }
 
-        public void SetPixel(int col, int row, byte red, byte green, byte blue, byte alpha)
+        public void SetPixel(int x, int y, byte red, byte green, byte blue, byte alpha)
         {
             throw new NotImplementedException();
         }
@@ -130,7 +136,7 @@ namespace XnaTouch.Framework.Graphics
         {
             get 
 			{ 
-				throw new NotImplementedException();
+				return texture.Format;
 			}
         }
 
@@ -214,26 +220,31 @@ namespace XnaTouch.Framework.Graphics
             throw new NotImplementedException();
         }
 
-        public void GetData<T>(T[] data)
+        public void GetData<T>(ref T[] data)
         {	
 			if (data == null )
 			{
-				throw new ArgumentException("data");
-			}	
-			
-			// 4 bytes per pixel
-		    if (data.Length < Width * Height * 4)
-			{
-		        throw new ArgumentException("data length is invalid");
+				throw new ArgumentException("data cannot be null");
 			}
 			
-			// Get the Color valuesk
+			int mult = (this.Format == SurfaceFormat.Alpha8) ? 1 : 4;
+			
+			if (data.Length < Width * Height * mult)
+			{
+				throw new ArgumentException("data is the wrong length for Pixel Format");
+			}
+			
+			// Get the Color values
 			if ((typeof(T) == typeof(Color))) 
 			{	
-				Color[] Pixel = new Color[Width * Height * 4];
-				//Color[] Pixel = (Color)data;
+				int i = 0;
 				
-				GL.ReadPixels<Color>(0, 0, Width, Height, All.Rgba, All.UnsignedByte, Pixel );	
+				while (i < data.Length) 
+				{
+					var d = (Color)(object)data[i];
+					d = new Color(texture.PixelData[i], texture.PixelData[i+1], texture.PixelData[i+2], texture.PixelData[i+3]);
+					i += 4;
+				}
 			}	
         }
 

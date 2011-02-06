@@ -207,5 +207,21 @@ namespace XnaTouch.Framework.Graphics
 				return texture.Name;
 			}
 		}
+		
+		public byte[] PixelData
+		{
+			get
+			{
+				return texture.PixelData;
+			}
+		}
+		
+		public SurfaceFormat Format
+        {
+            get 
+			{ 
+				return texture.PixelFormat;
+			}
+        }
 	}
 }
