@@ -41,11 +41,13 @@ purpose and non-infringement.
 using System;
 using System.IO;
 
+#if IPHONE
 using MonoTouch.CoreAnimation;
 using MonoTouch.CoreFoundation;
 using MonoTouch.Foundation;
 using MonoTouch.OpenGLES;
 using MonoTouch.UIKit;
+#endif
 
 using OpenTK.Graphics;
 

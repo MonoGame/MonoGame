@@ -4,8 +4,12 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using System.Xml;
-using OpenTK.Graphics.ES11;
+
+#if IPHONE
 using MonoTouch.UIKit;
+#endif
+
+using OpenTK.Graphics.ES11;
 
 namespace XnaTouch.Framework.Graphics
 {

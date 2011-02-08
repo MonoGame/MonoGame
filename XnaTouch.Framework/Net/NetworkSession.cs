@@ -43,8 +43,12 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.Remoting.Messaging;
+
+#if IPHONE
 using MonoTouch.UIKit;
 using MonoTouch.GameKit;
+#endif
+
 using XnaTouch.Framework.GamerServices;
 #endregion Using clause
 
