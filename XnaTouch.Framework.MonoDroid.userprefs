@@ -1,0 +1,44 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench>
+    <Files>
+      <File FileName="XnaTouch.Framework/Net/PacketWriter.cs" Line="49" Column="35" />
+      <File FileName="XnaTouch.Framework/Game.cs" Line="79" Column="56" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State expanded="True">
+          <Node name="XnaTouch.Framework.MonoDroid" expanded="True">
+            <Node name="Content" expanded="True">
+              <Node name="ContentReaders" expanded="True" />
+            </Node>
+            <Node name="GamerServices" expanded="True" />
+            <Node name="Graphics" expanded="True" />
+            <Node name="Input" expanded="True">
+              <Node name="Touch" expanded="True" />
+            </Node>
+            <Node name="Media" expanded="True" />
+            <Node name="Net" expanded="True" />
+            <Node name="Game.cs" selected="True" />
+          </Node>
+        </State>
+      </Pad>
+      <Pad Id="ClassPad">
+        <State selected="True" />
+      </Pad>
+      <Pad Id="MonoDevelop.Debugger.WatchPad">
+        <State />
+      </Pad>
+      <Pad Id="ConnectionManagerPad">
+        <State selected="True" />
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches>
+    <Watch file="XnaTouch.Framework/Graphics/SpriteBatch.cs" line="285" offsetX="453" offsetY="3720" expression="temp" liveUpdate="False" />
+    <Watch file="XnaTouch.Framework/GamerServices/Guide.cs" line="300" offsetX="993" offsetY="3945" expression="e" liveUpdate="False" />
+  </MonoDevelop.Ide.DebuggingService.PinnedWatches>
+</Properties>
