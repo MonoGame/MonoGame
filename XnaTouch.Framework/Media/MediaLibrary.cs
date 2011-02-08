@@ -39,8 +39,11 @@
 #endregion License 
 
 using System;
-using MonoTouch.MediaPlayer;
 using System.Collections.Generic;
+
+#if IPHONE
+using MonoTouch.MediaPlayer;
+#endif
 
 namespace XnaTouch.Framework.Media
 {

@@ -37,11 +37,16 @@ permitted under your local laws, the contributors exclude the implied warranties
 purpose and non-infringement.
 */
 #endregion License
-	
+
+using System;
+
+#if IPHONE
 using MonoTouch.CoreAnimation;
 using MonoTouch.OpenGLES;
+#endif
+
 using OpenTK.Graphics.ES11;
-using System;
+
 using XnaTouch.Framework;
 
 namespace XnaTouch.Framework.Graphics

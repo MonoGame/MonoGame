@@ -39,12 +39,13 @@
 // #endregion License
 // 
 using System;
+
 #if IPHONE
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
 using XnaTouch;
-#else
 #endif
+
 namespace XnaTouch.Framework
 {
 	public class XNATouchProgram : UIApplicationDelegate 
