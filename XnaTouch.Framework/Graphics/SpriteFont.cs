@@ -5,9 +5,7 @@ using System.Text;
 using System.IO;
 using System.Xml;
 
-#if IPHONE
 using MonoTouch.UIKit;
-#endif
 
 using OpenTK.Graphics.ES11;
 

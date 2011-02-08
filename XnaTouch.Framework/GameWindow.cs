@@ -43,7 +43,6 @@ using System;
 using System.Drawing;
 using System.Collections.Generic;
 
-#if IPHONE
 using MonoTouch.CoreAnimation;
 using MonoTouch.Foundation;
 using MonoTouch.ObjCRuntime;
@@ -51,15 +50,6 @@ using MonoTouch.OpenGLES;
 using MonoTouch.UIKit;
 
 using OpenTK.Platform.iPhoneOS;
-#endif
-
-#if ANDROID
-using Android.Views;
-using Android.Util;
-using Android.Content;
-
-using OpenTK.Platform.Android;
-#endif
 
 using OpenTK;
 using OpenTK.Platform;
@@ -73,12 +63,7 @@ using XnaTouch.Framework.Input.Touch;
 
 namespace XnaTouch.Framework
 {
-#if IPHONE
     public class GameWindow : iPhoneOSGameView
-#endif
-#if ANDROID
-    public class GameWindow : AndroidGameView
-#endif
     {
 		private readonly Rectangle clientBounds;
 		internal Game game;

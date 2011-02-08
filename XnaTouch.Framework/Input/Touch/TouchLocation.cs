@@ -41,9 +41,8 @@
 #region Using clause
 using System;
 
-#if IPHONE
 using MonoTouch.UIKit;
-#endif
+
 #endregion Using clause
 
 namespace XnaTouch.Framework.Input.Touch

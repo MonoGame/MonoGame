@@ -42,9 +42,7 @@
 #region Using clause
 using System;
 
-#if IPHONE
 using MonoTouch.UIKit;
-#endif
 
 using XnaTouch.Framework.GamerServices;
 #endregion Using clause

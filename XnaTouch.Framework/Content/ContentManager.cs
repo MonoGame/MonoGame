@@ -44,9 +44,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 
-#if IPHONE
 using MonoTouch.Foundation;
-#endif
 
 using XnaTouch.Framework.Audio;
 using XnaTouch.Framework.Graphics;
