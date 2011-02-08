@@ -44,9 +44,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-#if IPHONE
 using MonoTouch.UIKit;
-#endif
+
 #endregion Using clause
 
 namespace XnaTouch.Framework.Net

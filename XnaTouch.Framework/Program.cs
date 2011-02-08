@@ -40,11 +40,10 @@
 // 
 using System;
 
-#if IPHONE
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
+
 using XnaTouch;
-#endif
 
 namespace XnaTouch.Framework
 {

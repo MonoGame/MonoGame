@@ -1,9 +1,7 @@
 using System.Drawing;
 
-#if IPHONE
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
-#endif
 
 namespace XnaTouch.Framework.GamerServices
 {

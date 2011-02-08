@@ -40,9 +40,7 @@ purpose and non-infringement.
 
 using System;
 
-#if IPHONE
 using MonoTouch.UIKit;
-#endif
 
 namespace XnaTouch.Framework.Graphics
 {

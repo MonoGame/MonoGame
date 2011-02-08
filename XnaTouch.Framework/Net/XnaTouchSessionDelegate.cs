@@ -43,11 +43,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-#if IPHONE
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
 using MonoTouch.GameKit;
-#endif
 
 using XnaTouch.Framework.GamerServices;
 #endregion Using clause
