@@ -38,10 +38,15 @@ purpose and non-infringement.
 */
 #endregion License
 
-using XnaTouch.Framework.Graphics;
 using System;
+
+#if IPHONE
 using MonoTouch.UIKit;
+#endif
+
 using OpenTK.Graphics.ES11;
+
+using XnaTouch.Framework.Graphics;
 
 namespace XnaTouch.Framework
 {

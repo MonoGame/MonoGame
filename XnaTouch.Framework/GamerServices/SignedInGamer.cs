@@ -41,9 +41,11 @@ purpose and non-infringement.
 #region Statement
 ﻿using System;
 
+#if IPHONE
 using MonoTouch.Foundation;
 using MonoTouch.GameKit;
 using MonoTouch.UIKit;
+#endif
 
 #endregion Statement
 

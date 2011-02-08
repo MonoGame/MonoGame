@@ -25,19 +25,23 @@ SOFTWARE.
 */
 #endregion License
 
-
-using MonoTouch.CoreGraphics;
-using OpenTK.Graphics.ES11;
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Drawing;
+
+#if IPHONE
+using MonoTouch.UIKit;
+using MonoTouch.CoreGraphics;
+#endif
+
+using OpenTK.Graphics.ES11;
+
 using XnaTouch;
 using XnaTouch.Framework;
 using XnaTouch.Framework.Content;
 using XnaTouch.Framework.Graphics;
-using MonoTouch.UIKit;
-using System.Drawing;
 
 namespace XnaTouch.Framework.Content
 {

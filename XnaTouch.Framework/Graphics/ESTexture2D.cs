@@ -40,12 +40,17 @@ purpose and non-infringement.
 
 using System;
 using System.Drawing;
+using System.Runtime.InteropServices;
+using System.IO;
+
+#if IPHONE
 using MonoTouch.UIKit;
 using MonoTouch.CoreGraphics;
-using System.Runtime.InteropServices;
-using OpenTK.Graphics.ES11;
 using MonoTouch.Foundation;
-using System.IO;
+#endif
+
+using OpenTK.Graphics.ES11;
+
 
 namespace XnaTouch.Framework.Graphics
 {

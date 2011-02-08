@@ -41,7 +41,11 @@
 #region Using clause
 using System;
 using System.IO;
+
+#if IPHONE
 using MonoTouch.UIKit;
+#endif
+
 using XnaTouch.Framework.Graphics;
 #endregion Using clause
 

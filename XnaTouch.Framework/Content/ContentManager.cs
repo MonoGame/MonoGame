@@ -40,13 +40,17 @@ purpose and non-infringement.
 
 using System;
 using System.IO;
-using XnaTouch.Framework.Graphics;
 using System.Collections.Generic;
-using XnaTouch.Framework.Audio;
-using XnaTouch.Framework.Media;
 using System.Reflection;
 using System.Text;
+
+#if IPHONE
 using MonoTouch.Foundation;
+#endif
+
+using XnaTouch.Framework.Audio;
+using XnaTouch.Framework.Graphics;
+using XnaTouch.Framework.Media;
 
 namespace XnaTouch.Framework.Content
 {
