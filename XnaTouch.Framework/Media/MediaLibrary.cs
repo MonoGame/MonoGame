@@ -41,9 +41,7 @@
 using System;
 using System.Collections.Generic;
 
-#if IPHONE
 using MonoTouch.MediaPlayer;
-#endif
 
 namespace XnaTouch.Framework.Media
 {

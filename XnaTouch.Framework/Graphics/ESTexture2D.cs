@@ -43,11 +43,9 @@ using System.Drawing;
 using System.Runtime.InteropServices;
 using System.IO;
 
-#if IPHONE
 using MonoTouch.UIKit;
 using MonoTouch.CoreGraphics;
 using MonoTouch.Foundation;
-#endif
 
 using OpenTK.Graphics.ES11;
 

@@ -40,10 +40,8 @@ purpose and non-infringement.
 
 using System;
 
-#if IPHONE
 using MonoTouch.CoreAnimation;
 using MonoTouch.OpenGLES;
-#endif
 
 using OpenTK.Graphics.ES11;
 

@@ -31,10 +31,8 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Drawing;
 
-#if IPHONE
 using MonoTouch.UIKit;
 using MonoTouch.CoreGraphics;
-#endif
 
 using OpenTK.Graphics.ES11;
 

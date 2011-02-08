@@ -43,9 +43,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-#if IPHONE
 using MonoTouch.UIKit;
-#endif
+
 #endregion Using clause
 
 namespace XnaTouch.Framework.Input.Touch

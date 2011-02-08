@@ -41,10 +41,8 @@
 using System;
 using System.IO;
 
-#if IPHONE
 using MonoTouch.MediaPlayer;
 using MonoTouch.Foundation;
-#endif
 
 using XnaTouch.Framework.Graphics;
 

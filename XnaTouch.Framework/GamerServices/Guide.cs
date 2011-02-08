@@ -46,14 +46,14 @@ using System.Linq;
 using System.Threading;
 using System.Runtime.Remoting.Messaging;
 
-#if IPHONE
 using MonoTouch.UIKit;
 using MonoTouch.Foundation;
 using MonoTouch.GameKit;
 
 using XnaTouch.Framework.Net;
 using XnaTouch.Framework.Storage;
-#endif
+
+
 #endregion Using clause
 
 namespace XnaTouch.Framework.GamerServices
@@ -84,7 +84,7 @@ namespace XnaTouch.Framework.GamerServices
 		 bool usePasswordMode)
 		{
 			string result = defaultText; 
-			#if IPHONE						
+			
 			TextFieldAlertView myAlertView = new TextFieldAlertView(usePasswordMode, title, defaultText);
 		
 			
@@ -100,9 +100,7 @@ namespace XnaTouch.Framework.GamerServices
 					};
 			myAlertView.Transform = MonoTouch.CoreGraphics.CGAffineTransform.MakeTranslation (0f, 110f);
 			myAlertView.Show();
-			#endif
-			#if ANDROID
-			#endif
+
 			return result;
 		}
 		
@@ -160,7 +158,7 @@ namespace XnaTouch.Framework.GamerServices
          MessageBoxIcon icon)
 		{
 			Nullable<int> result = null;
-			#if IPHONE
+			
 			UIAlertView alert = new UIAlertView();
 			alert.Title = title;
 			foreach( string btn in buttons )
@@ -179,11 +177,7 @@ namespace XnaTouch.Framework.GamerServices
 			isVisible = true;
 			
 			alert.Show();
-			#endif
 			
-			#if ANDROID
-			
-			#endif
 			return result;
 		}
 	
