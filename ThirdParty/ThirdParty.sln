@@ -1,6 +1,17 @@
+﻿
 Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XnaTouch.ZuneLib", "ZuneLib\XnaTouch.ZuneLib.csproj", "{88637CDB-C0BB-4928-A0DC-522892A23550}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleWars", "ConsoleWars\ConsoleWars.csproj", "{E67FB53A-E53C-44E9-9348-5AB54FBFEB68}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FollowTheLeader", "FollowTheLeader\FollowTheLeader.csproj", "{AB523E9E-4342-42D3-AAB5-33F662AD0E73}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XnaTouch.Framework", "..\XnaTouch.Framework\XnaTouch.Framework.csproj", "{DB8508BB-9849-4CC2-BC0F-8EB5DACB3C47}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ABeanstalkTale", "BeanStalk\ABeanstalkTale.csproj", "{A31D51BF-6329-4985-98FE-A7FD187B54BB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IonBall.iPhone", "IonBallWindowsCode\IonBallX86\IonBall.iPhone.csproj", "{8C6C015A-0B4F-4200-A68E-686472055020}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IonBall.Engine.iPhone", "IonBallWindowsCode\IonBall.Engine\IonBall.Engine.iPhone.csproj", "{331780D2-1A4B-4F61-A7B7-51B5DA04427D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -8,18 +19,82 @@ Global
 		Release|iPhoneSimulator = Release|iPhoneSimulator
 		Debug|iPhone = Debug|iPhone
 		Release|iPhone = Release|iPhone
+		Distribution|iPhone = Distribution|iPhone
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{88637CDB-C0BB-4928-A0DC-522892A23550}.Debug|iPhone.ActiveCfg = Debug|iPhone
-		{88637CDB-C0BB-4928-A0DC-522892A23550}.Debug|iPhone.Build.0 = Debug|iPhone
-		{88637CDB-C0BB-4928-A0DC-522892A23550}.Debug|iPhoneSimulator.ActiveCfg = Debug|iPhoneSimulator
-		{88637CDB-C0BB-4928-A0DC-522892A23550}.Debug|iPhoneSimulator.Build.0 = Debug|iPhoneSimulator
-		{88637CDB-C0BB-4928-A0DC-522892A23550}.Release|iPhone.ActiveCfg = Release|iPhone
-		{88637CDB-C0BB-4928-A0DC-522892A23550}.Release|iPhone.Build.0 = Release|iPhone
-		{88637CDB-C0BB-4928-A0DC-522892A23550}.Release|iPhoneSimulator.ActiveCfg = Release|iPhoneSimulator
-		{88637CDB-C0BB-4928-A0DC-522892A23550}.Release|iPhoneSimulator.Build.0 = Release|iPhoneSimulator
+		{331780D2-1A4B-4F61-A7B7-51B5DA04427D}.Debug|iPhone.ActiveCfg = Debug|iPhone
+		{331780D2-1A4B-4F61-A7B7-51B5DA04427D}.Debug|iPhone.Build.0 = Debug|iPhone
+		{331780D2-1A4B-4F61-A7B7-51B5DA04427D}.Debug|iPhoneSimulator.ActiveCfg = Debug|iPhoneSimulator
+		{331780D2-1A4B-4F61-A7B7-51B5DA04427D}.Debug|iPhoneSimulator.Build.0 = Debug|iPhoneSimulator
+		{331780D2-1A4B-4F61-A7B7-51B5DA04427D}.Distribution|iPhone.ActiveCfg = Distribution|iPhone
+		{331780D2-1A4B-4F61-A7B7-51B5DA04427D}.Distribution|iPhone.Build.0 = Distribution|iPhone
+		{331780D2-1A4B-4F61-A7B7-51B5DA04427D}.Release|iPhone.ActiveCfg = Release|iPhone
+		{331780D2-1A4B-4F61-A7B7-51B5DA04427D}.Release|iPhone.Build.0 = Release|iPhone
+		{331780D2-1A4B-4F61-A7B7-51B5DA04427D}.Release|iPhoneSimulator.ActiveCfg = Release|iPhoneSimulator
+		{331780D2-1A4B-4F61-A7B7-51B5DA04427D}.Release|iPhoneSimulator.Build.0 = Release|iPhoneSimulator
+		{8C6C015A-0B4F-4200-A68E-686472055020}.Debug|iPhone.ActiveCfg = Debug|iPhone
+		{8C6C015A-0B4F-4200-A68E-686472055020}.Debug|iPhone.Build.0 = Debug|iPhone
+		{8C6C015A-0B4F-4200-A68E-686472055020}.Debug|iPhoneSimulator.ActiveCfg = Debug|iPhoneSimulator
+		{8C6C015A-0B4F-4200-A68E-686472055020}.Debug|iPhoneSimulator.Build.0 = Debug|iPhoneSimulator
+		{8C6C015A-0B4F-4200-A68E-686472055020}.Distribution|iPhone.ActiveCfg = Distribution|iPhone
+		{8C6C015A-0B4F-4200-A68E-686472055020}.Distribution|iPhone.Build.0 = Distribution|iPhone
+		{8C6C015A-0B4F-4200-A68E-686472055020}.Release|iPhone.ActiveCfg = Release|iPhone
+		{8C6C015A-0B4F-4200-A68E-686472055020}.Release|iPhone.Build.0 = Release|iPhone
+		{8C6C015A-0B4F-4200-A68E-686472055020}.Release|iPhoneSimulator.ActiveCfg = Release|iPhoneSimulator
+		{8C6C015A-0B4F-4200-A68E-686472055020}.Release|iPhoneSimulator.Build.0 = Release|iPhoneSimulator
+		{A31D51BF-6329-4985-98FE-A7FD187B54BB}.Debug|iPhone.ActiveCfg = Debug|iPhone
+		{A31D51BF-6329-4985-98FE-A7FD187B54BB}.Debug|iPhone.Build.0 = Debug|iPhone
+		{A31D51BF-6329-4985-98FE-A7FD187B54BB}.Debug|iPhoneSimulator.ActiveCfg = Debug|iPhoneSimulator
+		{A31D51BF-6329-4985-98FE-A7FD187B54BB}.Debug|iPhoneSimulator.Build.0 = Debug|iPhoneSimulator
+		{A31D51BF-6329-4985-98FE-A7FD187B54BB}.Distribution|iPhone.ActiveCfg = Distribution|iPhone
+		{A31D51BF-6329-4985-98FE-A7FD187B54BB}.Distribution|iPhone.Build.0 = Distribution|iPhone
+		{A31D51BF-6329-4985-98FE-A7FD187B54BB}.Release|iPhone.ActiveCfg = Release|iPhone
+		{A31D51BF-6329-4985-98FE-A7FD187B54BB}.Release|iPhone.Build.0 = Release|iPhone
+		{A31D51BF-6329-4985-98FE-A7FD187B54BB}.Release|iPhoneSimulator.ActiveCfg = Release|iPhoneSimulator
+		{A31D51BF-6329-4985-98FE-A7FD187B54BB}.Release|iPhoneSimulator.Build.0 = Release|iPhoneSimulator
+		{AB523E9E-4342-42D3-AAB5-33F662AD0E73}.Debug|iPhone.ActiveCfg = Debug|iPhone
+		{AB523E9E-4342-42D3-AAB5-33F662AD0E73}.Debug|iPhone.Build.0 = Debug|iPhone
+		{AB523E9E-4342-42D3-AAB5-33F662AD0E73}.Debug|iPhoneSimulator.ActiveCfg = Debug|iPhoneSimulator
+		{AB523E9E-4342-42D3-AAB5-33F662AD0E73}.Debug|iPhoneSimulator.Build.0 = Debug|iPhoneSimulator
+		{AB523E9E-4342-42D3-AAB5-33F662AD0E73}.Distribution|iPhone.ActiveCfg = Distribution|iPhone
+		{AB523E9E-4342-42D3-AAB5-33F662AD0E73}.Distribution|iPhone.Build.0 = Distribution|iPhone
+		{AB523E9E-4342-42D3-AAB5-33F662AD0E73}.Release|iPhone.ActiveCfg = Release|iPhone
+		{AB523E9E-4342-42D3-AAB5-33F662AD0E73}.Release|iPhone.Build.0 = Release|iPhone
+		{AB523E9E-4342-42D3-AAB5-33F662AD0E73}.Release|iPhoneSimulator.ActiveCfg = Release|iPhoneSimulator
+		{AB523E9E-4342-42D3-AAB5-33F662AD0E73}.Release|iPhoneSimulator.Build.0 = Release|iPhoneSimulator
+		{DB8508BB-9849-4CC2-BC0F-8EB5DACB3C47}.Debug|iPhone.ActiveCfg = Debug|iPhone
+		{DB8508BB-9849-4CC2-BC0F-8EB5DACB3C47}.Debug|iPhone.Build.0 = Debug|iPhone
+		{DB8508BB-9849-4CC2-BC0F-8EB5DACB3C47}.Debug|iPhoneSimulator.ActiveCfg = Debug|iPhoneSimulator
+		{DB8508BB-9849-4CC2-BC0F-8EB5DACB3C47}.Debug|iPhoneSimulator.Build.0 = Debug|iPhoneSimulator
+		{DB8508BB-9849-4CC2-BC0F-8EB5DACB3C47}.Distribution|iPhone.ActiveCfg = Debug|iPhone
+		{DB8508BB-9849-4CC2-BC0F-8EB5DACB3C47}.Distribution|iPhone.Build.0 = Debug|iPhone
+		{DB8508BB-9849-4CC2-BC0F-8EB5DACB3C47}.Release|iPhone.ActiveCfg = Release|iPhone
+		{DB8508BB-9849-4CC2-BC0F-8EB5DACB3C47}.Release|iPhone.Build.0 = Release|iPhone
+		{DB8508BB-9849-4CC2-BC0F-8EB5DACB3C47}.Release|iPhoneSimulator.ActiveCfg = Release|iPhoneSimulator
+		{DB8508BB-9849-4CC2-BC0F-8EB5DACB3C47}.Release|iPhoneSimulator.Build.0 = Release|iPhoneSimulator
+		{E67FB53A-E53C-44E9-9348-5AB54FBFEB68}.Debug|iPhone.ActiveCfg = Debug|iPhone
+		{E67FB53A-E53C-44E9-9348-5AB54FBFEB68}.Debug|iPhone.Build.0 = Debug|iPhone
+		{E67FB53A-E53C-44E9-9348-5AB54FBFEB68}.Debug|iPhoneSimulator.ActiveCfg = Debug|iPhoneSimulator
+		{E67FB53A-E53C-44E9-9348-5AB54FBFEB68}.Debug|iPhoneSimulator.Build.0 = Debug|iPhoneSimulator
+		{E67FB53A-E53C-44E9-9348-5AB54FBFEB68}.Distribution|iPhone.ActiveCfg = Distribution|iPhone
+		{E67FB53A-E53C-44E9-9348-5AB54FBFEB68}.Distribution|iPhone.Build.0 = Distribution|iPhone
+		{E67FB53A-E53C-44E9-9348-5AB54FBFEB68}.Release|iPhone.ActiveCfg = Release|iPhone
+		{E67FB53A-E53C-44E9-9348-5AB54FBFEB68}.Release|iPhone.Build.0 = Release|iPhone
+		{E67FB53A-E53C-44E9-9348-5AB54FBFEB68}.Release|iPhoneSimulator.ActiveCfg = Release|iPhoneSimulator
+		{E67FB53A-E53C-44E9-9348-5AB54FBFEB68}.Release|iPhoneSimulator.Build.0 = Release|iPhoneSimulator
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = ZuneLib\XnaTouch.ZuneLib.csproj
+		StartupItem = ConsoleWars\ConsoleWars.csproj
+		Policies = $0
+		$0.StandardHeader = $1
+		$1.Text = 
+		$1.inheritsSet = Apache2License
+		$0.VersionControlPolicy = $2
+		$2.inheritsSet = Mono
+		$0.ChangeLogPolicy = $3
+		$3.UpdateMode = None
+		$3.MessageStyle = $4
+		$4.LineAlign = 0
+		$3.inheritsSet = Mono
 	EndGlobalSection
 EndGlobal

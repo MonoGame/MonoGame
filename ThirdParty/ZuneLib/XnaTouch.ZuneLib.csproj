@@ -16,6 +16,7 @@
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <Thumbnail>GameThumbnail.png</Thumbnail>
     <MtouchSdkVersion>3.0</MtouchSdkVersion>
+    <MtouchMinimumOS>3.0</MtouchMinimumOS>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhoneSimulator' ">
     <DebugSymbols>true</DebugSymbols>
@@ -64,10 +65,6 @@
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
     <Reference Include="monotouch" />
-    <Reference Include="XnaTouch.Framework, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\XnaTouch.Framework\bin\iPhoneSimulator\Debug\XnaTouch.Framework.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="LandscapeOrientation.cs" />
@@ -91,4 +88,10 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <ItemGroup>
+    <ProjectReference Include="..\..\XnaTouch.Framework\XnaTouch.Framework.csproj">
+      <Project>{DB8508BB-9849-4CC2-BC0F-8EB5DACB3C47}</Project>
+      <Name>XnaTouch.Framework</Name>
+    </ProjectReference>
+  </ItemGroup>
 </Project>
