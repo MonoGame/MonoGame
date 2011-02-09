@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<Template Originator = "Dominique Louis"
+          Language = "C#"
+          Created = "2011/02/09"
+          LastModified = "2011/02/09">
+
+<TemplateConfiguration>
+<_Name>XnaTouchGameFile</_Name>
+<Icon>md-file-iphone</Icon>
+<_Category>iPhone and iPad</_Category>
+<LanguageName>C#</LanguageName>
+<_Description>Creates a Basic XnaTouch game file</_Description>
+</TemplateConfiguration>
+
+<Conditions>
+</Conditions>
+
+<TemplateFiles>
+<File Name="${Name}.cs" ><![CDATA[
+
+using System;
+#if IPHONE
+using XnaTouch.Framework;
+using XnaTouch.Framework.Graphics;
+using XnaTouch.Framework.Input;
+#else
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+#endif
+
+namespace ${Namespace}$
+{
+	public class ${Name}
+	{
+		public ${Name}()
+		{
+		}
+	}
+}
+]]>
+</File>
+</TemplateFiles>
+
+<FileOptions/>
+
+</Template>
