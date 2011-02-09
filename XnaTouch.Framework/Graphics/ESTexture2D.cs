@@ -363,7 +363,7 @@ namespace XnaTouch.Framework.Graphics
 			_pixelData = new byte[width * height * mult];
 			
 			//copy the date to a managed byte array.
-			Marshal.Copy(data, _pixelData, 0, width * height * mult);
+			// TODO Marshal.Copy(data, _pixelData, 0, width * height * mult);
 		}
 		
 		public void DrawAtPoint(Vector2 point)
