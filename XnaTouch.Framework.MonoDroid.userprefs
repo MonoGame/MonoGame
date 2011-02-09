@@ -1,24 +1,10 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.Workbench>
-    <Files>
-      <File FileName="XnaTouch.Framework/Net/PacketWriter.cs" Line="49" Column="35" />
-      <File FileName="XnaTouch.Framework/Game.cs" Line="79" Column="56" />
-    </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
           <Node name="XnaTouch.Framework.MonoDroid" expanded="True">
-            <Node name="Content" expanded="True">
-              <Node name="ContentReaders" expanded="True" />
-            </Node>
-            <Node name="GamerServices" expanded="True" />
-            <Node name="Graphics" expanded="True" />
-            <Node name="Input" expanded="True">
-              <Node name="Touch" expanded="True" />
-            </Node>
-            <Node name="Media" expanded="True" />
-            <Node name="Net" expanded="True" />
             <Node name="Game.cs" selected="True" />
           </Node>
         </State>
