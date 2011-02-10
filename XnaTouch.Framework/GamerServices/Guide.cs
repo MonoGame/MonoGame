@@ -68,6 +68,7 @@ namespace XnaTouch.Framework.GamerServices
 		private static bool simulateTrialMode;
 		private static GKLeaderboardViewController leaderboardController;
 		private static GKAchievementViewController achievementController;
+		private static UIViewController viewController = null;
 		
 		delegate string ShowKeyboardInputDelegate(
 		 PlayerIndex player,           
@@ -274,17 +275,22 @@ namespace XnaTouch.Framework.GamerServices
 				
 			    if (leaderboardController != null)			
 			    {
-					leaderboardController.DidFinish += delegate(object sender, EventArgs e) {
-						// TODO leaderboardController.DismissModalViewControllerAnimated(true);
-						leaderboardController.View.RemoveFromSuperview();
+					leaderboardController.DidFinish += delegate(object sender, EventArgs e) 
+					{
+						leaderboardController.DismissModalViewControllerAnimated(true);
 						isVisible = false;
-					};	
+ 					};
 					
 					if (Window !=null)
-					{
-						// Work out way to push these dialogs modally.
-						Window.AddSubview(leaderboardController.View);
-						leaderboardController.PopViewControllerAnimated(true);	
+					{						
+						if(viewController == null)
+						{
+							viewController = new UIViewController();
+							Window.Add(viewController.View);
+							viewController.View.Hidden = true;
+						}
+						
+						viewController.PresentModalViewController(leaderboardController, true);
 						isVisible = true;
 					}
 			    }
@@ -302,18 +308,23 @@ namespace XnaTouch.Framework.GamerServices
 				}
 	
 			    if (achievementController != null)		
-			    {
-					achievementController.DidFinish += delegate(object sender, EventArgs e) {									 
-							// TODO achievementController.DismissModalViewControllerAnimated(true);
-							achievementController.View.RemoveFromSuperview();
-							isVisible = false;
-						};
+			    {					
+					achievementController.DidFinish += delegate(object sender, EventArgs e) 
+					{									 
+						leaderboardController.DismissModalViewControllerAnimated(true);
+						isVisible = false;
+					};
 					
 					if (Window !=null)
 					{
-						// Work out way to push these dialogs modally.
-						Window.AddSubview(achievementController.View);
-						achievementController.PopViewControllerAnimated(true);
+						if(viewController == null)
+						{
+							viewController = new UIViewController();
+							Window.Add(viewController.View);
+							viewController.View.Hidden = true;
+						}
+						
+						viewController.PresentModalViewController(achievementController, true);						
 						isVisible = true;
 					}
 			    }
