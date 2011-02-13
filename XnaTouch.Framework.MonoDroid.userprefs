@@ -1,12 +1,14 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.Workbench>
+    <Files>
+      <File FileName="XnaTouch.Framework/Game.cs" Line="1" Column="1" />
+      <File FileName="XnaTouch.Framework/Input/Touch/TouchPanel.cs" Line="1" Column="1" />
+    </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
-          <Node name="XnaTouch.Framework.MonoDroid" expanded="True">
-            <Node name="Game.cs" selected="True" />
-          </Node>
+          <Node name="XnaTouch.Framework.MonoDroid" selected="True" />
         </State>
       </Pad>
       <Pad Id="ClassPad">
