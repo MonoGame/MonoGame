@@ -42,18 +42,18 @@ using System;
 
 namespace XnaTouch.Framework
 {
-	[FlagsAttribute]
+	[Flags]
 	public enum DisplayOrientation
 	{
-		Default,
-		LandscapeLeft,
-		LandscapeRight,
-		Portrait,
+		Default = 1,
+		LandscapeLeft = 2,
+		LandscapeRight = 4,
+		Portrait = 8,
 		// iPhone specific Orientations
-		FaceDown,
-		FaceUp,
-		PortraitUpsideDown,
-		Unknown,
+		FaceDown = 16,
+		FaceUp = 32,
+		PortraitUpsideDown = 64,
+		Unknown = 128,
 	}
 }
 
