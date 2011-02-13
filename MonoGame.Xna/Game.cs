@@ -49,13 +49,13 @@ using MonoTouch.UIKit;
 
 using OpenTK.Graphics;
 
-using XnaTouch.Framework.Content;
-using XnaTouch.Framework.GamerServices;
-using XnaTouch.Framework.Graphics;
-using XnaTouch.Framework.Input;
-using XnaTouch.Framework.Input.Touch;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.GamerServices;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Input.Touch;
 
-namespace XnaTouch.Framework
+namespace Microsoft.Xna.Framework
 {
     public class Game : IDisposable
     {
