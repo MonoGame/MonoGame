@@ -53,6 +53,7 @@ using XnaTouch.Framework.Content;
 using XnaTouch.Framework.GamerServices;
 using XnaTouch.Framework.Graphics;
 using XnaTouch.Framework.Input;
+using XnaTouch.Framework.Input.Touch;
 
 namespace XnaTouch.Framework
 {
@@ -113,31 +114,71 @@ namespace XnaTouch.Framework
 				switch (orientation)
 				{
 					case UIDeviceOrientation.Portrait :
-						_view.CurrentOrientation = DisplayOrientation.Portrait;
-						GraphicsDevice.PresentationParameters.DisplayOrientation = DisplayOrientation.Portrait;
+						if ( (graphicsDeviceManager as GraphicsDeviceManager).SupportedOrientations == DisplayOrientation.Portrait)
+						{
+							_view.CurrentOrientation = DisplayOrientation.Portrait;
+							GraphicsDevice.PresentationParameters.DisplayOrientation = DisplayOrientation.Portrait;
+							TouchPanel.DisplayOrientation = DisplayOrientation.Portrait;
+						}
 						break;
 					case UIDeviceOrientation.LandscapeLeft :
-						_view.CurrentOrientation = DisplayOrientation.LandscapeLeft;
-						GraphicsDevice.PresentationParameters.DisplayOrientation = DisplayOrientation.LandscapeLeft;
+						switch ((graphicsDeviceManager as GraphicsDeviceManager).SupportedOrientations)
+						{
+							case DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight :
+							{
+								_view.CurrentOrientation = DisplayOrientation.LandscapeLeft;
+								GraphicsDevice.PresentationParameters.DisplayOrientation = DisplayOrientation.LandscapeLeft;
+								TouchPanel.DisplayOrientation = DisplayOrientation.LandscapeLeft;
+								break;
+							}
+						}
 						break;
 					case UIDeviceOrientation.LandscapeRight :
-						_view.CurrentOrientation = DisplayOrientation.LandscapeRight;
-						GraphicsDevice.PresentationParameters.DisplayOrientation = DisplayOrientation.LandscapeRight;
+						switch ((graphicsDeviceManager as GraphicsDeviceManager).SupportedOrientations)
+						{
+							case DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight :
+							{
+								_view.CurrentOrientation = DisplayOrientation.LandscapeRight;
+								GraphicsDevice.PresentationParameters.DisplayOrientation = DisplayOrientation.LandscapeRight;
+								TouchPanel.DisplayOrientation = DisplayOrientation.LandscapeRight;
+								break;
+							}
+						}
 						break;
 					case UIDeviceOrientation.FaceDown :
-						_view.CurrentOrientation = DisplayOrientation.FaceDown;
+						if ( (graphicsDeviceManager as GraphicsDeviceManager).SupportedOrientations == DisplayOrientation.FaceDown)
+						{
+							_view.CurrentOrientation = DisplayOrientation.FaceDown;
+							TouchPanel.DisplayOrientation = DisplayOrientation.FaceDown;
+						}
 						break;
 					case UIDeviceOrientation.FaceUp :
-						_view.CurrentOrientation = DisplayOrientation.FaceUp;
+						if ( (graphicsDeviceManager as GraphicsDeviceManager).SupportedOrientations == DisplayOrientation.FaceDown)
+						{
+							_view.CurrentOrientation = DisplayOrientation.FaceUp;
+							TouchPanel.DisplayOrientation = DisplayOrientation.FaceUp;
+						}
 						break;
 					case UIDeviceOrientation.PortraitUpsideDown :
-						_view.CurrentOrientation = DisplayOrientation.PortraitUpsideDown;
+						if ( (graphicsDeviceManager as GraphicsDeviceManager).SupportedOrientations == DisplayOrientation.PortraitUpsideDown)
+						{
+							_view.CurrentOrientation = DisplayOrientation.PortraitUpsideDown;
+							TouchPanel.DisplayOrientation = DisplayOrientation.PortraitUpsideDown;
+						}
 						break;
 					case UIDeviceOrientation.Unknown :
-						_view.CurrentOrientation = DisplayOrientation.Unknown;
-						break;
+						if ( (graphicsDeviceManager as GraphicsDeviceManager).SupportedOrientations == DisplayOrientation.Unknown)
+						{
+							_view.CurrentOrientation = DisplayOrientation.Unknown;
+							TouchPanel.DisplayOrientation = DisplayOrientation.Unknown;
+						}
+						break;						
 					default:
-						_view.CurrentOrientation = DisplayOrientation.Default;
+						if ( (graphicsDeviceManager as GraphicsDeviceManager).SupportedOrientations == DisplayOrientation.Default)
+						{
+							_view.CurrentOrientation = DisplayOrientation.Default;
+							TouchPanel.DisplayOrientation = DisplayOrientation.Default;
+						}
 						break;
 				}					  
 			});
@@ -194,9 +235,6 @@ namespace XnaTouch.Framework
 		
         public void Run()
     	{			
-			// Listen out for rotation changes
-			ObserveDeviceRotation();
-			
 			_lastUpdate = DateTime.Now;
 			
 			_view.Run( FramesPerSecond / ( FramesPerSecond * TargetElapsedTime.TotalSeconds ) );	
@@ -211,6 +249,9 @@ namespace XnaTouch.Framework
 			// Get the Accelerometer going
 			Accelerometer.SetupAccelerometer();			
 			Initialize();
+			
+			// Listen out for rotation changes
+			ObserveDeviceRotation();
         }
 		
 		internal void DoUpdate(GameTime aGameTime)

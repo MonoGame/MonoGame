@@ -83,13 +83,8 @@ namespace XnaTouch.Framework.Input.Touch
 
         public static DisplayOrientation DisplayOrientation
         {
-            get
-            {
-				throw new NotImplementedException();
-            }
-            set
-            {
-            }
+            get;
+            set;
         }
 
         public static int DisplayWidth
