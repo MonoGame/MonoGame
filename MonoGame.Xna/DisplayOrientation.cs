@@ -40,7 +40,7 @@ purpose and non-infringement.
 
 using System;
 
-namespace XnaTouch.Framework
+namespace Microsoft.Xna.Framework
 {
 	[Flags]
 	public enum DisplayOrientation

@@ -100,7 +100,7 @@ namespace Microsoft.Xna.Framework.Content
  
 				// Need to resolve namespace differences
 				string readerTypeString = originalReaderTypeString;
-				if(readerTypeString.IndexOf(", Microsoft.Xna.Framework") != -1)
+				/*if(readerTypeString.IndexOf(", Microsoft.Xna.Framework") != -1)
  				{
 					string[] tokens = readerTypeString.Split(new char[] { ',' });
 					readerTypeString = "";
@@ -115,6 +115,12 @@ namespace Microsoft.Xna.Framework.Content
 							readerTypeString += tokens[j];
  					}
 					readerTypeString = readerTypeString.Replace(", Microsoft.Xna.Framework", "@");
+				}*/
+
+				if(readerTypeString.Contains("PublicKey"))
+				{
+					readerTypeString = readerTypeString.Split(new char[] { '[', '[' })[0] + "[" + 
+					readerTypeString.Split(new char[] { '[', '[' })[2].Split(',')[0] + "]"; 
 				}
 				
 				readerTypeString = readerTypeString.Replace("Microsoft.Xna.Framework", "Microsoft.Xna.Framework");

@@ -57,11 +57,11 @@ using OpenTK.Graphics;
 using OpenTK.Graphics.ES11;
 using OpenTK.Graphics.ES20;
 
-using XnaTouch.Framework.Input;
-using XnaTouch.Framework.Input.Touch;
+using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Input.Touch;
 #endregion Using Statements
 
-namespace XnaTouch.Framework
+namespace Microsoft.Xna.Framework
 {
     public class GameWindow : iPhoneOSGameView
     {
