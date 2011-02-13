@@ -1,7 +1,7 @@
 #region License
 /*
 Microsoft Public License (Ms-PL)
-XnaTouch - Copyright © 2009 The XnaTouch Team
+MonoGame - Copyright © 2009 The MonoGame Team
 
 All rights reserved.
 
@@ -40,11 +40,11 @@ purpose and non-infringement.
 ﻿
 using System;
 using System.IO;
-using XnaTouch;
-using XnaTouch.Framework;
-using XnaTouch.Framework.Audio;
+using Microsoft.Xna;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 
-namespace XnaTouch.Framework.Audio
+namespace Microsoft.Xna.Framework.Audio
 {
     public sealed class SoundEffect
     {

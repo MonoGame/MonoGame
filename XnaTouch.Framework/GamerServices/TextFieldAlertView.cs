@@ -3,7 +3,7 @@ using System.Drawing;
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
 
-namespace XnaTouch.Framework.GamerServices
+namespace Microsoft.Xna.Framework.GamerServices
 {
 	public class TextFieldAlertView : UIAlertView
 	{

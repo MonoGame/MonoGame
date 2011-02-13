@@ -5,7 +5,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleWars", "ConsoleWars\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FollowTheLeader", "FollowTheLeader\FollowTheLeader.csproj", "{AB523E9E-4342-42D3-AAB5-33F662AD0E73}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XnaTouch.Framework", "..\XnaTouch.Framework\XnaTouch.Framework.csproj", "{DB8508BB-9849-4CC2-BC0F-8EB5DACB3C47}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Framework", "..\MonoGame.Framework\MonoGame.Framework.csproj", "{DB8508BB-9849-4CC2-BC0F-8EB5DACB3C47}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ABeanstalkTale", "BeanStalk\ABeanstalkTale.csproj", "{A31D51BF-6329-4985-98FE-A7FD187B54BB}"
 EndProject

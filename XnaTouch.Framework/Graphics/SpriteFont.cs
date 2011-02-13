@@ -9,7 +9,7 @@ using MonoTouch.UIKit;
 
 using OpenTK.Graphics.ES11;
 
-namespace XnaTouch.Framework.Graphics
+namespace Microsoft.Xna.Framework.Graphics
 {
 	struct GlyphData
     {

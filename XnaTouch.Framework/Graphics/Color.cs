@@ -27,7 +27,7 @@ SOFTWARE.
 
 using System;
 
-namespace XnaTouch.Framework.Graphics
+namespace Microsoft.Xna.Framework.Graphics
 {
     public struct Color : IEquatable<Color>
     {

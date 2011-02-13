@@ -27,7 +27,7 @@ SOFTWARE.
 
 using System;
 
-namespace XnaTouch.Framework.Content
+namespace Microsoft.Xna.Framework.Content
 {
     public abstract class ContentTypeReader
     {

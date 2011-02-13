@@ -28,7 +28,7 @@ SOFTWARE.
 ﻿using System;
 using System.Collections.Generic;
 
-namespace XnaTouch.Framework
+namespace Microsoft.Xna.Framework
 {
     internal class ReusableItemList<T> : ICollection<T>, IEnumerator<T>
     {

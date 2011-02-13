@@ -1,7 +1,7 @@
 ﻿#region License
 // /*
 // Microsoft Public License (Ms-PL)
-// XnaTouch - Copyright © 2009-2010 The XnaTouch Team
+// MonoGame - Copyright © 2009-2010 The MonoGame Team
 // 
 // All rights reserved.
 // 
@@ -40,7 +40,7 @@
 
 using System;
 
-namespace XnaTouch.Framework.Input.Touch
+namespace Microsoft.Xna.Framework.Input.Touch
 {
     public enum GestureType
     {

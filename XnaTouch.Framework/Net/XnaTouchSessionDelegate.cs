@@ -1,7 +1,7 @@
 #region License
 // /*
 // Microsoft Public License (Ms-PL)
-// XnaTouch - Copyright © 2009 The XnaTouch Team
+// MonoGame - Copyright © 2009 The MonoGame Team
 // 
 // All rights reserved.
 // 
@@ -47,13 +47,13 @@ using MonoTouch.Foundation;
 using MonoTouch.UIKit;
 using MonoTouch.GameKit;
 
-using XnaTouch.Framework.GamerServices;
+using Microsoft.Xna.Framework.GamerServices;
 #endregion Using clause
 
-namespace XnaTouch.Framework.Net
+namespace Microsoft.Xna.Framework.Net
 {
 
-	public class XnaTouchSessionDelegate : GKSessionDelegate
+	public class MonoGameSessionDelegate : GKSessionDelegate
 	{
 		List<LocalNetworkGamer> gamerList;
 		public override void PeerChangedState(GKSession session, string peerID, GKPeerConnectionState state)

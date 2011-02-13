@@ -25,7 +25,7 @@
 	THE SOFTWARE.
 */
 
-namespace XnaTouch.Framework.Audio
+namespace Microsoft.Xna.Framework.Audio
 {
 	using System;
 	using System.Text;

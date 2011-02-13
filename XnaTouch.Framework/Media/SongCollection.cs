@@ -1,7 +1,7 @@
 // #region License
 // /*
 // Microsoft Public License (Ms-PL)
-// XnaTouch - Copyright © 2009 The XnaTouch Team
+// MonoGame - Copyright © 2009 The MonoGame Team
 // 
 // All rights reserved.
 // 
@@ -42,7 +42,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace XnaTouch.Framework.Media
+namespace Microsoft.Xna.Framework.Media
 {
 	public class SongCollection : ICollection<Song>, IEnumerable<Song>, IEnumerable, IDisposable
 	{

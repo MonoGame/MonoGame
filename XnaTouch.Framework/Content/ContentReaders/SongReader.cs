@@ -1,7 +1,7 @@
 // #region License
 // /*
 // Microsoft Public License (Ms-PL)
-// XnaTouch - Copyright © 2009 The XnaTouch Team
+// MonoGame - Copyright © 2009 The MonoGame Team
 // 
 // All rights reserved.
 // 
@@ -40,10 +40,10 @@
 // 
 
 using System;
-using XnaTouch.Framework.Media;
+using Microsoft.Xna.Framework.Media;
 using System.IO;
 
-namespace XnaTouch.Framework
+namespace Microsoft.Xna.Framework
 {
 	internal class SongReader
 	{
