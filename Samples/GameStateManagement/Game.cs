@@ -9,15 +9,15 @@
 
 #region Using Statements
 #if IPHONE
-using XnaTouch.Framework;
-using XnaTouch.Framework.Graphics;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 #else
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 #endif
 #endregion
 
-namespace XnaTouch.Samples.GameStateManagement
+namespace Microsoft.Xna.Samples.GameStateManagement
 {
     /// <summary>
     /// Sample showing how to manage different game states, with transitions

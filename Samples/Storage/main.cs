@@ -1,10 +1,10 @@
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
-using XnaTouch;
-using XnaTouch.Samples;
-using XnaTouch.Samples.Storage;
+using Microsoft.Xna;
+using Microsoft.Xna.Samples;
+using Microsoft.Xna.Samples.Storage;
 
-namespace XnaTouch.Samples.Storage
+namespace Microsoft.Xna.Samples.Storage
 {
 	[Register ("AppDelegate")]
 	class Program : UIApplicationDelegate 

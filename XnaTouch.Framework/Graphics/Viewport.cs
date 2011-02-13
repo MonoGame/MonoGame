@@ -1,7 +1,7 @@
 #region License
 /*
 Microsoft Public License (Ms-PL)
-XnaTouch - Copyright © 2009 The XnaTouch Team
+MonoGame - Copyright © 2009 The MonoGame Team
 
 All rights reserved.
 
@@ -38,10 +38,10 @@ purpose and non-infringement.
 */
 #endregion License
 
-using XnaTouch.Framework;
+using Microsoft.Xna.Framework;
 using System;
 
-namespace XnaTouch.Framework.Graphics
+namespace Microsoft.Xna.Framework.Graphics
 {
     public struct Viewport
     {

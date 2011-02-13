@@ -1,7 +1,7 @@
 // #region License
 // /*
 // Microsoft Public License (Ms-PL)
-// XnaTouch - Copyright © 2009 The XnaTouch Team
+// MonoGame - Copyright © 2009 The MonoGame Team
 // 
 // All rights reserved.
 // 
@@ -40,11 +40,11 @@
 // 
 
 using System;
-using XnaTouch.Framework.Graphics;
+using Microsoft.Xna.Framework.Graphics;
 using MonoTouch.MediaPlayer;
 using MonoTouch.Foundation;
 
-namespace XnaTouch.Framework.Media
+namespace Microsoft.Xna.Framework.Media
 {
     public sealed class VideoPlayer
     {
@@ -89,7 +89,7 @@ namespace XnaTouch.Framework.Media
 
 		}
 
-        public void Play(XnaTouch.Framework.Media.Video video)
+        public void Play(Microsoft.Xna.Framework.Media.Video video)
         {	
 			_video = video;
 			PlayVideo();		
@@ -122,7 +122,7 @@ namespace XnaTouch.Framework.Media
             }
         }
 
-        public XnaTouch.Framework.Media.Video Video
+        public Microsoft.Xna.Framework.Media.Video Video
         {
             get
             {

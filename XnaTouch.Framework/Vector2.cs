@@ -29,7 +29,7 @@ using System;
 using System.Text;
 using System.Drawing;
 
-namespace XnaTouch.Framework
+namespace Microsoft.Xna.Framework
 {
     public struct Vector2 : IEquatable<Vector2>
     {

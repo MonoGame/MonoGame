@@ -1,7 +1,7 @@
 #region License
 /*
 Microsoft Public License (Ms-PL)
-XnaTouch - Copyright © 2009 The XnaTouch Team
+MonoGame - Copyright © 2009 The MonoGame Team
 
 All rights reserved.
 
@@ -38,10 +38,10 @@ purpose and non-infringement.
 */
 #endregion License
 
-using XnaTouch.Framework;
+using Microsoft.Xna.Framework;
 using System;
 
-namespace XnaTouch.Framework.Input
+namespace Microsoft.Xna.Framework.Input
 {
 	public struct GamePadState
     {
@@ -80,12 +80,12 @@ namespace XnaTouch.Framework.Input
             }
         }
      
-        public bool IsButtonDown(XnaTouch.Framework.Input.Buttons button)
+        public bool IsButtonDown(Microsoft.Xna.Framework.Input.Buttons button)
         {
             return ((_buttons & button) == button);
         }
 
-        public bool IsButtonUp(XnaTouch.Framework.Input.Buttons button)
+        public bool IsButtonUp(Microsoft.Xna.Framework.Input.Buttons button)
         {
             return !this.IsButtonDown(button);
         }

@@ -29,10 +29,10 @@ SOFTWARE.
 using System;
 using System.Collections.Generic;
 using System.Text;
-using XnaTouch.Framework.Content;
-using XnaTouch.Framework.Graphics;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
 
-namespace XnaTouch.Framework.Content
+namespace Microsoft.Xna.Framework.Content
 {
 	
 	internal class RectangleReader : ContentTypeReader<Rectangle>

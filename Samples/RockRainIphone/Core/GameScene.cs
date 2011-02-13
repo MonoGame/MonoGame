@@ -1,7 +1,7 @@
 #region Using Statements
 
 using System.Collections.Generic;
-using XnaTouch.Framework;
+using Microsoft.Xna.Framework;
 
 #endregion
 

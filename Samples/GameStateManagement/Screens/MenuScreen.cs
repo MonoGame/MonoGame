@@ -11,15 +11,15 @@
 using System;
 using System.Collections.Generic;
 #if IPHONE
-using XnaTouch.Framework;
-using XnaTouch.Framework.Graphics;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 #else
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 #endif
 #endregion
 
-namespace XnaTouch.Samples.GameStateManagement
+namespace Microsoft.Xna.Samples.GameStateManagement
 {
     /// <summary>
     /// Base class for screens that contain a menu of options. The user can

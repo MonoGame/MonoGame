@@ -1,7 +1,7 @@
 #region Using Statements
 
-using XnaTouch.Framework;
-using XnaTouch.Framework.Graphics;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 #endregion
 

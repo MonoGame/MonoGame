@@ -1,16 +1,16 @@
 using System;
-using XnaTouch;
-using XnaTouch.Framework;
-using XnaTouch.Framework.Graphics;
-using XnaTouch.Samples;
-using XnaTouch.Samples.BatteryStatus;
+using Microsoft.Xna;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Samples;
+using Microsoft.Xna.Samples.BatteryStatus;
 
-namespace XnaTouch.Samples.BatteryStatus
+namespace Microsoft.Xna.Samples.BatteryStatus
 {
     /// <summary>
     /// This is the main type for your game
     /// </summary>
-    public class Game1 : XnaTouch.Framework.Game
+    public class Game1 : Microsoft.Xna.Framework.Game
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;		

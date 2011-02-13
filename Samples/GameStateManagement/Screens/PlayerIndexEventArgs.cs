@@ -10,13 +10,13 @@
 #region Using Statements
 using System;
 #if IPHONE
-using XnaTouch.Framework;
+using Microsoft.Xna.Framework;
 #else
 using Microsoft.Xna.Framework;
 #endif
 #endregion
 
-namespace XnaTouch.Samples.GameStateManagement
+namespace Microsoft.Xna.Samples.GameStateManagement
 {
     /// <summary>
     /// Custom event argument which includes the index of the player who

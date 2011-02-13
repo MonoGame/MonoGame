@@ -1,11 +1,11 @@
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
-using XnaTouch;
-using XnaTouch.Samples;
-using XnaTouch.Samples.GameComponents;
-using XnaTouch.Framework;
+using Microsoft.Xna;
+using Microsoft.Xna.Samples;
+using Microsoft.Xna.Samples.GameComponents;
+using Microsoft.Xna.Framework;
 
-namespace XnaTouch.Samples.GameComponents
+namespace Microsoft.Xna.Samples.GameComponents
 {
 	[Register ("AppDelegate")]
 	class Program : UIApplicationDelegate 

@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using XnaTouch.Framework;
+using Microsoft.Xna.Framework;
 using RockRainIphone.Core;
 
 
@@ -8,7 +8,7 @@ namespace RockRainIphone
     /// <summary>
     /// This is a game component that implements IUpdateable.
     /// </summary>
-    public class ExplosionManager : XnaTouch.Framework.DrawableGameComponent
+    public class ExplosionManager : Microsoft.Xna.Framework.DrawableGameComponent
     {
         protected List<ExplosionParticleSystem> explosions;
 

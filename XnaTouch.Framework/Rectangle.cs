@@ -29,7 +29,7 @@ using System;
 using System.Globalization;
 using System.ComponentModel;
 
-namespace XnaTouch.Framework
+namespace Microsoft.Xna.Framework
 {
 
     public struct Rectangle : IEquatable<Rectangle>

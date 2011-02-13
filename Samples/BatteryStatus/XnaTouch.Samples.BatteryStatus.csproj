@@ -11,8 +11,8 @@
     <AssemblyName>BatteryStatus</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <BundleDisplayName>Battery Status</BundleDisplayName>
-    <BundleIcon>xnatouchicon.png</BundleIcon>
-    <RootNamespace>XnaTouch.Samples.BatteryStatus</RootNamespace>
+    <BundleIcon>monogameicon.png</BundleIcon>
+    <RootNamespace>MonoGame.Samples.BatteryStatus</RootNamespace>
     <MtouchSdkVersion>4.0</MtouchSdkVersion>
     <MtouchMinimumOS>3.0</MtouchMinimumOS>
   </PropertyGroup>
@@ -69,9 +69,9 @@
     <Compile Include="main.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\XnaTouch.Framework\XnaTouch.Framework.csproj">
+    <ProjectReference Include="..\..\Microsoft.Xna.Framework\Microsoft.Xna.Framework.csproj">
       <Project>{DB8508BB-9849-4CC2-BC0F-8EB5DACB3C47}</Project>
-      <Name>XnaTouch.Framework</Name>
+      <Name>MonoGame.Framework</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
@@ -92,6 +92,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <None Include="xnatouchicon.png" />
+    <None Include="monogameicon.png" />
   </ItemGroup>
 </Project>

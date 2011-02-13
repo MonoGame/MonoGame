@@ -8,7 +8,7 @@
     <ProjectGuid>{E4C7960D-E564-4CD5-85D6-2B7B0B3DA5BA}</ProjectGuid>
     <ProjectTypeGuids>{E613F3A2-FE9C-494F-B74E-F63BCB86FEA6};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Exe</OutputType>
-    <RootNamespace>XnaTouch.Samples.Aiming</RootNamespace>
+    <RootNamespace>MonoGame.Samples.Aiming</RootNamespace>
     <MtouchSdkVersion>3.0</MtouchSdkVersion>
     <MtouchMinimumOS>3.0</MtouchMinimumOS>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
@@ -75,7 +75,7 @@
     <WarningLevel>4</WarningLevel>
     <MtouchDebug>False</MtouchDebug>
     <CodesignKey>iPhone Developer</CodesignKey>
-    <AssemblyName>XnaTouch.Samples.Waypoint</AssemblyName>
+    <AssemblyName>MonoGame.Samples.Waypoint</AssemblyName>
     <MtouchI18n />
     <DefineConstants>IPHONE</DefineConstants>
   </PropertyGroup>
@@ -115,9 +115,9 @@
     <None Include="Info.plist" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\XnaTouch.Framework\XnaTouch.Framework.csproj">
+    <ProjectReference Include="..\..\Microsoft.Xna.Framework\Microsoft.Xna.Framework.csproj">
       <Project>{DB8508BB-9849-4CC2-BC0F-8EB5DACB3C47}</Project>
-      <Name>XnaTouch.Framework</Name>
+      <Name>MonoGame.Framework</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>

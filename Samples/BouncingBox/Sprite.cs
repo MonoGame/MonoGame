@@ -1,8 +1,8 @@
 
 using System;
-using XnaTouch.Framework;
+using Microsoft.Xna.Framework;
 
-namespace XnaTouch.Samples.BouncingBox
+namespace Microsoft.Xna.Samples.BouncingBox
 {
 
 

@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using XnaTouch.Framework.Graphics;   //   for Texture2D
-using XnaTouch.Framework;  //  for Vector2
+using Microsoft.Xna.Framework.Graphics;   //   for Texture2D
+using Microsoft.Xna.Framework;  //  for Vector2
 
-namespace XnaTouch.Samples.GameComponents
+namespace Microsoft.Xna.Samples.GameComponents
 {
     class Sprite : DrawableGameComponent
     {

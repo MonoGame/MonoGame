@@ -1,19 +1,19 @@
 using System;
-using XnaTouch;
-using XnaTouch.Framework;
-using XnaTouch.Framework.Graphics;
-using XnaTouch.Samples;
+using Microsoft.Xna;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Samples;
 
-namespace XnaTouch.Samples.SpriteFont
+namespace Microsoft.Xna.Samples.SpriteFont
 {
     /// <summary>
     /// This is the main type for your game
     /// </summary>
-    public class Game1 : XnaTouch.Framework.Game
+    public class Game1 : Microsoft.Xna.Framework.Game
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;		
-		XnaTouch.Framework.Graphics.SpriteFont font;
+		Microsoft.Xna.Framework.Graphics.SpriteFont font;
 		float rotation;
 		Vector2 textSize;
 		
@@ -46,8 +46,8 @@ namespace XnaTouch.Samples.SpriteFont
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-			font = Content.Load<XnaTouch.Framework.Graphics.SpriteFont>("SpriteFont1");
-			textSize = font.MeasureString("XnaTouch");
+			font = Content.Load<Microsoft.Xna.Framework.Graphics.SpriteFont>("SpriteFont1");
+			textSize = font.MeasureString("MonoGame");
 			textSize = new Vector2(textSize.X/2,textSize.Y/2);
         }
 
@@ -76,14 +76,14 @@ namespace XnaTouch.Samples.SpriteFont
 			
 			spriteBatch.Begin();
 			
-			spriteBatch.DrawString(font,"XnaTouch",new Vector2(101,99),Color.Black);
-			spriteBatch.DrawString(font,"XnaTouch",new Vector2(101,101),Color.Black);
-			spriteBatch.DrawString(font,"XnaTouch",new Vector2(99,99),Color.Black);
-			spriteBatch.DrawString(font,"XnaTouch",new Vector2(99,101),Color.Black);
-			spriteBatch.DrawString(font,"XnaTouch",new Vector2(100,100),Color.White);
-            spriteBatch.DrawString(font,"XnaTouch", new Vector2(100, 100),Color.Yellow, MathHelper.PiOver2, Vector2.Zero, 1.0f,SpriteEffects.None, 1);
-            spriteBatch.DrawString(font,"XnaTouch", new Vector2(100, 100), Color.Yellow, MathHelper.PiOver4, Vector2.Zero, 1.0f, SpriteEffects.None, 1);
-			spriteBatch.DrawString(font,"XnaTouch", new Vector2(160, 340),Color.Red, rotation, textSize, 1.0f,SpriteEffects.None, 1);
+			spriteBatch.DrawString(font,"MonoGame",new Vector2(101,99),Color.Black);
+			spriteBatch.DrawString(font,"MonoGame",new Vector2(101,101),Color.Black);
+			spriteBatch.DrawString(font,"MonoGame",new Vector2(99,99),Color.Black);
+			spriteBatch.DrawString(font,"MonoGame",new Vector2(99,101),Color.Black);
+			spriteBatch.DrawString(font,"MonoGame",new Vector2(100,100),Color.White);
+            spriteBatch.DrawString(font,"MonoGame", new Vector2(100, 100),Color.Yellow, MathHelper.PiOver2, Vector2.Zero, 1.0f,SpriteEffects.None, 1);
+            spriteBatch.DrawString(font,"MonoGame", new Vector2(100, 100), Color.Yellow, MathHelper.PiOver4, Vector2.Zero, 1.0f, SpriteEffects.None, 1);
+			spriteBatch.DrawString(font,"MonoGame", new Vector2(160, 340),Color.Red, rotation, textSize, 1.0f,SpriteEffects.None, 1);
 			
 			spriteBatch.End();
 			

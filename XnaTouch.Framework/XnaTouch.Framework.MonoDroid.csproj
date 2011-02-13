@@ -8,11 +8,11 @@
     <ProjectGuid>{0A278080-0C1E-4578-B72A-09BCC95F910B}</ProjectGuid>
     <ProjectTypeGuids>{EFBA0AD7-5A72-4C68-AF49-83D382785DCF};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
-    <RootNamespace>XnaTouch.Framework.MonoDroid</RootNamespace>
+    <RootNamespace>Microsoft.Xna.Framework.MonoDroid</RootNamespace>
     <MonoDroidResourcePrefix>Resources</MonoDroidResourcePrefix>
-    <AssemblyName>XnaTouch.Framework.MonoDroid</AssemblyName>
+    <AssemblyName>MonoGame.Framework.MonoDroid</AssemblyName>
     <TargetFrameworkVersion>v2.2</TargetFrameworkVersion>
-    <Description>XnaTouch for Android</Description>
+    <Description>MonoGame for Android</Description>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>

@@ -10,9 +10,9 @@
     <OutputType>Exe</OutputType>
     <AssemblyName>BouncingBox</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
-    <RootNamespace>XnaTouch.Samples.BouncingBox</RootNamespace>
+    <RootNamespace>MonoGame.Samples.BouncingBox</RootNamespace>
     <BundleDisplayName>Bouncing Box</BundleDisplayName>
-    <BundleIcon>xnatouchicon.png</BundleIcon>
+    <BundleIcon>monogameicon.png</BundleIcon>
     <MtouchSdkVersion>4.0</MtouchSdkVersion>
     <MtouchMinimumOS>3.0</MtouchMinimumOS>
   </PropertyGroup>
@@ -70,16 +70,16 @@
     <Compile Include="Game1.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\XnaTouch.Framework\XnaTouch.Framework.csproj">
+    <ProjectReference Include="..\..\Microsoft.Xna.Framework\Microsoft.Xna.Framework.csproj">
       <Project>{DB8508BB-9849-4CC2-BC0F-8EB5DACB3C47}</Project>
-      <Name>XnaTouch.Framework</Name>
+      <Name>MonoGame.Framework</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Content\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Content\xnatouchicon.png">
+    <Content Include="Content\monogameicon.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Default.png">
@@ -93,6 +93,6 @@
     </MonoDevelop>
   </ProjectExtensions>
   <ItemGroup>
-    <None Include="xnatouchicon.png" />
+    <None Include="monogameicon.png" />
   </ItemGroup>
 </Project>

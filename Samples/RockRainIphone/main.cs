@@ -8,7 +8,7 @@ using MonoTouch.Foundation;
 using MonoTouch.OpenGLES;
 using MonoTouch.UIKit;
 using MonoTouch.ObjCRuntime;
-using XnaTouch.Framework;
+using Microsoft.Xna.Framework;
 
 namespace RockRainIphone
 {

@@ -14,9 +14,9 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using XnaTouch.Framework;
-using XnaTouch.Framework.Input.Touch;
-using XnaTouch.Framework.Graphics;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input.Touch;
+using Microsoft.Xna.Framework.Graphics;
 using System.Xml.Linq;
 
 #endregion

@@ -34,7 +34,7 @@ using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace XnaTouch.Framework
+namespace Microsoft.Xna.Framework
 {
     public class BoundingFrustum : IEquatable<BoundingFrustum>
     {

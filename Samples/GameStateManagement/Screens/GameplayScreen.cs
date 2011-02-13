@@ -11,10 +11,10 @@
 using System;
 using System.Threading;
 #if IPHONE
-using XnaTouch.Framework;
-using XnaTouch.Framework.Content;
-using XnaTouch.Framework.Graphics;
-using XnaTouch.Framework.Input;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 #else
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -23,7 +23,7 @@ using Microsoft.Xna.Framework.Input;
 #endif
 #endregion
 
-namespace XnaTouch.Samples.GameStateManagement
+namespace Microsoft.Xna.Samples.GameStateManagement
 {
     /// <summary>
     /// This screen implements the actual game logic. It is just a

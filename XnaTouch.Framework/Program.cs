@@ -1,7 +1,7 @@
 // #region License
 // /*
 // Microsoft Public License (Ms-PL)
-// XnaTouch - Copyright © 2009 The XnaTouch Team
+// MonoGame - Copyright © 2009 The MonoGame Team
 // 
 // All rights reserved.
 // 
@@ -43,9 +43,9 @@ using System;
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
 
-using XnaTouch;
+using Microsoft.Xna;
 
-namespace XnaTouch.Framework
+namespace Microsoft.Xna.Framework
 {
 	public class XNATouchProgram : UIApplicationDelegate 
 	{

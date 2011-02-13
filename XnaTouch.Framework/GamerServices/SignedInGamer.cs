@@ -1,7 +1,7 @@
 #region License
 /*
 Microsoft Public License (Ms-PL)
-XnaTouch - Copyright © 2009 The XnaTouch Team
+MonoGame - Copyright © 2009 The MonoGame Team
 
 All rights reserved.
 
@@ -48,7 +48,7 @@ using MonoTouch.UIKit;
 #endregion Statement
 
 
-namespace XnaTouch.Framework.GamerServices
+namespace Microsoft.Xna.Framework.GamerServices
 {
     public class SignedInGamer : Gamer
     {

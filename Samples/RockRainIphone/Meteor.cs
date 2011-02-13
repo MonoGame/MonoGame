@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using XnaTouch.Framework;
-using XnaTouch.Framework.Graphics;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using RockRainIphone.Core;
 
 namespace RockRainIphone

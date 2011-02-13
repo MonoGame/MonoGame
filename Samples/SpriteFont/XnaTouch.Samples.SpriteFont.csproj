@@ -10,7 +10,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>SpriteFont</RootNamespace>
     <BundleDisplayName>SpriteFont</BundleDisplayName>
-    <BundleIcon>xnatouchicon.png</BundleIcon>
+    <BundleIcon>monogameicon.png</BundleIcon>
     <AssemblyName>SpriteFont</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <MtouchMinimumOS>3.0</MtouchMinimumOS>
@@ -78,16 +78,16 @@
     <Compile Include="main.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="xnatouchicon.png" />
+    <None Include="monogameicon.png" />
     <None Include="Info.plist" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Content\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\XnaTouch.Framework\XnaTouch.Framework.csproj">
+    <ProjectReference Include="..\..\Microsoft.Xna.Framework\Microsoft.Xna.Framework.csproj">
       <Project>{DB8508BB-9849-4CC2-BC0F-8EB5DACB3C47}</Project>
-      <Name>XnaTouch.Framework</Name>
+      <Name>MonoGame.Framework</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

@@ -11,8 +11,8 @@
     <AssemblyName>Draw2D</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <BundleDisplayName>Draw2D</BundleDisplayName>
-    <BundleIcon>xnatouchicon.png</BundleIcon>
-    <RootNamespace>XnaTouch.Samples.Draw2D</RootNamespace>
+    <BundleIcon>monogameicon.png</BundleIcon>
+    <RootNamespace>MonoGame.Samples.Draw2D</RootNamespace>
     <MtouchMinimumOS>3.0</MtouchMinimumOS>
     <SupportedDevices>IPhoneAndIPad</SupportedDevices>
     <MtouchSdkVersion>4.0</MtouchSdkVersion>
@@ -81,14 +81,14 @@
     <Content Include="Default.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\xnatouchicon.png">
+    <Content Include="Content\monogameicon.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\XnaTouch.Framework\XnaTouch.Framework.csproj">
+    <ProjectReference Include="..\..\Microsoft.Xna.Framework\Microsoft.Xna.Framework.csproj">
       <Project>{DB8508BB-9849-4CC2-BC0F-8EB5DACB3C47}</Project>
-      <Name>XnaTouch.Framework</Name>
+      <Name>MonoGame.Framework</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
@@ -98,7 +98,7 @@
     </MonoDevelop>
   </ProjectExtensions>
   <ItemGroup>
-    <None Include="xnatouchicon.png" />
+    <None Include="monogameicon.png" />
     <None Include="Info.plist" />
   </ItemGroup>
 </Project>

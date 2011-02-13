@@ -1,16 +1,16 @@
 using System;
 using System.Collections.Generic;
-using XnaTouch.Framework;
-using XnaTouch.Framework.Graphics;
-using XnaTouch.Framework.Input;
-using XnaTouch.Framework.Input.Touch;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Input.Touch;
 
-namespace XnaTouch.Samples.MultiTouch
+namespace Microsoft.Xna.Samples.MultiTouch
 {
     /// <summary>
     /// This is the main type for your game
     /// </summary>
-    public class Game1 : XnaTouch.Framework.Game
+    public class Game1 : Microsoft.Xna.Framework.Game
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;

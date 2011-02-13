@@ -9,7 +9,7 @@
 
 #region Using Statements
 using System;
-using XnaTouch.Framework;
+using Microsoft.Xna.Framework;
 #endregion
 
 namespace RockRainIphone.Core

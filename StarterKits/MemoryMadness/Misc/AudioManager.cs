@@ -13,8 +13,8 @@
 
 using System;
 using System.Collections.Generic;
-using XnaTouch.Framework;
-using XnaTouch.Framework.Audio;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 
 #endregion
 

@@ -10,8 +10,8 @@
 #region Using Statements
 using System;
 #if IPHONE
-using XnaTouch.Framework;
-using XnaTouch.Framework.Graphics;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 #else
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -19,7 +19,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 #endregion
 
-namespace XnaTouch.Samples.GameStateManagement
+namespace Microsoft.Xna.Samples.GameStateManagement
 {
     /// <summary>
     /// The loading screen coordinates transitions between the menu system and the

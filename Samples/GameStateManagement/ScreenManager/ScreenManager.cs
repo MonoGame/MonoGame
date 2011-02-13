@@ -12,9 +12,9 @@ using System;
 using System.Diagnostics;
 using System.Collections.Generic;
 #if IPHONE
-using XnaTouch.Framework;
-using XnaTouch.Framework.Content;
-using XnaTouch.Framework.Graphics;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
 #else
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -22,7 +22,7 @@ using Microsoft.Xna.Framework.Graphics;
 #endif
 #endregion
 
-namespace XnaTouch.Samples.GameStateManagement
+namespace Microsoft.Xna.Samples.GameStateManagement
 {
     /// <summary>
     /// The screen manager is a component which manages one or more GameScreen

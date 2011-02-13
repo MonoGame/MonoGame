@@ -1,10 +1,10 @@
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
-using XnaTouch;
-using XnaTouch.Samples;
-using XnaTouch.Samples.BatteryStatus;
+using Microsoft.Xna;
+using Microsoft.Xna.Samples;
+using Microsoft.Xna.Samples.BatteryStatus;
 
-namespace XnaTouch.Samples.BatteryStatus
+namespace Microsoft.Xna.Samples.BatteryStatus
 {
 	[Register ("AppDelegate")]
 	class Program : UIApplicationDelegate 

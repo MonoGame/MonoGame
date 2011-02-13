@@ -1,7 +1,7 @@
 #region License
 /*
 Microsoft Public License (Ms-PL)
-XnaTouch - Copyright © 2009 The XnaTouch Team
+MonoGame - Copyright © 2009 The MonoGame Team
 
 All rights reserved.
 
@@ -40,12 +40,12 @@ purpose and non-infringement.
 
 ﻿using System;
 
-namespace XnaTouch.Framework.GamerServices
+namespace Microsoft.Xna.Framework.GamerServices
 {
     public class Gamer
     {
         static SignedInGamerCollection _signedInGamers = new SignedInGamerCollection();
-        string _gamer = "XnaTouch";
+        string _gamer = "MonoGame";
         bool _isDisposed;
         Object _tag;
 

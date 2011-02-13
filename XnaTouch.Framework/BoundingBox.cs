@@ -32,7 +32,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 
-namespace XnaTouch.Framework
+namespace Microsoft.Xna.Framework
 {
     public struct BoundingBox : IEquatable<BoundingBox>
     {

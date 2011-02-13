@@ -9,14 +9,14 @@
 
 #region Using Statements
 #if IPHONE
-using XnaTouch.Framework;
+using Microsoft.Xna.Framework;
 #else
 using Microsoft.Xna.Framework;
 #endif
 
 #endregion
 
-namespace XnaTouch.Samples.GameStateManagement
+namespace Microsoft.Xna.Samples.GameStateManagement
 {
     /// <summary>
     /// The pause menu comes up over the top of the game,

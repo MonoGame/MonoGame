@@ -1,7 +1,7 @@
 #region License
 /*
 Microsoft Public License (Ms-PL)
-XnaTouch - Copyright © 2009 The XnaTouch Team
+MonoGame - Copyright © 2009 The MonoGame Team
 
 All rights reserved.
 
@@ -42,13 +42,13 @@ purpose and non-infringement.
 ﻿using System;
 using System.IO;
 using System.Reflection;
-using XnaTouch;
-using XnaTouch.Framework;
-using XnaTouch.Framework.Storage;
+using Microsoft.Xna;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Storage;
 #endregion
 
 
-namespace XnaTouch.Framework.Storage
+namespace Microsoft.Xna.Framework.Storage
 {
     public class StorageContainer : IDisposable
     {
@@ -76,7 +76,7 @@ namespace XnaTouch.Framework.Storage
             }
         }
 		
-		 public XnaTouch.Framework.Storage.StorageDevice StorageDevice
+		 public Microsoft.Xna.Framework.Storage.StorageDevice StorageDevice
         {
             get
             {

@@ -1,9 +1,9 @@
 
 using System;
-using XnaTouch.Framework.Graphics;
-using XnaTouch.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework;
 
-namespace XnaTouch.Samples.GameComponents
+namespace Microsoft.Xna.Samples.GameComponents
 {
 	public class FPSCounterComponent : DrawableGameComponent
     {

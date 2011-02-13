@@ -1,7 +1,7 @@
  #region License
 // /*
 // Microsoft Public License (Ms-PL)
-// XnaTouch - Copyright © 2009 The XnaTouch Team
+// MonoGame - Copyright © 2009 The MonoGame Team
 // 
 // All rights reserved.
 // 
@@ -43,7 +43,7 @@ using System.Collections.Generic;
 
 using MonoTouch.MediaPlayer;
 
-namespace XnaTouch.Framework.Media
+namespace Microsoft.Xna.Framework.Media
 {
 	public sealed class MediaLibrary : IDisposable
     {
@@ -83,7 +83,7 @@ namespace XnaTouch.Framework.Media
             }
         }
 
-        public XnaTouch.Framework.Media.MediaSource MediaSource
+        public Microsoft.Xna.Framework.Media.MediaSource MediaSource
         {
             get
             {

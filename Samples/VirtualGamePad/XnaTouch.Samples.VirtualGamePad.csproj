@@ -11,8 +11,8 @@
     <AssemblyName>VirtualGamePad</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <BundleDisplayName>Virtual GamePad</BundleDisplayName>
-    <BundleIcon>xnatouchicon.png</BundleIcon>
-    <RootNamespace>XnaTouch.Samples.VirtualGamePad</RootNamespace>
+    <BundleIcon>monogameicon.png</BundleIcon>
+    <RootNamespace>MonoGame.Samples.VirtualGamePad</RootNamespace>
     <MtouchSdkVersion>4.0</MtouchSdkVersion>
     <MtouchMinimumOS>3.0</MtouchMinimumOS>
   </PropertyGroup>
@@ -65,9 +65,9 @@
     <Reference Include="monotouch" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\XnaTouch.Framework\XnaTouch.Framework.csproj">
+    <ProjectReference Include="..\..\Microsoft.Xna.Framework\Microsoft.Xna.Framework.csproj">
       <Project>{DB8508BB-9849-4CC2-BC0F-8EB5DACB3C47}</Project>
-      <Name>XnaTouch.Framework</Name>
+      <Name>MonoGame.Framework</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -87,7 +87,7 @@
     <Content Include="Default.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\xnatouchicon.png">
+    <Content Include="Content\monogameicon.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\font.xnb">
@@ -95,6 +95,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <None Include="xnatouchicon.png" />
+    <None Include="monogameicon.png" />
   </ItemGroup>
 </Project>

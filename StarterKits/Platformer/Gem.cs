@@ -1,9 +1,9 @@
 #region Using Clause
 using System;
 #if IPHONE
-using XnaTouch.Framework;
-using XnaTouch.Framework.Graphics;
-using XnaTouch.Framework.Audio;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Audio;
 #else
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;

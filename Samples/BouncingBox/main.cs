@@ -1,7 +1,7 @@
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
 
-namespace XnaTouch.Samples.BouncingBox
+namespace Microsoft.Xna.Samples.BouncingBox
 {
 	[Register ("AppDelegate")]
 	class Program : UIApplicationDelegate 

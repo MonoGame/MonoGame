@@ -13,12 +13,12 @@
 
 using System;
 using System.Collections.Generic;
-using XnaTouch.Framework;
-using XnaTouch.Framework.Graphics;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using GameStateManagement;
-using XnaTouch.Framework.GamerServices;
+using Microsoft.Xna.Framework.GamerServices;
 using System.Xml.Linq;
-using XnaTouch.Framework.Input.Touch;
+using Microsoft.Xna.Framework.Input.Touch;
 
 #endregion
 

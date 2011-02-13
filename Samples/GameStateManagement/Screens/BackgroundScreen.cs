@@ -10,9 +10,9 @@
 #region Using Statements
 using System;
 #if IPHONE
-using XnaTouch.Framework;
-using XnaTouch.Framework.Content;
-using XnaTouch.Framework.Graphics;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
 #else
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -20,7 +20,7 @@ using Microsoft.Xna.Framework.Graphics;
 #endif
 #endregion
 
-namespace XnaTouch.Samples.GameStateManagement
+namespace Microsoft.Xna.Samples.GameStateManagement
 {
     /// <summary>
     /// The background screen sits behind all the other menu screens.

@@ -1,10 +1,10 @@
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
-using XnaTouch;
-using XnaTouch.Samples;
-using XnaTouch.Samples.VirtualGamePad;
+using Microsoft.Xna;
+using Microsoft.Xna.Samples;
+using Microsoft.Xna.Samples.VirtualGamePad;
 
-namespace XnaTouch.Samples.VirtualGamePad
+namespace Microsoft.Xna.Samples.VirtualGamePad
 {
 	[Register ("AppDelegate")]
 	class Program : UIApplicationDelegate 

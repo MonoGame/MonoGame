@@ -8,11 +8,11 @@
     <ProjectGuid>{4F51EB5C-03A1-4488-8EEA-0E8F2411DB0C}</ProjectGuid>
     <ProjectTypeGuids>{E613F3A2-FE9C-494F-B74E-F63BCB86FEA6};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Exe</OutputType>
-    <RootNamespace>XnaTouch.Samples.GameComponents</RootNamespace>
+    <RootNamespace>MonoGame.Samples.GameComponents</RootNamespace>
     <AssemblyName>GameComponents</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <BundleDisplayName>GameComponents</BundleDisplayName>
-    <BundleIcon>xnatouchicon.png</BundleIcon>
+    <BundleIcon>monogameicon.png</BundleIcon>
     <MtouchSdkVersion>4.0</MtouchSdkVersion>
     <MtouchMinimumOS>3.0</MtouchMinimumOS>
   </PropertyGroup>
@@ -71,16 +71,16 @@
     <Compile Include="FPSCounterComponent.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\XnaTouch.Framework\XnaTouch.Framework.csproj">
+    <ProjectReference Include="..\..\Microsoft.Xna.Framework\Microsoft.Xna.Framework.csproj">
       <Project>{DB8508BB-9849-4CC2-BC0F-8EB5DACB3C47}</Project>
-      <Name>XnaTouch.Framework</Name>
+      <Name>MonoGame.Framework</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Default.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\xnatouchicon.png">
+    <Content Include="Content\monogameicon.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\font.xnb">
@@ -94,6 +94,6 @@
     </MonoDevelop>
   </ProjectExtensions>
   <ItemGroup>
-    <None Include="xnatouchicon.png" />
+    <None Include="monogameicon.png" />
   </ItemGroup>
 </Project>

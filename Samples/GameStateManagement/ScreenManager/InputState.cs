@@ -9,15 +9,15 @@
 
 #region Using Statements
 #if IPHONE
-using XnaTouch.Framework;
-using XnaTouch.Framework.Input;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 #else
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 #endif
 #endregion
 
-namespace XnaTouch.Samples.GameStateManagement
+namespace Microsoft.Xna.Samples.GameStateManagement
 {
     /// <summary>
     /// Helper for reading input from keyboard and gamepad. This class tracks both

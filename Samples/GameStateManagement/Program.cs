@@ -3,13 +3,13 @@ using System;
 #if IPHONE
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
-using XnaTouch;
-using XnaTouch.Framework.Media;
+using Microsoft.Xna;
+using Microsoft.Xna.Framework.Media;
 #else
 #endif
 #endregion
 
-namespace XnaTouch.Samples.GameStateManagement
+namespace Microsoft.Xna.Samples.GameStateManagement
 {
     #region Entry Point
 #if IPHONE

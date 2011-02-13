@@ -27,12 +27,12 @@ SOFTWARE.
 
 using System;
 using System.IO;
-using XnaTouch.Framework;
-using XnaTouch.Framework.Graphics;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System.Text;
 
 
-namespace XnaTouch.Framework.Content
+namespace Microsoft.Xna.Framework.Content
 {
     public sealed class ContentReader : BinaryReader
     {

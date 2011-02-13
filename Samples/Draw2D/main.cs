@@ -1,10 +1,10 @@
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
-using XnaTouch;
-using XnaTouch.Samples;
-using XnaTouch.Samples.Draw2D;
+using Microsoft.Xna;
+using Microsoft.Xna.Samples;
+using Microsoft.Xna.Samples.Draw2D;
 
-namespace XnaTouch.Samples.Draw2D
+namespace Microsoft.Xna.Samples.Draw2D
 {
 	[Register ("AppDelegate")]
 	class Program : UIApplicationDelegate 

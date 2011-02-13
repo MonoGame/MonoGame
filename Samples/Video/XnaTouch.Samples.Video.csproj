@@ -11,8 +11,8 @@
     <AssemblyName>Video</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <BundleDisplayName>Video Sample</BundleDisplayName>
-    <BundleIcon>xnatouchicon.png</BundleIcon>
-    <RootNamespace>XnaTouch.Samples.Video</RootNamespace>
+    <BundleIcon>monogameicon.png</BundleIcon>
+    <RootNamespace>MonoGame.Samples.Video</RootNamespace>
     <MtouchSdkVersion>4.0</MtouchSdkVersion>
     <SupportedDevices>IPhoneAndIPad</SupportedDevices>
     <MtouchMinimumOS>3.0</MtouchMinimumOS>
@@ -70,13 +70,13 @@
     <Compile Include="Game1.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="xnatouchicon.png" />
+    <None Include="monogameicon.png" />
     <None Include="Info.plist" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\XnaTouch.Framework\XnaTouch.Framework.csproj">
+    <ProjectReference Include="..\..\Microsoft.Xna.Framework\Microsoft.Xna.Framework.csproj">
       <Project>{DB8508BB-9849-4CC2-BC0F-8EB5DACB3C47}</Project>
-      <Name>XnaTouch.Framework</Name>
+      <Name>MonoGame.Framework</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
@@ -92,7 +92,7 @@
     <Content Include="Content\SpriteFont1.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\XnaTouch.m4v">
+    <Content Include="Content\MonoGame.m4v">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

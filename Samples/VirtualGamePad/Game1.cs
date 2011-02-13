@@ -1,21 +1,21 @@
 using System;
 using System.Collections.Generic;
-using XnaTouch.Framework;
-using XnaTouch.Framework.Content;
-using XnaTouch.Framework.GamerServices;
-using XnaTouch.Framework.Graphics;
-using XnaTouch.Framework.Input;
-using XnaTouch.Framework.Storage;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.GamerServices;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Storage;
 using MonoTouch.CoreAnimation;
 using MonoTouch.UIKit;
 using MonoTouch.Foundation;
 
-namespace XnaTouch.Samples.VirtualGamePad
+namespace Microsoft.Xna.Samples.VirtualGamePad
 {
     /// <summary>
     /// This is the main type for your game
     /// </summary>
-    public class Game1 : XnaTouch.Framework.Game
+    public class Game1 : Microsoft.Xna.Framework.Game
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;		
@@ -59,7 +59,7 @@ namespace XnaTouch.Samples.VirtualGamePad
 
             // TODO: use this.Content to load your game content here
             texture = Content.Load<Texture2D>("gamepad.png");
-			caracter = Content.Load<Texture2D>("xnatouchicon");
+			caracter = Content.Load<Texture2D>("monogameicon");
 			font = Content.Load<SpriteFont>("font");
 			
 			// Set the virtual GamePad

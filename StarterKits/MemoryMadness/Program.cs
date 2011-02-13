@@ -2,8 +2,8 @@
 using System;
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
-using XnaTouch;
-using XnaTouch.Framework.Media;
+using Microsoft.Xna;
+using Microsoft.Xna.Framework.Media;
 #endregion
 
 namespace MemoryMadness

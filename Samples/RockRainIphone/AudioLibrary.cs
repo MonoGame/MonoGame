@@ -1,6 +1,6 @@
-using XnaTouch.Framework.Audio;
-using XnaTouch.Framework.Content;
-using XnaTouch.Framework.Media;
+using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Media;
 
 namespace RockRainIphone
 {

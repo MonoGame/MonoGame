@@ -1,7 +1,7 @@
 #region License
 /*
 Microsoft Public License (Ms-PL)
-XnaTouch - Copyright © 2009 The XnaTouch Team
+MonoGame - Copyright © 2009 The MonoGame Team
 
 All rights reserved.
 
@@ -46,11 +46,11 @@ using System.Text;
 
 using MonoTouch.Foundation;
 
-using XnaTouch.Framework.Audio;
-using XnaTouch.Framework.Graphics;
-using XnaTouch.Framework.Media;
+using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Media;
 
-namespace XnaTouch.Framework.Content
+namespace Microsoft.Xna.Framework.Content
 {
     public class ContentManager : IDisposable
     {

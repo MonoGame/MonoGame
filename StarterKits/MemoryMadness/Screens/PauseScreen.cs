@@ -12,9 +12,9 @@
 #region Using Statements
 
 using System;
-using XnaTouch.Framework;
+using Microsoft.Xna.Framework;
 using GameStateManagement;
-using XnaTouch.Framework.GamerServices;
+using Microsoft.Xna.Framework.GamerServices;
 
 #endregion
 

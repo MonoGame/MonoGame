@@ -1,17 +1,17 @@
 
 using System;
-using XnaTouch;
-using XnaTouch.Framework;
-using XnaTouch.Framework.Graphics;
-using XnaTouch.Framework.Media;
-using XnaTouch.Framework.Input;
+using Microsoft.Xna;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Media;
+using Microsoft.Xna.Framework.Input;
 
-namespace XnaTouch.Samples.VideoSample
+namespace Microsoft.Xna.Samples.VideoSample
 {
 	/// <summary>
 	/// This is the main type for your game
 	/// </summary>
-	public class Game1 : XnaTouch.Framework.Game
+	public class Game1 : Microsoft.Xna.Framework.Game
 	{
 		GraphicsDeviceManager graphics;
 		SpriteBatch spriteBatch;
@@ -52,7 +52,7 @@ namespace XnaTouch.Samples.VideoSample
 
 			//TODO: use this.Content to load your game content here 
 			font = Content.Load<SpriteFont>("SpriteFont1");
-			video = Content.Load<Video>("XnaTouch.m4v");
+			video = Content.Load<Video>("MonoGame.m4v");
 		}
 
 		/// <summary>

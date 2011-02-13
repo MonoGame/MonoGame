@@ -1,9 +1,9 @@
 
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
-using XnaTouch;
+using Microsoft.Xna;
 
-namespace XnaTouch.Samples.VideoSample
+namespace Microsoft.Xna.Samples.VideoSample
 {
 	[Register("AppDelegate")]
 	class Program : UIApplicationDelegate

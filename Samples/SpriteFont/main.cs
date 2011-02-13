@@ -1,9 +1,9 @@
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
-using XnaTouch;
-using XnaTouch.Samples;
+using Microsoft.Xna;
+using Microsoft.Xna.Samples;
 
-namespace XnaTouch.Samples.SpriteFont
+namespace Microsoft.Xna.Samples.SpriteFont
 {
 	[Register ("AppDelegate")]
 	class Program : UIApplicationDelegate 

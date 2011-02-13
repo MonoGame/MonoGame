@@ -1,10 +1,10 @@
 
 using System;
-using XnaTouch.Framework.Storage;
+using Microsoft.Xna.Framework.Storage;
 using System.Xml.Serialization;
 using System.IO;
 
-namespace XnaTouch.Samples.Storage
+namespace Microsoft.Xna.Samples.Storage
 {
 	[Serializable]
     public struct SaveGame

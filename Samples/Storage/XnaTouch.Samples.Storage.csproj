@@ -11,7 +11,7 @@
     <BundleDisplayName>Storage</BundleDisplayName>
     <AssemblyName>Storage</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
-    <RootNamespace>XnaTouch.Samples.Storage</RootNamespace>
+    <RootNamespace>MonoGame.Samples.Storage</RootNamespace>
     <MtouchSdkVersion>4.0</MtouchSdkVersion>
     <MtouchMinimumOS>3.0</MtouchMinimumOS>
   </PropertyGroup>
@@ -69,9 +69,9 @@
     <Compile Include="SaveGame.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\XnaTouch.Framework\XnaTouch.Framework.csproj">
+    <ProjectReference Include="..\..\Microsoft.Xna.Framework\Microsoft.Xna.Framework.csproj">
       <Project>{DB8508BB-9849-4CC2-BC0F-8EB5DACB3C47}</Project>
-      <Name>XnaTouch.Framework</Name>
+      <Name>MonoGame.Framework</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

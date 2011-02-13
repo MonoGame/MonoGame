@@ -36,12 +36,12 @@ using MonoTouch.CoreGraphics;
 
 using OpenTK.Graphics.ES11;
 
-using XnaTouch;
-using XnaTouch.Framework;
-using XnaTouch.Framework.Content;
-using XnaTouch.Framework.Graphics;
+using Microsoft.Xna;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
 
-namespace XnaTouch.Framework.Content
+namespace Microsoft.Xna.Framework.Content
 {
     internal class Texture2DReader : ContentTypeReader<Texture2D>
     {

@@ -1,6 +1,6 @@
 using System;
 
-namespace XnaTouch.Framework.Graphics
+namespace Microsoft.Xna.Framework.Graphics
 {
 	internal class SpriteBatchItem
 	{
