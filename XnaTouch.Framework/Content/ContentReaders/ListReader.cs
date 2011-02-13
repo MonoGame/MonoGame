@@ -29,9 +29,9 @@ SOFTWARE.
 using System;
 using System.Collections.Generic;
 using System.Text;
-using XnaTouch.Framework.Content;
+using Microsoft.Xna.Framework.Content;
 
-namespace XnaTouch.Framework.Content
+namespace Microsoft.Xna.Framework.Content
 {
     internal class ListReader<T> : ContentTypeReader<List<T>>
     {

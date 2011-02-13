@@ -7,9 +7,9 @@
 
 using System;
 #if IPHONE
-using XnaTouch.Framework;
-using XnaTouch.Framework.Graphics;
-using XnaTouch.Framework.Input;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 #else
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;

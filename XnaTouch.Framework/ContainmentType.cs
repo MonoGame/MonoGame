@@ -25,7 +25,7 @@ SOFTWARE.
 */
 #endregion License
 
-namespace XnaTouch.Framework
+namespace Microsoft.Xna.Framework
 {
     public enum ContainmentType
     {

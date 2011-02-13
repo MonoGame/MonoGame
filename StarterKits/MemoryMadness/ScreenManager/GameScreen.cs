@@ -9,8 +9,8 @@
 
 #region Using Statements
 using System;
-using XnaTouch.Framework;
-using XnaTouch.Framework.Input.Touch;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input.Touch;
 using System.IO;
 #endregion
 

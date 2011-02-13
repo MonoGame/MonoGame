@@ -7,7 +7,7 @@
 
 using System;
 #if IPHONE
-using XnaTouch.Framework;
+using Microsoft.Xna.Framework;
 #else
 using Microsoft.Xna.Framework;
 #endif

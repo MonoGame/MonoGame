@@ -27,7 +27,7 @@ SOFTWARE.
 
 using System;
 
-namespace XnaTouch.Framework
+namespace Microsoft.Xna.Framework
 {
     public struct Matrix : IEquatable<Matrix>
     {

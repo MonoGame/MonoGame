@@ -1,7 +1,7 @@
 #region License
 /*
 Microsoft Public License (Ms-PL)
-XnaTouch - Copyright © 2009 The XnaTouch Team
+MonoGame - Copyright © 2009 The MonoGame Team
 
 All rights reserved.
 
@@ -50,13 +50,13 @@ using MonoTouch.UIKit;
 using MonoTouch.Foundation;
 using MonoTouch.GameKit;
 
-using XnaTouch.Framework.Net;
-using XnaTouch.Framework.Storage;
+using Microsoft.Xna.Framework.Net;
+using Microsoft.Xna.Framework.Storage;
 
 
 #endregion Using clause
 
-namespace XnaTouch.Framework.GamerServices
+namespace Microsoft.Xna.Framework.GamerServices
 {
 
 

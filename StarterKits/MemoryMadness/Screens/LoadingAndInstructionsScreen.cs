@@ -12,11 +12,11 @@
 #region Using Statements
 
 using System;
-using XnaTouch.Framework.Graphics;
-using XnaTouch.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework;
 using GameStateManagement;
 using System.Threading;
-using XnaTouch.Framework.Input.Touch;
+using Microsoft.Xna.Framework.Input.Touch;
 
 #endregion
 

@@ -4,9 +4,9 @@ using System.Text;
 using System.Collections.Generic;
 using OpenTK.Graphics.ES11;
 
-using XnaTouch.Framework;
+using Microsoft.Xna.Framework;
 
-namespace XnaTouch.Framework.Graphics
+namespace Microsoft.Xna.Framework.Graphics
 {
 	public class SpriteBatch : GraphicsResource
 	{

@@ -15,10 +15,10 @@ using System;
 using System.Collections.Generic;
 using System.IO.IsolatedStorage;
 using System.IO;
-using XnaTouch.Framework.Graphics;
-using XnaTouch.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework;
 using GameStateManagement;
-using XnaTouch.Framework.Input.Touch;
+using Microsoft.Xna.Framework.Input.Touch;
 
 #endregion
 
@@ -119,7 +119,7 @@ namespace MemoryMadness
         /// Renders the screen
         /// </summary>
         /// <param name="gameTime"></param>
-        public override void Draw(XnaTouch.Framework.GameTime gameTime)
+        public override void Draw(Microsoft.Xna.Framework.GameTime gameTime)
         {
             ScreenManager.SpriteBatch.Begin();
 

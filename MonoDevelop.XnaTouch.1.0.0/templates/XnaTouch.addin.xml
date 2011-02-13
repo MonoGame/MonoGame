@@ -1,15 +1,15 @@
-<Addin id          = "XnaTouch"
+<Addin id          = "MonoGame"
        namespace   = "MonoDevelop"
-       name        = "XnaTouch Project Template"
+       name        = "MonoGame Project Template"
        author      = "José Antonio Leal de Farias"
        copyright   = "LGPL 2.1"
        url         = "http://xnatouch.codeplex.com/"
-       description = "Templates for creating games with XnaTouch."
+       description = "Templates for creating games with MonoGame."
        category    = "Templates"
        version     = "1.0.0">
 	
 	<Runtime>
-		<Import file = "XnaTouchGameProject.xpt.xml"/>
+		<Import file = "MonoGameGameProject.xpt.xml"/>
         <Import file = "gameicon.png"/>
         <Import file = "Default.png"/>
     </Runtime>
@@ -20,12 +20,12 @@
 	</Dependencies>
 
 	<Extension path = "/MonoDevelop/Ide/ProjectTemplates">
-		<ProjectTemplate id   = "XnaTouchGameProject"
-		                 file = "XnaTouchGameProject.xpt.xml"/>
+		<ProjectTemplate id   = "MonoGameGameProject"
+		                 file = "MonoGameGameProject.xpt.xml"/>
 	</Extension>
 	
 	<Extension path = "/MonoDevelop/Ide/FileTemplates">
-		<FileTemplate id = "XnaTouchGameFile"
-					  file = "XnaTouchGameFile.xft.xml"/>
+		<FileTemplate id = "MonoGameGameFile"
+					  file = "MonoGameGameFile.xft.xml"/>
 	</Extension>
 </Addin>

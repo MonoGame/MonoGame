@@ -1,9 +1,9 @@
 using System;
 
-using XnaTouch.Framework;
-using XnaTouch.Framework.Graphics;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
-namespace XnaTouch.Framework.Graphics
+namespace Microsoft.Xna.Framework.Graphics
 {
 	//[StructLayout(LayoutKind.Sequential)]
 	// This should really be XNA's VertexPositionColorTexture

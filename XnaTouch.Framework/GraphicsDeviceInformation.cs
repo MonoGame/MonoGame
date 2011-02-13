@@ -1,7 +1,7 @@
 // #region License
 // /*
 // Microsoft Public License (Ms-PL)
-// XnaTouch - Copyright © 2009 The XnaTouch Team
+// MonoGame - Copyright © 2009 The MonoGame Team
 // 
 // All rights reserved.
 // 
@@ -39,9 +39,9 @@
 // #endregion License
 // 
 using System;
-using XnaTouch.Framework.Graphics;
+using Microsoft.Xna.Framework.Graphics;
 
-namespace XnaTouch.Framework
+namespace Microsoft.Xna.Framework
 {
 	public class GraphicsDeviceInformation
 	{

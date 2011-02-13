@@ -2,12 +2,12 @@
 using System;
 using System.IO;
 #if IPHONE
-using XnaTouch.Framework;
-using XnaTouch.Framework.Graphics;
-using XnaTouch.Framework.Input;
-using XnaTouch.Framework.Input.Touch;
-using XnaTouch.Framework.Storage;
-using XnaTouch.Framework.Media;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Input.Touch;
+using Microsoft.Xna.Framework.Storage;
+using Microsoft.Xna.Framework.Media;
 #else
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;

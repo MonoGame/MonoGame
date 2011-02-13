@@ -3,8 +3,8 @@ using System;
 #if IPHONE
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
-using XnaTouch;
-using XnaTouch.Framework.Media;
+using Microsoft.Xna;
+using Microsoft.Xna.Framework.Media;
 #else
 using Microsoft.Xna.Framework;
 #endif

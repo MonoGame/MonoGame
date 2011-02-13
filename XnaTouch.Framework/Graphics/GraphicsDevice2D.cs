@@ -1,7 +1,7 @@
 // #region License
 // /*
 // Microsoft Public License (Ms-PL)
-// XnaTouch - Copyright © 2009 The XnaTouch Team
+// MonoGame - Copyright © 2009 The MonoGame Team
 // 
 // All rights reserved.
 // 
@@ -44,7 +44,7 @@ using System.Collections.Generic;
 using OpenTK.Graphics.ES11;
 using System.Diagnostics;
 
-namespace XnaTouch.Framework.Graphics
+namespace Microsoft.Xna.Framework.Graphics
 {
 	internal class TextureComparer : IComparer<SpriteBatchRenderItem>
     {

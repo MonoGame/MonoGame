@@ -1,7 +1,7 @@
 #region License
 /*
 Microsoft Public License (Ms-PL)
-XnaTouch - Copyright © 2009 The XnaTouch Team
+MonoGame - Copyright © 2009 The MonoGame Team
 
 All rights reserved.
 
@@ -39,10 +39,10 @@ purpose and non-infringement.
 #endregion License
 
 using System;
-using XnaTouch.Framework.Audio;
+using Microsoft.Xna.Framework.Audio;
 using System.IO;
 ﻿
-namespace XnaTouch.Framework.Media
+namespace Microsoft.Xna.Framework.Media
 {
     public class Song : IEquatable<Song>, IDisposable
     {

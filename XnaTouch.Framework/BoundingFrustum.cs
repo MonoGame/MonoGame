@@ -33,7 +33,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.ComponentModel;
 
-namespace XnaTouch.Framework
+namespace Microsoft.Xna.Framework
 {
     public struct BoundingSphere : IEquatable<BoundingSphere>
     {

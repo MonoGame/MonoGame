@@ -26,7 +26,7 @@ SOFTWARE.
 #endregion License
 using System;
 
-namespace XnaTouch.Framework
+namespace Microsoft.Xna.Framework
 {
     public struct Point : IEquatable<Point>
     {

@@ -1,7 +1,7 @@
 #region License
 // /*
 // Microsoft Public License (Ms-PL)
-// XnaTouch - Copyright © 2009-2010 The XnaTouch Team
+// MonoGame - Copyright © 2009-2010 The MonoGame Team
 // 
 // All rights reserved.
 // 
@@ -45,7 +45,7 @@ using MonoTouch.UIKit;
 
 #endregion Using clause
 
-namespace XnaTouch.Framework.Input.Touch
+namespace Microsoft.Xna.Framework.Input.Touch
 {
     public struct TouchLocation : IEquatable<TouchLocation>
     {

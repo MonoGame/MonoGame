@@ -1,7 +1,7 @@
 #region License
 /*
 Microsoft Public License (Ms-PL)
-XnaTouch - Copyright © 2009 The XnaTouch Team
+MonoGame - Copyright © 2009 The MonoGame Team
 
 All rights reserved.
 
@@ -45,9 +45,9 @@ using MonoTouch.OpenGLES;
 
 using OpenTK.Graphics.ES11;
 
-using XnaTouch.Framework;
+using Microsoft.Xna.Framework;
 
-namespace XnaTouch.Framework.Graphics
+namespace Microsoft.Xna.Framework.Graphics
 {	
     public class GraphicsDevice : IDisposable
     {
@@ -165,17 +165,17 @@ namespace XnaTouch.Framework.Graphics
 			throw new NotImplementedException();
         }
 
-        public void Reset(XnaTouch.Framework.Graphics.PresentationParameters presentationParameters)
+        public void Reset(Microsoft.Xna.Framework.Graphics.PresentationParameters presentationParameters)
         {
 			throw new NotImplementedException();
         }
 
-        public void Reset(XnaTouch.Framework.Graphics.PresentationParameters presentationParameters, GraphicsAdapter graphicsAdapter)
+        public void Reset(Microsoft.Xna.Framework.Graphics.PresentationParameters presentationParameters, GraphicsAdapter graphicsAdapter)
         {
 			throw new NotImplementedException();
         }
 
-        public XnaTouch.Framework.Graphics.DisplayMode DisplayMode
+        public Microsoft.Xna.Framework.Graphics.DisplayMode DisplayMode
         {
             get
             {
@@ -183,7 +183,7 @@ namespace XnaTouch.Framework.Graphics
             }
         }
 
-        public XnaTouch.Framework.Graphics.GraphicsDeviceCapabilities GraphicsDeviceCapabilities
+        public Microsoft.Xna.Framework.Graphics.GraphicsDeviceCapabilities GraphicsDeviceCapabilities
         {
             get
             {
@@ -191,7 +191,7 @@ namespace XnaTouch.Framework.Graphics
             }
         }
 
-        public XnaTouch.Framework.Graphics.GraphicsDeviceStatus GraphicsDeviceStatus
+        public Microsoft.Xna.Framework.Graphics.GraphicsDeviceStatus GraphicsDeviceStatus
         {
             get
             {
@@ -199,13 +199,13 @@ namespace XnaTouch.Framework.Graphics
             }
         }
 
-        public XnaTouch.Framework.Graphics.PresentationParameters PresentationParameters
+        public Microsoft.Xna.Framework.Graphics.PresentationParameters PresentationParameters
         {
             get;
 			set;
         }
 
-        public XnaTouch.Framework.Graphics.Viewport Viewport
+        public Microsoft.Xna.Framework.Graphics.Viewport Viewport
         {
             get
             {
@@ -217,7 +217,7 @@ namespace XnaTouch.Framework.Graphics
 			}
 		}	
 		
-		public XnaTouch.Framework.Graphics.GraphicsProfile GraphicsProfile 
+		public Microsoft.Xna.Framework.Graphics.GraphicsProfile GraphicsProfile 
 		{ 
 			get; 
 			set;

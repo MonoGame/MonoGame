@@ -28,7 +28,7 @@ SOFTWARE.
 using System;
 using System.Collections.Generic;
 
-namespace XnaTouch.Framework
+namespace Microsoft.Xna.Framework
 {
     public class GameServiceContainer : IServiceProvider
     {

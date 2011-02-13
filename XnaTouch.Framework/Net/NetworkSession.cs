@@ -1,7 +1,7 @@
 #region License
 // /*
 // Microsoft Public License (Ms-PL)
-// XnaTouch - Copyright © 2009 The XnaTouch Team
+// MonoGame - Copyright © 2009 The MonoGame Team
 // 
 // All rights reserved.
 // 
@@ -47,10 +47,10 @@ using System.Runtime.Remoting.Messaging;
 using MonoTouch.UIKit;
 using MonoTouch.GameKit;
 
-using XnaTouch.Framework.GamerServices;
+using Microsoft.Xna.Framework.GamerServices;
 #endregion Using clause
 
-namespace XnaTouch.Framework.Net
+namespace Microsoft.Xna.Framework.Net
 {
 	// The delegate must have the same signature as the method
     // it will call asynchronously.
@@ -507,7 +507,7 @@ namespace XnaTouch.Framework.Net
 				networkSessionType = sessionType;
 				
 				GKPeerPickerController peerPickerController = new GKPeerPickerController();
-				peerPickerController.Delegate = new XnaTouchPeerPickerControllerDelegate(gkSession, ReceiveData);
+				peerPickerController.Delegate = new MonoGamePeerPickerControllerDelegate(gkSession, ReceiveData);
 				if ( sessionType == NetworkSessionType.SystemLink )
 				{
 				 	peerPickerController.ConnectionTypesMask = GKPeerPickerConnectionType.Nearby;

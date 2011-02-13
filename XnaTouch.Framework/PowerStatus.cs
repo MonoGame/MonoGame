@@ -1,7 +1,7 @@
 #region License
 /*
 Microsoft Public License (Ms-PL)
-XnaTouch - Copyright © 2009 The XnaTouch Team
+MonoGame - Copyright © 2009 The MonoGame Team
 
 All rights reserved.
 
@@ -42,11 +42,11 @@ using System;
 using System.Runtime.CompilerServices;
 using MonoTouch.UIKit;
 
-﻿namespace XnaTouch.Framework
+﻿namespace Microsoft.Xna.Framework
 {
     public static class PowerStatus
     {		
-        public static XnaTouch.Framework.BatteryChargeStatus BatteryChargeStatus
+        public static Microsoft.Xna.Framework.BatteryChargeStatus BatteryChargeStatus
         {
             get
             {
@@ -100,7 +100,7 @@ using MonoTouch.UIKit;
             }
         }
 
-        public static XnaTouch.Framework.PowerLineStatus PowerLineStatus
+        public static Microsoft.Xna.Framework.PowerLineStatus PowerLineStatus
         {
             get
             {

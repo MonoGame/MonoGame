@@ -29,7 +29,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace XnaTouch.Framework
+namespace Microsoft.Xna.Framework
 {
     public static class MathHelper
     {

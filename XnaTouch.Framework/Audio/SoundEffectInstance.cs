@@ -1,7 +1,7 @@
 #region License
 // /*
 // Microsoft Public License (Ms-PL)
-// XnaTouch - Copyright © 2009 The XnaTouch Team
+// MonoGame - Copyright © 2009 The MonoGame Team
 // 
 // All rights reserved.
 // 
@@ -42,7 +42,7 @@
 using System;
 #endregion Statements
 
-namespace XnaTouch.Framework.Audio
+namespace Microsoft.Xna.Framework.Audio
 {
 	public sealed class SoundEffectInstance : IDisposable
 	{

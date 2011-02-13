@@ -1,7 +1,7 @@
 #region License
 // /*
 // Microsoft Public License (Ms-PL)
-// XnaTouch - Copyright © 2009 The XnaTouch Team
+// MonoGame - Copyright © 2009 The MonoGame Team
 // 
 // All rights reserved.
 // 
@@ -46,18 +46,18 @@ using System.Collections.Generic;
 using MonoTouch.UIKit;
 using MonoTouch.GameKit;
 
-using XnaTouch.Framework.GamerServices;
+using Microsoft.Xna.Framework.GamerServices;
 #endregion Using clause
 
-namespace XnaTouch.Framework.Net
+namespace Microsoft.Xna.Framework.Net
 {
 
-	public class XnaTouchPeerPickerControllerDelegate : MonoTouch.GameKit.GKPeerPickerControllerDelegate
+	public class MonoGamePeerPickerControllerDelegate : MonoTouch.GameKit.GKPeerPickerControllerDelegate
 	{
 		private GKSession gkSession;
 		private EventHandler<GKDataReceivedEventArgs> receivedData;
 		
-		public XnaTouchPeerPickerControllerDelegate( GKSession aSession, EventHandler<GKDataReceivedEventArgs> aReceivedData )
+		public MonoGamePeerPickerControllerDelegate( GKSession aSession, EventHandler<GKDataReceivedEventArgs> aReceivedData )
 		{
 			gkSession = aSession;
 			receivedData = aReceivedData;
@@ -92,7 +92,7 @@ namespace XnaTouch.Framework.Net
     		this.gkSession = toSession;
 
 			// Assumes our object will also become the session's delegate.
-    		gkSession.Delegate = new XnaTouchSessionDelegate();
+    		gkSession.Delegate = new MonoGameSessionDelegate();
 			gkSession.ReceiveData += new EventHandler<GKDataReceivedEventArgs>(receivedData);
 
     		picker.Dismiss();

@@ -8,9 +8,9 @@
 using System;
 using System.Collections.Generic;
 #if IPHONE
-using XnaTouch.Framework;
-using XnaTouch.Framework.Content;
-using XnaTouch.Framework.Graphics;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
 #else
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;

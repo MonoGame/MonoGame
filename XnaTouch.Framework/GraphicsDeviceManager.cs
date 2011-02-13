@@ -1,7 +1,7 @@
 #region License
 /*
 Microsoft Public License (Ms-PL)
-XnaTouch - Copyright © 2009 The XnaTouch Team
+MonoGame - Copyright © 2009 The MonoGame Team
 
 All rights reserved.
 
@@ -44,9 +44,9 @@ using MonoTouch.UIKit;
 
 using OpenTK.Graphics.ES11;
 
-using XnaTouch.Framework.Graphics;
+using Microsoft.Xna.Framework.Graphics;
 
-namespace XnaTouch.Framework
+namespace Microsoft.Xna.Framework
 {
     public class GraphicsDeviceManager : IGraphicsDeviceService, IDisposable, IGraphicsDeviceManager
     {
@@ -142,7 +142,7 @@ namespace XnaTouch.Framework
 			IsFullScreen = !IsFullScreen;
         }
 		
-        public XnaTouch.Framework.Graphics.GraphicsDevice GraphicsDevice
+        public Microsoft.Xna.Framework.Graphics.GraphicsDevice GraphicsDevice
         {
             get
             {

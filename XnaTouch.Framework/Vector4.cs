@@ -28,7 +28,7 @@ SOFTWARE.
 using System;
 using System.Text;
 
-namespace XnaTouch.Framework
+namespace Microsoft.Xna.Framework
 {
     public struct Vector4 : IEquatable<Vector4>
     {

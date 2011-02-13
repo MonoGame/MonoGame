@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 #if IPHONE
-using XnaTouch.Framework;
-using XnaTouch.Framework.Input;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 #else
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;

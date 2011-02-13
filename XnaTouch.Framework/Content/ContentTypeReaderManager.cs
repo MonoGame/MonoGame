@@ -30,7 +30,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 
-namespace XnaTouch.Framework.Content
+namespace Microsoft.Xna.Framework.Content
 {
     public sealed class ContentTypeReaderManager
     {
@@ -83,7 +83,7 @@ namespace XnaTouch.Framework.Content
 
             if (compressed != 0)
             {
-                throw new NotImplementedException("XnaTouch cannot read compressed XNB files. Please use the XNB files from the Debug build of your XNA game instead. If someone wants to contribute decompression logic, that would be fantastic.");
+                throw new NotImplementedException("MonoGame cannot read compressed XNB files. Please use the XNB files from the Debug build of your XNA game instead. If someone wants to contribute decompression logic, that would be fantastic.");
             }
 
             // The next byte i read tells me the number of content readers in this XNB file
@@ -110,14 +110,14 @@ namespace XnaTouch.Framework.Content
 							readerTypeString += ",";
 						
 						if(j == 1)
-							readerTypeString += " XnaTouch.Framework";
+							readerTypeString += " Microsoft.Xna.Framework";
 						else
 							readerTypeString += tokens[j];
  					}
 					readerTypeString = readerTypeString.Replace(", Microsoft.Xna.Framework", "@");
 				}
 				
-				readerTypeString = readerTypeString.Replace("Microsoft.Xna.Framework", "XnaTouch.Framework");
+				readerTypeString = readerTypeString.Replace("Microsoft.Xna.Framework", "Microsoft.Xna.Framework");
 				Type l_readerType = Type.GetType(readerTypeString);
 			
             	if(l_readerType !=null)

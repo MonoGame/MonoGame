@@ -28,7 +28,7 @@ SOFTWARE.
 using System;
 using System.ComponentModel;
 
-namespace XnaTouch.Framework
+namespace Microsoft.Xna.Framework
 {
     public class Curve
     {

@@ -1,7 +1,7 @@
 #region License
 /*
 Microsoft Public License (Ms-PL)
-XnaTouch - Copyright © 2009 The XnaTouch Team
+MonoGame - Copyright © 2009 The MonoGame Team
 
 All rights reserved.
 
@@ -42,10 +42,10 @@ using System.IO;
 using System;
 using MonoTouch.UIKit;
 using System.Drawing;
-using XnaTouch.Framework.Content;
+using Microsoft.Xna.Framework.Content;
 using OpenTK.Graphics.ES11;
 
-namespace XnaTouch.Framework.Graphics
+namespace Microsoft.Xna.Framework.Graphics
 {
     public class Texture2D
     {

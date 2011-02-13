@@ -1,7 +1,7 @@
 #region License
 // /*
 // Microsoft Public License (Ms-PL)
-// XnaTouch - Copyright © 2009 The XnaTouch Team
+// MonoGame - Copyright © 2009 The MonoGame Team
 // 
 // All rights reserved.
 // 
@@ -43,7 +43,7 @@ using System;
 using MonoTouch.UIKit;
 #endregion Using clause
 
-namespace XnaTouch.Framework.Net
+namespace Microsoft.Xna.Framework.Net
 {
 	public enum SendDataOptions
 	{

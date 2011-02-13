@@ -1,7 +1,7 @@
 #region License
 /*
 Microsoft Public License (Ms-PL)
-XnaTouch - Copyright © 2009 The XnaTouch Team
+MonoGame - Copyright © 2009 The MonoGame Team
 
 All rights reserved.
 
@@ -41,10 +41,10 @@ purpose and non-infringement.
 #region Using Statements
 using System;
 using System.Globalization;
-using XnaTouch.Framework.Graphics;
+using Microsoft.Xna.Framework.Graphics;
 #endregion
 
-namespace XnaTouch.Framework.GamerServices
+namespace Microsoft.Xna.Framework.GamerServices
 {
     public sealed class GamerProfile : IDisposable
     {

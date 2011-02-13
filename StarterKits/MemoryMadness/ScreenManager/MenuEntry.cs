@@ -9,8 +9,8 @@
 
 #region Using Statements
 using System;
-using XnaTouch.Framework;
-using XnaTouch.Framework.Graphics;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 #endregion
 
 namespace GameStateManagement

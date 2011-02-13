@@ -1,7 +1,7 @@
 // #region License
 // /*
 // Microsoft Public License (Ms-PL)
-// XnaTouch - Copyright © 2009 The XnaTouch Team
+// MonoGame - Copyright © 2009 The MonoGame Team
 // 
 // All rights reserved.
 // 
@@ -41,7 +41,7 @@
 
 using System;
 
-namespace XnaTouch.Framework.Input
+namespace Microsoft.Xna.Framework.Input
 {
 	public struct GamePadTriggers
 	{

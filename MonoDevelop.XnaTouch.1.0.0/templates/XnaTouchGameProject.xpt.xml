@@ -4,11 +4,11 @@
 	
 	<!-- Template Header -->
 	<TemplateConfiguration>
-		<_Name>XnaTouch Game Project</_Name>
+		<_Name>MonoGame Game Project</_Name>
 		<_Category>C#/iPhone and iPad</_Category>
 		<Icon>md-project-iphone</Icon>
 		<LanguageName>C#</LanguageName>
-		<_Description>Creates a XnaTouch Game project for for iPhone, iPod Touch and iPad.</_Description>
+		<_Description>Creates a MonoGame Game project for for iPhone, iPod Touch and iPad.</_Description>
 	</TemplateConfiguration>
 	
 	<!-- Actions -->
@@ -36,8 +36,8 @@
 <![CDATA[
 #region Using Statements
 using System;
-using XnaTouch.Framework;
-using XnaTouch.Framework.Media;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Media;
 
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
@@ -70,10 +70,10 @@ namespace ${Namespace}
 #region Using Statements
 using System;
 
-using XnaTouch.Framework;
-using XnaTouch.Framework.GamerServices;
-using XnaTouch.Framework.Graphics;
-using XnaTouch.Framework.Storage;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.GamerServices;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Storage;
 
 using MonoTouch.StoreKit;
 using MonoTouch.Foundation;
@@ -160,7 +160,7 @@ namespace ${Namespace}
 				</File>
                 <File name="Content/readme.txt">
 <![CDATA[
-Put your resource files here! XnaTouch is compatible with several image formats (PNG,JPEG,TIFF, etc.)
+Put your resource files here! MonoGame is compatible with several image formats (PNG,JPEG,TIFF, etc.)
 and .MP3 and .WAV audio formats. It's also compatible with a Windows XNB SpriteFont file.
 ]]>
 				</File>

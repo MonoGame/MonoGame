@@ -13,14 +13,14 @@
 
 using System;
 using System.Collections.Generic;
-using XnaTouch.Framework;
-using XnaTouch.Framework.Audio;
-using XnaTouch.Framework.Content;
-using XnaTouch.Framework.GamerServices;
-using XnaTouch.Framework.Graphics;
-using XnaTouch.Framework.Input;
-using XnaTouch.Framework.Input.Touch;
-using XnaTouch.Framework.Media;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.GamerServices;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Input.Touch;
+using Microsoft.Xna.Framework.Media;
 using GameStateManagement;
 using System.IO.IsolatedStorage;
 using System.IO;
@@ -32,7 +32,7 @@ namespace MemoryMadness
     /// <summary>
     /// This is the main type for your game
     /// </summary>
-    public class MemoryMadnessGame : XnaTouch.Framework.Game
+    public class MemoryMadnessGame : Microsoft.Xna.Framework.Game
     {
         #region Fields
 

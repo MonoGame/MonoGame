@@ -1,7 +1,7 @@
 #region License
 /*
 Microsoft Public License (Ms-PL)
-XnaTouch - Copyright © 2009 The XnaTouch Team
+MonoGame - Copyright © 2009 The MonoGame Team
 
 All rights reserved.
 
@@ -39,7 +39,7 @@ purpose and non-infringement.
 #endregion License
 using System;
 
-namespace XnaTouch.Framework.Input
+namespace Microsoft.Xna.Framework.Input
 {
     // Summary:
     //     Enumerates input device buttons.
