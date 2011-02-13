@@ -60,33 +60,34 @@ namespace Microsoft.Xna.Framework.Media
         {
         }
 		
-		public bool Equals(Song other) 
+		public bool Equals(Song song) 
 		{
-		  if (this.Name == other.Name)
-		     return true;
-		  else
-		     return false;
+			return ((object)song != null) && (Name == song.Name);
 		}
 		
 		public override bool Equals(Object obj)
 		{
-		  if (obj == null) 
-			return base.Equals(obj);
-		
-		  if (! (obj is Song))
-		     throw new InvalidCastException("The 'obj' argument is not a Person object.");
-		  else
-		     return Equals(obj as Song);   
+			if(obj == null)
+			{
+				return false;
+			}
+			
+			return Equals(obj as Song);  
 		}
 		
 		public static bool operator ==(Song song1, Song song2)
 		{
-		  return song1.Equals(song2);
+			if((object)song1 == null)
+			{
+				return (object)song2 == null;
+			}
+
+			return song1.Equals(song2);
 		}
 		
 		public static bool operator !=(Song song1, Song song2)
 		{
-		  return (! song1.Equals(song2));
+		  return ! (song1 == song2);
 		}
 		
 		internal void Play()

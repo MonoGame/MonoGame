@@ -43,7 +43,7 @@ using System;
 using MonoTouch.UIKit;
 #endregion Using clause
 
-namespace XnaTouch.Framework.Input.Touch
+namespace Microsoft.Xna.Framework.Input.Touch
 {
     public static class TouchPanel
     {
