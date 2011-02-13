@@ -241,9 +241,69 @@ namespace XnaTouch.Framework
 				TouchLocation tlocation;
 				TouchLocation previousTouch;
 				if (state != TouchLocationState.Pressed && previousTouches.TryGetValue (touch.Handle, out previousTouch))
-					tlocation = new TouchLocation(touch.Handle.ToInt32(), state, new Vector2 (touch.LocationInView (touch.View)), 1.0f, previousTouch.State, previousTouch.Position, previousTouch.Pressure);
+				{
+					Vector2 position = new Vector2 (touch.LocationInView (touch.View));
+					Vector2 translatedPosition = position;
+					
+					switch (CurrentOrientation)
+					{
+						case DisplayOrientation.Portrait :
+						{																		
+							break;
+						}
+						
+						case DisplayOrientation.LandscapeRight :
+						{				
+							translatedPosition = new Vector2( ClientBounds.Height - position.Y, position.X );							
+							break;
+						}
+						
+						case DisplayOrientation.LandscapeLeft :
+						{							
+							translatedPosition = new Vector2( position.Y, ClientBounds.Width - position.X );							
+							break;
+						}
+						
+						case DisplayOrientation.PortraitUpsideDown :
+						{				
+							translatedPosition = new Vector2( ClientBounds.Width - position.X, ClientBounds.Height - position.Y );							
+							break;
+						}
+					}
+					tlocation = new TouchLocation(touch.Handle.ToInt32(), state, translatedPosition, 1.0f, previousTouch.State, previousTouch.Position, previousTouch.Pressure);
+				}
 				else
-					tlocation = new TouchLocation(touch.Handle.ToInt32(), state, new Vector2 (touch.LocationInView (touch.View)), 1.0f);
+				{
+					Vector2 position = new Vector2 (touch.LocationInView (touch.View));
+					Vector2 translatedPosition = position;
+					
+					switch (CurrentOrientation)
+					{
+						case DisplayOrientation.Portrait :
+						{																		
+							break;
+						}
+						
+						case DisplayOrientation.LandscapeRight :
+						{				
+							translatedPosition = new Vector2( ClientBounds.Height - position.Y, position.X );							
+							break;
+						}
+						
+						case DisplayOrientation.LandscapeLeft :
+						{							
+							translatedPosition = new Vector2( position.Y, ClientBounds.Width - position.X );							
+							break;
+						}
+						
+						case DisplayOrientation.PortraitUpsideDown :
+						{				
+							translatedPosition = new Vector2( ClientBounds.Width - position.X, ClientBounds.Height - position.Y );							
+							break;
+						}
+					}
+					tlocation = new TouchLocation(touch.Handle.ToInt32(), state, translatedPosition, 1.0f);
+				}
 				
 				TouchPanel.Collection.Add (tlocation);
 				

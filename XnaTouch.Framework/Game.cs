@@ -124,6 +124,7 @@ namespace XnaTouch.Framework
 					case UIDeviceOrientation.LandscapeLeft :
 						switch ((graphicsDeviceManager as GraphicsDeviceManager).SupportedOrientations)
 						{
+							case DisplayOrientation.LandscapeLeft:
 							case DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight :
 							{
 								_view.CurrentOrientation = DisplayOrientation.LandscapeLeft;
@@ -136,6 +137,7 @@ namespace XnaTouch.Framework
 					case UIDeviceOrientation.LandscapeRight :
 						switch ((graphicsDeviceManager as GraphicsDeviceManager).SupportedOrientations)
 						{
+							case DisplayOrientation.LandscapeRight:
 							case DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight :
 							{
 								_view.CurrentOrientation = DisplayOrientation.LandscapeRight;
