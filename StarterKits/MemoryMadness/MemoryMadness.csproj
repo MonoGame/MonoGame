@@ -10,7 +10,6 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>MemoryMadness</RootNamespace>
     <AssemblyName>MemoryMadness</AssemblyName>
-    <MtouchMinimumOS>3.0</MtouchMinimumOS>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhoneSimulator' ">
@@ -24,6 +23,8 @@
     <ConsolePause>false</ConsolePause>
     <MtouchLink>None</MtouchLink>
     <MtouchDebug>True</MtouchDebug>
+    <MtouchMinimumOS>3.1</MtouchMinimumOS>
+    <MtouchI18n />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
     <DebugType>none</DebugType>
@@ -34,6 +35,8 @@
     <MtouchDebug>False</MtouchDebug>
     <ConsolePause>false</ConsolePause>
     <MtouchLink>None</MtouchLink>
+    <MtouchMinimumOS>3.1</MtouchMinimumOS>
+    <MtouchI18n />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhone' ">
     <DebugSymbols>true</DebugSymbols>
@@ -46,6 +49,7 @@
     <ConsolePause>false</ConsolePause>
     <CodesignKey>iPhone Developer</CodesignKey>
     <MtouchDebug>True</MtouchDebug>
+    <MtouchMinimumOS>3.0</MtouchMinimumOS>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
     <DebugType>none</DebugType>
@@ -56,6 +60,7 @@
     <MtouchDebug>False</MtouchDebug>
     <ConsolePause>false</ConsolePause>
     <CodesignKey>iPhone Developer</CodesignKey>
+    <MtouchMinimumOS>3.0</MtouchMinimumOS>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -70,12 +75,6 @@
       <Properties InternalTargetFrameworkVersion="IPhone" />
     </MonoDevelop>
   </ProjectExtensions>
-  <ItemGroup>
-    <ProjectReference Include="..\..\Microsoft.Xna.Framework\Microsoft.Xna.Framework.csproj">
-      <Project>{DB8508BB-9849-4CC2-BC0F-8EB5DACB3C47}</Project>
-      <Name>MonoGame.Framework</Name>
-    </ProjectReference>
-  </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="MemoryMadnessGame.cs" />
@@ -175,5 +174,11 @@
     <Content Include="Content\Fonts\GameplayLargeFont.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\MonoGame.Xna\MonoGame.Xna.csproj">
+      <Project>{DB8508BB-9849-4CC2-BC0F-8EB5DACB3C47}</Project>
+      <Name>MonoGame.Xna</Name>
+    </ProjectReference>
   </ItemGroup>
 </Project>
