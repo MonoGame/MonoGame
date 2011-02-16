@@ -31,9 +31,6 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Drawing;
 
-using MonoTouch.UIKit;
-using MonoTouch.CoreGraphics;
-
 using OpenTK.Graphics.ES11;
 
 using Microsoft.Xna;

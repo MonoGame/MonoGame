@@ -40,7 +40,7 @@ purpose and non-infringement.
 
 using System;
 
-using MonoTouch.UIKit;
+
 
 using OpenTK.Graphics.ES11;
 
