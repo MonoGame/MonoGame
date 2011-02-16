@@ -5,8 +5,6 @@ using System.Text;
 using System.IO;
 using System.Xml;
 
-using MonoTouch.UIKit;
-
 using OpenTK.Graphics.ES11;
 
 namespace Microsoft.Xna.Framework.Graphics
