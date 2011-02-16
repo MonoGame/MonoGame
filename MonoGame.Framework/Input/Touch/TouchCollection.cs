@@ -42,9 +42,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-
-using MonoTouch.UIKit;
-
 #endregion Using clause
 
 namespace Microsoft.Xna.Framework.Input.Touch

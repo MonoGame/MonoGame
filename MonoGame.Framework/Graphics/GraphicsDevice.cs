@@ -40,9 +40,6 @@ purpose and non-infringement.
 
 using System;
 
-using MonoTouch.CoreAnimation;
-using MonoTouch.OpenGLES;
-
 using OpenTK.Graphics.ES11;
 
 using Microsoft.Xna.Framework;

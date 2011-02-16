@@ -40,7 +40,6 @@
 
 #region Using clause
 using System;
-using MonoTouch.UIKit;
 #endregion Using clause
 
 namespace Microsoft.Xna.Framework.Input.Touch
