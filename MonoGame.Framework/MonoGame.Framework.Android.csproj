@@ -61,6 +61,8 @@
     <Compile Include="Android\Input\AccelerometerCapabilities.cs" />
     <Compile Include="Android\Input\AccelerometerState.cs" />
     <Compile Include="Android\Media\Song.cs" />
+    <Compile Include="Android\Media\Video.cs" />
+    <Compile Include="Android\Media\VideoPlayer.cs" />
     <Compile Include="Android\PowerStatus.cs" />
     <Compile Include="Audio\AudioEmitter.cs" />
     <Compile Include="Audio\AudioListener.cs" />
