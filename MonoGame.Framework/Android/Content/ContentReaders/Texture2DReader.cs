@@ -81,8 +81,6 @@ namespace Microsoft.Xna.Framework.Content
 				return FileName+".png";
             if (Contains(file + ".gif", files))
 				return FileName+".gif";
-            if (Contains(file + ".pict", files))
-				return FileName+".pict";
 			
 			return null;
 		}
