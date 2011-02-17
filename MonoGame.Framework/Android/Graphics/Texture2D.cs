@@ -98,13 +98,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public Color GetPixel(int x, int y)
         {
-			
-            byte r = texture.PixelData[((y * texture.ImageWidth) + x)];
-			byte g = texture.PixelData[((y * texture.ImageWidth) + x) + 1];
-			byte b = texture.PixelData[((y * texture.ImageWidth) + x) + 2];
-			byte a = texture.PixelData[((y * texture.ImageWidth) + x) + 3];
-			
-			return new Color(r, g, b, a);
+            throw new NotImplementedException();
         }
 
         public void SetPixel(int x, int y, byte red, byte green, byte blue, byte alpha)
@@ -220,31 +214,8 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         public void GetData<T>(ref T[] data)
-        {	
-			if (data == null )
-			{
-				throw new ArgumentException("data cannot be null");
-			}
-			
-			int mult = (this.Format == SurfaceFormat.Alpha8) ? 1 : 4;
-			
-			if (data.Length < Width * Height * mult)
-			{
-				throw new ArgumentException("data is the wrong length for Pixel Format");
-			}
-			
-			// Get the Color values
-			if ((typeof(T) == typeof(Color))) 
-			{	
-				int i = 0;
-				
-				while (i < data.Length) 
-				{
-					var d = (Color)(object)data[i];
-					d = new Color(texture.PixelData[i], texture.PixelData[i+1], texture.PixelData[i+2], texture.PixelData[i+3]);
-					i += 4;
-				}
-			}	
+        {
+            throw new NotImplementedException();
         }
 
         public void GetData<T>(T[] data, int startIndex, int elementCount)

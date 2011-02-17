@@ -43,6 +43,10 @@ using System;
 using System.Drawing;
 using System.Collections.Generic;
 using Android.Content;
+using Android.Content.Res;
+using Android.Util;
+using Android.Views;
+using Microsoft.Xna.Framework.Graphics;
 using OpenTK.Platform.Android;
 
 using OpenTK;
@@ -93,235 +97,150 @@ namespace Microsoft.Xna.Framework
 			try
             {
                 // TODO  this.GLContextVersion = GLContextVersion.Gles2_0;
-                this.GLContextVersion = GLContextVersion.Gles1_1;
+                GLContextVersion = GLContextVersion.Gles1_1;
 				base.CreateFrameBuffer();
 		    } 
 			catch (Exception) 
 			{
-		        // device doesn't support OpenGLES 2.0; retry with 1.1:
-                this.GLContextVersion = GLContextVersion.Gles1_1;
-				base.CreateFrameBuffer();
+		        //device doesn't support OpenGLES 2.0; retry with 1.1:
+                //GLContextVersion = GLContextVersion.Gles1_1;
+				//base.CreateFrameBuffer();
 		    }
 		}
 	
 
         #region AndroidGameView Methods
 
-        protected override void OnClosed(EventArgs e)
-		{
-			base.OnClosed(e);
-		}
-		
-		protected override void OnDisposed(EventArgs e)
-		{
-			base.OnDisposed(e);
-		}
-		
-		protected override void OnLoad (EventArgs e)
-		{
-			base.OnLoad(e);
-		}
-		
-		protected override void OnRenderFrame(FrameEventArgs e)
-		{
-			base.OnRenderFrame(e);
-			
-			MakeCurrent();
-						
-			// This code was commented to make the code base more iPhone like.
-			// More speed testing is required, to see if this is worse or better
-			// game.DoStep();	
-			
-			if (game != null )
-			{
-				_drawGameTime.Update(_now - _lastUpdate);
-            	_lastUpdate = _now;
-            	game.DoDraw(_drawGameTime);
-			}
-						
-			SwapBuffers();
-		}
-		
-		protected override void OnResize(EventArgs e)
-		{
-			base.OnResize(e);
-		}
-		
-		protected override void OnTitleChanged(EventArgs e)
-		{
-			base.OnTitleChanged(e);
-		}
-		
-		protected override void OnUnload(EventArgs e)
-		{
-			base.OnUnload(e);
-		}
-		
-		protected override void OnUpdateFrame(FrameEventArgs e)
+        protected override void OnRenderFrame(FrameEventArgs e)
+        {
+            base.OnRenderFrame(e);
+            
+            if (GraphicsContext == null || GraphicsContext.IsDisposed)
+                return;
+
+            //Should not happen at all..
+            if (!GraphicsContext.IsCurrent)
+                MakeCurrent();
+
+            // This code was commented to make the code base more iPhone like.
+            // More speed testing is required, to see if this is worse or better
+            // game.DoStep();	
+
+            if (game != null) {
+                _drawGameTime.Update(_now - _lastUpdate);
+                _lastUpdate = _now;
+                game.DoDraw(_drawGameTime);
+            }
+
+            SwapBuffers();
+        }
+
+        protected override void OnUpdateFrame(FrameEventArgs e)
 		{			
-			base.OnUpdateFrame(e);	
+			base.OnUpdateFrame(e);
 			
 			if (game != null )
 			{
+                ObserveDeviceRotation();
+
 				_now = DateTime.Now;
 				_updateGameTime.Update(_now - _lastUpdate);
             	game.DoUpdate(_updateGameTime);
 			}
 		}
 		
-		protected override void OnVisibleChanged(EventArgs e)
-		{			
-			base.OnVisibleChanged(e);	
-		}
-		
-		protected override void OnWindowStateChanged(EventArgs e)
-		{		
-			base.OnWindowStateChanged(e);	
-		}
-		
 		#endregion
-				
-	/*
-						
-		private readonly Dictionary<IntPtr, TouchLocation> previousTouches = new Dictionary<IntPtr, TouchLocation>();
-		
-		private void FillTouchCollection(NSSet touches)
-		{
-			UITouch []touchesArray = touches.ToArray<UITouch>();
-			
-			TouchPanel.Collection.Clear();
-			TouchPanel.Collection.Capacity = touchesArray.Length;
-			
-			for (int i=0; i<touchesArray.Length;i++)
-			{
-				TouchLocationState state;				
-				UITouch touch = touchesArray[i];
-				switch (touch.Phase)
-				{
-					case UITouchPhase.Began	:	
-						state = TouchLocationState.Pressed;
-						break;
-					case UITouchPhase.Cancelled	:
-					case UITouchPhase.Ended	:
-						state = TouchLocationState.Released;
-						break;
-					default :
-						state = TouchLocationState.Moved;
-						break;					
-				}
-				
-				TouchLocation tlocation;
-				TouchLocation previousTouch;
-				if (state != TouchLocationState.Pressed && previousTouches.TryGetValue (touch.Handle, out previousTouch))
-				{
-					Vector2 position = new Vector2 (touch.LocationInView (touch.View));
-					Vector2 translatedPosition = position;
-					
-					switch (CurrentOrientation)
-					{
-						case DisplayOrientation.Portrait :
-						{																		
-							break;
-						}
-						
-						case DisplayOrientation.LandscapeRight :
-						{				
-							translatedPosition = new Vector2( ClientBounds.Height - position.Y, position.X );							
-							break;
-						}
-						
-						case DisplayOrientation.LandscapeLeft :
-						{							
-							translatedPosition = new Vector2( position.Y, ClientBounds.Width - position.X );							
-							break;
-						}
-						
-						case DisplayOrientation.PortraitUpsideDown :
-						{				
-							translatedPosition = new Vector2( ClientBounds.Width - position.X, ClientBounds.Height - position.Y );							
-							break;
-						}
-					}
-					tlocation = new TouchLocation(touch.Handle.ToInt32(), state, translatedPosition, 1.0f, previousTouch.State, previousTouch.Position, previousTouch.Pressure);
-				}
-				else
-				{
-					Vector2 position = new Vector2 (touch.LocationInView (touch.View));
-					Vector2 translatedPosition = position;
-					
-					switch (CurrentOrientation)
-					{
-						case DisplayOrientation.Portrait :
-						{																		
-							break;
-						}
-						
-						case DisplayOrientation.LandscapeRight :
-						{				
-							translatedPosition = new Vector2( ClientBounds.Height - position.Y, position.X );							
-							break;
-						}
-						
-						case DisplayOrientation.LandscapeLeft :
-						{							
-							translatedPosition = new Vector2( position.Y, ClientBounds.Width - position.X );							
-							break;
-						}
-						
-						case DisplayOrientation.PortraitUpsideDown :
-						{				
-							translatedPosition = new Vector2( ClientBounds.Width - position.X, ClientBounds.Height - position.Y );							
-							break;
-						}
-					}
-					tlocation = new TouchLocation(touch.Handle.ToInt32(), state, translatedPosition, 1.0f);
-				}
-				
-				TouchPanel.Collection.Add (tlocation);
-				
-				if (state != TouchLocationState.Released)
-					previousTouches[touch.Handle] = tlocation;
-				else
-					previousTouches.Remove(touch.Handle);
-			}
-		}
-		
-		public override void TouchesBegan (NSSet touches, UIEvent evt)
-		{
-			base.TouchesBegan (touches, evt);
-			
-			FillTouchCollection(touches);
-			
-			GamePad.Instance.TouchesBegan(touches,evt);	
-		}
-		
-		public override void TouchesEnded (NSSet touches, UIEvent evt)
-		{
-			base.TouchesEnded (touches, evt);
-			
-			FillTouchCollection(touches);	
-			
-			GamePad.Instance.TouchesEnded(touches,evt);								
-		}
-		
-		public override void TouchesMoved (NSSet touches, UIEvent evt)
-		{
-			base.TouchesMoved (touches, evt);
-			
-			FillTouchCollection(touches);
-			
-			GamePad.Instance.TouchesMoved(touches,evt);
-		}
 
-		public override void TouchesCancelled (NSSet touches, UIEvent evt)
-		{
-			base.TouchesCancelled (touches, evt);
-			
-			FillTouchCollection(touches);
-			
-			GamePad.Instance.TouchesCancelled(touches,evt);
-		}*/
 
+        private void ObserveDeviceRotation()
+        {
+            if (game.graphicsDeviceManager == null)
+                return;
+
+            switch (Resources.Configuration.Orientation) {
+
+                case Orientation.Portrait:
+                    if ((game.graphicsDeviceManager as GraphicsDeviceManager).SupportedOrientations == DisplayOrientation.Portrait) {
+                        CurrentOrientation = DisplayOrientation.Portrait;
+                        game.GraphicsDevice.PresentationParameters.DisplayOrientation = DisplayOrientation.Portrait;
+                        TouchPanel.DisplayOrientation = DisplayOrientation.Portrait;
+                    }
+                    break;
+                case Orientation.Landscape:
+                    DisplayOrientation orientation = DisplayOrientation.Unknown;
+                    if ((game.graphicsDeviceManager as GraphicsDeviceManager).SupportedOrientations == DisplayOrientation.LandscapeLeft)
+                        orientation = DisplayOrientation.LandscapeLeft;
+                    else if ((game.graphicsDeviceManager as GraphicsDeviceManager).SupportedOrientations == DisplayOrientation.LandscapeRight)
+                        orientation = DisplayOrientation.LandscapeRight;
+
+                    if (orientation != DisplayOrientation.Unknown) {
+                        CurrentOrientation = orientation;
+                        game.GraphicsDevice.PresentationParameters.DisplayOrientation = orientation;
+                        TouchPanel.DisplayOrientation = orientation;
+                    }
+                    break;
+
+                case Orientation.Undefined:
+                    if ((game.graphicsDeviceManager as GraphicsDeviceManager).SupportedOrientations == DisplayOrientation.Unknown) {
+                        CurrentOrientation = DisplayOrientation.Unknown;
+                        TouchPanel.DisplayOrientation = DisplayOrientation.Unknown;
+                    }
+                    break;
+                default:
+                    if ((game.graphicsDeviceManager as GraphicsDeviceManager).SupportedOrientations == DisplayOrientation.Default) {
+                        CurrentOrientation = DisplayOrientation.Default;
+                        TouchPanel.DisplayOrientation = DisplayOrientation.Default;
+                    }
+                    break;
+            }
+        }
+
+        private Dictionary<IntPtr, TouchLocation> _previousTouches = new Dictionary<IntPtr, TouchLocation>();
+
+        public override bool OnTouchEvent(MotionEvent e)
+        {
+           
+            TouchLocationState state = TouchLocationState.Invalid;
+
+            if(e.Action == MotionEventActions.Cancel) {
+                state = TouchLocationState.Invalid;
+            }
+            if (e.Action == MotionEventActions.Up) {
+                state = TouchLocationState.Released;
+            } 
+            if (e.Action == MotionEventActions.Move) {
+                state = TouchLocationState.Moved;
+            } 
+            if (e.Action == MotionEventActions.Down) {
+                state = TouchLocationState.Pressed;
+                Mouse.SetPosition((int)e.GetX(), (int)e.GetY());
+            }
+
+            TouchLocation tprevious;
+            TouchLocation tlocation;
+            Vector2 position = new Vector2(e.GetX(), e.GetY());
+
+            if (state != TouchLocationState.Pressed && _previousTouches.TryGetValue(e.Handle, out tprevious))
+            {
+                tlocation = new TouchLocation(e.Handle.ToInt32(), state, position, e.Pressure, tprevious.State, tprevious.Position, tprevious.Pressure);
+            }
+            else {
+                tlocation = new TouchLocation(e.Handle.ToInt32(), state, position, e.Pressure);
+            }
+           
+            TouchPanel.Collection.Clear();
+            TouchPanel.Collection.Add(tlocation);
+
+            if (state != TouchLocationState.Released)
+                _previousTouches[e.Handle] = tlocation;
+            else
+                _previousTouches.Remove(e.Handle);
+
+
+            //TODO: Update the virtual gamepad state GamePad.Instance.Update(location)
+
+            return base.OnTouchEvent(e);
+        }
 	
 						
 		public string ScreenDeviceName 

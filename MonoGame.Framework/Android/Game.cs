@@ -43,6 +43,7 @@ using System.IO;
 using Android.App;
 using Android.Content;
 using Android.Content.Res;
+using Android.Util;
 using Android.Views;
 using OpenTK.Graphics;
 
@@ -70,8 +71,8 @@ namespace Microsoft.Xna.Framework
 		private bool _isFixedTimeStep = true;
         private TimeSpan _targetElapsedTime = TimeSpan.FromSeconds(1 / FramesPerSecond); 
         
-		private IGraphicsDeviceManager graphicsDeviceManager;
-		private IGraphicsDeviceService graphicsDeviceService;
+		internal IGraphicsDeviceManager graphicsDeviceManager;
+        internal IGraphicsDeviceService graphicsDeviceService;
         private bool _devicesLoaded;
 
 		internal static bool _playingVideo = false;
@@ -109,50 +110,7 @@ namespace Microsoft.Xna.Framework
 			// do nothing
 		}
 
-        private void ObserveDeviceRotation()
-        {
-            /*
-            switch (contextInstance.Resources.Configuration.Orientation) {
-
-                case Orientation.Portrait:
-                    if ((graphicsDeviceManager as GraphicsDeviceManager).SupportedOrientations ==
-                        DisplayOrientation.Portrait) {
-                        _view.CurrentOrientation = DisplayOrientation.Portrait;
-                        GraphicsDevice.PresentationParameters.DisplayOrientation = DisplayOrientation.Portrait;
-                        TouchPanel.DisplayOrientation = DisplayOrientation.Portrait;
-                    }
-                    break;
-                case Orientation.Landscape:
-                    DisplayOrientation orientation = DisplayOrientation.Unknown;
-                    if ((graphicsDeviceManager as GraphicsDeviceManager).SupportedOrientations == DisplayOrientation.LandscapeLeft)
-                        orientation = DisplayOrientation.LandscapeLeft;
-                    else if ((graphicsDeviceManager as GraphicsDeviceManager).SupportedOrientations == DisplayOrientation.LandscapeRight)
-                        orientation = DisplayOrientation.LandscapeRight;
-                    if (orientation != DisplayOrientation.Unknown) {
-                        _view.CurrentOrientation = orientation;
-                        GraphicsDevice.PresentationParameters.DisplayOrientation = orientation;
-                        TouchPanel.DisplayOrientation = orientation;
-                    }
-                    break;
-
-                case Orientation.Undefined:
-                    if ((graphicsDeviceManager as GraphicsDeviceManager).SupportedOrientations ==
-                        DisplayOrientation.Unknown) {
-                        _view.CurrentOrientation = DisplayOrientation.Unknown;
-                        TouchPanel.DisplayOrientation = DisplayOrientation.Unknown;
-                    }
-                    break;
-                default:
-                    if ((graphicsDeviceManager as GraphicsDeviceManager).SupportedOrientations ==
-                        DisplayOrientation.Default) {
-                        _view.CurrentOrientation = DisplayOrientation.Default;
-                        TouchPanel.DisplayOrientation = DisplayOrientation.Default;
-                    }
-                    break;
-            }
-            */
-        }
-
+    
         public bool IsActive
         {
             get
@@ -199,9 +157,6 @@ namespace Microsoft.Xna.Framework
     	{			
 			_lastUpdate = DateTime.Now;
 			
-			_view.Run( FramesPerSecond / ( FramesPerSecond * TargetElapsedTime.TotalSeconds ) );	
-			
-			
 			// Get the Accelerometer going
 			Accelerometer.SetupAccelerometer();
 
@@ -214,9 +169,8 @@ namespace Microsoft.Xna.Framework
                     _devicesLoaded = true;
                 }
             };
-			
-			// Listen out for rotation changes
-			ObserveDeviceRotation();
+
+            _view.Run(FramesPerSecond / (FramesPerSecond * TargetElapsedTime.TotalSeconds));	
         }
 		
 		internal void DoUpdate(GameTime aGameTime)
