@@ -208,14 +208,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 		
-		public byte[] PixelData
-		{
-			get
-			{
-				return texture.PixelData;
-			}
-		}
-		
 		public SurfaceFormat Format
         {
             get 

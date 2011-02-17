@@ -52,16 +52,17 @@ namespace Microsoft.Xna.Framework.Input
 		private static AccelerometerCapabilities _capabilities = new AccelerometerCapabilities();
         private static SensorManager _sensorManger;
         private static Sensor _sensor;
-
-        static Accelerometer()
-        {
-            _sensorManger = (SensorManager)Game.contextInstance.GetSystemService(Context.SensorService);
-            _sensor = _sensorManger.GetDefaultSensor(SensorType.Accelerometer);
-        }
 		
 		public static void SetupAccelerometer()
 		{
-            _sensorManger.RegisterListener(new SensorListener(), _sensor, SensorDelay.Game);
+            _sensorManger = (SensorManager)Game.contextInstance.GetSystemService(Context.SensorService);
+            _sensor = _sensorManger.GetDefaultSensor(SensorType.Accelerometer);
+
+            if (_sensor != null) {
+                _state = new AccelerometerState { IsConnected = true };
+                _sensorManger.RegisterListener(new SensorListener(), _sensor, SensorDelay.Game);
+            }
+            else _state = new AccelerometerState { IsConnected = false };
         }
 
 		public static AccelerometerCapabilities GetCapabilities()

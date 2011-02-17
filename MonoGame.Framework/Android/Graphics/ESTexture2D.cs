@@ -43,7 +43,9 @@ using System.Drawing;
 using System.Runtime.InteropServices;
 using System.IO;
 using Android.Graphics;
+using Java.Nio;
 using OpenTK.Graphics.ES11;
+using Buffer = System.Buffer;
 
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -55,7 +57,6 @@ namespace Microsoft.Xna.Framework.Graphics
 		private int _width,_height;
 		private SurfaceFormat _format;
 		private float _maxS,_maxT;
-		private byte[] _pixelData;
 		
 		public ESTexture2D (IntPtr data, SurfaceFormat pixelFormat, int width, int height, Size size, All filter)
 		{
@@ -69,6 +70,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void InitWithBitmap(Bitmap image, All filter)
         {
+            //TODO:  Android.Opengl.GLUtils.GetInternalFormat()
+
+            _format = SurfaceFormat.Rgb32;
+            if(image.HasAlpha)
+                _format = SurfaceFormat.Rgba32;
+
             GL.GenTextures(1, ref _name);
             GL.BindTexture(All.Texture2D, _name);
             GL.TexParameter(All.Texture2D, All.TextureMinFilter, (int)filter);
@@ -79,7 +86,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _size = new Size(image.Width, image.Height);
             _width = image.Width;
             _height = image.Height;
-            _format = SurfaceFormat.Rgb32;
+            
             _maxS = _size.Width / (float)_width;
             _maxT = _size.Height / (float)_height;
         }
@@ -117,23 +124,14 @@ namespace Microsoft.Xna.Framework.Graphics
                     break;
                 default:
                     throw new NotSupportedException("Texture format");
-                    break;
             }
-
-        
-         //   var image = BitmapFactory.DecodeByteArray(data, 0, data.Length);
-          //  Android.Opengl.GLUtils.TexImage2D((int)All.Texture2D, 0, image, 0);
-
+            
             _size = size;
             _width = width;
             _height = height;
             _format = pixelFormat;
             _maxS = size.Width / (float)width;
             _maxT = size.Height / (float)height;
-
-            _pixelData = new byte[width * height * sz];
-            Marshal.Copy(data, _pixelData, 0, width * height * sz);
-          //  System.Buffer.BlockCopy(data, 0, _pixelData, 0, data.Length);
         }
 				
 		public void Dispose ()
@@ -341,12 +339,5 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 		
-		public byte[] PixelData 
-		{
-			get 
-			{
-				return _pixelData;
-			}
-		}
 	}
 }

@@ -64,12 +64,6 @@ namespace Microsoft.Xna.Framework.Input
 			throw new NotImplementedException();
         }
 
-		public bool IsConnected
-		{
-			get
-			{
-				return true;
-			}
-		}
+        public bool IsConnected { get; internal set; }
 	}
 }
