@@ -125,10 +125,10 @@ namespace Microsoft.Xna.Framework.Content
             {
                 assetName = SoundEffectReader.Normalize(assetName);
             }
-           /* else if ((typeof(T) == typeof(Video)))
+            else if ((typeof(T) == typeof(Video)))
             {
                 assetName = Video.Normalize(assetName);
-            }*/
+            }
             else {
                 throw new NotSupportedException("Format not supported");
             }
@@ -157,8 +157,8 @@ namespace Microsoft.Xna.Framework.Content
                     result = new Song(assetName);
                 if ((typeof(T) == typeof(SoundEffect)))
                     result = new SoundEffect(assetName);
-               /* if ((typeof(T) == typeof(Video)))
-                    result = new Video(assetName);	*/	
+                if ((typeof(T) == typeof(Video)))
+                    result = new Video(assetName);	
 
 			}
 			else 
