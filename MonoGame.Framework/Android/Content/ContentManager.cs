@@ -45,7 +45,9 @@ using System.Reflection;
 using System.Text;
 using Android.Content.Res;
 using Android.Graphics;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Media;
 using Path = System.IO.Path;
 
 
@@ -115,6 +117,18 @@ namespace Microsoft.Xna.Framework.Content
 			{
 				assetName = Effect.Normalize(assetName);
 			}
+            else if ((typeof(T) == typeof(Song)))
+            {
+                assetName = SongReader.Normalize(assetName);
+            }
+            else if ((typeof(T) == typeof(SoundEffect)))
+            {
+                assetName = SoundEffectReader.Normalize(assetName);
+            }
+           /* else if ((typeof(T) == typeof(Video)))
+            {
+                assetName = Video.Normalize(assetName);
+            }*/
             else {
                 throw new NotSupportedException("Format not supported");
             }
@@ -138,6 +152,14 @@ namespace Microsoft.Xna.Framework.Content
 					//result = new SpriteFont(Texture2D.FromFile(graphicsDeviceService.GraphicsDevice,assetName), null, null, null, 0, 0.0f, null, null);
 					throw new NotImplementedException();
 				}
+
+                if ((typeof(T) == typeof(Song)))
+                    result = new Song(assetName);
+                if ((typeof(T) == typeof(SoundEffect)))
+                    result = new SoundEffect(assetName);
+               /* if ((typeof(T) == typeof(Video)))
+                    result = new Video(assetName);	*/	
+
 			}
 			else 
 			{

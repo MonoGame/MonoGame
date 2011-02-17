@@ -45,7 +45,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Android\Audio\Sound.cs" />
+    <Compile Include="Android\Audio\SoundEffect.cs" />
     <Compile Include="Android\Content\ContentManager.cs" />
+    <Compile Include="Android\Content\ContentReaders\SongReader.cs" />
+    <Compile Include="Android\Content\ContentReaders\SoundEffectReader.cs" />
     <Compile Include="Android\Content\ContentReaders\SpriteFontReader.cs" />
     <Compile Include="Android\Content\ContentReaders\Texture2DReader.cs" />
     <Compile Include="Android\Graphics\DisplayMode.cs" />
@@ -56,7 +60,12 @@
     <Compile Include="Android\Input\Accelerometer.cs" />
     <Compile Include="Android\Input\AccelerometerCapabilities.cs" />
     <Compile Include="Android\Input\AccelerometerState.cs" />
+    <Compile Include="Android\Media\Song.cs" />
     <Compile Include="Android\PowerStatus.cs" />
+    <Compile Include="Audio\AudioEmitter.cs" />
+    <Compile Include="Audio\AudioListener.cs" />
+    <Compile Include="Audio\SoundEffectInstance.cs" />
+    <Compile Include="Audio\SoundState.cs" />
     <Compile Include="BatteryChargeStatus.cs" />
     <Compile Include="BoundingBox.cs" />
     <Compile Include="BoundingFrustum.cs" />
@@ -85,6 +94,12 @@
     <Compile Include="IUpdateable.cs" />
     <Compile Include="MathHelper.cs" />
     <Compile Include="Matrix.cs" />
+    <Compile Include="Media\MediaPlayer.cs" />
+    <Compile Include="Media\MediaSourceType.cs" />
+    <Compile Include="Media\MediaState.cs" />
+    <Compile Include="Media\Playlist.cs" />
+    <Compile Include="Media\PlaylistCollection.cs" />
+    <Compile Include="Media\SongCollection.cs" />
     <Compile Include="PerformanceCounter.cs" />
     <Compile Include="Plane.cs" />
     <Compile Include="PlaneIntersectionType.cs" />
@@ -106,8 +121,6 @@
     <Compile Include="Content\ContentReaders\CharReader.cs" />
     <Compile Include="Content\ContentReaders\ListReader.cs" />
     <Compile Include="Content\ContentReaders\RectangleReader.cs" />
-    <Compile Include="Content\ContentReaders\SongReader.cs" />
-    <Compile Include="Content\ContentReaders\SoundEffectReader.cs" />
     <Compile Include="Content\ContentReaders\StringReader.cs" />
     <Compile Include="Content\ContentReaders\Vector3Reader.cs" />
     <Compile Include="Graphics\BasicEffect.cs" />
@@ -172,9 +185,7 @@
     <Compile Include="Storage\StorageDevice.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Audio\" />
     <Folder Include="GamerServices\" />
-    <Folder Include="Media\" />
     <Folder Include="Net\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
