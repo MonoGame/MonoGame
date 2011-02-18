@@ -28,6 +28,7 @@ SOFTWARE.
 using System;
 using System.Text;
 using System.Drawing;
+using System.Globalization;
 
 namespace Microsoft.Xna.Framework
 {
@@ -158,27 +159,26 @@ namespace Microsoft.Xna.Framework
 
         public static float Distance(Vector2 value1, Vector2 value2)
         {
-            float result;
-            DistanceSquared(ref value1, ref value2, out result);
-            return (float)Math.Sqrt(result);
+			float v1 = value1.X - value2.X, v2 = value1.Y - value2.Y;
+			return (float)Math.Sqrt((v1 * v1) + (v2 * v2));
         }
 
         public static void Distance(ref Vector2 value1, ref Vector2 value2, out float result)
         {
-            DistanceSquared(ref value1, ref value2, out result);
-            result = (float)Math.Sqrt(result);
+			float v1 = value1.X - value2.X, v2 = value1.Y - value2.Y;
+            result = (float)Math.Sqrt((v1 * v1) + (v2 * v2));
         }
 
         public static float DistanceSquared(Vector2 value1, Vector2 value2)
         {
-            float result;
-            DistanceSquared(ref value1, ref value2, out result);
-            return result;
+			float v1 = value1.X - value2.X, v2 = value1.Y - value2.Y;
+			return (v1 * v1) + (v2 * v2);
         }
 
         public static void DistanceSquared(ref Vector2 value1, ref Vector2 value2, out float result)
         {
-            result = (value1.X - value2.X) * (value1.X - value2.X) + (value1.Y - value2.Y) * (value1.Y - value2.Y);
+			float v1 = value1.X - value2.X, v2 = value1.Y - value2.Y;
+			result = (v1 * v1) + (v2 * v2);
         }
 
         public static Vector2 Divide(Vector2 value1, Vector2 value2)
@@ -211,27 +211,48 @@ namespace Microsoft.Xna.Framework
 
         public static float Dot(Vector2 value1, Vector2 value2)
         {
-            return value1.X * value2.X + value1.Y * value2.Y;
+            return (value1.X * value2.X) + (value1.Y * value2.Y);
         }
 
         public static void Dot(ref Vector2 value1, ref Vector2 value2, out float result)
         {
-            result = value1.X * value2.X + value1.Y * value2.Y;
+            result = (value1.X * value2.X) + (value1.Y * value2.Y);
         }
 
         public override bool Equals(object obj)
         {
-            return (obj is Vector2) ? this == ((Vector2)obj) : false;
+			if(obj is Vector2)
+			{
+				return Equals((Vector2)this);
+			}
+			
+            return false;
         }
 
         public bool Equals(Vector2 other)
         {
-            return this == other;
+            return (X == other.X) && (Y == other.Y);
         }
-
+		
+		public static Vector2 Reflect(Vector2 vector, Vector2 normal)
+		{
+			Vector2 result;
+			float val = 2.0f * ((vector.X * normal.X) + (vector.Y * normal.Y));
+			result.X = vector.X - (normal.X * val);
+			result.Y = vector.Y - (normal.Y * val);
+			return result;
+		}
+		
+		public static void Reflect(ref Vector2 vector, ref Vector2 normal, out Vector2 result)
+		{
+			float val = 2.0f * ((vector.X * normal.X) + (vector.Y * normal.Y));
+			result.X = vector.X - (normal.X * val);
+			result.Y = vector.Y - (normal.Y * val);
+		}
+		
         public override int GetHashCode()
         {
-            return (int)(this.X + this.Y);
+            return X.GetHashCode() + Y.GetHashCode();
         }
 
         public static Vector2 Hermite(Vector2 value1, Vector2 tangent1, Vector2 value2, Vector2 tangent2, float amount)
@@ -249,16 +270,12 @@ namespace Microsoft.Xna.Framework
 
         public float Length()
         {
-            float result;
-            DistanceSquared(ref this, ref zeroVector, out result);
-            return (float)Math.Sqrt(result);
+			return (float)Math.Sqrt((X * X) + (Y * Y));
         }
 
         public float LengthSquared()
         {
-            float result;
-            DistanceSquared(ref this, ref zeroVector, out result);
-            return result;
+			return (X * X) + (Y * Y);
         }
 
         public static Vector2 Lerp(Vector2 value1, Vector2 value2, float amount)
@@ -277,31 +294,27 @@ namespace Microsoft.Xna.Framework
 
         public static Vector2 Max(Vector2 value1, Vector2 value2)
         {
-            return new Vector2(
-                MathHelper.Max(value1.X, value2.X),
-                MathHelper.Max(value1.Y, value2.Y));
+            return new Vector2(value1.X > value2.X ? value1.X : value2.X, 
+			                   value1.Y > value2.Y ? value1.Y : value2.Y);
         }
 
         public static void Max(ref Vector2 value1, ref Vector2 value2, out Vector2 result)
         {
-            result = new Vector2(
-                MathHelper.Max(value1.X, value2.X),
-                MathHelper.Max(value1.Y, value2.Y));
+            result.X = value1.X > value2.X ? value1.X : value2.X;
+			result.Y = value1.Y > value2.Y ? value1.Y : value2.Y;
         }
 
         public static Vector2 Min(Vector2 value1, Vector2 value2)
         {
-            return new Vector2(
-                MathHelper.Min(value1.X, value2.X),
-                MathHelper.Min(value1.Y, value2.Y));
+            return new Vector2(value1.X < value2.X ? value1.X : value2.X, 
+			                   value1.Y < value2.Y ? value1.Y : value2.Y); 
         }
 
         public static void Min(ref Vector2 value1, ref Vector2 value2, out Vector2 result)
         {
-            result = new Vector2(
-                MathHelper.Min(value1.X, value2.X),
-                MathHelper.Min(value1.Y, value2.Y));
-        }
+            result.X = value1.X < value2.X ? value1.X : value2.X;
+			result.Y = value1.Y < value2.Y ? value1.Y : value2.Y;
+		}
 
         public static Vector2 Multiply(Vector2 value1, Vector2 value2)
         {
@@ -344,22 +357,24 @@ namespace Microsoft.Xna.Framework
 
         public void Normalize()
         {
-            Normalize(ref this, out this);
+			float val = 1.0f / (float)Math.Sqrt((X * X) + (Y * Y));
+			X *= val;
+			Y *= val;
         }
 
         public static Vector2 Normalize(Vector2 value)
         {
-            Normalize(ref value, out value);
+			float val = 1.0f / (float)Math.Sqrt((value.X * value.X) + (value.Y * value.Y));
+			value.X *= val;
+			value.Y *= val;
             return value;
         }
 
         public static void Normalize(ref Vector2 value, out Vector2 result)
         {
-            float factor;
-            DistanceSquared(ref value, ref zeroVector, out factor);
-            factor = 1f / (float)Math.Sqrt(factor);
-            result.X = value.X * factor;
-            result.Y = value.Y * factor;
+			float val = 1.0f / (float)Math.Sqrt((value.X * value.X) + (value.Y * value.Y));
+			result.X = value.X * val;
+			result.Y = value.Y * val;
         }
 
         public static Vector2 SmoothStep(Vector2 value1, Vector2 value2, float amount)
@@ -433,13 +448,9 @@ namespace Microsoft.Xna.Framework
 
         public override string ToString()
         {
-            StringBuilder sb = new StringBuilder(24);
-            sb.Append("{X:");
-            sb.Append(this.X);
-            sb.Append(" Y:");
-            sb.Append(this.Y);
-            sb.Append("}");
-            return sb.ToString();
+			CultureInfo currentCulture = CultureInfo.CurrentCulture;
+        	return string.Format(currentCulture, "{{X:{0} Y:{1}}}", new object[] { 
+				this.X.ToString(currentCulture), this.Y.ToString(currentCulture) });
         }
 
         #endregion Public Methods
