@@ -210,6 +210,7 @@ namespace Microsoft.Xna.Framework
             } 
             if (e.Action == MotionEventActions.Move) {
                 state = TouchLocationState.Moved;
+                Mouse.SetPosition((int)e.GetX(), (int)e.GetY());
             } 
             if (e.Action == MotionEventActions.Down) {
                 state = TouchLocationState.Pressed;
@@ -236,8 +237,7 @@ namespace Microsoft.Xna.Framework
             else
                 _previousTouches.Remove(e.Handle);
 
-
-            //TODO: Update the virtual gamepad state GamePad.Instance.Update(location)
+            GamePad.Instance.Update(e);
 
             return base.OnTouchEvent(e);
         }

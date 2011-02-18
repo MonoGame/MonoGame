@@ -89,7 +89,8 @@ namespace Microsoft.Xna.Framework.Input
 
             public void OnSensorChanged(SensorEvent e)
             {
-                _state.Acceleration = new Vector3(e.Values[0], e.Values[1], e.Values[2]);	
+                if(e != null && e.Values != null)
+                    _state.Acceleration = new Vector3(e.Values[0], e.Values[1], e.Values[2]);	
             }
         }
 	}

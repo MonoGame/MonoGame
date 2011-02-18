@@ -40,6 +40,7 @@ purpose and non-infringement.
 
 using Android.Content;
 using Android.OS;
+using Android.Views;
 using Microsoft.Xna.Framework;
 using System;
 using Microsoft.Xna.Framework.Graphics;
@@ -130,12 +131,131 @@ using System.Collections.Generic;
 			return capabilities;
         }
 
+        internal void Update(MotionEvent e)
+        {
+            Vector2 location = new Vector2(e.GetX(), e.GetY());
+            // Check where is the touch
+            bool hitInButton = false;
+
+            if (e.Action == MotionEventActions.Down) {
+
+                Reset();
+
+                if (Visible) {
+                    foreach (ButtonDefinition button in _buttonsDefinitions) {
+                        hitInButton |= UpdateButton(button, location);
+                    }
+
+                    if (!hitInButton) {
+                        
+                        if (_leftThumbDefinition != null && (CheckThumbStickHit(_leftThumbDefinition, location))) {
+                            _leftThumbDefinition.InitialHit = location;
+                        }
+                        else if (Visible && (_rightThumbDefinition != null) && (CheckThumbStickHit(_rightThumbDefinition, location))) {
+                            _rightThumbDefinition.InitialHit = location;
+                        }
+                    }
+                }
+            } 
+            else if (e.Action == MotionEventActions.Move) {
+
+                if (Visible) {
+                    foreach (ButtonDefinition button in _buttonsDefinitions) {
+                        hitInButton |= UpdateButton(button, location);
+                    }
+                }
+
+                if (!hitInButton) {
+                    if (Visible && (_leftThumbDefinition != null) &&
+                        (CheckThumbStickHit(_leftThumbDefinition, location))) {
+                        Vector2 movement = location - LeftThumbStickDefinition.InitialHit;
+
+                        // Keep the stick in the "hole" 
+                        float radius = (movement.X*movement.X) + (movement.Y*movement.Y);
+
+                        if (radius <= _thumbStickRadius) {
+                            _leftThumbDefinition.Offset = movement;
+                            _leftStick = new Vector2(movement.X/20, movement.Y/-20);
+                        }
+                    }
+                    else {
+                        // reset left thumbstick
+                        if (_leftThumbDefinition != null) {
+                            _leftThumbDefinition.Offset = Vector2.Zero;
+                            _leftStick = Vector2.Zero;
+                        }
+
+                        if (Visible && (_rightThumbDefinition != null) &&
+                            (CheckThumbStickHit(_rightThumbDefinition, location))) {
+                            Vector2 movement = location - _rightThumbDefinition.InitialHit;
+
+                            // Keep the stick in the "hole" 
+                            float radius = (movement.X*movement.X) + (movement.Y*movement.Y);
+
+                            if (radius <= _thumbStickRadius) {
+                                _rightThumbDefinition.Offset = movement;
+                                _rightStick = new Vector2(movement.X/20, movement.Y/-20);
+                            }
+                        }
+                        else {
+                            // reset right thumbstick
+                            if (_rightThumbDefinition != null) {
+                                _rightThumbDefinition.Offset = Vector2.Zero;
+                                _rightStick = Vector2.Zero;
+                            }
+                        }
+                    }
+                }
+            }
+            else if (e.Action == MotionEventActions.Up || e.Action == MotionEventActions.Cancel) {
+                if (Visible) {
+                    foreach (ButtonDefinition button in _buttonsDefinitions) {
+                        if (CheckButtonHit(button, location)) {
+                            _buttons &= ~(int) button.Type;
+                        }
+                    }
+                    if ((_leftThumbDefinition != null) && (CheckThumbStickHit(_leftThumbDefinition, location))) {
+                        LeftThumbStickDefinition.Offset = Vector2.Zero;
+                        _leftStick = Vector2.Zero;
+                    }
+                    if ((_rightThumbDefinition != null) && (CheckThumbStickHit(_rightThumbDefinition, location))) {
+                        _rightThumbDefinition.Offset = Vector2.Zero;
+                        _rightStick = Vector2.Zero;
+                    }
+                }
+            }
+        }
+
+        private bool CheckButtonHit(ButtonDefinition theButton, Vector2 location)
+        {
+            Rectangle buttonRect = new Rectangle((int)theButton.Position.X, (int)theButton.Position.Y, theButton.TextureRect.Width, theButton.TextureRect.Height);
+            return buttonRect.Contains(location);
+        }
+
+        private bool CheckThumbStickHit(ThumbStickDefinition theStick, Vector2 location)
+        {
+            Vector2 stickPosition = theStick.Position + theStick.Offset;
+            Rectangle thumbRect = new Rectangle((int)stickPosition.X, (int)stickPosition.Y, theStick.TextureRect.Width, theStick.TextureRect.Height);
+            return thumbRect.Contains(location);
+        }
+
+        private bool UpdateButton(ButtonDefinition button, Vector2 location)
+        {
+            bool hitInButton = CheckButtonHit(button, location);
+
+            if (hitInButton)
+            {
+                _buttons |= (int)button.Type;
+            }
+            return hitInButton;
+        }
+
         public static GamePadState GetState(PlayerIndex playerIndex)
         {
-            /* if (playerIndex != PlayerIndex.One) 
+            if (playerIndex != PlayerIndex.One) 
 			{
 				throw new NotSupportedException("Only one player!");
-			}*/
+			}
 			
 			return new GamePadState((Buttons)GamePad.Instance._buttons,GamePad.Instance._leftStick,GamePad.Instance._rightStick);
         }
