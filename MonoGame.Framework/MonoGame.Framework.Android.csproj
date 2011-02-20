@@ -91,6 +91,7 @@
     <Compile Include="Android\GameWindow.cs" />
     <Compile Include="GraphicsDeviceInformation.cs" />
     <Compile Include="GraphicsDeviceManager.cs" />
+    <Compile Include="Graphics\Texture.cs" />
     <Compile Include="IDrawable.cs" />
     <Compile Include="IGameComponent.cs" />
     <Compile Include="IGraphicsDeviceManager.cs" />
