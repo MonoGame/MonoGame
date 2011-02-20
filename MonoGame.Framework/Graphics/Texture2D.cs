@@ -38,16 +38,21 @@ purpose and non-infringement.
 */
 #endregion License
 
-using System.IO;
 using System;
-using MonoTouch.UIKit;
 using System.Drawing;
-using Microsoft.Xna.Framework.Content;
+using System.IO;
+using System.Runtime.InteropServices;
+
+using MonoTouch.UIKit;
+
 using OpenTK.Graphics.ES11;
+
+using Microsoft.Xna.Framework.Content;
+
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-    public class Texture2D
+    public class Texture2D : Texture
     {
 		private ESImage texture;
 		private string name;
@@ -97,13 +102,71 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public Color GetPixel(int x, int y)
         {
+			var result = new Color(0, 0, 0, 0);
 			
-            byte r = texture.PixelData[((y * texture.ImageWidth) + x)];
-			byte g = texture.PixelData[((y * texture.ImageWidth) + x) + 1];
-			byte b = texture.PixelData[((y * texture.ImageWidth) + x) + 2];
-			byte a = texture.PixelData[((y * texture.ImageWidth) + x) + 3];
+			if((x < 0 ) || ( y < 0) )
+				return result;
 			
-			return new Color(r, g, b, a);
+			if(x >= Width || y >= Height) 
+				return result;
+			
+			int sz = 0;
+			
+			byte[] pixel;
+			switch(this.Format) 
+			{
+				case SurfaceFormat.Rgba32 /*kTexture2DPixelFormat_RGBA8888*/:
+				case SurfaceFormat.Dxt3 :
+				    sz = 4;
+					pixel = new byte[Width*Height*sz];
+					Marshal.Copy(texture.PixelData, pixel, 0, Width*Height*sz);					
+					result.R = pixel[(y * Width) + x];
+					result.G = pixel[((y * Width) + x) + 1];
+					result.B = pixel[((y * Width) + x) + 2];
+					result.A = pixel[((y * Width) + x) + 3];
+					break;
+				case SurfaceFormat.Bgra4444 /*kTexture2DPixelFormat_RGBA4444*/:
+					sz = 2;
+					pixel = new byte[Width*Height*sz];
+					Marshal.Copy(texture.PixelData, pixel, 0, Width*Height*sz);
+				
+					result.R = pixel[(y * Width) + x];
+					result.G = pixel[((y * Width) + x) + 1];
+					result.B = pixel[((y * Width) + x) + 2];
+					result.A = pixel[((y * Width) + x) + 3];
+					break;
+				case SurfaceFormat.Bgra5551 /*kTexture2DPixelFormat_RGB5A1*/:
+					sz = 2;
+					pixel = new byte[Width*Height*sz];
+					Marshal.Copy(texture.PixelData, pixel, 0, Width*Height*sz);
+				
+					result.R = pixel[(y * Width) + x];
+					result.G = pixel[((y * Width) + x) + 1];
+					result.B = pixel[((y * Width) + x) + 2];
+					result.A = pixel[((y * Width) + x) + 3];
+					break;
+				case SurfaceFormat.Rgb32 /*kTexture2DPixelFormat_RGB565*/:
+					sz = 2;	
+					pixel = new byte[Width*Height*sz];
+					Marshal.Copy(texture.PixelData, pixel, 0, Width*Height*sz);
+				
+					result.R = pixel[(y * Width) + x];
+					result.G = pixel[((y * Width) + x) + 1];
+					result.B = pixel[((y * Width) + x) + 2];					
+					result.A = 255;
+					break;
+				case SurfaceFormat.Alpha8 /*kTexture2DPixelFormat_A8*/:
+					sz = 1;
+					pixel = new byte[Width*Height*sz];
+					Marshal.Copy(texture.PixelData, pixel, 0, Width*Height*sz);
+				
+					result.A = pixel[(y * Width) + x];
+					break;
+				default:
+					throw new NotSupportedException("Texture format");
+			}
+			
+			return result;
         }
 
         public void SetPixel(int x, int y, byte red, byte green, byte blue, byte alpha)
@@ -227,24 +290,17 @@ namespace Microsoft.Xna.Framework.Graphics
 				throw new ArgumentException("data cannot be null");
 			}
 			
-			int mult = (this.Format == SurfaceFormat.Alpha8) ? 1 : 4;
+			/*int mult = (this.Format == SurfaceFormat.Alpha8) ? 1 : 4;
 			
 			if (data.Length < Width * Height * mult)
 			{
 				throw new ArgumentException("data is the wrong length for Pixel Format");
-			}
+			}*/
 			
 			// Get the Color values
 			if ((typeof(T) == typeof(Color))) 
 			{	
-				int i = 0;
 				
-				while (i < data.Length) 
-				{
-					var d = (Color)(object)data[i];
-					d = new Color(texture.PixelData[i], texture.PixelData[i+1], texture.PixelData[i+2], texture.PixelData[i+3]);
-					i += 4;
-				}
 			}	
         }
 
