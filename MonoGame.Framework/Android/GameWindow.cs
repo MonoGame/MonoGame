@@ -103,8 +103,8 @@ namespace Microsoft.Xna.Framework
 			catch (Exception) 
 			{
 		        //device doesn't support OpenGLES 2.0; retry with 1.1:
-                //GLContextVersion = GLContextVersion.Gles1_1;
-				//base.CreateFrameBuffer();
+                GLContextVersion = GLContextVersion.Gles1_1;
+				base.CreateFrameBuffer();
 		    }
 		}
 	
