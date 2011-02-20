@@ -208,7 +208,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 		
-		public byte[] PixelData
+		public IntPtr PixelData
 		{
 			get
 			{

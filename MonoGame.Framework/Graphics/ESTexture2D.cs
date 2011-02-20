@@ -59,7 +59,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		private int _width,_height;
 		private SurfaceFormat _format;
 		private float _maxS,_maxT;
-		private byte[] _pixelData;
+		private IntPtr _pixelData;
 		
 		public ESTexture2D (IntPtr data, SurfaceFormat pixelFormat, int width, int height, Size size, All filter)
 		{
@@ -365,10 +365,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			_maxS = size.Width / (float)width;
 			_maxT = size.Height / (float)height;
 						
-			_pixelData = new byte[width * height * sz];
-			
-			//copy the date to a managed byte array.
-			Marshal.Copy(data, _pixelData, 0, width * height * sz);
+			_pixelData = data;
 		}
 		
 		public void DrawAtPoint(Vector2 point)
@@ -454,7 +451,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 		
-		public byte[] PixelData 
+		public IntPtr PixelData 
 		{
 			get 
 			{

@@ -48,7 +48,7 @@ using Path = System.IO.Path;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-    public class Texture2D
+    public class Texture2D : Texture
     {
 		private ESImage texture;
 		private string name;
