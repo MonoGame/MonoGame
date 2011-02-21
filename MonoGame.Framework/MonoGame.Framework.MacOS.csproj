@@ -79,8 +79,52 @@
     <Compile Include="Vector2.cs" />
     <Compile Include="Vector3.cs" />
     <Compile Include="Vector4.cs" />
+    <Compile Include="Audio\AudioEmitter.cs" />
+    <Compile Include="Audio\AudioListener.cs" />
+    <Compile Include="Audio\SoundState.cs" />
+    <Compile Include="Graphics\Texture.cs" />
+    <Compile Include="Graphics\GraphicsResource.cs" />
+    <Compile Include="Content\ContentLoadException.cs" />
+    <Compile Include="GamerServices\Achievement.cs" />
+    <Compile Include="GamerServices\AchievementCollection.cs" />
+    <Compile Include="GamerServices\GamerPresence.cs" />
+    <Compile Include="GamerServices\GamerPresenceMode.cs" />
+    <Compile Include="GamerServices\GamerPrivileges.cs" />
+    <Compile Include="GamerServices\GamerPrivilegeSetting.cs" />
+    <Compile Include="Input\AccelerometerState.cs" />
+    <Compile Include="Input\ButtonState.cs" />
+    <Compile Include="Input\GamePadState.cs" />
+    <Compile Include="Input\KeyboardState.cs" />
+    <Compile Include="Input\KeyState.cs" />
+    <Compile Include="Input\MouseState.cs" />
+    <Compile Include="Input\GamePadThumbSticks.cs" />
+    <Compile Include="Input\Buttons.cs" />
+    <Compile Include="Input\GamePadCapabilities.cs" />
+    <Compile Include="Input\GamePadDPad.cs" />
+    <Compile Include="Input\GamePadTriggers.cs" />
+    <Compile Include="Input\GamePadButtons.cs" />
+    <Compile Include="Input\Keys.cs" />
+    <Compile Include="Net\PacketReader.cs" />
+    <Compile Include="Graphics\Color.cs" />
+    <Compile Include="Net\PacketWriter.cs" />
+    <Compile Include="Net\SendDataOptions.cs" />
+    <Compile Include="Net\QualityOfService.cs" />
+    <Compile Include="Net\NetworkSessionState.cs" />
+    <Compile Include="Net\NetworkSessionType.cs" />
+    <Compile Include="Net\NetworkSessionProperties.cs" />
+    <Compile Include="Net\NetworkNotAvailableException.cs" />
+    <Compile Include="Net\NetworkSessionEndReason.cs" />
+    <Compile Include="Net\NetworkSessionJoinError.cs" />
+    <Compile Include="Net\NetworkSessionJoinException.cs" />
+    <Compile Include="Net\NetworkException.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Storage\StorageContainer.cs" />
+    <Compile Include="Storage\StorageDevice.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />
+    <Folder Include="Graphics\" />
+    <Folder Include="Content\ContentReaders\" />
+    <Folder Include="GamerServices\" />
   </ItemGroup>
 </Project>
