@@ -42,8 +42,6 @@
 using System;
 using System.IO;
 
-using MonoTouch.UIKit;
-
 using Microsoft.Xna.Framework.Graphics;
 #endregion Using clause
 
