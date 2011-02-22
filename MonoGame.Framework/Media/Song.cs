@@ -39,8 +39,9 @@ purpose and non-infringement.
 #endregion License
 
 using System;
-using Microsoft.Xna.Framework.Audio;
 using System.IO;
+
+using Microsoft.Xna.Framework.Audio;
 ﻿
 namespace Microsoft.Xna.Framework.Media
 {
