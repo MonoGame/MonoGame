@@ -120,11 +120,20 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Storage\StorageContainer.cs" />
     <Compile Include="Storage\StorageDevice.cs" />
+    <Compile Include="MacOS\Audio\Sound.cs" />
+    <Compile Include="Audio\SoundEffect.cs" />
+    <Compile Include="Audio\SoundEffectInstance.cs" />
+    <Compile Include="Media\MediaPlayer.cs" />
+    <Compile Include="Media\Song.cs" />
+    <Compile Include="Media\MediaState.cs" />
+    <Compile Include="Media\MediaSourceType.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />
     <Folder Include="Graphics\" />
     <Folder Include="Content\ContentReaders\" />
     <Folder Include="GamerServices\" />
+    <Folder Include="MacOS\Audio\" />
+    <Folder Include="Media\" />
   </ItemGroup>
 </Project>
