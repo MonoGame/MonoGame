@@ -112,55 +112,62 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			int sz = 0;
 			
-			byte[] pixel;
+			byte[] pixel = new byte[4];;
+			int pos;
+			IntPtr pixelOffset;
 			switch(this.Format) 
 			{
 				case SurfaceFormat.Rgba32 /*kTexture2DPixelFormat_RGBA8888*/:
 				case SurfaceFormat.Dxt3 :
 				    sz = 4;
-					pixel = new byte[Width*Height*sz];
-					Marshal.Copy(texture.PixelData, pixel, 0, Width*Height*sz);					
-					result.R = pixel[(y * Width) + x];
-					result.G = pixel[((y * Width) + x) + 1];
-					result.B = pixel[((y * Width) + x) + 2];
-					result.A = pixel[((y * Width) + x) + 3];
+					pos = ( (y * Width) + x ) * sz;
+					pixelOffset = new IntPtr(texture.PixelData.ToInt64() + pos);
+					Marshal.Copy(pixelOffset, pixel, 0, 4);	
+					result.R = pixel[0];
+					result.G = pixel[1];
+					result.B = pixel[2];
+					result.A = pixel[3];
 					break;
 				case SurfaceFormat.Bgra4444 /*kTexture2DPixelFormat_RGBA4444*/:
 					sz = 2;
-					pixel = new byte[Width*Height*sz];
-					Marshal.Copy(texture.PixelData, pixel, 0, Width*Height*sz);
+					pos = ( (y * Width) + x ) * sz;
+					pixelOffset = new IntPtr(texture.PixelData.ToInt64() + pos);					
+					Marshal.Copy(pixelOffset, pixel, 0, 4);	
 				
-					result.R = pixel[(y * Width) + x];
-					result.G = pixel[((y * Width) + x) + 1];
-					result.B = pixel[((y * Width) + x) + 2];
-					result.A = pixel[((y * Width) + x) + 3];
+					result.R = pixel[0];
+					result.G = pixel[1];
+					result.B = pixel[2];
+					result.A = pixel[3];
 					break;
 				case SurfaceFormat.Bgra5551 /*kTexture2DPixelFormat_RGB5A1*/:
 					sz = 2;
-					pixel = new byte[Width*Height*sz];
-					Marshal.Copy(texture.PixelData, pixel, 0, Width*Height*sz);
+					pos = ( (y * Width) + x ) * sz;
+					pixelOffset = new IntPtr(texture.PixelData.ToInt64() + pos);					
+					Marshal.Copy(pixelOffset, pixel, 0, 4);	
 				
-					result.R = pixel[(y * Width) + x];
-					result.G = pixel[((y * Width) + x) + 1];
-					result.B = pixel[((y * Width) + x) + 2];
-					result.A = pixel[((y * Width) + x) + 3];
+					result.R = pixel[0];
+					result.G = pixel[1];
+					result.B = pixel[2];
+					result.A = pixel[3];
 					break;
 				case SurfaceFormat.Rgb32 /*kTexture2DPixelFormat_RGB565*/:
 					sz = 2;	
-					pixel = new byte[Width*Height*sz];
-					Marshal.Copy(texture.PixelData, pixel, 0, Width*Height*sz);
+					pos = ( (y * Width) + x ) * sz;
+					pixelOffset = new IntPtr(texture.PixelData.ToInt64() + pos);					
+					Marshal.Copy(pixelOffset, pixel, 0, 4);	
 				
-					result.R = pixel[(y * Width) + x];
-					result.G = pixel[((y * Width) + x) + 1];
-					result.B = pixel[((y * Width) + x) + 2];					
+					result.R = pixel[0];
+					result.G = pixel[1];
+					result.B = pixel[2];					
 					result.A = 255;
 					break;
 				case SurfaceFormat.Alpha8 /*kTexture2DPixelFormat_A8*/:
 					sz = 1;
-					pixel = new byte[Width*Height*sz];
-					Marshal.Copy(texture.PixelData, pixel, 0, Width*Height*sz);
+					pos = ( (y * Width) + x ) * sz;
+					pixelOffset = new IntPtr(texture.PixelData.ToInt64() + pos);
+					Marshal.Copy(pixelOffset, pixel, 0, 1);	
 				
-					result.A = pixel[(y * Width) + x];
+					result.A = pixel[0];
 					break;
 				default:
 					throw new NotSupportedException("Texture format");
@@ -297,10 +304,81 @@ namespace Microsoft.Xna.Framework.Graphics
 				throw new ArgumentException("data is the wrong length for Pixel Format");
 			}*/
 			
+			int sz = 0;
+						
+			byte[] pixel = new byte[4];
+			int pos;
+			IntPtr pixelOffset;
 			// Get the Color values
 			if ((typeof(T) == typeof(Color))) 
 			{	
-				
+				for(int y = 0; y < Height; y++ )
+				{
+					for( int x = 0; x < Width; x++ )
+					{
+						var result = new Color(0, 0, 0, 0);						
+						
+						switch(this.Format) 
+						{
+							case SurfaceFormat.Rgba32 /*kTexture2DPixelFormat_RGBA8888*/:
+							case SurfaceFormat.Dxt3 :
+							    sz = 4;
+								pos = ( (y * Width) + x ) * sz;
+								pixelOffset = new IntPtr(texture.PixelData.ToInt32() + pos);
+								Marshal.Copy(pixelOffset, pixel, 0, 4);	
+								result.R = pixel[0];
+								result.G = pixel[1];
+								result.B = pixel[2];
+								result.A = pixel[3];
+								break;
+							case SurfaceFormat.Bgra4444 /*kTexture2DPixelFormat_RGBA4444*/:
+								sz = 2;
+								pos = ( (y * Width) + x ) * sz;
+								pixelOffset = new IntPtr(texture.PixelData.ToInt64() + pos);
+
+								Marshal.Copy(pixelOffset, pixel, 0, 4);	
+							
+								result.R = pixel[0];
+								result.G = pixel[1];
+								result.B = pixel[2];
+								result.A = pixel[3];
+								break;
+							case SurfaceFormat.Bgra5551 /*kTexture2DPixelFormat_RGB5A1*/:
+								sz = 2;
+								pos = ( (y * Width) + x ) * sz;
+								pixelOffset = new IntPtr(texture.PixelData.ToInt64() + pos);
+								Marshal.Copy(pixelOffset, pixel, 0, 4);	
+							
+								result.R = pixel[0];
+								result.G = pixel[1];
+								result.B = pixel[2];
+								result.A = pixel[3];
+								break;
+							case SurfaceFormat.Rgb32 /*kTexture2DPixelFormat_RGB565*/:
+								sz = 2;	
+								pos = ( (y * Width) + x ) * sz;
+								pixelOffset = new IntPtr(texture.PixelData.ToInt64() + pos);
+								Marshal.Copy(pixelOffset, pixel, 0, 4);	
+							
+								result.R = pixel[0];
+								result.G = pixel[1];
+								result.B = pixel[2];					
+								result.A = 255;
+								break;
+							case SurfaceFormat.Alpha8 /*kTexture2DPixelFormat_A8*/:
+								sz = 1;
+								pos = ( (y * Width) + x ) * sz;
+								pixelOffset = new IntPtr(texture.PixelData.ToInt64() + pos);								
+								Marshal.Copy(pixelOffset, pixel, 0, 4);	
+							
+								result.A = pixel[0];
+								break;
+							default:
+								throw new NotSupportedException("Texture format");
+						}
+						data[((y * Width) + x)] = (T)(object)result;						
+					}
+				}
 			}	
         }
 
