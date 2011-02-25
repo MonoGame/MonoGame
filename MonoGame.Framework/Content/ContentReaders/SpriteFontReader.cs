@@ -29,9 +29,10 @@ SOFTWARE.
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.IO;
+
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using System.IO;
 
 namespace Microsoft.Xna.Framework.Content
 {
