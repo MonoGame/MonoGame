@@ -64,18 +64,18 @@ namespace Microsoft.Xna.Framework
         private DateTime _lastUpdate;
 		private DateTime _now;
 		
-		public EAGLContext MainContext;
-	    public EAGLContext BackgroundContext;
-	    public EAGLSharegroup ShareGroup; 
+		public NSOpenGLContext MainContext;
+	    public NSOpenGLContext BackgroundContext;
+	    public NSOpenGLContext ShareGroup; 
 				
 		#region UIVIew Methods
 		
-		public GameWindow() : base (UIScreen.MainScreen.Bounds)
+		public GameWindow() : base (NSScreen.MainScreen.Frame)
 		{
 			LayerRetainsBacking = false; 
 			LayerColorFormat	= EAGLColorFormat.RGBA8;
 			
-			RectangleF rect = UIScreen.MainScreen.Bounds;
+			RectangleF rect = NSScreen.MainScreen.Frame;
 			clientBounds = new Rectangle(0,0,(int) rect.Width,(int) rect.Height);
 			
 			// Enable multi-touch
