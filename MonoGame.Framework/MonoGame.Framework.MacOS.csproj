@@ -38,8 +38,9 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Drawing" />
-    <Reference Include="MonoMac">
+    <Reference Include="MonoMac, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
       <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Downloads\MacOSX\monomac\src\MonoMac.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
@@ -127,6 +128,59 @@
     <Compile Include="Media\Song.cs" />
     <Compile Include="Media\MediaState.cs" />
     <Compile Include="Media\MediaSourceType.cs" />
+    <Compile Include="MacOS\Content\ContentManager.cs" />
+    <Compile Include="Content\ContentReader.cs" />
+    <Compile Include="Graphics\IGraphicsDeviceService.cs" />
+    <Compile Include="Content\ContentTypeReader.cs" />
+    <Compile Include="MacOS\Graphics\GraphicsDevice.cs" />
+    <Compile Include="Content\ContentTypeReaderManager.cs" />
+    <Compile Include="Graphics\Viewport.cs" />
+    <Compile Include="MacOS\Graphics\DisplayMode.cs" />
+    <Compile Include="MacOS\Graphics\GraphicsDevice2D.cs" />
+    <Compile Include="Graphics\ClearOptions.cs" />
+    <Compile Include="MacOS\Graphics\PresentationParameters.cs" />
+    <Compile Include="Graphics\GraphicsAdapter.cs" />
+    <Compile Include="Graphics\GraphicsDeviceCapabilities.cs" />
+    <Compile Include="Graphics\GraphicsDeviceInformation.cs" />
+    <Compile Include="Graphics\GraphicsDeviceStatus.cs" />
+    <Compile Include="Graphics\SpriteBlendMode.cs" />
+    <Compile Include="Graphics\GraphicsProfile.cs" />
+    <Compile Include="Graphics\SpriteSortMode.cs" />
+    <Compile Include="Graphics\VertexDeclaration.cs" />
+    <Compile Include="Graphics\PrimitiveType.cs" />
+    <Compile Include="Graphics\ResolveTexture2D.cs" />
+    <Compile Include="MacOS\Graphics\RenderTarget2D.cs" />
+    <Compile Include="MacOS\Graphics\Texture2D.cs" />
+    <Compile Include="Graphics\RenderTarget.cs" />
+    <Compile Include="MacOS\Graphics\RenderState.cs" />
+    <Compile Include="Graphics\DepthFormat.cs" />
+    <Compile Include="Graphics\SurfaceFormat.cs" />
+    <Compile Include="Graphics\MultiSampleType.cs" />
+    <Compile Include="Graphics\SwapEffect.cs" />
+    <Compile Include="Graphics\RenderTargetUsage.cs" />
+    <Compile Include="Graphics\VertexElement.cs" />
+    <Compile Include="MacOS\Graphics\ESImage.cs" />
+    <Compile Include="MacOS\Graphics\ESTexture2D.cs" />
+    <Compile Include="Graphics\TextureUsage.cs" />
+    <Compile Include="Graphics\SetDataOptions.cs" />
+    <Compile Include="Graphics\BlendFunction.cs" />
+    <Compile Include="Graphics\Blend.cs" />
+    <Compile Include="MacOS\Content\Texture2DReader.cs" />
+    <Compile Include="MacOS\Graphics\SpriteFont.cs" />
+    <Compile Include="Content\ContentReaders\SpriteFontReader.cs" />
+    <Compile Include="Content\ContentReaders\SongReader.cs" />
+    <Compile Include="Content\ContentReaders\SoundEffectReader.cs" />
+    <Compile Include="MacOS\Media\Video.cs" />
+    <Compile Include="MacOS\Graphics\Effect.cs" />
+    <Compile Include="Graphics\CompilerOptions.cs" />
+    <Compile Include="Graphics\EffectPool.cs" />
+    <Compile Include="Graphics\EffectTechnique.cs" />
+    <Compile Include="Graphics\SaveStateMode.cs" />
+    <Compile Include="Content\ContentReaders\ListReader.cs" />
+    <Compile Include="Content\ContentReaders\CharReader.cs" />
+    <Compile Include="Content\ContentReaders\StringReader.cs" />
+    <Compile Include="Content\ContentReaders\RectangleReader.cs" />
+    <Compile Include="Content\ContentReaders\Vector3Reader.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />
@@ -135,5 +189,8 @@
     <Folder Include="GamerServices\" />
     <Folder Include="MacOS\Audio\" />
     <Folder Include="Media\" />
+    <Folder Include="MacOS\Content\" />
+    <Folder Include="MacOS\Graphics\" />
+    <Folder Include="MacOS\Media\" />
   </ItemGroup>
 </Project>

@@ -27,9 +27,10 @@ SOFTWARE.
 
 using System;
 using System.IO;
+using System.Text;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System.Text;
 
 
 namespace Microsoft.Xna.Framework.Content
