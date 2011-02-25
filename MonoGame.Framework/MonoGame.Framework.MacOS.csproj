@@ -181,6 +181,22 @@
     <Compile Include="Content\ContentReaders\StringReader.cs" />
     <Compile Include="Content\ContentReaders\RectangleReader.cs" />
     <Compile Include="Content\ContentReaders\Vector3Reader.cs" />
+    <Compile Include="Input\Touch\GestureType.cs" />
+    <Compile Include="Input\Touch\TouchCollection.cs" />
+    <Compile Include="Input\Touch\TouchLocation.cs" />
+    <Compile Include="Input\Touch\TouchLocationState.cs" />
+    <Compile Include="Input\Touch\TouchPanelCapabilities.cs" />
+    <Compile Include="Input\Touch\TouchPanel.cs" />
+    <Compile Include="Input\Touch\GestureSample.cs" />
+    <Compile Include="GameComponentCollection.cs" />
+    <Compile Include="MacOS\Graphics\SpriteBatch.cs" />
+    <Compile Include="MacOS\Graphics\SpriteBatcher.cs" />
+    <Compile Include="Graphics\SpriteBatchItem.cs" />
+    <Compile Include="Graphics\SpriteEffects.cs" />
+    <Compile Include="Graphics\VertexPosition2ColorTexture.cs" />
+    <Compile Include="MacOS\Game.cs" />
+    <Compile Include="GameComponent.cs" />
+    <Compile Include="DrawableGameComponent.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />
@@ -192,5 +208,6 @@
     <Folder Include="MacOS\Content\" />
     <Folder Include="MacOS\Graphics\" />
     <Folder Include="MacOS\Media\" />
+    <Folder Include="Graphics\New Folder\" />
   </ItemGroup>
 </Project>
