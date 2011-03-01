@@ -380,13 +380,27 @@ namespace Microsoft.Xna.Framework
 			}
 		}	
 		
+		private DisplayOrientation _currentOrientation;
 		public DisplayOrientation CurrentOrientation 
 		{ 
-			get;
-			set;
+			get
+            {
+                return _currentOrientation;
+            }
+            internal set
+            {
+                if (value != _currentOrientation)
+                {
+                    _currentOrientation = value;
+                    if (OrientationChanged != null)
+                    {
+                        OrientationChanged(this, EventArgs.Empty);
+                    }
+                }
+            }
 		}
 
-		
+		public event EventHandler<EventArgs> OrientationChanged;
 		public event EventHandler ClientSizeChanged;
 		public event EventHandler ScreenDeviceNameChanged;
     }
