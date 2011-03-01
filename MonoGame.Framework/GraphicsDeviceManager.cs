@@ -55,6 +55,7 @@ namespace Microsoft.Xna.Framework
 		private int _preferredBackBufferHeight;
 		private int _preferredBackBufferWidth;
 		private bool _preferMultiSampling;
+		private DisplayOrientation _supportedOrientations;
 
         public GraphicsDeviceManager(Game game)
         {
@@ -66,6 +67,7 @@ namespace Microsoft.Xna.Framework
 			_game = game;
 			_preferredBackBufferHeight = game.Window.ClientBounds.Height;
 			_preferredBackBufferWidth = game.Window.ClientBounds.Width;
+			_supportedOrientations = DisplayOrientation.Default;
 			
             if (game.Services.GetService(typeof(IGraphicsDeviceManager)) != null)
             {
@@ -241,8 +243,14 @@ namespace Microsoft.Xna.Framework
 		
 		public DisplayOrientation SupportedOrientations 
 		{ 
-			get; 
-			set; 
+			get
+			{
+				return _supportedOrientations;
+			}
+			set
+			{
+				_supportedOrientations = value;
+			}
 		}
 
     }
