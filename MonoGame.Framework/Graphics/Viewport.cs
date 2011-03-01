@@ -43,6 +43,7 @@ using System;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
+	[SerializableAttribute]
     public struct Viewport
     {
 
@@ -57,6 +58,22 @@ namespace Microsoft.Xna.Framework.Graphics
 			get
 			{
 				return Width/Height;
+			}
+		}
+		
+		public Rectangle Bounds 
+		{ 
+			get 
+			{
+				return new Rectangle(X, Y, Width, Height);	
+			}
+				
+			set
+			{				
+				X = value.X;
+				Y = value.Y;
+				Width = value.Width;
+				Height = value.Height;
 			}
 		}
 		

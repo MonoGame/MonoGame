@@ -47,7 +47,7 @@ using Microsoft.Xna.Framework.Audio;
 
 namespace Microsoft.Xna.Framework.Audio
 {
-    public sealed class SoundEffect
+    public sealed class SoundEffect : IDisposable
     {
 		private Sound _sound;
 		private string _name = "";
@@ -99,6 +99,20 @@ namespace Microsoft.Xna.Framework.Audio
 			{
 				Sound = _sound,
 			};
+		}
+		
+		#region IDisposable Members
+
+        public void Dispose()
+        {
+        }
+
+        #endregion
+		
+		public static float MasterVolume 
+		{ 
+			get; 
+			set;
 		}
     }
 }
