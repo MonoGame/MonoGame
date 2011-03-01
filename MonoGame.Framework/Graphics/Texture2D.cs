@@ -85,6 +85,12 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 		
+		public bool IsDisposed
+		{
+			get;
+			set;
+		}
+		
 		internal Texture2D(ESImage theImage)
 		{
 			texture = theImage;
@@ -297,13 +303,6 @@ namespace Microsoft.Xna.Framework.Graphics
 				throw new ArgumentException("data cannot be null");
 			}
 			
-			/*int mult = (this.Format == SurfaceFormat.Alpha8) ? 1 : 4;
-			
-			if (data.Length < Width * Height * mult)
-			{
-				throw new ArgumentException("data is the wrong length for Pixel Format");
-			}*/
-			
 			int sz = 0;
 						
 			byte[] pixel = new byte[4];
@@ -323,8 +322,8 @@ namespace Microsoft.Xna.Framework.Graphics
 							case SurfaceFormat.Rgba32 /*kTexture2DPixelFormat_RGBA8888*/:
 							case SurfaceFormat.Dxt3 :
 							    sz = 4;
-								pos = ( (y * Width) + x ) * sz;
-								pixelOffset = new IntPtr(texture.PixelData.ToInt32() + pos);
+								pos = ( (y * Width) + x ) * sz;								
+								pixelOffset = new IntPtr(texture.PixelData.ToInt64() + pos);							
 								Marshal.Copy(pixelOffset, pixel, 0, 4);	
 								result.R = pixel[0];
 								result.G = pixel[1];

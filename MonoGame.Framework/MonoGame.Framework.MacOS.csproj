@@ -208,6 +208,5 @@
     <Folder Include="MacOS\Content\" />
     <Folder Include="MacOS\Graphics\" />
     <Folder Include="MacOS\Media\" />
-    <Folder Include="Graphics\New Folder\" />
   </ItemGroup>
 </Project>

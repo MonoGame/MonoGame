@@ -55,7 +55,7 @@ using Microsoft.Xna.Framework.Input.Touch;
 
 namespace Microsoft.Xna.Framework
 {
-    public class GameWindow : NSOpenGLView
+    public class GameWindow : MonoMacGameView
     {
 		private readonly Rectangle clientBounds;
 		internal Game game;
