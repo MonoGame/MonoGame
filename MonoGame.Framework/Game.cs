@@ -109,12 +109,26 @@ namespace Microsoft.Xna.Framework
 		private void ObserveDeviceRotation ()
 		{
 			NSNotificationCenter.DefaultCenter.AddObserver( new NSString("UIDeviceOrientationDidChangeNotification"), (notification) => { 
-				UIDeviceOrientation orientation = UIDevice.CurrentDevice.Orientation;
+			UIDeviceOrientation orientation = UIDevice.CurrentDevice.Orientation;
+				
+				// Calculate supported orientations if it has been left as "default"
+            DisplayOrientation supportedOrientations = (graphicsDeviceManager as GraphicsDeviceManager).SupportedOrientations;
+            if ((supportedOrientations & DisplayOrientation.Default) != 0)
+            {
+                if (GraphicsDevice.PresentationParameters.BackBufferWidth > GraphicsDevice.PresentationParameters.BackBufferHeight)
+                {
+                    supportedOrientations = DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight;
+                }
+                else
+                {
+                    supportedOrientations = DisplayOrientation.Portrait | DisplayOrientation.PortraitUpsideDown;
+                }
+            }
 				
 				switch (orientation)
 				{
 					case UIDeviceOrientation.Portrait :
-						if ( (graphicsDeviceManager as GraphicsDeviceManager).SupportedOrientations == DisplayOrientation.Portrait)
+						if ((supportedOrientations & DisplayOrientation.Portrait) != 0)
 						{
 							_view.CurrentOrientation = DisplayOrientation.Portrait;
 							GraphicsDevice.PresentationParameters.DisplayOrientation = DisplayOrientation.Portrait;
@@ -122,65 +136,50 @@ namespace Microsoft.Xna.Framework
 						}
 						break;
 					case UIDeviceOrientation.LandscapeLeft :
-						switch ((graphicsDeviceManager as GraphicsDeviceManager).SupportedOrientations)
-						{
-							case DisplayOrientation.LandscapeLeft:
-							case DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight :
-							{
-								_view.CurrentOrientation = DisplayOrientation.LandscapeLeft;
-								GraphicsDevice.PresentationParameters.DisplayOrientation = DisplayOrientation.LandscapeLeft;
-								TouchPanel.DisplayOrientation = DisplayOrientation.LandscapeLeft;
-								break;
-							}
-						}
+						if ((supportedOrientations & DisplayOrientation.LandscapeLeft) != 0)
+			            {
+			              _view.CurrentOrientation = DisplayOrientation.LandscapeLeft;
+			              GraphicsDevice.PresentationParameters.DisplayOrientation = DisplayOrientation.LandscapeLeft;
+			              TouchPanel.DisplayOrientation = DisplayOrientation.LandscapeLeft;
+			            }
 						break;
-					case UIDeviceOrientation.LandscapeRight :
-						switch ((graphicsDeviceManager as GraphicsDeviceManager).SupportedOrientations)
-						{
-							case DisplayOrientation.LandscapeRight:
-							case DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight :
-							{
-								_view.CurrentOrientation = DisplayOrientation.LandscapeRight;
-								GraphicsDevice.PresentationParameters.DisplayOrientation = DisplayOrientation.LandscapeRight;
-								TouchPanel.DisplayOrientation = DisplayOrientation.LandscapeRight;
-								break;
-							}
-						}
+					case UIDeviceOrientation.LandscapeRight :						
+						if ((supportedOrientations & DisplayOrientation.LandscapeRight) != 0)
+			            {
+			              _view.CurrentOrientation = DisplayOrientation.LandscapeRight;
+			              GraphicsDevice.PresentationParameters.DisplayOrientation = DisplayOrientation.LandscapeRight;
+			              TouchPanel.DisplayOrientation = DisplayOrientation.LandscapeRight;
+			            }
 						break;
 					case UIDeviceOrientation.FaceDown :
-						if ( (graphicsDeviceManager as GraphicsDeviceManager).SupportedOrientations == DisplayOrientation.FaceDown)
+						if ((supportedOrientations & DisplayOrientation.FaceDown) != 0)
 						{
 							_view.CurrentOrientation = DisplayOrientation.FaceDown;
 							TouchPanel.DisplayOrientation = DisplayOrientation.FaceDown;
 						}
 						break;
 					case UIDeviceOrientation.FaceUp :
-						if ( (graphicsDeviceManager as GraphicsDeviceManager).SupportedOrientations == DisplayOrientation.FaceDown)
+						if ((supportedOrientations & DisplayOrientation.FaceUp) != 0)						
 						{
 							_view.CurrentOrientation = DisplayOrientation.FaceUp;
 							TouchPanel.DisplayOrientation = DisplayOrientation.FaceUp;
 						}
 						break;
 					case UIDeviceOrientation.PortraitUpsideDown :
-						if ( (graphicsDeviceManager as GraphicsDeviceManager).SupportedOrientations == DisplayOrientation.PortraitUpsideDown)
+						if ((supportedOrientations & DisplayOrientation.PortraitUpsideDown) != 0)						
 						{
 							_view.CurrentOrientation = DisplayOrientation.PortraitUpsideDown;
 							TouchPanel.DisplayOrientation = DisplayOrientation.PortraitUpsideDown;
 						}
 						break;
 					case UIDeviceOrientation.Unknown :
-						if ( (graphicsDeviceManager as GraphicsDeviceManager).SupportedOrientations == DisplayOrientation.Unknown)
+						if ((supportedOrientations & DisplayOrientation.Unknown) != 0)						
 						{
 							_view.CurrentOrientation = DisplayOrientation.Unknown;
 							TouchPanel.DisplayOrientation = DisplayOrientation.Unknown;
 						}
 						break;						
-					default:
-						if ( (graphicsDeviceManager as GraphicsDeviceManager).SupportedOrientations == DisplayOrientation.Default)
-						{
-							_view.CurrentOrientation = DisplayOrientation.Default;
-							TouchPanel.DisplayOrientation = DisplayOrientation.Default;
-						}
+					default:						
 						break;
 				}					  
 			});
