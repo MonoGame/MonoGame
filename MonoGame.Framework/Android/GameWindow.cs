@@ -157,20 +157,36 @@ namespace Microsoft.Xna.Framework
             if (game.graphicsDeviceManager == null)
                 return;
 
+            // Calculate supported orientations if it has been left as "default"
+            DisplayOrientation supportedOrientations = (game.graphicsDeviceManager as GraphicsDeviceManager).SupportedOrientations;
+            if ((supportedOrientations & DisplayOrientation.Default) != 0)
+            {
+                if (game.GraphicsDevice.PresentationParameters.BackBufferWidth > game.GraphicsDevice.PresentationParameters.BackBufferHeight)
+                {
+                    supportedOrientations = DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight;
+                }
+                else
+                {
+                    supportedOrientations = DisplayOrientation.Portrait | DisplayOrientation.PortraitUpsideDown;
+                }
+            }
+
             switch (Resources.Configuration.Orientation) {
 
                 case Orientation.Portrait:
-                    if ((game.graphicsDeviceManager as GraphicsDeviceManager).SupportedOrientations == DisplayOrientation.Portrait) {
+                    if ((supportedOrientations & DisplayOrientation.Portrait) != 0) {
                         CurrentOrientation = DisplayOrientation.Portrait;
                         game.GraphicsDevice.PresentationParameters.DisplayOrientation = DisplayOrientation.Portrait;
                         TouchPanel.DisplayOrientation = DisplayOrientation.Portrait;
                     }
                     break;
                 case Orientation.Landscape:
+                    // TODO: Since the system cannot tell us if it is left or right, we may need to use one of the other sensors
+                    // to determine actual orientation.  At this stage it chooses left (if set) over right (if set).
                     DisplayOrientation orientation = DisplayOrientation.Unknown;
-                    if ((game.graphicsDeviceManager as GraphicsDeviceManager).SupportedOrientations == DisplayOrientation.LandscapeLeft)
+                    if ((supportedOrientations & DisplayOrientation.LandscapeLeft) != 0)
                         orientation = DisplayOrientation.LandscapeLeft;
-                    else if ((game.graphicsDeviceManager as GraphicsDeviceManager).SupportedOrientations == DisplayOrientation.LandscapeRight)
+                    else if ((supportedOrientations & DisplayOrientation.LandscapeRight) != 0)
                         orientation = DisplayOrientation.LandscapeRight;
 
                     if (orientation != DisplayOrientation.Unknown) {
@@ -181,16 +197,12 @@ namespace Microsoft.Xna.Framework
                     break;
 
                 case Orientation.Undefined:
-                    if ((game.graphicsDeviceManager as GraphicsDeviceManager).SupportedOrientations == DisplayOrientation.Unknown) {
+                    if ((supportedOrientations & DisplayOrientation.Unknown) != 0) {
                         CurrentOrientation = DisplayOrientation.Unknown;
                         TouchPanel.DisplayOrientation = DisplayOrientation.Unknown;
                     }
                     break;
                 default:
-                    if ((game.graphicsDeviceManager as GraphicsDeviceManager).SupportedOrientations == DisplayOrientation.Default) {
-                        CurrentOrientation = DisplayOrientation.Default;
-                        TouchPanel.DisplayOrientation = DisplayOrientation.Default;
-                    }
                     break;
             }
         }
@@ -269,15 +281,29 @@ namespace Microsoft.Xna.Framework
 			{
 				// Do nothing; Ignore rather than raising and exception
 			}
-		}	
-		
-		public DisplayOrientation CurrentOrientation 
-		{ 
-			get;
-			set;
 		}
 
-		
+        private DisplayOrientation _currentOrientation;
+		public DisplayOrientation CurrentOrientation 
+		{
+            get
+            {
+                return _currentOrientation;
+            }
+            private set
+            {
+                if (value != _currentOrientation)
+                {
+                    _currentOrientation = value;
+                    if (OrientationChanged != null)
+                    {
+                        OrientationChanged(this, EventArgs.Empty);
+                    }
+                }
+            }
+		}
+
+        public event EventHandler<EventArgs> OrientationChanged;
 		public event EventHandler ClientSizeChanged;
 		public event EventHandler ScreenDeviceNameChanged;
     }
