@@ -55,7 +55,7 @@ namespace Microsoft.Xna.Framework.Content
 {
     public class ContentManager : IDisposable
     {
-        private string _rootDirectory;
+        private string _rootDirectory = string.Empty;
         private IServiceProvider serviceProvider;
 		private IGraphicsDeviceService graphicsDeviceService;
 
@@ -102,7 +102,7 @@ namespace Microsoft.Xna.Framework.Content
 			
 			// Check for windows-style directory separator character
             //Lowercase assetName (monodroid specification all assests are lowercase)
-			assetName = assetName.ToLower().Replace('\\',Path.DirectorySeparatorChar);
+            assetName = Path.Combine(_rootDirectory, assetName.Replace('\\', Path.DirectorySeparatorChar)).ToLower();
 			
 			// Get the real file name
 			if ((typeof(T) == typeof(Texture2D))) 
