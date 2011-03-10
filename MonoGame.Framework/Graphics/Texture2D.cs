@@ -301,9 +301,34 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void GetData<T>(ref T[] data)
         {	
-			if (data == null )
+			GetData<T>(0, null, data, 0, Width * Height);
+        }
+
+        public void GetData<T>(T[] data, int startIndex, int elementCount)
+        {
+            GetData<T>(0, null, data, startIndex, elementCount);
+        }
+
+        public void GetData<T>(int level, Rectangle? rect, T[] data, int startIndex, int elementCount)
+        {
+            if (data == null )
 			{
 				throw new ArgumentException("data cannot be null");
+			}
+			
+			if (data.Length < startIndex + elementCount)
+			{
+				throw new ArgumentException("The data passed has a length of " + data.Length + " but " + elementCount + " pixels have been requested.");
+			}
+			
+			Rectangle r;
+			if (rect != null)
+			{
+				r = rect.Value;
+			}
+			else
+			{
+				r = new Rectangle(0, 0, Width, Height);
 			}
 			
 			int sz = 0;
@@ -438,10 +463,12 @@ namespace Microsoft.Xna.Framework.Graphics
 					imageData = tempData;			
 				}									
 				
+				int count = 0;
+				
 				// Loop through and extract the data
-				for(int y = 0; y < imageSize.Height; y++ )
+				for(int y = r.Top; y < r.Bottom; y++ )
 				{
-					for( int x = 0; x < imageSize.Width; x++ )
+					for( int x = r.Left; x < r.Right; x++ )
 					{
 						var result = new Color(0, 0, 0, 0);						
 						
@@ -503,23 +530,21 @@ namespace Microsoft.Xna.Framework.Graphics
 							default:
 								throw new NotSupportedException("Texture format");
 						}
-						data[((y * imageSize.Width) + x)] = (T)(object)result;						
+						data[((y * imageSize.Width) + x)] = (T)(object)result;
+						
+						count++;
+						if (count >= elementCount) 
+							return;
 					}
 				}
 								
 				context.Dispose();
 				Marshal.FreeHGlobal(imageData);	
 			}	
-        }
-
-        public void GetData<T>(T[] data, int startIndex, int elementCount)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void GetData<T>(int level, Rectangle? rect, T[] data, int startIndex, int elementCount)
-        {
-            throw new NotImplementedException();
+			else
+			{
+				throw new NotImplementedException();
+			}
         }
 	}
 }
