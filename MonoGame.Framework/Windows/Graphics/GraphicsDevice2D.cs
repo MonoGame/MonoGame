@@ -42,7 +42,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-
+using System.Windows.Forms;
 using OpenTK.Graphics.OpenGL;
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -141,25 +141,48 @@ namespace Microsoft.Xna.Framework.Graphics
 		private GraphicsDevice _device;
 		private readonly List<SpriteBatchRenderItem> _sprites = new List<SpriteBatchRenderItem>();
 		private SpriteBlendMode _actualBlendMode;
-		private SpriteSortMode _actualSortMode = SpriteSortMode.Deferred; 		
-		
+		private SpriteSortMode _actualSortMode = SpriteSortMode.Deferred;
+    
 		public GraphicsDevice2D (GraphicsDevice Device)
 		{
 			_device = Device;
-			
-			// TODO Initialise2DOpenGL();
 		}
-		
+
+        public void SizeChanged()
+        {
+            // Set up OpenGL projection matrix
+            GL.MatrixMode(MatrixMode.Projection);
+            GL.LoadIdentity();
+            GL.Ortho(0, _device.DisplayMode.Width, _device.DisplayMode.Height, 0, -1, 1);
+
+            GL.MatrixMode(MatrixMode.Modelview);
+            GL.Viewport(0, 0, _device.DisplayMode.Width, _device.DisplayMode.Height);
+        }
+
+        public void ApplyScale()
+        {
+            GL.Scale(ScaleW, ScaleH, 1);
+        }
+
+        public float ScaleH
+        {
+            get
+            {
+                //GL.Scale(scaleW, scaleH, 1);
+                return _device.DisplayMode.Height / _device.mngr.PreferredBackBufferHeight;
+            }
+        }
+
+        public float ScaleW
+        {
+            get
+            {
+                return _device.DisplayMode.Width/_device.mngr.PreferredBackBufferWidth;
+            }
+        }
+
 		public void Initialise2DOpenGL()
 		{
-			// Set up OpenGL projection matrix
-			GL.MatrixMode(MatrixMode.Projection);
-			GL.LoadIdentity();
-			GL.Ortho(0, _device.DisplayMode.Width, _device.DisplayMode.Height, 0, -1, 1);	
-			
-			GL.MatrixMode(MatrixMode.Modelview);	
-			GL.Viewport(0, 0, _device.DisplayMode.Width, _device.DisplayMode.Height);	
-			
 			// Initialize OpenGL states			
 			GL.Disable(EnableCap.DepthTest);
 			GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode,(int) All.BlendSrc);

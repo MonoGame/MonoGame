@@ -39,7 +39,9 @@ purpose and non-infringement.
 #endregion License
 
 using System;
-
+using System.Drawing;
+using System.Windows.Forms;
+using OpenTK;
 using OpenTK.Graphics.OpenGL;
 
 using Microsoft.Xna.Framework.Graphics;
@@ -117,16 +119,15 @@ namespace Microsoft.Xna.Framework
 
         public void ApplyChanges()
         {
+            (_game.Window as WindowsGameWindow).OpenTkGameWindow.ClientSize = new Size(PreferredBackBufferWidth, PreferredBackBufferHeight);
         }
 
 		private void Initialize()
 		{
-            _graphicsDevice = new GraphicsDevice(_preferredBackBufferWidth, _preferredBackBufferHeight);
+            _graphicsDevice = new GraphicsDevice(this);
 			_graphicsDevice.PresentationParameters = new PresentationParameters();
 			
-			// Set "full screen"  as default
-			_graphicsDevice.PresentationParameters.IsFullScreen = true;
-
+			
 			if (_preferMultiSampling) 
 			{
 				_graphicsDevice.PreferedFilter = All.Linear;
@@ -135,6 +136,7 @@ namespace Microsoft.Xna.Framework
 			{
 				_graphicsDevice.PreferedFilter = All.Nearest;
 			}
+           
 		}
 		
         public void ToggleFullScreen()
@@ -158,7 +160,23 @@ namespace Microsoft.Xna.Framework
             }
             set
             {
-				_graphicsDevice.PresentationParameters.IsFullScreen = value;				
+                if (IsFullScreen != value)
+                {
+                    _graphicsDevice.PresentationParameters.IsFullScreen = value;
+                    var wGameWindow = _game.Window as WindowsGameWindow;
+
+                    if (IsFullScreen)
+                    {
+                        wGameWindow.OpenTkGameWindow.WindowBorder = WindowBorder.Hidden;
+                        wGameWindow.OpenTkGameWindow.WindowState = OpenTK.WindowState.Fullscreen;
+                        _graphicsDevice.SizeChanged(wGameWindow.OpenTkGameWindow.ClientRectangle.Width, wGameWindow.OpenTkGameWindow.ClientRectangle.Height);
+                    }
+                    else {
+                        wGameWindow.OpenTkGameWindow.WindowState = OpenTK.WindowState.Normal;
+                        wGameWindow.OpenTkGameWindow.WindowBorder = WindowBorder.Resizable;
+                        _graphicsDevice.SizeChanged(wGameWindow.OpenTkGameWindow.ClientRectangle.Width, wGameWindow.OpenTkGameWindow.ClientRectangle.Height);
+                    }
+                }
             }
         }
 
@@ -202,6 +220,7 @@ namespace Microsoft.Xna.Framework
             set
             {
 				_preferredBackBufferHeight = value;
+
             }
         }
 

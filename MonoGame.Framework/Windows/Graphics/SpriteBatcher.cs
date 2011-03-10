@@ -49,6 +49,7 @@ namespace Microsoft.Xna.Framework.Graphics
 {
 	internal class SpriteBatcher
 	{
+	    GraphicsDevice _graphicsDevice;
 		List<SpriteBatchItem> _batchItemList;
 		Queue<SpriteBatchItem> _freeBatchItemQueue;
 		VertexPosition2ColorTexture[] _vertexArray;
@@ -56,8 +57,9 @@ namespace Microsoft.Xna.Framework.Graphics
 		GCHandle _vertexHandle;
 		GCHandle _indexHandle;
 
-		public SpriteBatcher ()
-		{
+        public SpriteBatcher(GraphicsDevice graphicsDevice)
+        {
+            _graphicsDevice = graphicsDevice;
 			_batchItemList = new List<SpriteBatchItem>(256);
 			_freeBatchItemQueue = new Queue<SpriteBatchItem>(256);
 
@@ -103,6 +105,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			// nothing to do
 			if ( _batchItemList.Count == 0 )
 				return;
+
+		    _graphicsDevice.spriteDevice.ApplyScale();
 			
 			// sort the batch items
 			switch ( sortMode )
