@@ -52,11 +52,12 @@ namespace Microsoft.Xna.Framework.Graphics
 		private All _preferedFilter;
 		private int _activeTexture = -1;
 		private Viewport _viewport;
-		private GraphicsDevice2D _spriteDevice;
+		internal GraphicsDevice2D spriteDevice;
 		private bool _isDisposed = false;
-		private readonly DisplayMode _displayMode;
+		private DisplayMode _displayMode;
 		private RenderState _renderState;
-		
+        internal GraphicsDeviceManager mngr;
+
 		internal All PreferedFilter 
 		{
 			get 
@@ -90,7 +91,21 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 
-        internal GraphicsDevice(int width, int height)
+        internal GraphicsDevice(GraphicsDeviceManager mngr)
+        {
+            this.mngr = mngr;
+            _displayMode = new DisplayMode(this.mngr.PreferredBackBufferWidth, this.mngr.PreferredBackBufferHeight);
+
+            // Create the Sprite Rendering engine
+            spriteDevice = new GraphicsDevice2D(this);
+
+            // Init RenderState
+            _renderState = new RenderState();
+
+            SizeChanged(this.mngr.PreferredBackBufferWidth, this.mngr.PreferredBackBufferHeight);
+        }
+
+        internal void SizeChanged(int width, int height)
         {
             _displayMode = new DisplayMode(width, height);
 
@@ -102,15 +117,12 @@ namespace Microsoft.Xna.Framework.Graphics
             _viewport.Height = DisplayMode.Height;
             _viewport.TitleSafeArea = new Rectangle(0, 0, DisplayMode.Width, DisplayMode.Height);
 
-            // Create the Sprite Rendering engine
-            _spriteDevice = new GraphicsDevice2D(this);
+            if (PresentationParameters != null) {
+                PresentationParameters.BackBufferWidth = width;
+                PresentationParameters.BackBufferHeight = height;
+            }
 
-            // Init RenderState
-            _renderState = new RenderState();
-        }
-
-        public GraphicsDevice() :this(500, 500)
-        {
+            spriteDevice.SizeChanged();
         }
 
         public void Clear(Color color)
@@ -229,17 +241,17 @@ namespace Microsoft.Xna.Framework.Graphics
 				
 		internal void StartSpriteBatch(SpriteBlendMode blendMode, SpriteSortMode sortMode)
 		{
-			_spriteDevice.StartSpriteBatch(blendMode,sortMode);
+			spriteDevice.StartSpriteBatch(blendMode,sortMode);
 		}
 		
 		internal void EndSpriteBatch()
 		{
-			_spriteDevice.EndSpriteBatch();
+			spriteDevice.EndSpriteBatch();
 		}
 		
 		internal void AddToSpriteBuffer(SpriteBatchRenderItem sbItem)
 		{
-			_spriteDevice.AddToSpriteBuffer(sbItem);				
+			spriteDevice.AddToSpriteBuffer(sbItem);				
 		}
 		
 		internal void RenderSprites(Vector2 point, float[] texCoords, float[] quadVertices, RenderMode renderMode)
@@ -250,6 +262,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 			// Enable Texture_2D
 			GL.Enable(EnableCap.Texture2D);
+
+            spriteDevice.ApplyScale();
 			
 			// Set the glColor to apply alpha to the image
 			Vector4 color = renderMode.FilterColor.ToEAGLColor();			

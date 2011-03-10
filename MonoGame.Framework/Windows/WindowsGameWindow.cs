@@ -40,8 +40,11 @@ purpose and non-infringement.
 
 #region Using Statements
 using System;
+using System.Windows.Forms;
+using Microsoft.Xna.Framework.Input;
 using OpenTK;
 using OpenTK.Graphics;
+
 
 #endregion Using Statements
 
@@ -68,6 +71,7 @@ namespace Microsoft.Xna.Framework
             OpenTkGameWindow = new OpenTK.GameWindow();
             OpenTkGameWindow.RenderFrame += OnRenderFrame;
             OpenTkGameWindow.UpdateFrame += OnUpdateFrame;
+            OpenTkGameWindow.Resize += OnResize;
             clientBounds = new Rectangle(0, 0, OpenTkGameWindow.Width, OpenTkGameWindow.Height);
 
             // Initialize GameTime
@@ -76,9 +80,18 @@ namespace Microsoft.Xna.Framework
 
             // Initialize _lastUpdate
             _lastUpdate = DateTime.Now;
+
+            //Default no resizing
+            AllowUserResizing = false;
         }
 
         #region GameWindow Methods
+
+        private void OnResize(object sender, EventArgs e)
+        {
+            Game.GraphicsDevice.SizeChanged(OpenTkGameWindow.ClientRectangle.Width, OpenTkGameWindow.ClientRectangle.Height);
+            OnClientSizeChanged();
+        }
 
         private void OnRenderFrame(object sender, FrameEventArgs e)
         {
@@ -100,13 +113,20 @@ namespace Microsoft.Xna.Framework
 
         private void OnUpdateFrame(object sender, FrameEventArgs e)
 		{			
-			if (Game != null )
-			{
-				_now = DateTime.Now;
+			if (Game != null ) {
+			  
+                HandleInput();
+
+                _now = DateTime.Now;
 				_updateGameTime.Update(_now - _lastUpdate);
             	Game.DoUpdate(_updateGameTime);
 			}
 		}
+
+        private void HandleInput()
+        {
+            Mouse.SetPosition(OpenTkGameWindow.Mouse.X, OpenTkGameWindow.Mouse.Y);
+        }
 		
 		#endregion
 
@@ -139,17 +159,19 @@ namespace Microsoft.Xna.Framework
             set { SetTitle(value); }
         }
 
-        public override bool AllowUserResizing 
-		{
-			get 
-			{
-				return false;
-			}
-			set 
-			{
-				// Do nothing; Ignore rather than raising and exception
-			}
-		}
+        private bool _allowUserResizing;
+        public override bool AllowUserResizing
+        {
+            get { return _allowUserResizing; }
+            set
+            {
+                _allowUserResizing = value;
+
+                if (_allowUserResizing)
+                    OpenTkGameWindow.WindowBorder = WindowBorder.Resizable;
+                else OpenTkGameWindow.WindowBorder = WindowBorder.Fixed;
+            }
+        }
 
         private DisplayOrientation _currentOrientation;
 		public override DisplayOrientation CurrentOrientation 

@@ -34,8 +34,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			}	
 			
 			_graphicsDevice = graphicsDevice;
-			
-			_batcher = new SpriteBatcher();
+
+            _batcher = new SpriteBatcher(_graphicsDevice);
 		}
 		
 		public void Begin()
@@ -570,6 +570,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			{
 				throw new ArgumentException("spriteFont");
 			}
+
+
 			
 			Vector2 p = new Vector2(-origin.X,-origin.Y);
 			
