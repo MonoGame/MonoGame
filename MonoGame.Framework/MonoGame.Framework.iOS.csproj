@@ -130,7 +130,7 @@
     <Compile Include="GameComponentCollection.cs" />
     <Compile Include="GameServiceContainer.cs" />
     <Compile Include="GameTime.cs" />
-    <Compile Include="GameWindow.cs" />
+    <Compile Include="IOSGameWindow.cs" />
     <Compile Include="GraphicsDeviceManager.cs" />
     <Compile Include="IDrawable.cs" />
     <Compile Include="IGameComponent.cs" />
