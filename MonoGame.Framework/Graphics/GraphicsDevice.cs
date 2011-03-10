@@ -222,7 +222,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				
 		internal void StartSpriteBatch(SpriteBlendMode blendMode, SpriteSortMode sortMode)
 		{
-			_spriteDevice.StartSpriteBatch(blendMode,sortMode);
+			_spriteDevice.StartSpriteBatch(blendMode,sortMode);		
 		}
 		
 		internal void EndSpriteBatch()
@@ -296,11 +296,19 @@ namespace Microsoft.Xna.Framework.Graphics
 			get; 
 			set; 
 		}
-		
+			
+		Rectangle _scissorRectangle;
 		public Rectangle ScissorRectangle 
 		{ 
-			get; 
-			set; 
+			get
+			{
+				return _scissorRectangle;
+			}
+			set
+			{
+				_scissorRectangle = value;
+				GL.Scissor(_scissorRectangle.X, _scissorRectangle.Y, _scissorRectangle.Width, _scissorRectangle.Height );
+			}
 		}
 		
 		public RenderState RenderState 

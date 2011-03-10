@@ -134,6 +134,12 @@ namespace Microsoft.Xna.Framework.Graphics
 			GL.FrontFace(All.Cw);
 			GL.Color4(1.0f, 1.0f, 1.0f, 1.0f);
 			
+			// Enable Scissor Tests if necessary
+			if ( _graphicsDevice.RenderState.ScissorTestEnable )
+			{
+				// TODO GL.Enable(All.ScissorTest);
+			}
+			
 			_batcher.DrawBatch ( _sortMode );
 		}
 		
