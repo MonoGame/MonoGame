@@ -43,6 +43,7 @@ using System;
 using System.Drawing;
 using System.Collections.Generic;
 using Android.Content;
+using Android.Content.PM;
 using Android.Content.Res;
 using Android.Util;
 using Android.Views;
@@ -61,7 +62,7 @@ using Microsoft.Xna.Framework.Input.Touch;
 
 namespace Microsoft.Xna.Framework
 {
-    public class GameWindow : AndroidGameView
+    public class AndroidGameWindow : AndroidGameView
     {
 		private Rectangle clientBounds;
 		internal Game game;
@@ -69,9 +70,11 @@ namespace Microsoft.Xna.Framework
         private GameTime _drawGameTime;
         private DateTime _lastUpdate;
 		private DateTime _now;
+        private DisplayOrientation _currentOrientation;
 
-        public GameWindow(Context context) : base(context)
+        public AndroidGameWindow(Context context) :base(context)
         {
+          
             Initialize();
         }
 
@@ -87,7 +90,7 @@ namespace Microsoft.Xna.Framework
             _lastUpdate = DateTime.Now;
         }
 
-        ~GameWindow()
+        ~AndroidGameWindow()
 		{
 			//
 		}
@@ -121,10 +124,6 @@ namespace Microsoft.Xna.Framework
             //Should not happen at all..
             if (!GraphicsContext.IsCurrent)
                 MakeCurrent();
-
-            // This code was commented to make the code base more iPhone like.
-            // More speed testing is required, to see if this is worse or better
-            // game.DoStep();	
 
             if (game != null) {
                 _drawGameTime.Update(_now - _lastUpdate);
@@ -211,36 +210,51 @@ namespace Microsoft.Xna.Framework
 
         public override bool OnTouchEvent(MotionEvent e)
         {
-           
+
             TouchLocationState state = TouchLocationState.Invalid;
 
-            if(e.Action == MotionEventActions.Cancel) {
+            if (e.Action == MotionEventActions.Cancel) {
                 state = TouchLocationState.Invalid;
             }
             if (e.Action == MotionEventActions.Up) {
                 state = TouchLocationState.Released;
-            } 
+            }
             if (e.Action == MotionEventActions.Move) {
                 state = TouchLocationState.Moved;
-                Mouse.SetPosition((int)e.GetX(), (int)e.GetY());
-            } 
+                Mouse.SetPosition((int) e.GetX(), (int) e.GetY());
+            }
             if (e.Action == MotionEventActions.Down) {
                 state = TouchLocationState.Pressed;
-                Mouse.SetPosition((int)e.GetX(), (int)e.GetY());
+                Mouse.SetPosition((int) e.GetX(), (int) e.GetY());
             }
 
             TouchLocation tprevious;
             TouchLocation tlocation;
             Vector2 position = new Vector2(e.GetX(), e.GetY());
+            Vector2 translatedPosition = position;
 
-            if (state != TouchLocationState.Pressed && _previousTouches.TryGetValue(e.Handle, out tprevious))
-            {
-                tlocation = new TouchLocation(e.Handle.ToInt32(), state, position, e.Pressure, tprevious.State, tprevious.Position, tprevious.Pressure);
+            switch (CurrentOrientation) {
+                case DisplayOrientation.Portrait: 
+                    break;
+                case DisplayOrientation.LandscapeRight: 
+                    translatedPosition = new Vector2(ClientBounds.Height - position.Y, position.X);
+                    break;
+                case DisplayOrientation.LandscapeLeft: 
+                    translatedPosition = new Vector2(position.Y, ClientBounds.Width - position.X);
+                    break;
+                case DisplayOrientation.PortraitUpsideDown:
+                    translatedPosition = new Vector2(ClientBounds.Width - position.X, ClientBounds.Height - position.Y);
+                    break;
+            }
+
+
+            if (state != TouchLocationState.Pressed && _previousTouches.TryGetValue(e.Handle, out tprevious)) {
+                tlocation = new TouchLocation(e.Handle.ToInt32(), state, translatedPosition, e.Pressure, tprevious.State, tprevious.Position, tprevious.Pressure);
             }
             else {
-                tlocation = new TouchLocation(e.Handle.ToInt32(), state, position, e.Pressure);
+                tlocation = new TouchLocation(e.Handle.ToInt32(), state, translatedPosition, e.Pressure);
             }
-           
+
             TouchPanel.Collection.Clear();
             TouchPanel.Collection.Add(tlocation);
 
@@ -253,17 +267,17 @@ namespace Microsoft.Xna.Framework
 
             return base.OnTouchEvent(e);
         }
-	
-						
-		public string ScreenDeviceName 
+        
+        public string ScreenDeviceName 
 		{
 			get 
 			{
 				throw new System.NotImplementedException ();
 			}
 		}
+   
 
-		public Rectangle ClientBounds 
+        public Rectangle ClientBounds 
 		{
 			get 
 			{
@@ -282,8 +296,7 @@ namespace Microsoft.Xna.Framework
 				// Do nothing; Ignore rather than raising and exception
 			}
 		}
-
-        private DisplayOrientation _currentOrientation;
+        
 		public DisplayOrientation CurrentOrientation 
 		{
             get
@@ -295,6 +308,12 @@ namespace Microsoft.Xna.Framework
                 if (value != _currentOrientation)
                 {
                     _currentOrientation = value;
+
+                    if (_currentOrientation == DisplayOrientation.Portrait || _currentOrientation == DisplayOrientation.PortraitUpsideDown)
+                        Game.contextInstance.SetRequestedOrientation(ScreenOrientation.Portrait);
+                    else if (_currentOrientation == DisplayOrientation.LandscapeLeft || _currentOrientation == DisplayOrientation.LandscapeRight)
+                        Game.contextInstance.SetRequestedOrientation(ScreenOrientation.Landscape);
+
                     if (OrientationChanged != null)
                     {
                         OrientationChanged(this, EventArgs.Empty);
