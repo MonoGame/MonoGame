@@ -164,7 +164,13 @@ namespace Microsoft.Xna.Framework
 		
 		internal void DoUpdate(GameTime aGameTime)
 		{
-            if (_isActive && _devicesLoaded)
+            if (!_devicesLoaded)
+            {
+                Initialize();
+                _devicesLoaded = true;
+            }
+
+            if (_isActive)
 			{
 				Update(aGameTime);
 			}
@@ -172,13 +178,6 @@ namespace Microsoft.Xna.Framework
 		
 		internal void DoDraw(GameTime aGameTime)
         { 
-            //Need to execute this on the rendering thread
-            if (!_devicesLoaded)
-            {
-                Initialize();
-                _devicesLoaded = true;
-            }
-
 			if (_isActive)
 			{
 				Draw(aGameTime);
