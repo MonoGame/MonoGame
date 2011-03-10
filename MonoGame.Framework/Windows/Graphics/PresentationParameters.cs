@@ -135,14 +135,7 @@ namespace Microsoft.Xna.Framework.Graphics
             set { fullScreenRefreshRateInHz = value; }
         }
 
-        public bool IsFullScreen
-        {
-			get { return true; }
-            set
-            {
-                //TODO: How to access Activity.requestWindowFeature() ?	
-            }
-        }
+        public bool IsFullScreen { get; set; }
 
         public int MultiSampleQuality
         {
