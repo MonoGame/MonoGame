@@ -67,7 +67,7 @@ namespace Microsoft.Xna.Framework
         private GameComponentCollection _gameComponentCollection;
         public GameServiceContainer _services;
         private ContentManager _content;
-        private GameWindow _view;
+        internal AndroidGameWindow view;
 		private bool _isFixedTimeStep = true;
         private TimeSpan _targetElapsedTime = TimeSpan.FromSeconds(1 / FramesPerSecond); 
         
@@ -82,9 +82,9 @@ namespace Microsoft.Xna.Framework
 		delegate void InitialiseGameComponentsDelegate();
 
         //TODO: Can we really use a static contextInstance?!
-        internal static Context contextInstance;
+        internal static Activity contextInstance;
 
-		public Game(Context context)
+		public Game(Activity context)
 		{
 		    contextInstance = context;
 
@@ -92,9 +92,8 @@ namespace Microsoft.Xna.Framework
 			_services = new GameServiceContainer();
 			_gameComponentCollection = new GameComponentCollection();
 
-            _view = new GameWindow(contextInstance);
-			_view.game = this;
-					
+            view = new AndroidGameWindow(context);
+		    view.game = this;
 			// Initialize GameTime
             _updateGameTime = new GameTime();
             _drawGameTime = new GameTime();
@@ -159,30 +158,27 @@ namespace Microsoft.Xna.Framework
 			
 			// Get the Accelerometer going
 			Accelerometer.SetupAccelerometer();
-
-            //Need to execute this on the rendering thread
-            _view.RenderFrame += delegate
-            {
-                if (!_devicesLoaded)
-                {
-                    Initialize();
-                    _devicesLoaded = true;
-                }
-            };
-
-            _view.Run(FramesPerSecond / (FramesPerSecond * TargetElapsedTime.TotalSeconds));	
+        
+            view.Run(FramesPerSecond / (FramesPerSecond * TargetElapsedTime.TotalSeconds));	
         }
 		
 		internal void DoUpdate(GameTime aGameTime)
 		{
-			if (_isActive)
+            if (_isActive && _devicesLoaded)
 			{
 				Update(aGameTime);
 			}
 		}
 		
 		internal void DoDraw(GameTime aGameTime)
-		{
+        { 
+            //Need to execute this on the rendering thread
+            if (!_devicesLoaded)
+            {
+                Initialize();
+                _devicesLoaded = true;
+            }
+
 			if (_isActive)
 			{
 				Draw(aGameTime);
@@ -215,11 +211,11 @@ namespace Microsoft.Xna.Framework
 			}
         }
 
-        public GameWindow Window
+        public AndroidGameWindow Window
         {
             get
             {
-                return _view;
+                return view;
             }
         }
 		
