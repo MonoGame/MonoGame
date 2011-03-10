@@ -89,8 +89,16 @@ namespace Microsoft.Xna.Framework.Input
 
             public void OnSensorChanged(SensorEvent e)
             {
-                if(e != null && e.Values != null)
-                    _state.Acceleration = new Vector3(e.Values[0], e.Values[1], e.Values[2]);	
+                try {
+                    if (e != null && e.Values != null)
+                        _state.Acceleration = new Vector3(e.Values[0], e.Values[1], e.Values[2]);
+                }
+                catch (NullReferenceException ex) {
+                    //Occassionally an NullReferenceException is thrown when accessing e.Values??
+                    // mono    : Unhandled Exception: System.NullReferenceException: Object reference not set to an instance of an object
+                    // mono    :   at Android.Runtime.JNIEnv.GetObjectField (IntPtr jobject, IntPtr jfieldID) [0x00000] in <filename unknown>:0 
+                    // mono    :   at Android.Hardware.SensorEvent.get_Values () [0x00000] in <filename unknown>:0
+                }
             }
         }
 	}

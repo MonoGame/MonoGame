@@ -67,6 +67,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private MultiSampleType multiSampleType;
         private SwapEffect swapEffect;
         private bool disposed;
+        private bool _isFullScreen;
 
         #endregion Private Fields
 
@@ -139,11 +140,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public bool IsFullScreen
         {
-			get { return true; }
-            set
-            {
-                //TODO: How to access Activity.requestWindowFeature() ?	
-            }
+            get { return _isFullScreen; }
+            set { _isFullScreen = value; }
         }
 
         public int MultiSampleQuality

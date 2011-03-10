@@ -52,6 +52,7 @@
     <Compile Include="Android\Content\ContentReaders\SoundEffectReader.cs" />
     <Compile Include="Android\Content\ContentReaders\SpriteFontReader.cs" />
     <Compile Include="Android\Content\ContentReaders\Texture2DReader.cs" />
+    <Compile Include="Android\GraphicsDeviceManager.cs" />
     <Compile Include="Android\Graphics\DisplayMode.cs" />
     <Compile Include="Android\Graphics\ESImage.cs" />
     <Compile Include="Android\Graphics\ESTexture2D.cs" />
@@ -65,6 +66,7 @@
     <Compile Include="Android\Media\Video.cs" />
     <Compile Include="Android\Media\VideoPlayer.cs" />
     <Compile Include="Android\PowerStatus.cs" />
+    <Compile Include="Android\XnaGameWindowImpl.cs" />
     <Compile Include="Audio\AudioEmitter.cs" />
     <Compile Include="Audio\AudioListener.cs" />
     <Compile Include="Audio\SoundEffectInstance.cs" />
@@ -88,9 +90,9 @@
     <Compile Include="GameComponentCollectionEventArgs.cs" />
     <Compile Include="GameServiceContainer.cs" />
     <Compile Include="GameTime.cs" />
-    <Compile Include="Android\GameWindow.cs" />
+    <Compile Include="Android\AndroidGameWindow.cs" />
+    <Compile Include="GameWindow.cs" />
     <Compile Include="GraphicsDeviceInformation.cs" />
-    <Compile Include="GraphicsDeviceManager.cs" />
     <Compile Include="Graphics\Texture.cs" />
     <Compile Include="IDrawable.cs" />
     <Compile Include="IGameComponent.cs" />
