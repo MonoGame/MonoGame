@@ -46,18 +46,6 @@ namespace Microsoft.Xna.Framework.Audio
 		{
 		}
 			
-		public float Volume
-		{
-			get 
-			{ 
-				return audioPlayer.Volume;
-			}
-			set
-			{
-				audioPlayer.Volume = value;
-			}
-		}
-			
 		public bool Looping
 		{
 			get 
@@ -78,6 +66,31 @@ namespace Microsoft.Xna.Framework.Audio
 			}
 		}
 		
+		public float Pan
+		{
+			get 
+			{ 
+				return audioPlayer.Pan;
+			}
+			set
+			{
+				audioPlayer.Pan = value;
+			}
+		}
+		
+		public bool Playing
+		{
+			get 
+			{ 
+				return audioPlayer.Playing;
+			}
+		}
+		
+		public void Pause()
+		{		
+			audioPlayer.Pause();
+		}
+		
 		public void Play()
 		{		
 			audioPlayer.Play();
@@ -86,6 +99,18 @@ namespace Microsoft.Xna.Framework.Audio
 		public void Stop()
 		{			
 			audioPlayer.Stop();
+		}
+		
+		public float Volume
+		{
+			get 
+			{ 
+				return audioPlayer.Volume;
+			}
+			set
+			{
+				audioPlayer.Volume = value;
+			}
 		}
 		
 		public static Sound Create(string url, float volume, bool looping)
