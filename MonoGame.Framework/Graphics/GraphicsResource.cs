@@ -40,16 +40,25 @@
 // 
 using System;
 namespace Microsoft.Xna.Framework.Graphics
-{
+{	
 	public abstract class GraphicsResource : IDisposable
 	{
 		public GraphicsResource ()
 		{
 		}
 		
+		protected virtual void DoDisposing(EventArgs e) 
+		{
+			if (Disposing != null)
+				Disposing(this, e);
+		}
+		
 		public void Dispose()
         {
+			DoDisposing(EventArgs.Empty);
         }
+		
+		public event EventHandler<EventArgs> Disposing;
 	}
 }
 
