@@ -54,7 +54,7 @@ namespace Microsoft.Xna.Framework.Audio
 			
 		}
 		
-		public void Dispose ()
+		public void Dispose()
 		{
 			isDisposed = true;
 		}
@@ -70,7 +70,8 @@ namespace Microsoft.Xna.Framework.Audio
 		}		
 		
 		public void Pause ()
-		{
+		{		
+			_sound.Pause();
 			soundState = SoundState.Paused;
 		}
 		
@@ -140,7 +141,30 @@ namespace Microsoft.Xna.Framework.Audio
 			}
 		}
 		
-		public float Pan { get; set; }
+		public float Pan 
+		{ 
+			get
+			{
+				if (_sound != null)
+				{
+					return _sound.Pan;
+				}
+				else
+				{
+					return 0.0f;
+				}
+			}
+			
+			set
+			{
+				if ( _sound != null )
+				{
+					if ( _sound.Pan != value )
+					{
+						_sound.Pan = value;
+					}
+				}
+			} }
 		
 		public float Pitch { get; set; }
 		
