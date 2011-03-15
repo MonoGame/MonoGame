@@ -117,8 +117,8 @@ namespace Microsoft.Xna.Framework.Audio
 		{
 			Sound sound = new Sound();
 			
-			var mediaFile = NSUrl.FromFilename(url);
-			audioPlayer =  new MonoTouch.AVFoundation.AVAudioPlayer(mediaFile, null); 
+			var mediaFile = NSUrl.FromFilename(url);			
+			audioPlayer =  AVAudioPlayer.FromUrl(mediaFile); 
 			audioPlayer.Volume = volume;
 			if ( looping )
 			{
