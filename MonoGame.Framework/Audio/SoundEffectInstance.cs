@@ -118,7 +118,14 @@ namespace Microsoft.Xna.Framework.Audio
 		{ 
 			get
 			{
-				return _sound.Looping;
+				if ( _sound != null )
+				{
+					return _sound.Looping;
+				}
+				else
+				{
+					return false;
+				}
 			}
 			
 			set
@@ -163,7 +170,14 @@ namespace Microsoft.Xna.Framework.Audio
 		{ 
 			get
 			{
-				return _sound.Volume;
+				if (_sound != null)
+				{
+					return _sound.Volume;
+				}
+				else
+				{
+					return 0.0f;
+				}
 			}
 			
 			set
