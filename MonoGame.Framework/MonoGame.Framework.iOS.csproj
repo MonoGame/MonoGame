@@ -9,7 +9,7 @@
     <ProjectTypeGuids>{E613F3A2-FE9C-494F-B74E-F63BCB86FEA6};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <MainNibFile>MainWindow.xib</MainNibFile>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v1.0</TargetFrameworkVersion>
     <Description>XNA implementation for MonoTouch</Description>
     <RootNamespace>Microsoft.Xna.Framework</RootNamespace>
     <SynchReleaseVersion>false</SynchReleaseVersion>
@@ -35,6 +35,10 @@
     <MtouchLink>None</MtouchLink>
     <MtouchDebug>True</MtouchDebug>
     <AssemblyName>MonoGame.Framework.iOS</AssemblyName>
+    <MtouchUseLlvm>false</MtouchUseLlvm>
+    <MtouchUseArmv7>false</MtouchUseArmv7>
+    <MtouchUseThumb>false</MtouchUseThumb>
+    <MtouchUseSGen>false</MtouchUseSGen>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
     <DebugType>none</DebugType>
@@ -46,6 +50,10 @@
     <MtouchDebug>False</MtouchDebug>
     <DefineConstants>IPHONE</DefineConstants>
     <AssemblyName>MonoGame.Framework.iOS</AssemblyName>
+    <MtouchUseLlvm>false</MtouchUseLlvm>
+    <MtouchUseArmv7>false</MtouchUseArmv7>
+    <MtouchUseThumb>false</MtouchUseThumb>
+    <MtouchUseSGen>false</MtouchUseSGen>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhone' ">
     <DebugSymbols>true</DebugSymbols>
@@ -59,6 +67,10 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <MtouchDebug>True</MtouchDebug>
     <AssemblyName>MonoGame.Framework</AssemblyName>
+    <MtouchUseLlvm>false</MtouchUseLlvm>
+    <MtouchUseArmv7>false</MtouchUseArmv7>
+    <MtouchUseThumb>false</MtouchUseThumb>
+    <MtouchUseSGen>false</MtouchUseSGen>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
     <DebugType>none</DebugType>
@@ -70,6 +82,10 @@
     <MtouchDebug>False</MtouchDebug>
     <DefineConstants>IPHONE</DefineConstants>
     <AssemblyName>MonoGame.Framework</AssemblyName>
+    <MtouchUseLlvm>false</MtouchUseLlvm>
+    <MtouchUseArmv7>false</MtouchUseArmv7>
+    <MtouchUseThumb>false</MtouchUseThumb>
+    <MtouchUseSGen>false</MtouchUseSGen>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -281,13 +297,16 @@
     <Compile Include="Graphics\Texture.cs" />
     <Compile Include="Content\ContentSerializerIgnoreAttribute.cs" />
     <Compile Include="Content\ContentSerializerAttribute.cs" />
+    <Compile Include="Audio\InstancePlayLimitException.cs" />
+    <Compile Include="Graphics\CullMode.cs" />
+    <Compile Include="Graphics\FillMode.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
     <MonoDevelop>
-      <Properties InternalTargetFrameworkVersion="IPhone">
+      <Properties>
         <Policies>
-          <StandardHeader Text="#region License&#xD;&#xA;/*&#xD;&#xA;Microsoft Public License (Ms-PL)&#xD;&#xA;MonoGame - Copyright © 2009 The MonoGame Team&#xD;&#xA;&#xD;&#xA;All rights reserved.&#xD;&#xA;&#xD;&#xA;This license governs use of the accompanying software. If you use the software, you accept this license. If you do not&#xD;&#xA;accept the license, do not use the software.&#xD;&#xA;&#xD;&#xA;1. Definitions&#xD;&#xA;The terms &quot;reproduce,&quot; &quot;reproduction,&quot; &quot;derivative works,&quot; and &quot;distribution&quot; have the same meaning here as under &#xD;&#xA;U.S. copyright law.&#xD;&#xA;&#xD;&#xA;A &quot;contribution&quot; is the original software, or any additions or changes to the software.&#xD;&#xA;A &quot;contributor&quot; is any person that distributes its contribution under this license.&#xD;&#xA;&quot;Licensed patents&quot; are a contributor's patent claims that read directly on its contribution.&#xD;&#xA;&#xD;&#xA;2. Grant of Rights&#xD;&#xA;(A) Copyright Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, &#xD;&#xA;each contributor grants you a non-exclusive, worldwide, royalty-free copyright license to reproduce its contribution, prepare derivative works of its contribution, and distribute its contribution or any derivative works that you create.&#xD;&#xA;(B) Patent Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, &#xD;&#xA;each contributor grants you a non-exclusive, worldwide, royalty-free license under its licensed patents to make, have made, use, sell, offer for sale, import, and/or otherwise dispose of its contribution in the software or derivative works of the contribution in the software.&#xD;&#xA;&#xD;&#xA;3. Conditions and Limitations&#xD;&#xA;(A) No Trademark License- This license does not grant you rights to use any contributors' name, logo, or trademarks.&#xD;&#xA;(B) If you bring a patent claim against any contributor over patents that you claim are infringed by the software, &#xD;&#xA;your patent license from such contributor to the software ends automatically.&#xD;&#xA;(C) If you distribute any portion of the software, you must retain all copyright, patent, trademark, and attribution &#xD;&#xA;notices that are present in the software.&#xD;&#xA;(D) If you distribute any portion of the software in source code form, you may do so only under this license by including &#xD;&#xA;a complete copy of this license with your distribution. If you distribute any portion of the software in compiled or object &#xD;&#xA;code form, you may only do so under a license that complies with this license.&#xD;&#xA;(E) The software is licensed &quot;as-is.&quot; You bear the risk of using it. The contributors give no express warranties, guarantees&#xD;&#xA;or conditions. You may have additional consumer rights under your local laws which this license cannot change. To the extent&#xD;&#xA;permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular&#xD;&#xA;purpose and non-infringement.&#xD;&#xA;*/&#xD;&#xA;#endregion License&#xD;&#xA;" inheritsSet="Apache2License" />
+          <StandardHeader Text="#region License&#xD;&#xA;/*&#xD;&#xA;Microsoft Public License (Ms-PL)&#xD;&#xA;MonoGame - Copyright © 2009 The MonoGame Team&#xD;&#xA;&#xD;&#xA;All rights reserved.&#xD;&#xA;&#xD;&#xA;This license governs use of the accompanying software. If you use the software, you accept this license. If you do not&#xD;&#xA;accept the license, do not use the software.&#xD;&#xA;&#xD;&#xA;1. Definitions&#xD;&#xA;The terms &quot;reproduce,&quot; &quot;reproduction,&quot; &quot;derivative works,&quot; and &quot;distribution&quot; have the same meaning here as under &#xD;&#xA;U.S. copyright law.&#xD;&#xA;&#xD;&#xA;A &quot;contribution&quot; is the original software, or any additions or changes to the software.&#xD;&#xA;A &quot;contributor&quot; is any person that distributes its contribution under this license.&#xD;&#xA;&quot;Licensed patents&quot; are a contributor's patent claims that read directly on its contribution.&#xD;&#xA;&#xD;&#xA;2. Grant of Rights&#xD;&#xA;(A) Copyright Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, &#xD;&#xA;each contributor grants you a non-exclusive, worldwide, royalty-free copyright license to reproduce its contribution, prepare derivative works of its contribution, and distribute its contribution or any derivative works that you create.&#xD;&#xA;(B) Patent Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, &#xD;&#xA;each contributor grants you a non-exclusive, worldwide, royalty-free license under its licensed patents to make, have made, use, sell, offer for sale, import, and/or otherwise dispose of its contribution in the software or derivative works of the contribution in the software.&#xD;&#xA;&#xD;&#xA;3. Conditions and Limitations&#xD;&#xA;(A) No Trademark License- This license does not grant you rights to use any contributors' name, logo, or trademarks.&#xD;&#xA;(B) If you bring a patent claim against any contributor over patents that you claim are infringed by the software, &#xD;&#xA;your patent license from such contributor to the software ends automatically.&#xD;&#xA;(C) If you distribute any portion of the software, you must retain all copyright, patent, trademark, and attribution &#xD;&#xA;notices that are present in the software.&#xD;&#xA;(D) If you distribute any portion of the software in source code form, you may do so only under this license by including &#xD;&#xA;a complete copy of this license with your distribution. If you distribute any portion of the software in compiled or object &#xD;&#xA;code form, you may only do so under a license that complies with this license.&#xD;&#xA;(E) The software is licensed &quot;as-is.&quot; You bear the risk of using it. The contributors give no express warranties, guarantees&#xD;&#xA;or conditions. You may have additional consumer rights under your local laws which this license cannot change. To the extent&#xD;&#xA;permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular&#xD;&#xA;purpose and non-infringement.&#xD;&#xA;*/&#xD;&#xA;#endregion License&#xD;&#xA;" IncludeInNewFiles="True" />
         </Policies>
       </Properties>
     </MonoDevelop>
