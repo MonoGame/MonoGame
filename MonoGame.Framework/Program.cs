@@ -47,9 +47,9 @@ using Microsoft.Xna;
 
 namespace Microsoft.Xna.Framework
 {
-	public class XNATouchProgram : UIApplicationDelegate 
+	public class MonoGameProgram : UIApplicationDelegate 
 	{
-		public Game XNATouchGame
+		public Game MonoGameGame
         {
             get;
 			set;
@@ -57,12 +57,12 @@ namespace Microsoft.Xna.Framework
 		
 		public override void DidEnterBackground (UIApplication application)
 		{
-			XNATouchGame.EnterBackground();
+			MonoGameGame.EnterBackground();
 		}
 		
 		public override void WillEnterForeground (UIApplication application)
 		{
-			XNATouchGame.EnterForeground();
+			MonoGameGame.EnterForeground();
 		}
 	}
 }
