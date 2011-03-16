@@ -45,6 +45,14 @@ namespace Microsoft.Xna.Framework.Audio
 		private Sound()
 		{
 		}
+		
+		public double Duration
+		{
+			get 
+			{ 
+				return audioPlayer.Duration;
+			}
+		}
 			
 		public bool Looping
 		{

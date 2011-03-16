@@ -49,12 +49,12 @@ namespace Microsoft.Xna.Framework.Media
     {
 		private Sound _sound;
 		private string _name;
-		private float _volume = 1.0f;
-		private bool _loop = true;
+		private int _playCount;
 		
 		internal Song(string fileName)
 		{			
 			_name = fileName;
+			_sound = Sound.Create (_name, 1.0f, true);
 		}
 		
 		public void Dispose()
@@ -64,6 +64,11 @@ namespace Microsoft.Xna.Framework.Media
 		public bool Equals(Song song) 
 		{
 			return ((object)song != null) && (Name == song.Name);
+		}
+		
+		public override int GetHashCode ()
+		{
+			return base.GetHashCode ();
 		}
 		
 		public override bool Equals(Object obj)
@@ -92,46 +97,85 @@ namespace Microsoft.Xna.Framework.Media
 		}
 		
 		internal void Play()
-        {
-			_sound = Sound.Create (_name, _volume, _loop);
-			_sound.Play();
+		{			
+			if ( _sound != null )
+			{
+				_sound.Play();
+				_playCount++;
+			}
         }
 		
 		internal void Stop()
 		{
-			_sound.Stop();
-			_sound = null;
+			if ( _sound != null )
+			{
+				_sound.Stop();
+			}
 		}
 		
 		internal bool Loop
 		{
 			get
 			{
-				return _loop;
+				if ( _sound != null )
+				{
+					return _sound.Looping;
+				}
+				else
+				{
+				 	return false;	
+				}
 			}
 			set 
 			{
-				_loop = value;
+				if ( _sound != null )
+				{
+					if ( _sound.Looping != value )
+					{
+						_sound.Looping = value;
+					}
+				}
 			}
 		}
 		
 		internal float Volume
 		{
-			get 
+			get
 			{
-				return _volume;
+				if (_sound != null)
+				{
+					return _sound.Volume;
+				}
+				else
+				{
+					return 0.0f;
+				}
 			}
+			
 			set
 			{
-				_volume = value;
-			}
+				if ( _sound != null )
+				{
+					if ( _sound.Volume != value )
+					{
+						_sound.Volume = value;
+					}
+				}
+			}			
 		}
 		
         public TimeSpan Duration
         {
             get
             {
-				throw new NotImplementedException();
+				if ( _sound != null )
+				{
+					return new TimeSpan((long)_sound.Duration);
+				}
+				else
+				{
+					return new TimeSpan(0);
+				}
             }
         }
 
@@ -163,7 +207,7 @@ namespace Microsoft.Xna.Framework.Media
         {
             get
             {
-				throw new NotImplementedException();
+				return _playCount;
             }
         }
 
