@@ -49,9 +49,8 @@ namespace Microsoft.Xna.Framework.Audio
 {
     public sealed class SoundEffect : IDisposable
     {
-		private Sound _sound;
+		private static Sound _sound;
 		private string _name = "";
-		private float _volume = 1.0f;
 		
 		internal SoundEffect(string fileName)
 		{
@@ -61,19 +60,32 @@ namespace Microsoft.Xna.Framework.Audio
 			{
 			  throw new FileNotFoundException("Supported Sound Effect formats are wav, mp3, acc, aiff");
 			}
+			
+			_sound = Sound.Create(_name, 1.0f, false);
 		}
 		
         public bool Play()
         {
-			_sound = Sound.Create(_name, _volume, false);
-			_sound.Play();
+			if ( _sound != null )
+			{
+				_sound.Play();
+				return _sound.Playing;
+			}
+			else
+			{
+				return false;
+			}
 			
-			return true;
+			
         }
 
         public bool Play(float volume, float pitch, float pan)
         {
-			_volume = volume;
+			if ( _sound != null )
+			{
+				_sound.Volume = volume;
+				_sound.Pan = pan;
+			}
 			return Play();
         }
 		
@@ -81,7 +93,14 @@ namespace Microsoft.Xna.Framework.Audio
 		{ 
 			get
 			{
-				return new TimeSpan(0);// _sound.Duration;
+				if ( _sound != null )
+				{
+					return new TimeSpan((long)_sound.Duration);
+				}
+				else
+				{
+					return new TimeSpan(0);
+				}
 			}
 		}
 
@@ -111,8 +130,24 @@ namespace Microsoft.Xna.Framework.Audio
 		
 		public static float MasterVolume 
 		{ 
-			get; 
-			set;
+			get
+			{
+				if ( _sound != null )
+				{
+					return _sound.Volume;
+				}
+				else
+				{
+					return 0.0f;
+				}
+			}
+			set
+			{
+				if ( _sound != null )
+				{
+					_sound.Volume = value;	
+				}
+			}
 		}
     }
 }
