@@ -41,6 +41,7 @@ purpose and non-infringement.
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+
 using OpenTK.Graphics.ES11;
 
 using Microsoft.Xna.Framework;
@@ -316,7 +317,35 @@ namespace Microsoft.Xna.Framework.Graphics
 			set
 			{
 				_scissorRectangle = value;
-				GL.Scissor(_scissorRectangle.X, _scissorRectangle.Y, _scissorRectangle.Width, _scissorRectangle.Height );
+				
+				/*switch (this.PresentationParameters.DisplayOrientation )
+				{
+					case DisplayOrientation.Portrait :
+					{																		
+						break;
+					}
+					
+					case DisplayOrientation.LandscapeRight :
+					{				
+						var xy = new Vector2( _viewport.Height - _scissorRectangle.Y, _scissorRectangle.X );						
+						_scissorRectangle = new Rectangle( (int)xy.X, (int)xy.Y, _scissorRectangle.Width, _scissorRectangle.Height );						
+						break;
+					}
+					
+					case DisplayOrientation.LandscapeLeft :
+					{							
+						var xy = new Vector2( _scissorRectangle.Y, _viewport.Width - _scissorRectangle.X );							
+						_scissorRectangle = new Rectangle( (int)xy.X, (int)xy.Y, _scissorRectangle.Width, _scissorRectangle.Height );
+						break;
+					}
+					
+					case DisplayOrientation.PortraitUpsideDown :
+					{				
+						var xy = new Vector2( _viewport.Width - _scissorRectangle.X, _viewport.Height - _scissorRectangle.Y );							
+						_scissorRectangle = new Rectangle( (int)xy.X, (int)xy.Y, _scissorRectangle.Width, _scissorRectangle.Height );
+						break;
+					}
+				}*/				
 			}
 		}
 		
@@ -418,23 +447,20 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int vertexCount, int[] indexData, int indexOffset, int primitiveCount) where T : IVertexType
         {
-            // NOT TESTED
-
-            if (indexOffset > 0 || vertexOffset > 0)
-                throw new NotImplementedException("vertexOffset and indexOffset is not yet supported.");
-
-            // Unload the VBOs
-            GL.BindBuffer(All.VertexArray, 0);
+            // Unbind the VBOs
+            GL.BindBuffer(All.ArrayBuffer, 0);
             GL.BindBuffer(All.ElementArrayBuffer, 0);
 
             var vd = VertexDeclaration.FromType(typeof(T));
 
             IntPtr arrayStart = GCHandle.Alloc(vertexData, GCHandleType.Pinned).AddrOfPinnedObject();
+
             if (vertexOffset > 0)
-                arrayStart = new IntPtr(arrayStart.ToInt32() + vertexOffset);
+                arrayStart = new IntPtr(arrayStart.ToInt32() + (vertexOffset * vd.VertexStride));
+
             VertexDeclaration.PrepareForUse(vd, arrayStart);
 
-            GL.DrawElements(PrimitiveTypeGL11(primitiveType), vertexCount, All.UnsignedShort, indexData);
+            GL.DrawArrays(PrimitiveTypeGL11(primitiveType), vertexOffset, getElementCountArray(primitiveType, primitiveCount));
         }
 
         public int getElementCountArray(PrimitiveType primitiveType, int primitiveCount)
