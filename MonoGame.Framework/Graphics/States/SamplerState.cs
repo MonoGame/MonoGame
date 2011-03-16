@@ -1,7 +1,7 @@
 // #region License
 // /*
 // Microsoft Public License (Ms-PL)
-// MonoGame - Copyright © 2009 The MonoGame Team
+// XnaTouch - Copyright © 2009 The XnaTouch Team
 // 
 // All rights reserved.
 // 
@@ -38,82 +38,15 @@
 // */
 // #endregion License
 // 
-
 using System;
-
 namespace Microsoft.Xna.Framework.Graphics
 {
-	public class BasicEffect : Effect
+	public class SamplerState : GraphicsResource
 	{
-
-		public BasicEffect(GraphicsDevice device, EffectPool effectPool)
-            : base(device, new byte[]{0}, CompilerOptions.None, effectPool)
-
-        {
-            
-        }
-		
-		protected BasicEffect(GraphicsDevice device, BasicEffect clone)
-            : base(device, clone)
-        {
-            
-        }
-
-		public override Effect Clone(GraphicsDevice device)
-        {
-            BasicEffect effect = new BasicEffect(device, this);
-            return effect;
-        }
-
-        public void EnableDefaultLighting()
-        {
-           /* this.LightingEnabled = true;
-            this.AmbientLightColor = new Vector3(0.05333332f, 0.09882354f, 0.1819608f);
-            Vector3 color = new Vector3(1f, 0.9607844f, 0.8078432f);
-            this.DirectionalLight0.DiffuseColor = color;
-            this.DirectionalLight0.Direction = new Vector3(-0.5265408f, -0.5735765f, -0.6275069f);
-            this.DirectionalLight0.SpecularColor = color;
-            this.DirectionalLight0.Enabled = true;
-            this.DirectionalLight1.DiffuseColor = new Vector3(0.9647059f, 0.7607844f, 0.4078432f);
-            this.DirectionalLight1.Direction = new Vector3(0.7198464f, 0.3420201f, 0.6040227f);
-            this.DirectionalLight1.SpecularColor = Vector3.Zero;
-            this.DirectionalLight1.Enabled = true;
-            color = new Vector3(0.3231373f, 0.3607844f, 0.3937255f);
-            this.DirectionalLight2.DiffuseColor = color;
-            this.DirectionalLight2.Direction = new Vector3(0.4545195f, -0.7660444f, 0.4545195f);
-            this.DirectionalLight2.SpecularColor = color;
-            this.DirectionalLight2.Enabled = true;*/
-        }
+		public SamplerState ()
+		{
 			
-		public bool LightingEnabled 
-		{ 
-			get; set; 
 		}
-		
-		public Matrix Projection
-		{ 
-			get; set; 
-		}
-		
-		public bool TextureEnabled 
-		{ 
-			get; set; 
-		}
-		
-		public bool VertexColorEnabled 
-		{ 
-			get; set; 
-		}
-		
-		public Matrix View
-		{ 
-			get; set; 
-		}
-
-		public Matrix World
-		{ 
-			get; set; 
-		}
-
 	}
 }
+

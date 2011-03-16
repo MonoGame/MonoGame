@@ -50,6 +50,8 @@ namespace Microsoft.Xna.Framework.Graphics
 {
 	public class Effect : IDisposable
 	{
+        public EffectParameterCollection Parameters { get; set; }
+        public EffectTechniqueCollection Techniques { get; set; }
 		private GraphicsDevice graphicsDevice;
 		private int fragment_handle;
         private int vertex_handle;
@@ -131,15 +133,25 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
 		}
-		
-		protected Effect(GraphicsDevice graphicsDevice, Effect cloneSource )
-		{
-			if (graphicsDevice == null)
+
+        protected Effect(GraphicsDevice graphicsDevice, Effect cloneSource)
+        {
+            Parameters = new EffectParameterCollection();
+            Techniques = new EffectTechniqueCollection();
+
+            if (graphicsDevice == null)
             {
                 throw new ArgumentNullException("Graphics Device Cannot Be Null");
             }
-			this.graphicsDevice = graphicsDevice;
-		}
+            this.graphicsDevice = graphicsDevice;
+        }
+
+        internal virtual void Apply()
+        {
+            GLStateManager.Cull(GraphicsDevice.RasterizerState.CullMode.OpenGL11());
+            // TODO: This is prolly not right (DepthBuffer, etc)
+            GLStateManager.DepthTest(GraphicsDevice.DepthStencilState.DepthBufferEnable);
+        }
 		
 		public void Begin()
 		{
@@ -183,11 +195,16 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			return null;
 		}
-		
-		public EffectTechnique CurrentTechnique 
-		{ 
-			get; set; 
-		}
+
+        public EffectTechnique CurrentTechnique { get; set; }
+
+        internal Effect(GraphicsDevice device)
+        {
+            graphicsDevice = device;
+            Parameters = new EffectParameterCollection();
+            Techniques = new EffectTechniqueCollection();
+            CurrentTechnique = new EffectTechnique(this);
+        }
 
 	}
 }
