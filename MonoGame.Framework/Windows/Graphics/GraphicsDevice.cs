@@ -62,6 +62,7 @@ namespace Microsoft.Xna.Framework.Graphics
         internal List<IntPtr> _pointerCache = new List<IntPtr>();
         private VertexBuffer _vertexBuffer = null;
         private IndexBuffer _indexBuffer = null;
+        public TextureCollection Textures { get; set; }
 
         public static RasterizerState RasterizerState { get; set; }
         public static DepthStencilState DepthStencilState { get; set; }
@@ -355,25 +356,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			throw new NotImplementedException();
 		}
 
-#if IPHONE
-        public All PrimitiveTypeGL11(PrimitiveType primitiveType)
-        {
-            switch (primitiveType)
-            {
-                case PrimitiveType.LineList:
-                    return All.Lines;
-                case PrimitiveType.LineStrip:
-                    return All.LineStrip;
-                case PrimitiveType.TriangleList:
-                    return All.Triangles;
-                case PrimitiveType.TriangleStrip:
-                    return All.TriangleStrip;
-            }
-
-            throw new NotImplementedException();
-        }
-#endif
-#if WINDOWS
         public BeginMode PrimitiveTypeGL11(PrimitiveType primitiveType)
         {
             switch (primitiveType)
@@ -390,28 +372,17 @@ namespace Microsoft.Xna.Framework.Graphics
 
             throw new NotImplementedException();
         }
-#endif
 
         public void SetVertexBuffer(VertexBuffer vertexBuffer)
         {
             _vertexBuffer = vertexBuffer;
-#if IPHONE
-            GL.BindBuffer(All.ArrayBuffer, vertexBuffer._bufferStore);
-#endif
-#if WINDOWS
             GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBuffer._bufferStore);
-#endif 
         }
 
         private void SetIndexBuffer(IndexBuffer indexBuffer)
         {
             _indexBuffer = indexBuffer;
-#if IPHONE
-            GL.BindBuffer(All.ElementArrayBuffer, indexBuffer._bufferStore);
-#endif
-#if WINDOWS
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, indexBuffer._bufferStore);
-#endif 
         }
 
         public IndexBuffer Indices { set { SetIndexBuffer(value); } }
@@ -425,25 +396,15 @@ namespace Microsoft.Xna.Framework.Graphics
             // Hmm, can the pointer here be changed with baseVertex?
             VertexDeclaration.PrepareForUse(vd, IntPtr.Zero);
 
-#if IPHONE
-            GL.DrawElements(PrimitiveTypeGL11(primitiveType), _indexBuffer._count, All.UnsignedShort, new IntPtr(startIndex));
-#endif
-#if WINDOWS
             GL.DrawElements(PrimitiveTypeGL11(primitiveType), _indexBuffer._count, DrawElementsType.UnsignedShort, startIndex);
-#endif
         }
 
         public void DrawUserPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int primitiveCount) where T : struct, IVertexType
         {
             // Unbind the VBOs
-#if IPHONE
-            GL.BindBuffer(All.ArrayBuffer, 0);
-            GL.BindBuffer(All.ElementArrayBuffer, 0);
-#endif
-#if WINDOWS
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
-#endif
+
             var vd = VertexDeclaration.FromType(typeof(T));
 
             IntPtr arrayStart = GCHandle.Alloc(vertexData, GCHandleType.Pinned).AddrOfPinnedObject();
@@ -472,14 +433,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new NotImplementedException("vertexOffset and indexOffset is not yet supported.");
 
             // Unload the VBOs
-#if IPHONE
-            GL.BindBuffer(All.VertexArray, 0);
-            GL.BindBuffer(All.ElementArrayBuffer, 0);
-#endif
-#if WINDOWS
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
-#endif
+
             var vd = VertexDeclaration.FromType(typeof(T));
 
             IntPtr arrayStart = GCHandle.Alloc(vertexData, GCHandleType.Pinned).AddrOfPinnedObject();
@@ -487,12 +443,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 arrayStart = new IntPtr(arrayStart.ToInt32() + vertexOffset);
             VertexDeclaration.PrepareForUse(vd, arrayStart);
 
-#if IPHONE            
-            GL.DrawElements(PrimitiveTypeGL11(primitiveType), vertexCount, All.UnsignedShort, indexData);
-#endif
-#if WINDOWS
             GL.DrawElements(PrimitiveTypeGL11(primitiveType), vertexCount, DrawElementsType.UnsignedShort, indexData);
-#endif
         }
 
         public int getElementCountArray(PrimitiveType primitiveType, int primitiveCount)
