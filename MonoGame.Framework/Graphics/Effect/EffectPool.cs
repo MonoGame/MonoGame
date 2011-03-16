@@ -1,7 +1,7 @@
 // #region License
 // /*
 // Microsoft Public License (Ms-PL)
-// MonoGame - Copyright © 2009 The MonoGame Team
+// XnaTouch - Copyright © 2009 The XnaTouch Team
 // 
 // All rights reserved.
 // 
@@ -41,15 +41,17 @@
 
 using System;
 
-namespace Microsoft.Xna.Framework
+namespace Microsoft.Xna.Framework.Graphics
 {
-	public enum PrimitiveType
+	public class EffectPool : IDisposable
 	{
-		LineList, // 	Renders the vertices as a list of isolated straight line segments; the count may be any positive integer.
-		LineStrip, //	Renders the vertices as a single polyline; the count may be any positive integer.
-		PointList, //	Renders the vertices as a collection of isolated points. This value is unsupported for indexed primitives.
-		TriangleFan, //	Renders the vertices as a triangle fan.
-		TriangleList, // 	Renders the specified vertices as a sequence of isolated triangles. Each group of three vertices defines a separate triangle. Back-face culling is affected by the current winding-order render state.
-		TriangleStrip, //	Renders the vertices as a triangle strip. The back-face culling flag is flipped automatically on even-numbered triangles.
+
+		public EffectPool()
+		{
+		}
+		
+		public void Dispose()
+		{
+		}
 	}
 }
