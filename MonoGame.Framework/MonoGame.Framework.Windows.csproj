@@ -74,6 +74,7 @@
     <Compile Include="Graphics\States\SamplerState.cs" />
     <Compile Include="Graphics\States\SaveStateMode.cs" />
     <Compile Include="Graphics\States\StencilOperation.cs" />
+    <Compile Include="Graphics\TextureCollection.cs" />
     <Compile Include="Graphics\Vertices\BufferUsage.cs" />
     <Compile Include="Graphics\Vertices\IndexBuffer.cs" />
     <Compile Include="Graphics\Vertices\IVertexType.cs" />

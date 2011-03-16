@@ -55,6 +55,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		private bool _isDisposed = false;
 		private readonly DisplayMode _displayMode = new DisplayMode();
 		private RenderState _renderState;
+		public TextureCollection Textures { get; set; }
         internal List<IntPtr> _pointerCache = new List<IntPtr>();
         private VertexBuffer _vertexBuffer = null;
         private IndexBuffer _indexBuffer = null;
