@@ -55,6 +55,13 @@ namespace Microsoft.Xna.Framework.Graphics
 		private bool _isDisposed = false;
 		private readonly DisplayMode _displayMode = new DisplayMode();
 		private RenderState _renderState;
+        internal List<IntPtr> _pointerCache = new List<IntPtr>();
+        private VertexBuffer _vertexBuffer = null;
+        private IndexBuffer _indexBuffer = null;
+
+        public static RasterizerState RasterizerState { get; set; }
+        public static DepthStencilState DepthStencilState { get; set; }
+		
 		
 		internal All PreferedFilter 
 		{
@@ -338,13 +345,111 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 		}
 		
-		public void DrawUserPrimitives<T> (
-			 PrimitiveType primitiveType,
-			 T[] vertexData,
-			 int vertexOffset,
-			 int primitiveCount) 
-		{
-		}
+        public All PrimitiveTypeGL11(PrimitiveType primitiveType)
+        {
+            switch (primitiveType)
+            {
+                case PrimitiveType.LineList:
+                    return All.Lines;
+                case PrimitiveType.LineStrip:
+                    return All.LineStrip;
+                case PrimitiveType.TriangleList:
+                    return All.Triangles;
+                case PrimitiveType.TriangleStrip:
+                    return All.TriangleStrip;
+            }
+
+            throw new NotImplementedException();
+        }
+
+        public void SetVertexBuffer(VertexBuffer vertexBuffer)
+        {
+            _vertexBuffer = vertexBuffer;
+            GL.BindBuffer(All.ArrayBuffer, vertexBuffer._bufferStore);
+        }
+
+        private void SetIndexBuffer(IndexBuffer indexBuffer)
+        {
+            _indexBuffer = indexBuffer;
+            GL.BindBuffer(All.ElementArrayBuffer, indexBuffer._bufferStore);
+        }
+
+        public IndexBuffer Indices { set { SetIndexBuffer(value); } }
+
+        public void DrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int minVertexIndex, int numbVertices, int startIndex, int primitiveCount)
+        {
+            if (minVertexIndex > 0 || baseVertex > 0)
+                throw new NotImplementedException("baseVertex > 0 and minVertexIndex > 0 are not supported");
+
+            var vd = VertexDeclaration.FromType(_vertexBuffer._type);
+            // Hmm, can the pointer here be changed with baseVertex?
+            VertexDeclaration.PrepareForUse(vd, IntPtr.Zero);
+
+            GL.DrawElements(PrimitiveTypeGL11(primitiveType), _indexBuffer._count, All.UnsignedShort, new IntPtr(startIndex));
+        }
+
+        public void DrawUserPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int primitiveCount) where T : struct, IVertexType
+        {
+            // Unbind the VBOs
+            GL.BindBuffer(All.ArrayBuffer, 0);
+            GL.BindBuffer(All.ElementArrayBuffer, 0);
+			
+            var vd = VertexDeclaration.FromType(typeof(T));
+
+            IntPtr arrayStart = GCHandle.Alloc(vertexData, GCHandleType.Pinned).AddrOfPinnedObject();
+
+            if (vertexOffset > 0)
+                arrayStart = new IntPtr(arrayStart.ToInt32() + (vertexOffset * vd.VertexStride));
+
+            VertexDeclaration.PrepareForUse(vd, arrayStart);
+
+            GL.DrawArrays(PrimitiveTypeGL11(primitiveType), vertexOffset, getElementCountArray(primitiveType, primitiveCount));
+        }
+
+        public void DrawPrimitives(PrimitiveType primitiveType, int vertexStart, int primitiveCount)
+        {
+            var vd = VertexDeclaration.FromType(_vertexBuffer._type);
+            VertexDeclaration.PrepareForUse(vd, IntPtr.Zero);
+
+            GL.DrawArrays(PrimitiveTypeGL11(primitiveType), vertexStart, getElementCountArray(primitiveType, primitiveCount));
+        }
+
+        public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int vertexCount, int[] indexData, int indexOffset, int primitiveCount) where T : IVertexType
+        {
+            // NOT TESTED
+
+            if (indexOffset > 0 || vertexOffset > 0)
+                throw new NotImplementedException("vertexOffset and indexOffset is not yet supported.");
+
+            // Unload the VBOs
+            GL.BindBuffer(All.VertexArray, 0);
+            GL.BindBuffer(All.ElementArrayBuffer, 0);
+
+            IntPtr arrayStart = GCHandle.Alloc(vertexData, GCHandleType.Pinned).AddrOfPinnedObject();
+            if (vertexOffset > 0)
+                arrayStart = new IntPtr(arrayStart.ToInt32() + vertexOffset);
+            VertexDeclaration.PrepareForUse(vd, arrayStart);
+
+            GL.DrawElements(PrimitiveTypeGL11(primitiveType), vertexCount, All.UnsignedShort, indexData);
+        }
+
+        public int getElementCountArray(PrimitiveType primitiveType, int primitiveCount)
+        {
+            //TODO: Overview the calculation
+            switch (primitiveType)
+            {
+                case PrimitiveType.LineList:
+                    return primitiveCount * 2;
+                case PrimitiveType.LineStrip:
+                    return 3 + (primitiveCount - 1); // ???
+                case PrimitiveType.TriangleList:
+                    return primitiveCount * 2;
+                case PrimitiveType.TriangleStrip:
+                    return 3 + (primitiveCount - 1); // ???
+            }
+
+            throw new NotSupportedException();
+        }
 
 	}
 }
