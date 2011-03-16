@@ -48,12 +48,23 @@ using OpenTK.Graphics.ES20;
 namespace Microsoft.Xna.Framework.Graphics
 {
 	public class Effect : IDisposable
-	{
+    {
+        public EffectParameterCollection Parameters { get; set; }
+        public EffectTechniqueCollection Techniques { get; set; }
+
 		private GraphicsDevice graphicsDevice;
 		private int fragment_handle;
         private int vertex_handle;
         private bool fragment;
         private bool vertex;
+
+        internal Effect(GraphicsDevice device)
+        {
+            graphicsDevice = device;
+            Parameters = new EffectParameterCollection();
+            Techniques = new EffectTechniqueCollection();
+            CurrentTechnique = new EffectTechnique(this);
+        }
 
 		public Effect (
          GraphicsDevice graphicsDevice,
@@ -128,7 +139,12 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
 		}
-		
+
+        internal virtual void Apply()
+        {
+     
+        }
+
 		protected Effect(GraphicsDevice graphicsDevice, Effect cloneSource )
 		{
 			if (graphicsDevice == null)

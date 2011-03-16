@@ -39,7 +39,8 @@ purpose and non-infringement.
 #endregion License
 
 using System;
-
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using OpenTK.Graphics.ES11;
 
 using Microsoft.Xna.Framework;
@@ -425,6 +426,8 @@ namespace Microsoft.Xna.Framework.Graphics
             // Unload the VBOs
             GL.BindBuffer(All.VertexArray, 0);
             GL.BindBuffer(All.ElementArrayBuffer, 0);
+
+            var vd = VertexDeclaration.FromType(typeof(T));
 
             IntPtr arrayStart = GCHandle.Alloc(vertexData, GCHandleType.Pinned).AddrOfPinnedObject();
             if (vertexOffset > 0)

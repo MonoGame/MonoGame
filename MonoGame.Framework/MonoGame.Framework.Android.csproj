@@ -26,6 +26,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -45,6 +46,45 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Graphics\GraphicsExtensions.cs" />	
+    <Compile Include="Graphics\Effect\BasicEffect.cs" />
+    <Compile Include="Graphics\Effect\Effect.cs" />
+    <Compile Include="Graphics\Effect\EffectParameter.cs" />
+    <Compile Include="Graphics\Effect\EffectParameterCollection.cs" />
+    <Compile Include="Graphics\Effect\EffectPass.cs" />
+    <Compile Include="Graphics\Effect\EffectPassCollection.cs" />
+    <Compile Include="Graphics\Effect\EffectPool.cs" />
+    <Compile Include="Graphics\Effect\EffectTechnique.cs" />
+    <Compile Include="Graphics\Effect\EffectTechniqueCollection.cs" />
+    <Compile Include="Graphics\States\BlendState.cs" />
+    <Compile Include="Graphics\States\BlendFunction.cs" />
+    <Compile Include="Graphics\States\Blend.cs" />
+    <Compile Include="Graphics\States\CompareFunction.cs" />
+    <Compile Include="Graphics\States\CullMode.cs" />
+    <Compile Include="Graphics\States\DepthFormat.cs" />
+    <Compile Include="Graphics\States\DepthStencilState.cs" />
+    <Compile Include="Graphics\States\FillMode.cs" />
+    <Compile Include="Graphics\States\GLStateManager.cs" />
+    <Compile Include="Graphics\States\RasterizerState.cs" />
+    <Compile Include="Graphics\States\SamplerState.cs" />
+    <Compile Include="Graphics\States\SaveStateMode.cs" />
+    <Compile Include="Graphics\States\StencilOperation.cs" />
+    <Compile Include="Graphics\TextureCollection.cs" />
+    <Compile Include="Graphics\Vertices\BufferUsage.cs" />
+    <Compile Include="Graphics\Vertices\IndexBuffer.cs" />
+    <Compile Include="Graphics\Vertices\IVertexType.cs" />
+    <Compile Include="Graphics\Vertices\PrimitiveType.cs" />
+    <Compile Include="Graphics\Vertices\VertexBuffer.cs" />
+    <Compile Include="Graphics\Vertices\VertexColorTexture.cs" />
+    <Compile Include="Graphics\Vertices\VertexDeclaration.cs" />
+    <Compile Include="Graphics\Vertices\VertexElement.cs" />
+    <Compile Include="Graphics\Vertices\VertexElementDeclaration.cs" />
+    <Compile Include="Graphics\Vertices\VertexElementFormat.cs" />
+    <Compile Include="Graphics\Vertices\VertexElementUsage.cs" />
+    <Compile Include="Graphics\Vertices\VertexPosition2ColorTexture.cs" />
+    <Compile Include="Graphics\Vertices\VertexPositionColor.cs" />
+    <Compile Include="Graphics\Vertices\VertexPositionNormalTexture.cs" />
+    <Compile Include="Graphics\Vertices\VertexPositionTexture.cs" />
     <Compile Include="Android\Audio\Sound.cs" />
     <Compile Include="Android\Audio\SoundEffect.cs" />
     <Compile Include="Android\Content\ContentManager.cs" />
@@ -145,20 +185,12 @@
     <Compile Include="Content\ContentReaders\RectangleReader.cs" />
     <Compile Include="Content\ContentReaders\StringReader.cs" />
     <Compile Include="Content\ContentReaders\Vector3Reader.cs" />
-    <Compile Include="Graphics\BasicEffect.cs" />
     <Compile Include="Graphics\BatchItem.cs" />
-    <Compile Include="Graphics\Blend.cs" />
-    <Compile Include="Graphics\BlendFunction.cs" />
-    <Compile Include="Graphics\BlendState.cs" />
     <Compile Include="Graphics\ClearOptions.cs" />
     <Compile Include="Graphics\Color.cs" />
     <Compile Include="Graphics\CompilerOptions.cs" />
-    <Compile Include="Graphics\DepthFormat.cs" />
-    <Compile Include="Graphics\DepthStencilState.cs" />
     <Compile Include="Graphics\DeviceType.cs" />
     <Compile Include="Graphics\Effect.cs" />
-    <Compile Include="Graphics\EffectPool.cs" />
-    <Compile Include="Graphics\EffectTechnique.cs" />
     <Compile Include="Graphics\GraphicsAdapter.cs" />
     <Compile Include="Graphics\GraphicsDevice.cs" />
     <Compile Include="Graphics\GraphicsDevice2D.cs" />
@@ -169,16 +201,12 @@
     <Compile Include="Graphics\GraphicsResource.cs" />
     <Compile Include="Graphics\IGraphicsDeviceService.cs" />
     <Compile Include="Graphics\MultiSampleType.cs" />
-    <Compile Include="Graphics\PrimitiveType.cs" />
-    <Compile Include="Graphics\RasterizerState.cs" />
     <Compile Include="Graphics\RenderState.cs" />
     <Compile Include="Graphics\RenderTarget.cs" />
     <Compile Include="Graphics\RenderTarget2D.cs" />
     <Compile Include="Graphics\RenderTargetUsage.cs" />
     <Compile Include="Graphics\ResolveTexture2D.cs" />
     <Compile Include="Graphics\ResourceType.cs" />
-    <Compile Include="Graphics\SamplerState.cs" />
-    <Compile Include="Graphics\SaveStateMode.cs" />
     <Compile Include="Graphics\SetDataOptions.cs" />
     <Compile Include="Graphics\SpriteBatch.cs" />
     <Compile Include="Graphics\SpriteBatcher.cs" />
@@ -190,11 +218,6 @@
     <Compile Include="Graphics\SurfaceFormat.cs" />
     <Compile Include="Graphics\SwapEffect.cs" />
     <Compile Include="Graphics\TextureUsage.cs" />
-    <Compile Include="Graphics\VertexColorTexture.cs" />
-    <Compile Include="Graphics\VertexDeclaration.cs" />
-    <Compile Include="Graphics\VertexElement.cs" />
-    <Compile Include="Graphics\VertexPosition2ColorTexture.cs" />
-    <Compile Include="Graphics\VertexPositionColor.cs" />
     <Compile Include="Graphics\Viewport.cs" />
     <Compile Include="Input\Touch\GestureSample.cs" />
     <Compile Include="Input\Touch\GestureType.cs" />
