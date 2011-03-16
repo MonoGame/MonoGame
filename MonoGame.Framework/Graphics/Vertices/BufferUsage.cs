@@ -5,8 +5,9 @@ using System.Text;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-    public interface IVertexType
+    public enum BufferUsage
     {
-        VertexDeclaration VertexDeclaration { get; }
+        None,
+        WriteOnly
     }
 }
