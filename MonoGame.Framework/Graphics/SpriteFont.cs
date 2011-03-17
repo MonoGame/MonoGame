@@ -66,8 +66,9 @@ namespace Microsoft.Xna.Framework.Graphics
         public Vector2 MeasureString(string text)
         {
            	Vector2 v = Vector2.Zero;
-            float xoffset=0;
-            float yoffset=0;
+            float xoffset = 0;
+            float yoffset = 0;
+			float newHeight = 0;
 
             foreach (char c in text)
             {
@@ -80,7 +81,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 if (characterData.ContainsKey(c) == false) continue;
                 GlyphData g = characterData[c];				
                 xoffset += g.Kerning.Y + g.Kerning.Z + Spacing;
-                float newHeight = g.Glyph.Height + g.Cropping.Top + yoffset;
+				newHeight = g.Cropping.Height + yoffset;
 				if ( newHeight > v.Y)
                 {
                     v.Y = newHeight;
