@@ -38,7 +38,7 @@ using MonoTouch.AVFoundation;
 
 namespace Microsoft.Xna.Framework.Audio
 {	
-	public unsafe class Sound
+	public class Sound
 	{	
 		private static AVAudioPlayer audioPlayer;
 		
@@ -51,6 +51,14 @@ namespace Microsoft.Xna.Framework.Audio
 			get 
 			{ 
 				return audioPlayer.Duration;
+			}
+		}
+		
+		public double CurrentPosition
+		{
+			get 
+			{ 
+				return audioPlayer.CurrentTime;
 			}
 		}
 			
