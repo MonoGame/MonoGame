@@ -98,6 +98,11 @@ namespace Microsoft.Xna.Framework.Media
 			_sound.Play();
         }
 		
+		internal void Pause()
+		{
+			_sound.Pause();
+		}
+		
 		internal void Stop()
 		{
 			_sound.Stop();
@@ -135,6 +140,17 @@ namespace Microsoft.Xna.Framework.Media
                     return new TimeSpan(0);
 
                 return new TimeSpan(0, 0, _sound._player.Duration);
+            }
+        }
+		
+		public TimeSpan Position
+        {
+            get
+            {
+                if (_sound == null)
+                    return new TimeSpan(0);
+
+                return new TimeSpan(0, 0, _sound._player.CurrentPosition);
             }
         }
 
