@@ -105,7 +105,17 @@ namespace Microsoft.Xna.Framework.Audio
 
             Sound.Enqueue(_player.Start);
         }
+		
+		public void Pause()
+        {
+            if (this._player == null)
+                return;
 
+            lock (Sound.WorkItems) {
+                _player.Pause();
+            }
+        }
+		
         public void Stop()
         {
             if (this._player == null)
@@ -114,6 +124,12 @@ namespace Microsoft.Xna.Framework.Audio
             lock (Sound.WorkItems) {
                 _player.Stop();
             }
+        }
+		
+		public float Pan
+        {
+            get;
+			set;
         }
 
         internal bool IsPrepared { get; private set; }
