@@ -95,7 +95,7 @@ namespace Microsoft.Xna.Framework.Audio
 			{
 				if ( _sound != null )
 				{
-					return new TimeSpan((long)_sound.Duration);
+					return new TimeSpan(0,0,(int)_sound.Duration);
 				}
 				else
 				{

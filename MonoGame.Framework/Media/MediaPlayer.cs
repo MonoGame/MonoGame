@@ -54,9 +54,9 @@ using Microsoft.Xna.Framework.Audio;
         {
 			if (_song != null)
 			{
-				throw new NotImplementedException();
-			}
-			_mediaState = MediaState.Paused;
+				_song.Pause();
+				_mediaState = MediaState.Paused;
+			}			
         }
 
         public static void Play(Song song)
@@ -70,7 +70,11 @@ using Microsoft.Xna.Framework.Audio;
 
         public static void Resume()
         {
-			throw new NotImplementedException();
+			if (_song != null)
+			{
+				_song.Play();
+				_mediaState = MediaState.Playing;
+			}					
         }
 
         public static void Stop()
@@ -78,9 +82,8 @@ using Microsoft.Xna.Framework.Audio;
 			if (_song != null)
 			{
 				_song.Stop();
-				_song = null;
+				_mediaState = MediaState.Stopped;
 			}
-			_mediaState = MediaState.Stopped;
         }
 
         public static bool IsMuted
@@ -88,8 +91,13 @@ using Microsoft.Xna.Framework.Audio;
             get
             {
 				if (_song != null)
+				{
 					return _song.Volume == 0.0f;
-				else return true;
+				}
+				else
+				{
+					return false;
+				}
             }
             set
             {
@@ -101,7 +109,7 @@ using Microsoft.Xna.Framework.Audio;
 					}
 					else 
 					{
-						_song.Volume = 1.0f;
+						_song.Volume = _volume;
 					}
 				}
             }
@@ -111,7 +119,14 @@ using Microsoft.Xna.Framework.Audio;
         {
             get
             {
-				return _looping;
+				if (_song != null)
+				{
+					return _song.Loop;
+				}
+				else
+				{
+					return false;
+				}
             }
             set
             {
@@ -139,7 +154,14 @@ using Microsoft.Xna.Framework.Audio;
         {
             get
             {
-				throw new NotImplementedException();
+				if (_song != null)
+				{
+					return _song.Position;
+				}
+				else
+				{
+					return new TimeSpan(0);
+				}
             }
         }
 
@@ -166,10 +188,10 @@ using Microsoft.Xna.Framework.Audio;
             	return _volume;
 			}
             set
-            {
-            	_volume = value;
+            {         
 				if (_song != null)
 				{
+					_volume = value;
 					_song.Volume = value;
 				}
 			}

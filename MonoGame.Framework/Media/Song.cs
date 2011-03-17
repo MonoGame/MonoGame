@@ -105,6 +105,14 @@ namespace Microsoft.Xna.Framework.Media
 			}
         }
 		
+		internal void Pause()
+		{			
+			if ( _sound != null )
+			{
+				_sound.Pause();
+			}
+        }
+		
 		internal void Stop()
 		{
 			if ( _sound != null )
@@ -170,7 +178,22 @@ namespace Microsoft.Xna.Framework.Media
             {
 				if ( _sound != null )
 				{
-					return new TimeSpan((long)_sound.Duration);
+					return new TimeSpan(0,0,(int)_sound.Duration);
+				}
+				else
+				{
+					return new TimeSpan(0);
+				}
+            }
+        }
+		
+		public TimeSpan Position
+        {
+            get
+            {
+				if ( _sound != null )
+				{
+					return new TimeSpan(0,0,(int)_sound.CurrentPosition);
 				}
 				else
 				{
