@@ -71,7 +71,11 @@ namespace Microsoft.Xna.Framework.Audio
 		
 		public void Pause ()
 		{
-            throw new NotImplementedException();
+            if ( _sound != null )
+			{
+				_sound.Pause();
+				soundState = SoundState.Paused;
+			}
 		}
 		
 		public void Play ()
@@ -99,11 +103,7 @@ namespace Microsoft.Xna.Framework.Audio
 		
 		public void Stop (bool immediate)
 		{
-			if ( _sound != null )
-			{
-				_sound.Stop();
-				soundState = SoundState.Stopped;
-			}
+			Stop();
 		}
 		
 		public bool IsDisposed 
@@ -144,13 +144,27 @@ namespace Microsoft.Xna.Framework.Audio
 		{ 
 			get
 			{
-                throw new NotImplementedException();
+                if ( _sound != null )
+				{
+					return _sound.Pan;
+				}
+				else
+				{
+					return 0.0f;
+				}
 			}
 			
 			set
 			{
-                throw new NotImplementedException();
-			} }
+                if ( _sound != null )
+				{
+					if ( _sound.Pan != value )
+					{
+						_sound.Pan = value;
+					}
+				}
+			}
+		}
 		
 		public float Pitch { get; set; }
 		
