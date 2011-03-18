@@ -61,32 +61,26 @@ namespace Microsoft.Xna.Framework.Audio
 			  throw new FileNotFoundException("Supported Sound Effect formats are wav, mp3, acc, aiff");
 			}
 			
-			_sound = Sound.Create(_name, 1.0f, false);
+			_sound = new Sound(_name, 1.0f, false);
 		}
 		
         public bool Play()
-        {
-			if ( _sound != null )
-			{
-				_sound.Play();
-				return _sound.Playing;
-			}
-			else
-			{
-				return false;
-			}
-			
-			
+        {				
+			return Play(MasterVolume, 0.0f, 0.0f);
         }
 
         public bool Play(float volume, float pitch, float pan)
         {
-			if ( _sound != null )
+			if ( MasterVolume > 0.0f )
 			{
-				_sound.Volume = volume;
-				_sound.Pan = pan;
+				SoundEffectInstance instance = CreateInstance();
+				instance.Volume = volume;
+				instance.Pitch = pitch;
+				instance.Pan = pan;
+				instance.Play();
+				return instance.Sound.Playing;
 			}
-			return Play();
+			return false;
         }
 		
 		public TimeSpan Duration 
@@ -114,10 +108,11 @@ namespace Microsoft.Xna.Framework.Audio
 		
 		public SoundEffectInstance CreateInstance ()
 		{
-			return new SoundEffectInstance()
-			{
-				Sound = _sound,
-			};
+			var instance = new SoundEffectInstance();
+			_sound = new Sound( _name, MasterVolume, false);
+			instance.Sound = _sound;
+			return instance;
+			
 		}
 		
 		#region IDisposable Members
@@ -128,25 +123,16 @@ namespace Microsoft.Xna.Framework.Audio
 
         #endregion
 		
+		static float _masterVolume = 1.0f;
 		public static float MasterVolume 
 		{ 
 			get
 			{
-				if ( _sound != null )
-				{
-					return _sound.Volume;
-				}
-				else
-				{
-					return 0.0f;
-				}
+				return _masterVolume;
 			}
 			set
 			{
-				if ( _sound != null )
-				{
-					_sound.Volume = value;	
-				}
+				_masterVolume = value;	
 			}
 		}
     }
