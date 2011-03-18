@@ -56,6 +56,7 @@ namespace Microsoft.Xna.Framework.Audio
 		
 		public void Dispose()
 		{
+			_sound.Dispose();
 			isDisposed = true;
 		}
 		

@@ -66,6 +66,11 @@ namespace Microsoft.Xna.Framework.Audio
         {
             _player = player;
         }
+		
+		public void Dispose()
+		{
+			_player.Dispose();
+		}
 
         public float Volume
         {
