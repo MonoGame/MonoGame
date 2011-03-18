@@ -40,17 +40,37 @@ namespace Microsoft.Xna.Framework.Audio
 {	
 	public class Sound
 	{	
-		private static AVAudioPlayer audioPlayer;
+		private AVAudioPlayer _audioPlayer;
 		
-		private Sound()
+		public Sound()
 		{
+		}
+		
+		public Sound(string url, float volume, bool looping)
+		{
+			var mediaFile = NSUrl.FromFilename(url);			
+			_audioPlayer =  AVAudioPlayer.FromUrl(mediaFile); 
+			_audioPlayer.Volume = volume;
+			if ( looping )
+			{
+				_audioPlayer.NumberOfLoops = -1;
+			}
+			else
+			{
+				_audioPlayer.NumberOfLoops = 0;
+			}
+		}
+		
+		public void Dispose()
+		{
+			_audioPlayer.Dispose();
 		}
 		
 		public double Duration
 		{
 			get 
 			{ 
-				return audioPlayer.Duration;
+				return _audioPlayer.Duration;
 			}
 		}
 		
@@ -58,7 +78,7 @@ namespace Microsoft.Xna.Framework.Audio
 		{
 			get 
 			{ 
-				return audioPlayer.CurrentTime;
+				return _audioPlayer.CurrentTime;
 			}
 		}
 			
@@ -67,17 +87,17 @@ namespace Microsoft.Xna.Framework.Audio
 			get 
 			{ 
 				//return this._Looping; 
-				return (audioPlayer.NumberOfLoops == -1 );
+				return (_audioPlayer.NumberOfLoops == -1 );
 			}
 			set
 			{
 				if ( value )
 				{
-					audioPlayer.NumberOfLoops = -1;
+					_audioPlayer.NumberOfLoops = -1;
 				}
 				else
 				{
-					audioPlayer.NumberOfLoops = 0;
+					_audioPlayer.NumberOfLoops = 0;
 				}
 			}
 		}
@@ -86,11 +106,11 @@ namespace Microsoft.Xna.Framework.Audio
 		{
 			get 
 			{ 
-				return audioPlayer.Pan;
+				return _audioPlayer.Pan;
 			}
 			set
 			{
-				audioPlayer.Pan = value;
+				_audioPlayer.Pan = value;
 			}
 		}
 		
@@ -98,59 +118,40 @@ namespace Microsoft.Xna.Framework.Audio
 		{
 			get 
 			{ 
-				return audioPlayer.Playing;
+				return _audioPlayer.Playing;
 			}
 		}
 		
 		public void Pause()
 		{		
-			audioPlayer.Pause();
+			_audioPlayer.Pause();
 		}
 		
 		public void Play()
 		{		
-			audioPlayer.Play();
+			_audioPlayer.Play();
 		}
 		
 		public void Stop()
 		{			
-			audioPlayer.Stop();
+			_audioPlayer.Stop();
 		}
 		
 		public float Volume
 		{
 			get 
 			{ 
-				return audioPlayer.Volume;
+				return _audioPlayer.Volume;
 			}
 			set
 			{
-				audioPlayer.Volume = value;
+				_audioPlayer.Volume = value;
 			}
-		}
-		
-		public static Sound Create(string url, float volume, bool looping)
-		{
-			Sound sound = new Sound();
-			
-			var mediaFile = NSUrl.FromFilename(url);			
-			audioPlayer =  AVAudioPlayer.FromUrl(mediaFile); 
-			audioPlayer.Volume = volume;
-			if ( looping )
-			{
-				audioPlayer.NumberOfLoops = -1;
-			}
-			else
-			{
-				audioPlayer.NumberOfLoops = 0;
-			}
-			
-			return sound;
 		}
 		
 		public static Sound CreateAndPlay(string url, float volume, bool looping)
 		{
-			Sound sound = Sound.Create(url, volume, looping);
+			Sound sound = new Sound(url, volume, looping);
 			
 			sound.Play();
 			

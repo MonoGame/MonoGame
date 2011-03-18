@@ -54,11 +54,12 @@ namespace Microsoft.Xna.Framework.Media
 		internal Song(string fileName)
 		{			
 			_name = fileName;
-			_sound = Sound.Create (_name, 1.0f, true);
+			_sound = new Sound(_name, 1.0f, true);
 		}
 		
 		public void Dispose()
         {
+			_sound.Dispose();
         }
 		
 		public bool Equals(Song song) 
