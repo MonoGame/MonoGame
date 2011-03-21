@@ -160,6 +160,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		
         public void Present()
         {
+			GL.Flush();
         }
 		
         public void Present(Rectangle? sourceRectangle, Rectangle? destinationRectangle, IntPtr overrideWindowHandle)
@@ -318,34 +319,42 @@ namespace Microsoft.Xna.Framework.Graphics
 			{
 				_scissorRectangle = value;
 				
-				/*switch (this.PresentationParameters.DisplayOrientation )
+				switch (this.PresentationParameters.DisplayOrientation )
 				{
 					case DisplayOrientation.Portrait :
-					{																		
-						break;
-					}
-					
-					case DisplayOrientation.LandscapeRight :
-					{				
-						var xy = new Vector2( _viewport.Height - _scissorRectangle.Y, _scissorRectangle.X );						
-						_scissorRectangle = new Rectangle( (int)xy.X, (int)xy.Y, _scissorRectangle.Width, _scissorRectangle.Height );						
+					{	
+						_scissorRectangle.Y = _viewport.Height - _scissorRectangle.Y - _scissorRectangle.Height;
 						break;
 					}
 					
 					case DisplayOrientation.LandscapeLeft :
-					{							
-						var xy = new Vector2( _scissorRectangle.Y, _viewport.Width - _scissorRectangle.X );							
-						_scissorRectangle = new Rectangle( (int)xy.X, (int)xy.Y, _scissorRectangle.Width, _scissorRectangle.Height );
+					{		
+						_scissorRectangle.Y = _viewport.Height - _scissorRectangle.X - _scissorRectangle.Height;
+						_scissorRectangle.X = _viewport.Width - _scissorRectangle.X - _scissorRectangle.Width;
+						var w = _scissorRectangle.Width;
+						_scissorRectangle.Width = _scissorRectangle.Height;
+						_scissorRectangle.Height = w;
 						break;
 					}
 					
+					case DisplayOrientation.LandscapeRight :
+					{			
+						var x = _scissorRectangle.X;
+						_scissorRectangle.X = _scissorRectangle.Y;
+						_scissorRectangle.Y = x;
+						var w = _scissorRectangle.Width;
+						_scissorRectangle.Width = _scissorRectangle.Height;
+						_scissorRectangle.Height = w;
+						break;
+					}					
+					
 					case DisplayOrientation.PortraitUpsideDown :
-					{				
-						var xy = new Vector2( _viewport.Width - _scissorRectangle.X, _viewport.Height - _scissorRectangle.Y );							
-						_scissorRectangle = new Rectangle( (int)xy.X, (int)xy.Y, _scissorRectangle.Width, _scissorRectangle.Height );
+					{		
+						_scissorRectangle.Y = _scissorRectangle.X;
+						_scissorRectangle.X = _viewport.Width - _scissorRectangle.X - _scissorRectangle.Width;
 						break;
 					}
-				}*/				
+				}
 			}
 		}
 		
