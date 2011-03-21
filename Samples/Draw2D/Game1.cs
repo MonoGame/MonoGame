@@ -21,7 +21,8 @@ namespace Microsoft.Xna.Samples.Draw2D
         SpriteBatch spriteBatch;		
 		Texture2D texture,ball;
 		SpriteFont font;
-		float size,rotation;
+		float size, rotation;
+		float clippingSize = 0.0f;
 		Color alphaColor = Color.White;
 		FPSCounterComponent fps;
 
@@ -32,6 +33,8 @@ namespace Microsoft.Xna.Samples.Draw2D
 			
 			graphics.PreferMultiSampling = true;
 			graphics.IsFullScreen = true;	
+			
+			graphics.SupportedOrientations = DisplayOrientation.Portrait | DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight | DisplayOrientation.PortraitUpsideDown;
 		}
 
         /// <summary>
@@ -82,6 +85,11 @@ namespace Microsoft.Xna.Samples.Draw2D
 			rotation += 0.1f;
 			if (rotation > MathHelper.TwoPi) {
 				rotation = 0.0f;
+			}
+			
+			clippingSize += 0.5f;
+			if (clippingSize > 320) {
+				clippingSize = 0.0f;
 			}
 			
 			alphaColor.A ++;
@@ -137,6 +145,20 @@ namespace Microsoft.Xna.Samples.Draw2D
 			base.Draw(gameTime);
 									
 			spriteBatch.End();
+			
+			
+			// Now let's try some scissoring
+			spriteBatch.Begin();
+			
+			spriteBatch.GraphicsDevice.ScissorRectangle = new Rectangle(10, 40, (int)clippingSize, (int)clippingSize);
+            spriteBatch.GraphicsDevice.RenderState.ScissorTestEnable = true;
+						
+			spriteBatch.Draw(texture,new Rectangle(10, 40, 320, 40),Color.White);
+			spriteBatch.DrawString( font, "Scissor Clipping Test", new Vector2(10, 40), Color.Red );
+			
+			spriteBatch.End();
+			
+            spriteBatch.GraphicsDevice.RenderState.ScissorTestEnable = false;
 			            
         }
     }
