@@ -91,7 +91,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			// set camera
 			GL.MatrixMode(All.Projection);
-			GL.LoadIdentity();		
+			GL.LoadIdentity();							
 			
 			// Switch on the flags.
 	        switch (_graphicsDevice.PresentationParameters.DisplayOrientation)
@@ -110,17 +110,37 @@ namespace Microsoft.Xna.Framework.Graphics
 					break;
 				}
 				
+			case DisplayOrientation.PortraitUpsideDown:
+                {
+					GL.Rotate(180, 0, 0, 1); 
+					GL.Ortho(0, _graphicsDevice.Viewport.Width, _graphicsDevice.Viewport.Height,  0, -1, 1);
+					break;
+				}
+				
 				default:
 				{
 					GL.Ortho(0, _graphicsDevice.Viewport.Width, _graphicsDevice.Viewport.Height, 0, -1, 1);
 					break;
 				}
+			}			
+			
+			// Enable Scissor Tests if necessary
+			if ( _graphicsDevice.RenderState.ScissorTestEnable )
+			{
+				GL.Enable(All.ScissorTest);				
 			}
 			
 			GL.MatrixMode(All.Modelview);
-			GL.LoadMatrix( ref _matrix.M11 );
-			GL.Viewport (0, 0, _graphicsDevice.Viewport.Width, _graphicsDevice.Viewport.Height);
+			GL.LoadMatrix( ref _matrix.M11 );	
 						
+			GL.Viewport(0, 0, _graphicsDevice.Viewport.Width, _graphicsDevice.Viewport.Height);
+			
+			// Enable Scissor Tests if necessary
+			if ( _graphicsDevice.RenderState.ScissorTestEnable )
+			{
+				GL.Scissor(_graphicsDevice.ScissorRectangle.X, _graphicsDevice.ScissorRectangle.Y, _graphicsDevice.ScissorRectangle.Width, _graphicsDevice.ScissorRectangle.Height );
+			}
+			
 			// Initialize OpenGL states (ideally move this to initialize somewhere else)	
 			GL.Disable(All.DepthTest);
 			GL.TexEnv(All.TextureEnv, All.TextureEnvMode,(int) All.BlendSrc);
@@ -132,13 +152,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			// Enable Culling for better performance
 			GL.Enable(All.CullFace);
 			GL.FrontFace(All.Cw);
-			GL.Color4(1.0f, 1.0f, 1.0f, 1.0f);
-			
-			// Enable Scissor Tests if necessary
-			if ( _graphicsDevice.RenderState.ScissorTestEnable )
-			{
-				// TODO GL.Enable(All.ScissorTest);
-			}
+			GL.Color4(1.0f, 1.0f, 1.0f, 1.0f);						
 			
 			_batcher.DrawBatch ( _sortMode );
 		}
