@@ -6,9 +6,6 @@ using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Storage;
-using MonoTouch.CoreAnimation;
-using MonoTouch.UIKit;
-using MonoTouch.Foundation;
 
 namespace Microsoft.Xna.Samples.Draw2D
 {
