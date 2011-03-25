@@ -40,8 +40,6 @@ purpose and non-infringement.
 
 using System;
 
-
-
 using OpenTK.Graphics.ES11;
 
 using Microsoft.Xna.Framework.Graphics;
