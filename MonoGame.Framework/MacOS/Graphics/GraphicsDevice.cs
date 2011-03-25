@@ -39,9 +39,10 @@ purpose and non-infringement.
 #endregion License
 
 using System;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 using MonoMac.OpenGL;
-// using OpenTK.Graphics.ES11;
 
 using Microsoft.Xna.Framework;
 
@@ -56,6 +57,14 @@ namespace Microsoft.Xna.Framework.Graphics
 		private bool _isDisposed = false;
 		private readonly DisplayMode _displayMode = new DisplayMode();
 		private RenderState _renderState;
+		public TextureCollection Textures { get; set; }
+        internal List<IntPtr> _pointerCache = new List<IntPtr>();
+        private VertexBuffer _vertexBuffer = null;
+        private IndexBuffer _indexBuffer = null;
+
+        public static RasterizerState RasterizerState { get; set; }
+        public static DepthStencilState DepthStencilState { get; set; }
+		
 		
 		internal All PreferedFilter 
 		{
@@ -111,7 +120,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
 			Vector4 vector = color.ToEAGLColor();			
 			GL.ClearColor (vector.X,vector.Y,vector.Z,1.0f);
-			GL.Clear(ClearBufferMask.ColorBufferBit);
+			GL.Clear (ClearBufferMask.ColorBufferBit);
         }
 
         public void Clear(ClearOptions options, Color color, float depth, int stencil)
@@ -151,6 +160,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		
         public void Present()
         {
+			GL.Flush();
         }
 		
         public void Present(Rectangle? sourceRectangle, Rectangle? destinationRectangle, IntPtr overrideWindowHandle)
@@ -223,7 +233,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				
 		internal void StartSpriteBatch(SpriteBlendMode blendMode, SpriteSortMode sortMode)
 		{
-			_spriteDevice.StartSpriteBatch(blendMode,sortMode);
+			_spriteDevice.StartSpriteBatch(blendMode,sortMode);		
 		}
 		
 		internal void EndSpriteBatch()
@@ -297,11 +307,55 @@ namespace Microsoft.Xna.Framework.Graphics
 			get; 
 			set; 
 		}
-		
+			
+		Rectangle _scissorRectangle;
 		public Rectangle ScissorRectangle 
 		{ 
-			get; 
-			set; 
+			get
+			{
+				return _scissorRectangle;
+			}
+			set
+			{
+				_scissorRectangle = value;
+				
+				switch (this.PresentationParameters.DisplayOrientation )
+				{
+					case DisplayOrientation.Portrait :
+					{	
+						_scissorRectangle.Y = _viewport.Height - _scissorRectangle.Y - _scissorRectangle.Height;
+						break;
+					}
+					
+					case DisplayOrientation.LandscapeLeft :
+					{		
+						_scissorRectangle.Y = _viewport.Height - _scissorRectangle.X - _scissorRectangle.Height;
+						_scissorRectangle.X = _viewport.Width - _scissorRectangle.X - _scissorRectangle.Width;
+						var w = _scissorRectangle.Width;
+						_scissorRectangle.Width = _scissorRectangle.Height;
+						_scissorRectangle.Height = w;
+						break;
+					}
+					
+					case DisplayOrientation.LandscapeRight :
+					{			
+						var x = _scissorRectangle.X;
+						_scissorRectangle.X = _scissorRectangle.Y;
+						_scissorRectangle.Y = x;
+						var w = _scissorRectangle.Width;
+						_scissorRectangle.Width = _scissorRectangle.Height;
+						_scissorRectangle.Height = w;
+						break;
+					}					
+					
+					case DisplayOrientation.PortraitUpsideDown :
+					{		
+						_scissorRectangle.Y = _scissorRectangle.X;
+						_scissorRectangle.X = _viewport.Width - _scissorRectangle.X - _scissorRectangle.Width;
+						break;
+					}
+				}
+			}
 		}
 		
 		public RenderState RenderState 
@@ -331,14 +385,110 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 		}
 		
-		public void DrawUserPrimitives<T> (
-			 PrimitiveType primitiveType,
-			 T[] vertexData,
-			 int vertexOffset,
-			 int primitiveCount) 
-		{
-		}
+        public BeginMode PrimitiveTypeGL11(PrimitiveType primitiveType)
+        {
+            switch (primitiveType)
+            {
+                case PrimitiveType.LineList:
+                    return BeginMode.Lines;
+                case PrimitiveType.LineStrip:
+                    return BeginMode.LineStrip;
+                case PrimitiveType.TriangleList:
+                    return BeginMode.Triangles;
+                case PrimitiveType.TriangleStrip:
+                    return BeginMode.TriangleStrip;
+            }
+
+            throw new NotImplementedException();
+        }
+
+        public void SetVertexBuffer(VertexBuffer vertexBuffer)
+        {
+            _vertexBuffer = vertexBuffer;
+            GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBuffer._bufferStore);
+        }
+
+        private void SetIndexBuffer(IndexBuffer indexBuffer)
+        {
+            _indexBuffer = indexBuffer;
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, indexBuffer._bufferStore);
+        }
+
+        public IndexBuffer Indices { set { SetIndexBuffer(value); } }
+
+        public void DrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int minVertexIndex, int numbVertices, int startIndex, int primitiveCount)
+        {
+            if (minVertexIndex > 0 || baseVertex > 0)
+                throw new NotImplementedException("baseVertex > 0 and minVertexIndex > 0 are not supported");
+
+            var vd = VertexDeclaration.FromType(_vertexBuffer._type);
+            // Hmm, can the pointer here be changed with baseVertex?
+            VertexDeclaration.PrepareForUse(vd, IntPtr.Zero);
+
+            GL.DrawElements(PrimitiveTypeGL11(primitiveType), _indexBuffer._count, DrawElementsType.UnsignedShort, new IntPtr(startIndex));
+        }
+
+        public void DrawUserPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int primitiveCount) where T : struct, IVertexType
+        {
+            // Unbind the VBOs
+            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
+			
+            var vd = VertexDeclaration.FromType(typeof(T));
+
+            IntPtr arrayStart = GCHandle.Alloc(vertexData, GCHandleType.Pinned).AddrOfPinnedObject();
+
+            if (vertexOffset > 0)
+                arrayStart = new IntPtr(arrayStart.ToInt32() + (vertexOffset * vd.VertexStride));
+
+            VertexDeclaration.PrepareForUse(vd, arrayStart);
+
+            GL.DrawArrays(PrimitiveTypeGL11(primitiveType), vertexOffset, getElementCountArray(primitiveType, primitiveCount));
+        }
+
+        public void DrawPrimitives(PrimitiveType primitiveType, int vertexStart, int primitiveCount)
+        {
+            var vd = VertexDeclaration.FromType(_vertexBuffer._type);
+            VertexDeclaration.PrepareForUse(vd, IntPtr.Zero);
+
+            GL.DrawArrays(PrimitiveTypeGL11(primitiveType), vertexStart, getElementCountArray(primitiveType, primitiveCount));
+        }
+
+        public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int vertexCount, int[] indexData, int indexOffset, int primitiveCount) where T : IVertexType
+        {
+            // Unbind the VBOs
+            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
+
+            var vd = VertexDeclaration.FromType(typeof(T));
+
+            IntPtr arrayStart = GCHandle.Alloc(vertexData, GCHandleType.Pinned).AddrOfPinnedObject();
+
+            if (vertexOffset > 0)
+                arrayStart = new IntPtr(arrayStart.ToInt32() + (vertexOffset * vd.VertexStride));
+
+            VertexDeclaration.PrepareForUse(vd, arrayStart);
+
+            GL.DrawArrays(PrimitiveTypeGL11(primitiveType), vertexOffset, getElementCountArray(primitiveType, primitiveCount));
+        }
+
+        public int getElementCountArray(PrimitiveType primitiveType, int primitiveCount)
+        {
+            //TODO: Overview the calculation
+            switch (primitiveType)
+            {
+                case PrimitiveType.LineList:
+                    return primitiveCount * 2;
+                case PrimitiveType.LineStrip:
+                    return 3 + (primitiveCount - 1); // ???
+                case PrimitiveType.TriangleList:
+                    return primitiveCount * 2;
+                case PrimitiveType.TriangleStrip:
+                    return 3 + (primitiveCount - 1); // ???
+            }
+
+            throw new NotSupportedException();
+        }
 
 	}
 }
-
