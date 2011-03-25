@@ -50,6 +50,9 @@ namespace Microsoft.Xna.Framework.Graphics
 {
 	public class Effect : IDisposable
 	{
+		public EffectParameterCollection Parameters { get; set; }
+        public EffectTechniqueCollection Techniques { get; set; }
+		
 		private GraphicsDevice graphicsDevice;
 		private int fragment_handle;
         private int vertex_handle;
@@ -141,6 +144,15 @@ namespace Microsoft.Xna.Framework.Graphics
 			this.graphicsDevice = graphicsDevice;
 		}
 		
+		protected Effect(GraphicsDevice graphicsDevice)
+		{
+			if (graphicsDevice == null)
+            {
+                throw new ArgumentNullException("Graphics Device Cannot Be Null");
+            }
+			this.graphicsDevice = graphicsDevice;
+		}
+		
 		public void Begin()
 		{
 		}
@@ -187,6 +199,11 @@ namespace Microsoft.Xna.Framework.Graphics
 		public EffectTechnique CurrentTechnique 
 		{ 
 			get; set; 
+		}
+		
+		internal virtual void Apply()
+        {
+			
 		}
 
 	}
