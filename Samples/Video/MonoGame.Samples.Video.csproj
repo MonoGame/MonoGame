@@ -2,13 +2,12 @@
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">iPhoneSimulator</Platform>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{21E42CAF-11B3-4A25-A771-189A61732F94}</ProjectGuid>
     <ProjectTypeGuids>{E613F3A2-FE9C-494F-B74E-F63BCB86FEA6};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Exe</OutputType>
-    <AssemblyName>Video</AssemblyName>
     <TargetFrameworkVersion>v1.0</TargetFrameworkVersion>
     <BundleDisplayName>Video Sample</BundleDisplayName>
     <BundleIcon>monogameicon.png</BundleIcon>
@@ -31,6 +30,7 @@
     <MtouchUseArmv7>false</MtouchUseArmv7>
     <MtouchUseThumb>false</MtouchUseThumb>
     <MtouchUseSGen>false</MtouchUseSGen>
+    <AssemblyName>Video</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
     <DebugType>none</DebugType>
@@ -45,6 +45,7 @@
     <MtouchUseArmv7>false</MtouchUseArmv7>
     <MtouchUseThumb>false</MtouchUseThumb>
     <MtouchUseSGen>false</MtouchUseSGen>
+    <AssemblyName>Video</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhone' ">
     <DebugSymbols>true</DebugSymbols>
@@ -62,6 +63,7 @@
     <MtouchUseArmv7>false</MtouchUseArmv7>
     <MtouchUseThumb>false</MtouchUseThumb>
     <MtouchUseSGen>false</MtouchUseSGen>
+    <AssemblyName>Video</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
     <DebugType>none</DebugType>
@@ -78,6 +80,33 @@
     <MtouchUseArmv7>false</MtouchUseArmv7>
     <MtouchUseThumb>false</MtouchUseThumb>
     <MtouchUseSGen>false</MtouchUseSGen>
+    <AssemblyName>Video</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <WarningLevel>4</WarningLevel>
+    <MtouchMinimumOS>3.0</MtouchMinimumOS>
+    <MtouchDebug>False</MtouchDebug>
+    <MtouchUseSGen>false</MtouchUseSGen>
+    <MtouchUseLlvm>false</MtouchUseLlvm>
+    <AssemblyName>MonoGameSamplesVideo</AssemblyName>
+    <MtouchUseThumb>false</MtouchUseThumb>
+    <MtouchUseArmv7>false</MtouchUseArmv7>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <WarningLevel>4</WarningLevel>
+    <MtouchMinimumOS>3.0</MtouchMinimumOS>
+    <MtouchDebug>False</MtouchDebug>
+    <MtouchUseSGen>false</MtouchUseSGen>
+    <MtouchUseLlvm>false</MtouchUseLlvm>
+    <AssemblyName>MonoGameSamplesVideo</AssemblyName>
+    <MtouchUseThumb>false</MtouchUseThumb>
+    <MtouchUseArmv7>false</MtouchUseArmv7>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />

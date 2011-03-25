@@ -4,7 +4,7 @@
     <ProjectGuid>{A3BDF086-7EAA-486F-A90F-78938B7F0A69}</ProjectGuid>
     <ProjectTypeGuids>{E613F3A2-FE9C-494F-B74E-F63BCB86FEA6};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">iPhoneSimulator</Platform>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <OutputType>Exe</OutputType>
@@ -80,6 +80,30 @@
     <MtouchUseArmv7>false</MtouchUseArmv7>
     <MtouchUseThumb>false</MtouchUseThumb>
     <MtouchUseSGen>false</MtouchUseSGen>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <WarningLevel>4</WarningLevel>
+    <MtouchMinimumOS>3.0</MtouchMinimumOS>
+    <MtouchDebug>False</MtouchDebug>
+    <MtouchUseSGen>false</MtouchUseSGen>
+    <MtouchUseLlvm>false</MtouchUseLlvm>
+    <MtouchUseThumb>false</MtouchUseThumb>
+    <MtouchUseArmv7>false</MtouchUseArmv7>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <WarningLevel>4</WarningLevel>
+    <MtouchMinimumOS>3.0</MtouchMinimumOS>
+    <MtouchDebug>False</MtouchDebug>
+    <MtouchUseSGen>false</MtouchUseSGen>
+    <MtouchUseLlvm>false</MtouchUseLlvm>
+    <MtouchUseThumb>false</MtouchUseThumb>
+    <MtouchUseArmv7>false</MtouchUseArmv7>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />

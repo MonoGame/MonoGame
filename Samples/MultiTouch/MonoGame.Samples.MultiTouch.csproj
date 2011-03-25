@@ -4,7 +4,7 @@
     <ProjectGuid>{DF8DF5E3-2FF4-46DD-9EE0-AE3C9923C6BA}</ProjectGuid>
     <ProjectTypeGuids>{E613F3A2-FE9C-494F-B74E-F63BCB86FEA6};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">iPhoneSimulator</Platform>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <OutputType>Exe</OutputType>
@@ -12,7 +12,6 @@
     <BundleIcon>GameThumbnail.png</BundleIcon>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>MultiTouch</RootNamespace>
-    <AssemblyName>MultiTouch</AssemblyName>
     <TargetFrameworkVersion>v1.0</TargetFrameworkVersion>
     <Thumbnail>GameThumbnail.png</Thumbnail>
   </PropertyGroup>
@@ -33,6 +32,7 @@
     <MtouchUseArmv7>false</MtouchUseArmv7>
     <MtouchUseThumb>false</MtouchUseThumb>
     <MtouchUseSGen>false</MtouchUseSGen>
+    <AssemblyName>MultiTouch</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
     <DebugType>none</DebugType>
@@ -47,6 +47,7 @@
     <MtouchUseArmv7>false</MtouchUseArmv7>
     <MtouchUseThumb>false</MtouchUseThumb>
     <MtouchUseSGen>false</MtouchUseSGen>
+    <AssemblyName>MultiTouch</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhone' ">
     <DebugSymbols>true</DebugSymbols>
@@ -64,6 +65,7 @@
     <MtouchUseArmv7>false</MtouchUseArmv7>
     <MtouchUseThumb>false</MtouchUseThumb>
     <MtouchUseSGen>false</MtouchUseSGen>
+    <AssemblyName>MultiTouch</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
     <DebugType>none</DebugType>
@@ -80,6 +82,33 @@
     <MtouchUseArmv7>false</MtouchUseArmv7>
     <MtouchUseThumb>false</MtouchUseThumb>
     <MtouchUseSGen>false</MtouchUseSGen>
+    <AssemblyName>MultiTouch</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <WarningLevel>4</WarningLevel>
+    <MtouchMinimumOS>3.0</MtouchMinimumOS>
+    <MtouchDebug>False</MtouchDebug>
+    <MtouchUseSGen>false</MtouchUseSGen>
+    <MtouchUseLlvm>false</MtouchUseLlvm>
+    <AssemblyName>MonoGameSamplesMultiTouch</AssemblyName>
+    <MtouchUseThumb>false</MtouchUseThumb>
+    <MtouchUseArmv7>false</MtouchUseArmv7>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <WarningLevel>4</WarningLevel>
+    <MtouchMinimumOS>3.0</MtouchMinimumOS>
+    <MtouchDebug>False</MtouchDebug>
+    <MtouchUseSGen>false</MtouchUseSGen>
+    <MtouchUseLlvm>false</MtouchUseLlvm>
+    <AssemblyName>MonoGameSamplesMultiTouch</AssemblyName>
+    <MtouchUseThumb>false</MtouchUseThumb>
+    <MtouchUseArmv7>false</MtouchUseArmv7>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
