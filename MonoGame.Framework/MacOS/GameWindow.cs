@@ -72,14 +72,14 @@ namespace Microsoft.Xna.Framework
 		
 		public GameWindow() : base (NSScreen.MainScreen.Frame)
 		{
-			LayerRetainsBacking = false; 
-			LayerColorFormat	= EAGLColorFormat.RGBA8;
+			//LayerRetainsBacking = false; 
+			//LayerColorFormat	= EAGLColorFormat.RGBA8;
 			
 			RectangleF rect = NSScreen.MainScreen.Frame;
 			clientBounds = new Rectangle(0,0,(int) rect.Width,(int) rect.Height);
 			
 			// Enable multi-touch
-			MultipleTouchEnabled = true;
+			//MultipleTouchEnabled = true;
 						
 			// Initialize GameTime
             _updateGameTime = new GameTime();
@@ -94,10 +94,10 @@ namespace Microsoft.Xna.Framework
 			//
 		}
 		
-		[Export ("layerClass")]
+		/* TODO [Export ("layerClass")]
 		static Class LayerClass() 
 		{
-			return iPhoneOSGameView.GetLayerClass ();
+			return MonoMacGameView.GetLayerClass ();
 		}
 		
 		protected override void ConfigureLayer(CAEAGLLayer eaglLayer) 
@@ -121,7 +121,7 @@ namespace Microsoft.Xna.Framework
 		    }
 			
 			
-		}
+		}*/
 		
 		#endregion
 		
@@ -203,7 +203,7 @@ namespace Microsoft.Xna.Framework
 				
 		#region UIVIew Methods
 						
-		private readonly Dictionary<IntPtr, TouchLocation> previousTouches = new Dictionary<IntPtr, TouchLocation>();
+		/* TODO private readonly Dictionary<IntPtr, TouchLocation> previousTouches = new Dictionary<IntPtr, TouchLocation>();
 		
 		private void FillTouchCollection(NSSet touches)
 		{
@@ -340,7 +340,7 @@ namespace Microsoft.Xna.Framework
 			FillTouchCollection(touches);
 			
 			GamePad.Instance.TouchesCancelled(touches,evt);
-		}
+		} */
 
 		#endregion
 						

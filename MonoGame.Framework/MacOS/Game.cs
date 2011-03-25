@@ -68,13 +68,13 @@ namespace Microsoft.Xna.Framework
         private GameComponentCollection _gameComponentCollection;
         public GameServiceContainer _services;
         private ContentManager _content;
-        // TODO private GameWindow _view;
+        private GameWindow _view;
 		private bool _isFixedTimeStep = true;
         private TimeSpan _targetElapsedTime = TimeSpan.FromSeconds(1 / FramesPerSecond); 
         
 		private IGraphicsDeviceManager graphicsDeviceManager;
 		private IGraphicsDeviceService graphicsDeviceService;
-		private NSWindow _mainWindow;
+		// TODO private NSWindow _mainWindow;
 
 		internal static bool _playingVideo = false;
 		private SpriteBatch spriteBatch;
@@ -89,9 +89,9 @@ namespace Microsoft.Xna.Framework
 			_gameComponentCollection = new GameComponentCollection();
 
 			//Create a full-screen window
-			_mainWindow = new NSWindow(NSScreen.MainScreen.Frame, NSWindowStyle.Titled, NSBackingStore.Buffered, false);			
-			/* TODO _view = new GameWindow();
-			_view.game = this;	*/		
+			// TODO _mainWindow = new NSWindow(NSScreen.MainScreen.Frame, NSWindowStyle.Titled, NSBackingStore.Buffered, false);			
+			_view = new GameWindow();
+			_view.game = this;		
 			// TODO _mainWindow.Add(_view);							
 					
 			// Initialize GameTime
@@ -237,9 +237,9 @@ namespace Microsoft.Xna.Framework
     	{			
 			_lastUpdate = DateTime.Now;
 			
-			/* _view.Run( FramesPerSecond / ( FramesPerSecond * TargetElapsedTime.TotalSeconds ) );	
+			_view.Run( FramesPerSecond / ( FramesPerSecond * TargetElapsedTime.TotalSeconds ) );	
 			
-			_view.MainContext = _view.EAGLContext;
+			/*TODO _view.MainContext = _view.EAGLContext;
 			_view.ShareGroup = _view.MainContext.ShareGroup;
 			_view.BackgroundContext = new MonoTouch.OpenGLES.EAGLContext(_view.ContextRenderingApi, _view.ShareGroup); */
 			
@@ -296,13 +296,13 @@ namespace Microsoft.Xna.Framework
 			}
         }
 
-        /* TODO public GameWindow Window
+        public GameWindow Window
         {
             get
             {
                 return _view;
             }
-        } */
+        }
 		
 		public void ResetElapsedTime()
         {
