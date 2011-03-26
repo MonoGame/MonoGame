@@ -19,7 +19,6 @@ using Microsoft.Xna.Framework.Storage;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Media;
 
-
 namespace AlienGameSample
 {
     /// <summary>

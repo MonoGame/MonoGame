@@ -7,15 +7,10 @@
 
 using System;
 using System.Collections.Generic;
-#if IPHONE
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-#else
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Graphics;
-#endif
 
 namespace AlienGameSample
 {

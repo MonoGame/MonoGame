@@ -9,13 +9,9 @@
 
 #region Using Statements
 using System;
-#if IPHONE
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-#else
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-#endif
 #endregion
 
 namespace Marblets
