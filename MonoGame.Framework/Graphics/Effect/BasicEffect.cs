@@ -7,7 +7,7 @@ using All20 = OpenTK.Graphics.ES20.All;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-	public class BasicEffect : Effect
+	public class BasicEffect : Effect, IEffectMatrices, IEffectLights, IEffectFog
 	{
 		Texture2D _texture = null;
 		
@@ -131,5 +131,88 @@ namespace Microsoft.Xna.Framework.Graphics
 			get { return _texture; }
 			set { _texture = value; setTexture(value); }
 		}
+		
+		public Vector3 DiffuseColor {
+			get; set;
+		}
+		
+		public float Alpha {
+			get; set;
+		}
+
+		#region IEffectMatrices implementation
+		Matrix IEffectMatrices.Projection {
+			get; set;
+		}
+
+		Matrix IEffectMatrices.View {
+			get; set;
+		}
+
+		Matrix IEffectMatrices.World {
+			get; set;
+		}
+		#endregion
+
+		#region IEffectLights implementation
+		void IEffectLights.EnableDefaultLighting ()
+		{
+			throw new NotImplementedException ();
+		}
+
+		Vector3 IEffectLights.AmbientLightColor {
+			get; set;
+		}
+
+		DirectionalLight IEffectLights.DirectionalLight0 {
+			get {
+				throw new NotImplementedException ();
+			}
+		}
+
+		DirectionalLight IEffectLights.DirectionalLight1 {
+			get {
+				throw new NotImplementedException ();
+			}
+		}
+
+		DirectionalLight IEffectLights.DirectionalLight2 {
+			get {
+				throw new NotImplementedException ();
+			}
+		}
+
+		bool IEffectLights.LightingEnabled {
+			get {
+				throw new NotImplementedException ();
+			}
+			set {
+				throw new NotImplementedException ();
+			}
+		}
+		#endregion
+
+		#region IEffectFog implementation
+		Vector3 IEffectFog.FogColor {
+			get; set;
+		}
+
+		bool IEffectFog.FogEnabled {
+			get {
+				throw new NotImplementedException ();
+			}
+			set {
+				throw new NotImplementedException ();
+			}
+		}
+
+		float IEffectFog.FogEnd {
+			get; set;
+		}
+
+		float IEffectFog.FogStart {
+			get; set;
+		}
+		#endregion
     }
 }

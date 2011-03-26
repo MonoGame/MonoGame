@@ -47,12 +47,11 @@ using OpenTK.Graphics.ES20;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-	public class Effect : IDisposable
+	public class Effect : GraphicsResource
     {
         public EffectParameterCollection Parameters { get; set; }
         public EffectTechniqueCollection Techniques { get; set; }
 
-		private GraphicsDevice graphicsDevice;
 		private int fragment_handle;
         private int vertex_handle;
         private bool fragment;
@@ -167,10 +166,6 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			Effect f = new Effect( graphicsDevice, this );
 			return f;
-		}
-		
-		public void Dispose()
-		{
 		}
 		
 		public void End()

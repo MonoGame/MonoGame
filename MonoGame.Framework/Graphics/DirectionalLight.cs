@@ -39,61 +39,68 @@
 // #endregion License
 // 
 using System;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-	public class BlendState : GraphicsResource
+	public sealed class DirectionalLight
 	{
-		public float Alpha { get; set; }
-public BlendFunction AlphaBlendFunction { get; set; }
-		public Blend AlphaDestinationBlend { get; set; }
-		public Blend AlphaSourceBlend { get; set; }
-		public Color BlendFactor { get; set; }
-		public BlendFunction ColorBlendFunction { get; set; }
-		public Blend ColorDestinationBlend { get; set; }
-		public Blend ColorSourceBlend { get; set; }
-		public ColorWriteChannels ColorWriteChannels { get; set; }
-		public ColorWriteChannels ColorWriteChannels1 { get; set; }
-		public ColorWriteChannels ColorWriteChannels2 { get; set; }
-		public ColorWriteChannels ColorWriteChannels3 { get; set; }
-		public int MultiSampleMask { get; set; }
+		EffectParameter diffuseColorParameter;
+		EffectParameter directionParameter;
+		EffectParameter specularColorParameter;
 		
-		static BlendState additiveState;
+		Vector3 diffuseColor;
+		Vector3 direction;
+		Vector3 specularColor;
+		bool enabled;
 		
-		public static readonly BlendState Additive;
-		public static readonly BlendState AlphaBlend;
-		public static readonly BlendState NonPremultiplied;
-		public static readonly BlendState Opaque;
+		public DirectionalLight (EffectParameter directionParameter, EffectParameter diffuseColorParameter, EffectParameter specularColorParameter, DirectionalLight cloneSource)
+		{
+			if (cloneSource != null) {
+				this.diffuseColorParameter = cloneSource.diffuseColorParameter;
+				this.directionParameter = cloneSource.directionParameter;
+				this.specularColorParameter = cloneSource.specularColorParameter;
+				
+				this.diffuseColor = cloneSource.diffuseColor;
+				this.direction = cloneSource.direction;
+				this.specularColor = cloneSource.specularColor;
+				this.enabled = cloneSource.enabled;
+			} else {
+				this.diffuseColorParameter = diffuseColorParameter;
+				this.directionParameter = directionParameter;
+				this.specularColorParameter = specularColorParameter;
+			}
+		}
 		
-		static BlendState () {
-			Additive = new BlendState () {
-				ColorSourceBlend = Blend.One,
-				AlphaSourceBlend = Blend.One,
-    			ColorDestinationBlend = Blend.InverseSourceAlpha,	
-				AlphaDestinationBlend = Blend.InverseSourceAlpha
-			};
-			
-			AlphaBlend = new BlendState () {
-				ColorSourceBlend = Blend.One,
-				AlphaSourceBlend = Blend.One,
-				ColorDestinationBlend = Blend.InverseSourceAlpha,
-				AlphaDestinationBlend = Blend.InverseSourceAlpha
-			};
-			
-			NonPremultiplied = new BlendState () {
-				ColorSourceBlend = Blend.SourceAlpha,
-				AlphaSourceBlend = Blend.SourceAlpha,
-				ColorDestinationBlend = Blend.InverseSourceAlpha,
-				AlphaDestinationBlend = Blend.InverseSourceAlpha
-			};
-			
-			Opaque = new BlendState () {
-				ColorSourceBlend = Blend.One,
-				AlphaSourceBlend = Blend.One,			    
-				ColorDestinationBlend = Blend.Zero,
-				AlphaDestinationBlend = Blend.Zero
-			};
-		}				
+		public Vector3 DiffuseColor {
+			get {
+				return diffuseColor;
+			}
+			set {
+				diffuseColor = value;
+				diffuseColorParameter.SetValue (diffuseColor);
+			}
+		}
+		
+		public Vector3 Direction {
+			get {
+				return direction;
+			}
+			set {
+				direction = value;
+				directionParameter.SetValue (direction);
+			}
+		}
+		
+		public Vector3 SpecularColor {
+			get {
+				return specularColor;
+			}
+			set {
+				specularColor = value;
+				specularColorParameter.SetValue (specularColor);
+			}
+		}
 	}
 }
 

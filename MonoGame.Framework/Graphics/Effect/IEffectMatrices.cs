@@ -42,58 +42,11 @@ using System;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-	public class BlendState : GraphicsResource
+	public interface IEffectMatrices
 	{
-		public float Alpha { get; set; }
-public BlendFunction AlphaBlendFunction { get; set; }
-		public Blend AlphaDestinationBlend { get; set; }
-		public Blend AlphaSourceBlend { get; set; }
-		public Color BlendFactor { get; set; }
-		public BlendFunction ColorBlendFunction { get; set; }
-		public Blend ColorDestinationBlend { get; set; }
-		public Blend ColorSourceBlend { get; set; }
-		public ColorWriteChannels ColorWriteChannels { get; set; }
-		public ColorWriteChannels ColorWriteChannels1 { get; set; }
-		public ColorWriteChannels ColorWriteChannels2 { get; set; }
-		public ColorWriteChannels ColorWriteChannels3 { get; set; }
-		public int MultiSampleMask { get; set; }
-		
-		static BlendState additiveState;
-		
-		public static readonly BlendState Additive;
-		public static readonly BlendState AlphaBlend;
-		public static readonly BlendState NonPremultiplied;
-		public static readonly BlendState Opaque;
-		
-		static BlendState () {
-			Additive = new BlendState () {
-				ColorSourceBlend = Blend.One,
-				AlphaSourceBlend = Blend.One,
-    			ColorDestinationBlend = Blend.InverseSourceAlpha,	
-				AlphaDestinationBlend = Blend.InverseSourceAlpha
-			};
-			
-			AlphaBlend = new BlendState () {
-				ColorSourceBlend = Blend.One,
-				AlphaSourceBlend = Blend.One,
-				ColorDestinationBlend = Blend.InverseSourceAlpha,
-				AlphaDestinationBlend = Blend.InverseSourceAlpha
-			};
-			
-			NonPremultiplied = new BlendState () {
-				ColorSourceBlend = Blend.SourceAlpha,
-				AlphaSourceBlend = Blend.SourceAlpha,
-				ColorDestinationBlend = Blend.InverseSourceAlpha,
-				AlphaDestinationBlend = Blend.InverseSourceAlpha
-			};
-			
-			Opaque = new BlendState () {
-				ColorSourceBlend = Blend.One,
-				AlphaSourceBlend = Blend.One,			    
-				ColorDestinationBlend = Blend.Zero,
-				AlphaDestinationBlend = Blend.Zero
-			};
-		}				
+		Matrix Projection { get; set; }
+		Matrix View { get; set; }
+		Matrix World { get; set; }
 	}
 }
 

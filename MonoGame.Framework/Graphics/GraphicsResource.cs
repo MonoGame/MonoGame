@@ -43,6 +43,10 @@ namespace Microsoft.Xna.Framework.Graphics
 {	
 	public abstract class GraphicsResource : IDisposable
 	{
+		private bool disposed;
+		
+		internal GraphicsDevice graphicsDevice;
+		
 		public GraphicsResource ()
 		{
 		}
@@ -51,6 +55,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			if (Disposing != null)
 				Disposing(this, e);
+			
+			disposed = true;
 		}
 		
 		public void Dispose()
@@ -59,6 +65,26 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 		
 		public event EventHandler<EventArgs> Disposing;
+		
+		public GraphicsDevice GraphicsDevice
+		{
+			get
+			{
+				return graphicsDevice;
+			}
+		}
+		
+		public bool IsDisposed
+		{
+			get
+			{
+				return disposed;
+			}
+		}
+		
+		public string Name { get; set; }
+		
+		public Object Tag { get; set; }
 	}
 }
 
