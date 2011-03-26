@@ -45,7 +45,7 @@ namespace Microsoft.Xna.Framework.Graphics
 	public class BlendState : GraphicsResource
 	{
 		public float Alpha { get; set; }
-public BlendFunction AlphaBlendFunction { get; set; }
+		public BlendFunction AlphaBlendFunction { get; set; }
 		public Blend AlphaDestinationBlend { get; set; }
 		public Blend AlphaSourceBlend { get; set; }
 		public Color BlendFactor { get; set; }

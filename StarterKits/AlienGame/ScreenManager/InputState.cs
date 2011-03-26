@@ -5,14 +5,9 @@
 // Copyright (C) Microsoft Corporation. All rights reserved.
 //-----------------------------------------------------------------------------
 
-#if IPHONE
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
-#else
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
-#endif
 
 namespace AlienGameSample
 {
