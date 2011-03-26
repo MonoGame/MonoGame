@@ -74,7 +74,7 @@ namespace Microsoft.Xna.Framework
         
 		private IGraphicsDeviceManager graphicsDeviceManager;
 		private IGraphicsDeviceService graphicsDeviceService;
-		// TODO private NSWindow _mainWindow;
+		private NSWindow _mainWindow;
 
 		internal static bool _playingVideo = false;
 		private SpriteBatch spriteBatch;
@@ -89,10 +89,15 @@ namespace Microsoft.Xna.Framework
 			_gameComponentCollection = new GameComponentCollection();
 
 			//Create a full-screen window
-			// TODO _mainWindow = new NSWindow(NSScreen.MainScreen.Frame, NSWindowStyle.Titled, NSBackingStore.Buffered, false);			
+			_mainWindow = new NSWindow(NSScreen.MainScreen.Frame, NSWindowStyle.Titled, NSBackingStore.Buffered, false);
+			
+			// Perform any other window configuration you desire
+			_mainWindow.IsOpaque = true;
+			_mainWindow.HidesOnDeactivate = true;
+			
 			_view = new GameWindow();
 			_view.game = this;		
-			// TODO _mainWindow.Add(_view);							
+			// TODO _mainWindow.AddChildWindow(_view, NSWindowOrderingMode.Above);							
 					
 			// Initialize GameTime
             _updateGameTime = new GameTime();
@@ -244,7 +249,7 @@ namespace Microsoft.Xna.Framework
 			_view.BackgroundContext = new MonoTouch.OpenGLES.EAGLContext(_view.ContextRenderingApi, _view.ShareGroup); */
 			
 			//Show the window			
-			// TODO _mainWindow.MakeKeyAndVisible();	
+			_mainWindow.MakeKeyWindow();	
 			
 			// Get the Accelerometer going
 			// TODO Accelerometer.SetupAccelerometer();			
