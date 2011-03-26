@@ -3,12 +3,11 @@ using System;
 #if IPHONE
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
-using Microsoft.Xna;
-using Microsoft.Xna.Framework.Media;
-#else
+#endif
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Media;
-#endif
+
 #endregion
 
 namespace AlienGameSample

@@ -6,11 +6,8 @@
 //-----------------------------------------------------------------------------
 
 using System;
-#if IPHONE
+
 using Microsoft.Xna.Framework;
-#else
-using Microsoft.Xna.Framework;
-#endif
 
 namespace AlienGameSample
 {
