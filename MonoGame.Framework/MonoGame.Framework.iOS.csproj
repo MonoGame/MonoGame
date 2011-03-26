@@ -101,6 +101,7 @@
     <AssemblyName>MonoGameFrameworkiOS</AssemblyName>
     <MtouchUseThumb>false</MtouchUseThumb>
     <MtouchUseArmv7>false</MtouchUseArmv7>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
@@ -113,6 +114,7 @@
     <AssemblyName>MonoGameFrameworkiOS</AssemblyName>
     <MtouchUseThumb>false</MtouchUseThumb>
     <MtouchUseArmv7>false</MtouchUseArmv7>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -347,6 +349,11 @@
     <Compile Include="Graphics\States\BlendFunction.cs" />
     <Compile Include="Graphics\States\BlendState.cs" />
     <Compile Include="Graphics\GraphicsExtensions.cs" />
+    <Compile Include="Graphics\Effect\IEffectFog.cs" />
+    <Compile Include="Graphics\Effect\IEffectLights.cs" />
+    <Compile Include="Graphics\Effect\IEffectMatrices.cs" />
+    <Compile Include="Graphics\DirectionalLight.cs" />
+    <Compile Include="Graphics\ColorWriteChannels.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
