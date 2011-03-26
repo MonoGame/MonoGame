@@ -39,11 +39,26 @@
     <Reference Include="System.Drawing" />
     <Reference Include="MonoMac, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\MonoMac\monomac\src\MonoMac.dll</HintPath>
+      <HintPath>..\..\..\..\MonoMac\monomac\src\MonoMac.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
+    <None Include="..\..\iOS\Draw2D\Content\monogameicon.png">
+      <Link>Content\monogameicon.png</Link>
+    </None>
+    <None Include="..\..\iOS\Draw2D\Content\purpleBall.xnb">
+      <Link>Content\purpleBall.xnb</Link>
+    </None>
+    <None Include="..\..\iOS\Draw2D\Content\spriteFont1.xnb">
+      <Link>Content\spriteFont1.xnb</Link>
+    </None>
+    <None Include="..\..\iOS\Draw2D\Default.png">
+      <Link>Default.png</Link>
+    </None>
+    <None Include="..\..\iOS\Draw2D\monogameicon.png">
+      <Link>monogameicon.png</Link>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Mono\MonoMac\v0.0\Mono.MonoMac.targets" />
@@ -52,39 +67,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="main.cs" />
-    <Compile Include="..\Draw2D\Game1.cs">
-      <Link>Game1.cs</Link>
-    </Compile>
-    <Compile Include="..\Draw2D\FPSCounterComponent.cs">
+    <Compile Include="..\..\iOS\Draw2D\FPSCounterComponent.cs">
       <Link>FPSCounterComponent.cs</Link>
+    </Compile>
+    <Compile Include="..\..\iOS\Draw2D\Game1.cs">
+      <Link>Game1.cs</Link>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\MonoGame.Framework\MonoGame.Framework.MacOS.csproj">
+    <ProjectReference Include="..\..\..\MonoGame.Framework\MonoGame.Framework.MacOS.csproj">
       <Project>{36C538E6-C32A-4A8D-A39C-566173D7118E}</Project>
       <Name>MonoGame.Framework.MacOS</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="..\Draw2D\Content\monogameicon.png">
-      <Link>Content\monogameicon.png</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Draw2D\Content\purpleBall.xnb">
-      <Link>Content\purpleBall.xnb</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Draw2D\Content\spriteFont1.xnb">
-      <Link>Content\spriteFont1.xnb</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Draw2D\Default.png">
-      <Link>Default.png</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Draw2D\monogameicon.png">
-      <Link>monogameicon.png</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
 </Project>
