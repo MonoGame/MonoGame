@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Framework.MacOS", "MonoGame.Framework\MonoGame.Framework.MacOS.csproj", "{36C538E6-C32A-4A8D-A39C-566173D7118E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Samples.Draw2D.MacOS", "Samples\Draw2D.MacOS\MonoGame.Samples.Draw2D.MacOS.csproj", "{A82EAD58-40D7-49BE-8F24-09FEA34F9E55}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Samples.Draw2D.MacOS", "Samples\MacOS\Draw2D.MacOS\MonoGame.Samples.Draw2D.MacOS.csproj", "{A82EAD58-40D7-49BE-8F24-09FEA34F9E55}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

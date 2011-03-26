@@ -51,167 +51,194 @@ using MonoMac.AppKit;
 
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
+
 #endregion Using Statements
 
 namespace Microsoft.Xna.Framework
 {
-    public class GameWindow : MonoMacGameView
-    {
+	public class GameWindow : MonoMacGameView
+	{
 		private readonly Rectangle clientBounds;
 		internal Game game;
 		private GameTime _updateGameTime;
-        private GameTime _drawGameTime;
-        private DateTime _lastUpdate;
+		private GameTime _drawGameTime;
+		private DateTime _lastUpdate;
 		private DateTime _now;
-		
 		public NSOpenGLContext MainContext;
-	    public NSOpenGLContext BackgroundContext;
-	    public NSOpenGLContext ShareGroup; 
-				
+		public NSOpenGLContext BackgroundContext;
+		public NSOpenGLContext ShareGroup; 
+
 		#region UIVIew Methods
+//		[Export("initWithFrame:")]
+//		public GameWindow (RectangleF frame) : this(frame)
+//		{
+//		}
+
+//		public GameWindow (RectangleF frame, NSOpenGLContext context) : this(frame)
+//		{
+//		}
 		
-		public GameWindow() : base (NSScreen.MainScreen.Frame)
+		public GameWindow (RectangleF frame) : base (frame)
 		{
 			//LayerRetainsBacking = false; 
 			//LayerColorFormat	= EAGLColorFormat.RGBA8;
-			
-			RectangleF rect = NSScreen.MainScreen.Frame;
-			clientBounds = new Rectangle(0,0,(int) rect.Width,(int) rect.Height);
-			
+
+			//RectangleF rect = NSScreen.MainScreen.Frame;
+			RectangleF rect = frame;
+			clientBounds = new Rectangle (0,0,(int)rect.Width,(int)rect.Height);
+
 			// Enable multi-touch
 			//MultipleTouchEnabled = true;
-						
+
 			// Initialize GameTime
-            _updateGameTime = new GameTime();
-            _drawGameTime = new GameTime(); 
-			
+			_updateGameTime = new GameTime ();
+			_drawGameTime = new GameTime (); 
+
 			// Initialize _lastUpdate
 			_lastUpdate = DateTime.Now;
 		}
 		
-		~GameWindow()
+		//[Export("initWithFrame:")]
+		public GameWindow () : base (NSScreen.MainScreen.Frame)
+		{
+			//LayerRetainsBacking = false; 
+			//LayerColorFormat	= EAGLColorFormat.RGBA8;
+
+			RectangleF rect = NSScreen.MainScreen.Frame;
+			clientBounds = new Rectangle (0,0,(int)rect.Width,(int)rect.Height);
+
+			// Enable multi-touch
+			//MultipleTouchEnabled = true;
+
+			// Initialize GameTime
+			_updateGameTime = new GameTime ();
+			_drawGameTime = new GameTime (); 
+
+			// Initialize _lastUpdate
+			_lastUpdate = DateTime.Now;
+		}
+
+		~GameWindow ()
 		{
 			//
 		}
-		
+
 		/* TODO [Export ("layerClass")]
 		static Class LayerClass() 
 		{
 			return MonoMacGameView.GetLayerClass ();
 		}
-		
+
 		protected override void ConfigureLayer(CAEAGLLayer eaglLayer) 
 		{
 			eaglLayer.Opaque = true;
 		}
-		
+
 		protected override void CreateFrameBuffer()
 		{	    
 			try
 			{
-		        // TODO ContextRenderingApi = EAGLRenderingAPI.OpenGLES2;
+			// TODO ContextRenderingApi = EAGLRenderingAPI.OpenGLES2;
 				ContextRenderingApi = EAGLRenderingAPI.OpenGLES1;
 				base.CreateFrameBuffer();
-		    } 
+			} 
 			catch (Exception) 
 			{
-		        // device doesn't support OpenGLES 2.0; retry with 1.1:
-		        ContextRenderingApi = EAGLRenderingAPI.OpenGLES1;
+			// device doesn't support OpenGLES 2.0; retry with 1.1:
+			ContextRenderingApi = EAGLRenderingAPI.OpenGLES1;
 				base.CreateFrameBuffer();
-		    }
-			
-			
+			}
+
+
 		}*/
-		
+
 		#endregion
-		
+
 		#region MonoMacGameView Methods
-		
-		protected override void OnClosed(EventArgs e)
+
+		protected override void OnClosed (EventArgs e)
 		{
-			base.OnClosed(e);
+			base.OnClosed (e);
 		}
-		
-		protected override void OnDisposed(EventArgs e)
+
+		protected override void OnDisposed (EventArgs e)
 		{
-			base.OnDisposed(e);
+			base.OnDisposed (e);
 		}
-		
+
 		protected override void OnLoad (EventArgs e)
 		{
-			base.OnLoad(e);
+			base.OnLoad (e);
 		}
-		
-		protected override void OnRenderFrame(FrameEventArgs e)
+
+		protected override void OnRenderFrame (FrameEventArgs e)
 		{
-			base.OnRenderFrame(e);
-			
-			MakeCurrent();
-						
+			base.OnRenderFrame (e);
+
+			MakeCurrent ();
+
 			// This code was commented to make the code base more iPhone like.
 			// More speed testing is required, to see if this is worse or better
 			// game.DoStep();	
-			
-			if (game != null )
-			{
-				_drawGameTime.Update(_now - _lastUpdate);
-            	_lastUpdate = _now;
-            	game.DoDraw(_drawGameTime);
+
+			if (game != null) {
+				_drawGameTime.Update (_now - _lastUpdate);
+				_lastUpdate = _now;
+				game.DoDraw (_drawGameTime);
 			}
-						
-			SwapBuffers();
+
+			SwapBuffers ();
 		}
-		
-		protected override void OnResize(EventArgs e)
+
+		protected override void OnResize (EventArgs e)
 		{
-			base.OnResize(e);
+			base.OnResize (e);
 		}
-		
-		protected override void OnTitleChanged(EventArgs e)
+
+		protected override void OnTitleChanged (EventArgs e)
 		{
-			base.OnTitleChanged(e);
+			base.OnTitleChanged (e);
 		}
-		
-		protected override void OnUnload(EventArgs e)
+
+		protected override void OnUnload (EventArgs e)
 		{
-			base.OnUnload(e);
+			base.OnUnload (e);
 		}
-		
-		protected override void OnUpdateFrame(FrameEventArgs e)
+
+		protected override void OnUpdateFrame (FrameEventArgs e)
 		{			
-			base.OnUpdateFrame(e);	
-			
-			if (game != null )
-			{
+			base.OnUpdateFrame (e);	
+
+			if (game != null) {
 				_now = DateTime.Now;
-				_updateGameTime.Update(_now - _lastUpdate);
-            	game.DoUpdate(_updateGameTime);
+				_updateGameTime.Update (_now - _lastUpdate);
+				game.DoUpdate (_updateGameTime);
 			}
 		}
-		
-		protected override void OnVisibleChanged(EventArgs e)
+
+		protected override void OnVisibleChanged (EventArgs e)
 		{			
-			base.OnVisibleChanged(e);	
+			base.OnVisibleChanged (e);	
 		}
-		
-		protected override void OnWindowStateChanged(EventArgs e)
+
+		protected override void OnWindowStateChanged (EventArgs e)
 		{		
-			base.OnWindowStateChanged(e);	
+			base.OnWindowStateChanged (e);	
 		}
-		
+
 		#endregion
-				
+
 		#region UIVIew Methods
-						
+
 		/* TODO private readonly Dictionary<IntPtr, TouchLocation> previousTouches = new Dictionary<IntPtr, TouchLocation>();
-		
+
 		private void FillTouchCollection(NSSet touches)
 		{
 			UITouch []touchesArray = touches.ToArray<UITouch>();
-			
+
 			TouchPanel.Collection.Clear();
 			TouchPanel.Collection.Capacity = touchesArray.Length;
-			
+
 			for (int i=0; i<touchesArray.Length;i++)
 			{
 				TouchLocationState state;				
@@ -229,33 +256,33 @@ namespace Microsoft.Xna.Framework
 						state = TouchLocationState.Moved;
 						break;					
 				}
-				
+
 				TouchLocation tlocation;
 				TouchLocation previousTouch;
 				if (state != TouchLocationState.Pressed && previousTouches.TryGetValue (touch.Handle, out previousTouch))
 				{
 					Vector2 position = new Vector2 (touch.LocationInView (touch.View));
 					Vector2 translatedPosition = position;
-					
+
 					switch (CurrentOrientation)
 					{
 						case DisplayOrientation.Portrait :
 						{																		
 							break;
 						}
-						
+
 						case DisplayOrientation.LandscapeRight :
 						{				
 							translatedPosition = new Vector2( ClientBounds.Height - position.Y, position.X );							
 							break;
 						}
-						
+
 						case DisplayOrientation.LandscapeLeft :
 						{							
 							translatedPosition = new Vector2( position.Y, ClientBounds.Width - position.X );							
 							break;
 						}
-						
+
 						case DisplayOrientation.PortraitUpsideDown :
 						{				
 							translatedPosition = new Vector2( ClientBounds.Width - position.X, ClientBounds.Height - position.Y );							
@@ -268,26 +295,26 @@ namespace Microsoft.Xna.Framework
 				{
 					Vector2 position = new Vector2 (touch.LocationInView (touch.View));
 					Vector2 translatedPosition = position;
-					
+
 					switch (CurrentOrientation)
 					{
 						case DisplayOrientation.Portrait :
 						{																		
 							break;
 						}
-						
+
 						case DisplayOrientation.LandscapeRight :
 						{				
 							translatedPosition = new Vector2( ClientBounds.Height - position.Y, position.X );							
 							break;
 						}
-						
+
 						case DisplayOrientation.LandscapeLeft :
 						{							
 							translatedPosition = new Vector2( position.Y, ClientBounds.Width - position.X );							
 							break;
 						}
-						
+
 						case DisplayOrientation.PortraitUpsideDown :
 						{				
 							translatedPosition = new Vector2( ClientBounds.Width - position.X, ClientBounds.Height - position.Y );							
@@ -296,91 +323,82 @@ namespace Microsoft.Xna.Framework
 					}
 					tlocation = new TouchLocation(touch.Handle.ToInt32(), state, translatedPosition, 1.0f);
 				}
-				
+
 				TouchPanel.Collection.Add (tlocation);
-				
+
 				if (state != TouchLocationState.Released)
 					previousTouches[touch.Handle] = tlocation;
 				else
 					previousTouches.Remove(touch.Handle);
 			}
 		}
-		
+
 		public override void TouchesBegan (NSSet touches, UIEvent evt)
 		{
 			base.TouchesBegan (touches, evt);
-			
+
 			FillTouchCollection(touches);
-			
+
 			GamePad.Instance.TouchesBegan(touches,evt);	
 		}
-		
+
 		public override void TouchesEnded (NSSet touches, UIEvent evt)
 		{
 			base.TouchesEnded (touches, evt);
-			
+
 			FillTouchCollection(touches);	
-			
+
 			GamePad.Instance.TouchesEnded(touches,evt);								
 		}
-		
+
 		public override void TouchesMoved (NSSet touches, UIEvent evt)
 		{
 			base.TouchesMoved (touches, evt);
-			
+
 			FillTouchCollection(touches);
-			
+
 			GamePad.Instance.TouchesMoved(touches,evt);
 		}
 
 		public override void TouchesCancelled (NSSet touches, UIEvent evt)
 		{
 			base.TouchesCancelled (touches, evt);
-			
+
 			FillTouchCollection(touches);
-			
+
 			GamePad.Instance.TouchesCancelled(touches,evt);
 		} */
 
 		#endregion
-						
-		public string ScreenDeviceName 
-		{
-			get 
-			{
+
+		public string ScreenDeviceName {
+			get {
 				throw new System.NotImplementedException ();
 			}
 		}
 
-		public Rectangle ClientBounds 
-		{
-			get 
-			{
+		public Rectangle ClientBounds {
+			get {
 				return clientBounds;
 			}
 		}
-		
-		public bool AllowUserResizing 
-		{
-			get 
-			{
+
+		public bool AllowUserResizing {
+			get {
 				return false;
 			}
-			set 
-			{
+			set {
 				// Do nothing; Ignore rather than raising and exception
 			}
 		}	
-		
-		public DisplayOrientation CurrentOrientation 
-		{ 
+
+		public DisplayOrientation CurrentOrientation { 
 			get;
 			set;
 		}
 
-		
 		public event EventHandler ClientSizeChanged;
 		public event EventHandler ScreenDeviceNameChanged;
-    }
+	}
 }
 

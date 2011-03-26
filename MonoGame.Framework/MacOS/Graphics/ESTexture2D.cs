@@ -68,6 +68,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		public ESTexture2D(NSImage nsImage, All filter)
 		{
 			// TODO InitWithCGImage(nsImage,filter);
+			CGImage image = nsImage.AsCGImage(RectangleF.Empty, null, null);
+			InitWithCGImage(image, filter);
 		}
 		
 		public ESTexture2D(CGImage cgImage, All filter)
