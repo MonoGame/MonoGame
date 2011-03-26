@@ -25,6 +25,50 @@ namespace Microsoft.Xna.Framework.Graphics
             DepthBufferEnable = true;
             DepthBufferWriteEnable = true;
 		}
+		
+		static DepthStencilState defaultState;
+		
+		public static DepthStencilState Default {
+			get {
+				if (defaultState == null) {
+					defaultState = new DepthStencilState () {
+						DepthBufferEnable = true,
+						DepthBufferWriteEnable = true
+					};
+				}
+				
+				return defaultState;
+			}
+		}
+		
+		static DepthStencilState depthReadState;
+		
+		public static DepthStencilState DepthRead {
+			get {
+				if (depthReadState == null) {
+					depthReadState = new DepthStencilState () {
+						DepthBufferEnable = true,
+						DepthBufferWriteEnable = false
+					};
+				}
+				
+				return depthReadState;
+			}
+		}
+		
+		static DepthStencilState noneState;
+		public static DepthStencilState None {
+			get {
+				if (noneState == null) {
+					noneState = new DepthStencilState () {
+						DepthBufferEnable = false,
+						DepthBufferWriteEnable = false
+					};
+				}
+				
+				return noneState;
+			}
+		}
 	}
 }
 

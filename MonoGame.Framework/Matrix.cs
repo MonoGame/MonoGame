@@ -309,7 +309,11 @@ namespace Microsoft.Xna.Framework
         {
             throw new NotImplementedException();
         }
-
+		
+		public static Matrix CreateFromYawPitchRoll (float yaw, float pitch, float roll)
+		{
+			throw new NotImplementedException ();
+		}
 
         public static Matrix CreateLookAt(Vector3 cameraPosition, Vector3 cameraTarget, Vector3 cameraUpVector)
         {
