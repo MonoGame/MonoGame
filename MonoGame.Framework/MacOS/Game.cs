@@ -37,7 +37,6 @@ permitted under your local laws, the contributors exclude the implied warranties
 purpose and non-infringement.
 */
 #endregion License
-   
 using System;
 using System.IO;
 
@@ -55,65 +54,86 @@ using Microsoft.Xna.Framework.Input.Touch;
 
 namespace Microsoft.Xna.Framework
 {
-    public class Game : IDisposable
-    {
+	public class Game : IDisposable
+	{
 		private const float FramesPerSecond = 60.0f; // ~60 frames per second
-		
-        private GameTime _updateGameTime;
-        private GameTime _drawGameTime;
-        private DateTime _lastUpdate;
-        private bool _initialized = false;
+
+		private GameTime _updateGameTime;
+		private GameTime _drawGameTime;
+		private DateTime _lastUpdate;
+		private bool _initialized = false;
 		private bool _initializing = false;
 		private bool _isActive = true;
-        private GameComponentCollection _gameComponentCollection;
-        public GameServiceContainer _services;
-        private ContentManager _content;
-        private GameWindow _view;
+		private GameComponentCollection _gameComponentCollection;
+		public GameServiceContainer _services;
+		private ContentManager _content;
+		private GameWindow _view;
 		private bool _isFixedTimeStep = true;
-        private TimeSpan _targetElapsedTime = TimeSpan.FromSeconds(1 / FramesPerSecond); 
-        
+		private TimeSpan _targetElapsedTime = TimeSpan.FromSeconds (1 / FramesPerSecond); 
 		private IGraphicsDeviceManager graphicsDeviceManager;
 		private IGraphicsDeviceService graphicsDeviceService;
 		private NSWindow _mainWindow;
-
 		internal static bool _playingVideo = false;
 		private SpriteBatch spriteBatch;
 		private Texture2D splashScreen;
-		
-		delegate void InitialiseGameComponentsDelegate();
-		
-		public Game()
-        {           
+
+		delegate void InitialiseGameComponentsDelegate ();
+
+		public Game ()
+			{           
 			// Initialize collections
-			_services = new GameServiceContainer();
-			_gameComponentCollection = new GameComponentCollection();
+			_services = new GameServiceContainer ();
+			_gameComponentCollection = new GameComponentCollection ();
 
 			//Create a full-screen window
-			_mainWindow = new NSWindow(NSScreen.MainScreen.Frame, NSWindowStyle.Titled, NSBackingStore.Buffered, false);
-			
+			_mainWindow = new NSWindow (NSScreen.MainScreen.Frame, NSWindowStyle.Titled, NSBackingStore.Buffered, false);
+
 			// Perform any other window configuration you desire
 			_mainWindow.IsOpaque = true;
 			_mainWindow.HidesOnDeactivate = true;
-			
-			_view = new GameWindow();
+
+			_view = new GameWindow ();
 			_view.game = this;		
 			// TODO _mainWindow.AddChildWindow(_view, NSWindowOrderingMode.Above);							
-					
+
 			// Initialize GameTime
-            _updateGameTime = new GameTime();
-            _drawGameTime = new GameTime();  	
+			_updateGameTime = new GameTime ();
+			_drawGameTime = new GameTime ();  	
 		}
 		
-		~Game()
+		public Game (GameWindow view)
+			{           
+			// Initialize collections
+			_services = new GameServiceContainer ();
+			_gameComponentCollection = new GameComponentCollection ();
+
+			//Create a full-screen window
+			//_mainWindow = new NSWindow (NSScreen.MainScreen.Frame, NSWindowStyle.Titled, NSBackingStore.Buffered, false);
+
+			// Perform any other window configuration you desire
+			//_mainWindow.IsOpaque = true;
+			//_mainWindow.HidesOnDeactivate = true;
+
+			//_view = new GameWindow ();
+			_view = view;
+			_view.game = this;		
+			// TODO _mainWindow.AddChildWindow(_view, NSWindowOrderingMode.Above);							
+
+			// Initialize GameTime
+			_updateGameTime = new GameTime ();
+			_drawGameTime = new GameTime ();  	
+		}
+		
+		~Game ()
 		{
 			// TODO NSDevice.CurrentDevice.EndGeneratingDeviceOrientationNotifications(); 
 		}
-		
+
 		/* private void ObserveDeviceRotation ()
 		{
 			NSNotificationCenter.DefaultCenter.AddObserver( new NSString("UIDeviceOrientationDidChangeNotification"), (notification) => { 
 				UIDeviceOrientation orientation = UIDevice.CurrentDevice.Orientation;
-				
+
 				switch (orientation)
 				{
 					case UIDeviceOrientation.Portrait :
@@ -187,341 +207,290 @@ namespace Microsoft.Xna.Framework
 						break;
 				}					  
 			});
-			
+
 			UIDevice.CurrentDevice.BeginGeneratingDeviceOrientationNotifications();
 		}*/
-		
+
 		public void Dispose ()
 		{
 			// do nothing
 		}
-		
-        public bool IsActive
-        {
-            get
-			{
+
+		public bool IsActive {
+			get {
 				return _isActive;
 			}
-			protected set
-			{
-				if (_isActive != value )
-				{
+			protected set {
+				if (_isActive != value) {
 					_isActive = value;
 				}
 			}
-        }
+		}
 
-        public bool IsMouseVisible
-        {
-            get
-			{
+		public bool IsMouseVisible {
+			get {
 				return false;
 			}
-            set
-			{
+			set {
 				// do nothing; ignore
 			}
-        }
+		}
 
-        public TimeSpan TargetElapsedTime
-        {
-            get
-            {
-                return _targetElapsedTime;
-            }
-            set
-            {
-                _targetElapsedTime = value;			
-				if(_initialized) {
-					throw new NotSupportedException();
+		public TimeSpan TargetElapsedTime {
+			get {
+				return _targetElapsedTime;
+			}
+			set {
+				_targetElapsedTime = value;			
+				if (_initialized) {
+					throw new NotSupportedException ();
 				}
-            }
-        }
-		
-        public void Run()
-    	{			
+			}
+		}
+
+		public void Run ()
+		{			
 			_lastUpdate = DateTime.Now;
-			
-			_view.Run( FramesPerSecond / ( FramesPerSecond * TargetElapsedTime.TotalSeconds ) );	
-			
+
+			_view.Run (FramesPerSecond / (FramesPerSecond * TargetElapsedTime.TotalSeconds));	
+
 			/*TODO _view.MainContext = _view.EAGLContext;
 			_view.ShareGroup = _view.MainContext.ShareGroup;
 			_view.BackgroundContext = new MonoTouch.OpenGLES.EAGLContext(_view.ContextRenderingApi, _view.ShareGroup); */
-			
+
 			//Show the window			
-			_mainWindow.MakeKeyWindow();	
-			
+			//_mainWindow.MakeKeyWindow ();	
+
 			// Get the Accelerometer going
 			// TODO Accelerometer.SetupAccelerometer();			
-			Initialize();
-			
+			Initialize ();
+
 			// Listen out for rotation changes
 			// TODO ObserveDeviceRotation();
-        }
-		
-		internal void DoUpdate(GameTime aGameTime)
+		}
+
+		internal void DoUpdate (GameTime aGameTime)
 		{
-			if (_isActive)
-			{
-				Update(aGameTime);
+			if (_isActive) {
+				Update (aGameTime);
 			}
 		}
-		
-		internal void DoDraw(GameTime aGameTime)
+
+		internal void DoDraw (GameTime aGameTime)
 		{
-			if (_isActive)
-			{
-				Draw(aGameTime);
+			if (_isActive) {
+				Draw (aGameTime);
 			}
 		}
-		
-		internal void DoStep()
+
+		internal void DoStep ()
 		{
 			var timeNow = DateTime.Now;
-			
-			// Update the game			
-            _updateGameTime.Update(timeNow - _lastUpdate);
-            Update(_updateGameTime);
 
-            // Draw the screen
-            _drawGameTime.Update(timeNow - _lastUpdate);
-            _lastUpdate = timeNow;
-            Draw(_drawGameTime);       			
+			// Update the game			
+			_updateGameTime.Update (timeNow - _lastUpdate);
+			Update (_updateGameTime);
+
+			// Draw the screen
+			_drawGameTime.Update (timeNow - _lastUpdate);
+			_lastUpdate = timeNow;
+			Draw (_drawGameTime);       			
 		}
 
-        public bool IsFixedTimeStep
-        {
-            get
-			{
+		public bool IsFixedTimeStep {
+			get {
 				return _isFixedTimeStep;
 			}
-            set
-			{
+			set {
 				_isFixedTimeStep = value;
 			}
-        }
-
-        public GameWindow Window
-        {
-            get
-            {
-                return _view;
-            }
-        }
-		
-		public void ResetElapsedTime()
-        {
-            _lastUpdate = DateTime.Now;
-        }
-
-
-        public GameServiceContainer Services
-        {
-            get
-            {
-                return _services;
-            }
 		}
 
-        public ContentManager Content
-        {
-            get
-            {
-                if (_content == null)
-                {
-                    _content = new ContentManager(_services);
-                }
-                return _content;
-            }
-        }
+		public GameWindow Window {
+			get {
+				return _view;
+			}
+		}
 
-        public GraphicsDevice GraphicsDevice
-        {
-            get
-            {
-                if (this.graphicsDeviceService == null)
-                {
-                    this.graphicsDeviceService = this.Services.GetService(typeof(IGraphicsDeviceService)) as IGraphicsDeviceService;
-                    if (this.graphicsDeviceService == null)
-                    {
-                        throw new InvalidOperationException("No Graphics Device Service");
-                    }
-                }
-                return this.graphicsDeviceService.GraphicsDevice;
-            }
-        }
-		
-		public void EnterBackground()
-    	{
+		public void ResetElapsedTime ()
+		{
+			_lastUpdate = DateTime.Now;
+		}
+
+		public GameServiceContainer Services {
+			get {
+				return _services;
+			}
+		}
+
+		public ContentManager Content {
+			get {
+				if (_content == null) {
+					_content = new ContentManager (_services);
+				}
+				return _content;
+			}
+		}
+
+		public GraphicsDevice GraphicsDevice {
+			get {
+				if (this.graphicsDeviceService == null) {
+					this.graphicsDeviceService = this.Services.GetService (typeof(IGraphicsDeviceService)) as IGraphicsDeviceService;
+					if (this.graphicsDeviceService == null) {
+						throw new InvalidOperationException ("No Graphics Device Service");
+					}
+				}
+				return this.graphicsDeviceService.GraphicsDevice;
+			}
+		}
+
+		public void EnterBackground ()
+		{
 			_isActive = false;
-			 if (Deactivated != null)
-                Deactivated.Invoke(this, null);
+			if (Deactivated != null)
+				Deactivated.Invoke (this, null);
 		}
-		
-		public void EnterForeground()
-    	{
+
+		public void EnterForeground ()
+		{
 			_isActive = true;
 			if (Activated != null)
-                Activated.Invoke(this, null);
+				Activated.Invoke (this, null);
 		}
-		
-		protected virtual bool BeginDraw()
+
+		protected virtual bool BeginDraw ()
 		{
 			return true;
 		}
-		
-		protected virtual void EndDraw()
+
+		protected virtual void EndDraw ()
 		{
-			
+
 		}
-		
-		protected virtual void LoadContent()
+
+		protected virtual void LoadContent ()
 		{			
 			string DefaultPath = "Default.png";
-			if (File.Exists(DefaultPath))
-			{
+			if (File.Exists (DefaultPath)) {
 				// Store the RootDir for later 
 				string backup = Content.RootDirectory;
-				
-				try 
-				{
+
+				try {
 					// Clear the RootDirectory for this operation
 					Content.RootDirectory = string.Empty;
-					
-					spriteBatch = new SpriteBatch(GraphicsDevice);
-					splashScreen = Content.Load<Texture2D>(DefaultPath);			
-				}
-				finally 
-				{
+
+					spriteBatch = new SpriteBatch (GraphicsDevice);
+					splashScreen = Content.Load<Texture2D> (DefaultPath);			
+				} finally {
 					// Reset RootDir
 					Content.RootDirectory = backup;
 				}
-				
-			}
-			else
-			{
+
+			} else {
 				spriteBatch = null;
 				splashScreen = null;
 			}
 		}
-		
-		protected virtual void UnloadContent()
+
+		protected virtual void UnloadContent ()
 		{
 			// do nothing
 		}
-		
-        protected virtual void Initialize()
-        {
-			this.graphicsDeviceManager = this.Services.GetService(typeof(IGraphicsDeviceManager)) as IGraphicsDeviceManager;			
-			this.graphicsDeviceService = this.Services.GetService(typeof(IGraphicsDeviceService)) as IGraphicsDeviceService;			
 
-			if ((this.graphicsDeviceService != null) && (this.graphicsDeviceService.GraphicsDevice != null))
-            {
-                LoadContent();
-            }
-        }
-		
-		private void InitializeGameComponents()
+		protected virtual void Initialize ()
+		{
+			this.graphicsDeviceManager = this.Services.GetService (typeof(IGraphicsDeviceManager)) as IGraphicsDeviceManager;			
+			this.graphicsDeviceService = this.Services.GetService (typeof(IGraphicsDeviceService)) as IGraphicsDeviceService;			
+
+			if ((this.graphicsDeviceService != null) && (this.graphicsDeviceService.GraphicsDevice != null)) {
+				LoadContent ();
+			}
+		}
+
+		private void InitializeGameComponents ()
 		{
 			// TODO EAGLContext.SetCurrentContext(_view.BackgroundContext);
-			
-			foreach (GameComponent gc in _gameComponentCollection)
-            {
-                gc.Initialize();
-            }
-			
+
+			foreach (GameComponent gc in _gameComponentCollection) {
+				gc.Initialize ();
+			}
+
 			// TODO EAGLContext.SetCurrentContext(_view.MainContext);
 		}
 
-        protected virtual void Update(GameTime gameTime)
-        {			
-			if ( _initialized  /* TODO && !Guide.IsVisible */ )
-			{
-				foreach (GameComponent gc in _gameComponentCollection)			
-				{
-					if (gc.Enabled)
-	                {
-	                    gc.Update(gameTime);
-	                }
-	            }
-			}
-			else
-			{
-				if (!_initializing) 
-				{
+		protected virtual void Update (GameTime gameTime)
+		{			
+			if (_initialized  /* TODO && !Guide.IsVisible */) {
+				foreach (GameComponent gc in _gameComponentCollection) {
+					if (gc.Enabled) {
+						gc.Update (gameTime);
+					}
+				}
+			} else {
+				if (!_initializing) {
 					_initializing = true;
-					
+
 					// Use OpenGLES context switching as described here
 					// http://developer.apple.com/iphone/library/qa/qa2010/qa1612.html
-					InitialiseGameComponentsDelegate initD = new InitialiseGameComponentsDelegate(InitializeGameComponents);
+					InitialiseGameComponentsDelegate initD = new InitialiseGameComponentsDelegate (InitializeGameComponents);
 
 					// Invoke on thread from the pool
-        			initD.BeginInvoke( 
+					initD.BeginInvoke (
 						delegate (IAsyncResult iar) 
-					    {
+						{
 							// We must have finished initialising, so set our flag appropriately
 							// So that we enter the Update loop
-						    _initialized = true;
+							_initialized = true;
 							_initializing = false;
 						}, 
 					initD);
 				}
 			}
-        }
-		
-        protected virtual void Draw(GameTime gameTime)
-        {
-			if ( _initializing )
-			{
-				if ( spriteBatch != null )
-				{
-					spriteBatch.Begin();
-					
-					// We need to turn this into a progress bar or animation to give better user feedback
-					spriteBatch.Draw(splashScreen, new Vector2(0, 0), Color.White );
-					spriteBatch.End();
-				}
-			}
-			else
-			{
-				if (!_playingVideo) 
-				{
-		            foreach (GameComponent gc in _gameComponentCollection)
-		            {
-		                if (gc.Enabled && gc is DrawableGameComponent)
-		                {
-		                    DrawableGameComponent dc = gc as DrawableGameComponent;
-		                    if (dc.Visible)
-		                    {
-		                        dc.Draw(gameTime);
-		                    }
-		                }
-		            }
-				}
-			}
-        }
+		}
 
-        public void Exit()
-        {
+		protected virtual void Draw (GameTime gameTime)
+		{
+			if (_initializing) {
+				if (spriteBatch != null) {
+					spriteBatch.Begin ();
+
+					// We need to turn this into a progress bar or animation to give better user feedback
+					spriteBatch.Draw (splashScreen, new Vector2 (0, 0), Color.White);
+					spriteBatch.End ();
+				}
+			} else {
+				if (!_playingVideo) {
+					foreach (GameComponent gc in _gameComponentCollection) {
+						if (gc.Enabled && gc is DrawableGameComponent) {
+							DrawableGameComponent dc = gc as DrawableGameComponent;
+							if (dc.Visible) {
+								dc.Draw (gameTime);
+							}
+						}
+					}
+				}
+			}
+		}
+
+		public void Exit ()
+		{
 			//TODO: Fix this
 			/* UIAlertView alert = new UIAlertView("Game Exit", "Hit Home Button to Exit",null,null,null);
 			alert.Show();*/		
-        }
+		}
 
-        public GameComponentCollection Components
-        {
-            get
-            {
-                return _gameComponentCollection;
-            }
-        }
-		
+		public GameComponentCollection Components {
+			get {
+				return _gameComponentCollection;
+			}
+		}
+
 		#region Events
 		public event EventHandler Activated;
 		public event EventHandler Deactivated;
 		public event EventHandler Disposed;
 		public event EventHandler Exiting;
 		#endregion
-    }
+	}
 }
 
