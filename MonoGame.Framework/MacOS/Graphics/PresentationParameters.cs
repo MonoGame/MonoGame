@@ -62,7 +62,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private IntPtr deviceWindowHandle;
         private bool enableAutoDepthStencil;
         private int fullScreenRefreshRateInHz;
-        // private bool isFullScreen;
+        private bool isFullScreen;
         private int multiSampleQuality;
         private MultiSampleType multiSampleType;
         private SwapEffect swapEffect;
@@ -141,11 +141,11 @@ namespace Microsoft.Xna.Framework.Graphics
         {
 			get
             {
-				 throw new NotImplementedException();
+				 return isFullScreen;
             }
             set
             {
-				throw new NotImplementedException();				
+				isFullScreen = value;				
             }
         }
 

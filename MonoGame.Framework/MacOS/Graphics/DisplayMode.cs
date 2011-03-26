@@ -57,7 +57,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             get
             {
-            	throw new NotImplementedException();
+            	return (int)NSScreen.MainScreen.Frame.Width;
             }
         }
 
@@ -65,7 +65,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             get
             {
-                throw new NotImplementedException();
+                return (int)NSScreen.MainScreen.Frame.Height;
             }
         }
 

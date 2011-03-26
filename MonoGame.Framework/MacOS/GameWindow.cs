@@ -125,7 +125,7 @@ namespace Microsoft.Xna.Framework
 		
 		#endregion
 		
-		#region iPhoneOSGameView Methods
+		#region MonoMacGameView Methods
 		
 		protected override void OnClosed(EventArgs e)
 		{
