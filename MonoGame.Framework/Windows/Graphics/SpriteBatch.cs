@@ -111,6 +111,13 @@ namespace Microsoft.Xna.Framework.Graphics
 					break;
 				}
 				
+				case DisplayOrientation.PortraitUpsideDown:
+                {
+					GL.Rotate(180, 0, 0, 1); 
+					GL.Ortho(0, _graphicsDevice.Viewport.Width, _graphicsDevice.Viewport.Height,  0, -1, 1);
+					break;
+				}
+				
 				default:
 				{
 					GL.Ortho(0, _graphicsDevice.Viewport.Width, _graphicsDevice.Viewport.Height, 0, -1, 1);
@@ -118,9 +125,21 @@ namespace Microsoft.Xna.Framework.Graphics
 				}
 			}
 			
+			// Enable Scissor Tests if necessary
+			if ( _graphicsDevice.RenderState.ScissorTestEnable )
+			{
+				GL.Enable(EnableCap.ScissorTest);				
+			}
+			
 			GL.MatrixMode(MatrixMode.Modelview);
 			GL.LoadMatrix( ref _matrix.M11 );
 			GL.Viewport (0, 0, _graphicsDevice.Viewport.Width, _graphicsDevice.Viewport.Height);
+			
+			// Enable Scissor Tests if necessary
+			if ( _graphicsDevice.RenderState.ScissorTestEnable )
+			{
+				GL.Scissor(_graphicsDevice.ScissorRectangle.X, _graphicsDevice.ScissorRectangle.Y, _graphicsDevice.ScissorRectangle.Width, _graphicsDevice.ScissorRectangle.Height );
+			}
 						
 			// Initialize OpenGL states (ideally move this to initialize somewhere else)	
 			GL.Disable(EnableCap.DepthTest);
