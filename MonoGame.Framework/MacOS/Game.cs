@@ -92,9 +92,11 @@ namespace Microsoft.Xna.Framework
 			_mainWindow.IsOpaque = true;
 			_mainWindow.HidesOnDeactivate = true;
 
-			_view = new GameWindow ();
+			_view = new GameWindow();
 			_view.game = this;		
-			// TODO _mainWindow.AddChildWindow(_view, NSWindowOrderingMode.Above);							
+			
+			_mainWindow.ContentView = _view;
+			_mainWindow.MakeKeyAndOrderFront(_mainWindow);										
 
 			// Initialize GameTime
 			_updateGameTime = new GameTime ();
