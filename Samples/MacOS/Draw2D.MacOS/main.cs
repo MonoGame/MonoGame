@@ -23,7 +23,11 @@ namespace Microsoft.Xna.Samples.Draw2D
 		static void Main (string [] args)
 		{
 			NSApplication.Init ();
-			NSApplication.Main (args);
+			
+			using (var p = new NSAutoreleasePool ()) {
+				// NSApplication.SharedApplication.Delegate = this;
+				NSApplication.Main(args);
+			}
 		}
 	}
 }
