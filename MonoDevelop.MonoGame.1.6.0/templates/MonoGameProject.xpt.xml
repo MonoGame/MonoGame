@@ -46,15 +46,14 @@ using MonoTouch.UIKit;
 namespace ${Namespace}
 {
 	[Register ("AppDelegate")]
-	class  Program : XNATouchProgram 
+	class Program : UIApplicationDelegate 
 	{
-		public override bool FinishedLaunching (UIApplication app, NSDictionary options)
+		public override void FinishedLaunching (UIApplication app)
 		{
-			// Fun begins..
-			XNATouchGame = new Game1();            
-            XNATouchGame.Run();
-			
-			return true;
+            using (Game1 game = new Game1())
+            {
+                game.Run();
+            }
 		}
 		
 		static void Main (string [] args)
@@ -120,16 +119,6 @@ namespace ${Namespace}
 
             //TODO: use this.Content to load your game content here 
         }
-
-        /// <summary>
-        /// UnloadContent will be called once per game and is the place to unload
-        /// all content.
-        /// </summary>
-		protected override void UnLoadContent ()
-		{
-			// TODO: Unload any non ContentManager content here
-			base.UnLoadContent ();
-		}
 
         /// <summary>
         /// Allows the game to run logic such as updating the world,
