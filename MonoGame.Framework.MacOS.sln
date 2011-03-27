@@ -21,6 +21,6 @@ Global
 		{A82EAD58-40D7-49BE-8F24-09FEA34F9E55}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = MonoGame.Framework\MonoGame.Framework.MacOS.csproj
+		StartupItem = Samples\MacOS\Draw2D.MacOS\MonoGame.Samples.Draw2D.MacOS.csproj
 	EndGlobalSection
 EndGlobal
