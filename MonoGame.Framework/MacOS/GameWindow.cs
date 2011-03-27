@@ -68,16 +68,7 @@ namespace Microsoft.Xna.Framework
 		public NSOpenGLContext BackgroundContext;
 		public NSOpenGLContext ShareGroup; 
 
-		#region UIVIew Methods
-//		[Export("initWithFrame:")]
-//		public GameWindow (RectangleF frame) : this(frame)
-//		{
-//		}
-
-//		public GameWindow (RectangleF frame, NSOpenGLContext context) : this(frame)
-//		{
-//		}
-		
+		#region UIVIew Methods		
 		public GameWindow (RectangleF frame) : base (frame)
 		{
 			//LayerRetainsBacking = false; 
@@ -98,7 +89,13 @@ namespace Microsoft.Xna.Framework
 			_lastUpdate = DateTime.Now;
 		}
 		
-		//[Export("initWithFrame:")]
+
+		public GameWindow (RectangleF frame, NSOpenGLContext context) : base(frame)
+		{
+			
+		}
+		
+		[Export("initWithFrame:")]
 		public GameWindow () : base (NSScreen.MainScreen.Frame)
 		{
 			//LayerRetainsBacking = false; 
@@ -392,11 +389,27 @@ namespace Microsoft.Xna.Framework
 			}
 		}	
 
-		public DisplayOrientation CurrentOrientation { 
-			get;
-			set;
+		private DisplayOrientation _currentOrientation;
+		public DisplayOrientation CurrentOrientation 
+		{ 
+			get
+            {
+                return _currentOrientation;
+            }
+            internal set
+            {
+                if (value != _currentOrientation)
+                {
+                    _currentOrientation = value;
+                    if (OrientationChanged != null)
+                    {
+                        OrientationChanged(this, EventArgs.Empty);
+                    }
+                }
+            }
 		}
-
+		
+		public event EventHandler<EventArgs> OrientationChanged;
 		public event EventHandler ClientSizeChanged;
 		public event EventHandler ScreenDeviceNameChanged;
 	}

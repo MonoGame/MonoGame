@@ -1,20 +1,29 @@
 using MonoMac.AppKit;
+using MonoMac.Foundation;
 
 namespace Microsoft.Xna.Samples.Draw2D
 {
-	class Program
+	[Register ("AppDelegate")]
+	class Program : NSApplicationDelegate 
 	{
-		static private Game1 game;
-		
-		static void Main (string[] args)
-        {
-			NSApplication.Init();          
-			
-            // Fun begins..
+		private Game1 game;
+
+		public override void FinishedLaunching(NSObject notification)
+		{
+			// Fun begins..
 			game = new Game1();
 			game.Run();
-			
-			NSApplication.Main(args);
-        }
+		}
+		
+		public override bool ApplicationShouldTerminateAfterLastWindowClosed (NSApplication sender)
+		{
+			return true;
+		}
+
+		static void Main (string [] args)
+		{
+			NSApplication.Init ();
+			NSApplication.Main (args);
+		}
 	}
 }
