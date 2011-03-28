@@ -28,7 +28,7 @@ SOFTWARE.
 using System;
 using System.ComponentModel;
 
-namespace Microsoft.Xna.Framework
+namespace XnaTouch.Framework
 {
     public struct Ray : IEquatable<Ray>
     {
@@ -153,7 +153,13 @@ namespace Microsoft.Xna.Framework
 
         public float? Intersects(BoundingFrustum frustum)
         {
-            throw new NotImplementedException();
+            if (frustum == null)
+			{
+				throw new ArgumentNullException("frustum");
+			}
+			
+			return frustum.Intersects(this);
+			
         }
 
 
@@ -172,6 +178,7 @@ namespace Microsoft.Xna.Framework
         public void Intersects(ref Plane plane, out float? result)
         {
             throw new NotImplementedException();
+			
         }
 
         public void Intersects(ref BoundingSphere sphere, out float? result)
@@ -227,7 +234,6 @@ namespace Microsoft.Xna.Framework
         {
             return string.Format("{{Position:{0} Direction:{1}}}", Position.ToString(), Direction.ToString());
         }
-        #endregion
     }
 }
 

@@ -27,7 +27,7 @@ SOFTWARE.
 
 using System;
 
-namespace Microsoft.Xna.Framework
+namespace XnaTouch.Framework
 {
     public struct Matrix : IEquatable<Matrix>
     {
@@ -262,58 +262,355 @@ namespace Microsoft.Xna.Framework
         public static Matrix CreateBillboard(Vector3 objectPosition, Vector3 cameraPosition,
             Vector3 cameraUpVector, Nullable<Vector3> cameraForwardVector)
         {
-            throw new NotImplementedException();
+            Matrix matrix;
+		    Vector3 vector;
+		    Vector3 vector2;
+		    Vector3 vector3;
+		    vector.X = objectPosition.X - cameraPosition.X;
+		    vector.Y = objectPosition.Y - cameraPosition.Y;
+		    vector.Z = objectPosition.Z - cameraPosition.Z;
+		    float num = vector.LengthSquared();
+		    if (num < 0.0001f)
+		    {
+		        vector = cameraForwardVector.HasValue ? -cameraForwardVector.Value : Vector3.Forward;
+		    }
+		    else
+		    {
+		        Vector3.Multiply(ref vector, (float) (1f / ((float) Math.Sqrt((double) num))), out vector);
+		    }
+		    Vector3.Cross(ref cameraUpVector, ref vector, out vector3);
+		    vector3.Normalize();
+		    Vector3.Cross(ref vector, ref vector3, out vector2);
+		    matrix.M11 = vector3.X;
+		    matrix.M12 = vector3.Y;
+		    matrix.M13 = vector3.Z;
+		    matrix.M14 = 0f;
+		    matrix.M21 = vector2.X;
+		    matrix.M22 = vector2.Y;
+		    matrix.M23 = vector2.Z;
+		    matrix.M24 = 0f;
+		    matrix.M31 = vector.X;
+		    matrix.M32 = vector.Y;
+		    matrix.M33 = vector.Z;
+		    matrix.M34 = 0f;
+		    matrix.M41 = objectPosition.X;
+		    matrix.M42 = objectPosition.Y;
+		    matrix.M43 = objectPosition.Z;
+		    matrix.M44 = 1f;
+		    return matrix;
         }
 
         
         public static void CreateBillboard(ref Vector3 objectPosition, ref Vector3 cameraPosition,
             ref Vector3 cameraUpVector, Vector3? cameraForwardVector, out Matrix result)
         {
-            throw new NotImplementedException();
+            Vector3 vector;
+		    Vector3 vector2;
+		    Vector3 vector3;
+		    vector.X = objectPosition.X - cameraPosition.X;
+		    vector.Y = objectPosition.Y - cameraPosition.Y;
+		    vector.Z = objectPosition.Z - cameraPosition.Z;
+		    float num = vector.LengthSquared();
+		    if (num < 0.0001f)
+		    {
+		        vector = cameraForwardVector.HasValue ? -cameraForwardVector.Value : Vector3.Forward;
+		    }
+		    else
+		    {
+		        Vector3.Multiply(ref vector, (float) (1f / ((float) Math.Sqrt((double) num))), out vector);
+		    }
+		    Vector3.Cross(ref cameraUpVector, ref vector, out vector3);
+		    vector3.Normalize();
+		    Vector3.Cross(ref vector, ref vector3, out vector2);
+		    result.M11 = vector3.X;
+		    result.M12 = vector3.Y;
+		    result.M13 = vector3.Z;
+		    result.M14 = 0f;
+		    result.M21 = vector2.X;
+		    result.M22 = vector2.Y;
+		    result.M23 = vector2.Z;
+		    result.M24 = 0f;
+		    result.M31 = vector.X;
+		    result.M32 = vector.Y;
+		    result.M33 = vector.Z;
+		    result.M34 = 0f;
+		    result.M41 = objectPosition.X;
+		    result.M42 = objectPosition.Y;
+		    result.M43 = objectPosition.Z;
+		    result.M44 = 1f;
         }
 
         
         public static Matrix CreateConstrainedBillboard(Vector3 objectPosition, Vector3 cameraPosition,
             Vector3 rotateAxis, Nullable<Vector3> cameraForwardVector, Nullable<Vector3> objectForwardVector)
         {
-            throw new NotImplementedException();
+            float num;
+		    Vector3 vector;
+		    Matrix matrix;
+		    Vector3 vector2;
+		    Vector3 vector3;
+		    vector2.X = objectPosition.X - cameraPosition.X;
+		    vector2.Y = objectPosition.Y - cameraPosition.Y;
+		    vector2.Z = objectPosition.Z - cameraPosition.Z;
+		    float num2 = vector2.LengthSquared();
+		    if (num2 < 0.0001f)
+		    {
+		        vector2 = cameraForwardVector.HasValue ? -cameraForwardVector.Value : Vector3.Forward;
+		    }
+		    else
+		    {
+		        Vector3.Multiply(ref vector2, (float) (1f / ((float) Math.Sqrt((double) num2))), out vector2);
+		    }
+		    Vector3 vector4 = rotateAxis;
+		    Vector3.Dot(ref rotateAxis, ref vector2, out num);
+		    if (Math.Abs(num) > 0.9982547f)
+		    {
+		        if (objectForwardVector.HasValue)
+		        {
+		            vector = objectForwardVector.Value;
+		            Vector3.Dot(ref rotateAxis, ref vector, out num);
+		            if (Math.Abs(num) > 0.9982547f)
+		            {
+		                num = ((rotateAxis.X * Vector3.Forward.X) + (rotateAxis.Y * Vector3.Forward.Y)) + (rotateAxis.Z * Vector3.Forward.Z);
+		                vector = (Math.Abs(num) > 0.9982547f) ? Vector3.Right : Vector3.Forward;
+		            }
+		        }
+		        else
+		        {
+		            num = ((rotateAxis.X * Vector3.Forward.X) + (rotateAxis.Y * Vector3.Forward.Y)) + (rotateAxis.Z * Vector3.Forward.Z);
+		            vector = (Math.Abs(num) > 0.9982547f) ? Vector3.Right : Vector3.Forward;
+		        }
+		        Vector3.Cross(ref rotateAxis, ref vector, out vector3);
+		        vector3.Normalize();
+		        Vector3.Cross(ref vector3, ref rotateAxis, out vector);
+		        vector.Normalize();
+		    }
+		    else
+		    {
+		        Vector3.Cross(ref rotateAxis, ref vector2, out vector3);
+		        vector3.Normalize();
+		        Vector3.Cross(ref vector3, ref vector4, out vector);
+		        vector.Normalize();
+		    }
+		    matrix.M11 = vector3.X;
+		    matrix.M12 = vector3.Y;
+		    matrix.M13 = vector3.Z;
+		    matrix.M14 = 0f;
+		    matrix.M21 = vector4.X;
+		    matrix.M22 = vector4.Y;
+		    matrix.M23 = vector4.Z;
+		    matrix.M24 = 0f;
+		    matrix.M31 = vector.X;
+		    matrix.M32 = vector.Y;
+		    matrix.M33 = vector.Z;
+		    matrix.M34 = 0f;
+		    matrix.M41 = objectPosition.X;
+		    matrix.M42 = objectPosition.Y;
+		    matrix.M43 = objectPosition.Z;
+		    matrix.M44 = 1f;
+		    return matrix;
+
         }
 
         
         public static void CreateConstrainedBillboard(ref Vector3 objectPosition, ref Vector3 cameraPosition,
             ref Vector3 rotateAxis, Vector3? cameraForwardVector, Vector3? objectForwardVector, out Matrix result)
         {
-            throw new NotImplementedException();
+            float num;
+		    Vector3 vector;
+		    Vector3 vector2;
+		    Vector3 vector3;
+		    vector2.X = objectPosition.X - cameraPosition.X;
+		    vector2.Y = objectPosition.Y - cameraPosition.Y;
+		    vector2.Z = objectPosition.Z - cameraPosition.Z;
+		    float num2 = vector2.LengthSquared();
+		    if (num2 < 0.0001f)
+		    {
+		        vector2 = cameraForwardVector.HasValue ? -cameraForwardVector.Value : Vector3.Forward;
+		    }
+		    else
+		    {
+		        Vector3.Multiply(ref vector2, (float) (1f / ((float) Math.Sqrt((double) num2))), out vector2);
+		    }
+		    Vector3 vector4 = rotateAxis;
+		    Vector3.Dot(ref rotateAxis, ref vector2, out num);
+		    if (Math.Abs(num) > 0.9982547f)
+		    {
+		        if (objectForwardVector.HasValue)
+		        {
+		            vector = objectForwardVector.Value;
+		            Vector3.Dot(ref rotateAxis, ref vector, out num);
+		            if (Math.Abs(num) > 0.9982547f)
+		            {
+		                num = ((rotateAxis.X * Vector3.Forward.X) + (rotateAxis.Y * Vector3.Forward.Y)) + (rotateAxis.Z * Vector3.Forward.Z);
+		                vector = (Math.Abs(num) > 0.9982547f) ? Vector3.Right : Vector3.Forward;
+		            }
+		        }
+		        else
+		        {
+		            num = ((rotateAxis.X * Vector3.Forward.X) + (rotateAxis.Y * Vector3.Forward.Y)) + (rotateAxis.Z * Vector3.Forward.Z);
+		            vector = (Math.Abs(num) > 0.9982547f) ? Vector3.Right : Vector3.Forward;
+		        }
+		        Vector3.Cross(ref rotateAxis, ref vector, out vector3);
+		        vector3.Normalize();
+		        Vector3.Cross(ref vector3, ref rotateAxis, out vector);
+		        vector.Normalize();
+		    }
+		    else
+		    {
+		        Vector3.Cross(ref rotateAxis, ref vector2, out vector3);
+		        vector3.Normalize();
+		        Vector3.Cross(ref vector3, ref vector4, out vector);
+		        vector.Normalize();
+		    }
+		    result.M11 = vector3.X;
+		    result.M12 = vector3.Y;
+		    result.M13 = vector3.Z;
+		    result.M14 = 0f;
+		    result.M21 = vector4.X;
+		    result.M22 = vector4.Y;
+		    result.M23 = vector4.Z;
+		    result.M24 = 0f;
+		    result.M31 = vector.X;
+		    result.M32 = vector.Y;
+		    result.M33 = vector.Z;
+		    result.M34 = 0f;
+		    result.M41 = objectPosition.X;
+		    result.M42 = objectPosition.Y;
+		    result.M43 = objectPosition.Z;
+		    result.M44 = 1f;
+
         }
 
 
         public static Matrix CreateFromAxisAngle(Vector3 axis, float angle)
         {
-            throw new NotImplementedException();
+            Matrix matrix;
+		    float x = axis.X;
+		    float y = axis.Y;
+		    float z = axis.Z;
+		    float num2 = (float) Math.Sin((double) angle);
+		    float num = (float) Math.Cos((double) angle);
+		    float num11 = x * x;
+		    float num10 = y * y;
+		    float num9 = z * z;
+		    float num8 = x * y;
+		    float num7 = x * z;
+		    float num6 = y * z;
+		    matrix.M11 = num11 + (num * (1f - num11));
+		    matrix.M12 = (num8 - (num * num8)) + (num2 * z);
+		    matrix.M13 = (num7 - (num * num7)) - (num2 * y);
+		    matrix.M14 = 0f;
+		    matrix.M21 = (num8 - (num * num8)) - (num2 * z);
+		    matrix.M22 = num10 + (num * (1f - num10));
+		    matrix.M23 = (num6 - (num * num6)) + (num2 * x);
+		    matrix.M24 = 0f;
+		    matrix.M31 = (num7 - (num * num7)) + (num2 * y);
+		    matrix.M32 = (num6 - (num * num6)) - (num2 * x);
+		    matrix.M33 = num9 + (num * (1f - num9));
+		    matrix.M34 = 0f;
+		    matrix.M41 = 0f;
+		    matrix.M42 = 0f;
+		    matrix.M43 = 0f;
+		    matrix.M44 = 1f;
+		    return matrix;
+
         }
 
 
         public static void CreateFromAxisAngle(ref Vector3 axis, float angle, out Matrix result)
         {
-            throw new NotImplementedException();
+            float x = axis.X;
+		    float y = axis.Y;
+		    float z = axis.Z;
+		    float num2 = (float) Math.Sin((double) angle);
+		    float num = (float) Math.Cos((double) angle);
+		    float num11 = x * x;
+		    float num10 = y * y;
+		    float num9 = z * z;
+		    float num8 = x * y;
+		    float num7 = x * z;
+		    float num6 = y * z;
+		    result.M11 = num11 + (num * (1f - num11));
+		    result.M12 = (num8 - (num * num8)) + (num2 * z);
+		    result.M13 = (num7 - (num * num7)) - (num2 * y);
+		    result.M14 = 0f;
+		    result.M21 = (num8 - (num * num8)) - (num2 * z);
+		    result.M22 = num10 + (num * (1f - num10));
+		    result.M23 = (num6 - (num * num6)) + (num2 * x);
+		    result.M24 = 0f;
+		    result.M31 = (num7 - (num * num7)) + (num2 * y);
+		    result.M32 = (num6 - (num * num6)) - (num2 * x);
+		    result.M33 = num9 + (num * (1f - num9));
+		    result.M34 = 0f;
+		    result.M41 = 0f;
+		    result.M42 = 0f;
+		    result.M43 = 0f;
+		    result.M44 = 1f;
         }
 
 
         public static Matrix CreateFromQuaternion(Quaternion quaternion)
         {
-            throw new NotImplementedException();
+            Matrix matrix;
+		    float num9 = quaternion.X * quaternion.X;
+		    float num8 = quaternion.Y * quaternion.Y;
+		    float num7 = quaternion.Z * quaternion.Z;
+		    float num6 = quaternion.X * quaternion.Y;
+		    float num5 = quaternion.Z * quaternion.W;
+		    float num4 = quaternion.Z * quaternion.X;
+		    float num3 = quaternion.Y * quaternion.W;
+		    float num2 = quaternion.Y * quaternion.Z;
+		    float num = quaternion.X * quaternion.W;
+		    matrix.M11 = 1f - (2f * (num8 + num7));
+		    matrix.M12 = 2f * (num6 + num5);
+		    matrix.M13 = 2f * (num4 - num3);
+		    matrix.M14 = 0f;
+		    matrix.M21 = 2f * (num6 - num5);
+		    matrix.M22 = 1f - (2f * (num7 + num9));
+		    matrix.M23 = 2f * (num2 + num);
+		    matrix.M24 = 0f;
+		    matrix.M31 = 2f * (num4 + num3);
+		    matrix.M32 = 2f * (num2 - num);
+		    matrix.M33 = 1f - (2f * (num8 + num9));
+		    matrix.M34 = 0f;
+		    matrix.M41 = 0f;
+		    matrix.M42 = 0f;
+		    matrix.M43 = 0f;
+		    matrix.M44 = 1f;
+		    return matrix;
         }
 
 
         public static void CreateFromQuaternion(ref Quaternion quaternion, out Matrix result)
         {
-            throw new NotImplementedException();
+            float num9 = quaternion.X * quaternion.X;
+		    float num8 = quaternion.Y * quaternion.Y;
+		    float num7 = quaternion.Z * quaternion.Z;
+		    float num6 = quaternion.X * quaternion.Y;
+		    float num5 = quaternion.Z * quaternion.W;
+		    float num4 = quaternion.Z * quaternion.X;
+		    float num3 = quaternion.Y * quaternion.W;
+		    float num2 = quaternion.Y * quaternion.Z;
+		    float num = quaternion.X * quaternion.W;
+		    result.M11 = 1f - (2f * (num8 + num7));
+		    result.M12 = 2f * (num6 + num5);
+		    result.M13 = 2f * (num4 - num3);
+		    result.M14 = 0f;
+		    result.M21 = 2f * (num6 - num5);
+		    result.M22 = 1f - (2f * (num7 + num9));
+		    result.M23 = 2f * (num2 + num);
+		    result.M24 = 0f;
+		    result.M31 = 2f * (num4 + num3);
+		    result.M32 = 2f * (num2 - num);
+		    result.M33 = 1f - (2f * (num8 + num9));
+		    result.M34 = 0f;
+		    result.M41 = 0f;
+		    result.M42 = 0f;
+		    result.M43 = 0f;
+		    result.M44 = 1f;
         }
-		
-		public static Matrix CreateFromYawPitchRoll (float yaw, float pitch, float roll)
-		{
-			throw new NotImplementedException ();
-		}
+
 
         public static Matrix CreateLookAt(Vector3 cameraPosition, Vector3 cameraTarget, Vector3 cameraUpVector)
         {
@@ -395,19 +692,55 @@ namespace Microsoft.Xna.Framework
 
         public static void CreateLookAt(ref Vector3 cameraPosition, ref Vector3 cameraTarget, ref Vector3 cameraUpVector, out Matrix result)
         {
-            throw new NotImplementedException();
+            Vector3 vector = Vector3.Normalize(cameraPosition - cameraTarget);
+		    Vector3 vector2 = Vector3.Normalize(Vector3.Cross(cameraUpVector, vector));
+		    Vector3 vector3 = Vector3.Cross(vector, vector2);
+		    result.M11 = vector2.X;
+		    result.M12 = vector3.X;
+		    result.M13 = vector.X;
+		    result.M14 = 0f;
+		    result.M21 = vector2.Y;
+		    result.M22 = vector3.Y;
+		    result.M23 = vector.Y;
+		    result.M24 = 0f;
+		    result.M31 = vector2.Z;
+		    result.M32 = vector3.Z;
+		    result.M33 = vector.Z;
+		    result.M34 = 0f;
+		    result.M41 = -Vector3.Dot(vector2, cameraPosition);
+		    result.M42 = -Vector3.Dot(vector3, cameraPosition);
+		    result.M43 = -Vector3.Dot(vector, cameraPosition);
+		    result.M44 = 1f;
         }
 
 
         public static Matrix CreateOrthographic(float width, float height, float zNearPlane, float zFarPlane)
         {
-            throw new NotImplementedException();
+            Matrix matrix;
+		    matrix.M11 = 2f / width;
+		    matrix.M12 = matrix.M13 = matrix.M14 = 0f;
+		    matrix.M22 = 2f / height;
+		    matrix.M21 = matrix.M23 = matrix.M24 = 0f;
+		    matrix.M33 = 1f / (zNearPlane - zFarPlane);
+		    matrix.M31 = matrix.M32 = matrix.M34 = 0f;
+		    matrix.M41 = matrix.M42 = 0f;
+		    matrix.M43 = zNearPlane / (zNearPlane - zFarPlane);
+		    matrix.M44 = 1f;
+		    return matrix;
         }
 
 
         public static void CreateOrthographic(float width, float height, float zNearPlane, float zFarPlane, out Matrix result)
         {
-            throw new NotImplementedException();
+            result.M11 = 2f / width;
+		    result.M12 = result.M13 = result.M14 = 0f;
+		    result.M22 = 2f / height;
+		    result.M21 = result.M23 = result.M24 = 0f;
+		    result.M33 = 1f / (zNearPlane - zFarPlane);
+		    result.M31 = result.M32 = result.M34 = 0f;
+		    result.M41 = result.M42 = 0f;
+		    result.M43 = zNearPlane / (zNearPlane - zFarPlane);
+		    result.M44 = 1f;
         }
 
 
@@ -444,45 +777,185 @@ namespace Microsoft.Xna.Framework
 
         
         public static void CreateOrthographicOffCenter(float left, float right, float bottom, float top,
-            float zNearPlane, float zFarPlane, out Matrix result)
+            float nearPlaneDistance, float farPlaneDistance, out Matrix result)
         {
-            result = CreateOrthographicOffCenter( left, right, bottom, top, zNearPlane, zFarPlane);
+            result = CreateOrthographicOffCenter( left, right, bottom, top, nearPlaneDistance, farPlaneDistance);
         }
 
 
-        public static Matrix CreatePerspective(float width, float height, float zNearPlane, float zFarPlane)
+        public static Matrix CreatePerspective(float width, float height, float nearPlaneDistance, float farPlaneDistance)
         {
-            throw new NotImplementedException();
+            Matrix matrix;
+		    if (nearPlaneDistance <= 0f)
+		    {
+		        throw new ArgumentException("nearPlaneDistance <= 0");
+		    }
+		    if (farPlaneDistance <= 0f)
+		    {
+		        throw new ArgumentException("farPlaneDistance <= 0");
+		    }
+		    if (nearPlaneDistance >= farPlaneDistance)
+		    {
+		        throw new ArgumentException("nearPlaneDistance >= farPlaneDistance");
+		    }
+		    matrix.M11 = (2f * nearPlaneDistance) / width;
+		    matrix.M12 = matrix.M13 = matrix.M14 = 0f;
+		    matrix.M22 = (2f * nearPlaneDistance) / height;
+		    matrix.M21 = matrix.M23 = matrix.M24 = 0f;
+		    matrix.M33 = farPlaneDistance / (nearPlaneDistance - farPlaneDistance);
+		    matrix.M31 = matrix.M32 = 0f;
+		    matrix.M34 = -1f;
+		    matrix.M41 = matrix.M42 = matrix.M44 = 0f;
+		    matrix.M43 = (nearPlaneDistance * farPlaneDistance) / (nearPlaneDistance - farPlaneDistance);
+		    return matrix;
         }
 
 
-        public static void CreatePerspective(float width, float height, float zNearPlane, float zFarPlane, out Matrix result)
+        public static void CreatePerspective(float width, float height, float nearPlaneDistance, float farPlaneDistance, out Matrix result)
         {
-            throw new NotImplementedException();
+            if (nearPlaneDistance <= 0f)
+		    {
+		        throw new ArgumentException("nearPlaneDistance <= 0");
+		    }
+		    if (farPlaneDistance <= 0f)
+		    {
+		        throw new ArgumentException("farPlaneDistance <= 0");
+		    }
+		    if (nearPlaneDistance >= farPlaneDistance)
+		    {
+		        throw new ArgumentException("nearPlaneDistance >= farPlaneDistance");
+		    }
+		    result.M11 = (2f * nearPlaneDistance) / width;
+		    result.M12 = result.M13 = result.M14 = 0f;
+		    result.M22 = (2f * nearPlaneDistance) / height;
+		    result.M21 = result.M23 = result.M24 = 0f;
+		    result.M33 = farPlaneDistance / (nearPlaneDistance - farPlaneDistance);
+		    result.M31 = result.M32 = 0f;
+		    result.M34 = -1f;
+		    result.M41 = result.M42 = result.M44 = 0f;
+		    result.M43 = (nearPlaneDistance * farPlaneDistance) / (nearPlaneDistance - farPlaneDistance);
         }
 
 
-        public static Matrix CreatePerspectiveFieldOfView(float fieldOfView, float aspectRatio, float zNearPlane, float zFarPlane)
+        public static Matrix CreatePerspectiveFieldOfView(float fieldOfView, float aspectRatio, float nearPlaneDistance, float farPlaneDistance)
         {
-            throw new NotImplementedException();
+            Matrix matrix;
+		    if ((fieldOfView <= 0f) || (fieldOfView >= 3.141593f))
+		    {
+		        throw new ArgumentException("fieldOfView <= 0 O >= PI");
+		    }
+		    if (nearPlaneDistance <= 0f)
+		    {
+		        throw new ArgumentException("nearPlaneDistance <= 0");
+		    }
+		    if (farPlaneDistance <= 0f)
+		    {
+		        throw new ArgumentException("farPlaneDistance <= 0");
+		    }
+		    if (nearPlaneDistance >= farPlaneDistance)
+		    {
+		        throw new ArgumentException("nearPlaneDistance >= farPlaneDistance");
+		    }
+		    float num = 1f / ((float) Math.Tan((double) (fieldOfView * 0.5f)));
+		    float num9 = num / aspectRatio;
+		    matrix.M11 = num9;
+		    matrix.M12 = matrix.M13 = matrix.M14 = 0f;
+		    matrix.M22 = num;
+		    matrix.M21 = matrix.M23 = matrix.M24 = 0f;
+		    matrix.M31 = matrix.M32 = 0f;
+		    matrix.M33 = farPlaneDistance / (nearPlaneDistance - farPlaneDistance);
+		    matrix.M34 = -1f;
+		    matrix.M41 = matrix.M42 = matrix.M44 = 0f;
+		    matrix.M43 = (nearPlaneDistance * farPlaneDistance) / (nearPlaneDistance - farPlaneDistance);
+		    return matrix;
         }
 
 
         public static void CreatePerspectiveFieldOfView(float fieldOfView, float aspectRatio, float nearPlaneDistance, float farPlaneDistance, out Matrix result)
         {
-            throw new NotImplementedException();
+            if ((fieldOfView <= 0f) || (fieldOfView >= 3.141593f))
+		    {
+		        throw new ArgumentException("fieldOfView <= 0 or >= PI");
+		    }
+		    if (nearPlaneDistance <= 0f)
+		    {
+		        throw new ArgumentException("nearPlaneDistance <= 0");
+		    }
+		    if (farPlaneDistance <= 0f)
+		    {
+		        throw new ArgumentException("farPlaneDistance <= 0");
+		    }
+		    if (nearPlaneDistance >= farPlaneDistance)
+		    {
+		        throw new ArgumentException("nearPlaneDistance >= farPlaneDistance");
+		    }
+		    float num = 1f / ((float) Math.Tan((double) (fieldOfView * 0.5f)));
+		    float num9 = num / aspectRatio;
+		    result.M11 = num9;
+		    result.M12 = result.M13 = result.M14 = 0f;
+		    result.M22 = num;
+		    result.M21 = result.M23 = result.M24 = 0f;
+		    result.M31 = result.M32 = 0f;
+		    result.M33 = farPlaneDistance / (nearPlaneDistance - farPlaneDistance);
+		    result.M34 = -1f;
+		    result.M41 = result.M42 = result.M44 = 0f;
+		    result.M43 = (nearPlaneDistance * farPlaneDistance) / (nearPlaneDistance - farPlaneDistance);
         }
 
 
-        public static Matrix CreatePerspectiveOffCenter(float left, float right, float bottom, float top, float zNearPlane, float zFarPlane)
+        public static Matrix CreatePerspectiveOffCenter(float left, float right, float bottom, float top, float nearPlaneDistance, float farPlaneDistance)
         {
-            throw new NotImplementedException();
+            Matrix matrix;
+		    if (nearPlaneDistance <= 0f)
+		    {
+		        throw new ArgumentException("nearPlaneDistance <= 0");
+		    }
+		    if (farPlaneDistance <= 0f)
+		    {
+		        throw new ArgumentException("farPlaneDistance <= 0");
+		    }
+		    if (nearPlaneDistance >= farPlaneDistance)
+		    {
+		        throw new ArgumentException("nearPlaneDistance >= farPlaneDistance");
+		    }
+		    matrix.M11 = (2f * nearPlaneDistance) / (right - left);
+		    matrix.M12 = matrix.M13 = matrix.M14 = 0f;
+		    matrix.M22 = (2f * nearPlaneDistance) / (top - bottom);
+		    matrix.M21 = matrix.M23 = matrix.M24 = 0f;
+		    matrix.M31 = (left + right) / (right - left);
+		    matrix.M32 = (top + bottom) / (top - bottom);
+		    matrix.M33 = farPlaneDistance / (nearPlaneDistance - farPlaneDistance);
+		    matrix.M34 = -1f;
+		    matrix.M43 = (nearPlaneDistance * farPlaneDistance) / (nearPlaneDistance - farPlaneDistance);
+		    matrix.M41 = matrix.M42 = matrix.M44 = 0f;
+		    return matrix;
         }
 
 
         public static void CreatePerspectiveOffCenter(float left, float right, float bottom, float top, float nearPlaneDistance, float farPlaneDistance, out Matrix result)
         {
-            throw new NotImplementedException();
+            if (nearPlaneDistance <= 0f)
+		    {
+		        throw new ArgumentException("nearPlaneDistance <= 0");
+		    }
+		    if (farPlaneDistance <= 0f)
+		    {
+		        throw new ArgumentException("farPlaneDistance <= 0");
+		    }
+		    if (nearPlaneDistance >= farPlaneDistance)
+		    {
+		        throw new ArgumentException("nearPlaneDistance >= farPlaneDistance");
+		    }
+		    result.M11 = (2f * nearPlaneDistance) / (right - left);
+		    result.M12 = result.M13 = result.M14 = 0f;
+		    result.M22 = (2f * nearPlaneDistance) / (top - bottom);
+		    result.M21 = result.M23 = result.M24 = 0f;
+		    result.M31 = (left + right) / (right - left);
+		    result.M32 = (top + bottom) / (top - bottom);
+		    result.M33 = farPlaneDistance / (nearPlaneDistance - farPlaneDistance);
+		    result.M34 = -1f;
+		    result.M43 = (nearPlaneDistance * farPlaneDistance) / (nearPlaneDistance - farPlaneDistance);
+		    result.M41 = result.M42 = result.M44 = 0f;
         }
 
 
@@ -644,49 +1117,142 @@ namespace Microsoft.Xna.Framework
 
         public float Determinant()
         {
-            throw new NotImplementedException();
+            float num22 = this.M11;
+		    float num21 = this.M12;
+		    float num20 = this.M13;
+		    float num19 = this.M14;
+		    float num12 = this.M21;
+		    float num11 = this.M22;
+		    float num10 = this.M23;
+		    float num9 = this.M24;
+		    float num8 = this.M31;
+		    float num7 = this.M32;
+		    float num6 = this.M33;
+		    float num5 = this.M34;
+		    float num4 = this.M41;
+		    float num3 = this.M42;
+		    float num2 = this.M43;
+		    float num = this.M44;
+		    float num18 = (num6 * num) - (num5 * num2);
+		    float num17 = (num7 * num) - (num5 * num3);
+		    float num16 = (num7 * num2) - (num6 * num3);
+		    float num15 = (num8 * num) - (num5 * num4);
+		    float num14 = (num8 * num2) - (num6 * num4);
+		    float num13 = (num8 * num3) - (num7 * num4);
+		    return ((((num22 * (((num11 * num18) - (num10 * num17)) + (num9 * num16))) - (num21 * (((num12 * num18) - (num10 * num15)) + (num9 * num14)))) + (num20 * (((num12 * num17) - (num11 * num15)) + (num9 * num13)))) - (num19 * (((num12 * num16) - (num11 * num14)) + (num10 * num13))));
         }
 
 
         public static Matrix Divide(Matrix matrix1, Matrix matrix2)
         {
-            throw new NotImplementedException();
+            Matrix matrix;
+		    matrix.M11 = matrix1.M11 / matrix2.M11;
+		    matrix.M12 = matrix1.M12 / matrix2.M12;
+		    matrix.M13 = matrix1.M13 / matrix2.M13;
+		    matrix.M14 = matrix1.M14 / matrix2.M14;
+		    matrix.M21 = matrix1.M21 / matrix2.M21;
+		    matrix.M22 = matrix1.M22 / matrix2.M22;
+		    matrix.M23 = matrix1.M23 / matrix2.M23;
+		    matrix.M24 = matrix1.M24 / matrix2.M24;
+		    matrix.M31 = matrix1.M31 / matrix2.M31;
+		    matrix.M32 = matrix1.M32 / matrix2.M32;
+		    matrix.M33 = matrix1.M33 / matrix2.M33;
+		    matrix.M34 = matrix1.M34 / matrix2.M34;
+		    matrix.M41 = matrix1.M41 / matrix2.M41;
+		    matrix.M42 = matrix1.M42 / matrix2.M42;
+		    matrix.M43 = matrix1.M43 / matrix2.M43;
+		    matrix.M44 = matrix1.M44 / matrix2.M44;
+		    return matrix;
         }
 
 
         public static void Divide(ref Matrix matrix1, ref Matrix matrix2, out Matrix result)
         {
-            throw new NotImplementedException();
+            result.M11 = matrix1.M11 / matrix2.M11;
+		    result.M12 = matrix1.M12 / matrix2.M12;
+		    result.M13 = matrix1.M13 / matrix2.M13;
+		    result.M14 = matrix1.M14 / matrix2.M14;
+		    result.M21 = matrix1.M21 / matrix2.M21;
+		    result.M22 = matrix1.M22 / matrix2.M22;
+		    result.M23 = matrix1.M23 / matrix2.M23;
+		    result.M24 = matrix1.M24 / matrix2.M24;
+		    result.M31 = matrix1.M31 / matrix2.M31;
+		    result.M32 = matrix1.M32 / matrix2.M32;
+		    result.M33 = matrix1.M33 / matrix2.M33;
+		    result.M34 = matrix1.M34 / matrix2.M34;
+		    result.M41 = matrix1.M41 / matrix2.M41;
+		    result.M42 = matrix1.M42 / matrix2.M42;
+		    result.M43 = matrix1.M43 / matrix2.M43;
+		    result.M44 = matrix1.M44 / matrix2.M44;
         }
 
 
         public static Matrix Divide(Matrix matrix1, float divider)
         {
-            throw new NotImplementedException();
+            Matrix matrix;
+		    float num = 1f / divider;
+		    matrix.M11 = matrix1.M11 * num;
+		    matrix.M12 = matrix1.M12 * num;
+		    matrix.M13 = matrix1.M13 * num;
+		    matrix.M14 = matrix1.M14 * num;
+		    matrix.M21 = matrix1.M21 * num;
+		    matrix.M22 = matrix1.M22 * num;
+		    matrix.M23 = matrix1.M23 * num;
+		    matrix.M24 = matrix1.M24 * num;
+		    matrix.M31 = matrix1.M31 * num;
+		    matrix.M32 = matrix1.M32 * num;
+		    matrix.M33 = matrix1.M33 * num;
+		    matrix.M34 = matrix1.M34 * num;
+		    matrix.M41 = matrix1.M41 * num;
+		    matrix.M42 = matrix1.M42 * num;
+		    matrix.M43 = matrix1.M43 * num;
+		    matrix.M44 = matrix1.M44 * num;
+		    return matrix;
         }
 
 
         public static void Divide(ref Matrix matrix1, float divider, out Matrix result)
         {
-            throw new NotImplementedException();
+            float num = 1f / divider;
+		    result.M11 = matrix1.M11 * num;
+		    result.M12 = matrix1.M12 * num;
+		    result.M13 = matrix1.M13 * num;
+		    result.M14 = matrix1.M14 * num;
+		    result.M21 = matrix1.M21 * num;
+		    result.M22 = matrix1.M22 * num;
+		    result.M23 = matrix1.M23 * num;
+		    result.M24 = matrix1.M24 * num;
+		    result.M31 = matrix1.M31 * num;
+		    result.M32 = matrix1.M32 * num;
+		    result.M33 = matrix1.M33 * num;
+		    result.M34 = matrix1.M34 * num;
+		    result.M41 = matrix1.M41 * num;
+		    result.M42 = matrix1.M42 * num;
+		    result.M43 = matrix1.M43 * num;
+		    result.M44 = matrix1.M44 * num;
         }
 
 
         public bool Equals(Matrix other)
         {
-            throw new NotImplementedException();
+            return ((((((this.M11 == other.M11) && (this.M22 == other.M22)) && ((this.M33 == other.M33) && (this.M44 == other.M44))) && (((this.M12 == other.M12) && (this.M13 == other.M13)) && ((this.M14 == other.M14) && (this.M21 == other.M21)))) && ((((this.M23 == other.M23) && (this.M24 == other.M24)) && ((this.M31 == other.M31) && (this.M32 == other.M32))) && (((this.M34 == other.M34) && (this.M41 == other.M41)) && (this.M42 == other.M42)))) && (this.M43 == other.M43));
         }
 
 
         public override bool Equals(object obj)
         {
-            throw new NotImplementedException();
+            bool flag = false;
+		    if (obj is Matrix)
+		    {
+		        flag = this.Equals((Matrix) obj);
+		    }
+		    return flag;
         }
 
 
         public override int GetHashCode()
         {
-            throw new NotImplementedException();
+            return (((((((((((((((this.M11.GetHashCode() + this.M12.GetHashCode()) + this.M13.GetHashCode()) + this.M14.GetHashCode()) + this.M21.GetHashCode()) + this.M22.GetHashCode()) + this.M23.GetHashCode()) + this.M24.GetHashCode()) + this.M31.GetHashCode()) + this.M32.GetHashCode()) + this.M33.GetHashCode()) + this.M34.GetHashCode()) + this.M41.GetHashCode()) + this.M42.GetHashCode()) + this.M43.GetHashCode()) + this.M44.GetHashCode());
         }
 
 
@@ -739,13 +1305,45 @@ namespace Microsoft.Xna.Framework
 
         public static Matrix Lerp(Matrix matrix1, Matrix matrix2, float amount)
         {
-            throw new NotImplementedException();
+            Matrix matrix;
+		    matrix.M11 = matrix1.M11 + ((matrix2.M11 - matrix1.M11) * amount);
+		    matrix.M12 = matrix1.M12 + ((matrix2.M12 - matrix1.M12) * amount);
+		    matrix.M13 = matrix1.M13 + ((matrix2.M13 - matrix1.M13) * amount);
+		    matrix.M14 = matrix1.M14 + ((matrix2.M14 - matrix1.M14) * amount);
+		    matrix.M21 = matrix1.M21 + ((matrix2.M21 - matrix1.M21) * amount);
+		    matrix.M22 = matrix1.M22 + ((matrix2.M22 - matrix1.M22) * amount);
+		    matrix.M23 = matrix1.M23 + ((matrix2.M23 - matrix1.M23) * amount);
+		    matrix.M24 = matrix1.M24 + ((matrix2.M24 - matrix1.M24) * amount);
+		    matrix.M31 = matrix1.M31 + ((matrix2.M31 - matrix1.M31) * amount);
+		    matrix.M32 = matrix1.M32 + ((matrix2.M32 - matrix1.M32) * amount);
+		    matrix.M33 = matrix1.M33 + ((matrix2.M33 - matrix1.M33) * amount);
+		    matrix.M34 = matrix1.M34 + ((matrix2.M34 - matrix1.M34) * amount);
+		    matrix.M41 = matrix1.M41 + ((matrix2.M41 - matrix1.M41) * amount);
+		    matrix.M42 = matrix1.M42 + ((matrix2.M42 - matrix1.M42) * amount);
+		    matrix.M43 = matrix1.M43 + ((matrix2.M43 - matrix1.M43) * amount);
+		    matrix.M44 = matrix1.M44 + ((matrix2.M44 - matrix1.M44) * amount);
+		    return matrix;
         }
 
 
         public static void Lerp(ref Matrix matrix1, ref Matrix matrix2, float amount, out Matrix result)
         {
-            throw new NotImplementedException();
+            result.M11 = matrix1.M11 + ((matrix2.M11 - matrix1.M11) * amount);
+		    result.M12 = matrix1.M12 + ((matrix2.M12 - matrix1.M12) * amount);
+		    result.M13 = matrix1.M13 + ((matrix2.M13 - matrix1.M13) * amount);
+		    result.M14 = matrix1.M14 + ((matrix2.M14 - matrix1.M14) * amount);
+		    result.M21 = matrix1.M21 + ((matrix2.M21 - matrix1.M21) * amount);
+		    result.M22 = matrix1.M22 + ((matrix2.M22 - matrix1.M22) * amount);
+		    result.M23 = matrix1.M23 + ((matrix2.M23 - matrix1.M23) * amount);
+		    result.M24 = matrix1.M24 + ((matrix2.M24 - matrix1.M24) * amount);
+		    result.M31 = matrix1.M31 + ((matrix2.M31 - matrix1.M31) * amount);
+		    result.M32 = matrix1.M32 + ((matrix2.M32 - matrix1.M32) * amount);
+		    result.M33 = matrix1.M33 + ((matrix2.M33 - matrix1.M33) * amount);
+		    result.M34 = matrix1.M34 + ((matrix2.M34 - matrix1.M34) * amount);
+		    result.M41 = matrix1.M41 + ((matrix2.M41 - matrix1.M41) * amount);
+		    result.M42 = matrix1.M42 + ((matrix2.M42 - matrix1.M42) * amount);
+		    result.M43 = matrix1.M43 + ((matrix2.M43 - matrix1.M43) * amount);
+		    result.M44 = matrix1.M44 + ((matrix2.M44 - matrix1.M44) * amount);
         }
 
         public static Matrix Multiply(Matrix matrix1, Matrix matrix2)
@@ -826,13 +1424,45 @@ namespace Microsoft.Xna.Framework
 
         public static Matrix Negate(Matrix matrix)
         {
-            throw new NotImplementedException();
+            Matrix matrix2;
+		    matrix2.M11 = -matrix.M11;
+		    matrix2.M12 = -matrix.M12;
+		    matrix2.M13 = -matrix.M13;
+		    matrix2.M14 = -matrix.M14;
+		    matrix2.M21 = -matrix.M21;
+		    matrix2.M22 = -matrix.M22;
+		    matrix2.M23 = -matrix.M23;
+		    matrix2.M24 = -matrix.M24;
+		    matrix2.M31 = -matrix.M31;
+		    matrix2.M32 = -matrix.M32;
+		    matrix2.M33 = -matrix.M33;
+		    matrix2.M34 = -matrix.M34;
+		    matrix2.M41 = -matrix.M41;
+		    matrix2.M42 = -matrix.M42;
+		    matrix2.M43 = -matrix.M43;
+		    matrix2.M44 = -matrix.M44;
+		    return matrix2;
         }
 
 
         public static void Negate(ref Matrix matrix, out Matrix result)
         {
-            throw new NotImplementedException();
+            result.M11 = -matrix.M11;
+		    result.M12 = -matrix.M12;
+		    result.M13 = -matrix.M13;
+		    result.M14 = -matrix.M14;
+		    result.M21 = -matrix.M21;
+		    result.M22 = -matrix.M22;
+		    result.M23 = -matrix.M23;
+		    result.M24 = -matrix.M24;
+		    result.M31 = -matrix.M31;
+		    result.M32 = -matrix.M32;
+		    result.M33 = -matrix.M33;
+		    result.M34 = -matrix.M34;
+		    result.M41 = -matrix.M41;
+		    result.M42 = -matrix.M42;
+		    result.M43 = -matrix.M43;
+		    result.M44 = -matrix.M44;
         }
 
 
@@ -845,13 +1475,48 @@ namespace Microsoft.Xna.Framework
 
         public static Matrix operator /(Matrix matrix1, Matrix matrix2)
         {
-            throw new NotImplementedException();
+            Matrix matrix;
+		    matrix.M11 = matrix1.M11 / matrix2.M11;
+		    matrix.M12 = matrix1.M12 / matrix2.M12;
+		    matrix.M13 = matrix1.M13 / matrix2.M13;
+		    matrix.M14 = matrix1.M14 / matrix2.M14;
+		    matrix.M21 = matrix1.M21 / matrix2.M21;
+		    matrix.M22 = matrix1.M22 / matrix2.M22;
+		    matrix.M23 = matrix1.M23 / matrix2.M23;
+		    matrix.M24 = matrix1.M24 / matrix2.M24;
+		    matrix.M31 = matrix1.M31 / matrix2.M31;
+		    matrix.M32 = matrix1.M32 / matrix2.M32;
+		    matrix.M33 = matrix1.M33 / matrix2.M33;
+		    matrix.M34 = matrix1.M34 / matrix2.M34;
+		    matrix.M41 = matrix1.M41 / matrix2.M41;
+		    matrix.M42 = matrix1.M42 / matrix2.M42;
+		    matrix.M43 = matrix1.M43 / matrix2.M43;
+		    matrix.M44 = matrix1.M44 / matrix2.M44;
+		    return matrix;
         }
 
 
         public static Matrix operator /(Matrix matrix1, float divider)
         {
-            throw new NotImplementedException();
+            Matrix matrix;
+		    float num = 1f / divider;
+		    matrix.M11 = matrix1.M11 * num;
+		    matrix.M12 = matrix1.M12 * num;
+		    matrix.M13 = matrix1.M13 * num;
+		    matrix.M14 = matrix1.M14 * num;
+		    matrix.M21 = matrix1.M21 * num;
+		    matrix.M22 = matrix1.M22 * num;
+		    matrix.M23 = matrix1.M23 * num;
+		    matrix.M24 = matrix1.M24 * num;
+		    matrix.M31 = matrix1.M31 * num;
+		    matrix.M32 = matrix1.M32 * num;
+		    matrix.M33 = matrix1.M33 * num;
+		    matrix.M34 = matrix1.M34 * num;
+		    matrix.M41 = matrix1.M41 * num;
+		    matrix.M42 = matrix1.M42 * num;
+		    matrix.M43 = matrix1.M43 * num;
+		    matrix.M44 = matrix1.M44 * num;
+		    return matrix;
         }
 
 
@@ -926,31 +1591,115 @@ namespace Microsoft.Xna.Framework
 
         public static Matrix operator *(Matrix matrix, float scaleFactor)
         {
-            throw new NotImplementedException();
+            Matrix matrix2;
+		    float num = scaleFactor;
+		    matrix2.M11 = matrix.M11 * num;
+		    matrix2.M12 = matrix.M12 * num;
+		    matrix2.M13 = matrix.M13 * num;
+		    matrix2.M14 = matrix.M14 * num;
+		    matrix2.M21 = matrix.M21 * num;
+		    matrix2.M22 = matrix.M22 * num;
+		    matrix2.M23 = matrix.M23 * num;
+		    matrix2.M24 = matrix.M24 * num;
+		    matrix2.M31 = matrix.M31 * num;
+		    matrix2.M32 = matrix.M32 * num;
+		    matrix2.M33 = matrix.M33 * num;
+		    matrix2.M34 = matrix.M34 * num;
+		    matrix2.M41 = matrix.M41 * num;
+		    matrix2.M42 = matrix.M42 * num;
+		    matrix2.M43 = matrix.M43 * num;
+		    matrix2.M44 = matrix.M44 * num;
+		    return matrix2;
         }
 
 
         public static Matrix operator -(Matrix matrix1, Matrix matrix2)
         {
-            throw new NotImplementedException();
+            Matrix matrix;
+		    matrix.M11 = matrix1.M11 - matrix2.M11;
+		    matrix.M12 = matrix1.M12 - matrix2.M12;
+		    matrix.M13 = matrix1.M13 - matrix2.M13;
+		    matrix.M14 = matrix1.M14 - matrix2.M14;
+		    matrix.M21 = matrix1.M21 - matrix2.M21;
+		    matrix.M22 = matrix1.M22 - matrix2.M22;
+		    matrix.M23 = matrix1.M23 - matrix2.M23;
+		    matrix.M24 = matrix1.M24 - matrix2.M24;
+		    matrix.M31 = matrix1.M31 - matrix2.M31;
+		    matrix.M32 = matrix1.M32 - matrix2.M32;
+		    matrix.M33 = matrix1.M33 - matrix2.M33;
+		    matrix.M34 = matrix1.M34 - matrix2.M34;
+		    matrix.M41 = matrix1.M41 - matrix2.M41;
+		    matrix.M42 = matrix1.M42 - matrix2.M42;
+		    matrix.M43 = matrix1.M43 - matrix2.M43;
+		    matrix.M44 = matrix1.M44 - matrix2.M44;
+		    return matrix;
         }
 
 
         public static Matrix operator -(Matrix matrix1)
         {
-            throw new NotImplementedException();
+            Matrix matrix;
+		    matrix.M11 = -matrix1.M11;
+		    matrix.M12 = -matrix1.M12;
+		    matrix.M13 = -matrix1.M13;
+		    matrix.M14 = -matrix1.M14;
+		    matrix.M21 = -matrix1.M21;
+		    matrix.M22 = -matrix1.M22;
+		    matrix.M23 = -matrix1.M23;
+		    matrix.M24 = -matrix1.M24;
+		    matrix.M31 = -matrix1.M31;
+		    matrix.M32 = -matrix1.M32;
+		    matrix.M33 = -matrix1.M33;
+		    matrix.M34 = -matrix1.M34;
+		    matrix.M41 = -matrix1.M41;
+		    matrix.M42 = -matrix1.M42;
+		    matrix.M43 = -matrix1.M43;
+		    matrix.M44 = -matrix1.M44;
+		    return matrix;
         }
 
 
         public static Matrix Subtract(Matrix matrix1, Matrix matrix2)
         {
-            throw new NotImplementedException();
+            Matrix matrix;
+		    matrix.M11 = matrix1.M11 - matrix2.M11;
+		    matrix.M12 = matrix1.M12 - matrix2.M12;
+		    matrix.M13 = matrix1.M13 - matrix2.M13;
+		    matrix.M14 = matrix1.M14 - matrix2.M14;
+		    matrix.M21 = matrix1.M21 - matrix2.M21;
+		    matrix.M22 = matrix1.M22 - matrix2.M22;
+		    matrix.M23 = matrix1.M23 - matrix2.M23;
+		    matrix.M24 = matrix1.M24 - matrix2.M24;
+		    matrix.M31 = matrix1.M31 - matrix2.M31;
+		    matrix.M32 = matrix1.M32 - matrix2.M32;
+		    matrix.M33 = matrix1.M33 - matrix2.M33;
+		    matrix.M34 = matrix1.M34 - matrix2.M34;
+		    matrix.M41 = matrix1.M41 - matrix2.M41;
+		    matrix.M42 = matrix1.M42 - matrix2.M42;
+		    matrix.M43 = matrix1.M43 - matrix2.M43;
+		    matrix.M44 = matrix1.M44 - matrix2.M44;
+		    return matrix;
         }
 
 
         public static void Subtract(ref Matrix matrix1, ref Matrix matrix2, out Matrix result)
         {
-            throw new NotImplementedException();
+            result.M11 = matrix1.M11 - matrix2.M11;
+		    result.M12 = matrix1.M12 - matrix2.M12;
+		    result.M13 = matrix1.M13 - matrix2.M13;
+		    result.M14 = matrix1.M14 - matrix2.M14;
+		    result.M21 = matrix1.M21 - matrix2.M21;
+		    result.M22 = matrix1.M22 - matrix2.M22;
+		    result.M23 = matrix1.M23 - matrix2.M23;
+		    result.M24 = matrix1.M24 - matrix2.M24;
+		    result.M31 = matrix1.M31 - matrix2.M31;
+		    result.M32 = matrix1.M32 - matrix2.M32;
+		    result.M33 = matrix1.M33 - matrix2.M33;
+		    result.M34 = matrix1.M34 - matrix2.M34;
+		    result.M41 = matrix1.M41 - matrix2.M41;
+		    result.M42 = matrix1.M42 - matrix2.M42;
+		    result.M43 = matrix1.M43 - matrix2.M43;
+		    result.M44 = matrix1.M44 - matrix2.M44;
         }
 
 
