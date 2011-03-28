@@ -9,7 +9,6 @@
 
 #region Using Statements
 using System;
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 #endregion
@@ -24,12 +23,12 @@ namespace Marblets
         /// <summary>
         /// Width of a marble in HD resolution screen coordinates
         /// </summary>
-        public const int Width = 25;
+        public const int Width = 45;
 
         /// <summary>
         /// Height of a marble in HD resolution screen coordinates
         /// </summary>
-        public const int Height = 25;
+        public const int Height = 45;
 
         /// <summary>
         /// How long it takes a marble to break
@@ -63,7 +62,9 @@ namespace Marblets
         /// Marble position
         /// </summary>
         private Vector2 position2D;
-        public Vector2 boardLocation;
+
+
+
 
         /// <summary>
         /// Current state of the animation
@@ -165,28 +166,23 @@ namespace Marblets
         /// Draws the specified marble
         /// </summary>
         /// <param name="spriteBatch">The sprite batch to use</param>
-        public void Draw(SpriteBatch spriteBatch)
+        public void Draw(RelativeSpriteBatch spriteBatch)
         {
             Draw2DMarble(spriteBatch);
         }
 
-        private void Draw2DMarble(SpriteBatch spriteBatch)
+        private void Draw2DMarble(RelativeSpriteBatch spriteBatch)
         {
             //Draw the 2d marble
-
-            // Added functionality to account for the screen orientation.
             if (Animation == Animation.Breaking || Animation == Animation.Gone)
             {
                 //Draw the correct frame.
                 spriteBatch.Draw(breakTexture, Position, new Rectangle(frame * Width, 0,
-                    Width, Height), Color, MarbletsGame.screenRotation, Vector2.Zero, 
-                    1.0f, SpriteEffects.None, 0.0f);
+                                 Width, Height), Color);
             }
             else
             {
-                spriteBatch.Draw(marble, Position, null, Color, 
-                    MarbletsGame.screenRotation, Vector2.Zero, 1.0f, SpriteEffects.None,
-                    0.0f);
+                spriteBatch.Draw(marble, Position, Color);
 
                 //Highlight selected marbles
                 if (Selected)
@@ -198,9 +194,7 @@ namespace Marblets
                                               (byte)(-pulseFactor * 255.0));
 
                         //pulse the single ring
-                        spriteBatch.Draw(glowRing1Texture, Position, null, fade, 
-                            MarbletsGame.screenRotation, Vector2.Zero, 1.0f, 
-                            SpriteEffects.None, 0.0f);
+                        spriteBatch.Draw(glowRing1Texture, Position, fade);
                     }
                     else
                     {
@@ -210,9 +204,7 @@ namespace Marblets
                         Color fade = new Color(255, 255, 255,
                                               (byte)(pulseFactor * 255.0));
 
-                        spriteBatch.Draw(glowRing2Texture, Position, null, fade, 
-                            MarbletsGame.screenRotation, Vector2.Zero, 1.0f, 
-                            SpriteEffects.None, 0.0f);
+                        spriteBatch.Draw(glowRing2Texture, Position, fade);
                     }
                 }
             }
@@ -237,12 +229,12 @@ namespace Marblets
         public static void LoadContent()
         {
             breakTexture =
-                MarbletsGame.Content.Load<Texture2D>("marble_burst_zunehd");
+                MarbletsGame.Content.Load<Texture2D>("Textures/marble_burst");
             glowRing1Texture =
-                MarbletsGame.Content.Load<Texture2D>("marble_glow_1ring_zunehd");
+                MarbletsGame.Content.Load<Texture2D>("Textures/marble_glow_1ring");
             glowRing2Texture =
-                MarbletsGame.Content.Load<Texture2D>("marble_glow_2rings_zunehd");
-            marble = MarbletsGame.Content.Load<Texture2D>("marble_zunehd");
+                MarbletsGame.Content.Load<Texture2D>("Textures/marble_glow_2rings");
+            marble = MarbletsGame.Content.Load<Texture2D>("Textures/marble");
         }
     }
 }

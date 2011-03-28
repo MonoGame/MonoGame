@@ -74,6 +74,12 @@ namespace Microsoft.Xna.Framework
 			}
 		}
 		
+		public Blend AlphaSourceBlend 
+		{ 
+			get; 
+			set; 
+		}
+		
 		public Blend DestinationBlend
 		{ 
 			get; 

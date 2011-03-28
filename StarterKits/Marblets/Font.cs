@@ -9,7 +9,6 @@
 
 #region Using Statements
 using System;
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 #endregion
@@ -21,6 +20,7 @@ namespace Marblets
     /// </summary>
     public enum FontStyle
     {
+
         /// <summary>
         /// Small font
         /// </summary>
@@ -37,9 +37,6 @@ namespace Marblets
     /// </summary>
     public static class Font
     {
-        // Added to scale the font for the Zune HD.
-        public static float ZuneFontScale = 0.360f;
-
         private struct FontInfo
         {
             public string Filename;
@@ -64,11 +61,12 @@ namespace Marblets
 
         private static FontInfo[] fontInfo = new FontInfo[] 
         {
-            new FontInfo("numbers_small", "1234567890,", 10, 32, 18, 32),
-            new FontInfo("numbers_large", "1234567890,", 20, 64, 30, 64),
+            new FontInfo("Textures/numbers_small", "1234567890,", 10, 32, 18, 32),
+            new FontInfo("Textures/numbers_large", "1234567890,", 20, 64, 30, 64),
         };
 
         private static Texture2D[] fontTextures = new Texture2D[fontInfo.Length];
+
 
         /// <summary>
         /// Load graphics content.
@@ -93,12 +91,13 @@ namespace Marblets
         /// <param name="x">X position in screen pixel space</param>
         /// <param name="y">Y position in screen pixel space</param>
         /// <param name="number">The number to draw</param>
-        public static void Draw(SpriteBatch spriteBatch, FontStyle fontStyle,
+        public static void Draw(RelativeSpriteBatch spriteBatch, FontStyle fontStyle,
                                 int x, int y, int number)
         {
             //No color - use 'white' i.e. use whatever is in the file
             Draw(spriteBatch, fontStyle, x, y, number.ToString(), Color.White);
         }
+
 
         /// <summary>
         /// Draws some text from the given font
@@ -108,12 +107,14 @@ namespace Marblets
         /// <param name="x">X position in screen pixel space</param>
         /// <param name="y">Y position in screen pixel space</param>
         /// <param name="digits">The characters to draw</param>
-        public static void Draw(SpriteBatch spriteBatch, FontStyle fontStyle,
+        public static void Draw(RelativeSpriteBatch spriteBatch, FontStyle fontStyle,
                                 int x, int y, string digits)
         {
             //No color - use 'white' i.e. use whatever is in the file
             Draw(spriteBatch, fontStyle, x, y, digits, Color.White);
         }
+
+
 
         /// <summary>
         /// Draws some text from the given font
@@ -123,12 +124,13 @@ namespace Marblets
         /// <param name="position">A vector x,y position</param>
         /// <param name="number">A number to draw</param>
         /// <param name="color">The color of the text</param>
-        public static void Draw(SpriteBatch spriteBatch, FontStyle fontStyle,
+        public static void Draw(RelativeSpriteBatch spriteBatch, FontStyle fontStyle,
                                 Vector2 position, int number, Color color)
         {
             Draw(spriteBatch, fontStyle, (int)position.X, (int)position.Y,
                  number.ToString(), color);
         }
+
 
         /// <summary>
         /// Draws some text from the given font
@@ -139,10 +141,10 @@ namespace Marblets
         /// <param name="y">Y position in screen pixel space</param>
         /// <param name="digits">The characters to draw</param>
         /// <param name="color">The color to draw it in</param>
-        public static void Draw(SpriteBatch spriteBatch, FontStyle fontStyle,
+        public static void Draw(RelativeSpriteBatch spriteBatch, FontStyle fontStyle,
                                 int x, int y, string digits, Color color)
         {
-            float yPosition = y;
+            float xPosition = x;
             FontInfo thisFont = fontInfo[(int)fontStyle];
 
             for (int i = 0; i < digits.Length; i++)
@@ -154,36 +156,18 @@ namespace Marblets
                     int character = thisFont.Characters.IndexOf(digits[i]);
 
                     //Draw the correct character at the correct position
-                    spriteBatch.Draw(fontTextures[(int)fontStyle], new Vector2((float)x,
-                        yPosition), new Rectangle(character * thisFont.CharacterSpacing +
-                        thisFont.StartOffset, 0, thisFont.CharacterWidth,
-                        thisFont.CharacterHeight), color, MarbletsGame.screenRotation,
-                        Vector2.Zero, ZuneFontScale, SpriteEffects.None, 0.0f);
+                    spriteBatch.Draw(fontTextures[(int)fontStyle],
+                                     new Vector2(xPosition, (float)y),
+                        new Rectangle(character * thisFont.CharacterSpacing +
+                                      thisFont.StartOffset, 0, thisFont.CharacterWidth,
+                                      thisFont.CharacterHeight), color);
                 }
 
                 //Move the position of the next character.
                 //If the character is a comma or colon then use a 'fudge factor' to make 
                 //the font look a little proportional
-
-                // Added functionality to account for the screen orientation and to scale
-                // the font for the Zune HD.
-                switch (MarbletsGame.screenOrientation)
-                {
-                    case MarbletsGame.ScreenOrientation.LandscapeRight:
-                        yPosition -= ((digits[i] == ',' || digits[i] == ':') ?
-                            thisFont.CharacterWidth / 2 : thisFont.CharacterWidth) * 
-                            ZuneFontScale;
-                        break;
-
-                    case MarbletsGame.ScreenOrientation.LandscapeLeft:
-                        yPosition += ((digits[i] == ',' || digits[i] == ':') ?
-                            thisFont.CharacterWidth / 2 : thisFont.CharacterWidth) * 
-                            ZuneFontScale;
-                        break;
-
-                    default:
-                        break;
-                }
+                xPosition += ((digits[i] == ',' || digits[i] == ':') ?
+                              thisFont.CharacterWidth / 2 : thisFont.CharacterWidth);
             }
         }
     }

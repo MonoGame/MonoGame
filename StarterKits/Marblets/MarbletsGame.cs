@@ -12,7 +12,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Xml.Serialization;
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
@@ -20,7 +19,6 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Storage;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.GamerServices;
-using Microsoft.Xna.Framework.Input.Touch;
 #endregion
 
 namespace Marblets
@@ -30,24 +28,6 @@ namespace Marblets
     /// </summary>
     partial class MarbletsGame : Game
     {
-        // Added functionality to account for the screen orientation.
-        public enum ScreenOrientation
-        {
-            Normal,
-            UpsideDown,
-            LandscapeRight,
-            LandscapeLeft
-        }
-
-        public static ScreenOrientation screenOrientation =
-            ScreenOrientation.LandscapeRight;
-        public static ScreenOrientation priorScreenOrientation =
-            ScreenOrientation.LandscapeRight;
-        public static float screenRotation = 4.72f;
-
-        public static TouchCollection touchCollection;
-        public static AccelerometerState accelerometerState;
-
         /// <summary>
         /// A cache of content used by the game
         /// </summary>
@@ -80,36 +60,60 @@ namespace Marblets
         private GraphicsDeviceManager graphics;
         private GameScreen mainGame;
         private TitleScreen splashScreen;
+        private InputHelper inputHelper;
+        private int previousWindowWidth = 1024;
+        private int previousWindowHeight = 768;
+        private KeyboardState keyState;
+        private bool justWentFullScreen;
+
 
         public MarbletsGame()
         {
-            Settings.Load();
+#if !XBOX360
+            //Uncomment this line to force a save of the default settings file. Useful 
+            //when you had added things to settings.cs
+            //project Settings.Save("settings.xml");
+#endif
+            Settings = Settings.Load("settings.xml");
 
             //Create the content pipeline manager.
             base.Content.RootDirectory = "Content";
             MarbletsGame.Content = base.Content;
 
-            //Set up the device to be HD res.
+            //Set up the device to be HD res. The RelativeSpriteBatch will handle 
+            //resizing for us
             graphics = new GraphicsDeviceManager(this);
-			
-			// Zune use 30 frames per second
-			this.TargetElapsedTime = TimeSpan.FromSeconds(1/30.0f);
-			
-			// The assets need to be stretched...put some quality
-			graphics.PreferMultiSampling = true;
 
-            mainGame = new GameScreen(this, "play_frame_zunehd");
+            // If the window size changes, then our  drawable area changes and the 
+            // game graphics might not fit.  
+            // Hook into DeviceReset event so we can resize the graphics.
+            graphics.DeviceReset +=
+                new EventHandler(OnGraphicsComponentDeviceReset);
+
+            graphics.PreferredBackBufferWidth = 1024;
+            graphics.PreferredBackBufferHeight = 768;
+			
+			graphics.SupportedOrientations = DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight;
+
+            Window.AllowUserResizing = true;
+
+            mainGame = new GameScreen(this, "Textures/play_frame"/* TODO, SoundEntry.MusicGame*/);
             mainGame.Enabled = false;
             mainGame.Visible = false;
             this.Components.Add(mainGame);
 
-            splashScreen = new TitleScreen(this, "title_frame_zunehd");
+            splashScreen = new TitleScreen(this, "Textures/title_frame"/*TODO, SoundEntry.MusicTitle */);
             splashScreen.Enabled = true;
             splashScreen.Visible = true;
             this.Components.Add(splashScreen);
 
+            inputHelper = new InputHelper(this);
+            inputHelper.UpdateOrder = int.MinValue;
+            this.Components.Add(inputHelper);
+
             this.Components.Add(new GamerServicesComponent(this));
         }
+
 
         /// <summary>
         /// Allows the game to perform any initialization it needs to before starting to
@@ -119,6 +123,10 @@ namespace Marblets
         /// </summary>
         protected override void Initialize()
         {
+            //Initialize the sound helper 1st since some of the components expect it to
+            //be running
+            // TODO Sound.Initialize();
+
             //This will call initialize on all the game components
             base.Initialize();
 
@@ -128,7 +136,6 @@ namespace Marblets
             {
                 HighScores.Add(500 - i * 100);
             }
-
             // try to load the real ones...
             // now that the GamerServicesComponent has initialize,
             // we can show the Guide to get the storage device for the high scores
@@ -147,8 +154,8 @@ namespace Marblets
             }
             else
             {
-                /* TODO Guide.BeginShowStorageDeviceSelector(
-                    new AsyncCallback(LoadHighScoresCallback), null); */
+                Guide.BeginShowStorageDeviceSelector(
+                    new AsyncCallback(LoadHighScoresCallback), null);
             }
         }
 
@@ -159,9 +166,8 @@ namespace Marblets
         {
             if ((result != null) && result.IsCompleted)
             {
-                // TODO MarbletsGame.StorageDevice = Guide.EndShowStorageDeviceSelector(result);
+                MarbletsGame.StorageDevice = Guide.EndShowStorageDeviceSelector(result);
             }
-
             if ((MarbletsGame.StorageDevice != null) &&
                 MarbletsGame.StorageDevice.IsConnected)
             {
@@ -169,8 +175,7 @@ namespace Marblets
                     MarbletsGame.StorageDevice.OpenContainer("Marblets"))
                 {
                     string highscoresPath = Path.Combine(storageContainer.Path,
-                        "highscores.xml");
-
+                                                         "highscores.xml");
                     if (File.Exists(highscoresPath))
                     {
                         using (FileStream file =
@@ -194,9 +199,17 @@ namespace Marblets
                 (IGraphicsDeviceService)Services.GetService(
                 typeof(IGraphicsDeviceService));
 
+            //Correct settings for alpha blending in 3d game mode
+            graphicsService.GraphicsDevice.RenderState.AlphaSourceBlend =
+                Blend.SourceAlpha;
+
+            graphicsService.GraphicsDevice.RenderState.DestinationBlend =
+                Blend.InverseSourceAlpha;
+
             //Ask static helper objects to reload too
             Font.LoadContent();
         }
+
 
         /// <summary>
         /// Allows the game to run logic such as updating the world,
@@ -207,32 +220,31 @@ namespace Marblets
         {
             base.Update(gameTime);
 
-            touchCollection = TouchPanel.GetState();
-            accelerometerState = Accelerometer.GetState();
+            //Handle FullScreen
+            keyState = Keyboard.GetState();
 
-            // Use X axis to determine if the Zune is being viewed from the
-            // left or right side.
-            // Leave fixed for now, need to rethink recalculating marble
-            // positions when screen is rotated.
-            
-            if (accelerometerState.Acceleration.X >= 0.0 &&
-                accelerometerState.Acceleration.X < 1.0)
+            // Allows the default game to exit on Xbox 360 and Windows
+            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
+                AltComboPressed(keyState, Keys.F4) ||
+                keyState.IsKeyDown(Keys.Escape))
             {
-                screenOrientation = ScreenOrientation.LandscapeRight;
-                screenRotation = 4.72f;
-            }
-            else
-            {
-                screenOrientation = ScreenOrientation.LandscapeLeft;
-                screenRotation = 1.57f;
+                this.Exit();
             }
 
-            if (screenOrientation != priorScreenOrientation)
+            if ((keyState.IsKeyDown(Keys.RightAlt) || keyState.IsKeyDown(Keys.LeftAlt))
+                && keyState.IsKeyDown(Keys.Enter) && !justWentFullScreen)
             {
-                if (GameState == GameState.Play2D)
-                    mainGame.RecalculateMarblePositions();
-    
-                priorScreenOrientation = screenOrientation;
+                ToggleFullScreen();
+                justWentFullScreen = true;
+            }
+            if (keyState.IsKeyUp(Keys.Enter))
+            {
+                justWentFullScreen = false;
+            }
+
+            if (InputHelper.GamePads[PlayerIndex.One].StartPressed)
+            {
+                NextGameState = GameState.Started;
             }
 
             if (NextGameState != GameState.None)
@@ -249,10 +261,10 @@ namespace Marblets
         protected override void Draw(GameTime gameTime)
         {
             graphics.GraphicsDevice.Clear(Color.Black);
-            
             //Nothing to draw the components will handle it
             base.Draw(gameTime);
         }
+
 
         private void ChangeGameState()
         {
@@ -279,6 +291,7 @@ namespace Marblets
                 mainGame.Visible = false;
 
                 GameState = NextGameState;
+
             }
         }
 
@@ -287,8 +300,55 @@ namespace Marblets
             splashScreen.Shutdown();
             mainGame.Shutdown();
 
+            Sound.Shutdown();
+
             base.OnExiting(sender, args);
-             }*/
+        } */
+
+        private void ToggleFullScreen()
+        {
+            PresentationParameters presentation =
+                graphics.GraphicsDevice.PresentationParameters;
+
+            if (presentation.IsFullScreen)
+            {   // going windowed
+                graphics.PreferredBackBufferWidth = previousWindowWidth;
+                graphics.PreferredBackBufferHeight = previousWindowHeight;
+            }
+            else
+            {
+                previousWindowWidth = graphics.GraphicsDevice.Viewport.Width;
+                previousWindowWidth = graphics.GraphicsDevice.Viewport.Width;
+
+                // going fullscreen, use desktop resolution to minimize display mode 
+                // changes this also has the nice effect of working around some displays
+                // that lie about supporting 1024x768
+                /* TODO not supported in XNA 4.0 GraphicsAdapter adapter = graphics.GraphicsDevice.CreationParameters.Adapter;
+
+                graphics.PreferredBackBufferWidth = adapter.CurrentDisplayMode.Width;
+                graphics.PreferredBackBufferHeight = adapter.CurrentDisplayMode.Height;*/
+            }
+
+            graphics.ToggleFullScreen();
+        }
+
+        /// <summary>
+        /// Checks whether an alt+key combo is pressed.
+        /// </summary>
+        private static bool AltComboPressed(KeyboardState state, Keys key)
+        {
+            return state.IsKeyDown(key) &&
+                   (state.IsKeyDown(Keys.LeftAlt) ||
+                    state.IsKeyDown(Keys.RightAlt));
+        }
+
+        /// <summary>
+        /// Resize the game graphics when the window size changes
+        /// </summary>
+        void OnGraphicsComponentDeviceReset(object sender, EventArgs e)
+        {
+            mainGame.SpriteBatch.Resize();
+        }
     }
 
     /// <summary>
@@ -315,5 +375,7 @@ namespace Marblets
         /// Currently playing the 2d version
         /// </summary>
         Play2D,
+
     }
+
 }

@@ -14,6 +14,8 @@
     <BundleDisplayName>Marblets</BundleDisplayName>
     <BundleIcon>GameThumbnail.png</BundleIcon>
     <Thumbnail>GameThumbnail.png</Thumbnail>
+    <SupportedDevices>IPad</SupportedDevices>
+    <BundleIconIPad>GameThumbnail.png</BundleIconIPad>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhoneSimulator' ">
     <DebugSymbols>true</DebugSymbols>
@@ -114,6 +116,9 @@
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Folder Include="Content\" />
+    <Folder Include="Content\Textures\" />
+    <Folder Include="Content\Audio\" />
+    <Folder Include="Content\Audio\Wav\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Font.cs" />
@@ -125,45 +130,41 @@
     <Compile Include="Screen.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="TitleScreen.cs" />
+    <Compile Include="GamePadHelper.cs" />
+    <Compile Include="GamePads.cs" />
+    <Compile Include="InputHelper.cs" />
+    <Compile Include="TutorialGameBoard.cs" />
+    <Compile Include="RelativeSprite.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="GameThumbnail.png" />
     <Content Include="settings.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\game_over_frame_zunehd.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\marble_burst_zunehd.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\marble_cursor_zunehd.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\marble_glow_1ring_zunehd.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\marble_glow_2rings_zunehd.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\marble_zunehd.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\numbers_large.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\numbers_small.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\play_frame_zunehd.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\title_frame_zunehd.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="Default.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Content\Audio\Wav\clear_4.wav" />
+    <Content Include="Content\Audio\Wav\clear_bonus.wav" />
+    <Content Include="Content\Audio\Wav\clear_illegal.wav" />
+    <Content Include="Content\Audio\Wav\drop1.wav" />
+    <Content Include="Content\Audio\Wav\drop2.wav" />
+    <Content Include="Content\Audio\Wav\IntroMus.wav" />
+    <Content Include="Content\Audio\Wav\MusLoop_Temp1.wav" />
+    <Content Include="Content\Audio\Wav\navigate_1.wav" />
+    <Content Include="Content\Audio\Wav\start_1.wav" />
+    <Content Include="Content\Audio\Wav\start_3.wav" />
+    <Content Include="Content\Textures\game_over_frame.png" />
+    <Content Include="Content\Textures\marble.png" />
+    <Content Include="Content\Textures\marble_burst.png" />
+    <Content Include="Content\Textures\marble_cursor.png" />
+    <Content Include="Content\Textures\marble_glow_1ring.png" />
+    <Content Include="Content\Textures\marble_glow_2rings.png" />
+    <Content Include="Content\Textures\marble_tex1.png" />
+    <Content Include="Content\Textures\numbers_large.png" />
+    <Content Include="Content\Textures\numbers_small.png" />
+    <Content Include="Content\Textures\play_frame.png" />
+    <Content Include="Content\Textures\title_frame.png" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
@@ -178,5 +179,8 @@
       <Project>{DB8508BB-9849-4CC2-BC0F-8EB5DACB3C47}</Project>
       <Name>MonoGame.Framework.iOS</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Info.plist" />
   </ItemGroup>
 </Project>
