@@ -234,6 +234,7 @@ namespace Microsoft.Xna.Framework
         {
             return string.Format("{{Position:{0} Direction:{1}}}", Position.ToString(), Direction.ToString());
         }
+		
+		#endregion
     }
 }
-
