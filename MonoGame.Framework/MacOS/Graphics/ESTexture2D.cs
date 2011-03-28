@@ -37,7 +37,6 @@ permitted under your local laws, the contributors exclude the implied warranties
 purpose and non-infringement.
 */
 #endregion License
-
 using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
@@ -48,245 +47,228 @@ using MonoMac.CoreGraphics;
 using MonoMac.Foundation;
 using MonoMac.OpenGL;
 
-
 namespace Microsoft.Xna.Framework.Graphics
 {
 	internal class ESTexture2D : IDisposable
 	{
 		private uint _name;
 		private Size _size;
-		private int _width,_height;
+		private int _width, _height;
 		private SurfaceFormat _format;
-		private float _maxS,_maxT;
+		private float _maxS, _maxT;
 		private IntPtr _pixelData;
-		
-		public ESTexture2D(IntPtr data, SurfaceFormat pixelFormat, int width, int height, Size size, All filter)
+
+		public ESTexture2D (IntPtr data,SurfaceFormat pixelFormat,int width,int height,Size size,All filter)
 		{
-			InitWithData(data,pixelFormat,width,height,size, filter);
+			InitWithData (data, pixelFormat, width, height, size, filter);
 		}
-		
-		public ESTexture2D(NSImage nsImage, All filter)
+
+		public ESTexture2D (NSImage nsImage, All filter)
 		{
 			// TODO InitWithCGImage(nsImage,filter);
-			CGImage image = nsImage.AsCGImage(RectangleF.Empty, null, null);
-			InitWithCGImage(image, filter);
+			CGImage image = nsImage.AsCGImage (RectangleF.Empty, null, null);
+			InitWithCGImage (image, filter);
 		}
-		
-		public ESTexture2D(CGImage cgImage, All filter)
+
+		public ESTexture2D (CGImage cgImage, All filter)
 		{
-			InitWithCGImage(cgImage,filter);
+			InitWithCGImage (cgImage, filter);
 		}
-		
-		private void InitWithCGImage(CGImage image, All filter)
+
+		private void InitWithCGImage (CGImage image, All filter)
 		{
-			int	width,height,i;
-	        CGContext context = null;
-	        IntPtr data;
-	        CGColorSpace colorSpace;
-	        IntPtr tempData;
-	        bool hasAlpha;
-	        CGImageAlphaInfo info;
-	        CGAffineTransform transform;
-	        Size imageSize;
-	        SurfaceFormat pixelFormat;
-	        bool sizeToFit = false;
-			
-			if(image == null) 
-			{
-				throw new ArgumentException(" NSImage is invalid! " );
+			int	width, height, i;
+			CGContext context = null;
+			IntPtr data;
+			CGColorSpace colorSpace;
+			IntPtr tempData;
+			bool hasAlpha;
+			CGImageAlphaInfo info;
+			CGAffineTransform transform;
+			Size imageSize;
+			SurfaceFormat pixelFormat;
+			bool sizeToFit = false;
+
+			if (image == null) {
+				throw new ArgumentException (" NSImage is invalid! " );
 			}
-			
+
 			info = image.AlphaInfo;
 			hasAlpha = ((info == CGImageAlphaInfo.PremultipliedLast) || (info == CGImageAlphaInfo.PremultipliedFirst) || (info == CGImageAlphaInfo.Last) || (info == CGImageAlphaInfo.First) ? true : false);
-			
-			if (image.ColorSpace != null)
-			{
-				if (hasAlpha)
-				{
+
+			if (image.ColorSpace != null) {
+				if (hasAlpha) {
 					pixelFormat = SurfaceFormat.Rgba32;
-				}
-				else
-				{
+				} else {
 					pixelFormat = SurfaceFormat.Rgb32;
 				}
-			}
-			else 
-			{	
+			} else {	
 				pixelFormat = SurfaceFormat.Alpha8;
 			}
-	
-			imageSize = new Size(image.Width,image.Height);
-			transform = CGAffineTransform.MakeIdentity();
+
+			imageSize = new Size (image.Width,image.Height);
+			transform = CGAffineTransform.MakeIdentity ();
 			width = imageSize.Width;
-	
-			if((width != 1) && ((width & (width - 1))!=0)) {
+
+			if ((width != 1) && ((width & (width - 1)) != 0)) {
 				i = 1;
-				while((sizeToFit ? 2 * i : i) < width)
+				while ((sizeToFit ? 2 * i : i) < width)
 					i *= 2;
 				width = i;
 			}
 			height = imageSize.Height;
-			if((height != 1) && ((height & (height - 1))!=0)) {
+			if ((height != 1) && ((height & (height - 1)) != 0)) {
 				i = 1;
-				while((sizeToFit ? 2 * i : i) < height)
+				while ((sizeToFit ? 2 * i : i) < height)
 					i *= 2;
 				height = i;
 			}
 			// TODO: kMaxTextureSize = 1024
-			while((width > 1024) || (height > 1024)) 
-			{
+			while ((width > 1024) || (height > 1024)) {
 				width /= 2;
 				height /= 2;
-				transform = CGAffineTransform.MakeScale(0.5f,0.5f);
+				transform = CGAffineTransform.MakeScale (0.5f, 0.5f);
 				imageSize.Width /= 2;
 				imageSize.Height /= 2;
 			}
-			
-			switch(pixelFormat) 
-			{		
-				case SurfaceFormat.Rgba32:
-					colorSpace = CGColorSpace.CreateDeviceRGB();
-					data = Marshal.AllocHGlobal(height * width * 4);
-					context = new CGBitmapContext(data, width, height, 8, 4 * width, colorSpace,CGImageAlphaInfo.PremultipliedLast);
-					colorSpace.Dispose();
-					break;
-				case SurfaceFormat.Rgb32:
-					colorSpace = CGColorSpace.CreateDeviceRGB();
-					data = Marshal.AllocHGlobal(height * width * 4);
-					context = new CGBitmapContext(data, width, height, 8, 4 * width, colorSpace, CGImageAlphaInfo.NoneSkipLast);
-					colorSpace.Dispose();
-					break;					
-				case SurfaceFormat.Alpha8:
-					data = Marshal.AllocHGlobal(height * width);
-					context = new CGBitmapContext(data, width, height, 8, width, null, CGImageAlphaInfo.Only);
-					break;				
-				default:
-					throw new NotSupportedException("Invalid pixel format"); 
+
+			switch (pixelFormat) {		
+			case SurfaceFormat.Rgba32:
+				colorSpace = CGColorSpace.CreateDeviceRGB ();
+				data = Marshal.AllocHGlobal (height * width * 4);
+				context = new CGBitmapContext (data, width, height, 8, 4 * width, colorSpace,CGImageAlphaInfo.PremultipliedLast);
+				colorSpace.Dispose ();
+				break;
+			case SurfaceFormat.Rgb32:
+				colorSpace = CGColorSpace.CreateDeviceRGB ();
+				data = Marshal.AllocHGlobal (height * width * 4);
+				context = new CGBitmapContext (data, width, height, 8, 4 * width, colorSpace, CGImageAlphaInfo.NoneSkipLast);
+				colorSpace.Dispose ();
+				break;					
+			case SurfaceFormat.Alpha8:
+				data = Marshal.AllocHGlobal (height * width);
+				context = new CGBitmapContext (data, width, height, 8, width, null, CGImageAlphaInfo.Only);
+				break;				
+			default:
+				throw new NotSupportedException ("Invalid pixel format"); 
 			}
-				
-			context.ClearRect(new RectangleF(0,0,width,height));
- 			context.TranslateCTM(0, height - imageSize.Height);
-			
-			if (!transform.IsIdentity)
-			{
-				context.ConcatCTM(transform);
+
+			context.ClearRect (new RectangleF (0,0,width,height));
+			context.TranslateCTM (0, height - imageSize.Height);
+
+			if (!transform.IsIdentity) {
+				context.ConcatCTM (transform);
 			}
-			
-			context.DrawImage(new RectangleF(0, 0, image.Width, image.Height), image);
-			
+
+			context.DrawImage (new RectangleF (0, 0, image.Width, image.Height), image);
+
 			//Convert "RRRRRRRRRGGGGGGGGBBBBBBBBAAAAAAAA" to "RRRRRGGGGGGBBBBB"
-			if(pixelFormat == SurfaceFormat.Rgb32) {
-				tempData = Marshal.AllocHGlobal(height * width * 2);
-				
+			if (pixelFormat == SurfaceFormat.Rgb32) {
+				tempData = Marshal.AllocHGlobal (height * width * 2);
+
 				int d32;
 				short d16;
-				int inPixel32Count=0,outPixel16Count=0;
-				for(i = 0; i < width * height; ++i, inPixel32Count+=sizeof(int))
-				{
-					d32 = Marshal.ReadInt32(data,inPixel32Count);
+				int inPixel32Count = 0, outPixel16Count=0;
+				for (i = 0; i < width * height; ++i, inPixel32Count+=sizeof(int)) {
+					d32 = Marshal.ReadInt32 (data, inPixel32Count);
 					short R = (short)((((d32 >> 0) & 0xFF) >> 3) << 11);
 					short G = (short)((((d32 >> 8) & 0xFF) >> 2) << 5);
 					short B = (short)((((d32 >> 16) & 0xFF) >> 3) << 0);
-					d16 = (short)  (R | G | B);
-					Marshal.WriteInt16(tempData,outPixel16Count,d16);
+					d16 = (short)(R | G | B);
+					Marshal.WriteInt16 (tempData, outPixel16Count, d16);
 					outPixel16Count += sizeof(short);
 				}
-				Marshal.FreeHGlobal(data);
+				Marshal.FreeHGlobal (data);
 				data = tempData;			
 			}
-			
-			InitWithData(data,pixelFormat,width,height,imageSize, filter);
-	
-			context.Dispose();
+
+			InitWithData (data, pixelFormat, width, height, imageSize, filter);
+
+			context.Dispose ();
 			Marshal.FreeHGlobal (data);	
 		}
-				
+
 		public void Dispose ()
 		{
-			if(_name != 0) 
-			{
-	 			GL.DeleteTextures(1, ref _name);
+			if (_name != 0) {
+				GL.DeleteTextures (1, ref _name);
 			}
 		}
-		
-		private static byte GetBits64(ulong source, int first, int length, int shift)
-        {
+
+		private static byte GetBits64 (ulong source, int first, int length, int shift)
+		{
 			uint[] bitmasks = { 0x00, 0x01, 0x03, 0x07, 0x0f, 0x1f, 0x3f, 0x7f, 0xff };
-            uint bitmask = bitmasks[length];
-            source = source >> first;
-            source = source & bitmask;
-            source = source << shift;
-            return (byte)source;
-        }
-		
-		private static byte GetBits(uint source, int first, int length, int shift)
-        {
+			uint bitmask = bitmasks [length];
+			source = source >> first;
+			source = source & bitmask;
+			source = source << shift;
+			return (byte)source;
+		}
+
+		private static byte GetBits (uint source, int first, int length, int shift)
+		{
 			uint[] bitmasks = { 0x00, 0x01, 0x03, 0x07, 0x0f, 0x1f, 0x3f, 0x7f, 0xff };
-			
-            uint bitmask = bitmasks[length];
-            source = source >> first;
-            source = source & bitmask;
-            source = source << shift;
-            return (byte)source;
-        }
 
-		
-		private static void SetColorFromPacked(byte[] data, int offset, byte alpha, uint packed)
-        {
-            byte r = (byte)(GetBits(packed, 0, 8, 0));
-            byte g = (byte)(GetBits(packed, 8, 8, 0));
-            byte b = (byte)(GetBits(packed, 16, 8, 0));
-            data[offset] = r;
-            data[offset + 1] = g;
-            data[offset + 2] = b;
-            data[offset + 3] = alpha;
-        }
+			uint bitmask = bitmasks [length];
+			source = source >> first;
+			source = source & bitmask;
+			source = source << shift;
+			return (byte)source;
+		}
 
-		private static void ColorsFromPacked(uint[] colors, uint c0, uint c1, bool flag)
-        {
-            uint rb0, rb1, rb2, rb3, g0, g1, g2, g3;
+		private static void SetColorFromPacked (byte[] data, int offset, byte alpha, uint packed)
+		{
+			byte r = (byte)(GetBits (packed, 0, 8, 0));
+			byte g = (byte)(GetBits (packed, 8, 8, 0));
+			byte b = (byte)(GetBits (packed, 16, 8, 0));
+			data [offset] = r;
+			data [offset + 1] = g;
+			data [offset + 2] = b;
+			data [offset + 3] = alpha;
+		}
 
-            rb0 = (c0 << 3 | c0 << 8) & 0xf800f8;
-            rb1 = (c1 << 3 | c1 << 8) & 0xf800f8;
-            rb0 += (rb0 >> 5) & 0x070007;
-            rb1 += (rb1 >> 5) & 0x070007;
-            g0 = (c0 << 5) & 0x00fc00;
-            g1 = (c1 << 5) & 0x00fc00;
-            g0 += (g0 >> 6) & 0x000300;
-            g1 += (g1 >> 6) & 0x000300;
+		private static void ColorsFromPacked (uint[] colors, uint c0, uint c1, bool flag)
+		{
+			uint rb0, rb1, rb2, rb3, g0, g1, g2, g3;
 
-            colors[0] = rb0 + g0;
-            colors[1] = rb1 + g1;
+			rb0 = (c0 << 3 | c0 << 8) & 0xf800f8;
+			rb1 = (c1 << 3 | c1 << 8) & 0xf800f8;
+			rb0 += (rb0 >> 5) & 0x070007;
+			rb1 += (rb1 >> 5) & 0x070007;
+			g0 = (c0 << 5) & 0x00fc00;
+			g1 = (c1 << 5) & 0x00fc00;
+			g0 += (g0 >> 6) & 0x000300;
+			g1 += (g1 >> 6) & 0x000300;
 
-            if (c0 > c1 || flag)
-            {
-                rb2 = (((2 * rb0 + rb1) * 21) >> 6) & 0xff00ff;
-                rb3 = (((2 * rb1 + rb0) * 21) >> 6) & 0xff00ff;
-                g2 = (((2 * g0 + g1) * 21) >> 6) & 0x00ff00;
-                g3 = (((2 * g1 + g0) * 21) >> 6) & 0x00ff00;
-                colors[3] = rb3 + g3;
-            }
-            else
-            {
-                rb2 = ((rb0 + rb1) >> 1) & 0xff00ff;
-                g2 = ((g0 + g1) >> 1) & 0x00ff00;
-                colors[3] = 0;
-            }
+			colors [0] = rb0 + g0;
+			colors [1] = rb1 + g1;
 
-            colors[2] = rb2 + g2;
-        }
-		
-		static public ESTexture2D InitiFromDxt3File(BinaryReader rdr, int length, int width, int height)
-        {
-            byte [] b = GetBits (width, length, height, rdr);
-			
+			if (c0 > c1 || flag) {
+				rb2 = (((2 * rb0 + rb1) * 21) >> 6) & 0xff00ff;
+				rb3 = (((2 * rb1 + rb0) * 21) >> 6) & 0xff00ff;
+				g2 = (((2 * g0 + g1) * 21) >> 6) & 0x00ff00;
+				g3 = (((2 * g1 + g0) * 21) >> 6) & 0x00ff00;
+				colors [3] = rb3 + g3;
+			} else {
+				rb2 = ((rb0 + rb1) >> 1) & 0xff00ff;
+				g2 = ((g0 + g1) >> 1) & 0x00ff00;
+				colors [3] = 0;
+			}
+
+			colors [2] = rb2 + g2;
+		}
+
+		static public ESTexture2D InitiFromDxt3File (BinaryReader rdr, int length, int width, int height)
+		{
+			byte [] b = GetBits (width, length, height, rdr);
+
 			// Copy bits
-			IntPtr pointer = Marshal.AllocHGlobal(length);
+			IntPtr pointer = Marshal.AllocHGlobal (length);
 			Marshal.Copy (b, 0, pointer, length);
-            ESTexture2D result = new ESTexture2D(pointer,SurfaceFormat.Dxt3,width,height,new Size(width,height),All.Linear);
-			Marshal.FreeHGlobal(pointer);
+			ESTexture2D result = new ESTexture2D (pointer,SurfaceFormat.Dxt3,width,height,new Size (width,height),All.Linear);
+			Marshal.FreeHGlobal (pointer);
 			return result;
-        }
+		}
 
 		public static byte[] GetBits (int width, int length, int height, BinaryReader rdr)
 		{
@@ -309,7 +291,7 @@ namespace Microsoft.Xna.Framework.Graphics
 					lu = rdr.ReadUInt32 ();
 					for (int i = 0; i < 16; i++) {
 						int idx = GetBits (lu, 30 - i * 2, 2, 0);
-						uint ci = colors[idx];
+						uint ci = colors [idx];
 						int ii = 15 - i;
 						byte a = (byte)(GetBits64 (alpha, ii * 4, 4, 0));
 						a += (byte)(a << 4);
@@ -323,40 +305,40 @@ namespace Microsoft.Xna.Framework.Graphics
 			return b;
 		}
 
-
-		public void InitWithData(IntPtr data, SurfaceFormat pixelFormat, int width, int height, Size size, All filter)
+		public void InitWithData (IntPtr data, SurfaceFormat pixelFormat, int width, int height, Size size, All filter)
 		{		
-			GL.GenTextures(1,out _name);
-			GL.BindTexture(TextureTarget.Texture2D, _name);
-			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int) filter);
-			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int) filter);
-			
+			GL.GenTextures (1, out _name);
+			GL.BindTexture (TextureTarget.Texture2D, _name);
+			GL.TexParameter (TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)filter);
+			GL.TexParameter (TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)filter);
+
 			int sz = 0;
 
-			switch(pixelFormat) {				
-				case SurfaceFormat.Rgba32 /*kTexture2DPixelFormat_RGBA8888*/:
-				case SurfaceFormat.Dxt3 :
-				    sz = 4;
-					GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, (int) width, (int) height, 0, MonoMac.OpenGL.PixelFormat.Rgba, PixelType.UnsignedByte, data);
-					break;
-				case SurfaceFormat.Bgra4444 /*kTexture2DPixelFormat_RGBA4444*/:
-					sz = 2;
-					GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, (int) width, (int) height, 0, MonoMac.OpenGL.PixelFormat.Rgba, PixelType.UnsignedShort4444, data);
-					break;
-				case SurfaceFormat.Bgra5551 /*kTexture2DPixelFormat_RGB5A1*/:
-					sz = 2;
-					GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, (int) width, (int) height, 0, MonoMac.OpenGL.PixelFormat.Rgba, PixelType.UnsignedShort5551, data);
-					break;
-				case SurfaceFormat.Rgb32 /*kTexture2DPixelFormat_RGB565*/:
-					sz = 2;
-					GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgb, (int) width, (int) height, 0, MonoMac.OpenGL.PixelFormat.Rgb, PixelType.UnsignedShort565, data);
-					break;
-				case SurfaceFormat.Alpha8 /*kTexture2DPixelFormat_A8*/:
-					sz = 1;
-					GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Alpha, (int) width, (int) height, 0, MonoMac.OpenGL.PixelFormat.Alpha, PixelType.UnsignedByte, data);
-					break;
-				default:
-					throw new NotSupportedException("Texture format");;					
+			switch (pixelFormat) {				
+			case SurfaceFormat.Rgba32 /*kTexture2DPixelFormat_RGBA8888*/:
+			case SurfaceFormat.Dxt3 :
+				sz = 4;
+				GL.TexImage2D (TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, (int)width, (int)height, 0, MonoMac.OpenGL.PixelFormat.Rgba, PixelType.UnsignedByte, data);
+				break;
+			case SurfaceFormat.Bgra4444 /*kTexture2DPixelFormat_RGBA4444*/:
+				sz = 2;
+				GL.TexImage2D (TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, (int)width, (int)height, 0, MonoMac.OpenGL.PixelFormat.Rgba, PixelType.UnsignedShort4444, data);
+				break;
+			case SurfaceFormat.Bgra5551 /*kTexture2DPixelFormat_RGB5A1*/:
+				sz = 2;
+				GL.TexImage2D (TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, (int)width, (int)height, 0, MonoMac.OpenGL.PixelFormat.Rgba, PixelType.UnsignedShort5551, data);
+				break;
+			case SurfaceFormat.Rgb32 /*kTexture2DPixelFormat_RGB565*/:
+				sz = 2;
+				GL.TexImage2D (TextureTarget.Texture2D, 0, PixelInternalFormat.Rgb, (int)width, (int)height, 0, MonoMac.OpenGL.PixelFormat.Rgb, PixelType.UnsignedShort565, data);
+				break;
+			case SurfaceFormat.Alpha8 /*kTexture2DPixelFormat_A8*/:
+				sz = 1;
+				GL.TexImage2D (TextureTarget.Texture2D, 0, PixelInternalFormat.Alpha, (int)width, (int)height, 0, MonoMac.OpenGL.PixelFormat.Alpha, PixelType.UnsignedByte, data);
+				break;
+			default:
+				throw new NotSupportedException ("Texture format");
+				;					
 			}
 
 			_size = size;
@@ -365,11 +347,11 @@ namespace Microsoft.Xna.Framework.Graphics
 			_format = pixelFormat;
 			_maxS = size.Width / (float)width;
 			_maxT = size.Height / (float)height;
-						
+
 			_pixelData = data;
 		}
-		
-		public void DrawAtPoint(Vector2 point)
+
+		public void DrawAtPoint (Vector2 point)
 		{
 			float []coordinates = { 0,	_maxT, _maxS, _maxT, 0, 0,_maxS, 0 };
 			float width = (float)_width * _maxS;
@@ -378,84 +360,68 @@ namespace Microsoft.Xna.Framework.Graphics
 								width / 2.0f + point.X,	-height / 2.0f + point.Y,	0.0f,
 								-width / 2.0f + point.X,	height / 2.0f + point.Y,	0.0f,
 								width / 2.0f + point.X,	height / 2.0f + point.Y,	0.0f };
-			
-			GL.BindTexture(TextureTarget.Texture2D, _name);
-			GL.VertexPointer(3, VertexPointerType.Float, 0, vertices);
-			GL.TexCoordPointer(2, TexCoordPointerType.Float, 0, coordinates);
-			GL.DrawArrays(BeginMode.TriangleStrip, 0, 4);
+
+			GL.BindTexture (TextureTarget.Texture2D, _name);
+			GL.VertexPointer (3, VertexPointerType.Float, 0, vertices);
+			GL.TexCoordPointer (2, TexCoordPointerType.Float, 0, coordinates);
+			GL.DrawArrays (BeginMode.TriangleStrip, 0, 4);
 		}
-		
-		public void DrawInRect(Rectangle rect)
+
+		public void DrawInRect (Rectangle rect)
 		{
 			float[]	 coordinates = {  0, _maxT,_maxS, _maxT,0, 0,_maxS,	0  };
 			float[]	vertices = { rect.Left,	rect.Top, 0.0f, rect.Right, rect.Top,0.0f,rect.Left,rect.Bottom,0.0f,rect.Right,rect.Bottom,0.0f };
-			
-			GL.BindTexture(TextureTarget.Texture2D, _name);
-			GL.VertexPointer(3, VertexPointerType.Float, 0, vertices);
-			GL.TexCoordPointer(2, TexCoordPointerType.Float, 0, coordinates);
-			GL.DrawArrays(BeginMode.TriangleStrip, 0, 4);
+
+			GL.BindTexture (TextureTarget.Texture2D, _name);
+			GL.VertexPointer (3, VertexPointerType.Float, 0, vertices);
+			GL.TexCoordPointer (2, TexCoordPointerType.Float, 0, coordinates);
+			GL.DrawArrays (BeginMode.TriangleStrip, 0, 4);
 		}
-		
-		public Size ContentSize
-		{
-			get 
-			{
+
+		public Size ContentSize {
+			get {
 				return _size;
 			}
 		}
-		
-		public SurfaceFormat PixelFormat
-		{
-			get 
-			{
+
+		public SurfaceFormat PixelFormat {
+			get {
 				return _format;
 			}
 		}
-		
-		public int PixelsWide 
-		{
-			get 
-			{
+
+		public int PixelsWide {
+			get {
 				return _width;
 			}
 		}
-		
-		public int PixelsHigh 
-		{
-			get 
-			{
+
+		public int PixelsHigh {
+			get {
 				return _height;
 			}
 		}
-		
-		public uint Name 
-		{
-			get 
-			{
+
+		public uint Name {
+			get {
 				return _name;
 			}
 		}
-		
-		public float MaxS 
-		{
-			get 
-			{
+
+		public float MaxS {
+			get {
 				return _maxS;
 			}
 		}
-		
-		public float MaxT 
-		{
-			get 
-			{
+
+		public float MaxT {
+			get {
 				return _maxT;
 			}
 		}
-		
-		public IntPtr PixelData 
-		{
-			get 
-			{
+
+		public IntPtr PixelData {
+			get {
 				return _pixelData;
 			}
 		}
