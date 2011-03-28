@@ -86,8 +86,8 @@ namespace Microsoft.Xna.Framework
 			_gameComponentCollection = new GameComponentCollection ();
 
 			//Create a full-screen window
-			_mainWindow = new NSWindow (NSScreen.MainScreen.Frame, NSWindowStyle.Titled, NSBackingStore.Buffered, false);
-
+			_mainWindow = new NSWindow (NSScreen.MainScreen.Frame, NSWindowStyle.Titled | NSWindowStyle.Closable, NSBackingStore.Buffered, false);
+			
 			// Perform any other window configuration you desire
 			_mainWindow.IsOpaque = true;
 			_mainWindow.HidesOnDeactivate = true;
@@ -96,6 +96,7 @@ namespace Microsoft.Xna.Framework
 			_view.game = this;		
 			
 			_mainWindow.ContentView = _view;
+			_mainWindow.AcceptsMouseMovedEvents = true;
 			_mainWindow.MakeKeyAndOrderFront(_mainWindow);										
 
 			// Initialize GameTime
@@ -255,7 +256,6 @@ namespace Microsoft.Xna.Framework
 			_lastUpdate = DateTime.Now;
 
 			_view.Run (FramesPerSecond / (FramesPerSecond * TargetElapsedTime.TotalSeconds));	
-
 			/*TODO _view.MainContext = _view.EAGLContext;
 			_view.ShareGroup = _view.MainContext.ShareGroup;
 			_view.BackgroundContext = new MonoTouch.OpenGLES.EAGLContext(_view.ContextRenderingApi, _view.ShareGroup); */
