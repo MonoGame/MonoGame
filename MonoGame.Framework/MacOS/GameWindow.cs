@@ -64,9 +64,9 @@ namespace Microsoft.Xna.Framework
 		private GameTime _drawGameTime;
 		private DateTime _lastUpdate;
 		private DateTime _now;
-		public NSOpenGLContext MainContext;
-		public NSOpenGLContext BackgroundContext;
-		public NSOpenGLContext ShareGroup; 
+		//public NSOpenGLContext MainContext;
+		//public NSOpenGLContext BackgroundContext;
+		//public NSOpenGLContext ShareGroup; 
 
 		#region UIVIew Methods		
 		public GameWindow (RectangleF frame) : base (frame)
@@ -88,13 +88,12 @@ namespace Microsoft.Xna.Framework
 			// Initialize _lastUpdate
 			_lastUpdate = DateTime.Now;
 		}
-		
 
-		public GameWindow (RectangleF frame, NSOpenGLContext context) : base(frame)
+		public GameWindow (RectangleF frame,NSOpenGLContext context) : base(frame)
 		{
-			
+
 		}
-		
+
 		[Export("initWithFrame:")]
 		public GameWindow () : base (NSScreen.MainScreen.Frame)
 		{
@@ -120,35 +119,6 @@ namespace Microsoft.Xna.Framework
 			//
 		}
 
-		/* TODO [Export ("layerClass")]
-		static Class LayerClass() 
-		{
-			return MonoMacGameView.GetLayerClass ();
-		}
-
-		protected override void ConfigureLayer(CAEAGLLayer eaglLayer) 
-		{
-			eaglLayer.Opaque = true;
-		}
-
-		protected override void CreateFrameBuffer()
-		{	    
-			try
-			{
-			// TODO ContextRenderingApi = EAGLRenderingAPI.OpenGLES2;
-				ContextRenderingApi = EAGLRenderingAPI.OpenGLES1;
-				base.CreateFrameBuffer();
-			} 
-			catch (Exception) 
-			{
-			// device doesn't support OpenGLES 2.0; retry with 1.1:
-			ContextRenderingApi = EAGLRenderingAPI.OpenGLES1;
-				base.CreateFrameBuffer();
-			}
-
-
-		}*/
-
 		#endregion
 
 		#region MonoMacGameView Methods
@@ -172,7 +142,7 @@ namespace Microsoft.Xna.Framework
 		{
 			base.OnRenderFrame (e);
 
-			MakeCurrent ();
+			//MakeCurrent ();
 
 			// This code was commented to make the code base more iPhone like.
 			// More speed testing is required, to see if this is worse or better
@@ -184,7 +154,7 @@ namespace Microsoft.Xna.Framework
 				game.DoDraw (_drawGameTime);
 			}
 
-			SwapBuffers ();
+			//SwapBuffers ();
 		}
 
 		protected override void OnResize (EventArgs e)
@@ -390,28 +360,86 @@ namespace Microsoft.Xna.Framework
 		}	
 
 		private DisplayOrientation _currentOrientation;
-		public DisplayOrientation CurrentOrientation 
-		{ 
-			get
-            {
-                return _currentOrientation;
-            }
-            internal set
-            {
-                if (value != _currentOrientation)
-                {
-                    _currentOrientation = value;
-                    if (OrientationChanged != null)
-                    {
-                        OrientationChanged(this, EventArgs.Empty);
-                    }
-                }
-            }
+
+		public DisplayOrientation CurrentOrientation { 
+			get {
+				return _currentOrientation;
+			}
+			internal set {
+				if (value != _currentOrientation) {
+					_currentOrientation = value;
+					if (OrientationChanged != null) {
+						OrientationChanged (this, EventArgs.Empty);
+					}
+				}
+			}
 		}
-		
+
 		public event EventHandler<EventArgs> OrientationChanged;
 		public event EventHandler ClientSizeChanged;
 		public event EventHandler ScreenDeviceNameChanged;
+
+		// make sure we get mouse move events.
+		public override bool AcceptsFirstResponder ()
+		{
+			return true;
+		}
+		
+		public override void MouseDown (NSEvent theEvent)
+		{
+			PointF loc = NSEvent.CurrentMouseLocation;
+			//Console.WriteLine(NSEvent.CurrentMouseLocation);
+			SetMousePosition(loc);
+			switch (theEvent.Type) 
+			{
+				
+			case NSEventType.LeftMouseDown:
+				Mouse.LeftButton = ButtonState.Pressed;
+				break;
+			case NSEventType.RightMouseDown:
+				Mouse.RightButton = ButtonState.Pressed;
+				break;
+			//case NSEventType.LeftMouseDown:
+			//	Mouse.LeftButton = ButtonState.Pressed;
+			//	break;
+					
+				
+			}
+		}
+		
+		public override void MouseUp (NSEvent theEvent)
+		{
+			PointF loc = NSEvent.CurrentMouseLocation;
+			//Console.WriteLine(NSEvent.CurrentMouseLocation);
+			SetMousePosition(loc);
+			switch (theEvent.Type) 
+			{
+				
+			case NSEventType.LeftMouseUp:
+				Mouse.LeftButton = ButtonState.Released;
+				break;
+			case NSEventType.RightMouseUp:
+				Mouse.RightButton = ButtonState.Released;
+				break;
+			//case NSEventType.LeftMouseDown:
+			//	Mouse.LeftButton = ButtonState.Pressed;
+			//	break;
+					
+				
+			}
+		}		
+		public override void MouseMoved (NSEvent theEvent)
+		{
+			PointF loc = NSEvent.CurrentMouseLocation;
+			//Console.WriteLine(loc);
+			SetMousePosition(loc);
+		}
+		
+		private void SetMousePosition(PointF location)
+		{
+			Mouse.SetPosition((int)location.X, (int)(ClientBounds.Height - location.Y));
+			
+		}
 	}
 }
 

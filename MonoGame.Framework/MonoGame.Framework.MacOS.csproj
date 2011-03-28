@@ -97,7 +97,6 @@
     <Compile Include="Input\GamePadState.cs" />
     <Compile Include="Input\KeyboardState.cs" />
     <Compile Include="Input\KeyState.cs" />
-    <Compile Include="Input\MouseState.cs" />
     <Compile Include="Input\GamePadThumbSticks.cs" />
     <Compile Include="Input\Buttons.cs" />
     <Compile Include="Input\GamePadCapabilities.cs" />
@@ -237,6 +236,8 @@
     <Compile Include="Graphics\Effect\IEffectLights.cs" />
     <Compile Include="Graphics\Effect\IEffectMatrices.cs" />
     <Compile Include="Graphics\DirectionalLight.cs" />
+    <Compile Include="MacOS\Input\Mouse.cs" />
+    <Compile Include="MacOS\Input\MouseState.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />
@@ -253,5 +254,6 @@
     <Folder Include="MacOS\Media\" />
     <Folder Include="MacOS\Graphics\States\" />
     <Folder Include="MacOS\Graphics\Effect\" />
+    <Folder Include="MacOS\Input\" />
   </ItemGroup>
 </Project>
