@@ -9,10 +9,9 @@
 
 #region Using Statements
 using System;
-
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Audio;
 #endregion
 
 namespace Marblets
@@ -23,15 +22,18 @@ namespace Marblets
     /// </summary>
     public class Screen : DrawableGameComponent
     {
+        private bool isMusicPlaying;
+        // TODO private Cue cue;
+        // TODO private SoundEntry backgroundMusic;
         private Texture2D backgroundTexture;
         private string backgroundImage;
-        private SpriteBatch batch;
+        private RelativeSpriteBatch batch;
 
         /// <summary>
         /// Gets the sprite batch used for this screen
         /// </summary>
         /// <value>The sprite batch for this screen</value>
-        public SpriteBatch SpriteBatch
+        public RelativeSpriteBatch SpriteBatch
         {
             get
             {
@@ -47,10 +49,11 @@ namespace Marblets
         /// visible</param>
         /// <param name="backgroundMusic">The background music to play when this is 
         /// visible</param>
-        public Screen(Game game, string backgroundImage)
+        public Screen(Game game, string backgroundImage/* TODO, SoundEntry backgroundMusic*/)
             : base(game)
         {
             this.backgroundImage = backgroundImage;
+            // TODO this.backgroundMusic = backgroundMusic;
         }
 
         /// <summary>
@@ -60,6 +63,7 @@ namespace Marblets
         public override void Initialize()
         {
             base.Initialize();
+            StartMusic();
         }
 
         /// <summary>
@@ -72,6 +76,30 @@ namespace Marblets
         protected override void OnVisibleChanged(object sender, EventArgs args)
         {
             base.OnVisibleChanged(sender, args);
+            if (!Visible)
+            {
+                ShutdownMusic();
+            }
+            else
+            {
+                StartMusic();
+            }
+
+        }
+
+        private void ShutdownMusic()
+        {
+            if (isMusicPlaying)
+            {
+                // TODO Sound.Stop(cue);
+                isMusicPlaying = false;
+            }
+        }
+
+        private void StartMusic()
+        {
+            // TODO cue = Sound.Play(backgroundMusic);
+            isMusicPlaying = true;
         }
 
         /// <summary>
@@ -79,6 +107,8 @@ namespace Marblets
         /// </summary>
         public virtual void Shutdown()
         {
+            ShutdownMusic();
+
             if (batch != null)
             {
                 batch.Dispose();
@@ -96,15 +126,16 @@ namespace Marblets
                 Game.Services.GetService(typeof(IGraphicsDeviceService))
                 as IGraphicsDeviceService;
 
-            batch = new SpriteBatch(graphicsService.GraphicsDevice);
+            batch = new RelativeSpriteBatch(graphicsService.GraphicsDevice);
 
             //Load content for any sub components
-            if (!String.IsNullOrEmpty(backgroundImage))
+
+			if (!String.IsNullOrEmpty(backgroundImage))
             {
-                backgroundTexture =
-                    MarbletsGame.Content.Load<Texture2D>(backgroundImage);
+                backgroundTexture = MarbletsGame.Content.Load<Texture2D>(backgroundImage);
             }
         }
+
 
         /// <summary>
         /// Renders the screen. 
@@ -116,30 +147,9 @@ namespace Marblets
             if (!String.IsNullOrEmpty(backgroundImage))
             {
                 SpriteBatch.Begin();
-
-                Vector2 drawPosition = Vector2.Zero;
-
-                // Added functionality to account for the screen orientation.
-                switch (MarbletsGame.screenOrientation)
-                {
-                    case MarbletsGame.ScreenOrientation.LandscapeRight:
-                        drawPosition.X = 320;
-                        drawPosition.Y = 160;
-                        break;
-
-                    case MarbletsGame.ScreenOrientation.LandscapeLeft:
-                        drawPosition.X = 272;
-                        drawPosition.Y = 0;
-                        break;
-
-                    default:
-                        break;
-                }
-
-				SpriteBatch.Draw(backgroundTexture, new Rectangle((int)drawPosition.X,(int)drawPosition.Y,480,320),null,
-				                 Color.White,MarbletsGame.screenRotation,Vector2.Zero,SpriteEffects.None,0.0f);
-
+                SpriteBatch.Draw(backgroundTexture, Vector2.Zero, Color.White);
                 SpriteBatch.End();
+
             }
         }
     }

@@ -11,11 +11,8 @@
 using System;
 using System.IO;
 using System.Xml.Serialization;
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Storage;
-using Microsoft.Xna.Framework.GamerServices;
 #endregion
 
 namespace Marblets
@@ -27,8 +24,6 @@ namespace Marblets
     /// </summary>
     public class Settings
     {
-        private static string fileName;
-
         #region General App Settings
 
         /// <summary>
@@ -65,80 +60,28 @@ namespace Marblets
 
         #region Load/Save code
 
-        // Modified to work with the StorageDevice, rather than direct file access.
-
         /// <summary>
         /// Saves the current settings
         /// </summary>
         /// <param name="filename">The filename to save to</param>
-        public void Save()
+        public void Save(string filename)
         {
-            // TODO Guide.BeginShowStorageDeviceSelector(new AsyncCallback(SaveSettingsCallback),    null);
-        }
+            Stream stream = File.Create(filename);
 
-        private static void SaveSettingsCallback(IAsyncResult result)
-        {
-            if ((result != null) && result.IsCompleted)
-            {
-                // TODO MarbletsGame.StorageDevice = Guide.EndShowStorageDeviceSelector(result);
-            }
-
-            if ((MarbletsGame.StorageDevice != null) &&
-                MarbletsGame.StorageDevice.IsConnected)
-            {
-                using (StorageContainer storageContainer =
-                    MarbletsGame.StorageDevice.OpenContainer("Marblets"))
-                {
-                    string settingsPath = Path.Combine(storageContainer.Path,
-                        "settings.xml");
-
-                    using (FileStream file = File.Create(settingsPath))
-                    {
-                        XmlSerializer serializer = new XmlSerializer(typeof(Settings));
-                        serializer.Serialize(file, MarbletsGame.Settings);
-                    }
-                }
-            }
+            XmlSerializer serializer = new XmlSerializer(typeof(Settings));
+            serializer.Serialize(stream, this);
+            stream.Close();
         }
 
         /// <summary>
         /// Loads settings from a file
         /// </summary>
         /// <param name="filename">The filename to load</param>
-        public static void Load()
+        public static Settings Load(string filename)
         {
-            // TODO Guide.BeginShowStorageDeviceSelector(new AsyncCallback(LoadSettingsCallback), null);
-        }
-
-        private static void LoadSettingsCallback(IAsyncResult result)
-        {
-            if ((result != null) && result.IsCompleted)
-            {
-                // TODO MarbletsGame.StorageDevice = Guide.EndShowStorageDeviceSelector(result);
-            }
-
-            if ((MarbletsGame.StorageDevice != null) &&
-                MarbletsGame.StorageDevice.IsConnected)
-            {
-                using (StorageContainer storageContainer =
-                    MarbletsGame.StorageDevice.OpenContainer("Marblets"))
-                {
-                    string settingsPath = Path.Combine(storageContainer.Path,
-                        "settings.xml");
-
-                    if (File.Exists(settingsPath))
-                    {
-                        using (FileStream file =
-                            File.Open(settingsPath, FileMode.Open))
-                        {
-                            XmlSerializer serializer =
-                                new XmlSerializer(typeof(Settings));
-                            MarbletsGame.Settings = 
-                                (Settings)serializer.Deserialize(file);
-                        }
-                    }
-                }
-            }
+            Stream stream = File.OpenRead(filename);
+            XmlSerializer serializer = new XmlSerializer(typeof(Settings));
+            return (Settings)serializer.Deserialize(stream);
         }
 
         #endregion

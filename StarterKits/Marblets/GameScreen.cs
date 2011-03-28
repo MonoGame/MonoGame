@@ -7,13 +7,12 @@
 //-----------------------------------------------------------------------------
 #endregion
 
+// #define TutorialVersion //Uncomment this line to play the tutorial version
+
 #region Using Statements
 using System;
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Input.Touch;
 #endregion
 
 namespace Marblets
@@ -26,12 +25,23 @@ namespace Marblets
         private GameBoard board;
         private Texture2D gameOver;
 
-        public static TouchCollection touchCollection;
-
-        public GameScreen(Game game, string backgroundImage)
-            : base(game, backgroundImage)
+        public GameScreen(Game game, string backgroundImage/*TODO , SoundEntry backgroundMusic*/)
+            : base(game, backgroundImage/* TODO , backgroundMusic*/)
         {
-            board = new GameBoard(this.Game);
+
+            //Remove the define at the top of the file to play the tutorial version
+            bool tutorialVersion = false;
+#if TutorialVersion
+            tutorialVersion = true;
+#endif
+            if (tutorialVersion)
+            {
+                board = new TutorialGameBoard(this.Game);
+            }
+            else
+            {
+                board = new GameBoard(this.Game);
+            }
         }
 
         public override void Initialize()
@@ -45,84 +55,44 @@ namespace Marblets
             base.Update(gameTime);
             board.Update(gameTime);
 
-            // Check if the user wants to restart the game.
-            if (board.GameOver)
+            if (board.GameOver && InputHelper.GamePads[PlayerIndex.One].APressed)
             {
-                touchCollection = TouchPanel.GetState();
-
-                if (touchCollection.Count > 0)
-                {
-                    if (touchCollection[0].Position.X > 0 &&
-                        touchCollection[0].Position.X < 272 &&
-                        touchCollection[0].Position.Y > 0 &&
-                        touchCollection[0].Position.Y < 480)
-                    {
-                        MarbletsGame.NextGameState = GameState.Started;
-                    }
-                }
+                MarbletsGame.NextGameState = GameState.Started;
             }
         }
 
         protected override void LoadContent()
         {
-            gameOver = 
-                MarbletsGame.Content.Load<Texture2D>("game_over_frame_zunehd");
-
+            gameOver = MarbletsGame.Content.Load<Texture2D>("Textures/game_over_frame");
             base.LoadContent();
         }
+
 
         public override void Draw(GameTime gameTime)
         {
             base.Draw(gameTime);
 
-            SpriteBatch.Begin(SpriteSortMode.Deferred,SpriteBlendMode.AlphaBlend, 
+            SpriteBatch.Begin(SpriteSortMode.Deferred, SpriteBlendMode.AlphaBlend, 
                               SaveStateMode.None);
 
             board.Draw(SpriteBatch);
 
             //Draw Score
+            Font.Draw(SpriteBatch, FontStyle.Small, 946, 140,
+                      String.Format("{0:###,##0}", MarbletsGame.Score));
 
-            // Added functionality to account for the screen orientation.
-            switch (MarbletsGame.screenOrientation)
+            if (board.GameOver)
             {
-                case MarbletsGame.ScreenOrientation.LandscapeRight:
-                    Font.Draw(SpriteBatch, FontStyle.Large, 83, 100,
-                              String.Format("{0:###,##0}", MarbletsGame.Score));
-
-                    if (board.GameOver)
-                    {
-                        SpriteBatch.Draw(gameOver, new Vector2(200, 265), null, 
-                            Color.White, MarbletsGame.screenRotation, Vector2.Zero, 1.0f,SpriteEffects.None, 0.0f);
-                    }
-                    break;
-
-                case MarbletsGame.ScreenOrientation.LandscapeLeft:
-                    Font.Draw(SpriteBatch, FontStyle.Large, (480 - 48 + 3), (320 - 125),
-                              String.Format("{0:###,##0}", MarbletsGame.Score));
-
-                    if (board.GameOver)
-                    {
-                        SpriteBatch.Draw(gameOver, new Vector2((320 - 100), (480 - 355)), 
-                            null, Color.White, MarbletsGame.screenRotation, Vector2.Zero,
-                            1.0f, SpriteEffects.None, 0.0f);
-                    }
-                    break;
-
-                default:
-                    break;
+                SpriteBatch.Draw(gameOver, new Vector2(329, 264), Color.White);
             }
 
             SpriteBatch.End();
+
         }
 
         public void NewGame()
         {
             board.NewGame();
-        }
-
-        public void RecalculateMarblePositions()
-        {
-            board.RecalculateMarblePositions();
         }
     }
 }
