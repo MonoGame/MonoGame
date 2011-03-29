@@ -49,6 +49,8 @@ namespace Microsoft.Xna.Framework
 {
 	public class MonoGameProgram : UIApplicationDelegate 
 	{
+		private int ourTask;
+		
 		public Game MonoGameGame
         {
             get;
@@ -57,12 +59,68 @@ namespace Microsoft.Xna.Framework
 		
 		public override void DidEnterBackground (UIApplication application)
 		{
-			MonoGameGame.EnterBackground();
+			ourTask = application.BeginBackgroundTask(delegate
+			{    //this is the action that will run when the task expires
+				if (ourTask != 0) //this check is because we want to avoid ending the same task twice
+				{
+				    application.EndBackgroundTask(ourTask); //end the task
+				    ourTask = 0; //reset the id
+				}
+			});
+
+		    //we start an asynchronous operation
+		    //so that we make sure that DidEnterBackground
+		    //executes normally
+		    new System.Action(delegate
+		    {
+		        MonoGameGame.EnterBackground();
+		
+		        //Since we are in an asynchronous method,
+		        //we have to make sure that EndBackgroundTask
+		        //will run on the application's main thread
+		        //or we might have unexpected behavior.
+		        application.BeginInvokeOnMainThread(delegate
+		        {
+			            if (ourTask != 0) //same as above
+			            {
+			                application.EndBackgroundTask(ourTask);
+			                ourTask = 0;
+			            }
+			       });
+			}).BeginInvoke(null, null);	
 		}
 		
 		public override void WillEnterForeground (UIApplication application)
 		{
-			MonoGameGame.EnterForeground();
+			ourTask = application.BeginBackgroundTask(delegate
+			{    //this is the action that will run when the task expires
+				if (ourTask != 0) //this check is because we want to avoid ending the same task twice
+				{
+				    application.EndBackgroundTask(ourTask); //end the task
+				    ourTask = 0; //reset the id
+				}
+			});
+
+		    //we start an asynchronous operation
+		    //so that we make sure that DidEnterBackground
+		    //executes normally
+		    new System.Action(delegate
+		    {
+		        MonoGameGame.EnterForeground();
+		
+		        //Since we are in an asynchronous method,
+		        //we have to make sure that EndBackgroundTask
+		        //will run on the application's main thread
+		        //or we might have unexpected behavior.
+		        application.BeginInvokeOnMainThread(delegate
+		        {
+			            if (ourTask != 0) //same as above
+			            {
+			                application.EndBackgroundTask(ourTask);
+			                ourTask = 0;
+			            }
+			       });
+			}).BeginInvoke(null, null);	
 		}
 	}
 }
