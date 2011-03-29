@@ -18,7 +18,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug</OutputPath>
-    <DefineConstants>DEBUG</DefineConstants>
+    <DefineConstants>DEBUG MONOMAC</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
@@ -44,15 +44,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
-    <None Include="..\..\iOS\Draw2D\Content\monogameicon.png">
-      <Link>Content\monogameicon.png</Link>
-    </None>
-    <None Include="..\..\iOS\Draw2D\Content\purpleBall.xnb">
-      <Link>Content\purpleBall.xnb</Link>
-    </None>
-    <None Include="..\..\iOS\Draw2D\Content\spriteFont1.xnb">
-      <Link>Content\spriteFont1.xnb</Link>
-    </None>
     <None Include="..\..\iOS\Draw2D\Default.png">
       <Link>Default.png</Link>
     </None>
@@ -79,5 +70,16 @@
       <Project>{36C538E6-C32A-4A8D-A39C-566173D7118E}</Project>
       <Name>MonoGame.Framework.MacOS</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\..\iOS\Draw2D\Content\monogameicon.png">
+      <Link>Content\monogameicon.png</Link>
+    </Content>
+    <Content Include="..\..\iOS\Draw2D\Content\purpleBall.xnb">
+      <Link>Content\purpleBall.xnb</Link>
+    </Content>
+    <Content Include="..\..\iOS\Draw2D\Content\spriteFont1.xnb">
+      <Link>Content\spriteFont1.xnb</Link>
+    </Content>
   </ItemGroup>
 </Project>
