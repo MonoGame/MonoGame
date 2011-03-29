@@ -613,7 +613,11 @@ namespace Microsoft.Xna.Framework
 		
 		public static Matrix CreateFromYawPitchRoll(float yaw, float pitch, float roll)
 		{
-			throw new NotImplementedException ();
+			Matrix matrix;
+		    Quaternion quaternion;
+		    Quaternion.CreateFromYawPitchRoll(yaw, pitch, roll, out quaternion);
+		    CreateFromQuaternion(ref quaternion, out matrix);
+		    return matrix;
 		}
 		
 		public static void CreateFromYawPitchRoll(
@@ -622,7 +626,9 @@ namespace Microsoft.Xna.Framework
          float roll,
          out Matrix result)
 		{
-			throw new NotImplementedException ();
+			Quaternion quaternion;
+		    Quaternion.CreateFromYawPitchRoll(yaw, pitch, roll, out quaternion);
+		    CreateFromQuaternion(ref quaternion, out result);
 		}
 
         public static Matrix CreateLookAt(Vector3 cameraPosition, Vector3 cameraTarget, Vector3 cameraUpVector)
