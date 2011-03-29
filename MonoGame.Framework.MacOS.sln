@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Samples.Draw2D.Mac
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Samples.BouncingBox.MacOS", "Samples\MacOS\BouncingBox\MonoGame.Samples.BouncingBox.MacOS.csproj", "{4480BF44-7CE2-4A22-9372-DAFA3B05390E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TiledSprites", "Samples\MacOS\TiledSprites\TiledSprites.csproj", "{7D24D7EA-822C-4991-8BC9-1C2EF9C5F59A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{4480BF44-7CE2-4A22-9372-DAFA3B05390E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4480BF44-7CE2-4A22-9372-DAFA3B05390E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4480BF44-7CE2-4A22-9372-DAFA3B05390E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7D24D7EA-822C-4991-8BC9-1C2EF9C5F59A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7D24D7EA-822C-4991-8BC9-1C2EF9C5F59A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7D24D7EA-822C-4991-8BC9-1C2EF9C5F59A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7D24D7EA-822C-4991-8BC9-1C2EF9C5F59A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A82EAD58-40D7-49BE-8F24-09FEA34F9E55}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A82EAD58-40D7-49BE-8F24-09FEA34F9E55}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A82EAD58-40D7-49BE-8F24-09FEA34F9E55}.Release|Any CPU.ActiveCfg = Release|Any CPU
