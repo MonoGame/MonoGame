@@ -238,6 +238,7 @@
     <Compile Include="Graphics\DirectionalLight.cs" />
     <Compile Include="MacOS\Input\Mouse.cs" />
     <Compile Include="MacOS\Input\MouseState.cs" />
+    <Compile Include="MacOS\Input\Keyboard.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />
