@@ -66,12 +66,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\MonoGame.Framework\MonoGame.Framework.MacOS.csproj">
-      <Project>{36C538E6-C32A-4A8D-A39C-566173D7118E}</Project>
-      <Name>MonoGame.Framework.MacOS</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="..\..\iOS\Draw2D\Content\monogameicon.png">
       <Link>Content\monogameicon.png</Link>
     </Content>
@@ -81,5 +75,11 @@
     <Content Include="..\..\iOS\Draw2D\Content\spriteFont1.xnb">
       <Link>Content\spriteFont1.xnb</Link>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\MonoGame.Framework\MonoGame.Framework.MacOS.csproj">
+      <Project>{36C538E6-C32A-4A8D-A39C-566173D7118E}</Project>
+      <Name>MonoGame.Framework.MacOS</Name>
+    </ProjectReference>
   </ItemGroup>
 </Project>

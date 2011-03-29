@@ -36,8 +36,9 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Drawing" />
-    <Reference Include="MonoMac">
+    <Reference Include="MonoMac, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
       <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\MonoMac\monomac\src\MonoMac.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
@@ -52,12 +53,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\MonoGame.Framework\MonoGame.Framework.MacOS.csproj">
-      <Project>{36C538E6-C32A-4A8D-A39C-566173D7118E}</Project>
-      <Name>MonoGame.Framework.MacOS</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="..\..\iOS\BouncingBox\Content\font.xnb">
       <Link>Content\font.xnb</Link>
     </Content>
@@ -67,5 +62,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\MonoGame.Framework\MonoGame.Framework.MacOS.csproj">
+      <Project>{36C538E6-C32A-4A8D-A39C-566173D7118E}</Project>
+      <Name>MonoGame.Framework.MacOS</Name>
+    </ProjectReference>
   </ItemGroup>
 </Project>
