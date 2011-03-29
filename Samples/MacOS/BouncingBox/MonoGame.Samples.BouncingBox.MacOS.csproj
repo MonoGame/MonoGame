@@ -5,13 +5,12 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.0</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{A82EAD58-40D7-49BE-8F24-09FEA34F9E55}</ProjectGuid>
+    <ProjectGuid>{4480BF44-7CE2-4A22-9372-DAFA3B05390E}</ProjectGuid>
     <ProjectTypeGuids>{1C533B1C-72DD-4CB1-9F6B-BF11D93BCFBE};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Exe</OutputType>
-    <RootNamespace>MonoGame.Samples.Draw2D.MacOS</RootNamespace>
-    <AssemblyName>MonoGame.Samples.Draw2D.MacOS</AssemblyName>
+    <RootNamespace>Microsoft.Xna.Samples.BouncingBox.MacOS</RootNamespace>
+    <AssemblyName>Microsoft.Xna.Samples.BouncingBox.MacOS</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <StartupObject>Microsoft.Xna.Samples.Draw2D.Program</StartupObject>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -37,31 +36,18 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Drawing" />
-    <Reference Include="MonoMac, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="MonoMac">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\MonoMac\monomac\src\MonoMac.dll</HintPath>
     </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Info.plist" />
-    <None Include="..\..\iOS\Draw2D\Default.png">
-      <Link>Default.png</Link>
-    </None>
-    <None Include="..\..\iOS\Draw2D\monogameicon.png">
-      <Link>monogameicon.png</Link>
-    </None>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Mono\MonoMac\v0.0\Mono.MonoMac.targets" />
   <ItemGroup>
-    <Folder Include="Content\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="main.cs" />
-    <Compile Include="..\..\iOS\Draw2D\FPSCounterComponent.cs">
+    <Compile Include="..\..\iOS\BouncingBox\FPSCounterComponent.cs">
       <Link>FPSCounterComponent.cs</Link>
     </Compile>
-    <Compile Include="..\..\iOS\Draw2D\Game1.cs">
+    <Compile Include="main.cs" />
+    <Compile Include="..\..\iOS\BouncingBox\Game1.cs">
       <Link>Game1.cs</Link>
     </Compile>
   </ItemGroup>
@@ -72,14 +58,14 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\..\iOS\Draw2D\Content\monogameicon.png">
+    <Content Include="..\..\iOS\BouncingBox\Content\font.xnb">
+      <Link>Content\font.xnb</Link>
+    </Content>
+    <Content Include="..\..\iOS\BouncingBox\Content\monogameicon.png">
       <Link>Content\monogameicon.png</Link>
     </Content>
-    <Content Include="..\..\iOS\Draw2D\Content\purpleBall.xnb">
-      <Link>Content\purpleBall.xnb</Link>
-    </Content>
-    <Content Include="..\..\iOS\Draw2D\Content\spriteFont1.xnb">
-      <Link>Content\spriteFont1.xnb</Link>
-    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Info.plist" />
   </ItemGroup>
 </Project>

@@ -1,7 +1,7 @@
 using MonoMac.AppKit;
 using MonoMac.Foundation;
 
-namespace Microsoft.Xna.Samples.Draw2D
+namespace TiledSprites
 {
 	class Program
 	{
@@ -18,11 +18,11 @@ namespace Microsoft.Xna.Samples.Draw2D
 	
 	class AppDelegate : NSApplicationDelegate
 	{
-		private Game1 game;
+		private TiledSpritesSample game;
 		
 		public override void FinishedLaunching (MonoMac.Foundation.NSObject notification)
 		{
-			game = new Game1 ();
+			game = new TiledSpritesSample ();
 			game.Run ();
 		}
 		

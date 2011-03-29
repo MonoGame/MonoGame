@@ -1,7 +1,7 @@
 using MonoMac.AppKit;
 using MonoMac.Foundation;
 
-namespace Microsoft.Xna.Samples.Draw2D
+namespace Microsoft.Xna.Samples.BouncingBox
 {
 	class Program
 	{
