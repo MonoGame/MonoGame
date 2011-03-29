@@ -610,7 +610,20 @@ namespace Microsoft.Xna.Framework
 		    result.M43 = 0f;
 		    result.M44 = 1f;
         }
-
+		
+		public static Matrix CreateFromYawPitchRoll(float yaw, float pitch, float roll)
+		{
+			throw new NotImplementedException ();
+		}
+		
+		public static void CreateFromYawPitchRoll(
+         float yaw,
+         float pitch,
+         float roll,
+         out Matrix result)
+		{
+			throw new NotImplementedException ();
+		}
 
         public static Matrix CreateLookAt(Vector3 cameraPosition, Vector3 cameraTarget, Vector3 cameraUpVector)
         {
