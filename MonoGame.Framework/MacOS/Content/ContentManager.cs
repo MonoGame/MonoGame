@@ -204,7 +204,7 @@ namespace Microsoft.Xna.Framework.Content
             }
             set
             {
-                _rootDirectory = Path.Combine (NSBundle.MainBundle.ResourcePath, value);
+                _rootDirectory = Path.Combine(NSBundle.MainBundle.ResourcePath, value);
             }
         }
 

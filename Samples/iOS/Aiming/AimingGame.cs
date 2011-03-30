@@ -15,6 +15,7 @@ using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.Storage;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Media;
@@ -253,7 +254,7 @@ namespace Aiming
 
             // Start sprite batch with additive blending, and draw the spotlight.
             // Additive blending works very well for effects like lights and fire.
-            spriteBatch.Begin(SpriteBlendMode.Additive);
+            spriteBatch.Begin(SpriteSortMode.Deferred, SpriteBlendMode.Additive);
             spriteBatch.Draw(spotlightTexture, spotlightPosition, null, Color.White,
                 spotlightAngle, spotlightOrigin, 1.0f, SpriteEffects.None, 0.0f);
             spriteBatch.End();
@@ -279,6 +280,7 @@ namespace Aiming
 #endif
             GamePadState currentGamePadState = GamePad.GetState(PlayerIndex.One);
             MouseState currentMouseState = Mouse.GetState();
+			TouchCollection currentTouchState = TouchPanel.GetState();
 
             // Check for exit.
             if (currentKeyboardState.IsKeyDown(Keys.Escape) ||
@@ -317,27 +319,21 @@ namespace Aiming
 
             //Move toward the touch point. We slow down the cat when it gets within a distance of CatSpeed to the touch point.
             float smoothStop = 1;
-			#if IPHONE
-			TouchCollection currentTouchCollection = TouchPanel.GetState();
 			
-			// tap the screen to select				
-			foreach (TouchLocation location in currentTouchCollection)
-			{
-			    switch (location.State)
-			    {
-			        case TouchLocationState.Pressed:
-					    Vector2 mousePosition = new Vector2(location.Position.X, location.Position.Y);
-						catMovement = mousePosition - catPosition;
+			if (currentTouchState != null )
+            {
+				if (currentTouchState.Count > 0)
+	            {
+					Vector2 touchPosition = currentTouchState[0].Position;
+		            if (touchPosition != catPosition)
+		            {
+		                catMovement = touchPosition - catPosition;
 		                float delta = CatSpeed - MathHelper.Clamp(catMovement.Length(), 0, CatSpeed);
 		                smoothStop = 1 - delta / CatSpeed;
-			            break;
-			        case TouchLocationState.Moved:
-			            break;
-			        case TouchLocationState.Released:
-			            break;
-			    }	
+		            }
+				}
 			}
-			#else
+			
             Vector2 mousePosition = new Vector2(currentMouseState.X, currentMouseState.Y);
             if (currentMouseState.LeftButton == ButtonState.Pressed && mousePosition != catPosition)
             {
@@ -345,7 +341,6 @@ namespace Aiming
                 float delta = CatSpeed - MathHelper.Clamp(catMovement.Length(), 0, CatSpeed);
                 smoothStop = 1 - delta / CatSpeed;
             }
-			#endif
 
             // normalize the user's input, so the cat can never be going faster than
             // CatSpeed.
