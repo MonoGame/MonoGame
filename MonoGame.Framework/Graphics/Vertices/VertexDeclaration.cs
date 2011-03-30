@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-    public class VertexDeclaration
+    public class VertexDeclaration : GraphicsResource
     {
         // Fields
         internal VertexElement[] _elements;
