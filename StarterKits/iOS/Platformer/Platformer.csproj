@@ -66,6 +66,7 @@
     <MtouchUseThumb>false</MtouchUseThumb>
     <MtouchUseSGen>false</MtouchUseSGen>
     <AssemblyName>Platformer</AssemblyName>
+    <CodesignKey>iPhone Developer</CodesignKey>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
     <DebugType>none</DebugType>
@@ -145,4 +146,4 @@
   </Target>
   <Target Name="AfterBuild">
   </Target>
-  --><ItemGroup><ProjectReference Include="..\..\MonoGame.Framework\MonoGame.Framework.iOS.csproj"><Project>{DB8508BB-9849-4CC2-BC0F-8EB5DACB3C47}</Project><Name>MonoGame.Framework.iOS</Name></ProjectReference></ItemGroup></Project>
+  --><ItemGroup><ProjectReference Include="..\..\..\MonoGame.Framework\MonoGame.Framework.iOS.csproj"><Project>{DB8508BB-9849-4CC2-BC0F-8EB5DACB3C47}</Project><Name>MonoGame.Framework.iOS</Name></ProjectReference></ItemGroup></Project>
