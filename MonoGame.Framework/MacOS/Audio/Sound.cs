@@ -33,54 +33,61 @@ using System.Runtime.InteropServices;
 using System.Collections.Generic;
 
 using MonoMac;
+using MonoMac.AppKit;
 using MonoMac.Foundation;	
 
 namespace Microsoft.Xna.Framework.Audio
 {	
 	public class Sound
 	{	
-		//private AVAudioPlayer _audioPlayer;
+		private NSSound _audioPlayer;
 		
 		public Sound()
 		{
 		}
 		
 		public Sound(string url, float volume, bool looping)
-		{
-			var mediaFile = NSUrl.FromFilename(url);			
-			//_audioPlayer =  AVAudioPlayer.FromUrl(mediaFile); 
-			//_audioPlayer.Volume = volume;
-			if ( looping )
-			{
-				//_audioPlayer.NumberOfLoops = -1;
-			}
-			else
-			{
-				//_audioPlayer.NumberOfLoops = 0;
-			}
+		{			
+			_audioPlayer = NSSound.FromName(url);
+			_audioPlayer.Volume = volume;
+			_audioPlayer.Loops = looping;
 		}
 		
 		public void Dispose()
 		{
-			//_audioPlayer.Dispose();
+			_audioPlayer.Dispose();
 		}
 		
 		public double Duration
 		{
-			get;
-			set;
+			get
+			{
+				return _audioPlayer.Duration();
+			}
 		}
 		
 		public double CurrentPosition
 		{
-			get;
-			set;
+			get
+			{
+				return _audioPlayer.CurrentTime;
+			}
+			set
+			{
+				_audioPlayer.CurrentTime = value;
+			}
 		}
 			
 		public bool Looping
 		{
-			get;
-			set;
+			get
+			{
+				return _audioPlayer.Loops;
+			}
+			set
+			{
+				_audioPlayer.Loops = value;
+			}
 		}
 		
 		public float Pan
@@ -91,29 +98,54 @@ namespace Microsoft.Xna.Framework.Audio
 		
 		public bool Playing
 		{
-			get;
-			set;
+			get
+			{
+				return _audioPlayer.IsPlaying();
+			}
+			set
+			{
+				if ( value )
+				{
+					if (!_audioPlayer.IsPlaying())
+					{
+						Play();
+					}
+				}
+				else
+				{
+					if (_audioPlayer.IsPlaying())
+					{
+						Stop();
+					}
+				}
+			}
 		}
 		
 		public void Pause()
 		{		
-			//_audioPlayer.Pause();
+			_audioPlayer.Pause();
 		}
 		
 		public void Play()
 		{		
-			//_audioPlayer.Play();
+			_audioPlayer.Play();
 		}
 		
 		public void Stop()
 		{			
-			//_audioPlayer.Stop();
+			_audioPlayer.Stop();
 		}
 		
 		public float Volume
 		{
-			get;
-			set;
+			get
+			{
+				return _audioPlayer.Volume;
+			}
+			set
+			{
+				_audioPlayer.Volume = value;
+			}
 		}
 		
 		public static Sound CreateAndPlay(string url, float volume, bool looping)
