@@ -71,7 +71,7 @@ namespace Microsoft.Xna.Samples.Draw2D
 			font = Content.Load<SpriteFont> ("SpriteFont1");
 
 			fps = new FPSCounterComponent (this,spriteBatch,font);
-			Components.Add (fps);
+			Components.Add(fps);
 		}
 
 		/// <summary>
