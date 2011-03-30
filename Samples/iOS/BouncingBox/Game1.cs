@@ -7,15 +7,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Storage;
 
-#if MONOMAC
-using MonoMac.Foundation;
-using System.IO;
-#else
-using MonoTouch.CoreAnimation;
-using MonoTouch.UIKit;
-using MonoTouch.Foundation;
-#endif
-
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Media;
 
@@ -42,11 +33,8 @@ namespace Microsoft.Xna.Samples.BouncingBox
 			GetNewColor ();
 
 			graphics = new GraphicsDeviceManager (this);
-#if MONOMAC
-			Content.RootDirectory = Path.Combine (NSBundle.MainBundle.ResourcePath, "Content");
-#else
 			Content.RootDirectory = "Content";
-#endif
+			
 			graphics.IsFullScreen = true;		
 		}
 

@@ -20,12 +20,6 @@ using Microsoft.Xna.Framework.Storage;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Media;
 
-#if MONOMAC
-// MonoMac
-using MonoMac.Foundation;
-using System.IO;
-#endif
-
 #endregion
 
 namespace ChaseAndEvade
@@ -141,23 +135,19 @@ namespace ChaseAndEvade
 			{
 			graphics = new GraphicsDeviceManager (this);
 			
-#if MONOMAC
-			Content.RootDirectory = Path.Combine (NSBundle.MainBundle.ResourcePath, "Content");
-#else
 			Content.RootDirectory = "Content";
-#endif
+
 #if WINDOWS_PHONE
 			graphics.SupportedOrientations = DisplayOrientation.Portrait;
 			graphics.PreferredBackBufferWidth = 480;
 			graphics.PreferredBackBufferHeight = 800;
 	
 			TargetElapsedTime = TimeSpan.FromTicks(333333);
-	
-			graphics.IsFullScreen = true;
 #else
 			graphics.PreferredBackBufferWidth = 320;
 			graphics.PreferredBackBufferHeight = 480;
 #endif
+			graphics.IsFullScreen = true;
 		}
 
 		/// <summary>

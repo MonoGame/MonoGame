@@ -8,13 +8,8 @@
 #endregion
 
 #region Using Statements
-#if IPHONE
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-#else
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-#endif
 #endregion
 
 namespace Microsoft.Xna.Samples.GameStateManagement

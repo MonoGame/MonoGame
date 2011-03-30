@@ -1,9 +1,12 @@
-using RockRainIphone;
-using RockRainIphone.Core;
+
 using System;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+
+using RockRainIphone;
+using RockRainIphone.Core;
 
 namespace RockRainIphone
 {

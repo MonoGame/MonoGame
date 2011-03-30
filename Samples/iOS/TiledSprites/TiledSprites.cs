@@ -11,7 +11,6 @@
 using System;
 using System.Collections.Generic;
 
-#if IPHONE
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.GamerServices;
@@ -20,22 +19,6 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Storage;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Media;
-#else
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.GamerServices;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Storage;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Media;
-
-#endif
-
-#if MONOMAC
-using MonoMac.Foundation;
-using System.IO;
-#endif
 
 #endregion
 
@@ -118,11 +101,8 @@ namespace TiledSprites
 		public TiledSpritesSample ()
 			{
 			graphics = new GraphicsDeviceManager (this);
-#if MONOMAC
-			Content.RootDirectory = Path.Combine (NSBundle.MainBundle.ResourcePath, "Content");
-#else
 			Content.RootDirectory = "Content";
-#endif
+			
 			graphics.PreferredBackBufferWidth = 320;
 			graphics.PreferredBackBufferHeight = 480;
 

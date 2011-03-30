@@ -7,11 +7,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Storage;
 
-#if MONOMAC
-using MonoMac.Foundation;
-using System.IO;
-#endif
-
 namespace Microsoft.Xna.Samples.Draw2D
 {
 	/// <summary>
@@ -32,11 +27,8 @@ namespace Microsoft.Xna.Samples.Draw2D
 		{
 			graphics = new GraphicsDeviceManager (this);
 			
-#if MONOMAC
-			Content.RootDirectory = Path.Combine (NSBundle.MainBundle.ResourcePath, "Content");
-#else
 			Content.RootDirectory = "Content";
-#endif
+			
 			graphics.PreferMultiSampling = true;
 			graphics.IsFullScreen = true;	
 
