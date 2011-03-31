@@ -354,6 +354,7 @@
     <Compile Include="Graphics\Effect\IEffectMatrices.cs" />
     <Compile Include="Graphics\DirectionalLight.cs" />
     <Compile Include="Graphics\ColorWriteChannels.cs" />
+    <Compile Include="TitleContainer.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
