@@ -77,7 +77,13 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 		
-		public Rectangle TitleSafeArea {get;set;}
+		public Rectangle TitleSafeArea 
+		{
+			get
+			{
+				return Bounds;
+			}
+		}
 
         public Vector3 Project(Vector3 source, Matrix projection, Matrix view, Matrix world)
         {
