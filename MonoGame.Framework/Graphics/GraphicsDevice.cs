@@ -125,12 +125,15 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void Clear(ClearOptions options, Color color, float depth, int stencil)
         {
-			throw new NotImplementedException();
+			Clear(options,color.ToEAGLColor(),depth,stencil);
         }
 
         public void Clear(ClearOptions options, Vector4 color, float depth, int stencil)
         {
-			throw new NotImplementedException();
+			GL.ClearColor(color.X, color.Y, color.Z, 1.0f);
+			GL.ClearDepth(depth);
+			GL.ClearStencil(stencil);
+			GL.Clear((uint) (ClearBufferMask.ColorBufferBit| ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit));
         }
 
         public void Clear(ClearOptions options, Color color, float depth, int stencil, Rectangle[] regions)
