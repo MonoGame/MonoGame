@@ -1,13 +1,14 @@
-#region Using Clause
+﻿#region File Description
+//-----------------------------------------------------------------------------
+// RectangleExtensions.cs
+//
+// Microsoft XNA Community Game Platform
+// Copyright (C) Microsoft Corporation. All rights reserved.
+//-----------------------------------------------------------------------------
+#endregion
+
 using System;
-#if IPHONE
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-#else
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-#endif
-#endregion Using Clause
 
 namespace Platformer
 {

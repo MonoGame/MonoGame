@@ -1,20 +1,18 @@
-#region Using Clause
+#region File Description
+//-----------------------------------------------------------------------------
+// Player.cs
+//
+// Microsoft XNA Community Game Platform
+// Copyright (C) Microsoft Corporation. All rights reserved.
+//-----------------------------------------------------------------------------
+#endregion
+
 using System;
-#if IPHONE
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
-#else
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-#endif
-#endregion Using Clause
-
-
 
 namespace Platformer
 {
@@ -66,58 +64,23 @@ namespace Platformer
         }
         Vector2 velocity;
 
-#if ZUNE
         // Constants for controling horizontal movement
-        private const float MoveAcceleration = 7000.0f;
-        private const float MaxMoveSpeed = 1000.0f;
-        private const float GroundDragFactor = 0.38f;
-        private const float AirDragFactor = 0.48f;
+        private const float MoveAcceleration = 13000.0f;
+        private const float MaxMoveSpeed = 1750.0f;
+        private const float GroundDragFactor = 0.48f;
+        private const float AirDragFactor = 0.58f;
 
         // Constants for controlling vertical movement
         private const float MaxJumpTime = 0.35f;
-        private const float JumpLaunchVelocity = -2000.0f;
-        private const float GravityAcceleration = 1700.0f;
-        private const float MaxFallSpeed = 450.0f;
-        private const float JumpControlPower = 0.13f;
-
-        // Input configuration
-        private const float MoveStickScale = 0.0f;
-        private const Buttons JumpButton = Buttons.B;        
-#elif IPHONE
-        // Constants for controling horizontal movement
-        private const float MoveAcceleration = 7000.0f;
-        private const float MaxMoveSpeed = 1000.0f;
-        private const float GroundDragFactor = 0.38f;
-        private const float AirDragFactor = 0.48f;
-
-        // Constants for controlling vertical movement
-        private const float MaxJumpTime = 0.35f;
-        private const float JumpLaunchVelocity = -2000.0f;
-        private const float GravityAcceleration = 1700.0f;
-        private const float MaxFallSpeed = 450.0f;
-        private const float JumpControlPower = 0.13f;
-
-        // Input configuration
-        private const float MoveStickScale = 0.0f;
-        private const Buttons JumpButton = Buttons.B;
-#else
-        // Constants for controling horizontal movement
-        private const float MoveAcceleration = 14000.0f;
-        private const float MaxMoveSpeed = 2000.0f;
-        private const float GroundDragFactor = 0.58f;
-        private const float AirDragFactor = 0.65f;
-
-        // Constants for controlling vertical movement
-        private const float MaxJumpTime = 0.35f;
-        private const float JumpLaunchVelocity = -4000.0f;
-        private const float GravityAcceleration = 3500.0f;
-        private const float MaxFallSpeed = 600.0f;
-        private const float JumpControlPower = 0.14f;
+        private const float JumpLaunchVelocity = -3500.0f;
+        private const float GravityAcceleration = 3400.0f;
+        private const float MaxFallSpeed = 550.0f;
+        private const float JumpControlPower = 0.14f; 
 
         // Input configuration
         private const float MoveStickScale = 1.0f;
+        private const float AccelerometerScale = 1.5f;
         private const Buttons JumpButton = Buttons.A;
-#endif
 
         /// <summary>
         /// Gets whether or not the player's feet are on the ground.
@@ -205,9 +168,20 @@ namespace Platformer
         /// <summary>
         /// Handles input, performs physics, and animates the player sprite.
         /// </summary>
-        public void Update(GameTime gameTime, AccelerometerState accelState, TouchCollection touchState)
+        /// <remarks>
+        /// We pass in all of the input states so that our game is only polling the hardware
+        /// once per frame. We also pass the game's orientation because when using the accelerometer,
+        /// we need to reverse our motion when the orientation is in the LandscapeRight orientation.
+        /// </remarks>
+        public void Update(
+            GameTime gameTime, 
+            KeyboardState keyboardState, 
+            GamePadState gamePadState, 
+            TouchCollection touchState, 
+            AccelerometerState accelState,
+            DisplayOrientation orientation)
         {
-            GetInput(accelState, touchState);
+            GetInput(keyboardState, gamePadState, touchState, accelState, orientation);
 
             ApplyPhysics(gameTime);
 
@@ -231,12 +205,13 @@ namespace Platformer
         /// <summary>
         /// Gets player horizontal movement and jump commands from input.
         /// </summary>
-        private void GetInput(AccelerometerState accelState,  TouchCollection touchState)
+        private void GetInput(
+            KeyboardState keyboardState, 
+            GamePadState gamePadState, 
+            TouchCollection touchState,
+            AccelerometerState accelState, 
+            DisplayOrientation orientation)
         {
-            // Get input state.
-            GamePadState gamePadState = GamePad.GetState(PlayerIndex.One);			
-			KeyboardState keyboardState = Keyboard.GetState();
-
             // Get analog horizontal movement.
             movement = gamePadState.ThumbSticks.Left.X * MoveStickScale;
 
@@ -244,53 +219,38 @@ namespace Platformer
             if (Math.Abs(movement) < 0.5f)
                 movement = 0.0f;
 
-			if (Math.Abs(accelState.Acceleration.X) > 0.10f)
-			{
-			    if (accelState.Acceleration.X > 0.0f)
-			        movement = 1.0f;
-			    else
-			        movement = -1.0f;
-			}
-			
-			//override digital if touch input is found
-			// Process touch locations.
-			bool touchJump = false;
-			foreach (TouchLocation location in touchState)
-			{
-			    switch (location.State)
-			    {
-			        case TouchLocationState.Pressed:
-			            touchJump = true;
-			            break;
-			        case TouchLocationState.Moved:
-			            break;
-			        case TouchLocationState.Released:
-			            break;
-			    }
-			}
-			
-			// If any digital horizontal movement input is found, override the analog movement.
+            // Move the player with accelerometer
+            if (Math.Abs(accelState.Acceleration.Y) > 0.10f)
+            {
+                // set our movement speed
+                movement = MathHelper.Clamp(-accelState.Acceleration.Y * AccelerometerScale, -1f, 1f);
+
+                // if we're in the LandscapeLeft orientation, we must reverse our movement
+                if (orientation == DisplayOrientation.LandscapeRight)
+                    movement = -movement;
+            }
+
+            // If any digital horizontal movement input is found, override the analog movement.
             if (gamePadState.IsButtonDown(Buttons.DPadLeft) ||
                 keyboardState.IsKeyDown(Keys.Left) ||
-                keyboardState.IsKeyDown(Keys.A)) 
+                keyboardState.IsKeyDown(Keys.A))
             {
                 movement = -1.0f;
             }
-            else if (gamePadState.IsButtonDown(Buttons.DPadRight)||
+            else if (gamePadState.IsButtonDown(Buttons.DPadRight) ||
                      keyboardState.IsKeyDown(Keys.Right) ||
                      keyboardState.IsKeyDown(Keys.D))
             {
                 movement = 1.0f;
             }
-			
-			
-			// Check if the player wants to jump.
+
+            // Check if the player wants to jump.
             isJumping =
                 gamePadState.IsButtonDown(JumpButton) ||
                 keyboardState.IsKeyDown(Keys.Space) ||
                 keyboardState.IsKeyDown(Keys.Up) ||
                 keyboardState.IsKeyDown(Keys.W) ||
-				touchJump;
+                touchState.AnyTouch();
         }
 
         /// <summary>
@@ -488,22 +448,14 @@ namespace Platformer
         /// </summary>
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
-			#if ZUNE
-			Vector2 screenOffset = new Vector2(16, 80);
-			#elif IPHONE
-			Vector2 screenOffset = new Vector2(40, 80);
-			#else
-			Vector2 screenOffset = new Vector2(0, 0);
-            #endif
-			
-			// Flip the sprite to face the way we are moving.
+            // Flip the sprite to face the way we are moving.
             if (Velocity.X > 0)
                 flip = SpriteEffects.FlipHorizontally;
             else if (Velocity.X < 0)
                 flip = SpriteEffects.None;
 
             // Draw that sprite.
-            sprite.Draw(gameTime, spriteBatch, Position + screenOffset, flip);
+            sprite.Draw(gameTime, spriteBatch, Position, flip);
         }
     }
 }

@@ -1,13 +1,15 @@
-#region Using Clause
+﻿#region File Description
+//-----------------------------------------------------------------------------
+// Enemy.cs
+//
+// Microsoft XNA Community Game Platform
+// Copyright (C) Microsoft Corporation. All rights reserved.
+//-----------------------------------------------------------------------------
+#endregion
+
 using System;
-#if IPHONE
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-#else
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-#endif
-#endregion Using Clause
 
 namespace Platformer
 {
@@ -78,13 +80,7 @@ namespace Platformer
         /// <summary>
         /// The speed at which this enemy moves along the X axis.
         /// </summary>
-#if ZUNE
         private const float MoveSpeed = 64.0f;
-#elif IPHONE
-        private const float MoveSpeed = 64.0f;
-#else
-        private const float MoveSpeed = 128.0f;
-#endif
 
         /// <summary>
         /// Constructs a new Enemy.
@@ -161,14 +157,6 @@ namespace Platformer
         /// </summary>
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
-			#if ZUNE
-			Vector2 screenOffset = new Vector2(16, 80);
-			#elif IPHONE
-			Vector2 screenOffset = new Vector2(40, 80);
-			#else
-			Vector2 screenOffset = new Vector2(0, 0);
-            #endif
-			
             // Stop running when the game is paused or before turning around.
             if (!Level.Player.IsAlive ||
                 Level.ReachedExit ||
@@ -185,7 +173,7 @@ namespace Platformer
 
             // Draw facing the way the enemy is moving.
             SpriteEffects flip = direction > 0 ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
-            sprite.Draw(gameTime, spriteBatch, Position + screenOffset, flip);
+            sprite.Draw(gameTime, spriteBatch, Position, flip);
         }
     }
 }

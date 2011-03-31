@@ -1,15 +1,16 @@
-#region Using Clause
+﻿#region File Description
+//-----------------------------------------------------------------------------
+// Gem.cs
+//
+// Microsoft XNA Community Game Platform
+// Copyright (C) Microsoft Corporation. All rights reserved.
+//-----------------------------------------------------------------------------
+#endregion
+
 using System;
-#if IPHONE
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Audio;
-#else
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Audio;
-#endif
-#endregion Using Clause
 
 namespace Platformer
 {
@@ -111,15 +112,7 @@ namespace Platformer
         /// </summary>
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
-			#if ZUNE
-			Vector2 screenOffset = new Vector2(16, 80);
-			#elif IPHONE
-			Vector2 screenOffset = new Vector2(40, 80);
-			#else
-			Vector2 screenOffset = new Vector2(0, 0);
-            #endif
-			
-            spriteBatch.Draw(texture, Position + screenOffset, null, Color, 0.0f, origin, 1.0f, SpriteEffects.None, 0.0f);
+            spriteBatch.Draw(texture, Position, null, Color, 0.0f, origin, 1.0f, SpriteEffects.None, 0.0f);
         }
     }
 }

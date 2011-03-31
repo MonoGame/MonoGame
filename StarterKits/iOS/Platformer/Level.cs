@@ -1,23 +1,21 @@
-#region Using Clause
-using System;
-using System.IO;
-using System.Collections.Generic;
-#if IPHONE
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Input.Touch;
-#else
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Input;
-#endif
-#endregion Using Clause
+﻿#region File Description
+//-----------------------------------------------------------------------------
+// Level.cs
+//
+// Microsoft XNA Community Game Platform
+// Copyright (C) Microsoft Corporation. All rights reserved.
+//-----------------------------------------------------------------------------
+#endregion
 
+using System;
+using System.Collections.Generic;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Audio;
+using System.IO;
+using Microsoft.Xna.Framework.Input.Touch;
+using Microsoft.Xna.Framework.Input;
 
 namespace Platformer
 {
@@ -89,17 +87,17 @@ namespace Platformer
         /// <param name="serviceProvider">
         /// The service provider that will be used to construct a ContentManager.
         /// </param>
-        /// <param name="path">
-        /// The absolute path to the level file to be loaded.
+        /// <param name="fileStream">
+        /// A stream containing the tile data.
         /// </param>
-        public Level(IServiceProvider serviceProvider, string path)
+        public Level(IServiceProvider serviceProvider, Stream fileStream, int levelIndex)
         {
             // Create a new content manager to load content used just by this level.
             content = new ContentManager(serviceProvider, "Content");
 
             timeRemaining = TimeSpan.FromMinutes(2.0);
 
-            LoadTiles(path);
+            LoadTiles(fileStream);
 
             // Load background layer textures. For now, all levels must
             // use the same backgrounds and only use the left-most part of them.
@@ -107,7 +105,7 @@ namespace Platformer
             for (int i = 0; i < layers.Length; ++i)
             {
                 // Choose a random segment if each background layer for level variety.
-                int segmentIndex = random.Next(3);
+                int segmentIndex = levelIndex;
                 layers[i] = Content.Load<Texture2D>("Backgrounds/Layer" + i + "_" + segmentIndex);
             }
 
@@ -120,15 +118,15 @@ namespace Platformer
         /// appearance and behavior. This method also validates that the
         /// file is well-formed with a player start point, exit, etc.
         /// </summary>
-        /// <param name="path">
-        /// The absolute path to the level file to be loaded.
+        /// <param name="fileStream">
+        /// A stream containing the tile data.
         /// </param>
-        private void LoadTiles(string path)
+        private void LoadTiles(Stream fileStream)
         {
             // Load the level and ensure all of the lines are the same length.
             int width;
             List<string> lines = new List<string>();
-            using (StreamReader reader = new StreamReader(path))
+            using (StreamReader reader = new StreamReader(fileStream))
             {
                 string line = reader.ReadLine();
                 width = line.Length;
@@ -374,7 +372,13 @@ namespace Platformer
         /// Updates all objects in the world, performs collision between them,
         /// and handles the time limit with scoring.
         /// </summary>
-        public void Update(GameTime gameTime, AccelerometerState accelState, TouchCollection touchState)
+        public void Update(
+            GameTime gameTime, 
+            KeyboardState keyboardState, 
+            GamePadState gamePadState, 
+            TouchCollection touchState, 
+            AccelerometerState accelState,
+            DisplayOrientation orientation)
         {
             // Pause while the player is dead or time is expired.
             if (!Player.IsAlive || TimeRemaining == TimeSpan.Zero)
@@ -393,14 +397,11 @@ namespace Platformer
             else
             {
                 timeRemaining -= gameTime.ElapsedGameTime;
-
-                Player.Update(gameTime, accelState, touchState);
-
+                Player.Update(gameTime, keyboardState, gamePadState, touchState, accelState, orientation);
                 UpdateGems(gameTime);
 
                 // Falling off the bottom of the level kills the player.
-                if ((Player.IsAlive ) 
-				    && (Player.BoundingRectangle.Top >= Height * Tile.Height))
+                if (Player.BoundingRectangle.Top >= Height * Tile.Height)
                     OnPlayerKilled(null);
 
                 UpdateEnemies(gameTime);
@@ -508,17 +509,8 @@ namespace Platformer
         /// </summary>
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
-			
-			#if ZUNE
-			Vector2 screenOffset = new Vector2(0, 80);
-			#elif IPHONE
-			Vector2 screenOffset = new Vector2(0, 80);
-			#else
-			Vector2 screenOffset = new Vector2(0, 0);
-            #endif
-			
             for (int i = 0; i <= EntityLayer; ++i)
-                spriteBatch.Draw(layers[i], Vector2.Zero + screenOffset, Color.White);
+                spriteBatch.Draw(layers[i], Vector2.Zero, Color.White);
 
             DrawTiles(spriteBatch);
 
@@ -531,7 +523,7 @@ namespace Platformer
                 enemy.Draw(gameTime, spriteBatch);
 
             for (int i = EntityLayer + 1; i < layers.Length; ++i)
-                spriteBatch.Draw(layers[i], Vector2.Zero + screenOffset, Color.White);
+                spriteBatch.Draw(layers[i], Vector2.Zero, Color.White);
         }
 
         /// <summary>
@@ -539,14 +531,6 @@ namespace Platformer
         /// </summary>
         private void DrawTiles(SpriteBatch spriteBatch)
         {
-			#if ZUNE
-			Vector2 screenOffset = new Vector2(16, 80);
-			#elif IPHONE
-			Vector2 screenOffset = new Vector2(40, 80);
-			#else
-			Vector2 screenOffset = new Vector2(0, 0);
-            #endif
-			
             // For each tile position
             for (int y = 0; y < Height; ++y)
             {
@@ -558,7 +542,7 @@ namespace Platformer
                     {
                         // Draw it in screen space.
                         Vector2 position = new Vector2(x, y) * Tile.Size;
-                        spriteBatch.Draw(texture, position + screenOffset, Color.White);
+                        spriteBatch.Draw(texture, position, Color.White);
                     }
                 }
             }

@@ -1,11 +1,14 @@
-#region Using Clause
+﻿#region File Description
+//-----------------------------------------------------------------------------
+// Circle.cs
+//
+// Microsoft XNA Community Game Platform
+// Copyright (C) Microsoft Corporation. All rights reserved.
+//-----------------------------------------------------------------------------
+#endregion
+
 using System;
-#if IPHONE
 using Microsoft.Xna.Framework;
-#else
-using Microsoft.Xna.Framework;
-#endif
-#endregion Using Clause
 
 namespace Platformer
 {

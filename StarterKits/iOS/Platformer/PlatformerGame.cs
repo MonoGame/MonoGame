@@ -1,28 +1,27 @@
-#region Using Clause
+#region File Description
+//-----------------------------------------------------------------------------
+// PlatformerGame.cs
+//
+// Microsoft XNA Community Game Platform
+// Copyright (C) Microsoft Corporation. All rights reserved.
+//-----------------------------------------------------------------------------
+#endregion
+
 using System;
 using System.IO;
-#if IPHONE
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Media;
 using Microsoft.Xna.Framework.Input.Touch;
-using Microsoft.Xna.Framework.Storage;
-using Microsoft.Xna.Framework.Media;
-#else
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Storage;
-using Microsoft.Xna.Framework.Media;
-#endif
-#endregion Using Clause
+
 
 namespace Platformer
 {
     /// <summary>
     /// This is the main type for your game
-    /// </summary>  
-	public class PlatformerGame : Game
+    /// </summary>
+    public class PlatformerGame : Microsoft.Xna.Framework.Game
     {
         // Resources for drawing.
         private GraphicsDeviceManager graphics;
@@ -43,42 +42,29 @@ namespace Platformer
         // When the time remaining is less than the warning time, it blinks on the hud
         private static readonly TimeSpan WarningTime = TimeSpan.FromSeconds(30);
 
-#if ZUNE
-        private const int TargetFrameRate = 30;        
-        private const int BackBufferWidth = 272;
-        private const int BackBufferHeight = 480;
-        private const Buttons ContinueButton = Buttons.B;
-		
-		private AccelerometerState accelState;
+        // We store our input states so that we only poll once per frame, 
+        // then we use the same input state wherever needed
+        private GamePadState gamePadState;
+        private KeyboardState keyboardState;
         private TouchCollection touchState;
-#elif IPHONE
-        private const int TargetFrameRate = 30;        
-        private const int BackBufferWidth = 320;
-        private const int BackBufferHeight = 480;
-        private const Buttons ContinueButton = Buttons.B;
-		
-		private AccelerometerState accelState;
-        private TouchCollection touchState;
-#else
-        private const int TargetFrameRate = 60;
-        private const int BackBufferWidth = 1280;
-        private const int BackBufferHeight = 720;
-        private const Buttons ContinueButton = Buttons.A;
-#endif
+        private AccelerometerState accelerometerState;
+        
+        // The number of levels in the Levels directory of our content. We assume that
+        // levels in our content are 0-based and that all numbers under this constant
+        // have a level file present. This allows us to not need to check for the file
+        // or handle exceptions, both of which can add unnecessary time to level loading.
+        private const int numberOfLevels = 3;
 
         public PlatformerGame()
         {
             graphics = new GraphicsDeviceManager(this);
-			#if IPHONE
-			#else
-            graphics.PreferredBackBufferWidth = BackBufferWidth;
-            graphics.PreferredBackBufferHeight = BackBufferHeight;
-			#endif
-
             Content.RootDirectory = "Content";
 
-            // Framerate differs between platforms.
-            TargetElapsedTime = TimeSpan.FromTicks(TimeSpan.TicksPerSecond / TargetFrameRate);
+#if WINDOWS_PHONE
+            TargetElapsedTime = TimeSpan.FromTicks(333333);
+#endif
+			graphics.IsFullScreen = true;			
+            Accelerometer.Initialize();
         }
 
         /// <summary>
@@ -98,8 +84,16 @@ namespace Platformer
             loseOverlay = Content.Load<Texture2D>("Overlays/you_lose");
             diedOverlay = Content.Load<Texture2D>("Overlays/you_died");
 
-            MediaPlayer.IsRepeating = true;
-            MediaPlayer.Play(Content.Load<Song>("Sounds/Music"));
+            //Known issue that you get exceptions if you use Media PLayer while connected to your PC
+            //See http://social.msdn.microsoft.com/Forums/en/windowsphone7series/thread/c8a243d2-d360-46b1-96bd-62b1ef268c66
+            //Which means its impossible to test this from VS.
+            //So we have to catch the exception and throw it away
+            try
+            {
+                MediaPlayer.IsRepeating = true;
+                MediaPlayer.Play(Content.Load<Song>("Sounds/Music"));
+            }
+            catch { }
 
             LoadNextLevel();
         }
@@ -111,45 +105,32 @@ namespace Platformer
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+            // Handle polling for our input and handling high-level input
             HandleInput();
 
-            level.Update(gameTime, accelState, touchState);
+            // update our level, passing down the GameTime along with all of our input states
+            level.Update(gameTime, keyboardState, gamePadState, touchState, 
+                         accelerometerState, Window.CurrentOrientation);
 
             base.Update(gameTime);
         }
 
         private void HandleInput()
         {
-			accelState = Accelerometer.GetState();
-			touchState = TouchPanel.GetState();
-			bool buttonTouched = false;			
-            KeyboardState keyboardState = Keyboard.GetState();		
-            GamePadState gamepadState = GamePad.GetState(PlayerIndex.One);
+            // get all of our input states
+            keyboardState = Keyboard.GetState();
+            gamePadState = GamePad.GetState(PlayerIndex.One);
+            touchState = TouchPanel.GetState();
+            accelerometerState = Accelerometer.GetState();
 
             // Exit the game when back is pressed.
-            if (gamepadState.Buttons.Back == ButtonState.Pressed)
+            if (gamePadState.Buttons.Back == ButtonState.Pressed)
                 Exit();
-			
-			//interpert touch screen presses
-			foreach (TouchLocation location in touchState)
-			{
-			    switch (location.State)
-			    {
-			        case TouchLocationState.Pressed:
-			            buttonTouched = true;
-			            break;
-			        case TouchLocationState.Moved:
-			            break;
-			        case TouchLocationState.Released:
-			            break;
-			    }
-			}
-
 
             bool continuePressed =
-				gamepadState.IsButtonDown(ContinueButton) ||
-				keyboardState.IsKeyDown(Keys.Space) ||
-			    buttonTouched;
+                keyboardState.IsKeyDown(Keys.Space) ||
+                gamePadState.IsButtonDown(Buttons.A) ||
+                touchState.AnyTouch();
 
             // Perform the appropriate action to advance the game and
             // to get the player back to playing.
@@ -173,36 +154,17 @@ namespace Platformer
 
         private void LoadNextLevel()
         {
-            // Find the path of the next level.
-            string levelPath;
-
-            // Loop here so we can try again when we can't find a level.
-            while (true)
-            {
-                // Try to find the next level. They are sequentially numbered txt files.
-                #if IPHONE
-                levelPath = String.Format("Content/Levels/{0}.txt", ++levelIndex);
-				#else
-				levelPath = String.Format("Levels/{0}.txt", ++levelIndex);
-                levelPath = Path.Combine(StorageContainer.TitleLocation, "Content/" + levelPath);
-				#endif
-                if (File.Exists(levelPath))
-                    break;
-
-                // If there isn't even a level 0, something has gone wrong.
-                if (levelIndex == 0)
-                    throw new Exception("No levels found.");
-
-                // Whenever we can't find a level, start over again at 0.
-                levelIndex = -1;
-            }
+            // move to the next level
+            levelIndex = (levelIndex + 1) % numberOfLevels;
 
             // Unloads the content for the current level before loading the next one.
             if (level != null)
                 level.Dispose();
 
             // Load the level.
-            level = new Level(Services, levelPath);
+            string levelPath = string.Format("Content/Levels/{0}.txt", levelIndex);
+            using (Stream fileStream = TitleContainer.OpenStream(levelPath))
+                level = new Level(Services, fileStream, levelIndex);
         }
 
         private void ReloadCurrentLevel()
@@ -217,7 +179,8 @@ namespace Platformer
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            graphics.GraphicsDevice.Clear(Color.Black);
+            graphics.GraphicsDevice.Clear(Color.CornflowerBlue);
+
 
             spriteBatch.Begin();
 
@@ -236,15 +199,7 @@ namespace Platformer
             Vector2 hudLocation = new Vector2(titleSafeArea.X, titleSafeArea.Y);
             Vector2 center = new Vector2(titleSafeArea.X + titleSafeArea.Width / 2.0f,
                                          titleSafeArea.Y + titleSafeArea.Height / 2.0f);
-			
-			#if ZUNE
-			Vector2 screenOffset = new Vector2(16, 80);
-			#elif IPHONE
-			Vector2 screenOffset = new Vector2(16, 5);
-			#else
-			Vector2 screenOffset = new Vector2(0, 0);
-            #endif
-			
+
             // Draw time remaining. Uses modulo division to cause blinking when the
             // player is running out of time.
             string timeString = "TIME: " + level.TimeRemaining.Minutes.ToString("00") + ":" + level.TimeRemaining.Seconds.ToString("00");
@@ -263,8 +218,8 @@ namespace Platformer
 
             // Draw score
             float timeHeight = hudFont.MeasureString(timeString).Y;
-            DrawShadowedString(hudFont, "SCORE: " + level.Score.ToString(), hudLocation + screenOffset + new Vector2(0.0f, timeHeight * 1.2f), Color.Yellow);
-
+            DrawShadowedString(hudFont, "SCORE: " + level.Score.ToString(), hudLocation + new Vector2(0.0f, timeHeight * 1.2f), Color.Yellow);
+           
             // Determine the status overlay message to show.
             Texture2D status = null;
             if (level.TimeRemaining == TimeSpan.Zero)
