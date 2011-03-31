@@ -1,33 +1,36 @@
-#region Using Clause
+#region File Description
+//-----------------------------------------------------------------------------
+// Program.cs
+//
+// Microsoft XNA Community Game Platform
+// Copyright (C) Microsoft Corporation. All rights reserved.
+//-----------------------------------------------------------------------------
+#endregion
+
 using System;
+
 #if IPHONE
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
-using Microsoft.Xna;
-using Microsoft.Xna.Framework.Media;
-#else
-using Microsoft.Xna.Framework;
 #endif
-#endregion Using Clause
 
+using Microsoft.Xna.Framework;
+	
 namespace Platformer
 {
-#if IPHONE
-    [Register ("AppDelegate")]
-	class Program : UIApplicationDelegate 
+	#if IPHONE
+	[Register ("AppDelegate")]
+	class  Program : MonoGameProgram
 	{
-		public override void FinishedLaunching (UIApplication app)
+		public override bool FinishedLaunching (UIApplication app, NSDictionary options)
 		{
 			// Fun begins..
-			using (PlatformerGame game = new PlatformerGame())
-            {
-                game.Run();
-            }
+			MonoGameGame = new PlatformerGame(); 
+            MonoGameGame.Run();
 			
-			//MediaLibrary lib = new MediaLibrary();
-			//object result = lib.Playlists;
+			return true;
 		}
-
+		
 		static void Main (string [] args)
 		{
 			UIApplication.Main (args,null,"AppDelegate");
@@ -49,3 +52,4 @@ namespace Platformer
     }
 #endif
 }
+

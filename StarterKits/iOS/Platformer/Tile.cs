@@ -1,13 +1,15 @@
-#region Using Clause
+﻿#region File Description
+//-----------------------------------------------------------------------------
+// Tile.cs
+//
+// Microsoft XNA Community Game Platform
+// Copyright (C) Microsoft Corporation. All rights reserved.
+//-----------------------------------------------------------------------------
+#endregion
+
 using System;
-#if IPHONE
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-#else
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-#endif
-#endregion Using Clause
 
 namespace Platformer
 {
@@ -43,16 +45,9 @@ namespace Platformer
         public Texture2D Texture;
         public TileCollision Collision;
 
-#if ZUNE
-        public const int Width = 30;
-        public const int Height = 20;
-#elif IPHONE
-        public const int Width = 30;
-        public const int Height = 20;
-#else
-        public const int Width = 64;
-        public const int Height = 48;
-#endif
+        public const int Width = 40;
+        public const int Height = 32;
+
         public static readonly Vector2 Size = new Vector2(Width, Height);
 
         /// <summary>
