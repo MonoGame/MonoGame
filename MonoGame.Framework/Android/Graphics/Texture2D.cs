@@ -143,24 +143,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
         }
 
-        public Object Tag
-        {
-            get { return null; }
-            set { throw new NotImplementedException(); }
-		}
-
-        public string Name
-        {
-            get 
-			{ 
-				return name;
-			}
-			set 
-			{
-				name = value;
-			}
-        }
-
         public static Texture2D FromFile(GraphicsDevice graphicsDevice, Stream textureStream)
         {
             Bitmap image = BitmapFactory.DecodeStream(textureStream);

@@ -67,10 +67,10 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		static BlendState () {
 			Additive = new BlendState () {
-				ColorSourceBlend = Blend.One,
-				AlphaSourceBlend = Blend.One,
-    			ColorDestinationBlend = Blend.InverseSourceAlpha,	
-				AlphaDestinationBlend = Blend.InverseSourceAlpha
+				ColorSourceBlend = Blend.SourceAlpha,
+				AlphaSourceBlend = Blend.SourceAlpha,
+    			ColorDestinationBlend = Blend.One,	
+				AlphaDestinationBlend = Blend.One
 			};
 			
 			AlphaBlend = new BlendState () {

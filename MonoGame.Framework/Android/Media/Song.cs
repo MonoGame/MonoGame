@@ -59,7 +59,12 @@ namespace Microsoft.Xna.Framework.Media
 		public void Dispose()
         {
         }
-		
+
+        public override int GetHashCode()
+        {
+            return _name.GetHashCode();
+        }
+
 		public bool Equals(Song song) 
 		{
 			return ((object)song != null) && (Name == song.Name);
