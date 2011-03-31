@@ -63,7 +63,8 @@ namespace Platformer
 #if WINDOWS_PHONE
             TargetElapsedTime = TimeSpan.FromTicks(333333);
 #endif
-			graphics.IsFullScreen = true;			
+			graphics.IsFullScreen = true;
+			graphics.SupportedOrientations =  DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight;
             Accelerometer.Initialize();
         }
 
