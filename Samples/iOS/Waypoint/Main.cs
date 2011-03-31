@@ -37,7 +37,7 @@ namespace Waypoint
     {
         static void Main()
         {
-            using (GameStateManagementGame game = new GameStateManagementGame())
+            using (WaypointSample game = new WaypointSample())
             {
                 game.Run();
             }
