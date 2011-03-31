@@ -80,7 +80,17 @@ namespace ParticleSample
         /// </summary>
         public int FreeParticleCount
         {
-            get { return freeParticles.Count; }
+            get 
+			{ 
+				if (freeParticles != null )
+				{
+					return freeParticles.Count; 
+				}
+				else
+				{
+					return 0;
+				}
+			}
         }
 
 
@@ -343,7 +353,7 @@ namespace ParticleSample
         {
             // tell sprite batch to begin, using the spriteBlendMode specified in
             // initializeConstants
-            game.SpriteBatch.Begin(spriteBlendMode);
+            game.SpriteBatch.Begin(SpriteSortMode.Deferred, spriteBlendMode);
             
             foreach (Particle p in particles)
             {
