@@ -47,10 +47,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			:base(graphicsDevice, width, height, numberLevels, TextureUsage.None, surfaceformat)
 		{
 		}
-		
-		public void Dispose()
-		{
-		}
 	}
 }
 
