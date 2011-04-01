@@ -407,8 +407,6 @@ namespace Microsoft.Xna.Framework
 				_keys.Add (kk);
 
 			UpdateKeyboardState ();
-
-			base.KeyDown (theEvent);
 		}
 
 		public override void KeyUp (NSEvent theEvent)
@@ -418,8 +416,6 @@ namespace Microsoft.Xna.Framework
 			_keys.Remove (kk);
 
 			UpdateKeyboardState ();
-			
-			base.KeyUp (theEvent);
 		}
 
 		List<Keys> _flags = new List<Keys> ();
@@ -457,7 +453,6 @@ namespace Microsoft.Xna.Framework
 			}
 
 			UpdateKeyboardState ();
-			base.FlagsChanged (theEvent);
 		}
 
 		public override void MouseDown (NSEvent theEvent)
