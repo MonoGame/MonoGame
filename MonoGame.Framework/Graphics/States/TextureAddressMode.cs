@@ -39,14 +39,14 @@
 // #endregion License
 // 
 using System;
+
 namespace Microsoft.Xna.Framework.Graphics
 {
-	public class ResolveTexture2D : Texture2D
+	public enum TextureAddressMode
 	{
-		public ResolveTexture2D(GraphicsDevice graphicsDevice, int width, int height, int numberLevels, SurfaceFormat surfaceformat)
-			:base(graphicsDevice, width, height, numberLevels, TextureUsage.None, surfaceformat)
-		{
-		}
+		Clamp,
+		Mirror,
+		Wrap,
 	}
 }
 
