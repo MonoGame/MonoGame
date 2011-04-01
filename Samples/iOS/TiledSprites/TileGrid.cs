@@ -294,8 +294,7 @@ namespace TiledSprites
 		(displaySize.Y / 2));
 
 			//begin a batch of sprites to be drawn all at once
-			batch.Begin (SpriteSortMode.Deferred, SpriteBlendMode.AlphaBlend, 
-		SaveStateMode.None);
+			batch.Begin (SpriteSortMode.Deferred, BlendState.AlphaBlend);
 
 			Rectangle sourceRect = new Rectangle ();
 			Vector2 scale = Vector2.One;

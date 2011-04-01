@@ -517,7 +517,7 @@ namespace TiledSprites
 			rockLayer.Draw (spriteBatch);
 
 			animatedSprite.Draw (spriteBatch, Color.AntiqueWhite, 
-		SpriteBlendMode.AlphaBlend);
+		BlendState.AlphaBlend);
 
 			//draw the clouds
 			cloudLayer.Draw (spriteBatch);

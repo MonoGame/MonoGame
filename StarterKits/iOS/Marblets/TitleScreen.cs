@@ -67,7 +67,7 @@ namespace Marblets
             //will be null
             if (MarbletsGame.HighScores != null)
             {
-                SpriteBatch.Begin(SpriteSortMode.Deferred,SpriteBlendMode.AlphaBlend);
+                SpriteBatch.Begin(SpriteSortMode.Deferred,BlendState.AlphaBlend);
 
                 //Draw the high scores
                 for (int i = 0; i < 5; i++)
