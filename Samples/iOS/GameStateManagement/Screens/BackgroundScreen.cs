@@ -103,7 +103,7 @@ namespace Microsoft.Xna.Samples.GameStateManagement
             Rectangle fullscreen = new Rectangle(0, 0, viewport.Width, viewport.Height);
             byte fade = TransitionAlpha;
 
-            spriteBatch.Begin(SpriteSortMode.Deferred,SpriteBlendMode.None);
+            spriteBatch.Begin(SpriteSortMode.Deferred,BlendState.Opaque);
 
             spriteBatch.Draw(backgroundTexture, fullscreen,
                              new Color(fade, fade, fade));

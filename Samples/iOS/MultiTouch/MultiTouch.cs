@@ -108,7 +108,7 @@ namespace Microsoft.Xna.Samples.MultiTouch
                 graphics.GraphicsDevice.Clear(Color.Black);
             }
 
-            spriteBatch.Begin(SpriteSortMode.Deferred,SpriteBlendMode.AlphaBlend);
+            spriteBatch.Begin(SpriteSortMode.Deferred,BlendState.AlphaBlend);
 
 			foreach (TouchLocation t in touchStateCollection)
             {

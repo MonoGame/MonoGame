@@ -104,12 +104,12 @@ namespace Microsoft.Xna.Samples.Draw2D
 			graphics.GraphicsDevice.Clear (Color.CornflowerBlue);
 
 			// Draw without blend
-			spriteBatch.Begin (SpriteSortMode.Deferred, SpriteBlendMode.None);			
+			spriteBatch.Begin (SpriteSortMode.Deferred, BlendState.Opaque);			
 			spriteBatch.Draw (texture, new Vector2 (250,20), Color.White);	
 			spriteBatch.End ();
 
 			// Draw with additive blend
-			spriteBatch.Begin (SpriteSortMode.Deferred, SpriteBlendMode.Additive);
+			spriteBatch.Begin (SpriteSortMode.Deferred, BlendState.Additive);
 			spriteBatch.Draw (texture, new Vector2 (250,110), Color.White);	
 			spriteBatch.End ();
 
