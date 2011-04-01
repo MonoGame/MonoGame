@@ -39,6 +39,6 @@ Global
 		{D03F3BAF-E4D0-4B6B-A567-9A0E2F882335}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = Samples\MacOS\ChaseAndEvade\ChaseAndEvade.csproj
+		StartupItem = Samples\MacOS\Draw2D.MacOS\MonoGame.Samples.Draw2D.MacOS.csproj
 	EndGlobalSection
 EndGlobal
