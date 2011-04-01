@@ -163,7 +163,7 @@ namespace Platformer
                 level.Dispose();
 
             // Load the level.
-            string levelPath = string.Format("Content/Levels/{0}.txt", levelIndex);
+            string levelPath = string.Format("{0}/Levels/{1}.txt", Content.RootDirectory, levelIndex);
             using (Stream fileStream = TitleContainer.OpenStream(levelPath))
                 level = new Level(Services, fileStream, levelIndex);
         }
