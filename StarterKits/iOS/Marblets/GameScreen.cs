@@ -72,8 +72,7 @@ namespace Marblets
         {
             base.Draw(gameTime);
 
-            SpriteBatch.Begin(SpriteSortMode.Deferred, SpriteBlendMode.AlphaBlend, 
-                              SaveStateMode.None);
+            SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
 
             board.Draw(SpriteBatch);
 
