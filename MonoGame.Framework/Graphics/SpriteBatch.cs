@@ -10,10 +10,14 @@ namespace Microsoft.Xna.Framework.Graphics
 {
 	public class SpriteBatch : GraphicsResource
 	{
-		SpriteSortMode _sortMode;
-		SpriteBlendMode _blendMode;
-		SaveStateMode _saveMode;
 		SpriteBatcher _batcher;
+		
+		SpriteSortMode _sortMode;
+		BlendState _blendState;
+		SamplerState _samplerState;
+		DepthStencilState _depthStencilState; 
+		RasterizerState _rasterizerState;		
+		Effect _effect;		
 		Matrix _matrix;
 
         public SpriteBatch ( GraphicsDevice graphicsDevice )
@@ -31,54 +35,85 @@ namespace Microsoft.Xna.Framework.Graphics
 		public void Begin()
 		{
 			_sortMode = SpriteSortMode.Deferred;
-			_blendMode = SpriteBlendMode.AlphaBlend;
+			_blendState = BlendState.AlphaBlend;
+			_depthStencilState = DepthStencilState.None;
+			_samplerState = SamplerState.LinearClamp;
+			_rasterizerState =  RasterizerState.CullCounterClockwise;
 			_matrix = Matrix.Identity;
 		}
 		
-		public void Begin(SpriteSortMode sortMode, SpriteBlendMode blendMode)
+		public void Begin(SpriteSortMode sortMode, BlendState blendState)
 		{
 			_sortMode = sortMode;
-			_blendMode = blendMode;
+			_blendState = (blendState == null) ? BlendState.AlphaBlend : blendState;
+			_depthStencilState = DepthStencilState.None;
+			_samplerState = SamplerState.LinearClamp;
+			_rasterizerState =  RasterizerState.CullCounterClockwise;
 			_matrix = Matrix.Identity;
 		}
 		
-		public void Begin(SpriteSortMode sortMode, SpriteBlendMode blendMode,  SaveStateMode stateMode)
+		public void Begin(SpriteSortMode sortMode, BlendState blendState, SamplerState samplerState, DepthStencilState depthStencilState, RasterizerState rasterizerState )
 		{
-			_blendMode = blendMode;
 			_sortMode = sortMode;
-			_saveMode = stateMode;
+			
+			_blendState = (blendState == null) ? BlendState.AlphaBlend : blendState;
+			_depthStencilState = (depthStencilState == null) ? DepthStencilState.None : depthStencilState;
+			_samplerState = (samplerState == null) ? SamplerState.LinearClamp : samplerState;
+			_rasterizerState =  (rasterizerState == null) ? RasterizerState.CullCounterClockwise : rasterizerState;
+			
 			_matrix = Matrix.Identity;
 		}
 		
-		public void Begin(SpriteSortMode sortMode, SpriteBlendMode blendMode, SaveStateMode stateMode, Matrix transformMatrix)
+		public void Begin(SpriteSortMode sortMode, BlendState blendState, SamplerState samplerState, DepthStencilState depthStencilState, RasterizerState rasterizerState, Effect effect)
 		{
-			_blendMode = blendMode;
 			_sortMode = sortMode;
-			_saveMode = stateMode;
+			
+			_blendState = (blendState == null) ? BlendState.AlphaBlend : blendState;
+			_depthStencilState = (depthStencilState == null) ? DepthStencilState.None : depthStencilState;
+			_samplerState = (samplerState == null) ? SamplerState.LinearClamp : samplerState;
+			_rasterizerState =  (rasterizerState == null) ? RasterizerState.CullCounterClockwise : rasterizerState;
+			
+			_effect = effect;
+		}
+		
+		public void Begin(SpriteSortMode sortMode, BlendState blendState, SamplerState samplerState, DepthStencilState depthStencilState, RasterizerState rasterizerState, Effect effect, Matrix transformMatrix)
+		{
+			_sortMode = sortMode;
+			
+			_blendState = (blendState == null) ? BlendState.AlphaBlend : blendState;
+			_depthStencilState = (depthStencilState == null) ? DepthStencilState.None : depthStencilState;
+			_samplerState = (samplerState == null) ? SamplerState.LinearClamp : samplerState;
+			_rasterizerState =  (rasterizerState == null) ? RasterizerState.CullCounterClockwise : rasterizerState;
+			
+			_effect = effect;
 			_matrix = transformMatrix;
 		}
 		
 		public void End()
 		{			
 			// set the blend mode
-			switch ( _blendMode )
+			if ( _blendState == BlendState.NonPremultiplied )
 			{
-			case SpriteBlendMode.PreMultiplied :
 				GL.Enable(All.Blend);
 				GL.BlendFunc(All.One, All.OneMinusSrcAlpha);
-				break;
-			case SpriteBlendMode.AlphaBlend :
+			}
+			
+			if ( _blendState == BlendState.AlphaBlend )
+			{
 				GL.Enable(All.Blend);
 				GL.BlendFunc(All.SrcAlpha, All.OneMinusSrcAlpha);
-				break;
-			case SpriteBlendMode.Additive :
+			}
+			
+			if ( _blendState == BlendState.Additive )
+			{
 				GL.Enable(All.Blend);
 				GL.BlendFunc(All.SrcAlpha,All.One);
-				break;
-			case SpriteBlendMode.None :
-				GL.Disable(All.Blend);
-				break;
 			}
+			
+			if ( _blendState == BlendState.Opaque )
+			{
+				GL.Disable(All.Blend);
+			}			
 			
 			// set camera
 			GL.MatrixMode(All.Projection);
