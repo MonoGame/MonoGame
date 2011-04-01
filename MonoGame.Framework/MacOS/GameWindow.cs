@@ -384,15 +384,89 @@ namespace Microsoft.Xna.Framework
 		{
 			return true;
 		}
-		
+
+		private void UpdateKeyboardState ()
+		{
+
+			_keyStates.Clear ();
+			_keyStates.AddRange (_flags);
+			_keyStates.AddRange (_keys);
+			var kbs = new KeyboardState (_keyStates.ToArray ());
+			Keyboard.State = kbs;
+
+		}
+
+		List<Keys> _keys = new List<Keys> ();
+		List<Keys> _keyStates = new List<Keys> ();
+
+		public override void KeyDown (NSEvent theEvent)
+		{
+			Keys kk = KeyUtil.GetKeys (theEvent); 
+
+			if (!_keys.Contains (kk))
+				_keys.Add (kk);
+
+			UpdateKeyboardState ();
+
+			base.KeyDown (theEvent);
+		}
+
+		public override void KeyUp (NSEvent theEvent)
+		{
+			Keys kk = KeyUtil.GetKeys (theEvent); 
+
+			_keys.Remove (kk);
+
+			UpdateKeyboardState ();
+			
+			base.KeyUp (theEvent);
+		}
+
+		List<Keys> _flags = new List<Keys> ();
+
+		public override void FlagsChanged (NSEvent theEvent)
+		{
+
+			_flags.Clear ();
+			var modInt = (uint)theEvent.ModifierFlags & 0xFFFF0000;
+			var modifier = ((NSEventModifierMask)Enum.ToObject (typeof(NSEventModifierMask), modInt));
+
+			switch (modifier) {
+			//case NSEventModifierMask.AlphaShiftKeyMask:
+			// return Keys.None;
+			case NSEventModifierMask.AlternateKeyMask:
+				_flags.Add (Keys.LeftAlt);
+				_flags.Add (Keys.RightAlt);
+				break;
+
+			case NSEventModifierMask.CommandKeyMask:
+				_flags.Add (Keys.LeftWindows);
+				_flags.Add (Keys.RightWindows);
+				break;
+			case NSEventModifierMask.ControlKeyMask:
+				_flags.Add (Keys.LeftControl);
+				_flags.Add (Keys.RightControl);
+				break;
+			case NSEventModifierMask.HelpKeyMask:
+				_flags.Add (Keys.Help);
+				break;
+			case NSEventModifierMask.ShiftKeyMask:
+				_flags.Add (Keys.RightShift);
+				_flags.Add (Keys.LeftShift);
+				break;
+			}
+
+			UpdateKeyboardState ();
+			base.FlagsChanged (theEvent);
+		}
+
 		public override void MouseDown (NSEvent theEvent)
 		{
 			PointF loc = NSEvent.CurrentMouseLocation;
 			//Console.WriteLine(NSEvent.CurrentMouseLocation);
-			SetMousePosition(loc);
-			switch (theEvent.Type) 
-			{
-				
+			SetMousePosition (loc);
+			switch (theEvent.Type) {
+
 			case NSEventType.LeftMouseDown:
 				Mouse.LeftButton = ButtonState.Pressed;
 				break;
@@ -402,19 +476,18 @@ namespace Microsoft.Xna.Framework
 			//case NSEventType.LeftMouseDown:
 			//	Mouse.LeftButton = ButtonState.Pressed;
 			//	break;
-					
-				
+
+
 			}
 		}
-		
+
 		public override void MouseUp (NSEvent theEvent)
 		{
 			PointF loc = NSEvent.CurrentMouseLocation;
 			//Console.WriteLine(NSEvent.CurrentMouseLocation);
-			SetMousePosition(loc);
-			switch (theEvent.Type) 
-			{
-				
+			SetMousePosition (loc);
+			switch (theEvent.Type) {
+
 			case NSEventType.LeftMouseUp:
 				Mouse.LeftButton = ButtonState.Released;
 				break;
@@ -424,21 +497,22 @@ namespace Microsoft.Xna.Framework
 			//case NSEventType.LeftMouseDown:
 			//	Mouse.LeftButton = ButtonState.Pressed;
 			//	break;
-					
-				
+
+
 			}
 		}		
+
 		public override void MouseMoved (NSEvent theEvent)
 		{
 			PointF loc = NSEvent.CurrentMouseLocation;
 			//Console.WriteLine(loc);
-			SetMousePosition(loc);
+			SetMousePosition (loc);
 		}
-		
-		private void SetMousePosition(PointF location)
+
+		private void SetMousePosition (PointF location)
 		{
-			Mouse.SetPosition((int)location.X, (int)(ClientBounds.Height - location.Y));
-			
+			Mouse.SetPosition ((int)location.X, (int)(ClientBounds.Height - location.Y));
+
 		}
 	}
 }

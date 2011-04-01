@@ -56,27 +56,44 @@ namespace Microsoft.Xna.Framework.Input
 		
 		public override bool Equals(Object obj)
 		{
-			return false; // Never used on iPhone or Zune
+			return (this.GetHashCode() == obj.GetHashCode());
 		}
 		
 		public override int GetHashCode()
 		{
+			// Todo create a hashcode
 			return int.MinValue; // Never used on iPhone or Zune
 		}
 		
 		public Keys[] GetPressedKeys()
 		{
-			return null; // Never used on iPhone or Zune
+			return _keys;
 		}
 		
 		public bool IsKeyDown(Keys key)
 		{
-			return false; // Never used on iPhone or Zune
+			if (_keys != null) {
+				foreach(Keys kkey in _keys) {
+					
+					if (kkey == key) {
+						return true;
+					}
+				}
+			}
+			return false;
 		}
 		
 		public bool IsKeyUp(Keys key)
 		{
-			return false; // Never used on iPhone or Zune
+			if (_keys != null) {
+				foreach(Keys kkey in _keys) {
+					
+					if (kkey == key) {
+						return false;
+					}
+				}
+			}
+			return true;
 		}
 		#endregion
 		
@@ -85,7 +102,7 @@ namespace Microsoft.Xna.Framework.Input
 		{ 
 			get
 			{
-				return KeyState.Up; // Never used on iPhone or Zune
+				return (IsKeyDown(key) ? KeyState.Down : KeyState.Up);
 			}			
 		}
 		#endregion

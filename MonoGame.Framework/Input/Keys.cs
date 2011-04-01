@@ -44,8 +44,10 @@ using System;
 
 namespace Microsoft.Xna.Framework.Input
 {
+	[Flags]
 	public enum Keys
 	{
+		None		= 0x00000000,// 	Reserved
 		A,        // 	A key
 		Add,        // 	Add key
 		Apps,        // 	Applications key
@@ -139,7 +141,7 @@ namespace Microsoft.Xna.Framework.Input
 		MediaStop,        // 	Windows 2000/XP: Stop Media key
 		Multiply,        // 	Multiply key
 		N,        // 	N key
-		None,        // 	Reserved
+
 		NumLock,        // 	NUM LOCK key
 		NumPad0,        // 	Numeric keypad 0 key
 		NumPad1,        // 	Numeric keypad 1 key
