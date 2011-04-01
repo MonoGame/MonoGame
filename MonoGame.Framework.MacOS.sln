@@ -56,6 +56,6 @@ Global
 		{1D099BD4-805E-4C04-B33D-9F2D16D42B86} = {A8B44E55-84AD-4F3A-88F7-50B99031507E}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = Samples\MacOS\ChaseAndEvade\ChaseAndEvade.csproj
+		StartupItem = Samples\MacOS\Draw2D.MacOS\MonoGame.Samples.Draw2D.MacOS.csproj
 	EndGlobalSection
 EndGlobal
