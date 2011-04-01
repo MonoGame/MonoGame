@@ -123,8 +123,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _viewport.X = 0;
             _viewport.Y = 0;
             _viewport.Width = DisplayMode.Width;
-            _viewport.Height = DisplayMode.Height;
-            _viewport.TitleSafeArea = new Rectangle(0, 0, DisplayMode.Width, DisplayMode.Height);
+            _viewport.Height = DisplayMode.Height;            
 
             if (PresentationParameters != null) {
                 PresentationParameters.BackBufferWidth = width;
