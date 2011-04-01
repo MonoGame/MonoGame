@@ -62,7 +62,7 @@ namespace Microsoft.Xna.Framework.Input
 		public override int GetHashCode()
 		{
 			// use the hash code of the _keys array
-			_keys.GetHashCode();
+			return _keys.GetHashCode();
 		}
 		
 		public Keys[] GetPressedKeys()
