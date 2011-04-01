@@ -49,16 +49,6 @@ namespace Microsoft.Xna.Framework.Input
 	{		
 		static KeyboardState _state;
 
-//		static Keyboard() {
-//			
-//			var _keys = new Keys[Enum.GetNames( typeof( Keys)).Length];
-//			int idx = 0;
-//			foreach (var k in Enum.GetValues(typeof(Keys))) {
-//				_keys[idx++] = (Keys)k;
-//			}
-//			_state = new KeyboardState(_keys);
-//			Console.WriteLine("");
-//		}
 		public static KeyboardState GetState()
 		{
 			return _state; // TODO Not used on iPhone or Zune
