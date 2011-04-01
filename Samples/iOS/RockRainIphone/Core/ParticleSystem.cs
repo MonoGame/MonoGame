@@ -136,7 +136,7 @@ namespace RockRainIphone.Core
         /// different effects can use different blend modes. fire and explosions work
         /// well with additive blending, for example.
         /// </summary>
-        protected SpriteBlendMode spriteBlendMode;
+        protected BlendState spriteBlendMode;
 
         #endregion
         

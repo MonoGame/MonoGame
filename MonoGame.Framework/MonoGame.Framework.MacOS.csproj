@@ -239,6 +239,9 @@
     <Compile Include="MacOS\Input\Mouse.cs" />
     <Compile Include="MacOS\Input\MouseState.cs" />
     <Compile Include="MacOS\Input\Keyboard.cs" />
+    <Compile Include="MacOS\KeyUtil.cs" />
+    <Compile Include="Graphics\States\TextureAddressMode.cs" />
+    <Compile Include="Graphics\States\TextureFilter.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />

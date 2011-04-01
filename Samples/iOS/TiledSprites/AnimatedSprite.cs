@@ -154,10 +154,9 @@ namespace TiledSprites
 			currentFrameValue = (currentFrameValue + 1) % numFrames;
 		}
 
-		public void Draw (SpriteBatch batch, Color color, SpriteBlendMode blendMode)
+		public void Draw (SpriteBatch batch, Color color, BlendState blendMode)
 		{
-			batch.Begin (SpriteSortMode.Immediate, blendMode, 
-				SaveStateMode.None);
+			batch.Begin (SpriteSortMode.Immediate, blendMode);
 			batch.Draw (sheet.Texture, positionValue, sheet [currentFrameValue], 
 		color, rotationValue, originValue, scaleValue, 
 		SpriteEffects.None, 0f);

@@ -43,10 +43,72 @@ namespace Microsoft.Xna.Framework.Graphics
 {
 	public class SamplerState : GraphicsResource
 	{
-		public SamplerState ()
-		{
+		static SamplerState () {
+			AnisotropicClamp = new SamplerState () {
+				Filter = TextureFilter.Anisotropic,
+
+				AddressU = TextureAddressMode.Clamp,
+				AddressV = TextureAddressMode.Clamp,
+				AddressW = TextureAddressMode.Clamp,
+			};
 			
+			AnisotropicWrap = new SamplerState () {
+				Filter = TextureFilter.Anisotropic,
+
+				AddressU = TextureAddressMode.Wrap,
+				AddressV = TextureAddressMode.Wrap,
+				AddressW = TextureAddressMode.Wrap,
+			};
+			
+			LinearClamp = new SamplerState () {
+				Filter = TextureFilter.Linear,
+
+				AddressU = TextureAddressMode.Clamp,
+				AddressV = TextureAddressMode.Clamp,
+				AddressW = TextureAddressMode.Clamp,
+			};
+			
+			LinearWrap = new SamplerState () {
+				Filter = TextureFilter.Linear,
+
+				AddressU = TextureAddressMode.Wrap,
+				AddressV = TextureAddressMode.Wrap,
+				AddressW = TextureAddressMode.Wrap,
+			};
+			
+			PointClamp = new SamplerState () {
+				Filter = TextureFilter.Point,
+
+				AddressU = TextureAddressMode.Clamp,
+				AddressV = TextureAddressMode.Clamp,
+				AddressW = TextureAddressMode.Clamp,
+			};
+			
+			PointWrap = new SamplerState () {
+				Filter = TextureFilter.Point,
+
+				AddressU = TextureAddressMode.Wrap,
+				AddressV = TextureAddressMode.Wrap,
+				AddressW = TextureAddressMode.Wrap,
+			};
 		}
+		
+		public static readonly SamplerState AnisotropicClamp;
+		public static readonly SamplerState AnisotropicWrap;
+		public static readonly SamplerState LinearClamp;
+		public static readonly SamplerState LinearWrap;
+		public static readonly SamplerState PointClamp;
+		public static readonly SamplerState PointWrap;
+		
+		public TextureAddressMode AddressU { get; set; }
+		public TextureAddressMode AddressV { get; set; }
+		public TextureAddressMode AddressW { get; set; }
+		public TextureFilter Filter { get; set; }
+		
+		public int MaxAnisotropy { get; set; }
+		public int MaxMipLevel { get; set; }
+		public float MipMapLevelOfDetailBias { get; set; }
+
 	}
 }
 

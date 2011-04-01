@@ -82,7 +82,7 @@ namespace ParticleSample
             minRotationSpeed = -MathHelper.PiOver4;
             maxRotationSpeed = MathHelper.PiOver4;
 
-            spriteBlendMode = SpriteBlendMode.AlphaBlend;
+            spriteBlendMode = BlendState.AlphaBlend;
 
             DrawOrder = AlphaBlendDrawOrder;
         }

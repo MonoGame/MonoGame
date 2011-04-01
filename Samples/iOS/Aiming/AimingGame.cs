@@ -254,7 +254,7 @@ namespace Aiming
 
             // Start sprite batch with additive blending, and draw the spotlight.
             // Additive blending works very well for effects like lights and fire.
-            spriteBatch.Begin(SpriteSortMode.Deferred, SpriteBlendMode.Additive);
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive);
             spriteBatch.Draw(spotlightTexture, spotlightPosition, null, Color.White,
                 spotlightAngle, spotlightOrigin, 1.0f, SpriteEffects.None, 0.0f);
             spriteBatch.End();
