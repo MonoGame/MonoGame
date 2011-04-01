@@ -233,6 +233,8 @@
     <Compile Include="Graphics\Effect\IEffectMatrices.cs" />
     <Compile Include="Graphics\ColorWriteChannels.cs" />
     <Compile Include="Graphics\DirectionalLight.cs" />
+    <Compile Include="Graphics\States\TextureAddressMode.cs" />
+    <Compile Include="Graphics\States\TextureFilter.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="GamerServices\" />
