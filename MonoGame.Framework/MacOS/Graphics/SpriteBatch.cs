@@ -11,20 +11,15 @@ namespace Microsoft.Xna.Framework.Graphics
 {
 	public class SpriteBatch : GraphicsResource
 	{
-		SpriteSortMode _sortMode;
-		SpriteBlendMode _blendMode;
-		SaveStateMode _saveMode;
 		SpriteBatcher _batcher;
-		Matrix _matrix;
-		GraphicsDevice _graphicsDevice;
 		
-		public GraphicsDevice GraphicsDevice 
-		{ 
-			get 
-			{
-				return _graphicsDevice;
-			}
-		}
+		SpriteSortMode _sortMode;
+		BlendState _blendState;
+		SamplerState _samplerState;
+		DepthStencilState _depthStencilState; 
+		RasterizerState _rasterizerState;		
+		Effect _effect;	
+		Matrix _matrix;
 		
 		public SpriteBatch ( GraphicsDevice graphicsDevice )
 		{
@@ -33,7 +28,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				throw new ArgumentException("graphicsDevice");
 			}	
 			
-			_graphicsDevice = graphicsDevice;
+			this.graphicsDevice = graphicsDevice;
 			
 			_batcher = new SpriteBatcher();
 		}
@@ -41,104 +36,135 @@ namespace Microsoft.Xna.Framework.Graphics
 		public void Begin()
 		{
 			_sortMode = SpriteSortMode.Deferred;
-			_blendMode = SpriteBlendMode.AlphaBlend;
+			_blendState = BlendState.AlphaBlend;
+			_depthStencilState = DepthStencilState.None;
+			_samplerState = SamplerState.LinearClamp;
+			_rasterizerState =  RasterizerState.CullCounterClockwise;
 			_matrix = Matrix.Identity;
 		}
 		
-		public void Begin(SpriteSortMode sortMode, SpriteBlendMode blendMode)
+		public void Begin(SpriteSortMode sortMode, BlendState blendState)
 		{
 			_sortMode = sortMode;
-			_blendMode = blendMode;
+			_blendState = (blendState == null) ? BlendState.AlphaBlend : blendState;
+			_depthStencilState = DepthStencilState.None;
+			_samplerState = SamplerState.LinearClamp;
+			_rasterizerState =  RasterizerState.CullCounterClockwise;
 			_matrix = Matrix.Identity;
 		}
 		
-		public void Begin(SpriteSortMode sortMode, SpriteBlendMode blendMode,  SaveStateMode stateMode)
+		public void Begin(SpriteSortMode sortMode, BlendState blendState, SamplerState samplerState, DepthStencilState depthStencilState, RasterizerState rasterizerState )
 		{
-			_blendMode = blendMode;
 			_sortMode = sortMode;
-			_saveMode = stateMode;
+			
+			_blendState = (blendState == null) ? BlendState.AlphaBlend : blendState;
+			_depthStencilState = (depthStencilState == null) ? DepthStencilState.None : depthStencilState;
+			_samplerState = (samplerState == null) ? SamplerState.LinearClamp : samplerState;
+			_rasterizerState =  (rasterizerState == null) ? RasterizerState.CullCounterClockwise : rasterizerState;
+			
 			_matrix = Matrix.Identity;
 		}
 		
-		public void Begin(SpriteSortMode sortMode, SpriteBlendMode blendMode, SaveStateMode stateMode, Matrix transformMatrix)
+		public void Begin(SpriteSortMode sortMode, BlendState blendState, SamplerState samplerState, DepthStencilState depthStencilState, RasterizerState rasterizerState, Effect effect)
 		{
-			_blendMode = blendMode;
 			_sortMode = sortMode;
-			_saveMode = stateMode;
+			
+			_blendState = (blendState == null) ? BlendState.AlphaBlend : blendState;
+			_depthStencilState = (depthStencilState == null) ? DepthStencilState.None : depthStencilState;
+			_samplerState = (samplerState == null) ? SamplerState.LinearClamp : samplerState;
+			_rasterizerState =  (rasterizerState == null) ? RasterizerState.CullCounterClockwise : rasterizerState;
+			
+			_effect = effect;
+		}
+		
+		public void Begin(SpriteSortMode sortMode, BlendState blendState, SamplerState samplerState, DepthStencilState depthStencilState, RasterizerState rasterizerState, Effect effect, Matrix transformMatrix)
+		{
+			_sortMode = sortMode;
+			
+			_blendState = (blendState == null) ? BlendState.AlphaBlend : blendState;
+			_depthStencilState = (depthStencilState == null) ? DepthStencilState.None : depthStencilState;
+			_samplerState = (samplerState == null) ? SamplerState.LinearClamp : samplerState;
+			_rasterizerState =  (rasterizerState == null) ? RasterizerState.CullCounterClockwise : rasterizerState;
+			
+			_effect = effect;
 			_matrix = transformMatrix;
 		}
 		
 		public void End()
 		{			
 			// set the blend mode
-			switch ( _blendMode )
+			if ( _blendState == BlendState.NonPremultiplied )
 			{
-			case SpriteBlendMode.PreMultiplied :
 				GL.Enable(EnableCap.Blend);
 				GL.BlendFunc(BlendingFactorSrc.One, BlendingFactorDest.OneMinusSrcAlpha);
-				break;
-			case SpriteBlendMode.AlphaBlend :
+			}
+			
+			if ( _blendState == BlendState.AlphaBlend )
+			{
 				GL.Enable(EnableCap.Blend);
 				GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
-				break;
-			case SpriteBlendMode.Additive :
+			}
+			
+			if ( _blendState == BlendState.Additive )
+			{
 				GL.Enable(EnableCap.Blend);
 				GL.BlendFunc(BlendingFactorSrc.SrcAlpha,BlendingFactorDest.One);
-				break;
-			case SpriteBlendMode.None :
-				GL.Disable(EnableCap.Blend);
-				break;
 			}
+			
+			if ( _blendState == BlendState.Opaque )
+			{
+				GL.Disable(EnableCap.Blend);
+			}	
 			
 			// set camera
 			GL.MatrixMode(MatrixMode.Projection);
 			GL.LoadIdentity();		
 			
 			// Switch on the flags.
-	        switch (_graphicsDevice.PresentationParameters.DisplayOrientation)
+	        switch (this.graphicsDevice.PresentationParameters.DisplayOrientation)
 	        {
 				case DisplayOrientation.LandscapeLeft:
                 {
 					GL.Rotate(-90, 0, 0, 1); 
-					GL.Ortho(0, _graphicsDevice.Viewport.Height, _graphicsDevice.Viewport.Width,  0, -1, 1);
+					GL.Ortho(0, this.graphicsDevice.Viewport.Height, this.graphicsDevice.Viewport.Width,  0, -1, 1);
 					break;
 				}
 				
 				case DisplayOrientation.LandscapeRight:
                 {
 					GL.Rotate(90, 0, 0, 1); 
-					GL.Ortho(0, _graphicsDevice.Viewport.Height, _graphicsDevice.Viewport.Width,  0, -1, 1);
+					GL.Ortho(0, this.graphicsDevice.Viewport.Height, this.graphicsDevice.Viewport.Width,  0, -1, 1);
 					break;
 				}
 				
 				case DisplayOrientation.PortraitUpsideDown:
                 {
 					GL.Rotate(180, 0, 0, 1); 
-					GL.Ortho(0, _graphicsDevice.Viewport.Width, _graphicsDevice.Viewport.Height,  0, -1, 1);
+					GL.Ortho(0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height,  0, -1, 1);
 					break;
 				}
 				
 				default:
 				{
-					GL.Ortho(0, _graphicsDevice.Viewport.Width, _graphicsDevice.Viewport.Height, 0, -1, 1);
+					GL.Ortho(0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height, 0, -1, 1);
 					break;
 				}
 			}
 			
 			// Enable Scissor Tests if necessary
-			if ( _graphicsDevice.RenderState.ScissorTestEnable )
+			if ( this.graphicsDevice.RenderState.ScissorTestEnable )
 			{
 				GL.Enable(EnableCap.ScissorTest);				
 			}
 			
 			GL.MatrixMode(MatrixMode.Modelview);
 			GL.LoadMatrix( ref _matrix.M11 );
-			GL.Viewport (0, 0, _graphicsDevice.Viewport.Width, _graphicsDevice.Viewport.Height);
+			GL.Viewport (0, 0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height);
 			
 			// Enable Scissor Tests if necessary
-			if ( _graphicsDevice.RenderState.ScissorTestEnable )
+			if ( this.graphicsDevice.RenderState.ScissorTestEnable )
 			{
-				GL.Scissor(_graphicsDevice.ScissorRectangle.X, _graphicsDevice.ScissorRectangle.Y, _graphicsDevice.ScissorRectangle.Width, _graphicsDevice.ScissorRectangle.Height );
+				GL.Scissor(this.graphicsDevice.ScissorRectangle.X, this.graphicsDevice.ScissorRectangle.Y, this.graphicsDevice.ScissorRectangle.Width, this.graphicsDevice.ScissorRectangle.Height );
 			}
 						
 			// Initialize OpenGL states (ideally move this to initialize somewhere else)	
