@@ -3,13 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Framework.MacOS", "MonoGame.Framework\MonoGame.Framework.MacOS.csproj", "{36C538E6-C32A-4A8D-A39C-566173D7118E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Samples.Draw2D.MacOS", "Samples\MacOS\Draw2D.MacOS\MonoGame.Samples.Draw2D.MacOS.csproj", "{A82EAD58-40D7-49BE-8F24-09FEA34F9E55}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{72892965-7498-414A-972A-9A1C00717FED}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChaseAndEvade", "Samples\MacOS\ChaseAndEvade\ChaseAndEvade.csproj", "{D03F3BAF-E4D0-4B6B-A567-9A0E2F882335}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Samples.BouncingBox.MacOS", "Samples\MacOS\BouncingBox\MonoGame.Samples.BouncingBox.MacOS.csproj", "{4480BF44-7CE2-4A22-9372-DAFA3B05390E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TiledSprites", "Samples\MacOS\TiledSprites\TiledSprites.csproj", "{7D24D7EA-822C-4991-8BC9-1C2EF9C5F59A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Samples.Draw2D.MacOS", "Samples\MacOS\Draw2D.MacOS\MonoGame.Samples.Draw2D.MacOS.csproj", "{A82EAD58-40D7-49BE-8F24-09FEA34F9E55}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChaseAndEvade", "Samples\MacOS\ChaseAndEvade\ChaseAndEvade.csproj", "{D03F3BAF-E4D0-4B6B-A567-9A0E2F882335}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TiledSprites", "Samples\MacOS\TiledSprites\TiledSprites.csproj", "{7D24D7EA-822C-4991-8BC9-1C2EF9C5F59A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -37,6 +39,12 @@ Global
 		{D03F3BAF-E4D0-4B6B-A567-9A0E2F882335}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D03F3BAF-E4D0-4B6B-A567-9A0E2F882335}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D03F3BAF-E4D0-4B6B-A567-9A0E2F882335}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{D03F3BAF-E4D0-4B6B-A567-9A0E2F882335} = {72892965-7498-414A-972A-9A1C00717FED}
+		{4480BF44-7CE2-4A22-9372-DAFA3B05390E} = {72892965-7498-414A-972A-9A1C00717FED}
+		{A82EAD58-40D7-49BE-8F24-09FEA34F9E55} = {72892965-7498-414A-972A-9A1C00717FED}
+		{7D24D7EA-822C-4991-8BC9-1C2EF9C5F59A} = {72892965-7498-414A-972A-9A1C00717FED}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = Samples\MacOS\Draw2D.MacOS\MonoGame.Samples.Draw2D.MacOS.csproj
