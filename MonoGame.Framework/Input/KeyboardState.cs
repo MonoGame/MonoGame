@@ -61,8 +61,8 @@ namespace Microsoft.Xna.Framework.Input
 		
 		public override int GetHashCode()
 		{
-			// Todo create a hashcode
-			return int.MinValue; // Never used on iPhone or Zune
+			// use the hash code of the _keys array
+			return _keys.GetHashCode();
 		}
 		
 		public Keys[] GetPressedKeys()
