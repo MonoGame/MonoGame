@@ -11,6 +11,11 @@ namespace TiledSprites
 			
 			using (var p = new NSAutoreleasePool ()) {
 				NSApplication.SharedApplication.Delegate = new AppDelegate();
+
+				// Set our Application Icon
+				NSImage appIcon = NSImage.ImageNamed ("GameThumbnail.png");
+				NSApplication.SharedApplication.ApplicationIconImage = appIcon;
+				
 				NSApplication.Main(args);
 			}
 		}

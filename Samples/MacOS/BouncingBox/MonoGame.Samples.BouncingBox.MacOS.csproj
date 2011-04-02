@@ -59,6 +59,7 @@
     <Content Include="..\..\iOS\BouncingBox\Content\monogameicon.png">
       <Link>Content\monogameicon.png</Link>
     </Content>
+    <Content Include="monogameicon.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />

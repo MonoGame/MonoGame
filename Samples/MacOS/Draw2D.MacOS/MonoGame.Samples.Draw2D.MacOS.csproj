@@ -44,12 +44,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
-    <None Include="..\..\iOS\Draw2D\Default.png">
-      <Link>Default.png</Link>
-    </None>
-    <None Include="..\..\iOS\Draw2D\monogameicon.png">
-      <Link>monogameicon.png</Link>
-    </None>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Mono\MonoMac\v0.0\Mono.MonoMac.targets" />
@@ -75,6 +69,10 @@
     <Content Include="..\..\iOS\Draw2D\Content\spriteFont1.xnb">
       <Link>Content\spriteFont1.xnb</Link>
     </Content>
+    <Content Include="..\..\iOS\Draw2D\Default.png">
+      <Link>Default.png</Link>
+    </Content>
+    <Content Include="monogameicon.png" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\MonoGame.Framework\MonoGame.Framework.MacOS.csproj">
