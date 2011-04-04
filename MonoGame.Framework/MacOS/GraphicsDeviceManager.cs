@@ -66,18 +66,18 @@ namespace Microsoft.Xna.Framework
 			_preferredBackBufferHeight = game.Window.ClientBounds.Height;
 			_preferredBackBufferWidth = game.Window.ClientBounds.Width;
 			_supportedOrientations = DisplayOrientation.Default;
-			
+
             if (game.Services.GetService(typeof(IGraphicsDeviceManager)) != null)
             {
                 throw new ArgumentException("Graphics Device Manager Already Present");
             }
-			
+
             game.Services.AddService(typeof(IGraphicsDeviceManager), this);
             game.Services.AddService(typeof(IGraphicsDeviceService), this);	
-			
+
 			Initialize();
         }
-		
+
 		public void CreateDevice ()
 		{
 			throw new System.NotImplementedException ();
@@ -92,7 +92,7 @@ namespace Microsoft.Xna.Framework
 		{
 			throw new NotImplementedException();
 		}
-		
+
 		 #region IGraphicsDeviceService Members
 
         public event EventHandler DeviceCreated;
@@ -102,7 +102,7 @@ namespace Microsoft.Xna.Framework
         public event EventHandler DeviceReset;
 
         public event EventHandler DeviceResetting;
-		
+
 		public event EventHandler<PreparingDeviceSettingsEventArgs> PreparingDeviceSettings;
 
         #endregion
@@ -123,7 +123,7 @@ namespace Microsoft.Xna.Framework
 		{
 			_graphicsDevice = new GraphicsDevice();
 			_graphicsDevice.PresentationParameters = new PresentationParameters();
-			
+
 			// Set "full screen"  as default
 			_graphicsDevice.PresentationParameters.IsFullScreen = true;
 
@@ -136,12 +136,12 @@ namespace Microsoft.Xna.Framework
 				_graphicsDevice.PreferedFilter = All.Nearest;
 			}
 		}
-		
+
         public void ToggleFullScreen()
         {
 			IsFullScreen = !IsFullScreen;
         }
-		
+
         public Microsoft.Xna.Framework.Graphics.GraphicsDevice GraphicsDevice
         {
             get
@@ -238,7 +238,7 @@ namespace Microsoft.Xna.Framework
             {
             }
         }
-		
+
 		public DisplayOrientation SupportedOrientations 
 		{ 
 			get
@@ -253,4 +253,3 @@ namespace Microsoft.Xna.Framework
 
     }
 }
-
