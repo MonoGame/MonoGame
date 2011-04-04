@@ -58,22 +58,24 @@ namespace Microsoft.Xna.Framework
 {
 	public class GameWindow : MonoMacGameView
 	{
-		private readonly Rectangle clientBounds;
+		//private readonly Rectangle clientBounds;
+		private Rectangle clientBounds;
 		internal Game game;
 		private GameTime _updateGameTime;
 		private GameTime _drawGameTime;
 		private DateTime _lastUpdate;
 		private DateTime _now;
-		//public NSOpenGLContext MainContext;
-		//public NSOpenGLContext BackgroundContext;
-		//public NSOpenGLContext ShareGroup; 
 
 		#region UIVIew Methods		
 		public GameWindow (RectangleF frame) : base (frame)
 		{
+
 			//LayerRetainsBacking = false; 
 			//LayerColorFormat	= EAGLColorFormat.RGBA8;
-
+			this.AutoresizingMask = MonoMac.AppKit.NSViewResizingMask.HeightSizable
+					| MonoMac.AppKit.NSViewResizingMask.MaxXMargin 
+					| MonoMac.AppKit.NSViewResizingMask.MinYMargin
+					| MonoMac.AppKit.NSViewResizingMask.WidthSizable;
 			//RectangleF rect = NSScreen.MainScreen.Frame;
 			RectangleF rect = frame;
 			clientBounds = new Rectangle (0,0,(int)rect.Width,(int)rect.Height);
@@ -97,8 +99,10 @@ namespace Microsoft.Xna.Framework
 		[Export("initWithFrame:")]
 		public GameWindow () : base (NSScreen.MainScreen.Frame)
 		{
-			//LayerRetainsBacking = false; 
-			//LayerColorFormat	= EAGLColorFormat.RGBA8;
+			this.AutoresizingMask = MonoMac.AppKit.NSViewResizingMask.HeightSizable
+					| MonoMac.AppKit.NSViewResizingMask.MaxXMargin 
+					| MonoMac.AppKit.NSViewResizingMask.MinYMargin
+					| MonoMac.AppKit.NSViewResizingMask.WidthSizable;
 
 			RectangleF rect = NSScreen.MainScreen.Frame;
 			clientBounds = new Rectangle (0,0,(int)rect.Width,(int)rect.Height);
@@ -142,8 +146,6 @@ namespace Microsoft.Xna.Framework
 		{
 			base.OnRenderFrame (e);
 
-			//MakeCurrent ();
-
 			// This code was commented to make the code base more iPhone like.
 			// More speed testing is required, to see if this is worse or better
 			// game.DoStep();	
@@ -154,14 +156,33 @@ namespace Microsoft.Xna.Framework
 				game.DoDraw (_drawGameTime);
 			}
 
-			//SwapBuffers ();
 		}
 
 		protected override void OnResize (EventArgs e)
 		{
+			Microsoft.Xna.Framework.Graphics.Viewport _vp =
+			new Microsoft.Xna.Framework.Graphics.Viewport();
+				
+			_vp.X = (int)Bounds.X;
+			_vp.Y = (int)Bounds.Y;
+			_vp.Width = (int)Bounds.Width;
+			_vp.Height = (int)Bounds.Height;
+			
+			game.GraphicsDevice.Viewport = _vp;
+			
+			clientBounds = new Rectangle((int)Bounds.X,(int)Bounds.Y,(int)Bounds.Width,(int)Bounds.Height);
+			
 			base.OnResize (e);
+			OnClientSizeChanged(e);
 		}
-
+		
+		protected virtual void OnClientSizeChanged (EventArgs e)
+		{
+			var h = ClientSizeChanged;
+			if (h != null)
+				h (this, e);
+		}
+		
 		protected override void OnTitleChanged (EventArgs e)
 		{
 			base.OnTitleChanged (e);
@@ -387,13 +408,11 @@ namespace Microsoft.Xna.Framework
 
 		private void UpdateKeyboardState ()
 		{
-
 			_keyStates.Clear ();
 			_keyStates.AddRange (_flags);
 			_keyStates.AddRange (_keys);
 			var kbs = new KeyboardState (_keyStates.ToArray ());
 			Keyboard.State = kbs;
-
 		}
 
 		List<Keys> _keys = new List<Keys> ();
