@@ -55,7 +55,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		private Viewport _viewport;
 		private GraphicsDevice2D _spriteDevice;
 		private bool _isDisposed = false;
-		private readonly DisplayMode _displayMode = new DisplayMode();
+		private DisplayMode _displayMode = new DisplayMode();
 		private RenderState _renderState;
 		public TextureCollection Textures { get; set; }
         internal List<IntPtr> _pointerCache = new List<IntPtr>();
