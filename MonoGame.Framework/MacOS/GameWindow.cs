@@ -76,6 +76,7 @@ namespace Microsoft.Xna.Framework
 					| MonoMac.AppKit.NSViewResizingMask.MaxXMargin 
 					| MonoMac.AppKit.NSViewResizingMask.MinYMargin
 					| MonoMac.AppKit.NSViewResizingMask.WidthSizable;
+			
 			//RectangleF rect = NSScreen.MainScreen.Frame;
 			RectangleF rect = frame;
 			clientBounds = new Rectangle (0,0,(int)rect.Width,(int)rect.Height);
@@ -160,6 +161,11 @@ namespace Microsoft.Xna.Framework
 
 		protected override void OnResize (EventArgs e)
 		{
+			
+			var manager = game.Services.GetService (typeof(IGraphicsDeviceManager)) as GraphicsDeviceManager;
+			if (game._initialized)
+				manager.OnDeviceResetting(EventArgs.Empty);
+			
 			Microsoft.Xna.Framework.Graphics.Viewport _vp =
 			new Microsoft.Xna.Framework.Graphics.Viewport();
 				
@@ -174,6 +180,9 @@ namespace Microsoft.Xna.Framework
 			
 			base.OnResize (e);
 			OnClientSizeChanged(e);
+			
+			if (game._initialized)
+				manager.OnDeviceReset(EventArgs.Empty);
 		}
 		
 		protected virtual void OnClientSizeChanged (EventArgs e)

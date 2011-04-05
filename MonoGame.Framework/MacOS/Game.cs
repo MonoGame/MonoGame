@@ -62,7 +62,7 @@ namespace Microsoft.Xna.Framework
 		private GameTime _updateGameTime;
 		private GameTime _drawGameTime;
 		private DateTime _lastUpdate;
-		private bool _initialized = false;
+		internal bool _initialized = false;
 		private bool _initializing = false;
 		private bool _isActive = true;
 		private GameComponentCollection _gameComponentCollection;
