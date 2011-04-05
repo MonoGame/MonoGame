@@ -112,7 +112,19 @@ namespace Microsoft.Xna.Framework
 		{
 			// TODO NSDevice.CurrentDevice.EndGeneratingDeviceOrientationNotifications(); 
 		}
-
+		
+		internal bool IsAllowUserResizing
+		{
+			get {
+				return (_mainWindow.StyleMask & NSWindowStyle.Resizable) > 0;
+			}
+			
+			set {
+				if (IsAllowUserResizing != value)
+					_mainWindow.StyleMask ^= NSWindowStyle.Resizable;
+			}
+			
+		}
 		/* private void ObserveDeviceRotation ()
 		{
 			NSNotificationCenter.DefaultCenter.AddObserver( new NSString("UIDeviceOrientationDidChangeNotification"), (notification) => { 
