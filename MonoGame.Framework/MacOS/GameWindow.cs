@@ -373,10 +373,10 @@ namespace Microsoft.Xna.Framework
 
 		public bool AllowUserResizing {
 			get {
-				return false;
+				return game.IsAllowUserResizing;
 			}
 			set {
-				// Do nothing; Ignore rather than raising and exception
+				game.IsAllowUserResizing = value;
 			}
 		}	
 
