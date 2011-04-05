@@ -19,6 +19,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "StarterKits", "StarterKits"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Platformer", "StarterKits\MacOS\Platformer\Platformer.csproj", "{1D099BD4-805E-4C04-B33D-9F2D16D42B86}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Marblets", "StarterKits\MacOS\Marblets\Marblets.csproj", "{2BCFC6F4-5C08-467A-B310-5C0A009018CE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,6 +31,10 @@ Global
 		{1D099BD4-805E-4C04-B33D-9F2D16D42B86}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1D099BD4-805E-4C04-B33D-9F2D16D42B86}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1D099BD4-805E-4C04-B33D-9F2D16D42B86}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2BCFC6F4-5C08-467A-B310-5C0A009018CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2BCFC6F4-5C08-467A-B310-5C0A009018CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2BCFC6F4-5C08-467A-B310-5C0A009018CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2BCFC6F4-5C08-467A-B310-5C0A009018CE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{36C538E6-C32A-4A8D-A39C-566173D7118E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{36C538E6-C32A-4A8D-A39C-566173D7118E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{36C538E6-C32A-4A8D-A39C-566173D7118E}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -61,6 +67,7 @@ Global
 		{7D24D7EA-822C-4991-8BC9-1C2EF9C5F59A} = {72892965-7498-414A-972A-9A1C00717FED}
 		{FE144248-B1ED-4A7C-980C-7A2E603CE604} = {72892965-7498-414A-972A-9A1C00717FED}
 		{1D099BD4-805E-4C04-B33D-9F2D16D42B86} = {A8B44E55-84AD-4F3A-88F7-50B99031507E}
+		{2BCFC6F4-5C08-467A-B310-5C0A009018CE} = {A8B44E55-84AD-4F3A-88F7-50B99031507E}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = Samples\MacOS\Draw2D.MacOS\MonoGame.Samples.Draw2D.MacOS.csproj

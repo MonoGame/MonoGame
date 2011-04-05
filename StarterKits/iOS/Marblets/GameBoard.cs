@@ -21,7 +21,8 @@ using System.Text;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework.GamerServices;
 #endregion
-
+using MonoMac.AppKit;
+using MonoMac.Foundation;
 namespace Marblets
 {
     /// <summary>
@@ -117,8 +118,13 @@ namespace Marblets
         /// </summary>
         protected override void LoadContent()
         {
-            marbleCursorTexture =
-                MarbletsGame.Content.Load<Texture2D>("Textures/marble_cursor");
+		// There is no autorelease pool when this method is called because it will be called from a background thread
+		// It's important to create one or you will leak objects
+		using (NSAutoreleasePool pool = new NSAutoreleasePool ()) {
+			marbleCursorTexture = MarbletsGame.Content.Load<Texture2D>("Textures/marble_cursor");
+		}	
+//            marbleCursorTexture =
+//                MarbletsGame.Content.Load<Texture2D>("Textures/marble_cursor");
             Marble.LoadContent();
 
             base.LoadContent();
@@ -747,8 +753,8 @@ namespace Marblets
             }
             else
             {
-                Guide.BeginShowStorageDeviceSelector(
-                    new AsyncCallback(SaveHighScoresCallback), null);
+                //Guide.BeginShowStorageDeviceSelector(
+                //    new AsyncCallback(SaveHighScoresCallback), null);
             }
         }
 
@@ -759,7 +765,7 @@ namespace Marblets
         {
             if ((result != null) && result.IsCompleted)
             {
-                MarbletsGame.StorageDevice = Guide.EndShowStorageDeviceSelector(result);
+                //MarbletsGame.StorageDevice = Guide.EndShowStorageDeviceSelector(result);
             }
             if ((MarbletsGame.StorageDevice != null) &&
                 MarbletsGame.StorageDevice.IsConnected)
