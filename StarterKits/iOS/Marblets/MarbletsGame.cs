@@ -111,8 +111,9 @@ namespace Marblets
             inputHelper = new InputHelper(this);
             inputHelper.UpdateOrder = int.MinValue;
             this.Components.Add(inputHelper);
-
-            //this.Components.Add(new GamerServicesComponent(this));
+#if !MONOMAC
+            this.Components.Add(new GamerServicesComponent(this));
+#endif
         }
 
 
@@ -155,8 +156,10 @@ namespace Marblets
             }
             else
             {
-                //Guide.BeginShowStorageDeviceSelector(
-                //    new AsyncCallback(LoadHighScoresCallback), null);
+#if !MONOMAC
+                Guide.BeginShowStorageDeviceSelector(
+                    new AsyncCallback(LoadHighScoresCallback), null);
+#endif
             }
         }
 
@@ -167,7 +170,9 @@ namespace Marblets
         {
             if ((result != null) && result.IsCompleted)
             {
-                //MarbletsGame.StorageDevice = Guide.EndShowStorageDeviceSelector(result);
+#if !MONOMAC
+                MarbletsGame.StorageDevice = Guide.EndShowStorageDeviceSelector(result);
+#endif
             }
             if ((MarbletsGame.StorageDevice != null) &&
                 MarbletsGame.StorageDevice.IsConnected)

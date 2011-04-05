@@ -70,6 +70,6 @@ Global
 		{2BCFC6F4-5C08-467A-B310-5C0A009018CE} = {A8B44E55-84AD-4F3A-88F7-50B99031507E}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = Samples\MacOS\Draw2D.MacOS\MonoGame.Samples.Draw2D.MacOS.csproj
+		StartupItem = StarterKits\MacOS\Marblets\Marblets.csproj
 	EndGlobalSection
 EndGlobal

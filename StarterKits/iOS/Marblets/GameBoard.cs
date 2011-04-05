@@ -21,8 +21,7 @@ using System.Text;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework.GamerServices;
 #endregion
-using MonoMac.AppKit;
-using MonoMac.Foundation;
+
 namespace Marblets
 {
     /// <summary>
@@ -760,7 +759,9 @@ namespace Marblets
         {
             if ((result != null) && result.IsCompleted)
             {
+#if !MONOMAC
                 //MarbletsGame.StorageDevice = Guide.EndShowStorageDeviceSelector(result);
+#endif
             }
             if ((MarbletsGame.StorageDevice != null) &&
                 MarbletsGame.StorageDevice.IsConnected)

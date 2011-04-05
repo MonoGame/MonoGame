@@ -77,6 +77,7 @@ namespace Microsoft.Xna.Framework
 		internal static bool _playingVideo = false;
 		private SpriteBatch spriteBatch;
 		private Texture2D splashScreen;
+		private bool _mouseVisible = false;
 
 		delegate void InitialiseGameComponentsDelegate ();
 
@@ -212,10 +213,10 @@ namespace Microsoft.Xna.Framework
 
 		public bool IsMouseVisible {
 			get {
-				return false;
+				return _mouseVisible;
 			}
 			set {
-				// do nothing; ignore
+				_mouseVisible = value;
 			}
 		}
 
