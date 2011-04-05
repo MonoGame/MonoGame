@@ -118,13 +118,8 @@ namespace Marblets
         /// </summary>
         protected override void LoadContent()
         {
-		// There is no autorelease pool when this method is called because it will be called from a background thread
-		// It's important to create one or you will leak objects
-		using (NSAutoreleasePool pool = new NSAutoreleasePool ()) {
-			marbleCursorTexture = MarbletsGame.Content.Load<Texture2D>("Textures/marble_cursor");
-		}	
-//            marbleCursorTexture =
-//                MarbletsGame.Content.Load<Texture2D>("Textures/marble_cursor");
+            marbleCursorTexture =
+                MarbletsGame.Content.Load<Texture2D>("Textures/marble_cursor");
             Marble.LoadContent();
 
             base.LoadContent();
