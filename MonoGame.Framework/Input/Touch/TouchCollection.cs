@@ -48,6 +48,36 @@ namespace Microsoft.Xna.Framework.Input.Touch
 {	
 	public class TouchCollection : List<TouchLocation>
 	{
+		/// <summary>
+		/// Attributes 
+		/// </summary>
+		private bool isConnected;
+		private int locationCount;
+		
+		#region Properties
+		public int Count
+		{
+			get
+			{
+				return this.locationCount;
+			}
+		}
+		public bool IsConnected
+		{
+			get
+			{
+				return this.isConnected;
+			}
+		}
+		public bool IsReadOnly
+		{
+			get
+			{
+				return true;
+			}
+		}
+		#endregion
+		
 		public TouchCollection()
 		{
 			
@@ -57,5 +87,59 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		{
 			
 		}
+		
+		public bool Contains(TouchLocation item)
+		{
+			return (this.IndexOf(item) >= 0);
+		}
+		
+		public void CopyTo (TouchLocation[] array, int arrayIndex)
+		{
+			if (array == null)
+			{
+				throw new ArgumentNullException("array");
+			}
+			if (arrayIndex < 0)
+			{
+				throw new ArgumentOutOfRangeException("arrayIndex");
+			}
+			long num = arrayIndex + this.Count;
+			if (array.Length < num)
+			{
+				throw new ArgumentOutOfRangeException("arrayIndex");
+			}
+			for(int i = 0; i < this.Count; i++)
+			{
+				array[arrayIndex+i] = this[i];
+			}
+		}
+		
+		public bool FindById(int id, out TouchLocation touchLocation)
+		{
+			for (int i = 0; i < this.Count; i++)
+			{
+				TouchLocation location = this[i];
+				if (location.Id == id)
+				{
+					touchLocation = this[i];
+					return true;
+				}
+			}
+			touchLocation = new TouchLocation();
+			return false;
+		}
+		
+		public int IndexOf(TouchLocation item)
+		{
+			for (int i = 0; i < this.Count; i++)
+			{
+				if (this[i] == item)
+				{
+					return i;
+				}
+			}
+			return -1;
+		}
+		
 	}
 }
