@@ -405,13 +405,26 @@ namespace Microsoft.Xna.Framework
 
 		private void InitializeGameComponents ()
 		{
-			// TODO EAGLContext.SetCurrentContext(_view.BackgroundContext);
+			// There is no autorelease pool when this method is called because it will be called from a background thread
+			// It's important to create one or you will leak objects
+			using (NSAutoreleasePool pool = new NSAutoreleasePool ()) {
 
-			foreach (GameComponent gc in _gameComponentCollection) {
-				gc.Initialize ();
-			}
+				foreach (GameComponent gc in _gameComponentCollection) {
+					// This method will be called on the main thread when resizing, but we may be drawing on a secondary thread 
+					// through the display link or timer thread.
+					// Add a mutex around to avoid the threads accessing the context simultaneously
+					_view.OpenGLContext.CGLContext.Lock();
+					
+					// set our current context
+					_view.MakeCurrent();
 
-			// TODO EAGLContext.SetCurrentContext(_view.MainContext);
+					gc.Initialize ();
+				
+					// now unlock it
+					_view.OpenGLContext.CGLContext.Unlock();
+	
+				}
+			}							
 		}
 
 		protected virtual void Update (GameTime gameTime)
@@ -426,8 +439,7 @@ namespace Microsoft.Xna.Framework
 				if (!_initializing) {
 					_initializing = true;
 
-					// Use OpenGLES context switching as described here
-					// http://developer.apple.com/iphone/library/qa/qa2010/qa1612.html
+					// Use OpenGL context locking in delegate function
 					InitialiseGameComponentsDelegate initD = new InitialiseGameComponentsDelegate (InitializeGameComponents);
 
 					// Invoke on thread from the pool
