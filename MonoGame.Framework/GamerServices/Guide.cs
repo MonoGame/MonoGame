@@ -69,14 +69,14 @@ namespace Microsoft.Xna.Framework.GamerServices
 		private static GKLeaderboardViewController leaderboardController;
 		private static GKAchievementViewController achievementController;
 		private static UIViewController viewController = null;
-		
+
 		delegate string ShowKeyboardInputDelegate(
 		 PlayerIndex player,           
          string title,
          string description,
          string defaultText,
 		 bool usePasswordMode);
-		
+
 		public static string ShowKeyboardInput(
 		 PlayerIndex player,           
          string title,
@@ -85,13 +85,13 @@ namespace Microsoft.Xna.Framework.GamerServices
 		 bool usePasswordMode)
 		{
 			string result = defaultText; 
-			
+
 			TextFieldAlertView myAlertView = new TextFieldAlertView(usePasswordMode, title, defaultText);
-		
-			
+
+
 			myAlertView.Title = title;
 			myAlertView.Message = description;
-			
+
 			myAlertView.Clicked += delegate(object sender, UIButtonEventArgs e)
 					{
 						if (e.ButtonIndex == 1)
@@ -104,7 +104,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 
 			return result;
 		}
-		
+
 		public static IAsyncResult BeginShowKeyboardInput (
          PlayerIndex player,
          string title,
@@ -126,9 +126,9 @@ namespace Microsoft.Xna.Framework.GamerServices
          bool usePasswordMode)
 		{
 			isVisible = true;
-			
+
 			ShowKeyboardInputDelegate ski = ShowKeyboardInput; 
-			
+
 			return ski.BeginInvoke(player, title, description, defaultText, usePasswordMode, callback, ski);
 		}
 
@@ -137,7 +137,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 			try 
 			{
 				ShowKeyboardInputDelegate ski = (ShowKeyboardInputDelegate)result.AsyncState; 
-			
+
 				return ski.EndInvoke(result);
 			} 
 			finally 
@@ -151,7 +151,7 @@ namespace Microsoft.Xna.Framework.GamerServices
          IEnumerable<string> buttons,
          int focusButton,
          MessageBoxIcon icon);
-		
+
 		public static Nullable<int> ShowMessageBox( string title,
          string text,
          IEnumerable<string> buttons,
@@ -159,7 +159,7 @@ namespace Microsoft.Xna.Framework.GamerServices
          MessageBoxIcon icon)
 		{
 			Nullable<int> result = null;
-			
+
 			UIAlertView alert = new UIAlertView();
 			alert.Title = title;
 			foreach( string btn in buttons )
@@ -176,12 +176,12 @@ namespace Microsoft.Xna.Framework.GamerServices
 								result = e.ButtonIndex; 
 							};
 			isVisible = true;
-			
+
 			alert.Show();
-			
+
 			return result;
 		}
-	
+
 		public static IAsyncResult BeginShowMessageBox(
          PlayerIndex player,
          string title,
@@ -194,9 +194,9 @@ namespace Microsoft.Xna.Framework.GamerServices
 		)
 		{	
 			isVisible = true;
-			
+
 			ShowMessageBoxDelegate smb = ShowMessageBox; 
-			
+
 			return smb.BeginInvoke(title, text, buttons, focusButton, icon, callback, smb);			
 		}
 
@@ -218,7 +218,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 			try
 			{
 				ShowMessageBoxDelegate smbd = (ShowMessageBoxDelegate)result.AsyncState; 
-				
+
 				return smbd.EndInvoke(result);
 			} 
 			finally 
@@ -227,7 +227,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 			}
 		}
 
-		
+
 		public static void ShowMarketplace (PlayerIndex player )
 		{
 			NSUrl url = new NSUrl("http://phobos.apple.com/WebObjects/MZStore.woa/wa/viewSoftware?id=306469222&mt=8");
@@ -236,7 +236,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 						// Error
 					}
 		}
-		
+
 		public static void Show ()
 		{
 			/*GKPeerPickerController ppc = new GKPeerPickerController();
@@ -244,7 +244,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 			ppc.Show();*/
 			ShowSignIn(1, false);
 		}
-		
+
 		public static void ShowSignIn (int paneCount, bool onlineOnly)
 		{
 			if ( paneCount != 1 )
@@ -252,7 +252,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 				new ArgumentException("paneCount Can only be 1 on iPhone");
 				return;
 			}
-			
+
 			if (GamerServicesComponent.LocalNetworkGamer == null)
 			{
 				GamerServicesComponent.LocalNetworkGamer = new LocalNetworkGamer();
@@ -262,7 +262,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 				GamerServicesComponent.LocalNetworkGamer.SignedInGamer.BeginAuthentication(null, null);
 			}
 		}
-		
+
 		public static void ShowLeaderboard()
 		{
 			if ( ( Gamer.SignedInGamers.Count > 0 ) && ( Gamer.SignedInGamers[0].IsSignedInToLive ) )
@@ -272,7 +272,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 				{			    	
 					leaderboardController = new GKLeaderboardViewController();
 				}
-				
+
 			    if (leaderboardController != null)			
 			    {
 					leaderboardController.DidFinish += delegate(object sender, EventArgs e) 
@@ -280,7 +280,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 						leaderboardController.DismissModalViewControllerAnimated(true);
 						isVisible = false;
  					};
-					
+
 					if (Window !=null)
 					{						
 						if(viewController == null)
@@ -289,14 +289,14 @@ namespace Microsoft.Xna.Framework.GamerServices
 							Window.Add(viewController.View);
 							viewController.View.Hidden = true;
 						}
-						
+
 						viewController.PresentModalViewController(leaderboardController, true);
 						isVisible = true;
 					}
 			    }
 			}
 		}
-		
+
 		public static void ShowAchievements()
 		{
 			if ( ( Gamer.SignedInGamers.Count > 0 ) && ( Gamer.SignedInGamers[0].IsSignedInToLive ) )
@@ -306,7 +306,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 				{
 					achievementController = new GKAchievementViewController();
 				}
-	
+
 			    if (achievementController != null)		
 			    {					
 					achievementController.DidFinish += delegate(object sender, EventArgs e) 
@@ -314,7 +314,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 						leaderboardController.DismissModalViewControllerAnimated(true);
 						isVisible = false;
 					};
-					
+
 					if (Window !=null)
 					{
 						if(viewController == null)
@@ -323,24 +323,24 @@ namespace Microsoft.Xna.Framework.GamerServices
 							Window.Add(viewController.View);
 							viewController.View.Hidden = true;
 						}
-						
+
 						viewController.PresentModalViewController(achievementController, true);						
 						isVisible = true;
 					}
 			    }
 			}
 		}
-		
+
 		public static IAsyncResult BeginShowStorageDeviceSelector( AsyncCallback callback, object state )
 		{
 			return null;
 		}
-		
+
 		public static StorageDevice EndShowStorageDeviceSelector( IAsyncResult result )
 		{
 			return null;
 		}
-		
+
 		#region Properties
 		public static bool IsScreenSaverEnabled 
 		{ 
@@ -353,7 +353,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 				isScreenSaverEnabled = value;
 			}
 		}
-		
+
 		public static bool IsTrialMode 
 		{ 
 			get
@@ -365,7 +365,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 				isTrialMode = value;
 			}
 		}
-		
+
 		public static bool IsVisible 
 		{ 
 			get
@@ -377,7 +377,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 				isVisible = value;
 			}
 		}
-		
+
 		public static bool SimulateTrialMode 
 		{ 
 			get
@@ -389,7 +389,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 				simulateTrialMode = value;
 			}
 		}
-		
+
 		public static GameWindow Window 
 		{ 
 			get;

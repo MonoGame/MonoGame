@@ -55,7 +55,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		private Viewport _viewport;
 		private GraphicsDevice2D _spriteDevice;
 		private bool _isDisposed = false;
-		private readonly DisplayMode _displayMode = new DisplayMode();
+		private DisplayMode _displayMode = new DisplayMode();
 		private RenderState _renderState;
 		public TextureCollection Textures { get; set; }
         internal List<IntPtr> _pointerCache = new List<IntPtr>();
@@ -124,12 +124,15 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void Clear(ClearOptions options, Color color, float depth, int stencil)
         {
-			throw new NotImplementedException();
+		Clear(options,color.ToEAGLColor(),depth,stencil);
         }
 
         public void Clear(ClearOptions options, Vector4 color, float depth, int stencil)
         {
-			throw new NotImplementedException();
+		GL.ClearColor(color.X, color.Y, color.Z, 1.0f);
+		GL.ClearDepth(depth);
+		GL.ClearStencil(stencil);
+		GL.Clear((ClearBufferMask.ColorBufferBit| ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit));
         }
 
         public void Clear(ClearOptions options, Color color, float depth, int stencil, Rectangle[] regions)

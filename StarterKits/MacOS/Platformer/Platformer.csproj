@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>10.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{1D099BD4-805E-4C04-B33D-9F2D16D42B86}</ProjectGuid>
+    <ProjectTypeGuids>{1C533B1C-72DD-4CB1-9F6B-BF11D93BCFBE};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>Platformer</RootNamespace>
+    <AssemblyName>Platformer</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG MONOMAC</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="MonoMac, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\MonoMac\monomac\src\MonoMac.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Program.cs" />
+    <Compile Include="..\..\iOS\Platformer\Accelerometer.cs">
+      <Link>Accelerometer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\iOS\Platformer\Animation.cs">
+      <Link>Animation.cs</Link>
+    </Compile>
+    <Compile Include="..\..\iOS\Platformer\AnimationPlayer.cs">
+      <Link>AnimationPlayer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\iOS\Platformer\Circle.cs">
+      <Link>Circle.cs</Link>
+    </Compile>
+    <Compile Include="..\..\iOS\Platformer\Enemy.cs">
+      <Link>Enemy.cs</Link>
+    </Compile>
+    <Compile Include="..\..\iOS\Platformer\Gem.cs">
+      <Link>Gem.cs</Link>
+    </Compile>
+    <Compile Include="..\..\iOS\Platformer\Level.cs">
+      <Link>Level.cs</Link>
+    </Compile>
+    <Compile Include="..\..\iOS\Platformer\PlatformerGame.cs">
+      <Link>PlatformerGame.cs</Link>
+    </Compile>
+    <Compile Include="..\..\iOS\Platformer\Player.cs">
+      <Link>Player.cs</Link>
+    </Compile>
+    <Compile Include="..\..\iOS\Platformer\RectangleExtensions.cs">
+      <Link>RectangleExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\..\iOS\Platformer\Tile.cs">
+      <Link>Tile.cs</Link>
+    </Compile>
+    <Compile Include="..\..\iOS\Platformer\TouchCollectionExtensions.cs">
+      <Link>TouchCollectionExtensions.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Info.plist" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath)\Mono\MonoMac\v0.0\Mono.MonoMac.targets" />
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\MonoGame.Framework\MonoGame.Framework.MacOS.csproj">
+      <Project>{36C538E6-C32A-4A8D-A39C-566173D7118E}</Project>
+      <Name>MonoGame.Framework.MacOS</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\..\iOS\Platformer\Content\Backgrounds\Layer0_0.png">
+      <Link>Content\Backgrounds\Layer0_0.png</Link>
+    </Content>
+    <Content Include="..\..\iOS\Platformer\Content\Backgrounds\Layer0_1.png">
+      <Link>Content\Backgrounds\Layer0_1.png</Link>
+    </Content>
+    <Content Include="..\..\iOS\Platformer\Content\Backgrounds\Layer0_2.png">
+      <Link>Content\Backgrounds\Layer0_2.png</Link>
+    </Content>
+    <Content Include="..\..\iOS\Platformer\Content\Backgrounds\Layer1_0.png">
+      <Link>Content\Backgrounds\Layer1_0.png</Link>
+    </Content>
+    <Content Include="..\..\iOS\Platformer\Content\Backgrounds\Layer1_1.png">
+      <Link>Content\Backgrounds\Layer1_1.png</Link>
+    </Content>
+    <Content Include="..\..\iOS\Platformer\Content\Backgrounds\Layer1_2.png">
+      <Link>Content\Backgrounds\Layer1_2.png</Link>
+    </Content>
+    <Content Include="..\..\iOS\Platformer\Content\Backgrounds\Layer2_0.png">
+      <Link>Content\Backgrounds\Layer2_0.png</Link>
+    </Content>
+    <Content Include="..\..\iOS\Platformer\Content\Backgrounds\Layer2_1.png">
+      <Link>Content\Backgrounds\Layer2_1.png</Link>
+    </Content>
+    <Content Include="..\..\iOS\Platformer\Content\Backgrounds\Layer2_2.png">
+      <Link>Content\Backgrounds\Layer2_2.png</Link>
+    </Content>
+    <Content Include="..\..\iOS\Platformer\Content\Fonts\Hud.xnb">
+      <Link>Content\Fonts\Hud.xnb</Link>
+    </Content>
+    <Content Include="..\..\iOS\Platformer\Content\Levels\0.txt">
+      <Link>Content\Levels\0.txt</Link>
+    </Content>
+    <Content Include="..\..\iOS\Platformer\Content\Levels\1.txt">
+      <Link>Content\Levels\1.txt</Link>
+    </Content>
+    <Content Include="..\..\iOS\Platformer\Content\Levels\2.txt">
+      <Link>Content\Levels\2.txt</Link>
+    </Content>
+    <Content Include="..\..\iOS\Platformer\Content\Overlays\you_died.png">
+      <Link>Content\Overlays\you_died.png</Link>
+    </Content>
+    <Content Include="..\..\iOS\Platformer\Content\Overlays\you_lose.png">
+      <Link>Content\Overlays\you_lose.png</Link>
+    </Content>
+    <Content Include="..\..\iOS\Platformer\Content\Overlays\you_win.png">
+      <Link>Content\Overlays\you_win.png</Link>
+    </Content>
+    <Content Include="..\..\iOS\Platformer\Content\Sounds\ExitReached.mp3">
+      <Link>Content\Sounds\ExitReached.mp3</Link>
+    </Content>
+    <Content Include="..\..\iOS\Platformer\Content\Sounds\GemCollected.mp3">
+      <Link>Content\Sounds\GemCollected.mp3</Link>
+    </Content>
+    <Content Include="..\..\iOS\Platformer\Content\Sounds\MonsterKilled.mp3">
+      <Link>Content\Sounds\MonsterKilled.mp3</Link>
+    </Content>
+    <Content Include="..\..\iOS\Platformer\Content\Sounds\Music.mp3">
+      <Link>Content\Sounds\Music.mp3</Link>
+    </Content>
+    <Content Include="..\..\iOS\Platformer\Content\Sounds\PlayerFall.mp3">
+      <Link>Content\Sounds\PlayerFall.mp3</Link>
+    </Content>
+    <Content Include="..\..\iOS\Platformer\Content\Sounds\PlayerJump.mp3">
+      <Link>Content\Sounds\PlayerJump.mp3</Link>
+    </Content>
+    <Content Include="..\..\iOS\Platformer\Content\Sounds\PlayerKilled.mp3">
+      <Link>Content\Sounds\PlayerKilled.mp3</Link>
+    </Content>
+    <Content Include="..\..\iOS\Platformer\Content\Sounds\PowerUp.mp3">
+      <Link>Content\Sounds\PowerUp.mp3</Link>
+    </Content>
+    <Content Include="..\..\iOS\Platformer\Content\Sprites\Gem.png">
+      <Link>Content\Sprites\Gem.png</Link>
+    </Content>
+    <Content Include="..\..\iOS\Platformer\Content\Tiles\BlockA0.png">
+      <Link>Content\Tiles\BlockA0.png</Link>
+    </Content>
+    <Content Include="..\..\iOS\Platformer\Content\Tiles\BlockA1.png">
+      <Link>Content\Tiles\BlockA1.png</Link>
+    </Content>
+    <Content Include="..\..\iOS\Platformer\Content\Tiles\BlockA3.png">
+      <Link>Content\Tiles\BlockA3.png</Link>
+    </Content>
+    <Content Include="..\..\iOS\Platformer\Content\Tiles\BlockA4.png">
+      <Link>Content\Tiles\BlockA4.png</Link>
+    </Content>
+    <Content Include="..\..\iOS\Platformer\Content\Tiles\BlockA5.png">
+      <Link>Content\Tiles\BlockA5.png</Link>
+    </Content>
+    <Content Include="..\..\iOS\Platformer\Content\Tiles\BlockA6.png">
+      <Link>Content\Tiles\BlockA6.png</Link>
+    </Content>
+    <Content Include="..\..\iOS\Platformer\Content\Tiles\BlockB0.png">
+      <Link>Content\Tiles\BlockB0.png</Link>
+    </Content>
+    <Content Include="..\..\iOS\Platformer\Content\Tiles\BlockB1.png">
+      <Link>Content\Tiles\BlockB1.png</Link>
+    </Content>
+    <Content Include="..\..\iOS\Platformer\Content\Tiles\Exit.png">
+      <Link>Content\Tiles\Exit.png</Link>
+    </Content>
+    <Content Include="..\..\iOS\Platformer\Content\Tiles\Platform.png">
+      <Link>Content\Tiles\Platform.png</Link>
+    </Content>
+    <Content Include="..\..\iOS\Platformer\Content\Sprites\MonsterA\Idle.png">
+      <Link>Content\Sprites\MonsterA\Idle.png</Link>
+    </Content>
+    <Content Include="..\..\iOS\Platformer\Content\Sprites\MonsterA\Run.png">
+      <Link>Content\Sprites\MonsterA\Run.png</Link>
+    </Content>
+    <Content Include="..\..\iOS\Platformer\Content\Sprites\MonsterB\Idle.png">
+      <Link>Content\Sprites\MonsterB\Idle.png</Link>
+    </Content>
+    <Content Include="..\..\iOS\Platformer\Content\Sprites\MonsterB\Run.png">
+      <Link>Content\Sprites\MonsterB\Run.png</Link>
+    </Content>
+    <Content Include="..\..\iOS\Platformer\Content\Sprites\MonsterC\Idle.png">
+      <Link>Content\Sprites\MonsterC\Idle.png</Link>
+    </Content>
+    <Content Include="..\..\iOS\Platformer\Content\Sprites\MonsterC\Run.png">
+      <Link>Content\Sprites\MonsterC\Run.png</Link>
+    </Content>
+    <Content Include="..\..\iOS\Platformer\Content\Sprites\MonsterD\Idle.png">
+      <Link>Content\Sprites\MonsterD\Idle.png</Link>
+    </Content>
+    <Content Include="..\..\iOS\Platformer\Content\Sprites\MonsterD\Run.png">
+      <Link>Content\Sprites\MonsterD\Run.png</Link>
+    </Content>
+    <Content Include="..\..\iOS\Platformer\Content\Sprites\Player\Celebrate.png">
+      <Link>Content\Sprites\Player\Celebrate.png</Link>
+    </Content>
+    <Content Include="..\..\iOS\Platformer\Content\Sprites\Player\Die.png">
+      <Link>Content\Sprites\Player\Die.png</Link>
+    </Content>
+    <Content Include="..\..\iOS\Platformer\Content\Sprites\Player\Idle.png">
+      <Link>Content\Sprites\Player\Idle.png</Link>
+    </Content>
+    <Content Include="..\..\iOS\Platformer\Content\Sprites\Player\Jump.png">
+      <Link>Content\Sprites\Player\Jump.png</Link>
+    </Content>
+    <Content Include="..\..\iOS\Platformer\Content\Sprites\Player\Run.png">
+      <Link>Content\Sprites\Player\Run.png</Link>
+    </Content>
+    <Content Include="..\..\iOS\Platformer\Content\Tiles\BlockA2.png">
+      <Link>Content\Tiles\BlockA2.png</Link>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Content\" />
+  </ItemGroup>
+</Project>

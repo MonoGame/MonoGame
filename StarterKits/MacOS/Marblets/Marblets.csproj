@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>10.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{2BCFC6F4-5C08-467A-B310-5C0A009018CE}</ProjectGuid>
+    <ProjectTypeGuids>{1C533B1C-72DD-4CB1-9F6B-BF11D93BCFBE};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>Marblets</RootNamespace>
+    <AssemblyName>Marblets</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG MONOMAC MOUSE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="MonoMac">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Info.plist" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath)\Mono\MonoMac\v0.0\Mono.MonoMac.targets" />
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\MonoGame.Framework\MonoGame.Framework.MacOS.csproj">
+      <Project>{36C538E6-C32A-4A8D-A39C-566173D7118E}</Project>
+      <Name>MonoGame.Framework.MacOS</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Program.cs" />
+    <Compile Include="..\..\iOS\Marblets\Font.cs">
+      <Link>Font.cs</Link>
+    </Compile>
+    <Compile Include="..\..\iOS\Marblets\GameBoard.cs">
+      <Link>GameBoard.cs</Link>
+    </Compile>
+    <Compile Include="..\..\iOS\Marblets\GamePadHelper.cs">
+      <Link>GamePadHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\..\iOS\Marblets\GamePads.cs">
+      <Link>GamePads.cs</Link>
+    </Compile>
+    <Compile Include="..\..\iOS\Marblets\GameScreen.cs">
+      <Link>GameScreen.cs</Link>
+    </Compile>
+    <Compile Include="..\..\iOS\Marblets\InputHelper.cs">
+      <Link>InputHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\..\iOS\Marblets\Marble.cs">
+      <Link>Marble.cs</Link>
+    </Compile>
+    <Compile Include="..\..\iOS\Marblets\MarbletsGame.cs">
+      <Link>MarbletsGame.cs</Link>
+    </Compile>
+    <Compile Include="..\..\iOS\Marblets\RelativeSprite.cs">
+      <Link>RelativeSprite.cs</Link>
+    </Compile>
+    <Compile Include="..\..\iOS\Marblets\Screen.cs">
+      <Link>Screen.cs</Link>
+    </Compile>
+    <Compile Include="..\..\iOS\Marblets\Settings.cs">
+      <Link>Settings.cs</Link>
+    </Compile>
+    <Compile Include="..\..\iOS\Marblets\TitleScreen.cs">
+      <Link>TitleScreen.cs</Link>
+    </Compile>
+    <Compile Include="..\..\iOS\Marblets\TutorialGameBoard.cs">
+      <Link>TutorialGameBoard.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\..\iOS\Marblets\Content\game_over_frame_zunehd.tga">
+      <Link>Content\game_over_frame_zunehd.tga</Link>
+    </Content>
+    <Content Include="..\..\iOS\Marblets\Content\marble_burst_zunehd.tga">
+      <Link>Content\marble_burst_zunehd.tga</Link>
+    </Content>
+    <Content Include="..\..\iOS\Marblets\Content\marble_cursor_zunehd.tga">
+      <Link>Content\marble_cursor_zunehd.tga</Link>
+    </Content>
+    <Content Include="..\..\iOS\Marblets\Content\marble_glow_1ring_zunehd.tga">
+      <Link>Content\marble_glow_1ring_zunehd.tga</Link>
+    </Content>
+    <Content Include="..\..\iOS\Marblets\Content\marble_glow_2rings_zunehd.tga">
+      <Link>Content\marble_glow_2rings_zunehd.tga</Link>
+    </Content>
+    <Content Include="..\..\iOS\Marblets\Content\marble_zunehd.tga">
+      <Link>Content\marble_zunehd.tga</Link>
+    </Content>
+    <Content Include="..\..\iOS\Marblets\Content\numbers_large.tga">
+      <Link>Content\numbers_large.tga</Link>
+    </Content>
+    <Content Include="..\..\iOS\Marblets\Content\numbers_small.tga">
+      <Link>Content\numbers_small.tga</Link>
+    </Content>
+    <Content Include="..\..\iOS\Marblets\Content\play_frame_zunehd.tga">
+      <Link>Content\play_frame_zunehd.tga</Link>
+    </Content>
+    <Content Include="..\..\iOS\Marblets\Content\title_frame_zunehd.tga">
+      <Link>Content\title_frame_zunehd.tga</Link>
+    </Content>
+    <Content Include="..\..\iOS\Marblets\Content\Textures\game_over_frame.png">
+      <Link>Content\Textures\game_over_frame.png</Link>
+    </Content>
+    <Content Include="..\..\iOS\Marblets\Content\Textures\marble.png">
+      <Link>Content\Textures\marble.png</Link>
+    </Content>
+    <Content Include="..\..\iOS\Marblets\Content\Textures\marble_burst.png">
+      <Link>Content\Textures\marble_burst.png</Link>
+    </Content>
+    <Content Include="..\..\iOS\Marblets\Content\Textures\marble_cursor.png">
+      <Link>Content\Textures\marble_cursor.png</Link>
+    </Content>
+    <Content Include="..\..\iOS\Marblets\Content\Textures\marble_glow_1ring.png">
+      <Link>Content\Textures\marble_glow_1ring.png</Link>
+    </Content>
+    <Content Include="..\..\iOS\Marblets\Content\Textures\marble_glow_2rings.png">
+      <Link>Content\Textures\marble_glow_2rings.png</Link>
+    </Content>
+    <Content Include="..\..\iOS\Marblets\Content\Textures\marble_tex1.png">
+      <Link>Content\Textures\marble_tex1.png</Link>
+    </Content>
+    <Content Include="..\..\iOS\Marblets\Content\Textures\numbers_large.png">
+      <Link>Content\Textures\numbers_large.png</Link>
+    </Content>
+    <Content Include="..\..\iOS\Marblets\Content\Textures\numbers_small.png">
+      <Link>Content\Textures\numbers_small.png</Link>
+    </Content>
+    <Content Include="..\..\iOS\Marblets\Content\Textures\play_frame.png">
+      <Link>Content\Textures\play_frame.png</Link>
+    </Content>
+    <Content Include="..\..\iOS\Marblets\Content\Textures\title_frame.png">
+      <Link>Content\Textures\title_frame.png</Link>
+    </Content>
+    <Content Include="..\..\iOS\Marblets\Content\Audio\Wav\IntroMus.wav">
+      <Link>Content\Audio\Wav\IntroMus.wav</Link>
+    </Content>
+    <Content Include="..\..\iOS\Marblets\Content\Audio\Wav\MusLoop_Temp1.wav">
+      <Link>Content\Audio\Wav\MusLoop_Temp1.wav</Link>
+    </Content>
+    <Content Include="..\..\iOS\Marblets\Content\Audio\Wav\clear_4.wav">
+      <Link>Content\Audio\Wav\clear_4.wav</Link>
+    </Content>
+    <Content Include="..\..\iOS\Marblets\Content\Audio\Wav\clear_bonus.wav">
+      <Link>Content\Audio\Wav\clear_bonus.wav</Link>
+    </Content>
+    <Content Include="..\..\iOS\Marblets\Content\Audio\Wav\clear_illegal.wav">
+      <Link>Content\Audio\Wav\clear_illegal.wav</Link>
+    </Content>
+    <Content Include="..\..\iOS\Marblets\Content\Audio\Wav\drop1.wav">
+      <Link>Content\Audio\Wav\drop1.wav</Link>
+    </Content>
+    <Content Include="..\..\iOS\Marblets\Content\Audio\Wav\drop2.wav">
+      <Link>Content\Audio\Wav\drop2.wav</Link>
+    </Content>
+    <Content Include="..\..\iOS\Marblets\Content\Audio\Wav\navigate_1.wav">
+      <Link>Content\Audio\Wav\navigate_1.wav</Link>
+    </Content>
+    <Content Include="..\..\iOS\Marblets\Content\Audio\Wav\start_1.wav">
+      <Link>Content\Audio\Wav\start_1.wav</Link>
+    </Content>
+    <Content Include="..\..\iOS\Marblets\Content\Audio\Wav\start_3.wav">
+      <Link>Content\Audio\Wav\start_3.wav</Link>
+    </Content>
+    <Content Include="..\..\iOS\Marblets\Default.png">
+      <Link>Default.png</Link>
+    </Content>
+    <Content Include="..\..\iOS\Marblets\GameThumbnail.png">
+      <Link>GameThumbnail.png</Link>
+    </Content>
+    <Content Include="..\..\iOS\Marblets\settings.xml">
+      <Link>settings.xml</Link>
+    </Content>
+  </ItemGroup>
+</Project>

@@ -72,7 +72,8 @@ namespace Marblets
 #if !XBOX360
             //Uncomment this line to force a save of the default settings file. Useful 
             //when you had added things to settings.cs
-            //project Settings.Save("settings.xml");
+            //project 
+			//Settings.Save("settings.xml");
 #endif
             Settings = Settings.Load("settings.xml");
 
@@ -110,8 +111,9 @@ namespace Marblets
             inputHelper = new InputHelper(this);
             inputHelper.UpdateOrder = int.MinValue;
             this.Components.Add(inputHelper);
-
+#if !MONOMAC
             this.Components.Add(new GamerServicesComponent(this));
+#endif
         }
 
 
@@ -154,8 +156,10 @@ namespace Marblets
             }
             else
             {
+#if !MONOMAC
                 Guide.BeginShowStorageDeviceSelector(
                     new AsyncCallback(LoadHighScoresCallback), null);
+#endif
             }
         }
 
@@ -166,7 +170,9 @@ namespace Marblets
         {
             if ((result != null) && result.IsCompleted)
             {
+#if !MONOMAC
                 MarbletsGame.StorageDevice = Guide.EndShowStorageDeviceSelector(result);
+#endif
             }
             if ((MarbletsGame.StorageDevice != null) &&
                 MarbletsGame.StorageDevice.IsConnected)
@@ -200,8 +206,8 @@ namespace Marblets
                 typeof(IGraphicsDeviceService));
 
             //Correct settings for alpha blending in 3d game mode
-            graphicsService.GraphicsDevice.RenderState.AlphaSourceBlend =
-                Blend.SourceAlpha;
+            //graphicsService.GraphicsDevice.RenderState.AlphaSourceBlend =
+                //Blend.SourceAlpha;
 
             graphicsService.GraphicsDevice.RenderState.DestinationBlend =
                 Blend.InverseSourceAlpha;

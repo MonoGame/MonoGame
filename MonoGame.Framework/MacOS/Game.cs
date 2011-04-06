@@ -39,6 +39,7 @@ purpose and non-infringement.
 #endregion License
 using System;
 using System.IO;
+using System.Drawing;
 
 using MonoMac.CoreAnimation;
 using MonoMac.CoreFoundation;
@@ -61,7 +62,7 @@ namespace Microsoft.Xna.Framework
 		private GameTime _updateGameTime;
 		private GameTime _drawGameTime;
 		private DateTime _lastUpdate;
-		private bool _initialized = false;
+		internal bool _initialized = false;
 		private bool _initializing = false;
 		private bool _isActive = true;
 		private GameComponentCollection _gameComponentCollection;
@@ -76,62 +77,54 @@ namespace Microsoft.Xna.Framework
 		internal static bool _playingVideo = false;
 		private SpriteBatch spriteBatch;
 		private Texture2D splashScreen;
+		private bool _mouseVisible = false;
 
 		delegate void InitialiseGameComponentsDelegate ();
 
 		public Game ()
-			{           
+		{
 			// Initialize collections
 			_services = new GameServiceContainer ();
 			_gameComponentCollection = new GameComponentCollection ();
-
+			
+			RectangleF frame = NSScreen.MainScreen.Frame;
+			
 			//Create a full-screen window
-			_mainWindow = new NSWindow (NSScreen.MainScreen.Frame, NSWindowStyle.Titled | NSWindowStyle.Closable, NSBackingStore.Buffered, false);
+			_mainWindow = new NSWindow (frame, NSWindowStyle.Titled | NSWindowStyle.Closable, NSBackingStore.Buffered, true);
 			
 			// Perform any other window configuration you desire
 			_mainWindow.IsOpaque = true;
 			_mainWindow.HidesOnDeactivate = true;
 
-			_view = new GameWindow();
-			_view.game = this;		
+			_view = new GameWindow(frame);
+			_view.game = this;
 			
 			_mainWindow.ContentView = _view;
 			_mainWindow.AcceptsMouseMovedEvents = true;
-			_mainWindow.MakeKeyAndOrderFront(_mainWindow);										
-
-			// Initialize GameTime
-			_updateGameTime = new GameTime ();
-			_drawGameTime = new GameTime ();  	
-		}
 		
-		public Game (GameWindow view)
-			{           
-			// Initialize collections
-			_services = new GameServiceContainer ();
-			_gameComponentCollection = new GameComponentCollection ();
-
-			//Create a full-screen window
-			//_mainWindow = new NSWindow (NSScreen.MainScreen.Frame, NSWindowStyle.Titled, NSBackingStore.Buffered, false);
-
-			// Perform any other window configuration you desire
-			//_mainWindow.IsOpaque = true;
-			//_mainWindow.HidesOnDeactivate = true;
-
-			//_view = new GameWindow ();
-			_view = view;
-			_view.game = this;		
-			// TODO _mainWindow.AddChildWindow(_view, NSWindowOrderingMode.Above);							
-
 			// Initialize GameTime
 			_updateGameTime = new GameTime ();
-			_drawGameTime = new GameTime ();  	
+			_drawGameTime = new GameTime ();  
+	
 		}
 		
 		~Game ()
 		{
 			// TODO NSDevice.CurrentDevice.EndGeneratingDeviceOrientationNotifications(); 
 		}
-
+		
+		internal bool IsAllowUserResizing
+		{
+			get {
+				return (_mainWindow.StyleMask & NSWindowStyle.Resizable) > 0;
+			}
+			
+			set {
+				if (IsAllowUserResizing != value)
+					_mainWindow.StyleMask ^= NSWindowStyle.Resizable;
+			}
+			
+		}
 		/* private void ObserveDeviceRotation ()
 		{
 			NSNotificationCenter.DefaultCenter.AddObserver( new NSString("UIDeviceOrientationDidChangeNotification"), (notification) => { 
@@ -232,10 +225,10 @@ namespace Microsoft.Xna.Framework
 
 		public bool IsMouseVisible {
 			get {
-				return false;
+				return _mouseVisible;
 			}
 			set {
-				// do nothing; ignore
+				_mouseVisible = value;
 			}
 		}
 
@@ -254,8 +247,13 @@ namespace Microsoft.Xna.Framework
 		public void Run ()
 		{			
 			_lastUpdate = DateTime.Now;
+			
+			Initialize ();
 
-			_view.Run (FramesPerSecond / (FramesPerSecond * TargetElapsedTime.TotalSeconds));	
+			_mainWindow.MakeKeyAndOrderFront(_mainWindow);
+			
+			_view.Run (FramesPerSecond / (FramesPerSecond * TargetElapsedTime.TotalSeconds));
+			//_view.Run();
 			/*TODO _view.MainContext = _view.EAGLContext;
 			_view.ShareGroup = _view.MainContext.ShareGroup;
 			_view.BackgroundContext = new MonoTouch.OpenGLES.EAGLContext(_view.ContextRenderingApi, _view.ShareGroup); */
@@ -265,7 +263,7 @@ namespace Microsoft.Xna.Framework
 
 			// Get the Accelerometer going
 			// TODO Accelerometer.SetupAccelerometer();			
-			Initialize ();
+			
 
 			// Listen out for rotation changes
 			// TODO ObserveDeviceRotation();
@@ -401,9 +399,18 @@ namespace Microsoft.Xna.Framework
 
 		protected virtual void Initialize ()
 		{
+			
 			this.graphicsDeviceManager = this.Services.GetService (typeof(IGraphicsDeviceManager)) as IGraphicsDeviceManager;			
 			this.graphicsDeviceService = this.Services.GetService (typeof(IGraphicsDeviceService)) as IGraphicsDeviceService;			
 
+			RectangleF frame = _mainWindow.Frame;
+			
+			frame.Width = ((GraphicsDeviceManager)graphicsDeviceManager).PreferredBackBufferWidth;
+			frame.Height = ((GraphicsDeviceManager)graphicsDeviceManager).PreferredBackBufferHeight;
+			_mainWindow.SetFrame(frame,true);
+			
+			_view.Size = new Size((int)frame.Width,(int)frame.Height);			
+			
 			if ((this.graphicsDeviceService != null) && (this.graphicsDeviceService.GraphicsDevice != null)) {
 				LoadContent ();
 			}
@@ -411,13 +418,26 @@ namespace Microsoft.Xna.Framework
 
 		private void InitializeGameComponents ()
 		{
-			// TODO EAGLContext.SetCurrentContext(_view.BackgroundContext);
+			// There is no autorelease pool when this method is called because it will be called from a background thread
+			// It's important to create one or you will leak objects
+			using (NSAutoreleasePool pool = new NSAutoreleasePool ()) {
 
-			foreach (GameComponent gc in _gameComponentCollection) {
-				gc.Initialize ();
-			}
+				foreach (GameComponent gc in _gameComponentCollection) {
+					// This method will be called on the main thread when resizing, but we may be drawing on a secondary thread 
+					// through the display link or timer thread.
+					// Add a mutex around to avoid the threads accessing the context simultaneously
+					_view.OpenGLContext.CGLContext.Lock();
+					
+					// set our current context
+					_view.MakeCurrent();
 
-			// TODO EAGLContext.SetCurrentContext(_view.MainContext);
+					gc.Initialize ();
+				
+					// now unlock it
+					_view.OpenGLContext.CGLContext.Unlock();
+	
+				}
+			}							
 		}
 
 		protected virtual void Update (GameTime gameTime)
@@ -432,8 +452,7 @@ namespace Microsoft.Xna.Framework
 				if (!_initializing) {
 					_initializing = true;
 
-					// Use OpenGLES context switching as described here
-					// http://developer.apple.com/iphone/library/qa/qa2010/qa1612.html
+					// Use OpenGL context locking in delegate function
 					InitialiseGameComponentsDelegate initD = new InitialiseGameComponentsDelegate (InitializeGameComponents);
 
 					// Invoke on thread from the pool
@@ -457,7 +476,7 @@ namespace Microsoft.Xna.Framework
 					spriteBatch.Begin ();
 
 					// We need to turn this into a progress bar or animation to give better user feedback
-					spriteBatch.Draw (splashScreen, new Vector2 (0, 0), Color.White);
+					spriteBatch.Draw (splashScreen, new Vector2 (0, 0), Microsoft.Xna.Framework.Graphics.Color.White);
 					spriteBatch.End ();
 				}
 			} else {

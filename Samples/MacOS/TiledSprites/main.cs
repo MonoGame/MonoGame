@@ -10,7 +10,7 @@ namespace TiledSprites
 			NSApplication.Init ();
 			
 			using (var p = new NSAutoreleasePool ()) {
-				NSApplication.SharedApplication.Delegate = new AppDelegate();
+				NSApplication.SharedApplication.Delegate = new AppDelegate();				
 				NSApplication.Main(args);
 			}
 		}

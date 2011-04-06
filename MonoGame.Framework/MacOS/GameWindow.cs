@@ -58,22 +58,25 @@ namespace Microsoft.Xna.Framework
 {
 	public class GameWindow : MonoMacGameView
 	{
-		private readonly Rectangle clientBounds;
+		//private readonly Rectangle clientBounds;
+		private Rectangle clientBounds;
 		internal Game game;
 		private GameTime _updateGameTime;
 		private GameTime _drawGameTime;
 		private DateTime _lastUpdate;
 		private DateTime _now;
-		//public NSOpenGLContext MainContext;
-		//public NSOpenGLContext BackgroundContext;
-		//public NSOpenGLContext ShareGroup; 
 
 		#region UIVIew Methods		
 		public GameWindow (RectangleF frame) : base (frame)
 		{
+
 			//LayerRetainsBacking = false; 
 			//LayerColorFormat	= EAGLColorFormat.RGBA8;
-
+			this.AutoresizingMask = MonoMac.AppKit.NSViewResizingMask.HeightSizable
+					| MonoMac.AppKit.NSViewResizingMask.MaxXMargin 
+					| MonoMac.AppKit.NSViewResizingMask.MinYMargin
+					| MonoMac.AppKit.NSViewResizingMask.WidthSizable;
+			
 			//RectangleF rect = NSScreen.MainScreen.Frame;
 			RectangleF rect = frame;
 			clientBounds = new Rectangle (0,0,(int)rect.Width,(int)rect.Height);
@@ -97,8 +100,10 @@ namespace Microsoft.Xna.Framework
 		[Export("initWithFrame:")]
 		public GameWindow () : base (NSScreen.MainScreen.Frame)
 		{
-			//LayerRetainsBacking = false; 
-			//LayerColorFormat	= EAGLColorFormat.RGBA8;
+			this.AutoresizingMask = MonoMac.AppKit.NSViewResizingMask.HeightSizable
+					| MonoMac.AppKit.NSViewResizingMask.MaxXMargin 
+					| MonoMac.AppKit.NSViewResizingMask.MinYMargin
+					| MonoMac.AppKit.NSViewResizingMask.WidthSizable;
 
 			RectangleF rect = NSScreen.MainScreen.Frame;
 			clientBounds = new Rectangle (0,0,(int)rect.Width,(int)rect.Height);
@@ -142,8 +147,6 @@ namespace Microsoft.Xna.Framework
 		{
 			base.OnRenderFrame (e);
 
-			//MakeCurrent ();
-
 			// This code was commented to make the code base more iPhone like.
 			// More speed testing is required, to see if this is worse or better
 			// game.DoStep();	
@@ -154,14 +157,41 @@ namespace Microsoft.Xna.Framework
 				game.DoDraw (_drawGameTime);
 			}
 
-			//SwapBuffers ();
 		}
 
 		protected override void OnResize (EventArgs e)
 		{
+			
+			var manager = game.Services.GetService (typeof(IGraphicsDeviceManager)) as GraphicsDeviceManager;
+			if (game._initialized)
+				manager.OnDeviceResetting(EventArgs.Empty);
+			
+			Microsoft.Xna.Framework.Graphics.Viewport _vp =
+			new Microsoft.Xna.Framework.Graphics.Viewport();
+				
+			_vp.X = (int)Bounds.X;
+			_vp.Y = (int)Bounds.Y;
+			_vp.Width = (int)Bounds.Width;
+			_vp.Height = (int)Bounds.Height;
+			
+			game.GraphicsDevice.Viewport = _vp;
+			
+			clientBounds = new Rectangle((int)Bounds.X,(int)Bounds.Y,(int)Bounds.Width,(int)Bounds.Height);
+			
 			base.OnResize (e);
+			OnClientSizeChanged(e);
+			
+			if (game._initialized)
+				manager.OnDeviceReset(EventArgs.Empty);
 		}
-
+		
+		protected virtual void OnClientSizeChanged (EventArgs e)
+		{
+			var h = ClientSizeChanged;
+			if (h != null)
+				h (this, e);
+		}
+		
 		protected override void OnTitleChanged (EventArgs e)
 		{
 			base.OnTitleChanged (e);
@@ -352,10 +382,10 @@ namespace Microsoft.Xna.Framework
 
 		public bool AllowUserResizing {
 			get {
-				return false;
+				return game.IsAllowUserResizing;
 			}
 			set {
-				// Do nothing; Ignore rather than raising and exception
+				game.IsAllowUserResizing = value;
 			}
 		}	
 
@@ -387,13 +417,11 @@ namespace Microsoft.Xna.Framework
 
 		private void UpdateKeyboardState ()
 		{
-
 			_keyStates.Clear ();
 			_keyStates.AddRange (_flags);
 			_keyStates.AddRange (_keys);
 			var kbs = new KeyboardState (_keyStates.ToArray ());
 			Keyboard.State = kbs;
-
 		}
 
 		List<Keys> _keys = new List<Keys> ();
@@ -407,8 +435,6 @@ namespace Microsoft.Xna.Framework
 				_keys.Add (kk);
 
 			UpdateKeyboardState ();
-
-			base.KeyDown (theEvent);
 		}
 
 		public override void KeyUp (NSEvent theEvent)
@@ -418,8 +444,6 @@ namespace Microsoft.Xna.Framework
 			_keys.Remove (kk);
 
 			UpdateKeyboardState ();
-			
-			base.KeyUp (theEvent);
 		}
 
 		List<Keys> _flags = new List<Keys> ();
@@ -457,13 +481,11 @@ namespace Microsoft.Xna.Framework
 			}
 
 			UpdateKeyboardState ();
-			base.FlagsChanged (theEvent);
 		}
 
 		public override void MouseDown (NSEvent theEvent)
 		{
-			PointF loc = NSEvent.CurrentMouseLocation;
-			//Console.WriteLine(NSEvent.CurrentMouseLocation);
+			PointF loc = theEvent.LocationInWindow;
 			SetMousePosition (loc);
 			switch (theEvent.Type) {
 
@@ -483,8 +505,7 @@ namespace Microsoft.Xna.Framework
 
 		public override void MouseUp (NSEvent theEvent)
 		{
-			PointF loc = NSEvent.CurrentMouseLocation;
-			//Console.WriteLine(NSEvent.CurrentMouseLocation);
+			PointF loc = theEvent.LocationInWindow;
 			SetMousePosition (loc);
 			switch (theEvent.Type) {
 
@@ -504,8 +525,7 @@ namespace Microsoft.Xna.Framework
 
 		public override void MouseMoved (NSEvent theEvent)
 		{
-			PointF loc = NSEvent.CurrentMouseLocation;
-			//Console.WriteLine(loc);
+			PointF loc = theEvent.LocationInWindow;
 			SetMousePosition (loc);
 		}
 

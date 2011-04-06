@@ -37,7 +37,6 @@ permitted under your local laws, the contributors exclude the implied warranties
 purpose and non-infringement.
 */
 #endregion License
-
 using System;
 
 using MonoMac.OpenGL;
@@ -46,8 +45,8 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Microsoft.Xna.Framework
 {
-    public class GraphicsDeviceManager : IGraphicsDeviceService, IDisposable, IGraphicsDeviceManager
-    {
+	public class GraphicsDeviceManager : IGraphicsDeviceService, IDisposable, IGraphicsDeviceManager
+	{
 		private Game _game;
 		private GraphicsDevice _graphicsDevice;
 		private int _preferredBackBufferHeight;
@@ -55,29 +54,27 @@ namespace Microsoft.Xna.Framework
 		private bool _preferMultiSampling;
 		private DisplayOrientation _supportedOrientations;
 
-        public GraphicsDeviceManager(Game game)
-        {
-            if (game == null)
-            {
-                throw new ArgumentNullException("Game Cannot Be Null");
-            }
-            
+		public GraphicsDeviceManager (Game game)
+		{
+			if (game == null) {
+				throw new ArgumentNullException ("Game Cannot Be Null");
+			}
+
 			_game = game;
 			_preferredBackBufferHeight = game.Window.ClientBounds.Height;
 			_preferredBackBufferWidth = game.Window.ClientBounds.Width;
 			_supportedOrientations = DisplayOrientation.Default;
-			
-            if (game.Services.GetService(typeof(IGraphicsDeviceManager)) != null)
-            {
-                throw new ArgumentException("Graphics Device Manager Already Present");
-            }
-			
-            game.Services.AddService(typeof(IGraphicsDeviceManager), this);
-            game.Services.AddService(typeof(IGraphicsDeviceService), this);	
-			
-			Initialize();
-        }
-		
+
+			if (game.Services.GetService (typeof(IGraphicsDeviceManager)) != null) {
+				throw new ArgumentException ("Graphics Device Manager Already Present");
+			}
+
+			game.Services.AddService (typeof(IGraphicsDeviceManager), this);
+			game.Services.AddService (typeof(IGraphicsDeviceService), this);	
+
+			Initialize ();
+		}
+
 		public void CreateDevice ()
 		{
 			throw new System.NotImplementedException ();
@@ -85,172 +82,150 @@ namespace Microsoft.Xna.Framework
 
 		public bool BeginDraw ()
 		{
-			throw new NotImplementedException();
+			throw new NotImplementedException ();
 		}
 
 		public void EndDraw ()
 		{
-			throw new NotImplementedException();
+			throw new NotImplementedException ();
 		}
-		
-		 #region IGraphicsDeviceService Members
 
-        public event EventHandler DeviceCreated;
+		#region IGraphicsDeviceService Members
 
-        public event EventHandler DeviceDisposing;
-
-        public event EventHandler DeviceReset;
-
-        public event EventHandler DeviceResetting;
-		
+		public event EventHandler DeviceCreated;
+		public event EventHandler DeviceDisposing;
+		public event EventHandler DeviceReset;
+		public event EventHandler DeviceResetting;
 		public event EventHandler<PreparingDeviceSettingsEventArgs> PreparingDeviceSettings;
 
-        #endregion
-
-        #region IDisposable Members
-
-        public void Dispose()
-        {
-        }
-
-        #endregion
-
-        public void ApplyChanges()
-        {
-        }
-
-		private void Initialize()
+		internal void OnDeviceResetting (EventArgs e)
 		{
-			_graphicsDevice = new GraphicsDevice();
-			_graphicsDevice.PresentationParameters = new PresentationParameters();
-			
+			var h = DeviceResetting;
+			if (h != null)
+				h (this, e);
+		}
+
+		internal void OnDeviceReset (EventArgs e)
+		{
+			var h = DeviceReset;
+			if (h != null)
+				h (this, e);
+		}
+		
+		#endregion
+		
+
+		#region IDisposable Members
+
+		public void Dispose ()
+		{
+		}
+
+		#endregion
+
+		public void ApplyChanges ()
+		{
+		}
+
+		private void Initialize ()
+		{
+			_graphicsDevice = new GraphicsDevice ();
+			_graphicsDevice.PresentationParameters = new PresentationParameters ();
+
 			// Set "full screen"  as default
 			_graphicsDevice.PresentationParameters.IsFullScreen = true;
 
-			if (_preferMultiSampling) 
-			{
+			if (_preferMultiSampling) {
 				_graphicsDevice.PreferedFilter = All.Linear;
-			}
-			else 
-			{
+			} else {
 				_graphicsDevice.PreferedFilter = All.Nearest;
 			}
 		}
-		
-        public void ToggleFullScreen()
-        {
+
+		public void ToggleFullScreen ()
+		{
 			IsFullScreen = !IsFullScreen;
-        }
-		
-        public Microsoft.Xna.Framework.Graphics.GraphicsDevice GraphicsDevice
-        {
-            get
-            {
-                return _graphicsDevice;
-            }
-        }
+		}
 
-        public bool IsFullScreen
-        {
-            get
-            {
-				 return _graphicsDevice.PresentationParameters.IsFullScreen;
-            }
-            set
-            {
+		public Microsoft.Xna.Framework.Graphics.GraphicsDevice GraphicsDevice {
+			get {
+				return _graphicsDevice;
+			}
+		}
+
+		public bool IsFullScreen {
+			get {
+				return _graphicsDevice.PresentationParameters.IsFullScreen;
+			}
+			set {
 				_graphicsDevice.PresentationParameters.IsFullScreen = value;				
-            }
-        }
+			}
+		}
 
-        public bool PreferMultiSampling
-        {
-            get
-            {
-                return _preferMultiSampling;
-            }
-            set
-            {
+		public bool PreferMultiSampling {
+			get {
+				return _preferMultiSampling;
+			}
+			set {
 				_preferMultiSampling = value;
-				if (_preferMultiSampling) 
-				{
+				if (_preferMultiSampling) {
 					_graphicsDevice.PreferedFilter = All.Linear;
-				}
-				else 
-				{
+				} else {
 					_graphicsDevice.PreferedFilter = All.Nearest;
 				}
-            }
-        }
+			}
+		}
 
-        public SurfaceFormat PreferredBackBufferFormat
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-            set
-            {
-            }
-        }
+		public SurfaceFormat PreferredBackBufferFormat {
+			get {
+				throw new NotImplementedException ();
+			}
+			set {
+			}
+		}
 
-        public int PreferredBackBufferHeight
-        {
-            get
-            {
-                return _preferredBackBufferHeight;
-            }
-            set
-            {
+		public int PreferredBackBufferHeight {
+			get {
+				return _preferredBackBufferHeight;
+			}
+			set {
 				_preferredBackBufferHeight = value;
-            }
-        }
+			}
+		}
 
-        public int PreferredBackBufferWidth
-        {
-            get
-            {
-                return _preferredBackBufferWidth;
-            }
-            set
-            {
+		public int PreferredBackBufferWidth {
+			get {
+				return _preferredBackBufferWidth;
+			}
+			set {
 				_preferredBackBufferWidth = value;				
-            }
-        }
+			}
+		}
 
-        public DepthFormat PreferredDepthStencilFormat
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-            set
-            {
-            }
-        }
+		public DepthFormat PreferredDepthStencilFormat {
+			get {
+				throw new NotImplementedException ();
+			}
+			set {
+			}
+		}
 
-        public bool SynchronizeWithVerticalRetrace
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-            set
-            {
-            }
-        }
-		
-		public DisplayOrientation SupportedOrientations 
-		{ 
-			get
-			{
+		public bool SynchronizeWithVerticalRetrace {
+			get {
+				throw new NotImplementedException ();
+			}
+			set {
+			}
+		}
+
+		public DisplayOrientation SupportedOrientations { 
+			get {
 				return _supportedOrientations;
 			}
-			set
-			{
+			set {
 				_supportedOrientations = value;
 			}
 		}
 
-    }
+	}
 }
-

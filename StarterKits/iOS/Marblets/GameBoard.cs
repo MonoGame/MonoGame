@@ -747,8 +747,8 @@ namespace Marblets
             }
             else
             {
-                Guide.BeginShowStorageDeviceSelector(
-                    new AsyncCallback(SaveHighScoresCallback), null);
+                //Guide.BeginShowStorageDeviceSelector(
+                //    new AsyncCallback(SaveHighScoresCallback), null);
             }
         }
 
@@ -759,7 +759,9 @@ namespace Marblets
         {
             if ((result != null) && result.IsCompleted)
             {
-                MarbletsGame.StorageDevice = Guide.EndShowStorageDeviceSelector(result);
+#if !MONOMAC
+                //MarbletsGame.StorageDevice = Guide.EndShowStorageDeviceSelector(result);
+#endif
             }
             if ((MarbletsGame.StorageDevice != null) &&
                 MarbletsGame.StorageDevice.IsConnected)

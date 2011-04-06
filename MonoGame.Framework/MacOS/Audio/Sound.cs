@@ -48,7 +48,8 @@ namespace Microsoft.Xna.Framework.Audio
 		
 		public Sound(string url, float volume, bool looping)
 		{			
-			_audioPlayer = NSSound.FromName(url);
+			var data = NSData.FromUrl(NSUrl.FromFilename(url));
+			_audioPlayer = new NSSound(data);
 			_audioPlayer.Volume = volume;
 			_audioPlayer.Loops = looping;
 		}

@@ -71,5 +71,6 @@
     <Content Include="..\..\iOS\ChaseAndEvade\Content\tank.png">
       <Link>Content\tank.png</Link>
     </Content>
+    <Content Include="GameThumbnail.png" />
   </ItemGroup>
 </Project>

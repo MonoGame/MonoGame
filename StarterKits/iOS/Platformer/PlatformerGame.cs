@@ -63,9 +63,16 @@ namespace Platformer
 #if WINDOWS_PHONE
             TargetElapsedTime = TimeSpan.FromTicks(333333);
 #endif
+
+#if MONOMAC
+			graphics.PreferredBackBufferWidth = 800;
+			graphics.PreferredBackBufferHeight = 480;
+#else
 			graphics.IsFullScreen = true;
 			graphics.SupportedOrientations =  DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight;
+#endif			
             Accelerometer.Initialize();
+
         }
 
         /// <summary>
@@ -163,7 +170,7 @@ namespace Platformer
                 level.Dispose();
 
             // Load the level.
-            string levelPath = string.Format("Content/Levels/{0}.txt", levelIndex);
+            string levelPath = string.Format("{0}/Levels/{1}.txt", Content.RootDirectory, levelIndex);
             using (Stream fileStream = TitleContainer.OpenStream(levelPath))
                 level = new Level(Services, fileStream, levelIndex);
         }

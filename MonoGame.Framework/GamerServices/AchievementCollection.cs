@@ -80,7 +80,7 @@ namespace Microsoft.Xna.Framework.GamerServices
             }
         }
 
-		private bool isReadOnly;
+		private bool isReadOnly = false;
 		public bool IsReadOnly 
 		{
             get
