@@ -230,11 +230,17 @@ namespace Microsoft.Xna.Framework
 						state = TouchLocationState.Pressed;
 						break;
 					case UITouchPhase.Cancelled	:
+						state = TouchLocationState.Invalid;
+						break;
+					case UITouchPhase.Moved:
+					case UITouchPhase.Stationary:
+						state = TouchLocationState.Moved;
+					break;
 					case UITouchPhase.Ended	:
 						state = TouchLocationState.Released;
 						break;
 					default :
-						state = TouchLocationState.Moved;
+						state = TouchLocationState.Invalid;
 						break;					
 				}
 				

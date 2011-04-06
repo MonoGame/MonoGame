@@ -375,10 +375,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 		
-		public void SetRenderTarget (
-         int renderTargetIndex,
-         RenderTarget2D renderTarget
-		                             )
+		public void SetRenderTarget (RenderTarget2D renderTarget)
 		{
 			throw new NotImplementedException();
 		}

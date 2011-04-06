@@ -93,7 +93,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		#endregion
 		
 		#region Constructors
-		public TouchLocation(int aId, TouchLocationState aState, Vector2 aPosition, float aPressure, TouchLocationState aPreviousState, Vector2 aPreviousPosition, float aPreviousPressure)
+		public TouchLocation(int aId, TouchLocationState aState, Vector2 aPosition, float aPressure, 
+		                     TouchLocationState aPreviousState, Vector2 aPreviousPosition, float aPreviousPressure)
         {
             id = aId;
 			previousId = -1;
@@ -110,7 +111,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
             id = aId;
 			previousId = -1;
 			position = aPosition;
-			previousPosition = new Vector2();
+			previousPosition = Vector2.Zero;
 			pressure = aPressure;			
 			previousPressure = 0.0f;
 			state = aState;
@@ -120,19 +121,20 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		
         public override bool Equals(object obj)
         {
-			if (obj == null) 
-				return false;
-
-			TouchLocation touchLocation = (TouchLocation)obj;
-	    	return Equals(touchLocation);
+			bool result = false;
+			if (obj is TouchLocation)
+			{
+				result = Equals((TouchLocation) obj);
+			}
+			return result;
 		}
 
         public bool Equals(TouchLocation other)
         {
             return ( ( this.Id.Equals( other.Id ) ) && 
 			        ( this.Position.Equals( other.Position ) ) && 
-			        ( this.Pressure.Equals( other.Pressure ) ) && 
-			        ( this.State.Equals( other.State ) ) );
+			        ( this.previousPosition.Equals ( other.previousPosition)) &&
+			        ( this.Pressure.Equals( other.Pressure )));
         }
 
         public override int GetHashCode()
@@ -149,25 +151,45 @@ namespace Microsoft.Xna.Framework.Input.Touch
         {
 			if ( previousState == TouchLocationState.Invalid )
 			{
-			
-			  aPreviousLocation = this;
+			  aPreviousLocation = new TouchLocation(-1,TouchLocationState.Invalid,Vector2.Zero,this.pressure,TouchLocationState.Invalid,Vector2.Zero,this.previousPressure);
+			  /*aPreviousLocation.id = -1;
+			  aPreviousLocation.state = TouchLocationState.Invalid;
+			  aPreviousLocation.position = Vector2.Zero;
+			  aPreviousLocation.previousState = TouchLocationState.Invalid;
+			  aPreviousLocation.previousPosition = Vector2.Zero;
+			  aPreviousLocation.pressure = this.pressure;
+			  aPreviousLocation.previousPressure = this.previousPressure;     */                                 
 			  return false;
 			}
 			else
 			{
-			  aPreviousLocation = new TouchLocation(previousId, previousState, previousPosition, previousPressure);
+			  aPreviousLocation = new TouchLocation(id,this.previousState,previousPosition,this.previousPressure);
+			  /*aPreviousLocation.id = this.id;
+			  aPreviousLocation.state = this.previousState;
+			  aPreviousLocation.position = this.previousPosition;
+			  aPreviousLocation.previousState = TouchLocationState.Invalid;
+			  aPreviousLocation.previousPosition = Vector2.Zero;
+			  aPreviousLocation.pressure = this.pressure;*/
 			  return true;
 			}
         }
 
         public static bool operator !=(TouchLocation value1, TouchLocation value2)
         {
-			return !value1.Equals(value2);
+			return ! (((value1.id == value2.id) && 
+			        (value1.state == value2.state) &&
+			        (value1.position == value2.position) &&
+			        (value1.previousState == value2.previousState) &&
+			        (value1.previousPosition == value2.previousPosition)));
         }
 
         public static bool operator ==(TouchLocation value1, TouchLocation value2)
         {
-            return value1.Equals(value2);
+            return ((value1.id == value2.id) && 
+			        (value1.state == value2.state) &&
+			        (value1.position == value2.position) &&
+			        (value1.previousState == value2.previousState) &&
+			        (value1.previousPosition == value2.previousPosition));
         }
 
        
