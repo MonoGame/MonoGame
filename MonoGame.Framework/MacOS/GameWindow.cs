@@ -485,8 +485,7 @@ namespace Microsoft.Xna.Framework
 
 		public override void MouseDown (NSEvent theEvent)
 		{
-			PointF loc = NSEvent.CurrentMouseLocation;
-			//Console.WriteLine(NSEvent.CurrentMouseLocation);
+			PointF loc = theEvent.LocationInWindow;
 			SetMousePosition (loc);
 			switch (theEvent.Type) {
 
@@ -506,8 +505,7 @@ namespace Microsoft.Xna.Framework
 
 		public override void MouseUp (NSEvent theEvent)
 		{
-			PointF loc = NSEvent.CurrentMouseLocation;
-			//Console.WriteLine(NSEvent.CurrentMouseLocation);
+			PointF loc = theEvent.LocationInWindow;
 			SetMousePosition (loc);
 			switch (theEvent.Type) {
 
@@ -527,8 +525,7 @@ namespace Microsoft.Xna.Framework
 
 		public override void MouseMoved (NSEvent theEvent)
 		{
-			PointF loc = NSEvent.CurrentMouseLocation;
-			//Console.WriteLine(loc);
+			PointF loc = theEvent.LocationInWindow;
 			SetMousePosition (loc);
 		}
 
