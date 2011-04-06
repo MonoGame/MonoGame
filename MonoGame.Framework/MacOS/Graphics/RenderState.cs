@@ -38,7 +38,6 @@
 // */
 // #endregion License
 // 
-
 using System;
 
 using MonoMac.OpenGL;
@@ -51,53 +50,216 @@ namespace Microsoft.Xna.Framework
 	{
 
 		private bool _alphaBlendEnable;
-		
-		public bool AlphaBlendEnable 
-		{ 
-			get
-			{
+		private bool _alphaTestEnable;
+		private Blend _destinationBlend = Blend.One;
+		private Blend _sourceBlend = Blend.One;
+
+		public bool AlphaBlendEnable { 
+			get {
 				return _alphaBlendEnable;
 			}
-			set
-			{
-				if ( _alphaBlendEnable != value )
-				{
+			set {
+				if (_alphaBlendEnable != value) {
 					_alphaBlendEnable = value;
-					
-					if (_alphaBlendEnable)
-					{
-						GL.Enable(EnableCap.AlphaTest);
-					}
-					else
-					{
-						GL.Disable(EnableCap.AlphaTest);
+
+					if (_alphaBlendEnable) {
+						GL.Enable (EnableCap.Blend);
+					} else {
+						GL.Disable (EnableCap.Blend);
 					}
 				}
 			}
 		}
-		
-		public Blend DestinationBlend
-		{ 
-			get; 
-			set; 
-		}
-		
-		public Blend SourceBlend
-		{ 
-			get; 
-			set; 
-		}
-		
-		public bool ScissorTestEnable 
-		{ 
-			get; set; 
-		}
-		
+
 		BlendFunction alphaBlendOperation;
-		public BlendFunction AlphaBlendOperation 
-		{ 
-		get { return alphaBlendOperation; } 
-		set { alphaBlendOperation = value; }
+
+		public BlendFunction AlphaBlendOperation { 
+			get { return alphaBlendOperation; } 
+			set { alphaBlendOperation = value; }
 		}
+
+		CompareFunction _alphaFunction = CompareFunction.Always;
+
+		public CompareFunction AlphaFunction {
+			get {
+				return _alphaFunction;
+			}
+
+			set {
+				_alphaFunction = value;
+				AlphaFunction af = MonoMac.OpenGL.AlphaFunction.Always;
+				switch (value) {
+				case CompareFunction.Always:
+					af = MonoMac.OpenGL.AlphaFunction.Always;
+					break;
+				case CompareFunction.Equal:
+					af = MonoMac.OpenGL.AlphaFunction.Equal;
+					break;
+				case CompareFunction.Greater:
+					af = MonoMac.OpenGL.AlphaFunction.Greater;
+					break;
+				case CompareFunction.GreaterEqual:
+					af = MonoMac.OpenGL.AlphaFunction.Gequal;
+					break;
+				case CompareFunction.Less:
+					af = MonoMac.OpenGL.AlphaFunction.Less;
+					break;
+				case CompareFunction.LessEqual:
+					af = MonoMac.OpenGL.AlphaFunction.Lequal;
+					break;
+				case CompareFunction.Never:
+					af = MonoMac.OpenGL.AlphaFunction.Never;
+					break;
+				case CompareFunction.NotEqual:
+					af = MonoMac.OpenGL.AlphaFunction.Notequal;
+					break;
+				}
+
+				GL.AlphaFunc (af, _referenceAlpha);
+			}
+
+		}
+
+		public bool AlphaTestEnable { 
+			get {
+				return _alphaTestEnable;
+			}
+			set {
+				if (_alphaTestEnable != value) {
+					_alphaTestEnable = value;
+
+					if (_alphaTestEnable) {
+						GL.Enable (EnableCap.AlphaTest);
+
+					} else {
+						GL.Disable (EnableCap.AlphaTest);
+					}
+				}
+			}
+		}
+
+		bool _depthBufferEnable = true;
+		public bool DepthBufferEnable {
+			get {
+				return _depthBufferEnable;
+			}
+			
+			set {
+				if (_depthBufferEnable != value) {
+					_depthBufferEnable = value;
+
+					if (_depthBufferEnable) {
+						GL.Enable (EnableCap.DepthTest);
+
+					} else {
+						GL.Disable (EnableCap.DepthTest);
+					}
+				}				
+			}
+			
+		}
+		public Blend DestinationBlend { 
+			get {
+				return _destinationBlend;
+			} 
+			set {
+				if (_destinationBlend != value) {
+					_destinationBlend = value;
+				}
+			}
+		}
+
+		public Blend SourceBlend { 
+			get {
+				return _sourceBlend;
+			} 
+			set {
+				if (_sourceBlend != value) {
+					_sourceBlend = value;
+				}
+			}
+		}
+
+		float _pointSize = 64;
+
+		public float PointSize { 
+			get {
+
+				return _pointSize;
+			}
+			set {
+				if (_pointSize != value) {
+					_pointSize = Math.Max (Math.Min (value, _pointSizeMax), PointSizeMin);
+					GL.PointSize (_pointSize);
+				}
+
+			}
+		}
+
+		float _pointSizeMax = 64;
+
+		public float PointSizeMax {
+
+			get {
+				return _pointSizeMax;
+			}
+			set {
+				_pointSizeMax = value;
+			}
+		}
+
+		float _pointSizeMin = 1;
+
+		public float PointSizeMin {
+
+			get {
+				return _pointSizeMin;
+			}
+			set {
+				_pointSizeMin = value;
+			}
+		}
+
+		bool _pointSpriteEnable = false;
+		public bool PointSpriteEnable {
+			get {
+				return _pointSpriteEnable;
+			}
+			
+			set {
+				_pointSpriteEnable = value;
+			}
+			
+		}
+		int _referenceAlpha = 0;
+
+		public int ReferenceAlpha {
+			get {
+				return _referenceAlpha;
+			}
+
+			set {
+				_referenceAlpha = value;
+			}
+
+		}
+
+		bool _scissorTestEnable = false;
+
+		public bool ScissorTestEnable { 
+			get {
+				return _scissorTestEnable;
+			}
+			set {
+				if (_scissorTestEnable != value) {
+					_scissorTestEnable = value;
+					if (!_scissorTestEnable) {
+						GL.Disable (EnableCap.ScissorTest);	
+					}
+				}
+			}
+		}
+
+
 	}
 }
