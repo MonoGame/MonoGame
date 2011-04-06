@@ -204,6 +204,12 @@ namespace Microsoft.Xna.Framework.Graphics
                 return new Color(0);
             }
         }
+		public static Color Transparent
+		{
+			get{
+				return new Color(0);
+			}
+		}
         public static Color TransparentWhite
         {
             get

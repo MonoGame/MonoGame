@@ -46,6 +46,9 @@ namespace Microsoft.Xna.Framework.Input.Touch
 {
     public struct TouchLocation : IEquatable<TouchLocation>
     {
+		/// <summary>
+		///Attributes 
+		/// </summary>
 		private int id;
 		private int previousId;
 		private Vector2 position;
@@ -55,83 +58,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		private TouchLocationState state;
 		private TouchLocationState previousState;
 		
-        public override bool Equals(object obj)
-        {
-			if (obj == null) 
-				return false;
-
-			TouchLocation touchLocation = (TouchLocation)obj;
-	    	return Equals(touchLocation);
-		}
-
-        public bool Equals(TouchLocation other)
-        {
-            return ( ( this.Id.Equals( other.Id ) ) && 
-			        ( this.Position.Equals( other.Position ) ) && 
-			        ( this.Pressure.Equals( other.Pressure ) ) && 
-			        ( this.State.Equals( other.State ) ) );
-        }
-
-        public override int GetHashCode()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override string ToString()
-        {
-            return this.Id.ToString();
-        }
-
-        public TouchLocation(int aId, TouchLocationState aState, Vector2 aPosition, float aPressure, TouchLocationState aPreviousState, Vector2 aPreviousPosition, float aPreviousPressure)
-        {
-            id = aId;
-			previousId = -1;
-			position = aPosition;
-			previousPosition = aPreviousPosition;
-			pressure = aPressure;			
-			previousPressure = aPreviousPressure;
-			state = aState;
-			previousState = aPreviousState;			
-        }
-
-        public TouchLocation(int aId, TouchLocationState aState, Vector2 aPosition, float aPressure)
-        {
-            id = aId;
-			previousId = -1;
-			position = aPosition;
-			previousPosition = new Vector2();
-			pressure = aPressure;			
-			previousPressure = 0.0f;
-			state = aState;
-			previousState = TouchLocationState.Invalid;	
-        }
-
-        public bool TryGetPreviousLocation(out TouchLocation aPreviousLocation)
-        {
-			if ( previousState == TouchLocationState.Invalid )
-			{
-			
-			  aPreviousLocation = this;
-			  return false;
-			}
-			else
-			{
-			  aPreviousLocation = new TouchLocation(previousId, previousState, previousPosition, previousPressure);
-			  return true;
-			}
-        }
-
-        public static bool operator !=(TouchLocation value1, TouchLocation value2)
-        {
-			return !value1.Equals(value2);
-        }
-
-        public static bool operator ==(TouchLocation value1, TouchLocation value2)
-        {
-            return value1.Equals(value2);
-        }
-
-        public int Id 
+		#region Properties
+		 public int Id 
 		{ 
 			get
 	        	{
@@ -162,5 +90,86 @@ namespace Microsoft.Xna.Framework.Input.Touch
 	            	return state;
 	        	} 
 		}
+		#endregion
+		
+		#region Constructors
+		public TouchLocation(int aId, TouchLocationState aState, Vector2 aPosition, float aPressure, TouchLocationState aPreviousState, Vector2 aPreviousPosition, float aPreviousPressure)
+        {
+            id = aId;
+			previousId = -1;
+			position = aPosition;
+			previousPosition = aPreviousPosition;
+			pressure = aPressure;			
+			previousPressure = aPreviousPressure;
+			state = aState;
+			previousState = aPreviousState;			
+        }
+
+        public TouchLocation(int aId, TouchLocationState aState, Vector2 aPosition, float aPressure)
+        {
+            id = aId;
+			previousId = -1;
+			position = aPosition;
+			previousPosition = new Vector2();
+			pressure = aPressure;			
+			previousPressure = 0.0f;
+			state = aState;
+			previousState = TouchLocationState.Invalid;	
+        }
+		#endregion
+		
+        public override bool Equals(object obj)
+        {
+			if (obj == null) 
+				return false;
+
+			TouchLocation touchLocation = (TouchLocation)obj;
+	    	return Equals(touchLocation);
+		}
+
+        public bool Equals(TouchLocation other)
+        {
+            return ( ( this.Id.Equals( other.Id ) ) && 
+			        ( this.Position.Equals( other.Position ) ) && 
+			        ( this.Pressure.Equals( other.Pressure ) ) && 
+			        ( this.State.Equals( other.State ) ) );
+        }
+
+        public override int GetHashCode()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override string ToString()
+        {
+            return this.Id.ToString();
+        }
+
+        public bool TryGetPreviousLocation(out TouchLocation aPreviousLocation)
+        {
+			if ( previousState == TouchLocationState.Invalid )
+			{
+			
+			  aPreviousLocation = this;
+			  return false;
+			}
+			else
+			{
+			  aPreviousLocation = new TouchLocation(previousId, previousState, previousPosition, previousPressure);
+			  return true;
+			}
+        }
+
+        public static bool operator !=(TouchLocation value1, TouchLocation value2)
+        {
+			return !value1.Equals(value2);
+        }
+
+        public static bool operator ==(TouchLocation value1, TouchLocation value2)
+        {
+            return value1.Equals(value2);
+        }
+
+       
     }
 }
