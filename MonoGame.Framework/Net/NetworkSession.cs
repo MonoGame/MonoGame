@@ -44,9 +44,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.Remoting.Messaging;
 
-using MonoTouch.UIKit;
-using MonoTouch.GameKit;
-
 using Microsoft.Xna.Framework.GamerServices;
 #endregion Using clause
 
@@ -71,8 +68,7 @@ namespace Microsoft.Xna.Framework.Net
 	public sealed class NetworkSession : IDisposable
 	{
 		private static NetworkSessionState networkSessionState;
-		private static NetworkSessionType networkSessionType;
-		private static GKSession gkSession;		
+		private static NetworkSessionType networkSessionType;	
 
 		public NetworkSession()
 		{
@@ -117,26 +113,6 @@ namespace Microsoft.Xna.Framework.Net
 					throw new ArgumentOutOfRangeException( "Maximum number of gamers must be between 2 and 8." );
 				
 				networkSessionType = sessionType;
-				
-				GKSessionMode gkSessionMode;
-				switch (sessionType)
-				{
-				   case NetworkSessionType.Local:
-				      gkSessionMode = GKSessionMode.Client;
-				      break;
-				   case NetworkSessionType.SystemLink:
-				      gkSessionMode = GKSessionMode.Peer;
-				      break;
-				   case NetworkSessionType.PlayerMatch:
-				      gkSessionMode = GKSessionMode.Server;
-				      break;
-				   default:
-				      gkSessionMode = GKSessionMode.Peer;
-				      break;
-				}
-				
-				gkSession = new GKSession( null, null, gkSessionMode );
-				gkSession.Available = true;
 				
 				throw new NotImplementedException();
 			}
@@ -409,15 +385,7 @@ namespace Microsoft.Xna.Framework.Net
 			try
 			{
 				networkSessionState = NetworkSessionState.Lobby;
-				if (gkSession != null)
-				{
-					gkSession.DisconnectFromAllPeers();
-					gkSession.Available = false;
-					gkSession.ReceiveData -= null;
-					gkSession.Delegate = null;
-					gkSession.Dispose();
-					gkSession = null;
-				}
+				
 			}
 			finally
 			{
@@ -506,17 +474,7 @@ namespace Microsoft.Xna.Framework.Net
 			
 				networkSessionType = sessionType;
 				
-				GKPeerPickerController peerPickerController = new GKPeerPickerController();
-				peerPickerController.Delegate = new MonoGamePeerPickerControllerDelegate(gkSession, ReceiveData);
-				if ( sessionType == NetworkSessionType.SystemLink )
-				{
-				 	peerPickerController.ConnectionTypesMask = GKPeerPickerConnectionType.Nearby;
-				}
-				else if ( sessionType == NetworkSessionType.PlayerMatch )
-				{
-					peerPickerController.ConnectionTypesMask = GKPeerPickerConnectionType.Nearby | GKPeerPickerConnectionType.Online;
-				}				
-				peerPickerController.Show();
+				
 				List<AvailableNetworkSession> availableNetworkSessions = new List<AvailableNetworkSession>();
 				
 				return new AvailableNetworkSessionCollection( availableNetworkSessions );
@@ -811,12 +769,6 @@ namespace Microsoft.Xna.Framework.Net
 		public static event EventHandler<InviteAcceptedEventArgs> InviteAccepted;
 		public event EventHandler<NetworkSessionEndedEventArgs> SessionEnded;
 		#endregion
-		
-		private static void ReceiveData(object o, GKDataReceivedEventArgs args )
-		{
-			Console.WriteLine( "ReceiveData" );
-			// Transform GKSession Data into NetworkSesson Data
-		}
 	}
 	
 	public class GameEndedEventArgs : EventArgs

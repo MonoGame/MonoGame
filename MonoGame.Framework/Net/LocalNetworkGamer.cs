@@ -40,7 +40,7 @@
 
 #region Using clause
 using System;
-using MonoTouch.UIKit;
+
 using Microsoft.Xna.Framework.GamerServices;
 #endregion Using clause
 

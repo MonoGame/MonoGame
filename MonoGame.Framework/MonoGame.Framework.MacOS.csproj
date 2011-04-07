@@ -33,6 +33,13 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DefineConstants>MONOMAC</DefineConstants>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Distribution|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Distribution</OutputPath>
+    <WarningLevel>4</WarningLevel>
+    <DefineConstants>MONOMAC</DefineConstants>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Xml" />
@@ -247,6 +254,24 @@
     <Compile Include="MacOS\Input\GamePad.cs" />
     <Compile Include="Input\ButtonDefinition.cs" />
     <Compile Include="Input\ThumbStickDefinition.cs" />
+    <Compile Include="MacOS\GamerServices\SignedInGamer.cs" />
+    <Compile Include="GamerServices\Gamer.cs" />
+    <Compile Include="GamerServices\SignedInGamerCollection.cs" />
+    <Compile Include="GamerServices\GamerProfile.cs" />
+    <Compile Include="GamerServices\FriendCollection.cs" />
+    <Compile Include="GamerServices\FriendGamer.cs" />
+    <Compile Include="GamerServices\GamerDefaults.cs" />
+    <Compile Include="GamerServices\GamerZone.cs" />
+    <Compile Include="GamerServices\GamerServicesComponent.cs" />
+    <Compile Include="Net\NetworkGamer.cs" />
+    <Compile Include="Net\NetworkMachine.cs" />
+    <Compile Include="Net\NetworkSession.cs" />
+    <Compile Include="Net\AvailableNetworkSession.cs" />
+    <Compile Include="Net\AvailableNetworkSessionCollection.cs" />
+    <Compile Include="Net\LocalNetworkGamer.cs" />
+    <Compile Include="GamerServices\GamerCollection.cs" />
+    <Compile Include="MacOS\GamerServices\Guide.cs" />
+    <Compile Include="GamerServices\MessageBoxIcon.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />
@@ -264,5 +289,6 @@
     <Folder Include="MacOS\Graphics\States\" />
     <Folder Include="MacOS\Graphics\Effect\" />
     <Folder Include="MacOS\Input\" />
+    <Folder Include="MacOS\GamerServices\" />
   </ItemGroup>
 </Project>
