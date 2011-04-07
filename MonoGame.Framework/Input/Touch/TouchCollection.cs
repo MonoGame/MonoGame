@@ -93,6 +93,31 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			return (this.IndexOf(item) >= 0);
 		}
 		
+		internal void Update()
+		{ 
+			TouchCollection aux = new TouchCollection();
+			
+			foreach(TouchLocation t in this)
+			{
+				switch (t.State) {
+				case TouchLocationState.Pressed:
+					//Cannot modify t object
+					//t.State = TouchLocationState.Moved;
+					aux.Add(new TouchLocation(t.Id,TouchLocationState.Moved,t.Position,t.State,t.prevPosition));
+					break;
+				case TouchLocationState.Moved:
+					aux.Add(t);
+					break;
+				default:
+					break;
+				}				
+			}
+			
+			Clear();
+			foreach(TouchLocation t2 in aux)
+				this.Add(t2);
+		}
+		
 		public void CopyTo (TouchLocation[] array, int arrayIndex)
 		{
 			if (array == null)
@@ -116,18 +141,18 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		
 		public bool FindById(int id, out TouchLocation touchLocation)
 		{
-			for (int i = 0; i < this.Count; i++)
+			foreach (TouchLocation location in this)
 			{
-				TouchLocation location = this[i];
 				if (location.Id == id)
 				{
-					touchLocation = this[i];
+					touchLocation = location;
 					return true;
 				}
 			}
 			touchLocation = new TouchLocation();
 			return false;
 		}
+		
 		
 		public int IndexOf(TouchLocation item)
 		{

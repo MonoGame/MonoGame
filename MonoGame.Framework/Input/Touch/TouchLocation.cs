@@ -50,11 +50,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		///Attributes 
 		/// </summary>
 		private int id;
-		private int previousId;
 		private Vector2 position;
 		private Vector2 previousPosition;
-		private float pressure;
-		private float previousPressure;
 		private TouchLocationState state;
 		private TouchLocationState previousState;
 		
@@ -73,47 +70,56 @@ namespace Microsoft.Xna.Framework.Input.Touch
 	        	{
 	            	return position;
 	        	} 
+			set {
+				previousPosition = position;
+				position = value;
+			}
 		}
-
-        public float Pressure 
-		{ 
-			get
-	        	{
-	            	return pressure;
-	        	} 
+		
+		public Vector2 prevPosition
+		{
+			get{
+				return previousPosition;
+			}
 		}
-
+		
         public TouchLocationState State 
 		{ 
 			get
 	        	{
 	            	return state;
 	        	} 
+			set
+			{
+				previousState = state;
+				state = value;
+			}
+		}
+		public TouchLocationState prevState
+		{
+			get
+			{
+				return previousState;
+			}
 		}
 		#endregion
 		
 		#region Constructors
-		public TouchLocation(int aId, TouchLocationState aState, Vector2 aPosition, float aPressure, 
-		                     TouchLocationState aPreviousState, Vector2 aPreviousPosition, float aPreviousPressure)
+		public TouchLocation(int aId, TouchLocationState aState, Vector2 aPosition,
+		                     TouchLocationState aPreviousState, Vector2 aPreviousPosition)
         {
             id = aId;
-			previousId = -1;
 			position = aPosition;
 			previousPosition = aPreviousPosition;
-			pressure = aPressure;			
-			previousPressure = aPreviousPressure;
 			state = aState;
 			previousState = aPreviousState;			
         }
 
-        public TouchLocation(int aId, TouchLocationState aState, Vector2 aPosition, float aPressure)
+        public TouchLocation(int aId, TouchLocationState aState, Vector2 aPosition)
         {
             id = aId;
-			previousId = -1;
 			position = aPosition;
-			previousPosition = Vector2.Zero;
-			pressure = aPressure;			
-			previousPressure = 0.0f;
+			previousPosition = Vector2.Zero;		
 			state = aState;
 			previousState = TouchLocationState.Invalid;	
         }
@@ -133,8 +139,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
         {
             return ( ( this.Id.Equals( other.Id ) ) && 
 			        ( this.Position.Equals( other.Position ) ) && 
-			        ( this.previousPosition.Equals ( other.previousPosition)) &&
-			        ( this.Pressure.Equals( other.Pressure )));
+			        ( this.previousPosition.Equals ( other.previousPosition)));
         }
 
         public override int GetHashCode()
@@ -144,32 +149,27 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
         public override string ToString()
         {
-            return this.Id.ToString();
+            return "Touch id:"+id+" state:"+state + " position:" + position + " prevstate:"+previousState+" prevposition:"+ previousPosition;
         }
 
         public bool TryGetPreviousLocation(out TouchLocation aPreviousLocation)
         {
 			if ( previousState == TouchLocationState.Invalid )
 			{
-			  aPreviousLocation = new TouchLocation(-1,TouchLocationState.Invalid,Vector2.Zero,this.pressure,TouchLocationState.Invalid,Vector2.Zero,this.previousPressure);
-			  /*aPreviousLocation.id = -1;
+			  aPreviousLocation.id = -1;
 			  aPreviousLocation.state = TouchLocationState.Invalid;
 			  aPreviousLocation.position = Vector2.Zero;
 			  aPreviousLocation.previousState = TouchLocationState.Invalid;
-			  aPreviousLocation.previousPosition = Vector2.Zero;
-			  aPreviousLocation.pressure = this.pressure;
-			  aPreviousLocation.previousPressure = this.previousPressure;     */                                 
+			  aPreviousLocation.previousPosition = Vector2.Zero;                                   
 			  return false;
 			}
 			else
 			{
-			  aPreviousLocation = new TouchLocation(id,this.previousState,previousPosition,this.previousPressure);
-			  /*aPreviousLocation.id = this.id;
+			  aPreviousLocation.id = this.id;
 			  aPreviousLocation.state = this.previousState;
 			  aPreviousLocation.position = this.previousPosition;
 			  aPreviousLocation.previousState = TouchLocationState.Invalid;
 			  aPreviousLocation.previousPosition = Vector2.Zero;
-			  aPreviousLocation.pressure = this.pressure;*/
 			  return true;
 			}
         }
