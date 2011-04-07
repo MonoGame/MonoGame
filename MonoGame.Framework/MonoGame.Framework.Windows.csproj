@@ -58,6 +58,7 @@
     <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GamerServices\MessageBoxIcon.cs" />
     <Compile Include="GameWindow.cs" />
     <Compile Include="Graphics\ColorWriteChannels.cs" />
     <Compile Include="Graphics\Effect\BasicEffect.cs" />
@@ -101,11 +102,13 @@
     <Compile Include="Graphics\Vertices\VertexPositionColor.cs" />
     <Compile Include="Graphics\Vertices\VertexPositionNormalTexture.cs" />
     <Compile Include="Graphics\Vertices\VertexPositionTexture.cs" />
+    <Compile Include="Net\NetworkException.cs" />
     <Compile Include="Windows\Content\ContentManager.cs" />
     <Compile Include="Windows\Content\ContentReaders\SongReader.cs" />
     <Compile Include="Windows\Content\ContentReaders\SoundEffectReader.cs" />
     <Compile Include="Windows\Content\ContentReaders\SpriteFontReader.cs" />
     <Compile Include="Windows\Content\ContentReaders\Texture2DReader.cs" />
+    <Compile Include="Windows\GamerServices\Guide.cs" />
     <Compile Include="Windows\Graphics\DisplayMode.cs" />
     <Compile Include="Windows\Graphics\Effect.cs" />
     <Compile Include="Windows\Graphics\ESImage.cs" />
@@ -231,10 +234,6 @@
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="GamerServices\" />
-    <Folder Include="Net\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
