@@ -44,8 +44,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-using MonoTouch.UIKit;
-
 #endregion Using clause
 
 namespace Microsoft.Xna.Framework.Net
