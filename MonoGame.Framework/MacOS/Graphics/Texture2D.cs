@@ -272,7 +272,7 @@ namespace Microsoft.Xna.Framework.Graphics
             throw new NotImplementedException();
         }
 
-        public void GetData<T>(ref T[] data)
+        public void GetData<T>(T[] data)
         {	
 			if (data == null )
 			{
