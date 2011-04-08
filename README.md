@@ -7,12 +7,14 @@ MonoGame is sponsored by...
 
 
 [Syderis Technologies](http://www.syderis.com)
+
 <img src="http://www.syderis.com/images/galerias/logo_normal.png" alt="Syderis Logo" title="Syderis"/>
 
 and
 
 [Savage Software Solutions Ltd.](http://www.SavageSoftwareSolutions.com/) 
-<img src="http://www.savagesoftwaresolutions.com/images_sav/savage_lrg.png" alt="Savage Software Solutions Logo" title="Savage Software Solutions" width="320"/>
+
+<img src="http://www.savagesoftwaresolutions.com/images_sav/savage_lrg.png" alt="Savage Software Solutions Logo" title="Savage Software Solutions" width="215"/>
 
 If your company plans to use and contribute to MonoGame, why not become a sponsor. If you would like to sponsor MonoGame, please contact us.
 
