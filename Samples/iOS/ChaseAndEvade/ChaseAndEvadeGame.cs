@@ -143,7 +143,8 @@ namespace ChaseAndEvade
 			graphics.PreferredBackBufferHeight = 800;
 	
 			TargetElapsedTime = TimeSpan.FromTicks(333333);
-#else
+#elif !MONOMAC
+			
 			graphics.PreferredBackBufferWidth = 320;
 			graphics.PreferredBackBufferHeight = 480;
 #endif
