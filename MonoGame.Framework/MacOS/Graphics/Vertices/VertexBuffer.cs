@@ -87,6 +87,14 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			GL.GenBuffers(0, out _bufferStore);
 		}
+		
+		public bool IsContentLost 
+		{ 
+			get
+			{
+				return Graphics.IsContentLost;
+			}
+		}
     }
 	
     public class DynamicVertexBuffer : VertexBuffer
