@@ -42,7 +42,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			_delayedBufferDelegates.Clear();
 		}
 		
-		internal void GenerateBuffer<T>() where T : struct, IVertexType
+		//internal void GenerateBuffer<T>() where T : struct, IVertexType
+		internal void GenerateBuffer<T>() where T : struct
 		{
 			var vd = VertexDeclaration.FromType(_type);
 			
@@ -65,7 +66,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 vertices[i] = _tbuff[i];
         }
 
-        public unsafe void SetData<T>(T[] vertices) where T : struct, IVertexType
+        //public unsafe void SetData<T>(T[] vertices) where T : struct, IVertexType
+        public unsafe void SetData<T>(T[] vertices) where T : struct
         {
 			//the creation of the buffer should mb be moved to the constructor and then glMapBuffer and Unmap should be used to update it
 			//glMapBuffer - sets data
