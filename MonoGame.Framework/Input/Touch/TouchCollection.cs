@@ -52,16 +52,11 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		/// Attributes 
 		/// </summary>
 		private bool isConnected;
-		private int locationCount;
+		
+		//Helpers
+		private List<TouchLocation> aux;
 		
 		#region Properties
-		public int Count
-		{
-			get
-			{
-				return this.locationCount;
-			}
-		}
 		public bool IsConnected
 		{
 			get
@@ -80,7 +75,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		
 		public TouchCollection()
 		{
-			
+			aux = new List<TouchLocation>();
 		}
 		
 		internal TouchCollection(IEnumerable<TouchLocation> locations)	: base (locations)
@@ -95,27 +90,28 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		
 		internal void Update()
 		{ 
-			TouchCollection aux = new TouchCollection();
-			
-			foreach(TouchLocation t in this)
+			//Console.WriteLine("----------------"+this.Count+"--------------------");
+			aux.Clear();
+			for (int i = 0;  i <  this.Count; i++)
 			{
-				switch (t.State) {
-				case TouchLocationState.Pressed:
-					//Cannot modify t object
-					//t.State = TouchLocationState.Moved;
-					aux.Add(new TouchLocation(t.Id,TouchLocationState.Moved,t.Position,t.State,t.prevPosition));
+				TouchLocation t = this[i];
+				switch (t.State)
+				{
+					case TouchLocationState.Pressed:
+						t.State = TouchLocationState.Moved;
+						this[i] = t;
 					break;
-				case TouchLocationState.Moved:
-					aux.Add(t);
+					case TouchLocationState.Moved:
+						t.PrevState = TouchLocationState.Moved;
+						this[i] = t;
 					break;
-				default:
+					case TouchLocationState.Released:
+						aux.Add(t);
 					break;
-				}				
+				}
 			}
-			
-			Clear();
-			foreach(TouchLocation t2 in aux)
-				this.Add(t2);
+			foreach(TouchLocation touch in aux)
+				this.Remove(touch);
 		}
 		
 		public void CopyTo (TouchLocation[] array, int arrayIndex)
@@ -139,18 +135,19 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			}
 		}
 		
-		public bool FindById(int id, out TouchLocation touchLocation)
+		public int FindById(int id, out TouchLocation touchLocation)
 		{
-			foreach (TouchLocation location in this)
+			for (int i = 0; i < this.Count; i++)
 			{
+				TouchLocation location = this[i];
 				if (location.Id == id)
 				{
-					touchLocation = location;
-					return true;
+					touchLocation = this[i];
+					return i;
 				}
 			}
 			touchLocation = new TouchLocation();
-			return false;
+			return -1;
 		}
 		
 		

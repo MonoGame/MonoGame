@@ -76,7 +76,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			}
 		}
 		
-		public Vector2 prevPosition
+		public Vector2 PrevPosition
 		{
 			get{
 				return previousPosition;
@@ -95,11 +95,14 @@ namespace Microsoft.Xna.Framework.Input.Touch
 				state = value;
 			}
 		}
-		public TouchLocationState prevState
+		public TouchLocationState PrevState
 		{
 			get
 			{
 				return previousState;
+			}
+			set{
+				previousState = value;
 			}
 		}
 		#endregion

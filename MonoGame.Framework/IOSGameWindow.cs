@@ -210,12 +210,11 @@ namespace Microsoft.Xna.Framework
 		#endregion
 				
 		#region UIVIew Methods				
-		//private readonly Dictionary<IntPtr, TouchLocation> previousTouches = new Dictionary<IntPtr, TouchLocation>();
 		
 		private void FillTouchCollection(NSSet touches)
 		{
 			UITouch []touchesArray = touches.ToArray<UITouch>();
-			             
+			
 			for (int i=0; i < touchesArray.Length;i++)
 			{
 				
@@ -228,17 +227,17 @@ namespace Microsoft.Xna.Framework
 				
 				TouchLocation tlocation;
 				TouchCollection collection = TouchPanel.Collection;
+				int index;
 				switch (touch.Phase)
 				{
 					case UITouchPhase.Stationary:
 					case UITouchPhase.Moved:
-						if (collection.FindById(touch.Handle.ToInt32(), out tlocation))
+						index = collection.FindById(touch.Handle.ToInt32(), out tlocation);
+						if (index >= 0)
 					    {
-							//Cannot modify tlocation object
-							//tlocation.State = TouchLocationState.Moved;
-							//tlocation.Position = translatedPosition;
-							collection.Remove(tlocation);
-							collection.Add(new TouchLocation(touch.Handle.ToInt32(), TouchLocationState.Moved,translatedPosition, tlocation.State, tlocation.Position));
+							tlocation.State = TouchLocationState.Moved;
+							tlocation.Position = translatedPosition;
+							collection[index] = tlocation;
 						}
 						break;
 					case UITouchPhase.Began	:	
@@ -246,12 +245,11 @@ namespace Microsoft.Xna.Framework
 						collection.Add(tlocation);	
 						break;
 					case UITouchPhase.Ended	:
-						if (collection.FindById(touch.Handle.ToInt32(), out tlocation))
+						index = collection.FindById(touch.Handle.ToInt32(), out tlocation);
+						if (index >= 0)
 						{
-							//Cannot modify tlocation object
-							//tlocation.State = TouchLocationState.Released;
-							collection.Remove(tlocation);
-							collection.Add(new TouchLocation(touch.Handle.ToInt32(), TouchLocationState.Released,translatedPosition, tlocation.State, tlocation.Position));
+							tlocation.State = TouchLocationState.Released;
+							collection[index] = tlocation;
 						}
 						break;
 					default :
