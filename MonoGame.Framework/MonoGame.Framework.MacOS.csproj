@@ -272,6 +272,8 @@
     <Compile Include="GamerServices\GamerCollection.cs" />
     <Compile Include="MacOS\GamerServices\Guide.cs" />
     <Compile Include="GamerServices\MessageBoxIcon.cs" />
+    <Compile Include="Graphics\PackedVector\IPackedVector.cs" />
+    <Compile Include="Graphics\PackedVector\Short2.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />
