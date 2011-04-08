@@ -32,6 +32,7 @@
     <MtouchUseThumb>false</MtouchUseThumb>
     <MtouchUseSGen>false</MtouchUseSGen>
     <MtouchMinimumOS>3.1</MtouchMinimumOS>
+    <MtouchArch>ARMv6</MtouchArch>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
     <DebugType>none</DebugType>
@@ -51,6 +52,7 @@
     <MtouchUseSGen>false</MtouchUseSGen>
     <MtouchSdkVersion>3.0</MtouchSdkVersion>
     <MtouchMinimumOS>3.0</MtouchMinimumOS>
+    <MtouchArch>ARMv6</MtouchArch>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhone' ">
     <DebugSymbols>true</DebugSymbols>
@@ -71,6 +73,7 @@
     <MtouchUseSGen>false</MtouchUseSGen>
     <MtouchSdkVersion>3.0</MtouchSdkVersion>
     <MtouchMinimumOS>3.0</MtouchMinimumOS>
+    <MtouchArch>ARMv6</MtouchArch>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
     <DebugType>none</DebugType>
@@ -88,6 +91,7 @@
     <MtouchUseSGen>false</MtouchUseSGen>
     <MtouchSdkVersion>3.0</MtouchSdkVersion>
     <MtouchMinimumOS>3.0</MtouchMinimumOS>
+    <MtouchArch>ARMv6</MtouchArch>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Distribution|iPhone' ">
     <DebugType>none</DebugType>
@@ -103,6 +107,7 @@
     <MtouchUseSGen>false</MtouchUseSGen>
     <MtouchSdkVersion>3.0</MtouchSdkVersion>
     <MtouchMinimumOS>3.0</MtouchMinimumOS>
+    <MtouchArch>ARMv6</MtouchArch>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
