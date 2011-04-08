@@ -99,7 +99,7 @@ namespace Microsoft.Xna.Framework
 			_view = new GameWindow(frame);
 			_view.game = this;
 			
-			_mainWindow.ContentView = _view;
+			_mainWindow.ContentView.AddSubview(_view);
 			_mainWindow.AcceptsMouseMovedEvents = true;
 		
 			// Initialize GameTime
@@ -396,7 +396,13 @@ namespace Microsoft.Xna.Framework
 		{
 			// do nothing
 		}
-
+		
+		private float TitleBarHeight () 
+		{
+			RectangleF contentRect = NSWindow.ContentRectFor(_mainWindow.Frame,_mainWindow.StyleMask);
+			return _mainWindow.Frame.Height - contentRect.Height;
+		}
+		
 		protected virtual void Initialize ()
 		{
 			
@@ -404,12 +410,17 @@ namespace Microsoft.Xna.Framework
 			this.graphicsDeviceService = this.Services.GetService (typeof(IGraphicsDeviceService)) as IGraphicsDeviceService;			
 
 			RectangleF frame = _mainWindow.Frame;
+			RectangleF content = _view.Bounds;
 			
 			frame.Width = ((GraphicsDeviceManager)graphicsDeviceManager).PreferredBackBufferWidth;
-			frame.Height = ((GraphicsDeviceManager)graphicsDeviceManager).PreferredBackBufferHeight;
+			frame.Height = ((GraphicsDeviceManager)graphicsDeviceManager).PreferredBackBufferHeight + TitleBarHeight();
+
+			content.Width = ((GraphicsDeviceManager)graphicsDeviceManager).PreferredBackBufferWidth;
+			content.Height = ((GraphicsDeviceManager)graphicsDeviceManager).PreferredBackBufferHeight;
+
 			_mainWindow.SetFrame(frame,true);
 			
-			_view.Size = new Size((int)frame.Width,(int)frame.Height);			
+			_view.Size = new Size((int)content.Width,(int)content.Height);			
 			
 			if ((this.graphicsDeviceService != null) && (this.graphicsDeviceService.GraphicsDevice != null)) {
 				LoadContent ();
