@@ -43,23 +43,29 @@ using OpenTK.Graphics.ES20;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-	public class RenderTarget2D : RenderTarget
+	public class RenderTarget2D : Texture2D
 	{
+		/// <summary>
+		/// Attributes 
+		/// </summary>
 		private Texture2D texture = null;
 		private uint textureFrameBuffer;
+				
+		public RenderTarget2D (GraphicsDevice graphicsDevice, int width, int height)
+			:this (graphicsDevice,width,height,false,SurfaceFormat.Color, DepthFormat.Depth24,0, RenderTargetUsage.DiscardContents)
+		{}
 		
-		public RenderTarget2D (
-         GraphicsDevice graphicsDevice,
-         int width,
-         int height,
-         int numberLevels,
-         SurfaceFormat format
-		                       )
-		{
-			// throw new NotImplementedException();
+		public RenderTarget2D (GraphicsDevice graphicsDevice, int width, int height, bool mipMap,
+         					   SurfaceFormat format, DepthFormat depthFormat)
+			:this (graphicsDevice,width,height,mipMap,format,depthFormat,0,RenderTargetUsage.DiscardContents)
+		{}
+		
+		public RenderTarget2D (GraphicsDevice graphicsDevice, int width, int height, bool mipMap,
+         					   SurfaceFormat format, DepthFormat depthFormat, int multiSampleCount,
+		                       RenderTargetUsage usage)
+			:base(graphicsDevice, width, height,0, TextureUsage.None, format)
+		{				
 			
-			texture = new Texture2D( graphicsDevice, width, height, numberLevels, TextureUsage.None, format );
-
 			// create framebuffer
 			GL.GenFramebuffers(1, ref textureFrameBuffer);
 			GL.BindFramebuffer(All.Framebuffer, textureFrameBuffer);
@@ -79,59 +85,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		}
 		
-		public RenderTarget2D (
-         GraphicsDevice graphicsDevice,
-         int width,
-         int height,
-         int numberLevels,
-         SurfaceFormat format,
-         MultiSampleType multiSampleType,
-         int multiSampleQuality
-		                       )
-		{
-			throw new NotImplementedException();
-		}
 		
-		public RenderTarget2D (
-         GraphicsDevice graphicsDevice,
-         int width,
-         int height,
-         int numberLevels,
-         SurfaceFormat format,
-         MultiSampleType multiSampleType,
-         int multiSampleQuality,
-         RenderTargetUsage usage )
-		{
-			throw new NotImplementedException();
-		}
-		
-		public RenderTarget2D (
-         GraphicsDevice graphicsDevice,
-         int width,
-         int height,
-         int numberLevels,
-         SurfaceFormat format,
-         RenderTargetUsage usage
-		                       )
-		{
-			throw new NotImplementedException();
-		}
-		
-		public Texture2D GetTexture()
-		{
-			return texture;
-		}
-		
-		public int Width 
-		{ 
-			get; 
-			set; 
-		}
-		
-		public int Height 
-		{ 
-			get; 
-			set; 
-		}
+	
 	}
 }
