@@ -4,7 +4,7 @@ MonoGame is a free OpenGL implementation of the XNA Framework. It is built upon 
 
 # Sponsor
 MonoGame is sponsored by...
-< img src="http://www.syderis.com/images/galerias/logo_normal.png" alt="Syderis logo" title="Syderis"/>
+<img src="http://www.syderis.com/images/galerias/logo_normal.png" alt="Syderis logo" title="Syderis"/>
 
 If your company plans to use and contribute to MonoGame, why not become a sponsor. If you would like to sponsor MonoGame, please contact us.
 
