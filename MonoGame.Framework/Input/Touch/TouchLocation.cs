@@ -81,6 +81,9 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			get{
 				return previousPosition;
 			}
+			set{
+				previousPosition = value;
+			}
 		}
 		
         public TouchLocationState State 

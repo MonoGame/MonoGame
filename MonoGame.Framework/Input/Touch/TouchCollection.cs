@@ -99,6 +99,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 				{
 					case TouchLocationState.Pressed:
 						t.State = TouchLocationState.Moved;
+						t.PrevPosition = t.Position;
 						this[i] = t;
 					break;
 					case TouchLocationState.Moved:
