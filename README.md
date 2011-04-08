@@ -2,8 +2,8 @@
 
 MonoGame is a free OpenGL implementation of the XNA Framework. It is built upon the most excellent range of Mono compilers and it compatible with MonoTouch(iOS), MonoDroid(Android), MonoMac (Mac OS X) &amp; now Mono for Windows. Our goal is to allow XNA developers on Windows &amp; Windows Phone 7 to port of their games to the iOS / Android / Mac OS X / Windows and visa versa, with minimal hassle.<!-- img src="https://github.com/downloads/technomancy/leiningen/leiningen-banner.png" alt="Leiningen logo" title="The man himself" align="right" / -->
 
-# Sponsor
-MonoGame is sponsored by...
+# Sponsors
+MonoGame is actively being worked on by...
 
 
 [Syderis Technologies](http://www.syderis.com)
@@ -15,6 +15,12 @@ and
 [Savage Software Solutions Ltd.](http://www.SavageSoftwareSolutions.com/) 
 
 <img src="http://www.savagesoftwaresolutions.com/images_sav/savage_lrg.png" alt="Savage Software Solutions Logo" title="Savage Software Solutions" width="215"/>
+
+and
+
+[Team Mono](http://mono-project.com/) 
+
+<img src="http://mono-project.com/skins/MonoWaveWide/images/mp-mono-logo.png" width="215"/>
 
 If your company plans to use and contribute to MonoGame, why not become a sponsor. If you would like to sponsor MonoGame, please contact us.
 
