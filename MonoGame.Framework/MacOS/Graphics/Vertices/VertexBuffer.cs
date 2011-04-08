@@ -82,6 +82,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _bufferCount++;
             // TODO: Kill buffers in PhoneOSGameView.DestroyFrameBuffer()
         }
+	
 		
 		public void Dispose ()
 		{
@@ -103,5 +104,10 @@ namespace Microsoft.Xna.Framework.Graphics
             : base(graphics, type, vertexCount, bufferUsage)
         {
         }
+	public DynamicVertexBuffer (GraphicsDevice graphics, VertexDeclaration vertexDecs, int vertexCount, BufferUsage bufferUsage)
+			: base (graphics,vertexDecs.GetType(), vertexCount,bufferUsage)
+		{
+			
+		}
     }
 }
