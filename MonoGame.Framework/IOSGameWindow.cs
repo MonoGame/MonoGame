@@ -209,109 +209,86 @@ namespace Microsoft.Xna.Framework
 		
 		#endregion
 				
-		#region UIVIew Methods
-						
-		private readonly Dictionary<IntPtr, TouchLocation> previousTouches = new Dictionary<IntPtr, TouchLocation>();
+		#region UIVIew Methods				
 		
 		private void FillTouchCollection(NSSet touches)
 		{
 			UITouch []touchesArray = touches.ToArray<UITouch>();
 			
-			TouchPanel.Collection.Clear();
-			TouchPanel.Collection.Capacity = touchesArray.Length;
-			
-			for (int i=0; i<touchesArray.Length;i++)
+			for (int i=0; i < touchesArray.Length;i++)
 			{
-				TouchLocationState state;				
+				
+				//Get IOS touch
 				UITouch touch = touchesArray[i];
-				switch (touch.Phase)
-				{
-					case UITouchPhase.Began	:	
-						state = TouchLocationState.Pressed;
-						break;
-					case UITouchPhase.Cancelled	:
-					case UITouchPhase.Ended	:
-						state = TouchLocationState.Released;
-						break;
-					default :
-						state = TouchLocationState.Moved;
-						break;					
-				}
+				
+				//Get position touch
+				Vector2 position = new Vector2 (touch.LocationInView (touch.View));
+				Vector2 translatedPosition = GetOffsetPosition(position);
 				
 				TouchLocation tlocation;
-				TouchLocation previousTouch;
-				if (state != TouchLocationState.Pressed && previousTouches.TryGetValue (touch.Handle, out previousTouch))
+				TouchCollection collection = TouchPanel.Collection;
+				int index;
+				switch (touch.Phase)
 				{
-					Vector2 position = new Vector2 (touch.LocationInView (touch.View));
-					Vector2 translatedPosition = position;
-					
-					switch (CurrentOrientation)
-					{
-						case DisplayOrientation.Portrait :
-						{																		
-							break;
+					case UITouchPhase.Stationary:
+					case UITouchPhase.Moved:
+						index = collection.FindById(touch.Handle.ToInt32(), out tlocation);
+						if (index >= 0)
+					    {
+							tlocation.State = TouchLocationState.Moved;
+							tlocation.Position = translatedPosition;
+							collection[index] = tlocation;
 						}
-						
-						case DisplayOrientation.LandscapeRight :
-						{				
-							translatedPosition = new Vector2( ClientBounds.Height - position.Y, position.X );							
-							break;
+						break;
+					case UITouchPhase.Began	:	
+						tlocation = new TouchLocation(touch.Handle.ToInt32(), TouchLocationState.Pressed, translatedPosition);
+						collection.Add(tlocation);	
+						break;
+					case UITouchPhase.Ended	:
+						index = collection.FindById(touch.Handle.ToInt32(), out tlocation);
+						if (index >= 0)
+						{
+							tlocation.State = TouchLocationState.Released;
+							collection[index] = tlocation;
 						}
-						
-						case DisplayOrientation.LandscapeLeft :
-						{							
-							translatedPosition = new Vector2( position.Y, ClientBounds.Width - position.X );							
-							break;
-						}
-						
-						case DisplayOrientation.PortraitUpsideDown :
-						{				
-							translatedPosition = new Vector2( ClientBounds.Width - position.X, ClientBounds.Height - position.Y );							
-							break;
-						}
-					}
-					tlocation = new TouchLocation(touch.Handle.ToInt32(), state, translatedPosition, 1.0f, previousTouch.State, previousTouch.Position, previousTouch.Pressure);
+						break;
+					default :
+						break;					
 				}
-				else
-				{
-					Vector2 position = new Vector2 (touch.LocationInView (touch.View));
-					Vector2 translatedPosition = position;
-					
-					switch (CurrentOrientation)
-					{
-						case DisplayOrientation.Portrait :
-						{																		
-							break;
-						}
-						
-						case DisplayOrientation.LandscapeRight :
-						{				
-							translatedPosition = new Vector2( ClientBounds.Height - position.Y, position.X );							
-							break;
-						}
-						
-						case DisplayOrientation.LandscapeLeft :
-						{							
-							translatedPosition = new Vector2( position.Y, ClientBounds.Width - position.X );							
-							break;
-						}
-						
-						case DisplayOrientation.PortraitUpsideDown :
-						{				
-							translatedPosition = new Vector2( ClientBounds.Width - position.X, ClientBounds.Height - position.Y );							
-							break;
-						}
-					}
-					tlocation = new TouchLocation(touch.Handle.ToInt32(), state, translatedPosition, 1.0f);
-				}
-				
-				TouchPanel.Collection.Add (tlocation);
-				
-				if (state != TouchLocationState.Released)
-					previousTouches[touch.Handle] = tlocation;
-				else
-					previousTouches.Remove(touch.Handle);
 			}
+			
+		}
+		
+		private Vector2 GetOffsetPosition(Vector2 position)
+		{
+			Vector2 translatedPosition = position;
+					
+			switch (CurrentOrientation)
+			{
+				case DisplayOrientation.Portrait :
+				{																		
+					break;
+				}
+				
+				case DisplayOrientation.LandscapeRight :
+				{				
+					translatedPosition = new Vector2( ClientBounds.Height - position.Y, position.X );							
+					break;
+				}
+				
+				case DisplayOrientation.LandscapeLeft :
+				{							
+					translatedPosition = new Vector2( position.Y, ClientBounds.Width - position.X );							
+					break;
+				}
+				
+				case DisplayOrientation.PortraitUpsideDown :
+				{				
+					translatedPosition = new Vector2( ClientBounds.Width - position.X, ClientBounds.Height - position.Y );							
+					break;
+				}
+			}
+			return translatedPosition;
 		}
 		
 		public override void TouchesBegan (NSSet touches, UIEvent evt)
