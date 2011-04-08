@@ -29,12 +29,20 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Microsoft.Xna.Framework.Content
 {
     public sealed class ContentTypeReaderManager
     {
         ContentReader _reader;
+		
+		static string assemblyName;
+		
+		static ContentTypeReaderManager()
+		{
+			assemblyName = Assembly.GetExecutingAssembly().FullName;
+		}
 
         public ContentTypeReaderManager(ContentReader reader)
         {
@@ -51,7 +59,7 @@ namespace Microsoft.Xna.Framework.Content
         }
 		
 		public ContentTypeReader[] LoadAssetReaders(ContentReader reader)
-        {
+        {			
 			// Dummy variables required for it to work on iDevices ** DO NOT DELETE ** 
 			// This forces the classes not to be optimized out when deploying to iDevices
 			ListReader<Char> hCharListReader = new ListReader<Char>();
@@ -71,8 +79,9 @@ namespace Microsoft.Xna.Framework.Content
             // The first 4 bytes should be the "XNBw" header. i use that to detect an invalid file
             byte[] headerBuffer = new byte[4];
             reader.Read(headerBuffer, 0, 4);
+						
             string headerString = Encoding.UTF8.GetString(headerBuffer, 0, 4);
-            if (string.Compare(headerString, "XNBw", StringComparison.InvariantCultureIgnoreCase) != 0)
+            if (string.Compare(headerString, "XNBm", StringComparison.InvariantCultureIgnoreCase) != 0)
                 throw new ContentLoadException("Asset does not appear to be a valid XNB file.  Did you process your content for Windows?");
 
             // I think these two bytes are some kind of version number. Either for the XNB file or the type readers
@@ -100,38 +109,14 @@ namespace Microsoft.Xna.Framework.Content
  
 				// Need to resolve namespace differences
 				string readerTypeString = originalReaderTypeString;
-				/*if(readerTypeString.IndexOf(", Microsoft.Xna.Framework") != -1)
- 				{
-					string[] tokens = readerTypeString.Split(new char[] { ',' });
-					readerTypeString = "";
-					for(int j = 0; j < tokens.Length; j++)
- 					{
-						if(j != 0)
-							readerTypeString += ",";
-						
-						if(j == 1)
-							readerTypeString += " Microsoft.Xna.Framework";
-						else
-							readerTypeString += tokens[j];
- 					}
-					readerTypeString = readerTypeString.Replace(", Microsoft.Xna.Framework", "@");
-				}*/
-
-				if(readerTypeString.Contains("PublicKey"))
-				{
-					readerTypeString = readerTypeString.Split(new char[] { '[', '[' })[0] + "[" + 
-					readerTypeString.Split(new char[] { '[', '[' })[2].Split(',')[0] + "]"; 
-				}
-				
-				readerTypeString = readerTypeString.Replace("Microsoft.Xna.Framework", "Microsoft.Xna.Framework");
+								
+				readerTypeString = PrepareType(readerTypeString);
 				Type l_readerType = Type.GetType(readerTypeString);
 			
             	if(l_readerType !=null)
 					contentReaders[i] = (ContentTypeReader)Activator.CreateInstance(l_readerType,true);
             	else
-					throw new ContentLoadException("Could not find matching content reader of type " + originalReaderTypeString);
-				
-				
+					throw new ContentLoadException("Could not find matching content reader of type " + originalReaderTypeString + " (" + readerTypeString + ")");
 				
 				// I think the next 4 bytes refer to the "Version" of the type reader,
                 // although it always seems to be zero
@@ -140,6 +125,40 @@ namespace Microsoft.Xna.Framework.Content
 
             return contentReaders;
         }
+		
+		/// <summary>
+		/// Removes Version, Culture and PublicKeyToken from a type string.
+		/// </summary>
+		/// <remarks>
+		/// Supports multiple generic types (e.g. Dictionary<TKey,TValue>) and nested generic types (e.g. List<List<int>>).
+		/// </remarks> 
+		/// <param name="type">
+		/// A <see cref="System.String"/>
+		/// </param>
+		/// <returns>
+		/// A <see cref="System.String"/>
+		/// </returns>
+		public static string PrepareType(string type)
+		{			
+			//Needed to support nested types
+			int count = type.Split(new[] {"[["}, StringSplitOptions.None).Length - 1;
+			
+			string preparedType = type;
+			
+			for(int i=0; i<count; i++)
+			{
+				preparedType = Regex.Replace(preparedType, @"\[(.+?), Version=.+?\]", "[$1]");
+			}
+						
+			//Handle non generic types
+			if(preparedType.Contains("PublicKeyToken"))
+				preparedType = Regex.Replace(preparedType, @"(.+?), Version=.+?$", "$1");
+			
+			preparedType = preparedType.Replace(", Microsoft.Xna.Framework.Graphics", string.Format(", {0}", assemblyName));
+			preparedType = preparedType.Replace(", Microsoft.Xna.Framework", string.Format(", {0}", assemblyName));
+			
+			return preparedType;
+		}
 
     }
 }
