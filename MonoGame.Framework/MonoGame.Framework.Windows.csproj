@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="3.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -12,6 +12,10 @@
     <AssemblyName>MonoGame.Framework.Windows</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <UpgradeBackupLocation />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -115,7 +119,7 @@
     <Compile Include="Windows\Graphics\ESTexture2D.cs" />
     <Compile Include="Windows\Graphics\GraphicsDevice.cs" />
     <Compile Include="Windows\Graphics\GraphicsDevice2D.cs" />
-    <Compile Include="Windows\Graphics\GraphicsDeviceManager.cs" />
+    <Compile Include="Windows\GraphicsDeviceManager.cs" />
     <Compile Include="Windows\Graphics\PresentationParameters.cs" />
     <Compile Include="Windows\Graphics\RenderState.cs" />
     <Compile Include="Windows\Graphics\RenderTarget2D.cs" />
