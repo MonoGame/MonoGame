@@ -107,6 +107,16 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             throw new NotImplementedException();
         }
+		
+		public Texture2D(GraphicsDevice graphicsDevice, int width, int height)
+		{
+			throw new NotImplementedException();
+		}
+		
+		public Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipMap, SurfaceFormat format)
+		{
+			throw new NotImplementedException();
+		}
 
         public Color GetPixel(int x, int y)
         {
