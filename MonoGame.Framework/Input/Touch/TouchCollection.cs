@@ -52,16 +52,11 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		/// Attributes 
 		/// </summary>
 		private bool isConnected;
-		private int locationCount;
+		
+		//Helpers
+		private List<TouchLocation> aux;
 		
 		#region Properties
-		public int Count
-		{
-			get
-			{
-				return this.locationCount;
-			}
-		}
 		public bool IsConnected
 		{
 			get
@@ -80,7 +75,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		
 		public TouchCollection()
 		{
-			
+			aux = new List<TouchLocation>();
 		}
 		
 		internal TouchCollection(IEnumerable<TouchLocation> locations)	: base (locations)
@@ -91,6 +86,33 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		public bool Contains(TouchLocation item)
 		{
 			return (this.IndexOf(item) >= 0);
+		}
+		
+		internal void Update()
+		{ 
+			//Console.WriteLine("----------------"+this.Count+"--------------------");
+			aux.Clear();
+			for (int i = 0;  i <  this.Count; i++)
+			{
+				TouchLocation t = this[i];
+				switch (t.State)
+				{
+					case TouchLocationState.Pressed:
+						t.State = TouchLocationState.Moved;
+						t.PrevPosition = t.Position;
+						this[i] = t;
+					break;
+					case TouchLocationState.Moved:
+						t.PrevState = TouchLocationState.Moved;
+						this[i] = t;
+					break;
+					case TouchLocationState.Released:
+						aux.Add(t);
+					break;
+				}
+			}
+			foreach(TouchLocation touch in aux)
+				this.Remove(touch);
 		}
 		
 		public void CopyTo (TouchLocation[] array, int arrayIndex)
@@ -114,7 +136,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			}
 		}
 		
-		public bool FindById(int id, out TouchLocation touchLocation)
+		public int FindById(int id, out TouchLocation touchLocation)
 		{
 			for (int i = 0; i < this.Count; i++)
 			{
@@ -122,12 +144,13 @@ namespace Microsoft.Xna.Framework.Input.Touch
 				if (location.Id == id)
 				{
 					touchLocation = this[i];
-					return true;
+					return i;
 				}
 			}
 			touchLocation = new TouchLocation();
-			return false;
+			return -1;
 		}
+		
 		
 		public int IndexOf(TouchLocation item)
 		{
