@@ -116,7 +116,6 @@
     <Compile Include="GamerServices\SignedInGamer.cs" />
     <Compile Include="GamerServices\SignedInGamerCollection.cs" />
     <Compile Include="Graphics\ClearOptions.cs" />
-    <Compile Include="Graphics\Color.cs" />
     <Compile Include="Graphics\DisplayMode.cs" />
     <Compile Include="Graphics\ESImage.cs" />
     <Compile Include="Graphics\ESTexture2D.cs" />
@@ -337,6 +336,7 @@
     <Compile Include="Content\ContentReaders\EnumReader.cs" />
     <Compile Include="Content\ContentReaders\Int32Reader.cs" />
     <Compile Include="Content\ContentReaders\SingleReader.cs" />
+    <Compile Include="Color.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
@@ -350,5 +350,6 @@
   </ProjectExtensions>
   <ItemGroup>
     <Folder Include="Content\ContentReaders\" />
+    <Folder Include="Graphics\" />
   </ItemGroup>
 </Project>
