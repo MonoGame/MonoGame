@@ -18,7 +18,7 @@ and
 
 and
 
-[Team Mono](http://mono-project.com/) 
+[Some members Team Mono - Unofficially](http://mono-project.com/) 
 
 <img src="http://mono-project.com/skins/MonoWaveWide/images/mp-mono-logo.png" width="215"/>
 
