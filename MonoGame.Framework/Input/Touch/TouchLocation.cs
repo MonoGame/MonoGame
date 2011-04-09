@@ -226,8 +226,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
 				aPreviousLocation.position = this.previousPosition;
 				aPreviousLocation.previousState = TouchLocationState.Invalid;
 				aPreviousLocation.previousPosition = Vector2.Zero;
-				aPreviousLocation.pressure = this.pressure;
-				aPreviousLocation.previousPressure = this.previousPressure;
+				aPreviousLocation.pressure = this.previousPressure;
+				aPreviousLocation.previousPressure = 0.0f;
 				return true;
 			}
         }
