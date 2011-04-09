@@ -249,10 +249,10 @@ namespace Microsoft.Xna.Framework
 
 
             if (state != TouchLocationState.Pressed && _previousTouches.TryGetValue(e.Handle, out tprevious)) {
-                tlocation = new TouchLocation(e.Handle.ToInt32(), state, translatedPosition, /* TODO e.Pressure, */ tprevious.State, tprevious.Position/* TODO , tprevious.Pressure*/);
+                tlocation = new TouchLocation(e.Handle.ToInt32(), state, translatedPosition, e.Pressure, tprevious.State, tprevious.Position, tprevious.Pressure);
             }
             else {
-                tlocation = new TouchLocation(e.Handle.ToInt32(), state, translatedPosition/* TODO, e.Pressure*/);
+                tlocation = new TouchLocation(e.Handle.ToInt32(), state, translatedPosition, e.Pressure);
             }
 
             TouchPanel.Collection.Clear();
