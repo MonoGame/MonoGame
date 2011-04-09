@@ -32,4 +32,13 @@ If your company plans to use and contribute to MonoGame, why not become a sponso
 * Once we are happy that 2D is the best it can be...add 3D support. There is already some VertexBuffer code, and DrawPrimitives added by kelthar, but it needs to be fleshed out.
 * Once 3D support is stable we can then release MonoGame 3.0 :).
 
-## Installation
+## Contributors
+* jalfx
+* kangamono
+* kjpou1
+* jorgemagic
+* kelthar
+* DanielAdolfsson
+* slygamer
+* jdindia
+* CartBlanche
