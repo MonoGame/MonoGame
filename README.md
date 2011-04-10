@@ -43,6 +43,7 @@ If your company plans to use and contribute to MonoGame, why not become a sponso
 * DanielAdolfsson
 * slygamer
 * jdindia
+* jordoh
 * CartBlanche
 
 If you have contributed and are not listed above, please let us know.
