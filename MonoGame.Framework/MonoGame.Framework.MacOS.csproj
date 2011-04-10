@@ -38,6 +38,7 @@
     <Optimize>false</Optimize>
     <OutputPath>bin\Distribution</OutputPath>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DefineConstants>MONOMAC</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
@@ -143,7 +144,6 @@
     <Compile Include="Content\ContentTypeReaderManager.cs" />
     <Compile Include="Graphics\Viewport.cs" />
     <Compile Include="MacOS\Graphics\DisplayMode.cs" />
-    <Compile Include="MacOS\Graphics\GraphicsDevice2D.cs" />
     <Compile Include="Graphics\ClearOptions.cs" />
     <Compile Include="MacOS\Graphics\PresentationParameters.cs" />
     <Compile Include="Graphics\GraphicsAdapter.cs" />
