@@ -323,7 +323,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			switch(pixelFormat) {				
 				case SurfaceFormat.Color /*kTexture2DPixelFormat_RGBA8888*/:
-				case SurfaceFormat.Dxt3 :
+				case SurfaceFormat.Dxt1:
+				case SurfaceFormat.Dxt3:
 				    sz = 4;
 					GL.TexImage2D(All.Texture2D, 0, (int) All.Rgba, (int) width, (int) height, 0, All.Rgba, All.UnsignedByte, data);
 					break;
