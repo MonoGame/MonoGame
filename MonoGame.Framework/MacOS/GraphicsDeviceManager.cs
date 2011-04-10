@@ -72,12 +72,17 @@ namespace Microsoft.Xna.Framework
 			game.Services.AddService (typeof(IGraphicsDeviceManager), this);
 			game.Services.AddService (typeof(IGraphicsDeviceService), this);	
 
-			Initialize ();
+			CreateDevice();
 		}
 
 		public void CreateDevice ()
 		{
-			throw new System.NotImplementedException ();
+			_graphicsDevice = new GraphicsDevice ();
+			_graphicsDevice.PresentationParameters = new PresentationParameters ();
+			
+			Initialize();
+			
+			OnDeviceCreated(EventArgs.Empty);
 		}
 
 		public bool BeginDraw ()
@@ -111,6 +116,13 @@ namespace Microsoft.Xna.Framework
 			if (h != null)
 				h (this, e);
 		}
+
+		internal void OnDeviceCreated (EventArgs e)
+		{
+			var h = DeviceCreated;
+			if (h != null)
+				h (this, e);
+		}
 		
 		#endregion
 		
@@ -129,9 +141,6 @@ namespace Microsoft.Xna.Framework
 
 		private void Initialize ()
 		{
-			_graphicsDevice = new GraphicsDevice ();
-			_graphicsDevice.PresentationParameters = new PresentationParameters ();
-
 			// Set "full screen"  as default
 			_graphicsDevice.PresentationParameters.IsFullScreen = true;
 
