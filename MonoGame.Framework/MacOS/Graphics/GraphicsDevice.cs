@@ -37,7 +37,6 @@ permitted under your local laws, the contributors exclude the implied warranties
 purpose and non-infringement.
 */
 #endregion License
-
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
@@ -48,412 +47,369 @@ using Microsoft.Xna.Framework;
 
 namespace Microsoft.Xna.Framework.Graphics
 {	
-    public class GraphicsDevice : IDisposable
-    {
+	public class GraphicsDevice : IDisposable
+	{
 		private All _preferedFilter;
 		private int _activeTexture = -1;
 		private Viewport _viewport;
 		private bool _isDisposed = false;
-		private DisplayMode _displayMode = new DisplayMode();
+		private DisplayMode _displayMode = new DisplayMode ();
 		private RenderState _renderState;
+
 		public TextureCollection Textures { get; set; }
+
 		private BlendState _blendState = BlendState.Opaque;
 		private DepthStencilState _depthStencilState = DepthStencilState.Default;
-		private SamplerStateCollection _samplerStates = new SamplerStateCollection();
-		
-        internal List<IntPtr> _pointerCache = new List<IntPtr>();
-        private VertexBuffer _vertexBuffer = null;
-        private IndexBuffer _indexBuffer = null;
+		private SamplerStateCollection _samplerStates = new SamplerStateCollection ();
+		internal List<IntPtr> _pointerCache = new List<IntPtr> ();
+		private VertexBuffer _vertexBuffer = null;
+		private IndexBuffer _indexBuffer = null;
 
-        public static RasterizerState RasterizerState { get; set; }
+		public static RasterizerState RasterizerState { get; set; }
 
-		
-		
-		internal All PreferedFilter 
-		{
-			get 
-			{
+		internal All PreferedFilter {
+			get {
 				return _preferedFilter;
 			}
-			set 
-			{
+			set {
 				_preferedFilter = value;
 			}
-		
+
 		}
-		
-		internal int ActiveTexture
-		{
-			get 
-			{
+
+		internal int ActiveTexture {
+			get {
 				return _activeTexture;
 			}
-			set 
-			{
+			set {
 				_activeTexture = value;
 			}
 		}
-		
-		public bool IsDisposed 
-		{ 
-			get
-			{
+
+		public bool IsDisposed { 
+			get {
 				return _isDisposed;
 			}
 		}
 
-		public bool IsContentLost 
-		{ 
-			get
-			{
+		public bool IsContentLost { 
+			get {
 				// We will just return IsDisposed for now
 				// as that is the only case I can see for now
 				return IsDisposed;
 			}
 		}
-		
-		public GraphicsDevice()
-        {	
+
+		public GraphicsDevice ()
+			{	
 			// Initialize the main viewport
-			_viewport = new Viewport();
+			_viewport = new Viewport ();
 			_viewport.X = 0;
 			_viewport.Y = 0;						
 			_viewport.Width = DisplayMode.Width;
 			_viewport.Height = DisplayMode.Height;	
-			
+
 			// Init RenderState
-			_renderState = new RenderState();
-        }
-		
-		public BlendState BlendState
-		{
+			_renderState = new RenderState ();
+		}
+
+		public BlendState BlendState {
 			get { return _blendState; }
 			set { 
 				// ToDo check for invalid state
 				_blendState = value;
 			}
 		}
-		
-		public DepthStencilState DepthStencilState
-		{
+
+		public DepthStencilState DepthStencilState {
 			get { return _depthStencilState; }
 			set { 
 				_depthStencilState = value;
 			}
 		}
-		
-		public SamplerStateCollection SamplerStates 
-		{ 
+
+		public SamplerStateCollection SamplerStates { 
 			get {
 				var temp = _samplerStates;
 				return temp;
 			} 
 		}		
-        public void Clear(Color color)
-        {
-			Vector4 vector = color.ToEAGLColor();			
-			GL.ClearColor (vector.X,vector.Y,vector.Z,1.0f);
+
+		public void Clear (Color color)
+		{
+			Vector4 vector = color.ToEAGLColor ();			
+			GL.ClearColor (vector.X, vector.Y, vector.Z, 1.0f);
 			GL.Clear (ClearBufferMask.ColorBufferBit);
-        }
+		}
 
-        public void Clear(ClearOptions options, Color color, float depth, int stencil)
-        {
-			Clear(options,color.ToEAGLColor(),depth,stencil);
-        }
+		public void Clear (ClearOptions options, Color color, float depth, int stencil)
+		{
+			Clear (options, color.ToEAGLColor (), depth, stencil);
+		}
 
-        public void Clear(ClearOptions options, Vector4 color, float depth, int stencil)
-        {
-			GL.ClearColor(color.X, color.Y, color.Z, 1.0f);
-			GL.ClearDepth(depth);
-			GL.ClearStencil(stencil);
-			GL.Clear((ClearBufferMask.ColorBufferBit| ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit));
-        }
+		public void Clear (ClearOptions options, Vector4 color, float depth, int stencil)
+		{
+			GL.ClearColor (color.X, color.Y, color.Z, 1.0f);
+			GL.ClearDepth (depth);
+			GL.ClearStencil (stencil);
+			GL.Clear ((ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit));
+		}
 
-        public void Clear(ClearOptions options, Color color, float depth, int stencil, Rectangle[] regions)
-        {
-			throw new NotImplementedException();
-        }
+		public void Clear (ClearOptions options, Color color, float depth, int stencil, Rectangle[] regions)
+		{
+			throw new NotImplementedException ();
+		}
 
-        public void Clear(ClearOptions options, Vector4 color, float depth, int stencil, Rectangle[] regions)
-        {
-			throw new NotImplementedException();
-        }
+		public void Clear (ClearOptions options, Vector4 color, float depth, int stencil, Rectangle[] regions)
+		{
+			throw new NotImplementedException ();
+		}
 
-		public void Dispose()
+		public void Dispose ()
 		{
 			_isDisposed = true;
 		}
-		
-		protected virtual void Dispose(bool aReleaseEverything)
+
+		protected virtual void Dispose (bool aReleaseEverything)
 		{
-			if (aReleaseEverything)
-			{
-				
+			if (aReleaseEverything) {
+
 			}
-			
+
 			_isDisposed = true;
 		}
-		
-        public void Present()
-        {
-			GL.Flush();
-        }
-		
-        public void Present(Rectangle? sourceRectangle, Rectangle? destinationRectangle, IntPtr overrideWindowHandle)
-        {
-  			throw new NotImplementedException();
+
+		public void Present ()
+		{
+			GL.Flush ();
 		}
-				
-        public void Reset()
-        {
-			throw new NotImplementedException();
-        }
 
-        public void Reset(Microsoft.Xna.Framework.Graphics.PresentationParameters presentationParameters)
-        {
-			throw new NotImplementedException();
-        }
+		public void Present (Rectangle? sourceRectangle, Rectangle? destinationRectangle, IntPtr overrideWindowHandle)
+		{
+			throw new NotImplementedException ();
+		}
 
-        public void Reset(Microsoft.Xna.Framework.Graphics.PresentationParameters presentationParameters, GraphicsAdapter graphicsAdapter)
-        {
-			throw new NotImplementedException();
-        }
+		public void Reset ()
+		{
+			throw new NotImplementedException ();
+		}
 
-        public Microsoft.Xna.Framework.Graphics.DisplayMode DisplayMode
-        {
-            get
-            {
-                return _displayMode;
-            }
-        }
+		public void Reset (Microsoft.Xna.Framework.Graphics.PresentationParameters presentationParameters)
+		{
+			throw new NotImplementedException ();
+		}
 
-        public Microsoft.Xna.Framework.Graphics.GraphicsDeviceCapabilities GraphicsDeviceCapabilities
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+		public void Reset (Microsoft.Xna.Framework.Graphics.PresentationParameters presentationParameters, GraphicsAdapter graphicsAdapter)
+		{
+			throw new NotImplementedException ();
+		}
 
-        public Microsoft.Xna.Framework.Graphics.GraphicsDeviceStatus GraphicsDeviceStatus
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+		public Microsoft.Xna.Framework.Graphics.DisplayMode DisplayMode {
+			get {
+				return _displayMode;
+			}
+		}
 
-        public Microsoft.Xna.Framework.Graphics.PresentationParameters PresentationParameters
-        {
-            get;
+		public Microsoft.Xna.Framework.Graphics.GraphicsDeviceCapabilities GraphicsDeviceCapabilities {
+			get {
+				throw new NotImplementedException ();
+			}
+		}
+
+		public Microsoft.Xna.Framework.Graphics.GraphicsDeviceStatus GraphicsDeviceStatus {
+			get {
+				throw new NotImplementedException ();
+			}
+		}
+
+		public Microsoft.Xna.Framework.Graphics.PresentationParameters PresentationParameters {
+			get;
 			set;
-        }
+		}
 
-        public Microsoft.Xna.Framework.Graphics.Viewport Viewport
-        {
-            get
-            {
+		public Microsoft.Xna.Framework.Graphics.Viewport Viewport {
+			get {
 				return _viewport;
 			}
-			set
-			{
+			set {
 				_viewport = value;
 			}
 		}	
-		
-		public Microsoft.Xna.Framework.Graphics.GraphicsProfile GraphicsProfile 
-		{ 
+
+		public Microsoft.Xna.Framework.Graphics.GraphicsProfile GraphicsProfile { 
 			get; 
 			set;
 		}
-		
-		public VertexDeclaration VertexDeclaration 
-		{ 
+
+		public VertexDeclaration VertexDeclaration { 
 			get; 
 			set; 
 		}
-			
+
 		Rectangle _scissorRectangle;
-		public Rectangle ScissorRectangle 
-		{ 
-			get
-			{
+
+		public Rectangle ScissorRectangle { 
+			get {
 				return _scissorRectangle;
 			}
-			set
-			{
+			set {
 				_scissorRectangle = value;
-				
-				switch (this.PresentationParameters.DisplayOrientation )
+
+				switch (this.PresentationParameters.DisplayOrientation) {
+				case DisplayOrientation.Portrait :
+					_scissorRectangle.Y = _viewport.Height - _scissorRectangle.Y - _scissorRectangle.Height;
+					break;
+
+				case DisplayOrientation.LandscapeLeft :
+					_scissorRectangle.Y = _viewport.Height - _scissorRectangle.X - _scissorRectangle.Height;
+					_scissorRectangle.X = _viewport.Width - _scissorRectangle.X - _scissorRectangle.Width;
+					var w = _scissorRectangle.Width;
+					_scissorRectangle.Width = _scissorRectangle.Height;
+					_scissorRectangle.Height = w;
+					break;
+
+				case DisplayOrientation.LandscapeRight :
 				{
-					case DisplayOrientation.Portrait :
-					{	
-						_scissorRectangle.Y = _viewport.Height - _scissorRectangle.Y - _scissorRectangle.Height;
-						break;
-					}
-					
-					case DisplayOrientation.LandscapeLeft :
-					{		
-						_scissorRectangle.Y = _viewport.Height - _scissorRectangle.X - _scissorRectangle.Height;
-						_scissorRectangle.X = _viewport.Width - _scissorRectangle.X - _scissorRectangle.Width;
-						var w = _scissorRectangle.Width;
-						_scissorRectangle.Width = _scissorRectangle.Height;
-						_scissorRectangle.Height = w;
-						break;
-					}
-					
-					case DisplayOrientation.LandscapeRight :
-					{			
-						var x = _scissorRectangle.X;
-						_scissorRectangle.X = _scissorRectangle.Y;
-						_scissorRectangle.Y = x;
-						var w = _scissorRectangle.Width;
-						_scissorRectangle.Width = _scissorRectangle.Height;
-						_scissorRectangle.Height = w;
-						break;
-					}					
-					
-					case DisplayOrientation.PortraitUpsideDown :
-					{		
-						_scissorRectangle.Y = _scissorRectangle.X;
-						_scissorRectangle.X = _viewport.Width - _scissorRectangle.X - _scissorRectangle.Width;
-						break;
-					}
+					var x = _scissorRectangle.X;
+					_scissorRectangle.X = _scissorRectangle.Y;
+					_scissorRectangle.Y = x;
+					var w1 = _scissorRectangle.Width;
+					_scissorRectangle.Width = _scissorRectangle.Height;
+					_scissorRectangle.Height = w1;
+					break;
+				}
+				case DisplayOrientation.PortraitUpsideDown :
+					_scissorRectangle.Y = _scissorRectangle.X;
+					_scissorRectangle.X = _viewport.Width - _scissorRectangle.X - _scissorRectangle.Width;
+					break;
 				}
 			}
 		}
-		
-		public RenderState RenderState 
-		{ 
-			get
-			{
+
+		public RenderState RenderState { 
+			get {
 				return _renderState;
 			}
-			set
-			{
-				if ( _renderState  != value )
-				{
+			set {
+				if (_renderState != value) {
 					_renderState = value;
 				}
 			}
 		}
-		
+
 		public void SetRenderTarget (
-         int renderTargetIndex,
-         RenderTarget2D renderTarget
-		                             )
+			int renderTargetIndex,
+			RenderTarget2D renderTarget)
 		{
-			throw new NotImplementedException();
+			throw new NotImplementedException ();
 		}
-		
-		public void ResolveBackBuffer( ResolveTexture2D resolveTexture )
+
+		public void ResolveBackBuffer (ResolveTexture2D resolveTexture)
 		{
 		}
-		
-        public BeginMode PrimitiveTypeGL11(PrimitiveType primitiveType)
-        {
-            switch (primitiveType)
-            {
-                case PrimitiveType.LineList:
-                    return BeginMode.Lines;
-                case PrimitiveType.LineStrip:
-                    return BeginMode.LineStrip;
-                case PrimitiveType.TriangleList:
-                    return BeginMode.Triangles;
-                case PrimitiveType.TriangleStrip:
-                    return BeginMode.TriangleStrip;
-            }
 
-            throw new NotImplementedException();
-        }
+		public BeginMode PrimitiveTypeGL11 (PrimitiveType primitiveType)
+		{
+			switch (primitiveType) {
+			case PrimitiveType.LineList:
+				return BeginMode.Lines;
+			case PrimitiveType.LineStrip:
+				return BeginMode.LineStrip;
+			case PrimitiveType.TriangleList:
+				return BeginMode.Triangles;
+			case PrimitiveType.TriangleStrip:
+				return BeginMode.TriangleStrip;
+			}
 
-        public void SetVertexBuffer(VertexBuffer vertexBuffer)
-        {
-            _vertexBuffer = vertexBuffer;
-            GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBuffer._bufferStore);
-        }
+			throw new NotImplementedException ();
+		}
 
-        private void SetIndexBuffer(IndexBuffer indexBuffer)
-        {
-            _indexBuffer = indexBuffer;
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, indexBuffer._bufferStore);
-        }
+		public void SetVertexBuffer (VertexBuffer vertexBuffer)
+		{
+			_vertexBuffer = vertexBuffer;
+			GL.BindBuffer (BufferTarget.ArrayBuffer, vertexBuffer._bufferStore);
+		}
 
-        public IndexBuffer Indices { set { SetIndexBuffer(value); } }
+		private void SetIndexBuffer (IndexBuffer indexBuffer)
+		{
+			_indexBuffer = indexBuffer;
+			GL.BindBuffer (BufferTarget.ElementArrayBuffer, indexBuffer._bufferStore);
+		}
 
-        public void DrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int minVertexIndex, int numbVertices, int startIndex, int primitiveCount)
-        {
-            if (minVertexIndex > 0 || baseVertex > 0)
-                throw new NotImplementedException("baseVertex > 0 and minVertexIndex > 0 are not supported");
+		public IndexBuffer Indices { set { SetIndexBuffer (value); } }
 
-            var vd = VertexDeclaration.FromType(_vertexBuffer._type);
-            // Hmm, can the pointer here be changed with baseVertex?
-            VertexDeclaration.PrepareForUse(vd, IntPtr.Zero);
+		public void DrawIndexedPrimitives (PrimitiveType primitiveType, int baseVertex, int minVertexIndex, int numbVertices, int startIndex, int primitiveCount)
+		{
+			if (minVertexIndex > 0 || baseVertex > 0)
+				throw new NotImplementedException ("baseVertex > 0 and minVertexIndex > 0 are not supported");
 
-            GL.DrawElements(PrimitiveTypeGL11(primitiveType), _indexBuffer._count, DrawElementsType.UnsignedShort, new IntPtr(startIndex));
-        }
+			var vd = VertexDeclaration.FromType (_vertexBuffer._type);
+			// Hmm, can the pointer here be changed with baseVertex?
+			VertexDeclaration.PrepareForUse (vd, IntPtr.Zero);
 
-        public void DrawUserPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int primitiveCount) where T : struct, IVertexType
-        {
-            // Unbind the VBOs
-            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
-			
-            var vd = VertexDeclaration.FromType(typeof(T));
+			GL.DrawElements (PrimitiveTypeGL11 (primitiveType), _indexBuffer._count, DrawElementsType.UnsignedShort, new IntPtr (startIndex));
+		}
 
-            IntPtr arrayStart = GCHandle.Alloc(vertexData, GCHandleType.Pinned).AddrOfPinnedObject();
+		public void DrawUserPrimitives<T> (PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int primitiveCount) where T : struct, IVertexType
+		{
+			// Unbind the VBOs
+			GL.BindBuffer (BufferTarget.ArrayBuffer, 0);
+			GL.BindBuffer (BufferTarget.ElementArrayBuffer, 0);
 
-            if (vertexOffset > 0)
-                arrayStart = new IntPtr(arrayStart.ToInt32() + (vertexOffset * vd.VertexStride));
+			var vd = VertexDeclaration.FromType (typeof(T));
 
-            VertexDeclaration.PrepareForUse(vd, arrayStart);
+			IntPtr arrayStart = GCHandle.Alloc (vertexData, GCHandleType.Pinned).AddrOfPinnedObject ();
 
-            GL.DrawArrays(PrimitiveTypeGL11(primitiveType), vertexOffset, getElementCountArray(primitiveType, primitiveCount));
-        }
+			if (vertexOffset > 0)
+				arrayStart = new IntPtr (arrayStart.ToInt32 () + (vertexOffset * vd.VertexStride));
 
-        public void DrawPrimitives(PrimitiveType primitiveType, int vertexStart, int primitiveCount)
-        {
-            var vd = VertexDeclaration.FromType(_vertexBuffer._type);
-            VertexDeclaration.PrepareForUse(vd, IntPtr.Zero);
+			VertexDeclaration.PrepareForUse (vd, arrayStart);
 
-            GL.DrawArrays(PrimitiveTypeGL11(primitiveType), vertexStart, getElementCountArray(primitiveType, primitiveCount));
-        }
+			GL.DrawArrays (PrimitiveTypeGL11 (primitiveType), vertexOffset, getElementCountArray (primitiveType, primitiveCount));
+		}
 
-        public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int vertexCount, int[] indexData, int indexOffset, int primitiveCount) where T : IVertexType
-        {
-            // Unbind the VBOs
-            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
+		public void DrawPrimitives (PrimitiveType primitiveType, int vertexStart, int primitiveCount)
+		{
+			var vd = VertexDeclaration.FromType (_vertexBuffer._type);
+			VertexDeclaration.PrepareForUse (vd, IntPtr.Zero);
 
-            var vd = VertexDeclaration.FromType(typeof(T));
+			GL.DrawArrays (PrimitiveTypeGL11 (primitiveType), vertexStart, getElementCountArray (primitiveType, primitiveCount));
+		}
 
-            IntPtr arrayStart = GCHandle.Alloc(vertexData, GCHandleType.Pinned).AddrOfPinnedObject();
+		public void DrawUserIndexedPrimitives<T> (PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int vertexCount, int[] indexData, int indexOffset, int primitiveCount) where T : IVertexType
+		{
+			// Unbind the VBOs
+			GL.BindBuffer (BufferTarget.ArrayBuffer, 0);
+			GL.BindBuffer (BufferTarget.ElementArrayBuffer, 0);
 
-            if (vertexOffset > 0)
-                arrayStart = new IntPtr(arrayStart.ToInt32() + (vertexOffset * vd.VertexStride));
+			var vd = VertexDeclaration.FromType (typeof(T));
 
-            VertexDeclaration.PrepareForUse(vd, arrayStart);
+			IntPtr arrayStart = GCHandle.Alloc (vertexData, GCHandleType.Pinned).AddrOfPinnedObject ();
 
-            GL.DrawArrays(PrimitiveTypeGL11(primitiveType), vertexOffset, getElementCountArray(primitiveType, primitiveCount));
-        }
+			if (vertexOffset > 0)
+				arrayStart = new IntPtr (arrayStart.ToInt32 () + (vertexOffset * vd.VertexStride));
 
-        public int getElementCountArray(PrimitiveType primitiveType, int primitiveCount)
-        {
-            //TODO: Overview the calculation
-            switch (primitiveType)
-            {
-                case PrimitiveType.LineList:
-                    return primitiveCount * 2;
-                case PrimitiveType.LineStrip:
-                    return 3 + (primitiveCount - 1); // ???
-                case PrimitiveType.TriangleList:
-                    return primitiveCount * 2;
-                case PrimitiveType.TriangleStrip:
-                    return 3 + (primitiveCount - 1); // ???
-            }
+			VertexDeclaration.PrepareForUse (vd, arrayStart);
 
-            throw new NotSupportedException();
-        }
+			GL.DrawArrays (PrimitiveTypeGL11 (primitiveType), vertexOffset, getElementCountArray (primitiveType, primitiveCount));
+		}
+
+		public int getElementCountArray (PrimitiveType primitiveType, int primitiveCount)
+		{
+			//TODO: Overview the calculation
+			switch (primitiveType) {
+			case PrimitiveType.LineList:
+				return primitiveCount * 2;
+			case PrimitiveType.LineStrip:
+				return 3 + (primitiveCount - 1); // ???
+			case PrimitiveType.TriangleList:
+				return primitiveCount * 2;
+			case PrimitiveType.TriangleStrip:
+				return 3 + (primitiveCount - 1); // ???
+			}
+
+			throw new NotSupportedException ();
+		}
 
 	}
 }
