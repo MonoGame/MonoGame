@@ -82,9 +82,10 @@ namespace Microsoft.Xna.Framework
 		{
 			LayerRetainsBacking = false; 
 			LayerColorFormat	= EAGLColorFormat.RGBA8;
+			ContentScaleFactor  = UIScreen.MainScreen.Scale;
 			
 			RectangleF rect = UIScreen.MainScreen.Bounds;
-			clientBounds = new Rectangle(0,0,(int) rect.Width,(int) rect.Height);
+			clientBounds = new Rectangle(0,0,(int) (rect.Width * UIScreen.MainScreen.Scale),(int) (rect.Height * UIScreen.MainScreen.Scale));
 			
 			// Enable multi-touch
 			MultipleTouchEnabled = true;
@@ -288,7 +289,7 @@ namespace Microsoft.Xna.Framework
 					break;
 				}
 			}
-			return translatedPosition;
+			return translatedPosition * UIScreen.MainScreen.Scale;
 		}
 		
 		public override void TouchesBegan (NSSet touches, UIEvent evt)

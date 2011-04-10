@@ -57,7 +57,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             get
             {
-                return (int)UIScreen.MainScreen.Bounds.Width;
+                return (int)(UIScreen.MainScreen.Bounds.Width * UIScreen.MainScreen.Scale);
             }
         }
 
@@ -65,7 +65,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             get
             {
-                return (int)UIScreen.MainScreen.Bounds.Height;
+                return (int)(UIScreen.MainScreen.Bounds.Height * UIScreen.MainScreen.Scale);
             }
         }
 
