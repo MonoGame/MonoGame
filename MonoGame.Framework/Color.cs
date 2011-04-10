@@ -1263,7 +1263,7 @@ namespace Microsoft.Xna.Framework
 
         public bool Equals(Color other)
         {
-            throw new NotImplementedException();
+			return this == other;
         }
 
         #endregion
