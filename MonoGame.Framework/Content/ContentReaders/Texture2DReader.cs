@@ -85,9 +85,8 @@ namespace Microsoft.Xna.Framework.Content
 			int width = (reader.ReadInt32 ());
 			int height = (reader.ReadInt32 ());
 			int levelCount = (reader.ReadInt32 ());
-			SetDataOptions compressionType = (SetDataOptions)reader.ReadInt32 ();
-			int imageLength = width * height * 4;
-			
+			int imageLength = reader.ReadInt32();
+						
 			if (surfaceFormat == SurfaceFormat.Dxt3)
 			{
 				ESTexture2D temp = ESTexture2D.InitiFromDxt3File(reader,imageLength,width,height);
@@ -99,7 +98,7 @@ namespace Microsoft.Xna.Framework.Content
 				try 
 				{
 					Marshal.Copy (imageBytes, 0, ptr, imageLength);					
-					ESTexture2D temp = new ESTexture2D (ptr, SurfaceFormat.Rgba32, width, height, new Size (width, height), All.Linear);
+					ESTexture2D temp = new ESTexture2D (ptr, SurfaceFormat.Color, width, height, new Size (width, height), All.Linear);
 					texture = new Texture2D (new ESImage (temp));					
 				} 
 				finally 
