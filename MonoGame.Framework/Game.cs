@@ -138,24 +138,24 @@ namespace Microsoft.Xna.Framework
 					case UIDeviceOrientation.LandscapeLeft :
 						if ((supportedOrientations & DisplayOrientation.LandscapeLeft) != 0)
 			            {
-			              _view.CurrentOrientation = DisplayOrientation.LandscapeLeft;
-			              GraphicsDevice.PresentationParameters.DisplayOrientation = DisplayOrientation.LandscapeLeft;
-			              TouchPanel.DisplayOrientation = DisplayOrientation.LandscapeLeft;
+			            	_view.CurrentOrientation = DisplayOrientation.LandscapeLeft;
+			             	GraphicsDevice.PresentationParameters.DisplayOrientation = DisplayOrientation.LandscapeLeft;
+			              	TouchPanel.DisplayOrientation = DisplayOrientation.LandscapeLeft;							
 			            }
 						break;
 					case UIDeviceOrientation.LandscapeRight :						
 						if ((supportedOrientations & DisplayOrientation.LandscapeRight) != 0)
 			            {
-			              _view.CurrentOrientation = DisplayOrientation.LandscapeRight;
-			              GraphicsDevice.PresentationParameters.DisplayOrientation = DisplayOrientation.LandscapeRight;
-			              TouchPanel.DisplayOrientation = DisplayOrientation.LandscapeRight;
+			            	_view.CurrentOrientation = DisplayOrientation.LandscapeRight;
+			            	GraphicsDevice.PresentationParameters.DisplayOrientation = DisplayOrientation.LandscapeRight;
+			            	TouchPanel.DisplayOrientation = DisplayOrientation.LandscapeRight;							
 			            }
 						break;
 					case UIDeviceOrientation.FaceDown :
 						if ((supportedOrientations & DisplayOrientation.FaceDown) != 0)
 						{
 							_view.CurrentOrientation = DisplayOrientation.FaceDown;
-							TouchPanel.DisplayOrientation = DisplayOrientation.FaceDown;
+							TouchPanel.DisplayOrientation = DisplayOrientation.FaceDown;							
 						}
 						break;
 					case UIDeviceOrientation.FaceUp :

@@ -53,7 +53,6 @@ namespace Microsoft.Xna.Framework.Graphics
 		private All _preferedFilter;
 		private int _activeTexture = -1;
 		private Viewport _viewport;
-		private GraphicsDevice2D _spriteDevice;
 		private bool _isDisposed = false;
 		private DisplayMode _displayMode = new DisplayMode();
 		private RenderState _renderState;
@@ -122,9 +121,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			_viewport.Width = DisplayMode.Width;
 			_viewport.Height = DisplayMode.Height;	
 			
-			// Create the Sprite Rendering engine
-			_spriteDevice = new GraphicsDevice2D(this);
-			
 			// Init RenderState
 			_renderState = new RenderState();
         }
@@ -162,15 +158,15 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void Clear(ClearOptions options, Color color, float depth, int stencil)
         {
-		Clear(options,color.ToEAGLColor(),depth,stencil);
+			Clear(options,color.ToEAGLColor(),depth,stencil);
         }
 
         public void Clear(ClearOptions options, Vector4 color, float depth, int stencil)
         {
-		GL.ClearColor(color.X, color.Y, color.Z, 1.0f);
-		GL.ClearDepth(depth);
-		GL.ClearStencil(stencil);
-		GL.Clear((ClearBufferMask.ColorBufferBit| ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit));
+			GL.ClearColor(color.X, color.Y, color.Z, 1.0f);
+			GL.ClearDepth(depth);
+			GL.ClearStencil(stencil);
+			GL.Clear((ClearBufferMask.ColorBufferBit| ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit));
         }
 
         public void Clear(ClearOptions options, Color color, float depth, int stencil, Rectangle[] regions)
@@ -269,77 +265,6 @@ namespace Microsoft.Xna.Framework.Graphics
 		{ 
 			get; 
 			set;
-		}
-				
-		internal void StartSpriteBatch(SpriteBlendMode blendMode, SpriteSortMode sortMode)
-		{
-			_spriteDevice.StartSpriteBatch(blendMode,sortMode);		
-		}
-		
-		internal void EndSpriteBatch()
-		{
-			_spriteDevice.EndSpriteBatch();
-		}
-		
-		internal void AddToSpriteBuffer(SpriteBatchRenderItem sbItem)
-		{
-			_spriteDevice.AddToSpriteBuffer(sbItem);				
-		}
-		
-		internal void RenderSprites(Vector2 point, float[] texCoords, float[] quadVertices, RenderMode renderMode)
-		{
-			if (texCoords.Length == 0) return;
-			
-			int itemCount = texCoords.Length / 8;
-		
-			// Enable Texture_2D
-			GL.Enable(EnableCap.Texture2D);
-			
-			// Set the glColor to apply alpha to the image
-			Vector4 color = renderMode.FilterColor.ToEAGLColor();			
-			GL.Color4(color.X, color.Y, color.Z, color.W);
-	
-			// Set client states so that the Texture Coordinate Array will be used during rendering
-			GL.EnableClientState(ArrayCap.TextureCoordArray);
-							
-			// Bind to the texture that is associated with this image
-			if (ActiveTexture != renderMode.Texture.Image.Name) 
-			{
-				GL.BindTexture(TextureTarget.Texture2D, renderMode.Texture.Image.Name);
-				ActiveTexture = (int) renderMode.Texture.Image.Name;
-			}
-			
-			// Set up the VertexPointer to point to the vertices we have defined
-			GL.VertexPointer(2, VertexPointerType.Float, 0, quadVertices);
-			
-			// Set up the TexCoordPointer to point to the texture coordinates we want to use
-			GL.TexCoordPointer(2, TexCoordPointerType.Float, 0, texCoords);
-
-			// Draw the vertices to the screen
-			if (itemCount > 1) 
-			{
-				ushort[] indices = new ushort[itemCount*6];
-				for (int i=0;i<itemCount;i++)
-				{
-					indices[i*6+0] = (ushort) (i*4+0);
-					indices[i*6+1] = (ushort) (i*4+1);
-					indices[i*6+2] = (ushort) (i*4+2);
-					indices[i*6+5] = (ushort) (i*4+1);
-					indices[i*6+4] = (ushort) (i*4+2);
-					indices[i*6+3] = (ushort) (i*4+3);			
-				}
-				// Draw triangles
-				GL.DrawElements(BeginMode.Triangles,itemCount*6,DrawElementsType.UnsignedShort,indices);
-			}
-			else {				
-				// Draw the vertices to the screen
-				GL.DrawArrays(BeginMode.TriangleStrip, 0, 4);
-			}
-			// Disable as necessary
-			GL.DisableClientState(ArrayCap.TextureCoordArray);
-			
-			// Disable 2D textures
-			GL.Disable(EnableCap.Texture2D);
 		}
 		
 		public VertexDeclaration VertexDeclaration 
