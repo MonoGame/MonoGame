@@ -449,11 +449,12 @@ namespace Microsoft.Xna.Framework
 			// There is no autorelease pool when this method is called because it will be called from a background thread
 			// It's important to create one or you will leak objects
 			using (NSAutoreleasePool pool = new NSAutoreleasePool ()) {
-				//_gameComponentsToInitialize.Add((GameComponent)e.GameComponent);
+				
+				// Leave the following code there just in case there are problems
+				// with the intialization hack.
 				//foreach (GameComponent gc in _gameComponentCollection) {
 				foreach (IGameComponent gc in _gameComponentsToInitialize) {
-					// This method will be called on the main thread when resizing, but we may be drawing on a secondary thread 
-					// through the display link or timer thread.
+					// We may be drawing on a secondary thread through the display link or timer thread.
 					// Add a mutex around to avoid the threads accessing the context simultaneously
 					_view.OpenGLContext.CGLContext.Lock ();
 
