@@ -40,6 +40,7 @@ purpose and non-infringement.
 using System;
 using System.IO;
 using System.Drawing;
+using System.Collections.Generic;
 
 using MonoMac.CoreAnimation;
 using MonoMac.CoreFoundation;
@@ -78,6 +79,7 @@ namespace Microsoft.Xna.Framework
 		private SpriteBatch spriteBatch;
 		private Texture2D splashScreen;
 		private bool _mouseVisible = false;
+		private List<IGameComponent> _gameComponentsToInitialize = new List<IGameComponent>();
 
 		delegate void InitialiseGameComponentsDelegate ();
 
@@ -86,7 +88,8 @@ namespace Microsoft.Xna.Framework
 			// Initialize collections
 			_services = new GameServiceContainer ();
 			_gameComponentCollection = new GameComponentCollection ();
-
+			
+			_gameComponentCollection.ComponentAdded += Handle_gameComponentCollectionComponentAdded;
 			RectangleF frame = NSScreen.MainScreen.Frame;
 
 			//Create a full-screen window
@@ -106,6 +109,16 @@ namespace Microsoft.Xna.Framework
 			_updateGameTime = new GameTime ();
 			_drawGameTime = new GameTime ();  
 
+		}
+
+		void Handle_gameComponentCollectionComponentAdded (object sender, GameComponentCollectionEventArgs e)
+		{
+			if (!_initialized && !_initializing) {
+				e.GameComponent.Initialize();
+			}
+			else {
+				_gameComponentsToInitialize.Add(e.GameComponent);
+			}					
 		}
 
 		~Game ()
@@ -436,8 +449,9 @@ namespace Microsoft.Xna.Framework
 			// There is no autorelease pool when this method is called because it will be called from a background thread
 			// It's important to create one or you will leak objects
 			using (NSAutoreleasePool pool = new NSAutoreleasePool ()) {
-
-				foreach (GameComponent gc in _gameComponentCollection) {
+				//_gameComponentsToInitialize.Add((GameComponent)e.GameComponent);
+				//foreach (GameComponent gc in _gameComponentCollection) {
+				foreach (IGameComponent gc in _gameComponentsToInitialize) {
 					// This method will be called on the main thread when resizing, but we may be drawing on a secondary thread 
 					// through the display link or timer thread.
 					// Add a mutex around to avoid the threads accessing the context simultaneously
@@ -450,7 +464,7 @@ namespace Microsoft.Xna.Framework
 
 					// now unlock it
 					_view.OpenGLContext.CGLContext.Unlock ();
-
+					_gameComponentsToInitialize.Remove(gc);
 				}
 			}							
 		}
