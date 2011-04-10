@@ -257,8 +257,9 @@ namespace Microsoft.Xna.Framework.Graphics
 					
 					case DisplayOrientation.LandscapeLeft :
 					{		
-						_scissorRectangle.Y = _viewport.Height - _scissorRectangle.X - _scissorRectangle.Height;
-						_scissorRectangle.X = _viewport.Width - _scissorRectangle.X - _scissorRectangle.Width;
+						var x = _scissorRectangle.X;
+						_scissorRectangle.X = _viewport.Width - _scissorRectangle.Y - _scissorRectangle.Width;
+						_scissorRectangle.Y = _viewport.Height - x - _scissorRectangle.Height;
 						var w = _scissorRectangle.Width;
 						_scissorRectangle.Width = _scissorRectangle.Height;
 						_scissorRectangle.Height = w;
@@ -280,6 +281,12 @@ namespace Microsoft.Xna.Framework.Graphics
 					{		
 						_scissorRectangle.Y = _scissorRectangle.X;
 						_scissorRectangle.X = _viewport.Width - _scissorRectangle.X - _scissorRectangle.Width;
+						break;
+					}
+					
+					case DisplayOrientation.Default :
+					{
+						_scissorRectangle.Y = _viewport.Height - _scissorRectangle.Y - _scissorRectangle.Height;
 						break;
 					}
 				}
