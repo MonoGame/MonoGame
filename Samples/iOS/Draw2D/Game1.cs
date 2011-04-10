@@ -86,7 +86,7 @@ namespace Microsoft.Xna.Samples.Draw2D
 			}
 
 			clippingSize += 0.5f;
-			if (clippingSize > 320) {
+			if (clippingSize > graphics.GraphicsDevice.Viewport.Width) {
 				clippingSize = 0.0f;
 			}
 
@@ -110,7 +110,8 @@ namespace Microsoft.Xna.Samples.Draw2D
 
 			// Draw with additive blend
 			spriteBatch.Begin (SpriteSortMode.Deferred, BlendState.Additive);
-			spriteBatch.Draw (texture, new Vector2 (250,110), Color.White);	
+			spriteBatch.Draw (texture, new Vector2 (250,110), Color.White);
+			spriteBatch.Draw (texture, new Vector2 (260,120), Color.White);
 			spriteBatch.End ();
 
 			spriteBatch.Begin ();
@@ -148,15 +149,15 @@ namespace Microsoft.Xna.Samples.Draw2D
 			// Now let's try some scissoring
 			spriteBatch.Begin ();
 
-			spriteBatch.GraphicsDevice.ScissorRectangle = new Rectangle (10, 40, (int)clippingSize, (int)clippingSize);
+			spriteBatch.GraphicsDevice.ScissorRectangle = new Rectangle (50, 40, (int)clippingSize, (int)clippingSize);
 			spriteBatch.GraphicsDevice.RenderState.ScissorTestEnable = true;
 
-			spriteBatch.Draw (texture, new Rectangle (10, 40, 320, 40), Color.White);
-			spriteBatch.DrawString (font, "Scissor Clipping Test", new Vector2 (10, 40), Color.Red);
-			spriteBatch.GraphicsDevice.RenderState.ScissorTestEnable = false;
+			spriteBatch.Draw (texture, new Rectangle (50, 40, 320, 40), Color.White);
+			spriteBatch.DrawString (font, "Scissor Clipping Test", new Vector2 (50, 40), Color.Red);
 			
 			spriteBatch.End ();
-
+			
+			spriteBatch.GraphicsDevice.RenderState.ScissorTestEnable = false;
 
 
 		}
