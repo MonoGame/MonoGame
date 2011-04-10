@@ -114,15 +114,13 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             switch (surfaceFormat)
             {
-                case SurfaceFormat.Rgba32:
+                case SurfaceFormat.Color:
                     return 0;
                 case SurfaceFormat.Dxt3:
                     return 4;
                 case SurfaceFormat.Bgra4444:
                     return 2;
                 case SurfaceFormat.Bgra5551:
-                    return 2;
-                case SurfaceFormat.Rgb32:
                     return 2;
                 case SurfaceFormat.Alpha8:
                     return 1;

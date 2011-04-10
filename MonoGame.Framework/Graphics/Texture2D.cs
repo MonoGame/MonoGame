@@ -135,7 +135,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			IntPtr pixelOffset;
 			switch(this.Format) 
 			{
-				case SurfaceFormat.Rgba32 /*kTexture2DPixelFormat_RGBA8888*/:
+				case SurfaceFormat.Color /*kTexture2DPixelFormat_RGBA8888*/:
 				case SurfaceFormat.Dxt3 :
 				    sz = 4;
 					pos = ( (y * Width) + x ) * sz;
@@ -167,17 +167,6 @@ namespace Microsoft.Xna.Framework.Graphics
 					result.G = pixel[1];
 					result.B = pixel[2];
 					result.A = pixel[3];
-					break;
-				case SurfaceFormat.Rgb32 /*kTexture2DPixelFormat_RGB565*/:
-					sz = 2;	
-					pos = ( (y * Width) + x ) * sz;
-					pixelOffset = new IntPtr(texture.PixelData.ToInt64() + pos);					
-					Marshal.Copy(pixelOffset, pixel, 0, 4);	
-				
-					result.R = pixel[0];
-					result.G = pixel[1];
-					result.B = pixel[2];					
-					result.A = 255;
 					break;
 				case SurfaceFormat.Alpha8 /*kTexture2DPixelFormat_A8*/:
 					sz = 1;
@@ -356,14 +345,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				
 				if (image.ColorSpace != null)
 				{
-					if (hasAlpha)
-					{
-						pixelFormat = SurfaceFormat.Rgba32;
-					}
-					else
-					{
-						pixelFormat = SurfaceFormat.Rgb32;
-					}
+					pixelFormat = SurfaceFormat.Color;
 				}
 				else 
 				{	
@@ -399,18 +381,12 @@ namespace Microsoft.Xna.Framework.Graphics
 				
 				switch(pixelFormat) 
 				{		
-					case SurfaceFormat.Rgba32:
+					case SurfaceFormat.Color:
 						colorSpace = CGColorSpace.CreateDeviceRGB();
 						imageData = Marshal.AllocHGlobal(height * width * 4);
 						context = new CGBitmapContext(imageData, width, height, 8, 4 * width, colorSpace,CGImageAlphaInfo.PremultipliedLast);
 						colorSpace.Dispose();
-						break;
-					case SurfaceFormat.Rgb32:
-						colorSpace = CGColorSpace.CreateDeviceRGB();
-						imageData = Marshal.AllocHGlobal(height * width * 4);
-						context = new CGBitmapContext(imageData, width, height, 8, 4 * width, colorSpace, CGImageAlphaInfo.NoneSkipLast);
-						colorSpace.Dispose();
-						break;					
+						break;		
 					case SurfaceFormat.Alpha8:
 						imageData = Marshal.AllocHGlobal(height * width);
 						context = new CGBitmapContext(imageData, width, height, 8, width, null, CGImageAlphaInfo.Only);
@@ -430,6 +406,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				context.DrawImage(new RectangleF(0, 0, image.Width, image.Height), image);
 				
 				//Convert "RRRRRRRRRGGGGGGGGBBBBBBBBAAAAAAAA" to "RRRRRGGGGGGBBBBB"
+				/*
 				if(pixelFormat == SurfaceFormat.Rgb32) {
 					tempData = Marshal.AllocHGlobal(height * width * 2);
 					
@@ -449,7 +426,8 @@ namespace Microsoft.Xna.Framework.Graphics
 					Marshal.FreeHGlobal(imageData);
 					imageData = tempData;			
 				}									
-												
+				*/
+				
 				// Loop through and extract the data
 				for(int y = 0; y < imageSize.Height; y++ )
 				{
@@ -459,7 +437,7 @@ namespace Microsoft.Xna.Framework.Graphics
 						
 						switch(pixelFormat) 
 						{
-							case SurfaceFormat.Rgba32 : //kTexture2DPixelFormat_RGBA8888
+							case SurfaceFormat.Color : //kTexture2DPixelFormat_RGBA8888
 							case SurfaceFormat.Dxt3 :
 							    sz = 4;
 								pos = ( (y * imageSize.Width) + x ) * sz;								
@@ -492,17 +470,6 @@ namespace Microsoft.Xna.Framework.Graphics
 								result.G = pixel[1];
 								result.B = pixel[2];
 								result.A = pixel[3];
-								break;
-							case SurfaceFormat.Rgb32 : // kTexture2DPixelFormat_RGB565
-								sz = 2;	
-								pos = ( (y * imageSize.Width) + x ) * sz;
-								pixelOffset = new IntPtr(imageData.ToInt64() + pos);
-								Marshal.Copy(pixelOffset, pixel, 0, 4);	
-							
-								result.R = pixel[0];
-								result.G = pixel[1];
-								result.B = pixel[2];					
-								result.A = 255;
 								break;
 							case SurfaceFormat.Alpha8 :  // kTexture2DPixelFormat_A8 
 								sz = 1;
@@ -589,14 +556,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				
 				if (image.ColorSpace != null)
 				{
-					if (hasAlpha)
-					{
-						pixelFormat = SurfaceFormat.Rgba32;
-					}
-					else
-					{
-						pixelFormat = SurfaceFormat.Rgb32;
-					}
+					pixelFormat = SurfaceFormat.Color;
 				}
 				else 
 				{	
@@ -632,18 +592,12 @@ namespace Microsoft.Xna.Framework.Graphics
 				
 				switch(pixelFormat) 
 				{		
-					case SurfaceFormat.Rgba32:
+					case SurfaceFormat.Color:
 						colorSpace = CGColorSpace.CreateDeviceRGB();
 						imageData = Marshal.AllocHGlobal(height * width * 4);
 						context = new CGBitmapContext(imageData, width, height, 8, 4 * width, colorSpace,CGImageAlphaInfo.PremultipliedLast);
 						colorSpace.Dispose();
 						break;
-					case SurfaceFormat.Rgb32:
-						colorSpace = CGColorSpace.CreateDeviceRGB();
-						imageData = Marshal.AllocHGlobal(height * width * 4);
-						context = new CGBitmapContext(imageData, width, height, 8, 4 * width, colorSpace, CGImageAlphaInfo.NoneSkipLast);
-						colorSpace.Dispose();
-						break;					
 					case SurfaceFormat.Alpha8:
 						imageData = Marshal.AllocHGlobal(height * width);
 						context = new CGBitmapContext(imageData, width, height, 8, width, null, CGImageAlphaInfo.Only);
@@ -663,6 +617,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				context.DrawImage(new RectangleF(0, 0, image.Width, image.Height), image);
 				
 				//Convert "RRRRRRRRRGGGGGGGGBBBBBBBBAAAAAAAA" to "RRRRRGGGGGGBBBBB"
+				/*
 				if(pixelFormat == SurfaceFormat.Rgb32) {
 					tempData = Marshal.AllocHGlobal(height * width * 2);
 					
@@ -682,6 +637,7 @@ namespace Microsoft.Xna.Framework.Graphics
 					Marshal.FreeHGlobal(imageData);
 					imageData = tempData;			
 				}									
+				*/
 				
 				int count = 0;
 				
@@ -694,7 +650,7 @@ namespace Microsoft.Xna.Framework.Graphics
 						
 						switch(this.Format) 
 						{
-							case SurfaceFormat.Rgba32 /*kTexture2DPixelFormat_RGBA8888*/:
+							case SurfaceFormat.Color /*kTexture2DPixelFormat_RGBA8888*/:
 							case SurfaceFormat.Dxt3 :
 							    sz = 4;
 								pos = ( (y * imageSize.Width) + x ) * sz;								
@@ -727,17 +683,6 @@ namespace Microsoft.Xna.Framework.Graphics
 								result.G = pixel[1];
 								result.B = pixel[2];
 								result.A = pixel[3];
-								break;
-							case SurfaceFormat.Rgb32 /*kTexture2DPixelFormat_RGB565*/:
-								sz = 2;	
-								pos = ( (y * imageSize.Width) + x ) * sz;
-								pixelOffset = new IntPtr(imageData.ToInt64() + pos);
-								Marshal.Copy(pixelOffset, pixel, 0, 4);	
-							
-								result.R = pixel[0];
-								result.G = pixel[1];
-								result.B = pixel[2];					
-								result.A = 255;
 								break;
 							case SurfaceFormat.Alpha8 /*kTexture2DPixelFormat_A8*/:
 								sz = 1;
