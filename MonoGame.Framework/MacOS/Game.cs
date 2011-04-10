@@ -86,44 +86,43 @@ namespace Microsoft.Xna.Framework
 			// Initialize collections
 			_services = new GameServiceContainer ();
 			_gameComponentCollection = new GameComponentCollection ();
-			
+
 			RectangleF frame = NSScreen.MainScreen.Frame;
-			
+
 			//Create a full-screen window
 			_mainWindow = new NSWindow (frame, NSWindowStyle.Titled | NSWindowStyle.Closable, NSBackingStore.Buffered, true);
-			
+
 			// Perform any other window configuration you desire
 			_mainWindow.IsOpaque = true;
 			_mainWindow.HidesOnDeactivate = true;
 
-			_view = new GameWindow(frame);
+			_view = new GameWindow (frame);
 			_view.game = this;
-			
-			_mainWindow.ContentView.AddSubview(_view);
+
+			_mainWindow.ContentView.AddSubview (_view);
 			_mainWindow.AcceptsMouseMovedEvents = true;
-		
+
 			// Initialize GameTime
 			_updateGameTime = new GameTime ();
 			_drawGameTime = new GameTime ();  
-	
+
 		}
-		
+
 		~Game ()
 		{
 			// TODO NSDevice.CurrentDevice.EndGeneratingDeviceOrientationNotifications(); 
 		}
-		
-		internal bool IsAllowUserResizing
-		{
+
+		internal bool IsAllowUserResizing {
 			get {
 				return (_mainWindow.StyleMask & NSWindowStyle.Resizable) > 0;
 			}
-			
+
 			set {
 				if (IsAllowUserResizing != value)
 					_mainWindow.StyleMask ^= NSWindowStyle.Resizable;
 			}
-			
+
 		}
 		/* private void ObserveDeviceRotation ()
 		{
@@ -247,11 +246,11 @@ namespace Microsoft.Xna.Framework
 		public void Run ()
 		{			
 			_lastUpdate = DateTime.Now;
-			
+
 			Initialize ();
 
-			_mainWindow.MakeKeyAndOrderFront(_mainWindow);
-			
+			_mainWindow.MakeKeyAndOrderFront (_mainWindow);
+
 			_view.Run (FramesPerSecond / (FramesPerSecond * TargetElapsedTime.TotalSeconds));
 			//_view.Run();
 			/*TODO _view.MainContext = _view.EAGLContext;
@@ -263,7 +262,7 @@ namespace Microsoft.Xna.Framework
 
 			// Get the Accelerometer going
 			// TODO Accelerometer.SetupAccelerometer();			
-			
+
 
 			// Listen out for rotation changes
 			// TODO ObserveDeviceRotation();
@@ -396,31 +395,36 @@ namespace Microsoft.Xna.Framework
 		{
 			// do nothing
 		}
-		
-		private float TitleBarHeight () 
+
+		private float TitleBarHeight ()
 		{
-			RectangleF contentRect = NSWindow.ContentRectFor(_mainWindow.Frame,_mainWindow.StyleMask);
+			RectangleF contentRect = NSWindow.ContentRectFor (_mainWindow.Frame, _mainWindow.StyleMask);
 			return _mainWindow.Frame.Height - contentRect.Height;
 		}
-		
-		protected virtual void Initialize ()
-		{
-			
-			this.graphicsDeviceManager = this.Services.GetService (typeof(IGraphicsDeviceManager)) as IGraphicsDeviceManager;			
-			this.graphicsDeviceService = this.Services.GetService (typeof(IGraphicsDeviceService)) as IGraphicsDeviceService;			
 
+		private void ResetWindowBounds ()
+		{
 			RectangleF frame = _mainWindow.Frame;
 			RectangleF content = _view.Bounds;
-			
+
 			frame.Width = ((GraphicsDeviceManager)graphicsDeviceManager).PreferredBackBufferWidth;
-			frame.Height = ((GraphicsDeviceManager)graphicsDeviceManager).PreferredBackBufferHeight + TitleBarHeight();
+			frame.Height = ((GraphicsDeviceManager)graphicsDeviceManager).PreferredBackBufferHeight + TitleBarHeight ();
 
 			content.Width = ((GraphicsDeviceManager)graphicsDeviceManager).PreferredBackBufferWidth;
 			content.Height = ((GraphicsDeviceManager)graphicsDeviceManager).PreferredBackBufferHeight;
 
-			_mainWindow.SetFrame(frame,true);
+			_mainWindow.SetFrame (frame, true);
+
+			_view.Size = new Size ((int)content.Width,(int)content.Height);			
+		}
+
+		protected virtual void Initialize ()
+		{
+
+			this.graphicsDeviceManager = this.Services.GetService (typeof(IGraphicsDeviceManager)) as IGraphicsDeviceManager;			
+			this.graphicsDeviceService = this.Services.GetService (typeof(IGraphicsDeviceService)) as IGraphicsDeviceService;			
 			
-			_view.Size = new Size((int)content.Width,(int)content.Height);			
+			ResetWindowBounds();
 			
 			if ((this.graphicsDeviceService != null) && (this.graphicsDeviceService.GraphicsDevice != null)) {
 				LoadContent ();
@@ -437,16 +441,16 @@ namespace Microsoft.Xna.Framework
 					// This method will be called on the main thread when resizing, but we may be drawing on a secondary thread 
 					// through the display link or timer thread.
 					// Add a mutex around to avoid the threads accessing the context simultaneously
-					_view.OpenGLContext.CGLContext.Lock();
-					
+					_view.OpenGLContext.CGLContext.Lock ();
+
 					// set our current context
-					_view.MakeCurrent();
+					_view.MakeCurrent ();
 
 					gc.Initialize ();
-				
+
 					// now unlock it
-					_view.OpenGLContext.CGLContext.Unlock();
-	
+					_view.OpenGLContext.CGLContext.Unlock ();
+
 				}
 			}							
 		}
