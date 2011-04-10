@@ -119,8 +119,13 @@ namespace Microsoft.Xna.Framework.Content
 
 				if(readerTypeString.Contains("PublicKey"))
 				{
+					try {
 					readerTypeString = readerTypeString.Split(new char[] { '[', '[' })[0] + "[" + 
 					readerTypeString.Split(new char[] { '[', '[' })[2].Split(',')[0] + "]"; 
+					}
+					catch (Exception) {
+						
+					}
 				}
 				
 				readerTypeString = readerTypeString.Replace("Microsoft.Xna.Framework", "Microsoft.Xna.Framework");
