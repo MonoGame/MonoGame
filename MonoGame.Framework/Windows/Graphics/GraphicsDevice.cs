@@ -41,7 +41,6 @@ purpose and non-infringement.
 using System;
 
 using OpenTK.Graphics.OpenGL;
-// using OpenTK.Graphics.ES11;
 
 using Microsoft.Xna.Framework;
 using System.Runtime.InteropServices;
@@ -58,13 +57,16 @@ namespace Microsoft.Xna.Framework.Graphics
 		private DisplayMode _displayMode;
 		private RenderState _renderState;
         internal GraphicsDeviceManager mngr;
+
+        private BlendState _blendState = BlendState.Opaque;
+        private DepthStencilState _depthStencilState = DepthStencilState.Default;
+        private SamplerStateCollection _samplerStates = new SamplerStateCollection();
         internal List<IntPtr> _pointerCache = new List<IntPtr>();
         private VertexBuffer _vertexBuffer = null;
         private IndexBuffer _indexBuffer = null;
         public TextureCollection Textures { get; set; }
 
-        public static RasterizerState RasterizerState { get; set; }
-        public static DepthStencilState DepthStencilState { get; set; }
+        public RasterizerState RasterizerState { get; set; }        
 
 		internal All PreferedFilter 
 		{
@@ -99,13 +101,33 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 
+        public bool IsContentLost
+        {
+            get
+            {
+                // We will just return IsDisposed for now
+                // as that is the only case I can see for now
+                return IsDisposed;
+            }
+        }
+
+        public GraphicsDevice()
+        {
+            // Initialize the main viewport
+            _viewport = new Viewport();
+            _viewport.X = 0;
+            _viewport.Y = 0;
+            _viewport.Width = DisplayMode.Width;
+            _viewport.Height = DisplayMode.Height;
+
+            // Init RenderState
+            _renderState = new RenderState();
+        }
+
         internal GraphicsDevice(GraphicsDeviceManager mngr)
         {
             this.mngr = mngr;
             _displayMode = new DisplayMode(this.mngr.PreferredBackBufferWidth, this.mngr.PreferredBackBufferHeight);
-
-            // Create the Sprite Rendering engine
-            spriteDevice = new GraphicsDevice2D(this);
 
             // Init RenderState
             _renderState = new RenderState();
@@ -128,8 +150,34 @@ namespace Microsoft.Xna.Framework.Graphics
                 PresentationParameters.BackBufferWidth = width;
                 PresentationParameters.BackBufferHeight = height;
             }
+        }
 
-            spriteDevice.SizeChanged();
+        public BlendState BlendState
+        {
+            get { return _blendState; }
+            set
+            {
+                // ToDo check for invalid state
+                _blendState = value;
+            }
+        }
+
+        public DepthStencilState DepthStencilState
+        {
+            get { return _depthStencilState; }
+            set
+            {
+                _depthStencilState = value;
+            }
+        }
+
+        public SamplerStateCollection SamplerStates
+        {
+            get
+            {
+                var temp = _samplerStates;
+                return temp;
+            }
         }
 
         public void Clear(Color color)
