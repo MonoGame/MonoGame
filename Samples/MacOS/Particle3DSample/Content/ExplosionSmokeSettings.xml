@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<XnaContent>
+  <Asset Type="Particle3DSample.ParticleSettings">
+    <BlendState>NonPremultiplied</BlendState>
+    <TextureName>smoke</TextureName>
+    <MaxParticles>200</MaxParticles>
+    <Duration>PT4S</Duration>
+    <DurationRandomness>0</DurationRandomness>
+    <EmitterVelocitySensitivity>1</EmitterVelocitySensitivity>
+    <MinHorizontalVelocity>0</MinHorizontalVelocity>
+    <MaxHorizontalVelocity>50</MaxHorizontalVelocity>
+    <MinVerticalVelocity>-10</MinVerticalVelocity>
+    <MaxVerticalVelocity>50</MaxVerticalVelocity>
+    <Gravity>0 -20 0</Gravity>
+    <EndVelocity>0</EndVelocity>
+    <MinColor>FFD3D3D3</MinColor>
+    <MaxColor>FFFFFFFF</MaxColor>
+    <MinRotateSpeed>-2</MinRotateSpeed>
+    <MaxRotateSpeed>2</MaxRotateSpeed>
+    <MinStartSize>10</MinStartSize>
+    <MaxStartSize>10</MaxStartSize>
+    <MinEndSize>100</MinEndSize>
+    <MaxEndSize>200</MaxEndSize>
+  </Asset>
+</XnaContent>
