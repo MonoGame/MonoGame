@@ -119,8 +119,8 @@ namespace Particle3DSample
 		protected override void LoadContent ()
 		{
 			spriteBatch = new SpriteBatch (graphics.GraphicsDevice);
-			//font = Content.Load<SpriteFont> ("Arial");
-			font = Content.Load<SpriteFont> ("font");
+			font = Content.Load<SpriteFont> ("Arial");
+			//font = Content.Load<SpriteFont> ("font");
 			//grid = Content.Load<Model> ("grid");
 		}
 
