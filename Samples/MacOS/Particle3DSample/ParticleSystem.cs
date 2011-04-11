@@ -174,6 +174,7 @@ namespace Particle3DSample
 		/// </summary>
 		protected override void LoadContent ()
 		{
+			return;
 			settings = content.Load<ParticleSettings> (settingsName);
 
 			// Allocate the particle array, and fill in the corner fields (which never change).

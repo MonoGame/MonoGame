@@ -119,9 +119,8 @@ namespace Particle3DSample
 		protected override void LoadContent ()
 		{
 			spriteBatch = new SpriteBatch (graphics.GraphicsDevice);
-			var readerTypeString = "Microsoft.Xna.Framework.Content.SpriteFontReader, Microsoft.Xna.Framework.Graphics, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553";
-			font = Content.Load<SpriteFont> ("Arial");
-			//font = Content.Load<SpriteFont> ("font");
+			//font = Content.Load<SpriteFont> ("Arial");
+			font = Content.Load<SpriteFont> ("font");
 			//grid = Content.Load<Model> ("grid");
 		}
 

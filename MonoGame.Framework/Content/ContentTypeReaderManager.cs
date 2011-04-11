@@ -119,13 +119,18 @@ namespace Microsoft.Xna.Framework.Content
 
 				if(readerTypeString.Contains("PublicKey"))
 				{
-					try {
-					readerTypeString = readerTypeString.Split(new char[] { '[', '[' })[0] + "[" + 
-					readerTypeString.Split(new char[] { '[', '[' })[2].Split(',')[0] + "]"; 
-					}
-					catch (Exception) {
+					//if (readerTypeString.Contains("[[")) {
+						readerTypeString = readerTypeString.Split(new char[] { '[', '[' })[0] + "[" + 
+						readerTypeString.Split(new char[] { '[', '[' })[2].Split(',')[0] + "]"; 
+					//}
+					//else {
+					//	// If the readerTypeString did not contain "[[" to split the 
+					//	// types then we assume it is XNA 4.0 which splits the types
+					//	// by ', '
+					//	readerTypeString = readerTypeString.Split(new char[] { ',', ' '})[0];
+					//	
+					//}
 						
-					}
 				}
 				
 				readerTypeString = readerTypeString.Replace("Microsoft.Xna.Framework", "Microsoft.Xna.Framework");
