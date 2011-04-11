@@ -48,8 +48,7 @@ using Microsoft.Xna.Framework;
 namespace Microsoft.Xna.Framework.Graphics
 {
 	internal class SpriteBatcher
-	{
-	    GraphicsDevice _graphicsDevice;
+	{	    
 		List<SpriteBatchItem> _batchItemList;
 		Queue<SpriteBatchItem> _freeBatchItemQueue;
 		VertexPosition2ColorTexture[] _vertexArray;
@@ -57,27 +56,27 @@ namespace Microsoft.Xna.Framework.Graphics
 		GCHandle _vertexHandle;
 		GCHandle _indexHandle;
 
-        public SpriteBatcher(GraphicsDevice graphicsDevice)
+        public SpriteBatcher()
         {
-            _graphicsDevice = graphicsDevice;
-			_batchItemList = new List<SpriteBatchItem>(256);
-			_freeBatchItemQueue = new Queue<SpriteBatchItem>(256);
+            _batchItemList = new List<SpriteBatchItem>(256);
+            _freeBatchItemQueue = new Queue<SpriteBatchItem>(256);
 
-			_vertexArray = new VertexPosition2ColorTexture[4*256];
-			_index = new ushort[6*256];
-			_vertexHandle = GCHandle.Alloc(_vertexArray,GCHandleType.Pinned);
-			_indexHandle = GCHandle.Alloc(_index,GCHandleType.Pinned);
-			
-			for ( int i = 0; i < 256; i++ )
-			{
-				_index[i*6+0] = (ushort)(i*4);
-				_index[i*6+1] = (ushort)(i*4+1);
-				_index[i*6+2] = (ushort)(i*4+2);
-				_index[i*6+3] = (ushort)(i*4+1);
-				_index[i*6+4] = (ushort)(i*4+3);
-				_index[i*6+5] = (ushort)(i*4+2);
-			}
-		}
+            _vertexArray = new VertexPosition2ColorTexture[4 * 256];
+            _index = new ushort[6 * 256];
+            _vertexHandle = GCHandle.Alloc(_vertexArray, GCHandleType.Pinned);
+            _indexHandle = GCHandle.Alloc(_index, GCHandleType.Pinned);
+
+            for (int i = 0; i < 256; i++)
+            {
+                _index[i * 6 + 0] = (ushort)(i * 4);
+                _index[i * 6 + 1] = (ushort)(i * 4 + 1);
+                _index[i * 6 + 2] = (ushort)(i * 4 + 2);
+                _index[i * 6 + 3] = (ushort)(i * 4 + 1);
+                _index[i * 6 + 4] = (ushort)(i * 4 + 3);
+                _index[i * 6 + 5] = (ushort)(i * 4 + 2);
+            }
+        }
+
 		public SpriteBatchItem CreateBatchItem()
 		{
 			SpriteBatchItem item;
@@ -105,8 +104,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			// nothing to do
 			if ( _batchItemList.Count == 0 )
 				return;
-
-		    _graphicsDevice.spriteDevice.ApplyScale();
 			
 			// sort the batch items
 			switch ( sortMode )

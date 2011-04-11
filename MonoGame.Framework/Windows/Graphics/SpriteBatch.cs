@@ -30,7 +30,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			this.graphicsDevice = graphicsDevice;
 
-            _batcher = new SpriteBatcher(this.graphicsDevice);
+            _batcher = new SpriteBatcher();
 		}
 
         public void Begin()
@@ -93,25 +93,25 @@ namespace Microsoft.Xna.Framework.Graphics
 		public void End()
 		{
             // Disable Blending by default = BlendState.Opaque
-			GL.Disable(All.Blend);
+            GL.Disable(EnableCap.Blend);
 			
 			// set the blend mode
 			if ( _blendState == BlendState.NonPremultiplied )
 			{
-				GL.BlendFunc(All.One, All.OneMinusSrcAlpha);
-				GL.Enable(All.Blend);
+                GL.BlendFunc(BlendingFactorSrc.One, BlendingFactorDest.OneMinusSrcAlpha);
+				GL.Enable(EnableCap.Blend);
 			}
 			
 			if ( _blendState == BlendState.AlphaBlend )
 			{
-				GL.BlendFunc(All.SrcAlpha, All.OneMinusSrcAlpha);
-				GL.Enable(All.Blend);				
+                GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+                GL.Enable(EnableCap.Blend);				
 			}
 			
 			if ( _blendState == BlendState.Additive )
 			{
-				GL.BlendFunc(All.SrcAlpha,All.One);
-				GL.Enable(All.Blend);	
+                GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.One);
+                GL.Enable(EnableCap.Blend);	
 			}	
 			
 			// set camera
