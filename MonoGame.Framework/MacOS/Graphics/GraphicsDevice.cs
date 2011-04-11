@@ -65,7 +65,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		private VertexBuffer _vertexBuffer = null;
 		private IndexBuffer _indexBuffer = null;
 
-		public static RasterizerState RasterizerState { get; set; }
+		public RasterizerState RasterizerState { get; set; }
 
 		internal All PreferedFilter {
 			get {
