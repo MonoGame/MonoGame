@@ -100,9 +100,7 @@ namespace Microsoft.Xna.Framework.Content
                 }
             }
 			
-			// Check for windows-style directory separator character
-            //Lowercase assetName (monodroid specification all assests are lowercase)
-            assetName = Path.Combine(_rootDirectory, assetName.Replace('\\', Path.DirectorySeparatorChar)).ToLower();
+            assetName = Path.Combine(_rootDirectory, assetName.Replace('\\', Path.DirectorySeparatorChar));
 			
 			// Get the real file name
 			if ((typeof(T) == typeof(Texture2D))) 
