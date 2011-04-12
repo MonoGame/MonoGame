@@ -68,16 +68,13 @@ namespace Microsoft.Xna.Framework
 				return null;
 			}
 			
-			// Concat the file name with valid extensions
-            if (Contains(FileName + ".mp3", files))
-				return FileName+".mp3";
-            if (Contains(FileName + ".ogg", files))
-                return FileName + ".ogg";
-            if (Contains(FileName + ".mid", files))
-                return FileName + ".mid";
-			
-			return null;
+		    return Path.Combine(path, TryFindAnyCased(file, files, ".ogg", ".mp3", ".mid"));;
 		}
+
+        private static string TryFindAnyCased(string search, string[] arr, params string[] extensions)
+        {
+            return arr.FirstOrDefault(s => extensions.Any(ext => s.ToLower() == (search.ToLower() + ext)));
+        }
 
         private static bool Contains(string search, string[] arr)
         {

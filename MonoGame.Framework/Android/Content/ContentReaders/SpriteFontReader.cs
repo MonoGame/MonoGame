@@ -30,6 +30,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Android.Util;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System.IO;
@@ -62,17 +63,14 @@ namespace Microsoft.Xna.Framework.Content
 			{
 				return null;
 			}
-			
-			// Concat the file name with valid extensions
-            if (Contains(file + ".xnb", files))
-				return FileName+".xnb";
-			
-			// Concat the file name with valid extensions
-            if (Contains(file + ".spritefont", files))
-				return FileName+".spritefont";
-			
-			return null;
+		    
+            return Path.Combine(path, TryFindAnyCased(file, files, ".spritefont", ".xnb"));
 		}
+
+        private static string TryFindAnyCased(string search, string[] arr, params string[] extensions)
+        {
+            return arr.FirstOrDefault(s => extensions.Any(ext => s.ToLower() == (search.ToLower() + ext)));
+        }
 
         private static bool Contains(string search, string[] arr)
         {
