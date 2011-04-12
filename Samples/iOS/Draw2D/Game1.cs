@@ -1,8 +1,12 @@
 using System;
 using System.Collections.Generic;
+
+#if ANDROID
+using Android.App;
+#endif
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Storage;
@@ -22,8 +26,12 @@ namespace Microsoft.Xna.Samples.Draw2D
 		float clippingSize = 0.0f;
 		Color alphaColor = Color.White;
 		FPSCounterComponent fps;
-
-		public Game1 ()
+		
+#if ANDROID 
+		public Game1 (Activity activity) : base (activity)
+#else 
+        public Game1 ()  
+#endif
 		{
 			graphics = new GraphicsDeviceManager (this);
 			
@@ -34,7 +42,7 @@ namespace Microsoft.Xna.Samples.Draw2D
 
 			graphics.SupportedOrientations = DisplayOrientation.Portrait | DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight | DisplayOrientation.PortraitUpsideDown;
 		}
-
+		
 		/// <summary>
 		/// Allows the game to perform any initialization it needs to before starting to run.
 		/// This is where it can query for any required services and load any non-graphic

@@ -9,7 +9,11 @@
 
 #region Using Statements
 using System;
+
+#if ANDROID
 using Android.App;
+#endif
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;

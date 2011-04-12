@@ -5,7 +5,7 @@ using ChaseAndEvade;
 
 namespace MonoGame.Samples.ChaseAndEvade.Droid
 {
-    [Activity(Label = "MonoGame.Samples.ChaseAndEvade.Droid", MainLauncher = true, ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.KeyboardHidden)]
+    [Activity(Label = "ChaseAndEvade", MainLauncher = true, ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.KeyboardHidden)]
     public class Activity1 : Activity
     {
         protected override void OnCreate(Bundle bundle)
