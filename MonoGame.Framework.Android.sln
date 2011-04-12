@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Framework.Android", "MonoGame.Framework\MonoGame.Framework.Android.csproj", "{BA9476CF-99BA-4D03-92F2-73D2C5E58883}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Samples.ChaseAndEvade.Android", "Samples\Android\ChaseAndEvade\MonoGame.Samples.ChaseAndEvade.Android.csproj", "{F05F90DC-DD37-4967-A96A-8D36C1C23E81}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -13,12 +15,12 @@ Global
 		{BA9476CF-99BA-4D03-92F2-73D2C5E58883}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BA9476CF-99BA-4D03-92F2-73D2C5E58883}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BA9476CF-99BA-4D03-92F2-73D2C5E58883}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0902473D-5624-4151-A84F-7A16DF01C178}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0902473D-5624-4151-A84F-7A16DF01C178}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0902473D-5624-4151-A84F-7A16DF01C178}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
-		{0902473D-5624-4151-A84F-7A16DF01C178}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0902473D-5624-4151-A84F-7A16DF01C178}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0902473D-5624-4151-A84F-7A16DF01C178}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{F05F90DC-DD37-4967-A96A-8D36C1C23E81}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F05F90DC-DD37-4967-A96A-8D36C1C23E81}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F05F90DC-DD37-4967-A96A-8D36C1C23E81}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{F05F90DC-DD37-4967-A96A-8D36C1C23E81}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F05F90DC-DD37-4967-A96A-8D36C1C23E81}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F05F90DC-DD37-4967-A96A-8D36C1C23E81}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

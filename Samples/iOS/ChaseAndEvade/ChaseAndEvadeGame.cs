@@ -9,10 +9,9 @@
 
 #region Using Statements
 using System;
-
+using Android.App;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
@@ -128,11 +127,13 @@ namespace ChaseAndEvade
 
 	#region Initialization
 
-		/// <summary>
-		/// standard everyday constructor, nothing too fancy here.
-		/// </summary>
-		public ChaseAndEvadeGame ()
-			{
+#if ANDROID 
+		public ChaseAndEvadeGame (Activity activity) : base (activity)
+#else 
+        public ChaseAndEvadeGame ()  
+#endif
+        {
+
 			graphics = new GraphicsDeviceManager (this);
 			
 			Content.RootDirectory = "Content";
