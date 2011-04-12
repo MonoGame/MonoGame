@@ -276,6 +276,7 @@
     <Compile Include="Graphics\PackedVector\Short2.cs" />
     <Compile Include="Graphics\SamplerStateCollection.cs" />
     <Compile Include="ContentSerializerIgnoreAttribute.cs" />
+    <Compile Include="ContentSerializerAttribute.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />
