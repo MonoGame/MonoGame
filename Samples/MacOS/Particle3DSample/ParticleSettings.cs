@@ -109,7 +109,7 @@ namespace Particle3DSample
 		[ContentSerializerIgnore]
 		public BlendState BlendState = BlendState.NonPremultiplied;
 
-		//[ContentSerializer(ElementName = "BlendState")]
+		[ContentSerializer(ElementName = "BlendState")]
 		private string BlendStateSerializationHelper {
 			get { return BlendState.Name.Replace ("BlendState.", string.Empty); }
 
