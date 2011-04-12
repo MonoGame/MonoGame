@@ -37,13 +37,21 @@
 // purpose and non-infringement.
 // */
 // #endregion License
-// 
+//
+// Author: Kenneth James Pouncey
+//
 using System;
 
-namespace Microsoft.Xna.Framework.Content
+namespace Microsoft.Xna.Framework
 {
+	// http://msdn.microsoft.com/en-us/library/bb195465.aspx
+	// The class definition on msdn site shows: [AttributeUsageAttribute(384)]
+	// The following code var ff = (AttributeTargets)384; shows that ff is Field | Property
+	//  so that is what we use.
+	[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
 	public sealed class ContentSerializerIgnoreAttribute : Attribute
 	{
 	}
+
 }
 
