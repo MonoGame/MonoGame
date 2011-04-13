@@ -67,23 +67,14 @@ namespace Microsoft.Xna.Framework.Content
 			{
 				return null;
 			}
-			
-			// Concat the file name with valid extensions
-            if (Contains(file + ".xnb", files))
-				return FileName+".xnb";
-            if (Contains(file + ".jpg", files))
-				return FileName+".jpg";
-            if (Contains(file + ".bmp", files))
-				return FileName+".bmp";
-            if (Contains(file + ".jpeg", files))
-				return FileName+".jpeg";
-            if (Contains(file + ".png", files))
-				return FileName+".png";
-            if (Contains(file + ".gif", files))
-				return FileName+".gif";
-			
-			return null;
+		
+            return Path.Combine(path, TryFindAnyCased(file, files, ".xnb", ".jpg", ".bmp", ".jpeg", ".png", ".gif"));
 		}
+
+        private static string TryFindAnyCased(string search, string[] arr, params string[] extensions)
+        {
+            return arr.FirstOrDefault(s => extensions.Any(ext => s.ToLower() == (search.ToLower() + ext)));
+        }
 
         private static bool Contains(string search, string[] arr)
         {

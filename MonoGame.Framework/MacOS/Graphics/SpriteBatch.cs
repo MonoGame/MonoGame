@@ -91,30 +91,29 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 		
 		public void End()
-		{			
+		{		
+			
+			// Disable Blending by default = BlendState.Opaque
+			GL.Disable(EnableCap.Blend);
+	
 			// set the blend mode
 			if ( _blendState == BlendState.NonPremultiplied )
 			{
-				GL.Enable(EnableCap.Blend);
 				GL.BlendFunc(BlendingFactorSrc.One, BlendingFactorDest.OneMinusSrcAlpha);
+				GL.Enable(EnableCap.Blend);				
 			}
 			
 			if ( _blendState == BlendState.AlphaBlend )
 			{
-				GL.Enable(EnableCap.Blend);
 				GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+				GL.Enable(EnableCap.Blend);				
 			}
 			
 			if ( _blendState == BlendState.Additive )
 			{
-				GL.Enable(EnableCap.Blend);
 				GL.BlendFunc(BlendingFactorSrc.SrcAlpha,BlendingFactorDest.One);
+				GL.Enable(EnableCap.Blend);				
 			}
-			
-			if ( _blendState == BlendState.Opaque )
-			{
-				GL.Disable(EnableCap.Blend);
-			}	
 			
 			// set camera
 			GL.MatrixMode(MatrixMode.Projection);
@@ -158,15 +157,17 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 			
 			GL.MatrixMode(MatrixMode.Modelview);
-			GL.LoadMatrix( ref _matrix.M11 );
-			GL.Viewport (0, 0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height);
+						
+			GL.Viewport(0, 0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height);
 			
 			// Enable Scissor Tests if necessary
 			if ( this.graphicsDevice.RenderState.ScissorTestEnable )
 			{
 				GL.Scissor(this.graphicsDevice.ScissorRectangle.X, this.graphicsDevice.ScissorRectangle.Y, this.graphicsDevice.ScissorRectangle.Width, this.graphicsDevice.ScissorRectangle.Height );
 			}
-						
+			
+			GL.LoadMatrix( ref _matrix.M11 );
+			
 			// Initialize OpenGL states (ideally move this to initialize somewhere else)	
 			GL.Disable(EnableCap.DepthTest);
 			GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode,(int) All.BlendSrc);

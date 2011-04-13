@@ -78,6 +78,7 @@
     <Compile Include="Graphics\RenderTarget.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Graphics\SamplerStateCollection.cs" />
     <Compile Include="Graphics\States\CompareFunction.cs" />
     <Compile Include="Graphics\States\CullMode.cs" />
     <Compile Include="Graphics\States\DepthFormat.cs" />
@@ -118,7 +119,6 @@
     <Compile Include="Windows\Graphics\ESImage.cs" />
     <Compile Include="Windows\Graphics\ESTexture2D.cs" />
     <Compile Include="Windows\Graphics\GraphicsDevice.cs" />
-    <Compile Include="Windows\Graphics\GraphicsDevice2D.cs" />
     <Compile Include="Windows\GraphicsDeviceManager.cs" />
     <Compile Include="Windows\Graphics\PresentationParameters.cs" />
     <Compile Include="Windows\Graphics\RenderState.cs" />
