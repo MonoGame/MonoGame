@@ -1,8 +1,12 @@
 using System;
 using System.Collections.Generic;
+
+#if ANDROID
+using Android.App;
+#endif
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Storage;
@@ -22,8 +26,12 @@ namespace Microsoft.Xna.Samples.Draw2D
 		float clippingSize = 0.0f;
 		Color alphaColor = Color.White;
 		FPSCounterComponent fps;
-
-		public Game1 ()
+		
+#if ANDROID 
+		public Game1 (Activity activity) : base (activity)
+#else 
+        public Game1 ()  
+#endif
 		{
 			graphics = new GraphicsDeviceManager (this);
 			
@@ -34,7 +42,7 @@ namespace Microsoft.Xna.Samples.Draw2D
 
 			graphics.SupportedOrientations = DisplayOrientation.Portrait | DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight | DisplayOrientation.PortraitUpsideDown;
 		}
-
+		
 		/// <summary>
 		/// Allows the game to perform any initialization it needs to before starting to run.
 		/// This is where it can query for any required services and load any non-graphic
@@ -86,7 +94,7 @@ namespace Microsoft.Xna.Samples.Draw2D
 			}
 
 			clippingSize += 0.5f;
-			if (clippingSize > 320) {
+			if (clippingSize > graphics.GraphicsDevice.Viewport.Width) {
 				clippingSize = 0.0f;
 			}
 
@@ -110,7 +118,8 @@ namespace Microsoft.Xna.Samples.Draw2D
 
 			// Draw with additive blend
 			spriteBatch.Begin (SpriteSortMode.Deferred, BlendState.Additive);
-			spriteBatch.Draw (texture, new Vector2 (250,110), Color.White);	
+			spriteBatch.Draw (texture, new Vector2 (250,110), Color.White);
+			spriteBatch.Draw (texture, new Vector2 (260,120), Color.White);
 			spriteBatch.End ();
 
 			spriteBatch.Begin ();
@@ -148,15 +157,15 @@ namespace Microsoft.Xna.Samples.Draw2D
 			// Now let's try some scissoring
 			spriteBatch.Begin ();
 
-			spriteBatch.GraphicsDevice.ScissorRectangle = new Rectangle (10, 40, (int)clippingSize, (int)clippingSize);
+			spriteBatch.GraphicsDevice.ScissorRectangle = new Rectangle (50, 40, (int)clippingSize, (int)clippingSize);
 			spriteBatch.GraphicsDevice.RenderState.ScissorTestEnable = true;
 
-			spriteBatch.Draw (texture, new Rectangle (10, 40, 320, 40), Color.White);
-			spriteBatch.DrawString (font, "Scissor Clipping Test", new Vector2 (10, 40), Color.Red);
-			spriteBatch.GraphicsDevice.RenderState.ScissorTestEnable = false;
+			spriteBatch.Draw (texture, new Rectangle (50, 40, 320, 40), Color.White);
+			spriteBatch.DrawString (font, "Scissor Clipping Test", new Vector2 (50, 40), Color.Red);
 			
 			spriteBatch.End ();
-
+			
+			spriteBatch.GraphicsDevice.RenderState.ScissorTestEnable = false;
 
 
 		}

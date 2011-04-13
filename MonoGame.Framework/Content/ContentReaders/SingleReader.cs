@@ -53,4 +53,3 @@ namespace Microsoft.Xna.Framework.Content
         }
     }
 }
-

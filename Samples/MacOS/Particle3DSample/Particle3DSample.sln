@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Particle3DSample", "Particle3DSample.csproj", "{1230A19A-FA76-4D12-85E5-68A452315299}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Framework.MacOS", "..\..\..\..\..\..\..\Users\Jimmy\Public\Share\MonoMacSource\kjpgit\MonoGame\MonoGame.Framework\MonoGame.Framework.MacOS.csproj", "{36C538E6-C32A-4A8D-A39C-566173D7118E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1230A19A-FA76-4D12-85E5-68A452315299}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1230A19A-FA76-4D12-85E5-68A452315299}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1230A19A-FA76-4D12-85E5-68A452315299}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1230A19A-FA76-4D12-85E5-68A452315299}.Release|Any CPU.Build.0 = Release|Any CPU
+		{36C538E6-C32A-4A8D-A39C-566173D7118E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{36C538E6-C32A-4A8D-A39C-566173D7118E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36C538E6-C32A-4A8D-A39C-566173D7118E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{36C538E6-C32A-4A8D-A39C-566173D7118E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = Particle3DSample.csproj
+	EndGlobalSection
+EndGlobal

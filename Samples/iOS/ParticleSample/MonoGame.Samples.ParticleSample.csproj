@@ -131,11 +131,11 @@
     <Content Include="Default.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Content\Arial.xnb" />
   </ItemGroup>
   <ItemGroup>
     <None Include="GameThumbnail.png" />
     <None Include="Info.plist" />
-    <None Include="Content\Arial.xnb" />
     <None Include="Content\explosion.png" />
     <None Include="Content\smoke.bmp" />
   </ItemGroup>
