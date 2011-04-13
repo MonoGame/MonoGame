@@ -163,18 +163,18 @@ namespace Particle3DSample
 		/// </summary>
 		public ParticleSystem (Game game,ContentManager content,string settingsName)
 		: base(game)
-			{
+		{
 			this.content = content;
 			this.settingsName = settingsName;
 		}
-
-
+		
 		/// <summary>
 		/// Loads graphics for the particle system.
 		/// </summary>
 		protected override void LoadContent ()
 		{
-			return;
+			
+			//return;
 			settings = content.Load<ParticleSettings> (settingsName);
 
 			// Allocate the particle array, and fill in the corner fields (which never change).
@@ -430,21 +430,21 @@ namespace Particle3DSample
 			if (firstNewParticle < firstFreeParticle) {
 				// If the new particles are all in one consecutive range,
 				// we can upload them all in a single call.
-//				vertexBuffer.SetData (firstNewParticle * stride * 4, particles, 
-//					firstNewParticle * 4, 
-//					(firstFreeParticle - firstNewParticle) * 4, 
-//					stride, SetDataOptions.NoOverwrite);			} else {
+				//				vertexBuffer.SetData (firstNewParticle * stride * 4, particles, 
+				//					firstNewParticle * 4, 
+				//					(firstFreeParticle - firstNewParticle) * 4, 
+				//					stride, SetDataOptions.NoOverwrite);			} else {
 				// If the new particle range wraps past the end of the queue
 				// back to the start, we must split them over two upload calls.
-//				vertexBuffer.SetData (firstNewParticle * stride * 4, particles, 
-//					firstNewParticle * 4, 
-//					(settings.MaxParticles - firstNewParticle) * 4, 
-//					stride, SetDataOptions.NoOverwrite);
+				//				vertexBuffer.SetData (firstNewParticle * stride * 4, particles, 
+				//					firstNewParticle * 4, 
+				//					(settings.MaxParticles - firstNewParticle) * 4, 
+				//					stride, SetDataOptions.NoOverwrite);
 
 				if (firstFreeParticle > 0) {
-//					vertexBuffer.SetData (0, particles, 
-//					0, firstFreeParticle * 4, 
-//					stride, SetDataOptions.NoOverwrite);
+					//					vertexBuffer.SetData (0, particles, 
+					//					0, firstFreeParticle * 4, 
+					//					stride, SetDataOptions.NoOverwrite);
 				}
 			}
 
