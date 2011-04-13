@@ -277,6 +277,7 @@
     <Compile Include="Graphics\SamplerStateCollection.cs" />
     <Compile Include="Content\ContentSerializerAttribute.cs" />
     <Compile Include="Content\ContentSerializerIgnoreAttribute.cs" />
+    <Compile Include="Content\ContentReaders\ReflectiveReader.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />
