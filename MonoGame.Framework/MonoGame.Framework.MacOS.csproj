@@ -278,6 +278,8 @@
     <Compile Include="Content\ContentSerializerAttribute.cs" />
     <Compile Include="Content\ContentSerializerIgnoreAttribute.cs" />
     <Compile Include="Content\ContentReaders\ReflectiveReader.cs" />
+    <Compile Include="Content\ContentReaders\Int32Reader.cs" />
+    <Compile Include="Content\ContentReaders\SingleReader.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />
