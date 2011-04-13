@@ -159,8 +159,14 @@ namespace Microsoft.Xna.Framework.Content
 				if ((typeof(T) == typeof(Video)))
 					result = new Video (assetName);		
 			}
-			else 
+			
+			// If we still do not have a valid type then we try to load it as a .XNB file
+			if (result == null)
 			{
+				if (Path.GetExtension(assetName).ToUpper() !=".XNB")
+					// Concat the file name with valid extensions
+					assetName += ".xnb";
+
 				// Load a XNB file
 				FileStream stream = new FileStream(assetName, FileMode.Open, FileAccess.Read, FileShare.Read);
 		

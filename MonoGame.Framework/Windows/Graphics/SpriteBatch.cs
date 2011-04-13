@@ -30,7 +30,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			this.graphicsDevice = graphicsDevice;
 
-            _batcher = new SpriteBatcher(this.graphicsDevice);
+            _batcher = new SpriteBatcher();
 		}
 
         public void Begin()
@@ -92,29 +92,27 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		public void End()
 		{
-            // set the blend mode
-            if (_blendState == BlendState.NonPremultiplied)
-            {
-                GL.Enable(EnableCap.Blend);
+            // Disable Blending by default = BlendState.Opaque
+            GL.Disable(EnableCap.Blend);
+			
+			// set the blend mode
+			if ( _blendState == BlendState.NonPremultiplied )
+			{
                 GL.BlendFunc(BlendingFactorSrc.One, BlendingFactorDest.OneMinusSrcAlpha);
-            }
-
-            if (_blendState == BlendState.AlphaBlend)
-            {
-                GL.Enable(EnableCap.Blend);
+				GL.Enable(EnableCap.Blend);
+			}
+			
+			if ( _blendState == BlendState.AlphaBlend )
+			{
                 GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
-            }
-
-            if (_blendState == BlendState.Additive)
-            {
-                GL.Enable(EnableCap.Blend);
+                GL.Enable(EnableCap.Blend);				
+			}
+			
+			if ( _blendState == BlendState.Additive )
+			{
                 GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.One);
-            }
-
-            if (_blendState == BlendState.Opaque)
-            {
-                GL.Disable(EnableCap.Blend);
-            }	
+                GL.Enable(EnableCap.Blend);	
+			}	
 			
 			// set camera
 			GL.MatrixMode(MatrixMode.Projection);
@@ -158,14 +156,16 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 			
 			GL.MatrixMode(MatrixMode.Modelview);
-			GL.LoadMatrix( ref _matrix.M11 );
-			GL.Viewport (0, 0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height);
+			
+			GL.Viewport(0, 0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height);
 			
 			// Enable Scissor Tests if necessary
 			if ( this.graphicsDevice.RenderState.ScissorTestEnable )
 			{
 				GL.Scissor(this.graphicsDevice.ScissorRectangle.X, this.graphicsDevice.ScissorRectangle.Y, this.graphicsDevice.ScissorRectangle.Width, this.graphicsDevice.ScissorRectangle.Height );
 			}
+			
+			GL.LoadMatrix( ref _matrix.M11 );
 						
 			// Initialize OpenGL states (ideally move this to initialize somewhere else)	
 			GL.Disable(EnableCap.DepthTest);

@@ -72,7 +72,6 @@ namespace Microsoft.Xna.Framework.Content
 			RectangleReader hRectangleReader = new RectangleReader();
 			StringReader hStringReader = new StringReader();
 			Vector3Reader hVector3Reader = new Vector3Reader();
-					
             int numberOfReaders;
             ContentTypeReader[] contentReaders;		
 			
@@ -111,8 +110,9 @@ namespace Microsoft.Xna.Framework.Content
 				string readerTypeString = originalReaderTypeString;
 								
 				readerTypeString = PrepareType(readerTypeString);
+
 				Type l_readerType = Type.GetType(readerTypeString);
-			
+				
             	if(l_readerType !=null)
 					contentReaders[i] = (ContentTypeReader)Activator.CreateInstance(l_readerType,true);
             	else
@@ -159,6 +159,5 @@ namespace Microsoft.Xna.Framework.Content
 			
 			return preparedType;
 		}
-
     }
 }

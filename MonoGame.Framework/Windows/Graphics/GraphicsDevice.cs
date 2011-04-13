@@ -41,7 +41,6 @@ purpose and non-infringement.
 using System;
 
 using OpenTK.Graphics.OpenGL;
-// using OpenTK.Graphics.ES11;
 
 using Microsoft.Xna.Framework;
 using System.Runtime.InteropServices;
@@ -54,18 +53,20 @@ namespace Microsoft.Xna.Framework.Graphics
 		private All _preferedFilter;
 		private int _activeTexture = -1;
 		private Viewport _viewport;
-		internal GraphicsDevice2D spriteDevice;
 		private bool _isDisposed = false;
 		private DisplayMode _displayMode;
 		private RenderState _renderState;
         internal GraphicsDeviceManager mngr;
+
+        private BlendState _blendState = BlendState.Opaque;
+        private DepthStencilState _depthStencilState = DepthStencilState.Default;
+        private SamplerStateCollection _samplerStates = new SamplerStateCollection();
         internal List<IntPtr> _pointerCache = new List<IntPtr>();
         private VertexBuffer _vertexBuffer = null;
         private IndexBuffer _indexBuffer = null;
         public TextureCollection Textures { get; set; }
 
-        public static RasterizerState RasterizerState { get; set; }
-        public static DepthStencilState DepthStencilState { get; set; }
+        public RasterizerState RasterizerState { get; set; }        
 
 		internal All PreferedFilter 
 		{
@@ -100,13 +101,33 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 
+        public bool IsContentLost
+        {
+            get
+            {
+                // We will just return IsDisposed for now
+                // as that is the only case I can see for now
+                return IsDisposed;
+            }
+        }
+
+        public GraphicsDevice()
+        {
+            // Initialize the main viewport
+            _viewport = new Viewport();
+            _viewport.X = 0;
+            _viewport.Y = 0;
+            _viewport.Width = DisplayMode.Width;
+            _viewport.Height = DisplayMode.Height;
+
+            // Init RenderState
+            _renderState = new RenderState();
+        }
+
         internal GraphicsDevice(GraphicsDeviceManager mngr)
         {
             this.mngr = mngr;
             _displayMode = new DisplayMode(this.mngr.PreferredBackBufferWidth, this.mngr.PreferredBackBufferHeight);
-
-            // Create the Sprite Rendering engine
-            spriteDevice = new GraphicsDevice2D(this);
 
             // Init RenderState
             _renderState = new RenderState();
@@ -129,8 +150,34 @@ namespace Microsoft.Xna.Framework.Graphics
                 PresentationParameters.BackBufferWidth = width;
                 PresentationParameters.BackBufferHeight = height;
             }
+        }
 
-            spriteDevice.SizeChanged();
+        public BlendState BlendState
+        {
+            get { return _blendState; }
+            set
+            {
+                // ToDo check for invalid state
+                _blendState = value;
+            }
+        }
+
+        public DepthStencilState DepthStencilState
+        {
+            get { return _depthStencilState; }
+            set
+            {
+                _depthStencilState = value;
+            }
+        }
+
+        public SamplerStateCollection SamplerStates
+        {
+            get
+            {
+                var temp = _samplerStates;
+                return temp;
+            }
         }
 
         public void Clear(Color color)
@@ -246,79 +293,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			get; 
 			set;
 		}
-				
-		internal void StartSpriteBatch(SpriteBlendMode blendMode, SpriteSortMode sortMode)
-		{
-			spriteDevice.StartSpriteBatch(blendMode,sortMode);
-		}
-		
-		internal void EndSpriteBatch()
-		{
-			spriteDevice.EndSpriteBatch();
-		}
-		
-		internal void AddToSpriteBuffer(SpriteBatchRenderItem sbItem)
-		{
-			spriteDevice.AddToSpriteBuffer(sbItem);				
-		}
-		
-		internal void RenderSprites(Vector2 point, float[] texCoords, float[] quadVertices, RenderMode renderMode)
-		{
-			if (texCoords.Length == 0) return;
-			
-			int itemCount = texCoords.Length / 8;
-		
-			// Enable Texture_2D
-			GL.Enable(EnableCap.Texture2D);
-
-            spriteDevice.ApplyScale();
-			
-			// Set the glColor to apply alpha to the image
-			Vector4 color = renderMode.FilterColor.ToEAGLColor();			
-			GL.Color4(color.X, color.Y, color.Z, color.W);
-	
-			// Set client states so that the Texture Coordinate Array will be used during rendering
-			GL.EnableClientState(ArrayCap.TextureCoordArray);
-							
-			// Bind to the texture that is associated with this image
-			if (ActiveTexture != renderMode.Texture.Image.Name) 
-			{
-				GL.BindTexture(TextureTarget.Texture2D, renderMode.Texture.Image.Name);
-				ActiveTexture = (int) renderMode.Texture.Image.Name;
-			}
-			
-			// Set up the VertexPointer to point to the vertices we have defined
-			GL.VertexPointer(2, VertexPointerType.Float, 0, quadVertices);
-			
-			// Set up the TexCoordPointer to point to the texture coordinates we want to use
-			GL.TexCoordPointer(2, TexCoordPointerType.Float, 0, texCoords);
-
-			// Draw the vertices to the screen
-			if (itemCount > 1) 
-			{
-				ushort[] indices = new ushort[itemCount*6];
-				for (int i=0;i<itemCount;i++)
-				{
-					indices[i*6+0] = (ushort) (i*4+0);
-					indices[i*6+1] = (ushort) (i*4+1);
-					indices[i*6+2] = (ushort) (i*4+2);
-					indices[i*6+5] = (ushort) (i*4+1);
-					indices[i*6+4] = (ushort) (i*4+2);
-					indices[i*6+3] = (ushort) (i*4+3);			
-				}
-				// Draw triangles
-				GL.DrawElements(BeginMode.Triangles,itemCount*6,DrawElementsType.UnsignedShort,indices);
-			}
-			else {				
-				// Draw the vertices to the screen
-				GL.DrawArrays(BeginMode.TriangleStrip, 0, 4);
-			}
-			// Disable as necessary
-			GL.DisableClientState(ArrayCap.TextureCoordArray);
-			
-			// Disable 2D textures
-			GL.Disable(EnableCap.Texture2D);
-		}
 		
 		public VertexDeclaration VertexDeclaration 
 		{ 
@@ -326,10 +300,61 @@ namespace Microsoft.Xna.Framework.Graphics
 			set; 
 		}
 		
+		Rectangle _scissorRectangle;
 		public Rectangle ScissorRectangle 
 		{ 
-			get; 
-			set; 
+			get
+			{
+				return _scissorRectangle;
+			}
+			set
+			{
+				_scissorRectangle = value;
+				
+				switch (this.PresentationParameters.DisplayOrientation )
+				{
+					case DisplayOrientation.Portrait :
+					{	
+						_scissorRectangle.Y = _viewport.Height - _scissorRectangle.Y - _scissorRectangle.Height;
+						break;
+					}
+					
+					case DisplayOrientation.LandscapeLeft :
+					{		
+						var x = _scissorRectangle.X;
+						_scissorRectangle.X = _viewport.Width - _scissorRectangle.Y - _scissorRectangle.Width;
+						_scissorRectangle.Y = _viewport.Height - x - _scissorRectangle.Height;
+						var w = _scissorRectangle.Width;
+						_scissorRectangle.Width = _scissorRectangle.Height;
+						_scissorRectangle.Height = w;
+						break;
+					}
+					
+					case DisplayOrientation.LandscapeRight :
+					{			
+						var x = _scissorRectangle.X;
+						_scissorRectangle.X = _scissorRectangle.Y;
+						_scissorRectangle.Y = x;
+						var w = _scissorRectangle.Width;
+						_scissorRectangle.Width = _scissorRectangle.Height;
+						_scissorRectangle.Height = w;
+						break;
+					}					
+					
+					case DisplayOrientation.PortraitUpsideDown :
+					{		
+						_scissorRectangle.Y = _scissorRectangle.X;
+						_scissorRectangle.X = _viewport.Width - _scissorRectangle.X - _scissorRectangle.Width;
+						break;
+					}
+					
+					case DisplayOrientation.Default :
+					{
+						_scissorRectangle.Y = _viewport.Height - _scissorRectangle.Y - _scissorRectangle.Height;
+						break;
+					}
+				}
+			}
 		}
 		
 		public RenderState RenderState 

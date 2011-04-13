@@ -148,9 +148,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal virtual void Apply()
         {
-            GLStateManager.Cull(GraphicsDevice.RasterizerState.CullMode.OpenGL11());
+            GLStateManager.Cull(graphicsDevice.RasterizerState.CullMode.OpenGL11());
             // TODO: This is prolly not right (DepthBuffer, etc)
-            GLStateManager.DepthTest(GraphicsDevice.DepthStencilState.DepthBufferEnable);
+            GLStateManager.DepthTest(graphicsDevice.DepthStencilState.DepthBufferEnable);
         }
 		
 		public void Begin()
