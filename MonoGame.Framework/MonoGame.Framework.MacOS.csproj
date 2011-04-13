@@ -281,6 +281,7 @@
     <Compile Include="Content\ContentReaders\Int32Reader.cs" />
     <Compile Include="Content\ContentReaders\SingleReader.cs" />
     <Compile Include="Content\ContentReaders\Int16Reader.cs" />
+    <Compile Include="Content\ContentReaders\Int64Reader.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />
