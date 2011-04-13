@@ -64,7 +64,6 @@ namespace Microsoft.Xna.Framework.Content
 			RectangleReader hRectangleReader = new RectangleReader();
 			StringReader hStringReader = new StringReader();
 			Vector3Reader hVector3Reader = new Vector3Reader();
-					
             int numberOfReaders;
             ContentTypeReader[] contentReaders;		
 			
@@ -116,26 +115,29 @@ namespace Microsoft.Xna.Framework.Content
  					}
 					readerTypeString = readerTypeString.Replace(", Microsoft.Xna.Framework", "@");
 				}*/
-
-				if(readerTypeString.Contains("PublicKey"))
-				{
-					//if (readerTypeString.Contains("[[")) {
-						readerTypeString = readerTypeString.Split(new char[] { '[', '[' })[0] + "[" + 
-						readerTypeString.Split(new char[] { '[', '[' })[2].Split(',')[0] + "]"; 
-					//}
-					//else {
-					//	// If the readerTypeString did not contain "[[" to split the 
-					//	// types then we assume it is XNA 4.0 which splits the types
-					//	// by ', '
-					//	readerTypeString = readerTypeString.Split(new char[] { ',', ' '})[0];
-					//	
-					//}
-						
-				}
 				
-				readerTypeString = readerTypeString.Replace("Microsoft.Xna.Framework", "Microsoft.Xna.Framework");
+				readerTypeString = ParseReaderType(readerTypeString);
+				
+				// Commented out for now because the below code was replaced with ParseReaderType 
+//				if(readerTypeString.Contains("PublicKey"))
+//				{
+//					
+//					if (readerTypeString.Contains("[[")) {
+//						readerTypeString = readerTypeString.Split(new char[] { '[', '[' })[0] + "[" + 
+//						readerTypeString.Split(new char[] { '[', '[' })[2].Split(',')[0] + "]"; 
+//					}
+//					else {
+//						// If the readerTypeString did not contain "[[" to split the 
+//						// types then we assume it is XNA 4.0 which splits the types
+//						// by ', '
+//						readerTypeString = readerTypeString.Split(new char[] { ',', ' '})[0];
+//						
+//					}
+//						
+//				}
+				
 				Type l_readerType = Type.GetType(readerTypeString);
-			
+				
             	if(l_readerType !=null)
 					contentReaders[i] = (ContentTypeReader)Activator.CreateInstance(l_readerType,true);
             	else
@@ -150,6 +152,44 @@ namespace Microsoft.Xna.Framework.Content
 
             return contentReaders;
         }
+		private static Type contentType = typeof(Microsoft.Xna.Framework.Content.ListReader<int>);
+		private static Type frameworkType = typeof(Microsoft.Xna.Framework.Rectangle);
 
+		static string ParseReaderType (string readerTypeString)
+		{
+			string child = "";
+			if (readerTypeString.Contains ("[")) {
+				string[] s = readerTypeString.Split ("[]".ToCharArray (), StringSplitOptions.RemoveEmptyEntries);
+				child = ParseReaderType (s [1]);
+				readerTypeString = readerTypeString.Replace (s [1], "{child}");
+			}
+			string[] r = readerTypeString.Split (", ".ToCharArray (), StringSplitOptions.RemoveEmptyEntries);
+			string version = "";
+			if (r.Length > 2) {
+				version = r [2];
+			}
+			if (r.Length > 1) {
+				if (r [1] == "Microsoft.Xna.Framework") {
+					if (r [0].Contains ("Content")) {
+						string[] u = contentType.AssemblyQualifiedName.Split (", ".ToCharArray (), StringSplitOptions.RemoveEmptyEntries);
+						r [1] = u [1];
+						version = u [2];
+					} else {
+						string[] u = frameworkType.AssemblyQualifiedName.Split (", ".ToCharArray (), StringSplitOptions.RemoveEmptyEntries);
+						r [1] = u [1];
+						version = u [2];
+					}
+				}
+			}
+			string result = r [0];
+			if (r.Length > 1) {
+				result += ", " + r [1];
+			}
+			if (version != "") {
+				result += ", " + version;
+			}
+			result = result.Replace ("{child}", child);
+			return result;
+		}
     }
 }
