@@ -253,25 +253,32 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public static Texture2D FromFile(GraphicsDevice graphicsDevice, string filename, int width, int height)
         {
-			throw new NotImplementedException();
-			
-            // return FromFile( graphicsDevice, filename);
-			// Resizing texture before returning it, not yet implemented			
-        }
-
-        public static Texture2D FromFile(GraphicsDevice graphicsDevice, string filename)
-		{
 			UIImage image = UIImage.FromBundle(filename);
 			if (image == null)
 			{
 				throw new ContentLoadException("Error loading file: " + filename);
-			}
+			}			
 			
-			ESImage theTexture = new ESImage(image, graphicsDevice.PreferedFilter);
+			ESImage theTexture;
+			
+			if ( width == 0 && height == 0 )
+			{
+				theTexture = new ESImage(image, graphicsDevice.PreferedFilter);
+			}
+			else
+			{
+				var small = image.Scale (new SizeF (width, height));
+				theTexture = new ESImage(small, graphicsDevice.PreferedFilter);
+			}
 			Texture2D result = new Texture2D(theTexture);
 			// result.Name = Path.GetFileNameWithoutExtension(filename);
 			result.Name = filename;
-			return result;
+			return result;					
+        }
+
+        public static Texture2D FromFile(GraphicsDevice graphicsDevice, string filename)
+		{
+			return FromFile( graphicsDevice, filename, 0, 0 );
         }
 		
         public void SetData<T>(T[] data, int startIndex, int elementCount, SetDataOptions options)
