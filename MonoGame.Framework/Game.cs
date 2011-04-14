@@ -373,8 +373,15 @@ namespace Microsoft.Xna.Framework
 		
 		protected virtual void LoadContent()
 		{			
-			string DefaultPath = "Default.png";
-			if (File.Exists(DefaultPath))
+			string defaultPath = UIScreen.MainScreen.Scale != 1f 
+				? string.Format("Default@{0}x.png", UIScreen.MainScreen.Scale) 
+				: null;
+			if (string.IsNullOrEmpty(defaultPath) || !File.Exists(defaultPath))
+			{
+				defaultPath = "Default.png";
+			}
+			
+			if (File.Exists(defaultPath))
 			{
 				// Store the RootDir for later 
 				string backup = Content.RootDirectory;
@@ -385,7 +392,7 @@ namespace Microsoft.Xna.Framework
 					Content.RootDirectory = string.Empty;
 					
 					spriteBatch = new SpriteBatch(GraphicsDevice);
-					splashScreen = Content.Load<Texture2D>(DefaultPath);			
+					splashScreen = Content.Load<Texture2D>(defaultPath);			
 				}
 				finally 
 				{
