@@ -262,7 +262,7 @@ namespace Microsoft.Xna.Framework
 		
 		private Vector2 GetOffsetPosition(Vector2 position)
 		{
-			Vector2 translatedPosition = position;
+			Vector2 translatedPosition = position * UIScreen.MainScreen.Scale;
 					
 			switch (CurrentOrientation)
 			{
@@ -273,23 +273,23 @@ namespace Microsoft.Xna.Framework
 				
 				case DisplayOrientation.LandscapeRight :
 				{				
-					translatedPosition = new Vector2( ClientBounds.Height - position.Y, position.X );							
+					translatedPosition = new Vector2( ClientBounds.Height - translatedPosition.Y, translatedPosition.X );							
 					break;
 				}
 				
 				case DisplayOrientation.LandscapeLeft :
 				{							
-					translatedPosition = new Vector2( position.Y, ClientBounds.Width - position.X );							
+					translatedPosition = new Vector2( translatedPosition.Y, ClientBounds.Width - translatedPosition.X );							
 					break;
 				}
 				
 				case DisplayOrientation.PortraitUpsideDown :
 				{				
-					translatedPosition = new Vector2( ClientBounds.Width - position.X, ClientBounds.Height - position.Y );							
+					translatedPosition = new Vector2( ClientBounds.Width - translatedPosition.X, ClientBounds.Height - translatedPosition.Y );							
 					break;
 				}
 			}
-			return translatedPosition * UIScreen.MainScreen.Scale;
+			return translatedPosition;
 		}
 		
 		public override void TouchesBegan (NSSet touches, UIEvent evt)
