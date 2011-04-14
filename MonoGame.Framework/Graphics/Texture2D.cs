@@ -57,7 +57,6 @@ namespace Microsoft.Xna.Framework.Graphics
     public class Texture2D : Texture
     {
 		private ESImage texture;
-		private string name;
 		
 		internal bool IsSpriteFontTexture {get;set;}
 		
@@ -86,12 +85,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 return new Rectangle(0,0,texture.ImageWidth, texture.ImageHeight);
             }
         }
-		
-		public bool IsDisposed
-		{
-			get;
-			set;
-		}
 		
 		internal Texture2D(ESImage theImage)
 		{
@@ -233,24 +226,6 @@ namespace Microsoft.Xna.Framework.Graphics
             get 
 			{ 
 				throw new NotImplementedException();
-			}
-        }
-
-        public Object Tag
-        {
-            get { return null; }
-            set { throw new NotImplementedException(); }
-		}
-
-        public string Name
-        {
-            get 
-			{ 
-				return name;
-			}
-			set 
-			{
-				name = value;
 			}
         }
 
