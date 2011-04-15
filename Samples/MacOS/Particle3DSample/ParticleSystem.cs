@@ -173,7 +173,6 @@ namespace Particle3DSample
 		/// </summary>
 		protected override void LoadContent ()
 		{
-			
 			//return;
 			settings = content.Load<ParticleSettings> (settingsName);
 

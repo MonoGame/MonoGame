@@ -82,5 +82,15 @@
     <Content Include="Particle3DSample.png" />
     <Content Include="Content\Arial.xnb" />
     <Content Include="Content\ExplosionSettings.xnb" />
+    <Content Include="Content\ParticleEffect.xnb" />
+    <Content Include="Content\checker_0.xnb" />
+    <Content Include="Content\explosion.xnb" />
+    <Content Include="Content\ExplosionSmokeSettings.xnb" />
+    <Content Include="Content\fire.xnb" />
+    <Content Include="Content\FireSettings.xnb" />
+    <Content Include="Content\grid.xnb" />
+    <Content Include="Content\ProjectileTrailSettings.xnb" />
+    <Content Include="Content\smoke.xnb" />
+    <Content Include="Content\SmokePlumeSettings.xnb" />
   </ItemGroup>
 </Project>

@@ -78,7 +78,7 @@ namespace Microsoft.Xna.Framework.Content
         {
             throw new NotImplementedException();
         }
-
+		
         public Matrix ReadMatrix()
         {
             Matrix result = new Matrix();
@@ -122,6 +122,9 @@ namespace Microsoft.Xna.Framework.Content
 
         public T ReadObject<T>(ContentTypeReader typeReader, T existingInstance)
         {
+			if (!typeReader.TargetType.IsValueType)
+				return (T) ReadObject<object>();
+			else
             return (T)typeReader.Read(this, existingInstance);
         }
 
