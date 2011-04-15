@@ -119,7 +119,9 @@ namespace Microsoft.Xna.Framework.Content
             {
                 object existingChildObject = CreateChildObject(property, field);
                 object obj2 = null;
+				
                 obj2 = input.ReadObject<object>(reader, existingChildObject);
+				
                 if (property != null)
                 {
                     property.SetValue(parent, obj2, null);
