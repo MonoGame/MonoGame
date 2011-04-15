@@ -282,6 +282,8 @@
     <Compile Include="Content\ContentReaders\SingleReader.cs" />
     <Compile Include="Content\ContentReaders\Int16Reader.cs" />
     <Compile Include="Content\ContentReaders\Int64Reader.cs" />
+    <Compile Include="Content\ContentReaders\TimeSpanReader.cs" />
+    <Compile Include="Content\ContentReaders\ColorReader.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />
