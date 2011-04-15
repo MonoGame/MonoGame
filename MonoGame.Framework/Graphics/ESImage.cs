@@ -98,27 +98,27 @@ namespace Microsoft.Xna.Framework.Graphics
 		public ESImage(ESTexture2D tex, float imageScale)
 		{
 			texture = tex;
-			Initialize(1.0f);
+			Initialize(imageScale);
 		}
 		
 		public ESImage(UIImage image)
 		{
 			// By default set the scale to 1.0f and the filtering to GL_NEAREST
 			texture = new ESTexture2D(image,All.Nearest);
-			Initialize(image.CurrentScale);			
+			Initialize(1.0f);			
 		}
 
 		public ESImage(UIImage image, All filter)
 		{			
 			// By default set the scale to 1.0f
 			texture = new ESTexture2D(image,filter);
-			Initialize(image.CurrentScale);
+			Initialize(1.0f);
 		}
 		
 		public ESImage(UIImage image, float imageScale, All filter)
 		{
 			texture = new ESTexture2D(image,filter);
-			Initialize(image.CurrentScale);
+			Initialize(imageScale);
 		}
 		
 				
