@@ -58,7 +58,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		private float _maxS, _maxT;
 		private IntPtr _pixelData;
 
-		public ESTexture2D (IntPtr data,SurfaceFormat pixelFormat,int width,int height,Size size,All filter)
+		public ESTexture2D (IntPtr data, SurfaceFormat pixelFormat, int width, int height, Size size, All filter)
 		{
 			InitWithData (data, pixelFormat, width, height, size, filter);
 		}
@@ -98,9 +98,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			if (image.ColorSpace != null) {
 				if (hasAlpha) {
-					pixelFormat = SurfaceFormat.Rgba32;
+					pixelFormat = SurfaceFormat.Color;
 				} else {
-					pixelFormat = SurfaceFormat.Rgb32;
+					pixelFormat = SurfaceFormat.Color;
 				}
 			} else {	
 				pixelFormat = SurfaceFormat.Alpha8;
@@ -133,18 +133,12 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 
 			switch (pixelFormat) {		
-			case SurfaceFormat.Rgba32:
+			case SurfaceFormat.Color:
 				colorSpace = CGColorSpace.CreateDeviceRGB ();
 				data = Marshal.AllocHGlobal (height * width * 4);
 				context = new CGBitmapContext (data, width, height, 8, 4 * width, colorSpace,CGImageAlphaInfo.PremultipliedLast);
 				colorSpace.Dispose ();
-				break;
-			case SurfaceFormat.Rgb32:
-				colorSpace = CGColorSpace.CreateDeviceRGB ();
-				data = Marshal.AllocHGlobal (height * width * 4);
-				context = new CGBitmapContext (data, width, height, 8, 4 * width, colorSpace, CGImageAlphaInfo.NoneSkipLast);
-				colorSpace.Dispose ();
-				break;					
+				break;	
 			case SurfaceFormat.Alpha8:
 				data = Marshal.AllocHGlobal (height * width);
 				context = new CGBitmapContext (data, width, height, 8, width, null, CGImageAlphaInfo.Only);
@@ -163,24 +157,27 @@ namespace Microsoft.Xna.Framework.Graphics
 			context.DrawImage (new RectangleF (0, 0, image.Width, image.Height), image);
 
 			//Convert "RRRRRRRRRGGGGGGGGBBBBBBBBAAAAAAAA" to "RRRRRGGGGGGBBBBB"
-			if (pixelFormat == SurfaceFormat.Rgb32) {
-				tempData = Marshal.AllocHGlobal (height * width * 2);
+			/*
+			if(pixelFormat == SurfaceFormat.Rgb32) {
+				tempData = Marshal.AllocHGlobal(height * width * 2);
 
 				int d32;
 				short d16;
-				int inPixel32Count = 0, outPixel16Count=0;
-				for (i = 0; i < width * height; ++i, inPixel32Count+=sizeof(int)) {
-					d32 = Marshal.ReadInt32 (data, inPixel32Count);
+				int inPixel32Count=0,outPixel16Count=0;
+				for(i = 0; i < width * height; ++i, inPixel32Count+=sizeof(int))
+				{
+					d32 = Marshal.ReadInt32(data,inPixel32Count);
 					short R = (short)((((d32 >> 0) & 0xFF) >> 3) << 11);
 					short G = (short)((((d32 >> 8) & 0xFF) >> 2) << 5);
 					short B = (short)((((d32 >> 16) & 0xFF) >> 3) << 0);
-					d16 = (short)(R | G | B);
-					Marshal.WriteInt16 (tempData, outPixel16Count, d16);
+					d16 = (short)  (R | G | B);
+					Marshal.WriteInt16(tempData,outPixel16Count,d16);
 					outPixel16Count += sizeof(short);
 				}
-				Marshal.FreeHGlobal (data);
+				Marshal.FreeHGlobal(data);
 				data = tempData;			
 			}
+			*/
 
 			InitWithData (data, pixelFormat, width, height, imageSize, filter);
 
@@ -315,8 +312,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			int sz = 0;
 
 			switch (pixelFormat) {				
-			case SurfaceFormat.Rgba32 /*kTexture2DPixelFormat_RGBA8888*/:
-			case SurfaceFormat.Dxt3 :
+			case SurfaceFormat.Color /*kTexture2DPixelFormat_RGBA8888*/:
+			case SurfaceFormat.Dxt1:
+			case SurfaceFormat.Dxt3:
 				sz = 4;
 				GL.TexImage2D (TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, (int)width, (int)height, 0, MonoMac.OpenGL.PixelFormat.Rgba, PixelType.UnsignedByte, data);
 				break;
@@ -326,11 +324,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				break;
 			case SurfaceFormat.Bgra5551 /*kTexture2DPixelFormat_RGB5A1*/:
 				sz = 2;
-				GL.TexImage2D (TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, (int)width, (int)height, 0, MonoMac.OpenGL.PixelFormat.Rgba, PixelType.UnsignedShort5551, data);
-				break;
-			case SurfaceFormat.Rgb32 /*kTexture2DPixelFormat_RGB565*/:
-				sz = 2;
-				GL.TexImage2D (TextureTarget.Texture2D, 0, PixelInternalFormat.Rgb, (int)width, (int)height, 0, MonoMac.OpenGL.PixelFormat.Rgb, PixelType.UnsignedShort565, data);
+				GL.TexImage2D (TextureTarget.Texture2D, 0,  PixelInternalFormat.Rgba, (int)width, (int)height, 0, MonoMac.OpenGL.PixelFormat.Rgba, PixelType.UnsignedShort5551, data);
 				break;
 			case SurfaceFormat.Alpha8 /*kTexture2DPixelFormat_A8*/:
 				sz = 1;

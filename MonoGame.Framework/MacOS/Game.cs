@@ -506,7 +506,7 @@ namespace Microsoft.Xna.Framework
 					spriteBatch.Begin ();
 
 					// We need to turn this into a progress bar or animation to give better user feedback
-					spriteBatch.Draw (splashScreen, new Vector2 (0, 0), Microsoft.Xna.Framework.Graphics.Color.White);
+					spriteBatch.Draw (splashScreen, new Vector2 (0, 0), Microsoft.Xna.Framework.Color.White);
 					spriteBatch.End ();
 				}
 			} else {

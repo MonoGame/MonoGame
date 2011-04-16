@@ -99,7 +99,7 @@ namespace Microsoft.Xna.Framework.Content
 				try 
 				{
 					Marshal.Copy (imageBytes, 0, ptr, imageLength);					
-					ESTexture2D temp = new ESTexture2D(ptr, SurfaceFormat.Rgba32, width, height, new Size (width, height), All.Linear);
+					ESTexture2D temp = new ESTexture2D(ptr, SurfaceFormat.Color, width, height, new Size (width, height), All.Linear);
 					texture = new Texture2D (new ESImage (temp));					
 				} 
 				finally 
