@@ -100,14 +100,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			if (image.ColorSpace != null)
 			{
-				if (hasAlpha)
-				{
-					pixelFormat = SurfaceFormat.Rgba32;
-				}
-				else
-				{
-					pixelFormat = SurfaceFormat.Rgb32;
-				}
+				pixelFormat = SurfaceFormat.Color;
 			}
 			else 
 			{	
@@ -143,18 +136,12 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			switch(pixelFormat) 
 			{		
-				case SurfaceFormat.Rgba32:
+				case SurfaceFormat.Color:
 					colorSpace = CGColorSpace.CreateDeviceRGB();
 					data = Marshal.AllocHGlobal(height * width * 4);
 					context = new CGBitmapContext(data, width, height, 8, 4 * width, colorSpace,CGImageAlphaInfo.PremultipliedLast);
 					colorSpace.Dispose();
-					break;
-				case SurfaceFormat.Rgb32:
-					colorSpace = CGColorSpace.CreateDeviceRGB();
-					data = Marshal.AllocHGlobal(height * width * 4);
-					context = new CGBitmapContext(data, width, height, 8, 4 * width, colorSpace, CGImageAlphaInfo.NoneSkipLast);
-					colorSpace.Dispose();
-					break;					
+					break;	
 				case SurfaceFormat.Alpha8:
 					data = Marshal.AllocHGlobal(height * width);
 					context = new CGBitmapContext(data, width, height, 8, width, null, CGImageAlphaInfo.Only);
@@ -174,6 +161,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			context.DrawImage(new RectangleF(0, 0, image.Width, image.Height), image);
 			
 			//Convert "RRRRRRRRRGGGGGGGGBBBBBBBBAAAAAAAA" to "RRRRRGGGGGGBBBBB"
+			/*
 			if(pixelFormat == SurfaceFormat.Rgb32) {
 				tempData = Marshal.AllocHGlobal(height * width * 2);
 				
@@ -193,6 +181,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				Marshal.FreeHGlobal(data);
 				data = tempData;			
 			}
+			*/
 			
 			InitWithData(data,pixelFormat,width,height,imageSize, filter);
 	
@@ -333,8 +322,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			int sz = 0;
 
 			switch(pixelFormat) {				
-				case SurfaceFormat.Rgba32 /*kTexture2DPixelFormat_RGBA8888*/:
-				case SurfaceFormat.Dxt3 :
+				case SurfaceFormat.Color /*kTexture2DPixelFormat_RGBA8888*/:
+				case SurfaceFormat.Dxt1:
+				case SurfaceFormat.Dxt3:
 				    sz = 4;
 					GL.TexImage2D(All.Texture2D, 0, (int) All.Rgba, (int) width, (int) height, 0, All.Rgba, All.UnsignedByte, data);
 					break;
@@ -345,10 +335,6 @@ namespace Microsoft.Xna.Framework.Graphics
 				case SurfaceFormat.Bgra5551 /*kTexture2DPixelFormat_RGB5A1*/:
 					sz = 2;
 					GL.TexImage2D(All.Texture2D, 0, (int) All.Rgba, (int) width, (int) height, 0, All.Rgba, All.UnsignedShort5551, data);
-					break;
-				case SurfaceFormat.Rgb32 /*kTexture2DPixelFormat_RGB565*/:
-					sz = 2;
-					GL.TexImage2D(All.Texture2D, 0, (int) All.Rgb, (int) width, (int) height, 0, All.Rgb, All.UnsignedShort565, data);
 					break;
 				case SurfaceFormat.Alpha8 /*kTexture2DPixelFormat_A8*/:
 					sz = 1;
