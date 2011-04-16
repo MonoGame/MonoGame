@@ -41,15 +41,24 @@
 using System;
 namespace Microsoft.Xna.Framework.Content
 {
-	internal class SingleReader : ContentTypeReader<float>
+	internal class EnumReader<T> : ContentTypeReader<T>
     {
-        internal SingleReader()
+        ContentTypeReader elementReader;
+
+        internal EnumReader()
         {
         }
 
-        protected internal override float Read(ContentReader input, float existingInstance)
-        {
-            return input.ReadSingle();
+        protected internal override void Initialize(ContentTypeReaderManager manager)
+        {			
+			Type readerType = Enum.GetUnderlyingType(typeof(T));
+			elementReader = manager.GetTypeReader(readerType);
         }
+		
+        protected internal override T Read(ContentReader input, T existingInstance)
+        {
+			return input.ReadObject<T>(elementReader);
+		}
     }
 }
+
