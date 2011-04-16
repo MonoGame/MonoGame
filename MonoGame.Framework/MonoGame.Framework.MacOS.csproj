@@ -114,7 +114,6 @@
     <Compile Include="Input\GamePadButtons.cs" />
     <Compile Include="Input\Keys.cs" />
     <Compile Include="Net\PacketReader.cs" />
-    <Compile Include="Graphics\Color.cs" />
     <Compile Include="Net\PacketWriter.cs" />
     <Compile Include="Net\SendDataOptions.cs" />
     <Compile Include="Net\QualityOfService.cs" />
@@ -284,6 +283,11 @@
     <Compile Include="Content\ContentReaders\Int64Reader.cs" />
     <Compile Include="Content\ContentReaders\TimeSpanReader.cs" />
     <Compile Include="Content\ContentReaders\ColorReader.cs" />
+    <Compile Include="Color.cs" />
+    <Compile Include="Content\ContentReaders\DictionaryReader.cs" />
+    <Compile Include="Content\ContentReaders\DoubleReader.cs" />
+    <Compile Include="Content\ContentReaders\EnumReader.cs" />
+    <Compile Include="Graphics\DxtUtil.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />

@@ -143,30 +143,11 @@ namespace Microsoft.Xna.Framework.Content
 				throw new ContentLoadException("Could not load "  + originalAssetName + " asset!");
 			}
 			
-			if (Path.GetExtension(assetName).ToUpper() !=".XNB")
-			{
-				if ((typeof(T) == typeof(Texture2D))) 
-					result = Texture2D.FromFile(graphicsDeviceService.GraphicsDevice,assetName);
-				if ((typeof(T) == typeof(SpriteFont)))
-				{
-					//result = new SpriteFont(Texture2D.FromFile(graphicsDeviceService.GraphicsDevice,assetName), null, null, null, 0, 0.0f, null, null);
-					throw new NotImplementedException();
-				}
-				if ((typeof(T) == typeof(Song)))
-					result = new Song (assetName);		
-				if ((typeof(T) == typeof(SoundEffect)))
-					result = new SoundEffect (assetName);		
-				if ((typeof(T) == typeof(Video)))
-					result = new Video (assetName);		
-			}
+			if(!Path.HasExtension(assetName))
+				assetName = string.Format("{0}.xnb", assetName);
 			
-			// If we still do not have a valid type then we try to load it as a .XNB file
-			if (result == null)
+			if(Path.GetExtension(assetName).ToUpper() == ".XNB")
 			{
-				if (Path.GetExtension(assetName).ToUpper() !=".XNB")
-					// Concat the file name with valid extensions
-					assetName += ".xnb";
-
 				// Load a XNB file
 				FileStream stream = new FileStream(assetName, FileMode.Open, FileAccess.Read, FileShare.Read);
 		
@@ -187,6 +168,22 @@ namespace Microsoft.Xna.Framework.Content
 
 				reader.Close();
 				stream.Close();
+			}
+			else
+			{
+				if ((typeof(T) == typeof(Texture2D))) 
+					result = Texture2D.FromFile(graphicsDeviceService.GraphicsDevice,assetName);
+				if ((typeof(T) == typeof(SpriteFont)))
+				{
+					//result = new SpriteFont(Texture2D.FromFile(graphicsDeviceService.GraphicsDevice,assetName), null, null, null, 0, 0.0f, null, null);
+					throw new NotImplementedException();
+				}
+				if ((typeof(T) == typeof(Song)))
+					result = new Song (assetName);		
+				if ((typeof(T) == typeof(SoundEffect)))
+					result = new SoundEffect (assetName);		
+				if ((typeof(T) == typeof(Video)))
+					result = new Video (assetName);		
 			}
 						
 			if (result == null)
@@ -210,7 +207,7 @@ namespace Microsoft.Xna.Framework.Content
             }
             set
             {
-                _rootDirectory = Path.Combine(NSBundle.MainBundle.ResourcePath, value);
+                _rootDirectory = value;
             }
         }
 

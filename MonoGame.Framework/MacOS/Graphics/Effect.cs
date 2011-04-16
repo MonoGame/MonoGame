@@ -192,8 +192,6 @@ namespace Microsoft.Xna.Framework.Graphics
 				return FileName+".fsh";
 			if (File.Exists(FileName+".vsh"))
 				return FileName+".vsh";
-			if (File.Exists(FileName+".xnb"))
-				return FileName+".xnb";			
 			
 			return null;
 		}
