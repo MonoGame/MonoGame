@@ -39,17 +39,65 @@
 // #endregion License
 // 
 using System;
+using System.Collections.Generic;
 namespace Microsoft.Xna.Framework.Content
 {
-	internal class SingleReader : ContentTypeReader<float>
+ 
+	internal class DictionaryReader<TKey, TValue> : ContentTypeReader<Dictionary<TKey, TValue>>
     {
-        internal SingleReader()
+        ContentTypeReader keyReader;
+		ContentTypeReader valueReader;
+		
+		Type keyType;
+		Type valueType;
+		
+        internal DictionaryReader()
         {
         }
 
-        protected internal override float Read(ContentReader input, float existingInstance)
+        protected internal override void Initialize(ContentTypeReaderManager manager)
         {
-            return input.ReadSingle();
+			keyType = typeof(TKey);
+			valueType = typeof(TValue);
+			
+			keyReader = manager.GetTypeReader(keyType);
+			valueReader = manager.GetTypeReader(valueType);
+        }
+
+        protected internal override Dictionary<TKey, TValue> Read(ContentReader input, Dictionary<TKey, TValue> existingInstance)
+        {
+            int count = input.ReadInt32();
+            Dictionary<TKey, TValue> dictionary = existingInstance;
+            if (dictionary == null) dictionary = new Dictionary<TKey, TValue>();
+            for (int i = 0; i < count; i++)
+            {
+				TKey key;
+				TValue value;
+				
+				if(keyType.IsValueType)
+				{
+                	key = input.ReadObject<TKey>(keyReader);
+				}
+				else
+				{
+					int readerType = input.ReadByte();
+                	key = input.ReadObject<TKey>(input.TypeReaders[readerType - 1]);
+				}
+				
+				if(valueType.IsValueType)
+				{
+                	value = input.ReadObject<TValue>(valueReader);
+				}
+				else
+				{
+					int readerType = input.ReadByte();
+                	value = input.ReadObject<TValue>(input.TypeReaders[readerType - 1]);
+				}
+				
+				dictionary.Add(key, value);				
+            }
+            return dictionary;
         }
     }
 }
+

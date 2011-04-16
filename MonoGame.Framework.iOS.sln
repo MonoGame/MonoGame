@@ -456,6 +456,6 @@ Global
 		{9964D44C-AD60-497E-8ED3-1DE22F53CEED} = {ED13CD83-F288-496C-B046-027FA7D36717}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = Samples\iOS\Aiming\MonoGame.Samples.Aiming.csproj
+		StartupItem = Samples\iOS\Draw2D\MonoGame.Samples.Draw2D.csproj
 	EndGlobalSection
 EndGlobal

@@ -27,7 +27,7 @@ SOFTWARE.
 
 using System;
 
-namespace Microsoft.Xna.Framework.Graphics
+namespace Microsoft.Xna.Framework
 {
     public struct Color : IEquatable<Color>
     {
@@ -1263,7 +1263,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public bool Equals(Color other)
         {
-            throw new NotImplementedException();
+			return this == other;
         }
 
         #endregion

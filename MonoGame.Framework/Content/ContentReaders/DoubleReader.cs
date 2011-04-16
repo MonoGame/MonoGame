@@ -41,15 +41,16 @@
 using System;
 namespace Microsoft.Xna.Framework.Content
 {
-	internal class SingleReader : ContentTypeReader<float>
+	internal class DoubleReader : ContentTypeReader<double>
     {
-        internal SingleReader()
+        internal DoubleReader()
         {
         }
 
-        protected internal override float Read(ContentReader input, float existingInstance)
+        protected internal override double Read(ContentReader input, double existingInstance)
         {
-            return input.ReadSingle();
+            return input.ReadDouble();
         }
     }
 }
+
