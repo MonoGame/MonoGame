@@ -88,6 +88,21 @@ namespace Microsoft.Xna.Framework
 
             // Initialize _lastUpdate
             _lastUpdate = DateTime.Now;
+
+            this.RequestFocus();
+            this.FocusableInTouchMode = true;
+        }
+
+        public override bool OnKeyDown(Keycode keyCode, KeyEvent e)
+        {
+            Keyboard.KeyDown(keyCode);
+            return true;
+        }
+
+        public override bool OnKeyUp(Keycode keyCode, KeyEvent e)
+        {
+            Keyboard.KeyUp();
+            return true;
         }
 
         ~AndroidGameWindow()
@@ -210,7 +225,7 @@ namespace Microsoft.Xna.Framework
 
         public override bool OnTouchEvent(MotionEvent e)
         {
-
+            Log.Info("OnTouchEvent", "...");
             TouchLocationState state = TouchLocationState.Invalid;
 
             if (e.Action == MotionEventActions.Cancel) {
