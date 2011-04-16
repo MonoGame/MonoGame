@@ -148,8 +148,8 @@
     <Compile Include="Input\GamePadState.cs" />
     <Compile Include="Input\GamePadThumbSticks.cs" />
     <Compile Include="Input\GamePadTriggers.cs" />
-    <Compile Include="Input\Keyboard.cs" />
-    <Compile Include="Input\KeyboardState.cs" />
+    <Compile Include="Android\Input\Keyboard.cs" />
+    <Compile Include="Android\Input\KeyboardState.cs" />
     <Compile Include="Input\Keys.cs" />
     <Compile Include="Input\KeyState.cs" />
     <Compile Include="Input\Mouse.cs" />
