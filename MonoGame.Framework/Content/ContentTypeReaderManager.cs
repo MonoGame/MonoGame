@@ -80,11 +80,17 @@ namespace Microsoft.Xna.Framework.Content
             reader.Read(headerBuffer, 0, 4);
 						
             string headerString = Encoding.UTF8.GetString(headerBuffer, 0, 4);
-            if (string.Compare(headerString, "XNBm", StringComparison.InvariantCultureIgnoreCase) != 0)
-                throw new ContentLoadException("Asset does not appear to be a valid XNB file.  Did you process your content for Windows?");
+            if (string.Compare(headerString, "XNBw", StringComparison.InvariantCultureIgnoreCase) != 0 &&
+				string.Compare(headerString, "XNBx", StringComparison.InvariantCultureIgnoreCase) != 0 &&
+				string.Compare(headerString, "XNBm", StringComparison.InvariantCultureIgnoreCase) != 0)
+                throw new ContentLoadException("Asset does not appear to be a valid XNB file. Did you process your content for Windows?");
 
             // I think these two bytes are some kind of version number. Either for the XNB file or the type readers
             byte version = reader.ReadByte();
+			
+			if(version != 5)
+				throw new ContentLoadException("Invalid XNB file version.");
+			
             byte compressed = reader.ReadByte();
             // The next int32 is the length of the XNB file
             int xnbLength = reader.ReadInt32();
