@@ -67,7 +67,7 @@ namespace Microsoft.Xna.Samples.Draw2D
 
 			// TODO: use this.Content to load your game content here
 			texture = Content.Load<Texture2D> ("monogameicon");
-			ball = Content.Load<Texture2D> ("purpleBall.xnb");
+			// TODO ball = Content.Load<Texture2D> ("purpleBall.xnb");
 			font = Content.Load<SpriteFont> ("SpriteFont1");
 
 			fps = new FPSCounterComponent (this,spriteBatch,font);
@@ -125,8 +125,8 @@ namespace Microsoft.Xna.Samples.Draw2D
 			spriteBatch.Begin ();
 
 			// Normal draw
-			spriteBatch.Draw (ball, new Vector2 (200,300), Color.White);	
-			spriteBatch.Draw (ball, new Vector2 (200,300), null, Color.Yellow, 0.0f, new Vector2 (5,5), 1.0f, SpriteEffects.None, 0);	
+			// TODO spriteBatch.Draw (ball, new Vector2 (200,300), Color.White);	
+			// TODO spriteBatch.Draw (ball, new Vector2 (200,300), null, Color.Yellow, 0.0f, new Vector2 (5,5), 1.0f, SpriteEffects.None, 0);	
 
 			// Normal draw
 			spriteBatch.Draw (texture, new Vector2 (10,390), Color.White);		
