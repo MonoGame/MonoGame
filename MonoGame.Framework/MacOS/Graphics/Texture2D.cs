@@ -242,7 +242,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public static Texture2D FromFile(GraphicsDevice graphicsDevice, string filename, int width, int height)
         {
-			NSImage image = NSImage.ImageNamed(filename);
+			NSImage image = new NSImage(filename);
 			if (image == null)
 			{
 				throw new ContentLoadException("Error loading file: " + filename);
