@@ -65,8 +65,8 @@
     <Content Include="Content\font.spritefont" />
     <Content Include="Content\score.png" />
     <Content Include="Content\tetris.png" />
-    <Content Include="Content\Arial.xnb" />
     <Content Include="Game.ico" />
     <Content Include="GameThumbnail.png" />
+    <Content Include="Content\Arial.xnb" />
   </ItemGroup>
 </Project>

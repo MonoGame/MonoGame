@@ -288,6 +288,7 @@
     <Compile Include="Content\ContentReaders\DoubleReader.cs" />
     <Compile Include="Content\ContentReaders\EnumReader.cs" />
     <Compile Include="Graphics\DxtUtil.cs" />
+    <Compile Include="Graphics\Vertices\VertexPositionColorTexture.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />

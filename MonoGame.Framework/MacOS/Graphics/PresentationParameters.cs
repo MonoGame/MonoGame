@@ -55,6 +55,7 @@ namespace Microsoft.Xna.Framework.Graphics
         #region Private Fields
 
         private DepthFormat autoDepthStencilFormat;
+        private DepthFormat depthStencilFormat; // Added for XNA 4.0
         private int backBufferCount;
         private SurfaceFormat backBufferFormat;
         private int backBufferHeight;
@@ -63,6 +64,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private bool enableAutoDepthStencil;
         private int fullScreenRefreshRateInHz;
         private bool isFullScreen;
+        private int multiSampleCount; // Added for XNA 4.0
         private int multiSampleQuality;
         private MultiSampleType multiSampleType;
         private SwapEffect swapEffect;
@@ -124,7 +126,12 @@ namespace Microsoft.Xna.Framework.Graphics
             get { return deviceWindowHandle; }
             set { deviceWindowHandle = value; }
         }
-
+		
+        public DepthFormat DepthStencilFormat
+        {
+            get { return depthStencilFormat; }
+            set { depthStencilFormat = value; }
+        }
         public bool EnableAutoDepthStencil
         {
             get { return enableAutoDepthStencil; }
@@ -148,7 +155,13 @@ namespace Microsoft.Xna.Framework.Graphics
 				isFullScreen = value;				
             }
         }
-
+		
+        public int MultiSampleCount
+        {
+            get { return multiSampleCount; }
+            set { multiSampleCount = value; }
+        }
+		
         public int MultiSampleQuality
         {
             get { return multiSampleQuality; }
@@ -192,6 +205,8 @@ namespace Microsoft.Xna.Framework.Graphics
             fullScreenRefreshRateInHz = 0;
             // isFullScreen = false;
             multiSampleQuality = 0;
+            depthStencilFormat = DepthFormat.Unknown;
+            multiSampleCount = 0;
             multiSampleType = MultiSampleType.None;
             swapEffect = SwapEffect.Default;
 			this.DisplayOrientation = DisplayOrientation.Default;
@@ -213,6 +228,8 @@ namespace Microsoft.Xna.Framework.Graphics
             clone.multiSampleQuality = this.multiSampleQuality;
             clone.multiSampleType = this.multiSampleType;
             clone.swapEffect = this.swapEffect;
+            clone.depthStencilFormat = this.depthStencilFormat;
+            clone.multiSampleCount = this.multiSampleCount;
             return clone;
         }
 
