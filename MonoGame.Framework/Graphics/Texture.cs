@@ -41,10 +41,19 @@
 using System;
 namespace Microsoft.Xna.Framework.Graphics
 {
-	public class Texture : GraphicsResource
+	public abstract class Texture : GraphicsResource
 	{
-		public Texture ()
+		protected SurfaceFormat _format;
+		protected int _levelCount;
+		
+		public SurfaceFormat Format
 		{
+			get { return _format; }
+		}
+		
+		public int LevelCount
+		{
+			get { return _levelCount; }
 		}
 	}
 }

@@ -58,8 +58,8 @@ namespace Microsoft.Xna.Framework.Graphics
         private DepthFormat depthStencilFormat; // Added for XNA 4.0
         private int backBufferCount;
         private SurfaceFormat backBufferFormat;
-        private int backBufferHeight;
-        private int backBufferWidth;
+        private int backBufferHeight = _defaultBackBufferHeight;
+        private int backBufferWidth = _defaultBackBufferWidth;
         private IntPtr deviceWindowHandle;
         private bool enableAutoDepthStencil;
         private int fullScreenRefreshRateInHz;
@@ -69,6 +69,9 @@ namespace Microsoft.Xna.Framework.Graphics
         private MultiSampleType multiSampleType;
         private SwapEffect swapEffect;
         private bool disposed;
+        
+	internal static readonly int _defaultBackBufferHeight = 480;
+	internal static readonly int _defaultBackBufferWidth = 800;		
 
         #endregion Private Fields
 
@@ -198,8 +201,8 @@ namespace Microsoft.Xna.Framework.Graphics
             autoDepthStencilFormat = DepthFormat.Unknown;
             backBufferCount = 0;
             backBufferFormat = SurfaceFormat.Color;
-			backBufferWidth = 320;
-            backBufferHeight = 480;            
+			backBufferWidth = _defaultBackBufferWidth;
+            backBufferHeight = _defaultBackBufferHeight;            
             deviceWindowHandle = IntPtr.Zero;
             enableAutoDepthStencil = false;
             fullScreenRefreshRateInHz = 0;
