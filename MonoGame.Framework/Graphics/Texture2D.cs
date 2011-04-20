@@ -58,6 +58,11 @@ namespace Microsoft.Xna.Framework.Graphics
     {
 		private ESImage texture;
 		
+		protected int textureId = -1;
+		protected int _width;
+		protected int _height;
+		private bool _mipmap;
+		
 		internal bool IsSpriteFontTexture {get;set;}
 		
 		// my change
@@ -66,7 +71,11 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			get
 			{ 
-				return texture.Name;
+				if (texture == null)
+					return (uint)textureId;
+				else
+					return texture.Name;
+				
 			}
 		}
 		// --------
@@ -89,6 +98,9 @@ namespace Microsoft.Xna.Framework.Graphics
 		internal Texture2D(ESImage theImage)
 		{
 			texture = theImage;
+			_width = texture.ImageWidth;
+			_height = texture.ImageHeight;
+			_format = texture.Format;
 		}
 		
         public Texture2D(GraphicsDevice graphicsDevice, int width, int height, int numberLevels, TextureUsage usage, SurfaceFormat format)
@@ -108,7 +120,28 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		public Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipMap, SurfaceFormat format)
 		{
-			throw new NotImplementedException();
+			this.graphicsDevice = graphicsDevice;
+			this._width = width;
+			this._height = height;
+			this._format = format;
+			this._mipmap = mipMap;
+			
+			generateOpenGLTexture();
+		}
+		
+		private void generateOpenGLTexture() 
+		{
+			// modeled after this
+			// http://steinsoft.net/index.php?site=Programming/Code%20Snippets/OpenGL/no9
+			
+			GL.GenTextures(1,ref textureId);
+			GL.BindTexture(All.Texture2D, textureId);
+			
+			GL.TexParameter(All.Texture2D, All.TextureMinFilter, (int)All.Linear);
+			GL.TexParameter(All.Texture2D, All.TextureMagFilter, (int)All.Linear);
+			
+			GL.BindTexture(All.Texture2D, 0);
+			
 		}
 
         public Color GetPixel(int x, int y)
