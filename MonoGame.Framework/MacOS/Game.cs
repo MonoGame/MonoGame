@@ -90,7 +90,11 @@ namespace Microsoft.Xna.Framework
 			_gameComponentCollection = new GameComponentCollection ();
 			
 			_gameComponentCollection.ComponentAdded += Handle_gameComponentCollectionComponentAdded;
-			RectangleF frame = NSScreen.MainScreen.Frame;
+			
+			// The default for Windows is 480 x 800
+			//RectangleF frame = NSScreen.MainScreen.Frame;
+			RectangleF frame = new RectangleF(0,0,Microsoft.Xna.Framework.Graphics.PresentationParameters._defaultBackBufferWidth,
+				Microsoft.Xna.Framework.Graphics.PresentationParameters._defaultBackBufferHeight);
 
 			//Create a full-screen window
 			_mainWindow = new NSWindow (frame, NSWindowStyle.Titled | NSWindowStyle.Closable, NSBackingStore.Buffered, true);
