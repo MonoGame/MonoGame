@@ -100,15 +100,16 @@ namespace Microsoft.Xna.Framework.Content
             result.M44 = ReadSingle();
             return result;
         }
-		
-        public T ReadObject<T>()
-        {
-			int tmp = Read7BitEncodedInt();
-            if (tmp == 0) return default(T);
-            tmp--;
 			
-            return (T)TypeReaders[tmp].Read(this, default(T));
-        }
+        public T ReadObject<T>()
+        {			
+			int typeReaderIndex = Read7BitEncodedInt();
+        
+			if (typeReaderIndex == 0) 
+				return default(T);
+            				
+            return (T)TypeReaders[typeReaderIndex - 1].Read(this, default(T));
+		}
 
         public T ReadObject<T>(ContentTypeReader typeReader)
         {
