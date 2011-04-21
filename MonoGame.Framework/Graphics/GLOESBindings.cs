@@ -40,13 +40,41 @@
 // 
 using System;
 
-namespace Microsoft.Xna.Framework
+using OpenTK.Graphics.ES11;
+#pragma warning disable 3019
+#pragma warning disable 1591
+
+namespace Microsoft.Xna.Framework.Graphics
 {
-	public class GLOESBindings
+	public  static class GLOES
 	{
-		public GLOESBindings ()
-		{
-		}
+		[System.Security.SuppressUnmanagedCodeSecurity()]
+		[System.Runtime.InteropServices.DllImport("OpenTK.dll", EntryPoint = "glBindFramebufferOES", ExactSpelling = true)]
+		internal extern static void BindFramebuffer(OpenTK.Graphics.ES11.All target, UInt32 framebuffer);
+		
+		[System.Security.SuppressUnmanagedCodeSecurity()]
+		[System.Runtime.InteropServices.DllImport("OpenTK.dll", EntryPoint = "glBindRenderbufferOES", ExactSpelling = true)]
+		internal extern static void BindRenderbuffer(OpenTK.Graphics.ES11.All target, UInt32 renderbuffer);
+		
+		[System.Security.SuppressUnmanagedCodeSecurity()]
+		[System.Runtime.InteropServices.DllImport("OpenTK.dll", EntryPoint = "glGenFramebuffersOES", ExactSpelling = true)]
+		internal extern static unsafe void GenFramebuffers(Int32 n, UInt32* framebuffers);
+
+		[System.Security.SuppressUnmanagedCodeSecurity()]
+		[System.Runtime.InteropServices.DllImport("OpenTK.dll", EntryPoint = "glGenRenderbuffersOES", ExactSpelling = true)]
+		internal extern static unsafe void GenRenderbuffers(Int32 n, UInt32* renderbuffers);
+		
+		[System.Security.SuppressUnmanagedCodeSecurity()]
+		[System.Runtime.InteropServices.DllImport("OpenTK.dll", EntryPoint = "glFramebufferRenderbufferOES", ExactSpelling = true)]
+		internal extern static void FramebufferRenderbuffer(OpenTK.Graphics.ES11.All target, OpenTK.Graphics.ES11.All attachment, OpenTK.Graphics.ES11.All renderbuffertarget, UInt32 renderbuffer);
+
+		[System.Security.SuppressUnmanagedCodeSecurity()]
+		[System.Runtime.InteropServices.DllImport("OpenTK.dll", EntryPoint = "glFramebufferTexture2DOES", ExactSpelling = true)]
+		internal extern static void FramebufferTexture2D(OpenTK.Graphics.ES11.All target, OpenTK.Graphics.ES11.All attachment, OpenTK.Graphics.ES11.All textarget, UInt32 texture, Int32 level);
+		
+		[System.Security.SuppressUnmanagedCodeSecurity()]
+		[System.Runtime.InteropServices.DllImport("OpenTK.dll", EntryPoint = "glCheckFramebufferStatusOES", ExactSpelling = true)]
+		internal extern static OpenTK.Graphics.ES11.All CheckFramebufferStatus(OpenTK.Graphics.ES11.All target);
 	}
 }
 
