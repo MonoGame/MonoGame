@@ -39,21 +39,13 @@
 // #endregion License
 // 
 using System;
-namespace Microsoft.Xna.Framework.Graphics
+
+namespace Microsoft.Xna.Framework
 {
-	public abstract class Texture : GraphicsResource
+	public class GLOESBindings
 	{
-		protected SurfaceFormat _format;
-		protected int _levelCount;
-		
-		public SurfaceFormat Format
+		public GLOESBindings ()
 		{
-			get { return _format; }
-		}
-		
-		public int LevelCount
-		{
-			get { return _levelCount; }
 		}
 	}
 }
