@@ -155,6 +155,7 @@ namespace Microsoft.Xna.Framework
 						if ((supportedOrientations & DisplayOrientation.FaceDown) != 0)
 						{
 							_view.CurrentOrientation = DisplayOrientation.FaceDown;
+							GraphicsDevice.PresentationParameters.DisplayOrientation = DisplayOrientation.FaceDown;
 							TouchPanel.DisplayOrientation = DisplayOrientation.FaceDown;							
 						}
 						break;
@@ -162,6 +163,7 @@ namespace Microsoft.Xna.Framework
 						if ((supportedOrientations & DisplayOrientation.FaceUp) != 0)						
 						{
 							_view.CurrentOrientation = DisplayOrientation.FaceUp;
+							GraphicsDevice.PresentationParameters.DisplayOrientation = DisplayOrientation.FaceUp;
 							TouchPanel.DisplayOrientation = DisplayOrientation.FaceUp;
 						}
 						break;
@@ -169,6 +171,7 @@ namespace Microsoft.Xna.Framework
 						if ((supportedOrientations & DisplayOrientation.PortraitUpsideDown) != 0)						
 						{
 							_view.CurrentOrientation = DisplayOrientation.PortraitUpsideDown;
+							GraphicsDevice.PresentationParameters.DisplayOrientation = DisplayOrientation.PortraitUpsideDown;
 							TouchPanel.DisplayOrientation = DisplayOrientation.PortraitUpsideDown;
 						}
 						break;
