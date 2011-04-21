@@ -322,11 +322,13 @@ namespace Microsoft.Xna.Framework.Graphics
 					case DisplayOrientation.LandscapeLeft :
 					{		
 						var x = _scissorRectangle.X;
-						_scissorRectangle.X = _viewport.Width - _scissorRectangle.Y - _scissorRectangle.Width;
-						_scissorRectangle.Y = _viewport.Height - x - _scissorRectangle.Height;
+						_scissorRectangle.X = _viewport.Width - _scissorRectangle.Height - _scissorRectangle.Y;
+						_scissorRectangle.Y = _viewport.Height - _scissorRectangle.Width - x;
+					
+						// Swap Width and Height
 						var w = _scissorRectangle.Width;
 						_scissorRectangle.Width = _scissorRectangle.Height;
-						_scissorRectangle.Height = w;
+						_scissorRectangle.Height = w;	
 						break;
 					}
 					
