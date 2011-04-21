@@ -53,19 +53,31 @@ namespace Microsoft.Xna.Framework.Content
         PropertyInfo[] properties;
         FieldInfo[] fields;
         ContentTypeReaderManager manager;
+		
+		Type targetType;
+		Type baseType;
+		ContentTypeReader baseTypeReader;
 
         internal ReflectiveReader() : base(typeof(T))
         {
+			targetType = typeof(T);
         }
 
         protected internal override void Initialize(ContentTypeReaderManager manager)
         {
             base.Initialize(manager);
             this.manager = manager;
+			
+			if(targetType.BaseType != null && targetType.BaseType != typeof(object))
+			{
+				baseType = targetType.BaseType;
+				baseTypeReader = manager.GetTypeReader(baseType);
+			}
+			
             BindingFlags attrs = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly;
-            constructor = typeof(T).GetConstructor(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance, null, new Type[0], null);
-            properties = typeof(T).GetProperties(attrs);
-            fields = typeof(T).GetFields(attrs);
+			constructor = targetType.GetConstructor(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance, null, new Type[0], null);
+            properties = targetType.GetProperties(attrs);
+            fields = targetType.GetFields(attrs);
         }
 
         object CreateChildObject(PropertyInfo property, FieldInfo field)
@@ -80,7 +92,7 @@ namespace Microsoft.Xna.Framework.Content
             {
                 t = field.FieldType;
             }
-            if (t.IsClass)
+            if (t.IsClass && !t.IsAbstract)
             {
                 ConstructorInfo constructor = t.GetConstructor(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance, null, new Type[0], null);
                 if (constructor != null)
@@ -172,6 +184,10 @@ namespace Microsoft.Xna.Framework.Content
             {
                 obj = (T)constructor.Invoke(null);
             }
+			
+			if(baseTypeReader != null)
+				baseTypeReader.Read(input, obj);
+			
             foreach (PropertyInfo property in properties)
             {
                 Read(obj, input, property);
