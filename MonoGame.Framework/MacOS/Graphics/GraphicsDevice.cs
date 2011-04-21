@@ -323,6 +323,15 @@ namespace Microsoft.Xna.Framework.Graphics
 		public void SetRenderTarget (RenderTarget2D renderTarget) 
 		{
 			if (renderTarget == null) {
+				
+				// Detach the render buffers
+				GL.FramebufferRenderbuffer(FramebufferTarget.FramebufferExt, FramebufferAttachment.DepthAttachmentExt,
+						RenderbufferTarget.RenderbufferExt, 0);
+				// delete the RBO's
+				GL.DeleteRenderbuffers(renderBufferIDs.Length,renderBufferIDs);
+				// delete the FBO
+				GL.DeleteFramebuffers(1, ref framebufferId);
+				// Set the frame buffer back to the system window buffer
 				GL.BindFramebuffer(FramebufferTarget.FramebufferExt, 0);
 			}
 			else {
@@ -331,8 +340,11 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 		
 		private int framebufferId = -1;
+		int[] renderBufferIDs;
+		
 		public void SetRenderTargets (params RenderTargetBinding[] renderTargets) 
 		{
+			
 			currentRenderTargets = renderTargets;
 			
 			if (currentRenderTargets != null) {
@@ -343,6 +355,9 @@ namespace Microsoft.Xna.Framework.Graphics
 				GL.GenFramebuffers(1, out framebufferId);
 				GL.BindFramebuffer(FramebufferTarget.FramebufferExt, framebufferId);
 				
+				renderBufferIDs = new int[currentRenderTargets.Length];
+				GL.GenRenderbuffers(currentRenderTargets.Length, renderBufferIDs);
+				
 				for (int i = 0; i < currentRenderTargets.Length; i++) {
 					RenderTarget2D target = (RenderTarget2D)currentRenderTargets[0].RenderTarget;
 					
@@ -351,24 +366,23 @@ namespace Microsoft.Xna.Framework.Graphics
 						TextureTarget.Texture2D, target.ID,0);
 					
 					// create a renderbuffer object to store depth info
-					int rboId;
-					GL.GenRenderbuffers(1, out rboId);
-					GL.BindRenderbuffer(RenderbufferTarget.RenderbufferExt, rboId);
+					GL.BindRenderbuffer(RenderbufferTarget.RenderbufferExt, renderBufferIDs[i]);
 					GL.RenderbufferStorage(RenderbufferTarget.RenderbufferExt, RenderbufferStorage.DepthComponent24,
 						target.Width, target.Height);
 					GL.BindRenderbuffer(RenderbufferTarget.RenderbufferExt, 0);
 					
 					// attach the renderbuffer to depth attachment point
 					GL.FramebufferRenderbuffer(FramebufferTarget.FramebufferExt, FramebufferAttachment.DepthAttachmentExt,
-						RenderbufferTarget.RenderbufferExt, rboId);
+						RenderbufferTarget.RenderbufferExt, renderBufferIDs[i]);
 						
 				}
 				
 				FramebufferErrorCode status = GL.CheckFramebufferStatus(FramebufferTarget.FramebufferExt);
+				
 				if (status != FramebufferErrorCode.FramebufferComplete)
 					throw new Exception("Error creating framebuffer: " + status);
 				//GL.ClearColor (Color4.Transparent);
-				GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+				//GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 				
 			}
 			
