@@ -77,8 +77,8 @@ namespace Microsoft.Xna.Framework
 					| MonoMac.AppKit.NSViewResizingMask.MinYMargin
 					| MonoMac.AppKit.NSViewResizingMask.WidthSizable;
 			
-			//RectangleF rect = NSScreen.MainScreen.Frame;
-			RectangleF rect = frame;
+			RectangleF rect = NSScreen.MainScreen.Frame;
+			
 			clientBounds = new Rectangle (0,0,(int)rect.Width,(int)rect.Height);
 
 			// Enable multi-touch

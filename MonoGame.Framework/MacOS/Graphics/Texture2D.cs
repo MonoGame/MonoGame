@@ -58,15 +58,23 @@ namespace Microsoft.Xna.Framework.Graphics
     {
 		private ESImage texture;
 		
+		protected int textureId = -1;
+		protected int _width;
+		protected int _height;
+		private bool _mipmap;
+		
 		internal bool IsSpriteFontTexture {get;set;}
 		
 		// my change
 		// --------
-		public uint ID
+		internal uint ID
 		{
 			get
 			{ 
-				return texture.Name;
+				if (texture == null)
+					return (uint)textureId;
+				else
+					return texture.Name;
 			}
 		}
 		// --------
@@ -82,33 +90,64 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             get
             {
-                return new Rectangle(0,0,texture.ImageWidth, texture.ImageHeight);
+                return new Rectangle(0,0,_width, _height);
             }
         }
 		
+		public Rectangle Bounds {
+			get {
+				return new Rectangle (0,0,_width, _height);
+			}
+		}		
+
 		internal Texture2D(ESImage theImage)
 		{
 			texture = theImage;
+			_width = texture.ImageWidth;
+			_height = texture.ImageHeight;
+			_format = texture.Format;
 		}
 		
         public Texture2D(GraphicsDevice graphicsDevice, int width, int height, int numberLevels, TextureUsage usage, SurfaceFormat format)
         {
 			throw new NotImplementedException();
         }
-
-        public Texture2D(Texture2D source, Color color)
-        {
-            throw new NotImplementedException();
-        }
+//
+//        public Texture2D(Texture2D source, Color color)
+//        {
+//            throw new NotImplementedException();
+//        }
 		
-		public Texture2D(GraphicsDevice graphicsDevice, int width, int height)
+		public Texture2D(GraphicsDevice graphicsDevice, int width, int height) : 
+			this (graphicsDevice, width, height, false, SurfaceFormat.Color)
 		{
-			throw new NotImplementedException();
+
 		}
 		
 		public Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipMap, SurfaceFormat format)
 		{
-			throw new NotImplementedException();
+			this.graphicsDevice = graphicsDevice;
+			this._width = width;
+			this._height = height;
+			this._format = format;
+			this._mipmap = mipMap;
+			
+			generateOpenGLTexture();
+		}
+		
+		private void generateOpenGLTexture() 
+		{
+			// modeled after this
+			// http://steinsoft.net/index.php?site=Programming/Code%20Snippets/OpenGL/no9
+			
+			GL.GenTextures(1,out textureId);
+			GL.BindTexture(TextureTarget.Texture2D, textureId);
+			
+			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)All.Linear);
+			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)All.Linear);
+			
+			GL.BindTexture(TextureTarget.Texture2D, 0);
+			
 		}
 
         public Color GetPixel(int x, int y)
@@ -190,7 +229,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             get
             {
-                return texture.ImageWidth;
+                return _width;
             }
         }
 
@@ -198,16 +237,8 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             get
             {
-                return texture.ImageHeight;
+                return _height;
             }
-        }
-
-        public SurfaceFormat Format
-        {
-            get 
-			{ 
-				return texture.Format;
-			}
         }
 
         public TextureUsage TextureUsage
@@ -231,6 +262,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			ESImage theTexture = new ESImage(image, graphicsDevice.PreferedFilter);			
 			Texture2D result = new Texture2D(theTexture);
+			
+
 			
 			return result;
         }
@@ -264,6 +297,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			Texture2D result = new Texture2D(theTexture);
 			// result.Name = Path.GetFileNameWithoutExtension(filename);
 			result.Name = filename;
+//			_width = theTexture.ImageWidth;
+//			_height = theTexture.ImageHeight;
+//			_format = theTexture.Format;			
 			return result;					
         }
 
@@ -694,7 +730,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			{
 				throw new NotImplementedException();
 			}
-        }
+		}
 	}
 }
 

@@ -119,9 +119,6 @@
     <Content Include="..\..\iOS\Platformer\Content\Backgrounds\Layer2_2.png">
       <Link>Content\Backgrounds\Layer2_2.png</Link>
     </Content>
-    <Content Include="..\..\iOS\Platformer\Content\Fonts\Hud.xnb">
-      <Link>Content\Fonts\Hud.xnb</Link>
-    </Content>
     <Content Include="..\..\iOS\Platformer\Content\Levels\0.txt">
       <Link>Content\Levels\0.txt</Link>
     </Content>
@@ -239,8 +236,12 @@
     <Content Include="..\..\iOS\Platformer\Content\Tiles\BlockA2.png">
       <Link>Content\Tiles\BlockA2.png</Link>
     </Content>
+    <Content Include="..\..\iOS\Platformer\Content\Fonts\Hud.xnb">
+      <Link>Content\Fonts\Hud.xnb</Link>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Content\" />
+    <Folder Include="Content\Fonts\" />
   </ItemGroup>
 </Project>

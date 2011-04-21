@@ -66,7 +66,9 @@ namespace Microsoft.Xna.Framework.Graphics
 		private IndexBuffer _indexBuffer = null;
 
 		public RasterizerState RasterizerState { get; set; }
-
+		
+		private RenderTargetBinding[] currentRenderTargets;
+		
 		internal All PreferedFilter {
 			get {
 				return _preferedFilter;
@@ -137,8 +139,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void Clear (Color color)
 		{
-			Vector4 vector = color.ToEAGLColor ();			
-			GL.ClearColor (vector.X, vector.Y, vector.Z, 1.0f);
+			Vector4 vector = color.ToEAGLColor ();
+			// The following was not working with Color.Transparent
+			// Once we get some regression tests take the following out			
+			//GL.ClearColor (vector.X, vector.Y, vector.Z, 1.0f);
+			GL.ClearColor (vector.X, vector.Y, vector.Z, vector.W);
 			GL.Clear (ClearBufferMask.ColorBufferBit);
 		}
 
@@ -149,7 +154,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void Clear (ClearOptions options, Vector4 color, float depth, int stencil)
 		{
-			GL.ClearColor (color.X, color.Y, color.Z, 1.0f);
+			// The following was not working with Color.Transparent
+			// Once we get some regression tests take the following out
+			//GL.ClearColor (color.X, color.Y, color.Z, 1.0f);
+			GL.ClearColor (color.X, color.Y, color.Z, color.W);
 			GL.ClearDepth (depth);
 			GL.ClearStencil (stencil);
 			GL.Clear ((ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit));
@@ -311,12 +319,74 @@ namespace Microsoft.Xna.Framework.Graphics
 				}
 			}
 		}
-
-		public void SetRenderTarget (
-			int renderTargetIndex,
-			RenderTarget2D renderTarget)
+		
+		public void SetRenderTarget (RenderTarget2D renderTarget) 
 		{
-			throw new NotImplementedException ();
+			if (renderTarget == null) {
+				
+				// Detach the render buffers
+				GL.FramebufferRenderbuffer(FramebufferTarget.FramebufferExt, FramebufferAttachment.DepthAttachmentExt,
+						RenderbufferTarget.RenderbufferExt, 0);
+				// delete the RBO's
+				GL.DeleteRenderbuffers(renderBufferIDs.Length,renderBufferIDs);
+				// delete the FBO
+				GL.DeleteFramebuffers(1, ref framebufferId);
+				// Set the frame buffer back to the system window buffer
+				GL.BindFramebuffer(FramebufferTarget.FramebufferExt, 0);
+			}
+			else {
+				SetRenderTargets(new RenderTargetBinding(renderTarget));
+			}
+		}
+		
+		private int framebufferId = -1;
+		int[] renderBufferIDs;
+		
+		public void SetRenderTargets (params RenderTargetBinding[] renderTargets) 
+		{
+			
+			currentRenderTargets = renderTargets;
+			
+			if (currentRenderTargets != null) {
+				
+				// http://www.songho.ca/opengl/gl_fbo.html
+				
+				// create framebuffer
+				GL.GenFramebuffers(1, out framebufferId);
+				GL.BindFramebuffer(FramebufferTarget.FramebufferExt, framebufferId);
+				
+				renderBufferIDs = new int[currentRenderTargets.Length];
+				GL.GenRenderbuffers(currentRenderTargets.Length, renderBufferIDs);
+				
+				for (int i = 0; i < currentRenderTargets.Length; i++) {
+					RenderTarget2D target = (RenderTarget2D)currentRenderTargets[0].RenderTarget;
+					
+					// attach the texture to FBO color attachment point
+					GL.FramebufferTexture2D(FramebufferTarget.FramebufferExt, FramebufferAttachment.ColorAttachment0,
+						TextureTarget.Texture2D, target.ID,0);
+					
+					// create a renderbuffer object to store depth info
+					GL.BindRenderbuffer(RenderbufferTarget.RenderbufferExt, renderBufferIDs[i]);
+					GL.RenderbufferStorage(RenderbufferTarget.RenderbufferExt, RenderbufferStorage.DepthComponent24,
+						target.Width, target.Height);
+					GL.BindRenderbuffer(RenderbufferTarget.RenderbufferExt, 0);
+					
+					// attach the renderbuffer to depth attachment point
+					GL.FramebufferRenderbuffer(FramebufferTarget.FramebufferExt, FramebufferAttachment.DepthAttachmentExt,
+						RenderbufferTarget.RenderbufferExt, renderBufferIDs[i]);
+						
+				}
+				
+				FramebufferErrorCode status = GL.CheckFramebufferStatus(FramebufferTarget.FramebufferExt);
+				
+				if (status != FramebufferErrorCode.FramebufferComplete)
+					throw new Exception("Error creating framebuffer: " + status);
+				//GL.ClearColor (Color4.Transparent);
+				//GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+				
+			}
+			
+			
 		}
 
 		public void ResolveBackBuffer (ResolveTexture2D resolveTexture)
