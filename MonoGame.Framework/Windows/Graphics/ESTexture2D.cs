@@ -72,7 +72,7 @@ namespace Microsoft.Xna.Framework.Graphics
             BitmapData bitmapData = image.LockBits(new System.Drawing.Rectangle(0, 0, image.Width, image.Height), ImageLockMode.ReadOnly,
                            System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 
-            _format = SurfaceFormat.Rgba32;
+            _format = SurfaceFormat.Color;
             InitWithData(bitmapData.Scan0, _format, image.Width, image.Height, new Size(image.Width, image.Height), filter);
             image.UnlockBits(bitmapData);
         }
@@ -87,7 +87,7 @@ namespace Microsoft.Xna.Framework.Graphics
             int sz = 0;
 
             switch (pixelFormat) {
-                case SurfaceFormat.Rgba32 /*kTexture2DPixelFormat_RGBA8888*/:
+				case SurfaceFormat.Color /*kTexture2DPixelFormat_RGBA8888*/:
                 case SurfaceFormat.Dxt3:
                     sz = 4;
                     GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, (int)width, (int)height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Rgba, PixelType.UnsignedByte, data);
@@ -99,10 +99,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 case SurfaceFormat.Bgra5551 /*kTexture2DPixelFormat_RGB5A1*/:
                     sz = 2;
                     GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, (int)width, (int)height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Rgba, PixelType.UnsignedShort5551, data);
-                    break;
-                case SurfaceFormat.Rgb32 /*kTexture2DPixelFormat_RGB565*/:
-                    sz = 2;
-                    GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgb, (int)width, (int)height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Rgb, PixelType.UnsignedShort565, data);
                     break;
                 case SurfaceFormat.Alpha8 /*kTexture2DPixelFormat_A8*/:
                     sz = 1;
