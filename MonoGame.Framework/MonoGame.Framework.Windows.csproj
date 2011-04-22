@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -54,12 +54,18 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\OpenTK\1.0\Binaries\OpenTK\Release\OpenTK.dll</HintPath>
     </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Xml" />
-    <Reference Include="System.Drawing" />
+    <Reference Include="System">
+    </Reference>
+    <Reference Include="System.Core">
+    </Reference>
+    <Reference Include="System.Windows.Forms">
+    </Reference>
+    <Reference Include="System.Xml.Linq">
+    </Reference>
+    <Reference Include="System.Xml">
+    </Reference>
+    <Reference Include="System.Drawing">
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GamerServices\MessageBoxIcon.cs" />
@@ -119,7 +125,6 @@
     <Compile Include="Windows\Graphics\ESImage.cs" />
     <Compile Include="Windows\Graphics\ESTexture2D.cs" />
     <Compile Include="Windows\Graphics\GraphicsDevice.cs" />
-    <Compile Include="Windows\GraphicsDeviceManager.cs" />
     <Compile Include="Windows\Graphics\PresentationParameters.cs" />
     <Compile Include="Windows\Graphics\RenderState.cs" />
     <Compile Include="Windows\Graphics\RenderTarget2D.cs" />
@@ -198,7 +203,6 @@
     <Compile Include="Graphics\States\BlendFunction.cs" />
     <Compile Include="Graphics\States\BlendState.cs" />
     <Compile Include="Graphics\ClearOptions.cs" />
-    <Compile Include="Graphics\Color.cs" />
     <Compile Include="Graphics\CompilerOptions.cs" />
     <Compile Include="Graphics\DeviceType.cs" />
     <Compile Include="Graphics\GraphicsAdapter.cs" />
@@ -235,6 +239,8 @@
     <Compile Include="Graphics\Effect\IEffectLights.cs" />
     <Compile Include="Graphics\Effect\IEffectMatrices.cs" />
     <Compile Include="Graphics\DirectionalLight.cs" />
+    <Compile Include="Color.cs" />
+    <Compile Include="Windows\Graphics\GraphicsDeviceManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
