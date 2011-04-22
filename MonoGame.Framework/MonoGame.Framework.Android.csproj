@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -27,6 +27,7 @@
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <MonoDroidLinkMode>None</MonoDroidLinkMode>
+    <AndroidLinkMode>None</AndroidLinkMode>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -37,6 +38,7 @@
     <WarningLevel>4</WarningLevel>
     <AndroidUseSharedRuntime>false</AndroidUseSharedRuntime>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AndroidLinkMode>SdkOnly</AndroidLinkMode>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Mono.Android" />
@@ -189,7 +191,6 @@
     <Compile Include="Content\ContentReaders\Vector3Reader.cs" />
     <Compile Include="Graphics\BatchItem.cs" />
     <Compile Include="Graphics\ClearOptions.cs" />
-    <Compile Include="Graphics\Color.cs" />
     <Compile Include="Graphics\CompilerOptions.cs" />
     <Compile Include="Graphics\DeviceType.cs" />
     <Compile Include="Graphics\Effect.cs" />
@@ -236,6 +237,21 @@
     <Compile Include="Graphics\DirectionalLight.cs" />
     <Compile Include="Graphics\States\TextureAddressMode.cs" />
     <Compile Include="Graphics\States\TextureFilter.cs" />
+    <Compile Include="Color.cs" />
+    <Compile Include="Content\ContentReaders\BooleanReader.cs" />
+    <Compile Include="Content\ContentReaders\ColorReader.cs" />
+    <Compile Include="Content\ContentReaders\DictionaryReader.cs" />
+    <Compile Include="Content\ContentReaders\DoubleReader.cs" />
+    <Compile Include="Content\ContentReaders\EnumReader.cs" />
+    <Compile Include="Content\ContentReaders\Int16Reader.cs" />
+    <Compile Include="Content\ContentReaders\Int32Reader.cs" />
+    <Compile Include="Content\ContentReaders\Int64Reader.cs" />
+    <Compile Include="Content\ContentReaders\ReflectiveReader.cs" />
+    <Compile Include="Content\ContentReaders\SingleReader.cs" />
+    <Compile Include="Content\ContentReaders\TimeSpanReader.cs" />
+    <Compile Include="Content\ContentSerializerIgnoreAttribute.cs" />
+    <Compile Include="Content\ContentSerializerAttribute.cs" />
+    <Compile Include="Graphics\DxtUtil.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="GamerServices\" />
