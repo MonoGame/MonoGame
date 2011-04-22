@@ -290,6 +290,7 @@
     <Compile Include="Graphics\DxtUtil.cs" />
     <Compile Include="Graphics\Vertices\VertexPositionColorTexture.cs" />
     <Compile Include="Graphics\RenderTargetBinding.cs" />
+    <Compile Include="Content\ContentReaders\BooleanReader.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />
