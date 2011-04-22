@@ -72,9 +72,9 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             //TODO:  Android.Opengl.GLUtils.GetInternalFormat()
 
-            _format = SurfaceFormat.Rgb32;
+            _format = SurfaceFormat.Color;
             if(image.HasAlpha)
-                _format = SurfaceFormat.Rgba32;
+                _format = SurfaceFormat.Color;
 
             GL.GenTextures(1, ref _name);
             GL.BindTexture(All.Texture2D, _name);
@@ -101,7 +101,8 @@ namespace Microsoft.Xna.Framework.Graphics
             int sz = 0;
 
             switch (pixelFormat) {
-                case SurfaceFormat.Rgba32 /*kTexture2DPixelFormat_RGBA8888*/:
+                case SurfaceFormat.Color /*kTexture2DPixelFormat_RGBA8888*/:
+				case SurfaceFormat.Dxt1:
                 case SurfaceFormat.Dxt3:
                     sz = 4;
                     GL.TexImage2D(All.Texture2D, 0, (int) All.Rgba, (int) width, (int) height, 0, All.Rgba, All.UnsignedByte, data);
@@ -113,10 +114,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 case SurfaceFormat.Bgra5551 /*kTexture2DPixelFormat_RGB5A1*/:
                     sz = 2;
                     GL.TexImage2D(All.Texture2D, 0, (int)All.Rgba, (int)width, (int)height, 0, All.Rgba, All.UnsignedShort5551, data);
-                    break;
-                case SurfaceFormat.Rgb32 /*kTexture2DPixelFormat_RGB565*/:
-                    sz = 2;
-                    GL.TexImage2D(All.Texture2D, 0, (int)All.Rgb, (int)width, (int)height, 0, All.Rgb, All.UnsignedShort565, data);
                     break;
                 case SurfaceFormat.Alpha8 /*kTexture2DPixelFormat_A8*/:
                     sz = 1;
