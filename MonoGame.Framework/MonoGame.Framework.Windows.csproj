@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -50,10 +50,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="OpenTK, Version=1.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\OpenTK\1.0\Binaries\OpenTK\Release\OpenTK.dll</HintPath>
-    </Reference>
+    <Reference Include="OpenTK, Version=1.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL" />
     <Reference Include="System">
     </Reference>
     <Reference Include="System.Core">
@@ -71,6 +68,7 @@
     <Compile Include="GamerServices\MessageBoxIcon.cs" />
     <Compile Include="GameWindow.cs" />
     <Compile Include="Graphics\ColorWriteChannels.cs" />
+    <Compile Include="Graphics\DxtUtil.cs" />
     <Compile Include="Graphics\Effect\BasicEffect.cs" />
     <Compile Include="Graphics\Effect\Effect.cs" />
     <Compile Include="Graphics\Effect\EffectParameter.cs" />
