@@ -66,9 +66,23 @@ namespace Microsoft.Xna.Framework.GamerServices
 		private static bool isTrialMode;
 		private static bool isVisible;
 		private static bool simulateTrialMode;
+		private static bool isMessageBoxShowing = false;
+		private static bool isKeyboardInputShowing = false;
 		private static GKLeaderboardViewController leaderboardController;
 		private static GKAchievementViewController achievementController;
 		private static UIViewController viewController = null;
+		private static NSObject invokeOnMainThredObj = null;
+		
+		private static NSObject GetInvokeOnMainThredObj()
+		{
+			
+			if ( invokeOnMainThredObj == null )
+			{
+				invokeOnMainThredObj = new NSObject();
+			}
+			return invokeOnMainThredObj;
+		}
+			
 
 		delegate string ShowKeyboardInputDelegate(
 		 PlayerIndex player,           
@@ -85,23 +99,39 @@ namespace Microsoft.Xna.Framework.GamerServices
 		 bool usePasswordMode)
 		{
 			string result = defaultText; 
-
-			TextFieldAlertView myAlertView = new TextFieldAlertView(usePasswordMode, title, defaultText);
-
-
-			myAlertView.Title = title;
-			myAlertView.Message = description;
-
-			myAlertView.Clicked += delegate(object sender, UIButtonEventArgs e)
-					{
-						if (e.ButtonIndex == 1)
+			if (!isKeyboardInputShowing)
+			{
+				isKeyboardInputShowing = true;				
+	
+				TextFieldAlertView myAlertView = new TextFieldAlertView(usePasswordMode, title, defaultText);
+	
+	
+				myAlertView.Title = title;
+				myAlertView.Message = description;
+	
+				myAlertView.Clicked += delegate(object sender, UIButtonEventArgs e)
 						{
-								result = ((UIAlertView) sender).Subviews.OfType<UITextField>().Single().Text;
-						}
-					};
-			myAlertView.Transform = MonoTouch.CoreGraphics.CGAffineTransform.MakeTranslation (0f, 110f);
-			myAlertView.Show();
-
+							if (e.ButtonIndex == 1)
+							{
+									result = ((UIAlertView) sender).Subviews.OfType<UITextField>().Single().Text;
+									isKeyboardInputShowing = false;
+							}
+						};
+				
+				myAlertView.Dismissed += delegate(object sender, UIButtonEventArgs e) 
+								{ 
+									result = defaultText;
+									isKeyboardInputShowing = false;
+								};
+				
+				myAlertView.Transform = MonoTouch.CoreGraphics.CGAffineTransform.MakeTranslation (0f, 110f);
+				
+				GetInvokeOnMainThredObj().InvokeOnMainThread(delegate {    
+	       		 		myAlertView.Show();  
+	    			});
+			}
+			
+			isVisible = isKeyboardInputShowing;
 			return result;
 		}
 
@@ -125,8 +155,6 @@ namespace Microsoft.Xna.Framework.GamerServices
          Object state,
          bool usePasswordMode)
 		{
-			isVisible = true;
-
 			ShowKeyboardInputDelegate ski = ShowKeyboardInput; 
 
 			return ski.BeginInvoke(player, title, description, defaultText, usePasswordMode, callback, ski);
@@ -159,25 +187,36 @@ namespace Microsoft.Xna.Framework.GamerServices
          MessageBoxIcon icon)
 		{
 			Nullable<int> result = null;
-
-			UIAlertView alert = new UIAlertView();
-			alert.Title = title;
-			foreach( string btn in buttons )
+			
+			if ( !isMessageBoxShowing )
 			{
-				alert.AddButton(btn);
+				isMessageBoxShowing = true;	
+	
+				UIAlertView alert = new UIAlertView();
+				alert.Title = title;
+				foreach( string btn in buttons )
+				{
+					alert.AddButton(btn);
+				}
+				alert.Message = text;
+				alert.Dismissed += delegate(object sender, UIButtonEventArgs e) 
+								{ 
+									result = e.ButtonIndex;
+									isMessageBoxShowing = false;
+								};
+				alert.Clicked += delegate(object sender, UIButtonEventArgs e) 
+								{ 
+									result = e.ButtonIndex; 
+									isMessageBoxShowing = false;
+								};
+				
+				GetInvokeOnMainThredObj().InvokeOnMainThread(delegate {    
+       		 		alert.Show();   
+    			});
+				
 			}
-			alert.Message = text;
-			alert.Dismissed += delegate(object sender, UIButtonEventArgs e) 
-							{ 
-								result = e.ButtonIndex; 
-							};
-			alert.Clicked += delegate(object sender, UIButtonEventArgs e) 
-							{ 
-								result = e.ButtonIndex; 
-							};
-			isVisible = true;
-
-			alert.Show();
+			
+			isVisible = isMessageBoxShowing;
 
 			return result;
 		}
@@ -193,8 +232,6 @@ namespace Microsoft.Xna.Framework.GamerServices
          Object state
 		)
 		{	
-			isVisible = true;
-
 			ShowMessageBoxDelegate smb = ShowMessageBox; 
 
 			return smb.BeginInvoke(title, text, buttons, focusButton, icon, callback, smb);			
