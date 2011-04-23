@@ -172,7 +172,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             autoDepthStencilFormat = DepthFormat.Unknown;
             backBufferCount = 0;
-            backBufferFormat = SurfaceFormat.Unknown;
+            backBufferFormat = SurfaceFormat.Color;
 			backBufferWidth = 320;
             backBufferHeight = 480;            
             deviceWindowHandle = IntPtr.Zero;
