@@ -66,6 +66,8 @@ namespace Microsoft.Xna.Framework.Graphics
         public DepthStencilState DepthStencilState { get; set; }
 		public BlendState BlendState { get; set; }
 		
+		private RenderTargetBinding[] currentRenderTargets;
+		
 		internal All PreferedFilter 
 		{
 			get 
@@ -315,7 +317,71 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		public void SetRenderTarget (RenderTarget2D renderTarget)
 		{
-			throw new NotImplementedException();
+			if (renderTarget == null) 
+			{
+				// Detach the render buffers.
+				GL.Oes.FramebufferRenderbuffer(All.FramebufferOes, All.DepthAttachmentOes,
+						All.RenderbufferOes, 0);
+				// delete the RBO's
+				GL.Oes.DeleteRenderbuffers(renderBufferIDs.Length,renderBufferIDs);
+				// delete the FBO
+				GL.Oes.DeleteFramebuffers(1, ref framebufferId);
+				// Set the frame buffer back to the system window buffer
+				GL.Oes.BindFramebuffer(All.FramebufferOes, 0);
+			}
+			else {
+				SetRenderTargets(new RenderTargetBinding(renderTarget));
+			}
+		}
+		
+		private int framebufferId = -1;
+		int[] renderBufferIDs;
+		
+		public void SetRenderTargets (params RenderTargetBinding[] renderTargets) 
+		{
+			
+			currentRenderTargets = renderTargets;
+			
+			if (currentRenderTargets != null) {
+				
+				// http://www.songho.ca/opengl/gl_fbo.html
+				
+				// create framebuffer
+				GL.Oes.GenFramebuffers(1, ref framebufferId);
+				GL.Oes.BindFramebuffer(All.FramebufferOes, framebufferId);
+				
+				renderBufferIDs = new int[currentRenderTargets.Length];
+				GL.Oes.GenRenderbuffers(currentRenderTargets.Length, renderBufferIDs);
+				
+				for (int i = 0; i < currentRenderTargets.Length; i++) {
+					RenderTarget2D target = (RenderTarget2D)currentRenderTargets[0].RenderTarget;
+					
+					// attach the texture to FBO color attachment point
+					GL.Oes.FramebufferTexture2D(All.FramebufferOes, All.ColorAttachment0Oes,
+						All.Texture2D, target.ID,0);
+					
+					// create a renderbuffer object to store depth info
+					GL.Oes.BindRenderbuffer(All.RenderbufferOes, renderBufferIDs[i]);
+					GL.Oes.RenderbufferStorage(All.RenderbufferOes, All.DepthComponent24Oes,
+						target.Width, target.Height);
+					GL.Oes.BindRenderbuffer(All.RenderbufferOes, 0);
+					
+					// attach the renderbuffer to depth attachment point
+					GL.Oes.FramebufferRenderbuffer(All.FramebufferOes, All.DepthAttachmentOes,
+						All.RenderbufferOes, renderBufferIDs[i]);
+						
+				}
+				
+				All status = GL.Oes.CheckFramebufferStatus(All.FramebufferOes);
+				
+				if (status != All.FramebufferCompleteOes)
+					throw new Exception("Error creating framebuffer: " + status);
+				//GL.ClearColor (Color4.Transparent);
+				//GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+				
+			}
+			
+			
 		}
 		
 		public void ResolveBackBuffer( ResolveTexture2D resolveTexture )

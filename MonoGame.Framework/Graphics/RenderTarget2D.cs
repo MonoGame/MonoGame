@@ -39,7 +39,7 @@
 #endregion License
 
 using System;
-using OpenTK.Graphics.ES20;
+using OpenTK.Graphics.ES11;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -66,26 +66,27 @@ namespace Microsoft.Xna.Framework.Graphics
 			:base(graphicsDevice, width, height,0, TextureUsage.None, format)
 		{				
 			
-			// create framebuffer
-			GL.GenFramebuffers(1, ref textureFrameBuffer);
-			GL.BindFramebuffer(All.Framebuffer, textureFrameBuffer);
+			allocateOpenGLTexture();
 			
-			// attach renderbuffer
-			GL.FramebufferTexture2D(All.Framebuffer, All.ColorAttachment0, All.Texture2D, textureFrameBuffer, 0);
-			
-			// attach depth buffer
-			/* uint depthRenderbuffer;
-			GL.GenRenderbuffers(1, ref depthRenderbuffer);
-			GL.BindRenderbuffer(All.Renderbuffer, depthRenderbuffer);
-			GL.RenderbufferStorage(All.Renderbuffer, All.DepthComponent16, width, height);
-			GL.FramebufferRenderbuffer(All.Framebuffer, All.DepthAttachment, All.Renderbuffer, depthRenderbuffer);*/
-			
-			// unbind frame buffer
-			GL.BindFramebuffer(All.Framebuffer, 0);
-
 		}
 		
-		
-	
+		private void allocateOpenGLTexture() 
+		{
+			// modeled after this
+			// http://steinsoft.net/index.php?site=Programming/Code%20Snippets/OpenGL/no9
+			
+			// Allocate the space needed for the texture
+			GL.BindTexture (All.Texture2D, this.textureId);
+			
+			// it seems like we do not need to allocate any buffer space
+			//byte[] data = new byte[_width * _height * 4];
+			// Use offset instead of pointer to indictate that we want to use data copied from a PBO 
+			//GL.TexImage2D (TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, _width, _height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, data);
+			GL.TexImage2D(All.Texture2D, 0, (int)All.Rgba, _width, _height, 0, All.Rgba, All.UnsignedByte, IntPtr.Zero);
+			
+			GL.BindTexture(All.Texture2D, 0);
+			//data = null;
+
+		}
 	}
 }
