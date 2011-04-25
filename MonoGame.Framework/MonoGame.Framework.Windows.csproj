@@ -65,6 +65,24 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Content\ContentReaders\ArrayReader.cs" />
+    <Compile Include="Content\ContentReaders\BooleanReader.cs" />
+    <Compile Include="Content\ContentReaders\ColorReader.cs" />
+    <Compile Include="Content\ContentReaders\DictionaryReader.cs" />
+    <Compile Include="Content\ContentReaders\DoubleReader.cs" />
+    <Compile Include="Content\ContentReaders\EnumReader.cs" />
+    <Compile Include="Content\ContentReaders\Int16Reader.cs" />
+    <Compile Include="Content\ContentReaders\Int32Reader.cs" />
+    <Compile Include="Content\ContentReaders\Int64Reader.cs" />
+    <Compile Include="Content\ContentReaders\NullableReader.cs" />
+    <Compile Include="Content\ContentReaders\ReflectiveReader.cs" />
+    <Compile Include="Content\ContentReaders\SingleReader.cs" />
+    <Compile Include="Content\ContentReaders\TimeSpanReader.cs" />
+    <Compile Include="Content\ContentReaders\UInt16Reader.cs" />
+    <Compile Include="Content\ContentReaders\UInt32Reader.cs" />
+    <Compile Include="Content\ContentReaders\UInt64Reader.cs" />
+    <Compile Include="Content\ContentSerializerAttribute.cs" />
+    <Compile Include="Content\ContentSerializerIgnoreAttribute.cs" />
     <Compile Include="GamerServices\MessageBoxIcon.cs" />
     <Compile Include="GameWindow.cs" />
     <Compile Include="Graphics\ColorWriteChannels.cs" />
