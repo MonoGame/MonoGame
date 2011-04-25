@@ -95,7 +95,7 @@ namespace Microsoft.Xna.Framework.Content
             // The next int32 is the length of the XNB file
             int xnbLength = reader.ReadInt32();
 
-            if (compressed != 0)
+            if (compressed != 0 && compressed != 1)
             {
                 throw new NotImplementedException("MonoGame cannot read compressed XNB files. Please use the XNB files from the Debug build of your XNA game instead. If someone wants to contribute decompression logic, that would be fantastic.");
             }
