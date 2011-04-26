@@ -101,6 +101,15 @@ namespace Microsoft.Xna.Framework.Graphics
 				specularColorParameter.SetValue (specularColor);
 			}
 		}
+		
+		public bool Enabled {
+			get { return enabled; }
+			set {
+				
+				enabled = value;
+				// no set value here for effect parameter
+			}
+		}
 	}
 }
 
