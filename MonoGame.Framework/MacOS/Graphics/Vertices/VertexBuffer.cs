@@ -31,7 +31,12 @@ namespace Microsoft.Xna.Framework.Graphics
 			this._vertexCount = vertexCount;
 			this._bufferUsage = bufferUsage;
 		}
-
+		
+		public VertexBuffer (GraphicsDevice Graphics,VertexDeclaration vertexDecs,int vertexCount,BufferUsage bufferUsage)
+			: this (Graphics, vertexDecs.GetType(), vertexCount, bufferUsage)
+		{
+		}
+		
 		public int VertexCount { get; set; }
 
 		internal static void CreateFrameBuffers ()

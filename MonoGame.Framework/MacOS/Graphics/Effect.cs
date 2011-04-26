@@ -151,6 +151,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new ArgumentNullException("Graphics Device Cannot Be Null");
             }
 			this.graphicsDevice = graphicsDevice;
+			Techniques = new EffectTechniqueCollection();
 		}
 		
 		public void Begin()
