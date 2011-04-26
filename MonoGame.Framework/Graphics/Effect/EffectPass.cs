@@ -24,5 +24,6 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             _technique = technique;
         }
+		public string Name { get; set; }		
     }
 }

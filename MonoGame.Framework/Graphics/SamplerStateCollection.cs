@@ -54,7 +54,15 @@ namespace Microsoft.Xna.Framework.Graphics
 		//  for now I will just allocate a max amount so 
 		//  there are no exceptions
 		List<SamplerState> _samplers = new List<SamplerState> (20);
-
+		
+		internal SamplerStateCollection () : this(20) {}
+		
+		internal SamplerStateCollection (int initMax)
+		{
+			for (int x = 0; x<initMax; x++) {
+				_samplers.Add(SamplerState.LinearWrap);
+			}
+		}
 		public SamplerState this [int index] {
 			get { return _samplers [index]; }
 			set { _samplers [index] = value; }

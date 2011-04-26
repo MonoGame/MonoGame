@@ -67,6 +67,8 @@ namespace Microsoft.Xna.Framework.Input
 		
 		public Keys[] GetPressedKeys()
 		{
+			if (_keys == null)
+				_keys = new Keys[] {};
 			return _keys;
 		}
 		

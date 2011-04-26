@@ -8,6 +8,18 @@ namespace Microsoft.Xna.Framework.Graphics
 	{
 		Texture2D _texture = null;
 		
+		private float _alpha;
+		private Vector3 _ambientLightColor;
+		private Vector3 _diffuseColor;
+		private Vector3 _specularColor;
+		private float _specularPower;
+		
+		private DirectionalLight light0;
+		private DirectionalLight light1;
+		private DirectionalLight light2;
+		private bool lightingEnabled;
+		
+		
         public BasicEffect(GraphicsDevice device)
             : base(device)
         {
@@ -65,8 +77,9 @@ namespace Microsoft.Xna.Framework.Graphics
             var et = new EffectTechnique(this);
             Techniques["Wtf"] = et;
             CurrentTechnique = et;
-
-            et.Passes["Wtf2"] = new EffectPass(et);
+			var pass = new EffectPass(et);
+			pass.Name = "Wtf2";
+            et.Passes[pass.Name] = pass; 
         }
 
         public void EnableDefaultLighting()
@@ -88,12 +101,23 @@ namespace Microsoft.Xna.Framework.Graphics
             this.DirectionalLight2.SpecularColor = color;
             this.DirectionalLight2.Enabled = true;*/
         }
+   internal static Vector3 EnableDefaultLighting(DirectionalLight light0, DirectionalLight light1, DirectionalLight light2)
+    {
+      light0.Direction = new Vector3(-0.5265408f, -0.5735765f, -0.6275069f);
+      light0.DiffuseColor = new Vector3(1f, 0.9607844f, 0.8078432f);
+      light0.SpecularColor = new Vector3(1f, 0.9607844f, 0.8078432f);
+      light0.Enabled = true;
+      light1.Direction = new Vector3(0.7198464f, 0.3420201f, 0.6040227f);
+      light1.DiffuseColor = new Vector3(0.9647059f, 0.7607844f, 0.4078432f);
+      light1.SpecularColor = Vector3.Zero;
+      light1.Enabled = true;
+      light2.Direction = new Vector3(0.4545195f, -0.7660444f, 0.4545195f);
+      light2.DiffuseColor = new Vector3(0.3231373f, 0.3607844f, 0.3937255f);
+      light2.SpecularColor = new Vector3(0.3231373f, 0.3607844f, 0.3937255f);
+      light2.Enabled = true;
+      return new Vector3(0.05333332f, 0.09882354f, 0.1819608f);
+    }		
 			
-		public bool LightingEnabled 
-		{ 
-			get; set; 
-		}
-		
 		public Matrix Projection
 		{ 
 			get; set; 
@@ -108,7 +132,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		{ 
 			get; set; 
 		}
-		
+		#region IEffectMatrices implementation		
 		public Matrix View
 		{ 
 			get; set; 
@@ -118,6 +142,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		{ 
 			get; set; 
 		}
+		#endregion
 		
 		private void setTexture(Texture2D texture)
 		{
@@ -128,55 +153,81 @@ namespace Microsoft.Xna.Framework.Graphics
 			get { return _texture; }
 			set { _texture = value; setTexture(value); }
 		}
+
+		public float Alpha { 
+			get {
+				return _alpha;
+			} 
+			set {
+				_alpha = value;
+			}
+		}
 		
-		#region IEffectMatrices implementation
-		Matrix IEffectMatrices.Projection {
-			get; set;
+		public Vector3 DiffuseColor {
+			get {
+				return _diffuseColor;
+			}
+			
+			set {
+				_diffuseColor = value;
+			}
 		}
 
-		Matrix IEffectMatrices.View {
-			get; set;
+		public Vector3 SpecularColor {
+			get {
+				return _specularColor;
+			}
+			
+			set {
+				_specularColor = value;
+			}
 		}
-
-		Matrix IEffectMatrices.World {
-			get; set;
+		
+		public float SpecularPower { 
+			get { return _specularPower; }
+			set { _specularPower = value; } 
 		}
-		#endregion
-
+		
 		#region IEffectLights implementation
 		void IEffectLights.EnableDefaultLighting ()
 		{
 			throw new NotImplementedException ();
 		}
 
-		Vector3 IEffectLights.AmbientLightColor {
-			get; set;
-		}
-
-		DirectionalLight IEffectLights.DirectionalLight0 {
+		public Vector3 AmbientLightColor {
 			get {
-				throw new NotImplementedException ();
+				return _ambientLightColor;
+			}
+			
+			set {
+				_ambientLightColor = value;
 			}
 		}
 
-		DirectionalLight IEffectLights.DirectionalLight1 {
+		public DirectionalLight DirectionalLight0 {
 			get {
-				throw new NotImplementedException ();
+				return light0;
 			}
 		}
 
-		DirectionalLight IEffectLights.DirectionalLight2 {
+		public DirectionalLight DirectionalLight1 {
 			get {
-				throw new NotImplementedException ();
+				return light1;
 			}
 		}
 
-		bool IEffectLights.LightingEnabled {
+		public DirectionalLight DirectionalLight2 {
 			get {
-				throw new NotImplementedException ();
+				return light2;
+			}
+		}
+
+		public bool LightingEnabled {
+			get {
+				return lightingEnabled;
 			}
 			set {
-				throw new NotImplementedException ();
+				lightingEnabled = value;
 			}
 		}
 		#endregion
