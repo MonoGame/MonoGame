@@ -252,6 +252,8 @@
     <Compile Include="Content\ContentSerializerIgnoreAttribute.cs" />
     <Compile Include="Content\ContentSerializerAttribute.cs" />
     <Compile Include="Graphics\DxtUtil.cs" />
+    <Compile Include="Graphics\SamplerStateCollection.cs" />
+    <Compile Include="Graphics\RenderTargetBinding.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="GamerServices\" />

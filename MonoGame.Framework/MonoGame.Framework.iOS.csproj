@@ -347,6 +347,7 @@
     <Compile Include="Content\ContentReaders\UInt64Reader.cs" />
     <Compile Include="Content\ContentReaders\NullableReader.cs" />
     <Compile Include="Content\ContentReaders\ArrayReader.cs" />
+    <Compile Include="Graphics\SamplerStateCollection.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
