@@ -35,15 +35,18 @@ If your company plans to use and contribute to MonoGame, why not become a sponso
 
 ## Contributors
 * jalfx ( who started the project and named it XNATouch, in 2010. In 2011 it become MonoGame )
-* kangaroo
-* kjpou1
-* jorgemagic
+* Kangaroo
+* Kjpou1
+* Jorgemagic
+* jfernandezrodriguez
 * kelthar
 * taskbit
 * DanielAdolfsson
 * slygamer
 * jdindia
 * jordoh
+* vchelaru
+* cschwarz
 * CartBlanche
 
 If you have contributed and are not listed above, please let us know.
