@@ -42,6 +42,7 @@ using System;
 
 namespace Microsoft.Xna.Framework.Input.Touch
 {
+	[Flags]
     public enum GestureType
     {
         Tap = 1,
