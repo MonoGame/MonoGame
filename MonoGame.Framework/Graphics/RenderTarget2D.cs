@@ -44,30 +44,22 @@ using OpenTK.Graphics.ES11;
 namespace Microsoft.Xna.Framework.Graphics
 {
 	public class RenderTarget2D : Texture2D
-	{
-		/// <summary>
-		/// Attributes 
-		/// </summary>
-		private Texture2D texture = null;
-		private uint textureFrameBuffer;
-				
+	{		
 		public RenderTarget2D (GraphicsDevice graphicsDevice, int width, int height)
-			:this (graphicsDevice,width,height,false,SurfaceFormat.Color, DepthFormat.Depth24,0, RenderTargetUsage.DiscardContents)
+			: this(graphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.Unknown) 
 		{}
 		
-		public RenderTarget2D (GraphicsDevice graphicsDevice, int width, int height, bool mipMap,
-         					   SurfaceFormat format, DepthFormat depthFormat)
-			:this (graphicsDevice,width,height,mipMap,format,depthFormat,0,RenderTargetUsage.DiscardContents)
+		public RenderTarget2D (GraphicsDevice graphicsDevice, int width, int height, bool mipMap, 
+			SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat)
+			:this (graphicsDevice, width, height, mipMap, preferredFormat, 
+				DepthFormat.Unknown, 0, RenderTargetUsage.PreserveContents) 
 		{}
 		
-		public RenderTarget2D (GraphicsDevice graphicsDevice, int width, int height, bool mipMap,
-         					   SurfaceFormat format, DepthFormat depthFormat, int multiSampleCount,
-		                       RenderTargetUsage usage)
-			:base(graphicsDevice, width, height,0, TextureUsage.None, format)
-		{				
-			
+		public RenderTarget2D (GraphicsDevice graphicsDevice, int width, int height, bool mipMap, 
+			SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage)
+			:base (graphicsDevice, width, height, mipMap, preferredFormat)
+		{
 			allocateOpenGLTexture();
-			
 		}
 		
 		private void allocateOpenGLTexture() 

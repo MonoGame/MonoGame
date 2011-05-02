@@ -270,7 +270,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			if ( sourceRectangle.HasValue)
 				rect = sourceRectangle.Value;
 			else
-				rect = new Rectangle( 0, 0, texture.Image.ImageWidth, texture.Image.ImageHeight );
+				rect = new Rectangle( 0, 0, texture.Width, texture.Height );
 			
 			Vector2 texCoordTL = texture.Image.GetTextureCoord ( rect.X, rect.Y );
 			Vector2 texCoordBR = texture.Image.GetTextureCoord ( rect.X+rect.Width, rect.Y+rect.Height );
@@ -328,7 +328,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			if ( sourceRectangle.HasValue)
 				rect = sourceRectangle.Value;
 			else
-				rect = new Rectangle( 0, 0, texture.Image.ImageWidth, texture.Image.ImageHeight );
+				rect = new Rectangle( 0, 0, texture.Width, texture.Height );
 
 			Vector2 texCoordTL = texture.Image.GetTextureCoord ( rect.X, rect.Y );
 			Vector2 texCoordBR = texture.Image.GetTextureCoord ( rect.X+rect.Width, rect.Y+rect.Height );
@@ -376,7 +376,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			if ( sourceRectangle.HasValue)
 				rect = sourceRectangle.Value;
 			else
-				rect = new Rectangle( 0, 0, texture.Image.ImageWidth, texture.Image.ImageHeight );
+				rect = new Rectangle( 0, 0, texture.Width, texture.Height );
 			
 			Vector2 texCoordTL = texture.Image.GetTextureCoord ( rect.X, rect.Y );
 			Vector2 texCoordBR = texture.Image.GetTextureCoord ( rect.X+rect.Width, rect.Y+rect.Height );
@@ -400,7 +400,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			if ( sourceRectangle.HasValue)
 				rect = sourceRectangle.Value;
 			else
-				rect = new Rectangle( 0, 0, texture.Image.ImageWidth, texture.Image.ImageHeight );
+				rect = new Rectangle( 0, 0, texture.Width, texture.Height );
 			
 			Vector2 texCoordTL = texture.Image.GetTextureCoord ( rect.X, rect.Y );
 			Vector2 texCoordBR = texture.Image.GetTextureCoord ( rect.X+rect.Width, rect.Y+rect.Height );
@@ -433,7 +433,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			item.Depth = 0;
 			item.TextureID = (int) texture.ID;
 			
-			Rectangle rect = new Rectangle( 0, 0, texture.Image.ImageWidth, texture.Image.ImageHeight );
+			Rectangle rect = new Rectangle( 0, 0, texture.Width, texture.Height );
 			
 			Vector2 texCoordTL = texture.Image.GetTextureCoord ( rect.X, rect.Y );
 			Vector2 texCoordBR = texture.Image.GetTextureCoord ( rect.X+rect.Width, rect.Y+rect.Height );
@@ -463,7 +463,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			item.TextureID = (int) texture.ID;
 			
 			Vector2 texCoordTL = texture.Image.GetTextureCoord ( 0, 0 );
-			Vector2 texCoordBR = texture.Image.GetTextureCoord ( texture.Image.ImageWidth, texture.Image.ImageHeight );
+			Vector2 texCoordBR = texture.Image.GetTextureCoord ( texture.Width, texture.Height );
 			
 			item.Set
 				(
