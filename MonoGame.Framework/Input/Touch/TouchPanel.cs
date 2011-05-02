@@ -40,6 +40,8 @@
 
 #region Using clause
 using System;
+using System.Collections;
+using System.Collections.Generic;
 #endregion Using clause
 
 namespace Microsoft.Xna.Framework.Input.Touch
@@ -47,6 +49,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
     public static class TouchPanel
     {
 		internal static TouchCollection Collection = new TouchCollection();
+		internal static Queue<GestureSample> GestureList = new Queue<GestureSample>();
 		
         public static TouchPanelCapabilities GetCapabilities()
         {
@@ -56,7 +59,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
         public static TouchCollection GetState()
         {
-			TouchCollection result = new TouchCollection(Collection);
+			TouchCollection result = new TouchCollection(Collection);		
 			Collection.Update();
 			return result;
         }
@@ -68,7 +71,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		
 		public static GestureSample ReadGesture()
         {
-			throw new NotImplementedException();
+			return GestureList.Dequeue();			
         }
 
         public static int DisplayHeight
@@ -101,21 +104,15 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
         public static GestureType EnabledGestures
         {
-            get
-            {
-				throw new NotImplementedException();
-            }
-            set
-            {
-            }
+            get;
+            set;
         }
 
         public static bool IsGestureAvailable
         {
             get
             {
-				return false;
-				//throw new NotImplementedException();
+				return ( GestureList.Count > 0 );				
             }
         }
     }
