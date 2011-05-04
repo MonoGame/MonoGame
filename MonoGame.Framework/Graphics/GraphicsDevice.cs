@@ -117,7 +117,7 @@ namespace Microsoft.Xna.Framework.Graphics
         public void Clear(Color color)
         {
 			Vector4 vector = color.ToEAGLColor();			
-			GL.ClearColor (vector.X,vector.Y,vector.Z,1.0f);
+			GL.ClearColor (vector.X,vector.Y,vector.Z,vector.W);
 			GL.Clear ((uint) All.ColorBufferBit);
         }
 
@@ -128,7 +128,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void Clear(ClearOptions options, Vector4 color, float depth, int stencil)
         {
-			GL.ClearColor(color.X, color.Y, color.Z, 1.0f);
+			GL.ClearColor(color.X, color.Y, color.Z, color.W);
 			GL.ClearDepth(depth);
 			GL.ClearStencil(stencil);
 			GL.Clear((uint) (ClearBufferMask.ColorBufferBit| ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit));
@@ -377,7 +377,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				if (status != All.FramebufferCompleteOes)
 					throw new Exception("Error creating framebuffer: " + status);
 				//GL.ClearColor (Color4.Transparent);
-				//GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+				//GL.Clear((int)(All.ColorBufferBit | All.DepthBufferBit));
 				
 			}
 			
