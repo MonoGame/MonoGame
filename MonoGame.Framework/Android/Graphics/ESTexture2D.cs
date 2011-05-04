@@ -42,9 +42,13 @@ using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.IO;
+
 using Android.Graphics;
+
 using Java.Nio;
+
 using OpenTK.Graphics.ES11;
+
 using Buffer = System.Buffer;
 
 
@@ -53,7 +57,7 @@ namespace Microsoft.Xna.Framework.Graphics
 	internal class ESTexture2D : IDisposable
 	{
 		private uint _name;
-		private Size _size;
+		private Size _size = new Size(0,0);
 		private int _width,_height;
 		private SurfaceFormat _format;
 		private float _maxS,_maxT;
@@ -68,25 +72,31 @@ namespace Microsoft.Xna.Framework.Graphics
             InitWithBitmap(image, filter);
 		}
 
-        public void InitWithBitmap(Bitmap image, All filter)
+        public void InitWithBitmap(Bitmap imageSource, All filter)
         {
             //TODO:  Android.Opengl.GLUtils.GetInternalFormat()
 
             _format = SurfaceFormat.Color;
-            if(image.HasAlpha)
+            if(imageSource.HasAlpha)
                 _format = SurfaceFormat.Color;
 
-            GL.GenTextures(1, ref _name);
-            GL.BindTexture(All.Texture2D, _name);
-            GL.TexParameter(All.Texture2D, All.TextureMinFilter, (int)filter);
-            GL.TexParameter(All.Texture2D, All.TextureMagFilter, (int)filter);
+            // scale up bitmap to be power of 2 dimensions but dont exceed 1024x1024.
+            // Note: may not have to do this with OpenGL 2+
+            _width = (int)Math.Pow(2, Math.Min(10,Math.Ceiling(Math.Log10(imageSource.Width) / Math.Log10(2))));
+            _height = (int)Math.Pow(2, Math.Min(10,Math.Ceiling(Math.Log10(imageSource.Height) / Math.Log10(2))));
+            _size.Width =_width;
+			_size.Height = _height;
 
-            Android.Opengl.GLUtils.TexImage2D((int)All.Texture2D, 0, image, 0);
+            using (Bitmap imageScaled = Bitmap.CreateScaledBitmap(imageSource, _width, _height, false))
+            {
+                GL.GenTextures(1, ref _name);
+                GL.BindTexture(All.Texture2D, _name);
+                GL.TexParameter(All.Texture2D, All.TextureMinFilter, (int)filter);
+                GL.TexParameter(All.Texture2D, All.TextureMagFilter, (int)filter);
 
-            _size = new Size(image.Width, image.Height);
-            _width = image.Width;
-            _height = image.Height;
-            
+                Android.Opengl.GLUtils.TexImage2D((int)All.Texture2D, 0, imageScaled, 0);
+            }
+			
             _maxS = _size.Width / (float)_width;
             _maxT = _size.Height / (float)_height;
         }
