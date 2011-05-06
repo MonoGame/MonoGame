@@ -19,8 +19,9 @@ namespace Microsoft.Xna.Samples.Storage
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;		
-
-
+		SpriteFont font;
+		SaveGame loaded;
+		
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -54,12 +55,7 @@ namespace Microsoft.Xna.Samples.Storage
 			storage.Save(sg);
 			
 			//load the data back in to test if it was successful
-            SaveGame loaded = storage.Load();
-
-            Console.WriteLine("Name: " + loaded.Name);
-            Console.WriteLine("Hi Score: " + loaded.HiScore.ToString());
-            Console.WriteLine("Date: " + loaded.Date.ToString());
-            Console.WriteLine("Dont Keep: " + loaded.DontKeep.ToString());			
+            loaded = storage.Load();		
         }
 
         /// <summary>
@@ -70,6 +66,8 @@ namespace Microsoft.Xna.Samples.Storage
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
+			
+			font = Content.Load<Microsoft.Xna.Framework.Graphics.SpriteFont>("SpriteFont1");
         }
 
         /// <summary>
@@ -91,6 +89,15 @@ namespace Microsoft.Xna.Samples.Storage
         protected override void Draw(GameTime gameTime)
         {
            	graphics.GraphicsDevice.Clear(Color.CornflowerBlue);
+			
+			spriteBatch.Begin();
+
+			spriteBatch.DrawString(font,"Name: " + loaded.Name,new Vector2(20,100),Color.Black);
+			spriteBatch.DrawString(font,"Hi Score: " + loaded.HiScore.ToString(),new Vector2(20,130),Color.Black);
+			spriteBatch.DrawString(font,"Date: " + loaded.Date.ToString(),new Vector2(20,160),Color.Black);
+			spriteBatch.DrawString(font,"Dont Keep: " + loaded.DontKeep.ToString(),new Vector2(20,190),Color.Black);			
+			
+			spriteBatch.End();
 			
             base.Draw(gameTime);
         }

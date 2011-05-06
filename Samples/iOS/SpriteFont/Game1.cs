@@ -3,7 +3,6 @@ using System;
 using Microsoft.Xna;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Samples;
 
 namespace Microsoft.Xna.Samples.SpriteFont
 {
