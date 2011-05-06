@@ -108,16 +108,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			_format = texture.Format;
 		}
 		
-        public Texture2D(GraphicsDevice graphicsDevice, int width, int height, int numberLevels, TextureUsage usage, SurfaceFormat format)
-        {
-			throw new NotImplementedException();
-        }
-//
-//        public Texture2D(Texture2D source, Color color)
-//        {
-//            throw new NotImplementedException();
-//        }
-		
 		public Texture2D(GraphicsDevice graphicsDevice, int width, int height) : 
 			this (graphicsDevice, width, height, false, SurfaceFormat.Color)
 		{
@@ -239,14 +229,6 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 return _height;
             }
-        }
-
-        public TextureUsage TextureUsage
-        {
-            get 
-			{ 
-				throw new NotImplementedException();
-			}
         }
 
         public static Texture2D FromFile(GraphicsDevice graphicsDevice, Stream textureStream)
