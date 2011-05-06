@@ -669,24 +669,20 @@ namespace ChaseAndEvade
 			}
 			
 			TouchCollection currentTouchCollection = TouchPanel.GetState();
-
-			// tap the screen to select				
-			foreach (TouchLocation location in currentTouchCollection)
-			{
-				switch (location.State)
-				{
-				case TouchLocationState.Pressed:
-						Vector2 mousePosition = new Vector2(location.Position.X, location.Position.Y);
-						catMovement = mousePosition - catPosition;
-				float delta = MaxCatSpeed - MathHelper.Clamp(catMovement.Length(), 0, MaxCatSpeed);
-				smoothStop = 1 - delta / MaxCatSpeed;
-					break;
-				case TouchLocationState.Moved:
-					break;
-				case TouchLocationState.Released:
-					break;
-				}	
-			}			
+			
+			if (currentTouchCollection != null )
+            {
+				if (currentTouchCollection.Count > 0)
+	            {
+					Vector2 touchPosition = currentTouchCollection[0].Position;
+		            if (touchPosition != catPosition)
+		            {
+		                catMovement = touchPosition - catPosition;
+		                float delta = MaxCatSpeed - MathHelper.Clamp(catMovement.Length(), 0, MaxCatSpeed);
+		                smoothStop = 1 - delta / MaxCatSpeed;
+		            }
+				}
+			}		
 #else
 
 
