@@ -184,10 +184,21 @@ namespace Microsoft.Xna.Framework.Graphics
 	
 			return subImage;
 		}
-		public Vector2 GetTextureCoord ( int x, int y )
+		
+		public float GetTextureCoordX ( int x )
+		{
+			return (x*texWidthRatio);
+		}
+		
+		public float GetTextureCoordY ( int y )
+		{
+			return (y*texHeightRatio);
+		}
+		
+		/*public Vector2 GetTextureCoord ( int x, int y )
 		{
 			return new Vector2(x*texWidthRatio,y*texHeightRatio);
-		}
+		}*/
 		public Vector2[] GetTextureCoordinates(Rectangle textureRect)
 		{
 			Vector2[] coordinates = new Vector2[4];
