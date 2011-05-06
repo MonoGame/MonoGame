@@ -52,6 +52,7 @@ namespace Microsoft.Xna.Framework.Input
 		private static AccelerometerCapabilities _capabilities = new AccelerometerCapabilities();
         private static SensorManager _sensorManger;
         private static Sensor _sensor;
+		private static Vector3 _accelerometerVector = new Vector3(0, 0, 0);
 		
 		public static void SetupAccelerometer()
 		{
@@ -91,7 +92,12 @@ namespace Microsoft.Xna.Framework.Input
             {
                 try {
                     if (e != null && e.Values != null)
-                        _state.Acceleration = new Vector3(e.Values[0], e.Values[1], e.Values[2]);
+					{
+						_accelerometerVector.X = e.Values[0];
+						_accelerometerVector.Y = e.Values[1];
+						_accelerometerVector.Z = e.Values[2];
+                        _state.Acceleration = _accelerometerVector;
+					}
                 }
                 catch (NullReferenceException ex) {
                     //Occassionally an NullReferenceException is thrown when accessing e.Values??
