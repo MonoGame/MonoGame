@@ -21,6 +21,10 @@ namespace Microsoft.Xna.Framework.Graphics
 		Effect _effect;	
 		Matrix _matrix;
 		
+		Rectangle tempRect = new Rectangle(0,0,0,0);
+		Vector2 texCoordTL = new Vector2(0,0);
+		Vector2 texCoordBR = new Vector2(0,0);
+		
 		public SpriteBatch ( GraphicsDevice graphicsDevice )
 		{
 			if (graphicsDevice == null )
@@ -207,14 +211,36 @@ namespace Microsoft.Xna.Framework.Graphics
 			item.Depth = depth;
 			item.TextureID = (int) texture.ID;
 			
-			Rectangle rect;
 			if ( sourceRectangle.HasValue)
-				rect = sourceRectangle.Value;
+			{
+				tempRect = sourceRectangle.Value;
+			}
 			else
-				rect = new Rectangle( 0, 0, texture.Image.ImageWidth, texture.Image.ImageHeight );
+			{
+				tempRect.X = 0;
+				tempRect.Y = 0;
+				tempRect.Width = texture.Width;
+				tempRect.Height = texture.Height;				
+			}
 						
-			Vector2 texCoordTL = texture.Image.GetTextureCoord ( rect.X, rect.Y );
-			Vector2 texCoordBR = texture.Image.GetTextureCoord ( rect.X+rect.Width, rect.Y+rect.Height );
+			if (texture.Image == null) {
+				float texWidthRatio = 1.0f / (float)texture.Width;
+				float texHeightRatio = 1.0f / (float)texture.Height;
+				// We are initially flipped vertically so we need to flip the corners so that
+				//  the image is bottom side up to display correctly
+				texCoordTL.X = tempRect.X*texWidthRatio;
+				texCoordTL.Y = (tempRect.Y+tempRect.Height) * texHeightRatio;
+				
+				texCoordBR.X = (tempRect.X+tempRect.Width)*texWidthRatio;
+				texCoordBR.Y = tempRect.Y*texHeightRatio;
+				
+			}
+			else {
+				texCoordTL.X = texture.Image.GetTextureCoordX( tempRect.X );
+				texCoordTL.Y = texture.Image.GetTextureCoordY( tempRect.Y );
+				texCoordBR.X = texture.Image.GetTextureCoordX( tempRect.X+tempRect.Width );
+				texCoordBR.Y = texture.Image.GetTextureCoordY( tempRect.Y+tempRect.Height );
+			}
 			
 			if ( effect == SpriteEffects.FlipVertically )
 			{
@@ -235,8 +261,8 @@ namespace Microsoft.Xna.Framework.Graphics
 				 position.Y,
 				 -origin.X*scale.X,
 				 -origin.Y*scale.Y,
-				 rect.Width*scale.X,
-				 rect.Height*scale.Y,
+				 tempRect.Width*scale.X,
+				 tempRect.Height*scale.Y,
 				 (float)Math.Sin(rotation),
 				 (float)Math.Cos(rotation),
 				 color,
@@ -268,29 +294,35 @@ namespace Microsoft.Xna.Framework.Graphics
 			item.Depth = depth;
 			item.TextureID = (int) texture.ID;
 			
-			Rectangle rect;
 			if ( sourceRectangle.HasValue)
-				rect = sourceRectangle.Value;
+			{
+				tempRect = sourceRectangle.Value;
+			}
 			else
-				rect = new Rectangle( 0, 0, texture.Width, texture.Height );
-
-			Vector2 texCoordTL;// = texture.Image.GetTextureCoord ( rect.X, rect.Y );
-			Vector2 texCoordBR;// = texture.Image.GetTextureCoord ( rect.X+rect.Width, rect.Y+rect.Height );
-
+			{
+				tempRect.X = 0;
+				tempRect.Y = 0;
+				tempRect.Width = texture.Width;
+				tempRect.Height = texture.Height;				
+			}
 			
 			if (texture.Image == null) {
 				float texWidthRatio = 1.0f / (float)texture.Width;
 				float texHeightRatio = 1.0f / (float)texture.Height;
 				// We are initially flipped vertically so we need to flip the corners so that
 				//  the image is bottom side up to display correctly
-				texCoordTL = new Vector2(rect.X*texWidthRatio,(rect.Y+rect.Height) * texHeightRatio);
-				texCoordBR = new Vector2 ( (rect.X+rect.Width)*texWidthRatio, 
-					rect.Y*texHeightRatio );
+				texCoordTL.X = tempRect.X*texWidthRatio;
+				texCoordTL.Y = (tempRect.Y+tempRect.Height) * texHeightRatio;
+				
+				texCoordBR.X = (tempRect.X+tempRect.Width)*texWidthRatio;
+				texCoordBR.Y = tempRect.Y*texHeightRatio;
 				
 			}
 			else {
-				texCoordTL = texture.Image.GetTextureCoord ( rect.X, rect.Y );
-				texCoordBR = texture.Image.GetTextureCoord ( rect.X+rect.Width, rect.Y+rect.Height );
+				texCoordTL.X = texture.Image.GetTextureCoordX( tempRect.X );
+				texCoordTL.Y = texture.Image.GetTextureCoordY( tempRect.Y );
+				texCoordBR.X = texture.Image.GetTextureCoordX( tempRect.X+tempRect.Width );
+				texCoordBR.Y = texture.Image.GetTextureCoordY( tempRect.Y+tempRect.Height );
 			}
 			
 			if ( effect == SpriteEffects.FlipVertically )
@@ -312,8 +344,8 @@ namespace Microsoft.Xna.Framework.Graphics
 				 position.Y,
 				 -origin.X*scale,
 				 -origin.Y*scale,
-				 rect.Width*scale,
-				 rect.Height*scale,
+				 tempRect.Width*scale,
+				 tempRect.Height*scale,
 				 (float)Math.Sin(rotation),
 				 (float)Math.Cos(rotation),
 				 color,
@@ -343,30 +375,37 @@ namespace Microsoft.Xna.Framework.Graphics
 			item.Depth = depth;
 			item.TextureID = (int) texture.ID;
 			
-			Rectangle rect;
 			if ( sourceRectangle.HasValue)
-				rect = sourceRectangle.Value;
+			{
+				tempRect = sourceRectangle.Value;
+			}
 			else
-				rect = new Rectangle( 0, 0, texture.Width, texture.Height );
-
-			Vector2 texCoordTL;// = texture.Image.GetTextureCoord ( rect.X, rect.Y );
-			Vector2 texCoordBR;// = texture.Image.GetTextureCoord ( rect.X+rect.Width, rect.Y+rect.Height );
-
+			{
+				tempRect.X = 0;
+				tempRect.Y = 0;
+				tempRect.Width = texture.Width;
+				tempRect.Height = texture.Height;				
+			}
 			
 			if (texture.Image == null) {
 				float texWidthRatio = 1.0f / (float)texture.Width;
 				float texHeightRatio = 1.0f / (float)texture.Height;
 				// We are initially flipped vertically so we need to flip the corners so that
 				//  the image is bottom side up to display correctly
-				texCoordTL = new Vector2(rect.X*texWidthRatio,(rect.Y+rect.Height) * texHeightRatio);
-				texCoordBR = new Vector2 ( (rect.X+rect.Width)*texWidthRatio, 
-					rect.Y*texHeightRatio );
+				texCoordTL.X = tempRect.X*texWidthRatio;
+				texCoordTL.Y = (tempRect.Y+tempRect.Height) * texHeightRatio;
+				
+				texCoordBR.X = (tempRect.X+tempRect.Width)*texWidthRatio;
+				texCoordBR.Y = tempRect.Y*texHeightRatio;
 				
 			}
 			else {
-				texCoordTL = texture.Image.GetTextureCoord ( rect.X, rect.Y );
-				texCoordBR = texture.Image.GetTextureCoord ( rect.X+rect.Width, rect.Y+rect.Height );
+				texCoordTL.X = texture.Image.GetTextureCoordX( tempRect.X );
+				texCoordTL.Y = texture.Image.GetTextureCoordY( tempRect.Y );
+				texCoordBR.X = texture.Image.GetTextureCoordX( tempRect.X+tempRect.Width );
+				texCoordBR.Y = texture.Image.GetTextureCoordY( tempRect.Y+tempRect.Height );
 			}
+			
 			if ( effect == SpriteEffects.FlipVertically )
 			{
 				float temp = texCoordBR.Y;
@@ -407,32 +446,38 @@ namespace Microsoft.Xna.Framework.Graphics
 			item.Depth = 0.0f;
 			item.TextureID = (int) texture.ID;
 			
-			Rectangle rect;
 			if ( sourceRectangle.HasValue)
-				rect = sourceRectangle.Value;
+			{
+				tempRect = sourceRectangle.Value;
+			}
 			else
-				rect = new Rectangle( 0, 0, texture.Width, texture.Height );
-
-			Vector2 texCoordTL;// = texture.Image.GetTextureCoord ( rect.X, rect.Y );
-			Vector2 texCoordBR;// = texture.Image.GetTextureCoord ( rect.X+rect.Width, rect.Y+rect.Height );
-
+			{
+				tempRect.X = 0;
+				tempRect.Y = 0;
+				tempRect.Width = texture.Width;
+				tempRect.Height = texture.Height;				
+			}
 			
 			if (texture.Image == null) {
 				float texWidthRatio = 1.0f / (float)texture.Width;
 				float texHeightRatio = 1.0f / (float)texture.Height;
 				// We are initially flipped vertically so we need to flip the corners so that
 				//  the image is bottom side up to display correctly
-				texCoordTL = new Vector2(rect.X*texWidthRatio,(rect.Y+rect.Height) * texHeightRatio);
-				texCoordBR = new Vector2 ( (rect.X+rect.Width)*texWidthRatio, 
-					rect.Y*texHeightRatio );
+				texCoordTL.X = tempRect.X*texWidthRatio;
+				texCoordTL.Y = (tempRect.Y+tempRect.Height) * texHeightRatio;
+				
+				texCoordBR.X = (tempRect.X+tempRect.Width)*texWidthRatio;
+				texCoordBR.Y = tempRect.Y*texHeightRatio;
 				
 			}
 			else {
-				texCoordTL = texture.Image.GetTextureCoord ( rect.X, rect.Y );
-				texCoordBR = texture.Image.GetTextureCoord ( rect.X+rect.Width, rect.Y+rect.Height );
+				texCoordTL.X = texture.Image.GetTextureCoordX( tempRect.X );
+				texCoordTL.Y = texture.Image.GetTextureCoordY( tempRect.Y );
+				texCoordBR.X = texture.Image.GetTextureCoordX( tempRect.X+tempRect.Width );
+				texCoordBR.Y = texture.Image.GetTextureCoordY( tempRect.Y+tempRect.Height );
 			}
 			
-			item.Set ( position.X, position.Y, rect.Width, rect.Height, color, texCoordTL, texCoordBR );
+			item.Set ( position.X, position.Y, tempRect.Width, tempRect.Height, color, texCoordTL, texCoordBR );
 		}
 		
 		public void Draw(Texture2D texture, Rectangle destinationRectangle, Rectangle? sourceRectangle, Color color)
@@ -447,29 +492,35 @@ namespace Microsoft.Xna.Framework.Graphics
 			item.Depth = 0.0f;
 			item.TextureID = (int) texture.ID;
 			
-			Rectangle rect;
 			if ( sourceRectangle.HasValue)
-				rect = sourceRectangle.Value;
+			{
+				tempRect = sourceRectangle.Value;
+			}
 			else
-				rect = new Rectangle( 0, 0, texture.Width, texture.Height );
-
-			Vector2 texCoordTL;// = texture.Image.GetTextureCoord ( rect.X, rect.Y );
-			Vector2 texCoordBR;// = texture.Image.GetTextureCoord ( rect.X+rect.Width, rect.Y+rect.Height );
-
+			{
+				tempRect.X = 0;
+				tempRect.Y = 0;
+				tempRect.Width = texture.Width;
+				tempRect.Height = texture.Height;				
+			}
 			
 			if (texture.Image == null) {
 				float texWidthRatio = 1.0f / (float)texture.Width;
 				float texHeightRatio = 1.0f / (float)texture.Height;
 				// We are initially flipped vertically so we need to flip the corners so that
 				//  the image is bottom side up to display correctly
-				texCoordTL = new Vector2(rect.X*texWidthRatio,(rect.Y+rect.Height) * texHeightRatio);
-				texCoordBR = new Vector2 ( (rect.X+rect.Width)*texWidthRatio, 
-					rect.Y*texHeightRatio );
+				texCoordTL.X = tempRect.X*texWidthRatio;
+				texCoordTL.Y = (tempRect.Y+tempRect.Height) * texHeightRatio;
+				
+				texCoordBR.X = (tempRect.X+tempRect.Width)*texWidthRatio;
+				texCoordBR.Y = tempRect.Y*texHeightRatio;
 				
 			}
 			else {
-				texCoordTL = texture.Image.GetTextureCoord ( rect.X, rect.Y );
-				texCoordBR = texture.Image.GetTextureCoord ( rect.X+rect.Width, rect.Y+rect.Height );
+				texCoordTL.X = texture.Image.GetTextureCoordX( tempRect.X );
+				texCoordTL.Y = texture.Image.GetTextureCoordY( tempRect.Y );
+				texCoordBR.X = texture.Image.GetTextureCoordX( tempRect.X+tempRect.Width );
+				texCoordBR.Y = texture.Image.GetTextureCoordY( tempRect.Y+tempRect.Height );
 			}
 			
 			item.Set 
@@ -500,33 +551,36 @@ namespace Microsoft.Xna.Framework.Graphics
 			item.Depth = 0;
 			item.TextureID = (int) texture.ID;
 			
-			Rectangle rect = new Rectangle( 0, 0, texture.Width, texture.Height );
-
-			Vector2 texCoordTL;// = texture.Image.GetTextureCoord ( rect.X, rect.Y );
-			Vector2 texCoordBR;// = texture.Image.GetTextureCoord ( rect.X+rect.Width, rect.Y+rect.Height );
-
+			tempRect.X = 0;
+			tempRect.Y = 0;
+			tempRect.Width = texture.Width;
+			tempRect.Height = texture.Height;
 			
 			if (texture.Image == null) {
 				float texWidthRatio = 1.0f / (float)texture.Width;
 				float texHeightRatio = 1.0f / (float)texture.Height;
 				// We are initially flipped vertically so we need to flip the corners so that
 				//  the image is bottom side up to display correctly
-				texCoordTL = new Vector2(rect.X*texWidthRatio,(rect.Y+rect.Height) * texHeightRatio);
-				texCoordBR = new Vector2 ( (rect.X+rect.Width)*texWidthRatio, 
-					rect.Y*texHeightRatio );
+				texCoordTL.X = tempRect.X*texWidthRatio;
+				texCoordTL.Y = (tempRect.Y+tempRect.Height) * texHeightRatio;
+				
+				texCoordBR.X = (tempRect.X+tempRect.Width)*texWidthRatio;
+				texCoordBR.Y = tempRect.Y*texHeightRatio;
 				
 			}
 			else {
-				texCoordTL = texture.Image.GetTextureCoord ( rect.X, rect.Y );
-				texCoordBR = texture.Image.GetTextureCoord ( rect.X+rect.Width, rect.Y+rect.Height );
+				texCoordTL.X = texture.Image.GetTextureCoordX( tempRect.X );
+				texCoordTL.Y = texture.Image.GetTextureCoordY( tempRect.Y );
+				texCoordBR.X = texture.Image.GetTextureCoordX( tempRect.X+tempRect.Width );
+				texCoordBR.Y = texture.Image.GetTextureCoordY( tempRect.Y+tempRect.Height );
 			}
 			
 			item.Set 
 				(
 				 position.X,
 			     position.Y,
-				 rect.Width,
-				 rect.Height,
+				 tempRect.Width,
+				 tempRect.Height,
 				 color,
 				 texCoordTL,
 				 texCoordBR
@@ -545,8 +599,29 @@ namespace Microsoft.Xna.Framework.Graphics
 			item.Depth = 0;
 			item.TextureID = (int) texture.ID;
 			
-			Vector2 texCoordTL = texture.Image.GetTextureCoord ( 0, 0 );
-			Vector2 texCoordBR = texture.Image.GetTextureCoord ( texture.Image.ImageWidth, texture.Image.ImageHeight );
+			tempRect.X = 0;
+			tempRect.Y = 0;
+			tempRect.Width = texture.Width;
+			tempRect.Height = texture.Height;			
+			
+			if (texture.Image == null) {
+				float texWidthRatio = 1.0f / (float)texture.Width;
+				float texHeightRatio = 1.0f / (float)texture.Height;
+				// We are initially flipped vertically so we need to flip the corners so that
+				//  the image is bottom side up to display correctly
+				texCoordTL.X = tempRect.X*texWidthRatio;
+				texCoordTL.Y = (tempRect.Y+tempRect.Height) * texHeightRatio;
+				
+				texCoordBR.X = (tempRect.X+tempRect.Width)*texWidthRatio;
+				texCoordBR.Y = tempRect.Y*texHeightRatio;
+				
+			}
+			else {
+				texCoordTL.X = texture.Image.GetTextureCoordX( tempRect.X );
+				texCoordTL.Y = texture.Image.GetTextureCoordY( tempRect.Y );
+				texCoordBR.X = texture.Image.GetTextureCoordX( tempRect.X+tempRect.Width );
+				texCoordBR.Y = texture.Image.GetTextureCoordY( tempRect.Y+tempRect.Height );
+			}
 			
 			item.Set
 				(
@@ -587,8 +662,10 @@ namespace Microsoft.Xna.Framework.Graphics
 				item.Depth = 0.0f;
 				item.TextureID = (int) spriteFont._texture.ID;
 
-				Vector2 texCoordTL = spriteFont._texture.Image.GetTextureCoord ( g.Glyph.X, g.Glyph.Y );
-				Vector2 texCoordBR = spriteFont._texture.Image.GetTextureCoord ( g.Glyph.X+g.Glyph.Width, g.Glyph.Y+g.Glyph.Height );
+				texCoordTL.X = spriteFont._texture.Image.GetTextureCoordX( g.Glyph.X );
+				texCoordTL.Y = spriteFont._texture.Image.GetTextureCoordY( g.Glyph.Y );
+				texCoordBR.X = spriteFont._texture.Image.GetTextureCoordX( g.Glyph.X+g.Glyph.Width );
+				texCoordBR.Y = spriteFont._texture.Image.GetTextureCoordY( g.Glyph.Y+g.Glyph.Height );
 
 				item.Set
 					(
@@ -645,8 +722,10 @@ namespace Microsoft.Xna.Framework.Graphics
 				item.Depth = depth;
 				item.TextureID = (int) spriteFont._texture.ID;
 
-				Vector2 texCoordTL = spriteFont._texture.Image.GetTextureCoord ( g.Glyph.X, g.Glyph.Y );
-				Vector2 texCoordBR = spriteFont._texture.Image.GetTextureCoord ( g.Glyph.X+g.Glyph.Width, g.Glyph.Y+g.Glyph.Height );
+				texCoordTL.X = spriteFont._texture.Image.GetTextureCoordX( g.Glyph.X );
+				texCoordTL.Y = spriteFont._texture.Image.GetTextureCoordY( g.Glyph.Y );
+				texCoordBR.X = spriteFont._texture.Image.GetTextureCoordX( g.Glyph.X+g.Glyph.Width );
+				texCoordBR.Y = spriteFont._texture.Image.GetTextureCoordY( g.Glyph.Y+g.Glyph.Height );
 				
 				if ( effects == SpriteEffects.FlipVertically )
 				{
@@ -720,8 +799,10 @@ namespace Microsoft.Xna.Framework.Graphics
 				item.Depth = depth;
 				item.TextureID = (int) spriteFont._texture.ID;
 
-				Vector2 texCoordTL = spriteFont._texture.Image.GetTextureCoord ( g.Glyph.X, g.Glyph.Y );
-				Vector2 texCoordBR = spriteFont._texture.Image.GetTextureCoord ( g.Glyph.X+g.Glyph.Width, g.Glyph.Y+g.Glyph.Height );
+				texCoordTL.X = spriteFont._texture.Image.GetTextureCoordX( g.Glyph.X );
+				texCoordTL.Y = spriteFont._texture.Image.GetTextureCoordY( g.Glyph.Y );
+				texCoordBR.X = spriteFont._texture.Image.GetTextureCoordX( g.Glyph.X+g.Glyph.Width );
+				texCoordBR.Y = spriteFont._texture.Image.GetTextureCoordY( g.Glyph.Y+g.Glyph.Height );
 				
 				if ( effects == SpriteEffects.FlipVertically )
 				{
