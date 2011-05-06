@@ -48,8 +48,8 @@ namespace Microsoft.Xna.Framework.Input
 	{
 		private static AccelerometerState _state;
 		private static AccelerometerCapabilities _capabilities = new AccelerometerCapabilities();
-		
 		private const int AccelerometerFrequency = 30;
+		private static Vector3 _accelerometerVector = new Vector3(0, 0, 0);
 		
 		public static void SetupAccelerometer()
 		{
@@ -59,7 +59,10 @@ namespace Microsoft.Xna.Framework.Input
 
 		static void UIAccelerometerSharedAccelerometerAcceleration (object sender, UIAccelerometerEventArgs e)
 		{
-			_state.Acceleration = new Vector3((float)e.Acceleration.X*2,(float)e.Acceleration.Y*2, (float)e.Acceleration.Z*2);				
+			_accelerometerVector.X = (float)(e.Acceleration.X * 2);
+			_accelerometerVector.Y = (float)(e.Acceleration.Y * 2);
+			_accelerometerVector.Z = (float)(e.Acceleration.Z * 2);
+			_state.Acceleration = _accelerometerVector;				
 		}
 
 		public static AccelerometerCapabilities GetCapabilities()
