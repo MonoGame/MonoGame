@@ -51,18 +51,26 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public class Texture2D : Texture
     {
-		private ESImage texture;
-		private string name;
-		
-		internal bool IsSpriteFontTexture {get;set;}
+        private ESImage texture;
+
+        protected int textureId = -1;
+        protected int _width;
+        protected int _height;
+        private bool _mipmap;
+        private Rectangle _bounds = new Rectangle(0, 0, 0, 0);
+
+        internal bool IsSpriteFontTexture { get; set; }
 		
 		// my change
 		// --------
 		public uint ID
 		{
 			get
-			{ 
-				return texture.Name;
+			{
+                if (texture == null)
+                    return (uint)textureId;
+                else
+                    return texture.Name;
 			}
 		}
 		// --------
@@ -74,27 +82,63 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 		
-        public Rectangle SourceRect
+        public Rectangle Bounds
         {
             get
             {
-                return new Rectangle(0,0,texture.ImageWidth, texture.ImageHeight);
+                _bounds.Width = _width;
+                _bounds.Height = _height;
+                return _bounds;
             }
         }
 		
 		internal Texture2D(ESImage theImage)
 		{
 			texture = theImage;
+            _width = texture.ImageWidth;
+            _height = texture.ImageHeight;
+            _format = texture.Format;
 		}
-		
-        public Texture2D(GraphicsDevice graphicsDevice, int width, int height, int numberLevels, TextureUsage usage, SurfaceFormat format)
+
+        public Texture2D(GraphicsDevice graphicsDevice, int width, int height) :
+            this(graphicsDevice, width, height, false, SurfaceFormat.Color)
         {
-			throw new NotImplementedException();
+
         }
 
-        public Texture2D(Texture2D source, Color color)
+        public Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipMap, SurfaceFormat format)
         {
-            throw new NotImplementedException();
+            this.graphicsDevice = graphicsDevice;
+            this._width = width;
+            this._height = height;
+            this._format = format;
+            this._mipmap = mipMap;
+
+            generateOpenGLTexture();
+        }
+
+        private void generateOpenGLTexture()
+        {
+            // modeled after this
+            // http://steinsoft.net/index.php?site=Programming/Code%20Snippets/OpenGL/no9
+
+            GL.GenTextures(1, out textureId);
+            GL.BindTexture(TextureTarget.Texture2D, textureId);
+
+            if (_mipmap)
+            {
+                // Taken from http://www.flexicoder.com/blog/index.php/2009/11/iphone-mipmaps/
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)All.LinearMipmapNearest);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)All.Linear);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.GenerateMipmap, (int)All.True);
+            }
+            else
+            {
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)All.Linear);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)All.Linear);
+            }
+            GL.BindTexture(TextureTarget.Texture2D, 0);
+
         }
 
         public Color GetPixel(int x, int y)
@@ -133,7 +177,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             get
             {
-                return texture.ImageWidth;
+                return _width;
             }
         }
 
@@ -141,43 +185,9 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             get
             {
-                return texture.ImageHeight;
+                return _height;
             }
-        }
-
-        public SurfaceFormat Format
-        {
-            get 
-			{ 
-				return texture.Format;
-			}
-        }
-
-        public TextureUsage TextureUsage
-        {
-            get 
-			{ 
-				throw new NotImplementedException();
-			}
-        }
-
-        public Object Tag
-        {
-            get { return null; }
-            set { throw new NotImplementedException(); }
-		}
-
-        public string Name
-        {
-            get 
-			{ 
-				return name;
-			}
-			set 
-			{
-				name = value;
-			}
-        }
+        }        
 
         public static Texture2D FromFile(GraphicsDevice graphicsDevice, Stream textureStream)
         {
