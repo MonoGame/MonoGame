@@ -59,7 +59,6 @@ namespace Microsoft.Xna.Framework.Graphics
 		private int _width,_height;
 		private SurfaceFormat _format;
 		private float _maxS,_maxT;
-		private IntPtr _pixelData;
 		
 		public ESTexture2D (IntPtr data, SurfaceFormat pixelFormat, int width, int height, Size size, All filter)
 		{
@@ -268,11 +267,21 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             byte [] b = GetBits (width, length, height, rdr);
 			
+			IntPtr pointer = IntPtr.Zero;
+			ESTexture2D result = null;
+			
 			// Copy bits
-			IntPtr pointer = Marshal.AllocHGlobal(length);
-			Marshal.Copy (b, 0, pointer, length);
-            ESTexture2D result = new ESTexture2D(pointer,SurfaceFormat.Dxt3,width,height,new Size(width,height),All.Linear);
-			Marshal.FreeHGlobal(pointer);
+			try 
+			{
+				pointer = Marshal.AllocHGlobal(length);
+				Marshal.Copy (b, 0, pointer, length);
+	            result = new ESTexture2D(pointer,SurfaceFormat.Dxt3,width,height,new Size(width,height),All.Linear);
+			}
+			finally 
+			{		
+				Marshal.FreeHGlobal(pointer);
+			}
+			
 			return result;
         }
 
@@ -350,8 +359,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			_format = pixelFormat;
 			_maxS = size.Width / (float)width;
 			_maxT = size.Height / (float)height;
-						
-			_pixelData = data;
 		}
 		
 		public void DrawAtPoint(Vector2 point)
@@ -435,14 +442,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			{
 				return _maxT;
 			}
-		}
-		
-		public IntPtr PixelData 
-		{
-			get 
-			{
-				return _pixelData;
-			}
-		}
+		}		
 	}
 }
