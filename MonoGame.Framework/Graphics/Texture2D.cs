@@ -62,6 +62,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		protected int _width;
 		protected int _height;
 		private bool _mipmap;
+		private Rectangle _bounds = new Rectangle(0, 0, 0, 0);
 		
 		internal bool IsSpriteFontTexture {get;set;}
 		
@@ -87,11 +88,13 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 		
-        public Rectangle SourceRect
+        public Rectangle Bounds
         {
             get
             {
-                return new Rectangle(0,0,texture.ImageWidth, texture.ImageHeight);
+				_bounds.Width = _width;
+				_bounds.Height = _height;
+                return _bounds;
             }
         }
 		
@@ -128,8 +131,18 @@ namespace Microsoft.Xna.Framework.Graphics
 			GL.GenTextures(1,ref textureId);
 			GL.BindTexture(All.Texture2D, textureId);
 			
-			GL.TexParameter(All.Texture2D, All.TextureMinFilter, (int)All.Linear);
-			GL.TexParameter(All.Texture2D, All.TextureMagFilter, (int)All.Linear);
+			if (_mipmap)
+			{
+				// Taken from http://www.flexicoder.com/blog/index.php/2009/11/iphone-mipmaps/
+				GL.TexParameter(All.Texture2D, All.TextureMinFilter, (int)All.LinearMipmapNearest);
+				GL.TexParameter(All.Texture2D, All.TextureMagFilter, (int)All.Linear);
+				GL.TexParameter(All.Texture2D, All.GenerateMipmap, (int)All.True);
+			}
+			else
+			{
+				GL.TexParameter(All.Texture2D, All.TextureMinFilter, (int)All.Linear);
+				GL.TexParameter(All.Texture2D, All.TextureMagFilter, (int)All.Linear);
+			}
 			
 			GL.BindTexture(All.Texture2D, 0);
 			
@@ -156,7 +169,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				case SurfaceFormat.Dxt3 :
 				    sz = 4;
 					pos = ( (y * Width) + x ) * sz;
-					pixelOffset = new IntPtr(texture.PixelData.ToInt64() + pos);
+					//  TODO pixelOffset = new IntPtr(texture.PixelData.ToInt64() + pos);
 					Marshal.Copy(pixelOffset, pixel, 0, 4);	
 					result.R = pixel[0];
 					result.G = pixel[1];
@@ -166,7 +179,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				case SurfaceFormat.Bgra4444 /*kTexture2DPixelFormat_RGBA4444*/:
 					sz = 2;
 					pos = ( (y * Width) + x ) * sz;
-					pixelOffset = new IntPtr(texture.PixelData.ToInt64() + pos);					
+					// TODO pixelOffset = new IntPtr(texture.PixelData.ToInt64() + pos);					
 					Marshal.Copy(pixelOffset, pixel, 0, 4);	
 				
 					result.R = pixel[0];
@@ -177,7 +190,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				case SurfaceFormat.Bgra5551 /*kTexture2DPixelFormat_RGB5A1*/:
 					sz = 2;
 					pos = ( (y * Width) + x ) * sz;
-					pixelOffset = new IntPtr(texture.PixelData.ToInt64() + pos);					
+					// TODO pixelOffset = new IntPtr(texture.PixelData.ToInt64() + pos);					
 					Marshal.Copy(pixelOffset, pixel, 0, 4);	
 				
 					result.R = pixel[0];
@@ -188,7 +201,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				case SurfaceFormat.Alpha8 /*kTexture2DPixelFormat_A8*/:
 					sz = 1;
 					pos = ( (y * Width) + x ) * sz;
-					pixelOffset = new IntPtr(texture.PixelData.ToInt64() + pos);
+					// TODO pixelOffset = new IntPtr(texture.PixelData.ToInt64() + pos);
 					Marshal.Copy(pixelOffset, pixel, 0, 1);	
 				
 					result.A = pixel[0];
