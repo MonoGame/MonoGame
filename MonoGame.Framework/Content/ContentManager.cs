@@ -149,25 +149,25 @@ namespace Microsoft.Xna.Framework.Content
 			if(Path.GetExtension(assetName).ToUpper() == ".XNB")
 			{
 				// Load a XNB file
-				FileStream stream = new FileStream(assetName, FileMode.Open, FileAccess.Read, FileShare.Read);
-		
-				ContentReader reader = new ContentReader(this,stream,this.graphicsDeviceService.GraphicsDevice);
-				ContentTypeReaderManager typeManager = new ContentTypeReaderManager(reader);
-				reader.TypeReaders = typeManager.LoadAssetReaders(reader);
-	            foreach (ContentTypeReader r in reader.TypeReaders)
-	            {
-	                r.Initialize(typeManager);
-	            }
-	            // we need to read a byte here for things to work out, not sure why
-	            reader.ReadByte();
-				
-				// Get the 1-based index of the typereader we should use to start decoding with
-          		int index = reader.ReadByte();
-				ContentTypeReader contentReader = reader.TypeReaders[index - 1];
-           		result = reader.ReadObject<T>(contentReader);
-
-				reader.Close();
-				stream.Close();
+				using ( FileStream stream = new FileStream(assetName, FileMode.Open, FileAccess.Read, FileShare.Read) )
+				{
+					using ( ContentReader reader = new ContentReader(this,stream,this.graphicsDeviceService.GraphicsDevice) )
+					{
+						ContentTypeReaderManager typeManager = new ContentTypeReaderManager(reader);
+						reader.TypeReaders = typeManager.LoadAssetReaders(reader);
+			            foreach (ContentTypeReader r in reader.TypeReaders)
+			            {
+			                r.Initialize(typeManager);
+			            }
+			            // we need to read a byte here for things to work out, not sure why
+			            reader.ReadByte();
+						
+						// Get the 1-based index of the typereader we should use to start decoding with
+		          		int index = reader.ReadByte();
+						ContentTypeReader contentReader = reader.TypeReaders[index - 1];
+		           		result = reader.ReadObject<T>(contentReader);
+					}
+				}
 			}
 			else
 			{
