@@ -43,95 +43,42 @@ using System;
 using OpenTK.Graphics.OpenGL;
 namespace Microsoft.Xna.Framework.Graphics
 {
-	public class RenderTarget2D : RenderTarget
+    public class RenderTarget2D : Texture2D
 	{
-		private Texture2D texture = null;
-		private uint textureFrameBuffer;
-		
-		public RenderTarget2D (
-         GraphicsDevice graphicsDevice,
-         int width,
-         int height,
-         int numberLevels,
-         SurfaceFormat format
-		                       )
-		{
-			// throw new NotImplementedException();
-			
-			texture = new Texture2D( graphicsDevice, width, height, numberLevels, TextureUsage.None, format );
+        public RenderTarget2D(GraphicsDevice graphicsDevice, int width, int height)
+            : this(graphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.Unknown)
+        { }
 
-			// create framebuffer
-			/*GL.GenBuffers(1, ref textureFrameBuffer);
-			GL.BindBuffer(All.Framebuffer, textureFrameBuffer);
-			
-			// attach renderbuffer
-			GL.FramebufferTexture2D(All.Framebuffer, All.ColorAttachment0, All.Texture2D, textureFrameBuffer, 0);
-			
-			// attach depth buffer
-			uint depthRenderbuffer;
-			GL.GenRenderbuffers(1, ref depthRenderbuffer);
-			GL.BindRenderbuffer(All.Renderbuffer, depthRenderbuffer);
-			GL.RenderbufferStorage(All.Renderbuffer, All.DepthComponent16, width, height);
-			GL.FramebufferRenderbuffer(All.Framebuffer, All.DepthAttachment, All.Renderbuffer, depthRenderbuffer);
-			
-			// unbind frame buffer
-			GL.BindBuffer(All.Framebuffer, 0);*/
+        public RenderTarget2D(GraphicsDevice graphicsDevice, int width, int height, bool mipMap,
+            SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat)
+            : this(graphicsDevice, width, height, mipMap, preferredFormat,
+                DepthFormat.Unknown, 0, RenderTargetUsage.PreserveContents)
+        { }
 
-		}
-		
-		public RenderTarget2D (
-         GraphicsDevice graphicsDevice,
-         int width,
-         int height,
-         int numberLevels,
-         SurfaceFormat format,
-         MultiSampleType multiSampleType,
-         int multiSampleQuality
-		                       )
-		{
-			throw new NotImplementedException();
-		}
-		
-		public RenderTarget2D (
-         GraphicsDevice graphicsDevice,
-         int width,
-         int height,
-         int numberLevels,
-         SurfaceFormat format,
-         MultiSampleType multiSampleType,
-         int multiSampleQuality,
-         RenderTargetUsage usage )
-		{
-			throw new NotImplementedException();
-		}
-		
-		public RenderTarget2D (
-         GraphicsDevice graphicsDevice,
-         int width,
-         int height,
-         int numberLevels,
-         SurfaceFormat format,
-         RenderTargetUsage usage
-		                       )
-		{
-			throw new NotImplementedException();
-		}
-		
-		public Texture2D GetTexture()
-		{
-			return texture;
-		}
-		
-		public int Width 
-		{ 
-			get; 
-			set; 
-		}
-		
-		public int Height 
-		{ 
-			get; 
-			set; 
-		}
+        public RenderTarget2D(GraphicsDevice graphicsDevice, int width, int height, bool mipMap,
+            SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage)
+            : base(graphicsDevice, width, height, mipMap, preferredFormat)
+        {
+            allocateOpenGLTexture();
+        }
+
+        private void allocateOpenGLTexture()
+        {
+            // modeled after this
+            // http://steinsoft.net/index.php?site=Programming/Code%20Snippets/OpenGL/no9
+
+            // Allocate the space needed for the texture
+            GL.BindTexture(TextureTarget.Texture2D, this.textureId);
+
+            // it seems like we do not need to allocate any buffer space
+            //byte[] data = new byte[_width * _height * 4];
+            // Use offset instead of pointer to indictate that we want to use data copied from a PBO 
+            //GL.TexImage2D (TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, _width, _height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, data);
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, _width, _height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, IntPtr.Zero);
+
+            GL.BindTexture(TextureTarget.Texture2D, 0);
+            //data = null;
+
+        }
 	}
 }
