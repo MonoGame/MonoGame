@@ -133,9 +133,18 @@ namespace Microsoft.Xna.Framework.Graphics
 			GL.GenTextures(1,out textureId);
 			GL.BindTexture(TextureTarget.Texture2D, textureId);
 			
-			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)All.Linear);
-			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)All.Linear);
-			
+			if (_mipmap)
+			{
+				// Taken from http://www.flexicoder.com/blog/index.php/2009/11/iphone-mipmaps/
+				GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)All.LinearMipmapNearest);
+				GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)All.Linear);
+				GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.GenerateMipmap, (int)All.True);
+			}
+			else
+			{
+				GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)All.Linear);
+				GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)All.Linear);
+			}
 			GL.BindTexture(TextureTarget.Texture2D, 0);
 			
 		}
