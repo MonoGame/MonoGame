@@ -57,6 +57,14 @@ namespace Microsoft.Xna.Framework
 			set;
         }
 		
+		/// <summary>
+		/// GC is required to allocate a memory buffer.
+		/// </summary> 
+		public override void ReceiveMemoryWarning(UIApplication application)
+		{
+			GC.Collect();
+		} 
+		
 		public override void DidEnterBackground (UIApplication application)
 		{
 			ourTask = application.BeginBackgroundTask(delegate
