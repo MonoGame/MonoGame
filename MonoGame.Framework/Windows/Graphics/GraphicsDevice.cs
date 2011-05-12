@@ -119,6 +119,8 @@ namespace Microsoft.Xna.Framework.Graphics
             _viewport.Y = 0;
             _viewport.Width = DisplayMode.Width;
             _viewport.Height = DisplayMode.Height;
+			_viewport.MinDepth = 0.0f;
+			_viewport.MaxDepth = 1.0f;
 
             // Init RenderState
             _renderState = new RenderState();
