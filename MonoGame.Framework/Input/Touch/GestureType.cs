@@ -47,15 +47,17 @@ namespace Microsoft.Xna.Framework.Input.Touch
     {
         Tap = 1,
 		DragComplete = 2,		        
-        Flick = 3,
-        FreeDrag = 4,
-        Hold = 5,
-        HorizontalDrag = 6,
+        Flick = 4,
+        FreeDrag = 8,
+        Hold = 16,
+        HorizontalDrag = 32,
         None = 0,
-        Pinch = 7,
-        PinchComplete = 8,
-        DoubleTap = 9,
-        VerticalDrag = 10
+        Pinch = 64,
+        PinchComplete = 128,
+        DoubleTap = 256,
+        VerticalDrag = 512,
+		
+		Rotation = 1024,
     }
 }
 
