@@ -101,11 +101,18 @@ namespace Microsoft.Xna.Framework.Input.Touch
             {
             }
         }
-
+		
+		private static GestureType _enabledGestures = GestureType.None;
         public static GestureType EnabledGestures
         {
-            get;
-            set;
+            get
+			{ 
+				return _enabledGestures;
+			}
+            set
+			{
+				_enabledGestures = value;
+			}
         }
 
         public static bool IsGestureAvailable

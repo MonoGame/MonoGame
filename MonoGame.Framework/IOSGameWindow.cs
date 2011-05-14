@@ -73,6 +73,7 @@ namespace Microsoft.Xna.Framework
 		private DateTime _now;
 		
 		UITapGestureRecognizer recognizerTap;
+		UITapGestureRecognizer recognizerDoubleTap;
 		UIPinchGestureRecognizer recognizerPinch; 
 		UISwipeGestureRecognizer recognizerSwipe;
 		UILongPressGestureRecognizer recognizerLongPress;
@@ -95,10 +96,7 @@ namespace Microsoft.Xna.Framework
 			clientBounds = new Rectangle(0,0,(int) (rect.Width * UIScreen.MainScreen.Scale),(int) (rect.Height * UIScreen.MainScreen.Scale));
 			
 			// Enable multi-touch
-			MultipleTouchEnabled = true;
-			
-			// TODO SetUpGestureRecognizers();
-			
+			MultipleTouchEnabled = true;	
 						
 			// Initialize GameTime
             _updateGameTime = new GameTime();
@@ -106,29 +104,7 @@ namespace Microsoft.Xna.Framework
 			
 			// Initialize _lastUpdate
 			_lastUpdate = DateTime.Now;
-		}
-
-		public void SetUpGestureRecognizers ()
-		{
-			recognizerTap = new UITapGestureRecognizer(this, new Selector ("TapGestureRecognizer"));		
-			AddGestureRecognizer(recognizerTap);
-			
-			recognizerSwipe = new UISwipeGestureRecognizer(this, new Selector ("SwipeGestureRecognizer"));		
-			AddGestureRecognizer(recognizerSwipe);
-			
-			recognizerPinch = new UIPinchGestureRecognizer(this, new Selector ("PinchGestureRecognizer"));		
-			AddGestureRecognizer(recognizerPinch);
-			
-			recognizerLongPress = new UILongPressGestureRecognizer(this, new Selector ("LongPressGestureRecognizer"));		
-			recognizerLongPress.MinimumPressDuration = 1.0;
-			AddGestureRecognizer(recognizerLongPress);
-			
-			recognizerPan = new UIPanGestureRecognizer(this, new Selector ("PanGestureRecognizer"));		
-			AddGestureRecognizer(recognizerPan);
-			
-			recognizerRotation = new UIRotationGestureRecognizer(this, new Selector ("RotationGestureRecognizer"));		
-			AddGestureRecognizer(recognizerRotation);
-		}
+		}	
 		
 		~GameWindow()
 		{
@@ -181,6 +157,57 @@ namespace Microsoft.Xna.Framework
 		protected override void OnLoad (EventArgs e)
 		{
 			base.OnLoad(e);
+			
+			var enabledGestures = TouchPanel.EnabledGestures;
+			if ( enabledGestures != GestureType.None )
+			{
+				if ((enabledGestures & GestureType.Hold) != 0)
+				{
+					recognizerLongPress = new UILongPressGestureRecognizer(this, new Selector ("LongPressGestureRecognizer"));		
+					recognizerLongPress.MinimumPressDuration = 1.0;
+					AddGestureRecognizer(recognizerLongPress);
+				}
+				
+				if ((enabledGestures & GestureType.Tap) != 0)
+				{
+					recognizerTap = new UITapGestureRecognizer(this, new Selector ("TapGestureRecognizer"));
+					recognizerTap.NumberOfTapsRequired = 1;
+					AddGestureRecognizer(recognizerTap);
+				}
+				
+				if ((enabledGestures & GestureType.DoubleTap) != 0)
+				{
+					recognizerDoubleTap = new UITapGestureRecognizer(this, new Selector ("TapGestureRecognizer"));
+					recognizerDoubleTap.NumberOfTapsRequired = 2;
+					AddGestureRecognizer(recognizerDoubleTap);
+				}
+			
+				if ((enabledGestures & GestureType.FreeDrag) != 0)
+				{
+					recognizerPan = new UIPanGestureRecognizer(this, new Selector ("PanGestureRecognizer"));					
+					AddGestureRecognizer(recognizerPan);
+				}
+				
+				if ((enabledGestures & GestureType.Flick) != 0)
+				{			
+					recognizerSwipe = new UISwipeGestureRecognizer(this, new Selector ("SwipeGestureRecognizer"));		
+					AddGestureRecognizer(recognizerSwipe);
+				}
+			
+				if ((enabledGestures & GestureType.Pinch) != 0)
+				{
+					recognizerPinch = new UIPinchGestureRecognizer(this, new Selector ("PinchGestureRecognizer"));		
+					AddGestureRecognizer(recognizerPinch);
+				}
+				
+				if ((enabledGestures & GestureType.Rotation) != 0)
+				{
+					recognizerRotation = new UIRotationGestureRecognizer(this, new Selector ("RotationGestureRecognizer"));		
+					AddGestureRecognizer(recognizerRotation);
+				}	
+				
+				
+			}
 		}
 		
 		protected override void OnRenderFrame(FrameEventArgs e)
@@ -279,11 +306,11 @@ namespace Microsoft.Xna.Framework
 		[Export("RotationGestureRecognizer")]
 		public void RotationGestureRecognizer (UIRotationGestureRecognizer sender)
 		{
-			/* TODO var enabledGestures = TouchPanel.EnabledGestures;
-			if ((enabledGestures & GestureType.None) != 0)
+			var enabledGestures = TouchPanel.EnabledGestures;
+			if ((enabledGestures & GestureType.Rotation) != 0)
 			{
-				TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.None, new TimeSpan(_now.Ticks), new Vector2 (sender.LocationInView (sender.View)), new Vector2 (sender.LocationInView (sender.View)), new Vector2(0,0), new Vector2(0,0)));
-			} */
+				TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.Rotation, new TimeSpan(_now.Ticks), new Vector2 (sender.LocationInView (sender.View)), new Vector2 (sender.LocationInView (sender.View)), new Vector2(0,0), new Vector2(0,0)));
+			}
 		}
 		
 		[Export("SwipeGestureRecognizer")]
@@ -308,55 +335,59 @@ namespace Microsoft.Xna.Framework
 		
 		private void FillTouchCollection(NSSet touches)
 		{
-			UITouch []touchesArray = touches.ToArray<UITouch>();
-			
-			for (int i=0; i < touchesArray.Length;i++)
+			var enabledGestures = TouchPanel.EnabledGestures;
+			if ( enabledGestures == GestureType.None )
 			{
+				UITouch []touchesArray = touches.ToArray<UITouch>();
 				
-				//Get IOS touch
-				UITouch touch = touchesArray[i];
-				
-				//Get position touch
-				Vector2 position = new Vector2 (touch.LocationInView (touch.View));
-				Vector2 translatedPosition = GetOffsetPosition(position);
-				
-				TouchLocation tlocation;
-				TouchCollection collection = TouchPanel.Collection;
-				int index;
-				switch (touch.Phase)
+				for (int i=0; i < touchesArray.Length;i++)
 				{
-					case UITouchPhase.Stationary:
-					case UITouchPhase.Moved:
-						index = collection.FindById(touch.Handle.ToInt32(), out tlocation);
-						if (index >= 0)
-					    {
-							tlocation.State = TouchLocationState.Moved;
-							tlocation.Position = translatedPosition;
-							collection[index] = tlocation;
-						}
-						break;
-					case UITouchPhase.Began	:	
-						tlocation = new TouchLocation(touch.Handle.ToInt32(), TouchLocationState.Pressed, translatedPosition);
-						collection.Add(tlocation);	
-						break;
-					case UITouchPhase.Ended	:
-						index = collection.FindById(touch.Handle.ToInt32(), out tlocation);
-						if (index >= 0)
-						{
-							tlocation.State = TouchLocationState.Released;							
-							collection[index] = tlocation;
-						}
-						break;
-					case UITouchPhase.Cancelled:
-						index = collection.FindById(touch.Handle.ToInt32(), out tlocation);
-						if (index >= 0)
-						{
-							tlocation.State = TouchLocationState.Invalid;
-							collection[index] = tlocation;
-						}
-						break;
-					default :
-						break;					
+					
+					//Get IOS touch
+					UITouch touch = touchesArray[i];
+					
+					//Get position touch
+					Vector2 position = new Vector2 (touch.LocationInView (touch.View));
+					Vector2 translatedPosition = GetOffsetPosition(position);
+					
+					TouchLocation tlocation;
+					TouchCollection collection = TouchPanel.Collection;
+					int index;
+					switch (touch.Phase)
+					{
+						case UITouchPhase.Stationary:
+						case UITouchPhase.Moved:
+							index = collection.FindById(touch.Handle.ToInt32(), out tlocation);
+							if (index >= 0)
+						    {
+								tlocation.State = TouchLocationState.Moved;
+								tlocation.Position = translatedPosition;
+								collection[index] = tlocation;
+							}
+							break;
+						case UITouchPhase.Began	:	
+							tlocation = new TouchLocation(touch.Handle.ToInt32(), TouchLocationState.Pressed, translatedPosition);
+							collection.Add(tlocation);	
+							break;
+						case UITouchPhase.Ended	:
+							index = collection.FindById(touch.Handle.ToInt32(), out tlocation);
+							if (index >= 0)
+							{
+								tlocation.State = TouchLocationState.Released;							
+								collection[index] = tlocation;
+							}
+							break;
+						case UITouchPhase.Cancelled:
+							index = collection.FindById(touch.Handle.ToInt32(), out tlocation);
+							if (index >= 0)
+							{
+								tlocation.State = TouchLocationState.Invalid;
+								collection[index] = tlocation;
+							}
+							break;
+						default :
+							break;					
+					}
 				}
 			}
 			
