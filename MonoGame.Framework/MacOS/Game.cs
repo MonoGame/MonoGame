@@ -529,9 +529,15 @@ namespace Microsoft.Xna.Framework
 
 		public void Exit ()
 		{
-			//TODO: Fix this
-			/* UIAlertView alert = new UIAlertView("Game Exit", "Hit Home Button to Exit",null,null,null);
-			alert.Show();*/		
+			using ( NSAlert alert = NSAlert.WithMessage("Game Exit", "Ok", "Cancel", null, "Are you sure you wish to exit?"))
+			{
+				var button = alert.RunModal();
+				
+				if ( button == 1 )
+				{
+					NSApplication.SharedApplication.Terminate(new NSObject());		
+				}
+			}
 		}
 
 		public GameComponentCollection Components {
