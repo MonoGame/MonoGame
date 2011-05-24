@@ -184,6 +184,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			GL.Enable(EnableCap.CullFace);
 			GL.FrontFace(FrontFaceDirection.Cw);
 			GL.Color4(1.0f, 1.0f, 1.0f, 1.0f);
+			//GL.Color4(1.0f, 1.0f, 1.0f, 0.5f);
 			
 			_batcher.DrawBatch ( _sortMode );
 		}
