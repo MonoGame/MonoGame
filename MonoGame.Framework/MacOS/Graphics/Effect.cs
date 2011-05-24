@@ -153,30 +153,98 @@ namespace Microsoft.Xna.Framework.Graphics
 			this.graphicsDevice = graphicsDevice;
 			Techniques = new EffectTechniqueCollection();
 		}
+		protected Effect(Effect cloneSource )
+		{
+
+		}
 		
+		public Effect (
+	GraphicsDevice graphicsDevice,
+	byte[] effectCode)
+		{
+
+			if (graphicsDevice == null) {
+				throw new ArgumentNullException ("Graphics Device Cannot Be Null");
+			}
+			this.graphicsDevice = graphicsDevice;
+
+			int fragmentblocklength = BitConverter.ToInt32 (effectCode, 0);
+
+			int vertexblocklength = BitConverter.ToInt32 (effectCode, fragmentblocklength + 4);
+
+			if (fragmentblocklength != 0) {
+				fragment_handle = GL.CreateShader (ShaderType.FragmentShader);
+				fragment = true;
+			}
+
+			if (vertexblocklength != 0) {
+				vertex_handle = GL.CreateShader (ShaderType.VertexShader);
+				vertex = true;
+			}
+
+			if (fragment) {
+				string[] fragmentstring = new string[1] { Encoding.UTF8.GetString(effectCode, 4, fragmentblocklength) };
+				//int[] fragmentLength = new int[1] { fragmentstring[0].Length };
+				int fragmentLength = fragmentstring [0].Length;
+				GL.ShaderSource (fragment_handle, 1, fragmentstring, ref fragmentLength);
+			}
+
+			if (vertex) {
+				string[] vertexstring = new string[1] { Encoding.UTF8.GetString(effectCode, fragmentblocklength + 8, vertexblocklength) };
+				// int[] vertexLength = new int[1] { vertexstring[0].Length };
+				int vertexLength = vertexstring [0].Length;
+				GL.ShaderSource (vertex_handle, 1, vertexstring, ref vertexLength);
+			}
+
+			int compiled = 0;
+
+			if (fragment) {
+				GL.CompileShader (fragment_handle);
+
+				GL.GetShader (fragment_handle, ShaderParameter.CompileStatus, out compiled);
+				if (compiled == (int)All.False) {
+					Console.Write ("Fragment Compilation Failed!");
+				}
+			}
+
+			if (vertex) {
+				GL.CompileShader (vertex_handle);
+				GL.GetShader (vertex_handle, ShaderParameter.CompileStatus, out compiled);
+				if (compiled == (int)All.False) {
+					Console.Write ("Vertex Compilation Failed!");
+				}
+			}
+
+		}
+
 		public void Begin()
 		{
 		}
-		
+
 		public void Begin(SaveStateMode saveStateMode)
 		{
-			
+
 		}
-		
+
 		public virtual Effect Clone(GraphicsDevice device)
 		{
 			Effect f = new Effect( graphicsDevice, this );
 			return f;
 		}
-		
+
+		public virtual Effect Clone()
+		{
+			return Clone( graphicsDevice);
+		}
+
 		public void Dispose()
 		{
 		}
-		
+
 		public void End()
 		{
 		}
-		
+
 		internal static string Normalize(string FileName)
 		{
 			if (File.Exists(FileName))
@@ -207,5 +275,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 		}
 
+		protected virtual void OnApply()
+		{
+			
+		}
 	}
 }
