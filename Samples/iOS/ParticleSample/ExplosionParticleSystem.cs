@@ -70,7 +70,7 @@ namespace ParticleSample
 
             // additive blending is very good at creating fiery effects.
             spriteBlendMode = BlendState.Additive;
-
+			
             DrawOrder = AdditiveDrawOrder;
         }
 

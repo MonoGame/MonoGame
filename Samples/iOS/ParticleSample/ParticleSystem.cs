@@ -367,7 +367,8 @@ namespace ParticleSample
                 // since we want the maximum alpha to be 1, not .25, we'll scale the 
                 // entire equation by 4.
                 float alpha = 4 * normalizedLifetime * (1 - normalizedLifetime);
-                Color color = new Color(new Vector4(1, 1, 1, alpha));
+				alpha = 255f;
+                Color color = new Color(new Vector4(255, 255, 255, alpha));
 
                 // make particles grow as they age. they'll start at 75% of their size,
                 // and increase to 100% once they're finished.
