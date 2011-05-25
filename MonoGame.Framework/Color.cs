@@ -47,19 +47,19 @@ namespace Microsoft.Xna.Framework
         {
             _packedValue = 0;
 			
-			R = Convert.ToByte(color.X);
-            G = Convert.ToByte(color.Y);
-            B = Convert.ToByte(color.Z);
-            A = Convert.ToByte(color.W);
+			R = (byte)MathHelper.Clamp(color.X * 255, Byte.MinValue, Byte.MaxValue);
+            G = (byte)MathHelper.Clamp(color.Y * 255, Byte.MinValue, Byte.MaxValue);
+            B = (byte)MathHelper.Clamp(color.Z * 255, Byte.MinValue, Byte.MaxValue);
+            A = (byte)MathHelper.Clamp(color.W * 255, Byte.MinValue, Byte.MaxValue);
         }
 
         public Color(Vector3 color)
         {
             _packedValue = 0;
 
-            R = Convert.ToByte(color.X);
-            G = Convert.ToByte(color.Y);
-            B = Convert.ToByte(color.Z);
+            R = (byte)MathHelper.Clamp(color.X * 255, Byte.MinValue, Byte.MaxValue);
+            G = (byte)MathHelper.Clamp(color.Y * 255, Byte.MinValue, Byte.MaxValue);
+            B = (byte)MathHelper.Clamp(color.Z * 255, Byte.MinValue, Byte.MaxValue);
             A = 255;
         }
 
@@ -80,16 +80,16 @@ namespace Microsoft.Xna.Framework
             R = color.R;
             G = color.G;
             B = color.B;
-            A = Convert.ToByte(alpha * 255);
+            A = (byte)MathHelper.Clamp(alpha * 255, Byte.MinValue, Byte.MaxValue);
         }
 
         public Color(float r, float g, float b)
         {
             _packedValue = 0;
 			
-            R = Convert.ToByte(r * 255);
-            G = Convert.ToByte(g * 255);
-            B = Convert.ToByte(b * 255);
+            R = (byte)MathHelper.Clamp(r * 255, Byte.MinValue, Byte.MaxValue);
+            G = (byte)MathHelper.Clamp(g * 255, Byte.MinValue, Byte.MaxValue);
+            B = (byte)MathHelper.Clamp(b * 255, Byte.MinValue, Byte.MaxValue);
             A = 255;
         }
 
