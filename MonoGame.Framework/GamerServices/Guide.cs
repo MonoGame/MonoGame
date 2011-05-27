@@ -348,7 +348,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 			    {					
 					achievementController.DidFinish += delegate(object sender, EventArgs e) 
 					{									 
-						leaderboardController.DismissModalViewControllerAnimated(true);
+						achievementController.DismissModalViewControllerAnimated(true);
 						isVisible = false;
 					};
 
