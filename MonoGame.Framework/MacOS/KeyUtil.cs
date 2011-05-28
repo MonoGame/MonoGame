@@ -98,7 +98,8 @@ namespace Microsoft.Xna.Framework
 			keyNames.Add (NSKey.Semicolon, Keys.OemSemicolon);
 			keyNames.Add (NSKey.Slash, Keys.OemBackslash);
 			keyNames.Add (NSKey.UpArrow, Keys.Up);
-
+			keyNames.Add (NSKey.Period, Keys.OemPeriod);
+			
 			// Modifiers
 			modifiers.Add ("524576", Keys.LeftAlt);
 			modifiers.Add ("65792", Keys.CapsLock);			
