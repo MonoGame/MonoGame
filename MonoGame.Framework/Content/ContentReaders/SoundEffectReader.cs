@@ -42,9 +42,11 @@
 using System;
 using System.IO;
 
-namespace Microsoft.Xna.Framework
+using Microsoft.Xna.Framework.Audio;
+
+namespace Microsoft.Xna.Framework.Content
 {
-	internal class SoundEffectReader
+	internal class SoundEffectReader : ContentTypeReader<SoundEffect>
 	{
 		public static string Normalize(string FileName)
 		{
@@ -66,8 +68,47 @@ namespace Microsoft.Xna.Framework
 				return FileName+".ac3";
 			if (File.Exists(FileName+".mp3"))
 				return FileName+".mp3";
+			if (File.Exists(FileName+".xnb"))
+				return FileName+".xnb";
 			
 			return null;
+		}
+		
+		protected internal override SoundEffect Read(ContentReader input, SoundEffect existingInstance)
+		{                    
+			int headerLen = input.ReadInt32();
+		    if (headerLen != 18) 
+			{
+				throw new NotImplementedException();
+		    }
+			byte[] header = input.ReadBytes(headerLen);
+			
+			byte[] data = input.ReadBytes(input.ReadInt32());
+			int loopStart = input.ReadInt32();
+			int loopLength = input.ReadInt32();
+			int num = input.ReadInt32();
+			
+			string wavFileName = Path.GetTempFileName().Replace(".tmp", ".wav");
+			FileStream wavFile = new FileStream(wavFileName, FileMode.Create, FileAccess.ReadWrite);
+			BinaryWriter writer = new BinaryWriter(wavFile);
+			
+			writer.Write("RIFF".ToCharArray());
+			writer.Write((int)(data.Length+36));
+			writer.Write("WAVE".ToCharArray());
+			
+			writer.Write("fmt ".ToCharArray());
+			//the header can be writter as-is, except for the cbsize short at the end.
+			writer.Write(headerLen-2);
+			writer.Write(header, 0, headerLen-2);
+			
+			writer.Write("data".ToCharArray());
+			writer.Write((int)data.Length);
+			writer.Write(data);
+			
+			writer.Close();
+			wavFile.Close();
+			
+			return new SoundEffect(wavFileName);
 		}
 	}
 }
