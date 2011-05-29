@@ -495,11 +495,9 @@ namespace Microsoft.Xna.Framework
 			case NSEventType.RightMouseDown:
 				Mouse.RightButton = ButtonState.Pressed;
 				break;
-			//case NSEventType.LeftMouseDown:
-			//	Mouse.LeftButton = ButtonState.Pressed;
-			//	break;
-
-
+			case NSEventType.OtherMouseDown:
+				Mouse.MiddleButton = ButtonState.Pressed;
+				break;
 			}
 		}
 
@@ -515,18 +513,54 @@ namespace Microsoft.Xna.Framework
 			case NSEventType.RightMouseUp:
 				Mouse.RightButton = ButtonState.Released;
 				break;
-			//case NSEventType.LeftMouseDown:
-			//	Mouse.LeftButton = ButtonState.Pressed;
-			//	break;
+			 case NSEventType.OtherMouseDown:
+				Mouse.MiddleButton = ButtonState.Pressed;
+				break;
 
 
 			}
-		}		
+		}	
+		
+		public override void MouseDragged (NSEvent theEvent)
+		{
+			PointF loc = theEvent.LocationInWindow;
+			SetMousePosition (loc);
+
+			switch (theEvent.Type) {
+				case NSEventType.LeftMouseDragged:
+				Mouse.LeftButton = ButtonState.Dragged;
+				break;
+				case NSEventType.RightMouseDragged:
+				Mouse.RightButton = ButtonState.Dragged;
+				break;
+				case NSEventType.OtherMouseDragged:
+				Mouse.MiddleButton = ButtonState.Dragged;
+				break;
+			}
+		}
+		
+		public override void ScrollWheel (NSEvent theEvent)
+		{
+			PointF loc = theEvent.LocationInWindow;
+			SetMousePosition(loc);
+
+			switch (theEvent.Type) {
+				case NSEventType.ScrollWheel:
+					Mouse.ScrollWheelValue = (int)theEvent.DeltaY;				
+				break;
+			}	
+		}
 
 		public override void MouseMoved (NSEvent theEvent)
 		{
 			PointF loc = theEvent.LocationInWindow;
 			SetMousePosition (loc);
+
+			switch (theEvent.Type) {
+				case NSEventType.MouseMoved:
+				//Mouse.Moved = true;
+				break;
+			}			
 		}
 
 		private void SetMousePosition (PointF location)

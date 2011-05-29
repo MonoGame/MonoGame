@@ -72,25 +72,24 @@ namespace Microsoft.Xna.Framework.Input
 			set { _leftButton = value; }
 		}
 
-		internal static  ButtonState MiddleButton { 
+		internal static ButtonState MiddleButton { 
 			get {
 				return _middleButton;
 			}
 			set { _middleButton = value; }			
 		}
 
-		internal static  ButtonState RightButton { 
+		internal static ButtonState RightButton { 
 			get {
 				return _rightButton;
 			}
 			set { _rightButton = value; }
 		}
 
-		internal static  int ScrollWheelValue { 
-			get {
-				return 0;
-			}
-		}
+		internal static int ScrollWheelValue { 
+			get;
+			set;
+		}	
 	}
 }
 
