@@ -45,7 +45,8 @@ namespace Microsoft.Xna.Framework.Input
     public enum ButtonState
     {
         Released = 0,
-        Pressed = 1
+        Pressed = 1,
+		Dragged = 2,
     }
 }
 
