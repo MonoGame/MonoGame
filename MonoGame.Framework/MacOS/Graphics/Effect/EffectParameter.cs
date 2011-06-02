@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+using MonoMac.OpenGL;
+
 namespace Microsoft.Xna.Framework.Graphics
 {
 	public class EffectParameter
@@ -15,6 +17,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		EffectParameterCollection elements;
 		string semantic;
 		EffectParameterCollection structMembers;
+		object _cachedValue = null;
 		internal int internalIndex;  // used by opengl processes.
 		int internalLength;
 		Effect _parentEffect;
@@ -32,6 +35,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				paramClass = EffectParameterClass.Vector;
 				rowCount = 1;
 				colCount = 2;
+				_cachedValue = MonoMac.OpenGL.Vector2.Zero;
 				break;
 			case "Sampler2D":
 				paramType = EffectParameterType.Texture2D;
@@ -227,10 +231,22 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void SetValue (Texture value)
 		{
+			GL.UseProgram(_parentEffect.CurrentTechnique.Passes[0].shaderProgram);
+			GL.ActiveTexture(TextureUnit.Texture1);
+			GL.BindTexture(TextureTarget.Texture2D,value._textureId);
+			GL.Enable(EnableCap.Texture2D);
+			GL.Uniform1(internalIndex, value._textureId);
+			_cachedValue = value._textureId;
+			GL.UseProgram(0);
 		}
 
 		public void SetValue (Vector2 value)
 		{
+			GL.UseProgram(_parentEffect.CurrentTechnique.Passes[0].shaderProgram);			
+			MonoMac.OpenGL.Vector2 vect2 = new MonoMac.OpenGL.Vector2(value.X, value.Y);
+			_cachedValue = vect2;
+			GL.Uniform2(internalIndex,vect2);
+			GL.UseProgram(0);
 		}
 
 		public void SetValue (Vector2[] value)
@@ -239,6 +255,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void SetValue (Vector3 value)
 		{
+			GL.UseProgram(_parentEffect.CurrentTechnique.Passes[0].shaderProgram);			
+			MonoMac.OpenGL.Vector3 vect3 = new MonoMac.OpenGL.Vector3(value.X, value.Y, value.Z);
+			_cachedValue = vect3;
+			GL.Uniform3(internalIndex,vect3);
+			GL.UseProgram(0);			
 		}
 
 		public void SetValue (Vector3[] value)
@@ -247,10 +268,34 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void SetValue (Vector4 value)
 		{
+			GL.UseProgram(_parentEffect.CurrentTechnique.Passes[0].shaderProgram);			
+			MonoMac.OpenGL.Vector4 vect4 = new MonoMac.OpenGL.Vector4(value.X, value.Y, value.Z, value.W);
+			_cachedValue = vect4;
+			GL.Uniform4(internalIndex,vect4);
+			GL.UseProgram(0);	
 		}
 
 		public void SetValue (Vector4[] value)
 		{
+		}
+
+		internal void ApplyEffectValue() 
+		{
+			
+			switch (ParameterClass) {
+			case EffectParameterClass.Vector:
+				ApplyVectorValue();
+				break;
+			}
+		}
+		
+		private void ApplyVectorValue() 
+		{
+			switch (rowCount) {
+			case 2:
+				GL.Uniform2(internalIndex,(MonoMac.OpenGL.Vector2)_cachedValue);
+				break;
+			}
 		}
 	}
 }

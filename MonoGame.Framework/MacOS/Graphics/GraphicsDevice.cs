@@ -112,7 +112,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			_viewport.Height = DisplayMode.Height;
 			_viewport.MinDepth = 0.0f;
 			_viewport.MaxDepth = 1.0f;
-
+			Textures = new TextureCollection();
 			// Init RenderState
 			_renderState = new RenderState ();
 		}

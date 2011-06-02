@@ -9,7 +9,7 @@ namespace Microsoft.Xna.Framework.Graphics
     {
 		// Modified to be a list instead of dictionary object because a dictionary does not guarantee
 		// the order is kept as it is a hash key.
-		List<EffectPass> _passes = new List<EffectPass>();
+		internal List<EffectPass> _passes = new List<EffectPass>();
         //Dictionary<string, EffectPass> _passes = new Dictionary<string, EffectPass>();
         private EffectTechnique _effectTechnique;
 

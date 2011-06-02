@@ -7,7 +7,7 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public class EffectParameterCollection : IEnumerable<EffectParameter>
     {
-        Dictionary<string, EffectParameter> _parameters = new Dictionary<string, EffectParameter>();
+        internal Dictionary<string, EffectParameter> _parameters = new Dictionary<string, EffectParameter>();
 
         public EffectParameter this[int index]
         {

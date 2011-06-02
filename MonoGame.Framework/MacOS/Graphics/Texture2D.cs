@@ -58,7 +58,8 @@ namespace Microsoft.Xna.Framework.Graphics
     {
 		private ESImage texture;
 		
-		protected int textureId = -1;
+		// moved to Texture object..  Kenneth J. Pouncey
+		//protected int _textureId = -1;
 		protected int _width;
 		protected int _height;
 		private bool _mipmap;
@@ -72,7 +73,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			get
 			{ 
 				if (texture == null)
-					return (uint)textureId;
+					return (uint)_textureId;
 				else
 					return texture.Name;
 			}
@@ -106,6 +107,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			_width = texture.ImageWidth;
 			_height = texture.ImageHeight;
 			_format = texture.Format;
+			_textureId = (int)theImage.Name;
 		}
 		
 		public Texture2D(GraphicsDevice graphicsDevice, int width, int height) : 
@@ -130,8 +132,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			// modeled after this
 			// http://steinsoft.net/index.php?site=Programming/Code%20Snippets/OpenGL/no9
 			
-			GL.GenTextures(1,out textureId);
-			GL.BindTexture(TextureTarget.Texture2D, textureId);
+			GL.GenTextures(1,out _textureId);
+			GL.BindTexture(TextureTarget.Texture2D, _textureId);
 			
 			if (_mipmap)
 			{

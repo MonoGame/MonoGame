@@ -45,6 +45,7 @@ namespace Microsoft.Xna.Framework.Graphics
 	{
 		protected SurfaceFormat _format;
 		protected int _levelCount;
+		internal int _textureId = -1;
 		
 		public SurfaceFormat Format
 		{
