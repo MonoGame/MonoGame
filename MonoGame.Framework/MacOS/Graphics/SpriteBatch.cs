@@ -19,6 +19,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		DepthStencilState _depthStencilState; 
 		RasterizerState _rasterizerState;		
 		Effect _effect;	
+		SpriteEffect spriteEffect;
 		Matrix _matrix;
 		
 		Rectangle tempRect = new Rectangle(0,0,0,0);
@@ -33,7 +34,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			}	
 			
 			this.graphicsDevice = graphicsDevice;
-			
+			spriteEffect = new SpriteEffect(this.graphicsDevice);	
 			_batcher = new SpriteBatcher();
 		}
 		
@@ -45,6 +46,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			_samplerState = SamplerState.LinearClamp;
 			_rasterizerState =  RasterizerState.CullCounterClockwise;
 			_matrix = Matrix.Identity;
+			_effect = null;			
 		}
 		
 		public void Begin(SpriteSortMode sortMode, BlendState blendState)
@@ -55,6 +57,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			_samplerState = SamplerState.LinearClamp;
 			_rasterizerState =  RasterizerState.CullCounterClockwise;
 			_matrix = Matrix.Identity;
+			_effect = null;			
 		}
 		
 		public void Begin(SpriteSortMode sortMode, BlendState blendState, SamplerState samplerState, DepthStencilState depthStencilState, RasterizerState rasterizerState )
@@ -65,7 +68,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			_depthStencilState = (depthStencilState == null) ? DepthStencilState.None : depthStencilState;
 			_samplerState = (samplerState == null) ? SamplerState.LinearClamp : samplerState;
 			_rasterizerState =  (rasterizerState == null) ? RasterizerState.CullCounterClockwise : rasterizerState;
-			
+			_effect = null;
 			_matrix = Matrix.Identity;
 		}
 		
@@ -79,6 +82,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			_rasterizerState =  (rasterizerState == null) ? RasterizerState.CullCounterClockwise : rasterizerState;
 			
 			_effect = effect;
+			_matrix = Matrix.Identity;
+
 		}
 		
 		public void Begin(SpriteSortMode sortMode, BlendState blendState, SamplerState samplerState, DepthStencilState depthStencilState, RasterizerState rasterizerState, Effect effect, Matrix transformMatrix)
@@ -92,10 +97,15 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			_effect = effect;
 			_matrix = transformMatrix;
+	
 		}
 		
 		public void End()
-		{		
+		{	
+
+			// apply the custom effect if there is one
+			if (_effect != null)
+				_effect.Apply();
 			
 			// Disable Blending by default = BlendState.Opaque
 			GL.Disable(EnableCap.Blend);
@@ -187,6 +197,10 @@ namespace Microsoft.Xna.Framework.Graphics
 			//GL.Color4(1.0f, 1.0f, 1.0f, 0.5f);
 			
 			_batcher.DrawBatch ( _sortMode );
+			//GL.UseProgram(0);
+			spriteEffect.CurrentTechnique.Passes[0].Apply();		
+		
+
 		}
 		
 		public void Draw 

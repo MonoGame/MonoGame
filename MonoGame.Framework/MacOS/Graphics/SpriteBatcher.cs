@@ -145,7 +145,10 @@ namespace Microsoft.Xna.Framework.Graphics
 					FlushVertexArray( startIndex, index );
 					startIndex = index;
 					texID = item.TextureID;
+
+					GL.ActiveTexture(TextureUnit.Texture0);
 					GL.BindTexture ( TextureTarget.Texture2D, texID );
+					GL.Uniform1(1,texID);					
 				}
 				// store the SpriteBatchItem data in our vertexArray
 				_vertexArray[index++] = item.vertexTL;
@@ -154,10 +157,10 @@ namespace Microsoft.Xna.Framework.Graphics
 				_vertexArray[index++] = item.vertexBR;
 				
 				_freeBatchItemQueue.Enqueue ( item );
+				
 			}
 			// flush the remaining vertexArray data
 			FlushVertexArray(startIndex, index);
-			
 			_batchItemList.Clear();
 		}
 		void ExpandVertexArray( int batchSize )
