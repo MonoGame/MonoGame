@@ -9,7 +9,7 @@ namespace Microsoft.Xna.Framework.Graphics
     {
 		// Modified to be a list instead of dictionary object because a dictionary does not guarantee
 		// the order is kept as it is a hash key.
-		List <EffectTechnique> _techniques = new List<EffectTechnique> ();
+		internal List <EffectTechnique> _techniques = new List<EffectTechnique> ();
         //Dictionary<string, EffectTechnique> _techniques = new Dictionary<string, EffectTechnique>();
 
         public EffectTechnique this[int index]

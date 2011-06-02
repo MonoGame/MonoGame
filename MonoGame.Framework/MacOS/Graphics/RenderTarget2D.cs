@@ -75,7 +75,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			// http://steinsoft.net/index.php?site=Programming/Code%20Snippets/OpenGL/no9
 			
 			// Allocate the space needed for the texture
-			GL.BindTexture (TextureTarget.Texture2D, this.textureId);
+			GL.BindTexture (TextureTarget.Texture2D, this._textureId);
 			
 			// it seems like we do not need to allocate any buffer space
 			//byte[] data = new byte[_width * _height * 4];
