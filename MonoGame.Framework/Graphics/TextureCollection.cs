@@ -7,7 +7,7 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public class TextureCollection
     {
-        Dictionary<int, Texture> _textures = new Dictionary<int, Texture>();
+        internal Dictionary<int, Texture> _textures = new Dictionary<int, Texture>();
 
         public Texture this[int index]
         {
