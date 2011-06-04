@@ -102,10 +102,30 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		public void End()
 		{	
-
+			
 			// apply the custom effect if there is one
-			if (_effect != null)
+				
+			if (_effect != null) {
+				if (graphicsDevice.Textures._textures.Count > 0) {
+					foreach (var texture in graphicsDevice.Textures._textures) {
+						int index = texture.Key;
+						if (index > 0) {  // zero is the active texture
+							var tex = _effect._textureMappings[index];
+							int texOffset = (int)TextureUnit.Texture0;
+							var tex2 = texture.Value;
+							if (tex != null) {
+								// Need to support multiple passes as well
+								GL.UseProgram(_effect.CurrentTechnique.Passes[0].shaderProgram);
+								GL.ActiveTexture((TextureUnit)texOffset + index);
+								GL.BindTexture(TextureTarget.Texture2D,tex2._textureId);
+								GL.Uniform1(tex.internalIndex, tex2._textureId);
+								GL.UseProgram(0);
+							}
+						}
+					}
+				}
 				_effect.Apply();
+			}
 			
 			// Disable Blending by default = BlendState.Opaque
 			GL.Disable(EnableCap.Blend);
@@ -198,6 +218,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			_batcher.DrawBatch ( _sortMode );
 			//GL.UseProgram(0);
+			// clear out the textures
+			graphicsDevice.Textures._textures.Clear();
+			
 			spriteEffect.CurrentTechnique.Passes[0].Apply();		
 		
 

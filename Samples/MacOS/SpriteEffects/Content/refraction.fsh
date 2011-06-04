@@ -13,12 +13,14 @@ void main()
 	vec4 tex2 = texture2D(TextureSampler, gl_TexCoord[0].xy);
 
 	// Look up the displacement amount.
-	vec2 displacement = vec2(texture2D(DisplacementSampler, DisplacementScroll + gl_TexCoord[0].xy / 3.0)  * 0.2 - 0.15);
+	vec2 displacement = vec2(texture2D(DisplacementSampler, DisplacementScroll + gl_TexCoord[0].xy / 3.0));
 	
 	// Offset the main texture coordinates.
-	vec4 tex = texture2D(TextureSampler, gl_TexCoord[0].xy + displacement);
+	vec2 offset = gl_TexCoord[0].xy;
+	offset += displacement * 0.2 - 0.15;
 	
-	gl_FragColor = tex;// * gl_Color;
+	gl_FragColor = texture2D(TextureSampler, offset) * gl_Color;// * gl_Color;
+	//gl_FragColor = texture2D(DisplacementSampler, gl_TexCoord[0].xy) * gl_Color;// * gl_Color;
 }
 //float2 DisplacementScroll;
 
