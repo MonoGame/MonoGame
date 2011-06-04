@@ -37,6 +37,20 @@ namespace Microsoft.Xna.Framework.Graphics
 				colCount = 2;
 				_cachedValue = MonoMac.OpenGL.Vector2.Zero;
 				break;
+			case "FloatVec3":
+				paramType = EffectParameterType.Single;
+				paramClass = EffectParameterClass.Vector;
+				rowCount = 1;
+				colCount = 3;
+				_cachedValue = MonoMac.OpenGL.Vector2.Zero;
+				break;	
+			case "FloatVec4":
+				paramType = EffectParameterType.Single;
+				paramClass = EffectParameterClass.Vector;
+				rowCount = 1;
+				colCount = 4;
+				_cachedValue = MonoMac.OpenGL.Vector2.Zero;
+				break;				
 			case "Sampler2D":
 				paramType = EffectParameterType.Texture2D;
 				paramClass = EffectParameterClass.Object;
