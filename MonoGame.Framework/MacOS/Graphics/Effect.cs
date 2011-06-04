@@ -54,6 +54,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		public EffectParameterCollection Parameters { get; set; }
 
 		public EffectTechniqueCollection Techniques { get; set; }
+		
+		internal List<EffectParameter> _textureMappings = new List<EffectParameter>();
 
 		private GraphicsDevice graphicsDevice;
 		private int fragment_handle;
@@ -266,6 +268,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		internal virtual void Apply ()
 		{
+			//if (graphicsDevice.Textures.)
 			Techniques[0].Passes[0].Apply();
 		}
 
@@ -333,10 +336,11 @@ namespace Microsoft.Xna.Framework.Graphics
 				Console.WriteLine ("{0}: {1} {2} {3}", x, name, type, length);
 				EffectParameter efp = new EffectParameter(this,name.ToString(), x, type.ToString(), length);
 				Parameters._parameters.Add(efp.Name, efp);
+				if (efp.ParameterType == EffectParameterType.Texture2D) {
+					_textureMappings.Add(efp);
+				}
 			}
 			
-			
-			//Parameters
 		}		
 	}
 }
