@@ -1226,15 +1226,15 @@ namespace Microsoft.Xna.Framework
         public Vector3 ToVector3()
         {
             Vector3 vector = new Vector3();
-            vector.X = R;
-            vector.Y = G;
-            vector.Z = B;
+            vector.X = R/255.0f;
+            vector.Y = G/255.0f;
+            vector.Z = B/255.0f;
             return vector;
         }
 
         public Vector4 ToVector4()
         {
-            return new Vector4(R, G, B, A);
+            return new Vector4(R/255.0f, G/255.0f, B/255.0f, A/255.0f);
         }
 		
 		public Vector4 ToEAGLColor()
