@@ -11,15 +11,13 @@ void main()
 {
 	// Look up the texture and normalmap values.
 	vec4 tex = texture2D(TextureSampler, gl_TexCoord[0].xy);
-	vec3 normal = texture2D(NormalSampler, gl_TexCoord[0].xy).rgb;
+	vec3 normal = texture2D(NormalSampler, gl_TexCoord[0].xy).rgb * 2.0 - 1.0;
 
 	// Compute lighting.
-	float lightAmount = max(dot(normal.rgb, LightDirection),0.0);
-	
+	float lightAmount = max(dot(normal, LightDirection),0.0);
 	vec4 color = gl_Color;
-	color.rgb = AmbientColor + lightAmount * LightColor;
-
-	gl_FragColor = tex * color; //tex;// * color; //color; //tex * color;
+	color.rgb *= AmbientColor + lightAmount * LightColor;
+	gl_FragColor = tex * color; 
 }
 
 

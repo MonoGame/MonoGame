@@ -44,7 +44,7 @@ namespace SpriteEffects
 			Normalmap,
 		}
 
-		DemoEffect currentEffect = DemoEffect.Desaturate;
+		DemoEffect currentEffect = DemoEffect.RefractGlacier;
 
 		// Effects used by this sample.
 		Effect desaturateEffect;
@@ -269,14 +269,14 @@ namespace SpriteEffects
 		/// </summary>
 		void DrawRefractGlacier (GameTime gameTime)
 		{
-			
+
 			// Set an effect parameter to make the
 			// displacement texture scroll in a giant circle.
 			refractionEffect.Parameters ["DisplacementScroll"].SetValue (
 							MoveInCircle (gameTime, 0.2f));
 
 			// Set the displacement texture.
-			graphics.GraphicsDevice.Textures [1] = waterfallTexture;
+			graphics.GraphicsDevice.Textures [1] = glacierTexture;
 
 			// Begin the sprite batch.
 			spriteBatch.Begin (0, null, null, null, null, refractionEffect);
@@ -295,7 +295,7 @@ namespace SpriteEffects
 						glacierTexture.Height - 64);
 			spriteBatch.Draw (glacierTexture, 
 				GraphicsDevice.Viewport.Bounds, 
-				croppedGlacier, 
+				//croppedGlacier, 
 				Color.White);
 
 			// End the sprite batch.

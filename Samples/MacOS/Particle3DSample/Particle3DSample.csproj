@@ -62,6 +62,7 @@
     <Compile Include="ParticleSystem.cs" />
     <Compile Include="ParticleVertex.cs" />
     <Compile Include="Projectile.cs" />
+    <Compile Include="ParticleEffect.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\font.xnb" />
@@ -84,7 +85,6 @@
     <Content Include="Content\ExplosionSettings.xnb" />
     <Content Include="Content\ParticleEffect.xnb" />
     <Content Include="Content\checker_0.xnb" />
-    <Content Include="Content\explosion.xnb" />
     <Content Include="Content\ExplosionSmokeSettings.xnb" />
     <Content Include="Content\fire.xnb" />
     <Content Include="Content\FireSettings.xnb" />
@@ -92,5 +92,8 @@
     <Content Include="Content\ProjectileTrailSettings.xnb" />
     <Content Include="Content\smoke.xnb" />
     <Content Include="Content\SmokePlumeSettings.xnb" />
+    <Content Include="Content\ParticlePixelShader.fsh" />
+    <Content Include="Content\ParticlePixelShader.vsh" />
+    <Content Include="Content\explosion.xnb" />
   </ItemGroup>
 </Project>

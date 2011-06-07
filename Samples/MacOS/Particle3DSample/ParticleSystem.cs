@@ -216,8 +216,9 @@ namespace Particle3DSample
 		/// </summary>
 		void LoadParticleEffect ()
 		{
-			Effect effect = content.Load<Effect> ("ParticleEffect");
-
+			//Effect effect = content.Load<Effect> ("ParticleEffect");
+			Effect effect = new ParticleEffect(GraphicsDevice);
+			
 			// If we have several particle systems, the content manager will return
 			// a single shared effect instance to them all. But we want to preconfigure
 			// the effect with parameters that are specific to this particular
@@ -225,7 +226,9 @@ namespace Particle3DSample
 			// from stomping over the parameter settings of another.
 
 			//particleEffect = effect.Clone ();
-
+			// No cloning for now so we will just create a new effect for now
+			particleEffect = effect;
+			
 			EffectParameterCollection parameters = particleEffect.Parameters;
 
 			// Look up shortcuts for parameters that change every frame.
