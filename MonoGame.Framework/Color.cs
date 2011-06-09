@@ -1263,7 +1263,7 @@ namespace Microsoft.Xna.Framework
 
         public bool Equals(Color other)
         {
-			return this == other;
+			return this.GLPackedValue == other.GLPackedValue;
         }
 
         #endregion
