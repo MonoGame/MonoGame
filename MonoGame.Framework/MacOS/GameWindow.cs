@@ -525,18 +525,6 @@ namespace Microsoft.Xna.Framework
 		{
 			PointF loc = theEvent.LocationInWindow;
 			SetMousePosition (loc);
-
-			switch (theEvent.Type) {
-				case NSEventType.LeftMouseDragged:
-				Mouse.LeftButton = ButtonState.Dragged;
-				break;
-				case NSEventType.RightMouseDragged:
-				Mouse.RightButton = ButtonState.Dragged;
-				break;
-				case NSEventType.OtherMouseDragged:
-				Mouse.MiddleButton = ButtonState.Dragged;
-				break;
-			}
 		}
 		
 		public override void ScrollWheel (NSEvent theEvent)
