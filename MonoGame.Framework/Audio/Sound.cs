@@ -59,6 +59,11 @@ namespace Microsoft.Xna.Framework.Audio
 			{
 				_audioPlayer.NumberOfLoops = 0;
 			}
+			
+			if (!_audioPlayer.PrepareToPlay())
+			{
+				throw new Exception("Unable to Prepare sound for playback!");
+			}
 		}
 		
 		public void Dispose()
