@@ -78,13 +78,13 @@ namespace Microsoft.Xna.Framework.Graphics
 			// set the blend mode
 			if ( _blendState == BlendState.NonPremultiplied )
 			{
-				GL.BlendFunc(All.One, All.OneMinusSrcAlpha);
+				GL.BlendFunc(All.SrcAlpha, All.OneMinusSrcAlpha);
 				GL.Enable(All.Blend);
 			}
 			
 			if ( _blendState == BlendState.AlphaBlend )
 			{
-				GL.BlendFunc(All.SrcAlpha, All.OneMinusSrcAlpha);
+				GL.BlendFunc(All.One, All.OneMinusSrcAlpha);
 				GL.Enable(All.Blend);				
 			}
 			
