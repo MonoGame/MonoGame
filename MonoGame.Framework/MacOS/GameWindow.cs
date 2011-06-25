@@ -577,10 +577,14 @@ namespace Microsoft.Xna.Framework
 		{
 			PointF loc = theEvent.LocationInWindow;
 			SetMousePosition(loc);
-
+			
 			switch (theEvent.Type) {
 				case NSEventType.ScrollWheel:
-					Mouse.ScrollWheelValue += theEvent.DeltaY*1200;
+					if (theEvent.DeltaY > 0) {
+						Mouse.ScrollWheelValue += (theEvent.DeltaY*0.1f+0.09f)*1200;
+					} else {
+						Mouse.ScrollWheelValue += (theEvent.DeltaY*0.1f-0.09f)*1200;
+					}
 				break;
 			}	
 		}
