@@ -104,12 +104,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			// set the blend mode
 			if (_blendState == BlendState.NonPremultiplied) {
-				GL.BlendFunc (BlendingFactorSrc.One, BlendingFactorDest.OneMinusSrcAlpha);
+				GL.BlendFunc (BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
 				GL.Enable (EnableCap.Blend);				
 			}
 
 			if (_blendState == BlendState.AlphaBlend) {
-				GL.BlendFunc (BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+				GL.BlendFunc (BlendingFactorSrc.One, BlendingFactorDest.OneMinusSrcAlpha);
 				GL.Enable (EnableCap.Blend);				
 			}
 
