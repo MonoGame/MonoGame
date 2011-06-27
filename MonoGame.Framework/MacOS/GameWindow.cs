@@ -599,7 +599,9 @@ namespace Microsoft.Xna.Framework
 		
 		public override void MouseEntered (NSEvent theEvent)
 		{
-			NSCursor.Hide();
+			if (!game.IsMouseVisible) {
+				NSCursor.Hide();
+			}
 		}
 		
 		public override void MouseExited (NSEvent theEvent)
