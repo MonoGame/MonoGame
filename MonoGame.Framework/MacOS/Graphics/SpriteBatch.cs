@@ -238,11 +238,12 @@ namespace Microsoft.Xna.Framework.Graphics
 				texCoordBR.Y = texture.Image.GetTextureCoordY (tempRect.Y + tempRect.Height);
 			}
 
-			if (effect == SpriteEffects.FlipVertically) {
+			if ((effect & SpriteEffects.FlipVertically) != 0) {
 				float temp = texCoordBR.Y;
 				texCoordBR.Y = texCoordTL.Y;
 				texCoordTL.Y = temp;
-			} else if (effect == SpriteEffects.FlipHorizontally) {
+			}
+			if ((effect & SpriteEffects.FlipHorizontally) != 0) {
 				float temp = texCoordBR.X;
 				texCoordBR.X = texCoordTL.X;
 				texCoordTL.X = temp;
@@ -306,12 +307,13 @@ namespace Microsoft.Xna.Framework.Graphics
 				texCoordBR.X = texture.Image.GetTextureCoordX (tempRect.X + tempRect.Width);
 				texCoordBR.Y = texture.Image.GetTextureCoordY (tempRect.Y + tempRect.Height);
 			}
-
-			if (effect == SpriteEffects.FlipVertically) {
+			
+			if ((effect & SpriteEffects.FlipVertically) != 0) {
 				float temp = texCoordBR.Y;
 				texCoordBR.Y = texCoordTL.Y;
 				texCoordTL.Y = temp;
-			} else if (effect == SpriteEffects.FlipHorizontally) {
+			}
+			if ((effect & SpriteEffects.FlipHorizontally) != 0) {
 				float temp = texCoordBR.X;
 				texCoordBR.X = texCoordTL.X;
 				texCoordTL.X = temp;
@@ -375,11 +377,12 @@ namespace Microsoft.Xna.Framework.Graphics
 				texCoordBR.Y = texture.Image.GetTextureCoordY (tempRect.Y + tempRect.Height);
 			}
 
-			if (effect == SpriteEffects.FlipVertically) {
+			if ((effect & SpriteEffects.FlipVertically) != 0) {
 				float temp = texCoordBR.Y;
 				texCoordBR.Y = texCoordTL.Y;
 				texCoordTL.Y = temp;
-			} else if (effect == SpriteEffects.FlipHorizontally) {
+			}
+			if ((effect & SpriteEffects.FlipHorizontally) != 0) {
 				float temp = texCoordBR.X;
 				texCoordBR.X = texCoordTL.X;
 				texCoordTL.X = temp;
@@ -653,11 +656,12 @@ namespace Microsoft.Xna.Framework.Graphics
 				texCoordBR.X = spriteFont._texture.Image.GetTextureCoordX (g.Glyph.X + g.Glyph.Width);
 				texCoordBR.Y = spriteFont._texture.Image.GetTextureCoordY (g.Glyph.Y + g.Glyph.Height);
 
-				if (effects == SpriteEffects.FlipVertically) {
+				if ((effects & SpriteEffects.FlipVertically) != 0) {
 					float temp = texCoordBR.Y;
 					texCoordBR.Y = texCoordTL.Y;
 					texCoordTL.Y = temp;
-				} else if (effects == SpriteEffects.FlipHorizontally) {
+				}
+				if ((effects & SpriteEffects.FlipHorizontally) != 0) {
 					float temp = texCoordBR.X;
 					texCoordBR.X = texCoordTL.X;
 					texCoordTL.X = temp;
@@ -718,11 +722,12 @@ namespace Microsoft.Xna.Framework.Graphics
 				texCoordBR.X = spriteFont._texture.Image.GetTextureCoordX (g.Glyph.X + g.Glyph.Width);
 				texCoordBR.Y = spriteFont._texture.Image.GetTextureCoordY (g.Glyph.Y + g.Glyph.Height);
 
-				if (effects == SpriteEffects.FlipVertically) {
+				if ((effects & SpriteEffects.FlipVertically) != 0) {
 					float temp = texCoordBR.Y;
 					texCoordBR.Y = texCoordTL.Y;
 					texCoordTL.Y = temp;
-				} else if (effects == SpriteEffects.FlipHorizontally) {
+				}
+				if ((effects & SpriteEffects.FlipHorizontally) != 0) {
 					float temp = texCoordBR.X;
 					texCoordBR.X = texCoordTL.X;
 					texCoordTL.X = temp;
