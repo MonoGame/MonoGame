@@ -580,7 +580,7 @@ namespace Microsoft.Xna.Framework
 
 			switch (theEvent.Type) {
 				case NSEventType.ScrollWheel:
-					Mouse.ScrollWheelValue = (int)theEvent.DeltaY;				
+					Mouse.ScrollWheelValue += theEvent.DeltaY*1200;
 				break;
 			}	
 		}
