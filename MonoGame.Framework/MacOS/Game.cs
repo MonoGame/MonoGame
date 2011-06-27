@@ -245,6 +245,9 @@ namespace Microsoft.Xna.Framework
 			}
 			set {
 				_mouseVisible = value;
+				if (_mouseVisible) {
+					NSCursor.Show();
+				}
 			}
 		}
 
