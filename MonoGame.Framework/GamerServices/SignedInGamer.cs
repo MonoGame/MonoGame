@@ -78,9 +78,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 		{
 			try 
 			{
-				var verArray = UIDevice.CurrentDevice.SystemVersion.Split( new char[] {'.'} );
-				if ( (int.Parse(verArray[0]) >= 4)
-				&& (int.Parse(verArray[1]) >= 1) )
+				if (double.Parse(UIDevice.CurrentDevice.SystemVersion) > 4.1)
 				{
 					
 					lp = GKLocalPlayer.LocalPlayer;
@@ -93,7 +91,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 												{
 													if ( error != null )
 													{
-									
+														Console.WriteLine(error);
 													}
 													else
 													{
@@ -109,9 +107,9 @@ namespace Microsoft.Xna.Framework.GamerServices
 					}
 				}
 			}
-			catch (Exception) 
+			catch (Exception ex) 
 			{
-				
+				Console.WriteLine(ex.Message);
 			}
 		}
 		
