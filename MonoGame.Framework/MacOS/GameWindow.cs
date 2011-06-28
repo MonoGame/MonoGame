@@ -65,6 +65,7 @@ namespace Microsoft.Xna.Framework
 		private GameTime _drawGameTime;
 		private DateTime _lastUpdate;
 		private DateTime _now;
+		private int _windowTrackingRect = -1;
 
 		#region UIVIew Methods		
 		public GameWindow (RectangleF frame) : base (frame)
@@ -165,6 +166,10 @@ namespace Microsoft.Xna.Framework
 			var manager = game.Services.GetService (typeof(IGraphicsDeviceManager)) as GraphicsDeviceManager;
 			if (game._initialized)
 				manager.OnDeviceResetting(EventArgs.Empty);
+			
+			if (_windowTrackingRect != -1)
+				RemoveTrackingRect(_windowTrackingRect);
+			_windowTrackingRect = AddTrackingRect(Bounds, this, IntPtr.Zero, false);
 			
 			Microsoft.Xna.Framework.Graphics.Viewport _vp =
 			new Microsoft.Xna.Framework.Graphics.Viewport();
@@ -488,15 +493,8 @@ namespace Microsoft.Xna.Framework
 			PointF loc = theEvent.LocationInWindow;
 			SetMousePosition (loc);
 			switch (theEvent.Type) {
-
 			case NSEventType.LeftMouseDown:
 				Mouse.LeftButton = ButtonState.Pressed;
-				break;
-			case NSEventType.RightMouseDown:
-				Mouse.RightButton = ButtonState.Pressed;
-				break;
-			case NSEventType.OtherMouseDown:
-				Mouse.MiddleButton = ButtonState.Pressed;
 				break;
 			}
 		}
@@ -510,43 +508,83 @@ namespace Microsoft.Xna.Framework
 			case NSEventType.LeftMouseUp:
 				Mouse.LeftButton = ButtonState.Released;
 				break;
-			case NSEventType.RightMouseUp:
-				Mouse.RightButton = ButtonState.Released;
-				break;
-			 case NSEventType.OtherMouseDown:
-				Mouse.MiddleButton = ButtonState.Pressed;
-				break;
-
-
 			}
-		}	
+		}
 		
 		public override void MouseDragged (NSEvent theEvent)
 		{
 			PointF loc = theEvent.LocationInWindow;
 			SetMousePosition (loc);
-
+		}
+		
+		public override void RightMouseDown (NSEvent theEvent)
+		{
+			PointF loc = theEvent.LocationInWindow;
+			SetMousePosition (loc);
 			switch (theEvent.Type) {
-				case NSEventType.LeftMouseDragged:
-				Mouse.LeftButton = ButtonState.Dragged;
-				break;
-				case NSEventType.RightMouseDragged:
-				Mouse.RightButton = ButtonState.Dragged;
-				break;
-				case NSEventType.OtherMouseDragged:
-				Mouse.MiddleButton = ButtonState.Dragged;
+			case NSEventType.RightMouseDown:
+				Mouse.RightButton = ButtonState.Pressed;
 				break;
 			}
+		}
+		
+		public override void RightMouseUp (NSEvent theEvent)
+		{
+			PointF loc = theEvent.LocationInWindow;
+			SetMousePosition (loc);
+			switch (theEvent.Type) {
+			case NSEventType.RightMouseUp:
+				Mouse.RightButton = ButtonState.Released;
+				break;
+			}
+		}
+		
+		public override void RightMouseDragged (NSEvent theEvent)
+		{
+			PointF loc = theEvent.LocationInWindow;
+			SetMousePosition (loc);
+		}
+		
+		public override void OtherMouseDown (NSEvent theEvent)
+		{
+			PointF loc = theEvent.LocationInWindow;
+			SetMousePosition (loc);
+			switch (theEvent.Type) {
+			case NSEventType.OtherMouseDown:
+				Mouse.MiddleButton = ButtonState.Pressed;
+				break;
+			}
+		}
+		
+		public override void OtherMouseUp (NSEvent theEvent)
+		{
+			PointF loc = theEvent.LocationInWindow;
+			SetMousePosition (loc);
+			switch (theEvent.Type) {
+			case NSEventType.OtherMouseUp:
+				Mouse.MiddleButton = ButtonState.Released;
+				break;
+			}
+		}
+		
+		public override void OtherMouseDragged (NSEvent theEvent)
+		{
+			PointF loc = theEvent.LocationInWindow;
+			SetMousePosition (loc);
 		}
 		
 		public override void ScrollWheel (NSEvent theEvent)
 		{
 			PointF loc = theEvent.LocationInWindow;
 			SetMousePosition(loc);
-
+			
 			switch (theEvent.Type) {
 				case NSEventType.ScrollWheel:
-					Mouse.ScrollWheelValue = (int)theEvent.DeltaY;				
+					if (theEvent.DeltaY > 0) {
+						Mouse.ScrollWheelValue += (theEvent.DeltaY*0.1f+0.09f)*1200;
+					} else {
+						Mouse.ScrollWheelValue += (theEvent.DeltaY*0.1f-0.09f)*1200;
+					}
 				break;
 			}	
 		}
@@ -561,6 +599,18 @@ namespace Microsoft.Xna.Framework
 				//Mouse.Moved = true;
 				break;
 			}			
+		}
+		
+		public override void MouseEntered (NSEvent theEvent)
+		{
+			if (!game.IsMouseVisible) {
+				NSCursor.Hide();
+			}
+		}
+		
+		public override void MouseExited (NSEvent theEvent)
+		{
+			NSCursor.Unhide();
 		}
 
 		private void SetMousePosition (PointF location)
