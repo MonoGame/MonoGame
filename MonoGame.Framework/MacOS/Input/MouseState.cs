@@ -44,6 +44,7 @@ namespace Microsoft.Xna.Framework.Input
 	public struct MouseState
 	{
 		int _x, _y;
+		int _scrollWheelValue;
 		ButtonState _leftButton;
 		ButtonState _rightButton;
 		ButtonState _middleButton;
@@ -52,6 +53,8 @@ namespace Microsoft.Xna.Framework.Input
 		{
 			_x = x;
 			_y = y;
+			
+			_scrollWheelValue = 0;
 			
 			_leftButton = ButtonState.Released;
 			_rightButton = ButtonState.Released;
@@ -94,8 +97,9 @@ namespace Microsoft.Xna.Framework.Input
 
 		public int ScrollWheelValue { 
 			get {
-				return 0;
+				return _scrollWheelValue;
 			}
+			internal set { _scrollWheelValue = value; }
 		}
 
 		public ButtonState XButton1 { 

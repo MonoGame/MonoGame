@@ -46,7 +46,6 @@ namespace Microsoft.Xna.Framework.Input
     {
         Released = 0,
         Pressed = 1,
-		Dragged = 2,
     }
 }
 

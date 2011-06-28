@@ -45,6 +45,7 @@ namespace Microsoft.Xna.Framework.Input
 	public static class Mouse
 	{
 		private static int _x, _y;
+		private static float _scrollWheelValue;
 		private static ButtonState _leftButton = ButtonState.Released;
 		private static ButtonState _rightButton = ButtonState.Released;
 		private static ButtonState _middleButton = ButtonState.Released;
@@ -55,6 +56,7 @@ namespace Microsoft.Xna.Framework.Input
 			ms.LeftButton = _leftButton;
 			ms.RightButton = _rightButton;
 			ms.MiddleButton = _middleButton;
+			ms.ScrollWheelValue = (int)_scrollWheelValue;
 			
 			return ms;
 		}
@@ -86,10 +88,12 @@ namespace Microsoft.Xna.Framework.Input
 			set { _rightButton = value; }
 		}
 
-		internal static int ScrollWheelValue { 
-			get;
-			set;
-		}	
+		internal static float ScrollWheelValue { 
+			get {
+				return _scrollWheelValue;
+			}
+			set { _scrollWheelValue = value; }
+		}
 	}
 }
 
