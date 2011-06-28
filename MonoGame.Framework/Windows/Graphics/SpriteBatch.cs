@@ -192,13 +192,13 @@ namespace Microsoft.Xna.Framework.Graphics
 			Vector2 texCoordTL = texture.Image.GetTextureCoord ( rect.X, rect.Y );
 			Vector2 texCoordBR = texture.Image.GetTextureCoord ( rect.X+rect.Width, rect.Y+rect.Height );
 			
-			if ( effect == SpriteEffects.FlipVertically )
+			if ( (effect & SpriteEffects.FlipVertically) != 0 )
 			{
 				float temp = texCoordBR.Y;
 				texCoordBR.Y = texCoordTL.Y;
 				texCoordTL.Y = temp;
 			}
-			else if ( effect == SpriteEffects.FlipHorizontally )
+			if ( (effect & SpriteEffects.FlipHorizontally) != 0 )
 			{
 				float temp = texCoordBR.X;
 				texCoordBR.X = texCoordTL.X;
@@ -253,13 +253,13 @@ namespace Microsoft.Xna.Framework.Graphics
 			Vector2 texCoordTL = texture.Image.GetTextureCoord ( rect.X, rect.Y );
 			Vector2 texCoordBR = texture.Image.GetTextureCoord ( rect.X+rect.Width, rect.Y+rect.Height );
 			
-			if ( effect == SpriteEffects.FlipVertically )
+			if ( (effect & SpriteEffects.FlipVertically) != 0 )
 			{
 				float temp = texCoordBR.Y;
 				texCoordBR.Y = texCoordTL.Y;
 				texCoordTL.Y = temp;
 			}
-			else if ( effect == SpriteEffects.FlipHorizontally )
+			if ( (effect & SpriteEffects.FlipHorizontally) != 0 )
 			{
 				float temp = texCoordBR.X;
 				texCoordBR.X = texCoordTL.X;
@@ -310,13 +310,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			Vector2 texCoordTL = texture.Image.GetTextureCoord ( rect.X, rect.Y );
 			Vector2 texCoordBR = texture.Image.GetTextureCoord ( rect.X+rect.Width, rect.Y+rect.Height );
-			if ( effect == SpriteEffects.FlipVertically )
+			if ( (effect & SpriteEffects.FlipVertically) != 0 )
 			{
 				float temp = texCoordBR.Y;
 				texCoordBR.Y = texCoordTL.Y;
 				texCoordTL.Y = temp;
 			}
-			else if ( effect == SpriteEffects.FlipHorizontally )
+			if ( (effect & SpriteEffects.FlipHorizontally) != 0 )
 			{
 				float temp = texCoordBR.X;
 				texCoordBR.X = texCoordTL.X;

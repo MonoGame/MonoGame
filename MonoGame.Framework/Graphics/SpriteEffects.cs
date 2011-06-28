@@ -47,7 +47,7 @@ using System;
     {
 		None = 0,
         FlipHorizontally = 1,
-        FlipVertically = 256        
+        FlipVertically = 2        
     }
 }
 
