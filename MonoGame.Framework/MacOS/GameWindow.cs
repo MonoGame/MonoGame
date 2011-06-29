@@ -65,7 +65,7 @@ namespace Microsoft.Xna.Framework
 		private GameTime _drawGameTime;
 		private DateTime _lastUpdate;
 		private DateTime _now;
-		private int _windowTrackingRect = -1;
+		private NSTrackingArea _trackingArea;
 
 		#region UIVIew Methods		
 		public GameWindow (RectangleF frame) : base (frame)
@@ -166,10 +166,6 @@ namespace Microsoft.Xna.Framework
 			var manager = game.Services.GetService (typeof(IGraphicsDeviceManager)) as GraphicsDeviceManager;
 			if (game._initialized)
 				manager.OnDeviceResetting(EventArgs.Empty);
-			
-			if (_windowTrackingRect != -1)
-				RemoveTrackingRect(_windowTrackingRect);
-			_windowTrackingRect = AddTrackingRect(Bounds, this, IntPtr.Zero, false);
 			
 			Microsoft.Xna.Framework.Graphics.Viewport _vp =
 			new Microsoft.Xna.Framework.Graphics.Viewport();
@@ -420,6 +416,19 @@ namespace Microsoft.Xna.Framework
 			return true;
 		}
 
+		public override void ViewWillMoveToWindow (NSWindow newWindow)
+		{
+			if (_trackingArea != null) RemoveTrackingArea(_trackingArea);
+			_trackingArea = new NSTrackingArea(Frame,
+			                      	NSTrackingAreaOptions.MouseMoved | 
+			                        NSTrackingAreaOptions.MouseEnteredAndExited |
+			                        NSTrackingAreaOptions.EnabledDuringMouseDrag |
+			                        NSTrackingAreaOptions.ActiveAlways |
+			                        NSTrackingAreaOptions.InVisibleRect,
+			                      this, new NSDictionary());
+			AddTrackingArea(_trackingArea);
+		}
+		
 		private void UpdateKeyboardState ()
 		{
 			_keyStates.Clear ();
