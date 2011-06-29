@@ -99,6 +99,7 @@ namespace Microsoft.Xna.Framework
 			keyNames.Add (NSKey.Slash, Keys.OemBackslash);
 			keyNames.Add (NSKey.UpArrow, Keys.Up);
 			keyNames.Add (NSKey.Period, Keys.OemPeriod);
+			keyNames.Add (NSKey.Return, Keys.Enter);
 			
 			// Modifiers
 			modifiers.Add ("524576", Keys.LeftAlt);
