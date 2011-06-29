@@ -80,6 +80,7 @@ namespace Microsoft.Xna.Framework
 		private Texture2D splashScreen;
 		private bool _mouseVisible = false;
 		private List<IGameComponent> _gameComponentsToInitialize = new List<IGameComponent>();
+		private bool _wasResizeable;
 
 		delegate void InitialiseGameComponentsDelegate ();
 
@@ -96,18 +97,17 @@ namespace Microsoft.Xna.Framework
 			RectangleF frame = new RectangleF(0,0,Microsoft.Xna.Framework.Graphics.PresentationParameters._defaultBackBufferWidth,
 				Microsoft.Xna.Framework.Graphics.PresentationParameters._defaultBackBufferHeight);
 
-			//Create a full-screen window
+			//Create a window
 			_mainWindow = new NSWindow (frame, NSWindowStyle.Titled | NSWindowStyle.Closable, NSBackingStore.Buffered, true);
 
 			// Perform any other window configuration you desire
 			_mainWindow.IsOpaque = true;
-			_mainWindow.HidesOnDeactivate = true;
 
 			_view = new GameWindow (frame);
 			_view.game = this;
 
 			_mainWindow.ContentView.AddSubview (_view);
-			_mainWindow.AcceptsMouseMovedEvents = true;
+			_mainWindow.AcceptsMouseMovedEvents = false;
 
 			// Initialize GameTime
 			_updateGameTime = new GameTime ();
@@ -424,20 +424,84 @@ namespace Microsoft.Xna.Framework
 
 		private void ResetWindowBounds ()
 		{
-			RectangleF frame = _mainWindow.Frame;
-			RectangleF content = _view.Bounds;
-
-			frame.Width = ((GraphicsDeviceManager)graphicsDeviceManager).PreferredBackBufferWidth;
-			frame.Height = ((GraphicsDeviceManager)graphicsDeviceManager).PreferredBackBufferHeight + TitleBarHeight ();
-
-			content.Width = ((GraphicsDeviceManager)graphicsDeviceManager).PreferredBackBufferWidth;
-			content.Height = ((GraphicsDeviceManager)graphicsDeviceManager).PreferredBackBufferHeight;
-
+			RectangleF frame;
+			RectangleF content;
+			
+			if (((GraphicsDeviceManager)graphicsDeviceManager).IsFullScreen) {
+				frame = NSScreen.MainScreen.Frame;
+				content = NSScreen.MainScreen.Frame;
+			} else {
+				content = _view.Bounds;
+				content.Width = Math.Min(
+				                    ((GraphicsDeviceManager)graphicsDeviceManager).PreferredBackBufferWidth,
+				                    NSScreen.MainScreen.VisibleFrame.Width);
+				content.Height = Math.Min(
+				                    ((GraphicsDeviceManager)graphicsDeviceManager).PreferredBackBufferHeight,
+				                    NSScreen.MainScreen.VisibleFrame.Height-TitleBarHeight());
+				
+				frame = _mainWindow.Frame;
+				frame.X = Math.Max(frame.X, NSScreen.MainScreen.VisibleFrame.X);
+				frame.Y = Math.Max(frame.Y, NSScreen.MainScreen.VisibleFrame.Y);
+				frame.Width = content.Width;
+				frame.Height = content.Height + TitleBarHeight();
+			}
 			_mainWindow.SetFrame (frame, true);
-
-			_view.Size = new Size ((int)content.Width,(int)content.Height);			
+			
+			_view.Bounds = content;
+			_view.Size = content.Size.ToSize();				
 		}
 
+		internal void GoWindowed ()
+		{
+			
+			//Changing window style forces a redraw. Some games
+			//have fail-logic and toggle fullscreen in their draw function,
+			//so temporarily become inactive so it won't execute.
+			bool wasActive = IsActive;
+			IsActive = false;
+			
+			//Changing window style resets the title. Save it.
+			string oldTitle = _view.Title;
+			
+			NSMenu.MenuBarVisible = true;
+			_mainWindow.StyleMask = NSWindowStyle.Titled | NSWindowStyle.Closable;
+			if (_wasResizeable) _mainWindow.StyleMask |= NSWindowStyle.Resizable;
+			_mainWindow.HidesOnDeactivate = false;
+			
+			ResetWindowBounds();
+			
+			_view.Title = oldTitle;
+			
+			IsActive = wasActive;
+		}
+		
+		internal void GoFullScreen ()
+		{
+			bool wasActive = IsActive;
+			IsActive = false;
+			
+			_mainWindow.MakeKeyAndOrderFront(_mainWindow);
+			ResetWindowBounds();
+			
+			_wasResizeable = IsAllowUserResizing;
+			
+			string oldTitle = _view.Title;
+			
+			NSMenu.MenuBarVisible = false;
+			_mainWindow.StyleMask = NSWindowStyle.Borderless;
+			_mainWindow.HidesOnDeactivate = true;
+			
+			ResetWindowBounds();
+			
+			_view.Title = oldTitle;
+			
+			if (!IsMouseVisible) {
+				NSCursor.Hide();
+			}
+			
+			IsActive = wasActive;
+		}
+		
 		protected virtual void Initialize ()
 		{
 
