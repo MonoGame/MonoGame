@@ -143,8 +143,7 @@ namespace Microsoft.Xna.Framework
 
 		private void Initialize ()
 		{
-			// Set "full screen"  as default
-			_graphicsDevice.PresentationParameters.IsFullScreen = true;
+			_graphicsDevice.PresentationParameters.IsFullScreen = false;
 
 			if (_preferMultiSampling) {
 				_graphicsDevice.PreferedFilter = All.Linear;
@@ -169,7 +168,13 @@ namespace Microsoft.Xna.Framework
 				return _graphicsDevice.PresentationParameters.IsFullScreen;
 			}
 			set {
-				_graphicsDevice.PresentationParameters.IsFullScreen = value;				
+				bool wasFullScreen = _graphicsDevice.PresentationParameters.IsFullScreen;
+				_graphicsDevice.PresentationParameters.IsFullScreen = value;	
+				if (value && !wasFullScreen) {
+					_game.GoFullScreen();
+				} else if (!value && wasFullScreen) {
+					_game.GoWindowed();
+				}
 			}
 		}
 
