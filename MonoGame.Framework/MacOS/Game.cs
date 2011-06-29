@@ -480,6 +480,9 @@ namespace Microsoft.Xna.Framework
 			bool wasActive = IsActive;
 			IsActive = false;
 			
+			//Some games set fullscreen in their initialize function,
+			//before we have sized the window and set it active.
+			//Do that now, or else mouse tracking breaks.
 			_mainWindow.MakeKeyAndOrderFront(_mainWindow);
 			ResetWindowBounds();
 			
