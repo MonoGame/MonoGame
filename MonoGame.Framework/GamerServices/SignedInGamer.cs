@@ -76,9 +76,17 @@ namespace Microsoft.Xna.Framework.GamerServices
 		
 		private void DoAuthentication()
 		{
-			try 
+			try 				
 			{
-				if (double.Parse(UIDevice.CurrentDevice.SystemVersion) > 4.1)
+				var osVersion = UIDevice.CurrentDevice.SystemVersion;
+				if(osVersion.Contains("."))
+				if(osVersion.IndexOf(".") != osVersion.LastIndexOf("."))
+				{
+					var parts = osVersion.Split(char.Parse("."));
+					osVersion = parts[0] + "." + parts[1];
+				}
+				
+				if (double.Parse(osVersion) > 4.1)
 				{
 					
 					lp = GKLocalPlayer.LocalPlayer;
