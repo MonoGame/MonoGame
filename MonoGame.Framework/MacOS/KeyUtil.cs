@@ -61,7 +61,7 @@ namespace Microsoft.Xna.Framework
 			keyNames.Add (NSKey.Command, Keys.LeftWindows);
 			keyNames.Add (NSKey.Delete, Keys.Back);
 			keyNames.Add (NSKey.DownArrow, Keys.Down);
-			keyNames.Add (NSKey.Equal, Keys.D0);
+			keyNames.Add (NSKey.Equal, Keys.OemPlus);
 			keyNames.Add (NSKey.ForwardDelete, Keys.Delete);
 			keyNames.Add (NSKey.Keypad0, Keys.NumPad0);
 			keyNames.Add (NSKey.Keypad1, Keys.NumPad1);
@@ -96,10 +96,11 @@ namespace Microsoft.Xna.Framework
 			keyNames.Add (NSKey.RightShift, Keys.RightShift);
 			keyNames.Add (NSKey.ScrollLock, Keys.Scroll);
 			keyNames.Add (NSKey.Semicolon, Keys.OemSemicolon);
-			keyNames.Add (NSKey.Slash, Keys.OemBackslash);
+			keyNames.Add (NSKey.Slash, Keys.OemQuestion);
 			keyNames.Add (NSKey.UpArrow, Keys.Up);
 			keyNames.Add (NSKey.Period, Keys.OemPeriod);
 			keyNames.Add (NSKey.Return, Keys.Enter);
+			keyNames.Add (NSKey.Grave, Keys.OemTilde);
 			
 			// Modifiers
 			modifiers.Add ("524576", Keys.LeftAlt);
