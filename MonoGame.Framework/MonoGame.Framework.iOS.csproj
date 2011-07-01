@@ -117,6 +117,7 @@
     <Compile Include="GamerServices\SignedInGamerCollection.cs" />
     <Compile Include="Graphics\ClearOptions.cs" />
     <Compile Include="Graphics\DisplayMode.cs" />
+    <Compile Include="Graphics\DisplayModeCollection.cs" />
     <Compile Include="Graphics\ESImage.cs" />
     <Compile Include="Graphics\ESTexture2D.cs" />
     <Compile Include="Graphics\GraphicsAdapter.cs" />
