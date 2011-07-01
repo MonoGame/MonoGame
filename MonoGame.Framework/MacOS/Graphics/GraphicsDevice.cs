@@ -53,7 +53,6 @@ namespace Microsoft.Xna.Framework.Graphics
 		private int _activeTexture = -1;
 		private Viewport _viewport;
 		private bool _isDisposed = false;
-		private DisplayMode _displayMode = new DisplayMode ();
 		private RenderState _renderState;
 
 		public TextureCollection Textures { get; set; }
@@ -216,7 +215,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public Microsoft.Xna.Framework.Graphics.DisplayMode DisplayMode {
 			get {
-				return _displayMode;
+				return GraphicsAdapter.DefaultAdapter.CurrentDisplayMode;
 			}
 		}
 

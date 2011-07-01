@@ -55,7 +55,6 @@ namespace Microsoft.Xna.Framework.Graphics
 		private Viewport _viewport;
 		
 		private bool _isDisposed = false;
-		private readonly DisplayMode _displayMode = new DisplayMode();
 		private RenderState _renderState;
 		public TextureCollection Textures { get; set; }
         internal List<IntPtr> _pointerCache = new List<IntPtr>();
@@ -190,7 +189,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             get
             {
-                return _displayMode;
+                return GraphicsAdapter.DefaultAdapter.CurrentDisplayMode;
             }
         }
 
