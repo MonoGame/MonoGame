@@ -38,48 +38,47 @@
 // */
 // #endregion License
 // 
-
 using System;
 
 namespace Microsoft.Xna.Framework.Input
 {
-
 	public struct KeyboardState
 	{
 		private Keys[] _keys;
+
 		#region Methods
-		public KeyboardState( Keys[] keys )
+		public KeyboardState (Keys[] keys)
 		{
 			_keys = keys;
 			// Never used on iPhone or Zune
 		}
-		
-		public override bool Equals(Object obj)
+
+		public override bool Equals (Object obj)
 		{
-			return (this.GetHashCode() == obj.GetHashCode());
+			return (this.GetHashCode () == obj.GetHashCode ());
 		}
-		
-		public override int GetHashCode()
+
+		public override int GetHashCode ()
 		{
 			// use the hash code of the _keys array
 			if (_keys != null)
-				return _keys.GetHashCode();
+				return _keys.GetHashCode ();
 			else
 				return -1;
 		}
-		
-		public Keys[] GetPressedKeys()
+
+		public Keys[] GetPressedKeys ()
 		{
 			if (_keys == null)
 				_keys = new Keys[] {};
 			return _keys;
 		}
-		
-		public bool IsKeyDown(Keys key)
+
+		public bool IsKeyDown (Keys key)
 		{
 			if (_keys != null) {
-				foreach(Keys kkey in _keys) {
-					
+				foreach (Keys kkey in _keys) {
+
 					if (kkey == key) {
 						return true;
 					}
@@ -87,12 +86,12 @@ namespace Microsoft.Xna.Framework.Input
 			}
 			return false;
 		}
-		
-		public bool IsKeyUp(Keys key)
+
+		public bool IsKeyUp (Keys key)
 		{
 			if (_keys != null) {
-				foreach(Keys kkey in _keys) {
-					
+				foreach (Keys kkey in _keys) {
+
 					if (kkey == key) {
 						return false;
 					}
@@ -100,16 +99,27 @@ namespace Microsoft.Xna.Framework.Input
 			}
 			return true;
 		}
+
 		#endregion
-		
+
 		#region Properties
-		public KeyState this [Keys key] 
-		{ 
-			get
-			{
-				return (IsKeyDown(key) ? KeyState.Down : KeyState.Up);
+		public KeyState this [Keys key] { 
+			get {
+				return (IsKeyDown (key) ? KeyState.Down : KeyState.Up);
 			}			
 		}
+
 		#endregion
+
+		public static bool operator == (KeyboardState first, KeyboardState second)
+		{
+			return first.GetHashCode() == second.GetHashCode();
+		}
+		
+		public static bool operator != (KeyboardState first, KeyboardState second)
+		{
+			return first.GetHashCode() != second.GetHashCode();
+		}
+
 	}
 }
