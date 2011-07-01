@@ -42,7 +42,9 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-using MonoTouch.UIKit;
+using MonoMac.AppKit;
+using MonoMac.Foundation;
+
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -50,8 +52,11 @@ namespace Microsoft.Xna.Framework.Graphics
     {
         private static ReadOnlyCollection<GraphicsAdapter> adapters;
         
-        internal GraphicsAdapter()
+        private NSScreen _screen;
+        
+        internal GraphicsAdapter(NSScreen screen)
         {
+            _screen = screen;
         }
         
         public void Dispose()
@@ -62,10 +67,14 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             get
             {
-                return new DisplayMode((int)(UIScreen.MainScreen.Bounds.Width * UIScreen.MainScreen.Scale),
-                                       (int)(UIScreen.MainScreen.Bounds.Height * UIScreen.MainScreen.Scale),
-                                       60,
-                                       SurfaceFormat.Color);
+                //Dummy values until MonoMac implements Quartz Display Services
+                int refreshRate = 60;
+                SurfaceFormat format = SurfaceFormat.Color;
+                
+                return new DisplayMode((int)_screen.Frame.Width,
+                                       (int)_screen.Frame.Height,
+                                       refreshRate,
+                                       format);
             }
         }
 
@@ -77,7 +86,12 @@ namespace Microsoft.Xna.Framework.Graphics
         public static ReadOnlyCollection<GraphicsAdapter> Adapters {
             get {
                 if (adapters == null) {
-                    adapters = new ReadOnlyCollection<GraphicsAdapter>(new GraphicsAdapter[] {new GraphicsAdapter()});
+                    GraphicsAdapter[] tmpAdapters = new GraphicsAdapter[NSScreen.Screens.Length];
+                    for (int i=0; i<NSScreen.Screens.Length; i++) {
+                        tmpAdapters[i] = new GraphicsAdapter(NSScreen.Screens[i]);
+                    }
+                    
+                    adapters = new ReadOnlyCollection<GraphicsAdapter>(tmpAdapters);
                 }
                 return adapters;
             }
