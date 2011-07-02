@@ -51,17 +51,62 @@ namespace Microsoft.Xna.Framework.Audio
     {
 		private static Sound _sound;
 		private string _name = "";
+		private string _filename = "";
+		private byte[] _data;
 		
 		internal SoundEffect(string fileName)
 		{
-			_name = fileName;		
+			_filename = fileName;		
 			
-			if (_name == string.Empty )
+			if (_filename == string.Empty )
 			{
 			  throw new FileNotFoundException("Supported Sound Effect formats are wav, mp3, acc, aiff");
 			}
 			
-			_sound = new Sound(_name, 1.0f, false);
+			_sound = new Sound(_filename, 1.0f, false);
+			_name = Path.GetFileNameWithoutExtension(fileName);
+		}
+		
+		//SoundEffect from playable audio data
+		internal SoundEffect(string name, byte[] data)
+		{
+			_data = data;
+			_name = name;
+			_sound = new Sound(_data, 1.0f, false);
+		}
+		
+		public SoundEffect(byte[] buffer, int sampleRate, AudioChannels channels)
+		{
+			//buffer should contain 16-bit PCM wave data
+			short bitsPerSample = 16;
+			
+			MemoryStream mStream = new MemoryStream(44+buffer.Length);
+			BinaryWriter writer = new BinaryWriter(mStream);
+			
+			writer.Write("RIFF".ToCharArray()); //chunk id
+			writer.Write((int)(36+buffer.Length)); //chunk size
+			writer.Write("WAVE".ToCharArray()); //RIFF type
+			
+			writer.Write("fmt ".ToCharArray()); //chunk id
+			writer.Write((int)16); //format header size
+			writer.Write((short)1); //format (PCM)
+			writer.Write((short)channels);
+			writer.Write((int)sampleRate);
+			short blockAlign = (short)((bitsPerSample/8)*(int)channels);
+			writer.Write((int)(sampleRate*blockAlign)); //byte rate
+			writer.Write((short)blockAlign);
+			writer.Write((short)bitsPerSample);
+			
+			writer.Write("data".ToCharArray()); //chunk id
+			writer.Write((int)buffer.Length); //data size
+			writer.Write(buffer);
+			
+			writer.Close();
+			mStream.Close();
+			
+			_data = mStream.ToArray();
+			_name = "";
+			_sound = new Sound(_data, 1.0f, false);
 		}
 		
         public bool Play()
@@ -102,14 +147,18 @@ namespace Microsoft.Xna.Framework.Audio
         {
             get
             {
-				return Path.GetFileNameWithoutExtension(_name);
+				return _name;
             }
         }
 		
 		public SoundEffectInstance CreateInstance ()
 		{
 			var instance = new SoundEffectInstance();
-			_sound = new Sound( _name, MasterVolume, false);
+			if (_data != null) {
+				_sound = new Sound(_data, MasterVolume, false);
+			} else {
+				_sound = new Sound(_filename, MasterVolume, false);
+			}
 			instance.Sound = _sound;
 			return instance;
 			
