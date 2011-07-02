@@ -302,6 +302,11 @@
     <Compile Include="Graphics\Effect\SpriteEffect.cs" />
     <Compile Include="Graphics\Effect\SpriteEffectCode.cs" />
     <Compile Include="MacOS\Graphics\Effect\EffectParameter.cs" />
+    <Compile Include="Audio\AudioEngine.cs" />
+    <Compile Include="Audio\AudioStopOptions.cs" />
+    <Compile Include="Audio\Cue.cs" />
+    <Compile Include="Audio\SoundBank.cs" />
+    <Compile Include="Audio\WaveBank.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />
