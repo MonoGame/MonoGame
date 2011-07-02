@@ -66,6 +66,26 @@ namespace Microsoft.Xna.Framework.Audio
 			}
 		}
 		
+		public Sound(byte[] audiodata, float volume, bool looping)
+		{
+			var data = NSData.FromArray(audiodata);
+			_audioPlayer = AVAudioPlayer.FromData(data);
+			_audioPlayer.Volume = volume;
+			if ( looping )
+			{
+				_audioPlayer.NumberOfLoops = -1;
+			}
+			else
+			{
+				_audioPlayer.NumberOfLoops = 0;
+			}
+			
+			if (!_audioPlayer.PrepareToPlay())
+			{
+				throw new Exception("Unable to Prepare sound for playback!");
+			}
+		}
+		
 		public void Dispose()
 		{
 			_audioPlayer.Dispose();

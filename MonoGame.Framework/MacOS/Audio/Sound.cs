@@ -54,6 +54,13 @@ namespace Microsoft.Xna.Framework.Audio
 			_audioPlayer.Loops = looping;
 		}
 		
+		public Sound(byte[] audiodata, float volume, bool looping) {
+			var data = NSData.FromArray(audiodata);
+			_audioPlayer = new NSSound(data);
+			_audioPlayer.Volume = volume;
+			_audioPlayer.Loops = looping;
+		}
+		
 		public void Dispose()
 		{
 			_audioPlayer.Dispose();
@@ -124,7 +131,10 @@ namespace Microsoft.Xna.Framework.Audio
 		
 		public void Pause()
 		{		
-			_audioPlayer.Pause();
+			//HACK: Stopping or pausing NSSound is really slow (~200ms), don't if the sample is short :/
+			if (Duration > 2) {
+				_audioPlayer.Pause();
+			}
 		}
 		
 		public void Play()
@@ -134,7 +144,9 @@ namespace Microsoft.Xna.Framework.Audio
 		
 		public void Stop()
 		{			
-			_audioPlayer.Stop();
+			if (Duration > 2) { 
+				_audioPlayer.Stop();
+			}
 		}
 		
 		public float Volume
