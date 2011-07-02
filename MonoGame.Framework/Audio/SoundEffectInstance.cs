@@ -187,6 +187,9 @@ namespace Microsoft.Xna.Framework.Audio
 		{ 
 			get
 			{
+				if (_sound != null && soundState == SoundState.Playing && !_sound.Playing) {
+					soundState = SoundState.Stopped;
+				}
 				return soundState;
 			} 
 		}

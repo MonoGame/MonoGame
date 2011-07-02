@@ -128,6 +128,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Storage\StorageContainer.cs" />
     <Compile Include="Storage\StorageDevice.cs" />
+    <Compile Include="Audio\AudioChannels.cs" />
     <Compile Include="MacOS\Audio\Sound.cs" />
     <Compile Include="Audio\SoundEffect.cs" />
     <Compile Include="Audio\SoundEffectInstance.cs" />
