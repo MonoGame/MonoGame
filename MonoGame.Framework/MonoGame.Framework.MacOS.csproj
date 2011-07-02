@@ -142,10 +142,11 @@
     <Compile Include="MacOS\Graphics\GraphicsDevice.cs" />
     <Compile Include="Content\ContentTypeReaderManager.cs" />
     <Compile Include="Graphics\Viewport.cs" />
-    <Compile Include="MacOS\Graphics\DisplayMode.cs" />
+    <Compile Include="Graphics\DisplayMode.cs" />
+    <Compile Include="Graphics\DisplayModeCollection.cs" />
     <Compile Include="Graphics\ClearOptions.cs" />
     <Compile Include="MacOS\Graphics\PresentationParameters.cs" />
-    <Compile Include="Graphics\GraphicsAdapter.cs" />
+    <Compile Include="MacOS\Graphics\GraphicsAdapter.cs" />
     <Compile Include="Graphics\GraphicsDeviceCapabilities.cs" />
     <Compile Include="Graphics\GraphicsDeviceInformation.cs" />
     <Compile Include="Graphics\GraphicsDeviceStatus.cs" />
