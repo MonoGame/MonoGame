@@ -181,6 +181,7 @@
     <Compile Include="Input\ThumbStickDefinition.cs" />
     <Compile Include="Input\Mouse.cs" />
     <Compile Include="Input\MouseState.cs" />
+    <Compile Include="Audio\AudioChannels.cs" />
     <Compile Include="Audio\SoundEffect.cs" />
     <Compile Include="Audio\SoundState.cs" />
     <Compile Include="Media\MediaPlayer.cs" />
