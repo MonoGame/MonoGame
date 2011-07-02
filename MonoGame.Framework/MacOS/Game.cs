@@ -72,7 +72,7 @@ namespace Microsoft.Xna.Framework
 		private GameWindow _view;
 		private bool _isFixedTimeStep = true;
 		private TimeSpan _targetElapsedTime = TimeSpan.FromSeconds (1 / FramesPerSecond); 
-		private IGraphicsDeviceManager graphicsDeviceManager;
+		private IGraphicsDeviceManager _graphicsDeviceManager;
 		private IGraphicsDeviceService graphicsDeviceService;
 		private NSWindow _mainWindow;
 		internal static bool _playingVideo = false;
@@ -351,6 +351,18 @@ namespace Microsoft.Xna.Framework
 			}
 		}
 
+		private GraphicsDeviceManager graphicsDeviceManager {
+			get {
+				if (this._graphicsDeviceManager == null) {
+					this._graphicsDeviceManager = this.Services.GetService (typeof(IGraphicsDeviceManager)) as IGraphicsDeviceManager;
+					if (this._graphicsDeviceManager == null) {
+						throw new InvalidOperationException ("No Graphics Device Manager");
+					}
+				}
+				return (GraphicsDeviceManager)this._graphicsDeviceManager;
+			}
+		}
+		
 		public GraphicsDevice GraphicsDevice {
 			get {
 				if (this.graphicsDeviceService == null) {
@@ -427,16 +439,16 @@ namespace Microsoft.Xna.Framework
 			RectangleF frame;
 			RectangleF content;
 			
-			if (((GraphicsDeviceManager)graphicsDeviceManager).IsFullScreen) {
+			if (graphicsDeviceManager.IsFullScreen) {
 				frame = NSScreen.MainScreen.Frame;
 				content = NSScreen.MainScreen.Frame;
 			} else {
 				content = _view.Bounds;
 				content.Width = Math.Min(
-				                    ((GraphicsDeviceManager)graphicsDeviceManager).PreferredBackBufferWidth,
+				                    graphicsDeviceManager.PreferredBackBufferWidth,
 				                    NSScreen.MainScreen.VisibleFrame.Width);
 				content.Height = Math.Min(
-				                    ((GraphicsDeviceManager)graphicsDeviceManager).PreferredBackBufferHeight,
+				                    graphicsDeviceManager.PreferredBackBufferHeight,
 				                    NSScreen.MainScreen.VisibleFrame.Height-TitleBarHeight());
 				
 				frame = _mainWindow.Frame;
@@ -470,7 +482,8 @@ namespace Microsoft.Xna.Framework
 			
 			ResetWindowBounds();
 			
-			_view.Title = oldTitle;
+			if (oldTitle != null)
+				_view.Title = oldTitle;
 			
 			IsActive = wasActive;
 		}
@@ -496,7 +509,8 @@ namespace Microsoft.Xna.Framework
 			
 			ResetWindowBounds();
 			
-			_view.Title = oldTitle;
+			if (oldTitle != null)
+				_view.Title = oldTitle;
 			
 			if (!IsMouseVisible) {
 				NSCursor.Hide();
@@ -508,7 +522,6 @@ namespace Microsoft.Xna.Framework
 		protected virtual void Initialize ()
 		{
 
-			this.graphicsDeviceManager = this.Services.GetService (typeof(IGraphicsDeviceManager)) as IGraphicsDeviceManager;			
 			this.graphicsDeviceService = this.Services.GetService (typeof(IGraphicsDeviceService)) as IGraphicsDeviceService;			
 			
 			ResetWindowBounds();
