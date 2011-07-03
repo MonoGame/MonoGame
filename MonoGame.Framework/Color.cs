@@ -93,23 +93,23 @@ namespace Microsoft.Xna.Framework
             A = 255;
         }
 
-        public Color(byte r, byte g, byte b)
+        public Color(int r, int g, int b)
         {
             _packedValue = 0;
-            R = r;
-            G = g;
-            B = b;
+            R = (byte)r;
+            G = (byte)g;
+            B = (byte)b;
             A = (byte)255;
         }
 
 
-        public Color(byte r, byte g, byte b, byte alpha)
+        public Color(int r, int g, int b, int alpha)
         {
             _packedValue = 0;
-            R = r;
-            G = g;
-            B = b;
-            A = alpha;
+            R = (byte)r;
+            G = (byte)g;
+            B = (byte)b;
+            A = (byte)alpha;
         }
 
         public Color(float r, float g, float b, float alpha)
