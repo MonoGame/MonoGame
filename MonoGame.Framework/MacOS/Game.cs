@@ -560,11 +560,25 @@ namespace Microsoft.Xna.Framework
 		protected virtual void Update (GameTime gameTime)
 		{			
 			if (_initialized  /* TODO && !Guide.IsVisible */) {
-				foreach (GameComponent gc in _gameComponentCollection) {
+				
+				
+//				foreach (GameComponent gc in _gameComponentCollection) {
+//					if (gc.Enabled) {
+//						gc.Update (gameTime);
+//					}
+//				}
+				
+				// Changed from foreach to for loop in case the GameComponents's Update method
+				//   modifies the component collection.  With a foreach it causes an error:
+				//  "Collection was modified; enumeration operation may not execute."
+				//  .Net 4.0 I thought got around this but in Mono 2.10.2 we still get this error.
+				for (int x = 0; x < _gameComponentCollection.Count; x++) {
+					var gc = (GameComponent)_gameComponentCollection[x];
 					if (gc.Enabled) {
 						gc.Update (gameTime);
 					}
 				}
+
 			} else {
 				if (!_initializing) {
 					_initializing = true;
