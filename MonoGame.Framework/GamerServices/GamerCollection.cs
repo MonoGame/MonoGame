@@ -50,18 +50,23 @@ namespace Microsoft.Xna.Framework.GamerServices
 {
 
 
-	public class GamerCollection<Gamer> : ReadOnlyCollection<Gamer>, IEnumerable<Gamer>, IEnumerable
+	public class GamerCollection<T> : ReadOnlyCollection<T>, IEnumerable<T>, IEnumerable where T : Gamer
 	{	
-		GamerCollection(List<Gamer> list): base(list)
+		internal GamerCollection(List<T> list): base(list)
 		{
 		}
 		
-		/*public IEnumerator<Gamer> GetEnumerator()
-        {
-            return this.GetEnumerator();
-        }*/
+		public GamerCollection(): base(new List<T>())
+		{
+		}
+ 
 		
-		IEnumerator IEnumerable.GetEnumerator()
+//	public IEnumerator<Gamer> GetEnumerator()
+//        {
+//            return this.GetEnumerator();
+//        }
+		
+	IEnumerator IEnumerable.GetEnumerator()
         {
             return this.GetEnumerator();
         }
