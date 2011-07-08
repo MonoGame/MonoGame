@@ -69,6 +69,22 @@ namespace Microsoft.Xna.Framework.GamerServices
         {
             return _gamer;
         }
+		
+		public void Dispose(bool disposing)
+		{
+			if (disposing) {
+				_isDisposed = true;
+				foreach (var gamer in _signedInGamers) {
+					gamer.Dispose();
+				}
+			}
+		}
+		
+		public void Dispose()
+		{
+			this.Dispose(true);
+			GC.SuppressFinalize(this);
+		}
         #endregion
         #region Properties
 		public string DisplayName 
