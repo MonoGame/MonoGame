@@ -60,6 +60,9 @@ namespace Microsoft.Xna.Framework.GamerServices
 		{
 		}
  
+		public void AddGamer (T item) {
+			base.Items.Add (item);
+		}
 		
 //	public IEnumerator<Gamer> GetEnumerator()
 //        {

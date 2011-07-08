@@ -143,15 +143,15 @@ namespace Microsoft.Xna.Framework
         protected virtual void Dispose(bool disposing)
         {
 			
-		}
+	}
 		
 		/// <summary>
         /// Shuts down the component.
         /// </summary>
         public virtual void Dispose()
         {
-			
-		}
+		Dispose(true);
+	}
 		
         #region IComparable<GameComponent> Members
 
