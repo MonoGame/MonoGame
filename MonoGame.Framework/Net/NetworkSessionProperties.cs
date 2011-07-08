@@ -40,37 +40,50 @@
 
 #region Using clause
 using System;
+using System.Collections.Generic;
 
 using Microsoft.Xna.Framework.GamerServices;
 #endregion Using clause
 
 namespace Microsoft.Xna.Framework.Net
 {
-	public class NetworkSessionProperties
+	public class NetworkSessionProperties : List<Nullable<int>>
 	{
-
-		public NetworkSessionProperties()
+		
+		// The NetworkSessionProperies can contain up to eight interger values
+		//  from all the documentation I can find as well as tests that have been done
+		//  to confirm this.
+		public NetworkSessionProperties() : base(8)
 		{
+			this.Add(null);
+			this.Add(null);
+			this.Add(null);
+			this.Add(null);
+			this.Add(null);
+			this.Add(null);
+			this.Add(null);
+			this.Add(null);
+			
 		}
 		
-		public int Count 
-		{ 
-			get
-			{
-				throw new NotImplementedException();
-			}
-		}
-		
-		public Nullable<int> this [int index] 
-		{ 
-			get
-			{
-				throw new NotImplementedException();
-			}
-			set
-			{
-				throw new NotImplementedException();
-			}
-		}
+//		public int Count 
+//		{ 
+//			get
+//			{
+//				throw new NotImplementedException();
+//			}
+//		}
+//		
+//		public Nullable<int> this [int index] 
+//		{ 
+//			get
+//			{
+//				throw new NotImplementedException();
+//			}
+//			set
+//			{
+//				throw new NotImplementedException();
+//			}
+//		}
 	}
 }
