@@ -307,6 +307,11 @@
     <Compile Include="Audio\Cue.cs" />
     <Compile Include="Audio\SoundBank.cs" />
     <Compile Include="Audio\WaveBank.cs" />
+    <Compile Include="Net\CommandEvent.cs" />
+    <Compile Include="Net\CommandEventType.cs" />
+    <Compile Include="Net\CommandGamerJoined.cs" />
+    <Compile Include="Net\CommandSessionStateChange.cs" />
+    <Compile Include="Net\GamerStates.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />

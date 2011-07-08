@@ -47,8 +47,6 @@ using System.Threading;
 
 using Microsoft.Xna.Framework.GamerServices;
 
-using Lidgren.Network;
-
 #endregion Using clause
 
 namespace Microsoft.Xna.Framework.Net
