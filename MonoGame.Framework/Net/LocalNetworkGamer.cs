@@ -51,6 +51,12 @@ namespace Microsoft.Xna.Framework.Net
 
 		private bool isDataAvailable = false;
 		private SignedInGamer sig;
+		
+		public LocalNetworkGamer () : base(null, 0, 0)
+		{
+			sig = new SignedInGamer();
+		}
+		
 		public LocalNetworkGamer ( NetworkSession session, byte id, GamerStates state)
 			: base(session, id, state | GamerStates.Local)
 		{
