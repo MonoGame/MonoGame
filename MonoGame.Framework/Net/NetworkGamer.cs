@@ -51,9 +51,19 @@ namespace Microsoft.Xna.Framework.Net
 	{
 		
 		private byte id;
+		NetworkSession session; 
+		bool isHost;
+		bool isLocal;
+		bool hasVoice;
 		
-		public NetworkGamer ()
+		public NetworkGamer ( NetworkSession session, byte id, GamerStates state)
 		{
+			this.id = id;
+			this.session = session;
+			
+			this.isHost = state.HasFlag(GamerStates.Host);
+			this.isLocal = state.HasFlag(GamerStates.Local);
+			this.hasVoice = state.HasFlag(GamerStates.HasVoice);
 		}
 		
 		public bool HasLeftSession 
@@ -68,7 +78,7 @@ namespace Microsoft.Xna.Framework.Net
 		{ 
 			get
 			{
-				return false;
+				return hasVoice;
 			}
 		}
 		
@@ -84,7 +94,7 @@ namespace Microsoft.Xna.Framework.Net
 		{ 
 			get
 			{
-				return false;
+				return true;
 			}
 		}
 		
@@ -92,7 +102,7 @@ namespace Microsoft.Xna.Framework.Net
 		{ 
 			get
 			{
-				return false;
+				return isHost;
 			}
 		}
 		
@@ -100,7 +110,7 @@ namespace Microsoft.Xna.Framework.Net
 		{ 
 			get
 			{
-				return false;
+				return isLocal;
 			}
 		}
 		
@@ -108,7 +118,7 @@ namespace Microsoft.Xna.Framework.Net
 		{ 
 			get
 			{
-				return false;
+				return true;
 			}
 		}
 		
@@ -120,17 +130,17 @@ namespace Microsoft.Xna.Framework.Net
 			}
 		}
 		
-		private bool _IsReady;
+		private bool _isReady;
 		public bool IsReady 
 		{ 
 			get
 			{
-				return _IsReady;
+				return _isReady;
 			}
 			set
 			{
-				if (_IsReady != value )
-					_IsReady = value;
+				if (_isReady != value )
+					_isReady = value;
 			}
 		}
 		
@@ -138,7 +148,7 @@ namespace Microsoft.Xna.Framework.Net
 		{ 
 			get
 			{
-				return false;
+				return true;
 			}
 		}
 		
@@ -168,7 +178,7 @@ namespace Microsoft.Xna.Framework.Net
 		{ 
 			get
 			{
-				return null;
+				return session;
 			}
 		} 
 	}
