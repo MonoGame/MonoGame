@@ -149,18 +149,10 @@ namespace Microsoft.Xna.Framework.Net
 		)
 		{
 			try {
-				//				if (maxLocalGamers > 2) 
-				//					throw new ArgumentOutOfRangeException ( "Maximum local players can only be 2 on the iPhone." );
-				//				if (maxGamers < 2 || maxGamers > 8) 
-				//					throw new ArgumentOutOfRangeException ( "Maximum number of gamers must be between 2 and 8." );
-
-				//networkSessionType = sessionType;
-				NetworkSession session = new NetworkSession ();
-				return session;
-				//throw new NotImplementedException ();
+				return EndCreate(BeginCreate(sessionType,maxLocalGamers,maxGamers,null, null));
 			} finally {
 			}
-			//return null;
+			return null;
 		}
 
 		public static NetworkSession Create (
@@ -661,6 +653,10 @@ namespace Microsoft.Xna.Framework.Net
 			gamer.Machine = new NetworkMachine();
 			gamer.Machine.Gamers.AddGamer(gamer);
 			//gamer.IsReady = true;
+			
+			if (GamerJoined != null) {
+				GamerJoined(this, new GamerJoinedEventArgs(gamer));
+			}
 		}
 		#region Properties
 		public GamerCollection<NetworkGamer> AllGamers { 
