@@ -43,87 +43,116 @@ using System;
 using System.IO;
 
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Graphics.PackedVector;
+
 #endregion Using clause
 
 namespace Microsoft.Xna.Framework.Net
 {
-
 	public class PacketWriter : BinaryWriter
 	{
-		private int length = 0;
-		private int position = 0;
-			
+	
+		// I thought about using an array but that means more code in my opinion and it does not make sense
+		//  since the memory stream is perfect for this.
+		// Using a memory stream also fits nicely with the constructors see:
+		// http://msdn.microsoft.com/en-us/library/microsoft.xna.framework.net.packetwriter.packetwriter.aspx
+		// We will see when testing begins.
 		#region Constructors
-		public PacketWriter()
+		public PacketWriter () : this (0)
 		{
 		}
-		
-		public PacketWriter(int capacity)
+
+		public PacketWriter (int capacity) : base ( new MemoryStream(capacity))
 		{
 		}
+
 		#endregion
-		
+
 		#region Methods
-		public void Write( Color Value )
+		public void Write (Color Value)
 		{
-			throw new NotImplementedException();
+			this.Write (Value.PackedValue);
+		}
+
+		public override void Write (double Value)
+		{
+			this.Write (Value);
 		}
 		
-		public override void Write(double Value)
+		public void Write (Matrix Value)
 		{
-			throw new NotImplementedException();
+			// After looking at a captured packet it looks like all the values of 
+			//  the matrix are written.  This is different than the Lidgren XNAExtensions
+			this.Write (Value.M11);
+			this.Write (Value.M12);
+			this.Write (Value.M13);
+			this.Write (Value.M14);
+			this.Write (Value.M21);
+			this.Write (Value.M22);
+			this.Write (Value.M23);
+			this.Write (Value.M24);
+			this.Write (Value.M31);
+			this.Write (Value.M32);
+			this.Write (Value.M33);
+			this.Write (Value.M34);
+			this.Write (Value.M41);
+			this.Write (Value.M42);
+			this.Write (Value.M43);
+			this.Write (Value.M44);
 		}
-		
-		public void Write(Matrix Value)
+
+		public void Write (Quaternion Value)
 		{
-			throw new NotImplementedException();
-		}
-		
-		public void Write(Quaternion Value)
-		{
-			throw new NotImplementedException();
-		}
-		
-		public override void Write(float Value)
-		{
-			throw new NotImplementedException();
-		}
-		
-		public void Write(Vector2 Value)
-		{
-			throw new NotImplementedException();
-		}
-		
-		public void Write(Vector3 Value)
-		{
-			throw new NotImplementedException();
-		}
+			// This may need to be corrected as have no test for it
+			this.Write(Value.X);
+			this.Write(Value.Y);
+			this.Write(Value.Z);
+			this.Write(Value.W);			
 			
-		public void Write(Vector4 Value)
+		}
+
+		public override void Write (float Value)
 		{
-			throw new NotImplementedException();
+			this.Write(Value);
 		}
+
+		public void Write (Vector2 Value)
+		{
+			this.Write(Value.X);
+			this.Write(Value.Y);
+		}
+
+		public void Write (Vector3 Value)
+		{
+			this.Write(Value.X);
+			this.Write(Value.Y);
+			this.Write(Value.Z);
+		}
+
+		public void Write (Vector4 Value)
+		{
+			this.Write(Value.X);
+			this.Write(Value.Y);
+			this.Write(Value.Z);
+			this.Write(Value.W);
+		}
+
 		#endregion
-		
+
 		#region Properties
-		public int Length 
-		{ 
-			get 
-			{
-				return length; 
+		public int Length { 
+			get {
+				return (int)BaseStream.Length;
 			}
 		}
-		
-		public int Position 
-		{ 
-			get
-			{
-				return position;
+
+		public int Position { 
+			get {
+				return (int)BaseStream.Position;
 			}
-			set
-			{
-				if ( position != value )
-					position = value;
+			set {
+				if (BaseStream.Position != value)
+					BaseStream.Position = value;
 			} 
 		}
 		#endregion

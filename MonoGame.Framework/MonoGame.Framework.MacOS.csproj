@@ -331,4 +331,10 @@
     <Folder Include="MacOS\Input\" />
     <Folder Include="MacOS\GamerServices\" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\..\..\..\Volumes\Public\Development\Mono\lidgren-network-gen3\Lidgren.Network\Lidgren.Network.csproj">
+      <Project>{AE483C29-042E-4226-BA52-D247CE7676DA}</Project>
+      <Name>Lidgren.Network</Name>
+    </ProjectReference>
+  </ItemGroup>
 </Project>
