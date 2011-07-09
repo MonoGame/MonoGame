@@ -71,70 +71,70 @@ namespace Microsoft.Xna.Framework.Net
 		#region Methods
 		public void Write (Color Value)
 		{
-			this.Write (Value.PackedValue);
+			base.Write (Value.PackedValue);
 		}
 
 		public override void Write (double Value)
 		{
-			this.Write (Value);
+			base.Write (Value);
 		}
 		
 		public void Write (Matrix Value)
 		{
 			// After looking at a captured packet it looks like all the values of 
 			//  the matrix are written.  This is different than the Lidgren XNAExtensions
-			this.Write (Value.M11);
-			this.Write (Value.M12);
-			this.Write (Value.M13);
-			this.Write (Value.M14);
-			this.Write (Value.M21);
-			this.Write (Value.M22);
-			this.Write (Value.M23);
-			this.Write (Value.M24);
-			this.Write (Value.M31);
-			this.Write (Value.M32);
-			this.Write (Value.M33);
-			this.Write (Value.M34);
-			this.Write (Value.M41);
-			this.Write (Value.M42);
-			this.Write (Value.M43);
-			this.Write (Value.M44);
+			base.Write (Value.M11);
+			base.Write (Value.M12);
+			base.Write (Value.M13);
+			base.Write (Value.M14);
+			base.Write (Value.M21);
+			base.Write (Value.M22);
+			base.Write (Value.M23);
+			base.Write (Value.M24);
+			base.Write (Value.M31);
+			base.Write (Value.M32);
+			base.Write (Value.M33);
+			base.Write (Value.M34);
+			base.Write (Value.M41);
+			base.Write (Value.M42);
+			base.Write (Value.M43);
+			base.Write (Value.M44);
 		}
 
 		public void Write (Quaternion Value)
 		{
 			// This may need to be corrected as have no test for it
-			this.Write(Value.X);
-			this.Write(Value.Y);
-			this.Write(Value.Z);
-			this.Write(Value.W);			
+			base.Write(Value.X);
+			base.Write(Value.Y);
+			base.Write(Value.Z);
+			base.Write(Value.W);			
 			
 		}
 
 		public override void Write (float Value)
 		{
-			this.Write(Value);
+			base.Write(Value);
 		}
 
 		public void Write (Vector2 Value)
 		{
-			this.Write(Value.X);
-			this.Write(Value.Y);
+			base.Write(Value.X);
+			base.Write(Value.Y);
 		}
 
 		public void Write (Vector3 Value)
 		{
-			this.Write(Value.X);
-			this.Write(Value.Y);
-			this.Write(Value.Z);
+			base.Write(Value.X);
+			base.Write(Value.Y);
+			base.Write(Value.Z);
 		}
 
 		public void Write (Vector4 Value)
 		{
-			this.Write(Value.X);
-			this.Write(Value.Y);
-			this.Write(Value.Z);
-			this.Write(Value.W);
+			base.Write(Value.X);
+			base.Write(Value.Y);
+			base.Write(Value.Z);
+			base.Write(Value.W);
 		}
 
 		#endregion
