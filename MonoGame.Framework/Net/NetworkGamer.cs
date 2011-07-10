@@ -55,6 +55,7 @@ namespace Microsoft.Xna.Framework.Net
 		bool isHost;
 		bool isLocal;
 		bool hasVoice;
+		long remoteUniqueIdentifier = -1;
 		
 		public NetworkGamer ( NetworkSession session, byte id, GamerStates state)
 		{
@@ -64,6 +65,12 @@ namespace Microsoft.Xna.Framework.Net
 			this.isHost = state.HasFlag(GamerStates.Host);
 			this.isLocal = state.HasFlag(GamerStates.Local);
 			this.hasVoice = state.HasFlag(GamerStates.HasVoice);
+		}
+		
+		internal long RemoteUniqueIdentifier
+		{
+			get { return remoteUniqueIdentifier; }
+			set { remoteUniqueIdentifier = value; }
 		}
 		
 		public bool HasLeftSession 
