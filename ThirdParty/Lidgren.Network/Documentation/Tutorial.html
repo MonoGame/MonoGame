@@ -1,0 +1,206 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+	<style type="text/css">
+		body
+		{
+			font-family: Verdana, Geneva, Arial, sans-serif;
+			font-size: small;
+			margin-left: 20px;
+			background-color: #dddddd;
+		}
+		td
+		{
+			font-family: Verdana, Geneva, Arial, sans-serif;
+			font-size: small;
+		}
+		.cf
+		{
+			font-family: Courier New;
+			font-size: 10pt;
+			color: black;
+			background: white;
+			padding: 16px;
+			border: 1px solid black;
+		}
+		.cl
+		{
+			margin: 0px;
+		}
+		.cb1
+		{
+			color: green;
+		}
+		.cb2
+		{
+			color: #2b91af;
+		}
+		.cb3
+		{
+			color: blue;
+		}
+		.cb4
+		{
+			color: #a31515;
+		}
+	</style>
+	<title>Lidgren basics tutorial</title>
+</head>
+<body>
+	<table>
+		<tr>
+			<td width="700">
+				<h1>
+					Lidgren basics</h1>
+				<p>
+					Lidgren network library is all about messages. There are two types of messages:</p>
+				<li>Library messages telling you things like a peer has connected or diagnostics messages (warnings, errors) when unexpected things happen.</li>
+				<li>Data messages which is data sent from a remote (connected or unconnected) peer.</li>
+				<p>
+					The base class for establishing connections, receiving and sending message are the NetPeer class. Using it you can make a peer-to-peer network, but if you are creating a server/client topology there are special classes called NetServer and NetClient. They inherit NetPeer but sets some defaults and includes some helper methods/properties.</p>
+				<p>
+					Here's how to set up a NetServer:</p>
+				<div class="cf">
+					<pre class="cl"><span class="cb2">NetPeerConfiguration</span> config = <span class="cb3">new</span> <span class="cb2">NetPeerConfiguration</span>(<span class="cb4">&quot;MyExampleName&quot;</span>);</pre>
+					<pre class="cl">config.Port = 14242;</pre>
+					<pre class="cl">&nbsp;</pre>
+					<pre class="cl"><span class="cb2">NetServer</span> server = <span class="cb3">new</span> <span class="cb2">NetServer</span>(config);</pre>
+					<pre class="cl">server.Start();</pre>
+				</div>
+				<p>
+					The code above first creates a configuration. It has lots of properties you can change, but the default values should be pretty good for most applications. The string you provide in the constructor (MyExampleName) is an identifier to distinquish it from other applications using the lidgren library. Just make sure you use the same string in both server and client - or you will be unable to communicate between them.</p>
+				<p>
+					Secondly we've set the local port the server should listen to. This is the port number we tell the client(s) what port number to connect to. The local port can be set for a client too, but it's not needed and not recommended.</p>
+				<p>
+					Thirdly we create our server object and fourth we Start() it. Starting the server will create a new network thread and bind to a socket and start listening for connections.</p>
+				<p>
+					Early on we spoke about messages; now is the time to start receiving and sending some. Here's a code snippet for receiving messages:</p>
+				<div class="cf">
+					<pre class="cl"><span class="cb2">NetIncomingMessage</span> msg;</pre>
+					<pre class="cl"><span class="cb3">while</span> ((msg = server.ReadMessage()) != <span class="cb3">null</span>)</pre>
+					<pre class="cl">{</pre>
+					<pre class="cl">&nbsp;&nbsp;&nbsp; <span class="cb3">switch</span> (msg.MessageType)</pre>
+					<pre class="cl">&nbsp;&nbsp;&nbsp; {</pre>
+					<pre class="cl">&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <span class="cb3">case</span> <span class="cb2">NetIncomingMessageType</span>.VerboseDebugMessage:</pre>
+					<pre class="cl">&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <span class="cb3">case</span> <span class="cb2">NetIncomingMessageType</span>.DebugMessage:</pre>
+					<pre class="cl">&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <span class="cb3">case</span> <span class="cb2">NetIncomingMessageType</span>.WarningMessage:</pre>
+					<pre class="cl">&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <span class="cb3">case</span> <span class="cb2">NetIncomingMessageType</span>.ErrorMessage:</pre>
+					<pre class="cl">&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <span class="cb2">Console</span>.WriteLine(msg.ReadString());</pre>
+					<pre class="cl">&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <span class="cb3">break</span>;</pre>
+					<pre class="cl">&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <span class="cb3">default</span>:</pre>
+					<pre class="cl">&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <span class="cb2">Console</span>.WriteLine(<span class="cb4">&quot;Unhandled type: &quot;</span> + msg.MessageType);</pre>
+					<pre class="cl">&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <span class="cb3">break</span>;</pre>
+					<pre class="cl">&nbsp;&nbsp;&nbsp; }</pre>
+					<pre class="cl">&nbsp;&nbsp;&nbsp; server.Recycle(msg);</pre>
+					<pre class="cl">}</pre>
+				</div>
+				<p>
+					So, lets dissect the above code. First we declare a NetIncomingMessage, which is the type of incoming messages. Then we read a message and handles it, looping back as long as there are messages to fetch. For each message we find, we switch on sometime called MessageType - it's a description what the message contains. In this code example we only catch messages of type VerboseDebugMessage, DebugMessage, WarningMessage and ErrorMessage. All those four types are emitted by the library to inform about various events. They all contains a single string, so we use the method ReadString() to extract a copy of that string and print it in the console.</p>
+				<p>
+					Reading data will increment the internal message pointer so you can read subsequent data using the Read*() methods.</p>
+				<p>
+					For all other message type we just print that it's currently unhandled.</p>
+				<p>
+					Finally, we recycle the message after we're done with it - this will enable the library to reuse the object and create less garbage.</p>
+				<p>
+					Sending messages are even easier:</p>
+				<div class="cf">
+					<pre class="cl"><span class="cb2">NetOutgoingMessage</span> sendMsg = server.CreateMessage();</pre>
+					<pre class="cl">sendMsg.Write(<span class="cb4">&quot;Hello&quot;</span>);</pre>
+					<pre class="cl">sendMsg.Write(42);</pre>
+					<pre class="cl">&nbsp;</pre>
+					<pre class="cl">server.SendMessage(sendMsg, recipient, <span class="cb2">NetDeliveryMethod</span>.ReliableOrdered);</pre>
+				</div>
+				<p>
+					The above code first creates a new message, or uses a recycled message, which is why it's not possible to just create a message using new(). It then writes a string ("Hello") and an integer (System.Int32, 4 bytes in size) to the message.</p>
+				<p>
+					Then the message is sent using the SendMessage() method. The first argument is the message to send, the second argument is the recipient connection - which we'll not go into detail about just yet - and the third argument are HOW to deliver the message, or rather how to behave if network conditions are bad and a packet gets lost, duplicated or reordered.</p>
+				<p>
+					There are five delivery methods available:</p>
+				<div class="cf">
+					<table>
+						<tr>
+							<td valign="top">
+								<b>Unreliable</b>
+							</td>
+							<td>
+								&nbsp;
+							</td>
+							<td valign="top">
+								This is just UDP. Messages can be lost, received more than once and messages sent after other messages may be received before them.
+							</td>
+						</tr>
+						<tr>
+							<td colspan="3">
+								&nbsp;
+							</td>
+						</tr>
+						<tr>
+							<td valign="top">
+								<b>UnreliableSequenced</b>
+							</td>
+							<td>
+								&nbsp;
+							</td>
+							<td valign="top">
+								Using this delivery method messages can still be lost; but you're protected against duplicated messages and if a message arrives late; that is, if a message sent after this one has already been received - it will be dropped. This means you will never receive "older" data than what you already have received.
+							</td>
+						</tr>
+						<tr>
+							<td colspan="3">
+								&nbsp;
+							</td>
+						</tr>
+						<tr>
+							<td valign="top">
+								<b>ReliableUnordered</b>
+							</td>
+							<td>
+								&nbsp;
+							</td>
+							<td valign="top">
+								This delivery method ensures that every message sent will be received eventually. It does not however guarantee what order they will be received; late messages may be delivered before older ones.
+							</td>
+						</tr>
+						<tr>
+							<td colspan="3">
+								&nbsp;
+							</td>
+						</tr>
+						<tr>
+							<td valign="top">
+								<b>ReliableSequenced</b>
+							</td>
+							<td>
+								&nbsp;
+							</td>
+							<td valign="top">
+								This delivery method is similar to UnreliableSequenced; except that is guarantees that SOME messages will be received - if you only send one message - it will be received. If you sent two messages quickly, and they get reordered in transit, only the newest message will be received - but at least ONE of them will be received guaranteed.
+							</td>
+						</tr>
+						<tr>
+							<td colspan="3">
+								&nbsp;
+							</td>
+						</tr>
+						<tr>
+							<td valign="top"><b>ReliableOrdered</b></td>
+							<td>&nbsp;</td>
+							<td valign="top">
+								This delivery method guarantees that messages will always be received in the exact order they were sent.
+							</td>
+						</tr>
+					</table>
+				</div>
+				<p>
+					Here's how to read and decode the message above:</p>
+				<div class="cf">
+					<pre class="cl"><span class="cb2">NetIncomingMessage</span> incMsg = server.ReadMessage();</pre>
+					<pre class="cl"><span class="cb3">string</span> str = incMsg.ReadString();</pre>
+					<pre class="cl"><span class="cb3">int</span> a = incMsg.ReadInt32();</pre>
+				</div>
+			</td>
+		</tr>
+	</table>
+</body>
+</html>
