@@ -1,0 +1,10 @@
+﻿
+
+* The NetBuffer object is gone; instead there are NetOutgoingMessage and NetIncomingMessage objects
+
+* No need to allocate a read buffer before calling ReadMessage
+
+
+
+
+
