@@ -1,0 +1,115 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+	<style type="text/css">
+		body
+		{
+			font-family: Verdana, Geneva, Arial, sans-serif;
+			font-size: small;
+			margin-left: 20px;
+			background-color: #dddddd;
+		}
+		td
+		{
+			font-family: Verdana, Geneva, Arial, sans-serif;
+			font-size: small;
+		}
+		.cf
+		{
+			font-family: Courier New;
+			font-size: 10pt;
+			color: black;
+			background: white;
+			padding: 16px;
+			border: 1px solid black;
+		}
+		.cl
+		{
+			margin: 0px;
+		}
+		.cb1
+		{
+			color: green;
+		}
+		.cb2
+		{
+			color: #2b91af;
+		}
+		.cb3
+		{
+			color: blue;
+		}
+		.cb4
+		{
+			color: #a31515;
+		}
+	</style>
+	<title>Lidgren tutorial</title>
+</head>
+<body>
+	<table>
+		<tr>
+			<td width="700">
+				<h1>Simulating bad network conditions</h1>
+				<p>
+					On the internet, your packets are likely to run in to all kinds of trouble. They will be delayed and lost and they might even arrive multiple times at the destination. Lidgren has a few option to simulate how your application or game will react when this happens.<br />
+					They are all configured using the NetPeerConfiguration class - these properties exists:</p>
+				<p>
+				<div class="cf">
+					<table>
+						<tr>
+							<td valign="top">
+								<b>SimulatedLoss</b>
+							</td>
+							<td>
+								&nbsp;
+							</td>
+							<td valign="top">
+								This is a float which simulates lost packets. A value of 0 will disable this feature, a value of 0.5f will make half of your sent packets disappear, chosen randomly. Note that packets may contain several messages - this is the amount of packets lost.
+							</td>
+						</tr>
+						<tr>
+							<td colspan="3">
+								&nbsp;
+							</td>
+						</tr>
+						<tr>
+							<td valign="top">
+								<b>SimulatedDuplicatesChance</b>
+							</td>
+							<td>
+								&nbsp;
+							</td>
+							<td valign="top">
+								This is a float which determines the chance that a packet will be duplicated at the destination. 0 means no packets will be duplicated, 0.5f means that on average, every other packet will be duplicated.
+							</td>
+						</tr>
+						<tr>
+							<td colspan="3">
+								&nbsp;
+							</td>
+						</tr>
+						<tr>
+							<td valign="top">
+								<b>SimulatedMinimumLatency</b><br />
+								<b>SimulatedRandomLatency</b>
+							</td>
+							<td>
+								&nbsp;
+							</td>
+							<td valign="top">
+								These two properties control simulating delay of packets in seconds (not milliseconds, use 0.05 for 50 ms of lag). They work on top of the actual network delay and the total delay will be:<br />
+								Actual one way latency + SimulatedMinimumLatency + [Randomly per packet 0 to SimulatedRandomLatency seconds]
+							</td>
+						</tr>
+					</table>
+					
+				</div>
+					<p>It's recommended to assume symmetric condtions and configure server and client with the same simulation settings.</p>
+					<p>Simulating bad network conditions only works in DEBUG builds.</p>
+
+			</td>
+		</tr>
+	</table>
+</body>
+</html>
