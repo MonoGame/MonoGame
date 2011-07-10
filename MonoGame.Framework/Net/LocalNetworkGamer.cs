@@ -64,6 +64,7 @@ namespace Microsoft.Xna.Framework.Net
 			: base(session, id, state | GamerStates.Local)
 		{
 			sig = new SignedInGamer ();
+			receivedData = new Queue<CommandReceiveData>();
 		}
 
 		public void EnableSendVoice (
@@ -78,21 +79,81 @@ namespace Microsoft.Xna.Framework.Net
 			int offset,
 			out NetworkGamer sender)
 		{
-			throw new NotImplementedException ();
+			if (data == null)
+				throw new ArgumentNullException("data");
+			
+			if (receivedData.Count <= 0) {
+				sender = null;
+				return 0;
+			}
+			
+			lock (receivedData) {
+
+				CommandReceiveData crd;
+				
+				// we will peek at the value first to see if we can process it
+				crd = (CommandReceiveData)receivedData.Peek();
+				
+				if (offset + crd.data.Length > data.Length)
+					throw new ArgumentOutOfRangeException("data","The length + offset is greater than parameter can hold.");
+				
+				// no exception thrown yet so let's process it
+				// take it off the queue
+				receivedData.Dequeue();
+				
+				Array.Copy(crd.data, offset, data, 0, data.Length);
+				sender = crd.gamer;
+				return data.Length;			
+			}
+			
 		}
 
 		public int ReceiveData (
 			byte[] data,
 			out NetworkGamer sender)
 		{
-			throw new NotImplementedException ();
+			return ReceiveData(data, 0, out sender);
 		}
 
 		public int ReceiveData (
 			PacketReader data,
 			out NetworkGamer sender)
 		{
-			throw new NotImplementedException ();
+//      lock (this.incomingPackets)
+//      {
+//        if (this.incomingPackets.Count > 0)
+//        {
+//          data.Resize(this.incomingPackets.Peek().Size);
+//        }
+//        else
+//        {
+//          data.Resize(0);
+//        }
+//        return this.ReceiveData(data.ByteArray, 0, out sender);
+//      }
+			lock (receivedData) {
+				if (receivedData.Count >= 0) {
+					data.Reset(0);
+
+					// take it off the queue
+					CommandReceiveData crd = (CommandReceiveData)receivedData.Dequeue();
+					
+					// lets make sure that we can handle the data
+					if (data.Length < crd.data.Length) {
+						data.Reset(crd.data.Length);
+					}
+
+					Array.Copy(crd.data, data.Data, data.Length);
+					sender = crd.gamer;
+					return data.Length;	
+					
+				}
+				else {
+					sender = null;
+					return 0;
+				}
+				
+			}
 		}
 
 		public void SendData (
