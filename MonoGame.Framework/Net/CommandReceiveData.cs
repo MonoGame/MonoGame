@@ -6,6 +6,7 @@ namespace Microsoft.Xna.Framework.Net
 	{
 		internal byte[] data;
 		internal long remoteUniqueIdentifier = -1;
+		internal NetworkGamer gamer;
 		
 		public CommandReceiveData (long remoteUniqueIdentifier, byte[] data)
 		{

@@ -66,6 +66,18 @@ namespace Microsoft.Xna.Framework.Net
 		#endregion
 		
 		#region Methods
+		internal byte[] Data
+		{
+			get {
+				MemoryStream stream = (MemoryStream)this.BaseStream;
+				return stream.GetBuffer();
+			}			
+			set {
+				MemoryStream ms = (MemoryStream)this.BaseStream;
+				ms.Write(value, 0, value.Length);
+			}
+		}
+		
 		public Color ReadColor()
 		{
 			Color newColor = Color.Transparent;
@@ -149,6 +161,12 @@ namespace Microsoft.Xna.Framework.Net
 			vect.W = this.ReadSingle();
 			
 			return vect;
+		}
+		
+		internal void Reset(int size) {
+			MemoryStream ms = (MemoryStream)BaseStream;
+			ms.SetLength(size);
+			ms.Position = 0;
 		}
 		#endregion
 		

@@ -599,11 +599,21 @@ namespace Microsoft.Xna.Framework.Net
 		private void ProcessSendData(CommandSendData command)
 		{
 			hostServer.SendData(command.data, command.options);
+			//Console.WriteLine("ProcessSendData: " + command.data.Length);
 			
 		}
 		
 		private void ProcessReceiveData(CommandReceiveData command)
 		{
+			
+			// first let's look up the gamer that sent the data
+			foreach (NetworkGamer gamer in _allGamers) {
+				if (gamer.RemoteUniqueIdentifier == command.remoteUniqueIdentifier)
+					command.gamer = gamer;
+			}
+			
+			// now we loop through each of our local gamers and add the command
+			// to be processed.
 			foreach (LocalNetworkGamer localGamer in LocalGamers) {
 				lock (localGamer.receivedData) {
 					localGamer.receivedData.Enqueue(command);
@@ -659,6 +669,7 @@ namespace Microsoft.Xna.Framework.Net
 			}
 			else {
 				gamer = new NetworkGamer (this, (byte)command.InternalIndex, command.State);
+				gamer.RemoteUniqueIdentifier = command.remoteUniqueIdentifier;
 				_allGamers.AddGamer(gamer);
 				_remoteGamers.AddGamer(gamer);
 			}
@@ -674,6 +685,7 @@ namespace Microsoft.Xna.Framework.Net
 				GamerJoined(this, new GamerJoinedEventArgs(gamer));
 			}
 		}
+		
 		#region Properties
 		public GamerCollection<NetworkGamer> AllGamers { 
 			get {

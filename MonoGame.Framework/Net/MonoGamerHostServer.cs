@@ -164,7 +164,7 @@ namespace Microsoft.Xna.Framework.Net
 					//Console.WriteLine("Data to send: " + data.Length);
 					// write who this position is for
 					om.Write (otherPlayer.RemoteUniqueIdentifier);
-
+					//Console.WriteLine(otherPlayer.RemoteUniqueIdentifier);
 					om.Write (data);
 					
 					NetDeliveryMethod ndm = NetDeliveryMethod.Unreliable;

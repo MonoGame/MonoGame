@@ -5,7 +5,7 @@ namespace Microsoft.Xna.Framework.Net
 	internal class CommandGamerJoined : ICommand
 	{
 		int gamerInternalIndex = -1;
-		long remoteUniqueIdentifier = -1;
+		internal long remoteUniqueIdentifier = -1;
 		GamerStates states;
 		
 		public CommandGamerJoined (int internalIndex, bool isHost, bool isLocal)
@@ -19,9 +19,9 @@ namespace Microsoft.Xna.Framework.Net
 			
 		}
 		
-		public CommandGamerJoined (long remoteUniqueIndentifier)
+		public CommandGamerJoined (long uniqueIndentifier)
 		{
-			this.remoteUniqueIdentifier = remoteUniqueIdentifier;
+			this.remoteUniqueIdentifier = uniqueIndentifier;
 			
 		}		
 		
