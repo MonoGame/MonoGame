@@ -2,10 +2,12 @@ using System;
 
 namespace Microsoft.Xna.Framework.Net
 {
-	public class CommandGamerJoined
+	internal class CommandGamerJoined : ICommand
 	{
 		int gamerInternalIndex = -1;
+		long remoteUniqueIdentifier = -1;
 		GamerStates states;
+		
 		public CommandGamerJoined (int internalIndex, bool isHost, bool isLocal)
 		{
 			gamerInternalIndex = internalIndex;
@@ -17,6 +19,12 @@ namespace Microsoft.Xna.Framework.Net
 			
 		}
 		
+		public CommandGamerJoined (long remoteUniqueIndentifier)
+		{
+			this.remoteUniqueIdentifier = remoteUniqueIdentifier;
+			
+		}		
+		
 		public GamerStates State
 		{
 			get { return states; }
@@ -27,7 +35,7 @@ namespace Microsoft.Xna.Framework.Net
 			get { return gamerInternalIndex; }
 		}
 		
-		public static CommandEventType Command {
+		public CommandEventType Command {
 			get { return CommandEventType.GamerJoined; }
 		}
 	}

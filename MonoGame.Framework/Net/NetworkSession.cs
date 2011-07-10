@@ -81,33 +81,11 @@ namespace Microsoft.Xna.Framework.Net
 		private GamerCollection<NetworkGamer> _remoteGamers;
 		private GamerCollection<NetworkGamer> _previousGamers;
 		
-		private Queue<CommandEvent> commandQueue;
-			
-		public NetworkSession ()
-		{
-			_allGamers = new GamerCollection<NetworkGamer> ();
-		}
+		internal Queue<CommandEvent> commandQueue;
 
-		public static NetworkSession Create (
-			NetworkSessionType sessionType,// Type of session being hosted.
-			IEnumerable<SignedInGamer> localGamers, // Maximum number of local players on the same gaming machine in this network session.
-			int maxGamers, // Maximum number of players allowed in this network session.  For Zune-based games, this value must be between 2 and 8; 8 is the maximum number of players supported in the session.
-			int privateGamerSlots, // Number of reserved private session slots created for the session. This value must be less than maximumGamers. 
-			NetworkSessionProperties sessionProperties // Properties of the session being created.
-)
-		{
-			try {
-				if (maxGamers < 2 || maxGamers > 8) 
-					throw new ArgumentOutOfRangeException ( "Maximum number of gamers must be between 2 and 8."  );
-				if (privateGamerSlots < 0 || privateGamerSlots > maxGamers) 
-					throw new ArgumentOutOfRangeException ( "Private session slots must be between 0 and maximum number of gamers."  );
-
-				//networkSessionType = sessionType;
-
-				throw new NotImplementedException ();
-			} finally {
-			}
-		} 
+		// use the static Create or BeginCreate methods
+		private NetworkSession ()
+		{}
 		
 		private NetworkSessionType sessionType;
 		private int maxGamers;
@@ -116,6 +94,8 @@ namespace Microsoft.Xna.Framework.Net
 		private bool isHost = false;
 		private int hostGamerIndex = -1;
 		private NetworkGamer hostingGamer;
+		
+		internal MonoGamerHostServer hostServer;
 		
 		private NetworkSession (NetworkSessionType sessionType, int maxGamers, int privateGamerSlots, NetworkSessionProperties sessionProperties, bool isHost, int hostGamer)
 		{
@@ -138,10 +118,33 @@ namespace Microsoft.Xna.Framework.Net
 			this.isHost = isHost;
 			this.hostGamerIndex = hostGamer;
 			
+			hostServer = new MonoGamerHostServer(this);
+			
 			CommandGamerJoined gj = new CommandGamerJoined(hostGamer, this.isHost, true);
-			commandQueue.Enqueue(new CommandEvent(CommandGamerJoined.Command,gj));
+			commandQueue.Enqueue(new CommandEvent(gj));
 		}
+		
+		public static NetworkSession Create (
+			NetworkSessionType sessionType,// Type of session being hosted.
+			IEnumerable<SignedInGamer> localGamers, // Maximum number of local players on the same gaming machine in this network session.
+			int maxGamers, // Maximum number of players allowed in this network session.  For Zune-based games, this value must be between 2 and 8; 8 is the maximum number of players supported in the session.
+			int privateGamerSlots, // Number of reserved private session slots created for the session. This value must be less than maximumGamers. 
+			NetworkSessionProperties sessionProperties // Properties of the session being created.
+			)
+		{
+			try {
+				if (maxGamers < 2 || maxGamers > 8) 
+					throw new ArgumentOutOfRangeException ( "Maximum number of gamers must be between 2 and 8."  );
+				if (privateGamerSlots < 0 || privateGamerSlots > maxGamers) 
+					throw new ArgumentOutOfRangeException ( "Private session slots must be between 0 and maximum number of gamers."  );
 
+				//networkSessionType = sessionType;
+
+				throw new NotImplementedException ();
+			} finally {
+			}
+		} 
+		
 		public static NetworkSession Create (
 			NetworkSessionType sessionType,	// Type of session being hosted.
 			int maxLocalGamers,		// Maximum number of local players on the same gaming machine in this network session.
@@ -151,8 +154,9 @@ namespace Microsoft.Xna.Framework.Net
 			try {
 				return EndCreate(BeginCreate(sessionType,maxLocalGamers,maxGamers,null, null));
 			} finally {
+				
 			}
-			return null;
+			
 		}
 
 		public static NetworkSession Create (
@@ -163,18 +167,11 @@ namespace Microsoft.Xna.Framework.Net
 			NetworkSessionProperties sessionProperties)
 		{
 			try {
-				if (maxLocalGamers != 1) 
-					throw new ArgumentOutOfRangeException ( "Maximum local players can only be 1 on the iPhone." );
-				if (maxGamers < 2 || maxGamers > 8) 
-					throw new ArgumentOutOfRangeException ( "Maximum number of gamers must be between 2 and 8." );
-				if (privateGamerSlots < 0 || privateGamerSlots > maxGamers) 
-					throw new ArgumentOutOfRangeException ( "Private session slots must be between 0 and maximum number of gamers."  );
-
-
-				//networkSessionType = sessionType;
-				throw new NotImplementedException ();
+				return EndCreate(BeginCreate(sessionType,maxLocalGamers,maxGamers,privateGamerSlots,sessionProperties,null, null));
 			} finally {
+				
 			}
+			
 		}
 		
 		private static NetworkSession Create (
@@ -214,6 +211,11 @@ namespace Microsoft.Xna.Framework.Net
 				foreach (Gamer gamer in _allGamers) {
 					gamer.Dispose();
 				}
+			}
+			
+			// Make sure we shut down our server instance as we no longer need it.
+			if (hostServer != null) {
+				hostServer.ShutDown();
 			}
 		}
 
@@ -400,9 +402,6 @@ namespace Microsoft.Xna.Framework.Net
 				// Call EndInvoke to retrieve the results.
 				if (asyncResult.AsyncDelegate is NetworkSessionAsynchronousCreate) {
 					returnValue = ((NetworkSessionAsynchronousCreate)asyncResult.AsyncDelegate).EndInvoke (result);
-//								CommandGamerJoined gj = new CommandGamerJoined(50, true, true);			
-//					returnValue.commandQueue.Enqueue(new CommandEvent(CommandGamerJoined.Command, gj));
-//					returnValue.Update();
 				}	
 			} finally {
 				// Close the wait handle.
@@ -437,9 +436,7 @@ namespace Microsoft.Xna.Framework.Net
 		{
 			try {
 				CommandSessionStateChange ssc = new CommandSessionStateChange(NetworkSessionState.Lobby, sessionState);
-				commandQueue.Enqueue(new CommandEvent(CommandSessionStateChange.Command,ssc));
-
-				//sessionState = NetworkSessionState.Lobby;
+				commandQueue.Enqueue(new CommandEvent(ssc));
 
 			} finally {
 			}
@@ -510,9 +507,6 @@ namespace Microsoft.Xna.Framework.Net
 				if (maxLocalGamers < 1 || maxLocalGamers > 4)
 					throw new ArgumentOutOfRangeException ( "maxLocalGamers must be between 1 and 4." );
 
-				//networkSessionType = sessionType;
-
-
 				List<AvailableNetworkSession> availableNetworkSessions = new List<AvailableNetworkSession> ();
 
 				return new AvailableNetworkSessionCollection ( availableNetworkSessions );
@@ -570,7 +564,7 @@ namespace Microsoft.Xna.Framework.Net
 		{
 			try {
 				CommandSessionStateChange ssc = new CommandSessionStateChange(NetworkSessionState.Playing, sessionState);
-				commandQueue.Enqueue(new CommandEvent(CommandSessionStateChange.Command,ssc));
+				commandQueue.Enqueue(new CommandEvent(ssc));
 				//sessionState = NetworkSessionState.Playing;
 			} finally {
 			}
@@ -589,11 +583,33 @@ namespace Microsoft.Xna.Framework.Net
 					case CommandEventType.SessionStateChange:
 						ProcessSessionStateChange((CommandSessionStateChange)command.CommandObject);
 						break;
-						
-					}
+					case CommandEventType.SendData:
+						ProcessSendData((CommandSendData)command.CommandObject);
+						break;						
+					case CommandEventType.ReceiveData:
+						ProcessReceiveData((CommandReceiveData)command.CommandObject);
+						break;	
+					
+					}					
 				}
 			} finally {
 			}
+		}
+		
+		private void ProcessSendData(CommandSendData command)
+		{
+			hostServer.SendData(command.data, command.options);
+			
+		}
+		
+		private void ProcessReceiveData(CommandReceiveData command)
+		{
+			foreach (LocalNetworkGamer localGamer in LocalGamers) {
+				lock (localGamer.receivedData) {
+					localGamer.receivedData.Enqueue(command);
+				}
+			}
+			
 		}
 		
 		private void ProcessSessionStateChange(CommandSessionStateChange command)
@@ -750,22 +766,22 @@ namespace Microsoft.Xna.Framework.Net
 
 		public GamerCollection<NetworkGamer> PreviousGamers {
 			get {
-				throw new NotImplementedException ();
+				return _previousGamers;
 			}
 		}
 
 		public int PrivateGamerSlots { 
 			get {
-				throw new NotImplementedException ();
+				return privateGamerSlots;
 			}
 			set {
-				throw new NotImplementedException ();
+				privateGamerSlots = value;
 			}
 		}	
 
 		public GamerCollection<NetworkGamer> RemoteGamers {
 			get {
-				throw new NotImplementedException ();
+				return _remoteGamers;
 			}
 		}
 

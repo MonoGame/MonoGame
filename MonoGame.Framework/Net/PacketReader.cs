@@ -117,10 +117,10 @@ namespace Microsoft.Xna.Framework.Net
 			
 		}
 		
-		public override float ReadSingle()
-		{
-			return this.ReadSingle();
-		}
+//		public override float ReadSingle()
+//		{
+//			return this.ReadSingle();
+//		}
 		
 		public Vector2 ReadVector2()
 		{
