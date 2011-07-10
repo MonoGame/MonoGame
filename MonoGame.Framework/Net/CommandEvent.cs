@@ -2,7 +2,7 @@ using System;
 
 namespace Microsoft.Xna.Framework.Net
 {
-	public class CommandEvent
+	internal class CommandEvent
 	{
 		CommandEventType command;
 		object commandObject;
@@ -12,6 +12,12 @@ namespace Microsoft.Xna.Framework.Net
 			this.command = command;
 			this.commandObject = commandObject;
 		}
+		
+		public CommandEvent (ICommand command)
+		{
+			this.command = command.Command;
+			this.commandObject = command;
+		}		
 		
 		public CommandEventType Commnad
 		{

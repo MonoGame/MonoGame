@@ -138,7 +138,15 @@ namespace Microsoft.Xna.Framework.Net
 		}
 
 		#endregion
-
+		
+		internal byte[] Data
+		{
+			get {
+				MemoryStream stream = (MemoryStream)this.BaseStream;
+				return stream.GetBuffer();
+			}
+		}
+		
 		#region Properties
 		public int Length { 
 			get {
@@ -154,6 +162,14 @@ namespace Microsoft.Xna.Framework.Net
 				if (BaseStream.Position != value)
 					BaseStream.Position = value;
 			} 
+		}
+		
+		internal void Reset() 
+		{
+			MemoryStream stream = (MemoryStream)this.BaseStream;
+			stream.SetLength(0);
+			stream.Position = 0;
+			
 		}
 		#endregion
 	}
