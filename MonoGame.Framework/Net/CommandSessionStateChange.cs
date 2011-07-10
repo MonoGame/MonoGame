@@ -2,7 +2,7 @@ using System;
 
 namespace Microsoft.Xna.Framework.Net
 {
-	public class CommandSessionStateChange
+	internal class CommandSessionStateChange : ICommand
 	{
 		
 		NetworkSessionState newState;
@@ -24,7 +24,7 @@ namespace Microsoft.Xna.Framework.Net
 			get { return oldState; }
 		}
 		
-		public static CommandEventType Command {
+		public CommandEventType Command {
 			get { return CommandEventType.SessionStateChange; }
 		}		
 	}

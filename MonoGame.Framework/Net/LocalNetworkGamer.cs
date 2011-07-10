@@ -40,8 +40,10 @@
 
 #region Using clause
 using System;
+using System.Collections.Generic;
 
 using Microsoft.Xna.Framework.GamerServices;
+
 #endregion Using clause
 
 namespace Microsoft.Xna.Framework.Net
@@ -49,122 +51,115 @@ namespace Microsoft.Xna.Framework.Net
 	public sealed class LocalNetworkGamer : NetworkGamer
 	{
 
-		private bool isDataAvailable = false;
 		private SignedInGamer sig;
+		internal Queue<CommandReceiveData> receivedData;
 		
 		public LocalNetworkGamer () : base(null, 0, 0)
 		{
-			sig = new SignedInGamer();
+			sig = new SignedInGamer ();
+			receivedData = new Queue<CommandReceiveData>();
 		}
-		
-		public LocalNetworkGamer ( NetworkSession session, byte id, GamerStates state)
+
+		public LocalNetworkGamer (NetworkSession session,byte id,GamerStates state)
 			: base(session, id, state | GamerStates.Local)
 		{
-			sig = new SignedInGamer();
+			sig = new SignedInGamer ();
 		}
-		
+
 		public void EnableSendVoice (
-         NetworkGamer remoteGamer,
-         bool enable
-)
+			NetworkGamer remoteGamer, 
+			bool enable)
 		{
-			throw new NotImplementedException();
+			throw new NotImplementedException ();
 		}
-		
+
 		public int ReceiveData (
-         byte[] data,
-         int offset,
-         out NetworkGamer sender
-)
+			byte[] data, 
+			int offset,
+			out NetworkGamer sender)
 		{
-			throw new NotImplementedException();
+			throw new NotImplementedException ();
 		}
-		
+
 		public int ReceiveData (
-         byte[] data,
-         out NetworkGamer sender
-)
+			byte[] data,
+			out NetworkGamer sender)
 		{
-			throw new NotImplementedException();
+			throw new NotImplementedException ();
 		}
-		
+
 		public int ReceiveData (
-         PacketReader data,
-         out NetworkGamer sender
-)
+			PacketReader data,
+			out NetworkGamer sender)
 		{
-			throw new NotImplementedException();
+			throw new NotImplementedException ();
 		}
-		
+
 		public void SendData (
-         byte[] data,
-         int offset,
-         int count,
-         SendDataOptions options
-)
+			byte[] data,
+			int offset,
+			int count,
+			SendDataOptions options)
 		{
-			throw new NotImplementedException();
+			CommandEvent cme = new CommandEvent(new CommandSendData(data, offset, count, options, null ));
+			Session.commandQueue.Enqueue(cme);
 		}
-		
+
 		public void SendData (
-         byte[] data,
-         int offset,
-         int count,
-         SendDataOptions options,
-         NetworkGamer recipient
-)
+			byte[] data,
+			int offset,
+			int count,
+			SendDataOptions options,
+			NetworkGamer recipient)
 		{
-			throw new NotImplementedException();
+			CommandEvent cme = new CommandEvent(new CommandSendData(data, offset, count, options, recipient ));
+			Session.commandQueue.Enqueue(cme);
 		}
-		
+
 		public void SendData (
-         byte[] data,
-         SendDataOptions options
-)
+			byte[] data,
+			SendDataOptions options)
 		{
-			throw new NotImplementedException();
+			CommandEvent cme = new CommandEvent(new CommandSendData(data, 0, data.Length, options, null ));
+			Session.commandQueue.Enqueue(cme);
 		}
-		
+
 		public void SendData (
-         byte[] data,
-         SendDataOptions options,
-         NetworkGamer recipient
-)
+			byte[] data,
+			SendDataOptions options,
+			NetworkGamer recipient)
 		{
-			throw new NotImplementedException();
+			CommandEvent cme = new CommandEvent(new CommandSendData(data, 0, data.Length, options, recipient ));
+			Session.commandQueue.Enqueue(cme);
 		}
-		
+
 		public void SendData (
-         PacketWriter data,
-         SendDataOptions options
-)
+			PacketWriter data,
+			SendDataOptions options)
 		{
-			throw new NotImplementedException();
+			SendData(data.Data, 0, data.Length, options, null);
+			data.Reset();
 		}
-		
+
 		public void SendData (
-         PacketWriter data,
-         SendDataOptions options,
-         NetworkGamer recipient
-)
+			PacketWriter data,
+			SendDataOptions options,
+			NetworkGamer recipient)
 		{
-			throw new NotImplementedException();
+			SendData(data.Data, 0, data.Length, options, recipient);
+			data.Reset();
 		}
-		
-		
-		
-		public bool IsDataAvailable 
-		{ 
-			get
-			{
-				return isDataAvailable;
+
+		public bool IsDataAvailable { 
+			get {
+				lock (receivedData) {
+					return receivedData.Count > 0;
+				}
 			}
 		}
-		
-		public SignedInGamer SignedInGamer 
-		{ 
-			get
-			{
+
+		public SignedInGamer SignedInGamer { 
+			get {
 				return sig;
 			}
 		}

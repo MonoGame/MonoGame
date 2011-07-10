@@ -33,6 +33,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Platformer", "StarterKits\M
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Marblets", "StarterKits\MacOS\Marblets\Marblets.csproj", "{2BCFC6F4-5C08-467A-B310-5C0A009018CE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lidgren.Network", "ThirdParty\Lidgren.Network\Lidgren.Network.csproj", "{AE483C29-042E-4226-BA52-D247CE7676DA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -87,6 +89,10 @@ Global
 		{A82EAD58-40D7-49BE-8F24-09FEA34F9E55}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A82EAD58-40D7-49BE-8F24-09FEA34F9E55}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A82EAD58-40D7-49BE-8F24-09FEA34F9E55}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AE483C29-042E-4226-BA52-D247CE7676DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE483C29-042E-4226-BA52-D247CE7676DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AE483C29-042E-4226-BA52-D247CE7676DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AE483C29-042E-4226-BA52-D247CE7676DA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D03F3BAF-E4D0-4B6B-A567-9A0E2F882335}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D03F3BAF-E4D0-4B6B-A567-9A0E2F882335}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D03F3BAF-E4D0-4B6B-A567-9A0E2F882335}.Release|Any CPU.ActiveCfg = Release|Any CPU
