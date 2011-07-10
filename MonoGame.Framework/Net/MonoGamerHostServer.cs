@@ -101,7 +101,7 @@ namespace Microsoft.Xna.Framework.Net
 							CommandEvent cme = new CommandEvent(new CommandReceiveData(msg.SenderConnection.RemoteUniqueIdentifier,
 											data));
 							session.commandQueue.Enqueue(cme);
-							Console.WriteLine("data enqueued " + data.Length);
+							//Console.WriteLine("data enqueued " + data.Length);
 						break;
 					}
 
