@@ -65,6 +65,7 @@ namespace Microsoft.Xna.Framework.Net
 
 	public delegate AvailableNetworkSessionCollection  NetworkSessionAsynchronousFind (
 			NetworkSessionType sessionType,
+			int hostGamer,
 			int maxLocalGamers,
 			NetworkSessionProperties searchProperties);
 
@@ -96,8 +97,15 @@ namespace Microsoft.Xna.Framework.Net
 		private NetworkGamer hostingGamer;
 		
 		internal MonoGamerHostServer hostServer;
+		internal MonoGamerClient client;
+		
 		
 		private NetworkSession (NetworkSessionType sessionType, int maxGamers, int privateGamerSlots, NetworkSessionProperties sessionProperties, bool isHost, int hostGamer)
+			: this(sessionType, maxGamers, privateGamerSlots, sessionProperties, isHost, hostGamer, null)
+		{
+		}
+		
+		private NetworkSession (NetworkSessionType sessionType, int maxGamers, int privateGamerSlots, NetworkSessionProperties sessionProperties, bool isHost, int hostGamer, AvailableNetworkSession availableSession)
 		{
 			if (sessionProperties == null) {
 				throw new ArgumentNullException ("sessionProperties");
@@ -118,7 +126,12 @@ namespace Microsoft.Xna.Framework.Net
 			this.isHost = isHost;
 			this.hostGamerIndex = hostGamer;
 			
-			hostServer = new MonoGamerHostServer(this);
+			if (isHost)
+				hostServer = new MonoGamerHostServer(this);
+			else {
+				if (client == null)
+					client = new MonoGamerClient(this, availableSession);
+			}
 			
 			CommandGamerJoined gj = new CommandGamerJoined(hostGamer, this.isHost, true);
 			commandQueue.Enqueue(new CommandEvent(gj));
@@ -217,6 +230,9 @@ namespace Microsoft.Xna.Framework.Net
 			if (hostServer != null) {
 				hostServer.ShutDown();
 			}
+			if (client != null) {
+				client.ShutDown();
+			}
 		}
 
 	#endregion
@@ -306,7 +322,7 @@ namespace Microsoft.Xna.Framework.Net
 				}
 			}
 			if (hostGamer == null) {
-				throw new ArgumentException ("Invalid number of gamers in localGamers.");
+				throw new ArgumentException ("Invalid gamer in localGamers.");
 			}
 
 			return (int)hostGamer.PlayerIndex;
@@ -319,18 +335,27 @@ namespace Microsoft.Xna.Framework.Net
 			AsyncCallback callback,
 			Object asyncState)
 		{
-			if (sessionType == NetworkSessionType.Local)
-				throw new ArgumentException ( "NetworkSessionType cannot be NetworkSessionType.Local." );
+			int hostGamer = -1;
+			hostGamer = GetHostingGamerIndex (localGamers);
 
-			try {
-				throw new NotImplementedException ();
-			} finally {
-			}
+			return BeginFind (sessionType, hostGamer, 4, searchProperties, callback, asyncState);
+
 
 		}
 
 		public static IAsyncResult BeginFind (
 			NetworkSessionType sessionType,
+			int maxLocalGamers,
+			NetworkSessionProperties searchProperties,
+			AsyncCallback callback,
+			Object asyncState)
+		{
+			return BeginFind (sessionType, -1, 4, searchProperties, callback, asyncState);
+		}
+		
+		private static IAsyncResult BeginFind (
+			NetworkSessionType sessionType,
+			int hostGamer,
 			int maxLocalGamers,
 			NetworkSessionProperties searchProperties,
 			AsyncCallback callback,
@@ -343,7 +368,7 @@ namespace Microsoft.Xna.Framework.Net
 
 			try {
 				NetworkSessionAsynchronousFind AsynchronousFind = new NetworkSessionAsynchronousFind (Find);
-				return AsynchronousFind.BeginInvoke (sessionType, maxLocalGamers, searchProperties, callback, asyncState);
+				return AsynchronousFind.BeginInvoke (sessionType, hostGamer, maxLocalGamers, searchProperties, callback, asyncState);
 			} finally {
 			}
 		}
@@ -357,7 +382,7 @@ namespace Microsoft.Xna.Framework.Net
 				throw new ArgumentNullException ();			
 
 			try {
-				NetworkSessionAsynchronousJoin AsynchronousJoin = new NetworkSessionAsynchronousJoin (Join);
+				NetworkSessionAsynchronousJoin AsynchronousJoin = new NetworkSessionAsynchronousJoin (JoinSession);
 				return AsynchronousJoin.BeginInvoke (availableSession, callback, asyncState);
 			} finally {
 			}
@@ -414,21 +439,27 @@ namespace Microsoft.Xna.Framework.Net
 		public static AvailableNetworkSessionCollection EndFind (IAsyncResult result)
 		{
 			AvailableNetworkSessionCollection returnValue = null;
+			List<AvailableNetworkSession> networkSessions = new List<AvailableNetworkSession>();
+			
 			try {
 				// Retrieve the delegate.
 				AsyncResult asyncResult = (AsyncResult)result;            	
 
 				// Wait for the WaitHandle to become signaled.
 				result.AsyncWaitHandle.WaitOne ();
-
+				
+				
 				// Call EndInvoke to retrieve the results.
 				if (asyncResult.AsyncDelegate is NetworkSessionAsynchronousFind) {
 					returnValue = ((NetworkSessionAsynchronousFind)asyncResult.AsyncDelegate).EndInvoke (result);
+					
+					MonoGamerClient.FindResults(networkSessions);
 				}		            	            
 			} finally {
 				// Close the wait handle.
 				result.AsyncWaitHandle.Close ();
 			}
+			returnValue = new AvailableNetworkSessionCollection(networkSessions);
 			return returnValue;
 		}
 
@@ -489,17 +520,22 @@ namespace Microsoft.Xna.Framework.Net
 			IEnumerable<SignedInGamer> localGamers,
 			NetworkSessionProperties searchProperties)
 		{
-			if (sessionType != NetworkSessionType.SystemLink)
-				throw new ArgumentException ( "NetworkSessionType must be NetworkSessionType.SystemLink" );
-
-			try {
-				throw new NotImplementedException ();
-			} finally {
-			}
+			int hostGamer = -1;
+			hostGamer = GetHostingGamerIndex(localGamers);
+			return EndFind(BeginFind(sessionType, hostGamer, 4, searchProperties,null,null));
 		}
 
 		public static AvailableNetworkSessionCollection Find (
 			NetworkSessionType sessionType,
+			int maxLocalGamers,
+			NetworkSessionProperties searchProperties)
+		{
+			return EndFind(BeginFind(sessionType, -1, maxLocalGamers, searchProperties,null,null));
+		}
+
+		private static AvailableNetworkSessionCollection Find (
+			NetworkSessionType sessionType,
+			int hostGamer,
 			int maxLocalGamers,
 			NetworkSessionProperties searchProperties)
 		{
@@ -508,31 +544,67 @@ namespace Microsoft.Xna.Framework.Net
 					throw new ArgumentOutOfRangeException ( "maxLocalGamers must be between 1 and 4." );
 
 				List<AvailableNetworkSession> availableNetworkSessions = new List<AvailableNetworkSession> ();
-
+				MonoGamerClient.Find();
 				return new AvailableNetworkSessionCollection ( availableNetworkSessions );
 			} finally {
 			}
 		}
-
+		
+//		private static AvailableNetworkSessionCollection Find (
+//			NetworkSessionType sessionType,
+//			int maxLocalGamers,
+//			NetworkSessionProperties searchProperties)
+//		{
+//			try {
+//				if (maxLocalGamers < 1 || maxLocalGamers > 4)
+//					throw new ArgumentOutOfRangeException ( "maxLocalGamers must be between 1 and 4." );
+//
+//				List<AvailableNetworkSession> availableNetworkSessions = new List<AvailableNetworkSession> ();
+//				MonoGamerClient.Find();
+//				return new AvailableNetworkSessionCollection ( availableNetworkSessions );
+//			} finally {
+//			}
+//		}
+		
 		public NetworkGamer FindGamerById (byte gamerId)
 		{
 			try {
-				throw new NotImplementedException ();
+				foreach (NetworkGamer gamer in _allGamers) {
+					if (gamer.Id == gamerId)
+						return gamer;
+				}
+				
+				return null;
 			} finally {
 			}
 		}
 
 		public static NetworkSession Join (AvailableNetworkSession availableSession)
 		{
-			if (availableSession == null)
-				throw new ArgumentNullException ();
+			return EndJoin(BeginJoin(availableSession, null, null));
 
+		}
+		
+		private static NetworkSession JoinSession (AvailableNetworkSession availableSession) 
+		{
+			NetworkSession session = null;
+			
 			try {
-				throw new NotImplementedException ();
+				NetworkSessionType sessionType = NetworkSessionType.SystemLink;
+				int maxGamers = 32;
+				int privateGamerSlots = 0;
+				bool isHost = false;
+				int hostGamer = -1;
+				NetworkSessionProperties sessionProperties = null;
+				if (sessionProperties == null)
+					sessionProperties = new NetworkSessionProperties();
+				session = new NetworkSession (sessionType, maxGamers, privateGamerSlots, sessionProperties, isHost, hostGamer, availableSession);
+				
 			} finally {
 			}
+			
+			return session;		
 		}
-
 		public static NetworkSession JoinInvited (IEnumerable<SignedInGamer> localGamers)
 		{
 			try {
