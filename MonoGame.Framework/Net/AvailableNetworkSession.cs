@@ -40,6 +40,7 @@
 
 #region Using clause
 using System;
+using System.Net;
 
 #endregion Using clause
 
@@ -59,6 +60,8 @@ namespace Microsoft.Xna.Framework.Net
 			{
 				return _currentGameCount;
 			}
+			
+			internal set { _currentGameCount = value; }
 		}
 		
 		string _hostGamertag;
@@ -68,6 +71,8 @@ namespace Microsoft.Xna.Framework.Net
 			{
 				return _hostGamertag;
 			}
+			
+			internal set { _hostGamertag = value; }
 		}
 		
 		int _openPrivateGamerSlots;
@@ -77,6 +82,8 @@ namespace Microsoft.Xna.Framework.Net
 			{
 				return _openPrivateGamerSlots;
 			}
+			
+			internal set { _openPrivateGamerSlots = value; }			
 		}
 		
 		int _openPublicGamerSlots; 
@@ -86,6 +93,7 @@ namespace Microsoft.Xna.Framework.Net
 			{
 				return _openPublicGamerSlots;
 			}
+			internal set { _openPublicGamerSlots = value; }			
 		}
 		
 		private QualityOfService _QualityOfService;
@@ -95,6 +103,7 @@ namespace Microsoft.Xna.Framework.Net
 			{
 				return _QualityOfService;
 			}
+			internal set { _QualityOfService = value; }			
 		}
 		
 		NetworkSessionProperties _sessionProperties;
@@ -104,6 +113,14 @@ namespace Microsoft.Xna.Framework.Net
 			{
 				return _sessionProperties;
 			}
+			internal set { _sessionProperties = value; }			
+		}
+		
+		IPEndPoint _endPoint;
+		internal IPEndPoint EndPoint 
+		{
+			get { return _endPoint; }
+			set { _endPoint = value;}
 		}
 	}
 }

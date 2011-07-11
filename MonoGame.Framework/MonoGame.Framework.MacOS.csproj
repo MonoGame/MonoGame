@@ -316,6 +316,7 @@
     <Compile Include="Net\CommandSendData.cs" />
     <Compile Include="Net\ICommand.cs" />
     <Compile Include="Net\CommandReceiveData.cs" />
+    <Compile Include="Net\MonoGamerClient.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />
