@@ -119,18 +119,6 @@ namespace Microsoft.Xna.Framework.Net
 			PacketReader data,
 			out NetworkGamer sender)
 		{
-//      lock (this.incomingPackets)
-//      {
-//        if (this.incomingPackets.Count > 0)
-//        {
-//          data.Resize(this.incomingPackets.Peek().Size);
-//        }
-//        else
-//        {
-//          data.Resize(0);
-//        }
-//        return this.ReceiveData(data.ByteArray, 0, out sender);
-//      }
 			lock (receivedData) {
 				if (receivedData.Count >= 0) {
 					data.Reset(0);

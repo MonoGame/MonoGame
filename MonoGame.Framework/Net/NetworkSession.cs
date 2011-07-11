@@ -670,7 +670,10 @@ namespace Microsoft.Xna.Framework.Net
 		
 		private void ProcessSendData(CommandSendData command)
 		{
-			hostServer.SendData(command.data, command.options);
+			if (hostServer != null) 
+				hostServer.SendData(command.data, command.options);
+			else
+				client.SendData(command.data, command.options);
 			//Console.WriteLine("ProcessSendData: " + command.data.Length);
 			
 		}
