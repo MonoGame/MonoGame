@@ -115,16 +115,37 @@ namespace Microsoft.Xna.Framework.Net
 
 			NetPeerConfiguration config = new NetPeerConfiguration ("MonoGame");
 			config.EnableMessageType (NetIncomingMessageType.DiscoveryRequest);
+			config.DisableMessageType (NetIncomingMessageType.StatusChanged);
 			//config.Port = 3074;
 
 			// create and start server
 			client = new NetClient(config);
+			
 			client.Start ();
 			
-			client.Connect(availableSession.EndPoint);
+			Console.WriteLine("Connecting to: " + availableSession.EndPoint);
+			NetConnection connection = client.Connect(availableSession.EndPoint);
+			
+			
+			bool connectedToHost = false;
+			
+			do {
+				Thread.Sleep(2);
+				if (connection.RemoteUniqueIdentifier != 0) {
+					//Console.WriteLine(client.ServerConnection.RemoteEndpoint);
+					CommandGamerJoined cgj = new CommandGamerJoined(connection.RemoteUniqueIdentifier);
+					//cgj.State |= GamerStates.Host;
+					CommandEvent cmde = new CommandEvent(cgj);
+					session.commandQueue.Enqueue(cmde);
+					Console.WriteLine (NetUtility.ToHexString (connection.RemoteUniqueIdentifier) + " connected to host!");					
+					connectedToHost = true;
+				}
+				
+			} while (!connectedToHost);
 			
 			// run until we are done
 			do {
+
 				
 				NetIncomingMessage msg;
 				while ((msg = client.ReadMessage ()) != null) {
@@ -144,19 +165,19 @@ namespace Microsoft.Xna.Framework.Net
 						//
 						Console.WriteLine (msg.ReadString ());
 						break;
-					case NetIncomingMessageType.StatusChanged:
-						NetConnectionStatus status = (NetConnectionStatus)msg.ReadByte ();
-						if (status == NetConnectionStatus.Connected) {
-							//
-							// A new player just connected!
-							//
-							Console.WriteLine (NetUtility.ToHexString (msg.SenderConnection.RemoteUniqueIdentifier) + " connected!");
-							CommandGamerJoined cgj = new CommandGamerJoined(msg.SenderConnection.RemoteUniqueIdentifier);
-							CommandEvent cmde = new CommandEvent(cgj);
-							session.commandQueue.Enqueue(cmde);
-						}
-
-						break;
+//					case NetIncomingMessageType.StatusChanged:
+//						NetConnectionStatus status = (NetConnectionStatus)msg.ReadByte ();
+//						if (status == NetConnectionStatus.Connected) {
+//							//
+//							// A new player just connected!
+//							//
+//							Console.WriteLine (NetUtility.ToHexString (msg.SenderConnection.RemoteUniqueIdentifier) + " connected!");
+//							CommandGamerJoined cgj = new CommandGamerJoined(msg.SenderConnection.RemoteUniqueIdentifier);
+//							CommandEvent cmde = new CommandEvent(cgj);
+//							session.commandQueue.Enqueue(cmde);
+//						}
+//
+//						break;
 					case NetIncomingMessageType.Data:
 						
 							byte[] data = msg.ReadBytes(msg.LengthBytes);
@@ -229,8 +250,8 @@ namespace Microsoft.Xna.Framework.Net
 					// send position update about 'otherPlayer' to 'player'
 					NetOutgoingMessage om = client.CreateMessage ();
 					//Console.WriteLine("Data to send: " + data.Length);
-					// write who this position is for
-					om.Write (otherPlayer.RemoteUniqueIdentifier);
+					// write who this position is for (only for test)
+					//om.Write (otherPlayer.RemoteUniqueIdentifier);
 					//Console.WriteLine(otherPlayer.RemoteUniqueIdentifier);
 					om.Write (data);
 					

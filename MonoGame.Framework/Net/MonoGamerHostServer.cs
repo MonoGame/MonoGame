@@ -95,7 +95,7 @@ namespace Microsoft.Xna.Framework.Net
 							//
 							// A new player just connected!
 							//
-							Console.WriteLine (NetUtility.ToHexString (msg.SenderConnection.RemoteUniqueIdentifier) + " connected!");
+							Console.WriteLine (NetUtility.ToHexString (msg.SenderConnection.RemoteUniqueIdentifier) + " connected! from " + msg.SenderEndpoint);
 							CommandGamerJoined cgj = new CommandGamerJoined(msg.SenderConnection.RemoteUniqueIdentifier);
 							CommandEvent cmde = new CommandEvent(cgj);
 							session.commandQueue.Enqueue(cmde);
@@ -169,8 +169,8 @@ namespace Microsoft.Xna.Framework.Net
 					// send position update about 'otherPlayer' to 'player'
 					NetOutgoingMessage om = server.CreateMessage ();
 					//Console.WriteLine("Data to send: " + data.Length);
-					// write who this position is for
-					om.Write (otherPlayer.RemoteUniqueIdentifier);
+					// write who this position is for (only for tests)
+					//om.Write (otherPlayer.RemoteUniqueIdentifier);
 					//Console.WriteLine(otherPlayer.RemoteUniqueIdentifier);
 					om.Write (data);
 					
