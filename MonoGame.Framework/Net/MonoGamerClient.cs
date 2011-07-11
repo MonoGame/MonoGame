@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Net;
 
 using System.Threading;
 using System.ComponentModel;
@@ -8,23 +10,26 @@ using Lidgren.Network;
 
 namespace Microsoft.Xna.Framework.Net
 {
-	internal class MonoGamerHostServer
+	internal class MonoGamerClient
 	{
-		private BackgroundWorker MGServerWorker = new BackgroundWorker ();
+		private BackgroundWorker MGClientWorker = new BackgroundWorker ();
 		bool done = false;
-		NetServer server;
+		NetClient client;
 		NetworkSession session;
+		AvailableNetworkSession availableSession;
 		bool isToBeCancelled = false;
 		
-		public MonoGamerHostServer (NetworkSession session)
+		public MonoGamerClient (NetworkSession session, AvailableNetworkSession availableSession)
 		{
 			this.session = session;
+			this.availableSession = availableSession;
 			
 			//MGServerWorker.WorkerReportsProgress = true;
-			MGServerWorker.WorkerSupportsCancellation = true;
-			MGServerWorker.DoWork += new DoWorkEventHandler (MGServer_DoWork);
-			MGServerWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler (MGServer_RunWorkerCompleted);
-			MGServerWorker.RunWorkerAsync();
+			
+			MGClientWorker.WorkerSupportsCancellation = true;
+			MGClientWorker.DoWork += new DoWorkEventHandler (MGServer_DoWork);
+			MGClientWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler (MGServer_RunWorkerCompleted);
+			MGClientWorker.RunWorkerAsync();
 			
 			HookEvents();
 		}
@@ -39,14 +44,69 @@ namespace Microsoft.Xna.Framework.Net
 			
 			session.SessionEnded += delegate {
 				Console.WriteLine("session ended");
-				MGServerWorker.CancelAsync();
+				MGClientWorker.CancelAsync();
 				//server.Shutdown("byebye");
 			};
 			
 		}
 
 		internal void ShutDown() {
-			MGServerWorker.CancelAsync();			
+			MGClientWorker.CancelAsync();
+		}
+		
+		static NetPeer netPeer;
+		static List<NetIncomingMessage> discoveryMsgs;
+		
+		internal static void Find() {
+			
+			NetPeerConfiguration config = new NetPeerConfiguration ("MonoGame");
+			config.EnableMessageType (NetIncomingMessageType.DiscoveryRequest);
+			netPeer = new NetPeer(config);
+			
+			netPeer.Start();
+			
+			netPeer.DiscoverLocalPeers(3074);
+			
+			DateTime now = DateTime.Now;
+			
+			discoveryMsgs = new List<NetIncomingMessage>();
+			
+			do {
+				NetIncomingMessage msg;
+				while((msg = netPeer.ReadMessage()) != null) {
+					switch (msg.MessageType)
+					{
+					case NetIncomingMessageType.DiscoveryResponse:
+						discoveryMsgs.Add(msg);
+						break;
+					case NetIncomingMessageType.VerboseDebugMessage:
+					case NetIncomingMessageType.DebugMessage:
+					case NetIncomingMessageType.WarningMessage:
+					case NetIncomingMessageType.ErrorMessage:
+						//
+						// Just print diagnostic messages to console
+						//
+						Console.WriteLine ("Find: " + msg.ReadString ());
+						break;
+					}
+				}
+			} while ((DateTime.Now - now).Seconds <= 2);
+			
+
+			netPeer.Shutdown("Find shutting down");
+		}
+		
+		internal static void FindResults(List<AvailableNetworkSession> networkSessions) 
+		{
+			foreach (var resp in discoveryMsgs) {
+				string gamerTag = resp.ReadString();
+				bool isHost = resp.ReadBoolean();
+				Console.WriteLine(resp.SenderEndpoint + " gamerTag: " + gamerTag + " isHost: " + isHost);
+				AvailableNetworkSession ans = new AvailableNetworkSession();
+				ans.HostGamertag = gamerTag;
+				ans.EndPoint = resp.SenderEndpoint;
+				networkSessions.Add(ans);
+			}
 		}
 		
 		private void MGServer_DoWork (object sender, DoWorkEventArgs e)
@@ -55,30 +115,25 @@ namespace Microsoft.Xna.Framework.Net
 
 			NetPeerConfiguration config = new NetPeerConfiguration ("MonoGame");
 			config.EnableMessageType (NetIncomingMessageType.DiscoveryRequest);
-			config.Port = 3074;
+			//config.Port = 3074;
 
 			// create and start server
-			server = new NetServer (config);
-			server.Start ();
-
+			client = new NetClient(config);
+			client.Start ();
+			
+			client.Connect(availableSession.EndPoint);
+			
 			// run until we are done
 			do {
 				
 				NetIncomingMessage msg;
-				while ((msg = server.ReadMessage ()) != null) {
+				while ((msg = client.ReadMessage ()) != null) {
 					switch (msg.MessageType) {
 					case NetIncomingMessageType.DiscoveryRequest:
 						//
 						// Server received a discovery request from a client; send a discovery response (with no extra data attached)
 						//
-						// Get the primary local gamer
-						LocalNetworkGamer localMe = session.LocalGamers[0];
-						
-						NetOutgoingMessage om = server.CreateMessage ();
-						//om.Write((byte)localMe.Gamertag.Length);
-						om.Write(localMe.Gamertag);
-						om.Write(localMe.IsHost);
-						server.SendDiscoveryResponse (om, msg.SenderEndpoint);
+						client.DiscoverLocalPeers(3074);
 						break;
 					case NetIncomingMessageType.VerboseDebugMessage:
 					case NetIncomingMessageType.DebugMessage:
@@ -126,7 +181,12 @@ namespace Microsoft.Xna.Framework.Net
 			} while (!done);
 
 		}
-
+		
+		internal void DiscoverPeers() 
+		{
+			client.DiscoverLocalPeers(3074);			
+		}
+		
 		private void MGServer_RunWorkerCompleted (object sender, RunWorkerCompletedEventArgs e)
 		{
 			if ((e.Cancelled == true)) {
@@ -137,7 +197,7 @@ namespace Microsoft.Xna.Framework.Net
 			} 
 			Console.WriteLine("worker Completed");
 			
-			server.Shutdown ("app exiting");
+			client.Shutdown ("client exiting");
 		}	
 		
 		internal void SendData (
@@ -159,15 +219,15 @@ namespace Microsoft.Xna.Framework.Net
 		{
 			//Console.WriteLine("Data to send: " + data.Length);
 			
-			foreach (NetConnection player in server.Connections) {
+			foreach (NetConnection player in client.Connections) {
 				// ... send information about every other player (actually including self)
-				foreach (NetConnection otherPlayer in server.Connections) {
+				foreach (NetConnection otherPlayer in client.Connections) {
 					
 					if (gamer != null && gamer.Id != otherPlayer.RemoteUniqueIdentifier) {
 						continue;
 					}
 					// send position update about 'otherPlayer' to 'player'
-					NetOutgoingMessage om = server.CreateMessage ();
+					NetOutgoingMessage om = client.CreateMessage ();
 					//Console.WriteLine("Data to send: " + data.Length);
 					// write who this position is for
 					om.Write (otherPlayer.RemoteUniqueIdentifier);
@@ -190,7 +250,7 @@ namespace Microsoft.Xna.Framework.Net
 						break;
 					}
 					// send message
-					server.SendMessage (om, player, ndm);
+					client.SendMessage (om, player, ndm);
 				}
 			}				
 		}
