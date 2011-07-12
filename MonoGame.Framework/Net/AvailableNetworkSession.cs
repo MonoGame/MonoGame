@@ -51,6 +51,7 @@ namespace Microsoft.Xna.Framework.Net
 
 		public AvailableNetworkSession ()
 		{
+			_QualityOfService = new QualityOfService();
 		}
 		
 		int _currentGameCount;
