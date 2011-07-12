@@ -312,11 +312,11 @@
     <Compile Include="Net\CommandGamerJoined.cs" />
     <Compile Include="Net\CommandSessionStateChange.cs" />
     <Compile Include="Net\GamerStates.cs" />
-    <Compile Include="Net\MonoGamerHostServer.cs" />
     <Compile Include="Net\CommandSendData.cs" />
     <Compile Include="Net\ICommand.cs" />
     <Compile Include="Net\CommandReceiveData.cs" />
-    <Compile Include="Net\MonoGamerClient.cs" />
+    <Compile Include="Net\NetworkMessageType.cs" />
+    <Compile Include="Net\MonoGamerPeer.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />
@@ -337,7 +337,7 @@
     <Folder Include="MacOS\GamerServices\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.csproj">
+    <ProjectReference Include="..\..\..\..\..\..\..\..\Volumes\Public\Development\Mono\lidgren-network-gen3\Lidgren.Network\Lidgren.Network.csproj">
       <Project>{AE483C29-042E-4226-BA52-D247CE7676DA}</Project>
       <Name>Lidgren.Network</Name>
     </ProjectReference>
