@@ -96,9 +96,7 @@ namespace Microsoft.Xna.Framework.Net
 		private int hostGamerIndex = -1;
 		private NetworkGamer hostingGamer;
 		
-		internal MonoGamerHostServer hostServer;
-		internal MonoGamerClient client;
-		
+		internal MonoGamerPeer networkPeer;
 		
 		private NetworkSession (NetworkSessionType sessionType, int maxGamers, int privateGamerSlots, NetworkSessionProperties sessionProperties, bool isHost, int hostGamer)
 			: this(sessionType, maxGamers, privateGamerSlots, sessionProperties, isHost, hostGamer, null)
@@ -127,10 +125,10 @@ namespace Microsoft.Xna.Framework.Net
 			this.hostGamerIndex = hostGamer;
 			
 			if (isHost)
-				hostServer = new MonoGamerHostServer(this);
+				networkPeer = new MonoGamerPeer(this, null);
 			else {
-				if (client == null)
-					client = new MonoGamerClient(this, availableSession);
+				if (networkPeer == null)
+					networkPeer = new MonoGamerPeer(this, availableSession);
 			}
 			
 			CommandGamerJoined gj = new CommandGamerJoined(hostGamer, this.isHost, true);
@@ -146,16 +144,11 @@ namespace Microsoft.Xna.Framework.Net
 			)
 		{
 			try {
-				if (maxGamers < 2 || maxGamers > 8) 
-					throw new ArgumentOutOfRangeException ( "Maximum number of gamers must be between 2 and 8."  );
-				if (privateGamerSlots < 0 || privateGamerSlots > maxGamers) 
-					throw new ArgumentOutOfRangeException ( "Private session slots must be between 0 and maximum number of gamers."  );
-
-				//networkSessionType = sessionType;
-
-				throw new NotImplementedException ();
+				return EndCreate(BeginCreate(sessionType, localGamers, maxGamers,privateGamerSlots, sessionProperties,null, null));
 			} finally {
+				
 			}
+			
 		} 
 		
 		public static NetworkSession Create (
@@ -224,14 +217,14 @@ namespace Microsoft.Xna.Framework.Net
 				foreach (Gamer gamer in _allGamers) {
 					gamer.Dispose();
 				}
-			}
-			
-			// Make sure we shut down our server instance as we no longer need it.
-			if (hostServer != null) {
-				hostServer.ShutDown();
-			}
-			if (client != null) {
-				client.ShutDown();
+				
+				// Make sure we shut down our server instance as we no longer need it.
+				if (networkPeer != null) {
+					networkPeer.ShutDown();
+				}
+				if (networkPeer != null) {
+					networkPeer.ShutDown();
+				}				
 			}
 		}
 
@@ -303,7 +296,7 @@ namespace Microsoft.Xna.Framework.Net
 			
 		}
 
-		private static int GetHostingGamerIndex (IEnumerable<SignedInGamer> localGamers)
+		internal static int GetHostingGamerIndex (IEnumerable<SignedInGamer> localGamers)
 		{
 			SignedInGamer hostGamer = null;
 
@@ -453,7 +446,7 @@ namespace Microsoft.Xna.Framework.Net
 				if (asyncResult.AsyncDelegate is NetworkSessionAsynchronousFind) {
 					returnValue = ((NetworkSessionAsynchronousFind)asyncResult.AsyncDelegate).EndInvoke (result);
 					
-					MonoGamerClient.FindResults(networkSessions);
+					MonoGamerPeer.FindResults(networkSessions);
 				}		            	            
 			} finally {
 				// Close the wait handle.
@@ -544,7 +537,7 @@ namespace Microsoft.Xna.Framework.Net
 					throw new ArgumentOutOfRangeException ( "maxLocalGamers must be between 1 and 4." );
 
 				List<AvailableNetworkSession> availableNetworkSessions = new List<AvailableNetworkSession> ();
-				MonoGamerClient.Find();
+				MonoGamerPeer.Find();
 				return new AvailableNetworkSessionCollection ( availableNetworkSessions );
 			} finally {
 			}
@@ -664,16 +657,20 @@ namespace Microsoft.Xna.Framework.Net
 					
 					}					
 				}
-			} finally {
+			} 
+			catch (Exception exc) {
+				Console.WriteLine("null reference in Update: " + exc.Message);
+			}
+			finally {
 			}
 		}
 		
 		private void ProcessSendData(CommandSendData command)
 		{
-			if (hostServer != null) 
-				hostServer.SendData(command.data, command.options);
+			if (networkPeer != null) 
+				networkPeer.SendData(command.data, command.options);
 			else
-				client.SendData(command.data, command.options);
+				networkPeer.SendData(command.data, command.options);
 			//Console.WriteLine("ProcessSendData: " + command.data.Length);
 			
 		}
@@ -764,6 +761,11 @@ namespace Microsoft.Xna.Framework.Net
 			
 			if (GamerJoined != null) {
 				GamerJoined(this, new GamerJoinedEventArgs(gamer));
+			}
+			
+			if (networkPeer !=  null && !command.State.HasFlag(GamerStates.Local)) {
+				
+				networkPeer.SendPeerIntroductions(gamer);
 			}
 		}
 		
