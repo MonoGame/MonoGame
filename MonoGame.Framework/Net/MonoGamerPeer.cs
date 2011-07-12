@@ -320,6 +320,28 @@ namespace Microsoft.Xna.Framework.Net
 
 			netPeer.Shutdown("Find shutting down");
 		}	
+		
+		internal static void FindResults (List<AvailableNetworkSession> networkSessions) {
+			
+			foreach (NetIncomingMessage im in discoveryMsgs) {
+				
+				AvailableNetworkSession available = new AvailableNetworkSession();
+				int currentGameCount = im.ReadInt32();
+				string gamerTag = im.ReadString();
+				int openPrivateGamerSlots = im.ReadInt32();
+				int openPublicGamerSlots = im.ReadInt32();
+				bool isHost = im.ReadBoolean();
+				
+				available.CurrentGamerCount = currentGameCount;
+				available.HostGamertag = gamerTag;
+				available.OpenPrivateGamerSlots = openPrivateGamerSlots;
+				available.OpenPublicGamerSlots = openPublicGamerSlots;
+				available.EndPoint = im.SenderEndpoint;
+				
+				networkSessions.Add(available);
+				
+			}
+		}
 	}
 }
 
