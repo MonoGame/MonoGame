@@ -188,6 +188,7 @@
     <Compile Include="Windows\Graphics\Effect.cs" />
     <Compile Include="Windows\Graphics\ESImage.cs" />
     <Compile Include="Windows\Graphics\ESTexture2D.cs" />
+    <Compile Include="Windows\Graphics\GraphicsAdapter.cs" />
     <Compile Include="Windows\Graphics\GraphicsDevice.cs" />
     <Compile Include="Windows\Graphics\PresentationParameters.cs" />
     <Compile Include="Windows\Graphics\RenderState.cs" />
@@ -196,6 +197,7 @@
     <Compile Include="Windows\Graphics\SpriteBatcher.cs" />
     <Compile Include="Windows\Graphics\Texture2D.cs" />
     <Compile Include="Windows\Input\GamePad.cs" />
+    <Compile Include="Windows\Input\Keyboard.cs" />
     <Compile Include="Windows\WindowsGameWindow.cs" />
     <Compile Include="Windows\Game.cs" />
     <Compile Include="BatteryChargeStatus.cs" />
@@ -230,7 +232,6 @@
     <Compile Include="Input\GamePadState.cs" />
     <Compile Include="Input\GamePadThumbSticks.cs" />
     <Compile Include="Input\GamePadTriggers.cs" />
-    <Compile Include="Input\Keyboard.cs" />
     <Compile Include="Input\KeyboardState.cs" />
     <Compile Include="Input\Keys.cs" />
     <Compile Include="Input\KeyState.cs" />
@@ -270,7 +271,6 @@
     <Compile Include="Graphics\ClearOptions.cs" />
     <Compile Include="Graphics\CompilerOptions.cs" />
     <Compile Include="Graphics\DeviceType.cs" />
-    <Compile Include="Graphics\GraphicsAdapter.cs" />
     <Compile Include="Graphics\GraphicsDeviceCapabilities.cs" />
     <Compile Include="Graphics\GraphicsDeviceInformation.cs" />
     <Compile Include="Graphics\GraphicsDeviceStatus.cs" />
@@ -316,10 +316,7 @@
       <Name>Lidgren.Network</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Graphics\PackedVector" />
-    <Folder Include="Windows\Input" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
