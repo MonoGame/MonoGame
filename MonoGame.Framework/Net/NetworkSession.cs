@@ -687,6 +687,12 @@ namespace Microsoft.Xna.Framework.Net
 					command.gamer = gamer;
 			}
 			
+			// for some reason this is null sometimes
+			//  this needs to be looked into instead of the
+			//  check below
+			if (command.gamer == null)
+				return;
+			
 			// now we loop through each of our local gamers and add the command
 			// to be processed.
 			foreach (LocalNetworkGamer localGamer in LocalGamers) {
