@@ -15,10 +15,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Net;
 
-using MonoMac.Foundation;
-using MonoMac.AppKit;
-using MonoMac.ObjCRuntime;
-
 #endregion
 
 namespace PeerToPeer
@@ -56,6 +52,7 @@ namespace PeerToPeer
 
 			graphics.PreferredBackBufferWidth = screenWidth;
 			graphics.PreferredBackBufferHeight = screenHeight;
+			graphics.IsFullScreen = false;
 
 			Content.RootDirectory = "Content";
 
@@ -468,40 +465,4 @@ namespace PeerToPeer
 
 	#endregion
 	}
-
-
-	#region Entry Point
-	static class Program
-	{
-		/// <summary>
-		/// The main entry point for the application.
-		/// </summary>
-		static void Main (string[] args)
-		{
-			NSApplication.Init ();
-			
-			using (var p = new NSAutoreleasePool ()) {
-				NSApplication.SharedApplication.Delegate = new AppDelegate();
-				NSApplication.Main(args);
-			}
-		}
-	}
-	
-	class AppDelegate : NSApplicationDelegate
-	{
-		
-		public override void FinishedLaunching (MonoMac.Foundation.NSObject notification)
-		{
-			using (PeerToPeerGame game = new PeerToPeerGame ()) {
-				game.Run ();
-			}
-		}
-		
-		public override bool ApplicationShouldTerminateAfterLastWindowClosed (NSApplication sender)
-		{
-			return true;
-		}
-	}	
-	
-	#endregion
 }
