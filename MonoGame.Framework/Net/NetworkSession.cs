@@ -446,7 +446,7 @@ namespace Microsoft.Xna.Framework.Net
 				if (asyncResult.AsyncDelegate is NetworkSessionAsynchronousFind) {
 					returnValue = ((NetworkSessionAsynchronousFind)asyncResult.AsyncDelegate).EndInvoke (result);
 					
-					MonoGamerClient.FindResults(networkSessions);
+					MonoGamerPeer.FindResults(networkSessions);
 				}		            	            
 			} finally {
 				// Close the wait handle.
@@ -537,7 +537,7 @@ namespace Microsoft.Xna.Framework.Net
 					throw new ArgumentOutOfRangeException ( "maxLocalGamers must be between 1 and 4." );
 
 				List<AvailableNetworkSession> availableNetworkSessions = new List<AvailableNetworkSession> ();
-				MonoGamerClient.Find();
+				MonoGamerPeer.Find();
 				return new AvailableNetworkSessionCollection ( availableNetworkSessions );
 			} finally {
 			}
