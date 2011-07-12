@@ -97,6 +97,7 @@
     <Compile Include="IMessageDisplay.cs" />
     <Compile Include="MessageDisplayComponent.cs" />
     <Compile Include="Resources.Designer.cs" />
+    <Compile Include="Program.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\MonoGame.Framework\MonoGame.Framework.MacOS.csproj">
