@@ -59,388 +59,388 @@ namespace Microsoft.Xna.Framework
             {
                 case OpenTK.Input.Key.A:
                     return Input.Keys.A;
-                    break;
+                    
                 case OpenTK.Input.Key.AltLeft:
                     return Input.Keys.LeftAlt;
-                    break;
+                    
                 case OpenTK.Input.Key.AltRight:
                     return Input.Keys.RightAlt;
-                    break;
+                    
                 case OpenTK.Input.Key.B:
                     return Input.Keys.B;
-                    break;
+                    
                 case OpenTK.Input.Key.Back:
                     return Input.Keys.Back;
-                    break;
+                    
                 case OpenTK.Input.Key.BackSlash:
                     return Input.Keys.OemBackslash;
-                    break;
+                    
                 case OpenTK.Input.Key.BracketLeft:
                     return Input.Keys.OemOpenBrackets;
-                    break;
+                    
                 case OpenTK.Input.Key.BracketRight:
                     return Input.Keys.OemCloseBrackets;
-                    break;
+                    
                 case OpenTK.Input.Key.C:
                     return Input.Keys.C;
-                    break;
+                    
                 case OpenTK.Input.Key.CapsLock:
                     return Input.Keys.CapsLock;
-                    break;
+                    
                 case OpenTK.Input.Key.Clear:
                     return Input.Keys.OemClear;
-                    break;
+                    
                 case OpenTK.Input.Key.Comma:
                     return Input.Keys.OemComma;
-                    break;
+                    
                 case OpenTK.Input.Key.ControlLeft:
                     return Input.Keys.LeftControl;
-                    break;
+                    
                 case OpenTK.Input.Key.ControlRight:
                     return Input.Keys.RightControl;
-                    break;
+                    
                 case OpenTK.Input.Key.D:
                     return Input.Keys.D;
-                    break;
+                    
                 case OpenTK.Input.Key.Delete:
                     return Input.Keys.Delete;
-                    break;
+                    
                 case OpenTK.Input.Key.Down:
                     return Input.Keys.Down;
-                    break;
+                    
                 case OpenTK.Input.Key.E:
                     return Input.Keys.E;
-                    break;
+                    
                 case OpenTK.Input.Key.End:
                     return Input.Keys.End;
-                    break;
+                    
                 case OpenTK.Input.Key.Enter:
                     return Input.Keys.Enter;
-                    break;
+                    
                 case OpenTK.Input.Key.Escape:
                     return Input.Keys.Escape;
-                    break;
+                    
                 case OpenTK.Input.Key.F:
                     return Input.Keys.F;
-                    break;
+                    
                 case OpenTK.Input.Key.F1:
                     return Input.Keys.F1;
-                    break;
+                    
                 case OpenTK.Input.Key.F10:
                     return Input.Keys.F10;
-                    break;
+                    
                 case OpenTK.Input.Key.F11:
                     return Input.Keys.F11;
-                    break;
+                    
                 case OpenTK.Input.Key.F12:
                     return Input.Keys.F12;
-                    break;
+                    
                 case OpenTK.Input.Key.F13:
                     return Input.Keys.F13;
-                    break;
+                    
                 case OpenTK.Input.Key.F14:
                     return Input.Keys.F14;
-                    break;
+                    
                 case OpenTK.Input.Key.F15:
                     return Input.Keys.F15;
-                    break;
+                    
                 case OpenTK.Input.Key.F16:
                     return Input.Keys.F16;
-                    break;
+                    
                 case OpenTK.Input.Key.F17:
                     return Input.Keys.F17;
-                    break;
+                    
                 case OpenTK.Input.Key.F18:
                     return Input.Keys.F18;
-                    break;
+                    
                 case OpenTK.Input.Key.F19:
                     return Input.Keys.F19;
-                    break;
+                    
                 case OpenTK.Input.Key.F2:
                     return Input.Keys.F2;
-                    break;
+                    
                 case OpenTK.Input.Key.F20:
                     return Input.Keys.F20;
-                    break;
+                    
                 case OpenTK.Input.Key.F21:
                     return Input.Keys.F21;
-                    break;
+                    
                 case OpenTK.Input.Key.F22:
                     return Input.Keys.F22;
-                    break;
+                    
                 case OpenTK.Input.Key.F23:
                     return Input.Keys.F23;
-                    break;
+                    
                 case OpenTK.Input.Key.F24:
                     return Input.Keys.F24;
-                    break;
+                    
                 case OpenTK.Input.Key.F25:
                     return Input.Keys.None;
-                    break;
+                    
                 case OpenTK.Input.Key.F26:
                     return Input.Keys.None;
-                    break;
+                    
                 case OpenTK.Input.Key.F27:
                     return Input.Keys.None;
-                    break;
+                    
                 case OpenTK.Input.Key.F28:
                     return Input.Keys.None;
-                    break;
+                    
                 case OpenTK.Input.Key.F29:
                     return Input.Keys.None;
-                    break;
+                    
                 case OpenTK.Input.Key.F3:
                     return Input.Keys.F3;
-                    break;
+                    
                 case OpenTK.Input.Key.F30:
                     return Input.Keys.None;
-                    break;
+                    
                 case OpenTK.Input.Key.F31:
                     return Input.Keys.None;
-                    break;
+                    
                 case OpenTK.Input.Key.F32:
                     return Input.Keys.None;
-                    break;
+                    
                 case OpenTK.Input.Key.F33:
                     return Input.Keys.None;
-                    break;
+                    
                 case OpenTK.Input.Key.F34:
                     return Input.Keys.None;
-                    break;
+                    
                 case OpenTK.Input.Key.F35:
                     return Input.Keys.None;
-                    break;
+                    
                 case OpenTK.Input.Key.F4:
                     return Input.Keys.F4;
-                    break;
+                    
                 case OpenTK.Input.Key.F5:
                     return Input.Keys.F5;
-                    break;
+                    
                 case OpenTK.Input.Key.F6:
                     return Input.Keys.F6;
-                    break;
+                    
                 case OpenTK.Input.Key.F7:
                     return Input.Keys.F7;
-                    break;
+                    
                 case OpenTK.Input.Key.F8:
                     return Input.Keys.F8;
-                    break;
+                    
                 case OpenTK.Input.Key.F9:
                     return Input.Keys.F9;
-                    break;
+                    
                 case OpenTK.Input.Key.G:
                     return Input.Keys.G;
-                    break;
+                    
                 case OpenTK.Input.Key.H:
                     return Input.Keys.H;
-                    break;
+                    
                 case OpenTK.Input.Key.Home:
                     return Input.Keys.Home;
-                    break;
+                    
                 case OpenTK.Input.Key.I:
                     return Input.Keys.I;
-                    break;
+                    
                 case OpenTK.Input.Key.Insert:
                     return Input.Keys.Insert;
-                    break;
+                    
                 case OpenTK.Input.Key.J:
                     return Input.Keys.J;
-                    break;
+                    
                 case OpenTK.Input.Key.K:
                     return Input.Keys.K;
-                    break;
+                    
                 case OpenTK.Input.Key.Keypad0:
                     return Input.Keys.NumPad0;
-                    break;
+                    
                 case OpenTK.Input.Key.Keypad1:
                     return Input.Keys.NumPad1;
-                    break;
+                    
                 case OpenTK.Input.Key.Keypad2:
                     return Input.Keys.NumPad2;
-                    break;
+                    
                 case OpenTK.Input.Key.Keypad3:
                     return Input.Keys.NumPad3;
-                    break;
+                    
                 case OpenTK.Input.Key.Keypad4:
                     return Input.Keys.NumPad4;
-                    break;
+                    
                 case OpenTK.Input.Key.Keypad5:
                     return Input.Keys.NumPad5;
-                    break;
+                    
                 case OpenTK.Input.Key.Keypad6:
                     return Input.Keys.NumPad6;
-                    break;
+                    
                 case OpenTK.Input.Key.Keypad7:
                     return Input.Keys.NumPad7;
-                    break;
+                    
                 case OpenTK.Input.Key.Keypad8:
                     return Input.Keys.NumPad8;
-                    break;
+                    
                 case OpenTK.Input.Key.Keypad9:
                     return Input.Keys.NumPad9;
-                    break;
+                    
                 case OpenTK.Input.Key.KeypadAdd:
                     return Input.Keys.Add;
-                    break;
+                    
                 case OpenTK.Input.Key.KeypadDecimal:
                     return Input.Keys.Decimal;
-                    break;
+                    
                 case OpenTK.Input.Key.KeypadDivide:
                     return Input.Keys.Divide;
-                    break;
+                    
                 case OpenTK.Input.Key.KeypadEnter:
                     return Input.Keys.Enter;
-                    break;
+                    
                 case OpenTK.Input.Key.KeypadMinus:
                     return Input.Keys.OemMinus;
-                    break;
+                    
                 case OpenTK.Input.Key.KeypadMultiply:
                     return Input.Keys.Multiply;
-                    break;
+                    
                 case OpenTK.Input.Key.L:
                     return Input.Keys.L;
-                    break;
+                    
                 case OpenTK.Input.Key.LShift:
                     return Input.Keys.LeftShift;
-                    break;
+                    
                 case OpenTK.Input.Key.LWin:
                     return Input.Keys.LeftWindows;
-                    break;
+                    
                 case OpenTK.Input.Key.Left:
                     return Input.Keys.Left;
-                    break;
+                    
                 case OpenTK.Input.Key.M:
                     return Input.Keys.M;
-                    break;
+                    
                 case OpenTK.Input.Key.Minus:
                     return Input.Keys.OemMinus;
-                    break;
+                    
                 case OpenTK.Input.Key.N:
                     return Input.Keys.N;
-                    break;
+                    
                 case OpenTK.Input.Key.NumLock:
                     return Input.Keys.NumLock;
-                    break;
+                    
                 case OpenTK.Input.Key.Number0:
                     return Input.Keys.D1;
-                    break;
+                    
                 case OpenTK.Input.Key.Number1:
                     return Input.Keys.D1;
-                    break;
+                    
                 case OpenTK.Input.Key.Number2:
                     return Input.Keys.D2;
-                    break;
+                    
                 case OpenTK.Input.Key.Number3:
                     return Input.Keys.D3;
-                    break;
+                    
                 case OpenTK.Input.Key.Number4:
                     return Input.Keys.D4;
-                    break;
+                    
                 case OpenTK.Input.Key.Number5:
                     return Input.Keys.D5;
-                    break;
+                    
                 case OpenTK.Input.Key.Number6:
                     return Input.Keys.D6;
-                    break;
+                    
                 case OpenTK.Input.Key.Number7:
                     return Input.Keys.D7;
-                    break;
+                    
                 case OpenTK.Input.Key.Number8:
                     return Input.Keys.D8;
-                    break;
+                    
                 case OpenTK.Input.Key.Number9:
                     return Input.Keys.D9;
-                    break;
+                    
                 case OpenTK.Input.Key.O:
                     return Input.Keys.O;
-                    break;
+                    
                 case OpenTK.Input.Key.P:
                     return Input.Keys.P;
-                    break;
+                    
                 case OpenTK.Input.Key.PageDown:
                     return Input.Keys.PageDown;
-                    break;
+                    
                 case OpenTK.Input.Key.PageUp:
                     return Input.Keys.PageUp;
-                    break;
+                    
                 case OpenTK.Input.Key.Pause:
                     return Input.Keys.Pause;
-                    break;
+                    
                 case OpenTK.Input.Key.Period:
                     return Input.Keys.OemPeriod;
-                    break;
+                    
                 case OpenTK.Input.Key.Plus:
                     return Input.Keys.OemPlus;
-                    break;
+                    
                 case OpenTK.Input.Key.PrintScreen:
                     return Input.Keys.PrintScreen;
-                    break;
+                    
                 case OpenTK.Input.Key.Q:
                     return Input.Keys.Q;
-                    break;
+                    
                 case OpenTK.Input.Key.Quote:
                     return Input.Keys.OemQuotes;
-                    break;
+                    
                 case OpenTK.Input.Key.R:
                     return Input.Keys.R;
-                    break;
+                    
                 case OpenTK.Input.Key.Right:
                     return Input.Keys.Right;
-                    break;
+                    
                 case OpenTK.Input.Key.S:
                     return Input.Keys.S;
-                    break;
+                    
                 case OpenTK.Input.Key.ScrollLock:
                     return Input.Keys.Scroll;
-                    break;
+                    
                 case OpenTK.Input.Key.Semicolon:
                     return Input.Keys.OemSemicolon;
-                    break;
+                    
                 case OpenTK.Input.Key.Slash:
                     return Input.Keys.None;
-                    break;
+                    
                 case OpenTK.Input.Key.Sleep:
                     return Input.Keys.Sleep;
-                    break;
+                    
                 case OpenTK.Input.Key.Space:
                     return Input.Keys.Space;
-                    break;
+                    
                 case OpenTK.Input.Key.T:
                     return Input.Keys.T;
-                    break;
+                    
                 case OpenTK.Input.Key.Tab:
                     return Input.Keys.Tab;
-                    break;
+                    
                 case OpenTK.Input.Key.Tilde:
                     return Input.Keys.OemTilde;
-                    break;
+                    
                 case OpenTK.Input.Key.U:
                     return Input.Keys.U;
-                    break;
+                    
                 case OpenTK.Input.Key.Unknown:
                     return Input.Keys.None;
-                    break;
+                    
                 case OpenTK.Input.Key.Up:
                     return Input.Keys.Up;
-                    break;
+                    
                 case OpenTK.Input.Key.V:
                     return Input.Keys.V;
-                    break;
+                    
                 case OpenTK.Input.Key.W:
                     return Input.Keys.W;
-                    break;
+                    
                 case OpenTK.Input.Key.X:
                     return Input.Keys.X;
-                    break;
+                    
                 case OpenTK.Input.Key.Y:
                     return Input.Keys.Y;
-                    break;
+                    
                 case OpenTK.Input.Key.Z:
                     return Input.Keys.Z;
-                    break;
+                    
                 default:
                     return Input.Keys.None;
-                    break;
+                    
             }
         }
     }
