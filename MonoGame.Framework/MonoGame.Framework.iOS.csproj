@@ -99,6 +99,8 @@
     <Reference Include="OpenTK" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Graphics\PackedVector\IPackedVector.cs" />
+    <Compile Include="Graphics\PackedVector\Short2.cs" />
     <Compile Include="Graphics\Effect\BasicEffect.cs" />
     <Compile Include="Graphics\Effect\Effect.cs" />
     <Compile Include="Graphics\Effect\EffectParameter.cs" />
@@ -357,6 +359,16 @@
     <Compile Include="Audio\Cue.cs" />
     <Compile Include="Audio\SoundBank.cs" />
     <Compile Include="Audio\WaveBank.cs" />
+    <Compile Include="Net\GamerStates.cs" />
+    <Compile Include="Net\CommandReceiveData.cs" />
+    <Compile Include="Net\ICommand.cs" />
+    <Compile Include="Net\CommandEvent.cs" />
+    <Compile Include="Net\CommandSendData.cs" />
+    <Compile Include="Net\CommandSessionStateChange.cs" />
+    <Compile Include="Net\CommandGamerJoined.cs" />
+    <Compile Include="Net\CommandEventType.cs" />
+    <Compile Include="Net\MonoGamerPeer.cs" />
+    <Compile Include="Net\NetworkMessageType.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
@@ -371,5 +383,11 @@
   <ItemGroup>
     <Folder Include="Content\ContentReaders\" />
     <Folder Include="Graphics\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.iOS.csproj">
+      <Project>{734EAA48-F1CA-481A-B391-0285BC0E8B40}</Project>
+      <Name>Lidgren.Network.iOS</Name>
+    </ProjectReference>
   </ItemGroup>
 </Project>
