@@ -20,7 +20,7 @@ namespace Lidgren.Network
 
 		static NetAESEncryption()
 		{
-
+#if !IOS && !ANDROID
 			AesCryptoServiceProvider aes = new AesCryptoServiceProvider();
 			List<int> temp = new List<int>();
 			foreach (KeySizes keysize in aes.LegalKeySizes)
@@ -47,6 +47,7 @@ namespace Lidgren.Network
 				}
 			}
 			m_blocksizes = temp;
+#endif
 		}
 
 		/// <summary>
@@ -115,6 +116,7 @@ namespace Lidgren.Network
 		{
 			try
 			{
+#if !IOS && !ANDROID
 				// nested usings are fun!
 				using (AesCryptoServiceProvider aesCryptoServiceProvider = new AesCryptoServiceProvider { KeySize = m_bitSize, Mode = CipherMode.CBC })
 				{
@@ -130,8 +132,8 @@ namespace Lidgren.Network
 							msg.m_data = memoryStream.ToArray();
 						}
 					}
-				}
-
+				}			
+#endif
 			}
 			catch
 			{
@@ -147,6 +149,7 @@ namespace Lidgren.Network
 		{
 			try
 			{
+#if !IOS && !ANDROID
 				// nested usings are fun!
 				using (AesCryptoServiceProvider aesCryptoServiceProvider = new AesCryptoServiceProvider { KeySize = m_bitSize, Mode = CipherMode.CBC })
 				{
@@ -163,7 +166,7 @@ namespace Lidgren.Network
 						}
 					}
 				}
-
+#endif
 			}
 			catch
 			{
