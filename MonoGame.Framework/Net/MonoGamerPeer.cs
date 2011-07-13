@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Net.Sockets;
 
 using System.Threading;
 using System.ComponentModel;
@@ -14,10 +15,11 @@ namespace Microsoft.Xna.Framework.Net
 	{
 		private BackgroundWorker MGServerWorker = new BackgroundWorker ();
 		bool done = false;
-		NetServer server;
+		NetServer peer;
 		NetworkSession session;
 		AvailableNetworkSession availableSession;
-		bool isToBeCancelled = false;
+		string myLocalAddress = string.Empty;
+		IPEndPoint myLocalEndPoint = null;
 		
 		public MonoGamerPeer (NetworkSession session, AvailableNetworkSession availableSession)
 		{
@@ -65,19 +67,21 @@ namespace Microsoft.Xna.Framework.Net
 				config.Port = 3074;
 
 			// create and start server
-			server = new NetServer (config);
-			server.Start ();
+			peer = new NetServer (config);
+			peer.Start ();
+			
+			myLocalAddress = GetMyLocalIpAddress();
+			myLocalEndPoint = ParseIPEndPoint(myLocalAddress + ":" + peer.Port);
 			
 			if (availableSession != null) {
-				//NetOutgoingMessage om = server.CreateMessage(address + ":" + server.Port);
-				server.Connect(availableSession.EndPoint);
+				peer.Connect(availableSession.EndPoint);
 			}
 			
 			// run until we are done
 			do {
 				
 				NetIncomingMessage msg;
-				while ((msg = server.ReadMessage ()) != null) {
+				while ((msg = peer.ReadMessage ()) != null) {
 					
 					switch (msg.MessageType) {
 					case NetIncomingMessageType.DiscoveryRequest:
@@ -87,7 +91,7 @@ namespace Microsoft.Xna.Framework.Net
 						// Get the primary local gamer
 						LocalNetworkGamer localMe = session.LocalGamers[0];
 						
-						NetOutgoingMessage om = server.CreateMessage ();
+						NetOutgoingMessage om = peer.CreateMessage ();
 						
 						om.Write(session.AllGamers.Count);
 						om.Write(localMe.Gamertag);
@@ -95,7 +99,7 @@ namespace Microsoft.Xna.Framework.Net
 						om.Write(session.MaxGamers);
 						om.Write(localMe.IsHost);
 
-						server.SendDiscoveryResponse (om, msg.SenderEndpoint);
+						peer.SendDiscoveryResponse (om, msg.SenderEndpoint);
 						break;
 					case NetIncomingMessageType.VerboseDebugMessage:
 					case NetIncomingMessageType.DebugMessage:
@@ -133,11 +137,16 @@ namespace Microsoft.Xna.Framework.Net
 						case NetworkMessageType.Introduction:
 							
 							var intrduciontAddress = msg.ReadString();
-							//Console.WriteLine("Received Introduction for: " + intrduciontAddress);
 							
 							try {
 								IPEndPoint endPoint = ParseIPEndPoint(intrduciontAddress);
-								server.Connect(endPoint);
+							
+								if (myLocalEndPoint.ToString() != endPoint.ToString() && !AlreadyConnected(endPoint)) {
+									
+									Console.WriteLine("Received Introduction for: " + intrduciontAddress + 
+									" and I am: " + myLocalEndPoint + " from: " + msg.SenderEndpoint);
+									peer.Connect (endPoint);
+								}
 							}
 							catch (Exception exc) {
 								Console.WriteLine("Error parsing Introduction: " + intrduciontAddress + " : " + exc.Message);
@@ -161,9 +170,19 @@ namespace Microsoft.Xna.Framework.Net
 					done = true;
 				}
 			} while (!done);
-
 		}
 
+		private bool AlreadyConnected (IPEndPoint endPoint)
+		{
+			foreach (NetConnection player in peer.Connections) {
+				if (player.RemoteEndpoint == endPoint) {
+					return true;
+				}
+			}
+			
+			return false;
+		}
+		
 		private void MGServer_RunWorkerCompleted (object sender, RunWorkerCompletedEventArgs e)
 		{
 			if ((e.Cancelled == true)) {
@@ -174,14 +193,14 @@ namespace Microsoft.Xna.Framework.Net
 			} 
 			Console.WriteLine("worker Completed");
 			
-			server.Shutdown ("app exiting");
+			peer.Shutdown ("app exiting");
 		}	
 
 		internal void SendPeerIntroductions(NetworkGamer gamer) {
 			
 			NetConnection playerConnection = null;
 			
-			foreach (NetConnection player in server.Connections) {
+			foreach (NetConnection player in peer.Connections) {
 				if (player.RemoteUniqueIdentifier == gamer.RemoteUniqueIdentifier) {
 					playerConnection = player;
 				}
@@ -191,13 +210,14 @@ namespace Microsoft.Xna.Framework.Net
 				return;
 			}
 			
-			foreach (NetConnection player in server.Connections) {
-				//Console.WriteLine("Introduce sent to: " + player.RemoteEndpoint);
-				NetOutgoingMessage om = server.CreateMessage ();
+			foreach (NetConnection player in peer.Connections) {
+				
+				Console.WriteLine("Introduction sent to: " + player.RemoteEndpoint);
+				NetOutgoingMessage om = peer.CreateMessage ();
 				om.Write((byte)NetworkMessageType.Introduction);
 				om.Write(playerConnection.RemoteEndpoint.ToString()); 
 
-				server.SendMessage(om, player, NetDeliveryMethod.ReliableOrdered);
+				peer.SendMessage(om, player, NetDeliveryMethod.ReliableOrdered);
 			}
 		}
 
@@ -219,9 +239,27 @@ namespace Microsoft.Xna.Framework.Net
 			return new IPEndPoint(ip, port);
 		}
 		
+		internal static string GetMyLocalIpAddress () {
+			
+			IPHostEntry host;
+			string localIP = "?";
+			host = Dns.GetHostEntry(Dns.GetHostName());
+			foreach (IPAddress ip in host.AddressList)
+			{
+				// We only want those of type InterNetwork
+				if (ip.AddressFamily == AddressFamily.InterNetwork)
+				{
+					// We will return the first one in the list
+					localIP = ip.ToString();
+					break;
+				}
+			}
+			return localIP;
+		}
+		
 		internal void DiscoverPeers() 
 		{
-			server.DiscoverLocalPeers(3074);			
+			peer.DiscoverLocalPeers(3074);			
 		}
 		
 		internal void SendData (
@@ -246,12 +284,12 @@ namespace Microsoft.Xna.Framework.Net
 //			foreach (NetConnection player in server.Connections) {
 //				// ... send information about every other player (actually including self)
 //				foreach (NetConnection otherPlayer in server.Connections) {
-//					
+					
 //					if (gamer != null && gamer.RemoteUniqueIdentifier != otherPlayer.RemoteUniqueIdentifier) {
 //						continue;
 //					}
 
-					NetOutgoingMessage om = server.CreateMessage ();
+					NetOutgoingMessage om = peer.CreateMessage ();
 
 					om.Write((byte)messageType);
 					om.Write (data);
@@ -273,7 +311,7 @@ namespace Microsoft.Xna.Framework.Net
 					}
 					// send message
 					//server.SendToAll (om, player, ndm);
-					server.SendToAll (om, ndm);
+					peer.SendToAll (om, ndm);
 
 //				}
 //			}				
