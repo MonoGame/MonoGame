@@ -543,22 +543,6 @@ namespace Microsoft.Xna.Framework.Net
 			}
 		}
 		
-//		private static AvailableNetworkSessionCollection Find (
-//			NetworkSessionType sessionType,
-//			int maxLocalGamers,
-//			NetworkSessionProperties searchProperties)
-//		{
-//			try {
-//				if (maxLocalGamers < 1 || maxLocalGamers > 4)
-//					throw new ArgumentOutOfRangeException ( "maxLocalGamers must be between 1 and 4." );
-//
-//				List<AvailableNetworkSession> availableNetworkSessions = new List<AvailableNetworkSession> ();
-//				MonoGamerClient.Find();
-//				return new AvailableNetworkSessionCollection ( availableNetworkSessions );
-//			} finally {
-//			}
-//		}
-		
 		public NetworkGamer FindGamerById (byte gamerId)
 		{
 			try {
@@ -674,11 +658,7 @@ namespace Microsoft.Xna.Framework.Net
 		
 		private void ProcessSendData(CommandSendData command)
 		{
-			if (networkPeer != null) 
-				networkPeer.SendData(command.data, command.options);
-			else
-				networkPeer.SendData(command.data, command.options);
-			//Console.WriteLine("ProcessSendData: " + command.data.Length);
+			networkPeer.SendData(command.data, command.options);
 			
 		}
 		
