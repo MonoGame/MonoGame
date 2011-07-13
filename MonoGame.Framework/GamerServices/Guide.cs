@@ -70,6 +70,8 @@ namespace Microsoft.Xna.Framework.GamerServices
 		private static bool isKeyboardInputShowing = false;
 		private static GKLeaderboardViewController leaderboardController;
 		private static GKAchievementViewController achievementController;
+		private static GKPeerPickerController peerPickerController;
+		private static GKMatchmakerViewController matchmakerViewController;
 		private static UIViewController viewController = null;
 		private static NSObject invokeOnMainThredObj = null;
 		
@@ -276,9 +278,6 @@ namespace Microsoft.Xna.Framework.GamerServices
 
 		public static void Show ()
 		{
-			/*GKPeerPickerController ppc = new GKPeerPickerController();
-			ppc.ConnectionTypesMask = GKPeerPickerConnectionType.Nearby;
-			ppc.Show();*/
 			ShowSignIn(1, false);
 		}
 
@@ -364,6 +363,72 @@ namespace Microsoft.Xna.Framework.GamerServices
 						viewController.PresentModalViewController(achievementController, true);						
 						isVisible = true;
 					}
+			    }
+			}
+		}
+		
+		public static void ShowPeerPicker(GKPeerPickerControllerDelegate aPeerPickerControllerDelegate)
+		{
+			if ( ( Gamer.SignedInGamers.Count > 0 ) && ( Gamer.SignedInGamers[0].IsSignedInToLive ) )
+			{
+				// Lazy load it
+				if ( peerPickerController == null )
+				{
+					peerPickerController = new GKPeerPickerController();
+				}
+
+			    if (peerPickerController != null)		
+			    {			
+					peerPickerController.ConnectionTypesMask = GKPeerPickerConnectionType.Nearby;
+					peerPickerController.Delegate = aPeerPickerControllerDelegate;
+					peerPickerController.Show();					
+			    }
+			}
+		}
+		
+		
+		public static void ShowMatchMaker()
+		{
+			if ( ( Gamer.SignedInGamers.Count > 0 ) && ( Gamer.SignedInGamers[0].IsSignedInToLive ) )
+			{
+				// Lazy load it
+				if ( matchmakerViewController == null )
+				{
+					matchmakerViewController = new GKMatchmakerViewController();
+				}
+
+			    if (matchmakerViewController != null)		
+			    {			
+					matchmakerViewController.DidFailWithError += delegate(object sender, GKErrorEventArgs e) {
+						matchmakerViewController.DismissModalViewControllerAnimated(true);
+						isVisible = false;
+					};
+					
+					matchmakerViewController.DidFindMatch += delegate(object sender, GKMatchEventArgs e) {
+						
+					};
+						
+					matchmakerViewController.DidFindPlayers += delegate(object sender, GKPlayersEventArgs e) {
+						
+					};
+					
+					matchmakerViewController.WasCancelled += delegate(object sender, EventArgs e) {
+						matchmakerViewController.DismissModalViewControllerAnimated(true);
+						isVisible = false;
+					};
+
+					if (Window !=null)
+					{
+						if(viewController == null)
+						{
+							viewController = new UIViewController();
+							Window.Add(viewController.View);
+							viewController.View.Hidden = true;
+						}
+
+						viewController.PresentModalViewController(matchmakerViewController, true);						
+						isVisible = true;
+					}				
 			    }
 			}
 		}
