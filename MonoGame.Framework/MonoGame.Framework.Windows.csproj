@@ -160,11 +160,11 @@
     <Compile Include="Net\GamerStates.cs" />
     <Compile Include="Net\ICommand.cs" />
     <Compile Include="Net\LocalNetworkGamer.cs" />
-    <Compile Include="Net\MonoGamerClient.cs" />
-    <Compile Include="Net\MonoGamerHostServer.cs" />
+    <Compile Include="Net\MonoGamerPeer.cs" />
     <Compile Include="Net\NetworkException.cs" />
     <Compile Include="Net\NetworkGamer.cs" />
     <Compile Include="Net\NetworkMachine.cs" />
+    <Compile Include="Net\NetworkMessageType.cs" />
     <Compile Include="Net\NetworkNotAvailableException.cs" />
     <Compile Include="Net\NetworkSession.cs" />
     <Compile Include="Net\NetworkSessionEndReason.cs" />
