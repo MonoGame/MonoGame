@@ -727,7 +727,7 @@ namespace Microsoft.Xna.Framework.Net
 		{
 			NetworkGamer gamer;
 			
-			if (command.State.HasFlag(GamerStates.Local)) {
+			if ((command.State & GamerStates.Local) != 0) {
 				gamer = new LocalNetworkGamer(this, (byte)command.InternalIndex, command.State);
 				_allGamers.AddGamer(gamer);
 				_localGamers.AddGamer((LocalNetworkGamer)gamer);
@@ -739,7 +739,7 @@ namespace Microsoft.Xna.Framework.Net
 				_remoteGamers.AddGamer(gamer);
 			}
 			
-			if (command.State.HasFlag(GamerStates.Host))
+			if ((command.State & GamerStates.Host) != 0)
 				hostingGamer = gamer;
 			
 			gamer.Machine = new NetworkMachine();
@@ -750,7 +750,7 @@ namespace Microsoft.Xna.Framework.Net
 				GamerJoined(this, new GamerJoinedEventArgs(gamer));
 			}
 			
-			if (networkPeer !=  null && !command.State.HasFlag(GamerStates.Local)) {
+			if (networkPeer !=  null && (command.State & GamerStates.Local) == 0) {
 				
 				networkPeer.SendPeerIntroductions(gamer);
 			}
