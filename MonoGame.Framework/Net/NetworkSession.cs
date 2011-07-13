@@ -641,6 +641,13 @@ namespace Microsoft.Xna.Framework.Net
 			try {
 				while (commandQueue.Count > 0) {
 					var command = (CommandEvent)commandQueue.Dequeue();
+					
+					// for some screwed up reason we are dequeueing something
+					// that is null so we will just continue.  
+					if (command == null) {
+						continue;
+					}
+					
 					switch (command.Commnad) {
 					case CommandEventType.GamerJoined:
 						ProcessGamerJoined((CommandGamerJoined)command.CommandObject);
@@ -659,7 +666,7 @@ namespace Microsoft.Xna.Framework.Net
 				}
 			} 
 			catch (Exception exc) {
-				Console.WriteLine("null reference in Update: " + exc.Message);
+				Console.WriteLine("Error in Update: " + exc.Message);
 			}
 			finally {
 			}
