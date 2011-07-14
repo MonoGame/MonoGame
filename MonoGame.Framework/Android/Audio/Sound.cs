@@ -136,6 +136,14 @@ namespace Microsoft.Xna.Framework.Audio
             get;
 			set;
         }
+		
+		public bool Playing
+		{
+			get 
+			{ 
+				return _player.IsPlaying;
+			}
+		}
 
         internal bool IsPrepared { get; private set; }
 
