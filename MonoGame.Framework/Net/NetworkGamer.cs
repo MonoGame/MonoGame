@@ -158,7 +158,7 @@ namespace Microsoft.Xna.Framework.Net
 		{ 
 			get
 			{
-				return true;
+				return false;
 			}
 		}
 		
