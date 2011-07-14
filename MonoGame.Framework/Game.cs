@@ -452,7 +452,6 @@ namespace Microsoft.Xna.Framework
 						gc.Update (gameTime);
 					}
 				}
-	            }
 			}
 			else
 			{
