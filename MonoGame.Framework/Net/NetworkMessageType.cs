@@ -8,7 +8,9 @@ namespace Microsoft.Xna.Framework.Net
 		Data = 0,
 		GamerJoined = 1,
 		GamerLeft = 2,
-		Introduction = 3
+		Introduction = 3,
+		GamerProfile = 4,
+		RequestGamerProfile = 5,		
 	}
 }
 
