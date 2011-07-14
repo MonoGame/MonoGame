@@ -136,20 +136,20 @@ namespace Microsoft.Xna.Framework.Net
 							break;
 						case NetworkMessageType.Introduction:
 							
-							var intrduciontAddress = msg.ReadString();
+							var introductionAddress = msg.ReadString();
 							
 							try {
-								IPEndPoint endPoint = ParseIPEndPoint(intrduciontAddress);
+								IPEndPoint endPoint = ParseIPEndPoint(introductionAddress);
 							
 								if (myLocalEndPoint.ToString() != endPoint.ToString() && !AlreadyConnected(endPoint)) {
 									
-									Console.WriteLine("Received Introduction for: " + intrduciontAddress + 
+									Console.WriteLine("Received Introduction for: " + introductionAddress + 
 									" and I am: " + myLocalEndPoint + " from: " + msg.SenderEndpoint);
 									peer.Connect (endPoint);
 								}
 							}
 							catch (Exception exc) {
-								Console.WriteLine("Error parsing Introduction: " + intrduciontAddress + " : " + exc.Message);
+								Console.WriteLine("Error parsing Introduction: " + introductionAddress + " : " + exc.Message);
 							}
 							
 							break;
