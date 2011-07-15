@@ -119,9 +119,6 @@ namespace Microsoft.Xna.Framework.Net
 							// A new player just connected!
 							//
 							Console.WriteLine (NetUtility.ToHexString (msg.SenderConnection.RemoteUniqueIdentifier) + " connected! from " + msg.SenderEndpoint);
-//							CommandGamerJoined cgj = new CommandGamerJoined(msg.SenderConnection.RemoteUniqueIdentifier);
-//							CommandEvent cmde = new CommandEvent(cgj);
-//							session.commandQueue.Enqueue(cmde);
 							pendingGamers.Add(msg.SenderConnection.RemoteUniqueIdentifier,msg.SenderConnection);
 							SendProfileRequest(msg.SenderConnection);
 						}
@@ -161,7 +158,15 @@ namespace Microsoft.Xna.Framework.Net
 							Console.WriteLine("Profile recieved from: " + NetUtility.ToHexString(msg.SenderConnection.RemoteUniqueIdentifier));
 							if (pendingGamers.ContainsKey(msg.SenderConnection.RemoteUniqueIdentifier)) {
 								pendingGamers.Remove(msg.SenderConnection.RemoteUniqueIdentifier);
+								msg.ReadInt32();
+								string gamerTag = msg.ReadString();
+								msg.ReadInt32();
+								msg.ReadInt32();
+								GamerStates state = (GamerStates)msg.ReadInt32();
+								state &= ~GamerStates.Local;
 								CommandGamerJoined cgj = new CommandGamerJoined(msg.SenderConnection.RemoteUniqueIdentifier);
+								cgj.GamerTag = gamerTag;
+								cgj.State = state;
 								CommandEvent cmde = new CommandEvent(cgj);
 								session.commandQueue.Enqueue(cmde);					
 							}
@@ -171,7 +176,7 @@ namespace Microsoft.Xna.Framework.Net
 							break;
 						case NetworkMessageType.RequestGamerProfile:
 							Console.WriteLine("Profile Request recieved from: " + msg.SenderEndpoint);
-							SendProfileRequest(msg.SenderConnection);
+							SendProfile(msg.SenderConnection);
 							break;							
 						}
 						break;
@@ -218,15 +223,18 @@ namespace Microsoft.Xna.Framework.Net
 		internal void SendProfile(NetConnection player) {
 			NetOutgoingMessage om = peer.CreateMessage ();
 			om.Write((byte)NetworkMessageType.GamerProfile);
-			//om.Write(playerConnection.RemoteEndpoint.ToString()); 
+			om.Write(session.AllGamers.Count);
+			om.Write(session.LocalGamers[0].Gamertag);
+			om.Write(session.PrivateGamerSlots);
+			om.Write(session.MaxGamers);
+			om.Write((int)session.LocalGamers[0].State);			
 			Console.WriteLine("Sent profile to: " + NetUtility.ToHexString(player.RemoteUniqueIdentifier));
 			peer.SendMessage(om, player, NetDeliveryMethod.ReliableOrdered);			
 		}
 		
 		internal void SendProfileRequest(NetConnection player) {
 			NetOutgoingMessage om = peer.CreateMessage ();
-			om.Write((byte)NetworkMessageType.GamerProfile);
-			//om.Write(playerConnection.RemoteEndpoint.ToString()); 
+			om.Write((byte)NetworkMessageType.RequestGamerProfile);
 			Console.WriteLine("Sent profile request to: " + NetUtility.ToHexString(player.RemoteUniqueIdentifier));
 			peer.SendMessage(om, player, NetDeliveryMethod.ReliableOrdered);			
 		}

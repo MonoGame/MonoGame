@@ -7,6 +7,7 @@ namespace Microsoft.Xna.Framework.Net
 		int gamerInternalIndex = -1;
 		internal long remoteUniqueIdentifier = -1;
 		GamerStates states;
+		string gamerTag = string.Empty;
 		
 		public CommandGamerJoined (int internalIndex, bool isHost, bool isLocal)
 		{
@@ -25,9 +26,18 @@ namespace Microsoft.Xna.Framework.Net
 			
 		}		
 		
+		public string GamerTag {
+			get {
+				return gamerTag;
+			}
+			set {
+				gamerTag = value;
+			}
+		}		
 		public GamerStates State
 		{
 			get { return states; }
+			set { states = value; }
 		}
 		
 		public int InternalIndex

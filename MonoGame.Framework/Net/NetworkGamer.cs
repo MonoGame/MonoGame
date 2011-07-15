@@ -61,13 +61,17 @@ namespace Microsoft.Xna.Framework.Net
 		{
 			this.id = id;
 			this.session = session;
-			
+			this.gamerState = state;
 			// We will modify these HasFlags to inline code because MonoTouch does not support
 			// the HasFlag method.  Also after reading this : http://msdn.microsoft.com/en-us/library/system.enum.hasflag.aspx#2
 			// it just might be better to inline it anyway.
 			this.isHost = (state & GamerStates.Host) != 0; // state.HasFlag(GamerStates.Host);
 			this.isLocal = (state & GamerStates.Local) != 0; // state.HasFlag(GamerStates.Local);
 			this.hasVoice = (state & GamerStates.HasVoice) != 0; //state.HasFlag(GamerStates.HasVoice);
+			
+			// *** NOTE TODO **
+			// This whole state stuff need to be looked at again.  Maybe we should not be using local
+			//  variables here and instead just use the flags within the gamerState.
 		}
 		
 		internal long RemoteUniqueIdentifier
@@ -191,5 +195,10 @@ namespace Microsoft.Xna.Framework.Net
 				return session;
 			}
 		} 
+		
+		private GamerStates gamerState;
+		internal GamerStates State {
+			get { return gamerState; }
+		}
 	}
 }
