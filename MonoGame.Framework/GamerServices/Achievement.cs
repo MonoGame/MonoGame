@@ -41,7 +41,7 @@
 using System;
 using System.IO;
 
-namespace Microsoft.Xna.Framework
+namespace Microsoft.Xna.Framework.GamerServices
 {
 	public class Achievement
 	{
