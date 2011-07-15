@@ -9,6 +9,11 @@
 
 #region Using Statements
 using System;
+
+#if ANDROID
+using Android.App;
+#endif
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
@@ -46,7 +51,11 @@ namespace PeerToPeer
 	#region Initialization
 
 
-		public PeerToPeerGame ()
+#if ANDROID 
+		public PeerToPeerGame (Activity activity) : base (activity)
+#else 
+        public PeerToPeerGame ()  
+#endif
 		{
 			graphics = new GraphicsDeviceManager (this);
 
