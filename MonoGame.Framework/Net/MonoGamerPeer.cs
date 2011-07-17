@@ -114,6 +114,9 @@ namespace Microsoft.Xna.Framework.Net
 						break;
 					case NetIncomingMessageType.StatusChanged:
 						NetConnectionStatus status = (NetConnectionStatus)msg.ReadByte ();
+						if (status == NetConnectionStatus.Disconnected) {
+							Console.WriteLine (NetUtility.ToHexString (msg.SenderConnection.RemoteUniqueIdentifier) + " disconnected! from " + msg.SenderEndpoint);
+						}
 						if (status == NetConnectionStatus.Connected) {
 							//
 							// A new player just connected!
@@ -124,6 +127,7 @@ namespace Microsoft.Xna.Framework.Net
 						}
 
 						break;
+						
 					case NetIncomingMessageType.Data:
 						
 						NetworkMessageType mt = (NetworkMessageType)msg.ReadByte();
