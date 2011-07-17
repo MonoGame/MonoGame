@@ -78,8 +78,7 @@ namespace NetworkStateManagement
 			screenManager.AddScreen (new MainMenuScreen (), null);
 
 			// Listen for invite notification events.
-			NetworkSession.InviteAccepted += (sender, e)
- => NetworkSessionComponent.InviteAccepted (screenManager, e);
+			NetworkSession.InviteAccepted += (sender, e) => NetworkSessionComponent.InviteAccepted (screenManager, e);
 
 			// To test the trial mode behavior while developing your game,
 			// uncomment this line:
