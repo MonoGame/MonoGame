@@ -181,7 +181,17 @@ namespace Microsoft.Xna.Framework.Net
 						case NetworkMessageType.RequestGamerProfile:
 							Console.WriteLine("Profile Request recieved from: " + msg.SenderEndpoint);
 							SendProfile(msg.SenderConnection);
-							break;							
+							break;	
+						case NetworkMessageType.StateChange:
+							GamerStates state = (GamerStates)msg.ReadInt32();
+							state &= ~GamerStates.Local;
+							Console.WriteLine("State Change from: " + msg.SenderEndpoint + " new State: " + state );
+							foreach (var gamer in session.RemoteGamers) {
+								if (gamer.RemoteUniqueIdentifier == msg.SenderConnection.RemoteUniqueIdentifier)
+									gamer.State = state;
+							}
+							//SendProfile(msg.SenderConnection);
+							break;								
 						}
 						break;
 					}
@@ -268,6 +278,15 @@ namespace Microsoft.Xna.Framework.Net
 			}
 		}
 
+		internal void SendStateChange(NetworkGamer gamer) {
+			
+			NetOutgoingMessage om = peer.CreateMessage();
+			om.Write((byte)NetworkMessageType.StateChange);
+			om.Write((int)gamer.State);
+			
+			SendMessage(om, SendDataOptions.Reliable, gamer);
+		}
+		
 		
 		public static IPEndPoint ParseIPEndPoint(string endPoint)
 		{
@@ -326,6 +345,18 @@ namespace Microsoft.Xna.Framework.Net
 		
 		private void SendMessage (NetworkMessageType messageType, byte[] data, SendDataOptions options, NetworkGamer gamer) 
 		{
+
+			NetOutgoingMessage om = peer.CreateMessage ();
+
+			om.Write((byte)messageType);
+			om.Write (data);
+			
+			SendMessage(om, options,gamer);
+
+		}
+		
+		private void SendMessage (NetOutgoingMessage om, SendDataOptions options, NetworkGamer gamer) 
+		{
 			//Console.WriteLine("Data to send: " + data.Length);
 			
 //			foreach (NetConnection player in server.Connections) {
@@ -336,11 +367,6 @@ namespace Microsoft.Xna.Framework.Net
 //						continue;
 //					}
 
-					NetOutgoingMessage om = peer.CreateMessage ();
-
-					om.Write((byte)messageType);
-					om.Write (data);
-					
 					NetDeliveryMethod ndm = NetDeliveryMethod.Unreliable;
 					switch (options) {
 					case SendDataOptions.Reliable:
@@ -362,7 +388,7 @@ namespace Microsoft.Xna.Framework.Net
 
 //				}
 //			}				
-		}
+		}		
 		
 		static NetPeer netPeer;
 		static List<NetIncomingMessage> discoveryMsgs;

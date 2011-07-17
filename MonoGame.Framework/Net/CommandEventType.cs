@@ -7,7 +7,8 @@ namespace Microsoft.Xna.Framework.Net
 		GamerJoined,
 		SessionStateChange,
 		SendData,
-		ReceiveData
+		ReceiveData,
+		GamerStateChange,
 	}
 }
 

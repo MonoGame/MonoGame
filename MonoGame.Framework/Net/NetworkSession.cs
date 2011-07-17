@@ -645,6 +645,9 @@ namespace Microsoft.Xna.Framework.Net
 					case CommandEventType.ReceiveData:
 						ProcessReceiveData((CommandReceiveData)command.CommandObject);
 						break;	
+					case CommandEventType.GamerStateChange:
+						ProcessGamerStateChange((CommandGamerStateChange)command.CommandObject);
+						break;							
 					
 					}					
 				}
@@ -654,6 +657,12 @@ namespace Microsoft.Xna.Framework.Net
 			}
 			finally {
 			}
+		}
+		
+		private void ProcessGamerStateChange(CommandGamerStateChange command) 
+		{
+			
+			networkPeer.SendStateChange(command.Gamer);	
 		}
 		
 		private void ProcessSendData(CommandSendData command)
@@ -731,6 +740,10 @@ namespace Microsoft.Xna.Framework.Net
 				gamer = new LocalNetworkGamer(this, (byte)command.InternalIndex, command.State);
 				_allGamers.AddGamer(gamer);
 				_localGamers.AddGamer((LocalNetworkGamer)gamer);
+				
+				// We will attach a property change handler to local gamers
+				//  se that we can broadcast the change to other peers.
+				gamer.PropertyChanged += HandleGamerPropertyChanged;				
 			}
 			else {
 				gamer = new NetworkGamer (this, (byte)command.InternalIndex, command.State);
@@ -753,6 +766,24 @@ namespace Microsoft.Xna.Framework.Net
 			if (networkPeer !=  null && (command.State & GamerStates.Local) == 0) {
 				
 				networkPeer.SendPeerIntroductions(gamer);
+			}
+			
+		}
+
+		void HandleGamerPropertyChanged (object sender, System.ComponentModel.PropertyChangedEventArgs e)
+		{
+			NetworkGamer gamer = sender as NetworkGamer;
+			if (gamer == null)
+				return;
+			
+			// If the gamer is local then we need to broadcast that change to all other
+			// connected peers.  This is a double check here as we should only be handling 
+			//  property changes for local gamers for now.
+			if (gamer.IsLocal) {
+				Console.WriteLine("State change: " + gamer.State);
+				CommandGamerStateChange sc = new CommandGamerStateChange(gamer);
+				CommandEvent cmd = new CommandEvent(sc);
+				commandQueue.Enqueue(cmd);
 			}
 		}
 		

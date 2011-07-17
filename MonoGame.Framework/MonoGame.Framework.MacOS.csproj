@@ -317,6 +317,7 @@
     <Compile Include="Net\CommandReceiveData.cs" />
     <Compile Include="Net\NetworkMessageType.cs" />
     <Compile Include="Net\MonoGamerPeer.cs" />
+    <Compile Include="Net\CommandGamerStateChange.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />
