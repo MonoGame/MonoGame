@@ -182,7 +182,7 @@ namespace Microsoft.Xna.Framework.Net
 							Console.WriteLine("Profile Request recieved from: " + msg.SenderEndpoint);
 							SendProfile(msg.SenderConnection);
 							break;	
-						case NetworkMessageType.StateChange:
+						case NetworkMessageType.GamerStateChange:
 							GamerStates state = (GamerStates)msg.ReadInt32();
 							state &= ~GamerStates.Local;
 							Console.WriteLine("State Change from: " + msg.SenderEndpoint + " new State: " + state );
@@ -281,7 +281,7 @@ namespace Microsoft.Xna.Framework.Net
 		internal void SendStateChange(NetworkGamer gamer) {
 			
 			NetOutgoingMessage om = peer.CreateMessage();
-			om.Write((byte)NetworkMessageType.StateChange);
+			om.Write((byte)NetworkMessageType.GamerStateChange);
 			om.Write((int)gamer.State);
 			
 			SendMessage(om, SendDataOptions.Reliable, gamer);
