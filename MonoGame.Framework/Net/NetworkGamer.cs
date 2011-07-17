@@ -41,21 +41,28 @@
 
 #region Using clause
 using System;
+using System.ComponentModel;
 
 using Microsoft.Xna.Framework.GamerServices;
 #endregion Using clause
 
 namespace Microsoft.Xna.Framework.Net
 {
-	public class NetworkGamer : Gamer
+	public class NetworkGamer : Gamer, INotifyPropertyChanged
 	{
 		
 		private byte id;
 		NetworkSession session; 
-		bool isHost;
-		bool isLocal;
-		bool hasVoice;
+		//bool isHost;
+		//bool isLocal;
+		//bool hasVoice;
 		long remoteUniqueIdentifier = -1;
+		GamerStates gamerState;
+		GamerStates oldGamerState;
+		
+		// Declare the event
+		public event PropertyChangedEventHandler PropertyChanged;
+		
 		
 		public NetworkGamer ( NetworkSession session, byte id, GamerStates state)
 		{
@@ -65,13 +72,16 @@ namespace Microsoft.Xna.Framework.Net
 			// We will modify these HasFlags to inline code because MonoTouch does not support
 			// the HasFlag method.  Also after reading this : http://msdn.microsoft.com/en-us/library/system.enum.hasflag.aspx#2
 			// it just might be better to inline it anyway.
-			this.isHost = (state & GamerStates.Host) != 0; // state.HasFlag(GamerStates.Host);
-			this.isLocal = (state & GamerStates.Local) != 0; // state.HasFlag(GamerStates.Local);
-			this.hasVoice = (state & GamerStates.HasVoice) != 0; //state.HasFlag(GamerStates.HasVoice);
+			//this.isHost = (state & GamerStates.Host) != 0; // state.HasFlag(GamerStates.Host);
+			//this.isLocal = (state & GamerStates.Local) != 0; // state.HasFlag(GamerStates.Local);
+			//this.hasVoice = (state & GamerStates.HasVoice) != 0; //state.HasFlag(GamerStates.HasVoice);
 			
 			// *** NOTE TODO **
 			// This whole state stuff need to be looked at again.  Maybe we should not be using local
 			//  variables here and instead just use the flags within the gamerState.
+			
+			this.gamerState = state;
+			this.oldGamerState = state;
 		}
 		
 		internal long RemoteUniqueIdentifier
@@ -92,7 +102,7 @@ namespace Microsoft.Xna.Framework.Net
 		{ 
 			get
 			{
-				return hasVoice;
+				return (gamerState & GamerStates.HasVoice) != 0;
 			}
 		}
 		
@@ -108,7 +118,7 @@ namespace Microsoft.Xna.Framework.Net
 		{ 
 			get
 			{
-				return true;
+				return (gamerState & GamerStates.Guest) != 0;
 			}
 		}
 		
@@ -116,7 +126,7 @@ namespace Microsoft.Xna.Framework.Net
 		{ 
 			get
 			{
-				return isHost;
+				return (gamerState & GamerStates.Host) != 0;
 			}
 		}
 		
@@ -124,7 +134,7 @@ namespace Microsoft.Xna.Framework.Net
 		{ 
 			get
 			{
-				return isLocal;
+				return (gamerState & GamerStates.Local) != 0;
 			}
 		}
 		
@@ -144,17 +154,22 @@ namespace Microsoft.Xna.Framework.Net
 			}
 		}
 		
-		private bool _isReady;
 		public bool IsReady 
 		{ 
 			get
 			{
-				return _isReady;
+				return (gamerState & GamerStates.Ready) != 0;
 			}
 			set
 			{
-				if (_isReady != value )
-					_isReady = value;
+				if ((gamerState & GamerStates.Ready) == 0 ) {
+					//_isReady = value;
+					if (value)
+						gamerState |= GamerStates.Ready;
+					else
+						gamerState &= ~GamerStates.Ready;
+					OnPropertyChanged("Ready");
+				}
 			}
 		}
 		
@@ -196,9 +211,24 @@ namespace Microsoft.Xna.Framework.Net
 			}
 		} 
 		
-		private GamerStates gamerState;
 		internal GamerStates State {
 			get { return gamerState; }
+			set { gamerState = value; }
 		}
+		
+		internal GamerStates OldState {
+			get { return oldGamerState; }
+		}		
+		
+		// Create the OnPropertyChanged method to raise the event
+		protected void OnPropertyChanged(string name)
+		{
+			PropertyChangedEventHandler handler = PropertyChanged;
+			if (handler != null)
+			{
+				handler(this, new PropertyChangedEventArgs(name));
+			}
+		}
+		
 	}
 }

@@ -10,7 +10,8 @@ namespace Microsoft.Xna.Framework.Net
 		GamerLeft = 2,
 		Introduction = 3,
 		GamerProfile = 4,
-		RequestGamerProfile = 5,		
+		RequestGamerProfile = 5,
+		StateChange = 6,
 	}
 }
 

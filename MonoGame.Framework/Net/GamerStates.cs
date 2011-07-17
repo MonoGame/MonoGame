@@ -10,7 +10,8 @@ namespace Microsoft.Xna.Framework.Net
 		HasVoice 	= 0x000100,
 		Guest 		= 0x001000,
 		MutedByLocalUser = 0x010000,
-		PrivateSlot	=  0x100000
+		PrivateSlot	=  0x100000,
+		Ready		= 0x1000000,
 		
 	}
 }
