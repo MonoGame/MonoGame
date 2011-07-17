@@ -600,12 +600,14 @@ namespace Microsoft.Xna.Framework.Net
 			} finally {
 			}
 		}
-
+		
+		// I am not really sure how this is suppose to work so am just fleshing it in
+		//  for the way I think it should.  This will also send a message to all connected
+		//  peers for a state change.
 		public void ResetReady ()
 		{
-			try {
-				throw new NotImplementedException ();
-			} finally {
+			foreach (NetworkGamer gamer in _localGamers) {
+				gamer.IsReady = false;
 			}
 		}
 
@@ -705,10 +707,14 @@ namespace Microsoft.Xna.Framework.Net
 			
 			switch (command.NewState) {
 			case NetworkSessionState.Ended:
+				
+				ResetReady();
+				
 				if (SessionEnded != null) {
 					// Have to find an example of how this is used so that I can figure out how to pass
 					//  the EndReason
 					SessionEnded(this, new NetworkSessionEndedEventArgs(NetworkSessionEndReason.HostEndedSession));
+					
 				}
 				break;
 			case NetworkSessionState.Playing:
@@ -722,9 +728,7 @@ namespace Microsoft.Xna.Framework.Net
 			// if changing from playing to lobby
 			if (command.NewState == NetworkSessionState.Lobby && command.OldState == NetworkSessionState.Playing) {
 				
-				foreach (NetworkGamer gamer in _localGamers) {
-					gamer.IsReady = false;
-				}
+				ResetReady();
 				
 				if (GameEnded != null) {
 					GameEnded(this, new GameEndedEventArgs());
@@ -780,7 +784,6 @@ namespace Microsoft.Xna.Framework.Net
 			// connected peers.  This is a double check here as we should only be handling 
 			//  property changes for local gamers for now.
 			if (gamer.IsLocal) {
-				Console.WriteLine("State change: " + gamer.State);
 				CommandGamerStateChange sc = new CommandGamerStateChange(gamer);
 				CommandEvent cmd = new CommandEvent(sc);
 				commandQueue.Enqueue(cmd);
