@@ -375,9 +375,31 @@ namespace Microsoft.Xna.Framework
 		}
 		
 		protected virtual void LoadContent()
-		{			
-			string DefaultPath = "Default.png";
+		{		
+			var model = UIDevice.CurrentDevice.Model;
+			string suffix = "";
+			if ( model.ToLower().Contains("iphone") )
+			{
+				suffix = "~iphone";
+			}
+			else if ( model.ToLower().Contains("ipad") )
+			{
+				suffix = "~ipad";
+			}
+			
+			string DefaultPath = string.Format("Default{0}.png", suffix); 
+			bool filefound = false;
 			if (File.Exists(DefaultPath))
+			{
+				filefound = true;
+			}
+			else if (File.Exists("Default.png"))
+			{
+				DefaultPath = "Default.png";
+				filefound = true;
+			}
+			
+			if (filefound)
 			{
 				// Store the RootDir for later 
 				string backup = Content.RootDirectory;

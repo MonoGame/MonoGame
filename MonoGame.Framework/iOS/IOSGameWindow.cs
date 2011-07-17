@@ -348,7 +348,7 @@ namespace Microsoft.Xna.Framework
 					
 					//Get position touch
 					Vector2 position = new Vector2 (touch.LocationInView (touch.View));
-					Vector2 translatedPosition = GetOffsetPosition(position);
+					Vector2 translatedPosition = GetOffsetPosition(position, true);
 					
 					TouchLocation tlocation;
 					TouchCollection collection = TouchPanel.Collection;
@@ -393,9 +393,18 @@ namespace Microsoft.Xna.Framework
 			
 		}
 		
-		private Vector2 GetOffsetPosition(Vector2 position)
+		internal Vector2 GetOffsetPosition(Vector2 position, bool useScale)
 		{
-			Vector2 translatedPosition = position * UIScreen.MainScreen.Scale;
+			
+			Vector2 translatedPosition;
+			if (useScale)
+			{
+				translatedPosition = position * UIScreen.MainScreen.Scale;
+			}
+			else 
+			{
+				translatedPosition = position;
+			}
 					
 			switch (CurrentOrientation)
 			{
@@ -422,6 +431,7 @@ namespace Microsoft.Xna.Framework
 					break;
 				}
 			}
+			
 			return translatedPosition;
 		}
 		

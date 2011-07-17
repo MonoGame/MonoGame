@@ -37,14 +37,16 @@ permitted under your local laws, the contributors exclude the implied warranties
 purpose and non-infringement.
 */
 #endregion License
+using System;
+using System.Collections.Generic;
+
+using MonoTouch.UIKit;
+using MonoTouch.AudioToolbox;
+
+using OpenTK.Graphics.ES11;
 
 using Microsoft.Xna.Framework;
-using System;
 using Microsoft.Xna.Framework.Graphics;
-using OpenTK.Graphics.ES11;
-using MonoTouch.UIKit;
-using System.Collections.Generic;
-using MonoTouch.AudioToolbox;
 
 ﻿namespace Microsoft.Xna.Framework.Input
 {
