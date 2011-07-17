@@ -217,7 +217,7 @@ namespace Microsoft.Xna.Framework.Net
 				foreach (Gamer gamer in _allGamers) {
 					gamer.Dispose();
 				}
-				
+				//Console.WriteLine("disposing");
 				// Make sure we shut down our server instance as we no longer need it.
 				if (networkPeer != null) {
 					networkPeer.ShutDown();
