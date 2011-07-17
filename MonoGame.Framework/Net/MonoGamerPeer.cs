@@ -21,7 +21,7 @@ namespace Microsoft.Xna.Framework.Net
 		string myLocalAddress = string.Empty;
 		IPEndPoint myLocalEndPoint = null;
 		Dictionary<long, NetConnection> pendingGamers = new Dictionary<long, NetConnection>();
-		Dictionary<long, NetConnection> connectedGamers = new Dictionary<long, NetConnection>();
+		//Dictionary<long, NetConnection> connectedGamers = new Dictionary<long, NetConnection>();
 		
 		public MonoGamerPeer (NetworkSession session, AvailableNetworkSession availableSession)
 		{
@@ -95,7 +95,7 @@ namespace Microsoft.Xna.Framework.Net
 						
 						NetOutgoingMessage om = peer.CreateMessage ();
 						
-						om.Write(session.AllGamers.Count);
+						om.Write(session.RemoteGamers.Count);
 						om.Write(localMe.Gamertag);
 						om.Write(session.PrivateGamerSlots);
 						om.Write(session.MaxGamers);
@@ -150,6 +150,7 @@ namespace Microsoft.Xna.Framework.Net
 									
 									Console.WriteLine("Received Introduction for: " + introductionAddress + 
 									" and I am: " + myLocalEndPoint + " from: " + msg.SenderEndpoint);
+
 									peer.Connect (endPoint);
 								}
 							}
@@ -159,7 +160,7 @@ namespace Microsoft.Xna.Framework.Net
 							
 							break;
 						case NetworkMessageType.GamerProfile:
-							Console.WriteLine("Profile recieved from: " + NetUtility.ToHexString(msg.SenderConnection.RemoteUniqueIdentifier));
+							//Console.WriteLine("Profile recieved from: " + NetUtility.ToHexString(msg.SenderConnection.RemoteUniqueIdentifier));
 							if (pendingGamers.ContainsKey(msg.SenderConnection.RemoteUniqueIdentifier)) {
 								pendingGamers.Remove(msg.SenderConnection.RemoteUniqueIdentifier);
 								msg.ReadInt32();
@@ -179,13 +180,13 @@ namespace Microsoft.Xna.Framework.Net
 							}
 							break;
 						case NetworkMessageType.RequestGamerProfile:
-							Console.WriteLine("Profile Request recieved from: " + msg.SenderEndpoint);
+							//Console.WriteLine("Profile Request recieved from: " + msg.SenderEndpoint);
 							SendProfile(msg.SenderConnection);
 							break;	
 						case NetworkMessageType.GamerStateChange:
 							GamerStates state = (GamerStates)msg.ReadInt32();
 							state &= ~GamerStates.Local;
-							Console.WriteLine("State Change from: " + msg.SenderEndpoint + " new State: " + state );
+							//Console.WriteLine("State Change from: " + msg.SenderEndpoint + " new State: " + state );
 							foreach (var gamer in session.RemoteGamers) {
 								if (gamer.RemoteUniqueIdentifier == msg.SenderConnection.RemoteUniqueIdentifier)
 									gamer.State = state;
