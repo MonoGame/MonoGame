@@ -22,20 +22,30 @@ namespace Microsoft.Xna.Framework.Net
 		IPEndPoint myLocalEndPoint = null;
 		Dictionary<long, NetConnection> pendingGamers = new Dictionary<long, NetConnection>();
 		Dictionary<long, NetConnection> connectedGamers = new Dictionary<long, NetConnection>();
+        bool online = false;
+        private static int port = 3074;
+        private static IPEndPoint m_masterServer;
+        private static int masterserverport = 6000;
+        private static string masterServer = "86.19.223.140";
 		
-		public MonoGamerPeer (NetworkSession session, AvailableNetworkSession availableSession)
-		{
-			this.session = session;
-			this.availableSession = availableSession;
-			
-			//MGServerWorker.WorkerReportsProgress = true;
-			MGServerWorker.WorkerSupportsCancellation = true;
-			MGServerWorker.DoWork += new DoWorkEventHandler (MGServer_DoWork);
-			MGServerWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler (MGServer_RunWorkerCompleted);
-			MGServerWorker.RunWorkerAsync();
-			
-			HookEvents();
+		public MonoGamerPeer (NetworkSession session, AvailableNetworkSession availableSession) : this(session, availableSession, false)
+		{			
 		}
+
+        public MonoGamerPeer(NetworkSession session, AvailableNetworkSession availableSession, bool online)
+        {
+            this.online = online;
+            this.session = session;
+            this.availableSession = availableSession;
+
+            //MGServerWorker.WorkerReportsProgress = true;
+            MGServerWorker.WorkerSupportsCancellation = true;
+            MGServerWorker.DoWork += new DoWorkEventHandler(MGServer_DoWork);
+            MGServerWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(MGServer_RunWorkerCompleted);
+            MGServerWorker.RunWorkerAsync();
+
+            HookEvents();
+        }
 		
 		private void HookEvents()
 		{
@@ -64,9 +74,10 @@ namespace Microsoft.Xna.Framework.Net
 			NetPeerConfiguration config = new NetPeerConfiguration ("MonoGame");
 			config.EnableMessageType (NetIncomingMessageType.DiscoveryRequest);
 			config.EnableMessageType (NetIncomingMessageType.DiscoveryResponse);
+            config.EnableMessageType(NetIncomingMessageType.NatIntroductionSuccess);
 			
 			if (availableSession == null)
-				config.Port = 3074;
+                config.Port = port;
 
 			// create and start server
 			peer = new NetServer (config);
@@ -74,10 +85,48 @@ namespace Microsoft.Xna.Framework.Net
 			
 			myLocalAddress = GetMyLocalIpAddress();
 			myLocalEndPoint = ParseIPEndPoint(myLocalAddress + ":" + peer.Port);
-			
-			if (availableSession != null) {
-				peer.Connect(availableSession.EndPoint);
-			}
+
+            if (availableSession != null)
+            {
+                if (!this.online)
+                {
+                    peer.Connect(availableSession.EndPoint);
+                }
+                else
+                {
+                    RequestNATIntroduction(availableSession.EndPoint, peer);                    
+                }
+            }
+            else
+            {
+                if (this.online)
+                {
+                    IPAddress ipaddr = NetUtility.Resolve(masterServer);
+                    if (ipaddr != null)
+                    {
+                        m_masterServer = new IPEndPoint(ipaddr, masterserverport);
+                        LocalNetworkGamer localMe = session.LocalGamers[0];
+
+                        NetOutgoingMessage om = peer.CreateMessage();
+
+                        om.Write((byte)0);
+                        om.Write(session.AllGamers.Count);
+                        om.Write(localMe.Gamertag);
+                        om.Write(session.PrivateGamerSlots);
+                        om.Write(session.MaxGamers);
+                        om.Write(localMe.IsHost);
+                        IPAddress mask;
+                        IPAddress adr = NetUtility.GetMyAddress(out mask);
+                        om.Write(new IPEndPoint(adr, port));
+
+                        peer.SendUnconnectedMessage(om, m_masterServer); // send message to peer
+                    }
+                    else
+                    {
+                        throw new Exception("Could not resolve live host");
+                    }
+                }
+            }
 			
 			// run until we are done
 			do {
@@ -86,6 +135,12 @@ namespace Microsoft.Xna.Framework.Net
 				while ((msg = peer.ReadMessage ()) != null) {
 					
 					switch (msg.MessageType) {
+                    case NetIncomingMessageType.UnconnectedData :
+                        break;
+                    case NetIncomingMessageType.NatIntroductionSuccess:
+                        Console.WriteLine("NAT punch through OK " + msg.SenderEndpoint);                            
+                        peer.Connect(msg.SenderEndpoint);                            
+                        break;
 					case NetIncomingMessageType.DiscoveryRequest:
 						//
 						// Server received a discovery request from a client; send a discovery response (with no extra data attached)
@@ -116,7 +171,7 @@ namespace Microsoft.Xna.Framework.Net
 						NetConnectionStatus status = (NetConnectionStatus)msg.ReadByte ();
 						if (status == NetConnectionStatus.Disconnected) {
 							Console.WriteLine (NetUtility.ToHexString (msg.SenderConnection.RemoteUniqueIdentifier) + " disconnected! from " + msg.SenderEndpoint);
-						}
+						}                            
 						if (status == NetConnectionStatus.Connected) {
 							//
 							// A new player just connected!
@@ -183,12 +238,12 @@ namespace Microsoft.Xna.Framework.Net
 							SendProfile(msg.SenderConnection);
 							break;	
 						case NetworkMessageType.GamerStateChange:
-							GamerStates state = (GamerStates)msg.ReadInt32();
-							state &= ~GamerStates.Local;
-							Console.WriteLine("State Change from: " + msg.SenderEndpoint + " new State: " + state );
+							GamerStates gamerstate = (GamerStates)msg.ReadInt32();
+                            gamerstate &= ~GamerStates.Local;
+                            Console.WriteLine("State Change from: " + msg.SenderEndpoint + " new State: " + gamerstate);
 							foreach (var gamer in session.RemoteGamers) {
 								if (gamer.RemoteUniqueIdentifier == msg.SenderConnection.RemoteUniqueIdentifier)
-									gamer.State = state;
+                                    gamer.State = gamerstate;
 							}
 							//SendProfile(msg.SenderConnection);
 							break;								
@@ -325,7 +380,7 @@ namespace Microsoft.Xna.Framework.Net
 		
 		internal void DiscoverPeers() 
 		{
-			peer.DiscoverLocalPeers(3074);			
+			peer.DiscoverLocalPeers(port);			
 		}
 		
 		internal void SendData (
@@ -393,15 +448,30 @@ namespace Microsoft.Xna.Framework.Net
 		static NetPeer netPeer;
 		static List<NetIncomingMessage> discoveryMsgs;
 		
-		internal static void Find() {
+		internal static void Find(NetworkSessionType sessionType) {
 			
-			NetPeerConfiguration config = new NetPeerConfiguration ("MonoGame");
-			config.EnableMessageType (NetIncomingMessageType.DiscoveryRequest);
+			NetPeerConfiguration config = new NetPeerConfiguration ("MonoGame");			
+            if (sessionType == NetworkSessionType.PlayerMatch)
+            {
+                config.EnableMessageType(NetIncomingMessageType.UnconnectedData);
+                config.EnableMessageType(NetIncomingMessageType.NatIntroductionSuccess);
+            }
+            else
+            {
+                config.EnableMessageType(NetIncomingMessageType.DiscoveryRequest);
+            }
 			netPeer = new NetPeer(config);
 			
 			netPeer.Start();
-			
-			netPeer.DiscoverLocalPeers(3074);
+
+            if (sessionType == NetworkSessionType.PlayerMatch)
+            {
+                GetServerList(netPeer);
+            }
+            else
+            {
+                netPeer.DiscoverLocalPeers(port);
+            }
 			
 			DateTime now = DateTime.Now;
 			
@@ -415,6 +485,19 @@ namespace Microsoft.Xna.Framework.Net
 					case NetIncomingMessageType.DiscoveryResponse:
 						discoveryMsgs.Add(msg);
 						break;
+                    case NetIncomingMessageType.UnconnectedData:
+                        if (msg.SenderEndpoint.Equals(m_masterServer))
+                        {
+                            discoveryMsgs.Add(msg);
+                            /*
+                             * // it's from the master server - must be a host
+                            IPEndPoint hostInternal = msg.ReadIPEndpoint();
+                            IPEndPoint hostExternal = msg.ReadIPEndpoint();
+
+                            m_hostList.Add(new IPEndPoint[] { hostInternal, hostExternal });                            
+                             */
+                        }
+                        break;
 					case NetIncomingMessageType.VerboseDebugMessage:
 					case NetIncomingMessageType.DebugMessage:
 					case NetIncomingMessageType.WarningMessage:
@@ -430,24 +513,92 @@ namespace Microsoft.Xna.Framework.Net
 			
 
 			netPeer.Shutdown("Find shutting down");
-		}	
+		}
+
+        /// <summary>
+        /// Contacts the Master Server on the net and gets a list of available host games
+        /// </summary>
+        /// <param name="netPeer"></param>
+        private static void GetServerList(NetPeer netPeer)
+        {
+            m_masterServer = new IPEndPoint(NetUtility.Resolve(masterServer), masterserverport);
+
+            NetOutgoingMessage listRequest = netPeer.CreateMessage();
+            listRequest.Write((byte)1);
+            netPeer.SendUnconnectedMessage(listRequest, m_masterServer);
+
+        }
+
+        public static void RequestNATIntroduction(IPEndPoint host, NetPeer peer)
+        {
+            if (host == null)
+            {
+                return;
+            }
+
+            if (m_masterServer == null)
+                throw new Exception("Must connect to master server first!");
+
+            NetOutgoingMessage om = peer.CreateMessage();
+            om.Write((byte)2); // NAT intro request
+
+            // write internal ipendpoint
+            IPAddress mask;
+            om.Write(new IPEndPoint(NetUtility.GetMyAddress(out mask), peer.Port));
+
+            // write external address of host to request introduction to
+            IPEndPoint hostEp = new IPEndPoint(host.Address, port);
+            om.Write(hostEp);
+            om.Write(peer.Configuration.AppIdentifier); // send the app id
+
+            peer.SendUnconnectedMessage(om, m_masterServer);
+        }
+
 		
 		internal static void FindResults (List<AvailableNetworkSession> networkSessions) {
 			
 			foreach (NetIncomingMessage im in discoveryMsgs) {
+
+                AvailableNetworkSession available = new AvailableNetworkSession();
+                switch (im.MessageType)
+                {
+                    case NetIncomingMessageType.DiscoveryResponse :                        
+				            int currentGameCount = im.ReadInt32();
+				            string gamerTag = im.ReadString();
+				            int openPrivateGamerSlots = im.ReadInt32();
+				            int openPublicGamerSlots = im.ReadInt32();
+				            bool isHost = im.ReadBoolean();
+
+                            available.SessionType = NetworkSessionType.SystemLink;
+				            available.CurrentGamerCount = currentGameCount;
+				            available.HostGamertag = gamerTag;
+				            available.OpenPrivateGamerSlots = openPrivateGamerSlots;
+				            available.OpenPublicGamerSlots = openPublicGamerSlots;
+				            available.EndPoint = im.SenderEndpoint;
+                            available.InternalEndpont = null;
+                        break;
+                    case NetIncomingMessageType.UnconnectedData :
+                        if (im.SenderEndpoint.Equals(m_masterServer))
+                        {
+                            currentGameCount = im.ReadInt32();
+                            gamerTag = im.ReadString();
+                            openPrivateGamerSlots = im.ReadInt32();
+                            openPublicGamerSlots = im.ReadInt32();
+                            isHost = im.ReadBoolean();
+                            IPEndPoint hostInternal = im.ReadIPEndpoint();
+                            IPEndPoint hostExternal = im.ReadIPEndpoint();
+                            available.SessionType = NetworkSessionType.PlayerMatch;
+                            available.CurrentGamerCount = currentGameCount;
+                            available.HostGamertag = gamerTag;
+                            available.OpenPrivateGamerSlots = openPrivateGamerSlots;
+                            available.OpenPublicGamerSlots = openPublicGamerSlots;
+                            // its data from the master server so it includes the internal and external endponts
+                            available.EndPoint = hostExternal;
+                            available.InternalEndpont = hostInternal;
+                        }
+                        break;
+                }
 				
-				AvailableNetworkSession available = new AvailableNetworkSession();
-				int currentGameCount = im.ReadInt32();
-				string gamerTag = im.ReadString();
-				int openPrivateGamerSlots = im.ReadInt32();
-				int openPublicGamerSlots = im.ReadInt32();
-				bool isHost = im.ReadBoolean();
-				
-				available.CurrentGamerCount = currentGameCount;
-				available.HostGamertag = gamerTag;
-				available.OpenPrivateGamerSlots = openPrivateGamerSlots;
-				available.OpenPublicGamerSlots = openPublicGamerSlots;
-				available.EndPoint = im.SenderEndpoint;
 				
 				networkSessions.Add(available);
 				
