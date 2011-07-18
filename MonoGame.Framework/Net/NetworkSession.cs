@@ -635,18 +635,21 @@ namespace Microsoft.Xna.Framework.Net
 					}
 					
 					switch (command.Commnad) {
-					case CommandEventType.GamerJoined:
-						ProcessGamerJoined((CommandGamerJoined)command.CommandObject);
-						break;
-					case CommandEventType.SessionStateChange:
-						ProcessSessionStateChange((CommandSessionStateChange)command.CommandObject);
-						break;
 					case CommandEventType.SendData:
 						ProcessSendData((CommandSendData)command.CommandObject);
 						break;						
 					case CommandEventType.ReceiveData:
 						ProcessReceiveData((CommandReceiveData)command.CommandObject);
 						break;	
+					case CommandEventType.GamerJoined:
+						ProcessGamerJoined((CommandGamerJoined)command.CommandObject);
+						break;
+					case CommandEventType.GamerLeft:
+						ProcessGamerLeft((CommandGamerLeft)command.CommandObject);
+						break;
+					case CommandEventType.SessionStateChange:
+						ProcessSessionStateChange((CommandSessionStateChange)command.CommandObject);
+						break;
 					case CommandEventType.GamerStateChange:
 						ProcessGamerStateChange((CommandGamerStateChange)command.CommandObject);
 						break;							
@@ -664,7 +667,7 @@ namespace Microsoft.Xna.Framework.Net
 		private void ProcessGamerStateChange(CommandGamerStateChange command) 
 		{
 			
-			networkPeer.SendStateChange(command.Gamer);	
+			networkPeer.SendGamerStateChange(command.Gamer);	
 		}
 		
 		private void ProcessSendData(CommandSendData command)
@@ -773,6 +776,24 @@ namespace Microsoft.Xna.Framework.Net
 			}
 			
 		}
+		
+		private void ProcessGamerLeft(CommandGamerLeft command) 
+		{
+			NetworkGamer gamer;
+			
+			for (int x = 0; x < _remoteGamers.Count; x++) {
+				if (_remoteGamers[x].RemoteUniqueIdentifier == command.remoteUniqueIdentifier) {
+					gamer = _remoteGamers[x];
+					_remoteGamers.RemoveGamerAt(x);
+					_allGamers.RemoveGamerAt(x);
+				
+					if (GamerLeft != null) {
+						GamerLeft(this, new GamerLeftEventArgs(gamer));
+					}
+				}
+				
+			}
+		}		
 
 		void HandleGamerPropertyChanged (object sender, System.ComponentModel.PropertyChangedEventArgs e)
 		{
@@ -851,6 +872,8 @@ namespace Microsoft.Xna.Framework.Net
 
 		public bool IsEveryoneReady { 
 			get {
+				if (_allGamers.Count == 0)
+					return false;
 				foreach (NetworkGamer gamer in _allGamers) {
 					if (!gamer.IsReady)
 						return false;

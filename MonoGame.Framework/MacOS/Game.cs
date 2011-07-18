@@ -118,10 +118,12 @@ namespace Microsoft.Xna.Framework
 		void Handle_gameComponentCollectionComponentAdded (object sender, GameComponentCollectionEventArgs e)
 		{
 			if (!_initialized && !_initializing) {
+				//_gameComponentsToInitialize.Add(e.GameComponent);
 				e.GameComponent.Initialize();
 			}
 			else {
-				_gameComponentsToInitialize.Add(e.GameComponent);
+				e.GameComponent.Initialize();
+				//_gameComponentsToInitialize.Add(e.GameComponent);
 			}					
 		}
 
