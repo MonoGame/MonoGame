@@ -42,12 +42,14 @@
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug</OutputPath>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
-    <Optimize>false</Optimize>
+    <Optimize>true</Optimize>
     <OutputPath>bin\Release</OutputPath>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="OpenTK, Version=1.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL" />
@@ -154,6 +156,7 @@
     <Compile Include="Net\CommandEvent.cs" />
     <Compile Include="Net\CommandEventType.cs" />
     <Compile Include="Net\CommandGamerJoined.cs" />
+    <Compile Include="Net\CommandGamerStateChange.cs" />
     <Compile Include="Net\CommandReceiveData.cs" />
     <Compile Include="Net\CommandSendData.cs" />
     <Compile Include="Net\CommandSessionStateChange.cs" />

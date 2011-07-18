@@ -122,15 +122,15 @@ namespace Microsoft.Xna.Framework.Net
 			this.privateGamerSlots = privateGamerSlots;
 			this.sessionProperties = sessionProperties;
 			this.isHost = isHost;
-			this.hostGamerIndex = hostGamer;
-			
-			if (isHost)
-				networkPeer = new MonoGamerPeer(this, null);
-			else {
-				if (networkPeer == null)
-					networkPeer = new MonoGamerPeer(this, availableSession);
-			}
-			
+			this.hostGamerIndex = hostGamer;            
+            if (isHost)
+                networkPeer = new MonoGamerPeer(this, null, this.sessionType == NetworkSessionType.PlayerMatch);
+            else
+            {
+                if (networkPeer == null)
+                    networkPeer = new MonoGamerPeer(this, availableSession, this.sessionType == NetworkSessionType.PlayerMatch);
+            }
+            			
 			CommandGamerJoined gj = new CommandGamerJoined(hostGamer, this.isHost, true);
 			commandQueue.Enqueue(new CommandEvent(gj));
 		}
@@ -247,8 +247,7 @@ namespace Microsoft.Xna.Framework.Net
 			Object asyncState)
 		{
 			int hostGamer = -1;
-			hostGamer = GetHostingGamerIndex (localGamers);
-
+			hostGamer = GetHostingGamerIndex (localGamers);            
 			return BeginCreate (sessionType, hostGamer, 4, maxGamers, privateGamerSlots, sessionProperties, callback, asyncState);
 		}
 
@@ -444,7 +443,7 @@ namespace Microsoft.Xna.Framework.Net
 				
 				// Call EndInvoke to retrieve the results.
 				if (asyncResult.AsyncDelegate is NetworkSessionAsynchronousFind) {
-					returnValue = ((NetworkSessionAsynchronousFind)asyncResult.AsyncDelegate).EndInvoke (result);
+					returnValue = ((NetworkSessionAsynchronousFind)asyncResult.AsyncDelegate).EndInvoke (result);                    
 					
 					MonoGamerPeer.FindResults(networkSessions);
 				}		            	            
@@ -537,7 +536,7 @@ namespace Microsoft.Xna.Framework.Net
 					throw new ArgumentOutOfRangeException ( "maxLocalGamers must be between 1 and 4." );
 
 				List<AvailableNetworkSession> availableNetworkSessions = new List<AvailableNetworkSession> ();
-				MonoGamerPeer.Find();
+				MonoGamerPeer.Find(sessionType);
 				return new AvailableNetworkSessionCollection ( availableNetworkSessions );
 			} finally {
 			}
@@ -566,8 +565,8 @@ namespace Microsoft.Xna.Framework.Net
 		{
 			NetworkSession session = null;
 			
-			try {
-				NetworkSessionType sessionType = NetworkSessionType.SystemLink;
+			try {                
+				NetworkSessionType sessionType = availableSession.SessionType;
 				int maxGamers = 32;
 				int privateGamerSlots = 0;
 				bool isHost = false;

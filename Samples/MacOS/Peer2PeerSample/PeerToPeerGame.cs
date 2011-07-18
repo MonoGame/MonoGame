@@ -124,12 +124,41 @@ namespace PeerToPeer
 				} else if (IsPressed (Keys.A, Buttons.A)) {
 					// Create a new session?
 					CreateSession ();
+                } else if (IsPressed(Keys.X, Buttons.X)) {
+                    CreateLiveSession();
+                }
+                else if (IsPressed(Keys.Y, Buttons.Y))
+                {
+                    JoinSession(NetworkSessionType.PlayerMatch);
 				} else if (IsPressed (Keys.B, Buttons.B)) {
 					// Join an existing session?
-					JoinSession ();
+					JoinSession (NetworkSessionType.SystemLink);
 				}
 			}
 		}
+
+        private void JoinLiveSession()
+        {
+            throw new NotImplementedException();
+        }
+
+        private void CreateLiveSession()
+        {
+            DrawMessage("Creating Live session...");
+
+            try
+            {
+                networkSession = NetworkSession.Create(NetworkSessionType.PlayerMatch,
+                            maxLocalGamers, maxGamers);
+
+                HookSessionEvents();
+                //networkSession.AddLocalGamer();
+            }
+            catch (Exception e)
+            {
+                errorMessage = e.Message;
+            }
+        }
 
 
 		/// <summary>
@@ -154,14 +183,14 @@ namespace PeerToPeer
 		/// <summary>
 		/// Joins an existing network session.
 		/// </summary>
-		void JoinSession ()
+		void JoinSession (NetworkSessionType type)
 		{
 			DrawMessage ("Joining session...");
 
 			try {
 				// Search for sessions.
 				using (AvailableNetworkSessionCollection availableSessions =
-				NetworkSession.Find (NetworkSessionType.SystemLink, 
+				NetworkSession.Find (type, 
 						maxLocalGamers, null)) {
 					if (availableSessions.Count == 0) {
 						errorMessage = "No network sessions found.";
@@ -326,7 +355,9 @@ namespace PeerToPeer
 			if (!string.IsNullOrEmpty (errorMessage))
 				message += "Error:\n" + errorMessage.Replace (". ", ".\n") + "\n\n";
 
-			message += "A = create session\n" + 
+			message += "A = create local session\n" +
+            "X = create live session\n" +
+            "Y = join live session\n" + 
 			"B = join session";
 
 			spriteBatch.Begin ();
