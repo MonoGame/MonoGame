@@ -130,7 +130,7 @@ namespace NetworkStateManagement
 			if (networkSession == null)
 				return;
 
-			try			{
+			try {
 				networkSession.Update ();
 
 				// Has the session ended?
@@ -230,7 +230,7 @@ namespace NetworkStateManagement
 			try			{
 				// Which local profiles should we include in this session?
 				IEnumerable<SignedInGamer> localGamers = 
-			ChooseGamers (NetworkSessionType.PlayerMatch, e.Gamer.PlayerIndex);
+					ChooseGamers (NetworkSessionType.PlayerMatch, e.Gamer.PlayerIndex);
 
 				// Begin an asynchronous join-from-invite operation.
 				IAsyncResult asyncResult = NetworkSession.BeginJoinInvited (localGamers, 
