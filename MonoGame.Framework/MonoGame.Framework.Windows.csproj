@@ -156,6 +156,7 @@
     <Compile Include="Net\CommandEvent.cs" />
     <Compile Include="Net\CommandEventType.cs" />
     <Compile Include="Net\CommandGamerJoined.cs" />
+    <Compile Include="Net\CommandGamerLeft.cs" />
     <Compile Include="Net\CommandGamerStateChange.cs" />
     <Compile Include="Net\CommandReceiveData.cs" />
     <Compile Include="Net\CommandSendData.cs" />
