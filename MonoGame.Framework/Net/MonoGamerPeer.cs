@@ -39,18 +39,21 @@ namespace Microsoft.Xna.Framework.Net
 		
 		private void HookEvents()
 		{
-//			session.GameEnded += delegate {
-//				Console.WriteLine("game ended");
-//				MGServerWorker.CancelAsync();
-//				//server.Shutdown("byebye");
-//			};
+			session.GameEnded += HandleSessionStateChanged;
 			
-			session.SessionEnded += delegate {
-				Console.WriteLine("session ended");
-				MGServerWorker.CancelAsync();
-				//server.Shutdown("byebye");
-			};
+			session.SessionEnded += HandleSessionStateChanged;
 			
+			session.GameStarted += HandleSessionStateChanged;		
+			
+		}
+
+		void HandleSessionStateChanged (object sender, EventArgs e)
+		{
+			Console.WriteLine("session state change");
+			SendSessionStateChange();
+			
+			if (session.SessionState == NetworkSessionState.Ended)
+				MGServerWorker.CancelAsync();			
 		}
 
 		internal void ShutDown() {
@@ -116,6 +119,9 @@ namespace Microsoft.Xna.Framework.Net
 						NetConnectionStatus status = (NetConnectionStatus)msg.ReadByte ();
 						if (status == NetConnectionStatus.Disconnected) {
 							Console.WriteLine (NetUtility.ToHexString (msg.SenderConnection.RemoteUniqueIdentifier) + " disconnected! from " + msg.SenderEndpoint);
+							CommandGamerLeft cgj = new CommandGamerLeft(msg.SenderConnection.RemoteUniqueIdentifier);
+							CommandEvent cmde = new CommandEvent(cgj);
+							session.commandQueue.Enqueue(cmde);					
 						}
 						if (status == NetConnectionStatus.Connected) {
 							//
@@ -186,14 +192,27 @@ namespace Microsoft.Xna.Framework.Net
 						case NetworkMessageType.GamerStateChange:
 							GamerStates state = (GamerStates)msg.ReadInt32();
 							state &= ~GamerStates.Local;
-							//Console.WriteLine("State Change from: " + msg.SenderEndpoint + " new State: " + state );
 							foreach (var gamer in session.RemoteGamers) {
 								if (gamer.RemoteUniqueIdentifier == msg.SenderConnection.RemoteUniqueIdentifier)
 									gamer.State = state;
 							}
-							//SendProfile(msg.SenderConnection);
 							break;								
-						}
+						case NetworkMessageType.SessionStateChange:
+							NetworkSessionState sessionState = (NetworkSessionState)msg.ReadInt32();
+
+							foreach (var gamer in session.RemoteGamers) {
+								if (gamer.RemoteUniqueIdentifier == msg.SenderConnection.RemoteUniqueIdentifier) {
+									Console.WriteLine("Session State change from: " + NetUtility.ToHexString (msg.SenderConnection.RemoteUniqueIdentifier) +
+										" session is now: " + sessionState);
+									if (gamer.IsHost && sessionState == NetworkSessionState.Playing) {
+										session.StartGame();
+									}
+									
+								}
+							}
+							
+							break;								
+						}						
 						break;
 					}
 
@@ -279,7 +298,7 @@ namespace Microsoft.Xna.Framework.Net
 			}
 		}
 
-		internal void SendStateChange(NetworkGamer gamer) {
+		internal void SendGamerStateChange(NetworkGamer gamer) {
 			
 			NetOutgoingMessage om = peer.CreateMessage();
 			om.Write((byte)NetworkMessageType.GamerStateChange);
@@ -288,6 +307,14 @@ namespace Microsoft.Xna.Framework.Net
 			SendMessage(om, SendDataOptions.Reliable, gamer);
 		}
 		
+		internal void SendSessionStateChange() {
+			
+			NetOutgoingMessage om = peer.CreateMessage();
+			om.Write((byte)NetworkMessageType.SessionStateChange);
+			om.Write((int)session.SessionState);
+			
+			SendMessage(om, SendDataOptions.Reliable, null);
+		}		
 		
 		public static IPEndPoint ParseIPEndPoint(string endPoint)
 		{

@@ -12,6 +12,7 @@ namespace Microsoft.Xna.Framework.Net
 		GamerProfile = 4,
 		RequestGamerProfile = 5,
 		GamerStateChange = 6,
+		SessionStateChange = 7,
 	}
 }
 
