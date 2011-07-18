@@ -318,6 +318,7 @@
     <Compile Include="Net\NetworkMessageType.cs" />
     <Compile Include="Net\MonoGamerPeer.cs" />
     <Compile Include="Net\CommandGamerStateChange.cs" />
+    <Compile Include="Net\CommandGamerLeft.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />
