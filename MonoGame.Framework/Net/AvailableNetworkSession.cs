@@ -123,5 +123,14 @@ namespace Microsoft.Xna.Framework.Net
 			get { return _endPoint; }
 			set { _endPoint = value;}
 		}
-	}
+        IPEndPoint _internalendPoint;
+
+        internal IPEndPoint InternalEndpont
+        {
+            get { return _internalendPoint; }
+            set { _internalendPoint = value; }
+        }
+
+        internal NetworkSessionType SessionType { get; set; }
+    }
 }
