@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -140,6 +140,8 @@
     <Compile Include="Input\GamePadCapabilities.cs" />
     <Compile Include="Input\GamePadState.cs" />
     <Compile Include="Input\GamePadThumbSticks.cs" />
+    <Compile Include="Net\CommandGamerLeft.cs" />
+    <Compile Include="Net\CommandGamerStateChange.cs" />
     <Compile Include="Storage\StorageContainer.cs" />
     <Compile Include="Storage\StorageDevice.cs" />
     <Compile Include="BatteryChargeStatus.cs" />

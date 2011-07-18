@@ -27,6 +27,7 @@ namespace Microsoft.Xna.Framework.Net
         private static IPEndPoint m_masterServer;
         private static int masterserverport = 6000;
         private static string masterServer = "86.19.223.140";
+        private static string applicationIdentifier = "monogame";
 		
 		public MonoGamerPeer (NetworkSession session, AvailableNetworkSession availableSession) : this(session, availableSession, false)
 		{			
@@ -74,7 +75,7 @@ namespace Microsoft.Xna.Framework.Net
 		{
 			BackgroundWorker worker = sender as BackgroundWorker;
 
-			NetPeerConfiguration config = new NetPeerConfiguration ("MonoGame");
+            NetPeerConfiguration config = new NetPeerConfiguration(applicationIdentifier);
 			config.EnableMessageType (NetIncomingMessageType.DiscoveryRequest);
 			config.EnableMessageType (NetIncomingMessageType.DiscoveryResponse);
             config.EnableMessageType(NetIncomingMessageType.NatIntroductionSuccess);
@@ -121,7 +122,7 @@ namespace Microsoft.Xna.Framework.Net
                         IPAddress mask;
                         IPAddress adr = NetUtility.GetMyAddress(out mask);
                         om.Write(new IPEndPoint(adr, port));
-
+                        om.Write(peer.Configuration.AppIdentifier);
                         peer.SendUnconnectedMessage(om, m_masterServer); // send message to peer
                     }
                     else
@@ -182,9 +183,16 @@ namespace Microsoft.Xna.Framework.Net
 							//
 							// A new player just connected!
 							//
-							Console.WriteLine (NetUtility.ToHexString (msg.SenderConnection.RemoteUniqueIdentifier) + " connected! from " + msg.SenderEndpoint);
-							pendingGamers.Add(msg.SenderConnection.RemoteUniqueIdentifier,msg.SenderConnection);
-							SendProfileRequest(msg.SenderConnection);
+                            if (!pendingGamers.ContainsKey(msg.SenderConnection.RemoteUniqueIdentifier))
+                            {
+                                Console.WriteLine(NetUtility.ToHexString(msg.SenderConnection.RemoteUniqueIdentifier) + " connected! from " + msg.SenderEndpoint);
+                                pendingGamers.Add(msg.SenderConnection.RemoteUniqueIdentifier, msg.SenderConnection);
+                                SendProfileRequest(msg.SenderConnection);
+                            }
+                            else
+                            {
+                                Console.WriteLine("Already have a connection for that user, this is probably due to both NAT intro requests working");
+                            }
 						}
 
 						break;
@@ -478,8 +486,8 @@ namespace Microsoft.Xna.Framework.Net
 		static List<NetIncomingMessage> discoveryMsgs;
 		
 		internal static void Find(NetworkSessionType sessionType) {
-			
-			NetPeerConfiguration config = new NetPeerConfiguration ("MonoGame");			
+
+            NetPeerConfiguration config = new NetPeerConfiguration(applicationIdentifier);			
             if (sessionType == NetworkSessionType.PlayerMatch)
             {
                 config.EnableMessageType(NetIncomingMessageType.UnconnectedData);
@@ -554,6 +562,7 @@ namespace Microsoft.Xna.Framework.Net
 
             NetOutgoingMessage listRequest = netPeer.CreateMessage();
             listRequest.Write((byte)1);
+            listRequest.Write(netPeer.Configuration.AppIdentifier);
             netPeer.SendUnconnectedMessage(listRequest, m_masterServer);
 
         }
