@@ -56,13 +56,21 @@ namespace Microsoft.Xna.Framework.GamerServices
 		{
 		}
 		
-		public GamerCollection(): base(new List<T>())
+		internal GamerCollection(): base(new List<T>())
 		{
 		}
  
-		public void AddGamer (T item) {
+		internal void AddGamer (T item) {
 			base.Items.Add (item);
 		}
+		
+		internal void RemoveGamer (T item) {
+			base.Items.Remove (item);
+		}		
+
+		internal void RemoveGamerAt (int item) {
+			base.Items.RemoveAt (item);
+		}		
 		
 //	public IEnumerator<Gamer> GetEnumerator()
 //        {

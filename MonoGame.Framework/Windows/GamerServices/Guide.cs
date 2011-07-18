@@ -211,17 +211,14 @@ namespace Microsoft.Xna.Framework.GamerServices
 
 		public static void Show ()
 		{
-			/*GKPeerPickerController ppc = new GKPeerPickerController();
-			ppc.ConnectionTypesMask = GKPeerPickerConnectionType.Nearby;
-			ppc.Show();*/
 			ShowSignIn(1, false);
 		}
 
 		public static void ShowSignIn (int paneCount, bool onlineOnly)
 		{
-			if ( paneCount != 1 )
+			if ( paneCount != 1 && paneCount != 2 && paneCount != 4)
 			{
-				new ArgumentException("paneCount Can only be 1 on iPhone");
+				new ArgumentException("paneCount Can only be 1, 2 or 4 on Windows");
 				return;
 			}
 
