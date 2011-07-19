@@ -162,13 +162,13 @@ namespace Microsoft.Xna.Framework.Net
 			}
 			set
 			{
-				//if (((gamerState & GamerStates.Ready) != 0) != value) {
+				if (((gamerState & GamerStates.Ready) != 0) != value) {
 					if (value)
 						gamerState |= GamerStates.Ready;
 					else
 						gamerState &= ~GamerStates.Ready;
 					OnPropertyChanged("Ready");
-				//}
+				}
 			}
 		}
 		
