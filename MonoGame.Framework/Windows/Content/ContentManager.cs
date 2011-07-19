@@ -125,15 +125,18 @@ namespace Microsoft.Xna.Framework.Content
             else if ((typeof(T) == typeof(Video)))
             {
                 assetName = Video.Normalize(assetName);
-            }*/
+            }
             else {
                 throw new NotSupportedException("Format not supported");
-            }
+            }*/
 			
 			if (string.IsNullOrEmpty(assetName))
 			{	
 				throw new ContentLoadException("Could not load "  + originalAssetName + " asset!");
 			}
+
+            if (!Path.HasExtension(assetName))
+                assetName = string.Format("{0}.xnb", assetName);
 			
 			if (Path.GetExtension(assetName).ToUpper() !=".XNB")
 			{
