@@ -184,19 +184,25 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void Clear(Color color)
         {
-			Vector4 vector = color.ToEAGLColor();			
-			GL.ClearColor (vector.X,vector.Y,vector.Z,1.0f);
-			GL.Clear(ClearBufferMask.ColorBufferBit);
+            Vector4 vector = color.ToEAGLColor();
+            // The following was not working with Color.Transparent
+            // Once we get some regression tests take the following out			
+            //GL.ClearColor (vector.X, vector.Y, vector.Z, 1.0f);
+            GL.ClearColor(vector.X, vector.Y, vector.Z, vector.W);
+            GL.Clear(ClearBufferMask.ColorBufferBit);
         }
 
         public void Clear(ClearOptions options, Color color, float depth, int stencil)
         {
-			throw new NotImplementedException();
+            Clear(options, color.ToEAGLColor(), depth, stencil);
         }
 
         public void Clear(ClearOptions options, Vector4 color, float depth, int stencil)
         {
-			throw new NotImplementedException();
+            GL.ClearColor(color.X, color.Y, color.Z, color.W);
+            GL.ClearDepth(depth);
+            GL.ClearStencil(stencil);
+            GL.Clear((ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit));
         }
 
         public void Clear(ClearOptions options, Color color, float depth, int stencil, Rectangle[] regions)

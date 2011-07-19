@@ -29,16 +29,11 @@ namespace Microsoft.Xna.Framework.Net
         private static string masterServer = "monolive.servegame.com";
         private static string applicationIdentifier = "monogame";
 		
-		public MonoGamerPeer (NetworkSession session, AvailableNetworkSession availableSession) : this(session, availableSession, false)
-		{			
-		}
-
-        public MonoGamerPeer(NetworkSession session, AvailableNetworkSession availableSession, bool online)
-        {
-            this.online = online;
+		public MonoGamerPeer(NetworkSession session, AvailableNetworkSession availableSession)
+        {            
             this.session = session;
-            this.availableSession = availableSession;
-
+            this.online = this.session.SessionType == NetworkSessionType.PlayerMatch;
+            this.availableSession = availableSession;            
             //MGServerWorker.WorkerReportsProgress = true;
             MGServerWorker.WorkerSupportsCancellation = true;
             MGServerWorker.DoWork += new DoWorkEventHandler(MGServer_DoWork);
@@ -119,8 +114,7 @@ namespace Microsoft.Xna.Framework.Net
                         om.Write(session.PrivateGamerSlots);
                         om.Write(session.MaxGamers);
                         om.Write(localMe.IsHost);
-                        IPAddress mask;
-                        IPAddress adr = NetUtility.GetMyAddress(out mask);
+                        IPAddress adr = IPAddress.Parse(GetMyLocalIpAddress());
                         om.Write(new IPEndPoint(adr, port));
                         om.Write(peer.Configuration.AppIdentifier);
                         peer.SendUnconnectedMessage(om, m_masterServer); // send message to peer
@@ -314,7 +308,17 @@ namespace Microsoft.Xna.Framework.Net
 				Console.WriteLine("Error: " + e.Error.Message);
 			} 
 			Console.WriteLine("worker Completed");
-			
+
+            if (online && this.availableSession == null)
+            {
+                // inform the master server we have closed
+                NetOutgoingMessage om = peer.CreateMessage();
+
+                om.Write((byte)3);
+                om.Write(this.session.Host.Gamertag);
+                om.Write(peer.Configuration.AppIdentifier);
+                peer.SendUnconnectedMessage(om, m_masterServer); // send message to peer
+            }
 			peer.Shutdown ("app exiting");
 		}	
 		
