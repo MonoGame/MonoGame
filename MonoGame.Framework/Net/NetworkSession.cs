@@ -783,8 +783,8 @@ namespace Microsoft.Xna.Framework.Net
 			for (int x = 0; x < _remoteGamers.Count; x++) {
 				if (_remoteGamers[x].RemoteUniqueIdentifier == command.remoteUniqueIdentifier) {
 					gamer = _remoteGamers[x];
-					_remoteGamers.RemoveGamerAt(x);
-					_allGamers.RemoveGamerAt(x);
+					_remoteGamers.RemoveGamer(gamer);
+					_allGamers.RemoveGamer(gamer);
 				
 					if (GamerLeft != null) {
 						GamerLeft(this, new GamerLeftEventArgs(gamer));
@@ -874,8 +874,9 @@ namespace Microsoft.Xna.Framework.Net
 				if (_allGamers.Count == 0)
 					return false;
 				foreach (NetworkGamer gamer in _allGamers) {
-					if (!gamer.IsReady)
+					if (!gamer.IsReady) {
 						return false;
+					}
 				}
 				return true;
 			}
