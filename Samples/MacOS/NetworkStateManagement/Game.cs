@@ -13,10 +13,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Net;
 
-using MonoMac.Foundation;
-using MonoMac.AppKit;
-using MonoMac.ObjCRuntime;
-
 #endregion
 
 namespace NetworkStateManagement
@@ -53,18 +49,24 @@ namespace NetworkStateManagement
 
 	#region Initialization
 
-
-		/// <summary>
+        /// <summary>
 		/// The main game constructor.
-		/// </summary>
-		public NetworkStateManagementGame ()
-			{
+		/// </summary>		
+#if ANDROID 
+		public NetworkStateManagementGame  (Activity activity) : base (activity)
+#else 
+        public NetworkStateManagementGame  ()  
+#endif
+		{
 			Content.RootDirectory = "Content";
 
-			graphics = new GraphicsDeviceManager (this);
-
-			graphics.PreferredBackBufferWidth = 1067;
+			graphics = new GraphicsDeviceManager (this);            
+#if ANDROID
+            graphics.IsFullScreen = true;
+#else
+            graphics.PreferredBackBufferWidth = 1067;
 			graphics.PreferredBackBufferHeight = 600;
+#endif
 
 			// Create components.
 			screenManager = new ScreenManager (this);

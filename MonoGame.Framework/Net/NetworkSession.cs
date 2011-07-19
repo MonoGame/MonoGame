@@ -124,11 +124,11 @@ namespace Microsoft.Xna.Framework.Net
 			this.isHost = isHost;
 			this.hostGamerIndex = hostGamer;            
             if (isHost)
-                networkPeer = new MonoGamerPeer(this, null, this.sessionType == NetworkSessionType.PlayerMatch);
+                networkPeer = new MonoGamerPeer(this, null);
             else
             {
                 if (networkPeer == null)
-                    networkPeer = new MonoGamerPeer(this, availableSession, this.sessionType == NetworkSessionType.PlayerMatch);
+                    networkPeer = new MonoGamerPeer(this, availableSession);
             }
             			
 			CommandGamerJoined gj = new CommandGamerJoined(hostGamer, this.isHost, true);

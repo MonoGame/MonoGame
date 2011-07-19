@@ -32,6 +32,7 @@ namespace Peer2PeerMasterServer
             Console.WriteLine("Press ESC to quit");
             while (!Console.KeyAvailable || Console.ReadKey().Key != ConsoleKey.Escape)
             {
+                System.Threading.Thread.Sleep(10);
                 NetIncomingMessage msg;
                 while ((msg = peer.ReadMessage()) != null)
                 {
@@ -46,20 +47,23 @@ namespace Peer2PeerMasterServer
                             switch (msg.ReadByte())
                             {
                                 case 0: // register a new game
+                                    // currently only one game per host per router.
+                                    if (!registeredHosts.ContainsKey(msg.SenderEndpoint))
+                                    {
+                                        AvailableGame game = new AvailableGame();
+                                        game.Count = msg.ReadInt32();
+                                        game.GamerTag = msg.ReadString();
+                                        game.PrivateGamerSlots = msg.ReadInt32();
+                                        game.MaxGamers = msg.ReadInt32();
+                                        game.IsHost = msg.ReadBoolean();
+                                        game.InternalIP = msg.ReadIPEndpoint();
+                                        game.ExternalIP = msg.SenderEndpoint;
+                                        game.Game = msg.ReadString();
 
-                                    AvailableGame game = new AvailableGame();
-                                    game.Count = msg.ReadInt32();
-                                    game.GamerTag = msg.ReadString();
-                                    game.PrivateGamerSlots =   msg.ReadInt32();
-                                    game.MaxGamers = msg.ReadInt32();
-                                    game.IsHost = msg.ReadBoolean();                                    
-                                    game.InternalIP = msg.ReadIPEndpoint();
-                                    game.ExternalIP = msg.SenderEndpoint;
-                                    game.Game = msg.ReadString();
-                                    
-                                                                       
-                                    Console.WriteLine("Got registration for host " + game.ExternalIP.ToString());
-                                    registeredHosts.Add(game.ExternalIP,game);
+
+                                        Console.WriteLine("Got registration for host " + game.ExternalIP.ToString());
+                                        registeredHosts.Add(game.ExternalIP, game);
+                                    }
                                     break;
 
                                 case 1:
@@ -107,6 +111,19 @@ namespace Peer2PeerMasterServer
                                                     token // request token
                                             );
                                             break;
+                                        }
+                                    }
+                                    break;
+                                case 3:
+                                    if (registeredHosts.ContainsKey(msg.SenderEndpoint))
+                                    {
+                                        AvailableGame game = registeredHosts[msg.SenderEndpoint];
+                                        string tag = msg.ReadString();
+                                        string gamename = msg.ReadString();
+                                        if (game.GamerTag == tag)
+                                        {
+                                            Console.WriteLine("Remove for host " + game.ExternalIP.ToString());
+                                            registeredHosts.Remove(game.ExternalIP);
                                         }
                                     }
                                     break;

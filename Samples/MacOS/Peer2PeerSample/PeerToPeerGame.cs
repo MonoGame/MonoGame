@@ -59,9 +59,13 @@ namespace PeerToPeer
 		{
 			graphics = new GraphicsDeviceManager (this);
 
+#if ANDROID
+            graphics.IsFullScreen = true;
+#else
 			graphics.PreferredBackBufferWidth = screenWidth;
 			graphics.PreferredBackBufferHeight = screenHeight;
 			graphics.IsFullScreen = false;
+#endif
 
 			Content.RootDirectory = "Content";
 
