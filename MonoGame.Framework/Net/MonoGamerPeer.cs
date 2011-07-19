@@ -26,7 +26,7 @@ namespace Microsoft.Xna.Framework.Net
         private static int port = 3074;
         private static IPEndPoint m_masterServer;
         private static int masterserverport = 6000;
-        private static string masterServer = "86.19.223.140";
+        private static string masterServer = "monolive.servegame.com";
         private static string applicationIdentifier = "monogame";
 		
 		public MonoGamerPeer (NetworkSession session, AvailableNetworkSession availableSession) : this(session, availableSession, false)
