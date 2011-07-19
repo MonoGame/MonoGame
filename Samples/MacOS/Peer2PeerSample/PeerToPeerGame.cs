@@ -277,18 +277,22 @@ namespace PeerToPeer
 			// Look up what tank is associated with this local player.
 			Tank localTank = gamer.Tag as Tank;
 
-			// Update the tank.
-			ReadTankInputs (localTank, gamer.SignedInGamer.PlayerIndex);
+            if (localTank != null)
+            {
 
-			localTank.Update ();
+                // Update the tank.
+                ReadTankInputs(localTank, gamer.SignedInGamer.PlayerIndex);
 
-			// Write the tank state into a network packet.
-			packetWriter.Write (localTank.Position);
-			packetWriter.Write (localTank.TankRotation);
-			packetWriter.Write (localTank.TurretRotation);
+                localTank.Update();
 
-			// Send the data to everyone in the session.
-			gamer.SendData (packetWriter, SendDataOptions.InOrder);
+                // Write the tank state into a network packet.
+                packetWriter.Write(localTank.Position);
+                packetWriter.Write(localTank.TankRotation);
+                packetWriter.Write(localTank.TurretRotation);
+
+                // Send the data to everyone in the session.
+                gamer.SendData(packetWriter, SendDataOptions.InOrder);
+            }
 		}
 
 
@@ -310,12 +314,15 @@ namespace PeerToPeer
 
 				// Look up the tank associated with whoever sent this packet.
 				Tank remoteTank = sender.Tag as Tank;
+                if (remoteTank != null)
+                {
 
-				// Read the state of this tank from the network packet.
-				remoteTank.Position = packetReader.ReadVector2 ();
-				remoteTank.TankRotation = packetReader.ReadSingle ();
-				remoteTank.TurretRotation = packetReader.ReadSingle ();
-				//Console.WriteLine(remoteTank.Position);
+                    // Read the state of this tank from the network packet.
+                    remoteTank.Position = packetReader.ReadVector2();
+                    remoteTank.TankRotation = packetReader.ReadSingle();
+                    remoteTank.TurretRotation = packetReader.ReadSingle();
+                    //Console.WriteLine(remoteTank.Position);
+                }
 			}
 		}
 
@@ -381,23 +388,26 @@ namespace PeerToPeer
 				// Look up the tank object belonging to this network gamer.
 				Tank tank = gamer.Tag as Tank;
 
-				// Draw the tank.
-				tank.Draw (spriteBatch);
+                if (tank != null)
+                {
+                    // Draw the tank.
+                    tank.Draw(spriteBatch);
 
-				// Draw a gamertag label.
-				string label = gamer.Gamertag;
-				Color labelColor = Color.Black;
-				Vector2 labelOffset = new Vector2 (100, 150);
+                    // Draw a gamertag label.
+                    string label = gamer.Gamertag;
+                    Color labelColor = Color.Black;
+                    Vector2 labelOffset = new Vector2(100, 150);
 
-				if (gamer.IsHost)
-					label += " (host)";
+                    if (gamer.IsHost)
+                        label += " (host)";
 
-				// Flash the gamertag to yellow when the player is talking.
-				if (gamer.IsTalking)
-					labelColor = Color.Yellow;
+                    // Flash the gamertag to yellow when the player is talking.
+                    if (gamer.IsTalking)
+                        labelColor = Color.Yellow;
 
-				spriteBatch.DrawString (font, label, tank.Position, labelColor, 0, 
-					labelOffset, 0.6f, SpriteEffects.None, 0);
+                    spriteBatch.DrawString(font, label, tank.Position, labelColor, 0,
+                        labelOffset, 0.6f, SpriteEffects.None, 0);
+                }
 			}
 
 			spriteBatch.End ();

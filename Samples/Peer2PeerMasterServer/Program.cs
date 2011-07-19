@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 using Lidgren.Network;
 using System.Net;
 
+/// This is an example Master Server
+/// It listens on UDP port 6000 for incomming requests
+/// This port will need to be opened on any firewall/router and port farwarded.
 namespace Peer2PeerMasterServer
 {
     
@@ -13,9 +15,10 @@ namespace Peer2PeerMasterServer
     class Program
     {
        
-
         static void Main(string[] args)
         {
+            Console.WriteLine("Server Started");
+            
             Dictionary<IPEndPoint, AvailableGame> registeredHosts = new Dictionary<IPEndPoint, AvailableGame>();
 
             NetPeerConfiguration config = new NetPeerConfiguration("masterserver");
@@ -52,6 +55,7 @@ namespace Peer2PeerMasterServer
                                     game.IsHost = msg.ReadBoolean();                                    
                                     game.InternalIP = msg.ReadIPEndpoint();
                                     game.ExternalIP = msg.SenderEndpoint;
+                                    game.Game = msg.ReadString();
                                     
                                                                        
                                     Console.WriteLine("Got registration for host " + game.ExternalIP.ToString());
@@ -61,18 +65,22 @@ namespace Peer2PeerMasterServer
                                 case 1:
                                     // It's a client wanting a list of registered hosts
                                     Console.WriteLine("Sending list of " + registeredHosts.Count + " hosts to client " + msg.SenderEndpoint);
+                                    string appid = msg.ReadString();
                                     foreach (AvailableGame g1 in registeredHosts.Values)
                                     {
-                                        // send registered host to client
-                                        NetOutgoingMessage om = peer.CreateMessage();
-                                        om.Write(g1.Count);
-                                        om.Write(g1.GamerTag);
-                                        om.Write(g1.PrivateGamerSlots);
-                                        om.Write(g1.MaxGamers);
-                                        om.Write(g1.IsHost);                                        
-                                        om.Write(g1.InternalIP);
-                                        om.Write(g1.ExternalIP);
-                                        peer.SendUnconnectedMessage(om, msg.SenderEndpoint);
+                                        if (g1.Game == appid)
+                                        {
+                                            // send registered host to client
+                                            NetOutgoingMessage om = peer.CreateMessage();
+                                            om.Write(g1.Count);
+                                            om.Write(g1.GamerTag);
+                                            om.Write(g1.PrivateGamerSlots);
+                                            om.Write(g1.MaxGamers);
+                                            om.Write(g1.IsHost);
+                                            om.Write(g1.InternalIP);
+                                            om.Write(g1.ExternalIP);
+                                            peer.SendUnconnectedMessage(om, msg.SenderEndpoint);
+                                        }
                                     }
 
                                     break;
@@ -131,5 +139,7 @@ namespace Peer2PeerMasterServer
         public int PrivateGamerSlots { get; set; }
         public int MaxGamers { get; set; }
         public bool IsHost { get; set; }
+
+        public string Game { get; set; }
     }
 }
