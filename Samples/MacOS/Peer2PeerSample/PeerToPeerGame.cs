@@ -18,6 +18,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.Net;
 
 #endregion
@@ -41,6 +42,7 @@ namespace PeerToPeer
 		SpriteFont font;
 		KeyboardState currentKeyboardState;
 		GamePadState currentGamePadState;
+		TouchCollection currentTouchState;
 		NetworkSession networkSession;
 		PacketWriter packetWriter = new PacketWriter ();
 		PacketReader packetReader = new PacketReader ();
@@ -59,7 +61,7 @@ namespace PeerToPeer
 		{
 			graphics = new GraphicsDeviceManager (this);
 
-#if ANDROID
+#if ANDROID || IOS
             graphics.IsFullScreen = true;
 #else
 			graphics.PreferredBackBufferWidth = screenWidth;
@@ -373,8 +375,8 @@ namespace PeerToPeer
 
 			spriteBatch.Begin ();
 
-			spriteBatch.DrawString (font, message, new Vector2 (161, 161), Color.Black);
-			spriteBatch.DrawString (font, message, new Vector2 (160, 160), Color.White);
+			spriteBatch.DrawString (font, message, new Vector2 (61, 161), Color.Black);
+			spriteBatch.DrawString (font, message, new Vector2 (60, 160), Color.White);
 
 			spriteBatch.End ();
 		}
@@ -451,11 +453,46 @@ namespace PeerToPeer
 		{
 			currentKeyboardState = Keyboard.GetState ();
 			currentGamePadState = GamePad.GetState (PlayerIndex.One);
+			currentTouchState = TouchPanel.GetState();
 
 			// Check for exit.
 			if (IsActive && IsPressed (Keys.Escape, Buttons.Back)) {
 				Exit ();
 			}
+			
+			// Only test of Menu touches when networkSession is null
+			if (networkSession == null) 
+			{
+				// Doing very very basic touch detection for menu
+				if (currentTouchState.Count > 0) 
+				{
+					Console.WriteLine( string.Format("X:{0}, Y:{1}", currentTouchState[0].Position.X, currentTouchState[0].Position.Y ) );
+					if ((currentTouchState[0].Position.X > 60 ) && (currentTouchState[0].Position.Y > 160 )
+					&& (currentTouchState[0].Position.X < 220 ) && (currentTouchState[0].Position.Y < 190 ) )
+					{
+						CreateSession ();
+					}
+					
+					if ((currentTouchState[0].Position.X > 60 ) && (currentTouchState[0].Position.Y > 200 )
+					&& (currentTouchState[0].Position.X < 220 ) && (currentTouchState[0].Position.Y < 230 ) )
+					{
+						CreateLiveSession();
+					}
+					
+					if ((currentTouchState[0].Position.X > 60 ) && (currentTouchState[0].Position.Y > 240 )
+					&& (currentTouchState[0].Position.X < 220 ) && (currentTouchState[0].Position.Y < 270 ) )
+					{
+						JoinSession(NetworkSessionType.PlayerMatch);
+					}
+					
+					if ((currentTouchState[0].Position.X > 60 ) && (currentTouchState[0].Position.Y > 280 )
+					&& (currentTouchState[0].Position.X < 220 ) && (currentTouchState[0].Position.Y < 310 ) )
+					{
+						JoinSession(NetworkSessionType.SystemLink);
+					}
+				}
+			}
+			
 		}
 
 
