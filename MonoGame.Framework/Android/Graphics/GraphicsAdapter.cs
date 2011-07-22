@@ -68,7 +68,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             get 
 			{ 
-				throw new NotImplementedException(); 
+				return new GraphicsAdapter();
 			}
         }
         
