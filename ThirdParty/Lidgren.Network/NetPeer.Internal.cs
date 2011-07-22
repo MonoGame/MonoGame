@@ -1,4 +1,6 @@
-﻿#define IS_MAC_AVAILABLE
+﻿#if !ANDROID && !IOS
+#define IS_MAC_AVAILABLE
+#endif
 
 using System;
 using System.Net;
