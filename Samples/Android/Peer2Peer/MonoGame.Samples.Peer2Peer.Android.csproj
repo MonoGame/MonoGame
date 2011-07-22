@@ -86,5 +86,8 @@
     <None Include="..\..\MacOS\Peer2PeerSample\Content\Turret.xnb">
       <Link>Assets\Content\Turret.xnb</Link>
     </None>
+    <None Include="..\..\iOS\Peer2Peer\Content\gamepad.png">
+      <Link>Assets\Content\gamepad.png</Link>
+    </None>
   </ItemGroup>
 </Project>

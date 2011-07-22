@@ -47,6 +47,7 @@ namespace PeerToPeer
 		PacketWriter packetWriter = new PacketWriter ();
 		PacketReader packetReader = new PacketReader ();
 		string errorMessage;
+		Texture2D gamePadTexture;
 
 	#endregion
 
@@ -60,7 +61,7 @@ namespace PeerToPeer
 #endif
 		{
 			graphics = new GraphicsDeviceManager (this);
-
+			
 #if ANDROID || IOS
             graphics.IsFullScreen = true;
 #else
@@ -83,6 +84,22 @@ namespace PeerToPeer
 			spriteBatch = new SpriteBatch (GraphicsDevice);
 
 			font = Content.Load<SpriteFont> ("Font");
+			
+			gamePadTexture = Content.Load<Texture2D>("gamepad.png");
+			
+			ThumbStickDefinition thumbStickLeft = new ThumbStickDefinition();
+			thumbStickLeft.Position = new Vector2(10,400);
+			thumbStickLeft.Texture = gamePadTexture;
+			thumbStickLeft.TextureRect = new Rectangle(2,2,68,68);
+			
+			GamePad.LeftThumbStickDefinition = thumbStickLeft;
+			
+			ThumbStickDefinition thumbStickRight = new ThumbStickDefinition();
+			thumbStickRight.Position = new Vector2(240,400);
+			thumbStickRight.Texture = gamePadTexture;
+			thumbStickRight.TextureRect = new Rectangle(2,2,68,68);
+			
+			GamePad.RightThumbStickDefinition = thumbStickRight;
 		}
 
 
@@ -351,7 +368,7 @@ namespace PeerToPeer
 				DrawMenuScreen ();
 			} else {
 				// If we are in a network session, draw it.
-				DrawNetworkSession ();
+				DrawNetworkSession (gameTime);
 			}
 
 			base.Draw (gameTime);
@@ -385,7 +402,7 @@ namespace PeerToPeer
 		/// <summary>
 		/// Draws the state of an active network session.
 		/// </summary>
-		void DrawNetworkSession ()
+		void DrawNetworkSession (GameTime gameTime)
 		{
 			spriteBatch.Begin ();
 
@@ -415,7 +432,11 @@ namespace PeerToPeer
                         labelOffset, 0.6f, SpriteEffects.None, 0);
                 }
 			}
-
+			
+#if ANDROID || IOS
+			GamePad.Draw(gameTime, spriteBatch);
+#endif
+			
 			spriteBatch.End ();
 		}
 
