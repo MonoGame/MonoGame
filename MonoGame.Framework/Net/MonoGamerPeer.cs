@@ -153,6 +153,11 @@ namespace Microsoft.Xna.Framework.Net
 						om.Write(session.PrivateGamerSlots);
 						om.Write(session.MaxGamers);
 						om.Write(localMe.IsHost);
+						int[] propertyData = new int[session.SessionProperties.Count * 2];
+						NetworkSessionProperties.WriteProperties(session.SessionProperties, propertyData);
+						for (int x = 0; x < propertyData.Length; x++) {
+							om.Write(propertyData[x]);
+						}
 
 						peer.SendDiscoveryResponse (om, msg.SenderEndpoint);
 						break;
@@ -610,7 +615,16 @@ namespace Microsoft.Xna.Framework.Net
 				            int openPrivateGamerSlots = im.ReadInt32();
 				            int openPublicGamerSlots = im.ReadInt32();
 				            bool isHost = im.ReadBoolean();
-
+					
+					NetworkSessionProperties properties = new NetworkSessionProperties();
+					int[] propertyData = new int[properties.Count * 2];
+					for (int x = 0; x < propertyData.Length; x++) {
+						propertyData[x] = im.ReadInt32();
+					}
+					
+					NetworkSessionProperties.ReadProperties(properties, propertyData);
+					available.SessionProperties = properties;
+						
                             available.SessionType = NetworkSessionType.SystemLink;
 				            available.CurrentGamerCount = currentGameCount;
 				            available.HostGamertag = gamerTag;
