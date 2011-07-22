@@ -571,7 +571,7 @@ namespace Microsoft.Xna.Framework.Net
 				int privateGamerSlots = 0;
 				bool isHost = false;
 				int hostGamer = -1;
-				NetworkSessionProperties sessionProperties = null;
+				NetworkSessionProperties sessionProperties = availableSession.SessionProperties;
 				if (sessionProperties == null)
 					sessionProperties = new NetworkSessionProperties();
 				session = new NetworkSession (sessionType, maxGamers, privateGamerSlots, sessionProperties, isHost, hostGamer, availableSession);
