@@ -114,9 +114,8 @@ namespace Microsoft.Xna.Framework.Net
                         om.Write(session.PrivateGamerSlots);
                         om.Write(session.MaxGamers);
                         om.Write(localMe.IsHost);
-                        //IPAddress adr = IPAddress.Parse(GetMyLocalIpAddress());
-                        //om.Write(new IPEndPoint(adr, port));
-						om.Write(myLocalEndPoint);
+                        IPAddress adr = IPAddress.Parse(GetMyLocalIpAddress());
+                        om.Write(new IPEndPoint(adr, port));
                         om.Write(peer.Configuration.AppIdentifier);
                         peer.SendUnconnectedMessage(om, m_masterServer); // send message to peer
                     }
