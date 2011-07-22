@@ -305,6 +305,8 @@
     <Compile Include="GamerServices\GamerZone.cs" />
     <Compile Include="GamerServices\MessageBoxIcon.cs" />
     <Compile Include="Android\GamerServices\Guide.cs" />
+    <Compile Include="Net\CommandGamerLeft.cs" />
+    <Compile Include="Net\CommandGamerStateChange.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="GamerServices\" />
