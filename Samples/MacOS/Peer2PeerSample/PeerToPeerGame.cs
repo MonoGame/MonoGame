@@ -84,7 +84,8 @@ namespace PeerToPeer
 			spriteBatch = new SpriteBatch (GraphicsDevice);
 
 			font = Content.Load<SpriteFont> ("Font");
-			
+
+#if ANDROID || IOS
 			gamePadTexture = Content.Load<Texture2D>("gamepad.png");
 			
 			ThumbStickDefinition thumbStickLeft = new ThumbStickDefinition();
@@ -100,6 +101,7 @@ namespace PeerToPeer
 			thumbStickRight.TextureRect = new Rectangle(2,2,68,68);
 			
 			GamePad.RightThumbStickDefinition = thumbStickRight;
+#endif
 		}
 
 
