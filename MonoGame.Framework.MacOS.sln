@@ -41,6 +41,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BookSource", "BookSource", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FloodControl", "Samples\MacOS\BookSourceCode\XNAGameDevelopmentbyExampleCode\FloodControl\FloodControl.csproj", "{F3115910-E6D1-450D-97FB-A8168A5D622E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AsteroidBeltAssault", "Samples\MacOS\BookSourceCode\XNAGameDevelopmentbyExampleCode\AsteroidBeltAssault\AsteroidBeltAssault.csproj", "{1585306B-CF46-479D-B234-1E10EDF4D741}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{1230A19A-FA76-4D12-85E5-68A452315299}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1230A19A-FA76-4D12-85E5-68A452315299}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1230A19A-FA76-4D12-85E5-68A452315299}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1585306B-CF46-479D-B234-1E10EDF4D741}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1585306B-CF46-479D-B234-1E10EDF4D741}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1585306B-CF46-479D-B234-1E10EDF4D741}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1585306B-CF46-479D-B234-1E10EDF4D741}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1D099BD4-805E-4C04-B33D-9F2D16D42B86}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1D099BD4-805E-4C04-B33D-9F2D16D42B86}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1D099BD4-805E-4C04-B33D-9F2D16D42B86}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -132,6 +138,7 @@ Global
 		{1D099BD4-805E-4C04-B33D-9F2D16D42B86} = {A8B44E55-84AD-4F3A-88F7-50B99031507E}
 		{2BCFC6F4-5C08-467A-B310-5C0A009018CE} = {A8B44E55-84AD-4F3A-88F7-50B99031507E}
 		{F3115910-E6D1-450D-97FB-A8168A5D622E} = {E58F0822-614F-4642-97EE-F85AFBC55B95}
+		{1585306B-CF46-479D-B234-1E10EDF4D741} = {E58F0822-614F-4642-97EE-F85AFBC55B95}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = Samples\MacOS\Peer2PeerSample\Peer2PeerSample.csproj
