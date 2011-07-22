@@ -77,17 +77,17 @@
   </Target>
   -->
   <ItemGroup>
-    <None Include="..\..\MacOS\Peer2PeerSample\Content\Font.xnb">
+    <AndroidAsset Include="..\..\MacOS\Peer2PeerSample\Content\Font.xnb">
       <Link>Assets\Content\Font.xnb</Link>
-    </None>
-    <None Include="..\..\MacOS\Peer2PeerSample\Content\Tank.xnb">
-      <Link>Assets\Content\Tank.xnb</Link>
-    </None>
-    <None Include="..\..\MacOS\Peer2PeerSample\Content\Turret.xnb">
-      <Link>Assets\Content\Turret.xnb</Link>
-    </None>
-    <None Include="..\..\iOS\Peer2Peer\Content\gamepad.png">
+    </AndroidAsset>
+    <AndroidAsset Include="..\..\iOS\Peer2Peer\Content\gamepad.png">
       <Link>Assets\Content\gamepad.png</Link>
-    </None>
+    </AndroidAsset>
+    <AndroidAsset Include="..\..\MacOS\Peer2PeerSample\Content\Tank.xnb">
+      <Link>Assets\Content\Tank.xnb</Link>
+    </AndroidAsset>
+    <AndroidAsset Include="..\..\MacOS\Peer2PeerSample\Content\Turret.xnb">
+      <Link>Assets\Content\Turret.xnb</Link>
+    </AndroidAsset>
   </ItemGroup>
 </Project>

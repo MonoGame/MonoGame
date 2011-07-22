@@ -41,7 +41,7 @@ Global
 		{F05F90DC-DD37-4967-A96A-8D36C1C23E81}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = MonoGame.Framework\MonoGame.Framework.Android.csproj
+		StartupItem = Samples\Android\Peer2Peer\MonoGame.Samples.Peer2Peer.Android.csproj
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
