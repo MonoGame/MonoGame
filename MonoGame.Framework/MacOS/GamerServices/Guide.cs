@@ -52,34 +52,31 @@ using MonoMac.Foundation;
 using Microsoft.Xna.Framework.Net;
 using Microsoft.Xna.Framework.Storage;
 
-
 #endregion Using clause
 
 namespace Microsoft.Xna.Framework.GamerServices
 {
-
-
 	public static class Guide
 	{
 		private static bool isScreenSaverEnabled;
 		private static bool isTrialMode;
 		private static bool isVisible;
 		private static bool simulateTrialMode;
-		
 
-		delegate string ShowKeyboardInputDelegate(
-		 PlayerIndex player,           
-         string title,
-         string description,
-         string defaultText,
-		 bool usePasswordMode);
 
-		public static string ShowKeyboardInput(
-		 PlayerIndex player,           
-         string title,
-         string description,
-         string defaultText,
-		 bool usePasswordMode)
+		delegate string ShowKeyboardInputDelegate (
+			PlayerIndex player, 
+			string title, 
+			string description, 
+			string defaultText, 
+			bool usePasswordMode);
+
+		public static string ShowKeyboardInput (
+			PlayerIndex player, 
+			string title, 
+			string description, 
+			string defaultText,
+			bool usePasswordMode)
 		{
 			string result = defaultText; 
 
@@ -87,114 +84,105 @@ namespace Microsoft.Xna.Framework.GamerServices
 		}
 
 		public static IAsyncResult BeginShowKeyboardInput (
-         PlayerIndex player,
-         string title,
-         string description,
-         string defaultText,
-         AsyncCallback callback,
-         Object state)
+			PlayerIndex player,
+			string title,
+			string description,
+			string defaultText,
+			AsyncCallback callback,
+			Object state)
 		{
-			return BeginShowKeyboardInput(player, title, description, defaultText, callback, state, false );
+			return BeginShowKeyboardInput (player, title, description, defaultText, callback, state, false);
 		}
 
 		public static IAsyncResult BeginShowKeyboardInput (
-         PlayerIndex player,
-         string title,
-         string description,
-         string defaultText,
-         AsyncCallback callback,
-         Object state,
-         bool usePasswordMode)
+			PlayerIndex player,
+			string title,
+			string description,
+			string defaultText,
+			AsyncCallback callback,
+			Object state,
+			bool usePasswordMode)
 		{
 			isVisible = true;
 
 			ShowKeyboardInputDelegate ski = ShowKeyboardInput; 
 
-			return ski.BeginInvoke(player, title, description, defaultText, usePasswordMode, callback, ski);
+			return ski.BeginInvoke (player, title, description, defaultText, usePasswordMode, callback, ski);
 		}
 
 		public static string EndShowKeyboardInput (IAsyncResult result)
 		{
-			try 
-			{
+			try {
 				ShowKeyboardInputDelegate ski = (ShowKeyboardInputDelegate)result.AsyncState; 
 
-				return ski.EndInvoke(result);
-			} 
-			finally 
-			{
+				return ski.EndInvoke (result);
+			} finally {
 				isVisible = false;
 			}			
 		}
 
-		delegate Nullable<int> ShowMessageBoxDelegate( string title,
-         string text,
-         IEnumerable<string> buttons,
-         int focusButton,
-         MessageBoxIcon icon);
+		delegate Nullable<int> ShowMessageBoxDelegate (string title,
+			string text,
+			IEnumerable<string> buttons,
+			int focusButton,
+			MessageBoxIcon icon);
 
-		public static Nullable<int> ShowMessageBox( string title,
-         string text,
-         IEnumerable<string> buttons,
-         int focusButton,
-         MessageBoxIcon icon)
+		public static Nullable<int> ShowMessageBox (string title,
+				string text,
+				IEnumerable<string> buttons,
+				int focusButton,
+				MessageBoxIcon icon)
 		{
 			Nullable<int> result = null;
-			
+
 			isVisible = true;			
 
 			return result;
 		}
 
-		public static IAsyncResult BeginShowMessageBox(
-         PlayerIndex player,
-         string title,
-         string text,
-         IEnumerable<string> buttons,
-         int focusButton,
-         MessageBoxIcon icon,
-         AsyncCallback callback,
-         Object state
-		)
+		public static IAsyncResult BeginShowMessageBox (
+				PlayerIndex player,
+				string title,
+				string text,
+				IEnumerable<string> buttons,
+				int focusButton,
+				MessageBoxIcon icon,
+				AsyncCallback callback,
+				Object state)
 		{	
 			isVisible = true;
 
 			ShowMessageBoxDelegate smb = ShowMessageBox; 
 
-			return smb.BeginInvoke(title, text, buttons, focusButton, icon, callback, smb);			
+			return smb.BeginInvoke (title, text, buttons, focusButton, icon, callback, smb);			
 		}
 
 		public static IAsyncResult BeginShowMessageBox (
-         string title,
-         string text,
-         IEnumerable<string> buttons,
-         int focusButton,
-         MessageBoxIcon icon,
-         AsyncCallback callback,
-         Object state
-		)
+				string title,
+				string text,
+				IEnumerable<string> buttons,
+				int focusButton,
+				MessageBoxIcon icon,
+				AsyncCallback callback,
+				Object state)
 		{
-			return BeginShowMessageBox(PlayerIndex.One, title, text, buttons, focusButton, icon, callback, state);
+			return BeginShowMessageBox (PlayerIndex.One, title, text, buttons, focusButton, icon, callback, state);
 		}
 
 		public static Nullable<int> EndShowMessageBox (IAsyncResult result)
 		{
-			try
-			{
+			try {
 				ShowMessageBoxDelegate smbd = (ShowMessageBoxDelegate)result.AsyncState; 
 
-				return smbd.EndInvoke(result);
-			} 
-			finally 
-			{
+				return smbd.EndInvoke (result);
+			} finally {
 				isVisible = false;
 			}
 		}
 
-
-		public static void ShowMarketplace (PlayerIndex player )
+		public static void ShowMarketplace (PlayerIndex player)
 		{
-			
+
 		}
 
 		public static void Show ()
@@ -202,104 +190,85 @@ namespace Microsoft.Xna.Framework.GamerServices
 			/*GKPeerPickerController ppc = new GKPeerPickerController();
 			ppc.ConnectionTypesMask = GKPeerPickerConnectionType.Nearby;
 			ppc.Show();*/
-			ShowSignIn(1, false);
+			ShowSignIn (1, false);
 		}
 
 		public static void ShowSignIn (int paneCount, bool onlineOnly)
 		{
-			if ( paneCount != 1 )
-			{
-				new ArgumentException("paneCount Can only be 1 on iPhone");
+			if (paneCount != 1) {
+				new ArgumentException ("paneCount Can only be 1 on iPhone");
 				return;
 			}
 
-			if (GamerServicesComponent.LocalNetworkGamer == null)
-			{
-				GamerServicesComponent.LocalNetworkGamer = new LocalNetworkGamer();
-			}
-			else
-			{
-				GamerServicesComponent.LocalNetworkGamer.SignedInGamer.BeginAuthentication(null, null);
+			if (GamerServicesComponent.LocalNetworkGamer == null) {
+				GamerServicesComponent.LocalNetworkGamer = new LocalNetworkGamer ();
+			} else {
+				GamerServicesComponent.LocalNetworkGamer.SignedInGamer.BeginAuthentication (null, null);
 			}
 		}
 
-		public static void ShowLeaderboard()
+		public static void ShowLeaderboard ()
 		{
-			if ( ( Gamer.SignedInGamers.Count > 0 ) && ( Gamer.SignedInGamers[0].IsSignedInToLive ) )
-			{	
-				
+			if ((Gamer.SignedInGamers.Count > 0) && (Gamer.SignedInGamers [0].IsSignedInToLive)) {	
+
 			}
 		}
 
-		public static void ShowAchievements()
+		public static void ShowAchievements ()
 		{
-			if ( ( Gamer.SignedInGamers.Count > 0 ) && ( Gamer.SignedInGamers[0].IsSignedInToLive ) )
-			{
-				
+			if ((Gamer.SignedInGamers.Count > 0) && (Gamer.SignedInGamers [0].IsSignedInToLive)) {
+
 			}
 		}
 
-		public static IAsyncResult BeginShowStorageDeviceSelector( AsyncCallback callback, object state )
+		public static IAsyncResult BeginShowStorageDeviceSelector (AsyncCallback callback, object state)
 		{
 			return null;
 		}
 
-		public static StorageDevice EndShowStorageDeviceSelector( IAsyncResult result )
+		public static StorageDevice EndShowStorageDeviceSelector (IAsyncResult result)
 		{
 			return null;
 		}
 
 		#region Properties
-		public static bool IsScreenSaverEnabled 
-		{ 
-			get
-			{
+		public static bool IsScreenSaverEnabled { 
+			get {
 				return isScreenSaverEnabled;
 			}
-			set
-			{
+			set {
 				isScreenSaverEnabled = value;
 			}
 		}
 
-		public static bool IsTrialMode 
-		{ 
-			get
-			{
+		public static bool IsTrialMode { 
+			get {
 				return isTrialMode;
 			}
-			set
-			{
+			set {
 				isTrialMode = value;
 			}
 		}
 
-		public static bool IsVisible 
-		{ 
-			get
-			{
+		public static bool IsVisible { 
+			get {
 				return isVisible;
 			}
-			set
-			{
+			set {
 				isVisible = value;
 			}
 		}
 
-		public static bool SimulateTrialMode 
-		{ 
-			get
-			{
+		public static bool SimulateTrialMode { 
+			get {
 				return simulateTrialMode;
 			}
-			set
-			{
+			set {
 				simulateTrialMode = value;
 			}
 		}
 
-		public static GameWindow Window 
-		{ 
+		public static GameWindow Window { 
 			get;
 			set;
 		}
