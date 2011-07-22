@@ -591,7 +591,10 @@ namespace Microsoft.Xna.Framework.Net
 
             // write internal ipendpoint
             IPAddress mask;
-            om.Write(new IPEndPoint(NetUtility.GetMyAddress(out mask), peer.Port));
+            //om.Write(new IPEndPoint(NetUtility.GetMyAddress(out mask), peer.Port));
+			IPAddress adr = IPAddress.Parse(GetMyLocalIpAddress());
+                        om.Write(new IPEndPoint(adr, peer.Port));			
+			//om.Write(new IPEndPoint(, peer.Port));
 
             // write external address of host to request introduction to
             IPEndPoint hostEp = new IPEndPoint(host.Address, port);
