@@ -96,9 +96,9 @@ namespace Lidgren.Network
 
 		private static NetworkInterface GetNetworkInterface()
 		{
-			IPGlobalProperties computerProperties = IPGlobalProperties.GetIPGlobalProperties();
-			if (computerProperties == null)
-				return null;
+			//IPGlobalProperties computerProperties = IPGlobalProperties.GetIPGlobalProperties();
+			//if (computerProperties == null)
+			//	return null;
 
 			NetworkInterface[] nics = NetworkInterface.GetAllNetworkInterfaces();
 			if (nics == null || nics.Length < 1)
