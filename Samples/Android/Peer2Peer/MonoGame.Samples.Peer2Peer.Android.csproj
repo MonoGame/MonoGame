@@ -18,6 +18,7 @@
     <AndroidStoreUncompressedFileExtensions />
     <TargetFrameworkVersion>v2.2</TargetFrameworkVersion>
     <MandroidI18n />
+    <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -89,5 +90,8 @@
     <AndroidAsset Include="..\..\MacOS\Peer2PeerSample\Content\Turret.xnb">
       <Link>Assets\Content\Turret.xnb</Link>
     </AndroidAsset>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Properties\AndroidManifest.xml" />
   </ItemGroup>
 </Project>
