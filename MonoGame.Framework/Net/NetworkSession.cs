@@ -1,4 +1,4 @@
-#region License
+﻿#region License
 // /*
 // Microsoft Public License (Ms-PL)
 // MonoGame - Copyright © 2009 The MonoGame Team
@@ -75,6 +75,8 @@ namespace Microsoft.Xna.Framework.Net
 
 	public sealed class NetworkSession : IDisposable
 	{
+		internal static List<NetworkSession> activeSessions = new List<NetworkSession>();
+		
 		private NetworkSessionState sessionState;
 		//private static NetworkSessionType networkSessionType;	
 		private GamerCollection<NetworkGamer> _allGamers;
@@ -86,7 +88,9 @@ namespace Microsoft.Xna.Framework.Net
 
 		// use the static Create or BeginCreate methods
 		private NetworkSession ()
-		{}
+		{
+			activeSessions.Add(this);
+		}
 		
 		private NetworkSessionType sessionType;
 		private int maxGamers;
@@ -103,7 +107,7 @@ namespace Microsoft.Xna.Framework.Net
 		{
 		}
 		
-		private NetworkSession (NetworkSessionType sessionType, int maxGamers, int privateGamerSlots, NetworkSessionProperties sessionProperties, bool isHost, int hostGamer, AvailableNetworkSession availableSession)
+		private NetworkSession (NetworkSessionType sessionType, int maxGamers, int privateGamerSlots, NetworkSessionProperties sessionProperties, bool isHost, int hostGamer, AvailableNetworkSession availableSession) : this()
 		{
 			if (sessionProperties == null) {
 				throw new ArgumentNullException ("sessionProperties");
@@ -115,7 +119,7 @@ namespace Microsoft.Xna.Framework.Net
 			_previousGamers = new GamerCollection<NetworkGamer>();
 			hostingGamer = null;
 			
-			commandQueue = new Queue<CommandEvent>();
+			commandQueue = new Queue<CommandEvent>();			
 			
 			this.sessionType = sessionType;
 			this.maxGamers = maxGamers;
@@ -208,12 +212,14 @@ namespace Microsoft.Xna.Framework.Net
 		public void Dispose ()
 		{
 			this.Dispose(true);
-			GC.SuppressFinalize (this);
+			GC.SuppressFinalize (this);				
 		}
 		
 		public void Dispose (bool disposing) 
 		{
+			Console.WriteLine("Network Session Disposing");
 			if (disposing) {
+				
 				foreach (Gamer gamer in _allGamers) {
 					gamer.Dispose();
 				}
@@ -223,8 +229,9 @@ namespace Microsoft.Xna.Framework.Net
 					networkPeer.ShutDown();
 				}
 				if (networkPeer != null) {
-					networkPeer.ShutDown();
+					networkPeer.ShutDown();					
 				}				
+				this._isDisposed = true;
 			}
 		}
 
@@ -774,6 +781,12 @@ namespace Microsoft.Xna.Framework.Net
 				networkPeer.SendPeerIntroductions(gamer);
 			}
 			
+			if (networkPeer != null)
+			{
+				networkPeer.UpdateLiveSession(this);
+			}
+			
+			
 		}
 		
 		private void ProcessGamerLeft(CommandGamerLeft command) 
@@ -791,6 +804,11 @@ namespace Microsoft.Xna.Framework.Net
 					}
 				}
 				
+			}
+			
+			if (networkPeer != null)
+			{
+				networkPeer.UpdateLiveSession(this);
 			}
 		}		
 
@@ -971,7 +989,21 @@ namespace Microsoft.Xna.Framework.Net
 		public static event EventHandler<InviteAcceptedEventArgs> InviteAccepted;
 		public event EventHandler<NetworkSessionEndedEventArgs> SessionEnded;
 		#endregion
-	}
+
+        internal static void Exit()
+        {
+            if (Net.NetworkSession.activeSessions != null && Net.NetworkSession.activeSessions.Count > 0)
+            {
+                foreach (Net.NetworkSession session in Net.NetworkSession.activeSessions)
+                {
+                    if (!session.IsDisposed)
+                    {
+                        session.Dispose();
+                    }
+                }
+            }
+        }
+    }
 
 	public class GameEndedEventArgs : EventArgs
 	{

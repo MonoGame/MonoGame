@@ -127,6 +127,24 @@ namespace Peer2PeerMasterServer
                                         }
                                     }
                                     break;
+                                case 4 :
+                                    if (registeredHosts.ContainsKey(msg.SenderEndpoint))
+                                    {
+                                        AvailableGame game = registeredHosts[msg.SenderEndpoint];
+                                        int count = msg.ReadInt32();
+                                        string tag = msg.ReadString();                                        
+                                        if (game.GamerTag == tag)
+                                        {
+                                            Console.WriteLine("Update for host " + game.ExternalIP.ToString());                                            
+                                            game.Count = count;
+	                                        game.PrivateGamerSlots = msg.ReadInt32();
+	                                        game.MaxGamers = msg.ReadInt32();
+	                                        game.IsHost = msg.ReadBoolean();
+	                                        game.InternalIP = msg.ReadIPEndpoint();
+	                                        game.Game = msg.ReadString();
+                                        }
+                                    }
+                                    break;
                             }
                             break;
 

@@ -1,4 +1,4 @@
-#region License
+﻿#region License
 /*
 Microsoft Public License (Ms-PL)
 MonoGame - Copyright © 2009 The MonoGame Team
@@ -74,9 +74,9 @@ namespace Microsoft.Xna.Framework.GamerServices
 		{
 			if (disposing) {
 				_isDisposed = true;
-				foreach (var gamer in _signedInGamers) {
+				/*foreach (var gamer in _signedInGamers) {
 					gamer.Dispose();
-				}
+				}*/
 			}
 		}
 		

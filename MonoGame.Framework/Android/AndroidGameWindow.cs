@@ -42,6 +42,7 @@ purpose and non-infringement.
 using System;
 using System.Drawing;
 using System.Collections.Generic;
+using System.ComponentModel;
 using Android.Content;
 using Android.Content.PM;
 using Android.Content.Res;
@@ -76,11 +77,15 @@ namespace Microsoft.Xna.Framework
         {
           
             Initialize();
+				
         }
-
+		
+						
         private void Initialize()
         {
-            clientBounds = new Rectangle(0, 0, Context.Resources.DisplayMetrics.WidthPixels, Context.Resources.DisplayMetrics.HeightPixels);
+            
+			this.Closed +=	new EventHandler<EventArgs>(GameWindow_Closed);
+			clientBounds = new Rectangle(0, 0, Context.Resources.DisplayMetrics.WidthPixels, Context.Resources.DisplayMetrics.HeightPixels);
 
             // Initialize GameTime
             _updateGameTime = new GameTime();
@@ -88,10 +93,24 @@ namespace Microsoft.Xna.Framework
 
             // Initialize _lastUpdate
             _lastUpdate = DateTime.Now;
-
+			
+			
+			
             this.RequestFocus();
             this.FocusableInTouchMode = true;
         }
+		
+		void GameWindow_Closed(object sender,EventArgs e)
+        {        
+			try
+			{
+        		game.Exit();
+			}
+			catch(NullReferenceException)
+			{
+				// just in case the game is null
+			}
+		}
 
         public override bool OnKeyDown(Keycode keyCode, KeyEvent e)
         {

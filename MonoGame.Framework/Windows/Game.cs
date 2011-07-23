@@ -85,7 +85,7 @@ namespace Microsoft.Xna.Framework
 			_gameComponentCollection = new GameComponentCollection();
 
             _view = new WindowsGameWindow();
-			_view.Game = this;
+			_view.Game = this;			
 					
 			// Initialize GameTime
             _updateGameTime = new GameTime();
@@ -409,7 +409,12 @@ namespace Microsoft.Xna.Framework
         public void Exit()
         {
             if (!_view.OpenTkGameWindow.IsExiting)
+            {
+                // raise the Exiting event
+            	if (Exiting != null) Exiting(this, null);                
+                Net.NetworkSession.Exit();
                 _view.OpenTkGameWindow.Exit();
+            }
         }
 
         public GameComponentCollection Components

@@ -83,8 +83,10 @@ namespace Microsoft.Xna.Framework.Net
 			peer.Start ();
 			
 			myLocalAddress = GetMyLocalIpAddress();
-			myLocalEndPoint = ParseIPEndPoint(myLocalAddress + ":" + peer.Port);
 
+            IPAddress adr = IPAddress.Parse(myLocalAddress);
+            myLocalEndPoint = new IPEndPoint(adr, port);
+			
             if (availableSession != null)
             {
                 if (!this.online)
@@ -114,9 +116,15 @@ namespace Microsoft.Xna.Framework.Net
                         om.Write(session.PrivateGamerSlots);
                         om.Write(session.MaxGamers);
                         om.Write(localMe.IsHost);
-                        IPAddress adr = IPAddress.Parse(GetMyLocalIpAddress());
-                        om.Write(new IPEndPoint(adr, port));
+                        om.Write(myLocalEndPoint);
                         om.Write(peer.Configuration.AppIdentifier);
+                        // send up session properties
+                        int[] propertyData = new int[session.SessionProperties.Count * 2];
+                        NetworkSessionProperties.WriteProperties(session.SessionProperties, propertyData);
+                        for (int x = 0; x < propertyData.Length; x++)
+                        {
+                            om.Write(propertyData[x]);
+                        }
                         peer.SendUnconnectedMessage(om, m_masterServer); // send message to peer
                     }
                     else
@@ -660,6 +668,25 @@ namespace Microsoft.Xna.Framework.Net
 				
 			}
 		}
-	}
+
+        internal void UpdateLiveSession(NetworkSession networkSession)
+        {
+            if (peer != null && m_masterServer != null && networkSession.IsHost)
+            {
+                NetOutgoingMessage om = peer.CreateMessage();
+
+                om.Write((byte)0);
+                om.Write(session.AllGamers.Count);
+                om.Write(session.LocalGamers[0].Gamertag);
+                om.Write(session.PrivateGamerSlots);
+                om.Write(session.MaxGamers);
+                om.Write(session.LocalGamers[0].IsHost);
+                IPAddress adr = IPAddress.Parse(GetMyLocalIpAddress());
+                om.Write(new IPEndPoint(adr, port));
+                om.Write(peer.Configuration.AppIdentifier);
+                peer.SendUnconnectedMessage(om, m_masterServer); // send message to peer
+            }
+        }
+    }
 }
 
