@@ -45,6 +45,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AsteroidBeltAssault", "Samp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RobotRampage", "Samples\MacOS\BookSourceCode\XNAGameDevelopmentbyExampleCode\RobotRampage\RobotRampage.csproj", "{9522776F-02BA-4BED-B8BB-6BAE580F4068}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GemstoneHunter", "Samples\MacOS\BookSourceCode\XNAGameDevelopmentbyExampleCode\GemstoneHunter\GemstoneHunter.csproj", "{81313197-A8DF-4465-B503-2DD8248B80A9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tile Engine", "Samples\MacOS\BookSourceCode\XNAGameDevelopmentbyExampleCode\GemstoneHunter\TileEngine\Tile Engine.csproj", "{521972FD-1A9B-4CFD-A435-EB2224985131}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -91,6 +95,10 @@ Global
 		{4AD6BC7A-DB9A-4A6F-9EE2-DAD9B0BBA2A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4AD6BC7A-DB9A-4A6F-9EE2-DAD9B0BBA2A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4AD6BC7A-DB9A-4A6F-9EE2-DAD9B0BBA2A8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{521972FD-1A9B-4CFD-A435-EB2224985131}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{521972FD-1A9B-4CFD-A435-EB2224985131}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{521972FD-1A9B-4CFD-A435-EB2224985131}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{521972FD-1A9B-4CFD-A435-EB2224985131}.Release|Any CPU.Build.0 = Release|Any CPU
 		{71871CF8-8563-4FA3-ABF2-EC1CBBF817E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{71871CF8-8563-4FA3-ABF2-EC1CBBF817E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{71871CF8-8563-4FA3-ABF2-EC1CBBF817E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -99,6 +107,10 @@ Global
 		{7D24D7EA-822C-4991-8BC9-1C2EF9C5F59A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7D24D7EA-822C-4991-8BC9-1C2EF9C5F59A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7D24D7EA-822C-4991-8BC9-1C2EF9C5F59A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{81313197-A8DF-4465-B503-2DD8248B80A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81313197-A8DF-4465-B503-2DD8248B80A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81313197-A8DF-4465-B503-2DD8248B80A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81313197-A8DF-4465-B503-2DD8248B80A9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9522776F-02BA-4BED-B8BB-6BAE580F4068}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9522776F-02BA-4BED-B8BB-6BAE580F4068}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9522776F-02BA-4BED-B8BB-6BAE580F4068}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -146,6 +158,8 @@ Global
 		{F3115910-E6D1-450D-97FB-A8168A5D622E} = {E58F0822-614F-4642-97EE-F85AFBC55B95}
 		{1585306B-CF46-479D-B234-1E10EDF4D741} = {E58F0822-614F-4642-97EE-F85AFBC55B95}
 		{9522776F-02BA-4BED-B8BB-6BAE580F4068} = {E58F0822-614F-4642-97EE-F85AFBC55B95}
+		{81313197-A8DF-4465-B503-2DD8248B80A9} = {E58F0822-614F-4642-97EE-F85AFBC55B95}
+		{521972FD-1A9B-4CFD-A435-EB2224985131} = {E58F0822-614F-4642-97EE-F85AFBC55B95}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = Samples\MacOS\Peer2PeerSample\Peer2PeerSample.csproj
