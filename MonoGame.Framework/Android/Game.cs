@@ -409,10 +409,18 @@ namespace Microsoft.Xna.Framework
         public void Exit()
         {
 			//TODO: Fix this
-            AlertDialog dialog = new AlertDialog.Builder(Game.contextInstance).Create();
-            dialog.SetTitle("Game Exit");
-            dialog.SetMessage("Hit Home Button to Exit");
-            dialog.Show();
+			try
+			{
+				if (Exiting != null) Exiting(this, null);
+				Net.NetworkSession.Exit();
+	            AlertDialog dialog = new AlertDialog.Builder(Game.contextInstance).Create();
+	            dialog.SetTitle("Game Exit");
+	            dialog.SetMessage("Hit Home Button to Exit");
+	            dialog.Show();
+			}
+			catch
+			{
+			}
         }
 
         public GameComponentCollection Components

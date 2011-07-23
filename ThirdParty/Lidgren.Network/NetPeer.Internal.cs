@@ -313,6 +313,12 @@ namespace Lidgren.Network
 				while (m_unsentUnconnectedMessages.TryDequeue(out unsent))
 				{
 					NetOutgoingMessage om = unsent.Item2;
+#if DEBUG
+                    if (om.m_messageType == NetMessageType.NatPunchMessage)
+                    {
+                        LogDebug("Sending Nat Punch Message to " + unsent.Item1.ToString());
+                    }
+#endif
 
 					bool connReset;
 					int len = om.Encode(m_sendBuffer, 0, 0);

@@ -59,14 +59,18 @@ namespace Lidgren.Network
 
 			if (!isHost && m_configuration.IsMessageTypeEnabled(NetIncomingMessageType.NatIntroductionSuccess) == false)
 				return; // no need to punch - we're not listening for nat intros!
-
+#if DEBUG
+            LogDebug("Enqueuing  internal Punch message" + remoteInternal.ToString());
+#endif
 			// send internal punch
 			punch = CreateMessage(1);
 			punch.m_messageType = NetMessageType.NatPunchMessage;
 			punch.Write(hostByte);
 			punch.Write(token);
 			m_unsentUnconnectedMessages.Enqueue(new NetTuple<IPEndPoint, NetOutgoingMessage>(remoteInternal, punch));
-
+#if DEBUG
+            LogDebug("Enqueuing External Punch message to " + remoteExternal.ToString());
+#endif
 			// send external punch
 			punch = CreateMessage(1);
 			punch.m_messageType = NetMessageType.NatPunchMessage;

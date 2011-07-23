@@ -1,4 +1,4 @@
-#region License
+﻿#region License
 /*
 Microsoft Public License (Ms-PL)
 XnaTouch - Copyright © 2009 The XnaTouch Team
@@ -40,7 +40,7 @@ purpose and non-infringement.
 
 #region Using Statements
 using System;
-using System.Windows.Forms;
+using System.ComponentModel;
 using Microsoft.Xna.Framework.Input;
 using OpenTK;
 using OpenTK.Graphics;
@@ -472,9 +472,10 @@ namespace Microsoft.Xna.Framework
 
         private void Initialize()
         {
-            OpenTkGameWindow = new OpenTK.GameWindow();
+            OpenTkGameWindow = new OpenTK.GameWindow();            
             OpenTkGameWindow.RenderFrame += OnRenderFrame;
             OpenTkGameWindow.UpdateFrame += OnUpdateFrame;
+            OpenTkGameWindow.Closing += new EventHandler<CancelEventArgs>(OpenTkGameWindow_Closing);
             OpenTkGameWindow.Resize += OnResize;
             OpenTkGameWindow.Keyboard.KeyDown += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyDown);
             OpenTkGameWindow.Keyboard.KeyUp += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyUp);
@@ -489,6 +490,11 @@ namespace Microsoft.Xna.Framework
 
             //Default no resizing
             AllowUserResizing = false;
+        }
+
+        void OpenTkGameWindow_Closing(object sender,CancelEventArgs e)
+        {        	
+        	Game.Exit();
         }
 
         void Keyboard_KeyUp(object sender, OpenTK.Input.KeyboardKeyEventArgs e)
