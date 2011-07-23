@@ -250,7 +250,6 @@
     <Compile Include="MacOS\KeyUtil.cs" />
     <Compile Include="Graphics\States\TextureAddressMode.cs" />
     <Compile Include="Graphics\States\TextureFilter.cs" />
-    <Compile Include="TitleContainer.cs" />
     <Compile Include="MacOS\Input\GamePad.cs" />
     <Compile Include="Input\ButtonDefinition.cs" />
     <Compile Include="Input\ThumbStickDefinition.cs" />
@@ -319,6 +318,7 @@
     <Compile Include="Net\MonoGamerPeer.cs" />
     <Compile Include="Net\CommandGamerStateChange.cs" />
     <Compile Include="Net\CommandGamerLeft.cs" />
+    <Compile Include="MacOS\TitleContainer.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />
