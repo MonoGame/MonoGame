@@ -105,12 +105,14 @@ namespace Gemstone_Hunter
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+			KeyboardState keyState = Keyboard.GetState();
+			
             // Allows the game to exit
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back ==
+            if (keyState.IsKeyDown(Keys.Escape) || GamePad.GetState(PlayerIndex.One).Buttons.Back ==
                 ButtonState.Pressed)
                 this.Exit();
 
-            KeyboardState keyState = Keyboard.GetState();
+            
             GamePadState gamepadState = GamePad.GetState(PlayerIndex.One);
             float elapsed = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
