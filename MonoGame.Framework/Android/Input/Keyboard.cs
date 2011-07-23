@@ -78,6 +78,9 @@ namespace Microsoft.Xna.Framework.Input
 			maps[Keycode.Y] = Keys.Y;
 			maps[Keycode.X] = Keys.X;
 			maps[Keycode.B] = Keys.B;
+			maps[Keycode.S] = Keys.S;
+			maps[Keycode.W] = Keys.W;
+			maps[Keycode.D] = Keys.D;
 			maps[Keycode.Home] = Keys.Escape;
             // TODO: put in all the other mappings
             return maps;
