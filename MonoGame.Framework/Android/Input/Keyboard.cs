@@ -74,6 +74,11 @@ namespace Microsoft.Xna.Framework.Input
             maps[Keycode.DpadRight] = Keys.Right;
             maps[Keycode.DpadUp] = Keys.Up;
             maps[Keycode.DpadDown] = Keys.Down;
+			maps[Keycode.A] = Keys.A;
+			maps[Keycode.Y] = Keys.Y;
+			maps[Keycode.X] = Keys.X;
+			maps[Keycode.B] = Keys.B;
+			maps[Keycode.Home] = Keys.Escape;
             // TODO: put in all the other mappings
             return maps;
         }
