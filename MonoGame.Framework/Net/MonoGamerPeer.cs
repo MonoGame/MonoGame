@@ -590,11 +590,8 @@ namespace Microsoft.Xna.Framework.Net
             om.Write((byte)2); // NAT intro request
 
             // write internal ipendpoint
-            IPAddress mask;
-            //om.Write(new IPEndPoint(NetUtility.GetMyAddress(out mask), peer.Port));
-			IPAddress adr = IPAddress.Parse(GetMyLocalIpAddress());
-                        om.Write(new IPEndPoint(adr, peer.Port));			
-			//om.Write(new IPEndPoint(, peer.Port));
+            IPAddress addr = IPAddress.Parse(GetMyLocalIpAddress());
+            om.Write(new IPEndPoint(addr, peer.Port));
 
             // write external address of host to request introduction to
             IPEndPoint hostEp = new IPEndPoint(host.Address, port);
