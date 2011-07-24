@@ -61,7 +61,7 @@ namespace Peer2PeerMasterServer
                                         game.Game = msg.ReadString();
 
 
-                                        Console.WriteLine("Got registration for host " + game.ExternalIP.ToString());
+                                        Console.WriteLine("Got registration for host " + game.ToString());
                                         registeredHosts.Add(game.ExternalIP, game);
                                     }
                                     break;
@@ -176,5 +176,10 @@ namespace Peer2PeerMasterServer
         public bool IsHost { get; set; }
 
         public string Game { get; set; }
+
+        public override string ToString()
+        {
+            return String.Format("External {0}\n Internal \n{1} GamerTag{2}\n", ExternalIP, InternalIP, GamerTag);
+        }
     }
 }
