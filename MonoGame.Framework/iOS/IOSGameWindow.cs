@@ -70,7 +70,23 @@ namespace Microsoft.Xna.Framework
 		private GameTime _updateGameTime;
         private GameTime _drawGameTime;
         private DateTime _lastUpdate;
-		private DateTime _now;
+		private DateTime _lastDraw;
+		private DateTime _nowUpdate;
+		private DateTime _nowDraw;
+		
+		// HACK HACK HACK!
+		/// <summary>
+		/// This is an amazing hack that is based on the knowledge that Run will call CreateFrameBuffer
+		/// and that Stop will call DestroyFrameBuffer. We don't want to do either (we don't want to touch
+		/// the OpenGL state while the application is being backgrounded/foregrounded). So when the application
+		/// is pausing (from DidEnterBackground) simply don't allow CreateFrameBuffer or DestroyFrameBuffer to run.
+		/// Also OnLoad, the Load event, OnUnload and the Unload event are called - assume they pose no problem
+		/// (although the same technique could be used if they do).
+		/// 
+		/// The reason that Run and Stop need to be called at all is to stop the timer that is dispatching
+		/// update and draw events (which will touch the OpenGL context and get us killed when backgrounded).
+		/// </summary>
+		bool isPausing = false;
 		
 		UITapGestureRecognizer recognizerTap;
 		UITapGestureRecognizer recognizerDoubleTap;
@@ -102,8 +118,9 @@ namespace Microsoft.Xna.Framework
             _updateGameTime = new GameTime();
             _drawGameTime = new GameTime(); 
 			
-			// Initialize _lastUpdate
+			// Initialize _lastUpdate and _lastDraw
 			_lastUpdate = DateTime.Now;
+			_lastDraw = DateTime.Now;
 		}	
 		
 		~GameWindow()
@@ -120,15 +137,39 @@ namespace Microsoft.Xna.Framework
 		protected override void ConfigureLayer(CAEAGLLayer eaglLayer) 
 		{
 			eaglLayer.Opaque = true;
+
+			// Scale OpenGL layer to the scale of the main layer
+			// On iPhone 4 this makes the renderbuffer size the same as actual device resolution
+			// On iPad with user-selected scale of 2x at startup, this will trigger but has no effect on the renderbuffer
+			if(UIScreen.MainScreen.Scale != 1)
+				eaglLayer.ContentsScale = UIScreen.MainScreen.Scale;
 		}
+		
+		int renderbufferWidth;
+		int renderbufferHeight;
 		
 		protected override void CreateFrameBuffer()
 		{	    
+			if(isPausing)
+				return; // See note on isPausing
+			
 			try
 			{
 		        // TODO ContextRenderingApi = EAGLRenderingAPI.OpenGLES2;
 				ContextRenderingApi = EAGLRenderingAPI.OpenGLES1;
 				base.CreateFrameBuffer();
+				
+				// Determine actual render buffer size (due to possible Retina Display scaling)
+				// http://developer.apple.com/library/ios/#documentation/iphone/conceptual/iphoneosprogrammingguide/SupportingResolutionIndependence/SupportingResolutionIndependence.html#//apple_ref/doc/uid/TP40007072-CH10-SW11
+				unsafe
+				{
+					int width = 0, height = 0;
+					OpenTK.Graphics.ES11.GL.Oes.GetRenderbufferParameter(OpenTK.Graphics.ES11.All.RenderbufferOes, OpenTK.Graphics.ES11.All.RenderbufferWidthOes, &width);
+					OpenTK.Graphics.ES11.GL.Oes.GetRenderbufferParameter(OpenTK.Graphics.ES11.All.RenderbufferOes, OpenTK.Graphics.ES11.All.RenderbufferHeightOes, &height);
+	
+					renderbufferWidth = width;
+					renderbufferHeight = height;
+				}
 		    } 
 			catch (Exception) 
 			{
@@ -138,6 +179,24 @@ namespace Microsoft.Xna.Framework
 		    }
 			
 			
+		}
+		
+		protected override void DestroyFrameBuffer()
+		{
+			if(isPausing)
+				return; // see note on isPausing
+
+			base.DestroyFrameBuffer();
+		}
+		
+		public void Pause()
+		{
+			isPausing = true;
+		}
+
+		public void Resume()
+		{
+			isPausing = false;
 		}
 		
 		#endregion
@@ -222,8 +281,9 @@ namespace Microsoft.Xna.Framework
 			
 			if (game != null )
 			{
-				_drawGameTime.Update(_now - _lastUpdate);
-            	_lastUpdate = _now;
+				_nowDraw = DateTime.Now;
+				_drawGameTime.Update(_nowDraw - _lastDraw);
+            	_lastDraw = _nowDraw;
             	game.DoDraw(_drawGameTime);
 			}
 						
@@ -251,8 +311,9 @@ namespace Microsoft.Xna.Framework
 			
 			if (game != null )
 			{
-				_now = DateTime.Now;
-				_updateGameTime.Update(_now - _lastUpdate);
+				_nowUpdate = DateTime.Now;
+				_updateGameTime.Update(_nowUpdate - _lastUpdate);
+				_lastUpdate = _nowUpdate;
             	game.DoUpdate(_updateGameTime);
 			}
 		}
@@ -276,7 +337,7 @@ namespace Microsoft.Xna.Framework
 			var enabledGestures = TouchPanel.EnabledGestures;
 			if ((enabledGestures & GestureType.Hold) != 0)
 			{
-				TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.Hold, new TimeSpan(_now.Ticks), new Vector2 (sender.LocationInView (sender.View)), new Vector2 (sender.LocationInView (sender.View)), new Vector2(0,0), new Vector2(0,0)));
+				TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.Hold, new TimeSpan(_nowUpdate.Ticks), new Vector2 (sender.LocationInView (sender.View)), new Vector2 (sender.LocationInView (sender.View)), new Vector2(0,0), new Vector2(0,0)));
 			}
 		}
 		
@@ -288,7 +349,7 @@ namespace Microsoft.Xna.Framework
 			var enabledGestures = TouchPanel.EnabledGestures;
 			if ((enabledGestures & GestureType.FreeDrag) != 0)
 			{			
-				TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.FreeDrag, new TimeSpan(_now.Ticks), new Vector2 (sender.LocationInView (sender.View)), new Vector2(0,0), new Vector2 (sender.TranslationInView(sender.View)), new Vector2(0,0)));
+				TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.FreeDrag, new TimeSpan(_nowUpdate.Ticks), new Vector2 (sender.LocationInView (sender.View)), new Vector2(0,0), new Vector2 (sender.TranslationInView(sender.View)), new Vector2(0,0)));
 			}
 		}
 			
@@ -298,7 +359,7 @@ namespace Microsoft.Xna.Framework
 			var enabledGestures = TouchPanel.EnabledGestures;
 			if ((enabledGestures & GestureType.Pinch) != 0)
 			{
-				TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.Pinch, new TimeSpan(_now.Ticks), new Vector2 (sender.LocationOfTouch(0,sender.View)), new Vector2 (sender.LocationOfTouch(1,sender.View)), new Vector2(0,0), new Vector2(0,0)));
+				TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.Pinch, new TimeSpan(_nowUpdate.Ticks), new Vector2 (sender.LocationOfTouch(0,sender.View)), new Vector2 (sender.LocationOfTouch(1,sender.View)), new Vector2(0,0), new Vector2(0,0)));
 			}
 		}
 		
@@ -309,7 +370,7 @@ namespace Microsoft.Xna.Framework
 			var enabledGestures = TouchPanel.EnabledGestures;
 			if ((enabledGestures & GestureType.Rotation) != 0)
 			{
-				TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.Rotation, new TimeSpan(_now.Ticks), new Vector2 (sender.LocationInView (sender.View)), new Vector2 (sender.LocationInView (sender.View)), new Vector2(0,0), new Vector2(0,0)));
+				TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.Rotation, new TimeSpan(_nowUpdate.Ticks), new Vector2 (sender.LocationInView (sender.View)), new Vector2 (sender.LocationInView (sender.View)), new Vector2(0,0), new Vector2(0,0)));
 			}
 		}
 		
@@ -319,7 +380,7 @@ namespace Microsoft.Xna.Framework
 			var enabledGestures = TouchPanel.EnabledGestures;
 			if ((enabledGestures & GestureType.Flick) != 0)
 			{
-				TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.Flick, new TimeSpan(_now.Ticks), new Vector2 (sender.LocationInView (sender.View)), new Vector2 (sender.LocationInView (sender.View)), new Vector2(0,0), new Vector2(0,0)));		
+				TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.Flick, new TimeSpan(_nowUpdate.Ticks), new Vector2 (sender.LocationInView (sender.View)), new Vector2 (sender.LocationInView (sender.View)), new Vector2(0,0), new Vector2(0,0)));		
 			}
 		}
 		
@@ -329,7 +390,7 @@ namespace Microsoft.Xna.Framework
 			var enabledGestures = TouchPanel.EnabledGestures;
 			if ((enabledGestures & GestureType.Tap) != 0)
 			{
-				TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.Tap, new TimeSpan(_now.Ticks), new Vector2 (sender.LocationInView (sender.View)), new Vector2 (sender.LocationInView (sender.View)), new Vector2(0,0), new Vector2(0,0)));
+				TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.Tap, new TimeSpan(_nowUpdate.Ticks), new Vector2 (sender.LocationInView (sender.View)), new Vector2 (sender.LocationInView (sender.View)), new Vector2(0,0), new Vector2(0,0)));
 			}
 		}
 		

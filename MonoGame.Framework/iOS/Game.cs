@@ -355,13 +355,17 @@ namespace Microsoft.Xna.Framework
 			_isActive = false;
 			 if (Deactivated != null)
                 Deactivated.Invoke(this, null);
+			_view.Pause();
+			_view.Stop();
 		}
 		
 		public void EnterForeground()
     	{
-			_isActive = true;
+			_isActive = true;			
 			if (Activated != null)
                 Activated.Invoke(this, null);
+			_view.Resume();
+			Run();
 		}
 		
 		protected virtual bool BeginDraw()
