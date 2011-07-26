@@ -48,18 +48,20 @@ namespace Microsoft.Xna.Framework.Input
 {
 	public static class Keyboard
 	{
-        private static Keys _key;
+        private static List<Keys> keys = new List<Keys>();
 
         private static readonly IDictionary<Keycode, Keys> KeyMap = LoadKeyMap();
 
         public static void KeyDown(Keycode keyCode)
         {
-            _key = KeyMap[keyCode];
+            Keys key = KeyMap[keyCode];
+            if (!keys.Contains(key)) keys.Add(key);            
         }
 
-        public static void KeyUp()
+        public static void KeyUp(Keycode keyCode)
         {
-            _key = Keys.None;
+            Keys key = KeyMap[keyCode];
+            if (keys.Contains(key)) keys.Remove(key);            
         }
 
         private static IDictionary<Keycode, Keys> LoadKeyMap()
@@ -81,19 +83,21 @@ namespace Microsoft.Xna.Framework.Input
 			maps[Keycode.S] = Keys.S;
 			maps[Keycode.W] = Keys.W;
 			maps[Keycode.D] = Keys.D;
-			maps[Keycode.Home] = Keys.Escape;
+			maps[Keycode.Back] = Keys.Escape;
+            maps[Keycode.Back] = Keys.Back;
+            maps[Keycode.Home] = Keys.Home;
             // TODO: put in all the other mappings
             return maps;
         }
 
 	    public static KeyboardState GetState()
 		{
-			return new KeyboardState(new[] { _key}); // TODO Not used on iPhone or Zune
+			return new KeyboardState(keys.ToArray()); // TODO Not used on iPhone or Zune
 		}
 		
 		public static KeyboardState GetState(PlayerIndex playerIndex)
 		{
-            return new KeyboardState(new[] { _key });  // TODO Not used on iPhone or Zune
+            return new KeyboardState(keys.ToArray());  // TODO Not used on iPhone or Zune
 		}
 	}
 }

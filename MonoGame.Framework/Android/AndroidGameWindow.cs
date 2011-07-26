@@ -84,7 +84,7 @@ namespace Microsoft.Xna.Framework
         private void Initialize()
         {
             
-			this.Closed +=	new EventHandler<EventArgs>(GameWindow_Closed);
+			this.Closed +=	new EventHandler<EventArgs>(GameWindow_Closed);            
 			clientBounds = new Rectangle(0, 0, Context.Resources.DisplayMetrics.WidthPixels, Context.Resources.DisplayMetrics.HeightPixels);
 
             // Initialize GameTime
@@ -115,12 +115,14 @@ namespace Microsoft.Xna.Framework
         public override bool OnKeyDown(Keycode keyCode, KeyEvent e)
         {
             Keyboard.KeyDown(keyCode);
+            // we need to handle the Back key here because it doesnt work any other way
+            if (keyCode == Keycode.Back) game.Exit();
             return true;
         }
 
         public override bool OnKeyUp(Keycode keyCode, KeyEvent e)
         {
-            Keyboard.KeyUp();
+            Keyboard.KeyUp(keyCode);
             return true;
         }
 
@@ -164,8 +166,14 @@ namespace Microsoft.Xna.Framework
                 _lastUpdate = _now;
                 game.DoDraw(_drawGameTime);
             }
-
-            SwapBuffers();
+            try
+            {
+                SwapBuffers();
+            }
+            catch(Exception ex)
+            {
+                Android.Util.Log.Error("Error in swap buffers", ex.ToString());
+            }
         }
 
         protected override void OnUpdateFrame(FrameEventArgs e)
