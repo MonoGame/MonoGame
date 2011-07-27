@@ -50,16 +50,17 @@ namespace Microsoft.Xna.Framework.Graphics
 	{
 		List<SpriteBatchItem> _batchItemList;
 		Queue<SpriteBatchItem> _freeBatchItemQueue;
-		VertexPosition2ColorTexture[] _vertexArray;
+		VertexPosition2ColorTexture[] _vertexArray;		
+		
 		ushort[] _index;
 		GCHandle _vertexHandle;
 		GCHandle _indexHandle;
-
+		
 		public SpriteBatcher ()
 		{
 			_batchItemList = new List<SpriteBatchItem>(256);
 			_freeBatchItemQueue = new Queue<SpriteBatchItem>(256);
-
+			
 			_vertexArray = new VertexPosition2ColorTexture[4*256];
 			_index = new ushort[6*256];
 			_vertexHandle = GCHandle.Alloc(_vertexArray,GCHandleType.Pinned);
@@ -122,10 +123,11 @@ namespace Microsoft.Xna.Framework.Graphics
 			//GL.Flush();
 			
 			int size = sizeof(float)*4+sizeof(uint);
+			
 			GL.VertexPointer(2, VertexPointerType.Float,size,_vertexHandle.AddrOfPinnedObject() );
-			GL.ColorPointer(4, ColorPointerType.UnsignedByte,size,(IntPtr)((uint)_vertexHandle.AddrOfPinnedObject()+(uint)(sizeof(float)*2)));
-			GL.TexCoordPointer(2, TexCoordPointerType.Float,size,(IntPtr)((uint)_vertexHandle.AddrOfPinnedObject()+(uint)(sizeof(float)*2+sizeof(uint))) );
-
+			GL.ColorPointer(4, ColorPointerType.UnsignedByte,size,(IntPtr)((UInt64)_vertexHandle.AddrOfPinnedObject()+(UInt64)(sizeof(float)*2)));
+			GL.TexCoordPointer(2, TexCoordPointerType.Float,size,(IntPtr)((UInt64)_vertexHandle.AddrOfPinnedObject()+(UInt64)(sizeof(float)*2+sizeof(uint))) );			
+			
 			// setup the vertexArray array
 			int startIndex = 0;
 			int index = 0;
@@ -146,7 +148,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 					GL.ActiveTexture(TextureUnit.Texture0);
 					GL.BindTexture ( TextureTarget.Texture2D, texID );
-					GL.Uniform1(1,texID);					
+					GL.Uniform1(1,texID);
 				}
 				// store the SpriteBatchItem data in our vertexArray
 				_vertexArray[index++] = item.vertexTL;
@@ -154,8 +156,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				_vertexArray[index++] = item.vertexBL;
 				_vertexArray[index++] = item.vertexBR;
 				
-				_freeBatchItemQueue.Enqueue ( item );
-				
+				_freeBatchItemQueue.Enqueue ( item );				
 			}
 			// flush the remaining vertexArray data
 			FlushVertexArray(startIndex, index);
@@ -187,11 +188,16 @@ namespace Microsoft.Xna.Framework.Graphics
 				_index[i*6+5] = (ushort)(i*4+2);
 			}
 		}
+		
 		void FlushVertexArray ( int start, int end )
-		{
+		{			
 			// draw stuff
 			if ( start != end )
-				GL.DrawElements ( BeginMode.Triangles, (end-start)/2*3, DrawElementsType.UnsignedShort,(IntPtr)((uint)_indexHandle.AddrOfPinnedObject()+(uint)(start/2*3*sizeof(short))) );
+			{							
+				// TODO debug incorrect drawning
+				GL.DrawElements ( BeginMode.Triangles, (end-start)/2*3, DrawElementsType.UnsignedShort,
+				                 (IntPtr)((UInt64)_indexHandle.AddrOfPinnedObject()+(UInt64)(start/2*3*sizeof(short))) );
+			}
 		}
 	}
 }
