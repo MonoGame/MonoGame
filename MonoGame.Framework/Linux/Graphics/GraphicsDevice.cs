@@ -106,7 +106,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			// Initialize the main viewport
 			_viewport = new Viewport ();
 			_viewport.X = 0;
-			_viewport.Y = 0;						
+			_viewport.Y = 0;
 			_viewport.Width = DisplayMode.Width;
 			_viewport.Height = DisplayMode.Height;
 			_viewport.MinDepth = 0.0f;
@@ -122,8 +122,8 @@ namespace Microsoft.Xna.Framework.Graphics
             _viewport = new Viewport();
             _viewport.X = 0;
             _viewport.Y = 0;
-            _viewport.Width = DisplayMode.Width;
-            _viewport.Height = DisplayMode.Height;            
+            _viewport.Width = width;
+            _viewport.Height = height;
 
             if (PresentationParameters != null) {
                 PresentationParameters.BackBufferWidth = width;

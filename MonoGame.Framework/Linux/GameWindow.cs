@@ -481,8 +481,8 @@ namespace Microsoft.Xna.Framework
             OpenTkGameWindow.Resize += OnResize;
             OpenTkGameWindow.Keyboard.KeyDown += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyDown);
             OpenTkGameWindow.Keyboard.KeyUp += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyUp);
-            clientBounds = new Rectangle(0, 0, OpenTkGameWindow.Width, OpenTkGameWindow.Height);
-
+            clientBounds = new Rectangle(OpenTkGameWindow.X, OpenTkGameWindow.Y, OpenTkGameWindow.Width, OpenTkGameWindow.Height);
+			
             // Initialize GameTime
             _updateGameTime = new GameTime();
             _drawGameTime = new GameTime();
@@ -619,10 +619,18 @@ namespace Microsoft.Xna.Framework
 			OpenTkGameWindow.Run(updateRate);
 		}
 		
+		internal void ToggleFullScreen()
+		{
+			if (OpenTkGameWindow.WindowState == WindowState.Fullscreen)
+				OpenTkGameWindow.WindowState = WindowState.Normal;
+			else
+				OpenTkGameWindow.WindowState = WindowState.Fullscreen;
+		}
+		
 		internal void ChangeClientBounds(Rectangle clientBounds)
 		{
 			this.clientBounds = clientBounds;
-			OpenTkGameWindow.Bounds = new System.Drawing.Rectangle(clientBounds.X, clientBounds.Y, clientBounds.Width, clientBounds.Height);
+			OpenTkGameWindow.ClientRectangle = new System.Drawing.Rectangle(clientBounds.X, clientBounds.Y, clientBounds.Width, clientBounds.Height);
 		}
 		
         public void BeginScreenDeviceChange(bool willBeFullScreen)
