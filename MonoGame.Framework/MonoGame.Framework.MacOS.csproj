@@ -8,7 +8,7 @@
     <ProjectGuid>{36C538E6-C32A-4A8D-A39C-566173D7118E}</ProjectGuid>
     <ProjectTypeGuids>{1C533B1C-72DD-4CB1-9F6B-BF11D93BCFBE};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
-    <RootNamespace>MonoGame.Framework.MacOS</RootNamespace>
+    <RootNamespace>Microsoft.Xna.Framework.GamerServices</RootNamespace>
     <AssemblyName>MonoGame.Framework.MacOS</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
   </PropertyGroup>
@@ -319,6 +319,8 @@
     <Compile Include="Net\CommandGamerStateChange.cs" />
     <Compile Include="Net\CommandGamerLeft.cs" />
     <Compile Include="MacOS\TitleContainer.cs" />
+    <Compile Include="MacOS\GamerServices\MonoGameGamerServicesHelper.cs" />
+    <Compile Include="MacOS\GamerServices\SigninController.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />
