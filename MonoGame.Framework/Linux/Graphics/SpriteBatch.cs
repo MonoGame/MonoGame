@@ -71,8 +71,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 
 		public void End ()
-		{	
-
+		{							
 			// apply the custom effect if there is one
 			if (_effect != null) {
 				if (graphicsDevice.Textures._textures.Count > 0) {
@@ -100,7 +99,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			// Disable Blending by default = BlendState.Opaque
 			GL.Disable (EnableCap.Blend);
-
+			
 			// set the blend mode
 			if (_blendState == BlendState.NonPremultiplied) {
 				GL.BlendFunc (BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
@@ -116,7 +115,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				GL.BlendFunc (BlendingFactorSrc.SrcAlpha, BlendingFactorDest.One);
 				GL.Enable (EnableCap.Blend);				
 			}
-
+			
 			// set camera
 			GL.MatrixMode (MatrixMode.Projection);
 			GL.LoadIdentity ();		
@@ -150,7 +149,7 @@ namespace Microsoft.Xna.Framework.Graphics
 					break;
 				}
 			}
-
+			
 			// Enable Scissor Tests if necessary
 			if (this.graphicsDevice.RenderState.ScissorTestEnable) {
 				GL.Enable (EnableCap.ScissorTest);				
@@ -178,18 +177,15 @@ namespace Microsoft.Xna.Framework.Graphics
 			// Enable Culling for better performance
 			GL.Enable (EnableCap.CullFace);
 			GL.FrontFace (FrontFaceDirection.Cw);
-			GL.Color4 (1.0f, 1.0f, 1.0f, 1.0f);
-			//GL.Color4(1.0f, 1.0f, 1.0f, 0.5f);
-
+			GL.Color4 (1.0f, 1.0f, 1.0f, 1.0f);			
+			
 			_batcher.DrawBatch (_sortMode);
 			//GL.UseProgram(0);
 			// clear out the textures
 			graphicsDevice.Textures._textures.Clear ();
 
 			// TODO uncomment and debug
-			//spriteEffect.CurrentTechnique.Passes [0].Apply ();		
-
-
+			//spriteEffect.CurrentTechnique.Passes [0].Apply ();
 		}
 
 		public void Draw (Texture2D texture,
