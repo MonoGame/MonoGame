@@ -98,6 +98,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			return b.Depth.CompareTo(a.Depth);
 		}
+		
 		public void DrawBatch ( SpriteSortMode sortMode )
 		{
 			// nothing to do
@@ -118,15 +119,11 @@ namespace Microsoft.Xna.Framework.Graphics
 				break;
 			}
 			
-			// make sure an old draw isn't still going on.
-			// cross fingers, commenting this out!!
-			//GL.Flush();
-			
-			int size = sizeof(float)*4+sizeof(uint);
+			int size = sizeof(float)*4 + sizeof(uint);
 			
 			GL.VertexPointer(2, VertexPointerType.Float,size,_vertexHandle.AddrOfPinnedObject() );
-			GL.ColorPointer(4, ColorPointerType.UnsignedByte,size,(IntPtr)((UInt64)_vertexHandle.AddrOfPinnedObject()+(UInt64)(sizeof(float)*2)));
-			GL.TexCoordPointer(2, TexCoordPointerType.Float,size,(IntPtr)((UInt64)_vertexHandle.AddrOfPinnedObject()+(UInt64)(sizeof(float)*2+sizeof(uint))) );			
+			GL.ColorPointer(4, ColorPointerType.UnsignedByte,size,(IntPtr)((UInt64)_vertexHandle.AddrOfPinnedObject()+sizeof(float)*2));
+			GL.TexCoordPointer(2, TexCoordPointerType.Float,size,(IntPtr)((UInt64)_vertexHandle.AddrOfPinnedObject()+sizeof(float)*2+sizeof(uint)) );			
 			
 			// setup the vertexArray array
 			int startIndex = 0;
@@ -162,6 +159,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			FlushVertexArray(startIndex, index);
 			_batchItemList.Clear();
 		}
+		
 		void ExpandVertexArray( int batchSize )
 		{
 			// increase the size of the vertexArray
@@ -193,7 +191,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		{			
 			// draw stuff
 			if ( start != end )
-			{							
+			{			
 				// TODO debug incorrect drawning
 				GL.DrawElements ( BeginMode.Triangles, (end-start)/2*3, DrawElementsType.UnsignedShort,
 				                 (IntPtr)((UInt64)_indexHandle.AddrOfPinnedObject()+(UInt64)(start/2*3*sizeof(short))) );
