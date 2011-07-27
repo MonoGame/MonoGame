@@ -167,12 +167,6 @@ namespace Microsoft.Xna.Framework
                     _devicesLoaded = true;
                 }
             };
-
-			// if it's not fullscreen resize window to ajust to graphic device viewport size
-			if (!graphicsDeviceManager.IsFullScreen)
-			{
-				_view.ChangeClientBounds(GraphicsDevice.Viewport.Bounds);
-			}
 			
             _view.Run(FramesPerSecond / (FramesPerSecond * TargetElapsedTime.TotalSeconds));
 			
@@ -360,41 +354,48 @@ namespace Microsoft.Xna.Framework
 //			_view.Bounds = content;
 //			_view.Size = content.Size.ToSize();			
 			
-			//TODO do it right
+			Rectangle bounds;			
+
+			bounds = new Rectangle(_view.ClientBounds.X, _view.ClientBounds.X, 
+			                      	OpenTK.DisplayDevice.Default.Width,
+                                	OpenTK.DisplayDevice.Default.Height);			
+			
 			if (graphicsDeviceManager.IsFullScreen)
 			{
+				_view.ToggleFullScreen();
 			}
 			else
 			{
-				
+				bounds.Width = Math.Min(bounds.Width, graphicsDeviceManager.PreferredBackBufferWidth);
+				bounds.Height = Math.Min(bounds.Height, graphicsDeviceManager.PreferredBackBufferHeight);
+
+				_view.ChangeClientBounds(bounds);
 			}
 		}
 
 		internal void GoWindowed ()
 		{
-
-			// TODO do it right
-//			
-//			//Changing window style forces a redraw. Some games
-//			//have fail-logic and toggle fullscreen in their draw function,
-//			//so temporarily become inactive so it won't execute.
-//			bool wasActive = IsActive;
-//			IsActive = false;
-//			
-//			//Changing window style resets the title. Save it.
-//			string oldTitle = _view.Title;
-//			
+			
+			//Changing window style forces a redraw. Some games
+			//have fail-logic and toggle fullscreen in their draw function,
+			//so temporarily become inactive so it won't execute.
+			bool wasActive = IsActive;
+			IsActive = false;
+			
+			//Changing window style resets the title. Save it.
+			string oldTitle = _view.Title;
+						
 //			NSMenu.MenuBarVisible = true;
 //			_mainWindow.StyleMask = NSWindowStyle.Titled | NSWindowStyle.Closable;
 //			if (_wasResizeable) _mainWindow.StyleMask |= NSWindowStyle.Resizable;
 //			_mainWindow.HidesOnDeactivate = false;
-//			
-//			ResetWindowBounds();
-//			
-//			if (oldTitle != null)
-//				_view.Title = oldTitle;
-//			
-//			IsActive = wasActive;
+
+			ResetWindowBounds();
+			
+			if (oldTitle != null)
+				_view.Title = oldTitle;
+			
+			IsActive = wasActive;
 		}
 		
 		internal void GoFullScreen ()

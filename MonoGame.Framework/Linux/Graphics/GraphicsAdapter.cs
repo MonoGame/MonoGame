@@ -41,6 +41,7 @@ purpose and non-infringement.
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using OpenTK;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -48,6 +49,13 @@ namespace Microsoft.Xna.Framework.Graphics
     {
         private static ReadOnlyCollection<GraphicsAdapter> adapters;       
         
+		private DisplayDevice adapter;
+		
+		private GraphicsAdapter(DisplayDevice adapter)
+		{
+			this.adapter = adapter;	
+		}
+		
         public void Dispose()
         {
         }
@@ -56,13 +64,11 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             get
             {
-                //Dummy values until MonoMac implements Quartz Display Services
-                int refreshRate = 60;
+                int refreshRate = (int)adapter.RefreshRate;
                 SurfaceFormat format = SurfaceFormat.Color;
 
-				// TODO do it right
-                return new DisplayMode((int)800,
-                                       (int)600,
+                return new DisplayMode(adapter.Width,
+                                       adapter.Height,
                                        refreshRate,
                                        format);
             }
@@ -75,24 +81,20 @@ namespace Microsoft.Xna.Framework.Graphics
         
         public static ReadOnlyCollection<GraphicsAdapter> Adapters {
             get {
-				
-				// TODO multiple screen support
-//                if (adapters == null) {
-//                    GraphicsAdapter[] tmpAdapters = new GraphicsAdapter[NSScreen.Screens.Length];
-//                    for (int i=0; i<NSScreen.Screens.Length; i++) {
-//                        tmpAdapters[i] = new GraphicsAdapter(NSScreen.Screens[i]);
-//                    }
-//                    
-//                    adapters = new ReadOnlyCollection<GraphicsAdapter>(tmpAdapters);
-//                }
-//                return adapters;
-				
-				if (adapters == null) 
+
+				if (adapters == null)
 				{
-                    adapters = new ReadOnlyCollection<GraphicsAdapter>(new GraphicsAdapter[] {new GraphicsAdapter()});
-                }
-                return adapters;				
+					GraphicsAdapter[] tmpAdapters = new GraphicsAdapter[DisplayDevice.AvailableDisplays.Count];
+					
+					for (int i = 0; i< DisplayDevice.AvailableDisplays.Count; i++) 
+					{
+                        tmpAdapters[i] = new GraphicsAdapter(DisplayDevice.AvailableDisplays[i]);
+                    }
+					
+					adapters = new ReadOnlyCollection<GraphicsAdapter>(tmpAdapters);
+				}
 				
+				return adapters;	
             }
         } 
 
