@@ -51,7 +51,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 		{ 
 			get
 			{
-				return new SignedInGamer();
+				return this[(int)index];
 			}
 		}
 		#endregion

@@ -71,7 +71,8 @@ namespace Microsoft.Xna.Framework.GamerServices
 			selectButton.BezelStyle = NSBezelStyle.Rounded;
 			
 			selectButton.Activated += delegate {
-				NSApp.StopModal();
+				
+				profileSelected();
 			};
 			
 			selectButton.Enabled = false;
@@ -131,6 +132,20 @@ namespace Microsoft.Xna.Framework.GamerServices
 
 		public new NSWindow Window {
 			get { return window; }
+		}
+		
+		void profileSelected () 
+		{
+			if (tableView.SelectedRowCount > 0) {
+				var rowSelected = tableView.SelectedRow;
+				SignedInGamer sig = new SignedInGamer();
+				sig.DisplayName = gamerList[rowSelected];
+				sig.Gamertag = gamerList[rowSelected];
+				
+				Gamer.SignedInGamers.Add(sig);
+			}
+			
+			NSApp.StopModal();
 		}
 		
 		void removeLocalPlayer () 

@@ -115,6 +115,21 @@ namespace Microsoft.Xna.Framework.Net
 			
 			_allGamers = new GamerCollection<NetworkGamer>();
 			_localGamers = new GamerCollection<LocalNetworkGamer>();
+//			for (int x = 0; x < Gamer.SignedInGamers.Count; x++) {
+//				GamerStates states = GamerStates.Local;
+//				if (x == 0)
+//					states |= GamerStates.Host;
+//				LocalNetworkGamer localGamer = new LocalNetworkGamer(this, (byte)x, states);
+//				localGamer.SignedInGamer = Gamer.SignedInGamers[x];
+//				_allGamers.AddGamer(localGamer);
+//				_localGamers.AddGamer(localGamer);
+//				
+//				// We will attach a property change handler to local gamers
+//				//  se that we can broadcast the change to other peers.
+//				localGamer.PropertyChanged += HandleGamerPropertyChanged;	
+//				
+//			}
+
 			_remoteGamers = new GamerCollection<NetworkGamer>();
 			_previousGamers = new GamerCollection<NetworkGamer>();
 			hostingGamer = null;
@@ -241,8 +256,13 @@ namespace Microsoft.Xna.Framework.Net
 		{
 			if (gamer == null)
 				throw new ArgumentNullException ("gamer");
-
-			throw new NotImplementedException ();
+			
+//			_allGamers.AddGamer(gamer);
+//			_localGamers.AddGamer((LocalNetworkGamer)gamer);
+//			
+//			// We will attach a property change handler to local gamers
+//			//  se that we can broadcast the change to other peers.
+//			gamer.PropertyChanged += HandleGamerPropertyChanged;	
 		}
 
 		public static IAsyncResult BeginCreate (NetworkSessionType sessionType,
@@ -753,6 +773,7 @@ namespace Microsoft.Xna.Framework.Net
 				gamer = new LocalNetworkGamer(this, (byte)command.InternalIndex, command.State);
 				_allGamers.AddGamer(gamer);
 				_localGamers.AddGamer((LocalNetworkGamer)gamer);
+				((LocalNetworkGamer)gamer).SignedInGamer = Gamer.SignedInGamers[_localGamers.Count - 1];
 				
 				// We will attach a property change handler to local gamers
 				//  se that we can broadcast the change to other peers.

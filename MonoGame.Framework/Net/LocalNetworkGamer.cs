@@ -211,6 +211,12 @@ namespace Microsoft.Xna.Framework.Net
 			get {
 				return sig;
 			}
+			
+			internal set {
+				sig = value;
+				DisplayName = sig.DisplayName;
+				Gamertag = sig.Gamertag;
+			}
 		}
 	}
 }

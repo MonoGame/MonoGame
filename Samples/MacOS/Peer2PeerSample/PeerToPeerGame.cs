@@ -140,8 +140,8 @@ namespace PeerToPeer
 					// Test for now Mac OSX
 					
 					// Look up the primary gamer, and make sure they are signed in.
-					SignedInGamer primaryGamer = Gamer.SignedInGamers [PlayerIndex.One];
-					Gamer.SignedInGamers.Add(primaryGamer);
+					//SignedInGamer primaryGamer = Gamer.SignedInGamers [PlayerIndex.One];
+					//Gamer.SignedInGamers.Add(primaryGamer);
 
 					// If there are no profiles signed in, we cannot proceed.
 					// Show the Guide so the user can sign in.
@@ -346,7 +346,6 @@ namespace PeerToPeer
                     remoteTank.Position = packetReader.ReadVector2();
                     remoteTank.TankRotation = packetReader.ReadSingle();
                     remoteTank.TurretRotation = packetReader.ReadSingle();
-                    //Console.WriteLine(remoteTank.Position);
                 }
 			}
 		}
