@@ -473,8 +473,8 @@ namespace Microsoft.Xna.Framework
         }
 
         private void Initialize()
-        {
-            OpenTkGameWindow = new OpenTK.GameWindow();            
+        {	
+            OpenTkGameWindow = new OpenTK.GameWindow();
             OpenTkGameWindow.RenderFrame += OnRenderFrame;
             OpenTkGameWindow.UpdateFrame += OnUpdateFrame;
             OpenTkGameWindow.Closing += new EventHandler<CancelEventArgs>(OpenTkGameWindow_Closing);
@@ -614,6 +614,17 @@ namespace Microsoft.Xna.Framework
             }
 		}
 
+		internal void Run(double updateRate)
+		{
+			OpenTkGameWindow.Run(updateRate);
+		}
+		
+		internal void ChangeClientBounds(Rectangle clientBounds)
+		{
+			this.clientBounds = clientBounds;
+			OpenTkGameWindow.Bounds = new System.Drawing.Rectangle(clientBounds.X, clientBounds.Y, clientBounds.Width, clientBounds.Height);
+		}
+		
         public void BeginScreenDeviceChange(bool willBeFullScreen)
         {
            
