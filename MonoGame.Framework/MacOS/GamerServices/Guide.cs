@@ -192,10 +192,10 @@ namespace Microsoft.Xna.Framework.GamerServices
 
 		public static void ShowSignIn (int paneCount, bool onlineOnly)
 		{
-			if (paneCount != 1) {
-				new ArgumentException ("paneCount Can only be 1 on iPhone");
-				return;
-			}
+//			if (paneCount != 1) {
+//				new ArgumentException ("paneCount Can only be 1 on iPhone");
+//				return;
+//			}
 			
 			MonoGameGamerServicesHelper.ShowSigninSheet();
 			
