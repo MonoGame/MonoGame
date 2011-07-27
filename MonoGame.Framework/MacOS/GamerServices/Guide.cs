@@ -46,9 +46,6 @@ using System.Linq;
 using System.Threading;
 using System.Runtime.Remoting.Messaging;
 
-using MonoMac.AppKit;
-using MonoMac.Foundation;
-
 using Microsoft.Xna.Framework.Net;
 using Microsoft.Xna.Framework.Storage;
 
@@ -199,7 +196,9 @@ namespace Microsoft.Xna.Framework.GamerServices
 				new ArgumentException ("paneCount Can only be 1 on iPhone");
 				return;
 			}
-
+			
+			MonoGameGamerServicesHelper.ShowSigninSheet();
+			
 			if (GamerServicesComponent.LocalNetworkGamer == null) {
 				GamerServicesComponent.LocalNetworkGamer = new LocalNetworkGamer ();
 			} else {
