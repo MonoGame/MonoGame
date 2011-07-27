@@ -1,8 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
-Project("{9344bdbb-3e7f-41fc-a0dd-8665d75ee146}") = "Packages", "Packages.mdproj", "{3BA273FF-FAA7-426C-933A-4DF440B1A975}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Framework.Linux", "MonoGame.Framework\MonoGame.Framework.Linux.csproj", "{35253CE1-C864-4CD3-8249-4D1319748E8F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lidgren.Network", "ThirdParty\Lidgren.Network\Lidgren.Network.csproj", "{AE483C29-042E-4226-BA52-D247CE7676DA}"
@@ -19,8 +17,6 @@ Global
 		{35253CE1-C864-4CD3-8249-4D1319748E8F}.Debug|x86.Build.0 = Debug|x86
 		{35253CE1-C864-4CD3-8249-4D1319748E8F}.Release|x86.ActiveCfg = Release|x86
 		{35253CE1-C864-4CD3-8249-4D1319748E8F}.Release|x86.Build.0 = Release|x86
-		{3BA273FF-FAA7-426C-933A-4DF440B1A975}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{3BA273FF-FAA7-426C-933A-4DF440B1A975}.Release|x86.ActiveCfg = Release|Any CPU
 		{8CFEF1FE-9E32-43EB-A730-EB3AACDC77B1}.Debug|x86.ActiveCfg = Debug|x86
 		{8CFEF1FE-9E32-43EB-A730-EB3AACDC77B1}.Debug|x86.Build.0 = Debug|x86
 		{8CFEF1FE-9E32-43EB-A730-EB3AACDC77B1}.Release|x86.ActiveCfg = Release|x86
