@@ -59,8 +59,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 		private static bool isTrialMode;
 		private static bool isVisible;
 		private static bool simulateTrialMode;
-
-
+		
 		delegate string ShowKeyboardInputDelegate (
 			PlayerIndex player, 
 			string title, 
