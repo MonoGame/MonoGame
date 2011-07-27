@@ -56,11 +56,13 @@ namespace Microsoft.Xna.Framework.GamerServices
 			NSView content = window.ContentView;
 			window.WindowController = this;
 			
-			NSTextField profileText = new NSTextField(new RectangleF(17, 190, 109, 17));
-			profileText.StringValue = "Profile Selection:";
-			profileText.Editable = false;
-			profileText.Bordered = false;
-			content.AddSubview(profileText);
+			NSTextField signInLabel = new NSTextField(new RectangleF(17, 190, 109, 17));
+			signInLabel.StringValue = "Sign In:";
+			signInLabel.Editable = false;
+			signInLabel.Bordered = false;
+			signInLabel.BackgroundColor = NSColor.Control;
+			
+			content.AddSubview(signInLabel);
 			
 			// Create our select button
 			selectButton = new NSButton(new RectangleF(358,12,96,32));
@@ -85,11 +87,11 @@ namespace Microsoft.Xna.Framework.GamerServices
 			tableView = new NSTableView(new RectangleF(0,0,420, 123));
 			tableView.UsesAlternatingRowBackgroundColors = true;
 			
-			NSTableColumn colGamerTag = new NSTableColumn(new NSString("GamerTag"));
+			NSTableColumn colGamerTag = new NSTableColumn(new NSString("Gamer"));
 			tableView.AddColumn(colGamerTag);
 			
 			colGamerTag.Width = 420;
-			colGamerTag.HeaderCell.Title = "Gamer Tag";
+			colGamerTag.HeaderCell.Title = "Gamer Profile";
 			tableContainer.DocumentView = tableView;
 			
 			content.AddSubview(tableContainer);
