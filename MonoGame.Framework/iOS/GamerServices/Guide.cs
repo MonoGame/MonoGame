@@ -58,7 +58,59 @@ using Microsoft.Xna.Framework.Storage;
 
 namespace Microsoft.Xna.Framework.GamerServices
 {
+	
+	internal class GameVc : UIViewController
+	{
+		
+		public GameVc():base()
+		{
+		}
+		public override bool ShouldAutorotateToInterfaceOrientation (UIInterfaceOrientation toInterfaceOrientation)
+		{
 
+			var manager = GameWindow.game.graphicsDeviceManager as GraphicsDeviceManager;
+			Console.WriteLine(manager == null);
+			if(manager == null)
+				return true;
+			DisplayOrientation supportedOrientations = manager.SupportedOrientations;
+			switch(toInterfaceOrientation)
+			{
+			case UIInterfaceOrientation.LandscapeLeft :
+				return (supportedOrientations & DisplayOrientation.LandscapeLeft) != 0;
+			case UIInterfaceOrientation.LandscapeRight:
+				return (supportedOrientations & DisplayOrientation.LandscapeRight) != 0;
+			case UIInterfaceOrientation.Portrait:
+				return (supportedOrientations & DisplayOrientation.Portrait) != 0;
+			case UIInterfaceOrientation.PortraitUpsideDown :
+				return (supportedOrientations & DisplayOrientation.PortraitUpsideDown) != 0;
+			default :
+				return false;
+			}
+			return true;
+			//return base.ShouldAutorotateToInterfaceOrientation (toInterfaceOrientation);
+		}
+
+		public override void DidRotate (UIInterfaceOrientation fromInterfaceOrientation)
+		{
+			/*
+			switch(this.InterfaceOrientation)
+			{
+			case UIInterfaceOrientation.LandscapeLeft:
+			case UIInterfaceOrientation.LandscapeRight:
+				Game.View.Frame = new System.Drawing.RectangleF(this.View.Frame.Location,new System.Drawing.SizeF(this.View.Frame.Height,this.View.Frame.Width));
+				break;
+			default:				
+				Game.View.Frame = new System.Drawing.RectangleF(this.View.Frame.Location,new System.Drawing.SizeF(this.View.Frame.Width,this.View.Frame.Height));
+				break;
+			}
+			//Game.View.Frame = this.View.Frame;
+			Console.WriteLine("Main View's Frame:" + Game.View.Frame);
+			*/
+			base.DidRotate (fromInterfaceOrientation);
+		}
+
+
+	}
 
 	public static class Guide
 	{
@@ -72,7 +124,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 		private static GKAchievementViewController achievementController;
 		private static GKPeerPickerController peerPickerController;
 		private static GKMatchmakerViewController matchmakerViewController;
-		private static UIViewController viewController = null;
+		private static GameVc viewController = null;
 		private static NSObject invokeOnMainThredObj = null;
 		
 		private static NSObject GetInvokeOnMainThredObj()
@@ -321,7 +373,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 					{						
 						if(viewController == null)
 						{
-							viewController = new UIViewController();
+							viewController = new GameVc();
 							Window.Add(viewController.View);
 							viewController.View.Hidden = true;
 						}
@@ -330,6 +382,12 @@ namespace Microsoft.Xna.Framework.GamerServices
 						isVisible = true;
 					}
 			    }
+			}
+			else
+			{
+				UIAlertView alert = new UIAlertView("Error","You need to be logged into game center to view the High scores.",null,"Ok");
+				alert.Show();
+				ShowSignIn(1,true);
 			}
 		}
 
@@ -355,7 +413,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 					{
 						if(viewController == null)
 						{
-							viewController = new UIViewController();
+							viewController = new GameVc();
 							Window.Add(viewController.View);
 							viewController.View.Hidden = true;
 						}
@@ -421,7 +479,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 					{
 						if(viewController == null)
 						{
-							viewController = new UIViewController();
+							viewController = new GameVc();
 							Window.Add(viewController.View);
 							viewController.View.Hidden = true;
 						}
