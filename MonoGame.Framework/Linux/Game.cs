@@ -168,7 +168,13 @@ namespace Microsoft.Xna.Framework
                 }
             };
 
-            _view.OpenTkGameWindow.Run(FramesPerSecond / (FramesPerSecond * TargetElapsedTime.TotalSeconds));
+			// if it's not fullscreen resize window to ajust to graphic device viewport size
+			if (!graphicsDeviceManager.IsFullScreen)
+			{
+				_view.ChangeClientBounds(GraphicsDevice.Viewport.Bounds);
+			}
+			
+            _view.Run(FramesPerSecond / (FramesPerSecond * TargetElapsedTime.TotalSeconds));
 			
 			//_view.Run();
 			/*TODO _view.MainContext = _view.EAGLContext;
