@@ -39,6 +39,6 @@ Global
 		{AE483C29-042E-4226-BA52-D247CE7676DA}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = Samples\Linux\Input\MonoGame.Samples.Input.Linux.csproj
+		StartupItem = Samples\Linux\Tetris\MonoGame.Samples.Tetris.Linux.csproj
 	EndGlobalSection
 EndGlobal

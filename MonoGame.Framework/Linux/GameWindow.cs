@@ -227,10 +227,7 @@ namespace Microsoft.Xna.Framework
 
         private void HandleInput()
         {			
-			// mouse
-			
-            //Mouse.SetPosition(window.Mouse.X, window.Mouse.Y);                
-			//Mouse.ScrollWheelValue = (float)window.Mouse.Wheel;		
+			// mouse doesn't need to be treated here, Mouse class does it alone
 			
 			// keyboard
 			Keyboard.State = new KeyboardState(keys.ToArray());
