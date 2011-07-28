@@ -306,6 +306,7 @@
     <Compile Include="Net\CommandGamerStateChange.cs" />
     <Compile Include="Net\CommandGamerLeft.cs" />
     <Compile Include="Linux\TitleContainer.cs" />
+    <Compile Include="Linux\Input\KeyboardUtil.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Linux\" />
