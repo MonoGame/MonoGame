@@ -158,15 +158,15 @@ namespace Microsoft.Xna.Framework
 
 			Initialize ();
 			
-            //Need to execute this on the rendering thread
-            _view.OpenTkGameWindow.RenderFrame += delegate
-            {
-                if (!_devicesLoaded)
-                {
-                    Initialize();
-                    _devicesLoaded = true;
-                }
-            };
+//            //Need to execute this on the rendering thread
+//            _view.GameWindow.RenderFrame += delegate
+//            {
+//                if (!_devicesLoaded)
+//                {
+//                    Initialize();
+//                    _devicesLoaded = true;
+//                }
+//            };
 			
             _view.Run(FramesPerSecond / (FramesPerSecond * TargetElapsedTime.TotalSeconds));
 			
@@ -553,12 +553,12 @@ namespace Microsoft.Xna.Framework
 //				}
 //			}
 			 
-			if (!_view.OpenTkGameWindow.IsExiting)
+			if (!_view.Window.IsExiting)
             {
                 // raise the Exiting event
             	if (Exiting != null) Exiting(this, null);                
                 Net.NetworkSession.Exit();
-                _view.OpenTkGameWindow.Exit();
+                _view.Window.Exit();
             }			
 		}
 
