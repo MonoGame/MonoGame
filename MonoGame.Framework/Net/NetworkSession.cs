@@ -781,6 +781,8 @@ namespace Microsoft.Xna.Framework.Net
 			}
 			else {
 				gamer = new NetworkGamer (this, (byte)command.InternalIndex, command.State);
+				gamer.DisplayName = command.DisplayName;
+				gamer.Gamertag = command.GamerTag;
 				gamer.RemoteUniqueIdentifier = command.remoteUniqueIdentifier;
 				_allGamers.AddGamer(gamer);
 				_remoteGamers.AddGamer(gamer);
