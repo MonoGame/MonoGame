@@ -51,7 +51,11 @@ namespace Microsoft.Xna.Framework.GamerServices
 		{ 
 			get
 			{
-				return this[(int)index];
+                if ((int)index >= 0 && (int)index < this.Count)
+                {
+                    return this[(int)index];
+                }
+                return null;
 			}
 		}
 		#endregion

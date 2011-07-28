@@ -56,6 +56,7 @@ namespace Microsoft.Xna.Framework.GamerServices
         {
 			lng = new LocalNetworkGamer();
 			Guide.Window = game.Window;
+            Guide.Initialise(game);
         }
 		
 		protected override void LoadContent()
