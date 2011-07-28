@@ -232,7 +232,6 @@ namespace Microsoft.Xna.Framework
 			
 			// keyboard
 			Keyboard.State = new KeyboardState(keys.ToArray());
-			keys.Clear();
         }
 		
 		#endregion
