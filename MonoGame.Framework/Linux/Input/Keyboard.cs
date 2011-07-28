@@ -43,12 +43,10 @@ using System;
 
 namespace Microsoft.Xna.Framework.Input
 {
-
-
 	public static class Keyboard
 	{		
 		static KeyboardState _state;
-
+		
 		public static KeyboardState GetState()
 		{
 			return _state; // TODO Not used on iPhone or Zune
@@ -61,7 +59,8 @@ namespace Microsoft.Xna.Framework.Input
 		
 		internal static KeyboardState State
 		{
-			set {
+			set 
+			{
 				_state = value;
 			}
 		}
