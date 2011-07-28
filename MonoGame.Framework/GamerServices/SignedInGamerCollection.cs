@@ -37,25 +37,25 @@ permitted under your local laws, the contributors exclude the implied warranties
 purpose and non-infringement.
 */
 #endregion License
-
 ﻿using System;
 using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.GamerServices
 {
-    public class SignedInGamerCollection : List<SignedInGamer>
-    {
+	public class SignedInGamerCollection : List<SignedInGamer>
+	{
 		#region Properties
 		// Indexer to get and set words of the containing document:
-       	public SignedInGamer this [PlayerIndex index] 
-		{ 
-			get
-			{
-				return this[(int)index];
+		public SignedInGamer this [PlayerIndex index] { 
+			get {
+				if (this.Count == 0 || (int)index > this.Count - 1)
+					return null;
+
+				return this [(int)index];
 			}
 		}
 		#endregion
-    }
-	
-	
+	}
+
+
 }
