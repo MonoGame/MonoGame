@@ -41,92 +41,78 @@ purpose and non-infringement.
 #region Using Statements
 using System;
 using System.Globalization;
+
 using Microsoft.Xna.Framework.Graphics;
+
 #endregion
 
 namespace Microsoft.Xna.Framework.GamerServices
 {
-    public sealed class GamerProfile : IDisposable
-    {
+	
+	public sealed class GamerProfile : IDisposable
+	{
 	#region Methods
-	public void Dispose()
-    {
-			
-	}
+		public void Dispose ()
+		{
+
+		}
+
 	#endregion
 
-        #region Properties
-        public Texture2D GamerPicture 
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+	#region Properties
+		public Texture2D GamerPicture {
+			get {
+				throw new NotImplementedException ();
+			}
+		}
+		
+		public int GamerScore {
+			get {
+				throw new NotImplementedException ();
+			}
+		}
 
-        public int GamerScore 
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+		public GamerZone GamerZone {
+			get {
+				throw new NotImplementedException ();
+			}
+		}
 
-        public GamerZone GamerZone 
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+		public bool IsDisposed {
+			get {
+				throw new NotImplementedException ();
+			}
+		}
 
-        public bool IsDisposed
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+		public string Motto {
+			get {
+				throw new NotImplementedException ();
+			}
+		}
 
-        public string Motto 
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+		public RegionInfo Region {
+			get {
+				throw new NotImplementedException ();
+			}
+		}
 
-        public RegionInfo Region 
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+		public float Reputation {
+			get {
+				throw new NotImplementedException ();
+			}
+		}
 
-        public float Reputation 
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+		public int TitlesPlayed {
+			get {
+				throw new NotImplementedException ();
+			}
+		}
 
-        public int TitlesPlayed 
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        public int TotalAchievements 
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
-        #endregion
-    }
+		public int TotalAchievements {
+			get {
+				throw new NotImplementedException ();
+			}
+		}
+	#endregion
+	}
 }
