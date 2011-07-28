@@ -66,6 +66,12 @@ namespace Microsoft.Xna.Framework.Input
 			
 			//bool b = (bool)_mouse.GetType().GetProperty("Item").GetValue(OpenTK.Input.MouseButton.Left, null);
 			
+			// maybe someone is tring to get mouse before initialize
+			if (_mouse == null)
+			{
+				return new MouseState(0, 0);
+			}
+			
 			MouseState ms = new MouseState(_mouse.X, _mouse.Y);
 			
 			ms.LeftButton = _mouse[OpenTK.Input.MouseButton.Left] ? ButtonState.Pressed : ButtonState.Released;
@@ -78,7 +84,7 @@ namespace Microsoft.Xna.Framework.Input
 
 		public static void SetPosition (int x, int y)
 		{
-			// TODO propagete change to opentk mouse object
+			// TODO propagate change to opentk mouse object (requires opentk 1.1)
 			throw new NotImplementedException("Feature not implemented.");
 		}
 		

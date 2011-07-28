@@ -127,9 +127,7 @@ namespace Tetris
 				this.Exit ();
 
 			// Check pause
-			bool pauseKey = (oldKeyboardState.IsKeyDown (Keys.P) && (keyboardState.IsKeyUp (Keys.P)));
-
-			oldKeyboardState = keyboardState;
+			bool pauseKey = (oldKeyboardState.IsKeyDown (Keys.P) && (keyboardState.IsKeyUp (Keys.P)));			
 
 			if (pauseKey)
 				pause = !pause;
@@ -162,7 +160,8 @@ namespace Tetris
 						board.MoveFigureDown ();
 
 					// Rotate figure
-					if (keyboardState.IsKeyDown (Keys.Up) || keyboardState.IsKeyDown (Keys.Space))
+					if (keyboardState.IsKeyDown (Keys.Up) && oldKeyboardState.IsKeyUp(Keys.Up) || 
+					    keyboardState.IsKeyDown (Keys.Space) && oldKeyboardState.IsKeyUp(Keys.Space))
 						board.RotateFigure ();
 
 					// Moving figure
@@ -174,6 +173,8 @@ namespace Tetris
 				}
 			}
 
+			oldKeyboardState = keyboardState;
+			
 			base.Update (gameTime);
 		}
 
