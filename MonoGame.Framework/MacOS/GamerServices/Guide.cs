@@ -195,7 +195,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 //				new ArgumentException ("paneCount Can only be 1 on iPhone");
 //				return;
 //			}
-			
+			isVisible = true;
 			MonoGameGamerServicesHelper.ShowSigninSheet();
 			
 			if (GamerServicesComponent.LocalNetworkGamer == null) {
@@ -203,6 +203,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 			} else {
 				GamerServicesComponent.LocalNetworkGamer.SignedInGamer.BeginAuthentication (null, null);
 			}
+			isVisible = false;
 		}
 
 		public static void ShowLeaderboard ()

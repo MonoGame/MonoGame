@@ -16,7 +16,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 		NSApplication NSApp = NSApplication.SharedApplication;	
 		
 		
-		internal List<string> gamerList = new List<string>();
+		internal List<MonoGameLocalGamerProfile> gamerList;
 		internal NSTableView tableView;
 		
 		#region Constructors
@@ -120,9 +120,11 @@ namespace Microsoft.Xna.Framework.GamerServices
 			};
 			content.AddSubview(removeButton);			
 			
-			for (int x= 1; x< 25; x++) {
-				gamerList.Add("Player " + x);
-			}
+			gamerList = MonoGameGamerServicesHelper.DeserializeProfiles();
+			
+//			for (int x= 1; x< 25; x++) {
+//				gamerList.Add("Player " + x);
+//			}
 			tableView.DataSource = new GamersDataSource(this);
 			tableView.Delegate = new GamersTableDelegate(this);
 		}
@@ -139,12 +141,13 @@ namespace Microsoft.Xna.Framework.GamerServices
 			if (tableView.SelectedRowCount > 0) {
 				var rowSelected = tableView.SelectedRow;
 				SignedInGamer sig = new SignedInGamer();
-				sig.DisplayName = gamerList[rowSelected];
-				sig.Gamertag = gamerList[rowSelected];
+				sig.DisplayName = gamerList[rowSelected].DisplayName;
+				sig.Gamertag = gamerList[rowSelected].Gamertag;
+				sig.InternalIdentifier = gamerList[rowSelected].PlayerInternalIdentifier;
 				
 				Gamer.SignedInGamers.Add(sig);
 			}
-			
+			MonoGameGamerServicesHelper.SerializeProfiles(gamerList);
 			NSApp.StopModal();
 		}
 		
@@ -160,7 +163,11 @@ namespace Microsoft.Xna.Framework.GamerServices
 		
 		void addLocalPlayer () 
 		{
-			gamerList.Add("New Player");
+			MonoGameLocalGamerProfile prof = new MonoGameLocalGamerProfile();
+			prof.Gamertag = "New Player";
+			prof.DisplayName = prof.Gamertag;
+
+			gamerList.Add(prof);
 			
 			tableView.ReloadData();
 			int newPlayerRow = gamerList.Count - 1;
@@ -188,14 +195,16 @@ namespace Microsoft.Xna.Framework.GamerServices
 		
 		public override NSObject GetObjectValue (NSTableView tableView, NSTableColumn tableColumn, int row)
 		{
-			return new NSString(controller.gamerList[row]);
+			return new NSString(controller.gamerList[row].Gamertag);
 		}
 		
 		public override void SetObjectValue (NSTableView tableView, NSObject theObject, NSTableColumn tableColumn, int row)
 		{
 			var proposedValue = theObject.ToString();
-			if (proposedValue.Trim().Length > 0)
-				controller.gamerList[row] = theObject.ToString();
+			if (proposedValue.Trim().Length > 0) {
+				controller.gamerList[row].Gamertag = theObject.ToString();
+				controller.gamerList[row].DisplayName = theObject.ToString();
+			}
 		}
 		
 	}
@@ -211,7 +220,11 @@ namespace Microsoft.Xna.Framework.GamerServices
 		
 		public override bool ShouldSelectRow (NSTableView tableView, int row)
 		{
-			//return base.ShouldSelectRow (tableView, row);
+			var profile = controller.gamerList[row];
+			foreach (var gamer in Gamer.SignedInGamers) {
+				if (profile.PlayerInternalIdentifier == gamer.InternalIdentifier)
+					return false;
+			}
 			return true;
 		}
 		
