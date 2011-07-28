@@ -37,63 +37,52 @@ permitted under your local laws, the contributors exclude the implied warranties
 purpose and non-infringement.
 */
 #endregion License
-
-
 ﻿
+using MouseInfo = OpenTK.Input.Mouse;
+using System;
+
 namespace Microsoft.Xna.Framework.Input
 {
+	// TODO on opentk 1.1 release this class should be reviewed to decouple it from GameWindow
+	// OpenTK.Input.Mouse and OpenTK.Input.Mouse.GetState should be enough
+	
+	// TODO verify if why mouse middle button is laggy (maybe it's my mouse or the opentk implementation)
+	
 	public static class Mouse
 	{
-		private static int _x, _y;
-		private static float _scrollWheelValue;
-		private static ButtonState _leftButton = ButtonState.Released;
-		private static ButtonState _rightButton = ButtonState.Released;
-		private static ButtonState _middleButton = ButtonState.Released;
+		private static OpenTK.Input.MouseDevice _mouse = null;
+
+		internal static void UpdateMouseInfo(OpenTK.Input.MouseDevice mouse)
+		{
+			_mouse = mouse;
+		}
+		
+		#region Public interface		
 		
 		public static MouseState GetState ()
-		{
-			MouseState ms = new MouseState(_x,_y);
-			ms.LeftButton = _leftButton;
-			ms.RightButton = _rightButton;
-			ms.MiddleButton = _middleButton;
-			ms.ScrollWheelValue = (int)_scrollWheelValue;
+		{	
+			// no multiple mouse supported (yet!)
+			//OpenTK.Input.MouseState mState = MouseInfo.GetState(0); // to be implemented on opentk 1.1
+			
+			//bool b = (bool)_mouse.GetType().GetProperty("Item").GetValue(OpenTK.Input.MouseButton.Left, null);
+			
+			MouseState ms = new MouseState(_mouse.X, _mouse.Y);
+			
+			ms.LeftButton = _mouse[OpenTK.Input.MouseButton.Left] ? ButtonState.Pressed : ButtonState.Released;
+			ms.RightButton = _mouse[OpenTK.Input.MouseButton.Right] ? ButtonState.Pressed : ButtonState.Released;
+			ms.MiddleButton = _mouse[OpenTK.Input.MouseButton.Middle] ? ButtonState.Pressed : ButtonState.Released;;
+			ms.ScrollWheelValue = _mouse.Wheel;
 			
 			return ms;
 		}
 
 		public static void SetPosition (int x, int y)
 		{
-			_x = x;
-			_y = y;
+			// TODO propagete change to opentk mouse object
+			throw new NotImplementedException("Feature not implemented.");
 		}
 		
-		internal static ButtonState LeftButton { 
-			get {
-				return _leftButton;
-			}
-			set { _leftButton = value; }
-		}
-
-		internal static ButtonState MiddleButton { 
-			get {
-				return _middleButton;
-			}
-			set { _middleButton = value; }			
-		}
-
-		internal static ButtonState RightButton { 
-			get {
-				return _rightButton;
-			}
-			set { _rightButton = value; }
-		}
-
-		internal static float ScrollWheelValue { 
-			get {
-				return _scrollWheelValue;
-			}
-			set { _scrollWheelValue = value; }
-		}
+		#endregion
 	}
 }
 

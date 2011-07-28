@@ -24,6 +24,8 @@ namespace Microsoft.Xna.Samples.Draw2D
 		SpriteFont font;
 		Vector2 position;
 		FPSCounterComponent fps;
+		int wheel;
+		
 		
 #if ANDROID 
 		public Game1 (Activity activity) : base (activity)
@@ -52,6 +54,7 @@ namespace Microsoft.Xna.Samples.Draw2D
 			// TODO: Add your initialization logic here
 
 			position = new Vector2 (250,20);
+			wheel = 0;
 			
 			base.Initialize ();
 		}
@@ -82,14 +85,24 @@ namespace Microsoft.Xna.Samples.Draw2D
 		protected override void Update (GameTime gameTime)
 		{
 			KeyboardState ks = Keyboard.GetState();
+			MouseState mouse = Mouse.GetState();
 			
 			if (ks[Keys.Escape] == KeyState.Down)
 				base.Exit();
 			
-			if (ks[Keys.Left] == KeyState.Down)
+			if (ks[Keys.Left] == KeyState.Down || mouse.LeftButton == ButtonState.Pressed)
 				position.X -= 1f;
-			else if (ks[Keys.Right] == KeyState.Down)
+			else if (ks[Keys.Right] == KeyState.Down || mouse.RightButton == ButtonState.Pressed)
 				position.X += 1f;
+			else if (mouse.MiddleButton == ButtonState.Pressed)
+				position = new Vector2(mouse.X, mouse.Y);
+			
+			if (wheel - mouse.ScrollWheelValue > 0)
+				position.Y -= 1f;
+			else if (wheel - mouse.ScrollWheelValue < 0)
+				position.Y += 1f;
+			
+			wheel = mouse.ScrollWheelValue;
 			
 			base.Update (gameTime);
 		}
