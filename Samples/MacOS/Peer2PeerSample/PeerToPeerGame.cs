@@ -346,6 +346,7 @@ namespace PeerToPeer
                     remoteTank.Position = packetReader.ReadVector2();
                     remoteTank.TankRotation = packetReader.ReadSingle();
                     remoteTank.TurretRotation = packetReader.ReadSingle();
+
                 }
 			}
 		}
