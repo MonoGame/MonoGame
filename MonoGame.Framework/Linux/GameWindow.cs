@@ -152,11 +152,11 @@ namespace Microsoft.Xna.Framework
         }
 
         private void Keyboard_KeyDown(object sender, OpenTK.Input.KeyboardKeyEventArgs e)
-        {
+        {			
 			Keys xnaKey = KeyboardUtil.ToXna(e.Key);
             if (!keys.Contains(xnaKey)) keys.Add(xnaKey);
         }
-		
+				
 		protected void OnActivated(){}
 
         protected void OnClientSizeChanged()
@@ -226,9 +226,11 @@ namespace Microsoft.Xna.Framework
 		}
 
         private void HandleInput()
-        {
+        {			
 			// mouse
-            Mouse.SetPosition(window.Mouse.X, window.Mouse.Y);                
+			
+            //Mouse.SetPosition(window.Mouse.X, window.Mouse.Y);                
+			//Mouse.ScrollWheelValue = (float)window.Mouse.Wheel;		
 			
 			// keyboard
 			Keyboard.State = new KeyboardState(keys.ToArray());
@@ -245,9 +247,13 @@ namespace Microsoft.Xna.Framework
             window.Resize += OnResize;
             window.Keyboard.KeyDown += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyDown);
             window.Keyboard.KeyUp += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyUp);
-            clientBounds = new Rectangle(window.X, window.Y, window.Width, window.Height);
+			clientBounds = new Rectangle(window.X, window.Y, window.Width, window.Height);
 			
 			keys = new List<Keys>();
+			
+			// mouse
+			// TODO review this when opentk 1.1 is released
+			Mouse.UpdateMouseInfo(window.Mouse);
 			
             // Initialize GameTime
             _updateGameTime = new GameTime();
