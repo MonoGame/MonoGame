@@ -49,293 +49,266 @@ using MonoMac.AppKit;
 
 namespace Microsoft.Xna.Framework.GamerServices
 {
-    public class SignedInGamer : Gamer
-    {	
+	public class SignedInGamer : Gamer
+	{	
 		private AchievementCollection gamerAchievements;
 		private FriendCollection friendCollection;
 		
-		delegate void AuthenticationDelegate();
+		internal Guid InternalIdentifier;
 		
-		public IAsyncResult BeginAuthentication(AsyncCallback callback, Object asyncState)
+		delegate void AuthenticationDelegate ();
+
+		public IAsyncResult BeginAuthentication (AsyncCallback callback,Object asyncState)
 		{
 			// Go off authenticate
 			AuthenticationDelegate ad = DoAuthentication; 
-			
-			return ad.BeginInvoke(callback, ad);
+
+			return ad.BeginInvoke (callback, ad);
 		}
-		
-		public void EndAuthentication( IAsyncResult result )
+
+		public void EndAuthentication (IAsyncResult result)
 		{
 			AuthenticationDelegate ad = (AuthenticationDelegate)result.AsyncState; 
-			
-			ad.EndInvoke(result);
+
+			ad.EndInvoke (result);
 		}
-		
-		private void DoAuthentication()
+
+		private void DoAuthentication ()
 		{
-			try 
-			{
-				
-			}
-			catch (Exception) 
-			{
-				
+			try {
+
+			} catch (Exception) {
+
 			}
 		}
-		
-		public SignedInGamer()
+
+		public SignedInGamer ()
 		{
-			
+
 			// Register to receive the GKPlayerAuthenticationDidChangeNotificationName so we are notified when 
 			// Authentication changes
-			
+
 		}
-		
-		private void AuthenticationCompletedCallback( IAsyncResult result )
+
+		private void AuthenticationCompletedCallback (IAsyncResult result)
 		{
-			EndAuthentication(result);	
+			EndAuthentication (result);	
 		}
-		
+
 		#region Methods
-		public FriendCollection GetFriends()
+		public FriendCollection GetFriends ()
 		{
-			if(IsSignedInToLive)
-			{
-				if ( friendCollection == null )
-				{
-					friendCollection = new FriendCollection();
+			if (IsSignedInToLive) {
+				if (friendCollection == null) {
+					friendCollection = new FriendCollection ();
 				}
 			}
-			
+
 			return friendCollection;
 		}
-		
+
 		public bool IsFriend (Gamer gamer)
 		{
-			if ( gamer == null ) 
-				throw new ArgumentNullException();
-			
-			if ( gamer.IsDisposed )
-				throw new ObjectDisposedException(gamer.ToString());	
-			
+			if (gamer == null) 
+				throw new ArgumentNullException ();
+
+			if (gamer.IsDisposed)
+				throw new ObjectDisposedException (gamer.ToString ());	
+
 			bool found = false;
-			foreach(FriendGamer f in friendCollection)
-			{
-				if ( f.Gamertag == gamer.Gamertag )
-				{
+			foreach (FriendGamer f in friendCollection) {
+				if (f.Gamertag == gamer.Gamertag) {
 					found = true;
 				}
 			}
 			return found;
-						
+
 		}
-		
-		delegate AchievementCollection GetAchievementsDelegate();
-		
-		public IAsyncResult BeginGetAchievements( AsyncCallback callback, Object asyncState)
+
+		delegate AchievementCollection GetAchievementsDelegate ();
+
+		public IAsyncResult BeginGetAchievements (AsyncCallback callback, Object asyncState)
 		{
 			// Go off and grab achievements
 			GetAchievementsDelegate gad = GetAchievements; 
-			
-			return gad.BeginInvoke(callback, gad);
+
+			return gad.BeginInvoke (callback, gad);
 		}
-		
-		private void GetAchievementCompletedCallback( IAsyncResult result )
+
+		private void GetAchievementCompletedCallback (IAsyncResult result)
 		{
 			// get the delegate that was used to call that method
 			GetAchievementsDelegate gad = (GetAchievementsDelegate)result.AsyncState; 
 
 			// get the return value from that method call
-			gamerAchievements = gad.EndInvoke(result);
+			gamerAchievements = gad.EndInvoke (result);
 		}
-		
-		public AchievementCollection EndGetAchievements( IAsyncResult result )
+
+		public AchievementCollection EndGetAchievements (IAsyncResult result)
 		{
 			GetAchievementsDelegate gad = (GetAchievementsDelegate)result.AsyncState; 
-			
-			gamerAchievements = gad.EndInvoke(result);
-			
+
+			gamerAchievements = gad.EndInvoke (result);
+
 			return gamerAchievements;
 		}
-		
-		public AchievementCollection GetAchievements()
+
+		public AchievementCollection GetAchievements ()
 		{
-			if ( IsSignedInToLive )
-			{
-				if (gamerAchievements == null)
-				{
-					gamerAchievements = new AchievementCollection();
+			if (IsSignedInToLive) {
+				if (gamerAchievements == null) {
+					gamerAchievements = new AchievementCollection ();
 				}
 			}
 			return gamerAchievements;
 		}
-		
-		delegate void AwardAchievementDelegate(string achievementId, double percentageComplete);
-		
-		public IAsyncResult BeginAwardAchievement(
-         string achievementId,
-		 double percentageComplete,
-         AsyncCallback callback,
-         Object state
-		)
+
+		delegate void AwardAchievementDelegate (string achievementId, double percentageComplete);
+
+		public IAsyncResult BeginAwardAchievement (
+	string achievementId,
+			double percentageComplete,
+	AsyncCallback callback,
+	Object state
+)
 		{	
 			// Go off and award the achievement
 			AwardAchievementDelegate aad = DoAwardAchievement; 
-				
-			return aad.BeginInvoke(achievementId, percentageComplete, callback, aad);
+
+			return aad.BeginInvoke (achievementId, percentageComplete, callback, aad);
 		}
-		
-		public void EndAwardAchievement(IAsyncResult result)
+
+		public void EndAwardAchievement (IAsyncResult result)
 		{
 			AwardAchievementDelegate aad = (AwardAchievementDelegate)result.AsyncState; 
-			
-			aad.EndInvoke(result);
+
+			aad.EndInvoke (result);
 		}
-		
-		private void AwardAchievementCompletedCallback( IAsyncResult result )
+
+		private void AwardAchievementCompletedCallback (IAsyncResult result)
 		{
-			EndAwardAchievement(result);	
+			EndAwardAchievement (result);	
 		}
-		
-		public void AwardAchievement( string achievementId )
+
+		public void AwardAchievement (string achievementId)
 		{			
-			AwardAchievement(achievementId, 100.0f);
+			AwardAchievement (achievementId, 100.0f);
 		}
-		
-		public void DoAwardAchievement( string achievementId, double percentageComplete )
+
+		public void DoAwardAchievement (string achievementId, double percentageComplete)
 		{
-			
+
 		}
-		
-		public void AwardAchievement( string achievementId, double percentageComplete )
+
+		public void AwardAchievement (string achievementId, double percentageComplete)
 		{
-			if (IsSignedInToLive)
-			{
-				BeginAwardAchievement( achievementId, percentageComplete, AwardAchievementCompletedCallback, null );
+			if (IsSignedInToLive) {
+				BeginAwardAchievement (achievementId, percentageComplete, AwardAchievementCompletedCallback, null);
 			}
 		}
-		
-		public void UpdateScore( string aCategory, long aScore )
+
+		public void UpdateScore (string aCategory, long aScore)
 		{
-			if (IsSignedInToLive)
-			{
-				
+			if (IsSignedInToLive) {
+
 			}
 		}
-		
-		public void ResetAchievements()
+
+		public void ResetAchievements ()
 		{
-			if (IsSignedInToLive)
-			{
-				
+			if (IsSignedInToLive) {
+
 			}
 		}
 
 		#endregion
-			
+
 		#region Properties
-		public GameDefaults GameDefaults 
-		{ 
-			get
-			{
-				throw new NotSupportedException();
+		public GameDefaults GameDefaults { 
+			get {
+				throw new NotSupportedException ();
 			}
 		}
-		
-		public bool IsGuest 
-		{ 
-			get
-			{
-				throw new NotSupportedException();
+
+		public bool IsGuest { 
+			get {
+				throw new NotSupportedException ();
 			}
 		}
-		
-		public bool IsSignedInToLive 
-		{ 
-			get
-			{				
+
+		public bool IsSignedInToLive { 
+			get {				
 				return false;
 			}
 		}
-		
-		public int PartySize 
-		{ 
-			get
-			{
-				throw new NotSupportedException();
+
+		public int PartySize { 
+			get {
+				throw new NotSupportedException ();
 			}
-			set
-			{
-				throw new NotSupportedException();
-			}
-		}
-		
-        public PlayerIndex PlayerIndex
-        {
-            get
-            {
-                return PlayerIndex.One;
-            }
-        }
-		
-		public GamerPresence Presence 
-		{ 
-			get
-			{
-				throw new NotSupportedException();
+			set {
+				throw new NotSupportedException ();
 			}
 		}
 
-        GamerPrivileges _privileges = new GamerPrivileges();
-        public GamerPrivileges Privileges
-        {
-            get
-            {
-                return _privileges;
-            }
-        }
+		public PlayerIndex PlayerIndex {
+			get {
+				return PlayerIndex.One;
+			}
+		}
+
+		public GamerPresence Presence { 
+			get {
+				throw new NotSupportedException ();
+			}
+		}
+
+		GamerPrivileges _privileges = new GamerPrivileges ();
+
+		public GamerPrivileges Privileges {
+			get {
+				return _privileges;
+			}
+		}
+
 		#endregion
-		
-		
-		protected virtual void OnSignedIn(SignedInEventArgs e)
+
+
+		protected virtual void OnSignedIn (SignedInEventArgs e)
 		{
-			 if (SignedIn != null) 
-			 {
-			    // Invokes the delegates. 
-			    SignedIn(this, e);
-			 }
-		}
-		
-		protected virtual void OnSignedOut(SignedOutEventArgs e)
-		{
-			 if (SignedOut != null) 
-			 {
-			    // Invokes the delegates. 
-			    SignedOut(this, e);
-			 }
+			if (SignedIn != null) {
+				// Invokes the delegates. 
+				SignedIn (this, e);
+			}
 		}
 
-		
+		protected virtual void OnSignedOut (SignedOutEventArgs e)
+		{
+			if (SignedOut != null) {
+				// Invokes the delegates. 
+				SignedOut (this, e);
+			}
+		}
+
 		#region Events
 		public static event EventHandler<SignedInEventArgs> SignedIn;
-		
 		public static event EventHandler<SignedOutEventArgs> SignedOut;
 		#endregion
-    }
-	
+	}
+
 	public class SignedInEventArgs : EventArgs
 	{
-		public SignedInEventArgs ( SignedInGamer gamer )
+		public SignedInEventArgs (SignedInGamer gamer)
 		{
-			
+
 		}
 	}
-	
+
 	public class SignedOutEventArgs : EventArgs
 	{
-		public SignedOutEventArgs (SignedInGamer gamer )
+		public SignedOutEventArgs (SignedInGamer gamer)
 		{
-			
+
 		}
 	}
 }
