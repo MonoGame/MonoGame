@@ -25,6 +25,7 @@ namespace Microsoft.Xna.Samples.Draw2D
 		Vector2 position;
 		FPSCounterComponent fps;
 		int wheel;
+		KeyboardState oldKeyboardState;
 		
 		
 #if ANDROID 
@@ -38,8 +39,12 @@ namespace Microsoft.Xna.Samples.Draw2D
 			Content.RootDirectory = "Content";
 			
 			graphics.PreferMultiSampling = true;
-			graphics.IsFullScreen = true;	
+			graphics.IsFullScreen = false;	
 
+			Window.AllowUserResizing = false;
+
+			TargetElapsedTime = TimeSpan.FromSeconds(1f/30);
+			
 			graphics.SupportedOrientations = DisplayOrientation.Portrait | DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight | DisplayOrientation.PortraitUpsideDown;
 		}
 		
@@ -102,7 +107,12 @@ namespace Microsoft.Xna.Samples.Draw2D
 			else if (wheel - mouse.ScrollWheelValue < 0)
 				position.Y += 1f;
 			
+			if (ks.IsKeyDown(Keys.Enter) && oldKeyboardState.IsKeyUp(Keys.Enter))
+				graphics.ToggleFullScreen();
+			
 			wheel = mouse.ScrollWheelValue;
+			    
+			oldKeyboardState = ks;
 			
 			base.Update (gameTime);
 		}
@@ -116,8 +126,16 @@ namespace Microsoft.Xna.Samples.Draw2D
 			graphics.GraphicsDevice.Clear (Color.CornflowerBlue);
 
 			// Draw without blend
-			spriteBatch.Begin (SpriteSortMode.Deferred, BlendState.Opaque);			
+			spriteBatch.Begin (SpriteSortMode.Deferred, BlendState.AlphaBlend);			
 			spriteBatch.Draw (texture, position, Color.White);	
+			
+			spriteBatch.DrawString(font, "Viewport: " + GraphicsDevice.Viewport.X + "," + GraphicsDevice.Viewport.Y + "," + GraphicsDevice.Viewport.Width + "," + GraphicsDevice.Viewport.Height, new Vector2(0, 30), Color.White);
+			spriteBatch.DrawString(font, "ClientBounds: " + Window.ClientBounds, new Vector2(0, 50), Color.White);
+			spriteBatch.DrawString(font, "BackBuffer: " + graphics.PreferredBackBufferWidth + ", " + graphics.PreferredBackBufferHeight, new Vector2(0, 70), Color.White);
+			
+			
+			base.Draw(gameTime);
+			
 			spriteBatch.End ();
 		}
 	}

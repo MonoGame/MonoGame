@@ -138,7 +138,7 @@ namespace Microsoft.Xna.Framework
 		#endregion
 
 		public void ApplyChanges ()
-		{
+		{			
 		}
 
 		private void Initialize ()
@@ -168,13 +168,10 @@ namespace Microsoft.Xna.Framework
 				return _graphicsDevice.PresentationParameters.IsFullScreen;
 			}
 			set {
-				bool wasFullScreen = _graphicsDevice.PresentationParameters.IsFullScreen;
+				bool changed = value != _graphicsDevice.PresentationParameters.IsFullScreen;
 				_graphicsDevice.PresentationParameters.IsFullScreen = value;	
-				if (value && !wasFullScreen) {
-					_game.GoFullScreen();
-				} else if (!value && wasFullScreen) {
-					_game.GoWindowed();
-				}
+
+				_game.ResizeWindow(changed);
 			}
 		}
 

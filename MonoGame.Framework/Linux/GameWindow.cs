@@ -50,9 +50,8 @@ using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework
 {
-    public class GameWindow
+    public class GameWindow : IDisposable
     {	
-		private Rectangle clientBounds;
 		private GameTime _updateGameTime;
         private GameTime _drawGameTime;
         private DateTime _lastUpdate;
@@ -87,7 +86,9 @@ namespace Microsoft.Xna.Framework
 		{
 			get 
 			{
-				return clientBounds;
+				System.Drawing.Rectangle cb = window.ClientRectangle;
+				
+				return new Rectangle(cb.X, cb.Y, cb.Width, cb.Height);
 			}
 		}
 		
@@ -103,11 +104,10 @@ namespace Microsoft.Xna.Framework
             set
             {
                 _allowUserResizing = value;
-
                 if (_allowUserResizing)
                     window.WindowBorder = WindowBorder.Resizable;
                 else 
-					window.WindowBorder = WindowBorder.Fixed;
+					window.WindowBorder = WindowBorder.Fixed; // OTK's buggy here, let's wait for 1.1
             }
         }
 		
@@ -244,7 +244,6 @@ namespace Microsoft.Xna.Framework
             window.Resize += OnResize;
             window.Keyboard.KeyDown += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyDown);
             window.Keyboard.KeyUp += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyUp);
-			clientBounds = new Rectangle(window.X, window.Y, window.Width, window.Height);
 			
 			keys = new List<Keys>();
 			
@@ -283,7 +282,6 @@ namespace Microsoft.Xna.Framework
 		
 		internal void ChangeClientBounds(Rectangle clientBounds)
 		{
-			this.clientBounds = clientBounds;
 			window.ClientRectangle = new System.Drawing.Rectangle(clientBounds.X, clientBounds.Y, clientBounds.Width, clientBounds.Height);
 		}
 		
@@ -293,9 +291,13 @@ namespace Microsoft.Xna.Framework
 		
 		// TODO are those public method part of the xna gamewindow public interface?
 		
+		public void Dispose ()
+		{
+			window.Dispose();
+		}
+		
 		public void BeginScreenDeviceChange(bool willBeFullScreen)
         {
-           
         }
 
         public void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight)

@@ -65,19 +65,18 @@ namespace Microsoft.Xna.Framework
 		private ContentManager _content;
 		private GameWindow _view;
 		private bool _isFixedTimeStep = true;
-		private TimeSpan _targetElapsedTime = TimeSpan.FromSeconds (1 / FramesPerSecond); 
+		private TimeSpan _targetElapsedTime; 
 		private IGraphicsDeviceManager _graphicsDeviceManager;
 		private IGraphicsDeviceService graphicsDeviceService;
 		internal static bool _playingVideo = false;
 		private SpriteBatch spriteBatch;
 		private Texture2D splashScreen;
 		private bool _mouseVisible = false;
-		private List<IGameComponent> _gameComponentsToInitialize = new List<IGameComponent>();
-		private bool _wasResizeable;
-		private bool _devicesLoaded;
 
 		delegate void InitialiseGameComponentsDelegate ();
 
+		#region Ctor
+		
 		public Game ()
 		{
 			// Initialize collections
@@ -88,35 +87,83 @@ namespace Microsoft.Xna.Framework
 
 			_view = new GameWindow ();
 			_view.Game = this;
-
+			_view.AllowUserResizing = false; // seems to be the default
+			
+			// default update rate
+			_targetElapsedTime = TimeSpan.FromSeconds (1.0D / FramesPerSecond);
+			
 			// Initialize GameTime
 			_updateGameTime = new GameTime ();
 			_drawGameTime = new GameTime ();  
 
-		}
-
-		void Handle_gameComponentCollectionComponentAdded (object sender, GameComponentCollectionEventArgs e)
-		{
-			if (!_initialized && !_initializing) {
-				//_gameComponentsToInitialize.Add(e.GameComponent);
-				e.GameComponent.Initialize();
-			}
-			else {
-				e.GameComponent.Initialize();
-				//_gameComponentsToInitialize.Add(e.GameComponent);
-			}					
-		}
+		}		
 
 		~Game ()
 		{
-			// TODO NSDevice.CurrentDevice.EndGeneratingDeviceOrientationNotifications(); 
+		}
+		
+		#endregion
+
+		#region Private/Internal Properties
+		
+		private GraphicsDeviceManager graphicsDeviceManager {
+			get {
+				if (this._graphicsDeviceManager == null) {
+					this._graphicsDeviceManager = this.Services.GetService (typeof(IGraphicsDeviceManager)) as IGraphicsDeviceManager;
+					if (this._graphicsDeviceManager == null) {
+						throw new InvalidOperationException ("No Graphics Device Manager");
+					}
+				}
+				return (GraphicsDeviceManager)this._graphicsDeviceManager;
+			}
+		}
+		
+		#endregion
+		
+		#region Public Properties
+		
+		public bool IsFixedTimeStep {
+			get {
+				return _isFixedTimeStep;
+			}
+			set {
+				_isFixedTimeStep = value;
+			}
 		}
 
-		public void Dispose ()
-		{
-			// do nothing
+		public GameWindow Window {
+			get {
+				return _view;
+			}
+		}
+		
+		public GameServiceContainer Services {
+			get {
+				return _services;
+			}
 		}
 
+		public ContentManager Content {
+			get {
+				if (_content == null) {
+					_content = new ContentManager (_services);
+				}
+				return _content;
+			}
+		}		
+		
+		public GraphicsDevice GraphicsDevice {
+			get {
+				if (this.graphicsDeviceService == null) {
+					this.graphicsDeviceService = this.Services.GetService (typeof(IGraphicsDeviceService)) as IGraphicsDeviceService;
+					if (this.graphicsDeviceService == null) {
+						throw new InvalidOperationException ("No Graphics Device Service");
+					}
+				}
+				return this.graphicsDeviceService.GraphicsDevice;
+			}
+		}		
+		
 		public bool IsActive {
 			get {
 				return _isActive;
@@ -134,9 +181,9 @@ namespace Microsoft.Xna.Framework
 			}
 			set {
 				_mouseVisible = value;
-				if (_mouseVisible) {
-					//NSCursor.Unhide();
-				}
+
+				// TODO: implement this when available on opentk
+				
 			}
 		}
 
@@ -147,45 +194,81 @@ namespace Microsoft.Xna.Framework
 			set {
 				_targetElapsedTime = value;			
 				if (_initialized) {
-					throw new NotSupportedException ();
+					_view.Window.TargetUpdateFrequency = value.TotalSeconds;
 				}
 			}
+		}
+		
+		public GameComponentCollection Components {
+			get {
+				return _gameComponentCollection;
+			}
+		}
+		
+		#endregion		
+				
+		#region Public Methods
+		
+		public void Dispose ()
+		{
+			_view.Dispose();
+		}
+		
+		public void Exit ()
+		{	 
+			if (!_view.Window.IsExiting)
+            {
+                // raise the Exiting event
+            	if (Exiting != null) Exiting(this, null);                
+                Net.NetworkSession.Exit();
+                _view.Window.Exit();
+            }			
+		}
+
+		public void ResetElapsedTime ()
+		{
+			_lastUpdate = DateTime.Now;
+		}		
+
+		public void EnterBackground ()
+		{
+			_isActive = false;
+			if (Deactivated != null)
+				Deactivated.Invoke (this, null);
+		}
+
+		public void EnterForeground ()
+		{
+			_isActive = true;
+			if (Activated != null)
+				Activated.Invoke (this, null);
 		}
 
 		public void Run ()
 		{			
 			_lastUpdate = DateTime.Now;
 
-			Initialize ();
+			Initialize ();			
 			
-//            //Need to execute this on the rendering thread
-//            _view.GameWindow.RenderFrame += delegate
-//            {
-//                if (!_devicesLoaded)
-//                {
-//                    Initialize();
-//                    _devicesLoaded = true;
-//                }
-//            };
-			
-            _view.Run(FramesPerSecond / (FramesPerSecond * TargetElapsedTime.TotalSeconds));
-			
-			//_view.Run();
-			/*TODO _view.MainContext = _view.EAGLContext;
-			_view.ShareGroup = _view.MainContext.ShareGroup;
-			_view.BackgroundContext = new MonoTouch.OpenGLES.EAGLContext(_view.ContextRenderingApi, _view.ShareGroup); */
-
-			//Show the window			
-			//_mainWindow.MakeKeyWindow ();	
-
-			// Get the Accelerometer going
-			// TODO Accelerometer.SetupAccelerometer();			
-
-
-			// Listen out for rotation changes
-			// TODO ObserveDeviceRotation();
+            _view.Run(1.0f /  TargetElapsedTime.TotalSeconds);			
 		}
+		
+		#endregion
+		
+		#region Private / Internal Method
 
+		private void Handle_gameComponentCollectionComponentAdded (object sender, GameComponentCollectionEventArgs e)
+		{
+			if (!_initialized && !_initializing) {
+				//_gameComponentsToInitialize.Add(e.GameComponent);
+				e.GameComponent.Initialize();
+			}
+			else {
+				e.GameComponent.Initialize();
+				//_gameComponentsToInitialize.Add(e.GameComponent);
+			}					
+		}
+		
 		internal void DoUpdate (GameTime aGameTime)
 		{
 			if (_isActive) {
@@ -212,80 +295,7 @@ namespace Microsoft.Xna.Framework
 			_drawGameTime.Update (timeNow - _lastUpdate);
 			_lastUpdate = timeNow;
 			Draw (_drawGameTime);       			
-		}
-
-		public bool IsFixedTimeStep {
-			get {
-				return _isFixedTimeStep;
-			}
-			set {
-				_isFixedTimeStep = value;
-			}
-		}
-
-		public GameWindow Window {
-			get {
-				return _view;
-			}
-		}
-
-		public void ResetElapsedTime ()
-		{
-			_lastUpdate = DateTime.Now;
-		}
-
-		public GameServiceContainer Services {
-			get {
-				return _services;
-			}
-		}
-
-		public ContentManager Content {
-			get {
-				if (_content == null) {
-					_content = new ContentManager (_services);
-				}
-				return _content;
-			}
-		}
-
-		private GraphicsDeviceManager graphicsDeviceManager {
-			get {
-				if (this._graphicsDeviceManager == null) {
-					this._graphicsDeviceManager = this.Services.GetService (typeof(IGraphicsDeviceManager)) as IGraphicsDeviceManager;
-					if (this._graphicsDeviceManager == null) {
-						throw new InvalidOperationException ("No Graphics Device Manager");
-					}
-				}
-				return (GraphicsDeviceManager)this._graphicsDeviceManager;
-			}
-		}
-		
-		public GraphicsDevice GraphicsDevice {
-			get {
-				if (this.graphicsDeviceService == null) {
-					this.graphicsDeviceService = this.Services.GetService (typeof(IGraphicsDeviceService)) as IGraphicsDeviceService;
-					if (this.graphicsDeviceService == null) {
-						throw new InvalidOperationException ("No Graphics Device Service");
-					}
-				}
-				return this.graphicsDeviceService.GraphicsDevice;
-			}
-		}
-
-		public void EnterBackground ()
-		{
-			_isActive = false;
-			if (Deactivated != null)
-				Deactivated.Invoke (this, null);
-		}
-
-		public void EnterForeground ()
-		{
-			_isActive = true;
-			if (Activated != null)
-				Activated.Invoke (this, null);
-		}
+		}		
 
 		protected virtual bool BeginDraw ()
 		{
@@ -326,109 +336,42 @@ namespace Microsoft.Xna.Framework
 			// do nothing
 		}
 
-		private void ResetWindowBounds ()
+		private void ResetWindowBounds (bool toggleFullScreen)
 		{
-//			RectangleF frame;
-//			RectangleF content;
-//			
-//			if (graphicsDeviceManager.IsFullScreen) {
-//				frame = NSScreen.MainScreen.Frame;
-//				content = NSScreen.MainScreen.Frame;
-//			} else {
-//				content = _view.Bounds;
-//				content.Width = Math.Min(
-//				                    graphicsDeviceManager.PreferredBackBufferWidth,
-//				                    NSScreen.MainScreen.VisibleFrame.Width);
-//				content.Height = Math.Min(
-//				                    graphicsDeviceManager.PreferredBackBufferHeight,
-//				                    NSScreen.MainScreen.VisibleFrame.Height-TitleBarHeight());
-//				
-//				frame = _mainWindow.Frame;
-//				frame.X = Math.Max(frame.X, NSScreen.MainScreen.VisibleFrame.X);
-//				frame.Y = Math.Max(frame.Y, NSScreen.MainScreen.VisibleFrame.Y);
-//				frame.Width = content.Width;
-//				frame.Height = content.Height + TitleBarHeight();
-//			}
-//			
-//			
-//			_view.Bounds = content;
-//			_view.Size = content.Size.ToSize();			
-			
-			Rectangle bounds;			
+			Rectangle bounds;
 
-			bounds = new Rectangle(_view.ClientBounds.X, _view.ClientBounds.X, 
-			                      	OpenTK.DisplayDevice.Default.Width,
-                                	OpenTK.DisplayDevice.Default.Height);			
-			
-			if (graphicsDeviceManager.IsFullScreen)
-			{
-				_view.ToggleFullScreen();
-			}
-			else
-			{
-				bounds.Width = Math.Min(bounds.Width, graphicsDeviceManager.PreferredBackBufferWidth);
-				bounds.Height = Math.Min(bounds.Height, graphicsDeviceManager.PreferredBackBufferHeight);
-
-				_view.ChangeClientBounds(bounds);
-			}
-		}
-
-		internal void GoWindowed ()
-		{
+			bounds = _view.ClientBounds;
 			
 			//Changing window style forces a redraw. Some games
 			//have fail-logic and toggle fullscreen in their draw function,
 			//so temporarily become inactive so it won't execute.
+			
 			bool wasActive = IsActive;
 			IsActive = false;
 			
-			//Changing window style resets the title. Save it.
-			string oldTitle = _view.Title;
-						
-//			NSMenu.MenuBarVisible = true;
-//			_mainWindow.StyleMask = NSWindowStyle.Titled | NSWindowStyle.Closable;
-//			if (_wasResizeable) _mainWindow.StyleMask |= NSWindowStyle.Resizable;
-//			_mainWindow.HidesOnDeactivate = false;
-
-			ResetWindowBounds();
+			if (graphicsDeviceManager.IsFullScreen)
+			{
+				bounds = new Rectangle(0, 0,
+				                       OpenTK.DisplayDevice.Default.Width,
+						               OpenTK.DisplayDevice.Default.Height);
+			}
+			else
+			{
+				bounds.Width = graphicsDeviceManager.PreferredBackBufferWidth;
+				bounds.Height = graphicsDeviceManager.PreferredBackBufferHeight;				
+			}
 			
-			if (oldTitle != null)
-				_view.Title = oldTitle;
+			if (toggleFullScreen)
+				_view.ToggleFullScreen();
+			
+			_view.ChangeClientBounds(bounds);
 			
 			IsActive = wasActive;
 		}
 		
-		internal void GoFullScreen ()
+		internal void ResizeWindow(bool toggleFullScreen)
 		{
-			// TODO do it right
-//			
-//			bool wasActive = IsActive;
-//			IsActive = false;
-//			
-//			//Some games set fullscreen in their initialize function,
-//			//before we have sized the window and set it active.
-//			//Do that now, or else mouse tracking breaks.
-//			_mainWindow.MakeKeyAndOrderFront(_mainWindow);
-//			ResetWindowBounds();
-//			
-//			_wasResizeable = IsAllowUserResizing;
-//			
-//			string oldTitle = _view.Title;
-//			
-//			NSMenu.MenuBarVisible = false;
-//			_mainWindow.StyleMask = NSWindowStyle.Borderless;
-//			_mainWindow.HidesOnDeactivate = true;
-//			
-//			ResetWindowBounds();
-//			
-//			if (oldTitle != null)
-//				_view.Title = oldTitle;
-//			
-//			if (!IsMouseVisible) {
-//				NSCursor.Hide();
-//			}
-//			
-//			IsActive = wasActive;
+			ResetWindowBounds(toggleFullScreen);	
 		}
 		
 		protected virtual void Initialize ()
@@ -436,7 +379,7 @@ namespace Microsoft.Xna.Framework
 
 			this.graphicsDeviceService = this.Services.GetService (typeof(IGraphicsDeviceService)) as IGraphicsDeviceService;			
 			
-			ResetWindowBounds();
+			ResetWindowBounds(false);
 			
 			if ((this.graphicsDeviceService != null) && (this.graphicsDeviceService.GraphicsDevice != null)) {
 				LoadContent ();
@@ -445,29 +388,6 @@ namespace Microsoft.Xna.Framework
 
 		private void InitializeGameComponents ()
 		{
-//			// There is no autorelease pool when this method is called because it will be called from a background thread
-//			// It's important to create one or you will leak objects
-//			using (NSAutoreleasePool pool = new NSAutoreleasePool ()) {
-//				
-//				// Leave the following code there just in case there are problems
-//				// with the intialization hack.
-//				//foreach (GameComponent gc in _gameComponentCollection) {
-//				foreach (IGameComponent gc in _gameComponentsToInitialize) {
-//					// We may be drawing on a secondary thread through the display link or timer thread.
-//					// Add a mutex around to avoid the threads accessing the context simultaneously
-//					_view.OpenGLContext.CGLContext.Lock ();
-//
-//					// set our current context
-//					_view.MakeCurrent ();
-//
-//					gc.Initialize ();
-//
-//					// now unlock it
-//					_view.OpenGLContext.CGLContext.Unlock ();
-//					_gameComponentsToInitialize.Remove(gc);
-//				}
-//			}	
-			
 			foreach (GameComponent gc in _gameComponentCollection)
             {
                 gc.Initialize();
@@ -540,33 +460,7 @@ namespace Microsoft.Xna.Framework
 				}
 			}
 		}
-
-		public void Exit ()
-		{
-//			using ( NSAlert alert = NSAlert.WithMessage("Game Exit", "Ok", "Cancel", null, "Are you sure you wish to exit?"))
-//			{
-//				var button = alert.RunModal();
-//				
-//				if ( button == 1 )
-//				{
-//					NSApplication.SharedApplication.Terminate(new NSObject());		
-//				}
-//			}
-			 
-			if (!_view.Window.IsExiting)
-            {
-                // raise the Exiting event
-            	if (Exiting != null) Exiting(this, null);                
-                Net.NetworkSession.Exit();
-                _view.Window.Exit();
-            }			
-		}
-
-		public GameComponentCollection Components {
-			get {
-				return _gameComponentCollection;
-			}
-		}
+		#endregion
 
 		#region Events
 		public event EventHandler Activated;
