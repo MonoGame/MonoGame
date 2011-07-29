@@ -14,8 +14,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		SamplerState _samplerState;
 		DepthStencilState _depthStencilState; 
 		RasterizerState _rasterizerState;		
-		Effect _effect;	
-		SpriteEffect spriteEffect;
+		Effect _effect;
 		Matrix _matrix;
 		Rectangle tempRect = new Rectangle (0,0,0,0);
 		Vector2 texCoordTL = new Vector2 (0,0);
@@ -28,7 +27,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			}	
 
 			this.graphicsDevice = graphicsDevice;
-			spriteEffect = new SpriteEffect (this.graphicsDevice);	
+			//spriteEffect = new SpriteEffect (this.graphicsDevice);	
 			_batcher = new SpriteBatcher ();
 		}
 
@@ -47,7 +46,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			_depthStencilState = depthStencilState ?? DepthStencilState.None;
 			_rasterizerState = rasterizerState ?? RasterizerState.CullCounterClockwise;
 
-			//if (effect != null)
+			if (effect != null)
 				_effect = effect;
 
 			_matrix = transformMatrix;
@@ -183,7 +182,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			// clear out the textures
 			graphicsDevice.Textures._textures.Clear ();
 
-			spriteEffect.CurrentTechnique.Passes [0].Apply ();
+			if (_effect != null)
+				_effect.CurrentTechnique.Passes [0].Apply ();
 		}
 
 		public void Draw (Texture2D texture,
