@@ -28,8 +28,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			}	
 
 			this.graphicsDevice = graphicsDevice;
-			// TODO see what's going on here
-			//spriteEffect = new SpriteEffect (this.graphicsDevice);	
+			spriteEffect = new SpriteEffect (this.graphicsDevice);	
 			_batcher = new SpriteBatcher ();
 		}
 
@@ -180,12 +179,11 @@ namespace Microsoft.Xna.Framework.Graphics
 			GL.Color4 (1.0f, 1.0f, 1.0f, 1.0f);			
 			
 			_batcher.DrawBatch (_sortMode);
-			//GL.UseProgram(0);
+
 			// clear out the textures
 			graphicsDevice.Textures._textures.Clear ();
 
-			// TODO uncomment and debug
-			//spriteEffect.CurrentTechnique.Passes [0].Apply ();
+			spriteEffect.CurrentTechnique.Passes [0].Apply ();
 		}
 
 		public void Draw (Texture2D texture,

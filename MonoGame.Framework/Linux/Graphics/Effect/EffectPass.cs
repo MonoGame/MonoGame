@@ -40,16 +40,23 @@ namespace Microsoft.Xna.Framework.Graphics
 			if ( FragmentIndex < _technique._effect.fragmentShaders.Count)			
 				GL.AttachShader (shaderProgram, _technique._effect.fragmentShaders[FragmentIndex]);
 			
-			
+			// TODO GL.ProgramParameter gives no entry point exception
+			// this issue is reported here http://www.opentk.com/node/1637
+			// I've replaced GL.ProgramParameter for GL.Arb.ProgramParameter
+			// I don't know how critical is this, this will need review latter
 			
 			// Set the parameters
-			GL.ProgramParameter (shaderProgram, Version32.GeometryInputType, (int)All.Lines);	
-			GL.ProgramParameter (shaderProgram, Version32.GeometryOutputType, (int)All.Line);
+//			GL.ProgramParameter (shaderProgram, Version32.GeometryInputType, (int)All.Lines);	
+//			GL.ProgramParameter (shaderProgram, Version32.GeometryOutputType, (int)All.Line);
+			
+			GL.Arb.ProgramParameter (shaderProgram, ArbGeometryShader4.GeometryInputTypeArb, (int)All.Lines);	
+			GL.Arb.ProgramParameter (shaderProgram, ArbGeometryShader4.GeometryOutputTypeArb, (int)All.Line);
 			
 			// Set the max vertices
 			int maxVertices;
 			GL.GetInteger (GetPName.MaxGeometryOutputVertices, out maxVertices);
-			GL.ProgramParameter (shaderProgram, Version32.GeometryVerticesOut, maxVertices);
+			//GL.ProgramParameter (shaderProgram, Version32.GeometryVerticesOut, maxVertices);
+			GL.Arb.ProgramParameter (shaderProgram, ArbGeometryShader4.GeometryVerticesOutArb, maxVertices);
 
 			// Link the program
 			GL.LinkProgram (shaderProgram);
