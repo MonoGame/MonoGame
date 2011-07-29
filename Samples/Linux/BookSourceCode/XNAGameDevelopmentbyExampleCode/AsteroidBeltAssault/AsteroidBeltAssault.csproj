@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>10.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{1585306B-CF46-479D-B234-1E10EDF4D741}</ProjectGuid>
+    <ProjectTypeGuids>{1C533B1C-72DD-4CB1-9F6B-BF11D93BCFBE};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>AsteroidBeltAssault</RootNamespace>
+    <AssemblyName>AsteroidBeltAssault</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="MonoMac">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Info.plist" />
+    <None Include="Game.ico" />
+    <None Include="GameThumbnail.png" />
+    <None Include="README.md" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath)\Mono\MonoMac\v0.0\Mono.MonoMac.targets" />
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\ThirdParty\Lidgren.Network\Lidgren.Network.csproj">
+      <Project>{AE483C29-042E-4226-BA52-D247CE7676DA}</Project>
+      <Name>Lidgren.Network</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\MonoGame.Framework\MonoGame.Framework.MacOS.csproj">
+      <Project>{36C538E6-C32A-4A8D-A39C-566173D7118E}</Project>
+      <Name>MonoGame.Framework.MacOS</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Content\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Content\Fonts\Pericles14.xnb" />
+    <Content Include="Content\Sounds\Explosion1.xnb" />
+    <Content Include="Content\Sounds\Explosion2.xnb" />
+    <Content Include="Content\Sounds\Explosion3.xnb" />
+    <Content Include="Content\Sounds\Explosion4.xnb" />
+    <Content Include="Content\Sounds\Shot1.xnb" />
+    <Content Include="Content\Sounds\Shot2.xnb" />
+    <Content Include="Content\Textures\SpriteSheet.xnb" />
+    <Content Include="Content\Textures\TitleScreen.xnb" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AsteroidManager.cs" />
+    <Compile Include="CollisionManager.cs" />
+    <Compile Include="Enemy.cs" />
+    <Compile Include="EnemyManager.cs" />
+    <Compile Include="ExplosionManager.cs" />
+    <Compile Include="Game1.cs" />
+    <Compile Include="Particle.cs" />
+    <Compile Include="PlayerManager.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="ShotManager.cs" />
+    <Compile Include="SoundManager.cs" />
+    <Compile Include="Sprite.cs" />
+    <Compile Include="StarField.cs" />
+  </ItemGroup>
+</Project>
