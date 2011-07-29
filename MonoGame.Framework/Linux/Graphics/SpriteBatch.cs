@@ -120,44 +120,44 @@ namespace Microsoft.Xna.Framework.Graphics
 			GL.MatrixMode (MatrixMode.Projection);
 			GL.LoadIdentity ();		
 
+			Viewport vp = this.graphicsDevice.Viewport;
+			
 			// Switch on the flags.
 			switch (this.graphicsDevice.PresentationParameters.DisplayOrientation) {
 			case DisplayOrientation.LandscapeLeft:
 				{
-					GL.Rotate (-90, 0, 0, 1); 
-					GL.Ortho (0, this.graphicsDevice.Viewport.Height, this.graphicsDevice.Viewport.Width, 0, -1, 1);
+					GL.Rotate (-90, 0, 0, 1); 					
 					break;
 				}
 
 			case DisplayOrientation.LandscapeRight:
 				{
 					GL.Rotate (90, 0, 0, 1); 
-					GL.Ortho (0, this.graphicsDevice.Viewport.Height, this.graphicsDevice.Viewport.Width, 0, -1, 1);
 					break;
 				}
 
 			case DisplayOrientation.PortraitUpsideDown:
 				{
 					GL.Rotate (180, 0, 0, 1); 
-					GL.Ortho (0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height, 0, -1, 1);
 					break;
 				}
 
 			default:
-				{
-					GL.Ortho (0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height, 0, -1, 1);
+				{					
 					break;
 				}
 			}
+			
+			GL.Ortho (0, vp.Width, vp.Height, 0, -1, 1);
 			
 			// Enable Scissor Tests if necessary
 			if (this.graphicsDevice.RenderState.ScissorTestEnable) {
 				GL.Enable (EnableCap.ScissorTest);				
 			}
 
-			GL.MatrixMode (MatrixMode.Modelview);
-
-			GL.Viewport (0, 0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height);
+			GL.MatrixMode (MatrixMode.Modelview);			
+			
+			GL.Viewport (vp.X, vp.Y, vp.Width, vp.Height);
 
 			// Enable Scissor Tests if necessary
 			if (this.graphicsDevice.RenderState.ScissorTestEnable) {
