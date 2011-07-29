@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Samples.Draw2D.Lin
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Samples.Tetris.Linux", "Samples\Linux\Tetris\MonoGame.Samples.Tetris.Linux.csproj", "{86A619E2-C8F0-452B-B762-C69D5BB07C98}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Samples.Input.Linux", "Samples\Linux\Input\MonoGame.Samples.Input.Linux.csproj", "{8CFEF1FE-9E32-43EB-A730-EB3AACDC77B1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Samples.Input.Linux", "Samples\Linux\Input\MonoGame.Samples.Input.Linux.csproj", "{8CFEF1FE-5E32-43EB-A730-EB3AACDC77B1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,13 +25,13 @@ Global
 		{86A619E2-C8F0-452B-B762-C69D5BB07C98}.Debug|x86.Build.0 = Debug|x86
 		{86A619E2-C8F0-452B-B762-C69D5BB07C98}.Release|x86.ActiveCfg = Release|x86
 		{86A619E2-C8F0-452B-B762-C69D5BB07C98}.Release|x86.Build.0 = Release|x86
-		{8CFEF1FE-9E32-43EB-A730-EB3AACDC77B1}.Debug|x86.ActiveCfg = Debug|x86
+		{8CFEF1FE-5E32-43EB-A730-EB3AACDC77B1}.Debug|x86.ActiveCfg = Debug|x86
+		{8CFEF1FE-5E32-43EB-A730-EB3AACDC77B1}.Debug|x86.Build.0 = Debug|x86
+		{8CFEF1FE-5E32-43EB-A730-EB3AACDC77B1}.Release|x86.ActiveCfg = Release|x86
+		{8CFEF1FE-5E32-43EB-A730-EB3AACDC77B1}.Release|x86.Build.0 = Release|x86
 		{8CFEF1FE-9E32-43EB-A730-EB3AACDC77B1}.Debug|x86.ActiveCfg = Debug|x86
 		{8CFEF1FE-9E32-43EB-A730-EB3AACDC77B1}.Debug|x86.Build.0 = Debug|x86
-		{8CFEF1FE-9E32-43EB-A730-EB3AACDC77B1}.Debug|x86.Build.0 = Debug|x86
 		{8CFEF1FE-9E32-43EB-A730-EB3AACDC77B1}.Release|x86.ActiveCfg = Release|x86
-		{8CFEF1FE-9E32-43EB-A730-EB3AACDC77B1}.Release|x86.ActiveCfg = Release|x86
-		{8CFEF1FE-9E32-43EB-A730-EB3AACDC77B1}.Release|x86.Build.0 = Release|x86
 		{8CFEF1FE-9E32-43EB-A730-EB3AACDC77B1}.Release|x86.Build.0 = Release|x86
 		{AE483C29-042E-4226-BA52-D247CE7676DA}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{AE483C29-042E-4226-BA52-D247CE7676DA}.Debug|x86.Build.0 = Debug|Any CPU
@@ -39,6 +39,6 @@ Global
 		{AE483C29-042E-4226-BA52-D247CE7676DA}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = Samples\Linux\Tetris\MonoGame.Samples.Tetris.Linux.csproj
+		StartupItem = Samples\Linux\Input\MonoGame.Samples.Input.Linux.csproj
 	EndGlobalSection
 EndGlobal

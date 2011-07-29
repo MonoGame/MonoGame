@@ -118,17 +118,10 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		internal void SizeChanged(int width, int height)
         {
-            // Initialize the main viewport
-            _viewport = new Viewport();
             _viewport.X = 0;
             _viewport.Y = 0;
             _viewport.Width = width;
             _viewport.Height = height;
-
-            if (PresentationParameters != null) {
-                PresentationParameters.BackBufferWidth = width;
-                PresentationParameters.BackBufferHeight = height;
-            }
         }
 
 		public BlendState BlendState {
