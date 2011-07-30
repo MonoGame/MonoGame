@@ -15,9 +15,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Samples.TiledSprit
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Samples.ChaseAndEvade.Linux", "Samples\Linux\ChaseAndEvade\MonoGame.Samples.ChaseAndEvade.Linux.csproj", "{86A619E2-C8F0-452B-B764-C69D5BB07C98}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Samples.SpriteEffects.Linux", "Samples\Linux\SpriteEffects\MonoGame.Samples.SpriteEffects.Linux.csproj", "{86A619E2-C8F0-452B-B762-C69D5BB07C98}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Samples.Peer2PeerSample.Linux", "Samples\Linux\Peer2PeerSample\MonoGame.Samples.Peer2PeerSample.Linux.csproj", "{86A619E2-C8D0-452B-B762-C69D5BB07C98}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Samples.SpriteEffects.Linux", "Samples\Linux\SpriteEffects\MonoGame.Samples.SpriteEffects.Linux.csproj", "{86A919E2-D7F0-452B-B762-C69D5BB07C98}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -38,17 +38,17 @@ Global
 		{86A619E2-C8F0-452B-A762-C69D5BB07C98}.Release|x86.ActiveCfg = Release|x86
 		{86A619E2-C8F0-452B-A762-C69D5BB07C98}.Release|x86.Build.0 = Release|x86
 		{86A619E2-C8F0-452B-B762-C69D5BB07C98}.Debug|x86.ActiveCfg = Debug|x86
-		{86A619E2-C8F0-452B-B762-C69D5BB07C98}.Debug|x86.ActiveCfg = Debug|x86
-		{86A619E2-C8F0-452B-B762-C69D5BB07C98}.Debug|x86.Build.0 = Debug|x86
 		{86A619E2-C8F0-452B-B762-C69D5BB07C98}.Debug|x86.Build.0 = Debug|x86
 		{86A619E2-C8F0-452B-B762-C69D5BB07C98}.Release|x86.ActiveCfg = Release|x86
-		{86A619E2-C8F0-452B-B762-C69D5BB07C98}.Release|x86.ActiveCfg = Release|x86
-		{86A619E2-C8F0-452B-B762-C69D5BB07C98}.Release|x86.Build.0 = Release|x86
 		{86A619E2-C8F0-452B-B762-C69D5BB07C98}.Release|x86.Build.0 = Release|x86
 		{86A619E2-C8F0-452B-B764-C69D5BB07C98}.Debug|x86.ActiveCfg = Debug|x86
 		{86A619E2-C8F0-452B-B764-C69D5BB07C98}.Debug|x86.Build.0 = Debug|x86
 		{86A619E2-C8F0-452B-B764-C69D5BB07C98}.Release|x86.ActiveCfg = Release|x86
 		{86A619E2-C8F0-452B-B764-C69D5BB07C98}.Release|x86.Build.0 = Release|x86
+		{86A919E2-D7F0-452B-B762-C69D5BB07C98}.Debug|x86.ActiveCfg = Debug|x86
+		{86A919E2-D7F0-452B-B762-C69D5BB07C98}.Debug|x86.Build.0 = Debug|x86
+		{86A919E2-D7F0-452B-B762-C69D5BB07C98}.Release|x86.ActiveCfg = Release|x86
+		{86A919E2-D7F0-452B-B762-C69D5BB07C98}.Release|x86.Build.0 = Release|x86
 		{8CFEF1FE-5E32-43EB-A730-EB3AACDC77B1}.Debug|x86.ActiveCfg = Debug|x86
 		{8CFEF1FE-5E32-43EB-A730-EB3AACDC77B1}.Debug|x86.Build.0 = Debug|x86
 		{8CFEF1FE-5E32-43EB-A730-EB3AACDC77B1}.Release|x86.ActiveCfg = Release|x86
@@ -63,6 +63,6 @@ Global
 		{AE483C29-042E-4226-BA52-D247CE7676DA}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = Samples\Linux\Draw2D\MonoGame.Samples.Draw2D.Linux.csproj
+		StartupItem = Samples\Linux\Peer2PeerSample\MonoGame.Samples.Peer2PeerSample.Linux.csproj
 	EndGlobalSection
 EndGlobal
