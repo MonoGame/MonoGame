@@ -150,7 +150,7 @@ namespace Microsoft.Xna.Framework.Net
 			int count,
 			SendDataOptions options)
 		{
-			CommandEvent cme = new CommandEvent(new CommandSendData(data, offset, count, options, null ));
+			CommandEvent cme = new CommandEvent(new CommandSendData(data, offset, count, options, null, this ));
 			Session.commandQueue.Enqueue(cme);
 		}
 
@@ -161,7 +161,7 @@ namespace Microsoft.Xna.Framework.Net
 			SendDataOptions options,
 			NetworkGamer recipient)
 		{
-			CommandEvent cme = new CommandEvent(new CommandSendData(data, offset, count, options, recipient ));
+			CommandEvent cme = new CommandEvent(new CommandSendData(data, offset, count, options, recipient,this ));
 			Session.commandQueue.Enqueue(cme);
 		}
 
@@ -169,7 +169,7 @@ namespace Microsoft.Xna.Framework.Net
 			byte[] data,
 			SendDataOptions options)
 		{
-			CommandEvent cme = new CommandEvent(new CommandSendData(data, 0, data.Length, options, null ));
+			CommandEvent cme = new CommandEvent(new CommandSendData(data, 0, data.Length, options, null, this ));
 			Session.commandQueue.Enqueue(cme);
 		}
 
@@ -178,7 +178,7 @@ namespace Microsoft.Xna.Framework.Net
 			SendDataOptions options,
 			NetworkGamer recipient)
 		{
-			CommandEvent cme = new CommandEvent(new CommandSendData(data, 0, data.Length, options, recipient ));
+			CommandEvent cme = new CommandEvent(new CommandSendData(data, 0, data.Length, options, recipient, this ));
 			Session.commandQueue.Enqueue(cme);
 		}
 
