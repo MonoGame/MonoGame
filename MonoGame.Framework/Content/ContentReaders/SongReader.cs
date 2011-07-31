@@ -60,7 +60,6 @@ namespace Microsoft.Xna.Framework
 			// Concat the file name with valid extensions
 			if (File.Exists(FileName+".mp3"))
 				return FileName+".mp3";
-			
 			return null;
 		}
 	}

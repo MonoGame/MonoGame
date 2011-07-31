@@ -149,6 +149,9 @@ namespace Microsoft.Xna.Framework.Audio
             {
 				return _name;
             }
+			set {
+				_name = value;
+			}
         }
 		
 		public SoundEffectInstance CreateInstance ()
