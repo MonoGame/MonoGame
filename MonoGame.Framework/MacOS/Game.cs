@@ -117,9 +117,9 @@ namespace Microsoft.Xna.Framework
 
 		void Handle_gameComponentCollectionComponentAdded (object sender, GameComponentCollectionEventArgs e)
 		{
+
 			if (!_initialized && !_initializing) {
-				//_gameComponentsToInitialize.Add(e.GameComponent);
-				e.GameComponent.Initialize();
+				//e.GameComponent.Initialize();
 			}
 			else {
 				e.GameComponent.Initialize();
@@ -264,30 +264,45 @@ namespace Microsoft.Xna.Framework
 				}
 			}
 		}
-
+		
+		// This method calls the game Initialize and BeginRun methods before it begins the game loop and starts 
+		// processing events for the game.
 		public void Run ()
 		{			
 			_lastUpdate = DateTime.Now;
 
+			// In an original XNA game the GraphicsDevice property is null during initialization
+			// but before the Game's Initialize method is called the property is available so we can
+			// only assume that it should be created somewhere in here.  We can not set the viewport 
+			// values correctly based on the Preferred settings which is causing some problems on some
+			// Microsoft samples which we are not handling correctly.
+			graphicsDeviceManager.CreateDevice();
+			
+			var manager = Services.GetService (typeof(IGraphicsDeviceManager)) as GraphicsDeviceManager;
+			
+			Microsoft.Xna.Framework.Graphics.Viewport _vp =
+			new Microsoft.Xna.Framework.Graphics.Viewport();
+				
+			_vp.X = 0;
+			_vp.Y = 0;
+			_vp.Width = manager.PreferredBackBufferWidth;
+			_vp.Height = manager.PreferredBackBufferHeight;
+			
+			GraphicsDevice.Viewport = _vp;
+			
+			// Moving the GraphicsDevice creation to here also modifies when GameComponents are being
+			// initialized.
+			foreach (IGameComponent component in _gameComponentCollection) {
+				component.Initialize();
+			}
+			
 			Initialize ();
 
 			_mainWindow.MakeKeyAndOrderFront (_mainWindow);
+						_mainWindow.ContentView.AddSubview (_view);
+			_mainWindow.AcceptsMouseMovedEvents = false;
 
 			_view.Run (FramesPerSecond / (FramesPerSecond * TargetElapsedTime.TotalSeconds));
-			//_view.Run();
-			/*TODO _view.MainContext = _view.EAGLContext;
-			_view.ShareGroup = _view.MainContext.ShareGroup;
-			_view.BackgroundContext = new MonoTouch.OpenGLES.EAGLContext(_view.ContextRenderingApi, _view.ShareGroup); */
-
-			//Show the window			
-			//_mainWindow.MakeKeyWindow ();	
-
-			// Get the Accelerometer going
-			// TODO Accelerometer.SetupAccelerometer();			
-
-
-			// Listen out for rotation changes
-			// TODO ObserveDeviceRotation();
 		}
 
 		internal void DoUpdate (GameTime aGameTime)
@@ -462,7 +477,8 @@ namespace Microsoft.Xna.Framework
 			_mainWindow.SetFrame (frame, true);
 			
 			_view.Bounds = content;
-			_view.Size = content.Size.ToSize();				
+			_view.Size = content.Size.ToSize();
+				
 		}
 
 		internal void GoWindowed ()

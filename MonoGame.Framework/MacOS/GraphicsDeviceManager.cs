@@ -63,6 +63,8 @@ namespace Microsoft.Xna.Framework
 			_game = game;
 
 			_supportedOrientations = DisplayOrientation.Default;
+			_preferredBackBufferHeight = PresentationParameters._defaultBackBufferHeight;
+			_preferredBackBufferWidth = PresentationParameters._defaultBackBufferWidth;			
 
 			if (game.Services.GetService (typeof(IGraphicsDeviceManager)) != null) {
 				throw new ArgumentException ("Graphics Device Manager Already Present");
@@ -71,7 +73,6 @@ namespace Microsoft.Xna.Framework
 			game.Services.AddService (typeof(IGraphicsDeviceManager), this);
 			game.Services.AddService (typeof(IGraphicsDeviceService), this);	
 
-			CreateDevice();
 		}
 
 		public void CreateDevice ()
@@ -79,8 +80,8 @@ namespace Microsoft.Xna.Framework
 			_graphicsDevice = new GraphicsDevice ();
 			_graphicsDevice.PresentationParameters = new PresentationParameters ();
 
-			_preferredBackBufferHeight = _graphicsDevice.PresentationParameters.BackBufferHeight;
-			_preferredBackBufferWidth = _graphicsDevice.PresentationParameters.BackBufferWidth;
+//			_preferredBackBufferHeight = _graphicsDevice.PresentationParameters.BackBufferHeight;
+//			_preferredBackBufferWidth = _graphicsDevice.PresentationParameters.BackBufferWidth;
 			
 			Initialize();
 			
