@@ -703,6 +703,7 @@ namespace Microsoft.Xna.Framework.Net
 			NetworkGamer sender;
 			CommandReceiveData crd = new CommandReceiveData (command.sender.RemoteUniqueIdentifier,
 								command.data);
+			crd.gamer = command.sender;
 			foreach(LocalNetworkGamer gamer in _localGamers) {
 				gamer.receivedData.Enqueue(crd);
 			}
