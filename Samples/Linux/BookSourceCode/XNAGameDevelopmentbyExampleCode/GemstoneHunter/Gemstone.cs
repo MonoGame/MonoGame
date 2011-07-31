@@ -22,7 +22,7 @@ namespace Gemstone_Hunter
 
             animations.Add("idle",
                 new AnimationStrip(
-                    Content.Load<Texture2D>(@"Textures\Gem"),
+                    Content.Load<Texture2D>(@"Textures/Gem"),
                     48,
                     "idle"));
 

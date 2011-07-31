@@ -1,12 +1,9 @@
 using System;
 
-using MonoMac.Foundation;
-using MonoMac.AppKit;
-using MonoMac.ObjCRuntime;
 
 namespace Robot_Rampage
 {
-#if WINDOWS || XBOX
+#if WINDOWS || XBOX || LINUX
     static class Program
     {
         /// <summary>

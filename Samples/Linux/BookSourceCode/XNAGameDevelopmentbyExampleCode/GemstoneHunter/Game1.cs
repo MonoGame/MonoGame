@@ -64,13 +64,13 @@ namespace Gemstone_Hunter
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             TileMap.Initialize(
-                Content.Load<Texture2D>(@"Textures\PlatformTiles"));
+                Content.Load<Texture2D>(@"Textures/PlatformTiles"));
             TileMap.spriteFont =
-                Content.Load<SpriteFont>(@"Fonts\Pericles8");
+                Content.Load<SpriteFont>(@"Fonts/Pericles8");
 
-            pericles8 = Content.Load<SpriteFont>(@"Fonts\Pericles8");
+            pericles8 = Content.Load<SpriteFont>(@"Fonts/Pericles8");
 
-            titleScreen = Content.Load<Texture2D>(@"Textures\TitleScreen");
+            titleScreen = Content.Load<Texture2D>(@"Textures/TitleScreen");
 
             Camera.WorldRectangle = new Rectangle(0, 0, 160 * 48, 12 * 48);
             Camera.Position = Vector2.Zero;

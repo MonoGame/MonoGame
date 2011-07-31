@@ -41,21 +41,21 @@ namespace Gemstone_Hunter
         {
             animations.Add("idle",
                 new AnimationStrip(
-                    content.Load<Texture2D>(@"Textures\Sprites\Player\Idle"),
+                    content.Load<Texture2D>(@"Textures/Sprites/Player/Idle"),
                     48,
                     "idle"));
             animations["idle"].LoopAnimation = true;
 
             animations.Add("run",
                 new AnimationStrip(
-                    content.Load<Texture2D>(@"Textures\Sprites\Player\Run"),
+                    content.Load<Texture2D>(@"Textures/Sprites/Player/Run"),
                     48,
                     "run"));
             animations["run"].LoopAnimation = true;
 
             animations.Add("jump",
                 new AnimationStrip(
-                    content.Load<Texture2D>(@"Textures\Sprites\Player\Jump"),
+                    content.Load<Texture2D>(@"Textures/Sprites/Player/Jump"),
                     48,
                     "jump"));
             animations["jump"].LoopAnimation = false;
@@ -64,7 +64,7 @@ namespace Gemstone_Hunter
 
             animations.Add("die",
                 new AnimationStrip(
-                    content.Load<Texture2D>(@"Textures\Sprites\Player\Die"),
+                    content.Load<Texture2D>(@"Textures/Sprites/Player/Die"),
                     48,
                     "die"));
             animations["die"].LoopAnimation = false;

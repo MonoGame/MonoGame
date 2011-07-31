@@ -1,12 +1,8 @@
 using System;
 
-using MonoMac.Foundation;
-using MonoMac.AppKit;
-using MonoMac.ObjCRuntime;
-
 namespace Asteroid_Belt_Assault
 {
-#if WINDOWS || XBOX
+#if WINDOWS || XBOX || LINUX
     static class Program
     {
         /// <summary>

@@ -63,9 +63,9 @@ namespace Robot_Rampage
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            spriteSheet = Content.Load<Texture2D>(@"Textures\SpriteSheet");
-            titleScreen = Content.Load<Texture2D>(@"Textures\TitleScreen");
-            pericles14 = Content.Load<SpriteFont>(@"Fonts\Pericles14");
+            spriteSheet = Content.Load<Texture2D>(@"Textures/SpriteSheet");
+            titleScreen = Content.Load<Texture2D>(@"Textures/TitleScreen");
+            pericles14 = Content.Load<SpriteFont>(@"Fonts/Pericles14");
 
             Camera.WorldRectangle = new Rectangle(0, 0, 1600, 1600);
             Camera.ViewPortWidth = 800;

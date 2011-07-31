@@ -73,8 +73,8 @@ namespace Asteroid_Belt_Assault
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            titleScreen = Content.Load<Texture2D>(@"Textures\TitleScreen");
-            spriteSheet = Content.Load<Texture2D>(@"Textures\spriteSheet");
+            titleScreen = Content.Load<Texture2D>(@"Textures/TitleScreen");
+            spriteSheet = Content.Load<Texture2D>(@"Textures/SpriteSheet");
 
             starField = new StarField(
                 this.Window.ClientBounds.Width,
@@ -127,7 +127,7 @@ namespace Asteroid_Belt_Assault
 
             SoundManager.Initialize(Content);
 
-            pericles14 = Content.Load<SpriteFont>(@"Fonts\Pericles14");
+            pericles14 = Content.Load<SpriteFont>(@"Fonts/Pericles14");
 
 
             // TODO: use this.Content to load your game content here

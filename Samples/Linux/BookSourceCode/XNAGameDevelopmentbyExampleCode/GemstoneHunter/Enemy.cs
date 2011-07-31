@@ -22,7 +22,7 @@ namespace Gemstone_Hunter
             animations.Add("idle",
                 new AnimationStrip(
                     content.Load<Texture2D>(
-                        @"Textures\Sprites\MonsterC\Idle"),
+                        @"Textures/Sprites/MonsterC/Idle"),
                     48,
                     "idle"));
             animations["idle"].LoopAnimation = true;
@@ -30,7 +30,7 @@ namespace Gemstone_Hunter
             animations.Add("run",
                 new AnimationStrip(
                     content.Load<Texture2D>(
-                        @"Textures\Sprites\MonsterC\Run"),
+                        @"Textures/Sprites/MonsterC/Run"),
                     48,
                     "run"));
             animations["run"].FrameLength = 0.1f;
@@ -39,7 +39,7 @@ namespace Gemstone_Hunter
             animations.Add("die",
                 new AnimationStrip(
                     content.Load<Texture2D>(
-                        @"Textures\Sprites\MonsterC\Die"),
+                        @"Textures/Sprites/MonsterC/Die"),
                     48,
                     "die"));
             animations["die"].LoopAnimation = false;
