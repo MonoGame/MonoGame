@@ -50,7 +50,7 @@ namespace Microsoft.Xna.Framework.Graphics
 	internal class ESImage
 	{
 		// The OpenGL texture to be used for this image
-		private ESTexture2D	texture;	
+		internal ESTexture2D	texture;	
 		// The width of the image
 		private int	imageWidth;
 		// The height of the image
