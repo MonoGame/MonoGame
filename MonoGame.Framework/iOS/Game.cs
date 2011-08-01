@@ -54,6 +54,8 @@ using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
+using System.Linq;
+using MonoTouch.CoreGraphics;
 
 namespace Microsoft.Xna.Framework
 {
@@ -70,11 +72,11 @@ namespace Microsoft.Xna.Framework
         private GameComponentCollection _gameComponentCollection;
         public GameServiceContainer _services;
         private ContentManager _content;
-        private GameWindow _view;
+        internal GameWindow _view;
 		private bool _isFixedTimeStep = true;
         private TimeSpan _targetElapsedTime = TimeSpan.FromSeconds(1 / FramesPerSecond); 
         
-		private IGraphicsDeviceManager graphicsDeviceManager;
+		internal IGraphicsDeviceManager graphicsDeviceManager;
 		private IGraphicsDeviceService graphicsDeviceService;
 		private UIWindow _mainWindow;
 
@@ -93,7 +95,7 @@ namespace Microsoft.Xna.Framework
 			//Create a full-screen window
 			_mainWindow = new UIWindow (UIScreen.MainScreen.Bounds);			
 			_view = new GameWindow();
-			_view.game = this;			
+			GameWindow.game = this;			
 			_mainWindow.Add(_view);							
 					
 			// Initialize GameTime
@@ -380,54 +382,96 @@ namespace Microsoft.Xna.Framework
 		
 		protected virtual void LoadContent()
 		{		
+			var DefaultPath = DefaultPngFile;
+			//string[] files = Directory.GetFiles(Directory.GetCurrentDirectory(), "Default*~iphone.png",SearchOption.TopDirectoryOnly);
 			var model = UIDevice.CurrentDevice.Model;
-			string suffix = "";
-			if ( model.ToLower().Contains("iphone") )
-			{
-				suffix = "~iphone";
-			}
-			else if ( model.ToLower().Contains("ipad") )
-			{
-				suffix = "~ipad";
-			}
-			
-			string DefaultPath = string.Format("Default{0}.png", suffix); 
-			bool filefound = false;
+				string suffix = "";
+			bool isIpad = !model.ToLower().Contains("iphone");
+			Console.WriteLine(DefaultPath);
 			if (File.Exists(DefaultPath))
-			{
-				filefound = true;
-			}
-			else if (File.Exists("Default.png"))
-			{
-				DefaultPath = "Default.png";
-				filefound = true;
-			}
-			
-			if (filefound)
 			{
 				// Store the RootDir for later 
 				string backup = Content.RootDirectory;
-				
+
 				try 
 				{
 					// Clear the RootDirectory for this operation
 					Content.RootDirectory = string.Empty;
-					
+
 					spriteBatch = new SpriteBatch(GraphicsDevice);
-					splashScreen = Content.Load<Texture2D>(DefaultPath);			
+					//splashScreen = Texture2D.FromFile(GraphicsDevice,DefaultPath);
+					if(!isIpad && DefaultPath.Contains("Landscape") )
+						splashScreen = Texture2D.FromImage(GraphicsDevice,Rotate(new UIImage(DefaultPath),90));
+					else
+						splashScreen = Texture2D.FromFile(GraphicsDevice,DefaultPath);
 				}
 				finally 
 				{
 					// Reset RootDir
 					Content.RootDirectory = backup;
 				}
-				
+
 			}
 			else
 			{
 				spriteBatch = null;
 				splashScreen = null;
 			}
+		}
+		private string DefaultPngFile{
+			get{
+				
+				var model = UIDevice.CurrentDevice.Model;
+				string suffix = "";
+				if ( !model.ToLower().Contains("iphone") )
+				{
+					string[] files = Directory.GetFiles(Directory.GetCurrentDirectory(), "Default*~ipad.png",SearchOption.TopDirectoryOnly);
+					if(files.Length == 0)
+						return "Default.png";
+					if(files.Length == 1)
+						return files[0];
+					else
+					//todo: switch it out by orientation
+						return "Default~ipad.png";
+				}
+				else
+				{
+					string[] files = Directory.GetFiles(Directory.GetCurrentDirectory(), "Default*~iphone.png",SearchOption.TopDirectoryOnly);
+					if(files.Length == 0)
+						return "Default.png";
+					//if(files.Length == 1)
+					//	return files[0];
+					//else
+						return files.Where(x=> !x.Contains("@2x")).FirstOrDefault();
+					return "Default~iphone.png";
+				}
+			}
+		}
+		
+		UIImage Rotate(UIImage self,float degrees)
+		{
+			return self;
+			// calculate the size of the rotated view's containing box for our drawing space
+			UIView rotatedViewBox = new UIView(new System.Drawing.RectangleF(0,0,self.Size.Width * self.CurrentScale,self.Size.Height*self.CurrentScale));
+			CGAffineTransform t = CGAffineTransform.MakeRotation(MathHelper.ToRadians(degrees));
+			rotatedViewBox.Transform = t;
+			var size = rotatedViewBox.Frame.Size;
+			Console.WriteLine(size);
+			rotatedViewBox.Dispose();
+			// Create the bitmap context
+			UIGraphics.BeginImageContext(size);
+			CGContext bitmap = UIGraphics.GetCurrentContext();
+
+			bitmap.TranslateCTM(size.Width/2,size.Height/2);
+
+			bitmap.RotateCTM(MathHelper.ToRadians(degrees));
+
+   // Now, draw the rotated/scaled image into the context
+			bitmap.ScaleCTM(1,-1);
+			bitmap.DrawImage(new System.Drawing.RectangleF(-self.Size.Width*self.CurrentScale /2,-self.Size.Height*self.CurrentScale/2,self.Size.Width*self.CurrentScale,self.Size.Height*self.CurrentScale),self.CGImage);
+   			UIImage newImage = UIGraphics.GetImageFromCurrentImageContext();
+			UIGraphics.EndImageContext();
+   return newImage;	
 		}
 		
 		protected virtual void UnloadContent()
@@ -461,13 +505,7 @@ namespace Microsoft.Xna.Framework
         protected virtual void Update(GameTime gameTime)
         {			
 			if ( _initialized  && !Guide.IsVisible )
-			{
-//				foreach (GameComponent gc in _gameComponentCollection) {
-//					if (gc.Enabled) {
-//						gc.Update (gameTime);
-//					}
-//				}
-				
+			{				
 				// Changed from foreach to for loop in case the GameComponents's Update method
 				//   modifies the component collection.  With a foreach it causes an error:
 				//  "Collection was modified; enumeration operation may not execute."
@@ -520,17 +558,22 @@ namespace Microsoft.Xna.Framework
 			{
 				if (!_playingVideo) 
 				{
-		            foreach (GameComponent gc in _gameComponentCollection)
-		            {
-		                if (gc.Enabled && gc is DrawableGameComponent)
-		                {
-		                    DrawableGameComponent dc = gc as DrawableGameComponent;
-		                    if (dc.Visible)
-		                    {
-		                        dc.Draw(gameTime);
-		                    }
-		                }
-		            }
+					// Changed from foreach to for loop in case the GameComponents's Update method
+					//   modifies the component collection.  With a foreach it causes an error:
+					//  "Collection was modified; enumeration operation may not execute."
+					//  .Net 4.0 I thought got around this but in Mono 2.10.2 we still get this error.
+					for (int x = 0; x < _gameComponentCollection.Count; x++) 
+					{
+						var gc = (GameComponent)_gameComponentCollection[x];
+						if (gc.Enabled && gc is DrawableGameComponent) 
+						{
+							DrawableGameComponent dc = gc as DrawableGameComponent;
+							if (dc.Visible)
+							{
+								dc.Draw(gameTime);
+							}
+						}
+					}
 				}
 			}
         }

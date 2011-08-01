@@ -66,7 +66,7 @@ namespace Microsoft.Xna.Framework
     public class GameWindow : iPhoneOSGameView
     {
 		private readonly Rectangle clientBounds;
-		internal Game game;
+		internal static Game game;
 		private GameTime _updateGameTime;
         private GameTime _drawGameTime;
         private DateTime _lastUpdate;
@@ -456,43 +456,35 @@ namespace Microsoft.Xna.Framework
 		
 		internal Vector2 GetOffsetPosition(Vector2 position, bool useScale)
 		{
-			
-			Vector2 translatedPosition;
-			if (useScale)
-			{
-				translatedPosition = position * UIScreen.MainScreen.Scale;
-			}
-			else 
-			{
-				translatedPosition = position;
-			}
-					
+			Vector2 translatedPosition = position * UIScreen.MainScreen.Scale;
+
 			switch (CurrentOrientation)
 			{
 				case DisplayOrientation.Portrait :
 				{																		
 					break;
 				}
-				
+
 				case DisplayOrientation.LandscapeRight :
 				{				
 					translatedPosition = new Vector2( ClientBounds.Height - translatedPosition.Y, translatedPosition.X );							
 					break;
 				}
-				
+
 				case DisplayOrientation.LandscapeLeft :
 				{							
 					translatedPosition = new Vector2( translatedPosition.Y, ClientBounds.Width - translatedPosition.X );							
 					break;
 				}
-				
+
 				case DisplayOrientation.PortraitUpsideDown :
 				{				
 					translatedPosition = new Vector2( ClientBounds.Width - translatedPosition.X, ClientBounds.Height - translatedPosition.Y );							
 					break;
 				}
 			}
-			
+			if(!useScale)
+				translatedPosition = translatedPosition / UIScreen.MainScreen.Scale;
 			return translatedPosition;
 		}
 		
@@ -502,7 +494,7 @@ namespace Microsoft.Xna.Framework
 			
 			FillTouchCollection(touches);
 			
-			GamePad.Instance.TouchesBegan(touches,evt);	
+			GamePad.Instance.TouchesBegan(touches,evt,this);	
 		}
 		
 		public override void TouchesEnded (NSSet touches, UIEvent evt)
@@ -511,7 +503,7 @@ namespace Microsoft.Xna.Framework
 			
 			FillTouchCollection(touches);	
 			
-			GamePad.Instance.TouchesEnded(touches,evt);								
+			GamePad.Instance.TouchesEnded(touches,evt,this);								
 		}
 		
 		public override void TouchesMoved (NSSet touches, UIEvent evt)
@@ -520,7 +512,7 @@ namespace Microsoft.Xna.Framework
 			
 			FillTouchCollection(touches);
 			
-			GamePad.Instance.TouchesMoved(touches,evt);
+			GamePad.Instance.TouchesMoved(touches,evt,this);
 		}
 
 		public override void TouchesCancelled (NSSet touches, UIEvent evt)
