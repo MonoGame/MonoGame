@@ -385,7 +385,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 			}
 			else
 			{
-				UIAlertView alert = new UIAlertView("Error","You need to be logged into game center to view the High scores.",null,"Ok");
+				UIAlertView alert = new UIAlertView("Error","You need to be logged into Game Center to view the Leaderboard.",null,"Ok");
 				alert.Show();
 				ShowSignIn(1,true);
 			}
@@ -422,6 +422,12 @@ namespace Microsoft.Xna.Framework.GamerServices
 						isVisible = true;
 					}
 			    }
+			}
+			else
+			{
+				UIAlertView alert = new UIAlertView("Error","You need to be logged into Game Center to view Achievements.",null,"Ok");
+				alert.Show();
+				ShowSignIn(1,true);
 			}
 		}
 		
