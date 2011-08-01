@@ -85,6 +85,8 @@
     </Reference>
     <Reference Include="System.Core">
     </Reference>
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Services" />
     <Reference Include="System.Windows.Forms">
     </Reference>
     <Reference Include="System.Xml.Linq">
