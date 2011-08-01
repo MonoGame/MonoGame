@@ -699,7 +699,14 @@ namespace Microsoft.Xna.Framework.Net
 		private void ProcessSendData(CommandSendData command)
 		{
 			networkPeer.SendData(command.data, command.options);
-			
+
+			NetworkGamer sender;
+			CommandReceiveData crd = new CommandReceiveData (command.sender.RemoteUniqueIdentifier,
+								command.data);
+			crd.gamer = command.sender;
+			foreach(LocalNetworkGamer gamer in _localGamers) {
+				gamer.receivedData.Enqueue(crd);
+			}
 		}
 		
 		private void ProcessReceiveData(CommandReceiveData command)

@@ -64,7 +64,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			return result;
         }
 		
-		internal static void Reset()
+		public static void Reset()
 		{
 			Collection.Clear();
 		}

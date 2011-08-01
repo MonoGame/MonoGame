@@ -42,16 +42,13 @@ using System;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
+	// change to conform to XNA 4.0
     public enum DepthFormat
     {
-		Unknown = -1,
-        Depth24Stencil8 = 48,
-		Depth24Stencil8Single = 49,
-		Depth24Stencil4 = 50,
-		Depth24 = 51,		
-        Depth32 = 52,
+		None = -1,
 		Depth16 = 54,
-        Depth15Stencil1 = 56
+		Depth24 = 51,
+		Depth24Stencil8 = 48,		
     }
 }
 

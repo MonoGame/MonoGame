@@ -35,8 +35,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Platformer", "StarterKits\M
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Marblets", "StarterKits\MacOS\Marblets\Marblets.csproj", "{2BCFC6F4-5C08-467A-B310-5C0A009018CE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lidgren.Network", "ThirdParty\Lidgren.Network\Lidgren.Network.csproj", "{AE483C29-042E-4226-BA52-D247CE7676DA}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BookSource", "BookSource", "{E58F0822-614F-4642-97EE-F85AFBC55B95}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FloodControl", "Samples\MacOS\BookSourceCode\XNAGameDevelopmentbyExampleCode\FloodControl\FloodControl.csproj", "{F3115910-E6D1-450D-97FB-A8168A5D622E}"
@@ -48,6 +46,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GemstoneHunter", "Samples\MacOS\BookSourceCode\XNAGameDevelopmentbyExampleCode\GemstoneHunter\GemstoneHunter.csproj", "{81313197-A8DF-4465-B503-2DD8248B80A9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tile Engine", "Samples\MacOS\BookSourceCode\XNAGameDevelopmentbyExampleCode\GemstoneHunter\TileEngine\Tile Engine.csproj", "{521972FD-1A9B-4CFD-A435-EB2224985131}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lidgren.Network.MacOS", "ThirdParty\Lidgren.Network\Lidgren.Network.MacOS.csproj", "{AE483C29-042E-4226-BA52-D247CE7676DA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
