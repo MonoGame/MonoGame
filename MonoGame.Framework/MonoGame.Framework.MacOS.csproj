@@ -49,7 +49,7 @@
     <Reference Include="System.Drawing" />
     <Reference Include="MonoMac, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\MonoMac\monomac\src\MonoMac.dll</HintPath>
+      <HintPath>..\..\mono\monomac\src\MonoMac.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
@@ -322,6 +322,7 @@
     <Compile Include="MacOS\GamerServices\MonoGameGamerServicesHelper.cs" />
     <Compile Include="MacOS\GamerServices\SigninController.cs" />
     <Compile Include="MacOS\GamerServices\MonoGameLocalGamerProfile.cs" />
+    <Compile Include="Audio\NoAudioHardwareException.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />
@@ -342,9 +343,9 @@
     <Folder Include="MacOS\GamerServices\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.csproj">
+    <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.MacOS.csproj">
       <Project>{AE483C29-042E-4226-BA52-D247CE7676DA}</Project>
-      <Name>Lidgren.Network</Name>
+      <Name>Lidgren.Network.MacOS</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>

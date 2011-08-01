@@ -53,20 +53,20 @@ namespace Microsoft.Xna.Framework.Graphics
 	{
 		
 		public RenderTarget2D (GraphicsDevice graphicsDevice, int width, int height)
-			: this(graphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.Unknown) 
+			: this(graphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None) 
 		{}
 		
 		public RenderTarget2D (GraphicsDevice graphicsDevice, int width, int height, bool mipMap, 
 			SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat)
 			:this (graphicsDevice, width, height, mipMap, preferredFormat, 
-				DepthFormat.Unknown, 0, RenderTargetUsage.PreserveContents) 
+				DepthFormat.None, 0, RenderTargetUsage.PreserveContents) 
 		{}
 		
 		public RenderTarget2D (GraphicsDevice graphicsDevice, int width, int height, bool mipMap, 
 			SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage)
 			:base (graphicsDevice, width, height, mipMap, preferredFormat)
 		{
-			allocateOpenGLTexture();
+			//allocateOpenGLTexture();
 		}
 		
 		private void allocateOpenGLTexture() 
@@ -88,90 +88,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		}
 
-//		public RenderTarget2D (
-//         GraphicsDevice graphicsDevice,
-//         int width,
-//         int height,
-//         int numberLevels,
-//         SurfaceFormat format
-//		                       )
-//		{
-//			// throw new NotImplementedException();
-//			
-//			texture = new Texture2D( graphicsDevice, width, height, numberLevels, TextureUsage.None, format );
-//
-//			// create framebuffer
-//			/*GL.GenBuffers(1, ref textureFrameBuffer);
-//			GL.BindBuffer(All.Framebuffer, textureFrameBuffer);
-//			
-//			// attach renderbuffer
-//			GL.FramebufferTexture2D(All.Framebuffer, All.ColorAttachment0, All.Texture2D, textureFrameBuffer, 0);
-//			
-//			// attach depth buffer
-//			uint depthRenderbuffer;
-//			GL.GenRenderbuffers(1, ref depthRenderbuffer);
-//			GL.BindRenderbuffer(All.Renderbuffer, depthRenderbuffer);
-//			GL.RenderbufferStorage(All.Renderbuffer, All.DepthComponent16, width, height);
-//			GL.FramebufferRenderbuffer(All.Framebuffer, All.DepthAttachment, All.Renderbuffer, depthRenderbuffer);
-//			
-//			// unbind frame buffer
-//			GL.BindBuffer(All.Framebuffer, 0);*/
-//
-//		}
-		
-//		public RenderTarget2D (
-//         GraphicsDevice graphicsDevice,
-//         int width,
-//         int height,
-//         int numberLevels,
-//         SurfaceFormat format,
-//         MultiSampleType multiSampleType,
-//         int multiSampleQuality
-//		                       )
-//		{
-//			throw new NotImplementedException();
-//		}
-//		
-//		public RenderTarget2D (
-//         GraphicsDevice graphicsDevice,
-//         int width,
-//         int height,
-//         int numberLevels,
-//         SurfaceFormat format,
-//         MultiSampleType multiSampleType,
-//         int multiSampleQuality,
-//         RenderTargetUsage usage )
-//		{
-//			throw new NotImplementedException();
-//		}
-//		
-//		public RenderTarget2D (
-//         GraphicsDevice graphicsDevice,
-//         int width,
-//         int height,
-//         int numberLevels,
-//         SurfaceFormat format,
-//         RenderTargetUsage usage
-//		                       )
-//		{
-//			throw new NotImplementedException();
-//		}
-//		
-//		public Texture2D GetTexture()
-//		{
-//			return texture;
-//		}
-		
-//		public int Width 
-//		{ 
-//			get; 
-//			set; 
-//		}
-//		
-//		public int Height 
-//		{ 
-//			get; 
-//			set; 
-//		}
+
 	}
 }

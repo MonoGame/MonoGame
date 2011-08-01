@@ -81,7 +81,7 @@ namespace RenderTarget2DSample
 			// (the Reach profile requires power of 2 sizing in order to do that), uses an RGBA color format, and
 			// has no depth buffer or stencil buffer.
 			renderTarget = new RenderTarget2D (GraphicsDevice, GraphicsDevice.PresentationParameters.BackBufferWidth,
-				GraphicsDevice.PresentationParameters.BackBufferHeight, false, SurfaceFormat.Color, DepthFormat.Unknown);
+				GraphicsDevice.PresentationParameters.BackBufferHeight, false, SurfaceFormat.Color, DepthFormat.None);
 
 			// Load in the picture of Seamus.
 			mooTheMerciless = Content.Load<Texture2D> ("MooTheMerciless");
