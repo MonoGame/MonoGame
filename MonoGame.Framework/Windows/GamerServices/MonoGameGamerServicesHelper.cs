@@ -69,7 +69,7 @@ namespace Microsoft.Xna.Framework.GamerServices
         {
             if (gt == TimeSpan.Zero) gt = gameTime.TotalGameTime;
 
-            if ((gameTime.TotalGameTime - gt).TotalSeconds > 10)
+            if ((gameTime.TotalGameTime - gt).TotalSeconds > 10) // close after 10 seconds
             {
                 this.Enabled = false;
                 Guide.IsVisible = false;
