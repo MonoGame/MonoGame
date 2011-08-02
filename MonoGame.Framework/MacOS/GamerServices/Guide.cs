@@ -60,6 +60,9 @@ namespace Microsoft.Xna.Framework.GamerServices
 		private static bool isVisible;
 		private static bool simulateTrialMode;
 		
+		internal static void Initialise(Game game) {
+			
+		}
 		delegate string ShowKeyboardInputDelegate (
 			PlayerIndex player, 
 			string title, 
