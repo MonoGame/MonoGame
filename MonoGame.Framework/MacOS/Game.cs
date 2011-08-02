@@ -105,7 +105,7 @@ namespace Microsoft.Xna.Framework
 
 			_view = new GameWindow (frame);
 			_view.game = this;
-
+			
 			_mainWindow.ContentView.AddSubview (_view);
 			_mainWindow.AcceptsMouseMovedEvents = false;
 
@@ -289,20 +289,29 @@ namespace Microsoft.Xna.Framework
 			_vp.Height = manager.PreferredBackBufferHeight;
 			
 			GraphicsDevice.Viewport = _vp;
-			
+
+			_initializing = true;
+
 			// Moving the GraphicsDevice creation to here also modifies when GameComponents are being
 			// initialized.
-			foreach (IGameComponent component in _gameComponentCollection) {
-				component.Initialize();
-			}
-			
+			// Use OpenGL context locking in delegate function
+			InitialiseGameComponentsDelegate initD = new InitialiseGameComponentsDelegate (InitializeGameComponents);
+
+			// Invoke on thread from the pool
+			initD.BeginInvoke (
+				delegate (IAsyncResult iar) 
+				{
+					// We must have finished initialising, so set our flag appropriately
+					// So that we enter the Update loop
+					_initialized = true;
+					_initializing = false;
+				}, 
+			initD);
+
 			Initialize ();
 
-			_mainWindow.MakeKeyAndOrderFront (_mainWindow);
-						_mainWindow.ContentView.AddSubview (_view);
-			_mainWindow.AcceptsMouseMovedEvents = false;
-
 			_view.Run (FramesPerSecond / (FramesPerSecond * TargetElapsedTime.TotalSeconds));
+			_mainWindow.MakeKeyAndOrderFront (_mainWindow);
 		}
 
 		internal void DoUpdate (GameTime aGameTime)
@@ -558,7 +567,8 @@ namespace Microsoft.Xna.Framework
 				// Leave the following code there just in case there are problems
 				// with the intialization hack.
 				//foreach (GameComponent gc in _gameComponentCollection) {
-				foreach (IGameComponent gc in _gameComponentsToInitialize) {
+				//foreach (IGameComponent gc in _gameComponentsToInitialize) {
+				foreach (IGameComponent gc in _gameComponentCollection) {
 					// We may be drawing on a secondary thread through the display link or timer thread.
 					// Add a mutex around to avoid the threads accessing the context simultaneously
 					_view.OpenGLContext.CGLContext.Lock ();
