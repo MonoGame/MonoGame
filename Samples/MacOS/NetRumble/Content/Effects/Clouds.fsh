@@ -6,18 +6,13 @@ void main()
 {
     vec4 texCoord = vec4(gl_TexCoord[0].xy, 0, 0);
 
-    texCoord.x += Position.x * 0.0025;
-    texCoord.y += Position.y * 0.0025;
-    texCoord *= 0.5;    
-	
-	vec4 results = vec4(0,0,1,0.25) * texCoord;
-	
-	texCoord.x += Position.x * 0.0025 + 0.25;
-	texCoord.y += Position.y * 0.0025 - 0.15;
-	texCoord *= 0.4;
-	
-	results += vec4(0,1,0,0.15) * texture2D(TextureSampler, texCoord);
-	
-	gl_FragColor = results;
-
+    texCoord.x  += (Position.x  * 0.000250000);
+    texCoord.y  += (Position.y  * 0.000250000);
+    texCoord *= 0.500000;
+    vec4 results = (vec4( 0.000000, 0.000000, 1.00000, 0.250000) * texture2D( TextureSampler, texCoord));
+    texCoord.x  += ((Position.x  * 0.000250000) + 0.250000);
+    texCoord.y  += ((Position.y  * 0.000250000) - 0.150000);
+    texCoord *= 0.400000;
+    results += (vec4( 0.000000, 1.00000, 0.000000, 0.150000) * texture2D( TextureSampler, texCoord));
+    gl_FragColor = results;
 }
