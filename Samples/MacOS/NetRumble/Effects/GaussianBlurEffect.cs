@@ -15,7 +15,7 @@ namespace NetRumble
 		public GaussianBlurEffect (GraphicsDevice graphicsDevice) : base (graphicsDevice)
 		{
 			// We do not need this but here for test
-			LoadShaderFromFile ("Effects/Clouds.fsh");
+			LoadShaderFromFile ("BloomPostprocess/Effects/GaussianBlur.fsh");
 			
 			DefineTechnique ("Technique1", "Pass1", 0, 0);
 			CurrentTechnique = Techniques ["Technique1"];
