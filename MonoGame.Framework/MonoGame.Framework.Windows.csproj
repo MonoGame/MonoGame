@@ -101,6 +101,19 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Audio\AudioChannels.cs" />
+    <Compile Include="Audio\AudioEmitter.cs" />
+    <Compile Include="Audio\AudioEngine.cs" />
+    <Compile Include="Audio\AudioListener.cs" />
+    <Compile Include="Audio\AudioStopOptions.cs" />
+    <Compile Include="Audio\Cue.cs" />
+    <Compile Include="Audio\InstancePlayLimitException.cs" />
+    <Compile Include="Audio\NoAudioHardwareException.cs" />
+    <Compile Include="Audio\SoundBank.cs" />
+    <Compile Include="Audio\SoundEffect.cs" />
+    <Compile Include="Audio\SoundEffectInstance.cs" />
+    <Compile Include="Audio\SoundState.cs" />
+    <Compile Include="Audio\WaveBank.cs" />
     <Compile Include="Content\ContentReaders\ArrayReader.cs" />
     <Compile Include="Content\ContentReaders\BooleanReader.cs" />
     <Compile Include="Content\ContentReaders\ColorReader.cs" />
@@ -187,6 +200,13 @@
     <Compile Include="Graphics\Vertices\VertexPositionColor.cs" />
     <Compile Include="Graphics\Vertices\VertexPositionNormalTexture.cs" />
     <Compile Include="Graphics\Vertices\VertexPositionTexture.cs" />
+    <Compile Include="Media\MediaPlayer.cs" />
+    <Compile Include="Media\MediaSourceType.cs" />
+    <Compile Include="Media\MediaState.cs" />
+    <Compile Include="Media\Playlist.cs" />
+    <Compile Include="Media\PlaylistCollection.cs" />
+    <Compile Include="Media\Song.cs" />
+    <Compile Include="Media\SongCollection.cs" />
     <Compile Include="Net\AvailableNetworkSession.cs" />
     <Compile Include="Net\AvailableNetworkSessionCollection.cs" />
     <Compile Include="Net\CommandEvent.cs" />
@@ -217,6 +237,7 @@
     <Compile Include="Net\PacketWriter.cs" />
     <Compile Include="Net\QualityOfService.cs" />
     <Compile Include="Net\SendDataOptions.cs" />
+    <Compile Include="Windows\Audio\Sound.cs" />
     <Compile Include="Windows\Content\ContentManager.cs" />
     <Compile Include="Windows\Content\ContentReaders\SongReader.cs" />
     <Compile Include="Windows\Content\ContentReaders\SoundEffectReader.cs" />
@@ -364,5 +385,10 @@
       <Project>{AE483C29-042E-4226-BA52-D247CE7676DA}</Project>
       <Name>Lidgren.Network.Windows</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Audio" />
+    <Folder Include="Media" />
+    <Folder Include="Windows\Audio" />
   </ItemGroup>
 </Project>
