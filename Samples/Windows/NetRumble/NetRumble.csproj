@@ -1,0 +1,233 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build">
+  <PropertyGroup>
+    <ProjectGuid>{36CDED1D-BE90-4C12-BC0A-F923AB92B98D}</ProjectGuid>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>NetRumble</RootNamespace>
+    <AssemblyName>NetRumble</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Platform)' == 'x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <OutputPath>bin\Debug\</OutputPath>
+    <DebugSymbols>True</DebugSymbols>
+    <DebugType>Full</DebugType>
+    <Optimize>False</Optimize>
+    <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <OutputPath>bin\Release\</OutputPath>
+    <DebugSymbols>False</DebugSymbols>
+    <DebugType>None</DebugType>
+    <Optimize>True</Optimize>
+    <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
+    <DefineConstants>TRACE</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\MacOS\NetRumble\AudioManager.cs">
+      <Link>AudioManager.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\BatchRemovalCollection.cs">
+      <Link>BatchRemovalCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\BloomPostprocess\BloomComponent.cs">
+      <Link>BloomPostprocess\BloomComponent.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\BloomPostprocess\BloomSettings.cs">
+      <Link>BloomPostprocess\BloomSettings.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\CollisionMath.cs">
+      <Link>CollisionMath.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Effects\BloomCombineEffect.cs">
+      <Link>Effects\BloomCombineEffect.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Effects\BloomExtractEffect.cs">
+      <Link>Effects\BloomExtractEffect.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Effects\CloudsEffect.cs">
+      <Link>Effects\CloudsEffect.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Effects\GaussianBlurEffect.cs">
+      <Link>Effects\GaussianBlurEffect.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Gameplay\Asteroid.cs">
+      <Link>Gameplay\Asteroid.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Gameplay\CollisionManager.cs">
+      <Link>Gameplay\CollisionManager.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Gameplay\GameplayObject.cs">
+      <Link>Gameplay\GameplayObject.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Gameplay\PlayerData.cs">
+      <Link>Gameplay\PlayerData.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Gameplay\PowerUps\DoubleLaserPowerUp.cs">
+      <Link>Gameplay\PowerUps\DoubleLaserPowerUp.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Gameplay\PowerUps\PowerUp.cs">
+      <Link>Gameplay\PowerUps\PowerUp.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Gameplay\PowerUps\RocketPowerUp.cs">
+      <Link>Gameplay\PowerUps\RocketPowerUp.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Gameplay\PowerUps\TripleLaserPowerUp.cs">
+      <Link>Gameplay\PowerUps\TripleLaserPowerUp.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Gameplay\Projectiles\LaserProjectile.cs">
+      <Link>Gameplay\Projectiles\LaserProjectile.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Gameplay\Projectiles\MineProjectile.cs">
+      <Link>Gameplay\Projectiles\MineProjectile.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Gameplay\Projectiles\Projectile.cs">
+      <Link>Gameplay\Projectiles\Projectile.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Gameplay\Projectiles\RocketProjectile.cs">
+      <Link>Gameplay\Projectiles\RocketProjectile.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Gameplay\Ship.cs">
+      <Link>Gameplay\Ship.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Gameplay\ShipInput.cs">
+      <Link>Gameplay\ShipInput.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Gameplay\Weapons\DoubleLaserWeapon.cs">
+      <Link>Gameplay\Weapons\DoubleLaserWeapon.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Gameplay\Weapons\LaserWeapon.cs">
+      <Link>Gameplay\Weapons\LaserWeapon.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Gameplay\Weapons\MineWeapon.cs">
+      <Link>Gameplay\Weapons\MineWeapon.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Gameplay\Weapons\RocketWeapon.cs">
+      <Link>Gameplay\Weapons\RocketWeapon.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Gameplay\Weapons\TripleLaserWeapon.cs">
+      <Link>Gameplay\Weapons\TripleLaserWeapon.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Gameplay\Weapons\Weapon.cs">
+      <Link>Gameplay\Weapons\Weapon.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Gameplay\World.cs">
+      <Link>Gameplay\World.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\NetRumbleGame.cs">
+      <Link>NetRumbleGame.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\OperationCompletedEventArgs.cs">
+      <Link>OperationCompletedEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\RandomMath.cs">
+      <Link>RandomMath.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Rendering\Particles\Particle.cs">
+      <Link>Rendering\Particles\Particle.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Rendering\Particles\ParticleCache.cs">
+      <Link>Rendering\Particles\ParticleCache.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Rendering\Particles\ParticleEffect.cs">
+      <Link>Rendering\Particles\ParticleEffect.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Rendering\Particles\ParticleEffectManager.cs">
+      <Link>Rendering\Particles\ParticleEffectManager.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Rendering\Particles\ParticleEffectType.cs">
+      <Link>Rendering\Particles\ParticleEffectType.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Rendering\Particles\ParticleSystem.cs">
+      <Link>Rendering\Particles\ParticleSystem.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Rendering\Starfield.cs">
+      <Link>Rendering\Starfield.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\ScreenManager\GameScreen.cs">
+      <Link>ScreenManager\GameScreen.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\ScreenManager\InputState.cs">
+      <Link>ScreenManager\InputState.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\ScreenManager\LoadingScreen.cs">
+      <Link>ScreenManager\LoadingScreen.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\ScreenManager\MenuScreen.cs">
+      <Link>ScreenManager\MenuScreen.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\ScreenManager\MessageBoxScreen.cs">
+      <Link>ScreenManager\MessageBoxScreen.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\ScreenManager\ScreenManager.cs">
+      <Link>ScreenManager\ScreenManager.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Screens\BackgroundScreen.cs">
+      <Link>Screens\BackgroundScreen.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Screens\GameplayScreen.cs">
+      <Link>Screens\GameplayScreen.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Screens\LobbyScreen.cs">
+      <Link>Screens\LobbyScreen.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Screens\MainMenuScreen.cs">
+      <Link>Screens\MainMenuScreen.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Screens\NetworkBusyScreen.cs">
+      <Link>Screens\NetworkBusyScreen.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Screens\SearchResultsScreen.cs">
+      <Link>Screens\SearchResultsScreen.cs</Link>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\MonoGame.Framework\MonoGame.Framework.Windows.csproj">
+      <Project>{7DE47032-A904-4C29-BD22-2D235E8D91BA}</Project>
+      <Name>MonoGame.Framework.Windows</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\ThirdParty\Lidgren.Network\Lidgren.Network.Windows.csproj">
+      <Project>{AE483C29-042E-4226-BA52-D247CE7676DA}</Project>
+      <Name>Lidgren.Network.Windows</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="BloomPostprocess" />
+    <Folder Include="Content" />
+    <Folder Include="Effects" />
+    <Folder Include="Gameplay" />
+    <Folder Include="Gameplay\Weapons" />
+    <Folder Include="Gameplay\Projectiles" />
+    <Folder Include="Gameplay\PowerUps" />
+    <Folder Include="Rendering\Particles" />
+    <Folder Include="Screens" />
+    <Folder Include="ScreenManager" />
+    <Folder Include="Rendering" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.Targets" />
+</Project>
