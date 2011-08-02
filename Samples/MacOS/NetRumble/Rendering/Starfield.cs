@@ -185,8 +185,8 @@ namespace NetRumble
             cloudTexture = contentManager.Load<Texture2D>("Textures/Clouds");
 
             // load the cloud effect
-            //cloudEffect = contentManager.Load<Effect>("Effects/Clouds");
-			cloudEffect = new CloudsEffect(graphicsDevice); 
+            cloudEffect = contentManager.Load<Effect>("Effects/Clouds");
+			//cloudEffect = new CloudsEffect(graphicsDevice); 
             cloudEffectPosition = cloudEffect.Parameters["Position"];
       
             // create the star texture

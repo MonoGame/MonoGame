@@ -90,12 +90,12 @@ namespace NetRumble
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-//            bloomExtractEffect = content.Load<Effect>("Effects/BloomExtract");
-//            bloomCombineEffect = content.Load<Effect>("Effects/BloomCombine");
-//            gaussianBlurEffect = content.Load<Effect>("Effects/GaussianBlur");
-            bloomExtractEffect = new BloomExtractEffect(GraphicsDevice);
-            bloomCombineEffect = new BloomCombineEffect(GraphicsDevice);
-            gaussianBlurEffect = new GaussianBlurEffect(GraphicsDevice);
+			bloomExtractEffect = content.Load<Effect>("Effects/BloomExtract");
+			bloomCombineEffect = content.Load<Effect>("Effects/BloomCombine");
+			gaussianBlurEffect = content.Load<Effect>("Effects/GaussianBlur");
+            //bloomExtractEffect = new BloomExtractEffect(GraphicsDevice);
+            //bloomCombineEffect = new BloomCombineEffect(GraphicsDevice);
+            //gaussianBlurEffect = new GaussianBlurEffect(GraphicsDevice);
 
             // Look up the resolution and format of our main backbuffer.
             PresentationParameters pp = GraphicsDevice.PresentationParameters;
