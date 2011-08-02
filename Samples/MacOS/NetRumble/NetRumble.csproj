@@ -232,6 +232,8 @@
     <Content Include="Content\Audio\wav\rocket.xnb" />
     <Content Include="Content\Effects\Clouds.fsh" />
     <Content Include="Content\BloomPostprocess\Effects\BloomCombine.fsh" />
+    <Content Include="Content\BloomPostprocess\Effects\BloomExtract.fsh" />
+    <Content Include="Content\BloomPostprocess\Effects\GaussianBlur.fsh" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Effects\" />

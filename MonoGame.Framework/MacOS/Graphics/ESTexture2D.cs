@@ -124,24 +124,24 @@ namespace Microsoft.Xna.Framework.Graphics
 				height = i;
 			}
 			// TODO: kMaxTextureSize = 1024
-			while ((width > 1024) || (height > 1024)) {
-				width /= 2;
-				height /= 2;
-				transform = CGAffineTransform.MakeScale (0.5f, 0.5f);
-				imageSize.Width /= 2;
-				imageSize.Height /= 2;
-			}
-			
-//			var size = Math.Max(width,height);
-//			if(size > 1024) 
-//			{
-//				var ratio = size / 1024;
-//				width *= ratio;
-//				height *= ratio;
-//				transform = CGAffineTransform.MakeScale(ratio,ratio);
-//				imageSize.Width *= ratio;
-//				imageSize.Height *= ratio;
+//			while ((width > 1024) || (height > 1024)) {
+//				width /= 2;
+//				height /= 2;
+//				transform = CGAffineTransform.MakeScale (0.5f, 0.5f);
+//				imageSize.Width /= 2;
+//				imageSize.Height /= 2;
 //			}
+			
+			float size = Math.Max(width,height);
+			if(size > 1024) 
+			{
+				float ratio = 1024 / size;
+				width = (int)(width * ratio);
+				height = (int)(height * ratio);
+				transform = CGAffineTransform.MakeScale(ratio, ratio);
+				imageSize.Width = (int)(imageSize.Width * ratio);
+				imageSize.Height = (int)(imageSize.Height * ratio);;
+			}
 			
 			switch (pixelFormat) {		
 			case SurfaceFormat.Color:
