@@ -157,13 +157,21 @@ namespace NetRumble
         /// </summary>
         public override void LoadContent()
         {
+			
+			
+		// Developers Comment or uncomment the bloomComponent to run with effects or not
+		// ***************************	
+		// Comment or uncomment from here
+		// ***************************	
             // create and add the bloom effect
             bloomComponent = new BloomComponent(ScreenManager.Game);
             bloomComponent.Settings = BloomSettings.PresetSettings[0];
             ScreenManager.Game.Components.Add(bloomComponent);
             bloomComponent.Initialize();
             bloomComponent.Visible = false; // we want to control when bloom component is drawn
-			
+		// ***************************
+		// Comment or uncomment to here
+		// ***************************	
             // create the starfield
             starfield = new Starfield(Vector2.Zero, ScreenManager.GraphicsDevice, 
                 ScreenManager.Content);
