@@ -137,7 +137,9 @@ namespace Microsoft.Xna.Framework.GamerServices
 			return invokeOnMainThredObj;
 		}
 			
-
+		internal static void Initialise(Game game) {
+			
+		}
 		delegate string ShowKeyboardInputDelegate(
 		 PlayerIndex player,           
          string title,
