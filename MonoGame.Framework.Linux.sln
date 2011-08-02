@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Samples.Peer2PeerS
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Samples.SpriteEffects.Linux", "Samples\Linux\SpriteEffects\MonoGame.Samples.SpriteEffects.Linux.csproj", "{86A919E2-D7F0-452B-B762-C69D5BB07C98}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Samples.Sound.Linux", "Samples\Linux\Sound\MonoGame.Samples.Sound.Linux.csproj", "{8CFEF2EE-5E32-43EB-A730-EB3AACDC77B1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -57,12 +59,16 @@ Global
 		{8CFEF1FE-9E32-43EB-A730-EB3AACDC77B1}.Debug|x86.Build.0 = Debug|x86
 		{8CFEF1FE-9E32-43EB-A730-EB3AACDC77B1}.Release|x86.ActiveCfg = Release|x86
 		{8CFEF1FE-9E32-43EB-A730-EB3AACDC77B1}.Release|x86.Build.0 = Release|x86
+		{8CFEF2EE-5E32-43EB-A730-EB3AACDC77B1}.Debug|x86.ActiveCfg = Debug|x86
+		{8CFEF2EE-5E32-43EB-A730-EB3AACDC77B1}.Debug|x86.Build.0 = Debug|x86
+		{8CFEF2EE-5E32-43EB-A730-EB3AACDC77B1}.Release|x86.ActiveCfg = Release|x86
+		{8CFEF2EE-5E32-43EB-A730-EB3AACDC77B1}.Release|x86.Build.0 = Release|x86
 		{AE483C29-042E-4226-BA52-D247CE7676DA}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{AE483C29-042E-4226-BA52-D247CE7676DA}.Debug|x86.Build.0 = Debug|Any CPU
 		{AE483C29-042E-4226-BA52-D247CE7676DA}.Release|x86.ActiveCfg = Release|Any CPU
 		{AE483C29-042E-4226-BA52-D247CE7676DA}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = Samples\Linux\Peer2PeerSample\MonoGame.Samples.Peer2PeerSample.Linux.csproj
+		StartupItem = Samples\Linux\Sound\MonoGame.Samples.Sound.Linux.csproj
 	EndGlobalSection
 EndGlobal
