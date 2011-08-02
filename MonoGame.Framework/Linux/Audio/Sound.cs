@@ -1,65 +1,89 @@
-/*
-	Sound.cs
-	 
-	Author:
-	      Christian Beaumont chris@foundation42.org (http://www.foundation42.com)
-	
-	Copyright (c) 2009 Foundation42 LLC
-	
-	Permission is hereby granted, free of charge, to any person obtaining a copy
-	of this software and associated documentation files (the "Software"), to deal
-	in the Software without restriction, including without limitation the rights
-	to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-	copies of the Software, and to permit persons to whom the Software is
-	furnished to do so, subject to the following conditions:
-	
-	The above copyright notice and this permission notice shall be included in
-	all copies or substantial portions of the Software.
-	
-	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-	THE SOFTWARE.
-*/
-
 using System;
-using System.Text;
-using System.Threading;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
-using System.Collections.Generic;
+using System.IO;
+using OpenTK.Audio.OpenAL;
 
 namespace Microsoft.Xna.Framework.Audio
 {	
 	public class Sound
 	{	
-		//private NSSound _audioPlayer;
-		
-		public Sound()
-		{
-		}
+		private int bufferID;
+		private int sourceID;
 		
 		public Sound(string url, float volume, bool looping)
-		{			
-//			var data = NSData.FromUrl(NSUrl.FromFilename(url));
-//			_audioPlayer = new NSSound(data);
-//			_audioPlayer.Volume = volume;
-//			_audioPlayer.Loops = looping;
+		{
+			ALFormat format;
+			int size;
+			int freq;
+			byte[] data;
+			Stream s;
+			
+			try
+			{				
+		 		s = File.OpenRead(new Uri(url).LocalPath);
+			}
+			catch(IOException e)
+			{
+				throw new Content.ContentLoadException("Could not load audio data", e);
+			}	
+			
+			data = AudioLoader.Load(s, out format, out size, out freq);
+			
+			s.Close();
+			
+			Initialize(data, format, size, freq, volume, looping);
 		}
 		
-		public Sound(byte[] audiodata, float volume, bool looping) {
-//			var data = NSData.FromArray(audiodata);
-//			_audioPlayer = new NSSound(data);
-//			_audioPlayer.Volume = volume;
-//			_audioPlayer.Loops = looping;
+		public Sound(byte[] audiodata, float volume, bool looping) 
+		{
+			ALFormat format;
+			int size;
+			int freq;
+			byte[] data;
+			Stream s;
+			
+			try
+			{				
+		 		s = new MemoryStream(audiodata);
+			}
+			catch(IOException e)
+			{
+				throw new Content.ContentLoadException("Could not load audio data", e);
+			}	
+			
+			data = AudioLoader.Load(s, out format, out size, out freq);
+			
+			s.Close();
+			
+			Initialize(data, format, size, freq, volume, looping);			
+		}
+		
+		private void Initialize(byte[] data, ALFormat format, int size, int frequency, 
+		                        float volume, bool looping)
+		{
+			bufferID = AL.GenBuffer();
+			sourceID = AL.GenSource();
+			
+			try
+			{
+				AL.BufferData(bufferID, format, data, size, frequency);				
+			}
+			catch(Exception ex)
+			{
+				throw ex;	
+			}
+			
+			Volume = volume;
+			Looping = looping;
 		}
 		
 		public void Dispose()
 		{
-//			_audioPlayer.Dispose();
+			if (bufferID == -1)
+				return;			
+			
+			AL.DeleteSource(sourceID);
+			AL.DeleteBuffer(bufferID);
+			bufferID = -1;
 		}
 		
 		public double Duration
@@ -142,7 +166,7 @@ namespace Microsoft.Xna.Framework.Audio
 		
 		public void Play()
 		{		
-//			_audioPlayer.Play();
+			AL.SourcePlay(sourceID);
 		}
 		
 		public void Stop()
