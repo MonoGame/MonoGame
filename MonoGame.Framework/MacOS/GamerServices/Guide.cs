@@ -195,6 +195,9 @@ namespace Microsoft.Xna.Framework.GamerServices
 //				new ArgumentException ("paneCount Can only be 1 on iPhone");
 //				return;
 //			}
+			if (isVisible)
+				return;
+			
 			isVisible = true;
 			MonoGameGamerServicesHelper.ShowSigninSheet();
 			
