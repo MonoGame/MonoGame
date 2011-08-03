@@ -219,8 +219,9 @@ namespace Microsoft.Xna.Framework
 			if (!_view.Window.IsExiting)
             {
                 // raise the Exiting event
-            	if (Exiting != null) Exiting(this, null);                
+            	if (Exiting != null) Exiting(this, null);
                 Net.NetworkSession.Exit();
+				Audio.Sound.DisposeSoundServices();
                 _view.Window.Exit();
             }			
 		}

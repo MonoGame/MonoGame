@@ -22,6 +22,9 @@ namespace Microsoft.Xna.Samples.Sound
 		GraphicsDeviceManager graphics;	
 		KeyboardState oldSate;
 		SoundEffect sound;
+		SpriteBatch spriteBatch;
+		SoundEffectInstance soundInst;
+		SpriteFont font;
 		
 #if ANDROID 
 		public Game1 (Activity activity) : base (activity)
@@ -61,9 +64,12 @@ namespace Microsoft.Xna.Samples.Sound
 		protected override void LoadContent ()
 		{
 			// Create a new SpriteBatch, which can be used to draw textures.
+			spriteBatch = new SpriteBatch(GraphicsDevice);
 
 			sound = Content.Load<SoundEffect>("Explosion1");
+			soundInst = sound.CreateInstance();
 			
+			font = Content.Load<SpriteFont>("spriteFont1");
 		}
 
 		/// <summary>
@@ -80,10 +86,27 @@ namespace Microsoft.Xna.Samples.Sound
 				base.Exit();
 			
 			if (ks.IsKeyDown(Keys.A) && oldSate.IsKeyUp(Keys.A))
-				sound.Play();
+				soundInst.Play();
+			
+			if (ks.IsKeyDown(Keys.B) && oldSate.IsKeyUp(Keys.B))
+				soundInst.Stop();
+			
+			if (ks.IsKeyDown(Keys.C) && oldSate.IsKeyUp(Keys.C))
+				soundInst.Pause();
+			
+			if (ks.IsKeyDown(Keys.D) && oldSate.IsKeyUp(Keys.D))
+				soundInst.IsLooped = !soundInst.IsLooped;
+			
+			if (ks.IsKeyDown(Keys.E) && oldSate.IsKeyUp(Keys.E))
+				soundInst.Stop(true);			
+			
+			if (ks.IsKeyDown(Keys.X))
+				soundInst.Volume = MathHelper.Clamp(soundInst.Volume + 0.01f, 0f, 1f);
+			else if (ks.IsKeyDown(Keys.Z))
+				soundInst.Volume = MathHelper.Clamp(soundInst.Volume - 0.01f, 0f, 1f);;
 			
 			oldSate = ks;
-			    
+
 			base.Update (gameTime);
 		}
 
@@ -95,7 +118,17 @@ namespace Microsoft.Xna.Samples.Sound
 		{
 			graphics.GraphicsDevice.Clear (Color.CornflowerBlue);
 
+			spriteBatch.Begin();
+
+			spriteBatch.DrawString(font, "A: play\nB: stop\nC: pause\nD: toggle looping\nE: immediate stop\nX/Z volume\nStatus: " +
+			                       soundInst.State.ToString() + "\nLooping: " +
+			                       soundInst.IsLooped.ToString() + "\nVolume: " +
+			                       soundInst.Volume.ToString()
+			                       , Vector2.Zero, Color.White);
+			
 			base.Draw(gameTime);
+			
+			spriteBatch.End();
 		}
 	}
 }
