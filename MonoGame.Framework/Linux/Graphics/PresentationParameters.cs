@@ -196,7 +196,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void Clear()
         {
-            autoDepthStencilFormat = DepthFormat.Unknown;
+            autoDepthStencilFormat = DepthFormat.None;
             backBufferCount = 0;
             backBufferFormat = SurfaceFormat.Color;
 			backBufferWidth = _defaultBackBufferWidth;
@@ -206,7 +206,7 @@ namespace Microsoft.Xna.Framework.Graphics
             fullScreenRefreshRateInHz = 0;
             // isFullScreen = false;
             multiSampleQuality = 0;
-            depthStencilFormat = DepthFormat.Unknown;
+            depthStencilFormat = DepthFormat.None;
             multiSampleCount = 0;
             multiSampleType = MultiSampleType.None;
             swapEffect = SwapEffect.Default;

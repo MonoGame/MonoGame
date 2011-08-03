@@ -327,9 +327,9 @@
     <Folder Include="Linux\GamerServices\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.csproj">
+    <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.Linux.csproj">
       <Project>{AE483C29-042E-4226-BA52-D247CE7676DA}</Project>
-      <Name>Lidgren.Network</Name>
+      <Name>Lidgren.Network.Linux</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>
