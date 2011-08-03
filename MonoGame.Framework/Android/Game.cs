@@ -355,7 +355,11 @@ namespace Microsoft.Xna.Framework
 				if (!_initializing) 
 				{
 					_initializing = true;
-					
+
+                    InitializeGameComponents();
+                    _initialized = true;
+                    _initializing = false;
+                    /*
 					// Use OpenGLES context switching as described here
 					// http://developer.apple.com/iphone/library/qa/qa2010/qa1612.html
 					InitialiseGameComponentsDelegate initD = new InitialiseGameComponentsDelegate(InitializeGameComponents);
@@ -369,7 +373,7 @@ namespace Microsoft.Xna.Framework
 						    _initialized = true;
 							_initializing = false;
 						}, 
-					initD);
+					initD);*/
 				}
 			}
         }

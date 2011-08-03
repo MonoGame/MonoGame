@@ -8,7 +8,7 @@
     <ProjectGuid>{36C538E6-C32A-4A8D-A39C-566173D7118E}</ProjectGuid>
     <ProjectTypeGuids>{1C533B1C-72DD-4CB1-9F6B-BF11D93BCFBE};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
-    <RootNamespace>MonoGame.Framework.MacOS</RootNamespace>
+    <RootNamespace>Microsoft.Xna.Framework.GamerServices</RootNamespace>
     <AssemblyName>MonoGame.Framework.MacOS</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
   </PropertyGroup>
@@ -49,7 +49,7 @@
     <Reference Include="System.Drawing" />
     <Reference Include="MonoMac, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\MonoMac\monomac\src\MonoMac.dll</HintPath>
+      <HintPath>..\..\mono\monomac\src\MonoMac.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
@@ -319,6 +319,10 @@
     <Compile Include="Net\CommandGamerStateChange.cs" />
     <Compile Include="Net\CommandGamerLeft.cs" />
     <Compile Include="MacOS\TitleContainer.cs" />
+    <Compile Include="MacOS\GamerServices\MonoGameGamerServicesHelper.cs" />
+    <Compile Include="MacOS\GamerServices\SigninController.cs" />
+    <Compile Include="MacOS\GamerServices\MonoGameLocalGamerProfile.cs" />
+    <Compile Include="Audio\NoAudioHardwareException.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />
@@ -339,9 +343,9 @@
     <Folder Include="MacOS\GamerServices\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.csproj">
+    <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.MacOS.csproj">
       <Project>{AE483C29-042E-4226-BA52-D247CE7676DA}</Project>
-      <Name>Lidgren.Network</Name>
+      <Name>Lidgren.Network.MacOS</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>

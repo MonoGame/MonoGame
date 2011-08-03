@@ -46,6 +46,8 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
+using System.Threading;
+using OpenTK;
 
 namespace Microsoft.Xna.Framework
 {
@@ -84,7 +86,7 @@ namespace Microsoft.Xna.Framework
 			_services = new GameServiceContainer();
 			_gameComponentCollection = new GameComponentCollection();
 
-            _view = new WindowsGameWindow();
+            _view = new WindowsGameWindow();            
 			_view.Game = this;			
 					
 			// Initialize GameTime
@@ -333,7 +335,7 @@ namespace Microsoft.Xna.Framework
 		private void InitializeGameComponents()
 		{
 			foreach (GameComponent gc in _gameComponentCollection)
-            {
+            {                
                 gc.Initialize();
             }
 		}
@@ -355,21 +357,35 @@ namespace Microsoft.Xna.Framework
 				if (!_initializing) 
 				{
 					_initializing = true;
-					
-					// Use OpenGLES context switching as described here
-					// http://developer.apple.com/iphone/library/qa/qa2010/qa1612.html
-					InitialiseGameComponentsDelegate initD = new InitialiseGameComponentsDelegate(InitializeGameComponents);
+                    InitializeGameComponents();
+                    _initialized = true;
+                    _initializing = false;
+                    /*
+                     // This code will load in the background. Might be 
+                    EventWaitHandle context_ready = new EventWaitHandle(false, EventResetMode.AutoReset);
+                    (this.Window as WindowsGameWindow).OpenTkGameWindow.Context.MakeCurrent(null);
+                    var thread = new Thread(() =>
+                    {
+                        INativeWindow window = new NativeWindow();
+                        IGraphicsContext context = new GraphicsContext(GraphicsMode.Default, window.WindowInfo);
+                        context.MakeCurrent(window.WindowInfo); // Edit: this is necessary for GL functions to work
 
-					// Invoke on thread from the pool
-        			initD.BeginInvoke( 
-						delegate (IAsyncResult iar) 
-					    {
-							// We must have finished initialising, so set our flag appropriately
-							// So that we enter the Update loop
-						    _initialized = true;
-							_initializing = false;
-						}, 
-					initD);
+                        context_ready.Set();
+                        if (window.Exists)
+                        {
+                            window.ProcessEvents();
+                            InitializeGameComponents();
+                                                        
+                        }
+                        _initialized = true;
+                        _initializing = false;
+                    });
+                    thread.IsBackground = true;
+                    thread.Start();
+
+                    context_ready.WaitOne();
+                    (this.Window as WindowsGameWindow).OpenTkGameWindow.MakeCurrent();
+                    */                    
 				}
 			}
         }

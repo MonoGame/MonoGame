@@ -182,7 +182,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void Clear()
         {
-            autoDepthStencilFormat = DepthFormat.Unknown;
+            autoDepthStencilFormat = DepthFormat.None;
             backBufferCount = 0;
             backBufferFormat = SurfaceFormat.Color;
 			backBufferWidth = 320;

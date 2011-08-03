@@ -222,14 +222,15 @@ namespace Microsoft.Xna.Framework.GamerServices
 				return;
 			}
 
-            //if (GamerServicesComponent.LocalNetworkGamer == null)
-            //{
-            //    GamerServicesComponent.LocalNetworkGamer = new LocalNetworkGamer();
-            //}
-            //else
-            //{
-            //    GamerServicesComponent.LocalNetworkGamer.SignedInGamer.BeginAuthentication(null, null);
-            //}
+            Microsoft.Xna.Framework.GamerServices.MonoGameGamerServicesHelper.ShowSigninSheet();
+            if (GamerServicesComponent.LocalNetworkGamer == null)
+            {
+                GamerServicesComponent.LocalNetworkGamer = new LocalNetworkGamer();
+            }
+            else
+            {
+                GamerServicesComponent.LocalNetworkGamer.SignedInGamer.BeginAuthentication(null, null);
+            }
 		}
 
 		public static void ShowLeaderboard()
@@ -365,5 +366,10 @@ namespace Microsoft.Xna.Framework.GamerServices
 			set;
 		}
 		#endregion
-	}
+
+        internal static void Initialise(Game game)
+        {
+            MonoGameGamerServicesHelper.Initialise(game);
+        }
+    }
 }
