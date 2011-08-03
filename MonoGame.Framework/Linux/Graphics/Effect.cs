@@ -128,6 +128,25 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 
 		}
+		
+		internal Effect (GraphicsDevice aGraphicsDevice, string aFileName) : this(aGraphicsDevice)
+		{
+			StreamReader streamReader = new StreamReader (aFileName);
+			string text = streamReader.ReadToEnd ();
+			streamReader.Close ();
+			
+			if ( aFileName.ToLower().Contains("fsh") )
+			{
+				CreateFragmentShaderFromSource(text);
+			}
+			else
+			{
+				CreateVertexShaderFromSource(text);
+			}
+			
+			DefineTechnique ("Technique1", "Pass1", 0, 0);
+			CurrentTechnique = Techniques ["Technique1"];
+		}
 
 		protected Effect (GraphicsDevice graphicsDevice, Effect cloneSource)
 		{
@@ -210,6 +229,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 
 		}
+
 
 		public void Begin ()
 		{
