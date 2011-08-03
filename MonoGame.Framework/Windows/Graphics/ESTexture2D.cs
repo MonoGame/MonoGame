@@ -56,6 +56,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		private int _width,_height;
 		private SurfaceFormat _format;
 		private float _maxS,_maxT;
+        private IntPtr _pixelData;
 		
 		public ESTexture2D (IntPtr data, SurfaceFormat pixelFormat, int width, int height, Size size, All filter)
 		{
@@ -114,6 +115,42 @@ namespace Microsoft.Xna.Framework.Graphics
             _format = pixelFormat;
             _maxS = size.Width / (float)width;
             _maxT = size.Height / (float)height;
+
+            _pixelData = data;
+        }
+
+        public void SetPixel(int x, int y, byte red, byte green, byte blue, byte alpha)
+        {
+
+            GL.BindTexture(TextureTarget.Texture2D, _name);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)All.Nearest);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)All.Nearest);
+
+            switch (_format)
+            {
+                case SurfaceFormat.Color /*kTexture2DPixelFormat_RGBA8888*/:
+                case SurfaceFormat.Dxt1:
+                case SurfaceFormat.Dxt3:
+                    byte[] pixelInfo = new byte[4] { red, green, blue, alpha };
+                    Marshal.Copy(pixelInfo, ((y - 1) * _width) + (x - 1), _pixelData, 4);
+                    GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, _width, _height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Rgba, PixelType.UnsignedByte, _pixelData);
+                    break;
+
+                // TODO: Implement the rest of these but lack of knowledge and examples prevents this for now
+                case SurfaceFormat.Bgra4444 /*kTexture2DPixelFormat_RGBA4444*/:
+                    GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, _width, _height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Rgba, PixelType.UnsignedShort4444, _pixelData);
+                    break;
+                case SurfaceFormat.Bgra5551 /*kTexture2DPixelFormat_RGB5A1*/:
+                    GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, _width, _height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Rgba, PixelType.UnsignedShort5551, _pixelData);
+                    break;
+                case SurfaceFormat.Alpha8 /*kTexture2DPixelFormat_A8*/:
+                    GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Alpha, _width, _height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Alpha, PixelType.UnsignedByte, _pixelData);
+                    break;
+                default:
+                    throw new NotSupportedException("Texture format");
+                    ;
+            }
+
         }
 				
 		public unsafe void Dispose ()
@@ -317,6 +354,14 @@ namespace Microsoft.Xna.Framework.Graphics
 				return _maxT;
 			}
 		}
+
+        public IntPtr PixelData
+        {
+            get
+            {
+                return _pixelData;
+            }
+        }
 		
 	}
 }
