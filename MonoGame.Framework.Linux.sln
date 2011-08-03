@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Framework.Linux", "MonoGame.Framework\MonoGame.Framework.Linux.csproj", "{35253CE1-C864-4CD3-8249-4D1319748E8F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lidgren.Network", "ThirdParty\Lidgren.Network\Lidgren.Network.csproj", "{AE483C29-042E-4226-BA52-D247CE7676DA}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Samples.Draw2D.Linux", "Samples\Linux\Draw2D\MonoGame.Samples.Draw2D.Linux.csproj", "{8CFEF1FE-9E32-43EB-A730-EB3AACDC77B1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Samples.Tetris.Linux", "Samples\Linux\Tetris\MonoGame.Samples.Tetris.Linux.csproj", "{86A619E2-C8F0-452B-B762-C69D5BB07C98}"
@@ -20,6 +18,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Samples.SpriteEffects.Linux", "Samples\Linux\SpriteEffects\MonoGame.Samples.SpriteEffects.Linux.csproj", "{86A919E2-D7F0-452B-B762-C69D5BB07C98}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Samples.Sound.Linux", "Samples\Linux\Sound\MonoGame.Samples.Sound.Linux.csproj", "{8CFEF2EE-5E32-43EB-A730-EB3AACDC77B1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lidgren.Network.Linux", "ThirdParty\Lidgren.Network\Lidgren.Network.Linux.csproj", "{AE483C29-042E-4226-BA52-D247CE7676DA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
