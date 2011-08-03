@@ -52,13 +52,13 @@ namespace Microsoft.Xna.Framework.Graphics
 	{
 		
 		public RenderTarget2D (GraphicsDevice graphicsDevice, int width, int height)
-			: this(graphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.Unknown) 
+			: this(graphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None) 
 		{}
 		
 		public RenderTarget2D (GraphicsDevice graphicsDevice, int width, int height, bool mipMap, 
 			SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat)
 			:this (graphicsDevice, width, height, mipMap, preferredFormat, 
-				DepthFormat.Unknown, 0, RenderTargetUsage.PreserveContents) 
+				DepthFormat.None, 0, RenderTargetUsage.PreserveContents) 
 		{}
 		
 		public RenderTarget2D (GraphicsDevice graphicsDevice, int width, int height, bool mipMap, 
