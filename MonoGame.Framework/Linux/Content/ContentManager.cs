@@ -180,6 +180,8 @@ namespace Microsoft.Xna.Framework.Content
 					result = new SoundEffect (assetName);		
 				if ((typeof(T) == typeof(Video)))
 					result = new Video (assetName);		
+				if (typeof(T) == typeof(Effect))
+					result = new Effect(graphicsDeviceService.GraphicsDevice, assetName);
 			}
 						
 			if (result == null)
