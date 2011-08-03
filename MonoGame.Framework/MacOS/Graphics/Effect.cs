@@ -49,7 +49,7 @@ using MonoMac.OpenGL;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-	public class Effect : IDisposable
+	public class Effect : GraphicsResource
 	{
 		public EffectParameterCollection Parameters { get; set; }
 
@@ -57,11 +57,11 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		internal List<EffectParameter> _textureMappings = new List<EffectParameter>();
 
-		private GraphicsDevice graphicsDevice;
 		private int fragment_handle;
 		private int vertex_handle;
 		private bool fragment;
 		private bool vertex;
+		private string filename;
 		
 		internal List<int> vertexShaders = new List<int>();
 		internal List<int> fragmentShaders = new List<int>();
@@ -149,6 +149,25 @@ namespace Microsoft.Xna.Framework.Graphics
 			Techniques = new EffectTechniqueCollection ();
 			Parameters = new EffectParameterCollection();
 		}
+		
+		internal Effect (GraphicsDevice aGraphicsDevice, string aFileName) : this(aGraphicsDevice)
+		{
+			StreamReader streamReader = new StreamReader (aFileName);
+			string text = streamReader.ReadToEnd ();
+			streamReader.Close ();
+			
+			if ( aFileName.ToLower().Contains("fsh") )
+			{
+				CreateFragmentShaderFromSource(text);
+			}
+			else
+			{
+				CreateVertexShaderFromSource(text);
+			}
+			
+			DefineTechnique ("Technique1", "Pass1", 0, 0);
+			CurrentTechnique = Techniques ["Technique1"];
+		}
 
 		protected Effect (Effect cloneSource)
 		{
@@ -232,10 +251,6 @@ namespace Microsoft.Xna.Framework.Graphics
 		public virtual Effect Clone ()
 		{
 			return Clone (graphicsDevice);
-		}
-
-		public void Dispose ()
-		{
 		}
 
 		public void End ()
