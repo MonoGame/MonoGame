@@ -41,7 +41,7 @@ namespace Microsoft.Xna.Framework.Audio
 		
 		private static byte[] LoadWave (BinaryReader reader, out ALFormat format, out int size, out int frequency)
 		{
-			// CODE EXTRACTED FROM http://freeminerdotnet.googlecode.com/svn/trunk/FreeMiner.Plugin.Audio.OpenAL/AudioManagerOpenAL.cs
+			// code based on opentk exemple
 			
 			byte[] audioData;
 			
@@ -68,13 +68,24 @@ namespace Microsoft.Xna.Framework.Audio
             }
 
             int format_chunk_size = reader.ReadInt32();
-            int audio_format = reader.ReadInt16();
-            int num_channels = reader.ReadInt16();
-            int sample_rate = reader.ReadInt32();
-            int byte_rate = reader.ReadInt32();
-            int block_align = reader.ReadInt16();
-            int bits_per_sample = reader.ReadInt16();
+            
+			// total bytes read: tbp
+			int audio_format = reader.ReadInt16(); // 2
+			int num_channels = reader.ReadInt16(); // 4
+            int sample_rate = reader.ReadInt32();  // 8
+            int byte_rate = reader.ReadInt32();    // 12
+            int block_align = reader.ReadInt16();  // 14
+            int bits_per_sample = reader.ReadInt16(); // 16
 
+			if (audio_format != 1)
+			{
+				throw new NotSupportedException("Wave compression is not supported.");
+			}
+			
+			// reads residual bytes
+			if (format_chunk_size > 16)
+				reader.ReadBytes(format_chunk_size - 16);
+			
             string data_signature = new string(reader.ReadChars(4));
             if (data_signature != "data")
             {
@@ -86,7 +97,7 @@ namespace Microsoft.Xna.Framework.Audio
             frequency = sample_rate;
 			format = GetSoundFormat(num_channels, bits_per_sample);
 			audioData = reader.ReadBytes((int)reader.BaseStream.Length);
-			size = audioData.Length;
+			size = data_chunk_size;
 			
             return audioData;
 		}
