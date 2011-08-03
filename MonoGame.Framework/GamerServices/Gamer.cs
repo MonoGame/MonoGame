@@ -42,7 +42,7 @@ purpose and non-infringement.
 
 namespace Microsoft.Xna.Framework.GamerServices
 {
-    public class Gamer
+    public abstract class Gamer
     {
         static SignedInGamerCollection _signedInGamers = new SignedInGamerCollection();
         string _gamer = "MonoGame";

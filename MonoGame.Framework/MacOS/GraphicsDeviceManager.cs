@@ -53,6 +53,7 @@ namespace Microsoft.Xna.Framework
 		private int _preferredBackBufferWidth;
 		private bool _preferMultiSampling;
 		private DisplayOrientation _supportedOrientations;
+		private bool wantFullScreen = false;
 
 		public GraphicsDeviceManager (Game game)
 		{
@@ -63,6 +64,8 @@ namespace Microsoft.Xna.Framework
 			_game = game;
 
 			_supportedOrientations = DisplayOrientation.Default;
+			_preferredBackBufferHeight = PresentationParameters._defaultBackBufferHeight;
+			_preferredBackBufferWidth = PresentationParameters._defaultBackBufferWidth;			
 
 			if (game.Services.GetService (typeof(IGraphicsDeviceManager)) != null) {
 				throw new ArgumentException ("Graphics Device Manager Already Present");
@@ -71,7 +74,6 @@ namespace Microsoft.Xna.Framework
 			game.Services.AddService (typeof(IGraphicsDeviceManager), this);
 			game.Services.AddService (typeof(IGraphicsDeviceService), this);	
 
-			CreateDevice();
 		}
 
 		public void CreateDevice ()
@@ -79,9 +81,9 @@ namespace Microsoft.Xna.Framework
 			_graphicsDevice = new GraphicsDevice ();
 			_graphicsDevice.PresentationParameters = new PresentationParameters ();
 
-			_preferredBackBufferHeight = _graphicsDevice.PresentationParameters.BackBufferHeight;
-			_preferredBackBufferWidth = _graphicsDevice.PresentationParameters.BackBufferWidth;
-			
+//			_preferredBackBufferHeight = _graphicsDevice.PresentationParameters.BackBufferHeight;
+//			_preferredBackBufferWidth = _graphicsDevice.PresentationParameters.BackBufferWidth;
+			_graphicsDevice.PresentationParameters.IsFullScreen = wantFullScreen;
 			Initialize();
 			
 			OnDeviceCreated(EventArgs.Empty);
@@ -165,15 +167,22 @@ namespace Microsoft.Xna.Framework
 
 		public bool IsFullScreen {
 			get {
-				return _graphicsDevice.PresentationParameters.IsFullScreen;
+				if (_graphicsDevice != null)
+					return _graphicsDevice.PresentationParameters.IsFullScreen;
+				else
+					return wantFullScreen;
 			}
 			set {
-				bool wasFullScreen = _graphicsDevice.PresentationParameters.IsFullScreen;
-				_graphicsDevice.PresentationParameters.IsFullScreen = value;	
-				if (value && !wasFullScreen) {
-					_game.GoFullScreen();
-				} else if (!value && wasFullScreen) {
-					_game.GoWindowed();
+				wantFullScreen = value;
+				if (_graphicsDevice != null) {
+					
+					bool wasFullScreen = _graphicsDevice.PresentationParameters.IsFullScreen;
+					_graphicsDevice.PresentationParameters.IsFullScreen = value;	
+					if (value && !wasFullScreen) {
+						_game.GoFullScreen();
+					} else if (!value && wasFullScreen) {
+						_game.GoWindowed();
+					}
 				}
 			}
 		}

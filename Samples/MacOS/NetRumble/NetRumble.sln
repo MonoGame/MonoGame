@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetRumble", "NetRumble.csproj", "{52735207-2136-433B-A3E4-4C082728EED8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lidgren.Network", "..\..\..\..\..\..\..\Users\Jimmy\Public\Share\MonoMacSource\kjpgit\MonoGame\ThirdParty\Lidgren.Network\Lidgren.Network.csproj", "{AE483C29-042E-4226-BA52-D247CE7676DA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Framework.MacOS", "..\..\..\..\..\..\..\Users\Jimmy\Public\Share\MonoMacSource\kjpgit\MonoGame\MonoGame.Framework\MonoGame.Framework.MacOS.csproj", "{36C538E6-C32A-4A8D-A39C-566173D7118E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpriteEffects", "..\..\..\..\..\..\..\Users\Jimmy\Public\Share\MonoMacSource\kjpgit\MonoGame\Samples\MacOS\SpriteEffects\SpriteEffects.csproj", "{3B9ABB34-4D0F-4CFD-A02D-30D5569A060B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+		Distribution|Any CPU = Distribution|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{36C538E6-C32A-4A8D-A39C-566173D7118E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{36C538E6-C32A-4A8D-A39C-566173D7118E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36C538E6-C32A-4A8D-A39C-566173D7118E}.Distribution|Any CPU.ActiveCfg = Distribution|Any CPU
+		{36C538E6-C32A-4A8D-A39C-566173D7118E}.Distribution|Any CPU.Build.0 = Distribution|Any CPU
+		{36C538E6-C32A-4A8D-A39C-566173D7118E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{36C538E6-C32A-4A8D-A39C-566173D7118E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B9ABB34-4D0F-4CFD-A02D-30D5569A060B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B9ABB34-4D0F-4CFD-A02D-30D5569A060B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B9ABB34-4D0F-4CFD-A02D-30D5569A060B}.Distribution|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B9ABB34-4D0F-4CFD-A02D-30D5569A060B}.Distribution|Any CPU.Build.0 = Debug|Any CPU
+		{3B9ABB34-4D0F-4CFD-A02D-30D5569A060B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B9ABB34-4D0F-4CFD-A02D-30D5569A060B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{52735207-2136-433B-A3E4-4C082728EED8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{52735207-2136-433B-A3E4-4C082728EED8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{52735207-2136-433B-A3E4-4C082728EED8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{52735207-2136-433B-A3E4-4C082728EED8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AE483C29-042E-4226-BA52-D247CE7676DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE483C29-042E-4226-BA52-D247CE7676DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AE483C29-042E-4226-BA52-D247CE7676DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AE483C29-042E-4226-BA52-D247CE7676DA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = NetRumble.csproj
+	EndGlobalSection
+EndGlobal

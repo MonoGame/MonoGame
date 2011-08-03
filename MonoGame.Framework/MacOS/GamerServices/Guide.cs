@@ -46,9 +46,6 @@ using System.Linq;
 using System.Threading;
 using System.Runtime.Remoting.Messaging;
 
-using MonoMac.AppKit;
-using MonoMac.Foundation;
-
 using Microsoft.Xna.Framework.Net;
 using Microsoft.Xna.Framework.Storage;
 
@@ -62,8 +59,10 @@ namespace Microsoft.Xna.Framework.GamerServices
 		private static bool isTrialMode;
 		private static bool isVisible;
 		private static bool simulateTrialMode;
-
-
+		
+		internal static void Initialise(Game game) {
+			
+		}
 		delegate string ShowKeyboardInputDelegate (
 			PlayerIndex player, 
 			string title, 
@@ -195,16 +194,22 @@ namespace Microsoft.Xna.Framework.GamerServices
 
 		public static void ShowSignIn (int paneCount, bool onlineOnly)
 		{
-			if (paneCount != 1) {
-				new ArgumentException ("paneCount Can only be 1 on iPhone");
+//			if (paneCount != 1) {
+//				new ArgumentException ("paneCount Can only be 1 on iPhone");
+//				return;
+//			}
+			if (isVisible)
 				return;
-			}
-
+			
+			isVisible = true;
+			MonoGameGamerServicesHelper.ShowSigninSheet();
+			
 			if (GamerServicesComponent.LocalNetworkGamer == null) {
 				GamerServicesComponent.LocalNetworkGamer = new LocalNetworkGamer ();
 			} else {
 				GamerServicesComponent.LocalNetworkGamer.SignedInGamer.BeginAuthentication (null, null);
 			}
+			isVisible = false;
 		}
 
 		public static void ShowLeaderboard ()
