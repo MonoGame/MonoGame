@@ -59,11 +59,11 @@ namespace Tetris
 		protected override void Initialize ()
 		{
 			Window.Title = "MonoGame XNA Tetris 2D";
-
+			
 			graphics.PreferredBackBufferHeight = 600;
 			graphics.PreferredBackBufferWidth = 800;
 
-			//this.TargetElapsedTime = TimeSpan.FromSeconds (1.0f / 10.0f);
+			this.TargetElapsedTime = TimeSpan.FromSeconds (1.0f / 10.0f);
 
 			// Try to open file if it exists, otherwise create it
 			using (FileStream fileStream = File.Open ("record.dat", FileMode.OpenOrCreate)) {
@@ -124,8 +124,8 @@ namespace Tetris
 			// Allows the game to exit
 			KeyboardState keyboardState = Keyboard.GetState ();
 			if (keyboardState.IsKeyDown (Keys.Escape))
-				this.Exit ();
-
+				this.Exit ();				
+			
 			// Check pause
 			bool pauseKey = (oldKeyboardState.IsKeyDown (Keys.P) && (keyboardState.IsKeyUp (Keys.P)));			
 
