@@ -39,6 +39,7 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
     <Reference Include="OpenTK, Version=1.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4" />
+    <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -307,6 +308,7 @@
     <Compile Include="Linux\TitleContainer.cs" />
     <Compile Include="Linux\Input\KeyboardUtil.cs" />
     <Compile Include="Linux\Audio\AudioLoader.cs" />
+    <Compile Include="Linux\GamerServices\MonoGameGamerServicesHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Linux\" />
