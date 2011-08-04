@@ -44,7 +44,7 @@ namespace SpriteEffects
 			Normalmap,
 		}
 
-		DemoEffect currentEffect = DemoEffect.RefractGlacier;
+		DemoEffect currentEffect = DemoEffect.Normalmap;
 
 		// Effects used by this sample.
 		Effect desaturateEffect;
@@ -201,8 +201,8 @@ namespace SpriteEffects
 			// Draw the background image.
 			spriteBatch.Begin ();
 			spriteBatch.Draw (glacierTexture, GraphicsDevice.Viewport.Bounds, Color.White);
-			spriteBatch.End ();
-
+			spriteBatch.End ();		
+			
 			// Set an effect parameter to make our overlay
 			// texture scroll in a giant circle.
 			//TextureSampler 
@@ -212,7 +212,7 @@ namespace SpriteEffects
 			// Set the overlay texture (as texture 1,
 			// because 0 will be the main sprite texture).
 			graphics.GraphicsDevice.Textures [1] = waterfallTexture;
-
+			
 			// Begin the sprite batch.
 			spriteBatch.Begin (0, null, null, null, null, disappearEffect);
 
