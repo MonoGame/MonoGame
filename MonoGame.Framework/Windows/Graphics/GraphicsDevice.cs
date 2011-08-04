@@ -121,6 +121,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _viewport.Height = DisplayMode.Height;
 			_viewport.MinDepth = 0.0f;
 			_viewport.MaxDepth = 1.0f;
+            Textures = new TextureCollection();
 
             // Init RenderState
             _renderState = new RenderState();
@@ -130,7 +131,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             this.mngr = mngr;
             _displayMode = new DisplayMode(this.mngr.PreferredBackBufferWidth, this.mngr.PreferredBackBufferHeight);
-
+            Textures = new TextureCollection();
             // Init RenderState
             _renderState = new RenderState();
 
@@ -498,6 +499,11 @@ namespace Microsoft.Xna.Framework.Graphics
             throw new NotSupportedException();
         }
 
-	}
+
+        public static void SetRenderTarget(RenderTarget2D sceneRenderTarget)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }
 
