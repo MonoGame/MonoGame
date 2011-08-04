@@ -98,6 +98,7 @@ namespace Microsoft.Xna.Framework
             set { SetTitle(value); }
         }
 		
+		// TODO: this is buggy on linux - report to opentk team
 		public bool AllowUserResizing
         {
             get { return _allowUserResizing; }
@@ -282,15 +283,21 @@ namespace Microsoft.Xna.Framework
 		
 		internal void ChangeClientBounds(Rectangle clientBounds)
 		{
+			// at least on linux, we can't resize if we're disallowing user resizing
+			
+			bool allowResize = AllowUserResizing;
+			
+			AllowUserResizing = true;
+			
 			window.ClientRectangle = new System.Drawing.Rectangle(clientBounds.X, clientBounds.Y, clientBounds.Width, clientBounds.Height);
+			
+			AllowUserResizing = allowResize;
 		}
 		
 		#endregion
 		
 		#region Public Methods
-		
-		// TODO are those public method part of the xna gamewindow public interface?
-		
+				
 		public void Dispose ()
 		{
 			window.Dispose();
