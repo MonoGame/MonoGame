@@ -69,30 +69,28 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 
 		public void End ()
-		{							
+		{					
 			// apply the custom effect if there is one
 			if (_effect != null) {
-				if (graphicsDevice.Textures._textures.Count > 0) {
-					foreach (var texture in graphicsDevice.Textures._textures) {
-						int index = texture.Key;
-						if (index > 0) {  // zero is the active texture
-							if (index < _effect._textureMappings.Count) {
-								var tex = _effect._textureMappings [index];
-								int texOffset = (int)TextureUnit.Texture0;
-								var tex2 = texture.Value;
-								if (tex != null) {
-									// Need to support multiple passes as well
-									GL.UseProgram (_effect.CurrentTechnique.Passes [0].shaderProgram);
-									GL.ActiveTexture ((TextureUnit)texOffset + index);
-									GL.BindTexture (TextureTarget.Texture2D, tex2._textureId);
-									GL.Uniform1 (tex.internalIndex, tex2._textureId);
-									GL.UseProgram (0);
-								}
-							}
-						}
-					}
-				}
+				
 				_effect.Apply ();
+				
+				if (graphicsDevice.Textures._textures.Count > 0) 
+				{
+					foreach (EffectParameter ep in _effect._textureMappings)
+					{
+						// if user didn't inform the texture index, we can't bind it
+						if (ep.UserInedx == -1)
+							continue;
+						
+						Texture tex = graphicsDevice.Textures[ep.UserInedx];
+						
+						// Need to support multiple passes as well
+						GL.ActiveTexture ((TextureUnit)((int)TextureUnit.Texture0 + ep.UserInedx));
+						GL.BindTexture (TextureTarget.Texture2D, tex._textureId);
+						GL.Uniform1 (ep.UniformLocation, ep.UserInedx);
+					}
+				}				
 			}
 
 			// Disable Blending by default = BlendState.Opaque
@@ -182,8 +180,12 @@ namespace Microsoft.Xna.Framework.Graphics
 			// clear out the textures
 			graphicsDevice.Textures._textures.Clear ();
 
+			// unbinds shader
 			if (_effect != null)
-				_effect.CurrentTechnique.Passes [0].Apply ();
+			{
+				GL.UseProgram (0);
+				_effect = null;
+			}
 		}
 
 		public void Draw (Texture2D texture,
@@ -200,6 +202,9 @@ namespace Microsoft.Xna.Framework.Graphics
 				throw new ArgumentException ("texture");
 			}
 
+			// texture 0 is the texture beeing draw
+			graphicsDevice.Textures[0] = texture;
+			
 			SpriteBatchItem item = _batcher.CreateBatchItem ();
 
 			item.Depth = depth;
@@ -270,6 +275,9 @@ namespace Microsoft.Xna.Framework.Graphics
 				throw new ArgumentException ("texture");
 			}
 
+			// texture 0 is the texture beeing draw
+			graphicsDevice.Textures[0] = texture;			
+			
 			SpriteBatchItem item = _batcher.CreateBatchItem ();
 
 			item.Depth = depth;
@@ -339,6 +347,9 @@ namespace Microsoft.Xna.Framework.Graphics
 				throw new ArgumentException ("texture");
 			}
 
+			// texture 0 is the texture beeing draw
+			graphicsDevice.Textures[0] = texture;			
+			
 			SpriteBatchItem item = _batcher.CreateBatchItem ();
 
 			item.Depth = depth;
@@ -400,6 +411,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			if (texture == null) {
 				throw new ArgumentException ("texture");
 			}
+			
+			// texture 0 is the texture beeing draw
+			graphicsDevice.Textures[0] = texture;			
 
 			SpriteBatchItem item = _batcher.CreateBatchItem ();
 
@@ -442,6 +456,9 @@ namespace Microsoft.Xna.Framework.Graphics
 				throw new ArgumentException ("texture");
 			}
 
+			// texture 0 is the texture beeing draw
+			graphicsDevice.Textures[0] = texture;			
+			
 			SpriteBatchItem item = _batcher.CreateBatchItem ();
 
 			item.Depth = 0.0f;
@@ -490,6 +507,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			if (texture == null) {
 				throw new ArgumentException ("texture");
 			}
+			
+			// texture 0 is the texture beeing draw
+			graphicsDevice.Textures[0] = texture;			
 
 			SpriteBatchItem item = _batcher.CreateBatchItem ();
 
@@ -533,6 +553,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			if (texture == null) {
 				throw new ArgumentException ("texture");
 			}
+			
+			// texture 0 is the texture beeing draw
+			graphicsDevice.Textures[0] = texture;			
 
 			SpriteBatchItem item = _batcher.CreateBatchItem ();
 
@@ -577,6 +600,9 @@ namespace Microsoft.Xna.Framework.Graphics
 				throw new ArgumentException ("spriteFont");
 			}
 
+			// texture 0 is the texture beeing draw
+			graphicsDevice.Textures[0] = spriteFont._texture;			
+			
 			Vector2 p = position;
 
 			foreach (char c in text) {
