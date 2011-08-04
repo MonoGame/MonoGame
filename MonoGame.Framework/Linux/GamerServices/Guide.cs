@@ -1,4 +1,4 @@
-#region License
+﻿#region License
 /*
 Microsoft Public License (Ms-PL)
 MonoGame - Copyright © 2009 The MonoGame Team
@@ -49,6 +49,7 @@ using System.Runtime.Remoting.Messaging;
 using Microsoft.Xna.Framework.Net;
 using Microsoft.Xna.Framework.Storage;
 
+
 #endregion Using clause
 
 namespace Microsoft.Xna.Framework.GamerServices
@@ -58,217 +59,315 @@ namespace Microsoft.Xna.Framework.GamerServices
 		private static bool isScreenSaverEnabled;
 		private static bool isTrialMode;
 		private static bool isVisible;
-		private static bool simulateTrialMode;
+		private static bool simulateTrialMode;		
 
+		delegate string ShowKeyboardInputDelegate(
+		 PlayerIndex player,           
+         string title,
+         string description,
+         string defaultText,
+		 bool usePasswordMode);
 
-		delegate string ShowKeyboardInputDelegate (
-			PlayerIndex player, 
-			string title, 
-			string description, 
-			string defaultText, 
-			bool usePasswordMode);
-
-		public static string ShowKeyboardInput (
-			PlayerIndex player, 
-			string title, 
-			string description, 
-			string defaultText,
-			bool usePasswordMode)
+		public static string ShowKeyboardInput(
+		 PlayerIndex player,           
+         string title,
+         string description,
+         string defaultText,
+		 bool usePasswordMode)
 		{
 			string result = defaultText; 
+
+            //TextFieldAlertView myAlertView = new TextFieldAlertView(usePasswordMode, title, defaultText);
+
+
+            //myAlertView.Title = title;
+            //myAlertView.Message = description;
+
+            //myAlertView.Clicked += delegate(object sender, UIButtonEventArgs e)
+            //        {
+            //            if (e.ButtonIndex == 1)
+            //            {
+            //                    result = ((UIAlertView) sender).Subviews.OfType<UITextField>().Single().Text;
+            //            }
+            //        };
+            //myAlertView.Transform = MonoTouch.CoreGraphics.CGAffineTransform.MakeTranslation (0f, 110f);
+            //myAlertView.Show();
 
 			return result;
 		}
 
 		public static IAsyncResult BeginShowKeyboardInput (
-			PlayerIndex player,
-			string title,
-			string description,
-			string defaultText,
-			AsyncCallback callback,
-			Object state)
+         PlayerIndex player,
+         string title,
+         string description,
+         string defaultText,
+         AsyncCallback callback,
+         Object state)
 		{
-			return BeginShowKeyboardInput (player, title, description, defaultText, callback, state, false);
+			return BeginShowKeyboardInput(player, title, description, defaultText, callback, state, false );
 		}
 
 		public static IAsyncResult BeginShowKeyboardInput (
-			PlayerIndex player,
-			string title,
-			string description,
-			string defaultText,
-			AsyncCallback callback,
-			Object state,
-			bool usePasswordMode)
+         PlayerIndex player,
+         string title,
+         string description,
+         string defaultText,
+         AsyncCallback callback,
+         Object state,
+         bool usePasswordMode)
 		{
 			isVisible = true;
 
 			ShowKeyboardInputDelegate ski = ShowKeyboardInput; 
 
-			return ski.BeginInvoke (player, title, description, defaultText, usePasswordMode, callback, ski);
+			return ski.BeginInvoke(player, title, description, defaultText, usePasswordMode, callback, ski);
 		}
 
 		public static string EndShowKeyboardInput (IAsyncResult result)
 		{
-			try {
+			try 
+			{
 				ShowKeyboardInputDelegate ski = (ShowKeyboardInputDelegate)result.AsyncState; 
 
-				return ski.EndInvoke (result);
-			} finally {
+				return ski.EndInvoke(result);
+			} 
+			finally 
+			{
 				isVisible = false;
 			}			
 		}
 
-		delegate Nullable<int> ShowMessageBoxDelegate (string title,
-			string text,
-			IEnumerable<string> buttons,
-			int focusButton,
-			MessageBoxIcon icon);
+		delegate Nullable<int> ShowMessageBoxDelegate( string title,
+         string text,
+         IEnumerable<string> buttons,
+         int focusButton,
+         MessageBoxIcon icon);
 
-		public static Nullable<int> ShowMessageBox (string title,
-				string text,
-				IEnumerable<string> buttons,
-				int focusButton,
-				MessageBoxIcon icon)
+		public static Nullable<int> ShowMessageBox( string title,
+         string text,
+         IEnumerable<string> buttons,
+         int focusButton,
+         MessageBoxIcon icon)
 		{
 			Nullable<int> result = null;
 
-			isVisible = true;			
+			
 
 			return result;
 		}
 
-		public static IAsyncResult BeginShowMessageBox (
-				PlayerIndex player,
-				string title,
-				string text,
-				IEnumerable<string> buttons,
-				int focusButton,
-				MessageBoxIcon icon,
-				AsyncCallback callback,
-				Object state)
+		public static IAsyncResult BeginShowMessageBox(
+         PlayerIndex player,
+         string title,
+         string text,
+         IEnumerable<string> buttons,
+         int focusButton,
+         MessageBoxIcon icon,
+         AsyncCallback callback,
+         Object state
+		)
 		{	
 			isVisible = true;
 
 			ShowMessageBoxDelegate smb = ShowMessageBox; 
 
-			return smb.BeginInvoke (title, text, buttons, focusButton, icon, callback, smb);			
+			return smb.BeginInvoke(title, text, buttons, focusButton, icon, callback, smb);			
 		}
 
 		public static IAsyncResult BeginShowMessageBox (
-				string title,
-				string text,
-				IEnumerable<string> buttons,
-				int focusButton,
-				MessageBoxIcon icon,
-				AsyncCallback callback,
-				Object state)
+         string title,
+         string text,
+         IEnumerable<string> buttons,
+         int focusButton,
+         MessageBoxIcon icon,
+         AsyncCallback callback,
+         Object state
+		)
 		{
-			return BeginShowMessageBox (PlayerIndex.One, title, text, buttons, focusButton, icon, callback, state);
+			return BeginShowMessageBox(PlayerIndex.One, title, text, buttons, focusButton, icon, callback, state);
 		}
 
 		public static Nullable<int> EndShowMessageBox (IAsyncResult result)
 		{
-			try {
+			try
+			{
 				ShowMessageBoxDelegate smbd = (ShowMessageBoxDelegate)result.AsyncState; 
 
-				return smbd.EndInvoke (result);
-			} finally {
+				return smbd.EndInvoke(result);
+			} 
+			finally 
+			{
 				isVisible = false;
 			}
 		}
 
-		public static void ShowMarketplace (PlayerIndex player)
-		{
 
+		public static void ShowMarketplace (PlayerIndex player )
+		{
+			
 		}
 
 		public static void Show ()
 		{
-			/*GKPeerPickerController ppc = new GKPeerPickerController();
-			ppc.ConnectionTypesMask = GKPeerPickerConnectionType.Nearby;
-			ppc.Show();*/
-			ShowSignIn (1, false);
+			ShowSignIn(1, false);
 		}
 
 		public static void ShowSignIn (int paneCount, bool onlineOnly)
 		{
-			if (paneCount != 1) {
-				new ArgumentException ("paneCount Can only be 1 on iPhone");
+			if ( paneCount != 1 && paneCount != 2 && paneCount != 4)
+			{
+				new ArgumentException("paneCount Can only be 1, 2 or 4 on Windows");
 				return;
 			}
 
-			if (GamerServicesComponent.LocalNetworkGamer == null) {
-				GamerServicesComponent.LocalNetworkGamer = new LocalNetworkGamer ();
-			} else {
-				GamerServicesComponent.LocalNetworkGamer.SignedInGamer.BeginAuthentication (null, null);
-			}
+            Microsoft.Xna.Framework.GamerServices.MonoGameGamerServicesHelper.ShowSigninSheet();
+            if (GamerServicesComponent.LocalNetworkGamer == null)
+            {
+                GamerServicesComponent.LocalNetworkGamer = new LocalNetworkGamer();
+            }
+            else
+            {
+                GamerServicesComponent.LocalNetworkGamer.SignedInGamer.BeginAuthentication(null, null);
+            }
 		}
 
-		public static void ShowLeaderboard ()
+		public static void ShowLeaderboard()
 		{
-			if ((Gamer.SignedInGamers.Count > 0) && (Gamer.SignedInGamers [0].IsSignedInToLive)) {	
+            //if ( ( Gamer.SignedInGamers.Count > 0 ) && ( Gamer.SignedInGamers[0].IsSignedInToLive ) )
+            //{
+            //    // Lazy load it
+            //    if ( leaderboardController == null )
+            //    {			    	
+            //        leaderboardController = new GKLeaderboardViewController();
+            //    }
 
-			}
+            //    if (leaderboardController != null)			
+            //    {
+            //        leaderboardController.DidFinish += delegate(object sender, EventArgs e) 
+            //        {
+            //            leaderboardController.DismissModalViewControllerAnimated(true);
+            //            isVisible = false;
+            //        };
+
+            //        if (Window !=null)
+            //        {						
+            //            if(viewController == null)
+            //            {
+            //                viewController = new UIViewController();
+            //                Window.Add(viewController.View);
+            //                viewController.View.Hidden = true;
+            //            }
+
+            //            viewController.PresentModalViewController(leaderboardController, true);
+            //            isVisible = true;
+            //        }
+            //    }
+            //}
 		}
 
-		public static void ShowAchievements ()
+		public static void ShowAchievements()
 		{
-			if ((Gamer.SignedInGamers.Count > 0) && (Gamer.SignedInGamers [0].IsSignedInToLive)) {
+            //if ( ( Gamer.SignedInGamers.Count > 0 ) && ( Gamer.SignedInGamers[0].IsSignedInToLive ) )
+            //{
+            //    // Lazy load it
+            //    if ( achievementController == null )
+            //    {
+            //        achievementController = new GKAchievementViewController();
+            //    }
 
-			}
+            //    if (achievementController != null)		
+            //    {					
+            //        achievementController.DidFinish += delegate(object sender, EventArgs e) 
+            //        {									 
+            //            leaderboardController.DismissModalViewControllerAnimated(true);
+            //            isVisible = false;
+            //        };
+
+            //        if (Window !=null)
+            //        {
+            //            if(viewController == null)
+            //            {
+            //                viewController = new UIViewController();
+            //                Window.Add(viewController.View);
+            //                viewController.View.Hidden = true;
+            //            }
+
+            //            viewController.PresentModalViewController(achievementController, true);						
+            //            isVisible = true;
+            //        }
+            //    }
+            //}
 		}
 
-		public static IAsyncResult BeginShowStorageDeviceSelector (AsyncCallback callback, object state)
+		public static IAsyncResult BeginShowStorageDeviceSelector( AsyncCallback callback, object state )
 		{
 			return null;
 		}
 
-		public static StorageDevice EndShowStorageDeviceSelector (IAsyncResult result)
+		public static StorageDevice EndShowStorageDeviceSelector( IAsyncResult result )
 		{
 			return null;
 		}
 
 		#region Properties
-		public static bool IsScreenSaverEnabled { 
-			get {
+		public static bool IsScreenSaverEnabled 
+		{ 
+			get
+			{
 				return isScreenSaverEnabled;
 			}
-			set {
+			set
+			{
 				isScreenSaverEnabled = value;
 			}
 		}
 
-		public static bool IsTrialMode { 
-			get {
+		public static bool IsTrialMode 
+		{ 
+			get
+			{
 				return isTrialMode;
 			}
-			set {
+			set
+			{
 				isTrialMode = value;
 			}
 		}
 
-		public static bool IsVisible { 
-			get {
+		public static bool IsVisible 
+		{ 
+			get
+			{
 				return isVisible;
 			}
-			set {
+			set
+			{
 				isVisible = value;
 			}
 		}
 
-		public static bool SimulateTrialMode { 
-			get {
+		public static bool SimulateTrialMode 
+		{ 
+			get
+			{
 				return simulateTrialMode;
 			}
-			set {
+			set
+			{
 				simulateTrialMode = value;
 			}
 		}
 
-		public static GameWindow Window { 
+		public static GameWindow Window 
+		{ 
 			get;
 			set;
 		}
 		#endregion
-	}
+
+        internal static void Initialise(Game game)
+        {
+            MonoGameGamerServicesHelper.Initialise(game);
+        }
+    }
 }
