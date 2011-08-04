@@ -5,6 +5,12 @@ using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
+#if !LINUX
+
+using MonoMac.Foundation;
+
+#endif
+
 namespace Tetris
 {
 	/// <summary>
@@ -30,8 +36,12 @@ namespace Tetris
 		public Engine ()
 			{
 			graphics = new GraphicsDeviceManager (this);
-			//Content.RootDirectory = "Content";
+
+#if !LINUX			
+			Content.RootDirectory = Path.Combine (NSBundle.MainBundle.ResourcePath, "Content");
+#else
 			Content.RootDirectory = "Content";
+#endif
 			
 			// Create sprite rectangles for each figure in texture file
 			// O figure
@@ -59,7 +69,7 @@ namespace Tetris
 		protected override void Initialize ()
 		{
 			Window.Title = "MonoGame XNA Tetris 2D";
-			
+
 			graphics.PreferredBackBufferHeight = 600;
 			graphics.PreferredBackBufferWidth = 800;
 
@@ -124,10 +134,12 @@ namespace Tetris
 			// Allows the game to exit
 			KeyboardState keyboardState = Keyboard.GetState ();
 			if (keyboardState.IsKeyDown (Keys.Escape))
-				this.Exit ();				
-			
+				this.Exit ();
+
 			// Check pause
-			bool pauseKey = (oldKeyboardState.IsKeyDown (Keys.P) && (keyboardState.IsKeyUp (Keys.P)));			
+			bool pauseKey = (oldKeyboardState.IsKeyDown (Keys.P) && (keyboardState.IsKeyUp (Keys.P)));
+
+			oldKeyboardState = keyboardState;
 
 			if (pauseKey)
 				pause = !pause;
@@ -160,8 +172,7 @@ namespace Tetris
 						board.MoveFigureDown ();
 
 					// Rotate figure
-					if (keyboardState.IsKeyDown (Keys.Up) && oldKeyboardState.IsKeyUp(Keys.Up) || 
-					    keyboardState.IsKeyDown (Keys.Space) && oldKeyboardState.IsKeyUp(Keys.Space))
+					if (keyboardState.IsKeyDown (Keys.Up) || keyboardState.IsKeyDown (Keys.Space))
 						board.RotateFigure ();
 
 					// Moving figure
@@ -173,8 +184,6 @@ namespace Tetris
 				}
 			}
 
-			oldKeyboardState = keyboardState;
-			
 			base.Update (gameTime);
 		}
 

@@ -5,6 +5,13 @@ using System.Text;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 
+#if !LINUX
+
+using MonoMac.Foundation;
+using MonoMac.AppKit;
+
+#endif
+
 namespace SpriteEffects
 {
 	public class DesaturateEffect : Effect
@@ -18,7 +25,12 @@ namespace SpriteEffects
 
 		protected void LoadShaderFromFile (string sourceFile)
 		{
-			string path = "Content";
+			string path;
+#if !LINUX
+			path = Path.Combine (NSBundle.MainBundle.ResourcePath, "Content");
+#else
+			path = "Content";
+#endif
 			sourceFile = Path.Combine (path, sourceFile);
 
 			// Load the source into a string

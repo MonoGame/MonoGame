@@ -5,6 +5,13 @@ using System.Text;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 
+#if !LINUX
+
+using MonoMac.Foundation;
+using MonoMac.AppKit;
+
+#endif
+
 namespace NetRumble
 {
 	public class GaussianBlurEffect : Effect
@@ -20,9 +27,12 @@ namespace NetRumble
 
 		protected void LoadShaderFromFile (string sourceFile)
 		{
-			var path = "Content";
-			sourceFile = Path.Combine (path, sourceFile);
-
+			string path;
+#if !LINUX
+			path = Path.Combine (NSBundle.MainBundle.ResourcePath, "Content");
+#else
+			path = "Content";
+#endif
 			// Load the source into a string
 			string shaderSource = LoadShaderSource (sourceFile);
 

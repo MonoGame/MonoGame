@@ -16,7 +16,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug</OutputPath>
-    <DefineConstants>DEBUG</DefineConstants>
+    <DefineConstants>DEBUG LINUX</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
@@ -40,42 +40,57 @@
     <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Info.plist" />
-    <None Include="Content\Content.contentproj" />
-    <None Include="Content\background.psd">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    <None Include="..\..\MacOS\Tetris\Content\tetris.png">
+      <Link>Content\tetris.png</Link>
+    </None>
+    <None Include="..\..\MacOS\Tetris\Content\score.png">
+      <Link>Content\score.png</Link>
+    </None>
+    <None Include="..\..\MacOS\Tetris\Content\font.spritefont">
+      <Link>Content\font.spritefont</Link>
+    </None>
+    <None Include="..\..\MacOS\Tetris\Content\Content.contentproj">
+      <Link>Content\Content.contentproj</Link>
+    </None>
+    <None Include="..\..\MacOS\Tetris\Content\background.psd">
+      <Link>Content\background.psd</Link>
+    </None>
+    <None Include="..\..\MacOS\Tetris\Content\background.png">
+      <Link>Content\background.png</Link>
+    </None>
+    <None Include="..\..\MacOS\Tetris\Content\Arial.xnb">
+      <Link>Content\Arial.xnb</Link>
+    </None>
+    <None Include="..\..\MacOS\Tetris\Info.plist">
+      <Link>Info.plist</Link>
+    </None>
+    <None Include="..\..\MacOS\Tetris\GameThumbnail.png">
+      <Link>GameThumbnail.png</Link>
+    </None>
+    <None Include="..\..\MacOS\Tetris\Game.ico">
+      <Link>Game.ico</Link>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Board.cs" />
-    <Compile Include="Engine.cs" />
     <Compile Include="Program.cs" />
-    <Compile Include="Record.cs" />
-    <Compile Include="Score.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Content\background.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\font.spritefont">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\score.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\tetris.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Game.ico" />
-    <Content Include="GameThumbnail.png" />
-    <Content Include="Content\Arial.xnb">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <Compile Include="..\..\MacOS\Tetris\Score.cs">
+      <Link>Score.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Tetris\Record.cs">
+      <Link>Record.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Tetris\Board.cs">
+      <Link>Board.cs</Link>
+    </Compile>
+    <Compile Include="Engine.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\MonoGame.Framework\MonoGame.Framework.Linux.csproj">
       <Project>{35253CE1-C864-4CD3-8249-4D1319748E8F}</Project>
       <Name>MonoGame.Framework.Linux</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Content\" />
   </ItemGroup>
 </Project>
