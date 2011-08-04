@@ -1,4 +1,4 @@
-#region License
+﻿#region License
 /*
 Microsoft Public License (Ms-PL)
 MonoGame - Copyright © 2009 The MonoGame Team
@@ -47,7 +47,7 @@ purpose and non-infringement.
 namespace Microsoft.Xna.Framework.GamerServices
 {
     public class SignedInGamer : Gamer
-    {	
+    {		
 		private AchievementCollection gamerAchievements;
 		private FriendCollection friendCollection;
 		
@@ -70,22 +70,14 @@ namespace Microsoft.Xna.Framework.GamerServices
 		
 		private void DoAuthentication()
 		{
-			try 
-			{
 				
-			}
-			catch (Exception) 
-			{
-				
-			}
 		}
 		
 		public SignedInGamer()
 		{
 			
-			// Register to receive the GKPlayerAuthenticationDidChangeNotificationName so we are notified when 
-			// Authentication changes
-			
+			var result = BeginAuthentication(null, null);	
+			EndAuthentication( result );
 		}
 		
 		private void AuthenticationCompletedCallback( IAsyncResult result )
@@ -102,6 +94,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 				{
 					friendCollection = new FriendCollection();
 				}
+								
 			}
 			
 			return friendCollection;
@@ -163,6 +156,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 				{
 					gamerAchievements = new AchievementCollection();
 				}
+								
 			}
 			return gamerAchievements;
 		}
@@ -200,8 +194,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 		}
 		
 		public void DoAwardAchievement( string achievementId, double percentageComplete )
-		{
-			
+		{			
 		}
 		
 		public void AwardAchievement( string achievementId, double percentageComplete )
@@ -215,16 +208,14 @@ namespace Microsoft.Xna.Framework.GamerServices
 		public void UpdateScore( string aCategory, long aScore )
 		{
 			if (IsSignedInToLive)
-			{
-				
+			{				
 			}
 		}
 		
 		public void ResetAchievements()
 		{
 			if (IsSignedInToLive)
-			{
-				
+			{				
 			}
 		}
 
@@ -250,7 +241,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 		public bool IsSignedInToLive 
 		{ 
 			get
-			{				
+			{
 				return false;
 			}
 		}
@@ -336,3 +327,4 @@ namespace Microsoft.Xna.Framework.GamerServices
 		}
 	}
 }
+
