@@ -56,12 +56,13 @@ namespace Microsoft.Xna.Framework
         private GameTime _drawGameTime;
         private DateTime _lastUpdate;
 		private DateTime _now;
-        private bool _allowUserResizing;       
+        private bool _allowUserResizing;
+		private bool _transitiveAllowUserResizing;
         private DisplayOrientation _currentOrientation;
         private OpenTK.GameWindow window;
 		protected Game game;
 		private List<Microsoft.Xna.Framework.Input.Keys> keys;
-		
+				
 		#region Internal Properties
 		
 		internal Game Game { get; set; }
@@ -104,7 +105,7 @@ namespace Microsoft.Xna.Framework
             get { return _allowUserResizing; }
             set
             {
-                _allowUserResizing = value;
+                _allowUserResizing = _transitiveAllowUserResizing = value;
                 if (_allowUserResizing)
                     window.WindowBorder = WindowBorder.Resizable;
                 else 
@@ -204,7 +205,10 @@ namespace Microsoft.Xna.Framework
             //Should not happen at all..
             if (!GraphicsContext.CurrentContext.IsCurrent)
                 window.MakeCurrent();
-
+			
+			if (_transitiveAllowUserResizing != _allowUserResizing)
+				AllowUserResizing = _transitiveAllowUserResizing;
+			
             if (Game != null) {
                 _drawGameTime.Update(_now - _lastUpdate);
                 _lastUpdate = _now;
@@ -283,15 +287,19 @@ namespace Microsoft.Xna.Framework
 		
 		internal void ChangeClientBounds(Rectangle clientBounds)
 		{
-			// at least on linux, we can't resize if we're disallowing user resizing
+			// it seems, at least on linux, we can't resize if we disallow user resizing
 			
-			bool allowResize = AllowUserResizing;
+			// make next state the current state
+			_transitiveAllowUserResizing = AllowUserResizing;
+					
+			window.RenderFrame += delegate {
 			
-			AllowUserResizing = true;
-			
-			window.ClientRectangle = new System.Drawing.Rectangle(clientBounds.X, clientBounds.Y, clientBounds.Width, clientBounds.Height);
-			
-			AllowUserResizing = allowResize;
+				// allow resize to resize window
+				window.WindowBorder = WindowBorder.Resizable;
+				
+				// resize
+				window.ClientRectangle = new System.Drawing.Rectangle(clientBounds.X, clientBounds.Y, clientBounds.Width, clientBounds.Height);
+			};
 		}
 		
 		#endregion
