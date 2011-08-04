@@ -261,13 +261,12 @@ namespace Microsoft.Xna.Framework.Graphics
             throw new NotImplementedException();
         }
 		
-		private int framebufferId = -1;
-		int renderBufferID;
-		int currentRenderTargets = 1;
 		private byte[] GetImageData(int level)
 		{
 			
-
+			int framebufferId = -1;
+			int renderBufferID = -1;
+			
 			// create framebuffer
 			GL.Oes.GenFramebuffers(1, ref framebufferId);
 			GL.Oes.BindFramebuffer(All.FramebufferOes, framebufferId);
@@ -288,8 +287,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			GL.Oes.FramebufferRenderbuffer(All.FramebufferOes, All.DepthAttachmentOes,
 				All.RenderbufferOes, renderBufferID);
 				
-			
-			
 			All status = GL.Oes.CheckFramebufferStatus(All.FramebufferOes);
 			
 			if (status != All.FramebufferCompleteOes)
@@ -324,7 +321,16 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 			
 			GL.ReadPixels(0,0, _width, _height, All.Rgba, All.UnsignedByte, imageInfo);
-	
+
+			// Detach the render buffers.
+			GL.Oes.FramebufferRenderbuffer(All.FramebufferOes, All.DepthAttachmentOes,
+					All.RenderbufferOes, 0);
+			// delete the RBO's
+			GL.Oes.DeleteRenderbuffers(1,ref renderBufferID);
+			// delete the FBO
+			GL.Oes.DeleteFramebuffers(1, ref framebufferId);
+			// Set the frame buffer back to the system window buffer
+			GL.Oes.BindFramebuffer(All.FramebufferOes, 0);			
 
 			return imageInfo;
 					
