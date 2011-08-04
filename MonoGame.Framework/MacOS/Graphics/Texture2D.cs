@@ -550,7 +550,6 @@ namespace Microsoft.Xna.Framework.Graphics
 								result.B = imageInfo [pixelOffset + 2];
 								result.A = imageInfo [pixelOffset + 3];
 								break;							
-								break;
 							case SurfaceFormat.Bgra5551 : //kTexture2DPixelFormat_RGB5A1
 //								sz = 2;
 //								pos = ((y * imageSize.Width) + x) * sz;
