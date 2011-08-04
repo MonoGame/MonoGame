@@ -67,7 +67,11 @@ namespace Microsoft.Xna.Framework.GamerServices
 		private static bool isMessageBoxShowing = false;
 		private static bool isKeyboardInputShowing = false;
 
-		delegate string ShowKeyboardInputDelegate(
+        internal static void Initialise(Game game)
+        {
+        }
+
+	    delegate string ShowKeyboardInputDelegate(
 		 PlayerIndex player,           
          string title,
          string description,
