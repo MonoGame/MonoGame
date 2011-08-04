@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Samples.Sound.Linu
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lidgren.Network.Linux", "ThirdParty\Lidgren.Network\Lidgren.Network.Linux.csproj", "{AE483C29-042E-4226-BA52-D247CE7676DA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Samples.NetRumble.Linux", "Samples\Linux\NetRumble\MonoGame.Samples.NetRumble.Linux.csproj", "{52735207-2136-433B-A3E4-4C082728EED8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -31,6 +33,10 @@ Global
 		{35253CE1-C864-4CD3-8249-4D1319748E8F}.Debug|x86.Build.0 = Debug|x86
 		{35253CE1-C864-4CD3-8249-4D1319748E8F}.Release|x86.ActiveCfg = Release|x86
 		{35253CE1-C864-4CD3-8249-4D1319748E8F}.Release|x86.Build.0 = Release|x86
+		{52735207-2136-433B-A3E4-4C082728EED8}.Debug|x86.ActiveCfg = Debug|x86
+		{52735207-2136-433B-A3E4-4C082728EED8}.Debug|x86.Build.0 = Debug|x86
+		{52735207-2136-433B-A3E4-4C082728EED8}.Release|x86.ActiveCfg = Release|x86
+		{52735207-2136-433B-A3E4-4C082728EED8}.Release|x86.Build.0 = Release|x86
 		{86A619E2-C8D0-452B-B762-C69D5BB07C98}.Debug|x86.ActiveCfg = Debug|x86
 		{86A619E2-C8D0-452B-B762-C69D5BB07C98}.Debug|x86.Build.0 = Debug|x86
 		{86A619E2-C8D0-452B-B762-C69D5BB07C98}.Release|x86.ActiveCfg = Release|x86
@@ -69,6 +75,6 @@ Global
 		{AE483C29-042E-4226-BA52-D247CE7676DA}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = Samples\Linux\SpriteEffects\MonoGame.Samples.SpriteEffects.Linux.csproj
+		StartupItem = Samples\Linux\NetRumble\MonoGame.Samples.NetRumble.Linux.csproj
 	EndGlobalSection
 EndGlobal
