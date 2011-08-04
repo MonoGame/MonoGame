@@ -79,7 +79,7 @@ namespace NetRumble
                 for (int i = 0; i < audioFileList.Length; i++)
                 {
                     string soundName = Path.GetFileNameWithoutExtension(audioFileList[i].Name);
-                    soundList[soundName] = game.Content.Load<SoundEffect>("audio\\wav\\"+ soundName);
+                    soundList[soundName] = game.Content.Load<SoundEffect>("Audio/wav/"+ soundName);
                     soundList[soundName].Name = soundName;
                 }
 
