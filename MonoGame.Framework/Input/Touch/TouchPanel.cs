@@ -50,6 +50,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
     {
 		internal static TouchCollection Collection = new TouchCollection();
 		internal static Queue<GestureSample> GestureList = new Queue<GestureSample>();
+		internal static event EventHandler EnabledGesturesChanged;
 		
         public static TouchPanelCapabilities GetCapabilities()
         {
@@ -111,7 +112,10 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			}
             set
 			{
+				var prev=_enabledGestures;
 				_enabledGestures = value;
+				if (_enabledGestures!=prev && EnabledGesturesChanged!=null)
+					EnabledGesturesChanged(null, null);
 			}
         }
 
