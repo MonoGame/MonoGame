@@ -57,7 +57,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		private SurfaceFormat _format;
 		private float _maxS, _maxT;
 		private IntPtr _pixelData;
-
+		internal byte[] _pixelInfo;
+		
 		public ESTexture2D (IntPtr data, SurfaceFormat pixelFormat, int width, int height, Size size, All filter)
 		{
 			InitWithData (data, pixelFormat, width, height, size, filter);
@@ -354,6 +355,12 @@ namespace Microsoft.Xna.Framework.Graphics
 			_maxT = size.Height / (float)height;
 
 			_pixelData = data;
+			//IntPtr pData = texture.texture.PixelData;
+//			int size3 = (_width * _height) * 4;
+//			byte[] _pixelInfo = new byte[size3];
+//
+//			Marshal.Copy(data, _pixelInfo, 0, size3);			
+			//_pixelInfo = data;
 		}
 		
 		
