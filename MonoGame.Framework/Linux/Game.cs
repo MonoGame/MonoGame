@@ -87,7 +87,6 @@ namespace Microsoft.Xna.Framework
 
 			_view = new GameWindow ();
 			_view.Game = this;
-			_view.AllowUserResizing = false; // seems to be the default
 			
 			// default update rate
 			_targetElapsedTime = TimeSpan.FromSeconds (1.0D / FramesPerSecond);
@@ -376,8 +375,7 @@ namespace Microsoft.Xna.Framework
 		}
 		
 		protected virtual void Initialize ()
-		{
-
+		{			
 			this.graphicsDeviceService = this.Services.GetService (typeof(IGraphicsDeviceService)) as IGraphicsDeviceService;			
 			
 			ResetWindowBounds(false);
