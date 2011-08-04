@@ -18,16 +18,34 @@ namespace Microsoft.Xna.Framework.Graphics
 		string semantic;
 		EffectParameterCollection structMembers;
 		object _cachedValue = null;
-		internal int internalIndex;  // used by opengl processes.
+		
+		private int internalIndex;   // used by opengl processes.
+		private int uniformLocation; 
+		private int userIndex;		 // desired index by the user
+		
 		int internalLength;
 		Effect _parentEffect;
+	
+		internal int UserInedx
+		{
+			get { return userIndex; }	
+		}
 		
-		internal EffectParameter(Effect parent, string paramName, int paramIndex, string paramSType, int paramLength)
+		internal int UniformLocation
+		{
+			get { return uniformLocation; }	
+		}
+		
+		internal EffectParameter(Effect parent, string paramName, int paramIndex, int userIndex, int uniformLocation,
+		                         string paramSType, int paramLength)
 		{
 			_parentEffect = parent;
 			name = paramName;
 			internalIndex = paramIndex;
 			internalLength = paramLength;
+			
+			this.userIndex = userIndex;
+			this.uniformLocation = uniformLocation;
 			
 			switch (paramSType ){
 			case "Float":

@@ -312,6 +312,18 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 		}
 		
+		private int GetUniformUserInedx(string uniformName)
+		{
+			int sPos = uniformName.LastIndexOf("_s");
+			int index;
+			
+			// if there's no such construct on the string or it's not followed by numbers only
+			if (sPos == -1 || !int.TryParse(uniformName.Substring(sPos + 2), out index))
+			    return -1; // no user index
+				
+			return index;
+		}
+		
 		// Output the log of an object
 		private void LogShaderParameters (string whichObj, int obj)
 		{
@@ -327,11 +339,25 @@ namespace Microsoft.Xna.Framework.Graphics
 			StringBuilder name = new StringBuilder(100); 
 			int length;
 			
-			for (int x =0; x < actUnis; x++) {
+			for (int x =0; x < actUnis; x++) 
+			{
+				int uniformLocation, userIndex;
+				string uniformName;
+				
 				name = new StringBuilder(100); 
+				
 				GL.GetActiveUniform(obj,x,100,out length,out size, out type, name);
+				
+				uniformName = name.ToString();
+				
+				userIndex = GetUniformUserInedx(uniformName);
+				
+				uniformLocation = GL.GetUniformLocation(obj, uniformName);
+				
 				Console.WriteLine ("{0}: {1} {2} {3}", x, name, type, length);
-				EffectParameter efp = new EffectParameter(this,name.ToString(), x, type.ToString(), length);
+								
+				EffectParameter efp = new EffectParameter(this, uniformName, x, userIndex, uniformLocation,
+				                                          type.ToString(), length);
 				Parameters._parameters.Add(efp.Name, efp);
 				if (efp.ParameterType == EffectParameterType.Texture2D) {
 					_textureMappings.Add(efp);
