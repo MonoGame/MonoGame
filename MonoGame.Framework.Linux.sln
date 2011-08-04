@@ -7,8 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Samples.Draw2D.Lin
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Samples.Tetris.Linux", "Samples\Linux\Tetris\MonoGame.Samples.Tetris.Linux.csproj", "{86A619E2-C8F0-452B-B762-C69D5BB07C98}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Samples.Input.Linux", "Samples\Linux\Input\MonoGame.Samples.Input.Linux.csproj", "{8CFEF1FE-5E32-43EB-A730-EB3AACDC77B1}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Samples.TiledSprites.Linux", "Samples\Linux\TiledSprites\MonoGame.Samples.TiledSprites.Linux.csproj", "{86A619E2-C8F0-452B-A762-C69D5BB07C98}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Samples.ChaseAndEvade.Linux", "Samples\Linux\ChaseAndEvade\MonoGame.Samples.ChaseAndEvade.Linux.csproj", "{86A619E2-C8F0-452B-B764-C69D5BB07C98}"
@@ -57,10 +55,6 @@ Global
 		{86A919E2-D7F0-452B-B762-C69D5BB07C98}.Debug|x86.Build.0 = Debug|x86
 		{86A919E2-D7F0-452B-B762-C69D5BB07C98}.Release|x86.ActiveCfg = Release|x86
 		{86A919E2-D7F0-452B-B762-C69D5BB07C98}.Release|x86.Build.0 = Release|x86
-		{8CFEF1FE-5E32-43EB-A730-EB3AACDC77B1}.Debug|x86.ActiveCfg = Debug|x86
-		{8CFEF1FE-5E32-43EB-A730-EB3AACDC77B1}.Debug|x86.Build.0 = Debug|x86
-		{8CFEF1FE-5E32-43EB-A730-EB3AACDC77B1}.Release|x86.ActiveCfg = Release|x86
-		{8CFEF1FE-5E32-43EB-A730-EB3AACDC77B1}.Release|x86.Build.0 = Release|x86
 		{8CFEF1FE-9E32-43EB-A730-EB3AACDC77B1}.Debug|x86.ActiveCfg = Debug|x86
 		{8CFEF1FE-9E32-43EB-A730-EB3AACDC77B1}.Debug|x86.Build.0 = Debug|x86
 		{8CFEF1FE-9E32-43EB-A730-EB3AACDC77B1}.Release|x86.ActiveCfg = Release|x86
