@@ -45,7 +45,7 @@ using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework.Content;
 using OpenTK.Graphics.OpenGL;
 using Path = System.IO.Path;
-using PixelType = OpenTK.Graphics.ES11.PixelType;
+using PixelType = OpenTK.Graphics.OpenGL.PixelType;
 
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -59,6 +59,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		protected int _width;
 		protected int _height;
 		private bool _mipmap;
+		private byte[] textureData = null;
 		
 		internal bool IsSpriteFontTexture {get;set;}
 		
@@ -121,30 +122,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			this._mipmap = mipMap;
 			
 			generateOpenGLTexture();
-		}
-		
-		private void generateOpenGLTexture() 
-		{
-			// modeled after this
-			// http://steinsoft.net/index.php?site=Programming/Code%20Snippets/OpenGL/no9
-			
-			GL.GenTextures(1,out _textureId);
-			GL.BindTexture(TextureTarget.Texture2D, _textureId);
-			
-			if (_mipmap)
-			{
-				// Taken from http://www.flexicoder.com/blog/index.php/2009/11/iphone-mipmaps/
-				GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)All.LinearMipmapNearest);
-				GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)All.Linear);
-				GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.GenerateMipmap, (int)All.True);
-			}
-			else
-			{
-				GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)All.Linear);
-				GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)All.Linear);
-			}
-			GL.BindTexture(TextureTarget.Texture2D, 0);
-			
 		}
 
         public Color GetPixel(int x, int y)
@@ -217,11 +194,6 @@ namespace Microsoft.Xna.Framework.Graphics
             throw new NotImplementedException();
         }
 
-        public void SetData<T>(T[] data)
-        {
-			throw new NotImplementedException();
-        }
-
         public int Width
         {
             get
@@ -271,33 +243,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			Texture2D result = new Texture2D(theTexture);
 			result.Name = Path.GetFileNameWithoutExtension(filename);
 			return result;
-			
-			//NSImage image = new NSImage(filename);
-//			if (image == null)
-//			{
-//				throw new ContentLoadException("Error loading file: " + filename);
-//			}			
-//			
-//			ESImage theTexture;
-//			
-//			if ( width == 0 && height == 0 )
-//			{
-//				theTexture = new ESImage(image, graphicsDevice.PreferedFilter);
-//			}
-//			else
-//			{
-//				// TODO: figure out the scaling
-//				//var small = image.Scale (new SizeF (width, height));
-//				//theTexture = new ESImage(small, graphicsDevice.PreferedFilter);
-//				theTexture = new ESImage(image, graphicsDevice.PreferedFilter);
-//			}
-//			Texture2D result = new Texture2D(theTexture);
-//			// result.Name = Path.GetFileNameWithoutExtension(filename);
-//			result.Name = filename;
-////			_width = theTexture.ImageWidth;
-////			_height = theTexture.ImageHeight;
-////			_format = theTexture.Format;			
-//			return result;					
         }
 
         public static Texture2D FromFile(GraphicsDevice graphicsDevice, string filename)
@@ -305,15 +250,125 @@ namespace Microsoft.Xna.Framework.Graphics
 			return FromFile( graphicsDevice, filename, 0, 0 );
         }
 		
-        public void SetData<T>(T[] data, int startIndex, int elementCount, SetDataOptions options)
-        {
-            throw new NotImplementedException();
-        }
+		private void generateOpenGLTexture ()
+		{
+			// modeled after this
+			// http://steinsoft.net/index.php?site=Programming/Code%20Snippets/OpenGL/no9
+			
+			GL.GenTextures(1,out _textureId);
+			GL.BindTexture(TextureTarget.Texture2D, _textureId);
+			
+			if (_mipmap)
+			{
+				// Taken from http://www.flexicoder.com/blog/index.php/2009/11/iphone-mipmaps/
+				GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)All.LinearMipmapNearest);
+				GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)All.Linear);
+				GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.GenerateMipmap, (int)All.True);
+			}
+			else
+			{
+				GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)All.Linear);
+				GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)All.Linear);
+			}
+			
+			textureData = new byte[(_width * _height) * 4];
+			
+			GL.TexImage2D (TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, _width, _height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, textureData);			
+			
+			GL.BindTexture(TextureTarget.Texture2D, 0);
 
-        public void SetData<T>(int level, Rectangle? rect, T[] data, int startIndex, int elementCount, SetDataOptions options)
-        {
-            throw new NotImplementedException();
-        }
+			// The following is left here for testing purposes
+//			NSImage image = new NSImage (new SizeF (_width, _height));
+//			image.LockFocus ();
+//			// We set this to be cleared/initialized
+//			NSColor.Clear.Set ();
+//			NSGraphics.RectFill (new RectangleF (0,0,_width,_height));
+//			image.UnlockFocus ();
+//
+//			if (image == null) {
+//				throw new Exception ("Error Creating Texture2D.");
+//			}			
+//
+//			texture = new ESImage (image, graphicsDevice.PreferedFilter);
+//			_textureId = (int)texture.Name;
+		}		
+		
+		private void SetData (int index, byte red, byte green, byte blue, byte alpha) 
+		{
+			switch (_format) {				
+			case SurfaceFormat.Color /*kTexture2DPixelFormat_RGBA8888*/:
+			case SurfaceFormat.Dxt1:
+			case SurfaceFormat.Dxt3:
+				index *= 4;
+				textureData [index] = red;
+				textureData [index + 1] = green;
+				textureData [index + 2] = blue;
+				textureData [index + 3] = alpha;				
+				break;
+				
+			// TODO: Implement the rest of these but lack of knowledge and examples prevents this for now
+			case SurfaceFormat.Bgra4444 /*kTexture2DPixelFormat_RGBA4444*/:
+				break;
+			case SurfaceFormat.Bgra5551 /*kTexture2DPixelFormat_RGB5A1*/:
+				break;
+			case SurfaceFormat.Alpha8 /*kTexture2DPixelFormat_A8*/:
+				break;
+			default:
+				throw new NotSupportedException ("Texture format");
+				;					
+			}
+		}
+		
+		private void Apply() 
+		{
+			
+			GL.BindTexture (TextureTarget.Texture2D, (uint)_textureId);			
+			if (_mipmap)
+			{
+				// Taken from http://www.flexicoder.com/blog/index.php/2009/11/iphone-mipmaps/
+				GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)All.LinearMipmapNearest);
+				GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)All.Linear);
+				GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.GenerateMipmap, (int)All.True);
+			}
+			else
+			{
+				GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)All.Linear);
+				GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)All.Linear);
+			}			
+
+			GL.TexImage2D (TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, _width, _height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Rgba, PixelType.UnsignedByte, textureData);
+		}		
+		
+		public void SetData<T> (T[] data)
+		{
+			if (data == null) {
+				// we offload to ESImage here
+			}
+			else {
+				// we now have a texture not based on an outside image source
+				// now we check what type was passed
+				if (typeof(T) == typeof(Color)) {
+					int y = 0;
+					for (int x = data.Length - 1; x >= 0; x--) {
+						var color = (Color)(object)data[x];
+						SetData(y++,color.R, color.G, color.B, color.A);
+					}
+				}
+				
+				// when we are all done we need apply the changes
+				Apply();
+			}
+		}		
+		
+		public void SetData<T> (T[] data, int startIndex, int elementCount, SetDataOptions options)
+		{
+			throw new NotImplementedException ();
+		}
+
+		public void SetData<T> (int level, Rectangle? rect, T[] data, int startIndex, int elementCount, SetDataOptions options)
+		{
+			throw new NotImplementedException ();
+		}
 
         public void GetData<T>(T[] data)
         {	
