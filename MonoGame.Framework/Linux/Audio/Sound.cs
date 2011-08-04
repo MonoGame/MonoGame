@@ -96,7 +96,7 @@ namespace Microsoft.Xna.Framework.Audio
 			}
 		}
 		
-		public Sound(string url, float volume, bool looping)
+		public Sound(string filename, float volume, bool looping)
 		{
 			ALFormat format;
 			int size;
@@ -105,8 +105,8 @@ namespace Microsoft.Xna.Framework.Audio
 			Stream s;
 			
 			try
-			{				
-		 		s = File.OpenRead(new Uri(url).LocalPath);
+			{
+		 		s = File.OpenRead(filename);
 			}
 			catch(IOException e)
 			{
