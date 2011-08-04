@@ -1,4 +1,4 @@
-uniform sampler2D TextureSampler;
+uniform sampler2D TextureSampler_s0;
 
 vec4 Desaturate(vec3 color, float Desaturation)
 {
@@ -12,7 +12,7 @@ vec4 Desaturate(vec3 color, float Desaturation)
 
 void main()
 {
-	vec4 tex = texture2D(TextureSampler, gl_TexCoord[0].xy);
+	vec4 tex = texture2D(TextureSampler_s0, gl_TexCoord[0].xy);
 	vec4 color = Desaturate(tex.rgb, gl_Color.a * 4.0);
 	
 	gl_FragColor = color;
