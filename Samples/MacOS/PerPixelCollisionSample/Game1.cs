@@ -104,7 +104,6 @@ namespace PerPixelCollision
             personTextureData =
                 new Color[personTexture.Width * personTexture.Height];
             personTexture.GetData(personTextureData);
-
             // Create a sprite batch to draw those textures
             spriteBatch = new SpriteBatch(graphics.GraphicsDevice);
         }
@@ -211,12 +210,10 @@ namespace PerPixelCollision
                 device.Clear(Color.CornflowerBlue);
             }
 
-
             spriteBatch.Begin();
 
             // Draw person
             spriteBatch.Draw(personTexture, personPosition, Color.White);
-
             // Draw blocks
             foreach (Vector2 blockPosition in blockPositions)
                 spriteBatch.Draw(blockTexture, blockPosition, Color.White);
