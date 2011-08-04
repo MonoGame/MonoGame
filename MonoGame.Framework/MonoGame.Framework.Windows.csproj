@@ -160,11 +160,12 @@
     <Compile Include="Graphics\Effect\EffectParameterClass.cs" />
     <Compile Include="Graphics\Effect\EffectParameterCollection.cs" />
     <Compile Include="Graphics\Effect\EffectParameterType.cs" />
-    <Compile Include="Graphics\Effect\EffectPass.cs" />
     <Compile Include="Graphics\Effect\EffectPassCollection.cs" />
     <Compile Include="Graphics\Effect\EffectPool.cs" />
     <Compile Include="Graphics\Effect\EffectTechnique.cs" />
     <Compile Include="Graphics\Effect\EffectTechniqueCollection.cs" />
+    <Compile Include="Graphics\Effect\SpriteEffect.cs" />
+    <Compile Include="Graphics\Effect\SpriteEffectCode.cs" />
     <Compile Include="Graphics\GraphicsExtensions.cs" />
     <Compile Include="Graphics\PackedVector\IPackedVector.cs" />
     <Compile Include="Graphics\PackedVector\Short2.cs" />
@@ -248,6 +249,7 @@
     <Compile Include="Windows\GamerServices\SignedInGamer.cs" />
     <Compile Include="Windows\Graphics\DisplayMode.cs" />
     <Compile Include="Windows\Graphics\Effect.cs" />
+    <Compile Include="Windows\Graphics\Effect\EffectPass.cs" />
     <Compile Include="Windows\Graphics\ESImage.cs" />
     <Compile Include="Windows\Graphics\ESTexture2D.cs" />
     <Compile Include="Windows\Graphics\GraphicsAdapter.cs" />
@@ -386,9 +388,5 @@
       <Name>Lidgren.Network.Windows</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Audio" />
-    <Folder Include="Media" />
-    <Folder Include="Windows\Audio" />
-  </ItemGroup>
+  <ItemGroup />
 </Project>

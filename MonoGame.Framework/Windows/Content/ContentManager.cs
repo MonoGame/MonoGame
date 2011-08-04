@@ -152,6 +152,10 @@ namespace Microsoft.Xna.Framework.Content
 					//result = new SpriteFont(Texture2D.FromFile(graphicsDeviceService.GraphicsDevice,assetName), null, null, null, 0, 0.0f, null, null);
 					throw new NotImplementedException();
 				}
+                if (typeof(T) == typeof(Effect))
+                {
+                    result = new Effect(graphicsDeviceService.GraphicsDevice, assetName);
+                }
 
                 /*if ((typeof(T) == typeof(Song)))
                     result = new Song(assetName);
