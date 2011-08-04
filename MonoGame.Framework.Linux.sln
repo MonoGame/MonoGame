@@ -69,6 +69,6 @@ Global
 		{AE483C29-042E-4226-BA52-D247CE7676DA}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = Samples\Linux\Sound\MonoGame.Samples.Sound.Linux.csproj
+		StartupItem = Samples\Linux\SpriteEffects\MonoGame.Samples.SpriteEffects.Linux.csproj
 	EndGlobalSection
 EndGlobal
