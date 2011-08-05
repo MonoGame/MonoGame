@@ -5,7 +5,7 @@
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{86A219E2-C8F0-452B-B762-C69D5BB07C98}</ProjectGuid>
+    <ProjectGuid>{86A219E2-C8F1-422B-C762-C69D5BB07C98}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>FloodControl</RootNamespace>
     <AssemblyName>FloodControl</AssemblyName>
