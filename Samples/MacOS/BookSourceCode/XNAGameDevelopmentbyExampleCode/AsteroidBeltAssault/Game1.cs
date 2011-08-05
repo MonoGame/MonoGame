@@ -74,7 +74,7 @@ namespace Asteroid_Belt_Assault
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             titleScreen = Content.Load<Texture2D>(@"Textures\TitleScreen");
-            spriteSheet = Content.Load<Texture2D>(@"Textures\SpriteSheet");
+            spriteSheet = Content.Load<Texture2D>(@"Textures\spriteSheet");
 
             starField = new StarField(
                 this.Window.ClientBounds.Width,
