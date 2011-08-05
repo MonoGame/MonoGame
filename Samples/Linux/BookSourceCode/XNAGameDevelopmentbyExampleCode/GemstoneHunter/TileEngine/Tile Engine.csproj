@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>10.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{521972FD-1A9B-4CFD-A435-EB2224985131}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Tile_Engine</RootNamespace>
+    <AssemblyName>Tile Engine</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\..\..\..\..\..\..\projects\monogame\Samples\MacOS\BookSourceCode\XNAGameDevelopmentbyExampleCode\GemstoneHunter\TileEngine\TileMap.cs">
+      <Link>TileMap.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\..\..\projects\monogame\Samples\MacOS\BookSourceCode\XNAGameDevelopmentbyExampleCode\GemstoneHunter\TileEngine\MyClass.cs">
+      <Link>MyClass.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\..\..\projects\monogame\Samples\MacOS\BookSourceCode\XNAGameDevelopmentbyExampleCode\GemstoneHunter\TileEngine\MapSquare.cs">
+      <Link>MapSquare.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\..\..\projects\monogame\Samples\MacOS\BookSourceCode\XNAGameDevelopmentbyExampleCode\GemstoneHunter\TileEngine\Camera.cs">
+      <Link>Camera.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\..\MonoGame.Framework\MonoGame.Framework.Linux.csproj">
+      <Project>{35253CE1-C864-4CD3-8249-4D1319748E8F}</Project>
+      <Name>MonoGame.Framework.Linux</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\..\..\..\..\..\projects\monogame\Samples\MacOS\BookSourceCode\XNAGameDevelopmentbyExampleCode\GemstoneHunter\TileEngine\AssemblyInfo.cs">
+      <Link>AssemblyInfo.cs</Link>
+    </None>
+  </ItemGroup>
+</Project>

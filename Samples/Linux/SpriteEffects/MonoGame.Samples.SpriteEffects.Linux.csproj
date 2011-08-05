@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="3.5" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{86A919E2-D7F0-452B-B762-C69D5BB07C98}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>SpriteEffects</RootNamespace>
+    <AssemblyName>SpriteEffects</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG LINUX</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <DebugType>none</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Drawing" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\MacOS\SpriteEffects\Content\waterfall.xnb">
+      <Link>Content\waterfall.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\MacOS\SpriteEffects\Content\refraction.fx">
+      <Link>Content\refraction.fx</Link>
+    </None>
+    <None Include="..\..\MacOS\SpriteEffects\Content\refraction.fsh">
+      <Link>Content\refraction.fsh</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\MacOS\SpriteEffects\Content\normalmap.fx">
+      <Link>Content\normalmap.fx</Link>
+    </None>
+    <None Include="..\..\MacOS\SpriteEffects\Content\normalmap.fsh">
+      <Link>Content\normalmap.fsh</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\MacOS\SpriteEffects\Content\glacier.xnb">
+      <Link>Content\glacier.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\MacOS\SpriteEffects\Content\disappear.fx">
+      <Link>Content\disappear.fx</Link>
+    </None>
+    <None Include="..\..\MacOS\SpriteEffects\Content\disappear.fsh">
+      <Link>Content\disappear.fsh</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\MacOS\SpriteEffects\Content\desaturate.fx">
+      <Link>Content\desaturate.fx</Link>
+    </None>
+    <None Include="..\..\MacOS\SpriteEffects\Content\desaturate.fsh">
+      <Link>Content\desaturate.fsh</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\MacOS\SpriteEffects\Content\cat_normalmap.xnb">
+      <Link>Content\cat_normalmap.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\MacOS\SpriteEffects\Content\cat_depth.jpg">
+      <Link>Content\cat_depth.jpg</Link>
+    </None>
+    <None Include="..\..\MacOS\SpriteEffects\Content\cat_alpha.jpg">
+      <Link>Content\cat_alpha.jpg</Link>
+    </None>
+    <None Include="..\..\MacOS\SpriteEffects\Content\cat.xnb">
+      <Link>Content\cat.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\MacOS\SpriteEffects\Content\cat.jpg">
+      <Link>Content\cat.jpg</Link>
+    </None>
+    <None Include="..\..\MacOS\SpriteEffects\Info.plist">
+      <Link>Info.plist</Link>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Content\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Program.cs" />
+    <Compile Include="..\..\MacOS\SpriteEffects\SpriteEffects.cs">
+      <Link>SpriteEffects.cs</Link>
+    </Compile>
+    <Compile Include="RefractionEffect.cs" />
+    <Compile Include="NormalmapEffect.cs" />
+    <Compile Include="DisappearEffect.cs" />
+    <Compile Include="DesaturateEffect.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\MonoGame.Framework\MonoGame.Framework.Linux.csproj">
+      <Project>{35253CE1-C864-4CD3-8249-4D1319748E8F}</Project>
+      <Name>MonoGame.Framework.Linux</Name>
+    </ProjectReference>
+  </ItemGroup>
+</Project>

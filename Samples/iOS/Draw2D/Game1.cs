@@ -68,7 +68,7 @@ namespace Microsoft.Xna.Samples.Draw2D
 			// TODO: use this.Content to load your game content here
 			texture = Content.Load<Texture2D> ("monogameicon");
 			// TODO ball = Content.Load<Texture2D> ("purpleBall.xnb");
-			font = Content.Load<SpriteFont> ("SpriteFont1");
+			font = Content.Load<SpriteFont> ("spriteFont1");
 
 			fps = new FPSCounterComponent (this,spriteBatch,font);
 			Components.Add(fps);

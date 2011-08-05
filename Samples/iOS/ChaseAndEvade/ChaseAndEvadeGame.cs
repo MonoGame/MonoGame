@@ -186,9 +186,9 @@ namespace ChaseAndEvade
 			// during the game.
 			spriteBatch = new SpriteBatch (graphics.GraphicsDevice);
 			spriteFont = Content.Load<SpriteFont> ("Arial");
-			tankTexture = Content.Load<Texture2D> ("Tank");
-			catTexture = Content.Load<Texture2D> ("Cat");
-			mouseTexture = Content.Load<Texture2D> ("Mouse");
+			tankTexture = Content.Load<Texture2D> ("tank");
+			catTexture = Content.Load<Texture2D> ("cat");
+			mouseTexture = Content.Load<Texture2D> ("mouse");
 
 			// once all the content is loaded, we can calculate the centers of each
 			// of the textures that we loaded. Just like in the previous sample in
