@@ -79,10 +79,4 @@
       <Name>MonoGame.Framework.Linux</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="..\BookSourceCode\XNAGameDevelopmentbyExampleCode\AsteroidBeltAssault\Content\Sounds\Explosion1.xnb">
-      <Link>Content\Explosion1.xnb</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
 </Project>
