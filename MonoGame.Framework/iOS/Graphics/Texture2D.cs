@@ -292,7 +292,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			if (status != All.FramebufferCompleteOes)
 				throw new Exception("Error creating framebuffer: " + status);
 			
-			
 			byte[] imageInfo;
 			int sz = 0;
 			

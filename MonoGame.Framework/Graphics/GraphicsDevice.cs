@@ -365,7 +365,7 @@ namespace Microsoft.Xna.Framework.Graphics
 					GL.Oes.BindRenderbuffer(All.RenderbufferOes, renderBufferIDs[i]);
 					GL.Oes.RenderbufferStorage(All.RenderbufferOes, All.DepthComponent24Oes,
 						target.Width, target.Height);
-					GL.Oes.BindRenderbuffer(All.RenderbufferOes, 0);
+					GL.Oes.BindRenderbuffer(All.RenderbufferOes, renderBufferIDs[i]);
 					
 					// attach the renderbuffer to depth attachment point
 					GL.Oes.FramebufferRenderbuffer(All.FramebufferOes, All.DepthAttachmentOes,
