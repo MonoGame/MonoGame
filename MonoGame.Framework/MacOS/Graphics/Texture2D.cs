@@ -512,7 +512,9 @@ namespace Microsoft.Xna.Framework.Graphics
 				int rWidth = r.Width;
 				int rHeight = r.Height;
 				
-				if (textureData != null) {
+				if (texture == null) {
+					// For rendertargets we need to loop through and load the elements
+					// backwards because the texture data is flipped vertically and horizontally
 					var dataEnd = (rWidth * rHeight) - 1;
 					var dataPos = 0;
 					var dataRowColOffset = 0;
@@ -526,11 +528,10 @@ namespace Microsoft.Xna.Framework.Graphics
 								
 								dataPos = dataRowColOffset * 4;								
 															
-								//Marshal.Copy (pixelOffset, pixel, 0, 4);	
-								result.R = textureData [dataPos];
-								result.G = textureData [dataPos + 1];
-								result.B = textureData [dataPos + 2];
-								result.A = textureData [dataPos + 3];
+								result.R = imageInfo [dataPos];
+								result.G = imageInfo [dataPos + 1];
+								result.B = imageInfo [dataPos + 2];
+								result.A = imageInfo [dataPos + 3];
 								break;
 							default:
 								throw new NotSupportedException ("Texture format");
@@ -543,9 +544,6 @@ namespace Microsoft.Xna.Framework.Graphics
 				}
 				else {
 					// Loop through and extract the data but we need to load it 
-					// backwards from end to start
-					//var dataPos = (_width * _height) - 1;
-					var dataPos = 0;
 					var dataRowColOffset = 0;
 					var sz = 0;
 					var pixelOffset = 0;
