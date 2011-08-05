@@ -21,6 +21,11 @@
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
     <ConsolePause>false</ConsolePause>
+    <EnvironmentVariables>
+      <EnvironmentVariables>
+        <Variable name="MONO_IOMAP" value="all" />
+      </EnvironmentVariables>
+    </EnvironmentVariables>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <DebugType>none</DebugType>
