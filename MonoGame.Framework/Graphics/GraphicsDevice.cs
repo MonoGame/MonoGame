@@ -55,7 +55,6 @@ namespace Microsoft.Xna.Framework.Graphics
 		private Viewport _viewport;
 		
 		private bool _isDisposed = false;
-		private RenderState _renderState;
 		public TextureCollection Textures { get; set; }
         internal List<IntPtr> _pointerCache = new List<IntPtr>();
         private VertexBuffer _vertexBuffer = null;
@@ -111,8 +110,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			_viewport.MinDepth = 0.0f;
 			_viewport.MaxDepth = 1.0f;
 			
-			// Init RenderState
-			_renderState = new RenderState();
+			// Init RasterizerState
+			RasterizerState = new RasterizerState();
         }
 
         public void Clear(Color color)
@@ -297,21 +296,6 @@ namespace Microsoft.Xna.Framework.Graphics
 						_scissorRectangle.Y = _viewport.Height - _scissorRectangle.Y - _scissorRectangle.Height;
 						break;
 					}
-				}
-			}
-		}
-		
-		public RenderState RenderState 
-		{ 
-			get
-			{
-				return _renderState;
-			}
-			set
-			{
-				if ( _renderState  != value )
-				{
-					_renderState = value;
 				}
 			}
 		}
