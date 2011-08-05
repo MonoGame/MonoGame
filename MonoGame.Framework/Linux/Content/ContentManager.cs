@@ -106,7 +106,8 @@ namespace Microsoft.Xna.Framework.Content
 				assetName = _rootDirectory+Path.DirectorySeparatorChar+assetName;
 			}
 			
-			//assetName = assetName.Replace('/',Path.DirectorySeparatorChar);
+			// avoid windows programmers to have to change path separator on every content load.
+			assetName = assetName.Replace('\\',Path.DirectorySeparatorChar);
 			
 			// Get the real file name
 			if ((typeof(T) == typeof(Texture2D))) 
