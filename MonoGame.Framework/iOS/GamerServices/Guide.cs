@@ -52,6 +52,7 @@ using MonoTouch.GameKit;
 
 using Microsoft.Xna.Framework.Net;
 using Microsoft.Xna.Framework.Storage;
+using Microsoft.Xna.Framework.Input.Touch;
 
 
 #endregion Using clause
@@ -126,6 +127,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 		private static GKMatchmakerViewController matchmakerViewController;
 		private static GameVc viewController = null;
 		private static NSObject invokeOnMainThredObj = null;
+		private static GestureType prevGestures;
 		
 		private static NSObject GetInvokeOnMainThredObj()
 		{
@@ -369,6 +371,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 					{
 						leaderboardController.DismissModalViewControllerAnimated(true);
 						isVisible = false;
+						TouchPanel.EnabledGestures=prevGestures;
  					};
 
 					if (Window !=null)
@@ -379,7 +382,9 @@ namespace Microsoft.Xna.Framework.GamerServices
 							Window.Add(viewController.View);
 							viewController.View.Hidden = true;
 						}
-
+						
+						prevGestures=TouchPanel.EnabledGestures;
+						TouchPanel.EnabledGestures=GestureType.None;
 						viewController.PresentModalViewController(leaderboardController, true);
 						isVisible = true;
 					}
@@ -409,6 +414,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 					{									 
 						achievementController.DismissModalViewControllerAnimated(true);
 						isVisible = false;
+						TouchPanel.EnabledGestures=prevGestures;
 					};
 
 					if (Window !=null)
@@ -420,6 +426,8 @@ namespace Microsoft.Xna.Framework.GamerServices
 							viewController.View.Hidden = true;
 						}
 
+						prevGestures=TouchPanel.EnabledGestures;
+						TouchPanel.EnabledGestures=GestureType.None;
 						viewController.PresentModalViewController(achievementController, true);						
 						isVisible = true;
 					}
@@ -468,6 +476,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 					matchmakerViewController.DidFailWithError += delegate(object sender, GKErrorEventArgs e) {
 						matchmakerViewController.DismissModalViewControllerAnimated(true);
 						isVisible = false;
+						TouchPanel.EnabledGestures=prevGestures;
 					};
 					
 					matchmakerViewController.DidFindMatch += delegate(object sender, GKMatchEventArgs e) {
@@ -481,6 +490,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 					matchmakerViewController.WasCancelled += delegate(object sender, EventArgs e) {
 						matchmakerViewController.DismissModalViewControllerAnimated(true);
 						isVisible = false;
+						TouchPanel.EnabledGestures=prevGestures;
 					};
 
 					if (Window !=null)
@@ -492,6 +502,8 @@ namespace Microsoft.Xna.Framework.GamerServices
 							viewController.View.Hidden = true;
 						}
 
+						prevGestures=TouchPanel.EnabledGestures;
+						TouchPanel.EnabledGestures=GestureType.None;
 						viewController.PresentModalViewController(matchmakerViewController, true);						
 						isVisible = true;
 					}				
