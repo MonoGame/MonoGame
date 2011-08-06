@@ -38,86 +38,20 @@
 // */
 // #endregion License
 // 
-
 using System;
-using Microsoft.Xna.Framework.Graphics;
-using OpenTK.Graphics.ES11;
+using System.IO;
+
+ 
 
 namespace Microsoft.Xna.Framework
 {
-	[Obsolete("Removed from XNA 4")]
-	public sealed class RenderState
+	public static class TitleContainer
 	{
-
-		private bool _alphaBlendEnable;
-		
-		public bool AlphaBlendEnable 
-		{ 
-			get
-			{
-				return _alphaBlendEnable;
-			}
-			set
-			{
-				if ( _alphaBlendEnable != value )
-				{
-					_alphaBlendEnable = value;
-					
-					if (_alphaBlendEnable)
-					{
-						GL.Enable(All.AlphaTest);
-					}
-					else
-					{
-						GL.Disable(All.AlphaTest);
-					}
-				}
-			}
-		}
-		
-		public Blend AlphaSourceBlend 
-		{ 
-			get; 
-			set; 
-		}
-		
-		public Blend DestinationBlend
-		{ 
-			get; 
-			set; 
-		}
-		
-		public Blend SourceBlend
-		{ 
-			get; 
-			set; 
-		}
-		
-		bool _scissorTestEnable = false;
-		public bool ScissorTestEnable 
-		{ 
-			get
-			{
-				return _scissorTestEnable;
-			}
-			set
-			{
-				if ( _scissorTestEnable != value )
-				{
-					_scissorTestEnable = value;
-					if ( !_scissorTestEnable )					
-					{
-						GL.Disable(All.ScissorTest);	
-					}
-				}
-			}
-		}
-		
-		BlendFunction alphaBlendOperation;
-		public BlendFunction AlphaBlendOperation 
-		{ 
-		get { return alphaBlendOperation; } 
-		set { alphaBlendOperation = value; }
+		public static Stream OpenStream (string name)
+		{
+			var file = name;
+			return new FileStream(file, FileMode.Open); 
 		}
 	}
 }
+

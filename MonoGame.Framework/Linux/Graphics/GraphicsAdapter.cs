@@ -39,165 +39,167 @@ purpose and non-infringement.
 #endregion License
 
 using System;
-using Microsoft.Xna.Framework.Audio;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using OpenTK;
 
-﻿namespace Microsoft.Xna.Framework.Media
+namespace Microsoft.Xna.Framework.Graphics
 {
-    public static class MediaPlayer
+    public sealed class GraphicsAdapter : IDisposable
     {
-		private static Song _song = null;
-		private static MediaState _mediaState = MediaState.Stopped;
-		private static float _volume = 1.0f;
-		private static bool _looping = true;
+        private static ReadOnlyCollection<GraphicsAdapter> adapters;       
+        
+		private DisplayDevice adapter;
 		
-        public static void Pause()
-        {
-			if (_song != null)
-			{
-				_song.Pause();
-				_mediaState = MediaState.Paused;
-			}			
-        }
-
-        public static void Play(Song song)
-        {
-			if ( song != null )
-			{
-				_song = song;
-				_song.Volume = _volume;
-				_song.Loop = _looping;
-				_song.Play();
-				_mediaState = MediaState.Playing;
-			}
-        }
-
-        public static void Resume()
-        {
-			if (_song != null)
-			{
-				_song.Play();
-				_mediaState = MediaState.Playing;
-			}					
-        }
-
-        public static void Stop()
-        {
-			if (_song != null)
-			{
-				_song.Stop();
-				_mediaState = MediaState.Stopped;
-			}
-        }
-
-        public static bool IsMuted
-        {
-            get
-            {
-				if (_song != null)
-				{
-					return _song.Volume == 0.0f;
-				}
-				else
-				{
-					return false;
-				}
-            }
-            set
-            {
-				if (_song != null) 
-				{
-					if (value)
-					{
-						_song.Volume = 0.0f;
-					}
-					else 
-					{
-						_song.Volume = _volume;
-					}
-				}
-            }
-        }
-
-        public static bool IsRepeating
-        {
-            get
-            {
-				if (_song != null)
-				{
-					return _song.Loop;
-				}
-				else
-				{
-					return false;
-				}
-            }
-            set
-            {
-				_looping = value;
-            }
-        }
-
-        public static bool IsShuffled
-        {
-            get
-            {
-				return false;
-            }
-        }
-
-        public static bool IsVisualizationEnabled
-        {
-            get
-            {
-				return false;
-            }
-        }
-
-        public static TimeSpan PlayPosition
-        {
-            get
-            {
-				if (_song != null)
-				{
-					return _song.Position;
-				}
-				else
-				{
-					return new TimeSpan(0);
-				}
-            }
-        }
-
-        public static MediaState State
-        {
-            get
-            {
-				return _mediaState;
-            }
-        }
-		
-		public static bool GameHasControl
-        {
-            get
-            {
-            	return true;
-			}
+		private GraphicsAdapter(DisplayDevice adapter)
+		{
+			this.adapter = adapter;	
 		}
+		
+        public void Dispose()
+        {
+        }
 
-        public static float Volume
+        public DisplayMode CurrentDisplayMode
         {
             get
             {
-            	return _volume;
-			}
-            set
-            {         
-				if (_song != null)
+                int refreshRate = (int)adapter.RefreshRate;
+                SurfaceFormat format = SurfaceFormat.Color;
+
+                return new DisplayMode(adapter.Width,
+                                       adapter.Height,
+                                       refreshRate,
+                                       format);
+            }
+        }
+
+        public static GraphicsAdapter DefaultAdapter
+        {
+            get { return Adapters[0]; }
+        }
+        
+        public static ReadOnlyCollection<GraphicsAdapter> Adapters {
+            get {
+
+				if (adapters == null)
 				{
-					_volume = value;
-					_song.Volume = value;
+					GraphicsAdapter[] tmpAdapters = new GraphicsAdapter[DisplayDevice.AvailableDisplays.Count];
+					
+					for (int i = 0; i< DisplayDevice.AvailableDisplays.Count; i++) 
+					{
+                        tmpAdapters[i] = new GraphicsAdapter(DisplayDevice.AvailableDisplays[i]);
+                    }
+					
+					adapters = new ReadOnlyCollection<GraphicsAdapter>(tmpAdapters);
 				}
-			}
+				
+				return adapters;	
+            }
+        } 
+
+        public string Description
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public int DeviceId
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public Guid DeviceIdentifier
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public string DeviceName
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public string DriverDll
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public Version DriverVersion
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public bool IsDefaultAdapter
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public bool IsWideScreen
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public IntPtr MonitorHandle
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public int Revision
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public int SubSystemId
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+        
+        public DisplayModeCollection SupportedDisplayModes
+        {
+            get
+            {
+                return new DisplayModeCollection(new List<DisplayMode>(new DisplayMode[]{ CurrentDisplayMode, }));
+            }
+        }
+
+        public int VendorId
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 }

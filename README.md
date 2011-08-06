@@ -1,8 +1,8 @@
 # MonoGame
 
-MonoGame is a free OpenGL implementation of the XNA 4.0 Framework. It is built upon the excellent range of Mono compilers and is compatible with MonoTouch (iOS), MonoDroid (Android), MonoMac (Mac OS X) &amp; now Mono for Windows. 
+MonoGame is a free OpenGL implementation of the XNA 4.0 Framework. It is built upon the excellent range of Mono compilers and is compatible with MonoTouch (iOS), Mono for Android (Android), MonoMac (Mac OS X), Mono for Windows and now Linux!
 
-Our goal is to allow XNA developers on Windows &amp; Windows Phone 7 to port of their games to the iOS / Android / Mac OS X / Windows and visa versa, with minimal hassle.
+Our goal is to allow XNA developers on Windows &amp; Windows Phone 7 to port of their games to the iOS / Android / Mac OS X / Windows / Linux and visa versa, with minimal hassle.
 
 # Sponsors
 MonoGame is actively being worked on by...
