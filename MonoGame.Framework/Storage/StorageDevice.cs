@@ -38,28 +38,360 @@ purpose and non-infringement.
 */
 #endregion License
 
-﻿using System;
+//﻿using System;
+//
+//namespace Microsoft.Xna.Framework.Storage
+//{
+//    public class StorageDevice
+//    {
+//        public bool IsConnected
+//        {
+//            get
+//            {
+//                return true;
+//            }
+//        }
+//
+//        public StorageContainer OpenContainer(string containerName)
+//        {
+//            return new StorageContainer(this,containerName);
+//        }
+//		
+//		public static StorageDevice ShowStorageDeviceGuide()
+//		{
+//			return new StorageDevice();
+//		}
+//    }
+//}
+
+#region Assembly Microsoft.Xna.Framework.Storage.dll, v4.0.30319
+// C:\Program Files (x86)\Microsoft XNA\XNA Game Studio\v4.0\References\Windows\x86\Microsoft.Xna.Framework.Storage.dll
+#endregion
+using Microsoft.Xna.Framework;
+using System;
+using System.IO;
+
+using System.Runtime.Remoting.Messaging;
 
 namespace Microsoft.Xna.Framework.Storage
 {
-    public class StorageDevice
-    {
-        public bool IsConnected
-        {
-            get
-            {
-                return true;
-            }
-        }
+	
+	// The delegate must have the same signature as the method
+	// it will call asynchronously.
+	public delegate StorageDevice ShowSelectorAsynchronousShow (PlayerIndex? player, int sizeInBytes, int directoryCount);
 
-        public StorageContainer OpenContainer(string containerName)
-        {
-            return new StorageContainer(this,containerName);
-        }
+	// The delegate must have the same signature as the method
+	// it will call asynchronously.
+	public delegate StorageContainer OpenContainerAsynchronous (string displayName);
+	
+	// Summary:
+	//     Represents a storage device for user data, such as a memory unit or hard
+	//     drive. Reference page contains links to related conceptual articles.
+	public sealed class StorageDevice
+	{
 		
-		public static StorageDevice ShowStorageDeviceGuide()
+		PlayerIndex? player;
+		int sizeInBytes;
+		int directoryCount;
+		StorageContainer storageContainer;
+		
+		internal StorageDevice(PlayerIndex? player, int sizeInBytes, int directoryCount) 
 		{
-			return new StorageDevice();
+			this.player = player;
+			this.sizeInBytes = sizeInBytes;
+			this.directoryCount = directoryCount;
 		}
-    }
+		
+		// Summary:
+		//     Gets the amount of free space on the device.
+		public long FreeSpace { 
+			get { 
+				// I do not know if the DriveInfo is is implemented on Mac or not
+				// thus the try catch
+				try {
+					return new DriveInfo(GetDevicePath).AvailableFreeSpace;
+				}
+				catch (Exception) {
+					return 0;
+				}
+			} 
+		}
+		//
+		// Summary:
+		//     Gets whether the device is connected.
+		public bool IsConnected { 
+			get { 
+				// I do not know if the DriveInfo is is implemented on Mac or not
+				// thus the try catch
+				try {
+					return new DriveInfo(GetDevicePath).IsReady;
+				}
+				catch (Exception) {
+					return true;
+				}
+			} 
+		}
+		//
+		// Summary:
+		//     Gets the total amount of space on the device.
+		public long TotalSpace { 
+			get { 
+				
+				// I do not know if the DriveInfo is is implemented on Mac or not
+				// thus the try catch
+				try {
+					// Not sure if this should be TotalSize or TotalFreeSize
+					return new DriveInfo(GetDevicePath).TotalSize;
+				}
+				catch (Exception) {
+					return 0;
+				}
+					
+			} 
+		}
+		
+		string GetDevicePath
+		{
+			get {
+				// We may not need to store the StorageContainer in the future
+				// when we get DeviceChanged events working.
+				if (storageContainer == null) {
+					return StorageRoot;
+				}
+				else {
+					return storageContainer._storagePath;
+				}				
+			}
+		}
+		// Summary:
+		//     Occurs when a device is removed or inserted.
+		//
+		// Parameters:
+		//   :
+		// TODO: Implement DeviceChanged when we having the graphical implementation
+		public static event EventHandler<EventArgs> DeviceChanged;
+
+		// Summary:
+		//     Begins the process for opening a StorageContainer containing any files for
+		//     the specified title.
+		//
+		// Parameters:
+		//   displayName:
+		//     A constant human-readable string that names the file.
+		//
+		//   callback:
+		//     An AsyncCallback that represents the method called when the operation is
+		//     complete.
+		//
+		//   state:
+		//     A user-created object used to uniquely identify the request, or null.
+		public IAsyncResult BeginOpenContainer (string displayName, AsyncCallback callback, object state)
+		{
+			return OpenContainer(displayName, callback, state);
+
+		}
+		
+		private IAsyncResult OpenContainer (string displayName, AsyncCallback callback, object state)
+		{
+			try {
+				OpenContainerAsynchronous AsynchronousOpen = new OpenContainerAsynchronous (Open);
+				return AsynchronousOpen.BeginInvoke (displayName, callback, state);
+			} finally {
+			}
+		}
+	
+		// Private method to handle the creation of the StorageDevice
+		private StorageContainer Open (string displayName) 
+		{
+			storageContainer = new StorageContainer(this, displayName, this.player);
+			return storageContainer;
+		}
+		
+		//
+		// Summary:
+		//     Begins the process for displaying the storage device selector user interface,
+		//     and for specifying a callback implemented when the player chooses a device.
+		//     Reference page contains links to related code samples.
+		//
+		// Parameters:
+		//   callback:
+		//     An AsyncCallback that represents the method called when the player chooses
+		//     a device.
+		//
+		//   state:
+		//     A user-created object used to uniquely identify the request, or null.
+		public static IAsyncResult BeginShowSelector (AsyncCallback callback, object state)
+		{
+			return ShowSelector(null, 0, 0, callback, state);
+
+		}
+		//
+		// Summary:
+		//     Begins the process for displaying the storage device selector user interface;
+		//     specifies the callback implemented when the player chooses a device. Reference
+		//     page contains links to related code samples.
+		//
+		// Parameters:
+		//   player:
+		//     The PlayerIndex that represents the player who requested the save operation.
+		//     On Windows, the only valid option is PlayerIndex.One.
+		//
+		//   callback:
+		//     An AsyncCallback that represents the method called when the player chooses
+		//     a device.
+		//
+		//   state:
+		//     A user-created object used to uniquely identify the request, or null.
+		public static IAsyncResult BeginShowSelector (PlayerIndex player, AsyncCallback callback, object state)
+		{
+			return ShowSelector(null, 0, 0, callback, state);
+		}
+		//
+		// Summary:
+		//     Begins the process for displaying the storage device selector user interface,
+		//     and for specifying the size of the data to be written to the storage device
+		//     and the callback implemented when the player chooses a device. Reference
+		//     page contains links to related code samples.
+		//
+		// Parameters:
+		//   sizeInBytes:
+		//     The size, in bytes, of data to write to the storage device.
+		//
+		//   directoryCount:
+		//     The number of directories to write to the storage device.
+		//
+		//   callback:
+		//     An AsyncCallback that represents the method called when the player chooses
+		//     a device.
+		//
+		//   state:
+		//     A user-created object used to uniquely identify the request, or null.
+		public static IAsyncResult BeginShowSelector (int sizeInBytes, int directoryCount, AsyncCallback callback, object state)
+		{
+			return ShowSelector(null, sizeInBytes, directoryCount, callback, state);
+		}
+		
+		//
+		// Summary:
+		//     Begins the process for displaying the storage device selector user interface,
+		//     for specifying the player who requested the save operation, for setting the
+		//     size of data to be written to the storage device, and for naming the callback
+		//     implemented when the player chooses a device. Reference page contains links
+		//     to related code samples.
+		//
+		// Parameters:
+		//   player:
+		//     The PlayerIndex that represents the player who requested the save operation.
+		//     On Windows, the only valid option is PlayerIndex.One.
+		//
+		//   sizeInBytes:
+		//     The size, in bytes, of the data to write to the storage device.
+		//
+		//   directoryCount:
+		//     The number of directories to write to the storage device.
+		//
+		//   callback:
+		//     An AsyncCallback that represents the method called when the player chooses
+		//     a device.
+		//
+		//   state:
+		//     A user-created object used to uniquely identify the request, or null.
+		public static IAsyncResult BeginShowSelector (PlayerIndex player, int sizeInBytes, int directoryCount, AsyncCallback callback, object state)
+		{
+			return ShowSelector(player, sizeInBytes, directoryCount, callback, state);
+		}
+		
+		private static IAsyncResult ShowSelector (PlayerIndex? player, int sizeInBytes, int directoryCount, AsyncCallback callback, object state)
+		{
+			try {
+				ShowSelectorAsynchronousShow AsynchronousShow = new ShowSelectorAsynchronousShow (Show);
+				return AsynchronousShow.BeginInvoke (player, sizeInBytes, directoryCount, callback, state);
+			} finally {
+			}
+		}
+	
+		// Private method to handle the creation of the StorageDevice
+		private static StorageDevice Show (PlayerIndex? player, int sizeInBytes, int directoryCount) 
+		{
+			return new StorageDevice(player, sizeInBytes, directoryCount);
+		}
+		
+		
+		//
+		//
+		// Parameters:
+		//   titleName:
+		//     The name of the storage container to delete.
+		public void DeleteContainer (string titleName)
+		{
+			throw new NotImplementedException ();
+
+		}			
+		//
+		// Summary:
+		//     Ends the process for opening a StorageContainer.
+		//
+		// Parameters:
+		//   result:
+		//     The IAsyncResult returned from BeginOpenContainer.
+		public StorageContainer EndOpenContainer (IAsyncResult result)
+		{
+			StorageContainer returnValue = null;
+			try {
+				// Retrieve the delegate.
+				AsyncResult asyncResult = (AsyncResult)result;
+
+				// Wait for the WaitHandle to become signaled.
+				result.AsyncWaitHandle.WaitOne ();
+
+				// Call EndInvoke to retrieve the results.
+				if (asyncResult.AsyncDelegate is OpenContainerAsynchronous) {
+					returnValue = ((OpenContainerAsynchronous)asyncResult.AsyncDelegate).EndInvoke (result);
+				}	
+			} finally {
+				// Close the wait handle.
+				result.AsyncWaitHandle.Close ();	 
+			}
+			
+			return returnValue;
+
+		}			
+		//
+		// Summary:
+		//     Ends the display of the storage selector user interface. Reference page contains
+		//     links to related code samples.
+		//
+		// Parameters:
+		//   result:
+		//     The IAsyncResult returned from BeginShowSelector.
+		public static StorageDevice EndShowSelector (IAsyncResult result) 
+		{
+			StorageDevice returnValue = null;
+			try {
+				// Retrieve the delegate.
+				AsyncResult asyncResult = (AsyncResult)result;
+
+				// Wait for the WaitHandle to become signaled.
+				result.AsyncWaitHandle.WaitOne ();
+
+				// Call EndInvoke to retrieve the results.
+				if (asyncResult.AsyncDelegate is ShowSelectorAsynchronousShow) {
+					returnValue = ((ShowSelectorAsynchronousShow)asyncResult.AsyncDelegate).EndInvoke (result);
+				}	
+			} finally {
+				// Close the wait handle.
+				result.AsyncWaitHandle.Close ();	 
+			}
+			
+			return returnValue;
+
+		}
+		
+		internal static string StorageRoot
+		{
+			get {
+				return Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+			}
+		}
+	}
 }

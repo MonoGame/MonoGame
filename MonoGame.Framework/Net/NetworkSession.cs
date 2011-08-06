@@ -608,6 +608,7 @@ namespace Microsoft.Xna.Framework.Net
 			
 			return session;		
 		}
+		
 		public static NetworkSession JoinInvited (IEnumerable<SignedInGamer> localGamers)
 		{
 			try {

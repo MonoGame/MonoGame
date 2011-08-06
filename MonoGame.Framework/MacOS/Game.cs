@@ -119,6 +119,7 @@ namespace Microsoft.Xna.Framework
 		{
 
 			if (!_initialized && !_initializing) {
+				//Console.WriteLine("here");
 				//e.GameComponent.Initialize();
 			}
 			else {
@@ -295,19 +296,24 @@ namespace Microsoft.Xna.Framework
 			// Moving the GraphicsDevice creation to here also modifies when GameComponents are being
 			// initialized.
 			// Use OpenGL context locking in delegate function
-			InitialiseGameComponentsDelegate initD = new InitialiseGameComponentsDelegate (InitializeGameComponents);
-
-			// Invoke on thread from the pool
-			initD.BeginInvoke (
-				delegate (IAsyncResult iar) 
-				{
-					// We must have finished initialising, so set our flag appropriately
-					// So that we enter the Update loop
-					_initialized = true;
-					_initializing = false;
-				}, 
-			initD);
-
+//			InitialiseGameComponentsDelegate initD = new InitialiseGameComponentsDelegate (InitializeGameComponents);
+//
+//			// Invoke on thread from the pool
+//			initD.BeginInvoke (
+//				delegate (IAsyncResult iar) 
+//				{
+//					// We must have finished initialising, so set our flag appropriately
+//					// So that we enter the Update loop
+//					_initialized = true;
+//					_initializing = false;
+//				}, 
+//			initD);
+			
+			InitializeGameComponents();
+			_initialized = true;
+			_initializing = false;
+			
+			
 			Initialize ();
 
 			_view.Run (FramesPerSecond / (FramesPerSecond * TargetElapsedTime.TotalSeconds));
@@ -566,9 +572,30 @@ namespace Microsoft.Xna.Framework
 				
 				// Leave the following code there just in case there are problems
 				// with the intialization hack.
+				
 				//foreach (GameComponent gc in _gameComponentCollection) {
 				//foreach (IGameComponent gc in _gameComponentsToInitialize) {
-				foreach (IGameComponent gc in _gameComponentCollection) {
+//				foreach (IGameComponent gc in _gameComponentCollection) {
+//					// We may be drawing on a secondary thread through the display link or timer thread.
+//					// Add a mutex around to avoid the threads accessing the context simultaneously
+//					_view.OpenGLContext.CGLContext.Lock ();
+//
+//					// set our current context
+//					_view.MakeCurrent ();
+//
+//					gc.Initialize ();
+//
+//					// now unlock it
+//					_view.OpenGLContext.CGLContext.Unlock ();
+//					_gameComponentsToInitialize.Remove(gc);
+//				}
+				
+				// Changed from foreach to for loop in case the GameComponents's Update method
+				//   modifies the component collection.  With a foreach it causes an error:
+				//  "Collection was modified; enumeration operation may not execute."
+				//  .Net 4.0 I thought got around this but in Mono 2.10.2 we still get this error.
+				for (int x = 0; x < _gameComponentCollection.Count; x++) {
+					var gc = (GameComponent)_gameComponentCollection[x];
 					// We may be drawing on a secondary thread through the display link or timer thread.
 					// Add a mutex around to avoid the threads accessing the context simultaneously
 					_view.OpenGLContext.CGLContext.Lock ();
@@ -581,20 +608,13 @@ namespace Microsoft.Xna.Framework
 					// now unlock it
 					_view.OpenGLContext.CGLContext.Unlock ();
 					_gameComponentsToInitialize.Remove(gc);
-				}
+				}				
 			}							
 		}
 
 		protected virtual void Update (GameTime gameTime)
 		{			
 			if (_initialized  /* TODO && !Guide.IsVisible */) {
-				
-				
-//				foreach (GameComponent gc in _gameComponentCollection) {
-//					if (gc.Enabled) {
-//						gc.Update (gameTime);
-//					}
-//				}
 				
 				// Changed from foreach to for loop in case the GameComponents's Update method
 				//   modifies the component collection.  With a foreach it causes an error:
@@ -608,6 +628,10 @@ namespace Microsoft.Xna.Framework
 				}
 
 			} else {
+				
+				// TODO: We can probably take this out but will wait until the next round
+				//  of code checking.
+				//  This should have all been moved to the Run method for initialization
 				if (!_initializing) {
 					_initializing = true;
 
