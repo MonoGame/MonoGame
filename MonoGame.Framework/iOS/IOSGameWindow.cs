@@ -206,6 +206,7 @@ namespace Microsoft.Xna.Framework
 		protected override void OnClosed(EventArgs e)
 		{
 			base.OnClosed(e);
+			TouchPanel.EnabledGesturesChanged -= updateGestures;
 		}
 		
 		protected override void OnDisposed(EventArgs e)
@@ -216,57 +217,115 @@ namespace Microsoft.Xna.Framework
 		protected override void OnLoad (EventArgs e)
 		{
 			base.OnLoad(e);
-			
+			updateGestures (null, null);
+			TouchPanel.EnabledGesturesChanged += updateGestures;
+		}
+
+		void updateGestures (object sender, EventArgs e)
+		{
 			var enabledGestures = TouchPanel.EnabledGestures;
-			if ( enabledGestures != GestureType.None )
+			
+			if ((enabledGestures & GestureType.Hold) != 0)
 			{
-				if ((enabledGestures & GestureType.Hold) != 0)
+				if (recognizerLongPress == null)
 				{
-					recognizerLongPress = new UILongPressGestureRecognizer(this, new Selector ("LongPressGestureRecognizer"));		
+					recognizerLongPress = new UILongPressGestureRecognizer(this, new Selector("LongPressGestureRecognizer"));
 					recognizerLongPress.MinimumPressDuration = 1.0;
 					AddGestureRecognizer(recognizerLongPress);
 				}
-				
-				if ((enabledGestures & GestureType.Tap) != 0)
+			}
+			else if (recognizerLongPress != null)
+			{
+				RemoveGestureRecognizer(recognizerLongPress);
+				recognizerLongPress = null;
+			}
+			
+			if ((enabledGestures & GestureType.Tap) != 0)
+			{
+				if (recognizerTap == null)
 				{
-					recognizerTap = new UITapGestureRecognizer(this, new Selector ("TapGestureRecognizer"));
+					recognizerTap = new UITapGestureRecognizer(this, new Selector("TapGestureRecognizer"));
 					recognizerTap.NumberOfTapsRequired = 1;
 					AddGestureRecognizer(recognizerTap);
 				}
-				
-				if ((enabledGestures & GestureType.DoubleTap) != 0)
+			}
+			else if (recognizerTap != null)
+			{
+				RemoveGestureRecognizer(recognizerTap);
+				recognizerTap = null;
+			}
+			
+			if ((enabledGestures & GestureType.DoubleTap) != 0)
+			{
+				if (recognizerDoubleTap == null)
 				{
-					recognizerDoubleTap = new UITapGestureRecognizer(this, new Selector ("TapGestureRecognizer"));
+					recognizerDoubleTap = new UITapGestureRecognizer(this, new Selector("TapGestureRecognizer"));
 					recognizerDoubleTap.NumberOfTapsRequired = 2;
 					AddGestureRecognizer(recognizerDoubleTap);
 				}
+			}
+			else if (recognizerDoubleTap != null)
+			{
+				RemoveGestureRecognizer(recognizerDoubleTap);
+				recognizerDoubleTap = null;
+			}
 			
-				if ((enabledGestures & GestureType.FreeDrag) != 0)
+			if ((enabledGestures & GestureType.FreeDrag) != 0)
+			{
+				if (recognizerPan == null)
 				{
-					recognizerPan = new UIPanGestureRecognizer(this, new Selector ("PanGestureRecognizer"));					
+					recognizerPan = new UIPanGestureRecognizer(this, new Selector("PanGestureRecognizer"));
 					AddGestureRecognizer(recognizerPan);
 				}
-				
-				if ((enabledGestures & GestureType.Flick) != 0)
-				{			
-					recognizerSwipe = new UISwipeGestureRecognizer(this, new Selector ("SwipeGestureRecognizer"));		
+			}
+			else if (recognizerPan != null)
+			{
+				RemoveGestureRecognizer(recognizerPan);
+				recognizerPan = null;
+			}
+			
+			if ((enabledGestures & GestureType.Flick) != 0)
+			{
+				if (recognizerSwipe == null)
+				{
+					recognizerSwipe = new UISwipeGestureRecognizer(this, new Selector("SwipeGestureRecognizer"));
 					AddGestureRecognizer(recognizerSwipe);
 				}
+			}
+			else if (recognizerSwipe != null)
+			{
+				RemoveGestureRecognizer(recognizerSwipe);
+				recognizerSwipe = null;
+			}
 			
-				if ((enabledGestures & GestureType.Pinch) != 0)
+			if ((enabledGestures & GestureType.Pinch) != 0)
+			{
+				if (recognizerPinch == null)
 				{
-					recognizerPinch = new UIPinchGestureRecognizer(this, new Selector ("PinchGestureRecognizer"));		
+					recognizerPinch = new UIPinchGestureRecognizer(this, new Selector("PinchGestureRecognizer"));
 					AddGestureRecognizer(recognizerPinch);
 				}
-				
-				if ((enabledGestures & GestureType.Rotation) != 0)
-				{
-					recognizerRotation = new UIRotationGestureRecognizer(this, new Selector ("RotationGestureRecognizer"));		
-					AddGestureRecognizer(recognizerRotation);
-				}	
-				
-				
 			}
+			else if (recognizerPinch != null)
+			{
+				RemoveGestureRecognizer(recognizerPinch);
+				recognizerPinch = null;
+			}
+			
+			if ((enabledGestures & GestureType.Rotation) != 0)
+			{
+				if (recognizerRotation == null)
+				{
+					recognizerRotation = new UIRotationGestureRecognizer(this, new Selector("RotationGestureRecognizer"));
+					AddGestureRecognizer(recognizerRotation);
+				}
+			}
+			else if (recognizerRotation != null)
+			{
+				RemoveGestureRecognizer(recognizerRotation);
+				recognizerRotation = null;
+			}
+			
 		}
 		
 		protected override void OnRenderFrame(FrameEventArgs e)
@@ -334,64 +393,42 @@ namespace Microsoft.Xna.Framework
 		[Export("LongPressGestureRecognizer")]
 		public void LongPressGestureRecognizer (UILongPressGestureRecognizer sender)
 		{
-			var enabledGestures = TouchPanel.EnabledGestures;
-			if ((enabledGestures & GestureType.Hold) != 0)
-			{
-				TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.Hold, new TimeSpan(_nowUpdate.Ticks), new Vector2 (sender.LocationInView (sender.View)), new Vector2 (sender.LocationInView (sender.View)), new Vector2(0,0), new Vector2(0,0)));
-			}
+			TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.Hold, new TimeSpan(_nowUpdate.Ticks), new Vector2 (sender.LocationInView (sender.View)), new Vector2 (sender.LocationInView (sender.View)), new Vector2(0,0), new Vector2(0,0)));
 		}
 		
 		
 		[Export("PanGestureRecognizer")]
 		public void PanGestureRecognizer (UIPanGestureRecognizer sender)
 		{
-			
-			var enabledGestures = TouchPanel.EnabledGestures;
-			if ((enabledGestures & GestureType.FreeDrag) != 0)
-			{			
+			if (sender.State==UIGestureRecognizerState.Ended || sender.State==UIGestureRecognizerState.Cancelled || sender.State==UIGestureRecognizerState.Failed)
+				TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.DragComplete, new TimeSpan(_nowUpdate.Ticks), new Vector2 (sender.LocationInView (sender.View)), new Vector2(0,0), new Vector2 (sender.TranslationInView(sender.View)), new Vector2(0,0)));
+			else
 				TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.FreeDrag, new TimeSpan(_nowUpdate.Ticks), new Vector2 (sender.LocationInView (sender.View)), new Vector2(0,0), new Vector2 (sender.TranslationInView(sender.View)), new Vector2(0,0)));
-			}
 		}
 			
 		[Export("PinchGestureRecognizer")]
 		public void PinchGestureRecognizer (UIPinchGestureRecognizer sender)
 		{
-			var enabledGestures = TouchPanel.EnabledGestures;
-			if ((enabledGestures & GestureType.Pinch) != 0)
-			{
-				TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.Pinch, new TimeSpan(_nowUpdate.Ticks), new Vector2 (sender.LocationOfTouch(0,sender.View)), new Vector2 (sender.LocationOfTouch(1,sender.View)), new Vector2(0,0), new Vector2(0,0)));
-			}
+			TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.Pinch, new TimeSpan(_nowUpdate.Ticks), new Vector2 (sender.LocationOfTouch(0,sender.View)), new Vector2 (sender.LocationOfTouch(1,sender.View)), new Vector2(0,0), new Vector2(0,0)));
 		}
 		
 		
 		[Export("RotationGestureRecognizer")]
 		public void RotationGestureRecognizer (UIRotationGestureRecognizer sender)
 		{
-			var enabledGestures = TouchPanel.EnabledGestures;
-			if ((enabledGestures & GestureType.Rotation) != 0)
-			{
-				TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.Rotation, new TimeSpan(_nowUpdate.Ticks), new Vector2 (sender.LocationInView (sender.View)), new Vector2 (sender.LocationInView (sender.View)), new Vector2(0,0), new Vector2(0,0)));
-			}
+			TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.Rotation, new TimeSpan(_nowUpdate.Ticks), new Vector2 (sender.LocationInView (sender.View)), new Vector2 (sender.LocationInView (sender.View)), new Vector2(0,0), new Vector2(0,0)));
 		}
 		
 		[Export("SwipeGestureRecognizer")]
 		public void SwipeGestureRecognizer (UISwipeGestureRecognizer sender)
 		{
-			var enabledGestures = TouchPanel.EnabledGestures;
-			if ((enabledGestures & GestureType.Flick) != 0)
-			{
-				TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.Flick, new TimeSpan(_nowUpdate.Ticks), new Vector2 (sender.LocationInView (sender.View)), new Vector2 (sender.LocationInView (sender.View)), new Vector2(0,0), new Vector2(0,0)));		
-			}
+			TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.Flick, new TimeSpan(_nowUpdate.Ticks), new Vector2 (sender.LocationInView (sender.View)), new Vector2 (sender.LocationInView (sender.View)), new Vector2(0,0), new Vector2(0,0)));		
 		}
 		
 		[Export("TapGestureRecognizer")]
 		public void TapGestureRecognizer (UITapGestureRecognizer sender)
 		{
-			var enabledGestures = TouchPanel.EnabledGestures;
-			if ((enabledGestures & GestureType.Tap) != 0)
-			{
-				TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.Tap, new TimeSpan(_nowUpdate.Ticks), new Vector2 (sender.LocationInView (sender.View)), new Vector2 (sender.LocationInView (sender.View)), new Vector2(0,0), new Vector2(0,0)));
-			}
+			TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.Tap, new TimeSpan(_nowUpdate.Ticks), new Vector2 (sender.LocationInView (sender.View)), new Vector2 (sender.LocationInView (sender.View)), new Vector2(0,0), new Vector2(0,0)));
 		}
 		
 		private void FillTouchCollection(NSSet touches)
