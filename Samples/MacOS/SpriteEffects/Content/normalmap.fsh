@@ -1,7 +1,7 @@
 // Effect applies normalmapped lighting to a 2D sprite.
 
-uniform sampler2D TextureSampler;
-uniform sampler2D NormalSampler;
+uniform sampler2D TextureSampler_s0;
+uniform sampler2D NormalSampler_s1;
 
 uniform vec3 LightDirection;
 vec3 LightColor = vec3(1.5);
@@ -10,8 +10,8 @@ vec3 AmbientColor = vec3(0.0);
 void main()
 {
 	// Look up the texture and normalmap values.
-	vec4 tex = texture2D(TextureSampler, gl_TexCoord[0].xy);
-	vec3 normal = texture2D(NormalSampler, gl_TexCoord[0].xy).rgb * 2.0 - 1.0;
+	vec4 tex = texture2D(TextureSampler_s0, gl_TexCoord[0].xy);
+	vec3 normal = texture2D(NormalSampler_s1, gl_TexCoord[0].xy).rgb * 2.0 - 1.0;
 
 	// Compute lighting.
 	float lightAmount = max(dot(normal, LightDirection),0.0);

@@ -1,12 +1,12 @@
-uniform sampler2D TextureSampler;
-uniform sampler2D OverlaySampler;
+uniform sampler2D TextureSampler_s0;
+uniform sampler2D OverlaySampler_s1;
 
 uniform vec2 OverlayScroll;
 
 void main()
 {
-	vec4 tex = gl_Color * texture2D(TextureSampler, gl_TexCoord[0].xy);
-	vec4 tex2 = gl_Color * texture2D(OverlaySampler, OverlayScroll + gl_TexCoord[0].xy);
+	vec4 tex = gl_Color * texture2D(TextureSampler_s0, gl_TexCoord[0].xy);
+	vec4 tex2 = gl_Color * texture2D(OverlaySampler_s1, OverlayScroll + gl_TexCoord[0].xy);
 	float fadeSpeed = tex2.x; //texture2D(OverlaySampler, OverlayScroll + gl_TexCoord[1].xy).x;
 	vec4 color = tex;
 	color *= clamp((tex.a - fadeSpeed) * 2.5 + 1.0,0.0,1.0);
