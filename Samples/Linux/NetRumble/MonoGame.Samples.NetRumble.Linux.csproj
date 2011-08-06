@@ -1,0 +1,602 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="3.5" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{52735207-2136-433B-A3E4-4C082728EED8}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>NetRumble</RootNamespace>
+    <AssemblyName>NetRumble</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG LINUX</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <DebugType>none</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Drawing" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\MacOS\NetRumble\Info.plist">
+      <Link>Info.plist</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\GameThumbnail.png">
+      <Link>GameThumbnail.png</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Game.ico">
+      <Link>Game.ico</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\One Step Beyond.xnb">
+      <Link>Content\One Step Beyond.xnb</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\One Step Beyond.wma">
+      <Link>Content\One Step Beyond.wma</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\title.xnb">
+      <Link>Content\Textures\title.xnb</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\title.png">
+      <Link>Content\Textures\title.png</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\shipShields.xnb">
+      <Link>Content\Textures\shipShields.xnb</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\shipShields.png">
+      <Link>Content\Textures\shipShields.png</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\ship3Overlay.xnb">
+      <Link>Content\Textures\ship3Overlay.xnb</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\ship3Overlay.png">
+      <Link>Content\Textures\ship3Overlay.png</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\ship3.xnb">
+      <Link>Content\Textures\ship3.xnb</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\ship3.png">
+      <Link>Content\Textures\ship3.png</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\ship2Overlay.xnb">
+      <Link>Content\Textures\ship2Overlay.xnb</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\ship2Overlay.png">
+      <Link>Content\Textures\ship2Overlay.png</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\ship2.xnb">
+      <Link>Content\Textures\ship2.xnb</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\ship2.png">
+      <Link>Content\Textures\ship2.png</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\ship1Overlay.xnb">
+      <Link>Content\Textures\ship1Overlay.xnb</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\ship1Overlay.png">
+      <Link>Content\Textures\ship1Overlay.png</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\ship1.xnb">
+      <Link>Content\Textures\ship1.xnb</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\ship1.png">
+      <Link>Content\Textures\ship1.png</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\ship0Overlay.xnb">
+      <Link>Content\Textures\ship0Overlay.xnb</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\ship0Overlay.png">
+      <Link>Content\Textures\ship0Overlay.png</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\ship0.xnb">
+      <Link>Content\Textures\ship0.xnb</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\ship0.png">
+      <Link>Content\Textures\ship0.png</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\rocket.xnb">
+      <Link>Content\Textures\rocket.xnb</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\rocket.png">
+      <Link>Content\Textures\rocket.png</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\ready.xnb">
+      <Link>Content\Textures\ready.xnb</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\ready.png">
+      <Link>Content\Textures\ready.png</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\powerupTripleLaser.xnb">
+      <Link>Content\Textures\powerupTripleLaser.xnb</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\powerupTripleLaser.png">
+      <Link>Content\Textures\powerupTripleLaser.png</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\powerupRocket.xnb">
+      <Link>Content\Textures\powerupRocket.xnb</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\powerupRocket.png">
+      <Link>Content\Textures\powerupRocket.png</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\powerupDoubleLaser.xnb">
+      <Link>Content\Textures\powerupDoubleLaser.xnb</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\powerupDoubleLaser.png">
+      <Link>Content\Textures\powerupDoubleLaser.png</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\mine.xnb">
+      <Link>Content\Textures\mine.xnb</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\mine.png">
+      <Link>Content\Textures\mine.png</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\laser.xnb">
+      <Link>Content\Textures\laser.xnb</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\laser.png">
+      <Link>Content\Textures\laser.png</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\explosion.xnb">
+      <Link>Content\Textures\explosion.xnb</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\explosion.png">
+      <Link>Content\Textures\explosion.png</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\clouds.xnb">
+      <Link>Content\Textures\clouds.xnb</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\clouds.png">
+      <Link>Content\Textures\clouds.png</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\chatTalking.xnb">
+      <Link>Content\Textures\chatTalking.xnb</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\chatTalking.png">
+      <Link>Content\Textures\chatTalking.png</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\chatMute.xnb">
+      <Link>Content\Textures\chatMute.xnb</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\chatMute.png">
+      <Link>Content\Textures\chatMute.png</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\chatAble.xnb">
+      <Link>Content\Textures\chatAble.xnb</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\chatAble.png">
+      <Link>Content\Textures\chatAble.png</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\blank.xnb">
+      <Link>Content\Textures\blank.xnb</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\blank.png">
+      <Link>Content\Textures\blank.png</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\barrierRed.xnb">
+      <Link>Content\Textures\barrierRed.xnb</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\barrierRed.png">
+      <Link>Content\Textures\barrierRed.png</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\barrierPurple.xnb">
+      <Link>Content\Textures\barrierPurple.xnb</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\barrierPurple.png">
+      <Link>Content\Textures\barrierPurple.png</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\barrierEnd.xnb">
+      <Link>Content\Textures\barrierEnd.xnb</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\barrierEnd.png">
+      <Link>Content\Textures\barrierEnd.png</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\asteroid2.xnb">
+      <Link>Content\Textures\asteroid2.xnb</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\asteroid2.png">
+      <Link>Content\Textures\asteroid2.png</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\asteroid1.xnb">
+      <Link>Content\Textures\asteroid1.xnb</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\asteroid1.png">
+      <Link>Content\Textures\asteroid1.png</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\asteroid0.xnb">
+      <Link>Content\Textures\asteroid0.xnb</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\asteroid0.png">
+      <Link>Content\Textures\asteroid0.png</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\Particles\defaultParticle.PNG">
+      <Link>Content\Textures\Particles\defaultParticle.PNG</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\Particles\defaultParticle.xnb">
+      <Link>Content\Textures\Particles\defaultParticle.xnb</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\Particles\particle.png">
+      <Link>Content\Textures\Particles\particle.png</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\Particles\particle.xnb">
+      <Link>Content\Textures\Particles\particle.xnb</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\Particles\smoke.png">
+      <Link>Content\Textures\Particles\smoke.png</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\Particles\smoke.xnb">
+      <Link>Content\Textures\Particles\smoke.xnb</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\Particles\spark.png">
+      <Link>Content\Textures\Particles\spark.png</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Textures\Particles\spark.xnb">
+      <Link>Content\Textures\Particles\spark.xnb</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Particles\laserExplosion.xml">
+      <Link>Content\Particles\laserExplosion.xml</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Particles\mineExplosion.xml">
+      <Link>Content\Particles\mineExplosion.xml</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Particles\rocketExplosion.xml">
+      <Link>Content\Particles\rocketExplosion.xml</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Particles\rocketTrail.xml">
+      <Link>Content\Particles\rocketTrail.xml</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Particles\shipExplosion.xml">
+      <Link>Content\Particles\shipExplosion.xml</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Particles\shipSpawn.xml">
+      <Link>Content\Particles\shipSpawn.xml</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Fonts\NetRumbleFont.xnb">
+      <Link>Content\Fonts\NetRumbleFont.xnb</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Fonts\NetRumbleFont.png">
+      <Link>Content\Fonts\NetRumbleFont.png</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Fonts\MessageBox.xnb">
+      <Link>Content\Fonts\MessageBox.xnb</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Fonts\MessageBox.spritefont">
+      <Link>Content\Fonts\MessageBox.spritefont</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Fonts\MenuFont.xnb">
+      <Link>Content\Fonts\MenuFont.xnb</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Fonts\MenuFont.spritefont">
+      <Link>Content\Fonts\MenuFont.spritefont</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\BloomPostprocess\Effects\BloomCombine.fsh">
+      <Link>Content\BloomPostprocess\Effects\BloomCombine.fsh</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\BloomPostprocess\Effects\BloomCombine.fx">
+      <Link>Content\BloomPostprocess\Effects\BloomCombine.fx</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\BloomPostprocess\Effects\BloomCombine.xnb">
+      <Link>Content\BloomPostprocess\Effects\BloomCombine.xnb</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\BloomPostprocess\Effects\BloomExtract.fsh">
+      <Link>Content\BloomPostprocess\Effects\BloomExtract.fsh</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\BloomPostprocess\Effects\BloomExtract.fx">
+      <Link>Content\BloomPostprocess\Effects\BloomExtract.fx</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\BloomPostprocess\Effects\BloomExtract.xnb">
+      <Link>Content\BloomPostprocess\Effects\BloomExtract.xnb</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\BloomPostprocess\Effects\GaussianBlur.fsh">
+      <Link>Content\BloomPostprocess\Effects\GaussianBlur.fsh</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\BloomPostprocess\Effects\GaussianBlur.fx">
+      <Link>Content\BloomPostprocess\Effects\GaussianBlur.fx</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\BloomPostprocess\Effects\GaussianBlur.xnb">
+      <Link>Content\BloomPostprocess\Effects\GaussianBlur.xnb</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Audio\wav\rocket.xnb">
+      <Link>Content\Audio\wav\rocket.xnb</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Audio\wav\rocket.wav">
+      <Link>Content\Audio\wav\rocket.wav</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Audio\wav\powerup_touch.xnb">
+      <Link>Content\Audio\wav\powerup_touch.xnb</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Audio\wav\powerup_touch.wav">
+      <Link>Content\Audio\wav\powerup_touch.wav</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Audio\wav\powerup_spawn.xnb">
+      <Link>Content\Audio\wav\powerup_spawn.xnb</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Audio\wav\powerup_spawn.wav">
+      <Link>Content\Audio\wav\powerup_spawn.wav</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Audio\wav\player_spawn.xnb">
+      <Link>Content\Audio\wav\player_spawn.xnb</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Audio\wav\player_spawn.wav">
+      <Link>Content\Audio\wav\player_spawn.wav</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Audio\wav\menu_select.xnb">
+      <Link>Content\Audio\wav\menu_select.xnb</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Audio\wav\menu_select.wav">
+      <Link>Content\Audio\wav\menu_select.wav</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Audio\wav\menu_scroll.xnb">
+      <Link>Content\Audio\wav\menu_scroll.xnb</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Audio\wav\menu_scroll.wav">
+      <Link>Content\Audio\wav\menu_scroll.wav</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Audio\wav\fire_rocket2.xnb">
+      <Link>Content\Audio\wav\fire_rocket2.xnb</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Audio\wav\fire_rocket2.wav">
+      <Link>Content\Audio\wav\fire_rocket2.wav</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Audio\wav\fire_rocket1.xnb">
+      <Link>Content\Audio\wav\fire_rocket1.xnb</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Audio\wav\fire_rocket1.wav">
+      <Link>Content\Audio\wav\fire_rocket1.wav</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Audio\wav\fire_laser3.xnb">
+      <Link>Content\Audio\wav\fire_laser3.xnb</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Audio\wav\fire_laser3.wav">
+      <Link>Content\Audio\wav\fire_laser3.wav</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Audio\wav\fire_laser2.xnb">
+      <Link>Content\Audio\wav\fire_laser2.xnb</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Audio\wav\fire_laser2.wav">
+      <Link>Content\Audio\wav\fire_laser2.wav</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Audio\wav\fire_laser1.xnb">
+      <Link>Content\Audio\wav\fire_laser1.xnb</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Audio\wav\fire_laser1.wav">
+      <Link>Content\Audio\wav\fire_laser1.wav</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Audio\wav\explosion_shockwave.xnb">
+      <Link>Content\Audio\wav\explosion_shockwave.xnb</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Audio\wav\explosion_shockwave.wav">
+      <Link>Content\Audio\wav\explosion_shockwave.wav</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Audio\wav\explosion_medium.xnb">
+      <Link>Content\Audio\wav\explosion_medium.xnb</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Audio\wav\explosion_medium.wav">
+      <Link>Content\Audio\wav\explosion_medium.wav</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Audio\wav\explosion_large.xnb">
+      <Link>Content\Audio\wav\explosion_large.xnb</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Audio\wav\explosion_large.wav">
+      <Link>Content\Audio\wav\explosion_large.wav</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Audio\wav\asteroid_touch.xnb">
+      <Link>Content\Audio\wav\asteroid_touch.xnb</Link>
+    </None>
+    <None Include="..\..\MacOS\NetRumble\Content\Audio\wav\asteroid_touch.wav">
+      <Link>Content\Audio\wav\asteroid_touch.wav</Link>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Program.cs" />
+    <Compile Include="..\..\MacOS\NetRumble\RandomMath.cs">
+      <Link>RandomMath.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\OperationCompletedEventArgs.cs">
+      <Link>OperationCompletedEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\NetRumbleGame.cs">
+      <Link>NetRumbleGame.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\CollisionMath.cs">
+      <Link>CollisionMath.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\BatchRemovalCollection.cs">
+      <Link>BatchRemovalCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Screens\SearchResultsScreen.cs">
+      <Link>Screens\SearchResultsScreen.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Screens\NetworkBusyScreen.cs">
+      <Link>Screens\NetworkBusyScreen.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Screens\MainMenuScreen.cs">
+      <Link>Screens\MainMenuScreen.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Screens\LobbyScreen.cs">
+      <Link>Screens\LobbyScreen.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Screens\GameplayScreen.cs">
+      <Link>Screens\GameplayScreen.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Screens\BackgroundScreen.cs">
+      <Link>Screens\BackgroundScreen.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\ScreenManager\ScreenManager.cs">
+      <Link>ScreenManager\ScreenManager.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\ScreenManager\MessageBoxScreen.cs">
+      <Link>ScreenManager\MessageBoxScreen.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\ScreenManager\MenuScreen.cs">
+      <Link>ScreenManager\MenuScreen.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\ScreenManager\LoadingScreen.cs">
+      <Link>ScreenManager\LoadingScreen.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\ScreenManager\InputState.cs">
+      <Link>ScreenManager\InputState.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\ScreenManager\GameScreen.cs">
+      <Link>ScreenManager\GameScreen.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Rendering\Particles\ParticleSystem.cs">
+      <Link>Rendering\Particles\ParticleSystem.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Rendering\Particles\ParticleEffectType.cs">
+      <Link>Rendering\Particles\ParticleEffectType.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Rendering\Particles\ParticleEffectManager.cs">
+      <Link>Rendering\Particles\ParticleEffectManager.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Rendering\Particles\ParticleEffect.cs">
+      <Link>Rendering\Particles\ParticleEffect.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Rendering\Particles\ParticleCache.cs">
+      <Link>Rendering\Particles\ParticleCache.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Rendering\Particles\Particle.cs">
+      <Link>Rendering\Particles\Particle.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Gameplay\World.cs">
+      <Link>Gameplay\World.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Gameplay\ShipInput.cs">
+      <Link>Gameplay\ShipInput.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Gameplay\Ship.cs">
+      <Link>Gameplay\Ship.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Gameplay\PlayerData.cs">
+      <Link>Gameplay\PlayerData.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Gameplay\GameplayObject.cs">
+      <Link>Gameplay\GameplayObject.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Gameplay\CollisionManager.cs">
+      <Link>Gameplay\CollisionManager.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Gameplay\Asteroid.cs">
+      <Link>Gameplay\Asteroid.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Gameplay\PowerUps\TripleLaserPowerUp.cs">
+      <Link>Gameplay\PowerUps\TripleLaserPowerUp.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Gameplay\PowerUps\RocketPowerUp.cs">
+      <Link>Gameplay\PowerUps\RocketPowerUp.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Gameplay\PowerUps\PowerUp.cs">
+      <Link>Gameplay\PowerUps\PowerUp.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Gameplay\PowerUps\DoubleLaserPowerUp.cs">
+      <Link>Gameplay\PowerUps\DoubleLaserPowerUp.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Gameplay\Projectiles\RocketProjectile.cs">
+      <Link>Gameplay\Projectiles\RocketProjectile.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Gameplay\Projectiles\Projectile.cs">
+      <Link>Gameplay\Projectiles\Projectile.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Gameplay\Projectiles\MineProjectile.cs">
+      <Link>Gameplay\Projectiles\MineProjectile.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Gameplay\Projectiles\LaserProjectile.cs">
+      <Link>Gameplay\Projectiles\LaserProjectile.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Gameplay\Weapons\Weapon.cs">
+      <Link>Gameplay\Weapons\Weapon.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Gameplay\Weapons\TripleLaserWeapon.cs">
+      <Link>Gameplay\Weapons\TripleLaserWeapon.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Gameplay\Weapons\RocketWeapon.cs">
+      <Link>Gameplay\Weapons\RocketWeapon.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Gameplay\Weapons\MineWeapon.cs">
+      <Link>Gameplay\Weapons\MineWeapon.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Gameplay\Weapons\LaserWeapon.cs">
+      <Link>Gameplay\Weapons\LaserWeapon.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\Gameplay\Weapons\DoubleLaserWeapon.cs">
+      <Link>Gameplay\Weapons\DoubleLaserWeapon.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\BloomPostprocess\BloomSettings.cs">
+      <Link>BloomPostprocess\BloomSettings.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\NetRumble\BloomPostprocess\BloomComponent.cs">
+      <Link>BloomPostprocess\BloomComponent.cs</Link>
+    </Compile>
+    <Compile Include="AudioManager.cs" />
+    <Compile Include="Effects\GaussianBlurEffect.cs" />
+    <Compile Include="Effects\CloudsEffect.cs" />
+    <Compile Include="Effects\BloomExtractEffect.cs" />
+    <Compile Include="Effects\BloomCombineEffect.cs" />
+    <Compile Include="Rendering\Starfield.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Effects\" />
+    <Folder Include="BloomPostprocess\" />
+    <Folder Include="Content\Audio\wav\" />
+    <Folder Include="Content\BloomPostprocess\Effects\" />
+    <Folder Include="Content\Effects\" />
+    <Folder Include="Content\Fonts\" />
+    <Folder Include="Content\Particles\" />
+    <Folder Include="Content\Textures\Particles\" />
+    <Folder Include="Gameplay\Weapons\" />
+    <Folder Include="Gameplay\Projectiles\" />
+    <Folder Include="Gameplay\PowerUps\" />
+    <Folder Include="Rendering\Particles\" />
+    <Folder Include="ScreenManager\" />
+    <Folder Include="Screens\" />
+    <Folder Include="Content\Particles\" />
+    <Folder Include="Content\Particles\" />
+    <Folder Include="Content\Particles\" />
+    <Folder Include="Content\Particles\" />
+    <Folder Include="Content\Particles\" />
+    <Folder Include="Content\Particles\" />
+    <Folder Include="Content\Particles\" />
+    <Folder Include="Content\Particles\" />
+    <Folder Include="Content\Textures\Particles\" />
+    <Folder Include="Content\Textures\Particles\" />
+    <Folder Include="Content\Textures\Particles\" />
+    <Folder Include="Content\Textures\Particles\" />
+    <Folder Include="Content\Textures\Particles\" />
+    <Folder Include="Content\Textures\Particles\" />
+    <Folder Include="Content\BloomPostprocess\" />
+    <Folder Include="Content\BloomPostprocess\" />
+    <Folder Include="Content\BloomPostprocess\" />
+    <Folder Include="Content\BloomPostprocess\" />
+    <Folder Include="Content\BloomPostprocess\" />
+    <Folder Include="Content\BloomPostprocess\" />
+    <Folder Include="Content\BloomPostprocess\" />
+    <Folder Include="Content\BloomPostprocess\" />
+    <Folder Include="Content\BloomPostprocess\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\MonoGame.Framework\MonoGame.Framework.Linux.csproj">
+      <Project>{35253CE1-C864-4CD3-8249-4D1319748E8F}</Project>
+      <Name>MonoGame.Framework.Linux</Name>
+    </ProjectReference>
+  </ItemGroup>
+</Project>

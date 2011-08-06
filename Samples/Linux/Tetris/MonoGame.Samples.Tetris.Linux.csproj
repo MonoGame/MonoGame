@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="3.5" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{86A619E2-C8F0-452B-B762-C69D5BB07C98}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>Tetris</RootNamespace>
+    <AssemblyName>Tetris</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG LINUX</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <DebugType>none</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Drawing" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\MacOS\Tetris\Content\tetris.png">
+      <Link>Content\tetris.png</Link>
+    </None>
+    <None Include="..\..\MacOS\Tetris\Content\score.png">
+      <Link>Content\score.png</Link>
+    </None>
+    <None Include="..\..\MacOS\Tetris\Content\font.spritefont">
+      <Link>Content\font.spritefont</Link>
+    </None>
+    <None Include="..\..\MacOS\Tetris\Content\Content.contentproj">
+      <Link>Content\Content.contentproj</Link>
+    </None>
+    <None Include="..\..\MacOS\Tetris\Content\background.psd">
+      <Link>Content\background.psd</Link>
+    </None>
+    <None Include="..\..\MacOS\Tetris\Content\background.png">
+      <Link>Content\background.png</Link>
+    </None>
+    <None Include="..\..\MacOS\Tetris\Content\Arial.xnb">
+      <Link>Content\Arial.xnb</Link>
+    </None>
+    <None Include="..\..\MacOS\Tetris\Info.plist">
+      <Link>Info.plist</Link>
+    </None>
+    <None Include="..\..\MacOS\Tetris\GameThumbnail.png">
+      <Link>GameThumbnail.png</Link>
+    </None>
+    <None Include="..\..\MacOS\Tetris\Game.ico">
+      <Link>Game.ico</Link>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Program.cs" />
+    <Compile Include="..\..\MacOS\Tetris\Score.cs">
+      <Link>Score.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Tetris\Record.cs">
+      <Link>Record.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Tetris\Board.cs">
+      <Link>Board.cs</Link>
+    </Compile>
+    <Compile Include="Engine.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\MonoGame.Framework\MonoGame.Framework.Linux.csproj">
+      <Project>{35253CE1-C864-4CD3-8249-4D1319748E8F}</Project>
+      <Name>MonoGame.Framework.Linux</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Content\" />
+  </ItemGroup>
+</Project>
