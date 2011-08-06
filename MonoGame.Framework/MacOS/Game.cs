@@ -112,7 +112,10 @@ namespace Microsoft.Xna.Framework
 			// Initialize GameTime
 			_updateGameTime = new GameTime ();
 			_drawGameTime = new GameTime ();  
-
+			
+			//Set the current directory.
+			// We set the current directory to the ResourcePath on Mac
+			Directory.SetCurrentDirectory(NSBundle.MainBundle.ResourcePath);
 		}
 
 		void Handle_gameComponentCollectionComponentAdded (object sender, GameComponentCollectionEventArgs e)
