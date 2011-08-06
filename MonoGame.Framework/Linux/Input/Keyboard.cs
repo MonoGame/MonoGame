@@ -40,84 +40,29 @@
 // 
 
 using System;
-using Microsoft.Xna.Framework.Graphics;
-using OpenTK.Graphics.ES11;
 
-namespace Microsoft.Xna.Framework
+namespace Microsoft.Xna.Framework.Input
 {
-	[Obsolete("Removed from XNA 4")]
-	public sealed class RenderState
-	{
-
-		private bool _alphaBlendEnable;
+	public static class Keyboard
+	{		
+		static KeyboardState _state;
 		
-		public bool AlphaBlendEnable 
-		{ 
-			get
+		public static KeyboardState GetState()
+		{
+			return _state; // TODO Not used on iPhone or Zune
+		}
+		
+		public static KeyboardState GetState(PlayerIndex playerIndex)
+		{
+			return _state;  // TODO Not used on iPhone or Zune
+		}
+		
+		internal static KeyboardState State
+		{
+			set 
 			{
-				return _alphaBlendEnable;
+				_state = value;
 			}
-			set
-			{
-				if ( _alphaBlendEnable != value )
-				{
-					_alphaBlendEnable = value;
-					
-					if (_alphaBlendEnable)
-					{
-						GL.Enable(All.AlphaTest);
-					}
-					else
-					{
-						GL.Disable(All.AlphaTest);
-					}
-				}
-			}
-		}
-		
-		public Blend AlphaSourceBlend 
-		{ 
-			get; 
-			set; 
-		}
-		
-		public Blend DestinationBlend
-		{ 
-			get; 
-			set; 
-		}
-		
-		public Blend SourceBlend
-		{ 
-			get; 
-			set; 
-		}
-		
-		bool _scissorTestEnable = false;
-		public bool ScissorTestEnable 
-		{ 
-			get
-			{
-				return _scissorTestEnable;
-			}
-			set
-			{
-				if ( _scissorTestEnable != value )
-				{
-					_scissorTestEnable = value;
-					if ( !_scissorTestEnable )					
-					{
-						GL.Disable(All.ScissorTest);	
-					}
-				}
-			}
-		}
-		
-		BlendFunction alphaBlendOperation;
-		public BlendFunction AlphaBlendOperation 
-		{ 
-		get { return alphaBlendOperation; } 
-		set { alphaBlendOperation = value; }
 		}
 	}
 }

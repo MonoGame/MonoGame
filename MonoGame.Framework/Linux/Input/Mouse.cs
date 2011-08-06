@@ -37,168 +37,58 @@ permitted under your local laws, the contributors exclude the implied warranties
 purpose and non-infringement.
 */
 #endregion License
-
+﻿
+using MouseInfo = OpenTK.Input.Mouse;
 using System;
-using Microsoft.Xna.Framework.Audio;
 
-﻿namespace Microsoft.Xna.Framework.Media
+namespace Microsoft.Xna.Framework.Input
 {
-    public static class MediaPlayer
-    {
-		private static Song _song = null;
-		private static MediaState _mediaState = MediaState.Stopped;
-		private static float _volume = 1.0f;
-		private static bool _looping = true;
+	// TODO on opentk 1.1 release this class should be reviewed to decouple it from GameWindow
+	// OpenTK.Input.Mouse and OpenTK.Input.Mouse.GetState should be enough
+	
+	// TODO verify if why mouse middle button is laggy (maybe it's my mouse or the opentk implementation)
+	
+	public static class Mouse
+	{
+		private static OpenTK.Input.MouseDevice _mouse = null;
+
+		internal static void UpdateMouseInfo(OpenTK.Input.MouseDevice mouse)
+		{
+			_mouse = mouse;
+		}
 		
-        public static void Pause()
-        {
-			if (_song != null)
-			{
-				_song.Pause();
-				_mediaState = MediaState.Paused;
-			}			
-        }
-
-        public static void Play(Song song)
-        {
-			if ( song != null )
-			{
-				_song = song;
-				_song.Volume = _volume;
-				_song.Loop = _looping;
-				_song.Play();
-				_mediaState = MediaState.Playing;
-			}
-        }
-
-        public static void Resume()
-        {
-			if (_song != null)
-			{
-				_song.Play();
-				_mediaState = MediaState.Playing;
-			}					
-        }
-
-        public static void Stop()
-        {
-			if (_song != null)
-			{
-				_song.Stop();
-				_mediaState = MediaState.Stopped;
-			}
-        }
-
-        public static bool IsMuted
-        {
-            get
-            {
-				if (_song != null)
-				{
-					return _song.Volume == 0.0f;
-				}
-				else
-				{
-					return false;
-				}
-            }
-            set
-            {
-				if (_song != null) 
-				{
-					if (value)
-					{
-						_song.Volume = 0.0f;
-					}
-					else 
-					{
-						_song.Volume = _volume;
-					}
-				}
-            }
-        }
-
-        public static bool IsRepeating
-        {
-            get
-            {
-				if (_song != null)
-				{
-					return _song.Loop;
-				}
-				else
-				{
-					return false;
-				}
-            }
-            set
-            {
-				_looping = value;
-            }
-        }
-
-        public static bool IsShuffled
-        {
-            get
-            {
-				return false;
-            }
-        }
-
-        public static bool IsVisualizationEnabled
-        {
-            get
-            {
-				return false;
-            }
-        }
-
-        public static TimeSpan PlayPosition
-        {
-            get
-            {
-				if (_song != null)
-				{
-					return _song.Position;
-				}
-				else
-				{
-					return new TimeSpan(0);
-				}
-            }
-        }
-
-        public static MediaState State
-        {
-            get
-            {
-				return _mediaState;
-            }
-        }
+		#region Public interface		
 		
-		public static bool GameHasControl
-        {
-            get
-            {
-            	return true;
+		public static MouseState GetState ()
+		{	
+			// no multiple mouse supported (yet!)
+			//OpenTK.Input.MouseState mState = MouseInfo.GetState(0); // to be implemented on opentk 1.1
+			
+			//bool b = (bool)_mouse.GetType().GetProperty("Item").GetValue(OpenTK.Input.MouseButton.Left, null);
+			
+			// maybe someone is tring to get mouse before initialize
+			if (_mouse == null)
+			{
+				return new MouseState(0, 0);
 			}
+			
+			MouseState ms = new MouseState(_mouse.X, _mouse.Y);
+			
+			ms.LeftButton = _mouse[OpenTK.Input.MouseButton.Left] ? ButtonState.Pressed : ButtonState.Released;
+			ms.RightButton = _mouse[OpenTK.Input.MouseButton.Right] ? ButtonState.Pressed : ButtonState.Released;
+			ms.MiddleButton = _mouse[OpenTK.Input.MouseButton.Middle] ? ButtonState.Pressed : ButtonState.Released;;
+			ms.ScrollWheelValue = _mouse.Wheel;
+			
+			return ms;
 		}
 
-        public static float Volume
-        {
-            get
-            {
-            	return _volume;
-			}
-            set
-            {         
-				if (_song != null)
-				{
-					_volume = value;
-					_song.Volume = value;
-				}
-			}
-        }
-    }
+		public static void SetPosition (int x, int y)
+		{
+			// TODO propagate change to opentk mouse object (requires opentk 1.1)
+			throw new NotImplementedException("Feature not implemented.");
+		}
+		
+		#endregion
+	}
 }
 

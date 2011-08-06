@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
+	// TODO is this class really in xna public interface?
 	public class SpriteEffect : Effect
 	{
 		public SpriteEffect (GraphicsDevice graphicsDevice) : base (graphicsDevice)
