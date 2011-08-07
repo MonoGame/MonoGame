@@ -437,7 +437,12 @@ namespace Microsoft.Xna.Framework
 			var kbs = new KeyboardState (_keyStates.ToArray ());
 			Keyboard.State = kbs;
 		}
-
+		
+		// This method should only be called when necessary like when the Guide is displayed
+		internal void ClearKeyCacheState() {
+			_keys.Clear();	
+		}
+		
 		List<Keys> _keys = new List<Keys> ();
 		List<Keys> _keyStates = new List<Keys> ();
 
