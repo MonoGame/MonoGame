@@ -617,7 +617,7 @@ namespace Microsoft.Xna.Framework
 
 		protected virtual void Update (GameTime gameTime)
 		{			
-			if (_initialized  /* TODO && !Guide.IsVisible */) {
+			if (_initialized  && !Guide.IsVisible ) {
 				
 				// Changed from foreach to for loop in case the GameComponents's Update method
 				//   modifies the component collection.  With a foreach it causes an error:

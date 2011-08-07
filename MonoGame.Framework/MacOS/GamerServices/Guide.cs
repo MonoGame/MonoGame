@@ -57,7 +57,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 	{
 		private static bool isScreenSaverEnabled;
 		private static bool isTrialMode;
-		private static bool isVisible;
+		internal static bool isVisible;
 		private static bool simulateTrialMode;
 		
 		internal static void Initialise(Game game) {
@@ -201,7 +201,12 @@ namespace Microsoft.Xna.Framework.GamerServices
 			if (isVisible)
 				return;
 			
-			isVisible = true;
+			// We clear the key cache state here to prevent any extraneous keys from
+			// corrupting the key states from the time we call the method
+			// to the time it is actually shown.  This seems to be caused because
+			// we are interrupting the normal flow the game update logic.
+			Window.ClearKeyCacheState();
+			
 			MonoGameGamerServicesHelper.ShowSigninSheet();
 			
 			if (GamerServicesComponent.LocalNetworkGamer == null) {
@@ -209,7 +214,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 			} else {
 				GamerServicesComponent.LocalNetworkGamer.SignedInGamer.BeginAuthentication (null, null);
 			}
-			isVisible = false;
+
 		}
 
 		public static void ShowLeaderboard ()
