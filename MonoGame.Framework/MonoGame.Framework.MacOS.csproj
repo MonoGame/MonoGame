@@ -323,6 +323,7 @@
     <Compile Include="MacOS\GamerServices\SigninController.cs" />
     <Compile Include="MacOS\GamerServices\MonoGameLocalGamerProfile.cs" />
     <Compile Include="Audio\NoAudioHardwareException.cs" />
+    <Compile Include="Content\ContentReaders\PointReader.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />
