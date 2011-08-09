@@ -1,0 +1,817 @@
+﻿                                                                                                                                                                                                                                                                 <html xmlns:MSHelp="http://msdn.microsoft.com/mshelp" xmlns:msxsl="urn:schemas-microsoft-com:xslt" xmlns:xanx="http://schemas.microsoft.com/developer/xanx/2005"><head><META http-equiv="Content-Type" content="text/html; charset=utf-8"><META NAME="save" CONTENT="history">
+
+<title>Card Game Starter Kit</title>
+<style>
+<!--
+.userDataStyle
+{
+	behavior: url(#default#userData);
+}
+
+div.saveHistory
+{
+	behavior: url(#default#saveHistory);
+}
+
+img.toggle
+{
+	border: 0;
+	margin-right: 5;
+}
+
+img#languageFilterImage
+{
+	border: 0;
+	margin-left: 0;
+	vertical-align: middle;
+}
+
+img#membersOptionsFilterImage
+{
+	border: 0;
+	margin-left: 0;
+	vertical-align: middle;
+}
+
+img#toggleAllImage
+{
+	margin-left: 0;
+	vertical-align: middle;
+}
+
+MSHelp\:link
+{
+ 	text-decoration: underline;
+	color: #0000ff; 
+	hoverColor: #3366ff;
+	filterString: ;
+}
+
+
+body
+	{
+	background:	#FFFFFF;
+	color: #000000;
+	font-family:	Verdana;
+	font-size: medium;
+	font-style: normal;
+	font-weight: normal;
+	margin-top:	0;
+	margin-bottom:	0;
+	margin-left:	0;
+	margin-right:	0;
+	width:	100%;
+	/*font-size: 110%;*/
+	}
+
+div.section
+	{
+	margin-left: 15px;
+	}
+
+div.hxnx5
+	{
+	margin-left: 1.5em;
+	}
+
+h1, h2, h3, h4, h5, h6
+	{
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	margin-top: 18;
+	margin-bottom: 8; 
+	font-weight: bold;
+	}
+h1
+	{
+	font-size: 130%;
+	color: #003399;
+	}
+div#scrollyes h1 /* Changes font size for full-scrolling topic */
+	{
+	font-size: 150%;
+	}
+h2
+	{
+	font-size: 125%;
+	}
+h3
+	{
+	font-size: 115%;
+	margin-top: 9;
+	margin-bottom: 4; 
+	}
+h4
+	{
+	font-size: 115%;
+	margin-top: 9;
+	margin-bottom: 4; 
+	}
+h5
+	{
+	font-size: 100%;
+	margin-top: 9;
+	margin-bottom: 4; 
+	}
+h6
+	{
+	font-size: 100%;
+	margin-top: 9;
+	margin-bottom: 4; 
+	}
+
+ul p, ol p, dl p
+	{
+	margin-left: 0em;
+	}
+
+p
+	{
+	margin-top: .6em;
+	margin-bottom: .6em;
+	}
+	
+td p
+	{
+	margin-top: 0.0em;
+	margin-bottom: 0.6em;
+	}
+
+dd p
+	{
+	margin-top: 0.0em;
+	margin-bottom: 0.6em;
+	}
+
+.image
+	{
+	text-align: center;
+	}
+
+dl
+	{
+	margin-top: 0em; 
+	margin-bottom: 1.3em;
+	}
+
+dd
+	{
+	margin-bottom: 0em;
+	margin-left: 1.5em;
+	}
+
+dl.glossary dd 
+{
+	margin-bottom: 0em;  
+	margin-left: 1.5em; 
+}
+
+dt
+	{
+	margin-top: .6em;
+	margin-bottom: 1;
+	}
+
+ul, ol
+	{
+	margin-top: 0.6em;
+	margin-bottom: 0.6em; 	
+	}
+	
+ol
+	{
+	margin-left: 2.5em; 
+	
+	}	
+	
+ul
+	{
+	list-style-type: disc; 
+	margin-left: 1.9em; 
+	}
+
+li
+	{
+	margin-bottom: 0.4em;
+	}
+
+ul ol, ol ol
+	{
+	list-style-type: lower-alpha;
+	}
+
+pre
+	{
+	margin-top: .6em;
+	margin-bottom: .6em; 
+	}
+
+pre
+	{
+	font: 105% Lucida, mono; 
+	color: #000066;
+	}
+
+code
+{
+	font-family: Monospace, Courier New, Courier;
+	font-size: 105%;
+	color:	#000066;
+}
+
+table.userdata td 
+	{
+	background: #ffffff;
+	background-color: #F5F5F5;
+	border-color: #ffffff;
+	border: none;
+	}	
+table.clsWarning
+	{
+	background: #ffffff;
+	padding: 0px;
+	margin: 0px;
+	border: none;
+	}
+table.clsWarning td
+	{
+	padding: 0px;
+	margin: 0px;
+	background: #ffffff;
+	vertical-align: middle;
+	font-size: 70%;
+	}
+
+div#mainSection table
+	{
+	width: 98%;
+	background: #ffffff;
+	margin-top: 5px;
+	margin-bottom: 5px;
+	}
+
+div#mainSection table th
+	{ 
+	padding: 5px 6px;
+	background: #EFEFF7;
+	text-align: left;
+	font-size: 70%;
+	vertical-align: bottom;
+	border-bottom: 1px solid #C8CDDE;
+	}
+div#mainSection table td
+	{ 
+	padding: 5px 5px;
+	background: #F7F7FF;
+	vertical-align: top;
+	font-size: 70%;
+	border-bottom: 1px solid #D5D5D3;
+	}
+
+div#syntaxCodeBlocks table th
+	{
+	padding: 1px 6px;
+	color: #000066;
+	}
+
+div#syntaxCodeBlocks table td
+	{
+	padding: 1px 5px;
+	}
+
+span#runningHeaderText
+{
+	color: #003399;
+	font-size: 90%;
+	padding-left: 13;
+}
+
+span#nsrTitle
+{
+	color: #003399;
+	font-size: 120%;
+	font-weight: 600;
+	padding-left: 13;
+}
+
+div#mainSection
+{
+	font-size: 70%;
+	width: 100%;
+}
+
+div#mainBody
+{
+	font-size: 90%;
+	margin-left: 15;
+	margin-top: 10;
+	padding-bottom: 20;
+}
+
+div#mainBody p, div#mainBody ol, div#mainBody ul, div#mainBody dl
+{
+	padding-right: 5;
+}
+
+div#mainBody div.alert, div#mainBody div.code, div#mainBody div.tableSection
+{
+	width:98.9%;
+}
+
+div.alert p, div.code p
+{
+	margin-top:5;
+	margin-bottom:8;
+}
+
+div#mainSection div.alert table
+{
+	border: 0;
+}
+
+div#mainSection div.alert table th
+{
+	padding-top: 0;
+	padding-bottom: 0;
+	padding-left: 5;
+	padding-right: 5;
+}
+
+div#mainSection div.alert table td
+{
+	padding-left: 5;
+	padding-right: 5;
+}
+
+img.note
+{
+	border: 0;
+	margin-left: 0;
+	margin-right: 3;
+}
+div#header
+{
+	background-color: #D4DFFF;
+	padding-top:	0;
+	padding-bottom:	0;
+	padding-left:	0;
+	padding-right:	0;
+	width:	100%;
+}
+
+div#header table
+{
+	margin-top:	0;
+	margin-bottom: 0;
+	border-bottom-color: #C8CDDE;
+	border-bottom-style: solid;
+	border-bottom-width: 1;
+	background: #D4DFFF;
+	width:	100%;
+}
+
+div#header table td
+{
+	color: #0000FF;
+	font-size: 70%;
+	padding-right: 20;
+	padding-top: 1;
+	padding-bottom: 1;
+	border: none;
+	background: #D4DFFF;
+}
+
+div#header table tr#headerTableRow3 td
+{
+	padding-bottom: 2;
+	padding-top: 5;
+	padding-left: 15;
+}
+
+div#header table#bottomTable
+{
+	border-top-color: #FFFFFF;
+	border-top-style: solid;
+	border-top-width: 1;
+	text-align: left;
+	padding-left: 15;
+}
+
+
+blockquote
+	{
+	margin-left: 3.8em;
+	margin-right: 3.8em;
+	margin-top: .6em;
+	margin-bottom: .6em;
+	}
+
+sup
+	{
+	text-decoration: none;
+	font-size: smaller; 
+	}
+
+a:link
+	{
+	color: #0000FF;
+/*    font-weight: bold */
+	}
+	
+a:visited
+	{
+	color: #0000AA;
+/*    font-weight: bold	*/
+	}
+	
+a:hover
+	{
+	color: #3366FF;
+/*    font-weight: bold */
+	}
+	
+.label
+	{
+	font-weight: bold; 
+	margin-top: 1em;
+	margin-left: -26px;
+	}
+	
+.tl
+	{
+	margin-bottom: .75em; 
+	}
+	
+.atl
+	{
+	padding-left: 1.5em;
+	padding-bottom: .75em; 
+	}
+	
+.cfe
+	{
+	font-weight: bold; 
+	}
+	
+.mini
+	{
+	font-size: smaller;
+	}
+	
+.dt
+	{
+	margin-bottom: -.6em; 
+	}
+	
+.indent
+	{
+	margin-left: 1.9em; 
+	margin-right: 1.9em;
+	}
+
+.product
+	{
+	text-align: right;
+	color: #333333;
+	font-size: smaller;
+	font-style: italic;
+	}
+
+.buttonbarshade
+	{
+	position: relative;
+	margin: 0;
+	left: 0px;
+	top: 2;
+	width: 50%;
+	height: 40px;
+	}
+
+.buttonbartable
+	{
+	position: absolute;
+	margin: 0;
+	padding:0;
+	border:0;
+	left:0px;
+	top: 2;
+	width: 100%;
+	height: 40px;
+	}
+
+table.buttonbartable td, table.buttonbarshade td
+	{
+	background: #ffffff; /*#5177B8; #80C615;*/
+	border-left: 0px solid #80C615;
+	margin: 0;
+	padding: 0px 0px 0px 0px;
+	font-family: Impact, sans-serif;
+	font-size: 14pt;
+	}
+
+table.buttonbartable td.button1
+	{
+	background: #5177B8; /*#80C615;*/;
+	padding: 0;
+	font-weight: bold;
+	text-align: center;
+	cursor: hand;
+	}
+
+table.buttonbartable td.button2
+	{
+	background: #5177B8; /*#80C615;*/;
+	font-weight: bold;
+	text-align: center;
+	}
+
+table.buttonbartable td.button3
+	{
+	background: #5177B8; /*#80C615;*/;
+	font-weight: bold;
+	text-align: center;
+	}
+
+table.buttonbartable td.runninghead
+	{
+	padding-left: 0px;
+	font-style: italic;
+	text-align: left;
+	}
+
+.version
+	{
+	text-align: left;
+	color: #000000;
+	margin-top: 3em;
+	margin-left: -26px;
+	font-size: smaller;
+	font-style: italic;
+	}
+
+.lang, .ilang
+	{
+	color: #0000ff;
+	font: normal 7pt Arial, Helvetica, sans-serif;
+	}
+
+div.langMenu
+	{
+	position: absolute;
+	z-index: 1;
+	width: 96pt;
+	padding: 8pt;
+	visibility: hidden;
+	border: 1px solid #000000;
+	background: #ffffd0;
+	}
+
+div.langMenu ul
+	{
+	padding-left: 2em;
+	margin-left: 0;
+	}
+
+div.filtered
+	{
+	margin: 4pt 0 8pt -26px;
+	padding: 4px 4px 8px 26px;
+	width: 100%;
+	border: 2px solid #aaaacc;
+	background: #ffffff;
+	}
+
+div.filtered2
+	{
+	margin: 4pt 0 8pt -26px;
+	padding: 4px 4px 8px 26px;
+	width: 100%;
+	border: none;
+	background: #ffffff;
+	}
+
+div.filtered h1, div.filtered h2, div.filtered h3, div.filtered h4
+	{
+	margin-left: -22px;
+	}
+
+div.filtered span.lang
+	{
+	position: relative;
+	left: -22px;
+	}
+
+div.reftip
+	{
+	position: absolute;
+	z-index: 1;
+	padding: 8pt;
+	visibility: hidden;
+	border: 1px solid #000000;
+	background: #ffffd0;
+	}
+
+a.synParam
+	{
+	color: #0000FF;
+	/*color: #3F7800;*/ 	
+	/*color: #8DC54F;*/
+	text-decoration: none;
+    font-weight: normal;
+	}
+
+a.synParam:hover
+	{
+	text-decoration: underline;
+    font-weight: normal;
+	}
+
+div.sapop
+	{
+	position: absolute;
+	z-index: 1;
+	left: 26px;
+	width: 100%;
+	padding: 10px 10px 10px 36px;
+	visibility: hidden;
+	border: 1px solid #000000;
+	background: #ffffd0;
+	}
+
+div.footer
+	{
+	width: 100%;
+	border: none;
+	background: #ffffff;
+	margin-top: 18pt;
+	padding-bottom: 12pt;
+	color: #0000FF;
+	/*color: #228B22; */
+	text-align: center;
+	font-size: 76%;
+	}
+
+div.preliminary
+	{
+	margin-top: 8pt;
+	padding-bottom: 12pt;
+	color: #A0A0A0;
+	}
+
+div.proc
+    {
+	margin-left: 0.5em; 
+    }
+     
+div.proc h3
+    {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-weight: bold;
+	font-size: 115%;
+	margin-top: 1em;
+	margin-bottom: 0.4em;
+	margin-left: -0.5em; 
+	color: #003399;
+    }
+
+div.proc ul
+    {
+    margin-left: 1.5em;
+    }
+
+div.proc ol
+    {
+    margin-left: 2.0em;
+    }
+      
+.note
+	{
+	margin-left: 14pt;
+	margin-right: 12pt;
+	}
+
+.indent1
+	{
+	margin-left: 12pt;
+	}
+
+.indent2
+	{
+	margin-left: 24pt;
+	}
+
+.indent3
+	{
+	margin-left: 36pt;
+	}
+
+p.proch
+	{
+	padding-left: 16px;
+	}
+
+p.proch img
+	{
+	position: relative; 
+	vertical-align: top;
+	left: -18px; 
+	margin-right: -14px; 
+	margin-bottom: -18px;
+	}
+	
+div.clsPlatSpec
+{
+	background-color:#FFF8DC;
+	border-style:solid;
+	border-width:1pt 0pt 0pt 1pt;
+	border-color:#ffE4C4;
+	margin-top:0.6em;
+	width:100%;
+}
+
+
+.languageFilter
+{
+	color:	#0000FF;
+	cursor:hand;
+	text-decoration:underline;
+	padding-bottom:4;
+}
+
+#languageSpan {
+	position: absolute;
+	visibility: hidden;
+	border-style: solid;
+	border-width: 1px;
+	border-color: #C8CDDE;
+	background: #d4dfff;
+	padding: 4px;
+	font-size: 70%;
+}
+
+#membersOptionsSpan {
+	position: absolute;
+	visibility: hidden;
+	border-style: solid;
+	border-width: 1px;
+	border-color: #C8CDDE;
+	background: #d4dfff;
+	padding: 4px;
+	font-size: 70%;
+}
+.style1 {
+	margin-left: 40px;
+}
+--></style>
+
+<xml>
+<MSHelp:TOCTitle Title="User Interface Controls Sample" />
+<MSHelp:RLTitle Title="User Interface Controls Sample" />
+<MSHelp:Keyword Index="A" Term="O:Microsoft.Xna.Primitives3D" />
+<MSHelp:Keyword Index="A" Term="6336846e-5264-82f5-883d-7cf38401b788" />
+<MSHelp:Keyword Index="K" Term="Primitives 3D Sample" />
+
+<MSHelp:Attr Name="AssetID" Value="6336846e-5264-82f5-883d-7cf38401b788" />
+<MSHelp:Attr Name="Locale" Value="en-us" />
+<MSHelp:Attr Name="CommunityContent" Value="1" />
+<MSHelp:Attr Name="TopicType" Value="kbOrient" />
+<MSHelp:Attr Name="DocSet" Value="XNA" />
+<MSHelp:Attr Name="DocSet" Value="ExpressLibVS" />
+<MSHelp:Attr Name="DocSet" Value="C#" />
+<MSHelp:Attr Name="ProjType" Value="LocalProj" />
+<MSHelp:Attr Name="ProjType" Value="XNA_31" />
+<MSHelp:Attr Name="ProjType" Value="XNA_30" />
+<MSHelp:Attr Name="Technology" Value="XNA" />
+</xml>
+</head><body><div id="mainSection">
+
+<div id="mainBody">
+  
+  <h1>Card Game Starter Kit</h1>
+
+    <p>This sample is a fully-functional Blackjack card game for Windows, Xbox 360 and Windows Phone 7, built on top of an easily-extensible card game and animation framework you can use to build your own card games.</p>
+
+	<h1 class="heading">How the Sample Works</h1>
+	
+	<div id="ID4EKD" class="hxnx1">
+    <p>The full game of Blackjack that can be built and played from this sample is built from a number of different underlying components, each of which can be separated out and extended to create new functionality:</p>
+    <ul>
+    <li>Classes from the GameStateManagement sample to handle the loading, updating, and transitioning of screens</li>
+    <li>The <strong>AnimatedGameComponent</strong> class, inherited from <strong>DrawableGameComponent</strong>, to handle animating the position, scale, and text drawing of in-game objects</li>
+    <li>The Cards Framework, represented primarily by the <strong>CardGame</strong>, <strong>CardPacket</strong>, <strong>Player</strong>, <strong>GameTable</strong> and <strong>GameRule</strong> classes, that provide generic card game functionality and are extended by the Blackjack classes to provide the specific game logic.</li>
+    </ul>
+    <p>Upon starting the game, the <strong>GameplayScreen</strong> creates the <strong>BlackjackCardGame</strong>, passing in a <strong>BlackJackTable</strong> and initializing <strong>BlackjackPlayers</strong>. Per-frame, the <strong>BlackjackCardGame</strong> handles the input per-frame via the <strong>GameScreen.HandleInput</strong> method, and passed via the <strong>InputState</strong> object to all of the other classes it manages.</p>
+    <p>The various phases of gameplay are handled by a state machine inside <strong>BlackjackCardGame</strong>, deciding when to start dealing, when to add and resolve rules, and when to start a new round, based primarily on user interactions with the various input buttons, which are <strong>AnimatedGameComponent</strong> objects.</p>
+    <p>Drawing is handled by the objects that inherit from <strong>AnimatedGameComponent</strong>. Each object is responsible for drawing itself and updating its animation states per-frame. Many of the objects, including the <strong>GameTable</strong>, derive from <strong>AnimatedGameComponent</strong>.</p>
+   </div>
+
+
+  	<h1 class="heading">Extending the Sample</h1>
+	
+	<div id="Div3" class="hxnx1">   
+	
+	   <p>If you are interested in creating a different type of card game, extending the Cards Framework is a good place to start; create a new class that inherits from <strong>CardsGame</strong>,  a new class that inherits from <strong>GameTable</strong>, a new player class that inherits from <strong>Player</strong>, and any new <strong>GameRule</strong> classes you need to judge card values specific to your game. You can then modify the <strong>GameplayScreen.Initialize</strong> method to call your custom <strong>CardsGame.Initialize</strong>, add the necessary <strong>Player</strong> objects and start a round of play.</p>
+	
+	</div>
+
+</div>
+<div class="footer" id="footer"><p>© 2010 Microsoft Corporation. All rights reserved.<br>Send feedback to <a href="mailto:creators@microsoft.com?subject=Documentation Feedback: Card Game Starter Kit">creators@microsoft.com</a>.</p></div></div></body></html>
