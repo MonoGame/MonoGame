@@ -150,14 +150,14 @@ namespace Microsoft.Xna.Framework.Content
 			foreach(ContentTypeReader typeReader in TypeReaders)
 			{
 				if(typeReader.TargetType == objectType)
-					return (T)ReadObject<T>(typeReader,existingInstance);
+					return (T)ReadRawObject<T>(typeReader,existingInstance);
 			}
             throw new NotSupportedException();
         }
 
         public T ReadRawObject<T>(ContentTypeReader typeReader, T existingInstance)
         {
-            throw new NotImplementedException();
+            return (T)typeReader.Read(this, existingInstance);
         }
 
         public void ReadSharedResource<T>(Action<T> fixup)
