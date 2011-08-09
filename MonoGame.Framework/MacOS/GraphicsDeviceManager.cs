@@ -81,9 +81,6 @@ namespace Microsoft.Xna.Framework
 			_graphicsDevice = new GraphicsDevice ();
 			_graphicsDevice.PresentationParameters = new PresentationParameters ();
 
-//			_preferredBackBufferHeight = _graphicsDevice.PresentationParameters.BackBufferHeight;
-//			_preferredBackBufferWidth = _graphicsDevice.PresentationParameters.BackBufferWidth;
-			_graphicsDevice.PresentationParameters.IsFullScreen = wantFullScreen;
 			Initialize();
 			
 			OnDeviceCreated(EventArgs.Empty);
@@ -193,10 +190,12 @@ namespace Microsoft.Xna.Framework
 			}
 			set {
 				_preferMultiSampling = value;
-				if (_preferMultiSampling) {
-					_graphicsDevice.PreferedFilter = All.Linear;
-				} else {
-					_graphicsDevice.PreferedFilter = All.Nearest;
+				if (_graphicsDevice != null) {				
+					if (_preferMultiSampling) {
+						_graphicsDevice.PreferedFilter = All.Linear;
+					} else {
+						_graphicsDevice.PreferedFilter = All.Nearest;
+					}
 				}
 			}
 		}
