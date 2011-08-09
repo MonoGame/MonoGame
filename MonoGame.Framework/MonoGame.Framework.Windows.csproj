@@ -127,7 +127,6 @@
     <Compile Include="Content\ContentReaders\PointReader.cs" />
     <Compile Include="Content\ContentReaders\ReflectiveReader.cs" />
     <Compile Include="Content\ContentReaders\SingleReader.cs" />
-    <Compile Include="Content\ContentReaders\SongReader.cs" />
     <Compile Include="Content\ContentReaders\SoundEffectReader.cs" />
     <Compile Include="Content\ContentReaders\TimeSpanReader.cs" />
     <Compile Include="Content\ContentReaders\UInt16Reader.cs" />
