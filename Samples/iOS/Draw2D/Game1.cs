@@ -158,14 +158,14 @@ namespace Microsoft.Xna.Samples.Draw2D
 			spriteBatch.Begin ();
 
 			spriteBatch.GraphicsDevice.ScissorRectangle = new Rectangle (50, 40, (int)clippingSize, (int)clippingSize);
-			spriteBatch.GraphicsDevice.RenderState.ScissorTestEnable = true;
+			spriteBatch.GraphicsDevice.RasterizerState.ScissorTestEnable = true;
 
 			spriteBatch.Draw (texture, new Rectangle (50, 40, 320, 40), Color.White);
 			spriteBatch.DrawString (font, "Scissor Clipping Test", new Vector2 (50, 40), Color.Red);
 			
 			spriteBatch.End ();
-			
-			spriteBatch.GraphicsDevice.RenderState.ScissorTestEnable = false;
+
+            spriteBatch.GraphicsDevice.RasterizerState.ScissorTestEnable = false;
 
 
 		}
