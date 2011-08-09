@@ -324,6 +324,7 @@
     <Compile Include="MacOS\GamerServices\MonoGameLocalGamerProfile.cs" />
     <Compile Include="Audio\NoAudioHardwareException.cs" />
     <Compile Include="Content\ContentReaders\PointReader.cs" />
+    <Compile Include="Content\ContentReaders\Vector2Reader.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />
