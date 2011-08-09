@@ -76,13 +76,16 @@ namespace Microsoft.Xna.Framework
 			
             game.Services.AddService(typeof(IGraphicsDeviceManager), this);
             game.Services.AddService(typeof(IGraphicsDeviceService), this);	
-			
-			Initialize();
         }
 		
 		public void CreateDevice ()
 		{
-			throw new System.NotImplementedException ();
+            _graphicsDevice = new GraphicsDevice();
+            _graphicsDevice.PresentationParameters = new PresentationParameters();
+
+            Initialize();
+
+            OnDeviceCreated(EventArgs.Empty);
 		}
 
 		public bool BeginDraw ()
@@ -106,6 +109,28 @@ namespace Microsoft.Xna.Framework
         public event EventHandler DeviceResetting;
 		
 		public event EventHandler<PreparingDeviceSettingsEventArgs> PreparingDeviceSettings;
+        private bool wantFullScreen;
+
+        internal void OnDeviceResetting(EventArgs e)
+        {
+            var h = DeviceResetting;
+            if (h != null)
+                h(this, e);
+        }
+
+        internal void OnDeviceReset(EventArgs e)
+        {
+            var h = DeviceReset;
+            if (h != null)
+                h(this, e);
+        }
+
+        internal void OnDeviceCreated(EventArgs e)
+        {
+            var h = DeviceCreated;
+            if (h != null)
+                h(this, e);
+        }
 
         #endregion
 
@@ -124,11 +149,9 @@ namespace Microsoft.Xna.Framework
 
 		private void Initialize()
 		{
-            _graphicsDevice = new GraphicsDevice(this);
-			_graphicsDevice.PresentationParameters = new PresentationParameters();
-			
-			
-			if (_preferMultiSampling) 
+            _graphicsDevice.PresentationParameters.IsFullScreen = false;
+
+            if (_preferMultiSampling) 
 			{
 				_graphicsDevice.PreferedFilter = All.Linear;
 			}
@@ -156,11 +179,15 @@ namespace Microsoft.Xna.Framework
         {
             get
             {
-				 return _graphicsDevice.PresentationParameters.IsFullScreen;
+                if (_graphicsDevice != null)
+                    return _graphicsDevice.PresentationParameters.IsFullScreen;
+                else
+                    return wantFullScreen;
             }
             set
             {
-                if (IsFullScreen != value)
+                wantFullScreen = value;
+                if ( _graphicsDevice != null && IsFullScreen != value)
                 {
                     _graphicsDevice.PresentationParameters.IsFullScreen = value;
                     var wGameWindow = _game.Window as WindowsGameWindow;
@@ -189,14 +216,17 @@ namespace Microsoft.Xna.Framework
             set
             {
 				_preferMultiSampling = value;
-				if (_preferMultiSampling) 
-				{
-					_graphicsDevice.PreferedFilter = All.Linear;
-				}
-				else 
-				{
-					_graphicsDevice.PreferedFilter = All.Nearest;
-				}
+                if (_graphicsDevice != null)
+                {
+                    if (_preferMultiSampling)
+                    {
+                        _graphicsDevice.PreferedFilter = All.Linear;
+                    }
+                    else
+                    {
+                        _graphicsDevice.PreferedFilter = All.Nearest;
+                    }
+                }
             }
         }
 
