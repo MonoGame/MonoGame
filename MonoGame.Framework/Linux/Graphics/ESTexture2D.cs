@@ -58,7 +58,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public ESTexture2D (IntPtr data, SurfaceFormat pixelFormat, int width, int height, Size size, All filter)
 		{
-			InitWithData (data, pixelFormat, width, height, size, filter);
+			// XNB color order are already inverted
+			InitWithData (data, pixelFormat, width, height, size, filter, false);
 		}
 
 		public ESTexture2D(Bitmap image, All filter)
@@ -66,53 +67,65 @@ namespace Microsoft.Xna.Framework.Graphics
             InitWithBitmap(image, filter);
 		}
 
-        public void InitWithBitmap(Bitmap image, All filter)
+        private void InitWithBitmap(Bitmap image, All filter)
         {
             BitmapData bitmapData = image.LockBits(new System.Drawing.Rectangle(0, 0, image.Width, image.Height), ImageLockMode.ReadOnly,
                            System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-
+			
             _format = SurfaceFormat.Color;
-            InitWithData(bitmapData.Scan0, _format, image.Width, image.Height, new Size(image.Width, image.Height), filter);
+			// when we load a image which is not xnb, the color order is not what the opengl expects
+            InitWithData(bitmapData.Scan0, _format, image.Width, image.Height, new Size(image.Width, image.Height), filter, true);
             image.UnlockBits(bitmapData);
         }
 
-        public void InitWithData (IntPtr data, SurfaceFormat pixelFormat, int width, int height, Size size, All filter)
+        private void InitWithData (IntPtr data, SurfaceFormat pixelSurfaceFormat, int width, int height, Size size, All filter, 
+		                           bool invertColorOrdering)
 		{		
 			GL.GenTextures (1, out _name);
 			GL.BindTexture (TextureTarget.Texture2D, _name);
-			GL.TexParameter (TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)filter);
-			GL.TexParameter (TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)filter);
+			GL.TexParameter (TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)filter);			
 
-			int sz = 0;
-
-			switch (pixelFormat) {				
+			PixelInternalFormat internalFormat;
+			OpenTK.Graphics.OpenGL.PixelFormat pixelFormat;
+			PixelType pixelType;
+			
+			switch (pixelSurfaceFormat) {				
 			case SurfaceFormat.Color /*kTexture2DPixelFormat_RGBA8888*/:
 			case SurfaceFormat.Dxt1:
 			case SurfaceFormat.Dxt3:
-				sz = 4;
-				GL.TexImage2D (TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, (int)width, (int)height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Rgba, PixelType.UnsignedByte, data);
+				internalFormat = PixelInternalFormat.Rgba;
+				pixelFormat = OpenTK.Graphics.OpenGL.PixelFormat.Rgba;
+				pixelType = PixelType.UnsignedByte;
 				break;
 			case SurfaceFormat.Bgra4444 /*kTexture2DPixelFormat_RGBA4444*/:
-				sz = 2;
-				GL.TexImage2D (TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, (int)width, (int)height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Rgba, PixelType.UnsignedShort4444, data);
+				internalFormat = PixelInternalFormat.Rgba;
+				pixelFormat = OpenTK.Graphics.OpenGL.PixelFormat.Rgba;
+				pixelType = PixelType.UnsignedShort4444;
 				break;
 			case SurfaceFormat.Bgra5551 /*kTexture2DPixelFormat_RGB5A1*/:
-				sz = 2;
-				GL.TexImage2D (TextureTarget.Texture2D, 0,  PixelInternalFormat.Rgba, (int)width, (int)height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Rgba, PixelType.UnsignedShort5551, data);
+				internalFormat = PixelInternalFormat.Rgba;
+				pixelFormat = OpenTK.Graphics.OpenGL.PixelFormat.Rgba;
+				pixelType = PixelType.UnsignedShort5551;
 				break;
 			case SurfaceFormat.Alpha8 /*kTexture2DPixelFormat_A8*/:
-				sz = 1;
-				GL.TexImage2D (TextureTarget.Texture2D, 0, PixelInternalFormat.Alpha, (int)width, (int)height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Alpha, PixelType.UnsignedByte, data);
+				internalFormat = PixelInternalFormat.Alpha;
+				pixelFormat = OpenTK.Graphics.OpenGL.PixelFormat.Alpha;
+				pixelType = PixelType.UnsignedByte;
 				break;
 			default:
 				throw new NotSupportedException ("Texture format");
 				;					
 			}
+			
+			if (invertColorOrdering)
+				pixelFormat = InvertColorOrder(internalFormat);
 
+			GL.TexImage2D (TextureTarget.Texture2D, 0, internalFormat, (int)width, (int)height, 0, pixelFormat, pixelType, data);
+			
 			_size = size;
 			_width = width;
 			_height = height;
-			_format = pixelFormat;
+			_format = pixelSurfaceFormat;
 			_maxS = size.Width / (float)width;
 			_maxT = size.Height / (float)height;
 
@@ -123,6 +136,21 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			if (_name != 0) {
 				GL.DeleteTextures (1, ref _name);
+			}
+		}
+		
+		private static OpenTK.Graphics.OpenGL.PixelFormat InvertColorOrder(PixelInternalFormat format)
+		{
+			switch(format)
+			{
+				case PixelInternalFormat.Rgba:
+					return OpenTK.Graphics.OpenGL.PixelFormat.Bgra;
+				
+				case PixelInternalFormat.Alpha:
+					return OpenTK.Graphics.OpenGL.PixelFormat.Alpha;
+				
+				default:
+					throw new NotSupportedException("Invalid format");
 			}
 		}
 
