@@ -157,7 +157,7 @@ namespace Microsoft.Xna.Framework.Content
 
         public T ReadRawObject<T>(ContentTypeReader typeReader, T existingInstance)
         {
-            return (T)typeReader.Read(this, existingInstance);
+		return (T)typeReader.Read(this, existingInstance);
         }
 
         public void ReadSharedResource<T>(Action<T> fixup)

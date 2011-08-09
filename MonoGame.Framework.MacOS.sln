@@ -197,6 +197,6 @@ Global
 		{521972FD-1A9B-4CFD-A435-EB2224985131} = {E58F0822-614F-4642-97EE-F85AFBC55B95}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = Samples\MacOS\PerPixelCollisionSample\PerPixelCollisionSample.csproj
+		StartupItem = Samples\MacOS\Draw2D\MonoGame.Samples.Draw2D.MacOS.csproj
 	EndGlobalSection
 EndGlobal

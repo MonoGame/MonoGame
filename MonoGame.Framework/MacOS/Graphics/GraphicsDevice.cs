@@ -113,7 +113,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			_viewport.MaxDepth = 1.0f;
 			Textures = new TextureCollection();
 			// Init RenderState
-			_renderState = new RenderState ();
+			//_renderState = new RenderState ();
+			RasterizerState = new RasterizerState();
 		}
 
 		public BlendState BlendState {
@@ -312,17 +313,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 
-		public RenderState RenderState { 
-			get {
-				return _renderState;
-			}
-			set {
-				if (_renderState != value) {
-					_renderState = value;
-				}
-			}
-		}
-		
 		public void SetRenderTarget (RenderTarget2D renderTarget) 
 		{
 			if (renderTarget == null) {
