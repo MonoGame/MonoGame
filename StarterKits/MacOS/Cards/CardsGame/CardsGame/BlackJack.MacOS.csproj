@@ -88,4 +88,7 @@
       <Name>MonoGame.Framework.MacOS</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Content\" />
+  </ItemGroup>
 </Project>
