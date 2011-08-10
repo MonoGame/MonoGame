@@ -19,7 +19,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\iPhoneSimulator\Debug</OutputPath>
-    <DefineConstants>DEBUG;IPHONE</DefineConstants>
+    <DefineConstants>DEBUG;IOS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <MtouchLink>None</MtouchLink>
@@ -46,13 +46,14 @@
     <MtouchUseThumb>false</MtouchUseThumb>
     <MtouchArch>ARMv6</MtouchArch>
     <MtouchMinimumOS>3.0</MtouchMinimumOS>
+    <DefineConstants>IOS</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhone' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\iPhone\Debug</OutputPath>
-    <DefineConstants>DEBUG</DefineConstants>
+    <DefineConstants>DEBUG;IOS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <MtouchUseSGen>false</MtouchUseSGen>
@@ -78,6 +79,7 @@
     <MtouchArch>ARMv6</MtouchArch>
     <MtouchUseLlvm>false</MtouchUseLlvm>
     <MtouchMinimumOS>3.0</MtouchMinimumOS>
+    <DefineConstants>IOS</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
