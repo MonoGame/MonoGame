@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">iPhoneSimulator</Platform>
+    <ProductVersion>10.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{1B9C099B-3958-4E11-A178-1E3B6ED34FC7}</ProjectGuid>
+    <ProjectTypeGuids>{E613F3A2-FE9C-494F-B74E-F63BCB86FEA6};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>BlackJack.iOS</RootNamespace>
+    <AssemblyName>BlackJackiOS</AssemblyName>
+    <TargetFrameworkVersion>v1.0</TargetFrameworkVersion>
+    <SupportedDevices>IPad</SupportedDevices>
+    <BundleDisplayName>BlackJack</BundleDisplayName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhoneSimulator' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\iPhoneSimulator\Debug</OutputPath>
+    <DefineConstants>DEBUG;IPHONE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <MtouchLink>None</MtouchLink>
+    <MtouchDebug>True</MtouchDebug>
+    <MtouchUseLlvm>false</MtouchUseLlvm>
+    <ConsolePause>false</ConsolePause>
+    <MtouchUseSGen>false</MtouchUseSGen>
+    <MtouchUseThumb>false</MtouchUseThumb>
+    <MtouchArch>ARMv6</MtouchArch>
+    <MtouchMinimumOS>3.2</MtouchMinimumOS>
+    <MtouchI18n />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
+    <DebugType>none</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\iPhoneSimulator\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <MtouchLink>None</MtouchLink>
+    <MtouchDebug>False</MtouchDebug>
+    <MtouchUseSGen>false</MtouchUseSGen>
+    <ConsolePause>false</ConsolePause>
+    <MtouchUseLlvm>false</MtouchUseLlvm>
+    <MtouchUseThumb>false</MtouchUseThumb>
+    <MtouchArch>ARMv6</MtouchArch>
+    <MtouchMinimumOS>3.0</MtouchMinimumOS>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhone' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\iPhone\Debug</OutputPath>
+    <DefineConstants>DEBUG</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <MtouchUseSGen>false</MtouchUseSGen>
+    <MtouchDebug>True</MtouchDebug>
+    <CodesignKey>iPhone Developer</CodesignKey>
+    <ConsolePause>false</ConsolePause>
+    <MtouchUseThumb>false</MtouchUseThumb>
+    <MtouchArch>ARMv6</MtouchArch>
+    <MtouchUseLlvm>false</MtouchUseLlvm>
+    <MtouchMinimumOS>3.0</MtouchMinimumOS>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
+    <DebugType>none</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\iPhone\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <MtouchUseSGen>false</MtouchUseSGen>
+    <MtouchDebug>False</MtouchDebug>
+    <MtouchUseThumb>false</MtouchUseThumb>
+    <ConsolePause>false</ConsolePause>
+    <CodesignKey>iPhone Developer</CodesignKey>
+    <MtouchArch>ARMv6</MtouchArch>
+    <MtouchUseLlvm>false</MtouchUseLlvm>
+    <MtouchMinimumOS>3.0</MtouchMinimumOS>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="monotouch" />
+    <Reference Include="OpenTK" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Info.plist" />
+    <None Include="..\..\MacOS\Cards\CardsGame\CardsGame\Background.png">
+      <Link>Background.png</Link>
+    </None>
+    <None Include="..\..\MacOS\Cards\CardsGame\CardsGame\GameThumbnail.png">
+      <Link>GameThumbnail.png</Link>
+    </None>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <ProjectReference Include="CardsFramework.iOS.csproj">
+      <Project>{91CF4A04-9FDC-471D-AED0-D8F057068230}</Project>
+      <Name>CardsFramework.iOS</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\MonoGame.Framework\MonoGame.Framework.iOS.csproj">
+      <Project>{DB8508BB-9849-4CC2-BC0F-8EB5DACB3C47}</Project>
+      <Name>MonoGame.Framework.iOS</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\MacOS\Cards\CardsGame\CardsGame\Blackjack\Game\BlackjackCardGame.cs">
+      <Link>Blackjack\Game\BlackjackCardGame.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Cards\CardsGame\CardsGame\Blackjack\Misc\BetGameComponent.cs">
+      <Link>Blackjack\Misc\BetGameComponent.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Cards\CardsGame\CardsGame\Blackjack\Players\BlackjackAIPlayer.cs">
+      <Link>Blackjack\Players\BlackjackAIPlayer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Cards\CardsGame\CardsGame\Blackjack\Players\BlackjackPlayer.cs">
+      <Link>Blackjack\Players\BlackjackPlayer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Cards\CardsGame\CardsGame\Blackjack\Rules\BlackjackGameEventArgs.cs">
+      <Link>Blackjack\Rules\BlackjackGameEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Cards\CardsGame\CardsGame\Blackjack\Rules\BlackjackRule.cs">
+      <Link>Blackjack\Rules\BlackjackRule.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Cards\CardsGame\CardsGame\Blackjack\Rules\BustRule.cs">
+      <Link>Blackjack\Rules\BustRule.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Cards\CardsGame\CardsGame\Blackjack\Rules\InsuranceRule.cs">
+      <Link>Blackjack\Rules\InsuranceRule.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Cards\CardsGame\CardsGame\Blackjack\UI\BlackJackAnimatedPlayerHandComponent.cs">
+      <Link>Blackjack\UI\BlackJackAnimatedPlayerHandComponent.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Cards\CardsGame\CardsGame\Blackjack\UI\BlackJackTable.cs">
+      <Link>Blackjack\UI\BlackJackTable.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Cards\CardsGame\CardsGame\Blackjack\UI\BlackjackAnimatedDealerHandComponent.cs">
+      <Link>Blackjack\UI\BlackjackAnimatedDealerHandComponent.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Cards\CardsGame\CardsGame\Blackjack\UI\Button.cs">
+      <Link>Blackjack\UI\Button.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Cards\CardsGame\CardsGame\Misc\AudioManager.cs">
+      <Link>Misc\AudioManager.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Cards\CardsGame\CardsGame\Misc\InputHelper.cs">
+      <Link>Misc\InputHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Cards\CardsGame\CardsGame\Properties\AssemblyInfo.cs">
+      <Link>Properties\AssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Cards\CardsGame\CardsGame\ScreenManager\GameScreen.cs">
+      <Link>ScreenManager\GameScreen.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Cards\CardsGame\CardsGame\ScreenManager\InputState.cs">
+      <Link>ScreenManager\InputState.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Cards\CardsGame\CardsGame\ScreenManager\MenuEntry.cs">
+      <Link>ScreenManager\MenuEntry.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Cards\CardsGame\CardsGame\ScreenManager\MenuScreen.cs">
+      <Link>ScreenManager\MenuScreen.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Cards\CardsGame\CardsGame\ScreenManager\PlayerIndexEventArgs.cs">
+      <Link>ScreenManager\PlayerIndexEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Cards\CardsGame\CardsGame\ScreenManager\ScreenManager.cs">
+      <Link>ScreenManager\ScreenManager.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Cards\CardsGame\CardsGame\BlackjackGame.cs">
+      <Link>BlackjackGame.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Cards\CardsGame\CardsGame\Screens\BackgroundScreen.cs">
+      <Link>Screens\BackgroundScreen.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Cards\CardsGame\CardsGame\Screens\GameplayScreen.cs">
+      <Link>Screens\GameplayScreen.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Cards\CardsGame\CardsGame\Screens\InstructionScreen.cs">
+      <Link>Screens\InstructionScreen.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Cards\CardsGame\CardsGame\Screens\MainMenuScreen.cs">
+      <Link>Screens\MainMenuScreen.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Cards\CardsGame\CardsGame\Screens\OptionsMenu.cs">
+      <Link>Screens\OptionsMenu.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Cards\CardsGame\CardsGame\Screens\PauseScreen.cs">
+      <Link>Screens\PauseScreen.cs</Link>
+    </Compile>
+    <Compile Include="Program.iOS.cs" />
+  </ItemGroup>
+</Project>
