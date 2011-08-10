@@ -119,8 +119,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			generateOpenGLTexture ();
 		}
 		
-		byte[] textureData = null;
-		
 		private void generateOpenGLTexture ()
 		{
 			// modeled after this
@@ -142,7 +140,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)All.Linear);
 			}
 			
-			textureData = new byte[(_width * _height) * 4];
+			byte[] textureData = new byte[(_width * _height) * 4];
 			
 			GL.TexImage2D (TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, _width, _height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, textureData);			
 			
@@ -297,7 +295,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			return FromFile (graphicsDevice, filename, 0, 0);
 		}
 		
-		private void Apply() 
+		private void Apply(byte[] textureData) 
 		{
 			
 			GL.BindTexture (TextureTarget.Texture2D, (uint)_textureId);			
@@ -314,29 +312,29 @@ namespace Microsoft.Xna.Framework.Graphics
 				GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)All.Linear);
 			}			
 
-			GL.TexImage2D (TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, _width, _height, 0, MonoMac.OpenGL.PixelFormat.Rgba, PixelType.UnsignedByte, textureData);
+			GL.TexImage2D (TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, _width, _height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, textureData);
 		}
 		
 		private void SetPixel (int x, int y, byte red, byte green, byte blue, byte alpha)
 		{
 			
-			if (textureData != null) {
-				GL.BindTexture (TextureTarget.Texture2D, (uint)_textureId);
-				GL.TexParameter (TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)All.Nearest);
-				GL.TexParameter (TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)All.Nearest);
-				int startIndex = ((y-1) * _width) + (x-1) * 4;
-				textureData [startIndex] = red;
-				textureData [startIndex + 1] = green;
-				textureData [startIndex + 2] = blue;
-				textureData [startIndex + 3] = alpha;
-				GL.TexImage2D (TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, _width, _height, 0, MonoMac.OpenGL.PixelFormat.Rgba, PixelType.UnsignedByte, textureData);
-			}
-			else {
-				texture.texture.SetPixel(x,y,red,green,blue,alpha);
-			}
+//			if (textureData != null) {
+//				GL.BindTexture (TextureTarget.Texture2D, (uint)_textureId);
+//				GL.TexParameter (TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)All.Nearest);
+//				GL.TexParameter (TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)All.Nearest);
+//				int startIndex = ((y-1) * _width) + (x-1) * 4;
+//				textureData [startIndex] = red;
+//				textureData [startIndex + 1] = green;
+//				textureData [startIndex + 2] = blue;
+//				textureData [startIndex + 3] = alpha;
+//				GL.TexImage2D (TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, _width, _height, 0, MonoMac.OpenGL.PixelFormat.Rgba, PixelType.UnsignedByte, textureData);
+//			}
+//			else {
+//				texture.texture.SetPixel(x,y,red,green,blue,alpha);
+//			}
 		}
 
-		private void SetData (int index, byte red, byte green, byte blue, byte alpha) 
+		private void SetData (int index, byte red, byte green, byte blue, byte alpha, byte[] textureData) 
 		{
 			switch (_format) {				
 			case SurfaceFormat.Color /*kTexture2DPixelFormat_RGBA8888*/:
@@ -361,36 +359,131 @@ namespace Microsoft.Xna.Framework.Graphics
 				;					
 			}
 		}
+
+		private byte[] AllocColorData () 
+		{
+			switch (_format) {				
+			case SurfaceFormat.Color /*kTexture2DPixelFormat_RGBA8888*/:
+			case SurfaceFormat.Dxt1:
+			case SurfaceFormat.Dxt3:
+				return new byte[(_width * _height) * 4];
+				
+			// TODO: Implement the rest of these but lack of knowledge and examples prevents this for now
+			case SurfaceFormat.Bgra4444 /*kTexture2DPixelFormat_RGBA4444*/:
+				break;
+			case SurfaceFormat.Bgra5551 /*kTexture2DPixelFormat_RGB5A1*/:
+				break;
+			case SurfaceFormat.Alpha8 /*kTexture2DPixelFormat_A8*/:
+				break;
+			default:
+				throw new NotSupportedException ("Texture format");
+				;					
+			}
+			
+			return null;
+		}
 		
+		
+		/*
+		* perform an in-place swap from Quadrant 1 to Quadrant III format
+		* (upside-down PostScript/GL to right side up QD/CG raster format)
+		* We do this in-place, which requires more copying, but will touch
+		* only half the pages.
+		* 
+		* Pixel reformatting may optionally be done here if needed.
+		*/
+		private void flipImageData (byte[] mData, int mWidth, int mHeight, int mByteWidth)
+		{
+
+			long top, bottom;
+			byte[] buffer;
+			long topP;
+			long bottomP;
+			long rowBytes;
+
+			top = 0;
+			bottom = mHeight - 1;
+			rowBytes = mWidth * mByteWidth;
+			buffer = new byte[rowBytes];
+
+			while (top < bottom) {
+				topP = top * rowBytes;
+				bottomP = bottom * rowBytes;
+
+				/*
+				* Save and swap scanlines.
+				*
+				* This code does a simple in-place exchange with a temp buffer.
+				* If you need to reformat the pixels, replace the first two Array.Copy
+				* calls with your own custom pixel reformatter.
+				*/
+
+				Array.Copy (mData, topP, buffer, 0, rowBytes);
+				Array.Copy (mData, bottomP, mData, topP, rowBytes);
+				Array.Copy (buffer, 0, mData, bottomP, rowBytes);
+
+				++top;
+				--bottom;
+
+			}
+		}
+
 		public void SetData<T> (T[] data)
 		{
-			if (data == null) {
-				// we offload to ESImage here
-			}
-			else {
-				// we now have a texture not based on an outside image source
-				// now we check what type was passed
-				if (typeof(T) == typeof(Color)) {
-					int y = 0;
-					for (int x = data.Length - 1; x >= 0; x--) {
-						var color = (Color)(object)data[x];
-						SetData(y++,color.R, color.G, color.B, color.A);
-					}
-				}
-				
-				// when we are all done we need apply the changes
-				Apply();
-			}
+			SetData(data, 0, data.Length, SetDataOptions.None);
 		}
 		
 		public void SetData<T> (T[] data, int startIndex, int elementCount, SetDataOptions options)
 		{
-			throw new NotImplementedException ();
+			if (data == null) {
+				throw new ArgumentNullException("Argument data can not be null.");
+			}
+			
+			if (startIndex < 0 || startIndex > data.Length - 1) {
+				throw new ArgumentNullException("Argument startIndex in invalid.");
+			}			
+
+			if (elementCount < 0 || (startIndex + elementCount) > data.Length) {
+				throw new ArgumentNullException("Argument elementCount is invalid.");
+			}			
+			
+			byte[] textureData = AllocColorData();
+			// we now have a texture not based on an outside image source
+			// now we check what type was passed
+			if (typeof(T) == typeof(Color)) {
+
+				for (int x = startIndex; x < elementCount; x++) {
+					var color = (Color)(object)data[x];
+					SetData(x,color.R, color.G, color.B, color.A, textureData);
+					
+				}
+				
+				// For RenderTextures we need to flip the data.
+				if (texture == null) {
+					flipImageData (textureData, _width, _height, 4);
+				}
+			}
+			
+			// when we are all done we need apply the changes
+			Apply(textureData);
 		}
 
 		public void SetData<T> (int level, Rectangle? rect, T[] data, int startIndex, int elementCount, SetDataOptions options)
 		{
-			throw new NotImplementedException ();
+			if (data == null) {
+				throw new ArgumentException ("data cannot be null");
+			}
+
+			if (data.Length < startIndex + elementCount) {
+				throw new ArgumentException ("The data passed has a length of " + data.Length + " but " + elementCount + " pixels have been requested.");
+			}
+
+			Rectangle r;
+			if (rect != null) {
+				r = rect.Value;
+			} else {
+				r = new Rectangle (0, 0, Width, Height);
+			}
 		}
 		
 		
@@ -479,6 +572,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			byte[] imageInfo = GetImageData(0);
 			
+			// For RenderTextures we need to flip the data.
+			if (texture == null) {
+				flipImageData(imageInfo, _width, _height, 4);
+			}
+			
 			// Get the Color values
 			if ((typeof(T) == typeof(Color))) {	
 				
@@ -512,45 +610,14 @@ namespace Microsoft.Xna.Framework.Graphics
 				int rWidth = r.Width;
 				int rHeight = r.Height;
 				
-				if (texture == null) {
-					// For rendertargets we need to loop through and load the elements
-					// backwards because the texture data is flipped vertically and horizontally
-					var dataEnd = (rWidth * rHeight) - 1;
-					var dataPos = 0;
-					var dataRowColOffset = 0;
+					// Loop through and extract the data but we need to load it 
+					int dataRowColOffset = 0;
+					int sz = 0;
+					int pixelOffset = 0;
 					for (int y = r.Top; y < rHeight; y++) {
 						for (int x = r.Left; x < rWidth; x++) {
 							var result = new Color (0, 0, 0, 0);						
 							dataRowColOffset = ((y * rWidth) + x);
-							switch (_format) {
-							case SurfaceFormat.Color : //kTexture2DPixelFormat_RGBA8888
-							case SurfaceFormat.Dxt3 :
-								
-								dataPos = dataRowColOffset * 4;								
-															
-								result.R = imageInfo [dataPos];
-								result.G = imageInfo [dataPos + 1];
-								result.B = imageInfo [dataPos + 2];
-								result.A = imageInfo [dataPos + 3];
-								break;
-							default:
-								throw new NotSupportedException ("Texture format");
-							}
-							data[dataEnd - dataRowColOffset] = (T)(object)result;
-						}
-						
-						
-					}
-				}
-				else {
-					// Loop through and extract the data but we need to load it 
-					var dataRowColOffset = 0;
-					var sz = 0;
-					var pixelOffset = 0;
-					for (int y = r.Top; y < rHeight; y++) {
-						for (int x = r.Left; x < rWidth; x++) {
-							var result = new Color (0, 0, 0, 0);						
-							dataRowColOffset = ((y * r.Width) + x);
 							switch (_format) {
 							case SurfaceFormat.Color : //kTexture2DPixelFormat_RGBA8888
 							case SurfaceFormat.Dxt3 :
@@ -613,7 +680,6 @@ namespace Microsoft.Xna.Framework.Graphics
 							data [dataRowColOffset] = (T)(object)result;
 						}
 					}
-				}
 			}
 			else {
 				throw new NotImplementedException ("GetData not implemented for type.");

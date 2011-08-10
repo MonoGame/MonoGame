@@ -209,8 +209,8 @@ namespace Marblets
             //graphicsService.GraphicsDevice.RenderState.AlphaSourceBlend =
                 //Blend.SourceAlpha;
 
-            graphicsService.GraphicsDevice.RenderState.DestinationBlend =
-                Blend.InverseSourceAlpha;
+            //graphicsService.GraphicsDevice.RenderState.DestinationBlend =
+                //Blend.InverseSourceAlpha;
 
             //Ask static helper objects to reload too
             Font.LoadContent();
