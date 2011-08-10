@@ -69,7 +69,7 @@ namespace Blackjack
         /// </summary>
         public override void Initialize()
         {
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || IOS || ANDROID
             // Enable tab gesture
             TouchPanel.EnabledGestures = GestureType.Tap;
 #endif
@@ -135,7 +135,7 @@ namespace Blackjack
             bool pressed = false;
             Vector2 position = Vector2.Zero;
 
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || IOS || ANDROID
             if ((input.Gestures.Count > 0) && input.Gestures[0].GestureType == GestureType.Tap)
             {
                 pressed = true;
@@ -180,7 +180,7 @@ namespace Blackjack
                     if (IntersectWith(position))
                     {
                         isPressed = true;
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || IOS || ANDROID
                         FireClick();
                         isPressed = false;
 #endif

@@ -32,7 +32,7 @@ namespace GameStateManagement
         List<MenuEntry> menuEntries = new List<MenuEntry>();
         int selectedEntry = 0;
         string menuTitle;
-#if WINDOWS
+#if WINDOWS || MACOS || LINUX
         bool isMouseDown = false;
 #endif
         Rectangle bounds;
@@ -61,7 +61,7 @@ namespace GameStateManagement
         /// </summary>
         public MenuScreen(string menuTitle)
         {
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || IOS || ANDROID
             // menus generally only need Tap for menu selection
             EnabledGestures = GestureType.Tap;
 #endif
@@ -103,7 +103,7 @@ namespace GameStateManagement
             {
                 OnCancel(player);
             }
-#if WINDOWS
+#if WINDOWS || MACOS || LINUX
             // Take care of Keyboard input
             if (input.IsMenuUp(ControllingPlayer))
             {
@@ -186,7 +186,7 @@ namespace GameStateManagement
             else if (input.IsNewButtonPress(Buttons.A, ControllingPlayer, out player))
                 OnSelectEntry(selectedEntry, player);
 
-#elif WINDOWS_PHONE
+#elif WINDOWS_PHONE || IOS || ANDROID
             // look for any taps that occurred and select any entries that were tapped
             foreach (GestureSample gesture in input.Gestures)
             {

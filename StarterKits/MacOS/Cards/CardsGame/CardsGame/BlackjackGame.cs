@@ -52,9 +52,9 @@ namespace Blackjack
 
             Components.Add(screenManager);
 
-#if WINDOWS
+#if WINDOWS || MACOS || LINUX
             IsMouseVisible = true;
-#elif WINDOWS_PHONE
+#elif WINDOWS_PHONE || IOS || ANDROID
             // Frame rate is 30 fps by default for Windows Phone.
             TargetElapsedTime = TimeSpan.FromTicks(333333);
             graphics.IsFullScreen = true;
@@ -73,7 +73,7 @@ namespace Blackjack
 #if XBOX
             graphics.PreferredBackBufferHeight = graphics.GraphicsDevice.DisplayMode.Height;
             graphics.PreferredBackBufferWidth = graphics.GraphicsDevice.DisplayMode.Width; 
-#elif WINDOWS
+#elif WINDOWS || MACOS || LINUX
             graphics.PreferredBackBufferHeight = 480;
             graphics.PreferredBackBufferWidth = 800; 
 #endif         

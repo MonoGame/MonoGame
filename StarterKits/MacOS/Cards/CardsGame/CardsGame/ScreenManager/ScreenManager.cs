@@ -113,7 +113,7 @@ namespace GameStateManagement
         {
             // we must set EnabledGestures before we can query for them, but
             // we don't assume the game wants to read them.
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || IOS || ANDROID
             TouchPanel.EnabledGestures = GestureType.None;
 #endif
         }
@@ -275,7 +275,7 @@ namespace GameStateManagement
             screens.Add(screen);
 
             // update the TouchPanel to respond to gestures this screen is interested in
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || IOS || ANDROID
             TouchPanel.EnabledGestures = screen.EnabledGestures;
 #endif
         }
