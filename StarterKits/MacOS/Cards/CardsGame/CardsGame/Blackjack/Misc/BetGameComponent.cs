@@ -78,7 +78,7 @@ namespace Blackjack
         /// </summary>
         public override void Initialize()
         {
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE  || IOS || ANDROID
             // Enable tap gesture
             TouchPanel.EnabledGestures = GestureType.Tap;
 #endif
@@ -256,7 +256,7 @@ namespace Blackjack
                 isPressed = true;
                 position = inputHelper.PointPosition;
             }
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || IOS || ANDROID
             else if ((input.Gestures.Count > 0) && input.Gestures[0].GestureType == GestureType.Tap)
             {
                 isPressed = true;

@@ -63,7 +63,7 @@ namespace Blackjack
             new Vector2(100 * BlackjackGame.WidthScale, 25 * BlackjackGame.HeightScale);
         static Vector2 ringOffset = new Vector2(0, 110);
 
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || IOS || ANDROID
         Vector2 frameSize = new Vector2(162, 162);
 #else
         Vector2 frameSize = new Vector2(180, 180);

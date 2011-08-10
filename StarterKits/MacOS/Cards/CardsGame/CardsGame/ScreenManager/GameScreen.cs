@@ -180,7 +180,7 @@ namespace GameStateManagement
 
         PlayerIndex? controllingPlayer;
 
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || IOS || ANDROID
         /// <summary>
         /// Gets the gestures the screen is interested in. Screens should be as specific
         /// as possible with gestures to increase the accuracy of the gesture engine.

@@ -87,13 +87,253 @@
     <Reference Include="OpenTK" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Info.plist" />
-    <None Include="..\..\MacOS\Cards\CardsGame\CardsGame\Background.png">
+    <Content Include="Info.plist" />
+    <Content Include="..\..\MacOS\Cards\CardsGame\CardsGame\Background.png">
       <Link>Background.png</Link>
-    </None>
-    <None Include="..\..\MacOS\Cards\CardsGame\CardsGame\GameThumbnail.png">
+    </Content>
+    <Content Include="..\..\MacOS\Cards\CardsGame\CardsGame\GameThumbnail.png">
       <Link>GameThumbnail.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Cards\CardBack_Blue.png">
+      <Link>Content\Images\Cards\CardBack_Blue.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Cards\CardBack_Red.png">
+      <Link>Content\Images\Cards\CardBack_Red.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Cards\ClubAce.png">
+      <Link>Content\Images\Cards\ClubAce.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Cards\ClubEight.png">
+      <Link>Content\Images\Cards\ClubEight.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Cards\ClubFive.png">
+      <Link>Content\Images\Cards\ClubFive.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Cards\ClubFour.png">
+      <Link>Content\Images\Cards\ClubFour.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Cards\ClubJack.png">
+      <Link>Content\Images\Cards\ClubJack.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Cards\ClubKing.png">
+      <Link>Content\Images\Cards\ClubKing.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Cards\ClubNine.png">
+      <Link>Content\Images\Cards\ClubNine.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Cards\ClubQueen.png">
+      <Link>Content\Images\Cards\ClubQueen.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Cards\ClubSeven.png">
+      <Link>Content\Images\Cards\ClubSeven.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Cards\ClubSix.png">
+      <Link>Content\Images\Cards\ClubSix.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Cards\ClubTen.png">
+      <Link>Content\Images\Cards\ClubTen.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Cards\ClubThree.png">
+      <Link>Content\Images\Cards\ClubThree.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Cards\ClubTwo.png">
+      <Link>Content\Images\Cards\ClubTwo.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Cards\DiamondAce.png">
+      <Link>Content\Images\Cards\DiamondAce.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Cards\DiamondEight.png">
+      <Link>Content\Images\Cards\DiamondEight.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Cards\DiamondFive.png">
+      <Link>Content\Images\Cards\DiamondFive.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Cards\DiamondFour.png">
+      <Link>Content\Images\Cards\DiamondFour.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Cards\DiamondJack.png">
+      <Link>Content\Images\Cards\DiamondJack.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Cards\DiamondKing.png">
+      <Link>Content\Images\Cards\DiamondKing.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Cards\DiamondNine.png">
+      <Link>Content\Images\Cards\DiamondNine.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Cards\DiamondQueen.png">
+      <Link>Content\Images\Cards\DiamondQueen.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Cards\DiamondSeven.png">
+      <Link>Content\Images\Cards\DiamondSeven.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Cards\DiamondSix.png">
+      <Link>Content\Images\Cards\DiamondSix.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Cards\DiamondTen.png">
+      <Link>Content\Images\Cards\DiamondTen.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Cards\DiamondThree.png">
+      <Link>Content\Images\Cards\DiamondThree.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Cards\DiamondTwo.png">
+      <Link>Content\Images\Cards\DiamondTwo.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Cards\FirstJoker.png">
+      <Link>Content\Images\Cards\FirstJoker.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Cards\HeartAce.png">
+      <Link>Content\Images\Cards\HeartAce.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Cards\HeartEight.png">
+      <Link>Content\Images\Cards\HeartEight.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Cards\HeartFive.png">
+      <Link>Content\Images\Cards\HeartFive.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Cards\HeartFour.png">
+      <Link>Content\Images\Cards\HeartFour.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Cards\HeartJack.png">
+      <Link>Content\Images\Cards\HeartJack.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Cards\HeartKing.png">
+      <Link>Content\Images\Cards\HeartKing.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Cards\HeartNine.png">
+      <Link>Content\Images\Cards\HeartNine.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Cards\HeartQueen.png">
+      <Link>Content\Images\Cards\HeartQueen.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Cards\HeartSeven.png">
+      <Link>Content\Images\Cards\HeartSeven.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Cards\HeartSix.png">
+      <Link>Content\Images\Cards\HeartSix.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Cards\HeartTen.png">
+      <Link>Content\Images\Cards\HeartTen.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Cards\HeartThree.png">
+      <Link>Content\Images\Cards\HeartThree.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Cards\HeartTwo.png">
+      <Link>Content\Images\Cards\HeartTwo.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Cards\SecondJoker.png">
+      <Link>Content\Images\Cards\SecondJoker.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Cards\SpadeAce.png">
+      <Link>Content\Images\Cards\SpadeAce.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Cards\SpadeEight.png">
+      <Link>Content\Images\Cards\SpadeEight.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Cards\SpadeFive.png">
+      <Link>Content\Images\Cards\SpadeFive.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Cards\SpadeFour.png">
+      <Link>Content\Images\Cards\SpadeFour.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Cards\SpadeJack.png">
+      <Link>Content\Images\Cards\SpadeJack.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Cards\SpadeKing.png">
+      <Link>Content\Images\Cards\SpadeKing.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Cards\SpadeNine.png">
+      <Link>Content\Images\Cards\SpadeNine.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Cards\SpadeQueen.png">
+      <Link>Content\Images\Cards\SpadeQueen.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Cards\SpadeSeven.png">
+      <Link>Content\Images\Cards\SpadeSeven.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Cards\SpadeSix.png">
+      <Link>Content\Images\Cards\SpadeSix.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Cards\SpadeTen.png">
+      <Link>Content\Images\Cards\SpadeTen.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Cards\SpadeThree.png">
+      <Link>Content\Images\Cards\SpadeThree.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Cards\SpadeTwo.png">
+      <Link>Content\Images\Cards\SpadeTwo.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Chips\chip100.png">
+      <Link>Content\Images\Chips\chip100.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Chips\chip25.png">
+      <Link>Content\Images\Chips\chip25.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Chips\chip5.png">
+      <Link>Content\Images\Chips\chip5.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Chips\chip500.png">
+      <Link>Content\Images\Chips\chip500.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Chips\chipBlack.png">
+      <Link>Content\Images\Chips\chipBlack.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Chips\chipRed.png">
+      <Link>Content\Images\Chips\chipRed.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Chips\chipWhite.png">
+      <Link>Content\Images\Chips\chipWhite.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Chips\chipYellow.png">
+      <Link>Content\Images\Chips\chipYellow.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\UI\Shuffle_Blue.png">
+      <Link>Content\Images\UI\Shuffle_Blue.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\UI\Shuffle_Red.png">
+      <Link>Content\Images\UI\Shuffle_Red.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\UI\bust.png">
+      <Link>Content\Images\UI\bust.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\UI\lose.png">
+      <Link>Content\Images\UI\lose.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\UI\pass.png">
+      <Link>Content\Images\UI\pass.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\UI\push.png">
+      <Link>Content\Images\UI\push.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\UI\ring.png">
+      <Link>Content\Images\UI\ring.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\UI\table - Copy.png">
+      <Link>Content\Images\UI\table - Copy.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\UI\table.png">
+      <Link>Content\Images\UI\table.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\UI\win.png">
+      <Link>Content\Images\UI\win.png</Link>
+    </Content>
+    <None Include="..\..\MacOS\Cards\BlackjackLoDefContent\Fonts\Bold.spritefont">
+      <Link>Content\Fonts\Bold.spritefont</Link>
     </None>
+    <None Include="..\..\MacOS\Cards\BlackjackLoDefContent\Fonts\MenuFont.spritefont">
+      <Link>Content\Fonts\MenuFont.spritefont</Link>
+    </None>
+    <None Include="..\..\MacOS\Cards\BlackjackLoDefContent\Fonts\Regular.spritefont">
+      <Link>Content\Fonts\Regular.spritefont</Link>
+    </None>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Fonts\Bold.xnb">
+      <Link>Content\Fonts\Bold.xnb</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Fonts\MenuFont.xnb">
+      <Link>Content\Fonts\MenuFont.xnb</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Fonts\Regular.xnb">
+      <Link>Content\Fonts\Regular.xnb</Link>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -192,5 +432,52 @@
       <Link>Screens\PauseScreen.cs</Link>
     </Compile>
     <Compile Include="Program.iOS.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Content\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\blank.png">
+      <Link>Content\Images\blank.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\Button.png">
+      <Link>Content\Images\Button.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\ButtonPressed.png">
+      <Link>Content\Images\ButtonPressed.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\ButtonRegular.png">
+      <Link>Content\Images\ButtonRegular.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\GamePadCursor.png">
+      <Link>Content\Images\GamePadCursor.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\instructions.png">
+      <Link>Content\Images\instructions.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\titlescreen.png">
+      <Link>Content\Images\titlescreen.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\youLose.png">
+      <Link>Content\Images\youLose.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Sounds\Bet.wav">
+      <Link>Content\Sounds\Bet.wav</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Sounds\CardFlip.wav">
+      <Link>Content\Sounds\CardFlip.wav</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Sounds\CardsShuffle.wav">
+      <Link>Content\Sounds\CardsShuffle.wav</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Sounds\Deal.wav">
+      <Link>Content\Sounds\Deal.wav</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\BlackjackLoDefContent\Images\UI\blackjack.png">
+      <Link>Content\Images\UI\blackjack.png</Link>
+    </Content>
+    <Content Include="..\..\MacOS\Cards\CardsFramework\Background.png">
+      <Link>Content\Background.png</Link>
+    </Content>
   </ItemGroup>
 </Project>
