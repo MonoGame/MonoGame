@@ -307,6 +307,7 @@
     <Compile Include="Android\GamerServices\Guide.cs" />
     <Compile Include="Net\CommandGamerLeft.cs" />
     <Compile Include="Net\CommandGamerStateChange.cs" />
+    <Compile Include="Storage\StorageDeviceHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="GamerServices\" />
