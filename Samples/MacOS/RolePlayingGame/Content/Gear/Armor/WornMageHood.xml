@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Armor">
+      <Name>Worn Mage Hood</Name>
+      <Description>This set provides basic magical protection for spellcasters.</Description>
+      <GoldValue>300</GoldValue>
+      <IsDroppable>true</IsDroppable>
+      <MinimumCharacterLevel>2</MinimumCharacterLevel>
+      <SupportedClasses>
+          <Item>Wizard</Item>
+          <Item>Red Mage</Item>
+      </SupportedClasses>
+      <IconTextureName>Hood01b</IconTextureName>
+	  <OwnerBuffStatistics>
+		  <MagicPoints>5</MagicPoints>
+	  </OwnerBuffStatistics>
+	  <Slot>Helmet</Slot>
+      <OwnerHealthDefenseRange>
+          <Minimum>2</Minimum>
+          <Maximum>4</Maximum>
+      </OwnerHealthDefenseRange>
+      <OwnerMagicDefenseRange>
+          <Minimum>4</Minimum>
+          <Maximum>6</Maximum>
+      </OwnerMagicDefenseRange>
+  </Asset>
+</XnaContent>

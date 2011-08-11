@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.QuestNpc">
+      <Name>Itemania!</Name>
+      <IntroductionDialogue>Good Items at Good Prices, Guaranteed!</IntroductionDialogue>
+  </Asset>
+</XnaContent>

@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Store">
+      <Name>Gear Man</Name>
+      <BuyMultiplier>1.5</BuyMultiplier>
+      <SellMultiplier>0.5</SellMultiplier>
+      <StoreCategories>
+          <Item>
+              <Name>Weapons</Name>
+              <AvailableContentNames>
+                  <Item>Weapons\PersianSword</Item>
+                  <Item>Weapons\MysticalStaff</Item>
+                  <Item>Weapons\GiantClub</Item>
+              </AvailableContentNames>
+          </Item>
+          <Item>
+              <Name>Armor</Name>
+              <AvailableContentNames>
+                  <Item>Armor\BronzeArmor</Item>
+                  <Item>Armor\IronArmor</Item>
+                  <Item>Armor\MagicRobe</Item>
+              </AvailableContentNames>
+          </Item>
+          <Item>
+              <Name>Shields</Name>
+              <AvailableContentNames>
+                  <Item>Armor\BronzeShield</Item>
+                  <Item>Armor\IronShield</Item>
+                  <Item>Armor\IronShieldPlus</Item>
+              </AvailableContentNames>
+          </Item>
+          <Item>
+              <Name>Helmets</Name>
+              <AvailableContentNames>
+                  <Item>Armor\BronzeHelmet</Item>
+                  <Item>Armor\IronHelmet</Item>
+                  <Item>Armor\MageHood</Item>
+              </AvailableContentNames>
+          </Item>
+          <Item>
+              <Name>Boots</Name>
+              <AvailableContentNames>
+                  <Item>Armor\BronzeBoots</Item>
+                  <Item>Armor\IronBoots</Item>
+                  <Item>Armor\MageBoots</Item>
+              </AvailableContentNames>
+          </Item>
+      </StoreCategories>
+      <WelcomeMessage>Welcome! I only sell the finest equipment here.  But you know what they say... the best is never cheap!</WelcomeMessage>
+      <ShopkeeperTextureName>ShopKeeper02</ShopkeeperTextureName>
+  </Asset>
+</XnaContent>

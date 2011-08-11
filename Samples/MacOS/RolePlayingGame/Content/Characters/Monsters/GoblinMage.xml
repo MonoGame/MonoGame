@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Monster">
+      <Name>Goblin Mage</Name>
+      <MapSprite>
+          <TextureName>Characters\Goblin1IdleLeft</TextureName>
+          <FrameDimensions>126 168</FrameDimensions>
+          <FramesPerRow>6</FramesPerRow>
+          <SourceOffset>63 128</SourceOffset>
+          <Animations />
+      </MapSprite>
+      <CharacterClassContentName>RedMage</CharacterClassContentName>
+      <CharacterLevel>2</CharacterLevel>
+      <InitialEquipmentContentNames>
+          <Item>Weapons\WornStaff</Item>
+          <Item>Armor\WornRobe</Item>
+      </InitialEquipmentContentNames>
+      <Inventory>
+		  <Item>
+			  <ContentName>Items\MinorMagicPotion</ContentName>
+			  <Count>2</Count>
+		  </Item>
+      </Inventory>
+      <CombatSprite>
+          <TextureName>Characters\Goblin1AttackLeft</TextureName>
+          <FrameDimensions>224 168</FrameDimensions>
+          <FramesPerRow>6</FramesPerRow>
+          <SourceOffset>120 135</SourceOffset>
+          <Animations />
+      </CombatSprite>
+      <DefendPercentage>30</DefendPercentage>
+      <GearDrops>
+          <Item>
+              <GearName>Items\MinorMagicPotion</GearName>
+              <DropPercentage>40</DropPercentage>
+          </Item>
+          <Item>
+              <GearName>Weapons\WornStaff</GearName>
+              <DropPercentage>10</DropPercentage>
+          </Item>
+          <Item>
+              <GearName>Armor\WornRobe</GearName>
+              <DropPercentage>10</DropPercentage>
+          </Item>
+      </GearDrops>
+  </Asset>
+</XnaContent>

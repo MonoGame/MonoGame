@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.QuestNpc">
+      <Name>New Age Inn</Name>
+      <IntroductionDialogue>Come inside, and enjoy the finest in new-age drinks, food and beds just for weary travelers such as yourselves.</IntroductionDialogue>
+  </Asset>
+</XnaContent>

@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.QuestNpc">
+      <Name>Shed-darr the Wise</Name>
+      <MapSprite>
+          <TextureName>Characters\Wizard1IdleRight</TextureName>
+          <FrameDimensions>128 192</FrameDimensions>
+          <FramesPerRow>6</FramesPerRow>
+          <SourceOffset>64 150</SourceOffset>
+          <Animations />
+      </MapSprite>
+      <MapIdleAnimationInterval>150</MapIdleAnimationInterval>
+      <IntroductionDialogue>Welcome to Mercadia, hero.  Unfortunately, not all is well.  The evil Tamar has taken the Sacred Amulet. The world is now in peril! Please help us before the Mercadia falls into darkness!</IntroductionDialogue>
+  </Asset>
+</XnaContent>

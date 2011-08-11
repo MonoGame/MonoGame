@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<XnaContent><Asset Type="RolePlayingGameData.Chest">
+  <Name>PD Elixer</Name>
+  <Gold>0</Gold>
+  <Entries>
+    <Item>
+      <ContentName>Items\PDElixir</ContentName>
+      <Count>1</Count>
+    </Item>
+  </Entries>
+  <TextureName>Chest1e</TextureName>
+</Asset></XnaContent>

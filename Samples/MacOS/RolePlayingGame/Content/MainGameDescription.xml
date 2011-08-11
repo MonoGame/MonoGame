@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.GameStartDescription">
+      <MapContentName>Map001</MapContentName>
+	  <PlayerContentNames>
+		  <Item>Kolatt</Item>
+	  </PlayerContentNames>
+      <QuestLineContentName>MainQuestLine</QuestLineContentName>
+  </Asset>
+</XnaContent>

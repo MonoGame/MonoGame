@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Player">
+      <Name>Nykkas</Name>
+      <MapSprite>
+          <TextureName>Characters\WizardIdleRight</TextureName>
+          <FrameDimensions>128 192</FrameDimensions>
+          <FramesPerRow>6</FramesPerRow>
+          <SourceOffset>64 150</SourceOffset>
+          <Animations />
+      </MapSprite>
+      <WalkingSprite>
+          <TextureName>Characters\WizardWalkRight</TextureName>
+          <FrameDimensions>128 192</FrameDimensions>
+          <FramesPerRow>6</FramesPerRow>
+          <SourceOffset>64 150</SourceOffset>
+          <Animations />
+      </WalkingSprite>
+      <MapIdleAnimationInterval>190</MapIdleAnimationInterval>
+      <CharacterClassContentName>Wizard</CharacterClassContentName>
+      <CharacterLevel>3</CharacterLevel>
+      <InitialEquipmentContentNames>
+          <Item>Weapons\WornStaff</Item>
+          <Item>Armor\HideArmor</Item>
+          <Item>Armor\HideBoots</Item>
+      </InitialEquipmentContentNames>
+      <Inventory>
+		  <Item>
+			  <ContentName>Items\MinorMagicPotion</ContentName>
+			  <Count>3</Count>
+		  </Item>
+      </Inventory>
+      <CombatSprite>
+          <TextureName>Characters\WizardAttackRight</TextureName>
+          <FrameDimensions>256 192</FrameDimensions>
+          <FramesPerRow>6</FramesPerRow>
+          <SourceOffset>120 155</SourceOffset>
+          <Animations />
+      </CombatSprite>
+      <Gold>20</Gold>
+      <IntroductionDialogue>I am Nykas the Wizard, and Destroyer of Orcs!  My fame is known beyond even Mercadia! I'm in need of followers at the moment. Interested in joining the stable of a world renown Hero such as myself? The pay is quite poor, but the experience would be invaluable to you.</IntroductionDialogue>
+      <JoinAcceptedDialogue>Wonderful!  You know, my boots do need a bit of polishing.  Oh, my robe could use some dry cleaning. And don't forget to...</JoinAcceptedDialogue>
+      <JoinRejectedDialogue>Fools you are!</JoinRejectedDialogue>
+      <ActivePortraitTextureName>WizardActive</ActivePortraitTextureName>
+      <InactivePortraitTextureName>WizardInActive</InactivePortraitTextureName>
+      <UnselectablePortraitTextureName>WizardUnselectable</UnselectablePortraitTextureName>
+  </Asset>
+</XnaContent>

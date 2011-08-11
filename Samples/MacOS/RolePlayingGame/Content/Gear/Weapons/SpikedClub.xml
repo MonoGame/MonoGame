@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Weapon">
+      <Name>Spiked Club</Name>
+      <Description>The spikes covering this club make it a fearsome weapon.</Description>
+      <GoldValue>400</GoldValue>
+      <IsDroppable>true</IsDroppable>
+      <MinimumCharacterLevel>3</MinimumCharacterLevel>
+      <SupportedClasses>
+          <Item>Barbarian</Item>
+      </SupportedClasses>
+      <IconTextureName>Club03a</IconTextureName>
+      <TargetDamageRange>
+          <Minimum>25</Minimum>
+          <Maximum>45</Maximum>
+      </TargetDamageRange>
+      <SwingCueName>StaffSwing</SwingCueName>
+      <HitCueName>StaffHit</HitCueName>
+      <BlockCueName>StaffBlock</BlockCueName>
+      <Overlay>
+          <TextureName>Spells\OverlayMelee</TextureName>
+          <FrameDimensions>111 130</FrameDimensions>
+          <FramesPerRow>1</FramesPerRow>
+          <Animations>
+              <Item>
+                  <StartingFrame>1</StartingFrame>
+                  <EndingFrame>1</EndingFrame>
+                  <Interval>200</Interval>
+                  <IsLoop>false</IsLoop>
+              </Item>
+          </Animations>
+      </Overlay>
+  </Asset>
+</XnaContent>

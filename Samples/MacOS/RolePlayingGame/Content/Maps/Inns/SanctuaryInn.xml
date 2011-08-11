@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Inn">
+      <Name>Sanctuary Inn</Name>
+      <ChargePerPlayer>50</ChargePerPlayer>
+      <WelcomeMessage>It's dangerous out there. We'll guard you with our lives while you sleep, but it won't come cheap.</WelcomeMessage>
+      <PaidMessage>Come back anytime!</PaidMessage>
+      <NotEnoughGoldMessage>Do you honestly think that we would risk our lives to ensure your safety for free?!  Get out of here!</NotEnoughGoldMessage>
+      <ShopkeeperTextureName>ShopKeeper</ShopkeeperTextureName>
+  </Asset>
+</XnaContent>

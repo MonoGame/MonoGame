@@ -1,0 +1,1090 @@
+﻿<html xmlns:MSHelp="http://msdn.microsoft.com/mshelp" xmlns:msxsl="urn:schemas-microsoft-com:xslt" xmlns:xanx="http://schemas.microsoft.com/developer/xanx/2005"><head><META http-equiv="Content-Type" content="text/html; charset=utf-8"><META NAME="save" CONTENT="history"><title>Role-Playing Game Starter Kit</title>
+<style><!--
+/***********************************************************
+ *             SCRIPT-SUPPORTING STYLES
+ ***********************************************************/
+
+/* Defines the userData cache persistence mechanism. */
+.userDataStyle
+{
+	behavior: url(#default#userData);
+}
+
+/* Used to save the scroll bar position when navigating away from a page. */
+div.saveHistory
+{
+	behavior: url(#default#saveHistory);
+}
+
+/* Formats the expand/collapse images for all collapsible regions. */
+img.toggle
+{
+	border: 0;
+	margin-right: 5;
+}
+
+/* Formats the Language filter drop-down image. */
+img#languageFilterImage
+{
+	border: 0;
+	margin-left: 0;
+	vertical-align: middle;
+}
+
+/* Formats the Members Options filter drop-down image. */
+img#membersOptionsFilterImage
+{
+	border: 0;
+	margin-left: 0;
+	vertical-align: middle;
+}
+
+/* Formats the Collapse All/Expand All images. */
+img#toggleAllImage
+{
+	margin-left: 0;
+	vertical-align: middle;
+}
+
+/* Supports XLinks */
+MSHelp\:link
+{
+ 	text-decoration: underline;
+	color: #0000ff; 
+	hoverColor: #3366ff;
+	filterString: ;
+}
+
+
+body
+	{
+	background:	#FFFFFF;
+	color: #000000;
+	font-family:	Verdana;
+	font-size: medium;
+	font-style: normal;
+	font-weight: normal;
+	margin-top:	0;
+	margin-bottom:	0;
+	margin-left:	0;
+	margin-right:	0;
+	width:	100%;
+	/*font-size: 110%;*/
+	}
+
+div.section
+	{
+	margin-left: 15px;
+	}
+
+div.hxnx5
+	{
+	margin-left: 1.5em;
+	}
+
+/* Font for all headings */	
+h1, h2, h3, h4, h5, h6
+	{
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	margin-top: 18;
+	margin-bottom: 8; 
+	font-weight: bold;
+	}
+h1
+	{
+	font-size: 130%;
+	color: #003399;
+	}
+div#scrollyes h1 /* Changes font size for full-scrolling topic */
+	{
+	font-size: 150%;
+	}
+h2
+	{
+	font-size: 125%;
+	}
+h3
+	{
+	font-size: 115%;
+	margin-top: 9;
+	margin-bottom: 4; 
+	}
+h4
+	{
+	font-size: 115%;
+	margin-top: 9;
+	margin-bottom: 4; 
+	}
+h5
+	{
+	font-size: 100%;
+	margin-top: 9;
+	margin-bottom: 4; 
+	}
+h6
+	{
+	font-size: 100%;
+	margin-top: 9;
+	margin-bottom: 4; 
+	}
+
+ul p, ol p, dl p
+	{
+	margin-left: 0em;
+	}
+
+p
+	{
+	margin-top: .6em;
+	margin-bottom: .6em;
+	}
+	
+td p
+	{
+	margin-top: 0.0em;
+	margin-bottom: 0.6em;
+	}
+
+dd p
+	{
+	margin-top: 0.0em;
+	margin-bottom: 0.6em;
+	}
+
+.image
+	{
+	text-align: center;
+	}
+
+dl
+	{
+	margin-top: 0em; 
+	margin-bottom: 1.3em;
+	}
+
+dd
+	{
+	margin-bottom: 0em;
+	margin-left: 0;
+	}
+
+dl.glossary dd 
+{
+	margin-bottom: 0em;  
+	margin-left: 1.5em; 
+}
+
+dt
+	{
+	margin-top: .6em;
+	margin-bottom: 1;
+	}
+
+ul, ol
+	{
+	margin-top: 0.6em;
+	margin-bottom: 0.6em; 	
+	}
+	
+ol
+	{
+	margin-left: 2.5em; 
+	
+	}	
+	
+ul
+	{
+	list-style-type: disc; 
+	margin-left: 1.9em; 
+	}
+
+li
+	{
+	margin-bottom: 0.4em;
+	}
+
+ul ol, ol ol
+	{
+	list-style-type: lower-alpha;
+	}
+
+pre
+	{
+	margin-top: .6em;
+	margin-bottom: .6em; 
+	}
+
+pre
+	{
+	font: 105% Lucida, mono; 
+	color: #000066;
+	}
+
+code
+{
+	font-family: Monospace, Courier New, Courier;
+	font-size: 105%;
+	color:	#000066;
+}
+
+table.userdata td 
+	{
+	background: #ffffff;
+	background-color: #F5F5F5;
+	border-color: #ffffff;
+	border: none;
+	}	
+table.clsWarning
+	{
+	background: #ffffff;
+	padding: 0px;
+	margin: 0px;
+	border: none;
+	}
+table.clsWarning td
+	{
+	padding: 0px;
+	margin: 0px;
+	background: #ffffff;
+	vertical-align: middle;
+	font-size: 70%;
+	}
+
+div#mainSection table
+	{
+	width: 98%;
+	background: #ffffff;
+	margin-top: 5px;
+	margin-bottom: 5px;
+	}
+
+div#mainSection table th
+	{ 
+	padding: 5px 6px;
+	background: #EFEFF7;
+	text-align: left;
+	font-size: 70%;
+	vertical-align: bottom;
+	border-bottom: 1px solid #C8CDDE;
+	}
+div#mainSection table td
+	{ 
+	padding: 5px 5px;
+	background: #F7F7FF;
+	vertical-align: top;
+	font-size: 70%;
+	border-bottom: 1px solid #D5D5D3;
+	}
+
+div#syntaxCodeBlocks table th
+	{
+	padding: 1px 6px;
+	color: #000066;
+	}
+
+div#syntaxCodeBlocks table td
+	{
+	padding: 1px 5px;
+	}
+
+/* Applies to the running header text in the first row of the upper table in the
+   non-scrolling header region. */
+span#runningHeaderText
+{
+	color: #003399;
+	font-size: 90%;
+	padding-left: 13;
+}
+
+/* Applies to the topic title in the second row of the upper table in the
+   non-scrolling header region. */
+span#nsrTitle
+{
+	color: #003399;
+	font-size: 120%;
+	font-weight: 600;
+	padding-left: 13;
+}
+
+/* Applies to everything below the non-scrolling header region. */
+div#mainSection
+{
+	font-size: 70%;
+	width: 100%;
+}
+
+/* Applies to everything below the non-scrolling header region, minus the footer. */
+div#mainBody
+{
+	font-size: 90%;
+	margin-left: 15;
+	margin-top: 10;
+	padding-bottom: 20;
+}
+
+/* Adds right padding for all blocks in mainBody */
+div#mainBody p, div#mainBody ol, div#mainBody ul, div#mainBody dl
+{
+	padding-right: 5;
+}
+
+div#mainBody div.alert, div#mainBody div.code, div#mainBody div.tableSection
+{
+	width:98.9%;
+}
+
+div.alert p, div.code p
+{
+	margin-top:5;
+	margin-bottom:8;
+}
+
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - Begin Note Styles - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
+div#mainSection div.alert table
+{
+	border: 0;
+}
+
+div#mainSection div.alert table th
+{
+	padding-top: 0;
+	padding-bottom: 0;
+	padding-left: 5;
+	padding-right: 5;
+}
+
+div#mainSection div.alert table td
+{
+	padding-left: 5;
+	padding-right: 5;
+}
+
+img.note
+{
+	border: 0;
+	margin-left: 0;
+	margin-right: 3;
+}
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - End Note Styles - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
+
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - Begin Non-scrolling Header Region Styles - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
+/* Applies to the entire non-scrolling header region. */
+div#header
+{
+	background-color: #D4DFFF;
+	padding-top:	0;
+	padding-bottom:	0;
+	padding-left:	0;
+	padding-right:	0;
+	width:	100%;
+}
+
+/* Applies to both tables in the non-scrolling header region. */
+div#header table
+{
+	margin-top:	0;
+	margin-bottom: 0;
+	border-bottom-color: #C8CDDE;
+	border-bottom-style: solid;
+	border-bottom-width: 1;
+	background: #D4DFFF;
+	width:	100%;
+}
+
+/* Applies to cells in both tables in the non-scrolling header region. */
+div#header table td
+{
+	color: #0000FF;
+	font-size: 70%;
+	padding-right: 20;
+	padding-top: 1;
+	padding-bottom: 1;
+	border: none;
+	background: #D4DFFF;
+}
+
+/* Applies to the last row in the upper table of the non-scrolling header region. Text 
+   in this row includes See Also, Constructors, Methods, and Properties. */
+div#header table tr#headerTableRow3 td
+{
+	padding-bottom: 2;
+	padding-top: 5;
+	padding-left: 15;
+}
+
+/* Applies to the lower table in the non-scrolling header region. Text in this table
+   includes Collapse All/Expand All, Language Filter, and Members Options. */
+div#header table#bottomTable
+{
+	border-top-color: #FFFFFF;
+	border-top-style: solid;
+	border-top-width: 1;
+	text-align: left;
+	padding-left: 15;
+}
+
+
+blockquote
+	{
+	margin-left: 3.8em;
+	margin-right: 3.8em;
+	margin-top: .6em;
+	margin-bottom: .6em;
+	}
+
+sup
+	{
+	text-decoration: none;
+	font-size: smaller; 
+	}
+
+a:link
+	{
+	color: #0000FF;
+/*    font-weight: bold */
+	}
+	
+a:visited
+	{
+	color: #0000AA;
+/*    font-weight: bold	*/
+	}
+	
+a:hover
+	{
+	color: #3366FF;
+/*    font-weight: bold */
+	}
+	
+.label
+	{
+	font-weight: bold; 
+	margin-top: 1em;
+	margin-left: -26px;
+	}
+	
+.tl
+	{
+	margin-bottom: .75em; 
+	}
+	
+.atl
+	{
+	padding-left: 1.5em;
+	padding-bottom: .75em; 
+	}
+	
+.cfe
+	{
+	font-weight: bold; 
+	}
+	
+.mini
+	{
+	font-size: smaller;
+	}
+	
+.dt
+	{
+	margin-bottom: -.6em; 
+	}
+	
+.indent
+	{
+	margin-left: 1.9em; 
+	margin-right: 1.9em;
+	}
+
+.product
+	{
+	text-align: right;
+	color: #333333;
+	font-size: smaller;
+	font-style: italic;
+	}
+
+.buttonbarshade
+	{
+	position: relative;
+	margin: 0;
+	left: 0px;
+	top: 2;
+	width: 50%;
+	height: 40px;
+	}
+
+.buttonbartable
+	{
+	position: absolute;
+	margin: 0;
+	padding:0;
+	border:0;
+	left:0px;
+	top: 2;
+	width: 100%;
+	height: 40px;
+	}
+
+/* background color, font for header */ 
+table.buttonbartable td, table.buttonbarshade td
+	{
+	background: #ffffff; /*#5177B8; #80C615;*/
+	border-left: 0px solid #80C615;
+	margin: 0;
+	padding: 0px 0px 0px 0px;
+	font-family: Impact, sans-serif;
+	font-size: 14pt;
+	}
+
+table.buttonbartable td.button1
+	{
+	background: #5177B8; /*#80C615;*/;
+	padding: 0;
+	font-weight: bold;
+	text-align: center;
+	cursor: hand;
+	}
+
+table.buttonbartable td.button2
+	{
+	background: #5177B8; /*#80C615;*/;
+	font-weight: bold;
+	text-align: center;
+	}
+
+table.buttonbartable td.button3
+	{
+	background: #5177B8; /*#80C615;*/;
+	font-weight: bold;
+	text-align: center;
+	}
+
+table.buttonbartable td.runninghead
+	{
+	padding-left: 0px;
+	font-style: italic;
+	text-align: left;
+	}
+
+.version
+	{
+	text-align: left;
+	color: #000000;
+	margin-top: 3em;
+	margin-left: -26px;
+	font-size: smaller;
+	font-style: italic;
+	}
+
+.lang, .ilang
+	{
+	color: #0000ff;
+	font: normal 7pt Arial, Helvetica, sans-serif;
+	}
+
+div.langMenu
+	{
+	position: absolute;
+	z-index: 1;
+	width: 96pt;
+	padding: 8pt;
+	visibility: hidden;
+	border: 1px solid #000000;
+	background: #ffffd0;
+	}
+
+div.langMenu ul
+	{
+	padding-left: 2em;
+	margin-left: 0;
+	}
+
+div.filtered
+	{
+	margin: 4pt 0 8pt -26px;
+	padding: 4px 4px 8px 26px;
+	width: 100%;
+	border: 2px solid #aaaacc;
+	background: #ffffff;
+	}
+
+div.filtered2
+	{
+	margin: 4pt 0 8pt -26px;
+	padding: 4px 4px 8px 26px;
+	width: 100%;
+	border: none;
+	background: #ffffff;
+	}
+
+div.filtered h1, div.filtered h2, div.filtered h3, div.filtered h4
+	{
+	margin-left: -22px;
+	}
+
+div.filtered span.lang
+	{
+	position: relative;
+	left: -22px;
+	}
+
+div.reftip
+	{
+	position: absolute;
+	z-index: 1;
+	padding: 8pt;
+	visibility: hidden;
+	border: 1px solid #000000;
+	background: #ffffd0;
+	}
+
+a.synParam
+	{
+	color: #0000FF;
+	/*color: #3F7800;*/ 	
+	/*color: #8DC54F;*/
+	text-decoration: none;
+    font-weight: normal;
+	}
+
+a.synParam:hover
+	{
+	text-decoration: underline;
+    font-weight: normal;
+	}
+
+div.sapop
+	{
+	position: absolute;
+	z-index: 1;
+	left: 26px;
+	width: 100%;
+	padding: 10px 10px 10px 36px;
+	visibility: hidden;
+	border: 1px solid #000000;
+	background: #ffffd0;
+	}
+
+div.footer
+	{
+	width: 100%;
+	border: none;
+	background: #ffffff;
+	margin-top: 18pt;
+	padding-bottom: 12pt;
+	color: #0000FF;
+	/*color: #228B22; */
+	text-align: center;
+	font-size: 76%;
+	}
+
+div.preliminary
+	{
+	margin-top: 8pt;
+	padding-bottom: 12pt;
+	color: #A0A0A0;
+	}
+
+/* A procedure section. eg. 'To create a file', 'To add a value' */
+div.proc
+    {
+	margin-left: 0.5em; 
+    }
+     
+/* The title of a 'procedure' section. */
+div.proc h3
+    {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-weight: bold;
+	font-size: 115%;
+	margin-top: 1em;
+	margin-bottom: 0.4em;
+	margin-left: -0.5em; 
+	color: #003399;
+    }
+
+div.proc ul
+    {
+    margin-left: 1.5em;
+    }
+
+div.proc ol
+    {
+    margin-left: 2.0em;
+    }
+      
+.note
+	{
+	margin-left: 14pt;
+	margin-right: 12pt;
+	}
+
+.indent1
+	{
+	margin-left: 12pt;
+	}
+
+.indent2
+	{
+	margin-left: 24pt;
+	}
+
+.indent3
+	{
+	margin-left: 36pt;
+	}
+
+p.proch
+	{
+	padding-left: 16px;
+	}
+
+p.proch img
+	{
+	position: relative; 
+	vertical-align: top;
+	left: -18px; 
+	margin-right: -14px; 
+	margin-bottom: -18px;
+	}
+	
+div.clsPlatSpec
+{
+	background-color:#FFF8DC;
+	border-style:solid;
+	border-width:1pt 0pt 0pt 1pt;
+	border-color:#ffE4C4;
+	margin-top:0.6em;
+	width:100%;
+}
+
+
+/* Applies to the language labels in the Language Filter drop-down list. */
+.languageFilter
+{
+	color:	#0000FF;
+	cursor:hand;
+	text-decoration:underline;
+	padding-bottom:4;
+}
+
+/* Dropdown areas */
+
+#languageSpan {
+	position: absolute;
+	visibility: hidden;
+	border-style: solid;
+	border-width: 1px;
+	border-color: #C8CDDE;
+	background: #d4dfff;
+	padding: 4px;
+	font-size: 70%;
+}
+
+#membersOptionsSpan {
+	position: absolute;
+	visibility: hidden;
+	border-style: solid;
+	border-width: 1px;
+	border-color: #C8CDDE;
+	background: #d4dfff;
+	padding: 4px;
+	font-size: 70%;
+}
+--></style>
+
+<xml>
+<MSHelp:TOCTitle Title="Role-Playing Game Starter Kit" />
+<MSHelp:RLTitle Title="Role-Playing Game Starter Kit" />
+<MSHelp:Keyword Index="A" Term="O:Microsoft.Xna.Role-Playing_Game_Starter_Kit" />
+<MSHelp:Keyword Index="A" Term="861a5edb-14b7-0f36-23aa-7abf1f869577" />
+<MSHelp:Keyword Index="K" Term="Role-Playing Game Starter Kit" />
+<MSHelp:Attr Name="ProjType" Value="LocalProj" />
+<MSHelp:Attr Name="ProjType" Value="XNA_30" />
+<MSHelp:Attr Name="DocSet" Value="XNA" />
+<MSHelp:Attr Name="DocSet" Value="ExpressLibVS" />
+<MSHelp:Attr Name="DocSet" Value="C#" />
+<MSHelp:Attr Name="Locale" Value="en-us" />
+<MSHelp:Attr Name="CommunityContent" Value="1" />
+<MSHelp:Attr Name="AssetID" Value="861a5edb-14b7-0f36-23aa-7abf1f869577" />
+<MSHelp:Attr Name="TopicType" Value="kbOrient" />
+</xml>
+</head><body><div id="mainSection"><div id="mainBody">
+  <h1>Role-Playing Game Starter Kit</h1>
+  
+  <p>This topic contains the following sections.</p>
+  <ul><li><a href="#ID2EP">Introduction to the Role-Playing Game Starter Kit</a></li><li><a href="#ID2ECB">Features</a></li><li><a href="#ID2EBF">Getting Started</a></li><li><a href="#ID2EGBAC">Playing the Role-Playing Game</a></li><li><a href="#ID2EIHAC">Extending the Role-Playing Game</a></li></ul>
+
+  <a name="ID2EP"></a><h1 class="heading">Introduction to the Role-Playing Game Starter Kit</h1><div id="ID2EP" class="hxnx1">
+    
+    <p>The Role-Playing Game Starter Kit is a complete XNA Game Studio game. The project comes ready to compile and run, and it's easy to customize with a little bit of C# programming. You are free to use the source code as the basis for your own XNA Game Studio game projects, and to share your work with others.</p>
+
+    <p>
+      This starter kit contains a two-dimensional, tile-based, single-player, role-playing game. This game is complete with character classes, multiple party members, items, and quests.  It also features a turn-based combat engine with a side-on presentation and animated characters and effects.  All of the game data is exposed in XML files. This makes it easy to write your own quests, create your own towns, or even write your own storyline right into the game.
+    </p>
+
+    <div class="alert"><table cellspacing="0" cellpadding="0"><tr><th>Note </th></tr><tr><td>This documentation assumes that you have a basic knowledge of programming concepts and the Visual C# environment. You can learn more about these topics in the product documentation by clicking one of the <b>Help</b> menu items. Another way to learn is to position the mouse cursor on language keywords or user interface elements such as windows or dialog boxes and then press F1.</td></tr></table></div>
+  </div>
+  <a name="ID2ECB"></a><h1 class="heading">Features</h1><div id="ID2ECB" class="hxnx1">
+    
+    <p>This starter kit provides a complete XNA Game Studio game. It includes source code and game content such as models, textures, and sounds.  The starter kit documentation describes the general layout and controls for the Role-Playing Game Starter Kit.</p>
+    <p>The Role-Playing Game Starter Kit demonstrates the following features:</p>
+    <a name="ID2ENB"></a><h2 class="subHeading">Tile Engine</h2><div id="ID2ENB" class="hxnx2">
+      
+      <ul>
+        <li>Two-dimensional overhead view of the world</li>
+        <li>
+          <p>World layout controlled by four two-dimensional arrays of integers:</p>        
+        <ul>
+          <li>Base tiles</li>
+          <li>Fringe tiles</li>
+          <li>Objects</li>
+          <li>Collision</li>
+        </ul></li>
+        <li>Arbitrary player movement within tiles</li>
+        <li>Calculation of collisions with the environment at the tile level</li>
+        <li>Animated sprite support</li>
+        <li>Visibility checks to make sure that only the tiles onscreen are submitted to the graphics device</li>
+      </ul>
+    </div>
+    <a name="ID2EOC"></a><h2 class="subHeading">Turn-Based Combat Engine</h2><div id="ID2EOC" class="hxnx2">
+      
+      <ul>
+        <li>Two-dimensional view of the combat arena, with the player’s party lined up against the enemy forces</li>
+        <li>Turn-based combat where each combatant chooses an action and executes it immediately</li>
+        <li>Multiple supported actions per character, including attacking, defending, spell-casting, and item use</li>
+        <li>Artificial intelligence that adapts to each enemy’s statistics and supported actions</li>
+        <li>Animated combat actions and spell effects</li>
+      </ul>
+    </div>
+    <a name="ID2EAD"></a><h2 class="subHeading">External Game Data</h2><div id="ID2EAD" class="hxnx2">
+      
+      <p>Nearly all game data is exposed in XML files outside of the game code, which means there is support for extensive modifications that don’t require any programming knowledge</p>
+      <ul>
+        <li>
+          <p>Supported game data types include:</p>
+          <ul>
+            <li>Maps</li>
+            <li>Quests</li>
+            <li>Party members</li>
+            <li>Non-player characters</li>
+            <li>Monsters</li>
+            <li>Character classes</li>
+            <li>Spells</li>
+            <li>Equipment</li>
+            <li>Items</li>
+          </ul>
+        </li>
+      </ul>
+      <p>These types have direct correlations in the RolePlayingGameData class library.  These types have very little game logic in them to make them as easy to maintain and modify as possible.</p>
+    </div>
+    <a name="ID2EGE"></a><h2 class="subHeading">User Interface</h2><div id="ID2EGE" class="hxnx2">
+      
+      <ul>
+        <li>Features numerous screens, including inventory and dialogue menus</li>
+        <li>Implemented using the Game State Management sample, which is available on the XNA Creators Club Online Web site</li>
+      </ul>
+    </div>
+    <a name="ID2ESE"></a><h2 class="subHeading">Saving and Loading</h2><div id="ID2ESE" class="hxnx2">
+      
+      <ul>
+        <li>Save and load from any time when the party is in the overhead view</li>
+        <li>Extensive serialization and deserialization system supports complete and efficient save games</li>
+        <li>Side-by-side serialization types separate loading and saving code from gameplay code</li>
+      </ul>
+    </div>
+  </div>
+  <a name="ID2EBF"></a><h1 class="heading">Getting Started</h1><div id="ID2EBF" class="hxnx1">
+    
+    <a name="ID2EFF"></a><h2 class="subHeading">Requirements</h2><div id="ID2EFF" class="hxnx2">
+      
+      <a name="ID2EJF"></a><h4 class="subHeading">Minimum Shader Profile</h4><div id="ID2EJF" class="hxnx3">
+        
+        <dl class="glossary">
+          <dt>Vertex Shader Model 1.1</dt>
+          <dt>Pixel Shader Model 2.0</dt>
+        </dl>
+      </div>
+    </div>
+    <a name="ID2EWF"></a><h2 class="subHeading">Installing the Role-Playing Game Starter Kit</h2><div id="ID2EWF" class="hxnx2">
+      
+      <div class="proc"><h3 class="subHeading">To install the Role-Playing Game Starter Kit</h3><div class="subSection">
+        
+
+        <ol>
+          <li>Download the Role-Playing Game .vsi file.</li>
+          <li>Run Visual Studio Installer, following the on-screen instructions.</li>
+        </ol>
+      </div></div>
+    </div>
+    <a name="ID2EHG"></a><h2 class="subHeading">Creating, Building, and Running a Role-Playing Game Project</h2><div id="ID2EHG" class="hxnx2">
+      
+      <p>You can create multiple Role-Playing Game projects. Each is a complete, stand-alone game that you can build, run, and modify as desired.</p>
+      <div class="proc"><h3 class="subHeading">To create a new Role-Playing Game project</h3><div class="subSection">
+        
+        <ol>
+          <li>On the Visual C# Express <b>File</b> menu, click <b>New Project</b>.
+          <div class="alert"><table cellspacing="0" cellpadding="0"><tr><th>Note </th></tr><tr><td>This may take a minute while Visual C# Express loads the templates for the first time.</td></tr></table></div>
+            <p>
+              The <b>New Project</b> dialog box appears, displaying the project types you can create. Under <b>My Templates</b>, you will see <b>Role-Playing Game Windows Starter Kit</b> and <b>Role-Playing Game Xbox 360 Starter Kit</b>.
+            </p>
+          </li>
+          <li>Select <b>Role-Playing Game Windows Starter Kit</b> or <b>Role-Playing Game Xbox 360 Starter Kit</b>, and then click <b>OK</b>.
+            <div class="alert"><table cellspacing="0" cellpadding="0"><tr><th>Note </th></tr><tr><td>The starter kit may take a minute to load.</td></tr></table></div>
+          </li>
+        </ol>
+      </div></div>
+    <div class="proc"><h3 class="subHeading">To build and run the Role-Playing Game project</h3><div class="subSection">
+      
+      <ul>
+        <li>
+          <p>Press F5, or, on the <b>Debug</b> menu, click <b>Start Debugging</b>.</p>
+          <p>The project will build and then run within the debugger.</p>
+        </li>
+      </ul>
+      <div class="alert"><table cellspacing="0" cellpadding="0"><tr><th>Note </th></tr><tr><td>The project may take several minutes to build before it can be launched.  To see build progress during the build, open the Output window (from the <b>View</b> menu, click <b>Output</b>) before you start the build.</td></tr></table></div>
+    </div></div>
+
+    <div class="proc"><h3 class="subHeading">To build the project without running it</h3><div class="subSection">
+      
+      <ul>
+        <li>
+          <p>Press F6, or, on the <b>Build</b> menu, click <b>Build Solution</b>.</p>
+          <p>The project will build without running.</p>
+        </li>
+      </ul>
+    </div></div>
+  </div>
+  </div>
+  <a name="ID2EGBAC"></a><h1 class="heading">Playing the Role-Playing Game</h1><div id="ID2EGBAC" class="hxnx1">
+    
+    <a name="ID2EKBAC"></a><h2 class="subHeading">Role-Playing Game Screens</h2><div id="ID2EKBAC" class="hxnx2">
+      
+
+      <p>The Role-Playing Game begins at the Main Menu.</p>
+      <a name="ID2EQBAC"></a><h4 class="subHeading">Main Menu</h4><div id="ID2EQBAC" class="hxnx3">
+        
+        <p>From the Main Menu, you can start a <b>New Game</b>, <b>Load Game</b>, check the <b>Controls</b>, access <b>Help</b>, or <b>Exit</b>.</p>
+        <table>
+          <tr>
+            <th>Action</th>
+            <th>Controller</th>
+            <th>Keyboard</th>
+          </tr>
+          <tr>
+            <td>Highlight a menu option.</td>
+            <td>D-Pad UP or D-Pad DOWN</td>
+            <td>UP ARROW or DOWN ARROW</td>
+          </tr>
+          <tr>
+            <td>Select a highlighted option.</td>
+            <td>
+              <b>A</b>
+            </td>
+            <td>ENTER</td>
+          </tr>
+          <tr>
+            <td>Exit the game.</td>
+            <td>
+              <b>BACK</b>
+            </td>
+            <td>ESC</td>
+          </tr>
+        </table>
+      </div>
+      <a name="ID2EPDAC"></a><h4 class="subHeading">Exploring the World</h4><div id="ID2EPDAC" class="hxnx3">
+        
+        <p>You will explore the game world with your party by controlling your party leader from a top-down perspective.</p>
+        <table>
+          <tr>
+            <th>Action</th>
+            <th>Controller</th>
+            <th>Keyboard</th>
+          </tr>
+          <tr>
+            <td>Move Up/Down/Left/Right</td>
+            <td>Left Thumbstick Up/Down/Left/Right</td>
+            <td>UP/DOWN/LEFT/RIGHT</td>
+          </tr>
+          <tr>
+            <td>Enter Character Management System</td>
+            <td>Y</td>
+            <td>SPACE</td>
+          </tr>
+          <tr>
+            <td>Return to the Main Menu</td>
+            <td>START</td>
+            <td>TAB</td>
+          </tr>
+          <tr>
+            <td>Exit the Game</td>
+            <td>BACK</td>
+            <td>ESC</td>
+          </tr>
+        </table>
+      </div>
+      <a name="ID2EGFAC"></a><h4 class="subHeading">Combat</h4><div id="ID2EGFAC" class="hxnx3">
+        
+        <p>When your characters enter combat, the perspective will shift to a side-on view. Control your characters in turn-based combat to defeat enemies.</p>
+        <table>
+          <tr>
+            <th>Action</th>
+            <th>Controller</th>
+            <th>Keyboard</th>
+          </tr>
+          <tr>
+            <td>Change Active Character Left/Right</td>
+            <td>Left Thumbstick Left/Right</td>
+            <td>LEFT/RIGHT</td>
+          </tr>
+          <tr>
+            <td>Change Menu Selection Up/Down</td>
+            <td>Left Thumbstick Up/Down</td>
+            <td>UP/DOWN</td>
+          </tr>
+          <tr>
+            <td>Select Option</td>
+            <td>A</td>
+            <td>ENTER</td>
+          </tr>
+          <tr>
+            <td>Cancel Option</td>
+            <td>B</td>
+            <td>ESC</td>
+          </tr>
+          <tr>
+            <td>Win Combat (Debug Only)</td>
+            <td>Right Shoulder</td>
+            <td>W</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+  <a name="ID2EIHAC"></a><h1 class="heading">Extending the Role-Playing Game</h1><div id="ID2EIHAC" class="hxnx1">
+    
+    <p>There are many ways to add your own functionality to the Role-Playing Game:</p>
+    <a name="ID2EOHAC"></a><h2 class="subHeading">Game Content</h2><div id="ID2EOHAC" class="hxnx2">
+      
+      <p>All of the gameplay content is contained in XML files loaded by the XNA Content Pipeline.  These can be altered, or new files can be added and integrated into the game.</p>
+      <p>For example, you can edit Content\MainGameDescription.xml to add more members to the party at the start of the game, or edit Content\Characters\Players\Kolatt.xml to give him better equipment at the start of the game.</p>
+      <p>Additional changes could be made to the code to support additional features built on top of these data types.  For example, you could change the quest system to support rewarding the party with a new party member.</p>
+      <p>All of the animations are implemented as sprite sheets, combined with animation definitions in the game types that use them (spells, characters, etc.).</p>
+      <p>There is a lot of extra content provided with this starter kit than is used in the pre-existing game.  For example, walking animations for the map sprites for your party members are provided, and you could use these to draw all of the party members trailing behind the leader.</p>
+      <p>Additional content will be made available on the <a href="http://creators.xna.com">XNA Creators Club Online</a> website that will describe some of these content-creation scenarios in more detail.</p>
+    </div>
+    <a name="ID2EDIAC"></a><h2 class="subHeading">Combat and Artificial Intelligence</h2><div id="ID2EDIAC" class="hxnx2">
+      
+      <p>The player chooses combat actions for the party members, and the code in Combat\ArtificialIntelligence.cs chooses combat actions for the monsters.  This AI code can be customized to provide advanced behaviors, like healing fellow monsters or performing statistic-damaging attacks.</p>
+      <p>With more alterations to the combat engine, defined in Combat\CombatEngine.cs, the player's party can have NPCs of it's own, fighting under AI control.</p>
+      <p>Additional combat actions could be added by deriving new classes from CombatAction, using the existing actions as a reference.  The combat engine, in Combat\CombatEngine.cs, and the HUD (heads-up-display) menu, in GameScreens\Hud.cs, would have to be updated to support this additional action.  For example, a Steal action would add a fun dimension to combat.</p>
+      <p>Another possibility is to extend the size of the party beyond the current four-member limit, and create a new menu to designate which party members will fight in combat.</p>
+      <p>The current combat system chooses sides randomly, and each side completes all of their moves before the other side may take their turn.  You could interleave the combat turns and make the order deterministic by adding a dexterity or speed attribute to fighting characters.</p>
+    </div>
+    <a name="ID2ESIAC"></a><h2 class="subHeading">Re-using Game Systems</h2><div id="ID2ESIAC" class="hxnx2">
+      
+      <p>Many of the game systems represent universal concepts to role-playing games, such as quests and characters, that could be re-used in an original game engine.  This would leverage the existing XNA Content Pipeline-based data management system while using these types in entirely new ways.</p>
+      <p>The game execution systems could also be decoupled from the rest of the starter kit and reused in new games.  The tile engine, defined in TileEngine.cs, could be used in many different kinds of games.</p>
+    </div>
+  </div>
+</div><div class="footer" id="footer"><p>© 2008 Microsoft Corporation. All rights reserved.<br>Send feedback to <a href="mailto:xnags@microsoft.com?subject=Documentation Feedback: Role-Playing Game Starter Kit">xnags@microsoft.com</a>.</p></div></div></body></html>

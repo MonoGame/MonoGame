@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Quest">
+      <Name>Hide Shield</Name>
+      <Description>Your first quest is to find a Glimmering Ruby for Shed-darr The Wise.  He will give you the Hide Shield in return.</Description>
+      <ObjectiveMessage>Look for a nearby chest that contains the Glimmering Ruby.</ObjectiveMessage>
+      <CompletionMessage>Thank you for the Glimmering Ruby.  I shall reward you with the Hide Shield.  Go to the Inventory screen and equip it now!</CompletionMessage>
+      <GearRequirements>
+          <Item>
+              <ContentName>Items\GlimmeringRuby</ContentName>
+              <Count>1</Count>
+          </Item>
+      </GearRequirements>
+      <MonsterRequirements />
+      <FixedCombatEntries />
+      <ChestEntries>
+          <Item>
+              <ContentName>Ruby</ContentName>
+			  <MapPosition>13 9</MapPosition>
+			  <MapContentName>Map001</MapContentName>
+		  </Item>
+      </ChestEntries>
+      <DestinationMapContentName>Map001</DestinationMapContentName>
+      <DestinationNpcContentName>Sheddarr</DestinationNpcContentName>
+      <DestinationObjectiveMessage>Go and speak with Shed-darr the Wise.</DestinationObjectiveMessage>
+      <ExperienceReward>30</ExperienceReward>
+      <GoldReward>10</GoldReward>
+      <GearRewardContentNames>
+          <Item>Armor\HideShield</Item>
+      </GearRewardContentNames>
+  </Asset>
+</XnaContent>

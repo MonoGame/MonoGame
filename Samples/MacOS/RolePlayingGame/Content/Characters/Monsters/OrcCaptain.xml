@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Monster">
+      <Name>Orc Captain</Name>
+      <MapSprite>
+          <TextureName>Characters\Orc3IdleLeft</TextureName>
+          <FrameDimensions>208 240</FrameDimensions>
+          <FramesPerRow>6</FramesPerRow>
+          <SourceOffset>104 185</SourceOffset>
+          <Animations />
+      </MapSprite>
+      <CharacterClassContentName>Barbarian</CharacterClassContentName>
+      <CharacterLevel>4</CharacterLevel>
+      <InitialEquipmentContentNames>
+          <Item>Weapons\SpikedClub</Item>
+          <Item>Armor\LeatherArmor</Item>
+      </InitialEquipmentContentNames>
+      <Inventory>
+		  <Item>
+			  <ContentName>Items\HealingPotion</ContentName>
+			  <Count>2</Count>
+		  </Item>
+      </Inventory>
+      <CombatSprite>
+          <TextureName>Characters\Orc3AttackLeft</TextureName>
+          <FrameDimensions>320 212</FrameDimensions>
+          <FramesPerRow>6</FramesPerRow>
+          <SourceOffset>170 160</SourceOffset>
+          <Animations>
+              <Item>
+                  <Name>Idle</Name>
+                  <StartingFrame>37</StartingFrame>
+                  <EndingFrame>42</EndingFrame>
+                  <Interval>80</Interval>
+                  <IsLoop>true</IsLoop>
+              </Item>
+          </Animations>
+      </CombatSprite>
+      <DefendPercentage>20</DefendPercentage>
+      <GearDrops>
+          <Item>
+              <GearName>Items\HealingPotion</GearName>
+              <DropPercentage>50</DropPercentage>
+          </Item>
+          <Item>
+              <GearName>Items\MajorHealingPotion</GearName>
+              <DropPercentage>30</DropPercentage>
+          </Item>
+          <Item>
+              <GearName>Weapons\SpikedClub</GearName>
+              <DropPercentage>40</DropPercentage>
+          </Item>
+          <Item>
+              <GearName>Armor\LeatherArmor</GearName>
+              <DropPercentage>40</DropPercentage>
+          </Item>
+      </GearDrops>
+  </Asset>
+</XnaContent>

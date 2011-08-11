@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Armor">
+      <Name>Legendary Hood</Name>
+      <Description>The legendary armor set is very powerful and of unknown origin.</Description>
+      <GoldValue>-1</GoldValue>
+      <IsDroppable>true</IsDroppable>
+      <MinimumCharacterLevel>10</MinimumCharacterLevel>
+      <SupportedClasses>
+          <Item>Wizard</Item>
+          <Item>Red Mage</Item>
+      </SupportedClasses>
+      <IconTextureName>Hood02d</IconTextureName>
+	  <OwnerBuffStatistics>
+		  <MagicPoints>30</MagicPoints>
+		  <PhysicalDefense>5</PhysicalDefense>
+		  <MagicalOffense>5</MagicalOffense>
+		  <MagicalDefense>5</MagicalDefense>
+	  </OwnerBuffStatistics>
+	  <Slot>Helmet</Slot>
+      <OwnerHealthDefenseRange>
+          <Minimum>15</Minimum>
+          <Maximum>25</Maximum>
+      </OwnerHealthDefenseRange>
+      <OwnerMagicDefenseRange>
+          <Minimum>25</Minimum>
+          <Maximum>35</Maximum>
+      </OwnerMagicDefenseRange>
+  </Asset>
+</XnaContent>

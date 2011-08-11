@@ -1,0 +1,159 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Quest">
+      <Name>The Bandit Leader</Name>
+      <Description>The bandit leader has been supplying Tamar with weaponry for his horde of monsters.  Find him by the beach to the east.  It won't be easy to defeat him and his marauding raiders.  Stop by Apple Village to the west first, and stock up for the big fight!</Description>
+      <ObjectiveMessage>Find the bandit leader and defeat him.</ObjectiveMessage>
+      <CompletionMessage>Congratulations!  You have defeated the bandit leader!  Tamar's supplies will now fall short... his undoing is surely close at hand.</CompletionMessage>
+      <GearRequirements />
+      <MonsterRequirements>
+          <Item>
+              <ContentName>BanditLeader</ContentName>
+              <Count>1</Count>
+          </Item>
+      </MonsterRequirements>
+      <FixedCombatEntries>
+          <Item>
+              <ContentName>BanditMinor3</ContentName>
+			  <MapPosition>3 5</MapPosition>
+			  <Direction>SouthWest</Direction>
+			  <MapContentName>Map007</MapContentName>
+		  </Item>
+          <Item>
+              <ContentName>BanditMinor3</ContentName>
+			  <MapPosition>3 8</MapPosition>
+			  <Direction>South</Direction>
+			  <MapContentName>Map007</MapContentName>
+		  </Item>
+          <Item>
+              <ContentName>BanditMinor3</ContentName>
+			  <MapPosition>2 12</MapPosition>
+			  <Direction>South</Direction>
+			  <MapContentName>Map007</MapContentName>
+		  </Item>
+          <Item>
+              <ContentName>BanditMinor3</ContentName>
+			  <MapPosition>2 14</MapPosition>
+			  <Direction>North</Direction>
+			  <MapContentName>Map007</MapContentName>
+		  </Item>
+          <Item>
+              <ContentName>BanditMinor5</ContentName>
+			  <MapPosition>6 3</MapPosition>
+			  <Direction>South</Direction>
+			  <MapContentName>Map007</MapContentName>
+		  </Item>
+		  <Item>
+			  <ContentName>BanditMinor5</ContentName>
+			  <MapPosition>6 8</MapPosition>
+			  <Direction>SouthWest</Direction>
+			  <MapContentName>Map007</MapContentName>
+		  </Item>
+          <Item>
+              <ContentName>BanditMinor5</ContentName>
+			  <MapPosition>6 15</MapPosition>
+			  <Direction>West</Direction>
+			  <MapContentName>Map007</MapContentName>
+		  </Item>
+		  <Item>
+			  <ContentName>BanditMisc3</ContentName>
+			  <MapPosition>5 18</MapPosition>
+			  <Direction>South</Direction>
+			  <MapContentName>Map007</MapContentName>
+		  </Item>
+          <Item>
+              <ContentName>BanditMage3</ContentName>
+			  <MapPosition>4 19</MapPosition>
+			  <Direction>SouthEast</Direction>
+			  <MapContentName>Map007</MapContentName>
+		  </Item>
+          <Item>
+              <ContentName>BanditMisc5a</ContentName>
+			  <MapPosition>9 10</MapPosition>
+			  <Direction>West</Direction>
+			  <MapContentName>Map007</MapContentName>
+		  </Item>
+          <Item>
+              <ContentName>BanditMisc5a</ContentName>
+			  <MapPosition>9 11</MapPosition>
+			  <Direction>West</Direction>
+			  <MapContentName>Map007</MapContentName>
+		  </Item>
+          <Item>
+              <ContentName>BanditMisc5b</ContentName>
+			  <MapPosition>12 10</MapPosition>
+			  <Direction>West</Direction>
+			  <MapContentName>Map007</MapContentName>
+		  </Item>
+          <Item>
+              <ContentName>BanditMage3</ContentName>
+			  <MapPosition>13 14</MapPosition>
+			  <Direction>NorthWest</Direction>
+			  <MapContentName>Map007</MapContentName>
+		  </Item>
+          <Item>
+              <ContentName>BanditMisc5a</ContentName>
+			  <MapPosition>13 15</MapPosition>
+			  <Direction>SouthWest</Direction>
+			  <MapContentName>Map007</MapContentName>
+		  </Item>
+          <Item>
+              <ContentName>BanditMisc5a</ContentName>
+			  <MapPosition>13 6</MapPosition>
+			  <Direction>NorthWest</Direction>
+			  <MapContentName>Map007</MapContentName>
+		  </Item>
+          <Item>
+              <ContentName>BanditMage3</ContentName>
+			  <MapPosition>13 7</MapPosition>
+			  <Direction>SouthWest</Direction>
+			  <MapContentName>Map007</MapContentName>
+		  </Item>
+      </FixedCombatEntries>
+      <ChestEntries>
+          <Item>
+              <ContentName>Mage</ContentName>
+			  <MapPosition>13 9</MapPosition>
+			  <MapContentName>Map007</MapContentName>
+		  </Item>
+          <Item>
+              <ContentName>POElixir</ContentName>
+			  <MapPosition>17 8</MapPosition>
+			  <MapContentName>Map007</MapContentName>
+		  </Item>
+		  <Item>
+			  <ContentName>PDElixir</ContentName>
+			  <MapPosition>17 13</MapPosition>
+			  <MapContentName>Map007</MapContentName>
+		  </Item>
+		  <Item>
+			  <ContentName>MOElixir</ContentName>
+			  <MapPosition>15 8</MapPosition>
+			  <MapContentName>Map007</MapContentName>
+		  </Item>
+          <Item>
+              <ContentName>MDElixir</ContentName>
+			  <MapPosition>15 15</MapPosition>
+			  <MapContentName>Map007</MapContentName>
+		  </Item>
+          <Item>
+              <ContentName>Gold</ContentName>
+			  <MapPosition>6 2</MapPosition>
+			  <MapContentName>Map007</MapContentName>
+		  </Item>
+		  <Item>
+			  <ContentName>Gold</ContentName>
+			  <MapPosition>2 13</MapPosition>
+			  <MapContentName>Map007</MapContentName>
+		  </Item>
+      </ChestEntries>
+      <DestinationMapContentName />
+      <DestinationNpcContentName />
+      <DestinationObjectiveMessage />
+      <ExperienceReward>500</ExperienceReward>
+      <GoldReward>500</GoldReward>
+      <GearRewardContentNames>
+          <Item>Armor\IronArmor</Item>
+      </GearRewardContentNames>
+  </Asset>
+</XnaContent>

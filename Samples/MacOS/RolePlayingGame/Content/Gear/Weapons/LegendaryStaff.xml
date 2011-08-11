@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Weapon">
+      <Name>Legendary Staff</Name>
+      <Description>This staff has strange runes carved into it.  It is of unknown origin.</Description>
+      <GoldValue>-1</GoldValue>
+      <IsDroppable>true</IsDroppable>
+      <MinimumCharacterLevel>10</MinimumCharacterLevel>
+      <SupportedClasses>
+          <Item>Wizard</Item>
+          <Item>Red Mage</Item>
+      </SupportedClasses>
+      <IconTextureName>Staff02d</IconTextureName>
+	  <OwnerBuffStatistics>
+		  <HealthPoints>20</HealthPoints>
+		  <MagicPoints>20</MagicPoints>
+		  <MagicalOffense>10</MagicalOffense>
+		  <MagicalDefense>20</MagicalDefense>
+	  </OwnerBuffStatistics>
+	  <TargetDamageRange>
+		  <Minimum>100</Minimum>
+		  <Maximum>140</Maximum>
+	  </TargetDamageRange>
+	  <SwingCueName>StaffSwing</SwingCueName>
+      <HitCueName>StaffHit</HitCueName>
+      <BlockCueName>StaffBlock</BlockCueName>
+      <Overlay>
+          <TextureName>Spells\OverlayMelee</TextureName>
+          <FrameDimensions>111 130</FrameDimensions>
+          <FramesPerRow>1</FramesPerRow>
+          <Animations>
+              <Item>
+                  <StartingFrame>1</StartingFrame>
+                  <EndingFrame>1</EndingFrame>
+                  <Interval>200</Interval>
+                  <IsLoop>false</IsLoop>
+              </Item>
+          </Animations>
+      </Overlay>
+  </Asset>
+</XnaContent>

@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Armor">
+      <Name>Tamar Shield</Name>
+      <Description>The personal armor set of the Tamar.</Description>
+      <GoldValue>-1</GoldValue>
+      <IsDroppable>true</IsDroppable>
+      <MinimumCharacterLevel>10</MinimumCharacterLevel>
+      <SupportedClasses>
+          <Item>Mystic</Item>
+      </SupportedClasses>
+      <IconTextureName>Shield01c</IconTextureName>
+	  <OwnerBuffStatistics>
+		  <MagicPoints>30</MagicPoints>
+		  <PhysicalDefense>5</PhysicalDefense>
+		  <MagicalOffense>5</MagicalOffense>
+		  <MagicalDefense>5</MagicalDefense>
+	  </OwnerBuffStatistics>
+	  <Slot>Shield</Slot>
+      <OwnerHealthDefenseRange>
+          <Minimum>15</Minimum>
+          <Maximum>25</Maximum>
+      </OwnerHealthDefenseRange>
+      <OwnerMagicDefenseRange>
+          <Minimum>25</Minimum>
+          <Maximum>35</Maximum>
+      </OwnerMagicDefenseRange>
+  </Asset>
+</XnaContent>

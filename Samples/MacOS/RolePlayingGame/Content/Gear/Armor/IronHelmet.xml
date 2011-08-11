@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Armor">
+      <Name>Iron Helmet</Name>
+      <Description>The iron armor set is inlaid with bronze.</Description>
+      <GoldValue>500</GoldValue>
+      <IsDroppable>true</IsDroppable>
+      <MinimumCharacterLevel>5</MinimumCharacterLevel>
+      <SupportedClasses>
+          <Item>Warrior</Item>
+          <Item>Paladin</Item>
+      </SupportedClasses>
+      <IconTextureName>Helmet02a</IconTextureName>
+      <Slot>Helmet</Slot>
+      <OwnerHealthDefenseRange>
+          <Minimum>8</Minimum>
+          <Maximum>10</Maximum>
+      </OwnerHealthDefenseRange>
+      <OwnerMagicDefenseRange>
+          <Minimum>5</Minimum>
+          <Maximum>6</Maximum>
+      </OwnerMagicDefenseRange>
+  </Asset>
+</XnaContent>

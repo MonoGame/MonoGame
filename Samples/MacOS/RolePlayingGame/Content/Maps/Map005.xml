@@ -1,0 +1,418 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Map">
+      <Name>Map005</Name>
+      <MapDimensions>32 40</MapDimensions>
+      <TileSize>64 64</TileSize>
+      <SpawnMapPosition>28 4</SpawnMapPosition>
+      <TextureName>ForestTiles</TextureName>
+      <CombatTextureName>CombatBkgdVillage</CombatTextureName>
+      <MusicCueName>VillageTheme</MusicCueName>
+      <CombatMusicCueName>BattleTheme</CombatMusicCueName>
+      <BaseLayer>
+          41  41  41  41  41  41  41  41  41  41  41  41  41  41  41  41  41  41  41 114 114 114  41  79 113 112 113 108 111 108 112 113
+          41  41  38  38  38  38  38  41  41  41  41  41  41  41  41  41  41  41 114 114 114 114  41  73  76  76  76  76  76  76  76  76
+          41  -1  -1  -1  -1  -1  -1  42  41  41  41  41  41  41  41  41  41  41 114 114 114 114  41  37  38  38  38  38  38  38  38  38
+          41  -1  -1  -1  -1  -1  -1  42   0   1   2  41  41  41  41  41  41  41  41  41  41  41  41  40  36  18  36  18  36  18  36  18
+          41  -1  -1  -1  -1  -1  -1  42   3   4   5  41  -1  41  79 111 111  78  41  41  41  41  41  40   1   1   1   1   1   1   1   1
+          41  -1  -1  -1  -1  -1  -1  -1   3   4   5  41  41  41  41  41  41  41  41  41  41  41  41  40   7   7   7   7   7   7   7   7
+          -1  -1   0   1   1   1   1   1  12   4  11   1   1   1   1   1   1   1   1   1   1   4  41  40  18  36  18  36  18  36  18  36
+          -1  -1   3   4   9   7   7   7  10   4   9   7   7   7  10   4   9   7   7   7  10   5  41  47  58  59  60  60  40  40  40  40
+          -1  -1   3   4   5  36  22  36   3   4   5  41  41  41   3   4   5  36  22  36   3   5  41  48  61  62  63  50  50  50  50  50
+          -1  -1   3   4   5  22  16  22   3   4   5  41  41  41   3   4   5  22  16  22   3   5  41  -1   0   1   2  -1   4  -1  -1  -1
+          -1  -1   3   4   5  36  22  36   3   4   5  41  41  41   3   4   5  36  22  36   3   5  41  41   3   4   5  41   4  41  -1  -1
+          -1  -1   3   4  11   1   1   1  12   4  11   1   1   1  12   4  11   1   1   1  12  11   1   1   5   4   5   4  41  41  -1  -1
+          -1  -1   3   4   9   7   7   7  10   4   9   7   7   7  10   4   9   7   7   7  10   4   4   4   4   4   5  41  41   4  -1  -1
+          -1  -1   3   4   5  41  41  41   3   4   5  41  41  41   3   4   5  41  41  41   3   9   7   7   7   4   5   4   4  41  -1  -1
+          -1  -1   3   4   5  41  36  41   3   4   5  79  41  78   3   4   5  41  36  41   3   5  41  41   3   4   5  41  41   4  -1  -1
+          -1  -1   3   4   5  41  41  41   3   4   5  41  41  41   3   4   5  41  41  41   3   5  41  22   3   4   5  22  41  41  -1  -1
+          -1  -1   3   4  11   1   1   1  12   4  11   1   1   1  12   4  11   1   1   1  12   5  41  36   3   4   5  36  41   4  -1  -1
+          -1  -1   3   4   9   7   7   7  10   4   9   7   7   7   7  10   9   7   7   7  10   5  41  22   3   4   5  22  41  41  -1  -1
+          -1  -1   3   4   5  -1  41  41   3   4   5  35  35  35  35   3   5  -1  41  41   3   5  41  36   3   4   5  36  41  41  -1  -1
+          -1  -1   3   4   5  41  41  -1   3   4   5  41  35  35  35   3   5  41  41  -1   3   5  41  41   3   4   5  41  41  41  -1  -1
+          -1  -1   3   4   5  41  41  22   3   4   5  35  41  41  35   3   5  41  41  22   3   5  41  41   3   4   5  41  41   4  -1  -1
+          -1  -1   3   4  11   1   1   1  12   4  11   1   1   1   1  12  11   1   1   1  12   5  41  41   3   4   5  41  41  41  -1  -1
+          -1  -1   3   4   9   7   7   7  10   4   9   7   7   7  10   4   9   7   7   7  10   5  41  22   3   4   5  22  41  41  -1  -1
+          -1  -1   3   4   5 128  -1 128   3   4   5  41  41  41   3   4   5  41  41  41   3   5  41  36   3   4   5  36  41   4  -1  -1
+          -1  -1   3   4   5  -1 127  -1   3   4   5  79  41  78   3   4   5  41  41  41   3   5  41  22   3   4   5  22  41  41  -1  -1
+          -1  -1   3   4   5 128  -1 128   3   4   5  41  41  41   3   4   5  41  41  41   3   5  41  36   3   4   5  36  41   4  -1  -1
+          -1  -1   3   4  11   1   1   1  12   4  11   1   1   1  12   4  11   1   1   1  12   5  41  41   3   4   5  41  41  41  -1  -1
+          -1  -1   3   4   9   7   7   7  10   4   9   7   7   7  10   4   9   7   7   7  10   5  41  41   3   4   5  41  41   4  -1  -1
+          -1  -1   3   4   5  41  41  41   3   4   5  41  41  41   3   4   5  41  41  41   3   5  41  41   3   4   5  41  41  41  -1  -1
+          -1  -1   3   4   5  41  36  41   3   4   5  41  41  41   3   4   5  41  36  41   3   5  41  22   3   4   5  22  41  41  -1  -1
+          -1  -1   3   4   5  41  41  41   3   4   5  41  41  41   3   4   5  41  41  41   3   5  41  36   3   4   5  36  41  41  -1  -1
+          -1  -1   3   4  11   1   1   1  12   4  11   1   1   1  12   4  11   1   1   1  12   5  41  22   3   4   5  22  41   4  -1  -1
+          41  41   3   4   9   7   7   7  10   4   9   7   7   7   7  10   9   7   7   7  10   5  41  36   3   4   5  36  41  41  -1  -1
+          -1  -1   3   4   5 128  -1 128   3   4   5  35  35  35  35   3   5 128  -1 128   3   5  41  41   3   4   5  41  41  41  -1  -1
+          -1  -1   3   4   5  -1 127  -1   3   4   5  41  35  35  35   3   5  -1 127  -1   3   5  41  41   3   4   5  41  41   4  -1  -1
+          -1  -1   3   4   5 128  -1 128   3   4   5  35  41  41  35   3   5 128  -1 128   3   5  41  41   3   4   5  41  41  41  -1  -1
+          -1  -1   3   4  11   1   1   1  12   4  11   1   1   1   1  12  11   1   1   1  12   5  41  22   3   4   5  22  41   4  -1  -1
+          41  37  38  38  38  38  38  38  38  38  38  38  38  38  38  38  38  38  38  38  38  39  41  36   3   4   5  36  41  41  -1  -1
+          41  40  18  41  41  18  41  41  18  41  41  18  41  41  18  41  41  18  41  41  18  42  41  22   3   4   5  22  41   4  -1  -1
+          41  40  18  41  41  18  41  41  18  41  41  18  41  41  18  41  41  18  41  41  18  42  41  41   3   4   5  41  41  -1  -1  -1
+      </BaseLayer>
+      <FringeLayer>
+          41  41  41  41  41  41  41  41  41  41  41  41  41  41  41  41  41  41  41 126 126 126  41  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          41  37  -1  -1  -1  -1  -1  39 129 130 129 130 129 130 129 130 129 130 126 126 126 126  41  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          41  40 127  36 127  36 127  -1 131 132 131 132 131 132 131 132 131 132 126 126 126 126  41  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          41  40  36 127  36 127  36  -1  -1  -1  -1  -1  41 127  75  77  77  74 127  41  -1  -1  41  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          41  40 127  36 127  36 127  -1  -1  -1  -1  41  41 127  -1  -1  -1  -1 127  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          41  55  57  57  57  57  57  56  -1  -1  -1  41  -1 127  73  76  76  72 127  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          128 128  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1   2  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          128 128  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  49  49  49  49  49
+          126 126  -1  -1  -1  -1  -1  -1  -1  -1  -1 209 210 211  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          126 126  -1  -1  -1  -1  -1  -1  -1  -1  -1 212 213 214  -1  -1  -1  -1  -1  -1  -1  -1  -1 128  -1  -1  -1 128  18 128 128 128
+          128 128  -1  -1  -1  -1  -1  -1  -1  -1  -1 215 216 217 165  -1  -1  -1  -1  -1  -1  -1  -1 162  -1  -1  -1  -1  18  -1 126 126
+          128 128  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  12  -1  -1  18  -1  -1 128 128
+          126 126  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1 164  -1  18 128 128
+          126 126  -1  -1  -1 118 121 116  -1  -1  -1  75  77  74  -1  -1  -1 118 121 116  -1  -1  -1  -1  10  -1  -1  18  18  -1 128 128
+          128 128  -1  -1  -1 124  -1 124  -1  -1  -1  -1 110  -1  -1  -1  -1 124  -1 124  -1  -1 118 115  -1  -1  -1 114 116  18 126 126
+          126 126  -1  -1  -1 119 121 117  -1  -1  -1  73  76  72  -1  -1  -1 119 121 117  -1  -1 124  -1  -1  -1  -1  -1 124  -1 128 128
+          126 126  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1 124  -1  -1  -1  -1  -1 124  18 128 128
+          126 126  -1  -1  -1  -1 262 262  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1 262 262  -1  -1 124  -1  -1  -1  -1  -1 124  -1 126 126
+          126 126  -1  -1  -1 126 131 132  -1  -1  -1  -1  -1  -1  -1  -1  -1 126 131 132  -1  -1 124  -1  -1  -1  -1  -1 124  -1 126 126
+          128 128  -1  -1  -1 129 130 126  -1  -1  -1 141 142 143 144  -1  -1 129 130 126  -1  -1 119 115  -1  -1  -1 114 117  -1 128 128
+          126 126  -1  -1  -1 131 132  -1  -1  -1  -1 145 146 147 148  -1  -1 131 132  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  18 128 128
+          126 126  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1 118 121  -1  -1  -1 114 116  -1 126 126
+          126 126  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1 124  -1  -1  -1  -1  -1 124  -1 128 128
+          126 126  -1  -1  -1  -1 126  -1  -1  -1  -1  75  77  74  -1  -1  -1 173 174 175  -1  -1 124  -1  -1  -1  -1  -1 124  18 128 128
+          128 128  -1  -1  -1 126  -1 126  -1  -1  -1  -1 110  -1  -1  -1  -1 176 177 178  -1  -1 124  -1  -1  -1  -1  -1 124  -1 128 128
+          126 126  -1  -1  -1  -1 126  -1  -1  -1  -1  73  76  72  -1  -1  -1 179 180 181 165  -1 124  -1  -1  -1  -1  -1 124  18 126 126
+          126 126  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1 119 115  -1  -1  -1 114 117  -1 128 128
+          126 126  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  18 128 128
+          126 126  -1  -1  -1 118 121 116  -1  -1  -1 197 198 199  -1  -1  -1 118 121 116  -1  -1 118 115  -1  -1  -1 114 116  -1 126 126
+          128 128  -1  -1  -1 124  -1 124  -1  -1  -1 200 201 202  -1  -1  -1 124  -1 124  -1  -1 124  -1  -1  -1  -1  -1 124  -1 126 126
+          126 126  -1  -1  -1 119 121 117  -1  -1  -1 203 204 205 165  -1  -1 119 121 117  -1  -1 124  -1  -1  -1  -1  -1 124  -1 128 128
+          126 126  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1 124  -1  -1  -1  -1  -1 124  18 128 128
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1 124  -1  -1  -1  -1  -1 124  -1 126 126
+          126 126  -1  -1  -1  -1 126  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1 126  -1  -1  -1 119 115  -1  -1  -1 114 117  -1 128 128
+          128 128  -1  -1  -1 126  -1 126  -1  -1  -1 141 142 143 144  -1  -1 126  -1 126  -1  -1  -1  -1  -1  -1  -1  -1  -1  18 128 128
+          126 126  -1  -1  -1  -1 126  -1  -1  -1  -1 145 146 147 148  -1  -1  -1 126  -1  -1  -1 118 115  -1  -1  -1 114 116  -1 128 128
+          126 126  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1 124  -1  -1  -1  -1  -1 124  18 126 126
+          41  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1 124  -1  -1  -1  -1  -1 124  -1 128 128
+          41  -1  -1 129 130  -1 129 130  -1 129 130  -1 129 130  -1 129 130  -1 129 130  -1  -1 124  -1  -1  -1  -1  -1 124  18 128 128
+          41  -1  -1 131 132  -1 131 132  -1 131 132  -1 131 132  -1 131 132  -1 131 132  -1  -1 119 115  -1  -1  -1 114 117 126 126 126
+      </FringeLayer>
+      <ObjectLayer>
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1 206 207 208  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1 129 130  -1  -1  -1 133 134 135 136  -1  -1  -1 129 130  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1 137 138 139 140  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1 170 171 172  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1 194 195 196  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1 133 134 135 136  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1 137 138 139 140  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+      </ObjectLayer>
+      <CollisionLayer>
+          0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   1   1   1   0   1   0   0   0   0   0   0   0   0
+          0   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   0   1   0   0   0   0   0   0   0   0
+          0   1   0   0   0   0   0   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   0   1   1   1   1   1   1   1   1   1
+          0   1   0   0   0   0   0   1   0   0   0   0   0   1   0   0   0   0   1   0   0   0   0   1   0   0   0   0   0   0   0   0
+          0   1   0   0   0   0   0   1   0   0   0   0   0   1   1   0   0   0   1   0   0   0   0   1   0   0   0   0   0   0   0   0
+          0   1   1   1   1   1   1   1   0   0   0   0   0   1   1   1   1   1   1   0   0   0   0   1   0   0   0   0   0   0   0   0
+          1   1   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   1   0   0   0   0   0   0   0   0
+          1   1   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   1   1   0   1   1   1   1   1   1
+          1   1   0   0   0   0   0   0   0   0   0   1   1   1   0   0   0   0   0   0   0   0   0   1   1   0   1   1   1   1   1   1
+          1   1   0   0   0   0   0   0   0   0   0   1   1   1   0   0   0   0   0   0   0   0   0   1   0   0   0   1   0   1   1   1
+          1   1   0   0   0   0   0   0   0   0   0   1   0   1   0   0   0   0   0   0   0   0   0   1   0   0   0   0   0   0   1   1
+          1   1   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   1   1
+          1   1   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   1   0   0   1   1
+          1   1   0   0   0   1   1   1   0   0   0   1   1   1   0   0   0   1   1   1   0   0   0   0   0   0   0   0   0   0   1   1
+          1   1   0   0   0   1   0   1   0   0   0   1   0   1   0   0   0   1   0   1   0   0   1   1   0   0   0   1   1   0   1   1
+          1   1   0   0   0   1   1   1   0   0   0   1   1   1   0   0   0   1   1   1   0   0   1   0   0   0   0   0   1   0   1   1
+          1   1   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   1   0   0   0   0   0   1   0   1   1
+          1   1   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   1   0   0   0   0   0   1   0   1   1
+          1   1   0   0   0   1   1   1   0   0   0   0   0   0   0   0   0   1   1   1   0   0   1   0   0   0   0   0   1   0   1   1
+          1   1   0   0   0   1   1   1   0   0   0   1   1   1   1   0   0   1   1   1   0   0   1   1   0   0   0   1   1   0   1   1
+          1   1   0   0   0   1   1   0   0   0   0   1   1   1   1   0   0   1   1   0   0   0   0   0   0   0   0   0   0   0   1   1
+          1   1   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   1   1   0   0   0   1   1   0   1   1
+          1   1   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   1   0   0   0   0   0   1   0   1   1
+          1   1   0   0   0   1   1   1   0   0   0   1   1   1   0   0   0   1   1   1   0   0   1   0   0   0   0   0   1   0   1   1
+          1   1   0   0   0   1   1   1   0   0   0   1   0   1   0   0   0   1   1   1   0   0   1   0   0   0   0   0   1   0   1   1
+          1   1   0   0   0   1   1   1   0   0   0   1   1   1   0   0   0   1   0   1   0   0   1   0   0   0   0   0   1   0   1   1
+          1   1   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   1   1   0   0   0   1   1   0   1   1
+          1   1   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   1   1
+          1   1   0   0   0   1   1   1   0   0   0   1   1   1   0   0   0   1   1   1   0   0   1   1   0   0   0   1   1   0   1   1
+          1   1   0   0   0   1   0   1   0   0   0   1   1   1   0   0   0   1   0   1   0   0   1   0   0   0   0   0   1   0   1   1
+          1   1   0   0   0   1   1   1   0   0   0   1   0   1   0   0   0   1   1   1   0   0   1   0   0   0   0   0   1   0   1   1
+          1   1   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   1   0   0   0   0   0   1   0   1   1
+          0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   1   0   0   0   0   0   1   0   1   1
+          1   1   0   0   0   1   1   1   0   0   0   0   0   0   0   0   0   1   1   1   0   0   1   1   0   0   0   1   1   0   1   1
+          1   1   0   0   0   1   1   1   0   0   0   1   1   1   1   0   0   1   1   1   0   0   0   0   0   0   0   0   0   0   1   1
+          1   1   0   0   0   1   1   1   0   0   0   1   1   1   1   0   0   1   1   1   0   0   1   1   0   0   0   1   1   0   1   1
+          1   1   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   1   0   0   0   0   0   1   0   1   1
+          0   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   0   0   0   0   0   1   0   1   1
+          0   0   0   1   1   0   1   1   0   1   1   0   1   1   0   1   1   0   1   1   0   1   1   0   0   0   0   0   1   0   1   1
+          0   0   0   1   1   0   1   1   0   1   1   0   1   1   0   1   1   0   1   1   0   1   1   1   0   0   0   1   1   1   1   1
+      </CollisionLayer>
+      <Portals>
+          <Item>
+			  <Name>P1</Name>
+			  <LandingMapPosition>29 3</LandingMapPosition>
+              <DestinationMapContentName>Map004</DestinationMapContentName>
+              <DestinationMapPortalName>P10</DestinationMapPortalName>
+          </Item>
+          <Item>
+			  <Name>P2</Name>
+			  <LandingMapPosition>29 4</LandingMapPosition>
+              <DestinationMapContentName>Map004</DestinationMapContentName>
+              <DestinationMapPortalName>P11</DestinationMapPortalName>
+          </Item>
+          <Item>
+			  <Name>P3</Name>
+			  <LandingMapPosition>29 5</LandingMapPosition>
+              <DestinationMapContentName>Map004</DestinationMapContentName>
+              <DestinationMapPortalName>P12</DestinationMapPortalName>
+          </Item>
+          <Item>
+			  <Name>P4</Name>
+			  <LandingMapPosition>29 6</LandingMapPosition>
+              <DestinationMapContentName>Map004</DestinationMapContentName>
+              <DestinationMapPortalName>P13</DestinationMapPortalName>
+          </Item>
+          <Item>
+			  <Name>P5</Name>
+			  <LandingMapPosition>8 2</LandingMapPosition>
+              <DestinationMapContentName>Map008</DestinationMapContentName>
+              <DestinationMapPortalName>P1</DestinationMapPortalName>
+          </Item>
+          <Item>
+			  <Name>P6</Name>
+			  <LandingMapPosition>9 2</LandingMapPosition>
+			  <DestinationMapContentName>Map008</DestinationMapContentName>
+			  <DestinationMapPortalName>P2</DestinationMapPortalName>
+		  </Item>
+		  <Item>
+			  <Name>P7</Name>
+			  <LandingMapPosition>10 2</LandingMapPosition>
+              <DestinationMapContentName>Map008</DestinationMapContentName>
+              <DestinationMapPortalName>P3</DestinationMapPortalName>
+          </Item>
+          <Item>
+			  <Name>P8</Name>
+			  <LandingMapPosition>24 37</LandingMapPosition>
+              <DestinationMapContentName>Map009</DestinationMapContentName>
+              <DestinationMapPortalName>P1</DestinationMapPortalName>
+          </Item>
+          <Item>
+			  <Name>P9</Name>
+			  <LandingMapPosition>25 37</LandingMapPosition>
+              <DestinationMapContentName>Map009</DestinationMapContentName>
+              <DestinationMapPortalName>P2</DestinationMapPortalName>
+          </Item>
+          <Item>
+			  <Name>P10</Name>
+			  <LandingMapPosition>26 37</LandingMapPosition>
+              <DestinationMapContentName>Map009</DestinationMapContentName>
+              <DestinationMapPortalName>P3</DestinationMapPortalName>
+          </Item>
+      </Portals>
+	  <PortalEntries>
+		  <Item>
+			  <ContentName>P1</ContentName>
+			  <MapPosition>31 3</MapPosition>
+		  </Item>
+		  <Item>
+			  <ContentName>P2</ContentName>
+			  <MapPosition>31 4</MapPosition>
+		  </Item>
+		  <Item>
+			  <ContentName>P3</ContentName>
+			  <MapPosition>31 5</MapPosition>
+		  </Item>
+		  <Item>
+			  <ContentName>P4</ContentName>
+			  <MapPosition>31 6</MapPosition>
+		  </Item>
+		  <Item>
+			  <ContentName>P5</ContentName>
+			  <MapPosition>8 0</MapPosition>
+		  </Item>
+		  <Item>
+			  <ContentName>P6</ContentName>
+			  <MapPosition>9 0</MapPosition>
+		  </Item>
+		  <Item>
+			  <ContentName>P7</ContentName>
+			  <MapPosition>10 0</MapPosition>
+		  </Item>
+		  <Item>
+			  <ContentName>P8</ContentName>
+			  <MapPosition>24 39</MapPosition>
+		  </Item>
+		  <Item>
+			  <ContentName>P9</ContentName>
+			  <MapPosition>25 39</MapPosition>
+		  </Item>
+		  <Item>
+			  <ContentName>P10</ContentName>
+			  <MapPosition>26 39</MapPosition>
+		  </Item>
+	  </PortalEntries>
+	  <ChestEntries>
+          <Item>
+              <ContentName>MOElixir</ContentName>
+              <MapPosition>12 18</MapPosition>
+          </Item>
+          <Item>
+              <ContentName>MDElixir</ContentName>
+              <MapPosition>13 18</MapPosition>
+          </Item>
+          <Item>
+              <ContentName>POElixir</ContentName>
+              <MapPosition>12 33</MapPosition>
+          </Item>
+          <Item>
+              <ContentName>PDElixir</ContentName>
+              <MapPosition>13 33</MapPosition>
+          </Item>
+          <Item>
+              <ContentName>MinorGold</ContentName>
+              <MapPosition>2 36</MapPosition>
+          </Item>
+          <Item>
+              <ContentName>MinorGold</ContentName>
+              <MapPosition>21 36</MapPosition>
+          </Item>
+          <Item>
+              <ContentName>LongSword</ContentName>
+              <MapPosition>1 32</MapPosition>
+          </Item>
+      </ChestEntries>
+      <FixedCombatEntries>
+          <Item>
+              <ContentName>OrcGrunts3</ContentName>
+              <MapPosition>24 34</MapPosition>
+              <Direction>North</Direction>
+          </Item>
+          <Item>
+              <ContentName>OrcMisc3</ContentName>
+              <MapPosition>25 34</MapPosition>
+              <Direction>North</Direction>
+          </Item>
+          <Item>
+              <ContentName>OrcGrunts3</ContentName>
+              <MapPosition>26 34</MapPosition>
+              <Direction>North</Direction>
+          </Item>
+          <Item>
+              <ContentName>OrcSoldiers3</ContentName>
+              <MapPosition>24 37</MapPosition>
+              <Direction>North</Direction>
+          </Item>
+          <Item>
+              <ContentName>OrcSoldiers3</ContentName>
+              <MapPosition>25 37</MapPosition>
+              <Direction>North</Direction>
+          </Item>
+          <Item>
+              <ContentName>OrcSoldiers3</ContentName>
+              <MapPosition>26 37</MapPosition>
+              <Direction>North</Direction>
+          </Item>
+      </FixedCombatEntries>
+      <RandomCombat>
+          <CombatProbability>0</CombatProbability>
+          <FleeProbability>50</FleeProbability>
+          <MonsterCountRange>
+              <Minimum>1</Minimum>
+              <Maximum>3</Maximum>
+          </MonsterCountRange>
+          <Entries>
+              <Item>
+                  <ContentName>GoblinGrunt</ContentName>
+                  <Count>1</Count>
+                  <Weight>100</Weight>
+              </Item>
+          </Entries>
+      </RandomCombat>
+      <QuestNpcEntries>
+          <Item>
+              <ContentName>Itemania</ContentName>
+              <MapPosition>14 30</MapPosition>
+          </Item>
+          <Item>
+              <ContentName>TheWeaponsmith</ContentName>
+              <MapPosition>20 25</MapPosition>
+          </Item>
+          <Item>
+              <ContentName>NewAgeInn</ContentName>
+              <MapPosition>14 10</MapPosition>
+          </Item>
+          <Item>
+              <ContentName>Theaniv</ContentName>
+              <MapPosition>6 9</MapPosition>
+              <Direction>South</Direction>
+          </Item>
+          <Item>
+              <ContentName>Dunkum</ContentName>
+              <MapPosition>12 22</MapPosition>
+              <Direction>South</Direction>
+          </Item>
+          <Item>
+              <ContentName>Kneevan</ContentName>
+              <MapPosition>2 33</MapPosition>
+              <Direction>NorthEast</Direction>
+          </Item>
+          <Item>
+              <ContentName>Ayttas</ContentName>
+              <MapPosition>27 10</MapPosition>
+              <Direction>SouthWest</Direction>
+          </Item>
+          <Item>
+              <ContentName>Shejarr</ContentName>
+              <MapPosition>25 26</MapPosition>
+              <Direction>North</Direction>
+          </Item>
+      </QuestNpcEntries>
+      <PlayerNpcEntries />
+      <InnEntries>
+          <Item>
+              <ContentName>NewAgeInn</ContentName>
+              <MapPosition>12 10</MapPosition>
+          </Item>
+      </InnEntries>
+      <StoreEntries>
+          <Item>
+              <ContentName>Itemania</ContentName>
+              <MapPosition>12 30</MapPosition>
+          </Item>
+          <Item>
+              <ContentName>TheWeaponsmith</ContentName>
+              <MapPosition>18 25</MapPosition>
+          </Item>
+      </StoreEntries>
+  </Asset>
+</XnaContent>

@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Armor">
+      <Name>Sage Boots</Name>
+      <Description>The set provides the maxmium magical protection for spellcasters.</Description>
+      <GoldValue>500</GoldValue>
+      <IsDroppable>true</IsDroppable>
+      <MinimumCharacterLevel>6</MinimumCharacterLevel>
+      <SupportedClasses>
+          <Item>Wizard</Item>
+          <Item>Red Mage</Item>
+      </SupportedClasses>
+      <IconTextureName>Boots06d</IconTextureName>
+	  <OwnerBuffStatistics>
+		  <MagicPoints>25</MagicPoints>
+		  <MagicalOffense>10</MagicalOffense>
+		  <MagicalDefense>5</MagicalDefense>
+	  </OwnerBuffStatistics>
+	  <Slot>Boots</Slot>
+      <OwnerHealthDefenseRange>
+          <Minimum>8</Minimum>
+          <Maximum>10</Maximum>
+      </OwnerHealthDefenseRange>
+      <OwnerMagicDefenseRange>
+          <Minimum>10</Minimum>
+          <Maximum>12</Maximum>
+      </OwnerMagicDefenseRange>
+  </Asset>
+</XnaContent>

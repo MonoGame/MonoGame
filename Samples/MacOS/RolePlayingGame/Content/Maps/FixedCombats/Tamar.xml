@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<XnaContent><Asset Type="RolePlayingGameData.FixedCombat">
+  <Name>Tamar</Name>
+  <Entries>
+    <Item>
+      <ContentName>Tamar</ContentName>
+      <Count>1</Count>
+    </Item>
+  </Entries>
+</Asset></XnaContent>

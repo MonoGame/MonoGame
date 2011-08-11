@@ -1,0 +1,96 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Item">
+      <Name>Minor Healing Potion</Name>
+      <Description>Restores the target's health points by 20 points.</Description>
+      <GoldValue>15</GoldValue>
+      <IsDroppable>true</IsDroppable>
+      <MinimumCharacterLevel>1</MinimumCharacterLevel>
+      <SupportedClasses />
+      <IconTextureName>Potion01a</IconTextureName>
+      <Usage>Combat,NonCombat</Usage>
+      <IsOffensive>false</IsOffensive>
+      <TargetDuration>0</TargetDuration>
+      <TargetEffectRange>
+          <HealthPointsRange>
+              <Minimum>20</Minimum>
+              <Maximum>20</Maximum>
+          </HealthPointsRange>
+          <MagicPointsRange>
+              <Minimum>0</Minimum>
+              <Maximum>0</Maximum>
+          </MagicPointsRange>
+          <PhysicalOffenseRange>
+              <Minimum>0</Minimum>
+              <Maximum>0</Maximum>
+          </PhysicalOffenseRange>
+          <PhysicalDefenseRange>
+              <Minimum>0</Minimum>
+              <Maximum>0</Maximum>
+          </PhysicalDefenseRange>
+          <MagicalOffenseRange>
+              <Minimum>0</Minimum>
+              <Maximum>0</Maximum>
+          </MagicalOffenseRange>
+          <MagicalDefenseRange>
+              <Minimum>0</Minimum>
+              <Maximum>0</Maximum>
+          </MagicalDefenseRange>
+      </TargetEffectRange>
+      <AdjacentTargets>0</AdjacentTargets>
+      <UsingCueName>HealPotion</UsingCueName>
+      <TravelingCueName />
+      <ImpactCueName>HealImpact</ImpactCueName>
+      <BlockCueName>HealImpact</BlockCueName>
+      <CreationSprite>
+          <TextureName>Spells\Potion1a</TextureName>
+          <FrameDimensions>64 64</FrameDimensions>
+          <FramesPerRow>1</FramesPerRow>
+          <SourceOffset>40 20</SourceOffset>
+          <Animations>
+              <Item>
+                  <Name>Creation</Name>
+                  <StartingFrame>1</StartingFrame>
+                  <EndingFrame>1</EndingFrame>
+                  <Interval>500</Interval>
+                  <IsLoop>false</IsLoop>
+              </Item>
+          </Animations>
+      </CreationSprite>
+      <SpellSprite>
+          <TextureName>Spells\HealSmallSpell</TextureName>
+          <FrameDimensions>102 102</FrameDimensions>
+          <FramesPerRow>6</FramesPerRow>
+          <SourceOffset>40 20</SourceOffset>
+          <Animations>
+              <Item>
+                  <Name>Traveling</Name>
+                  <StartingFrame>12</StartingFrame>
+                  <EndingFrame>12</EndingFrame>
+                  <Interval>120</Interval>
+                  <IsLoop>true</IsLoop>
+              </Item>
+              <Item>
+                  <Name>Impact</Name>
+                  <StartingFrame>13</StartingFrame>
+                  <EndingFrame>18</EndingFrame>
+                  <Interval>200</Interval>
+                  <IsLoop>false</IsLoop>
+              </Item>
+          </Animations>
+      </SpellSprite>
+      <Overlay>
+          <TextureName>Spells\EffectSmall</TextureName>
+          <FrameDimensions>130 210</FrameDimensions>
+          <FramesPerRow>6</FramesPerRow>
+          <Animations>
+              <Item>
+                  <StartingFrame>1</StartingFrame>
+                  <EndingFrame>6</EndingFrame>
+                  <Interval>100</Interval>
+                  <IsLoop>false</IsLoop>
+              </Item>
+          </Animations>
+      </Overlay>      
+  </Asset>
+</XnaContent>

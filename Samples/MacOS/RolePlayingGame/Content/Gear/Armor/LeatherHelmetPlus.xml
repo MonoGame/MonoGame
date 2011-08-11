@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Armor">
+      <Name>Leather Helmet</Name>
+      <Description>This armor set is made out of hardened leather with additional magical protection.</Description>
+      <GoldValue>350</GoldValue>
+      <IsDroppable>true</IsDroppable>
+      <MinimumCharacterLevel>2</MinimumCharacterLevel>
+      <SupportedClasses>
+          <Item>Warrior</Item>
+          <Item>Paladin</Item>
+          <Item>Barbarian</Item>
+      </SupportedClasses>
+      <IconTextureName>Helmet04c</IconTextureName>
+	  <OwnerBuffStatistics>
+		  <MagicalDefense>5</MagicalDefense>
+	  </OwnerBuffStatistics>
+	  <Slot>Helmet</Slot>
+      <OwnerHealthDefenseRange>
+          <Minimum>2</Minimum>
+          <Maximum>4</Maximum>
+      </OwnerHealthDefenseRange>
+      <OwnerMagicDefenseRange>
+          <Minimum>2</Minimum>
+          <Maximum>3</Maximum>
+      </OwnerMagicDefenseRange>
+  </Asset>
+</XnaContent>

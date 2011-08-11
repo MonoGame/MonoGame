@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Weapon">
+      <Name>Giant Club</Name>
+      <Description>This magically-embued large club is an excessively brutal bludgeoning weapon.</Description>
+      <GoldValue>1000</GoldValue>
+      <IsDroppable>true</IsDroppable>
+      <MinimumCharacterLevel>5</MinimumCharacterLevel>
+      <SupportedClasses>
+          <Item>Barbarian</Item>
+      </SupportedClasses>
+      <IconTextureName>Club01c</IconTextureName>
+	  <OwnerBuffStatistics>
+		  <HealthPoints>20</HealthPoints>
+		  <PhysicalOffense>5</PhysicalOffense>
+		  <MagicalDefense>-5</MagicalDefense>
+	  </OwnerBuffStatistics>
+	  <TargetDamageRange>
+		  <Minimum>55</Minimum>
+		  <Maximum>95</Maximum>
+	  </TargetDamageRange>
+	  <SwingCueName>StaffSwing</SwingCueName>
+      <HitCueName>StaffHit</HitCueName>
+      <BlockCueName>StaffBlock</BlockCueName>
+      <Overlay>
+          <TextureName>Spells\OverlayMelee</TextureName>
+          <FrameDimensions>111 130</FrameDimensions>
+          <FramesPerRow>1</FramesPerRow>
+          <Animations>
+              <Item>
+                  <StartingFrame>1</StartingFrame>
+                  <EndingFrame>1</EndingFrame>
+                  <Interval>200</Interval>
+                  <IsLoop>false</IsLoop>
+              </Item>
+          </Animations>
+      </Overlay>
+  </Asset>
+</XnaContent>

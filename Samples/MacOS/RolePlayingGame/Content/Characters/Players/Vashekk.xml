@@ -1,0 +1,62 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Player">
+      <Name>Vashekk</Name>
+      <MapSprite>
+          <TextureName>Characters\WarriorIdleRight</TextureName>
+          <FrameDimensions>138 192</FrameDimensions>
+          <FramesPerRow>6</FramesPerRow>
+          <SourceOffset>69 125</SourceOffset>
+          <Animations />
+      </MapSprite>
+      <WalkingSprite>
+          <TextureName>Characters\WarriorWalkRight</TextureName>
+          <FrameDimensions>138 192</FrameDimensions>
+          <FramesPerRow>6</FramesPerRow>
+          <SourceOffset>69 125</SourceOffset>
+          <Animations />
+      </WalkingSprite>
+      <MapIdleAnimationInterval>165</MapIdleAnimationInterval>
+      <CharacterClassContentName>Paladin</CharacterClassContentName>
+      <CharacterLevel>6</CharacterLevel>
+      <InitialEquipmentContentNames>
+          <Item>Weapons\LongSword</Item>
+          <Item>Armor\ChainMail</Item>
+          <Item>Armor\LeatherShield</Item>
+          <Item>Armor\ChainBoots</Item>
+          <Item>Armor\LeatherBoots</Item>
+      </InitialEquipmentContentNames>
+      <Inventory>
+		  <Item>
+			  <ContentName>Items\MinorHealingPotion</ContentName>
+			  <Count>1</Count>
+		  </Item>
+		  <Item>
+			  <ContentName>Items\HealingPotion</ContentName>
+			  <Count>1</Count>
+		  </Item>
+		  <Item>
+			  <ContentName>Items\MinorMagicPotion</ContentName>
+			  <Count>1</Count>
+		  </Item>
+		  <Item>
+			  <ContentName>Items\MagicPotion</ContentName>
+			  <Count>1</Count>
+		  </Item>
+      </Inventory>
+      <CombatSprite>
+          <TextureName>Characters\WarriorAttackRight</TextureName>
+		  <FrameDimensions>288 192</FrameDimensions>
+		  <FramesPerRow>6</FramesPerRow>
+		  <SourceOffset>135 135</SourceOffset>
+		  <Animations />
+      </CombatSprite>
+      <Gold>10</Gold>
+      <IntroductionDialogue>I am Vashekk, Defender of the Royal Kingdom of Mercadia.  I wish to aid you in your virtuous quest to vanquish the Evil Tamar!</IntroductionDialogue>
+      <JoinAcceptedDialogue>Thank you, my brave comrade.  I shall be your shield!</JoinAcceptedDialogue>
+      <JoinRejectedDialogue>I shall remain here until you have changed your mind.</JoinRejectedDialogue>
+      <ActivePortraitTextureName>WarriorActive</ActivePortraitTextureName>
+      <InactivePortraitTextureName>WarriorInActive</InactivePortraitTextureName>
+      <UnselectablePortraitTextureName>WarriorUnselectable</UnselectablePortraitTextureName>
+  </Asset>
+</XnaContent>

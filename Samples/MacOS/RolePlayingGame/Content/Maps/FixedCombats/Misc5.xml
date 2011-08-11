@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<XnaContent><Asset Type="RolePlayingGameData.FixedCombat">
+  <Name>Misc5</Name>
+  <Entries>
+    <Item>
+      <ContentName>BanditLeader</ContentName>
+      <Count>1</Count>
+    </Item>
+    <Item>
+      <ContentName>OrcBrute</ContentName>
+      <Count>2</Count>
+    </Item>
+    <Item>
+      <ContentName>BanditMage</ContentName>
+      <Count>2</Count>
+    </Item>
+  </Entries>
+</Asset></XnaContent>

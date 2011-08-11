@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Player">
+      <Name>Shenidd</Name>
+      <MapSprite>
+          <TextureName>Characters\BossIdleRight</TextureName>
+          <FrameDimensions>174 216</FrameDimensions>
+          <FramesPerRow>6</FramesPerRow>
+          <SourceOffset>87 156</SourceOffset>
+          <Animations />
+      </MapSprite>
+      <WalkingSprite>
+          <TextureName>Characters\BossWalkRight</TextureName>
+          <FrameDimensions>174 216</FrameDimensions>
+          <FramesPerRow>6</FramesPerRow>
+          <SourceOffset>87 156</SourceOffset>
+          <Animations />
+      </WalkingSprite>
+      <MapIdleAnimationInterval>210</MapIdleAnimationInterval>
+      <CharacterClassContentName>Barbarian</CharacterClassContentName>
+      <CharacterLevel>5</CharacterLevel>
+      <InitialEquipmentContentNames>
+          <Item>Weapons\Club</Item>
+          <Item>Armor\HideArmor</Item>
+      </InitialEquipmentContentNames>
+      <Inventory>
+		  <Item>
+			  <ContentName>Items\MinorHealingPotion</ContentName>
+			  <Count>1</Count>
+		  </Item>
+		  <Item>
+			  <ContentName>Items\HealingPotion</ContentName>
+			  <Count>1</Count>
+		  </Item>
+		  <Item>
+			  <ContentName>Items\MajorHealingPotion</ContentName>
+			  <Count>1</Count>
+		  </Item>
+      </Inventory>
+      <CombatSprite>
+          <TextureName>Characters\BossAttackRight</TextureName>
+          <FrameDimensions>288 288</FrameDimensions>
+          <FramesPerRow>6</FramesPerRow>
+          <SourceOffset>135 240</SourceOffset>
+          <Animations>
+              <Item>
+                  <Name>Walk</Name>
+                  <StartingFrame>25</StartingFrame>
+                  <EndingFrame>30</EndingFrame>
+                  <Interval>80</Interval>
+                  <IsLoop>true</IsLoop>
+              </Item>
+          </Animations>
+      </CombatSprite>
+      <Gold>100</Gold>
+      <IntroductionDialogue>Me Shenidd, the Great!  Bow before your new leader!</IntroductionDialogue>
+      <JoinAcceptedDialogue>Good!  Now, get Shenidd MEAT!</JoinAcceptedDialogue>
+      <JoinRejectedDialogue>Shenidd should kill you!  Next time, Shenidd not be so nice...</JoinRejectedDialogue>
+      <ActivePortraitTextureName>BossActive</ActivePortraitTextureName>
+      <InactivePortraitTextureName>BossInActive</InactivePortraitTextureName>
+      <UnselectablePortraitTextureName>BossUnselectable</UnselectablePortraitTextureName>
+  </Asset>
+</XnaContent>

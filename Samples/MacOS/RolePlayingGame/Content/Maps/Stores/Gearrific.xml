@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Store">
+      <Name>Gearrific!</Name>
+      <BuyMultiplier>1.1</BuyMultiplier>
+      <SellMultiplier>0.4</SellMultiplier>
+      <StoreCategories>
+          <Item>
+              <Name>Weapons</Name>
+              <AvailableContentNames>
+                  <Item>Weapons\ShortSword</Item>
+                  <Item>Weapons\Claymore</Item>
+                  <Item>Weapons\Club</Item>
+                  <Item>Weapons\MagicStaff</Item>
+              </AvailableContentNames>
+          </Item>
+          <Item>
+              <Name>Armor</Name>
+              <AvailableContentNames>
+                  <Item>Armor\HideArmor</Item>
+                  <Item>Armor\LeatherArmor</Item>
+                  <Item>Armor\WornRobe</Item>
+              </AvailableContentNames>
+          </Item>
+          <Item>
+              <Name>Shields</Name>
+              <AvailableContentNames>
+                  <Item>Armor\HideShield</Item>
+                  <Item>Armor\LeatherShield</Item>
+              </AvailableContentNames>
+          </Item>
+          <Item>
+              <Name>Helmets</Name>
+              <AvailableContentNames>
+                  <Item>Armor\HideHelmet</Item>
+                  <Item>Armor\WornMageHood</Item>
+              </AvailableContentNames>
+          </Item>
+          <Item>
+              <Name>Boots</Name>
+              <AvailableContentNames>
+                  <Item>Armor\HideBoots</Item>
+                  <Item>Armor\WornMageBoots</Item>
+              </AvailableContentNames>
+          </Item>
+          <Item>
+              <Name>Items</Name>
+              <AvailableContentNames>
+                  <Item>Items\MinorHealingPotion</Item>
+                  <Item>Items\MinorMagicPotion</Item>
+                  <Item>Items\HealingPotion</Item>
+                  <Item>Items\MagicPotion</Item>
+              </AvailableContentNames>
+          </Item>
+      </StoreCategories>
+      <WelcomeMessage>You won't find a more diverse selection of equipment for miles!</WelcomeMessage>
+      <ShopkeeperTextureName>ShopKeeper</ShopkeeperTextureName>
+  </Asset>
+</XnaContent>

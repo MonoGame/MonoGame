@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Weapon">
+      <Name>Dagger</Name>
+      <Description>The dagger is small, sharp, and light.</Description>
+      <GoldValue>50</GoldValue>
+      <IsDroppable>true</IsDroppable>
+      <MinimumCharacterLevel>1</MinimumCharacterLevel>
+      <SupportedClasses />
+      <IconTextureName>Sword06a</IconTextureName>
+      <TargetDamageRange>
+          <Minimum>2</Minimum>
+          <Maximum>4</Maximum>
+      </TargetDamageRange>
+      <SwingCueName>SwordSwing</SwingCueName>
+      <HitCueName>SwordHit</HitCueName>
+      <BlockCueName>SwordBlock</BlockCueName>
+      <Overlay>
+          <TextureName>Spells\OverlayMelee</TextureName>
+          <FrameDimensions>111 130</FrameDimensions>
+          <FramesPerRow>1</FramesPerRow>
+          <Animations>
+              <Item>
+                  <StartingFrame>1</StartingFrame>
+                  <EndingFrame>1</EndingFrame>
+                  <Interval>200</Interval>
+                  <IsLoop>false</IsLoop>
+              </Item>
+          </Animations>
+      </Overlay>
+  </Asset>
+</XnaContent>
