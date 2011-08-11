@@ -999,21 +999,43 @@ namespace Microsoft.Xna.Framework.Net
 			}
 		}
 
+        private TimeSpan defaultSimulatedLatency = new TimeSpan(0, 0, 0);
+
 		public TimeSpan SimulatedLatency {
 			get {
-				throw new NotImplementedException ();
+#if DEBUG
+                if (networkPeer != null)
+                {
+                    return networkPeer.SimulatedLatency;
+                }
+#endif
+                return defaultSimulatedLatency;				
 			}
 			set {
-				throw new NotImplementedException ();
+                defaultSimulatedLatency = value;
+#if DEBUG
+                if (networkPeer != null)
+                {
+                    networkPeer.SimulatedLatency = value;
+                }
+#endif
+                
 			}
 		}
 
+        private float simulatedPacketLoss = 0.0f;
+
 		public float SimulatedPacketLoss {
 			get {
-				throw new NotImplementedException ();
+                if (networkPeer != null)
+                {
+                    simulatedPacketLoss = networkPeer.SimulatedPacketLoss;                   
+                }
+                return simulatedPacketLoss;
 			}
 			set {
-				throw new NotImplementedException ();
+                if (networkPeer != null) networkPeer.SimulatedPacketLoss = value;
+                simulatedPacketLoss = value;
 			}
 		}			
 
