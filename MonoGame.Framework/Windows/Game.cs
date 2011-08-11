@@ -171,12 +171,6 @@ namespace Microsoft.Xna.Framework
 
             GraphicsDevice.Viewport = _vp;
 
-            // bit of a hack
-
-            _view.OpenTkGameWindow.Width = _vp.Width;
-            _view.OpenTkGameWindow.Height = _vp.Height;            
-			
-
             //Need to execute this on the rendering thread
             _view.OpenTkGameWindow.RenderFrame += delegate
             {
