@@ -88,7 +88,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			CGAffineTransform transform;
 			Size imageSize;
 			SurfaceFormat pixelFormat;
-			bool sizeToFit = false;
+			//bool sizeToFit = false;
 
 			if (image == null) {
 				throw new ArgumentException (" NSImage is invalid! " );
@@ -110,20 +110,29 @@ namespace Microsoft.Xna.Framework.Graphics
 			imageSize = new Size (image.Width,image.Height);
 			transform = CGAffineTransform.MakeIdentity ();
 			width = imageSize.Width;
-
-			if ((width != 1) && ((width & (width - 1)) != 0)) {
-				i = 1;
-				while ((sizeToFit ? 2 * i : i) < width)
-					i *= 2;
-				width = i;
-			}
+			
+			// Take out the width and height adjustments for power of 2
+			//  If not then GetData and SetData is messed up.
+			
+			// The Mac opengl version supports non power of 2 textures
+			// so we do not have to make them so
+//			if ((width != 1) && ((width & (width - 1)) != 0)) {
+//				i = 1;
+//				while ((sizeToFit ? 2 * i : i) < width)
+//					i *= 2;
+//				width = i;
+//			}
+			
 			height = imageSize.Height;
-			if ((height != 1) && ((height & (height - 1)) != 0)) {
-				i = 1;
-				while ((sizeToFit ? 2 * i : i) < height)
-					i *= 2;
-				height = i;
-			}
+
+			// The Mac opengl version supports non power of 2 textures
+			// so we do not have to make them so
+//			if ((height != 1) && ((height & (height - 1)) != 0)) {
+//				i = 1;
+//				while ((sizeToFit ? 2 * i : i) < height)
+//					i *= 2;
+//				height = i;
+//			}
 			// TODO: kMaxTextureSize = 1024
 //			while ((width > 1024) || (height > 1024)) {
 //				width /= 2;
