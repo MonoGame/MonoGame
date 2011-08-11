@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Store">
+      <Name>Itemania!</Name>
+      <BuyMultiplier>1</BuyMultiplier>
+      <SellMultiplier>0.5</SellMultiplier>
+      <StoreCategories>
+          <Item>
+              <Name>Items</Name>
+              <AvailableContentNames>
+                  <Item>Items\MinorHealingPotion</Item>
+                  <Item>Items\MinorMagicPotion</Item>
+                  <Item>Items\MagicPotion</Item>
+              </AvailableContentNames>
+          </Item>
+      </StoreCategories>
+      <WelcomeMessage>Welcome, welcome!  What can I do for you?</WelcomeMessage>
+      <ShopkeeperTextureName>ShopKeeper</ShopkeeperTextureName>
+  </Asset>
+</XnaContent>

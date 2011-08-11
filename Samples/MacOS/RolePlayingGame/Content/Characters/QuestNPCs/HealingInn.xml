@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.QuestNpc">
+      <Name>Healing Inn</Name>
+      <IntroductionDialogue>One Night of Pure Bliss!  We have the most comfortable rooms at amazing rates.</IntroductionDialogue>
+  </Asset>
+</XnaContent>

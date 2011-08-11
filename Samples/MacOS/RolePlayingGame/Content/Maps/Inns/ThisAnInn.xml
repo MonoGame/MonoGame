@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Inn">
+      <Name>This An Inn</Name>
+      <ChargePerPlayer>100</ChargePerPlayer>
+      <WelcomeMessage>You WILL pay for a safe night's sleep!</WelcomeMessage>
+      <PaidMessage>Thanks... hehe...</PaidMessage>
+      <NotEnoughGoldMessage>You can't afford a slice of bread around here with that kind of money.  LEAVE!</NotEnoughGoldMessage>
+      <ShopkeeperTextureName>ShopKeeper</ShopkeeperTextureName>
+  </Asset>
+</XnaContent>

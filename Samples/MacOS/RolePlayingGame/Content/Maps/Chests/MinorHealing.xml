@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<XnaContent><Asset Type="RolePlayingGameData.Chest">
+  <Name>Minor Healing</Name>
+  <Gold>0</Gold>
+  <Entries>
+    <Item>
+      <ContentName>Items\MinorHealingPotion</ContentName>
+      <Count>2</Count>
+    </Item>
+  </Entries>
+  <TextureName>Chest1c</TextureName>
+</Asset></XnaContent>

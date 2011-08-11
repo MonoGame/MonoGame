@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.QuestNpc">
+      <Name>Manny</Name>
+      <MapSprite>
+          <TextureName>Characters\VillagerIdleRight</TextureName>
+          <FrameDimensions>92 120</FrameDimensions>
+          <FramesPerRow>6</FramesPerRow>
+          <SourceOffset>46 89</SourceOffset>
+          <Animations />
+      </MapSprite>
+      <MapIdleAnimationInterval>150</MapIdleAnimationInterval>
+      <IntroductionDialogue>Don't go east unless you are confident in your capabilities.</IntroductionDialogue>
+  </Asset>
+</XnaContent>

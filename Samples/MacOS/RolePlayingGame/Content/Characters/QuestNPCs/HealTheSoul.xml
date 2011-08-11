@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.QuestNpc">
+      <Name>Heal the Soul</Name>
+      <IntroductionDialogue>Come in, and enjoy the aromas of freshly concocted potions.  Each one is guarenteed to make you feel like a new person!</IntroductionDialogue>
+  </Asset>
+</XnaContent>

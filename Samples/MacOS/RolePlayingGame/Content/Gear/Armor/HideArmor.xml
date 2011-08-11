@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Armor">
+      <Name>Hide Armor</Name>
+      <Description>The hide armor set provides basic protection for all heroes.</Description>
+      <GoldValue>75</GoldValue>
+      <IsDroppable>true</IsDroppable>
+      <MinimumCharacterLevel>1</MinimumCharacterLevel>
+      <SupportedClasses />
+      <IconTextureName>Torso10a</IconTextureName>
+      <Slot>Torso</Slot>
+      <OwnerHealthDefenseRange>
+          <Minimum>2</Minimum>
+          <Maximum>3</Maximum>
+      </OwnerHealthDefenseRange>
+      <OwnerMagicDefenseRange>
+          <Minimum>2</Minimum>
+          <Maximum>3</Maximum>
+      </OwnerMagicDefenseRange>
+  </Asset>
+</XnaContent>

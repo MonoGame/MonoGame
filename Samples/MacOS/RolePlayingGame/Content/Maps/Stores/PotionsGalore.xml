@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Store">
+      <Name>Potions Galore</Name>
+      <BuyMultiplier>1</BuyMultiplier>
+      <SellMultiplier>0.3</SellMultiplier>
+      <StoreCategories>
+          <Item>
+              <Name>Standards</Name>
+              <AvailableContentNames>
+                  <Item>Items\MinorHealingPotion</Item>
+                  <Item>Items\MinorMagicPotion</Item>
+                  <Item>Items\HealingPotion</Item>
+                  <Item>Items\MagicPotion</Item>
+                  <Item>Items\MajorHealingPotion</Item>
+                  <Item>Items\MajorMagicPotion</Item>
+              </AvailableContentNames>
+          </Item>
+          <Item>
+              <Name>Boosters</Name>
+              <AvailableContentNames>
+                  <Item>Items\POElixir</Item>
+                  <Item>Items\PDElixir</Item>
+                  <Item>Items\MOElixir</Item>
+                  <Item>Items\MDElixir</Item>
+              </AvailableContentNames>
+          </Item>
+      </StoreCategories>
+      <WelcomeMessage>We have the rarest potions in Mercadia!</WelcomeMessage>
+      <ShopkeeperTextureName>ShopKeeper03</ShopkeeperTextureName>
+  </Asset>
+</XnaContent>

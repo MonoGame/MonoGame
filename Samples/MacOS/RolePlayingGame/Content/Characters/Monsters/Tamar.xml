@@ -1,0 +1,74 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Monster">
+      <Name>Tamar</Name>
+      <MapSprite>
+          <TextureName>Characters\Boss3IdleLeft</TextureName>
+          <FrameDimensions>174 216</FrameDimensions>
+          <FramesPerRow>6</FramesPerRow>
+          <SourceOffset>87 156</SourceOffset>
+          <Animations />
+      </MapSprite>
+      <CharacterClassContentName>Mystic</CharacterClassContentName>
+      <CharacterLevel>13</CharacterLevel>
+      <InitialEquipmentContentNames>
+          <Item>Weapons\TamarBlade</Item>
+          <Item>Armor\TamarArmor</Item>
+          <Item>Armor\TamarHelmet</Item>
+          <Item>Armor\TamarShield</Item>
+          <Item>Armor\TamarBoots</Item>
+      </InitialEquipmentContentNames>
+      <Inventory>
+		  <Item>
+			  <ContentName>Items\MajorMagicPotion</ContentName>
+			  <Count>5</Count>
+		  </Item>
+		  <Item>
+			  <ContentName>Items\MajorHealingPotion</ContentName>
+			  <Count>3</Count>
+		  </Item>
+      </Inventory>
+      <CombatSprite>
+          <TextureName>Characters\Boss3AttackLeft</TextureName>
+          <FrameDimensions>288 288</FrameDimensions>
+          <FramesPerRow>6</FramesPerRow>
+          <SourceOffset>150 245</SourceOffset>
+          <Animations>
+              <Item>
+                  <Name>Walk</Name>
+                  <StartingFrame>25</StartingFrame>
+                  <EndingFrame>30</EndingFrame>
+                  <Interval>80</Interval>
+                  <IsLoop>true</IsLoop>
+              </Item>
+          </Animations>
+      </CombatSprite>
+      <DefendPercentage>30</DefendPercentage>
+      <GearDrops>
+          <Item>
+              <GearName>Weapons\TamarBlade</GearName>
+              <DropPercentage>100</DropPercentage>
+          </Item>
+          <Item>
+              <GearName>Armor\TamarArmor</GearName>
+              <DropPercentage>100</DropPercentage>
+          </Item>
+          <Item>
+              <GearName>Armor\TamarHelmet</GearName>
+              <DropPercentage>100</DropPercentage>
+          </Item>
+          <Item>
+              <GearName>Armor\TamarShield</GearName>
+              <DropPercentage>100</DropPercentage>
+          </Item>
+          <Item>
+              <GearName>Armor\TamarBoots</GearName>
+              <DropPercentage>100</DropPercentage>
+          </Item>
+          <Item>
+              <GearName>Items\MajorMagicPotion</GearName>
+              <DropPercentage>100</DropPercentage>
+          </Item>
+      </GearDrops>
+  </Asset>
+</XnaContent>

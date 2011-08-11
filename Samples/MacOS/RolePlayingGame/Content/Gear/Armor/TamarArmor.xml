@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Armor">
+      <Name>Tamar Armor</Name>
+      <Description>The personal armor set of the Tamar.</Description>
+      <GoldValue>-1</GoldValue>
+      <IsDroppable>true</IsDroppable>
+      <MinimumCharacterLevel>10</MinimumCharacterLevel>
+      <SupportedClasses>
+          <Item>Mystic</Item>
+      </SupportedClasses>
+      <IconTextureName>Torso01g</IconTextureName>
+	  <OwnerBuffStatistics>
+		  <HealthPoints>20</HealthPoints>
+		  <PhysicalOffense>10</PhysicalOffense>
+		  <MagicalDefense>10</MagicalDefense>
+	  </OwnerBuffStatistics>
+	  <Slot>Torso</Slot>
+      <OwnerHealthDefenseRange>
+          <Minimum>30</Minimum>
+          <Maximum>35</Maximum>
+      </OwnerHealthDefenseRange>
+      <OwnerMagicDefenseRange>
+          <Minimum>20</Minimum>
+          <Maximum>25</Maximum>
+      </OwnerMagicDefenseRange>
+  </Asset>
+</XnaContent>

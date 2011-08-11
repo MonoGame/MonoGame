@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Weapon">
+      <Name>Short Sword</Name>
+      <Description>The short sword is short, swift, and sharp.  It is a staple for all warriors.</Description>
+      <GoldValue>100</GoldValue>
+      <IsDroppable>true</IsDroppable>
+      <MinimumCharacterLevel>1</MinimumCharacterLevel>
+      <SupportedClasses>
+          <Item>Warrior</Item>
+          <Item>Paladin</Item>
+      </SupportedClasses>
+      <IconTextureName>Sword03a</IconTextureName>
+      <TargetDamageRange>
+          <Minimum>4</Minimum>
+          <Maximum>8</Maximum>
+      </TargetDamageRange>
+      <SwingCueName>SwordSwing</SwingCueName>
+      <HitCueName>SwordHit</HitCueName>
+      <BlockCueName>SwordBlock</BlockCueName>
+      <Overlay>
+          <TextureName>Spells\OverlayMelee</TextureName>
+          <FrameDimensions>111 130</FrameDimensions>
+          <FramesPerRow>1</FramesPerRow>
+          <Animations>
+              <Item>
+                  <StartingFrame>1</StartingFrame>
+                  <EndingFrame>1</EndingFrame>
+                  <Interval>200</Interval>
+                  <IsLoop>false</IsLoop>
+              </Item>
+          </Animations>
+      </Overlay>
+  </Asset>
+</XnaContent>

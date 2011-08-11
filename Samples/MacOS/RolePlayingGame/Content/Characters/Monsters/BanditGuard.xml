@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Monster">
+      <Name>Bandit Guard</Name>
+      <MapSprite>
+          <TextureName>Characters\Warrior3IdleLeft</TextureName>
+          <FrameDimensions>138 192</FrameDimensions>
+          <FramesPerRow>6</FramesPerRow>
+          <SourceOffset>69 125</SourceOffset>
+          <Animations />
+      </MapSprite>
+      <CharacterClassContentName>Warrior</CharacterClassContentName>
+      <CharacterLevel>5</CharacterLevel>
+      <InitialEquipmentContentNames>
+          <Item>Weapons\Claymore</Item>
+          <Item>Armor\LeatherArmor</Item>
+          <Item>Armor\HideShield</Item>
+          <Item>Armor\LeatherBoots</Item>
+          <Item>Armor\HideHelmet</Item>
+      </InitialEquipmentContentNames>
+      <Inventory>
+          <Item>
+			  <ContentName>Items\MinorHealingPotion</ContentName>
+			  <Count>5</Count>
+		  </Item>
+      </Inventory>
+      <CombatSprite>
+          <TextureName>Characters\Warrior3AttackLeft</TextureName>
+          <FrameDimensions>288 192</FrameDimensions>
+          <FramesPerRow>6</FramesPerRow>
+          <SourceOffset>155 135</SourceOffset>
+          <Animations />
+      </CombatSprite>
+      <DefendPercentage>30</DefendPercentage>
+      <GearDrops>
+          <Item>
+              <GearName>Items\HealingPotion</GearName>
+              <DropPercentage>60</DropPercentage>
+          </Item>
+          <Item>
+              <GearName>Items\MinorHealingPotion</GearName>
+              <DropPercentage>60</DropPercentage>
+          </Item>
+          <Item>
+              <GearName>Armor\HideShield</GearName>
+              <DropPercentage>10</DropPercentage>
+          </Item>
+          <Item>
+              <GearName>Armor\LeatherArmor</GearName>
+              <DropPercentage>10</DropPercentage>
+          </Item>
+          <Item>
+              <GearName>Armor\LeatherBoots</GearName>
+              <DropPercentage>10</DropPercentage>
+          </Item>
+      </GearDrops>
+  </Asset>
+</XnaContent>

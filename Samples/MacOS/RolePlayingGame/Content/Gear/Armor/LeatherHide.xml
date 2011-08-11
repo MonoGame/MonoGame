@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Armor">
+      <Name>Leather Hide</Name>
+      <Description>The hardened-hide armor provides basic protection for all heroes.</Description>
+      <GoldValue>30</GoldValue>
+      <IsDroppable>true</IsDroppable>
+      <MinimumCharacterLevel>1</MinimumCharacterLevel>
+      <SupportedClasses />
+      <IconTextureName>Torso09a</IconTextureName>
+      <Slot>Torso</Slot>
+      <OwnerHealthDefenseRange>
+          <Minimum>1</Minimum>
+          <Maximum>2</Maximum>
+      </OwnerHealthDefenseRange>
+      <OwnerMagicDefenseRange>
+          <Minimum>0</Minimum>
+          <Maximum>0</Maximum>
+      </OwnerMagicDefenseRange>
+  </Asset>
+</XnaContent>

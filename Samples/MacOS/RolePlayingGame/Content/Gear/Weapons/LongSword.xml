@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Weapon">
+      <Name>Long Sword</Name>
+      <Description>The long sword's advantage lies in its incredible length.</Description>
+      <GoldValue>350</GoldValue>
+      <IsDroppable>true</IsDroppable>
+      <MinimumCharacterLevel>3</MinimumCharacterLevel>
+      <SupportedClasses>
+          <Item>Warrior</Item>
+          <Item>Paladin</Item>
+      </SupportedClasses>
+      <IconTextureName>Sword07a</IconTextureName>
+      <TargetDamageRange>
+          <Minimum>20</Minimum>
+          <Maximum>30</Maximum>
+      </TargetDamageRange>
+      <SwingCueName>SwordSwing</SwingCueName>
+      <HitCueName>SwordHit</HitCueName>
+      <BlockCueName>SwordBlock</BlockCueName>
+      <Overlay>
+          <TextureName>Spells\OverlayMelee</TextureName>
+          <FrameDimensions>111 130</FrameDimensions>
+          <FramesPerRow>1</FramesPerRow>
+          <Animations>
+              <Item>
+                  <StartingFrame>1</StartingFrame>
+                  <EndingFrame>1</EndingFrame>
+                  <Interval>200</Interval>
+                  <IsLoop>false</IsLoop>
+              </Item>
+          </Animations>
+      </Overlay>
+  </Asset>
+</XnaContent>

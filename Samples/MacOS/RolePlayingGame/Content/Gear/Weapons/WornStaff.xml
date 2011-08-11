@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Weapon">
+      <Name>Worn Staff</Name>
+      <Description>Every spellcaster needs a trusty staff.</Description>
+      <GoldValue>100</GoldValue>
+      <IsDroppable>true</IsDroppable>
+      <MinimumCharacterLevel>1</MinimumCharacterLevel>
+      <SupportedClasses>
+          <Item>Wizard</Item>
+          <Item>Red Mage</Item>
+      </SupportedClasses>
+      <IconTextureName>Staff03a</IconTextureName>
+	  <OwnerBuffStatistics>
+		  <MagicalOffense>1</MagicalOffense>
+	  </OwnerBuffStatistics>
+	  <TargetDamageRange>
+		  <Minimum>2</Minimum>
+		  <Maximum>4</Maximum>
+	  </TargetDamageRange>
+	  <SwingCueName>StaffSwing</SwingCueName>
+      <HitCueName>StaffHit</HitCueName>
+      <BlockCueName>StaffBlock</BlockCueName>
+      <Overlay>
+          <TextureName>Spells\OverlayMelee</TextureName>
+          <FrameDimensions>111 130</FrameDimensions>
+          <FramesPerRow>1</FramesPerRow>
+          <Animations>
+              <Item>
+                  <StartingFrame>1</StartingFrame>
+                  <EndingFrame>1</EndingFrame>
+                  <Interval>200</Interval>
+                  <IsLoop>false</IsLoop>
+              </Item>
+          </Animations>
+      </Overlay>
+  </Asset>
+</XnaContent>

@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Store">
+      <Name>Who Me Shop</Name>
+      <BuyMultiplier>2.0</BuyMultiplier>
+      <SellMultiplier>0.2</SellMultiplier>
+      <StoreCategories>
+          <Item>
+              <Name>Weapons</Name>
+              <AvailableContentNames>
+                  <Item>Weapons\PersianSword</Item>
+                  <Item>Weapons\SageStaff</Item>
+                  <Item>Weapons\LongBlade</Item>
+                  <Item>Weapons\GiantClubPlus</Item>
+              </AvailableContentNames>
+          </Item>
+          <Item>
+              <Name>Armor</Name>
+              <AvailableContentNames>
+                  <Item>Armor\SteelArmor</Item>
+                  <Item>Armor\SageRobe</Item>
+              </AvailableContentNames>
+          </Item>
+          <Item>
+              <Name>Shields</Name>
+              <AvailableContentNames>
+                  <Item>Armor\SteelShield</Item>
+              </AvailableContentNames>
+          </Item>
+          <Item>
+              <Name>Helmets</Name>
+              <AvailableContentNames>
+                  <Item>Armor\SteelHelmet</Item>
+                  <Item>Armor\SageHood</Item>
+              </AvailableContentNames>
+          </Item>
+          <Item>
+              <Name>Boots</Name>
+              <AvailableContentNames>
+                  <Item>Armor\SteelBoots</Item>
+                  <Item>Armor\SageBoots</Item>
+              </AvailableContentNames>
+          </Item>
+          <Item>
+              <Name>Items</Name>
+              <AvailableContentNames>
+                  <Item>Items\HealingPotion</Item>
+                  <Item>Items\MagicPotion</Item>
+                  <Item>Items\MajorHealingPotion</Item>
+                  <Item>Items\MajorMagicPotion</Item>
+              </AvailableContentNames>
+          </Item>
+      </StoreCategories>
+      <WelcomeMessage>You WILL pay if you want this equipment!</WelcomeMessage>
+      <ShopkeeperTextureName>ShopKeeper02</ShopkeeperTextureName>
+  </Asset>
+</XnaContent>

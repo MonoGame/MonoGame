@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Weapon">
+      <Name>Mystical Staff</Name>
+      <Description>This staff is clearly magical but is of unknown origin.</Description>
+      <GoldValue>350</GoldValue>
+      <IsDroppable>true</IsDroppable>
+      <MinimumCharacterLevel>3</MinimumCharacterLevel>
+      <SupportedClasses>
+          <Item>Wizard</Item>
+          <Item>Red Mage</Item>
+      </SupportedClasses>
+      <IconTextureName>Staff04a</IconTextureName>
+	  <OwnerBuffStatistics>
+		  <MagicPoints>15</MagicPoints>
+		  <MagicalOffense>8</MagicalOffense>
+		  <MagicalDefense>3</MagicalDefense>
+	  </OwnerBuffStatistics>
+	  <TargetDamageRange>
+          <Minimum>6</Minimum>
+          <Maximum>10</Maximum>
+      </TargetDamageRange>
+      <SwingCueName>StaffSwing</SwingCueName>
+      <HitCueName>StaffHit</HitCueName>
+      <BlockCueName>StaffBlock</BlockCueName>
+      <Overlay>
+          <TextureName>Spells\OverlayMelee</TextureName>
+          <FrameDimensions>111 130</FrameDimensions>
+          <FramesPerRow>1</FramesPerRow>
+          <Animations>
+              <Item>
+                  <StartingFrame>1</StartingFrame>
+                  <EndingFrame>1</EndingFrame>
+                  <Interval>200</Interval>
+                  <IsLoop>false</IsLoop>
+              </Item>
+          </Animations>
+      </Overlay>
+  </Asset>
+</XnaContent>

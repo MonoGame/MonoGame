@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.QuestNpc">
+      <Name>To Plot Inn</Name>
+      <IntroductionDialogue>South: Plot Town</IntroductionDialogue>
+  </Asset>
+</XnaContent>

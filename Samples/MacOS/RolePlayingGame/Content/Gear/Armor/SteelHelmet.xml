@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Armor">
+      <Name>Steel Helmet</Name>
+      <Description>The steel armor set is made of the hardest metal for maximum defense.</Description>
+      <GoldValue>600</GoldValue>
+      <IsDroppable>true</IsDroppable>
+      <MinimumCharacterLevel>6</MinimumCharacterLevel>
+      <SupportedClasses>
+          <Item>Warrior</Item>
+          <Item>Paladin</Item>
+      </SupportedClasses>
+      <IconTextureName>Helmet03a</IconTextureName>
+      <Slot>Helmet</Slot>
+      <OwnerHealthDefenseRange>
+          <Minimum>10</Minimum>
+          <Maximum>12</Maximum>
+      </OwnerHealthDefenseRange>
+      <OwnerMagicDefenseRange>
+          <Minimum>6</Minimum>
+          <Maximum>7</Maximum>
+      </OwnerMagicDefenseRange>
+  </Asset>
+</XnaContent>

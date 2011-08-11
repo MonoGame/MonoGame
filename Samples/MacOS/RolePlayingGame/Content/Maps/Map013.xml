@@ -1,0 +1,196 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Map">
+      <Name>Map013</Name>
+      <MapDimensions>19 20</MapDimensions>
+      <TileSize>64 64</TileSize>
+      <SpawnMapPosition>12 9</SpawnMapPosition>
+      <TextureName>DungeonTiles</TextureName>
+      <CombatTextureName>CombatBkgdDungeon</CombatTextureName>
+      <MusicCueName>DungeonTheme</MusicCueName>
+      <CombatMusicCueName>BattleTheme</CombatMusicCueName>
+      <BaseLayer>
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1 129  -1  -1  -1 129  -1  -1  -1 129  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  82  -1  -1  -1  82  -1  -1  -1  82  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  82  -1  -1  82  82  -1  82  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  82  82  -1  -1  82  82  -1  82  82  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  82  82  82  82  82  82  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  82  82  82  82  82  82  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  82  82  82  -1  82  82  -1  82  82  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  82  82  82  -1  82  82  -1  82  82  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+      </BaseLayer>
+      <FringeLayer>
+          5   4   2   2   2   2   2   2   2   2   2   2   2   2   2   2   2   5   4
+          7   6   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   7   6
+          1   0  59  60  37  11  11  11  11  11  11  11  11  11  48  59  60   1   0
+          1   0  53  54  36  12 174 174  12  12  12 174 174  12  49  53  54   1   0
+          1   0  33  34  35 147 129 129 129 147 129 129 129 147  50  51  52   1   0
+          1   0  18  19  20 148 145 145  82 148 145  82 145 148  29  28  27   1   0
+          1   0  18 155  20  82 169  82  82 165 166  82 169  82  29 156  27   1   0
+          1   0  18  19  20 169 169  82  82 167 168  82 169 169  29  28  27   1   0
+          1   0  18  19  20  82  82  82  82  82  82  82  82  82 123 124 121   1   0
+          1   0  18  19  20 145 165 166 169 163 164 169  82  82 125 102 120   1   0
+          1   0  18  19  20 145 167 168 169 167 168 169  82  82 126 127 122   1   0
+          1   0  18  19  20  82  82  82  82  82  82  82  82  82  29  28  27   1   0
+          1   0  18  19  20 169 165 166  82 165 166  82 165 166  29  28  27   1   0
+          1   0  18 155  20 169 167 168  82 167 168  82 167 168  29 156  27   1   0
+          1   0  18  19  20  82  82  82  82  82  82  82  82  82  29  28  27   1   0
+          1   0  40  41  42  23  23  23  23  23  23  23  23  23  45  46  47   1   0
+          1   0  59  60  39  22  22  22  22  22  22  22  22  22  44  59  60   1   0
+          1   0  53  54  38  21  21  21  21  21  21  21  21  21  43  53  54   1   0
+          5   4   2   2   2   2   2   2   2   2   2   2   2   2   2   2   2   5   4
+          7   6   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   7   6
+      </FringeLayer>
+      <ObjectLayer>
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+      </ObjectLayer>
+      <CollisionLayer>
+          0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+          0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+          0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+          0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+          0   0   0   0   0   1   1   1   1   1   1   1   1   1   0   0   0   0   0
+          0   0   0   0   1   1   1   1   0   1   1   0   1   1   1   0   0   0   0
+          0   0   0   0   1   0   0   0   0   1   1   0   0   0   1   0   0   0   0
+          0   0   0   0   1   0   0   0   0   1   1   0   0   0   1   0   0   0   0
+          0   0   0   0   1   0   0   0   0   0   0   0   0   0   1   0   0   0   0
+          0   0   0   0   1   1   1   1   1   1   1   1   0   0   0   0   0   0   0
+          0   0   0   0   1   1   1   1   1   1   1   1   0   0   1   0   0   0   0
+          0   0   0   0   1   0   0   0   0   0   0   0   0   0   1   0   0   0   0
+          0   0   0   0   1   1   1   1   0   1   1   0   1   1   1   0   0   0   0
+          0   0   0   0   1   1   1   1   0   1   1   0   1   1   1   0   0   0   0
+          0   0   0   0   1   0   0   0   0   0   0   0   0   0   1   0   0   0   0
+          0   0   0   0   1   1   1   1   1   1   1   1   1   1   1   0   0   0   0
+          0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+          0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+          0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+          0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+      </CollisionLayer>
+      <Portals>
+          <Item>
+			  <Name>P1</Name>
+			  <LandingMapPosition>12 9</LandingMapPosition>
+              <DestinationMapContentName>Map012</DestinationMapContentName>
+              <DestinationMapPortalName>P2</DestinationMapPortalName>
+          </Item>
+      </Portals>
+	  <PortalEntries>
+		  <Item>
+			  <ContentName>P1</ContentName>
+			  <MapPosition>14 9</MapPosition>
+		  </Item>
+	  </PortalEntries>
+	  <ChestEntries>
+          <Item>
+              <ContentName>POElixir</ContentName>
+              <MapPosition>5 14</MapPosition>
+          </Item>
+          <Item>
+              <ContentName>MOElixir</ContentName>
+              <MapPosition>9 14</MapPosition>
+          </Item>
+          <Item>
+              <ContentName>PDElixir</ContentName>
+              <MapPosition>13 14</MapPosition>
+          </Item>
+          <Item>
+              <ContentName>MDElixir</ContentName>
+              <MapPosition>5 11</MapPosition>
+          </Item>
+          <Item>
+              <ContentName>SteelShield</ContentName>
+              <MapPosition>5 8</MapPosition>
+          </Item>
+          <Item>
+              <ContentName>LongBlade</ContentName>
+              <MapPosition>8 5</MapPosition>
+          </Item>
+          <Item>
+              <ContentName>SteelHelmet</ContentName>
+              <MapPosition>11 5</MapPosition>
+          </Item>
+      </ChestEntries>
+      <FixedCombatEntries />
+      <RandomCombat>
+          <CombatProbability>0</CombatProbability>
+          <FleeProbability>50</FleeProbability>
+          <MonsterCountRange>
+              <Minimum>1</Minimum>
+              <Maximum>3</Maximum>
+          </MonsterCountRange>
+          <Entries />
+      </RandomCombat>
+      <QuestNpcEntries>
+          <Item>
+              <ContentName>WhoMe</ContentName>
+              <MapPosition>5 6</MapPosition>
+              <Direction>SouthEast</Direction>
+          </Item>
+          <Item>
+              <ContentName>ThisAnInn</ContentName>
+              <MapPosition>13 6</MapPosition>
+              <Direction>South</Direction>
+          </Item>
+      </QuestNpcEntries>
+      <PlayerNpcEntries />
+      <InnEntries>
+          <Item>
+              <ContentName>ThisAnInn</ContentName>
+              <MapPosition>12 6</MapPosition>
+          </Item>
+          <Item>
+              <ContentName>ThisAnInn</ContentName>
+              <MapPosition>12 7</MapPosition>
+          </Item>
+          <Item>
+              <ContentName>ThisAnInn</ContentName>
+              <MapPosition>13 7</MapPosition>
+          </Item>
+      </InnEntries>
+      <StoreEntries>
+          <Item>
+              <ContentName>WhoMeShop</ContentName>
+              <MapPosition>5 7</MapPosition>
+          </Item>
+          <Item>
+              <ContentName>WhoMeShop</ContentName>
+              <MapPosition>6 7</MapPosition>
+          </Item>
+          <Item>
+              <ContentName>WhoMeShop</ContentName>
+              <MapPosition>6 6</MapPosition>
+          </Item>
+      </StoreEntries>
+  </Asset>
+</XnaContent>

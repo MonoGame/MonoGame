@@ -1,0 +1,207 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Map">
+      <Name>Map001</Name>
+      <MapDimensions>20 23</MapDimensions>
+      <TileSize>64 64</TileSize>
+      <SpawnMapPosition>9 7</SpawnMapPosition>
+      <TextureName>ForestTiles</TextureName>
+      <CombatTextureName>CombatBkgdVillage</CombatTextureName>
+      <MusicCueName>BeachTheme</MusicCueName>
+      <CombatMusicCueName>BattleTheme</CombatMusicCueName>
+      <BaseLayer>
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  37  38  38  38  38  38  39  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  40  41  41  41  41  41  42  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  40  41  41  41  41  41  42  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  47  49  49  49  49  49  51  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  48  50  50  50  50  50  52  -1  -1  -1  -1  -1  -1  -1
+          4   4  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1   4   4
+          1   1   1 150   1   1   1   1   1   1   1   1   1   1   1   1   1 150   1   1
+          4   4   4   4   4   4   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+          4   4   4   4   4   4   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+          4   4   4   4   4   4   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+          4   4   4   4   4   4   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+          4   4   4   4   4   4   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+          4   4   4   4   4   4   4   9   7   7   7   7  10   4   4   4   4   4   4   4
+          4   4   4   4   4   4   9   8  27  26  26  28   6  10   4   4   4   4   4   4
+          4   4   4   4   4   4   5  24  36  35  35  36  23   3   4   4   4   4   4   4
+          4   4   4   4   4   4   5  24  36  35  35  36  23   3   4   4   4   4   4   4
+          4   4   4   4   4   4   5  24  36  35  35  36  23   3   4   4   4   4   4   4
+          4   4   4   4   4   4  11   2  29  25  25  30   0  12   4   4   4   4   4   4
+          4   4   4   4   4   4   4  11   1   1   1   1  12   4   4   4   4   4   4   4
+          4   4   4   4   4   4   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+          4   4   4   4   4   4   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+          4   4   4   4   4   4   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+      </BaseLayer>
+      <FringeLayer>
+          108  95  95  95  95  96  76  76  76  76  76  76  76  97  95  95  95  95  95 108
+          95  95  95 108  95  78  -1  -1  -1  -1  -1  -1  -1  79  95  95  95  95  95  95
+          95  95  95  95  95  78  -1  41  41  41  41  41  -1  79  95  95  95  95  95  95
+          108  95  95  95 108  78  -1  41  41  41  41 238  -1  79  95 108  95  95 108 108
+          95  95 108  95  95  78  -1  -1  -1  -1  -1  -1  -1  79  95  95 108  95  95  95
+          95  95  95  95 108  78  -1  -1  -1  -1  -1  -1  -1  79  95 108  95 108  95  95
+          76  76  76  76  76  87  80  80  80  80  80  80  80  88  76  76  76  76  76  76
+          155 156 263   1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1 263   1 155 156
+          157 158 155 156 263 263  -1  -1  -1  -1  -1  -1  -1  -1 263 263 155 156 157 158
+          155 156 157 158 155 156  -1  -1  -1  -1  -1  -1  -1  -1 155 156 157 158 155 156
+          157 158 155 156 157 158 263 263  -1  -1  -1  -1 263 263 157 158 155 156 157 158
+          155 156 157 158 155 156 155 156  -1  -1  -1  -1 155 156 155 156 157 158 155 156
+          157 158 155 156 157 158 157 158  -1  -1  -1  -1 157 158 157 158 155 156 157 158
+          155 156 157 158 155 156  -1  -1  -1  -1  -1  -1  -1  -1 155 156 157 158 155 156
+          157 158 155 156 157 158  -1  -1  -1  -1  -1  -1  -1  -1 157 158 155 156 157 158
+          155 156 157 158 155 156  -1  -1  -1  -1  -1  -1  -1  -1 155 156 157 158 155 156
+          157 158 155 156 157 158  -1  -1  -1  -1  -1  -1  -1  -1 157 158 155 156 157 158
+          155 156 157 158 155 156  -1  -1  -1  -1  -1  -1  -1  -1 155 156 157 158 155 156
+          157 158 155 156 157 158  -1  -1  -1  -1  -1 164  -1  -1 157 158 155 156 157 158
+          155 156 157 158 155 156 263 263  -1  -1  -1  -1 263 263 155 156 157 158 155 156
+          157 158 155 156 157 158 155 156  -1  -1  -1  -1 155 156 157 158 155 156 157 158
+          155 156 157 158 155 156 157 158  -1  -1  -1  -1 157 158 155 156 157 158 155 156
+          157 158 155 156 157 158 155 156  -1  -1  -1  -1 155 156 157 158 155 156 157 158
+      </FringeLayer>
+      <ObjectLayer>
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          149 150  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1 149 150
+          -1  -1 149 150  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1 149 150  -1  -1
+          149 150  -1  -1 149 150  -1  -1  -1  -1  -1  -1  -1  -1 149 150  -1  -1 149 150
+          -1  -1 149 150  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1 149 150  -1  -1
+          149 150  -1  -1 149 150 149 150  -1  -1  -1  -1 149 150 149 150  -1  -1 149 150
+          -1  -1 149 150  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1 149 150  -1  -1
+          149 150  -1  -1 149 150  -1  -1  -1  -1  -1  -1  -1  -1 149 150  -1  -1 149 150
+          -1  -1 149 150  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1 149 150  -1  -1
+          149 150  -1  -1 149 150  -1  -1  -1  -1  -1  -1  -1  -1 149 150  -1  -1 149 150
+          -1  -1 149 150  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1 149 150  -1  -1
+          149 150  -1  -1 149 150  -1  -1  -1  -1  -1  -1  -1  -1 149 150  -1  -1 149 150
+          -1  -1 149 150  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1 149 150  -1  -1
+          149 150  -1  -1 149 150  -1  -1  -1  -1  -1  -1  -1  -1 149 150  -1  -1 149 150
+          -1  -1 149 150  -1  -1 149 150  -1  -1  -1  -1 149 150  -1  -1 149 150  -1  -1
+          149 150  -1  -1 149 150  -1  -1  -1  -1  -1  -1  -1  -1 149 150  -1  -1 149 150
+          -1  -1 149 150  -1  -1 149 150  -1  -1  -1  -1 149 150  -1  -1 149 150  -1  -1
+          149 150  -1  -1 149 150  -1  -1  -1  -1  -1  -1  -1  -1 149 150  -1  -1 149 150
+      </ObjectLayer>
+      <CollisionLayer>
+          0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+          0   0   0   0   0   1   1   1   1   1   1   1   1   0   0   0   0   0   0   0
+          0   0   0   0   0   1   1   0   0   0   0   0   1   0   0   0   0   0   0   0
+          0   0   0   0   0   1   1   0   0   0   0   0   1   0   0   0   0   0   0   0
+          0   0   0   0   0   1   1   1   1   1   1   1   1   0   0   0   0   0   0   0
+          0   0   0   0   0   1   1   1   1   1   1   1   1   0   0   0   0   0   0   0
+          0   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   0
+          1   1   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   1   1
+          1   1   1   1   0   0   0   0   0   0   0   0   0   0   0   0   1   1   1   1
+          1   1   1   1   1   1   0   0   0   0   0   0   0   0   1   1   1   1   1   1
+          1   1   1   1   1   1   0   0   0   0   0   0   0   0   1   1   1   1   1   1
+          1   1   1   1   1   1   1   1   0   0   0   0   1   1   1   1   1   1   1   1
+          1   1   1   1   1   1   1   1   0   0   0   0   1   1   1   1   1   1   1   1
+          1   1   1   1   1   1   0   0   0   0   0   0   0   0   1   1   1   1   1   1
+          1   1   1   1   1   1   0   0   0   0   0   0   0   0   1   1   1   1   1   1
+          1   1   1   1   1   1   0   0   0   0   0   0   0   0   1   1   1   1   1   1
+          1   1   1   1   1   1   0   0   0   0   0   0   0   0   1   1   1   1   1   1
+          1   1   1   1   1   1   0   0   0   0   0   0   0   0   1   1   1   1   1   1
+          1   1   1   1   1   1   0   0   0   0   0   1   0   0   1   1   1   1   1   1
+          1   1   1   1   1   1   0   0   0   0   0   0   0   0   1   1   1   1   1   1
+          1   1   1   1   1   1   1   1   0   0   0   0   1   1   1   1   1   1   1   1
+          1   1   1   1   1   1   1   1   0   0   0   0   1   1   1   1   1   1   1   1
+          1   1   1   1   1   1   1   1   0   0   0   0   1   1   1   1   1   1   1   1
+      </CollisionLayer>
+      <Portals>
+          <Item>
+			  <Name>P1</Name>
+			  <LandingMapPosition>8 20</LandingMapPosition>
+              <DestinationMapContentName>Map002</DestinationMapContentName>
+              <DestinationMapPortalName>P1</DestinationMapPortalName>
+          </Item>
+          <Item>
+			  <Name>P2</Name>
+			  <LandingMapPosition>9 20</LandingMapPosition>
+              <DestinationMapContentName>Map002</DestinationMapContentName>
+              <DestinationMapPortalName>P3</DestinationMapPortalName>
+          </Item>
+          <Item>
+			  <Name>P3</Name>
+			  <LandingMapPosition>10 20</LandingMapPosition>
+              <DestinationMapContentName>Map002</DestinationMapContentName>
+              <DestinationMapPortalName>P4</DestinationMapPortalName>
+          </Item>
+          <Item>
+			  <Name>P4</Name>
+			  <LandingMapPosition>11 20</LandingMapPosition>
+              <DestinationMapContentName>Map002</DestinationMapContentName>
+              <DestinationMapPortalName>P5</DestinationMapPortalName>
+          </Item>
+          <Item>
+			  <Name>P5</Name>
+			  <LandingMapPosition>11 3</LandingMapPosition>
+              <DestinationMapContentName>Map001</DestinationMapContentName>
+              <DestinationMapPortalName>P1</DestinationMapPortalName>
+          </Item>
+      </Portals>
+	  <PortalEntries>
+		  <Item>
+			  <ContentName>P1</ContentName>
+			  <MapPosition>8 22</MapPosition>
+		  </Item>
+		  <Item>
+			  <ContentName>P2</ContentName>
+			  <MapPosition>9 22</MapPosition>
+		  </Item>
+		  <Item>
+			  <ContentName>P3</ContentName>
+			  <MapPosition>10 22</MapPosition>
+		  </Item>
+		  <Item>
+			  <ContentName>P4</ContentName>
+			  <MapPosition>11 22</MapPosition>
+		  </Item>
+		  <Item>
+			  <ContentName>P5</ContentName>
+			  <MapPosition>11 3</MapPosition>
+		  </Item>
+	  </PortalEntries>
+	  <ChestEntries>
+          <Item>
+              <ContentName>MinorHealing</ContentName>
+              <MapPosition>9 16</MapPosition>
+          </Item>
+          <Item>
+              <ContentName>MinorGold</ContentName>
+              <MapPosition>10 16</MapPosition>
+          </Item>
+          <Item>
+              <ContentName>MoneyBags</ContentName>
+              <MapPosition>8 3</MapPosition>
+          </Item>
+      </ChestEntries>
+      <FixedCombatEntries />
+      <RandomCombat>
+          <CombatProbability>0</CombatProbability>
+          <FleeProbability>50</FleeProbability>
+          <MonsterCountRange>
+              <Minimum>5</Minimum>
+              <Maximum>5</Maximum>
+          </MonsterCountRange>
+          <Entries>
+              <Item>
+                  <ContentName>GoblinGrunt</ContentName>
+                  <Count>1</Count>
+                  <Weight>100</Weight>
+              </Item>
+          </Entries>
+      </RandomCombat>
+      <QuestNpcEntries>
+          <Item>
+              <ContentName>Sheddarr</ContentName>
+              <MapPosition>9 11</MapPosition>
+              <Direction>South</Direction>
+          </Item>
+      </QuestNpcEntries>
+      <PlayerNpcEntries />
+      <InnEntries />
+      <StoreEntries />
+  </Asset>
+</XnaContent>

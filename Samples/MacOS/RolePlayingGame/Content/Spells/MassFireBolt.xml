@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Spell">
+	  <Name>Fire Bolt</Name>
+	  <Description>Low-level fire spell that targets up to three enemies.</Description>
+	  <MagicPointCost>15</MagicPointCost>
+	  <IsOffensive>true</IsOffensive>
+	  <TargetDuration>0</TargetDuration>
+	  <InitialTargetEffectRange>
+		  <HealthPointsRange>
+			  <Minimum>8</Minimum>
+			  <Maximum>12</Maximum>
+		  </HealthPointsRange>
+	  </InitialTargetEffectRange>
+	  <AdjacentTargets>1</AdjacentTargets>
+	  <LevelingProgression>
+		  <HealthPoints>4</HealthPoints>
+	  </LevelingProgression>	
+	  <CreatingCueName>FireballCreate</CreatingCueName>
+	  <TravelingCueName>FireballTravel</TravelingCueName>
+	  <ImpactCueName>FireballHit</ImpactCueName>
+	  <BlockCueName>SpellBlock</BlockCueName>
+	  <IconTextureName>FireBallSmallIcon</IconTextureName>
+      <SpellSprite>
+          <TextureName>Spells\FireBallSmallSpell</TextureName>
+          <FrameDimensions>102 102</FrameDimensions>
+          <FramesPerRow>6</FramesPerRow>
+          <SourceOffset>20 20</SourceOffset>
+          <Animations>
+              <Item>
+                  <Name>Creation</Name>
+                  <StartingFrame>1</StartingFrame>
+                  <EndingFrame>12</EndingFrame>
+                  <Interval>50</Interval>
+                  <IsLoop>false</IsLoop>
+              </Item>
+              <Item>
+                  <Name>Traveling</Name>
+                  <StartingFrame>13</StartingFrame>
+                  <EndingFrame>18</EndingFrame>
+                  <Interval>50</Interval>
+                  <IsLoop>true</IsLoop>
+              </Item>
+              <Item>
+                  <Name>Impact</Name>
+                  <StartingFrame>19</StartingFrame>
+                  <EndingFrame>24</EndingFrame>
+                  <Interval>50</Interval>
+                  <IsLoop>false</IsLoop>
+              </Item>
+          </Animations>
+      </SpellSprite>
+      <Overlay>
+          <TextureName>Spells\Overlay</TextureName>
+          <FrameDimensions>222 177</FrameDimensions>
+          <FramesPerRow>4</FramesPerRow>
+          <Animations>
+              <Item>
+                  <StartingFrame>1</StartingFrame>
+                  <EndingFrame>4</EndingFrame>
+                  <Interval>200</Interval>
+                  <IsLoop>true</IsLoop>
+              </Item>
+          </Animations>
+	  </Overlay>
+  </Asset>
+</XnaContent>

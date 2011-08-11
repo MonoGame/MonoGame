@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Weapon">
+      <Name>Sage Staff</Name>
+      <Description>A sage staff belongs only to the greatest of spellcasters.</Description>
+      <GoldValue>500</GoldValue>
+      <IsDroppable>true</IsDroppable>
+      <MinimumCharacterLevel>5</MinimumCharacterLevel>
+      <SupportedClasses>
+          <Item>Wizard</Item>
+          <Item>Red Mage</Item>
+      </SupportedClasses>
+      <IconTextureName>Staff01c</IconTextureName>
+	  <OwnerBuffStatistics>
+		  <MagicPoints>20</MagicPoints>
+		  <MagicalOffense>12</MagicalOffense>
+		  <MagicalDefense>9</MagicalDefense>
+	  </OwnerBuffStatistics>
+	  <TargetDamageRange>
+		  <Minimum>10</Minimum>
+		  <Maximum>12</Maximum>
+	  </TargetDamageRange>
+	  <SwingCueName>StaffSwing</SwingCueName>
+      <HitCueName>StaffHit</HitCueName>
+      <BlockCueName>StaffBlock</BlockCueName>
+      <Overlay>
+          <TextureName>Spells\OverlayMelee</TextureName>
+          <FrameDimensions>111 130</FrameDimensions>
+          <FramesPerRow>1</FramesPerRow>
+          <Animations>
+              <Item>
+                  <StartingFrame>1</StartingFrame>
+                  <EndingFrame>1</EndingFrame>
+                  <Interval>200</Interval>
+                  <IsLoop>false</IsLoop>
+              </Item>
+          </Animations>
+      </Overlay>
+  </Asset>
+</XnaContent>

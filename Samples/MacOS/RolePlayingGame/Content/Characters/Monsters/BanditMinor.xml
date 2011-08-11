@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Monster">
+      <Name>Bandit Minor</Name>
+      <MapSprite>
+          <TextureName>Characters\Warrior2IdleLeft</TextureName>
+          <FrameDimensions>138 192</FrameDimensions>
+          <FramesPerRow>6</FramesPerRow>
+          <SourceOffset>69 125</SourceOffset>
+          <Animations />
+      </MapSprite>
+      <CharacterClassContentName>Warrior</CharacterClassContentName>
+      <CharacterLevel>4</CharacterLevel>
+      <InitialEquipmentContentNames>
+          <Item>Weapons\Claymore</Item>
+          <Item>Armor\HideArmor</Item>
+          <Item>Armor\HideShield</Item>
+          <Item>Armor\HideBoots</Item>
+          <Item>Armor\HideHelmet</Item>
+      </InitialEquipmentContentNames>
+      <Inventory>
+		  <Item>
+			  <ContentName>Items\MinorHealingPotion</ContentName>
+			  <Count>5</Count>
+		  </Item>
+	  </Inventory>
+	  <CombatSprite>
+          <TextureName>Characters\Warrior2AttackLeft</TextureName>
+          <FrameDimensions>288 192</FrameDimensions>
+          <FramesPerRow>6</FramesPerRow>
+          <SourceOffset>155 135</SourceOffset>
+          <Animations />
+      </CombatSprite>
+      <DefendPercentage>30</DefendPercentage>
+      <GearDrops>
+          <Item>
+              <GearName>Items\MinorHealingPotion</GearName>
+              <DropPercentage>60</DropPercentage>
+          </Item>
+          <Item>
+              <GearName>Armor\HideShield</GearName>
+              <DropPercentage>10</DropPercentage>
+          </Item>
+          <Item>
+              <GearName>Armor\HideArmor</GearName>
+              <DropPercentage>10</DropPercentage>
+          </Item>
+          <Item>
+              <GearName>Armor\HideBoots</GearName>
+              <DropPercentage>10</DropPercentage>
+          </Item>
+      </GearDrops>
+  </Asset>
+</XnaContent>

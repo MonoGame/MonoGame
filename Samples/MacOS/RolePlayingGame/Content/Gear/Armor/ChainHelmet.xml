@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Armor">
+      <Name>Chain Helmet</Name>
+      <Description>Iron links form a chain, providing mobility and superior protection.</Description>
+      <GoldValue>250</GoldValue>
+      <IsDroppable>true</IsDroppable>
+      <MinimumCharacterLevel>3</MinimumCharacterLevel>
+      <SupportedClasses>
+          <Item>Warrior</Item>
+          <Item>Paladin</Item>
+      </SupportedClasses>
+      <IconTextureName>Helmet01a</IconTextureName>
+      <Slot>Helmet</Slot>
+      <OwnerHealthDefenseRange>
+          <Minimum>4</Minimum>
+          <Maximum>6</Maximum>
+      </OwnerHealthDefenseRange>
+      <OwnerMagicDefenseRange>
+          <Minimum>3</Minimum>
+          <Maximum>4</Maximum>
+      </OwnerMagicDefenseRange>
+  </Asset>
+</XnaContent>

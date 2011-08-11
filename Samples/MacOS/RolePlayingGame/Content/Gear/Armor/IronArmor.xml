@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Armor">
+      <Name>Iron Armor</Name>
+      <Description>The iron armor set is inlaid with bronze.</Description>
+      <GoldValue>600</GoldValue>
+      <IsDroppable>true</IsDroppable>
+      <MinimumCharacterLevel>5</MinimumCharacterLevel>
+      <SupportedClasses>
+          <Item>Warrior</Item>
+          <Item>Paladin</Item>
+      </SupportedClasses>
+      <IconTextureName>Torso04a</IconTextureName>
+      <Slot>Torso</Slot>
+      <OwnerHealthDefenseRange>
+          <Minimum>15</Minimum>
+          <Maximum>20</Maximum>
+      </OwnerHealthDefenseRange>
+      <OwnerMagicDefenseRange>
+          <Minimum>10</Minimum>
+          <Maximum>12</Maximum>
+      </OwnerMagicDefenseRange>
+  </Asset>
+</XnaContent>

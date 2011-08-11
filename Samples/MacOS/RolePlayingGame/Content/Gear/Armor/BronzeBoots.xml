@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Armor">
+      <Name>Bronze Boots</Name>
+      <Description>The bronze armor set provides decent protection against most attacks.</Description>
+      <GoldValue>400</GoldValue>
+      <IsDroppable>true</IsDroppable>
+      <MinimumCharacterLevel>4</MinimumCharacterLevel>
+      <SupportedClasses>
+          <Item>Warrior</Item>
+          <Item>Paladin</Item>
+      </SupportedClasses>
+      <IconTextureName>Boots05e</IconTextureName>
+	  <Slot>Boots</Slot>
+      <OwnerHealthDefenseRange>
+          <Minimum>6</Minimum>
+          <Maximum>8</Maximum>
+      </OwnerHealthDefenseRange>
+      <OwnerMagicDefenseRange>
+          <Minimum>4</Minimum>
+          <Maximum>5</Maximum>
+      </OwnerMagicDefenseRange>
+  </Asset>
+</XnaContent>

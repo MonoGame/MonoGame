@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Quest">
+      <Name>The Goblin Brigade</Name>
+      <Description>The Goblin Brigade is blocking the path to Lush Village south of here.  Defeat them, please!</Description>
+      <ObjectiveMessage>Find the four Goblin Grunts, and teach them a lesson!</ObjectiveMessage>
+      <CompletionMessage>Friends, thank you for defeating those evil goblins.  That should teach those nasty critters to stop hijacking our roads... I hope.  It seems like there isn't a safe place in Mercadia anymore.</CompletionMessage>
+      <GearRequirements />
+      <MonsterRequirements>
+          <Item>
+              <ContentName>GoblinGrunt</ContentName>
+              <Count>4</Count>
+          </Item>
+      </MonsterRequirements>
+      <FixedCombatEntries>
+          <Item>
+              <ContentName>GoblinGrunts</ContentName>
+			  <MapPosition>10 8</MapPosition>
+			  <Direction>North</Direction>
+			  <MapContentName>Map002</MapContentName>
+		  </Item>
+		  <Item>
+			  <ContentName>GoblinGrunts</ContentName>
+			  <MapPosition>12 8</MapPosition>
+			  <Direction>North</Direction>
+			  <MapContentName>Map002</MapContentName>
+		  </Item>
+          <Item>
+              <ContentName>GoblinGrunts2</ContentName>
+			  <MapPosition>11 22</MapPosition>
+			  <Direction>North</Direction>
+			  <MapContentName>Map002</MapContentName>
+		  </Item>
+      </FixedCombatEntries>
+      <ChestEntries>
+          <Item>
+              <ContentName>MinorHealing</ContentName>
+			  <MapPosition>3 17</MapPosition>
+			  <MapContentName>Map002</MapContentName>
+		  </Item>
+          <Item>
+              <ContentName>MinorMagic</ContentName>
+			  <MapPosition>19 17</MapPosition>
+			  <MapContentName>Map002</MapContentName>
+		  </Item>
+      </ChestEntries>
+      <DestinationMapContentName>Map002</DestinationMapContentName>
+      <DestinationNpcContentName>JangElder</DestinationNpcContentName>
+      <DestinationObjectiveMessage>Visit Jang Elder to claim your reward, just northwest of here.</DestinationObjectiveMessage>
+      <ExperienceReward>320</ExperienceReward>
+      <GoldReward>100</GoldReward>
+      <GearRewardContentNames>
+          <Item>Items\POElixir</Item>
+          <Item>Items\MOElixir</Item>
+      </GearRewardContentNames>
+  </Asset>
+</XnaContent>

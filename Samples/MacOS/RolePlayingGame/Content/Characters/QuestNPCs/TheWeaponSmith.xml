@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.QuestNpc">
+      <Name>The Weapon Smith</Name>
+      <IntroductionDialogue>Be amazed at the incredible selection of weaponry available!</IntroductionDialogue>
+  </Asset>
+</XnaContent>

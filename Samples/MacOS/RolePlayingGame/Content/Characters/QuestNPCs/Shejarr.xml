@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.QuestNpc">
+      <Name>Shejarr</Name>
+      <MapSprite>
+          <TextureName>Characters\Villager2IdleRight</TextureName>
+          <FrameDimensions>92 120</FrameDimensions>
+          <FramesPerRow>6</FramesPerRow>
+          <SourceOffset>46 89</SourceOffset>
+          <Animations />
+      </MapSprite>
+      <MapIdleAnimationInterval>150</MapIdleAnimationInterval>
+      <IntroductionDialogue>I hear that Vashekk, the Defender of the Royal Kingdom of Mercadia is looking for comrades. Rumors say he's at the beach far east of Apple Village.  Hey, isn't that where those Bandits are hiding out?</IntroductionDialogue>
+  </Asset>
+</XnaContent>

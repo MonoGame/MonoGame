@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Weapon">
+      <Name>Tamar Blade</Name>
+      <Description>The sword is the personal weapon of the Tamar.</Description>
+      <GoldValue>-1</GoldValue>
+      <IsDroppable>true</IsDroppable>
+      <MinimumCharacterLevel>10</MinimumCharacterLevel>
+      <SupportedClasses>
+          <Item>Mystic</Item>
+      </SupportedClasses>
+      <IconTextureName>Sword02d</IconTextureName>
+	  <OwnerBuffStatistics>
+		  <HealthPoints>20</HealthPoints>
+		  <PhysicalOffense>10</PhysicalOffense>
+	  </OwnerBuffStatistics>
+	  <TargetDamageRange>
+          <Minimum>80</Minimum>
+          <Maximum>100</Maximum>
+      </TargetDamageRange>
+      <SwingCueName>SwordSwing</SwingCueName>
+      <HitCueName>SwordHit</HitCueName>
+      <BlockCueName>SwordBlock</BlockCueName>
+      <Overlay>
+          <TextureName>Spells\OverlayMelee</TextureName>
+          <FrameDimensions>111 130</FrameDimensions>
+          <FramesPerRow>1</FramesPerRow>
+          <Animations>
+              <Item>
+                  <StartingFrame>1</StartingFrame>
+                  <EndingFrame>1</EndingFrame>
+                  <Interval>200</Interval>
+                  <IsLoop>false</IsLoop>
+              </Item>
+          </Animations>
+      </Overlay>
+  </Asset>
+</XnaContent>

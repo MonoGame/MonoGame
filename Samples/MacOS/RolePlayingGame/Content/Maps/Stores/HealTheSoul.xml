@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Store">
+      <Name>Heal The Soul</Name>
+      <BuyMultiplier>1</BuyMultiplier>
+      <SellMultiplier>0.5</SellMultiplier>
+      <StoreCategories>
+          <Item>
+              <Name>Pick-Me-Ups</Name>
+              <AvailableContentNames>
+                  <Item>Items\MinorHealingPotion</Item>
+                  <Item>Items\MinorMagicPotion</Item>
+              </AvailableContentNames>
+          </Item>
+          <Item>
+              <Name>Boosters</Name>
+              <AvailableContentNames>
+                  <Item>Items\POElixir</Item>
+                  <Item>Items\MOElixir</Item>
+              </AvailableContentNames>
+          </Item>
+      </StoreCategories>
+      <WelcomeMessage>Welcome to the world of healing.  Please enjoy our selection of finely-concocted potions.</WelcomeMessage>
+      <ShopkeeperTextureName>ShopKeeper02</ShopkeeperTextureName>
+  </Asset>
+</XnaContent>

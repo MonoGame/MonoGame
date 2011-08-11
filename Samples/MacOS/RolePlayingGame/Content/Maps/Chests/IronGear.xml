@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<XnaContent><Asset Type="RolePlayingGameData.Chest">
+  <Name>Iron Gear</Name>
+  <Gold>500</Gold>
+  <Entries>
+    <Item>
+      <ContentName>Armor\IronArmor</ContentName>
+      <Count>1</Count>
+    </Item>
+    <Item>
+      <ContentName>Armor\IronShield</ContentName>
+      <Count>1</Count>
+    </Item>
+    <Item>
+      <ContentName>Armor\IronBoots</ContentName>
+      <Count>1</Count>
+    </Item>
+    <Item>
+      <ContentName>Armor\IronHelmet</ContentName>
+      <Count>1</Count>
+    </Item>
+  </Entries>
+  <TextureName>Chest1b</TextureName>
+</Asset></XnaContent>

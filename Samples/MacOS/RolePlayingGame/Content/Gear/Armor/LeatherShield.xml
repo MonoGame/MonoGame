@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Armor">
+      <Name>Leather Shield</Name>
+      <Description>This shield is made out of wood covered with hardened leather.</Description>
+      <GoldValue>150</GoldValue>
+      <IsDroppable>true</IsDroppable>
+      <MinimumCharacterLevel>2</MinimumCharacterLevel>
+      <SupportedClasses>
+          <Item>Warrior</Item>
+          <Item>Paladin</Item>
+          <Item>Barbarian</Item>
+      </SupportedClasses>
+      <IconTextureName>Shield05a</IconTextureName>
+      <Slot>Shield</Slot>
+      <OwnerHealthDefenseRange>
+          <Minimum>2</Minimum>
+          <Maximum>4</Maximum>
+      </OwnerHealthDefenseRange>
+      <OwnerMagicDefenseRange>
+          <Minimum>2</Minimum>
+          <Maximum>3</Maximum>
+      </OwnerMagicDefenseRange>
+  </Asset>
+</XnaContent>

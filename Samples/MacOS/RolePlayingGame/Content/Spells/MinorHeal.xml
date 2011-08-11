@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Spell">
+	  <Name>Minor Heal</Name>
+	  <Description>Low-Level Healing Spell.</Description>
+	  <MagicPointCost>8</MagicPointCost>
+	  <IsOffensive>false</IsOffensive>
+	  <TargetDuration>0</TargetDuration>
+	  <InitialTargetEffectRange>
+		  <HealthPointsRange>
+			  <Minimum>15</Minimum>
+			  <Maximum>15</Maximum>
+		  </HealthPointsRange>
+	  </InitialTargetEffectRange>
+	  <AdjacentTargets>0</AdjacentTargets>
+	  <LevelingProgression>
+		  <HealthPoints>5</HealthPoints>
+	  </LevelingProgression>	
+	  <CreatingCueName>HealCreate</CreatingCueName>
+      <TravelingCueName />
+	  <ImpactCueName>HealImpact</ImpactCueName>
+	  <BlockCueName>HealImpact</BlockCueName>
+	  <IconTextureName>HealSmallIcon</IconTextureName>
+      <SpellSprite>
+          <TextureName>Spells\HealSmallSpell</TextureName>
+          <FrameDimensions>102 102</FrameDimensions>
+          <FramesPerRow>6</FramesPerRow>
+          <SourceOffset>20 20</SourceOffset>
+          <Animations>
+              <Item>
+                  <Name>Creation</Name>
+                  <StartingFrame>1</StartingFrame>
+                  <EndingFrame>12</EndingFrame>
+                  <Interval>100</Interval>
+                  <IsLoop>false</IsLoop>
+              </Item>
+              <Item>
+                  <Name>Traveling</Name>
+                  <StartingFrame>12</StartingFrame>
+                  <EndingFrame>12</EndingFrame>
+                  <Interval>120</Interval>
+                  <IsLoop>true</IsLoop>
+              </Item>
+              <Item>
+                  <Name>Impact</Name>
+                  <StartingFrame>13</StartingFrame>
+                  <EndingFrame>18</EndingFrame>
+                  <Interval>200</Interval>
+                  <IsLoop>false</IsLoop>
+              </Item>
+          </Animations>
+      </SpellSprite>
+      <Overlay>
+          <TextureName>Spells\EffectSmall</TextureName>
+          <FrameDimensions>130 210</FrameDimensions>
+          <FramesPerRow>6</FramesPerRow>
+          <Animations>
+              <Item>
+                  <StartingFrame>1</StartingFrame>
+                  <EndingFrame>6</EndingFrame>
+                  <Interval>130</Interval>
+                  <IsLoop>false</IsLoop>
+              </Item>
+          </Animations>
+	  </Overlay>
+  </Asset>
+</XnaContent>

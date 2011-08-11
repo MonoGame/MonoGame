@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Weapon">
+      <Name>Bo Staff</Name>
+      <Description>The bo staff is primarily used for self-defense and immobilization.</Description>
+      <GoldValue>100</GoldValue>
+      <IsDroppable>true</IsDroppable>
+      <MinimumCharacterLevel>1</MinimumCharacterLevel>
+      <SupportedClasses />
+      <IconTextureName>Staff05a</IconTextureName>
+      <TargetDamageRange>
+          <Minimum>4</Minimum>
+          <Maximum>6</Maximum>
+      </TargetDamageRange>
+      <SwingCueName>StaffSwing</SwingCueName>
+      <HitCueName>StaffHit</HitCueName>
+      <BlockCueName>StaffBlock</BlockCueName>
+      <Overlay>
+          <TextureName>Spells\OverlayMelee</TextureName>
+          <FrameDimensions>111 130</FrameDimensions>
+          <FramesPerRow>1</FramesPerRow>
+          <Animations>
+              <Item>
+                  <StartingFrame>1</StartingFrame>
+                  <EndingFrame>1</EndingFrame>
+                  <Interval>200</Interval>
+                  <IsLoop>false</IsLoop>
+              </Item>
+          </Animations>
+      </Overlay>
+  </Asset>
+</XnaContent>

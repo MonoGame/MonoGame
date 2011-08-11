@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Monster">
+      <Name>Sir Shire</Name>
+      <MapSprite>
+          <TextureName>Characters\Warrior3IdleLeft</TextureName>
+          <FrameDimensions>138 192</FrameDimensions>
+          <FramesPerRow>6</FramesPerRow>
+          <SourceOffset>69 125</SourceOffset>
+          <Animations />
+      </MapSprite>
+      <CharacterClassContentName>Warrior</CharacterClassContentName>
+      <CharacterLevel>1</CharacterLevel>
+      <InitialEquipmentContentNames>
+          <Item>Weapons\ShortSword</Item>
+      </InitialEquipmentContentNames>
+      <Inventory />
+      <CombatSprite>
+          <TextureName>Characters\Warrior3AttackLeft</TextureName>
+          <FrameDimensions>288 192</FrameDimensions>
+          <FramesPerRow>6</FramesPerRow>
+          <SourceOffset>155 140</SourceOffset>
+          <Animations />
+      </CombatSprite>
+      <DefendPercentage>30</DefendPercentage>
+      <GearDrops>
+          <Item>
+              <GearName>Weapons\ShortSwordPlus</GearName>
+              <DropPercentage>100</DropPercentage>
+          </Item>
+          <Item>
+              <GearName>Items\MinorHealingPotion</GearName>
+              <DropPercentage>100</DropPercentage>
+          </Item>
+          <Item>
+              <GearName>Items\MinorHealingPotion</GearName>
+              <DropPercentage>100</DropPercentage>
+          </Item>
+      </GearDrops>
+  </Asset>
+</XnaContent>

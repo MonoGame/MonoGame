@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Quest">
+      <Name>Save Mercadia</Name>
+      <Description>The evil Tamar has stolen the sacred amulet which binds the world of Mercadia together.  Without it, Mercadia is doomed... despair shall overwhelm the populace as volcanoes erupt, earthquakes devour villages, tornadoes engulf the landscape, and hurricanes destroy the harvest fields.  Civilization will come to an end, and darkness will rise to consume the world.  Mercadia needs a Savior!  Mercadia needs you!</Description>
+      <ObjectiveMessage />
+      <CompletionMessage>Welcome, hero.  You must meet new comrades, earn necessary experience, gold, spells, and the equipment required to challenge and defeat the evil Tamar, who resides in his lair, known as the Unspoken Tower.  Be wary!  The Unspoken Tower is filled with monstrosities that only the most hardened of heroes could possibly face.  Good Luck!</CompletionMessage>
+      <GearRequirements />
+      <MonsterRequirements />
+      <FixedCombatEntries />
+      <ChestEntries />
+      <DestinationMapContentName>Map001</DestinationMapContentName>
+      <DestinationNpcContentName>Sheddarr</DestinationNpcContentName>
+      <DestinationObjectiveMessage>Go and speak with Shed-darr the Wise.</DestinationObjectiveMessage>
+      <ExperienceReward>40</ExperienceReward>
+      <GoldReward>0</GoldReward>
+      <GearRewardContentNames />
+  </Asset>
+</XnaContent>
