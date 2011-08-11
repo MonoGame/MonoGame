@@ -87,6 +87,12 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 		
+		public Rectangle Bounds {
+			get {
+				return new Rectangle (0,0,texture.ImageWidth, texture.ImageHeight);
+			}
+		}
+		
 		internal Texture2D(ESImage theImage)
 		{
 			texture = theImage;

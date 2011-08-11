@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>10.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{25465464-21B2-4C14-8E3C-3B9F8C131484}</ProjectGuid>
+    <ProjectTypeGuids>{EFBA0AD7-5A72-4C68-AF49-83D382785DCF};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <RootNamespace>CardsFramework.Android</RootNamespace>
+    <MonoAndroidAssetsPrefix>Assets</MonoAndroidAssetsPrefix>
+    <MonoAndroidResourcePrefix>Resources</MonoAndroidResourcePrefix>
+    <AssemblyName>CardsFramework.Android</AssemblyName>
+    <TargetFrameworkVersion>v2.2</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <AndroidLinkMode>None</AndroidLinkMode>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <AndroidUseSharedRuntime>false</AndroidUseSharedRuntime>
+    <AndroidLinkMode>SdkOnly</AndroidLinkMode>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="Mono.Android" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\MacOS\Cards\CardsFramework\Cards\CardPacket.cs">
+      <Link>Cards\CardPacket.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Cards\CardsFramework\Cards\Hand.cs">
+      <Link>Cards\Hand.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Cards\CardsFramework\Cards\TraditionalCard.cs">
+      <Link>Cards\TraditionalCard.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Cards\CardsFramework\Game\CardsGame.cs">
+      <Link>Game\CardsGame.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Cards\CardsFramework\Players\Player.cs">
+      <Link>Players\Player.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Cards\CardsFramework\Properties\AssemblyInfo.cs">
+      <Link>Properties\AssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Cards\CardsFramework\Rules\GameRule.cs">
+      <Link>Rules\GameRule.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Cards\CardsFramework\UI\AnimatedCardsGameComponent.cs">
+      <Link>UI\AnimatedCardsGameComponent.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Cards\CardsFramework\UI\AnimatedGameComponent.cs">
+      <Link>UI\AnimatedGameComponent.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Cards\CardsFramework\UI\AnimatedGameComponentAnimation.cs">
+      <Link>UI\AnimatedGameComponentAnimation.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Cards\CardsFramework\UI\AnimatedHandGameComponent.cs">
+      <Link>UI\AnimatedHandGameComponent.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Cards\CardsFramework\UI\FlipGameComponentAnimation.cs">
+      <Link>UI\FlipGameComponentAnimation.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Cards\CardsFramework\UI\FramesetGameComponentAnimation.cs">
+      <Link>UI\FramesetGameComponentAnimation.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Cards\CardsFramework\UI\GameTable.cs">
+      <Link>UI\GameTable.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Cards\CardsFramework\UI\ScaleGameComponentAnimation.cs">
+      <Link>UI\ScaleGameComponentAnimation.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Cards\CardsFramework\UI\TransitionGameComponentAnimation.cs">
+      <Link>UI\TransitionGameComponentAnimation.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Cards\CardsFramework\Utils\MathUtility.cs">
+      <Link>Utils\MathUtility.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Cards\CardsFramework\Utils\UIUtilty.cs">
+      <Link>Utils\UIUtilty.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\MonoGame.Framework\MonoGame.Framework.Android.csproj">
+      <Project>{BA9476CF-99BA-4D03-92F2-73D2C5E58883}</Project>
+      <Name>MonoGame.Framework.Android</Name>
+    </ProjectReference>
+  </ItemGroup>
+</Project>

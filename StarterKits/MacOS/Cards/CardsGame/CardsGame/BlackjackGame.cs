@@ -11,6 +11,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Globalization;
+
+#if ANDROID
+using Android.App;
+#endif
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
@@ -18,8 +24,8 @@ using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
+
 using CardsFramework;
-using System.Globalization;
 using GameStateManagement;
 #endregion
 
@@ -39,7 +45,11 @@ namespace Blackjack
         /// <summary>
         /// Initializes a new instance of the game.
         /// </summary>
-        public BlackjackGame()
+#if ANDROID 
+		public BlackjackGame (Activity activity) : base (activity)
+#else 
+        public BlackjackGame ()  
+#endif
         {
             graphics = new GraphicsDeviceManager(this);
 
