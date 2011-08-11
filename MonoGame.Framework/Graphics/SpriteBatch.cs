@@ -71,7 +71,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 		
 		public void End()
-		{		
+		{					
 			// Disable Blending by default = BlendState.Opaque
 			GL.Disable(All.Blend);
 			
@@ -131,9 +131,10 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			// Enable Scissor Tests if necessary
 			if ( this.graphicsDevice.RasterizerState.ScissorTestEnable )
+			{
 				GL.Enable(All.ScissorTest);
-			else
-				GL.Disable(All.ScissorTest);
+			}
+			
 			
 			GL.MatrixMode(All.Modelview);			
 			
@@ -161,6 +162,11 @@ namespace Microsoft.Xna.Framework.Graphics
 			GL.Color4(1.0f, 1.0f, 1.0f, 1.0f);						
 			
 			_batcher.DrawBatch ( _sortMode );
+			
+			if (this.graphicsDevice.RasterizerState.ScissorTestEnable)
+            {
+               GL.Disable(All.ScissorTest);
+            }
 		}
 		
 		public void Draw 

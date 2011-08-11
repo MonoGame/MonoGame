@@ -62,7 +62,7 @@ Global
 		{25465464-21B2-4C14-8E3C-3B9F8C131484} = {58ECF36E-6B65-4330-B44B-22232B472512}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = Samples\Android\Peer2Peer\MonoGame.Samples.Peer2Peer.Android.csproj
+		StartupItem = Samples\Android\Draw2D\MonoGame.Samples.Draw2D.Android.csproj
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
