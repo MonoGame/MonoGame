@@ -112,7 +112,8 @@ namespace Microsoft.Xna.Framework.Storage
 					return new DriveInfo(GetDevicePath).AvailableFreeSpace;
 				}
 				catch (Exception) {
-					return 0;
+					StorageDeviceHelper.Path = StorageRoot;
+					return StorageDeviceHelper.FreeSpace;
 				}
 			} 
 		}
@@ -144,7 +145,8 @@ namespace Microsoft.Xna.Framework.Storage
 					return new DriveInfo(GetDevicePath).TotalSize;
 				}
 				catch (Exception) {
-					return 0;
+					StorageDeviceHelper.Path = StorageRoot;
+					return StorageDeviceHelper.TotalSpace;
 				}
 					
 			} 
