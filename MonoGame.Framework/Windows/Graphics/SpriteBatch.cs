@@ -107,7 +107,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Disable Blending by default = BlendState.Opaque
             GL.Disable(EnableCap.Blend);
-
+            
             // set the blend mode
             if (_blendState == BlendState.NonPremultiplied)
             {
@@ -174,7 +174,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Enable Scissor Tests if necessary
             if (this.graphicsDevice.RasterizerState.ScissorTestEnable)
-            {
+            {                
                 GL.Scissor(this.graphicsDevice.ScissorRectangle.X, this.graphicsDevice.ScissorRectangle.Y, this.graphicsDevice.ScissorRectangle.Width, this.graphicsDevice.ScissorRectangle.Height);
             }
 
@@ -201,9 +201,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
             spriteEffect.CurrentTechnique.Passes[0].Apply();
 
-
+            if (this.graphicsDevice.RasterizerState.ScissorTestEnable)
+            {
+                GL.Disable(EnableCap.ScissorTest);
+            }            
         }
-
+  
         public void Draw(Texture2D texture,
                 Vector2 position,
                 Nullable<Rectangle> sourceRectangle,
