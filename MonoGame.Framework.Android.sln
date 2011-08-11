@@ -11,12 +11,24 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lidgren.Network.Android", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Samples.Peer2Peer.Android", "Samples\Android\Peer2Peer\MonoGame.Samples.Peer2Peer.Android.csproj", "{56F6C06F-6F07-402E-89A5-39EDB037A516}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "StarterKits", "StarterKits", "{92B7443B-C82B-4B44-89A9-11C29CA34CF7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Cards", "Cards", "{58ECF36E-6B65-4330-B44B-22232B472512}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blackjack.Android", "StarterKits\Android\Cards\Blackjack.Android.csproj", "{9B7D8FCF-5A3B-48D6-B9E7-4C3C0D0632F6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CardsFramework.Android", "StarterKits\Android\Cards\CardsFramework.Android.csproj", "{25465464-21B2-4C14-8E3C-3B9F8C131484}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{25465464-21B2-4C14-8E3C-3B9F8C131484}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{25465464-21B2-4C14-8E3C-3B9F8C131484}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{25465464-21B2-4C14-8E3C-3B9F8C131484}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{25465464-21B2-4C14-8E3C-3B9F8C131484}.Release|Any CPU.Build.0 = Release|Any CPU
 		{565129E0-4EE5-4F6F-B403-C3484C9740BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{565129E0-4EE5-4F6F-B403-C3484C9740BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{565129E0-4EE5-4F6F-B403-C3484C9740BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -29,6 +41,10 @@ Global
 		{616BBFA6-52F2-40A1-AA76-1CF2BD6390D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{616BBFA6-52F2-40A1-AA76-1CF2BD6390D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{616BBFA6-52F2-40A1-AA76-1CF2BD6390D5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9B7D8FCF-5A3B-48D6-B9E7-4C3C0D0632F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B7D8FCF-5A3B-48D6-B9E7-4C3C0D0632F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B7D8FCF-5A3B-48D6-B9E7-4C3C0D0632F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B7D8FCF-5A3B-48D6-B9E7-4C3C0D0632F6}.Release|Any CPU.Build.0 = Release|Any CPU
 		{BA9476CF-99BA-4D03-92F2-73D2C5E58883}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{BA9476CF-99BA-4D03-92F2-73D2C5E58883}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BA9476CF-99BA-4D03-92F2-73D2C5E58883}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -39,6 +55,11 @@ Global
 		{F05F90DC-DD37-4967-A96A-8D36C1C23E81}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F05F90DC-DD37-4967-A96A-8D36C1C23E81}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
 		{F05F90DC-DD37-4967-A96A-8D36C1C23E81}.Release|Any CPU.Deploy.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{58ECF36E-6B65-4330-B44B-22232B472512} = {92B7443B-C82B-4B44-89A9-11C29CA34CF7}
+		{9B7D8FCF-5A3B-48D6-B9E7-4C3C0D0632F6} = {58ECF36E-6B65-4330-B44B-22232B472512}
+		{25465464-21B2-4C14-8E3C-3B9F8C131484} = {58ECF36E-6B65-4330-B44B-22232B472512}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = Samples\Android\Peer2Peer\MonoGame.Samples.Peer2Peer.Android.csproj
