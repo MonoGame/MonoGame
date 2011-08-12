@@ -146,13 +146,13 @@ namespace NetworkPrediction
         {
             if (IsActive)
             {
-                /*if (Gamer.SignedInGamers.Count == 0)
+                if (Gamer.SignedInGamers.Count == 0)
                 {
                     // If there are no profiles signed in, we cannot proceed.
                     // Show the Guide so the user can sign in.
                     Guide.ShowSignIn(maxLocalGamers, false);
                 }
-                else*/
+                else
                 if (IsPressed(Keys.A, Buttons.A))
                 {
                     // Create a new session?
