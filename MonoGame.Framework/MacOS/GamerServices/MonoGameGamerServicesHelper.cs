@@ -42,10 +42,6 @@ namespace Microsoft.Xna.Framework.GamerServices
 					BinaryFormatter bin = new BinaryFormatter ();
 
 					profiles = (List<MonoGameLocalGamerProfile>)bin.Deserialize (stream);
-					foreach (var profile in profiles) {
-						Console.WriteLine ("{0}", 
-					profile);
-					}
 				}
 				
 			} catch (IOException) {
