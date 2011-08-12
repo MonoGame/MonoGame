@@ -3,29 +3,31 @@ Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Framework.Linux", "MonoGame.Framework\MonoGame.Framework.Linux.csproj", "{35253CE1-C864-4CD3-8249-4D1319748E8F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lidgren.Network.Linux", "ThirdParty\Lidgren.Network\Lidgren.Network.Linux.csproj", "{AE483C29-042E-4226-BA52-D247CE7676DA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{5E0991E0-AFF1-424F-BD95-E866AB9F1973}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Samples.AsteroidBeltAssault.Linux", "Samples\Linux\BookSourceCode\XNAGameDevelopmentbyExampleCode\AsteroidBeltAssault\MonoGame.Samples.AsteroidBeltAssault.Linux.csproj", "{86A219E2-C8F0-452B-B762-C69D5BB07C99}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Samples.ChaseAndEvade.Linux", "Samples\Linux\ChaseAndEvade\MonoGame.Samples.ChaseAndEvade.Linux.csproj", "{86A619E2-C8F0-452B-B764-C69D5BB07C98}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Samples.Draw2D.Linux", "Samples\Linux\Draw2D\MonoGame.Samples.Draw2D.Linux.csproj", "{8CFEF1FE-9E32-43EB-A730-EB3AACDC77B1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Samples.FloodControl.Linux", "Samples\Linux\BookSourceCode\XNAGameDevelopmentbyExampleCode\FloodControl\MonoGame.Samples.FloodControl.Linux.csproj", "{86A219E2-C8F1-422B-C762-C69D5BB07C98}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Samples.NetRumble.Linux", "Samples\Linux\NetRumble\MonoGame.Samples.NetRumble.Linux.csproj", "{52735207-2136-433B-A3E4-4C082728EED8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Samples.Peer2PeerSample.Linux", "Samples\Linux\Peer2PeerSample\MonoGame.Samples.Peer2PeerSample.Linux.csproj", "{86A619E2-C8D0-452B-B762-C69D5BB07C98}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Samples.RobotRampage.Linux", "Samples\Linux\BookSourceCode\XNAGameDevelopmentbyExampleCode\RobotRampage\MonoGame.Samples.RobotRampage.Linux.csproj", "{86A219E2-C8F0-452B-B762-C69D5BB07C98}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Samples.Sound.Linux", "Samples\Linux\Sound\MonoGame.Samples.Sound.Linux.csproj", "{8CFEF2EE-5E32-43EB-A730-EB3AACDC77B1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Samples.SpriteEffects.Linux", "Samples\Linux\SpriteEffects\MonoGame.Samples.SpriteEffects.Linux.csproj", "{86A919E2-D7F0-452B-B762-C69D5BB07C98}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Samples.Tetris.Linux", "Samples\Linux\Tetris\MonoGame.Samples.Tetris.Linux.csproj", "{86A619E2-C8F0-452B-B762-C69D5BB07C98}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Samples.TiledSprites.Linux", "Samples\Linux\TiledSprites\MonoGame.Samples.TiledSprites.Linux.csproj", "{86A619E2-C8F0-452B-A762-C69D5BB07C98}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Samples.ChaseAndEvade.Linux", "Samples\Linux\ChaseAndEvade\MonoGame.Samples.ChaseAndEvade.Linux.csproj", "{86A619E2-C8F0-452B-B764-C69D5BB07C98}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Samples.Peer2PeerSample.Linux", "Samples\Linux\Peer2PeerSample\MonoGame.Samples.Peer2PeerSample.Linux.csproj", "{86A619E2-C8D0-452B-B762-C69D5BB07C98}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Samples.SpriteEffects.Linux", "Samples\Linux\SpriteEffects\MonoGame.Samples.SpriteEffects.Linux.csproj", "{86A919E2-D7F0-452B-B762-C69D5BB07C98}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Samples.Sound.Linux", "Samples\Linux\Sound\MonoGame.Samples.Sound.Linux.csproj", "{8CFEF2EE-5E32-43EB-A730-EB3AACDC77B1}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lidgren.Network.Linux", "ThirdParty\Lidgren.Network\Lidgren.Network.Linux.csproj", "{AE483C29-042E-4226-BA52-D247CE7676DA}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Samples.NetRumble.Linux", "Samples\Linux\NetRumble\MonoGame.Samples.NetRumble.Linux.csproj", "{52735207-2136-433B-A3E4-4C082728EED8}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Samples.RobotRampage.Linux", "Samples\Linux\BookSourceCode\XNAGameDevelopmentbyExampleCode\RobotRampage\MonoGame.Samples.RobotRampage.Linux.csproj", "{86A219E2-C8F0-452B-B762-C69D5BB07C98}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Samples.AsteroidBeltAssault.Linux", "Samples\Linux\BookSourceCode\XNAGameDevelopmentbyExampleCode\AsteroidBeltAssault\MonoGame.Samples.AsteroidBeltAssault.Linux.csproj", "{86A219E2-C8F0-452B-B762-C69D5BB07C99}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Samples.FloodControl.Linux", "Samples\Linux\BookSourceCode\XNAGameDevelopmentbyExampleCode\FloodControl\MonoGame.Samples.FloodControl.Linux.csproj", "{86A219E2-C8F1-422B-C762-C69D5BB07C98}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -85,6 +87,19 @@ Global
 		{AE483C29-042E-4226-BA52-D247CE7676DA}.Debug|x86.Build.0 = Debug|Any CPU
 		{AE483C29-042E-4226-BA52-D247CE7676DA}.Release|x86.ActiveCfg = Release|Any CPU
 		{AE483C29-042E-4226-BA52-D247CE7676DA}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{86A219E2-C8F0-452B-B762-C69D5BB07C99} = {5E0991E0-AFF1-424F-BD95-E866AB9F1973}
+		{86A619E2-C8F0-452B-B764-C69D5BB07C98} = {5E0991E0-AFF1-424F-BD95-E866AB9F1973}
+		{8CFEF1FE-9E32-43EB-A730-EB3AACDC77B1} = {5E0991E0-AFF1-424F-BD95-E866AB9F1973}
+		{86A219E2-C8F1-422B-C762-C69D5BB07C98} = {5E0991E0-AFF1-424F-BD95-E866AB9F1973}
+		{52735207-2136-433B-A3E4-4C082728EED8} = {5E0991E0-AFF1-424F-BD95-E866AB9F1973}
+		{86A619E2-C8D0-452B-B762-C69D5BB07C98} = {5E0991E0-AFF1-424F-BD95-E866AB9F1973}
+		{86A219E2-C8F0-452B-B762-C69D5BB07C98} = {5E0991E0-AFF1-424F-BD95-E866AB9F1973}
+		{8CFEF2EE-5E32-43EB-A730-EB3AACDC77B1} = {5E0991E0-AFF1-424F-BD95-E866AB9F1973}
+		{86A919E2-D7F0-452B-B762-C69D5BB07C98} = {5E0991E0-AFF1-424F-BD95-E866AB9F1973}
+		{86A619E2-C8F0-452B-B762-C69D5BB07C98} = {5E0991E0-AFF1-424F-BD95-E866AB9F1973}
+		{86A619E2-C8F0-452B-A762-C69D5BB07C98} = {5E0991E0-AFF1-424F-BD95-E866AB9F1973}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = Samples\Linux\SpriteEffects\MonoGame.Samples.SpriteEffects.Linux.csproj
