@@ -15,43 +15,29 @@ using MonoTouch.Foundation;
 using MonoTouch.UIKit;
 #endif
 
-using Microsoft.Xna.Framework;
 #endregion
 
 namespace Marblets
 {
-#if IPHONE
 	[Register ("AppDelegate")]
-	class  Program : MonoGameProgram
+	class Program : UIApplicationDelegate 
 	{
-		public override bool FinishedLaunching (UIApplication app, NSDictionary options)
+		public override void FinishedLaunching (UIApplication app)
 		{
 			// Fun begins..
-			MonoGameGame = new MarbletsGame(); 
-            MonoGameGame.Run();
+			using (MarbletsGame game = new MarbletsGame())
+            {
+                game.Run();
+            }
 			
-			return true;
+			//MediaLibrary lib = new MediaLibrary();
+			//object result = lib.Playlists;
 		}
-		
+
 		static void Main (string [] args)
 		{
 			UIApplication.Main (args,null,"AppDelegate");
 		}
 	}
-#else
-    static class Program
-    {
-        /// <summary>
-        /// The main entry point for the application.
-        /// </summary>
-        static void Main()
-        {
-            using (MarbletsGame game = new MarbletsGame())
-            {
-                game.Run();
-            }
-        }
-    }
-#endif
 }
 
