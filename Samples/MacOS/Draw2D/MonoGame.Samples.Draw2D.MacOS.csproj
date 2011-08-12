@@ -10,7 +10,6 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>MonoGame.Samples.Draw2D.MacOS</RootNamespace>
     <AssemblyName>MonoGame.Samples.Draw2D.MacOS</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <StartupObject>Microsoft.Xna.Samples.Draw2D.Program</StartupObject>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">

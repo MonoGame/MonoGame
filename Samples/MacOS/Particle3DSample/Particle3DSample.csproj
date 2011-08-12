@@ -10,7 +10,6 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>Particle3DSample</RootNamespace>
     <AssemblyName>Particle3DSample</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -36,9 +35,7 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Drawing" />
-    <Reference Include="MonoMac">
-      <SpecificVersion>False</SpecificVersion>
-    </Reference>
+    <Reference Include="MonoMac" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />

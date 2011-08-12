@@ -10,7 +10,6 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>BlackJack.MacOS</RootNamespace>
     <AssemblyName>BlackJack.MacOS</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -37,9 +36,7 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Drawing" />
-    <Reference Include="MonoMac">
-      <SpecificVersion>False</SpecificVersion>
-    </Reference>
+    <Reference Include="MonoMac" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.MacOS.cs" />

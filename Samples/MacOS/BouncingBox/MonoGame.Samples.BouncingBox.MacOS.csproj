@@ -10,7 +10,6 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>Microsoft.Xna.Samples.BouncingBox.MacOS</RootNamespace>
     <AssemblyName>Microsoft.Xna.Samples.BouncingBox.MacOS</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
