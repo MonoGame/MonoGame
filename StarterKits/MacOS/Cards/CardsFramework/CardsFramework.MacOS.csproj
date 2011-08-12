@@ -10,7 +10,6 @@
     <OutputType>Library</OutputType>
     <RootNamespace>CardsFramework.MacOS</RootNamespace>
     <AssemblyName>CardsFramework.MacOS</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
