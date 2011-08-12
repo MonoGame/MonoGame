@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Weapon">
+      <Name>Club</Name>
+      <Description>The club is a basic bludgeoning weapon.</Description>
+      <GoldValue>200</GoldValue>
+      <IsDroppable>true</IsDroppable>
+      <MinimumCharacterLevel>1</MinimumCharacterLevel>
+      <SupportedClasses>
+          <Item>Barbarian</Item>
+      </SupportedClasses>
+      <IconTextureName>Club02a</IconTextureName>
+      <TargetDamageRange>
+          <Minimum>6</Minimum>
+          <Maximum>15</Maximum>
+      </TargetDamageRange>
+      <SwingCueName>StaffSwing</SwingCueName>
+      <HitCueName>StaffHit</HitCueName>
+      <BlockCueName>StaffBlock</BlockCueName>
+      <Overlay>
+          <TextureName>Spells\OverlayMelee</TextureName>
+          <FrameDimensions>111 130</FrameDimensions>
+          <FramesPerRow>1</FramesPerRow>
+          <Animations>
+              <Item>
+                  <StartingFrame>1</StartingFrame>
+                  <EndingFrame>1</EndingFrame>
+                  <Interval>200</Interval>
+                  <IsLoop>false</IsLoop>
+              </Item>
+          </Animations>
+      </Overlay>
+  </Asset>
+</XnaContent>

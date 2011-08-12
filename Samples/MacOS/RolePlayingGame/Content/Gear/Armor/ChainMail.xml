@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Armor">
+      <Name>Chain Mail</Name>
+      <Description>Iron links form a chain, providing mobility and superior protection.</Description>
+      <GoldValue>350</GoldValue>
+      <IsDroppable>true</IsDroppable>
+      <MinimumCharacterLevel>3</MinimumCharacterLevel>
+      <SupportedClasses>
+          <Item>Warrior</Item>
+          <Item>Paladin</Item>
+      </SupportedClasses>
+      <IconTextureName>Torso07a</IconTextureName>
+      <Slot>Torso</Slot>
+      <OwnerHealthDefenseRange>
+          <Minimum>6</Minimum>
+          <Maximum>10</Maximum>
+      </OwnerHealthDefenseRange>
+      <OwnerMagicDefenseRange>
+          <Minimum>5</Minimum>
+          <Maximum>8</Maximum>
+      </OwnerMagicDefenseRange>
+  </Asset>
+</XnaContent>

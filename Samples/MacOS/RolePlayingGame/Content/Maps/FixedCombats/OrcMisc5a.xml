@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<XnaContent><Asset Type="RolePlayingGameData.FixedCombat">
+  <Name>Orc Misc 5a</Name>
+  <Entries>
+    <Item>
+      <ContentName>OrcGrunt</ContentName>
+      <Count>3</Count>
+    </Item>
+    <Item>
+      <ContentName>OrcSoldier</ContentName>
+      <Count>2</Count>
+    </Item>
+  </Entries>
+</Asset></XnaContent>

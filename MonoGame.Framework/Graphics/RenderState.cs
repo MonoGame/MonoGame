@@ -45,6 +45,7 @@ using OpenTK.Graphics.ES11;
 
 namespace Microsoft.Xna.Framework
 {
+	[Obsolete("Removed from XNA 4")]
 	public sealed class RenderState
 	{
 

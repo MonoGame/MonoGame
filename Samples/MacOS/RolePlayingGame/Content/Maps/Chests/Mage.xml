@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<XnaContent><Asset Type="RolePlayingGameData.Chest">
+  <Name>Mage</Name>
+  <Gold>1000</Gold>
+  <Entries>
+    <Item>
+      <ContentName>Armor\MageBoots</ContentName>
+      <Count>1</Count>
+    </Item>
+    <Item>
+      <ContentName>Armor\MageHood</ContentName>
+      <Count>1</Count>
+    </Item>
+    <Item>
+      <ContentName>Weapons\MagicStaff</ContentName>
+      <Count>1</Count>
+    </Item>
+  </Entries>
+  <TextureName>Chest1g</TextureName>
+</Asset></XnaContent>

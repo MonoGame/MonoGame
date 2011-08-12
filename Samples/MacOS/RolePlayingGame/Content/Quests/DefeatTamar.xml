@@ -1,0 +1,120 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Quest">
+      <Name>Defeat Tamar</Name>
+      <Description>Your quest will only be complete once you have defeated the evil Tamar.  Good luck, Hero.</Description>
+      <ObjectiveMessage>Find the evil Tamar in his treacherous dungeon that lies south of Apple Village. Defeat him, and save the world of Mercadia!</ObjectiveMessage>
+      <CompletionMessage>Congratulations! You have defeated the evil Tamar and saved Mercadia!</CompletionMessage>
+      <GearRequirements />
+      <MonsterRequirements>
+          <Item>
+              <ContentName>Tamar</ContentName>
+              <Count>1</Count>
+          </Item>
+      </MonsterRequirements>
+      <FixedCombatEntries>
+          <Item>
+              <ContentName>Tamar</ContentName>
+			  <MapPosition>11 5</MapPosition>
+			  <Direction>South</Direction>
+			  <MapContentName>Map016</MapContentName>
+		  </Item>
+      </FixedCombatEntries>
+      <ChestEntries>
+          <Item>
+              <ContentName>POElixir</ContentName>
+			  <MapPosition>4 8</MapPosition>
+			  <MapContentName>Map016</MapContentName>
+		  </Item>
+          <Item>
+              <ContentName>MOElixir</ContentName>
+			  <MapPosition>18 8</MapPosition>
+			  <MapContentName>Map016</MapContentName>
+		  </Item>
+          <Item>
+              <ContentName>MDElixir</ContentName>
+			  <MapPosition>6 8</MapPosition>
+			  <MapContentName>Map016</MapContentName>
+		  </Item>
+          <Item>
+              <ContentName>PDElixir</ContentName>
+			  <MapPosition>16 8</MapPosition>
+			  <MapContentName>Map016</MapContentName>
+		  </Item>
+          <Item>
+              <ContentName>GoldPlus</ContentName>
+			  <MapPosition>6 4</MapPosition>
+			  <MapContentName>Map016</MapContentName>
+		  </Item>
+          <Item>
+              <ContentName>GoldPlus</ContentName>
+			  <MapPosition>7 4</MapPosition>
+			  <MapContentName>Map016</MapContentName>
+		  </Item>
+          <Item>
+              <ContentName>GoldPlus</ContentName>
+			  <MapPosition>8 4</MapPosition>
+			  <MapContentName>Map016</MapContentName>
+		  </Item>
+		  <Item>
+			  <ContentName>GoldPlus</ContentName>
+			  <MapPosition>9 4</MapPosition>
+			  <MapContentName>Map016</MapContentName>
+		  </Item>
+          <Item>
+              <ContentName>GoldPlus</ContentName>
+			  <MapPosition>10 4</MapPosition>
+			  <MapContentName>Map016</MapContentName>
+		  </Item>
+          <Item>
+              <ContentName>GoldPlus</ContentName>
+			  <MapPosition>11 4</MapPosition>
+			  <MapContentName>Map016</MapContentName>
+		  </Item>
+          <Item>
+              <ContentName>GoldPlus</ContentName>
+			  <MapPosition>12 4</MapPosition>
+			  <MapContentName>Map016</MapContentName>
+		  </Item>
+          <Item>
+              <ContentName>GoldPlus</ContentName>
+			  <MapPosition>13 4</MapPosition>
+			  <MapContentName>Map016</MapContentName>
+		  </Item>
+          <Item>
+              <ContentName>GoldPlus</ContentName>
+			  <MapPosition>14 4</MapPosition>
+			  <MapContentName>Map016</MapContentName>
+		  </Item>
+          <Item>
+              <ContentName>GoldPlus</ContentName>
+			  <MapPosition>15 4</MapPosition>
+			  <MapContentName>Map016</MapContentName>
+		  </Item>
+		  <Item>
+			  <ContentName>GoldPlus</ContentName>
+			  <MapPosition>16 4</MapPosition>
+			  <MapContentName>Map016</MapContentName>
+		  </Item>
+      </ChestEntries>
+      <DestinationMapContentName>Map001</DestinationMapContentName>
+      <DestinationNpcContentName>Sheddarr</DestinationNpcContentName>
+      <DestinationObjectiveMessage>Go and speak with Shed-darr the Wise.</DestinationObjectiveMessage>
+      <ExperienceReward>5000</ExperienceReward>
+      <GoldReward>10000</GoldReward>
+      <GearRewardContentNames>
+          <Item>Items\POElixir</Item>
+          <Item>Items\POElixir</Item>
+          <Item>Items\POElixir</Item>
+          <Item>Items\PDElixir</Item>
+          <Item>Items\PDElixir</Item>
+          <Item>Items\PDElixir</Item>
+          <Item>Items\MOElixir</Item>
+          <Item>Items\MOElixir</Item>
+          <Item>Items\MOElixir</Item>
+          <Item>Items\MDElixir</Item>
+          <Item>Items\MDElixir</Item>
+          <Item>Items\MDElixir</Item>
+      </GearRewardContentNames>
+  </Asset>
+</XnaContent>

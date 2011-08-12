@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Quest">
+      <Name>Save Lush Village... Again</Name>
+      <Description>Clear out the goblin horde around Lush Village to the south.  Again.</Description>
+      <ObjectiveMessage>Eliminate those pesky Goblin Grunts!</ObjectiveMessage>
+      <CompletionMessage>Congratulations! You have defeated ANOTHER set of Goblin Grunts!  Maybe now they'll learn their lesson.</CompletionMessage>
+      <GearRequirements />
+      <MonsterRequirements>
+          <Item>
+              <ContentName>GoblinGrunt</ContentName>
+              <Count>4</Count>
+          </Item>
+      </MonsterRequirements>
+      <FixedCombatEntries>
+          <Item>
+              <ContentName>GoblinGrunts2</ContentName>
+			  <MapPosition>11 24</MapPosition>
+			  <Direction>North</Direction>
+			  <MapContentName>Map003</MapContentName>
+		  </Item>
+		  <Item>
+			  <ContentName>GoblinGrunts2</ContentName>
+			  <MapPosition>11 21</MapPosition>
+			  <Direction>North</Direction>
+			  <MapContentName>Map003</MapContentName>
+		  </Item>
+      </FixedCombatEntries>
+      <ChestEntries />
+      <DestinationMapContentName />
+      <DestinationNpcContentName />
+      <DestinationObjectiveMessage />
+      <ExperienceReward>300</ExperienceReward>
+      <GoldReward>150</GoldReward>
+      <GearRewardContentNames>
+          <Item>Items\PDElixir</Item>
+          <Item>Items\MDElixir</Item>
+      </GearRewardContentNames>
+  </Asset>
+</XnaContent>

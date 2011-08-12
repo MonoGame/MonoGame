@@ -1,0 +1,114 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.CharacterClass">
+      <Name>Red Mage</Name>
+      <InitialStatistics>
+          <HealthPoints>20</HealthPoints>
+          <MagicPoints>25</MagicPoints>
+          <PhysicalOffense>5</PhysicalOffense>
+          <PhysicalDefense>3</PhysicalDefense>
+          <MagicalOffense>15</MagicalOffense>
+          <MagicalDefense>5</MagicalDefense>          
+      </InitialStatistics>
+      <LevelingStatistics>
+          <HealthPointsIncrease>5</HealthPointsIncrease>
+          <LevelsPerHealthPointsIncrease>1</LevelsPerHealthPointsIncrease>
+          <MagicPointsIncrease>13</MagicPointsIncrease>
+          <LevelsPerMagicPointsIncrease>1</LevelsPerMagicPointsIncrease>
+          <PhysicalOffenseIncrease>1</PhysicalOffenseIncrease>
+          <LevelsPerPhysicalOffenseIncrease>1</LevelsPerPhysicalOffenseIncrease>
+          <PhysicalDefenseIncrease>1</PhysicalDefenseIncrease>
+          <LevelsPerPhysicalDefenseIncrease>1</LevelsPerPhysicalDefenseIncrease>
+          <MagicalOffenseIncrease>2</MagicalOffenseIncrease>
+          <LevelsPerMagicalOffenseIncrease>1</LevelsPerMagicalOffenseIncrease>
+          <MagicalDefenseIncrease>2</MagicalDefenseIncrease>
+          <LevelsPerMagicalDefenseIncrease>1</LevelsPerMagicalDefenseIncrease>
+      </LevelingStatistics>
+      <LevelEntries>
+          <Item>
+              <ExperiencePoints>100</ExperiencePoints>
+              <SpellContentNames>
+                  <Item>FireBolt</Item>
+              </SpellContentNames>
+          </Item>
+          <Item>
+              <ExperiencePoints>150</ExperiencePoints>
+              <SpellContentNames />
+          </Item>
+          <Item>
+              <ExperiencePoints>200</ExperiencePoints>
+              <SpellContentNames>
+                  <Item>FireBolt</Item>
+              </SpellContentNames>
+          </Item>
+          <Item>
+              <ExperiencePoints>250</ExperiencePoints>
+              <SpellContentNames>
+                  <Item>FireBlast</Item>
+              </SpellContentNames>
+          </Item>
+          <Item>
+              <ExperiencePoints>300</ExperiencePoints>
+              <SpellContentNames />
+          </Item>
+          <Item>
+              <ExperiencePoints>350</ExperiencePoints>
+              <SpellContentNames>
+                  <Item>FireBlast</Item>
+              </SpellContentNames>
+          </Item>
+          <Item>
+              <ExperiencePoints>400</ExperiencePoints>
+              <SpellContentNames />
+          </Item>
+          <Item>
+              <ExperiencePoints>450</ExperiencePoints>
+              <SpellContentNames>
+                  <Item>FireBomb</Item>
+              </SpellContentNames>
+          </Item>
+          <Item>
+              <ExperiencePoints>500</ExperiencePoints>
+              <SpellContentNames />
+          </Item>
+          <Item>
+              <ExperiencePoints>550</ExperiencePoints>
+              <SpellContentNames>
+                  <Item>FireBlast</Item>
+              </SpellContentNames>
+          </Item>
+          <Item>
+              <ExperiencePoints>600</ExperiencePoints>
+              <SpellContentNames />
+          </Item>
+          <Item>
+              <ExperiencePoints>650</ExperiencePoints>
+              <SpellContentNames>
+                  <Item>FireBomb</Item>
+              </SpellContentNames>
+          </Item>
+          <Item>
+              <ExperiencePoints>700</ExperiencePoints>
+              <SpellContentNames />
+          </Item>
+          <Item>
+              <ExperiencePoints>750</ExperiencePoints>
+              <SpellContentNames />
+          </Item>
+          <Item>
+              <ExperiencePoints>800</ExperiencePoints>
+              <SpellContentNames>
+                  <Item>FireBomb</Item>
+              </SpellContentNames>
+          </Item>
+          <Item>
+              <ExperiencePoints>0</ExperiencePoints>
+              <SpellContentNames>
+                  <Item>IceBlast</Item>
+              </SpellContentNames>
+          </Item>
+      </LevelEntries>
+      <BaseExperienceValue>20</BaseExperienceValue>
+      <BaseGoldValue>10</BaseGoldValue>
+  </Asset>
+</XnaContent>

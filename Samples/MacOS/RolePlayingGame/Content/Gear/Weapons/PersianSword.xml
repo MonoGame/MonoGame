@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Weapon">
+      <Name>Persian Sword</Name>
+      <Description>The curved sword with unbridled attack speed.</Description>
+      <GoldValue>450</GoldValue>
+      <IsDroppable>true</IsDroppable>
+      <MinimumCharacterLevel>4</MinimumCharacterLevel>
+      <SupportedClasses>
+          <Item>Warrior</Item>
+          <Item>Paladin</Item>
+      </SupportedClasses>
+      <IconTextureName>Sword08a</IconTextureName>
+      <TargetDamageRange>
+          <Minimum>30</Minimum>
+          <Maximum>45</Maximum>
+      </TargetDamageRange>
+      <SwingCueName>SwordSwing</SwingCueName>
+      <HitCueName>SwordHit</HitCueName>
+      <BlockCueName>SwordBlock</BlockCueName>
+      <Overlay>
+          <TextureName>Spells\OverlayMelee</TextureName>
+          <FrameDimensions>111 130</FrameDimensions>
+          <FramesPerRow>1</FramesPerRow>
+          <Animations>
+              <Item>
+                  <StartingFrame>1</StartingFrame>
+                  <EndingFrame>1</EndingFrame>
+                  <Interval>200</Interval>
+                  <IsLoop>false</IsLoop>
+              </Item>
+          </Animations>
+      </Overlay>
+  </Asset>
+</XnaContent>

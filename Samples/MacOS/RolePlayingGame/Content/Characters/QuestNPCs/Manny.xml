@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.QuestNpc">
+      <Name>Ayttas</Name>
+      <MapSprite>
+          <TextureName>Characters\Villager2IdleRight</TextureName>
+          <FrameDimensions>92 120</FrameDimensions>
+          <FramesPerRow>6</FramesPerRow>
+          <SourceOffset>46 89</SourceOffset>
+          <Animations />
+      </MapSprite>
+      <MapIdleAnimationInterval>150</MapIdleAnimationInterval>
+      <IntroductionDialogue>Welcome to Apple Village!  Unfortunately, we're not in the best of shape right now because of these monstrosities.  But enjoy your stay anyway!  What choice is there, after all?</IntroductionDialogue>
+  </Asset>
+</XnaContent>

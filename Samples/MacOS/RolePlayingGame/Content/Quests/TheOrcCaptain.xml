@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Quest">
+      <Name>The Orc Captain</Name>
+      <Description>The Orc Captain is creating a ruckus south of here.  He has stolen some Sir Thansharp's prized possessions.  Find him and defeat him.  Whatever you find is yours.</Description>
+      <ObjectiveMessage>Teach the Orc Captain how to behave himself.  You'll have to kill him, of course.</ObjectiveMessage>
+      <CompletionMessage>Enjoy the prized possessions of Sir Thansharp.  You deserve it!</CompletionMessage>
+      <GearRequirements />
+      <MonsterRequirements>
+          <Item>
+              <ContentName>OrcCaptain</ContentName>
+              <Count>1</Count>
+          </Item>
+      </MonsterRequirements>
+	  <FixedCombatEntries>
+		  <Item>
+			  <ContentName>OrcMisc3d</ContentName>
+			  <MapPosition>11 27</MapPosition>
+			  <Direction>North</Direction>
+			  <MapContentName>Map004</MapContentName>
+		  </Item>
+	  </FixedCombatEntries>
+      <ChestEntries />
+      <DestinationMapContentName />
+      <DestinationNpcContentName />
+      <DestinationObjectiveMessage />
+      <ExperienceReward>500</ExperienceReward>
+      <GoldReward>250</GoldReward>
+      <GearRewardContentNames>
+          <Item>Items\POElixir</Item>
+          <Item>Items\PDElixir</Item>
+          <Item>Items\MOElixir</Item>
+          <Item>Items\MDElixir</Item>
+      </GearRewardContentNames>
+  </Asset>
+</XnaContent>

@@ -177,22 +177,22 @@ namespace Marblets
             if ((MarbletsGame.StorageDevice != null) &&
                 MarbletsGame.StorageDevice.IsConnected)
             {
-                using (StorageContainer storageContainer =
-                    MarbletsGame.StorageDevice.OpenContainer("Marblets"))
-                {
-                    string highscoresPath = Path.Combine(storageContainer.Path,
-                                                         "highscores.xml");
-                    if (File.Exists(highscoresPath))
-                    {
-                        using (FileStream file =
-                            File.Open(highscoresPath, FileMode.Open))
-                        {
-                            XmlSerializer serializer =
-                                new XmlSerializer(typeof(List<int>));
-                            HighScores = (List<int>)serializer.Deserialize(file);
-                        }
-                    }
-                }
+//                using (StorageContainer storageContainer =
+//                    MarbletsGame.StorageDevice.OpenContainer("Marblets"))
+//                {
+//                    string highscoresPath = Path.Combine(storageContainer.Path,
+//                                                         "highscores.xml");
+//                    if (File.Exists(highscoresPath))
+//                    {
+//                        using (FileStream file =
+//                            File.Open(highscoresPath, FileMode.Open))
+//                        {
+//                            XmlSerializer serializer =
+//                                new XmlSerializer(typeof(List<int>));
+//                            HighScores = (List<int>)serializer.Deserialize(file);
+//                        }
+//                    }
+//                }
             }
         }
 
@@ -209,8 +209,8 @@ namespace Marblets
             //graphicsService.GraphicsDevice.RenderState.AlphaSourceBlend =
                 //Blend.SourceAlpha;
 
-            graphicsService.GraphicsDevice.RenderState.DestinationBlend =
-                Blend.InverseSourceAlpha;
+            //graphicsService.GraphicsDevice.RenderState.DestinationBlend =
+                //Blend.InverseSourceAlpha;
 
             //Ask static helper objects to reload too
             Font.LoadContent();

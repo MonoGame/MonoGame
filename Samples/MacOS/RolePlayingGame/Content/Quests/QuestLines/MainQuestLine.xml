@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.QuestLine">
+      <Name>Main Quest Line</Name>
+      <QuestContentNames>
+          <Item>SaveMercadia</Item>
+          <Item>HideArmor</Item>
+          <Item>ShortSword</Item>
+          <Item>TestBattle</Item>
+          <Item>TheGoblinBrigade</Item>
+          <Item>LushVillage</Item>
+          <Item>TheOrcCaptain</Item>
+          <Item>TheBanditLeader</Item>
+          <Item>DefeatTamar</Item>
+      </QuestContentNames>
+  </Asset>
+</XnaContent>

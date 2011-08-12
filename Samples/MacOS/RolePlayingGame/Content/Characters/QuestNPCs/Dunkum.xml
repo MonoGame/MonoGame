@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.QuestNpc">
+      <Name>Dunkum</Name>
+      <MapSprite>
+          <TextureName>Characters\Villager3IdleRight</TextureName>
+          <FrameDimensions>92 120</FrameDimensions>
+          <FramesPerRow>6</FramesPerRow>
+          <SourceOffset>46 89</SourceOffset>
+          <Animations />
+      </MapSprite>
+      <MapIdleAnimationInterval>150</MapIdleAnimationInterval>
+      <IntroductionDialogue>Have you checked out the weaponsmith's shop?  He has pretty good stuff, but he rips you off when you try to sell your gear.  Be careful!</IntroductionDialogue>
+  </Asset>
+</XnaContent>

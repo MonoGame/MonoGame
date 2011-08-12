@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<XnaContent><Asset Type="RolePlayingGameData.Chest">
+  <Name>Money Bags</Name>
+  <Gold>5000</Gold>
+  <Entries>
+    <Item>
+      <ContentName>Items\POElixir</ContentName>
+      <Count>6</Count>
+    </Item>
+    <Item>
+      <ContentName>Items\PDElixir</ContentName>
+      <Count>6</Count>
+    </Item>
+    <Item>
+      <ContentName>Items\MOElixir</ContentName>
+      <Count>6</Count>
+    </Item>
+    <Item>
+      <ContentName>Items\MDElixir</ContentName>
+      <Count>6</Count>
+    </Item>
+  </Entries>
+  <TextureName>Chest1d</TextureName>
+</Asset></XnaContent>

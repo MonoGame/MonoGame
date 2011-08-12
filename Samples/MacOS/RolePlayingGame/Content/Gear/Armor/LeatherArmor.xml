@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Armor">
+      <Name>Leather Armor</Name>
+      <Description>This armor set is made out of hardened leather.</Description>
+      <GoldValue>200</GoldValue>
+      <IsDroppable>true</IsDroppable>
+      <MinimumCharacterLevel>2</MinimumCharacterLevel>
+      <SupportedClasses>
+          <Item>Warrior</Item>
+          <Item>Paladin</Item>
+          <Item>Barbarian</Item>
+      </SupportedClasses>
+      <IconTextureName>Torso08a</IconTextureName>
+      <Slot>Torso</Slot>
+      <OwnerHealthDefenseRange>
+          <Minimum>3</Minimum>
+          <Maximum>6</Maximum>
+      </OwnerHealthDefenseRange>
+      <OwnerMagicDefenseRange>
+          <Minimum>3</Minimum>
+          <Maximum>5</Maximum>
+      </OwnerMagicDefenseRange>
+  </Asset>
+</XnaContent>

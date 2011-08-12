@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Armor">
+      <Name>Steel Armor</Name>
+      <Description>The steel armor set is made of the hardest metal for maximum defense.</Description>
+      <GoldValue>750</GoldValue>
+      <IsDroppable>true</IsDroppable>
+      <MinimumCharacterLevel>6</MinimumCharacterLevel>
+      <SupportedClasses>
+          <Item>Warrior</Item>
+          <Item>Paladin</Item>
+      </SupportedClasses>
+      <IconTextureName>Torso02a</IconTextureName>
+      <Slot>Torso</Slot>
+      <OwnerHealthDefenseRange>
+          <Minimum>20</Minimum>
+          <Maximum>25</Maximum>
+      </OwnerHealthDefenseRange>
+      <OwnerMagicDefenseRange>
+          <Minimum>12</Minimum>
+          <Maximum>15</Maximum>
+      </OwnerMagicDefenseRange>
+  </Asset>
+</XnaContent>

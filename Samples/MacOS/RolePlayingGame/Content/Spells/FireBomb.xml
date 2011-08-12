@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+    <Asset Type="RolePlayingGameData.Spell">
+        <Name>Fire Bomb</Name>
+        <Description>High-Level Fire Spell.</Description>
+        <MagicPointCost>50</MagicPointCost>
+        <IsOffensive>true</IsOffensive>
+        <TargetDuration>0</TargetDuration>
+        <InitialTargetEffectRange>
+            <HealthPointsRange>
+                <Minimum>45</Minimum>
+                <Maximum>60</Maximum>
+            </HealthPointsRange>
+        </InitialTargetEffectRange>
+        <AdjacentTargets>0</AdjacentTargets>
+        <LevelingProgression>
+            <HealthPoints>15</HealthPoints>
+        </LevelingProgression>
+        <CreatingCueName>FireballCreate</CreatingCueName>
+        <TravelingCueName>FireballTravel</TravelingCueName>
+        <ImpactCueName>FireballHit</ImpactCueName>
+        <BlockCueName>FireballHit</BlockCueName>
+        <IconTextureName>FireBallLargeIcon</IconTextureName>
+        <SpellSprite>
+            <TextureName>Spells\FireBallLargeSpell</TextureName>
+            <FrameDimensions>102 102</FrameDimensions>
+            <FramesPerRow>6</FramesPerRow>
+            <SourceOffset>20 20</SourceOffset>
+            <Animations>
+                <Item>
+                    <Name>Creation</Name>
+                    <StartingFrame>1</StartingFrame>
+                    <EndingFrame>12</EndingFrame>
+                    <Interval>50</Interval>
+                    <IsLoop>false</IsLoop>
+                </Item>
+                <Item>
+                    <Name>Traveling</Name>
+                    <StartingFrame>13</StartingFrame>
+                    <EndingFrame>18</EndingFrame>
+                    <Interval>50</Interval>
+                    <IsLoop>true</IsLoop>
+                </Item>
+                <Item>
+                    <Name>Impact</Name>
+                    <StartingFrame>19</StartingFrame>
+                    <EndingFrame>24</EndingFrame>
+                    <Interval>50</Interval>
+                    <IsLoop>false</IsLoop>
+                </Item>
+            </Animations>
+        </SpellSprite>
+        <Overlay>
+            <TextureName>Spells\Overlay2</TextureName>
+            <FrameDimensions>222 177</FrameDimensions>
+            <FramesPerRow>4</FramesPerRow>
+            <Animations>
+                <Item>
+                    <StartingFrame>1</StartingFrame>
+                    <EndingFrame>4</EndingFrame>
+                    <Interval>200</Interval>
+                    <IsLoop>true</IsLoop>
+                </Item>
+            </Animations>
+        </Overlay>
+    </Asset>
+</XnaContent>

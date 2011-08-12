@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Store">
+      <Name>The Weaponsmith</Name>
+      <BuyMultiplier>1.5</BuyMultiplier>
+      <SellMultiplier>0.5</SellMultiplier>
+      <StoreCategories>
+          <Item>
+              <Name>Weapons</Name>
+              <AvailableContentNames>
+                  <Item>Weapons\ShortSword</Item>
+                  <Item>Weapons\Claymore</Item>
+                  <Item>Weapons\SpikedClub</Item>
+                  <Item>Weapons\MagicStaff</Item>
+              </AvailableContentNames>
+          </Item>
+          <Item>
+              <Name>Armor</Name>
+              <AvailableContentNames>
+                  <Item>Armor\HideArmor</Item>
+                  <Item>Armor\LeatherArmor</Item>
+                  <Item>Armor\BronzeArmor</Item>
+                  <Item>Armor\WornRobe</Item>
+              </AvailableContentNames>
+          </Item>
+          <Item>
+              <Name>Shields</Name>
+              <AvailableContentNames>
+                  <Item>Armor\HideShield</Item>
+                  <Item>Armor\LeatherShield</Item>
+                  <Item>Armor\IronShield</Item>
+              </AvailableContentNames>
+          </Item>
+          <Item>
+              <Name>Helmets</Name>
+              <AvailableContentNames>
+                  <Item>Armor\HideHelmet</Item>
+                  <Item>Armor\LeatherHelmet</Item>
+                  <Item>Armor\BronzeHelmet</Item>
+                  <Item>Armor\WornMageHood</Item>
+              </AvailableContentNames>
+          </Item>
+          <Item>
+              <Name>Boots</Name>
+              <AvailableContentNames>
+                  <Item>Armor\HideBoots</Item>
+                  <Item>Armor\LeatherBoots</Item>
+                  <Item>Armor\BronzeBoots</Item>
+                  <Item>Armor\WornMageBoots</Item>
+              </AvailableContentNames>
+          </Item>
+      </StoreCategories>
+      <WelcomeMessage>You won't find a better selection for miles around!</WelcomeMessage>
+      <ShopkeeperTextureName>ShopKeeper02</ShopkeeperTextureName>
+  </Asset>
+</XnaContent>

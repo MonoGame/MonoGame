@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Armor">
+      <Name>Legendary robe</Name>
+      <Description>The legendary armor set is very powerful and of unknown origin.</Description>
+      <GoldValue>-1</GoldValue>
+      <IsDroppable>true</IsDroppable>
+      <MinimumCharacterLevel>10</MinimumCharacterLevel>
+      <SupportedClasses>
+          <Item>Wizard</Item>
+          <Item>Red Mage</Item>
+      </SupportedClasses>
+      <IconTextureName>Torso05a</IconTextureName>
+	  <OwnerBuffStatistics>
+		  <MagicPoints>30</MagicPoints>
+		  <PhysicalDefense>5</PhysicalDefense>
+		  <MagicalOffense>5</MagicalOffense>
+		  <MagicalDefense>5</MagicalDefense>
+	  </OwnerBuffStatistics>
+	  <Slot>Torso</Slot>
+      <OwnerHealthDefenseRange>
+          <Minimum>25</Minimum>
+          <Maximum>35</Maximum>
+      </OwnerHealthDefenseRange>
+      <OwnerMagicDefenseRange>
+          <Minimum>35</Minimum>
+          <Maximum>50</Maximum>
+      </OwnerMagicDefenseRange>
+  </Asset>
+</XnaContent>

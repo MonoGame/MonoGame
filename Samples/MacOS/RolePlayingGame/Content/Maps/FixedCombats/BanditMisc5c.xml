@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<XnaContent><Asset Type="RolePlayingGameData.FixedCombat">
+  <Name>Bandit Misc 5c</Name>
+  <Entries>
+    <Item>
+      <ContentName>BanditMaster</ContentName>
+      <Count>3</Count>
+    </Item>
+    <Item>
+      <ContentName>BanditMage</ContentName>
+      <Count>2</Count>
+    </Item>
+  </Entries>
+</Asset></XnaContent>

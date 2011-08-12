@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<XnaContent><Asset Type="RolePlayingGameData.Chest">
+  <Name>Leather Gear</Name>
+  <Gold>500</Gold>
+  <Entries>
+    <Item>
+      <ContentName>Armor\LeatherArmor</ContentName>
+      <Count>1</Count>
+    </Item>
+    <Item>
+      <ContentName>Armor\LeatherShield</ContentName>
+      <Count>1</Count>
+    </Item>
+    <Item>
+      <ContentName>Armor\LeatherBoots</ContentName>
+      <Count>1</Count>
+    </Item>
+    <Item>
+      <ContentName>Armor\LeatherHelmet</ContentName>
+      <Count>1</Count>
+    </Item>
+  </Entries>
+  <TextureName>Chest1b</TextureName>
+</Asset></XnaContent>

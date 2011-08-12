@@ -1,0 +1,383 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Map">
+      <Name>Map014</Name>
+      <MapDimensions>35 29</MapDimensions>
+      <TileSize>64 64</TileSize>
+      <SpawnMapPosition>5 22</SpawnMapPosition>
+      <TextureName>DungeonTiles</TextureName>
+      <CombatTextureName>CombatBkgdDungeon</CombatTextureName>
+      <MusicCueName>DungeonTheme</MusicCueName>
+      <CombatMusicCueName>BattleTheme</CombatMusicCueName>
+      <BaseLayer>
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  70  74  74  74  74  -1  -1  -1  -1  -1  -1  74  74  74  74  74  -1  -1  -1  -1  -1  -1  -1  -1  -1  74  71  -1  -1  -1  -1
+          -1  -1  -1  -1  74  -1  74  -1  74  -1  -1  -1  -1  -1  -1  74  -1  -1  -1  74  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  74  74  74  74  74  -1  -1  -1  -1  -1  -1  74  74  75  74  74  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  75  75  75  75  75  -1  -1  -1  -1  -1  -1  75  75  74  75  75  -1  -1  -1  -1  -1  -1  76  76  76  76  76  -1  -1  -1  -1
+          -1  -1  -1  -1  75  -1  -1  -1  75  -1  -1  -1  -1  -1  -1  75  -1  -1  -1  75  -1  -1  -1  -1  -1  -1  76  -1  -1  -1  76  -1  -1  -1  -1
+          -1  -1  -1  -1  72  75  75  75  75  -1  -1  -1  -1  -1  -1  75  75  75  75  75  -1  -1  -1  -1  -1  -1  76  76  76  75  73  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1 129 129  -1  -1  -1 129 129  -1  -1  -1  -1  -1 129 129  -1  -1  -1 129 129  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  19  -1  75  -1  74  -1  69  69  -1  -1  -1  69  69  -1  -1  74  -1  -1  69  69  -1  -1  -1  69  69  75  74  75  75  -1  -1  -1  -1
+          -1  -1  -1  -1  75  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  75  -1  -1  -1  -1
+          -1  -1  -1  -1  75  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  75  -1  -1  -1  -1
+          -1  -1  -1  -1  75  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  75  -1  -1  -1  -1
+          -1  -1  19  -1  75  75  75  75  75  75  75  75  75  75  75  75  75  75  75  75  75  75  75  75  75  75  75  75  75  75  75  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+      </BaseLayer>
+      <FringeLayer>
+          6   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   7
+          0  69  69  69  11  95  96  97  11  69  69  69  69  69  69  11  95  96  97  11  69  69  69  69  69  69  11  95  96  97  11  69  69  69   1
+          0  18  69  69  66  98 136 100  66  69  69  69  18  69  69  66  98 102 100  66  69  69  69  18  69  69  66  98 136 100  66  69  69  69   1
+          0  18  19  10 129  99 137 101 129  30  28  27  18  19  10 129  99 103 101 129  30  28  27  18  19  10 129  99 137 101 129  30  28  27   1
+          0  18  19  20 182 182  74  74  71  29  28  27  18  19  20  70  74  74  74  71  29  28  27  18  19  20  70  74  74 182 182  29  28  27   1
+          0  18  19  20  77  69  69  69  76  29  28  27  18  19  20  77  69  69  69  76  29  28  27  18  19  20  77  69  69  69  76  29  28  27   1
+          0  18  19  20  72  75  75  75  73  29  28  27  18  19  20  72  75 182  75  73  29  28  27  18  19  20  72  75  75  75  73  29  28  27   1
+          0  18  19  17  23  23  23  23  23  24  28  27  18  19  17  23  23  23  23  23  24  28  27  18  19  17  23  23  23  23  23  24  28  27   1
+          0  15  21  21  21  21  21  21  21  21  21  26  15  21  21  21  21  21  21  21  21  21  26  15  21  21  21  21  21  21  21  21  21  26   1
+          0  69  69  69  11  95  96  97  11  69  69  69  69  69  69  11  95  96  97  11  69  69  69  69  69  69  11  95  96  97  11  69  69  69   1
+          0  18  69  69  66  98 136 100  66  69  69  69  18  69  69  66  98 136 100  66  69  69  69  18  69  69  66  98 136 100  66  69  69  69   1
+          0  18  19  10 129  99 137 101 129  30  28  27  18  19  10 129  99 137 101 129  30  28  27  18  19  10 129  99 137 101 129  30  28  27   1
+          0  18  19  20  70  74  74  74  71  29  28  27  18  19  20  70  74 182  74  71  29  28  27  18  19  20  70  74  74  74  71  29  28  27   1
+          0  18  19  20  77  69  69  69  76  29  28  27  18  19  20  77  69  69  69  76  29  28  27  18  19  20  77  69  69  69  76  29  28  27   1
+          0  18  19  20 182 182  75  75  73  29  28  27  18  19  20  72  75  75  75  73  29  28  27  18  19  20  72  75  75 182 182  29  28  27   1
+          0  18  19  17  23  23  23  23  23  24  28  27  18  19  17  23  23  23  23  23  24  28  27  18  19  17  23  23  23  23  23  24  28  27   1
+          0  15  21  21  21  21  21  21  21  21  21  26  15  21  21  21  21  21  21  21  21  21  26  15  21  21  21  21  21  21  21  21  21  26   1
+          0  59  60  37  11  95  96  97  11  11  11  11  11  11  11  11  95  96  97  11  11  11  11  11  11  11  11  95  96  97  11  48  59  60   1
+          0  53  54  36  66  98 136 100  66 153  13  13  13 153  12  66  98 136 100  66  12 153  12  12  12 153  66  98 136 100  66  49  53  54   1
+          0  33  34  35 129  99 137 101 147 147 129 129 129 147 147 129  99 137 101 129 147 147 129 129 129 147 147  99 137 101 129  50  51  52   1
+          0  18 152  20  70  74 182  74 148 148 145 145 145 148 148  74  74 182  74  74 148 148 145 145 145 148 148  74 182  74  71  29  28  27   1
+          0 116 117 118  77  69  69  69  69  69  69  69  69  69  69  69  69  69  69  69  69  69  69  69  69  69  69  69  69  69  76  29 176  27   1
+          0 112 102 119  77  69  69  69  69  69  69  69  69  69  69  69  69  69  69  69  69  69  69  69  69  69  69  69  69  69  76  29 176  27   1
+          0 113 114 115  77  69  69  69  69  69  69  69  69  69  69  69  69  69  69  69  69  69  69  69  69  69  69  69  69  69  76  29 176  27   1
+          0  18 150  20  72  75  75  75  75  75  75  75  75  75  75  75  75  75  75  75  75  75  75  75  75  75  75  75  75  75  73  29  28  27   1
+          0  40  41  42  23  23  23  23  23  23  23  23  23  23  23  23  23  23  23  23  23  23  23  23  23  23  23  23  23  23  23  45  46  47   1
+          0  59  60  39  12  12  12  12  12 154  12  12  12 154  12  12  12  12  12  12  12 154  12  12  12 154  12  12  12  12  12  44  59  60   1
+          0  53  54  38  21  21  21  21  21  21  21  21  21  21  21  21  21  21  21  21  21  21  21  21  21  21  21  21  21  21  21  43  53  54   1
+          4   2   2   2   2   2   2   2   2   2   2   2   2   2   2   2   2   2   2   2   2   2   2   2   2   2   2   2   2   2   2   2   2   2   5
+      </FringeLayer>
+      <ObjectLayer>
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1   8  11  11  -1  -1  -1  -1  -1  11  11  32   8  11  11  -1  -1  -1  -1  -1  11  11  32   8  11  11  -1  -1  -1  -1  -1  11  11  32  -1
+          -1  -1   9  12  -1  -1  -1  -1  -1  12  31  27  -1   9  12  -1  -1  -1  -1  -1  12  31  27  -1   9  12  -1  -1  -1  -1  -1  12  31  27  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1   8  11  11  -1  -1  -1  -1  -1  11  11  32   8  11  11  -1  -1  -1  -1  -1  11  11  32   8  11  11  -1  -1  -1  -1  -1  11  11  32  -1
+          -1  -1   9  12  -1  -1  -1  -1  -1  12  31  27  -1   9  12  -1  -1  -1  -1  -1  12  31  27  -1   9  12  -1  -1  -1  -1  -1  12  31  27  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+          -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+      </ObjectLayer>
+      <CollisionLayer>
+          0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+          0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+          0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+          0   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   0   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   0
+          0   0   0   1   0   0   0   0   0   1   0   0   0   0   1   0   0   0   0   0   1   0   0   0   0   1   0   0   0   0   0   1   0   0   0
+          0   0   0   1   0   0   0   0   0   1   0   0   0   0   1   0   0   0   0   0   1   0   0   0   0   1   0   0   0   0   0   1   0   0   0
+          0   0   0   1   0   0   0   0   0   1   0   0   0   0   1   0   0   0   0   0   1   0   0   0   0   1   0   0   0   0   0   1   0   0   0
+          0   0   0   1   1   1   1   1   1   1   0   0   0   0   1   1   1   1   1   1   1   0   0   0   0   1   1   1   1   1   1   1   0   0   0
+          0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+          0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+          0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+          0   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   0
+          0   0   0   1   0   0   0   0   0   1   0   0   0   0   1   0   0   0   0   0   1   0   0   0   0   1   0   0   0   0   0   1   0   0   0
+          0   0   0   1   0   0   0   0   0   1   0   0   0   0   1   0   0   0   0   0   1   0   0   0   0   1   0   0   0   0   0   1   0   0   0
+          0   0   0   1   0   0   0   0   0   1   0   0   0   0   1   0   0   0   0   0   1   0   0   0   0   1   0   0   0   0   0   1   0   0   0
+          0   0   0   1   1   1   1   1   1   1   0   0   0   0   1   1   1   1   1   1   1   0   0   0   0   1   1   1   1   1   1   1   0   0   0
+          0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+          0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+          0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+          0   0   0   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   0   0   0
+          0   0   0   1   0   0   0   0   1   1   1   1   1   1   1   0   0   0   0   0   1   1   1   1   1   1   1   0   0   0   0   1   0   0   0
+          0   0   0   1   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   1   0   0   0
+          0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   1   0   0   0
+          0   0   0   1   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   1   0   0   0
+          0   0   0   1   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   1   0   0   0
+          0   0   0   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   0   0   0
+          0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+          0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+          0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+      </CollisionLayer>
+      <Portals>
+          <Item>
+			  <Name>P1</Name>
+			  <LandingMapPosition>5 22</LandingMapPosition>
+              <DestinationMapContentName>Map012</DestinationMapContentName>
+              <DestinationMapPortalName>P3</DestinationMapPortalName>
+          </Item>
+          <Item>
+			  <Name>P2</Name>
+			  <LandingMapPosition>6 20</LandingMapPosition>
+              <DestinationMapContentName>Map014</DestinationMapContentName>
+              <DestinationMapPortalName>P9</DestinationMapPortalName>
+          </Item>
+          <Item>
+			  <Name>P3</Name>
+			  <LandingMapPosition>17 20</LandingMapPosition>
+              <DestinationMapContentName>Map014</DestinationMapContentName>
+              <DestinationMapPortalName>P8</DestinationMapPortalName>
+          </Item>
+          <Item>
+			  <Name>P4</Name>
+			  <LandingMapPosition>28 20</LandingMapPosition>
+              <DestinationMapContentName>Map014</DestinationMapContentName>
+              <DestinationMapPortalName>P14</DestinationMapPortalName>
+          </Item>
+          <Item>
+			  <Name>P5</Name>
+			  <LandingMapPosition>4 14</LandingMapPosition>
+              <DestinationMapContentName>Map014</DestinationMapContentName>
+              <DestinationMapPortalName>P2</DestinationMapPortalName>
+          </Item>
+          <Item>
+			  <Name>P6</Name>
+			  <LandingMapPosition>5 14</LandingMapPosition>
+              <DestinationMapContentName>Map014</DestinationMapContentName>
+              <DestinationMapPortalName>P7</DestinationMapPortalName>
+          </Item>
+          <Item>
+			  <Name>P7</Name>
+			  <LandingMapPosition>17 12</LandingMapPosition>
+              <DestinationMapContentName>Map014</DestinationMapContentName>
+              <DestinationMapPortalName>P10</DestinationMapPortalName>
+          </Item>
+          <Item>
+			  <Name>P8</Name>
+			  <LandingMapPosition>29 14</LandingMapPosition>
+              <DestinationMapContentName>Map014</DestinationMapContentName>
+              <DestinationMapPortalName>P4</DestinationMapPortalName>
+          </Item>
+          <Item>
+			  <Name>P9</Name>
+			  <LandingMapPosition>30 14</LandingMapPosition>
+              <DestinationMapContentName>Map014</DestinationMapContentName>
+              <DestinationMapPortalName>P5</DestinationMapPortalName>
+          </Item>
+          <Item>
+			  <Name>P10</Name>
+			  <LandingMapPosition>4 4</LandingMapPosition>
+              <DestinationMapContentName>Map014</DestinationMapContentName>
+              <DestinationMapPortalName>P3</DestinationMapPortalName>
+          </Item>
+          <Item>
+			  <Name>P11</Name>
+			  <LandingMapPosition>5 4</LandingMapPosition>
+              <DestinationMapContentName>Map014</DestinationMapContentName>
+              <DestinationMapPortalName>P13</DestinationMapPortalName>
+          </Item>
+          <Item>
+			  <Name>P12</Name>
+			  <LandingMapPosition>17 6</LandingMapPosition>
+              <DestinationMapContentName>Map014</DestinationMapContentName>
+              <DestinationMapPortalName>P2</DestinationMapPortalName>
+          </Item>
+          <Item>
+			  <Name>P13</Name>
+			  <LandingMapPosition>29 4</LandingMapPosition>
+              <DestinationMapContentName>Map014</DestinationMapContentName>
+              <DestinationMapPortalName>P11</DestinationMapPortalName>
+          </Item>
+          <Item>
+			  <Name>P14</Name>
+			  <LandingMapPosition>30 4</LandingMapPosition>
+              <DestinationMapContentName>Map014</DestinationMapContentName>
+              <DestinationMapPortalName>P12</DestinationMapPortalName>
+          </Item>
+          <Item>
+			  <Name>P15</Name>
+			  <LandingMapPosition>17 5</LandingMapPosition>
+              <DestinationMapContentName>Map015</DestinationMapContentName>
+              <DestinationMapPortalName>P1</DestinationMapPortalName>
+          </Item>
+      </Portals>
+	  <PortalEntries>
+		  <Item>
+			  <ContentName>P1</ContentName>
+			  <MapPosition>3 22</MapPosition>
+		  </Item>
+		  <Item>
+			  <ContentName>P2</ContentName>
+			  <MapPosition>6 20</MapPosition>
+		  </Item>
+		  <Item>
+			  <ContentName>P3</ContentName>
+			  <MapPosition>17 20</MapPosition>
+		  </Item>
+		  <Item>
+			  <ContentName>P4</ContentName>
+			  <MapPosition>28 20</MapPosition>
+		  </Item>
+		  <Item>
+			  <ContentName>P5</ContentName>
+			  <MapPosition>4 14</MapPosition>
+		  </Item>
+		  <Item>
+			  <ContentName>P6</ContentName>
+			  <MapPosition>5 14</MapPosition>
+		  </Item>
+		  <Item>
+			  <ContentName>P7</ContentName>
+			  <MapPosition>17 12</MapPosition>
+		  </Item>
+		  <Item>
+			  <ContentName>P8</ContentName>
+			  <MapPosition>29 14</MapPosition>
+		  </Item>
+		  <Item>
+			  <ContentName>P9</ContentName>
+			  <MapPosition>30 14</MapPosition>
+		  </Item>
+		  <Item>
+			  <ContentName>P10</ContentName>
+			  <MapPosition>4 4</MapPosition>
+		  </Item>
+		  <Item>
+			  <ContentName>P11</ContentName>
+			  <MapPosition>5 4</MapPosition>
+		  </Item>
+		  <Item>
+			  <ContentName>P12</ContentName>
+			  <MapPosition>17 6</MapPosition>
+		  </Item>
+		  <Item>
+			  <ContentName>P13</ContentName>
+			  <MapPosition>29 4</MapPosition>
+		  </Item>
+		  <Item>
+			  <ContentName>P14</ContentName>
+			  <MapPosition>30 4</MapPosition>
+		  </Item>
+		  <Item>
+			  <ContentName>P15</ContentName>
+			  <MapPosition>17 3</MapPosition>
+		  </Item>
+	  </PortalEntries>
+	  <ChestEntries>
+          <Item>
+              <ContentName>LegendaryBoots</ContentName>
+              <MapPosition>30 12</MapPosition>
+          </Item>
+          <Item>
+              <ContentName>LegendaryHood</ContentName>
+              <MapPosition>15 14</MapPosition>
+          </Item>
+          <Item>
+              <ContentName>LegendaryShield</ContentName>
+              <MapPosition>8 12</MapPosition>
+          </Item>
+          <Item>
+              <ContentName>SteelArmor</ContentName>
+              <MapPosition>26 6</MapPosition>
+          </Item>
+          <Item>
+              <ContentName>LegendaryClub</ContentName>
+              <MapPosition>8 6</MapPosition>
+          </Item>
+          <Item>
+              <ContentName>SteelShield</ContentName>
+              <MapPosition>19 6</MapPosition>
+          </Item>
+          <Item>
+              <ContentName>POElixir</ContentName>
+              <MapPosition>19 14</MapPosition>
+          </Item>
+          <Item>
+              <ContentName>MOElixir</ContentName>
+              <MapPosition>15 6</MapPosition>
+          </Item>
+          <Item>
+              <ContentName>MDElixir</ContentName>
+              <MapPosition>15 4</MapPosition>
+          </Item>
+          <Item>
+              <ContentName>PDElixir</ContentName>
+              <MapPosition>19 4</MapPosition>
+          </Item>
+          <Item>
+              <ContentName>MDElixir</ContentName>
+              <MapPosition>26 12</MapPosition>
+          </Item>
+          <Item>
+              <ContentName>MajorHealing</ContentName>
+              <MapPosition>30 20</MapPosition>
+          </Item>
+          <Item>
+              <ContentName>MajorMagic</ContentName>
+              <MapPosition>30 24</MapPosition>
+          </Item>
+          <Item>
+              <ContentName>MajorHealing</ContentName>
+              <MapPosition>4 20</MapPosition>
+          </Item>
+          <Item>
+              <ContentName>MajorMagic</ContentName>
+              <MapPosition>4 24</MapPosition>
+          </Item>
+      </ChestEntries>
+      <FixedCombatEntries />
+      <RandomCombat>
+          <CombatProbability>10</CombatProbability>
+          <FleeProbability>50</FleeProbability>
+          <MonsterCountRange>
+              <Minimum>3</Minimum>
+              <Maximum>5</Maximum>
+          </MonsterCountRange>
+          <Entries>
+              <Item>
+                  <ContentName>BruteMaster</ContentName>
+                  <Count>2</Count>
+                  <Weight>80</Weight>
+              </Item>
+              <Item>
+                  <ContentName>BruteMage</ContentName>
+                  <Count>2</Count>
+                  <Weight>80</Weight>
+              </Item>
+              <Item>
+                  <ContentName>OrcBrute</ContentName>
+                  <Count>1</Count>
+                  <Weight>100</Weight>
+              </Item>
+          </Entries>
+      </RandomCombat>
+      <QuestNpcEntries />
+      <PlayerNpcEntries />
+      <InnEntries />
+      <StoreEntries />
+  </Asset>
+</XnaContent>

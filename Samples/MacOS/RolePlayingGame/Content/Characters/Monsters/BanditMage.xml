@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Monster">
+      <Name>Bandit Mage</Name>
+      <MapSprite>
+          <TextureName>Characters\Wizard2IdleLeft</TextureName>
+          <FrameDimensions>128 192</FrameDimensions>
+          <FramesPerRow>6</FramesPerRow>
+          <SourceOffset>64 150</SourceOffset>
+          <Animations />
+      </MapSprite>
+      <CharacterClassContentName>Wizard</CharacterClassContentName>
+      <CharacterLevel>5</CharacterLevel>
+      <InitialEquipmentContentNames>
+          <Item>Weapons\MysticalStaff</Item>
+          <Item>Armor\MagicRobe</Item>
+          <Item>Armor\MageBoots</Item>
+          <Item>Armor\MageHood</Item>
+      </InitialEquipmentContentNames>
+      <Inventory>
+          <Item>
+			  <ContentName>Items\MagicPotion</ContentName>
+			  <Count>5</Count>
+		  </Item>
+      </Inventory>
+      <CombatSprite>
+          <TextureName>Characters\Wizard2AttackLeft</TextureName>
+          <FrameDimensions>256 192</FrameDimensions>
+          <FramesPerRow>6</FramesPerRow>
+          <SourceOffset>135 155</SourceOffset>
+          <Animations />
+      </CombatSprite>
+      <DefendPercentage>30</DefendPercentage>
+      <GearDrops>
+          <Item>
+              <GearName>Items\MagicPotion</GearName>
+              <DropPercentage>40</DropPercentage>
+          </Item>
+          <Item>
+              <GearName>Weapons\MysticalStaff</GearName>
+              <DropPercentage>5</DropPercentage>
+          </Item>
+          <Item>
+              <GearName>Armor\MagicRobe</GearName>
+              <DropPercentage>5</DropPercentage>
+          </Item>
+          <Item>
+              <GearName>Armor\MageBoots</GearName>
+              <DropPercentage>5</DropPercentage>
+          </Item>
+          <Item>
+              <GearName>Armor\MageHood</GearName>
+              <DropPercentage>5</DropPercentage>
+          </Item>
+      </GearDrops>
+  </Asset>
+</XnaContent>

@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Armor">
+      <Name>Legendary Shield</Name>
+      <Description>The legendary armor set is very powerful and of unknown origin.</Description>
+      <GoldValue>-1</GoldValue>
+      <IsDroppable>true</IsDroppable>
+      <MinimumCharacterLevel>10</MinimumCharacterLevel>
+      <SupportedClasses>
+          <Item>Warrior</Item>
+          <Item>Paladin</Item>
+      </SupportedClasses>
+      <IconTextureName>Shield02d</IconTextureName>
+	  <OwnerBuffStatistics>
+		  <HealthPoints>10</HealthPoints>
+		  <PhysicalDefense>5</PhysicalDefense>
+		  <MagicalDefense>5</MagicalDefense>
+	  </OwnerBuffStatistics>
+	  <Slot>Shield</Slot>
+      <OwnerHealthDefenseRange>
+          <Minimum>15</Minimum>
+          <Maximum>20</Maximum>
+      </OwnerHealthDefenseRange>
+      <OwnerMagicDefenseRange>
+          <Minimum>10</Minimum>
+          <Maximum>15</Maximum>
+      </OwnerMagicDefenseRange>
+  </Asset>
+</XnaContent>

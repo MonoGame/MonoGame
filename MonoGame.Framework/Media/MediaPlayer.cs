@@ -63,12 +63,6 @@ using Microsoft.Xna.Framework.Audio;
         {
 			if ( song != null )
 			{
-				if ( _song != null )
-				{
-					_song.Dispose();
-					_song = null;
-				}
-				
 				_song = song;
 				_song.Volume = _volume;
 				_song.Loop = _looping;

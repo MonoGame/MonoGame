@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<XnaContent><Asset Type="RolePlayingGameData.Chest">
+  <Name>L Shield MD</Name>
+  <Gold>0</Gold>
+  <Entries>
+    <Item>
+      <ContentName>Armor\LeatherShieldPlus</ContentName>
+      <Count>1</Count>
+    </Item>
+  </Entries>
+  <TextureName>Chest1b</TextureName>
+</Asset></XnaContent>

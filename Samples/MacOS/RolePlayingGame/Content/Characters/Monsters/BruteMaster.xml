@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Monster">
+      <Name>Brute Master</Name>
+      <MapSprite>
+          <TextureName>Characters\Boss1IdleLeft</TextureName>
+          <FrameDimensions>174 216</FrameDimensions>
+          <FramesPerRow>6</FramesPerRow>
+          <SourceOffset>87 156</SourceOffset>
+          <Animations />
+      </MapSprite>
+      <CharacterClassContentName>Warrior</CharacterClassContentName>
+      <CharacterLevel>8</CharacterLevel>
+      <InitialEquipmentContentNames>
+          <Item>Weapons\PersianBlade</Item>
+          <Item>Armor\IronArmor</Item>
+          <Item>Armor\SteelHelmet</Item>
+      </InitialEquipmentContentNames>
+      <Inventory>
+		  <Item>
+			  <ContentName>Items\MajorHealingPotion</ContentName>
+			  <Count>5</Count>
+		  </Item>
+      </Inventory>
+      <CombatSprite>
+          <TextureName>Characters\Boss1AttackLeft</TextureName>
+          <FrameDimensions>288 288</FrameDimensions>
+          <FramesPerRow>6</FramesPerRow>
+          <SourceOffset>150 240</SourceOffset>
+          <Animations>
+              <Item>
+                  <Name>Walk</Name>
+                  <StartingFrame>25</StartingFrame>
+                  <EndingFrame>30</EndingFrame>
+                  <Interval>80</Interval>
+                  <IsLoop>true</IsLoop>
+              </Item>
+          </Animations>
+      </CombatSprite>
+      <DefendPercentage>20</DefendPercentage>
+      <GearDrops>
+          <Item>
+              <GearName>Items\MajorHealingPotion</GearName>
+              <DropPercentage>50</DropPercentage>
+          </Item>
+          <Item>
+              <GearName>Armor\SteelHelmet</GearName>
+              <DropPercentage>10</DropPercentage>
+          </Item>
+      </GearDrops>
+  </Asset>
+</XnaContent>

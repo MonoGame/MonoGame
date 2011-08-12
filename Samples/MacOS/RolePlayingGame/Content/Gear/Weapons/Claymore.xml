@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Weapon">
+      <Name>Claymore</Name>
+      <Description>The claymore is a deadly, heavy-hitting, Scottish sword.</Description>
+      <GoldValue>250</GoldValue>
+      <IsDroppable>true</IsDroppable>
+      <MinimumCharacterLevel>2</MinimumCharacterLevel>
+      <SupportedClasses>
+          <Item>Warrior</Item>
+          <Item>Paladin</Item>
+      </SupportedClasses>
+      <IconTextureName>Sword05a</IconTextureName>
+      <TargetDamageRange>
+          <Minimum>10</Minimum>
+          <Maximum>18</Maximum>
+	  </TargetDamageRange>
+	  <SwingCueName>SwordSwing</SwingCueName>
+	  <HitCueName>SwordHit</HitCueName>
+	  <BlockCueName>SwordBlock</BlockCueName>
+	  <Overlay>
+		  <TextureName>Spells\OverlayMelee</TextureName>
+		  <FrameDimensions>111 130</FrameDimensions>
+		  <FramesPerRow>1</FramesPerRow>
+		  <Animations>
+			  <Item>
+				  <StartingFrame>1</StartingFrame>
+				  <EndingFrame>1</EndingFrame>
+				  <Interval>200</Interval>
+				  <IsLoop>false</IsLoop>
+              </Item>
+          </Animations>
+      </Overlay>
+  </Asset>
+</XnaContent>

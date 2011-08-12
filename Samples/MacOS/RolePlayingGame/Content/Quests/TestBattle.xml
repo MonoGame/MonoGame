@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Quest">
+      <Name>Test Battle</Name>
+      <Description>It's time to test your mettle in combat!  Find Sir Shire and let's see what you're capable of!</Description>
+      <ObjectiveMessage>Walk south to the bottom of the map.  There you will find Sir Shire awaiting you for combat!</ObjectiveMessage>
+      <CompletionMessage>Congratulations! You have defeated Sir Shire.  You may be the one to save us from the evil Tamar...</CompletionMessage>
+      <GearRequirements />
+      <MonsterRequirements>
+          <Item>
+              <ContentName>SirShire</ContentName>
+              <Count>1</Count>
+          </Item>
+      </MonsterRequirements>
+      <FixedCombatEntries>
+          <Item>
+              <ContentName>SirShire</ContentName>
+			  <MapPosition>9 19</MapPosition>
+			  <Direction>North</Direction>
+			  <MapContentName>Map001</MapContentName>
+		  </Item>
+      </FixedCombatEntries>
+      <ChestEntries />
+      <DestinationMapContentName>Map001</DestinationMapContentName>
+      <DestinationNpcContentName>Sheddarr</DestinationNpcContentName>
+      <DestinationObjectiveMessage>Go and speak with Shed-darr the Wise.</DestinationObjectiveMessage>
+      <ExperienceReward>50</ExperienceReward>
+      <GoldReward>10</GoldReward>
+      <GearRewardContentNames />
+  </Asset>
+</XnaContent>

@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Player">
+      <Name>Tyjavus</Name>
+      <MapSprite>
+          <TextureName>Characters\Goblin2IdleRight</TextureName>
+          <FrameDimensions>126 168</FrameDimensions>
+          <FramesPerRow>6</FramesPerRow>
+          <SourceOffset>63 128</SourceOffset>
+          <Animations />
+      </MapSprite>
+      <WalkingSprite>
+          <TextureName>Characters\Goblin2WalkRight</TextureName>
+          <FrameDimensions>126 168</FrameDimensions>
+          <FramesPerRow>6</FramesPerRow>
+          <SourceOffset>63 128</SourceOffset>
+          <Animations />
+      </WalkingSprite>
+      <MapIdleAnimationInterval>160</MapIdleAnimationInterval>
+      <CharacterClassContentName>RedMage</CharacterClassContentName>
+      <CharacterLevel>7</CharacterLevel>
+      <InitialEquipmentContentNames>
+          <Item>Weapons\MagicStaff</Item>
+          <Item>Armor\MagicRobe</Item>
+          <Item>Armor\WornMageBoots</Item>
+          <Item>Armor\WornMageHood</Item>
+      </InitialEquipmentContentNames>
+      <Inventory>
+		  <Item>
+			  <ContentName>Items\HealingPotion</ContentName>
+			  <Count>2</Count>
+		  </Item>
+		  <Item>
+			  <ContentName>Items\MagicPotion</ContentName>
+			  <Count>2</Count>
+		  </Item>
+      </Inventory>
+      <CombatSprite>
+          <TextureName>Characters\Goblin2AttackRight</TextureName>
+          <FrameDimensions>224 168</FrameDimensions>
+          <FramesPerRow>6</FramesPerRow>
+          <SourceOffset>100 140</SourceOffset>
+          <Animations />
+      </CombatSprite>
+      <Gold>500</Gold>
+      <IntroductionDialogue>Tyjavus of Calypso.  The pleasure is mine.  If you're in need of a specialist Wizard, I won't disappoint.</IntroductionDialogue>
+      <JoinAcceptedDialogue>I am grateful.</JoinAcceptedDialogue>
+      <JoinRejectedDialogue>Perhaps another time, then.</JoinRejectedDialogue>
+      <ActivePortraitTextureName>Goblin2Active</ActivePortraitTextureName>
+      <InactivePortraitTextureName>Goblin2InActive</InactivePortraitTextureName>
+      <UnselectablePortraitTextureName>Goblin2Unselectable</UnselectablePortraitTextureName>
+  </Asset>
+</XnaContent>

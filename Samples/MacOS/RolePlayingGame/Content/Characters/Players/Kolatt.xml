@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Player">
+      <Name>Kolatt</Name>
+      <MapSprite>
+          <TextureName>Characters\Warrior1IdleRight</TextureName>
+          <FrameDimensions>138 192</FrameDimensions>
+          <FramesPerRow>6</FramesPerRow>
+          <SourceOffset>69 125</SourceOffset>
+          <Animations />
+      </MapSprite>
+      <WalkingSprite>
+          <TextureName>Characters\Warrior1WalkRight</TextureName>
+          <FrameDimensions>138 192</FrameDimensions>
+          <FramesPerRow>6</FramesPerRow>
+          <SourceOffset>69 125</SourceOffset>
+          <Animations />
+      </WalkingSprite>
+      <MapIdleAnimationInterval>180</MapIdleAnimationInterval>
+      <CharacterClassContentName>Warrior</CharacterClassContentName>
+      <CharacterLevel>2</CharacterLevel>
+	  <InitialEquipmentContentNames>
+		  <Item>Weapons\Dagger</Item>
+		  <Item>Armor\HideArmor</Item>
+	  </InitialEquipmentContentNames>
+      <Inventory />
+      <CombatSprite>
+          <TextureName>Characters\Warrior1AttackRight</TextureName>
+          <FrameDimensions>288 192</FrameDimensions>
+          <FramesPerRow>6</FramesPerRow>
+          <SourceOffset>135 135</SourceOffset>
+          <Animations />
+      </CombatSprite>
+      <Gold>10</Gold>
+      <IntroductionDialogue>Kolatt here.  Warrior extraordinaire, at your service.  May I join?</IntroductionDialogue>
+      <JoinAcceptedDialogue>You won't be disappointed!</JoinAcceptedDialogue>
+      <JoinRejectedDialogue>Let me know if you change your mind.  I'll be twiddling my thumbs over here in the meantime.</JoinRejectedDialogue>
+      <ActivePortraitTextureName>Warrior1Active</ActivePortraitTextureName>
+      <InactivePortraitTextureName>Warrior1InActive</InactivePortraitTextureName>
+      <UnselectablePortraitTextureName>Warrior1Unselectable</UnselectablePortraitTextureName>
+  </Asset>
+</XnaContent>

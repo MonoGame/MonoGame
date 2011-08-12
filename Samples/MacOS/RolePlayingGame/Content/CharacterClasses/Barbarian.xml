@@ -1,0 +1,96 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.CharacterClass">
+      <Name>Barbarian</Name>
+      <InitialStatistics>
+          <HealthPoints>50</HealthPoints>
+          <MagicPoints>0</MagicPoints>
+          <PhysicalOffense>15</PhysicalOffense>
+          <PhysicalDefense>5</PhysicalDefense>
+          <MagicalOffense>0</MagicalOffense>
+          <MagicalDefense>1</MagicalDefense>          
+      </InitialStatistics>
+      <LevelingStatistics>
+          <HealthPointsIncrease>15</HealthPointsIncrease>
+          <LevelsPerHealthPointsIncrease>1</LevelsPerHealthPointsIncrease>
+          <MagicPointsIncrease>0</MagicPointsIncrease>
+          <LevelsPerMagicPointsIncrease>0</LevelsPerMagicPointsIncrease>
+          <PhysicalOffenseIncrease>4</PhysicalOffenseIncrease>
+          <LevelsPerPhysicalOffenseIncrease>1</LevelsPerPhysicalOffenseIncrease>
+          <PhysicalDefenseIncrease>1</PhysicalDefenseIncrease>
+          <LevelsPerPhysicalDefenseIncrease>1</LevelsPerPhysicalDefenseIncrease>
+          <MagicalOffenseIncrease>0</MagicalOffenseIncrease>
+          <LevelsPerMagicalOffenseIncrease>0</LevelsPerMagicalOffenseIncrease>
+          <MagicalDefenseIncrease>1</MagicalDefenseIncrease>
+          <LevelsPerMagicalDefenseIncrease>2</LevelsPerMagicalDefenseIncrease>
+      </LevelingStatistics>
+      <LevelEntries>
+          <Item>
+              <ExperiencePoints>100</ExperiencePoints>
+              <SpellContentNames />
+          </Item>
+          <Item>
+              <ExperiencePoints>150</ExperiencePoints>
+              <SpellContentNames />
+          </Item>
+          <Item>
+              <ExperiencePoints>200</ExperiencePoints>
+              <SpellContentNames />
+          </Item>
+          <Item>
+              <ExperiencePoints>250</ExperiencePoints>
+              <SpellContentNames />
+          </Item>
+          <Item>
+              <ExperiencePoints>300</ExperiencePoints>
+              <SpellContentNames />
+          </Item>
+          <Item>
+              <ExperiencePoints>350</ExperiencePoints>
+              <SpellContentNames />
+          </Item>
+          <Item>
+              <ExperiencePoints>400</ExperiencePoints>
+              <SpellContentNames />
+          </Item>
+          <Item>
+              <ExperiencePoints>450</ExperiencePoints>
+              <SpellContentNames />
+          </Item>
+          <Item>
+              <ExperiencePoints>500</ExperiencePoints>
+              <SpellContentNames />
+          </Item>
+          <Item>
+              <ExperiencePoints>550</ExperiencePoints>
+              <SpellContentNames />
+          </Item>
+          <Item>
+              <ExperiencePoints>600</ExperiencePoints>
+              <SpellContentNames />
+          </Item>
+          <Item>
+              <ExperiencePoints>650</ExperiencePoints>
+              <SpellContentNames />
+          </Item>
+          <Item>
+              <ExperiencePoints>700</ExperiencePoints>
+              <SpellContentNames />
+          </Item>
+          <Item>
+              <ExperiencePoints>750</ExperiencePoints>
+              <SpellContentNames />
+          </Item>
+          <Item>
+              <ExperiencePoints>800</ExperiencePoints>
+              <SpellContentNames />
+          </Item>
+          <Item>
+              <ExperiencePoints>0</ExperiencePoints>
+              <SpellContentNames />
+          </Item>
+      </LevelEntries>
+      <BaseExperienceValue>20</BaseExperienceValue>
+      <BaseGoldValue>10</BaseGoldValue>
+  </Asset>
+</XnaContent>

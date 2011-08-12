@@ -419,9 +419,63 @@ namespace Microsoft.Xna.Framework.Net
 			return localIP;
 		}
 
+
+        /// <summary>
+        /// Used to Simulate the delay between computers
+        /// </summary>
+        public TimeSpan SimulatedLatency
+        {
+            get
+            {                
+#if DEBUG
+		if (peer != null)
+                	return new TimeSpan(0,0,(int)peer.Configuration.SimulatedAverageLatency);
+		else
+			return new TimeSpan(0);
+#else
+                return null;
+#endif
+            }
+            set
+            {
+#if DEBUG
+		if (peer != null) {
+                	peer.Configuration.SimulatedMinimumLatency = (float)value.TotalSeconds;
+		}
+#endif
+            }
+        }
+
+
+        /// <summary>
+        /// Used to simulate the number of packets you might expect to loose.
+        /// </summary>
+        public float SimulatedPacketLoss
+        {
+            get
+            {
+#if DEBUG
+		if (peer != null)
+                	return peer.Configuration.SimulatedLoss;
+		else
+			return 0.0f;
+#else
+                return 0.0f;
+#endif
+            }
+            set
+            {
+#if DEBUG
+		if (peer != null) {
+                	peer.Configuration.SimulatedLoss = value;
+		}
+#endif
+            }
+        }		
+
 		internal void DiscoverPeers ()
 		{
-			peer.DiscoverLocalPeers (port);			
+			peer.DiscoverLocalPeers (port);			    
 		}
 
 		internal void SendData (

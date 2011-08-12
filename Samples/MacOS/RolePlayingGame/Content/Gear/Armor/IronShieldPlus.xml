@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="RolePlayingGameData.Armor">
+      <Name>Iron Shield Plus</Name>
+      <Description>This iron shield provides additional protection against magical attacks.</Description>
+      <GoldValue>750</GoldValue>
+      <IsDroppable>true</IsDroppable>
+      <MinimumCharacterLevel>5</MinimumCharacterLevel>
+      <SupportedClasses>
+          <Item>Warrior</Item>
+          <Item>Paladin</Item>
+      </SupportedClasses>
+      <IconTextureName>Shield03c</IconTextureName>
+	  <OwnerBuffStatistics>
+		  <MagicalDefense>10</MagicalDefense>
+	  </OwnerBuffStatistics>
+	  <Slot>Shield</Slot>
+      <OwnerHealthDefenseRange>
+          <Minimum>8</Minimum>
+          <Maximum>10</Maximum>
+      </OwnerHealthDefenseRange>
+      <OwnerMagicDefenseRange>
+          <Minimum>5</Minimum>
+          <Maximum>6</Maximum>
+      </OwnerMagicDefenseRange>
+  </Asset>
+</XnaContent>

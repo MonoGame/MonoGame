@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Difficulties>
+  <Difficulty ID="Easy">
+    <GameElapsed>00:02:00</GameElapsed>
+    <MinWorkerBeeVelocity>1</MinWorkerBeeVelocity>
+    <MaxWorkerBeeVelocity>3</MaxWorkerBeeVelocity>
+    <MinSoldierBeeVelocity>2</MinSoldierBeeVelocity>
+    <MaxSoldierBeeVelocity>4</MaxSoldierBeeVelocity>
+    <TotalSmokeAmount>50</TotalSmokeAmount>
+    <DecreaseAmountSpeed>2</DecreaseAmountSpeed>
+    <IncreaseAmountSpeed>1</IncreaseAmountSpeed>
+    <HighScoreFactor>1</HighScoreFactor>
+  </Difficulty>
+  <Difficulty ID="Medium">
+    <GameElapsed>00:01:30</GameElapsed>
+    <MinWorkerBeeVelocity>2</MinWorkerBeeVelocity>
+    <MaxWorkerBeeVelocity>4</MaxWorkerBeeVelocity>
+    <MinSoldierBeeVelocity>3</MinSoldierBeeVelocity>
+    <MaxSoldierBeeVelocity>5</MaxSoldierBeeVelocity>
+    <TotalSmokeAmount>40</TotalSmokeAmount>
+    <DecreaseAmountSpeed>2</DecreaseAmountSpeed>
+    <IncreaseAmountSpeed>1</IncreaseAmountSpeed>
+    <HighScoreFactor>2</HighScoreFactor>
+  </Difficulty>
+  <Difficulty ID="Hard">
+    <GameElapsed>00:01:00</GameElapsed>
+    <MinWorkerBeeVelocity>2</MinWorkerBeeVelocity>
+    <MaxWorkerBeeVelocity>6</MaxWorkerBeeVelocity>
+    <MinSoldierBeeVelocity>3</MinSoldierBeeVelocity>
+    <MaxSoldierBeeVelocity>6</MaxSoldierBeeVelocity>
+    <TotalSmokeAmount>30</TotalSmokeAmount>
+    <DecreaseAmountSpeed>2</DecreaseAmountSpeed>
+    <IncreaseAmountSpeed>1</IncreaseAmountSpeed>
+    <HighScoreFactor>3</HighScoreFactor>
+  </Difficulty>
+</Difficulties>

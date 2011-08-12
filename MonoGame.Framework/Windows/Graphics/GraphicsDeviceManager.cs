@@ -76,13 +76,16 @@ namespace Microsoft.Xna.Framework
 			
             game.Services.AddService(typeof(IGraphicsDeviceManager), this);
             game.Services.AddService(typeof(IGraphicsDeviceService), this);	
-			
-			Initialize();
         }
 		
 		public void CreateDevice ()
 		{
-			throw new System.NotImplementedException ();
+            _graphicsDevice = new GraphicsDevice();
+            _graphicsDevice.PresentationParameters = new PresentationParameters();
+
+            Initialize();
+
+            OnDeviceCreated(EventArgs.Empty);
 		}
 
 		public bool BeginDraw ()
@@ -106,6 +109,28 @@ namespace Microsoft.Xna.Framework
         public event EventHandler DeviceResetting;
 		
 		public event EventHandler<PreparingDeviceSettingsEventArgs> PreparingDeviceSettings;
+        private bool wantFullScreen;
+
+        internal void OnDeviceResetting(EventArgs e)
+        {
+            var h = DeviceResetting;
+            if (h != null)
+                h(this, e);
+        }
+
+        internal void OnDeviceReset(EventArgs e)
+        {
+            var h = DeviceReset;
+            if (h != null)
+                h(this, e);
+        }
+
+        internal void OnDeviceCreated(EventArgs e)
+        {
+            var h = DeviceCreated;
+            if (h != null)
+                h(this, e);
+        }
 
         #endregion
 
@@ -119,16 +144,28 @@ namespace Microsoft.Xna.Framework
 
         public void ApplyChanges()
         {
-            (_game.Window as WindowsGameWindow).OpenTkGameWindow.ClientSize = new Size(PreferredBackBufferWidth, PreferredBackBufferHeight);
+            var wGameWindow = _game.Window as WindowsGameWindow;
+
+            if (IsFullScreen)
+            {
+                wGameWindow.OpenTkGameWindow.WindowBorder = WindowBorder.Hidden;
+                wGameWindow.OpenTkGameWindow.WindowState = OpenTK.WindowState.Fullscreen;
+                (_game.Window as WindowsGameWindow).OpenTkGameWindow.ClientSize = new Size(wGameWindow.OpenTkGameWindow.ClientRectangle.Width, wGameWindow.OpenTkGameWindow.ClientRectangle.Height);
+            }
+            else
+            {
+                wGameWindow.OpenTkGameWindow.WindowState = OpenTK.WindowState.Normal;
+                wGameWindow.OpenTkGameWindow.WindowBorder =  _game.Window.AllowUserResizing ? WindowBorder.Resizable : WindowBorder.Fixed;
+                (_game.Window as WindowsGameWindow).OpenTkGameWindow.ClientSize = new Size(PreferredBackBufferWidth, PreferredBackBufferHeight);
+            }
+            
         }
 
 		private void Initialize()
 		{
-            _graphicsDevice = new GraphicsDevice(this);
-			_graphicsDevice.PresentationParameters = new PresentationParameters();
-			
-			
-			if (_preferMultiSampling) 
+            _graphicsDevice.PresentationParameters.IsFullScreen = IsFullScreen;
+
+            if (_preferMultiSampling) 
 			{
 				_graphicsDevice.PreferedFilter = All.Linear;
 			}
@@ -136,6 +173,8 @@ namespace Microsoft.Xna.Framework
 			{
 				_graphicsDevice.PreferedFilter = All.Nearest;
 			}
+
+            ApplyChanges();
            
 		}
 		
@@ -156,26 +195,20 @@ namespace Microsoft.Xna.Framework
         {
             get
             {
-				 return _graphicsDevice.PresentationParameters.IsFullScreen;
+                if (_graphicsDevice != null)
+                {
+                    if (_graphicsDevice.PresentationParameters.IsFullScreen != wantFullScreen) _graphicsDevice.PresentationParameters.IsFullScreen = wantFullScreen;
+                    return _graphicsDevice.PresentationParameters.IsFullScreen;
+                }
+                else
+                    return wantFullScreen;
             }
             set
             {
-                if (IsFullScreen != value)
+                wantFullScreen = value;
+                if ( _graphicsDevice != null && IsFullScreen != value)
                 {
-                    _graphicsDevice.PresentationParameters.IsFullScreen = value;
-                    var wGameWindow = _game.Window as WindowsGameWindow;
-
-                    if (IsFullScreen)
-                    {
-                        wGameWindow.OpenTkGameWindow.WindowBorder = WindowBorder.Hidden;
-                        wGameWindow.OpenTkGameWindow.WindowState = OpenTK.WindowState.Fullscreen;
-                        _graphicsDevice.SizeChanged(wGameWindow.OpenTkGameWindow.ClientRectangle.Width, wGameWindow.OpenTkGameWindow.ClientRectangle.Height);
-                    }
-                    else {
-                        wGameWindow.OpenTkGameWindow.WindowState = OpenTK.WindowState.Normal;
-                        wGameWindow.OpenTkGameWindow.WindowBorder = WindowBorder.Resizable;
-                        _graphicsDevice.SizeChanged(wGameWindow.OpenTkGameWindow.ClientRectangle.Width, wGameWindow.OpenTkGameWindow.ClientRectangle.Height);
-                    }
+                    _graphicsDevice.PresentationParameters.IsFullScreen = value;                    
                 }
             }
         }
@@ -189,14 +222,17 @@ namespace Microsoft.Xna.Framework
             set
             {
 				_preferMultiSampling = value;
-				if (_preferMultiSampling) 
-				{
-					_graphicsDevice.PreferedFilter = All.Linear;
-				}
-				else 
-				{
-					_graphicsDevice.PreferedFilter = All.Nearest;
-				}
+                if (_graphicsDevice != null)
+                {
+                    if (_preferMultiSampling)
+                    {
+                        _graphicsDevice.PreferedFilter = All.Linear;
+                    }
+                    else
+                    {
+                        _graphicsDevice.PreferedFilter = All.Nearest;
+                    }
+                }
             }
         }
 
