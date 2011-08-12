@@ -14,7 +14,7 @@
     <BundleDisplayName>Marblets</BundleDisplayName>
     <BundleIcon>GameThumbnail.png</BundleIcon>
     <Thumbnail>GameThumbnail.png</Thumbnail>
-    <SupportedDevices>IPad</SupportedDevices>
+    <SupportedDevices>IPhoneAndIPad</SupportedDevices>
     <BundleIconIPad>GameThumbnail.png</BundleIconIPad>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhoneSimulator' ">
@@ -141,6 +141,7 @@
     <Compile Include="InputHelper.cs" />
     <Compile Include="TutorialGameBoard.cs" />
     <Compile Include="RelativeSprite.cs" />
+    <Compile Include="Sound.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="GameThumbnail.png" />
