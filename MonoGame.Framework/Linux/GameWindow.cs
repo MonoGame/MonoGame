@@ -63,6 +63,11 @@ namespace Microsoft.Xna.Framework
 		protected Game game;
 		private List<Microsoft.Xna.Framework.Input.Keys> keys;
 				
+		// we need this variables to make changes beetween threads
+		private WindowState windowState;
+		private Rectangle clientBounds;
+		private bool updateClientBounds;
+		
 		#region Internal Properties
 		
 		internal Game Game { get; set; }
@@ -87,9 +92,7 @@ namespace Microsoft.Xna.Framework
 		{
 			get 
 			{
-				System.Drawing.Rectangle cb = window.ClientRectangle;
-				
-				return new Rectangle(cb.X, cb.Y, cb.Width, cb.Height);
+				return clientBounds;
 			}
 		}
 		
@@ -158,7 +161,7 @@ namespace Microsoft.Xna.Framework
 			Keys xnaKey = KeyboardUtil.ToXna(e.Key);
             if (!keys.Contains(xnaKey)) keys.Add(xnaKey);
         }
-				
+		
 		protected void OnActivated(){}
 
         protected void OnClientSizeChanged()
@@ -206,8 +209,28 @@ namespace Microsoft.Xna.Framework
             if (!GraphicsContext.CurrentContext.IsCurrent)
                 window.MakeCurrent();
 			
-			if (_transitiveAllowUserResizing != _allowUserResizing)
+			// we should wait until window's not fullscreen to resize
+			if (updateClientBounds && window.WindowState == WindowState.Normal)
+			{
+				// it seems, at least on linux, we can't resize if we disallow user resizing			
+				// make next state the current state
+				_transitiveAllowUserResizing = AllowUserResizing;
+				// allow resize to resize window
+				window.WindowBorder = WindowBorder.Resizable;
+				
+				window.ClientRectangle = new System.Drawing.Rectangle(clientBounds.X,
+				                     clientBounds.Y, clientBounds.Width, clientBounds.Height);
+				
+				updateClientBounds = false;
+			}
+			else if (_transitiveAllowUserResizing != _allowUserResizing)
+			{
+				// reset previous value
 				AllowUserResizing = _transitiveAllowUserResizing;
+			}
+			
+			if (window.WindowState != windowState)
+				window.WindowState = windowState;
 			
             if (Game != null) {
                 _drawGameTime.Update(_now - _lastUpdate);
@@ -250,6 +273,11 @@ namespace Microsoft.Xna.Framework
             window.Keyboard.KeyDown += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyDown);
             window.Keyboard.KeyUp += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyUp);
 			
+			updateClientBounds = false;
+			clientBounds = new Rectangle(window.ClientRectangle.X, window.ClientRectangle.Y,
+			                             window.ClientRectangle.Width, window.ClientRectangle.Height);
+			windowState = window.WindowState;
+			
 			keys = new List<Keys>();
 			
 			// mouse
@@ -279,27 +307,16 @@ namespace Microsoft.Xna.Framework
 		
 		internal void ToggleFullScreen()
 		{
-			if (window.WindowState == WindowState.Fullscreen)
-				window.WindowState = WindowState.Normal;
+			if (windowState == WindowState.Fullscreen)
+				windowState = WindowState.Normal;
 			else
-				window.WindowState = WindowState.Fullscreen;
+				windowState = WindowState.Fullscreen;
 		}
 		
 		internal void ChangeClientBounds(Rectangle clientBounds)
-		{
-			// it seems, at least on linux, we can't resize if we disallow user resizing
-			
-			// make next state the current state
-			_transitiveAllowUserResizing = AllowUserResizing;
-					
-			window.RenderFrame += delegate {
-			
-				// allow resize to resize window
-				window.WindowBorder = WindowBorder.Resizable;
-				
-				// resize
-				window.ClientRectangle = new System.Drawing.Rectangle(clientBounds.X, clientBounds.Y, clientBounds.Width, clientBounds.Height);
-			};
+		{	
+			updateClientBounds = true;			
+			this.clientBounds = clientBounds;
 		}
 		
 		#endregion
