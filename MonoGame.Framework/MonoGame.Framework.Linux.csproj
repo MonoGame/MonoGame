@@ -309,6 +309,7 @@
     <Compile Include="Linux\Input\KeyboardUtil.cs" />
     <Compile Include="Linux\Audio\AudioLoader.cs" />
     <Compile Include="Linux\GamerServices\MonoGameGamerServicesHelper.cs" />
+    <Compile Include="Linux\Storage\StorageDeviceHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Linux\" />
