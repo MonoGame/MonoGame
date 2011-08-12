@@ -103,7 +103,14 @@ namespace Microsoft.Xna.Framework
 		public event EventHandler<EventArgs> DeviceReset;
 		public event EventHandler<EventArgs> DeviceResetting;
 		public event EventHandler<PreparingDeviceSettingsEventArgs> PreparingDeviceSettings;
-
+		
+		internal void OnDeviceDisposing (EventArgs e)
+		{
+			var h = DeviceDisposing;
+			if (h != null)
+				h (this, e);
+		}
+		
 		internal void OnDeviceResetting (EventArgs e)
 		{
 			var h = DeviceResetting;
