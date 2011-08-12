@@ -323,6 +323,9 @@
     <Compile Include="MacOS\GamerServices\SigninController.cs" />
     <Compile Include="MacOS\GamerServices\MonoGameLocalGamerProfile.cs" />
     <Compile Include="Audio\NoAudioHardwareException.cs" />
+    <Compile Include="Content\ContentReaders\PointReader.cs" />
+    <Compile Include="Content\ContentReaders\Vector2Reader.cs" />
+    <Compile Include="MacOS\Storage\StorageDeviceHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />
@@ -341,6 +344,7 @@
     <Folder Include="MacOS\Graphics\Effect\" />
     <Folder Include="MacOS\Input\" />
     <Folder Include="MacOS\GamerServices\" />
+    <Folder Include="MacOS\Storage\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.MacOS.csproj">

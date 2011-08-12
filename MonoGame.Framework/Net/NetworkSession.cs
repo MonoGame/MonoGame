@@ -608,6 +608,7 @@ namespace Microsoft.Xna.Framework.Net
 			
 			return session;		
 		}
+		
 		public static NetworkSession JoinInvited (IEnumerable<SignedInGamer> localGamers)
 		{
 			try {
@@ -655,7 +656,11 @@ namespace Microsoft.Xna.Framework.Net
 					var command = (CommandEvent)commandQueue.Dequeue();
 					
 					// for some screwed up reason we are dequeueing something
-					// that is null so we will just continue.  
+					// that is null so we will just continue.  I am not sure
+					// if is jumbled data coming in from the connection or
+					// something that is not being done correctly in code
+					//  For sure this needs to be looked at although it is not
+					//  causing any real problems right now.
 					if (command == null) {
 						continue;
 					}
@@ -684,7 +689,7 @@ namespace Microsoft.Xna.Framework.Net
 				}
 			} 
 			catch (Exception exc) {
-				Console.WriteLine("Error in Update: " + exc.Message);
+				Console.WriteLine("Error in NetworkSession Update: " + exc.Message);
 			}
 			finally {
 			}
@@ -780,7 +785,11 @@ namespace Microsoft.Xna.Framework.Net
 				gamer = new LocalNetworkGamer(this, (byte)command.InternalIndex, command.State);
 				_allGamers.AddGamer(gamer);
 				_localGamers.AddGamer((LocalNetworkGamer)gamer);
-				((LocalNetworkGamer)gamer).SignedInGamer = Gamer.SignedInGamers[_localGamers.Count - 1];
+
+				// Note - This might be in the wrong place for certain connections
+				//  Take a look at HoneycombRush tut for debugging later.
+				if (Gamer.SignedInGamers.Count >= _localGamers.Count)
+					((LocalNetworkGamer)gamer).SignedInGamer = Gamer.SignedInGamers[_localGamers.Count - 1];
 				
 				// We will attach a property change handler to local gamers
 				//  se that we can broadcast the change to other peers.
@@ -990,21 +999,43 @@ namespace Microsoft.Xna.Framework.Net
 			}
 		}
 
+        private TimeSpan defaultSimulatedLatency = new TimeSpan(0, 0, 0);
+
 		public TimeSpan SimulatedLatency {
 			get {
-				throw new NotImplementedException ();
+#if DEBUG
+                if (networkPeer != null)
+                {
+                    return networkPeer.SimulatedLatency;
+                }
+#endif
+                return defaultSimulatedLatency;				
 			}
 			set {
-				throw new NotImplementedException ();
+                defaultSimulatedLatency = value;
+#if DEBUG
+                if (networkPeer != null)
+                {
+                    networkPeer.SimulatedLatency = value;
+                }
+#endif
+                
 			}
 		}
 
+        private float simulatedPacketLoss = 0.0f;
+
 		public float SimulatedPacketLoss {
 			get {
-				throw new NotImplementedException ();
+                if (networkPeer != null)
+                {
+                    simulatedPacketLoss = networkPeer.SimulatedPacketLoss;                   
+                }
+                return simulatedPacketLoss;
 			}
 			set {
-				throw new NotImplementedException ();
+                if (networkPeer != null) networkPeer.SimulatedPacketLoss = value;
+                simulatedPacketLoss = value;
 			}
 		}			
 
