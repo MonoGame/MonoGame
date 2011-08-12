@@ -13,19 +13,23 @@ namespace Microsoft.Xna.Framework.GamerServices
 		internal static void ShowSigninSheet ()
 		{
 
-
 			NSApplication NSApp = NSApplication.SharedApplication;
 			NSWindow gameWindow = NSApp.MainWindow;
 			SigninController controller = new SigninController ();
 
 			NSWindow window = controller.Window;
-
-			NSApp.BeginSheet (window, gameWindow);
-			NSApp.RunModalForWindow (window);
-			// sheet is up here.....
-
-			NSApp.EndSheet (window);
-			window.OrderOut (gameWindow);
+			
+			NSApp.BeginInvokeOnMainThread(delegate {
+				Guide.isVisible = true;
+				NSApp.BeginSheet (window, gameWindow);
+				NSApp.RunModalForWindow (window);
+				// sheet is up here.....
+	
+				NSApp.EndSheet (window);
+				window.OrderOut (gameWindow);
+				Guide.isVisible = false;
+				
+			});
 		}
 
 		internal static List<MonoGameLocalGamerProfile> DeserializeProfiles ()
@@ -38,10 +42,6 @@ namespace Microsoft.Xna.Framework.GamerServices
 					BinaryFormatter bin = new BinaryFormatter ();
 
 					profiles = (List<MonoGameLocalGamerProfile>)bin.Deserialize (stream);
-					foreach (var profile in profiles) {
-						Console.WriteLine ("{0}", 
-					profile);
-					}
 				}
 				
 			} catch (IOException) {

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>10.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{91CF4A04-9FDC-471D-AED0-D8F057068230}</ProjectGuid>
+    <ProjectTypeGuids>{E613F3A2-FE9C-494F-B74E-F63BCB86FEA6};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <RootNamespace>CardsFramework.iOS</RootNamespace>
+    <AssemblyName>CardsFramework.iOS</AssemblyName>
+    <MtouchMinimumOS>3.0</MtouchMinimumOS>
+    <TargetFrameworkVersion>v1.0</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <MtouchDebug>False</MtouchDebug>
+    <MtouchUseSGen>false</MtouchUseSGen>
+    <ConsolePause>false</ConsolePause>
+    <MtouchUseLlvm>false</MtouchUseLlvm>
+    <MtouchUseThumb>false</MtouchUseThumb>
+    <MtouchArch>ARMv6</MtouchArch>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <MtouchUseSGen>false</MtouchUseSGen>
+    <MtouchDebug>False</MtouchDebug>
+    <ConsolePause>false</ConsolePause>
+    <MtouchUseLlvm>false</MtouchUseLlvm>
+    <MtouchUseThumb>false</MtouchUseThumb>
+    <MtouchArch>ARMv6</MtouchArch>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="monotouch" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\MonoGame.Framework\MonoGame.Framework.iOS.csproj">
+      <Project>{DB8508BB-9849-4CC2-BC0F-8EB5DACB3C47}</Project>
+      <Name>MonoGame.Framework.iOS</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\MacOS\Cards\CardsFramework\Cards\CardPacket.cs">
+      <Link>Cards\CardPacket.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Cards\CardsFramework\Cards\Hand.cs">
+      <Link>Cards\Hand.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Cards\CardsFramework\Cards\TraditionalCard.cs">
+      <Link>Cards\TraditionalCard.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Cards\CardsFramework\Game\CardsGame.cs">
+      <Link>Game\CardsGame.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Cards\CardsFramework\Players\Player.cs">
+      <Link>Players\Player.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Cards\CardsFramework\Properties\AssemblyInfo.cs">
+      <Link>Properties\AssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Cards\CardsFramework\Rules\GameRule.cs">
+      <Link>Rules\GameRule.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Cards\CardsFramework\UI\AnimatedCardsGameComponent.cs">
+      <Link>UI\AnimatedCardsGameComponent.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Cards\CardsFramework\UI\AnimatedGameComponent.cs">
+      <Link>UI\AnimatedGameComponent.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Cards\CardsFramework\UI\AnimatedGameComponentAnimation.cs">
+      <Link>UI\AnimatedGameComponentAnimation.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Cards\CardsFramework\UI\AnimatedHandGameComponent.cs">
+      <Link>UI\AnimatedHandGameComponent.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Cards\CardsFramework\UI\FlipGameComponentAnimation.cs">
+      <Link>UI\FlipGameComponentAnimation.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Cards\CardsFramework\UI\FramesetGameComponentAnimation.cs">
+      <Link>UI\FramesetGameComponentAnimation.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Cards\CardsFramework\UI\GameTable.cs">
+      <Link>UI\GameTable.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Cards\CardsFramework\UI\ScaleGameComponentAnimation.cs">
+      <Link>UI\ScaleGameComponentAnimation.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Cards\CardsFramework\UI\TransitionGameComponentAnimation.cs">
+      <Link>UI\TransitionGameComponentAnimation.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Cards\CardsFramework\Utils\MathUtility.cs">
+      <Link>Utils\MathUtility.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\Cards\CardsFramework\Utils\UIUtilty.cs">
+      <Link>Utils\UIUtilty.cs</Link>
+    </Compile>
+  </ItemGroup>
+</Project>

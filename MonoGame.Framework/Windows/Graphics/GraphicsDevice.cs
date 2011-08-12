@@ -124,7 +124,7 @@ namespace Microsoft.Xna.Framework.Graphics
             Textures = new TextureCollection();
 
             // Init RenderState
-            _renderState = new RenderState();
+            RasterizerState = new RasterizerState();
         }
 
         internal GraphicsDevice(GraphicsDeviceManager mngr)
@@ -367,22 +367,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				}
 			}
 		}
-		
-		public RenderState RenderState 
-		{ 
-			get
-			{
-				return _renderState;
-			}
-			set
-			{
-				if ( _renderState  != value )
-				{
-					_renderState = value;
-				}
-			}
-		}
-		
+				
 		public void SetRenderTarget (
          int renderTargetIndex,
          RenderTarget2D renderTarget

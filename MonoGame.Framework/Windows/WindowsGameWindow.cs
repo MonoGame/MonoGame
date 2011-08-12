@@ -507,6 +507,12 @@ namespace Microsoft.Xna.Framework
             if (!keys.Contains(e.Key.ToXna())) keys.Add(e.Key.ToXna());
         }
 
+        // This method should only be called when necessary like when the Guide is displayed
+        internal void ClearKeyCacheState()
+        {
+            keys.Clear();
+        }
+
         
         #region GameWindow Methods
 

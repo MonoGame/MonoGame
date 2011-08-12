@@ -763,21 +763,21 @@ namespace Marblets
                 //MarbletsGame.StorageDevice = Guide.EndShowStorageDeviceSelector(result);
 #endif
             }
-            if ((MarbletsGame.StorageDevice != null) &&
-                MarbletsGame.StorageDevice.IsConnected)
-            {
-                using (StorageContainer storageContainer =
-                    MarbletsGame.StorageDevice.OpenContainer("Marblets"))
-                {
-                    string highscoresPath = Path.Combine(storageContainer.Path,
-                                                         "highscores.xml");
-                    using (FileStream file = File.Create(highscoresPath))
-                    {
-                        XmlSerializer serializer = new XmlSerializer(typeof(List<int>));
-                        serializer.Serialize(file, MarbletsGame.HighScores);
-                    }
-                }
-            }
+//            if ((MarbletsGame.StorageDevice != null) &&
+//                MarbletsGame.StorageDevice.IsConnected)
+//            {
+//                using (StorageContainer storageContainer =
+//                    MarbletsGame.StorageDevice.OpenContainer("Marblets"))
+//                {
+//                    string highscoresPath = Path.Combine(storageContainer.Path,
+//                                                         "highscores.xml");
+//                    using (FileStream file = File.Create(highscoresPath))
+//                    {
+//                        XmlSerializer serializer = new XmlSerializer(typeof(List<int>));
+//                        serializer.Serialize(file, MarbletsGame.HighScores);
+//                    }
+//                }
+//            }
         }
 
         /// <summary>
