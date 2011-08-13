@@ -64,7 +64,7 @@ namespace Platformer
             TargetElapsedTime = TimeSpan.FromTicks(333333);
 #endif
 
-#if MONOMAC
+#if MONOMAC || WINDOWS
 			graphics.PreferredBackBufferWidth = 800;
 			graphics.PreferredBackBufferHeight = 480;
 #else
