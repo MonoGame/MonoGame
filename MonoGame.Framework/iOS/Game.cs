@@ -262,15 +262,6 @@ namespace Microsoft.Xna.Framework
 			
 			GraphicsDevice.Viewport = _vp;
 			
-			#region Moved off backgroun thread. TEST on device to see if this speeds things up
-			_initializing = true;
-			
-			InitializeGameComponents();
-			_initialized = true;
-			_initializing = false;	
-			
-			#endregion
-			
 			_view.Run( FramesPerSecond / ( FramesPerSecond * TargetElapsedTime.TotalSeconds ) );	
 			
 			_view.MainContext = _view.EAGLContext;
@@ -537,10 +528,6 @@ namespace Microsoft.Xna.Framework
 				var gc = (GameComponent)_gameComponentCollection[x];
 				gc.Initialize();
 			}
-			/*foreach (GameComponent gc in _gameComponentCollection)
-            {
-                gc.Initialize();
-            }*/
 			
 			EAGLContext.SetCurrentContext(_view.MainContext);
 		}
