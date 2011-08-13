@@ -93,9 +93,6 @@ namespace NetRumble
 			bloomExtractEffect = content.Load<Effect>("Effects/BloomExtract");
 			bloomCombineEffect = content.Load<Effect>("Effects/BloomCombine");
 			gaussianBlurEffect = content.Load<Effect>("Effects/GaussianBlur");
-            //bloomExtractEffect = new BloomExtractEffect(GraphicsDevice);
-            //bloomCombineEffect = new BloomCombineEffect(GraphicsDevice);
-            //gaussianBlurEffect = new GaussianBlurEffect(GraphicsDevice);
 
             // Look up the resolution and format of our main backbuffer.
             PresentationParameters pp = GraphicsDevice.PresentationParameters;
@@ -150,56 +147,56 @@ namespace NetRumble
         /// </summary>
         public override void Draw(GameTime gameTime)
         {
-//            GraphicsDevice.SamplerStates[1] = SamplerState.LinearClamp;
-//
-//            // Pass 1: draw the scene into rendertarget 1, using a
-//            // shader that extracts only the brightest parts of the image.
-//            bloomExtractEffect.Parameters["BloomThreshold"].SetValue(
-//                Settings.BloomThreshold);
-//
-//            DrawFullscreenQuad(sceneRenderTarget, renderTarget1,
-//                               bloomExtractEffect,
-//                               IntermediateBuffer.PreBloom);
-//
-//            // Pass 2: draw from rendertarget 1 into rendertarget 2,
-//            // using a shader to apply a horizontal gaussian blur filter.
-//            //SetBlurEffectParameters(1.0f / (float)renderTarget1.Width, 0);
-//
-//            DrawFullscreenQuad(renderTarget1, renderTarget2,
-//                               gaussianBlurEffect,
-//                               IntermediateBuffer.BlurredHorizontally);
-//
-//            // Pass 3: draw from rendertarget 2 back into rendertarget 1,
-//            // using a shader to apply a vertical gaussian blur filter.
-//            //SetBlurEffectParameters(0, 1.0f / (float)renderTarget1.Height);
-//
-//            DrawFullscreenQuad(renderTarget2, renderTarget1,
-//                               gaussianBlurEffect,
-//                               IntermediateBuffer.BlurredBothWays);
-//
-//            // Pass 4: draw both rendertarget 1 and the original scene
-//            // image back into the main backbuffer, using a shader that
-//            // combines them to produce the final bloomed result.
+            GraphicsDevice.SamplerStates[1] = SamplerState.LinearClamp;
+
+            // Pass 1: draw the scene into rendertarget 1, using a
+            // shader that extracts only the brightest parts of the image.
+            bloomExtractEffect.Parameters["BloomThreshold"].SetValue(
+                Settings.BloomThreshold);
+
+            DrawFullscreenQuad(sceneRenderTarget, renderTarget1,
+                               bloomExtractEffect,
+                               IntermediateBuffer.PreBloom);
+
+            // Pass 2: draw from rendertarget 1 into rendertarget 2,
+            // using a shader to apply a horizontal gaussian blur filter.
+            SetBlurEffectParameters(1.0f / (float)renderTarget1.Width, 0);
+
+            DrawFullscreenQuad(renderTarget1, renderTarget2,
+                               gaussianBlurEffect,
+                               IntermediateBuffer.BlurredHorizontally);
+
+            // Pass 3: draw from rendertarget 2 back into rendertarget 1,
+            // using a shader to apply a vertical gaussian blur filter.
+            SetBlurEffectParameters(0, 1.0f / (float)renderTarget1.Height);
+
+            DrawFullscreenQuad(renderTarget2, renderTarget1,
+                               gaussianBlurEffect,
+                               IntermediateBuffer.BlurredBothWays);
+
+            // Pass 4: draw both rendertarget 1 and the original scene
+            // image back into the main backbuffer, using a shader that
+            // combines them to produce the final bloomed result.
             GraphicsDevice.SetRenderTarget(null);
-//
-//            EffectParameterCollection parameters = bloomCombineEffect.Parameters;
-//            parameters["BloomIntensity"].SetValue(Settings.BloomIntensity);
-//            parameters["BaseIntensity"].SetValue(Settings.BaseIntensity);
-//            parameters["BloomSaturation"].SetValue(Settings.BloomSaturation);
-//            parameters["BaseSaturation"].SetValue(Settings.BaseSaturation);
+
+            EffectParameterCollection parameters = bloomCombineEffect.Parameters;
+            parameters["BloomIntensity"].SetValue(Settings.BloomIntensity);
+            parameters["BaseIntensity"].SetValue(Settings.BaseIntensity);
+            parameters["BloomSaturation"].SetValue(Settings.BloomSaturation);
+            parameters["BaseSaturation"].SetValue(Settings.BaseSaturation);
 
             GraphicsDevice.Textures[1] = sceneRenderTarget;
 
             Viewport viewport = GraphicsDevice.Viewport;
 
-//            DrawFullscreenQuad(renderTarget1,
+            DrawFullscreenQuad(renderTarget1,
+                               viewport.Width, viewport.Height,
+                               bloomCombineEffect,
+                               IntermediateBuffer.FinalResult);
+//            DrawFullscreenQuad(sceneRenderTarget,
 //                               viewport.Width, viewport.Height,
 //                               bloomCombineEffect,
 //                               IntermediateBuffer.FinalResult);
-            DrawFullscreenQuad(sceneRenderTarget,
-                               viewport.Width, viewport.Height,
-                               bloomCombineEffect,
-                               IntermediateBuffer.FinalResult);			
         }
 
 
@@ -232,7 +229,7 @@ namespace NetRumble
             {
                 effect = null;
             }
-			effect = null;
+			//effect = null;
             spriteBatch.Begin(0, BlendState.Opaque, null, null, null, effect);
             spriteBatch.Draw(texture, new Rectangle(0, 0, width, height), Color.White);
             spriteBatch.End();

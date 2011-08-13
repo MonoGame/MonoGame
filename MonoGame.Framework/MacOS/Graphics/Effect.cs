@@ -330,7 +330,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 		}
 		
-		private int GetUniformUserInedx (string uniformName)
+		private int GetUniformUserIndex (string uniformName)
 		{
 			int sPos = uniformName.LastIndexOf ("_s");
 			int index;
@@ -367,14 +367,14 @@ namespace Microsoft.Xna.Framework.Graphics
 
 				uniformName = name.ToString ();
 
-				userIndex = GetUniformUserInedx (uniformName);
+				userIndex = GetUniformUserIndex (uniformName);
 
 				uniformLocation = GL.GetUniformLocation (obj, uniformName);
 
-				Console.WriteLine ("{0}: {1} {2} {3}", x, name, type, length);
+				Console.WriteLine ("{0}: {1} {2} {3} {4}", x, name, type, length, size);
 
 				EffectParameter efp = new EffectParameter (this, uniformName, x, userIndex, uniformLocation,
-				                                          type.ToString (), length);
+				                                          type.ToString (), length, size);
 				Parameters._parameters.Add (efp.Name, efp);
 				if (efp.ParameterType == EffectParameterType.Texture2D) {
 					_textureMappings.Add(efp);
