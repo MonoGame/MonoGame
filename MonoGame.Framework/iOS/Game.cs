@@ -91,6 +91,7 @@ namespace Microsoft.Xna.Framework
 			// Initialize collections
 			_services = new GameServiceContainer();
 			_gameComponentCollection = new GameComponentCollection();
+			_gameComponentCollection.ComponentAdded += Handle_gameComponentCollectionComponentAdded;
 
 			//Create a full-screen window
 			_mainWindow = new UIWindow (UIScreen.MainScreen.Bounds);			
@@ -101,6 +102,19 @@ namespace Microsoft.Xna.Framework
 			// Initialize GameTime
             _updateGameTime = new GameTime();
             _drawGameTime = new GameTime();  	
+		}
+		
+		void Handle_gameComponentCollectionComponentAdded (object sender, GameComponentCollectionEventArgs e)
+		{
+			
+			if (!_initialized && !_initializing) {
+				//Console.WriteLine("here");
+				//e.GameComponent.Initialize();
+			}
+			else {
+				e.GameComponent.Initialize();
+				//_gameComponentsToInitialize.Add(e.GameComponent);
+			}				
 		}
 		
 		~Game()
@@ -260,7 +274,7 @@ namespace Microsoft.Xna.Framework
 			_vp.Width = manager.PreferredBackBufferWidth;
 			_vp.Height = manager.PreferredBackBufferHeight;
 			
-			GraphicsDevice.Viewport = _vp;
+			GraphicsDevice.Viewport = _vp;	
 			
 			_view.Run( FramesPerSecond / ( FramesPerSecond * TargetElapsedTime.TotalSeconds ) );	
 			
@@ -271,7 +285,7 @@ namespace Microsoft.Xna.Framework
 			//Show the window			
 			_mainWindow.MakeKeyAndVisible();	
 			
-			Accelerometer.SetupAccelerometer();	
+			Accelerometer.SetupAccelerometer();			
 			Initialize();
 			
 			// Listen out for rotation changes
@@ -496,12 +510,12 @@ namespace Microsoft.Xna.Framework
 
 			bitmap.RotateCTM(MathHelper.ToRadians(degrees));
 
-   // Now, draw the rotated/scaled image into the context
+   			// Now, draw the rotated/scaled image into the context
 			bitmap.ScaleCTM(1,-1);
 			bitmap.DrawImage(new System.Drawing.RectangleF(-self.Size.Width*self.CurrentScale /2,-self.Size.Height*self.CurrentScale/2,self.Size.Width*self.CurrentScale,self.Size.Height*self.CurrentScale),self.CGImage);
    			UIImage newImage = UIGraphics.GetImageFromCurrentImageContext();
 			UIGraphics.EndImageContext();
-   return newImage;	
+   			return newImage;	
 		}
 		
 		protected virtual void UnloadContent()
