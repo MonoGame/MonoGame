@@ -234,6 +234,6 @@ Global
 		{B35097FE-CBF0-4CAD-8B93-36C9587057DE} = {144280E6-FEFD-4B13-B25C-0DDB48CFBCAE}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = Samples\MacOS\HoneycombRush\HoneycombRush.csproj
+		StartupItem = Samples\MacOS\NetRumble\NetRumble.csproj
 	EndGlobalSection
 EndGlobal

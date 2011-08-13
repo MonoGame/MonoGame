@@ -23,7 +23,7 @@ namespace Microsoft.Xna.Framework.Graphics
         public EffectParameter this[string name]
         {
             get { return _parameters[name]; }
-            set { _parameters[name] = value; }
+            internal set { _parameters[name] = value; }
         }
 
         public IEnumerator<EffectParameter> GetEnumerator()
