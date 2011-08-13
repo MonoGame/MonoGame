@@ -76,7 +76,7 @@ namespace Microsoft.Xna.Framework
 		private bool _isFixedTimeStep = true;
         private TimeSpan _targetElapsedTime = TimeSpan.FromSeconds(1 / FramesPerSecond); 
         
-		internal IGraphicsDeviceManager graphicsDeviceManager;
+		private IGraphicsDeviceManager _graphicsDeviceManager;
 		private IGraphicsDeviceService graphicsDeviceService;
 		private UIWindow _mainWindow;
 
@@ -91,6 +91,7 @@ namespace Microsoft.Xna.Framework
 			// Initialize collections
 			_services = new GameServiceContainer();
 			_gameComponentCollection = new GameComponentCollection();
+			_gameComponentCollection.ComponentAdded += Handle_gameComponentCollectionComponentAdded;
 
 			//Create a full-screen window
 			_mainWindow = new UIWindow (UIScreen.MainScreen.Bounds);			
@@ -101,6 +102,19 @@ namespace Microsoft.Xna.Framework
 			// Initialize GameTime
             _updateGameTime = new GameTime();
             _drawGameTime = new GameTime();  	
+		}
+		
+		void Handle_gameComponentCollectionComponentAdded (object sender, GameComponentCollectionEventArgs e)
+		{
+			
+			if (!_initialized && !_initializing) {
+				//Console.WriteLine("here");
+				//e.GameComponent.Initialize();
+			}
+			else {
+				e.GameComponent.Initialize();
+				//_gameComponentsToInitialize.Add(e.GameComponent);
+			}				
 		}
 		
 		~Game()
@@ -243,6 +257,25 @@ namespace Microsoft.Xna.Framework
     	{			
 			_lastUpdate = DateTime.Now;
 			
+			// In an original XNA game the GraphicsDevice property is null during initialization
+			// but before the Game's Initialize method is called the property is available so we can
+			// only assume that it should be created somewhere in here.  We can not set the viewport 
+			// values correctly based on the Preferred settings which is causing some problems on some
+			// Microsoft samples which we are not handling correctly.
+			graphicsDeviceManager.CreateDevice();
+			
+			var manager = Services.GetService (typeof(IGraphicsDeviceManager)) as GraphicsDeviceManager;
+			
+			Microsoft.Xna.Framework.Graphics.Viewport _vp =
+			new Microsoft.Xna.Framework.Graphics.Viewport();
+				
+			_vp.X = 0;
+			_vp.Y = 0;
+			_vp.Width = manager.PreferredBackBufferWidth;
+			_vp.Height = manager.PreferredBackBufferHeight;
+			
+			GraphicsDevice.Viewport = _vp;	
+			
 			_view.Run( FramesPerSecond / ( FramesPerSecond * TargetElapsedTime.TotalSeconds ) );	
 			
 			_view.MainContext = _view.EAGLContext;
@@ -252,7 +285,6 @@ namespace Microsoft.Xna.Framework
 			//Show the window			
 			_mainWindow.MakeKeyAndVisible();	
 			
-			// Get the Accelerometer going
 			Accelerometer.SetupAccelerometer();			
 			Initialize();
 			
@@ -335,6 +367,18 @@ namespace Microsoft.Xna.Framework
                 return _content;
             }
         }
+		
+		internal GraphicsDeviceManager graphicsDeviceManager {
+			get {
+				if (this._graphicsDeviceManager == null) {
+					this._graphicsDeviceManager = this.Services.GetService (typeof(IGraphicsDeviceManager)) as IGraphicsDeviceManager;
+					if (this._graphicsDeviceManager == null) {
+						throw new InvalidOperationException ("No Graphics Device Manager");
+					}
+				}
+				return (GraphicsDeviceManager)this._graphicsDeviceManager;
+			}
+		}
 
         public GraphicsDevice GraphicsDevice
         {
@@ -466,12 +510,12 @@ namespace Microsoft.Xna.Framework
 
 			bitmap.RotateCTM(MathHelper.ToRadians(degrees));
 
-   // Now, draw the rotated/scaled image into the context
+   			// Now, draw the rotated/scaled image into the context
 			bitmap.ScaleCTM(1,-1);
 			bitmap.DrawImage(new System.Drawing.RectangleF(-self.Size.Width*self.CurrentScale /2,-self.Size.Height*self.CurrentScale/2,self.Size.Width*self.CurrentScale,self.Size.Height*self.CurrentScale),self.CGImage);
    			UIImage newImage = UIGraphics.GetImageFromCurrentImageContext();
 			UIGraphics.EndImageContext();
-   return newImage;	
+   			return newImage;	
 		}
 		
 		protected virtual void UnloadContent()
@@ -481,7 +525,6 @@ namespace Microsoft.Xna.Framework
 		
         protected virtual void Initialize()
         {
-			this.graphicsDeviceManager = this.Services.GetService(typeof(IGraphicsDeviceManager)) as IGraphicsDeviceManager;			
 			this.graphicsDeviceService = this.Services.GetService(typeof(IGraphicsDeviceService)) as IGraphicsDeviceService;			
 
 			if ((this.graphicsDeviceService != null) && (this.graphicsDeviceService.GraphicsDevice != null))
@@ -494,10 +537,11 @@ namespace Microsoft.Xna.Framework
 		{
 			EAGLContext.SetCurrentContext(_view.BackgroundContext);
 			
-			foreach (GameComponent gc in _gameComponentCollection)
-            {
-                gc.Initialize();
-            }
+			for (int x = 0; x < _gameComponentCollection.Count; x++) 
+			{
+				var gc = (GameComponent)_gameComponentCollection[x];
+				gc.Initialize();
+			}
 			
 			EAGLContext.SetCurrentContext(_view.MainContext);
 		}
