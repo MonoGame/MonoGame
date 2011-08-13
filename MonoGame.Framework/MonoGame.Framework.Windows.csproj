@@ -85,8 +85,10 @@
     </Reference>
     <Reference Include="System.Core">
     </Reference>
-    <Reference Include="System.Web" />
-    <Reference Include="System.Web.Services" />
+    <Reference Include="System.Web">
+    </Reference>
+    <Reference Include="System.Web.Services">
+    </Reference>
     <Reference Include="System.Windows.Forms">
     </Reference>
     <Reference Include="System.Xml.Linq">
@@ -375,6 +377,7 @@
     <Compile Include="Graphics\DirectionalLight.cs" />
     <Compile Include="Color.cs" />
     <Compile Include="Windows\GraphicsDeviceManager.cs" />
+    <Compile Include="Windows\TitleContainer.cs" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
