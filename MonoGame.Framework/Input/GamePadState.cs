@@ -55,6 +55,14 @@ namespace Microsoft.Xna.Framework.Input
 			_buttons = buttons;
 			_thumbs = new GamePadThumbSticks(LeftStick,RightStick);
 		}
+
+        public GamePadState(GamePadThumbSticks thumbs, GamePadTriggers triggers, GamePadButtons gamePadButtons, GamePadDPad dPad)
+        {
+            _thumbs = thumbs;
+            _triggers = triggers;
+            ConvertGamePadButtonsToButtons(ref gamePadButtons, out _buttons);
+            _dPad = dPad;
+        }
 		
         public GamePadButtons Buttons
         {
@@ -105,6 +113,55 @@ namespace Microsoft.Xna.Framework.Input
 				return _triggers;
 			}
 		}
+
+        internal static void ConvertGamePadButtonsToButtons(ref GamePadButtons gamePadButtons, out Buttons buttons)
+        {
+            buttons = new Buttons();
+            if (gamePadButtons.A == ButtonState.Pressed)
+            {
+                buttons |= Microsoft.Xna.Framework.Input.Buttons.A;
+            }
+            if (gamePadButtons.B == ButtonState.Pressed)
+            {
+                buttons |= Microsoft.Xna.Framework.Input.Buttons.B;
+            }
+            if (gamePadButtons.X == ButtonState.Pressed)
+            {
+                buttons |= Microsoft.Xna.Framework.Input.Buttons.X;
+            }
+            if (gamePadButtons.Y == ButtonState.Pressed)
+            {
+                buttons |= Microsoft.Xna.Framework.Input.Buttons.Y;
+            }
+            if (gamePadButtons.Back == ButtonState.Pressed)
+            {
+                buttons |= Microsoft.Xna.Framework.Input.Buttons.Back;
+            }
+            if (gamePadButtons.Start == ButtonState.Pressed)
+            {
+                buttons |= Microsoft.Xna.Framework.Input.Buttons.Start;
+            }
+            if (gamePadButtons.BigButton == ButtonState.Pressed)
+            {
+                buttons |= Microsoft.Xna.Framework.Input.Buttons.BigButton;
+            }
+            if (gamePadButtons.LeftShoulder == ButtonState.Pressed)
+            {
+                buttons |= Microsoft.Xna.Framework.Input.Buttons.LeftShoulder;
+            }
+            if (gamePadButtons.RightShoulder == ButtonState.Pressed)
+            {
+                buttons |= Microsoft.Xna.Framework.Input.Buttons.RightShoulder;
+            }
+            if (gamePadButtons.LeftStick == ButtonState.Pressed)
+            {
+                buttons |= Microsoft.Xna.Framework.Input.Buttons.LeftStick;
+            }
+            if (gamePadButtons.RightStick == ButtonState.Pressed)
+            {
+                buttons |= Microsoft.Xna.Framework.Input.Buttons.RightStick;
+            }
+        }
     }
 
 }
