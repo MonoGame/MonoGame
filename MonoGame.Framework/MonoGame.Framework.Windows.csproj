@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -151,6 +151,7 @@
     <Compile Include="GamerServices\GamerProfile.cs" />
     <Compile Include="GamerServices\GamerServicesComponent.cs" />
     <Compile Include="GamerServices\GamerZone.cs" />
+    <Compile Include="GamerServices\GuideAlreadyVisibleException.cs" />
     <Compile Include="GamerServices\MessageBoxIcon.cs" />
     <Compile Include="GamerServices\MonoLive.cs" />
     <Compile Include="GamerServices\MonoLiveClient.cs" />
