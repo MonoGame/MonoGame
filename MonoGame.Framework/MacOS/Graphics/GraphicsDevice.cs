@@ -367,13 +367,16 @@ namespace Microsoft.Xna.Framework.Graphics
 					// attach the renderbuffer to depth attachment point
 					GL.FramebufferRenderbuffer(FramebufferTarget.FramebufferExt, FramebufferAttachment.DepthAttachmentExt,
 						RenderbufferTarget.RenderbufferExt, renderBufferIDs[i]);
-						
+
+					if (target.RenderTargetUsage == RenderTargetUsage.DiscardContents)
+						Clear(Color.Transparent);
 				}
 				
 				FramebufferErrorCode status = GL.CheckFramebufferStatus(FramebufferTarget.FramebufferExt);
 				
 				if (status != FramebufferErrorCode.FramebufferComplete)
 					throw new Exception("Error creating framebuffer: " + status);
+
 				//GL.ClearColor (Color4.Transparent);
 				//GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 				
