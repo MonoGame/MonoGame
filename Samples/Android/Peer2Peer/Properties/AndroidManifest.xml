@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="1" android:versionName="1.0" package="monogamesamplespeer2peerandroid.monogamesamplespeer2peerandroid">
-	<application android:label="MonoGame.Samples.Peer2Peer.Android"></application>
-	<uses-sdk />
-	<uses-permission android:name="android.permission.INTERNET" />
-</manifest>
