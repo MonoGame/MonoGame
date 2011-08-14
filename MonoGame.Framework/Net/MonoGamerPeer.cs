@@ -433,7 +433,7 @@ namespace Microsoft.Xna.Framework.Net
 		else
 			return new TimeSpan(0);
 #else
-                return null;
+                return new TimeSpan(0);
 #endif
             }
             set
