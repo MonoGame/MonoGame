@@ -50,7 +50,7 @@ namespace Microsoft.Xna.Framework
 		public static Stream OpenStream (string name)
 		{
 			var file = Path.Combine(NSBundle.MainBundle.ResourcePath, name);
-			return new FileStream(file, FileMode.Open); 
+			return new FileStream(file, FileMode.Open);
 		}
 	}
 }

@@ -141,8 +141,11 @@ namespace Microsoft.Xna.Framework
 		public Point Center
 		{
 			get 
-			{ 
-				return new Point( (this.X + this.Width) / 2,(this.Y + this.Height) / 2 ); 
+			{
+				// This is incorrect
+				//return new Point( (this.X + this.Width) / 2,(this.Y + this.Height) / 2 );
+				// What we want is the Center of the rectangle from the X and Y Origins
+				return new Point(this.X + (this.Width / 2), this.Y + (this.Height / 2));
 			}
 		}
 
