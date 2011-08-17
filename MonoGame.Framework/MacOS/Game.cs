@@ -60,6 +60,11 @@ namespace Microsoft.Xna.Framework
 	{
 		private const float FramesPerSecond = 60.0f; // ~60 frames per second
 
+
+		// I do believe we can take out the next three variables.
+		//  After the release this should be looked at as the time is
+		//  passed from the GameWindow which controlls when updating is to
+		//  be done.
 		private GameTime _updateGameTime;
 		private GameTime _drawGameTime;
 		private DateTime _lastUpdate;
@@ -273,6 +278,7 @@ namespace Microsoft.Xna.Framework
 		// processing events for the game.
 		public void Run ()
 		{			
+
 			_lastUpdate = DateTime.Now;
 
 			// In an original XNA game the GraphicsDevice property is null during initialization
@@ -335,20 +341,6 @@ namespace Microsoft.Xna.Framework
 			if (_isActive) {
 				Draw (aGameTime);
 			}
-		}
-
-		internal void DoStep ()
-		{
-			var timeNow = DateTime.Now;
-
-			// Update the game			
-			_updateGameTime.Update (timeNow - _lastUpdate);
-			Update (_updateGameTime);
-
-			// Draw the screen
-			_drawGameTime.Update (timeNow - _lastUpdate);
-			_lastUpdate = timeNow;
-			Draw (_drawGameTime);       			
 		}
 
 		public bool IsFixedTimeStep {

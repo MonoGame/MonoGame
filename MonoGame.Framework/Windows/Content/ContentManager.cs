@@ -46,6 +46,8 @@ using System.Reflection;
 using System.Text;
 using Microsoft.Xna.Framework.Graphics;
 using Path = System.IO.Path;
+using Microsoft.Xna.Framework.Media;
+using Microsoft.Xna.Framework.Audio;
 
 
 namespace Microsoft.Xna.Framework.Content
@@ -114,14 +116,14 @@ namespace Microsoft.Xna.Framework.Content
 			{
 				assetName = Effect.Normalize(assetName);
 			}
-            /*else if ((typeof(T) == typeof(Song)))
+            else if ((typeof(T) == typeof(Song)))
             {
                 assetName = SongReader.Normalize(assetName);
             }
             else if ((typeof(T) == typeof(SoundEffect)))
             {
                 assetName = SoundEffectReader.Normalize(assetName);
-            }
+            }/*
             else if ((typeof(T) == typeof(Video)))
             {
                 assetName = Video.Normalize(assetName);
@@ -142,10 +144,12 @@ namespace Microsoft.Xna.Framework.Content
 			{
 				if ((typeof(T) == typeof(Texture2D))) {
                     //Basically the same as Texture2D.FromFile but loading from the assets instead of a filePath
-                    Stream assetStream = File.Open(assetName, FileMode.Open, FileAccess.Read);
-				    Bitmap image = (Bitmap)Bitmap.FromStream(assetStream);
-                    ESImage theTexture = new ESImage(image, graphicsDeviceService.GraphicsDevice.PreferedFilter);
-                    result = new Texture2D(theTexture) { Name = Path.GetFileNameWithoutExtension(assetName) };
+                    using (Stream assetStream = File.Open(assetName, FileMode.Open, FileAccess.Read))
+                    {
+                        Bitmap image = (Bitmap)Bitmap.FromStream(assetStream);
+                        ESImage theTexture = new ESImage(image, graphicsDeviceService.GraphicsDevice.PreferedFilter);
+                        result = new Texture2D(theTexture) { Name = Path.GetFileNameWithoutExtension(assetName) };
+                    }
 				}
 				if ((typeof(T) == typeof(SpriteFont)))
 				{
@@ -157,11 +161,11 @@ namespace Microsoft.Xna.Framework.Content
                     result = new Effect(graphicsDeviceService.GraphicsDevice, assetName);
                 }
 
-                /*if ((typeof(T) == typeof(Song)))
+                if ((typeof(T) == typeof(Song)))
                     result = new Song(assetName);
                 if ((typeof(T) == typeof(SoundEffect)))
                     result = new SoundEffect(assetName);
-                if ((typeof(T) == typeof(Video)))
+                /*if ((typeof(T) == typeof(Video)))
                     result = new Video(assetName);*/	
 
 			}

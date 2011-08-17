@@ -1,7 +1,0 @@
-<?xml version="1.0"?>
-<XnaContent><Asset Type="RolePlayingGameData.Chest">
-  <Name>Gold</Name>
-  <Gold>200</Gold>
-  <Entries />
-  <TextureName>Chest1d</TextureName>
-</Asset></XnaContent>

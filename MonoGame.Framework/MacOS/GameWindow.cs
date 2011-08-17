@@ -129,6 +129,12 @@ namespace Microsoft.Xna.Framework
 
 		#region MonoMacGameView Methods
 
+		public new void Run (double updateRate)
+		{
+			_lastUpdate = DateTime.Now;
+			base.Run(updateRate);
+		}
+
 		protected override void OnClosed (EventArgs e)
 		{
 			base.OnClosed (e);

@@ -10,7 +10,6 @@
     <OutputType>Library</OutputType>
     <RootNamespace>Microsoft.Xna.Framework.GamerServices</RootNamespace>
     <AssemblyName>MonoGame.Framework.MacOS</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>

@@ -98,12 +98,19 @@ namespace Microsoft.Xna.Framework
 
 		#region IGraphicsDeviceService Members
 
-		public event EventHandler DeviceCreated;
-		public event EventHandler DeviceDisposing;
-		public event EventHandler DeviceReset;
-		public event EventHandler DeviceResetting;
+		public event EventHandler<EventArgs> DeviceCreated;
+		public event EventHandler<EventArgs> DeviceDisposing;
+		public event EventHandler<EventArgs> DeviceReset;
+		public event EventHandler<EventArgs> DeviceResetting;
 		public event EventHandler<PreparingDeviceSettingsEventArgs> PreparingDeviceSettings;
-
+		
+		internal void OnDeviceDisposing (EventArgs e)
+		{
+			var h = DeviceDisposing;
+			if (h != null)
+				h (this, e);
+		}
+		
 		internal void OnDeviceResetting (EventArgs e)
 		{
 			var h = DeviceResetting;

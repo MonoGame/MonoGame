@@ -85,8 +85,10 @@
     </Reference>
     <Reference Include="System.Core">
     </Reference>
-    <Reference Include="System.Web" />
-    <Reference Include="System.Web.Services" />
+    <Reference Include="System.Web">
+    </Reference>
+    <Reference Include="System.Web.Services">
+    </Reference>
     <Reference Include="System.Windows.Forms">
     </Reference>
     <Reference Include="System.Xml.Linq">
@@ -149,6 +151,7 @@
     <Compile Include="GamerServices\GamerProfile.cs" />
     <Compile Include="GamerServices\GamerServicesComponent.cs" />
     <Compile Include="GamerServices\GamerZone.cs" />
+    <Compile Include="GamerServices\GuideAlreadyVisibleException.cs" />
     <Compile Include="GamerServices\MessageBoxIcon.cs" />
     <Compile Include="GamerServices\MonoLive.cs" />
     <Compile Include="GamerServices\MonoLiveClient.cs" />
@@ -242,6 +245,7 @@
     <Compile Include="Net\QualityOfService.cs" />
     <Compile Include="Net\SendDataOptions.cs" />
     <Compile Include="Storage\StorageDeviceHelper.cs" />
+    <Compile Include="TitleContainer.cs" />
     <Compile Include="Windows\Audio\AudioLoader.cs" />
     <Compile Include="Windows\Audio\Sound.cs" />
     <Compile Include="Windows\Content\ContentManager.cs" />
@@ -374,7 +378,8 @@
     <Compile Include="Graphics\Effect\IEffectMatrices.cs" />
     <Compile Include="Graphics\DirectionalLight.cs" />
     <Compile Include="Color.cs" />
-    <Compile Include="Windows\Graphics\GraphicsDeviceManager.cs" />
+    <Compile Include="Windows\GraphicsDeviceManager.cs" />
+    <Compile Include="Windows\TitleContainer.cs" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
