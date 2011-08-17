@@ -358,13 +358,15 @@ namespace Microsoft.Xna.Framework
 			else
 			{
 				bounds.Width = graphicsDeviceManager.PreferredBackBufferWidth;
-				bounds.Height = graphicsDeviceManager.PreferredBackBufferHeight;				
+				bounds.Height = graphicsDeviceManager.PreferredBackBufferHeight;
 			}
 			
 			if (toggleFullScreen)
 				_view.ToggleFullScreen();
 			
-			_view.ChangeClientBounds(bounds);
+			// we only change window bounds if we are not fullscreen 
+			if (!graphicsDeviceManager.IsFullScreen)
+				_view.ChangeClientBounds(bounds);
 			
 			IsActive = wasActive;
 		}
