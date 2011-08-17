@@ -39,9 +39,10 @@ purpose and non-infringement.
 #endregion License
 
 using System;
-using Android.Content.PM;
-using Android.Views;
-using OpenTK.Graphics.ES11;
+using System.Drawing;
+using System.Windows.Forms;
+using OpenTK;
+using OpenTK.Graphics.OpenGL;
 
 using Microsoft.Xna.Framework.Graphics;
 
@@ -62,9 +63,7 @@ namespace Microsoft.Xna.Framework
             {
                 throw new ArgumentNullException("Game Cannot Be Null");
             }
-
-            Game.contextInstance.RequestWindowFeature(WindowFeatures.NoTitle);
-           
+            
 			_game = game;
 			_preferredBackBufferHeight = game.Window.ClientBounds.Height;
 			_preferredBackBufferWidth = game.Window.ClientBounds.Width;
@@ -77,13 +76,16 @@ namespace Microsoft.Xna.Framework
 			
             game.Services.AddService(typeof(IGraphicsDeviceManager), this);
             game.Services.AddService(typeof(IGraphicsDeviceService), this);	
-			
-			Initialize();
         }
 		
 		public void CreateDevice ()
 		{
-			throw new System.NotImplementedException ();
+            _graphicsDevice = new GraphicsDevice();
+            _graphicsDevice.PresentationParameters = new PresentationParameters();
+
+            Initialize();
+
+            OnDeviceCreated(EventArgs.Empty);
 		}
 
 		public bool BeginDraw ()
@@ -101,8 +103,9 @@ namespace Microsoft.Xna.Framework
         public event EventHandler<EventArgs> DeviceCreated;
         public event EventHandler<EventArgs> DeviceDisposing;
         public event EventHandler<EventArgs> DeviceReset;
-        public event EventHandler<EventArgs> DeviceResetting;
+        public event EventHandler<EventArgs> DeviceResetting;	
 		public event EventHandler<PreparingDeviceSettingsEventArgs> PreparingDeviceSettings;
+        private bool wantFullScreen;
 		
 		internal void OnDeviceDisposing (EventArgs e)
 		{
@@ -110,27 +113,28 @@ namespace Microsoft.Xna.Framework
 			if (h != null)
 				h (this, e);
 		}
-		
-		internal void OnDeviceCreated (EventArgs e)
-		{
-			var h = DeviceCreated;
-			if (h != null)
-				h (this, e);
-		}
-		
-		internal void OnDeviceResetting (EventArgs e)
-		{
-			var h = DeviceResetting;
-			if (h != null)
-				h (this, e);
-		}
 
-		internal void OnDeviceReset (EventArgs e)
-		{
-			var h = DeviceReset;
-			if (h != null)
-				h (this, e);
-		}		
+        internal void OnDeviceResetting(EventArgs e)
+        {
+            var h = DeviceResetting;
+            if (h != null)
+                h(this, e);
+        }
+
+        internal void OnDeviceReset(EventArgs e)
+        {
+            var h = DeviceReset;
+            if (h != null)
+                h(this, e);
+        }
+
+        internal void OnDeviceCreated(EventArgs e)
+        {
+            var h = DeviceCreated;
+            if (h != null)
+                h(this, e);
+        }
+
         #endregion
 
         #region IDisposable Members
@@ -143,17 +147,28 @@ namespace Microsoft.Xna.Framework
 
         public void ApplyChanges()
         {
+            var wGameWindow = _game.Window as WindowsGameWindow;
+
+            if (IsFullScreen)
+            {
+                wGameWindow.OpenTkGameWindow.WindowBorder = WindowBorder.Hidden;
+                wGameWindow.OpenTkGameWindow.WindowState = OpenTK.WindowState.Fullscreen;
+                (_game.Window as WindowsGameWindow).OpenTkGameWindow.ClientSize = new Size(wGameWindow.OpenTkGameWindow.ClientRectangle.Width, wGameWindow.OpenTkGameWindow.ClientRectangle.Height);
+            }
+            else
+            {
+                wGameWindow.OpenTkGameWindow.WindowState = OpenTK.WindowState.Normal;
+                wGameWindow.OpenTkGameWindow.WindowBorder =  _game.Window.AllowUserResizing ? WindowBorder.Resizable : WindowBorder.Fixed;
+                (_game.Window as WindowsGameWindow).OpenTkGameWindow.ClientSize = new Size(PreferredBackBufferWidth, PreferredBackBufferHeight);
+            }
+            
         }
 
 		private void Initialize()
 		{
-			_graphicsDevice = new GraphicsDevice();
-			_graphicsDevice.PresentationParameters = new PresentationParameters();
-			
-			// Set "full screen"  as default
-			IsFullScreen = true;
+            _graphicsDevice.PresentationParameters.IsFullScreen = IsFullScreen;
 
-			if (_preferMultiSampling) 
+            if (_preferMultiSampling) 
 			{
 				_graphicsDevice.PreferedFilter = All.Linear;
 			}
@@ -161,6 +176,9 @@ namespace Microsoft.Xna.Framework
 			{
 				_graphicsDevice.PreferedFilter = All.Nearest;
 			}
+
+            ApplyChanges();
+           
 		}
 		
         public void ToggleFullScreen()
@@ -180,16 +198,20 @@ namespace Microsoft.Xna.Framework
         {
             get
             {
-				 return _graphicsDevice.PresentationParameters.IsFullScreen;
+                if (_graphicsDevice != null)
+                {
+                    if (_graphicsDevice.PresentationParameters.IsFullScreen != wantFullScreen) _graphicsDevice.PresentationParameters.IsFullScreen = wantFullScreen;
+                    return _graphicsDevice.PresentationParameters.IsFullScreen;
+                }
+                else
+                    return wantFullScreen;
             }
             set
             {
-                if (IsFullScreen != value) {
-                    _graphicsDevice.PresentationParameters.IsFullScreen = value;
-                    if (IsFullScreen)
-                        Game.contextInstance.Window.SetFlags(WindowManagerFlags.Fullscreen, WindowManagerFlags.Fullscreen);
-                    else
-                        Game.contextInstance.Window.SetFlags(WindowManagerFlags.ForceNotFullscreen, WindowManagerFlags.ForceNotFullscreen);
+                wantFullScreen = value;
+                if ( _graphicsDevice != null && IsFullScreen != value)
+                {
+                    _graphicsDevice.PresentationParameters.IsFullScreen = value;                    
                 }
             }
         }
@@ -203,14 +225,17 @@ namespace Microsoft.Xna.Framework
             set
             {
 				_preferMultiSampling = value;
-				if (_preferMultiSampling) 
-				{
-					_graphicsDevice.PreferedFilter = All.Linear;
-				}
-				else 
-				{
-					_graphicsDevice.PreferedFilter = All.Nearest;
-				}
+                if (_graphicsDevice != null)
+                {
+                    if (_preferMultiSampling)
+                    {
+                        _graphicsDevice.PreferedFilter = All.Linear;
+                    }
+                    else
+                    {
+                        _graphicsDevice.PreferedFilter = All.Nearest;
+                    }
+                }
             }
         }
 
@@ -234,6 +259,7 @@ namespace Microsoft.Xna.Framework
             set
             {
 				_preferredBackBufferHeight = value;
+
             }
         }
 

@@ -119,10 +119,6 @@ namespace Microsoft.Xna.Framework.Graphics
 				break;
 			}
 			
-			// make sure an old draw isn't still going on.
-			// cross fingers, commenting this out!!
-			//GL.Flush();
-			
 			int size = sizeof(float)*4+sizeof(uint);
 			GL.VertexPointer(2, VertexPointerType.Float,size,_vertexHandle.AddrOfPinnedObject() );
 			GL.ColorPointer(4, ColorPointerType.UnsignedByte,size,(IntPtr)((uint)_vertexHandle.AddrOfPinnedObject()+(uint)(sizeof(float)*2)));
@@ -148,7 +144,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 					GL.ActiveTexture(TextureUnit.Texture0);
 					GL.BindTexture ( TextureTarget.Texture2D, texID );
-					GL.Uniform1(1,texID);					
+					//GL.Uniform1(1,texID);					
 				}
 				// store the SpriteBatchItem data in our vertexArray
 				_vertexArray[index++] = item.vertexTL;

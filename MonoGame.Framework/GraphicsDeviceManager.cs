@@ -54,6 +54,7 @@ namespace Microsoft.Xna.Framework
 		private int _preferredBackBufferWidth;
 		private bool _preferMultiSampling;
 		private DisplayOrientation _supportedOrientations;
+		private bool wantFullScreen = true;
 
         public GraphicsDeviceManager(Game game)
         {
@@ -63,9 +64,10 @@ namespace Microsoft.Xna.Framework
             }
             
 			_game = game;
+			
+			_supportedOrientations = DisplayOrientation.Default;
 			_preferredBackBufferHeight = game.Window.ClientBounds.Height;
 			_preferredBackBufferWidth = game.Window.ClientBounds.Width;
-			_supportedOrientations = DisplayOrientation.Default;
 			
             if (game.Services.GetService(typeof(IGraphicsDeviceManager)) != null)
             {
@@ -73,14 +75,17 @@ namespace Microsoft.Xna.Framework
             }
 			
             game.Services.AddService(typeof(IGraphicsDeviceManager), this);
-            game.Services.AddService(typeof(IGraphicsDeviceService), this);	
-			
-			Initialize();
+            game.Services.AddService(typeof(IGraphicsDeviceService), this);
         }
 		
-		public void CreateDevice ()
+		public void CreateDevice()
 		{
-			throw new System.NotImplementedException ();
+			_graphicsDevice = new GraphicsDevice();
+			_graphicsDevice.PresentationParameters = new PresentationParameters();
+
+			Initialize();
+			
+			OnDeviceCreated(EventArgs.Empty);
 		}
 
 		public bool BeginDraw ()
@@ -95,15 +100,39 @@ namespace Microsoft.Xna.Framework
 		
 		 #region IGraphicsDeviceService Members
 
-        public event EventHandler DeviceCreated;
-
-        public event EventHandler DeviceDisposing;
-
-        public event EventHandler DeviceReset;
-
-        public event EventHandler DeviceResetting;
-		
+        public event EventHandler<EventArgs> DeviceCreated;
+        public event EventHandler<EventArgs> DeviceDisposing;
+        public event EventHandler<EventArgs> DeviceReset;
+        public event EventHandler<EventArgs> DeviceResetting;		
 		public event EventHandler<PreparingDeviceSettingsEventArgs> PreparingDeviceSettings;
+		
+		internal void OnDeviceDisposing (EventArgs e)
+		{
+			var h = DeviceDisposing;
+			if (h != null)
+				h (this, e);
+		}
+		
+		internal void OnDeviceCreated (EventArgs e)
+		{
+			var h = DeviceCreated;
+			if (h != null)
+				h (this, e);
+		}
+		
+		internal void OnDeviceResetting (EventArgs e)
+		{
+			var h = DeviceResetting;
+			if (h != null)
+				h (this, e);
+		}
+
+		internal void OnDeviceReset (EventArgs e)
+		{
+			var h = DeviceReset;
+			if (h != null)
+				h (this, e);
+		}		
 
         #endregion
 
@@ -120,10 +149,7 @@ namespace Microsoft.Xna.Framework
         }
 
 		private void Initialize()
-		{
-			_graphicsDevice = new GraphicsDevice();
-			_graphicsDevice.PresentationParameters = new PresentationParameters();
-			
+		{			
 			// Set "full screen"  as default
 			_graphicsDevice.PresentationParameters.IsFullScreen = true;
 
@@ -154,11 +180,18 @@ namespace Microsoft.Xna.Framework
         {
             get
             {
-				 return _graphicsDevice.PresentationParameters.IsFullScreen;
+				if (_graphicsDevice != null)
+					return _graphicsDevice.PresentationParameters.IsFullScreen;
+				else
+					return wantFullScreen;				 
             }
             set
             {
-				_graphicsDevice.PresentationParameters.IsFullScreen = value;				
+				wantFullScreen = value;
+				if (_graphicsDevice != null) 
+				{
+					_graphicsDevice.PresentationParameters.IsFullScreen = value;	
+				}
             }
         }
 
@@ -171,13 +204,16 @@ namespace Microsoft.Xna.Framework
             set
             {
 				_preferMultiSampling = value;
-				if (_preferMultiSampling) 
+				if ( _graphicsDevice != null )
 				{
-					_graphicsDevice.PreferedFilter = All.Linear;
-				}
-				else 
-				{
-					_graphicsDevice.PreferedFilter = All.Nearest;
+					if (_preferMultiSampling) 
+					{
+						_graphicsDevice.PreferedFilter = All.Linear;
+					}
+					else 
+					{
+						_graphicsDevice.PreferedFilter = All.Nearest;
+					}
 				}
             }
         }

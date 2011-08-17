@@ -51,6 +51,8 @@ namespace Microsoft.Xna.Framework.Graphics
 	//
 	public class RenderTarget2D : Texture2D
 	{
+
+		internal RenderTargetUsage RenderTargetUsage { get; set; }
 		
 		public RenderTarget2D (GraphicsDevice graphicsDevice, int width, int height)
 			: this(graphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None) 
@@ -66,6 +68,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage)
 			:base (graphicsDevice, width, height, mipMap, preferredFormat)
 		{
+			RenderTargetUsage = usage;
 			//allocateOpenGLTexture();
 		}
 		

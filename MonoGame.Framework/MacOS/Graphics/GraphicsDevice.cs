@@ -315,8 +315,15 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void SetRenderTarget (RenderTarget2D renderTarget) 
 		{
-			if (renderTarget == null) {
-				
+
+			// We check if the rendertarget being passed is null or if we already have a rendertarget
+			// NetRumble sample does not set the the renderTarget to null before setting another
+			// rendertarget.  We handle that by checking first if we have a current render target set
+			// if we do then we unbind the current rendertarget, reset the viewport and set the
+			// rendertarget to the new one being passed if it is not null
+			if (renderTarget == null || currentRenderTargets != null) {
+
+				GL.DrawBuffer(DrawBufferMode.ColorAttachment0);
 				// Detach the render buffers
 				GL.FramebufferRenderbuffer(FramebufferTarget.FramebufferExt, FramebufferAttachment.DepthAttachmentExt,
 						RenderbufferTarget.RenderbufferExt, 0);
@@ -326,6 +333,17 @@ namespace Microsoft.Xna.Framework.Graphics
 				GL.DeleteFramebuffers(1, ref framebufferId);
 				// Set the frame buffer back to the system window buffer
 				GL.BindFramebuffer(FramebufferTarget.FramebufferExt, 0);
+				framebufferId = -1;
+
+				// We need to reset our GraphicsDevice viewport back to what it was
+				// before rendering.
+				Viewport = savedViewport;
+
+				if (renderTarget == null)
+					currentRenderTargets = null;
+				else {
+					SetRenderTargets(new RenderTargetBinding(renderTarget));
+				}
 			}
 			else {
 				SetRenderTargets(new RenderTargetBinding(renderTarget));
@@ -334,7 +352,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		private int framebufferId = -1;
 		int[] renderBufferIDs;
-		
+		Viewport savedViewport;
+
 		public void SetRenderTargets (params RenderTargetBinding[] renderTargets) 
 		{
 			
@@ -346,7 +365,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				
 				// create framebuffer
 				GL.GenFramebuffers(1, out framebufferId);
-				GL.BindFramebuffer(FramebufferTarget.FramebufferExt, framebufferId);
+				GL.BindFramebuffer(FramebufferTarget.DrawFramebuffer, framebufferId);
 				
 				renderBufferIDs = new int[currentRenderTargets.Length];
 				GL.GenRenderbuffers(currentRenderTargets.Length, renderBufferIDs);
@@ -367,16 +386,37 @@ namespace Microsoft.Xna.Framework.Graphics
 					// attach the renderbuffer to depth attachment point
 					GL.FramebufferRenderbuffer(FramebufferTarget.FramebufferExt, FramebufferAttachment.DepthAttachmentExt,
 						RenderbufferTarget.RenderbufferExt, renderBufferIDs[i]);
-						
+
+					if (target.RenderTargetUsage == RenderTargetUsage.DiscardContents)
+						Clear(Color.Transparent);
 				}
 				
 				FramebufferErrorCode status = GL.CheckFramebufferStatus(FramebufferTarget.FramebufferExt);
 				
 				if (status != FramebufferErrorCode.FramebufferComplete)
 					throw new Exception("Error creating framebuffer: " + status);
-				//GL.ClearColor (Color4.Transparent);
-				//GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-				
+
+				// We need to start saving off the ViewPort and setting the current ViewPort to
+				// the width and height of the texture.  Then when we pop off the rendertarget
+				// it needs to be reset.  This causes drawing problems if we do not set the viewport.
+				// Makes sense once you follow the flow (hits head on desk)
+				// For an example of this take a look at NetRumble's sample for the BloomPostprocess
+
+				// Save off the current viewport to be reset later
+				savedViewport = Viewport;
+
+				// Create a new Viewport
+				Viewport renderTargetViewPort = new Viewport();
+
+				// Set the new viewport to the width and height of the render target
+				Texture2D target2 = (Texture2D)currentRenderTargets[0].RenderTarget;
+				renderTargetViewPort.Width = target2.Width;
+				renderTargetViewPort.Height = target2.Height;
+
+				// now we set our viewport to the new rendertarget viewport just created.
+				Viewport = renderTargetViewPort;
+
+
 			}
 			
 			
