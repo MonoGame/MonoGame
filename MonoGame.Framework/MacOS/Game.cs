@@ -60,7 +60,7 @@ namespace Microsoft.Xna.Framework
 	{
 		private const float FramesPerSecond = 60.0f; // ~60 frames per second
 
-
+		 
 		// I do believe we can take out the next three variables.
 		//  After the release this should be looked at as the time is
 		//  passed from the GameWindow which controlls when updating is to
