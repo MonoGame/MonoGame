@@ -67,8 +67,20 @@ namespace Microsoft.Xna.Framework.Content
 		{
 			get
 			{
-				if(BaseStream is FileStream)
-					return ((FileStream)(this.BaseStream)).Name.Replace("Content/",""); 
+				if(BaseStream is FileStream) {
+
+					// Get the full name
+					var name  = ((FileStream)(this.BaseStream)).Name;
+					// get the directory name
+					var directory = Path.GetDirectoryName(name);
+					// strip off the Content/
+					var index = directory.LastIndexOf("Content/");
+					directory = directory.Substring(index + 8);
+					// We then put them back together again without the extension
+					name = Path.Combine(directory, Path.GetFileNameWithoutExtension(name));
+					return name;
+					//return ((FileStream)(this.BaseStream)).Name.Replace("Content/","");
+				}
 				else
 					return string.Empty;
 			}
