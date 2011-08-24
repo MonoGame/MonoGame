@@ -73,6 +73,8 @@ namespace Microsoft.Xna.Framework.Content
 				return FileName+".gif";
 			if (File.Exists(FileName+".pict"))
 				return FileName+".pict";
+			if (File.Exists(FileName+".tga"))
+				return FileName+".tga";
 			
 			return null;
 		}
