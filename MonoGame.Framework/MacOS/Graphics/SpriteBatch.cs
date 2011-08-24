@@ -76,7 +76,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			// apply the custom effect if there is one
 			if (_effect != null) {
-				_effect.Apply ();
+				_effect.CurrentTechnique.Passes [0].Apply ();
 
 				if (graphicsDevice.Textures._textures.Count > 0) {
 					foreach (EffectParameter ep in _effect._textureMappings) {

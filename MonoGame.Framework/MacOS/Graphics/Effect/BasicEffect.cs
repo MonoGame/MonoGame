@@ -25,13 +25,15 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             createBasicEffect();
         }
-		
-        internal override void Apply()
+
+	// TODO: This all needs to be redone
+	// Take a look at AlphaTest for example
+        internal void Apply()
         {
             GLStateManager.Projection(Projection);
             GLStateManager.World(World);
             GLStateManager.View(View);
-			base.Apply();			
+			//base.Apply();
 			
 			// set camera
 			Matrix _matrix = Matrix.Identity;

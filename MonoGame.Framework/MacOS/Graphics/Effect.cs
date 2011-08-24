@@ -281,13 +281,13 @@ namespace Microsoft.Xna.Framework.Graphics
 			set; 
 		}
 
-		internal virtual void Apply ()
-		{
-			//if (graphicsDevice.Textures.)
-			Techniques[0].Passes[0].Apply();
-		}
+//		internal virtual void Apply ()
+//		{
+//			//if (graphicsDevice.Textures.)
+//			Techniques[0].Passes[0].Apply();
+//		}
 
-		protected virtual void OnApply ()
+		protected internal virtual void OnApply ()
 		{
 
 		}
