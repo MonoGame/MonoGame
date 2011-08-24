@@ -163,8 +163,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			GL.LoadMatrix (ref _matrix.M11);
 
-			// Initialize OpenGL states (ideally move this to initialize somewhere else)	
-			GL.Disable (EnableCap.DepthTest);
+			// Initialize OpenGL states (ideally move this to initialize somewhere else)
+			MonoGameGraphicsHelper.SetDepthStencilState(_depthStencilState);
+
+			//GL.Disable (EnableCap.DepthTest);
+			
 			GL.TexEnv (TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)All.BlendSrc);
 			GL.Enable (EnableCap.Texture2D);
 			GL.EnableClientState (ArrayCap.VertexArray);
