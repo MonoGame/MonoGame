@@ -141,12 +141,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void Clear (Color color)
 		{
-			Vector4 vector = color.ToEAGLColor ();
-			// The following was not working with Color.Transparent
-			// Once we get some regression tests take the following out			
-			//GL.ClearColor (vector.X, vector.Y, vector.Z, 1.0f);
-			GL.ClearColor (vector.X, vector.Y, vector.Z, vector.W);
-			GL.Clear (ClearBufferMask.ColorBufferBit);
+			Clear (ClearOptions.Target, color.ToEAGLColor(), 0, 0);
 		}
 
 		public void Clear (ClearOptions options, Color color, float depth, int stencil)
@@ -156,13 +151,26 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void Clear (ClearOptions options, Vector4 color, float depth, int stencil)
 		{
-			// The following was not working with Color.Transparent
-			// Once we get some regression tests take the following out
-			//GL.ClearColor (color.X, color.Y, color.Z, 1.0f);
 			GL.ClearColor (color.X, color.Y, color.Z, color.W);
-			GL.ClearDepth (depth);
-			GL.ClearStencil (stencil);
-			GL.Clear ((ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit));
+			GL.Clear (CreateClearOptions(options, depth, stencil));
+		}
+
+		private ClearBufferMask CreateClearOptions (ClearOptions clearOptions, float depth, int stencil)
+		{
+			ClearBufferMask bufferMask = 0;
+			if (clearOptions.HasFlag(ClearOptions.Target)) {
+				bufferMask = bufferMask | ClearBufferMask.ColorBufferBit;
+			}
+			if (clearOptions.HasFlag(ClearOptions.Stencil)) {
+				GL.ClearStencil (stencil);
+				bufferMask = bufferMask | ClearBufferMask.StencilBufferBit;
+			}
+			if (clearOptions.HasFlag(ClearOptions.DepthBuffer)) {
+				GL.ClearDepth (depth);
+				bufferMask = bufferMask | ClearBufferMask.DepthBufferBit;
+			}
+
+			return bufferMask;
 		}
 
 		public void Clear (ClearOptions options, Color color, float depth, int stencil, Rectangle[] regions)
@@ -349,9 +357,16 @@ namespace Microsoft.Xna.Framework.Graphics
 				SetRenderTargets(new RenderTargetBinding(renderTarget));
 			}
 		}
-		
+
 		private int framebufferId = -1;
 		int[] renderBufferIDs;
+
+		// TODO: We need to come up with a state save and restore of the GraphicsDevice
+		//  This would probably work with a Stack that allows pushing and popping of the current
+		//  Graphics device state.
+		//  Right now here is the list of state values that should be implemented
+		//  Viewport - Used for RenderTargets
+		//  Depth and Stencil formats	- To be determined
 		Viewport savedViewport;
 
 		public void SetRenderTargets (params RenderTargetBinding[] renderTargets) 
@@ -360,7 +375,11 @@ namespace Microsoft.Xna.Framework.Graphics
 			currentRenderTargets = renderTargets;
 			
 			if (currentRenderTargets != null) {
-				
+
+
+				// TODO: For speed we need to consider using FBO switching instead
+				// of multiple FBO's if they are the same size.
+
 				// http://www.songho.ca/opengl/gl_fbo.html
 				
 				// create framebuffer
@@ -376,19 +395,45 @@ namespace Microsoft.Xna.Framework.Graphics
 					// attach the texture to FBO color attachment point
 					GL.FramebufferTexture2D(FramebufferTarget.FramebufferExt, FramebufferAttachment.ColorAttachment0,
 						TextureTarget.Texture2D, target.ID,0);
-					
+					GL.FramebufferTexture2D(FramebufferTarget.FramebufferExt, FramebufferAttachment.ColorAttachment0,
+						TextureTarget.Texture2D, target.ID,0);
+
 					// create a renderbuffer object to store depth info
 					GL.BindRenderbuffer(RenderbufferTarget.RenderbufferExt, renderBufferIDs[i]);
-					GL.RenderbufferStorage(RenderbufferTarget.RenderbufferExt, RenderbufferStorage.DepthComponent24,
-						target.Width, target.Height);
-					GL.BindRenderbuffer(RenderbufferTarget.RenderbufferExt, 0);
-					
+
+					ClearOptions clearOptions = ClearOptions.Target | ClearOptions.DepthBuffer;
+
+					switch (target.DepthStencilFormat) {
+					case DepthFormat.Depth16:
+						GL.RenderbufferStorage(RenderbufferTarget.RenderbufferExt, RenderbufferStorage.DepthComponent16,
+							target.Width, target.Height);
+						break;
+					case DepthFormat.Depth24:
+						GL.RenderbufferStorage(RenderbufferTarget.RenderbufferExt, RenderbufferStorage.DepthComponent24,
+							target.Width, target.Height);
+						break;
+					case DepthFormat.Depth24Stencil8:
+						GL.RenderbufferStorage(RenderbufferTarget.RenderbufferExt, RenderbufferStorage.Depth24Stencil8,
+							target.Width, target.Height);
+						GL.FramebufferRenderbuffer(FramebufferTarget.FramebufferExt, FramebufferAttachment.StencilAttachmentExt,
+							RenderbufferTarget.RenderbufferExt, renderBufferIDs[i]);
+						clearOptions = clearOptions | ClearOptions.Stencil;
+						break;
+					default:
+						GL.RenderbufferStorage(RenderbufferTarget.RenderbufferExt, RenderbufferStorage.DepthComponent24,
+							target.Width, target.Height);
+						break;
+					}
+//					GL.RenderbufferStorage(RenderbufferTarget.RenderbufferExt, RenderbufferStorage.DepthComponent24,
+//						target.Width, target.Height);
 					// attach the renderbuffer to depth attachment point
 					GL.FramebufferRenderbuffer(FramebufferTarget.FramebufferExt, FramebufferAttachment.DepthAttachmentExt,
 						RenderbufferTarget.RenderbufferExt, renderBufferIDs[i]);
 
+					GL.BindRenderbuffer(RenderbufferTarget.RenderbufferExt, 0);
+					
 					if (target.RenderTargetUsage == RenderTargetUsage.DiscardContents)
-						Clear(Color.Transparent);
+						Clear (clearOptions, Color.Transparent, 0, 0);
 				}
 				
 				FramebufferErrorCode status = GL.CheckFramebufferStatus(FramebufferTarget.FramebufferExt);
