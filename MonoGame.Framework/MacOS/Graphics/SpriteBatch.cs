@@ -76,7 +76,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			// apply the custom effect if there is one
 			if (_effect != null) {
-				_effect.Apply ();
+				_effect.CurrentTechnique.Passes [0].Apply ();
 
 				if (graphicsDevice.Textures._textures.Count > 0) {
 					foreach (EffectParameter ep in _effect._textureMappings) {
@@ -163,8 +163,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			GL.LoadMatrix (ref _matrix.M11);
 
-			// Initialize OpenGL states (ideally move this to initialize somewhere else)	
-			GL.Disable (EnableCap.DepthTest);
+			// Initialize OpenGL states (ideally move this to initialize somewhere else)
+			MonoGameGraphicsHelper.SetDepthStencilState(_depthStencilState);
+
+			//GL.Disable (EnableCap.DepthTest);
+			
 			GL.TexEnv (TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)All.BlendSrc);
 			GL.Enable (EnableCap.Texture2D);
 			GL.EnableClientState (ArrayCap.VertexArray);

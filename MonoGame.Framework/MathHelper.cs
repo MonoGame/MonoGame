@@ -141,5 +141,23 @@ namespace Microsoft.Xna.Framework
             // Factor = pi / 180
             return (float)(degrees * 0.017453292519943295769236907684886);
         }
+
+	public static float WrapAngle(float angle)
+	{
+		angle = (float)Math.IEEERemainder((double)angle, 6.2831854820251465);
+		if (angle <= -3.14159274f)
+		{
+			angle += 6.28318548f;
+		}
+		else
+		{
+		if (angle > 3.14159274f)
+		{
+			angle -= 6.28318548f;
+		}
+		}
+		return angle;
+	}
+
     }
 }

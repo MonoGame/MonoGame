@@ -39,7 +39,10 @@ namespace Microsoft.Xna.Framework.Audio
         public SoundBank(AudioEngine audioEngine, string filename)
         {
             audioengine = audioEngine;
-            
+
+            // Check for windows-style directory separator character
+            filename = filename.Replace('\\',Path.DirectorySeparatorChar);
+
             BinaryReader soundbankreader = new BinaryReader(new FileStream(filename, FileMode.Open));
             //byte[] identifier = soundbankreader.ReadBytes(4);
 

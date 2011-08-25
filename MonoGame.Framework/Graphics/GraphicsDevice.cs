@@ -56,6 +56,9 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		private bool _isDisposed = false;
 		public TextureCollection Textures { get; set; }
+		private BlendState _blendState = BlendState.Opaque;
+		private DepthStencilState _depthStencilState = DepthStencilState.Default;
+		private SamplerStateCollection _samplerStates = new SamplerStateCollection ();
         internal List<IntPtr> _pointerCache = new List<IntPtr>();
         private VertexBuffer _vertexBuffer = null;
         private IndexBuffer _indexBuffer = null;
@@ -114,6 +117,27 @@ namespace Microsoft.Xna.Framework.Graphics
 			RasterizerState = new RasterizerState();
         }
 
+		public BlendState BlendState {
+			get { return _blendState; }
+			set { 
+				// ToDo check for invalid state
+				_blendState = value;
+			}
+		}
+
+		public DepthStencilState DepthStencilState {
+			get { return _depthStencilState; }
+			set { 
+				_depthStencilState = value;
+			}
+		}
+
+		public SamplerStateCollection SamplerStates { 
+			get {
+				var temp = _samplerStates;
+				return temp;
+			} 
+		}
         public void Clear(Color color)
         {
 			Vector4 vector = color.ToEAGLColor();			
