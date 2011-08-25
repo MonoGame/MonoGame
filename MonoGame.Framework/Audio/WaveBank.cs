@@ -97,7 +97,10 @@ namespace Microsoft.Xna.Framework.Audio
             wavebankentry.PlayRegion.Offset = 0;
 
             int wavebank_offset = 0;
-            
+
+            // Check for windows-style directory separator character
+            nonStreamingWaveBankFilename = nonStreamingWaveBankFilename.Replace('\\',Path.DirectorySeparatorChar);
+
             BinaryReader reader = new BinaryReader(new FileStream(nonStreamingWaveBankFilename, FileMode.Open));
             reader.ReadBytes(4);
 
