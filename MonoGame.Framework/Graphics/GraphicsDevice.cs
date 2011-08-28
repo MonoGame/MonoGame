@@ -64,8 +64,6 @@ namespace Microsoft.Xna.Framework.Graphics
         private IndexBuffer _indexBuffer = null;
 
         public RasterizerState RasterizerState { get; set; }
-        public DepthStencilState DepthStencilState { get; set; }
-		public BlendState BlendState { get; set; }
 		
 		private RenderTargetBinding[] currentRenderTargets;
 		
