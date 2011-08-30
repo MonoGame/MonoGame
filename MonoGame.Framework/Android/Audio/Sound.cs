@@ -156,8 +156,9 @@ namespace Microsoft.Xna.Framework.Audio
         {
             MediaPlayer player = new MediaPlayer();
             Sound sound = new Sound(player);
-
-            player.SetDataSource(Game.contextInstance.Assets.OpenFd(assetPath).FileDescriptor);
+			//This breaks the platformer sample. Not sure if it works anywhere else
+            //player.SetDataSource(Game.contextInstance.Assets.OpenFd(assetPath).FileDescriptor);
+			player.SetDataSource(assetPath);
             player.Prepared += sound.OnPrepared;
             sound.Looping = looping;
             sound.Volume = volume;
