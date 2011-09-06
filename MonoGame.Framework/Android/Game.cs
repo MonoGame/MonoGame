@@ -338,8 +338,11 @@ namespace Microsoft.Xna.Framework
             }
 		}
 
+        private int garbageCounter = 0;
+
         protected virtual void Update(GameTime gameTime)
-        {			
+        {		
+	
 			if ( _initialized)
 			{
 				foreach (GameComponent gc in _gameComponentCollection)			
@@ -349,6 +352,20 @@ namespace Microsoft.Xna.Framework
 	                    gc.Update(gameTime);
 	                }
 	            }
+                garbageCounter++;
+                if (garbageCounter > 200)
+                {
+                    // force a Garbage Collection
+                    try
+                    {
+                        GC.Collect(0);
+                    }
+                    catch(Exception ex)
+                    {
+                        Android.Util.Log.Error("GC.Collect(0)", ex.ToString());
+                    }
+                    garbageCounter = 0;
+                }
 			}
 			else
 			{
@@ -420,7 +437,7 @@ namespace Microsoft.Xna.Framework
 	            AlertDialog dialog = new AlertDialog.Builder(Game.contextInstance).Create();
 	            dialog.SetTitle("Game Exit");
 	            dialog.SetMessage("Hit Home Button to Exit");
-	            dialog.Show();
+	            dialog.Show();                
 			}
 			catch
 			{
