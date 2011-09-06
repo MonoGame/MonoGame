@@ -251,22 +251,12 @@ using System.Collections.Generic;
         }
 
         public static GamePadState GetState(PlayerIndex playerIndex)
-        {
-            if (playerIndex != PlayerIndex.One) 
-			{
-				throw new NotSupportedException("Only one player!");
-			}
-			
+        {      
 			return new GamePadState((Buttons)GamePad.Instance._buttons,GamePad.Instance._leftStick,GamePad.Instance._rightStick);
         }
 
         public static bool SetVibration(PlayerIndex playerIndex, float leftMotor, float rightMotor)
         {	
-			if (playerIndex != PlayerIndex.One) 
-			{
-				throw new NotSupportedException("Only one player!");
-			}
-
             Vibrator vibrator = (Vibrator)Game.contextInstance.GetSystemService(Context.VibratorService);
 			vibrator.Vibrate(500);
             return true;
