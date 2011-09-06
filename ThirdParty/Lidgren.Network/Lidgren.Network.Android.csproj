@@ -12,7 +12,7 @@
     <MonoAndroidAssetsPrefix>Assets</MonoAndroidAssetsPrefix>
     <MonoAndroidResourcePrefix>Resources</MonoAndroidResourcePrefix>
     <AssemblyName>Lidgren.Network.Android.csproj</AssemblyName>
-    <TargetFrameworkVersion>v1.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v2.2</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
