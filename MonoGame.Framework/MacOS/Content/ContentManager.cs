@@ -150,8 +150,92 @@ namespace Microsoft.Xna.Framework.Content
 			{
 				// Load a XNB file
 				FileStream stream = new FileStream(assetName, FileMode.Open, FileAccess.Read, FileShare.Read);
-		
-				ContentReader reader = new ContentReader(this,stream,this.graphicsDeviceService.GraphicsDevice);
+				BinaryReader xnbReader = new BinaryReader(stream);
+				
+				// The first 4 bytes should be the "XNB" header. i use that to detect an invalid file
+				byte[] headerBuffer = new byte[3];
+				xnbReader.Read(headerBuffer, 0, 3);
+							
+				string headerString = Encoding.UTF8.GetString(headerBuffer, 0, 3);
+				
+				byte platform = xnbReader.ReadByte();
+				
+				if (string.Compare(headerString, "XNB") != 0 ||
+					!(platform == 'w' || platform == 'x' || platform == 'm'))
+					throw new ContentLoadException("Asset does not appear to be a valid XNB file. Did you process your content for Windows?");
+				
+				ushort version = xnbReader.ReadUInt16();
+				int graphicsProfile = version & 0x7f00;
+				version &= 0x80ff;
+				
+				bool compressed = false;
+				if (version == 0x8005 || version == 0x8004)
+				{
+					compressed = true;
+				}
+				else if (version != 5 && version != 4)
+				{
+					throw new ContentLoadException("Invalid XNB version");
+				}
+				
+				// The next int32 is the length of the XNB file
+				int xnbLength = xnbReader.ReadInt32();
+	
+				ContentReader reader;
+				if (compressed )
+				{
+					//decompress the xnb
+					//thanks to ShinAli (https://bitbucket.org/alisci01/xnbdecompressor)
+					int compressedSize = xnbLength - 14;
+					int decompressedSize = xnbReader.ReadInt32();
+					int newFileSize = decompressedSize + 10;
+					
+					MemoryStream decompressedStream = new MemoryStream(decompressedSize);
+					
+					LzxDecoder dec = new LzxDecoder(16);
+					int decodedBytes = 0;
+					int pos = 0;
+					
+					while (pos < compressedSize)
+					{
+						// let's seek to the correct position
+						stream.Seek(pos+14, SeekOrigin.Begin);
+						int hi = stream.ReadByte();
+						int lo = stream.ReadByte();
+						int block_size = (hi << 8) | lo;
+						int frame_size = 0x8000;
+						if(hi == 0xFF)
+						{
+							hi = lo;
+							lo = (byte)stream.ReadByte();
+							frame_size = (hi << 8) | lo;
+							hi = (byte)stream.ReadByte();
+							lo = (byte)stream.ReadByte();
+							block_size = (hi << 8) | lo;
+							pos += 5;
+						} else
+							pos += 2;
+						
+						if(block_size == 0 || frame_size == 0)
+							break;
+						
+						int lzxRet = dec.Decompress(stream, block_size, decompressedStream, frame_size);
+						pos += block_size;
+						decodedBytes += frame_size;
+					}
+					
+					if (decompressedStream.Position != decompressedSize) {
+						throw new ContentLoadException("Decompression of " + originalAssetName + "failed. "+
+													   " Try decompressing with nativeDecompressXnb first.");
+					}
+					
+					decompressedStream.Seek(0, SeekOrigin.Begin);
+					reader = new ContentReader(this, decompressedStream, this.graphicsDeviceService.GraphicsDevice);
+					
+				} else {
+					reader = new ContentReader(this,stream,this.graphicsDeviceService.GraphicsDevice);
+				}
+				
 				ContentTypeReaderManager typeManager = new ContentTypeReaderManager(reader);
 				reader.TypeReaders = typeManager.LoadAssetReaders(reader);
 	            foreach (ContentTypeReader r in reader.TypeReaders)

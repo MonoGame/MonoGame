@@ -329,6 +329,7 @@
     <Compile Include="Graphics\Effect\AlphaTestEffectCode.cs" />
     <Compile Include="Graphics\Effect\AlphaTestEffect.cs" />
     <Compile Include="Graphics\Effect\EffectHelpers.cs" />
+    <Compile Include="Content\LzxDecoder.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />
