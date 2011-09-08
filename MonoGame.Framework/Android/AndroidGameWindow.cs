@@ -306,7 +306,7 @@ namespace Microsoft.Xna.Framework
 
             GamePad.Instance.Update(e);
 
-            return base.OnTouchEvent(e);
+            return true;
         }
         
         public string ScreenDeviceName 
