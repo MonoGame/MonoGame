@@ -1,3 +1,44 @@
+#region HEADER
+/* This file was derived from libmspack
+ * (C) 2003-2004 Stuart Caie.
+ * (C) 2011 Ali Scissons.
+ *
+ * The LZX method was created by Jonathan Forbes and Tomi Poutanen, adapted
+ * by Microsoft Corporation.
+ *
+ * This source file is Dual licensed; meaning the end-user of this source file
+ * may redistribute/modify it under the LGPL 2.1 or MS-PL licenses.
+ */ 
+#region LGPL License
+/* GNU LESSER GENERAL PUBLIC LICENSE version 2.1
+ * LzxDecoder is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License (LGPL) version 2.1 
+ */
+#endregion
+#region MS-PL License
+/* 
+ * MICROSOFT PUBLIC LICENSE
+ * This source code is subject to the terms of the Microsoft Public License (Ms-PL). 
+ *  
+ * Redistribution and use in source and binary forms, with or without modification, 
+ * is permitted provided that redistributions of the source code retain the above 
+ * copyright notices and this file header. 
+ *  
+ * Additional copyright notices should be appended to the list above. 
+ * 
+ * For details, see <http://www.opensource.org/licenses/ms-pl.html>. 
+ */
+#endregion
+/*
+ * DETAILS
+ * This file is a pure C# port of the lzxd.c file from libmspack, with minor
+ * changes towards the decompression of XNB files. The original decompression
+ * software of LZX encoded data was written by Suart Caie in his
+ * libmspack/cabextract projects, which can be located at 
+ * http://http://www.cabextract.org.uk/
+ */
+#endregion
+
 using System;
 namespace Microsoft.Xna.Framework.Content
 {
