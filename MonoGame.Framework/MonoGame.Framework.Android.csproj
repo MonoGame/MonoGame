@@ -14,7 +14,7 @@
     <FileAlignment>512</FileAlignment>
     <AndroidSupportedAbis>armeabi</AndroidSupportedAbis>
     <AndroidStoreUncompressedFileExtensions />
-    <TargetFrameworkVersion>v1.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v2.2</TargetFrameworkVersion>
     <MandroidI18n />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -91,7 +91,6 @@
     <Compile Include="Graphics\Vertices\VertexPositionTexture.cs" />
     <Compile Include="Android\Audio\Sound.cs" />
     <Compile Include="Android\Audio\SoundEffect.cs" />
-    <Compile Include="Android\Content\ContentManager.cs" />
     <Compile Include="Android\Content\ContentReaders\SongReader.cs" />
     <Compile Include="Android\Content\ContentReaders\SoundEffectReader.cs" />
     <Compile Include="Android\Content\ContentReaders\SpriteFontReader.cs" />
@@ -309,6 +308,8 @@
     <Compile Include="Net\CommandGamerStateChange.cs" />
     <Compile Include="Storage\StorageDeviceHelper.cs" />
     <Compile Include="Android\TitleContainer.cs" />
+    <Compile Include="Content\ContentManager.cs" />
+    <Compile Include="Content\LzxDecoder.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="GamerServices\" />

@@ -349,7 +349,6 @@
     <Compile Include="Net\CommandEventType.cs" />
     <Compile Include="Net\MonoGamerPeer.cs" />
     <Compile Include="Net\NetworkMessageType.cs" />
-    <Compile Include="iOS\Content\ContentManager.cs" />
     <Compile Include="iOS\GamerServices\SignedInGamer.cs" />
     <Compile Include="iOS\Graphics\ESImage.cs" />
     <Compile Include="iOS\Graphics\ESTexture2D.cs" />
@@ -374,6 +373,8 @@
     <Compile Include="Graphics\Extender.cs" />
     <Compile Include="Audio\NoAudioHardwareException.cs" />
     <Compile Include="Storage\StorageDeviceHelper.cs" />
+    <Compile Include="Content\ContentManager.cs" />
+    <Compile Include="Content\LzxDecoder.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
@@ -394,6 +395,7 @@
     <Folder Include="iOS\Audio\" />
     <Folder Include="iOS\Media\" />
     <Folder Include="iOS\Net\" />
+    <Folder Include="iOS\Content\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.iOS.csproj">

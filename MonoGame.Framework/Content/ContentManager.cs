@@ -44,7 +44,9 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 
+#if MONOMAC
 using MonoMac.Foundation;
+#endif
 
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
@@ -293,7 +295,11 @@ namespace Microsoft.Xna.Framework.Content
             }
             set
             {
+#if MONOMAC
                 _rootDirectory = Path.Combine(NSBundle.MainBundle.ResourcePath, value);
+#else
+				_rootDirectory = value;
+#endif
             }
         }
 
