@@ -30,6 +30,10 @@
  */
 #endregion
 /*
+ * This derived work is recognized by Stuart Caie and is authorized to adapt
+ * any changes made to lzxd.c in his libmspack library and will still retain
+ * this dual licensing scheme. Big thanks to Stuart Caie!
+ * 
  * DETAILS
  * This file is a pure C# port of the lzxd.c file from libmspack, with minor
  * changes towards the decompression of XNB files. The original decompression
