@@ -50,12 +50,15 @@ namespace Microsoft.Xna.Framework.Graphics
 	public class Effect : GraphicsResource
     {
         public EffectParameterCollection Parameters { get; set; }
-        public EffectTechniqueCollection Techniques { get; set; }
+        public EffectTechniqueCollection Techniques { get; set; }		
 
 		private int fragment_handle;
         private int vertex_handle;
         private bool fragment;
         private bool vertex;
+		
+		internal List<int> vertexShaders = new List<int>();
+		internal List<int> fragmentShaders = new List<int>();
 
         internal Effect(GraphicsDevice device)
         {
@@ -143,7 +146,45 @@ namespace Microsoft.Xna.Framework.Graphics
         {
      
         }
-
+		
+		protected void CreateVertexShaderFromSource(string source)
+		{
+			int shader = GL.CreateShader (All.VertexShader);
+			// Attach the loaded source string to the shader object
+			// TODO GL.ShaderSource(shader, source);
+			// Compile the shader
+			GL.CompileShader (shader);
+			
+			vertexShaders.Add(shader);			
+		}
+		
+		
+		protected void CreateFragmentShaderFromSource(string source)
+		{
+			int shader = GL.CreateShader (All.FragmentShader);
+			// Attach the loaded source string to the shader object
+			// TODO GL.ShaderSource (shader, source);
+			// Compile the shader
+			GL.CompileShader (shader);
+			
+			fragmentShaders.Add(shader);			
+		}
+		
+		protected void DefineTechnique (string techniqueName, string passName, int vertexIndex, int fragmentIndex)
+		{
+			EffectTechnique tech = new EffectTechnique(this);
+			tech.Name = techniqueName;
+			EffectPass pass = new EffectPass(tech);
+			pass.Name = passName;
+			/* TODO pass.VertexIndex = vertexIndex;
+			pass.FragmentIndex = fragmentIndex;
+			pass.ApplyPass(); */
+			tech.Passes._passes.Add(pass);
+			Techniques._techniques.Add(tech);
+			// TODO LogShaderParameters(String.Format("Technique {0} - Pass {1} :" ,tech.Name ,pass.Name), pass.shaderProgram);
+			
+		}
+		
 		protected Effect(GraphicsDevice graphicsDevice, Effect cloneSource )
 		{
 			if (graphicsDevice == null)
@@ -151,6 +192,25 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new ArgumentNullException("Graphics Device Cannot Be Null");
             }
 			this.graphicsDevice = graphicsDevice;
+		}
+		
+		internal Effect (GraphicsDevice aGraphicsDevice, string aFileName) : this(aGraphicsDevice)
+		{
+			StreamReader streamReader = new StreamReader (aFileName);
+			string text = streamReader.ReadToEnd ();
+			streamReader.Close ();
+			
+			if ( aFileName.ToLower().Contains("fsh") )
+			{
+				CreateFragmentShaderFromSource(text);
+			}
+			else
+			{
+				CreateVertexShaderFromSource(text);
+			}
+			
+			DefineTechnique ("Technique1", "Pass1", 0, 0);
+			CurrentTechnique = Techniques ["Technique1"];
 		}
 		
 		public void Begin()
@@ -196,6 +256,5 @@ namespace Microsoft.Xna.Framework.Graphics
 		{ 
 			get; set; 
 		}
-
 	}
 }
