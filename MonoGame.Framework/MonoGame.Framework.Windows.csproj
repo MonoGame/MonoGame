@@ -116,6 +116,7 @@
     <Compile Include="Audio\SoundEffectInstance.cs" />
     <Compile Include="Audio\SoundState.cs" />
     <Compile Include="Audio\WaveBank.cs" />
+    <Compile Include="Content\ContentManager.cs" />
     <Compile Include="Content\ContentReaders\ArrayReader.cs" />
     <Compile Include="Content\ContentReaders\BooleanReader.cs" />
     <Compile Include="Content\ContentReaders\ColorReader.cs" />
@@ -137,6 +138,7 @@
     <Compile Include="Content\ContentReaders\Vector2Reader.cs" />
     <Compile Include="Content\ContentSerializerAttribute.cs" />
     <Compile Include="Content\ContentSerializerIgnoreAttribute.cs" />
+    <Compile Include="Content\LzxDecoder.cs" />
     <Compile Include="GamerServices\Achievement.cs" />
     <Compile Include="GamerServices\AchievementCollection.cs" />
     <Compile Include="GamerServices\FriendCollection.cs" />
@@ -248,7 +250,6 @@
     <Compile Include="TitleContainer.cs" />
     <Compile Include="Windows\Audio\AudioLoader.cs" />
     <Compile Include="Windows\Audio\Sound.cs" />
-    <Compile Include="Windows\Content\ContentManager.cs" />
     <Compile Include="Windows\Content\ContentReaders\SongReader.cs" />
     <Compile Include="Windows\Content\ContentReaders\SoundEffectReader.cs" />
     <Compile Include="Windows\Content\ContentReaders\SpriteFontReader.cs" />
@@ -271,6 +272,7 @@
     <Compile Include="Windows\Graphics\Texture2D.cs" />
     <Compile Include="Windows\Input\GamePad.cs" />
     <Compile Include="Windows\Input\Keyboard.cs" />
+    <Compile Include="Windows\Media\Video.cs" />
     <Compile Include="Windows\WindowsGameWindow.cs" />
     <Compile Include="Windows\Game.cs" />
     <Compile Include="BatteryChargeStatus.cs" />
