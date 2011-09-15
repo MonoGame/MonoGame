@@ -43,8 +43,10 @@ using System.IO;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
+
 using Android.Content.Res;
 using Android.Graphics;
+
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Media;
@@ -100,6 +102,11 @@ namespace Microsoft.Xna.Framework.Content
                 }
             }
 			
+			if (string.IsNullOrEmpty(assetName))
+			{
+				throw new ArgumentException("assetname");
+			}	
+			
             assetName = Path.Combine(_rootDirectory, assetName.Replace('\\', Path.DirectorySeparatorChar));
 			
 			// Get the real file name
@@ -127,7 +134,8 @@ namespace Microsoft.Xna.Framework.Content
             {
                 assetName = Video.Normalize(assetName);
             }
-            else {
+            else 
+			{
                 throw new NotSupportedException("Format not supported");
             }
 			
@@ -136,7 +144,118 @@ namespace Microsoft.Xna.Framework.Content
 				throw new ContentLoadException("Could not load "  + originalAssetName + " asset!");
 			}
 			
-			if (Path.GetExtension(assetName).ToUpper() !=".XNB")
+			if(!Path.HasExtension(assetName))
+				assetName = string.Format("{0}.xnb", assetName);
+			
+			if (Path.GetExtension(assetName).ToUpper() ==".XNB")
+			{
+				// Load a XNB file
+                //Loads from Assets directory + /assetName
+			    Stream stream = Game.contextInstance.Assets.Open(assetName);
+				BinaryReader xnbReader = new BinaryReader(stream);
+				
+				// The first 4 bytes should be the "XNB" header. i use that to detect an invalid file
+				byte[] headerBuffer = new byte[3];
+				xnbReader.Read(headerBuffer, 0, 3);
+							
+				string headerString = Encoding.UTF8.GetString(headerBuffer, 0, 3);
+				
+				byte platform = xnbReader.ReadByte();
+				
+				if (string.Compare(headerString, "XNB") != 0 ||
+					!(platform == 'w' || platform == 'x' || platform == 'm'))
+					throw new ContentLoadException("Asset does not appear to be a valid XNB file. Did you process your content for Windows?");
+				
+				ushort version = xnbReader.ReadUInt16();
+				int graphicsProfile = version & 0x7f00;
+				version &= 0x80ff;
+				
+				bool compressed = false;
+				if (version == 0x8005 || version == 0x8004)
+				{
+					compressed = true;
+				}
+				else if (version != 5 && version != 4)
+				{
+					throw new ContentLoadException("Invalid XNB version");
+				}
+				
+				// The next int32 is the length of the XNB file
+				int xnbLength = xnbReader.ReadInt32();
+	
+				ContentReader reader;
+				if (compressed )
+				{
+					//decompress the xnb
+					//thanks to ShinAli (https://bitbucket.org/alisci01/xnbdecompressor)
+					int compressedSize = xnbLength - 14;
+					int decompressedSize = xnbReader.ReadInt32();
+					int newFileSize = decompressedSize + 10;
+					
+					MemoryStream decompressedStream = new MemoryStream(decompressedSize);
+					
+					LzxDecoder dec = new LzxDecoder(16);
+					int decodedBytes = 0;
+					int pos = 0;
+					
+					while (pos < compressedSize)
+					{
+						// let's seek to the correct position
+						stream.Seek(pos+14, SeekOrigin.Begin);
+						int hi = stream.ReadByte();
+						int lo = stream.ReadByte();
+						int block_size = (hi << 8) | lo;
+						int frame_size = 0x8000;
+						if(hi == 0xFF)
+						{
+							hi = lo;
+							lo = (byte)stream.ReadByte();
+							frame_size = (hi << 8) | lo;
+							hi = (byte)stream.ReadByte();
+							lo = (byte)stream.ReadByte();
+							block_size = (hi << 8) | lo;
+							pos += 5;
+						} else
+							pos += 2;
+						
+						if(block_size == 0 || frame_size == 0)
+							break;
+						
+						int lzxRet = dec.Decompress(stream, block_size, decompressedStream, frame_size);
+						pos += block_size;
+						decodedBytes += frame_size;
+					}
+					
+					if (decompressedStream.Position != decompressedSize) {
+						throw new ContentLoadException("Decompression of " + originalAssetName + "failed. "+
+													   " Try decompressing with nativeDecompressXnb first.");
+					}
+					
+					decompressedStream.Seek(0, SeekOrigin.Begin);
+					reader = new ContentReader(this, decompressedStream, this.graphicsDeviceService.GraphicsDevice);
+					
+				} else {
+					reader = new ContentReader(this,stream,this.graphicsDeviceService.GraphicsDevice);
+				}
+				
+				ContentTypeReaderManager typeManager = new ContentTypeReaderManager(reader);
+				reader.TypeReaders = typeManager.LoadAssetReaders(reader);
+	            foreach (ContentTypeReader r in reader.TypeReaders)
+	            {
+	                r.Initialize(typeManager);
+	            }
+	            // we need to read a byte here for things to work out, not sure why
+	            reader.ReadByte();
+				
+				// Get the 1-based index of the typereader we should use to start decoding with
+          		int index = reader.ReadByte();
+				ContentTypeReader contentReader = reader.TypeReaders[index - 1];
+           		result = reader.ReadObject<T>(contentReader);
+
+				reader.Close();
+				stream.Close();				
+			}
+			else
 			{
 				if ((typeof(T) == typeof(Texture2D))) {
                     //Basically the same as Texture2D.FromFile but loading from the assets instead of a filePath
@@ -159,7 +278,7 @@ namespace Microsoft.Xna.Framework.Content
                     result = new Video(assetName);	
 
 			}
-			else 
+			/*else 
 			{
 				// Load a XNB file
                 //Loads from Assets directory + /assetName
@@ -182,7 +301,7 @@ namespace Microsoft.Xna.Framework.Content
 
 				reader.Close();
 				assetStream.Close();
-			}
+			}*/
 						
 			if (result == null)
 			{	
