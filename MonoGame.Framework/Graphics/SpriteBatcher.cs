@@ -49,6 +49,8 @@ namespace Microsoft.Xna.Framework.Graphics
 {
 	internal class SpriteBatcher
 	{
+		private const int InitialBatchSize = 256;
+		private const int InitialVertexArraySize = 256;
 		List<SpriteBatchItem> _batchItemList;
 		Queue<SpriteBatchItem> _freeBatchItemQueue;
 		VertexPosition2ColorTexture[] _vertexArray;
@@ -58,15 +60,15 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public SpriteBatcher ()
 		{
-			_batchItemList = new List<SpriteBatchItem>(256);
-			_freeBatchItemQueue = new Queue<SpriteBatchItem>(256);
+			_batchItemList = new List<SpriteBatchItem>(InitialBatchSize);
+			_freeBatchItemQueue = new Queue<SpriteBatchItem>(InitialBatchSize);
 
-			_vertexArray = new VertexPosition2ColorTexture[4*256];
-			_index = new ushort[6*256];
+			_vertexArray = new VertexPosition2ColorTexture[4*InitialVertexArraySize];
+			_index = new ushort[6*InitialVertexArraySize];
 			_vertexHandle = GCHandle.Alloc(_vertexArray,GCHandleType.Pinned);
 			_indexHandle = GCHandle.Alloc(_index,GCHandleType.Pinned);
 			
-			for ( int i = 0; i < 256; i++ )
+			for ( int i = 0; i < InitialVertexArraySize; i++ )
 			{
 				_index[i*6+0] = (ushort)(i*4);
 				_index[i*6+1] = (ushort)(i*4+1);
@@ -167,8 +169,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			while ( batchSize*4 > newCount )
 				newCount += 128;
 			
-			_vertexHandle.Free();
-			_indexHandle.Free();
+			_vertexHandle.Free();			
+			_indexHandle.Free();			
 			
 			_vertexArray = new VertexPosition2ColorTexture[4*newCount];
 			_index = new ushort[6*newCount];

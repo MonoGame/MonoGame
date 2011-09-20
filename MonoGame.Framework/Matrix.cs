@@ -139,17 +139,23 @@ namespace Microsoft.Xna.Framework
             get { return identity; }
         }
 
+		// made this static so we dont create a new
+		// float array each time we use the matrix 
+		private static float[] openglMatrix = { 1f, 0f, 0f, 0f, 
+	                                            0f, 1f, 0f, 0f, 
+	                                            0f, 0f, 1f, 0f, 
+	                                            0f, 0f, 0f, 1f};
+		
+				
 		
 		// required for OpenGL 2.0 projection matrix stuff
 		public static float[] ToFloatArray(Matrix mat)
         {
-			float [] matarray = {
-									mat.M11, mat.M12, mat.M13, mat.M14,
-									mat.M21, mat.M22, mat.M23, mat.M24,
-									mat.M31, mat.M32, mat.M33, mat.M34,
-									mat.M41, mat.M42, mat.M43, mat.M44
-								};
-			return matarray;
+			openglMatrix[0]  = mat.M11; openglMatrix[1]  = mat.M12; openglMatrix[2]  = mat.M13; openglMatrix[3]  = mat.M14;
+			openglMatrix[4]  = mat.M21; openglMatrix[5]  = mat.M22; openglMatrix[6]  = mat.M23; openglMatrix[7]  = mat.M24;
+			openglMatrix[8]  = mat.M31; openglMatrix[9]  = mat.M32; openglMatrix[10] = mat.M33; openglMatrix[11] = mat.M34;
+			openglMatrix[12] = mat.M41; openglMatrix[13] = mat.M42; openglMatrix[14] = mat.M43; openglMatrix[15] = mat.M44;
+			return openglMatrix;
 		}
         
         public Vector3 Left
