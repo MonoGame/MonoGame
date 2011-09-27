@@ -157,7 +157,8 @@ namespace Microsoft.Xna.Framework
 			_lastUpdate = DateTime.Now;
 			
 			// Get the Accelerometer going
-			Accelerometer.SetupAccelerometer();
+            //TODO Follow up on the following bug http://bugzilla.xamarin.com/show_bug.cgi?id=1084            
+            //Accelerometer.SetupAccelerometer();
         
             view.Run(FramesPerSecond / (FramesPerSecond * TargetElapsedTime.TotalSeconds));	
         }
