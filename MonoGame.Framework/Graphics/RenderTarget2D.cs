@@ -45,6 +45,9 @@ namespace Microsoft.Xna.Framework.Graphics
 {
 	public class RenderTarget2D : Texture2D
 	{		
+		public RenderTargetUsage RenderTargetUsage { get; internal set; }
+		public DepthFormat DepthStencilFormat { get; internal set; }
+		
 		public RenderTarget2D (GraphicsDevice graphicsDevice, int width, int height)
 			: this(graphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None) 
 		{}
@@ -59,10 +62,11 @@ namespace Microsoft.Xna.Framework.Graphics
 			SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage)
 			:base (graphicsDevice, width, height, mipMap, preferredFormat)
 		{
-			allocateOpenGLTexture();
+			RenderTargetUsage = usage;
+			DepthStencilFormat = preferredDepthFormat;
 		}
 		
-		private void allocateOpenGLTexture() 
+		/*private void allocateOpenGLTexture() 
 		{
 			// modeled after this
 			// http://steinsoft.net/index.php?site=Programming/Code%20Snippets/OpenGL/no9
@@ -79,6 +83,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			GL.BindTexture(All.Texture2D, 0);
 			//data = null;
 
-		}
+		}*/
 	}
 }

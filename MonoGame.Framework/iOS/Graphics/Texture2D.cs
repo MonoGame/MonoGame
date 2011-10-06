@@ -58,7 +58,7 @@ namespace Microsoft.Xna.Framework.Graphics
     {
 		private ESImage texture;
 		
-		protected int textureId = -1;
+		// Moved as per kjpou1 protected int textureId = -1;
 		protected int _width;
 		protected int _height;
 		private bool _mipmap;
@@ -68,12 +68,12 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		// my change
 		// --------
-		public uint ID
+		internal uint ID
 		{
 			get
 			{ 
 				if (texture == null)
-					return (uint)textureId;
+					return (uint)_textureId;
 				else
 					return texture.Name;
 				
@@ -104,6 +104,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			_width = texture.ImageWidth;
 			_height = texture.ImageHeight;
 			_format = texture.Format;
+			_textureId = (int)theImage.Name;
 		}
 		
 		public Texture2D(GraphicsDevice graphicsDevice, int width, int height): 
@@ -128,8 +129,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			// modeled after this
 			// http://steinsoft.net/index.php?site=Programming/Code%20Snippets/OpenGL/no9
 			
-			GL.GenTextures(1,ref textureId);
-			GL.BindTexture(All.Texture2D, textureId);
+			GL.GenTextures(1,ref _textureId);
+			GL.BindTexture(All.Texture2D, _textureId);
 			
 			if (_mipmap)
 			{
@@ -143,6 +144,10 @@ namespace Microsoft.Xna.Framework.Graphics
 				GL.TexParameter(All.Texture2D, All.TextureMinFilter, (int)All.Linear);
 				GL.TexParameter(All.Texture2D, All.TextureMagFilter, (int)All.Linear);
 			}
+			
+			byte[] textureData = new byte[(_width * _height) * 4];
+			
+			GL.TexImage2D(All.Texture2D, 0, (int)All.Rgba, _width, _height, 0, All.Rgba, All.UnsignedByte, textureData);
 			
 			GL.BindTexture(All.Texture2D, 0);
 			
