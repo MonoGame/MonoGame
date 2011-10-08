@@ -159,8 +159,16 @@ namespace Microsoft.Xna.Framework
 			_lastUpdate = DateTime.Now;
 			
 			// Get the Accelerometer going
+<<<<<<< HEAD
 			Accelerometer.SetupAccelerometer();
                     
+=======
+			//TODO umcomment when the following bug is fixed 
+			// http://bugzilla.xamarin.com/show_bug.cgi?id=1084
+			// Accelerometer currently seems to have a memory leak
+			//Accelerometer.SetupAccelerometer();
+        
+>>>>>>> 61d75b25864dbfbbea2ddab59514fced22a14a16
             view.Run(FramesPerSecond / (FramesPerSecond * TargetElapsedTime.TotalSeconds));	
         }
 		

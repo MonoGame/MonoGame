@@ -51,7 +51,6 @@ namespace Microsoft.Xna.Framework.Graphics
     public class Texture2D : Texture
     {
 		private ESImage texture;
-		protected int textureId = -1;
 		protected int _width;
 		protected int _height;
 		private bool _mipmap;
@@ -65,7 +64,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			get
 			{ 
 				if (texture == null)
-					return (uint)textureId;
+					return (uint)_textureId;
 				else
 					return texture.Name;
 			}
@@ -99,28 +98,28 @@ namespace Microsoft.Xna.Framework.Graphics
 			_width = texture.ImageWidth;
 			_height = texture.ImageHeight;
 			_format = texture.Format;
+			_textureId = (int)theImage.Name;
 		}
 		
-		public Texture2D(GraphicsDevice graphicsDevice, int width, int height, int numberLevels, TextureUsage usage, SurfaceFormat format)
-        {
-			throw new NotImplementedException();
-        }
-		
-        public Texture2D(Texture2D source, Color color)
-        {
-            throw new NotImplementedException();
-        }
-		
-		public Texture2D(GraphicsDevice graphicsDevice, int width, int height)
+		public Texture2D(GraphicsDevice graphicsDevice, int width, int height) : 
+			this (graphicsDevice, width, height, false, SurfaceFormat.Color)
 		{
-			throw new NotImplementedException();
+			
 		}
 		
 		public Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipMap, SurfaceFormat format)
 		{
 			this.graphicsDevice = graphicsDevice;
-			this._width = width;
-			this._height = height;
+			
+			// This is needed in OpenGL ES 1.1 as it only supports power of 2 textures
+			int m_i32TexSize = 1;
+			int iSize = Math.Min(graphicsDevice.Viewport.Width, graphicsDevice.Viewport.Height);
+			while (m_i32TexSize * 2 < iSize) 
+				m_i32TexSize *= 2;
+			
+			this._width = m_i32TexSize;
+			this._height = m_i32TexSize;
+			
 			this._format = format;
 			this._mipmap = mipMap;
 			
@@ -132,11 +131,25 @@ namespace Microsoft.Xna.Framework.Graphics
 			// modeled after this
 			// http://steinsoft.net/index.php?site=Programming/Code%20Snippets/OpenGL/no9
 			
-			GL.GenTextures(1,ref textureId);
-			GL.BindTexture(All.Texture2D, textureId);
+			GL.GenTextures(1,ref _textureId);
+			GL.BindTexture(All.Texture2D, _textureId);
 			
-			GL.TexParameter(All.Texture2D, All.TextureMinFilter, (int)All.Linear);
-			GL.TexParameter(All.Texture2D, All.TextureMagFilter, (int)All.Linear);
+			if (_mipmap)
+			{
+				// Taken from http://www.flexicoder.com/blog/index.php/2009/11/iphone-mipmaps/
+				GL.TexParameter(All.Texture2D, All.TextureMinFilter, (int)All.LinearMipmapNearest);
+				GL.TexParameter(All.Texture2D, All.TextureMagFilter, (int)All.Linear);
+				GL.TexParameter(All.Texture2D, All.GenerateMipmap, (int)All.True);
+			}
+			else
+			{
+				GL.TexParameter(All.Texture2D, All.TextureMinFilter, (int)All.Linear);
+				GL.TexParameter(All.Texture2D, All.TextureMagFilter, (int)All.Linear);
+			}
+			
+			byte[] textureData = new byte[(_width * _height) * 4];
+			
+			GL.TexImage2D(All.Texture2D, 0, (int)All.Rgba, _width, _height, 0, All.Rgba, All.UnsignedByte, textureData);
 			
 			GL.BindTexture(All.Texture2D, 0);
 			
@@ -161,7 +174,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             get
             {
-                return texture.ImageWidth;
+                return _width;
             }
         }
 
@@ -169,7 +182,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             get
             {
-                return texture.ImageHeight;
+                return _height;
             }
         }
 
