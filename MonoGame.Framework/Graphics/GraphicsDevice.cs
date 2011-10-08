@@ -326,15 +326,16 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			if (renderTarget == null) 
 			{
+                GL.Oes.BindFramebuffer(All.FramebufferOes, framebufferId);
 				// Detach the render buffers.
 				GL.Oes.FramebufferRenderbuffer(All.FramebufferOes, All.DepthAttachmentOes,
 						All.RenderbufferOes, 0);
 				// delete the RBO's
-				GL.Oes.DeleteRenderbuffers(renderBufferIDs.Length,renderBufferIDs);
-				// delete the FBO
-				GL.Oes.DeleteFramebuffers(1, ref framebufferId);
+				GL.Oes.DeleteRenderbuffers(renderBufferIDs.Length,renderBufferIDs);				
 				// Set the frame buffer back to the system window buffer
 				GL.Oes.BindFramebuffer(All.FramebufferOes, 0);
+                // delete the FBO
+                GL.Oes.DeleteFramebuffers(1, ref framebufferId);
 			}
 			else {
 				SetRenderTargets(new RenderTargetBinding(renderTarget));
@@ -364,19 +365,14 @@ namespace Microsoft.Xna.Framework.Graphics
 					RenderTarget2D target = (RenderTarget2D)currentRenderTargets[0].RenderTarget;
 					
 					// attach the texture to FBO color attachment point
-					GL.Oes.FramebufferTexture2D(All.FramebufferOes, All.ColorAttachment0Oes,
-						All.Texture2D, target.ID,0);
+					GL.Oes.FramebufferTexture2D(All.FramebufferOes, All.ColorAttachment0Oes,All.Texture2D, target.ID,0);
 					
 					// create a renderbuffer object to store depth info
 					GL.Oes.BindRenderbuffer(All.RenderbufferOes, renderBufferIDs[i]);
-					GL.Oes.RenderbufferStorage(All.RenderbufferOes, All.DepthComponent24Oes,
-						target.Width, target.Height);
-					GL.Oes.BindRenderbuffer(All.RenderbufferOes, renderBufferIDs[i]);
-					
+					GL.Oes.RenderbufferStorage(All.RenderbufferOes, All.DepthComponent16Oes,target.Width, target.Height);					
 					// attach the renderbuffer to depth attachment point
-					GL.Oes.FramebufferRenderbuffer(All.FramebufferOes, All.DepthAttachmentOes,
-						All.RenderbufferOes, renderBufferIDs[i]);
-						
+					GL.Oes.FramebufferRenderbuffer(All.FramebufferOes, All.DepthAttachmentOes, All.RenderbufferOes, renderBufferIDs[i]);
+                    //GL.Clear((uint)All.ColorBufferBit);
 				}
 				
 				All status = GL.Oes.CheckFramebufferStatus(All.FramebufferOes);
