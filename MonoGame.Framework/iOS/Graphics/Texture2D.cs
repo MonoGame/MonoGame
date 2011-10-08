@@ -115,13 +115,21 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		public Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipMap, SurfaceFormat format)
 		{
-			this.graphicsDevice = graphicsDevice;
-			this._width = width;
-			this._height = height;
+			this.graphicsDevice = graphicsDevice;	
+			
+			// This is needed in OpenGL ES 1.1 as it only supports power of 2 textures
+			int m_i32TexSize = 1;
+			int iSize = Math.Min(graphicsDevice.Viewport.Width, graphicsDevice.Viewport.Height);
+			while (m_i32TexSize * 2 < iSize) 
+				m_i32TexSize *= 2;
+			
+			this._width = m_i32TexSize;
+			this._height = m_i32TexSize;
+			
 			this._format = format;
 			this._mipmap = mipMap;
 			
-			generateOpenGLTexture();
+			generateOpenGLTexture();			
 		}
 		
 		private void generateOpenGLTexture() 

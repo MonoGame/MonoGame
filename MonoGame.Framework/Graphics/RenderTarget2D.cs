@@ -39,10 +39,14 @@
 #endregion License
 
 using System;
-using OpenTK.Graphics.ES11;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
+	// modified to inherit directly from Texture2D as per
+	// http://blogs.msdn.com/b/shawnhar/archive/2010/03/26/rendertarget-changes-in-xna-game-studio-4-0.aspx
+	// 	and
+	// http://msdn.microsoft.com/en-us/library/bb198676.aspx
+	//
 	public class RenderTarget2D : Texture2D
 	{		
 		public RenderTargetUsage RenderTargetUsage { get; internal set; }
@@ -65,24 +69,5 @@ namespace Microsoft.Xna.Framework.Graphics
 			RenderTargetUsage = usage;
 			DepthStencilFormat = preferredDepthFormat;
 		}
-		
-		/*private void allocateOpenGLTexture() 
-		{
-			// modeled after this
-			// http://steinsoft.net/index.php?site=Programming/Code%20Snippets/OpenGL/no9
-			
-			// Allocate the space needed for the texture
-			GL.BindTexture (All.Texture2D, this.textureId);
-			
-			// it seems like we do not need to allocate any buffer space
-			//byte[] data = new byte[_width * _height * 4];
-			// Use offset instead of pointer to indictate that we want to use data copied from a PBO 
-			//GL.TexImage2D (TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, _width, _height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, data);
-			GL.TexImage2D(All.Texture2D, 0, (int)All.Rgba, _width, _height, 0, All.Rgba, All.UnsignedByte, IntPtr.Zero);
-			
-			GL.BindTexture(All.Texture2D, 0);
-			//data = null;
-
-		}*/
 	}
 }

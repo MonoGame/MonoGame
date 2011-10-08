@@ -43,7 +43,6 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 using OpenTK.Graphics.ES11;
-using MonoTouch.OpenGLES;
 
 using Microsoft.Xna.Framework;
 
@@ -335,13 +334,15 @@ namespace Microsoft.Xna.Framework.Graphics
 				// Detach the render buffers.
 				GL.Oes.FramebufferRenderbuffer(All.FramebufferOes, All.DepthAttachmentOes,
 						All.RenderbufferOes, 0);
+				
 				// delete the RBO's
 				GL.Oes.DeleteRenderbuffers(renderBufferIDs.Length,renderBufferIDs);
+				
 				// delete the FBO
-				GL.Oes.DeleteFramebuffers(1, ref framebufferId);
+				GL.Oes.DeleteFramebuffers(frameBufferIDs.Length, frameBufferIDs);
+				
 				// Set the frame buffer back to the system window buffer
-				GL.Oes.BindFramebuffer(All.FramebufferOes, 0);
-				framebufferId = -1;
+				GL.Oes.BindFramebuffer(All.FramebufferOes, originalFbo);
 
 				// We need to reset our GraphicsDevice viewport back to what it was
 				// before rendering.
@@ -358,8 +359,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 		
-		private int framebufferId = -1;
+		int[] frameBufferIDs;
 		int[] renderBufferIDs;
+		int originalFbo = -1;
 		
 		// TODO: We need to come up with a state save and restore of the GraphicsDevice
 		//  This would probably work with a Stack that allows pushing and popping of the current
@@ -381,26 +383,25 @@ namespace Microsoft.Xna.Framework.Graphics
 				
 				// http://www.songho.ca/opengl/gl_fbo.html
 				
-				// create framebuffer
-				GL.Oes.GenFramebuffers(1, ref framebufferId);
-				GL.Oes.BindFramebuffer(All.FramebufferOes, framebufferId);
+				// Get the currently bound frame buffer object. On most platforms this just gives 0.				
+				GL.GetInteger(All.FramebufferBindingOes, ref originalFbo);
+				
+				frameBufferIDs = new int[currentRenderTargets.Length];
 				
 				renderBufferIDs = new int[currentRenderTargets.Length];
 				GL.Oes.GenRenderbuffers(currentRenderTargets.Length, renderBufferIDs);
 				
-				for (int i = 0; i < currentRenderTargets.Length; i++) {
+				for (int i = 0; i < currentRenderTargets.Length; i++) 
+				{
 					RenderTarget2D target = (RenderTarget2D)currentRenderTargets[i].RenderTarget;
-					
-					// attach the texture to FBO color attachment point
-					GL.Oes.FramebufferTexture2D(All.FramebufferOes, All.ColorAttachment0Oes,
-						All.Texture2D, target.ID,0);
 					
 					// create a renderbuffer object to store depth info
 					GL.Oes.BindRenderbuffer(All.RenderbufferOes, renderBufferIDs[i]);
 					
 					ClearOptions clearOptions = ClearOptions.Target | ClearOptions.DepthBuffer;
 					
-					switch (target.DepthStencilFormat) {
+					switch (target.DepthStencilFormat) 
+					{
 						case DepthFormat.Depth16:
 							GL.Oes.RenderbufferStorage(All.RenderbufferOes, All.DepthComponent16Oes,
 							target.Width, target.Height);
@@ -422,14 +423,21 @@ namespace Microsoft.Xna.Framework.Graphics
 							break;
 					}					
 					
+					// create framebuffer
+					GL.Oes.GenFramebuffers(1, ref frameBufferIDs[i]);
+					GL.Oes.BindFramebuffer(All.FramebufferOes, frameBufferIDs[i]);
+					
+					// attach the texture to FBO color attachment point
+					GL.Oes.FramebufferTexture2D(All.FramebufferOes, All.ColorAttachment0Oes, All.Texture2D, target.ID, 0);
+					
 					// attach the renderbuffer to depth attachment point
 					GL.Oes.FramebufferRenderbuffer(All.FramebufferOes, All.DepthAttachmentOes,
-							All.RenderbufferOes, renderBufferIDs[i]);
-							
-					GL.Oes.BindRenderbuffer(All.RenderbufferOes, 0);
+							All.RenderbufferOes, renderBufferIDs[i]);							
 					
 					if (target.RenderTargetUsage == RenderTargetUsage.DiscardContents)
 						Clear (clearOptions, Color.Transparent, 0, 0);
+					
+					GL.Oes.BindRenderbuffer(All.FramebufferOes, originalFbo);
 						
 				}
 				
