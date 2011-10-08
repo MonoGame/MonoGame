@@ -1,21 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">iPhoneSimulator</Platform>
     <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{DB8508BB-9849-4CC2-BC0F-8EB5DACB3C47}</ProjectGuid>
-    <ProjectTypeGuids>{E613F3A2-FE9C-494F-B74E-F63BCB86FEA6};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <ProjectTypeGuids>{6BC8ED88-2882-458C-8E55-DFD12B67127B};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
-    <MainNibFile>MainWindow.xib</MainNibFile>
-    <TargetFrameworkVersion>v1.0</TargetFrameworkVersion>
     <Description>XNA implementation for MonoTouch</Description>
     <RootNamespace>Microsoft.Xna.Framework</RootNamespace>
     <SynchReleaseVersion>false</SynchReleaseVersion>
-    <BundleDisplayName>MonoGame</BundleDisplayName>
     <ReleaseVersion>1.6</ReleaseVersion>
-    <MtouchMinimumOS>3.0</MtouchMinimumOS>
     <MtouchSdkVersion>3.0</MtouchSdkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhoneSimulator' ">
@@ -33,13 +29,9 @@
     </CustomCommands>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <MtouchLink>None</MtouchLink>
-    <MtouchDebug>True</MtouchDebug>
+    <MtouchDebug>true</MtouchDebug>
     <AssemblyName>MonoGame.Framework.iOS</AssemblyName>
-    <MtouchUseLlvm>false</MtouchUseLlvm>
     <MtouchUseArmv7>false</MtouchUseArmv7>
-    <MtouchUseThumb>false</MtouchUseThumb>
-    <MtouchUseSGen>false</MtouchUseSGen>
-    <MtouchArch>ARMv6</MtouchArch>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
     <DebugType>none</DebugType>
@@ -48,14 +40,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <MtouchDebug>False</MtouchDebug>
     <DefineConstants>IPHONE</DefineConstants>
     <AssemblyName>MonoGame.Framework.iOS</AssemblyName>
-    <MtouchUseLlvm>false</MtouchUseLlvm>
     <MtouchUseArmv7>false</MtouchUseArmv7>
-    <MtouchUseThumb>false</MtouchUseThumb>
-    <MtouchUseSGen>false</MtouchUseSGen>
-    <MtouchArch>ARMv6</MtouchArch>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhone' ">
     <DebugSymbols>true</DebugSymbols>
@@ -67,13 +54,9 @@
     <WarningLevel>4</WarningLevel>
     <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <MtouchDebug>True</MtouchDebug>
+    <MtouchDebug>true</MtouchDebug>
     <AssemblyName>MonoGame.Framework</AssemblyName>
-    <MtouchUseLlvm>false</MtouchUseLlvm>
     <MtouchUseArmv7>false</MtouchUseArmv7>
-    <MtouchUseThumb>false</MtouchUseThumb>
-    <MtouchUseSGen>false</MtouchUseSGen>
-    <MtouchArch>ARMv6</MtouchArch>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
     <DebugType>none</DebugType>
@@ -82,14 +65,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <MtouchDebug>False</MtouchDebug>
     <DefineConstants>IPHONE</DefineConstants>
     <AssemblyName>MonoGame.Framework</AssemblyName>
-    <MtouchUseLlvm>false</MtouchUseLlvm>
     <MtouchUseArmv7>false</MtouchUseArmv7>
-    <MtouchUseThumb>false</MtouchUseThumb>
-    <MtouchUseSGen>false</MtouchUseSGen>
-    <MtouchArch>ARMv6</MtouchArch>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
