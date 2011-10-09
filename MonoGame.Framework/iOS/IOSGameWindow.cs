@@ -192,10 +192,12 @@ namespace Microsoft.Xna.Framework
 		public void Pause()
 		{
 			isPausing = true;
+			Stop();
 		}
 
 		public void Resume()
 		{
+			Run();
 			isPausing = false;
 		}
 		

@@ -401,8 +401,8 @@ namespace Microsoft.Xna.Framework
 			_isActive = false;
 			 if (Deactivated != null)
                 Deactivated.Invoke(this, null);
+			
 			_view.Pause();
-			_view.Stop();
 		}
 		
 		public void EnterForeground()
@@ -410,8 +410,8 @@ namespace Microsoft.Xna.Framework
 			_isActive = true;			
 			if (Activated != null)
                 Activated.Invoke(this, null);
-			_view.Resume();
-			Run();
+			
+			_view.Resume();			
 		}
 		
 		protected virtual bool BeginDraw()
