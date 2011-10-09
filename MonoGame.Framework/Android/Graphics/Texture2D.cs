@@ -112,13 +112,16 @@ namespace Microsoft.Xna.Framework.Graphics
 			this.graphicsDevice = graphicsDevice;
 			
 			// This is needed in OpenGL ES 1.1 as it only supports power of 2 textures
-			int m_i32TexSize = 1;
-			int iSize = Math.Min(graphicsDevice.Viewport.Width, graphicsDevice.Viewport.Height);
-			while (m_i32TexSize * 2 < iSize) 
-				m_i32TexSize *= 2;
-			
-			this._width = m_i32TexSize;
-			this._height = m_i32TexSize;
+            int xTexSize = 1;
+            int yTexSize = 1;
+            while (width > xTexSize && height > yTexSize)
+            {
+                if (width > xTexSize) xTexSize *= 2;
+                if (height > yTexSize) yTexSize *= 2;
+            }
+
+            this._width = xTexSize;
+            this._height = yTexSize;
 			
 			this._format = format;
 			this._mipmap = mipMap;
@@ -130,7 +133,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			// modeled after this
 			// http://steinsoft.net/index.php?site=Programming/Code%20Snippets/OpenGL/no9
-			
+
+            GL.Enable(All.Texture2D);
 			GL.GenTextures(1,ref _textureId);
 			GL.BindTexture(All.Texture2D, _textureId);
 			
