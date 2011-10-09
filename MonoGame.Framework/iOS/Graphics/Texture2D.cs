@@ -118,13 +118,16 @@ namespace Microsoft.Xna.Framework.Graphics
 			this.graphicsDevice = graphicsDevice;	
 			
 			// This is needed in OpenGL ES 1.1 as it only supports power of 2 textures
-			int m_i32TexSize = 1;
-			int iSize = Math.Min(graphicsDevice.Viewport.Width, graphicsDevice.Viewport.Height);
-			while (m_i32TexSize * 2 < iSize) 
-				m_i32TexSize *= 2;
+			int xTexSize = 1;
+			int yTexSize = 1;
+			while (width > xTexSize && height > yTexSize)
+			{
+				if (width > xTexSize) xTexSize *= 2;
+				if (height > yTexSize) yTexSize *= 2;
+			}
 			
-			this._width = m_i32TexSize;
-			this._height = m_i32TexSize;
+			this._width = xTexSize;
+			this._height = yTexSize;
 			
 			this._format = format;
 			this._mipmap = mipMap;
