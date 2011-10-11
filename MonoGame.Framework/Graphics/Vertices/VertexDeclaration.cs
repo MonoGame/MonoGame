@@ -1,10 +1,26 @@
-using Microsoft.Xna.Framework.Graphics;
 using System;
+#if WINDOWS
+using OpenTK.Graphics.OpenGL;
+using GL11 = OpenTK.Graphics.OpenGL.GL;
+using All11 = OpenTK.Graphics.OpenGL.All;
+using ArrayCap11 = OpenTK.Graphics.OpenGL.ArrayCap;
+using EnableCap11 = OpenTK.Graphics.OpenGL.EnableCap;
+using MatrixMode11 = OpenTK.Graphics.OpenGL.MatrixMode;
+using BlendingFactorSrc11 = OpenTK.Graphics.OpenGL.BlendingFactorSrc;
+using BlendingFactorDest11 = OpenTK.Graphics.OpenGL.BlendingFactorDest;
+#else
+using OpenTK.Graphics.ES20;
+using OpenTK.Graphics.ES11;
 using GL11 = OpenTK.Graphics.ES11.GL;
 using GL20 = OpenTK.Graphics.ES20.GL;
 using All11 = OpenTK.Graphics.ES11.All;
 using All20 = OpenTK.Graphics.ES20.All;
-using System.Runtime.InteropServices;
+using ArrayCap11 = OpenTK.Graphics.ES11.All;
+using EnableCap11 = OpenTK.Graphics.ES11.All;
+using MatrixMode11 = OpenTK.Graphics.ES11.All;
+using BlendingFactorSrc11 = OpenTK.Graphics.ES11.All;
+using BlendingFactorDest11 = OpenTK.Graphics.ES11.All;
+#endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -99,24 +115,39 @@ namespace Microsoft.Xna.Framework.Graphics
                         case VertexElementUsage.Position:
                             GL11.VertexPointer(
                                 ve.VertexElementFormat.OpenGLNumberOfElements(),
+#if WINDOWS
+                                ve.VertexElementFormat.OpenGLVertexPointerType(),
+#else
                                 ve.VertexElementFormat.OpenGLValueType(),
+#endif
                                 vd.VertexStride,
+                                //ve.Offset
                                 new IntPtr(arrayStart.ToInt32() + ve.Offset)
                                 );
                             break;
                         case VertexElementUsage.Color:
                             GL11.ColorPointer(
                                 ve.VertexElementFormat.OpenGLNumberOfElements(),
+#if WINDOWS
+                                ve.VertexElementFormat.OpenGLColorPointerType(),
+#else
                                 ve.VertexElementFormat.OpenGLValueType(),
+#endif
                                 vd.VertexStride,
+                                //ve.Offset
                                 new IntPtr(arrayStart.ToInt32() + ve.Offset)
                                 );
                             color = true;
                             break;
                         case VertexElementUsage.Normal:
                             GL11.NormalPointer(
+#if WINDOWS
+                                ve.VertexElementFormat.OpenGLNormalPointerType(),
+#else
                                 ve.VertexElementFormat.OpenGLValueType(),
+#endif
                                 vd.VertexStride,
+                                //ve.Offset
                                 new IntPtr(arrayStart.ToInt32() + ve.Offset)
                                 );
                             normal = true;
@@ -124,8 +155,13 @@ namespace Microsoft.Xna.Framework.Graphics
                         case VertexElementUsage.TextureCoordinate:
                             GL11.TexCoordPointer(
                                 ve.VertexElementFormat.OpenGLNumberOfElements(),
+#if WINDOWS
+                                ve.VertexElementFormat.OpenGLTexCoordPointerType(),
+#else
                                 ve.VertexElementFormat.OpenGLValueType(),
+#endif
                                 vd.VertexStride,
+                                //ve.Offset
                                 new IntPtr(arrayStart.ToInt32() + ve.Offset)
                                 );
                             texcoord = true;

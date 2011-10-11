@@ -1,9 +1,27 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+#if WINDOWS
+using OpenTK.Graphics.OpenGL;
+using GL11 = OpenTK.Graphics.OpenGL.GL;
+using All11 = OpenTK.Graphics.OpenGL.All;
+using ArrayCap11 = OpenTK.Graphics.OpenGL.ArrayCap;
+using EnableCap11 = OpenTK.Graphics.OpenGL.EnableCap;
+using MatrixMode11 = OpenTK.Graphics.OpenGL.MatrixMode;
+using BlendingFactorSrc11 = OpenTK.Graphics.OpenGL.BlendingFactorSrc;
+using BlendingFactorDest11 = OpenTK.Graphics.OpenGL.BlendingFactorDest;
+#else
+using OpenTK.Graphics.ES20;
+using OpenTK.Graphics.ES11;
+using GL11 = OpenTK.Graphics.ES11.GL;
+using GL20 = OpenTK.Graphics.ES20.GL;
 using All11 = OpenTK.Graphics.ES11.All;
 using All20 = OpenTK.Graphics.ES20.All;
+using ArrayCap11 = OpenTK.Graphics.ES11.All;
+using EnableCap11 = OpenTK.Graphics.ES11.All;
+using MatrixMode11 = OpenTK.Graphics.ES11.All;
+using BlendingFactorSrc11 = OpenTK.Graphics.ES11.All;
+using BlendingFactorDest11 = OpenTK.Graphics.ES11.All;
+using VertexPointerType11 = OpenTK.Graphics.ES11.All;
+#endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -66,6 +84,123 @@ namespace Microsoft.Xna.Framework.Graphics
             throw new NotImplementedException();
         }
 
+#if WINDOWS
+        public static VertexPointerType OpenGLVertexPointerType(this VertexElementFormat elementFormat)
+        {
+            switch (elementFormat)
+            {
+                case VertexElementFormat.Single:
+                    throw new NotImplementedException();
+
+                case VertexElementFormat.Vector2:
+                    return VertexPointerType.Float;
+
+                case VertexElementFormat.Vector3:
+                    return VertexPointerType.Float;
+
+                case VertexElementFormat.Vector4:
+                    return VertexPointerType.Float;
+            }
+
+            throw new NotImplementedException();
+        }
+
+        public static ColorPointerType OpenGLColorPointerType(this VertexElementFormat elementFormat)
+        {
+            switch (elementFormat)
+            {
+                case VertexElementFormat.Single:
+                    throw new NotImplementedException();
+
+                case VertexElementFormat.Vector2:
+                    return ColorPointerType.Float;
+
+                case VertexElementFormat.Vector3:
+                    return ColorPointerType.Float;
+
+                case VertexElementFormat.Vector4:
+                    return ColorPointerType.Float;
+
+                case VertexElementFormat.Color:
+                    return ColorPointerType.UnsignedByte;
+
+                case VertexElementFormat.Byte4:
+                    return ColorPointerType.UnsignedByte;
+
+                case VertexElementFormat.Short2:
+                    return ColorPointerType.UnsignedShort;
+
+                case VertexElementFormat.Short4:
+                    return ColorPointerType.UnsignedShort;
+
+                case VertexElementFormat.NormalizedShort2:
+                    return ColorPointerType.UnsignedShort;
+
+                case VertexElementFormat.NormalizedShort4:
+                    return ColorPointerType.UnsignedShort;
+
+                case VertexElementFormat.HalfVector2:
+                    return ColorPointerType.Float;
+
+                case VertexElementFormat.HalfVector4:
+                    return ColorPointerType.Float;
+            }
+
+            throw new NotImplementedException();
+        }
+
+        public static NormalPointerType OpenGLNormalPointerType(this VertexElementFormat elementFormat)
+        {
+            switch (elementFormat)
+            {
+                case VertexElementFormat.Single:
+                    throw new NotImplementedException();
+
+                case VertexElementFormat.Vector2:
+                    return NormalPointerType.Float;
+
+                case VertexElementFormat.Vector3:
+                    return NormalPointerType.Float;
+
+                case VertexElementFormat.Vector4:
+                    return NormalPointerType.Float;
+
+                case VertexElementFormat.HalfVector2:
+                    return NormalPointerType.Float;
+
+                case VertexElementFormat.HalfVector4:
+                    return NormalPointerType.Float;
+            }
+
+            throw new NotImplementedException();
+        }
+
+        public static TexCoordPointerType OpenGLTexCoordPointerType(this VertexElementFormat elementFormat)
+        {
+            switch (elementFormat)
+            {
+                case VertexElementFormat.Single:
+                    throw new NotImplementedException();
+
+                case VertexElementFormat.Vector2:
+                    return TexCoordPointerType.Float;
+
+                case VertexElementFormat.Vector3:
+                    return TexCoordPointerType.Float;
+
+                case VertexElementFormat.Vector4:
+                    return TexCoordPointerType.Float;
+
+                case VertexElementFormat.HalfVector2:
+                    return TexCoordPointerType.Float;
+
+                case VertexElementFormat.HalfVector4:
+                    return TexCoordPointerType.Float;
+            }
+
+            throw new NotImplementedException();
+        }
+#else
         public static All11 OpenGLValueType(this VertexElementFormat elementFormat)
         {
             switch (elementFormat)
@@ -109,6 +244,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             throw new NotImplementedException();
         }
+#endif
 
         public static int Size(this SurfaceFormat surfaceFormat)
         {

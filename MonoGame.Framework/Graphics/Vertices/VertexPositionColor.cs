@@ -6,11 +6,12 @@ namespace Microsoft.Xna.Framework.Graphics
     {
         public Vector3 Position;
         public Color Color;
+
         public static readonly VertexDeclaration VertexDeclaration;
-        public VertexPositionColor(Vector3 position, Color color)
+        public VertexPositionColor(Vector3 position, Color color) : this()
         {
-            this.Position = position;
-            this.Color = color;
+            Position = position;
+            Color = color;
         }
 
         VertexDeclaration IVertexType.VertexDeclaration

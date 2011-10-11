@@ -1,9 +1,24 @@
 using System;
 
+#if WINDOWS
+using GL11 = OpenTK.Graphics.OpenGL.GL;
+using MatrixMode11 = OpenTK.Graphics.OpenGL.MatrixMode;
+using EnableCap11 = OpenTK.Graphics.OpenGL.EnableCap;
+using TextureEnvTarget11 = OpenTK.Graphics.OpenGL.TextureEnvTarget;
+using TextureEnvParameter11 = OpenTK.Graphics.OpenGL.TextureEnvParameter;
+using ArrayCap11 = OpenTK.Graphics.OpenGL.ArrayCap;
+using TextureTarget11 = OpenTK.Graphics.OpenGL.TextureTarget;
+#else
 using GL11 = OpenTK.Graphics.ES11.GL;
-using GL20 = OpenTK.Graphics.ES20.GL;
 using All11 = OpenTK.Graphics.ES11.All;
-using All20 = OpenTK.Graphics.ES20.All;
+
+using MatrixMode11 = OpenTK.Graphics.ES11.All;
+using EnableCap11 = OpenTK.Graphics.ES11.All;
+using TextureEnvTarget11 = OpenTK.Graphics.ES11.All;
+using TextureEnvParameter11 = OpenTK.Graphics.ES11.All;
+using ArrayCap11 = OpenTK.Graphics.ES11.All;
+using TextureTarget11 = OpenTK.Graphics.ES11.All;
+#endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -26,22 +41,26 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			// set camera
 			Matrix _matrix = Matrix.Identity;
-			GL11.MatrixMode(All11.Projection);
+            GL11.MatrixMode(MatrixMode11.Projection);
 			GL11.LoadIdentity();
 			GL11.Ortho(0, 320, 480, 0, -1, 1);
-			GL11.MatrixMode(All11.Modelview);
+            GL11.MatrixMode(MatrixMode11.Modelview);
 			GL11.LoadMatrix( ref _matrix.M11 );
 			GL11.Viewport (0, 0, 320, 480);
 						
 			// Initialize OpenGL states (ideally move this to initialize somewhere else)	
-			GL11.Disable(All11.DepthTest);
-			GL11.TexEnv(All11.TextureEnv, All11.TextureEnvMode,(int) All11.BlendSrc);
-			GL11.Enable(All11.Texture2D);
-			GL11.EnableClientState(All11.VertexArray);
-			GL11.EnableClientState(All11.ColorArray);
-			GL11.EnableClientState(All11.TextureCoordArray);
-			
-			GL11.Disable(All11.CullFace);		
+            GL11.Disable(EnableCap11.DepthTest);
+#if WINDOWS
+            GL11.TexEnv(TextureEnvTarget11.TextureEnv, TextureEnvParameter11.TextureEnvMode, (int)EnableCap11.Blend);
+#else
+            GL11.TexEnv(TextureEnvTarget11.TextureEnv, TextureEnvParameter11.TextureEnvMode, (int)All11.BlendSrc);
+#endif
+            GL11.Enable(EnableCap11.Texture2D);
+            GL11.EnableClientState(ArrayCap11.VertexArray);
+            GL11.EnableClientState(ArrayCap11.ColorArray);
+            GL11.EnableClientState(ArrayCap11.TextureCoordArray);
+
+            GL11.Disable(EnableCap11.CullFace);		
         }
 
 		public BasicEffect(GraphicsDevice device, EffectPool effectPool)
@@ -124,7 +143,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		private void setTexture(Texture2D texture)
 		{
-			GL11.BindTexture(All11.Texture2D, texture.Image.Name);
+            GL11.BindTexture(TextureTarget11.Texture2D, texture.Image.Name);
 		}
 
         public Texture2D Texture {

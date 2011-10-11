@@ -103,6 +103,8 @@ namespace Microsoft.Xna.Framework.Graphics
             _height = texture.ImageHeight;
             _format = texture.Format;
             _textureId = (int)theImage.Name;
+
+            //generateOpenGLTexture();
         }
 
         public Texture2D(GraphicsDevice graphicsDevice, int width, int height) :
@@ -119,7 +121,7 @@ namespace Microsoft.Xna.Framework.Graphics
             this._format = format;
             this._mipmap = mipMap;
 
-            generateOpenGLTexture();
+            generateOpenGLTextureEmpty();
         }
 
         byte[] textureData = null;
@@ -131,6 +133,54 @@ namespace Microsoft.Xna.Framework.Graphics
 
             GL.GenTextures(1, out _textureId);
             GL.BindTexture(TextureTarget.Texture2D, _textureId);
+
+            if (_mipmap)
+            {
+                // Taken from http://www.flexicoder.com/blog/index.php/2009/11/iphone-mipmaps/
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)All.LinearMipmapNearest);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)All.Linear);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.GenerateMipmap, (int)All.True);
+            }
+            else
+            {
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)All.Linear);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)All.Linear);
+            }
+
+
+            //GCHandle handle = GCHandle.Alloc(texture, GCHandleType.Pinned);
+
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, _width, _height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, texture.PixelData);
+
+            //handle.Free();
+
+            GL.BindTexture(TextureTarget.Texture2D, 0);
+
+            // The following is left here for testing purposes
+            //			NSImage image = new NSImage (new SizeF (_width, _height));
+            //			image.LockFocus ();
+            //			// We set this to be cleared/initialized
+            //			NSColor.Clear.Set ();
+            //			NSGraphics.RectFill (new RectangleF (0,0,_width,_height));
+            //			image.UnlockFocus ();
+            //
+            //			if (image == null) {
+            //				throw new Exception ("Error Creating Texture2D.");
+            //			}			
+            //
+            //			texture = new ESImage (image, graphicsDevice.PreferedFilter);
+            //			_textureId = (int)texture.Name;
+        }
+
+        private void generateOpenGLTextureEmpty()
+        {
+            // modeled after this
+            // http://steinsoft.net/index.php?site=Programming/Code%20Snippets/OpenGL/no9
+
+            GL.GenTextures(1, out _textureId);
+            GL.BindTexture(TextureTarget.Texture2D, _textureId);
+
+            GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (float)TextureEnvMode.Replace);
 
             if (_mipmap)
             {
@@ -305,24 +355,38 @@ namespace Microsoft.Xna.Framework.Graphics
             return FromFile(graphicsDevice, filename, 0, 0);
         }
 
-        private void Apply()
+        public void Apply()
         {
-
-            GL.BindTexture(TextureTarget.Texture2D, (uint)_textureId);
-            if (_mipmap)
+            if (texture == null)
             {
-                // Taken from http://www.flexicoder.com/blog/index.php/2009/11/iphone-mipmaps/
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)All.LinearMipmapNearest);
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)All.Linear);
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.GenerateMipmap, (int)All.True);
-            }
-            else
-            {
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)All.Linear);
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)All.Linear);
-            }
+                GL.BindTexture(TextureTarget.Texture2D, (uint) _textureId);
+                GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode,
+                          (float) TextureEnvMode.Replace);
+                if (_mipmap)
+                {
+                    // Taken from http://www.flexicoder.com/blog/index.php/2009/11/iphone-mipmaps/
+                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter,
+                                    (int) All.LinearMipmapNearest);
+                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int) All.Linear);
+                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.GenerateMipmap, (int) All.True);
+                }
+                else
+                {
+                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int) All.Linear);
+                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int) All.Linear);
+                }
 
-            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, _width, _height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Rgba, PixelType.UnsignedByte, textureData);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS,
+                                (float) TextureWrapMode.Repeat);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT,
+                                (float) TextureWrapMode.Repeat);
+
+                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, _width, _height, 0,
+                              OpenTK.Graphics.OpenGL.PixelFormat.Rgba, PixelType.UnsignedByte, textureData);
+            }else
+            {
+                GL.BindTexture(TextureTarget.Texture2D, (uint) _textureId);
+            }
         }
 
         private void SetPixel(int x, int y, byte red, byte green, byte blue, byte alpha)

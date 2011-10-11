@@ -82,6 +82,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             GL.GenTextures(1, out _name);
             GL.BindTexture(TextureTarget.Texture2D, _name);
+            GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (float)TextureEnvMode.Replace);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)filter);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)filter);
 
