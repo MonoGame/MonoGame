@@ -51,6 +51,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
+using Microsoft.Xna.Framework;
 
 namespace Microsoft.Xna.Framework
 {
@@ -62,8 +63,8 @@ namespace Microsoft.Xna.Framework
         private GameTime _drawGameTime;
         private DateTime _lastUpdate;
         private bool _initialized = false;
-		private bool _initializing = false;
-		private bool _isActive = true;
+		private bool _initializing = true;
+		private bool _isActive = false;
         private GameComponentCollection _gameComponentCollection;
         public GameServiceContainer _services;
         private ContentManager _content;
@@ -84,9 +85,10 @@ namespace Microsoft.Xna.Framework
         //TODO: Can we really use a static contextInstance?!
         internal static Activity contextInstance;
 
-		public Game(Activity context)
+		public Game(AndroidGameActivity context)
 		{
 		    contextInstance = context;
+            context.Game = this;
 
 			// Initialize collections
 			_services = new GameServiceContainer();
@@ -161,7 +163,6 @@ namespace Microsoft.Xna.Framework
 			// http://bugzilla.xamarin.com/show_bug.cgi?id=1084
 			// Accelerometer currently seems to have a memory leak
 			//Accelerometer.SetupAccelerometer();
-        
             view.Run(FramesPerSecond / (FramesPerSecond * TargetElapsedTime.TotalSeconds));	
         }
 		
@@ -183,7 +184,7 @@ namespace Microsoft.Xna.Framework
         { 
 			if (_isActive)
 			{
-				Draw(aGameTime);
+                Draw(aGameTime);                
 			}
 		}
 		
@@ -265,16 +266,26 @@ namespace Microsoft.Xna.Framework
 		
 		public void EnterBackground()
     	{
-			_isActive = false;
-			 if (Deactivated != null)
-                Deactivated.Invoke(this, null);
+            if (_isActive)
+            {
+                _isActive = false;
+                view.Pause();
+                Accelerometer.Pause();
+                if (Deactivated != null)
+                    Deactivated.Invoke(this, null);
+            }
 		}
 		
 		public void EnterForeground()
     	{
-			_isActive = true;
-			if (Activated != null)
-                Activated.Invoke(this, null);
+            if (!_isActive)
+            {
+                _isActive = true;
+                view.Resume();
+                Accelerometer.Resume();
+                if (Activated != null)
+                    Activated.Invoke(this, null);
+            }
 		}
 		
 		protected virtual bool BeginDraw()
@@ -288,40 +299,15 @@ namespace Microsoft.Xna.Framework
 		}
 		
 		protected virtual void LoadContent()
-		{			
-			string DefaultPath = "Default.png";
-			if (File.Exists(DefaultPath))
-			{
-				// Store the RootDir for later 
-				string backup = Content.RootDirectory;
-				
-				try 
-				{
-					// Clear the RootDirectory for this operation
-					Content.RootDirectory = string.Empty;
-					
-					spriteBatch = new SpriteBatch(GraphicsDevice);
-					splashScreen = Content.Load<Texture2D>(DefaultPath);			
-				}
-				finally 
-				{
-					// Reset RootDir
-					Content.RootDirectory = backup;
-				}
-				
-			}
-			else
-			{
-				spriteBatch = null;
-				splashScreen = null;
-			}
+		{
+            
 		}
 		
 		protected virtual void UnloadContent()
 		{
 			// do nothing
 		}
-		
+        
         protected virtual void Initialize()
         {
 			this.graphicsDeviceManager = this.Services.GetService(typeof(IGraphicsDeviceManager)) as IGraphicsDeviceManager;			
@@ -355,27 +341,29 @@ namespace Microsoft.Xna.Framework
 	                    gc.Update(gameTime);
 	                }
 	            }
+#if xDEBUG
                 garbageCounter++;
                 if (garbageCounter > 200)
                 {
                     // force a Garbage Collection
                     try
                     {
-                        GC.Collect(0);
+                       Android.Util.Log.Info("MonoGameInfo", String.Format("Game.Update Pre Collect {0}", GC.GetTotalMemory(true)));
+                      // GC.Collect(0);
+                      // Android.Util.Log.Info("MonoGameInfo", String.Format("Game.Update Pos Collect {0}", GC.GetTotalMemory(false)));
                     }
                     catch(Exception ex)
                     {
-                        Android.Util.Log.Error("GC.Collect(0)", ex.ToString());
+                        Android.Util.Log.Error("MonoGameInfo",String.Format("GC.Collect(0) {0}", ex.ToString()));
                     }
                     garbageCounter = 0;
                 }
+#endif
 			}
 			else
 			{
-				if (!_initializing) 
-				{
-					_initializing = true;
-
+                if (_initializing && !_initialized)
+                {
                     InitializeGameComponents();
                     _initialized = true;
                     _initializing = false;
@@ -394,7 +382,7 @@ namespace Microsoft.Xna.Framework
 							_initializing = false;
 						}, 
 					initD);*/
-				}
+                }
 			}
         }
 		
@@ -402,14 +390,6 @@ namespace Microsoft.Xna.Framework
         {
 			if ( _initializing )
 			{
-				if ( spriteBatch != null )
-				{
-					spriteBatch.Begin();
-					
-					// We need to turn this into a progress bar or animation to give better user feedback
-					spriteBatch.Draw(splashScreen, new Vector2(0, 0), Color.White );
-					spriteBatch.End();
-				}
 			}
 			else
 			{
@@ -437,10 +417,11 @@ namespace Microsoft.Xna.Framework
 			{
 				if (Exiting != null) Exiting(this, null);
 				Net.NetworkSession.Exit();
-	            AlertDialog dialog = new AlertDialog.Builder(Game.contextInstance).Create();
+                view.Close();
+	            /*AlertDialog dialog = new AlertDialog.Builder(Game.contextInstance).Create();
 	            dialog.SetTitle("Game Exit");
 	            dialog.SetMessage("Hit Home Button to Exit");
-	            dialog.Show();                
+	            dialog.Show();   */
 			}
 			catch
 			{

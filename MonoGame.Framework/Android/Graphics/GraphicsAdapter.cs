@@ -47,6 +47,9 @@ namespace Microsoft.Xna.Framework.Graphics
     public sealed class GraphicsAdapter : IDisposable
     {
         private static ReadOnlyCollection<GraphicsAdapter> adapters;
+        private static GraphicsAdapter defaultAdapter = new GraphicsAdapter();
+        private static DisplayMode defaultDisplayMode = new DisplayMode();
+         
         
         internal GraphicsAdapter()
         {
@@ -60,7 +63,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             get
             {
-                return new DisplayMode();
+                return defaultDisplayMode;
             }
         }
 
@@ -68,7 +71,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             get 
 			{ 
-				return new GraphicsAdapter();
+				return defaultAdapter;
 			}
         }
         
@@ -165,7 +168,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 throw new NotImplementedException();
             }
-        }
+        }        
         
         public DisplayModeCollection SupportedDisplayModes
         {

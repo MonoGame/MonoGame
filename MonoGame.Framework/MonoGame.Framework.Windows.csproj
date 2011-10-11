@@ -173,6 +173,7 @@
     <Compile Include="Graphics\RenderTarget.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Graphics\RenderTargetBinding.cs" />
     <Compile Include="Graphics\SamplerStateCollection.cs" />
     <Compile Include="Graphics\States\CompareFunction.cs" />
     <Compile Include="Graphics\States\CullMode.cs" />
