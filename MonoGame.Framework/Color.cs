@@ -1260,7 +1260,7 @@ namespace Microsoft.Xna.Framework
 
         public static Color FromNonPremultiplied(Vector4 vector)
         {
-            return FromNonPremultiplied((int)vector.X, (int)vector.Y, (int)vector.Z, (int)vector.W);
+            return FromNonPremultiplied((int)(vector.X * 255), (int)(vector.Y * 255), (int)(vector.Z * 255), (int)(vector.W * 255));
         }
 
         public static Color FromNonPremultiplied(int r, int g, int b, int a)
