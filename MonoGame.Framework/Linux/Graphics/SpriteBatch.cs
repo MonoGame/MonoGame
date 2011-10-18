@@ -174,8 +174,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			GL.Enable (EnableCap.CullFace);
 			GL.FrontFace (FrontFaceDirection.Cw);
 			GL.Color4 (1.0f, 1.0f, 1.0f, 1.0f);			
-			
-			_batcher.DrawBatch (_sortMode);
+
+			_batcher.DrawBatch (_sortMode, _samplerState);
 
 			// clear out the textures
 			graphicsDevice.Textures._textures.Clear ();

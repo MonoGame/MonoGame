@@ -39,6 +39,8 @@
 // #endregion License
 // 
 using System;
+using OpenTK.Graphics.OpenGL;
+
 namespace Microsoft.Xna.Framework.Graphics
 {
 	public class SamplerState : GraphicsResource
@@ -108,7 +110,47 @@ namespace Microsoft.Xna.Framework.Graphics
 		public int MaxAnisotropy { get; set; }
 		public int MaxMipLevel { get; set; }
 		public float MipMapLevelOfDetailBias { get; set; }
+		
+		internal void Activate()
+		{
+			// Set up texture sample filtering.
+			bool useMipmaps = MaxMipLevel > 0;
+			switch(Filter)
+			{
+			case TextureFilter.Point:
+				GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)(useMipmaps ? TextureMinFilter.NearestMipmapNearest : TextureMinFilter.Nearest));
+				GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
+				break;
+			case TextureFilter.Linear:
+				GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)(useMipmaps ? TextureMinFilter.LinearMipmapLinear : TextureMinFilter.Linear));
+				GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+				break;
+			case TextureFilter.Anisotropic:
+				// TODO: Requires EXT_texture_filter_anisotropic. Use linear filtering for now.
+				GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)(useMipmaps ? TextureMinFilter.LinearMipmapLinear : TextureMinFilter.Linear));
+				GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+				break;
+			}
 
+			// Set up texture addressing.
+			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)GetWrapMode(AddressU));
+			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)GetWrapMode(AddressV));
+		}
+		
+		private int GetWrapMode(TextureAddressMode textureAddressMode)
+		{
+			switch(textureAddressMode)
+			{
+			case TextureAddressMode.Clamp:
+				return (int)TextureWrapMode.Clamp;
+			case TextureAddressMode.Wrap:
+				return (int)TextureWrapMode.Repeat;
+			case TextureAddressMode.Mirror:
+				return (int)TextureWrapMode.MirroredRepeat;
+			default:
+				throw new NotImplementedException("No support for " + textureAddressMode);
+			}
+		}
 	}
 }
 
