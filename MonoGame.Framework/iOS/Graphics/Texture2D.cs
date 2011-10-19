@@ -163,6 +163,12 @@ namespace Microsoft.Xna.Framework.Graphics
 			GL.BindTexture(All.Texture2D, 0);
 			
 		}
+		
+		public override void Dispose()
+        {
+			base.Dispose();
+			texture.Dispose();
+		}
 
         public Color GetPixel(int x, int y)
         {

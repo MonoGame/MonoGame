@@ -121,6 +121,13 @@ namespace Microsoft.Xna.Framework.Graphics
 			Initialize(imageScale);
 		}
 		
+		public void Dispose ()
+		{
+			if (texture != null)
+			{
+				texture.Dispose();
+			}
+		}
 				
 		public int TextureOffsetX 
 		{
