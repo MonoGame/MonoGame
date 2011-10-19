@@ -59,7 +59,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			disposed = true;
 		}
 		
-		public void Dispose()
+		public virtual void Dispose()
         {
 			DoDisposing(EventArgs.Empty);
         }
