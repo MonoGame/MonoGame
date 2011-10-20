@@ -165,9 +165,15 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 		
 		public override void Dispose()
-        {
+		{
 			base.Dispose();
-			texture.Dispose();
+
+			if (texture != null) {
+				texture.Dispose();
+			}
+			if (_textureId!=0) {
+				GL.DeleteTextures(1, ref _textureId);
+			}
 		}
 
         public Color GetPixel(int x, int y)
