@@ -68,8 +68,9 @@ namespace Microsoft.Xna.Framework
         private ContentManager _content;
         internal AndroidGameWindow view;
 		private bool _isFixedTimeStep = true;
-        private TimeSpan _targetElapsedTime = TimeSpan.FromSeconds(1 / FramesPerSecond); 
-        
+        private TimeSpan _targetElapsedTime = TimeSpan.FromSeconds(1 / FramesPerSecond);
+        bool disposed;
+
 		internal IGraphicsDeviceManager graphicsDeviceManager;
         internal IGraphicsDeviceService graphicsDeviceService;
         private bool _devicesLoaded;
@@ -112,14 +113,31 @@ namespace Microsoft.Xna.Framework
 		
 		~Game()
 		{
-			
-		}
+            Dispose(false);
+        }
 
-		public void Dispose ()
-		{
-			// do nothing
-		}
+        public void Dispose()
+        {
+            Dispose(true);
+            // Tell the garbage collector not to call the finalizer
+            // since all the cleanup will already be done.
+            GC.SuppressFinalize(this);
+        }
 
+        // If disposing is true, it was called explicitly.
+        // If disposing is false, it was called by the finalizer.
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing && !disposed)
+            {
+                if (_content != null)
+                {
+                    _content.Dispose();
+                    _content = null;
+                }
+                disposed = true;
+            }
+        }
     
         public bool IsActive
         {
