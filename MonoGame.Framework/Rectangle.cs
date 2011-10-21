@@ -227,7 +227,10 @@ namespace Microsoft.Xna.Framework
                 int bottom_side = Math.Min(value1.Y + value1.Height, value2.Y + value2.Height);
                 result = new Rectangle(left_side, top_side, right_side - left_side, bottom_side - top_side);
             }
-            result = new Rectangle(0, 0, 0, 0);
+            else
+            {
+                result = new Rectangle(0, 0, 0, 0);
+            }
         }
 
         #endregion Public Methods
