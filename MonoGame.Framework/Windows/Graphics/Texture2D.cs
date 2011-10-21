@@ -277,6 +277,8 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 throw new ContentLoadException("Error loading file: " + filename);
             }
+            // Fix up the Image to match the expected format
+            image.RGBToBGR();
 
             ESImage theTexture;
 
