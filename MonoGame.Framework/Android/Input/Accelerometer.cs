@@ -53,6 +53,7 @@ namespace Microsoft.Xna.Framework.Input
         private static SensorManager _sensorManger;
         private static Sensor _sensor;
 		private static Vector3 _accelerometerVector = new Vector3(0, 0, 0);
+        private static SensorListener listener = new SensorListener();
 		
 		public static void SetupAccelerometer()
 		{
@@ -60,8 +61,7 @@ namespace Microsoft.Xna.Framework.Input
             _sensor = _sensorManger.GetDefaultSensor(SensorType.Accelerometer);
 
             if (_sensor != null) {
-                _state = new AccelerometerState { IsConnected = true };
-                _sensorManger.RegisterListener(new SensorListener(), _sensor, SensorDelay.Game);
+                _state = new AccelerometerState { IsConnected = true };                
             }
             else _state = new AccelerometerState { IsConnected = false };
         }
@@ -76,13 +76,8 @@ namespace Microsoft.Xna.Framework.Input
 			return _state;
 		}
 
-        private class SensorListener : ISensorEventListener
+        private class SensorListener : Java.Lang.Object, ISensorEventListener
         {
-            public IntPtr Handle
-            {
-                get { throw new NotImplementedException(); }
-            }
-
             public void OnAccuracyChanged(Sensor sensor, int accuracy)
             {
                //do nothing
@@ -107,5 +102,15 @@ namespace Microsoft.Xna.Framework.Input
                 }
             }
         }
-	}
+
+        internal static void Pause()
+        {
+            if (_sensorManger != null && _sensor == null) _sensorManger.UnregisterListener(listener, _sensor);
+        }
+
+        internal static void Resume()
+        {
+            if (_sensorManger != null && _sensor == null) _sensorManger.RegisterListener(listener, _sensor, SensorDelay.Game);            
+        }
+    }
 }

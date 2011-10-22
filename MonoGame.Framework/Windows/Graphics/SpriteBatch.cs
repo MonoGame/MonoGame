@@ -194,7 +194,7 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.Color4(1.0f, 1.0f, 1.0f, 1.0f);
             //GL.Color4(1.0f, 1.0f, 1.0f, 0.5f);
 
-            _batcher.DrawBatch(_sortMode);
+            _batcher.DrawBatch(_sortMode, _samplerState);
             //GL.UseProgram(0);
             // clear out the textures
             graphicsDevice.Textures._textures.Clear();

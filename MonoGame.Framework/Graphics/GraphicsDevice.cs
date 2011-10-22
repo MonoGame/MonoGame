@@ -451,7 +451,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				// it needs to be reset.  This causes drawing problems if we do not set the viewport.
 				// Makes sense once you follow the flow (hits head on desk)
 				// For an example of this take a look at NetRumble's sample for the BloomPostprocess
-
+               
 				// Save off the current viewport to be reset later
 				savedViewport = Viewport;
 

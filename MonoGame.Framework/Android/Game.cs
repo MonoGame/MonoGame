@@ -51,6 +51,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
+using Microsoft.Xna.Framework;
 
 namespace Microsoft.Xna.Framework
 {
@@ -61,38 +62,49 @@ namespace Microsoft.Xna.Framework
         private GameTime _updateGameTime;
         private GameTime _drawGameTime;
         private DateTime _lastUpdate;
-        private bool _initialized = false;
-		private bool _initializing = false;
-		private bool _isActive = true;
+		private bool _isActive = false;
         private GameComponentCollection _gameComponentCollection;
         public GameServiceContainer _services;
         private ContentManager _content;
         internal AndroidGameWindow view;
 		private bool _isFixedTimeStep = true;
-        private TimeSpan _targetElapsedTime = TimeSpan.FromSeconds(1 / FramesPerSecond); 
-        
+        private TimeSpan _targetElapsedTime = TimeSpan.FromSeconds(1 / FramesPerSecond);
+        bool disposed;
+
 		internal IGraphicsDeviceManager graphicsDeviceManager;
         internal IGraphicsDeviceService graphicsDeviceService;
         private bool _devicesLoaded;
 
 		internal static bool _playingVideo = false;
-		private SpriteBatch spriteBatch;
-		private Texture2D splashScreen;
 		
 		delegate void InitialiseGameComponentsDelegate();
 
-        //TODO: Can we really use a static contextInstance?!
-        internal static Activity contextInstance;
+		internal static AndroidGameActivity contextInstance;
 
-		public Game(Activity context)
+		public static AndroidGameActivity Activity
 		{
-		    contextInstance = context;
+			get
+			{
+				return contextInstance;
+			}
+			set
+			{
+				contextInstance = value;
+			}
+		}
+
+		public Game()
+		{
+			System.Diagnostics.Debug.Assert(contextInstance != null, "Must set Game.Activity before creating the Game instance");
+			contextInstance.Game = this;
 
 			// Initialize collections
 			_services = new GameServiceContainer();
 			_gameComponentCollection = new GameComponentCollection();
 
-            view = new AndroidGameWindow(context);
+			_content = new ContentManager(_services);
+
+            view = new AndroidGameWindow(contextInstance);
 		    view.game = this;
 			// Initialize GameTime
             _updateGameTime = new GameTime();
@@ -101,14 +113,31 @@ namespace Microsoft.Xna.Framework
 		
 		~Game()
 		{
-			
-		}
+            Dispose(false);
+        }
 
-		public void Dispose ()
-		{
-			// do nothing
-		}
+        public void Dispose()
+        {
+            Dispose(true);
+            // Tell the garbage collector not to call the finalizer
+            // since all the cleanup will already be done.
+            GC.SuppressFinalize(this);
+        }
 
+        // If disposing is true, it was called explicitly.
+        // If disposing is false, it was called by the finalizer.
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing && !disposed)
+            {
+                if (_content != null)
+                {
+                    _content.Dispose();
+                    _content = null;
+                }
+                disposed = true;
+            }
+        }
     
         public bool IsActive
         {
@@ -146,9 +175,6 @@ namespace Microsoft.Xna.Framework
             set
             {
                 _targetElapsedTime = value;			
-				if(_initialized) {
-					throw new NotSupportedException();
-				}
             }
         }
 		
@@ -161,7 +187,6 @@ namespace Microsoft.Xna.Framework
 			// http://bugzilla.xamarin.com/show_bug.cgi?id=1084
 			// Accelerometer currently seems to have a memory leak
 			//Accelerometer.SetupAccelerometer();
-        
             view.Run(FramesPerSecond / (FramesPerSecond * TargetElapsedTime.TotalSeconds));	
         }
 		
@@ -183,7 +208,7 @@ namespace Microsoft.Xna.Framework
         { 
 			if (_isActive)
 			{
-				Draw(aGameTime);
+                Draw(aGameTime);                
 			}
 		}
 		
@@ -239,13 +264,13 @@ namespace Microsoft.Xna.Framework
         {
             get
             {
-                if (_content == null)
-                {
-                    _content = new ContentManager(_services);
-                }
-                return _content;
-            }
-        }
+				return _content;
+			}
+			set
+			{
+				_content = value;
+			}
+		}
 
         public GraphicsDevice GraphicsDevice
         {
@@ -265,16 +290,26 @@ namespace Microsoft.Xna.Framework
 		
 		public void EnterBackground()
     	{
-			_isActive = false;
-			 if (Deactivated != null)
-                Deactivated.Invoke(this, null);
+            if (_isActive)
+            {
+                _isActive = false;
+                view.Pause();
+                Accelerometer.Pause();
+                if (Deactivated != null)
+                    Deactivated.Invoke(this, null);
+            }
 		}
 		
 		public void EnterForeground()
     	{
-			_isActive = true;
-			if (Activated != null)
-                Activated.Invoke(this, null);
+            if (!_isActive)
+            {
+                _isActive = true;
+                view.Resume();
+                Accelerometer.Resume();
+                if (Activated != null)
+                    Activated.Invoke(this, null);
+            }
 		}
 		
 		protected virtual bool BeginDraw()
@@ -288,144 +323,78 @@ namespace Microsoft.Xna.Framework
 		}
 		
 		protected virtual void LoadContent()
-		{			
-			string DefaultPath = "Default.png";
-			if (File.Exists(DefaultPath))
-			{
-				// Store the RootDir for later 
-				string backup = Content.RootDirectory;
-				
-				try 
-				{
-					// Clear the RootDirectory for this operation
-					Content.RootDirectory = string.Empty;
-					
-					spriteBatch = new SpriteBatch(GraphicsDevice);
-					splashScreen = Content.Load<Texture2D>(DefaultPath);			
-				}
-				finally 
-				{
-					// Reset RootDir
-					Content.RootDirectory = backup;
-				}
-				
-			}
-			else
-			{
-				spriteBatch = null;
-				splashScreen = null;
-			}
+		{
+            
 		}
 		
 		protected virtual void UnloadContent()
 		{
 			// do nothing
 		}
-		
+        
         protected virtual void Initialize()
         {
 			this.graphicsDeviceManager = this.Services.GetService(typeof(IGraphicsDeviceManager)) as IGraphicsDeviceManager;			
 			this.graphicsDeviceService = this.Services.GetService(typeof(IGraphicsDeviceService)) as IGraphicsDeviceService;			
 
-			if ((this.graphicsDeviceService != null) && (this.graphicsDeviceService.GraphicsDevice != null))
-            {
-                LoadContent();
-            }
-        }
-		
-		private void InitializeGameComponents()
-		{
 			foreach (GameComponent gc in _gameComponentCollection)
-            {
-                gc.Initialize();
-            }
+			{
+				gc.Initialize();
+			}
+			
+			if ((this.graphicsDeviceService != null) && (this.graphicsDeviceService.GraphicsDevice != null))
+			{
+				LoadContent();
+			}
 		}
-
+		
+#if xDEBUG
         private int garbageCounter = 0;
+#endif
 
         protected virtual void Update(GameTime gameTime)
-        {		
-	
-			if ( _initialized)
+		{		
+			foreach (GameComponent gc in _gameComponentCollection)			
 			{
-				foreach (GameComponent gc in _gameComponentCollection)			
+				if (gc.Enabled)
 				{
-					if (gc.Enabled)
-	                {
-	                    gc.Update(gameTime);
-	                }
-	            }
-                garbageCounter++;
-                if (garbageCounter > 200)
-                {
-                    // force a Garbage Collection
-                    try
-                    {
-                        GC.Collect(0);
-                    }
-                    catch(Exception ex)
-                    {
-                        Android.Util.Log.Error("GC.Collect(0)", ex.ToString());
-                    }
-                    garbageCounter = 0;
-                }
-			}
-			else
-			{
-				if (!_initializing) 
-				{
-					_initializing = true;
-
-                    InitializeGameComponents();
-                    _initialized = true;
-                    _initializing = false;
-                    /*
-					// Use OpenGLES context switching as described here
-					// http://developer.apple.com/iphone/library/qa/qa2010/qa1612.html
-					InitialiseGameComponentsDelegate initD = new InitialiseGameComponentsDelegate(InitializeGameComponents);
-
-					// Invoke on thread from the pool
-        			initD.BeginInvoke( 
-						delegate (IAsyncResult iar) 
-					    {
-							// We must have finished initialising, so set our flag appropriately
-							// So that we enter the Update loop
-						    _initialized = true;
-							_initializing = false;
-						}, 
-					initD);*/
+					gc.Update(gameTime);
 				}
 			}
+#if xDEBUG
+			garbageCounter++;
+			if (garbageCounter > 200)
+			{
+				// force a Garbage Collection
+				try
+				{
+					Android.Util.Log.Info("MonoGameInfo", String.Format("Game.Update Pre Collect {0}", GC.GetTotalMemory(true)));
+					// GC.Collect(0);
+					// Android.Util.Log.Info("MonoGameInfo", String.Format("Game.Update Pos Collect {0}", GC.GetTotalMemory(false)));
+				}
+				catch(Exception ex)
+				{
+					Android.Util.Log.Error("MonoGameInfo",String.Format("GC.Collect(0) {0}", ex.ToString()));
+				}
+				garbageCounter = 0;
+			}
+#endif
         }
 		
         protected virtual void Draw(GameTime gameTime)
-        {
-			if ( _initializing )
+		{
+			if (!_playingVideo) 
 			{
-				if ( spriteBatch != null )
+				foreach (GameComponent gc in _gameComponentCollection)
 				{
-					spriteBatch.Begin();
-					
-					// We need to turn this into a progress bar or animation to give better user feedback
-					spriteBatch.Draw(splashScreen, new Vector2(0, 0), Color.White );
-					spriteBatch.End();
-				}
-			}
-			else
-			{
-				if (!_playingVideo) 
-				{
-		            foreach (GameComponent gc in _gameComponentCollection)
-		            {
-		                if (gc.Enabled && gc is DrawableGameComponent)
-		                {
-		                    DrawableGameComponent dc = gc as DrawableGameComponent;
-		                    if (dc.Visible)
-		                    {
-		                        dc.Draw(gameTime);
-		                    }
-		                }
-		            }
+					if (gc.Enabled && gc is DrawableGameComponent)
+					{
+						DrawableGameComponent dc = gc as DrawableGameComponent;
+						if (dc.Visible)
+						{
+							dc.Draw(gameTime);
+						}
+					}
 				}
 			}
         }
@@ -437,10 +406,7 @@ namespace Microsoft.Xna.Framework
 			{
 				if (Exiting != null) Exiting(this, null);
 				Net.NetworkSession.Exit();
-	            AlertDialog dialog = new AlertDialog.Builder(Game.contextInstance).Create();
-	            dialog.SetTitle("Game Exit");
-	            dialog.SetMessage("Hit Home Button to Exit");
-	            dialog.Show();                
+                view.Close();
 			}
 			catch
 			{

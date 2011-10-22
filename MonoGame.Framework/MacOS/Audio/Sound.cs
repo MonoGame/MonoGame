@@ -38,7 +38,7 @@ using MonoMac.Foundation;
 
 namespace Microsoft.Xna.Framework.Audio
 {	
-	public class Sound
+	internal class Sound : IDisposable
 	{	
 		private NSSound _audioPlayer;
 		
@@ -59,6 +59,11 @@ namespace Microsoft.Xna.Framework.Audio
 			_audioPlayer = new NSSound(data);
 			_audioPlayer.Volume = volume;
 			_audioPlayer.Loops = looping;
+		}
+		
+		~Sound()
+		{
+			Dispose();	
 		}
 		
 		public void Dispose()

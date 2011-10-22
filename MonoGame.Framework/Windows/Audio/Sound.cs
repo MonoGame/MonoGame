@@ -37,7 +37,7 @@ using OpenTK.Audio;
 
 namespace Microsoft.Xna.Framework.Audio
 {
-    public class Sound
+    internal class Sound : IDisposable
     {
         private static AudioContext context = null;
 
@@ -175,6 +175,11 @@ namespace Microsoft.Xna.Framework.Audio
 
             Initialize(data, format, size, freq, volume, looping);
         }
+		
+		~Sound()
+		{
+			Dispose();	
+		}
 
         private static void InitilizeSoundServices()
         {

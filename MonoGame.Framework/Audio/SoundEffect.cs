@@ -49,7 +49,7 @@ namespace Microsoft.Xna.Framework.Audio
 {
     public sealed class SoundEffect : IDisposable
     {
-		private static Sound _sound;
+		private Sound _sound;
 		private string _name = "";
 		private string _filename = "";
 		private byte[] _data;
@@ -157,20 +157,15 @@ namespace Microsoft.Xna.Framework.Audio
 		public SoundEffectInstance CreateInstance ()
 		{
 			var instance = new SoundEffectInstance();
-			if (_data != null) {
-				_sound = new Sound(_data, MasterVolume, false);
-			} else {
-				_sound = new Sound(_filename, MasterVolume, false);
-			}
 			instance.Sound = _sound;
 			return instance;
-			
 		}
 		
 		#region IDisposable Members
 
         public void Dispose()
         {
+			_sound.Dispose();
         }
 
         #endregion

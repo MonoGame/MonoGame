@@ -44,6 +44,7 @@ using MonoTouch.Foundation;
 using MonoTouch.UIKit;
 
 using Microsoft.Xna;
+using Microsoft.Xna.Framework.Input.Touch;
 
 namespace Microsoft.Xna.Framework
 {
@@ -130,6 +131,12 @@ namespace Microsoft.Xna.Framework
 			       });
 			}).BeginInvoke(null, null);	
 		}
+		
+		public override void OnActivated(UIApplication application)
+        {
+			TouchPanel.Reset ();
+		}
+
 	}
 }
 

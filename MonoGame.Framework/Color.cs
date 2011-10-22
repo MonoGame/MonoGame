@@ -1258,6 +1258,15 @@ namespace Microsoft.Xna.Framework
 			return string.Format("[Color: R={0}, G={1}, B={2}, A={3}, PackedValue={4}]", R, G, B, A, PackedValue);
 		}
 
+        public static Color FromNonPremultiplied(Vector4 vector)
+        {
+            return FromNonPremultiplied((int)(vector.X * 255), (int)(vector.Y * 255), (int)(vector.Z * 255), (int)(vector.W * 255));
+        }
+
+        public static Color FromNonPremultiplied(int r, int g, int b, int a)
+        {
+            return new Color((byte)(r * a / 255),(byte)(g * a / 255), (byte)(b * a / 255), a);
+        }
 
         #region IEquatable<Color> Members
 
