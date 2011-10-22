@@ -170,7 +170,7 @@ namespace Microsoft.Xna.Framework.Audio
 		public float Pitch { get; set; }
 		
 		private Sound _sound;
-		public Sound Sound 
+		internal Sound Sound 
 		{ 
 			get
 			{

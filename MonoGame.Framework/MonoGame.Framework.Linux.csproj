@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="3.5" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
@@ -9,7 +9,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>MonoGame.Framework.Linux</RootNamespace>
     <AssemblyName>MonoGame.Framework.Linux</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>true</DebugSymbols>
@@ -38,8 +38,11 @@
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
-    <Reference Include="OpenTK, Version=1.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="OpenTK, Version=1.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\opentk\Binaries\OpenTK\Release\OpenTK.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -124,7 +127,6 @@
     <Compile Include="Media\Song.cs" />
     <Compile Include="Media\MediaState.cs" />
     <Compile Include="Media\MediaSourceType.cs" />
-    <Compile Include="Linux\Content\ContentManager.cs" />
     <Compile Include="Content\ContentReader.cs" />
     <Compile Include="Graphics\IGraphicsDeviceService.cs" />
     <Compile Include="Content\ContentTypeReader.cs" />
@@ -143,7 +145,6 @@
     <Compile Include="Graphics\GraphicsProfile.cs" />
     <Compile Include="Graphics\SpriteSortMode.cs" />
     <Compile Include="Graphics\ResolveTexture2D.cs" />
-    <Compile Include="Linux\Graphics\RenderTarget2D.cs" />
     <Compile Include="Linux\Graphics\Texture2D.cs" />
     <Compile Include="Graphics\RenderTarget.cs" />
     <Compile Include="Linux\Graphics\RenderState.cs" />
@@ -310,6 +311,9 @@
     <Compile Include="Linux\Audio\AudioLoader.cs" />
     <Compile Include="Linux\GamerServices\MonoGameGamerServicesHelper.cs" />
     <Compile Include="Linux\Storage\StorageDeviceHelper.cs" />
+    <Compile Include="Graphics\RenderTarget2D.cs" />
+    <Compile Include="Content\ContentManager.cs" />
+    <Compile Include="Content\LzxDecoder.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Linux\" />

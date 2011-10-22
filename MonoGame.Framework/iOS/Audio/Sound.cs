@@ -38,7 +38,7 @@ using MonoTouch.AVFoundation;
 
 namespace Microsoft.Xna.Framework.Audio
 {	
-	public class Sound
+	internal class Sound : IDisposable
 	{	
 		private AVAudioPlayer _audioPlayer;
 		
@@ -84,6 +84,11 @@ namespace Microsoft.Xna.Framework.Audio
 			{
 				throw new Exception("Unable to Prepare sound for playback!");
 			}
+		}
+		
+		~Sound()
+		{
+			Dispose();	
 		}
 		
 		public void Dispose()
@@ -153,8 +158,11 @@ namespace Microsoft.Xna.Framework.Audio
 		}
 		
 		public void Play()
-		{		
-			_audioPlayer.Play();
+		{
+            ThreadPool.QueueUserWorkItem(delegate
+            {
+                _audioPlayer.Play();
+            });
 		}
 		
 		public void Stop()

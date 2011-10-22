@@ -209,6 +209,30 @@ namespace Microsoft.Xna.Framework
 
         }
 
+        public static Rectangle Intersect(Rectangle value1, Rectangle value2)
+        {
+            Rectangle rectangle;
+            Intersect(ref value1, ref value2, out rectangle);
+            return rectangle;
+        }
+
+
+        public static void Intersect(ref Rectangle value1, ref Rectangle value2, out Rectangle result)
+        {
+            if (value1.Intersects(value2))
+            {
+                int right_side = Math.Min(value1.X + value1.Width, value2.X + value2.Width);
+                int left_side = Math.Max(value1.X, value2.X);
+                int top_side = Math.Max(value1.Y, value2.Y);
+                int bottom_side = Math.Min(value1.Y + value1.Height, value2.Y + value2.Height);
+                result = new Rectangle(left_side, top_side, right_side - left_side, bottom_side - top_side);
+            }
+            else
+            {
+                result = new Rectangle(0, 0, 0, 0);
+            }
+        }
+
         #endregion Public Methods
     }
 }

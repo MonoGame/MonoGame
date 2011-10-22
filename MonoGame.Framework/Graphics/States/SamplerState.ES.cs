@@ -40,11 +40,7 @@
 // 
 using System;
 
-#if MONOMAC
-using MonoMac.OpenGL;
-#else
-using OpenTK.Graphics.OpenGL;
-#endif
+using OpenTK.Graphics.ES11;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -123,23 +119,23 @@ namespace Microsoft.Xna.Framework.Graphics
 			switch(Filter)
 			{
 			case TextureFilter.Point:
-				GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)(useMipmaps ? TextureMinFilter.NearestMipmapNearest : TextureMinFilter.Nearest));
-				GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
+				GL.TexParameter(All.Texture2D, All.TextureMinFilter, (int)(useMipmaps ? All.NearestMipmapNearest : All.Nearest));
+				GL.TexParameter(All.Texture2D, All.TextureMagFilter, (int)All.Nearest);
 				break;
 			case TextureFilter.Linear:
-				GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)(useMipmaps ? TextureMinFilter.LinearMipmapLinear : TextureMinFilter.Linear));
-				GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+				GL.TexParameter(All.Texture2D, All.TextureMinFilter, (int)(useMipmaps ? All.LinearMipmapLinear : All.Linear));
+				GL.TexParameter(All.Texture2D, All.TextureMagFilter, (int)All.Linear);
 				break;
 			case TextureFilter.Anisotropic:
 				// TODO: Requires EXT_texture_filter_anisotropic. Use linear filtering for now.
-				GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)(useMipmaps ? TextureMinFilter.LinearMipmapLinear : TextureMinFilter.Linear));
-				GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+				GL.TexParameter(All.Texture2D, All.TextureMinFilter, (int)(useMipmaps ? All.LinearMipmapLinear : All.Linear));
+				GL.TexParameter(All.Texture2D, All.TextureMagFilter, (int)All.Linear);
 				break;
 			}
 
 			// Set up texture addressing.
-			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)GetWrapMode(AddressU));
-			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)GetWrapMode(AddressV));
+			GL.TexParameter(All.Texture2D, All.TextureWrapS, (int)GetWrapMode(AddressU));
+			GL.TexParameter(All.Texture2D, All.TextureWrapT, (int)GetWrapMode(AddressV));
 		}
 		
 		private int GetWrapMode(TextureAddressMode textureAddressMode)
@@ -147,11 +143,11 @@ namespace Microsoft.Xna.Framework.Graphics
 			switch(textureAddressMode)
 			{
 			case TextureAddressMode.Clamp:
-				return (int)TextureWrapMode.Clamp;
+				return (int)All.ClampToEdge;
 			case TextureAddressMode.Wrap:
-				return (int)TextureWrapMode.Repeat;
+				return (int)All.Repeat;
 			case TextureAddressMode.Mirror:
-				return (int)TextureWrapMode.MirroredRepeat;
+				return (int)All.MirroredRepeatOes;
 			default:
 				throw new NotImplementedException("No support for " + textureAddressMode);
 			}

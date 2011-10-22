@@ -11,10 +11,11 @@ using Android.Runtime;
 using Android.Util;
 using Android.Views;
 using Android.Widget;
+using Android.Content.Res;
 
 namespace Microsoft.Xna.Framework.Audio
 {
-    public class Sound
+    internal class Sound : IDisposable
     {
         internal MediaPlayer _player;
         private float _Volume;
@@ -50,9 +51,9 @@ namespace Microsoft.Xna.Framework.Audio
                 {
                     workItem();
                 }
-                catch
+                catch(Exception ex)
                 {
-                    Log.Debug("Sound.Worker" , "Sound thread: Work Exception");
+                    Log.Debug("Sound.Worker" , "Sound thread: Work Exception" + ex.ToString());
                 }
             }
         }
@@ -66,6 +67,11 @@ namespace Microsoft.Xna.Framework.Audio
         {
             _player = player;
         }
+		
+		~Sound()
+		{
+			Dispose();	
+		}
 		
 		public void Dispose()
 		{
@@ -83,6 +89,22 @@ namespace Microsoft.Xna.Framework.Audio
 
                 _player.SetVolume(value, value);
 
+            }
+        }
+
+        public double Duration
+        {
+            get
+            {
+                return _player != null ? _player.Duration : 0;
+            }
+        }
+
+        public double CurrentPosition
+        {
+            get
+            {
+                return _player != null ? _player.CurrentPosition : 0;
             }
         }
 
@@ -108,6 +130,7 @@ namespace Microsoft.Xna.Framework.Audio
             if (this._player == null)
                 return;
 
+            //_player.Start();
             Sound.Enqueue(_player.Start);
         }
 		
@@ -152,28 +175,35 @@ namespace Microsoft.Xna.Framework.Audio
             IsPrepared = true;
         }
 
-        public static Sound Create(string assetPath, float volume, bool looping)
-        {
-            MediaPlayer player = new MediaPlayer();
-            Sound sound = new Sound(player);
-			//This breaks the platformer sample. Not sure if it works anywhere else
-            //player.SetDataSource(Game.contextInstance.Assets.OpenFd(assetPath).FileDescriptor);
-			player.SetDataSource(assetPath);
-            player.Prepared += sound.OnPrepared;
-            sound.Looping = looping;
-            sound.Volume = volume;
-            
-            Sound.Enqueue(player.Prepare);
 
-            return sound;
+       
+              
+        public Sound(string filename, float volume, bool looping)
+        {
+            this._player = new MediaPlayer();
+            // get the Asset Descriptor and Release it when the SetDataSource returns
+            // otherwise you cant play the file
+            using (AssetFileDescriptor fd = Game.contextInstance.Assets.OpenFd(filename))
+            {
+                _player.SetDataSource(fd.FileDescriptor);
+            }
+            _player.Prepared += this.OnPrepared;
+            this.Looping = looping;
+            this.Volume = volume;            
+            // prepare on the background  thread
+            try
+            {
+                _player.PrepareAsync();
+            }
+            catch (Exception ex)
+            {
+                Log.Debug("MonoGameInfo", ex.ToString());
+            }
         }
 
-        public static Sound CreateAndPlay(string url, float volume, bool looping)
+        public Sound(byte[] audiodata, float volume, bool looping)
         {
-            Sound sound = Sound.Create(url, volume, looping);
-            sound.Play();
-
-            return sound;
+            throw new NotImplementedException();
         }
 
     }

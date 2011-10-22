@@ -60,6 +60,22 @@ namespace Microsoft.Xna.Framework.Content
         private string _rootDirectory = string.Empty;
         private IServiceProvider serviceProvider;
 		private IGraphicsDeviceService graphicsDeviceService;
+        Dictionary<string, object> loadedAssets = new Dictionary<string, object>();
+        List<IDisposable> disposableAssets = new List<IDisposable>();
+        bool disposed;
+
+        // Use C# destructor syntax for finalization code.
+        // This destructor will run only if the Dispose method
+        // does not get called.
+        // It gives your base class the opportunity to finalize.
+        // Do not provide destructors in types derived from this class.
+        ~ContentManager()
+        {
+            // Do not re-create Dispose clean-up code here.
+            // Calling Dispose(false) is optimal in terms of
+            // readability and maintainability.
+            Dispose(false);
+        }
 
         public ContentManager(IServiceProvider serviceProvider)
         {
@@ -86,10 +102,59 @@ namespace Microsoft.Xna.Framework.Content
 
         public void Dispose()
         {
+            Dispose(true);
+            // Tell the garbage collector not to call the finalizer
+            // since all the cleanup will already be done.
+            GC.SuppressFinalize(this);
         }
 		
+        // If disposing is true, it was called explicitly.
+        // If disposing is false, it was called by the finalizer.
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing && !disposed)
+            {
+                Unload();
+                disposed = true;
+            }
+        }
+
         public T Load<T>(string assetName)
-        {			
+        {
+            if (string.IsNullOrEmpty(assetName))
+            {
+                throw new ArgumentNullException();
+            }
+            if (disposed)
+            {
+                throw new ObjectDisposedException("ContentManager");
+            }
+
+            // Check for a previously loaded asset first
+            object asset = null;
+            if (loadedAssets.TryGetValue(assetName, out asset))
+            {
+                if (asset is T)
+                {
+                    return (T)asset;
+                }
+            }
+
+            asset = ReadAsset<T>(assetName, null);
+            return (T)asset;
+        }
+
+        protected T ReadAsset<T>(string assetName, Action<IDisposable> recordDisposableObject)
+        {
+            if (string.IsNullOrEmpty(assetName))
+            {
+                throw new ArgumentNullException();
+            }
+            if (disposed)
+            {
+                throw new ObjectDisposedException("ContentManager");
+            }
+
 			string originalAssetName = assetName;
 			object result = null;
 			
@@ -102,11 +167,7 @@ namespace Microsoft.Xna.Framework.Content
                 }
             }
 			
-			if (string.IsNullOrEmpty(assetName))
-			{
-				throw new ArgumentException("assetname");
-			}	
-			
+            // Replace Windows path separators with local path separators
             assetName = Path.Combine(_rootDirectory, assetName.Replace('\\', Path.DirectorySeparatorChar));
 			
 			// Get the real file name
@@ -151,7 +212,7 @@ namespace Microsoft.Xna.Framework.Content
 			{
 				// Load a XNB file
                 //Loads from Assets directory + /assetName
-			    Stream stream = Game.contextInstance.Assets.Open(assetName);
+			    Stream stream = OpenStream(assetName);
 				BinaryReader xnbReader = new BinaryReader(stream);
 				
 				// The first 4 bytes should be the "XNB" header. i use that to detect an invalid file
@@ -259,7 +320,7 @@ namespace Microsoft.Xna.Framework.Content
 			{
 				if ((typeof(T) == typeof(Texture2D))) {
                     //Basically the same as Texture2D.FromFile but loading from the assets instead of a filePath
-                    Stream assetStream = Game.contextInstance.Assets.Open(assetName);
+                    Stream assetStream = OpenStream(assetName);
                     Bitmap image = BitmapFactory.DecodeStream(assetStream);
                     ESImage theTexture = new ESImage(image, graphicsDeviceService.GraphicsDevice.PreferedFilter);
                     result = new Texture2D(theTexture) { Name = Path.GetFileNameWithoutExtension(assetName) };
@@ -282,7 +343,7 @@ namespace Microsoft.Xna.Framework.Content
 			{
 				// Load a XNB file
                 //Loads from Assets directory + /assetName
-			    Stream assetStream = Game.contextInstance.Assets.Open(assetName);
+			    Stream assetStream = OpenStream(assetName);
                
                 ContentReader reader = new ContentReader(this, assetStream, this.graphicsDeviceService.GraphicsDevice);
 				ContentTypeReaderManager typeManager = new ContentTypeReaderManager(reader);
@@ -307,13 +368,30 @@ namespace Microsoft.Xna.Framework.Content
 			{	
 				throw new ContentLoadException("Could not load "  + originalAssetName + " asset!");
 			}
-			
+
+            // Store references to the asset for later use
+            T asset = (T)result;
+            if (asset is IDisposable && recordDisposableObject != null)
+            {
+                recordDisposableObject(asset as IDisposable);
+            }
+            else
+            {
+                disposableAssets.Add(asset as IDisposable);
+            }
+            loadedAssets.Add(originalAssetName, asset);
+
 			return (T) result;
         }
 		
-		
         public virtual void Unload()
         {
+            foreach (IDisposable asset in disposableAssets)
+            {
+                asset.Dispose();
+            }
+            disposableAssets.Clear();
+            loadedAssets.Clear();
         }
 
         public string RootDirectory
@@ -334,6 +412,12 @@ namespace Microsoft.Xna.Framework.Content
             {
                 return this.serviceProvider;
             }
+        }
+
+        protected virtual Stream OpenStream(string assetName)
+        {
+            Stream stream = Game.Activity.Assets.Open(assetName);
+            return stream;
         }
     }
 }

@@ -100,7 +100,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			return b.Depth.CompareTo(a.Depth);
 		}
-		public void DrawBatch ( SpriteSortMode sortMode )
+		public void DrawBatch ( SpriteSortMode sortMode, SamplerState samplerState )
 		{
 			// nothing to do
 			if ( _batchItemList.Count == 0 )
@@ -147,6 +147,8 @@ namespace Microsoft.Xna.Framework.Graphics
 					startIndex = index;
 					texID = item.TextureID;
 					GL.BindTexture ( All.Texture2D, texID );
+					
+					samplerState.Activate();
 				}
 				// store the SpriteBatchItem data in our vertexArray
 				_vertexArray[index++] = item.vertexTL;

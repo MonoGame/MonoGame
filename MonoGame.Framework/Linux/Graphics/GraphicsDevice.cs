@@ -333,25 +333,50 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		public void SetRenderTarget (RenderTarget2D renderTarget) 
 		{
-			if (renderTarget == null) {
-				
+			// We check if the rendertarget being passed is null or if we already have a rendertarget
+			// NetRumble sample does not set the the renderTarget to null before setting another
+			// rendertarget.  We handle that by checking first if we have a current render target set
+			// if we do then we unbind the current rendertarget, reset the viewport and set the
+			// rendertarget to the new one being passed if it is not null
+			if (renderTarget == null || currentRenderTargets != null)
+			{				
 				// Detach the render buffers
 				GL.FramebufferRenderbuffer(FramebufferTarget.FramebufferExt, FramebufferAttachment.DepthAttachmentExt,
 						RenderbufferTarget.RenderbufferExt, 0);
 				// delete the RBO's
 				GL.DeleteRenderbuffers(renderBufferIDs.Length,renderBufferIDs);
 				// delete the FBO
-				GL.DeleteFramebuffers(1, ref framebufferId);
+				GL.DeleteFramebuffers(frameBufferIDs.Length, frameBufferIDs);
 				// Set the frame buffer back to the system window buffer
-				GL.BindFramebuffer(FramebufferTarget.FramebufferExt, 0);
+				GL.BindFramebuffer(FramebufferTarget.FramebufferExt, originalFbo);
+				
+				// We need to reset our GraphicsDevice viewport back to what it was
+				// before rendering.
+				Viewport = savedViewport;
+
+				if (renderTarget == null)
+					currentRenderTargets = null;
+				else {
+					SetRenderTargets(new RenderTargetBinding(renderTarget));
+				}
 			}
-			else {
+			else 
+			{
 				SetRenderTargets(new RenderTargetBinding(renderTarget));
 			}
 		}
 		
-		private int framebufferId = -1;
+		int[] frameBufferIDs;
 		int[] renderBufferIDs;
+		int originalFbo = 0; // -1 for when GL.GetInteger works
+			
+		// TODO: We need to come up with a state save and restore of the GraphicsDevice
+		//  This would probably work with a Stack that allows pushing and popping of the current
+		//  Graphics device state.
+		//  Right now here is the list of state values that should be implemented
+		//  Viewport - Used for RenderTargets
+		//  Depth and Stencil formats	- To be determined
+		Viewport savedViewport;
 		
 		public void SetRenderTargets (params RenderTargetBinding[] renderTargets) 
 		{
@@ -362,38 +387,86 @@ namespace Microsoft.Xna.Framework.Graphics
 				
 				// http://www.songho.ca/opengl/gl_fbo.html
 				
-				// create framebuffer
-				GL.GenFramebuffers(1, out framebufferId);
-				GL.BindFramebuffer(FramebufferTarget.FramebufferExt, framebufferId);
+				// Get the currently bound frame buffer object. On most platforms this just gives 0.				
+				// GL.GetInteger( FramebufferTarget.DrawFramebuffer, ref originalFbo);
 				
+				frameBufferIDs = new int[currentRenderTargets.Length];				
 				renderBufferIDs = new int[currentRenderTargets.Length];
+				
 				GL.GenRenderbuffers(currentRenderTargets.Length, renderBufferIDs);
 				
-				for (int i = 0; i < currentRenderTargets.Length; i++) {
+				for (int i = 0; i < currentRenderTargets.Length; i++) 
+				{
 					RenderTarget2D target = (RenderTarget2D)currentRenderTargets[0].RenderTarget;
+					
+					// create a renderbuffer object to store depth info
+					GL.BindRenderbuffer(RenderbufferTarget.RenderbufferExt, renderBufferIDs[i]);
+					
+					ClearOptions clearOptions = ClearOptions.Target | ClearOptions.DepthBuffer;
+					
+					switch (target.DepthStencilFormat) 
+					{
+						case DepthFormat.Depth16:
+							GL.RenderbufferStorage(RenderbufferTarget.RenderbufferExt, RenderbufferStorage.DepthComponent16,
+							target.Width, target.Height);
+							break;
+						case DepthFormat.Depth24:
+							GL.RenderbufferStorage(RenderbufferTarget.RenderbufferExt, RenderbufferStorage.DepthComponent24,
+							target.Width, target.Height);
+							break;
+						case DepthFormat.Depth24Stencil8:
+							GL.RenderbufferStorage(RenderbufferTarget.RenderbufferExt, RenderbufferStorage.Depth24Stencil8,
+							target.Width, target.Height);							
+							GL.FramebufferRenderbuffer(FramebufferTarget.FramebufferExt, FramebufferAttachment.StencilAttachmentExt,
+							RenderbufferTarget.RenderbufferExt, renderBufferIDs[i]);
+							clearOptions = clearOptions | ClearOptions.Stencil;
+							break;
+						default :
+							GL.RenderbufferStorage(RenderbufferTarget.RenderbufferExt, RenderbufferStorage.DepthComponent24,
+							target.Width, target.Height);
+							break;
+					}
+										
+					// create framebuffer
+					GL.GenFramebuffers(1, out frameBufferIDs[i]);
+					GL.BindFramebuffer(FramebufferTarget.FramebufferExt, frameBufferIDs[i]);
 					
 					// attach the texture to FBO color attachment point
 					GL.FramebufferTexture2D(FramebufferTarget.FramebufferExt, FramebufferAttachment.ColorAttachment0,
 						TextureTarget.Texture2D, target.ID,0);
 					
-					// create a renderbuffer object to store depth info
-					GL.BindRenderbuffer(RenderbufferTarget.RenderbufferExt, renderBufferIDs[i]);
-					GL.RenderbufferStorage(RenderbufferTarget.RenderbufferExt, RenderbufferStorage.DepthComponent24,
-						target.Width, target.Height);
-					GL.BindRenderbuffer(RenderbufferTarget.RenderbufferExt, 0);
-					
 					// attach the renderbuffer to depth attachment point
 					GL.FramebufferRenderbuffer(FramebufferTarget.FramebufferExt, FramebufferAttachment.DepthAttachmentExt,
 						RenderbufferTarget.RenderbufferExt, renderBufferIDs[i]);
-						
+					
+					GL.BindRenderbuffer(RenderbufferTarget.RenderbufferExt, originalFbo);
+											
 				}
 				
 				FramebufferErrorCode status = GL.CheckFramebufferStatus(FramebufferTarget.FramebufferExt);
 				
 				if (status != FramebufferErrorCode.FramebufferComplete)
 					throw new Exception("Error creating framebuffer: " + status);
-				//GL.ClearColor (Color4.Transparent);
-				//GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+				
+				// We need to start saving off the ViewPort and setting the current ViewPort to
+				// the width and height of the texture.  Then when we pop off the rendertarget
+				// it needs to be reset.  This causes drawing problems if we do not set the viewport.
+				// Makes sense once you follow the flow (hits head on desk)
+				// For an example of this take a look at NetRumble's sample for the BloomPostprocess
+
+				// Save off the current viewport to be reset later
+				savedViewport = Viewport;
+
+				// Create a new Viewport
+				Viewport renderTargetViewPort = new Viewport();
+
+				// Set the new viewport to the width and height of the render target
+				Texture2D target2 = (Texture2D)currentRenderTargets[0].RenderTarget;
+				renderTargetViewPort.Width = target2.Width;
+				renderTargetViewPort.Height = target2.Height;
+
+				// now we set our viewport to the new rendertarget viewport just created.
+				Viewport = renderTargetViewPort;
 				
 			}
 			
