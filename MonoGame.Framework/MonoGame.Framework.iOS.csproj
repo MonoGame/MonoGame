@@ -239,7 +239,6 @@
     <Compile Include="Graphics\States\FillMode.cs" />
     <Compile Include="Graphics\States\GLStateManager.cs" />
     <Compile Include="Graphics\States\RasterizerState.cs" />
-    <Compile Include="Graphics\States\SamplerState.cs" />
     <Compile Include="Graphics\States\SaveStateMode.cs" />
     <Compile Include="Graphics\States\StencilOperation.cs" />
     <Compile Include="Graphics\Vertices\BufferUsage.cs" />
@@ -353,6 +352,7 @@
     <Compile Include="Storage\StorageDeviceHelper.cs" />
     <Compile Include="Content\ContentManager.cs" />
     <Compile Include="Content\LzxDecoder.cs" />
+    <Compile Include="Graphics\States\SamplerState.ES.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
