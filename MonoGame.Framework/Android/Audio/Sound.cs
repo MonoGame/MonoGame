@@ -15,7 +15,7 @@ using Android.Content.Res;
 
 namespace Microsoft.Xna.Framework.Audio
 {
-    public class Sound
+    internal class Sound : IDisposable
     {
         internal MediaPlayer _player;
         private float _Volume;
@@ -67,6 +67,11 @@ namespace Microsoft.Xna.Framework.Audio
         {
             _player = player;
         }
+		
+		~Sound()
+		{
+			Dispose();	
+		}
 		
 		public void Dispose()
 		{
