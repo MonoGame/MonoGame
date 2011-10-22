@@ -40,7 +40,11 @@
 // 
 using System;
 
+#if MONOMAC
+using MonoMac.OpenGL;
+#else
 using OpenTK.Graphics.OpenGL;
+#endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
