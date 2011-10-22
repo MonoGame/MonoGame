@@ -338,10 +338,9 @@ namespace Microsoft.Xna.Framework.Graphics
 				// delete the RBO's
 				GL.DeleteRenderbuffers(renderBufferIDs.Length,renderBufferIDs);
 				// delete the FBO
-				GL.DeleteFramebuffers(1, ref framebufferId);
+				GL.DeleteFramebuffers(frameBufferIDs.Length, frameBufferIDs);
 				// Set the frame buffer back to the system window buffer
-				GL.BindFramebuffer(FramebufferTarget.FramebufferExt, 0);
-				framebufferId = -1;
+				GL.BindFramebuffer(FramebufferTarget.FramebufferExt, 0);				
 
 				// We need to reset our GraphicsDevice viewport back to what it was
 				// before rendering.
@@ -358,7 +357,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 
-		private int framebufferId = -1;
+		int[] frameBufferIDs;
 		int[] renderBufferIDs;
 
 		// TODO: We need to come up with a state save and restore of the GraphicsDevice
@@ -382,21 +381,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
 				// http://www.songho.ca/opengl/gl_fbo.html
 				
-				// create framebuffer
-				GL.GenFramebuffers(1, out framebufferId);
-				GL.BindFramebuffer(FramebufferTarget.DrawFramebuffer, framebufferId);
+				frameBufferIDs = new int[currentRenderTargets.Length];
 				
 				renderBufferIDs = new int[currentRenderTargets.Length];
 				GL.GenRenderbuffers(currentRenderTargets.Length, renderBufferIDs);
 				
 				for (int i = 0; i < currentRenderTargets.Length; i++) {
-					RenderTarget2D target = (RenderTarget2D)currentRenderTargets[0].RenderTarget;
-					
-					// attach the texture to FBO color attachment point
-					GL.FramebufferTexture2D(FramebufferTarget.FramebufferExt, FramebufferAttachment.ColorAttachment0,
-						TextureTarget.Texture2D, target.ID,0);
-					GL.FramebufferTexture2D(FramebufferTarget.FramebufferExt, FramebufferAttachment.ColorAttachment0,
-						TextureTarget.Texture2D, target.ID,0);
+					RenderTarget2D target = (RenderTarget2D)currentRenderTargets[i].RenderTarget;
 
 					// create a renderbuffer object to store depth info
 					GL.BindRenderbuffer(RenderbufferTarget.RenderbufferExt, renderBufferIDs[i]);
@@ -424,16 +415,23 @@ namespace Microsoft.Xna.Framework.Graphics
 							target.Width, target.Height);
 						break;
 					}
-//					GL.RenderbufferStorage(RenderbufferTarget.RenderbufferExt, RenderbufferStorage.DepthComponent24,
-//						target.Width, target.Height);
+					
+					// create framebuffer
+					GL.GenFramebuffers(1, out frameBufferIDs[i]);
+					GL.BindFramebuffer(FramebufferTarget.DrawFramebuffer, frameBufferIDs[i]);
+					
+					// attach the texture to FBO color attachment point
+					GL.FramebufferTexture2D(FramebufferTarget.FramebufferExt, FramebufferAttachment.ColorAttachment0,
+						TextureTarget.Texture2D, target.ID,0);
+					
 					// attach the renderbuffer to depth attachment point
 					GL.FramebufferRenderbuffer(FramebufferTarget.FramebufferExt, FramebufferAttachment.DepthAttachmentExt,
-						RenderbufferTarget.RenderbufferExt, renderBufferIDs[i]);
-
-					GL.BindRenderbuffer(RenderbufferTarget.RenderbufferExt, 0);
+						RenderbufferTarget.RenderbufferExt, renderBufferIDs[i]);					
 					
 					if (target.RenderTargetUsage == RenderTargetUsage.DiscardContents)
 						Clear (clearOptions, Color.Transparent, 0, 0);
+					
+					GL.BindRenderbuffer(RenderbufferTarget.RenderbufferExt, 0);
 				}
 				
 				FramebufferErrorCode status = GL.CheckFramebufferStatus(FramebufferTarget.FramebufferExt);
@@ -460,11 +458,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 				// now we set our viewport to the new rendertarget viewport just created.
 				Viewport = renderTargetViewPort;
-
-
-			}
-			
-			
+			}						
 		}
 
 		public void ResolveBackBuffer (ResolveTexture2D resolveTexture)
