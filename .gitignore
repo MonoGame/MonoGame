@@ -49,3 +49,6 @@ _ReSharper*/
 
 #monodroid private beta
 monodroid*.msi
+
+#Unix temporary files
+*~
