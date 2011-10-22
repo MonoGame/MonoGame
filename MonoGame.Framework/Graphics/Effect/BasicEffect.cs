@@ -34,19 +34,23 @@ namespace Microsoft.Xna.Framework.Graphics
 		
         internal override void Apply()
         {
-            GLStateManager.Projection(Projection);
-            GLStateManager.World(World);
-            GLStateManager.View(View);
-			base.Apply();			
-			
-			// set camera
-			Matrix _matrix = Matrix.Identity;
+            //GLStateManager.Projection(Projection);
+            //GLStateManager.World(World);
+           // GLStateManager.View(View);
+			base.Apply();
+
+            GL11.Viewport(0, 0, graphicsDevice.Viewport.Width, graphicsDevice.Viewport.Height);
+         
             GL11.MatrixMode(MatrixMode11.Projection);
-			GL11.LoadIdentity();
-			GL11.Ortho(0, 320, 480, 0, -1, 1);
+            GL11.LoadIdentity();
+            Matrix projectionMatrix = Projection;
+            GL11.LoadMatrix(ref projectionMatrix.M11);
+         
             GL11.MatrixMode(MatrixMode11.Modelview);
-			GL11.LoadMatrix( ref _matrix.M11 );
-			GL11.Viewport (0, 0, 320, 480);
+            GL11.LoadIdentity();
+            Matrix viewMatrix = View;
+            GL11.LoadMatrix(ref viewMatrix.M11);
+            
 						
 			// Initialize OpenGL states (ideally move this to initialize somewhere else)	
             GL11.Disable(EnableCap11.DepthTest);
@@ -55,10 +59,10 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
             GL11.TexEnv(TextureEnvTarget11.TextureEnv, TextureEnvParameter11.TextureEnvMode, (int)All11.BlendSrc);
 #endif
-            GL11.Enable(EnableCap11.Texture2D);
-            GL11.EnableClientState(ArrayCap11.VertexArray);
-            GL11.EnableClientState(ArrayCap11.ColorArray);
-            GL11.EnableClientState(ArrayCap11.TextureCoordArray);
+            if(Texture != null)
+                GL11.Enable(EnableCap11.Texture2D);
+            else
+                GL11.Disable(EnableCap11.Texture2D);
 
             GL11.Disable(EnableCap11.CullFace);		
         }
@@ -143,7 +147,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		private void setTexture(Texture2D texture)
 		{
-            GL11.BindTexture(TextureTarget11.Texture2D, texture.Image.Name);
+            if(texture != null)
+                texture.Apply();
 		}
 
         public Texture2D Texture {
@@ -179,7 +184,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			throw new NotImplementedException ();
 		}
 
-		Vector3 IEffectLights.AmbientLightColor {
+		public Vector3 AmbientLightColor {
 			get; set;
 		}
 
@@ -212,24 +217,24 @@ namespace Microsoft.Xna.Framework.Graphics
 		#endregion
 
 		#region IEffectFog implementation
-		Vector3 IEffectFog.FogColor {
+
+	    public Vector3 FogColor {
 			get; set;
 		}
 
-		bool IEffectFog.FogEnabled {
-			get {
-				throw new NotImplementedException ();
-			}
+	    public bool FogEnabled {
+			get { return false; }
 			set {
-				throw new NotImplementedException ();
+                if(value)
+				    throw new NotImplementedException ();
 			}
 		}
 
-		float IEffectFog.FogEnd {
+	    public float FogEnd {
 			get; set;
 		}
 
-		float IEffectFog.FogStart {
+	    public float FogStart {
 			get; set;
 		}
 		#endregion
