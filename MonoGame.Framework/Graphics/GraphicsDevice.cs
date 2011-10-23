@@ -331,6 +331,10 @@ namespace Microsoft.Xna.Framework.Graphics
 			// rendertarget to the new one being passed if it is not null
 			if (renderTarget == null || currentRenderTargets != null)
 			{
+#if ANDROID
+                byte[] imageInfo = new byte[4];
+                GL.ReadPixels(0, 0, 1, 1, All.Rgba, All.UnsignedByte, imageInfo);
+#endif
 				// Detach the render buffers.
 				GL.Oes.FramebufferRenderbuffer(All.FramebufferOes, All.DepthAttachmentOes,
 						All.RenderbufferOes, 0);
