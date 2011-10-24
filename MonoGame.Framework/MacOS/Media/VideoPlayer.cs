@@ -76,6 +76,7 @@ namespace Microsoft.Xna.Framework.Media
 			if (_video != null )
 			{
 				_video.MovieView.Pause(new NSObject());
+				_state = MediaState.Paused;
 			}
         }
 		
@@ -91,6 +92,11 @@ namespace Microsoft.Xna.Framework.Media
 		{				
 			if (_video != null )
 			{
+				
+				//_video.MovieView.SetFrameOrigin(new System.Drawing.PointF(0,0));
+				//_video.MovieView.SetFrameSize(new System.Drawing.SizeF(_game.GraphicsDevice.PresentationParameters.BackBufferWidth,_game.GraphicsDevice.PresentationParameters.BackBufferHeight));
+				_video.MovieView.Frame = new System.Drawing.RectangleF(0,0, _game.GraphicsDevice.PresentationParameters.BackBufferWidth, _game.GraphicsDevice.PresentationParameters.BackBufferHeight);
+				
 				/*  A primitive way of launching the media player
 				 * MonoMac.AppKit.NSWorkspace workspace = MonoMac.AppKit.NSWorkspace.SharedWorkspace; 
 				workspace.OpenUrls(new[]{NSUrl.FromString(_video.FileName)},
@@ -104,7 +110,10 @@ namespace Microsoft.Xna.Framework.Media
 				_game.Window.AddSubview(_video.MovieView);			
 				
 				NSNotificationCenter.DefaultCenter.AddObserver( new NSString("QTMovieDidEndNotification"),(NSNotification) => OnStop(null), _video.MovieView);
-				_video.MovieView.Play(new NSObject());			
+				_video.MovieView.Play(new NSObject());	
+				
+				_state = MediaState.Playing;
+				Game._playingVideo = true;
 			}
 		}
 

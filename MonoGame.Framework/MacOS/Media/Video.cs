@@ -116,8 +116,8 @@ namespace Microsoft.Xna.Framework.Media
 			{
 				mMovieView = new QTMovieView();
 				mMovieView.Movie = mMovie;
-				// TODO Not sure this is needed mMovieView.Frame = new System.Drawing.RectangleF(0,0, 640, 480);
-				mMovieView.IsControllerVisible = false;
+				
+				mMovieView.IsControllerVisible = false;				
 			}
 			else
 			{
