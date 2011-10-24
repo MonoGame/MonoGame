@@ -41,7 +41,8 @@
 using System;
 using System.IO;
 
-using MonoMac.CoreVideo;
+using MonoMac.ObjCRuntime;
+using MonoMac.QTKit;
 using MonoMac.Foundation;
 
 using Microsoft.Xna.Framework.Graphics;
@@ -52,7 +53,8 @@ namespace Microsoft.Xna.Framework.Media
     {
 		private string _fileName;
 		private Color _backColor = Color.Black;
-		// TODO private MPMoviePlayerViewController _view;
+		private QTMovie mMovie;
+		private QTMovieView mMovieView;
 		
 		internal Video(string FileName)
 		{
@@ -107,30 +109,43 @@ namespace Microsoft.Xna.Framework.Media
 		
 		internal void Prepare()
 		{
-			/* TODO _view = new MPMoviePlayerViewController(new NSUrl(FileName));
-			_view.MoviePlayer.ScalingMode = MPMovieScalingMode.AspectFill;
-			_view.MoviePlayer.MovieControlMode = MPMovieControlMode.Hidden;
-			_view.MoviePlayer.PrepareToPlay();
+			NSError err = new NSError();
 			
-			Vector4 color = BackgroundColor.ToEAGLColor();
-			_view.MoviePlayer.BackgroundColor = new MonoTouch.UIKit.UIColor(color.X,color.Y,color.Z,color.W); */
+			mMovie = new QTMovie(_fileName, out err);
+			if (mMovie != null)
+			{
+				mMovieView = new QTMovieView();
+				mMovieView.Movie = mMovie;
+				// TODO Not sure this is needed mMovieView.Frame = new System.Drawing.RectangleF(0,0, 640, 480);
+				mMovieView.IsControllerVisible = false;
+			}
+			else
+			{
+				Console.WriteLine(err);
+			}
 		}
 		
-		/* TODO internal MPMoviePlayerViewController MovieView
+		internal QTMovieView MovieView
 		{
 			get
 			{
-				return _view;
+				return mMovieView;
 			}
-		} */
+		}
 		
 		public void Dispose()
 		{
-			/* TODO if (_view != null)
+			if (mMovieView != null)
 			{
-				_view.Dispose();
-				_view = null;
-			} */
+				mMovieView.Dispose();
+				mMovieView = null;
+			} 
+			
+			if (mMovie != null)
+			{
+				mMovie.Dispose();
+				mMovie = null;
+			} 
 		}
     }
 }
