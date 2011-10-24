@@ -415,6 +415,22 @@ namespace Microsoft.Xna.Framework
             result = new Vector2((position.X * matrix.M11) + (position.Y * matrix.M21) + matrix.M41,
                                  (position.X * matrix.M12) + (position.Y * matrix.M22) + matrix.M42);
         }
+
+        public static Vector2 Transform(Vector2 position, Quaternion quat)
+        {
+            Transform(ref position, ref quat, out position);
+            return position;
+        }
+
+        public static void Transform(ref Vector2 position, ref Quaternion quat, out Vector2 result)
+        {
+            Quaternion v = new Quaternion(position.X, position.Y, 0, 0), i, t;
+            Quaternion.Inverse(ref quat, out i);
+            Quaternion.Multiply(ref quat, ref v, out t);
+            Quaternion.Multiply(ref t, ref i, out v);
+
+            result = new Vector2(v.X, v.Y);
+        }
 		
 		public static void Transform (
          Vector2[] sourceArray,
