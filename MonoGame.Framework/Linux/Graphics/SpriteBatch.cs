@@ -147,16 +147,17 @@ namespace Microsoft.Xna.Framework.Graphics
 			GL.Ortho (0, vp.Width, vp.Height, 0, -1, 1);
 			
 			// Enable Scissor Tests if necessary
-			if (this.graphicsDevice.RenderState.ScissorTestEnable) {
+			if (this.graphicsDevice.RasterizerState.ScissorTestEnable) {
 				GL.Enable (EnableCap.ScissorTest);				
 			}
 
 			GL.MatrixMode (MatrixMode.Modelview);			
 			
-			GL.Viewport (vp.X, vp.Y, vp.Width, vp.Height);
+			GL.Viewport (0, 0, vp.Width, vp.Height);
+			//GL.Viewport (vp.X, vp.Y, vp.Width, vp.Height);
 
 			// Enable Scissor Tests if necessary
-			if (this.graphicsDevice.RenderState.ScissorTestEnable) {
+			if (this.graphicsDevice.RasterizerState.ScissorTestEnable) {
 				GL.Scissor (this.graphicsDevice.ScissorRectangle.X, this.graphicsDevice.ScissorRectangle.Y, this.graphicsDevice.ScissorRectangle.Width, this.graphicsDevice.ScissorRectangle.Height);
 			}
 

@@ -113,7 +113,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			_viewport.MaxDepth = 1.0f;
 			Textures = new TextureCollection();
 			// Init RenderState
-			_renderState = new RenderState ();
+			//_renderState = new RenderState ();
+			RasterizerState = new RasterizerState();
 		}
 		
 		internal void SizeChanged(int width, int height)
@@ -146,14 +147,35 @@ namespace Microsoft.Xna.Framework.Graphics
 			} 
 		}		
 
+//		public void Clear (Color color)
+//		{
+//			Vector4 vector = color.ToEAGLColor ();
+//			// The following was not working with Color.Transparent
+//			// Once we get some regression tests take the following out			
+//			//GL.ClearColor (vector.X, vector.Y, vector.Z, 1.0f);
+//			GL.ClearColor (vector.X, vector.Y, vector.Z, vector.W);
+//			GL.Clear (ClearBufferMask.ColorBufferBit);
+//		}
+//
+//		public void Clear (ClearOptions options, Color color, float depth, int stencil)
+//		{
+//			Clear (options, color.ToEAGLColor (), depth, stencil);
+//		}
+//
+//		public void Clear (ClearOptions options, Vector4 color, float depth, int stencil)
+//		{
+//			// The following was not working with Color.Transparent
+//			// Once we get some regression tests take the following out
+//			//GL.ClearColor (color.X, color.Y, color.Z, 1.0f);
+//			GL.ClearColor (color.X, color.Y, color.Z, color.W);
+//			GL.ClearDepth (depth);
+//			GL.ClearStencil (stencil);
+//			GL.Clear ((ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit));
+//		}
+		
 		public void Clear (Color color)
 		{
-			Vector4 vector = color.ToEAGLColor ();
-			// The following was not working with Color.Transparent
-			// Once we get some regression tests take the following out			
-			//GL.ClearColor (vector.X, vector.Y, vector.Z, 1.0f);
-			GL.ClearColor (vector.X, vector.Y, vector.Z, vector.W);
-			GL.Clear (ClearBufferMask.ColorBufferBit);
+			Clear (ClearOptions.Target, color.ToEAGLColor(), 0, 0);
 		}
 
 		public void Clear (ClearOptions options, Color color, float depth, int stencil)
@@ -163,15 +185,28 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void Clear (ClearOptions options, Vector4 color, float depth, int stencil)
 		{
-			// The following was not working with Color.Transparent
-			// Once we get some regression tests take the following out
-			//GL.ClearColor (color.X, color.Y, color.Z, 1.0f);
 			GL.ClearColor (color.X, color.Y, color.Z, color.W);
-			GL.ClearDepth (depth);
-			GL.ClearStencil (stencil);
-			GL.Clear ((ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit));
+			GL.Clear (CreateClearOptions(options, depth, stencil));
 		}
 
+		private ClearBufferMask CreateClearOptions (ClearOptions clearOptions, float depth, int stencil)
+		{
+			ClearBufferMask bufferMask = 0;
+			if (clearOptions.HasFlag(ClearOptions.Target)) {
+				bufferMask = bufferMask | ClearBufferMask.ColorBufferBit;
+			}
+			if (clearOptions.HasFlag(ClearOptions.Stencil)) {
+				GL.ClearStencil (stencil);
+				bufferMask = bufferMask | ClearBufferMask.StencilBufferBit;
+			}
+			if (clearOptions.HasFlag(ClearOptions.DepthBuffer)) {
+				GL.ClearDepth (depth);
+				bufferMask = bufferMask | ClearBufferMask.DepthBufferBit;
+			}
+
+			return bufferMask;
+		}
+		
 		public void Clear (ClearOptions options, Color color, float depth, int stencil, Rectangle[] regions)
 		{
 			throw new NotImplementedException ();
@@ -319,17 +354,18 @@ namespace Microsoft.Xna.Framework.Graphics
 				}
 			}
 		}
-
-		public RenderState RenderState { 
-			get {
-				return _renderState;
-			}
-			set {
-				if (_renderState != value) {
-					_renderState = value;
-				}
-			}
-		}
+		
+		// kjpou1 Left this commented out for now until everything works
+//		public RenderState RenderState { 
+//			get {
+//				return _renderState;
+//			}
+//			set {
+//				if (_renderState != value) {
+//					_renderState = value;
+//				}
+//			}
+//		}
 		
 		public void SetRenderTarget (RenderTarget2D renderTarget) 
 		{

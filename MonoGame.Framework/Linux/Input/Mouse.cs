@@ -51,10 +51,18 @@ namespace Microsoft.Xna.Framework.Input
 	public static class Mouse
 	{
 		private static OpenTK.Input.MouseDevice _mouse = null;
-
+		private static int _x, _y;
+		
 		internal static void UpdateMouseInfo(OpenTK.Input.MouseDevice mouse)
 		{
 			_mouse = mouse;
+			_mouse.Move += HandleWindowMouseMove;
+		}
+		
+
+		internal static void HandleWindowMouseMove (object sender, OpenTK.Input.MouseMoveEventArgs e)
+		{
+			SetPosition(e.X, e.Y);
 		}
 		
 		#region Public interface		
@@ -72,12 +80,13 @@ namespace Microsoft.Xna.Framework.Input
 				return new MouseState(0, 0);
 			}
 			
-			MouseState ms = new MouseState(_mouse.X, _mouse.Y);
-			
+			MouseState ms = new MouseState(_x, _y);
+
 			ms.LeftButton = _mouse[OpenTK.Input.MouseButton.Left] ? ButtonState.Pressed : ButtonState.Released;
 			ms.RightButton = _mouse[OpenTK.Input.MouseButton.Right] ? ButtonState.Pressed : ButtonState.Released;
 			ms.MiddleButton = _mouse[OpenTK.Input.MouseButton.Middle] ? ButtonState.Pressed : ButtonState.Released;;
 			ms.ScrollWheelValue = _mouse.Wheel;
+			
 			
 			return ms;
 		}
@@ -85,7 +94,9 @@ namespace Microsoft.Xna.Framework.Input
 		public static void SetPosition (int x, int y)
 		{
 			// TODO propagate change to opentk mouse object (requires opentk 1.1)
-			throw new NotImplementedException("Feature not implemented.");
+			//throw new NotImplementedException("Feature not implemented.");
+			_x = x;
+			_y = y;
 		}
 		
 		#endregion
