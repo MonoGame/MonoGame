@@ -170,5 +170,25 @@ namespace Microsoft.Xna.Framework.Media
                 return _video;
             }
         }
+		
+		public float Volume 
+		{ 
+			get
+			{
+				return _video.Volume;
+			}
+			set
+			{
+				_video.Volume = value;
+			}
+		}
+		
+		public TimeSpan PlayPosition 
+		{ 
+			get
+			{
+				return _video.CurrentPosition;
+			}
+		}
 	}
 }
