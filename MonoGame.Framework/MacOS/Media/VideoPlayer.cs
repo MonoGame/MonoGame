@@ -108,8 +108,14 @@ namespace Microsoft.Xna.Framework.Media
 				// TODO when Xamarin implement the relevant functions var theError = QTOpenGLTextureContextCreate( null, null, _game.Window.PixelFormat, _game.Window.OpenGLContext, out textureContext);
 				
 				_game.Window.AddSubview(_video.MovieView);			
-				
-				NSNotificationCenter.DefaultCenter.AddObserver( new NSString("QTMovieDidEndNotification"),(NSNotification) => OnStop(null), _video.MovieView);
+								
+				NSNotificationCenter.DefaultCenter.AddObserver( new NSString("QTMovieDidEndNotification"), (notification) => 
+				{
+					Stop();
+					if (_isLooped)
+						PlayVideo();
+					
+				});
 				_video.MovieView.Play(new NSObject());	
 				
 				_state = MediaState.Playing;
@@ -122,13 +128,6 @@ namespace Microsoft.Xna.Framework.Media
 			_video = video;
 			PlayVideo();		
         }
-		
-		private void OnStop(NSNotification e)
-		{	
-			Stop();
-			if (_isLooped)
-				PlayVideo();
-		}
 
         public void Stop()
         {
