@@ -112,12 +112,12 @@ namespace Microsoft.Xna.Framework.Media
 			NSError err = new NSError();
 			
 			mMovie = new QTMovie(_fileName, out err);
-			if (mMovie != null)
+			if (mMovie != null)				
 			{
 				mMovieView = new QTMovieView();
 				mMovieView.Movie = mMovie;
-				// TODO Not sure this is needed mMovieView.Frame = new System.Drawing.RectangleF(0,0, 640, 480);
-				mMovieView.IsControllerVisible = false;
+				
+				mMovieView.IsControllerVisible = false;				
 			}
 			else
 			{
@@ -131,6 +131,36 @@ namespace Microsoft.Xna.Framework.Media
 			{
 				return mMovieView;
 			}
+		}
+		
+		internal float Volume
+		{
+			get
+			{
+				return mMovie.Volume;
+			}
+			set
+			{
+				// TODO When Xamarain fix the set Volume mMovie.Volume = value;
+			}
+		}
+		
+		internal TimeSpan Duration
+		{
+			get
+			{
+				return new TimeSpan( mMovie.Duration.TimeValue );
+			}
+			
+		}
+		
+		internal TimeSpan CurrentPosition
+		{
+			get
+			{
+				return new TimeSpan( mMovie.CurrentTime.TimeValue );
+			}
+			
 		}
 		
 		public void Dispose()
