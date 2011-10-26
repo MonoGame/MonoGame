@@ -117,8 +117,15 @@ namespace Microsoft.Xna.Framework.Media
 		internal void Prepare()
 		{
             Player = new Android.Media.MediaPlayer();
-            Player.SetDataSource(Game.contextInstance.Assets.OpenFd(_fileName).FileDescriptor);
-            Player.Prepare();
+			if (Player != null )
+			{
+				var fd = Game.contextInstance.Assets.OpenFd(_fileName).FileDescriptor;
+				if (fd != null)
+				{
+		            Player.SetDataSource(fd);			
+		            Player.Prepare();
+				}
+			}
 		}
 		
 		public void Dispose()
