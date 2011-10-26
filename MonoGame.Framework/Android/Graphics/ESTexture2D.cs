@@ -87,14 +87,17 @@ namespace Microsoft.Xna.Framework.Graphics
             _size.Width =_width;
 			_size.Height = _height;
 
-            using (Bitmap imageScaled = Bitmap.CreateScaledBitmap(imageSource, _width, _height, false))
+            using (Bitmap imagePadded = Bitmap.CreateBitmap(_width, _height, Bitmap.Config.Argb8888))
             {
+                Canvas can = new Canvas(imagePadded);
+                can.DrawARGB(0, 0, 0, 0);
+                can.DrawBitmap(imageSource, 0, 0, null);
                 GL.GenTextures(1, ref _name);
                 GL.BindTexture(All.Texture2D, _name);
                 GL.TexParameter(All.Texture2D, All.TextureMinFilter, (int)filter);
                 GL.TexParameter(All.Texture2D, All.TextureMagFilter, (int)filter);
 
-                Android.Opengl.GLUtils.TexImage2D((int)All.Texture2D, 0, imageScaled, 0);
+                Android.Opengl.GLUtils.TexImage2D((int)All.Texture2D, 0, imagePadded, 0);
             }
 			
             _maxS = _size.Width / (float)_width;
