@@ -22,6 +22,21 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+		internal static int WrapMode(this TextureAddressMode textureAddressMode)
+		{
+			switch(textureAddressMode)
+			{
+			case TextureAddressMode.Clamp:
+				return (int)TextureWrapMode.Clamp;
+			case TextureAddressMode.Wrap:
+				return (int)TextureWrapMode.Repeat;
+			case TextureAddressMode.Mirror:
+				return (int)TextureWrapMode.MirroredRepeat;
+			default:
+				throw new NotImplementedException("No support for " + textureAddressMode);
+			}
+		}
+				
         public static int OpenGLNumberOfElements(this VertexElementFormat elementFormat)
         {
             switch (elementFormat)
@@ -171,5 +186,31 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             return 0;
         }
-    }
+
+		internal static void ApplyTo(this SamplerState samplerState, TextureTarget textureTarget)
+		{
+			// Set up texture sample filtering.
+			bool useMipmaps = samplerState.MaxMipLevel > 0;
+			switch(samplerState.Filter)
+			{
+			case TextureFilter.Point:
+				GL.TexParameter(textureTarget, TextureParameterName.TextureMinFilter, (int)(useMipmaps ? TextureMinFilter.NearestMipmapNearest : TextureMinFilter.Nearest));
+				GL.TexParameter(textureTarget, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
+				break;
+			case TextureFilter.Linear:
+				GL.TexParameter(textureTarget, TextureParameterName.TextureMinFilter, (int)(useMipmaps ? TextureMinFilter.LinearMipmapLinear : TextureMinFilter.Linear));
+				GL.TexParameter(textureTarget, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+				break;
+			case TextureFilter.Anisotropic:
+				// TODO: Requires EXT_texture_filter_anisotropic. Use linear filtering for now.
+				GL.TexParameter(textureTarget, TextureParameterName.TextureMinFilter, (int)(useMipmaps ? TextureMinFilter.LinearMipmapLinear : TextureMinFilter.Linear));
+				GL.TexParameter(textureTarget, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+				break;
+			}
+
+			// Set up texture addressing.
+			GL.TexParameter(textureTarget, TextureParameterName.TextureWrapS, samplerState.AddressU.WrapMode());
+			GL.TexParameter(textureTarget, TextureParameterName.TextureWrapT, samplerState.AddressV.WrapMode());
+		}
+	}
 }

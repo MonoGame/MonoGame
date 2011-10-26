@@ -165,7 +165,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			// Initialize OpenGL states (ideally move this to initialize somewhere else)	
 			GL.Disable (EnableCap.DepthTest);
-			GL.TexEnv (TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)All.BlendSrc);
+			GL.TexEnv (TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)All.Blend);
 			GL.Enable (EnableCap.Texture2D);
 			GL.EnableClientState (ArrayCap.VertexArray);
 			GL.EnableClientState (ArrayCap.ColorArray);
@@ -175,8 +175,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			GL.Enable (EnableCap.CullFace);
 			GL.FrontFace (FrontFaceDirection.Cw);
 			GL.Color4 (1.0f, 1.0f, 1.0f, 1.0f);			
-			
-			_batcher.DrawBatch (_sortMode);
+
+			_batcher.DrawBatch (_sortMode, _samplerState);
 
 			// Disable Scissor Tests if necessary
 			if (this.graphicsDevice.RasterizerState.ScissorTestEnable) {
