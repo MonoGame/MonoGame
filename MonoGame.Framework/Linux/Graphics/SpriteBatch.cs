@@ -178,6 +178,11 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			_batcher.DrawBatch (_sortMode);
 
+			// Disable Scissor Tests if necessary
+			if (this.graphicsDevice.RasterizerState.ScissorTestEnable) {
+				GL.Disable (EnableCap.ScissorTest);
+			}
+
 			// clear out the textures
 			graphicsDevice.Textures._textures.Clear ();
 
