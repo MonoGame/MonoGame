@@ -665,7 +665,7 @@ namespace Microsoft.Xna.Framework.Net
 						continue;
 					}
 					
-					switch (command.Commnad) {
+					switch (command.Command) {
 					case CommandEventType.SendData:
 						ProcessSendData((CommandSendData)command.CommandObject);
 						break;						
