@@ -100,6 +100,8 @@ namespace Microsoft.Xna.Framework.Media
 				return FileName+".avi";
 			if (File.Exists(FileName+".m4v"))
 				return FileName+".m4v";
+			if (File.Exists(FileName+".3gp"))
+				return FileName+".3gp";
 			
 			
 			return null;
