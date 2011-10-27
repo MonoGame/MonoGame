@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("IXna.Framework")]
+[assembly: AssemblyTitle("MonoGame.Framework")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("IXna.Framework")]
-[assembly: AssemblyCopyright("Copyright ©  2009")]
+[assembly: AssemblyProduct("MonoGame.Framework")]
+[assembly: AssemblyCopyright("Copyright ©  20011")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
