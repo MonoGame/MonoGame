@@ -19,7 +19,7 @@ namespace Microsoft.Xna.Framework.Net
 			this.commandObject = command;
 		}		
 		
-		public CommandEventType Commnad
+		public CommandEventType Command
 		{
 			get { return command; }
 			
