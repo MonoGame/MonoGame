@@ -36,7 +36,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             //GLStateManager.Projection(Projection);
             //GLStateManager.World(World);
-           // GLStateManager.View(View);
+            //GLStateManager.View(View);
 			base.Apply();
 
             GL11.Viewport(0, 0, graphicsDevice.Viewport.Width, graphicsDevice.Viewport.Height);

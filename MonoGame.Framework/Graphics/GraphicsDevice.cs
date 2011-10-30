@@ -110,6 +110,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			_viewport.Height = DisplayMode.Height;
 			_viewport.MinDepth = 0.0f;
 			_viewport.MaxDepth = 1.0f;
+            Textures = new TextureCollection();
 			
 			// Init RasterizerState
 			RasterizerState = new RasterizerState();
@@ -569,7 +570,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 case PrimitiveType.LineStrip:
                     return 3 + (primitiveCount - 1); // ???
                 case PrimitiveType.TriangleList:
-                    return primitiveCount * 2;
+                    return primitiveCount * 3;
                 case PrimitiveType.TriangleStrip:
                     return 3 + (primitiveCount - 1); // ???
             }
