@@ -673,15 +673,7 @@ namespace Microsoft.Xna.Framework
 
 		public void Exit ()
 		{
-			using ( NSAlert alert = NSAlert.WithMessage("Game Exit", "Ok", "Cancel", null, "Are you sure you wish to exit?"))
-			{
-				var button = alert.RunModal();
-				
-				if ( button == 1 )
-				{
-					NSApplication.SharedApplication.Terminate(new NSObject());		
-				}
-			}
+			NSApplication.SharedApplication.Terminate(new NSObject());
 		}
 
 		public GameComponentCollection Components {
