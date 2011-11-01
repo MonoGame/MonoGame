@@ -304,7 +304,9 @@ namespace Microsoft.Xna.Framework
 		{
 			if (_isActive)
 			{
+				BeginDraw();
 				Draw(aGameTime);
+				EndDraw();
 			}
 		}
 		
