@@ -339,8 +339,9 @@ namespace Microsoft.Xna.Framework
 		internal void DoDraw (GameTime aGameTime)
 		{
 			if (_isActive) {
-				BeginDraw();
-				Draw (aGameTime);
+				if (BeginDraw()) {
+					Draw (aGameTime);
+				}
 				EndDraw();
 			}
 		}
