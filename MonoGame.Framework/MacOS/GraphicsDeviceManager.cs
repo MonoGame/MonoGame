@@ -149,7 +149,9 @@ namespace Microsoft.Xna.Framework
 
 		private void Initialize ()
 		{
-			_graphicsDevice.PresentationParameters.IsFullScreen = false;
+			PresentationParameters parms = _graphicsDevice.PresentationParameters;
+			parms.IsFullScreen = wantFullScreen;
+			_graphicsDevice.PresentationParameters = parms;
 
 			if (_preferMultiSampling) {
 				_graphicsDevice.PreferedFilter = All.Linear;
