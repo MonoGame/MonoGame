@@ -280,8 +280,9 @@ namespace Microsoft.Xna.Framework
 		{
 			if (_isActive) 
 			{
-				BeginDraw();
-				Draw (aGameTime);
+				if (BeginDraw()) {
+					Draw (aGameTime);
+				}
 				EndDraw();
 			}
 		}
