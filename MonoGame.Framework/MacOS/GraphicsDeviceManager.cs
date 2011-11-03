@@ -183,7 +183,11 @@ namespace Microsoft.Xna.Framework
 				if (_graphicsDevice != null) {
 					
 					bool wasFullScreen = _graphicsDevice.PresentationParameters.IsFullScreen;
-					_graphicsDevice.PresentationParameters.IsFullScreen = value;	
+
+					PresentationParameters presParams = _graphicsDevice.PresentationParameters;
+					presParams.IsFullScreen = value;
+					_graphicsDevice.PresentationParameters = presParams;
+
 					if (value && !wasFullScreen) {
 						_game.GoFullScreen();
 					} else if (!value && wasFullScreen) {

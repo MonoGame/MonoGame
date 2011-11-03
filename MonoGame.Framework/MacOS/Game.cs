@@ -79,7 +79,7 @@ namespace Microsoft.Xna.Framework
 		private TimeSpan _targetElapsedTime = TimeSpan.FromSeconds (1 / FramesPerSecond); 
 		private IGraphicsDeviceManager _graphicsDeviceManager;
 		private IGraphicsDeviceService graphicsDeviceService;
-		private NSWindow _mainWindow;
+		private MacGameNSWindow _mainWindow;
 		internal static bool _playingVideo = false;
 		private SpriteBatch spriteBatch;
 		private Texture2D splashScreen;
@@ -103,7 +103,7 @@ namespace Microsoft.Xna.Framework
 				Microsoft.Xna.Framework.Graphics.PresentationParameters._defaultBackBufferHeight);
 
 			//Create a window
-			_mainWindow = new NSWindow (frame, NSWindowStyle.Titled | NSWindowStyle.Closable, NSBackingStore.Buffered, true);
+			_mainWindow = new MacGameNSWindow (frame, NSWindowStyle.Titled | NSWindowStyle.Closable, NSBackingStore.Buffered, true);
 
 			// Perform any other window configuration you desire
 			_mainWindow.IsOpaque = true;
@@ -292,13 +292,18 @@ namespace Microsoft.Xna.Framework
 			
 			Microsoft.Xna.Framework.Graphics.Viewport _vp =
 			new Microsoft.Xna.Framework.Graphics.Viewport();
-				
+
 			_vp.X = 0;
 			_vp.Y = 0;
 			_vp.Width = manager.PreferredBackBufferWidth;
 			_vp.Height = manager.PreferredBackBufferHeight;
 			
 			GraphicsDevice.Viewport = _vp;
+
+			if (GraphicsDevice.PresentationParameters.IsFullScreen)
+				GoFullScreen();
+			else
+				GoWindowed();
 
 			_initializing = true;
 
@@ -493,11 +498,10 @@ namespace Microsoft.Xna.Framework
 				frame.Width = content.Width;
 				frame.Height = content.Height + TitleBarHeight();
 			}
-			_mainWindow.SetFrame (frame, true);
+			//_mainWindow.SetFrame (frame, true);
 			
 			_view.Bounds = content;
 			_view.Size = content.Size.ToSize();
-				
 		}
 
 		internal void GoWindowed ()
@@ -512,48 +516,77 @@ namespace Microsoft.Xna.Framework
 			//Changing window style resets the title. Save it.
 			string oldTitle = _view.Title;
 			
-			NSMenu.MenuBarVisible = true;
-			_mainWindow.StyleMask = NSWindowStyle.Titled | NSWindowStyle.Closable;
-			if (_wasResizeable) _mainWindow.StyleMask |= NSWindowStyle.Resizable;
-			_mainWindow.HidesOnDeactivate = false;
-			
-			ResetWindowBounds();
-			
+//			NSMenu.MenuBarVisible = true;
+//			_mainWindow.StyleMask = NSWindowStyle.Titled | NSWindowStyle.Closable;
+//			if (_wasResizeable) _mainWindow.StyleMask |= NSWindowStyle.Resizable;
+//			_mainWindow.HidesOnDeactivate = false;
+			NSCursor.Unhide();
+
+			//ResetWindowBounds();
+			_mainWindow.ContentView.ExitFullscreenModeWithOptions(new NSDictionary());
+
 			if (oldTitle != null)
 				_view.Title = oldTitle;
 			
 			IsActive = wasActive;
+
+			Window.Window.IsVisible = false;
+			Window.Window.MakeKeyAndOrderFront(Window);
+			ResetWindowBounds();
+
+			//if (!IsMouseVisible) {
+			//	NSCursor.Hide();
+			//}
 		}
 		
 		internal void GoFullScreen ()
 		{
+
 			bool wasActive = IsActive;
 			IsActive = false;
-			
+
+			_mainWindow.ContentView.EnterFullscreenModeWithOptions(NSScreen.MainScreen,new NSDictionary());
+
 			//Some games set fullscreen in their initialize function,
 			//before we have sized the window and set it active.
 			//Do that now, or else mouse tracking breaks.
-			_mainWindow.MakeKeyAndOrderFront(_mainWindow);
-			ResetWindowBounds();
-			
+//			_mainWindow.MakeKeyAndOrderFront(_mainWindow);
+//			ResetWindowBounds();
+
 			_wasResizeable = IsAllowUserResizing;
-			
+
 			string oldTitle = _view.Title;
-			
-			NSMenu.MenuBarVisible = false;
-			_mainWindow.StyleMask = NSWindowStyle.Borderless;
-			_mainWindow.HidesOnDeactivate = true;
-			
-			ResetWindowBounds();
-			
+
+//			NSMenu.MenuBarVisible = false;
+//			_mainWindow.StyleMask = NSWindowStyle.Borderless;
+//			_mainWindow.HidesOnDeactivate = true;
+
+			//Console.WriteLine("Before windows reset");
+
+//			ResetWindowBounds();
+			//Console.WriteLine("After windows reset");
+
+
 			if (oldTitle != null)
 				_view.Title = oldTitle;
-			
+
 			if (!IsMouseVisible) {
 				NSCursor.Hide();
 			}
-			
+
 			IsActive = wasActive;
+
+			Window.Window.IsVisible = false;
+			Window.Window.MakeKeyAndOrderFront(Window);
+			ResetWindowBounds();
+			//_mainWindow.MakeKeyAndOrderFront(_mainWindow);
+			//_mainWindow.MakeKeyWindow();
+//						_mainWindow.MakeKeyWindow();
+//			_mainWindow.MakeFirstResponder(_mainWindow);
+			//_mainWindow.ContentView.
+
+			//_mainWindow.ContentView.MouseDown(NSEvent.MouseEvent(NSEventType.LeftMouseDown, new PointF(0,0),
+			//	(NSEventModifierMask)0,0,0,_mainWindow.GraphicsContext,0,0,0.0f));
 		}
 		
 		protected virtual void Initialize ()
