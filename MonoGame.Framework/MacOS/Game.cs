@@ -520,7 +520,8 @@ namespace Microsoft.Xna.Framework
 //			_mainWindow.StyleMask = NSWindowStyle.Titled | NSWindowStyle.Closable;
 //			if (_wasResizeable) _mainWindow.StyleMask |= NSWindowStyle.Resizable;
 //			_mainWindow.HidesOnDeactivate = false;
-			
+			NSCursor.Unhide();
+
 			//ResetWindowBounds();
 			_mainWindow.ContentView.ExitFullscreenModeWithOptions(new NSDictionary());
 
@@ -528,9 +529,14 @@ namespace Microsoft.Xna.Framework
 				_view.Title = oldTitle;
 			
 			IsActive = wasActive;
+
 			Window.Window.IsVisible = false;
 			Window.Window.MakeKeyAndOrderFront(Window);
 			ResetWindowBounds();
+
+			//if (!IsMouseVisible) {
+			//	NSCursor.Hide();
+			//}
 		}
 		
 		internal void GoFullScreen ()
