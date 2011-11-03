@@ -422,6 +422,11 @@ namespace Microsoft.Xna.Framework
 			return true;
 		}
 
+		public override bool BecomeFirstResponder ()
+		{
+			return true;
+		}
+
 		public override void ViewWillMoveToWindow (NSWindow newWindow)
 		{
 			if (_trackingArea != null) RemoveTrackingArea(_trackingArea);
