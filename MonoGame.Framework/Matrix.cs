@@ -706,9 +706,9 @@ namespace Microsoft.Xna.Framework
 		    m.M32 = z[1];
 		    m.M33 = z[2];
 		    m.M34 = 0.0f;
-		    m.M41 = 0.0f;
-		    m.M42 = 0.0f;
-		    m.M43 = 0.0f;
+		    m.M41 = -1.0f * (x[0]*cameraPosition.X + x[1]*cameraPosition.Y + x[2]*cameraPosition.Z);
+		    m.M42 = -1.0f * (y[0]*cameraPosition.X + y[1]*cameraPosition.Y + y[2]*cameraPosition.Z);
+		    m.M43 = -1.0f * (z[0]*cameraPosition.X + z[1]*cameraPosition.Y + z[2]*cameraPosition.Z);
 		    m.M44 = 1.0f;
 			
 			return m;
