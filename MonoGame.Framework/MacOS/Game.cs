@@ -519,7 +519,7 @@ namespace Microsoft.Xna.Framework
 //			NSMenu.MenuBarVisible = true;
 //			_mainWindow.StyleMask = NSWindowStyle.Titled | NSWindowStyle.Closable;
 //			if (_wasResizeable) _mainWindow.StyleMask |= NSWindowStyle.Resizable;
-//			_mainWindow.HidesOnDeactivate = false;
+
 			NSCursor.Unhide();
 
 			//ResetWindowBounds();
@@ -533,7 +533,8 @@ namespace Microsoft.Xna.Framework
 			Window.Window.IsVisible = false;
 			Window.Window.MakeKeyAndOrderFront(Window);
 			ResetWindowBounds();
-
+			_mainWindow.HidesOnDeactivate = false;
+			Mouse.ResetMouse();
 			//if (!IsMouseVisible) {
 			//	NSCursor.Hide();
 			//}
@@ -559,7 +560,7 @@ namespace Microsoft.Xna.Framework
 
 //			NSMenu.MenuBarVisible = false;
 //			_mainWindow.StyleMask = NSWindowStyle.Borderless;
-//			_mainWindow.HidesOnDeactivate = true;
+
 
 			//Console.WriteLine("Before windows reset");
 
@@ -579,6 +580,9 @@ namespace Microsoft.Xna.Framework
 			Window.Window.IsVisible = false;
 			Window.Window.MakeKeyAndOrderFront(Window);
 			ResetWindowBounds();
+			_mainWindow.HidesOnDeactivate = true;
+			Window.Window.HidesOnDeactivate = true;
+			Mouse.ResetMouse();
 			//_mainWindow.MakeKeyAndOrderFront(_mainWindow);
 			//_mainWindow.MakeKeyWindow();
 //						_mainWindow.MakeKeyWindow();
