@@ -267,10 +267,16 @@ namespace Microsoft.Xna.Framework
 				return _targetElapsedTime;
 			}
 			set {
-				_targetElapsedTime = value;			
-				if (_initialized) {
-					throw new NotSupportedException ();
-				}
+				// http://msdn.microsoft.com/en-us/library/microsoft.xna.framework.game.targetelapsedtime.aspx
+				// the check here would be for a value that is a positive non zeo value.
+				// Not supported does not make sense.
+//				_targetElapsedTime = value;			
+//				if (_initialized) {
+//					throw new NotSupportedException ();
+//				}
+				if (value <= TimeSpan.Zero)
+					throw new ArgumentOutOfRangeException("value must be positive and non zero.");
+				_targetElapsedTime = value;
 			}
 		}
 		
