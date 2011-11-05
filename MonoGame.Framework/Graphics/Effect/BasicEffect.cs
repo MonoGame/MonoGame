@@ -9,6 +9,7 @@ using TextureEnvParameter11 = OpenTK.Graphics.OpenGL.TextureEnvParameter;
 using ArrayCap11 = OpenTK.Graphics.OpenGL.ArrayCap;
 using TextureTarget11 = OpenTK.Graphics.OpenGL.TextureTarget;
 #else
+using OpenTK.Graphics.ES11;
 using GL11 = OpenTK.Graphics.ES11.GL;
 using All11 = OpenTK.Graphics.ES11.All;
 
@@ -34,37 +35,15 @@ namespace Microsoft.Xna.Framework.Graphics
 		
         internal override void Apply()
         {
-            //GLStateManager.Projection(Projection);
-            //GLStateManager.World(World);
-            //GLStateManager.View(View);
+            GLStateManager.Projection(Projection);
+            GLStateManager.World(World);
+            GLStateManager.View(View);
+
 			base.Apply();
 
-            GL11.Viewport(0, 0, graphicsDevice.Viewport.Width, graphicsDevice.Viewport.Height);
-         
-            GL11.MatrixMode(MatrixMode11.Projection);
-            GL11.LoadIdentity();
-            Matrix projectionMatrix = Projection;
-            GL11.LoadMatrix(ref projectionMatrix.M11);
-         
-            GL11.MatrixMode(MatrixMode11.Modelview);
-            GL11.LoadIdentity();
-            Matrix viewMatrix = View;
-            GL11.LoadMatrix(ref viewMatrix.M11);
-            
-						
-			// Initialize OpenGL states (ideally move this to initialize somewhere else)	
-            GL11.Disable(EnableCap11.DepthTest);
-#if WINDOWS
-            GL11.TexEnv(TextureEnvTarget11.TextureEnv, TextureEnvParameter11.TextureEnvMode, (int)EnableCap11.Blend);
-#else
-            GL11.TexEnv(TextureEnvTarget11.TextureEnv, TextureEnvParameter11.TextureEnvMode, (int)All11.BlendSrc);
-#endif
-            if(Texture != null)
-                GL11.Enable(EnableCap11.Texture2D);
-            else
-                GL11.Disable(EnableCap11.Texture2D);
+            GLStateManager.Textures2D(Texture != null);
 
-            GL11.Disable(EnableCap11.CullFace);		
+            GLStateManager.ColorArray(VertexColorEnabled);
         }
 
 		public BasicEffect(GraphicsDevice device, EffectPool effectPool)

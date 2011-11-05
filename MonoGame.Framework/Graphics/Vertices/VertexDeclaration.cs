@@ -38,7 +38,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             else
             {
-                VertexElement[] elementArray = (VertexElement[]) elements.Clone();
+                VertexElement[] elementArray = (VertexElement[])elements.Clone();
                 this._elements = elementArray;
                 this._vertexStride = getVertexStride(elementArray);
             }
@@ -67,7 +67,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             else
             {
-                VertexElement[] elementArray = (VertexElement[]) elements.Clone();
+                VertexElement[] elementArray = (VertexElement[])elements.Clone();
                 this._elements = elementArray;
                 this._vertexStride = vertexStride;
             }
@@ -100,85 +100,82 @@ namespace Microsoft.Xna.Framework.Graphics
             return vertexDeclaration;
         }
 
-        public static void PrepareForUse(VertexDeclaration vd, IntPtr arrayStart)
+        public static void PrepareForUse(VertexDeclaration vd)
         {
             GLStateManager.VertexArray(true);
 
             bool normal = false;
-            bool color = false;
             bool texcoord = false;
-			
+
             foreach (var ve in vd.GetVertexElements())
             {
-                    switch (ve.VertexElementUsage)
-                    {
-                        case VertexElementUsage.Position:
-                            GL11.VertexPointer(
-                                ve.VertexElementFormat.OpenGLNumberOfElements(),
+                switch (ve.VertexElementUsage)
+                {
+                    case VertexElementUsage.Position:
+                        GL11.VertexPointer(
+                            ve.VertexElementFormat.OpenGLNumberOfElements(),
 #if WINDOWS
-                                ve.VertexElementFormat.OpenGLVertexPointerType(),
+                            ve.VertexElementFormat.OpenGLVertexPointerType(),
 #else
-                                ve.VertexElementFormat.OpenGLValueType(),
+                            ve.VertexElementFormat.OpenGLValueType(),
 #endif
-                                vd.VertexStride,
-                                //ve.Offset
-                                new IntPtr(arrayStart.ToInt32() + ve.Offset)
-                                );
-                            break;
-                        case VertexElementUsage.Color:
-                            GL11.ColorPointer(
-                                ve.VertexElementFormat.OpenGLNumberOfElements(),
+                            vd.VertexStride,
+                            //ve.Offset
+                            (IntPtr)ve.Offset
+                            );
+                        break;
+                    case VertexElementUsage.Color:
+                        GL11.ColorPointer(
+                            ve.VertexElementFormat.OpenGLNumberOfElements(),
 #if WINDOWS
-                                ve.VertexElementFormat.OpenGLColorPointerType(),
+                            ve.VertexElementFormat.OpenGLColorPointerType(),
 #else
-                                ve.VertexElementFormat.OpenGLValueType(),
+                            ve.VertexElementFormat.OpenGLValueType(),
 #endif
-                                vd.VertexStride,
-                                //ve.Offset
-                                new IntPtr(arrayStart.ToInt32() + ve.Offset)
-                                );
-                            color = true;
-                            break;
-                        case VertexElementUsage.Normal:
-                            GL11.NormalPointer(
+                            vd.VertexStride,
+                            //ve.Offset
+                            (IntPtr)ve.Offset
+                            );
+                        break;
+                    case VertexElementUsage.Normal:
+                        GL11.NormalPointer(
 #if WINDOWS
-                                ve.VertexElementFormat.OpenGLNormalPointerType(),
+                            ve.VertexElementFormat.OpenGLNormalPointerType(),
 #else
-                                ve.VertexElementFormat.OpenGLValueType(),
+                            ve.VertexElementFormat.OpenGLValueType(),
 #endif
-                                vd.VertexStride,
-                                //ve.Offset
-                                new IntPtr(arrayStart.ToInt32() + ve.Offset)
-                                );
-                            normal = true;
-                            break;
-                        case VertexElementUsage.TextureCoordinate:
-                            GL11.TexCoordPointer(
-                                ve.VertexElementFormat.OpenGLNumberOfElements(),
+                            vd.VertexStride,
+                            //ve.Offset
+                            (IntPtr)ve.Offset
+                            );
+                        normal = true;
+                        break;
+                    case VertexElementUsage.TextureCoordinate:
+                        GL11.TexCoordPointer(
+                            ve.VertexElementFormat.OpenGLNumberOfElements(),
 #if WINDOWS
-                                ve.VertexElementFormat.OpenGLTexCoordPointerType(),
+                            ve.VertexElementFormat.OpenGLTexCoordPointerType(),
 #else
-                                ve.VertexElementFormat.OpenGLValueType(),
+                            ve.VertexElementFormat.OpenGLValueType(),
 #endif
-                                vd.VertexStride,
-                                //ve.Offset
-                                new IntPtr(arrayStart.ToInt32() + ve.Offset)
-                                );
-                            texcoord = true;
-                            break;
-                        default:
-                            throw new NotImplementedException();
-                    }
+                            vd.VertexStride,
+                            //ve.Offset
+                            (IntPtr)ve.Offset
+                            );
+                        texcoord = true;
+                        break;
+                    default:
+                        throw new NotImplementedException();
+                }
             }
 
             GLStateManager.TextureCoordArray(texcoord);
-            GLStateManager.ColorArray(color);
             GLStateManager.NormalArray(normal);
         }
 
         public VertexElement[] GetVertexElements()
         {
-            return (VertexElement[]) this._elements.Clone();
+            return (VertexElement[])this._elements.Clone();
         }
 
         // Properties

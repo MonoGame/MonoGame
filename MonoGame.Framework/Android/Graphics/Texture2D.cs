@@ -530,8 +530,6 @@ namespace Microsoft.Xna.Framework.Graphics
             if (texture == null) return;
 
             GL.BindTexture(All.Texture2D, (uint)_textureId);
-            GL.TexEnv(All.TextureEnv, All.TextureEnvMode,
-                      (float)All.Replace);
             if (_mipmap)
             {
                 // Taken from http://www.flexicoder.com/blog/index.php/2009/11/iphone-mipmaps/
