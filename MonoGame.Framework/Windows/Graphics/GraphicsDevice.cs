@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 /*
 Microsoft Public License (Ms-PL)
 MonoGame - Copyright © 2009 The MonoGame Team
@@ -70,6 +70,8 @@ namespace Microsoft.Xna.Framework.Graphics
         
         public RasterizerState RasterizerState { get; set; }        
 
+        private uint vboArrayBuffer;
+
 		internal All PreferedFilter 
 		{
 			get 
@@ -123,6 +125,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _viewport.Height = DisplayMode.Height;
 			_viewport.MinDepth = 0.0f;
 			_viewport.MaxDepth = 1.0f;
+            
             Textures = new TextureCollection();
 
             // Init RenderState
@@ -415,20 +418,22 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void DrawUserPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int primitiveCount) where T : struct, IVertexType
         {
-            // Unbind the VBOs
-            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
-
+            var vertexCount = getElementCountArray(primitiveType, primitiveCount);
             var vd = VertexDeclaration.FromType(typeof(T));
 
-            IntPtr arrayStart = GCHandle.Alloc(vertexData, GCHandleType.Pinned).AddrOfPinnedObject();
+            InitArrayBuffer();
 
-            if (vertexOffset > 0)
-                arrayStart = new IntPtr(arrayStart.ToInt32() + (vertexOffset * vd.VertexStride));
+            GL.BindBuffer(BufferTarget.ArrayBuffer, vboArrayBuffer);
 
-            VertexDeclaration.PrepareForUse(vd, arrayStart);
+            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vertexCount * vd.VertexStride), IntPtr.Zero, BufferUsageHint.StreamDraw);
 
-            GL.DrawArrays(PrimitiveTypeGL11(primitiveType), vertexOffset, getElementCountArray(primitiveType, primitiveCount));
+            VertexDeclaration.PrepareForUse(vd, (IntPtr)0);
+
+            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vertexCount * vd.VertexStride), vertexData, BufferUsageHint.StreamDraw);
+
+            GL.DrawArrays(PrimitiveTypeGL11(primitiveType), vertexOffset, vertexCount);
+
+            InitArrayBuffer();
         }
 
         public void DrawPrimitives(PrimitiveType primitiveType, int vertexStart, int primitiveCount)
@@ -439,25 +444,38 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.DrawArrays(PrimitiveTypeGL11(primitiveType), vertexStart, getElementCountArray(primitiveType, primitiveCount));
         }
 
-        public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int vertexCount, int[] indexData, int indexOffset, int primitiveCount) where T : IVertexType
+        private void InitArrayBuffer()
+        {
+            if (vboArrayBuffer == 0)
+            {
+                GL.GenBuffers(1, out vboArrayBuffer);
+            }
+
+            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+        }
+        
+        public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int vertexCount, uint[] indexData, int indexOffset, int primitiveCount) where T : struct, IVertexType
         {
             // NOT TESTED
 
             if (indexOffset > 0 || vertexOffset > 0)
                 throw new NotImplementedException("vertexOffset and indexOffset is not yet supported.");
 
-            // Unload the VBOs
-            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
-
             var vd = VertexDeclaration.FromType(typeof(T));
 
-            IntPtr arrayStart = GCHandle.Alloc(vertexData, GCHandleType.Pinned).AddrOfPinnedObject();
-            if (vertexOffset > 0)
-                arrayStart = new IntPtr(arrayStart.ToInt32() + vertexOffset);
-            VertexDeclaration.PrepareForUse(vd, arrayStart);
+            InitArrayBuffer();
 
-            GL.DrawElements(PrimitiveTypeGL11(primitiveType), vertexCount, DrawElementsType.UnsignedShort, indexData);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, vboArrayBuffer);
+
+            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vertexCount * vd.VertexStride), IntPtr.Zero, BufferUsageHint.StreamDraw);
+
+            VertexDeclaration.PrepareForUse(vd, (IntPtr)0);
+
+            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vertexCount * vd.VertexStride), vertexData, BufferUsageHint.StreamDraw);
+
+            GL.DrawElements(PrimitiveTypeGL11(primitiveType), 2, DrawElementsType.UnsignedInt, indexData);
+
+            InitArrayBuffer();
         }
 
         public int getElementCountArray(PrimitiveType primitiveType, int primitiveCount)
@@ -470,7 +488,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 case PrimitiveType.LineStrip:
                     return 3 + (primitiveCount - 1); // ???
                 case PrimitiveType.TriangleList:
-                    return primitiveCount * 2;
+                    return primitiveCount*3;
                 case PrimitiveType.TriangleStrip:
                     return 3 + (primitiveCount - 1); // ???
             }

@@ -48,6 +48,7 @@ using Microsoft.Xna.Framework;
 
 namespace Microsoft.Xna.Framework.Graphics
 {	
+
     public class GraphicsDevice : IDisposable
     {
 		private All _preferedFilter;
@@ -59,9 +60,19 @@ namespace Microsoft.Xna.Framework.Graphics
 		private BlendState _blendState = BlendState.Opaque;
 		private DepthStencilState _depthStencilState = DepthStencilState.Default;
 		private SamplerStateCollection _samplerStates = new SamplerStateCollection ();
+
+
+
+
+
+
+
+
+
         internal List<IntPtr> _pointerCache = new List<IntPtr>();
         private VertexBuffer _vertexBuffer = null;
         private IndexBuffer _indexBuffer = null;
+        private uint VBOid;
 
         public RasterizerState RasterizerState { get; set; }
 		
@@ -113,15 +124,38 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			// Init RasterizerState
 			RasterizerState = new RasterizerState();
+
+            // Initialize OpenGL states
+            GL.Disable(All.DepthTest);
+            GL.TexEnv(All.TextureEnv, All.TextureEnvMode, (int)All.BlendSrc);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         }
 
-		public BlendState BlendState {
-			get { return _blendState; }
-			set { 
-				// ToDo check for invalid state
-				_blendState = value;
-			}
-		}
+
+
+
+
+
+
+
+
+
+
+
 
 		public DepthStencilState DepthStencilState {
 			get { return _depthStencilState; }
@@ -130,40 +164,136 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 
+
+
+
+
+
+
+
 		public SamplerStateCollection SamplerStates { 
 			get {
 				var temp = _samplerStates;
 				return temp;
 			} 
 		}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        public BlendState BlendState
+        {
+            get { return _blendState; }
+            set
+            {
+                // ToDo check for invalid state
+                _blendState = value;
+
+                // Disable Blending by default = BlendState.Opaque
+                GL.Disable(All.Blend);
+
+                // set the blend mode
+                if (_blendState == BlendState.NonPremultiplied)
+                {
+                    GL.BlendFunc(All.SrcAlpha, All.OneMinusSrcAlpha);
+                    GL.Enable(All.Blend);
+                }
+
+                if (_blendState == BlendState.AlphaBlend)
+                {
+                    GL.BlendFunc(All.One, All.OneMinusSrcAlpha);
+                    GL.Enable(All.Blend);
+                }
+
+                if (_blendState == BlendState.Additive)
+                {
+                    GL.BlendFunc(All.SrcAlpha, All.One);
+                    GL.Enable(All.Blend);
+                }
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         public void Clear(Color color)
         {
 			Vector4 vector = color.ToEAGLColor();			
 			GL.ClearColor (vector.X,vector.Y,vector.Z,vector.W);
 			GL.Clear ((uint) All.ColorBufferBit);
+
+
+
         }
 
         public void Clear(ClearOptions options, Color color, float depth, int stencil)
         {
 			Clear(options,color.ToEAGLColor(),depth,stencil);
+
         }
 
         public void Clear(ClearOptions options, Vector4 color, float depth, int stencil)
         {
-			GL.ClearColor(color.X, color.Y, color.Z, color.W);
-			GL.ClearDepth(depth);
-			GL.ClearStencil(stencil);
-			GL.Clear((uint) (ClearBufferMask.ColorBufferBit| ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit));
+            uint mask = 0;
+
+            if (color.X != 0f || color.Y != 0f || color.Z != 0f || color.W != 0f)
+            {
+                GL.ClearColor(color.X, color.Y, color.Z, color.W);
+
+                mask = (uint)ClearBufferMask.ColorBufferBit | mask;
+            }
+
+            GL.ClearDepth(depth);
+            mask = (uint)ClearBufferMask.DepthBufferBit | mask;
+
+            GL.ClearStencil(stencil);
+            mask = (uint)ClearBufferMask.StencilBufferBit | mask;
+
+            GL.Clear(mask);
         }
 
         public void Clear(ClearOptions options, Color color, float depth, int stencil, Rectangle[] regions)
         {
 			throw new NotImplementedException();
+
         }
 
         public void Clear(ClearOptions options, Vector4 color, float depth, int stencil, Rectangle[] regions)
         {
 			throw new NotImplementedException();
+
         }
 
 		public void Dispose()
@@ -181,29 +311,52 @@ namespace Microsoft.Xna.Framework.Graphics
 			_isDisposed = true;
 		}
 		
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         public void Present()
         {
 			GL.Flush();
+
         }
 		
+
         public void Present(Rectangle? sourceRectangle, Rectangle? destinationRectangle, IntPtr overrideWindowHandle)
         {
   			throw new NotImplementedException();
 		}
 				
+
+
+
         public void Reset()
         {
 			throw new NotImplementedException();
+
         }
 
         public void Reset(Microsoft.Xna.Framework.Graphics.PresentationParameters presentationParameters)
         {
 			throw new NotImplementedException();
+
         }
 
         public void Reset(Microsoft.Xna.Framework.Graphics.PresentationParameters presentationParameters, GraphicsAdapter graphicsAdapter)
         {
 			throw new NotImplementedException();
+
         }
 
         public Microsoft.Xna.Framework.Graphics.DisplayMode DisplayMode
@@ -234,6 +387,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             get;
 			set;
+
         }
 
         public Microsoft.Xna.Framework.Graphics.Viewport Viewport
@@ -352,6 +506,11 @@ namespace Microsoft.Xna.Framework.Graphics
 				// before rendering.
 				Viewport = savedViewport;
 
+
+
+
+
+
 				if (renderTarget == null)
 					currentRenderTargets = null;
 				else {
@@ -459,13 +618,35 @@ namespace Microsoft.Xna.Framework.Graphics
 				// Save off the current viewport to be reset later
 				savedViewport = Viewport;
 
+
+
+
+
+
 				// Create a new Viewport
 				Viewport renderTargetViewPort = new Viewport();
+
+
+
+
+
+
+
+
+
+
 
 				// Set the new viewport to the width and height of the render target
 				Texture2D target2 = (Texture2D)currentRenderTargets[0].RenderTarget;
 				renderTargetViewPort.Width = target2.Width;
 				renderTargetViewPort.Height = target2.Height;
+
+
+
+
+
+
+
 
 				// now we set our viewport to the new rendertarget viewport just created.
 				Viewport = renderTargetViewPort;				
@@ -476,6 +657,201 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 		}
 		
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         public All PrimitiveTypeGL11(PrimitiveType primitiveType)
         {
             switch (primitiveType)
@@ -514,7 +890,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             var vd = VertexDeclaration.FromType(_vertexBuffer._type);
             // Hmm, can the pointer here be changed with baseVertex?
-            VertexDeclaration.PrepareForUse(vd, IntPtr.Zero);
+            VertexDeclaration.PrepareForUse(vd);
 
             GL.DrawElements(PrimitiveTypeGL11(primitiveType), _indexBuffer._count, All.UnsignedShort, new IntPtr(startIndex));
         }
@@ -524,23 +900,42 @@ namespace Microsoft.Xna.Framework.Graphics
             // Unbind the VBOs
             GL.BindBuffer(All.ArrayBuffer, 0);
             GL.BindBuffer(All.ElementArrayBuffer, 0);
-			
+
+            //Create VBO if not created already
+            if (VBOid == 0)
+                GL.GenBuffers(1, ref VBOid);
+
+            // Bind the VBO
+            GL.BindBuffer(All.ArrayBuffer, VBOid);
+            ////Clear previous data
+            GL.BufferData(All.ArrayBuffer, (IntPtr)0, (IntPtr)null, All.DynamicDraw);
+
+            //Get VertexDeclaration
             var vd = VertexDeclaration.FromType(typeof(T));
 
-            IntPtr arrayStart = GCHandle.Alloc(vertexData, GCHandleType.Pinned).AddrOfPinnedObject();
+            //Pin data
+            var handle = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
 
-            if (vertexOffset > 0)
-                arrayStart = new IntPtr(arrayStart.ToInt32() + (vertexOffset * vd.VertexStride));
+            //Buffer data to VBO
+            GL.BufferData(All.ArrayBuffer, (IntPtr)(vd.VertexStride * getElementCountArray(primitiveType, primitiveCount)), vertexData, All.DynamicDraw);
 
-            VertexDeclaration.PrepareForUse(vd, arrayStart);
+            //Setup VertexDeclaration
+            VertexDeclaration.PrepareForUse(vd);
 
+            //Draw
             GL.DrawArrays(PrimitiveTypeGL11(primitiveType), vertexOffset, getElementCountArray(primitiveType, primitiveCount));
+
+
+            // Free resources
+            GL.BindBuffer(All.ArrayBuffer, 0);
+            GL.BindBuffer(All.ElementArrayBuffer, 0);
+            handle.Free();
         }
 
         public void DrawPrimitives(PrimitiveType primitiveType, int vertexStart, int primitiveCount)
         {
             var vd = VertexDeclaration.FromType(_vertexBuffer._type);
-            VertexDeclaration.PrepareForUse(vd, IntPtr.Zero);
+            VertexDeclaration.PrepareForUse(vd);
 
             GL.DrawArrays(PrimitiveTypeGL11(primitiveType), vertexStart, getElementCountArray(primitiveType, primitiveCount));
         }
@@ -553,14 +948,16 @@ namespace Microsoft.Xna.Framework.Graphics
 
             var vd = VertexDeclaration.FromType(typeof(T));
 
-            IntPtr arrayStart = GCHandle.Alloc(vertexData, GCHandleType.Pinned).AddrOfPinnedObject();
+            var handle = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
+            var arrayStart = handle.AddrOfPinnedObject();
 
             if (vertexOffset > 0)
                 arrayStart = new IntPtr(arrayStart.ToInt32() + (vertexOffset * vd.VertexStride));
 
-            VertexDeclaration.PrepareForUse(vd, arrayStart);
+            VertexDeclaration.PrepareForUse(vd);
 
             GL.DrawArrays(PrimitiveTypeGL11(primitiveType), vertexOffset, getElementCountArray(primitiveType, primitiveCount));
+            handle.Free();
         }
 
         public int getElementCountArray(PrimitiveType primitiveType, int primitiveCount)
@@ -571,9 +968,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 case PrimitiveType.LineList:
                     return primitiveCount * 2;
                 case PrimitiveType.LineStrip:
-                    return 3 + (primitiveCount - 1); // ???
+                    return primitiveCount + 1;
                 case PrimitiveType.TriangleList:
-                    return primitiveCount * 2;
+                    return primitiveCount * 3;
                 case PrimitiveType.TriangleStrip:
                     return 3 + (primitiveCount - 1); // ???
             }
@@ -582,5 +979,6 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
 	}
+
 }
 

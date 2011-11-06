@@ -4,12 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
 
+#if WINDOWS
+using GL11 = OpenTK.Graphics.OpenGL.GL;
+using All11 = OpenTK.Graphics.OpenGL.BufferTarget;
+using Usage11 = OpenTK.Graphics.OpenGL.BufferUsageHint;
+#else
 using OpenTK.Graphics.ES20;
 using OpenTK.Graphics.ES11;
 using GL11 = OpenTK.Graphics.ES11.GL;
 using GL20 = OpenTK.Graphics.ES20.GL;
 using All11 = OpenTK.Graphics.ES11.All;
 using All20 = OpenTK.Graphics.ES20.All;
+#endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -53,12 +59,22 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			_size = vd.VertexStride * ((T[])_buffer).Length;
 			
-            All11 bufferUsage = (_bufferUsage == BufferUsage.WriteOnly) ? All11.StaticDraw : All11.DynamicDraw;
+            
 			
+#if WINDOWS
+            Usage11 bufferUsage = (_bufferUsage == BufferUsage.WriteOnly) ? Usage11.StaticDraw : Usage11.DynamicDraw;
+
+            GL11.GenBuffers(1, out _bufferStore);
+            GL11.BindBuffer(All11.ArrayBuffer, _bufferStore);
+            GL11.BufferData<T>(All11.ArrayBuffer, (IntPtr)_size, (T[])_buffer, bufferUsage);			
+#else
+            All11 bufferUsage = (_bufferUsage == BufferUsage.WriteOnly) ? All11.StaticDraw : All11.DynamicDraw;
+
             GL11.GenBuffers(1, ref _bufferStore);
             GL11.BindBuffer(All11.ArrayBuffer, _bufferStore);
             GL11.BufferData<T>(All11.ArrayBuffer, (IntPtr)_size, (T[])_buffer, bufferUsage);			
-		}
+#endif
+        }
 		
         public unsafe void GetData<T>(T[] vertices) where T : IVertexType
         {
@@ -90,8 +106,12 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		public void Dispose ()
 		{
-			GL11.GenBuffers(0, ref _bufferStore);
-		}
+#if WINDOWS
+			GL11.GenBuffers(0, out _bufferStore);
+#else
+            GL11.GenBuffers(0, ref _bufferStore);
+#endif
+        }
     }
 	
     public class DynamicVertexBuffer : VertexBuffer
