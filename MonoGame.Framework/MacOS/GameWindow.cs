@@ -625,17 +625,40 @@ namespace Microsoft.Xna.Framework
 				break;
 			}			
 		}
-		
+
+		private static int hideUnHideCntr = 0;
+
+		internal void HideCursor ()
+		{
+			if (hideUnHideCntr % 2 == 0) {
+				NSCursor.Hide();
+				hideUnHideCntr ++;
+				//Console.WriteLine("Hide: " + hideUnHideCntr);
+			}
+
+		}
+
+		internal void UnHideCursor ()
+		{
+			if (hideUnHideCntr % 2 != 0) {
+				NSCursor.Unhide();
+				hideUnHideCntr --;
+				//Console.WriteLine("UnHide: " + hideUnHideCntr);
+			}
+		}
+
 		public override void MouseEntered (NSEvent theEvent)
 		{
 			if (!game.IsMouseVisible) {
-				NSCursor.Hide();
+				HideCursor();
 			}
 		}
 		
 		public override void MouseExited (NSEvent theEvent)
 		{
-			NSCursor.Unhide();
+			if (!game.IsMouseVisible) {
+				UnHideCursor();
+			}
 		}
 
 		private void SetMousePosition (PointF location)

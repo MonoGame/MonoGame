@@ -66,7 +66,13 @@ namespace Microsoft.Xna.Framework.Input
 			_x = x;
 			_y = y;
 		}
-		
+
+		internal static void ResetMouse () {
+			_leftButton = ButtonState.Released;
+			_rightButton = ButtonState.Released;
+			_middleButton = ButtonState.Released;
+		}
+
 		internal static ButtonState LeftButton { 
 			get {
 				return _leftButton;
