@@ -48,7 +48,6 @@ using Microsoft.Xna.Framework;
 
 namespace Microsoft.Xna.Framework.Graphics
 {	
-
     public class GraphicsDevice : IDisposable
     {
 		private All _preferedFilter;
@@ -60,14 +59,6 @@ namespace Microsoft.Xna.Framework.Graphics
 		private BlendState _blendState = BlendState.Opaque;
 		private DepthStencilState _depthStencilState = DepthStencilState.Default;
 		private SamplerStateCollection _samplerStates = new SamplerStateCollection ();
-
-
-
-
-
-
-
-
 
         internal List<IntPtr> _pointerCache = new List<IntPtr>();
         private VertexBuffer _vertexBuffer = null;
@@ -121,6 +112,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			_viewport.Height = DisplayMode.Height;
 			_viewport.MinDepth = 0.0f;
 			_viewport.MaxDepth = 1.0f;
+            Textures = new TextureCollection();
 			
 			// Init RasterizerState
 			RasterizerState = new RasterizerState();
@@ -128,76 +120,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // Initialize OpenGL states
             GL.Disable(All.DepthTest);
             GL.TexEnv(All.TextureEnv, All.TextureEnvMode, (int)All.BlendSrc);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-		public DepthStencilState DepthStencilState {
-			get { return _depthStencilState; }
-			set { 
-				_depthStencilState = value;
-			}
-		}
-
-
-
-
-
-
-
-
-		public SamplerStateCollection SamplerStates { 
-			get {
-				var temp = _samplerStates;
-				return temp;
-			} 
-		}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
         public BlendState BlendState
         {
@@ -231,37 +154,29 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+		public DepthStencilState DepthStencilState {
+			get { return _depthStencilState; }
+			set { 
+				_depthStencilState = value;
+			}
+		}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+		public SamplerStateCollection SamplerStates { 
+			get {
+				var temp = _samplerStates;
+				return temp;
+			} 
+		}
         public void Clear(Color color)
         {
 			Vector4 vector = color.ToEAGLColor();			
 			GL.ClearColor (vector.X,vector.Y,vector.Z,vector.W);
 			GL.Clear ((uint) All.ColorBufferBit);
-
-
-
         }
 
         public void Clear(ClearOptions options, Color color, float depth, int stencil)
         {
 			Clear(options,color.ToEAGLColor(),depth,stencil);
-
         }
 
         public void Clear(ClearOptions options, Vector4 color, float depth, int stencil)
@@ -287,13 +202,11 @@ namespace Microsoft.Xna.Framework.Graphics
         public void Clear(ClearOptions options, Color color, float depth, int stencil, Rectangle[] regions)
         {
 			throw new NotImplementedException();
-
         }
 
         public void Clear(ClearOptions options, Vector4 color, float depth, int stencil, Rectangle[] regions)
         {
 			throw new NotImplementedException();
-
         }
 
 		public void Dispose()
@@ -311,52 +224,29 @@ namespace Microsoft.Xna.Framework.Graphics
 			_isDisposed = true;
 		}
 		
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         public void Present()
         {
 			GL.Flush();
-
         }
 		
-
         public void Present(Rectangle? sourceRectangle, Rectangle? destinationRectangle, IntPtr overrideWindowHandle)
         {
   			throw new NotImplementedException();
 		}
 				
-
-
-
         public void Reset()
         {
 			throw new NotImplementedException();
-
         }
 
         public void Reset(Microsoft.Xna.Framework.Graphics.PresentationParameters presentationParameters)
         {
 			throw new NotImplementedException();
-
         }
 
         public void Reset(Microsoft.Xna.Framework.Graphics.PresentationParameters presentationParameters, GraphicsAdapter graphicsAdapter)
         {
 			throw new NotImplementedException();
-
         }
 
         public Microsoft.Xna.Framework.Graphics.DisplayMode DisplayMode
@@ -387,7 +277,6 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             get;
 			set;
-
         }
 
         public Microsoft.Xna.Framework.Graphics.Viewport Viewport
@@ -506,11 +395,6 @@ namespace Microsoft.Xna.Framework.Graphics
 				// before rendering.
 				Viewport = savedViewport;
 
-
-
-
-
-
 				if (renderTarget == null)
 					currentRenderTargets = null;
 				else {
@@ -618,35 +502,13 @@ namespace Microsoft.Xna.Framework.Graphics
 				// Save off the current viewport to be reset later
 				savedViewport = Viewport;
 
-
-
-
-
-
 				// Create a new Viewport
 				Viewport renderTargetViewPort = new Viewport();
-
-
-
-
-
-
-
-
-
-
 
 				// Set the new viewport to the width and height of the render target
 				Texture2D target2 = (Texture2D)currentRenderTargets[0].RenderTarget;
 				renderTargetViewPort.Width = target2.Width;
 				renderTargetViewPort.Height = target2.Height;
-
-
-
-
-
-
-
 
 				// now we set our viewport to the new rendertarget viewport just created.
 				Viewport = renderTargetViewPort;				
@@ -657,201 +519,6 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 		}
 		
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         public All PrimitiveTypeGL11(PrimitiveType primitiveType)
         {
             switch (primitiveType)
@@ -979,6 +646,5 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
 	}
-
 }
 

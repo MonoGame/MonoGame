@@ -56,26 +56,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		private int _width,_height;
 		private SurfaceFormat _format;
 		private float _maxS,_maxT;
-        private byte[] _pixelData;
-	    private bool _updateTexture = true;
-
-	    public bool UpdateTexture
-	    {
-	        get { return _updateTexture; }
-            set
-            {
-                _updateTexture = value;
-
-                if (_updateTexture)
-                {
-                    var unmanagedPointer = Marshal.AllocHGlobal(_pixelData.Length);
-                    if (UpdateTexture)
-                        GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, _width, _height, 0,
-                                      OpenTK.Graphics.OpenGL.PixelFormat.Rgba, PixelType.UnsignedByte, _pixelData);
-                    Marshal.FreeHGlobal(unmanagedPointer);
-                }
-            }
-	    }
+        private IntPtr _pixelData;
 		
 		public ESTexture2D (IntPtr data, SurfaceFormat pixelFormat, int width, int height, Size size, All filter)
 		{
@@ -89,7 +70,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void InitWithBitmap(Bitmap image, All filter)
         {
-            BitmapData bitmapData = image.LockBits(new System.Drawing.Rectangle(0, 0, image.Width, image.Height), ImageLockMode.ReadWrite,
+            BitmapData bitmapData = image.LockBits(new System.Drawing.Rectangle(0, 0, image.Width, image.Height), ImageLockMode.ReadOnly,
                            System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 
             _format = SurfaceFormat.Color;
@@ -101,7 +82,6 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             GL.GenTextures(1, out _name);
             GL.BindTexture(TextureTarget.Texture2D, _name);
-            GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (float)TextureEnvMode.Replace);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)filter);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)filter);
 
@@ -136,8 +116,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _maxS = size.Width / (float)width;
             _maxT = size.Height / (float)height;
 
-            _pixelData = new byte[width * height * 4];
-            Marshal.Copy(data, _pixelData, 0, width * height * 4);
+            _pixelData = data;
         }
 
         public void SetPixel(int x, int y, byte red, byte green, byte blue, byte alpha)
@@ -153,12 +132,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 case SurfaceFormat.Dxt1:
                 case SurfaceFormat.Dxt3:
                     byte[] pixelInfo = new byte[4] { red, green, blue, alpha };
-                    IntPtr unmanagedPointer = Marshal.AllocHGlobal(_pixelData.Length);
-                    var pos = ((y * _width) + x) * 4;
-                    Marshal.Copy(pixelInfo, 0, IntPtr.Add(unmanagedPointer, pos), 4);
-                    if(UpdateTexture)
-                        GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, _width, _height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Rgba, PixelType.UnsignedByte, _pixelData);
-                    Marshal.FreeHGlobal(unmanagedPointer);
+                    Marshal.Copy(pixelInfo, ((y - 1) * _width) + (x - 1), _pixelData, 4);
+                    GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, _width, _height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Rgba, PixelType.UnsignedByte, _pixelData);
                     break;
 
                 // TODO: Implement the rest of these but lack of knowledge and examples prevents this for now
@@ -380,7 +355,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 
-        public byte[] PixelData
+        public IntPtr PixelData
         {
             get
             {

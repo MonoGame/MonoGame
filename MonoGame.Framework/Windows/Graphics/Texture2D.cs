@@ -38,7 +38,6 @@ purpose and non-infringement.
 */
 #endregion License
 using System;
-using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -81,11 +80,6 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        internal void Bind()
-        {
-            
-        }
-
         public Rectangle SourceRect
         {
             get
@@ -125,7 +119,7 @@ namespace Microsoft.Xna.Framework.Graphics
             this._format = format;
             this._mipmap = mipMap;
 
-            generateOpenGLTextureEmpty();
+            generateOpenGLTexture();
         }
 
         byte[] textureData = null;
@@ -137,54 +131,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
             GL.GenTextures(1, out _textureId);
             GL.BindTexture(TextureTarget.Texture2D, _textureId);
-
-            if (_mipmap)
-            {
-                // Taken from http://www.flexicoder.com/blog/index.php/2009/11/iphone-mipmaps/
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)All.LinearMipmapNearest);
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)All.Linear);
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.GenerateMipmap, (int)All.True);
-            }
-            else
-            {
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)All.Linear);
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)All.Linear);
-            }
-
-
-            //GCHandle handle = GCHandle.Alloc(texture, GCHandleType.Pinned);
-
-            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, _width, _height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, texture.PixelData);
-
-            //handle.Free();
-
-            GL.BindTexture(TextureTarget.Texture2D, 0);
-
-            // The following is left here for testing purposes
-            //			NSImage image = new NSImage (new SizeF (_width, _height));
-            //			image.LockFocus ();
-            //			// We set this to be cleared/initialized
-            //			NSColor.Clear.Set ();
-            //			NSGraphics.RectFill (new RectangleF (0,0,_width,_height));
-            //			image.UnlockFocus ();
-            //
-            //			if (image == null) {
-            //				throw new Exception ("Error Creating Texture2D.");
-            //			}			
-            //
-            //			texture = new ESImage (image, graphicsDevice.PreferedFilter);
-            //			_textureId = (int)texture.Name;
-        }
-
-        private void generateOpenGLTextureEmpty()
-        {
-            // modeled after this
-            // http://steinsoft.net/index.php?site=Programming/Code%20Snippets/OpenGL/no9
-
-            GL.GenTextures(1, out _textureId);
-            GL.BindTexture(TextureTarget.Texture2D, _textureId);
-
-            GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (float)TextureEnvMode.Replace);
 
             if (_mipmap)
             {
@@ -232,19 +178,19 @@ namespace Microsoft.Xna.Framework.Graphics
                 return result;
 
             int sz = 0;
-            IntPtr unmanagedPointer;
+
             byte[] pixel = new byte[4];
             ;
             int pos;
+            IntPtr pixelOffset;
             switch (this.Format)
             {
                 case SurfaceFormat.Color /*kTexture2DPixelFormat_RGBA8888*/:
                 case SurfaceFormat.Dxt3:
                     sz = 4;
                     pos = ((y * Width) + x) * sz;
-                    unmanagedPointer = Marshal.AllocHGlobal(texture.PixelData.Length);
-                    Marshal.Copy(IntPtr.Add(unmanagedPointer, pos), pixel, 0, 4);
-                    Marshal.FreeHGlobal(unmanagedPointer);
+                    pixelOffset = new IntPtr(texture.PixelData.ToInt64() + pos);
+                    Marshal.Copy(pixelOffset, pixel, 0, 4);
                     result.R = pixel[0];
                     result.G = pixel[1];
                     result.B = pixel[2];
@@ -253,9 +199,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 case SurfaceFormat.Bgra4444 /*kTexture2DPixelFormat_RGBA4444*/:
                     sz = 2;
                     pos = ((y * Width) + x) * sz;
-                    unmanagedPointer = Marshal.AllocHGlobal(texture.PixelData.Length);
-                    Marshal.Copy(IntPtr.Add(unmanagedPointer, pos), pixel, 0, 4);
-                    Marshal.FreeHGlobal(unmanagedPointer);
+                    pixelOffset = new IntPtr(texture.PixelData.ToInt64() + pos);
+                    Marshal.Copy(pixelOffset, pixel, 0, 4);
+
                     result.R = pixel[0];
                     result.G = pixel[1];
                     result.B = pixel[2];
@@ -264,9 +210,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 case SurfaceFormat.Bgra5551 /*kTexture2DPixelFormat_RGB5A1*/:
                     sz = 2;
                     pos = ((y * Width) + x) * sz;
-                    unmanagedPointer = Marshal.AllocHGlobal(texture.PixelData.Length);
-                    Marshal.Copy(IntPtr.Add(unmanagedPointer, pos), pixel, 0, 4);
-                    Marshal.FreeHGlobal(unmanagedPointer);
+                    pixelOffset = new IntPtr(texture.PixelData.ToInt64() + pos);
+                    Marshal.Copy(pixelOffset, pixel, 0, 4);
 
                     result.R = pixel[0];
                     result.G = pixel[1];
@@ -276,9 +221,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 case SurfaceFormat.Alpha8 /*kTexture2DPixelFormat_A8*/:
                     sz = 1;
                     pos = ((y * Width) + x) * sz;
-                    unmanagedPointer = Marshal.AllocHGlobal(texture.PixelData.Length);
-                    Marshal.Copy(IntPtr.Add(unmanagedPointer, pos), pixel, 0, 4);
-                    Marshal.FreeHGlobal(unmanagedPointer);
+                    pixelOffset = new IntPtr(texture.PixelData.ToInt64() + pos);
+                    Marshal.Copy(pixelOffset, pixel, 0, 1);
 
                     result.A = pixel[0];
                     break;
@@ -363,39 +307,24 @@ namespace Microsoft.Xna.Framework.Graphics
             return FromFile(graphicsDevice, filename, 0, 0);
         }
 
-        public void Apply()
+        private void Apply()
         {
-            if (texture == null)
+
+            GL.BindTexture(TextureTarget.Texture2D, (uint)_textureId);
+            if (_mipmap)
             {
-                GL.BindTexture(TextureTarget.Texture2D, (uint)_textureId);
-                GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode,
-                          (float)TextureEnvMode.Replace);
-                if (_mipmap)
-                {
-                    // Taken from http://www.flexicoder.com/blog/index.php/2009/11/iphone-mipmaps/
-                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter,
-                                    (int)All.LinearMipmapNearest);
-                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)All.Linear);
-                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.GenerateMipmap, (int)All.True);
-                }
-                else
-                {
-                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)All.Linear);
-                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)All.Linear);
-                }
-
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS,
-                                (float)TextureWrapMode.Repeat);
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT,
-                                (float)TextureWrapMode.Repeat);
-
-                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, _width, _height, 0,
-                              OpenTK.Graphics.OpenGL.PixelFormat.Rgba, PixelType.UnsignedByte, textureData);
+                // Taken from http://www.flexicoder.com/blog/index.php/2009/11/iphone-mipmaps/
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)All.LinearMipmapNearest);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)All.Linear);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.GenerateMipmap, (int)All.True);
             }
             else
             {
-                GL.BindTexture(TextureTarget.Texture2D, (uint)_textureId);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)All.Linear);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)All.Linear);
             }
+
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, _width, _height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Rgba, PixelType.UnsignedByte, textureData);
         }
 
         private void SetPixel(int x, int y, byte red, byte green, byte blue, byte alpha)
@@ -431,7 +360,6 @@ namespace Microsoft.Xna.Framework.Graphics
                     textureData[index + 1] = green;
                     textureData[index + 2] = blue;
                     textureData[index + 3] = alpha;
-
                     break;
 
                 // TODO: Implement the rest of these but lack of knowledge and examples prevents this for now
@@ -455,34 +383,14 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             else
             {
-                if (textureData != null)
+                // we now have a texture not based on an outside image source
+                // now we check what type was passed
+                if (typeof(T) == typeof(Color))
                 {
-                    // we now have a texture not based on an outside image source
-                    // now we check what type was passed
-                    if (typeof(T) == typeof(Color))
+                    for (int x = 0; x < data.Length; x++)
                     {
-                        for (int x = 0; x < data.Length; x++)
-                        {
-                            var color = (Color)(object)data[x];
-                            SetData(x, color.R, color.G, color.B, color.A);
-                        }
-                    }
-                }
-                else
-                {
-                    // we now have a texture not based on an outside image source
-                    // now we check what type was passed
-                    if (typeof(T) == typeof(Color))
-                    {
-                        texture.texture.UpdateTexture = false;
-                        for (int x = 0; x < data.Length; x++)
-                        {
-                            if(x % 1000 == 0)
-                                Debug.WriteLine("Test");
-                            var color = (Color)(object)data[x];
-                            texture.texture.SetPixel(x % texture.ImageWidth, (int)(x / texture.ImageWidth), color.R, color.G, color.B, color.A);
-                        }
-                        texture.texture.UpdateTexture = true;
+                        var color = (Color)(object)data[x];
+                        SetData(x, color.R, color.G, color.B, color.A);
                     }
                 }
 
@@ -638,9 +546,8 @@ namespace Microsoft.Xna.Framework.Graphics
                                 //							pos = ((y * imageSize.Width) + x) * sz;								
                                 //							pixelOffset = new IntPtr (imageData.ToInt64 () + pos);							
                                 pos = ((y * _width) + x) * sz;
-                                IntPtr unmanagedPointer = Marshal.AllocHGlobal(texture.PixelData.Length);
-                                Marshal.Copy(IntPtr.Add(unmanagedPointer, pos), pixel, 0, 4);
-                                Marshal.FreeHGlobal(unmanagedPointer);
+                                pixelOffset = texture.PixelData + pos;
+                                Marshal.Copy(pixelOffset, pixel, 0, 4);
                                 result.R = pixel[0];
                                 result.G = pixel[1];
                                 result.B = pixel[2];
@@ -848,11 +755,8 @@ namespace Microsoft.Xna.Framework.Graphics
                                 //pos = ((y * imageSize.Width) + x) * sz;								
                                 //pixelOffset = new IntPtr (imageData.ToInt64 () + pos);
                                 pos = ((y * _width) + x) * sz;
-
-                                IntPtr unmanagedPointer = Marshal.AllocHGlobal(texture.PixelData.Length);
-                                Marshal.Copy(IntPtr.Add(unmanagedPointer, pos), pixel, 0, 4);
-                                Marshal.FreeHGlobal(unmanagedPointer);
-
+                                pixelOffset = texture.PixelData + pos;
+                                Marshal.Copy(pixelOffset, pixel, 0, 4);
                                 result.R = pixel[0];
                                 result.G = pixel[1];
                                 result.B = pixel[2];
