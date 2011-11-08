@@ -666,6 +666,7 @@ namespace Microsoft.Xna.Framework
 			Mouse.SetPosition ((int)location.X, (int)(ClientBounds.Height - location.Y));
 
 		}
+
 	}
 }
 

@@ -110,7 +110,7 @@ namespace Microsoft.Xna.Framework
 
 			_gameWindow = new GameWindow (frame);
 			_gameWindow.game = this;
-			
+
 			_mainWindow.ContentView.AddSubview (_gameWindow);
 			_mainWindow.AcceptsMouseMovedEvents = false;
 
@@ -270,7 +270,7 @@ namespace Microsoft.Xna.Framework
 				// http://msdn.microsoft.com/en-us/library/microsoft.xna.framework.game.targetelapsedtime.aspx
 				// the check here would be for a value that is a positive non zeo value.
 				// Not supported does not make sense.
-//				_targetElapsedTime = value;			
+//				_targetElapsedTime = value;
 //				if (_initialized) {
 //					throw new NotSupportedException ();
 //				}
@@ -308,8 +308,10 @@ namespace Microsoft.Xna.Framework
 
 			if (GraphicsDevice.PresentationParameters.IsFullScreen)
 				GoFullScreen();
-			else
+			else {
+				_wasResizeable = IsAllowUserResizing;
 				GoWindowed();
+			}
 
 			if (!IsMouseVisible) {
 				_gameWindow.HideCursor();
@@ -574,16 +576,15 @@ namespace Microsoft.Xna.Framework
 			if (oldTitle != null)
 				_gameWindow.Title = oldTitle;
 
-			if (!IsMouseVisible) {
-				_gameWindow.HideCursor();
-			}
-
 			Window.Window.IsVisible = false;
 			Window.Window.MakeKeyAndOrderFront(Window);
 			ResetWindowBounds();
 			_mainWindow.HidesOnDeactivate = true;
 			Window.Window.HidesOnDeactivate = true;
 			Mouse.ResetMouse();
+			if (!IsMouseVisible) {
+				_gameWindow.HideCursor();
+			}
 			IsActive = wasActive;
 		}
 		
