@@ -101,7 +101,7 @@ namespace Microsoft.Xna.Framework.Media
 			}
 			
 			// Concat the file name with valid extensions
-			return Path.Combine(path, TryFindAnyCased(file, files, ".3gp", ".mp4"));
+			return Path.Combine(path, TryFindAnyCased(file, files, ".3gp", ".mkv", ".mp4", ".ts", ".webm"));
 		}
 		
 		private static string TryFindAnyCased(string search, string[] arr, params string[] extensions)
@@ -119,10 +119,10 @@ namespace Microsoft.Xna.Framework.Media
             Player = new Android.Media.MediaPlayer();
 			if (Player != null )
 			{
-				var fd = Game.contextInstance.Assets.OpenFd(_fileName).FileDescriptor;
-				if (fd != null)
+				var afd = Game.contextInstance.Assets.OpenFd(_fileName);
+				if (afd != null)
 				{
-		            Player.SetDataSource(fd);			
+		            Player.SetDataSource(afd.FileDescriptor, afd.StartOffset, afd.Length);						
 		            Player.Prepare();
 				}
 			}
