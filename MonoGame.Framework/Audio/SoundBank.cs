@@ -29,7 +29,7 @@ using System;
 using System.IO;
 namespace Microsoft.Xna.Framework.Audio
 {
-    public class SoundBank
+    public class SoundBank : IDisposable
     {
         string name;
         string targetname;
@@ -61,6 +61,7 @@ namespace Microsoft.Xna.Framework.Audio
 
             cues = System.Text.Encoding.UTF8.GetString(soundbankreader.ReadBytes(cuelength)).Split('\0');
         }
+		
         public Cue GetCue(string name)
         {
             for (int i = 0; i < cues.Length - 1; i++)
@@ -78,6 +79,24 @@ namespace Microsoft.Xna.Framework.Audio
             }
             throw new NotImplementedException();
         }
+		
+		public void PlayCue(string name)
+		{
+			var musicCue = GetCue(name);
+            musicCue.Play();
+		}
+		
+		public void PlayCue (string name, AudioListener listener, AudioEmitter emitter)
+		{
+			throw new NotImplementedException();
+		}
+
+		#region IDisposable implementation
+		public void Dispose ()
+		{
+			throw new NotImplementedException ();
+		}
+		#endregion
     }
 }
 
