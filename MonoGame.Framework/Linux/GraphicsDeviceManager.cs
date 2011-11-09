@@ -145,7 +145,8 @@ namespace Microsoft.Xna.Framework
 		#endregion
 
 		public void ApplyChanges ()
-		{			
+		{		
+			_game.ResizeWindow(false);
 		}
 
 		private void Initialize ()
