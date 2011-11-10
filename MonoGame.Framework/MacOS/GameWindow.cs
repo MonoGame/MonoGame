@@ -412,10 +412,10 @@ namespace Microsoft.Xna.Framework
 			}
 		}
 
+		public event EventHandler<EventArgs> ClientSizeChanged;
 		public event EventHandler<EventArgs> OrientationChanged;
-		public event EventHandler ClientSizeChanged;
-		public event EventHandler ScreenDeviceNameChanged;
-
+		public event EventHandler<EventArgs> ScreenDeviceNameChanged;
+		
 		// make sure we get mouse move events.
 		public override bool AcceptsFirstResponder ()
 		{
