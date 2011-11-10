@@ -548,6 +548,31 @@ namespace Microsoft.Xna.Framework.Graphics
 				throw new NotImplementedException ("GetData not implemented for type.");
 			}
         }
+		
+		internal void Apply()
+        {
+            if (texture == null) return;
+
+            GL.BindTexture(All.Texture2D, (uint)_textureId);
+            if (_mipmap)
+            {
+                // Taken from http://www.flexicoder.com/blog/index.php/2009/11/iphone-mipmaps/
+                GL.TexParameter(All.Texture2D, All.TextureMinFilter,
+                                (int)All.LinearMipmapNearest);
+                GL.TexParameter(All.Texture2D, All.TextureMagFilter, (int)All.Linear);
+                GL.TexParameter(All.Texture2D, All.GenerateMipmap, (int)All.True);
+            }
+            else
+            {
+                GL.TexParameter(All.Texture2D, All.TextureMinFilter, (int)All.Linear);
+                GL.TexParameter(All.Texture2D, All.TextureMagFilter, (int)All.Linear);
+            }
+
+            GL.TexParameter(All.Texture2D, All.TextureWrapS,
+                            (float)TextureWrapMode.Repeat);
+            GL.TexParameter(All.Texture2D, All.TextureWrapT,
+                            (float)TextureWrapMode.Repeat);
+        }
 	}
 }
 
