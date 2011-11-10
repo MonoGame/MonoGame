@@ -148,21 +148,21 @@ namespace Microsoft.Xna.Framework
 
 			_mainWindow.DidDeminiaturize += delegate(object sender, EventArgs e) {
 				if (!IsMouseVisible)
-					_gameWindow.HideCursor();
-				//Console.WriteLine("BecomeMain");
+					_gameWindow.UnHideCursor();
+				//Console.WriteLine("Deminiaturize");
 			};
 
 			_mainWindow.DidMiniaturize += delegate(object sender, EventArgs e) {
 				if (!IsMouseVisible)
 					_gameWindow.UnHideCursor();
-				//Console.WriteLine("ResignMain");
+				//Console.WriteLine("Miniaturize");
 			};
 
 			_mainWindow.DidChangeScreen += delegate(object sender, EventArgs e) {
 				//Console.WriteLine("ChangeScreen");
 			};
 
-}
+		}
 
 		void Handle_gameComponentCollectionComponentAdded (object sender, GameComponentCollectionEventArgs e)
 		{

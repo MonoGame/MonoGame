@@ -652,6 +652,7 @@ namespace Microsoft.Xna.Framework
 			if (!game.IsMouseVisible) {
 				HideCursor();
 			}
+			//Console.WriteLine("Enter");
 		}
 		
 		public override void MouseExited (NSEvent theEvent)
@@ -659,6 +660,7 @@ namespace Microsoft.Xna.Framework
 			if (!game.IsMouseVisible) {
 				UnHideCursor();
 			}
+			//Console.WriteLine("Exited");
 		}
 
 		private void SetMousePosition (PointF location)
