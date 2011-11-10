@@ -93,8 +93,7 @@ namespace Microsoft.Xna.Framework
 
             // Initialize _lastUpdate
             _lastUpdate = DateTime.Now;
-			
-			
+												
 			
             this.RequestFocus();
             this.FocusableInTouchMode = true;
@@ -182,7 +181,7 @@ namespace Microsoft.Xna.Framework
 			
 			if (game != null )
 			{
-                ObserveDeviceRotation();
+                //ObserveDeviceRotation();
 
 				_now = DateTime.Now;
 				_updateGameTime.Update(_now - _lastUpdate);
@@ -191,61 +190,82 @@ namespace Microsoft.Xna.Framework
 		}
 		
 		#endregion
+		
+		
 
-
-        private void ObserveDeviceRotation()
+        internal void SetOrientation(DisplayOrientation currentorientation)
         {
             if (game.graphicsDeviceManager == null)
                 return;
 
-            // Calculate supported orientations if it has been left as "default"
-            DisplayOrientation supportedOrientations = (game.graphicsDeviceManager as GraphicsDeviceManager).SupportedOrientations;
-            if ((supportedOrientations & DisplayOrientation.Default) != 0)
-            {
-                if (game.GraphicsDevice.PresentationParameters.BackBufferWidth > game.GraphicsDevice.PresentationParameters.BackBufferHeight)
-                {
-                    supportedOrientations = DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight;
-                }
-                else
-                {
-                    supportedOrientations = DisplayOrientation.Portrait | DisplayOrientation.PortraitUpsideDown;
-                }
-            }
+            // Calculate supported orientations if it has been left as "default" and only default
+            DisplayOrientation supportedOrientations = (game.graphicsDeviceManager as GraphicsDeviceManager).SupportedOrientations;			
+			var allowedOrientation = DisplayOrientation.LandscapeLeft; 				
+			if ((supportedOrientations == DisplayOrientation.Default))
+			{
+			  // if we have default only we only allow Landscape
+			  allowedOrientation = allowedOrientation | DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight; 				
+			}
+			if ((supportedOrientations == DisplayOrientation.LandscapeLeft))
+			{
+			  // if we have default only we only allow Landscape
+			  allowedOrientation = DisplayOrientation.LandscapeLeft; 				
+			}
+			if ((supportedOrientations & DisplayOrientation.LandscapeLeft) != 0)
+			{
+			  // if we have default only we only allow Landscape
+			  allowedOrientation = allowedOrientation | DisplayOrientation.LandscapeLeft; 				
+			}
+			if ((supportedOrientations == DisplayOrientation.LandscapeRight))
+			{
+			  // if we have default only we only allow Landscape
+			  allowedOrientation = DisplayOrientation.LandscapeRight; 				
+			}
+			if ((supportedOrientations & DisplayOrientation.LandscapeRight) != 0)
+			{
+			  // if we have default only we only allow Landscape
+			  allowedOrientation = allowedOrientation | DisplayOrientation.LandscapeRight; 				
+			}
+			if ((supportedOrientations == DisplayOrientation.Portrait))
+			{
+			  // if we have Portrait only we only allow Landscape
+			  allowedOrientation = DisplayOrientation.Portrait; 				
+			}
+			if ((supportedOrientations & DisplayOrientation.Portrait) != 0)
+			{
+			  // if we have default only we only allow Landscape
+			  allowedOrientation = allowedOrientation | DisplayOrientation.Portrait; 				
+			}
+			
+			// ok we default to landscape left
+			var actualOrientation = DisplayOrientation.LandscapeLeft;
+			// now based on the  orientation of the device we 
+			// decide of we honour the device orientation or force our own
+			
+			// so if we are in Portrait but we allow only LandScape we stay in landscape
+						
 
-            switch (Resources.Configuration.Orientation) {
+            switch (currentorientation) {
 
-                case Orientation.Portrait:
-                    if ((supportedOrientations & DisplayOrientation.Portrait) != 0) {
-                        CurrentOrientation = DisplayOrientation.Portrait;
-                        game.GraphicsDevice.PresentationParameters.DisplayOrientation = DisplayOrientation.Portrait;
-                        TouchPanel.DisplayOrientation = DisplayOrientation.Portrait;
+			case DisplayOrientation.Portrait:
+                    if ((allowedOrientation & DisplayOrientation.Portrait) != 0) {
+                        actualOrientation = DisplayOrientation.Portrait;
                     }
                     break;
-                case Orientation.Landscape:
-                    // TODO: Since the system cannot tell us if it is left or right, we may need to use one of the other sensors
-                    // to determine actual orientation.  At this stage it chooses left (if set) over right (if set).
-                    DisplayOrientation orientation = DisplayOrientation.Unknown;
-                    if ((supportedOrientations & DisplayOrientation.LandscapeLeft) != 0)
-                        orientation = DisplayOrientation.LandscapeLeft;
-                    else if ((supportedOrientations & DisplayOrientation.LandscapeRight) != 0)
-                        orientation = DisplayOrientation.LandscapeRight;
-
-                    if (orientation != DisplayOrientation.Unknown) {
-                        CurrentOrientation = orientation;
-                        game.GraphicsDevice.PresentationParameters.DisplayOrientation = orientation;
-                        TouchPanel.DisplayOrientation = orientation;
+				case DisplayOrientation.LandscapeRight:	
+				    if ((allowedOrientation & DisplayOrientation.LandscapeRight) != 0) {
+                        actualOrientation = DisplayOrientation.LandscapeRight;
                     }
-                    break;
-
-                case Orientation.Undefined:
-                    if ((supportedOrientations & DisplayOrientation.Unknown) != 0) {
-                        CurrentOrientation = DisplayOrientation.Unknown;
-                        TouchPanel.DisplayOrientation = DisplayOrientation.Unknown;
-                    }
-                    break;
+				    break;
+                case DisplayOrientation.LandscapeLeft:				     
                 default:
+				    actualOrientation = DisplayOrientation.LandscapeLeft;
                     break;
             }
+			
+			CurrentOrientation = actualOrientation;
+            game.GraphicsDevice.PresentationParameters.DisplayOrientation = actualOrientation;
+            TouchPanel.DisplayOrientation = actualOrientation;
         }
 
         private Dictionary<IntPtr, TouchLocation> _previousTouches = new Dictionary<IntPtr, TouchLocation>();
@@ -273,18 +293,16 @@ namespace Microsoft.Xna.Framework
             TouchLocation tlocation;
             Vector2 position = new Vector2(e.GetX(), e.GetY());
             Vector2 translatedPosition = position;
-
+			
             switch (CurrentOrientation) {
                 case DisplayOrientation.Portrait: 
+				case DisplayOrientation.LandscapeLeft: 
                     break;
                 case DisplayOrientation.LandscapeRight: 
-                    translatedPosition = new Vector2(ClientBounds.Height - position.Y, position.X);
-                    break;
-                case DisplayOrientation.LandscapeLeft: 
-                    translatedPosition = new Vector2(position.Y, ClientBounds.Width - position.X);
-                    break;
-                case DisplayOrientation.PortraitUpsideDown:
                     translatedPosition = new Vector2(ClientBounds.Width - position.X, ClientBounds.Height - position.Y);
+                    break;                                  
+                //case DisplayOrientation.PortraitUpsideDown:
+                 //   translatedPosition = new Vector2(ClientBounds.Width - position.X, ClientBounds.Height - position.Y);
                     break;
             }
 
