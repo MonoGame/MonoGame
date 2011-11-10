@@ -107,7 +107,7 @@ namespace Microsoft.Xna.Framework
 
 			// Perform any other window configuration you desire
 			_mainWindow.IsOpaque = true;
-
+			_mainWindow.EnableCursorRects();
 			_gameWindow = new GameWindow (frame);
 			_gameWindow.game = this;
 
@@ -161,6 +161,7 @@ namespace Microsoft.Xna.Framework
 			_mainWindow.DidChangeScreen += delegate(object sender, EventArgs e) {
 				//Console.WriteLine("ChangeScreen");
 			};
+
 
 		}
 
@@ -297,9 +298,10 @@ namespace Microsoft.Xna.Framework
 			}
 			set {
 				_mouseVisible = value;
-				if (_mouseVisible) {
-					_gameWindow.UnHideCursor();
-				}
+				_mainWindow.InvalidateCursorRectsForView(_gameWindow);
+				//if (_mouseVisible) {
+				//	_gameWindow.UnHideCursor();
+				//}
 			}
 		}
 

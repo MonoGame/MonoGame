@@ -426,20 +426,56 @@ namespace Microsoft.Xna.Framework
 		{
 			return true;
 		}
+		public override void CursorUpdate (NSEvent theEvent)
+		{
+			base.CursorUpdate (theEvent);
+			//Console.WriteLine("Cursor Update");
+		}
 
 		public override void ViewWillMoveToWindow (NSWindow newWindow)
 		{
+			//Console.WriteLine("View will move to window");
 			if (_trackingArea != null) RemoveTrackingArea(_trackingArea);
 			_trackingArea = new NSTrackingArea(Frame,
 			                      	NSTrackingAreaOptions.MouseMoved | 
 			                        NSTrackingAreaOptions.MouseEnteredAndExited |
 			                        NSTrackingAreaOptions.EnabledDuringMouseDrag |
-			                        NSTrackingAreaOptions.ActiveAlways |
-			                        NSTrackingAreaOptions.InVisibleRect,
+			                        NSTrackingAreaOptions.ActiveWhenFirstResponder |
+			                        NSTrackingAreaOptions.InVisibleRect |
+				NSTrackingAreaOptions.CursorUpdate,
 			                      this, new NSDictionary());
 			AddTrackingArea(_trackingArea);
+
 		}
-		
+
+		// These variables are to handle our custom cursor for when IsMouseVisible is false.
+		// Hiding and unhiding the cursor was such a pain that I decided to let the system
+		// take care of this with Cursor Rectangles
+		NSImage cursorImage = null;	// Will be set to our custom image
+		NSCursor cursor = null;		// Our custom cursor
+		public override void ResetCursorRects ()
+		{
+
+			// If we do not have a cursor then we create an image size 1 x 1
+			// and then create our custom cursor with clear colors
+			if (cursor == null) {
+				cursorImage = new NSImage(new SizeF(1,1));
+				cursor = new NSCursor(cursorImage, NSColor.Clear, NSColor.Clear, new PointF(0,0));
+			}
+
+			// if the cursor is not to be visible then we us our custom cursor.
+			if (!game.IsMouseVisible)
+				AddCursorRectcursor(Frame, cursor);
+			else
+				AddCursorRectcursor(Frame, NSCursor.CurrentSystemCursor);
+
+		}
+
+		public override void DiscardCursorRects ()
+		{
+			base.DiscardCursorRects ();
+			//Console.WriteLine("DiscardCursorRects");
+		}
 		private void UpdateKeyboardState ()
 		{
 			_keyStates.Clear ();
@@ -631,7 +667,7 @@ namespace Microsoft.Xna.Framework
 		internal void HideCursor ()
 		{
 			if (hideUnHideCntr % 2 == 0) {
-				NSCursor.Hide();
+				//NSCursor.Hide();
 				hideUnHideCntr ++;
 				//Console.WriteLine("Hide: " + hideUnHideCntr);
 			}
@@ -641,7 +677,7 @@ namespace Microsoft.Xna.Framework
 		internal void UnHideCursor ()
 		{
 			if (hideUnHideCntr % 2 != 0) {
-				NSCursor.Unhide();
+				//NSCursor.Unhide();
 				hideUnHideCntr --;
 				//Console.WriteLine("UnHide: " + hideUnHideCntr);
 			}
