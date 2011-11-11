@@ -30,6 +30,8 @@ using System.ComponentModel;
 
 namespace Microsoft.Xna.Framework
 {
+	// TODO [TypeConverter(ExpandableObjectConverter)]
+	[Serializable]
     public class Curve
     {
         #region Private Fields
