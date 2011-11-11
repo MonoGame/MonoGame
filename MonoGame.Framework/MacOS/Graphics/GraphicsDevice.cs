@@ -102,7 +102,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 
 		public GraphicsDevice ()
-			{	
+		{	
 			// Initialize the main viewport
 			_viewport = new Viewport ();
 			_viewport.X = 0;

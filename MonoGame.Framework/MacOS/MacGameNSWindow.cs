@@ -1,7 +1,7 @@
 #region License
 /*
 Microsoft Public License (Ms-PL)
-MonoGame - Copyright © 2009 The MonoGame Team
+XnaTouch - Copyright © 2009 The XnaTouch Team
 
 All rights reserved.
 
@@ -37,91 +37,29 @@ permitted under your local laws, the contributors exclude the implied warranties
 purpose and non-infringement.
 */
 #endregion License
-
 using System;
+using System.Collections.Generic;
+using System.Drawing;
+using MonoMac.AppKit;
+using MonoMac.Foundation;
 
-namespace Microsoft.Xna.Framework.Audio
+/// <summary>
+/// Mac game window.
+/// This is a custom class that extends NSWindow so that we can override certian properties.
+/// </summary>
+namespace Microsoft.Xna.Framework
 {
-	public class Cue : IDisposable
+	public class MacGameNSWindow : NSWindow
 	{
-		private string _name;
-		private Sound _sound;
-		private bool _paused = false;
-		
-		public bool IsPaused
-		{
-			get { return _paused; }
-		}
-		
-		public bool IsPlaying
-		{
-			get { return _sound.Playing; }
-		}
-		
-		public bool IsStopped
-		{
-			get { return !_sound.Playing; }
-		}
-		
-		public string Name
-		{
-			get { return _name; }
-		}
-		
-		internal Cue(string cuename, Sound sound)
-		{
-			_name = cuename;
-			_sound = sound;
-		}
-		
-		public void Pause()
-		{
-			_sound.Pause();
-			_paused = true;
-		}
-		
-		public void Play()
-		{
-			_sound.Play();
-			_paused = false;
-		}
-		
-		public void Resume()
-		{
-			_sound.Play();
-			_paused = false;
-		}
-		
-		public void Stop(AudioStopOptions options)
-		{
-			_sound.Stop();
-			_paused = false;
-		}
-		
-		public void SetVariable(string name, float value)
-		{
-			if (name == "Volume") {
-				_sound.Volume = value;
-			} else {
-				throw new NotImplementedException();
+		[Export ("initWithContentRect:styleMask:backing:defer:")]
+		public MacGameNSWindow (RectangleF rect, NSWindowStyle style, NSBackingStore backing, bool defer)
+		: base (rect, style, backing, defer)
+		{}
+
+		public override bool CanBecomeKeyWindow {
+			get {
+				return true;
 			}
 		}
-		
-		public float GetVariable(string name, float value)
-		{
-			if (name == "Volume") {
-				return _sound.Volume;
-			} else {
-				throw new NotImplementedException();
-			}
-		}
-		
-		#region IDisposable implementation
-		public void Dispose ()
-		{
-			_sound.Dispose();
-		}
-		#endregion
 	}
 }
-

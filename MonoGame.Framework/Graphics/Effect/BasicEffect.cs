@@ -1,9 +1,5 @@
 using System;
 
-using GL11 = OpenTK.Graphics.ES11.GL;
-using GL20 = OpenTK.Graphics.ES20.GL;
-using All11 = OpenTK.Graphics.ES11.All;
-using All20 = OpenTK.Graphics.ES20.All;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -22,26 +18,12 @@ namespace Microsoft.Xna.Framework.Graphics
             GLStateManager.Projection(Projection);
             GLStateManager.World(World);
             GLStateManager.View(View);
-			base.Apply();			
-			
-			// set camera
-			Matrix _matrix = Matrix.Identity;
-			GL11.MatrixMode(All11.Projection);
-			GL11.LoadIdentity();
-			GL11.Ortho(0, 320, 480, 0, -1, 1);
-			GL11.MatrixMode(All11.Modelview);
-			GL11.LoadMatrix( ref _matrix.M11 );
-			GL11.Viewport (0, 0, 320, 480);
-						
-			// Initialize OpenGL states (ideally move this to initialize somewhere else)	
-			GL11.Disable(All11.DepthTest);
-			GL11.TexEnv(All11.TextureEnv, All11.TextureEnvMode,(int) All11.BlendSrc);
-			GL11.Enable(All11.Texture2D);
-			GL11.EnableClientState(All11.VertexArray);
-			GL11.EnableClientState(All11.ColorArray);
-			GL11.EnableClientState(All11.TextureCoordArray);
-			
-			GL11.Disable(All11.CullFace);		
+
+			base.Apply();
+
+            GLStateManager.Textures2D(Texture != null);
+
+            GLStateManager.ColorArray(VertexColorEnabled);
         }
 
 		public BasicEffect(GraphicsDevice device, EffectPool effectPool)
@@ -124,7 +106,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		private void setTexture(Texture2D texture)
 		{
-			GL11.BindTexture(All11.Texture2D, texture.Image.Name);
+            if(texture != null)
+                texture.Apply();
 		}
 
         public Texture2D Texture {
@@ -160,7 +143,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			throw new NotImplementedException ();
 		}
 
-		Vector3 IEffectLights.AmbientLightColor {
+		public Vector3 AmbientLightColor {
 			get; set;
 		}
 
@@ -193,24 +176,24 @@ namespace Microsoft.Xna.Framework.Graphics
 		#endregion
 
 		#region IEffectFog implementation
-		Vector3 IEffectFog.FogColor {
+
+	    public Vector3 FogColor {
 			get; set;
 		}
 
-		bool IEffectFog.FogEnabled {
-			get {
-				throw new NotImplementedException ();
-			}
+	    public bool FogEnabled {
+			get { return false; }
 			set {
-				throw new NotImplementedException ();
+                if(value)
+				    throw new NotImplementedException ();
 			}
 		}
 
-		float IEffectFog.FogEnd {
+	    public float FogEnd {
 			get; set;
 		}
 
-		float IEffectFog.FogStart {
+	    public float FogStart {
 			get; set;
 		}
 		#endregion

@@ -41,7 +41,7 @@ purpose and non-infringement.
 using System;
 namespace Microsoft.Xna.Framework.Audio
 {
-	public class AudioEngine
+	public class AudioEngine : IDisposable
 	{
 		public const int ContentVersion = 39;
 		
@@ -55,6 +55,17 @@ namespace Microsoft.Xna.Framework.Audio
 		{
 		}
 		
+		public void Update ()
+		{
+			throw new NotImplementedException ();
+		}
+		
+		#region IDisposable implementation
+		public void Dispose ()
+		{
+			throw new NotImplementedException ();
+		}
+		#endregion
 	}
 }
 
