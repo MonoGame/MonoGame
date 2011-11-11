@@ -107,7 +107,7 @@ namespace Microsoft.Xna.Framework
 
 			// Perform any other window configuration you desire
 			_mainWindow.IsOpaque = true;
-
+			_mainWindow.EnableCursorRects();
 			_gameWindow = new GameWindow (frame);
 			_gameWindow.game = this;
 
@@ -116,11 +116,37 @@ namespace Microsoft.Xna.Framework
 
 			// Initialize GameTime
 			_updateGameTime = new GameTime ();
-			_drawGameTime = new GameTime ();  
-			
+			_drawGameTime = new GameTime ();
+
 			//Set the current directory.
 			// We set the current directory to the ResourcePath on Mac
 			Directory.SetCurrentDirectory(NSBundle.MainBundle.ResourcePath);
+
+			// Leave these here for when we implement the Activate and Deactivated
+			_mainWindow.DidBecomeKey += delegate(object sender, EventArgs e) {
+				//if (!IsMouseVisible)
+				//	_gameWindow.HideCursor();
+				//Console.WriteLine("BecomeKey");
+			};
+
+			_mainWindow.DidResignKey += delegate(object sender, EventArgs e) {
+				//if (!IsMouseVisible)
+				//	_gameWindow.UnHideCursor();
+				//Console.WriteLine("ResignKey");
+			};
+
+			_mainWindow.DidBecomeMain += delegate(object sender, EventArgs e) {
+				//if (!IsMouseVisible)
+					_gameWindow.HideCursor();
+				////Console.WriteLine("BecomeMain");
+			};
+
+			_mainWindow.DidResignMain += delegate(object sender, EventArgs e) {
+				//if (!IsMouseVisible)
+				//	_gameWindow.UnHideCursor();
+				//Console.WriteLine("ResignMain");
+			};
+
 		}
 
 		void Handle_gameComponentCollectionComponentAdded (object sender, GameComponentCollectionEventArgs e)
@@ -256,10 +282,7 @@ namespace Microsoft.Xna.Framework
 			}
 			set {
 				_mouseVisible = value;
-				if (_mouseVisible) {
-					_gameWindow.UnHideCursor();
-				}
-			}
+				_mainWindow.InvalidateCursorRectsForView(_gameWindow);			}
 		}
 
 		public TimeSpan TargetElapsedTime {
@@ -311,10 +334,6 @@ namespace Microsoft.Xna.Framework
 			else {
 				_wasResizeable = IsAllowUserResizing;
 				GoWindowed();
-			}
-
-			if (!IsMouseVisible) {
-				_gameWindow.HideCursor();
 			}
 
 			_initializing = true;
@@ -536,13 +555,12 @@ namespace Microsoft.Xna.Framework
 			_mainWindow.StyleMask = NSWindowStyle.Titled | NSWindowStyle.Closable;
 			if (_wasResizeable) _mainWindow.StyleMask |= NSWindowStyle.Resizable;
 
-			_gameWindow.UnHideCursor();
-
-
 			if (oldTitle != null)
 				_gameWindow.Title = oldTitle;
-			
 
+
+			// Set the level here to normal
+			_mainWindow.Level = NSWindowLevel.Normal;
 
 			Window.Window.IsVisible = false;
 			Window.Window.MakeKeyAndOrderFront(Window);
@@ -550,9 +568,6 @@ namespace Microsoft.Xna.Framework
 			_mainWindow.HidesOnDeactivate = false;
 			Mouse.ResetMouse();
 
-			if (!IsMouseVisible) {
-				_gameWindow.HideCursor();
-			}
 			IsActive = wasActive;
 		}
 		
@@ -573,6 +588,9 @@ namespace Microsoft.Xna.Framework
 			NSMenu.MenuBarVisible = false;
 			_mainWindow.StyleMask = NSWindowStyle.Borderless;
 
+			// Set the level here to normal
+			_mainWindow.Level = NSWindowLevel.Floating;
+
 			if (oldTitle != null)
 				_gameWindow.Title = oldTitle;
 
@@ -582,9 +600,7 @@ namespace Microsoft.Xna.Framework
 			_mainWindow.HidesOnDeactivate = true;
 			Window.Window.HidesOnDeactivate = true;
 			Mouse.ResetMouse();
-			if (!IsMouseVisible) {
-				_gameWindow.HideCursor();
-			}
+
 			IsActive = wasActive;
 		}
 		

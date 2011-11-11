@@ -37,8 +37,8 @@ permitted under your local laws, the contributors exclude the implied warranties
 purpose and non-infringement.
 */
 #endregion License
-
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using MonoMac.AppKit;
 using MonoMac.Foundation;
@@ -56,13 +56,10 @@ namespace Microsoft.Xna.Framework
 		: base (rect, style, backing, defer)
 		{}
 
-		public override bool CanBecomeKeyWindow
-		{
+		public override bool CanBecomeKeyWindow {
 			get {
 				return true;
 			}
 		}
-
-
 	}
 }
