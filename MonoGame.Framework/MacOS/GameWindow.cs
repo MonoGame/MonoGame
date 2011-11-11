@@ -429,7 +429,6 @@ namespace Microsoft.Xna.Framework
 		public override void CursorUpdate (NSEvent theEvent)
 		{
 			base.CursorUpdate (theEvent);
-			//Console.WriteLine("Cursor Update");
 		}
 
 		public override void ViewWillMoveToWindow (NSWindow newWindow)
@@ -660,43 +659,6 @@ namespace Microsoft.Xna.Framework
 				//Mouse.Moved = true;
 				break;
 			}			
-		}
-
-		private static int hideUnHideCntr = 0;
-
-		internal void HideCursor ()
-		{
-			if (hideUnHideCntr % 2 == 0) {
-				//NSCursor.Hide();
-				hideUnHideCntr ++;
-				//Console.WriteLine("Hide: " + hideUnHideCntr);
-			}
-
-		}
-
-		internal void UnHideCursor ()
-		{
-			if (hideUnHideCntr % 2 != 0) {
-				//NSCursor.Unhide();
-				hideUnHideCntr --;
-				//Console.WriteLine("UnHide: " + hideUnHideCntr);
-			}
-		}
-
-		public override void MouseEntered (NSEvent theEvent)
-		{
-			if (!game.IsMouseVisible) {
-				HideCursor();
-			}
-			//Console.WriteLine("Enter");
-		}
-		
-		public override void MouseExited (NSEvent theEvent)
-		{
-			if (!game.IsMouseVisible) {
-				UnHideCursor();
-			}
-			//Console.WriteLine("Exited");
 		}
 
 		private void SetMousePosition (PointF location)
