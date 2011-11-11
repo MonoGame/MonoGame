@@ -87,9 +87,11 @@ namespace Microsoft.Xna.Framework.Audio
 				reader.ReadBytes(format_chunk_size - 16);
 			
             string data_signature = new string(reader.ReadChars(4));
-            if (data_signature != "data")
+			
+			while (data_signature.ToLower() != "data")
             {
-                throw new NotSupportedException("Specified wave file is not supported.");
+                reader.ReadChars(reader.ReadInt32());
+                data_signature = new string(reader.ReadChars(4));
             }
 
             int data_chunk_size = reader.ReadInt32();
@@ -103,4 +105,3 @@ namespace Microsoft.Xna.Framework.Audio
 		}
 	}
 }
-
