@@ -332,6 +332,7 @@
     <Compile Include="Content\ContentManager.cs" />
     <Compile Include="MacOS\Media\VideoPlayer.cs" />
     <Compile Include="MacOS\MacGameNSWindow.cs" />
+    <Compile Include="Content\ContentReaders\CurveReader.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />

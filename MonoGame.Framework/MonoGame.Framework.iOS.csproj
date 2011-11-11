@@ -354,6 +354,7 @@
     <Compile Include="Content\ContentManager.cs" />
     <Compile Include="Content\LzxDecoder.cs" />
     <Compile Include="Graphics\States\SamplerState.ES.cs" />
+    <Compile Include="Content\ContentReaders\CurveReader.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
