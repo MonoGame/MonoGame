@@ -137,7 +137,7 @@ namespace Microsoft.Xna.Framework
 
 			_mainWindow.DidBecomeMain += delegate(object sender, EventArgs e) {
 				//if (!IsMouseVisible)
-					_gameWindow.HideCursor();
+					//_gameWindow.HideCursor();
 				////Console.WriteLine("BecomeMain");
 			};
 
