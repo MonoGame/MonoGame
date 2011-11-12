@@ -171,7 +171,11 @@ namespace Microsoft.Xna.Framework.Content
             assetName = Path.Combine(_rootDirectory, assetName.Replace('\\', Path.DirectorySeparatorChar));
 			
 			// Get the real file name
-			if ((typeof(T) == typeof(Texture2D))) 
+			if ((typeof(T) == typeof(Curve))) 
+			{				
+				assetName = CurveReader.Normalize(assetName);
+			}
+			else if ((typeof(T) == typeof(Texture2D))) 
 			{				
 				assetName = Texture2DReader.Normalize(assetName);
 			}
