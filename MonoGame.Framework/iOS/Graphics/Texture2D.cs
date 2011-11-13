@@ -544,7 +544,8 @@ namespace Microsoft.Xna.Framework.Graphics
 					}
 				}
 			}
-			else {
+			else 
+			{
 				throw new NotImplementedException ("GetData not implemented for type.");
 			}
         }
