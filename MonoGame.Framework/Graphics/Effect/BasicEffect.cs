@@ -15,6 +15,9 @@ namespace Microsoft.Xna.Framework.Graphics
 		
         internal override void Apply()
         {
+			// May need to be moved elsewhere within this method
+			OnApply();
+			
             GLStateManager.Projection(Projection);
             GLStateManager.World(World);
             GLStateManager.View(View);
@@ -73,6 +76,12 @@ namespace Microsoft.Xna.Framework.Graphics
             this.DirectionalLight2.SpecularColor = color;
             this.DirectionalLight2.Enabled = true;*/
         }
+		
+		// Computes derived parameter values immediately before applying the effect.
+		protected internal override void OnApply()
+		{
+			
+		}
 			
 		public bool LightingEnabled 
 		{ 
