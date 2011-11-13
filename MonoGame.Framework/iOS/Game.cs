@@ -84,10 +84,15 @@ namespace Microsoft.Xna.Framework
 		private SpriteBatch spriteBatch;
 		private Texture2D splashScreen;
 		
+		private static Game _instance = null;
+		internal static Game Instance { get { return _instance; } }
+
 		delegate void InitialiseGameComponentsDelegate();
 		
 		public Game()
-        {           
+		{
+			_instance = this;
+
 			// Initialize collections
 			_services = new GameServiceContainer();
 			_gameComponentCollection = new GameComponentCollection();

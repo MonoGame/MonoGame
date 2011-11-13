@@ -87,10 +87,15 @@ namespace Microsoft.Xna.Framework
 		private List<IGameComponent> _gameComponentsToInitialize = new List<IGameComponent>();
 		private bool _wasResizeable;
 
+		private static Game _instance = null;
+		internal static Game Instance { get { return _instance; } }
+
 		delegate void InitialiseGameComponentsDelegate ();
 
 		public Game ()
 		{
+			_instance = this;
+
 			// Initialize collections
 			_services = new GameServiceContainer ();
 			_gameComponentCollection = new GameComponentCollection ();

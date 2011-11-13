@@ -77,6 +77,9 @@ namespace Microsoft.Xna.Framework
 
 		internal static bool _playingVideo = false;
 		
+		private static Game _instance = null;
+		internal static Game Instance { get { return _instance; } }
+
 		delegate void InitialiseGameComponentsDelegate();
 
 		internal static AndroidGameActivity contextInstance;
@@ -95,6 +98,8 @@ namespace Microsoft.Xna.Framework
 
 		public Game()
 		{
+			_instance = this;
+
 			System.Diagnostics.Debug.Assert(contextInstance != null, "Must set Game.Activity before creating the Game instance");
 			contextInstance.Game = this;
 
