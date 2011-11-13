@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -42,6 +42,14 @@
     <Reference Include="OpenTK, Version=1.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\opentk\opentk\Binaries\OpenTK\Release\OpenTK.dll</HintPath>
+    </Reference>
+    <Reference Include="Tao.Sdl, Version=1.2.13.0, Culture=neutral, PublicKeyToken=9c7a200e36c0094e">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\ThirdParty\GamepadConfig\Tao.Sdl.dll</HintPath>
+    </Reference>
+    <Reference Include="GamepadBridge, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\ThirdParty\GamepadConfig\GamepadBridge.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
@@ -238,7 +246,6 @@
     <Compile Include="Linux\Input\Keyboard.cs" />
     <Compile Include="Graphics\States\TextureAddressMode.cs" />
     <Compile Include="Graphics\States\TextureFilter.cs" />
-    <Compile Include="Linux\Input\GamePad.cs" />
     <Compile Include="Input\ButtonDefinition.cs" />
     <Compile Include="Input\ThumbStickDefinition.cs" />
     <Compile Include="Linux\GamerServices\SignedInGamer.cs" />
@@ -314,25 +321,10 @@
     <Compile Include="Graphics\RenderTarget2D.cs" />
     <Compile Include="Content\ContentManager.cs" />
     <Compile Include="Content\LzxDecoder.cs" />
+    <Compile Include="Input\GamePadDeadZone.cs" />
+    <Compile Include="Linux\Input\GamePad.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Linux\" />
-    <Folder Include="Graphics\" />
-    <Folder Include="Graphics\Vertices\" />
-    <Folder Include="Linux\Graphics\" />
-    <Folder Include="Linux\Graphics\Vertices\" />
-    <Folder Include="Content\ContentReaders\" />
-    <Folder Include="GamerServices\" />
-    <Folder Include="Linux\Audio\" />
-    <Folder Include="Media\" />
-    <Folder Include="Linux\Content\" />
-    <Folder Include="Linux\Graphics\" />
-    <Folder Include="Linux\Media\" />
-    <Folder Include="Linux\Graphics\States\" />
-    <Folder Include="Linux\Graphics\Effect\" />
-    <Folder Include="Linux\Input\" />
-    <Folder Include="Linux\GamerServices\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.Linux.csproj">
       <Project>{AE483C29-042E-4226-BA52-D247CE7676DA}</Project>
