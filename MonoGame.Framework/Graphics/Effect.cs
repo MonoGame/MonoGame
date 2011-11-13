@@ -147,6 +147,11 @@ namespace Microsoft.Xna.Framework.Graphics
      
         }
 		
+		protected internal virtual void OnApply ()
+		{
+			
+		}
+		
 		protected void CreateVertexShaderFromSource(string source)
 		{
 			int shader = GL.CreateShader (All.VertexShader);

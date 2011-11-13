@@ -314,6 +314,11 @@
     <Compile Include="Android\Content\ContentManager.cs" />
     <Compile Include="Graphics\States\SamplerState.ES.cs" />
     <Compile Include="Android\Content\ContentReaders\CurveReader.cs" />
+    <Compile Include="Audio\AudioEngine.cs" />
+    <Compile Include="Audio\WaveBank.cs" />
+    <Compile Include="Audio\SoundBank.cs" />
+    <Compile Include="Audio\Cue.cs" />
+    <Compile Include="Audio\AudioStopOptions.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
