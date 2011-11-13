@@ -106,8 +106,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		private void setTexture(Texture2D texture)
 		{
-            if(texture != null)
-                texture.Apply();
+            //if(texture != null)
+                //texture.Apply();
 		}
 
         public Texture2D Texture {
