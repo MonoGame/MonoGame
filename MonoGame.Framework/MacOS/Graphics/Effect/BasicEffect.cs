@@ -26,9 +26,13 @@ namespace Microsoft.Xna.Framework.Graphics
             createBasicEffect();
         }
 
+		internal protected override void OnApply ()
+		{
+			Apply ();
+		}
 	// TODO: This all needs to be redone
 	// Take a look at AlphaTest for example
-        internal void Apply()
+        private void Apply()
         {
             GLStateManager.Projection(Projection);
             GLStateManager.World(World);
@@ -36,23 +40,26 @@ namespace Microsoft.Xna.Framework.Graphics
 			//base.Apply();
 			
 			// set camera
-			Matrix _matrix = Matrix.Identity;
-			GL.MatrixMode(MatrixMode.Projection);
-			GL.LoadIdentity();
-			GL.Ortho(0, 320, 480, 0, -1, 1);
-			GL.MatrixMode(MatrixMode.Modelview);
-			GL.LoadMatrix( ref _matrix.M11 );
-			GL.Viewport (0, 0, 320, 480);
+			//Matrix _matrix = Matrix.Identity;
+			//GL.MatrixMode(MatrixMode.Projection);
+			//GL.LoadIdentity();
+			//GL.Ortho(0, 320, 480, 0, -1, 1);
+			//GL.MatrixMode(MatrixMode.Modelview);
+			//GL.LoadMatrix( ref _matrix.M11 );
+			//GL.Viewport (0, 0, 320, 480);
 						
 			// Initialize OpenGL states (ideally move this to initialize somewhere else)	
-			GL.Disable(EnableCap.DepthTest);
-			GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode,(int) All.BlendSrc);
-			GL.Enable(EnableCap.Texture2D);
-			GL.EnableClientState(ArrayCap.VertexArray);
-			GL.EnableClientState(ArrayCap.ColorArray);
-			GL.EnableClientState(ArrayCap.TextureCoordArray);
+			//GL.Disable(EnableCap.DepthTest);
+			//GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode,(int) All.BlendSrc);
+			//GL.Enable(EnableCap.Texture2D);
+			//GL.EnableClientState(ArrayCap.VertexArray);
+			//GL.EnableClientState(ArrayCap.ColorArray);
+			//GL.EnableClientState(ArrayCap.TextureCoordArray);
 			
-			GL.Disable(EnableCap.CullFace);		
+			//GL.Disable(EnableCap.CullFace);
+		GLStateManager.Textures2D(Texture != null);
+
+		GLStateManager.ColorArray(VertexColorEnabled);
         }
 
 		public BasicEffect(GraphicsDevice device, EffectPool effectPool)
