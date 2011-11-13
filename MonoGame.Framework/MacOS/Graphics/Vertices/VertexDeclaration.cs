@@ -5,7 +5,7 @@ using MonoMac.OpenGL;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-    public class VertexDeclaration
+    public class VertexDeclaration : GraphicsResource
     {
         // Fields
         internal VertexElement[] _elements;
@@ -81,12 +81,11 @@ namespace Microsoft.Xna.Framework.Graphics
             return vertexDeclaration;
         }
 
-        public static void PrepareForUse(VertexDeclaration vd, IntPtr arrayStart)
+        public static void PrepareForUse(VertexDeclaration vd)
         {
             GLStateManager.VertexArray(true);
 
             bool normal = false;
-            bool color = false;
             bool texcoord = false;
 			
             foreach (var ve in vd.GetVertexElements())
@@ -94,37 +93,36 @@ namespace Microsoft.Xna.Framework.Graphics
                     switch (ve.VertexElementUsage)
                     {
                         case VertexElementUsage.Position:
-                            /* TODO GL.VertexPointer(
+                            GL.VertexPointer(
                                 ve.VertexElementFormat.OpenGLNumberOfElements(),
-                                ve.VertexElementFormat.OpenGLValueType(),
+                                ve.VertexElementFormat.OpenGLVertexPointerType(),
                                 vd.VertexStride,
-                                new IntPtr(arrayStart.ToInt32() + ve.Offset)
-                                );*/
+                                (IntPtr)ve.Offset
+                                );
                             break;
                         case VertexElementUsage.Color:
-                            /* TODO GL.ColorPointer(
+                            GL.ColorPointer(
                                 ve.VertexElementFormat.OpenGLNumberOfElements(),
-                                ve.VertexElementFormat.OpenGLValueType(),
+                                ve.VertexElementFormat.OpenGLColorPointerType(),
                                 vd.VertexStride,
-                                new IntPtr(arrayStart.ToInt32() + ve.Offset)
-                                );*/
-                            color = true;
+                                (IntPtr)ve.Offset
+                                );
                             break;
                         case VertexElementUsage.Normal:
-                            /* TODO GL.NormalPointer(
-                                ve.VertexElementFormat.OpenGLValueType(),
-                                vd.VertexStride,
-                                new IntPtr(arrayStart.ToInt32() + ve.Offset)
-                                );*/
+                            GL.NormalPointer(
+                            ve.VertexElementFormat.OpenGLNormalPointerType(),
+                            vd.VertexStride,
+                            (IntPtr)ve.Offset
+                            );
                             normal = true;
                             break;
                         case VertexElementUsage.TextureCoordinate:
-                            /* TODO GL.TexCoordPointer(
-                                ve.VertexElementFormat.OpenGLNumberOfElements(),
-                                ve.VertexElementFormat.OpenGLValueType(),
-                                vd.VertexStride,
-                                new IntPtr(arrayStart.ToInt32() + ve.Offset)
-                                );*/
+                            GL.TexCoordPointer(
+                            ve.VertexElementFormat.OpenGLNumberOfElements(),
+                            ve.VertexElementFormat.OpenGLTexCoordPointerType(),
+                            vd.VertexStride,
+                            (IntPtr)ve.Offset
+                            );
                             texcoord = true;
                             break;
                         default:
@@ -133,7 +131,6 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
             GLStateManager.TextureCoordArray(texcoord);
-            GLStateManager.ColorArray(color);
             GLStateManager.NormalArray(normal);
         }
 

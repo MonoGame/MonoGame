@@ -26,7 +26,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (enable && (_textureCoordArray != GLStateEnabled.True))
                 GL.EnableClientState(ArrayCap.TextureCoordArray);
             else
-                GL.EnableClientState(ArrayCap.TextureCoordArray);
+                GL.DisableClientState(ArrayCap.TextureCoordArray);
         }
 
         public static void VertexArray(bool enable)
@@ -34,7 +34,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (enable && (_vertextArray != GLStateEnabled.True))
                 GL.EnableClientState(ArrayCap.VertexArray);
             else
-                GL.EnableClientState(ArrayCap.VertexArray);
+                GL.DisableClientState(ArrayCap.VertexArray);
         }
 
         public static void ColorArray(bool enable)
@@ -42,7 +42,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (enable && (_colorArray != GLStateEnabled.True))
                 GL.EnableClientState(ArrayCap.ColorArray);
             else
-                GL.EnableClientState(ArrayCap.ColorArray);
+                GL.DisableClientState(ArrayCap.ColorArray);
         }
 
         public static void NormalArray(bool enable)
@@ -50,7 +50,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (enable && (_normalArray != GLStateEnabled.True))
                 GL.EnableClientState(ArrayCap.NormalArray);
             else
-                GL.EnableClientState(ArrayCap.NormalArray);
+                GL.DisableClientState(ArrayCap.NormalArray);
         }
 
         public static void Textures2D(bool enable)
