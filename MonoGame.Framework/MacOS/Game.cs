@@ -113,7 +113,7 @@ namespace Microsoft.Xna.Framework
 
 			_mainWindow.ContentView.AddSubview (_gameWindow);
 			_mainWindow.AcceptsMouseMovedEvents = false;
-
+			_mainWindow.Center();
 			// Initialize GameTime
 			_updateGameTime = new GameTime ();
 			_drawGameTime = new GameTime ();
