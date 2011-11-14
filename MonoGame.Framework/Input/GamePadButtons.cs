@@ -44,91 +44,96 @@ namespace Microsoft.Xna.Framework.Input
 {
     public struct GamePadButtons
     {
-        private Buttons _buttons;
-		
-        public GamePadButtons(Buttons buttons)
-        {
-            _buttons = buttons;
-        }
+        internal Buttons buttons;
 
         public ButtonState A
         {
             get
             {
-                return ((_buttons & Buttons.A) == Buttons.A) ? ButtonState.Pressed : ButtonState.Released;
+                return ((buttons & Buttons.A) == Buttons.A) ? ButtonState.Pressed : ButtonState.Released;
             }
         }
         public ButtonState B
         {
             get
             {
-                return ((_buttons & Buttons.B) == Buttons.B) ? ButtonState.Pressed : ButtonState.Released;
+                return ((buttons & Buttons.B) == Buttons.B) ? ButtonState.Pressed : ButtonState.Released;
             }
         }
         public ButtonState Back
         {
             get
             {
-                return ((_buttons & Buttons.Back) == Buttons.Back) ? ButtonState.Pressed : ButtonState.Released;
+                return ((buttons & Buttons.Back) == Buttons.Back) ? ButtonState.Pressed : ButtonState.Released;
             }
         }
         public ButtonState X
         {
             get
             {
-                return ((_buttons & Buttons.X) == Buttons.X) ? ButtonState.Pressed : ButtonState.Released;
+                return ((buttons & Buttons.X) == Buttons.X) ? ButtonState.Pressed : ButtonState.Released;
             }
         }
         public ButtonState Y
         {
             get
             {
-                return ((_buttons & Buttons.Y) == Buttons.Y) ? ButtonState.Pressed : ButtonState.Released;
+                return ((buttons & Buttons.Y) == Buttons.Y) ? ButtonState.Pressed : ButtonState.Released;
             }
         }
         public ButtonState Start
         {
             get
             {
-                return ((_buttons & Buttons.Start) == Buttons.Start) ? ButtonState.Pressed : ButtonState.Released;
+                return ((buttons & Buttons.Start) == Buttons.Start) ? ButtonState.Pressed : ButtonState.Released;
             }
         }
         public ButtonState LeftShoulder
         {
             get
             {
-                return ((_buttons & Buttons.LeftShoulder) == Buttons.LeftShoulder) ? ButtonState.Pressed : ButtonState.Released;
+                return ((buttons & Buttons.LeftShoulder) == Buttons.LeftShoulder) ? ButtonState.Pressed : ButtonState.Released;
             }
         }
         public ButtonState LeftStick
         {
             get
             {
-                return ((_buttons & Buttons.LeftStick) == Buttons.LeftStick) ? ButtonState.Pressed : ButtonState.Released;
+                return ((buttons & Buttons.LeftStick) == Buttons.LeftStick) ? ButtonState.Pressed : ButtonState.Released;
             }
         }
         public ButtonState RightShoulder
         {
             get
             {
-                return ((_buttons & Buttons.RightShoulder) == Buttons.RightShoulder) ? ButtonState.Pressed : ButtonState.Released;
+                return ((buttons & Buttons.RightShoulder) == Buttons.RightShoulder) ? ButtonState.Pressed : ButtonState.Released;
             }
         }
         public ButtonState RightStick
         {
             get
             {
-                return ((_buttons & Buttons.RightStick) == Buttons.RightStick) ? ButtonState.Pressed : ButtonState.Released;
+                return ((buttons & Buttons.RightStick) == Buttons.RightStick) ? ButtonState.Pressed : ButtonState.Released;
             }
         }
         public ButtonState BigButton
         {
             get
             {
-                return ((_buttons & Buttons.BigButton) == Buttons.BigButton) ? ButtonState.Pressed : ButtonState.Released;
+                return ((buttons & Buttons.BigButton) == Buttons.BigButton) ? ButtonState.Pressed : ButtonState.Released;
             }
         }
+		
+        public GamePadButtons(Buttons buttons)
+        {
+            this.buttons = buttons;
+        }
+        internal GamePadButtons(params Buttons[] buttons)
+            : this()
+        {
+            foreach (Buttons b in buttons)
+                this.buttons |= b;
+        }
     }
-
 }
 

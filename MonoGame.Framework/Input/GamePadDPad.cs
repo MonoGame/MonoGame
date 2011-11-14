@@ -1,4 +1,4 @@
-// #region License
+#region License
 // /*
 // Microsoft Public License (Ms-PL)
 // MonoGame - Copyright © 2009 The MonoGame Team
@@ -36,8 +36,7 @@
 // permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular
 // purpose and non-infringement.
 // */
-// #endregion License
-// 
+#endregion License
 
 using System;
 
@@ -45,44 +44,46 @@ namespace Microsoft.Xna.Framework.Input
 {
 	public struct GamePadDPad
 	{
-		public GamePadDPad (
-         ButtonState upValue,
-         ButtonState downValue,
-         ButtonState leftValue,
-         ButtonState rightValue )
-		{
-		}
-		
-		public ButtonState Down 
-		{ 
-			get
-			{
-				return ButtonState.Released;
-			}
-		}
-		
-		public ButtonState Left 
-		{ 
-			get
-			{
-				return ButtonState.Released;
-			}
-		}
-		
-		public ButtonState Right 
-		{ 
-			get
-			{
-				return ButtonState.Released;
-			}
-		}
-		
-		public ButtonState Up 
-		{ 
-			get
-			{
-				return ButtonState.Released;
-			}
-		}
+        public ButtonState Down
+        {
+            get;
+            internal set;
+        }
+        public ButtonState Left
+        {
+            get;
+            internal set;
+        }
+        public ButtonState Right
+        {
+            get;
+            internal set;
+        }
+        public ButtonState Up
+        {
+            get;
+            internal set;
+        }
+
+        public GamePadDPad(ButtonState upValue, ButtonState downValue, ButtonState leftValue, ButtonState rightValue)
+            : this()
+        {
+            Up = upValue;
+            Down = downValue;
+            Left = leftValue;
+            Right = rightValue;
+        }
+        internal GamePadDPad(Buttons b)
+            : this()
+        {
+            if ((b & Buttons.DPadDown) == Buttons.DPadDown)
+                Down = ButtonState.Pressed;
+            if ((b & Buttons.DPadLeft) == Buttons.DPadLeft)
+                Left = ButtonState.Pressed;
+            if ((b & Buttons.DPadRight) == Buttons.DPadRight)
+                Right = ButtonState.Pressed;
+            if ((b & Buttons.DPadUp) == Buttons.DPadUp)
+                Up = ButtonState.Pressed;
+        }
 	}
 }
