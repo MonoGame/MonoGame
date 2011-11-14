@@ -1,168 +1,200 @@
-#region License
-/*
-Microsoft Public License (Ms-PL)
-MonoGame - Copyright © 2009 The MonoGame Team
-
-All rights reserved.
-
-This license governs use of the accompanying software. If you use the software, you accept this license. If you do not
-accept the license, do not use the software.
-
-1. Definitions
-The terms "reproduce," "reproduction," "derivative works," and "distribution" have the same meaning here as under 
-U.S. copyright law.
-
-A "contribution" is the original software, or any additions or changes to the software.
-A "contributor" is any person that distributes its contribution under this license.
-"Licensed patents" are a contributor's patent claims that read directly on its contribution.
-
-2. Grant of Rights
-(A) Copyright Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-each contributor grants you a non-exclusive, worldwide, royalty-free copyright license to reproduce its contribution, prepare derivative works of its contribution, and distribute its contribution or any derivative works that you create.
-(B) Patent Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-each contributor grants you a non-exclusive, worldwide, royalty-free license under its licensed patents to make, have made, use, sell, offer for sale, import, and/or otherwise dispose of its contribution in the software or derivative works of the contribution in the software.
-
-3. Conditions and Limitations
-(A) No Trademark License- This license does not grant you rights to use any contributors' name, logo, or trademarks.
-(B) If you bring a patent claim against any contributor over patents that you claim are infringed by the software, 
-your patent license from such contributor to the software ends automatically.
-(C) If you distribute any portion of the software, you must retain all copyright, patent, trademark, and attribution 
-notices that are present in the software.
-(D) If you distribute any portion of the software in source code form, you may do so only under this license by including 
-a complete copy of this license with your distribution. If you distribute any portion of the software in compiled or object 
-code form, you may only do so under a license that complies with this license.
-(E) The software is licensed "as-is." You bear the risk of using it. The contributors give no express warranties, guarantees
-or conditions. You may have additional consumer rights under your local laws which this license cannot change. To the extent
-permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular
-purpose and non-infringement.
-*/
-#endregion License
-
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using System;
 
 namespace Microsoft.Xna.Framework.Input
 {
-	public struct GamePadState
+    //
+    // Summary:
+    //     Represents specific information about the state of an Xbox 360 Controller,
+    //     including the current state of buttons and sticks. Reference page contains
+    //     links to related code samples.
+    public struct GamePadState
     {
-        private GamePadThumbSticks _thumbs;
-        private Buttons _buttons;
-		private GamePadDPad _dPad;
-		private GamePadTriggers _triggers;
-
-		internal GamePadState(Buttons buttons, Vector2 LeftStick, Vector2 RightStick)
-		{
-			_buttons = buttons;
-			_thumbs = new GamePadThumbSticks(LeftStick,RightStick);
-		}
-
-        public GamePadState(GamePadThumbSticks thumbs, GamePadTriggers triggers, GamePadButtons gamePadButtons, GamePadDPad dPad)
-        {
-            _thumbs = thumbs;
-            _triggers = triggers;
-            ConvertGamePadButtonsToButtons(ref gamePadButtons, out _buttons);
-            _dPad = dPad;
-        }
-		
-        public GamePadButtons Buttons
-        {
-            get
-            {
-                return new GamePadButtons(_buttons);
-            }
-        }
- 
+        //
+        // Summary:
+        //     Indicates whether the Xbox 360 Controller is connected. Reference page contains
+        //     links to related code samples.
         public bool IsConnected
         {
-            get
-            {
-                return true;
-            }
+            get;
+            internal set;
         }
-       
+        //
+        // Summary:
+        //     Gets the packet number associated with this state. Reference page contains
+        //     links to related code samples.
+        public int PacketNumber
+        {
+            get;
+            internal set;
+        }
+        
+        //
+        // Summary:
+        //     Returns a structure that identifies what buttons on the Xbox 360 controller
+        //     are pressed. Reference page contains links to related code samples.
+        public GamePadButtons Buttons
+        {
+            get;
+            internal set;
+        }
+        //
+        // Summary:
+        //     Returns a structure that identifies what directions of the directional pad
+        //     on the Xbox 360 Controller are pressed.
+        public GamePadDPad DPad
+        {
+            get;
+            internal set;
+        }
+        //
+        // Summary:
+        //     Returns a structure that indicates the position of the Xbox 360 Controller
+        //     sticks (thumbsticks).
         public GamePadThumbSticks ThumbSticks
         {
-            get
-            {
-                return this._thumbs;
-            }
+            get;
+            internal set;
         }
-     
-        public bool IsButtonDown(Microsoft.Xna.Framework.Input.Buttons button)
+        //
+        // Summary:
+        //     Returns a structure that identifies the position of triggers on the Xbox
+        //     360 controller.
+        public GamePadTriggers Triggers
         {
-            return ((_buttons & button) == button);
+            get;
+            internal set;
         }
 
-        public bool IsButtonUp(Microsoft.Xna.Framework.Input.Buttons button)
+        //
+        // Summary:
+        //     Initializes a new instance of the GamePadState class using the specified
+        //     GamePadThumbSticks, GamePadTriggers, GamePadButtons, and GamePadDPad.
+        //
+        // Parameters:
+        //   thumbSticks:
+        //     Initial thumbstick state.
+        //
+        //   triggers:
+        //     Initial trigger state.
+        //
+        //   buttons:
+        //     Initial button state.
+        //
+        //   dPad:
+        //     Initial directional pad state.
+        public GamePadState(GamePadThumbSticks thumbSticks, GamePadTriggers triggers, GamePadButtons buttons, GamePadDPad dPad)
+            : this()
         {
-            return !this.IsButtonDown(button);
+            ThumbSticks = thumbSticks;
+            Triggers = triggers;
+            Buttons = buttons;
+            DPad = dPad;
         }
-			
-		public GamePadDPad DPad 
-		{ 
-			get
-			{
-				return _dPad;
-			}
-		}
-		
-		public GamePadTriggers Triggers 
-		{ 
-			get
-			{
-				return _triggers;
-			}
-		}
-
-        internal static void ConvertGamePadButtonsToButtons(ref GamePadButtons gamePadButtons, out Buttons buttons)
+        //
+        // Summary:
+        //     Initializes a new instance of the GamePadState class with the specified stick,
+        //     trigger, and button values.
+        //
+        // Parameters:
+        //   leftThumbStick:
+        //     Left stick value. Each axis is clamped between −1.0 and 1.0.
+        //
+        //   rightThumbStick:
+        //     Right stick value. Each axis is clamped between −1.0 and 1.0.
+        //
+        //   leftTrigger:
+        //     Left trigger value. This value is clamped between 0.0 and 1.0.
+        //
+        //   rightTrigger:
+        //     Right trigger value. This value is clamped between 0.0 and 1.0.
+        //
+        //   buttons:
+        //     Array or parameter list of Buttons to initialize as pressed.
+        public GamePadState(Vector2 leftThumbStick, Vector2 rightThumbStick, float leftTrigger, float rightTrigger, params Buttons[] buttons)
+            : this(new GamePadThumbSticks(leftThumbStick, rightThumbStick), new GamePadTriggers(leftTrigger, rightTrigger), new GamePadButtons(buttons), new GamePadDPad())
         {
-            buttons = new Buttons();
-            if (gamePadButtons.A == ButtonState.Pressed)
-            {
-                buttons |= Microsoft.Xna.Framework.Input.Buttons.A;
-            }
-            if (gamePadButtons.B == ButtonState.Pressed)
-            {
-                buttons |= Microsoft.Xna.Framework.Input.Buttons.B;
-            }
-            if (gamePadButtons.X == ButtonState.Pressed)
-            {
-                buttons |= Microsoft.Xna.Framework.Input.Buttons.X;
-            }
-            if (gamePadButtons.Y == ButtonState.Pressed)
-            {
-                buttons |= Microsoft.Xna.Framework.Input.Buttons.Y;
-            }
-            if (gamePadButtons.Back == ButtonState.Pressed)
-            {
-                buttons |= Microsoft.Xna.Framework.Input.Buttons.Back;
-            }
-            if (gamePadButtons.Start == ButtonState.Pressed)
-            {
-                buttons |= Microsoft.Xna.Framework.Input.Buttons.Start;
-            }
-            if (gamePadButtons.BigButton == ButtonState.Pressed)
-            {
-                buttons |= Microsoft.Xna.Framework.Input.Buttons.BigButton;
-            }
-            if (gamePadButtons.LeftShoulder == ButtonState.Pressed)
-            {
-                buttons |= Microsoft.Xna.Framework.Input.Buttons.LeftShoulder;
-            }
-            if (gamePadButtons.RightShoulder == ButtonState.Pressed)
-            {
-                buttons |= Microsoft.Xna.Framework.Input.Buttons.RightShoulder;
-            }
-            if (gamePadButtons.LeftStick == ButtonState.Pressed)
-            {
-                buttons |= Microsoft.Xna.Framework.Input.Buttons.LeftStick;
-            }
-            if (gamePadButtons.RightStick == ButtonState.Pressed)
-            {
-                buttons |= Microsoft.Xna.Framework.Input.Buttons.RightStick;
-            }
+        }
+
+        //
+        // Summary:
+        //     Determines whether specified input device buttons are pressed in this GamePadState.
+        //
+        // Parameters:
+        //   button:
+        //     Buttons to query. Specify a single button, or combine multiple buttons using
+        //     a bitwise OR operation.
+        public bool IsButtonDown(Buttons button)
+        {
+            return (Buttons.buttons & button) == button;
+        }
+        //
+        // Summary:
+        //     Determines whether specified input device buttons are up (not pressed) in
+        //     this GamePadState.
+        //
+        // Parameters:
+        //   button:
+        //     Buttons to query. Specify a single button, or combine multiple buttons using
+        //     a bitwise OR operation.
+        public bool IsButtonUp(Buttons button)
+        {
+            return (Buttons.buttons & button) != button;
+        }
+
+        //
+        // Summary:
+        //     Determines whether two GamePadState instances are not equal.
+        //
+        // Parameters:
+        //   left:
+        //     Object on the left of the equal sign.
+        //
+        //   right:
+        //     Object on the right of the equal sign.
+        public static bool operator !=(GamePadState left, GamePadState right)
+        {
+            return !left.Equals(right);
+        }
+        //
+        // Summary:
+        //     Determines whether two GamePadState instances are equal.
+        //
+        // Parameters:
+        //   left:
+        //     Object on the left of the equal sign.
+        //
+        //   right:
+        //     Object on the right of the equal sign.
+        public static bool operator ==(GamePadState left, GamePadState right)
+        {
+            return left.Equals(right);
+        }
+        //
+        // Summary:
+        //     Returns a value that indicates whether the current instance is equal to a
+        //     specified object.
+        //
+        // Parameters:
+        //   obj:
+        //     Object with which to make the comparison.
+        public override bool Equals(object obj)
+        {
+            return base.Equals(obj);
+        }
+        //
+        // Summary:
+        //     Gets the hash code for this instance.
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+        //
+        // Summary:
+        //     Retrieves a string representation of this object.
+        public override string ToString()
+        {
+            return base.ToString();
         }
     }
-
 }
-
