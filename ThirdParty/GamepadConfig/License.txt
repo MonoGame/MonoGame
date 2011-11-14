@@ -1,0 +1,1 @@
+These files can be used for commercial and non-commercial projects that makes use of MonoGame.
