@@ -137,6 +137,14 @@ namespace Microsoft.Xna.Framework
             X += offsetX;
             Y += offsetY;
         }
+
+        public Point Location
+        {
+            get
+            {
+                return new Point(this.X, this.Y);
+            }
+        }
 		
 		public Point Center
 		{
