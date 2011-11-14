@@ -53,10 +53,10 @@ namespace Microsoft.Xna.Framework.Media
 		private bool _isLooped;
 		private Game _game;		
 		
-        public VideoPlayer()
+        public VideoPlayer(Game game)
         {
 			_state = MediaState.Stopped;
-			_game = Game.Instance;
+			_game = game;
         }
 
         public Texture2D GetTexture()
