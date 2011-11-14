@@ -73,12 +73,17 @@ namespace Microsoft.Xna.Framework
 		private Texture2D splashScreen;
 		private bool _mouseVisible = false;
 
+		private static Game _instance = null;
+		internal static Game Instance { get { return _instance; } }
+
 		delegate void InitialiseGameComponentsDelegate ();
 
 		#region Ctor
 		
 		public Game ()
 		{
+			_instance = this;
+
 			// Initialize collections
 			_services = new GameServiceContainer ();
 			_gameComponentCollection = new GameComponentCollection ();
