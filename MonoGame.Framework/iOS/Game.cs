@@ -127,8 +127,20 @@ namespace Microsoft.Xna.Framework
 			NSNotificationCenter.DefaultCenter.AddObserver( new NSString("UIDeviceOrientationDidChangeNotification"), (notification) => { 
 			UIDeviceOrientation orientation = UIDevice.CurrentDevice.Orientation;
 				
-				// Calculate supported orientations if it has been left as "default"
-            DisplayOrientation supportedOrientations = (graphicsDeviceManager as GraphicsDeviceManager).SupportedOrientations;
+			// Calculate supported orientations if it has been left as "default"
+			var gdm = (graphicsDeviceManager as GraphicsDeviceManager);
+            DisplayOrientation supportedOrientations = gdm.SupportedOrientations;
+			
+			if (GraphicsDevice.PresentationParameters.BackBufferWidth > gdm.PreferredBackBufferWidth)
+			{
+				GraphicsDevice.PresentationParameters.BackBufferWidth = gdm.PreferredBackBufferWidth;
+			}
+			
+			if (GraphicsDevice.PresentationParameters.BackBufferHeight > gdm.PreferredBackBufferHeight)
+			{
+				GraphicsDevice.PresentationParameters.BackBufferHeight = gdm.PreferredBackBufferHeight;
+			}
+				
             if ((supportedOrientations & DisplayOrientation.Default) != 0)
             {
                 if (GraphicsDevice.PresentationParameters.BackBufferWidth > GraphicsDevice.PresentationParameters.BackBufferHeight)
