@@ -214,7 +214,6 @@
     <Compile Include="CurveTangent.cs" />
     <Compile Include="Input\GamePadDPad.cs" />
     <Compile Include="Input\GamePadTriggers.cs" />
-    <Compile Include="Graphics\Effect.cs" />
     <Compile Include="Graphics\CompilerOptions.cs" />
     <Compile Include="Graphics\RenderState.cs" />
     <Compile Include="Audio\AudioListener.cs" />
@@ -355,6 +354,7 @@
     <Compile Include="Content\LzxDecoder.cs" />
     <Compile Include="Graphics\States\SamplerState.ES.cs" />
     <Compile Include="Content\ContentReaders\CurveReader.cs" />
+    <Compile Include="Input\GamePadDeadZone.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>

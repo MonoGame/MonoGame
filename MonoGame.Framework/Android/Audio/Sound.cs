@@ -185,7 +185,7 @@ namespace Microsoft.Xna.Framework.Audio
             // otherwise you cant play the file
             using (AssetFileDescriptor fd = Game.contextInstance.Assets.OpenFd(filename))
             {
-                _player.SetDataSource(fd.FileDescriptor);
+                _player.SetDataSource(fd.FileDescriptor, fd.StartOffset, fd.Length);
             }
             _player.Prepared += this.OnPrepared;
             this.Looping = looping;
