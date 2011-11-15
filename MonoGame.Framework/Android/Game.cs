@@ -105,7 +105,7 @@ namespace Microsoft.Xna.Framework
 			_content = new ContentManager(_services);
 
             view = new AndroidGameWindow(contextInstance);
-		    view.game = this;
+		    view.game = this;						
 			// Initialize GameTime
             _updateGameTime = new GameTime();
             _drawGameTime = new GameTime();
@@ -344,6 +344,18 @@ namespace Microsoft.Xna.Framework
         {
 			this.graphicsDeviceManager = this.Services.GetService(typeof(IGraphicsDeviceManager)) as IGraphicsDeviceManager;			
 			this.graphicsDeviceService = this.Services.GetService(typeof(IGraphicsDeviceService)) as IGraphicsDeviceService;			
+			
+			switch (Window.Context.Resources.Configuration.Orientation) {
+				case Android.Content.Res.Orientation.Portrait :
+					Window.SetOrientation(DisplayOrientation.Portrait);
+					break;				
+				case Android.Content.Res.Orientation.Landscape :
+				    Window.SetOrientation(DisplayOrientation.LandscapeLeft);
+					break;
+				default:
+				    Window.SetOrientation(DisplayOrientation.LandscapeLeft);
+					break;
+			} 
 
 			foreach (GameComponent gc in _gameComponentCollection)
 			{
