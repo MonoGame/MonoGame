@@ -66,6 +66,17 @@ namespace Microsoft.Xna.Framework.Input
             internal set;
         }
 
+	private static GamePadState initializedGamePadState =
+		new GamePadState(new GamePadThumbSticks(Vector2.Zero,Vector2.Zero), new GamePadTriggers(0,0),
+					new GamePadButtons(new Buttons[0]), new GamePadDPad(ButtonState.Released, ButtonState.Released,ButtonState.Released,ButtonState.Released));
+
+	internal static GamePadState InitializedState
+	{
+		get {
+				return initializedGamePadState;
+		}
+	}
+
         //
         // Summary:
         //     Initializes a new instance of the GamePadState class using the specified
