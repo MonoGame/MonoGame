@@ -251,8 +251,9 @@ using System.Collections.Generic;
         }
 
         public static GamePadState GetState(PlayerIndex playerIndex)
-        {      
-			return new GamePadState((Buttons)GamePad.Instance._buttons,GamePad.Instance._leftStick,GamePad.Instance._rightStick);
+        {    
+			return new GamePadState();
+			// TODO return new GamePadState((Buttons)GamePad.Instance._buttons,GamePad.Instance._leftStick,GamePad.Instance._rightStick);
         }
 
         public static bool SetVibration(PlayerIndex playerIndex, float leftMotor, float rightMotor)

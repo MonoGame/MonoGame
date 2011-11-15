@@ -194,7 +194,6 @@
     <Compile Include="Graphics\ClearOptions.cs" />
     <Compile Include="Graphics\CompilerOptions.cs" />
     <Compile Include="Graphics\DeviceType.cs" />
-    <Compile Include="Graphics\Effect.cs" />
     <Compile Include="Graphics\GraphicsDevice.cs" />
     <Compile Include="Graphics\GraphicsDeviceCapabilities.cs" />
     <Compile Include="Graphics\GraphicsDeviceInformation.cs" />
@@ -319,6 +318,7 @@
     <Compile Include="Audio\SoundBank.cs" />
     <Compile Include="Audio\Cue.cs" />
     <Compile Include="Audio\AudioStopOptions.cs" />
+    <Compile Include="Input\GamePadDeadZone.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
