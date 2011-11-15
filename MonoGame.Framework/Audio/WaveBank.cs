@@ -29,7 +29,7 @@ using System;
 using System.IO;
 namespace Microsoft.Xna.Framework.Audio
 {
-    public class WaveBank
+    public class WaveBank : IDisposable
     {
         internal Sound[] sounds;
         internal string BankName;
@@ -371,6 +371,13 @@ namespace Microsoft.Xna.Framework.Audio
                 
             }
         }
+
+		#region IDisposable implementation
+		public void Dispose ()
+		{
+			throw new NotImplementedException ();
+		}
+		#endregion
     }
 }
 

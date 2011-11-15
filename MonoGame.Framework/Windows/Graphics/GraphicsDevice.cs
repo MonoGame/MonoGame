@@ -408,7 +408,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             var vd = VertexDeclaration.FromType(_vertexBuffer._type);
             // Hmm, can the pointer here be changed with baseVertex?
-            VertexDeclaration.PrepareForUse(vd, IntPtr.Zero);
+            VertexDeclaration.PrepareForUse(vd);
 
             GL.DrawElements(PrimitiveTypeGL11(primitiveType), _indexBuffer._count, DrawElementsType.UnsignedShort, startIndex);
         }
@@ -426,7 +426,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (vertexOffset > 0)
                 arrayStart = new IntPtr(arrayStart.ToInt32() + (vertexOffset * vd.VertexStride));
 
-            VertexDeclaration.PrepareForUse(vd, arrayStart);
+            VertexDeclaration.PrepareForUse(vd);
 
             GL.DrawArrays(PrimitiveTypeGL11(primitiveType), vertexOffset, getElementCountArray(primitiveType, primitiveCount));
         }
@@ -434,7 +434,7 @@ namespace Microsoft.Xna.Framework.Graphics
         public void DrawPrimitives(PrimitiveType primitiveType, int vertexStart, int primitiveCount)
         {
             var vd = VertexDeclaration.FromType(_vertexBuffer._type);
-            VertexDeclaration.PrepareForUse(vd, IntPtr.Zero);
+            VertexDeclaration.PrepareForUse(vd);
 
             GL.DrawArrays(PrimitiveTypeGL11(primitiveType), vertexStart, getElementCountArray(primitiveType, primitiveCount));
         }
@@ -455,7 +455,7 @@ namespace Microsoft.Xna.Framework.Graphics
             IntPtr arrayStart = GCHandle.Alloc(vertexData, GCHandleType.Pinned).AddrOfPinnedObject();
             if (vertexOffset > 0)
                 arrayStart = new IntPtr(arrayStart.ToInt32() + vertexOffset);
-            VertexDeclaration.PrepareForUse(vd, arrayStart);
+            VertexDeclaration.PrepareForUse(vd);
 
             GL.DrawElements(PrimitiveTypeGL11(primitiveType), vertexCount, DrawElementsType.UnsignedShort, indexData);
         }

@@ -66,7 +66,7 @@ namespace Microsoft.Xna.Framework.Graphics
             throw new NotImplementedException();
         }
 
-        public static All OpenGLValueType(VertexElementFormat elementFormat)
+        public static VertexPointerType OpenGLVertexPointerType(this VertexElementFormat elementFormat)
         {
             switch (elementFormat)
             {
@@ -74,37 +74,169 @@ namespace Microsoft.Xna.Framework.Graphics
                     throw new NotImplementedException();
 
                 case VertexElementFormat.Vector2:
-                    return All.Float;
+                    return VertexPointerType.Float;
 
                 case VertexElementFormat.Vector3:
-                    return All.Float;
+                    return VertexPointerType.Float;
 
                 case VertexElementFormat.Vector4:
-                    return All.Float;
+                    return VertexPointerType.Float;
 
                 case VertexElementFormat.Color:
-                    return All.UnsignedByte;
+                    return VertexPointerType.Float;
 
                 case VertexElementFormat.Byte4:
-                    return All.UnsignedByte;
+                    return VertexPointerType.Short;
 
                 case VertexElementFormat.Short2:
-                    return All.UnsignedShort;
+                    return VertexPointerType.Short;
 
                 case VertexElementFormat.Short4:
-                    return All.UnsignedShort;
+                    return VertexPointerType.Short;
 
                 case VertexElementFormat.NormalizedShort2:
-                    return All.UnsignedShort;
+                    return VertexPointerType.Short;
 
                 case VertexElementFormat.NormalizedShort4:
-                    return All.UnsignedShort;
+                    return VertexPointerType.Short;
 
                 case VertexElementFormat.HalfVector2:
-                    return All.Float;
+                    return VertexPointerType.Float;
 
                 case VertexElementFormat.HalfVector4:
-                    return All.Float;
+                    return VertexPointerType.Float;
+            }
+
+            throw new NotImplementedException();
+        }
+
+        public static ColorPointerType OpenGLColorPointerType(this VertexElementFormat elementFormat)
+        {
+            switch (elementFormat)
+            {
+                case VertexElementFormat.Single:
+                    throw new NotImplementedException();
+
+                case VertexElementFormat.Vector2:
+                    return ColorPointerType.Float;
+
+                case VertexElementFormat.Vector3:
+                    return ColorPointerType.Float;
+
+                case VertexElementFormat.Vector4:
+                    return ColorPointerType.Float;
+
+                case VertexElementFormat.Color:
+                    return ColorPointerType.Float;
+
+                case VertexElementFormat.Byte4:
+                    return ColorPointerType.UnsignedByte;
+
+                case VertexElementFormat.Short2:
+                    return ColorPointerType.Short;
+
+                case VertexElementFormat.Short4:
+                    return ColorPointerType.Short;
+
+                case VertexElementFormat.NormalizedShort2:
+                    return ColorPointerType.UnsignedShort;
+
+                case VertexElementFormat.NormalizedShort4:
+                    return ColorPointerType.UnsignedShort;
+
+                case VertexElementFormat.HalfVector2:
+                    return ColorPointerType.HalfFloat;
+
+                case VertexElementFormat.HalfVector4:
+                    return ColorPointerType.HalfFloat;
+            }
+
+            throw new NotImplementedException();
+        }
+
+       public static NormalPointerType OpenGLNormalPointerType(this VertexElementFormat elementFormat)
+        {
+            switch (elementFormat)
+            {
+                case VertexElementFormat.Single:
+                    throw new NotImplementedException();
+
+                case VertexElementFormat.Vector2:
+                    return NormalPointerType.Float;
+
+                case VertexElementFormat.Vector3:
+                    return NormalPointerType.Float;
+
+                case VertexElementFormat.Vector4:
+                    return NormalPointerType.Float;
+
+                case VertexElementFormat.Color:
+                    return NormalPointerType.Float;
+
+                case VertexElementFormat.Byte4:
+                    return NormalPointerType.Byte;
+
+                case VertexElementFormat.Short2:
+                    return NormalPointerType.Short;
+
+                case VertexElementFormat.Short4:
+                    return NormalPointerType.Short;
+
+                case VertexElementFormat.NormalizedShort2:
+                    return NormalPointerType.Short;
+
+                case VertexElementFormat.NormalizedShort4:
+                    return NormalPointerType.Short;
+
+                case VertexElementFormat.HalfVector2:
+                    return NormalPointerType.HalfFloat;
+
+                case VertexElementFormat.HalfVector4:
+                    return NormalPointerType.HalfFloat;
+            }
+
+            throw new NotImplementedException();
+        }
+
+       public static TexCoordPointerType OpenGLTexCoordPointerType(this VertexElementFormat elementFormat)
+        {
+            switch (elementFormat)
+            {
+                case VertexElementFormat.Single:
+                    throw new NotImplementedException();
+
+                case VertexElementFormat.Vector2:
+                    return TexCoordPointerType.Float;
+
+                case VertexElementFormat.Vector3:
+                    return TexCoordPointerType.Float;
+
+                case VertexElementFormat.Vector4:
+                    return TexCoordPointerType.Float;
+
+                case VertexElementFormat.Color:
+                    return TexCoordPointerType.Float;
+
+                case VertexElementFormat.Byte4:
+                    return TexCoordPointerType.Float;
+
+                case VertexElementFormat.Short2:
+                    return TexCoordPointerType.Short;
+
+                case VertexElementFormat.Short4:
+                    return TexCoordPointerType.Short;
+
+                case VertexElementFormat.NormalizedShort2:
+                    return TexCoordPointerType.Short;
+
+                case VertexElementFormat.NormalizedShort4:
+                    return TexCoordPointerType.Short;
+
+                case VertexElementFormat.HalfVector2:
+                    return TexCoordPointerType.HalfFloat;
+
+                case VertexElementFormat.HalfVector4:
+                    return TexCoordPointerType.HalfFloat;
             }
 
             throw new NotImplementedException();

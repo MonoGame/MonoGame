@@ -42,7 +42,7 @@ using System;
 
 namespace Microsoft.Xna.Framework.Audio
 {
-	public class Cue
+	public class Cue : IDisposable
 	{
 		private string _name;
 		private Sound _sound;
@@ -116,6 +116,12 @@ namespace Microsoft.Xna.Framework.Audio
 			}
 		}
 		
+		#region IDisposable implementation
+		public void Dispose ()
+		{
+			_sound.Dispose();
+		}
+		#endregion
 	}
 }
 

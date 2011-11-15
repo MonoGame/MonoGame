@@ -73,6 +73,8 @@ namespace Microsoft.Xna.Framework.Content
 			RectangleReader hRectangleReader = new RectangleReader();
 			StringReader hStringReader = new StringReader();
 			Vector3Reader hVector3Reader = new Vector3Reader();
+			CurveReader hCurveReader = new CurveReader();
+			
             int numberOfReaders;
             ContentTypeReader[] contentReaders;		
 			
