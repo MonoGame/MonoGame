@@ -16,23 +16,24 @@ namespace Microsoft.Xna.Framework.Input
     //     code samples.
     public static class GamePad
     {
-
+		static bool running;
         static Settings settings;
         static Settings Settings
         {
-            get
+        	get
             {
-                if (settings == null)
+        		if (settings == null)
                 {
-                    settings = LoadConfigs("Settings.xml");
-                }
-                if (settings == null)
-                    throw new Exception("Gamepad settings broke");
-                else
+        			settings = LoadConfigs ("Settings.xml");
+                    if (settings == null)
+                        settings = new Settings();
+        		}
+                else if (!running)
                 {
-                    Init();
-                    return settings;
-                }
+        			Init ();
+        			return settings;
+				}
+				return settings;
             }
         }
         static Settings LoadConfigs(string filename)
@@ -50,24 +51,25 @@ namespace Microsoft.Xna.Framework.Input
             {
                 return null;
             }
-            for (int i = 0; i < 4; i++)
-                if (e[i] == null)
-                    e[i] = new PadConfig();
+            //for (int i = 0; i < 4; i++)
+              //  if (e[i] == null)
+                //    e[i] = new PadConfig(true);
             return e;
         }
 
         static IntPtr[] devices = new IntPtr[4];
 
-        static void Init()
+        static void Init ()
         {
-            Joystick.Init();
-            for (int i = 0; i < 4; i++)
+        	running = true;
+        	Joystick.Init ();
+        	for (int i = 0; i < 4; i++)
             {
-                PadConfig pc = settings[i];
-                if (pc.JoystickName == Sdl.SDL_JoystickName(pc.ID))
+        		PadConfig pc = settings[i];
+        		if (pc != null)
                 {
-                    devices[i] = Sdl.SDL_JoystickOpen(pc.ID);
-                }
+        			devices[i] = Sdl.SDL_JoystickOpen (pc.ID);
+				}
             }
         }
         static void Cleanup()
@@ -79,6 +81,7 @@ namespace Microsoft.Xna.Framework.Input
         {
             return devices[(int)index];
         }
+
         static PadConfig GetConfig(PlayerIndex index)
         {
             return Settings[(int)index];
@@ -151,9 +154,11 @@ namespace Microsoft.Xna.Framework.Input
 
         static GamePadState ReadState(PlayerIndex index, GamePadDeadZone deadZone)
         {
-            const float DeadZoneSize = 0.25f;
+            const float DeadZoneSize = 0.27f;
             IntPtr device = GetDevice(index);
             PadConfig c = GetConfig(index);
+            if (device == IntPtr.Zero || c == null)
+                return new GamePadState();
 
             GamePadThumbSticks sticks = new GamePadThumbSticks(new Vector2(c.LeftStick.ReadAxisPair(device)), new Vector2(c.RightStick.ReadAxisPair(device)));
             sticks.ApplyDeadZone(deadZone, DeadZoneSize);
@@ -177,7 +182,7 @@ namespace Microsoft.Xna.Framework.Input
             IntPtr d = GetDevice(playerIndex);
             PadConfig c = GetConfig(playerIndex);
 
-            if (c.JoystickName == null || c.JoystickName == string.Empty)
+            if (c == null || ((c.JoystickName == null || c.JoystickName == string.Empty) && d == IntPtr.Zero))
                 return new GamePadCapabilities();
 
             return new GamePadCapabilities()
