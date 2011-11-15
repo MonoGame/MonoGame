@@ -46,11 +46,11 @@ namespace Microsoft.Xna.Framework.Input
                     e = (Settings)x.Deserialize(s);
                 }
             }
-            catch
-            {
+            catch {
                 return null;
-            }
-            for (int i = 0; i < 4; i++)
+		}
+
+		for (int i = 0; i < 4; i++)
                 if (e[i] == null)
                     e[i] = new PadConfig();
             return e;
@@ -152,16 +152,21 @@ namespace Microsoft.Xna.Framework.Input
         static GamePadState ReadState(PlayerIndex index, GamePadDeadZone deadZone)
         {
             const float DeadZoneSize = 0.25f;
+			GamePadState g;
             IntPtr device = GetDevice(index);
             PadConfig c = GetConfig(index);
-
+			if (c.ID >= 0) {
             GamePadThumbSticks sticks = new GamePadThumbSticks(new Vector2(c.LeftStick.ReadAxisPair(device)), new Vector2(c.RightStick.ReadAxisPair(device)));
             sticks.ApplyDeadZone(deadZone, DeadZoneSize);
             GamePadTriggers triggers = new GamePadTriggers(c.LeftTrigger.ReadFloat(device), c.RightTrigger.ReadFloat(device));
             GamePadButtons buttons = new GamePadButtons(ReadButtons(device, c, DeadZoneSize));
             GamePadDPad dpad = new GamePadDPad(buttons.buttons);
 
-            GamePadState g = new GamePadState(sticks, triggers, buttons, dpad);
+            g = new GamePadState(sticks, triggers, buttons, dpad);
+			}
+			else {
+				g = GamePadState.InitializedState;
+			}
             return g;
         }
 
@@ -236,8 +241,14 @@ namespace Microsoft.Xna.Framework.Input
         //     Enumerated value that specifies what dead zone type to use.
         public static GamePadState GetState(PlayerIndex playerIndex, GamePadDeadZone deadZoneMode)
         {
-            Sdl.SDL_JoystickUpdate();
-            return ReadState(playerIndex, deadZoneMode);
+			Sdl.SDL_JoystickUpdate();
+			try {
+				return ReadState(playerIndex, deadZoneMode);
+			}
+			catch (Exception rsExec) {
+					//Console.WriteLine(rsExec.Message);
+					return GamePadState.InitializedState;
+				}
         }
         //
         // Summary:

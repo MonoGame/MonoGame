@@ -121,7 +121,7 @@ namespace Microsoft.Xna.Framework
 			//Set the current directory.
 			// We set the current directory to the ResourcePath on Mac
 			Directory.SetCurrentDirectory(NSBundle.MainBundle.ResourcePath);
-
+			Tao.Sdl.Sdl.SDL_Init(Tao.Sdl.Sdl.SDL_INIT_JOYSTICK);
 			// Leave these here for when we implement the Activate and Deactivated
 			_mainWindow.DidBecomeKey += delegate(object sender, EventArgs e) {
 				//if (!IsMouseVisible)
