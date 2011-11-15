@@ -80,7 +80,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		// Computes derived parameter values immediately before applying the effect.
 		protected internal override void OnApply()
 		{
-			
+			if(_texture != null)
+                _texture.Apply();
 		}
 			
 		public bool LightingEnabled 
