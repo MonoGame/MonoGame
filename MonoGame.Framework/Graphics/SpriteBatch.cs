@@ -138,8 +138,28 @@ namespace Microsoft.Xna.Framework.Graphics
 			GL.MatrixMode(All.Projection);
 			GL.LoadIdentity();							
 			
+#if ANDROID			
 			// Switch on the flags.
 	        switch (this.graphicsDevice.PresentationParameters.DisplayOrientation)
+	        {
+			
+				case DisplayOrientation.LandscapeRight:
+                {
+					GL.Rotate(180, 0, 0, 1); 
+					GL.Ortho(0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height,  0, -1, 1);
+					break;
+				}
+				
+				case DisplayOrientation.LandscapeLeft:
+				case DisplayOrientation.PortraitUpsideDown:
+                default:
+				{
+					GL.Ortho(0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height, 0, -1, 1);
+					break;
+				}
+			}					
+#else			
+			switch (this.graphicsDevice.PresentationParameters.DisplayOrientation)
 	        {
 				case DisplayOrientation.LandscapeLeft:
                 {
@@ -167,7 +187,8 @@ namespace Microsoft.Xna.Framework.Graphics
 					GL.Ortho(0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height, 0, -1, 1);
 					break;
 				}
-			}			
+			}		
+#endif			
 			
 			// Enable Scissor Tests if necessary
 			if ( this.graphicsDevice.RasterizerState.ScissorTestEnable )
