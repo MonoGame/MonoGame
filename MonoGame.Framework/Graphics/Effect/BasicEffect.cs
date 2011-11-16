@@ -7,11 +7,35 @@ namespace Microsoft.Xna.Framework.Graphics
 	{
 		Texture2D _texture = null;
 		
-        public BasicEffect(GraphicsDevice device)
-            : base(device)
+        public BasicEffect(GraphicsDevice device) : base(device)
         {
             createBasicEffect();
         }
+		
+		public BasicEffect(BasicEffect cloneSource) : base(null)
+        {
+            this.Alpha = cloneSource.Alpha;
+			this.AmbientLightColor = cloneSource.AmbientLightColor;
+			this.CurrentTechnique = cloneSource.CurrentTechnique;
+			this.DiffuseColor = cloneSource.DiffuseColor;
+			this.FogColor = cloneSource.FogColor;
+			this.FogEnabled = cloneSource.FogEnabled;
+			this.FogStart = cloneSource.FogStart;
+			this.graphicsDevice = cloneSource.GraphicsDevice;
+			// some lighting properties needed here
+			
+			this.LightingEnabled = cloneSource.LightingEnabled;
+			this.Name = cloneSource.Name;
+			this.Parameters = cloneSource.Parameters;
+			this.Projection = cloneSource.Projection;
+			this.Tag = cloneSource.Tag;
+			this.Techniques = cloneSource.Techniques;
+			this.Texture = cloneSource.Texture;
+			this.TextureEnabled = cloneSource.TextureEnabled;
+			this.VertexColorEnabled = cloneSource.VertexColorEnabled;
+			this.View = cloneSource.View;
+			this.World = cloneSource.World;
+		}
 		
         internal override void Apply()
         {
@@ -27,24 +51,11 @@ namespace Microsoft.Xna.Framework.Graphics
             GLStateManager.Textures2D(Texture != null);
 
             GLStateManager.ColorArray(VertexColorEnabled);
-        }
+		}
 
-		public BasicEffect(GraphicsDevice device, EffectPool effectPool)
-            : base(device, new byte[]{0}, CompilerOptions.None, effectPool)
-
+		public override Effect Clone()
         {
-            createBasicEffect();
-        }
-		
-		protected BasicEffect(GraphicsDevice device, BasicEffect clone)
-            : base(device, clone)
-        {
-            createBasicEffect();
-        }
-
-		public override Effect Clone(GraphicsDevice device)
-        {
-            BasicEffect effect = new BasicEffect(device, this);
+            BasicEffect effect = new BasicEffect(this);
             return effect;
         }
 

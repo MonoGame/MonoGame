@@ -60,31 +60,21 @@ namespace Microsoft.Xna.Framework.Graphics
 		internal List<int> vertexShaders = new List<int>();
 		internal List<int> fragmentShaders = new List<int>();
 
-        internal Effect(GraphicsDevice device)
+        internal Effect(GraphicsDevice aGraphicsDevice)
         {
-            if (graphicsDevice == null)
+            if (aGraphicsDevice == null)
             {
                 throw new ArgumentNullException("Graphics Device Cannot Be Null");
             }
-			this.graphicsDevice = graphicsDevice;
+			this.graphicsDevice = aGraphicsDevice;
 			
             Parameters = new EffectParameterCollection();
             Techniques = new EffectTechniqueCollection();
             CurrentTechnique = new EffectTechnique(this);
         }
 
-		public Effect(
-         GraphicsDevice graphicsDevice,
-         byte[] effectCode,
-         CompilerOptions options,
-         EffectPool pool) : this(graphicsDevice)
-		{			
-			if (pool == null)
-            { 
-				return;
-                // TODO throw new ArgumentNullException("Effect Pool Cannot Be Null");
-            }
-			
+		public Effect(GraphicsDevice aGraphicsDevice, byte[] effectCode): this(aGraphicsDevice)
+		{						
 			int fragmentblocklength = BitConverter.ToInt32(effectCode, 0);
 
             int vertexblocklength = BitConverter.ToInt32(effectCode, fragmentblocklength + 4);
@@ -188,14 +178,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 		}
 		
-		protected Effect(GraphicsDevice graphicsDevice, Effect cloneSource ) : this(graphicsDevice)
-		{
-			if(cloneSource != null)
-			{
-				// Clonage goes here
-			}
-		}
-		
 		internal Effect (GraphicsDevice aGraphicsDevice, string aFileName) : this(aGraphicsDevice)
 		{
 			StreamReader streamReader = new StreamReader (aFileName);
@@ -206,7 +188,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			{
 				CreateFragmentShaderFromSource(text);
 			}
-			else
+			else if ( aFileName.ToLower().Contains("fsh") )
 			{
 				CreateVertexShaderFromSource(text);
 			}
@@ -224,10 +206,15 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 		}
 		
-		public virtual Effect Clone(GraphicsDevice device)
+		public virtual Effect Clone()
 		{
-			Effect f = new Effect( graphicsDevice, this );
-			return f;
+			Effect ef = new Effect(this.GraphicsDevice);
+			ef.CurrentTechnique = this.CurrentTechnique;
+			ef.Name = this.Name;
+			ef.Parameters = this.Parameters;
+			ef.Tag = this.Tag;
+			ef.Techniques = this.Techniques;
+			return ef;
 		}
 		
 		public void End()
