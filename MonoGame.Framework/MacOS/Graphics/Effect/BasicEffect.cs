@@ -25,19 +25,43 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             createBasicEffect();
         }
-
+		
+		public BasicEffect(BasicEffect cloneSource) : base(cloneSource)
+        {
+            this.Alpha = cloneSource.Alpha;
+			this.AmbientLightColor = cloneSource.AmbientLightColor;
+			this.CurrentTechnique = cloneSource.CurrentTechnique;
+			this.DiffuseColor = cloneSource.DiffuseColor;
+			
+			// some lighting properties needed here
+			
+			this.LightingEnabled = cloneSource.LightingEnabled;
+			this.Projection = cloneSource.Projection;;
+			this.Texture = cloneSource.Texture;
+			this.TextureEnabled = cloneSource.TextureEnabled;
+			this.VertexColorEnabled = cloneSource.VertexColorEnabled;
+			this.View = cloneSource.View;
+			this.World = cloneSource.World;
+		}
+		
+		// Computes derived parameter values immediately before applying the effect.
 		internal protected override void OnApply ()
 		{
-			Apply ();
+			if(_texture != null)
+                _texture.Apply();
 		}
 	// TODO: This all needs to be redone
 	// Take a look at AlphaTest for example
         private void Apply()
         {
+			// May need to be moved elsewhere within this method
+			OnApply();
+			
             GLStateManager.Projection(Projection);
             GLStateManager.World(World);
             GLStateManager.View(View);
-			//base.Apply();
+			
+			base.Apply();
 			
 			// set camera
 			//Matrix _matrix = Matrix.Identity;
@@ -57,27 +81,14 @@ namespace Microsoft.Xna.Framework.Graphics
 			//GL.EnableClientState(ArrayCap.TextureCoordArray);
 			
 			//GL.Disable(EnableCap.CullFace);
-		GLStateManager.Textures2D(Texture != null);
-
-		GLStateManager.ColorArray(VertexColorEnabled);
+			GLStateManager.Textures2D(Texture != null);
+			
+			GLStateManager.ColorArray(VertexColorEnabled);
         }
 
-		public BasicEffect(GraphicsDevice device, EffectPool effectPool)
-            : base(device, new byte[]{0}, CompilerOptions.None, effectPool)
-
+		public override Effect Clone()
         {
-            createBasicEffect();
-        }
-		
-		protected BasicEffect(GraphicsDevice device, BasicEffect clone)
-            : base(device, clone)
-        {
-            createBasicEffect();
-        }
-
-		public override Effect Clone(GraphicsDevice device)
-        {
-            BasicEffect effect = new BasicEffect(device, this);
+            BasicEffect effect = new BasicEffect(this);
             return effect;
         }
 
@@ -155,7 +166,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		private void setTexture(Texture2D texture)
 		{
-			GL.BindTexture(TextureTarget.Texture2D, texture.Image.Name);
+			// RGL.BindTexture(TextureTarget.Texture2D, texture.Image.Name);
 		}
 
         public Texture2D Texture {
