@@ -131,14 +131,15 @@ namespace Microsoft.Xna.Framework
 			var gdm = (graphicsDeviceManager as GraphicsDeviceManager);
             DisplayOrientation supportedOrientations = gdm.SupportedOrientations;
 			
-			if (GraphicsDevice.PresentationParameters.BackBufferWidth > gdm.PreferredBackBufferWidth)
+			if (GraphicsDevice.PresentationParameters.BackBufferWidth != gdm.PreferredBackBufferWidth)
 			{
 				GraphicsDevice.PresentationParameters.BackBufferWidth = gdm.PreferredBackBufferWidth;
 			}
 			
-			if (GraphicsDevice.PresentationParameters.BackBufferHeight > gdm.PreferredBackBufferHeight)
+			if (GraphicsDevice.PresentationParameters.BackBufferHeight != gdm.PreferredBackBufferHeight)
 			{
 				GraphicsDevice.PresentationParameters.BackBufferHeight = gdm.PreferredBackBufferHeight;
+
 			}
 				
             if ((supportedOrientations & DisplayOrientation.Default) != 0)
