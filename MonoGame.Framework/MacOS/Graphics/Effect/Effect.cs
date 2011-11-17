@@ -70,14 +70,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			GraphicsDevice graphicsDevice,
 			byte[] effectCode,
 			CompilerOptions options,
-			EffectPool pool)
+			EffectPool pool) : this(graphicsDevice)
 		{
-
-			if (graphicsDevice == null) {
-				throw new ArgumentNullException ("Graphics Device Cannot Be Null");
-			}
-			this.graphicsDevice = graphicsDevice;
-
 			if (pool == null) { 
 				return;
 				// TODO throw new ArgumentNullException("Effect Pool Cannot Be Null");
@@ -132,22 +126,26 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		}
 
-		protected Effect (GraphicsDevice graphicsDevice, Effect cloneSource)
+		protected Effect (GraphicsDevice graphicsDevice, Effect cloneSource) : this(graphicsDevice)
 		{
-			if (graphicsDevice == null) {
-				throw new ArgumentNullException ("Graphics Device Cannot Be Null");
+			// Add Clonage code here
+			if ( cloneSource != null )
+			{
+				
 			}
-			this.graphicsDevice = graphicsDevice;
 		}
 
 		protected Effect (GraphicsDevice graphicsDevice)
 		{
-			if (graphicsDevice == null) {
-				throw new ArgumentNullException ("Graphics Device Cannot Be Null");
-			}
+			if (graphicsDevice == null)
+            {
+                throw new ArgumentNullException("Graphics Device Cannot Be Null");
+            }
 			this.graphicsDevice = graphicsDevice;
+			
 			Techniques = new EffectTechniqueCollection ();
 			Parameters = new EffectParameterCollection();
+			CurrentTechnique = new EffectTechnique(this);
 		}
 		
 		internal Effect (GraphicsDevice aGraphicsDevice, string aFileName) : this(aGraphicsDevice)
@@ -171,7 +169,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		protected Effect (Effect cloneSource)
 		{
-
+			throw new NotImplementedException();
 		}
 
 		public Effect (
@@ -281,11 +279,11 @@ namespace Microsoft.Xna.Framework.Graphics
 			set; 
 		}
 
-//		internal virtual void Apply ()
-//		{
-//			//if (graphicsDevice.Textures.)
-//			Techniques[0].Passes[0].Apply();
-//		}
+		internal virtual void Apply ()
+		{
+			/* TODO if (graphicsDevice.Textures.)
+			  Techniques[0].Passes[0].Apply(); */
+		}
 
 		protected internal virtual void OnApply ()
 		{

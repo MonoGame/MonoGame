@@ -76,12 +76,6 @@ namespace Microsoft.Xna.Framework.Input
 			if (_keys != null)
 			{
                 return _keys.Contains(key);
-//				foreach(Keys kkey in _keys) {
-//					
-//					if (kkey == key) {
-//						return true;
-//					}
-//				}
 			}
 			return false;
 		}
@@ -90,13 +84,7 @@ namespace Microsoft.Xna.Framework.Input
 		{
 			if (_keys != null)
 			{
-			    return _keys.Contains(key);
-//				foreach(Keys kkey in _keys) {
-//					
-//					if (kkey == key) {
-//						return false;
-//					}
-//				}
+			    return !_keys.Contains(key);
 			}
 			return true;
 		}
@@ -109,6 +97,18 @@ namespace Microsoft.Xna.Framework.Input
 			{
 				return (IsKeyDown(key) ? KeyState.Down : KeyState.Up);
 			}			
+		}
+		#endregion
+		
+		#region Operator overloads
+		public static bool operator == (KeyboardState first, KeyboardState second)
+		{
+			return first.GetHashCode() == second.GetHashCode();
+		}
+		
+		public static bool operator != (KeyboardState first, KeyboardState second)
+		{
+			return first.GetHashCode() != second.GetHashCode();
 		}
 		#endregion
 	}
