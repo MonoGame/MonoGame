@@ -12,24 +12,18 @@ namespace Microsoft.Xna.Framework.Graphics
             createBasicEffect();
         }
 		
-		public BasicEffect(BasicEffect cloneSource) : base(null)
+		public BasicEffect(BasicEffect cloneSource) : base(cloneSource)
         {
             this.Alpha = cloneSource.Alpha;
 			this.AmbientLightColor = cloneSource.AmbientLightColor;
-			this.CurrentTechnique = cloneSource.CurrentTechnique;
 			this.DiffuseColor = cloneSource.DiffuseColor;
 			this.FogColor = cloneSource.FogColor;
 			this.FogEnabled = cloneSource.FogEnabled;
 			this.FogStart = cloneSource.FogStart;
-			this.graphicsDevice = cloneSource.GraphicsDevice;
 			// some lighting properties needed here
 			
 			this.LightingEnabled = cloneSource.LightingEnabled;
-			this.Name = cloneSource.Name;
-			this.Parameters = cloneSource.Parameters;
 			this.Projection = cloneSource.Projection;
-			this.Tag = cloneSource.Tag;
-			this.Techniques = cloneSource.Techniques;
 			this.Texture = cloneSource.Texture;
 			this.TextureEnabled = cloneSource.TextureEnabled;
 			this.VertexColorEnabled = cloneSource.VertexColorEnabled;

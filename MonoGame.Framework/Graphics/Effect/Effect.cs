@@ -72,6 +72,15 @@ namespace Microsoft.Xna.Framework.Graphics
             Techniques = new EffectTechniqueCollection();
             CurrentTechnique = new EffectTechnique(this);
         }
+		
+		protected Effect(Effect cloneSource) : this(cloneSource.GraphicsDevice)
+		{
+			this.CurrentTechnique = cloneSource.CurrentTechnique;
+			this.Name = cloneSource.Name;
+			this.Parameters = cloneSource.Parameters;
+			this.Tag = cloneSource.Tag;
+			this.Techniques = cloneSource.Techniques;
+		}
 
 		public Effect(GraphicsDevice aGraphicsDevice, byte[] effectCode): this(aGraphicsDevice)
 		{						
@@ -188,9 +197,13 @@ namespace Microsoft.Xna.Framework.Graphics
 			{
 				CreateFragmentShaderFromSource(text);
 			}
-			else if ( aFileName.ToLower().Contains("fsh") )
+			else if ( aFileName.ToLower().Contains("vsh") )
 			{
 				CreateVertexShaderFromSource(text);
+			}			
+			else
+			{
+				throw new ArgumentException( aFileName + " not supported!" );
 			}
 			
 			DefineTechnique ("Technique1", "Pass1", 0, 0);
@@ -208,12 +221,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		public virtual Effect Clone()
 		{
-			Effect ef = new Effect(this.GraphicsDevice);
-			ef.CurrentTechnique = this.CurrentTechnique;
-			ef.Name = this.Name;
-			ef.Parameters = this.Parameters;
-			ef.Tag = this.Tag;
-			ef.Techniques = this.Techniques;
+			Effect ef = new Effect(this);
 			return ef;
 		}
 		
