@@ -1,279 +1,467 @@
-using System;
-
-using MonoMac.OpenGL;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
+	/// <summary>
+	/// /// Built-in effect that supports optional texturing, vertex coloring, fog, and lighting.
+	/// /// </summary>
 	public class BasicEffect : Effect, IEffectMatrices, IEffectLights, IEffectFog
 	{
-		Texture2D _texture = null;
-		
-		private float _alpha;
-		private Vector3 _ambientLightColor;
-		private Vector3 _diffuseColor;
-		private Vector3 _specularColor;
-		private float _specularPower;
-		
-		private DirectionalLight light0;
-		private DirectionalLight light1;
-		private DirectionalLight light2;
-		private bool lightingEnabled;
-		
-		
-        public BasicEffect(GraphicsDevice device)
-            : base(device)
-        {
-            createBasicEffect();
-        }
-		
-		public BasicEffect(BasicEffect cloneSource) : base(cloneSource)
-        {
-            this.Alpha = cloneSource.Alpha;
-			this.AmbientLightColor = cloneSource.AmbientLightColor;
-			this.CurrentTechnique = cloneSource.CurrentTechnique;
-			this.DiffuseColor = cloneSource.DiffuseColor;
-			
-			// some lighting properties needed here
-			
-			this.LightingEnabled = cloneSource.LightingEnabled;
-			this.Projection = cloneSource.Projection;;
-			this.Texture = cloneSource.Texture;
-			this.TextureEnabled = cloneSource.TextureEnabled;
-			this.VertexColorEnabled = cloneSource.VertexColorEnabled;
-			this.View = cloneSource.View;
-			this.World = cloneSource.World;
+		EffectParameter textureParam;
+		EffectParameter diffuseColorParam;
+		EffectParameter emissiveColorParam;
+		EffectParameter specularColorParam;
+		EffectParameter specularPowerParam;
+		EffectParameter eyePositionParam;
+		EffectParameter fogColorParam;
+		EffectParameter fogVectorParam;
+		EffectParameter worldParam;
+		EffectParameter worldInverseTransposeParam;
+		EffectParameter worldViewProjParam;
+		EffectParameter shaderIndexParam;
+		bool lightingEnabled;
+		bool preferPerPixelLighting;
+		bool oneLight;
+		bool fogEnabled;
+		bool textureEnabled;
+		bool vertexColorEnabled;
+		Matrix world = Matrix.Identity;
+		Matrix view = Matrix.Identity;
+		Matrix projection = Matrix.Identity;
+		Matrix worldView;
+		Vector3 diffuseColor = Vector3.One;
+		Vector3 emissiveColor = Vector3.Zero;
+		Vector3 ambientLightColor = Vector3.Zero;
+		float alpha = 1;
+		DirectionalLight light0;
+		DirectionalLight light1;
+		DirectionalLight light2;
+		float fogStart = 0;
+		float fogEnd = 1;
+		EffectDirtyFlags dirtyFlags = EffectDirtyFlags.All;
+
+
+
+		/// <summary>
+		/// Gets or sets the world matrix.
+		/// </summary>
+		public Matrix World {
+			get { return world; }
+
+			set {
+				world = value;
+				dirtyFlags |= EffectDirtyFlags.World | EffectDirtyFlags.WorldViewProj | EffectDirtyFlags.Fog;
+			}
 		}
-		
-		// Computes derived parameter values immediately before applying the effect.
-		internal protected override void OnApply ()
+
+
+		/// <summary>
+		/// Gets or sets the view matrix.
+		/// </summary>
+		public Matrix View {
+			get { return view; }
+
+			set {
+				view = value;
+				dirtyFlags |= EffectDirtyFlags.WorldViewProj | EffectDirtyFlags.EyePosition | EffectDirtyFlags.Fog;
+			}
+		}
+
+
+		/// <summary>
+		/// Gets or sets the projection matrix.
+		/// </summary>
+		public Matrix Projection {
+			get { return projection; }
+            
+			set {
+				projection = value;
+				dirtyFlags |= EffectDirtyFlags.WorldViewProj;
+			}
+		}
+
+
+		/// <summary>
+		/// Gets or sets the material diffuse color (range 0 to 1).
+		/// </summary>
+		public Vector3 DiffuseColor {
+			get { return diffuseColor; }
+            
+			set {
+				diffuseColor = value;
+				dirtyFlags |= EffectDirtyFlags.MaterialColor;
+			}
+		}
+
+
+		/// <summary>
+		/// Gets or sets the material emissive color (range 0 to 1).
+		/// </summary>
+		public Vector3 EmissiveColor {
+			get { return emissiveColor; }
+            
+			set {
+				emissiveColor = value;
+				dirtyFlags |= EffectDirtyFlags.MaterialColor;
+			}
+		}
+
+
+		/// <summary>
+		/// Gets or sets the material specular color (range 0 to 1).
+		/// </summary>
+		public Vector3 SpecularColor {
+			get { return specularColorParam.GetValueVector3 (); }
+			set { specularColorParam.SetValue (value); }
+		}
+
+
+		/// <summary>
+		/// Gets or sets the material specular power.
+		/// </summary>
+		public float SpecularPower {
+			get { return specularPowerParam.GetValueSingle (); }
+			set { specularPowerParam.SetValue (value); }
+		}
+
+
+		/// <summary>
+		/// Gets or sets the material alpha.
+		/// </summary>
+		public float Alpha {
+			get { return alpha; }
+            
+			set {
+				alpha = value;
+				dirtyFlags |= EffectDirtyFlags.MaterialColor;
+			}
+		}
+
+
+		/// <summary>
+		/// Gets or sets the lighting enable flag.
+		/// </summary>
+		public bool LightingEnabled {
+			get { return lightingEnabled; }
+            
+			set {
+				if (lightingEnabled != value) {
+					lightingEnabled = value;
+					dirtyFlags |= EffectDirtyFlags.ShaderIndex | EffectDirtyFlags.MaterialColor;
+				}
+			}
+		}
+
+
+		/// <summary>
+		/// Gets or sets the per-pixel lighting prefer flag.
+		/// </summary>
+		public bool PreferPerPixelLighting {
+			get { return preferPerPixelLighting; }
+            
+			set {
+				if (preferPerPixelLighting != value) {
+					preferPerPixelLighting = value;
+					dirtyFlags |= EffectDirtyFlags.ShaderIndex;
+				}
+			}
+		}
+
+
+		/// <summary>
+		/// Gets or sets the ambient light color (range 0 to 1).
+		/// </summary>
+		public Vector3 AmbientLightColor {
+			get { return ambientLightColor; }
+
+			set {
+				ambientLightColor = value;
+				dirtyFlags |= EffectDirtyFlags.MaterialColor;
+			}
+		}
+
+
+		/// <summary>
+		/// Gets the first directional light.
+		/// </summary>
+		public DirectionalLight DirectionalLight0 { get { return light0; } }
+
+
+		/// <summary>
+		/// Gets the second directional light.
+		/// </summary>
+		public DirectionalLight DirectionalLight1 { get { return light1; } }
+
+
+		/// <summary>
+		/// Gets the third directional light.
+		/// </summary>
+		public DirectionalLight DirectionalLight2 { get { return light2; } }
+
+
+		/// <summary>
+		/// Gets or sets the fog enable flag.
+		/// </summary>
+		public bool FogEnabled {
+			get { return fogEnabled; }
+
+			set {
+				if (fogEnabled != value) {
+					fogEnabled = value;
+					dirtyFlags |= EffectDirtyFlags.ShaderIndex | EffectDirtyFlags.FogEnable;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Gets or sets the fog start distance.
+		/// </summary>
+		public float FogStart {
+			get { return fogStart; }
+			set {
+				fogStart = value;
+				dirtyFlags |= EffectDirtyFlags.Fog;
+			}
+		}
+		/// <summary>
+		/// Gets or sets the fog end distance.
+		/// </summary>
+		public float FogEnd {
+			get { return fogEnd; }
+
+			set {
+				fogEnd = value;
+				dirtyFlags |= EffectDirtyFlags.Fog;
+			}
+		}
+
+
+		/// <summary>
+		/// Gets or sets the fog color.
+		/// </summary>
+		public Vector3 FogColor {
+			get { return fogColorParam.GetValueVector3 (); }
+			set { fogColorParam.SetValue (value); }
+		}
+
+
+		/// <summary>
+		/// Gets or sets whether texturing is enabled.
+		/// </summary>
+		public bool TextureEnabled {
+			get { return textureEnabled; }
+
+			set {
+				if (textureEnabled != value) {
+					textureEnabled = value;
+					dirtyFlags |= EffectDirtyFlags.ShaderIndex;
+				}
+			}
+		}
+
+
+		/// <summary>
+		/// Gets or sets the current texture.
+		/// </summary>
+		public Texture2D Texture {
+			get { return textureParam.GetValueTexture2D (); }
+			set { textureParam.SetValue (value); }
+		}
+
+
+		/// <summary>
+		/// Gets or sets whether vertex color is enabled.
+
+		/// </summary>
+		public bool VertexColorEnabled {
+			get { return vertexColorEnabled; }
+
+			set {
+				if (vertexColorEnabled != value) {
+					vertexColorEnabled = value;
+					dirtyFlags |= EffectDirtyFlags.ShaderIndex;
+				}
+			}
+		}
+
+
+		/// <summary>
+		/// Creates a new BasicEffect with default parameter settings.
+		/// </summary>
+		public BasicEffect (GraphicsDevice device)
+			//:base(device, Resources.BasicEffect)
+			:base(device)
 		{
-			if(_texture != null)
-                _texture.Apply();
-			Apply();
+			CacheEffectParameters (null);
+			// We only create the fragment code for now
+			// There needs to be a vertex shader created as well as per the Microsoft BaseEffects
+			//CreateFragmentShaderFromSource (AlphaTestEffectCode.AlphaTestEffectFragmentCode());
+			DefineTechnique ("BasicEffect", "", 0, 0);
+			CurrentTechnique = Techniques ["BasicEffect"];
+//			DirectionalLight0.Enabled = true;
+//
+//			SpecularColor = Vector3.One;
+//			SpecularPower = 16;
+
 		}
-	// TODO: This all needs to be redone
-	// Take a look at AlphaTest for example
-        private void Apply()
-        {
-			// May need to be moved elsewhere within this method
-			//OnApply();
-			
-            GLStateManager.Projection(Projection);
+
+
+		/// <summary>
+		/// Creates a new BasicEffect by cloning parameter settings from an existing instance.
+		/// </summary>
+		protected BasicEffect (BasicEffect cloneSource)
+            : base(cloneSource)
+		{
+			CacheEffectParameters (cloneSource);
+
+			lightingEnabled = cloneSource.lightingEnabled;
+			preferPerPixelLighting = cloneSource.preferPerPixelLighting;
+			fogEnabled = cloneSource.fogEnabled;
+			textureEnabled = cloneSource.textureEnabled;
+			vertexColorEnabled = cloneSource.vertexColorEnabled;
+
+			world = cloneSource.world;
+			view = cloneSource.view;
+			projection = cloneSource.projection;
+
+			diffuseColor = cloneSource.diffuseColor;
+			emissiveColor = cloneSource.emissiveColor;
+			ambientLightColor = cloneSource.ambientLightColor;
+
+			alpha = cloneSource.alpha;
+
+			fogStart = cloneSource.fogStart;
+			fogEnd = cloneSource.fogEnd;
+		}
+
+
+		/// <summary>
+		/// Creates a clone of the current BasicEffect instance.
+		/// </summary>
+		public override Effect Clone ()
+		{
+			return new BasicEffect (this);
+		}
+
+
+		/// <summary>
+		/// Sets up the standard key/fill/back lighting rig.
+		/// </summary>
+		public void EnableDefaultLighting ()
+		{
+			LightingEnabled = true;
+
+			AmbientLightColor = EffectHelpers.EnableDefaultLighting (light0, light1, light2);
+		}
+
+
+		/// <summary>
+		/// Looks up shortcut references to our effect parameters.
+		/// </summary>
+		void CacheEffectParameters (BasicEffect cloneSource)
+		{
+//			textureParam = Parameters ["Texture"];
+//			diffuseColorParam = Parameters ["DiffuseColor"];
+//			emissiveColorParam = Parameters ["EmissiveColor"];
+//			specularColorParam = Parameters ["SpecularColor"];
+//			specularPowerParam = Parameters ["SpecularPower"];
+//			eyePositionParam = Parameters ["EyePosition"];
+//			fogColorParam = Parameters ["FogColor"];
+//			fogVectorParam = Parameters ["FogVector"];
+//			worldParam = Parameters ["World"];
+//			worldInverseTransposeParam = Parameters ["WorldInverseTranspose"];
+//			worldViewProjParam = Parameters ["WorldViewProj"];
+//			shaderIndexParam = Parameters ["ShaderIndex"];
+//
+//			light0 = new DirectionalLight (Parameters ["DirLight0Direction"],
+//                                          Parameters ["DirLight0DiffuseColor"],
+//                                          Parameters ["DirLight0SpecularColor"],
+//                                          (cloneSource != null) ? cloneSource.light0 : null);
+//
+//			light1 = new DirectionalLight (Parameters ["DirLight1Direction"],
+//                                          Parameters ["DirLight1DiffuseColor"],
+//                                          Parameters ["DirLight1SpecularColor"],
+//                                          (cloneSource != null) ? cloneSource.light1 : null);
+//
+//			light2 = new DirectionalLight (Parameters ["DirLight2Direction"],
+//                                          Parameters ["DirLight2DiffuseColor"],
+//                                          Parameters ["DirLight2SpecularColor"],
+//                                          (cloneSource != null) ? cloneSource.light2 : null);
+		}
+
+
+		/// <summary>
+		/// Lazily computes derived parameter values immediately before applying the effect.
+		/// </summary>
+		protected internal override void OnApply ()
+		{
+			            GLStateManager.Projection(Projection);
             GLStateManager.World(World);
             GLStateManager.View(View);
-			
-			//base.Apply();
-			
-			// set camera
-			//Matrix _matrix = Matrix.Identity;
-			//GL.MatrixMode(MatrixMode.Projection);
-			//GL.LoadIdentity();
-			//GL.Ortho(0, 320, 480, 0, -1, 1);
-			//GL.MatrixMode(MatrixMode.Modelview);
-			//GL.LoadMatrix( ref _matrix.M11 );
-			//GL.Viewport (0, 0, 320, 480);
-						
-			// Initialize OpenGL states (ideally move this to initialize somewhere else)	
-			//GL.Disable(EnableCap.DepthTest);
-			//GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode,(int) All.BlendSrc);
-			//GL.Enable(EnableCap.Texture2D);
-			//GL.EnableClientState(ArrayCap.VertexArray);
-			//GL.EnableClientState(ArrayCap.ColorArray);
-			//GL.EnableClientState(ArrayCap.TextureCoordArray);
-			
-			//GL.Disable(EnableCap.CullFace);
-			GLStateManager.Textures2D(Texture != null);
-			
+						//System.Console.WriteLine("Apply");
+
+			// Override this for now for testing purposes
+			//dirtyFlags |= EffectDirtyFlags.World | EffectDirtyFlags.WorldViewProj;
+			//dirtyFlags |= EffectDirtyFlags.WorldViewProj | EffectDirtyFlags.EyePosition;
+			//dirtyFlags &= ~EffectDirtyFlags.FogEnable; // turn off fog for now
+
+
+			// Recompute the world+view+projection matrix or fog vector?
+//			dirtyFlags = EffectHelpers.SetWorldViewProjAndFog (dirtyFlags, ref world, ref view, ref projection, ref worldView, fogEnabled, fogStart, fogEnd, worldViewProjParam, fogVectorParam);
+//
+//			// Recompute the diffuse/emissive/alpha material color parameters?
+//			if ((dirtyFlags & EffectDirtyFlags.MaterialColor) != 0) {
+//				EffectHelpers.SetMaterialColor (lightingEnabled, alpha, ref diffuseColor, ref emissiveColor, ref ambientLightColor, diffuseColorParam, emissiveColorParam);
+//
+//				dirtyFlags &= ~EffectDirtyFlags.MaterialColor;
+//			}
+//
+//			if (lightingEnabled) {
+//				// Recompute the world inverse transpose and eye position?
+//				dirtyFlags = EffectHelpers.SetLightingMatrices (dirtyFlags, ref world, ref view, worldParam, worldInverseTransposeParam, eyePositionParam);
+//                
+//				// Check if we can use the only-bother-with-the-first-light shader optimization.
+//				bool newOneLight = !light1.Enabled && !light2.Enabled;
+//                
+//				if (oneLight != newOneLight) {
+//					oneLight = newOneLight;
+//					dirtyFlags |= EffectDirtyFlags.ShaderIndex;
+//				}
+//			}
+			GLStateManager.Textures2D(false);
 			GLStateManager.ColorArray(VertexColorEnabled);
-        }
+			// Recompute the shader index?
+//			if ((dirtyFlags & EffectDirtyFlags.ShaderIndex) != 0) {
+//				int shaderIndex = 0;
+//                
+//				if (!fogEnabled)
+//					shaderIndex += 1;
+//                
+//				if (vertexColorEnabled)
+//					shaderIndex += 2;
+//                
+//				if (textureEnabled)
+//					shaderIndex += 4;
+//
+//				if (lightingEnabled) {
+//					if (preferPerPixelLighting)
+//						shaderIndex += 24;
+//					else if (oneLight)
+//						shaderIndex += 16;
+//					else
+//						shaderIndex += 8;
+//				}
+//
+//				//shaderIndexParam.SetValue (shaderIndex);
+//
+//				dirtyFlags &= ~EffectDirtyFlags.ShaderIndex;
+//			}
 
-		public override Effect Clone()
-        {
-            BasicEffect effect = new BasicEffect(this);
-            return effect;
-        }
 
-        private void createBasicEffect()
-        {
-            var et = new EffectTechnique(this);
-            Techniques["Wtf"] = et;
-            CurrentTechnique = et;
-			var pass = new EffectPass(et);
-			pass.Name = "Wtf2";
-            et.Passes[pass.Name] = pass; 
-        }
-
-        public void EnableDefaultLighting()
-        {
-           /* this.LightingEnabled = true;
-            this.AmbientLightColor = new Vector3(0.05333332f, 0.09882354f, 0.1819608f);
-            Vector3 color = new Vector3(1f, 0.9607844f, 0.8078432f);
-            this.DirectionalLight0.DiffuseColor = color;
-            this.DirectionalLight0.Direction = new Vector3(-0.5265408f, -0.5735765f, -0.6275069f);
-            this.DirectionalLight0.SpecularColor = color;
-            this.DirectionalLight0.Enabled = true;
-            this.DirectionalLight1.DiffuseColor = new Vector3(0.9647059f, 0.7607844f, 0.4078432f);
-            this.DirectionalLight1.Direction = new Vector3(0.7198464f, 0.3420201f, 0.6040227f);
-            this.DirectionalLight1.SpecularColor = Vector3.Zero;
-            this.DirectionalLight1.Enabled = true;
-            color = new Vector3(0.3231373f, 0.3607844f, 0.3937255f);
-            this.DirectionalLight2.DiffuseColor = color;
-            this.DirectionalLight2.Direction = new Vector3(0.4545195f, -0.7660444f, 0.4545195f);
-            this.DirectionalLight2.SpecularColor = color;
-            this.DirectionalLight2.Enabled = true;*/
-        }
-   internal static Vector3 EnableDefaultLighting(DirectionalLight light0, DirectionalLight light1, DirectionalLight light2)
-    {
-      light0.Direction = new Vector3(-0.5265408f, -0.5735765f, -0.6275069f);
-      light0.DiffuseColor = new Vector3(1f, 0.9607844f, 0.8078432f);
-      light0.SpecularColor = new Vector3(1f, 0.9607844f, 0.8078432f);
-      light0.Enabled = true;
-      light1.Direction = new Vector3(0.7198464f, 0.3420201f, 0.6040227f);
-      light1.DiffuseColor = new Vector3(0.9647059f, 0.7607844f, 0.4078432f);
-      light1.SpecularColor = Vector3.Zero;
-      light1.Enabled = true;
-      light2.Direction = new Vector3(0.4545195f, -0.7660444f, 0.4545195f);
-      light2.DiffuseColor = new Vector3(0.3231373f, 0.3607844f, 0.3937255f);
-      light2.SpecularColor = new Vector3(0.3231373f, 0.3607844f, 0.3937255f);
-      light2.Enabled = true;
-      return new Vector3(0.05333332f, 0.09882354f, 0.1819608f);
-    }		
-			
-		public Matrix Projection
-		{ 
-			get; set; 
-		}
-		
-		public bool TextureEnabled 
-		{ 
-			get; set; 
-		}
-		
-		public bool VertexColorEnabled 
-		{ 
-			get; set; 
-		}
-		#region IEffectMatrices implementation		
-		public Matrix View
-		{ 
-			get; set; 
 		}
 
-		public Matrix World
-		{ 
-			get; set; 
-		}
-		#endregion
-		
-		private void setTexture(Texture2D texture)
-		{
-			// RGL.BindTexture(TextureTarget.Texture2D, texture.Image.Name);
-		}
 
-        public Texture2D Texture {
-			get { return _texture; }
-			set { _texture = value; setTexture(value); }
-		}
 
-		public float Alpha { 
-			get {
-				return _alpha;
-			} 
-			set {
-				_alpha = value;
-			}
-		}
-		
-		public Vector3 DiffuseColor {
-			get {
-				return _diffuseColor;
-			}
-			
-			set {
-				_diffuseColor = value;
-			}
-		}
-
-		public Vector3 SpecularColor {
-			get {
-				return _specularColor;
-			}
-			
-			set {
-				_specularColor = value;
-			}
-		}
-		
-		public float SpecularPower { 
-			get { return _specularPower; }
-			set { _specularPower = value; } 
-		}
-		
-		#region IEffectLights implementation
-		void IEffectLights.EnableDefaultLighting ()
-		{
-			throw new NotImplementedException ();
-		}
-
-		public Vector3 AmbientLightColor {
-			get {
-				return _ambientLightColor;
-			}
-			
-			set {
-				_ambientLightColor = value;
-			}
-		}
-
-		public DirectionalLight DirectionalLight0 {
-			get {
-				return light0;
-			}
-		}
-
-		public DirectionalLight DirectionalLight1 {
-			get {
-				return light1;
-			}
-		}
-
-		public DirectionalLight DirectionalLight2 {
-			get {
-				return light2;
-			}
-		}
-
-		public bool LightingEnabled {
-			get {
-				return lightingEnabled;
-			}
-			set {
-				lightingEnabled = value;
-			}
-		}
-		#endregion
-
-		#region IEffectFog implementation
-		Vector3 IEffectFog.FogColor {
-			get; set;
-		}
-
-		bool IEffectFog.FogEnabled {
-			get {
-				throw new NotImplementedException ();
-			}
-			set {
-				throw new NotImplementedException ();
-			}
-		}
-
-		float IEffectFog.FogEnd {
-			get; set;
-		}
-
-		float IEffectFog.FogStart {
-			get; set;
-		}
-		#endregion
-    }
+	}
 }
