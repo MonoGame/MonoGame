@@ -49,19 +49,20 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			if(_texture != null)
                 _texture.Apply();
+			Apply();
 		}
 	// TODO: This all needs to be redone
 	// Take a look at AlphaTest for example
         private void Apply()
         {
 			// May need to be moved elsewhere within this method
-			OnApply();
+			//OnApply();
 			
             GLStateManager.Projection(Projection);
             GLStateManager.World(World);
             GLStateManager.View(View);
 			
-			base.Apply();
+			//base.Apply();
 			
 			// set camera
 			//Matrix _matrix = Matrix.Identity;
