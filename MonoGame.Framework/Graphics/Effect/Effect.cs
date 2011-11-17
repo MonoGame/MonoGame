@@ -60,19 +60,6 @@ namespace Microsoft.Xna.Framework.Graphics
 		internal List<int> vertexShaders = new List<int>();
 		internal List<int> fragmentShaders = new List<int>();
 
-        internal Effect(GraphicsDevice aGraphicsDevice)
-        {
-            if (aGraphicsDevice == null)
-            {
-                throw new ArgumentNullException("Graphics Device Cannot Be Null");
-            }
-			this.graphicsDevice = aGraphicsDevice;
-			
-            Parameters = new EffectParameterCollection();
-            Techniques = new EffectTechniqueCollection();
-            CurrentTechnique = new EffectTechnique(this);
-        }
-		
 		protected Effect(Effect cloneSource) : this(cloneSource.GraphicsDevice)
 		{
 			this.CurrentTechnique = cloneSource.CurrentTechnique;
@@ -138,6 +125,42 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
 		}
+		
+		internal Effect(GraphicsDevice aGraphicsDevice)
+        {
+            if (aGraphicsDevice == null)
+            {
+                throw new ArgumentNullException("Graphics Device Cannot Be Null");
+            }
+			this.graphicsDevice = aGraphicsDevice;
+			
+            Parameters = new EffectParameterCollection();
+            Techniques = new EffectTechniqueCollection();
+            CurrentTechnique = new EffectTechnique(this);
+        }
+		
+		internal Effect (GraphicsDevice aGraphicsDevice, string aFileName) : this(aGraphicsDevice)
+		{
+			StreamReader streamReader = new StreamReader (aFileName);
+			string text = streamReader.ReadToEnd ();
+			streamReader.Close ();
+			
+			if ( aFileName.ToLower().Contains("fsh") )
+			{
+				CreateFragmentShaderFromSource(text);
+			}
+			else if ( aFileName.ToLower().Contains("vsh") )
+			{
+				CreateVertexShaderFromSource(text);
+			}			
+			else
+			{
+				throw new ArgumentException( aFileName + " not supported!" );
+			}
+			
+			DefineTechnique ("Technique1", "Pass1", 0, 0);
+			CurrentTechnique = Techniques ["Technique1"];
+		}
 
         internal virtual void Apply()
         {
@@ -185,29 +208,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			Techniques._techniques.Add(tech);
 			// TODO LogShaderParameters(String.Format("Technique {0} - Pass {1} :" ,tech.Name ,pass.Name), pass.shaderProgram);
 			
-		}
-		
-		internal Effect (GraphicsDevice aGraphicsDevice, string aFileName) : this(aGraphicsDevice)
-		{
-			StreamReader streamReader = new StreamReader (aFileName);
-			string text = streamReader.ReadToEnd ();
-			streamReader.Close ();
-			
-			if ( aFileName.ToLower().Contains("fsh") )
-			{
-				CreateFragmentShaderFromSource(text);
-			}
-			else if ( aFileName.ToLower().Contains("vsh") )
-			{
-				CreateVertexShaderFromSource(text);
-			}			
-			else
-			{
-				throw new ArgumentException( aFileName + " not supported!" );
-			}
-			
-			DefineTechnique ("Technique1", "Pass1", 0, 0);
-			CurrentTechnique = Techniques ["Technique1"];
 		}
 		
 		public void Begin()
