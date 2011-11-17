@@ -19,7 +19,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			// Tell the GL Context to use the program
 			GL.UseProgram (shaderProgram);
 
-			_technique._effect.OnApply();
+			_technique._effect.Apply();
 
 		}
 
