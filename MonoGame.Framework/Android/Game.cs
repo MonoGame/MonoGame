@@ -40,6 +40,7 @@ purpose and non-infringement.
    
 using System;
 using System.IO;
+using System.Linq;
 using Android.App;
 using Android.Content;
 using Android.Content.Res;
@@ -374,8 +375,9 @@ namespace Microsoft.Xna.Framework
 
         protected virtual void Update(GameTime gameTime)
 		{		
-			foreach (GameComponent gc in _gameComponentCollection)			
+			for (int x = 0; x < _gameComponentCollection.Count; x++)			
 			{
+				var gc = (GameComponent)_gameComponentCollection[x]; 
 				if (gc.Enabled)
 				{
 					gc.Update(gameTime);
