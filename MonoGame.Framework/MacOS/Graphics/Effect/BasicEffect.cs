@@ -293,12 +293,15 @@ namespace Microsoft.Xna.Framework.Graphics
 			//:base(device, Resources.BasicEffect)
 			:base(device)
 		{
-			CacheEffectParameters (null);
 			// We only create the fragment code for now
 			// There needs to be a vertex shader created as well as per the Microsoft BaseEffects
-			//CreateFragmentShaderFromSource (AlphaTestEffectCode.AlphaTestEffectFragmentCode());
+			CreateVertexShaderFromSource (VSBasicVcNoFog.BasicEffectVertexCode());
+			CreateFragmentShaderFromSource (PSBasicNoFog.BasicEffectVertexCode());
 			DefineTechnique ("BasicEffect", "", 0, 0);
 			CurrentTechnique = Techniques ["BasicEffect"];
+
+			CacheEffectParameters (null);
+			
 //			DirectionalLight0.Enabled = true;
 //
 //			SpecularColor = Vector3.One;
@@ -371,7 +374,7 @@ namespace Microsoft.Xna.Framework.Graphics
 //			fogVectorParam = Parameters ["FogVector"];
 //			worldParam = Parameters ["World"];
 //			worldInverseTransposeParam = Parameters ["WorldInverseTranspose"];
-//			worldViewProjParam = Parameters ["WorldViewProj"];
+			worldViewProjParam = Parameters ["WorldViewProj"];
 //			shaderIndexParam = Parameters ["ShaderIndex"];
 //
 //			light0 = new DirectionalLight (Parameters ["DirLight0Direction"],
@@ -396,19 +399,19 @@ namespace Microsoft.Xna.Framework.Graphics
 		/// </summary>
 		protected internal override void OnApply ()
 		{
-			            GLStateManager.Projection(Projection);
-            GLStateManager.World(World);
-            GLStateManager.View(View);
+			GLStateManager.Projection(Projection);
+			GLStateManager.World(World);
+			GLStateManager.View(View);
 						//System.Console.WriteLine("Apply");
 
 			// Override this for now for testing purposes
-			//dirtyFlags |= EffectDirtyFlags.World | EffectDirtyFlags.WorldViewProj;
-			//dirtyFlags |= EffectDirtyFlags.WorldViewProj | EffectDirtyFlags.EyePosition;
-			//dirtyFlags &= ~EffectDirtyFlags.FogEnable; // turn off fog for now
+			dirtyFlags |= EffectDirtyFlags.World | EffectDirtyFlags.WorldViewProj;
+			dirtyFlags |= EffectDirtyFlags.WorldViewProj | EffectDirtyFlags.EyePosition;
+			dirtyFlags &= ~EffectDirtyFlags.FogEnable; // turn off fog for now
 
 
 			// Recompute the world+view+projection matrix or fog vector?
-//			dirtyFlags = EffectHelpers.SetWorldViewProjAndFog (dirtyFlags, ref world, ref view, ref projection, ref worldView, fogEnabled, fogStart, fogEnd, worldViewProjParam, fogVectorParam);
+			//dirtyFlags = EffectHelpers.SetWorldViewProjAndFog (dirtyFlags, ref world, ref view, ref projection, ref worldView, fogEnabled, fogStart, fogEnd, worldViewProjParam, fogVectorParam);
 //
 //			// Recompute the diffuse/emissive/alpha material color parameters?
 //			if ((dirtyFlags & EffectDirtyFlags.MaterialColor) != 0) {
