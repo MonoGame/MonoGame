@@ -55,6 +55,7 @@ namespace Microsoft.Xna.Framework.Graphics
         #region Private Fields
 
         private DepthFormat autoDepthStencilFormat;
+		private DepthFormat depthStencilFormat;
         private int backBufferCount;
         private SurfaceFormat backBufferFormat;
         private int backBufferHeight;
@@ -64,6 +65,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private int fullScreenRefreshRateInHz;
         // private bool isFullScreen;
         private int multiSampleQuality;
+		private int multiSampleCount;
         private MultiSampleType multiSampleType;
         private SwapEffect swapEffect;
         private bool disposed;
@@ -125,7 +127,13 @@ namespace Microsoft.Xna.Framework.Graphics
             get { return deviceWindowHandle; }
             set { deviceWindowHandle = value; }
         }
-
+		
+		public DepthFormat DepthStencilFormat
+        {
+            get { return depthStencilFormat; }
+            set { depthStencilFormat = value; }
+        }
+		
         public bool EnableAutoDepthStencil
         {
             get { return enableAutoDepthStencil; }
@@ -142,6 +150,12 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             get { return _isFullScreen; }
             set { _isFullScreen = value; }
+        }
+		
+		public int MultiSampleCount
+        {
+            get { return multiSampleCount; }
+            set { multiSampleCount = value; }
         }
 
         public int MultiSampleQuality
