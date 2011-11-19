@@ -84,8 +84,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 Matrix.Multiply(ref worldView, ref projection, out worldViewProj);
                 
                 worldViewProjParam.SetValue(worldViewProj);
-				//GLStateManager.World(worldViewProj);
-                //System.Console.WriteLine("Helper");
+
+                System.Console.WriteLine("Helper");
                 dirtyFlags &= ~EffectDirtyFlags.WorldViewProj;
             }
 

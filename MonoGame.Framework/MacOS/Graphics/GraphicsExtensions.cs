@@ -83,7 +83,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     return VertexPointerType.Float;
 
                 case VertexElementFormat.Color:
-                    return VertexPointerType.Float;
+                    return VertexPointerType.Short;
 
                 case VertexElementFormat.Byte4:
                     return VertexPointerType.Short;
@@ -127,7 +127,8 @@ namespace Microsoft.Xna.Framework.Graphics
                     return ColorPointerType.Float;
 
                 case VertexElementFormat.Color:
-                    return ColorPointerType.Float;
+                    return ColorPointerType.UnsignedByte;
+                    //return ColorPointerType.Float;
 
                 case VertexElementFormat.Byte4:
                     return ColorPointerType.UnsignedByte;
@@ -171,7 +172,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     return NormalPointerType.Float;
 
                 case VertexElementFormat.Color:
-                    return NormalPointerType.Float;
+                    return NormalPointerType.Byte;
 
                 case VertexElementFormat.Byte4:
                     return NormalPointerType.Byte;

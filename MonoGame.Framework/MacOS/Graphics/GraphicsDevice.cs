@@ -503,6 +503,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			if (minVertexIndex > 0 || baseVertex > 0)
 				throw new NotImplementedException ("baseVertex > 0 and minVertexIndex > 0 are not supported");
 
+		// Set up our Rasterizer States
+		GLStateManager.SetRasterizerStates(RasterizerState);
+
 			var vd = VertexDeclaration.FromType (_vertexBuffer._type);
 			// Hmm, can the pointer here be changed with baseVertex?
 			VertexDeclaration.PrepareForUse (vd);
@@ -526,6 +529,11 @@ namespace Microsoft.Xna.Framework.Graphics
 			//VertexDeclaration.PrepareForUse (vd, arrayStart);
 
 			//GL.DrawArrays (PrimitiveTypeGL11 (primitiveType), vertexOffset, getElementCountArray (primitiveType, primitiveCount));
+
+
+		// Set up our Rasterizer States
+		GLStateManager.SetRasterizerStates(RasterizerState);
+
            // Unbind the VBOs
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
@@ -570,9 +578,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int vertexCount, short[] indexData, int indexOffset, int primitiveCount) where T : struct, IVertexType
         {
-            ////////////////////////////
-            //This has not been tested//
-            ////////////////////////////
+
+		// Set up our Rasterizer States
+		GLStateManager.SetRasterizerStates(RasterizerState);
 
             // Unbind the VBOs
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
@@ -599,7 +607,14 @@ namespace Microsoft.Xna.Framework.Graphics
             var handle2 = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
 
             //Buffer data to VBO; This should use stream when we move to ES2.0
-            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vd.VertexStride * GetElementCountArray(primitiveType, primitiveCount)), new IntPtr(handle.AddrOfPinnedObject().ToInt64() + (vertexOffset * vd.VertexStride)), BufferUsageHint.DynamicDraw);
+//			int vds = vd.VertexStride;
+//			int ec = GetElementCountArray(primitiveType, primitiveCount);
+//			int sec = vd.VertexStride * GetElementCountArray(primitiveType, primitiveCount);
+//			IntPtr ip = (IntPtr)(vd.VertexStride * GetElementCountArray(primitiveType, primitiveCount));
+//			IntPtr ip2 = new IntPtr(handle.AddrOfPinnedObject().ToInt64() + (vertexOffset * vd.VertexStride));
+
+            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vd.VertexStride * GetElementCountArray(primitiveType, primitiveCount)),
+				new IntPtr(handle.AddrOfPinnedObject().ToInt64() + (vertexOffset * vd.VertexStride)), BufferUsageHint.DynamicDraw);
             GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(sizeof(short) * GetElementCountArray(primitiveType, primitiveCount)), indexData, BufferUsageHint.DynamicDraw);
 
             //Setup VertexDeclaration
@@ -618,9 +633,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int vertexCount, int[] indexData, int indexOffset, int primitiveCount) where T : struct, IVertexType
         {
-            ////////////////////////////
-            //This has not been tested//
-            ////////////////////////////
+
+		// Set up our Rasterizer States
+		GLStateManager.SetRasterizerStates(RasterizerState);
 
             // Unbind the VBOs
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
