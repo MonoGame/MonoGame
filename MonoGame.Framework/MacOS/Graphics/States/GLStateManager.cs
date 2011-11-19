@@ -98,14 +98,41 @@ namespace Microsoft.Xna.Framework.Graphics
             //GL11.Ortho(0, _device.DisplayMode.Width, _device.DisplayMode.Height, 0, -1, 1);
         }
 
-        public static void Cull(All cullMode)
+		public static void FillMode (RasterizerState state)
+		{
+			switch (state.FillMode) {
+			case Microsoft.Xna.Framework.Graphics.FillMode.Solid:
+				GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
+				break;
+			case Microsoft.Xna.Framework.Graphics.FillMode.WireFrame:
+				GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
+				break;
+			}
+		}
+
+        public static void Cull(RasterizerState state)
         {
-            if (_cull != cullMode)
-            {
-                _cull = cullMode;
-               // TODO  GL.Enable(_cull);
-            }
+			switch (state.CullMode) {
+			case CullMode.None:
+				GL.Disable(EnableCap.CullFace);
+				break;
+			case CullMode.CullClockwiseFace:
+				GL.Enable(EnableCap.CullFace);
+				GL.CullFace(CullFaceMode.FrontAndBack);
+				GL.FrontFace(FrontFaceDirection.Cw);
+				break;
+			case CullMode.CullCounterClockwiseFace:
+				GL.Enable(EnableCap.CullFace);
+				GL.CullFace(CullFaceMode.FrontAndBack);
+				GL.FrontFace(FrontFaceDirection.Ccw);
+				break;
+			}
         }
+
+		public static void SetRasterizerStates (RasterizerState state) {
+			Cull(state);
+			FillMode(state);
+		}
 
         public static void BlendFunc(BlendingFactorSrc source, BlendingFactorDest dest)
         {
