@@ -295,8 +295,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			// We only create the fragment code for now
 			// There needs to be a vertex shader created as well as per the Microsoft BaseEffects
-			CreateVertexShaderFromSource (VSBasicVcNoFog.BasicEffectVertexCode());
-			CreateFragmentShaderFromSource (PSBasicNoFog.BasicEffectVertexCode());
+			//CreateVertexShaderFromSource (VSBasicVcNoFog.BasicEffectVertexCode());
+			//CreateFragmentShaderFromSource (PSBasicNoFog.BasicEffectVertexCode());
 			DefineTechnique ("BasicEffect", "", 0, 0);
 			CurrentTechnique = Techniques ["BasicEffect"];
 
@@ -374,7 +374,7 @@ namespace Microsoft.Xna.Framework.Graphics
 //			fogVectorParam = Parameters ["FogVector"];
 //			worldParam = Parameters ["World"];
 //			worldInverseTransposeParam = Parameters ["WorldInverseTranspose"];
-			worldViewProjParam = Parameters ["WorldViewProj"];
+//			worldViewProjParam = Parameters ["WorldViewProj"];
 //			shaderIndexParam = Parameters ["ShaderIndex"];
 //
 //			light0 = new DirectionalLight (Parameters ["DirLight0Direction"],
