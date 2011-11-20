@@ -400,19 +400,18 @@ namespace Microsoft.Xna.Framework.Graphics
 		/// </summary>
 		protected internal override void OnApply ()
 		{
-			//GLStateManager.Projection(Projection);
+
+			//Matrix worldViewProj;
+
+			//Matrix.Multiply(ref world, ref view, out worldView);
+			//Matrix.Multiply(ref worldView, ref projection, out worldViewProj);
+
+
+			GLStateManager.Projection(Projection);
+			//GLStateManager.World(worldView);
+			GLStateManager.WorldView(world, view);
 			//GLStateManager.World(World);
 			//GLStateManager.View(View);
-						//System.Console.WriteLine("Apply");
-			//GLStateManager.SetRasterizerStates(graphicsDevice.RasterizerState);
-
-			Matrix worldViewProj;
-
-			Matrix.Multiply(ref world, ref view, out worldView);
-			Matrix.Multiply(ref worldView, ref projection, out worldViewProj);
-
-
-			GLStateManager.World(worldViewProj);
 
 			// Override this for now for testing purposes
 			dirtyFlags |= EffectDirtyFlags.World | EffectDirtyFlags.WorldViewProj;
