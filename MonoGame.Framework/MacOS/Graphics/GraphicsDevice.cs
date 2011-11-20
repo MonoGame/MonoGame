@@ -513,6 +513,13 @@ namespace Microsoft.Xna.Framework.Graphics
 			GL.DrawElements (PrimitiveTypeGL11 (primitiveType), _indexBuffer._count, DrawElementsType.UnsignedShort, new IntPtr (startIndex));
 		}
 
+		internal void SetGraphicsStates ()
+		{
+			// Set up our Rasterizer States
+			GLStateManager.SetRasterizerStates(RasterizerState);
+			GLStateManager.SetBlendStates(BlendState);
+		}
+
 		public void DrawUserPrimitives<T> (PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int primitiveCount) where T : struct, IVertexType
 		{
 			// Unbind the VBOs
@@ -531,8 +538,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			//GL.DrawArrays (PrimitiveTypeGL11 (primitiveType), vertexOffset, getElementCountArray (primitiveType, primitiveCount));
 
 
-		// Set up our Rasterizer States
-		GLStateManager.SetRasterizerStates(RasterizerState);
+			// Set up our Graphics States
+			SetGraphicsStates();
 
            // Unbind the VBOs
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
@@ -579,8 +586,8 @@ namespace Microsoft.Xna.Framework.Graphics
         public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int vertexCount, short[] indexData, int indexOffset, int primitiveCount) where T : struct, IVertexType
         {
 
-		// Set up our Rasterizer States
-		GLStateManager.SetRasterizerStates(RasterizerState);
+			// Set up our Graphics States
+			SetGraphicsStates();
 
             // Unbind the VBOs
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
@@ -634,8 +641,9 @@ namespace Microsoft.Xna.Framework.Graphics
         public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int vertexCount, int[] indexData, int indexOffset, int primitiveCount) where T : struct, IVertexType
         {
 
-		// Set up our Rasterizer States
-		GLStateManager.SetRasterizerStates(RasterizerState);
+			// Set up our Graphics States
+			SetGraphicsStates();
+
 
             // Unbind the VBOs
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
