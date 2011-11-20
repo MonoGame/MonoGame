@@ -339,8 +339,8 @@
     <Compile Include="Input\GamePadType.cs" />
     <Compile Include="MacOS\Graphics\Effect\Effect.cs" />
     <Compile Include="MacOS\Graphics\Effect\BasicEffect.cs" />
-    <Compile Include="MacOS\Graphics\Effect\VSBasicVcNoFog.cs" />
-    <Compile Include="MacOS\Graphics\Effect\PSBasicNoFog.cs" />
+    <Compile Include="MacOS\Graphics\Effect\PSBasicEffect.cs" />
+    <Compile Include="MacOS\Graphics\Effect\VSBasicEffectcs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />

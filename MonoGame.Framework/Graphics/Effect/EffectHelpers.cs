@@ -238,7 +238,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 diffuse.Z = (diffuseColor.Z + emissiveColor.Z) * alpha;
                 diffuse.W = alpha;
 
-                //diffuseColorParam.SetValue(diffuse);
+                diffuseColorParam.SetValue(diffuse);
             }
         }
     }
