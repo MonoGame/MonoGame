@@ -327,7 +327,6 @@
     <Compile Include="Content\ContentReaders\PointReader.cs" />
     <Compile Include="Content\ContentReaders\Vector2Reader.cs" />
     <Compile Include="MacOS\Storage\StorageDeviceHelper.cs" />
-    <Compile Include="MacOS\Graphics\MonoGameGraphicsHelper.cs" />
     <Compile Include="Graphics\Effect\AlphaTestEffectCode.cs" />
     <Compile Include="Graphics\Effect\AlphaTestEffect.cs" />
     <Compile Include="Graphics\Effect\EffectHelpers.cs" />
@@ -340,8 +339,8 @@
     <Compile Include="Input\GamePadType.cs" />
     <Compile Include="MacOS\Graphics\Effect\Effect.cs" />
     <Compile Include="MacOS\Graphics\Effect\BasicEffect.cs" />
-    <Compile Include="MacOS\Graphics\Effect\VSBasicVcNoFog.cs" />
-    <Compile Include="MacOS\Graphics\Effect\PSBasicNoFog.cs" />
+    <Compile Include="MacOS\Graphics\Effect\PSBasicEffect.cs" />
+    <Compile Include="MacOS\Graphics\Effect\VSBasicEffectcs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />
