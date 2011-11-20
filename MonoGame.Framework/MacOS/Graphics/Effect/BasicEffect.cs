@@ -296,8 +296,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			// We only create the fragment code for now
 			// There needs to be a vertex shader created as well as per the Microsoft BaseEffects
-//			CreateVertexShaderFromSource (VSBasicVcNoFog.BasicEffectVertexCode());
-//			CreateFragmentShaderFromSource (PSBasicNoFog.BasicEffectVertexCode());
+			CreateVertexShaderFromSource (VSBasicVcNoFog.BasicEffectVertexCode());
+			CreateFragmentShaderFromSource (PSBasicNoFog.BasicEffectVertexCode());
 			DefineTechnique ("BasicEffect", "", 0, 0);
 			CurrentTechnique = Techniques ["BasicEffect"];
 
@@ -373,9 +373,9 @@ namespace Microsoft.Xna.Framework.Graphics
 //			eyePositionParam = Parameters ["EyePosition"];
 //			fogColorParam = Parameters ["FogColor"];
 //			fogVectorParam = Parameters ["FogVector"];
-//			worldParam = Parameters ["World"];
+			worldParam = Parameters ["World"];
 //			worldInverseTransposeParam = Parameters ["WorldInverseTranspose"];
-//			worldViewProjParam = Parameters ["WorldViewProj"];
+			worldViewProjParam = Parameters ["WorldViewProj"];
 //			shaderIndexParam = Parameters ["ShaderIndex"];
 //
 //			light0 = new DirectionalLight (Parameters ["DirLight0Direction"],
@@ -407,20 +407,26 @@ namespace Microsoft.Xna.Framework.Graphics
 			//Matrix.Multiply(ref worldView, ref projection, out worldViewProj);
 
 
+			// These are the states that work
 			GLStateManager.Projection(Projection);
-			//GLStateManager.World(worldView);
 			GLStateManager.WorldView(world, view);
+
+			//GLStateManager.World(worldView);
+
 			//GLStateManager.World(World);
 			//GLStateManager.View(View);
-
+			//GLStateManager.Projection(Matrix.Identity);
+			//GLStateManager.World(Matrix.Identity);
 			// Override this for now for testing purposes
 			dirtyFlags |= EffectDirtyFlags.World | EffectDirtyFlags.WorldViewProj;
 			dirtyFlags |= EffectDirtyFlags.WorldViewProj | EffectDirtyFlags.EyePosition;
 			dirtyFlags &= ~EffectDirtyFlags.FogEnable; // turn off fog for now
 
+			GLStateManager.Textures2D(false);
+			GLStateManager.ColorArray(VertexColorEnabled);
 
 			// Recompute the world+view+projection matrix or fog vector?
-//			dirtyFlags = EffectHelpers.SetWorldViewProjAndFog (dirtyFlags, ref world, ref view, ref projection, ref worldView, fogEnabled, fogStart, fogEnd, worldViewProjParam, fogVectorParam);
+			dirtyFlags = EffectHelpers.SetWorldViewProjAndFog (dirtyFlags, ref world, ref view, ref projection, ref worldView, fogEnabled, fogStart, fogEnd, worldViewProjParam, fogVectorParam);
 //
 //			// Recompute the diffuse/emissive/alpha material color parameters?
 //			if ((dirtyFlags & EffectDirtyFlags.MaterialColor) != 0) {
@@ -441,8 +447,7 @@ namespace Microsoft.Xna.Framework.Graphics
 //					dirtyFlags |= EffectDirtyFlags.ShaderIndex;
 //				}
 //			}
-			GLStateManager.Textures2D(false);
-			GLStateManager.ColorArray(VertexColorEnabled);
+
 			// Recompute the shader index?
 //			if ((dirtyFlags & EffectDirtyFlags.ShaderIndex) != 0) {
 //				int shaderIndex = 0;

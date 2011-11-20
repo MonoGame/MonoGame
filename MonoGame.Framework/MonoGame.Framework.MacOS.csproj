@@ -327,7 +327,6 @@
     <Compile Include="Content\ContentReaders\PointReader.cs" />
     <Compile Include="Content\ContentReaders\Vector2Reader.cs" />
     <Compile Include="MacOS\Storage\StorageDeviceHelper.cs" />
-    <Compile Include="MacOS\Graphics\MonoGameGraphicsHelper.cs" />
     <Compile Include="Graphics\Effect\AlphaTestEffectCode.cs" />
     <Compile Include="Graphics\Effect\AlphaTestEffect.cs" />
     <Compile Include="Graphics\Effect\EffectHelpers.cs" />

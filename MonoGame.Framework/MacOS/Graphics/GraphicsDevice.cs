@@ -498,26 +498,37 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public IndexBuffer Indices { set { SetIndexBuffer (value); } }
 
+
+		internal void SetGraphicsStates ()
+		{
+			GL.PushMatrix();
+			// Set up our Rasterizer States
+			GLStateManager.SetRasterizerStates(RasterizerState);
+			GLStateManager.SetBlendStates(BlendState);
+		}
+
+		internal void UnsetGraphicsStates ()
+		{
+			// Make sure we are not user any shaders
+			GL.UseProgram(0);
+				GL.PopMatrix();
+
+		}
+
 		public void DrawIndexedPrimitives (PrimitiveType primitiveType, int baseVertex, int minVertexIndex, int numbVertices, int startIndex, int primitiveCount)
 		{
 			if (minVertexIndex > 0 || baseVertex > 0)
 				throw new NotImplementedException ("baseVertex > 0 and minVertexIndex > 0 are not supported");
 
-		// Set up our Rasterizer States
-		GLStateManager.SetRasterizerStates(RasterizerState);
+			SetGraphicsStates();
 
 			var vd = VertexDeclaration.FromType (_vertexBuffer._type);
 			// Hmm, can the pointer here be changed with baseVertex?
 			VertexDeclaration.PrepareForUse (vd);
 
 			GL.DrawElements (PrimitiveTypeGL11 (primitiveType), _indexBuffer._count, DrawElementsType.UnsignedShort, new IntPtr (startIndex));
-		}
 
-		internal void SetGraphicsStates ()
-		{
-			// Set up our Rasterizer States
-			GLStateManager.SetRasterizerStates(RasterizerState);
-			GLStateManager.SetBlendStates(BlendState);
+			UnsetGraphicsStates();
 		}
 
 		public void DrawUserPrimitives<T> (PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int primitiveCount) where T : struct, IVertexType
@@ -573,14 +584,23 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
             handle.Free();
+
+			// Unset our Graphics States
+			UnsetGraphicsStates();
 		}
 
 		public void DrawPrimitives (PrimitiveType primitiveType, int vertexStart, int primitiveCount)
 		{
+			// Set up our Graphics States
+			SetGraphicsStates();
+
 			var vd = VertexDeclaration.FromType (_vertexBuffer._type);
 			VertexDeclaration.PrepareForUse (vd);
 
 			GL.DrawArrays (PrimitiveTypeGL11 (primitiveType), vertexStart, GetElementCountArray (primitiveType, primitiveCount));
+
+			// Unset our Graphics States
+			UnsetGraphicsStates();
 		}
 
         public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int vertexCount, short[] indexData, int indexOffset, int primitiveCount) where T : struct, IVertexType
@@ -636,6 +656,10 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
             handle.Free();
             handle2.Free();
+
+			// Unset our Graphics States
+			UnsetGraphicsStates();
+
         }
 
         public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int vertexCount, int[] indexData, int indexOffset, int primitiveCount) where T : struct, IVertexType
@@ -685,6 +709,10 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
             handle.Free();
             handle2.Free();
+
+			// Unset our Graphics States
+			UnsetGraphicsStates();
+
         }
 
 		public int GetElementCountArray (PrimitiveType primitiveType, int primitiveCount)

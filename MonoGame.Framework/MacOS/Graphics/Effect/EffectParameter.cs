@@ -288,7 +288,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void SetValue (Matrix value)
 		{ 
-			//GL.UseProgram (_parentEffect.CurrentTechnique.Passes [0].shaderProgram);
+			GL.UseProgram (_parentEffect.CurrentTechnique.Passes [0].shaderProgram);
 			MonoMac.OpenGL.Matrix4 mat4 = new MonoMac.OpenGL.Matrix4 (value.M11,
 										value.M12,
 										value.M13,
@@ -306,7 +306,8 @@ namespace Microsoft.Xna.Framework.Graphics
 										value.M43,
 										value.M44);
 			_cachedValue = mat4;
-			GL.UniformMatrix4 (internalIndex, true, ref mat4);
+			float[] matArray = Matrix.ToFloatArray(value);
+			GL.UniformMatrix4 (internalIndex, matArray.Length, true, matArray);
 			//GL.UseProgram (0);
 		}
 
