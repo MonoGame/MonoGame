@@ -163,22 +163,19 @@ namespace Microsoft.Xna.Framework.Graphics
 	        {
 				case DisplayOrientation.LandscapeLeft:
                 {
-					GL.Rotate(-90, 0, 0, 1); 
-					GL.Ortho(0, this.graphicsDevice.Viewport.Height, this.graphicsDevice.Viewport.Width,  0, -1, 1);
+					GL.Rotate(-90, 0, 0, 1);
 					break;
 				}
 				
 				case DisplayOrientation.LandscapeRight:
                 {
-					GL.Rotate(90, 0, 0, 1); 
-					GL.Ortho(0, this.graphicsDevice.Viewport.Height, this.graphicsDevice.Viewport.Width,  0, -1, 1);
+					GL.Rotate(90, 0, 0, 1);					
 					break;
 				}
 				
 			case DisplayOrientation.PortraitUpsideDown:
                 {
 					GL.Rotate(180, 0, 0, 1); 
-					GL.Ortho(0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height,  0, -1, 1);
 					break;
 				}
 				
@@ -187,7 +184,9 @@ namespace Microsoft.Xna.Framework.Graphics
 					GL.Ortho(0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height, 0, -1, 1);
 					break;
 				}
-			}		
+			}
+			
+			GL.Ortho(0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height, 0, -1, 1);
 #endif			
 			
 			// Enable Scissor Tests if necessary
@@ -199,7 +198,15 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			GL.MatrixMode(All.Modelview);			
 			
-			GL.Viewport(0, 0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height);
+			// Only swap our viewport if Width is greater than height
+			if (this.graphicsDevice.Viewport.Width > this.graphicsDevice.Viewport.Height)
+			{
+				GL.Viewport(0, 0, this.graphicsDevice.Viewport.Height, this.graphicsDevice.Viewport.Width);
+			}
+			else
+			{
+				GL.Viewport(0, 0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height);
+			}
 			
 			// Enable Scissor Tests if necessary
 			if ( this.graphicsDevice.RasterizerState.ScissorTestEnable )
