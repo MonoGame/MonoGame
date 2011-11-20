@@ -83,9 +83,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 Matrix.Multiply(ref world, ref view, out worldView);
                 Matrix.Multiply(ref worldView, ref projection, out worldViewProj);
                 
-                worldViewProjParam.SetValue(worldViewProj);
+                //worldViewProjParam.SetValue(worldViewProj);
+				worldViewProjParam.SetValue(worldViewProj);
 
-                System.Console.WriteLine("Helper");
+                //System.Console.WriteLine("Helper");
                 dirtyFlags &= ~EffectDirtyFlags.WorldViewProj;
             }
 
@@ -237,7 +238,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 diffuse.Z = (diffuseColor.Z + emissiveColor.Z) * alpha;
                 diffuse.W = alpha;
 
-                //diffuseColorParam.SetValue(diffuse);
+                diffuseColorParam.SetValue(diffuse);
             }
         }
     }
