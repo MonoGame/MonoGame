@@ -98,6 +98,29 @@ namespace Microsoft.Xna.Framework.Graphics
             //GL11.Ortho(0, _device.DisplayMode.Width, _device.DisplayMode.Height, 0, -1, 1);
         }
 
+		public static void WorldView (Matrix world, Matrix view)
+		{
+			Matrix worldView;
+			Matrix.Multiply(ref world, ref view, out worldView);
+			GL.MatrixMode(MatrixMode.Modelview);
+			GL.LoadIdentity();
+			GL.LoadMatrix(Matrix.ToFloatArray(worldView));
+		}
+
+		public static void SetBlendStates (BlendState state)
+		{
+			// Set blending mode
+			BlendEquationMode blendMode = state.ColorBlendFunction.GetBlendEquationMode();
+			GL.BlendEquation (blendMode);
+
+			// Set blending function
+			BlendingFactorSrc bfs = state.ColorSourceBlend.GetBlendFactorSrc();
+			BlendingFactorDest bfd = state.ColorDestinationBlend.GetBlendFactorDest();
+			GL.BlendFunc (bfs, bfd);
+
+			GL.Enable (EnableCap.Blend);
+		}
+
 		public static void FillMode (RasterizerState state)
 		{
 			switch (state.FillMode) {
@@ -110,8 +133,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 
-        public static void Cull(RasterizerState state)
-        {
+		public static void Cull(RasterizerState state)
+		{
 			switch (state.CullMode) {
 			case CullMode.None:
 				GL.Disable(EnableCap.CullFace);
@@ -127,7 +150,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				GL.FrontFace(FrontFaceDirection.Ccw);
 				break;
 			}
-        }
+		}
 
 		public static void SetRasterizerStates (RasterizerState state) {
 			Cull(state);
