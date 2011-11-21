@@ -199,8 +199,10 @@ namespace Microsoft.Xna.Framework.Graphics
             autoDepthStencilFormat = DepthFormat.None;
             backBufferCount = 0;
             backBufferFormat = SurfaceFormat.Color;
-			backBufferWidth = 320;
-            backBufferHeight = 480;            
+			
+			backBufferWidth = (int)(UIScreen.MainScreen.Bounds.Width * UIScreen.MainScreen.Scale);
+            backBufferHeight = (int)(UIScreen.MainScreen.Bounds.Height * UIScreen.MainScreen.Scale);
+			           
             deviceWindowHandle = IntPtr.Zero;
             enableAutoDepthStencil = false;
             fullScreenRefreshRateInHz = 0;
