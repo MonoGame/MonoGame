@@ -55,6 +55,7 @@ namespace Microsoft.Xna.Framework.Graphics
         #region Private Fields
 
         private DepthFormat autoDepthStencilFormat;
+		private DepthFormat depthStencilFormat; // Added for XNA 4.0
         private int backBufferCount;
         private SurfaceFormat backBufferFormat;
         private int backBufferHeight;
@@ -63,6 +64,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private bool enableAutoDepthStencil;
         private int fullScreenRefreshRateInHz;
         // private bool isFullScreen;
+		private int multiSampleCount; // Added for XNA 4.0
         private int multiSampleQuality;
         private MultiSampleType multiSampleType;
         private SwapEffect swapEffect;
@@ -124,6 +126,12 @@ namespace Microsoft.Xna.Framework.Graphics
             get { return deviceWindowHandle; }
             set { deviceWindowHandle = value; }
         }
+		
+		public DepthFormat DepthStencilFormat
+        {
+            get { return depthStencilFormat; }
+            set { depthStencilFormat = value; }
+        }
 
         public bool EnableAutoDepthStencil
         {
@@ -147,6 +155,12 @@ namespace Microsoft.Xna.Framework.Graphics
             {
 				UIApplication.SharedApplication.StatusBarHidden = value;				
             }
+        }
+		
+		public int MultiSampleCount
+        {
+            get { return multiSampleCount; }
+            set { multiSampleCount = value; }
         }
 
         public int MultiSampleQuality
@@ -185,12 +199,16 @@ namespace Microsoft.Xna.Framework.Graphics
             autoDepthStencilFormat = DepthFormat.None;
             backBufferCount = 0;
             backBufferFormat = SurfaceFormat.Color;
-			backBufferWidth = 320;
-            backBufferHeight = 480;            
+			
+			backBufferWidth = (int)(UIScreen.MainScreen.Bounds.Width * UIScreen.MainScreen.Scale);
+            backBufferHeight = (int)(UIScreen.MainScreen.Bounds.Height * UIScreen.MainScreen.Scale);
+			           
             deviceWindowHandle = IntPtr.Zero;
             enableAutoDepthStencil = false;
             fullScreenRefreshRateInHz = 0;
             // isFullScreen = false;
+			depthStencilFormat = DepthFormat.None;
+            multiSampleCount = 0;
             multiSampleQuality = 0;
             multiSampleType = MultiSampleType.None;
             swapEffect = SwapEffect.Default;
@@ -213,6 +231,8 @@ namespace Microsoft.Xna.Framework.Graphics
             clone.multiSampleQuality = this.multiSampleQuality;
             clone.multiSampleType = this.multiSampleType;
             clone.swapEffect = this.swapEffect;
+			clone.depthStencilFormat = this.depthStencilFormat;
+            clone.multiSampleCount = this.multiSampleCount;
             return clone;
         }
 
