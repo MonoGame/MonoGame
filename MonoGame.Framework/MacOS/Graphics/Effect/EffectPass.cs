@@ -56,6 +56,44 @@ namespace Microsoft.Xna.Framework.Graphics
 			ShaderLog(name,shaderProgram);				
 			
 		}
+
+		internal void UpdatePass(int shader, int fragment)
+		{
+			int count = 0;
+			//int[] objs = new int[10];
+			int obj = 0;
+			int max = 10;
+			// Detach all the shaders
+			GL.GetAttachedShaders(shaderProgram,max, out count, out obj);
+			while (count > 0) {
+				GL.DetachShader(shaderProgram, obj);
+				GL.GetAttachedShaders(shaderProgram,max, out count, out obj);
+			}
+//			for (int x = 0; x < count; x++) {
+//				GL.DetachShader(shaderProgram, obj);
+//			}
+
+			// Attach our compiled shaders
+			if ( shader > 0)
+				GL.AttachShader (shaderProgram, shader);
+			if ( fragment > 0)
+				GL.AttachShader (shaderProgram, fragment);
+
+			// Set the parameters
+			GL.ProgramParameter (shaderProgram, AssemblyProgramParameterArb.GeometryInputType, (int)All.Lines);
+			GL.ProgramParameter (shaderProgram, AssemblyProgramParameterArb.GeometryOutputType, (int)All.Line);
+
+			// Set the max vertices
+			int maxVertices;
+			GL.GetInteger (GetPName.MaxGeometryOutputVertices, out maxVertices);
+			GL.ProgramParameter (shaderProgram, AssemblyProgramParameterArb.GeometryVerticesOut, maxVertices);
+
+			// Link the program
+			GL.LinkProgram (shaderProgram);
+			string name = String.Format("Technique {0} - Pass {1}: ",_technique.Name, Name);
+			ShaderLog(name,shaderProgram);
+			GL.UseProgram(shaderProgram);
+		}
 		
 		public string Name { get; set; }
 		
