@@ -718,15 +718,27 @@ namespace Microsoft.Xna.Framework.Graphics
 		public int GetElementCountArray (PrimitiveType primitiveType, int primitiveCount)
 		{
 			//TODO: Overview the calculation
+			// Please see comments made by kjpou1 below.  The samples would not work correctly so
+			//  modified the values below.  This is what got the samples working so if they
+			//  are not correct please modify but make sure samples are working.
+			//  TextureQuad and PrimitivesTest are the ones to check
 			switch (primitiveType) {
 			case PrimitiveType.LineList:
 				return primitiveCount * 2;
 			case PrimitiveType.LineStrip:
-				return 3 + (primitiveCount - 1); // ???
+				// Was causing extra lines
+				return primitiveCount + 1;//     3 + (primitiveCount - 1); // ???
 			case PrimitiveType.TriangleList:
-				return primitiveCount * 2;
+				// The primitiveCount * 2 was causing some lines not to show up
+				//  changing it to 3 activated those lines.  For a quad map only the first
+				//  triangle was showing instead of the full quad.
+				return primitiveCount * 3;  //primitiveCount * 2;
 			case PrimitiveType.TriangleStrip:
-				return 3 + (primitiveCount - 1); // ???
+				// This is a test --- changed by kjpou1 -- modified from what is below
+				// as I really did not understand it.
+				//   If the change does not work then please move back to what was below
+				//3 + (primitiveCount - 1); // ???
+				return primitiveCount + 2;
 			}
 
 			throw new NotSupportedException ();
