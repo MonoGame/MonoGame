@@ -83,7 +83,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     return VertexPointerType.Float;
 
                 case VertexElementFormat.Color:
-                    return VertexPointerType.Float;
+                    return VertexPointerType.Short;
 
                 case VertexElementFormat.Byte4:
                     return VertexPointerType.Short;
@@ -127,7 +127,8 @@ namespace Microsoft.Xna.Framework.Graphics
                     return ColorPointerType.Float;
 
                 case VertexElementFormat.Color:
-                    return ColorPointerType.Float;
+                    //return ColorPointerType.UnsignedByte;
+                    return ColorPointerType.UnsignedByte;
 
                 case VertexElementFormat.Byte4:
                     return ColorPointerType.UnsignedByte;
@@ -171,7 +172,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     return NormalPointerType.Float;
 
                 case VertexElementFormat.Color:
-                    return NormalPointerType.Float;
+                    return NormalPointerType.Byte;
 
                 case VertexElementFormat.Byte4:
                     return NormalPointerType.Byte;
@@ -303,5 +304,86 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             return 0;
         }
+
+		public static BlendEquationMode GetBlendEquationMode (this BlendFunction function)
+		{
+			switch (function) {
+			case BlendFunction.Add:
+				return BlendEquationMode.FuncAdd;
+			case BlendFunction.Max:
+				return BlendEquationMode.Max;
+			case BlendFunction.Min:
+				return BlendEquationMode.Min;
+			case BlendFunction.ReverseSubtract:
+				return BlendEquationMode.FuncReverseSubtract;
+			case BlendFunction.Subtract:
+				return BlendEquationMode.FuncSubtract;
+			default:
+				return BlendEquationMode.FuncAdd;
+			}
+		}
+
+		public static BlendingFactorSrc GetBlendFactorSrc (this Blend blend)
+		{
+			switch (blend) {
+			case Blend.DestinationAlpha:
+				return BlendingFactorSrc.DstAlpha;
+			case Blend.DestinationColor:
+				return BlendingFactorSrc.DstColor;
+			case Blend.InverseDestinationAlpha:
+				return BlendingFactorSrc.OneMinusDstAlpha;
+			case Blend.InverseDestinationColor:
+				return BlendingFactorSrc.OneMinusDstColor;
+			case Blend.InverseSourceAlpha:
+				return BlendingFactorSrc.OneMinusSrcAlpha;
+			case Blend.InverseSourceColor:
+				return BlendingFactorSrc.OneMinusSrc1Color;
+			case Blend.One:
+				return BlendingFactorSrc.One;
+			case Blend.SourceAlpha:
+				return BlendingFactorSrc.SrcAlpha;
+			case Blend.SourceAlphaSaturation:
+				return BlendingFactorSrc.SrcAlphaSaturate;
+			case Blend.SourceColor:
+				return BlendingFactorSrc.Src1Color;
+			case Blend.Zero:
+				return BlendingFactorSrc.Zero;
+			default:
+				return BlendingFactorSrc.One;
+			}
+
+		}
+
+		public static BlendingFactorDest GetBlendFactorDest (this Blend blend)
+		{
+			switch (blend) {
+			case Blend.DestinationAlpha:
+				return BlendingFactorDest.DstAlpha;
+//			case Blend.DestinationColor:
+//				return BlendingFactorDest.DstColor;
+			case Blend.InverseDestinationAlpha:
+				return BlendingFactorDest.OneMinusDstAlpha;
+//			case Blend.InverseDestinationColor:
+//				return BlendingFactorDest.OneMinusDstColor;
+			case Blend.InverseSourceAlpha:
+				return BlendingFactorDest.OneMinusSrcAlpha;
+			case Blend.InverseSourceColor:
+				return BlendingFactorDest.OneMinusSrc1Color;
+			case Blend.One:
+				return BlendingFactorDest.One;
+			case Blend.SourceAlpha:
+				return BlendingFactorDest.SrcAlpha;
+//			case Blend.SourceAlphaSaturation:
+//				return BlendingFactorDest.SrcAlphaSaturate;
+			case Blend.SourceColor:
+				return BlendingFactorDest.Src1Color;
+			case Blend.Zero:
+				return BlendingFactorDest.Zero;
+			default:
+				return BlendingFactorDest.One;
+			}
+
+		}
+
     }
 }

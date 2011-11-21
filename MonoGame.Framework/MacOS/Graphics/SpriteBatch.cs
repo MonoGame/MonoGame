@@ -95,24 +95,25 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 
 			// Disable Blending by default = BlendState.Opaque
-			GL.Disable (EnableCap.Blend);
+			//GL.Disable (EnableCap.Blend);
 
 			// set the blend mode
-			if (_blendState == BlendState.NonPremultiplied) {
-				GL.BlendFunc (BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
-				GL.Enable (EnableCap.Blend);				
-			}
-
-			if (_blendState == BlendState.AlphaBlend) {
-				GL.BlendFunc (BlendingFactorSrc.One, BlendingFactorDest.OneMinusSrcAlpha);
-				GL.Enable (EnableCap.Blend);				
-			}
-
-			if (_blendState == BlendState.Additive) {
-				GL.BlendFunc (BlendingFactorSrc.SrcAlpha, BlendingFactorDest.One);
-				GL.Enable (EnableCap.Blend);				
-			}
-
+//			if (_blendState == BlendState.NonPremultiplied) {
+//				GL.BlendFunc (BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+//				GL.Enable (EnableCap.Blend);
+//			}
+//
+//			if (_blendState == BlendState.AlphaBlend) {
+//				GL.BlendFunc (BlendingFactorSrc.One, BlendingFactorDest.OneMinusSrcAlpha);
+//				GL.Enable (EnableCap.Blend);
+//			}
+//
+//			if (_blendState == BlendState.Additive) {
+//				GL.BlendFunc (BlendingFactorSrc.SrcAlpha, BlendingFactorDest.One);
+//				GL.Enable (EnableCap.Blend);
+//			}
+			graphicsDevice.BlendState = _blendState;
+			graphicsDevice.SetGraphicsStates();
 			// set camera
 			GL.MatrixMode (MatrixMode.Projection);
 			GL.LoadIdentity ();		
@@ -164,7 +165,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			GL.LoadMatrix (ref _matrix.M11);
 
 			// Initialize OpenGL states (ideally move this to initialize somewhere else)
-			MonoGameGraphicsHelper.SetDepthStencilState(_depthStencilState);
+			GLStateManager.SetDepthStencilState(_depthStencilState);
 
 			//GL.Disable (EnableCap.DepthTest);
 			

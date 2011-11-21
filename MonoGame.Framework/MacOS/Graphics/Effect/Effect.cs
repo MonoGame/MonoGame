@@ -230,7 +230,7 @@ namespace Microsoft.Xna.Framework.Graphics
 					Console.Write ("Vertex Compilation Failed!");
 				}
 			}
-
+			 
 		}
 
 		public void Begin ()
@@ -281,18 +281,12 @@ namespace Microsoft.Xna.Framework.Graphics
 			set; 
 		}
 
-//		internal virtual void Apply ()
-//		{
-//			//if (graphicsDevice.Textures.)
-//			Techniques[0].Passes[0].Apply();
-//		}
-
 		protected internal virtual void OnApply ()
 		{
 
 		}
 
-		protected void CreateVertexShaderFromSource(string source)
+		protected int CreateVertexShaderFromSource(string source)
 		{
 			int shader = GL.CreateShader (ShaderType.VertexShader);
 			// Attach the loaded source string to the shader object
@@ -300,11 +294,13 @@ namespace Microsoft.Xna.Framework.Graphics
 			// Compile the shader
 			GL.CompileShader (shader);
 			
-			vertexShaders.Add(shader);			
+			vertexShaders.Add(shader);
+
+			return shader;
 		}
 		
 		
-		protected void CreateFragmentShaderFromSource(string source)
+		protected int CreateFragmentShaderFromSource(string source)
 		{
 			int shader = GL.CreateShader (ShaderType.FragmentShader);
 			// Attach the loaded source string to the shader object
@@ -312,7 +308,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			// Compile the shader
 			GL.CompileShader (shader);
 			
-			fragmentShaders.Add(shader);			
+			fragmentShaders.Add(shader);
+
+			return shader;
 		}
 
 		protected void DefineTechnique (string techniqueName, string passName, int vertexIndex, int fragmentIndex)
@@ -328,6 +326,16 @@ namespace Microsoft.Xna.Framework.Graphics
 			Techniques._techniques.Add(tech);
 			LogShaderParameters(String.Format("Technique {0} - Pass {1} :" ,tech.Name ,pass.Name), pass.shaderProgram);
 			
+		}
+
+		protected void UpdateTechnique (string techniqueName, string passName, int vertexIndex, int fragmentIndex)
+		{
+			EffectTechnique tech = Techniques[techniqueName];
+			EffectPass pass = tech.Passes[passName];
+			//pass.VertexIndex = vertexIndex;
+			//pass.FragmentIndex = fragmentIndex;
+			pass.UpdatePass(vertexIndex, fragmentIndex);
+			LogShaderParameters(String.Format("Technique {0} - Pass {1} :" ,tech.Name ,pass.Name), pass.shaderProgram);
 		}
 		
 		private int GetUniformUserIndex (string uniformName)

@@ -714,7 +714,6 @@ namespace Microsoft.Xna.Framework
 			return m;
         }
 
-
         public static void CreateLookAt(ref Vector3 cameraPosition, ref Vector3 cameraTarget, ref Vector3 cameraUpVector, out Matrix result)
         {
             Vector3 vector = Vector3.Normalize(cameraPosition - cameraTarget);
@@ -737,76 +736,42 @@ namespace Microsoft.Xna.Framework
 		    result.M43 = -Vector3.Dot(vector, cameraPosition);
 		    result.M44 = 1f;
         }
-
-
-        public static Matrix CreateOrthographic(float width, float height, float zNearPlane, float zFarPlane)
+		
+		public static Matrix CreateOrthographic(float width, float height, float zNearPlane, float zFarPlane)
         {
-            Matrix matrix;
-		    matrix.M11 = 2f / width;
-		    matrix.M12 = matrix.M13 = matrix.M14 = 0f;
-		    matrix.M22 = 2f / height;
-		    matrix.M21 = matrix.M23 = matrix.M24 = 0f;
-		    matrix.M33 = 1f / (zNearPlane - zFarPlane);
-		    matrix.M31 = matrix.M32 = matrix.M34 = 0f;
-		    matrix.M41 = matrix.M42 = 0f;
-		    matrix.M43 = zNearPlane / (zNearPlane - zFarPlane);
-		    matrix.M44 = 1f;
-		    return matrix;
+			return CreateOrthographicOffCenter(-width / 2, width / 2, -height / 2, height / 2, zNearPlane, zFarPlane);
         }
-
 
         public static void CreateOrthographic(float width, float height, float zNearPlane, float zFarPlane, out Matrix result)
         {
-            result.M11 = 2f / width;
-		    result.M12 = result.M13 = result.M14 = 0f;
-		    result.M22 = 2f / height;
-		    result.M21 = result.M23 = result.M24 = 0f;
-		    result.M33 = 1f / (zNearPlane - zFarPlane);
-		    result.M31 = result.M32 = result.M34 = 0f;
-		    result.M41 = result.M42 = 0f;
-		    result.M43 = zNearPlane / (zNearPlane - zFarPlane);
-		    result.M44 = 1f;
+            result = CreateOrthographicOffCenter(-width / 2, width / 2, -height / 2, height / 2, zNearPlane, zFarPlane);
         }
-
 
         public static Matrix CreateOrthographicOffCenter(float left, float right, float bottom, float top, float zNearPlane, float zFarPlane)
         {
-            float tx = - (right + left)/(right - left);
-			float ty = - (top + bottom)/(top - bottom);
-			float tz = - (zFarPlane + zNearPlane)/(zFarPlane - zNearPlane);
-			
-			Matrix m = identity;
-			
-			m.M11 = 2.0f/(right-left);
-			m.M12 = 0;
-			m.M13 = 0;
-			m.M14 = tx;
-			
-			m.M21 = 0;
-			m.M22 = 2.0f/(top-bottom);
-			m.M23 = 0;
-			m.M24 = ty;
-			
-			m.M31 = 0;
-			m.M32 = 0;
-			m.M33 = -2.0f/(zFarPlane - zNearPlane);
-			m.M34 = tz;
-			
-			m.M41 = 0;
-			m.M42 = 0;
-			m.M43 = 0;
-			m.M44 = 1;
-			
-			return m;
-        }
+			Matrix result = identity;
 
+            float invRL = 1 / (right - left);
+            float invTB = 1 / (top - bottom);
+            float invFN = 1 / (zFarPlane - zNearPlane);
+
+            result.M11 = 2 * invRL;
+            result.M22 = 2 * invTB;
+            result.M33 = -2 * invFN;
+
+            result.M41 = -(right + left) * invRL;
+            result.M42 = -(top + bottom) * invTB;
+            result.M43 = -(zFarPlane + zNearPlane) * invFN;
+            result.M44 = 1;
+			
+			return result;
+        }
         
         public static void CreateOrthographicOffCenter(float left, float right, float bottom, float top,
             float nearPlaneDistance, float farPlaneDistance, out Matrix result)
         {
             result = CreateOrthographicOffCenter( left, right, bottom, top, nearPlaneDistance, farPlaneDistance);
         }
-
 
         public static Matrix CreatePerspective(float width, float height, float nearPlaneDistance, float farPlaneDistance)
         {

@@ -86,7 +86,7 @@ namespace Microsoft.Xna.Framework.Graphics
             GLStateManager.VertexArray(true);
 
             bool normal = false;
-            bool texcoord = false;
+            bool texcoord = false; 
 			
             foreach (var ve in vd.GetVertexElements())
             {

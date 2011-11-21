@@ -16,24 +16,138 @@ namespace Microsoft.Xna.Framework.Input
     //     code samples.
     public static class GamePad
     {
-
+		static bool running;
+		static bool sdl;
         static Settings settings;
         static Settings Settings
         {
-            get
+        	get
             {
-                if (settings == null)
-                {
-                    settings = LoadConfigs("Settings.xml");
-                }
-                if (settings == null)
-                    throw new Exception("Gamepad settings broke");
-                else
-                {
-                    Init();
-                    return settings;
-                }
+                return PrepSettings();
             }
+        }
+
+		static void AutoConfig () {
+						Init();
+				if (!sdl)
+					return;
+				Console.WriteLine("Number of joysticks: " + Sdl.SDL_NumJoysticks());
+					int numSticks = Sdl.SDL_NumJoysticks();
+					for (int x = 0; x < numSticks; x++) {
+
+						PadConfig pc = new PadConfig(Sdl.SDL_JoystickName(x), 0);
+						devices[x] = Sdl.SDL_JoystickOpen (pc.ID);
+
+						int numbuttons = Sdl.SDL_JoystickNumButtons(devices[x]);
+						Console.WriteLine("Number of buttons for joystick: " + x + " - " + numbuttons);
+
+						for (int b = 0; b < numbuttons; b++) {
+							//pc
+						}
+						//pc.Button_A = new Input();
+						pc.Button_A.ID = 0;
+						pc.Button_A.Type = InputType.Button;
+
+						pc.Button_B.ID = 1;
+						pc.Button_B.Type = InputType.Button;
+
+						pc.Button_X.ID = 2;
+						pc.Button_X.Type = InputType.Button;
+
+						pc.Button_Y.ID = 3;
+						pc.Button_Y.Type = InputType.Button;
+
+						pc.Button_Back.ID = 8;
+						pc.Button_Back.Type = InputType.Button;
+
+						pc.Button_Start.ID = 9;
+						pc.Button_Start.Type = InputType.Button;
+
+						pc.Button_LB.ID = 4;
+						pc.Button_LB.Type = InputType.Button;
+
+						pc.Button_RB.ID = 5;
+						pc.Button_RB.Type = InputType.Button;
+
+						pc.LeftStick.X.Negative.Type = InputType.Axis;
+						pc.LeftStick.X.Negative.Negative = true;
+						pc.LeftStick.X.Positive.Type = InputType.Axis;
+						pc.LeftStick.X.Positive.Negative = false;
+
+						pc.LeftStick.Y.Negative.ID = 1;
+						pc.LeftStick.Y.Negative.Type = InputType.Axis;
+						pc.LeftStick.Y.Negative.Negative = true;
+
+						pc.LeftStick.Y.Positive.ID = 1;
+						pc.LeftStick.Y.Positive.Type = InputType.Axis;
+						pc.LeftStick.Y.Positive.Negative = false;
+
+						//pc.RightStick.X.Negative.Type = InputType.Axis;
+						//pc.RightStick.X.Negative.Negative = true;
+						//pc.RightStick.X.Positive.Type = InputType.Axis;
+						//pc.RightStick.X.Positive.Negative = false;
+
+						//pc.RightStick.Y.Negative.ID = 1;
+						//pc.RightStick.Y.Negative.Type = InputType.Axis;
+						//pc.RightStick.Y.Negative.Negative = true;
+
+						//pc.RightStick.Y.Positive.ID = 1;
+						//pc.RightStick.Y.Positive.Type = InputType.Axis;
+						//pc.RightStick.Y.Positive.Negative = false;
+
+						pc.Dpad.Up.ID = 0;
+						pc.Dpad.Up.Type = InputType.PovUp;
+
+						pc.Dpad.Down.ID = 0;
+						pc.Dpad.Down.Type = InputType.PovDown;
+
+						pc.Dpad.Left.ID = 0;
+						pc.Dpad.Left.Type = InputType.PovLeft;
+
+						pc.Dpad.Right.ID = 0;
+						pc.Dpad.Right.Type = InputType.PovRight;
+
+						//pc.LeftTrigger.ID = 6;
+						//pc.LeftTrigger.Type = InputType.Button;
+
+						pc.RightTrigger.ID = 7;
+						pc.RightTrigger.Type = InputType.Button;
+
+						int numaxes = Sdl.SDL_JoystickNumAxes(devices[x]);
+						Console.WriteLine("Number of axes for joystick: " + x + " - " + numaxes);
+
+						for (int a = 0; a < numaxes; a++) {
+							//pc.LeftStick = new Stick();
+						}
+
+						int numhats = Sdl.SDL_JoystickNumHats(devices[x]);
+						Console.WriteLine("Number of PovHats for joystick: " + x + " - " + numhats);
+
+						for (int h = 0; h < numhats; h++) {
+							//pc
+						}
+						settings[x] = pc;
+			}
+		}
+
+        static Settings PrepSettings()
+        {
+            if (settings == null)
+            {
+                settings = LoadConfigs("Settings.xml");
+                if (settings == null) {
+                    settings = new Settings();
+					AutoConfig();
+		}
+            }
+            else if (!running)
+            {
+                Init();
+                return settings;
+            }
+            if (!running)
+                Init();
+            return settings;
         }
         static Settings LoadConfigs(string filename)
         {
@@ -50,35 +164,48 @@ namespace Microsoft.Xna.Framework.Input
             {
                 return null;
             }
-            for (int i = 0; i < 4; i++)
-                if (e[i] == null)
-                    e[i] = new PadConfig();
+            //for (int i = 0; i < 4; i++)
+              //  if (e[i] == null)
+                //    e[i] = new PadConfig(true);
             return e;
         }
 
         static IntPtr[] devices = new IntPtr[4];
-
-        static void Init()
+        //Inits SDL and grabs the sticks
+        static void Init ()
         {
-            Joystick.Init();
-            for (int i = 0; i < 4; i++)
-            {
-                PadConfig pc = settings[i];
-                if (pc.JoystickName == Sdl.SDL_JoystickName(pc.ID))
-                {
-                    devices[i] = Sdl.SDL_JoystickOpen(pc.ID);
-                }
-            }
+        	running = true;
+		try {
+        	Joystick.Init ();
+				sdl = true;
+			}
+			catch (Exception exc) {
+
+			}
+
+        	for (int i = 0; i < 4; i++)
+            	{
+        		PadConfig pc = settings[i];
+        		if (pc != null)
+                	{
+        			devices[i] = Sdl.SDL_JoystickOpen (pc.ID);
+			}
+		}
+
+
         }
+        //Disposes of SDL
         static void Cleanup()
         {
             Joystick.Cleanup();
+            running = false;
         }
 
         static IntPtr GetDevice(PlayerIndex index)
         {
             return devices[(int)index];
         }
+
         static PadConfig GetConfig(PlayerIndex index)
         {
             return Settings[(int)index];
@@ -151,9 +278,11 @@ namespace Microsoft.Xna.Framework.Input
 
         static GamePadState ReadState(PlayerIndex index, GamePadDeadZone deadZone)
         {
-            const float DeadZoneSize = 0.25f;
+            const float DeadZoneSize = 0.27f;
             IntPtr device = GetDevice(index);
             PadConfig c = GetConfig(index);
+            if (device == IntPtr.Zero || c == null)
+                return GamePadState.InitializedState;
 
             GamePadThumbSticks sticks = new GamePadThumbSticks(new Vector2(c.LeftStick.ReadAxisPair(device)), new Vector2(c.RightStick.ReadAxisPair(device)));
             sticks.ApplyDeadZone(deadZone, DeadZoneSize);
@@ -177,7 +306,7 @@ namespace Microsoft.Xna.Framework.Input
             IntPtr d = GetDevice(playerIndex);
             PadConfig c = GetConfig(playerIndex);
 
-            if (c.JoystickName == null || c.JoystickName == string.Empty)
+            if (c == null || ((c.JoystickName == null || c.JoystickName == string.Empty) && d == IntPtr.Zero))
                 return new GamePadCapabilities();
 
             return new GamePadCapabilities()
@@ -236,7 +365,9 @@ namespace Microsoft.Xna.Framework.Input
         //     Enumerated value that specifies what dead zone type to use.
         public static GamePadState GetState(PlayerIndex playerIndex, GamePadDeadZone deadZoneMode)
         {
-            Sdl.SDL_JoystickUpdate();
+            PrepSettings();
+            if (sdl)
+				Sdl.SDL_JoystickUpdate();
             return ReadState(playerIndex, deadZoneMode);
         }
         //

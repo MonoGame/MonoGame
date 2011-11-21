@@ -93,6 +93,8 @@ namespace Microsoft.Xna.Framework.Input
 		public bool HasRightVibrationMotor { get; internal set; }
 
 		public bool HasVoiceSupport { get; internal set; }
+
+		public bool GamePadType { get; internal set; }
     }
 }
 

@@ -60,31 +60,17 @@ namespace Microsoft.Xna.Framework.Graphics
 		internal List<int> vertexShaders = new List<int>();
 		internal List<int> fragmentShaders = new List<int>();
 
-        internal Effect(GraphicsDevice device)
-        {
-            if (graphicsDevice == null)
-            {
-                throw new ArgumentNullException("Graphics Device Cannot Be Null");
-            }
-			this.graphicsDevice = graphicsDevice;
-			
-            Parameters = new EffectParameterCollection();
-            Techniques = new EffectTechniqueCollection();
-            CurrentTechnique = new EffectTechnique(this);
-        }
+		protected Effect(Effect cloneSource) : this(cloneSource.GraphicsDevice)
+		{
+			this.CurrentTechnique = cloneSource.CurrentTechnique;
+			this.Name = cloneSource.Name;
+			this.Parameters = cloneSource.Parameters;
+			this.Tag = cloneSource.Tag;
+			this.Techniques = cloneSource.Techniques;
+		}
 
-		public Effect(
-         GraphicsDevice graphicsDevice,
-         byte[] effectCode,
-         CompilerOptions options,
-         EffectPool pool) : this(graphicsDevice)
-		{			
-			if (pool == null)
-            { 
-				return;
-                // TODO throw new ArgumentNullException("Effect Pool Cannot Be Null");
-            }
-			
+		public Effect(GraphicsDevice aGraphicsDevice, byte[] effectCode): this(aGraphicsDevice)
+		{						
 			int fragmentblocklength = BitConverter.ToInt32(effectCode, 0);
 
             int vertexblocklength = BitConverter.ToInt32(effectCode, fragmentblocklength + 4);
@@ -139,6 +125,42 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
 		}
+		
+		internal Effect(GraphicsDevice aGraphicsDevice)
+        {
+            if (aGraphicsDevice == null)
+            {
+                throw new ArgumentNullException("Graphics Device Cannot Be Null");
+            }
+			this.graphicsDevice = aGraphicsDevice;
+			
+            Parameters = new EffectParameterCollection();
+            Techniques = new EffectTechniqueCollection();
+            CurrentTechnique = new EffectTechnique(this);
+        }
+		
+		internal Effect (GraphicsDevice aGraphicsDevice, string aFileName) : this(aGraphicsDevice)
+		{
+			StreamReader streamReader = new StreamReader (aFileName);
+			string text = streamReader.ReadToEnd ();
+			streamReader.Close ();
+			
+			if ( aFileName.ToLower().Contains("fsh") )
+			{
+				CreateFragmentShaderFromSource(text);
+			}
+			else if ( aFileName.ToLower().Contains("vsh") )
+			{
+				CreateVertexShaderFromSource(text);
+			}			
+			else
+			{
+				throw new ArgumentException( aFileName + " not supported!" );
+			}
+			
+			DefineTechnique ("Technique1", "Pass1", 0, 0);
+			CurrentTechnique = Techniques ["Technique1"];
+		}
 
         internal virtual void Apply()
         {
@@ -188,33 +210,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 		}
 		
-		protected Effect(GraphicsDevice graphicsDevice, Effect cloneSource ) : this(graphicsDevice)
-		{
-			if(cloneSource != null)
-			{
-				// Clonage goes here
-			}
-		}
-		
-		internal Effect (GraphicsDevice aGraphicsDevice, string aFileName) : this(aGraphicsDevice)
-		{
-			StreamReader streamReader = new StreamReader (aFileName);
-			string text = streamReader.ReadToEnd ();
-			streamReader.Close ();
-			
-			if ( aFileName.ToLower().Contains("fsh") )
-			{
-				CreateFragmentShaderFromSource(text);
-			}
-			else
-			{
-				CreateVertexShaderFromSource(text);
-			}
-			
-			DefineTechnique ("Technique1", "Pass1", 0, 0);
-			CurrentTechnique = Techniques ["Technique1"];
-		}
-		
 		public void Begin()
 		{
 		}
@@ -224,10 +219,10 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 		}
 		
-		public virtual Effect Clone(GraphicsDevice device)
+		public virtual Effect Clone()
 		{
-			Effect f = new Effect( graphicsDevice, this );
-			return f;
+			Effect ef = new Effect(this);
+			return ef;
 		}
 		
 		public void End()
