@@ -355,6 +355,10 @@
     <Compile Include="Graphics\States\SamplerState.ES.cs" />
     <Compile Include="Content\ContentReaders\CurveReader.cs" />
     <Compile Include="Input\GamePadDeadZone.cs" />
+    <Compile Include="Content\ContentReaders\ColorReader.cs" />
+    <Compile Include="Content\ContentReaders\Vector2Reader.cs" />
+    <Compile Include="Content\ContentReaders\TimeSpanReader.cs" />
+    <Compile Include="Content\ContentReaders\PointReader.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
