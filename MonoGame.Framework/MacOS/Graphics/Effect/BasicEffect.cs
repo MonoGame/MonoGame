@@ -263,12 +263,16 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 
 
+		Texture2D _texture = null;
+
 		/// <summary>
 		/// Gets or sets the current texture.
 		/// </summary>
 		public Texture2D Texture {
 			get { return textureParam.GetValueTexture2D (); }
-			set { //textureParam.SetValue (value);
+			set {
+				_texture = value;
+				textureParam.SetValue (value);
 			}
 		}
 
@@ -288,6 +292,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 
+		bool shadersLoaded = false;
+		int[] VSArray = new int[20];
+		int[] PSArray = new int[10];
 
 		/// <summary>
 		/// Creates a new BasicEffect with default parameter settings.
@@ -296,10 +303,26 @@ namespace Microsoft.Xna.Framework.Graphics
 			//:base(device, Resources.BasicEffect)
 			:base(device)
 		{
-			// We only create the fragment code for now
-			// There needs to be a vertex shader created as well as per the Microsoft BaseEffects
-			CreateVertexShaderFromSource (VSBasicEffect.VSBasicVcNoFog);
-			CreateFragmentShaderFromSource (PSBasicEffect.PSBasicNoFog);
+			if (!shadersLoaded) {
+
+				// Load Vertex Shaders
+				VSArray[0] = CreateVertexShaderFromSource (VSBasicEffect.VSBasic);
+				VSArray[1] = CreateVertexShaderFromSource (VSBasicEffect.VSBasicNoFog);
+				VSArray[2] = CreateVertexShaderFromSource (VSBasicEffect.VSBasicVc);
+				VSArray[3] = CreateVertexShaderFromSource (VSBasicEffect.VSBasicVcNoFog);
+				VSArray[4] = CreateVertexShaderFromSource (VSBasicEffect.VSBasicTx);
+				VSArray[5] = CreateVertexShaderFromSource (VSBasicEffect.VSBasicTxNoFog);
+				VSArray[6] = CreateVertexShaderFromSource (VSBasicEffect.VSBasicTxVc);
+				VSArray[7] = CreateVertexShaderFromSource (VSBasicEffect.VSBasicTxVcNoFog);
+
+				PSArray[0] = CreateFragmentShaderFromSource (PSBasicEffect.PSBasic);
+				PSArray[1] = CreateFragmentShaderFromSource (PSBasicEffect.PSBasicNoFog);
+//				PSArray[2] = CreateFragmentShaderFromSource (PSBasicEffect.PSBasicVc);
+//				PSArray[3] = CreateFragmentShaderFromSource (PSBasicEffect.PSBasicVcNoFog);
+				PSArray[3] = CreateFragmentShaderFromSource (PSBasicEffect.PSBasicTx);
+				PSArray[4] = CreateFragmentShaderFromSource (PSBasicEffect.PSBasicTxNoFog);
+
+			}
 
 			DefineTechnique ("BasicEffect", "", 0, 0);
 			CurrentTechnique = Techniques ["BasicEffect"];
@@ -362,13 +385,14 @@ namespace Microsoft.Xna.Framework.Graphics
 			AmbientLightColor = EffectHelpers.EnableDefaultLighting (light0, light1, light2);
 		}
 
-
 		/// <summary>
 		/// Looks up shortcut references to our effect parameters.
 		/// </summary>
 		void CacheEffectParameters (BasicEffect cloneSource)
 		{
-//			textureParam = Parameters ["Texture"];
+
+			
+			textureParam = Parameters ["Texture"];
 			diffuseColorParam = Parameters ["DiffuseColor"];
 //			emissiveColorParam = Parameters ["EmissiveColor"];
 //			specularColorParam = Parameters ["SpecularColor"];
@@ -397,6 +421,87 @@ namespace Microsoft.Xna.Framework.Graphics
 //                                          (cloneSource != null) ? cloneSource.light2 : null);
 		}
 
+		int oldIndex = 0;
+		int shaderIndex = 0;
+
+		int[] VSIndices = new int[32]
+		{
+		    0,      // basic
+		    1,      // no fog
+		    2,      // vertex color
+		    3,      // vertex color, no fog
+		    4,      // texture
+		    5,      // texture, no fog
+		    6,      // texture + vertex color
+		    7,      // texture + vertex color, no fog
+		
+		    8,      // vertex lighting
+		    8,      // vertex lighting, no fog
+		    9,      // vertex lighting + vertex color
+		    9,      // vertex lighting + vertex color, no fog
+		    10,     // vertex lighting + texture
+		    10,     // vertex lighting + texture, no fog
+		    11,     // vertex lighting + texture + vertex color
+		    11,     // vertex lighting + texture + vertex color, no fog
+		
+		    12,     // one light
+		    12,     // one light, no fog
+		    13,     // one light + vertex color
+		    13,     // one light + vertex color, no fog
+		    14,     // one light + texture
+		    14,     // one light + texture, no fog
+		    15,     // one light + texture + vertex color
+		    15,     // one light + texture + vertex color, no fog
+		
+		    16,     // pixel lighting
+		    16,     // pixel lighting, no fog
+		    17,     // pixel lighting + vertex color
+		    17,     // pixel lighting + vertex color, no fog
+		    18,     // pixel lighting + texture
+		    18,     // pixel lighting + texture, no fog
+		    19,     // pixel lighting + texture + vertex color
+		    19,     // pixel lighting + texture + vertex color, no fog
+		};
+
+		int[] PSIndices = new int[32]
+		{
+		    0,      // basic
+		    1,      // no fog
+		    0,      // vertex color
+		    1,      // vertex color, no fog
+		    2,      // texture
+		    3,      // texture, no fog
+		    2,      // texture + vertex color
+		    3,      // texture + vertex color, no fog
+		
+		    4,      // vertex lighting
+		    5,      // vertex lighting, no fog
+		    4,      // vertex lighting + vertex color
+		    5,      // vertex lighting + vertex color, no fog
+		    6,      // vertex lighting + texture
+		    7,      // vertex lighting + texture, no fog
+		    6,      // vertex lighting + texture + vertex color
+		    7,      // vertex lighting + texture + vertex color, no fog
+		
+		    4,      // one light
+		    5,      // one light, no fog
+		    4,      // one light + vertex color
+		    5,      // one light + vertex color, no fog
+		    6,      // one light + texture
+		    7,      // one light + texture, no fog
+		    6,      // one light + texture + vertex color
+		    7,      // one light + texture + vertex color, no fog
+		
+		    8,      // pixel lighting
+		    8,      // pixel lighting, no fog
+		    8,      // pixel lighting + vertex color
+		    8,      // pixel lighting + vertex color, no fog
+		    9,      // pixel lighting + texture
+		    9,      // pixel lighting + texture, no fog
+		    9,      // pixel lighting + texture + vertex color
+		    9,      // pixel lighting + texture + vertex color, no fog
+		};
+
 
 		/// <summary>
 		/// Lazily computes derived parameter values immediately before applying the effect.
@@ -404,41 +509,6 @@ namespace Microsoft.Xna.Framework.Graphics
 		protected internal override void OnApply ()
 		{
 
-			// These are the states that work
-			GLStateManager.Projection(Projection);
-			GLStateManager.WorldView(world, view);
-
-			// Override this for now for testing purposes
-			dirtyFlags |= EffectDirtyFlags.World | EffectDirtyFlags.WorldViewProj;
-			dirtyFlags |= EffectDirtyFlags.WorldViewProj | EffectDirtyFlags.EyePosition;
-			dirtyFlags &= ~EffectDirtyFlags.FogEnable; // turn off fog for now
-			dirtyFlags |= EffectDirtyFlags.MaterialColor;
-
-			GLStateManager.Textures2D(false);
-			GLStateManager.ColorArray(VertexColorEnabled);
-
-			// Recompute the world+view+projection matrix or fog vector?
-			dirtyFlags = EffectHelpers.SetWorldViewProjAndFog (dirtyFlags, ref world, ref view, ref projection, ref worldView, fogEnabled, fogStart, fogEnd, worldViewProjParam, fogVectorParam);
-
-			// Recompute the diffuse/emissive/alpha material color parameters?
-			if ((dirtyFlags & EffectDirtyFlags.MaterialColor) != 0) {
-				EffectHelpers.SetMaterialColor (lightingEnabled, alpha, ref diffuseColor, ref emissiveColor, ref ambientLightColor, diffuseColorParam, emissiveColorParam);
-
-				dirtyFlags &= ~EffectDirtyFlags.MaterialColor;
-			}
-//
-//			if (lightingEnabled) {
-//				// Recompute the world inverse transpose and eye position?
-//				dirtyFlags = EffectHelpers.SetLightingMatrices (dirtyFlags, ref world, ref view, worldParam, worldInverseTransposeParam, eyePositionParam);
-//                
-//				// Check if we can use the only-bother-with-the-first-light shader optimization.
-//				bool newOneLight = !light1.Enabled && !light2.Enabled;
-//                
-//				if (oneLight != newOneLight) {
-//					oneLight = newOneLight;
-//					dirtyFlags |= EffectDirtyFlags.ShaderIndex;
-//				}
-//			}
 
 			// Recompute the shader index?
 //			if ((dirtyFlags & EffectDirtyFlags.ShaderIndex) != 0) {
@@ -446,10 +516,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
 				if (!fogEnabled)
 					shaderIndex += 1;
-                
+
 				if (vertexColorEnabled)
 					shaderIndex += 2;
-                
+
 				if (textureEnabled)
 					shaderIndex += 4;
 
@@ -465,7 +535,57 @@ namespace Microsoft.Xna.Framework.Graphics
 //				//shaderIndexParam.SetValue (shaderIndex);
 //
 //				dirtyFlags &= ~EffectDirtyFlags.ShaderIndex;
+				if (oldIndex != shaderIndex) {
+					int vertexShader = VSArray[VSIndices[shaderIndex]];
+					int fragmentShader = PSArray[PSIndices[shaderIndex]];
+					UpdateTechnique("BasicEffect", "", vertexShader, fragmentShader);
+					oldIndex = shaderIndex;
+					// Update here
+				}
 //			}
+
+
+			// These are the states that work
+			GLStateManager.Projection(Projection);
+			GLStateManager.WorldView(world, view);
+
+			// Override this for now for testing purposes
+			dirtyFlags |= EffectDirtyFlags.World | EffectDirtyFlags.WorldViewProj;
+			dirtyFlags |= EffectDirtyFlags.WorldViewProj | EffectDirtyFlags.EyePosition;
+			dirtyFlags &= ~EffectDirtyFlags.FogEnable; // turn off fog for now
+			dirtyFlags |= EffectDirtyFlags.MaterialColor;
+
+			GLStateManager.Textures2D(TextureEnabled);
+			GLStateManager.ColorArray(VertexColorEnabled);
+
+			// Recompute the world+view+projection matrix or fog vector?
+			dirtyFlags = EffectHelpers.SetWorldViewProjAndFog (dirtyFlags, ref world, ref view, ref projection, ref worldView, fogEnabled, fogStart, fogEnd, worldViewProjParam, fogVectorParam);
+
+			// Recompute the diffuse/emissive/alpha material color parameters?
+			if ((dirtyFlags & EffectDirtyFlags.MaterialColor) != 0) {
+				EffectHelpers.SetMaterialColor (lightingEnabled, alpha, ref diffuseColor, ref emissiveColor, ref ambientLightColor, diffuseColorParam, emissiveColorParam);
+
+				dirtyFlags &= ~EffectDirtyFlags.MaterialColor;
+			}
+
+			if (TextureEnabled) {
+				textureParam.SetValue(_texture);
+			}
+//
+//			if (lightingEnabled) {
+//				// Recompute the world inverse transpose and eye position?
+//				dirtyFlags = EffectHelpers.SetLightingMatrices (dirtyFlags, ref world, ref view, worldParam, worldInverseTransposeParam, eyePositionParam);
+//                
+//				// Check if we can use the only-bother-with-the-first-light shader optimization.
+//				bool newOneLight = !light1.Enabled && !light2.Enabled;
+//                
+//				if (oneLight != newOneLight) {
+//					oneLight = newOneLight;
+//					dirtyFlags |= EffectDirtyFlags.ShaderIndex;
+//				}
+//			}
+
+
 
 
 		}

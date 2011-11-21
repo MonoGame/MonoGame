@@ -325,10 +325,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void SetValue (Single value)
 		{
-			GL.UseProgram (_parentEffect.CurrentTechnique.Passes [0].shaderProgram);			
+			GL.UseProgram (_parentEffect.CurrentTechnique.Passes [0].shaderProgram);
 			_cachedValue = value;
 			GL.Uniform1 (internalIndex, value);
-			GL.UseProgram (0);		
+			GL.UseProgram (0);
 		}
 
 		public void SetValue (Single[] value)
@@ -355,7 +355,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void SetValue (Vector2 value)
 		{
-			GL.UseProgram (_parentEffect.CurrentTechnique.Passes [0].shaderProgram);			
+			GL.UseProgram (_parentEffect.CurrentTechnique.Passes [0].shaderProgram);
 			MonoMac.OpenGL.Vector2 vect2 = new MonoMac.OpenGL.Vector2 (value.X, value.Y);
 			_cachedValue = vect2;
 			GL.Uniform2 (internalIndex, vect2);
@@ -393,11 +393,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void SetValue (Vector3 value)
 		{
-			GL.UseProgram (_parentEffect.CurrentTechnique.Passes [0].shaderProgram);			
+			GL.UseProgram (_parentEffect.CurrentTechnique.Passes [0].shaderProgram);
 			MonoMac.OpenGL.Vector3 vect3 = new MonoMac.OpenGL.Vector3 (value.X, value.Y, value.Z);
 			_cachedValue = vect3;
 			GL.Uniform3 (internalIndex, vect3);
-			GL.UseProgram (0);			
+			GL.UseProgram (0);
 		}
 
 		public void SetValue (Vector3[] value)
@@ -406,11 +406,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void SetValue (Vector4 value)
 		{
-			GL.UseProgram (_parentEffect.CurrentTechnique.Passes [0].shaderProgram);			
+			GL.UseProgram (_parentEffect.CurrentTechnique.Passes [0].shaderProgram);
 			MonoMac.OpenGL.Vector4 vect4 = new MonoMac.OpenGL.Vector4 (value.X, value.Y, value.Z, value.W);
 			_cachedValue = vect4;
 			GL.Uniform4 (internalIndex, vect4);
-			GL.UseProgram (0);	
+			GL.UseProgram (0);
 		}
 
 		public void SetValue (Vector4[] value)
