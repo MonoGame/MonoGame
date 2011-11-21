@@ -272,6 +272,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			get { return textureParam.GetValueTexture2D (); }
 			set {
 				_texture = value;
+				_texture.Apply();
 				textureParam.SetValue (value);
 			}
 		}
