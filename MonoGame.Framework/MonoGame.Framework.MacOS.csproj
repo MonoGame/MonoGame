@@ -232,7 +232,6 @@
     <Compile Include="Graphics\Vertices\VertexPositionTexture.cs" />
     <Compile Include="MacOS\Graphics\GraphicsExtensions.cs" />
     <Compile Include="MacOS\Graphics\States\GLStateManager.cs" />
-    <Compile Include="MacOS\Graphics\Effect\BasicEffect.cs" />
     <Compile Include="MacOS\Graphics\Effect\EffectPass.cs" />
     <Compile Include="MacOS\Graphics\Vertices\IndexBuffer.cs" />
     <Compile Include="MacOS\Graphics\Vertices\VertexDeclaration.cs" />
@@ -328,7 +327,6 @@
     <Compile Include="Content\ContentReaders\PointReader.cs" />
     <Compile Include="Content\ContentReaders\Vector2Reader.cs" />
     <Compile Include="MacOS\Storage\StorageDeviceHelper.cs" />
-    <Compile Include="MacOS\Graphics\MonoGameGraphicsHelper.cs" />
     <Compile Include="Graphics\Effect\AlphaTestEffectCode.cs" />
     <Compile Include="Graphics\Effect\AlphaTestEffect.cs" />
     <Compile Include="Graphics\Effect\EffectHelpers.cs" />
@@ -340,6 +338,9 @@
     <Compile Include="Input\GamePadDeadZone.cs" />
     <Compile Include="Input\GamePadType.cs" />
     <Compile Include="MacOS\Graphics\Effect\Effect.cs" />
+    <Compile Include="MacOS\Graphics\Effect\BasicEffect.cs" />
+    <Compile Include="MacOS\Graphics\Effect\PSBasicEffect.cs" />
+    <Compile Include="MacOS\Graphics\Effect\VSBasicEffectcs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />

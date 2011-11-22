@@ -61,23 +61,28 @@ namespace Microsoft.Xna.Framework.Graphics
 		private int vertex_handle;
 		private bool fragment;
 		private bool vertex;
+		private string filename;
 		
 		internal List<int> vertexShaders = new List<int>();
 		internal List<int> fragmentShaders = new List<int>();
 		
-		protected Effect(Effect cloneSource) : this(cloneSource.GraphicsDevice)
-		{
-			this.CurrentTechnique = cloneSource.CurrentTechnique;
-			this.Name = cloneSource.Name;
-			this.Parameters = cloneSource.Parameters;
-			this.Tag = cloneSource.Tag;
-			this.Techniques = cloneSource.Techniques;
-		}
-
 		public Effect (
-			GraphicsDevice aGraphicsDevice,
-			byte[] effectCode) : this(aGraphicsDevice)
+			GraphicsDevice graphicsDevice,
+			byte[] effectCode,
+			CompilerOptions options,
+			EffectPool pool)
 		{
+
+			if (graphicsDevice == null) {
+				throw new ArgumentNullException ("Graphics Device Cannot Be Null");
+			}
+			this.graphicsDevice = graphicsDevice;
+
+			if (pool == null) { 
+				return;
+				// TODO throw new ArgumentNullException("Effect Pool Cannot Be Null");
+			}
+
 			int fragmentblocklength = BitConverter.ToInt32 (effectCode, 0);
 
 			int vertexblocklength = BitConverter.ToInt32 (effectCode, fragmentblocklength + 4);
@@ -126,19 +131,24 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 
 		}
-		
-		internal Effect(GraphicsDevice aGraphicsDevice)
-        {
-            if (aGraphicsDevice == null)
-            {
-                throw new ArgumentNullException("Graphics Device Cannot Be Null");
-            }
-			this.graphicsDevice = aGraphicsDevice;
-			
-            Parameters = new EffectParameterCollection();
-            Techniques = new EffectTechniqueCollection();
-            CurrentTechnique = new EffectTechnique(this);
-        }
+
+		protected Effect (GraphicsDevice graphicsDevice, Effect cloneSource)
+		{
+			if (graphicsDevice == null) {
+				throw new ArgumentNullException ("Graphics Device Cannot Be Null");
+			}
+			this.graphicsDevice = graphicsDevice;
+		}
+
+		protected Effect (GraphicsDevice graphicsDevice)
+		{
+			if (graphicsDevice == null) {
+				throw new ArgumentNullException ("Graphics Device Cannot Be Null");
+			}
+			this.graphicsDevice = graphicsDevice;
+			Techniques = new EffectTechniqueCollection ();
+			Parameters = new EffectParameterCollection();
+		}
 		
 		internal Effect (GraphicsDevice aGraphicsDevice, string aFileName) : this(aGraphicsDevice)
 		{
@@ -150,17 +160,77 @@ namespace Microsoft.Xna.Framework.Graphics
 			{
 				CreateFragmentShaderFromSource(text);
 			}
-			else if ( aFileName.ToLower().Contains("vsh") )
-			{
-				CreateVertexShaderFromSource(text);
-			}			
 			else
 			{
-				throw new ArgumentException( aFileName + " not supported!" );
-			}			
+				CreateVertexShaderFromSource(text);
+			}
 			
 			DefineTechnique ("Technique1", "Pass1", 0, 0);
 			CurrentTechnique = Techniques ["Technique1"];
+		}
+
+		protected Effect (Effect cloneSource)
+		{
+
+		}
+
+		public Effect (
+			GraphicsDevice graphicsDevice,
+			byte[] effectCode)
+		{
+
+			if (graphicsDevice == null) {
+				throw new ArgumentNullException ("Graphics Device Cannot Be Null");
+			}
+			this.graphicsDevice = graphicsDevice;
+
+			int fragmentblocklength = BitConverter.ToInt32 (effectCode, 0);
+
+			int vertexblocklength = BitConverter.ToInt32 (effectCode, fragmentblocklength + 4);
+
+			if (fragmentblocklength != 0) {
+				fragment_handle = GL.CreateShader (ShaderType.FragmentShader);
+				fragment = true;
+			}
+
+			if (vertexblocklength != 0) {
+				vertex_handle = GL.CreateShader (ShaderType.VertexShader);
+				vertex = true;
+			}
+
+			if (fragment) {
+				string[] fragmentstring = new string[1] { Encoding.UTF8.GetString(effectCode, 4, fragmentblocklength) };
+				//int[] fragmentLength = new int[1] { fragmentstring[0].Length };
+				int fragmentLength = fragmentstring [0].Length;
+				GL.ShaderSource (fragment_handle, 1, fragmentstring, ref fragmentLength);
+			}
+
+			if (vertex) {
+				string[] vertexstring = new string[1] { Encoding.UTF8.GetString(effectCode, fragmentblocklength + 8, vertexblocklength) };
+				// int[] vertexLength = new int[1] { vertexstring[0].Length };
+				int vertexLength = vertexstring [0].Length;
+				GL.ShaderSource (vertex_handle, 1, vertexstring, ref vertexLength);
+			}
+
+			int compiled = 0;
+
+			if (fragment) {
+				GL.CompileShader (fragment_handle);
+
+				GL.GetShader (fragment_handle, ShaderParameter.CompileStatus, out compiled);
+				if (compiled == (int)All.False) {
+					Console.Write ("Fragment Compilation Failed!");
+				}
+			}
+
+			if (vertex) {
+				GL.CompileShader (vertex_handle);
+				GL.GetShader (vertex_handle, ShaderParameter.CompileStatus, out compiled);
+				if (compiled == (int)All.False) {
+					Console.Write ("Vertex Compilation Failed!");
+				}
+			}
+			 
 		}
 
 		public void Begin ()
@@ -172,10 +242,15 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		}
 
-		public virtual Effect Clone()
+		public virtual Effect Clone (GraphicsDevice device)
 		{
-			Effect ef = new Effect(this);
-			return ef;
+			Effect f = new Effect ( graphicsDevice, this );
+			return f;
+		}
+
+		public virtual Effect Clone ()
+		{
+			return Clone (graphicsDevice);
 		}
 
 		public void End ()
@@ -206,18 +281,12 @@ namespace Microsoft.Xna.Framework.Graphics
 			set; 
 		}
 
-		internal virtual void Apply ()
-		{
-			/* TODO if (graphicsDevice.Textures.)
-			  Techniques[0].Passes[0].Apply(); */
-		}
-
 		protected internal virtual void OnApply ()
 		{
 
 		}
 
-		protected void CreateVertexShaderFromSource(string source)
+		protected int CreateVertexShaderFromSource(string source)
 		{
 			int shader = GL.CreateShader (ShaderType.VertexShader);
 			// Attach the loaded source string to the shader object
@@ -225,11 +294,13 @@ namespace Microsoft.Xna.Framework.Graphics
 			// Compile the shader
 			GL.CompileShader (shader);
 			
-			vertexShaders.Add(shader);			
+			vertexShaders.Add(shader);
+
+			return shader;
 		}
 		
 		
-		protected void CreateFragmentShaderFromSource(string source)
+		protected int CreateFragmentShaderFromSource(string source)
 		{
 			int shader = GL.CreateShader (ShaderType.FragmentShader);
 			// Attach the loaded source string to the shader object
@@ -237,7 +308,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			// Compile the shader
 			GL.CompileShader (shader);
 			
-			fragmentShaders.Add(shader);			
+			fragmentShaders.Add(shader);
+
+			return shader;
 		}
 
 		protected void DefineTechnique (string techniqueName, string passName, int vertexIndex, int fragmentIndex)
@@ -253,6 +326,16 @@ namespace Microsoft.Xna.Framework.Graphics
 			Techniques._techniques.Add(tech);
 			LogShaderParameters(String.Format("Technique {0} - Pass {1} :" ,tech.Name ,pass.Name), pass.shaderProgram);
 			
+		}
+
+		protected void UpdateTechnique (string techniqueName, string passName, int vertexIndex, int fragmentIndex)
+		{
+			EffectTechnique tech = Techniques[techniqueName];
+			EffectPass pass = tech.Passes[passName];
+			//pass.VertexIndex = vertexIndex;
+			//pass.FragmentIndex = fragmentIndex;
+			pass.UpdatePass(vertexIndex, fragmentIndex);
+			LogShaderParameters(String.Format("Technique {0} - Pass {1} :" ,tech.Name ,pass.Name), pass.shaderProgram);
 		}
 		
 		private int GetUniformUserIndex (string uniformName)

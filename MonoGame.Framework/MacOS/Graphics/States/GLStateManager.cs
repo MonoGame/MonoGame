@@ -98,14 +98,156 @@ namespace Microsoft.Xna.Framework.Graphics
             //GL11.Ortho(0, _device.DisplayMode.Width, _device.DisplayMode.Height, 0, -1, 1);
         }
 
-        public static void Cull(All cullMode)
-        {
-            if (_cull != cullMode)
-            {
-                _cull = cullMode;
-               // TODO  GL.Enable(_cull);
-            }
-        }
+		public static void WorldView (Matrix world, Matrix view)
+		{
+			Matrix worldView;
+			Matrix.Multiply(ref world, ref view, out worldView);
+			GL.MatrixMode(MatrixMode.Modelview);
+			GL.LoadIdentity();
+			GL.LoadMatrix(Matrix.ToFloatArray(worldView));
+		}
+
+		public static void SetBlendStates (BlendState state)
+		{
+			// Set blending mode
+			BlendEquationMode blendMode = state.ColorBlendFunction.GetBlendEquationMode();
+			GL.BlendEquation (blendMode);
+
+			// Set blending function
+			BlendingFactorSrc bfs = state.ColorSourceBlend.GetBlendFactorSrc();
+			BlendingFactorDest bfd = state.ColorDestinationBlend.GetBlendFactorDest();
+			GL.BlendFunc (bfs, bfd);
+
+			GL.Enable (EnableCap.Blend);
+		}
+
+		public static void FillMode (RasterizerState state)
+		{
+			switch (state.FillMode) {
+			case Microsoft.Xna.Framework.Graphics.FillMode.Solid:
+				GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
+				break;
+			case Microsoft.Xna.Framework.Graphics.FillMode.WireFrame:
+				GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
+				break;
+			}
+		}
+
+		public static void Cull(RasterizerState state)
+		{
+			switch (state.CullMode) {
+			case CullMode.None:
+				GL.Disable(EnableCap.CullFace);
+				break;
+			case CullMode.CullClockwiseFace:
+				GL.Enable(EnableCap.CullFace);
+				// set it to Back
+				GL.CullFace(CullFaceMode.Back);
+				// Set our direction
+				// I know this seems weird and maybe it is but based
+				//  on the samples these seem to be reversed in OpenGL and DirectX
+				GL.FrontFace(FrontFaceDirection.Ccw);
+				break;
+			case CullMode.CullCounterClockwiseFace:
+				GL.Enable(EnableCap.CullFace);
+				// set it to Back
+				GL.CullFace(CullFaceMode.Back);
+				// I know this seems weird and maybe it is but based
+				//  on the samples these seem to be reversed in OpenGL and DirectX
+				GL.FrontFace(FrontFaceDirection.Cw);
+				break;
+			}
+		}
+
+		public static void SetRasterizerStates (RasterizerState state) {
+			Cull(state);
+			FillMode(state);
+		}
+
+		internal static void SetDepthStencilState ( DepthStencilState state )
+		{
+
+			if (state.DepthBufferEnable) {
+				// enable Depth Buffer
+				GL.Enable( EnableCap.DepthTest);
+			}
+			else {
+				GL.Disable (EnableCap.DepthTest);
+			}
+
+
+			if (state.StencilEnable) {
+
+				// enable Stencil
+				GL.Enable( EnableCap.StencilTest);
+
+				// Set color mask - not needed
+				//GL.ColorMask(false, false, false, false); //Disable drawing colors to the screen
+				// set function
+				StencilFunction func = StencilFunction.Always;
+				switch (state.StencilFunction) {
+				case CompareFunction.Always:
+					func = StencilFunction.Always;
+					break;
+				case CompareFunction.Equal:
+					func = StencilFunction.Equal;
+					break;
+				case CompareFunction.Greater:
+					func = StencilFunction.Greater;
+					break;
+				case CompareFunction.GreaterEqual:
+					func = StencilFunction.Gequal;
+					break;
+				case CompareFunction.Less:
+					func = StencilFunction.Less;
+					break;
+				case CompareFunction.LessEqual:
+					func = StencilFunction.Lequal;
+					break;
+				case CompareFunction.Never:
+					func = StencilFunction.Never;
+					break;
+				case CompareFunction.NotEqual:
+					func = StencilFunction.Notequal;
+					break;
+				}
+
+				GL.StencilFunc (func, state.ReferenceStencil, state.StencilMask);
+
+				GL.StencilOp (GetStencilOp(state.StencilFail) , GetStencilOp (state.StencilDepthBufferFail)
+					, GetStencilOp ( state.StencilPass));
+			}
+			else {
+				// Set color mask - not needed
+				//GL.ColorMask(true, true, true, true); // Enable drawing colors to the screen
+				GL.Disable (EnableCap.StencilTest);
+			}
+
+		}
+
+		static StencilOp GetStencilOp (StencilOperation operation) {
+
+			switch (operation) {
+			case StencilOperation.Keep:
+				return StencilOp.Keep;
+			case StencilOperation.Decrement:
+				return StencilOp.Decr;
+			case StencilOperation.DecrementSaturation:
+				return StencilOp.DecrWrap;
+			case StencilOperation.Increment:
+				return StencilOp.Incr;
+			case StencilOperation.IncrementSaturation:
+				return StencilOp.IncrWrap;
+			case StencilOperation.Invert:
+				return StencilOp.Invert;
+			case StencilOperation.Replace:
+				return StencilOp.Replace;
+			case StencilOperation.Zero:
+				return StencilOp.Zero;
+			default:
+				return StencilOp.Keep;
+			}
+		}		
 
         public static void BlendFunc(BlendingFactorSrc source, BlendingFactorDest dest)
         {
