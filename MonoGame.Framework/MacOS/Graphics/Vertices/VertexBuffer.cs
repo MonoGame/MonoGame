@@ -8,7 +8,7 @@ using MonoMac.OpenGL;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-	public class VertexBuffer : IDisposable
+	public class VertexBuffer : GraphicsResource
 	{
 		private GraphicsDevice Graphics;
 		internal Type _type;
@@ -23,6 +23,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		// allow for 50 buffers initially
 		internal static VertexBuffer[] _allBuffers = new VertexBuffer[50];
 		internal static List<Action> _delayedBufferDelegates = new List<Action> ();
+		internal VertexDeclaration vertexDeclaration = null;
 
 		public VertexBuffer (GraphicsDevice Graphics,Type type,int vertexCount,BufferUsage bufferUsage)
 		{
@@ -35,6 +36,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		public VertexBuffer (GraphicsDevice Graphics,VertexDeclaration vertexDecs,int vertexCount,BufferUsage bufferUsage)
 			: this (Graphics, vertexDecs.GetType(), vertexCount, bufferUsage)
 		{
+			vertexDeclaration = vertexDecs;
 		}
 		
 		public int VertexCount { get; set; }
