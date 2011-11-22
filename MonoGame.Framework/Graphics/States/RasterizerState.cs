@@ -9,11 +9,19 @@ namespace Microsoft.Xna.Framework.Graphics
         public bool MultiSampleAntiAlias { get; set; }
         public bool ScissorTestEnable { get; set; }
         public float SlopeScaleDepthBias { get; set; }
-		
+
 		public static readonly RasterizerState CullClockwise;		
 		public static readonly RasterizerState CullCounterClockwise;
 		public static readonly RasterizerState CullNone;
-		
+
+		public RasterizerState ()
+		{
+			// Default is counter clockwise as per documentation
+			CullMode = CullMode.CullCounterClockwiseFace;
+			// Default is Solid as per documentation
+			FillMode = FillMode.Solid;
+		}
+
 		static RasterizerState ()
 		{
 			CullClockwise = new RasterizerState () {
