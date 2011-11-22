@@ -8,7 +8,7 @@ using MonoMac.OpenGL;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-	public class VertexBuffer : IDisposable
+	public class VertexBuffer : GraphicsResource
 	{
 		private GraphicsDevice Graphics;
 		internal Type _type;
