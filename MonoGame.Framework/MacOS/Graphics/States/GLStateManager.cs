@@ -141,13 +141,20 @@ namespace Microsoft.Xna.Framework.Graphics
 				break;
 			case CullMode.CullClockwiseFace:
 				GL.Enable(EnableCap.CullFace);
-				GL.CullFace(CullFaceMode.FrontAndBack);
-				GL.FrontFace(FrontFaceDirection.Cw);
+				// set it to Back
+				GL.CullFace(CullFaceMode.Back);
+				// Set our direction
+				// I know this seems weird and maybe it is but based
+				//  on the samples these seem to be reversed in OpenGL and DirectX
+				GL.FrontFace(FrontFaceDirection.Ccw);
 				break;
 			case CullMode.CullCounterClockwiseFace:
 				GL.Enable(EnableCap.CullFace);
-				GL.CullFace(CullFaceMode.FrontAndBack);
-				GL.FrontFace(FrontFaceDirection.Ccw);
+				// set it to Back
+				GL.CullFace(CullFaceMode.Back);
+				// I know this seems weird and maybe it is but based
+				//  on the samples these seem to be reversed in OpenGL and DirectX
+				GL.FrontFace(FrontFaceDirection.Cw);
 				break;
 			}
 		}
