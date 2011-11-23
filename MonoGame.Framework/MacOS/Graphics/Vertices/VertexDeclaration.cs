@@ -60,11 +60,11 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 throw new ArgumentNullException("vertexType", "Cannot be null");
             }
-            if (!vertexType.IsValueType)
-            {
-                object[] args = new object[] { vertexType };
-                throw new ArgumentException("vertexType", "Must be value type");
-            }
+//            if (!vertexType.IsValueType)
+//            {
+//                object[] args = new object[] { vertexType };
+//                throw new ArgumentException("vertexType", "Must be value type");
+//            }
             IVertexType type = Activator.CreateInstance(vertexType) as IVertexType;
             if (type == null)
             {
@@ -83,10 +83,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public static void PrepareForUse(VertexDeclaration vd)
         {
-            GLStateManager.VertexArray(true);
+
 
             bool normal = false;
-            bool texcoord = false; 
+            bool texcoord = false;
+			bool color = false;
 			
             foreach (var ve in vd.GetVertexElements())
             {
@@ -99,6 +100,7 @@ namespace Microsoft.Xna.Framework.Graphics
                                 vd.VertexStride,
                                 (IntPtr)ve.Offset
                                 );
+				GLStateManager.VertexArray(true);
                             break;
                         case VertexElementUsage.Color:
                             GL.ColorPointer(
@@ -107,6 +109,8 @@ namespace Microsoft.Xna.Framework.Graphics
                                 vd.VertexStride,
                                 (IntPtr)ve.Offset
                                 );
+				GLStateManager.ColorArray(true);
+
                             break;
                         case VertexElementUsage.Normal:
                             GL.NormalPointer(
@@ -114,7 +118,7 @@ namespace Microsoft.Xna.Framework.Graphics
                             vd.VertexStride,
                             (IntPtr)ve.Offset
                             );
-                            normal = true;
+                            GLStateManager.NormalArray(normal);
                             break;
                         case VertexElementUsage.TextureCoordinate:
                             GL.TexCoordPointer(
@@ -123,15 +127,16 @@ namespace Microsoft.Xna.Framework.Graphics
                             vd.VertexStride,
                             (IntPtr)ve.Offset
                             );
-                            texcoord = true;
+                            GLStateManager.TextureCoordArray(true);
                             break;
                         default:
                             throw new NotImplementedException();
                     }
             }
 
-            GLStateManager.TextureCoordArray(texcoord);
-            GLStateManager.NormalArray(normal);
+
+
+
         }
 
         public VertexElement[] GetVertexElements()
