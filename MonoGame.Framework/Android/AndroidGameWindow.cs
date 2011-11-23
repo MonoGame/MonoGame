@@ -243,8 +243,21 @@ namespace Microsoft.Xna.Framework
 			// decide of we honour the device orientation or force our own
 			
 			// so if we are in Portrait but we allow only LandScape we stay in landscape
-						
-
+			if (allowedOrientation == DisplayOrientation.Portrait)
+			{
+				actualOrientation = DisplayOrientation.Portrait;
+			}
+			else
+			if (allowedOrientation == DisplayOrientation.LandscapeLeft)
+			{
+				actualOrientation = DisplayOrientation.LandscapeLeft;
+			}
+			else
+			if (allowedOrientation == DisplayOrientation.LandscapeRight)
+			{
+				actualOrientation = DisplayOrientation.LandscapeRight;
+			}	
+			
             switch (currentorientation) {
 
 			case DisplayOrientation.Portrait:
@@ -255,13 +268,16 @@ namespace Microsoft.Xna.Framework
 				case DisplayOrientation.LandscapeRight:	
 				    if ((allowedOrientation & DisplayOrientation.LandscapeRight) != 0) {
                         actualOrientation = DisplayOrientation.LandscapeRight;
-                    }
+                    }				    
 				    break;
                 case DisplayOrientation.LandscapeLeft:				     
                 default:
-				    actualOrientation = DisplayOrientation.LandscapeLeft;
+					if ((allowedOrientation & DisplayOrientation.LandscapeLeft) != 0) {
+				    	actualOrientation = DisplayOrientation.LandscapeLeft;
+					}
                     break;
             }
+			
 			
 			CurrentOrientation = actualOrientation;
             game.GraphicsDevice.PresentationParameters.DisplayOrientation = actualOrientation;
