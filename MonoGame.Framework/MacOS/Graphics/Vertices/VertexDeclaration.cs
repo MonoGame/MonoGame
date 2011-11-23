@@ -60,11 +60,11 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 throw new ArgumentNullException("vertexType", "Cannot be null");
             }
-            if (!vertexType.IsValueType)
-            {
-                object[] args = new object[] { vertexType };
-                throw new ArgumentException("vertexType", "Must be value type");
-            }
+//            if (!vertexType.IsValueType)
+//            {
+//                object[] args = new object[] { vertexType };
+//                throw new ArgumentException("vertexType", "Must be value type");
+//            }
             IVertexType type = Activator.CreateInstance(vertexType) as IVertexType;
             if (type == null)
             {

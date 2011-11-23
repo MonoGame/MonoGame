@@ -536,11 +536,60 @@ namespace Microsoft.Xna.Framework.Graphics
 			// Set up our Graphics States
 			SetGraphicsStates();
 
-			var vd = VertexDeclaration.FromType (_vertexBuffer._type);
-			// Hmm, can the pointer here be changed with baseVertex?
-			VertexDeclaration.PrepareForUse (vd);
+            // Unbind the VBOs
+            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
 
-			GL.DrawElements (PrimitiveTypeGL11 (primitiveType), _indexBuffer._count, DrawElementsType.UnsignedShort, new IntPtr (startIndex));
+            //Create VBO if not created already
+            if (VboIdArray == 0)
+                GL.GenBuffers(1, out VboIdArray);
+            if (VboIdElement == 0)
+                GL.GenBuffers(1, out VboIdElement);
+
+            // Bind the VBO
+            GL.BindBuffer(BufferTarget.ArrayBuffer, VboIdArray);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, VboIdElement);
+            ////Clear previous data
+            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)0, (IntPtr)null, BufferUsageHint.DynamicDraw);
+            GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)0, (IntPtr)null, BufferUsageHint.DynamicDraw);
+
+			//Get VertexDeclaration
+			var vd = _vertexBuffer.VertexDeclaration;
+			if (vd == null) {
+
+				vd = VertexDeclaration.FromType(_vertexBuffer._type);
+			}
+
+            //Pin data
+            var handle = GCHandle.Alloc(_vertexBuffer, GCHandleType.Pinned);
+            var handle2 = GCHandle.Alloc(_vertexBuffer, GCHandleType.Pinned);
+
+            //Buffer data to VBO; This should use stream when we move to ES2.0
+            GL.BufferData(BufferTarget.ArrayBuffer,
+				(IntPtr)(vd.VertexStride * GetElementCountArray(primitiveType, primitiveCount)),
+				_vertexBuffer._bufferPtr,
+				BufferUsageHint.DynamicDraw);
+
+            GL.BufferData(BufferTarget.ElementArrayBuffer,
+				(IntPtr)(sizeof(ushort) * GetElementCountArray(primitiveType, primitiveCount)),
+				_indexBuffer._bufferPtr,
+				BufferUsageHint.DynamicDraw);
+
+            //Setup VertexDeclaration
+            VertexDeclaration.PrepareForUse(vd);
+
+            //Draw
+            GL.DrawElements(PrimitiveTypeGL11(primitiveType),
+				GetElementCountArray(primitiveType, primitiveCount),
+				DrawElementsType.UnsignedShort,
+				(IntPtr)(startIndex * sizeof(ushort)));
+
+
+            // Free resources
+            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
+            handle.Free();
+            handle2.Free();
 
 			UnsetGraphicsStates();
 		}
@@ -613,9 +662,12 @@ namespace Microsoft.Xna.Framework.Graphics
             ////Clear previous data
             GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)0, (IntPtr)null, BufferUsageHint.DynamicDraw);
 
-            //Get VertexDeclaration
-            //var vd = VertexDeclaration.FromType(typeof(T));
-			var vd = _vertexBuffer.vertexDeclaration;
+			//Get VertexDeclaration
+			var vd = _vertexBuffer.VertexDeclaration;
+			if (vd == null) {
+
+				vd = VertexDeclaration.FromType(_vertexBuffer._type);
+			}
             //Pin data
             var handle = GCHandle.Alloc(_vertexBuffer, GCHandleType.Pinned);
 
