@@ -1,0 +1,82 @@
+using System;
+
+namespace Microsoft.Xna.Framework.Graphics
+{
+	public struct VertexElementColor
+	{
+		byte R;
+		byte G;
+		byte B;
+		byte A;
+
+		public VertexElementColor (Color color)
+		{
+
+			R = color.R;
+			G = color.G;
+			B = color.B;
+			A = color.A;
+		}
+
+		public Color Color {
+			get {
+				return new Color (R, G, B, A);
+			}
+
+			set {
+				R = value.R;
+				G = value.G;
+				B = value.B;
+				A = value.A;
+			}
+		}
+
+		public override string ToString ()
+		{
+			return string.Format ("[Color: R={0}, G={1}, B={2}, A={3}]", R, G, B, A);
+		}
+
+		public static implicit operator Color (VertexElementColor typ)
+		{
+			// code to convert from  Color to VertexElementColor
+			// and return a Color object.
+			Color c = new Color ();
+			c.R = typ.R;
+			c.G = typ.G;
+			c.B = typ.B;
+			c.R = typ.A;
+			return c;
+		}
+
+		public static implicit operator VertexElementColor (Color typ)
+		{
+			// code to convert from  VertextElementColor to Color
+			// and return a VertexElementColor object.
+			VertexElementColor c = new VertexElementColor (typ);
+			return c;
+		}
+
+		public static bool operator == (VertexElementColor left, Color right)
+		{
+			return ( left.R == right.R && left.G == right.G && left.B == right.B && left.A == right.A);
+		}
+
+		public static bool operator != (VertexElementColor left, Color right)
+		{
+			return !(left == right);
+		}
+
+		public override bool Equals (object obj)
+		{
+			if (obj == null) {
+				return false;
+			}
+			if (obj.GetType () != base.GetType ()) {
+				return false;
+			}
+			return (this == ((VertexElementColor)obj));
+		}		
+	}
+
+}
+

@@ -341,6 +341,7 @@
     <Compile Include="MacOS\Graphics\Effect\BasicEffect.cs" />
     <Compile Include="MacOS\Graphics\Effect\PSBasicEffect.cs" />
     <Compile Include="MacOS\Graphics\Effect\VSBasicEffectcs" />
+    <Compile Include="Graphics\Vertices\VertexElementColor.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />

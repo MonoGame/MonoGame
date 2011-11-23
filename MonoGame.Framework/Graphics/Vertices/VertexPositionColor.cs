@@ -2,63 +2,61 @@ using System;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-    public struct VertexPositionColor : IVertexType
-    {
-        public Vector3 Position;
-        public Color Color;
-        public static readonly VertexDeclaration VertexDeclaration;
-        public VertexPositionColor(Vector3 position, Color color)
-        {
-            this.Position = position;
-            this.Color = color;
-        }
+	public struct VertexPositionColor : IVertexType
+	{
+		public Vector3 Position;
+		public VertexElementColor Color;
+		public static readonly VertexDeclaration VertexDeclaration;
 
-        VertexDeclaration IVertexType.VertexDeclaration
-        {
-            get
-            {
-                return VertexDeclaration;
-            }
-        }
-        public override int GetHashCode()
-        {
-            // TODO: Fix gethashcode
-            return 0;
-        }
+		public VertexPositionColor (Vector3 position, Color color)
+		{
+			this.Position = position;
+			this.Color = color;
+		}
 
-        public override string ToString()
-        {
-            return string.Format( "{{Position:{0} Color:{1}}}", new object[] { this.Position, this.Color });
-        }
+		VertexDeclaration IVertexType.VertexDeclaration {
+			get {
+				return VertexDeclaration;
+			}
+		}
 
-        public static bool operator ==(VertexPositionColor left, VertexPositionColor right)
-        {
-            return ((left.Color == right.Color) && (left.Position == right.Position));
-        }
+		public override int GetHashCode ()
+		{
+			// TODO: Fix gethashcode
+			return 0;
+		}
 
-        public static bool operator !=(VertexPositionColor left, VertexPositionColor right)
-        {
-            return !(left == right);
-        }
+		public override string ToString ()
+		{
+			return string.Format ("{{Position:{0} Color:{1}}}", new object[] { this.Position, this.Color });
+		}
 
-        public override bool Equals(object obj)
-        {
-            if (obj == null)
-            {
-                return false;
-            }
-            if (obj.GetType() != base.GetType())
-            {
-                return false;
-            }
-            return (this == ((VertexPositionColor)obj));
-        }
+		public static bool operator == (VertexPositionColor left, VertexPositionColor right)
+		{
+			return ((left.Color == right.Color) && (left.Position == right.Position));
+		}
 
-        static VertexPositionColor()
-        {
-            VertexElement[] elements = new VertexElement[] { new VertexElement(0, VertexElementFormat.Vector3, VertexElementUsage.Position, 0), new VertexElement(12, VertexElementFormat.Color, VertexElementUsage.Color, 0) };
-            VertexDeclaration declaration = new VertexDeclaration(elements);
-            VertexDeclaration = declaration;
-        }
-    }
+		public static bool operator != (VertexPositionColor left, VertexPositionColor right)
+		{
+			return !(left == right);
+		}
+
+		public override bool Equals (object obj)
+		{
+			if (obj == null) {
+				return false;
+			}
+			if (obj.GetType () != base.GetType ()) {
+				return false;
+			}
+			return (this == ((VertexPositionColor)obj));
+		}
+
+		static VertexPositionColor ()
+		{
+			VertexElement[] elements = new VertexElement[] { new VertexElement (0, VertexElementFormat.Vector3, VertexElementUsage.Position, 0), new VertexElement (12, VertexElementFormat.Color, VertexElementUsage.Color, 0) };
+			VertexDeclaration declaration = new VertexDeclaration (elements);
+			VertexDeclaration = declaration;
+		}
+	}
 }

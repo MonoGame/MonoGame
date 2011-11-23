@@ -507,10 +507,20 @@ namespace Microsoft.Xna.Framework.Graphics
 			GLStateManager.SetBlendStates(BlendState);
 		}
 
+		bool resetVertexStates = false;
 		internal void UnsetGraphicsStates ()
 		{
 			// Make sure we are not user any shaders
 			GL.UseProgram(0);
+
+			// if primitives were used then we need to reset them
+			if (resetVertexStates) {
+				GLStateManager.VertexArray(false);
+				GLStateManager.ColorArray(false);
+				GLStateManager.NormalArray(false);
+				GLStateManager.TextureCoordArray(false);
+				resetVertexStates = false;
+			}
 				GL.PopMatrix();
 
 		}
@@ -520,6 +530,10 @@ namespace Microsoft.Xna.Framework.Graphics
 			if (minVertexIndex > 0 || baseVertex > 0)
 				throw new NotImplementedException ("baseVertex > 0 and minVertexIndex > 0 are not supported");
 
+			// we need to reset vertex states afterwards
+			resetVertexStates = true;
+
+			// Set up our Graphics States
 			SetGraphicsStates();
 
 			var vd = VertexDeclaration.FromType (_vertexBuffer._type);
@@ -533,6 +547,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void DrawUserPrimitives<T> (PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int primitiveCount) where T : struct, IVertexType
 		{
+
+			// we need to reset vertex states afterwards
+			resetVertexStates = true;
+
 			// Set up our Graphics States
 			SetGraphicsStates();
 
@@ -575,6 +593,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void DrawPrimitives (PrimitiveType primitiveType, int vertexStart, int primitiveCount)
 		{
+
+			// we need to reset vertex states afterwards
+			resetVertexStates = true;
+
 			// Set up our Graphics States
 			SetGraphicsStates();
 
@@ -621,6 +643,9 @@ namespace Microsoft.Xna.Framework.Graphics
         public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int vertexCount, short[] indexData, int indexOffset, int primitiveCount) where T : struct, IVertexType
         {
 
+			// we need to reset vertex states afterwards
+			resetVertexStates = true;
+
 			// Set up our Graphics States
 			SetGraphicsStates();
 
@@ -657,13 +682,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
             GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vd.VertexStride * GetElementCountArray(primitiveType, primitiveCount)),
 				new IntPtr(handle.AddrOfPinnedObject().ToInt64() + (vertexOffset * vd.VertexStride)), BufferUsageHint.DynamicDraw);
-            GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(sizeof(short) * GetElementCountArray(primitiveType, primitiveCount)), indexData, BufferUsageHint.DynamicDraw);
+            GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(sizeof(ushort) * GetElementCountArray(primitiveType, primitiveCount)), indexData, BufferUsageHint.DynamicDraw);
 
             //Setup VertexDeclaration
             VertexDeclaration.PrepareForUse(vd);
 
             //Draw
-            GL.DrawElements(PrimitiveTypeGL11(primitiveType), GetElementCountArray(primitiveType, primitiveCount),DrawElementsType.UnsignedShort, (IntPtr)(indexOffset * sizeof(short)));
+            GL.DrawElements(PrimitiveTypeGL11(primitiveType), GetElementCountArray(primitiveType, primitiveCount),DrawElementsType.UnsignedShort, (IntPtr)(indexOffset * sizeof(ushort)));
 
 
             // Free resources
@@ -679,6 +704,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int vertexCount, int[] indexData, int indexOffset, int primitiveCount) where T : struct, IVertexType
         {
+
+			// we need to reset vertex states afterwards
+			resetVertexStates = true;
 
 			// Set up our Graphics States
 			SetGraphicsStates();
