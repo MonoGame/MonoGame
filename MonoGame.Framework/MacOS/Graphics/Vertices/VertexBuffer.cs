@@ -12,7 +12,7 @@ namespace Microsoft.Xna.Framework.Graphics
 	{
 		private GraphicsDevice Graphics;
 		internal Type _type;
-		private int _vertexCount;
+		//private int _vertexCount;
 		private BufferUsage _bufferUsage;
 		internal object _buffer = null;
 		internal IntPtr _bufferPtr;
@@ -23,13 +23,13 @@ namespace Microsoft.Xna.Framework.Graphics
 		// allow for 50 buffers initially
 		internal static VertexBuffer[] _allBuffers = new VertexBuffer[50];
 		internal static List<Action> _delayedBufferDelegates = new List<Action> ();
-		internal VertexDeclaration vertexDeclaration = null;
+		private VertexDeclaration vertexDeclaration = null;
 
 		public VertexBuffer (GraphicsDevice Graphics,Type type,int vertexCount,BufferUsage bufferUsage)
 		{
 			this.Graphics = Graphics;
 			this._type = type;
-			this._vertexCount = vertexCount;
+			VertexCount = vertexCount;
 			this._bufferUsage = bufferUsage;
 		}
 		
@@ -40,6 +40,13 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 		
 		public int VertexCount { get; set; }
+
+		public VertexDeclaration VertexDeclaration
+		{
+			get {
+				return vertexDeclaration;
+			}
+		}
 
 		internal static void CreateFrameBuffers ()
 		{
