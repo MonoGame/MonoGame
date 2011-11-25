@@ -570,7 +570,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 
 			if (TextureEnabled) {
+				_texture.Apply();
 				textureParam.SetValue(_texture);
+				//System.Console.WriteLine("Texture set");
 			}
 //
 //			if (lightingEnabled) {

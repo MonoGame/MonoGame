@@ -43,6 +43,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 GL.EnableClientState(ArrayCap.ColorArray);
             else
                 GL.DisableClientState(ArrayCap.ColorArray);
+			//GL.Enable(EnableCap.ColorArray);
         }
 
         public static void NormalArray(bool enable)
