@@ -84,10 +84,9 @@ namespace Microsoft.Xna.Framework.Graphics
         public static void PrepareForUse(VertexDeclaration vd)
         {
 
-
+		GLStateManager.VertexArray(true);
             bool normal = false;
             bool texcoord = false;
-			bool color = false;
 			
             foreach (var ve in vd.GetVertexElements())
             {
@@ -100,7 +99,7 @@ namespace Microsoft.Xna.Framework.Graphics
                                 vd.VertexStride,
                                 (IntPtr)ve.Offset
                                 );
-				GLStateManager.VertexArray(true);
+
                             break;
                         case VertexElementUsage.Color:
                             GL.ColorPointer(
@@ -109,8 +108,6 @@ namespace Microsoft.Xna.Framework.Graphics
                                 vd.VertexStride,
                                 (IntPtr)ve.Offset
                                 );
-				GLStateManager.ColorArray(true);
-
                             break;
                         case VertexElementUsage.Normal:
                             GL.NormalPointer(
@@ -118,7 +115,7 @@ namespace Microsoft.Xna.Framework.Graphics
                             vd.VertexStride,
                             (IntPtr)ve.Offset
                             );
-                            GLStateManager.NormalArray(normal);
+					normal = true;
                             break;
                         case VertexElementUsage.TextureCoordinate:
                             GL.TexCoordPointer(
@@ -127,13 +124,15 @@ namespace Microsoft.Xna.Framework.Graphics
                             vd.VertexStride,
                             (IntPtr)ve.Offset
                             );
-                            GLStateManager.TextureCoordArray(true);
+                            texcoord = true;
                             break;
                         default:
                             throw new NotImplementedException();
                     }
             }
 
+            GLStateManager.NormalArray(normal);
+		GLStateManager.TextureCoordArray(texcoord);			
 
 
 

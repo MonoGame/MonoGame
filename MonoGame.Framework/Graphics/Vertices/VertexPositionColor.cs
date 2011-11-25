@@ -5,13 +5,19 @@ namespace Microsoft.Xna.Framework.Graphics
 	public struct VertexPositionColor : IVertexType
 	{
 		public Vector3 Position;
-		public VertexElementColor Color;
+		internal VertexElementColor color;
 		public static readonly VertexDeclaration VertexDeclaration;
 
 		public VertexPositionColor (Vector3 position, Color color)
 		{
 			this.Position = position;
-			this.Color = color;
+			this.color = color;
+		}
+
+		public Color Color
+		{
+			get { return color; }
+			set { color = value; }
 		}
 
 		VertexDeclaration IVertexType.VertexDeclaration {
