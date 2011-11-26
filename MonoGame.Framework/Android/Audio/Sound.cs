@@ -1,210 +1,90 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using Android.App;
 using Android.Content;
-using Android.Media;
-using Android.OS;
-using Android.Runtime;
-using Android.Util;
-using Android.Views;
-using Android.Widget;
 using Android.Content.Res;
+using Android.Media;
+using Android.Util;
 
 namespace Microsoft.Xna.Framework.Audio
 {
     internal class Sound : IDisposable
     {
-        internal MediaPlayer _player;
-        private float _Volume;
-        private bool _Looping;
+        private const int MAX_SIMULTANEOUS_SOUNDS = 10;
+        private static SoundPool s_soundPool = new SoundPool(MAX_SIMULTANEOUS_SOUNDS, (int)Stream.Music, 0);
+        private int _soundId;
+        private int _streamId;
 
-        private static bool Running = true;
-        private static Queue<Action> WorkItems = new Queue<Action>();
-
-        private static void Enqueue(Action workItem)
+        ~Sound()
         {
-            lock (Sound.WorkItems)
-            {
-                Sound.WorkItems.Enqueue(workItem);
-                Monitor.Pulse(Sound.WorkItems);
-            }
+            Dispose();
         }
 
-        private static void Worker(object state)
+        public void Dispose()
         {
-            while (Sound.Running)
-            {
-                Action workItem;
-
-                lock (Sound.WorkItems)
-                {
-                    if (Sound.WorkItems.Count == 0)
-                        Monitor.Wait(Sound.WorkItems);
-
-                    workItem = Sound.WorkItems.Dequeue();
-                }
-
-                try
-                {
-                    workItem();
-                }
-                catch(Exception ex)
-                {
-                    Log.Debug("Sound.Worker" , "Sound thread: Work Exception" + ex.ToString());
-                }
-            }
+            s_soundPool.Unload(_soundId);
         }
 
-        static Sound()
-        {
-            ThreadPool.QueueUserWorkItem(Worker);
-        }
-        
-        private Sound(MediaPlayer player)
-        {
-            _player = player;
-        }
-		
-		~Sound()
-		{
-			Dispose();	
-		}
-		
-		public void Dispose()
-		{
-			_player.Dispose();
-		}
-
-        public float Volume
-        {
-            get { return this._Volume; }
-            set
-            {
-                this._Volume = value;
-                if (this._player == null)
-                    return;
-
-                _player.SetVolume(value, value);
-
-            }
-        }
+        public float Volume { get; set; }
+        public bool Looping { get; set; }
+        public float Rate { get; set; }
+        public float Pan { get; set; }
 
         public double Duration
         {
-            get
-            {
-                return _player != null ? _player.Duration : 0;
-            }
+            get { return 0; } // cant get this from soundpool.
         }
 
         public double CurrentPosition
         {
-            get
-            {
-                return _player != null ? _player.CurrentPosition : 0;
-            }
+            get { return 0; } // cant get this from soundpool.
         }
 
-        public bool Looping
+        public bool Playing
         {
-            get { return this._Looping; }
-            set
+            get
             {
-                if (this._Looping != value) {
-                    this._Looping = value;
-
-                    if (_player == null)
-                        return;
-
-                    _player.Looping = value;
-                }
+                return false; // cant get this from soundpool.
             }
-
         }
 
         public void Play()
         {
-            if (this._player == null)
-                return;
+            AudioManager audioManager = (AudioManager)Game.contextInstance.GetSystemService(Context.AudioService);
 
-            //_player.Start();
-            Sound.Enqueue(_player.Start);
+            float streamVolumeCurrent = audioManager.GetStreamVolume(Stream.Music);
+            float streamVolumeMax = audioManager.GetStreamMaxVolume(Stream.Music);
+            float streamVolume = streamVolumeCurrent / streamVolumeMax;
+            float panRatio = (this.Pan + 1.0f) / 2.0f;
+            float volumeLeft = Volume * streamVolume * (1.0f - panRatio);
+            float volumeRight = Volume * streamVolume * panRatio;
+
+            float rate = (float)Math.Pow(2, Rate);
+            rate = Math.Max(Math.Min(rate, 2.0f), 0.5f);
+
+            _streamId = s_soundPool.Play(_soundId, volumeLeft, volumeRight, 1, Looping ? -1 : 0, rate);
         }
-		
-		public void Pause()
+
+        public void Pause()
         {
-            if (this._player == null)
-                return;
-
-            lock (Sound.WorkItems) {
-                _player.Pause();
-            }
+            s_soundPool.Pause(_streamId);
         }
-		
+
         public void Stop()
         {
-            if (this._player == null)
-                return;
-
-            lock (Sound.WorkItems) {
-                _player.Stop();
-            }
-        }
-		
-		public float Pan
-        {
-            get;
-			set;
-        }
-		
-		public bool Playing
-		{
-			get 
-			{ 
-				return _player.IsPlaying;
-			}
-		}
-
-        internal bool IsPrepared { get; private set; }
-
-        protected void OnPrepared(object sender, EventArgs e)
-        {
-            IsPrepared = true;
+            s_soundPool.Stop(_streamId);
         }
 
-
-       
-              
         public Sound(string filename, float volume, bool looping)
         {
-            this._player = new MediaPlayer();
-            // get the Asset Descriptor and Release it when the SetDataSource returns
-            // otherwise you cant play the file
             using (AssetFileDescriptor fd = Game.contextInstance.Assets.OpenFd(filename))
-            {
-                _player.SetDataSource(fd.FileDescriptor, fd.StartOffset, fd.Length);
-            }
-            _player.Prepared += this.OnPrepared;
+                _soundId = s_soundPool.Load(fd.FileDescriptor, fd.StartOffset, fd.Length, 1);
+
             this.Looping = looping;
-            this.Volume = volume;            
-            // prepare on the background  thread
-            try
-            {
-                _player.PrepareAsync();
-            }
-            catch (Exception ex)
-            {
-                Log.Debug("MonoGameInfo", ex.ToString());
-            }
+            this.Volume = volume;
         }
 
         public Sound(byte[] audiodata, float volume, bool looping)
         {
             throw new NotImplementedException();
         }
-
     }
 }
