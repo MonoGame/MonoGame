@@ -309,7 +309,7 @@ namespace Microsoft.Xna.Framework.Graphics
             Techniques[0].Passes[0].Apply();
         }
 
-        protected virtual void OnApply()
+        protected internal virtual void OnApply()
         {
 
         }
