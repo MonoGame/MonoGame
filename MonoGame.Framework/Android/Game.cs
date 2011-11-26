@@ -306,7 +306,7 @@ namespace Microsoft.Xna.Framework
                 _isActive = false;
                 view.Pause();
                 Accelerometer.Pause();
-				if (Sound.SoundPool != null) Sound.SoundPool.AutoPause();
+				Sound.PauseAll();
                 if (Deactivated != null)
                     Deactivated.Invoke(this, null);
             }
@@ -319,7 +319,7 @@ namespace Microsoft.Xna.Framework
                 _isActive = true;
                 view.Resume();
                 Accelerometer.Resume();				
-				if (Sound.SoundPool != null) Sound.SoundPool.AutoResume();
+				Sound.ResumeAll();
                 if (Activated != null)
                     Activated.Invoke(this, null);
             }
