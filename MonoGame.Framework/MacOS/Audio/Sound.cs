@@ -134,6 +134,12 @@ namespace Microsoft.Xna.Framework.Audio
 			}
 		}
 		
+		public float Rate 
+		{ 
+			get; 
+			set; 
+		}
+		
 		public void Pause()
 		{		
 			//HACK: Stopping or pausing NSSound is really slow (~200ms), don't if the sample is short :/
