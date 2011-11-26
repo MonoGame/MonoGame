@@ -2,7 +2,7 @@
 // /*
 // Microsoft Public License (Ms-PL)
 // XnaTouch - Copyright © 2009-2010 The XnaTouch Team
-// 
+//
 // All rights reserved.
 // 
 // This license governs use of the accompanying software. If you use the software, you accept this license. If you do not
@@ -63,7 +63,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			TouchCollection result = new TouchCollection(Collection);		
 			Collection.Update();
 			return result;
-        }
+        }       
 		
 		public static void Reset()
 		{

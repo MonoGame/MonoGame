@@ -53,6 +53,8 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework;
+using Android.Media;
+using Microsoft.Xna.Framework.Audio;
 
 namespace Microsoft.Xna.Framework
 {
@@ -304,6 +306,7 @@ namespace Microsoft.Xna.Framework
                 _isActive = false;
                 view.Pause();
                 Accelerometer.Pause();
+				if (Sound.SoundPool != null) Sound.SoundPool.AutoPause();
                 if (Deactivated != null)
                     Deactivated.Invoke(this, null);
             }
@@ -315,7 +318,8 @@ namespace Microsoft.Xna.Framework
             {
                 _isActive = true;
                 view.Resume();
-                Accelerometer.Resume();
+                Accelerometer.Resume();				
+				if (Sound.SoundPool != null) Sound.SoundPool.AutoResume();
                 if (Activated != null)
                     Activated.Invoke(this, null);
             }
