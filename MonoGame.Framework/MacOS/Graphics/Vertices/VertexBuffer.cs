@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,7 +17,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		internal object _buffer = null;
 		internal IntPtr _bufferPtr;
 		internal int _bufferIndex = 0;
-		internal int _size;		
+		internal int _size;
 		internal static int _bufferCount = 0;
 		internal uint _bufferStore; 
 		// allow for 50 buffers initially
@@ -25,7 +25,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		internal static List<Action> _delayedBufferDelegates = new List<Action> ();
 		private VertexDeclaration vertexDeclaration = null;
 
-		public VertexBuffer (GraphicsDevice Graphics,Type type,int vertexCount,BufferUsage bufferUsage)
+		public VertexBuffer (GraphicsDevice Graphics, Type type, int vertexCount, BufferUsage bufferUsage)
 		{
 			this.Graphics = Graphics;
 			this._type = type;
@@ -33,7 +33,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			this._bufferUsage = bufferUsage;
 		}
 		
-		public VertexBuffer (GraphicsDevice Graphics,VertexDeclaration vertexDecs,int vertexCount,BufferUsage bufferUsage)
+		public VertexBuffer (GraphicsDevice Graphics, VertexDeclaration vertexDecs, int vertexCount, BufferUsage bufferUsage)
 			: this (Graphics, vertexDecs.GetType(), vertexCount, bufferUsage)
 		{
 			vertexDeclaration = vertexDecs;
@@ -41,8 +41,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		public int VertexCount { get; set; }
 
-		public VertexDeclaration VertexDeclaration
-		{
+		public VertexDeclaration VertexDeclaration {
 			get {
 				return vertexDeclaration;
 			}
@@ -88,8 +87,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			//glUnmapBuffer - finished setting data
 
 			_buffer = vertices;
-			_bufferPtr = GCHandle.Alloc (_buffer, GCHandleType.Pinned).AddrOfPinnedObject ();			
-
+			_bufferPtr = GCHandle.Alloc (_buffer, GCHandleType.Pinned).AddrOfPinnedObject ();
 			_bufferIndex = _bufferCount + 1;
 			_allBuffers [_bufferIndex] = this;
 
@@ -97,6 +95,17 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			_bufferCount++;
 			// TODO: Kill buffers in PhoneOSGameView.DestroyFrameBuffer()
+		}
+
+		public void SetData<T> (
+			int offsetInBytes,
+			T[] data,
+			int startIndex,
+			int elementCount,
+			int vertexStride
+			) where T : struct
+		{
+			throw new NotImplementedException();
 		}
 
 		public void Dispose ()

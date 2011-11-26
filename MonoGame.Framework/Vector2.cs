@@ -433,21 +433,29 @@ namespace Microsoft.Xna.Framework
         }
 		
 		public static void Transform (
-         Vector2[] sourceArray,
-         ref Matrix matrix,
-         Vector2[] destinationArray)
+			Vector2[] sourceArray,
+			ref Matrix matrix,
+			Vector2[] destinationArray)
 		{
+			Transform(sourceArray, 0, ref matrix, destinationArray, 0, sourceArray.Length);
 		}
 
 		
 		public static void Transform (
-         Vector2[] sourceArray,
-         int sourceIndex,
-         ref Matrix matrix,
-         Vector2[] destinationArray,
-         int destinationIndex,
-         int length)
+			Vector2[] sourceArray,
+			int sourceIndex,
+			ref Matrix matrix,
+			Vector2[] destinationArray,
+			int destinationIndex,
+			int length)
 		{
+			for (int x = 0; x < length; x++) {
+				var position = sourceArray[sourceIndex + x];
+				var destination = destinationArray[destinationIndex + x];
+				destination.X = (position.X * matrix.M11) + (position.Y * matrix.M21) + matrix.M41;
+				destination.Y = (position.X * matrix.M12) + (position.Y * matrix.M22) + matrix.M42;
+				destinationArray[destinationIndex + x] = destination;
+			}
 		}
 
         public static Vector2 TransformNormal(Vector2 normal, Matrix matrix)
