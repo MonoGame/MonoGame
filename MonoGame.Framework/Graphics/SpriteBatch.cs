@@ -198,12 +198,14 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			GL.MatrixMode(All.Modelview);			
 			
+#if !ANDROID			
 			// Only swap our viewport if Width is greater than height
 			if (this.graphicsDevice.Viewport.Width > this.graphicsDevice.Viewport.Height)
 			{
 				GL.Viewport(0, 0, this.graphicsDevice.Viewport.Height, this.graphicsDevice.Viewport.Width);
 			}
 			else
+#endif								
 			{
 				GL.Viewport(0, 0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height);
 			}

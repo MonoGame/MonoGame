@@ -112,7 +112,10 @@ namespace Microsoft.Xna.Framework
 			clientBounds = new Rectangle(0,0,(int) (rect.Width * UIScreen.MainScreen.Scale),(int) (rect.Height * UIScreen.MainScreen.Scale));
 			
 			// Enable multi-touch
-			MultipleTouchEnabled = true;	
+			MultipleTouchEnabled = true;
+			
+			// Don't Autoresize, we'll do that
+			AutoResize = false;
 						
 			// Initialize GameTime
             _updateGameTime = new GameTime();
@@ -291,6 +294,7 @@ namespace Microsoft.Xna.Framework
 				if (recognizerSwipe == null)
 				{
 					recognizerSwipe = new UISwipeGestureRecognizer(this, new Selector("SwipeGestureRecognizer"));
+					recognizerSwipe.Direction = UISwipeGestureRecognizerDirection.Down | UISwipeGestureRecognizerDirection.Up | UISwipeGestureRecognizerDirection.Left | UISwipeGestureRecognizerDirection.Right;
 					AddGestureRecognizer(recognizerSwipe);
 				}
 			}
@@ -435,62 +439,76 @@ namespace Microsoft.Xna.Framework
 		
 		private void FillTouchCollection(NSSet touches)
 		{
-			var enabledGestures = TouchPanel.EnabledGestures;
-			if ( enabledGestures == GestureType.None )
-			{
-				UITouch []touchesArray = touches.ToArray<UITouch>();
-				
-				for (int i=0; i < touchesArray.Length;i++)
-				{
-					
-					//Get IOS touch
-					UITouch touch = touchesArray[i];
-					
-					//Get position touch
-					Vector2 position = new Vector2 (touch.LocationInView (touch.View));
-					Vector2 translatedPosition = GetOffsetPosition(position, true);
-					
-					TouchLocation tlocation;
-					TouchCollection collection = TouchPanel.Collection;
-					int index;
-					switch (touch.Phase)
-					{
-						case UITouchPhase.Stationary:
-						case UITouchPhase.Moved:
-							index = collection.FindById(touch.Handle.ToInt32(), out tlocation);
-							if (index >= 0)
-						    {
-								tlocation.State = TouchLocationState.Moved;
-								tlocation.Position = translatedPosition;
-								collection[index] = tlocation;
-							}
-							break;
-						case UITouchPhase.Began	:	
-							tlocation = new TouchLocation(touch.Handle.ToInt32(), TouchLocationState.Pressed, translatedPosition);
-							collection.Add(tlocation);	
-							break;
-						case UITouchPhase.Ended	:
-							index = collection.FindById(touch.Handle.ToInt32(), out tlocation);
-							if (index >= 0)
-							{
-								tlocation.State = TouchLocationState.Released;							
-								collection[index] = tlocation;
-							}
-							break;
-						case UITouchPhase.Cancelled:
-							index = collection.FindById(touch.Handle.ToInt32(), out tlocation);
-							if (index >= 0)
-							{
-								tlocation.State = TouchLocationState.Invalid;
-								collection[index] = tlocation;
-							}
-							break;
-						default :
-							break;					
-					}
-				}
-			}
+			UITouch []touchesArray = touches.ToArray<UITouch>();
 			
+			for (int i=0; i < touchesArray.Length;i++)
+			{
+				
+				//Get IOS touch
+				UITouch touch = touchesArray[i];
+				
+				//Get position touch
+				Vector2 position = new Vector2 (touch.LocationInView (touch.View));
+				Vector2 translatedPosition = GetOffsetPosition(position, true);
+				
+				TouchLocation tlocation;
+				TouchCollection collection = TouchPanel.Collection;
+				int index;
+				switch (touch.Phase)
+				{
+					case UITouchPhase.Stationary:
+					case UITouchPhase.Moved:
+						index = collection.FindById(touch.Handle.ToInt32(), out tlocation);
+						if (index >= 0)
+					    {
+							tlocation.State = TouchLocationState.Moved;
+							tlocation.Position = translatedPosition;
+							collection[index] = tlocation;
+						}
+						
+						if (i == 1)
+						{
+						    Mouse.State.X = (int)translatedPosition.X;
+							Mouse.State.Y = (int)translatedPosition.Y;
+						}
+						break;
+					case UITouchPhase.Began	:	
+						tlocation = new TouchLocation(touch.Handle.ToInt32(), TouchLocationState.Pressed, translatedPosition);
+						collection.Add(tlocation);
+					    if (i == 1)
+						{
+						    Mouse.State.X = (int)translatedPosition.X;
+							Mouse.State.Y = (int)translatedPosition.Y;
+							Mouse.State.LeftButton = ButtonState.Pressed;
+						}
+						break;
+					case UITouchPhase.Ended	:
+						index = collection.FindById(touch.Handle.ToInt32(), out tlocation);
+						if (index >= 0)
+						{
+							tlocation.State = TouchLocationState.Released;							
+							collection[index] = tlocation;
+						}
+					
+						if (i == 1)
+						{
+						    Mouse.State.X = (int)translatedPosition.X;
+							Mouse.State.Y = (int)translatedPosition.Y;
+							Mouse.State.LeftButton = ButtonState.Released;
+						}
+						break;
+					case UITouchPhase.Cancelled:
+						index = collection.FindById(touch.Handle.ToInt32(), out tlocation);
+						if (index >= 0)
+						{
+							tlocation.State = TouchLocationState.Invalid;
+							collection[index] = tlocation;
+						}
+						break;
+					default :
+						break;					
+				}
+			}			
 		}
 		
 		internal Vector2 GetOffsetPosition(Vector2 position, bool useScale)

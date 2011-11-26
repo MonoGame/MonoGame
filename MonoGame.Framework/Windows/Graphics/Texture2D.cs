@@ -307,7 +307,7 @@ namespace Microsoft.Xna.Framework.Graphics
             return FromFile(graphicsDevice, filename, 0, 0);
         }
 
-        private void Apply()
+        internal void Apply()
         {
 
             GL.BindTexture(TextureTarget.Texture2D, (uint)_textureId);
