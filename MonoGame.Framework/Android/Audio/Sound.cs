@@ -12,6 +12,24 @@ namespace Microsoft.Xna.Framework.Audio
         private static SoundPool s_soundPool = new SoundPool(MAX_SIMULTANEOUS_SOUNDS, (int)Stream.Music, 0);
         private int _soundId;
         private int _streamId;
+		
+		internal static SoundPool SoundPool
+		{
+			get {
+				return s_soundPool;
+			}
+			
+		}
+		
+		internal static void PauseAll()
+		{
+			s_soundPool.AutoPause();
+		}
+		
+		internal static void ResumeAll()
+		{
+			s_soundPool.AutoResume();
+		}
 
         ~Sound()
         {
