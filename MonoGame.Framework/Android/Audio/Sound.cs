@@ -20,6 +20,16 @@ namespace Microsoft.Xna.Framework.Audio
 			}
 			
 		}
+		
+		internal static void PauseAll()
+		{
+			s_soundPool.AutoPause();
+		}
+		
+		internal static void ResumeAll()
+		{
+			s_soundPool.AutoResume();
+		}
 
         ~Sound()
         {
