@@ -45,11 +45,17 @@ namespace Microsoft.Xna.Framework.Input
     public struct MouseState
     {
 		int _x,_y;
+		ButtonState _leftButton;
+		ButtonState _middleButton;
+		ButtonState _rightButton;
 		
 		internal MouseState(int x, int y)
 		{
 			_x = x;
-			_y=y;
+			_y = y;
+			_leftButton = ButtonState.Released;
+			_middleButton = ButtonState.Released;
+			_rightButton = ButtonState.Released;
 		}
 		
         public int X
@@ -58,7 +64,11 @@ namespace Microsoft.Xna.Framework.Input
             {
                 return _x;
             }
-			           
+			
+			internal set
+			{
+				_x = value;
+			}	           
         }
         public int Y
         {
@@ -66,13 +76,23 @@ namespace Microsoft.Xna.Framework.Input
             {
                 return _y;
             }
+			
+			internal set
+			{
+				_y = value;
+			}
         }
 		
 		public ButtonState LeftButton 
 		{ 
 			get
 			{
-				return ButtonState.Released;
+				return _leftButton;	
+			}
+			
+			internal set
+			{
+				_leftButton = value;
 			}
 		}
 		
@@ -80,7 +100,12 @@ namespace Microsoft.Xna.Framework.Input
 		{ 
 			get
 			{
-				return ButtonState.Released;
+				return _middleButton;	
+			}
+			
+			internal set
+			{
+				_middleButton = value;
 			}
 		}
 		
@@ -88,7 +113,12 @@ namespace Microsoft.Xna.Framework.Input
 		{ 
 			get
 			{
-				return ButtonState.Released;
+				return _rightButton;	
+			}
+			
+			internal set
+			{
+				_rightButton = value;
 			}
 		}
 		

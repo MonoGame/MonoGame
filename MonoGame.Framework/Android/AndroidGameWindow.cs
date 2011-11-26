@@ -295,14 +295,20 @@ namespace Microsoft.Xna.Framework
             }
             if (e.Action == MotionEventActions.Up) {
                 state = TouchLocationState.Released;
+				Mouse.State.X = (int)e.GetX();
+				Mouse.State.Y = (int)e.GetY();
+				Mouse.State.LeftButton = ButtonState.Released;
             }
             if (e.Action == MotionEventActions.Move) {
                 state = TouchLocationState.Moved;
-                Mouse.SetPosition((int) e.GetX(), (int) e.GetY());
+				Mouse.State.X = (int)e.GetX();
+				Mouse.State.Y = (int)e.GetY();
             }
             if (e.Action == MotionEventActions.Down) {
                 state = TouchLocationState.Pressed;
-                Mouse.SetPosition((int) e.GetX(), (int) e.GetY());
+                Mouse.State.X = (int)e.GetX();
+				Mouse.State.Y = (int)e.GetY();
+				Mouse.State.LeftButton = ButtonState.Pressed;
             }
 
             TouchLocation tprevious;
