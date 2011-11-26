@@ -803,5 +803,76 @@ namespace Microsoft.Xna.Framework
         {
             throw new NotImplementedException();
         }
+
+		internal Matrix ToMatrix ()
+		{
+			Matrix matrix = Matrix.Identity;
+			ToMatrix(out matrix);
+			return matrix;
+		}
+
+		internal void ToMatrix (out Matrix matrix)
+		{
+			Quaternion.ToMatrix(this, out matrix);
+		}
+
+		internal static void ToMatrix(Quaternion quaternion, out Matrix matrix)
+		{
+
+			// source -> http://content.gpwiki.org/index.php/OpenGL:Tutorials:Using_Quaternions_to_represent_rotation#Quaternion_to_Matrix
+			float x2 = quaternion.X * quaternion.X;
+			float y2 = quaternion.Y * quaternion.Y;
+			float z2 = quaternion.Z * quaternion.Z;
+			float xy = quaternion.X * quaternion.Y;
+			float xz = quaternion.X * quaternion.Z;
+			float yz = quaternion.Y * quaternion.Z;
+			float wx = quaternion.W * quaternion.X;
+			float wy = quaternion.W * quaternion.Y;
+			float wz = quaternion.W * quaternion.Z;
+
+			// This calculation would be a lot more complicated for non-unit length quaternions
+			// Note: The constructor of Matrix4 expects the Matrix in column-major format like expected by
+			//   OpenGL
+			matrix.M11 = 1.0f - 2.0f * (y2 + z2);
+			matrix.M12 = 2.0f * (xy - wz);
+			matrix.M13 = 2.0f * (xz + wy);
+			matrix.M14 = 0.0f;
+
+			matrix.M21 = 2.0f * (xy + wz);
+			matrix.M22 = 1.0f - 2.0f * (x2 + z2);
+			matrix.M23 = 2.0f * (yz - wx);
+			matrix.M24 = 0.0f;
+
+			matrix.M31 = 2.0f * (xz - wy);
+			matrix.M32 = 2.0f * (yz + wx);
+			matrix.M33 = 1.0f - 2.0f * (x2 + y2);
+			matrix.M34 = 0.0f;
+
+			matrix.M41 = 2.0f * (xz - wy);
+			matrix.M42 = 2.0f * (yz + wx);
+			matrix.M43 = 1.0f - 2.0f * (x2 + y2);
+			matrix.M44 = 0.0f;
+
+			//return Matrix4( 1.0f - 2.0f * (y2 + z2), 2.0f * (xy - wz), 2.0f * (xz + wy), 0.0f,
+			//		2.0f * (xy + wz), 1.0f - 2.0f * (x2 + z2), 2.0f * (yz - wx), 0.0f,
+			//		2.0f * (xz - wy), 2.0f * (yz + wx), 1.0f - 2.0f * (x2 + y2), 0.0f,
+			//		0.0f, 0.0f, 0.0f, 1.0f)
+			//	}
+		}
+
+		internal Vector3 Xyz
+		{
+			get {
+				return new Vector3(X, Y, Z);
+			}
+
+			set {
+				X = value.X;
+				Y = value.Y;
+				Z = value.Z;
+			}
+		}
+
+
     }
 }
