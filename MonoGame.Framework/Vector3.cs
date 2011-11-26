@@ -515,6 +515,53 @@ namespace Microsoft.Xna.Framework
                                  (position.X * matrix.M13) + (position.Y * matrix.M23) + (position.Z * matrix.M33) + matrix.M43);
         }
 
+	/// <summary>
+        /// Transforms a vector by a quaternion rotation.
+        /// </summary>
+        /// <param name="vec">The vector to transform.</param>
+        /// <param name="quat">The quaternion to rotate the vector by.</param>
+        /// <returns>The result of the operation.</returns>
+        public static Vector3 Transform(Vector3 vec, Quaternion quat)
+        {
+            Vector3 result;
+            Transform(ref vec, ref quat, out result);
+            return result;
+        }
+
+        /// <summary>
+        /// Transforms a vector by a quaternion rotation.
+        /// </summary>
+        /// <param name="vec">The vector to transform.</param>
+        /// <param name="quat">The quaternion to rotate the vector by.</param>
+        /// <param name="result">The result of the operation.</param>
+//        public static void Transform(ref Vector3 vec, ref Quaternion quat, out Vector3 result)
+//        {
+//		// Taken from the OpentTK implementation of Vector3
+//            // Since vec.W == 0, we can optimize quat * vec * quat^-1 as follows:
+//            // vec + 2.0 * cross(quat.xyz, cross(quat.xyz, vec) + quat.w * vec)
+//            Vector3 xyz = quat.Xyz, temp, temp2;
+//            Vector3.Cross(ref xyz, ref vec, out temp);
+//            Vector3.Multiply(ref vec, quat.W, out temp2);
+//            Vector3.Add(ref temp, ref temp2, out temp);
+//            Vector3.Cross(ref xyz, ref temp, out temp);
+//            Vector3.Multiply(ref temp, 2, out temp);
+//            Vector3.Add(ref vec, ref temp, out result);
+//        }
+
+        /// <summary>
+        /// Transforms a vector by a quaternion rotation.
+        /// </summary>
+        /// <param name="vec">The vector to transform.</param>
+        /// <param name="quat">The quaternion to rotate the vector by.</param>
+        /// <param name="result">The result of the operation.</param>
+        public static void Transform(ref Vector3 vec, ref Quaternion quat, out Vector3 result)
+        {
+			// This has not been tested
+			// TODO:  This could probably be unrolled so will look into it later
+			Matrix matrix = quat.ToMatrix();
+			Transform(ref vec, ref matrix, out result);
+        }
+
         public static Vector3 TransformNormal(Vector3 normal, Matrix matrix)
         {
             TransformNormal(ref normal, ref matrix, out normal);
