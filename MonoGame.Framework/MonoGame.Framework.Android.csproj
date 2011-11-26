@@ -321,6 +321,7 @@
     <Compile Include="Audio\AudioStopOptions.cs" />
     <Compile Include="Input\GamePadDeadZone.cs" />
     <Compile Include="Input\KeyboardState.cs" />
+    <Compile Include="Graphics\Vertices\VertexElementColor.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
