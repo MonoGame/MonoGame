@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -88,8 +88,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			//glUnmapBuffer - finished setting data
 
 			_buffer = vertices;
-			_bufferPtr = GCHandle.Alloc (_buffer, GCHandleType.Pinned).AddrOfPinnedObject ();			
-
+			_bufferPtr = GCHandle.Alloc (_buffer, GCHandleType.Pinned).AddrOfPinnedObject ();
 			_bufferIndex = _bufferCount + 1;
 			_allBuffers [_bufferIndex] = this;
 
