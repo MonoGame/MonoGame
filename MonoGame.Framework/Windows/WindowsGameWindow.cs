@@ -554,7 +554,8 @@ namespace Microsoft.Xna.Framework
 
         private void HandleInput()
         {
-            Mouse.SetPosition(OpenTkGameWindow.Mouse.X, OpenTkGameWindow.Mouse.Y);                
+			Mouse.State.X = OpenTkGameWindow.Mouse.X;
+			Mouse.State.Y = OpenTkGameWindow.Mouse.Y;                     
         }
 		
 		#endregion
