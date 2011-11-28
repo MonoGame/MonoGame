@@ -286,6 +286,7 @@ namespace Microsoft.Xna.Framework
 				if (recognizerPan == null)
 				{
 					recognizerPan = new UIPanGestureRecognizer(this, new Selector("PanGestureRecognizer"));
+					recognizerPan.CancelsTouchesInView = false;
 					AddGestureRecognizer(recognizerPan);
 				}
 			}
@@ -494,7 +495,7 @@ namespace Microsoft.Xna.Framework
 							collection[index] = tlocation;
 						}
 						
-						if (i == 1)
+						if (i == 0)
 						{
 						    Mouse.State.X = (int)translatedTouchPosition.X;
 							Mouse.State.Y = (int)translatedTouchPosition.Y;
@@ -503,7 +504,7 @@ namespace Microsoft.Xna.Framework
 					case UITouchPhase.Began	:	
 						tlocation = new TouchLocation(touch.Handle.ToInt32(), TouchLocationState.Pressed, translatedTouchPosition);
 						collection.Add(tlocation);
-					    if (i == 1)
+					    if (i == 0)
 						{
 						    Mouse.State.X = (int)translatedTouchPosition.X;
 							Mouse.State.Y = (int)translatedTouchPosition.Y;
@@ -518,7 +519,7 @@ namespace Microsoft.Xna.Framework
 							collection[index] = tlocation;
 						}
 					
-						if (i == 1)
+						if (i == 0)
 						{
 						    Mouse.State.X = (int)translatedTouchPosition.X;
 							Mouse.State.Y = (int)translatedTouchPosition.Y;
