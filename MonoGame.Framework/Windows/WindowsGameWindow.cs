@@ -480,6 +480,10 @@ namespace Microsoft.Xna.Framework
             OpenTkGameWindow.Keyboard.KeyDown += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyDown);
             OpenTkGameWindow.Keyboard.KeyUp += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyUp);
             clientBounds = new Rectangle(0, 0, OpenTkGameWindow.Width, OpenTkGameWindow.Height);
+			
+			// mouse
+			// TODO review this when opentk 1.1 is released
+			Mouse.UpdateMouseInfo(OpenTkGameWindow.Mouse);
 
             // Initialize GameTime
             _updateGameTime = new GameTime();
@@ -554,7 +558,7 @@ namespace Microsoft.Xna.Framework
 
         private void HandleInput()
         {
-            Mouse.SetPosition(OpenTkGameWindow.Mouse.X, OpenTkGameWindow.Mouse.Y);                
+			// mouse doesn't need to be treated here, Mouse class does it alone
         }
 		
 		#endregion

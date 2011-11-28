@@ -152,6 +152,12 @@ namespace Microsoft.Xna.Framework.Audio
 			}
 		}
 		
+		public float Rate 
+		{ 
+			get; 
+			set; 
+		}
+		
 		public void Pause()
 		{		
 			_audioPlayer.Pause();

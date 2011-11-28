@@ -127,6 +127,12 @@ namespace Microsoft.Xna.Framework.Audio
                 AL.Source(sourceID, ALSourcef.Gain, value);
             }
         }
+		
+		public float Rate 
+		{ 
+			get; 
+			set; 
+		}
 
         public Sound(string filename, float volume, bool looping)
         {
