@@ -640,9 +640,9 @@ namespace Microsoft.Xna.Framework.Graphics
 					int pixelOffset = 0;
 					for (int y = r.Top; y < rHeight; y++) {
 						for (int x = r.Left; x < rWidth; x++) {
-							var result = new Color (0, 0, 0, 0);						
-							dataRowColOffset = ((y * rWidth) + x);
-							switch (_format) {
+							var result = new Color (0, 0, 0, 0);
+													dataRowColOffset = ((y * rWidth) + x);
+	switch (_format) {
 							case SurfaceFormat.Color : //kTexture2DPixelFormat_RGBA8888
 							case SurfaceFormat.Dxt3 :
 								sz = 4;
@@ -701,8 +701,8 @@ namespace Microsoft.Xna.Framework.Graphics
 							default:
 								throw new NotSupportedException ("Texture format");
 							}
-							data [dataRowColOffset] = (T)(object)result;
-						}
+													data [dataRowColOffset] = (T)(object)result;
+}
 					}
 			}
 			else {
