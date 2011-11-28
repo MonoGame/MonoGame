@@ -304,7 +304,27 @@ namespace Microsoft.Xna.Framework
 				_targetElapsedTime = value;
 			}
 		}
-		
+
+		internal void applyChanges (GraphicsDeviceManager manager)
+		{
+			Microsoft.Xna.Framework.Graphics.Viewport _vp =
+			new Microsoft.Xna.Framework.Graphics.Viewport();
+
+			_vp.X = 0;
+			_vp.Y = 0;
+			_vp.Width = manager.PreferredBackBufferWidth;
+			_vp.Height = manager.PreferredBackBufferHeight;
+
+			GraphicsDevice.Viewport = _vp;
+
+			if (GraphicsDevice.PresentationParameters.IsFullScreen)
+				GoFullScreen();
+			else {
+				_wasResizeable = IsAllowUserResizing;
+				GoWindowed();
+			}
+		}
+
 		// This method calls the game Initialize and BeginRun methods before it begins the game loop and starts 
 		// processing events for the game.
 		public void Run ()
@@ -321,22 +341,7 @@ namespace Microsoft.Xna.Framework
 			
 			var manager = Services.GetService (typeof(IGraphicsDeviceManager)) as GraphicsDeviceManager;
 			
-			Microsoft.Xna.Framework.Graphics.Viewport _vp =
-			new Microsoft.Xna.Framework.Graphics.Viewport();
-
-			_vp.X = 0;
-			_vp.Y = 0;
-			_vp.Width = manager.PreferredBackBufferWidth;
-			_vp.Height = manager.PreferredBackBufferHeight;
-			
-			GraphicsDevice.Viewport = _vp;
-
-			if (GraphicsDevice.PresentationParameters.IsFullScreen)
-				GoFullScreen();
-			else {
-				_wasResizeable = IsAllowUserResizing;
-				GoWindowed();
-			}
+			applyChanges(manager);
 
 			_initializing = true;
 
@@ -535,6 +540,11 @@ namespace Microsoft.Xna.Framework
 			
 			_gameWindow.Bounds = content;
 			_gameWindow.Size = content.Size.ToSize();
+
+			// Now we set our Presentaion Parameters
+			PresentationParameters parms = GraphicsDevice.PresentationParameters;
+			parms.BackBufferHeight = (int)content.Size.Height;
+			parms.BackBufferWidth = (int)content.Size.Width;
 		}
 
 		internal void GoWindowed ()
