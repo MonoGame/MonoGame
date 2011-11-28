@@ -312,8 +312,6 @@
     <Compile Include="Input\KeyboardState.cs" />
     <Compile Include="Input\Keys.cs" />
     <Compile Include="Input\KeyState.cs" />
-    <Compile Include="Input\Mouse.cs" />
-    <Compile Include="Input\MouseState.cs" />
     <Compile Include="Input\ThumbStickDefinition.cs" />
     <Compile Include="IUpdateable.cs" />
     <Compile Include="MathHelper.cs" />
@@ -386,6 +384,8 @@
     <Compile Include="Windows\TitleContainer.cs" />
     <Compile Include="Content\ContentReaders\CurveReader.cs" />
     <Compile Include="Graphics\Vertices\VertexElementColor.cs" />
+    <Compile Include="Windows\Input\Mouse.cs" />
+    <Compile Include="Windows\Input\MouseState.cs" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
