@@ -39,197 +39,22 @@ purpose and non-infringement.
 #endregion License
 
 using System;
-using System.Drawing;
 using System.IO;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Text;
-using Microsoft.Xna.Framework.Graphics;
-using Path = System.IO.Path;
-using Microsoft.Xna.Framework.Media;
-using Microsoft.Xna.Framework.Audio;
-
 
 namespace Microsoft.Xna.Framework.Content
 {
-    public class ContentManager : IDisposable
+    public partial class ContentManager
     {
-        private string _rootDirectory = string.Empty;
-        private IServiceProvider serviceProvider;
-		private IGraphicsDeviceService graphicsDeviceService;
-
-        public ContentManager(IServiceProvider serviceProvider)
+        string GetFilename(string assetName)
         {
-			if (serviceProvider == null)
-            {
-                throw new ArgumentNullException("serviceProvider");
-            }
-            this.serviceProvider = serviceProvider;
-		}
-
-        public ContentManager(IServiceProvider serviceProvider, string rootDirectory)
-        {
-          	if (serviceProvider == null)
-            {
-                throw new ArgumentNullException("serviceProvider");
-            }
-            if (rootDirectory == null)
-            {
-                throw new ArgumentNullException("rootDirectory");
-            }
-            this.RootDirectory = rootDirectory;
-            this.serviceProvider = serviceProvider;
+            // Replace non-Windows path separators with local path separators
+            return Path.Combine(_rootDirectory, assetName.Replace('/', Path.DirectorySeparatorChar));
         }
 
-        public void Dispose()
+        protected virtual Stream OpenStream(string assetName)
         {
-        }
-		
-        public T Load<T>(string assetName)
-        {			
-			string originalAssetName = assetName;
-			object result = null;
-			
-			if (this.graphicsDeviceService == null)
-            {
-                this.graphicsDeviceService = serviceProvider.GetService(typeof(IGraphicsDeviceService)) as IGraphicsDeviceService;
-                if (this.graphicsDeviceService == null)
-                {
-                    throw new InvalidOperationException("No Graphics Device Service");
-                }
-            }
-			
-			// Check for windows-style directory separator character
-            //Lowercase assetName (monodroid specification all assests are lowercase)
-            assetName = Path.Combine(_rootDirectory, assetName.Replace('\\', Path.DirectorySeparatorChar)).ToLower();
-			
-			// Get the real file name
-			if ((typeof(T) == typeof(Curve))) 
-			{				
-				assetName = CurveReader.Normalize(assetName);
-			}
-			else if ((typeof(T) == typeof(Texture2D))) 
-			{				
-				assetName = Texture2DReader.Normalize(assetName);
-			}
-            else if ((typeof(T) == typeof(SpriteFont))) 
-			{
-				assetName = SpriteFontReader.Normalize(assetName);
-			} 
-            else if ((typeof(T) == typeof(Effect))) 
-			{
-				assetName = Effect.Normalize(assetName);
-			}
-            else if ((typeof(T) == typeof(Song)))
-            {
-                assetName = SongReader.Normalize(assetName);
-            }
-            else if ((typeof(T) == typeof(SoundEffect)))
-            {
-                assetName = SoundEffectReader.Normalize(assetName);
-            }
-            else if ((typeof(T) == typeof(Video)))
-            {
-                assetName = Video.Normalize(assetName);
-            }
-            else {
-                throw new NotSupportedException("Format not supported");
-            }
-			
-			if (string.IsNullOrEmpty(assetName))
-			{	
-				throw new ContentLoadException("Could not load "  + originalAssetName + " asset!");
-			}
-
-            if (!Path.HasExtension(assetName))
-                assetName = string.Format("{0}.xnb", assetName);
-			
-			if (Path.GetExtension(assetName).ToUpper() !=".XNB")
-			{
-				if ((typeof(T) == typeof(Texture2D))) {
-                    //Basically the same as Texture2D.FromFile but loading from the assets instead of a filePath
-                    using (Stream assetStream = File.Open(assetName, FileMode.Open, FileAccess.Read))
-                    {
-                        Bitmap image = (Bitmap)Bitmap.FromStream(assetStream);
-                        ESImage theTexture = new ESImage(image, graphicsDeviceService.GraphicsDevice.PreferedFilter);
-                        result = new Texture2D(theTexture) { Name = Path.GetFileNameWithoutExtension(assetName) };
-                    }
-				}
-				if ((typeof(T) == typeof(SpriteFont)))
-				{
-					//result = new SpriteFont(Texture2D.FromFile(graphicsDeviceService.GraphicsDevice,assetName), null, null, null, 0, 0.0f, null, null);
-					throw new NotImplementedException();
-				}
-                if (typeof(T) == typeof(Effect))
-                {
-                    result = new Effect(graphicsDeviceService.GraphicsDevice, assetName);
-                }
-
-                if ((typeof(T) == typeof(Song)))
-                    result = new Song(assetName);
-                if ((typeof(T) == typeof(SoundEffect)))
-                    result = new SoundEffect(assetName);
-                if ((typeof(T) == typeof(Video)))
-                    result = new Video(assetName);
-
-			}
-			else 
-			{
-				// Load a XNB file
-                //Loads from Assets directory + /assetName
-			    Stream assetStream = File.Open(assetName, FileMode.Open, FileAccess.Read);
-               
-                ContentReader reader = new ContentReader(this, assetStream, this.graphicsDeviceService.GraphicsDevice);
-				ContentTypeReaderManager typeManager = new ContentTypeReaderManager(reader);
-				reader.TypeReaders = typeManager.LoadAssetReaders(reader);
-	            foreach (ContentTypeReader r in reader.TypeReaders)
-	            {
-	                r.Initialize(typeManager);
-	            }
-	            // we need to read a byte here for things to work out, not sure why
-	            reader.ReadByte();
-				
-				// Get the 1-based index of the typereader we should use to start decoding with
-          		int index = reader.ReadByte();
-				ContentTypeReader contentReader = reader.TypeReaders[index - 1];
-           		result = reader.ReadObject<T>(contentReader);
-
-				reader.Close();
-				assetStream.Close();
-			}
-						
-			if (result == null)
-			{	
-				throw new ContentLoadException("Could not load "  + originalAssetName + " asset!");
-			}
-			
-			return (T) result;
-        }
-		
-		
-        public virtual void Unload()
-        {
-        }
-
-        public string RootDirectory
-        {
-            get
-            {
-                return _rootDirectory;
-            }
-            set
-            {
-                _rootDirectory = value;
-            }
-        }
-
-        public IServiceProvider ServiceProvider
-        {
-            get
-            {
-                return this.serviceProvider;
-            }
+            Stream stream = new FileStream(assetName, FileMode.Open, FileAccess.Read, FileShare.Read);
+            return stream;
         }
     }
 }
-

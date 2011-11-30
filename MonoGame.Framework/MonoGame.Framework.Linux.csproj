@@ -321,6 +321,7 @@
     <Compile Include="Graphics\RenderTarget2D.cs" />
     <Compile Include="Content\ContentManager.cs" />
     <Compile Include="Content\LzxDecoder.cs" />
+    <Compile Include="Linux\Content\ContentManager.cs" />
     <Compile Include="Input\GamePadDeadZone.cs" />
     <Compile Include="Content\ContentReaders\CurveReader.cs" />
     <Compile Include="Input\GamePadType.cs" />
