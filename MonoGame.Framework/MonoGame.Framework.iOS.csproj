@@ -359,6 +359,7 @@
     <Compile Include="Content\ContentReaders\Vector2Reader.cs" />
     <Compile Include="Content\ContentReaders\TimeSpanReader.cs" />
     <Compile Include="Content\ContentReaders\PointReader.cs" />
+    <Compile Include="Graphics\Vertices\VertexElementColor.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
