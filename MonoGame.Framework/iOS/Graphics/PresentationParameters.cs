@@ -63,7 +63,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private IntPtr deviceWindowHandle;
         private bool enableAutoDepthStencil;
         private int fullScreenRefreshRateInHz;
-        // private bool isFullScreen;
+        private bool isFullScreen;
 		private int multiSampleCount; // Added for XNA 4.0
         private int multiSampleQuality;
         private MultiSampleType multiSampleType;
@@ -149,11 +149,15 @@ namespace Microsoft.Xna.Framework.Graphics
         {
 			get
             {
-				 return UIApplication.SharedApplication.StatusBarHidden;
+				 return isFullScreen;
             }
             set
             {
-				UIApplication.SharedApplication.StatusBarHidden = value;				
+				if ( isFullScreen != value )
+				{
+					isFullScreen = value;
+					UIApplication.SharedApplication.StatusBarHidden = isFullScreen;
+				}
             }
         }
 		
@@ -206,7 +210,7 @@ namespace Microsoft.Xna.Framework.Graphics
             deviceWindowHandle = IntPtr.Zero;
             enableAutoDepthStencil = false;
             fullScreenRefreshRateInHz = 0;
-            // isFullScreen = false;
+            isFullScreen = UIApplication.SharedApplication.StatusBarHidden;
 			depthStencilFormat = DepthFormat.None;
             multiSampleCount = 0;
             multiSampleQuality = 0;
@@ -227,7 +231,7 @@ namespace Microsoft.Xna.Framework.Graphics
             clone.disposed = this.disposed;
             clone.enableAutoDepthStencil = this.enableAutoDepthStencil;
             clone.fullScreenRefreshRateInHz = this.fullScreenRefreshRateInHz;
-            clone.IsFullScreen = this.IsFullScreen;
+            clone.IsFullScreen = this.isFullScreen;
             clone.multiSampleQuality = this.multiSampleQuality;
             clone.multiSampleType = this.multiSampleType;
             clone.swapEffect = this.swapEffect;
