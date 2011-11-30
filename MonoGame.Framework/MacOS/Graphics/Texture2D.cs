@@ -614,36 +614,36 @@ namespace Microsoft.Xna.Framework.Graphics
 				int rWidth = r.Width;
 				int rHeight = r.Height;
 
-				if (texture == null) {
-					// For rendertargets we need to loop through and load the elements
-					// backwards because the texture data is flipped vertically and horizontally
-					var dataEnd = (rWidth * rHeight) - 1;
-					var dataPos = 0;
-					var dataRowColOffset = 0;
-					for (int y = r.Top; y < rHeight; y++) {
-						for (int x = r.Left; x < rWidth; x++) {
-							var result = new Color (0, 0, 0, 0);						
-							dataRowColOffset = ((y * rWidth) + x);
-							switch (_format) {
-							case SurfaceFormat.Color : //kTexture2DPixelFormat_RGBA8888
-							case SurfaceFormat.Dxt3 :
-								
-								dataPos = dataRowColOffset * 4;								
-															
-								result.R = imageInfo [dataPos];
-								result.G = imageInfo [dataPos + 1];
-								result.B = imageInfo [dataPos + 2];
-								result.A = imageInfo [dataPos + 3];
-								break;
-							default:
-								throw new NotSupportedException ("Texture format");
-							}
-							data [dataEnd - dataRowColOffset] = (T)(object)result;
-						}
-
-
-					}
-				} else {
+//				if (texture == null) {
+//					// For rendertargets we need to loop through and load the elements
+//					// backwards because the texture data is flipped vertically and horizontally
+//					var dataEnd = (rWidth * rHeight) - 1;
+//					var dataPos = 0;
+//					var dataRowColOffset = 0;
+//					for (int y = r.Top; y < rHeight; y++) {
+//						for (int x = r.Left; x < rWidth; x++) {
+//							var result = new Color (0, 0, 0, 0);						
+//							dataRowColOffset = ((y * rWidth) + x);
+//							switch (_format) {
+//							case SurfaceFormat.Color : //kTexture2DPixelFormat_RGBA8888
+//							case SurfaceFormat.Dxt3 :
+//								
+//								dataPos = dataRowColOffset * 4;								
+//															
+//								result.R = imageInfo [dataPos];
+//								result.G = imageInfo [dataPos + 1];
+//								result.B = imageInfo [dataPos + 2];
+//								result.A = imageInfo [dataPos + 3];
+//								break;
+//							default:
+//								throw new NotSupportedException ("Texture format");
+//							}
+//							data [dataEnd - dataRowColOffset] = (T)(object)result;
+//						}
+//
+//
+//					}
+//				} else {
 					// Loop through and extract the data but we need to load it 
 					var dataRowColOffset = 0;
 					var sz = 0;
@@ -714,7 +714,7 @@ namespace Microsoft.Xna.Framework.Graphics
 							data [((y - r.Top) * r.Width) + (x - r.Left)] = (T)(object)result;
 						}
 					}
-				}
+				//}
 			} else {
 				throw new NotImplementedException ("GetData not implemented for type.");
 			}
