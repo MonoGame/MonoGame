@@ -252,6 +252,7 @@
     <Compile Include="TitleContainer.cs" />
     <Compile Include="Windows\Audio\AudioLoader.cs" />
     <Compile Include="Windows\Audio\Sound.cs" />
+    <Compile Include="Windows\Content\ContentManager.cs" />
     <Compile Include="Windows\Content\ContentReaders\SongReader.cs" />
     <Compile Include="Windows\Content\ContentReaders\SoundEffectReader.cs" />
     <Compile Include="Windows\Content\ContentReaders\SpriteFontReader.cs" />
