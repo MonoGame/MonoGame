@@ -355,6 +355,10 @@ namespace Microsoft.Xna.Framework.Content
                 {
                     result = new Video(assetName);
                 }
+                else if ((typeof(T) == typeof(Effect)))
+                {
+                    result = new Effect(graphicsDeviceService.GraphicsDevice, assetName);
+                }
             }
 
             if (result == null)
