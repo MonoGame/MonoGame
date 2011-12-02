@@ -10,13 +10,15 @@ using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 
+using Microsoft.Xna.Framework.Input.Touch;
+
 namespace Microsoft.Xna.Framework
 {
     public class AndroidGameActivity : Activity
     {
         public Game Game { get; set; }
 		
-		private OrientationListener o;
+		private OrientationListener o;		
 		
 		protected override void OnCreate (Bundle savedInstanceState)
 		{
@@ -25,9 +27,9 @@ namespace Microsoft.Xna.Framework
 			if (o.CanDetectOrientation())
 			{
 				o.Enable();				
-			}
-		}
-
+			}						
+		}	
+				
         protected override void OnPause()
         {
             base.OnPause();
@@ -87,5 +89,5 @@ namespace Microsoft.Xna.Framework
 
 		}
 	}
-		
+			
 }

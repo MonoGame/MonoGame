@@ -322,6 +322,7 @@
     <Compile Include="Input\GamePadDeadZone.cs" />
     <Compile Include="Input\KeyboardState.cs" />
     <Compile Include="Graphics\Vertices\VertexElementColor.cs" />
+    <Compile Include="Android\Input\Touch\GestureListener.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
@@ -340,5 +341,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\AndroidManifest.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Android\Input\Touch\" />
   </ItemGroup>
 </Project>
