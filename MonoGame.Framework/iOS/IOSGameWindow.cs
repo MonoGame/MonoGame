@@ -91,10 +91,16 @@ namespace Microsoft.Xna.Framework
 		UITapGestureRecognizer recognizerTap;
 		UITapGestureRecognizer recognizerDoubleTap;
 		UIPinchGestureRecognizer recognizerPinch; 
-		UISwipeGestureRecognizer recognizerSwipe;
+		
+		// As per http://stackoverflow.com/questions/3319209/setting-direction-for-uiswipegesturerecognizer
+		UISwipeGestureRecognizer recognizerLeftRightSwipe;
+		UISwipeGestureRecognizer recognizerUpDownSwipe;
+		
 		UILongPressGestureRecognizer recognizerLongPress;
 		UIPanGestureRecognizer recognizerPan;
-		UIRotationGestureRecognizer recognizerRotation;		
+		UIRotationGestureRecognizer recognizerRotation;
+		
+		Vector2 translatedTouchPosition;
 		
 		public EAGLContext MainContext;
 	    public EAGLContext BackgroundContext;
@@ -112,7 +118,10 @@ namespace Microsoft.Xna.Framework
 			clientBounds = new Rectangle(0,0,(int) (rect.Width * UIScreen.MainScreen.Scale),(int) (rect.Height * UIScreen.MainScreen.Scale));
 			
 			// Enable multi-touch
-			MultipleTouchEnabled = true;	
+			MultipleTouchEnabled = true;
+			
+			// Don't Autoresize, we'll do that
+			AutoResize = false;
 						
 			// Initialize GameTime
             _updateGameTime = new GameTime();
@@ -277,6 +286,7 @@ namespace Microsoft.Xna.Framework
 				if (recognizerPan == null)
 				{
 					recognizerPan = new UIPanGestureRecognizer(this, new Selector("PanGestureRecognizer"));
+					recognizerPan.CancelsTouchesInView = false;
 					AddGestureRecognizer(recognizerPan);
 				}
 			}
@@ -288,16 +298,39 @@ namespace Microsoft.Xna.Framework
 			
 			if ((enabledGestures & GestureType.Flick) != 0)
 			{
-				if (recognizerSwipe == null)
+				if (recognizerLeftRightSwipe == null)
 				{
-					recognizerSwipe = new UISwipeGestureRecognizer(this, new Selector("SwipeGestureRecognizer"));
-					AddGestureRecognizer(recognizerSwipe);
+					recognizerLeftRightSwipe = new UISwipeGestureRecognizer(this, new Selector("SwipeGestureRecognizer"));
+					recognizerLeftRightSwipe.Direction = UISwipeGestureRecognizerDirection.Down | UISwipeGestureRecognizerDirection.Up | UISwipeGestureRecognizerDirection.Left | UISwipeGestureRecognizerDirection.Right;
+					AddGestureRecognizer(recognizerLeftRightSwipe);
+				}
+				
+				if (recognizerUpDownSwipe == null)
+				{
+					recognizerUpDownSwipe = new UISwipeGestureRecognizer(this, new Selector("SwipeGestureRecognizer"));
+					recognizerUpDownSwipe.Direction = UISwipeGestureRecognizerDirection.Left | UISwipeGestureRecognizerDirection.Right;
+					AddGestureRecognizer(recognizerUpDownSwipe);
 				}
 			}
-			else if (recognizerSwipe != null)
+			else if (recognizerLeftRightSwipe != null)
 			{
-				RemoveGestureRecognizer(recognizerSwipe);
-				recognizerSwipe = null;
+				RemoveGestureRecognizer(recognizerLeftRightSwipe);
+				recognizerLeftRightSwipe = null;
+			}
+			
+			if ((enabledGestures & GestureType.Flick) != 0)
+			{
+				if (recognizerUpDownSwipe == null)
+				{
+					recognizerUpDownSwipe = new UISwipeGestureRecognizer(this, new Selector("SwipeGestureRecognizer"));
+					recognizerUpDownSwipe.Direction = UISwipeGestureRecognizerDirection.Up | UISwipeGestureRecognizerDirection.Down;
+					AddGestureRecognizer(recognizerUpDownSwipe);
+				}
+			}
+			else if (recognizerUpDownSwipe != null)
+			{
+				RemoveGestureRecognizer(recognizerUpDownSwipe);
+				recognizerUpDownSwipe = null;
 			}
 			
 			if ((enabledGestures & GestureType.Pinch) != 0)
@@ -395,7 +428,7 @@ namespace Microsoft.Xna.Framework
 		[Export("LongPressGestureRecognizer")]
 		public void LongPressGestureRecognizer (UILongPressGestureRecognizer sender)
 		{
-			TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.Hold, new TimeSpan(_nowUpdate.Ticks), new Vector2 (sender.LocationInView (sender.View)), new Vector2 (sender.LocationInView (sender.View)), new Vector2(0,0), new Vector2(0,0)));
+			TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.Hold, new TimeSpan(_nowUpdate.Ticks), translatedTouchPosition, new Vector2 (sender.LocationInView (sender.View)), new Vector2(0,0), new Vector2(0,0)));
 		}
 		
 		
@@ -403,9 +436,9 @@ namespace Microsoft.Xna.Framework
 		public void PanGestureRecognizer (UIPanGestureRecognizer sender)
 		{
 			if (sender.State==UIGestureRecognizerState.Ended || sender.State==UIGestureRecognizerState.Cancelled || sender.State==UIGestureRecognizerState.Failed)
-				TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.DragComplete, new TimeSpan(_nowUpdate.Ticks), new Vector2 (sender.LocationInView (sender.View)), new Vector2(0,0), new Vector2 (sender.TranslationInView(sender.View)), new Vector2(0,0)));
+				TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.DragComplete, new TimeSpan(_nowUpdate.Ticks), translatedTouchPosition, new Vector2(0,0), new Vector2 (sender.TranslationInView(sender.View)), new Vector2(0,0)));
 			else
-				TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.FreeDrag, new TimeSpan(_nowUpdate.Ticks), new Vector2 (sender.LocationInView (sender.View)), new Vector2(0,0), new Vector2 (sender.TranslationInView(sender.View)), new Vector2(0,0)));
+				TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.FreeDrag, new TimeSpan(_nowUpdate.Ticks), translatedTouchPosition, new Vector2(0,0), new Vector2 (sender.TranslationInView(sender.View)), new Vector2(0,0)));
 		}
 			
 		[Export("PinchGestureRecognizer")]
@@ -430,67 +463,81 @@ namespace Microsoft.Xna.Framework
 		[Export("TapGestureRecognizer")]
 		public void TapGestureRecognizer (UITapGestureRecognizer sender)
 		{
-			TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.Tap, new TimeSpan(_nowUpdate.Ticks), new Vector2 (sender.LocationInView (sender.View)), new Vector2 (sender.LocationInView (sender.View)), new Vector2(0,0), new Vector2(0,0)));
+			TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.Tap, new TimeSpan(_nowUpdate.Ticks), translatedTouchPosition, new Vector2 (sender.LocationInView (sender.View)), new Vector2(0,0), new Vector2(0,0)));
 		}
 		
 		private void FillTouchCollection(NSSet touches)
 		{
-			var enabledGestures = TouchPanel.EnabledGestures;
-			if ( enabledGestures == GestureType.None )
-			{
-				UITouch []touchesArray = touches.ToArray<UITouch>();
-				
-				for (int i=0; i < touchesArray.Length;i++)
-				{
-					
-					//Get IOS touch
-					UITouch touch = touchesArray[i];
-					
-					//Get position touch
-					Vector2 position = new Vector2 (touch.LocationInView (touch.View));
-					Vector2 translatedPosition = GetOffsetPosition(position, true);
-					
-					TouchLocation tlocation;
-					TouchCollection collection = TouchPanel.Collection;
-					int index;
-					switch (touch.Phase)
-					{
-						case UITouchPhase.Stationary:
-						case UITouchPhase.Moved:
-							index = collection.FindById(touch.Handle.ToInt32(), out tlocation);
-							if (index >= 0)
-						    {
-								tlocation.State = TouchLocationState.Moved;
-								tlocation.Position = translatedPosition;
-								collection[index] = tlocation;
-							}
-							break;
-						case UITouchPhase.Began	:	
-							tlocation = new TouchLocation(touch.Handle.ToInt32(), TouchLocationState.Pressed, translatedPosition);
-							collection.Add(tlocation);	
-							break;
-						case UITouchPhase.Ended	:
-							index = collection.FindById(touch.Handle.ToInt32(), out tlocation);
-							if (index >= 0)
-							{
-								tlocation.State = TouchLocationState.Released;							
-								collection[index] = tlocation;
-							}
-							break;
-						case UITouchPhase.Cancelled:
-							index = collection.FindById(touch.Handle.ToInt32(), out tlocation);
-							if (index >= 0)
-							{
-								tlocation.State = TouchLocationState.Invalid;
-								collection[index] = tlocation;
-							}
-							break;
-						default :
-							break;					
-					}
-				}
-			}
+			UITouch []touchesArray = touches.ToArray<UITouch>();
 			
+			for (int i=0; i < touchesArray.Length;i++)
+			{
+				
+				//Get IOS touch
+				UITouch touch = touchesArray[i];
+				
+				//Get position touch
+				Vector2 position = new Vector2 (touch.LocationInView (touch.View));
+				translatedTouchPosition = GetOffsetPosition(position, true);
+				
+				TouchLocation tlocation;
+				TouchCollection collection = TouchPanel.Collection;
+				int index;
+				switch (touch.Phase)
+				{
+					case UITouchPhase.Stationary:
+					case UITouchPhase.Moved:
+						index = collection.FindById(touch.Handle.ToInt32(), out tlocation);
+						if (index >= 0)
+					    {
+							tlocation.State = TouchLocationState.Moved;
+							tlocation.Position = translatedTouchPosition;
+							collection[index] = tlocation;
+						}
+						
+						if (i == 0)
+						{
+						    Mouse.State.X = (int)translatedTouchPosition.X;
+							Mouse.State.Y = (int)translatedTouchPosition.Y;
+						}
+						break;
+					case UITouchPhase.Began	:	
+						tlocation = new TouchLocation(touch.Handle.ToInt32(), TouchLocationState.Pressed, translatedTouchPosition);
+						collection.Add(tlocation);
+					    if (i == 0)
+						{
+						    Mouse.State.X = (int)translatedTouchPosition.X;
+							Mouse.State.Y = (int)translatedTouchPosition.Y;
+							Mouse.State.LeftButton = ButtonState.Pressed;
+						}
+						break;
+					case UITouchPhase.Ended	:
+						index = collection.FindById(touch.Handle.ToInt32(), out tlocation);
+						if (index >= 0)
+						{
+							tlocation.State = TouchLocationState.Released;							
+							collection[index] = tlocation;
+						}
+					
+						if (i == 0)
+						{
+						    Mouse.State.X = (int)translatedTouchPosition.X;
+							Mouse.State.Y = (int)translatedTouchPosition.Y;
+							Mouse.State.LeftButton = ButtonState.Released;
+						}
+						break;
+					case UITouchPhase.Cancelled:
+						index = collection.FindById(touch.Handle.ToInt32(), out tlocation);
+						if (index >= 0)
+						{
+							tlocation.State = TouchLocationState.Invalid;
+							collection[index] = tlocation;
+						}
+						break;
+					default :
+						break;					
+				}
+			}			
 		}
 		
 		internal Vector2 GetOffsetPosition(Vector2 position, bool useScale)

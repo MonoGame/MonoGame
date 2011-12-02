@@ -38,8 +38,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public IndexBuffer (GraphicsDevice Graphics, Type type, int count, BufferUsage bufferUsage)
 		{
-			if (type != typeof(int) && type != typeof(short))   // && type != typeof(byte))
-				throw new NotSupportedException ("The only types that are supported are: int, short");
+			if (type != typeof(int) && type != typeof(short) && type != typeof(byte) && type != typeof(ushort))
+				throw new NotSupportedException ("The only types that are supported are: int, short, byte, ushort");
 
 			this._graphics = Graphics;
 			this._type = type;

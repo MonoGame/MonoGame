@@ -43,17 +43,11 @@ purpose and non-infringement.
 {
     public static class Mouse
     {
-		private static int _x, _y;
+		internal static MouseState State;
 		
         public static MouseState GetState()
         {
-            return new MouseState(_x,_y);
-        }
-		
-		public static void SetPosition(int x, int y)
-        {
-			_x = x;
-			_y = y;
+            return State;
         }
     }
 }

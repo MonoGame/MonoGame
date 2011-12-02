@@ -145,6 +145,18 @@ namespace Microsoft.Xna.Framework
 
 		public void ApplyChanges ()
 		{
+			PresentationParameters parms = _graphicsDevice.PresentationParameters;
+			parms.IsFullScreen = wantFullScreen;
+			_graphicsDevice.PresentationParameters = parms;
+
+			if (_preferMultiSampling) {
+				_graphicsDevice.PreferedFilter = All.Linear;
+			} else {
+				_graphicsDevice.PreferedFilter = All.Nearest;
+			}
+
+			_game.applyChanges(this);
+
 		}
 
 		private void Initialize ()

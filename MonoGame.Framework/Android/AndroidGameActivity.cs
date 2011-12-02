@@ -50,32 +50,39 @@ namespace Microsoft.Xna.Framework
 			this.activity = activity;
 		}
 		
+		private bool inprogress = false;
+		
 		 public override void OnOrientationChanged (int orientation)
 		{
-			// Divide by 90 into an int to round, then multiply out to one of 5 positions, either 0,90,180,270,360. 
-			int ort = (90*(int)Math.Round(orientation/90f)) % 360;
-			
-			// Convert 360 to 0
-			if(ort == 360)
-			{
-			    ort = 0;
+			if (!inprogress) 
+			{			
+				inprogress = true;
+				// Divide by 90 into an int to round, then multiply out to one of 5 positions, either 0,90,180,270,360. 
+				int ort = (90*(int)Math.Round(orientation/90f)) % 360;
+				
+				// Convert 360 to 0
+				if(ort == 360)
+				{
+				    ort = 0;
+				}
+										
+				var disporientation = DisplayOrientation.Unknown;
+				
+				switch (ort) {
+					case 90 : disporientation = DisplayOrientation.LandscapeRight;
+						break;
+			    	case 270 : disporientation = DisplayOrientation.LandscapeLeft;
+						break;
+			    	case 0 : disporientation = DisplayOrientation.Portrait;
+						break;
+					default:
+						disporientation = DisplayOrientation.LandscapeLeft;
+						break;
+				}
+				
+				activity.Game.Window.SetOrientation(disporientation);
+				inprogress = false;
 			}
-									
-			var disporientation = DisplayOrientation.Unknown;
-			
-			switch (ort) {
-				case 90 : disporientation = DisplayOrientation.LandscapeRight;
-					break;
-		    	case 270 : disporientation = DisplayOrientation.LandscapeLeft;
-					break;
-		    	case 0 : disporientation = DisplayOrientation.Portrait;
-					break;
-				default:
-					disporientation = DisplayOrientation.LandscapeLeft;
-					break;
-			}
-			
-			activity.Game.Window.SetOrientation(disporientation);
 			
 
 		}

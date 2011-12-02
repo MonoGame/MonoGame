@@ -80,6 +80,12 @@
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="GamepadBridge">
+      <HintPath>..\ThirdParty\GamepadConfig\GamepadBridge.dll</HintPath>
+    </Reference>
+    <Reference Include="GamepadConfigControls">
+      <HintPath>..\ThirdParty\GamepadConfig\GamepadConfigControls.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Web" />
@@ -88,11 +94,15 @@
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Drawing" />
+    <Reference Include="Tao.Sdl">
+      <HintPath>..\ThirdParty\GamepadConfig\Tao.Sdl.dll</HintPath>
+    </Reference>
     <Reference Include="OpenTK">
-      <HintPath>..\..\OpenTK1.0\Binaries\OpenTK\Release\OpenTK.dll</HintPath>
+      <HintPath>..\..\OpenTK\Binaries\OpenTK\Release\OpenTK.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Input\GamePadDeadZone.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Audio\AudioChannels.cs" />
     <Compile Include="Audio\AudioEmitter.cs" />
@@ -154,7 +164,6 @@
     <Compile Include="Graphics\DisplayModeCollection.cs" />
     <Compile Include="Graphics\DxtUtil.cs" />
     <Compile Include="Graphics\Effect\BasicEffect.cs" />
-    <Compile Include="Graphics\Effect\Effect.cs" />
     <Compile Include="Graphics\Effect\EffectParameter.cs" />
     <Compile Include="Graphics\Effect\EffectParameterClass.cs" />
     <Compile Include="Graphics\Effect\EffectParameterCollection.cs" />
@@ -243,6 +252,7 @@
     <Compile Include="TitleContainer.cs" />
     <Compile Include="Windows\Audio\AudioLoader.cs" />
     <Compile Include="Windows\Audio\Sound.cs" />
+    <Compile Include="Windows\Content\ContentManager.cs" />
     <Compile Include="Windows\Content\ContentReaders\SongReader.cs" />
     <Compile Include="Windows\Content\ContentReaders\SoundEffectReader.cs" />
     <Compile Include="Windows\Content\ContentReaders\SpriteFontReader.cs" />
@@ -303,8 +313,6 @@
     <Compile Include="Input\KeyboardState.cs" />
     <Compile Include="Input\Keys.cs" />
     <Compile Include="Input\KeyState.cs" />
-    <Compile Include="Input\Mouse.cs" />
-    <Compile Include="Input\MouseState.cs" />
     <Compile Include="Input\ThumbStickDefinition.cs" />
     <Compile Include="IUpdateable.cs" />
     <Compile Include="MathHelper.cs" />
@@ -376,6 +384,9 @@
     <Compile Include="Windows\GraphicsDeviceManager.cs" />
     <Compile Include="Windows\TitleContainer.cs" />
     <Compile Include="Content\ContentReaders\CurveReader.cs" />
+    <Compile Include="Graphics\Vertices\VertexElementColor.cs" />
+    <Compile Include="Windows\Input\Mouse.cs" />
+    <Compile Include="Windows\Input\MouseState.cs" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />

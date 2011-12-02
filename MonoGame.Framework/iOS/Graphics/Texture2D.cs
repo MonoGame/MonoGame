@@ -384,37 +384,32 @@ namespace Microsoft.Xna.Framework.Graphics
 			GetData<T> (0, null, data, startIndex, elementCount);
 		}
 		
-        public void GetData<T>(int level, Rectangle? rect, T[] data, int startIndex, int elementCount)
-        {
-            if (data == null )
-			{
-				throw new ArgumentException("data cannot be null");
+		public void GetData<T> (int level, Rectangle? rect, T[] data, int startIndex, int elementCount)
+		{
+			if (data == null) {
+				throw new ArgumentException ("data cannot be null");
 			}
-			
-			if (data.Length < startIndex + elementCount)
-			{
-				throw new ArgumentException("The data passed has a length of " + data.Length + " but " + elementCount + " pixels have been requested.");
+
+			if (data.Length < startIndex + elementCount) {
+				throw new ArgumentException ("The data passed has a length of " + data.Length + " but " + elementCount + " pixels have been requested.");
 			}
-			
+
 			Rectangle r;
-			if (rect != null)
-			{
+			if (rect != null) {
 				r = rect.Value;
+			} else {
+				r = new Rectangle (0, 0, Width, Height);
 			}
-			else
-			{
-				r = new Rectangle(0, 0, Width, Height);
-			}
-			
-			byte[] imageInfo = GetImageData(0);
-			
+
+			byte[] imageInfo = GetImageData (0);
+
 			// Get the Color values
-			if ((typeof(T) == typeof(Color))) {	
-				
-				
+			if ((typeof(T) == typeof(Color))) {
+
+
 				// Left this here for documentation - Not sure what it does but the
 				// routine looks important
-				
+
 				//Convert "RRRRRRRRRGGGGGGGGBBBBBBBBAAAAAAAA" to "RRRRRGGGGGGBBBBB"
 				/*
 				if(pixelFormat == SurfaceFormat.Rgb32) {
@@ -437,7 +432,7 @@ namespace Microsoft.Xna.Framework.Graphics
 					imageData = tempData;			
 				}									
 				*/
-				
+
 				int rWidth = r.Width;
 				int rHeight = r.Height;
 
@@ -465,21 +460,20 @@ namespace Microsoft.Xna.Framework.Graphics
 							default:
 								throw new NotSupportedException ("Texture format");
 							}
-							data[dataEnd - dataRowColOffset] = (T)(object)result;
+							data [dataEnd - dataRowColOffset] = (T)(object)result;
 						}
-						
-						
+
+
 					}
-				}
-				else {
+				} else {
 					// Loop through and extract the data but we need to load it 
 					var dataRowColOffset = 0;
 					var sz = 0;
 					var pixelOffset = 0;
-					for (int y = r.Top; y < rHeight; y++) {
-						for (int x = r.Left; x < rWidth; x++) {
-							var result = new Color (0, 0, 0, 0);						
-							dataRowColOffset = ((y * r.Width) + x);
+					for (int y = r.Top; y < r.Top + rHeight; y++) {
+						for (int x = r.Left; x < r.Left + rWidth; x++) {
+							var result = new Color (0, 0, 0, 0);
+							dataRowColOffset = ((y * _width) + x);
 							switch (_format) {
 							case SurfaceFormat.Color : //kTexture2DPixelFormat_RGBA8888
 							case SurfaceFormat.Dxt3 :
@@ -513,7 +507,7 @@ namespace Microsoft.Xna.Framework.Graphics
 //								pos = ((y * imageSize.Width) + x) * sz;
 //								pixelOffset = new IntPtr (imageData.ToInt64 () + pos);
 //								Marshal.Copy (pixelOffset, pixel, 0, 4);	
-//	
+//
 //								result.R = pixel [0];
 //								result.G = pixel [1];
 //								result.B = pixel [2];
@@ -523,13 +517,13 @@ namespace Microsoft.Xna.Framework.Graphics
 								result.R = imageInfo [pixelOffset];
 								result.G = imageInfo [pixelOffset + 1];
 								result.B = imageInfo [pixelOffset + 2];
-								result.A = imageInfo [pixelOffset + 3];							
+								result.A = imageInfo [pixelOffset + 3];
 								break;
-							case SurfaceFormat.Alpha8 :  // kTexture2DPixelFormat_A8 
+							case SurfaceFormat.Alpha8 :  // kTexture2DPixelFormat_A8
 //								sz = 1;
 //								pos = ((y * imageSize.Width) + x) * sz;
-//								pixelOffset = new IntPtr (imageData.ToInt64 () + pos);								
-//								Marshal.Copy (pixelOffset, pixel, 0, 4);	
+//								pixelOffset = new IntPtr (imageData.ToInt64 () + pos);
+//								Marshal.Copy (pixelOffset, pixel, 0, 4);
 //	
 //								result.A = pixel [0];
 								sz = 1;
@@ -539,16 +533,14 @@ namespace Microsoft.Xna.Framework.Graphics
 							default:
 								throw new NotSupportedException ("Texture format");
 							}
-							data [dataRowColOffset] = (T)(object)result;
+							data [((y - r.Top) * r.Width) + (x - r.Left)] = (T)(object)result;
 						}
 					}
 				}
-			}
-			else 
-			{
+			} else {
 				throw new NotImplementedException ("GetData not implemented for type.");
 			}
-        }
+		}
 		
 		internal void Apply()
         {

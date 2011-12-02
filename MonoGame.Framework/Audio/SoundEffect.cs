@@ -182,6 +182,7 @@ namespace Microsoft.Xna.Framework.Audio
 				_masterVolume = value;	
 			}
 		}
+				
     }
 }
 

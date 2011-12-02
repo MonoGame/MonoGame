@@ -134,6 +134,7 @@ using Microsoft.Xna.Framework.Audio;
             set
             {
 				_looping = value;
+				if(_song != null) _song.Loop = value;
             }
         }
 

@@ -222,7 +222,8 @@
 							}
 							else // Handle mouse 
 							{
-								Mouse.SetPosition((int) location.X, (int) location.Y);
+								Mouse.State.X = (int) location.X;
+								Mouse.State.Y = (int) location.Y;
 							}
 						}
 						
@@ -335,7 +336,8 @@
 								}
 								
 								// Handle the mouse
-								Mouse.SetPosition( (int) location.X, (int) location.Y);
+								Mouse.State.X = (int) location.X;
+								Mouse.State.Y = (int) location.Y;
 							}
 						}
 					}

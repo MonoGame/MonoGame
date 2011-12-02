@@ -243,8 +243,21 @@ namespace Microsoft.Xna.Framework
 			// decide of we honour the device orientation or force our own
 			
 			// so if we are in Portrait but we allow only LandScape we stay in landscape
-						
-
+			if (allowedOrientation == DisplayOrientation.Portrait)
+			{
+				actualOrientation = DisplayOrientation.Portrait;
+			}
+			else
+			if (allowedOrientation == DisplayOrientation.LandscapeLeft)
+			{
+				actualOrientation = DisplayOrientation.LandscapeLeft;
+			}
+			else
+			if (allowedOrientation == DisplayOrientation.LandscapeRight)
+			{
+				actualOrientation = DisplayOrientation.LandscapeRight;
+			}	
+			
             switch (currentorientation) {
 
 			case DisplayOrientation.Portrait:
@@ -255,13 +268,16 @@ namespace Microsoft.Xna.Framework
 				case DisplayOrientation.LandscapeRight:	
 				    if ((allowedOrientation & DisplayOrientation.LandscapeRight) != 0) {
                         actualOrientation = DisplayOrientation.LandscapeRight;
-                    }
+                    }				    
 				    break;
                 case DisplayOrientation.LandscapeLeft:				     
                 default:
-				    actualOrientation = DisplayOrientation.LandscapeLeft;
+					if ((allowedOrientation & DisplayOrientation.LandscapeLeft) != 0) {
+				    	actualOrientation = DisplayOrientation.LandscapeLeft;
+					}
                     break;
             }
+			
 			
 			CurrentOrientation = actualOrientation;
             game.GraphicsDevice.PresentationParameters.DisplayOrientation = actualOrientation;
@@ -279,14 +295,20 @@ namespace Microsoft.Xna.Framework
             }
             if (e.Action == MotionEventActions.Up) {
                 state = TouchLocationState.Released;
+				Mouse.State.X = (int)e.GetX();
+				Mouse.State.Y = (int)e.GetY();
+				Mouse.State.LeftButton = ButtonState.Released;
             }
             if (e.Action == MotionEventActions.Move) {
                 state = TouchLocationState.Moved;
-                Mouse.SetPosition((int) e.GetX(), (int) e.GetY());
+				Mouse.State.X = (int)e.GetX();
+				Mouse.State.Y = (int)e.GetY();
             }
             if (e.Action == MotionEventActions.Down) {
                 state = TouchLocationState.Pressed;
-                Mouse.SetPosition((int) e.GetX(), (int) e.GetY());
+                Mouse.State.X = (int)e.GetX();
+				Mouse.State.Y = (int)e.GetY();
+				Mouse.State.LeftButton = ButtonState.Pressed;
             }
 
             TouchLocation tprevious;
