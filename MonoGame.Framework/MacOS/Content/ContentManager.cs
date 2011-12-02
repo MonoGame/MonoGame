@@ -55,7 +55,7 @@ namespace Microsoft.Xna.Framework.Content
 
         protected virtual Stream OpenStream(string assetName)
         {
-            Stream stream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
+            Stream stream = new FileStream(assetName, FileMode.Open, FileAccess.Read, FileShare.Read);
             return stream;
         }
     }
