@@ -597,6 +597,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		public void DrawUserPrimitives<T> (PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int primitiveCount) where T : struct, IVertexType
 		{
 
+
 			// we need to reset vertex states afterwards
 			resetVertexStates = true;
 
@@ -627,6 +628,54 @@ namespace Microsoft.Xna.Framework.Graphics
 
             //Setup VertexDeclaration
             VertexDeclaration.PrepareForUse(vd);
+
+            //Draw
+            GL.DrawArrays(PrimitiveTypeGL11(primitiveType), vertexOffset, GetElementCountArray(primitiveType, primitiveCount));
+
+            // Free resources
+            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
+            handle.Free();
+
+			// Unset our Graphics States
+			UnsetGraphicsStates();
+
+
+		}
+
+		public void DrawUserPrimitives<T> (PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct, IVertexType
+		{
+
+			// we need to reset vertex states afterwards
+			resetVertexStates = true;
+
+			// Set up our Graphics States
+			SetGraphicsStates();
+
+           // Unbind the VBOs
+            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
+
+            //Create VBO if not created already
+            if (VboIdArray == 0)
+                GL.GenBuffers(1, out VboIdArray);
+
+            // Bind the VBO
+            GL.BindBuffer(BufferTarget.ArrayBuffer, VboIdArray);
+            ////Clear previous data
+            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)0, (IntPtr)null, BufferUsageHint.DynamicDraw);
+
+            //Get VertexDeclaration
+            //var vd = VertexDeclaration.FromType(typeof(T));
+
+            //Pin data
+            var handle = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
+
+            //Buffer data to VBO; This should use stream when we move to ES2.0
+            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vertexDeclaration.VertexStride * GetElementCountArray(primitiveType, primitiveCount)), vertexData,BufferUsageHint.DynamicDraw);
+
+            //Setup VertexDeclaration
+            VertexDeclaration.PrepareForUse(vertexDeclaration);
 
             //Draw
             GL.DrawArrays(PrimitiveTypeGL11(primitiveType), vertexOffset, GetElementCountArray(primitiveType, primitiveCount));
