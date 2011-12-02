@@ -257,6 +257,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new ContentLoadException("Error loading Texture2D Stream");
             }
 
+            // Fix up the Image to match the expected format
+            image.RGBToBGR();
+
             ESImage theTexture = new ESImage(image, graphicsDevice.PreferedFilter);
             Texture2D result = new Texture2D(theTexture);
 
