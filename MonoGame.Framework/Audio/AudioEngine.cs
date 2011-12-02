@@ -57,7 +57,7 @@ namespace Microsoft.Xna.Framework.Audio
 		
 		public void Update ()
 		{
-			throw new NotImplementedException ();
+			// TODO throw new NotImplementedException ();
 		}
 		
 		#region IDisposable implementation

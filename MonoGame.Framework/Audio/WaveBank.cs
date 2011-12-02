@@ -330,7 +330,15 @@ namespace Microsoft.Xna.Framework.Audio
                     writer.Write((int)rate); //sample rate
                     writer.Write((int)rate*align); //byte rate
                     writer.Write((short)align);
-                    writer.Write((short)bits);
+
+					if (bits == 1) 
+					{
+                        writer.Write((short)16);
+                    } 
+					else 
+					{
+                        writer.Write((short)8); //not sure if this is right
+                    } 
                     
                     writer.Write("data".ToCharArray());
                     writer.Write((int)audiodata.Length);
