@@ -230,7 +230,7 @@ namespace Microsoft.Xna.Framework
 			{
 				return _isActive;
 			}
-			protected set
+			internal set
 			{
 				if (_isActive != value )
 				{

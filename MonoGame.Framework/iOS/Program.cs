@@ -132,9 +132,29 @@ namespace Microsoft.Xna.Framework
 			}).BeginInvoke(null, null);	
 		}
 		
+		public override void OnResignActivation(UIApplication application)
+		{
+			if ( MonoGameGame != null )
+			{
+				MonoGameGame.IsActive = false;
+			}
+		}
+		
 		public override void OnActivated(UIApplication application)
         {
+			if ( MonoGameGame != null )
+			{
+				MonoGameGame.IsActive = true;
+			}
 			TouchPanel.Reset ();
+		}
+		
+		public override void WillTerminate(UIApplication application)
+		{
+			if ( MonoGameGame != null )
+			{
+				// TODO MonoGameGame.Terminate();
+			}
 		}
 
 	}

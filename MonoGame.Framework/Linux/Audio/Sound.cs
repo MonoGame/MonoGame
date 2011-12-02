@@ -79,6 +79,12 @@ namespace Microsoft.Xna.Framework.Audio
 			}
 		}
 		
+		public float Rate
+		{
+			get;
+			set;
+		}
+		
 		public float Volume
 		{
 			get
