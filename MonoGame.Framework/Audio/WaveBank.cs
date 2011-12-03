@@ -82,8 +82,7 @@ namespace Microsoft.Xna.Framework.Audio
             //XWB PARSING
             //Adapted from MonoXNA
             //Originally adaped from Luigi Auriemma's unxwb
-            
-            audioEngine.Wavebanks.Add(this);
+			
             WaveBankHeader wavebankheader;
             WaveBankData wavebankdata;
             WaveBankEntry wavebankentry;
@@ -406,6 +405,8 @@ namespace Microsoft.Xna.Framework.Audio
                 }
                 
             }
+			
+			audioEngine.Wavebanks[BankName] = this;
         }
 
 		#region IDisposable implementation
