@@ -70,7 +70,8 @@ namespace Microsoft.Xna.Framework
 		private DateTime _lastUpdate;
 		internal bool _initialized = false;
 		private bool _initializing = false;
-		private bool _isActive = true;
+		private bool _isShouldDraw = true;
+		private bool _isActive = false;
 		private GameComponentCollection _gameComponentCollection;
 		public GameServiceContainer _services;
 		private ContentManager _content;
@@ -129,12 +130,14 @@ namespace Microsoft.Xna.Framework
 				//if (!IsMouseVisible)
 				//	_gameWindow.HideCursor();
 				//Console.WriteLine("BecomeKey");
+				IsActive = true;
 			};
 
 			_mainWindow.DidResignKey += delegate(object sender, EventArgs e) {
 				//if (!IsMouseVisible)
 				//	_gameWindow.UnHideCursor();
 				//Console.WriteLine("ResignKey");
+				IsActive = false;
 			};
 
 			_mainWindow.DidBecomeMain += delegate(object sender, EventArgs e) {
@@ -264,7 +267,9 @@ namespace Microsoft.Xna.Framework
 
 		public void Dispose ()
 		{
-			// do nothing
+			// Send event to listeners
+			if (Disposed != null)
+				Disposed(this, new EventArgs());
 		}
 
 		public bool IsActive {
@@ -274,6 +279,25 @@ namespace Microsoft.Xna.Framework
 			protected set {
 				if (_isActive != value) {
 					_isActive = value;
+					if (_isActive) {
+						if (Activated != null)
+							Activated(this, new EventArgs());
+					}
+					else {
+						if (Deactivated != null)
+							Deactivated(this, new EventArgs());
+					}
+				}
+			}
+		}
+
+		internal bool IsCanUpdateDraw {
+			get {
+				return _isShouldDraw;
+			}
+			set {
+				if (_isShouldDraw != value) {
+					_isShouldDraw = value;
 				}
 			}
 		}
@@ -374,14 +398,14 @@ namespace Microsoft.Xna.Framework
 
 		internal void DoUpdate (GameTime aGameTime)
 		{
-			if (_isActive) {
+			if (_isShouldDraw) {
 				Update (aGameTime);
 			}
 		}
 
 		internal void DoDraw (GameTime aGameTime)
 		{
-			if (_isActive) {
+			if (_isShouldDraw) {
 
 				// Ok Based on these two messages the Draw and EndDraw should not be called
 				// if BeginDraw returns false.
@@ -456,14 +480,14 @@ namespace Microsoft.Xna.Framework
 
 		public void EnterBackground ()
 		{
-			_isActive = false;
+			_isShouldDraw = false;
 			if (Deactivated != null)
 				Deactivated.Invoke (this, null);
 		}
 
 		public void EnterForeground ()
 		{
-			_isActive = true;
+			_isShouldDraw = true;
 			if (Activated != null)
 				Activated.Invoke (this, null);
 		}
@@ -553,8 +577,8 @@ namespace Microsoft.Xna.Framework
 			//Changing window style forces a redraw. Some games
 			//have fail-logic and toggle fullscreen in their draw function,
 			//so temporarily become inactive so it won't execute.
-			bool wasActive = IsActive;
-			IsActive = false;
+			bool wasActive = IsCanUpdateDraw;
+			IsCanUpdateDraw = false;
 
 			// I will leave this here just in case someone can figure out how to do
 			//  a full screen with this and still get Alt + Tab to friggin work.
@@ -580,14 +604,14 @@ namespace Microsoft.Xna.Framework
 			_mainWindow.HidesOnDeactivate = false;
 			Mouse.ResetMouse();
 
-			IsActive = wasActive;
+			IsCanUpdateDraw = wasActive;
 		}
 		
 		internal void GoFullScreen ()
 		{
 
-			bool wasActive = IsActive;
-			IsActive = false;
+			bool wasActive = IsCanUpdateDraw;
+			IsCanUpdateDraw = false;
 
 			// I will leave this here just in case someone can figure out how to do
 			//  a full screen with this and still get Alt + Tab to friggin work.
@@ -613,7 +637,7 @@ namespace Microsoft.Xna.Framework
 			Window.Window.HidesOnDeactivate = true;
 			Mouse.ResetMouse();
 
-			IsActive = wasActive;
+			IsCanUpdateDraw = wasActive;
 		}
 		
 		protected virtual void Initialize ()
@@ -742,6 +766,9 @@ namespace Microsoft.Xna.Framework
 
 		public void Exit ()
 		{
+			if (Exiting != null)
+				Exiting(this, new EventArgs());
+
 			NSApplication.SharedApplication.Terminate(new NSObject());
 		}
 
@@ -752,10 +779,10 @@ namespace Microsoft.Xna.Framework
 		}
 
 		#region Events
-		public event EventHandler Activated;
-		public event EventHandler Deactivated;
-		public event EventHandler Disposed;
-		public event EventHandler Exiting;
+		public event EventHandler<EventArgs> Activated;
+		public event EventHandler<EventArgs> Deactivated;
+		public event EventHandler<EventArgs> Disposed;
+		public event EventHandler<EventArgs> Exiting;
 		#endregion
 	}
 }
