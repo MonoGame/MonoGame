@@ -40,68 +40,94 @@ purpose and non-infringement.
 
 using System;
 
+
 namespace Microsoft.Xna.Framework.Audio
 {
 	public class Cue : IDisposable
 	{
-		private string _name;
-		private Sound _sound;
-		private bool _paused = false;
+		string name;
+		XactSound[] sounds;
+		float[] probs;
+		XactSound curSound;
+		Random variationRand;
+		
+		bool paused = false;
+		float volume = 1.0f;
 		
 		public bool IsPaused
 		{
-			get { return _paused; }
+			get { return paused; }
 		}
 		
 		public bool IsPlaying
 		{
-			get { return _sound.Playing; }
+			get { return curSound.Playing; }
 		}
 		
 		public bool IsStopped
 		{
-			get { return !_sound.Playing; }
+			get { return !curSound.Playing; }
 		}
 		
 		public string Name
 		{
-			get { return _name; }
+			get { return name; }
 		}
 		
-		internal Cue(string cuename, Sound sound)
+		internal Cue(string cuename, XactSound sound)
 		{
-			_name = cuename;
-			_sound = sound;
+			name = cuename;
+			sounds = new XactSound[1];
+			sounds[0] = sound;
+			
+			probs = new float[1];
+			probs[0] = 1.0f;
+			
+			variationRand = new Random();
+		}
+		
+		internal Cue(string cuename, XactSound[] _sounds, float[] _probs)
+		{
+			name = cuename;
+			sounds = _sounds;
+			probs = _probs;
+			
+			variationRand = new Random();
 		}
 		
 		public void Pause()
 		{
-			_sound.Pause();
-			_paused = true;
+			curSound.Pause();
+			paused = true;
 		}
 		
 		public void Play()
 		{
-			_sound.Play();
-			_paused = false;
+			//TODO: Probabilities
+			curSound = sounds[variationRand.Next (sounds.Length)];
+			
+			curSound.Volume = volume;
+			curSound.Play ();
+			paused = false;
 		}
 		
 		public void Resume()
 		{
-			_sound.Play();
-			_paused = false;
+			curSound.Play ();
+			paused = false;
 		}
 		
 		public void Stop(AudioStopOptions options)
 		{
-			_sound.Stop();
-			_paused = false;
+			curSound.Stop();
+			paused = false;
 		}
 		
 		public void SetVariable(string name, float value)
 		{
 			if (name == "Volume") {
-				_sound.Volume = value;
+				volume = value;
+				curSound.Volume = value;
 			} else {
 				throw new NotImplementedException();
 			}
@@ -110,7 +136,7 @@ namespace Microsoft.Xna.Framework.Audio
 		public float GetVariable(string name, float value)
 		{
 			if (name == "Volume") {
-				return _sound.Volume;
+				return volume;
 			} else {
 				throw new NotImplementedException();
 			}
@@ -119,7 +145,7 @@ namespace Microsoft.Xna.Framework.Audio
 		#region IDisposable implementation
 		public void Dispose ()
 		{
-			_sound.Dispose();
+			//_sound.Dispose();
 		}
 		#endregion
 	}
