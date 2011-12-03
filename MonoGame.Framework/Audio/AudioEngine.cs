@@ -61,14 +61,6 @@ namespace Microsoft.Xna.Framework.Audio
 			// TODO throw new NotImplementedException ();
 		}
 		
-		internal void RegisterWaveBank(WaveBank waveBank) {
-			Wavebanks.Add (waveBank.BankName, waveBank);
-		}
-		
-		internal WaveBank GetWaveBank(string bankName) {
-			return Wavebanks[bankName];
-		}
-		
 		#region IDisposable implementation
 		public void Dispose ()
 		{

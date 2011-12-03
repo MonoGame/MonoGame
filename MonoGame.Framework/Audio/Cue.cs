@@ -61,12 +61,22 @@ namespace Microsoft.Xna.Framework.Audio
 		
 		public bool IsPlaying
 		{
-			get { return curSound.Playing; }
+			get {
+				if (curSound != null) {
+					return curSound.Playing;
+				}
+				return false;
+			}
 		}
 		
 		public bool IsStopped
 		{
-			get { return !curSound.Playing; }
+			get {
+				if (curSound != null) {
+					return !curSound.Playing;
+				}
+				return true;
+			}
 		}
 		
 		public string Name
@@ -97,7 +107,9 @@ namespace Microsoft.Xna.Framework.Audio
 		
 		public void Pause()
 		{
-			curSound.Pause();
+			if (curSound != null) {
+				curSound.Pause();
+			}
 			paused = true;
 		}
 		
@@ -113,13 +125,17 @@ namespace Microsoft.Xna.Framework.Audio
 		
 		public void Resume()
 		{
-			curSound.Play ();
+			if (curSound != null) {
+				curSound.Play ();
+			}
 			paused = false;
 		}
 		
 		public void Stop(AudioStopOptions options)
 		{
-			curSound.Stop();
+			if (curSound != null) {
+				curSound.Stop();
+			}
 			paused = false;
 		}
 		
@@ -127,7 +143,9 @@ namespace Microsoft.Xna.Framework.Audio
 		{
 			if (name == "Volume") {
 				volume = value;
-				curSound.Volume = value;
+				if (curSound != null) {
+					curSound.Volume = value;
+				}
 			} else {
 				throw new NotImplementedException();
 			}
