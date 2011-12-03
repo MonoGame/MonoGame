@@ -344,6 +344,8 @@
     <Compile Include="MacOS\Graphics\Effect\VSBasicEffectcs" />
     <Compile Include="Graphics\Vertices\VertexElementColor.cs" />
     <Compile Include="Graphics\Vertices\IndexElementSize.cs" />
+    <Compile Include="Audio\XactSound.cs" />
+    <Compile Include="Audio\XactClip.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />
