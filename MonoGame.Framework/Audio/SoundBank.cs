@@ -46,6 +46,9 @@ namespace Microsoft.Xna.Framework.Audio
 			FileStream soundbankstream = new FileStream(filename, FileMode.Open);
             BinaryReader soundbankreader = new BinaryReader(soundbankstream);
             
+			//Parse the SoundBank.
+			//Thanks to Liandril for "xactxtract" for some of the offsets
+			
 			uint magic = soundbankreader.ReadUInt32 ();
 			if (magic != 0x4B424453) { //"SDBK"
 				throw new Exception("Bad soundbank format");
