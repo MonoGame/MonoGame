@@ -39,13 +39,14 @@ purpose and non-infringement.
 #endregion License
 
 using System;
+using System.Collections.Generic;
 namespace Microsoft.Xna.Framework.Audio
 {
 	public class AudioEngine : IDisposable
 	{
 		public const int ContentVersion = 39;
 		
-		internal System.Collections.Generic.List<WaveBank> Wavebanks = new System.Collections.Generic.List<WaveBank>();
+		internal Dictionary<string, WaveBank> Wavebanks = new Dictionary<string, WaveBank>();
 		
 		public AudioEngine (string settingsFile)
 		{
@@ -58,6 +59,14 @@ namespace Microsoft.Xna.Framework.Audio
 		public void Update ()
 		{
 			// TODO throw new NotImplementedException ();
+		}
+		
+		internal void RegisterWaveBank(WaveBank waveBank) {
+			Wavebanks.Add (waveBank.BankName, waveBank);
+		}
+		
+		internal WaveBank GetWaveBank(string bankName) {
+			return Wavebanks[bankName];
 		}
 		
 		#region IDisposable implementation
