@@ -147,7 +147,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			switch(textureAddressMode)
 			{
 			case TextureAddressMode.Clamp:
-				return (int)TextureWrapMode.Clamp;
+				return (int)TextureWrapMode.ClampToEdge;
 			case TextureAddressMode.Wrap:
 				return (int)TextureWrapMode.Repeat;
 			case TextureAddressMode.Mirror:
