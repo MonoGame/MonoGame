@@ -268,7 +268,9 @@ namespace Microsoft.Xna.Framework
 		public void Dispose ()
 		{
 			// Send event to listeners
-			Disposed(this, new EventArgs());
+			if (Disposed != null) {
+				Disposed(this, new EventArgs());
+			}
 		}
 
 		public bool IsActive {
@@ -278,10 +280,17 @@ namespace Microsoft.Xna.Framework
 			protected set {
 				if (_isActive != value) {
 					_isActive = value;
-					if (_isActive)
-						Activated(this, new EventArgs());
+					if (_isActive){						
+						if (Activated != null){
+							Activated(this, new EventArgs());
+						}
+					}
 					else
-						Deactivated(this, new EventArgs());
+					{
+						if (Deactivated != null){
+							Deactivated(this, new EventArgs());
+						}
+					}
 				}
 			}
 		}
