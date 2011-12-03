@@ -34,15 +34,22 @@ namespace Microsoft.Xna.Framework.Audio
     public class SoundBank : IDisposable
     {
         string name;
-		
+		string filename;
+		AudioEngine audioengine;
 		WaveBank[] waveBanks;
 		Dictionary<string, Cue> cues = new Dictionary<string, Cue>();
         
-        public SoundBank(AudioEngine audioEngine, string filename)
+		bool loaded = false;
+		
+        public SoundBank(AudioEngine audioEngine, string fileName)
         {
             // Check for windows-style directory separator character
-            filename = filename.Replace('\\',Path.DirectorySeparatorChar);
-			
+            filename = fileName.Replace('\\',Path.DirectorySeparatorChar);
+			audioengine = audioEngine;
+		}
+		
+		//Defer loading because some programs load soundbanks before wavebanks
+		private void Load() {	
 			FileStream soundbankstream = new FileStream(filename, FileMode.Open);
             BinaryReader soundbankreader = new BinaryReader(soundbankstream);
             
@@ -94,7 +101,7 @@ namespace Microsoft.Xna.Framework.Audio
 			waveBanks = new WaveBank[numWaveBanks];
 			for (int i=0; i<numWaveBanks; i++) {
 				string bankname = System.Text.Encoding.UTF8.GetString(soundbankreader.ReadBytes(64)).Replace("\0","");
-				waveBanks[i] = audioEngine.GetWaveBank (bankname);
+				waveBanks[i] = audioengine.Wavebanks[bankname];
 			}
 			
 			//parse cue name table
@@ -186,6 +193,10 @@ namespace Microsoft.Xna.Framework.Audio
 				cues.Add(cue.Name, cue);
 			}
 			
+			soundbankreader.Close ();
+			soundbankstream.Close ();
+			
+			loaded = true;
         }
 		
 		internal Sound GetWave(byte waveBankIndex, uint trackIndex) {
@@ -194,6 +205,9 @@ namespace Microsoft.Xna.Framework.Audio
 		
         public Cue GetCue(string name)
         {
+			if (!loaded) Load ();
+			
+			//Does this have to return /new/ Cue instances?
 			return cues[name];
         }
 		
