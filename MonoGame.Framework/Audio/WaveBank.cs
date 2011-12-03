@@ -406,7 +406,7 @@ namespace Microsoft.Xna.Framework.Audio
                 
             }
 			
-			audioEngine.RegisterWaveBank(this);
+			audioEngine.Wavebanks[BankName] = this;
         }
 
 		#region IDisposable implementation
