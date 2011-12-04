@@ -105,6 +105,14 @@ namespace Microsoft.Xna.Framework.Media
 				_playCount++;
 			}
         }
+
+		internal void Resume()
+		{
+			if ( _sound != null )
+			{
+				_sound.Resume();
+			}
+		}
 		
 		internal void Pause()
 		{			
