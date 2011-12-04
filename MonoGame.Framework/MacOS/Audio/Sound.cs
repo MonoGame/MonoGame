@@ -35,6 +35,8 @@ using System.Collections.Generic;
 using MonoMac;
 using MonoMac.AppKit;
 using MonoMac.Foundation;	
+using MonoMac.AudioToolbox;
+using MonoMac.AudioUnit;
 
 namespace Microsoft.Xna.Framework.Audio
 {	
@@ -52,6 +54,7 @@ namespace Microsoft.Xna.Framework.Audio
 			_audioPlayer = new NSSound(data);
 			_audioPlayer.Volume = volume;
 			_audioPlayer.Loops = looping;
+			
 		}
 		
 		public Sound(byte[] audiodata, float volume, bool looping) {
