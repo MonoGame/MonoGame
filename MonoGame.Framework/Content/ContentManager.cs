@@ -368,14 +368,16 @@ namespace Microsoft.Xna.Framework.Content
 
             // Store references to the asset for later use
             T asset = (T)result;
-            if (asset is IDisposable && recordDisposableObject != null)
-            {
-                recordDisposableObject(asset as IDisposable);
-            }
-            else
-            {
-                disposableAssets.Add(asset as IDisposable);
-            }
+            if (asset is IDisposable) {
+
+		if (recordDisposableObject != null) {
+                        recordDisposableObject(asset as IDisposable);
+                 }
+                 else
+                 {
+                        disposableAssets.Add(asset as IDisposable);
+                  }
+		}
             loadedAssets.Add(originalAssetName, asset);
 
             return (T)result;
