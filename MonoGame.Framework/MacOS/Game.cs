@@ -594,7 +594,6 @@ namespace Microsoft.Xna.Framework
 			if (oldTitle != null)
 				_gameWindow.Title = oldTitle;
 
-
 			// Set the level here to normal
 			_mainWindow.Level = NSWindowLevel.Normal;
 
@@ -625,7 +624,7 @@ namespace Microsoft.Xna.Framework
 			_mainWindow.StyleMask = NSWindowStyle.Borderless;
 
 			// Set the level here to normal
-			_mainWindow.Level = NSWindowLevel.Floating;
+			_mainWindow.Level = NSWindowLevel.MainMenu + 1;
 
 			if (oldTitle != null)
 				_gameWindow.Title = oldTitle;
