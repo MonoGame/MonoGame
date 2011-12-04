@@ -72,12 +72,11 @@ namespace Microsoft.Xna.Framework
         private DateTime _lastUpdate;
 		private DateTime _now;
         private DisplayOrientation _currentOrientation;
+		private GestureDetector gesture = null;
 
         public AndroidGameWindow(Context context) :base(context)
-        {
-          
-            Initialize();
-				
+        {          
+            Initialize();							
         }
 		
 						
@@ -93,7 +92,8 @@ namespace Microsoft.Xna.Framework
 
             // Initialize _lastUpdate
             _lastUpdate = DateTime.Now;
-												
+					
+			gesture = new GestureDetector(new GestureListener((AndroidGameActivity)this.Context));
 			
             this.RequestFocus();
             this.FocusableInTouchMode = true;
@@ -338,6 +338,7 @@ namespace Microsoft.Xna.Framework
 
             TouchPanel.Collection.Clear();
             TouchPanel.Collection.Add(tlocation);
+			if (gesture != null) gesture.OnTouchEvent(e);
 
             if (state != TouchLocationState.Released)
                 _previousTouches[e.Handle] = tlocation;
