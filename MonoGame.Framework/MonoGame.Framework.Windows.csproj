@@ -387,6 +387,8 @@
     <Compile Include="Graphics\Vertices\VertexElementColor.cs" />
     <Compile Include="Windows\Input\Mouse.cs" />
     <Compile Include="Windows\Input\MouseState.cs" />
+    <Compile Include="Audio\XactClip.cs" />
+    <Compile Include="Audio\XactSound.cs" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
