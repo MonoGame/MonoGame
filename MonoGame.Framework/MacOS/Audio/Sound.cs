@@ -156,6 +156,11 @@ namespace Microsoft.Xna.Framework.Audio
 			_audioPlayer.Play();
 		}
 		
+		public void Resume()
+		{
+			_audioPlayer.Resume();
+		}
+		
 		public void Stop()
 		{			
 			if (Duration > 2) { 
