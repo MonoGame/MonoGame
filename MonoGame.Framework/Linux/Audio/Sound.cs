@@ -60,12 +60,6 @@ namespace Microsoft.Xna.Framework.Audio
 			set;
 		}
 		
-		public float Rate
-		{
-			get;
-			set;
-		}
-		
 		public bool Playing
 		{
 			get
@@ -292,6 +286,11 @@ namespace Microsoft.Xna.Framework.Audio
 		
 		#endregion		
 		
+        public void Resume()
+        {
+            Play();
+        }
+        
 		public void Pause()
 		{		
 			AL.SourcePause(sourceID);
