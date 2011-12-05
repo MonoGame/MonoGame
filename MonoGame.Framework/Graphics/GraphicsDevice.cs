@@ -43,6 +43,8 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 using OpenTK.Graphics.ES11;
+using MonoTouch.OpenGLES;
+
 
 using Microsoft.Xna.Framework;
 
@@ -69,6 +71,9 @@ namespace Microsoft.Xna.Framework.Graphics
         public RasterizerState RasterizerState { get; set; }
 		
 		private RenderTargetBinding[] currentRenderTargets;
+		
+		//OpenGL Rendering API
+		public static EAGLRenderingAPI OpenGLESVersion;
 		
 		internal All PreferedFilter 
 		{

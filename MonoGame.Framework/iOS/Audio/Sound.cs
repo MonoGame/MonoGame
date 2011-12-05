@@ -176,6 +176,10 @@ namespace Microsoft.Xna.Framework.Audio
 			_audioPlayer.Stop();
 		}
 		
+		public void Resume()
+		{
+		}
+		
 		public float Volume
 		{
 			get 

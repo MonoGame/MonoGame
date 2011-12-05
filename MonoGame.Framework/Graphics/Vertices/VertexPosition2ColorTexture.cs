@@ -22,6 +22,11 @@ namespace Microsoft.Xna.Framework.Graphics
 			Color = color.GLPackedValue;
 			TextureCoordinate = texCoord;
 		}
+		
+		public static int GetSize()
+		{
+				return sizeof(float)*4+sizeof(uint);
+	    }
 	}
 }
 

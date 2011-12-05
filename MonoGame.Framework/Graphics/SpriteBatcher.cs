@@ -41,9 +41,13 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Collections.Generic;
-using OpenTK.Graphics.ES11;
+using GL11 = OpenTK.Graphics.ES11.GL;
+using GL20 = OpenTK.Graphics.ES20.GL;
+using ALL11 = OpenTK.Graphics.ES11.All;
+using ALL20 = OpenTK.Graphics.ES20.All;
 
 using Microsoft.Xna.Framework;
+using System.Text; // just for StringBuilder
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -57,7 +61,11 @@ namespace Microsoft.Xna.Framework.Graphics
 		ushort[] _index;
 		GCHandle _vertexHandle;
 		GCHandle _indexHandle;
-
+		
+		// OpenGL ES2.0 Variables
+		public int attributePosition = 0;
+		public int attributeTexCoord = 1;
+		
 		public SpriteBatcher ()
 		{
 			_batchItemList = new List<SpriteBatchItem>(InitialBatchSize);
@@ -77,7 +85,9 @@ namespace Microsoft.Xna.Framework.Graphics
 				_index[i*6+4] = (ushort)(i*4+3);
 				_index[i*6+5] = (ushort)(i*4+2);
 			}
+			
 		}
+		
 		public SpriteBatchItem CreateBatchItem()
 		{
 			SpriteBatchItem item;
@@ -88,19 +98,92 @@ namespace Microsoft.Xna.Framework.Graphics
 			_batchItemList.Add(item);
 			return item;
 		}
+		
 		int CompareTexture ( SpriteBatchItem a, SpriteBatchItem b )
 		{
 			return a.TextureID.CompareTo(b.TextureID);
 		}
+		
 		int CompareDepth ( SpriteBatchItem a, SpriteBatchItem b )
 		{
 			return a.Depth.CompareTo(b.Depth);
 		}
+		
 		int CompareReverseDepth ( SpriteBatchItem a, SpriteBatchItem b )
 		{
 			return b.Depth.CompareTo(a.Depth);
 		}
-		public void DrawBatch ( SpriteSortMode sortMode, SamplerState samplerState )
+		
+		public void DrawBatchGL20 ( SpriteSortMode sortMode )
+		{
+			// nothing to do
+			if ( _batchItemList.Count == 0 )
+				return;
+			
+			// sort the batch items
+			switch ( sortMode )
+			{
+			case SpriteSortMode.Texture :
+				_batchItemList.Sort( CompareTexture );
+				break;
+			case SpriteSortMode.FrontToBack :
+				_batchItemList.Sort ( CompareDepth );
+				break;
+			case SpriteSortMode.BackToFront :
+				_batchItemList.Sort ( CompareReverseDepth );
+				break;
+			}
+			
+			GL20.EnableVertexAttribArray(attributePosition);
+			GL20.EnableVertexAttribArray(attributeTexCoord);
+			
+			int size = VertexPosition2ColorTexture.GetSize();
+			GL20.VertexAttribPointer(attributePosition,2,ALL20.Float,false,size,_vertexHandle.AddrOfPinnedObject());
+			GL20.VertexAttribPointer(attributeTexCoord,2,ALL20.Float,false,size,(IntPtr)((uint)_vertexHandle.AddrOfPinnedObject()+(uint)(sizeof(float)*2+sizeof(uint))));
+
+			// setup the vertexArray array
+			int startIndex = 0;
+			int index = 0;
+			int texID = -1;
+			Color lastTint =  new Color(0.0f,0.0f,0.0f,0.0f);
+
+			// make sure the vertexArray has enough space
+			if ( _batchItemList.Count*4 > _vertexArray.Length )
+				ExpandVertexArray( _batchItemList.Count );
+			
+			foreach ( SpriteBatchItem item in _batchItemList )
+			{
+				//Tint Color
+				Vector4 vtint = item.Tint.ToVector4();
+				vtint /= 255;
+
+				// if the texture changed, we need to flush and bind the new texture
+				if ( item.TextureID != texID || item.Tint != lastTint)
+				{
+					FlushVertexArrayGL20( startIndex, index );
+					startIndex = index;
+					texID = item.TextureID;
+					lastTint = item.Tint;
+					GL20.ActiveTexture(ALL20.Texture0);
+					GL20.BindTexture ( ALL20.Texture2D, texID );
+					GL20.Uniform1(texID, 0);
+					//GL20.VertexAttrib4(attributeTint,vtint.X, vtint.Y, vtint.Z, vtint.W);
+				}
+				// store the SpriteBatchItem data in our vertexArray
+				_vertexArray[index++] = item.vertexTL;
+				_vertexArray[index++] = item.vertexTR;
+				_vertexArray[index++] = item.vertexBL;
+				_vertexArray[index++] = item.vertexBR;
+				
+				_freeBatchItemQueue.Enqueue ( item );
+			}
+			// flush the remaining vertexArray data
+			FlushVertexArrayGL20(startIndex, index);
+			
+			_batchItemList.Clear();
+		}
+		
+		public void DrawBatchGL11 ( SpriteSortMode sortMode, SamplerState samplerState )
 		{
 			// nothing to do
 			if ( _batchItemList.Count == 0 )
@@ -125,9 +208,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			//GL.Flush();
 			
 			int size = sizeof(float)*4+sizeof(uint);
-			GL.VertexPointer(2,All.Float,size,_vertexHandle.AddrOfPinnedObject() );
-			GL.ColorPointer(4, All.UnsignedByte,size,(IntPtr)((uint)_vertexHandle.AddrOfPinnedObject()+(uint)(sizeof(float)*2)));
-			GL.TexCoordPointer(2, All.Float,size,(IntPtr)((uint)_vertexHandle.AddrOfPinnedObject()+(uint)(sizeof(float)*2+sizeof(uint))) );
+			GL11.VertexPointer(2,ALL11.Float,size,_vertexHandle.AddrOfPinnedObject() );
+			GL11.ColorPointer(4, ALL11.UnsignedByte,size,(IntPtr)((uint)_vertexHandle.AddrOfPinnedObject()+(uint)(sizeof(float)*2)));
+			GL11.TexCoordPointer(2, ALL11.Float,size,(IntPtr)((uint)_vertexHandle.AddrOfPinnedObject()+(uint)(sizeof(float)*2+sizeof(uint))) );
 
 			// setup the vertexArray array
 			int startIndex = 0;
@@ -143,10 +226,10 @@ namespace Microsoft.Xna.Framework.Graphics
 				// if the texture changed, we need to flush and bind the new texture
 				if ( item.TextureID != texID )
 				{
-					FlushVertexArray( startIndex, index );
+					FlushVertexArrayGL11( startIndex, index );
 					startIndex = index;
 					texID = item.TextureID;
-					GL.BindTexture ( All.Texture2D, texID );
+					GL11.BindTexture ( ALL11.Texture2D, texID );
 					
 					samplerState.Activate();
 				}
@@ -159,10 +242,11 @@ namespace Microsoft.Xna.Framework.Graphics
 				_freeBatchItemQueue.Enqueue ( item );
 			}
 			// flush the remaining vertexArray data
-			FlushVertexArray(startIndex, index);
+			FlushVertexArrayGL11(startIndex, index);
 			
 			_batchItemList.Clear();
 		}
+		
 		void ExpandVertexArray( int batchSize )
 		{
 			// increase the size of the vertexArray
@@ -189,11 +273,18 @@ namespace Microsoft.Xna.Framework.Graphics
 				_index[i*6+5] = (ushort)(i*4+2);
 			}
 		}
-		void FlushVertexArray ( int start, int end )
+		void FlushVertexArrayGL11 ( int start, int end )
 		{
 			// draw stuff
 			if ( start != end )
-				GL.DrawElements ( All.Triangles, (end-start)/2*3, All.UnsignedShort,(IntPtr)((uint)_indexHandle.AddrOfPinnedObject()+(uint)(start/2*3*sizeof(short))) );
+				GL11.DrawElements ( ALL11.Triangles, (end-start)/2*3, ALL11.UnsignedShort,(IntPtr)((uint)_indexHandle.AddrOfPinnedObject()+(uint)(start/2*3*sizeof(short))) );
+		}
+		
+		void FlushVertexArrayGL20 ( int start, int end )
+		{
+			// draw stuff
+			if ( start != end )
+				GL20.DrawElements ( ALL20.Triangles, (end-start)/2*3, ALL20.UnsignedShort,(IntPtr)((uint)_indexHandle.AddrOfPinnedObject()+(uint)(start/2*3*sizeof(short))) );
 		}
 	}
 }

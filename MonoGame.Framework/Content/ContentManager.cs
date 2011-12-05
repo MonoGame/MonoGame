@@ -323,7 +323,7 @@ namespace Microsoft.Xna.Framework.Content
                     }
                     finally
                     {
-                        xnbReader.Dispose();
+                        //xnbReader.Dispose();
                     }
                 }
             }

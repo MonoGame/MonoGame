@@ -42,9 +42,13 @@ using System;
 using System.Text;
 using System.Collections.Generic;
 
-using OpenTK.Graphics.ES11;
+using GL11 = OpenTK.Graphics.ES11.GL;
+using GL20 = OpenTK.Graphics.ES20.GL;
+using ALL11 = OpenTK.Graphics.ES11.All;
+using ALL20 = OpenTK.Graphics.ES20.All;
 
 using Microsoft.Xna.Framework;
+using OpenTK;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -63,7 +67,12 @@ namespace Microsoft.Xna.Framework.Graphics
 		Rectangle tempRect = new Rectangle(0,0,0,0);
 		Vector2 texCoordTL = new Vector2(0,0);
 		Vector2 texCoordBR = new Vector2(0,0);
-
+		
+		//OpenGLES2 variables
+		int program;
+		Matrix4 matWorldViewProjection, matProjection, matView, matWorld;
+		int uniformWVP, uniformTex;
+		
         public SpriteBatch ( GraphicsDevice graphicsDevice )
 		{
 			if (graphicsDevice == null )
@@ -74,6 +83,134 @@ namespace Microsoft.Xna.Framework.Graphics
 			this.graphicsDevice = graphicsDevice;
 			
 			_batcher = new SpriteBatcher();
+			
+			if(GraphicsDevice.OpenGLESVersion == MonoTouch.OpenGLES.EAGLRenderingAPI.OpenGLES2)
+				InitGL20();
+		}
+		
+			/// <summary>
+			///Initialize shaders and program on OpenGLES2.0
+			/// </summary>
+			private void InitGL20()
+			{
+				string vertexShaderSrc = @"uniform mat4 uMVPMatrix;
+										attribute vec4 aPosition;
+										attribute vec2 aTexCoord;
+										varying vec2 vTexCoord;
+										void main()
+										{
+										vTexCoord = aTexCoord;
+										gl_Position = uMVPMatrix * aPosition;
+										}";
+				            
+	            string fragmentShaderSrc = @"precision mediump float;
+										varying vec2 vTexCoord;
+										uniform sampler2D sTexture;
+										void main()
+										{
+										//gl_FragColor = vec4(1.0,0.0,0.0,1.0);
+										gl_FragColor = texture2D(sTexture, vTexCoord);
+										}";
+				
+				int vertexShader = LoadShader (ALL20.VertexShader, vertexShaderSrc );
+	            int fragmentShader = LoadShader (ALL20.FragmentShader, fragmentShaderSrc );
+			
+	            program = GL20.CreateProgram();
+			
+	            if (program == 0)
+	                throw new InvalidOperationException ("Unable to create program");
+	
+	            GL20.AttachShader (program, vertexShader);
+	            GL20.AttachShader (program, fragmentShader);
+	            
+	            //Set position
+	            GL20.BindAttribLocation (program, _batcher.attributePosition, "aPosition");
+	            GL20.BindAttribLocation (program, _batcher.attributeTexCoord, "aTexCoord");
+          
+	            GL20.LinkProgram (program);
+	
+	            int linked = 0;
+	            GL20.GetProgram (program, ALL20.LinkStatus, ref linked);
+	            if (linked == 0) {
+	                // link failed
+	                int length = 0;
+	                GL20.GetProgram (program, ALL20.InfoLogLength, ref length);
+	                if (length > 0) {
+	                    var log = new StringBuilder (length);
+	                    GL20.GetProgramInfoLog (program, length, ref length, log);
+	                    Console.WriteLine ("GL2" + log.ToString ());
+	                }
+	
+	                GL20.DeleteProgram (program);
+	                throw new InvalidOperationException ("Unable to link program");
+	            }
+	
+				matWorld = Matrix4.Identity;
+				matView = Matrix4.CreateRotationZ((float)Math.PI)*
+						  Matrix4.CreateRotationY((float)Math.PI)*
+						  Matrix4.CreateTranslation(-this.graphicsDevice.Viewport.Width/2,
+										this.graphicsDevice.Viewport.Height/2,
+										1);
+				matProjection = Matrix4.CreateOrthographic(this.graphicsDevice.Viewport.Width,
+										this.graphicsDevice.Viewport.Height,
+										-1f,1f);
+				matWorldViewProjection = matWorld * matView * matProjection;
+				
+				GetUniformVariables();
+			
+			}
+	
+			/// <summary>
+			/// Build the shaders
+			/// </summary>
+			private int LoadShader ( ALL20 type, string source )
+	        {
+	           int shader = GL20.CreateShader(type);
+	
+	           if ( shader == 0 )
+	                   throw new InvalidOperationException("Unable to create shader");
+	        
+	           // Load the shader source
+	           int length = 0;
+	            GL20.ShaderSource(shader, 1, new string[] {source}, (int[])null);
+	           
+	           // Compile the shader
+	           GL20.CompileShader( shader );
+	                
+	              int compiled = 0;
+	            GL20.GetShader (shader, ALL20.CompileStatus, ref compiled);
+	            if (compiled == 0) {
+	                length = 0;
+	                GL20.GetShader (shader, ALL20.InfoLogLength, ref length);
+	                if (length > 0) {
+	                    var log = new StringBuilder (length);
+	                    GL20.GetShaderInfoLog (shader, length, ref length, log);
+	                    Console.WriteLine("GL2" + log.ToString ());
+	                }
+	
+	                GL20.DeleteShader (shader);
+	                throw new InvalidOperationException ("Unable to compile shader of type : " + type.ToString ());
+	            }
+	
+	            return shader;
+	        
+	        }
+	
+		private void GetUniformVariables()
+		{
+			uniformWVP = GL20.GetUniformLocation(program, "uMVPMatrix");
+			uniformTex = GL20.GetUniformLocation(program, "sTexture");
+		}
+		
+		private void SetUniformMatrix4(int location, bool transpose, ref Matrix4 matrix)
+		{
+			unsafe
+			{
+				fixed (float* matrix_ptr = &matrix.Row0.X)
+				{
+					GL20.UniformMatrix4(location,1,transpose,matrix_ptr);
+				}
+			}
 		}
 		
 		public void Begin()
@@ -111,32 +248,57 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 		
 		public void End()
+		{
+			// OpenGL ES Version 
+			if(GraphicsDevice.OpenGLESVersion == MonoTouch.OpenGLES.EAGLRenderingAPI.OpenGLES2)
+				EndGL20();
+			else
+				EndGL11();
+		}
+		
+		private void EndGL20()
+		{
+			//CullMode
+			GL20.FrontFace(ALL20.Cw);
+			GL20.CullFace(ALL20.Back);
+			GL20.Enable(ALL20.CullFace);
+			
+			// Configure ViewPort
+			GL20.Viewport(0, 0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height); 
+			GL20.UseProgram(program);
+			
+			SetUniformMatrix4(uniformWVP, false, ref matWorldViewProjection);
+			
+			_batcher.DrawBatchGL20 ( _sortMode );
+		}
+		
+		public void EndGL11()
 		{					
 			// Disable Blending by default = BlendState.Opaque
-			GL.Disable(All.Blend);
+			GL11.Disable(ALL11.Blend);
 			
 			// set the blend mode
 			if ( _blendState == BlendState.NonPremultiplied )
 			{
-				GL.BlendFunc(All.SrcAlpha, All.OneMinusSrcAlpha);
-				GL.Enable(All.Blend);
+				GL11.BlendFunc(ALL11.SrcAlpha, ALL11.OneMinusSrcAlpha);
+				GL11.Enable(ALL11.Blend);
 			}
 			
 			if ( _blendState == BlendState.AlphaBlend )
 			{
-				GL.BlendFunc(All.One, All.OneMinusSrcAlpha);
-				GL.Enable(All.Blend);				
+				GL11.BlendFunc(ALL11.One, ALL11.OneMinusSrcAlpha);
+				GL11.Enable(ALL11.Blend);				
 			}
 			
 			if ( _blendState == BlendState.Additive )
 			{
-				GL.BlendFunc(All.SrcAlpha,All.One);
-				GL.Enable(All.Blend);	
+				GL11.BlendFunc(ALL11.SrcAlpha,ALL11.One);
+				GL11.Enable(ALL11.Blend);	
 			}			
 			
 			// set camera
-			GL.MatrixMode(All.Projection);
-			GL.LoadIdentity();							
+			GL11.MatrixMode(ALL11.Projection);
+			GL11.LoadIdentity();							
 			
 #if ANDROID			
 			// Switch on the flags.
@@ -163,79 +325,79 @@ namespace Microsoft.Xna.Framework.Graphics
 	        {
 				case DisplayOrientation.LandscapeLeft:
                 {
-					GL.Rotate(-90, 0, 0, 1);
+					GL11.Rotate(-90, 0, 0, 1);
 					break;
 				}
 				
 				case DisplayOrientation.LandscapeRight:
                 {
-					GL.Rotate(90, 0, 0, 1);					
+					GL11.Rotate(90, 0, 0, 1);					
 					break;
 				}
 				
 			case DisplayOrientation.PortraitUpsideDown:
                 {
-					GL.Rotate(180, 0, 0, 1); 
+					GL11.Rotate(180, 0, 0, 1); 
 					break;
 				}
 				
 				default:
 				{
-					GL.Ortho(0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height, 0, -1, 1);
+					GL11.Ortho(0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height, 0, -1, 1);
 					break;
 				}
 			}
 			
-			GL.Ortho(0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height, 0, -1, 1);
+			GL11.Ortho(0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height, 0, -1, 1);
 #endif			
 			
 			// Enable Scissor Tests if necessary
 			if ( this.graphicsDevice.RasterizerState.ScissorTestEnable )
 			{
-				GL.Enable(All.ScissorTest);
+				GL11.Enable(ALL11.ScissorTest);
 			}
 			
 			
-			GL.MatrixMode(All.Modelview);			
+			GL11.MatrixMode(ALL11.Modelview);			
 			
 #if !ANDROID			
 			// Only swap our viewport if Width is greater than height
 			if (this.graphicsDevice.Viewport.Width > this.graphicsDevice.Viewport.Height)
 			{
-				GL.Viewport(0, 0, this.graphicsDevice.Viewport.Height, this.graphicsDevice.Viewport.Width);
+				GL11.Viewport(0, 0, this.graphicsDevice.Viewport.Height, this.graphicsDevice.Viewport.Width);
 			}
 			else
 #endif								
 			{
-				GL.Viewport(0, 0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height);
+				GL11.Viewport(0, 0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height);
 			}
 			
 			// Enable Scissor Tests if necessary
 			if ( this.graphicsDevice.RasterizerState.ScissorTestEnable )
 			{
-				GL.Scissor(this.graphicsDevice.ScissorRectangle.X, this.graphicsDevice.ScissorRectangle.Y, this.graphicsDevice.ScissorRectangle.Width, this.graphicsDevice.ScissorRectangle.Height );
+				GL11.Scissor(this.graphicsDevice.ScissorRectangle.X, this.graphicsDevice.ScissorRectangle.Y, this.graphicsDevice.ScissorRectangle.Width, this.graphicsDevice.ScissorRectangle.Height );
 			}			
 			
-			GL.LoadMatrix( ref _matrix.M11 );	
+			GL11.LoadMatrix( ref _matrix.M11 );	
 			
 			// Initialize OpenGL states (ideally move this to initialize somewhere else)	
-			GL.Disable(All.DepthTest);
-			GL.TexEnv(All.TextureEnv, All.TextureEnvMode,(int) All.BlendSrc);
-			GL.Enable(All.Texture2D);
-			GL.EnableClientState(All.VertexArray);
-			GL.EnableClientState(All.ColorArray);
-			GL.EnableClientState(All.TextureCoordArray);
+			GL11.Disable(ALL11.DepthTest);
+			GL11.TexEnv(ALL11.TextureEnv, ALL11.TextureEnvMode,(int) ALL11.BlendSrc);
+			GL11.Enable(ALL11.Texture2D);
+			GL11.EnableClientState(ALL11.VertexArray);
+			GL11.EnableClientState(ALL11.ColorArray);
+			GL11.EnableClientState(ALL11.TextureCoordArray);
 			
 			// Enable Culling for better performance
-			GL.Enable(All.CullFace);
-			GL.FrontFace(All.Cw);
-			GL.Color4(1.0f, 1.0f, 1.0f, 1.0f);						
+			GL11.Enable(ALL11.CullFace);
+			GL11.FrontFace(ALL11.Cw);
+			GL11.Color4(1.0f, 1.0f, 1.0f, 1.0f);						
 			
-			_batcher.DrawBatch (_sortMode, _samplerState);
+			_batcher.DrawBatchGL11(_sortMode, _samplerState);
 			
 			if (this.graphicsDevice.RasterizerState.ScissorTestEnable)
             {
-               GL.Disable(All.ScissorTest);
+               GL11.Disable(ALL11.ScissorTest);
             }
 		}
 		

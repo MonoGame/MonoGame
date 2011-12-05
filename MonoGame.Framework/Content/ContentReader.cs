@@ -193,5 +193,10 @@ namespace Microsoft.Xna.Framework.Content
             result.Z = ReadSingle();
             return result;
         }
+		
+		public void Dispose()
+		{
+			base.Dispose(true);
+		}
     }
 }
