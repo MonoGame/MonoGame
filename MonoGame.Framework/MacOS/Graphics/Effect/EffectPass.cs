@@ -16,40 +16,6 @@ namespace Microsoft.Xna.Framework.Graphics
 		DXShader pixelShader;
 		DXShader vertexShader;
 		
-		bool needPixelShader = false;
-		bool needVertexShader = false;
-		
-		void makeProgram() {
-			if (shaderProgram > 0) {
-				GL.DeleteProgram (1, ref shaderProgram);
-			}
-			
-			shaderProgram = GL.CreateProgram ();
-			
-			if (needPixelShader) {
-				GL.AttachShader (shaderProgram, pixelShader.gl_shader);
-			}
-			if (needVertexShader) {
-				GL.AttachShader (shaderProgram, vertexShader.gl_shader);
-			}
-			
-			// Set the parameters
-			//is this nesesary, or just for VR?
-			/*GL.ProgramParameter (shaderProgram,
-				AssemblyProgramParameterArb.GeometryInputType,(int)All.Lines);
-			GL.ProgramParameter (shaderProgram,
-				AssemblyProgramParameterArb.GeometryOutputType, (int)All.Line);*/
-			
-			// Set the max vertices
-			int maxVertices;
-			GL.GetInteger (GetPName.MaxGeometryOutputVertices, out maxVertices);
-			GL.ProgramParameter (shaderProgram,
-				AssemblyProgramParameterArb.GeometryVerticesOut, maxVertices);
-			
-			// Link the program
-			GL.LinkProgram (shaderProgram);
-		}
-		
 		public void Apply ()
 		{
 			_technique._effect.OnApply();
@@ -64,7 +30,7 @@ namespace Microsoft.Xna.Framework.Graphics
 					
 					switch (state.type) {
 					case DXEffectObject.STATE_TYPE.PARAMETER:
-						//should be easy
+						//should be easy, but haven't seen it
 					case DXEffectObject.STATE_TYPE.EXPRESSIONINDEX:
 						//hmm
 					default:
@@ -74,9 +40,18 @@ namespace Microsoft.Xna.Framework.Graphics
 				}
 				
 			}
+			//remake program is nesesary
 			
 			GL.UseProgram (shaderProgram);
 			
+			if (pixelShader != null) {
+				pixelShader.PopulateUniforms(_technique._effect.Parameters);
+				pixelShader.UploadUniforms((uint)shaderProgram);
+			}
+			if (vertexShader != null) {
+				vertexShader.PopulateUniforms(_technique._effect.Parameters);
+				vertexShader.UploadUniforms((uint)shaderProgram);
+			}
 
 		}
 
@@ -87,25 +62,42 @@ namespace Microsoft.Xna.Framework.Graphics
 			name = pass.name;
 			states = pass.states;
 			
+			shaderProgram = GL.CreateProgram ();
+			
+			// Set the parameters
+			//is this nesesary, or just for VR?
+			/*GL.ProgramParameter (shaderProgram,
+				AssemblyProgramParameterArb.GeometryInputType,(int)All.Lines);
+			GL.ProgramParameter (shaderProgram,
+				AssemblyProgramParameterArb.GeometryOutputType, (int)All.Line);*/
+			
+			// Set the max vertices
+			int maxVertices;
+			GL.GetInteger (GetPName.MaxGeometryOutputVertices, out maxVertices);
+			GL.ProgramParameter (shaderProgram,
+				AssemblyProgramParameterArb.GeometryVerticesOut, maxVertices);
+			
+			
 			foreach ( DXEffectObject.d3dx_state state in states) {
 				if (state.operation.class_ == DXEffectObject.STATE_CLASS.PIXELSHADER) {
 					needPixelShader = true;
 					if (state.type == DXEffectObject.STATE_TYPE.CONSTANT) {
 						pixelShader = new DXShader((byte[])state.parameter.data);
+						GL.AttachShader (shaderProgram, pixelShader.shader);
 					}
 				} else if (state.operation.class_ == DXEffectObject.STATE_CLASS.VERTEXSHADER) {
 					needVertexShader = true;
 					if (state.type == DXEffectObject.STATE_TYPE.CONSTANT) {
 						vertexShader = new DXShader((byte[])state.parameter.data);
+						GL.AttachShader (shaderProgram, vertexShader.shader);
 					}
 				}
 			}
 			
-			//If we have what we need make the program now, why not
-			
+			//If we have what we need, link now
 			if ( (needPixelShader == (pixelShader != null)) &&
 				 (needVertexShader == (vertexShader != null))) {
-				makeProgram();
+				GL.LinkProgram (shaderProgram);
 			}
 			
         }

@@ -97,6 +97,8 @@ namespace Microsoft.Xna.Framework.Graphics
 				Techniques._techniques.Add (new EffectTechnique(this, technique));
 			}
 			
+			CurrentTechnique = Techniques[0];
+			
 		}
 
 		public virtual Effect Clone ()

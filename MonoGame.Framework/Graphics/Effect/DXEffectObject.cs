@@ -607,6 +607,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			byte[] rb = effectReader.ReadBytes(effectReader.ReadInt32());
 			string r = System.Text.ASCIIEncoding.ASCII.GetString (rb);
+			r = r.Replace ("\0", "");
 			
 			effectStream.Seek (oldPos, SeekOrigin.Begin);
 			return r;

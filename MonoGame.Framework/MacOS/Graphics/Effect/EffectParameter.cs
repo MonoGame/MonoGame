@@ -21,7 +21,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		Effect _parentEffect;
 		
 		bool isShader = false;
-		object data;
+		internal object data;
 		
 		internal EffectParameter( DXEffectObject.d3dx_parameter parameter )
 		{
@@ -136,7 +136,31 @@ namespace Microsoft.Xna.Framework.Graphics
 							//throw new NotSupportedException();
 						}
 						break;
-					//todo
+					case EffectParameterClass.Vector:
+						switch (paramType) {
+						case EffectParameterType.Single:
+							float[] vals = new Single[colCount];
+							for (int i=0; i<colCount; i++) {
+								vals[i] = BitConverter.ToSingle ((byte[])parameter.data, i*4);
+							}
+							switch (colCount) {
+							case 2:
+								data = new Vector2(vals[0], vals[1]);
+								break;
+							case 3:
+								data = new Vector3(vals[0], vals[1], vals[2]);
+								break;
+							case 4:
+								data = new Vector4(vals[0], vals[1], vals[2], vals[3]);
+								break;
+							default:
+								break;
+							}
+							break;
+						default:
+							break;
+						}
+						break;
 					default:
 						//throw new NotSupportedException();
 						break;

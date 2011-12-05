@@ -198,7 +198,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				_effect = null;
 			}
 			
-			spriteEffect.CurrentTechnique.Passes [0].Apply ();
+			//spriteEffect.CurrentTechnique.Passes [0].Apply ();
 
 
 		}

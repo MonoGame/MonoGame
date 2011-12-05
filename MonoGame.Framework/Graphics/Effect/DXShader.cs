@@ -8,8 +8,17 @@ namespace Microsoft.Xna.Framework.Graphics
 	internal class DXShader
 	{
 		
-		public ShaderType gl_shaderType;
-		public int gl_shader;
+		public ShaderType shaderType;
+		public int shader;
+		
+		float[] uniforms_float4;
+		int[] uniforms_int4;
+		int[] uniforms_bool;
+		int uniforms_float4_count = 0;
+		int uniforms_int4_count = 0;
+		int uniforms_bool_count = 0;
+		
+		MojoShader.MOJOSHADER_symbol[] symbols;
 		
 		T[] UnmarshalArray<T>(IntPtr ptr, int count) {
 			Type type = typeof(T);
@@ -45,29 +54,52 @@ namespace Microsoft.Xna.Framework.Graphics
 							parseData.errors, parseData.error_count);
 					throw new Exception(errors[0].error);
 				}
-				MojoShader.MOJOSHADER_symbol[] symbols = 
-					UnmarshalArray<MojoShader.MOJOSHADER_symbol>(
-						parseData.symbols, parseData.symbol_count);
 				
 				
 				switch(parseData.shader_type) {
 				case MojoShader.MOJOSHADER_shaderType.MOJOSHADER_TYPE_PIXEL:
-					gl_shaderType = ShaderType.FragmentShader;
+					shaderType = ShaderType.FragmentShader;
 					break;
 				case MojoShader.MOJOSHADER_shaderType.MOJOSHADER_TYPE_VERTEX:
-					gl_shaderType = ShaderType.VertexShader;
+					shaderType = ShaderType.VertexShader;
 					break;
 				default:
 					throw new NotSupportedException();
 				}
 				
 				
-				gl_shader = GL.CreateShader (gl_shaderType);
-				GL.ShaderSource (gl_shader, parseData.output);
-				GL.CompileShader(gl_shader);
+				symbols = UnmarshalArray<MojoShader.MOJOSHADER_symbol>(
+						parseData.symbols, parseData.symbol_count);
+				
+				
+				foreach (MojoShader.MOJOSHADER_symbol symbol in symbols) {
+					switch (symbol.register_set) {
+					case MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_BOOL:
+						uniforms_bool_count++;
+						break;
+					case MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_FLOAT4:
+						uniforms_float4_count++;
+						break;
+					case MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_INT4:
+						uniforms_int4_count++;
+						break;
+					default:
+						break;
+					}
+				}
+				
+				uniforms_float4 = new float[uniforms_float4_count*4];
+				uniforms_int4 = new int[uniforms_int4_count*4];
+				uniforms_bool = new int[uniforms_bool_count];
+				
+				Console.WriteLine ( parseData.output );
+				
+				shader = GL.CreateShader (shaderType);
+				GL.ShaderSource (shader, parseData.output);
+				GL.CompileShader(shader);
 				
 				int compiled = 0;
-				GL.GetShader (gl_shader, ShaderParameter.CompileStatus, out compiled);
+				GL.GetShader (shader, ShaderParameter.CompileStatus, out compiled);
 				if (compiled == (int)All.False) {
 					throw new Exception("Shader Compilation Failed");
 				}
@@ -76,6 +108,71 @@ namespace Microsoft.Xna.Framework.Graphics
 				MojoShader.NativeMethods.MOJOSHADER_freeParseData(parseDataPtr);
 			}
 		}
+		
+		public void PopulateUniforms(EffectParameterCollection parameters) {
+			//only populate modofied stuff?
+			foreach (MojoShader.MOJOSHADER_symbol symbol in symbols) {
+				//todo: support array parameters
+				EffectParameter parameter = parameters[symbol.name];
+				switch (symbol.register_set) {
+				case MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_BOOL:
+					uniforms_bool[symbol.register_index] = (int)parameter.data;
+					break;
+				case MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_FLOAT4:
+					switch (parameter.ParameterClass) {
+					case EffectParameterClass.Scalar:
+						uniforms_float4[symbol.register_index*4] = (float)parameter.data;
+						break;
+					case EffectParameterClass.Vector:
+						Vector4 vec = (Vector4)parameter.data;
+						uniforms_float4[symbol.register_index*4] = vec.X;
+						uniforms_float4[symbol.register_index*4+1] = vec.Y;
+						uniforms_float4[symbol.register_index*4+2] = vec.Z;
+						uniforms_float4[symbol.register_index*4+3] = vec.W;
+						break;
+					default:
+						break;
+					}
+					break;
+				case MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_INT4:
+					for (int i=0; i<4; i++) {
+						uniforms_int4[symbol.register_index+i] = ((int[])parameter.data)[i];
+					}
+					break;
+				default:
+					break;
+				}
+			}
+		}
+		
+		public void UploadUniforms(uint program) {
+			string prefix;
+			switch(shaderType) {
+			case ShaderType.FragmentShader:
+				prefix = "ps";
+				break;
+			case ShaderType.VertexShader:
+				prefix = "vs";
+				break;
+			default:
+				throw new NotImplementedException();
+			}
+				
+				
+			if (uniforms_float4_count > 0) {
+				int vec4_loc = GL.GetUniformLocation (program, prefix+"_uniforms_vec4");
+				GL.Uniform4 (vec4_loc, uniforms_float4_count, uniforms_float4);
+			}
+			if (uniforms_int4_count > 0) {
+				int int4_loc = GL.GetUniformLocation (program, prefix+"_uniforms_ivec4");
+				GL.Uniform4 (int4_loc, uniforms_int4_count, uniforms_int4);
+			}
+			if (uniforms_bool_count > 0) {
+				int bool_loc = GL.GetUniformLocation (program, prefix+"_uniforms_bool");
+				GL.Uniform1 (bool_loc, uniforms_bool_count, uniforms_bool);
+			}
+		}
+		
 	}
 }
 
