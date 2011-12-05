@@ -209,8 +209,7 @@ namespace Microsoft.Xna.Framework.Content
                 // Load a XNB file
                 using (Stream stream = OpenStream(assetName))
                 {
-                    BinaryReader xnbReader = new BinaryReader(stream);
-                    try
+                    using(BinaryReader xnbReader = new BinaryReader(stream))
                     {
                         // The first 4 bytes should be the "XNB" header. i use that to detect an invalid file
                         byte[] headerBuffer = new byte[3];
@@ -300,7 +299,7 @@ namespace Microsoft.Xna.Framework.Content
                             reader = new ContentReader(this, stream, this.graphicsDeviceService.GraphicsDevice);
                         }
 
-                        try
+                        using(reader)
                         {
                             ContentTypeReaderManager typeManager = new ContentTypeReaderManager(reader);
                             reader.TypeReaders = typeManager.LoadAssetReaders(reader);
@@ -316,14 +315,6 @@ namespace Microsoft.Xna.Framework.Content
                             ContentTypeReader contentReader = reader.TypeReaders[index - 1];
                             result = reader.ReadObject<T>(contentReader);
                         }
-                        finally
-                        {
-                            reader.Dispose();
-                        }
-                    }
-                    finally
-                    {
-                        xnbReader.Dispose();
                     }
                 }
             }
