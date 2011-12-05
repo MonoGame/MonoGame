@@ -85,6 +85,11 @@ namespace Microsoft.Xna.Framework.Audio
         {
             s_soundPool.Pause(_streamId);
         }
+		
+		public void Resume()
+        {
+            s_soundPool.Resume(_streamId);
+        }
 
         public void Stop()
         {

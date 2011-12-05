@@ -59,6 +59,7 @@ using OpenTK.Graphics.ES20;
 
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
+using Microsoft.Xna.Framework.Graphics;
 #endregion Using Statements
 
 namespace Microsoft.Xna.Framework
@@ -164,8 +165,13 @@ namespace Microsoft.Xna.Framework
 			
 			try
 			{
-		        // TODO ContextRenderingApi = EAGLRenderingAPI.OpenGLES2;
-				ContextRenderingApi = EAGLRenderingAPI.OpenGLES1;
+				ContextRenderingApi = EAGLRenderingAPI.OpenGLES2;
+				base.CreateFrameBuffer();
+		    } 
+			catch (Exception) 
+			{
+		        // device doesn't support OpenGLES 2.0; retry with 1.1:
+		        ContextRenderingApi = EAGLRenderingAPI.OpenGLES1;
 				base.CreateFrameBuffer();
 				
 				// Determine actual render buffer size (due to possible Retina Display scaling)
@@ -179,15 +185,11 @@ namespace Microsoft.Xna.Framework
 					renderbufferWidth = width;
 					renderbufferHeight = height;
 				}
-		    } 
-			catch (Exception) 
-			{
-		        // device doesn't support OpenGLES 2.0; retry with 1.1:
-		        ContextRenderingApi = EAGLRenderingAPI.OpenGLES1;
-				base.CreateFrameBuffer();
 		    }
 			
-			
+			// OpenGL Version for GraphicsDevice (Used to generate OpenGL1.1 or Opengl2.0 textures, buffers, and draw with Fixed or Fragment Pixel Shader)
+			GraphicsDevice.OpenGLESVersion = ContextRenderingApi;
+			GraphicsDevice.FrameBufferScreen = this.Framebuffer;
 		}
 		
 		protected override void DestroyFrameBuffer()

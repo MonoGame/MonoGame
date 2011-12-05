@@ -10,6 +10,10 @@ namespace Microsoft.Xna.Framework.Graphics
 		public VertexPosition2ColorTexture vertexTR;
 		public VertexPosition2ColorTexture vertexBL;
 		public VertexPosition2ColorTexture vertexBR;
+		
+		// Tint Color
+		public Color Tint;
+		
 		public SpriteBatchItem ()
 		{
 			vertexTL = new VertexPosition2ColorTexture();
@@ -20,6 +24,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		public void Set ( float x, float y, float w, float h, Color color, Vector2 texCoordTL, Vector2 texCoordBR )
 		{
+			this.Tint = color;
 			vertexTL.Position.X = x;
             vertexTL.Position.Y = y;
 			vertexTL.Color = color.GLPackedValue;
@@ -46,6 +51,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 		public void Set ( float x, float y, float dx, float dy, float w, float h, float sin, float cos, Color color, Vector2 texCoordTL, Vector2 texCoordBR )
 		{
+			this.Tint = color;
 			vertexTL.Position.X = x+dx*cos-dy*sin;
             vertexTL.Position.Y = y+dx*sin+dy*cos;
 			vertexTL.Color = color.GLPackedValue;
