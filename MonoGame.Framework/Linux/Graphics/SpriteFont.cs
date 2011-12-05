@@ -1,6 +1,7 @@
 // Original code from SilverSprite Project
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Text;
 using System.IO;
 using System.Xml;
@@ -59,6 +60,16 @@ namespace Microsoft.Xna.Framework.Graphics
 					_defaultCharacter = value;
 				}
 			}
+        }
+  
+        public ReadOnlyCollection<char> Characters
+        {
+            get
+            {
+                char[] chars = new char[characterData.Keys.Count];
+                characterData.Keys.CopyTo (chars, 0);
+                return new ReadOnlyCollection<char>(chars);
+            }
         }
 
         public Vector2 MeasureString(string text)
