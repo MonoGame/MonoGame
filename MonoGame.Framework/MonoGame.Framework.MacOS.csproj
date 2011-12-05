@@ -346,6 +346,7 @@
     <Compile Include="Graphics\Effect\DXShader.cs" />
     <Compile Include="Graphics\Effect\DXEffectObject.cs" />
     <Compile Include="Graphics\Effect\MojoShader.cs" />
+    <Compile Include="Graphics\Effect\SpriteEffectCode.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />

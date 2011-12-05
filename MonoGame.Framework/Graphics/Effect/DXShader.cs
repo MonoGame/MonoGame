@@ -75,13 +75,16 @@ namespace Microsoft.Xna.Framework.Graphics
 				foreach (MojoShader.MOJOSHADER_symbol symbol in symbols) {
 					switch (symbol.register_set) {
 					case MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_BOOL:
-						uniforms_bool_count++;
+						uniforms_bool_count = Math.Max (
+							uniforms_bool_count, (int)(uniforms_bool_count+symbol.register_count));
 						break;
 					case MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_FLOAT4:
-						uniforms_float4_count++;
+						uniforms_float4_count = Math.Max (
+							uniforms_float4_count, (int)(uniforms_float4_count+symbol.register_count));
 						break;
 					case MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_INT4:
-						uniforms_int4_count++;
+						uniforms_int4_count = Math.Max (
+							uniforms_int4_count, (int)(uniforms_int4_count+symbol.register_count));
 						break;
 					default:
 						break;
@@ -124,11 +127,10 @@ namespace Microsoft.Xna.Framework.Graphics
 						uniforms_float4[symbol.register_index*4] = (float)parameter.data;
 						break;
 					case EffectParameterClass.Vector:
-						Vector4 vec = (Vector4)parameter.data;
-						uniforms_float4[symbol.register_index*4] = vec.X;
-						uniforms_float4[symbol.register_index*4+1] = vec.Y;
-						uniforms_float4[symbol.register_index*4+2] = vec.Z;
-						uniforms_float4[symbol.register_index*4+3] = vec.W;
+					case EffectParameterClass.Matrix:
+						for (int i=0; i<parameter.RowCount*parameter.ColumnCount; i++) {
+							uniforms_float4[symbol.register_index*4+i] = ((float[])parameter.data)[i];
+						}
 						break;
 					default:
 						break;

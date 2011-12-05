@@ -198,14 +198,14 @@ namespace Microsoft.Xna.Framework.Graphics
 				_effect = null;
 			}
 			
-			//spriteEffect.CurrentTechnique.Passes [0].Apply ();
+			spriteEffect.CurrentTechnique.Passes [0].Apply ();
 
 
 		}
 
 		public void Draw (Texture2D texture,
 				Vector2 position,
-				Nullable<Rectangle> sourceRectangle,
+				Rectangle? sourceRectangle,
 				Color color,
 				float rotation,
 				Vector2 origin,
@@ -217,68 +217,19 @@ namespace Microsoft.Xna.Framework.Graphics
 				throw new ArgumentException ("texture");
 			}
 			
-			// texture 0 is the texture beeing draw
-			graphicsDevice.Textures [0] = texture;
-			
-			SpriteBatchItem item = _batcher.CreateBatchItem ();
-
-			item.Depth = depth;
-			item.TextureID = (int)texture.ID;
-
-			if (sourceRectangle.HasValue) {
-				tempRect = sourceRectangle.Value;
-			} else {
-				tempRect.X = 0;
-				tempRect.Y = 0;
-				tempRect.Width = texture.Width;
-				tempRect.Height = texture.Height;				
-			}
-
-			if (texture.Image == null) {
-				float texWidthRatio = 1.0f / (float)texture.Width;
-				float texHeightRatio = 1.0f / (float)texture.Height;
-				// We are initially flipped vertically so we need to flip the corners so that
-				//  the image is bottom side up to display correctly
-				texCoordTL.X = tempRect.X * texWidthRatio;
-				texCoordTL.Y = (tempRect.Y + tempRect.Height) * texHeightRatio;
-
-				texCoordBR.X = (tempRect.X + tempRect.Width) * texWidthRatio;
-				texCoordBR.Y = tempRect.Y * texHeightRatio;
-
-			} else {
-				texCoordTL.X = texture.Image.GetTextureCoordX (tempRect.X);
-				texCoordTL.Y = texture.Image.GetTextureCoordY (tempRect.Y);
-				texCoordBR.X = texture.Image.GetTextureCoordX (tempRect.X + tempRect.Width);
-				texCoordBR.Y = texture.Image.GetTextureCoordY (tempRect.Y + tempRect.Height);
-			}
-
-			if ((effect & SpriteEffects.FlipVertically) != 0) {
-				float temp = texCoordBR.Y;
-				texCoordBR.Y = texCoordTL.Y;
-				texCoordTL.Y = temp;
-			}
-			if ((effect & SpriteEffects.FlipHorizontally) != 0) {
-				float temp = texCoordBR.X;
-				texCoordBR.X = texCoordTL.X;
-				texCoordTL.X = temp;
-			}
-
-			item.Set (position.X, 
-					position.Y, 
-					-origin.X * scale.X, 
-					-origin.Y * scale.Y, 
-					tempRect.Width * scale.X, 
-					tempRect.Height * scale.Y, 
-					(float)Math.Sin (rotation), 
-					(float)Math.Cos (rotation), 
-					color, 
-					texCoordTL, 
-					texCoordBR);
+			Draw (texture,
+				new Rectangle((int)position.X, (int)position.Y, (int)(texture.Width*scale.X), (int)(texture.Height*scale.Y)),
+				sourceRectangle,
+				color,
+				rotation,
+				origin,
+				effect,
+				depth);
 		}
 
 		public void Draw (Texture2D texture,
 				Vector2 position,
-				Nullable<Rectangle> sourceRectangle,
+				Rectangle? sourceRectangle,
 				Color color,
 				float rotation,
 				Vector2 origin,
@@ -286,72 +237,20 @@ namespace Microsoft.Xna.Framework.Graphics
 				SpriteEffects effect,
 				float depth)
 		{
-			if (texture == null) {
-				throw new ArgumentException ("texture");
-			}
-			
-			// texture 0 is the texture beeing draw
-			graphicsDevice.Textures [0] = texture;			
-			
-			SpriteBatchItem item = _batcher.CreateBatchItem ();
-
-			item.Depth = depth;
-			item.TextureID = (int)texture.ID;
-
-			if (sourceRectangle.HasValue) {
-				tempRect = sourceRectangle.Value;
-			} else {
-				tempRect.X = 0;
-				tempRect.Y = 0;
-				tempRect.Width = texture.Width;
-				tempRect.Height = texture.Height;				
-			}
-
-			if (texture.Image == null) {
-				float texWidthRatio = 1.0f / (float)texture.Width;
-				float texHeightRatio = 1.0f / (float)texture.Height;
-				// We are initially flipped vertically so we need to flip the corners so that
-				//  the image is bottom side up to display correctly
-				texCoordTL.X = tempRect.X * texWidthRatio;
-				texCoordTL.Y = (tempRect.Y + tempRect.Height) * texHeightRatio;
-
-				texCoordBR.X = (tempRect.X + tempRect.Width) * texWidthRatio;
-				texCoordBR.Y = tempRect.Y * texHeightRatio;
-
-			} else {
-				texCoordTL.X = texture.Image.GetTextureCoordX (tempRect.X);
-				texCoordTL.Y = texture.Image.GetTextureCoordY (tempRect.Y);
-				texCoordBR.X = texture.Image.GetTextureCoordX (tempRect.X + tempRect.Width);
-				texCoordBR.Y = texture.Image.GetTextureCoordY (tempRect.Y + tempRect.Height);
-			}
-			
-			if ((effect & SpriteEffects.FlipVertically) != 0) {
-				float temp = texCoordBR.Y;
-				texCoordBR.Y = texCoordTL.Y;
-				texCoordTL.Y = temp;
-			}
-			if ((effect & SpriteEffects.FlipHorizontally) != 0) {
-				float temp = texCoordBR.X;
-				texCoordBR.X = texCoordTL.X;
-				texCoordTL.X = temp;
-			}
-
-			item.Set (position.X, 
-					position.Y, 
-					-origin.X * scale, 
-					-origin.Y * scale, 
-					tempRect.Width * scale, 
-					tempRect.Height * scale, 
-					(float)Math.Sin (rotation), 
-					(float)Math.Cos (rotation), 
-					color, 
-					texCoordTL, 
-					texCoordBR);
+			Draw (texture,
+				position,
+				sourceRectangle,
+				color,
+				rotation,
+				origin,
+				new Vector2(scale, scale),
+				effect,
+				depth);
 		}
 
 		public void Draw (Texture2D texture,
 			Rectangle destinationRectangle,
-			Nullable<Rectangle> sourceRectangle,
+			Rectangle? sourceRectangle,
 			Color color,
 			float rotation,
 			Vector2 origin,
@@ -419,194 +318,33 @@ namespace Microsoft.Xna.Framework.Graphics
 					color, 
 					texCoordTL, 
 					texCoordBR);			
+			
+			if (_sortMode == SpriteSortMode.Immediate) {
+				End ();
+			}
+			
 		}
 
 		public void Draw (Texture2D texture, Vector2 position, Rectangle? sourceRectangle, Color color)
 		{
-			if (texture == null) {
-				throw new ArgumentException ("texture");
-			}
-			
-			// texture 0 is the texture beeing draw
-			graphicsDevice.Textures [0] = texture;			
-			
-			SpriteBatchItem item = _batcher.CreateBatchItem ();
-
-			item.Depth = 0.0f;
-			item.TextureID = (int)texture.ID;
-
-			if (sourceRectangle.HasValue) {
-				tempRect = sourceRectangle.Value;
-			} else {
-				tempRect.X = 0;
-				tempRect.Y = 0;
-				tempRect.Width = texture.Width;
-				tempRect.Height = texture.Height;				
-			}
-
-			if (texture.Image == null) {
-				float texWidthRatio = 1.0f / (float)texture.Width;
-				float texHeightRatio = 1.0f / (float)texture.Height;
-				// We are initially flipped vertically so we need to flip the corners so that
-				//  the image is bottom side up to display correctly
-				texCoordTL.X = tempRect.X * texWidthRatio;
-				texCoordTL.Y = (tempRect.Y + tempRect.Height) * texHeightRatio;
-
-				texCoordBR.X = (tempRect.X + tempRect.Width) * texWidthRatio;
-				texCoordBR.Y = tempRect.Y * texHeightRatio;
-
-			} else {
-				texCoordTL.X = texture.Image.GetTextureCoordX (tempRect.X);
-				texCoordTL.Y = texture.Image.GetTextureCoordY (tempRect.Y);
-				texCoordBR.X = texture.Image.GetTextureCoordX (tempRect.X + tempRect.Width);
-				texCoordBR.Y = texture.Image.GetTextureCoordY (tempRect.Y + tempRect.Height);
-			}
-
-			item.Set (position.X, position.Y, tempRect.Width, tempRect.Height, color, texCoordTL, texCoordBR);
+			Draw (texture, position, sourceRectangle, color, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
 		}
 
 		public void Draw (Texture2D texture, Rectangle destinationRectangle, Rectangle? sourceRectangle, Color color)
 		{
-			if (texture == null) {
-				throw new ArgumentException ("texture");
-			}
-			
-			// texture 0 is the texture beeing draw
-			graphicsDevice.Textures [0] = texture;			
-			
-			SpriteBatchItem item = _batcher.CreateBatchItem ();
-
-			item.Depth = 0.0f;
-			item.TextureID = (int)texture.ID;
-
-			if (sourceRectangle.HasValue) {
-				tempRect = sourceRectangle.Value;
-			} else {
-				tempRect.X = 0;
-				tempRect.Y = 0;
-				tempRect.Width = texture.Width;
-				tempRect.Height = texture.Height;				
-			}
-
-			if (texture.Image == null) {
-				float texWidthRatio = 1.0f / (float)texture.Width;
-				float texHeightRatio = 1.0f / (float)texture.Height;
-				// We are initially flipped vertically so we need to flip the corners so that
-				//  the image is bottom side up to display correctly
-				texCoordTL.X = tempRect.X * texWidthRatio;
-				texCoordTL.Y = (tempRect.Y + tempRect.Height) * texHeightRatio;
-
-				texCoordBR.X = (tempRect.X + tempRect.Width) * texWidthRatio;
-				texCoordBR.Y = tempRect.Y * texHeightRatio;
-
-			} else {
-				texCoordTL.X = texture.Image.GetTextureCoordX (tempRect.X);
-				texCoordTL.Y = texture.Image.GetTextureCoordY (tempRect.Y);
-				texCoordBR.X = texture.Image.GetTextureCoordX (tempRect.X + tempRect.Width);
-				texCoordBR.Y = texture.Image.GetTextureCoordY (tempRect.Y + tempRect.Height);
-			}
-
-			item.Set (destinationRectangle.X, 
-					destinationRectangle.Y, 
-					destinationRectangle.Width, 
-					destinationRectangle.Height, 
-					color, 
-					texCoordTL, 
-					texCoordBR);
+			Draw (texture, destinationRectangle, sourceRectangle, color, 0, Vector2.Zero, SpriteEffects.None, 0f);
 		}
 
 		public void Draw (Texture2D texture,
 				Vector2 position,
 				Color color)
 		{
-			if (texture == null) {
-				throw new ArgumentException ("texture");
-			}
-			
-			// texture 0 is the texture beeing draw
-			graphicsDevice.Textures [0] = texture;			
-			
-			SpriteBatchItem item = _batcher.CreateBatchItem ();
-
-			item.Depth = 0;
-			item.TextureID = (int)texture.ID;
-
-			tempRect.X = 0;
-			tempRect.Y = 0;
-			tempRect.Width = texture.Width;
-			tempRect.Height = texture.Height;
-
-			if (texture.Image == null) {
-				float texWidthRatio = 1.0f / (float)texture.Width;
-				float texHeightRatio = 1.0f / (float)texture.Height;
-				// We are initially flipped vertically so we need to flip the corners so that
-				//  the image is bottom side up to display correctly
-				texCoordTL.X = tempRect.X * texWidthRatio;
-				texCoordTL.Y = (tempRect.Y + tempRect.Height) * texHeightRatio;
-
-				texCoordBR.X = (tempRect.X + tempRect.Width) * texWidthRatio;
-				texCoordBR.Y = tempRect.Y * texHeightRatio;
-
-			} else {
-				texCoordTL.X = texture.Image.GetTextureCoordX (tempRect.X);
-				texCoordTL.Y = texture.Image.GetTextureCoordY (tempRect.Y);
-				texCoordBR.X = texture.Image.GetTextureCoordX (tempRect.X + tempRect.Width);
-				texCoordBR.Y = texture.Image.GetTextureCoordY (tempRect.Y + tempRect.Height);
-			}
-
-			item.Set (position.X, 
-				position.Y, 
-				tempRect.Width, 
-				tempRect.Height, 
-				color, 
-				texCoordTL, 
-				texCoordBR);
+			Draw (texture, position, null, color);
 		}
 
 		public void Draw (Texture2D texture, Rectangle rectangle, Color color)
 		{
-			if (texture == null) {
-				throw new ArgumentException ("texture");
-			}
-			
-			// texture 0 is the texture beeing draw
-			graphicsDevice.Textures [0] = texture;			
-			
-			SpriteBatchItem item = _batcher.CreateBatchItem ();
-
-			item.Depth = 0;
-			item.TextureID = (int)texture.ID;
-
-			tempRect.X = 0;
-			tempRect.Y = 0;
-			tempRect.Width = texture.Width;
-			tempRect.Height = texture.Height;			
-
-			if (texture.Image == null) {
-				float texWidthRatio = 1.0f / (float)texture.Width;
-				float texHeightRatio = 1.0f / (float)texture.Height;
-				// We are initially flipped vertically so we need to flip the corners so that
-				//  the image is bottom side up to display correctly
-				texCoordTL.X = tempRect.X * texWidthRatio;
-				texCoordTL.Y = (tempRect.Y + tempRect.Height) * texHeightRatio;
-
-				texCoordBR.X = (tempRect.X + tempRect.Width) * texWidthRatio;
-				texCoordBR.Y = tempRect.Y * texHeightRatio;
-
-			} else {
-				texCoordTL.X = texture.Image.GetTextureCoordX (tempRect.X);
-				texCoordTL.Y = texture.Image.GetTextureCoordY (tempRect.Y);
-				texCoordBR.X = texture.Image.GetTextureCoordX (tempRect.X + tempRect.Width);
-				texCoordBR.Y = texture.Image.GetTextureCoordY (tempRect.Y + tempRect.Height);
-			}
-
-			item.Set (rectangle.X, 
-					rectangle.Y, 
-					rectangle.Width, 
-					rectangle.Height, 
-					color, 
-					texCoordTL, 
-					texCoordBR);
+			Draw (texture, rectangle, null, color);
 		}
 
 		public void DrawString (SpriteFont spriteFont, string text, Vector2 position, Color color)

@@ -40,7 +40,6 @@ namespace Microsoft.Xna.Framework.Graphics
 				}
 				
 			}
-			//remake program is nesesary
 			
 			GL.UseProgram (shaderProgram);
 			
@@ -77,7 +76,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			GL.ProgramParameter (shaderProgram,
 				AssemblyProgramParameterArb.GeometryVerticesOut, maxVertices);
 			
-			
+			bool needPixelShader = false;
+			bool needVertexShader = false;
 			foreach ( DXEffectObject.d3dx_state state in states) {
 				if (state.operation.class_ == DXEffectObject.STATE_CLASS.PIXELSHADER) {
 					needPixelShader = true;
@@ -89,7 +89,7 @@ namespace Microsoft.Xna.Framework.Graphics
 					needVertexShader = true;
 					if (state.type == DXEffectObject.STATE_TYPE.CONSTANT) {
 						vertexShader = new DXShader((byte[])state.parameter.data);
-						GL.AttachShader (shaderProgram, vertexShader.shader);
+						//GL.AttachShader (shaderProgram, vertexShader.shader);
 					}
 				}
 			}

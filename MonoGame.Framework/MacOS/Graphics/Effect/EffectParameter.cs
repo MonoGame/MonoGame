@@ -137,25 +137,14 @@ namespace Microsoft.Xna.Framework.Graphics
 						}
 						break;
 					case EffectParameterClass.Vector:
+					case EffectParameterClass.Matrix:
 						switch (paramType) {
 						case EffectParameterType.Single:
-							float[] vals = new Single[colCount];
-							for (int i=0; i<colCount; i++) {
+							float[] vals = new float[rowCount*colCount];
+							for (int i=0; i<rowCount*colCount; i++) {
 								vals[i] = BitConverter.ToSingle ((byte[])parameter.data, i*4);
 							}
-							switch (colCount) {
-							case 2:
-								data = new Vector2(vals[0], vals[1]);
-								break;
-							case 3:
-								data = new Vector3(vals[0], vals[1], vals[2]);
-								break;
-							case 4:
-								data = new Vector4(vals[0], vals[1], vals[2], vals[3]);
-								break;
-							default:
-								break;
-							}
+							data = vals;
 							break;
 						default:
 							break;
@@ -324,24 +313,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void SetValue (Matrix value)
 		{ 
-			//GL.UseProgram (_parentEffect.CurrentTechnique.Passes [0].shaderProgram);
-			MonoMac.OpenGL.Matrix4 mat4 = new MonoMac.OpenGL.Matrix4 (value.M11,
-										value.M12,
-										value.M13,
-										value.M14,
-										value.M21,
-										value.M22,
-										value.M23,
-										value.M24,
-										value.M31,
-										value.M32,
-										value.M33,
-										value.M34,
-										value.M41,
-										value.M42,
-										value.M43,
-										value.M44);
-			float[] matArray = Matrix.ToFloatArray(value);
+			data = Matrix.ToFloatArray(value);
 		}
 
 		public void SetValue (Matrix[] value)
