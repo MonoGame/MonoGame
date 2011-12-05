@@ -80,7 +80,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
 				if (graphicsDevice.Textures._textures.Count > 0) {
 					foreach (EffectParameter ep in _effect._textureMappings) {
-						// if user didn't inform the texture index, we can't bind it
+						//MAFIX
+						/*// if user didn't inform the texture index, we can't bind it
 						if (ep.UserInedx == -1)
 							continue;
 
@@ -90,6 +91,7 @@ namespace Microsoft.Xna.Framework.Graphics
 						GL.ActiveTexture ((TextureUnit)((int)TextureUnit.Texture0 + ep.UserInedx));
 						GL.BindTexture (TextureTarget.Texture2D, tex._textureId);
 						GL.Uniform1 (ep.UniformLocation, ep.UserInedx);
+						*/
 					}
 				}
 			}

@@ -7,33 +7,38 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public class EffectParameterCollection : IEnumerable<EffectParameter>
     {
-        internal Dictionary<string, EffectParameter> _parameters = new Dictionary<string, EffectParameter>();
-
-        public EffectParameter this[int index]
-        {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
-        }
+        internal List<EffectParameter> _parameters = new List<EffectParameter>();
 
         public int Count
         {
             get { return _parameters.Count; }
         }
-
-        public EffectParameter this[string name]
+		
+		public EffectParameter this[int index]
+		{
+			get { return _parameters[index]; }
+		}
+		
+		public EffectParameter this[string name]
         {
-            get { return _parameters[name]; }
-            internal set { _parameters[name] = value; }
+            get {
+				foreach (EffectParameter parameter in _parameters) {
+					if (parameter.Name == name) {
+						return parameter;
+					}
+				}
+				return null;
+			}
         }
 
         public IEnumerator<EffectParameter> GetEnumerator()
         {
-            return _parameters.Values.GetEnumerator();
+            return _parameters.GetEnumerator();
         }
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
-            return _parameters.Values.GetEnumerator();
+            return _parameters.GetEnumerator();
         }
     }
 }

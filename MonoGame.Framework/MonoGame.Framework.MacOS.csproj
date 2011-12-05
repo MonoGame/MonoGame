@@ -299,8 +299,6 @@
     <Compile Include="Content\ContentReaders\UInt64Reader.cs" />
     <Compile Include="Graphics\Effect\EffectParameterClass.cs" />
     <Compile Include="Graphics\Effect\EffectParameterType.cs" />
-    <Compile Include="Graphics\Effect\SpriteEffect.cs" />
-    <Compile Include="Graphics\Effect\SpriteEffectCode.cs" />
     <Compile Include="MacOS\Graphics\Effect\EffectParameter.cs" />
     <Compile Include="Audio\AudioEngine.cs" />
     <Compile Include="Audio\AudioStopOptions.cs" />
@@ -327,8 +325,6 @@
     <Compile Include="Content\ContentReaders\PointReader.cs" />
     <Compile Include="Content\ContentReaders\Vector2Reader.cs" />
     <Compile Include="MacOS\Storage\StorageDeviceHelper.cs" />
-    <Compile Include="Graphics\Effect\AlphaTestEffectCode.cs" />
-    <Compile Include="Graphics\Effect\AlphaTestEffect.cs" />
     <Compile Include="Graphics\Effect\EffectHelpers.cs" />
     <Compile Include="Content\LzxDecoder.cs" />
     <Compile Include="Content\ContentManager.cs" />
@@ -339,13 +335,17 @@
     <Compile Include="Input\GamePadDeadZone.cs" />
     <Compile Include="Input\GamePadType.cs" />
     <Compile Include="MacOS\Graphics\Effect\Effect.cs" />
-    <Compile Include="MacOS\Graphics\Effect\BasicEffect.cs" />
-    <Compile Include="MacOS\Graphics\Effect\PSBasicEffect.cs" />
-    <Compile Include="MacOS\Graphics\Effect\VSBasicEffectcs" />
     <Compile Include="Graphics\Vertices\VertexElementColor.cs" />
     <Compile Include="Graphics\Vertices\IndexElementSize.cs" />
     <Compile Include="Audio\XactSound.cs" />
     <Compile Include="Audio\XactClip.cs" />
+    <Compile Include="Graphics\Effect\SpriteEffect.cs" />
+    <Compile Include="Content\ContentReaders\EffectReader.cs" />
+    <Compile Include="Graphics\Effect\EffectAnnotation.cs" />
+    <Compile Include="Graphics\Effect\EffectAnnotationCollection.cs" />
+    <Compile Include="Graphics\Effect\DXShader.cs" />
+    <Compile Include="Graphics\Effect\DXEffectObject.cs" />
+    <Compile Include="Graphics\Effect\MojoShader.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />

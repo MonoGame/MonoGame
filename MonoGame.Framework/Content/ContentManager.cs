@@ -179,10 +179,6 @@ namespace Microsoft.Xna.Framework.Content
             {
                 assetName = SpriteFontReader.Normalize(assetName);
             }
-            else if ((typeof(T) == typeof(Effect)))
-            {
-                assetName = Effect.Normalize(assetName);
-            }
             else if ((typeof(T) == typeof(Song)))
             {
                 assetName = SongReader.Normalize(assetName);
@@ -354,10 +350,6 @@ namespace Microsoft.Xna.Framework.Content
                 else if ((typeof(T) == typeof(Video)))
                 {
                     result = new Video(assetName);
-                }
-                else if ((typeof(T) == typeof(Effect)))
-                {
-                    result = new Effect(graphicsDeviceService.GraphicsDevice, assetName);
                 }
             }
 
