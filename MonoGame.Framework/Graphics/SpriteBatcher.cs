@@ -65,6 +65,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		// OpenGL ES2.0 Variables
 		public int attributePosition = 0;
 		public int attributeTexCoord = 1;
+		public int attributeTint = 2;
 		
 		public SpriteBatcher ()
 		{
@@ -155,7 +156,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			{
 				//Tint Color
 				Vector4 vtint = item.Tint.ToVector4();
-				vtint /= 255;
+				//vtint /= 255;
+				GL20.VertexAttrib4(attributeTint, vtint.X, vtint.Y, vtint.Z, vtint.W);
 
 				// if the texture changed, we need to flush and bind the new texture
 				if ( item.TextureID != texID || item.Tint != lastTint)

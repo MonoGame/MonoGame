@@ -41,6 +41,7 @@ purpose and non-infringement.
 using System;
 using MonoTouch.UIKit;
 using OpenTK.Graphics.ES11;
+using System.Drawing;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -77,6 +78,17 @@ namespace Microsoft.Xna.Framework.Graphics
 			textureOffsetY = 0;
 		}
 		
+		public ESImage(int width, int height)
+		{
+			texture = new ESTexture2D(IntPtr.Zero,SurfaceFormat.Color,width,height,new Size(width,height),All.Linear);
+			imageWidth = textureWidth = width;
+			imageHeight = textureHeight = height;
+			texWidthRatio = 1.0f / width;
+			texHeightRatio = 1.0f / height;
+			textureOffsetX = 0;
+			textureOffsetY = 0;
+		}
+		
 		private void Initialize( float scale )
 		{
 			imageWidth = texture.ContentSize.Width;
@@ -90,10 +102,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 
 		public ESImage(ESTexture2D tex)
-		{
-			texture = tex;
-			Initialize(1.0f);
-		}
+			: this(tex, 1.0f)
+		{ }
 
 		public ESImage(ESTexture2D tex, float imageScale)
 		{
@@ -108,12 +118,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			Initialize(1.0f);			
 		}
 
-		public ESImage(UIImage image, All filter)
-		{			
-			// By default set the scale to 1.0f
-			texture = new ESTexture2D(image,filter);
-			Initialize(1.0f);
-		}
+		public ESImage(UIImage image, All filter) : this(image, 1.0f, filter)
+		{ }
 		
 		public ESImage(UIImage image, float imageScale, All filter)
 		{

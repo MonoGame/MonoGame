@@ -117,22 +117,32 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			this.graphicsDevice = graphicsDevice;	
 			
-			// This is needed in OpenGL ES 1.1 as it only supports power of 2 textures
-			int xTexSize = 1;
-			int yTexSize = 1;
-			while (width > xTexSize && height > yTexSize)
-			{
-				if (width > xTexSize) xTexSize *= 2;
-				if (height > yTexSize) yTexSize *= 2;
-			}
-			
-			this._width = xTexSize;
-			this._height = yTexSize;
-			
 			this._format = format;
 			this._mipmap = mipMap;
+				
 			
-			generateOpenGLTexture();			
+			if(GraphicsDevice.OpenGLESVersion == MonoTouch.OpenGLES.EAGLRenderingAPI.OpenGLES2)
+			{
+				this._width = width;
+				this._height = height;
+				texture = new ESImage(width, height);
+			}
+			else
+			{
+				// This is needed in OpenGL ES 1.1 as it only supports power of 2 textures
+				int xTexSize = 1;
+				int yTexSize = 1;
+				while (width > xTexSize && height > yTexSize)
+				{
+					if (width > xTexSize) xTexSize *= 2;
+					if (height > yTexSize) yTexSize *= 2;
+				}
+				
+				this._width = xTexSize;
+				this._height = yTexSize;
+					
+				generateOpenGLTexture();			
+			}
 		}
 		
 		private void generateOpenGLTexture() 

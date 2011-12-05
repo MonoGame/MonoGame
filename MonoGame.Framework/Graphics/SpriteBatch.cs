@@ -70,7 +70,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		//OpenGLES2 variables
 		int program;
-		Matrix4 matWorldViewProjection, matProjection, matView, matWorld;
+		Matrix4 matWVPScreen, matWVPFramebuffer, matProjection, matViewScreen, matViewFramebuffer, matWorld;
 		int uniformWVP, uniformTex;
 		
         public SpriteBatch ( GraphicsDevice graphicsDevice )
@@ -93,24 +93,28 @@ namespace Microsoft.Xna.Framework.Graphics
 			/// </summary>
 			private void InitGL20()
 			{
-				string vertexShaderSrc = @"uniform mat4 uMVPMatrix;
-										attribute vec4 aPosition;
-										attribute vec2 aTexCoord;
-										varying vec2 vTexCoord;
-										void main()
-										{
-										vTexCoord = aTexCoord;
-										gl_Position = uMVPMatrix * aPosition;
-										}";
-				            
-	            string fragmentShaderSrc = @"precision mediump float;
-										varying vec2 vTexCoord;
-										uniform sampler2D sTexture;
-										void main()
-										{
-										//gl_FragColor = vec4(1.0,0.0,0.0,1.0);
-										gl_FragColor = texture2D(sTexture, vTexCoord);
-										}";
+				string vertexShaderSrc = @" uniform mat4 uMVPMatrix;
+											attribute vec4 aPosition;
+											attribute vec2 aTexCoord;
+											attribute vec4 aTint;
+											varying vec2 vTexCoord;
+											varying vec4 vTint;
+											void main()
+											{
+												vTexCoord = aTexCoord;
+												vTint = aTint;
+												gl_Position = uMVPMatrix * aPosition;
+											}";
+            
+            string fragmentShaderSrc = @"precision mediump float;
+											varying vec2 vTexCoord;
+											varying vec4 vTint;
+											uniform sampler2D sTexture;
+											void main()
+											{
+												vec4 baseColor = texture2D(sTexture, vTexCoord);
+												gl_FragColor = baseColor * vTint;
+											}";
 				
 				int vertexShader = LoadShader (ALL20.VertexShader, vertexShaderSrc );
 	            int fragmentShader = LoadShader (ALL20.FragmentShader, fragmentShaderSrc );
@@ -126,7 +130,8 @@ namespace Microsoft.Xna.Framework.Graphics
 	            //Set position
 	            GL20.BindAttribLocation (program, _batcher.attributePosition, "aPosition");
 	            GL20.BindAttribLocation (program, _batcher.attributeTexCoord, "aTexCoord");
-          
+          		GL20.BindAttribLocation (program, _batcher.attributeTint, "aTint");
+			
 	            GL20.LinkProgram (program);
 	
 	            int linked = 0;
@@ -146,15 +151,20 @@ namespace Microsoft.Xna.Framework.Graphics
 	            }
 	
 				matWorld = Matrix4.Identity;
-				matView = Matrix4.CreateRotationZ((float)Math.PI)*
-						  Matrix4.CreateRotationY((float)Math.PI)*
-						  Matrix4.CreateTranslation(-this.graphicsDevice.Viewport.Width/2,
-										this.graphicsDevice.Viewport.Height/2,
-										1);
+				matViewScreen = Matrix4.CreateRotationZ((float)Math.PI)*
+						Matrix4.CreateRotationY((float)Math.PI)*
+						Matrix4.CreateTranslation(-this.graphicsDevice.Viewport.Width/2,
+							this.graphicsDevice.Viewport.Height/2,
+							1);
+				matViewFramebuffer = Matrix4.CreateTranslation(-this.graphicsDevice.Viewport.Width/2,
+							-this.graphicsDevice.Viewport.Height/2,
+							1);
 				matProjection = Matrix4.CreateOrthographic(this.graphicsDevice.Viewport.Width,
-										this.graphicsDevice.Viewport.Height,
-										-1f,1f);
-				matWorldViewProjection = matWorld * matView * matProjection;
+							this.graphicsDevice.Viewport.Height,
+							-1f,1f);
+				
+				matWVPScreen = matWorld * matViewScreen * matProjection;
+				matWVPFramebuffer = matWorld * matViewFramebuffer * matProjection;
 				
 				GetUniformVariables();
 			
@@ -258,17 +268,52 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		private void EndGL20()
 		{
+			// Disable Blending by default = BlendState.Opaque
+			GL20.Disable(ALL20.Blend);
+			
+			// set the blend mode
+			if ( _blendState == BlendState.NonPremultiplied )
+			{
+				GL20.BlendFunc(ALL20.One, ALL20.OneMinusSrcAlpha);
+				GL20.Enable(ALL20.Blend);
+				GL20.BlendEquation(ALL20.FuncAdd);
+			}
+			
+			if ( _blendState == BlendState.AlphaBlend )
+			{
+				GL20.BlendFunc(ALL20.SrcAlpha, ALL20.OneMinusSrcAlpha);
+				GL20.Enable(ALL20.Blend);
+				GL20.BlendEquation(ALL20.FuncAdd);
+			}
+			
+			if ( _blendState == BlendState.Additive )
+			{
+				GL20.BlendFunc(ALL20.SrcAlpha,ALL20.One);
+				GL20.Enable(ALL20.Blend);
+				GL20.BlendEquation(ALL20.FuncAdd);
+			}
+
 			//CullMode
 			GL20.FrontFace(ALL20.Cw);
-			GL20.CullFace(ALL20.Back);
 			GL20.Enable(ALL20.CullFace);
 			
 			// Configure ViewPort
 			GL20.Viewport(0, 0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height); 
 			GL20.UseProgram(program);
 			
-			SetUniformMatrix4(uniformWVP, false, ref matWorldViewProjection);
-			
+			if (GraphicsDevice.DefaultFrameBuffer)
+			{
+				GL20.CullFace(ALL20.Back);
+				SetUniformMatrix4(uniformWVP, false, ref matWVPScreen);
+			}
+			else
+			{
+				GL20.CullFace(ALL20.Front);
+				SetUniformMatrix4(uniformWVP,false,ref matWVPFramebuffer);
+				GL20.ClearColor(0.0f,0.0f,0.0f,0.0f);
+				GL20.Clear((int) (ALL20.ColorBufferBit | ALL20.DepthBufferBit));
+			}
+
 			_batcher.DrawBatchGL20 ( _sortMode );
 		}
 		

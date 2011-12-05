@@ -189,6 +189,7 @@ namespace Microsoft.Xna.Framework
 			
 			// OpenGL Version for GraphicsDevice (Used to generate OpenGL1.1 or Opengl2.0 textures, buffers, and draw with Fixed or Fragment Pixel Shader)
 			GraphicsDevice.OpenGLESVersion = ContextRenderingApi;
+			GraphicsDevice.FrameBufferScreen = this.Framebuffer;
 		}
 		
 		protected override void DestroyFrameBuffer()
