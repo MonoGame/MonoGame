@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lidgren.Network.iOS", "Thir
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Samples.Draw2D", "..\..\MonogameSamples\MonoGame-Samples\Samples\iOS\Draw2D\MonoGame.Samples.Draw2D.csproj", "{DEC435F4-9E84-490B-9890-72E5F514B8D0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Samples.RenderTarget2D", "..\..\MonogameSamples\MonoGame-Samples\Samples\iOS\RenderTarget2D\MonoGame.Samples.RenderTarget2D.csproj", "{0A404652-27C9-40AA-B037-5665BC725621}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|iPhoneSimulator = Debug|iPhoneSimulator
@@ -21,6 +23,26 @@ Global
 		Distribution|iPhoneSimulator = Distribution|iPhoneSimulator
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0A404652-27C9-40AA-B037-5665BC725621}.Debug|Any CPU.ActiveCfg = Debug|iPhoneSimulator
+		{0A404652-27C9-40AA-B037-5665BC725621}.Debug|Any CPU.Build.0 = Debug|iPhoneSimulator
+		{0A404652-27C9-40AA-B037-5665BC725621}.Debug|iPhone.ActiveCfg = Debug|iPhone
+		{0A404652-27C9-40AA-B037-5665BC725621}.Debug|iPhone.Build.0 = Debug|iPhone
+		{0A404652-27C9-40AA-B037-5665BC725621}.Debug|iPhoneSimulator.ActiveCfg = Debug|iPhoneSimulator
+		{0A404652-27C9-40AA-B037-5665BC725621}.Debug|iPhoneSimulator.Build.0 = Debug|iPhoneSimulator
+		{0A404652-27C9-40AA-B037-5665BC725621}.Debug|x86.ActiveCfg = Debug|iPhoneSimulator
+		{0A404652-27C9-40AA-B037-5665BC725621}.Debug|x86.Build.0 = Debug|iPhoneSimulator
+		{0A404652-27C9-40AA-B037-5665BC725621}.Distribution|iPhone.ActiveCfg = Debug|iPhone
+		{0A404652-27C9-40AA-B037-5665BC725621}.Distribution|iPhone.Build.0 = Debug|iPhone
+		{0A404652-27C9-40AA-B037-5665BC725621}.Distribution|iPhoneSimulator.ActiveCfg = Debug|iPhoneSimulator
+		{0A404652-27C9-40AA-B037-5665BC725621}.Distribution|iPhoneSimulator.Build.0 = Debug|iPhoneSimulator
+		{0A404652-27C9-40AA-B037-5665BC725621}.Release|Any CPU.ActiveCfg = Release|iPhoneSimulator
+		{0A404652-27C9-40AA-B037-5665BC725621}.Release|Any CPU.Build.0 = Release|iPhoneSimulator
+		{0A404652-27C9-40AA-B037-5665BC725621}.Release|iPhone.ActiveCfg = Release|iPhone
+		{0A404652-27C9-40AA-B037-5665BC725621}.Release|iPhone.Build.0 = Release|iPhone
+		{0A404652-27C9-40AA-B037-5665BC725621}.Release|iPhoneSimulator.ActiveCfg = Release|iPhoneSimulator
+		{0A404652-27C9-40AA-B037-5665BC725621}.Release|iPhoneSimulator.Build.0 = Release|iPhoneSimulator
+		{0A404652-27C9-40AA-B037-5665BC725621}.Release|x86.ActiveCfg = Release|iPhoneSimulator
+		{0A404652-27C9-40AA-B037-5665BC725621}.Release|x86.Build.0 = Release|iPhoneSimulator
 		{734EAA48-F1CA-481A-B391-0285BC0E8B40}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{734EAA48-F1CA-481A-B391-0285BC0E8B40}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{734EAA48-F1CA-481A-B391-0285BC0E8B40}.Debug|iPhone.ActiveCfg = Debug|Any CPU
@@ -79,6 +101,6 @@ Global
 		{DEC435F4-9E84-490B-9890-72E5F514B8D0}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = ..\..\MonogameSamples\MonoGame-Samples\Samples\iOS\Draw2D\MonoGame.Samples.Draw2D.csproj
+		StartupItem = ..\..\MonogameSamples\MonoGame-Samples\Samples\iOS\RenderTarget2D\MonoGame.Samples.RenderTarget2D.csproj
 	EndGlobalSection
 EndGlobal

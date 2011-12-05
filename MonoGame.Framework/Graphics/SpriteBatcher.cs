@@ -157,7 +157,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				//Tint Color
 				Vector4 vtint = item.Tint.ToVector4();
 				//vtint /= 255;
-				GL20.VertexAttrib4(attributeTint, vtint.X, vtint.Y, vtint.Z, vtint.W);
+				//GL20.VertexAttrib4(attributeTint, vtint.X, vtint.Y, vtint.Z, vtint.W);
 
 				// if the texture changed, we need to flush and bind the new texture
 				if ( item.TextureID != texID || item.Tint != lastTint)
@@ -169,7 +169,7 @@ namespace Microsoft.Xna.Framework.Graphics
 					GL20.ActiveTexture(ALL20.Texture0);
 					GL20.BindTexture ( ALL20.Texture2D, texID );
 					GL20.Uniform1(texID, 0);
-					//GL20.VertexAttrib4(attributeTint,vtint.X, vtint.Y, vtint.Z, vtint.W);
+					GL20.VertexAttrib4(attributeTint,vtint.X, vtint.Y, vtint.Z, vtint.W);
 				}
 				// store the SpriteBatchItem data in our vertexArray
 				_vertexArray[index++] = item.vertexTL;

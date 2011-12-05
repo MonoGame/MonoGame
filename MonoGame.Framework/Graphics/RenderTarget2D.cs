@@ -84,5 +84,12 @@ namespace Microsoft.Xna.Framework.Graphics
 				DepthStencilFormat = preferredDepthFormat;
 			}
 		}
+		
+		public override void Dispose ()
+		{
+			base.Dispose ();
+			
+			GL20.DeleteFramebuffers(1, ref frameBuffer);
+		}
 	}
 }
