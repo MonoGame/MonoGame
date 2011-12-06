@@ -19,6 +19,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		int uniforms_bool_count = 0;
 		
 		MojoShader.MOJOSHADER_symbol[] symbols;
+		MojoShader.MOJOSHADER_sampler[] samplers;
 		
 		T[] UnmarshalArray<T>(IntPtr ptr, int count) {
 			Type type = typeof(T);
@@ -71,6 +72,8 @@ namespace Microsoft.Xna.Framework.Graphics
 				symbols = UnmarshalArray<MojoShader.MOJOSHADER_symbol>(
 						parseData.symbols, parseData.symbol_count);
 				
+				samplers = UnmarshalArray<MojoShader.MOJOSHADER_sampler>(
+						parseData.samplers, parseData.sampler_count);
 				
 				foreach (MojoShader.MOJOSHADER_symbol symbol in symbols) {
 					switch (symbol.register_set) {
@@ -95,10 +98,17 @@ namespace Microsoft.Xna.Framework.Graphics
 				uniforms_int4 = new int[uniforms_int4_count*4];
 				uniforms_bool = new int[uniforms_bool_count];
 				
-				Console.WriteLine ( parseData.output );
+				string newOutput = parseData.output.Replace ("vs_v0", "gl_Color")
+					.Replace ("attribute vec4 gl_Color;", "")
+					.Replace ("vs_v1", "gl_MultiTexCoord0")
+					.Replace ("attribute vec4 gl_MultiTexCoord0;", "")
+					.Replace ("vs_v2", "gl_Vertex")
+					.Replace ("attribute vec4 gl_Vertex;", "");
+				
+				Console.WriteLine ( newOutput );
 				
 				shader = GL.CreateShader (shaderType);
-				GL.ShaderSource (shader, parseData.output);
+				GL.ShaderSource (shader, newOutput);
 				GL.CompileShader(shader);
 				
 				int compiled = 0;
@@ -172,6 +182,29 @@ namespace Microsoft.Xna.Framework.Graphics
 			if (uniforms_bool_count > 0) {
 				int bool_loc = GL.GetUniformLocation (program, prefix+"_uniforms_bool");
 				GL.Uniform1 (bool_loc, uniforms_bool_count, uniforms_bool);
+			}
+		}
+		
+		public void ActivateTextures(uint program, TextureCollection textures) {
+			foreach (MojoShader.MOJOSHADER_sampler sampler in samplers) {
+				int loc = GL.GetUniformLocation (program, sampler.name);
+				
+				//set the sampler texture slot
+				GL.Uniform1 (loc, sampler.index);
+				
+				if (sampler.type == MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_2D) {
+					//are smapler indexes normal texture indexes?
+					
+					if (sampler.index >= textures._textures.Count) {
+						continue;
+					}
+					
+					Texture tex = textures [sampler.index];
+					GL.ActiveTexture( (TextureUnit)((int)TextureUnit.Texture0 + sampler.index) );
+					GL.BindTexture (TextureTarget.Texture2D, tex._textureId);
+					
+				}
+
 			}
 		}
 		

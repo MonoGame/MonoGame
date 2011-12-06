@@ -51,7 +51,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			//if (effect != null)
 				_effect = effect;
-
+			
+			if (_effect == null) {
+				spriteEffect.CurrentTechnique.Passes [0].Apply ();
+			}
+			
 			_matrix = transformMatrix;
 		}
 
@@ -73,7 +77,21 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void End ()
 		{	
+			
+			Flush ();
+			
+			// clear out the textures
+			graphicsDevice.Textures._textures.Clear ();
+			
+			// unbinds shader
+			if (_effect != null) {
+				GL.UseProgram (0);
+				_effect = null;
+			}
 
+		}
+		
+		void Flush() {
 			// apply the custom effect if there is one
 			if (_effect != null) {
 				_effect.CurrentTechnique.Passes [0].Apply ();
@@ -188,18 +206,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			if (this.graphicsDevice.RasterizerState.ScissorTestEnable) {
 				GL.Disable (EnableCap.ScissorTest);
 			}
-
-			// clear out the textures
-			graphicsDevice.Textures._textures.Clear ();
-			
-			// unbinds shader
-			if (_effect != null) {
-				GL.UseProgram (0);
-				_effect = null;
-			}
-			
-			spriteEffect.CurrentTechnique.Passes [0].Apply ();
-
 
 		}
 
@@ -320,7 +326,7 @@ namespace Microsoft.Xna.Framework.Graphics
 					texCoordBR);			
 			
 			if (_sortMode == SpriteSortMode.Immediate) {
-				End ();
+				Flush ();
 			}
 			
 		}

@@ -46,6 +46,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			if (pixelShader != null) {
 				pixelShader.PopulateUniforms(_technique._effect.Parameters);
 				pixelShader.UploadUniforms((uint)shaderProgram);
+				pixelShader.ActivateTextures((uint)shaderProgram,
+					_technique._effect.GraphicsDevice.Textures);
 			}
 			if (vertexShader != null) {
 				vertexShader.PopulateUniforms(_technique._effect.Parameters);
@@ -60,6 +62,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			name = pass.name;
 			states = pass.states;
+			
+			Console.WriteLine (technique.Name);
 			
 			shaderProgram = GL.CreateProgram ();
 			
@@ -89,7 +93,7 @@ namespace Microsoft.Xna.Framework.Graphics
 					needVertexShader = true;
 					if (state.type == DXEffectObject.STATE_TYPE.CONSTANT) {
 						vertexShader = new DXShader((byte[])state.parameter.data);
-						//GL.AttachShader (shaderProgram, vertexShader.shader);
+						GL.AttachShader (shaderProgram, vertexShader.shader);
 					}
 				}
 			}

@@ -313,7 +313,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void SetValue (Matrix value)
 		{ 
-			data = Matrix.ToFloatArray(value);
+			data = Matrix.ToFloatArray(Matrix.Transpose (value));
 		}
 
 		public void SetValue (Matrix[] value)
@@ -346,6 +346,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void SetValue (Vector2 value)
 		{
+			data = new float[2] { value.X, value.Y };
 		}
 
 		public void SetValue (Vector2[] value)
@@ -354,6 +355,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void SetValue (Vector3 value)
 		{
+			data = new float[3] { value.X, value.Y, value.Z };
 		}
 
 		public void SetValue (Vector3[] value)
