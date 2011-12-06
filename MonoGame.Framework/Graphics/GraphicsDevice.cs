@@ -42,7 +42,11 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
+#if ANDROID
+using OpenTK.Graphics;
+#else
 using MonoTouch.OpenGLES;
+#endif
 
 using GL11 = OpenTK.Graphics.ES11.GL;
 using GL20 = OpenTK.Graphics.ES20.GL;
@@ -77,7 +81,12 @@ namespace Microsoft.Xna.Framework.Graphics
 		private RenderTargetBinding[] currentRenderTargets;
 		
 		//OpenGL Rendering API
+#if ANDROID
+		public static GLContextVersion OpenGLESVersion;
+#else
 		public static EAGLRenderingAPI OpenGLESVersion;
+#endif
+		
 		public static int FrameBufferScreen;
 		public static bool DefaultFrameBuffer = true;
 		
@@ -377,8 +386,12 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 		
 		public void SetRenderTarget (RenderTarget2D renderTarget)
-		{
+		{	
+#if ANDROID
+			if(OpenGLESVersion == GLContextVersion.Gles2_0)
+#else
 			if(OpenGLESVersion == EAGLRenderingAPI.OpenGLES2)
+#endif
 				SetRenderTargetGL20(renderTarget);
 			else
 				SetRenderTargetGL11(renderTarget);
@@ -415,7 +428,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			{
 #if ANDROID
                 byte[] imageInfo = new byte[4];
-                GL.ReadPixels(0, 0, 1, 1, All.Rgba, All.UnsignedByte, imageInfo);
+                GL11.ReadPixels(0, 0, 1, 1, ALL11.Rgba, ALL11.UnsignedByte, imageInfo);
 #endif
 				// Detach the render buffers.
 				GL11.Oes.FramebufferRenderbuffer(ALL11.FramebufferOes, ALL11.DepthAttachmentOes,
