@@ -134,7 +134,7 @@ namespace Microsoft.Xna.Framework
 		{	    
 			try
             {
-                // TODO  this.GLContextVersion = GLContextVersion.Gles2_0;
+                // TODO GLContextVersion = GLContextVersion.Gles2_0;
                 GLContextVersion = GLContextVersion.Gles1_1;
 				base.CreateFrameBuffer();
 		    } 
@@ -144,6 +144,8 @@ namespace Microsoft.Xna.Framework
                 GLContextVersion = GLContextVersion.Gles1_1;
 				base.CreateFrameBuffer();
 		    }
+			
+			GraphicsDevice.OpenGLESVersion = GLContextVersion;
 		}
 	
 

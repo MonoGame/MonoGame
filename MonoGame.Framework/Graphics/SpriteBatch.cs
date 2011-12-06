@@ -83,8 +83,11 @@ namespace Microsoft.Xna.Framework.Graphics
 			this.graphicsDevice = graphicsDevice;
 			
 			_batcher = new SpriteBatcher();
-			
+#if ANDROID
+			if(GraphicsDevice.OpenGLESVersion == OpenTK.Graphics.GLContextVersion.Gles2_0)
+#else
 			if(GraphicsDevice.OpenGLESVersion == MonoTouch.OpenGLES.EAGLRenderingAPI.OpenGLES2)
+#endif
 				InitGL20();
 		}
 		
@@ -260,7 +263,11 @@ namespace Microsoft.Xna.Framework.Graphics
 		public void End()
 		{
 			// OpenGL ES Version 
+#if ANDROID
+			if(GraphicsDevice.OpenGLESVersion == OpenTK.Graphics.GLContextVersion.Gles2_0)
+#else
 			if(GraphicsDevice.OpenGLESVersion == MonoTouch.OpenGLES.EAGLRenderingAPI.OpenGLES2)
+#endif
 				EndGL20();
 			else
 				EndGL11();
@@ -352,8 +359,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 				case DisplayOrientation.LandscapeRight:
                 {
-					GL.Rotate(180, 0, 0, 1); 
-					GL.Ortho(0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height,  0, -1, 1);
+					GL11.Rotate(180, 0, 0, 1); 
+					GL11.Ortho(0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height,  0, -1, 1);
 					break;
 				}
 				
@@ -361,7 +368,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				case DisplayOrientation.PortraitUpsideDown:
                 default:
 				{
-					GL.Ortho(0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height, 0, -1, 1);
+					GL11.Ortho(0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height, 0, -1, 1);
 					break;
 				}
 			}					
@@ -380,7 +387,7 @@ namespace Microsoft.Xna.Framework.Graphics
 					break;
 				}
 				
-			case DisplayOrientation.PortraitUpsideDown:
+				case DisplayOrientation.PortraitUpsideDown:
                 {
 					GL11.Rotate(180, 0, 0, 1); 
 					break;
@@ -388,7 +395,6 @@ namespace Microsoft.Xna.Framework.Graphics
 				
 				default:
 				{
-					GL11.Ortho(0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height, 0, -1, 1);
 					break;
 				}
 			}
@@ -407,7 +413,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 #if !ANDROID			
 			// Only swap our viewport if Width is greater than height
-			if (this.graphicsDevice.Viewport.Width > this.graphicsDevice.Viewport.Height)
+			if ((this.graphicsDevice.Viewport.Width > this.graphicsDevice.Viewport.Height)
+				&& ((this.graphicsDevice.PresentationParameters.DisplayOrientation == DisplayOrientation.LandscapeLeft )
+				|| (this.graphicsDevice.PresentationParameters.DisplayOrientation == DisplayOrientation.LandscapeRight ) ) )
 			{
 				GL11.Viewport(0, 0, this.graphicsDevice.Viewport.Height, this.graphicsDevice.Viewport.Width);
 			}
