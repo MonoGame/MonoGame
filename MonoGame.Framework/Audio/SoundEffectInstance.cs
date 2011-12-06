@@ -83,7 +83,10 @@ namespace Microsoft.Xna.Framework.Audio
 		{
 			if ( _sound != null )
 			{
-				_sound.Play();
+				if (soundState == SoundState.Paused)
+					_sound.Resume();
+				else
+					_sound.Play();
 				soundState = SoundState.Playing;
 			}
 		}

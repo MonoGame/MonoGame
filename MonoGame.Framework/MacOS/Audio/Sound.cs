@@ -35,6 +35,8 @@ using System.Collections.Generic;
 using MonoMac;
 using MonoMac.AppKit;
 using MonoMac.Foundation;	
+using MonoMac.AudioToolbox;
+using MonoMac.AudioUnit;
 
 namespace Microsoft.Xna.Framework.Audio
 {	
@@ -52,6 +54,7 @@ namespace Microsoft.Xna.Framework.Audio
 			_audioPlayer = new NSSound(data);
 			_audioPlayer.Volume = volume;
 			_audioPlayer.Loops = looping;
+			
 		}
 		
 		public Sound(byte[] audiodata, float volume, bool looping) {
@@ -143,9 +146,10 @@ namespace Microsoft.Xna.Framework.Audio
 		public void Pause()
 		{		
 			//HACK: Stopping or pausing NSSound is really slow (~200ms), don't if the sample is short :/
-			if (Duration > 2) {
+			//Uncomment the if clause if you have trouble pausing sounds.
+			//if (Duration > 2) {
 				_audioPlayer.Pause();
-			}
+			//}
 		}
 		
 		public void Play()
@@ -153,11 +157,19 @@ namespace Microsoft.Xna.Framework.Audio
 			_audioPlayer.Play();
 		}
 		
+		public void Resume()
+		{
+			_audioPlayer.Resume();
+		}
+		
 		public void Stop()
-		{			
-			if (Duration > 2) { 
+		{
+			//HACK: Stopping or pausing NSSound is really slow (~200ms), don't if the sample is short :/
+			//Uncomment the if clause if you have trouble with stopping sounds.
+			//Note that with the if active it is impossible to stop looped sounds that are shorter than x seconds!
+			//if (Duration > 2) { 
 				_audioPlayer.Stop();
-			}
+			//}
 		}
 		
 		public float Volume

@@ -323,7 +323,9 @@
     <Compile Include="Input\GamePadDeadZone.cs" />
     <Compile Include="Input\KeyboardState.cs" />
     <Compile Include="Graphics\Vertices\VertexElementColor.cs" />
+    <Compile Include="Audio\XactClip.cs" />
     <Compile Include="Android\Input\Touch\GestureListener.cs" />
+    <Compile Include="Audio\XactSound.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />

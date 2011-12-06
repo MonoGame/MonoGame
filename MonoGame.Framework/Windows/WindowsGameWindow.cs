@@ -322,7 +322,7 @@ namespace Microsoft.Xna.Framework
                     return Input.Keys.NumLock;
                     
                 case OpenTK.Input.Key.Number0:
-                    return Input.Keys.D1;
+                    return Input.Keys.D0;
                     
                 case OpenTK.Input.Key.Number1:
                     return Input.Keys.D1;
@@ -386,6 +386,12 @@ namespace Microsoft.Xna.Framework
                     
                 case OpenTK.Input.Key.Right:
                     return Input.Keys.Right;
+
+                case OpenTK.Input.Key.RShift:
+                    return Input.Keys.RightShift;
+
+                case OpenTK.Input.Key.RWin:
+                    return Input.Keys.RightWindows;
                     
                 case OpenTK.Input.Key.S:
                     return Input.Keys.S;
@@ -397,7 +403,7 @@ namespace Microsoft.Xna.Framework
                     return Input.Keys.OemSemicolon;
                     
                 case OpenTK.Input.Key.Slash:
-                    return Input.Keys.None;
+                    return Input.Keys.OemQuestion;
                     
                 case OpenTK.Input.Key.Sleep:
                     return Input.Keys.Sleep;
