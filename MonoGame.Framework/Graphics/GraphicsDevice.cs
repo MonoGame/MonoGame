@@ -362,8 +362,7 @@ namespace Microsoft.Xna.Framework.Graphics
 					}					
 					
 					case DisplayOrientation.PortraitUpsideDown :
-					{		
-						_scissorRectangle.Y = _viewport.Height - _scissorRectangle.Height - _scissorRectangle.Y;
+					{								
 						_scissorRectangle.X = _viewport.Width - _scissorRectangle.Width - _scissorRectangle.X;
 						break;
 					}

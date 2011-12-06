@@ -380,7 +380,7 @@ namespace Microsoft.Xna.Framework.Graphics
 					break;
 				}
 				
-			case DisplayOrientation.PortraitUpsideDown:
+				case DisplayOrientation.PortraitUpsideDown:
                 {
 					GL11.Rotate(180, 0, 0, 1); 
 					break;
@@ -388,7 +388,6 @@ namespace Microsoft.Xna.Framework.Graphics
 				
 				default:
 				{
-					GL11.Ortho(0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height, 0, -1, 1);
 					break;
 				}
 			}
@@ -407,7 +406,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 #if !ANDROID			
 			// Only swap our viewport if Width is greater than height
-			if (this.graphicsDevice.Viewport.Width > this.graphicsDevice.Viewport.Height)
+			if ((this.graphicsDevice.Viewport.Width > this.graphicsDevice.Viewport.Height)
+				&& ((this.graphicsDevice.PresentationParameters.DisplayOrientation == DisplayOrientation.LandscapeLeft )
+				|| (this.graphicsDevice.PresentationParameters.DisplayOrientation == DisplayOrientation.LandscapeRight ) ) )
 			{
 				GL11.Viewport(0, 0, this.graphicsDevice.Viewport.Height, this.graphicsDevice.Viewport.Width);
 			}
