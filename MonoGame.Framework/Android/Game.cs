@@ -433,6 +433,8 @@ namespace Microsoft.Xna.Framework
 				if (Exiting != null) Exiting(this, null);
 				Net.NetworkSession.Exit();
                 view.Close();
+
+                GC.Collect(0);
 			}
 			catch
 			{

@@ -83,12 +83,14 @@ namespace Microsoft.Xna.Framework.Graphics
 			this.graphicsDevice = graphicsDevice;
 			
 			_batcher = new SpriteBatcher();
-#if ANDROID
-			if(GraphicsDevice.OpenGLESVersion == OpenTK.Graphics.GLContextVersion.Gles2_0)
-#else
+
+#if IPHONE
 			if(GraphicsDevice.OpenGLESVersion == MonoTouch.OpenGLES.EAGLRenderingAPI.OpenGLES2)
-#endif
 				InitGL20();
+#elif ANDROID
+            if (GraphicsDevice.OpenGLESVersion == OpenTK.Graphics.GLContextVersion.Gles2_0)
+                InitGL20();
+#endif
 		}
 		
 			/// <summary>
@@ -146,7 +148,7 @@ namespace Microsoft.Xna.Framework.Graphics
 	                if (length > 0) {
 	                    var log = new StringBuilder (length);
 	                    GL20.GetProgramInfoLog (program, length, ref length, log);
-	                    Console.WriteLine ("GL2" + log.ToString ());
+	                    Console.WriteLine ("GL2.0 error: " + log.ToString ());
 	                }
 	
 	                GL20.DeleteProgram (program);
@@ -263,15 +265,21 @@ namespace Microsoft.Xna.Framework.Graphics
 		public void End()
 		{
 			// OpenGL ES Version 
-#if ANDROID
-			if(GraphicsDevice.OpenGLESVersion == OpenTK.Graphics.GLContextVersion.Gles2_0)
-#else
-			if(GraphicsDevice.OpenGLESVersion == MonoTouch.OpenGLES.EAGLRenderingAPI.OpenGLES2)
-#endif
+#if IPHONE
+            if(GraphicsDevice.OpenGLESVersion == MonoTouch.OpenGLES.EAGLRenderingAPI.OpenGLES2)
 				EndGL20();
 			else
 				EndGL11();
-		}
+#elif ANDROID
+            if (GraphicsDevice.OpenGLESVersion == OpenTK.Graphics.GLContextVersion.Gles2_0)
+                EndGL20();
+            else
+                EndGL11();
+#else
+            EndGL11();
+#endif
+
+        }
 		
 		private void EndGL20()
 		{
@@ -322,6 +330,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 
 			_batcher.DrawBatchGL20 ( _sortMode );
+
+            GL20.Disable(ALL20.Texture2D);
 		}
 		
 		public void EndGL11()
@@ -359,8 +369,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 				case DisplayOrientation.LandscapeRight:
                 {
-					GL11.Rotate(180, 0, 0, 1); 
-					GL11.Ortho(0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height,  0, -1, 1);
+                    GL11.Rotate(180, 0, 0, 1);
+                    GL11.Ortho(0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height, 0, -1, 1);
 					break;
 				}
 				
@@ -368,7 +378,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				case DisplayOrientation.PortraitUpsideDown:
                 default:
 				{
-					GL11.Ortho(0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height, 0, -1, 1);
+                    GL11.Ortho(0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height, 0, -1, 1);
 					break;
 				}
 			}					
