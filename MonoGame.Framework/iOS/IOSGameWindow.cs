@@ -165,8 +165,35 @@ namespace Microsoft.Xna.Framework
 			
 			try
 			{
+#if ES20
 				ContextRenderingApi = EAGLRenderingAPI.OpenGLES2;
 				base.CreateFrameBuffer();
+				
+				unsafe
+				{
+					int width = 0, height = 0;
+					OpenTK.Graphics.ES20.GL.GetRenderbufferParameter(OpenTK.Graphics.ES20.All.Renderbuffer, OpenTK.Graphics.ES20.All.RenderbufferWidth, &width);
+					OpenTK.Graphics.ES20.GL.GetRenderbufferParameter(OpenTK.Graphics.ES20.All.Renderbuffer, OpenTK.Graphics.ES20.All.RenderbufferHeight, &height);
+	
+					renderbufferWidth = width;
+					renderbufferHeight = height;
+				}
+#else
+				ContextRenderingApi = EAGLRenderingAPI.OpenGLES1;
+				base.CreateFrameBuffer();
+				
+				// Determine actual render buffer size (due to possible Retina Display scaling)
+				// http://developer.apple.com/library/ios/#documentation/iphone/conceptual/iphoneosprogrammingguide/SupportingResolutionIndependence/SupportingResolutionIndependence.html#//apple_ref/doc/uid/TP40007072-CH10-SW11
+				unsafe
+				{
+					int width = 0, height = 0;
+					OpenTK.Graphics.ES11.GL.Oes.GetRenderbufferParameter(OpenTK.Graphics.ES11.All.RenderbufferOes, OpenTK.Graphics.ES11.All.RenderbufferWidthOes, &width);
+					OpenTK.Graphics.ES11.GL.Oes.GetRenderbufferParameter(OpenTK.Graphics.ES11.All.RenderbufferOes, OpenTK.Graphics.ES11.All.RenderbufferHeightOes, &height);
+	
+					renderbufferWidth = width;
+					renderbufferHeight = height;
+				}
+#endif
 		    } 
 			catch (Exception) 
 			{
