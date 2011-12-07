@@ -41,6 +41,11 @@ namespace Microsoft.Xna.Framework.Audio
             s_soundPool.Unload(_soundId);
         }
 
+        public void Resume()
+        {
+            s_soundPool.Resume(_soundId);
+        }
+
         public float Volume { get; set; }
         public bool Looping { get; set; }
         public float Rate { get; set; }
