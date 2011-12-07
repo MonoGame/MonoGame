@@ -20,6 +20,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			_technique._effect.OnApply();
 			
+			bool relink = false;
 			foreach ( DXEffectObject.d3dx_state state in states) {
 				
 				//constants handled on init
@@ -28,17 +29,45 @@ namespace Microsoft.Xna.Framework.Graphics
 				if (state.operation.class_ == DXEffectObject.STATE_CLASS.PIXELSHADER ||
 					state.operation.class_ == DXEffectObject.STATE_CLASS.VERTEXSHADER) {
 					
+					DXShader shader;
 					switch (state.type) {
+					case DXEffectObject.STATE_TYPE.EXPRESSIONINDEX:
+						shader = (DXShader) (((DXExpression)state.parameter.data)
+							.Evaluate (_technique._effect.Parameters));
+						break;
 					case DXEffectObject.STATE_TYPE.PARAMETER:
 						//should be easy, but haven't seen it
-					case DXEffectObject.STATE_TYPE.EXPRESSIONINDEX:
-						//hmm
 					default:
 						throw new NotImplementedException();
 					}
 					
+					relink = true;
+					
+					if (shader.shaderType == ShaderType.FragmentShader) {
+						if (shader != pixelShader) {
+							if (pixelShader != null) {
+								GL.DetachShader (shaderProgram, pixelShader.shader);
+							}
+							pixelShader = shader;
+							GL.AttachShader (shaderProgram, pixelShader.shader);
+						}
+					} else if (shader.shaderType == ShaderType.VertexShader) {
+						if (shader != vertexShader) {
+							if (vertexShader != null) {
+								GL.DetachShader(shaderProgram, vertexShader.shader);
+							}
+							relink = true;
+							vertexShader = shader;
+							GL.AttachShader (shaderProgram, vertexShader.shader);
+						}
+					}
+					
 				}
 				
+			}
+			
+			if (relink) {
+				GL.LinkProgram (shaderProgram);
 			}
 			
 			GL.UseProgram (shaderProgram);

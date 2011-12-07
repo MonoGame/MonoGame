@@ -328,6 +328,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		    MOJOSHADER_PRESHADEROPERAND_LITERAL,
 		    
 		    MOJOSHADER_PRESHADEROPERAND_TEMP,
+			
+			MOJOSHADER_PRESHADEROPERAND_UNKN
 		}
 		
 		[StructLayoutAttribute(LayoutKind.Sequential)]
@@ -2785,6 +2787,14 @@ namespace Microsoft.Xna.Framework.Graphics
 		    [DllImportAttribute("libmojoshader.dll", EntryPoint="MOJOSHADER_maxShaderModel")]
 		public static extern  int MOJOSHADER_maxShaderModel([InAttribute()] [MarshalAsAttribute(UnmanagedType.LPStr)] string profile) ;
 		
+			
+			
+			
+			[DllImportAttribute("libmojoshader.dll", EntryPoint="MOJOSHADER_parseExpression")]
+		public static extern  IntPtr MOJOSHADER_parseExpression([InAttribute()] byte[] tokenbuf, int bufsize, IntPtr/*MOJOSHADER_malloc*/ m, IntPtr/*MOJOSHADER_free*/ f, IntPtr d) ;
+			
+			[DllImportAttribute("libmojoshader.dll", EntryPoint="MOJOSHADER_runPreshader")]
+		public static extern void MOJOSHADER_runPreshader(ref MOJOSHADER_preshader preshader, [InAttribute()] float[] inregs, float[] outregs);
 		    
 		    /// Return Type: MOJOSHADER_parseData*
 		    ///profile: char*

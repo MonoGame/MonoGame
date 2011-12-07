@@ -11,6 +11,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		public ShaderType shaderType;
 		public int shader;
 		
+		string newOutput;
+		
 		float[] uniforms_float4;
 		int[] uniforms_int4;
 		int[] uniforms_bool;
@@ -20,16 +22,6 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		MojoShader.MOJOSHADER_symbol[] symbols;
 		MojoShader.MOJOSHADER_sampler[] samplers;
-		
-		T[] UnmarshalArray<T>(IntPtr ptr, int count) {
-			Type type = typeof(T);
-			T[] ret = new T[count];
-			for (int i=0; i<count; i++) {
-				ret[i] = (T)Marshal.PtrToStructure (ptr, type);
-				ptr = IntPtr.Add (ptr, Marshal.SizeOf (type));
-			}
-			return ret;
-		}
 		
 		public DXShader (byte[] shaderData)
 		{
@@ -51,11 +43,14 @@ namespace Microsoft.Xna.Framework.Graphics
 				
 				if (parseData.error_count > 0) {
 					MojoShader.MOJOSHADER_error[] errors =
-						UnmarshalArray<MojoShader.MOJOSHADER_error>(
+						DXHelper.UnmarshalArray<MojoShader.MOJOSHADER_error>(
 							parseData.errors, parseData.error_count);
 					throw new Exception(errors[0].error);
 				}
 				
+				if (parseData.preshader != IntPtr.Zero) {
+					throw new NotImplementedException();
+				}
 				
 				switch(parseData.shader_type) {
 				case MojoShader.MOJOSHADER_shaderType.MOJOSHADER_TYPE_PIXEL:
@@ -69,25 +64,29 @@ namespace Microsoft.Xna.Framework.Graphics
 				}
 				
 				
-				symbols = UnmarshalArray<MojoShader.MOJOSHADER_symbol>(
+				symbols = DXHelper.UnmarshalArray<MojoShader.MOJOSHADER_symbol>(
 						parseData.symbols, parseData.symbol_count);
 				
-				samplers = UnmarshalArray<MojoShader.MOJOSHADER_sampler>(
+				samplers = DXHelper.UnmarshalArray<MojoShader.MOJOSHADER_sampler>(
 						parseData.samplers, parseData.sampler_count);
+				
+				MojoShader.MOJOSHADER_attribute[] attributes = 
+					DXHelper.UnmarshalArray<MojoShader.MOJOSHADER_attribute>(
+						parseData.attributes, parseData.attribute_count);
 				
 				foreach (MojoShader.MOJOSHADER_symbol symbol in symbols) {
 					switch (symbol.register_set) {
 					case MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_BOOL:
 						uniforms_bool_count = Math.Max (
-							uniforms_bool_count, (int)(uniforms_bool_count+symbol.register_count));
+							uniforms_bool_count, (int)(symbol.register_index+symbol.register_count));
 						break;
 					case MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_FLOAT4:
 						uniforms_float4_count = Math.Max (
-							uniforms_float4_count, (int)(uniforms_float4_count+symbol.register_count));
+							uniforms_float4_count, (int)(symbol.register_index+symbol.register_count));
 						break;
 					case MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_INT4:
 						uniforms_int4_count = Math.Max (
-							uniforms_int4_count, (int)(uniforms_int4_count+symbol.register_count));
+							uniforms_int4_count, (int)(symbol.register_index+symbol.register_count));
 						break;
 					default:
 						break;
@@ -98,12 +97,31 @@ namespace Microsoft.Xna.Framework.Graphics
 				uniforms_int4 = new int[uniforms_int4_count*4];
 				uniforms_bool = new int[uniforms_bool_count];
 				
-				string newOutput = parseData.output.Replace ("vs_v0", "gl_Color")
-					.Replace ("attribute vec4 gl_Color;", "")
-					.Replace ("vs_v1", "gl_MultiTexCoord0")
-					.Replace ("attribute vec4 gl_MultiTexCoord0;", "")
-					.Replace ("vs_v2", "gl_Vertex")
-					.Replace ("attribute vec4 gl_Vertex;", "");
+				newOutput = parseData.output;
+				foreach (MojoShader.MOJOSHADER_attribute attrb in attributes) {
+					if (shaderType == ShaderType.VertexShader) {
+						switch (attrb.usage) {
+						case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_COLOR:
+							newOutput = newOutput.Replace ("attribute vec4 "+attrb.name+";", "")
+								.Replace (attrb.name, "gl_Color");
+							break;
+						case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_POSITION:
+							newOutput = newOutput.Replace ("attribute vec4 "+attrb.name+";", "")
+								.Replace (attrb.name, "gl_Vertex");
+							break;
+						case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_TEXCOORD:
+							newOutput = newOutput.Replace ("attribute vec4 "+attrb.name+";", "")
+								.Replace (attrb.name, "gl_MultiTexCoord0");
+							break;
+						case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_NORMAL:
+							newOutput = newOutput.Replace ("attribute vec4 "+attrb.name+";", "")
+								.Replace (attrb.name, "gl_Normal");
+							break;
+						default:
+							throw new NotImplementedException();
+						}
+					}
+				}
 				
 				Console.WriteLine ( newOutput );
 				
@@ -143,7 +161,8 @@ namespace Microsoft.Xna.Framework.Graphics
 						}
 						break;
 					default:
-						break;
+						throw new NotImplementedException();
+						//break;
 					}
 					break;
 				case MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_INT4:
@@ -151,8 +170,10 @@ namespace Microsoft.Xna.Framework.Graphics
 						uniforms_int4[symbol.register_index+i] = ((int[])parameter.data)[i];
 					}
 					break;
+				case MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_SAMPLER:
+					break; //handled by ActivateTextures
 				default:
-					break;
+					throw new NotImplementedException();
 				}
 			}
 		}
@@ -201,6 +222,8 @@ namespace Microsoft.Xna.Framework.Graphics
 					
 					Texture tex = textures [sampler.index];
 					GL.ActiveTexture( (TextureUnit)((int)TextureUnit.Texture0 + sampler.index) );
+					
+					//just to tex.Apply() instead?
 					GL.BindTexture (TextureTarget.Texture2D, tex._textureId);
 					
 				}

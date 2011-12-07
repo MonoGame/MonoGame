@@ -705,7 +705,17 @@ namespace Microsoft.Xna.Framework.Graphics
 				//Array index by FXLVM expression
 				state.type = STATE_TYPE.EXPRESSIONINDEX;
 				//preceded by array name
-				param.data = copy_data();
+				
+				//annoying hax to extract the name
+				uint length = effectReader.ReadUInt32 ();
+				uint nameLength = effectReader.ReadUInt32 ();
+				string paramName = parse_name (effectStream.Position-4);
+				effectStream.Seek (nameLength, SeekOrigin.Current);
+				byte[] expressionData = effectReader.ReadBytes ((int)(length-4-nameLength));
+				
+				param.data = new DXExpression(paramName, expressionData);
+				
+				//param.data = copy_data();
 				break;
 			default:
 				Console.WriteLine ("Unknown usage "+usage.ToString());

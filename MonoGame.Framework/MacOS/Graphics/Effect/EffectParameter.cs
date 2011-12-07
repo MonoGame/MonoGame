@@ -91,22 +91,20 @@ namespace Microsoft.Xna.Framework.Graphics
 			colCount = (int)parameter.columns;
 			semantic = parameter.semantic;
 			
-			if (parameter.annotation_count > 0) {
-				annotations = new EffectAnnotationCollection();
-				for (int i=0; i<parameter.annotation_count; i++) {
-					EffectAnnotation annotation = new EffectAnnotation();
-					annotations._annotations.Add (annotation);
-				}
+			annotations = new EffectAnnotationCollection();
+			for (int i=0; i<parameter.annotation_count; i++) {
+				EffectAnnotation annotation = new EffectAnnotation();
+				annotations._annotations.Add (annotation);
 			}
 			
+			elements = new EffectParameterCollection();
+			structMembers = new EffectParameterCollection();
 			if (parameter.element_count > 0) {
-				elements = new EffectParameterCollection();
 				for (int i=0; i<parameter.element_count; i++) {
 					EffectParameter element = new EffectParameter(parameter.member_handles[i]);
 					elements._parameters.Add (element);
 				}
 			} else if (parameter.member_count > 0) {
-				structMembers = new EffectParameterCollection();
 				for (int i=0; i<parameter.member_count; i++) {
 					EffectParameter member = new EffectParameter(parameter.member_handles[i]);
 					structMembers._parameters.Add (member);
@@ -193,66 +191,67 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void SetValue (object value)
 		{
+			throw new NotImplementedException();
 		}
 
 		public bool GetValueBoolean ()
 		{
-			return true;
+			throw new NotImplementedException();
 		}
 
 		public bool[] GetValueBooleanArray ()
 		{
-			return new bool[0];
+			throw new NotImplementedException();
 		}
 
 		public int GetValueInt32 ()
 		{
-			return 0;
+			throw new NotImplementedException();
 		}
 
 		public int[] GetValueInt32Array ()
 		{
-			return new int[0];
+			throw new NotImplementedException();
 		}
 
 		public Matrix GetValueMatrix ()
 		{
-			return new Matrix ();
+			throw new NotImplementedException();
 		}
 
 		public Matrix[] GetValueMatrixArray ()
 		{
-			return new Matrix[0];
+			throw new NotImplementedException();
 		}
 
 		public Quaternion GetValueQuaternion ()
 		{
-			return new Quaternion ();
+			throw new NotImplementedException();
 		}
 
 		public Quaternion[] GetValueQuaternionArray ()
 		{
-			return new Quaternion[0];
+			throw new NotImplementedException();
 		}
 
 		public Single GetValueSingle ()
 		{
-			return new Single ();
+			throw new NotImplementedException();
 		}
 
 		public Single[] GetValueSingleArray ()
 		{
-			return new Single[0];
+			throw new NotImplementedException();
 		}
 
 		public string GetValueString ()
 		{
-			return String.Empty;
+			throw new NotImplementedException();
 		}
 
 		public Texture2D GetValueTexture2D ()
 		{
-			return null; //new Texture2D ();
+			throw new NotImplementedException();
 		}
 
 		//		public Texture3D GetValueTexture3D ()
@@ -267,48 +266,52 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public Vector2 GetValueVector2 ()
 		{
-			return Vector2.One;
+			throw new NotImplementedException();
 		}
 
 		public Vector2[] GetValueVector2Array ()
 		{
-			return new Vector2[0];
+			throw new NotImplementedException();
 		}
 
 		public Vector3 GetValueVector3 ()
 		{
-			return Vector3.One;
+			throw new NotImplementedException();
 		}
 
 		public Vector3[] GetValueVector3Array ()
 		{
-			return new Vector3[0];
+			throw new NotImplementedException();
 		}
 
 		public Vector4 GetValueVector4 ()
 		{
-			return Vector4.One;
+			throw new NotImplementedException();
 		}
 
 		public Vector4[] GetValueVector4Array ()
 		{
-			return new Vector4[0];
+			throw new NotImplementedException();
 		}
 
 		public void SetValue (bool value)
 		{
+			throw new NotImplementedException();
 		}
 
 		public void SetValue (bool[] value)
 		{
+			throw new NotImplementedException();
 		}
 
 		public void SetValue (int value)
 		{
+			data = value;
 		}
 
 		public void SetValue (int[] value)
 		{
+			throw new NotImplementedException();
 		}
 
 		public void SetValue (Matrix value)
@@ -318,30 +321,37 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void SetValue (Matrix[] value)
 		{
+			throw new NotImplementedException();
 		}
 
 		public void SetValue (Quaternion value)
 		{
+			throw new NotImplementedException();
 		}
 
 		public void SetValue (Quaternion[] value)
 		{
+			throw new NotImplementedException();
 		}
 
 		public void SetValue (Single value)
 		{
+			data = value;
 		}
 
 		public void SetValue (Single[] value)
 		{
+			throw new NotImplementedException();
 		}
 		
 		public void SetValue (string value)
 		{
+			throw new NotImplementedException();
 		}
 
 		public void SetValue (Texture value)
 		{
+			throw new NotImplementedException();
 		}
 
 		public void SetValue (Vector2 value)
@@ -351,6 +361,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void SetValue (Vector2[] value)
 		{
+			throw new NotImplementedException();
 		}
 
 		public void SetValue (Vector3 value)
@@ -360,14 +371,17 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void SetValue (Vector3[] value)
 		{
+			throw new NotImplementedException();
 		}
 
 		public void SetValue (Vector4 value)
 		{
+			data = new float[4] { value.X, value.Y, value.Z, value.W };
 		}
 
 		public void SetValue (Vector4[] value)
 		{
+			throw new NotImplementedException();
 		}
 	}
 }
