@@ -9,7 +9,7 @@ namespace Microsoft.Xna.Framework.Audio
     internal class Sound : IDisposable
     {
         private const int MAX_SIMULTANEOUS_SOUNDS = 10;
-        private static SoundPool s_soundPool = new SoundPool(MAX_SIMULTANEOUS_SOUNDS, Stream.Music, 0);
+        private static SoundPool s_soundPool = new SoundPool(MAX_SIMULTANEOUS_SOUNDS,(int)Stream.Music, 0);
         private int _soundId;
         private int _streamId;
 		
@@ -39,6 +39,11 @@ namespace Microsoft.Xna.Framework.Audio
         public void Dispose()
         {
             s_soundPool.Unload(_soundId);
+        }
+
+        public void Resume()
+        {
+            s_soundPool.Resume(_soundId);
         }
 
         public float Volume { get; set; }
@@ -84,11 +89,6 @@ namespace Microsoft.Xna.Framework.Audio
         public void Pause()
         {
             s_soundPool.Pause(_streamId);
-        }
-		
-		public void Resume()
-        {
-            s_soundPool.Resume(_streamId);
         }
 
         public void Stop()
