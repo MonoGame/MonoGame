@@ -80,7 +80,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 
 			if (graphicsDevice == null) {
-				//throw new ArgumentNullException ("Graphics Device Cannot Be Null");
+				throw new ArgumentNullException ("Graphics Device Cannot Be Null");
 			}
 			this.graphicsDevice = graphicsDevice;
 			

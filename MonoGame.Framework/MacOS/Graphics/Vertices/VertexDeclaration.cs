@@ -87,6 +87,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		GLStateManager.VertexArray(true);
             bool normal = false;
             bool texcoord = false;
+			bool color = false;
 			
             foreach (var ve in vd.GetVertexElements())
             {
@@ -108,6 +109,7 @@ namespace Microsoft.Xna.Framework.Graphics
                                 vd.VertexStride,
                                 (IntPtr)ve.Offset
                                 );
+                            color = true;
                             break;
                         case VertexElementUsage.Normal:
                             GL.NormalPointer(
@@ -131,6 +133,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     }
             }
 
+            GLStateManager.ColorArray (color);
             GLStateManager.NormalArray(normal);
 		GLStateManager.TextureCoordArray(texcoord);			
 

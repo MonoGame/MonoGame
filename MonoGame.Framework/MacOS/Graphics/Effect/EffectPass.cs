@@ -73,13 +73,15 @@ namespace Microsoft.Xna.Framework.Graphics
 			GL.UseProgram (shaderProgram);
 			
 			if (pixelShader != null) {
-				pixelShader.PopulateUniforms(_technique._effect.Parameters);
+				pixelShader.PopulateUniforms(_technique._effect.Parameters,
+					_technique._effect.GraphicsDevice.Viewport);
 				pixelShader.UploadUniforms((uint)shaderProgram);
 				pixelShader.ActivateTextures((uint)shaderProgram,
 					_technique._effect.GraphicsDevice.Textures);
 			}
 			if (vertexShader != null) {
-				vertexShader.PopulateUniforms(_technique._effect.Parameters);
+				vertexShader.PopulateUniforms(_technique._effect.Parameters,
+					_technique._effect.GraphicsDevice.Viewport);
 				vertexShader.UploadUniforms((uint)shaderProgram);
 			}
 

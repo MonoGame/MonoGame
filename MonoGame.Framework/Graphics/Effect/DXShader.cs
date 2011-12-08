@@ -20,6 +20,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		int uniforms_int4_count = 0;
 		int uniforms_bool_count = 0;
 		
+		float[] posFixup = new float[4];
+		
 		MojoShader.MOJOSHADER_symbol[] symbols;
 		MojoShader.MOJOSHADER_sampler[] samplers;
 		
@@ -63,7 +65,6 @@ namespace Microsoft.Xna.Framework.Graphics
 					throw new NotSupportedException();
 				}
 				
-				
 				symbols = DXHelper.UnmarshalArray<MojoShader.MOJOSHADER_symbol>(
 						parseData.symbols, parseData.symbol_count);
 				
@@ -77,16 +78,13 @@ namespace Microsoft.Xna.Framework.Graphics
 				foreach (MojoShader.MOJOSHADER_symbol symbol in symbols) {
 					switch (symbol.register_set) {
 					case MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_BOOL:
-						uniforms_bool_count = Math.Max (
-							uniforms_bool_count, (int)(symbol.register_index+symbol.register_count));
+						uniforms_bool_count += (int)symbol.register_count;
 						break;
 					case MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_FLOAT4:
-						uniforms_float4_count = Math.Max (
-							uniforms_float4_count, (int)(symbol.register_index+symbol.register_count));
+						uniforms_float4_count += (int)symbol.register_count;
 						break;
 					case MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_INT4:
-						uniforms_int4_count = Math.Max (
-							uniforms_int4_count, (int)(symbol.register_index+symbol.register_count));
+						uniforms_int4_count += (int)symbol.register_count;
 						break;
 					default:
 						break;
@@ -140,41 +138,57 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 		
-		public void PopulateUniforms(EffectParameterCollection parameters) {
+		public void PopulateUniforms(EffectParameterCollection parameters, Viewport vp) {
+			//TODO: not necessarily packed contiguously, get info from mojoshader somehow
+			int bool_index = 0;
+			int float4_index = 0;
+			int int4_index = 0;
+			
 			//only populate modofied stuff?
 			foreach (MojoShader.MOJOSHADER_symbol symbol in symbols) {
 				//todo: support array parameters
 				EffectParameter parameter = parameters[symbol.name];
 				switch (symbol.register_set) {
 				case MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_BOOL:
-					uniforms_bool[symbol.register_index] = (int)parameter.data;
+					uniforms_bool[bool_index*4] = (int)parameter.data;
+					bool_index += (int)symbol.register_count;
 					break;
 				case MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_FLOAT4:
 					switch (parameter.ParameterClass) {
 					case EffectParameterClass.Scalar:
-						uniforms_float4[symbol.register_index*4] = (float)parameter.data;
+						uniforms_float4[float4_index*4] = (float)parameter.data;
 						break;
 					case EffectParameterClass.Vector:
 					case EffectParameterClass.Matrix:
 						for (int i=0; i<parameter.RowCount*parameter.ColumnCount; i++) {
-							uniforms_float4[symbol.register_index*4+i] = ((float[])parameter.data)[i];
+							uniforms_float4[float4_index*4+i] = ((float[])parameter.data)[i];
 						}
 						break;
 					default:
 						throw new NotImplementedException();
 						//break;
 					}
+					float4_index += (int)symbol.register_count;
 					break;
 				case MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_INT4:
 					for (int i=0; i<4; i++) {
-						uniforms_int4[symbol.register_index+i] = ((int[])parameter.data)[i];
+						uniforms_int4[int4_index+i] = ((int[])parameter.data)[i];
 					}
+					int4_index += (int)symbol.register_count;
 					break;
 				case MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_SAMPLER:
 					break; //handled by ActivateTextures
 				default:
 					throw new NotImplementedException();
 				}
+			}
+			
+			//calc data for directx projection fix
+			if (shaderType == ShaderType.VertexShader) {
+				posFixup[0] = 1.0f;
+				posFixup[1] = 1.0f;
+				posFixup[2] = (63.0f / 64.0f) / vp.Width;
+				posFixup[3] = -(63.0f / 64.0f) / vp.Height;
 			}
 		}
 		
@@ -203,6 +217,12 @@ namespace Microsoft.Xna.Framework.Graphics
 			if (uniforms_bool_count > 0) {
 				int bool_loc = GL.GetUniformLocation (program, prefix+"_uniforms_bool");
 				GL.Uniform1 (bool_loc, uniforms_bool_count, uniforms_bool);
+			}
+			
+			//Send data for directx projection fix
+			if (shaderType == ShaderType.VertexShader) {
+				int posFixup_loc = GL.GetUniformLocation (program, "posFixup");
+				GL.Uniform4 (posFixup_loc, 1, posFixup);
 			}
 		}
 		
