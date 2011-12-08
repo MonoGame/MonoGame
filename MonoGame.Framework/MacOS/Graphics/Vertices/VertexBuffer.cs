@@ -128,7 +128,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 
 		public DynamicVertexBuffer (GraphicsDevice graphics, VertexDeclaration vertexDecs, int vertexCount, BufferUsage bufferUsage)
-			: base (graphics,vertexDecs.GetType(), vertexCount,bufferUsage)
+			: base (graphics,vertexDecs, vertexCount,bufferUsage)
 		{
 
 		}
