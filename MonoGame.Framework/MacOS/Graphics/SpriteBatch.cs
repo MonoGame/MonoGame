@@ -236,9 +236,14 @@ namespace Microsoft.Xna.Framework.Graphics
 			if (texture == null) {
 				throw new ArgumentException ("texture");
 			}
-			
+			float w = texture.Width*scale.X;
+			float h = texture.Height*scale.Y;
+			if (sourceRectangle.HasValue) {
+				w = sourceRectangle.Value.Width*scale.X;
+				h = sourceRectangle.Value.Height*scale.Y;
+			}
 			Draw (texture,
-				new Rectangle((int)position.X, (int)position.Y, (int)(texture.Width*scale.X), (int)(texture.Height*scale.Y)),
+				new Rectangle((int)position.X, (int)position.Y, (int)w, (int)h),
 				sourceRectangle,
 				color,
 				rotation,
