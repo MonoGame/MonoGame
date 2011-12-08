@@ -322,6 +322,11 @@ namespace Microsoft.Xna.Framework.Audio
         {
             AL.SourcePause(sourceID);
         }
+		
+		public void Resume()
+        {
+            Play();
+        }
 
         public void Play()
         {

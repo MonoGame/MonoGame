@@ -75,7 +75,7 @@ using Microsoft.Xna.Framework.Audio;
         {
 			if (_song != null)
 			{
-				_song.Play();
+				_song.Resume();
 				_mediaState = MediaState.Playing;
 			}					
         }
