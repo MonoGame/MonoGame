@@ -364,7 +364,6 @@
     <Folder Include="MacOS\Audio\" />
     <Folder Include="Media\" />
     <Folder Include="MacOS\Content\" />
-    <Folder Include="MacOS\Graphics\" />
     <Folder Include="MacOS\Media\" />
     <Folder Include="MacOS\Graphics\States\" />
     <Folder Include="MacOS\Graphics\Effect\" />

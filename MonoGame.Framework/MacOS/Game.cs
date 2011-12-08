@@ -452,6 +452,9 @@ namespace Microsoft.Xna.Framework
 				}
 				return _content;
 			}
+			set {
+				_content = value;
+			}
 		}
 
 		private GraphicsDeviceManager graphicsDeviceManager {
@@ -761,6 +764,10 @@ namespace Microsoft.Xna.Framework
 					}
 				}
 			}
+		}
+		
+		protected virtual void OnExiting (Object sender, EventArgs args) {
+			
 		}
 
 		public void Exit ()

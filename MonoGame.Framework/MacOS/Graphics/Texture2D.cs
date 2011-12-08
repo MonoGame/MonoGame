@@ -290,6 +290,10 @@ namespace Microsoft.Xna.Framework.Graphics
 			return FromFile (graphicsDevice, filename, 0, 0);
 		}
 		
+		public void SaveAsJpeg (Stream stream, int width, int height) {
+			throw new NotImplementedException();
+		}
+		
 		internal void Apply ()
 		{
 			if (texture == null)
