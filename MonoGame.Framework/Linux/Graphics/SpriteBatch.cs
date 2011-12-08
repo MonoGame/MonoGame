@@ -631,7 +631,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				texCoordBR.X = spriteFont._texture.Image.GetTextureCoordX (g.Glyph.X + g.Glyph.Width);
 				texCoordBR.Y = spriteFont._texture.Image.GetTextureCoordY (g.Glyph.Y + g.Glyph.Height);
 
-				item.Set (p.X, 
+				item.Set (p.X + g.Cropping.X, 
 						p.Y + g.Cropping.Y, 
 						g.Glyph.Width, 
 						g.Glyph.Height, 
@@ -695,7 +695,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 				item.Set (position.X, 
 						position.Y, 
-						p.X * scale, 
+						(p.X + g.Cropping.X) * scale, 
 						(p.Y + g.Cropping.Y) * scale, 
 						g.Glyph.Width * scale, 
 						g.Glyph.Height * scale, 

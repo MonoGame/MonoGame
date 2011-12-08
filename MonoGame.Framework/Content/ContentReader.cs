@@ -26,71 +26,132 @@ SOFTWARE.
 #endregion License
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-
 namespace Microsoft.Xna.Framework.Content
 {
     public sealed class ContentReader : BinaryReader
     {
         private ContentManager contentManager;
+        private ContentTypeReaderManager typeReaderManager;
         private GraphicsDevice graphicsDevice;
+        private string assetName;
+        private List<KeyValuePair<int, Action<object>>> sharedResourceFixups;
+        private ContentTypeReader[] typeReaders;
 
-        public ContentTypeReader[] TypeReaders
+        internal ContentTypeReader[] TypeReaders
         {
-            get;
-            set;
+            get
+            {
+                return typeReaders;
+            }
         }
 
         internal GraphicsDevice GraphicsDevice
         {
-            get { return this.graphicsDevice; }
+            get
+            {
+                return this.graphicsDevice;
+            }
         }
 
-        internal ContentReader(ContentManager manager, Stream stream, GraphicsDevice graphicsDevice)
+        internal ContentReader(ContentManager manager, Stream stream, GraphicsDevice graphicsDevice, string assetName)
             : base(stream)
         {
             this.graphicsDevice = graphicsDevice;
-			this.contentManager = manager;
+            this.contentManager = manager;
+            this.assetName = assetName;
         }
 
         public ContentManager ContentManager
         {
-            get { return this.contentManager; }
+            get
+            {
+                return contentManager;
+            }
         }
-		
-		public string AssetName
-		{
-			get
-			{
-				if(BaseStream is FileStream) {
+        
+        public string AssetName
+        {
+            get
+            {
+                return assetName;
+            }
+        }
 
-					// Get the full name
-					var name  = ((FileStream)(this.BaseStream)).Name;
-					// get the directory name
-					var directory = Path.GetDirectoryName(name);
-					// strip off the Content/
-					var index = directory.LastIndexOf("Content/");
-					directory = directory.Substring(index + 8);
-					// We then put them back together again without the extension
-					name = Path.Combine(directory, Path.GetFileNameWithoutExtension(name));
-					return name;
-					//return ((FileStream)(this.BaseStream)).Name.Replace("Content/","");
-				}
-				else
-					return string.Empty;
-			}
-		}
+        internal object ReadAsset<T>()
+        {
+            object result = null;
+
+            typeReaderManager = new ContentTypeReaderManager(this);
+            typeReaders = typeReaderManager.LoadAssetReaders();
+            foreach (ContentTypeReader r in typeReaders)
+            {
+                r.Initialize(typeReaderManager);
+            }
+
+            int sharedResourceCount = Read7BitEncodedInt();
+            sharedResourceFixups = new List<KeyValuePair<int, Action<object>>>();
+
+            // Read primary object
+            int index = Read7BitEncodedInt();
+            if (index > 0)
+            {
+                ContentTypeReader contentReader = typeReaders[index - 1];
+                result = ReadObject<T>(contentReader);
+            }
+
+            // Read shared resources
+            if (sharedResourceCount > 0)
+            {
+                ReadSharedResources(sharedResourceCount);
+            }
+
+            return result;
+        }
+
+        void ReadSharedResources(int sharedResourceCount)
+        {
+            object[] sharedResources = new object[sharedResourceCount];
+            for (int i = 0; i < sharedResourceCount; ++i)
+            {
+                int index = Read7BitEncodedInt();
+                if (index > 0)
+                {
+                    ContentTypeReader contentReader = typeReaders[index - 1];
+                    sharedResources[i] = ReadObject<object>(contentReader);
+                }
+                else
+                {
+                    sharedResources[i] = null;
+                }
+            }
+            // Fixup shared resources by calling each registered action
+            foreach (KeyValuePair<int, Action<object>> fixup in sharedResourceFixups)
+            {
+                fixup.Value(sharedResources[fixup.Key]);
+            }
+        }
 
         public T ReadExternalReference<T>()
         {
-            throw new NotImplementedException();
+            string externalAssetName = ReadString();
+            if (!String.IsNullOrEmpty(externalAssetName))
+            {
+                // Use Path.GetFullPath to help resolve relative directories
+                string fullRootPath = Path.GetFullPath(contentManager.RootDirectory);
+                string fullAssetPath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(assetName), externalAssetName));
+                externalAssetName = fullAssetPath.Substring(fullRootPath.Length + 1);
+                return contentManager.Load<T>(externalAssetName);
+            }
+            return default(T);
         }
-		
+        
         public Matrix ReadMatrix()
         {
             Matrix result = new Matrix();
@@ -112,16 +173,16 @@ namespace Microsoft.Xna.Framework.Content
             result.M44 = ReadSingle();
             return result;
         }
-			
+            
         public T ReadObject<T>()
         {			
-			int typeReaderIndex = Read7BitEncodedInt();
+            int typeReaderIndex = Read7BitEncodedInt();
         
-			if (typeReaderIndex == 0) 
-				return default(T);
-            				
-            return (T)TypeReaders[typeReaderIndex - 1].Read(this, default(T));
-		}
+            if (typeReaderIndex == 0) 
+                return default(T);
+                            
+            return (T)typeReaders[typeReaderIndex - 1].Read(this, default(T));
+        }
 
         public T ReadObject<T>(ContentTypeReader typeReader)
         {
@@ -130,20 +191,29 @@ namespace Microsoft.Xna.Framework.Content
 
         public T ReadObject<T>(T existingInstance)
         {
-            throw new NotImplementedException();
+            ContentTypeReader typeReader = typeReaderManager.GetTypeReader(typeof(T));
+            if (typeReader != null)
+            {
+                return (T)typeReader.Read(this, existingInstance);
+            }
+            throw new ContentLoadException(String.Format("Could not read object type " + typeof(T).Name));
         }
 
         public T ReadObject<T>(ContentTypeReader typeReader, T existingInstance)
         {
-			if (!typeReader.TargetType.IsValueType)
-				return (T) ReadObject<object>();
-			else
+            if (!typeReader.TargetType.IsValueType)
+                return (T)ReadObject<object>();
             return (T)typeReader.Read(this, existingInstance);
         }
 
         public Quaternion ReadQuaternion()
         {
-            throw new NotImplementedException();
+            Quaternion result = new Quaternion();
+            result.X = ReadSingle();
+            result.Y = ReadSingle();
+            result.Z = ReadSingle();
+            result.W = ReadSingle();
+            return result;
         }
 
         public T ReadRawObject<T>()
@@ -159,22 +229,33 @@ namespace Microsoft.Xna.Framework.Content
         public T ReadRawObject<T>(T existingInstance)
         {
             Type objectType = typeof(T);
-			foreach(ContentTypeReader typeReader in TypeReaders)
-			{
-				if(typeReader.TargetType == objectType)
-					return (T)ReadRawObject<T>(typeReader,existingInstance);
-			}
+            foreach(ContentTypeReader typeReader in typeReaders)
+            {
+                if(typeReader.TargetType == objectType)
+                    return (T)ReadRawObject<T>(typeReader,existingInstance);
+            }
             throw new NotSupportedException();
         }
 
         public T ReadRawObject<T>(ContentTypeReader typeReader, T existingInstance)
         {
-		return (T)typeReader.Read(this, existingInstance);
+            return (T)typeReader.Read(this, existingInstance);
         }
 
         public void ReadSharedResource<T>(Action<T> fixup)
         {
-            throw new NotImplementedException();
+            int index = Read7BitEncodedInt();
+            if (index > 0)
+            {
+                sharedResourceFixups.Add(new KeyValuePair<int, Action<object>>(index - 1, delegate(object v)
+                    {
+                        if (!(v is T))
+                        {
+                            throw new ContentLoadException(String.Format("Error loading shared resource. Expected type {0}, received type {1}", typeof(T).Name, v.GetType().Name));
+                        }
+                        fixup((T)v);
+                    }));
+            }
         }
 
         public Vector2 ReadVector2()
@@ -192,6 +273,36 @@ namespace Microsoft.Xna.Framework.Content
             result.Y = ReadSingle();
             result.Z = ReadSingle();
             return result;
+        }
+
+        public Vector4 ReadVector4()
+        {
+            Vector4 result = new Vector4();
+            result.X = ReadSingle();
+            result.Y = ReadSingle();
+            result.Z = ReadSingle();
+            result.W = ReadSingle();
+            return result;
+        }
+
+        public Color ReadColor()
+        {
+            Color result = new Color();
+            result.R = ReadByte();
+            result.G = ReadByte();
+            result.B = ReadByte();
+            result.A = ReadByte();
+            return result;
+        }
+
+        internal int Read7BitEncodedInt()
+        {
+            return base.Read7BitEncodedInt();
+        }
+
+        public void Dispose()
+        {
+            base.Dispose(true);
         }
     }
 }

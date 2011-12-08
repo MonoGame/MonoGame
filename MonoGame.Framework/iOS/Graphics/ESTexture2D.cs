@@ -327,6 +327,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			GL.BindTexture(All.Texture2D, _name);
 			GL.TexParameter(All.Texture2D, All.TextureMinFilter, (int) filter);
 			GL.TexParameter(All.Texture2D, All.TextureMagFilter, (int) filter);
+			GL.TexParameter(All.Texture2D, All.TextureWrapS, (int)All.ClampToEdge);
+			GL.TexParameter(All.Texture2D, All.TextureWrapT, (int)All.ClampToEdge);
 			
 			int sz = 0;
 

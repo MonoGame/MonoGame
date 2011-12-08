@@ -39,6 +39,11 @@
 #endregion License
 
 using System;
+using GL11 = OpenTK.Graphics.ES11.GL;
+using GL20 = OpenTK.Graphics.ES20.GL;
+using ALL11 = OpenTK.Graphics.ES11.All;
+using ALL20 = OpenTK.Graphics.ES20.All;
+
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -49,6 +54,9 @@ namespace Microsoft.Xna.Framework.Graphics
 	//
 	public class RenderTarget2D : Texture2D
 	{		
+		// OpenGL ES 2.0 frameBuffer reference.
+		internal int frameBuffer;
+		
 		public RenderTargetUsage RenderTargetUsage { get; internal set; }
 		public DepthFormat DepthStencilFormat { get; internal set; }
 		
@@ -66,8 +74,42 @@ namespace Microsoft.Xna.Framework.Graphics
 			SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage)
 			:base (graphicsDevice, width, height, mipMap, preferredFormat)
 		{
-			RenderTargetUsage = usage;
-			DepthStencilFormat = preferredDepthFormat;
+
+
+#if IPHONE
+			if(GraphicsDevice.OpenGLESVersion == MonoTouch.OpenGLES.EAGLRenderingAPI.OpenGLES2)
+
+			{
+				GL20.GenFramebuffers(1, ref frameBuffer);
+			}
+			else
+			{
+				RenderTargetUsage = usage;
+				DepthStencilFormat = preferredDepthFormat;
+			}
+#elif ANDROID
+            if (GraphicsDevice.OpenGLESVersion == OpenTK.Graphics.GLContextVersion.Gles2_0)
+            {
+                GL20.GenFramebuffers(1, ref frameBuffer);
+            }
+            else
+            {
+                RenderTargetUsage = usage;
+                DepthStencilFormat = preferredDepthFormat;
+            }
+#else
+				RenderTargetUsage = usage;
+				DepthStencilFormat = preferredDepthFormat;
+#endif
+
+
+        }
+		
+		public override void Dispose ()
+		{
+			base.Dispose ();
+			
+			GL20.DeleteFramebuffers(1, ref frameBuffer);
 		}
 	}
 }
