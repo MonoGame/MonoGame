@@ -246,7 +246,9 @@ namespace Microsoft.Xna.Framework.Graphics
 							if (samplerState.state_count > 0) {
 								string textureName = samplerState.states[0].parameter.name;
 								EffectParameter textureParameter = parameters[textureName];
-								tex = (Texture2D)textureParameter.data;
+								if (textureParameter != null) {
+									tex = (Texture2D)textureParameter.data;
+								}
 							}
 						}
 						if (tex == null) {
