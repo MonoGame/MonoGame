@@ -622,13 +622,11 @@ namespace Microsoft.Xna.Framework.Graphics
 				param.data = parse_name(effectStream.Position-4);
 				effectReader.ReadBytes((int)((size+3) & ~3));	break;
 			case D3DXPARAMETER_TYPE.VERTEXSHADER:
-				//todo
-				param.data = effectReader.ReadBytes((int)((size+3) & ~3));
+				param.data = new DXShader(effectReader.ReadBytes((int)((size+3) & ~3)));
 				Console.WriteLine ("vertex shader data");
 				break;
 			case D3DXPARAMETER_TYPE.PIXELSHADER:
-				//todo
-				param.data = effectReader.ReadBytes((int)((size+3) & ~3));
+				param.data = new DXShader(effectReader.ReadBytes((int)((size+3) & ~3)));
 				Console.WriteLine("pixel shader data");
 				break;
 			}
@@ -699,7 +697,20 @@ namespace Microsoft.Xna.Framework.Graphics
 			case 1:
 				state.type = STATE_TYPE.PARAMETER;
 				//the state's parameter is another parameter
-				param.data = copy_data();
+				//the we are given its name
+				
+				uint nameLength_ = effectReader.ReadUInt32 ();
+				string name = parse_name (effectStream.Position-4);
+				effectStream.Seek (nameLength_, SeekOrigin.Current);
+				
+				foreach (d3dx_parameter findParam in parameter_handles) {
+					if (findParam.name == name) {
+						param.data = findParam.data;
+						param.name = findParam.name;
+						//todo: copy other stuff
+						break;
+					}
+				}
 				break;
 			case 2:
 				//Array index by FXLVM expression
@@ -714,8 +725,6 @@ namespace Microsoft.Xna.Framework.Graphics
 				byte[] expressionData = effectReader.ReadBytes ((int)(length-4-nameLength));
 				
 				param.data = new DXExpression(paramName, expressionData);
-				
-				//param.data = copy_data();
 				break;
 			default:
 				Console.WriteLine ("Unknown usage "+usage.ToString());

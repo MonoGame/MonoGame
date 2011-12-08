@@ -20,8 +20,6 @@ namespace Microsoft.Xna.Framework.Graphics
 		int uniforms_int4_count = 0;
 		int uniforms_bool_count = 0;
 		
-		float[] posFixup = new float[4];
-		
 		MojoShader.MOJOSHADER_symbol[] symbols;
 		MojoShader.MOJOSHADER_sampler[] samplers;
 		
@@ -67,6 +65,8 @@ namespace Microsoft.Xna.Framework.Graphics
 				
 				symbols = DXHelper.UnmarshalArray<MojoShader.MOJOSHADER_symbol>(
 						parseData.symbols, parseData.symbol_count);
+				
+				Array.Sort (symbols, (a, b) => a.register_index.CompareTo(b.register_index));
 				
 				samplers = DXHelper.UnmarshalArray<MojoShader.MOJOSHADER_sampler>(
 						parseData.samplers, parseData.sampler_count);
@@ -138,13 +138,20 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 		
-		public void PopulateUniforms(EffectParameterCollection parameters, Viewport vp) {
+		
+		public void Apply(uint program,
+		                  EffectParameterCollection parameters,
+		                  Viewport vp,
+		                  TextureCollection textures) {
+			
+			//Populate the uniform register arrays
+			
 			//TODO: not necessarily packed contiguously, get info from mojoshader somehow
 			int bool_index = 0;
 			int float4_index = 0;
 			int int4_index = 0;
 			
-			//only populate modofied stuff?
+			//only populate modified stuff?
 			foreach (MojoShader.MOJOSHADER_symbol symbol in symbols) {
 				//todo: support array parameters
 				EffectParameter parameter = parameters[symbol.name];
@@ -183,16 +190,9 @@ namespace Microsoft.Xna.Framework.Graphics
 				}
 			}
 			
-			//calc data for directx projection fix
-			if (shaderType == ShaderType.VertexShader) {
-				posFixup[0] = 1.0f;
-				posFixup[1] = 1.0f;
-				posFixup[2] = (63.0f / 64.0f) / vp.Width;
-				posFixup[3] = -(63.0f / 64.0f) / vp.Height;
-			}
-		}
-		
-		public void UploadUniforms(uint program) {
+			
+			//Upload the uniforms
+			
 			string prefix;
 			switch(shaderType) {
 			case ShaderType.FragmentShader:
@@ -219,35 +219,53 @@ namespace Microsoft.Xna.Framework.Graphics
 				GL.Uniform1 (bool_loc, uniforms_bool_count, uniforms_bool);
 			}
 			
-			//Send data for directx projection fix
-			if (shaderType == ShaderType.VertexShader) {
-				int posFixup_loc = GL.GetUniformLocation (program, "posFixup");
-				GL.Uniform4 (posFixup_loc, 1, posFixup);
-			}
-		}
-		
-		public void ActivateTextures(uint program, TextureCollection textures) {
-			foreach (MojoShader.MOJOSHADER_sampler sampler in samplers) {
-				int loc = GL.GetUniformLocation (program, sampler.name);
-				
-				//set the sampler texture slot
-				GL.Uniform1 (loc, sampler.index);
-				
-				if (sampler.type == MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_2D) {
-					//are smapler indexes normal texture indexes?
+			if (shaderType == ShaderType.FragmentShader) {
+				//activate textures
+				foreach (MojoShader.MOJOSHADER_sampler sampler in samplers) {
+					int loc = GL.GetUniformLocation (program, sampler.name);
 					
-					if (sampler.index >= textures._textures.Count) {
-						continue;
-					}
+					//set the sampler texture slot
+					GL.Uniform1 (loc, sampler.index);
 					
-					Texture tex = textures [sampler.index];
-					GL.ActiveTexture( (TextureUnit)((int)TextureUnit.Texture0 + sampler.index) );
-					
-					//just to tex.Apply() instead?
-					GL.BindTexture (TextureTarget.Texture2D, tex._textureId);
-					
-				}
+					if (sampler.type == MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_2D) {
+						MojoShader.MOJOSHADER_symbol? samplerSymbol;
+						foreach (MojoShader.MOJOSHADER_symbol symbol in symbols) {
+							if (symbol.register_set ==
+							    	MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_SAMPLER &&
+							    symbol.register_index == sampler.index) {
+								
+								samplerSymbol = symbol;
+								break;
+							}
+						}
+						
+						Texture2D tex = null;
+						if (samplerSymbol.HasValue) {
+							DXEffectObject.d3dx_sampler samplerState =
+								(DXEffectObject.d3dx_sampler)parameters[samplerSymbol.Value.name].data;
+							if (samplerState.state_count > 0) {
+								string textureName = samplerState.states[0].parameter.name;
+								EffectParameter textureParameter = parameters[textureName];
+								tex = (Texture2D)textureParameter.data;
+							}
+						}
+						if (tex == null) {
+							//texutre 0 will be set in drawbatch :/
+							if (sampler.index == 0) {
+								continue;
+							}
+							//are smapler indexes always normal texture indexes?
+							tex = (Texture2D)textures [sampler.index];
+						}
 
+						GL.ActiveTexture( (TextureUnit)((int)TextureUnit.Texture0 + sampler.index) );
+						
+						//just to tex.Apply() instead?
+						GL.BindTexture (TextureTarget.Texture2D, tex._textureId);
+						
+					}
+	
+				}
 			}
 		}
 		

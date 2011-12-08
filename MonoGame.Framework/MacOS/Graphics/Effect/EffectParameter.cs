@@ -20,7 +20,9 @@ namespace Microsoft.Xna.Framework.Graphics
 		EffectAnnotationCollection annotations;
 		Effect _parentEffect;
 		
-		bool isShader = false;
+		internal bool rawParameter = false;
+		internal DXEffectObject.D3DXPARAMETER_TYPE rawType;
+		
 		internal object data;
 		
 		internal EffectParameter( DXEffectObject.d3dx_parameter parameter )
@@ -77,14 +79,11 @@ namespace Microsoft.Xna.Framework.Graphics
 			case DXEffectObject.D3DXPARAMETER_TYPE.TEXTURECUBE:
 				paramType = EffectParameterType.TextureCube;
 				break;
-			case DXEffectObject.D3DXPARAMETER_TYPE.PIXELSHADER:
-			case DXEffectObject.D3DXPARAMETER_TYPE.VERTEXSHADER:
-				//we handle these specially in this class for convenience
-				isShader = true;
-				break;
 			default:
+				//we need types not normally exposed in XNA for internal use
+				rawParameter = true;
+				rawType = parameter.type;
 				break;
-				//throw new NotSupportedException();
 			}
 			name = parameter.name;
 			rowCount = (int)parameter.rows;
@@ -110,8 +109,8 @@ namespace Microsoft.Xna.Framework.Graphics
 					structMembers._parameters.Add (member);
 				}
 			} else {
-				if (isShader) {
-					data = new DXShader((byte[])parameter.data);
+				if (rawParameter) {
+					data = parameter.data;
 				} else {
 					//interpret data
 					switch (paramClass) {
@@ -351,7 +350,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void SetValue (Texture value)
 		{
-			throw new NotImplementedException();
+			//throw new NotImplementedException();
+			data = value;
 		}
 
 		public void SetValue (Vector2 value)

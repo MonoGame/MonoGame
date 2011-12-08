@@ -17,7 +17,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		DepthStencilState _depthStencilState; 
 		RasterizerState _rasterizerState;		
 		Effect _effect;	
-		SpriteEffect spriteEffect;
+		Effect spriteEffect;
 		Matrix _matrix;
 		Rectangle tempRect = new Rectangle (0,0,0,0);
 		Vector2 texCoordTL = new Vector2 (0,0);
@@ -30,7 +30,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			}	
 
 			this.graphicsDevice = graphicsDevice;
-			spriteEffect = new SpriteEffect (this.graphicsDevice);	
+			//use a custon SpriteEffect so we can control the transformation matrix
+			spriteEffect = new Effect (this.graphicsDevice, SpriteEffectCode.Code);	
 			_batcher = new SpriteBatcher ();
 		}
 
@@ -49,14 +50,15 @@ namespace Microsoft.Xna.Framework.Graphics
 			_depthStencilState = depthStencilState ?? DepthStencilState.None;
 			_rasterizerState = rasterizerState ?? RasterizerState.CullCounterClockwise;
 
-			//if (effect != null)
-				_effect = effect;
-			
-			if (_effect == null) {
-				spriteEffect.CurrentTechnique.Passes [0].Apply ();
-			}
+			_effect = effect;
 			
 			_matrix = transformMatrix;
+			
+			
+			if (sortMode == SpriteSortMode.Immediate) {
+				//setup effects now so a user can chage them
+				SetupEffects();
+			}
 		}
 
 		public void Begin (SpriteSortMode sortMode, BlendState blendState)
@@ -77,7 +79,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void End ()
 		{	
-			
+			if (_sortMode != SpriteSortMode.Immediate) {
+				SetupEffects ();
+			}
 			Flush ();
 			
 			// clear out the textures
@@ -91,10 +95,18 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		}
 		
-		void Flush() {
-			// apply the custom effect if there is one
-			if (_effect != null) {
-				_effect.CurrentTechnique.Passes [0].Apply ();
+		void SetupEffects () {
+			if (_effect == null) {
+				Viewport vp = graphicsDevice.Viewport;
+				Matrix projection = Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, 0, 1);
+				Matrix halfPixelOffset = Matrix.CreateTranslation(-0.5f, -0.5f, 0);
+				Matrix transform = _matrix * (halfPixelOffset * projection);
+				spriteEffect.Parameters["MatrixTransform"].SetValue (transform);
+				
+				spriteEffect.CurrentTechnique.Passes[0].Apply();
+			} else {
+				// apply the custom effect if there is one
+				_effect.CurrentTechnique.Passes[0].Apply ();
 				/*
 				if (graphicsDevice.Textures._textures.Count > 0) {
 					foreach (EffectParameter ep in _effect._textureMappings) {
@@ -111,6 +123,9 @@ namespace Microsoft.Xna.Framework.Graphics
 					}
 				}*/
 			}
+		}
+		
+		void Flush() {
 
 			// Disable Blending by default = BlendState.Opaque
 			//GL.Disable (EnableCap.Blend);
@@ -135,7 +150,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			// set camera
 			GL.MatrixMode (MatrixMode.Projection);
 			GL.LoadIdentity ();		
-
+			
+			
 			// Switch on the flags.
 			switch (this.graphicsDevice.PresentationParameters.DisplayOrientation) {
 			case DisplayOrientation.LandscapeLeft:
@@ -170,17 +186,17 @@ namespace Microsoft.Xna.Framework.Graphics
 			if (this.graphicsDevice.RasterizerState.ScissorTestEnable) {
 				GL.Enable (EnableCap.ScissorTest);				
 			}
-
+			
+			
 			GL.MatrixMode (MatrixMode.Modelview);
 
 			GL.Viewport (0, 0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height);
-
+			 
+			 
 			// Enable Scissor Tests if necessary
 			if (this.graphicsDevice.RasterizerState.ScissorTestEnable) {
 				GL.Scissor (this.graphicsDevice.ScissorRectangle.X, this.graphicsDevice.ScissorRectangle.Y, this.graphicsDevice.ScissorRectangle.Width, this.graphicsDevice.ScissorRectangle.Height);
 			}
-
-			GL.LoadMatrix (ref _matrix.M11);
 
 			// Initialize OpenGL states (ideally move this to initialize somewhere else)
 			GLStateManager.SetDepthStencilState(_depthStencilState);
@@ -188,10 +204,10 @@ namespace Microsoft.Xna.Framework.Graphics
 			//GL.Disable (EnableCap.DepthTest);
 			
 			GL.TexEnv (TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)All.BlendSrc);
-			GL.Enable (EnableCap.Texture2D);
-			GL.EnableClientState (ArrayCap.VertexArray);
-			GL.EnableClientState (ArrayCap.ColorArray);
-			GL.EnableClientState (ArrayCap.TextureCoordArray);
+			GLStateManager.Textures2D(true);
+			GLStateManager.VertexArray(true);
+			GLStateManager.ColorArray(true);
+			GLStateManager.TextureCoordArray(true);
 
 			// Enable Culling for better performance
 			GL.Enable (EnableCap.CullFace);
