@@ -42,7 +42,7 @@ using System;
 
 namespace Microsoft.Xna.Framework
 {   
-    public class GameComponent : IGameComponent, IComparable<GameComponent>, IDisposable
+    public class GameComponent : IGameComponent, IUpdateable, IComparable<GameComponent>, IDisposable
     {
         Game _game;
         int _updateOrder;

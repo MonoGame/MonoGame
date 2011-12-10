@@ -346,6 +346,7 @@
     <Compile Include="Graphics\Vertices\IndexElementSize.cs" />
     <Compile Include="Audio\XactSound.cs" />
     <Compile Include="Audio\XactClip.cs" />
+    <Compile Include="Shared\Game.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />
@@ -358,13 +359,13 @@
     <Folder Include="MacOS\Audio\" />
     <Folder Include="Media\" />
     <Folder Include="MacOS\Content\" />
-    <Folder Include="MacOS\Graphics\" />
     <Folder Include="MacOS\Media\" />
     <Folder Include="MacOS\Graphics\States\" />
     <Folder Include="MacOS\Graphics\Effect\" />
     <Folder Include="MacOS\Input\" />
     <Folder Include="MacOS\GamerServices\" />
     <Folder Include="MacOS\Storage\" />
+    <Folder Include="Shared\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.MacOS.csproj">

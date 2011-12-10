@@ -119,7 +119,7 @@ namespace Microsoft.Xna.Framework.Media
 				_video.MovieView.Play(new NSObject());	
 				
 				_state = MediaState.Playing;
-				Game._playingVideo = true;
+				_game.IsPlayingVideo = true;
 			}
 		}
 
@@ -137,7 +137,7 @@ namespace Microsoft.Xna.Framework.Media
 				_video.MovieView.Pause(o);
 				_video.MovieView.GotoBeginning(o);
 				_state = MediaState.Stopped;
-				Game._playingVideo = false;
+				_game.IsPlayingVideo = false;
 				_video.MovieView.RemoveFromSuperview();
 			}
         }

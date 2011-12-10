@@ -170,7 +170,7 @@ namespace Microsoft.Xna.Framework
 		{
 			
 			var manager = game.Services.GetService (typeof(IGraphicsDeviceManager)) as GraphicsDeviceManager;
-			if (game._initialized)
+			if (game.Initialized)
 				manager.OnDeviceResetting(EventArgs.Empty);
 			
 			Microsoft.Xna.Framework.Graphics.Viewport _vp =
@@ -188,7 +188,7 @@ namespace Microsoft.Xna.Framework
 			base.OnResize (e);
 			OnClientSizeChanged(e);
 			
-			if (game._initialized)
+			if (game.Initialized)
 				manager.OnDeviceReset(EventArgs.Empty);
 		}
 		
@@ -389,10 +389,10 @@ namespace Microsoft.Xna.Framework
 
 		public bool AllowUserResizing {
 			get {
-				return game.IsAllowUserResizing;
+				return game.AllowUserResizing;
 			}
 			set {
-				game.IsAllowUserResizing = value;
+				game.AllowUserResizing = value;
 			}
 		}	
 
