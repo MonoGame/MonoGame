@@ -422,9 +422,8 @@ namespace Microsoft.Xna.Framework
         private void CategorizeComponents()
         {
             DecategorizeComponents();
-            // FIXME: Try to eliminate foreach (IEnumerable instances)
-            foreach (var component in Components)
-                CategorizeComponent(component);
+            for (int i = Components.Count - 1; i >= 0; --i)
+                CategorizeComponent(Components[i]);
         }
 
         // FIXME: I am open to a better name for this method.  It does the
@@ -504,11 +503,12 @@ namespace Microsoft.Xna.Framework
                     ProcessRemoveJournal();
                     ProcessAddJournal();
 
+                    // Rebuild the cache
                     _cachedFilteredItems.Clear();
-                    // FIXME: foreach results in a needless IEnumerable instance
-                    foreach (var item in _items)
+                    _items.ForEach(item => {
                         if (_filter(item))
                             _cachedFilteredItems.Add(item);
+                    });
 
                     _shouldRebuildCache = false;
                 }
@@ -548,12 +548,10 @@ namespace Microsoft.Xna.Framework
 
             public void Clear()
             {
-                // FIXME: foreach results in needless IEnumerable instances
-                foreach (var item in _items)
-                {
+                _items.ForEach(item => {
                     _filterChangedUnsubscriber(item, Item_FilterPropertyChanged);
                     _sortChangedUnsubscriber(item, Item_SortPropertyChanged);
-                }
+                });
 
                 _addJournal.Clear();
                 _removeJournal.Clear();
@@ -567,16 +565,11 @@ namespace Microsoft.Xna.Framework
                 if (_removeJournal.Count == 0)
                     return;
 
-                // Sort high to low
-                _removeJournal.Sort((x, y) => y - x);
-
                 // Remove items in reverse.  (Technically there exist faster
                 // ways to bulk-remove from a variable-length array, but List<T>
                 // does not provide such a method.)
-                // FIXME: foreach results in a needless IEnumerable instance
-                foreach (var index in _removeJournal)
-                    _items.RemoveAt(index);
-
+                _removeJournal.Sort((x, y) => y - x); // Sort high to low
+                _removeJournal.ForEach(index => { _items.RemoveAt(index); });
                 _removeJournal.Clear();
             }
 
