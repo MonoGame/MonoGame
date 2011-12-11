@@ -301,9 +301,7 @@ namespace Microsoft.Xna.Framework
             if (!PlatformBeforeDraw(gameTime))
                 return;
 
-            // FIXME: try to eliminate the creation of IEnumerable objects
-            foreach (var drawable in _drawables.GetFilteredItems())
-                drawable.Draw(gameTime);
+            _drawables.ForEachFilteredItem(d => d.Draw(gameTime));
         }
 
         protected virtual void Update(GameTime gameTime)
@@ -311,9 +309,7 @@ namespace Microsoft.Xna.Framework
             if (!PlatformBeforeUpdate(gameTime))
                 return;
 
-            // FIXME: try to eliminate the creation of IEnumerable objects
-            foreach (var updateable in _updateables.GetFilteredItems())
-                updateable.Update(gameTime);
+            _updateables.ForEachFilteredItem(u => u.Update(gameTime));
         }
 
         #endregion Protected Methods
@@ -464,7 +460,7 @@ namespace Microsoft.Xna.Framework
                 handler(this, e);
         }
 
-        private class SortingFilteringCollection<T> : IComparer<T>
+        class SortingFilteringCollection<T> : IComparer<T>
         {
             private List<T> _items;
             private List<T> _addJournal;
@@ -501,7 +497,7 @@ namespace Microsoft.Xna.Framework
                 _sortChangedUnsubscriber = sortChangedUnsubscriber;
             }
 
-            public IEnumerable<T> GetFilteredItems()
+            public void ForEachFilteredItem(Action<T> action)
             {
                 if (_shouldRebuildCache)
                 {
@@ -517,11 +513,7 @@ namespace Microsoft.Xna.Framework
                     _shouldRebuildCache = false;
                 }
 
-                // FIXME: foreach results in a needless IEnumerable instance.
-                //        Using indexes would be uglier, but it would give the
-                //        GC less to do.
-                foreach (var item in _cachedFilteredItems)
-                    yield return item;
+                _cachedFilteredItems.ForEach(action);
 
                 // If the cache was invalidated as a result of processing items,
                 // now is a good time to clear it and give the GC (more of) a
@@ -603,7 +595,9 @@ namespace Microsoft.Xna.Framework
                 while (iItems < _items.Count && iAddJournal < _addJournal.Count)
                 {
                     var addJournalItem = _addJournal[iAddJournal];
-                    if (_sort(_items[iItems], addJournalItem) < 0)
+                    // If addJournalItem is less than (belongs before)
+                    // _items[iItems], insert it.
+                    if (_sort(addJournalItem, _items[iItems]) < 0)
                     {
                         SubscribeToItemEvents(addJournalItem);
                         _items.Insert(iItems, addJournalItem);
@@ -671,4 +665,3 @@ namespace Microsoft.Xna.Framework
         }
     }
 }
-
