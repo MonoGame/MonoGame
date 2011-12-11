@@ -98,6 +98,8 @@ namespace Microsoft.Xna.Framework
         partial void PlatformRun();
         partial void PlatformGoFullScreen();
         partial void PlatformGoWindowed();
+        partial void PlatformEnterForeground();
+        partial void PlatformEnterBackground();
 
         #region Properties
 
@@ -303,7 +305,7 @@ namespace Microsoft.Xna.Framework
 
         protected virtual void Draw(GameTime gameTime)
         {
-            if (!PlatformBeforeDraw(gameTime))
+            if (!PlatformBeforeDraw(gameTime) || _playingVideo)
                 return;
 
             _drawables.ForEachFilteredItem(d => d.Draw(gameTime));

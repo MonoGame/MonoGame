@@ -97,11 +97,13 @@ namespace Microsoft.Xna.Framework
             _gameWindow.Run(FramesPerSecond / (FramesPerSecond * TargetElapsedTime.TotalSeconds));
         }
 
+        private bool PlatformBeforeRun()
+        {
+            return true;
+        }
+
         private bool PlatformBeforeDraw(GameTime gameTime)
         {
-            // If a video is currenty playing, prevent the normal draw loop.
-            if (_isPlayingVideo)
-                return false;
             return true;
         }
 
@@ -114,11 +116,10 @@ namespace Microsoft.Xna.Framework
             NSApplication.SharedApplication.Terminate(new NSObject());
         }
 
-        private bool _isPlayingVideo = false;
         internal bool IsPlayingVideo
         {
-            get { return _isPlayingVideo; }
-            set { _isPlayingVideo = value; }
+            get { return _playingVideo; }
+            set { _playingVideo = value; }
         }
 
         internal bool AllowUserResizing

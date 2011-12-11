@@ -93,8 +93,8 @@ namespace Microsoft.Xna.Framework
                 return view;
             }
         }
-		
-		void PlatformEnterBackground()
+
+        partial void PlatformEnterBackground()
     	{
             if (_isActive)
             {
@@ -105,7 +105,7 @@ namespace Microsoft.Xna.Framework
             }
 		}
 		
-		void PlatformEnterForeground()
+		partial void PlatformEnterForeground()
     	{
             if (!_isActive)
             {

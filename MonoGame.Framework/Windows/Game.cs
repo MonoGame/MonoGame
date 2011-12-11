@@ -91,6 +91,11 @@ namespace Microsoft.Xna.Framework
             }
         }
 
+        private bool PlatformBeforeRun()
+        {
+            return true;
+        }
+
         private bool PlatformBeforeDraw(GameTime gameTime)
         {
             return true;
