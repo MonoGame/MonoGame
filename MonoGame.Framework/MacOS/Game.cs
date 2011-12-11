@@ -134,8 +134,8 @@ namespace Microsoft.Xna.Framework
             set { _shouldDraw = value; }
         }
 
-        private void PlatformIsMouseVisibleChanging(bool value) { }
-        private void PlatformIsMouseVisibleChanged()
+        partial void PlatformIsMouseVisibleChanging(bool value) { }
+        partial void PlatformIsMouseVisibleChanged()
         {
             _mainWindow.InvalidateCursorRectsForView(_gameWindow);
         }
@@ -182,6 +182,12 @@ namespace Microsoft.Xna.Framework
             parms.BackBufferWidth = (int)content.Size.Width;
         }
 
+        // FIXME: Internal methods are not ideal.
+        internal void InternalGoWindowed()
+        {
+            PlatformGoWindowed();
+        }
+
         partial void PlatformGoWindowed()
         {
             _wasResizeable = AllowUserResizing;
@@ -217,6 +223,12 @@ namespace Microsoft.Xna.Framework
             Mouse.ResetMouse();
 
             ShouldDraw = wasActive;
+        }
+
+        // FIXME: Internal methods are not ideal.
+        internal void InternalGoFullScreen()
+        {
+            PlatformGoFullScreen();
         }
 
         partial void PlatformGoFullScreen()

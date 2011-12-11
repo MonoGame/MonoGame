@@ -201,9 +201,9 @@ namespace Microsoft.Xna.Framework
 					_graphicsDevice.PresentationParameters = presParams;
 
 					if (value && !wasFullScreen) {
-						_game.GoFullScreen();
+						_game.InternalGoFullScreen();
 					} else if (!value && wasFullScreen) {
-						_game.GoWindowed();
+						_game.InternalGoWindowed();
 					}
 				}
 			}
