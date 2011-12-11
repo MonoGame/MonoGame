@@ -18,6 +18,12 @@ namespace Microsoft.Xna.Framework
     {
         private MacGameNSWindow _mainWindow;
         private GameWindow _gameWindow;
+        private bool _wasResizeable;
+
+        public GameWindow Window
+        {
+            get { return _gameWindow; }
+        }
 
         private void PlatformConstructor()
         {
@@ -73,17 +79,22 @@ namespace Microsoft.Xna.Framework
             };
         }
 
-        private void PlatformFinalize()
+        partial void PlatformFinalize()
         {
             // TODO NSDevice.CurrentDevice.EndGeneratingDeviceOrientationNotifications();
         }
 
-        private void PlatformDispose() { }
-
-        private void PlatformInitialize()
+        partial void PlatformInitialize()
         {
             ResetWindowBounds();
             _mainWindow.MakeKeyAndOrderFront(_mainWindow);
+        }
+
+        partial void PlatformRun()
+        {
+            // FIXME: This equation makes no sense.  It reduces to:
+            //        1/TargetElapsedTime.TotalSeconds
+            _gameWindow.Run(FramesPerSecond / (FramesPerSecond * TargetElapsedTime.TotalSeconds));
         }
 
         private bool PlatformBeforeDraw(GameTime gameTime)
@@ -96,7 +107,7 @@ namespace Microsoft.Xna.Framework
 
         private bool PlatformBeforeUpdate(GameTime gameTime) { return true; }
 
-        private void PlatformExit()
+        partial void PlatformExit()
         {
             // FIXME: Should we not simply terminate our run loop, rather than
             //        forcefully destroying the whole application?
@@ -123,17 +134,11 @@ namespace Microsoft.Xna.Framework
             set { _shouldDraw = value; }
         }
 
-        private void PlatformIsActiveChanging(bool value) { }
-        private void PlatformIsActiveChanged() { }
-
         private void PlatformIsMouseVisibleChanging(bool value) { }
         private void PlatformIsMouseVisibleChanged()
         {
             _mainWindow.InvalidateCursorRectsForView(_gameWindow);
         }
-
-        private void PlatformTargetElapsedTimeChanging(TimeSpan value) { }
-        private void PlatformTargetElapsedTimeChanged() { }
 
         private float GetTitleBarHeight()
         {
@@ -176,8 +181,11 @@ namespace Microsoft.Xna.Framework
             parms.BackBufferHeight = (int)content.Size.Height;
             parms.BackBufferWidth = (int)content.Size.Width;
         }
-        internal void GoWindowed ()
+
+        partial void PlatformGoWindowed()
         {
+            _wasResizeable = AllowUserResizing;
+
             //Changing window style forces a redraw. Some games
             //have fail-logic and toggle fullscreen in their draw function,
             //so temporarily become inactive so it won't execute.
@@ -211,9 +219,8 @@ namespace Microsoft.Xna.Framework
             ShouldDraw = wasActive;
         }
 
-        internal void GoFullScreen()
+        partial void PlatformGoFullScreen()
         {
-
             bool wasActive = ShouldDraw;
             ShouldDraw = false;
 

@@ -6,11 +6,6 @@ using System.Collections.ObjectModel;
 using System.Drawing;
 using System.IO;
 
-using MonoMac.CoreAnimation;
-using MonoMac.CoreFoundation;
-using MonoMac.Foundation;
-using MonoMac.OpenGL;
-
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
@@ -66,7 +61,6 @@ namespace Microsoft.Xna.Framework
 
         // Mac-specific variables
         private bool _shouldDraw = true;
-        private bool _wasResizeable;
 
         public Game()
         {
@@ -89,6 +83,20 @@ namespace Microsoft.Xna.Framework
             PlatformDispose();
             Raise(Disposed, EventArgs.Empty);
         }
+
+        partial void PlatformFinalize();
+        partial void PlatformDispose();
+        partial void PlatformIsActiveChanging(bool value);
+        partial void PlatformIsActiveChanged();
+        partial void PlatformIsMouseVisibleChanging(bool value);
+        partial void PlatformIsMouseVisibleChanged();
+        partial void PlatformTargetElapsedTimeChanging(TimeSpan value);
+        partial void PlatformTargetElapsedTimeChanged();
+        partial void PlatformExit();
+        partial void PlatformInitialize();
+        partial void PlatformRun();
+        partial void PlatformGoFullScreen();
+        partial void PlatformGoWindowed();
 
         #region Properties
 
@@ -153,10 +161,6 @@ namespace Microsoft.Xna.Framework
         {
             get { return _isFixedTimeStep; }
             set { _isFixedTimeStep = value; }
-        }
-
-        public GameWindow Window {
-            get { return _gameWindow; }
         }
 
         public GameServiceContainer Services {
@@ -251,9 +255,7 @@ namespace Microsoft.Xna.Framework
             _initialized = true;
 
             BeginRun();
-            // FIXME: This equation makes no sense.  It reduces to:
-            //        1/TargetElapsedTime.TotalSeconds
-            _gameWindow.Run(FramesPerSecond / (FramesPerSecond * TargetElapsedTime.TotalSeconds));
+            PlatformRun();
 
             // FIXME: Is Run() blocking on all (any??) platforms?  Or should
             //        EndRun be called in a platform-specific way?
@@ -351,12 +353,11 @@ namespace Microsoft.Xna.Framework
 
             if (GraphicsDevice.PresentationParameters.IsFullScreen)
             {
-                GoFullScreen();
+                PlatformGoFullScreen();
             }
             else
             {
-                _wasResizeable = AllowUserResizing;
-                GoWindowed();
+                PlatformGoWindowed();
             }
         }
 

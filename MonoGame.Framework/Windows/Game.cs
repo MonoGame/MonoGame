@@ -51,421 +51,55 @@ using OpenTK;
 
 namespace Microsoft.Xna.Framework
 {
-    public class Game : IDisposable
+    public partial class Game
     {
-		private const float FramesPerSecond = 60.0f; // ~60 frames per second
-		
-        private GameTime _updateGameTime;
-        private GameTime _drawGameTime;
-        private DateTime _lastUpdate;
-        private bool _initialized = false;
-		private bool _initializing = false;
-		private bool _isActive = true;
-        private GameComponentCollection _gameComponentCollection;
-        public GameServiceContainer _services;
-        private ContentManager _content;
         private WindowsGameWindow _view;
-		private bool _isFixedTimeStep = true;
-        private TimeSpan _targetElapsedTime = TimeSpan.FromSeconds(1 / FramesPerSecond);
 
-        private IGraphicsDeviceManager _graphicsDeviceManager;
-        internal IGraphicsDeviceService graphicsDeviceService;
-        private bool _devicesLoaded;
-
-		internal static bool _playingVideo = false;
-		private SpriteBatch spriteBatch;
-		private Texture2D splashScreen;
-		
-		delegate void InitialiseGameComponentsDelegate();
-       
-
-		public Game()
+		private void PlatformConstructor()
 		{
-
-			// Initialize collections
-			_services = new GameServiceContainer();
-			_gameComponentCollection = new GameComponentCollection();
-
             _view = new WindowsGameWindow();            
-			_view.Game = this;			
-					
-			// Initialize GameTime
-            _updateGameTime = new GameTime();
-            _drawGameTime = new GameTime();
-		}
-		
-		~Game()
-		{
-			
+			_view.Game = this;
 		}
 
-		public void Dispose ()
-		{
-			// do nothing
-		}
-
-    
-        public bool IsActive
+        public GameWindow Window
         {
-            get
-			{
-				return _isActive;
-			}
-			protected set
-			{
-				if (_isActive != value )
-				{
-					_isActive = value;
-				}
-			}
+            get { return _view; }
         }
 
-        public bool IsMouseVisible
-        {
-            get
-			{
-				return false;
-			}
-            set
-			{
-				// do nothing; ignore
-			}
-        }
-
-        public TimeSpan TargetElapsedTime
-        {
-            get
-            {
-                return _targetElapsedTime;
-            }
-            set
-            {
-                _targetElapsedTime = value;			
-				if(_initialized) {
-					throw new NotSupportedException();
-				}
-            }
-        }
-		
-        public void Run()
-    	{			
-			_lastUpdate = DateTime.Now;
-
-            // In an original XNA game the GraphicsDevice property is null during initialization
-            // but before the Game's Initialize method is called the property is available so we can
-            // only assume that it should be created somewhere in here.  We can not set the viewport 
-            // values correctly based on the Preferred settings which is causing some problems on some
-            // Microsoft samples which we are not handling correctly.
-
-            graphicsDeviceManager.CreateDevice();
-
-            var manager = Services.GetService(typeof(IGraphicsDeviceManager)) as GraphicsDeviceManager;
-
-            Microsoft.Xna.Framework.Graphics.Viewport _vp =
-            new Microsoft.Xna.Framework.Graphics.Viewport();
-
-            _vp.X = 0;
-            _vp.Y = 0;
-            _vp.Width = manager.PreferredBackBufferWidth;
-            _vp.Height = manager.PreferredBackBufferHeight;
-
-            GraphicsDevice.Viewport = _vp;
-
+        partial void PlatformRun()
+    	{
             //Need to execute this on the rendering thread
-            _view.OpenTkGameWindow.RenderFrame += delegate
+            // FIXME: Is this needed?
+            /*_view.OpenTkGameWindow.RenderFrame += delegate
             {
                 if (!_devicesLoaded)
                 {
                     Initialize();
                     _devicesLoaded = true;
                 }
-            };
+            };*/
 
             _view.OpenTkGameWindow.Run(FramesPerSecond / (FramesPerSecond * TargetElapsedTime.TotalSeconds));	
         }
-		
-		internal void DoUpdate(GameTime aGameTime)
-		{
-            if (!_devicesLoaded)
-                return;
 
-			if (_isActive)
-			{
-				Update(aGameTime);
-			}
-		}
-		
-		internal void DoDraw(GameTime aGameTime)
-		{
-            if (!_devicesLoaded)
-                return;
-
-			if (_isActive)
-			{
-                // Ok Based on these two messages the Draw and EndDraw should not be called
-                // if BeginDraw returns false.
-                // http://stackoverflow.com/questions/4054936/manual-control-over-when-to-redraw-the-screen/4057180#4057180
-                // http://stackoverflow.com/questions/4235439/xna-3-1-to-4-0-requires-constant-redraw-or-will-display-a-purple-screen 
-                if (BeginDraw())
-                {
-                    Draw(aGameTime);
-                    EndDraw();
-                }
-			}
-		}
-		
-		internal void DoStep()
-		{
-			var timeNow = DateTime.Now;
-			
-			// Update the game			
-            _updateGameTime.Update(timeNow - _lastUpdate);
-            Update(_updateGameTime);
-
-            // Draw the screen
-            _drawGameTime.Update(timeNow - _lastUpdate);
-            _lastUpdate = timeNow;
-            Draw(_drawGameTime);       			
-		}
-
-        public bool IsFixedTimeStep
-        {
-            get
-			{
-				return _isFixedTimeStep;
-			}
-            set
-			{
-				_isFixedTimeStep = value;
-			}
-        }
-
-        public GameWindow Window
-        {
-            get
-            {
-                return _view;
-            }
-        }
-		
-		public void ResetElapsedTime()
-        {
-            _lastUpdate = DateTime.Now;
-        }
-
-
-        public GameServiceContainer Services
-        {
-            get
-            {
-                return _services;
-            }
-		}
-
-        public ContentManager Content
-        {
-            get
-            {
-                if (_content == null)
-                {
-                    _content = new ContentManager(_services);
-                }
-                return _content;
-            }
-        }
-
-        private GraphicsDeviceManager graphicsDeviceManager
-        {
-            get
-            {
-                if (this._graphicsDeviceManager == null)
-                {
-                    this._graphicsDeviceManager = this.Services.GetService(typeof(IGraphicsDeviceManager)) as IGraphicsDeviceManager;
-                    if (this._graphicsDeviceManager == null)
-                    {
-                        throw new InvalidOperationException("No Graphics Device Manager");
-                    }
-                }
-                return (GraphicsDeviceManager)this._graphicsDeviceManager;
-            }
-        }
-		
-
-        public GraphicsDevice GraphicsDevice
-        {
-            get
-            {
-                if (this.graphicsDeviceService == null)
-                {
-                    this.graphicsDeviceService = this.Services.GetService(typeof(IGraphicsDeviceService)) as IGraphicsDeviceService;
-                    if (this.graphicsDeviceService == null)
-                    {
-                        throw new InvalidOperationException("No Graphics Device Service");
-                    }
-                }
-                return this.graphicsDeviceService.GraphicsDevice;
-            }
-        }
-		
-		public void EnterBackground()
-    	{
-			_isActive = false;
-			 if (Deactivated != null)
-                Deactivated.Invoke(this, null);
-		}
-		
-		public void EnterForeground()
-    	{
-			_isActive = true;
-			if (Activated != null)
-                Activated.Invoke(this, null);
-		}
-		
-		protected virtual bool BeginDraw()
-		{
-			return true;
-		}
-		
-		protected virtual void EndDraw()
-		{
-			
-		}
-		
-		protected virtual void LoadContent()
-		{			
-			string DefaultPath = "Default.png";
-			if (File.Exists(DefaultPath))
-			{
-				// Store the RootDir for later 
-				string backup = Content.RootDirectory;
-				
-				try 
-				{
-					// Clear the RootDirectory for this operation
-					Content.RootDirectory = string.Empty;
-					
-					spriteBatch = new SpriteBatch(GraphicsDevice);
-					splashScreen = Content.Load<Texture2D>(DefaultPath);			
-				}
-				finally 
-				{
-					// Reset RootDir
-					Content.RootDirectory = backup;
-				}
-				
-			}
-			else
-			{
-				spriteBatch = null;
-				splashScreen = null;
-			}
-		}
-		
-		protected virtual void UnloadContent()
-		{
-			// do nothing
-		}
-		
-        protected virtual void Initialize()
-        {
-			this.graphicsDeviceService = this.Services.GetService(typeof(IGraphicsDeviceService)) as IGraphicsDeviceService;			
-
-			if ((this.graphicsDeviceService != null) && (this.graphicsDeviceService.GraphicsDevice != null))
-            {
-                LoadContent();
-            }
-        }
-		
-		private void InitializeGameComponents()
-		{
-			foreach (GameComponent gc in _gameComponentCollection)
-            {                
-                gc.Initialize();
-            }
-		}
-
-        protected virtual void Update(GameTime gameTime)
-        {
-			if ( _initialized)
-			{
-				foreach (GameComponent gc in _gameComponentCollection)			
-				{
-					if (gc.Enabled)
-	                {
-	                    gc.Update(gameTime);
-	                }
-	            }
-			}
-			else
-			{
-				if (!_initializing) 
-				{                    
-                    _initializing = true;
-
-                    InitializeGameComponents();
-                    _initialized = true;
-                    _initializing = false;                                        
-				}
-			}
-        }
-		
-        protected virtual void Draw(GameTime gameTime)
-        {
-			if ( _initializing )
-			{
-				if ( spriteBatch != null )
-				{
-					spriteBatch.Begin();
-					
-					// We need to turn this into a progress bar or animation to give better user feedback
-					spriteBatch.Draw(splashScreen, new Vector2(0, 0), Color.White );
-					spriteBatch.End();
-				}
-			}
-			else
-			{
-				if (!_playingVideo) 
-				{
-		            foreach (GameComponent gc in _gameComponentCollection)
-		            {
-		                if (gc.Enabled && gc is DrawableGameComponent)
-		                {
-		                    DrawableGameComponent dc = gc as DrawableGameComponent;
-		                    if (dc.Visible)
-		                    {
-		                        dc.Draw(gameTime);
-		                    }
-		                }
-		            }
-				}
-			}
-        }
-
-        public void Exit()
+        partial void PlatformExit()
         {
             if (!_view.OpenTkGameWindow.IsExiting)
             {
-                // raise the Exiting event
-            	if (Exiting != null) Exiting(this, null);                
                 Net.NetworkSession.Exit();
                 _view.OpenTkGameWindow.Exit();
             }
         }
 
-        public GameComponentCollection Components
+        private bool PlatformBeforeDraw(GameTime gameTime)
         {
-            get
-            {
-                return _gameComponentCollection;
-            }
+            return true;
         }
-		
-		#region Events
-		public event EventHandler Activated;
-		public event EventHandler Deactivated;
-		public event EventHandler Disposed;
-		public event EventHandler Exiting;
-        #endregion
+
+        private bool PlatformBeforeUpdate(GameTime gameTime)
+        {
+            return true;
+        }
     }
 }
 
