@@ -56,6 +56,7 @@ namespace Microsoft.Xna.Framework
         private bool _isActive = false;
         private bool _isFixedTimeStep = true;
         private bool _isMouseVisible = false;
+        static internal bool _playingVideo = false;
 
         private TimeSpan _targetElapsedTime = TimeSpan.FromSeconds(1 / FramesPerSecond);
 
@@ -250,7 +251,9 @@ namespace Microsoft.Xna.Framework
             _components.ComponentAdded += Components_ComponentAdded;
             _components.ComponentRemoved += Components_ComponentRemoved;
 
-            PlatformInitialize();
+            if (!PlatformBeforeRun())
+                return;
+
             Initialize();
             _initialized = true;
 
@@ -277,6 +280,8 @@ namespace Microsoft.Xna.Framework
 
         protected virtual void Initialize()
         {
+            PlatformInitialize();
+
             // According to the information given on MSDN (see link below), all
             // GameComponents in Components at the time Initialize() is called
             // are initialized.
@@ -381,18 +386,20 @@ namespace Microsoft.Xna.Framework
         internal void EnterForeground()
         {
             _shouldDraw = true;
+            PlatformEnterForeground();
             Raise(Activated, EventArgs.Empty);
         }
 
         internal void EnterBackground()
         {
             _shouldDraw = false;
+            PlatformEnterBackground();
             Raise(Deactivated, EventArgs.Empty);
         }
 
         #endregion Internal Methods
 
-        private GraphicsDeviceManager graphicsDeviceManager
+        internal GraphicsDeviceManager graphicsDeviceManager
         {
             get
             {

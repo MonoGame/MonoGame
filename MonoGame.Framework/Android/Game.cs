@@ -58,29 +58,9 @@ using Microsoft.Xna.Framework.Audio;
 
 namespace Microsoft.Xna.Framework
 {
-    public class Game : IDisposable
+    public partial class Game : IDisposable
     {
-		private const float FramesPerSecond = 60.0f; // ~60 frames per second
-		
-        private GameTime _updateGameTime;
-        private GameTime _drawGameTime;
-        private DateTime _lastUpdate;
-		private bool _isActive = false;
-        private GameComponentCollection _gameComponentCollection;
-        public GameServiceContainer _services;
-        private ContentManager _content;
         internal AndroidGameWindow view;
-		private bool _isFixedTimeStep = true;
-        private TimeSpan _targetElapsedTime = TimeSpan.FromSeconds(1 / FramesPerSecond);
-        bool disposed;
-
-		internal IGraphicsDeviceManager graphicsDeviceManager;
-        internal IGraphicsDeviceService graphicsDeviceService;
-        private bool _devicesLoaded;
-
-		internal static bool _playingVideo = false;
-		
-		delegate void InitialiseGameComponentsDelegate();
 
 		internal static AndroidGameActivity contextInstance;
 
@@ -96,158 +76,15 @@ namespace Microsoft.Xna.Framework
 			}
 		}
 
-		public Game()
+		private void PlatformConstructor()
 		{
 			System.Diagnostics.Debug.Assert(contextInstance != null, "Must set Game.Activity before creating the Game instance");
 			contextInstance.Game = this;
 
-			// Initialize collections
-			_services = new GameServiceContainer();
-			_gameComponentCollection = new GameComponentCollection();
-
-			_content = new ContentManager(_services);
-
             view = new AndroidGameWindow(contextInstance);
-		    view.game = this;						
-			// Initialize GameTime
-            _updateGameTime = new GameTime();
-            _drawGameTime = new GameTime();
+		    view.game = this;
+			_content = new ContentManager(_services);
 		}
-		
-		~Game()
-		{
-            Dispose(false);
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            // Tell the garbage collector not to call the finalizer
-            // since all the cleanup will already be done.
-            GC.SuppressFinalize(this);
-        }
-
-        // If disposing is true, it was called explicitly.
-        // If disposing is false, it was called by the finalizer.
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposing && !disposed)
-            {
-                if (_content != null)
-                {
-                    _content.Dispose();
-                    _content = null;
-                }
-                disposed = true;
-            }
-        }
-    
-        public bool IsActive
-        {
-            get
-			{
-				return _isActive;
-			}
-			protected set
-			{
-				if (_isActive != value )
-				{
-					_isActive = value;
-				}
-			}
-        }
-
-        public bool IsMouseVisible
-        {
-            get
-			{
-				return false;
-			}
-            set
-			{
-				// do nothing; ignore
-			}
-        }
-
-        public TimeSpan TargetElapsedTime
-        {
-            get
-            {
-                return _targetElapsedTime;
-            }
-            set
-            {
-                _targetElapsedTime = value;			
-            }
-        }
-		
-        public void Run()
-    	{			
-			_lastUpdate = DateTime.Now;
-			
-			// Get the Accelerometer going
-			//TODO umcomment when the following bug is fixed 
-			// http://bugzilla.xamarin.com/show_bug.cgi?id=1084
-			// Accelerometer currently seems to have a memory leak
-			//Accelerometer.SetupAccelerometer();
-            view.Run(FramesPerSecond / (FramesPerSecond * TargetElapsedTime.TotalSeconds));	
-        }
-		
-		internal void DoUpdate(GameTime aGameTime)
-		{
-            if (!_devicesLoaded)
-            {
-                Initialize();
-                _devicesLoaded = true;
-            }
-
-            if (_isActive)
-			{
-				Update(aGameTime);
-			}
-		}
-		
-		internal void DoDraw(GameTime aGameTime)
-        { 
-			if (_isActive)
-			{
-				// Ok Based on these two messages the Draw and EndDraw should not be called
-                // if BeginDraw returns false.
-                // http://stackoverflow.com/questions/4054936/manual-control-over-when-to-redraw-the-screen/4057180#4057180
-                // http://stackoverflow.com/questions/4235439/xna-3-1-to-4-0-requires-constant-redraw-or-will-display-a-purple-screen
-                if (BeginDraw())
-                {
-                    Draw(aGameTime);
-                    EndDraw();
-                }                              
-			}
-		}
-		
-		internal void DoStep()
-		{
-			var timeNow = DateTime.Now;
-			
-			// Update the game			
-            _updateGameTime.Update(timeNow - _lastUpdate);
-            Update(_updateGameTime);
-
-            // Draw the screen
-            _drawGameTime.Update(timeNow - _lastUpdate);
-            _lastUpdate = timeNow;
-            Draw(_drawGameTime);       			
-		}
-
-        public bool IsFixedTimeStep
-        {
-            get
-			{
-				return _isFixedTimeStep;
-			}
-            set
-			{
-				_isFixedTimeStep = value;
-			}
-        }
 
         public AndroidGameWindow Window
         {
@@ -257,49 +94,7 @@ namespace Microsoft.Xna.Framework
             }
         }
 		
-		public void ResetElapsedTime()
-        {
-            _lastUpdate = DateTime.Now;
-        }
-
-
-        public GameServiceContainer Services
-        {
-            get
-            {
-                return _services;
-            }
-		}
-
-        public ContentManager Content
-        {
-            get
-            {
-				return _content;
-			}
-			set
-			{
-				_content = value;
-			}
-		}
-
-        public GraphicsDevice GraphicsDevice
-        {
-            get
-            {
-                if (this.graphicsDeviceService == null)
-                {
-                    this.graphicsDeviceService = this.Services.GetService(typeof(IGraphicsDeviceService)) as IGraphicsDeviceService;
-                    if (this.graphicsDeviceService == null)
-                    {
-                        throw new InvalidOperationException("No Graphics Device Service");
-                    }
-                }
-                return this.graphicsDeviceService.GraphicsDevice;
-            }
-        }
-		
-		public void EnterBackground()
+		void PlatformEnterBackground()
     	{
             if (_isActive)
             {
@@ -307,12 +102,10 @@ namespace Microsoft.Xna.Framework
                 view.Pause();
                 Accelerometer.Pause();
 				Sound.PauseAll();
-                if (Deactivated != null)
-                    Deactivated.Invoke(this, null);
             }
 		}
 		
-		public void EnterForeground()
+		void PlatformEnterForeground()
     	{
             if (!_isActive)
             {
@@ -320,36 +113,11 @@ namespace Microsoft.Xna.Framework
                 view.Resume();
                 Accelerometer.Resume();				
 				Sound.ResumeAll();
-                if (Activated != null)
-                    Activated.Invoke(this, null);
             }
 		}
-		
-		protected virtual bool BeginDraw()
-		{
-			return true;
-		}
-		
-		protected virtual void EndDraw()
-		{
-			
-		}
-		
-		protected virtual void LoadContent()
-		{
-            
-		}
-		
-		protected virtual void UnloadContent()
-		{
-			// do nothing
-		}
         
-        protected virtual void Initialize()
+        partial void PlatformInitialize()
         {
-			this.graphicsDeviceManager = this.Services.GetService(typeof(IGraphicsDeviceManager)) as IGraphicsDeviceManager;			
-			this.graphicsDeviceService = this.Services.GetService(typeof(IGraphicsDeviceService)) as IGraphicsDeviceService;			
-			
 			switch (Window.Context.Resources.Configuration.Orientation) {
 				case Android.Content.Res.Orientation.Portrait :
 					Window.SetOrientation(DisplayOrientation.Portrait);
@@ -360,77 +128,14 @@ namespace Microsoft.Xna.Framework
 				default:
 				    Window.SetOrientation(DisplayOrientation.LandscapeLeft);
 					break;
-			} 
-
-			foreach (GameComponent gc in _gameComponentCollection)
-			{
-				gc.Initialize();
-			}
-			
-			if ((this.graphicsDeviceService != null) && (this.graphicsDeviceService.GraphicsDevice != null))
-			{
-				LoadContent();
 			}
 		}
-		
-#if xDEBUG
-        private int garbageCounter = 0;
-#endif
 
-        protected virtual void Update(GameTime gameTime)
-		{		
-			for (int x = 0; x < _gameComponentCollection.Count; x++)			
-			{
-				var gc = (GameComponent)_gameComponentCollection[x]; 
-				if (gc.Enabled)
-				{
-					gc.Update(gameTime);
-				}
-			}
-#if xDEBUG
-			garbageCounter++;
-			if (garbageCounter > 200)
-			{
-				// force a Garbage Collection
-				try
-				{
-					Android.Util.Log.Info("MonoGameInfo", String.Format("Game.Update Pre Collect {0}", GC.GetTotalMemory(true)));
-					// GC.Collect(0);
-					// Android.Util.Log.Info("MonoGameInfo", String.Format("Game.Update Pos Collect {0}", GC.GetTotalMemory(false)));
-				}
-				catch(Exception ex)
-				{
-					Android.Util.Log.Error("MonoGameInfo",String.Format("GC.Collect(0) {0}", ex.ToString()));
-				}
-				garbageCounter = 0;
-			}
-#endif
-        }
-		
-        protected virtual void Draw(GameTime gameTime)
-		{
-			if (!_playingVideo) 
-			{
-				foreach (GameComponent gc in _gameComponentCollection)
-				{
-					if (gc.Enabled && gc is DrawableGameComponent)
-					{
-						DrawableGameComponent dc = gc as DrawableGameComponent;
-						if (dc.Visible)
-						{
-							dc.Draw(gameTime);
-						}
-					}
-				}
-			}
-        }
-
-        public void Exit()
+        partial void PlatformExit()
         {
 			//TODO: Fix this
 			try
 			{
-				if (Exiting != null) Exiting(this, null);
 				Net.NetworkSession.Exit();
                 view.Close();
 			}
@@ -439,20 +144,30 @@ namespace Microsoft.Xna.Framework
 			}
         }
 
-        public GameComponentCollection Components
+		private bool PlatformBeforeDraw(GameTime gameTime)
+		{
+			return true;
+		}
+
+		private bool PlatformBeforeUpdate(GameTime gameTime)
+		{
+            if (!_initialized)
+                Initialize();
+
+			return true;
+		}
+
+        private bool PlatformBeforeRun()
         {
-            get
-            {
-                return _gameComponentCollection;
-            }
+            // Get the Accelerometer going
+            //TODO umcomment when the following bug is fixed
+            // http://bugzilla.xamarin.com/show_bug.cgi?id=1084
+            // Accelerometer currently seems to have a memory leak
+            //Accelerometer.SetupAccelerometer();
+            view.Run(FramesPerSecond / (FramesPerSecond * TargetElapsedTime.TotalSeconds));
+
+            return false;
         }
-		
-		#region Events
-		public event EventHandler Activated;
-		public event EventHandler Deactivated;
-		public event EventHandler Disposed;
-		public event EventHandler Exiting;
-		#endregion
     }
 }
 

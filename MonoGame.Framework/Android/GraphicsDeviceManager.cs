@@ -83,7 +83,7 @@ namespace Microsoft.Xna.Framework
 		
 		public void CreateDevice ()
 		{
-			throw new System.NotImplementedException ();
+			//throw new System.NotImplementedException ();
 		}
 
 		public bool BeginDraw ()
