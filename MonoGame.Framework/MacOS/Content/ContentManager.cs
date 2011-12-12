@@ -52,11 +52,5 @@ namespace Microsoft.Xna.Framework.Content
             string bundleRoot = Path.Combine(NSBundle.MainBundle.ResourcePath, _rootDirectory);
             return Path.Combine(bundleRoot, assetName.Replace('\\', Path.DirectorySeparatorChar));
         }
-
-        protected virtual Stream OpenStream(string assetName)
-        {
-            Stream stream = new FileStream(assetName, FileMode.Open, FileAccess.Read, FileShare.Read);
-            return stream;
-        }
     }
 }

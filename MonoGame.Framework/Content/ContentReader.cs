@@ -43,6 +43,7 @@ namespace Microsoft.Xna.Framework.Content
         private string assetName;
         private List<KeyValuePair<int, Action<object>>> sharedResourceFixups;
         private ContentTypeReader[] typeReaders;
+		internal int version;
 
         internal ContentTypeReader[] TypeReaders
         {
@@ -60,12 +61,13 @@ namespace Microsoft.Xna.Framework.Content
             }
         }
 
-        internal ContentReader(ContentManager manager, Stream stream, GraphicsDevice graphicsDevice, string assetName)
+        internal ContentReader(ContentManager manager, Stream stream, GraphicsDevice graphicsDevice, string assetName, int version)
             : base(stream)
         {
             this.graphicsDevice = graphicsDevice;
             this.contentManager = manager;
             this.assetName = assetName;
+			this.version = version;
         }
 
         public ContentManager ContentManager
