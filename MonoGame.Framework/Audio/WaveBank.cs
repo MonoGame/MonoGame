@@ -408,6 +408,14 @@ namespace Microsoft.Xna.Framework.Audio
 			
 			audioEngine.Wavebanks[BankName] = this;
         }
+		
+		public WaveBank(AudioEngine audioEngine, string streamingWaveBankFilename, int offset, short packetsize)
+			: this(audioEngine, streamingWaveBankFilename)
+		{
+			if (offset != 0) {
+				throw new NotImplementedException();
+			}
+		}
 
 		#region IDisposable implementation
 		public void Dispose ()
