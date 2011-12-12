@@ -6,6 +6,7 @@ namespace Microsoft.Xna.Framework.Graphics
 	internal class DXExpression
 	{
 		string indexName;
+		float[] outRegs;
 		DXPreshader preshader;
 		
 		public DXExpression (string indexName, byte[] expressionData)
@@ -32,13 +33,14 @@ namespace Microsoft.Xna.Framework.Graphics
 				throw new Exception(errors[0].error);
 			}
 			
-			preshader = new DXPreshader(parseData.preshader, 1);
+			preshader = new DXPreshader(parseData.preshader);
+			outRegs = new float[4];
 			
 		}
 		
 		public object Evaluate(EffectParameterCollection parameters)
 		{
-			float[] outRegs = preshader.Run (parameters);
+			preshader.Run (parameters, outRegs);
 			
 			int index = (int)outRegs[0];
 			

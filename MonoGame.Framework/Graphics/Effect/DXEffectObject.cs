@@ -623,11 +623,9 @@ namespace Microsoft.Xna.Framework.Graphics
 				effectReader.ReadBytes((int)((size+3) & ~3));	break;
 			case D3DXPARAMETER_TYPE.VERTEXSHADER:
 				param.data = new DXShader(effectReader.ReadBytes((int)((size+3) & ~3)));
-				Console.WriteLine ("vertex shader data");
 				break;
 			case D3DXPARAMETER_TYPE.PIXELSHADER:
 				param.data = new DXShader(effectReader.ReadBytes((int)((size+3) & ~3)));
-				Console.WriteLine("pixel shader data");
 				break;
 			}
 			

@@ -23,6 +23,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		MojoShader.MOJOSHADER_symbol[] symbols;
 		MojoShader.MOJOSHADER_sampler[] samplers;
 		
+		DXPreshader preshader;
+		
 		public DXShader (byte[] shaderData)
 		{
 			IntPtr parseDataPtr = MojoShader.NativeMethods.MOJOSHADER_parse(
@@ -49,7 +51,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				}
 				
 				if (parseData.preshader != IntPtr.Zero) {
-					throw new NotImplementedException();
+					preshader = new DXPreshader(parseData.preshader);
 				}
 				
 				switch(parseData.shader_type) {
@@ -121,8 +123,6 @@ namespace Microsoft.Xna.Framework.Graphics
 					}
 				}
 				
-				Console.WriteLine ( newOutput );
-				
 				shader = GL.CreateShader (shaderType);
 				GL.ShaderSource (shader, newOutput);
 				GL.CompileShader(shader);
@@ -145,7 +145,6 @@ namespace Microsoft.Xna.Framework.Graphics
 		                  TextureCollection textures) {
 			
 			//Populate the uniform register arrays
-			
 			//TODO: not necessarily packed contiguously, get info from mojoshader somehow
 			int bool_index = 0;
 			int float4_index = 0;
@@ -188,6 +187,11 @@ namespace Microsoft.Xna.Framework.Graphics
 				default:
 					throw new NotImplementedException();
 				}
+			}
+			
+			//execute the preshader
+			if (preshader != null) {
+				preshader.Run (parameters, uniforms_float4);
 			}
 			
 			
