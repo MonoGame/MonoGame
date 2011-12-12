@@ -141,9 +141,12 @@ namespace Microsoft.Xna.Framework.Graphics
             // Init RasterizerState
             RasterizerState = new RasterizerState();
 
-            // Initialize OpenGL states
-            GL11.Disable(ALL11.DepthTest);
-            GL11.TexEnv(ALL11.TextureEnv, ALL11.TextureEnvMode, (int)ALL11.BlendSrc);
+            if (OpenGLESVersion == GLContextVersion.Gles1_1 || OpenGLESVersion == GLContextVersion.Gles1_0)
+            {
+                // Initialize OpenGL states
+                GL11.Disable(ALL11.DepthTest);
+                GL11.TexEnv(ALL11.TextureEnv, ALL11.TextureEnvMode, (int)ALL11.BlendSrc);
+            }
         }
 
         public BlendState BlendState

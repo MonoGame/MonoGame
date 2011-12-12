@@ -63,7 +63,7 @@ using Microsoft.Xna.Framework.Input.Touch;
 
 namespace Microsoft.Xna.Framework
 {
-    public class AndroidGameWindow : AndroidGameView, Android.Views.View.IOnTouchListener
+    public class AndroidGameWindow : AndroidGameView //, Android.Views.View.IOnTouchListener
     {
 		private Rectangle clientBounds;
 		internal Game game;
@@ -98,7 +98,7 @@ namespace Microsoft.Xna.Framework
             this.RequestFocus();
             this.FocusableInTouchMode = true;
 
-            this.SetOnTouchListener(this);
+            //this.SetOnTouchListener(this);
         }
 		
 		void GameWindow_Closed(object sender,EventArgs e)
@@ -137,15 +137,17 @@ namespace Microsoft.Xna.Framework
 			try
             {
                 GLContextVersion = GLContextVersion.Gles2_0;
+                GraphicsDevice.OpenGLESVersion = GLContextVersion;
                 base.CreateFrameBuffer();
 		    } 
 			catch (Exception) 
 			{
 		        //device doesn't support OpenGLES 2.0; retry with 1.1:
                 GLContextVersion = GLContextVersion.Gles1_1;
+                GraphicsDevice.OpenGLESVersion = GLContextVersion;
 				base.CreateFrameBuffer();
 		    }
-            GraphicsDevice.OpenGLESVersion = GLContextVersion;
+            
 		}
 	
 
@@ -289,11 +291,6 @@ namespace Microsoft.Xna.Framework
         private Dictionary<IntPtr, TouchLocation> _previousTouches = new Dictionary<IntPtr, TouchLocation>();
 
         public override bool OnTouchEvent(MotionEvent e)
-        {
-            return false;
-        }
-
-        public bool OnTouch(View v, MotionEvent e)
         {
             TouchLocation tlocation;            
             TouchCollection collection = TouchPanel.Collection;            

@@ -315,7 +315,14 @@ namespace Microsoft.Xna.Framework.Graphics
 			// Configure ViewPort
 			GL20.Viewport(0, 0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height); 
 			GL20.UseProgram(program);
-			
+
+            // Enable Scissor Tests if necessary
+            if (this.graphicsDevice.RasterizerState.ScissorTestEnable)
+            {
+                GL20.Enable(ALL20.ScissorTest);
+                GL20.Scissor(this.graphicsDevice.ScissorRectangle.X, this.graphicsDevice.ScissorRectangle.Y, this.graphicsDevice.ScissorRectangle.Width, this.graphicsDevice.ScissorRectangle.Height);
+            }
+                        
 			if (GraphicsDevice.DefaultFrameBuffer)
 			{
 				GL20.CullFace(ALL20.Back);
@@ -330,6 +337,11 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 
 			_batcher.DrawBatchGL20 ( _sortMode );
+
+            if (this.graphicsDevice.RasterizerState.ScissorTestEnable)
+            {
+                GL20.Disable(ALL20.ScissorTest);
+            }
 
             GL20.Disable(ALL20.Texture2D);
 		}
