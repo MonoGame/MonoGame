@@ -10,11 +10,10 @@ namespace Microsoft.Xna.Framework.Graphics
 		MojoShader.MOJOSHADER_symbol[] symbols;
 		
 		float[] inRegs;
-		float[] outRegs;
 		
 		//TODO: Fix mojoshader to handle output registers properly
 		
-		public DXPreshader (IntPtr preshaderPtr, int output_count)
+		public DXPreshader (IntPtr preshaderPtr)
 		{
 			preshader = (MojoShader.MOJOSHADER_preshader)Marshal.PtrToStructure(
 					preshaderPtr,
@@ -30,10 +29,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 			
 			inRegs = new float[4*input_count];
-			outRegs = new float[4*output_count];
 		}
 		
-		public float[] Run(EffectParameterCollection parameters) {
+		public void Run(EffectParameterCollection parameters, float[] outRegs) {
 			//todo: cleanup and merge with DXShader :/
 			
 			//only populate modified stuff?
@@ -103,8 +101,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 			
 			MojoShader.NativeMethods.MOJOSHADER_runPreshader(ref preshader, inRegs, outRegs);
-			
-			return outRegs;
 		}
 	}
 }
