@@ -140,8 +140,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Init RasterizerState
             RasterizerState = new RasterizerState();
-
-            if (OpenGLESVersion == GLContextVersion.Gles1_1 || OpenGLESVersion == GLContextVersion.Gles1_0)
+#if IPHONE
+            if (OpenGLESVersion == EAGLRenderingAPI.OpenGLES1)
+#else
+			if (OpenGLESVersion == GLContextVersion.Gles1_1 || OpenGLESVersion == GLContextVersion.Gles1_0)
+#endif
             {
                 // Initialize OpenGL states
                 GL11.Disable(ALL11.DepthTest);
