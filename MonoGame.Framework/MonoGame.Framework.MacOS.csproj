@@ -352,6 +352,9 @@
     <Compile Include="Graphics\Effect\BasicEffectCode.cs" />
     <Compile Include="Graphics\Effect\DXPreshader.cs" />
     <Compile Include="Graphics\Effect\DXHelper.cs" />
+    <Compile Include="GamerServices\GuideAlreadyVisibleException.cs" />
+    <Compile Include="GamerServices\GamerServicesDispatcher.cs" />
+    <Compile Include="Audio\AudioCategory.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />
