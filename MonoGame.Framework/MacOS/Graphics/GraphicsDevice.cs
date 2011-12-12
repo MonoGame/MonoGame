@@ -643,7 +643,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		}
 
-		public void DrawUserPrimitives<T> (PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct, IVertexType
+		public void DrawUserPrimitives<T> (PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct
 		{
 
 			// we need to reset vertex states afterwards
@@ -741,7 +741,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			UnsetGraphicsStates();
 		}
 
-        public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int vertexCount, short[] indexData, int indexOffset, int primitiveCount) where T : struct, IVertexType
+        public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int vertexCount, short[] indexData, int indexOffset, int primitiveCount) where T : struct
         {
 
 			// we need to reset vertex states afterwards
@@ -803,7 +803,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         }
 
-        public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int vertexCount, int[] indexData, int indexOffset, int primitiveCount) where T : struct, IVertexType
+        public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int vertexCount, int[] indexData, int indexOffset, int primitiveCount) where T : struct
         {
 
 			// we need to reset vertex states afterwards
@@ -859,7 +859,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         }
 		
-		public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int vertexCount, int[] indexData, int indexOffset, int primitiveCount, VertexDeclaration vd) where T : struct, IVertexType
+		public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int vertexCount, int[] indexData, int indexOffset, int primitiveCount, VertexDeclaration vd) where T : struct
         {
 
 			// we need to reset vertex states afterwards
