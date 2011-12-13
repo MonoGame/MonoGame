@@ -63,6 +63,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		RasterizerState _rasterizerState;		
 		Effect _effect;		
 		Matrix _matrix;
+		DisplayOrientation lastDisplayOrientation;
 		
 		Rectangle tempRect = new Rectangle(0,0,0,0);
 		Vector2 texCoordTL = new Vector2(0,0);
@@ -70,7 +71,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		//OpenGLES2 variables
 		int program;
-		Matrix4 matWVPScreen, matWVPFramebuffer, matProjection, matViewScreen, matViewFramebuffer, matWorld;
+		Matrix4 matWVPScreen, matWVPFramebuffer, matProjection, matViewScreen, matViewFramebuffer;
 		int uniformWVP, uniformTex;
 		
         public SpriteBatch ( GraphicsDevice graphicsDevice )
@@ -79,7 +80,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			{
 				throw new ArgumentException("graphicsDevice");
 			}	
-			
+
 			this.graphicsDevice = graphicsDevice;
 			
 			_batcher = new SpriteBatcher();
@@ -155,7 +156,9 @@ namespace Microsoft.Xna.Framework.Graphics
 	                throw new InvalidOperationException ("Unable to link program");
 	            }
 	
-				matWorld = Matrix4.Identity;
+				//UpdateWorldMatrixOrientation();
+				lastDisplayOrientation = graphicsDevice.PresentationParameters.DisplayOrientation;
+
 				matViewScreen = Matrix4.CreateRotationZ((float)Math.PI)*
 						Matrix4.CreateRotationY((float)Math.PI)*
 						Matrix4.CreateTranslation(-this.graphicsDevice.Viewport.Width/2,
@@ -168,8 +171,8 @@ namespace Microsoft.Xna.Framework.Graphics
 							this.graphicsDevice.Viewport.Height,
 							-1f,1f);
 				
-				matWVPScreen = matWorld * matViewScreen * matProjection;
-				matWVPFramebuffer = matWorld * matViewFramebuffer * matProjection;
+				matWVPScreen = matViewScreen * matProjection;
+				matWVPFramebuffer = matViewFramebuffer * matProjection;
 				
 				GetUniformVariables();
 			
@@ -311,6 +314,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			//CullMode
 			GL20.FrontFace(ALL20.Cw);
 			GL20.Enable(ALL20.CullFace);
+			
+			
+			UpdateWorldMatrixOrientation();
 			
 			// Configure ViewPort
 			GL20.Viewport(0, 0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height); 
@@ -474,6 +480,62 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                GL11.Disable(ALL11.ScissorTest);
             }
+		}
+		
+		private void UpdateWorldMatrixOrientation()
+		{
+			// Configure Display Orientation:
+			if(lastDisplayOrientation != graphicsDevice.PresentationParameters.DisplayOrientation)
+			{
+				// updates last display orientation (optimization)
+				lastDisplayOrientation = graphicsDevice.PresentationParameters.DisplayOrientation;
+				switch (this.graphicsDevice.PresentationParameters.DisplayOrientation)
+		        {
+					case DisplayOrientation.LandscapeLeft:
+	                {
+						matViewScreen = Matrix4.CreateRotationZ(-(float)Math.PI/2)*
+							Matrix4.CreateRotationY((float)Math.PI)*
+							Matrix4.CreateTranslation(this.graphicsDevice.Viewport.Width/2,
+								this.graphicsDevice.Viewport.Height/2,
+								0);	
+						matWVPScreen = matViewScreen * matProjection;
+						break;
+					}
+					
+					case DisplayOrientation.LandscapeRight:
+	                {
+						matViewScreen = Matrix4.CreateRotationZ((float)Math.PI/2)*
+							Matrix4.CreateRotationY((float)Math.PI)*
+							Matrix4.CreateTranslation(-this.graphicsDevice.Viewport.Width/2,
+								-this.graphicsDevice.Viewport.Height/2,
+								0);	
+						matWVPScreen = matViewScreen * matProjection;
+						break;
+					}
+					
+					case DisplayOrientation.PortraitUpsideDown:
+	                {
+						matViewScreen = Matrix4.CreateRotationZ(0)*
+							Matrix4.CreateRotationY((float)Math.PI)*
+							Matrix4.CreateTranslation(this.graphicsDevice.Viewport.Width/2,
+								-this.graphicsDevice.Viewport.Height/2,
+								0);
+						matWVPScreen = matViewScreen * matProjection;
+						break;
+					}
+					
+					default:
+					{
+						matViewScreen = Matrix4.CreateRotationZ((float)Math.PI)*
+							Matrix4.CreateRotationY((float)Math.PI)*
+							Matrix4.CreateTranslation(-this.graphicsDevice.Viewport.Width/2,
+								this.graphicsDevice.Viewport.Height/2,
+								0);
+							matWVPScreen = matViewScreen * matProjection;
+						break;
+					}
+				}
+			}
 		}
 		
 		public void Draw 

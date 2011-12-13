@@ -668,6 +668,7 @@ namespace Microsoft.Xna.Framework
                     {
                         OrientationChanged(this, EventArgs.Empty);
                     }
+				
                 }
             }
 		}
