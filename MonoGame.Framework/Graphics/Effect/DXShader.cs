@@ -98,24 +98,28 @@ namespace Microsoft.Xna.Framework.Graphics
 				uniforms_bool = new int[uniforms_bool_count];
 				
 				newOutput = parseData.output;
+				
+				//MojoShader wants us to handle vertex input attributes ourselves
+				//to get around some directx fetures that opengl's entry points
+				//don't support. We just hack around it for now
 				foreach (MojoShader.MOJOSHADER_attribute attrb in attributes) {
 					if (shaderType == ShaderType.VertexShader) {
 						switch (attrb.usage) {
 						case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_COLOR:
-							newOutput = newOutput.Replace ("attribute vec4 "+attrb.name+";", "")
-								.Replace (attrb.name, "gl_Color");
+							newOutput = newOutput.Replace ("attribute vec4 "+attrb.name+";",
+							                               "#define "+attrb.name+" gl_Color");
 							break;
 						case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_POSITION:
-							newOutput = newOutput.Replace ("attribute vec4 "+attrb.name+";", "")
-								.Replace (attrb.name, "gl_Vertex");
+							newOutput = newOutput.Replace ("attribute vec4 "+attrb.name+";",
+							                               "#define "+attrb.name+" gl_Vertex");
 							break;
 						case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_TEXCOORD:
-							newOutput = newOutput.Replace ("attribute vec4 "+attrb.name+";", "")
-								.Replace (attrb.name, "gl_MultiTexCoord0");
+							newOutput = newOutput.Replace ("attribute vec4 "+attrb.name+";",
+							                               "#define "+attrb.name+" gl_MultiTexCoord0");
 							break;
 						case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_NORMAL:
-							newOutput = newOutput.Replace ("attribute vec4 "+attrb.name+";", "")
-								.Replace (attrb.name, "gl_Normal");
+							newOutput = newOutput.Replace ("attribute vec4 "+attrb.name+";",
+							                               "#define "+attrb.name+" gl_Normal");
 							break;
 						default:
 							throw new NotImplementedException();
