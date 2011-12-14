@@ -314,7 +314,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void SetValue (Matrix value)
 		{ 
-			data = Matrix.ToFloatArray(Matrix.Transpose (value));
+			data = Matrix.ToFloatArray(Matrix.Transpose (value)).Clone ();
 		}
 
 		public void SetValue (Matrix[] value)
