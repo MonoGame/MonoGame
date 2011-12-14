@@ -166,8 +166,10 @@ namespace Microsoft.Xna.Framework.Graphics
 						break;
 					case EffectParameterClass.Vector:
 					case EffectParameterClass.Matrix:
-						for (int i=0; i<parameter.RowCount*parameter.ColumnCount; i++) {
-							uniforms_float4[float4_index*4+i] = ((float[])parameter.data)[i];
+						for (int y=0; y<Math.Min (symbol.register_count, parameter.RowCount); y++) {
+							for (int x=0; x<parameter.ColumnCount; x++) {
+								uniforms_float4[(float4_index+y)*4+x] = ((float[])parameter.data)[y*4+x];
+							}
 						}
 						break;
 					default:

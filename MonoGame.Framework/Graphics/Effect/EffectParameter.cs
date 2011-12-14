@@ -80,9 +80,10 @@ namespace Microsoft.Xna.Framework.Graphics
 			default:
 				//we need types not normally exposed in XNA for internal use
 				rawParameter = true;
-				rawType = parameter.type;
 				break;
 			}
+			rawType = parameter.type;
+			
 			name = parameter.name;
 			rowCount = (int)parameter.rows;
 			colCount = (int)parameter.columns;
