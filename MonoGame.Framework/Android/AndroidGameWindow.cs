@@ -63,7 +63,7 @@ using Microsoft.Xna.Framework.Input.Touch;
 
 namespace Microsoft.Xna.Framework
 {
-    public class AndroidGameWindow : AndroidGameView //, Android.Views.View.IOnTouchListener
+    public class AndroidGameWindow : AndroidGameView , Android.Views.View.IOnTouchListener
     {
 		private Rectangle clientBounds;
 		internal Game game;
@@ -98,7 +98,7 @@ namespace Microsoft.Xna.Framework
             this.RequestFocus();
             this.FocusableInTouchMode = true;
 
-            //this.SetOnTouchListener(this);
+            this.SetOnTouchListener(this);
         }
 		
 		void GameWindow_Closed(object sender,EventArgs e)
@@ -133,7 +133,8 @@ namespace Microsoft.Xna.Framework
 		}
 		
 		protected override void CreateFrameBuffer()
-		{	    
+		{	
+#if !GL20			
 			try
             {
                 GLContextVersion = GLContextVersion.Gles2_0;
@@ -141,6 +142,7 @@ namespace Microsoft.Xna.Framework
                 base.CreateFrameBuffer();
 		    } 
 			catch (Exception) 
+#endif			
 			{
 		        //device doesn't support OpenGLES 2.0; retry with 1.1:
                 GLContextVersion = GLContextVersion.Gles1_1;
@@ -285,19 +287,38 @@ namespace Microsoft.Xna.Framework
 			
 			CurrentOrientation = actualOrientation;
             game.GraphicsDevice.PresentationParameters.DisplayOrientation = actualOrientation;
-            TouchPanel.DisplayOrientation = actualOrientation;
+			TouchPanel.DisplayOrientation = actualOrientation;						
         }
 
-        private Dictionary<IntPtr, TouchLocation> _previousTouches = new Dictionary<IntPtr, TouchLocation>();
+        private Dictionary<IntPtr, TouchLocation> _previousTouches = new Dictionary<IntPtr, TouchLocation>();				
 
+		#region IOnTouchListener implementation
+		public bool OnTouch (View v, MotionEvent e)
+		{
+			return OnTouchEvent(e);
+		}
+		#endregion
+		
+		private void UpdateTouchPosition(ref Vector2 position)
+		{
+			if (this.game.Window.CurrentOrientation == DisplayOrientation.LandscapeRight)
+			{
+				// we need to fudge the position
+				position.X = this.Width - position.X;
+				position.Y = this.Height - position.Y;
+			}
+			Android.Util.Log.Info("MonoGameInfo", String.Format("Touch {0}x{1}", position.X, position.Y));
+		}
+		
         public override bool OnTouchEvent(MotionEvent e)
-        {
+        {			
             TouchLocation tlocation;            
             TouchCollection collection = TouchPanel.Collection;            
             Vector2 position = Vector2.Zero;            
             position.X = e.GetX(e.ActionIndex);            
-            position.Y = e.GetY(e.ActionIndex);            
-            int id = e.GetPointerId(e.ActionIndex);            
+            position.Y = e.GetY(e.ActionIndex);     
+			UpdateTouchPosition(ref position);
+			int id = e.GetPointerId(e.ActionIndex);            
             int index;            
             switch (e.ActionMasked)            
             {                
@@ -323,7 +344,8 @@ namespace Microsoft.Xna.Framework
                     {                        
                         id = e.GetPointerId(i);                        
                         position.X = e.GetX(i);                        
-                        position.Y = e.GetY(i);                        
+                        position.Y = e.GetY(i);  
+					    UpdateTouchPosition(ref position);
                         index = collection.FindById(id, out tlocation);                        
                         if (index >= 0)                        
                         {                            

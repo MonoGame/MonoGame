@@ -21,7 +21,7 @@ namespace Microsoft.Xna.Framework
 		private OrientationListener o;		
 		
 		protected override void OnCreate (Bundle savedInstanceState)
-		{
+		{			
 			base.OnCreate (savedInstanceState);
 			o = new OrientationListener(this);	
 			if (o.CanDetectOrientation())
@@ -29,6 +29,13 @@ namespace Microsoft.Xna.Framework
 				o.Enable();				
 			}						
 		}	
+		
+		public override void OnConfigurationChanged (Android.Content.Res.Configuration newConfig)
+		{			
+			// we need to refresh the viewport here.
+			Game.GraphicsDevice.Reset();
+			base.OnConfigurationChanged (newConfig);
+		}
 				
         protected override void OnPause()
         {
@@ -40,7 +47,8 @@ namespace Microsoft.Xna.Framework
         {
             base.OnResume();
             if (Game != null) Game.EnterForeground();
-        }
+        }				
+			
     }
 	
 	internal class OrientationListener : OrientationEventListener
@@ -80,9 +88,12 @@ namespace Microsoft.Xna.Framework
 					default:
 						disporientation = DisplayOrientation.LandscapeLeft;
 						break;
-				}
+				}								
 				
-				activity.Game.Window.SetOrientation(disporientation);
+				if (activity.Game.Window.CurrentOrientation != disporientation)
+				{
+				   activity.Game.Window.SetOrientation(disporientation);				   
+				}
 				inprogress = false;
 			}
 			
