@@ -93,7 +93,7 @@ namespace Microsoft.Xna.Framework
             // Initialize _lastUpdate
             _lastUpdate = DateTime.Now;
 					
-			gesture = new GestureDetector(new GestureListener((AndroidGameActivity)this.Context));
+			gesture = new GestureDetector(new GestureListener((AndroidGameActivity)this.Context));		
 			
             this.RequestFocus();
             this.FocusableInTouchMode = true;
@@ -299,7 +299,7 @@ namespace Microsoft.Xna.Framework
 		}
 		#endregion
 		
-		private void UpdateTouchPosition(ref Vector2 position)
+		internal void UpdateTouchPosition(ref Vector2 position)
 		{
 			if (this.game.Window.CurrentOrientation == DisplayOrientation.LandscapeRight)
 			{
@@ -365,7 +365,9 @@ namespace Microsoft.Xna.Framework
                         collection[index] = tlocation;                    
                     }                    
                     break;            
-            }            
+            }           
+			if (gesture != null) gesture.OnTouchEvent(e);
+			
             return true;
         }
         
