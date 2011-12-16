@@ -106,12 +106,12 @@ namespace Microsoft.Xna.Framework.Input
 
         internal static void Pause()
         {
-            if (_sensorManger != null && _sensor == null) _sensorManger.UnregisterListener(listener, _sensor);
+            if (_sensorManger != null && _sensor != null) _sensorManger.UnregisterListener(listener, _sensor);
         }
 
         internal static void Resume()
         {
-            if (_sensorManger != null && _sensor == null) _sensorManger.RegisterListener(listener, _sensor, SensorDelay.Game);            
+            if (_sensorManger != null && _sensor != null) _sensorManger.RegisterListener(listener, _sensor, SensorDelay.Game);            
         }
     }
 }

@@ -378,7 +378,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void Reset()
         {
-            throw new NotImplementedException();
+            _viewport.Width = DisplayMode.Width;
+            _viewport.Height = DisplayMode.Height;
         }
 
         public void Reset(Microsoft.Xna.Framework.Graphics.PresentationParameters presentationParameters)

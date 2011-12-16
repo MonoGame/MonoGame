@@ -22,8 +22,10 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		{
 			if ((TouchPanel.EnabledGestures & GestureType.DoubleTap) != 0)
 			{				
+				Vector2 positon = new Vector2(e.GetX(), e.GetY());
+				activity.Game.Window.UpdateTouchPosition(ref positon);
 				var gs = new GestureSample(GestureType.DoubleTap, activity.Game.TargetElapsedTime, 
-					new Vector2(e.GetX(), e.GetY()), Vector2.Zero, Vector2.Zero, Vector2.Zero);
+					positon, Vector2.Zero, Vector2.Zero, Vector2.Zero);
 				TouchPanel.GestureList.Enqueue(gs);
 			}
 			return base.OnDoubleTap (e);
@@ -39,8 +41,10 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		{
 			if ((TouchPanel.EnabledGestures & GestureType.Tap) != 0)
 			{
+				Vector2 positon = new Vector2(e.GetX(), e.GetY());
+				activity.Game.Window.UpdateTouchPosition(ref positon);
 				var gs = new GestureSample(GestureType.Tap, activity.Game.TargetElapsedTime, 
-					new Vector2(e.GetX(), e.GetY()), Vector2.Zero, Vector2.Zero, Vector2.Zero);
+					positon, Vector2.Zero, Vector2.Zero, Vector2.Zero);
 				TouchPanel.GestureList.Enqueue(gs);
 			}
 			return base.OnSingleTapConfirmed (e);
