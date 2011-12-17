@@ -11,7 +11,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		public ShaderType shaderType;
 		public int shader;
 		
-		string newOutput;
+		string glslCode;
 		
 		float[] uniforms_float4;
 		int[] uniforms_int4;
@@ -28,7 +28,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		public DXShader (byte[] shaderData)
 		{
 			IntPtr parseDataPtr = MojoShader.NativeMethods.MOJOSHADER_parse(
-					"glsl120",
+					"glsl",
 					shaderData,
 					shaderData.Length,
 					IntPtr.Zero,
@@ -97,7 +97,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				uniforms_int4 = new int[uniforms_int4_count*4];
 				uniforms_bool = new int[uniforms_bool_count];
 				
-				newOutput = parseData.output;
+				glslCode = parseData.output;
 				
 				//MojoShader wants us to handle vertex input attributes ourselves
 				//to get around some directx fetures that opengl's entry points
@@ -106,19 +106,19 @@ namespace Microsoft.Xna.Framework.Graphics
 					if (shaderType == ShaderType.VertexShader) {
 						switch (attrb.usage) {
 						case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_COLOR:
-							newOutput = newOutput.Replace ("attribute vec4 "+attrb.name+";",
+							glslCode = glslCode.Replace ("attribute vec4 "+attrb.name+";",
 							                               "#define "+attrb.name+" gl_Color");
 							break;
 						case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_POSITION:
-							newOutput = newOutput.Replace ("attribute vec4 "+attrb.name+";",
+							glslCode = glslCode.Replace ("attribute vec4 "+attrb.name+";",
 							                               "#define "+attrb.name+" gl_Vertex");
 							break;
 						case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_TEXCOORD:
-							newOutput = newOutput.Replace ("attribute vec4 "+attrb.name+";",
+							glslCode = glslCode.Replace ("attribute vec4 "+attrb.name+";",
 							                               "#define "+attrb.name+" gl_MultiTexCoord0");
 							break;
 						case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_NORMAL:
-							newOutput = newOutput.Replace ("attribute vec4 "+attrb.name+";",
+							glslCode = glslCode.Replace ("attribute vec4 "+attrb.name+";",
 							                               "#define "+attrb.name+" gl_Normal");
 							break;
 						default:
@@ -127,8 +127,10 @@ namespace Microsoft.Xna.Framework.Graphics
 					}
 				}
 				
+				glslCode = GLSLOptimizer.Optimize (glslCode, shaderType);
+				
 				shader = GL.CreateShader (shaderType);
-				GL.ShaderSource (shader, newOutput);
+				GL.ShaderSource (shader, glslCode);
 				GL.CompileShader(shader);
 				
 				int compiled = 0;
