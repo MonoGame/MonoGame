@@ -247,7 +247,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				sourceRectangle,
 				color,
 				rotation,
-				origin,
+				origin * scale,
 				effect,
 				depth);
 		}

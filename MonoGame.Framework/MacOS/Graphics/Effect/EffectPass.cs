@@ -91,13 +91,12 @@ namespace Microsoft.Xna.Framework.Graphics
 						throw new NotImplementedException();
 					}
 					
-					relink = true;
-					
 					if (shader.shaderType == ShaderType.FragmentShader) {
 						if (shader != pixelShader) {
 							if (pixelShader != null) {
 								GL.DetachShader (shaderProgram, pixelShader.shader);
 							}
+							relink = true;
 							pixelShader = shader;
 							GL.AttachShader (shaderProgram, pixelShader.shader);
 						}
@@ -106,6 +105,7 @@ namespace Microsoft.Xna.Framework.Graphics
 							if (vertexShader != null) {
 								GL.DetachShader(shaderProgram, vertexShader.shader);
 							}
+							relink = true;
 							vertexShader = shader;
 							GL.AttachShader (shaderProgram, vertexShader.shader);
 						}

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,36 +15,146 @@ namespace Microsoft.Xna.Framework.Graphics
 		EffectParameterCollection elements;
 		string semantic;
 		EffectParameterCollection structMembers;
-		internal int internalIndex;  // used by opengl processes.
-		int internalLength;
+		EffectAnnotationCollection annotations;
 		Effect _parentEffect;
 		
-		internal EffectParameter(Effect parent, string paramName, int paramIndex, string paramSType, int paramLength)
+		internal bool rawParameter = false;
+		internal DXEffectObject.D3DXPARAMETER_TYPE rawType;
+		
+		internal object data;
+		
+		internal EffectParameter( DXEffectObject.d3dx_parameter parameter )
 		{
-			_parentEffect = parent;
-			name = paramName;
-			internalIndex = paramIndex;
-			internalLength = paramLength;
-			
-			switch (paramSType ){
-			case "FloatVec2":
-				paramType = EffectParameterType.Single;
-				paramClass = EffectParameterClass.Vector;
-				rowCount = 1;
-				colCount = 2;
+			switch (parameter.class_) {
+			case DXEffectObject.D3DXPARAMETER_CLASS.SCALAR:
+				paramClass = EffectParameterClass.Scalar;
 				break;
-			case "Sampler2D":
-				paramType = EffectParameterType.Texture2D;
+			case DXEffectObject.D3DXPARAMETER_CLASS.VECTOR:
+				paramClass = EffectParameterClass.Vector;
+				break;
+			case DXEffectObject.D3DXPARAMETER_CLASS.MATRIX_ROWS:
+			case DXEffectObject.D3DXPARAMETER_CLASS.MATRIX_COLUMNS:
+				paramClass = EffectParameterClass.Matrix;
+				break;
+			case DXEffectObject.D3DXPARAMETER_CLASS.OBJECT:
 				paramClass = EffectParameterClass.Object;
-				rowCount = 0;
-				colCount = 0;
-				break;				
-				
+				break;
+			case DXEffectObject.D3DXPARAMETER_CLASS.STRUCT:
+				paramClass = EffectParameterClass.Struct;
+				break;
+			default:
+				throw new NotImplementedException();
 			}
-				
 			
+			switch (parameter.type) {
+			case DXEffectObject.D3DXPARAMETER_TYPE.VOID:
+				paramType = EffectParameterType.Void;
+				break;
+			case DXEffectObject.D3DXPARAMETER_TYPE.BOOL:
+				paramType = EffectParameterType.Bool;
+				break;
+			case DXEffectObject.D3DXPARAMETER_TYPE.INT:
+				paramType = EffectParameterType.Int32;
+				break;
+			case DXEffectObject.D3DXPARAMETER_TYPE.FLOAT:
+				paramType = EffectParameterType.Single;
+				break;
+			case DXEffectObject.D3DXPARAMETER_TYPE.STRING:
+				paramType = EffectParameterType.String;
+				break;
+			case DXEffectObject.D3DXPARAMETER_TYPE.TEXTURE:
+				paramType = EffectParameterType.Texture;
+				break;
+			case DXEffectObject.D3DXPARAMETER_TYPE.TEXTURE1D:
+				paramType = EffectParameterType.Texture1D;
+				break;
+			case DXEffectObject.D3DXPARAMETER_TYPE.TEXTURE2D:
+				paramType = EffectParameterType.Texture2D;
+				break;
+			case DXEffectObject.D3DXPARAMETER_TYPE.TEXTURE3D:
+				paramType = EffectParameterType.Texture3D;
+				break;
+			case DXEffectObject.D3DXPARAMETER_TYPE.TEXTURECUBE:
+				paramType = EffectParameterType.TextureCube;
+				break;
+			default:
+				//we need types not normally exposed in XNA for internal use
+				rawParameter = true;
+				break;
+			}
+			rawType = parameter.type;
+			
+			name = parameter.name;
+			rowCount = (int)parameter.rows;
+			colCount = (int)parameter.columns;
+			semantic = parameter.semantic;
+			
+			annotations = new EffectAnnotationCollection();
+			for (int i=0; i<parameter.annotation_count; i++) {
+				EffectAnnotation annotation = new EffectAnnotation();
+				annotations._annotations.Add (annotation);
+			}
+			
+			elements = new EffectParameterCollection();
+			structMembers = new EffectParameterCollection();
+			if (parameter.element_count > 0) {
+				for (int i=0; i<parameter.element_count; i++) {
+					EffectParameter element = new EffectParameter(parameter.member_handles[i]);
+					elements._parameters.Add (element);
+				}
+			} else if (parameter.member_count > 0) {
+				for (int i=0; i<parameter.member_count; i++) {
+					EffectParameter member = new EffectParameter(parameter.member_handles[i]);
+					structMembers._parameters.Add (member);
+				}
+			} else {
+				if (rawParameter) {
+					data = parameter.data;
+				} else {
+					//interpret data
+					switch (paramClass) {
+					case EffectParameterClass.Scalar:
+						switch (paramType) {
+						case EffectParameterType.Bool:
+							data = BitConverter.ToBoolean((byte[])parameter.data, 0);
+							break;
+						case EffectParameterType.Int32:
+							data = BitConverter.ToInt32 ((byte[])parameter.data, 0);
+							break;
+						case EffectParameterType.Single:
+							data = BitConverter.ToSingle((byte[])parameter.data, 0);
+							break;
+						case EffectParameterType.Void:
+							data = null;
+							break;
+						default:
+							break;
+							//throw new NotSupportedException();
+						}
+						break;
+					case EffectParameterClass.Vector:
+					case EffectParameterClass.Matrix:
+						switch (paramType) {
+						case EffectParameterType.Single:
+							float[] vals = new float[rowCount*colCount];
+							for (int i=0; i<rowCount*colCount; i++) {
+								vals[i] = BitConverter.ToSingle ((byte[])parameter.data, i*4);
+							}
+							data = vals;
+							break;
+						default:
+							break;
+						}
+						break;
+					default:
+						//throw new NotSupportedException();
+						break;
+					}
+				}
+			}
 			
 		}
+		
 		public int ColumnCount {
 			get { return colCount; }
 		}
@@ -79,66 +189,67 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void SetValue (object value)
 		{
+			throw new NotImplementedException();
 		}
 
 		public bool GetValueBoolean ()
 		{
-			return true;
+			throw new NotImplementedException();
 		}
 
 		public bool[] GetValueBooleanArray ()
 		{
-			return new bool[0];
+			throw new NotImplementedException();
 		}
 
 		public int GetValueInt32 ()
 		{
-			return 0;
+			throw new NotImplementedException();
 		}
 
 		public int[] GetValueInt32Array ()
 		{
-			return new int[0];
+			throw new NotImplementedException();
 		}
 
 		public Matrix GetValueMatrix ()
 		{
-			return new Matrix ();
+			throw new NotImplementedException();
 		}
 
 		public Matrix[] GetValueMatrixArray ()
 		{
-			return new Matrix[0];
+			throw new NotImplementedException();
 		}
 
 		public Quaternion GetValueQuaternion ()
 		{
-			return new Quaternion ();
+			throw new NotImplementedException();
 		}
 
 		public Quaternion[] GetValueQuaternionArray ()
 		{
-			return new Quaternion[0];
+			throw new NotImplementedException();
 		}
 
 		public Single GetValueSingle ()
 		{
-			return new Single ();
+			throw new NotImplementedException();
 		}
 
 		public Single[] GetValueSingleArray ()
 		{
-			return new Single[0];
+			throw new NotImplementedException();
 		}
 
 		public string GetValueString ()
 		{
-			return String.Empty;
+			throw new NotImplementedException();
 		}
 
 		public Texture2D GetValueTexture2D ()
 		{
-			return null; //new Texture2D ();
+			throw new NotImplementedException();
 		}
 
 		//		public Texture3D GetValueTexture3D ()
@@ -153,104 +264,123 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public Vector2 GetValueVector2 ()
 		{
-			return Vector2.One;
+			throw new NotImplementedException();
 		}
 
 		public Vector2[] GetValueVector2Array ()
 		{
-			return new Vector2[0];
+			throw new NotImplementedException();
 		}
 
 		public Vector3 GetValueVector3 ()
 		{
-			return Vector3.One;
+			throw new NotImplementedException();
 		}
 
 		public Vector3[] GetValueVector3Array ()
 		{
-			return new Vector3[0];
+			throw new NotImplementedException();
 		}
 
 		public Vector4 GetValueVector4 ()
 		{
-			return Vector4.One;
+			throw new NotImplementedException();
 		}
 
 		public Vector4[] GetValueVector4Array ()
 		{
-			return new Vector4[0];
-		}		
+			throw new NotImplementedException();
+		}
 
 		public void SetValue (bool value)
 		{
+			throw new NotImplementedException();
 		}
 
 		public void SetValue (bool[] value)
 		{
+			throw new NotImplementedException();
 		}
 
 		public void SetValue (int value)
 		{
+			data = value;
 		}
 
 		public void SetValue (int[] value)
 		{
+			throw new NotImplementedException();
 		}
 
 		public void SetValue (Matrix value)
-		{
+		{ 
+			data = Matrix.ToFloatArray(Matrix.Transpose (value)).Clone ();
 		}
 
 		public void SetValue (Matrix[] value)
 		{
+			throw new NotImplementedException();
 		}
 
 		public void SetValue (Quaternion value)
 		{
+			throw new NotImplementedException();
 		}
 
 		public void SetValue (Quaternion[] value)
 		{
+			throw new NotImplementedException();
 		}
 
 		public void SetValue (Single value)
 		{
+			data = value;
 		}
 
 		public void SetValue (Single[] value)
 		{
+			throw new NotImplementedException();
 		}
-
+		
 		public void SetValue (string value)
 		{
+			throw new NotImplementedException();
 		}
 
 		public void SetValue (Texture value)
 		{
+			//throw new NotImplementedException();
+			data = value;
 		}
 
 		public void SetValue (Vector2 value)
 		{
+			data = new float[2] { value.X, value.Y };
 		}
 
 		public void SetValue (Vector2[] value)
 		{
+			throw new NotImplementedException();
 		}
 
 		public void SetValue (Vector3 value)
 		{
+			data = new float[3] { value.X, value.Y, value.Z };
 		}
 
 		public void SetValue (Vector3[] value)
 		{
+			throw new NotImplementedException();
 		}
 
 		public void SetValue (Vector4 value)
 		{
+			data = new float[4] { value.X, value.Y, value.Z, value.W };
 		}
 
 		public void SetValue (Vector4[] value)
 		{
+			throw new NotImplementedException();
 		}
 	}
 }
