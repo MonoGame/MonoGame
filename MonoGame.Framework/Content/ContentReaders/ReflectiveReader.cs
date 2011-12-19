@@ -182,7 +182,7 @@ namespace Microsoft.Xna.Framework.Content
             }
             else
             {
-                obj = (T)constructor.Invoke(null);
+                obj = (constructor == null ? (T)Activator.CreateInstance(typeof(T), false) : (T)constructor.Invoke(null));
             }
 			
 			if(baseTypeReader != null)
