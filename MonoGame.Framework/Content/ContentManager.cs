@@ -44,6 +44,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Media;
@@ -142,16 +143,22 @@ namespace Microsoft.Xna.Framework.Content
 		
 		protected virtual Stream OpenStream(string assetName)
 		{
-			string originalAssetName = assetName;
-			
-			// Replace Windows path separators with local path separators
-			assetName = GetFilename(assetName)+".xnb";
-			
 			Stream stream;
 			try {
-				stream = new FileStream(assetName, FileMode.Open, FileAccess.Read, FileShare.Read);
-			} catch (Exception ex) {
-				throw new ContentLoadException("Could not load " + originalAssetName + " asset!");
+				string assetPath = Path.Combine (_rootDirectory, assetName)+".xnb";
+				stream = TitleContainer.OpenStream(assetPath);
+			}
+			catch (FileNotFoundException fileNotFound)
+			{
+				throw new ContentLoadException("The content file was not found.", fileNotFound);
+			}
+			catch (DirectoryNotFoundException directoryNotFound)
+			{
+				throw new ContentLoadException("The directory was not found.", directoryNotFound);
+			}
+			catch (Exception exception)
+			{
+				throw new ContentLoadException("Opening stream error.", exception);
 			}
 			return stream;
 		}
@@ -188,8 +195,7 @@ namespace Microsoft.Xna.Framework.Content
 			} catch (ContentLoadException ex) {
 				//MonoGame try to load as a non-content file
 				
-				// Replace Windows path separators with local path separators
-				assetName = GetFilename(assetName);
+				assetName = TitleContainer.GetFilename(assetName);
 				
 				if ((typeof(T) == typeof(Texture2D)))
 				{
