@@ -8,7 +8,11 @@ namespace Microsoft.Xna.Framework
         public static GamePlatform Create(Game game)
         {
             // FIXME: How do we want this factory method to operate?  ifdef?  Reflection?
+#if IPHONE
             return new iOSGamePlatform(game);
+#elif MONOMAC
+            return new MacGamePlatform(game);
+#endif
         }
 
         protected GamePlatform(Game game)
@@ -25,9 +29,26 @@ namespace Microsoft.Xna.Framework
 
         #region Public Properties
 
+        private bool _isActive;
         public bool IsActive
         {
-            get; protected set;
+            get { return _isActive; }
+            protected set
+            {
+                if (_isActive != value)
+                {
+                    _isActive = value;
+                    if (_isActive)
+                        Raise(Activated, EventArgs.Empty);
+                    else
+                        Raise(Deactivated, EventArgs.Empty);
+                }
+            }
+        }
+
+        public bool IsMouseVisible
+        {
+            get; set;
         }
 
         public Game Game
@@ -44,13 +65,20 @@ namespace Microsoft.Xna.Framework
 
         #region Events
 
-        public event EventHandler AsyncRunLoopEnded;
+        public event EventHandler<EventArgs> AsyncRunLoopEnded;
+        public event EventHandler<EventArgs> Activated;
+        public event EventHandler<EventArgs> Deactivated;
+
+        private void Raise<TEventArgs>(EventHandler<TEventArgs> handler, TEventArgs e)
+            where TEventArgs : EventArgs
+        {
+            if (handler != null)
+                handler(this, e);
+        }
 
         protected void RaiseAsyncRunLoopEnded()
         {
-            var handler = AsyncRunLoopEnded;
-            if (handler != null)
-                handler(this, EventArgs.Empty);
+            Raise(AsyncRunLoopEnded, EventArgs.Empty);
         }
 
         #endregion Events

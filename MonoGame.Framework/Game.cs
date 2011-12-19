@@ -74,6 +74,8 @@ namespace Microsoft.Xna.Framework
             _drawGameTime = new GameTime();
 
             _platform = GamePlatform.Create(this);
+            _platform.Activated += Platform_Activated;
+            _platform.Deactivated += Platform_Deactivated;
         }
 
         ~Game()
@@ -108,38 +110,13 @@ namespace Microsoft.Xna.Framework
 
         public bool IsActive
         {
-            get { return _isActive; }
-            protected set
-            {
-                // Give GamePlatform implementations an opportunity to override the new value.
-                value = _platform.IsActiveChanging(value);
-                if (_isActive != value)
-                {
-                    _isActive = value;
-
-                    if (_isActive)
-                        Raise(Activated, EventArgs.Empty);
-                    else
-                        Raise(Deactivated, EventArgs.Empty);
-
-                    _platform.IsActiveChanged();
-                }
-            }
+            get { return _platform.IsActive; }
         }
 
         public bool IsMouseVisible
         {
-            get { return _isMouseVisible; }
-            set
-            {
-                // Give GamePlatform implementations an opportunity to override the new value.
-                value = _platform.IsMouseVisibleChanging(value);
-                if (_isMouseVisible != value)
-                {
-                    _isMouseVisible = value;
-                    _platform.IsMouseVisibleChanged();
-                }
-            }
+            get { return _platform.IsMouseVisible; }
+            set { _platform.IsMouseVisible = value; }
         }
 
         public TimeSpan TargetElapsedTime
@@ -350,6 +327,16 @@ namespace Microsoft.Xna.Framework
         {
             _platform.AsyncRunLoopEnded -= Platform_AsyncRunLoopEnded;
             EndRun();
+        }
+
+        private void Platform_Activated (object sender, EventArgs e)
+        {
+            Raise(Activated, e);
+        }
+
+        private void Platform_Deactivated (object sender, EventArgs e)
+        {
+            Raise(Deactivated, e);
         }
 
         #endregion Event Handlers

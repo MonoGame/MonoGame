@@ -60,7 +60,7 @@ namespace Microsoft.Xna.Framework
 	{
 		//private readonly Rectangle clientBounds;
 		private Rectangle clientBounds;
-		internal Game game;
+		private Game _game;
 		private GameTime _updateGameTime;
 		private GameTime _drawGameTime;
 		private DateTime _lastUpdate;
@@ -68,8 +68,11 @@ namespace Microsoft.Xna.Framework
 		private NSTrackingArea _trackingArea;
 
 		#region UIVIew Methods		
-		public GameWindow (RectangleF frame) : base (frame)
+		public GameWindow(Game game, RectangleF frame) : base (frame)
 		{
+            if (game == null)
+                throw new ArgumentNullException("game");
+            _game = game;
 
 			//LayerRetainsBacking = false; 
 			//LayerColorFormat	= EAGLColorFormat.RGBA8;
@@ -158,10 +161,10 @@ namespace Microsoft.Xna.Framework
 			// More speed testing is required, to see if this is worse or better
 			// game.DoStep();	
 
-			if (game != null) {
+			if (_game != null) {
 				_drawGameTime.Update (_now - _lastUpdate);
 				_lastUpdate = _now;
-				game.DoDraw (_drawGameTime);
+				_game.DoDraw (_drawGameTime);
 			}
 
 		}
@@ -169,8 +172,8 @@ namespace Microsoft.Xna.Framework
 		protected override void OnResize (EventArgs e)
 		{
 			
-			var manager = game.Services.GetService (typeof(IGraphicsDeviceManager)) as GraphicsDeviceManager;
-			if (game.Initialized)
+			var manager = _game.Services.GetService (typeof(IGraphicsDeviceManager)) as GraphicsDeviceManager;
+			if (_game.Initialized)
 				manager.OnDeviceResetting(EventArgs.Empty);
 			
 			Microsoft.Xna.Framework.Graphics.Viewport _vp =
@@ -181,14 +184,14 @@ namespace Microsoft.Xna.Framework
 			_vp.Width = (int)Bounds.Width;
 			_vp.Height = (int)Bounds.Height;
 			
-			game.GraphicsDevice.Viewport = _vp;
+			_game.GraphicsDevice.Viewport = _vp;
 			
 			clientBounds = new Rectangle((int)Bounds.X,(int)Bounds.Y,(int)Bounds.Width,(int)Bounds.Height);
 			
 			base.OnResize (e);
 			OnClientSizeChanged(e);
 			
-			if (game.Initialized)
+			if (_game.Initialized)
 				manager.OnDeviceReset(EventArgs.Empty);
 		}
 		
@@ -213,10 +216,10 @@ namespace Microsoft.Xna.Framework
 		{			
 			base.OnUpdateFrame (e);	
 
-			if (game != null) {
+			if (_game != null) {
 				_now = DateTime.Now;
 				_updateGameTime.Update (_now - _lastUpdate);
-				game.DoUpdate (_updateGameTime);
+				_game.DoUpdate (_updateGameTime);
 			}
 		}
 
@@ -388,12 +391,18 @@ namespace Microsoft.Xna.Framework
 		}
 
 		public bool AllowUserResizing {
-			get {
-				return game.AllowUserResizing;
-			}
-			set {
-				game.AllowUserResizing = value;
-			}
+			get
+            {
+                throw new NotImplementedException();
+                // FIXME: Replace _game.AllowUserResizing
+                //return _game.AllowUserResizing;
+            }
+			set
+            {
+                throw new NotImplementedException();
+                // FIXME: Replace _game.AllowUserResizing
+                //_game.AllowUserResizing = value;
+            }
 		}	
 
 		private DisplayOrientation _currentOrientation;
@@ -463,7 +472,7 @@ namespace Microsoft.Xna.Framework
 			}
 
 			// if the cursor is not to be visible then we us our custom cursor.
-			if (!game.IsMouseVisible)
+			if (!_game.IsMouseVisible)
 				AddCursorRectcursor(Frame, cursor);
 			else
 				AddCursorRectcursor(Frame, NSCursor.CurrentSystemCursor);

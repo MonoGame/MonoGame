@@ -119,7 +119,9 @@ namespace Microsoft.Xna.Framework.Media
 				_video.MovieView.Play(new NSObject());	
 				
 				_state = MediaState.Playing;
-				_game.IsPlayingVideo = true;
+                // FIXME: Replace _game.IsPlayingVideo
+                throw new NotImplementedException();
+				//_game.IsPlayingVideo = true;
 			}
 		}
 
@@ -137,7 +139,9 @@ namespace Microsoft.Xna.Framework.Media
 				_video.MovieView.Pause(o);
 				_video.MovieView.GotoBeginning(o);
 				_state = MediaState.Stopped;
-				_game.IsPlayingVideo = false;
+                // FIXME: Replace _game.IsPlayingView
+                throw new NotImplementedException();
+				//_game.IsPlayingVideo = false;
 				_video.MovieView.RemoveFromSuperview();
 			}
         }
