@@ -254,6 +254,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 			set {
 				_viewport = value;
+				GL.Viewport (value.X, value.Y, value.Width, value.Height);
 			}
 		}	
 

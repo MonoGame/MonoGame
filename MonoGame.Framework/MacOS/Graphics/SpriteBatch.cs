@@ -189,8 +189,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			
 			GL.MatrixMode (MatrixMode.Modelview);
-
-			GL.Viewport (0, 0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height);
 			 
 			 
 			// Enable Scissor Tests if necessary
