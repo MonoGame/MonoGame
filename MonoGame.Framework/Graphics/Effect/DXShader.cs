@@ -37,111 +37,109 @@ namespace Microsoft.Xna.Framework.Graphics
 					IntPtr.Zero,
 					IntPtr.Zero);
 			
-			try {
-				MojoShader.MOJOSHADER_parseData parseData =
-					(MojoShader.MOJOSHADER_parseData)Marshal.PtrToStructure(
-						parseDataPtr,
-						typeof(MojoShader.MOJOSHADER_parseData));
-				
-				if (parseData.error_count > 0) {
-					MojoShader.MOJOSHADER_error[] errors =
-						DXHelper.UnmarshalArray<MojoShader.MOJOSHADER_error>(
-							parseData.errors, parseData.error_count);
-					throw new Exception(errors[0].error);
-				}
-				
-				if (parseData.preshader != IntPtr.Zero) {
-					preshader = new DXPreshader(parseData.preshader);
-				}
-				
-				switch(parseData.shader_type) {
-				case MojoShader.MOJOSHADER_shaderType.MOJOSHADER_TYPE_PIXEL:
-					shaderType = ShaderType.FragmentShader;
+			MojoShader.MOJOSHADER_parseData parseData =
+				(MojoShader.MOJOSHADER_parseData)Marshal.PtrToStructure(
+					parseDataPtr,
+					typeof(MojoShader.MOJOSHADER_parseData));
+			
+			if (parseData.error_count > 0) {
+				MojoShader.MOJOSHADER_error[] errors =
+					DXHelper.UnmarshalArray<MojoShader.MOJOSHADER_error>(
+						parseData.errors, parseData.error_count);
+				throw new Exception(errors[0].error);
+			}
+			
+			if (parseData.preshader != IntPtr.Zero) {
+				preshader = new DXPreshader(parseData.preshader);
+			}
+			
+			switch(parseData.shader_type) {
+			case MojoShader.MOJOSHADER_shaderType.MOJOSHADER_TYPE_PIXEL:
+				shaderType = ShaderType.FragmentShader;
+				break;
+			case MojoShader.MOJOSHADER_shaderType.MOJOSHADER_TYPE_VERTEX:
+				shaderType = ShaderType.VertexShader;
+				break;
+			default:
+				throw new NotSupportedException();
+			}
+			
+			symbols = DXHelper.UnmarshalArray<MojoShader.MOJOSHADER_symbol>(
+					parseData.symbols, parseData.symbol_count);
+			
+			Array.Sort (symbols, (a, b) => a.register_index.CompareTo(b.register_index));
+			
+			samplers = DXHelper.UnmarshalArray<MojoShader.MOJOSHADER_sampler>(
+					parseData.samplers, parseData.sampler_count);
+			
+			MojoShader.MOJOSHADER_attribute[] attributes = 
+				DXHelper.UnmarshalArray<MojoShader.MOJOSHADER_attribute>(
+					parseData.attributes, parseData.attribute_count);
+			
+			foreach (MojoShader.MOJOSHADER_symbol symbol in symbols) {
+				switch (symbol.register_set) {
+				case MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_BOOL:
+					uniforms_bool_count += (int)symbol.register_count;
 					break;
-				case MojoShader.MOJOSHADER_shaderType.MOJOSHADER_TYPE_VERTEX:
-					shaderType = ShaderType.VertexShader;
+				case MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_FLOAT4:
+					uniforms_float4_count += (int)symbol.register_count;
+					break;
+				case MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_INT4:
+					uniforms_int4_count += (int)symbol.register_count;
 					break;
 				default:
-					throw new NotSupportedException();
+					break;
 				}
-				
-				symbols = DXHelper.UnmarshalArray<MojoShader.MOJOSHADER_symbol>(
-						parseData.symbols, parseData.symbol_count);
-				
-				Array.Sort (symbols, (a, b) => a.register_index.CompareTo(b.register_index));
-				
-				samplers = DXHelper.UnmarshalArray<MojoShader.MOJOSHADER_sampler>(
-						parseData.samplers, parseData.sampler_count);
-				
-				MojoShader.MOJOSHADER_attribute[] attributes = 
-					DXHelper.UnmarshalArray<MojoShader.MOJOSHADER_attribute>(
-						parseData.attributes, parseData.attribute_count);
-				
-				foreach (MojoShader.MOJOSHADER_symbol symbol in symbols) {
-					switch (symbol.register_set) {
-					case MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_BOOL:
-						uniforms_bool_count += (int)symbol.register_count;
+			}
+			
+			uniforms_float4 = new float[uniforms_float4_count*4];
+			uniforms_int4 = new int[uniforms_int4_count*4];
+			uniforms_bool = new int[uniforms_bool_count];
+			
+			glslCode = parseData.output;
+			
+			//MojoShader wants us to handle vertex input attributes ourselves
+			//to get around some directx fetures that opengl's entry points
+			//don't support. We just hack around it for now
+			foreach (MojoShader.MOJOSHADER_attribute attrb in attributes) {
+				if (shaderType == ShaderType.VertexShader) {
+					switch (attrb.usage) {
+					case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_COLOR:
+						glslCode = glslCode.Replace ("attribute vec4 "+attrb.name+";",
+						                               "#define "+attrb.name+" gl_Color");
 						break;
-					case MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_FLOAT4:
-						uniforms_float4_count += (int)symbol.register_count;
+					case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_POSITION:
+						glslCode = glslCode.Replace ("attribute vec4 "+attrb.name+";",
+						                               "#define "+attrb.name+" gl_Vertex");
 						break;
-					case MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_INT4:
-						uniforms_int4_count += (int)symbol.register_count;
+					case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_TEXCOORD:
+						glslCode = glslCode.Replace ("attribute vec4 "+attrb.name+";",
+						                               "#define "+attrb.name+" gl_MultiTexCoord0");
+						break;
+					case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_NORMAL:
+						glslCode = glslCode.Replace ("attribute vec4 "+attrb.name+";",
+						                               "#define "+attrb.name+" gl_Normal");
 						break;
 					default:
-						break;
+						throw new NotImplementedException();
 					}
 				}
-				
-				uniforms_float4 = new float[uniforms_float4_count*4];
-				uniforms_int4 = new int[uniforms_int4_count*4];
-				uniforms_bool = new int[uniforms_bool_count];
-				
-				glslCode = parseData.output;
-				
-				//MojoShader wants us to handle vertex input attributes ourselves
-				//to get around some directx fetures that opengl's entry points
-				//don't support. We just hack around it for now
-				foreach (MojoShader.MOJOSHADER_attribute attrb in attributes) {
-					if (shaderType == ShaderType.VertexShader) {
-						switch (attrb.usage) {
-						case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_COLOR:
-							glslCode = glslCode.Replace ("attribute vec4 "+attrb.name+";",
-							                               "#define "+attrb.name+" gl_Color");
-							break;
-						case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_POSITION:
-							glslCode = glslCode.Replace ("attribute vec4 "+attrb.name+";",
-							                               "#define "+attrb.name+" gl_Vertex");
-							break;
-						case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_TEXCOORD:
-							glslCode = glslCode.Replace ("attribute vec4 "+attrb.name+";",
-							                               "#define "+attrb.name+" gl_MultiTexCoord0");
-							break;
-						case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_NORMAL:
-							glslCode = glslCode.Replace ("attribute vec4 "+attrb.name+";",
-							                               "#define "+attrb.name+" gl_Normal");
-							break;
-						default:
-							throw new NotImplementedException();
-						}
-					}
-				}
-				
-				glslCode = GLSLOptimizer.Optimize (glslCode, shaderType);
-				
-				shader = GL.CreateShader (shaderType);
-				GL.ShaderSource (shader, glslCode);
-				GL.CompileShader(shader);
-				
-				int compiled = 0;
-				GL.GetShader (shader, ShaderParameter.CompileStatus, out compiled);
-				if (compiled == (int)All.False) {
-					throw new Exception("Shader Compilation Failed");
-				}
-				
-			} finally {
-				MojoShader.NativeMethods.MOJOSHADER_freeParseData(parseDataPtr);
 			}
+			
+			glslCode = GLSLOptimizer.Optimize (glslCode, shaderType);
+			
+			shader = GL.CreateShader (shaderType);
+			GL.ShaderSource (shader, glslCode);
+			GL.CompileShader(shader);
+			
+			int compiled = 0;
+			GL.GetShader (shader, ShaderParameter.CompileStatus, out compiled);
+			if (compiled == (int)All.False) {
+				throw new Exception("Shader Compilation Failed");
+			}
+				
+			//MojoShader.NativeMethods.MOJOSHADER_freeParseData(parseDataPtr);
+			//TODO: dispose properly - DXPreshader holds unmanaged data
 		}
 		
 		
@@ -166,29 +164,33 @@ namespace Microsoft.Xna.Framework.Graphics
 					bool_index += (int)symbol.register_count;
 					break;
 				case MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_FLOAT4:
+					
+					Single[] data = parameter.GetValueSingleArray();
+					if (data.Length > symbol.register_count*4) {
+						throw new Exception("effect parameter data is broken");
+					}
+					
 					switch (parameter.ParameterClass) {
 					case EffectParameterClass.Scalar:
-						uniforms_float4[float4_index*4] = (float)parameter.data;
+						for (int i=0; i<data.Length; i++) {
+							uniforms_float4[float4_index*4+i] = (float)data[i];
+						}
 						break;
 					case EffectParameterClass.Vector:
 					case EffectParameterClass.Matrix:
 						for (int y=0; y<Math.Min (symbol.register_count, parameter.RowCount); y++) {
 							for (int x=0; x<parameter.ColumnCount; x++) {
-								uniforms_float4[(float4_index+y)*4+x] = ((float[])parameter.data)[y*4+x];
+								uniforms_float4[(float4_index+y)*4+x] = (float)data[y*4+x];
 							}
 						}
 						break;
 					default:
 						throw new NotImplementedException();
-						//break;
 					}
 					float4_index += (int)symbol.register_count;
 					break;
 				case MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_INT4:
-					for (int i=0; i<4; i++) {
-						uniforms_int4[int4_index+i] = ((int[])parameter.data)[i];
-					}
-					int4_index += (int)symbol.register_count;
+					throw new NotImplementedException();
 					break;
 				case MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_SAMPLER:
 					break; //handled by ActivateTextures

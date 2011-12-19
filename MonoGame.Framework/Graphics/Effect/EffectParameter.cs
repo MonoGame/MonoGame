@@ -234,12 +234,31 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public Single GetValueSingle ()
 		{
-			throw new NotImplementedException();
+			return (Single)data;
 		}
 
 		public Single[] GetValueSingleArray ()
 		{
-			throw new NotImplementedException();
+			if (Elements.Count > 0) {
+				Single[] ret = new Single[rowCount*colCount*Elements.Count];
+				for (int i=0; i<Elements.Count; i++) {
+					Single[] elmArray = Elements[i].GetValueSingleArray ();
+					for (int j=0; j<elmArray.Length; j++) {
+						ret[rowCount*colCount*i+j] = elmArray[j];
+					}
+				}
+				return ret;
+			}
+			
+			switch(ParameterClass) {
+			case EffectParameterClass.Scalar:
+				return new Single[] { GetValueSingle () };
+			case EffectParameterClass.Matrix:
+			case EffectParameterClass.Vector:
+				return (Single[])data;
+			default:
+				throw new NotImplementedException();
+			}
 		}
 
 		public string GetValueString ()
@@ -314,6 +333,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void SetValue (Matrix value)
 		{ 
+			//TODO: obey rowcount and colcount instead of hax in DXShader
 			data = Matrix.ToFloatArray(Matrix.Transpose (value)).Clone ();
 		}
 
@@ -334,12 +354,24 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void SetValue (Single value)
 		{
-			data = value;
+			switch (ParameterClass) {
+			case EffectParameterClass.Matrix:
+			case EffectParameterClass.Vector:
+				((float[])data)[0] = value;
+				break;
+			case EffectParameterClass.Scalar:
+				data = value;
+				break;
+			default:
+				throw new NotImplementedException();
+			}
 		}
 
 		public void SetValue (Single[] value)
 		{
-			throw new NotImplementedException();
+			for (int i=0; i<value.Length; i++) {
+				Elements[i].SetValue (value[i]);
+			}
 		}
 		
 		public void SetValue (string value)
@@ -349,7 +381,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void SetValue (Texture value)
 		{
-			//throw new NotImplementedException();
 			data = value;
 		}
 
@@ -360,7 +391,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void SetValue (Vector2[] value)
 		{
-			throw new NotImplementedException();
+			for (int i=0; i<value.Length; i++) {
+				Elements[i].SetValue (value[i]);
+			}
 		}
 
 		public void SetValue (Vector3 value)
@@ -370,7 +403,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void SetValue (Vector3[] value)
 		{
-			throw new NotImplementedException();
+			for (int i=0; i<value.Length; i++) {
+				Elements[i].SetValue (value[i]);
+			}
 		}
 
 		public void SetValue (Vector4 value)
@@ -380,7 +415,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void SetValue (Vector4[] value)
 		{
-			throw new NotImplementedException();
+			for (int i=0; i<value.Length; i++) {
+				Elements[i].SetValue (value[i]);
+			}
 		}
 	}
 }

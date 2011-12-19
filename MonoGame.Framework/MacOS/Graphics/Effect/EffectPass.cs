@@ -69,7 +69,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		public void Apply ()
 		{
 			_technique._effect.OnApply();
-			
+			Console.WriteLine (_technique._effect.Name+" - "+_technique.Name);
 			bool relink = false;
 			foreach ( DXEffectObject.d3dx_state state in states) {
 				

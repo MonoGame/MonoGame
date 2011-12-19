@@ -17,7 +17,10 @@ namespace Microsoft.Xna.Framework.Content
         {
             int count = input.ReadInt32();
             
-            return new Effect(input.GraphicsDevice,input.ReadBytes(count));
+            Effect effect = new Effect(input.GraphicsDevice,input.ReadBytes(count));
+            effect.Name = input.AssetName;
+            
+            return effect;
         }
     }
 }

@@ -39,64 +39,25 @@ namespace Microsoft.Xna.Framework.Graphics
 				if (symbol.register_set != MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_FLOAT4) {
 					throw new NotImplementedException();
 				}
-				//todo: support array parameters
 				EffectParameter parameter = parameters[symbol.name];
-				
-				if (parameter.Elements.Count > 0) {
-					for (int i=0; i<parameter.Elements.Count; i++) {
-						EffectParameter element = parameter.Elements[i];
-						
-						switch (element.ParameterClass) {
-						case EffectParameterClass.Scalar:
-							switch (element.ParameterType) {
-							case EffectParameterType.Single:
-								inRegs[(symbol.register_index+i)*4] = (float)element.data;
-								break;
-							case EffectParameterType.Int32:
-								inRegs[(symbol.register_index+i)*4] = (float)(int)element.data;
-								break;
-							default:
-								throw new NotImplementedException();
-							}
-							
-							break;
-						case EffectParameterClass.Vector:
-						case EffectParameterClass.Matrix:
-							for (int j=0; j<element.RowCount*parameter.ColumnCount; j++) {
-								inRegs[(symbol.register_index+i)*4+j] = ((float[])parameter.data)[i];
-							}
-							break;
-						default:
-							throw new NotImplementedException();
-							//break;
-						}
-					}
-					continue;
-				}
+				Single[] data = parameter.GetValueSingleArray();
 				
 				switch (parameter.ParameterClass) {
 				case EffectParameterClass.Scalar:
-					switch (parameter.ParameterType) {
-					case EffectParameterType.Single:
-						inRegs[symbol.register_index*4] = (float)parameter.data;
-						break;
-					case EffectParameterType.Int32:
-						inRegs[symbol.register_index*4] = (float)(int)parameter.data;
-						break;
-					default:
-						throw new NotImplementedException();
+					for (int i=0; i<data.Length; i++) {
+						inRegs[symbol.register_index*4+i] = (float)data[i];
 					}
-					
 					break;
 				case EffectParameterClass.Vector:
 				case EffectParameterClass.Matrix:
-					for (int i=0; i<parameter.RowCount*parameter.ColumnCount; i++) {
-						inRegs[symbol.register_index*4+i] = ((float[])parameter.data)[i];
+					for (int y=0; y<Math.Min (symbol.register_count, parameter.RowCount); y++) {
+						for (int x=0; x<parameter.ColumnCount; x++) {
+							inRegs[(symbol.register_index+y)*4+x] = (float)data[y*4+x];
+						}
 					}
 					break;
 				default:
 					throw new NotImplementedException();
-					//break;
 				}
 			}
 			
