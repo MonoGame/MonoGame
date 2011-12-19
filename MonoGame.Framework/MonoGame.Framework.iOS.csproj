@@ -333,7 +333,6 @@
     <Compile Include="iOS\Graphics\PresentationParameters.cs" />
     <Compile Include="iOS\Graphics\Texture2D.cs" />
     <Compile Include="iOS\Input\GamePad.cs" />
-    <Compile Include="iOS\Game.cs" />
     <Compile Include="iOS\IOSGameWindow.cs" />
     <Compile Include="iOS\PowerStatus.cs" />
     <Compile Include="iOS\Audio\Sound.cs" />
@@ -363,6 +362,9 @@
     <Compile Include="Graphics\Vertices\VertexElementColor.cs" />
     <Compile Include="Audio\XactClip.cs" />
     <Compile Include="Audio\XactSound.cs" />
+    <Compile Include="Game.cs" />
+    <Compile Include="GamePlatform.cs" />
+    <Compile Include="iOS\iOSGamePlatform.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>

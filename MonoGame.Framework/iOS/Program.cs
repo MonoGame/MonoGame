@@ -136,7 +136,9 @@ namespace Microsoft.Xna.Framework
 		{
 			if ( MonoGameGame != null )
 			{
-				MonoGameGame.IsActive = false;
+                // FIXME: Re-express this SetIsActive call
+                throw new NotImplementedException("Re-express this SetIsActive call");
+				//MonoGameGame.SetIsActive(false);
 			}
 		}
 		
@@ -144,7 +146,9 @@ namespace Microsoft.Xna.Framework
         {
 			if ( MonoGameGame != null )
 			{
-				MonoGameGame.IsActive = true;
+                // FIXME: Re-express this SetIsActive call
+                throw new NotImplementedException("Re-express this SetIsActive call");
+				//MonoGameGame.SetIsActive(true);
 			}
 			TouchPanel.Reset ();
 		}

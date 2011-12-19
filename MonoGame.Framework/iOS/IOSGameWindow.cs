@@ -109,7 +109,7 @@ namespace Microsoft.Xna.Framework
 				
 		#region UIVIew Methods
 
-		public GameWindow() : base (UIScreen.MainScreen.Bounds)
+		internal GameWindow(Game game, iOSGamePlatform platform) : base (UIScreen.MainScreen.Bounds)
 		{
 			LayerRetainsBacking = false; 
 			LayerColorFormat	= EAGLColorFormat.RGBA8;

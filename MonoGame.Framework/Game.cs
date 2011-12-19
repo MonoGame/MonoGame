@@ -14,7 +14,7 @@ using Microsoft.Xna.Framework.Input.Touch;
 
 namespace Microsoft.Xna.Framework
 {
-    public partial class Game : IDisposable
+    public class Game : IDisposable
     {
         // FIXME:  What does this constant actually represent?  The target FPS?
         private const float FramesPerSecond = 60.0f; // ~60 frames per second
@@ -30,6 +30,7 @@ namespace Microsoft.Xna.Framework
         private GameComponentCollection _components;
         private ContentManager _content;
         private GameServiceContainer _services;
+        private GamePlatform _platform;
 
         private SortingFilteringCollection<IDrawable> _drawables =
             new SortingFilteringCollection<IDrawable>(
@@ -56,7 +57,7 @@ namespace Microsoft.Xna.Framework
         private bool _isActive = false;
         private bool _isFixedTimeStep = true;
         private bool _isMouseVisible = false;
-        static internal bool _playingVideo = false;
+        internal bool _playingVideo = false;
 
         private TimeSpan _targetElapsedTime = TimeSpan.FromSeconds(1 / FramesPerSecond);
 
@@ -67,39 +68,36 @@ namespace Microsoft.Xna.Framework
         {
             _services = new GameServiceContainer();
             _components = new GameComponentCollection();
+            _content = new ContentManager(_services);
 
             _updateGameTime = new GameTime();
             _drawGameTime = new GameTime();
 
-            PlatformConstructor();
+            _platform = GamePlatform.Create(this);
         }
 
         ~Game()
         {
-            PlatformFinalize();
+            Dispose(false);
         }
+
+        #region IDisposable Implementation
 
         public void Dispose()
         {
-            PlatformDispose();
+            Dispose(true);
             Raise(Disposed, EventArgs.Empty);
         }
 
-        partial void PlatformFinalize();
-        partial void PlatformDispose();
-        partial void PlatformIsActiveChanging(bool value);
-        partial void PlatformIsActiveChanged();
-        partial void PlatformIsMouseVisibleChanging(bool value);
-        partial void PlatformIsMouseVisibleChanged();
-        partial void PlatformTargetElapsedTimeChanging(TimeSpan value);
-        partial void PlatformTargetElapsedTimeChanged();
-        partial void PlatformExit();
-        partial void PlatformInitialize();
-        partial void PlatformRun();
-        partial void PlatformGoFullScreen();
-        partial void PlatformGoWindowed();
-        partial void PlatformEnterForeground();
-        partial void PlatformEnterBackground();
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _platform.Dispose();
+            }
+        }
+
+        #endregion IDisposable Implementation
 
         #region Properties
 
@@ -113,9 +111,10 @@ namespace Microsoft.Xna.Framework
             get { return _isActive; }
             protected set
             {
+                // Give GamePlatform implementations an opportunity to override the new value.
+                value = _platform.IsActiveChanging(value);
                 if (_isActive != value)
                 {
-                    PlatformIsActiveChanging(value);
                     _isActive = value;
 
                     if (_isActive)
@@ -123,7 +122,7 @@ namespace Microsoft.Xna.Framework
                     else
                         Raise(Deactivated, EventArgs.Empty);
 
-                    PlatformIsActiveChanged();
+                    _platform.IsActiveChanged();
                 }
             }
         }
@@ -133,11 +132,12 @@ namespace Microsoft.Xna.Framework
             get { return _isMouseVisible; }
             set
             {
+                // Give GamePlatform implementations an opportunity to override the new value.
+                value = _platform.IsMouseVisibleChanging(value);
                 if (_isMouseVisible != value)
                 {
-                    PlatformIsMouseVisibleChanging(value);
                     _isMouseVisible = value;
-                    PlatformIsMouseVisibleChanged();
+                    _platform.IsMouseVisibleChanged();
                 }
             }
         }
@@ -147,15 +147,17 @@ namespace Microsoft.Xna.Framework
             get { return _targetElapsedTime; }
             set
             {
+                // Give GamePlatform implementations an opportunity to override the new value.
+                value = _platform.TargetElapsedTimeChanging(value);
+
                 if (value <= TimeSpan.Zero)
                     throw new ArgumentOutOfRangeException(
                         "value must be positive and non-zero.");
 
                 if (value != _targetElapsedTime)
                 {
-                    PlatformTargetElapsedTimeChanging(value);
                     _targetElapsedTime = value;
-                    PlatformTargetElapsedTimeChanged();
+                    _platform.TargetElapsedTimeChanged();
                 }
             }
         }
@@ -172,12 +174,7 @@ namespace Microsoft.Xna.Framework
 
         public ContentManager Content
         {
-            get
-            {
-                if (_content == null)
-                    _content = new ContentManager(_services);
-                return _content;
-            }
+            get { return _content; }
         }
 
         public GraphicsDevice GraphicsDevice
@@ -196,10 +193,16 @@ namespace Microsoft.Xna.Framework
             }
         }
 
+        public GameWindow Window
+        {
+            get { return _platform.Window; }
+        }
+
         #endregion Properties
 
         #region Internal Properties
 
+        // FIXME: Internal members should be eliminated.
         internal bool Initialized
         {
             get { return _initialized; }
@@ -221,7 +224,7 @@ namespace Microsoft.Xna.Framework
         public void Exit()
         {
             Raise(Exiting, EventArgs.Empty);
-            PlatformExit();
+            _platform.Exit();
         }
 
         public void ResetElapsedTime()
@@ -229,7 +232,7 @@ namespace Microsoft.Xna.Framework
             _lastUpdate = DateTime.Now;
         }
 
-        public void Run()
+        public void Run(bool asynchronous=false)
         {
             _lastUpdate = DateTime.Now;
 
@@ -253,18 +256,23 @@ namespace Microsoft.Xna.Framework
             _components.ComponentAdded += Components_ComponentAdded;
             _components.ComponentRemoved += Components_ComponentRemoved;
 
-            if (!PlatformBeforeRun())
+            if (!_platform.BeforeRun())
                 return;
 
             Initialize();
             _initialized = true;
 
             BeginRun();
-            PlatformRun();
-
-            // FIXME: Is Run() blocking on all (any??) platforms?  Or should
-            //        EndRun be called in a platform-specific way?
-            EndRun();
+            if (asynchronous)
+            {
+                _platform.AsyncRunLoopEnded += Platform_AsyncRunLoopEnded;
+                _platform.StartRunLoop();
+            }
+            else
+            {
+                _platform.RunLoop();
+                EndRun();
+            }
         }
 
         #endregion
@@ -282,7 +290,7 @@ namespace Microsoft.Xna.Framework
 
         protected virtual void Initialize()
         {
-            PlatformInitialize();
+            _platform.BeforeInitialize();
 
             // According to the information given on MSDN (see link below), all
             // GameComponents in Components at the time Initialize() is called
@@ -305,7 +313,7 @@ namespace Microsoft.Xna.Framework
 
         protected virtual void Draw(GameTime gameTime)
         {
-            if (!PlatformBeforeDraw(gameTime) || _playingVideo)
+            if (!_platform.BeforeDraw(gameTime) || _playingVideo)
                 return;
 
             _drawables.ForEachFilteredItem(d => d.Draw(gameTime));
@@ -313,7 +321,7 @@ namespace Microsoft.Xna.Framework
 
         protected virtual void Update(GameTime gameTime)
         {
-            if (!PlatformBeforeUpdate(gameTime))
+            if (!_platform.BeforeUpdate(gameTime))
                 return;
 
             _updateables.ForEachFilteredItem(u => u.Update(gameTime));
@@ -338,30 +346,31 @@ namespace Microsoft.Xna.Framework
             DecategorizeComponent(e.GameComponent);
         }
 
+        private void Platform_AsyncRunLoopEnded(object sender, EventArgs e)
+        {
+            _platform.AsyncRunLoopEnded -= Platform_AsyncRunLoopEnded;
+            EndRun();
+        }
+
         #endregion Event Handlers
 
         #region Internal Methods
 
         internal void applyChanges(GraphicsDeviceManager manager)
         {
-            Microsoft.Xna.Framework.Graphics.Viewport _vp =
-            new Microsoft.Xna.Framework.Graphics.Viewport();
+            var viewport = new Viewport();
 
-            _vp.X = 0;
-            _vp.Y = 0;
-            _vp.Width = manager.PreferredBackBufferWidth;
-            _vp.Height = manager.PreferredBackBufferHeight;
+            viewport.X = 0;
+            viewport.Y = 0;
+            viewport.Width = manager.PreferredBackBufferWidth;
+            viewport.Height = manager.PreferredBackBufferHeight;
 
-            GraphicsDevice.Viewport = _vp;
+            GraphicsDevice.Viewport = viewport;
 
             if (GraphicsDevice.PresentationParameters.IsFullScreen)
-            {
-                PlatformGoFullScreen();
-            }
+                _platform.EnterFullScreen();
             else
-            {
-                PlatformGoWindowed();
-            }
+                _platform.ExitFullScreen();
         }
 
         internal void DoUpdate(GameTime gameTime)
@@ -369,7 +378,8 @@ namespace Microsoft.Xna.Framework
             // FIXME: Should we really be checking _shouldDraw before doing an
             //        update?  And if the answer is "yes", shouldn't it be
             //        called _shouldDrawAndUpdate.
-            if (_shouldDraw)
+            // FIXME: What is the difference between _shouldDraw and _isActive?
+            if (_isActive && _shouldDraw)
                 Update(gameTime);
         }
 
@@ -378,24 +388,36 @@ namespace Microsoft.Xna.Framework
             // Draw and EndDraw should not be called if BeginDraw returns false.
             // http://stackoverflow.com/questions/4054936/manual-control-over-when-to-redraw-the-screen/4057180#4057180
             // http://stackoverflow.com/questions/4235439/xna-3-1-to-4-0-requires-constant-redraw-or-will-display-a-purple-screen
-            if (_shouldDraw && BeginDraw())
+            // FIXME: What is the difference between _shouldDraw and _isActive?
+            if (_isActive && _shouldDraw && BeginDraw())
             {
                 Draw(gameTime);
                 EndDraw();
             }
         }
 
+        // FIXME: Can EnterForeground be pushed into GamePlatform
+        //        implementations that need it, rather than hanging around
+        //        as an internal method here?
         internal void EnterForeground()
         {
+            // FIXME: What is the difference between _shouldDraw and _isActive?
             _shouldDraw = true;
-            PlatformEnterForeground();
+            _isActive = true;
+            _platform.EnterForeground();
             Raise(Activated, EventArgs.Empty);
         }
 
+
+        // FIXME: Can EnterBackground be pushed into GamePlatform
+        //        implementations that need it, rather than hanging around
+        //        as an internal method here?
         internal void EnterBackground()
         {
+            // FIXME: What is the difference between _shouldDraw and _isActive?
             _shouldDraw = false;
-            PlatformEnterBackground();
+            _isActive = false;
+            _platform.EnterBackground();
             Raise(Deactivated, EventArgs.Empty);
         }
 

@@ -84,9 +84,8 @@ namespace Microsoft.Xna.Framework.Media
 			NSNotificationCenter.DefaultCenter.AddObserver("MPMoviePlayerPlaybackDidFinishNotification",(NSNotification) => OnStop(null),_video.MovieView.MoviePlayer);		
 
 			_video.MovieView.MoviePlayer.Play();
-			_state = MediaState.Playing;			
-			Game._playingVideo = true;			
-
+			_state = MediaState.Playing;
+			_game._playingVideo = true;
 		}
 
         public void Play(Microsoft.Xna.Framework.Media.Video video)
@@ -106,7 +105,7 @@ namespace Microsoft.Xna.Framework.Media
         {
 			_video.MovieView.MoviePlayer.Stop();
 			_state = MediaState.Stopped;
-			Game._playingVideo = false;
+			_game._playingVideo = false;
 			_video.MovieView.View.RemoveFromSuperview();
         }
 
