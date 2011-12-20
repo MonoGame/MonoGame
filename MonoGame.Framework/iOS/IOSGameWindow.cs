@@ -67,7 +67,7 @@ namespace Microsoft.Xna.Framework
     public class GameWindow : iPhoneOSGameView
     {
 		private readonly Rectangle clientBounds;
-		internal static Game game;
+		private Game _game;
 		private GameTime _updateGameTime;
         private GameTime _drawGameTime;
         private DateTime _lastUpdate;
@@ -111,6 +111,7 @@ namespace Microsoft.Xna.Framework
 
 		internal GameWindow(Game game, iOSGamePlatform platform) : base (UIScreen.MainScreen.Bounds)
 		{
+            _game = game;
 			LayerRetainsBacking = false; 
 			LayerColorFormat	= EAGLColorFormat.RGBA8;
 			ContentScaleFactor  = UIScreen.MainScreen.Scale;
@@ -402,12 +403,12 @@ namespace Microsoft.Xna.Framework
 			// More speed testing is required, to see if this is worse or better
 			// game.DoStep();	
 			
-			if (game != null )
+			if (_game != null )
 			{
 				_nowDraw = DateTime.Now;
 				_drawGameTime.Update(_nowDraw - _lastDraw);
             	_lastDraw = _nowDraw;
-            	game.DoDraw(_drawGameTime);
+            	_game.DoDraw(_drawGameTime);
 			}
 						
 			SwapBuffers();
@@ -432,12 +433,12 @@ namespace Microsoft.Xna.Framework
 		{			
 			base.OnUpdateFrame(e);	
 			
-			if (game != null )
+			if (_game != null )
 			{
 				_nowUpdate = DateTime.Now;
 				_updateGameTime.Update(_nowUpdate - _lastUpdate);
 				_lastUpdate = _nowUpdate;
-            	game.DoUpdate(_updateGameTime);
+            	_game.DoUpdate(_updateGameTime);
 			}
 		}
 		

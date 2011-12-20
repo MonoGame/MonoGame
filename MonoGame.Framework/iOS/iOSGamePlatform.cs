@@ -1,5 +1,7 @@
 // FIXME: Add appropriate license
 using System;
+using System.Collections.Generic;
+using System.IO;
 
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
@@ -12,25 +14,41 @@ namespace Microsoft.Xna.Framework
 {
     class iOSGamePlatform : GamePlatform
     {
-        // FIXME: Previously components were being initialized on a background thread, apparently.  We made need to
+        // FIXME: Previously components were being initialized on a background thread, apparently.  We may need to
         //        express this concept somewhere within the Game-GamePlatform contract.  Not sure where yet.
 //        EAGLContext.SetCurrentContext(_window.BackgroundContext);
 //        Initialize all components...
 //        EAGLContext.SetCurrentContext(_window.MainContext);
 
 
-        private GameWindow _window;
+        private GameWindow _gameWindow;
         private UIWindow _mainWindow;
         private NSObject _rotationObserver;
+        private List<NSObject> _applicationObservers;
 
         public iOSGamePlatform(Game game) :
             base(game)
         {
+            game.Services.AddService(typeof(iOSGamePlatform), this);
+            Directory.SetCurrentDirectory(NSBundle.MainBundle.ResourcePath);
+
             // Create a full-screen window
             _mainWindow = new UIWindow(UIScreen.MainScreen.Bounds);
-            _window = new GameWindow(game, this);
-            _mainWindow.Add(_window);
+
+            _gameWindow = new GameWindow(game, this);
+            _gameWindow.Load += GameWindow_Load;
+            _gameWindow.Unload += GameWindow_Unload;
+
+            Window = _gameWindow;
+            _mainWindow.Add(_gameWindow);
+            _applicationObservers = new List<NSObject>();
+
+            // FIXME: What is GameVc doing in GamerServices?  Who knows if it
+            //        will even help.
+            _mainWindow.RootViewController = new Microsoft.Xna.Framework.GamerServices.GameVc();
         }
+
+        public bool IsPlayingVideo { get; set; }
 
         protected override void Dispose(bool disposing)
         {
@@ -38,8 +56,13 @@ namespace Microsoft.Xna.Framework
             if (disposing)
             {
                 _mainWindow.Dispose();
-                _window.Dispose();
+                _gameWindow.Dispose();
             }
+        }
+
+        public override bool BeforeRun()
+        {
+            return true;
         }
 
         public override void RunLoop()
@@ -49,26 +72,43 @@ namespace Microsoft.Xna.Framework
 
         public override void StartRunLoop()
         {
-            _window.MainContext = _window.EAGLContext;
-            _window.ShareGroup = _window.MainContext.ShareGroup;
-            _window.BackgroundContext = new EAGLContext(_window.ContextRenderingApi, _window.ShareGroup);
-
             // Show the window
             _mainWindow.MakeKeyAndVisible();
 
             Accelerometer.SetupAccelerometer();
+            BeginObservingUIApplication();
             BeginObservingDeviceRotation();
 
-            _window.Run(1 / Game.TargetElapsedTime.TotalSeconds);
+            _gameWindow.Run(1 / Game.TargetElapsedTime.TotalSeconds);
+        }
+
+        private void GameWindow_Load(object sender, EventArgs e)
+        {
+            _gameWindow.MainContext = _gameWindow.EAGLContext;
+            _gameWindow.ShareGroup = _gameWindow.MainContext.ShareGroup;
+            _gameWindow.BackgroundContext = new EAGLContext(_gameWindow.ContextRenderingApi, _gameWindow.ShareGroup);
+        }
+
+        private void GameWindow_Unload(object sender, EventArgs e)
+        {
+            _gameWindow.MainContext = null;
+            _gameWindow.ShareGroup = null;
+            // FIXME: Dispose BackgroundContext first?  We created it in
+            //        GameWindow_Load.
+            _gameWindow.BackgroundContext = null;
         }
 
         public override bool BeforeDraw(GameTime gameTime)
         {
+            if (IsPlayingVideo)
+                return false;
             return true;
         }
 
         public override bool BeforeUpdate(GameTime gameTime)
         {
+            if (IsPlayingVideo)
+                return false;
             return true;
         }
 
@@ -82,23 +122,48 @@ namespace Microsoft.Xna.Framework
             // Do nothing: iOS games are always full screen
         }
 
-        public override void EnterForeground()
-        {
-            // Do nothing: iOS games are always in the foreground when they are active.
-        }
-
-        public override void EnterBackground()
-        {
-            // Do nothing: iOS games are always in the foreground when they are active.
-        }
-
         public override void Exit()
         {
+            StopObservingUIApplication();
             StopObservingDeviceRotation();
             // FIXME: Need to terminate the run loop.  On iOS, this probably means
             //        destroying _mainWindow.  But should async platforms try to kill the
             //        whole program?
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
+        }
+
+        private void BeginObservingUIApplication()
+        {
+            var events = new Tuple<NSString, Action<NSNotification>>[]
+            {
+                Tuple.Create(
+                    UIApplication.WillEnterForegroundNotification,
+                    new Action<NSNotification>(Application_WillEnterForeground)),
+                Tuple.Create(
+                    UIApplication.DidEnterBackgroundNotification,
+                    new Action<NSNotification>(Application_DidEnterBackground)),
+                Tuple.Create(
+                    UIApplication.DidBecomeActiveNotification,
+                    new Action<NSNotification>(Application_DidBecomeActive)),
+                Tuple.Create(
+                    UIApplication.WillResignActiveNotification,
+                    new Action<NSNotification>(Application_WillResignActive)),
+                Tuple.Create(
+                    UIApplication.WillTerminateNotification,
+                    new Action<NSNotification>(Application_WillTerminate)),
+                Tuple.Create(
+                    UIApplication.DidReceiveMemoryWarningNotification,
+                    new Action<NSNotification>(Application_DidReceiveMemoryWarning))
+             };
+
+            foreach (var entry in events)
+                _applicationObservers.Add(NSNotificationCenter.DefaultCenter.AddObserver(entry.Item1, entry.Item2));
+        }
+
+        private void StopObservingUIApplication()
+        {
+            NSNotificationCenter.DefaultCenter.RemoveObservers(_applicationObservers);
+            _applicationObservers.Clear();
         }
 
         private void BeginObservingDeviceRotation()
@@ -116,6 +181,43 @@ namespace Microsoft.Xna.Framework
             UIDevice.CurrentDevice.EndGeneratingDeviceOrientationNotifications();
         }
 
+        #region Notification Handling
+
+        private void Application_WillEnterForeground(NSNotification notification)
+        {
+            // FIXME: What needs to be done here?
+            //throw new NotImplementedException();
+        }
+
+        private void Application_DidEnterBackground(NSNotification notification)
+        {
+            // FIXME: What needs to be done here?
+            //throw new NotImplementedException();
+        }
+
+        private void Application_DidBecomeActive(NSNotification notification)
+        {
+            IsActive = true;
+            TouchPanel.Reset();
+        }
+
+        private void Application_WillResignActive(NSNotification notification)
+        {
+            IsActive = false;
+        }
+
+        private void Application_WillTerminate(NSNotification notification)
+        {
+            // FIXME: Cleanly end the run loop.
+        }
+
+        private void Application_DidReceiveMemoryWarning(NSNotification notification)
+        {
+            // FIXME: Possibly add some more sophisticated behavior here.  It's
+            //        also possible that this is not iOSGamePlatform's job.
+            GC.Collect();
+        }
+
         private void Device_OrientationDidChange(NSNotification notification)
         {
             var orientation = UIDeviceOrientationToDisplayOrientation(UIDevice.CurrentDevice.Orientation);
@@ -124,7 +226,7 @@ namespace Microsoft.Xna.Framework
             // FIXME: Obviously casting null is not going to work.  I think maybe a platform-specific
             //        GraphicsDeviceManager should be provided and owned by the specific GamePlatform implementations.
             //        If that intuition is right, then this problem will evaporate.
-            var gdm = (GraphicsDeviceManager)null;
+            var gdm = (GraphicsDeviceManager)Game.Services.GetService(typeof(IGraphicsDeviceManager));
             DisplayOrientation supportedOrientations = gdm.SupportedOrientations;
 
             var presentParams = gdm.GraphicsDevice.PresentationParameters;
@@ -145,11 +247,13 @@ namespace Microsoft.Xna.Framework
 
             if ((supportedOrientations & orientation) == orientation)
             {
-                _window.CurrentOrientation = orientation;
+                _gameWindow.CurrentOrientation = orientation;
                 presentParams.DisplayOrientation = orientation;
                 TouchPanel.DisplayOrientation = orientation;
             }
         }
+
+        #endregion Notification Handling
 
         private static DisplayOrientation UIDeviceOrientationToDisplayOrientation(UIDeviceOrientation orientation)
         {

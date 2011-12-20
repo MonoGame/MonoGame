@@ -51,12 +51,16 @@ namespace Microsoft.Xna.Framework.Media
 		private Video  _video;
 		private MediaState _state;
 		private bool _isLooped;
-		private Game _game;		
+		private Game _game;
+        private iOSGamePlatform _platform;
 		
         public VideoPlayer(Game game)
         {
 			_state = MediaState.Stopped;
 			_game = game;
+            _platform = (iOSGamePlatform)_game.Services.GetService(typeof(iOSGamePlatform));
+            if (_platform == null)
+                throw new InvalidOperationException("No iOSGamePlatform instance was available");
         }
 
         public Texture2D GetTexture()
@@ -85,7 +89,7 @@ namespace Microsoft.Xna.Framework.Media
 
 			_video.MovieView.MoviePlayer.Play();
 			_state = MediaState.Playing;
-			_game._playingVideo = true;
+			_platform.IsPlayingVideo = true;
 		}
 
         public void Play(Microsoft.Xna.Framework.Media.Video video)
@@ -105,7 +109,7 @@ namespace Microsoft.Xna.Framework.Media
         {
 			_video.MovieView.MoviePlayer.Stop();
 			_state = MediaState.Stopped;
-			_game._playingVideo = false;
+			_platform.IsPlayingVideo = false;
 			_video.MovieView.View.RemoveFromSuperview();
         }
 
