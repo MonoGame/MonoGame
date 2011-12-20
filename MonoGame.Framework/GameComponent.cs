@@ -66,93 +66,83 @@ namespace Microsoft.Xna.Framework
 
         public virtual void Initialize()
         {
+            // FIXME: This test-and-set does absolutely nothing right now.  If
+            //        components must be initialized exactly once, then we'll
+            //        need a mechanism for Game to use so that it can know not
+            //        to re-initialize a component.  Unfortunately,
+            //        the IGameComponent interface does not provide such a
+            //        facility, and having Game keep a list of all the
+            //        components it has ever initialized ever seems like a
+            //        less-than-ideal solution.
             if (!_initialized)
             {
-                LoadContent();
-				_initialized = true;
+                _initialized = true;
             }
         }
 
         public virtual void Update(GameTime gameTime)
         {
         }
-
-        protected virtual void LoadContent()
+        
+        public Graphics.GraphicsDevice GraphicsDevice
         {
+            get 
+            {
+                return _game.GraphicsDevice;
+            }
         }
-
-        protected virtual void UnloadContent()
-        {
-        }
-
-        protected virtual void LoadGraphicsContent(bool loadContent)
-        {
-
-        }
-		
-		public Graphics.GraphicsDevice GraphicsDevice
-		{
-			get 
-			{
-				return _game.GraphicsDevice;
-			}
-		}
 
         public bool Enabled
         {
-            get{return _enabled;}
+            get { return _enabled; }
             set
             {
                 _enabled = value;
-                if(EnabledChanged != null)
-                    EnabledChanged(this, null);
-
+                Raise(EnabledChanged, EventArgs.Empty);
                 OnEnabledChanged(this, null);
             }
         }
 
         public int UpdateOrder
         {
-            get
-            {
-                return _updateOrder;
-            }
+            get { return _updateOrder; }
             set
             {
                 _updateOrder = value;
-                if(UpdateOrderChanged != null)
-                    UpdateOrderChanged(this, null);
-
+                Raise(UpdateOrderChanged, EventArgs.Empty);
                 OnUpdateOrderChanged(this, null);
             }
         }
 
+        private void Raise(EventHandler handler, EventArgs e)
+        {
+            if (handler != null)
+                handler(this, e);
+        }
+
         protected virtual void OnUpdateOrderChanged(object sender, EventArgs args)
         {
-
         }
 
         protected virtual void OnEnabledChanged(object sender, EventArgs args)
         {
-
         }
 
-		/// <summary>
+        /// <summary>
         /// Shuts down the component.
         /// </summary>
         protected virtual void Dispose(bool disposing)
         {
-			
-	}
-		
-		/// <summary>
+        }
+        
+        /// <summary>
         /// Shuts down the component.
         /// </summary>
         public virtual void Dispose()
         {
-		Dispose(true);
-	}
-		
+            Dispose(true);
+        }
+        
         #region IComparable<GameComponent> Members
 
         public int CompareTo(GameComponent other)

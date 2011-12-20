@@ -19,26 +19,25 @@ namespace Microsoft.Xna.Framework
         public MacGamePlatform(Game game) :
             base(game)
         {
+            game.Services.AddService(typeof(MacGamePlatform), this);
+
             RectangleF frame = new RectangleF(
                 0, 0,
                 PresentationParameters._defaultBackBufferWidth,
                 PresentationParameters._defaultBackBufferHeight);
 
-            //Create a window
+            // Create a window
             _mainWindow = new MacGameNSWindow(
                 frame, NSWindowStyle.Titled | NSWindowStyle.Closable,
                 NSBackingStore.Buffered, true);
-
-            // Perform any other window configuration you desire
             _mainWindow.IsOpaque = true;
             _mainWindow.EnableCursorRects();
+            _mainWindow.AcceptsMouseMovedEvents = false;
+            _mainWindow.Center();
 
             _gameWindow = new GameWindow(game, frame);
             Window = _gameWindow;
-
             _mainWindow.ContentView.AddSubview(_gameWindow);
-            _mainWindow.AcceptsMouseMovedEvents = false;
-            _mainWindow.Center();
 
             // We set the current directory to the ResourcePath on Mac
             Directory.SetCurrentDirectory(NSBundle.MainBundle.ResourcePath);
@@ -73,9 +72,11 @@ namespace Microsoft.Xna.Framework
 
         ~MacGamePlatform()
         {
-            // FIXME: Does this really apply on OS X
+            // FIXME: Does this really apply on OS X?
             // TODO NSDevice.CurrentDevice.EndGeneratingDeviceOrientationNotifications();
         }
+
+        public bool IsPlayingVideo { get; set; }
 
         #region GamePlatform Implementation
 
@@ -86,15 +87,16 @@ namespace Microsoft.Xna.Framework
             NSApplication.SharedApplication.Terminate(new NSObject());
         }
 
-        public override void BeforeInitialize()
+        public override bool BeforeRun()
         {
             ResetWindowBounds();
             _mainWindow.MakeKeyAndOrderFront(_mainWindow);
+            return true;
         }
 
         public override void RunLoop()
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException("Blocking run loops are not supported on this platform");
         }
 
         public override void StartRunLoop()
@@ -104,11 +106,15 @@ namespace Microsoft.Xna.Framework
 
         public override bool BeforeUpdate(GameTime gameTime)
         {
+            if (IsPlayingVideo)
+                return false;
             return true;
         }
 
         public override bool BeforeDraw(GameTime gameTime)
         {
+            if (IsPlayingVideo)
+                return false;
             return true;
         }
 
@@ -164,11 +170,11 @@ namespace Microsoft.Xna.Framework
 
             NSMenu.MenuBarVisible = true;
             _mainWindow.StyleMask = NSWindowStyle.Titled | NSWindowStyle.Closable;
-            if (_wasResizeable) _mainWindow.StyleMask |= NSWindowStyle.Resizable;
+            if (_wasResizeable)
+                _mainWindow.StyleMask |= NSWindowStyle.Resizable;
 
             if (oldTitle != null)
                 _gameWindow.Title = oldTitle;
-
 
             // Set the level here to normal
             _mainWindow.Level = NSWindowLevel.Normal;
@@ -180,16 +186,6 @@ namespace Microsoft.Xna.Framework
             Mouse.ResetMouse();
 
             IsActive = wasActive;
-        }
-
-        public override void EnterForeground()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void EnterBackground()
-        {
-            throw new NotImplementedException();
         }
 
         public override void IsMouseVisibleChanged()
@@ -205,26 +201,27 @@ namespace Microsoft.Xna.Framework
             set { _mainWindow.StyleMask ^= NSWindowStyle.Resizable; }
         }
 
-
-        private void ResetWindowBounds ()
+        private void ResetWindowBounds()
         {
             RectangleF frame;
             RectangleF content;
 
-            // FIXME: Obvious nonsense.
-            var graphicsDeviceManager = (GraphicsDeviceManager)null;
+            var graphicsDeviceManager = (GraphicsDeviceManager)Game.Services.GetService(typeof(IGraphicsDeviceManager));
 
-            if (graphicsDeviceManager.IsFullScreen) {
+            if (graphicsDeviceManager.IsFullScreen)
+            {
                 frame = NSScreen.MainScreen.Frame;
                 content = NSScreen.MainScreen.Frame;
-            } else {
+            }
+            else
+            {
                 content = _gameWindow.Bounds;
                 content.Width = Math.Min(
                     graphicsDeviceManager.PreferredBackBufferWidth,
                     NSScreen.MainScreen.VisibleFrame.Width);
                 content.Height = Math.Min(
                     graphicsDeviceManager.PreferredBackBufferHeight,
-                    NSScreen.MainScreen.VisibleFrame.Height-GetTitleBarHeight());
+                    NSScreen.MainScreen.VisibleFrame.Height - GetTitleBarHeight());
 
                 frame = _mainWindow.Frame;
                 frame.X = Math.Max(frame.X, NSScreen.MainScreen.VisibleFrame.X);
@@ -232,15 +229,14 @@ namespace Microsoft.Xna.Framework
                 frame.Width = content.Width;
                 frame.Height = content.Height + GetTitleBarHeight();
             }
-            _mainWindow.SetFrame (frame, true);
+            _mainWindow.SetFrame(frame, true);
 
             _gameWindow.Bounds = content;
             _gameWindow.Size = content.Size.ToSize();
 
-            // FIXME: Obvious nonsense
-            var GraphicsDevice = (GraphicsDevice)null;
-            // Now we set our Presentaion Parameters
-            PresentationParameters parms = GraphicsDevice.PresentationParameters;
+            // Now we set our Presentation Parameters
+            var device = (GraphicsDevice)graphicsDeviceManager.GraphicsDevice;
+            PresentationParameters parms = device.PresentationParameters;
             parms.BackBufferHeight = (int)content.Size.Height;
             parms.BackBufferWidth = (int)content.Size.Width;
         }

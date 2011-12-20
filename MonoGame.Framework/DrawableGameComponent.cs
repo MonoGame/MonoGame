@@ -62,6 +62,14 @@ namespace Microsoft.Xna.Framework
             LoadContent();
         }
 
+        protected virtual void LoadContent()
+        {
+        }
+
+        protected virtual void UnloadContent()
+        {
+        }
+
         #region IDrawable Members
 
         public int DrawOrder

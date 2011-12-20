@@ -113,9 +113,6 @@ namespace Microsoft.Xna.Framework
         public abstract void EnterFullScreen();
         public abstract void ExitFullScreen();
 
-        public abstract void EnterForeground();
-        public abstract void EnterBackground();
-
         public virtual bool IsActiveChanging(bool value)
         {
             return value;

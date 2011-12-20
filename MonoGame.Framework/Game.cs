@@ -54,15 +54,9 @@ namespace Microsoft.Xna.Framework
         private IGraphicsDeviceService _graphicsDeviceService;
 
         private bool _initialized = false;
-        private bool _isActive = false;
         private bool _isFixedTimeStep = true;
-        private bool _isMouseVisible = false;
-        internal bool _playingVideo = false;
 
         private TimeSpan _targetElapsedTime = TimeSpan.FromSeconds(1 / FramesPerSecond);
-
-        // Mac-specific variables
-        private bool _shouldDraw = true;
 
         public Game()
         {
@@ -76,6 +70,7 @@ namespace Microsoft.Xna.Framework
             _platform = GamePlatform.Create(this);
             _platform.Activated += Platform_Activated;
             _platform.Deactivated += Platform_Deactivated;
+            _services.AddService(typeof(GamePlatform), _platform);
         }
 
         ~Game()
@@ -227,12 +222,6 @@ namespace Microsoft.Xna.Framework
 
             applyChanges(manager);
 
-            // 1. Sort components into IUpdateable and IDrawable lists.
-            // 2. Subscribe to Added/Removed events to keep these lists synced.
-            CategorizeComponents();
-            _components.ComponentAdded += Components_ComponentAdded;
-            _components.ComponentRemoved += Components_ComponentRemoved;
-
             if (!_platform.BeforeRun())
                 return;
 
@@ -273,7 +262,14 @@ namespace Microsoft.Xna.Framework
             // GameComponents in Components at the time Initialize() is called
             // are initialized.
             // http://msdn.microsoft.com/en-us/library/microsoft.xna.framework.game.initialize.aspx
+
+            // 1. Sort components into IUpdateable and IDrawable lists.
+            // 2. Initialize all existing components
+            // 3. Subscribe to Added/Removed events to keep these lists synced.
+            CategorizeComponents();
             InitializeExistingComponents();
+            _components.ComponentAdded += Components_ComponentAdded;
+            _components.ComponentRemoved += Components_ComponentRemoved;
 
             _graphicsDeviceService = (IGraphicsDeviceService)
                 Services.GetService(typeof(IGraphicsDeviceService));
@@ -290,17 +286,11 @@ namespace Microsoft.Xna.Framework
 
         protected virtual void Draw(GameTime gameTime)
         {
-            if (!_platform.BeforeDraw(gameTime) || _playingVideo)
-                return;
-
             _drawables.ForEachFilteredItem(d => d.Draw(gameTime));
         }
 
         protected virtual void Update(GameTime gameTime)
         {
-            if (!_platform.BeforeUpdate(gameTime))
-                return;
-
             _updateables.ForEachFilteredItem(u => u.Update(gameTime));
         }
 
@@ -313,6 +303,8 @@ namespace Microsoft.Xna.Framework
         {
             // Since we only subscribe to ComponentAdded after the graphics
             // devices are set up, it is safe to just blindly call Initialize.
+            // FIXME:  Is it legal to re-Initialize GameComponents if they
+            //         are removed from Components and re-added?
             e.GameComponent.Initialize();
             CategorizeComponent(e.GameComponent);
         }
@@ -325,16 +317,17 @@ namespace Microsoft.Xna.Framework
 
         private void Platform_AsyncRunLoopEnded(object sender, EventArgs e)
         {
-            _platform.AsyncRunLoopEnded -= Platform_AsyncRunLoopEnded;
+            var platform = (GamePlatform)sender;
+            platform.AsyncRunLoopEnded -= Platform_AsyncRunLoopEnded;
             EndRun();
         }
 
-        private void Platform_Activated (object sender, EventArgs e)
+        private void Platform_Activated(object sender, EventArgs e)
         {
             Raise(Activated, e);
         }
 
-        private void Platform_Deactivated (object sender, EventArgs e)
+        private void Platform_Deactivated(object sender, EventArgs e)
         {
             Raise(Deactivated, e);
         }
@@ -362,11 +355,7 @@ namespace Microsoft.Xna.Framework
 
         internal void DoUpdate(GameTime gameTime)
         {
-            // FIXME: Should we really be checking _shouldDraw before doing an
-            //        update?  And if the answer is "yes", shouldn't it be
-            //        called _shouldDrawAndUpdate.
-            // FIXME: What is the difference between _shouldDraw and _isActive?
-            if (_isActive && _shouldDraw)
+            if (IsActive && _platform.BeforeUpdate(gameTime))
                 Update(gameTime);
         }
 
@@ -375,42 +364,16 @@ namespace Microsoft.Xna.Framework
             // Draw and EndDraw should not be called if BeginDraw returns false.
             // http://stackoverflow.com/questions/4054936/manual-control-over-when-to-redraw-the-screen/4057180#4057180
             // http://stackoverflow.com/questions/4235439/xna-3-1-to-4-0-requires-constant-redraw-or-will-display-a-purple-screen
-            // FIXME: What is the difference between _shouldDraw and _isActive?
-            if (_isActive && _shouldDraw && BeginDraw())
+            if (IsActive && _platform.BeforeDraw(gameTime) && BeginDraw())
             {
                 Draw(gameTime);
                 EndDraw();
             }
         }
 
-        // FIXME: Can EnterForeground be pushed into GamePlatform
-        //        implementations that need it, rather than hanging around
-        //        as an internal method here?
-        internal void EnterForeground()
-        {
-            // FIXME: What is the difference between _shouldDraw and _isActive?
-            _shouldDraw = true;
-            _isActive = true;
-            _platform.EnterForeground();
-            Raise(Activated, EventArgs.Empty);
-        }
-
-
-        // FIXME: Can EnterBackground be pushed into GamePlatform
-        //        implementations that need it, rather than hanging around
-        //        as an internal method here?
-        internal void EnterBackground()
-        {
-            // FIXME: What is the difference between _shouldDraw and _isActive?
-            _shouldDraw = false;
-            _isActive = false;
-            _platform.EnterBackground();
-            Raise(Deactivated, EventArgs.Empty);
-        }
-
         #endregion Internal Methods
 
-        internal GraphicsDeviceManager graphicsDeviceManager
+        private GraphicsDeviceManager graphicsDeviceManager
         {
             get
             {

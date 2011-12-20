@@ -96,9 +96,9 @@ namespace Microsoft.Xna.Framework
 			_lastUpdate = DateTime.Now;
 		}
 
-		public GameWindow (RectangleF frame,NSOpenGLContext context) : base(frame)
+		public GameWindow(Game game, RectangleF frame, NSOpenGLContext context) :
+            this(game, frame)
 		{
-
 		}
 
 		[Export("initWithFrame:")]
@@ -130,13 +130,13 @@ namespace Microsoft.Xna.Framework
 
 		#endregion
 
-		#region MonoMacGameView Methods
+        public void StartRunLoop(double updateRate)
+        {
+            _lastUpdate = DateTime.Now;
+            Run(updateRate);
+        }
 
-		public new void Run (double updateRate)
-		{
-			_lastUpdate = DateTime.Now;
-			base.Run(updateRate);
-		}
+		#region MonoMacGameView Methods
 
 		protected override void OnClosed (EventArgs e)
 		{
