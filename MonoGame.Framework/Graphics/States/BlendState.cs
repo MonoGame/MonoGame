@@ -65,6 +65,21 @@ namespace Microsoft.Xna.Framework.Graphics
 		public static readonly BlendState NonPremultiplied;
 		public static readonly BlendState Opaque;
 		
+		public BlendState() {
+			AlphaBlendFunction = BlendFunction.Add;
+			AlphaDestinationBlend = Blend.Zero;
+			AlphaSourceBlend = Blend.One;
+			BlendFactor = Color.White;
+			ColorBlendFunction = BlendFunction.Add;
+			ColorDestinationBlend = Blend.Zero;
+			ColorSourceBlend = Blend.One;
+			ColorWriteChannels = ColorWriteChannels.All;
+			ColorWriteChannels1 = ColorWriteChannels.All;
+			ColorWriteChannels2 = ColorWriteChannels.All;
+			ColorWriteChannels3 = ColorWriteChannels.All;
+			MultiSampleMask = 0xffffffff;
+		}
+		
 		static BlendState () {
 			Additive = new BlendState () {
 				ColorSourceBlend = Blend.SourceAlpha,

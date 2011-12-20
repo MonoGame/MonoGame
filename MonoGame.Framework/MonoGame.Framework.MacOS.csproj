@@ -162,7 +162,6 @@
     <Compile Include="MacOS\Graphics\RenderTarget2D.cs" />
     <Compile Include="MacOS\Graphics\Texture2D.cs" />
     <Compile Include="Graphics\RenderTarget.cs" />
-    <Compile Include="MacOS\Graphics\RenderState.cs" />
     <Compile Include="Graphics\SurfaceFormat.cs" />
     <Compile Include="Graphics\MultiSampleType.cs" />
     <Compile Include="Graphics\SwapEffect.cs" />

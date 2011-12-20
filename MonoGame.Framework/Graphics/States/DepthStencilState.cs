@@ -24,53 +24,44 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
             DepthBufferEnable = true;
             DepthBufferWriteEnable = true;
+			DepthBufferFunction = CompareFunction.LessEqual;
+			StencilEnable = false;
+			StencilFunction = CompareFunction.Always;
+			StencilPass = StencilOperation.Keep;
+			StencilFail = StencilOperation.Keep;
+			StencilDepthBufferFail = StencilOperation.Keep;
+			TwoSidedStencilMode = false;
+			CounterClockwiseStencilFunction = CompareFunction.Always;
+			CounterClockwiseStencilFail = StencilOperation.Keep;
+			CounterClockwiseStencilPass = StencilOperation.Keep;
+			CounterClockwiseStencilDepthBufferFail = StencilOperation.Keep;
 			StencilMask = Int32.MaxValue;
 			StencilWriteMask = Int32.MaxValue;
+			ReferenceStencil = 0;
 		}
 		
-		static DepthStencilState defaultState;
+		public static readonly DepthStencilState Default;
+		public static readonly DepthStencilState DepthRead;
+		public static readonly DepthStencilState None;
 		
-		public static DepthStencilState Default {
-			get {
-				if (defaultState == null) {
-					defaultState = new DepthStencilState () {
-						DepthBufferEnable = true,
-						DepthBufferWriteEnable = true
-					};
-				}
-				
-				return defaultState;
-			}
+		static DepthStencilState ()
+		{
+			Default = new DepthStencilState () {
+				DepthBufferEnable = true,
+				DepthBufferWriteEnable = true
+			};
+			
+			DepthRead = new DepthStencilState () {
+				DepthBufferEnable = true,
+				DepthBufferWriteEnable = false
+			};
+			
+			None = new DepthStencilState () {
+				DepthBufferEnable = false,
+				DepthBufferWriteEnable = false
+			};
 		}
 		
-		static DepthStencilState depthReadState;
-		
-		public static DepthStencilState DepthRead {
-			get {
-				if (depthReadState == null) {
-					depthReadState = new DepthStencilState () {
-						DepthBufferEnable = true,
-						DepthBufferWriteEnable = false
-					};
-				}
-				
-				return depthReadState;
-			}
-		}
-		
-		static DepthStencilState noneState;
-		public static DepthStencilState None {
-			get {
-				if (noneState == null) {
-					noneState = new DepthStencilState () {
-						DepthBufferEnable = false,
-						DepthBufferWriteEnable = false
-					};
-				}
-				
-				return noneState;
-			}
-		}
 	}
 }
 

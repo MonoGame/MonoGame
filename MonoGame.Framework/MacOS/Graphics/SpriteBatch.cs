@@ -56,8 +56,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			
 			if (sortMode == SpriteSortMode.Immediate) {
-				//setup effects now so a user can chage them
-				SetupEffects();
+				//setup things now so a user can chage them
+				Setup();
 			}
 		}
 
@@ -80,7 +80,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		public void End ()
 		{	
 			if (_sortMode != SpriteSortMode.Immediate) {
-				SetupEffects ();
+				Setup ();
 			}
 			Flush ();
 			
@@ -95,7 +95,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		}
 		
-		void SetupEffects () {
+		void Setup () {
+			graphicsDevice.BlendState = _blendState;
+			graphicsDevice.DepthStencilState = _depthStencilState;
+			graphicsDevice.RasterizerState = _rasterizerState;
+			graphicsDevice.SamplerStates[0] = _samplerState;
+			
 			if (_effect == null) {
 				Viewport vp = graphicsDevice.Viewport;
 				Matrix projection = Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, 0, 1);
@@ -145,8 +150,8 @@ namespace Microsoft.Xna.Framework.Graphics
 //				GL.BlendFunc (BlendingFactorSrc.SrcAlpha, BlendingFactorDest.One);
 //				GL.Enable (EnableCap.Blend);
 //			}
-			graphicsDevice.BlendState = _blendState;
-			graphicsDevice.SetGraphicsStates();
+			//graphicsDevice.BlendState = _blendState;
+			//graphicsDevice.SetGraphicsStates();
 			// set camera
 			GL.MatrixMode (MatrixMode.Projection);
 			GL.LoadIdentity ();		
@@ -197,7 +202,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 
 			// Initialize OpenGL states (ideally move this to initialize somewhere else)
-			GLStateManager.SetDepthStencilState(_depthStencilState);
+			//GLStateManager.SetDepthStencilState(_depthStencilState);
 
 			//GL.Disable (EnableCap.DepthTest);
 			
@@ -212,7 +217,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			GL.FrontFace (FrontFaceDirection.Cw);
 			GL.Color4 (1.0f, 1.0f, 1.0f, 1.0f);
 
-			_batcher.DrawBatch (_sortMode, _samplerState);
+			_batcher.DrawBatch (_sortMode, graphicsDevice.SamplerStates[0]);
 	
 			// Disable Scissor Tests if necessary
 			if (this.graphicsDevice.RasterizerState.ScissorTestEnable) {
@@ -372,42 +377,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void DrawString (SpriteFont spriteFont, string text, Vector2 position, Color color)
 		{
-			if (spriteFont == null) {
-				throw new ArgumentException ("spriteFont");
-			}
-
-			Vector2 p = position;
-
-			foreach (char c in text) {
-				if (c == '\n') {
-					p.Y += spriteFont.LineSpacing;
-					p.X = position.X;
-					continue;
-				}
-				if (spriteFont.characterData.ContainsKey (c) == false) 
-					continue;
-				GlyphData g = spriteFont.characterData [c];
-
-				SpriteBatchItem item = _batcher.CreateBatchItem ();
-
-				item.Depth = 0.0f;
-				item.TextureID = (int)spriteFont._texture.ID;
-
-				texCoordTL.X = spriteFont._texture.Image.GetTextureCoordX (g.Glyph.X);
-				texCoordTL.Y = spriteFont._texture.Image.GetTextureCoordY (g.Glyph.Y);
-				texCoordBR.X = spriteFont._texture.Image.GetTextureCoordX (g.Glyph.X + g.Glyph.Width);
-				texCoordBR.Y = spriteFont._texture.Image.GetTextureCoordY (g.Glyph.Y + g.Glyph.Height);
-
-				item.Set (p.X, 
-						p.Y + g.Cropping.Y, 
-						g.Glyph.Width, 
-						g.Glyph.Height, 
-						color, 
-						texCoordTL, 
-						texCoordBR);
-
-				p.X += (g.Kerning.Y + g.Kerning.Z + spriteFont.Spacing);
-			}			
+			DrawString (spriteFont, text, position, color, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
 		}
 
 		public void DrawString (SpriteFont spriteFont, 
@@ -420,60 +390,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			SpriteEffects effects,
 			float depth)
 		{
-			if (spriteFont == null) {
-				throw new ArgumentException ("spriteFont");
-			}
-
-			Vector2 p = new Vector2 (-origin.X,-origin.Y);
-
-			float sin = (float)Math.Sin (rotation);
-			float cos = (float)Math.Cos (rotation);
-
-			foreach (char c in text) {
-				if (c == '\n') {
-					p.Y += spriteFont.LineSpacing;
-					p.X = -origin.X;
-					continue;
-				}
-				if (spriteFont.characterData.ContainsKey (c) == false) 
-					continue;
-				GlyphData g = spriteFont.characterData [c];
-
-				SpriteBatchItem item = _batcher.CreateBatchItem ();
-
-				item.Depth = depth;
-				item.TextureID = (int)spriteFont._texture.ID;
-
-				texCoordTL.X = spriteFont._texture.Image.GetTextureCoordX (g.Glyph.X);
-				texCoordTL.Y = spriteFont._texture.Image.GetTextureCoordY (g.Glyph.Y);
-				texCoordBR.X = spriteFont._texture.Image.GetTextureCoordX (g.Glyph.X + g.Glyph.Width);
-				texCoordBR.Y = spriteFont._texture.Image.GetTextureCoordY (g.Glyph.Y + g.Glyph.Height);
-
-				if ((effects & SpriteEffects.FlipVertically) != 0) {
-					float temp = texCoordBR.Y;
-					texCoordBR.Y = texCoordTL.Y;
-					texCoordTL.Y = temp;
-				}
-				if ((effects & SpriteEffects.FlipHorizontally) != 0) {
-					float temp = texCoordBR.X;
-					texCoordBR.X = texCoordTL.X;
-					texCoordTL.X = temp;
-				}
-
-				item.Set (position.X, 
-						position.Y, 
-						p.X * scale, 
-						(p.Y + g.Cropping.Y) * scale, 
-						g.Glyph.Width * scale, 
-						g.Glyph.Height * scale, 
-						sin, 
-						cos, 
-						color, 
-						texCoordTL, 
-						texCoordBR);
-
-				p.X += (g.Kerning.Y + g.Kerning.Z + spriteFont.Spacing);
-			}			
+			DrawString (spriteFont, text, position, color, rotation, origin, new Vector2(scale, scale), effects, depth);
 		}
 
 		public void DrawString (SpriteFont spriteFont, 
@@ -539,7 +456,11 @@ namespace Microsoft.Xna.Framework.Graphics
 						texCoordBR);
 
 				p.X += (g.Kerning.Y + g.Kerning.Z + spriteFont.Spacing);
-			}			
+			}
+			
+			if (_sortMode == SpriteSortMode.Immediate) {
+				Flush ();
+			}
 		}
 
 		public void DrawString (SpriteFont spriteFont, StringBuilder text, Vector2 position, Color color)

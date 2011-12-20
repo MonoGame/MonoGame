@@ -53,12 +53,12 @@ namespace Microsoft.Xna.Framework.Graphics
 		private int _activeTexture = -1;
 		private Viewport _viewport;
 		private bool _isDisposed = false;
-		private RenderState _renderState;
 
 		public TextureCollection Textures { get; set; }
 
 		private BlendState _blendState = BlendState.Opaque;
 		private DepthStencilState _depthStencilState = DepthStencilState.Default;
+		private RasterizerState _rasterizerState = RasterizerState.CullCounterClockwise;
 		private SamplerStateCollection _samplerStates = new SamplerStateCollection ();
 		internal List<IntPtr> _pointerCache = new List<IntPtr> ();
 		private VertexBuffer _vertexBuffer = null;
@@ -67,7 +67,15 @@ namespace Microsoft.Xna.Framework.Graphics
 		private uint VboIdArray;
 		private uint VboIdElement;
 
-		public RasterizerState RasterizerState { get; set; }
+		public RasterizerState RasterizerState {
+			get {
+				return _rasterizerState;
+			}
+			set {
+				_rasterizerState = value;
+				GLStateManager.SetRasterizerStates(value);
+			}
+		}
 		
 		private RenderTargetBinding[] currentRenderTargets;
 		
@@ -117,7 +125,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			Textures = new TextureCollection();
 			// Init RenderState
 			//_renderState = new RenderState ();
-			RasterizerState = new RasterizerState();
+			//RasterizerState = new RasterizerState();
 		}
 
 		public BlendState BlendState {
@@ -125,6 +133,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			set { 
 				// ToDo check for invalid state
 				_blendState = value;
+				GLStateManager.SetBlendStates(value);
 			}
 		}
 
@@ -132,6 +141,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			get { return _depthStencilState; }
 			set { 
 				_depthStencilState = value;
+				GLStateManager.SetDepthStencilState(value);
 			}
 		}
 
@@ -504,8 +514,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			GL.PushMatrix();
 			// Set up our Rasterizer States
-			GLStateManager.SetRasterizerStates(RasterizerState);
-			GLStateManager.SetBlendStates(BlendState);
+			//GLStateManager.SetRasterizerStates(RasterizerState);
+			//GLStateManager.SetBlendStates(BlendState);
 		}
 
 		bool resetVertexStates = false;
