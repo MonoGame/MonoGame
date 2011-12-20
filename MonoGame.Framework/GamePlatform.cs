@@ -12,6 +12,8 @@ namespace Microsoft.Xna.Framework
             return new iOSGamePlatform(game);
 #elif MONOMAC
             return new MacGamePlatform(game);
+#elif WINDOWS
+            return new WindowsGamePlatform(game);
 #endif
         }
 
