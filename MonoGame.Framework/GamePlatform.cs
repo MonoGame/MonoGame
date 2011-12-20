@@ -14,6 +14,8 @@ namespace Microsoft.Xna.Framework
             return new MacGamePlatform(game);
 #elif WINDOWS
             return new WindowsGamePlatform(game);
+#elif ANDROID
+            return new AndroidGamePlatform(game);
 #endif
         }
 
@@ -60,10 +62,17 @@ namespace Microsoft.Xna.Framework
             get; private set;
         }
 
+#if ANDROID
+        public AndroidGameWindow Window
+        {
+            get; protected set;
+        }
+#else
         public GameWindow Window
         {
             get; protected set;
         }
+#endif
 
         #endregion
 
@@ -137,6 +146,9 @@ namespace Microsoft.Xna.Framework
         }
 
         public virtual void TargetElapsedTimeChanged() {}
+
+        public virtual void EnterBackground() {}
+        public virtual void EnterForeground() {}
 
         #region IDisposable implementation
 

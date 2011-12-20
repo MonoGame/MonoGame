@@ -66,7 +66,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         public void Play()
         {
-            AudioManager audioManager = (AudioManager)Game.contextInstance.GetSystemService(Context.AudioService);
+            AudioManager audioManager = (AudioManager)Game.Activity.GetSystemService(Context.AudioService);
 
             float streamVolumeCurrent = audioManager.GetStreamVolume(Stream.Music);
             float streamVolumeMax = audioManager.GetStreamMaxVolume(Stream.Music);
@@ -98,7 +98,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         public Sound(string filename, float volume, bool looping)
         {
-            using (AssetFileDescriptor fd = Game.contextInstance.Assets.OpenFd(filename))
+            using (AssetFileDescriptor fd = Game.Activity.Assets.OpenFd(filename))
                 _soundId = s_soundPool.Load(fd.FileDescriptor, fd.StartOffset, fd.Length, 1);
 
             this.Looping = looping;

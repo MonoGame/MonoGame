@@ -98,6 +98,10 @@ namespace Microsoft.Xna.Framework
 
         #region Properties
 
+#if ANDROID
+        public static AndroidGameActivity Activity { get; set; }
+#endif
+
         public GameComponentCollection Components
         {
             get { return _components; }
@@ -165,10 +169,17 @@ namespace Microsoft.Xna.Framework
             }
         }
 
+#if ANDROID
+        public AndroidGameWindow Window
+        {
+            get { return _platform.Window; }
+        }
+#else
         public GameWindow Window
         {
             get { return _platform.Window; }
         }
+#endif
 
         #endregion Properties
 
@@ -248,6 +259,14 @@ namespace Microsoft.Xna.Framework
                 throw new NotImplementedException(string.Format(
                     "Handling for the run behavior {0} is not implemented.", runBehavior));
             }
+        }
+
+        public void EnterForeground()
+        {
+        }
+
+        public void EnterBackground()
+        {
         }
 
         #endregion
