@@ -55,6 +55,8 @@ namespace Microsoft.Xna.Framework.Graphics
 						vertexShader = (DXShader)state.parameter.data;
 						GL.AttachShader (shaderProgram, vertexShader.shader);
 					}
+				} else {
+					throw new NotImplementedException();
 				}
 			}
 			
@@ -69,7 +71,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		public void Apply ()
 		{
 			_technique._effect.OnApply();
-			Console.WriteLine (_technique._effect.Name+" - "+_technique.Name);
+			//Console.WriteLine (_technique._effect.Name+" - "+_technique.Name+" - "+Name);
 			bool relink = false;
 			foreach ( DXEffectObject.d3dx_state state in states) {
 				
@@ -124,14 +126,12 @@ namespace Microsoft.Xna.Framework.Graphics
 			if (pixelShader != null) {
 				pixelShader.Apply((uint)shaderProgram,
 				                  _technique._effect.Parameters,
-				                  _technique._effect.GraphicsDevice.Viewport,
-				                  _technique._effect.GraphicsDevice.Textures);
+				                  _technique._effect.GraphicsDevice);
 			}
 			if (vertexShader != null) {
 				vertexShader.Apply((uint)shaderProgram,
 				                  _technique._effect.Parameters,
-				                  _technique._effect.GraphicsDevice.Viewport,
-				                  _technique._effect.GraphicsDevice.Textures);
+				                  _technique._effect.GraphicsDevice);
 			}
 
 		}

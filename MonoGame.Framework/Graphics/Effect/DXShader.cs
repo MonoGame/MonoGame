@@ -145,8 +145,11 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		public void Apply(uint program,
 		                  EffectParameterCollection parameters,
-		                  Viewport vp,
-		                  TextureCollection textures) {
+		                  GraphicsDevice graphicsDevice) {
+			
+			Viewport vp = graphicsDevice.Viewport;
+			TextureCollection textures = graphicsDevice.Textures;
+			SamplerStateCollection samplerStates = graphicsDevice.SamplerStates;
 			
 			//Populate the uniform register arrays
 			//TODO: not necessarily packed contiguously, get info from mojoshader somehow
@@ -278,6 +281,8 @@ namespace Microsoft.Xna.Framework.Graphics
 						
 						//just to tex.Apply() instead?
 						GL.BindTexture (TextureTarget.Texture2D, tex._textureId);
+						
+						samplerStates[sampler.index].Activate();
 						
 					}
 	
