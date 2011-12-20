@@ -77,7 +77,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			ColorWriteChannels1 = ColorWriteChannels.All;
 			ColorWriteChannels2 = ColorWriteChannels.All;
 			ColorWriteChannels3 = ColorWriteChannels.All;
-			MultiSampleMask = 0xffffffff;
+			MultiSampleMask = Int32.MaxValue;
 		}
 		
 		static BlendState () {

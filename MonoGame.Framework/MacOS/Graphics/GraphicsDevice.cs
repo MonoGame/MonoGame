@@ -514,8 +514,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			GL.PushMatrix();
 			// Set up our Rasterizer States
-			//GLStateManager.SetRasterizerStates(RasterizerState);
-			//GLStateManager.SetBlendStates(BlendState);
+			GLStateManager.SetRasterizerStates(RasterizerState);
+			GLStateManager.SetBlendStates(BlendState);
 		}
 
 		bool resetVertexStates = false;
