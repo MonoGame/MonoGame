@@ -426,7 +426,7 @@ namespace Microsoft.Xna.Framework.Graphics
 						colors[i].R << 24 |
 						colors[i].G << 16 |
 						colors[i].B << 8 |
-						colors[i].G
+						colors[i].A
 					);
 				}
 			}
