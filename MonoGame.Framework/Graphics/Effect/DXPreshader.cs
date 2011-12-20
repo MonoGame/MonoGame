@@ -45,11 +45,15 @@ namespace Microsoft.Xna.Framework.Graphics
 				switch (parameter.ParameterClass) {
 				case EffectParameterClass.Scalar:
 					for (int i=0; i<data.Length; i++) {
-						inRegs[symbol.register_index*4+i] = (float)data[i];
+						//preshader scalar arrays map one to each vec4 register
+						inRegs[symbol.register_index*4+i*4] = (float)data[i];
 					}
 					break;
 				case EffectParameterClass.Vector:
 				case EffectParameterClass.Matrix:
+					if (parameter.Elements.Count > 0) {
+						throw new NotImplementedException();
+					}
 					for (int y=0; y<Math.Min (symbol.register_count, parameter.RowCount); y++) {
 						for (int x=0; x<parameter.ColumnCount; x++) {
 							inRegs[(symbol.register_index+y)*4+x] = (float)data[y*4+x];

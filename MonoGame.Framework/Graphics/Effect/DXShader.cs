@@ -163,27 +163,33 @@ namespace Microsoft.Xna.Framework.Graphics
 				EffectParameter parameter = parameters[symbol.name];
 				switch (symbol.register_set) {
 				case MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_BOOL:
+					if (parameter.Elements.Count > 0) {
+						throw new NotImplementedException();
+					}
 					uniforms_bool[bool_index*4] = (int)parameter.data;
 					bool_index += (int)symbol.register_count;
 					break;
 				case MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_FLOAT4:
 					
 					Single[] data = parameter.GetValueSingleArray();
-					if (data.Length > symbol.register_count*4) {
-						throw new Exception("effect parameter data is broken");
-					}
 					
 					switch (parameter.ParameterClass) {
 					case EffectParameterClass.Scalar:
+						if (parameter.Elements.Count > 0) {
+							throw new NotImplementedException();
+						}
 						for (int i=0; i<data.Length; i++) {
 							uniforms_float4[float4_index*4+i] = (float)data[i];
 						}
 						break;
 					case EffectParameterClass.Vector:
 					case EffectParameterClass.Matrix:
+						if (parameter.Elements.Count > 0) {
+							throw new NotImplementedException();
+						}
 						for (int y=0; y<Math.Min (symbol.register_count, parameter.RowCount); y++) {
 							for (int x=0; x<parameter.ColumnCount; x++) {
-								uniforms_float4[(float4_index+y)*4+x] = (float)data[y*4+x];
+								uniforms_float4[(float4_index+y)*4+x] = (float)data[y*parameter.ColumnCount+x];
 							}
 						}
 						break;
@@ -194,7 +200,6 @@ namespace Microsoft.Xna.Framework.Graphics
 					break;
 				case MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_INT4:
 					throw new NotImplementedException();
-					break;
 				case MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_SAMPLER:
 					break; //handled by ActivateTextures
 				default:

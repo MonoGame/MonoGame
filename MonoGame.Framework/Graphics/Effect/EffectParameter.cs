@@ -137,6 +137,7 @@ namespace Microsoft.Xna.Framework.Graphics
 						switch (paramType) {
 						case EffectParameterType.Single:
 							float[] vals = new float[rowCount*colCount];
+							//transpose maybe?
 							for (int i=0; i<rowCount*colCount; i++) {
 								vals[i] = BitConverter.ToSingle ((byte[])parameter.data, i*4);
 							}
@@ -234,7 +235,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public Single GetValueSingle ()
 		{
-			return (Single)data;
+			switch(ParameterType) {
+			case EffectParameterType.Int32:
+				return (Single)(int)data;
+			default:
+				return (Single)data;
+			}
 		}
 
 		public Single[] GetValueSingleArray ()
@@ -333,8 +339,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void SetValue (Matrix value)
 		{ 
-			//TODO: obey rowcount and colcount instead of hax in DXShader
-			data = Matrix.ToFloatArray(Matrix.Transpose (value)).Clone ();
+			float[] matrixData = Matrix.ToFloatArray(Matrix.Transpose (value));
+			for (int y=0; y<RowCount; y++) {
+				for (int x=0; x<ColumnCount; x++) {
+					((float[])data)[y*ColumnCount+x] = matrixData[y*4+x];
+				}
+			}
 		}
 
 		public void SetValue (Matrix[] value)
