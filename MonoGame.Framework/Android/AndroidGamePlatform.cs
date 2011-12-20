@@ -10,6 +10,9 @@ using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 
+using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Audio;
+
 namespace Microsoft.Xna.Framework
 {
     class AndroidGamePlatform : GamePlatform
@@ -21,8 +24,10 @@ namespace Microsoft.Xna.Framework
             Game.Activity.Game = game;
 
             Window = new AndroidGameWindow(Game.Activity, game);
+            IsActive = true;
         }
 
+        private bool _initialized;
         public static bool IsPlayingVdeo { get; set; }
 
         public override void Exit()
@@ -40,7 +45,8 @@ namespace Microsoft.Xna.Framework
 
         public override void RunLoop()
         {
-            throw new NotImplementedException();
+            StartRunLoop();
+            //throw new NotImplementedException();
         }
 
         public override void StartRunLoop()
@@ -55,6 +61,12 @@ namespace Microsoft.Xna.Framework
 
         public override bool BeforeUpdate(GameTime gameTime)
         {
+            if (!_initialized)
+            {
+                Game.DoInitialize();
+                _initialized = true;
+            }
+
             return true;
         }
 
@@ -77,6 +89,18 @@ namespace Microsoft.Xna.Framework
                     Window.SetOrientation(DisplayOrientation.LandscapeLeft);
                     break;
             }
+        }
+
+        public override bool BeforeRun()
+        {
+            // Get the Accelerometer going
+            //TODO umcomment when the following bug is fixed
+            // http://bugzilla.xamarin.com/show_bug.cgi?id=1084
+            // Accelerometer currently seems to have a memory leak
+            //Accelerometer.SetupAccelerometer();
+            Window.Run(1 / Game.TargetElapsedTime.TotalSeconds);
+
+            return false;
         }
 
         public override void EnterFullScreen()

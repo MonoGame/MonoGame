@@ -282,6 +282,11 @@ namespace Microsoft.Xna.Framework
         protected virtual void LoadContent() { }
         protected virtual void UnloadContent() { }
 
+        internal virtual void DoInitialize()
+        {
+            Initialize();
+        }
+
         protected virtual void Initialize()
         {
             _platform.BeforeInitialize();
