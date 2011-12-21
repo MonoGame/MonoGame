@@ -83,7 +83,6 @@ namespace Microsoft.Xna.Framework
             _view = new WindowsGameWindow();
             _view.Game = game;
             this.Window = _view;
-            IsActive = true;
         }
 
         public override GameRunBehavior DefaultRunBehavior

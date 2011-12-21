@@ -452,6 +452,11 @@ namespace Microsoft.Xna.Framework
             }
         }
 
+        internal void DoInitialize()
+        {
+            Initialize();
+        }
+
         #endregion Internal Methods
 
         private GraphicsDeviceManager graphicsDeviceManager

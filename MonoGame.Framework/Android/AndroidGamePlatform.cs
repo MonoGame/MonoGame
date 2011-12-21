@@ -90,9 +90,9 @@ namespace Microsoft.Xna.Framework
         {
             System.Diagnostics.Debug.Assert(Game.Activity != null, "Must set Game.Activity before creating the Game instance");
             Game.Activity.Game = game;
+            Game.Activity.GamePlatform = this;
 
             Window = new AndroidGameWindow(Game.Activity, game);
-            IsActive = true;
         }
 
         private bool _initialized;
@@ -113,18 +113,12 @@ namespace Microsoft.Xna.Framework
 
         public override void RunLoop()
         {
-            StartRunLoop();
-            //throw new NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public override void StartRunLoop()
         {
-            // Get the Accelerometer going
-            //TODO umcomment when the following bug is fixed
-            // http://bugzilla.xamarin.com/show_bug.cgi?id=1084
-            // Accelerometer currently seems to have a memory leak
-            //Accelerometer.SetupAccelerometer();
-            Window.Run(1 / Game.TargetElapsedTime.TotalSeconds);
+            Window.Resume();
         }
 
         public override bool BeforeUpdate(GameTime gameTime)
@@ -157,6 +151,8 @@ namespace Microsoft.Xna.Framework
                     Window.SetOrientation(DisplayOrientation.LandscapeLeft);
                     break;
             }
+
+            base.BeforeInitialize();
         }
 
         public override bool BeforeRun()
@@ -167,6 +163,7 @@ namespace Microsoft.Xna.Framework
             // Accelerometer currently seems to have a memory leak
             //Accelerometer.SetupAccelerometer();
             Window.Run(1 / Game.TargetElapsedTime.TotalSeconds);
+            //Window.Pause();
 
             return false;
         }
@@ -199,6 +196,11 @@ namespace Microsoft.Xna.Framework
                 Accelerometer.Resume();
                 Sound.ResumeAll();
             }
+        }
+
+        public override GameRunBehavior DefaultRunBehavior
+        {
+            get { return GameRunBehavior.Asynchronous; }
         }
     }
 }
