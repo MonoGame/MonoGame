@@ -411,16 +411,13 @@ namespace Microsoft.Xna.Framework
 		{
 			if (!_playingVideo) 
 			{
-				foreach (GameComponent gc in _gameComponentCollection)
+				var components = _gameComponentCollection
+				        .Where(x => (x is DrawableGameComponent) && (((DrawableGameComponent)x).Enabled))
+						.ToList().Cast<DrawableGameComponent>();
+					       
+				foreach (DrawableGameComponent gc in components.Where(x => x.Visible).OrderBy(x => x.DrawOrder))
 				{
-					if (gc.Enabled && gc is DrawableGameComponent)
-					{
-						DrawableGameComponent dc = gc as DrawableGameComponent;
-						if (dc.Visible)
-						{
-							dc.Draw(gameTime);
-						}
-					}
+					gc.Draw(gameTime);										
 				}
 			}
         }
@@ -433,6 +430,8 @@ namespace Microsoft.Xna.Framework
 				if (Exiting != null) Exiting(this, null);
 				Net.NetworkSession.Exit();
                 view.Close();
+
+                GC.Collect(0);
 			}
 			catch
 			{
@@ -455,4 +454,3 @@ namespace Microsoft.Xna.Framework
 		#endregion
     }
 }
-
