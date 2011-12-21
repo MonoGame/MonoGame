@@ -171,28 +171,29 @@ namespace Microsoft.Xna.Framework
 
 		protected override void OnResize (EventArgs e)
 		{
-			
-			var manager = _game.Services.GetService (typeof(IGraphicsDeviceManager)) as GraphicsDeviceManager;
-			if (_game.Initialized)
-				manager.OnDeviceResetting(EventArgs.Empty);
-			
-			Microsoft.Xna.Framework.Graphics.Viewport _vp =
-			new Microsoft.Xna.Framework.Graphics.Viewport();
-				
-			_vp.X = (int)Bounds.X;
-			_vp.Y = (int)Bounds.Y;
-			_vp.Width = (int)Bounds.Width;
-			_vp.Height = (int)Bounds.Height;
-			
-			_game.GraphicsDevice.Viewport = _vp;
+            var manager = (GraphicsDeviceManager)_game.Services.GetService(typeof(IGraphicsDeviceManager));
+            if (_game.Initialized)
+            {
+    			manager.OnDeviceResetting(EventArgs.Empty);
+    			
+    			Microsoft.Xna.Framework.Graphics.Viewport _vp =
+    			new Microsoft.Xna.Framework.Graphics.Viewport();
+    				
+    			_vp.X = (int)Bounds.X;
+    			_vp.Y = (int)Bounds.Y;
+    			_vp.Width = (int)Bounds.Width;
+    			_vp.Height = (int)Bounds.Height;
+
+    			_game.GraphicsDevice.Viewport = _vp;
+            }
 			
 			clientBounds = new Rectangle((int)Bounds.X,(int)Bounds.Y,(int)Bounds.Width,(int)Bounds.Height);
 			
-			base.OnResize (e);
+			base.OnResize(e);
 			OnClientSizeChanged(e);
-			
-			if (_game.Initialized)
-				manager.OnDeviceReset(EventArgs.Empty);
+
+            if (_game.Initialized)
+    			manager.OnDeviceReset(EventArgs.Empty);
 		}
 		
 		protected virtual void OnClientSizeChanged (EventArgs e)

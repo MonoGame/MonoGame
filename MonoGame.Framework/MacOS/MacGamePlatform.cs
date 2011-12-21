@@ -162,8 +162,8 @@ namespace Microsoft.Xna.Framework
 
         public override bool BeforeRun()
         {
-            ResetWindowBounds();
             _mainWindow.MakeKeyAndOrderFront(_mainWindow);
+            ResetWindowBounds();
             return true;
         }
 
@@ -261,7 +261,7 @@ namespace Microsoft.Xna.Framework
             IsActive = wasActive;
         }
 
-        public override void IsMouseVisibleChanged()
+        protected override void OnIsMouseVisibleChanged()
         {
             _mainWindow.InvalidateCursorRectsForView(_gameWindow);
         }
@@ -309,9 +309,15 @@ namespace Microsoft.Xna.Framework
 
             // Now we set our Presentation Parameters
             var device = (GraphicsDevice)graphicsDeviceManager.GraphicsDevice;
-            PresentationParameters parms = device.PresentationParameters;
-            parms.BackBufferHeight = (int)content.Size.Height;
-            parms.BackBufferWidth = (int)content.Size.Width;
+            // HACK: Eliminate the need for null checks by only calling
+            //       ResetWindowBounds after the device is ready.  Or,
+            //       possibly break this method into smaller methods.
+            if (device != null)
+            {
+                PresentationParameters parms = device.PresentationParameters;
+                parms.BackBufferHeight = (int)content.Size.Height;
+                parms.BackBufferWidth = (int)content.Size.Width;
+            }
         }
 
         private float GetTitleBarHeight()

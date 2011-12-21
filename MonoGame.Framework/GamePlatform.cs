@@ -131,9 +131,18 @@ namespace Microsoft.Xna.Framework
             }
         }
 
+        private bool _isMouseVisible;
         public bool IsMouseVisible
         {
-            get; set;
+            get { return _isMouseVisible; }
+            set
+            {
+                if (_isMouseVisible != value)
+                {
+                    _isMouseVisible = value;
+                    OnIsMouseVisibleChanged();
+                }
+            }
         }
 
 #if ANDROID
@@ -265,6 +274,8 @@ namespace Microsoft.Xna.Framework
         /// Game.TargetElapsedTime has been set.
         /// </summary>
         public virtual void TargetElapsedTimeChanged() {}
+
+        protected virtual void OnIsMouseVisibleChanged() {}
 
         #endregion Methods
 
