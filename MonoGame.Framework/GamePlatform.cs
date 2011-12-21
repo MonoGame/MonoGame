@@ -96,7 +96,10 @@ namespace Microsoft.Xna.Framework
 
         #endregion Events
 
-        public virtual void BeforeInitialize() {}
+        public virtual void BeforeInitialize()
+        {
+            IsActive = true;
+        }
 
         public virtual bool BeforeRun()
         {
