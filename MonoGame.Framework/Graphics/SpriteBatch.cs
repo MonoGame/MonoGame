@@ -435,7 +435,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			// Initialize OpenGL states (ideally move this to initialize somewhere else)	
 			GL11.Disable(ALL11.DepthTest);
-			GL11.TexEnv(ALL11.TextureEnv, ALL11.TextureEnvMode,(int) ALL11.BlendSrc);
+			GL11.TexEnv(ALL11.TextureEnv, ALL11.TextureEnvMode,(int) ALL11.SrcAlpha);
 			GL11.Enable(ALL11.Texture2D);
 			GL11.EnableClientState(ALL11.VertexArray);
 			GL11.EnableClientState(ALL11.ColorArray);

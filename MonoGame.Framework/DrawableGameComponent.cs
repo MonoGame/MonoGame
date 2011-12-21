@@ -44,6 +44,7 @@ namespace Microsoft.Xna.Framework
 {
     public class DrawableGameComponent : GameComponent, IDrawable
     {
+        private bool _isInitialized;
         private bool _isVisible;
         private int _drawOrder;
 
@@ -58,8 +59,11 @@ namespace Microsoft.Xna.Framework
 
         public override void Initialize()
         {
-            base.Initialize();
-            LoadContent();
+            if (!_isInitialized)
+            {
+                _isInitialized = true;
+                LoadContent();
+            }
         }
 
         protected virtual void LoadContent()

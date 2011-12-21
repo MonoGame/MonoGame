@@ -76,6 +76,11 @@ namespace Microsoft.Xna.Framework
             // TODO NSDevice.CurrentDevice.EndGeneratingDeviceOrientationNotifications();
         }
 
+        public override GameRunBehavior DefaultRunBehavior
+        {
+            get { return GameRunBehavior.Asynchronous; }
+        }
+
         public bool IsPlayingVideo { get; set; }
 
         #region GamePlatform Implementation

@@ -20,7 +20,6 @@ namespace Microsoft.Xna.Framework
 //        Initialize all components...
 //        EAGLContext.SetCurrentContext(_window.MainContext);
 
-
         private GameWindow _gameWindow;
         private UIWindow _mainWindow;
         private NSObject _rotationObserver;
@@ -43,9 +42,15 @@ namespace Microsoft.Xna.Framework
             _mainWindow.Add(_gameWindow);
             _applicationObservers = new List<NSObject>();
 
-            // FIXME: What is GameVc doing in GamerServices?  Who knows if it
-            //        will even help.
+            // FIXME: What is GameVc doing in GamerServices?
+            //        It does silence iOS's warning that a root view controller
+            //        is expected.
             _mainWindow.RootViewController = new Microsoft.Xna.Framework.GamerServices.GameVc();
+        }
+
+        public override GameRunBehavior DefaultRunBehavior
+        {
+            get { return GameRunBehavior.Asynchronous; }
         }
 
         public bool IsPlayingVideo { get; set; }
@@ -60,9 +65,17 @@ namespace Microsoft.Xna.Framework
             }
         }
 
-        public override bool BeforeRun()
+        public override void BeforeInitialize()
         {
-            return true;
+            // HACK: Force the OpenGL context to be created before any
+            //       components are initialized.  This hack could be eliminated
+            //       by implementing a custom Initialize method in
+            //       iOSGameWindow that calls CreateFrameBuffer and OnLoad.
+            //       CreateFrameBuffer and OnLoad would both need to be changed
+            //       to be idempotent per create-destroy cycle of the OpenGL
+            //       context.
+            _gameWindow.Run(1 / Game.TargetElapsedTime.TotalSeconds);
+            _gameWindow.Pause();
         }
 
         public override void RunLoop()
@@ -79,7 +92,7 @@ namespace Microsoft.Xna.Framework
             BeginObservingUIApplication();
             BeginObservingDeviceRotation();
 
-            _gameWindow.Run(1 / Game.TargetElapsedTime.TotalSeconds);
+            _gameWindow.Resume();
         }
 
         private void GameWindow_Load(object sender, EventArgs e)

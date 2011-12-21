@@ -51,6 +51,8 @@ namespace Microsoft.Xna.Framework
             get; set;
         }
 
+        public abstract GameRunBehavior DefaultRunBehavior { get; }
+
         public Game Game
         {
             get; private set;

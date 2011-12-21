@@ -204,7 +204,12 @@ namespace Microsoft.Xna.Framework
             _lastUpdate = DateTime.Now;
         }
 
-        public void Run(bool asynchronous=false)
+        public void Run()
+        {
+            Run(_platform.DefaultRunBehavior);
+        }
+
+        public void Run(GameRunBehavior runBehavior)
         {
             _lastUpdate = DateTime.Now;
 
@@ -229,15 +234,19 @@ namespace Microsoft.Xna.Framework
             _initialized = true;
 
             BeginRun();
-            if (asynchronous)
+            switch (runBehavior)
             {
+            case GameRunBehavior.Asynchronous:
                 _platform.AsyncRunLoopEnded += Platform_AsyncRunLoopEnded;
                 _platform.StartRunLoop();
-            }
-            else
-            {
+                break;
+            case GameRunBehavior.Synchronous:
                 _platform.RunLoop();
                 EndRun();
+                break;
+            default:
+                throw new NotImplementedException(string.Format(
+                    "Handling for the run behavior {0} is not implemented.", runBehavior));
             }
         }
 
@@ -637,5 +646,11 @@ namespace Microsoft.Xna.Framework
             }
             #endregion
         }
+    }
+
+    public enum GameRunBehavior
+    {
+        Asynchronous,
+        Synchronous
     }
 }

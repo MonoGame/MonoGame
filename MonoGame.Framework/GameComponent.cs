@@ -49,7 +49,6 @@ namespace Microsoft.Xna.Framework
         bool _enabled;
         public event EventHandler UpdateOrderChanged;
         public event EventHandler EnabledChanged;
-        bool _initialized = false;
         public GameComponent(Game game)
         {
             _game = game;
@@ -66,18 +65,6 @@ namespace Microsoft.Xna.Framework
 
         public virtual void Initialize()
         {
-            // FIXME: This test-and-set does absolutely nothing right now.  If
-            //        components must be initialized exactly once, then we'll
-            //        need a mechanism for Game to use so that it can know not
-            //        to re-initialize a component.  Unfortunately,
-            //        the IGameComponent interface does not provide such a
-            //        facility, and having Game keep a list of all the
-            //        components it has ever initialized ever seems like a
-            //        less-than-ideal solution.
-            if (!_initialized)
-            {
-                _initialized = true;
-            }
         }
 
         public virtual void Update(GameTime gameTime)
