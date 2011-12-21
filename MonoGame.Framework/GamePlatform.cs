@@ -72,9 +72,10 @@ namespace Microsoft.Xna.Framework
 {
     abstract class GamePlatform : IDisposable
     {
+        #region Construction/Destruction
+
         public static GamePlatform Create(Game game)
         {
-            // FIXME: How do we want this factory method to operate?  ifdef?  Reflection?
 #if IPHONE
             return new iOSGamePlatform(game);
 #elif MONOMAC
@@ -98,7 +99,23 @@ namespace Microsoft.Xna.Framework
             Dispose(false);
         }
 
+        #endregion Construction/Destruction
+
         #region Public Properties
+
+        /// <summary>
+        /// When implemented in a derived class, reports the default
+        /// GameRunBehavior for this platform.
+        /// </summary>
+        public abstract GameRunBehavior DefaultRunBehavior { get; }
+
+        /// <summary>
+        /// Gets the Game instance that owns this GamePlatform instance.
+        /// </summary>
+        public Game Game
+        {
+            get; private set;
+        }
 
         private bool _isActive;
         public bool IsActive
@@ -109,10 +126,7 @@ namespace Microsoft.Xna.Framework
                 if (_isActive != value)
                 {
                     _isActive = value;
-                    if (_isActive)
-                        Raise(Activated, EventArgs.Empty);
-                    else
-                        Raise(Deactivated, EventArgs.Empty);
+                    Raise(_isActive ? Activated : Deactivated, EventArgs.Empty);
                 }
             }
         }
@@ -120,13 +134,6 @@ namespace Microsoft.Xna.Framework
         public bool IsMouseVisible
         {
             get; set;
-        }
-
-        public abstract GameRunBehavior DefaultRunBehavior { get; }
-
-        public Game Game
-        {
-            get; private set;
         }
 
 #if ANDROID
@@ -156,6 +163,11 @@ namespace Microsoft.Xna.Framework
                 handler(this, e);
         }
 
+        /// <summary>
+        /// Raises the AsyncRunLoopEnded event.  This method must be called by
+        /// derived classes when the asynchronous run loop they start has
+        /// stopped running.
+        /// </summary>
         protected void RaiseAsyncRunLoopEnded()
         {
             Raise(AsyncRunLoopEnded, EventArgs.Empty);
@@ -163,65 +175,102 @@ namespace Microsoft.Xna.Framework
 
         #endregion Events
 
+        #region Methods
+
+        /// <summary>
+        /// Gives derived classes an opportunity to do work before any
+        /// components are initialized.  Note that the base implementation sets
+        /// IsActive to true, so derived classes should either call the base
+        /// implementation or set IsActive to true by their own means.
+        /// </summary>
         public virtual void BeforeInitialize()
         {
             IsActive = true;
         }
 
+        /// <summary>
+        /// Gives derived classes an opportunity to do work just before the
+        /// run loop is begun.  Implementations may also return false to prevent
+        /// the run loop from starting.
+        /// </summary>
+        /// <returns></returns>
         public virtual bool BeforeRun()
         {
             return true;
         }
 
         /// <summary>
-        /// When implemented in a subclass, ends the active run loop.
+        /// When implemented in a derived, ends the active run loop.
         /// </summary>
         public abstract void Exit();
 
         /// <summary>
-        /// When implemented in a subclass, starts the run loop and blocks
+        /// When implemented in a derived, starts the run loop and blocks
         /// until it has ended.
         /// </summary>
         public abstract void RunLoop();
 
         /// <summary>
-        /// When implemented in a subclass, starts the run loop and returns
+        /// When implemented in a derived, starts the run loop and returns
         /// immediately.
         /// </summary>
         public abstract void StartRunLoop();
 
+        /// <summary>
+        /// Gives derived classes an opportunity to do work just before Update
+        /// is called for all IUpdatable components.  Returning false from this
+        /// method will result in this round of Update calls being skipped.
+        /// </summary>
+        /// <param name="gameTime"></param>
+        /// <returns></returns>
         public abstract bool BeforeUpdate(GameTime gameTime);
+
+        /// <summary>
+        /// Gives derived classes an opportunity to do work just before Draw
+        /// is called for all IDrawable components.  Returning false from this
+        /// method will result in this round of Draw calls being skipped.
+        /// </summary>
+        /// <param name="gameTime"></param>
+        /// <returns></returns>
         public abstract bool BeforeDraw(GameTime gameTime);
 
+        /// <summary>
+        /// When implemented in a derived class, causes the game to enter
+        /// full-screen mode.
+        /// </summary>
         public abstract void EnterFullScreen();
+
+        /// <summary>
+        /// When implemented in a derived class, causes the game to exit
+        /// full-screen mode.
+        /// </summary>
         public abstract void ExitFullScreen();
 
-        public virtual bool IsActiveChanging(bool value)
-        {
-            return value;
-        }
-
-        public virtual void IsActiveChanged() {}
-
-        public virtual bool IsMouseVisibleChanging(bool value)
-        {
-            return value;
-        }
-
-        public virtual void IsMouseVisibleChanged() {}
-
+        /// <summary>
+        /// Gives derived classes an opportunity to modify
+        /// Game.TargetElapsedTime before it is set.
+        /// </summary>
+        /// <param name="value">The proposed new value of TargetElapsedTime.</param>
+        /// <returns>The new value of TargetElapsedTime that will be set.</returns>
         public virtual TimeSpan TargetElapsedTimeChanging(TimeSpan value)
         {
             return value;
         }
 
+        /// <summary>
+        /// Gives derived classes an opportunity to take action after
+        /// Game.TargetElapsedTime has been set.
+        /// </summary>
         public virtual void TargetElapsedTimeChanged() {}
 
-        public virtual void EnterBackground() {}
-        public virtual void EnterForeground() {}
+        #endregion Methods
 
         #region IDisposable implementation
 
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing,
+        /// releasing, or resetting unmanaged resources.
+        /// </summary>
         public void Dispose()
         {
             Dispose(true);

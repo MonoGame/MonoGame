@@ -86,6 +86,11 @@ namespace Microsoft.Xna.Framework
             IsActive = true;
         }
 
+        public override GameRunBehavior DefaultRunBehavior
+        {
+            get { return GameRunBehavior.Synchronous; }
+        }
+
         public override void RunLoop()
         {
             //Need to execute this on the rendering thread

@@ -82,16 +82,7 @@ namespace Microsoft.Xna.Framework
 {
     public class Game : IDisposable
     {
-        // FIXME:  What does this constant actually represent?  The target FPS?
-        private const float FramesPerSecond = 60.0f; // ~60 frames per second
-
-        // I do believe we can take out the next three variables.
-        //  After the release this should be looked at as the time is
-        //  passed from the GameWindow which controlls when updating is to
-        //  be done.
-        private GameTime _updateGameTime;
-        private GameTime _drawGameTime;
-        private DateTime _lastUpdate;
+        private const float DefaultTargetFramesPerSecond = 60.0f;
 
         private GameComponentCollection _components;
         private ContentManager _content;
@@ -122,16 +113,13 @@ namespace Microsoft.Xna.Framework
         private bool _initialized = false;
         private bool _isFixedTimeStep = true;
 
-        private TimeSpan _targetElapsedTime = TimeSpan.FromSeconds(1 / FramesPerSecond);
+        private TimeSpan _targetElapsedTime = TimeSpan.FromSeconds(1 / DefaultTargetFramesPerSecond);
 
         public Game()
         {
             _services = new GameServiceContainer();
             _components = new GameComponentCollection();
             _content = new ContentManager(_services);
-
-            _updateGameTime = new GameTime();
-            _drawGameTime = new GameTime();
 
             _platform = GamePlatform.Create(this);
             _platform.Activated += Platform_Activated;
@@ -189,7 +177,8 @@ namespace Microsoft.Xna.Framework
             get { return _targetElapsedTime; }
             set
             {
-                // Give GamePlatform implementations an opportunity to override the new value.
+                // Give GamePlatform implementations an opportunity to override
+                // the new value.
                 value = _platform.TargetElapsedTimeChanging(value);
 
                 if (value <= TimeSpan.Zero)
@@ -252,6 +241,9 @@ namespace Microsoft.Xna.Framework
         #region Internal Properties
 
         // FIXME: Internal members should be eliminated.
+        // Currently Game.Initialized is used by the Mac game window class to
+        // determine whether to raise DeviceResetting and DeviceReset on
+        // GraphicsDeviceManager.
         internal bool Initialized
         {
             get { return _initialized; }
@@ -278,7 +270,12 @@ namespace Microsoft.Xna.Framework
 
         public void ResetElapsedTime()
         {
-            _lastUpdate = DateTime.Now;
+            // FIXME: This method didn't actually do anything before.  It
+            //        may need to call a new method in GamePlatform to allow
+            //        platforms to handle elapsed time in their own way.
+            //        Now that things are more unified, it may be possible to
+            //        consolidate this logic back into the Game class.
+            //        Regardless, an empty implementation is not correct.
         }
 
         public void Run()
@@ -288,7 +285,8 @@ namespace Microsoft.Xna.Framework
 
         public void Run(GameRunBehavior runBehavior)
         {
-            _lastUpdate = DateTime.Now;
+            if (!_platform.BeforeRun())
+                return;
 
             // In an original XNA game the GraphicsDevice property is null
             // during initialization but before the Game's Initialize method is
@@ -298,14 +296,7 @@ namespace Microsoft.Xna.Framework
             // some problems on some Microsoft samples which we are not handling
             // correctly.
             graphicsDeviceManager.CreateDevice();
-
-            var manager = (GraphicsDeviceManager)Services.GetService(
-                typeof(IGraphicsDeviceManager));
-
-            applyChanges(manager);
-
-            if (!_platform.BeforeRun())
-                return;
+            applyChanges(graphicsDeviceManager);
 
             Initialize();
             _initialized = true;
@@ -327,14 +318,6 @@ namespace Microsoft.Xna.Framework
             }
         }
 
-        public void EnterForeground()
-        {
-        }
-
-        public void EnterBackground()
-        {
-        }
-
         #endregion
 
         #region Protected Methods
@@ -348,11 +331,6 @@ namespace Microsoft.Xna.Framework
         protected virtual void LoadContent() { }
         protected virtual void UnloadContent() { }
 
-        internal virtual void DoInitialize()
-        {
-            Initialize();
-        }
-
         protected virtual void Initialize()
         {
             _platform.BeforeInitialize();
@@ -362,9 +340,11 @@ namespace Microsoft.Xna.Framework
             // are initialized.
             // http://msdn.microsoft.com/en-us/library/microsoft.xna.framework.game.initialize.aspx
 
-            // 1. Sort components into IUpdateable and IDrawable lists.
+            // 1. Categorize components into IUpdateable and IDrawable lists.
             // 2. Initialize all existing components
-            // 3. Subscribe to Added/Removed events to keep these lists synced.
+            // 3. Subscribe to Added/Removed events to keep the categorized
+            //    lists synced and to Initialize future components as they are
+            //    added.
             CategorizeComponents();
             InitializeExistingComponents();
             _components.ComponentAdded += Components_ComponentAdded;
@@ -402,8 +382,6 @@ namespace Microsoft.Xna.Framework
         {
             // Since we only subscribe to ComponentAdded after the graphics
             // devices are set up, it is safe to just blindly call Initialize.
-            // FIXME:  Is it legal to re-Initialize GameComponents if they
-            //         are removed from Components and re-added?
             e.GameComponent.Initialize();
             CategorizeComponent(e.GameComponent);
         }
@@ -434,6 +412,10 @@ namespace Microsoft.Xna.Framework
         #endregion Event Handlers
 
         #region Internal Methods
+
+        // FIXME: We should work toward eliminating internal methods.  They
+        //        break entirely the possibility that additional platforms could
+        //        be added by third parties without changing MonoGame itself.
 
         internal void applyChanges(GraphicsDeviceManager manager)
         {
@@ -539,7 +521,12 @@ namespace Microsoft.Xna.Framework
                 handler(this, e);
         }
 
-        class SortingFilteringCollection<T> : IComparer<T>
+        /// <summary>
+        /// The SortingFilteringCollection class provides efficient, reusable
+        /// sorting and filtering based on a configurable sort comparer, filter
+        /// predicate, and associate change events.
+        /// </summary>
+        class SortingFilteringCollection<T> : ICollection<T>, IComparer<T>
         {
             private List<T> _items;
             private List<T> _addJournal;
@@ -638,6 +625,36 @@ namespace Microsoft.Xna.Framework
                 _items.Clear();
 
                 InvalidateCache();
+            }
+
+            public bool Contains(T item)
+            {
+                return _items.Contains(item);
+            }
+
+            public void CopyTo(T[] array, int arrayIndex)
+            {
+                _items.CopyTo(array, arrayIndex);
+            }
+
+            public int Count
+            {
+                get { return _items.Count; }
+            }
+
+            public bool IsReadOnly
+            {
+                get { return false; }
+            }
+
+            public IEnumerator<T> GetEnumerator()
+            {
+                return _items.GetEnumerator();
+            }
+
+            System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+            {
+                return ((System.Collections.IEnumerable)_items).GetEnumerator();
             }
 
             private void ProcessRemoveJournal()
