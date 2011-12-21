@@ -90,7 +90,8 @@ namespace Microsoft.Xna.Framework
         {
             System.Diagnostics.Debug.Assert(Game.Activity != null, "Must set Game.Activity before creating the Game instance");
             Game.Activity.Game = game;
-            Game.Activity.GamePlatform = this;
+            Game.Activity.Paused += new EventHandler(Activity_Paused);
+            Game.Activity.Resumed += new EventHandler(Activity_Resumed);
 
             Window = new AndroidGameWindow(Game.Activity, game);
         }
@@ -176,18 +177,8 @@ namespace Microsoft.Xna.Framework
         {
         }
 
-        public override void EnterBackground()
-        {
-            if (IsActive)
-            {
-                IsActive = false;
-                Window.Pause();
-                Accelerometer.Pause();
-                Sound.PauseAll();
-            }
-        }
-
-        public override void EnterForeground()
+        // EnterForeground
+        void Activity_Resumed(object sender, EventArgs e)
         {
             if (!IsActive)
             {
@@ -195,6 +186,18 @@ namespace Microsoft.Xna.Framework
                 Window.Resume();
                 Accelerometer.Resume();
                 Sound.ResumeAll();
+            }
+        }
+
+        // EnterBackground
+        void Activity_Paused(object sender, EventArgs e)
+        {
+            if (IsActive)
+            {
+                IsActive = false;
+                Window.Pause();
+                Accelerometer.Pause();
+                Sound.PauseAll();
             }
         }
 

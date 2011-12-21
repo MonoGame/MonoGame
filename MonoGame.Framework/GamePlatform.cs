@@ -255,9 +255,6 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         public abstract void ExitFullScreen();
 
-        public virtual void EnterBackground() { }
-        public virtual void EnterForeground() { }
-
         /// <summary>
         /// Gives derived classes an opportunity to modify
         /// Game.TargetElapsedTime before it is set.

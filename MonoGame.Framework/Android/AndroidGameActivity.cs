@@ -16,7 +16,6 @@ namespace Microsoft.Xna.Framework
 {
     public class AndroidGameActivity : Activity
     {
-        internal GamePlatform GamePlatform { get; set; }
         public Game Game { get; set; }
 		
 		private OrientationListener o;		
@@ -29,18 +28,22 @@ namespace Microsoft.Xna.Framework
 			{
 				o.Enable();				
 			}						
-		}	
-				
+		}
+
+        public event EventHandler Paused;
         protected override void OnPause()
         {
             base.OnPause();
-            if (GamePlatform != null) GamePlatform.EnterBackground();
+            if (Paused != null)
+                Paused(this, EventArgs.Empty);
         }
 
+        public event EventHandler Resumed;
         protected override void OnResume()
         {
             base.OnResume();
-            if (GamePlatform != null) GamePlatform.EnterForeground();
+            if (Resumed != null)
+                Resumed(this, EventArgs.Empty);
         }
     }
 	
