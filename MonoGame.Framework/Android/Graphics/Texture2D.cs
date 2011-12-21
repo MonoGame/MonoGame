@@ -388,9 +388,26 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
             byte[] imageInfo = GetImageData(0);
-
+			
+			// Get the Color values
+			if (typeof(T) == typeof(uint))
+			{
+				Color[] colors = new Color[elementCount];
+				GetData<Color>(level, rect, colors, startIndex, elementCount);
+				uint[] final = data as uint[];
+				for (int i = 0; i < final.Length; i++)
+				{
+					final[i] = (uint)
+					(
+						colors[i].R << 24 |
+						colors[i].G << 16 |
+						colors[i].B << 8 |
+						colors[i].A
+					);
+				}
+			}
             // Get the Color values
-            if ((typeof(T) == typeof(Color)))
+            else if ((typeof(T) == typeof(Color)))
             {
 
 
