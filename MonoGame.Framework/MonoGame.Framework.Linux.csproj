@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -16,7 +16,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug</OutputPath>
-    <DefineConstants>DEBUG</DefineConstants>
+    <DefineConstants>DEBUG;LINUX</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
@@ -32,6 +32,7 @@
     <PlatformTarget>x86</PlatformTarget>
     <ConsolePause>false</ConsolePause>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DefineConstants>LINUX</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -63,13 +64,16 @@
     <Compile Include="CurveLoopType.cs" />
     <Compile Include="CurveTangent.cs" />
     <Compile Include="DisplayOrientation.cs" />
+    <Compile Include="Game.cs" />
     <Compile Include="GameComponentCollectionEventArgs.cs" />
+    <Compile Include="GamePlatform.cs" />
     <Compile Include="GameServiceContainer.cs" />
     <Compile Include="GameTime.cs" />
     <Compile Include="IDrawable.cs" />
     <Compile Include="IGameComponent.cs" />
     <Compile Include="IGraphicsDeviceManager.cs" />
     <Compile Include="IUpdateable.cs" />
+    <Compile Include="Linux\LinuxGamePlatform.cs" />
     <Compile Include="MathHelper.cs" />
     <Compile Include="Matrix.cs" />
     <Compile Include="PerformanceCounter.cs" />
@@ -187,7 +191,6 @@
     <Compile Include="Linux\Graphics\SpriteBatcher.cs" />
     <Compile Include="Graphics\SpriteBatchItem.cs" />
     <Compile Include="Graphics\SpriteEffects.cs" />
-    <Compile Include="Linux\Game.cs" />
     <Compile Include="GameComponent.cs" />
     <Compile Include="DrawableGameComponent.cs" />
     <Compile Include="Audio\InstancePlayLimitException.cs" />
@@ -325,26 +328,8 @@
     <Compile Include="Audio\XactClip.cs" />
     <Compile Include="Audio\XactSound.cs" />
     <Compile Include="Linux\Graphics\RenderTarget2D.cs" />
-    <Compile Include="Shared\Game.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Linux\" />
-    <Folder Include="Graphics\" />
-    <Folder Include="Graphics\Vertices\" />
-    <Folder Include="Linux\Graphics\" />
-    <Folder Include="Linux\Graphics\Vertices\" />
-    <Folder Include="Content\ContentReaders\" />
-    <Folder Include="GamerServices\" />
-    <Folder Include="Linux\Audio\" />
-    <Folder Include="Media\" />
-    <Folder Include="Linux\Content\" />
-    <Folder Include="Linux\Graphics\" />
-    <Folder Include="Linux\Media\" />
-    <Folder Include="Linux\Graphics\States\" />
-    <Folder Include="Linux\Graphics\Effect\" />
-    <Folder Include="Linux\Input\" />
-    <Folder Include="Linux\GamerServices\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.Linux.csproj">
       <Project>{AE483C29-042E-4226-BA52-D247CE7676DA}</Project>

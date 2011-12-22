@@ -84,6 +84,8 @@ namespace Microsoft.Xna.Framework
             return new WindowsGamePlatform(game);
 #elif ANDROID
             return new AndroidGamePlatform(game);
+#elif LINUX
+            return new LinuxGamePlatform(game);
 #endif
         }
 

@@ -457,6 +457,13 @@ namespace Microsoft.Xna.Framework
             Initialize();
         }
 
+#if LINUX
+        internal void ResizeWindow(bool changed)
+        {
+            ((LinuxGamePlatform)_platform).ResetWindowBounds(changed);
+        }
+#endif
+
         #endregion Internal Methods
 
         private GraphicsDeviceManager graphicsDeviceManager
