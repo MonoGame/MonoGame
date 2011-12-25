@@ -132,6 +132,94 @@ namespace Microsoft.Xna.Framework.Input
 							pc.RightStick.Press.Type = InputType.Button;
 						}
 						
+						else if (Sdl.SDL_JoystickName(x).Contains("Sony PLAYSTATION(R)3"))
+						{
+							pc.Button_A.ID = 14;
+							pc.Button_A.Type = InputType.Button;
+
+							pc.Button_B.ID = 13;
+							pc.Button_B.Type = InputType.Button;
+
+							pc.Button_X.ID = 15;
+							pc.Button_X.Type = InputType.Button;
+
+							pc.Button_Y.ID = 12;
+							pc.Button_Y.Type = InputType.Button;
+
+							pc.Button_Back.ID = 0;
+							pc.Button_Back.Type = InputType.Button;
+
+							pc.Button_Start.ID = 3;
+							pc.Button_Start.Type = InputType.Button;
+
+							pc.Button_LB.ID = 10;
+							pc.Button_LB.Type = InputType.Button;
+
+							pc.Button_RB.ID = 11;
+							pc.Button_RB.Type = InputType.Button;
+
+							pc.LeftStick.X.Negative.ID = 0;
+							pc.LeftStick.X.Negative.Type = InputType.Axis;
+							pc.LeftStick.X.Negative.Negative = true;
+
+							pc.LeftStick.X.Positive.ID = 0;
+							pc.LeftStick.X.Positive.Type = InputType.Axis;
+							pc.LeftStick.X.Positive.Negative = false;
+
+							pc.LeftStick.Y.Negative.ID = 1;
+							pc.LeftStick.Y.Negative.Type = InputType.Axis;
+							pc.LeftStick.Y.Negative.Negative = true;
+
+							pc.LeftStick.Y.Positive.ID = 1;
+							pc.LeftStick.Y.Positive.Type = InputType.Axis;
+							pc.LeftStick.Y.Positive.Negative = false;
+
+							pc.RightStick.X.Negative.ID = 2;
+							pc.RightStick.X.Negative.Type = InputType.Axis;
+							pc.RightStick.X.Negative.Negative = true;
+
+							pc.RightStick.X.Positive.ID = 2;
+							pc.RightStick.X.Positive.Type = InputType.Axis;
+							pc.RightStick.X.Positive.Negative = false;
+
+							pc.RightStick.Y.Negative.ID = 3;
+							pc.RightStick.Y.Negative.Type = InputType.Axis;
+							pc.RightStick.Y.Negative.Negative = true;
+
+							pc.RightStick.Y.Positive.ID = 3;
+							pc.RightStick.Y.Positive.Type = InputType.Axis;
+							pc.RightStick.Y.Positive.Negative = false;
+
+							pc.Dpad.Up.ID = 8;
+							pc.Dpad.Up.Type = InputType.PovUp;
+
+							pc.Dpad.Down.ID = 10;
+							pc.Dpad.Down.Type = InputType.PovDown;
+
+							pc.Dpad.Left.ID = 11;
+							pc.Dpad.Left.Type = InputType.PovLeft;
+
+							pc.Dpad.Right.ID = 9;
+							pc.Dpad.Right.Type = InputType.PovRight;
+
+							pc.LeftTrigger.ID = 12;
+							pc.LeftTrigger.Type = InputType.Axis;
+							// Only positive value
+
+							pc.RightTrigger.ID = 13;
+							pc.RightTrigger.Type = InputType.Axis;
+							// Only positive value
+							
+							//pc.BigButton.ID = 16;
+							//pc.BigButton.Type = InputType.Button;
+
+							pc.LeftStick.Press.ID = 1;
+							pc.LeftStick.Press.Type = InputType.Button;
+
+							pc.RightStick.Press.ID = 2;
+							pc.RightStick.Press.Type = InputType.Button;
+						}
+						
 						else
 						{
 							//pc.Button_A = new Input();
