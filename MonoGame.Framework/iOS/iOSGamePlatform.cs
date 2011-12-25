@@ -87,7 +87,7 @@ namespace Microsoft.Xna.Framework
 //        Initialize all components...
 //        EAGLContext.SetCurrentContext(_window.MainContext);
 
-        private GameWindow _gameWindow;
+        private iOSGameViewController _viewController;
         private UIWindow _mainWindow;
         private NSObject _rotationObserver;
         private List<NSObject> _applicationObservers;
@@ -101,18 +101,14 @@ namespace Microsoft.Xna.Framework
             // Create a full-screen window
             _mainWindow = new UIWindow(UIScreen.MainScreen.Bounds);
 
-            _gameWindow = new GameWindow(game, this);
-            _gameWindow.Load += GameWindow_Load;
-            _gameWindow.Unload += GameWindow_Unload;
+            _viewController = new iOSGameViewController(this);
+            _mainWindow.RootViewController = _viewController;
 
-            Window = _gameWindow;
-            _mainWindow.Add(_gameWindow);
+            _viewController.View.Load += GameWindow_Load;
+            _viewController.View.Unload += GameWindow_Unload;
+
+            Window = _viewController.View;
             _applicationObservers = new List<NSObject>();
-
-            // FIXME: What is GameVc doing in GamerServices?
-            //        It does silence iOS's warning that a root view controller
-            //        is expected.
-            _mainWindow.RootViewController = new Microsoft.Xna.Framework.GamerServices.GameVc();
         }
 
         public override GameRunBehavior DefaultRunBehavior
@@ -127,13 +123,23 @@ namespace Microsoft.Xna.Framework
             base.Dispose(disposing);
             if (disposing)
             {
-                _mainWindow.Dispose();
-                _gameWindow.Dispose();
+                if (_mainWindow != null)
+                {
+                    _mainWindow.Dispose();
+                    _mainWindow = null;
+                }
+                if (_viewController != null)
+                {
+                    _viewController.Dispose();
+                    _viewController = null;
+                }
             }
         }
 
         public override void BeforeInitialize()
         {
+            TouchPanel.Reset();
+
             // HACK: Force the OpenGL context to be created before any
             //       components are initialized.  This hack could be eliminated
             //       by implementing a custom Initialize method in
@@ -141,8 +147,9 @@ namespace Microsoft.Xna.Framework
             //       CreateFrameBuffer and OnLoad would both need to be changed
             //       to be idempotent per create-destroy cycle of the OpenGL
             //       context.
-            _gameWindow.Run(1 / Game.TargetElapsedTime.TotalSeconds);
-            _gameWindow.Pause();
+
+            _viewController.View.Run(1 / Game.TargetElapsedTime.TotalSeconds);
+            _viewController.View.Pause();
         }
 
         public override void RunLoop()
@@ -159,23 +166,28 @@ namespace Microsoft.Xna.Framework
             BeginObservingUIApplication();
             BeginObservingDeviceRotation();
 
-            _gameWindow.Resume();
+            _viewController.View.BecomeFirstResponder();
+            _viewController.View.Resume();
         }
 
         private void GameWindow_Load(object sender, EventArgs e)
         {
-            _gameWindow.MainContext = _gameWindow.EAGLContext;
-            _gameWindow.ShareGroup = _gameWindow.MainContext.ShareGroup;
-            _gameWindow.BackgroundContext = new EAGLContext(_gameWindow.ContextRenderingApi, _gameWindow.ShareGroup);
+            // FIXME: Surely this activity should be performed by some other
+            //        class.  iOSGameViewController or the iOS GameWindow.
+            _viewController.View.MainContext = _viewController.View.EAGLContext;
+            _viewController.View.ShareGroup = _viewController.View.MainContext.ShareGroup;
+            _viewController.View.BackgroundContext = new EAGLContext(_viewController.View.ContextRenderingApi, _viewController.View.ShareGroup);
         }
 
         private void GameWindow_Unload(object sender, EventArgs e)
         {
-            _gameWindow.MainContext = null;
-            _gameWindow.ShareGroup = null;
+            // FIXME: Surely this activity should be performed by some other
+            //        class.  iOSGameViewController or the iOS GameWindow.
+            _viewController.View.MainContext = null;
+            _viewController.View.ShareGroup = null;
             // FIXME: Dispose BackgroundContext first?  We created it in
             //        GameWindow_Load.
-            _gameWindow.BackgroundContext = null;
+            _viewController.View.BackgroundContext = null;
         }
 
         public override bool BeforeDraw(GameTime gameTime)
@@ -300,12 +312,10 @@ namespace Microsoft.Xna.Framework
 
         private void Device_OrientationDidChange(NSNotification notification)
         {
-            var orientation = UIDeviceOrientationToDisplayOrientation(UIDevice.CurrentDevice.Orientation);
+            var orientation = OrientationConverter.UIDeviceOrientationToDisplayOrientation(
+                UIDevice.CurrentDevice.Orientation);
 
             // Calculate supported orientations if it has been left as "default"
-            // FIXME: Obviously casting null is not going to work.  I think maybe a platform-specific
-            //        GraphicsDeviceManager should be provided and owned by the specific GamePlatform implementations.
-            //        If that intuition is right, then this problem will evaporate.
             var gdm = (GraphicsDeviceManager)Game.Services.GetService(typeof(IGraphicsDeviceManager));
             DisplayOrientation supportedOrientations = gdm.SupportedOrientations;
 
@@ -327,27 +337,13 @@ namespace Microsoft.Xna.Framework
 
             if ((supportedOrientations & orientation) == orientation)
             {
-                _gameWindow.CurrentOrientation = orientation;
+                _viewController.View.CurrentOrientation = orientation;
                 presentParams.DisplayOrientation = orientation;
                 TouchPanel.DisplayOrientation = orientation;
             }
         }
 
         #endregion Notification Handling
-
-        private static DisplayOrientation UIDeviceOrientationToDisplayOrientation(UIDeviceOrientation orientation)
-        {
-            switch (orientation)
-            {
-            case UIDeviceOrientation.FaceDown: return DisplayOrientation.FaceDown;
-            case UIDeviceOrientation.FaceUp: return DisplayOrientation.FaceUp;
-            default:
-            case UIDeviceOrientation.LandscapeLeft: return DisplayOrientation.LandscapeLeft;
-            case UIDeviceOrientation.LandscapeRight: return DisplayOrientation.LandscapeRight;
-            case UIDeviceOrientation.Portrait: return DisplayOrientation.Portrait;
-            case UIDeviceOrientation.PortraitUpsideDown: return DisplayOrientation.PortraitUpsideDown;
-            }
-        }
     }
 }
 

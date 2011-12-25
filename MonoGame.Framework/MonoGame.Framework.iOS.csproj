@@ -364,6 +364,8 @@
     <Compile Include="Game.cs" />
     <Compile Include="GamePlatform.cs" />
     <Compile Include="iOS\iOSGamePlatform.cs" />
+    <Compile Include="iOS\iOSGameViewController.cs" />
+    <Compile Include="iOS\OrientationConverter.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
