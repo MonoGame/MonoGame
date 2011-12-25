@@ -298,6 +298,7 @@ namespace Microsoft.Xna.Framework
             graphicsDeviceManager.CreateDevice();
             applyChanges(graphicsDeviceManager);
 
+            _platform.BeforeInitialize();
             Initialize();
             _initialized = true;
 
@@ -333,8 +334,6 @@ namespace Microsoft.Xna.Framework
 
         protected virtual void Initialize()
         {
-            _platform.BeforeInitialize();
-
             // According to the information given on MSDN (see link below), all
             // GameComponents in Components at the time Initialize() is called
             // are initialized.
