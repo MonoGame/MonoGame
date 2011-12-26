@@ -392,17 +392,13 @@ namespace Microsoft.Xna.Framework
 		}
 
 		public bool AllowUserResizing {
-			get
-            {
-                throw new NotImplementedException();
-                // FIXME: Replace _game.AllowUserResizing
-                //return _game.AllowUserResizing;
-            }
+			get { return (Window.StyleMask & NSWindowStyle.Resizable) == NSWindowStyle.Resizable; }
 			set
             {
-                throw new NotImplementedException();
-                // FIXME: Replace _game.AllowUserResizing
-                //_game.AllowUserResizing = value;
+                if (value)
+                    Window.StyleMask |= NSWindowStyle.Resizable;
+                else
+                    Window.StyleMask &= ~NSWindowStyle.Resizable;
             }
 		}	
 
