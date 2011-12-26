@@ -418,19 +418,21 @@ namespace Microsoft.Xna.Framework
 
         internal void applyChanges(GraphicsDeviceManager manager)
         {
-            var viewport = new Viewport();
-
-            viewport.X = 0;
-            viewport.Y = 0;
-            viewport.Width = manager.PreferredBackBufferWidth;
-            viewport.Height = manager.PreferredBackBufferHeight;
-
-            GraphicsDevice.Viewport = viewport;
-
             if (GraphicsDevice.PresentationParameters.IsFullScreen)
                 _platform.EnterFullScreen();
             else
                 _platform.ExitFullScreen();
+
+            // FIXME: Is this the correct/best way to set the viewport?  There
+            //        are/were several snippets like this through the project.
+            var viewport = new Viewport();
+
+            viewport.X = 0;
+            viewport.Y = 0;
+            viewport.Width = GraphicsDevice.PresentationParameters.BackBufferWidth;
+            viewport.Height = GraphicsDevice.PresentationParameters.BackBufferHeight;
+
+            GraphicsDevice.Viewport = viewport;
         }
 
         internal void DoUpdate(GameTime gameTime)

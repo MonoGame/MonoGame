@@ -200,22 +200,8 @@ namespace Microsoft.Xna.Framework
 			}
 			set {
 				wantFullScreen = value;
-				if (_graphicsDevice != null) {
-					
-					bool wasFullScreen = _graphicsDevice.PresentationParameters.IsFullScreen;
-
-					PresentationParameters presParams = _graphicsDevice.PresentationParameters;
-					presParams.IsFullScreen = value;
-					_graphicsDevice.PresentationParameters = presParams;
-
-					if (value && !wasFullScreen) {
-                        throw new NotImplementedException("replace _game.InternalGoFullScreen");
-						//_game.InternalGoFullScreen();
-					} else if (!value && wasFullScreen) {
-                        throw new NotImplementedException("replace _game.InternalGoWindowed");
-						//_game.InternalGoWindowed();
-					}
-				}
+                if (_graphicsDevice != null)
+                    ApplyChanges();
 			}
 		}
 
