@@ -98,17 +98,17 @@ namespace Microsoft.Xna.Framework
             game.Services.AddService(typeof(iOSGamePlatform), this);
             Directory.SetCurrentDirectory(NSBundle.MainBundle.ResourcePath);
 
+            _applicationObservers = new List<NSObject>();
+
             // Create a full-screen window
             _mainWindow = new UIWindow(UIScreen.MainScreen.Bounds);
 
             _viewController = new iOSGameViewController(this);
-            _mainWindow.RootViewController = _viewController;
-
             _viewController.View.Load += GameWindow_Load;
             _viewController.View.Unload += GameWindow_Unload;
-
             Window = _viewController.View;
-            _applicationObservers = new List<NSObject>();
+
+            _mainWindow.RootViewController = _viewController;
         }
 
         public override GameRunBehavior DefaultRunBehavior
@@ -117,6 +117,13 @@ namespace Microsoft.Xna.Framework
         }
 
         public bool IsPlayingVideo { get; set; }
+
+        // FIXME: VideoPlayer 'needs' this to set up its own movie player view
+        //        controller.
+        public iOSGameViewController ViewController
+        {
+            get { return _viewController; }
+        }
 
         protected override void Dispose(bool disposing)
         {

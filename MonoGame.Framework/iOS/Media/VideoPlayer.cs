@@ -37,12 +37,12 @@
 // purpose and non-infringement.
 // */
 // #endregion License
-// 
 
 using System;
 using Microsoft.Xna.Framework.Graphics;
 using MonoTouch.MediaPlayer;
 using MonoTouch.Foundation;
+using MonoTouch.UIKit;
 
 namespace Microsoft.Xna.Framework.Media
 {
@@ -81,15 +81,21 @@ namespace Microsoft.Xna.Framework.Media
             }
         }
 		
+        private NSObject _playbackDidFinishObserver;
 		private void PlayVideo()
 		{				
-			_game.Window.AddSubview(_video.MovieView.View);			
-			
-			NSNotificationCenter.DefaultCenter.AddObserver("MPMoviePlayerPlaybackDidFinishNotification",(NSNotification) => OnStop(null),_video.MovieView.MoviePlayer);		
-
-			_video.MovieView.MoviePlayer.Play();
 			_state = MediaState.Playing;
 			_platform.IsPlayingVideo = true;
+
+            _playbackDidFinishObserver = NSNotificationCenter.DefaultCenter.AddObserver(
+                MPMoviePlayerController.PlaybackDidFinishNotification, OnStop);
+
+            _video.MovieView.MoviePlayer.RepeatMode = _isLooped ? MPMovieRepeatMode.One : MPMovieRepeatMode.None;
+
+            // HACK: Pause window to prevent GL context re-creation.
+            _platform.Window.Pause();
+            _platform.ViewController.PresentModalViewController(_video.MovieView, animated: false);
+            _video.MovieView.MoviePlayer.Play();
 		}
 
         public void Play(Microsoft.Xna.Framework.Media.Video video)
@@ -99,18 +105,25 @@ namespace Microsoft.Xna.Framework.Media
         }
 		
 		private void OnStop(NSNotification e)
-		{	
+		{
 			Stop();
-			if (_isLooped)
-				PlayVideo();
 		}
 
         public void Stop()
         {
+            if (_playbackDidFinishObserver != null)
+            {
+                NSNotificationCenter.DefaultCenter.RemoveObserver(_playbackDidFinishObserver);
+                _playbackDidFinishObserver = null;
+            }
+
 			_video.MovieView.MoviePlayer.Stop();
 			_state = MediaState.Stopped;
 			_platform.IsPlayingVideo = false;
-			_video.MovieView.View.RemoveFromSuperview();
+            _platform.ViewController.DismissViewController(
+                animated: false, completionHandler: () => {});
+            // HACK: End of pausing to prevent GL context re-creation.
+            _platform.Window.Resume();
         }
 
         public bool IsLooped
