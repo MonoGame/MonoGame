@@ -37,6 +37,7 @@ namespace Microsoft.Xna.Framework.Content
     public sealed class ContentTypeReaderManager
     {
         ContentReader _reader;
+        ContentTypeReader[] contentReaders;		
 		
 		static string assemblyName;
 		
@@ -52,14 +53,14 @@ namespace Microsoft.Xna.Framework.Content
 
         public ContentTypeReader GetTypeReader(Type targetType)
         {
-            foreach (ContentTypeReader r in _reader.TypeReaders)
+            foreach (ContentTypeReader r in contentReaders)
             {
                 if (targetType == r.TargetType) return r;
             }
             return null;
         }
 		
-		public ContentTypeReader[] LoadAssetReaders(ContentReader reader)
+		internal ContentTypeReader[] LoadAssetReaders()
         {			
 			// Dummy variables required for it to work on iDevices ** DO NOT DELETE ** 
 			// This forces the classes not to be optimized out when deploying to iDevices
@@ -76,11 +77,9 @@ namespace Microsoft.Xna.Framework.Content
 			CurveReader hCurveReader = new CurveReader();
 			
             int numberOfReaders;
-            ContentTypeReader[] contentReaders;		
 			
-
             // The first content byte i read tells me the number of content readers in this XNB file
-            numberOfReaders = reader.ReadByte();
+            numberOfReaders = _reader.Read7BitEncodedInt();
             contentReaders = new ContentTypeReader[numberOfReaders];
 		
             // For each reader in the file, we read out the length of the string which contains the type of the reader,
@@ -89,7 +88,7 @@ namespace Microsoft.Xna.Framework.Content
             {
                 // This string tells us what reader we need to decode the following data
                 // string readerTypeString = reader.ReadString();
-				string originalReaderTypeString = reader.ReadString();
+				string originalReaderTypeString = _reader.ReadString();
  
 				// Need to resolve namespace differences
 				string readerTypeString = originalReaderTypeString;
@@ -105,7 +104,7 @@ namespace Microsoft.Xna.Framework.Content
 				
 				// I think the next 4 bytes refer to the "Version" of the type reader,
                 // although it always seems to be zero
-                int typeReaderVersion = reader.ReadInt32();
+                int typeReaderVersion = _reader.ReadInt32();
             }
 
             return contentReaders;

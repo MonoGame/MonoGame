@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -53,6 +53,13 @@
   <ItemGroup>
     <Compile Include="Android\AndroidGamePlatform.cs" />
     <Compile Include="Content\ContentManager.cs" />
+    <Compile Include="Content\ContentReaders\ArrayReader.cs" />
+    <Compile Include="Content\ContentReaders\NullableReader.cs" />
+    <Compile Include="Content\ContentReaders\PointReader.cs" />
+    <Compile Include="Content\ContentReaders\UInt16Reader.cs" />
+    <Compile Include="Content\ContentReaders\UInt32Reader.cs" />
+    <Compile Include="Content\ContentReaders\UInt64Reader.cs" />
+    <Compile Include="Content\ContentReaders\Vector2Reader.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="GamePlatform.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -169,7 +176,6 @@
     <Compile Include="Media\MediaState.cs" />
     <Compile Include="Media\Playlist.cs" />
     <Compile Include="Media\PlaylistCollection.cs" />
-    <Compile Include="Media\Song.cs" />
     <Compile Include="Media\SongCollection.cs" />
     <Compile Include="PerformanceCounter.cs" />
     <Compile Include="Plane.cs" />
@@ -328,6 +334,7 @@
     <Compile Include="Audio\XactClip.cs" />
     <Compile Include="Android\Input\Touch\GestureListener.cs" />
     <Compile Include="Audio\XactSound.cs" />
+    <Compile Include="Android\Media\Song.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />

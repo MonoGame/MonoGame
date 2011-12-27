@@ -60,7 +60,8 @@ namespace Microsoft.Xna.Framework.Input
             _sensorManger = (SensorManager)Game.Activity.GetSystemService(Context.SensorService);
             _sensor = _sensorManger.GetDefaultSensor(SensorType.Accelerometer);
 
-            if (_sensor != null) {
+            if (_sensor != null) 
+            {
                 _state = new AccelerometerState { IsConnected = true };                
             }
             else _state = new AccelerometerState { IsConnected = false };
@@ -105,12 +106,12 @@ namespace Microsoft.Xna.Framework.Input
 
         internal static void Pause()
         {
-            if (_sensorManger != null && _sensor == null) _sensorManger.UnregisterListener(listener, _sensor);
+            if (_sensorManger != null && _sensor != null) _sensorManger.UnregisterListener(listener, _sensor);
         }
 
         internal static void Resume()
         {
-            if (_sensorManger != null && _sensor == null) _sensorManger.RegisterListener(listener, _sensor, SensorDelay.Game);            
+            if (_sensorManger != null && _sensor != null) _sensorManger.RegisterListener(listener, _sensor, SensorDelay.Game);            
         }
     }
 }

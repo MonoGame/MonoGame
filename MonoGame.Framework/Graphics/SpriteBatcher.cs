@@ -146,6 +146,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			int startIndex = 0;
 			int index = 0;
 			int texID = -1;
+            // store last tint color
 			Color lastTint =  new Color(0.0f,0.0f,0.0f,0.0f);
 
 			// make sure the vertexArray has enough space

@@ -31,6 +31,15 @@ namespace Microsoft.Xna.Framework
 		}
 
         public event EventHandler Paused;
+
+		public override void OnConfigurationChanged (Android.Content.Res.Configuration newConfig)
+		{
+			// we need to refresh the viewport here.
+			Game.GraphicsDevice.Reset();
+			base.OnConfigurationChanged (newConfig);
+		}
+
+
         protected override void OnPause()
         {
             base.OnPause();
@@ -45,6 +54,7 @@ namespace Microsoft.Xna.Framework
             if (Resumed != null)
                 Resumed(this, EventArgs.Empty);
         }
+
     }
 	
 	internal class OrientationListener : OrientationEventListener
@@ -86,7 +96,10 @@ namespace Microsoft.Xna.Framework
 						break;
 				}
 				
+				if (activity.Game.Window.CurrentOrientation != disporientation)
+				{
 				activity.Game.Window.SetOrientation(disporientation);
+				}
 				inprogress = false;
 			}
 			

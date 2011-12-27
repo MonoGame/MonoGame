@@ -74,11 +74,11 @@ namespace Microsoft.Xna.Framework.Graphics
 			SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage)
 			:base (graphicsDevice, width, height, mipMap, preferredFormat)
 		{
-#if ANDROID
-			if(GraphicsDevice.OpenGLESVersion == OpenTK.Graphics.GLContextVersion.Gles2_0)
-#else
+
+
+#if IPHONE
 			if(GraphicsDevice.OpenGLESVersion == MonoTouch.OpenGLES.EAGLRenderingAPI.OpenGLES2)
-#endif
+
 			{
 				GL20.GenFramebuffers(1, ref frameBuffer);
 			}
@@ -87,7 +87,23 @@ namespace Microsoft.Xna.Framework.Graphics
 				RenderTargetUsage = usage;
 				DepthStencilFormat = preferredDepthFormat;
 			}
-		}
+#elif ANDROID
+            if (GraphicsDevice.OpenGLESVersion == OpenTK.Graphics.GLContextVersion.Gles2_0)
+            {
+                GL20.GenFramebuffers(1, ref frameBuffer);
+            }
+            else
+            {
+                RenderTargetUsage = usage;
+                DepthStencilFormat = preferredDepthFormat;
+            }
+#else
+				RenderTargetUsage = usage;
+				DepthStencilFormat = preferredDepthFormat;
+#endif
+
+
+        }
 		
 		public override void Dispose ()
 		{
