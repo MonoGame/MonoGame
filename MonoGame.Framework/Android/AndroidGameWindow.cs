@@ -302,7 +302,7 @@ namespace Microsoft.Xna.Framework
 		
 		internal void UpdateTouchPosition(ref Vector2 position)
 		{
-			if (this.game.Window.CurrentOrientation == DisplayOrientation.LandscapeRight)
+			if (this._game.Window.CurrentOrientation == DisplayOrientation.LandscapeRight)
 			{
 				// we need to fudge the position
 				position.X = this.Width - position.X;
