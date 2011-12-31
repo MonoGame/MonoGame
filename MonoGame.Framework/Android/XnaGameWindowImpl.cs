@@ -18,8 +18,7 @@ namespace Microsoft.Xna.Framework
 
         public XnaGameWindowImpl(Activity context, Game game)
         {
-            nativeWindow = new AndroidGameWindow(context);
-            nativeWindow.game = game;
+            nativeWindow = new AndroidGameWindow(context, game);
         }
 
         public override void BeginScreenDeviceChange(bool willBeFullScreen)

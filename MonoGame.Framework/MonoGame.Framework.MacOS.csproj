@@ -196,7 +196,6 @@
     <Compile Include="MacOS\Graphics\SpriteBatcher.cs" />
     <Compile Include="Graphics\SpriteBatchItem.cs" />
     <Compile Include="Graphics\SpriteEffects.cs" />
-    <Compile Include="MacOS\Game.cs" />
     <Compile Include="GameComponent.cs" />
     <Compile Include="DrawableGameComponent.cs" />
     <Compile Include="Audio\InstancePlayLimitException.cs" />
@@ -346,6 +345,9 @@
     <Compile Include="Graphics\Vertices\IndexElementSize.cs" />
     <Compile Include="Audio\XactSound.cs" />
     <Compile Include="Audio\XactClip.cs" />
+    <Compile Include="Game.cs" />
+    <Compile Include="GamePlatform.cs" />
+    <Compile Include="MacOS\MacGamePlatform.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />
@@ -358,7 +360,6 @@
     <Folder Include="MacOS\Audio\" />
     <Folder Include="Media\" />
     <Folder Include="MacOS\Content\" />
-    <Folder Include="MacOS\Graphics\" />
     <Folder Include="MacOS\Media\" />
     <Folder Include="MacOS\Graphics\States\" />
     <Folder Include="MacOS\Graphics\Effect\" />

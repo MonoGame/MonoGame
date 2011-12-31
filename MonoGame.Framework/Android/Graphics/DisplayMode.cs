@@ -56,7 +56,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             get
             {
-                return (int)Game.contextInstance.Resources.DisplayMetrics.WidthPixels;
+                return (int)Game.Activity.Resources.DisplayMetrics.WidthPixels;
             }
         }
 
@@ -64,7 +64,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             get
             {
-                return (int)Game.contextInstance.Resources.DisplayMetrics.HeightPixels;
+                return (int)Game.Activity.Resources.DisplayMetrics.HeightPixels;
             }
         }
     }

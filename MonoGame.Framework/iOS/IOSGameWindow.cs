@@ -67,7 +67,7 @@ namespace Microsoft.Xna.Framework
     public class GameWindow : iPhoneOSGameView
     {
 		private readonly Rectangle clientBounds;
-		internal static Game game;
+		private iOSGamePlatform _platform;
 		private GameTime _updateGameTime;
         private GameTime _drawGameTime;
         private DateTime _lastUpdate;
@@ -109,8 +109,12 @@ namespace Microsoft.Xna.Framework
 				
 		#region UIVIew Methods
 
-		public GameWindow() : base (UIScreen.MainScreen.Bounds)
+		internal GameWindow(iOSGamePlatform platform) : base (UIScreen.MainScreen.Bounds)
 		{
+            if (platform == null)
+                throw new ArgumentNullException("platform");
+            _platform = platform;
+
 			LayerRetainsBacking = false; 
 			LayerColorFormat	= EAGLColorFormat.RGBA8;
 			ContentScaleFactor  = UIScreen.MainScreen.Scale;
@@ -143,6 +147,11 @@ namespace Microsoft.Xna.Framework
 		{
 			return iPhoneOSGameView.GetLayerClass ();
 		}
+
+        public override bool CanBecomeFirstResponder
+        {
+            get { return true; }
+        }
 		
 		protected override void ConfigureLayer(CAEAGLLayer eaglLayer) 
 		{
@@ -385,13 +394,10 @@ namespace Microsoft.Xna.Framework
 			// More speed testing is required, to see if this is worse or better
 			// game.DoStep();	
 			
-			if (game != null )
-			{
-				_nowDraw = DateTime.Now;
-				_drawGameTime.Update(_nowDraw - _lastDraw);
-            	_lastDraw = _nowDraw;
-            	game.DoDraw(_drawGameTime);
-			}
+			_nowDraw = DateTime.Now;
+			_drawGameTime.Update(_nowDraw - _lastDraw);
+			_lastDraw = _nowDraw;
+			_platform.Game.DoDraw(_drawGameTime);
 						
 			SwapBuffers();
 		}
@@ -415,13 +421,10 @@ namespace Microsoft.Xna.Framework
 		{			
 			base.OnUpdateFrame(e);	
 			
-			if (game != null )
-			{
-				_nowUpdate = DateTime.Now;
-				_updateGameTime.Update(_nowUpdate - _lastUpdate);
-				_lastUpdate = _nowUpdate;
-            	game.DoUpdate(_updateGameTime);
-			}
+			_nowUpdate = DateTime.Now;
+			_updateGameTime.Update(_nowUpdate - _lastUpdate);
+			_lastUpdate = _nowUpdate;
+			_platform.Game.DoUpdate(_updateGameTime);
 		}
 		
 		protected override void OnVisibleChanged(EventArgs e)
@@ -437,10 +440,18 @@ namespace Microsoft.Xna.Framework
 		#endregion
 				
 		#region UIVIew Methods	
+
 		[Export("LongPressGestureRecognizer")]
 		public void LongPressGestureRecognizer (UILongPressGestureRecognizer sender)
 		{
-			TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.Hold, new TimeSpan(_nowUpdate.Ticks), translatedTouchPosition, new Vector2 (sender.LocationInView (sender.View)), new Vector2(0,0), new Vector2(0,0)));
+            // FIXME: Determine the appropriate action to take here.  The XNA
+            //        docs say, "This is a single event, and not continuously
+            //        generated while the user is holding the touchpoint."
+            //        However, iOS generates Began for that condition, then zero
+            //        or more Changed notifications, and then one of the final-
+            //        state notifications (Recognized, Failed, etc)
+            if (sender.State == UIGestureRecognizerState.Began)
+			    TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.Hold, new TimeSpan(_nowUpdate.Ticks), translatedTouchPosition, new Vector2 (sender.LocationInView (sender.View)), new Vector2(0,0), new Vector2(0,0)));
 		}
 		
 		

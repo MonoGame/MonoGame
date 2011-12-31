@@ -109,7 +109,9 @@ namespace Microsoft.Xna.Framework.Media
 		
 		internal void Prepare()
 		{
-			_view = new MPMoviePlayerViewController(new NSUrl(FileName));
+            var url = NSUrl.FromFilename(Path.GetFullPath(FileName));
+
+			_view = new MPMoviePlayerViewController(url);
 			_view.MoviePlayer.ScalingMode = MPMovieScalingMode.AspectFill;
 			_view.MoviePlayer.MovieControlMode = MPMovieControlMode.Hidden;
 			_view.MoviePlayer.PrepareToPlay();
