@@ -206,6 +206,7 @@ namespace Microsoft.Xna.Framework
         public ContentManager Content
         {
             get { return _content; }
+            set { _content = value; }
         }
 
         public GraphicsDevice GraphicsDevice
