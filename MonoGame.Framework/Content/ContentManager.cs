@@ -115,7 +115,7 @@ namespace Microsoft.Xna.Framework.Content
             }
         }
 
-        public T Load<T>(string assetName)
+        public virtual T Load<T>(string assetName)
         {
             if (string.IsNullOrEmpty(assetName))
             {
