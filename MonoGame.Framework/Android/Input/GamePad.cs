@@ -258,7 +258,7 @@ using System.Collections.Generic;
 
         public static bool SetVibration(PlayerIndex playerIndex, float leftMotor, float rightMotor)
         {	
-            Vibrator vibrator = (Vibrator)Game.contextInstance.GetSystemService(Context.VibratorService);
+            Vibrator vibrator = (Vibrator)Game.Activity.GetSystemService(Context.VibratorService);
 			vibrator.Vibrate(500);
             return true;
         }

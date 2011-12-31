@@ -63,7 +63,7 @@ namespace Microsoft.Xna.Framework
                 throw new ArgumentNullException("Game Cannot Be Null");
             }
 
-            Game.contextInstance.RequestWindowFeature(WindowFeatures.NoTitle);
+            Game.Activity.RequestWindowFeature(WindowFeatures.NoTitle);
            
 			_game = game;
 			_preferredBackBufferHeight = game.Window.ClientBounds.Height;
@@ -83,7 +83,7 @@ namespace Microsoft.Xna.Framework
 		
 		public void CreateDevice ()
 		{
-			throw new System.NotImplementedException ();
+			//throw new System.NotImplementedException ();
 		}
 
 		public bool BeginDraw ()
@@ -187,9 +187,9 @@ namespace Microsoft.Xna.Framework
                 if (IsFullScreen != value) {
                     _graphicsDevice.PresentationParameters.IsFullScreen = value;
                     if (IsFullScreen)
-                        Game.contextInstance.Window.SetFlags(WindowManagerFlags.Fullscreen, WindowManagerFlags.Fullscreen);
+                        Game.Activity.Window.SetFlags(WindowManagerFlags.Fullscreen, WindowManagerFlags.Fullscreen);
                     else
-                        Game.contextInstance.Window.SetFlags(WindowManagerFlags.ForceNotFullscreen, WindowManagerFlags.ForceNotFullscreen);
+                        Game.Activity.Window.SetFlags(WindowManagerFlags.ForceNotFullscreen, WindowManagerFlags.ForceNotFullscreen);
                 }
             }
         }

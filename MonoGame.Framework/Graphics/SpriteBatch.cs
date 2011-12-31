@@ -80,7 +80,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			{
 				throw new ArgumentException("graphicsDevice");
 			}	
-
+			
 			this.graphicsDevice = graphicsDevice;
 			
 			_batcher = new SpriteBatcher();
@@ -269,7 +269,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			// OpenGL ES Version 
 #if IPHONE
-            if(GraphicsDevice.OpenGLESVersion == MonoTouch.OpenGLES.EAGLRenderingAPI.OpenGLES2)
+			if(GraphicsDevice.OpenGLESVersion == MonoTouch.OpenGLES.EAGLRenderingAPI.OpenGLES2)
 				EndGL20();
 			else
 				EndGL11();
@@ -282,7 +282,7 @@ namespace Microsoft.Xna.Framework.Graphics
             EndGL11();
 #endif
 
-        }
+		}
 		
 		private void EndGL20()
 		{
@@ -321,7 +321,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			// Configure ViewPort
 			GL20.Viewport(0, 0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height); 
 			GL20.UseProgram(program);
-
+			
             // Enable Scissor Tests if necessary
             if (this.graphicsDevice.RasterizerState.ScissorTestEnable)
             {
@@ -387,8 +387,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 				case DisplayOrientation.LandscapeRight:
                 {
-                    GL11.Rotate(180, 0, 0, 1);
-                    GL11.Ortho(0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height, 0, -1, 1);
+					GL11.Rotate(180, 0, 0, 1); 
+					GL11.Ortho(0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height,  0, -1, 1);
 					break;
 				}
 				
@@ -396,7 +396,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				case DisplayOrientation.PortraitUpsideDown:
                 default:
 				{
-                    GL11.Ortho(0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height, 0, -1, 1);
+					GL11.Ortho(0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height, 0, -1, 1);
 					break;
 				}
 			}					
@@ -463,7 +463,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			// Initialize OpenGL states (ideally move this to initialize somewhere else)	
 			GL11.Disable(ALL11.DepthTest);
-			GL11.TexEnv(ALL11.TextureEnv, ALL11.TextureEnvMode,(int) ALL11.BlendSrc);
+			GL11.TexEnv(ALL11.TextureEnv, ALL11.TextureEnvMode,(int) ALL11.SrcAlpha);
 			GL11.Enable(ALL11.Texture2D);
 			GL11.EnableClientState(ALL11.VertexArray);
 			GL11.EnableClientState(ALL11.ColorArray);

@@ -57,12 +57,12 @@ namespace Microsoft.Xna.Framework.Input
 		
 		public static void SetupAccelerometer()
 		{
-            _sensorManger = (SensorManager)Game.contextInstance.GetSystemService(Context.SensorService);
+            _sensorManger = (SensorManager)Game.Activity.GetSystemService(Context.SensorService);
             _sensor = _sensorManger.GetDefaultSensor(SensorType.Accelerometer);
 
             if (_sensor != null) 
             {
-                _state = new AccelerometerState { IsConnected = true };
+                _state = new AccelerometerState { IsConnected = true };                
             }
             else _state = new AccelerometerState { IsConnected = false };
         }
