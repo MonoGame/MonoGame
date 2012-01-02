@@ -37,7 +37,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		/// <param name='e'>
 		/// If set to <c>true</c> e.
 		/// </param>
-		public override bool OnSingleTapConfirmed (MotionEvent e)
+		public override bool OnSingleTapUp (MotionEvent e)
 		{
 			if ((TouchPanel.EnabledGestures & GestureType.Tap) != 0)
 			{
@@ -47,7 +47,39 @@ namespace Microsoft.Xna.Framework.Input.Touch
 					positon, Vector2.Zero, Vector2.Zero, Vector2.Zero);
 				TouchPanel.GestureList.Enqueue(gs);
 			}
-			return base.OnSingleTapConfirmed (e);
+			return base.OnSingleTapUp (e);
+		}
+				
+		// AJW
+        public override bool OnFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY)
+        {
+            if ((TouchPanel.EnabledGestures & GestureType.Flick) != 0)
+            {
+				Vector2 positon = new Vector2(e1.GetX(), e1.GetY());
+				activity.Game.Window.UpdateTouchPosition(ref positon);
+				Vector2 positon2 = new Vector2(e2.GetX(), e2.GetY());
+				activity.Game.Window.UpdateTouchPosition(ref positon2);
+                var gs = new GestureSample(GestureType.Flick, activity.Game.TargetElapsedTime,
+                    positon,
+                    positon2,
+                    new Vector2(velocityX, velocityY),
+                    Vector2.Zero);
+                TouchPanel.GestureList.Enqueue(gs);
+            }
+            return base.OnFling(e1, e2, velocityX, velocityY);
+        }
+		
+		public override void OnLongPress (MotionEvent e)
+		{
+			if ((TouchPanel.EnabledGestures & GestureType.Hold) != 0)
+			{
+				Vector2 positon = new Vector2(e.GetX(), e.GetY());
+				activity.Game.Window.UpdateTouchPosition(ref positon);
+				var gs = new GestureSample(GestureType.Hold, activity.Game.TargetElapsedTime, 
+					positon, Vector2.Zero, Vector2.Zero, Vector2.Zero);
+				TouchPanel.GestureList.Enqueue(gs);
+			}
+			base.OnLongPress (e);
 		}
 	}
 }
