@@ -83,11 +83,15 @@ namespace Microsoft.Xna.Framework
         private MacGameNSWindow _mainWindow;
         private GameWindow _gameWindow;
         private bool _wasResizeable;
+	Microsoft.Xna.Framework.Audio.OpenALSoundController soundControllerInstance = null;
 
         public MacGamePlatform(Game game) :
             base(game)
         {
             game.Services.AddService(typeof(MacGamePlatform), this);
+
+			// Setup our OpenALSoundController to handle our SoundBuffer pools
+			soundControllerInstance = Microsoft.Xna.Framework.Audio.OpenALSoundController.GetInstance;
 
             RectangleF frame = new RectangleF(
                 0, 0,
@@ -179,6 +183,8 @@ namespace Microsoft.Xna.Framework
 
         public override bool BeforeUpdate(GameTime gameTime)
         {
+		// Update our OpenAL sound buffer pools
+		soundControllerInstance.Update();
             if (IsPlayingVideo)
                 return false;
             return true;
