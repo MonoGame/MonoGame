@@ -76,6 +76,7 @@ using Microsoft.Xna.Framework.Input.Touch;
 using MonoTouch.Foundation;
 using MonoTouch.OpenGLES;
 using MonoTouch.UIKit;
+using Microsoft.Xna.Framework.Audio;
 
 namespace Microsoft.Xna.Framework
 {
@@ -91,11 +92,15 @@ namespace Microsoft.Xna.Framework
         private UIWindow _mainWindow;
         private NSObject _rotationObserver;
         private List<NSObject> _applicationObservers;
+	private OpenALSoundController soundControllerInstance = null;
 
         public iOSGamePlatform(Game game) :
             base(game)
         {
             game.Services.AddService(typeof(iOSGamePlatform), this);
+		// Setup our OpenALSoundController to handle our SoundBuffer pools
+		soundControllerInstance = OpenALSoundController.GetInstance;
+			
             Directory.SetCurrentDirectory(NSBundle.MainBundle.ResourcePath);
 
             _applicationObservers = new List<NSObject>();
@@ -199,6 +204,8 @@ namespace Microsoft.Xna.Framework
 
         public override bool BeforeDraw(GameTime gameTime)
         {
+		// Update our OpenAL sound buffer pools
+		soundControllerInstance.Update();
             if (IsPlayingVideo)
                 return false;
             return true;

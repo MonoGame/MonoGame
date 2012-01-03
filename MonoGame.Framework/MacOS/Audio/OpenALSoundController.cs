@@ -4,9 +4,12 @@ using System.Linq;
 using System.IO;
 using System.Runtime.InteropServices;
 
-//using MonoMac.AudioToolbox;
-//using MonoMac.AudioUnit;
+#if IPHONE
+using OpenTK.Audio.OpenAL;
+using OpenTK;
+#elif MONOMAC
 using MonoMac.OpenAL;
+#endif
 
 namespace Microsoft.Xna.Framework.Audio
 {

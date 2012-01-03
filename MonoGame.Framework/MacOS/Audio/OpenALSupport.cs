@@ -1,18 +1,26 @@
 using System;
 using System.Runtime.InteropServices;
 
+#if IPHONE
+using MonoTouch.UIKit;
+using MonoTouch.Foundation;
+using MonoTouch.CoreFoundation;
+using MonoTouch.AudioToolbox;
+using MonoTouch.AudioUnit;
+
+using OpenTK.Audio.OpenAL;
+
+#elif MONOMAC
+
 using MonoMac.AppKit;
 using MonoMac.Foundation;
 using MonoMac.CoreFoundation;
 using MonoMac.AudioToolbox;
 using MonoMac.AudioUnit;
-//using MonoTouch.UIKit;
-//using MonoTouch.Foundation;
-//using MonoTouch.CoreFoundation;
-//using MonoTouch.AudioToolbox;
-//using MonoTouch.AudioUnit;
 
 using MonoMac.OpenAL;
+
+#endif
 
 namespace Microsoft.Xna.Framework.Audio
 {

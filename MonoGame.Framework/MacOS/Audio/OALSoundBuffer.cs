@@ -1,6 +1,11 @@
 using System;
 
+#if IPHONE
+using OpenTK.Audio.OpenAL;
+#elif MONOMAC
 using MonoMac.OpenAL;
+#endif
+
 
 namespace Microsoft.Xna.Framework.Audio
 {

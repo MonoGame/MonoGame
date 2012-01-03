@@ -46,13 +46,17 @@ using Microsoft.Xna;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 
-//using MonoMac.AudioToolbox;
-//using MonoMac.AudioUnit;
-//using MonoMac.AudioUnitWrapper;
+#if IPHONE
+using MonoTouch.AudioToolbox;
+using MonoTouch.AudioUnit;
+
+using OpenTK.Audio.OpenAL;
+#elif MONOMAC
 using MonoMac.AudioToolbox;
 using MonoMac.AudioUnit;
 
 using MonoMac.OpenAL;
+#endif
 
 namespace Microsoft.Xna.Framework.Audio
 {

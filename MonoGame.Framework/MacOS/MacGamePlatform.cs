@@ -75,6 +75,7 @@ using Microsoft.Xna.Framework.Graphics;
 using MonoMac.AppKit;
 using MonoMac.Foundation;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Audio;
 
 namespace Microsoft.Xna.Framework
 {
@@ -83,7 +84,7 @@ namespace Microsoft.Xna.Framework
         private MacGameNSWindow _mainWindow;
         private GameWindow _gameWindow;
         private bool _wasResizeable;
-	Microsoft.Xna.Framework.Audio.OpenALSoundController soundControllerInstance = null;
+	private OpenALSoundController soundControllerInstance = null;
 
         public MacGamePlatform(Game game) :
             base(game)
@@ -91,7 +92,7 @@ namespace Microsoft.Xna.Framework
             game.Services.AddService(typeof(MacGamePlatform), this);
 
 			// Setup our OpenALSoundController to handle our SoundBuffer pools
-			soundControllerInstance = Microsoft.Xna.Framework.Audio.OpenALSoundController.GetInstance;
+			soundControllerInstance = OpenALSoundController.GetInstance;
 
             RectangleF frame = new RectangleF(
                 0, 0,
