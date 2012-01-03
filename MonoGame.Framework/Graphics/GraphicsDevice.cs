@@ -698,6 +698,11 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+		public RenderTargetBinding[] GetRenderTargets ()
+		{
+			return currentRenderTargets;
+		}
+		
         public void ResolveBackBuffer(ResolveTexture2D resolveTexture)
         {
         }

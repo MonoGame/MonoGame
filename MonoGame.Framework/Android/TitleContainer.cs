@@ -47,7 +47,7 @@ namespace Microsoft.Xna.Framework
 	{
 		public static Stream OpenStream (string name)
 		{
-			return Game.contextInstance.Assets.Open(name);
+			return Game.Activity.Assets.Open(name);
 		}
 	}
 }

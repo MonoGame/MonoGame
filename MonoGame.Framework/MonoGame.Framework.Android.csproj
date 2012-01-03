@@ -51,6 +51,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Android\AndroidGamePlatform.cs" />
     <Compile Include="Content\ContentManager.cs" />
     <Compile Include="Content\ContentReaders\ArrayReader.cs" />
     <Compile Include="Content\ContentReaders\NullableReader.cs" />
@@ -59,6 +60,8 @@
     <Compile Include="Content\ContentReaders\UInt32Reader.cs" />
     <Compile Include="Content\ContentReaders\UInt64Reader.cs" />
     <Compile Include="Content\ContentReaders\Vector2Reader.cs" />
+    <Compile Include="Game.cs" />
+    <Compile Include="GamePlatform.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Android\AndroidGameActivity.cs" />
     <Compile Include="Audio\AudioChannels.cs" />
@@ -138,7 +141,6 @@
     <Compile Include="CurveTangent.cs" />
     <Compile Include="DisplayOrientation.cs" />
     <Compile Include="DrawableGameComponent.cs" />
-    <Compile Include="Android\Game.cs" />
     <Compile Include="GameComponent.cs" />
     <Compile Include="GameComponentCollection.cs" />
     <Compile Include="GameComponentCollectionEventArgs.cs" />

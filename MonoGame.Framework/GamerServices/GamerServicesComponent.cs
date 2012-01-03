@@ -59,11 +59,6 @@ namespace Microsoft.Xna.Framework.GamerServices
             Guide.Initialise(game);
         }
 		
-		protected override void LoadContent()
-        {
-			
-        }
-		
 		public override void Update (GameTime gameTime)
 		{
 			
