@@ -81,6 +81,13 @@ namespace Microsoft.Xna.Framework.Graphics
         public RasterizerState RasterizerState { get; set; }
 
         private RenderTargetBinding[] currentRenderTargets;
+		
+		// TODO Graphics Device events need implementing
+		public event EventHandler<EventArgs> DeviceLost;
+		public event EventHandler<EventArgs> DeviceReset;
+		public event EventHandler<EventArgs> DeviceResetting;
+		//public event EventHandler<ResourceCreatedEventArgs> ResourceCreated;
+		//public event EventHandler<ResourceDestroyedEventArgs> ResourceDestroyed;
 
         //OpenGL Rendering API
 
@@ -876,6 +883,54 @@ namespace Microsoft.Xna.Framework.Graphics
             //Buffer data to VBO; This should use stream when we move to ES2.0
             GL11.BufferData(ALL11.ArrayBuffer, (IntPtr)(vd.VertexStride * GetElementCountArray(primitiveType, primitiveCount)), new IntPtr(handle.AddrOfPinnedObject().ToInt64() + (vertexOffset * vd.VertexStride)), ALL11.DynamicDraw);
             GL11.BufferData(ALL11.ElementArrayBuffer, (IntPtr)(sizeof(uint) * GetElementCountArray(primitiveType, primitiveCount)), indexData, ALL11.DynamicDraw);
+
+            //Setup VertexDeclaration
+            VertexDeclaration.PrepareForUse(vd);
+
+            //Draw
+            GL11.DrawElements(PrimitiveTypeGL11(primitiveType), GetElementCountArray(primitiveType, primitiveCount), ALL11.UnsignedInt248Oes, (IntPtr)(indexOffset * sizeof(uint)));
+
+
+            // Free resources
+            GL11.BindBuffer(ALL11.ArrayBuffer, 0);
+            GL11.BindBuffer(ALL11.ElementArrayBuffer, 0);
+            handle.Free();
+            handle2.Free();
+        }
+		
+		public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int vertexCount, int[] indexData, int indexOffset, int primitiveCount) where T : struct, IVertexType
+        {
+            ////////////////////////////
+            //This has not been tested//
+            ////////////////////////////
+
+            // Unbind the VBOs
+            GL11.BindBuffer(ALL11.ArrayBuffer, 0);
+            GL11.BindBuffer(ALL11.ElementArrayBuffer, 0);
+
+            //Create VBO if not created already
+            if (VboIdArray == 0)
+                GL11.GenBuffers(1, ref VboIdArray);
+            if (VboIdElement == 0)
+                GL11.GenBuffers(1, ref VboIdElement);
+
+            // Bind the VBO
+            GL11.BindBuffer(ALL11.ArrayBuffer, VboIdArray);
+            GL11.BindBuffer(ALL11.ElementArrayBuffer, VboIdElement);
+            ////Clear previous data
+            GL11.BufferData(ALL11.ArrayBuffer, (IntPtr)0, (IntPtr)null, ALL11.DynamicDraw);
+            GL11.BufferData(ALL11.ElementArrayBuffer, (IntPtr)0, (IntPtr)null, ALL11.DynamicDraw);
+
+            //Get VertexDeclaration
+            var vd = VertexDeclaration.FromType(typeof(T));
+
+            //Pin data
+            var handle = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
+            var handle2 = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
+
+            //Buffer data to VBO; This should use stream when we move to ES2.0
+            GL11.BufferData(ALL11.ArrayBuffer, (IntPtr)(vd.VertexStride * GetElementCountArray(primitiveType, primitiveCount)), new IntPtr(handle.AddrOfPinnedObject().ToInt64() + (vertexOffset * vd.VertexStride)), ALL11.DynamicDraw);
+            GL11.BufferData(ALL11.ElementArrayBuffer, (IntPtr)(sizeof(int) * GetElementCountArray(primitiveType, primitiveCount)), indexData, ALL11.DynamicDraw);
 
             //Setup VertexDeclaration
             VertexDeclaration.PrepareForUse(vd);
