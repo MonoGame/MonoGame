@@ -90,7 +90,7 @@ namespace Microsoft.Xna.Framework.Audio
 			set {
 				_sourceId = value;
 				if (Reserved != null)
-					Reserved(this, new EventArgs());
+					Reserved(this, EventArgs.Empty);
 
 			}
 		}
@@ -98,7 +98,7 @@ namespace Microsoft.Xna.Framework.Audio
 		public void RecycleSoundBuffer()
 		{
 			if (Recycled != null)
-				Recycled(this, new EventArgs());
+				Recycled(this, EventArgs.Empty);
 		}
 
 		#region Events
