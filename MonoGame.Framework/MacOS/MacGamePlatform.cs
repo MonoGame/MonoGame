@@ -85,6 +85,7 @@ namespace Microsoft.Xna.Framework
         private GameWindow _gameWindow;
         private bool _wasResizeable;
 	private OpenALSoundController soundControllerInstance = null;
+	private bool _isShouldDraw = true;
 
         public MacGamePlatform(Game game) :
             base(game)
@@ -186,22 +187,53 @@ namespace Microsoft.Xna.Framework
         {
 		// Update our OpenAL sound buffer pools
 		soundControllerInstance.Update();
+		if (!_isShouldDraw)
+				return false;
             if (IsPlayingVideo)
                 return false;
             return true;
         }
+
+		internal bool IsCanUpdateDraw {
+			get {
+				return _isShouldDraw;
+			}
+			set {
+				if (_isShouldDraw != value) {
+					_isShouldDraw = value;
+				}
+			}
+		}
 
         public override bool BeforeDraw(GameTime gameTime)
         {
+		if (!_isShouldDraw)
+				return false;
             if (IsPlayingVideo)
                 return false;
             return true;
         }
 
+		public void EnterBackground ()
+		{
+			_isShouldDraw = false;
+			IsActive = false;
+//			if (Deactivated != null)
+//				Deactivated.Invoke (this, null);
+		}
+
+		public void EnterForeground ()
+		{
+			_isShouldDraw = true;
+			IsActive = true;
+//			if (Activated != null)
+//				Activated.Invoke (this, null);
+		}
+
         public override void EnterFullScreen()
         {
-            bool wasActive = IsActive;
-            IsActive = false;
+            bool wasActive = IsCanUpdateDraw;
+            IsCanUpdateDraw = false;
 
             // I will leave this here just in case someone can figure out how
             // to do a full screen with this and still get Alt + Tab to friggin
@@ -228,7 +260,7 @@ namespace Microsoft.Xna.Framework
             Window.Window.HidesOnDeactivate = true;
             Mouse.ResetMouse();
 
-            IsActive = wasActive;
+            IsCanUpdateDraw = wasActive;
         }
 
         public override void ExitFullScreen()
@@ -238,8 +270,8 @@ namespace Microsoft.Xna.Framework
             // Changing window style forces a redraw. Some games
             // have fail-logic and toggle fullscreen in their draw function,
             // so temporarily become inactive so it won't execute.
-            bool wasActive = IsActive;
-            IsActive = false;
+            bool wasActive = IsCanUpdateDraw;
+            IsCanUpdateDraw = false;
 
             // I will leave this here just in case someone can figure out how to do
             //  a full screen with this and still get Alt + Tab to friggin work.
@@ -265,7 +297,7 @@ namespace Microsoft.Xna.Framework
             _mainWindow.HidesOnDeactivate = false;
             Mouse.ResetMouse();
 
-            IsActive = wasActive;
+            IsCanUpdateDraw = wasActive;
         }
 
         protected override void OnIsMouseVisibleChanged()
