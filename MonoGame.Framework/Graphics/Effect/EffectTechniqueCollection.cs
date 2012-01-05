@@ -15,7 +15,6 @@ namespace Microsoft.Xna.Framework.Graphics
         public EffectTechnique this[int index]
         {
             get { return _techniques [index]; }
-            set { _techniques [index] = value; }
         }
 
         public EffectTechnique this[string name]
@@ -27,14 +26,6 @@ namespace Microsoft.Xna.Framework.Graphics
 				}
 				return null;
 		}
-            set {
-
-				var technique = this[name];
-				if (technique != null)
-					technique = value;
-				else
-					_techniques.Add(value);
-			}
         }
 
         public IEnumerator<EffectTechnique> GetEnumerator()

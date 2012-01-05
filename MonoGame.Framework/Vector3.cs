@@ -31,6 +31,8 @@ using System.Text;
 
 namespace Microsoft.Xna.Framework
 {
+	[SerializableAttribute]
+	[TypeConverterAttribute("typeof(Vector3Converter)")]
     public struct Vector3 : IEquatable<Vector3>
     {
         #region Private Fields

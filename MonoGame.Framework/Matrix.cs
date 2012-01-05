@@ -149,7 +149,7 @@ namespace Microsoft.Xna.Framework
 				
 		
 		// required for OpenGL 2.0 projection matrix stuff
-		public static float[] ToFloatArray(Matrix mat)
+		internal static float[] ToFloatArray(Matrix mat)
         {
 			openglMatrix[0]  = mat.M11; openglMatrix[1]  = mat.M12; openglMatrix[2]  = mat.M13; openglMatrix[3]  = mat.M14;
 			openglMatrix[4]  = mat.M21; openglMatrix[5]  = mat.M22; openglMatrix[6]  = mat.M23; openglMatrix[7]  = mat.M24;

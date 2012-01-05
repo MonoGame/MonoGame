@@ -47,6 +47,13 @@ namespace Microsoft.Xna.Framework.Audio
 		public AudioEmitter ()
 		{
 		}
+		
+		public Vector3 Position { get; set; }
+		
+		public Vector3 Up { get; set; }
+		
+		
+		
 	}
 }
 

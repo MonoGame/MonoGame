@@ -10,110 +10,133 @@ namespace Microsoft.Xna.Framework.Graphics
     public class EffectPass
     {
         EffectTechnique _technique = null;
-		internal int shaderProgram;
+		string name;
+		int shaderProgram = 0;
+		DXEffectObject.d3dx_state[] states;
+		DXShader pixelShader;
+		DXShader vertexShader;
 		
+		public EffectPass(EffectTechnique technique, DXEffectObject.d3dx_pass pass)
+        {
+            _technique = technique;
+			
+			name = pass.name;
+			states = pass.states;
+			
+			Console.WriteLine (technique.Name);
+			
+			shaderProgram = GL.CreateProgram ();
+			
+			// Set the parameters
+			//is this nesesary, or just for VR?
+			/*GL.ProgramParameter (shaderProgram,
+				AssemblyProgramParameterArb.GeometryInputType,(int)All.Lines);
+			GL.ProgramParameter (shaderProgram,
+				AssemblyProgramParameterArb.GeometryOutputType, (int)All.Line);*/
+			
+			// Set the max vertices
+			int maxVertices;
+			GL.GetInteger (GetPName.MaxGeometryOutputVertices, out maxVertices);
+			GL.ProgramParameter (shaderProgram,
+				AssemblyProgramParameterArb.GeometryVerticesOut, maxVertices);
+			
+			bool needPixelShader = false;
+			bool needVertexShader = false;
+			foreach ( DXEffectObject.d3dx_state state in states) {
+				if (state.operation.class_ == DXEffectObject.STATE_CLASS.PIXELSHADER) {
+					needPixelShader = true;
+					if (state.type == DXEffectObject.STATE_TYPE.CONSTANT) {
+						pixelShader = (DXShader)state.parameter.data;
+						GL.AttachShader (shaderProgram, pixelShader.shader);
+					}
+				} else if (state.operation.class_ == DXEffectObject.STATE_CLASS.VERTEXSHADER) {
+					needVertexShader = true;
+					if (state.type == DXEffectObject.STATE_TYPE.CONSTANT) {
+						vertexShader = (DXShader)state.parameter.data;
+						GL.AttachShader (shaderProgram, vertexShader.shader);
+					}
+				} else {
+					throw new NotImplementedException();
+				}
+			}
+			
+			//If we have what we need, link now
+			if ( (needPixelShader == (pixelShader != null)) &&
+				 (needVertexShader == (vertexShader != null))) {
+				GL.LinkProgram (shaderProgram);
+			}
+			
+        }
 		
 		public void Apply ()
 		{
-
-			// Tell the GL Context to use the program
-			GL.UseProgram (shaderProgram);
-
 			_technique._effect.OnApply();
-
-		}
-
-        public EffectPass(EffectTechnique technique)
-        {
-            _technique = technique;
-		
-        }
-		
-		internal void ApplyPass ()
-		{
-			
-			// Create a Program object
-			shaderProgram = GL.CreateProgram ();
-
-			// Attach our compiled shaders
-			if ( VertexIndex < _technique._effect.vertexShaders.Count)
-				GL.AttachShader (shaderProgram, _technique._effect.vertexShaders[VertexIndex]);
-			if ( FragmentIndex < _technique._effect.fragmentShaders.Count)			
-				GL.AttachShader (shaderProgram, _technique._effect.fragmentShaders[FragmentIndex]);
-
-			// Set the parameters
-			GL.ProgramParameter (shaderProgram, AssemblyProgramParameterArb.GeometryInputType, (int)All.Lines);	
-			GL.ProgramParameter (shaderProgram, AssemblyProgramParameterArb.GeometryOutputType, (int)All.Line);
-			
-			// Set the max vertices
-			int maxVertices;
-			GL.GetInteger (GetPName.MaxGeometryOutputVertices, out maxVertices);
-			GL.ProgramParameter (shaderProgram, AssemblyProgramParameterArb.GeometryVerticesOut, maxVertices);
-
-			// Link the program
-			GL.LinkProgram (shaderProgram);
-			string name = String.Format("Technique {0} - Pass {1}: ",_technique.Name, Name);
-			ShaderLog(name,shaderProgram);				
-			
-		}
-
-		internal void UpdatePass(int shader, int fragment)
-		{
-			int count = 0;
-			//int[] objs = new int[10];
-			int obj = 0;
-			int max = 10;
-			// Detach all the shaders
-			GL.GetAttachedShaders(shaderProgram,max, out count, out obj);
-			while (count > 0) {
-				GL.DetachShader(shaderProgram, obj);
-				GL.GetAttachedShaders(shaderProgram,max, out count, out obj);
+			//Console.WriteLine (_technique._effect.Name+" - "+_technique.Name+" - "+Name);
+			bool relink = false;
+			foreach ( DXEffectObject.d3dx_state state in states) {
+				
+				//constants handled on init
+				if (state.type == DXEffectObject.STATE_TYPE.CONSTANT) continue;
+				
+				if (state.operation.class_ == DXEffectObject.STATE_CLASS.PIXELSHADER ||
+					state.operation.class_ == DXEffectObject.STATE_CLASS.VERTEXSHADER) {
+					
+					DXShader shader;
+					switch (state.type) {
+					case DXEffectObject.STATE_TYPE.EXPRESSIONINDEX:
+						shader = (DXShader) (((DXExpression)state.parameter.data)
+							.Evaluate (_technique._effect.Parameters));
+						break;
+					case DXEffectObject.STATE_TYPE.PARAMETER:
+						//should be easy, but haven't seen it
+					default:
+						throw new NotImplementedException();
+					}
+					
+					if (shader.shaderType == ShaderType.FragmentShader) {
+						if (shader != pixelShader) {
+							if (pixelShader != null) {
+								GL.DetachShader (shaderProgram, pixelShader.shader);
+							}
+							relink = true;
+							pixelShader = shader;
+							GL.AttachShader (shaderProgram, pixelShader.shader);
+						}
+					} else if (shader.shaderType == ShaderType.VertexShader) {
+						if (shader != vertexShader) {
+							if (vertexShader != null) {
+								GL.DetachShader(shaderProgram, vertexShader.shader);
+							}
+							relink = true;
+							vertexShader = shader;
+							GL.AttachShader (shaderProgram, vertexShader.shader);
+						}
+					}
+					
+				}
+				
 			}
-//			for (int x = 0; x < count; x++) {
-//				GL.DetachShader(shaderProgram, obj);
-//			}
+			
+			if (relink) {
+				GL.LinkProgram (shaderProgram);
+			}
+			
+			GL.UseProgram (shaderProgram);
+			
+			if (pixelShader != null) {
+				pixelShader.Apply((uint)shaderProgram,
+				                  _technique._effect.Parameters,
+				                  _technique._effect.GraphicsDevice);
+			}
+			if (vertexShader != null) {
+				vertexShader.Apply((uint)shaderProgram,
+				                  _technique._effect.Parameters,
+				                  _technique._effect.GraphicsDevice);
+			}
 
-			// Attach our compiled shaders
-			if ( shader > 0)
-				GL.AttachShader (shaderProgram, shader);
-			if ( fragment > 0)
-				GL.AttachShader (shaderProgram, fragment);
-
-			// Set the parameters
-			GL.ProgramParameter (shaderProgram, AssemblyProgramParameterArb.GeometryInputType, (int)All.Lines);
-			GL.ProgramParameter (shaderProgram, AssemblyProgramParameterArb.GeometryOutputType, (int)All.Line);
-
-			// Set the max vertices
-			int maxVertices;
-			GL.GetInteger (GetPName.MaxGeometryOutputVertices, out maxVertices);
-			GL.ProgramParameter (shaderProgram, AssemblyProgramParameterArb.GeometryVerticesOut, maxVertices);
-
-			// Link the program
-			GL.LinkProgram (shaderProgram);
-			string name = String.Format("Technique {0} - Pass {1}: ",_technique.Name, Name);
-			ShaderLog(name,shaderProgram);
-			GL.UseProgram(shaderProgram);
 		}
 		
-		public string Name { get; set; }
+		public string Name { get { return name; } }
 		
-		// internal for now until I figure out what I can do with this mess
-		internal int VertexIndex { get; set; }
-		internal int FragmentIndex { get; set; }
-		
-		// Output the log of an object
-		private void ShaderLog (string whichObj, int obj)
-		{
-			int infoLogLen = 0;
-			var infoLog = "Is good to go.";
-
-			GL.GetProgram (obj, ProgramParameter.InfoLogLength, out infoLogLen);
-
-			if (infoLogLen > 0)
-				infoLog = GL.GetProgramInfoLog (obj);
-
-			Console.WriteLine ("{0} {1}", whichObj, infoLog);
-
-		}		
     }
 }

@@ -177,7 +177,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			IntPtr pixelOffset;
 			switch (this.Format) {
 			case SurfaceFormat.Color /*kTexture2DPixelFormat_RGBA8888*/:
-			case SurfaceFormat.Dxt3 :
 				sz = 4;
 				pos = ((y * Width) + x) * sz;
 				pixelOffset = new IntPtr (texture.PixelData.ToInt64 () + pos);
@@ -236,7 +235,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 
-		public static Texture2D FromFile (GraphicsDevice graphicsDevice, Stream textureStream)
+		public static Texture2D FromStream (GraphicsDevice graphicsDevice, Stream textureStream)
 		{
 			MonoMac.Foundation.NSData nsData = MonoMac.Foundation.NSData.FromStream (textureStream);
 
@@ -253,13 +252,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			return result;
 		}
-
-		public static Texture2D FromFile (GraphicsDevice graphicsDevice, Stream textureStream, int numberBytes)
-		{
-			throw new NotImplementedException ();
-		}
-
-		public static Texture2D FromFile (GraphicsDevice graphicsDevice, string filename, int width, int height)
+		
+		public static Texture2D FromStream (GraphicsDevice graphicsDevice, string filename, int width, int height, bool zoom)
 		{
 			NSImage image = new NSImage (filename);
 			if (image == null) {
@@ -284,10 +278,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			//			_format = theTexture.Format;			
 			return result;					
 		}
-
-		public static Texture2D FromFile (GraphicsDevice graphicsDevice, string filename)
-		{
-			return FromFile (graphicsDevice, filename, 0, 0);
+		
+		public void SaveAsJpeg (Stream stream, int width, int height) {
+			throw new NotImplementedException();
 		}
 		
 		internal void Apply ()
@@ -352,8 +345,6 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			switch (_format) {				
 			case SurfaceFormat.Color /*kTexture2DPixelFormat_RGBA8888*/:
-			case SurfaceFormat.Dxt1:
-			case SurfaceFormat.Dxt3:
 				index *= 4;
 				textureData [index] = red;
 				textureData [index + 1] = green;
@@ -378,8 +369,6 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			switch (_format) {				
 			case SurfaceFormat.Color /*kTexture2DPixelFormat_RGBA8888*/:
-			case SurfaceFormat.Dxt1:
-			case SurfaceFormat.Dxt3:
 				return new byte[(_width * _height) * 4];
 				
 			// TODO: Implement the rest of these but lack of knowledge and examples prevents this for now
@@ -519,8 +508,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			switch (_format) {
 			case SurfaceFormat.Color : //kTexture2DPixelFormat_RGBA8888
-			case SurfaceFormat.Dxt3 :
-				
 				sz = 4;
 				imageInfo = new byte[(_width * _height) * sz];
 				break;
@@ -671,7 +658,6 @@ namespace Microsoft.Xna.Framework.Graphics
 							dataRowColOffset = ((y * _width) + x);
 							switch (_format) {
 							case SurfaceFormat.Color : //kTexture2DPixelFormat_RGBA8888
-							case SurfaceFormat.Dxt3 :
 								sz = 4;
 								pixelOffset = dataRowColOffset * sz;
 								result.R = imageInfo [pixelOffset];

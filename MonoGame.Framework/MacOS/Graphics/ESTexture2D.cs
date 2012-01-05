@@ -59,9 +59,9 @@ namespace Microsoft.Xna.Framework.Graphics
 		private IntPtr _pixelData;
 		internal byte[] _pixelInfo;
 		
-		public ESTexture2D (IntPtr data, SurfaceFormat pixelFormat, int width, int height, Size size, All filter)
+		public ESTexture2D (IntPtr data, int dataLength, SurfaceFormat pixelFormat, int width, int height, Size size, All filter)
 		{
-			InitWithData (data, pixelFormat, width, height, size, filter);
+			InitWithData (data, dataLength, pixelFormat, width, height, size, filter);
 		}
 
 		public ESTexture2D (NSImage nsImage, All filter)
@@ -153,15 +153,18 @@ namespace Microsoft.Xna.Framework.Graphics
 				imageSize.Height = (int)(imageSize.Height * ratio);;
 			}
 			
+			int dataLength;
 			switch (pixelFormat) {		
 			case SurfaceFormat.Color:
 				colorSpace = CGColorSpace.CreateDeviceRGB ();
-				data = Marshal.AllocHGlobal (height * width * 4);
+				dataLength = height * width * 4;
+				data = Marshal.AllocHGlobal (dataLength);
 				context = new CGBitmapContext (data, width, height, 8, 4 * width, colorSpace,CGImageAlphaInfo.PremultipliedLast);
 				colorSpace.Dispose ();
 				break;	
 			case SurfaceFormat.Alpha8:
-				data = Marshal.AllocHGlobal (height * width);
+				dataLength = height * width;
+				data = Marshal.AllocHGlobal (dataLength);
 				context = new CGBitmapContext (data, width, height, 8, width, null, CGImageAlphaInfo.Only);
 				break;				
 			default:
@@ -200,7 +203,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 			*/
 
-			InitWithData (data, pixelFormat, width, height, imageSize, filter);
+			InitWithData (data, dataLength, pixelFormat, width, height, imageSize, filter);
 
 			context.Dispose ();
 			Marshal.FreeHGlobal (data);	
@@ -276,18 +279,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			colors [2] = rb2 + g2;
 		}
 
-		static public ESTexture2D InitiFromDxt3File (BinaryReader rdr, int length, int width, int height)
-		{
-			byte [] b = GetBits (width, length, height, rdr);
-
-			// Copy bits
-			IntPtr pointer = Marshal.AllocHGlobal (length);
-			Marshal.Copy (b, 0, pointer, length);
-			ESTexture2D result = new ESTexture2D (pointer,SurfaceFormat.Dxt3,width,height,new Size (width,height),All.Linear);
-			Marshal.FreeHGlobal (pointer);
-			return result;
-		}
-
 		public static byte[] GetBits (int width, int length, int height, BinaryReader rdr)
 		{
 			int xoffset = 0;
@@ -323,32 +314,33 @@ namespace Microsoft.Xna.Framework.Graphics
 			return b;
 		}
 
-		public void InitWithData (IntPtr data, SurfaceFormat pixelFormat, int width, int height, Size size, All filter)
+		public void InitWithData (IntPtr data, int dataLength, SurfaceFormat pixelFormat, int width, int height, Size size, All filter)
 		{		
 			GL.GenTextures (1, out _name);
 			GL.BindTexture (TextureTarget.Texture2D, _name);
 			GL.TexParameter (TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)filter);
 			GL.TexParameter (TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)filter);
-
-			int sz = 0;
-
+			Console.WriteLine (pixelFormat.ToString ());
 			switch (pixelFormat) {				
 			case SurfaceFormat.Color /*kTexture2DPixelFormat_RGBA8888*/:
-			case SurfaceFormat.Dxt1:
-			case SurfaceFormat.Dxt3:
-				sz = 4;
 				GL.TexImage2D (TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, (int)width, (int)height, 0, MonoMac.OpenGL.PixelFormat.Rgba, PixelType.UnsignedByte, data);
 				break;
+			case SurfaceFormat.Dxt1:
+				GL.CompressedTexImage2D (TextureTarget.Texture2D, 0, PixelInternalFormat.CompressedRgbaS3tcDxt1Ext, (int)width, (int)height, 0, dataLength, data);
+				break;
+			case SurfaceFormat.Dxt3:
+				GL.CompressedTexImage2D (TextureTarget.Texture2D, 0, PixelInternalFormat.CompressedRgbaS3tcDxt3Ext, (int)width, (int)height, 0, dataLength, data);
+				break;
+			case SurfaceFormat.Dxt5:
+				GL.CompressedTexImage2D (TextureTarget.Texture2D, 0, PixelInternalFormat.CompressedRgbaS3tcDxt5Ext, (int)width, (int)height, 0, dataLength, data);
+				break;
 			case SurfaceFormat.Bgra4444 /*kTexture2DPixelFormat_RGBA4444*/:
-				sz = 2;
 				GL.TexImage2D (TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, (int)width, (int)height, 0, MonoMac.OpenGL.PixelFormat.Rgba, PixelType.UnsignedShort4444, data);
 				break;
 			case SurfaceFormat.Bgra5551 /*kTexture2DPixelFormat_RGB5A1*/:
-				sz = 2;
 				GL.TexImage2D (TextureTarget.Texture2D, 0,  PixelInternalFormat.Rgba, (int)width, (int)height, 0, MonoMac.OpenGL.PixelFormat.Rgba, PixelType.UnsignedShort5551, data);
 				break;
 			case SurfaceFormat.Alpha8 /*kTexture2DPixelFormat_A8*/:
-				sz = 1;
 				GL.TexImage2D (TextureTarget.Texture2D, 0, PixelInternalFormat.Alpha, (int)width, (int)height, 0, MonoMac.OpenGL.PixelFormat.Alpha, PixelType.UnsignedByte, data);
 				break;
 			default:
@@ -382,13 +374,10 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			switch (_format) {				
 			case SurfaceFormat.Color /*kTexture2DPixelFormat_RGBA8888*/:
-			case SurfaceFormat.Dxt1:
-			case SurfaceFormat.Dxt3:
 				byte[] pixelInfo = new byte[4] { red, green, blue, alpha };
 				Marshal.Copy (pixelInfo, ((y-1) * _width) + (x-1), _pixelData, 4);
 				GL.TexImage2D (TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, _width, _height, 0, MonoMac.OpenGL.PixelFormat.Rgba, PixelType.UnsignedByte, _pixelData);
 				break;
-				
 			// TODO: Implement the rest of these but lack of knowledge and examples prevents this for now
 			case SurfaceFormat.Bgra4444 /*kTexture2DPixelFormat_RGBA4444*/:
 				GL.TexImage2D (TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, _width, _height, 0, MonoMac.OpenGL.PixelFormat.Rgba, PixelType.UnsignedShort4444, _pixelData);

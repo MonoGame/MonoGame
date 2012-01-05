@@ -96,6 +96,18 @@ namespace Microsoft.Xna.Framework.Graphics
                 return adapters;
             }
         } 
+		
+		public bool QueryRenderTargetFormat(
+			GraphicsProfile graphicsProfile,
+			SurfaceFormat format,
+			DepthFormat depthFormat,
+			int multiSampleCount,
+			out SurfaceFormat selectedFormat,
+			out DepthFormat selectedDepthFormat,
+			out int selectedMultiSampleCount)
+		{
+			throw new NotImplementedException();
+		}
 
         public string Description
         {

@@ -206,6 +206,7 @@ namespace Microsoft.Xna.Framework
         public ContentManager Content
         {
             get { return _content; }
+            set { _content = value; }
         }
 
         public GraphicsDevice GraphicsDevice
@@ -261,6 +262,10 @@ namespace Microsoft.Xna.Framework
         #endregion
 
         #region Public Methods
+        
+        protected virtual void OnExiting (Object sender, EventArgs args) {
+          
+        }
 
         public void Exit()
         {

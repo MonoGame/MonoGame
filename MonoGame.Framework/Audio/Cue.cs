@@ -160,6 +160,14 @@ namespace Microsoft.Xna.Framework.Audio
 			}
 		}
 		
+		public void Apply3D(AudioListener listener, AudioEmitter emitter) {
+			
+		}
+		
+		public bool IsDisposed { get { return false; } }
+		
+		
+		
 		#region IDisposable implementation
 		public void Dispose ()
 		{

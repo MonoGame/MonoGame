@@ -53,12 +53,12 @@ namespace Microsoft.Xna.Framework.Graphics
 		private int _activeTexture = -1;
 		private Viewport _viewport;
 		private bool _isDisposed = false;
-		private RenderState _renderState;
 
 		public TextureCollection Textures { get; set; }
 
 		private BlendState _blendState = BlendState.Opaque;
 		private DepthStencilState _depthStencilState = DepthStencilState.Default;
+		private RasterizerState _rasterizerState = RasterizerState.CullCounterClockwise;
 		private SamplerStateCollection _samplerStates = new SamplerStateCollection ();
 		internal List<IntPtr> _pointerCache = new List<IntPtr> ();
 		private VertexBuffer _vertexBuffer = null;
@@ -67,7 +67,15 @@ namespace Microsoft.Xna.Framework.Graphics
 		private uint VboIdArray;
 		private uint VboIdElement;
 
-		public RasterizerState RasterizerState { get; set; }
+		public RasterizerState RasterizerState {
+			get {
+				return _rasterizerState;
+			}
+			set {
+				_rasterizerState = value;
+				GLStateManager.SetRasterizerStates(value);
+			}
+		}
 		
 		private RenderTargetBinding[] currentRenderTargets;
 		
@@ -117,7 +125,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			Textures = new TextureCollection();
 			// Init RenderState
 			//_renderState = new RenderState ();
-			RasterizerState = new RasterizerState();
+			//RasterizerState = new RasterizerState();
 		}
 
 		public BlendState BlendState {
@@ -125,6 +133,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			set { 
 				// ToDo check for invalid state
 				_blendState = value;
+				GLStateManager.SetBlendStates(value);
 			}
 		}
 
@@ -132,6 +141,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			get { return _depthStencilState; }
 			set { 
 				_depthStencilState = value;
+				GLStateManager.SetDepthStencilState(value);
 			}
 		}
 
@@ -254,6 +264,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 			set {
 				_viewport = value;
+				GL.Viewport (value.X, value.Y, value.Width, value.Height);
 			}
 		}	
 
@@ -397,6 +408,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
 					ClearOptions clearOptions = ClearOptions.Target | ClearOptions.DepthBuffer;
 
+					// create framebuffer
+					GL.GenFramebuffers(1, out frameBufferIDs[i]);
+					GL.BindFramebuffer(FramebufferTarget.DrawFramebuffer, frameBufferIDs[i]);
+					
+					//allocate depth buffer
 					switch (target.DepthStencilFormat) {
 					case DepthFormat.Depth16:
 						GL.RenderbufferStorage(RenderbufferTarget.RenderbufferExt, RenderbufferStorage.DepthComponent16,
@@ -409,6 +425,7 @@ namespace Microsoft.Xna.Framework.Graphics
 					case DepthFormat.Depth24Stencil8:
 						GL.RenderbufferStorage(RenderbufferTarget.RenderbufferExt, RenderbufferStorage.Depth24Stencil8,
 							target.Width, target.Height);
+						// attach stencil buffer
 						GL.FramebufferRenderbuffer(FramebufferTarget.FramebufferExt, FramebufferAttachment.StencilAttachmentExt,
 							RenderbufferTarget.RenderbufferExt, renderBufferIDs[i]);
 						clearOptions = clearOptions | ClearOptions.Stencil;
@@ -418,10 +435,6 @@ namespace Microsoft.Xna.Framework.Graphics
 							target.Width, target.Height);
 						break;
 					}
-					
-					// create framebuffer
-					GL.GenFramebuffers(1, out frameBufferIDs[i]);
-					GL.BindFramebuffer(FramebufferTarget.DrawFramebuffer, frameBufferIDs[i]);
 					
 					// attach the texture to FBO color attachment point
 					GL.FramebufferTexture2D(FramebufferTarget.FramebufferExt, FramebufferAttachment.ColorAttachment0,
@@ -648,7 +661,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		}
 
-		public void DrawUserPrimitives<T> (PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct, IVertexType
+		public void DrawUserPrimitives<T> (PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct
 		{
 
 			// we need to reset vertex states afterwards
@@ -746,7 +759,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			UnsetGraphicsStates();
 		}
 
-        public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int vertexCount, short[] indexData, int indexOffset, int primitiveCount) where T : struct, IVertexType
+        public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int vertexCount, short[] indexData, int indexOffset, int primitiveCount) where T : struct
         {
 
 			// we need to reset vertex states afterwards
@@ -808,7 +821,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         }
 
-        public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int vertexCount, int[] indexData, int indexOffset, int primitiveCount) where T : struct, IVertexType
+        public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int vertexCount, int[] indexData, int indexOffset, int primitiveCount) where T : struct
         {
 
 			// we need to reset vertex states afterwards
@@ -837,6 +850,59 @@ namespace Microsoft.Xna.Framework.Graphics
 
             //Get VertexDeclaration
             var vd = VertexDeclaration.FromType(typeof(T));
+
+            //Pin data
+            var handle = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
+            var handle2 = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
+
+            //Buffer data to VBO; This should use stream when we move to ES2.0
+            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vd.VertexStride * GetElementCountArray(primitiveType, primitiveCount)), new IntPtr(handle.AddrOfPinnedObject().ToInt64() + (vertexOffset * vd.VertexStride)), BufferUsageHint.DynamicDraw);
+            GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(sizeof(uint) * GetElementCountArray(primitiveType, primitiveCount)), indexData, BufferUsageHint.DynamicDraw);
+
+            //Setup VertexDeclaration
+            VertexDeclaration.PrepareForUse(vd);
+
+            //Draw
+            GL.DrawElements(PrimitiveTypeGL11(primitiveType), GetElementCountArray(primitiveType, primitiveCount),DrawElementsType.UnsignedInt, (IntPtr)(indexOffset * sizeof(uint)));
+
+
+            // Free resources
+            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
+            handle.Free();
+            handle2.Free();
+
+			// Unset our Graphics States
+			UnsetGraphicsStates();
+
+        }
+		
+		public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int vertexCount, int[] indexData, int indexOffset, int primitiveCount, VertexDeclaration vd) where T : struct
+        {
+
+			// we need to reset vertex states afterwards
+			resetVertexStates = true;
+
+			// Set up our Graphics States
+			SetGraphicsStates();
+
+
+            // Unbind the VBOs
+            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
+
+            //Create VBO if not created already
+            if (VboIdArray == 0)
+                GL.GenBuffers(1, out VboIdArray);
+            if (VboIdElement == 0)
+                GL.GenBuffers(1, out VboIdElement);
+
+            // Bind the VBO
+            GL.BindBuffer(BufferTarget.ArrayBuffer, VboIdArray);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, VboIdElement);
+            ////Clear previous data
+            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)0, (IntPtr)null, BufferUsageHint.DynamicDraw);
+            GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)0, (IntPtr)null, BufferUsageHint.DynamicDraw);
 
             //Pin data
             var handle = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
@@ -892,6 +958,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			throw new NotSupportedException ();
 		}
+		
+		public event EventHandler<EventArgs> DeviceReset;
 
 	}
 }

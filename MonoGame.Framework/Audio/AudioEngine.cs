@@ -61,6 +61,15 @@ namespace Microsoft.Xna.Framework.Audio
 			// TODO throw new NotImplementedException ();
 		}
 		
+		public AudioCategory GetCategory (string name)
+		{
+			throw new NotImplementedException();
+		}
+		public void SetGlobalVariable(string name, float value)
+		{
+			throw new NotImplementedException();
+		}
+		
 		#region IDisposable implementation
 		public void Dispose ()
 		{

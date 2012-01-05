@@ -47,6 +47,15 @@ namespace Microsoft.Xna.Framework.Audio
 		public AudioListener ()
 		{
 		}
+		
+		public Vector3 Forward { get; set; }
+		
+		public Vector3 Position { get; set; }
+		
+		public Vector3 Up { get; set; }
+		
+		public Vector3 Velocity { get; set; }
+		
 	}
 }
 
