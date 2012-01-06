@@ -163,6 +163,16 @@ namespace Microsoft.Xna.Framework.Graphics
 		public static void SetRasterizerStates (RasterizerState state) {
 			Cull(state);
 			FillMode(state);
+			if (state.ScissorTestEnable)
+			{
+				GL.Enable (EnableCap.ScissorTest);
+			} else {
+				GL.Disable(EnableCap.ScissorTest);
+			}
+		}
+		
+		public static void SetScissor (Rectangle scissor) {
+			GL.Scissor(scissor.X, scissor.Y, scissor.Width, scissor.Height );
 		}
 
 		internal static void SetDepthStencilState ( DepthStencilState state )

@@ -70,8 +70,8 @@ namespace Microsoft.Xna.Framework.Graphics
         private SwapEffect swapEffect;
         private bool disposed;
         
-	internal static readonly int _defaultBackBufferHeight = 480;
-	internal static readonly int _defaultBackBufferWidth = 800;		
+        internal static readonly int _defaultBackBufferHeight = 480;
+        internal static readonly int _defaultBackBufferWidth = 800;		
 
         #endregion Private Fields
 
@@ -156,7 +156,11 @@ namespace Microsoft.Xna.Framework.Graphics
             set
             {
 				isFullScreen = value;				
-            }
+#if IPHONE
+				UIApplication.SharedApplication.StatusBarHidden = isFullScreen;
+#endif
+
+			}
         }
 		
         public int MultiSampleCount
@@ -201,12 +205,21 @@ namespace Microsoft.Xna.Framework.Graphics
             autoDepthStencilFormat = DepthFormat.None;
             backBufferCount = 0;
             backBufferFormat = SurfaceFormat.Color;
+#if IPHONE
+			backBufferWidth = (int)(UIScreen.MainScreen.Bounds.Width * UIScreen.MainScreen.Scale);
+            backBufferHeight = (int)(UIScreen.MainScreen.Bounds.Height * UIScreen.MainScreen.Scale);
+#else
 			backBufferWidth = _defaultBackBufferWidth;
-            backBufferHeight = _defaultBackBufferHeight;            
+            backBufferHeight = _defaultBackBufferHeight;     
+#endif
             deviceWindowHandle = IntPtr.Zero;
             enableAutoDepthStencil = false;
             fullScreenRefreshRateInHz = 0;
+#if IPHONE
+			isFullScreen = UIApplication.SharedApplication.StatusBarHidden;
+#else
             // isFullScreen = false;
+#endif
             multiSampleQuality = 0;
             depthStencilFormat = DepthFormat.None;
             multiSampleCount = 0;

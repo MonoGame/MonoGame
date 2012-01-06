@@ -16,10 +16,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public RasterizerState ()
 		{
-			// Default is counter clockwise as per documentation
 			CullMode = CullMode.CullCounterClockwiseFace;
-			// Default is Solid as per documentation
 			FillMode = FillMode.Solid;
+			DepthBias = 0;
+			MultiSampleAntiAlias = true;
+			ScissorTestEnable = false;
+			SlopeScaleDepthBias = 0;
 		}
 
 		static RasterizerState ()

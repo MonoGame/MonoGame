@@ -39,11 +39,19 @@ purpose and non-infringement.
 #endregion License
 
 using System;
+using System.Drawing;
 
+#if MONOMAC
 using MonoMac.AppKit;
 using MonoMac.CoreGraphics;
 using MonoMac.CoreImage;
 using MonoMac.OpenGL;
+using Image = MonoMac.AppKit.NSImage;
+#elif IPHONE
+using MonoTouch.UIKit;
+using OpenTK.Graphics.ES11;
+using Image = MonoTouch.UIKit.UIImage;
+#endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -80,6 +88,17 @@ namespace Microsoft.Xna.Framework.Graphics
 			textureOffsetY = 0;
 		}
 		
+		public ESImage(int width, int height)
+		{
+			texture = new ESTexture2D(IntPtr.Zero, 0, SurfaceFormat.Color,width,height,new Size(width,height),All.Linear);
+			imageWidth = textureWidth = width;
+			imageHeight = textureHeight = height;
+			texWidthRatio = 1.0f / width;
+			texHeightRatio = 1.0f / height;
+			textureOffsetX = 0;
+			textureOffsetY = 0;
+		}
+		
 		private void Initialize( float scale )
 		{
 			imageWidth = texture.ContentSize.Width;
@@ -101,27 +120,35 @@ namespace Microsoft.Xna.Framework.Graphics
 		public ESImage(ESTexture2D tex, float imageScale)
 		{
 			texture = tex;
-			Initialize(1.0f);
+			Initialize(imageScale);
 		}
 		
-		public ESImage(NSImage image)
+		public ESImage(Image image)
 		{
 			// By default set the scale to 1.0f and the filtering to GL_NEAREST
 			texture = new ESTexture2D(image,All.Nearest);
 			Initialize(1.0f/*TODO image.CurrentScale*/);			
 		}
 
-		public ESImage(NSImage image, All filter)
+		public ESImage(Image image, All filter)
 		{			
 			// By default set the scale to 1.0f
 			texture = new ESTexture2D(image,filter);
 			Initialize(1.0f/*TODO image.CurrentScale*/);
 		}
 		
-		public ESImage(NSImage image, float imageScale, All filter)
+		public ESImage(Image image, float imageScale, All filter)
 		{
 			texture = new ESTexture2D(image,filter);
 			Initialize(imageScale);
+		}
+		
+		public void Dispose ()
+		{
+			if (texture != null)
+			{
+				texture.Dispose();
+			}
 		}
 		
 				

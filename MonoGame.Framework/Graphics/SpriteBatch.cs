@@ -1,387 +1,164 @@
-// #region License
-// /*
-// Microsoft Public License (Ms-PL)
-// XnaTouch - Copyright © 2009 The XnaTouch Team
-// 
-// All rights reserved.
-// 
-// This license governs use of the accompanying software. If you use the software, you accept this license. If you do not
-// accept the license, do not use the software.
-// 
-// 1. Definitions
-// The terms "reproduce," "reproduction," "derivative works," and "distribution" have the same meaning here as under 
-// U.S. copyright law.
-// 
-// A "contribution" is the original software, or any additions or changes to the software.
-// A "contributor" is any person that distributes its contribution under this license.
-// "Licensed patents" are a contributor's patent claims that read directly on its contribution.
-// 
-// 2. Grant of Rights
-// (A) Copyright Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-// each contributor grants you a non-exclusive, worldwide, royalty-free copyright license to reproduce its contribution, prepare derivative works of its contribution, and distribute its contribution or any derivative works that you create.
-// (B) Patent Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-// each contributor grants you a non-exclusive, worldwide, royalty-free license under its licensed patents to make, have made, use, sell, offer for sale, import, and/or otherwise dispose of its contribution in the software or derivative works of the contribution in the software.
-// 
-// 3. Conditions and Limitations
-// (A) No Trademark License- This license does not grant you rights to use any contributors' name, logo, or trademarks.
-// (B) If you bring a patent claim against any contributor over patents that you claim are infringed by the software, 
-// your patent license from such contributor to the software ends automatically.
-// (C) If you distribute any portion of the software, you must retain all copyright, patent, trademark, and attribution 
-// notices that are present in the software.
-// (D) If you distribute any portion of the software in source code form, you may do so only under this license by including 
-// a complete copy of this license with your distribution. If you distribute any portion of the software in compiled or object 
-// code form, you may only do so under a license that complies with this license.
-// (E) The software is licensed "as-is." You bear the risk of using it. The contributors give no express warranties, guarantees
-// or conditions. You may have additional consumer rights under your local laws which this license cannot change. To the extent
-// permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular
-// purpose and non-infringement.
-// */
-// #endregion License
-// 
 using System;
 using System.Text;
 using System.Collections.Generic;
 
+#if MONOMAC
+using MonoMac.OpenGL;
+
+using GL11 = MonoMac.OpenGL.GL;
+using GL20 = MonoMac.OpenGL.GL;
+using ALL11 = MonoMac.OpenGL.All;
+using ALL20 = MonoMac.OpenGL.All;
+#else
 using GL11 = OpenTK.Graphics.ES11.GL;
 using GL20 = OpenTK.Graphics.ES20.GL;
 using ALL11 = OpenTK.Graphics.ES11.All;
 using ALL20 = OpenTK.Graphics.ES20.All;
+#endif
 
 using Microsoft.Xna.Framework;
-using OpenTK;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
 	public class SpriteBatch : GraphicsResource
 	{
 		SpriteBatcher _batcher;
-		
 		SpriteSortMode _sortMode;
 		BlendState _blendState;
 		SamplerState _samplerState;
 		DepthStencilState _depthStencilState; 
 		RasterizerState _rasterizerState;		
-		Effect _effect;		
+		Effect _effect;	
+		Effect spriteEffect;
 		Matrix _matrix;
-		DisplayOrientation lastDisplayOrientation;
-		
-		Rectangle tempRect = new Rectangle(0,0,0,0);
-		Vector2 texCoordTL = new Vector2(0,0);
-		Vector2 texCoordBR = new Vector2(0,0);
-		
-		//OpenGLES2 variables
-		int program;
-		Matrix4 matWVPScreen, matWVPFramebuffer, matProjection, matViewScreen, matViewFramebuffer;
-		int uniformWVP, uniformTex;
-		
-        public SpriteBatch ( GraphicsDevice graphicsDevice )
+		Rectangle tempRect = new Rectangle (0,0,0,0);
+		Vector2 texCoordTL = new Vector2 (0,0);
+		Vector2 texCoordBR = new Vector2 (0,0);
+
+		public SpriteBatch (GraphicsDevice graphicsDevice)
 		{
-			if (graphicsDevice == null )
-			{
-				throw new ArgumentException("graphicsDevice");
+			if (graphicsDevice == null) {
+				throw new ArgumentException ("graphicsDevice");
 			}	
-			
+
 			this.graphicsDevice = graphicsDevice;
+			//use a custon SpriteEffect so we can control the transformation matrix
+			spriteEffect = new Effect (this.graphicsDevice, SpriteEffectCode.Code);	
 			
-			_batcher = new SpriteBatcher();
-
 #if IPHONE
-			if(GraphicsDevice.OpenGLESVersion == MonoTouch.OpenGLES.EAGLRenderingAPI.OpenGLES2)
-				InitGL20();
+			_batcher = new SpriteBatcher (
+				GraphicsDevice.OpenGLESVersion == MonoTouch.OpenGLES.EAGLRenderingAPI.OpenGLES2);
 #elif ANDROID
-            if (GraphicsDevice.OpenGLESVersion == OpenTK.Graphics.GLContextVersion.Gles2_0)
-                InitGL20();
-#endif
-		}
-		
-			/// <summary>
-			///Initialize shaders and program on OpenGLES2.0
-			/// </summary>
-			private void InitGL20()
-			{
-				string vertexShaderSrc = @" uniform mat4 uMVPMatrix;
-											attribute vec4 aPosition;
-											attribute vec2 aTexCoord;
-											attribute vec4 aTint;
-											varying vec2 vTexCoord;
-											varying vec4 vTint;
-											void main()
-											{
-												vTexCoord = aTexCoord;
-												vTint = aTint;
-												gl_Position = uMVPMatrix * aPosition;
-											}";
-            
-            string fragmentShaderSrc = @"precision mediump float;
-											varying vec2 vTexCoord;
-											varying vec4 vTint;
-											uniform sampler2D sTexture;
-											void main()
-											{
-												vec4 baseColor = texture2D(sTexture, vTexCoord);
-												gl_FragColor = baseColor * vTint;
-											}";
-				
-				int vertexShader = LoadShader (ALL20.VertexShader, vertexShaderSrc );
-	            int fragmentShader = LoadShader (ALL20.FragmentShader, fragmentShaderSrc );
-			
-	            program = GL20.CreateProgram();
-			
-	            if (program == 0)
-	                throw new InvalidOperationException ("Unable to create program");
-	
-	            GL20.AttachShader (program, vertexShader);
-	            GL20.AttachShader (program, fragmentShader);
-	            
-	            //Set position
-	            GL20.BindAttribLocation (program, _batcher.attributePosition, "aPosition");
-	            GL20.BindAttribLocation (program, _batcher.attributeTexCoord, "aTexCoord");
-          		GL20.BindAttribLocation (program, _batcher.attributeTint, "aTint");
-			
-	            GL20.LinkProgram (program);
-	
-	            int linked = 0;
-	            GL20.GetProgram (program, ALL20.LinkStatus, ref linked);
-	            if (linked == 0) {
-	                // link failed
-	                int length = 0;
-	                GL20.GetProgram (program, ALL20.InfoLogLength, ref length);
-	                if (length > 0) {
-	                    var log = new StringBuilder (length);
-	                    GL20.GetProgramInfoLog (program, length, ref length, log);
-	                    Console.WriteLine ("GL2.0 error: " + log.ToString ());
-	                }
-	
-	                GL20.DeleteProgram (program);
-	                throw new InvalidOperationException ("Unable to link program");
-	            }
-	
-				//UpdateWorldMatrixOrientation();
-				lastDisplayOrientation = graphicsDevice.PresentationParameters.DisplayOrientation;
-
-				matViewScreen = Matrix4.CreateRotationZ((float)Math.PI)*
-						Matrix4.CreateRotationY((float)Math.PI)*
-						Matrix4.CreateTranslation(-this.graphicsDevice.Viewport.Width/2,
-							this.graphicsDevice.Viewport.Height/2,
-							1);
-				matViewFramebuffer = Matrix4.CreateTranslation(-this.graphicsDevice.Viewport.Width/2,
-							-this.graphicsDevice.Viewport.Height/2,
-							1);
-				matProjection = Matrix4.CreateOrthographic(this.graphicsDevice.Viewport.Width,
-							this.graphicsDevice.Viewport.Height,
-							-1f,1f);
-				
-				matWVPScreen = matViewScreen * matProjection;
-				matWVPFramebuffer = matViewFramebuffer * matProjection;
-				
-				GetUniformVariables();
-			
-			}
-	
-			/// <summary>
-			/// Build the shaders
-			/// </summary>
-			private int LoadShader ( ALL20 type, string source )
-	        {
-	           int shader = GL20.CreateShader(type);
-	
-	           if ( shader == 0 )
-	                   throw new InvalidOperationException("Unable to create shader");
-	        
-	           // Load the shader source
-	           int length = 0;
-	            GL20.ShaderSource(shader, 1, new string[] {source}, (int[])null);
-	           
-	           // Compile the shader
-	           GL20.CompileShader( shader );
-	                
-	              int compiled = 0;
-	            GL20.GetShader (shader, ALL20.CompileStatus, ref compiled);
-	            if (compiled == 0) {
-	                length = 0;
-	                GL20.GetShader (shader, ALL20.InfoLogLength, ref length);
-	                if (length > 0) {
-	                    var log = new StringBuilder (length);
-	                    GL20.GetShaderInfoLog (shader, length, ref length, log);
-	                    Console.WriteLine("GL2" + log.ToString ());
-	                }
-	
-	                GL20.DeleteShader (shader);
-	                throw new InvalidOperationException ("Unable to compile shader of type : " + type.ToString ());
-	            }
-	
-	            return shader;
-	        
-	        }
-	
-		private void GetUniformVariables()
-		{
-			uniformWVP = GL20.GetUniformLocation(program, "uMVPMatrix");
-			uniformTex = GL20.GetUniformLocation(program, "sTexture");
-		}
-		
-		private void SetUniformMatrix4(int location, bool transpose, ref Matrix4 matrix)
-		{
-			unsafe
-			{
-				fixed (float* matrix_ptr = &matrix.Row0.X)
-				{
-					GL20.UniformMatrix4(location,1,transpose,matrix_ptr);
-				}
-			}
-		}
-		
-		public void Begin()
-		{
-			Begin( SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Matrix.Identity );			
-		}
-		
-		public void Begin(SpriteSortMode sortMode, BlendState blendState)
-		{
-			Begin( sortMode, blendState, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Matrix.Identity );			
-		}
-		
-		public void Begin(SpriteSortMode sortMode, BlendState blendState, SamplerState samplerState, DepthStencilState depthStencilState, RasterizerState rasterizerState )
-		{	
-			Begin( sortMode, blendState, samplerState, depthStencilState, rasterizerState, null, Matrix.Identity );	
-		}
-		
-		public void Begin(SpriteSortMode sortMode, BlendState blendState, SamplerState samplerState, DepthStencilState depthStencilState, RasterizerState rasterizerState, Effect effect)
-		{
-			Begin( sortMode, blendState, samplerState, depthStencilState, rasterizerState, effect, Matrix.Identity );			
-		}
-		
-		public void Begin(SpriteSortMode sortMode, BlendState blendState, SamplerState samplerState, DepthStencilState depthStencilState, RasterizerState rasterizerState, Effect effect, Matrix transformMatrix)
-		{
-			_sortMode = sortMode;
-
-			_blendState = blendState ?? BlendState.AlphaBlend;
-			_depthStencilState = depthStencilState ?? DepthStencilState.None;
-			_samplerState = samplerState ?? SamplerState.LinearClamp;
-			_rasterizerState = rasterizerState ?? RasterizerState.CullCounterClockwise;
-			
-			if(effect != null)
-				_effect = effect;
-			_matrix = transformMatrix;
-		}
-		
-		public void End()
-		{
-			// OpenGL ES Version 
-#if IPHONE
-			if(GraphicsDevice.OpenGLESVersion == MonoTouch.OpenGLES.EAGLRenderingAPI.OpenGLES2)
-				EndGL20();
-			else
-				EndGL11();
-#elif ANDROID
-            if (GraphicsDevice.OpenGLESVersion == OpenTK.Graphics.GLContextVersion.Gles2_0)
-                EndGL20();
-            else
-                EndGL11();
+			_batcher = new SpriteBatcher (
+				GraphicsDevice.OpenGLESVersion == OpenTK.Graphics.GLContextVersion.Gles2_0);
 #else
-            EndGL11();
+			_batcher = new SpriteBatcher (false);
 #endif
-
 		}
-		
-		private void EndGL20()
+
+		public void Begin ()
 		{
-			// Disable Blending by default = BlendState.Opaque
-			GL20.Disable(ALL20.Blend);
+			Begin (SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Matrix.Identity);			
+		}
+
+		public void Begin (SpriteSortMode sortMode, BlendState blendState, SamplerState samplerState, DepthStencilState depthStencilState, RasterizerState rasterizerState, Effect effect, Matrix transformMatrix)
+		{
+
+			// defaults
+			_sortMode = sortMode;
+			_blendState = blendState ?? BlendState.AlphaBlend;
+			_samplerState = samplerState ?? SamplerState.LinearClamp;
+			_depthStencilState = depthStencilState ?? DepthStencilState.None;
+			_rasterizerState = rasterizerState ?? RasterizerState.CullCounterClockwise;
+
+			_effect = effect;
 			
-			// set the blend mode
-			if ( _blendState == BlendState.NonPremultiplied )
-			{
-				GL20.BlendFunc(ALL20.One, ALL20.OneMinusSrcAlpha);
-				GL20.Enable(ALL20.Blend);
-				GL20.BlendEquation(ALL20.FuncAdd);
+			_matrix = transformMatrix;
+			
+			
+			if (sortMode == SpriteSortMode.Immediate) {
+				//setup things now so a user can chage them
+				Setup();
 			}
-			
-			if ( _blendState == BlendState.AlphaBlend )
-			{
-				GL20.BlendFunc(ALL20.SrcAlpha, ALL20.OneMinusSrcAlpha);
-				GL20.Enable(ALL20.Blend);
-				GL20.BlendEquation(ALL20.FuncAdd);
+		}
+
+		public void Begin (SpriteSortMode sortMode, BlendState blendState)
+		{
+			Begin (sortMode, blendState, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Matrix.Identity);			
+		}
+
+		public void Begin (SpriteSortMode sortMode, BlendState blendState, SamplerState samplerState, DepthStencilState depthStencilState, RasterizerState rasterizerState)
+		{
+			Begin (sortMode, blendState, samplerState, depthStencilState, rasterizerState, null, Matrix.Identity);	
+		}
+
+		public void Begin (SpriteSortMode sortMode, BlendState blendState, SamplerState samplerState, DepthStencilState depthStencilState, RasterizerState rasterizerState, Effect effect)
+		{
+
+			Begin (sortMode, blendState, samplerState, depthStencilState, rasterizerState, effect, Matrix.Identity);			
+		}
+
+		public void End ()
+		{	
+			if (_sortMode != SpriteSortMode.Immediate) {
+				Setup ();
 			}
+			Flush ();
 			
-			if ( _blendState == BlendState.Additive )
-			{
-				GL20.BlendFunc(ALL20.SrcAlpha,ALL20.One);
-				GL20.Enable(ALL20.Blend);
-				GL20.BlendEquation(ALL20.FuncAdd);
+			// clear out the textures
+			graphicsDevice.Textures._textures.Clear ();
+			
+			// unbinds shader
+			if (_effect != null) {
+				GL.UseProgram (0);
+				_effect = null;
 			}
 
-			//CullMode
-			GL20.FrontFace(ALL20.Cw);
-			GL20.Enable(ALL20.CullFace);
-			
-			
-			UpdateWorldMatrixOrientation();
-			
-			// Configure ViewPort
-			GL20.Viewport(0, 0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height); 
-			GL20.UseProgram(program);
-			
-            // Enable Scissor Tests if necessary
-            if (this.graphicsDevice.RasterizerState.ScissorTestEnable)
-            {
-                GL20.Enable(ALL20.ScissorTest);
-                GL20.Scissor(this.graphicsDevice.ScissorRectangle.X, this.graphicsDevice.ScissorRectangle.Y, this.graphicsDevice.ScissorRectangle.Width, this.graphicsDevice.ScissorRectangle.Height);
-            }
-                        
-			if (GraphicsDevice.DefaultFrameBuffer)
-			{
-				GL20.CullFace(ALL20.Back);
-				SetUniformMatrix4(uniformWVP, false, ref matWVPScreen);
-			}
-			else
-			{
-				GL20.CullFace(ALL20.Front);
-				SetUniformMatrix4(uniformWVP,false,ref matWVPFramebuffer);
-				GL20.ClearColor(0.0f,0.0f,0.0f,0.0f);
-				GL20.Clear((int) (ALL20.ColorBufferBit | ALL20.DepthBufferBit));
-			}
-
-			_batcher.DrawBatchGL20 ( _sortMode );
-
-            if (this.graphicsDevice.RasterizerState.ScissorTestEnable)
-            {
-                GL20.Disable(ALL20.ScissorTest);
-            }
-
-            GL20.Disable(ALL20.Texture2D);
 		}
 		
-		public void EndGL11()
-		{					
-			// Disable Blending by default = BlendState.Opaque
-			GL11.Disable(ALL11.Blend);
+		void Setup () {
+			graphicsDevice.BlendState = _blendState;
+			graphicsDevice.DepthStencilState = _depthStencilState;
+			graphicsDevice.RasterizerState = _rasterizerState;
+			graphicsDevice.SamplerStates[0] = _samplerState;
 			
-			// set the blend mode
-			if ( _blendState == BlendState.NonPremultiplied )
-			{
-				GL11.BlendFunc(ALL11.SrcAlpha, ALL11.OneMinusSrcAlpha);
-				GL11.Enable(ALL11.Blend);
+			if (_effect == null) {
+				Viewport vp = graphicsDevice.Viewport;
+				Matrix projection = Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, 0, 1);
+				Matrix halfPixelOffset = Matrix.CreateTranslation(-0.5f, -0.5f, 0);
+				Matrix transform = _matrix * (halfPixelOffset * projection);
+				spriteEffect.Parameters["MatrixTransform"].SetValue (transform);
+				
+				spriteEffect.CurrentTechnique.Passes[0].Apply();
+			} else {
+				// apply the custom effect if there is one
+				_effect.CurrentTechnique.Passes[0].Apply ();
+				/*
+				if (graphicsDevice.Textures._textures.Count > 0) {
+					foreach (EffectParameter ep in _effect._textureMappings) {
+						// if user didn't inform the texture index, we can't bind it
+						if (ep.UserInedx == -1)
+							continue;
+
+						Texture tex = graphicsDevice.Textures [ep.UserInedx];
+
+						// Need to support multiple passes as well
+						GL.ActiveTexture ((TextureUnit)((int)TextureUnit.Texture0 + ep.UserInedx));
+						GL.BindTexture (TextureTarget.Texture2D, tex._textureId);
+						GL.Uniform1 (ep.UniformLocation, ep.UserInedx);
+					}
+				}*/
 			}
-			
-			if ( _blendState == BlendState.AlphaBlend )
-			{
-				GL11.BlendFunc(ALL11.One, ALL11.OneMinusSrcAlpha);
-				GL11.Enable(ALL11.Blend);				
-			}
-			
-			if ( _blendState == BlendState.Additive )
-			{
-				GL11.BlendFunc(ALL11.SrcAlpha,ALL11.One);
-				GL11.Enable(ALL11.Blend);	
-			}			
-			
+		}
+		
+		void Flush() {
 			// set camera
-			GL11.MatrixMode(ALL11.Projection);
-			GL11.LoadIdentity();							
+			GL.MatrixMode (MatrixMode.Projection);
+			GL.LoadIdentity ();		
 			
-#if ANDROID			
+			
 			// Switch on the flags.
+#if ANDROID
 	        switch (this.graphicsDevice.PresentationParameters.DisplayOrientation)
 	        {
 			
@@ -399,643 +176,233 @@ namespace Microsoft.Xna.Framework.Graphics
 					GL11.Ortho(0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height, 0, -1, 1);
 					break;
 				}
-			}					
-#else			
-			switch (this.graphicsDevice.PresentationParameters.DisplayOrientation)
-	        {
-				case DisplayOrientation.LandscapeLeft:
-                {
-					GL11.Rotate(-90, 0, 0, 1);
-					break;
-				}
-				
-				case DisplayOrientation.LandscapeRight:
-                {
-					GL11.Rotate(90, 0, 0, 1);					
-					break;
-				}
-				
-				case DisplayOrientation.PortraitUpsideDown:
-                {
-					GL11.Rotate(180, 0, 0, 1); 
-					break;
-				}
-				
-				default:
+			}
+#else
+			// Switch on the flags.
+			switch (this.graphicsDevice.PresentationParameters.DisplayOrientation) {
+			case DisplayOrientation.LandscapeLeft:
 				{
+					GL.Rotate (-90, 0, 0, 1); 
+					GL.Ortho (0, this.graphicsDevice.Viewport.Height, this.graphicsDevice.Viewport.Width, 0, -1, 1);
+					break;
+				}
+
+			case DisplayOrientation.LandscapeRight:
+				{
+					GL.Rotate (90, 0, 0, 1); 
+					GL.Ortho (0, this.graphicsDevice.Viewport.Height, this.graphicsDevice.Viewport.Width, 0, -1, 1);
+					break;
+				}
+
+			case DisplayOrientation.PortraitUpsideDown:
+				{
+					GL.Rotate (180, 0, 0, 1); 
+					GL.Ortho (0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height, 0, -1, 1);
+					break;
+				}
+
+			default:
+				{
+					GL.Ortho (0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height, 0, -1, 1);
 					break;
 				}
 			}
-			
-			GL11.Ortho(0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height, 0, -1, 1);
-#endif			
-			
+#endif
+
 			// Enable Scissor Tests if necessary
-			if ( this.graphicsDevice.RasterizerState.ScissorTestEnable )
-			{
-				GL11.Enable(ALL11.ScissorTest);
-			}
+			//if (this.graphicsDevice.RasterizerState.ScissorTestEnable) {
+			//	GL.Enable (EnableCap.ScissorTest);				
+			//}
 			
 			
-			GL11.MatrixMode(ALL11.Modelview);			
-			
-#if !ANDROID			
-			// Only swap our viewport if Width is greater than height
-			if ((this.graphicsDevice.Viewport.Width > this.graphicsDevice.Viewport.Height)
-				&& ((this.graphicsDevice.PresentationParameters.DisplayOrientation == DisplayOrientation.LandscapeLeft )
-				|| (this.graphicsDevice.PresentationParameters.DisplayOrientation == DisplayOrientation.LandscapeRight ) ) )
-			{
-				GL11.Viewport(0, 0, this.graphicsDevice.Viewport.Height, this.graphicsDevice.Viewport.Width);
-			}
-			else
-#endif								
-			{
-				GL11.Viewport(0, 0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height);
-			}
-			
+			GL.MatrixMode (MatrixMode.Modelview);
+			 
+			 
 			// Enable Scissor Tests if necessary
-			if ( this.graphicsDevice.RasterizerState.ScissorTestEnable )
-			{
-				GL11.Scissor(this.graphicsDevice.ScissorRectangle.X, this.graphicsDevice.ScissorRectangle.Y, this.graphicsDevice.ScissorRectangle.Width, this.graphicsDevice.ScissorRectangle.Height );
-			}			
+			//if (this.graphicsDevice.RasterizerState.ScissorTestEnable) {
+			//	GL.Scissor (this.graphicsDevice.ScissorRectangle.X, this.graphicsDevice.ScissorRectangle.Y, this.graphicsDevice.ScissorRectangle.Width, this.graphicsDevice.ScissorRectangle.Height);
+			//}
+
+			// Initialize OpenGL states (ideally move this to initialize somewhere else)
+			//GLStateManager.SetDepthStencilState(_depthStencilState);
+
+			//GL.Disable (EnableCap.DepthTest);
 			
-			GL11.LoadMatrix( ref _matrix.M11 );	
-			
-			// Initialize OpenGL states (ideally move this to initialize somewhere else)	
-			GL11.Disable(ALL11.DepthTest);
-			GL11.TexEnv(ALL11.TextureEnv, ALL11.TextureEnvMode,(int) ALL11.SrcAlpha);
-			GL11.Enable(ALL11.Texture2D);
-			GL11.EnableClientState(ALL11.VertexArray);
-			GL11.EnableClientState(ALL11.ColorArray);
-			GL11.EnableClientState(ALL11.TextureCoordArray);
-			
+			GL.TexEnv (TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)All.BlendSrc);
+			GLStateManager.Textures2D(true);
+			GLStateManager.VertexArray(true);
+			GLStateManager.ColorArray(true);
+			GLStateManager.TextureCoordArray(true);
+
 			// Enable Culling for better performance
-			GL11.Enable(ALL11.CullFace);
-			GL11.FrontFace(ALL11.Cw);
-			GL11.Color4(1.0f, 1.0f, 1.0f, 1.0f);						
-			
-			_batcher.DrawBatchGL11(_sortMode, _samplerState);
-			
-			if (this.graphicsDevice.RasterizerState.ScissorTestEnable)
-            {
-               GL11.Disable(ALL11.ScissorTest);
-            }
+			GL.Enable (EnableCap.CullFace);
+			GL.FrontFace (FrontFaceDirection.Cw);
+			GL.Color4 (1.0f, 1.0f, 1.0f, 1.0f);
+
+			_batcher.DrawBatch (_sortMode, graphicsDevice.SamplerStates[0]);
+	
+			// Disable Scissor Tests if necessary
+			//if (this.graphicsDevice.RasterizerState.ScissorTestEnable) {
+			//	GL.Disable (EnableCap.ScissorTest);
+			//}
+
 		}
-		
-		private void UpdateWorldMatrixOrientation()
+
+		public void Draw (Texture2D texture,
+				Vector2 position,
+				Rectangle? sourceRectangle,
+				Color color,
+				float rotation,
+				Vector2 origin,
+				Vector2 scale,
+				SpriteEffects effect,
+				float depth)
 		{
-			// Configure Display Orientation:
-			if(lastDisplayOrientation != graphicsDevice.PresentationParameters.DisplayOrientation)
-			{
-				// updates last display orientation (optimization)
-				lastDisplayOrientation = graphicsDevice.PresentationParameters.DisplayOrientation;
-				switch (this.graphicsDevice.PresentationParameters.DisplayOrientation)
-		        {
-					case DisplayOrientation.LandscapeLeft:
-	                {
-						matViewScreen = Matrix4.CreateRotationZ(-(float)Math.PI/2)*
-							Matrix4.CreateRotationY((float)Math.PI)*
-							Matrix4.CreateTranslation(this.graphicsDevice.Viewport.Width/2,
-								this.graphicsDevice.Viewport.Height/2,
-								0);	
-						matWVPScreen = matViewScreen * matProjection;
-						break;
-					}
-					
-					case DisplayOrientation.LandscapeRight:
-	                {
-						matViewScreen = Matrix4.CreateRotationZ((float)Math.PI/2)*
-							Matrix4.CreateRotationY((float)Math.PI)*
-							Matrix4.CreateTranslation(-this.graphicsDevice.Viewport.Width/2,
-								-this.graphicsDevice.Viewport.Height/2,
-								0);	
-						matWVPScreen = matViewScreen * matProjection;
-						break;
-					}
-					
-					case DisplayOrientation.PortraitUpsideDown:
-	                {
-						matViewScreen = Matrix4.CreateRotationZ(0)*
-							Matrix4.CreateRotationY((float)Math.PI)*
-							Matrix4.CreateTranslation(this.graphicsDevice.Viewport.Width/2,
-								-this.graphicsDevice.Viewport.Height/2,
-								0);
-						matWVPScreen = matViewScreen * matProjection;
-						break;
-					}
-					
-					default:
-					{
-						matViewScreen = Matrix4.CreateRotationZ((float)Math.PI)*
-							Matrix4.CreateRotationY((float)Math.PI)*
-							Matrix4.CreateTranslation(-this.graphicsDevice.Viewport.Width/2,
-								this.graphicsDevice.Viewport.Height/2,
-								0);
-							matWVPScreen = matViewScreen * matProjection;
-						break;
-					}
-				}
+			if (texture == null) {
+				throw new ArgumentException ("texture");
 			}
+			float w = texture.Width*scale.X;
+			float h = texture.Height*scale.Y;
+			if (sourceRectangle.HasValue) {
+				w = sourceRectangle.Value.Width*scale.X;
+				h = sourceRectangle.Value.Height*scale.Y;
+			}
+			Draw (texture,
+				new Rectangle((int)position.X, (int)position.Y, (int)w, (int)h),
+				sourceRectangle,
+				color,
+				rotation,
+				origin * scale,
+				effect,
+				depth);
 		}
-		
-		public void Draw 
-			( 
-			 Texture2D texture,
-			 Vector2 position,
-			 Nullable<Rectangle> sourceRectangle,
-			 Color color,
-			 float rotation,
-			 Vector2 origin,
-			 Vector2 scale,
-			 SpriteEffects effect,
-			 float depth 
-			 )
+
+		public void Draw (Texture2D texture,
+				Vector2 position,
+				Rectangle? sourceRectangle,
+				Color color,
+				float rotation,
+				Vector2 origin,
+				float scale,
+				SpriteEffects effect,
+				float depth)
 		{
-			if (texture == null )
-			{
-				throw new ArgumentException("texture");
+			Draw (texture,
+				position,
+				sourceRectangle,
+				color,
+				rotation,
+				origin,
+				new Vector2(scale, scale),
+				effect,
+				depth);
+		}
+
+		public void Draw (Texture2D texture,
+			Rectangle destinationRectangle,
+			Rectangle? sourceRectangle,
+			Color color,
+			float rotation,
+			Vector2 origin,
+			SpriteEffects effect,
+			float depth)
+		{
+			if (texture == null) {
+				throw new ArgumentException ("texture");
 			}
 			
-			SpriteBatchItem item = _batcher.CreateBatchItem();
+			// texture 0 is the texture beeing draw
+			graphicsDevice.Textures [0] = texture;			
 			
+			SpriteBatchItem item = _batcher.CreateBatchItem ();
+
 			item.Depth = depth;
-			item.TextureID = (int) texture.ID;
-				
-			if ( sourceRectangle.HasValue)
-			{
+			item.TextureID = (int)texture.ID;
+
+			if (sourceRectangle.HasValue) {
 				tempRect = sourceRectangle.Value;
-			}
-			else
-			{
+			} else {
 				tempRect.X = 0;
 				tempRect.Y = 0;
 				tempRect.Width = texture.Width;
 				tempRect.Height = texture.Height;				
 			}
-			
+
 			if (texture.Image == null) {
 				float texWidthRatio = 1.0f / (float)texture.Width;
 				float texHeightRatio = 1.0f / (float)texture.Height;
 				// We are initially flipped vertically so we need to flip the corners so that
 				//  the image is bottom side up to display correctly
-				texCoordTL.X = tempRect.X*texWidthRatio;
-				texCoordTL.Y = (tempRect.Y+tempRect.Height) * texHeightRatio;
-				
-				texCoordBR.X = (tempRect.X+tempRect.Width)*texWidthRatio;
-				texCoordBR.Y = tempRect.Y*texHeightRatio;
-				
+				texCoordTL.X = tempRect.X * texWidthRatio;
+				texCoordTL.Y = (tempRect.Y + tempRect.Height) * texHeightRatio;
+
+				texCoordBR.X = (tempRect.X + tempRect.Width) * texWidthRatio;
+				texCoordBR.Y = tempRect.Y * texHeightRatio;
+
+			} else {
+				texCoordTL.X = texture.Image.GetTextureCoordX (tempRect.X);
+				texCoordTL.Y = texture.Image.GetTextureCoordY (tempRect.Y);
+				texCoordBR.X = texture.Image.GetTextureCoordX (tempRect.X + tempRect.Width);
+				texCoordBR.Y = texture.Image.GetTextureCoordY (tempRect.Y + tempRect.Height);
 			}
-			else {
-				texCoordTL.X = texture.Image.GetTextureCoordX( tempRect.X );
-				texCoordTL.Y = texture.Image.GetTextureCoordY( tempRect.Y );
-				texCoordBR.X = texture.Image.GetTextureCoordX( tempRect.X+tempRect.Width );
-				texCoordBR.Y = texture.Image.GetTextureCoordY( tempRect.Y+tempRect.Height );
-			}
-			
-			if ( (effect & SpriteEffects.FlipVertically) != 0 )
-			{
+
+			if ((effect & SpriteEffects.FlipVertically) != 0) {
 				float temp = texCoordBR.Y;
 				texCoordBR.Y = texCoordTL.Y;
 				texCoordTL.Y = temp;
 			}
-			if ( (effect & SpriteEffects.FlipHorizontally) != 0 )
-			{
+			if ((effect & SpriteEffects.FlipHorizontally) != 0) {
 				float temp = texCoordBR.X;
 				texCoordBR.X = texCoordTL.X;
 				texCoordTL.X = temp;
 			}
+
+			item.Set (destinationRectangle.X, 
+					destinationRectangle.Y, 
+					-origin.X, 
+					-origin.Y, 
+					destinationRectangle.Width, 
+					destinationRectangle.Height, 
+					(float)Math.Sin (rotation), 
+					(float)Math.Cos (rotation), 
+					color, 
+					texCoordTL, 
+					texCoordBR);			
 			
-			item.Set
-				(
-				 position.X,
-				 position.Y,
-				 -origin.X*scale.X,
-				 -origin.Y*scale.Y,
-				 tempRect.Width*scale.X,
-				 tempRect.Height*scale.Y,
-				 (float)Math.Sin(rotation),
-				 (float)Math.Cos(rotation),
-				 color,
-				 texCoordTL,
-				 texCoordBR
-				 );
+			if (_sortMode == SpriteSortMode.Immediate) {
+				Flush ();
+			}
+			
 		}
-		
-		public void Draw 
-			( 
-			 Texture2D texture,
-			 Vector2 position,
-			 Nullable<Rectangle> sourceRectangle,
-			 Color color,
-			 float rotation,
-			 Vector2 origin,
-			 float scale,
-			 SpriteEffects effect,
-			 float depth 
-			 )
+
+		public void Draw (Texture2D texture, Vector2 position, Rectangle? sourceRectangle, Color color)
 		{
-			if (texture == null )
-			{
-				throw new ArgumentException("texture");
-			}
-			
-			SpriteBatchItem item = _batcher.CreateBatchItem();
-			
-			item.Depth = depth;
-			item.TextureID = (int) texture.ID;
-						
-			if ( sourceRectangle.HasValue)
-			{
-				tempRect = sourceRectangle.Value;
-			}
-			else
-			{
-				tempRect.X = 0;
-				tempRect.Y = 0;
-				tempRect.Width = texture.Width;
-				tempRect.Height = texture.Height;
-			}
-			
-			if (texture.Image == null) {
-				float texWidthRatio = 1.0f / (float)texture.Width;
-				float texHeightRatio = 1.0f / (float)texture.Height;
-				// We are initially flipped vertically so we need to flip the corners so that
-				//  the image is bottom side up to display correctly
-				texCoordTL.X = tempRect.X*texWidthRatio;
-				texCoordTL.Y = (tempRect.Y+tempRect.Height) * texHeightRatio;
-				
-				texCoordBR.X = (tempRect.X+tempRect.Width)*texWidthRatio;
-				texCoordBR.Y = tempRect.Y*texHeightRatio;
-				
-			}
-			else {
-				texCoordTL.X = texture.Image.GetTextureCoordX( tempRect.X );
-				texCoordTL.Y = texture.Image.GetTextureCoordY( tempRect.Y );
-				texCoordBR.X = texture.Image.GetTextureCoordX( tempRect.X+tempRect.Width );
-				texCoordBR.Y = texture.Image.GetTextureCoordY( tempRect.Y+tempRect.Height );
-			}
-			
-			if ( (effect & SpriteEffects.FlipVertically) != 0)
-			{
-				float temp = texCoordBR.Y;
-				texCoordBR.Y = texCoordTL.Y;
-				texCoordTL.Y = temp;
-			}
-			if ( (effect & SpriteEffects.FlipHorizontally) != 0)
-			{
-				float temp = texCoordBR.X;
-				texCoordBR.X = texCoordTL.X;
-				texCoordTL.X = temp;
-			}
-			item.Set
-				(
-				 position.X,
-				 position.Y,
-				 -origin.X*scale,
-				 -origin.Y*scale,
-				 tempRect.Width*scale,
-				 tempRect.Height*scale,
-				 (float)Math.Sin(rotation),
-				 (float)Math.Cos(rotation),
-				 color,
-				 texCoordTL,
-				 texCoordBR
-				 );
+			Draw (texture, position, sourceRectangle, color, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
 		}
-		
-		public void Draw (
-         	Texture2D texture,
-         	Rectangle destinationRectangle,
-         	Nullable<Rectangle> sourceRectangle,
-         	Color color,
-         	float rotation,
-         	Vector2 origin,
-         	SpriteEffects effect,
-         	float depth
-			)
+
+		public void Draw (Texture2D texture, Rectangle destinationRectangle, Rectangle? sourceRectangle, Color color)
 		{
-			if (texture == null )
-			{
-				throw new ArgumentException("texture");
-			}
-			
-			SpriteBatchItem item = _batcher.CreateBatchItem();
-			
-			item.Depth = depth;
-			item.TextureID = (int) texture.ID;
-						
-			if ( sourceRectangle.HasValue)
-			{
-				tempRect = sourceRectangle.Value;
-			}
-			else
-			{
-				tempRect.X = 0;
-				tempRect.Y = 0;
-				tempRect.Width = texture.Width;
-				tempRect.Height = texture.Height;
-			}
-			
-			if (texture.Image == null) {
-				float texWidthRatio = 1.0f / (float)texture.Width;
-				float texHeightRatio = 1.0f / (float)texture.Height;
-				// We are initially flipped vertically so we need to flip the corners so that
-				//  the image is bottom side up to display correctly
-				texCoordTL.X = tempRect.X*texWidthRatio;
-				texCoordTL.Y = (tempRect.Y+tempRect.Height) * texHeightRatio;
-				
-				texCoordBR.X = (tempRect.X+tempRect.Width)*texWidthRatio;
-				texCoordBR.Y = tempRect.Y*texHeightRatio;
-				
-			}
-			else {
-				texCoordTL.X = texture.Image.GetTextureCoordX( tempRect.X );
-				texCoordTL.Y = texture.Image.GetTextureCoordY( tempRect.Y );
-				texCoordBR.X = texture.Image.GetTextureCoordX( tempRect.X+tempRect.Width );
-				texCoordBR.Y = texture.Image.GetTextureCoordY( tempRect.Y+tempRect.Height );
-			}
-			
-			if ( (effect & SpriteEffects.FlipVertically) != 0)
-			{
-				float temp = texCoordBR.Y;
-				texCoordBR.Y = texCoordTL.Y;
-				texCoordTL.Y = temp;
-			}
-			if ( (effect & SpriteEffects.FlipHorizontally) != 0)
-			{
-				float temp = texCoordBR.X;
-				texCoordBR.X = texCoordTL.X;
-				texCoordTL.X = temp;
-			}
-			
-			item.Set 
-				( 
-				 destinationRectangle.X, 
-				 destinationRectangle.Y, 
-				 -origin.X, 
-				 -origin.Y, 
-				 destinationRectangle.Width,
-				 destinationRectangle.Height,
-				 (float)Math.Sin(rotation),
-				 (float)Math.Cos(rotation),
-				 color,
-				 texCoordTL,
-				 texCoordBR );			
+			Draw (texture, destinationRectangle, sourceRectangle, color, 0, Vector2.Zero, SpriteEffects.None, 0f);
 		}
-		
-        public void Draw(Texture2D texture, Vector2 position, Rectangle? sourceRectangle, Color color)
+
+		public void Draw (Texture2D texture,
+				Vector2 position,
+				Color color)
 		{
-			if (texture == null )
-			{
-				throw new ArgumentException("texture");
-			}
-			
-			SpriteBatchItem item = _batcher.CreateBatchItem();
-			
-			item.Depth = 0.0f;
-			item.TextureID = (int) texture.ID;
-			
-			if ( sourceRectangle.HasValue)
-			{
-				tempRect = sourceRectangle.Value;
-			}
-			else
-			{
-				tempRect.X = 0;
-				tempRect.Y = 0;
-				tempRect.Width = texture.Width;
-				tempRect.Height = texture.Height;
-			}
-			
-			
-			
-			if (texture.Image == null) {
-				float texWidthRatio = 1.0f / (float)texture.Width;
-				float texHeightRatio = 1.0f / (float)texture.Height;
-				// We are initially flipped vertically so we need to flip the corners so that
-				//  the image is bottom side up to display correctly
-				texCoordTL.X = tempRect.X*texWidthRatio;
-				texCoordTL.Y = (tempRect.Y+tempRect.Height) * texHeightRatio;
-				
-				texCoordBR.X = (tempRect.X+tempRect.Width)*texWidthRatio;
-				texCoordBR.Y = tempRect.Y*texHeightRatio;
-				
-			}
-			else {
-				texCoordTL.X = texture.Image.GetTextureCoordX( tempRect.X );
-				texCoordTL.Y = texture.Image.GetTextureCoordY( tempRect.Y );
-				texCoordBR.X = texture.Image.GetTextureCoordX( tempRect.X+tempRect.Width );
-				texCoordBR.Y = texture.Image.GetTextureCoordY( tempRect.Y+tempRect.Height );
-			}
-			
-			item.Set ( position.X, position.Y, tempRect.Width, tempRect.Height, color, texCoordTL, texCoordBR );
+			Draw (texture, position, null, color);
 		}
-		
-		public void Draw(Texture2D texture, Rectangle destinationRectangle, Rectangle? sourceRectangle, Color color)
-		{
-			if (texture == null )
-			{
-				throw new ArgumentException("texture");
-			}
-			
-			SpriteBatchItem item = _batcher.CreateBatchItem();
-			
-			item.Depth = 0.0f;
-			item.TextureID = (int) texture.ID;
-			
-			if ( sourceRectangle.HasValue)
-			{
-				tempRect = sourceRectangle.Value;
-			}
-			else
-			{
-				tempRect.X = 0;
-				tempRect.Y = 0;
-				tempRect.Width = texture.Width;
-				tempRect.Height = texture.Height;
-			}		
-			
-			if (texture.Image == null) {
-				float texWidthRatio = 1.0f / (float)texture.Width;
-				float texHeightRatio = 1.0f / (float)texture.Height;
-				// We are initially flipped vertically so we need to flip the corners so that
-				//  the image is bottom side up to display correctly
-				texCoordTL.X = tempRect.X*texWidthRatio;
-				texCoordTL.Y = (tempRect.Y+tempRect.Height) * texHeightRatio;
-				
-				texCoordBR.X = (tempRect.X+tempRect.Width)*texWidthRatio;
-				texCoordBR.Y = tempRect.Y*texHeightRatio;
-				
-			}
-			else {
-				texCoordTL.X = texture.Image.GetTextureCoordX( tempRect.X );
-				texCoordTL.Y = texture.Image.GetTextureCoordY( tempRect.Y );
-				texCoordBR.X = texture.Image.GetTextureCoordX( tempRect.X+tempRect.Width );
-				texCoordBR.Y = texture.Image.GetTextureCoordY( tempRect.Y+tempRect.Height );
-			}
-			
-			item.Set 
-				( 
-				 destinationRectangle.X, 
-				 destinationRectangle.Y, 
-				 destinationRectangle.Width, 
-				 destinationRectangle.Height, 
-				 color, 
-				 texCoordTL, 
-				 texCoordBR );
-		}
-		
-		public void Draw 
-			( 
-			 Texture2D texture,
-			 Vector2 position,
-			 Color color
-			 )
-		{
-			if (texture == null )
-			{
-				throw new ArgumentException("texture");
-			}
-			
-			SpriteBatchItem item = _batcher.CreateBatchItem();
-			
-			item.Depth = 0;
-			item.TextureID = (int) texture.ID;
-			
-			tempRect.X = 0;
-			tempRect.Y = 0;
-			tempRect.Width = texture.Width;
-			tempRect.Height = texture.Height;
-			
-			if (texture.Image == null) {
-				float texWidthRatio = 1.0f / (float)texture.Width;
-				float texHeightRatio = 1.0f / (float)texture.Height;
-				// We are initially flipped vertically so we need to flip the corners so that
-				//  the image is bottom side up to display correctly
-				texCoordTL.X = tempRect.X*texWidthRatio;
-				texCoordTL.Y = (tempRect.Y+tempRect.Height) * texHeightRatio;
-				
-				texCoordBR.X = (tempRect.X+tempRect.Width)*texWidthRatio;
-				texCoordBR.Y = tempRect.Y*texHeightRatio;
-				
-			}
-			else {
-				texCoordTL.X = texture.Image.GetTextureCoordX( tempRect.X );
-				texCoordTL.Y = texture.Image.GetTextureCoordY( tempRect.Y );
-				texCoordBR.X = texture.Image.GetTextureCoordX( tempRect.X+tempRect.Width );
-				texCoordBR.Y = texture.Image.GetTextureCoordY( tempRect.Y+tempRect.Height );
-			}
-			
-			item.Set 
-				(
-				 position.X,
-			     position.Y,
-				 tempRect.Width,
-				 tempRect.Height,
-				 color,
-				 texCoordTL,
-				 texCoordBR
-				 );
-		}
-		
+
 		public void Draw (Texture2D texture, Rectangle rectangle, Color color)
 		{
-			if (texture == null )
-			{
-				throw new ArgumentException("texture");
-			}
-			
-			SpriteBatchItem item = _batcher.CreateBatchItem();
-			
-			item.Depth = 0;
-			item.TextureID = (int) texture.ID;
-			
-			tempRect.X = 0;
-			tempRect.Y = 0;
-			tempRect.Width = texture.Width;
-			tempRect.Height = texture.Height;			
-			
-			if (texture.Image == null) {
-				float texWidthRatio = 1.0f / (float)texture.Width;
-				float texHeightRatio = 1.0f / (float)texture.Height;
-				// We are initially flipped vertically so we need to flip the corners so that
-				//  the image is bottom side up to display correctly
-				texCoordTL.X = tempRect.X*texWidthRatio;
-				texCoordTL.Y = (tempRect.Y+tempRect.Height) * texHeightRatio;
-				
-				texCoordBR.X = (tempRect.X+tempRect.Width)*texWidthRatio;
-				texCoordBR.Y = tempRect.Y*texHeightRatio;
-				
-			}
-			else {
-				texCoordTL.X = texture.Image.GetTextureCoordX( tempRect.X );
-				texCoordTL.Y = texture.Image.GetTextureCoordY( tempRect.Y );
-				texCoordBR.X = texture.Image.GetTextureCoordX( tempRect.X+tempRect.Width );
-				texCoordBR.Y = texture.Image.GetTextureCoordY( tempRect.Y+tempRect.Height );
-			}
-			
-			item.Set
-				(
-				 rectangle.X,
-				 rectangle.Y,
-				 rectangle.Width,
-				 rectangle.Height,
-				 color,
-				 texCoordTL,
-				 texCoordBR
-			    );
+			Draw (texture, rectangle, null, color);
 		}
-		
-		
-		public void DrawString(SpriteFont spriteFont, string text, Vector2 position, Color color)
+
+		public void DrawString (SpriteFont spriteFont, string text, Vector2 position, Color color)
 		{
-			if (spriteFont == null )
-			{
-				throw new ArgumentException("spriteFont");
-			}
-			
-			Vector2 p = position;
-			
-            foreach (char c in text)
-            {
-                if (c == '\n')
-                {
-                    p.Y += spriteFont.LineSpacing;
-                    p.X = position.X;
-                    continue;
-                }
-                if (spriteFont.characterData.ContainsKey(c) == false) 
-					continue;
-                GlyphData g = spriteFont.characterData[c];
-				
-				SpriteBatchItem item = _batcher.CreateBatchItem();
-				
-				item.Depth = 0.0f;
-				item.TextureID = (int) spriteFont._texture.ID;
-
-				texCoordTL.X = spriteFont._texture.Image.GetTextureCoordX( g.Glyph.X );
-				texCoordTL.Y = spriteFont._texture.Image.GetTextureCoordY( g.Glyph.Y );
-				texCoordBR.X = spriteFont._texture.Image.GetTextureCoordX( g.Glyph.X+g.Glyph.Width );
-				texCoordBR.Y = spriteFont._texture.Image.GetTextureCoordY( g.Glyph.Y+g.Glyph.Height );
-
-				item.Set
-					(
-					 p.X,
-					 p.Y+g.Cropping.Y,
-					 g.Glyph.Width,
-					 g.Glyph.Height,
-					 color,
-					 texCoordTL,
-					 texCoordBR
-					 );
-		                
-				p.X += (g.Kerning.Y + g.Kerning.Z + spriteFont.Spacing);
-            }			
+			DrawString (spriteFont, text, position, color, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
 		}
-		
-		public void DrawString
-			(
-			SpriteFont spriteFont, 
+
+		public void DrawString (SpriteFont spriteFont, 
 			string text, 
 			Vector2 position,
 			Color color,
@@ -1043,76 +410,12 @@ namespace Microsoft.Xna.Framework.Graphics
 			Vector2 origin,
 			float scale,
 			SpriteEffects effects,
-			float depth
-			)
+			float depth)
 		{
-			if (spriteFont == null )
-			{
-				throw new ArgumentException("spriteFont");
-			}
-			
-			Vector2 p = new Vector2(-origin.X,-origin.Y);
-			
-			float sin = (float)Math.Sin(rotation);
-			float cos = (float)Math.Cos(rotation);
-			
-            foreach (char c in text)
-            {
-                if (c == '\n')
-                {
-                    p.Y += spriteFont.LineSpacing;
-                    p.X = -origin.X;
-                    continue;
-                }
-                if (spriteFont.characterData.ContainsKey(c) == false) 
-					continue;
-                GlyphData g = spriteFont.characterData[c];
-				
-				SpriteBatchItem item = _batcher.CreateBatchItem();
-				
-				item.Depth = depth;
-				item.TextureID = (int) spriteFont._texture.ID;
-
-				texCoordTL.X = spriteFont._texture.Image.GetTextureCoordX( g.Glyph.X );
-				texCoordTL.Y = spriteFont._texture.Image.GetTextureCoordY( g.Glyph.Y );
-				texCoordBR.X = spriteFont._texture.Image.GetTextureCoordX( g.Glyph.X+g.Glyph.Width );
-				texCoordBR.Y = spriteFont._texture.Image.GetTextureCoordY( g.Glyph.Y+g.Glyph.Height );
-				
-				if ( effects == SpriteEffects.FlipVertically )
-				{
-					float temp = texCoordBR.Y;
-					texCoordBR.Y = texCoordTL.Y;
-					texCoordTL.Y = temp;
-				}
-				else if ( effects == SpriteEffects.FlipHorizontally )
-				{
-					float temp = texCoordBR.X;
-					texCoordBR.X = texCoordTL.X;
-					texCoordTL.X = temp;
-				}
-				
-				item.Set
-					(
-					 position.X,
-					 position.Y,
-					 p.X*scale,
-					 (p.Y+g.Cropping.Y)*scale,
-					 g.Glyph.Width*scale,
-					 g.Glyph.Height*scale,
-					 sin,
-					 cos,
-					 color,
-					 texCoordTL,
-					 texCoordBR
-					 );
-
-				p.X += (g.Kerning.Y + g.Kerning.Z + spriteFont.Spacing);
-            }			
+			DrawString (spriteFont, text, position, color, rotation, origin, new Vector2(scale, scale), effects, depth);
 		}
-		
-		public void DrawString
-			(
-			SpriteFont spriteFont, 
+
+		public void DrawString (SpriteFont spriteFont, 
 			string text, 
 			Vector2 position,
 			Color color,
@@ -1120,81 +423,74 @@ namespace Microsoft.Xna.Framework.Graphics
 			Vector2 origin,
 			Vector2 scale,
 			SpriteEffects effects,
-			float depth
-			)
+			float depth)
 		{			
-			if (spriteFont == null )
-			{
-				throw new ArgumentException("spriteFont");
+			if (spriteFont == null) {
+				throw new ArgumentException ("spriteFont");
 			}
-			
-			Vector2 p = new Vector2(-origin.X,-origin.Y);
-			
-			float sin = (float)Math.Sin(rotation);
-			float cos = (float)Math.Cos(rotation);
-			
-            foreach (char c in text)
-            {
-                if (c == '\n')
-                {
-                    p.Y += spriteFont.LineSpacing;
-                    p.X = -origin.X;
-                    continue;
-                }
-                if (spriteFont.characterData.ContainsKey(c) == false) 
-					continue;
-                GlyphData g = spriteFont.characterData[c];
-				
-				SpriteBatchItem item = _batcher.CreateBatchItem();
-				
-				item.Depth = depth;
-				item.TextureID = (int) spriteFont._texture.ID;
 
-				texCoordTL.X = spriteFont._texture.Image.GetTextureCoordX( g.Glyph.X );
-				texCoordTL.Y = spriteFont._texture.Image.GetTextureCoordY( g.Glyph.Y );
-				texCoordBR.X = spriteFont._texture.Image.GetTextureCoordX( g.Glyph.X+g.Glyph.Width );
-				texCoordBR.Y = spriteFont._texture.Image.GetTextureCoordY( g.Glyph.Y+g.Glyph.Height );
-				
-				if ( effects == SpriteEffects.FlipVertically )
-				{
+			Vector2 p = new Vector2 (-origin.X,-origin.Y);
+
+			float sin = (float)Math.Sin (rotation);
+			float cos = (float)Math.Cos (rotation);
+
+			foreach (char c in text) {
+				if (c == '\n') {
+					p.Y += spriteFont.LineSpacing;
+					p.X = -origin.X;
+					continue;
+				}
+				if (spriteFont.characterData.ContainsKey (c) == false) 
+					continue;
+				GlyphData g = spriteFont.characterData [c];
+
+				SpriteBatchItem item = _batcher.CreateBatchItem ();
+
+				item.Depth = depth;
+				item.TextureID = (int)spriteFont._texture.ID;
+
+				texCoordTL.X = spriteFont._texture.Image.GetTextureCoordX (g.Glyph.X);
+				texCoordTL.Y = spriteFont._texture.Image.GetTextureCoordY (g.Glyph.Y);
+				texCoordBR.X = spriteFont._texture.Image.GetTextureCoordX (g.Glyph.X + g.Glyph.Width);
+				texCoordBR.Y = spriteFont._texture.Image.GetTextureCoordY (g.Glyph.Y + g.Glyph.Height);
+
+				if ((effects & SpriteEffects.FlipVertically) != 0) {
 					float temp = texCoordBR.Y;
 					texCoordBR.Y = texCoordTL.Y;
 					texCoordTL.Y = temp;
 				}
-				else if ( effects == SpriteEffects.FlipHorizontally )
-				{
+				if ((effects & SpriteEffects.FlipHorizontally) != 0) {
 					float temp = texCoordBR.X;
 					texCoordBR.X = texCoordTL.X;
 					texCoordTL.X = temp;
 				}
-				
-				item.Set
-					(
-					 position.X,
-					 position.Y,
-					 p.X*scale.X,
-					 (p.Y+g.Cropping.Y)*scale.Y,
-					 g.Glyph.Width*scale.X,
-					 g.Glyph.Height*scale.Y,
-					 sin,
-					 cos,
-					 color,
-					 texCoordTL,
-					 texCoordBR
-					 );
+
+				item.Set (position.X, 
+						position.Y, 
+						p.X * scale.X, 
+						(p.Y + g.Cropping.Y) * scale.Y, 
+						g.Glyph.Width * scale.X, 
+						g.Glyph.Height * scale.Y, 
+						sin, 
+						cos, 
+						color, 
+						texCoordTL, 
+						texCoordBR);
 
 				p.X += (g.Kerning.Y + g.Kerning.Z + spriteFont.Spacing);
-            }			
+			}
+			
+			if (_sortMode == SpriteSortMode.Immediate) {
+				Flush ();
+			}
 		}
-		
-		public void DrawString(SpriteFont spriteFont, StringBuilder text, Vector2 position, Color color)
+
+		public void DrawString (SpriteFont spriteFont, StringBuilder text, Vector2 position, Color color)
 		{
-			DrawString ( spriteFont, text.ToString(), position, color );
+			DrawString (spriteFont, text.ToString (), position, color);
 		}
-		
-		public void DrawString
-			(
-			SpriteFont spriteFont, 
+
+		public void DrawString (SpriteFont spriteFont, 
 			StringBuilder text, 
 			Vector2 position,
 			Color color,
@@ -1202,15 +498,12 @@ namespace Microsoft.Xna.Framework.Graphics
 			Vector2 origin,
 			float scale,
 			SpriteEffects effects,
-			float depth
-			)
+			float depth)
 		{
-			DrawString ( spriteFont, text.ToString(), position, color, rotation, origin, scale, effects, depth );
+			DrawString (spriteFont, text.ToString (), position, color, rotation, origin, scale, effects, depth);
 		}
-		
-		public void DrawString
-			(
-			SpriteFont spriteFont, 
+
+		public void DrawString (SpriteFont spriteFont, 
 			StringBuilder text, 
 			Vector2 position,
 			Color color,
@@ -1218,10 +511,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			Vector2 origin,
 			Vector2 scale,
 			SpriteEffects effects,
-			float depth
-			)
+			float depth)
 		{
-			DrawString ( spriteFont, text.ToString(), position, color, rotation, origin, scale, effects, depth );
+			DrawString (spriteFont, text.ToString (), position, color, rotation, origin, scale, effects, depth);
 		}
 	}
 }

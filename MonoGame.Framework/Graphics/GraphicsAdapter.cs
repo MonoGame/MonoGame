@@ -42,9 +42,12 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
+#if MONOMAC
 using MonoMac.AppKit;
 using MonoMac.Foundation;
-
+#elif IPHONE
+using MonoTouch.UIKit;
+#endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -52,12 +55,20 @@ namespace Microsoft.Xna.Framework.Graphics
     {
         private static ReadOnlyCollection<GraphicsAdapter> adapters;
         
-        private NSScreen _screen;
         
+#if MONOMAC
+		private NSScreen _screen;
         internal GraphicsAdapter(NSScreen screen)
         {
             _screen = screen;
         }
+#elif IPHONE
+		private UIScreen _screen;
+        internal GraphicsAdapter(UIScreen screen)
+        {
+            _screen = screen;
+        }
+#endif
         
         public void Dispose()
         {
@@ -67,6 +78,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             get
             {
+#if MONOMAC
                 //Dummy values until MonoMac implements Quartz Display Services
                 int refreshRate = 60;
                 SurfaceFormat format = SurfaceFormat.Color;
@@ -75,6 +87,12 @@ namespace Microsoft.Xna.Framework.Graphics
                                        (int)_screen.Frame.Height,
                                        refreshRate,
                                        format);
+#elif IPHONE
+                return new DisplayMode((int)(_screen.Bounds.Width * _screen.Scale),
+                       (int)(_screen.Bounds.Height * _screen.Scale),
+                       60,
+                       SurfaceFormat.Color);
+#endif
             }
         }
 
@@ -86,12 +104,17 @@ namespace Microsoft.Xna.Framework.Graphics
         public static ReadOnlyCollection<GraphicsAdapter> Adapters {
             get {
                 if (adapters == null) {
+#if MONOMAC
                     GraphicsAdapter[] tmpAdapters = new GraphicsAdapter[NSScreen.Screens.Length];
                     for (int i=0; i<NSScreen.Screens.Length; i++) {
                         tmpAdapters[i] = new GraphicsAdapter(NSScreen.Screens[i]);
                     }
                     
                     adapters = new ReadOnlyCollection<GraphicsAdapter>(tmpAdapters);
+#elif IPHONE
+					adapters = new ReadOnlyCollection<GraphicsAdapter>(
+						new GraphicsAdapter[] {new GraphicsAdapter(UIScreen.MainScreen)});
+#endif
                 }
                 return adapters;
             }

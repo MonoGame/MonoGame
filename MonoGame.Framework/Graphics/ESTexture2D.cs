@@ -42,10 +42,18 @@ using System.Drawing;
 using System.Runtime.InteropServices;
 using System.IO;
 
+#if MONOMAC
 using MonoMac.AppKit;
 using MonoMac.CoreGraphics;
 using MonoMac.Foundation;
 using MonoMac.OpenGL;
+#elif IOS
+using MonoTouch.UIKit;
+using MonoTouch.CoreGraphics;
+using MonoTouch.Foundation;
+
+using OpenTK.Graphics.ES11
+#endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -116,31 +124,34 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			// The Mac opengl version supports non power of 2 textures
 			// so we do not have to make them so
-//			if ((width != 1) && ((width & (width - 1)) != 0)) {
-//				i = 1;
-//				while ((sizeToFit ? 2 * i : i) < width)
-//					i *= 2;
-//				width = i;
-//			}
+			// TODO: Check for the extension instead
+#if IOS
+			if ((width != 1) && ((width & (width - 1)) != 0)) {
+				i = 1;
+				while ((sizeToFit ? 2 * i : i) < width)
+					i *= 2;
+				width = i;
+			}
+#endif
 			
 			height = imageSize.Height;
 
-			// The Mac opengl version supports non power of 2 textures
-			// so we do not have to make them so
-//			if ((height != 1) && ((height & (height - 1)) != 0)) {
-//				i = 1;
-//				while ((sizeToFit ? 2 * i : i) < height)
-//					i *= 2;
-//				height = i;
-//			}
+#if IOS
+			if ((height != 1) && ((height & (height - 1)) != 0)) {
+				i = 1;
+				while ((sizeToFit ? 2 * i : i) < height)
+					i *= 2;
+				height = i;
+			}
 			// TODO: kMaxTextureSize = 1024
-//			while ((width > 1024) || (height > 1024)) {
-//				width /= 2;
-//				height /= 2;
-//				transform = CGAffineTransform.MakeScale (0.5f, 0.5f);
-//				imageSize.Width /= 2;
-//				imageSize.Height /= 2;
-//			}
+			while ((width > 1024) || (height > 1024)) {
+				width /= 2;
+				height /= 2;
+				transform = CGAffineTransform.MakeScale (0.5f, 0.5f);
+				imageSize.Width /= 2;
+				imageSize.Height /= 2;
+			}
+#endif
 			
 			float size = Math.Max(width,height);
 			if(size > 1024) 

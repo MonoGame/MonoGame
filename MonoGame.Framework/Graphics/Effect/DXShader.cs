@@ -135,6 +135,11 @@ namespace Microsoft.Xna.Framework.Graphics
 			int compiled = 0;
 			GL.GetShader (shader, ShaderParameter.CompileStatus, out compiled);
 			if (compiled == (int)All.False) {
+				string log;
+				GL.GetShaderInfoLog(shader, out log);
+				Console.WriteLine (log);
+				
+				GL.DeleteShader (shader);
 				throw new Exception("Shader Compilation Failed");
 			}
 				

@@ -51,9 +51,9 @@ namespace Microsoft.Xna.Framework
 		#endregion
 		
 		#region Events
-		event EventHandler<EventArgs> EnabledChanged;
+		event EventHandler EnabledChanged;
 		
-		event EventHandler<EventArgs> UpdateOrderChanged;
+		event EventHandler UpdateOrderChanged;
 		#endregion
 	
 		#region Properties
