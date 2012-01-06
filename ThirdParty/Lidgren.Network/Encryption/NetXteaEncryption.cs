@@ -82,7 +82,7 @@ namespace Lidgren.Network
 		/// String to hash for key
 		/// </summary>
 		public NetXtea(string key)
-			: this(SHA1.Create().ComputeHash(Encoding.ASCII.GetBytes(key)), 32)
+			: this(SHA1.Create().ComputeHash(Encoding.UTF8.GetBytes(key)), 32)
 		{
 		}
 
