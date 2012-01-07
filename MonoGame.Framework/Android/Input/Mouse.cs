@@ -39,18 +39,25 @@ purpose and non-infringement.
 #endregion License
 
 using System;
+using Microsoft.Xna.Framework.Input.Touch;
 
 namespace Microsoft.Xna.Framework.Input
 {
     public static class Mouse
     {
-		internal static MouseState State;
+        private static int _x, _y;
 
         public static IntPtr WindowHandle { get; set; }
 		
         public static MouseState GetState()
         {
-            return State;
+            var state = TouchPanel.GetState();
+            if (state.Count > 0)
+            {
+                _x = (int) state[state.Count - 1].Position.X;
+                _y = (int) state[state.Count - 1].Position.Y;
+            }
+            return new MouseState(_x, _y);
         }
     }
 }
