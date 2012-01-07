@@ -149,7 +149,7 @@ namespace Microsoft.Xna.Framework
                 GraphicsDevice.OpenGLESVersion = GLContextVersion;
 				base.CreateFrameBuffer();
 		    }
-			
+			_game.GraphicsDevice.Initialize();
 		}
 	
 
