@@ -245,8 +245,8 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             get
             {
-                var temp = _samplerStates;
-                return temp;
+                //var temp = _samplerStates;
+                return _samplerStates;
             }
         }
         public void Clear(Color color)
@@ -822,7 +822,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 //Buffer data to VBO; This should use stream when we move to ES2.0
                 GL20.BufferData(ALL20.ArrayBuffer,
-                                (IntPtr) (vd.VertexStride*GetElementCountArray(primitiveType, primitiveCount)),
+                                (IntPtr)(vd.VertexStride * GetElementCountArray(primitiveType, primitiveCount) + vertexOffset * vd.VertexStride),
                                 vertexData, ALL20.DynamicDraw);
 
                 //Setup VertexDeclaration
@@ -860,7 +860,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 //Buffer data to VBO; This should use stream when we move to ES2.0
                 GL11.BufferData(ALL11.ArrayBuffer,
-                                (IntPtr)(vd.VertexStride * GetElementCountArray(primitiveType, primitiveCount)),
+                                (IntPtr)(vd.VertexStride * GetElementCountArray(primitiveType, primitiveCount) + vertexOffset * vd.VertexStride),
                                 vertexData, ALL11.DynamicDraw);
 
                 //Setup VertexDeclaration
