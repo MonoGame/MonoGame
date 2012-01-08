@@ -299,17 +299,19 @@ namespace Microsoft.Xna.Framework
 			return OnTouchEvent(e);
             }
 		#endregion
-		
-		internal void UpdateTouchPosition(ref Vector2 position)
-		{
-			if (this._game.Window.CurrentOrientation == DisplayOrientation.LandscapeRight)
-			{
-				// we need to fudge the position
-				position.X = this.Width - position.X;
-				position.Y = this.Height - position.Y;
+
+        internal void UpdateTouchPosition(ref Vector2 position)
+        {
+            if (this._game.Window.CurrentOrientation == DisplayOrientation.LandscapeRight)
+            {
+                // we need to fudge the position
+                position.X = this.Width - position.X;
+                position.Y = this.Height - position.Y;
             }
-			Android.Util.Log.Info("MonoGameInfo", String.Format("Touch {0}x{1}", position.X, position.Y));
-            }
+            position.X = (position.X / Width) * _game.GraphicsDevice.Viewport.Width;
+            position.Y = (position.Y / Height) * _game.GraphicsDevice.Viewport.Height;
+            Android.Util.Log.Info("MonoGameInfo", String.Format("Touch {0}x{1}", position.X, position.Y));
+        }
 
         public override bool OnTouchEvent(MotionEvent e)
         {			

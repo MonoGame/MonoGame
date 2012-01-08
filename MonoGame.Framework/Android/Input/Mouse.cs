@@ -54,8 +54,27 @@ namespace Microsoft.Xna.Framework.Input
             var state = TouchPanel.GetState();
             if (state.Count > 0)
             {
-                _x = (int) state[state.Count - 1].Position.X;
-                _y = (int) state[state.Count - 1].Position.Y;
+                var middlePosition = Vector2.Zero;
+                var currentNumberOfTouches = 0;
+                for (int i = 0; i < state.Count; i++)
+                {
+                    if (state[i].State == TouchLocationState.Pressed ||
+                        state[i].State == TouchLocationState.Moved)
+                    {
+                        middlePosition += state[i].Position;
+                        currentNumberOfTouches++;
+                        break;
+                    }
+                }
+
+                if (currentNumberOfTouches > 1)
+                    middlePosition /= currentNumberOfTouches;
+
+                if (middlePosition != Vector2.Zero)
+                {
+                    _x = (int) middlePosition.X;
+                    _y = (int) middlePosition.Y;
+                }
             }
             return new MouseState(_x, _y);
         }
