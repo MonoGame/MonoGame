@@ -117,7 +117,8 @@ namespace Microsoft.Xna.Framework
         {
             Keyboard.KeyDown(keyCode);
             // we need to handle the Back key here because it doesnt work any other way
-            if (keyCode == Keycode.Back) _game.Exit();
+            //if (keyCode == Keycode.Back) _game.Exit();
+            GamePad.Instance.SetBack();
             return true;
         }
 
