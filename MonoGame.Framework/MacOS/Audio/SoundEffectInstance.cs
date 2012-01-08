@@ -154,7 +154,7 @@ namespace Microsoft.Xna.Framework.Audio
 			AL.DistanceModel (ALDistanceModel.InverseDistanceClamped);
 			// Listener
 			// Pan
-			AL.Source (sourceId, ALSource3f.Position, _pan, 0, 0);
+			AL.Source (sourceId, ALSource3f.Position, _pan, 0, 0.1f);
 			// Volume
 			AL.Source (sourceId, ALSourcef.Gain, _volume);
 			// Looping
@@ -230,7 +230,7 @@ namespace Microsoft.Xna.Framework.Audio
 				if (hasSourceId) {
 					// Listener
 					// Pan
-					AL.Source (sourceId, ALSource3f.Position, _pan, 0, 0);
+					AL.Source (sourceId, ALSource3f.Position, _pan, 0.0f, 0.1f);
 				}
 			}
 		}

@@ -81,6 +81,7 @@ using Microsoft.Xna.Framework.Input.Touch;
 namespace Microsoft.Xna.Framework
 {
     public class Game : IDisposable
+
     {
         private const float DefaultTargetFramesPerSecond = 60.0f;
 
