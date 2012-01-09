@@ -245,5 +245,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 return texture.PixelFormat;
             }
         }
+
+        public void RetryToCreateTexture()
+        {
+            texture.RetryToCreateTexture();
+        }
     }
 }
