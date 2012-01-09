@@ -159,10 +159,7 @@ namespace Microsoft.Xna.Framework
         public override bool BeforeRun()
         {
             // Get the Accelerometer going
-            //TODO umcomment when the following bug is fixed
-            // http://bugzilla.xamarin.com/show_bug.cgi?id=1084
-            // Accelerometer currently seems to have a memory leak
-            //Accelerometer.SetupAccelerometer();
+            Accelerometer.SetupAccelerometer();
             Window.Run(1 / Game.TargetElapsedTime.TotalSeconds);
             //Window.Pause();
 
