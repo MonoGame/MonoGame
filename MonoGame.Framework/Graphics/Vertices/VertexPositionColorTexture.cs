@@ -8,20 +8,15 @@ namespace Microsoft.Xna.Framework.Graphics
     public struct VertexPositionColorTexture : IVertexType
     {
         public Vector3 Position;
-        internal VertexElementColor color;
+        public VertexElementColor Color;
         public Vector2 TextureCoordinate;
         public static readonly VertexDeclaration VertexDeclaration;
         public VertexPositionColorTexture(Vector3 position, Color color, Vector2 textureCoordinate)
         {
             this.Position = position;
-            this.color = color;
+            Color = color;
             this.TextureCoordinate = textureCoordinate;
         }
-		public Color Color
-		{
-			get { return color; }
-			set { color = value; }
-		}
 		
         VertexDeclaration IVertexType.VertexDeclaration
         {
