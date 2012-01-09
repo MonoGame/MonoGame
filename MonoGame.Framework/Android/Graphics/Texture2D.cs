@@ -562,6 +562,14 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (texture == null) return;
 
+            if (_textureId == 0)
+            {
+                texture.RetryToCreateTexture();
+                if (texture.Name != 0)
+                {
+                    _textureId = (int)texture.Name;
+                }
+            }
 #if IPHONE
               if (GraphicsDevice.OpenGLESVersion == MonoTouch.OpenGLES.EAGLRenderingAPI.OpenGLES2)
             {
