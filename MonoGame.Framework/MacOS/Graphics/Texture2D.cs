@@ -713,7 +713,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 
-		CGImage createRGBImageFromBufferData (int mByteWidth, int mWidth, int mHeight)
+		private CGImage createRGBImageFromBufferData (int mByteWidth, int mWidth, int mHeight)
 		{
 
 			CGColorSpace cSpace = CGColorSpace.CreateDeviceRGB ();
@@ -794,7 +794,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			WriteImageToStream (data.AsStream (), stream);
 		}
 
-		public void WriteImageToStream (Stream source, Stream target)
+		private void WriteImageToStream (Stream source, Stream target)
 		{
 			byte[] buffer = new byte[0x10000];
 			int bytes;
