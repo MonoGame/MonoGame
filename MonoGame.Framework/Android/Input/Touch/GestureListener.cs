@@ -37,7 +37,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		/// <param name='e'>
 		/// If set to <c>true</c> e.
 		/// </param>
-		public override bool OnSingleTapUp (MotionEvent e)
+		public override bool OnSingleTapConfirmed (MotionEvent e)
 		{
 			if ((TouchPanel.EnabledGestures & GestureType.Tap) != 0)
 			{
@@ -47,7 +47,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 					positon, Vector2.Zero, Vector2.Zero, Vector2.Zero);
 				TouchPanel.GestureList.Enqueue(gs);
 			}
-			return base.OnSingleTapUp (e);
+			return base.OnSingleTapConfirmed (e);
 		}
 				
 		// AJW
@@ -81,6 +81,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			}
 			base.OnLongPress (e);
 		}
+		
 	}
 }
 
