@@ -375,7 +375,7 @@ namespace Lidgren.Network
 					// UPnP response
 					try
 					{
-						string resp = System.Text.Encoding.ASCII.GetString(m_receiveBuffer, 0, bytesReceived);
+						string resp = System.Text.Encoding.UTF8.GetString(m_receiveBuffer, 0, bytesReceived);
 						if (resp.Contains("upnp:rootdevice"))
 						{
 							resp = resp.Substring(resp.ToLower().IndexOf("location:") + 9);
