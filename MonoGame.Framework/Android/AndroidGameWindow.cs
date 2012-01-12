@@ -48,6 +48,7 @@ using Android.Content.PM;
 using Android.Content.Res;
 using Android.Util;
 using Android.Views;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using OpenTK.Platform.Android;
 
@@ -117,8 +118,15 @@ namespace Microsoft.Xna.Framework
         {
             Keyboard.KeyDown(keyCode);
             // we need to handle the Back key here because it doesnt work any other way
-            //if (keyCode == Keycode.Back) _game.Exit();
-            GamePad.Instance.SetBack();
+            if (keyCode == Keycode.Back) //_game.Exit();
+                GamePad.Instance.SetBack();
+
+            if (keyCode == Keycode.VolumeUp)
+                Sound.IncreaseMediaVolume();
+
+            if (keyCode == Keycode.VolumeDown)
+                Sound.DecreaseMediaVolume();
+
             return true;
         }
 
