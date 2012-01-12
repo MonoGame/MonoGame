@@ -274,31 +274,59 @@ namespace Microsoft.Xna.Framework.Graphics
             int framebufferId = -1;
             int renderBufferID = -1;
             
-            // create framebuffer
-            GL11.Oes.GenFramebuffers(1, ref framebufferId);
-            GL11.Oes.BindFramebuffer(ALL11.FramebufferOes, framebufferId);
-
-            //renderBufferIDs = new int[currentRenderTargets];
-            GL11.Oes.GenRenderbuffers(1, ref renderBufferID);
-
-            // attach the texture to FBO color attachment point
-            GL11.Oes.FramebufferTexture2D(ALL11.FramebufferOes, ALL11.ColorAttachment0Oes,
-                ALL11.Texture2D, ID, 0);
-
-            // create a renderbuffer object to store depth info
-            GL11.Oes.BindRenderbuffer(ALL11.RenderbufferOes, renderBufferID);
-            GL11.Oes.RenderbufferStorage(ALL11.RenderbufferOes, ALL11.DepthComponent24Oes,
-                _width, _height);
-
-            // attach the renderbuffer to depth attachment point
-            GL11.Oes.FramebufferRenderbuffer(ALL11.FramebufferOes, ALL11.DepthAttachmentOes,
-                ALL11.RenderbufferOes, renderBufferID);
-
-            ALL11 status = GL11.Oes.CheckFramebufferStatus(ALL11.FramebufferOes);
-
-            if (status != ALL11.FramebufferCompleteOes)
-                throw new Exception("Error creating framebuffer: " + status);
-
+			if (GraphicsDevice.OpenGLESVersion == OpenTK.Graphics.GLContextVersion.Gles2_0)
+            {
+				GL20.GenFramebuffers(1, ref framebufferId);
+				GL20.BindFramebuffer(ALL20.Framebuffer, framebufferId);
+				//renderBufferIDs = new int[currentRenderTargets];
+	            GL20.GenRenderbuffers(1, ref renderBufferID);
+	
+	            // attach the texture to FBO color attachment point
+	            GL20.FramebufferTexture2D(ALL20.Framebuffer, ALL20.ColorAttachment0,
+	                ALL20.Texture2D, ID, 0);
+	
+	            // create a renderbuffer object to store depth info
+	            GL20.BindRenderbuffer(ALL20.Renderbuffer, renderBufferID);
+	            GL20.RenderbufferStorage(ALL20.Renderbuffer, ALL20.DepthComponent24Oes,
+	                _width, _height);
+	
+	            // attach the renderbuffer to depth attachment point
+	            GL20.FramebufferRenderbuffer(ALL20.Framebuffer, ALL20.DepthAttachment,
+	                ALL20.Renderbuffer, renderBufferID);
+	
+	            ALL20 status = GL20.CheckFramebufferStatus(ALL20.Framebuffer);
+	
+	            if (status != ALL20.FramebufferComplete)
+	                throw new Exception("Error creating framebuffer: " + status);	
+				
+			}
+			else
+			{
+	            // create framebuffer
+	            GL11.Oes.GenFramebuffers(1, ref framebufferId);
+	            GL11.Oes.BindFramebuffer(ALL11.FramebufferOes, framebufferId);
+	
+	            //renderBufferIDs = new int[currentRenderTargets];
+	            GL11.Oes.GenRenderbuffers(1, ref renderBufferID);
+	
+	            // attach the texture to FBO color attachment point
+	            GL11.Oes.FramebufferTexture2D(ALL11.FramebufferOes, ALL11.ColorAttachment0Oes,
+	                ALL11.Texture2D, ID, 0);
+	
+	            // create a renderbuffer object to store depth info
+	            GL11.Oes.BindRenderbuffer(ALL11.RenderbufferOes, renderBufferID);
+	            GL11.Oes.RenderbufferStorage(ALL11.RenderbufferOes, ALL11.DepthComponent24Oes,
+	                _width, _height);
+	
+	            // attach the renderbuffer to depth attachment point
+	            GL11.Oes.FramebufferRenderbuffer(ALL11.FramebufferOes, ALL11.DepthAttachmentOes,
+	                ALL11.RenderbufferOes, renderBufferID);
+	
+	            ALL11 status = GL11.Oes.CheckFramebufferStatus(ALL11.FramebufferOes);
+	
+	            if (status != ALL11.FramebufferCompleteOes)
+	                throw new Exception("Error creating framebuffer: " + status);				
+			}
             byte[] imageInfo;
             int sz = 0;
 
@@ -326,19 +354,29 @@ namespace Microsoft.Xna.Framework.Graphics
                 default:
                     throw new NotSupportedException("Texture format");
             }
-
-            GL11.ReadPixels(0, 0, _width, _height, ALL11.Rgba, ALL11.UnsignedByte, imageInfo);
-
-            // Detach the render buffers.
-            GL11.Oes.FramebufferRenderbuffer(ALL11.FramebufferOes, ALL11.DepthAttachmentOes,
-                    ALL11.RenderbufferOes, 0);
-            // delete the RBO's
-            GL11.Oes.DeleteRenderbuffers(1, ref renderBufferID);
-            // delete the FBO
-            GL11.Oes.DeleteFramebuffers(1, ref framebufferId);
-            // Set the frame buffer back to the system window buffer
-            GL11.Oes.BindFramebuffer(ALL11.FramebufferOes, 0);
-
+			
+			if (GraphicsDevice.OpenGLESVersion == OpenTK.Graphics.GLContextVersion.Gles2_0)
+            {
+				GL20.ReadPixels(0,0,_width, _height, ALL20.Rgba, ALL20.UnsignedByte, imageInfo);
+				GL20.FramebufferRenderbuffer(ALL20.Framebuffer, ALL20.DepthAttachment, ALL20.Renderbuffer, 0);
+				GL20.DeleteRenderbuffers(1, ref renderBufferID);
+				GL20.DeleteFramebuffers(1, ref framebufferId);
+				GL20.BindFramebuffer(ALL20.Framebuffer, 0);
+			}
+			else
+			{
+	            GL11.ReadPixels(0, 0, _width, _height, ALL11.Rgba, ALL11.UnsignedByte, imageInfo);
+	
+	            // Detach the render buffers.
+	            GL11.Oes.FramebufferRenderbuffer(ALL11.FramebufferOes, ALL11.DepthAttachmentOes,
+	                    ALL11.RenderbufferOes, 0);
+	            // delete the RBO's
+	            GL11.Oes.DeleteRenderbuffers(1, ref renderBufferID);
+	            // delete the FBO
+	            GL11.Oes.DeleteFramebuffers(1, ref framebufferId);
+	            // Set the frame buffer back to the system window buffer
+	            GL11.Oes.BindFramebuffer(ALL11.FramebufferOes, 0);
+			}
             return imageInfo;
 
         }
