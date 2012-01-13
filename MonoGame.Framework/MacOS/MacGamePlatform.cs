@@ -175,6 +175,10 @@ namespace Microsoft.Xna.Framework
         public override void StartRunLoop()
         {
             _gameWindow.Run(1 / Game.TargetElapsedTime.TotalSeconds);
+			
+			//The first call to MonoMacGameView.Run disables vsync for some reason, so  give
+			//the game a chance to re-enable it here
+			this.Game.applyChanges();
         }
 
         public override bool BeforeUpdate(GameTime gameTime)
