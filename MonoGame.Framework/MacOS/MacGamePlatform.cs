@@ -180,11 +180,11 @@ namespace Microsoft.Xna.Framework
 
         public override void StartRunLoop()
         {
+		_gameWindow.Run(1 / Game.TargetElapsedTime.TotalSeconds);
 		var graphicsDeviceManager = (GraphicsDeviceManager)Game.Services.GetService(typeof(IGraphicsDeviceManager));
-		if (graphicsDeviceManager.SynchronizeWithVerticalRetrace)
-			_gameWindow.Run();
-		else
-			_gameWindow.Run(1 / Game.TargetElapsedTime.TotalSeconds);
+		// This is a hack and it should go in MonoMacGameView.  Until that is done we will set the SwapInterval ourselves
+		// Using DisplayLink does not play nicely with background thread loading.
+		_gameWindow.OpenGLContext.SwapInterval = graphicsDeviceManager.SynchronizeWithVerticalRetrace;
         }
 
         public override bool BeforeUpdate(GameTime gameTime)
