@@ -180,7 +180,11 @@ namespace Microsoft.Xna.Framework
 
         public override void StartRunLoop()
         {
-            _gameWindow.Run(1 / Game.TargetElapsedTime.TotalSeconds);
+		var graphicsDeviceManager = (GraphicsDeviceManager)Game.Services.GetService(typeof(IGraphicsDeviceManager));
+		if (graphicsDeviceManager.SynchronizeWithVerticalRetrace)
+			_gameWindow.Run();
+		else
+			_gameWindow.Run(1 / Game.TargetElapsedTime.TotalSeconds);
         }
 
         public override bool BeforeUpdate(GameTime gameTime)
