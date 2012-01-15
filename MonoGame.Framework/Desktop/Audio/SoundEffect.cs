@@ -45,6 +45,8 @@ using Microsoft.Xna;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 
+using OpenTK.Audio.OpenAL;
+
 namespace Microsoft.Xna.Framework.Audio
 {
     public sealed class SoundEffect : IDisposable
@@ -52,11 +54,11 @@ namespace Microsoft.Xna.Framework.Audio
 		private Sound _sound;
 		private string _name = "";
 		private string _filename = "";
-		private byte[] _data;
+		internal byte[] _data;
 		
 		internal float Rate { get; set; }
 
-		//internal ALFormat Format { get; set; }
+		internal ALFormat Format { get; set; }
 
 		internal int Size { get; set; }
 		
@@ -69,8 +71,26 @@ namespace Microsoft.Xna.Framework.Audio
 			  throw new FileNotFoundException("Supported Sound Effect formats are wav, mp3, acc, aiff");
 			}
 			
-			_sound = new Sound(_filename, 1.0f, false);
+			//_sound = new Sound(_filename, 1.0f, false);
 			_name = Path.GetFileNameWithoutExtension(fileName);
+            ALFormat format;
+            int size;
+            int freq;
+            byte[] data;
+            Stream s;
+
+            try
+            {
+                s = File.OpenRead(fileName);
+            }
+            catch (IOException e)
+            {
+                throw new Content.ContentLoadException("Could not load audio data", e);
+            }
+
+            data = LoadAudioStream(s, 1.0f, false);
+
+            s.Close();			
 		}
 		
 		//SoundEffect from playable audio data
@@ -78,7 +98,21 @@ namespace Microsoft.Xna.Framework.Audio
 		{
 			_data = data;
 			_name = name;
-			_sound = new Sound(_data, 1.0f, false);
+			
+            Stream s;
+
+            try
+            {
+                s = new MemoryStream(data);
+            }
+            catch (IOException e)
+            {
+                throw new Content.ContentLoadException("Could not load audio data", e);
+            }
+			
+			//_sound = new Sound(_data, 1.0f, false);
+            _data = LoadAudioStream(s, 1.0f, false);
+
 		}
 		
 		public SoundEffect(byte[] buffer, int sampleRate, AudioChannels channels)
@@ -110,126 +144,152 @@ namespace Microsoft.Xna.Framework.Audio
 			writer.Close();
 			mStream.Close();
 			
-			_data = mStream.ToArray();
+			//_data = mStream.ToArray();
 			_name = "";
-			_sound = new Sound(_data, 1.0f, false);
+			_data = LoadAudioStream(mStream, 1.0f, false);
+			//_sound = new Sound(_data, 1.0f, false);
 		}
 		
+        byte[] LoadAudioStream(Stream s, float volume, bool looping)
+        {
+            ALFormat format;
+            int size;
+            int freq;
+            byte[] data;
+
+            data = AudioLoader.Load(s, out format, out size, out freq);
+            //s.Close();
+
+            Format = format;
+            Size = size;
+            Rate = freq;
+            return data;
+
+            //Initialize(data, format, size, freq, volume, looping);
+        }
+
+        TimeSpan _duration = TimeSpan.Zero;
+
         public bool Play()
-        {				
-			return Play(MasterVolume, 0.0f, 0.0f);
+        {
+            return Play(MasterVolume, 1.0f, 0.0f);
         }
 
         public bool Play(float volume, float pitch, float pan)
         {
-			if ( MasterVolume > 0.0f )
-			{
-				SoundEffectInstance instance = CreateInstance();
-				instance.Volume = volume;
-				instance.Pitch = pitch;
-				instance.Pan = pan;
-				instance.Play();
-				return instance.Sound.Playing;
-			}
-			return false;
+            if (MasterVolume > 0.0f)
+            {
+                SoundEffectInstance instance = CreateInstance();
+                instance.Volume = volume;
+                instance.Pitch = pitch;
+                instance.Pan = pan;
+                instance.Play();
+            }
+            return false;
         }
-		
-		public TimeSpan Duration 
-		{ 
-			get
-			{
-				if ( _sound != null )
-				{
-					return new TimeSpan(0,0,(int)_sound.Duration);
-				}
-				else
-				{
-					return new TimeSpan(0);
-				}
-			}
-		}
+
+        public TimeSpan Duration
+        {
+            get
+            {
+
+                return _duration;
+            }
+        }
 
         public string Name
         {
             get
             {
-				return _name;
+                return _name;
             }
-			set {
-				_name = value;
-			}
+            set
+            {
+                _name = value;
+            }
         }
-		
-		public SoundEffectInstance CreateInstance ()
-		{
-			var instance = new SoundEffectInstance();
-			instance.Sound = _sound;
-			return instance;
-		}
-		
-		#region IDisposable Members
+
+        public SoundEffectInstance CreateInstance()
+        {
+            var instance = new SoundEffectInstance(this);
+            return instance;
+        }
+
+        #region IDisposable Members
 
         public void Dispose()
         {
-			_sound.Dispose();
+            //_sound.Dispose ();
         }
 
         #endregion
-		
-		static float _masterVolume = 1.0f;
-		public static float MasterVolume 
-		{ 
-			get
-			{
-				return _masterVolume;
-			}
-			set
-			{
-				_masterVolume = value;	
-			}
-		}
 
-		static float _distanceScale = 1f;
+        static float _masterVolume = 1.0f;
 
-		public static float DistanceScale {
-			get {
-				return _distanceScale;
-			}
-			set {
-				if (value <= 0f) {
-					throw new ArgumentOutOfRangeException ("value of DistanceScale");
-				}
-				_distanceScale = value;
-			}
-		}
+        public static float MasterVolume
+        {
+            get
+            {
+                return _masterVolume;
+            }
+            set
+            {
+                _masterVolume = value;
+            }
+        }
 
-		static float _dopplerScale = 1f;
+        static float _distanceScale = 1f;
 
-		public static float DopplerScale {
-			get {
-				return _dopplerScale;
-			}
-			set {
-				// As per documenation it does not look like the value can be less than 0
-				//   although the documentation does not say it throws an error we will anyway
-				//   just so it is like the DistanceScale
-				if (value < 0f) {
-					throw new ArgumentOutOfRangeException ("value of DopplerScale");
-				}
-				_dopplerScale = value;
-			}
-		}
+        public static float DistanceScale
+        {
+            get
+            {
+                return _distanceScale;
+            }
+            set
+            {
+                if (value <= 0f)
+                {
+                    throw new ArgumentOutOfRangeException("value of DistanceScale");
+                }
+                _distanceScale = value;
+            }
+        }
 
-		static float speedOfSound = 343.5f;
+        static float _dopplerScale = 1f;
 
-		public static float SpeedOfSound {
-			get {
-				return speedOfSound;
-			}
-			set {
-				speedOfSound = value;
-			}
-		}						
+        public static float DopplerScale
+        {
+            get
+            {
+                return _dopplerScale;
+            }
+            set
+            {
+                // As per documenation it does not look like the value can be less than 0
+                //   although the documentation does not say it throws an error we will anyway
+                //   just so it is like the DistanceScale
+                if (value < 0f)
+                {
+                    throw new ArgumentOutOfRangeException("value of DopplerScale");
+                }
+                _dopplerScale = value;
+            }
+        }
+
+        static float speedOfSound = 343.5f;
+
+        public static float SpeedOfSound
+        {
+            get
+            {
+                return speedOfSound;
+            }
+            set
+            {
+                speedOfSound = value;
+            }
+        }		
     }
 }
 
