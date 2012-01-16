@@ -378,28 +378,31 @@ namespace Microsoft.Xna.Framework.Graphics
 				case DisplayOrientation.LandscapeLeft:
                 {
 					GL11.Rotate(-90, 0, 0, 1);
+					GL11.Ortho(0, this.graphicsDevice.Viewport.Height, this.graphicsDevice.Viewport.Width, 0, -1, 1);
 					break;
 				}
 				
 				case DisplayOrientation.LandscapeRight:
                 {
 					GL11.Rotate(90, 0, 0, 1);					
+					GL11.Ortho(0, this.graphicsDevice.Viewport.Height, this.graphicsDevice.Viewport.Width, 0, -1, 1);
 					break;
 				}
 				
 				case DisplayOrientation.PortraitUpsideDown:
                 {
 					GL11.Rotate(180, 0, 0, 1); 
+					GL11.Ortho(0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height, 0, -1, 1);
 					break;
 				}
 				
 				default:
 				{
+					GL11.Ortho(0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height, 0, -1, 1);
 					break;
 				}
 			}
 			
-			GL11.Ortho(0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height, 0, -1, 1);
 #endif			
 			
 			// Enable Scissor Tests if necessary
