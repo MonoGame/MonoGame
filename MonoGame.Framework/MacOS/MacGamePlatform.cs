@@ -76,6 +76,7 @@ using MonoMac.AppKit;
 using MonoMac.Foundation;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.GamerServices;
 
 namespace Microsoft.Xna.Framework
 {
@@ -193,7 +194,7 @@ namespace Microsoft.Xna.Framework
 		soundControllerInstance.Update();
 		if (!_isShouldDraw)
 				return false;
-            if (IsPlayingVideo)
+            if (IsPlayingVideo || Guide.isVisible)
                 return false;
             return true;
         }
@@ -213,7 +214,7 @@ namespace Microsoft.Xna.Framework
         {
 		if (!_isShouldDraw)
 				return false;
-            if (IsPlayingVideo)
+            if (IsPlayingVideo || Guide.isVisible)
                 return false;
             return true;
         }
