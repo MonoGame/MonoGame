@@ -295,14 +295,9 @@ namespace Microsoft.Xna.Framework.Content
             return result;
         }
 
-        internal int Read7BitEncodedInt()
+        internal new int Read7BitEncodedInt()
         {
             return base.Read7BitEncodedInt();
-        }
-
-        public void Dispose()
-        {
-            base.Dispose(true);
         }
     }
 }
