@@ -319,7 +319,7 @@ namespace Microsoft.Xna.Framework
             }
             position.X = (position.X / Width) * _game.GraphicsDevice.Viewport.Width;
             position.Y = (position.Y / Height) * _game.GraphicsDevice.Viewport.Height;
-            Android.Util.Log.Info("MonoGameInfo", String.Format("Touch {0}x{1}", position.X, position.Y));
+            //Android.Util.Log.Info("MonoGameInfo", String.Format("Touch {0}x{1}", position.X, position.Y));
         }
 
         public override bool OnTouchEvent(MotionEvent e)
