@@ -87,13 +87,26 @@ namespace Microsoft.Xna.Framework.Input
             public void OnSensorChanged(SensorEvent e)
             {
                 try {
-                    if (e != null && e.Values != null)
+					
+					if (e != null && e.Sensor.Type == SensorType.Accelerometer) 
 					{
-						_accelerometerVector.X = e.Values[0];
-						_accelerometerVector.Y = e.Values[1];
-						_accelerometerVector.Z = e.Values[2];
-                        _state.Acceleration = _accelerometerVector;
-					}
+     				    var values = e.Values;
+				        try 
+						{
+				            if (values != null && values.Count == 3) {
+				                _accelerometerVector.X = values[0];
+				                _accelerometerVector.Y = values[1];
+				                _accelerometerVector.Z = values[2];  
+							    _state.Acceleration = _accelerometerVector;
+				            }
+				        } 
+						finally 
+						{
+				            IDisposable d = values as IDisposable;
+				            if (d != null)
+				                d.Dispose ();
+				        }
+    				}                
                 }
                 catch (NullReferenceException ex) {
                     //Occassionally an NullReferenceException is thrown when accessing e.Values??

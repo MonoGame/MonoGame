@@ -69,7 +69,7 @@ namespace Lidgren.Network
 		{
 			var sha = GetHashAlgorithm();
 
-			byte[] tmp = Encoding.ASCII.GetBytes(username + ":" + password);
+			byte[] tmp = Encoding.UTF8.GetBytes(username + ":" + password);
 			byte[] innerHash = sha.ComputeHash(tmp);
 
 			byte[] total = new byte[innerHash.Length + salt.Length];
