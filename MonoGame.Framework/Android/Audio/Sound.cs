@@ -109,5 +109,19 @@ namespace Microsoft.Xna.Framework.Audio
         {
             throw new NotImplementedException();
         }
+
+        internal static void IncreaseMediaVolume()
+        {
+            AudioManager audioManager = (AudioManager)Game.Activity.GetSystemService(Context.AudioService);
+
+            audioManager.AdjustStreamVolume(Stream.Music, Adjust.Raise, VolumeNotificationFlags.ShowUi);
+        }
+
+        internal static void DecreaseMediaVolume()
+        {
+            AudioManager audioManager = (AudioManager)Game.Activity.GetSystemService(Context.AudioService);
+
+            audioManager.AdjustStreamVolume(Stream.Music, Adjust.Lower, VolumeNotificationFlags.ShowUi);
+        }
     }
 }
