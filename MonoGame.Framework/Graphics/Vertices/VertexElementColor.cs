@@ -84,17 +84,17 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 // ARGB
                 uint _packedValue = 0;
-                _packedValue = (_packedValue & 0xffffff00) | B;
+                _packedValue = (_packedValue & 0xffffff00) | R;
                 _packedValue = (_packedValue & 0xffff00ff) | ((uint)(G << 8));
-                _packedValue = (_packedValue & 0xff00ffff) | ((uint)(R << 16));
+                _packedValue = (_packedValue & 0xff00ffff) | ((uint)(B << 16));
                 _packedValue = (_packedValue & 0x00ffffff) | ((uint)(A << 24));
                 return _packedValue;
             }
             set
             {
-                B = (byte)value;
+                R = (byte)value;
                 G = (byte)(value >> 8);
-                R = (byte)(value >> 16);
+                B = (byte)(value >> 16);
                 A = (byte)(value >> 24);
             }
         }
