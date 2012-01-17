@@ -75,6 +75,8 @@ using Microsoft.Xna.Framework.Graphics;
 using MonoMac.AppKit;
 using MonoMac.Foundation;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.GamerServices;
 
 namespace Microsoft.Xna.Framework
 {
@@ -83,11 +85,16 @@ namespace Microsoft.Xna.Framework
         private MacGameNSWindow _mainWindow;
         private GameWindow _gameWindow;
         private bool _wasResizeable;
+	private OpenALSoundController soundControllerInstance = null;
+	private bool _isShouldDraw = true;
 
         public MacGamePlatform(Game game) :
             base(game)
         {
             game.Services.AddService(typeof(MacGamePlatform), this);
+
+			// Setup our OpenALSoundController to handle our SoundBuffer pools
+			soundControllerInstance = OpenALSoundController.GetInstance;
 
             RectangleF frame = new RectangleF(
                 0, 0,
@@ -174,27 +181,64 @@ namespace Microsoft.Xna.Framework
 
         public override void StartRunLoop()
         {
-            _gameWindow.Run(1 / Game.TargetElapsedTime.TotalSeconds);
+		_gameWindow.Run(1 / Game.TargetElapsedTime.TotalSeconds);
+		var graphicsDeviceManager = (GraphicsDeviceManager)Game.Services.GetService(typeof(IGraphicsDeviceManager));
+		// This is a hack and it should go in MonoMacGameView.  Until that is done we will set the SwapInterval ourselves
+		// Using DisplayLink does not play nicely with background thread loading.
+		_gameWindow.OpenGLContext.SwapInterval = graphicsDeviceManager.SynchronizeWithVerticalRetrace;
         }
 
         public override bool BeforeUpdate(GameTime gameTime)
         {
-            if (IsPlayingVideo)
+		// Update our OpenAL sound buffer pools
+		soundControllerInstance.Update();
+		if (!_isShouldDraw)
+				return false;
+            if (IsPlayingVideo || Guide.isVisible)
                 return false;
             return true;
         }
+
+		internal bool IsCanUpdateDraw {
+			get {
+				return _isShouldDraw;
+			}
+			set {
+				if (_isShouldDraw != value) {
+					_isShouldDraw = value;
+				}
+			}
+		}
 
         public override bool BeforeDraw(GameTime gameTime)
         {
-            if (IsPlayingVideo)
+		if (!_isShouldDraw)
+				return false;
+            if (IsPlayingVideo || Guide.isVisible)
                 return false;
             return true;
         }
 
+		public void EnterBackground ()
+		{
+			_isShouldDraw = false;
+			IsActive = false;
+//			if (Deactivated != null)
+//				Deactivated.Invoke (this, null);
+		}
+
+		public void EnterForeground ()
+		{
+			_isShouldDraw = true;
+			IsActive = true;
+//			if (Activated != null)
+//				Activated.Invoke (this, null);
+		}
+
         public override void EnterFullScreen()
         {
-            bool wasActive = IsActive;
-            IsActive = false;
+            bool wasActive = IsCanUpdateDraw;
+            IsCanUpdateDraw = false;
 
             // I will leave this here just in case someone can figure out how
             // to do a full screen with this and still get Alt + Tab to friggin
@@ -221,7 +265,7 @@ namespace Microsoft.Xna.Framework
             Window.Window.HidesOnDeactivate = true;
             Mouse.ResetMouse();
 
-            IsActive = wasActive;
+            IsCanUpdateDraw = wasActive;
         }
 
         public override void ExitFullScreen()
@@ -231,8 +275,8 @@ namespace Microsoft.Xna.Framework
             // Changing window style forces a redraw. Some games
             // have fail-logic and toggle fullscreen in their draw function,
             // so temporarily become inactive so it won't execute.
-            bool wasActive = IsActive;
-            IsActive = false;
+            bool wasActive = IsCanUpdateDraw;
+            IsCanUpdateDraw = false;
 
             // I will leave this here just in case someone can figure out how to do
             //  a full screen with this and still get Alt + Tab to friggin work.
@@ -258,7 +302,7 @@ namespace Microsoft.Xna.Framework
             _mainWindow.HidesOnDeactivate = false;
             Mouse.ResetMouse();
 
-            IsActive = wasActive;
+            IsCanUpdateDraw = wasActive;
         }
 
         protected override void OnIsMouseVisibleChanged()
@@ -327,5 +371,15 @@ namespace Microsoft.Xna.Framework
 
             return _mainWindow.Frame.Height - contentRect.Height;
         }
+
+		public override void BeginScreenDeviceChange (bool willBeFullScreen)
+		{
+
+		}
+
+		public override void EndScreenDeviceChange (string screenDeviceName, int clientWidth,int clientHeight)
+		{
+
+		}
     }
 }

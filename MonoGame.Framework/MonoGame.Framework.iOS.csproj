@@ -154,7 +154,6 @@
     <Compile Include="Input\Mouse.cs" />
     <Compile Include="Input\MouseState.cs" />
     <Compile Include="Audio\AudioChannels.cs" />
-    <Compile Include="Audio\SoundEffect.cs" />
     <Compile Include="Audio\SoundState.cs" />
     <Compile Include="Media\MediaPlayer.cs" />
     <Compile Include="Media\MediaState.cs" />
@@ -199,7 +198,6 @@
     <Compile Include="Input\KeyboardState.cs" />
     <Compile Include="Input\Keys.cs" />
     <Compile Include="Input\Keyboard.cs" />
-    <Compile Include="Audio\SoundEffectInstance.cs" />
     <Compile Include="Input\KeyState.cs" />
     <Compile Include="IUpdateable.cs" />
     <Compile Include="Net\NetworkSessionJoinError.cs" />
@@ -335,7 +333,6 @@
     <Compile Include="iOS\Input\GamePad.cs" />
     <Compile Include="iOS\IOSGameWindow.cs" />
     <Compile Include="iOS\PowerStatus.cs" />
-    <Compile Include="iOS\Audio\Sound.cs" />
     <Compile Include="iOS\Media\MediaSource.cs" />
     <Compile Include="iOS\Media\MediaLibrary.cs" />
     <Compile Include="iOS\Input\Accelerometer.cs" />
@@ -366,6 +363,21 @@
     <Compile Include="iOS\iOSGamePlatform.cs" />
     <Compile Include="iOS\iOSGameViewController.cs" />
     <Compile Include="iOS\OrientationConverter.cs" />
+    <Compile Include="MacOS\Audio\OALSoundBuffer.cs">
+      <Link>iOS\Audio\OALSoundBuffer.cs</Link>
+    </Compile>
+    <Compile Include="MacOS\Audio\OpenALSoundController.cs">
+      <Link>iOS\Audio\OpenALSoundController.cs</Link>
+    </Compile>
+    <Compile Include="MacOS\Audio\OpenALSupport.cs">
+      <Link>iOS\Audio\OpenALSupport.cs</Link>
+    </Compile>
+    <Compile Include="MacOS\Audio\SoundEffect.cs">
+      <Link>iOS\Audio\SoundEffect.cs</Link>
+    </Compile>
+    <Compile Include="MacOS\Audio\SoundEffectInstance.cs">
+      <Link>iOS\Audio\SoundEffectInstance.cs</Link>
+    </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
