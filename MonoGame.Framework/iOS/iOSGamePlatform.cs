@@ -358,6 +358,15 @@ namespace Microsoft.Xna.Framework
         }
 
         #endregion Notification Handling
+		public override void BeginScreenDeviceChange (bool willBeFullScreen)
+		{
+
+		}
+
+		public override void EndScreenDeviceChange (string screenDeviceName, int clientWidth,int clientHeight)
+		{
+
+		}		
     }
 }
 

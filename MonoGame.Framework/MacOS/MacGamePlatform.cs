@@ -371,5 +371,15 @@ namespace Microsoft.Xna.Framework
 
             return _mainWindow.Frame.Height - contentRect.Height;
         }
+
+		public override void BeginScreenDeviceChange (bool willBeFullScreen)
+		{
+
+		}
+
+		public override void EndScreenDeviceChange (string screenDeviceName, int clientWidth,int clientHeight)
+		{
+
+		}
     }
 }
