@@ -75,7 +75,29 @@ namespace Microsoft.Xna.Framework.Graphics
 				return false;
 			}
 			return (this == ((VertexElementColor)obj));
-		}		
+		}
+
+        public UInt32 PackedValue
+        {
+            get
+            {
+
+                // ARGB
+                uint _packedValue = 0;
+                _packedValue = (_packedValue & 0xffffff00) | R;
+                _packedValue = (_packedValue & 0xffff00ff) | ((uint)(G << 8));
+                _packedValue = (_packedValue & 0xff00ffff) | ((uint)(B << 16));
+                _packedValue = (_packedValue & 0x00ffffff) | ((uint)(A << 24));
+                return _packedValue;
+            }
+            set
+            {
+                R = (byte)value;
+                G = (byte)(value >> 8);
+                B = (byte)(value >> 16);
+                A = (byte)(value >> 24);
+            }
+        }
 	}
 
 }

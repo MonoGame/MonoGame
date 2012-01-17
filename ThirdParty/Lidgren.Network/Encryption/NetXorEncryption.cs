@@ -24,7 +24,7 @@ namespace Lidgren.Network
 		/// </summary>
 		public NetXorEncryption(string key)
 		{
-			m_key = Encoding.ASCII.GetBytes(key);
+			m_key = Encoding.UTF8.GetBytes(key);
 		}
 
 		/// <summary>

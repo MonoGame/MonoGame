@@ -79,7 +79,11 @@ namespace Microsoft.Xna.Framework.Input.Touch
         {
             get
             {
+#if ANDROID				
+				return (int)Game.Activity.Resources.DisplayMetrics.HeightPixels;
+#else
 				throw new NotImplementedException();
+#endif
             }
             set
             {
@@ -96,7 +100,11 @@ namespace Microsoft.Xna.Framework.Input.Touch
         {
             get
             {
+#if ANDROID				
+				return (int)Game.Activity.Resources.DisplayMetrics.WidthPixels;
+#else
 				throw new NotImplementedException();
+#endif				
             }
             set
             {

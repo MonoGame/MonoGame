@@ -48,6 +48,7 @@ using Android.Content.PM;
 using Android.Content.Res;
 using Android.Util;
 using Android.Views;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using OpenTK.Platform.Android;
 
@@ -117,7 +118,15 @@ namespace Microsoft.Xna.Framework
         {
             Keyboard.KeyDown(keyCode);
             // we need to handle the Back key here because it doesnt work any other way
-            if (keyCode == Keycode.Back) _game.Exit();
+            if (keyCode == Keycode.Back) //_game.Exit();
+                GamePad.Instance.SetBack();
+
+            if (keyCode == Keycode.VolumeUp)
+                Sound.IncreaseMediaVolume();
+
+            if (keyCode == Keycode.VolumeDown)
+                Sound.DecreaseMediaVolume();
+
             return true;
         }
 
@@ -149,7 +158,7 @@ namespace Microsoft.Xna.Framework
                 GraphicsDevice.OpenGLESVersion = GLContextVersion;
 				base.CreateFrameBuffer();
 		    }
-			
+			_game.GraphicsDevice.Initialize();
 		}
 	
 
@@ -299,17 +308,19 @@ namespace Microsoft.Xna.Framework
 			return OnTouchEvent(e);
             }
 		#endregion
-		
-		internal void UpdateTouchPosition(ref Vector2 position)
-		{
-			if (this._game.Window.CurrentOrientation == DisplayOrientation.LandscapeRight)
-			{
-				// we need to fudge the position
-				position.X = this.Width - position.X;
-				position.Y = this.Height - position.Y;
+
+        internal void UpdateTouchPosition(ref Vector2 position)
+        {
+            if (this._game.Window.CurrentOrientation == DisplayOrientation.LandscapeRight)
+            {
+                // we need to fudge the position
+                position.X = this.Width - position.X;
+                position.Y = this.Height - position.Y;
             }
-			Android.Util.Log.Info("MonoGameInfo", String.Format("Touch {0}x{1}", position.X, position.Y));
-            }
+            position.X = (position.X / Width) * _game.GraphicsDevice.Viewport.Width;
+            position.Y = (position.Y / Height) * _game.GraphicsDevice.Viewport.Height;
+            //Android.Util.Log.Info("MonoGameInfo", String.Format("Touch {0}x{1}", position.X, position.Y));
+        }
 
         public override bool OnTouchEvent(MotionEvent e)
         {			
