@@ -365,6 +365,7 @@ namespace Microsoft.Xna.Framework
 
         protected virtual void Draw(GameTime gameTime)
         {
+            PrimaryThreadLoader.DoLoads();
             _drawables.ForEachFilteredItem(d => d.Draw(gameTime));
         }
 
