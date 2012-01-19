@@ -47,6 +47,8 @@ using MonoTouch.OpenGLES;
 #endif
 #if ANDROID
 using Android.Opengl;
+using Android.Views;
+using Microsoft.Xna.Framework.Content;
 using OpenTK.Graphics;
 #endif
 
@@ -167,6 +169,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 GL11.Disable(ALL11.DepthTest);
                 GL11.TexEnv(ALL11.TextureEnv, ALL11.TextureEnvMode, (int)ALL11.BlendSrc);
             }
+            VboIdArray = 0;
+            VboIdElement = 0;
         }
 
         public BlendState BlendState
@@ -368,6 +372,15 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             _viewport.Width = DisplayMode.Width;
             _viewport.Height = DisplayMode.Height;
+
+            if (ResourcesLost)
+            {
+                ContentManager.ReloadAllContent();
+                ResourcesLost = false;
+            }
+
+            if(DeviceReset != null)
+                DeviceReset(null, new EventArgs());
         }
 
         public void Reset(Microsoft.Xna.Framework.Graphics.PresentationParameters presentationParameters)
@@ -769,6 +782,8 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         public IndexBuffer Indices { set { SetIndexBuffer(value); } }
+
+        public bool ResourcesLost { get; set; }
 
         public void DrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int minVertexIndex, int numbVertices, int startIndex, int primitiveCount)
         {

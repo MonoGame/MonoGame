@@ -97,13 +97,29 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		internal Texture2D(GraphicsDevice graphicsDevice, ESImage theImage)
 		{
-			texture = theImage;
-			_width = texture.ImageWidth;
-			_height = texture.ImageHeight;
-			_format = texture.Format;
-			_textureId = (int)theImage.Name;
+			SetInfoFromESImage(theImage);
 		    this.graphicsDevice = graphicsDevice;
+
+            Disposing += Texture2D_Disposing;
 		}
+
+        void SetInfoFromESImage(ESImage image)
+        {
+            texture = image;
+            _width = texture.ImageWidth;
+            _height = texture.ImageHeight;
+            _format = texture.Format;
+            _textureId = (int)image.Name;
+        }
+
+        void Texture2D_Disposing(object sender, EventArgs e)
+        {
+            if (texture != null)
+            {
+                texture.Dispose();
+                texture = null;
+            }
+        }
 		
 		public Texture2D(GraphicsDevice graphicsDevice, int width, int height) : 
 			this (graphicsDevice, width, height, false, SurfaceFormat.Color)
@@ -143,6 +159,8 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
             	generateOpenGLTexture();
 #endif
+
+            Disposing += Texture2D_Disposing;
         }
 		
 		private void generateOpenGLTexture() 
@@ -229,6 +247,22 @@ namespace Microsoft.Xna.Framework.Graphics
 			Texture2D result = new Texture2D(graphicsDevice, theTexture);
 			
 			return result;
+        }
+
+        internal void Reload(Stream textureStream)
+        {
+            texture.Dispose();
+            texture = null;
+
+            Bitmap image = BitmapFactory.DecodeStream(textureStream);
+
+            if (image == null)
+            {
+                throw new ContentLoadException("Error loading Texture2D Stream");
+            }
+
+            ESImage esImage = new ESImage(image, graphicsDevice.PreferedFilter);
+            SetInfoFromESImage(esImage);
         }
 
         public static Texture2D FromFile(GraphicsDevice graphicsDevice, Stream textureStream, int numberBytes)
