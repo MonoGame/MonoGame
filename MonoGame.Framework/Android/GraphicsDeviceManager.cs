@@ -62,8 +62,6 @@ namespace Microsoft.Xna.Framework
             {
                 throw new ArgumentNullException("Game Cannot Be Null");
             }
-
-            Game.Activity.RequestWindowFeature(WindowFeatures.NoTitle);
            
 			_game = game;
 			_preferredBackBufferHeight = game.Window.ClientBounds.Height;
@@ -125,7 +123,7 @@ namespace Microsoft.Xna.Framework
 				h (this, e);
 		}
 
-		internal void OnDeviceReset (EventArgs e)
+		internal void OnDeviceReset (object o, EventArgs e)
 		{
 			var h = DeviceReset;
 			if (h != null)
@@ -161,6 +159,8 @@ namespace Microsoft.Xna.Framework
 			{
 				_graphicsDevice.PreferedFilter = All.Nearest;
 			}
+
+		    _graphicsDevice.DeviceReset += OnDeviceReset;
 		}
 		
         public void ToggleFullScreen()
@@ -186,12 +186,17 @@ namespace Microsoft.Xna.Framework
             {
                 if (IsFullScreen != value) {
                     _graphicsDevice.PresentationParameters.IsFullScreen = value;
-                    if (IsFullScreen)
-                        Game.Activity.Window.SetFlags(WindowManagerFlags.Fullscreen, WindowManagerFlags.Fullscreen);
-                    else
-                        Game.Activity.Window.SetFlags(WindowManagerFlags.ForceNotFullscreen, WindowManagerFlags.ForceNotFullscreen);
+                    ForceSetFullScreen();
                 }
             }
+        }
+
+        internal void ForceSetFullScreen()
+        {
+            if (IsFullScreen)
+                Game.Activity.Window.SetFlags(WindowManagerFlags.Fullscreen, WindowManagerFlags.Fullscreen);
+            else
+                Game.Activity.Window.SetFlags(WindowManagerFlags.ForceNotFullscreen, WindowManagerFlags.ForceNotFullscreen);
         }
 
         public bool PreferMultiSampling
