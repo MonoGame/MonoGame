@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Drawing;
 
 using MonoMac.Foundation;
 using MonoMac.AppKit;
@@ -15,21 +16,36 @@ namespace Microsoft.Xna.Framework.GamerServices
 
 			NSApplication NSApp = NSApplication.SharedApplication;
 			NSWindow gameWindow = NSApp.MainWindow;
+
 			SigninController controller = new SigninController ();
 
 			NSWindow window = controller.Window;
-			
+
+			// Something has happened with BeginSheet and needs to be looked into.
+			// Until then just use modal for now.
+			RectangleF frame = window.Frame;
+			PointF location = new PointF (gameWindow.Frame.Bottom, gameWindow.Frame.Left);
+			location = new PointF(gameWindow.Frame.Location.X, gameWindow.Frame.Location.Y);
+
+			window.SetFrameOrigin(location);
 			NSApp.BeginInvokeOnMainThread(delegate {
 				Guide.isVisible = true;
-				NSApp.BeginSheet (window, gameWindow);
+//				NSApp.BeginSheet (window, gameWindow);
 				NSApp.RunModalForWindow (window);
-				// sheet is up here.....
-	
-				NSApp.EndSheet (window);
+//				// sheet is up here.....
+//
+//				NSApp.EndSheet (window);
 				window.OrderOut (gameWindow);
 				Guide.isVisible = false;
-				
+//
 			});
+			//window.MakeKeyAndOrderFront(gameWindow);
+//				SignedInGamer sig = new SignedInGamer();
+//				sig.DisplayName = "MonoMac Gamer";
+//				sig.Gamertag = "MonoMac Gamer";
+//				sig.InternalIdentifier = Guid.NewGuid();
+//
+//				Gamer.SignedInGamers.Add(sig);
 		}
 
 		internal static List<MonoGameLocalGamerProfile> DeserializeProfiles ()

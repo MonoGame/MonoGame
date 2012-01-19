@@ -39,6 +39,8 @@
 // #endregion License
 // 
 using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace Microsoft.Xna.Framework.Audio
 {
@@ -46,7 +48,37 @@ namespace Microsoft.Xna.Framework.Audio
 	{
 		public AudioEmitter ()
 		{
+			DopplerScale = 1.0f;
+			Forward = Vector3.Forward;
+			Position = Vector3.Zero;
+			Up = Vector3.Up;
+			Velocity = Vector3.Zero;
 		}
+		
+		public float DopplerScale {
+			get;
+			set;
+		}
+
+		public Vector3 Forward {
+			get;
+			set;
+		}
+
+		public Vector3 Position {
+			get;
+			set;
+		}
+
+		public Vector3 Up {
+			get;
+			set;
+		}
+
+		public Vector3 Velocity {
+			get;
+			set;
+		}
+
 	}
 }
-
