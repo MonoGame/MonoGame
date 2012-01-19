@@ -26,7 +26,7 @@
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DebugSymbols>true</DebugSymbols>
-    <DefineConstants>TRACE;DEBUG;WINDOWS</DefineConstants>
+    <DefineConstants>TRACE;WINDOWS</DefineConstants>
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
@@ -48,7 +48,7 @@
     <RegisterForComInterop>False</RegisterForComInterop>
     <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
     <BaseAddress>4194304</BaseAddress>
-    <DefineConstants>TRACE;DEBUG;WINDOWS</DefineConstants>
+    <DefineConstants>TRACE;WINDOWS</DefineConstants>
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -98,10 +98,11 @@
       <HintPath>..\ThirdParty\GamepadConfig\Tao.Sdl.dll</HintPath>
     </Reference>
     <Reference Include="OpenTK">
-      <HintPath>..\..\OpenTK\Binaries\OpenTK\Release\OpenTK.dll</HintPath>
+      <HintPath>..\..\OpenTK1.0\Binaries\OpenTK\Release\OpenTK.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Desktop\Audio\SoundEffectInstance.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="GamePlatform.cs" />
     <Compile Include="Input\GamePadDeadZone.cs" />
@@ -120,8 +121,6 @@
     <Compile Include="Audio\InstancePlayLimitException.cs" />
     <Compile Include="Audio\NoAudioHardwareException.cs" />
     <Compile Include="Audio\SoundBank.cs" />
-    <Compile Include="Audio\SoundEffect.cs" />
-    <Compile Include="Audio\SoundEffectInstance.cs" />
     <Compile Include="Audio\SoundState.cs" />
     <Compile Include="Audio\WaveBank.cs" />
     <Compile Include="Content\ContentManager.cs" />
@@ -181,7 +180,6 @@
     <Compile Include="Graphics\Effect\EffectTechniqueCollection.cs" />
     <Compile Include="Graphics\Effect\SpriteEffect.cs" />
     <Compile Include="Graphics\Effect\SpriteEffectCode.cs" />
-    <Compile Include="Graphics\GraphicsExtensions.cs" />
     <Compile Include="Graphics\ImageEx.cs" />
     <Compile Include="Graphics\PackedVector\IPackedVector.cs" />
     <Compile Include="Graphics\PackedVector\Short2.cs" />
@@ -195,7 +193,6 @@
     <Compile Include="Graphics\States\DepthFormat.cs" />
     <Compile Include="Graphics\States\DepthStencilState.cs" />
     <Compile Include="Graphics\States\FillMode.cs" />
-    <Compile Include="Graphics\States\GLStateManager.cs" />
     <Compile Include="Graphics\States\RasterizerState.cs" />
     <Compile Include="Graphics\States\SamplerState.cs" />
     <Compile Include="Graphics\States\SaveStateMode.cs" />
@@ -391,6 +388,12 @@
     <Compile Include="Windows\Input\MouseState.cs" />
     <Compile Include="Audio\XactClip.cs" />
     <Compile Include="Audio\XactSound.cs" />
+    <Compile Include="Desktop\Graphics\States\GLStateManager.cs" />
+    <Compile Include="Desktop\Graphics\GraphicsExtensions.cs" />
+    <Compile Include="Desktop\Graphics\Vertices\VertexDeclaration.cs" />
+    <Compile Include="Desktop\Audio\OALSoundBuffer.cs" />
+    <Compile Include="Desktop\Audio\OpenALSoundController.cs" />
+    <Compile Include="Desktop\Audio\SoundEffect.cs" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
@@ -409,4 +412,5 @@
       <Name>Lidgren.Network.Windows</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
 </Project>
