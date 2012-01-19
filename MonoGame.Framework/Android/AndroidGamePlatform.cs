@@ -175,6 +175,16 @@ namespace Microsoft.Xna.Framework
         {
         }
 
+        public override void BeginScreenDeviceChange(bool willBeFullScreen)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight)
+        {
+            throw new NotImplementedException();
+        }
+
         // EnterForeground
         void Activity_Resumed(object sender, EventArgs e)
         {
