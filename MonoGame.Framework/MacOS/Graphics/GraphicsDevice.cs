@@ -397,6 +397,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
 					ClearOptions clearOptions = ClearOptions.Target | ClearOptions.DepthBuffer;
 
+					// create framebuffer
+					GL.GenFramebuffers(1, out frameBufferIDs[i]);
+					GL.BindFramebuffer(FramebufferTarget.DrawFramebuffer, frameBufferIDs[i]);
+
+					// attach stencil buffer
 					switch (target.DepthStencilFormat) {
 					case DepthFormat.Depth16:
 						GL.RenderbufferStorage(RenderbufferTarget.RenderbufferExt, RenderbufferStorage.DepthComponent16,
@@ -418,10 +423,6 @@ namespace Microsoft.Xna.Framework.Graphics
 							target.Width, target.Height);
 						break;
 					}
-					
-					// create framebuffer
-					GL.GenFramebuffers(1, out frameBufferIDs[i]);
-					GL.BindFramebuffer(FramebufferTarget.DrawFramebuffer, frameBufferIDs[i]);
 					
 					// attach the texture to FBO color attachment point
 					GL.FramebufferTexture2D(FramebufferTarget.FramebufferExt, FramebufferAttachment.ColorAttachment0,

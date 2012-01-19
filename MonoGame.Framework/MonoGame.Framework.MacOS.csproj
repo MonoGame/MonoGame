@@ -134,9 +134,6 @@
     <Compile Include="Storage\StorageContainer.cs" />
     <Compile Include="Storage\StorageDevice.cs" />
     <Compile Include="Audio\AudioChannels.cs" />
-    <Compile Include="MacOS\Audio\Sound.cs" />
-    <Compile Include="Audio\SoundEffect.cs" />
-    <Compile Include="Audio\SoundEffectInstance.cs" />
     <Compile Include="Media\MediaPlayer.cs" />
     <Compile Include="Media\Song.cs" />
     <Compile Include="Media\MediaState.cs" />
@@ -348,6 +345,11 @@
     <Compile Include="Game.cs" />
     <Compile Include="GamePlatform.cs" />
     <Compile Include="MacOS\MacGamePlatform.cs" />
+    <Compile Include="MacOS\Audio\OALSoundBuffer.cs" />
+    <Compile Include="MacOS\Audio\OpenALSoundController.cs" />
+    <Compile Include="MacOS\Audio\OpenALSupport.cs" />
+    <Compile Include="MacOS\Audio\SoundEffect.cs" />
+    <Compile Include="MacOS\Audio\SoundEffectInstance.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />
