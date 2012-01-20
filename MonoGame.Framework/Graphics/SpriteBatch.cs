@@ -294,14 +294,14 @@ namespace Microsoft.Xna.Framework.Graphics
 			// set the blend mode
 			if ( _blendState == BlendState.NonPremultiplied )
 			{
-				GL20.BlendFunc(ALL20.One, ALL20.OneMinusSrcAlpha);
+				GL20.BlendFunc(ALL20.SrcAlpha, ALL20.OneMinusSrcAlpha);
 				GL20.Enable(ALL20.Blend);
 				GL20.BlendEquation(ALL20.FuncAdd);
 			}
 			
 			if ( _blendState == BlendState.AlphaBlend )
 			{
-				GL20.BlendFunc(ALL20.SrcAlpha, ALL20.OneMinusSrcAlpha);
+				GL20.BlendFunc(ALL20.One, ALL20.OneMinusSrcAlpha);
 				GL20.Enable(ALL20.Blend);
 				GL20.BlendEquation(ALL20.FuncAdd);
 			}

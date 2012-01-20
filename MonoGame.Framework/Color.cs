@@ -63,14 +63,14 @@ namespace Microsoft.Xna.Framework
             A = 255;
         }
 
-        public Color(Color color, byte alpha)
+        public Color(Color color, int alpha)
         {
             _packedValue = 0;
 
             R = color.R;
             G = color.G;
             B = color.B;
-            A = alpha;
+            A = (byte)MathHelper.Clamp(alpha, Byte.MinValue, Byte.MaxValue);
         }
 
         public Color(Color color, float alpha)
@@ -96,9 +96,9 @@ namespace Microsoft.Xna.Framework
         public Color(int r, int g, int b)
         {
             _packedValue = 0;
-            R = (byte)r;
-            G = (byte)g;
-            B = (byte)b;
+            R = (byte)MathHelper.Clamp(r, Byte.MinValue, Byte.MaxValue);
+            G = (byte)MathHelper.Clamp(g, Byte.MinValue, Byte.MaxValue);
+            B = (byte)MathHelper.Clamp(b, Byte.MinValue, Byte.MaxValue);
             A = (byte)255;
         }
 
@@ -106,10 +106,10 @@ namespace Microsoft.Xna.Framework
         public Color(int r, int g, int b, int alpha)
         {
             _packedValue = 0;
-            R = (byte)r;
-            G = (byte)g;
-            B = (byte)b;
-            A = (byte)alpha;
+            R = (byte)MathHelper.Clamp(r, Byte.MinValue, Byte.MaxValue);
+            G = (byte)MathHelper.Clamp(g, Byte.MinValue, Byte.MaxValue);
+            B = (byte)MathHelper.Clamp(b, Byte.MinValue, Byte.MaxValue);
+            A = (byte)MathHelper.Clamp(alpha, Byte.MinValue, Byte.MaxValue);
         }
 
         public Color(float r, float g, float b, float alpha)
@@ -1225,27 +1225,13 @@ namespace Microsoft.Xna.Framework
 
         public Vector3 ToVector3()
         {
-            Vector3 vector = new Vector3();
-            vector.X = R/255.0f;
-            vector.Y = G/255.0f;
-            vector.Z = B/255.0f;
-            return vector;
+            return new Vector3(R / 255.0f, G / 255.0f, B / 255.0f);
         }
 
         public Vector4 ToVector4()
         {
-            return new Vector4(R/255.0f, G/255.0f, B/255.0f, A/255.0f);
+            return new Vector4(R / 255.0f, G / 255.0f, B / 255.0f, A / 255.0f);
         }
-		
-		public Vector4 ToEAGLColor()
-		{
-			float r = R/255.0f;
-			float g = G/255.0f;
-			float b = B/255.0f;
-			float a = A/255.0f;
-			
-			return new Vector4(r, g, b, a);
-		}
 
         public UInt32 PackedValue
         {
@@ -1260,7 +1246,7 @@ namespace Microsoft.Xna.Framework
 
         public static Color FromNonPremultiplied(Vector4 vector)
         {
-            return FromNonPremultiplied((int)(vector.X * 255), (int)(vector.Y * 255), (int)(vector.Z * 255), (int)(vector.W * 255));
+            return new Color(vector.X * vector.W, vector.Y * vector.W, vector.Z * vector.W, vector.W);
         }
 
         public static Color FromNonPremultiplied(int r, int g, int b, int a)

@@ -255,7 +255,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
         public void Clear(Color color)
         {
-            Vector4 vector = color.ToEAGLColor();
+            Vector4 vector = color.ToVector4();
 
 #if IPHONE
             if (OpenGLESVersion == EAGLRenderingAPI.OpenGLES2)
@@ -277,7 +277,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void Clear(ClearOptions options, Color color, float depth, int stencil)
         {
-            Clear(options, color.ToEAGLColor(), depth, stencil);
+            Clear(options, color.ToVector4(), depth, stencil);
         }
 
         public void Clear(ClearOptions options, Vector4 color, float depth, int stencil)

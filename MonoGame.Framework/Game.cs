@@ -373,7 +373,9 @@ namespace Microsoft.Xna.Framework
 
         protected virtual void Draw(GameTime gameTime)
         {
+#if ANDROID
             PrimaryThreadLoader.DoLoads();
+#endif
             _drawables.ForEachFilteredItem(d => d.Draw(gameTime));
         }
 
