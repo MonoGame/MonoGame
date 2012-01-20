@@ -199,7 +199,7 @@ namespace Microsoft.Xna.Framework.Audio
 			loaded = true;
         }
 		
-		internal Sound GetWave(byte waveBankIndex, uint trackIndex) {
+		internal SoundEffectInstance GetWave(byte waveBankIndex, uint trackIndex) {
 			return waveBanks[waveBankIndex].sounds[trackIndex];
 		}
 		

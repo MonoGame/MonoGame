@@ -80,6 +80,7 @@ using Android.Widget;
 
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.Media;
 
 namespace Microsoft.Xna.Framework
 {
@@ -89,9 +90,9 @@ namespace Microsoft.Xna.Framework
             : base(game)
         {
             System.Diagnostics.Debug.Assert(Game.Activity != null, "Must set Game.Activity before creating the Game instance");
-            Game.Activity.Game = game;
-            Game.Activity.Paused += new EventHandler(Activity_Paused);
-            Game.Activity.Resumed += new EventHandler(Activity_Resumed);
+            AndroidGameActivity.Game = game;
+            AndroidGameActivity.Paused += Activity_Paused;
+            AndroidGameActivity.Resumed += Activity_Resumed;
 
             Window = new AndroidGameWindow(Game.Activity, game);
         }
@@ -174,6 +175,16 @@ namespace Microsoft.Xna.Framework
         {
         }
 
+        public override void BeginScreenDeviceChange(bool willBeFullScreen)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight)
+        {
+            throw new NotImplementedException();
+        }
+
         // EnterForeground
         void Activity_Resumed(object sender, EventArgs e)
         {
@@ -183,6 +194,7 @@ namespace Microsoft.Xna.Framework
                 Window.Resume();
                 Accelerometer.Resume();
                 Sound.ResumeAll();
+                MediaPlayer.Resume();
             }
         }
 
@@ -195,6 +207,7 @@ namespace Microsoft.Xna.Framework
                 Window.Pause();
                 Accelerometer.Pause();
                 Sound.PauseAll();
+                MediaPlayer.Pause();
             }
         }
 

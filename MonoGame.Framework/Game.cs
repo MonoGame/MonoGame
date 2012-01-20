@@ -81,6 +81,7 @@ using Microsoft.Xna.Framework.Input.Touch;
 namespace Microsoft.Xna.Framework
 {
     public class Game : IDisposable
+
     {
         private const float DefaultTargetFramesPerSecond = 60.0f;
 
@@ -364,6 +365,7 @@ namespace Microsoft.Xna.Framework
 
         protected virtual void Draw(GameTime gameTime)
         {
+            PrimaryThreadLoader.DoLoads();
             _drawables.ForEachFilteredItem(d => d.Draw(gameTime));
         }
 
@@ -437,7 +439,7 @@ namespace Microsoft.Xna.Framework
 
         internal void DoUpdate(GameTime gameTime)
         {
-            if (IsActive && _platform.BeforeUpdate(gameTime))
+            if (_platform.BeforeUpdate(gameTime))
                 Update(gameTime);
         }
 
@@ -446,7 +448,7 @@ namespace Microsoft.Xna.Framework
             // Draw and EndDraw should not be called if BeginDraw returns false.
             // http://stackoverflow.com/questions/4054936/manual-control-over-when-to-redraw-the-screen/4057180#4057180
             // http://stackoverflow.com/questions/4235439/xna-3-1-to-4-0-requires-constant-redraw-or-will-display-a-purple-screen
-            if (IsActive && _platform.BeforeDraw(gameTime) && BeginDraw())
+            if (_platform.BeforeDraw(gameTime) && BeginDraw())
             {
                 Draw(gameTime);
                 EndDraw();
