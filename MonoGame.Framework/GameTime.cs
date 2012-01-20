@@ -96,7 +96,7 @@ namespace Microsoft.Xna.Framework
         {
             elapsedTime = elapsed;
             totalTime += elapsed;
-        }
+        }				
     }
 }
 

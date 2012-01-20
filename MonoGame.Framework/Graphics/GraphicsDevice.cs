@@ -370,8 +370,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void Reset()
         {
-            _viewport.Width = DisplayMode.Width;
-            _viewport.Height = DisplayMode.Height;
 
             if (ResourcesLost)
             {
@@ -1259,7 +1257,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
             throw new NotSupportedException();
         }
+		
+		
+		internal void SetViewPort(int Width, int Height)
+		{
+			this._viewport.Width = Width;
+			this._viewport.Height = Height;
+		}
 
     }
 }
-

@@ -156,9 +156,11 @@ namespace Microsoft.Xna.Framework.Graphics
 	                throw new InvalidOperationException ("Unable to link program");
 	            }
 	
-				//UpdateWorldMatrixOrientation();
+#if ANDROID			
+			    lastDisplayOrientation = DisplayOrientation.Unknown;
+				UpdateWorldMatrixOrientation();
+#else			
 				lastDisplayOrientation = graphicsDevice.PresentationParameters.DisplayOrientation;
-
 				matViewScreen = Matrix4.CreateRotationZ((float)Math.PI)*
 						Matrix4.CreateRotationY((float)Math.PI)*
 						Matrix4.CreateTranslation(-this.graphicsDevice.Viewport.Width/2,
@@ -173,7 +175,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				
 				matWVPScreen = matViewScreen * matProjection;
 				matWVPFramebuffer = matViewFramebuffer * matProjection;
-				
+#endif				
 				GetUniformVariables();
 			
 			}
@@ -482,6 +484,56 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 		}
 		
+#if ANDROID
+		private void UpdateWorldMatrixOrientation()
+		{
+			// Configure Display Orientation:
+			if(lastDisplayOrientation != graphicsDevice.PresentationParameters.DisplayOrientation)
+			{
+				// updates last display orientation (optimization)				
+				lastDisplayOrientation = graphicsDevice.PresentationParameters.DisplayOrientation;
+				
+				// make sure the viewport is correct
+				this.graphicsDevice.SetViewPort(graphicsDevice.DisplayMode.Width, graphicsDevice.DisplayMode.Height);
+				
+				matViewScreen = Matrix4.CreateRotationZ((float)Math.PI)*
+							     	Matrix4.CreateRotationY((float)Math.PI)*
+									Matrix4.CreateTranslation(-this.graphicsDevice.Viewport.Width/2,
+									this.graphicsDevice.Viewport.Height/2,
+									1);
+				matProjection = Matrix4.CreateOrthographic(this.graphicsDevice.Viewport.Width,
+							this.graphicsDevice.Viewport.Height,
+							-1f,1f);
+				if (graphicsDevice.PresentationParameters.DisplayOrientation == DisplayOrientation.LandscapeRight)
+				{
+					// flip the viewport	
+					matProjection = Matrix4.CreateOrthographic(-this.graphicsDevice.Viewport.Width,
+							-this.graphicsDevice.Viewport.Height,
+							-1f,1f);
+				}
+				
+
+				matViewFramebuffer = Matrix4.CreateTranslation(-this.graphicsDevice.Viewport.Width/2,
+							-this.graphicsDevice.Viewport.Height/2,
+							1);
+
+
+				
+				
+				matWVPScreen = matViewScreen * matProjection;
+				matWVPFramebuffer = matViewFramebuffer * matProjection;
+				
+				AndroidGameActivity.Game.Log("--------------- Start Change -----------");
+				AndroidGameActivity.Game.Log(String.Format("DisplayMode = {0}", this.graphicsDevice.DisplayMode.ToString()));
+				AndroidGameActivity.Game.Log(String.Format("Orientation = {0}", this.graphicsDevice.PresentationParameters.DisplayOrientation.ToString()));
+				AndroidGameActivity.Game.Log(String.Format("ViewPort = {0}", this.graphicsDevice.Viewport.ToString()));
+				AndroidGameActivity.Game.Log(String.Format("ViewScreen = {0}", matViewScreen.ToString()));
+				AndroidGameActivity.Game.Log(String.Format("Projection = {0}", matProjection.ToString()));
+				AndroidGameActivity.Game.Log(String.Format("ViewFramebuffer = {0}", matViewFramebuffer.ToString()));
+				AndroidGameActivity.Game.Log("--------------- End Change -------------");
+			}
+		}
+#else		
 		private void UpdateWorldMatrixOrientation()
 		{
 			// Configure Display Orientation:
@@ -537,7 +589,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				}
 			}
 		}
-		
+#endif		
 		public void Draw 
 			( 
 			 Texture2D texture,

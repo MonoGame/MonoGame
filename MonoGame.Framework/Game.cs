@@ -132,6 +132,12 @@ namespace Microsoft.Xna.Framework
         {
             Dispose(false);
         }
+		
+		[System.Diagnostics.Conditional("DEBUG")]
+		internal void Log(string Message)
+		{
+			if (_platform != null) _platform.Log(Message);
+		}
 
         #region IDisposable Implementation
 
@@ -277,6 +283,7 @@ namespace Microsoft.Xna.Framework
             //        Now that things are more unified, it may be possible to
             //        consolidate this logic back into the Game class.
             //        Regardless, an empty implementation is not correct.
+			
         }
 
         public void Run()
@@ -302,7 +309,7 @@ namespace Microsoft.Xna.Framework
             _platform.BeforeInitialize();
             Initialize();
             _initialized = true;
-
+						
             BeginRun();
             switch (runBehavior)
             {
@@ -360,7 +367,8 @@ namespace Microsoft.Xna.Framework
                 _graphicsDeviceService.GraphicsDevice != null)
             {
                 LoadContent();
-            }
+            }			
+			ResetElapsedTime();
         }
 
         protected virtual void Draw(GameTime gameTime)
@@ -456,7 +464,8 @@ namespace Microsoft.Xna.Framework
         }
 
         internal void DoInitialize()
-        {
+        {		
+			_platform.BeforeInitialize();
             Initialize();
         }
 

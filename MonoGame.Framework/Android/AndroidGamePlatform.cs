@@ -128,7 +128,7 @@ namespace Microsoft.Xna.Framework
             if (!_initialized)
             {
                 Game.DoInitialize();
-                _initialized = true;
+                _initialized = true;				
             }
 
             return true;
@@ -144,7 +144,7 @@ namespace Microsoft.Xna.Framework
             switch (Window.Context.Resources.Configuration.Orientation)
             {
                 case Android.Content.Res.Orientation.Portrait:
-                    Window.SetOrientation(DisplayOrientation.Portrait);
+                    Window.SetOrientation(DisplayOrientation.Portrait);				
                     break;
                 case Android.Content.Res.Orientation.Landscape:
                     Window.SetOrientation(DisplayOrientation.LandscapeLeft);
@@ -152,8 +152,7 @@ namespace Microsoft.Xna.Framework
                 default:
                     Window.SetOrientation(DisplayOrientation.LandscapeLeft);
                     break;
-            }
-
+            }			
             base.BeforeInitialize();
         }
 
@@ -215,5 +214,13 @@ namespace Microsoft.Xna.Framework
         {
             get { return GameRunBehavior.Asynchronous; }
         }
+		
+		public override void Log(string Message) 
+		{
+#if LOGGING
+			Android.Util.Log.Debug("MonoGameDebug", Message);
+#endif
+		}
+					
     }
 }

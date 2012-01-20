@@ -196,8 +196,7 @@ namespace Microsoft.Xna.Framework
 			
 			if (_game != null )
 			{
-                //ObserveDeviceRotation();
-
+                //ObserveDeviceRotation();				
 				_now = DateTime.Now;
 				_updateGameTime.Update(_now - _lastUpdate);
             	_game.DoUpdate(_updateGameTime);
@@ -215,7 +214,7 @@ namespace Microsoft.Xna.Framework
                 return;
 
             // Calculate supported orientations if it has been left as "default" and only default
-            DisplayOrientation supportedOrientations = (deviceManager as GraphicsDeviceManager).SupportedOrientations;			
+            DisplayOrientation supportedOrientations = (deviceManager as GraphicsDeviceManager).SupportedOrientations;					
 			var allowedOrientation = DisplayOrientation.LandscapeLeft; 				
 			if ((supportedOrientations == DisplayOrientation.Default))
 			{
@@ -273,6 +272,16 @@ namespace Microsoft.Xna.Framework
 			{
 				actualOrientation = DisplayOrientation.LandscapeRight;
 			}	
+			/*else 
+			if (_game.GraphicsDevice.PresentationParameters.BackBufferHeight < _game.GraphicsDevice.PresentationParameters.BackBufferWidth)
+			{
+				actualOrientation = DisplayOrientation.LandscapeLeft;
+			}
+			else 
+			if (_game.GraphicsDevice.PresentationParameters.BackBufferHeight > _game.GraphicsDevice.PresentationParameters.BackBufferWidth)
+			{
+				actualOrientation = DisplayOrientation.Portrait;
+			}*/
 			
             switch (currentorientation) {
 
@@ -295,7 +304,7 @@ namespace Microsoft.Xna.Framework
             }
 			
 			
-			CurrentOrientation = actualOrientation;
+			CurrentOrientation = actualOrientation;      
             _game.GraphicsDevice.PresentationParameters.DisplayOrientation = actualOrientation;
             TouchPanel.DisplayOrientation = actualOrientation;
         }
@@ -434,9 +443,13 @@ namespace Microsoft.Xna.Framework
                     _currentOrientation = value;
 
                     if (_currentOrientation == DisplayOrientation.Portrait || _currentOrientation == DisplayOrientation.PortraitUpsideDown)
-                        Game.Activity.SetRequestedOrientation(ScreenOrientation.Portrait);
+				    {
+                        Game.Activity.SetRequestedOrientation(ScreenOrientation.Portrait);						
+				    }
                     else if (_currentOrientation == DisplayOrientation.LandscapeLeft || _currentOrientation == DisplayOrientation.LandscapeRight)
-                        Game.Activity.SetRequestedOrientation(ScreenOrientation.Landscape);
+				    {
+                        Game.Activity.SetRequestedOrientation(ScreenOrientation.Landscape);						
+				    }	
 
                     if (OrientationChanged != null)
                     {
