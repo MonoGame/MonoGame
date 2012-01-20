@@ -57,7 +57,7 @@ using Buffer = System.Buffer;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-    internal class ESTexture2D : IDisposable
+    internal class ESTexture2D : IDisposable, IPrimaryThreadLoaded
     {
         private uint _name;
         private Size _size = new Size(0, 0);
@@ -93,8 +93,8 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             else
             {
-                 //scale up bitmap to be power of 2 dimensions but dont exceed 1024x1024.
-                 //Note: may not have to do this with OpenGL 2+
+                //scale up bitmap to be power of 2 dimensions but dont exceed 1024x1024.
+                //Note: may not have to do this with OpenGL 2+
                 _width = (int)Math.Pow(2, Math.Min(10, Math.Ceiling(Math.Log10(imageSource.Width) / Math.Log10(2))));
                 _height = (int)Math.Pow(2, Math.Min(10, Math.Ceiling(Math.Log10(imageSource.Height) / Math.Log10(2))));
             }
@@ -102,10 +102,12 @@ namespace Microsoft.Xna.Framework.Graphics
             _size.Width = _width;
             _size.Height = _height;
 
-            if (GraphicsDevice.OpenGLESVersion == OpenTK.Graphics.GLContextVersion.Gles2_0)
+            if (GraphicsDevice.OpenGLESVersion ==
+                OpenTK.Graphics.GLContextVersion.Gles2_0)
             {
                 GL20.GenTextures(1, ref _name);
-            }else
+            }
+            else
             {
                 GL11.GenTextures(1, ref _name);
             }
@@ -114,20 +116,28 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 _originalBitmap = imageSource;
                 _originalFilter = filter;
+                PrimaryThreadLoader.AddToList(this);
             }
             else
             {
-                using (Bitmap imagePadded = Bitmap.CreateBitmap(_width, _height, Bitmap.Config.Argb8888))
+                using (
+                    Bitmap imagePadded = Bitmap.CreateBitmap(_width, _height,
+                                                             Bitmap.Config.Argb8888)
+                    )
                 {
                     Canvas can = new Canvas(imagePadded);
                     can.DrawARGB(0, 0, 0, 0);
                     can.DrawBitmap(imageSource, 0, 0, null);
-                    if (GraphicsDevice.OpenGLESVersion == OpenTK.Graphics.GLContextVersion.Gles2_0)
+                    if (GraphicsDevice.OpenGLESVersion ==
+                        OpenTK.Graphics.GLContextVersion.Gles2_0)
                     {
                         GL20.BindTexture(ALL20.Texture2D, _name);
-                        GL20.TexParameter(ALL20.Texture2D, ALL20.TextureMinFilter, (int) filter);
-                        GL20.TexParameter(ALL20.Texture2D, ALL20.TextureMagFilter, (int) filter);
-                        Android.Opengl.GLUtils.TexImage2D((int) ALL20.Texture2D, 0, imagePadded, 0);
+                        GL20.TexParameter(ALL20.Texture2D, ALL20.TextureMinFilter,
+                                          (int)filter);
+                        GL20.TexParameter(ALL20.Texture2D, ALL20.TextureMagFilter,
+                                          (int)filter);
+                        Android.Opengl.GLUtils.TexImage2D((int)ALL20.Texture2D, 0,
+                                                          imagePadded, 0);
 
                         // error checking
                         //int errAndroidGL = Android.Opengl.GLES20.GlGetError();
@@ -138,9 +148,12 @@ namespace Microsoft.Xna.Framework.Graphics
                     else
                     {
                         GL11.BindTexture(ALL11.Texture2D, _name);
-                        GL11.TexParameter(ALL11.Texture2D, ALL11.TextureMinFilter, (int) filter);
-                        GL11.TexParameter(ALL11.Texture2D, ALL11.TextureMagFilter, (int) filter);
-                        Android.Opengl.GLUtils.TexImage2D((int) ALL11.Texture2D, 0, imagePadded, 0);
+                        GL11.TexParameter(ALL11.Texture2D, ALL11.TextureMinFilter,
+                                          (int)filter);
+                        GL11.TexParameter(ALL11.Texture2D, ALL11.TextureMagFilter,
+                                          (int)filter);
+                        Android.Opengl.GLUtils.TexImage2D((int)ALL11.Texture2D, 0,
+                                                          imagePadded, 0);
 
                         // free bitmap
                         imageSource.Recycle();
@@ -239,12 +252,19 @@ namespace Microsoft.Xna.Framework.Graphics
             InitWithBitmap(_originalBitmap, _originalFilter);
             if (_name != 0)
             {
+                _originalBitmap.Dispose();
                 _originalBitmap = null;
             }
         }
 
         public void Dispose()
         {
+            if (_originalBitmap != null)
+            {
+                _originalBitmap.Dispose();
+                _originalBitmap = null;
+            }
+
             if (_name != 0)
             {
                 if (GraphicsDevice.OpenGLESVersion == OpenTK.Graphics.GLContextVersion.Gles2_0)
@@ -454,5 +474,11 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        public bool Load()
+        {
+            RetryToCreateTexture();
+
+            return _originalBitmap == null;
+        }
     }
 }

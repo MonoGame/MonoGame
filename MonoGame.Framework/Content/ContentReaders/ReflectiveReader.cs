@@ -123,12 +123,14 @@ namespace Microsoft.Xna.Framework.Content
                 {
                     foreach (MethodInfo info in property.GetAccessors(true))
                     {
-                        if (info.IsPublic == false) return;
+                        if (info.IsPublic == false)
+                            return;
                     }
                 }
                 else
                 {
-                    if (!field.IsPublic) return;
+                    if (!field.IsPublic)
+                        return;
                 }
             }
             ContentTypeReader reader = null;
@@ -153,7 +155,9 @@ namespace Microsoft.Xna.Framework.Content
                 }
                 else
                 {
-                    if (field.IsPrivate == false) field.SetValue(parent, obj2);
+                    // Private fields can be serialized if they have ContentSerializerAttribute added to them
+                    if (field.IsPrivate == false || attr2 != null)
+                        field.SetValue(parent, obj2);
                 }
             }
             else

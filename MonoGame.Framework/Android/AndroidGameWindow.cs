@@ -331,52 +331,61 @@ namespace Microsoft.Xna.Framework
             position.Y = e.GetY(e.ActionIndex);     
 			UpdateTouchPosition(ref position);
 			int id = e.GetPointerId(e.ActionIndex);            
-            int index;            
-            switch (e.ActionMasked)            
-            {                
+            int index;
+            switch (e.ActionMasked)
+            {
                 // DOWN                
-                case 0:                
-                case 5:                    
-                    tlocation = new TouchLocation(id, TouchLocationState.Pressed, position);                    
-                    collection.Add(tlocation);                    
+                case 0:
+                case 5:
+                    index = collection.FindById(e.GetPointerId(e.ActionIndex), out tlocation);
+                    if (index < 0)
+                    {
+                        tlocation = new TouchLocation(id, TouchLocationState.Pressed, position);
+                        collection.Add(tlocation);
+                    }
+                    else
+                    {
+                        tlocation.State = TouchLocationState.Pressed;
+                        tlocation.Position = position;
+                    }
                     break;
                 // UP                
-                case 1:                
-                case 6:                    
-                    index = collection.FindById(e.GetPointerId(e.ActionIndex), out tlocation);                    
-                    if (index >= 0)                    
-                    {                        
-                        tlocation.State = TouchLocationState.Released;                        
-                        collection[index] = tlocation;                    
-                    }                    
+                case 1:
+                case 6:
+                    index = collection.FindById(e.GetPointerId(e.ActionIndex), out tlocation);
+                    if (index >= 0)
+                    {
+                        tlocation.State = TouchLocationState.Released;
+                        collection[index] = tlocation;
+                    }
                     break;
                 // MOVE                
-                case 2:                    
-                    for (int i = 0; i < e.PointerCount; i++)                    
-                    {                        
-                        id = e.GetPointerId(i);                        
-                        position.X = e.GetX(i);                        
-                        position.Y = e.GetY(i);  
-					    UpdateTouchPosition(ref position);
-                        index = collection.FindById(id, out tlocation);                        
-                        if (index >= 0)                        
-                        {                            
-                            tlocation.State = TouchLocationState.Moved;                            
-                            tlocation.Position = position;                            
-                            collection[index] = tlocation;                        
-            }
-            }
-                    break;                
+                case 2:
+                    for (int i = 0; i < e.PointerCount; i++)
+                    {
+                        id = e.GetPointerId(i);
+                        position.X = e.GetX(i);
+                        position.Y = e.GetY(i);
+                        UpdateTouchPosition(ref position);
+                        index = collection.FindById(id, out tlocation);
+                        if (index >= 0)
+                        {
+                            tlocation.State = TouchLocationState.Moved;
+                            tlocation.Position = position;
+                            collection[index] = tlocation;
+                        }
+                    }
+                    break;
                 // CANCEL, OUTSIDE                
-                case 3:                
-                case 4:                    
-                    index = collection.FindById(id, out tlocation);                    
-                    if (index >= 0)                    
-                    {                        
-                        tlocation.State = TouchLocationState.Invalid;                        
-                        collection[index] = tlocation;                    
-                    }                    
-                    break;            
+                case 3:
+                case 4:
+                    index = collection.FindById(id, out tlocation);
+                    if (index >= 0)
+                    {
+                        tlocation.State = TouchLocationState.Invalid;
+                        collection[index] = tlocation;
+                    }
+                    break;
             }
 			if (gesture != null) gesture.OnTouchEvent(e);
 

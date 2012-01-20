@@ -16,7 +16,7 @@ namespace Microsoft.Xna.Framework
 {
     public class AndroidGameActivity : Activity
     {
-        public Game Game { get; set; }
+        public static Game Game { get; set; }
 		
 		private OrientationListener o;		
 		
@@ -27,10 +27,12 @@ namespace Microsoft.Xna.Framework
 			if (o.CanDetectOrientation())
 			{
 				o.Enable();				
-			}						
+			}
+
+            RequestWindowFeature(WindowFeatures.NoTitle);
 		}
 
-        public event EventHandler Paused;
+        public static event EventHandler Paused;
 
 		public override void OnConfigurationChanged (Android.Content.Res.Configuration newConfig)
 		{
@@ -39,20 +41,29 @@ namespace Microsoft.Xna.Framework
 			base.OnConfigurationChanged (newConfig);
 		}
 
-
         protected override void OnPause()
         {
             base.OnPause();
             if (Paused != null)
                 Paused(this, EventArgs.Empty);
+            Game.GraphicsDevice.ResourcesLost = true;
+
+            ((FrameLayout)Game.Window.Parent).RemoveAllViews();
         }
 
-        public event EventHandler Resumed;
+        public static event EventHandler Resumed;
         protected override void OnResume()
         {
             base.OnResume();
             if (Resumed != null)
                 Resumed(this, EventArgs.Empty);
+
+            var deviceManager = (IGraphicsDeviceManager)Game.Services.GetService(typeof(IGraphicsDeviceManager));
+            if (deviceManager == null)
+                return;
+            (deviceManager as GraphicsDeviceManager).ForceSetFullScreen();
+            Game.Window.RequestFocus();
+            Game.GraphicsDevice.Initialize();
         }
 
     }
@@ -96,9 +107,9 @@ namespace Microsoft.Xna.Framework
 						break;
 				}
 				
-				if (activity.Game.Window.CurrentOrientation != disporientation)
+				if (AndroidGameActivity.Game.Window.CurrentOrientation != disporientation)
 				{
-				activity.Game.Window.SetOrientation(disporientation);
+				AndroidGameActivity.Game.Window.SetOrientation(disporientation);
 				}
 				inprogress = false;
 			}
