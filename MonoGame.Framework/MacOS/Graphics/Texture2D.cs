@@ -290,7 +290,12 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			return FromFile (graphicsDevice, filename, 0, 0);
 		}
-		
+
+		// Not sure what this should do in Mac will leave it non implemented for now.
+		internal void Reload(Stream textureStream)
+		{
+		}
+
 		internal void Apply ()
 		{
 			if (texture == null)
