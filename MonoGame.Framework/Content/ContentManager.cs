@@ -153,8 +153,6 @@
                 throw new ObjectDisposedException("ContentManager");
             }
 
-            object result = null;
-
             if (this.graphicsDeviceService == null)
             {
                 this.graphicsDeviceService = serviceProvider.GetService(typeof(IGraphicsDeviceService)) as IGraphicsDeviceService;

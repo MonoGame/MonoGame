@@ -55,12 +55,12 @@ namespace Microsoft.Xna.Framework.Content
 
 		protected internal override Color Read (ContentReader input, Color existingInstance)
 		{
-			// There are 4 bytes in the .xnb
-			// 80 80 80 FF that correspond to the values passed from the xml file as FF808080
-			uint color = input.ReadUInt32();
-			Color colorObj  = new Color();
-			colorObj.PackedValue = color;
-			return colorObj;
+            // Read RGBA as four separate bytes to make sure we comply with XNB format document
+            byte r = input.ReadByte();
+            byte g = input.ReadByte();
+            byte b = input.ReadByte();
+            byte a = input.ReadByte();
+            return new Color(r, g, b, a);
 		}
 	}
 }

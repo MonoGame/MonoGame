@@ -144,12 +144,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void Clear (Color color)
 		{
-			Clear (ClearOptions.Target, color.ToEAGLColor(), 0, 0);
+			Clear (ClearOptions.Target, color.ToVector4(), 0, 0);
 		}
 
 		public void Clear (ClearOptions options, Color color, float depth, int stencil)
 		{
-			Clear (options, color.ToEAGLColor (), depth, stencil);
+			Clear (options, color.ToVector4 (), depth, stencil);
 		}
 
 		public void Clear (ClearOptions options, Vector4 color, float depth, int stencil)
