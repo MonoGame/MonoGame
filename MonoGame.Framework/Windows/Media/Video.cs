@@ -109,7 +109,7 @@ namespace Microsoft.Xna.Framework.Media
 			_view.MoviePlayer.MovieControlMode = MPMovieControlMode.Hidden;
 			_view.MoviePlayer.PrepareToPlay();
 			
-			Vector4 color = BackgroundColor.ToEAGLColor();
+			Vector4 color = BackgroundColor.ToVector4();
 			_view.MoviePlayer.BackgroundColor = new MonoTouch.UIKit.UIColor(color.X,color.Y,color.Z,color.W); */
 		}
 		
