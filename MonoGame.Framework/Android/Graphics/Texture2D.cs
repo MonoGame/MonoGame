@@ -48,6 +48,7 @@ using GL20 = OpenTK.Graphics.ES20.GL;
 using ALL11 = OpenTK.Graphics.ES11.All;
 using ALL20 = OpenTK.Graphics.ES20.All;
 using Path = System.IO.Path;
+using System.Runtime.InteropServices;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -207,7 +208,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void SetData<T>(T[] data)
         {
-			throw new NotImplementedException();
+			SetData (data, 0, data.Length, SetDataOptions.None);
         }
 
         public int Width
@@ -291,15 +292,152 @@ namespace Microsoft.Xna.Framework.Graphics
 			result.Name = Path.GetFileNameWithoutExtension(filename);
 			return result;
         }
+		
+		private void SetData (int index, byte red, byte green, byte blue, byte alpha, byte[] textureData)
+		{
+			switch (_format) {				
+			case SurfaceFormat.Color /*kTexture2DPixelFormat_RGBA8888*/:
+			case SurfaceFormat.Dxt1:
+			case SurfaceFormat.Dxt3:
+				index *= 4;
+				textureData [index] = red;
+				textureData [index + 1] = green;
+				textureData [index + 2] = blue;
+				textureData [index + 3] = alpha;				
+				break;
+				
+			// TODO: Implement the rest of these but lack of knowledge and examples prevents this for now
+			case SurfaceFormat.Bgra4444 /*kTexture2DPixelFormat_RGBA4444*/:
+				break;
+			case SurfaceFormat.Bgra5551 /*kTexture2DPixelFormat_RGB5A1*/:
+				break;
+			case SurfaceFormat.Alpha8 /*kTexture2DPixelFormat_A8*/:
+				break;
+			default:
+				throw new NotSupportedException ("Texture format");
+				;					
+			}
+		}
+		
+		private byte[] AllocColorData ()
+		{
+			switch (_format) {				
+			case SurfaceFormat.Color /*kTexture2DPixelFormat_RGBA8888*/:
+			case SurfaceFormat.Dxt1:
+			case SurfaceFormat.Dxt3:
+				return new byte[(_width * _height) * 4];
+				
+			// TODO: Implement the rest of these but lack of knowledge and examples prevents this for now
+			case SurfaceFormat.Bgra4444 /*kTexture2DPixelFormat_RGBA4444*/:
+				break;
+			case SurfaceFormat.Bgra5551 /*kTexture2DPixelFormat_RGB5A1*/:
+				break;
+			case SurfaceFormat.Alpha8 /*kTexture2DPixelFormat_A8*/:
+				break;
+			default:
+				throw new NotSupportedException ("Texture format");
+				;					
+			}
+			
+			return null;
+		}
+		
+		
+		/*
+		* perform an in-place swap from Quadrant 1 to Quadrant III format
+		* (upside-down PostScript/GL to right side up QD/CG raster format)
+		* We do this in-place, which requires more copying, but will touch
+		* only half the pages.
+		* 
+		* Pixel reformatting may optionally be done here if needed.
+		*/
+		private void flipImageData (byte[] mData, int mWidth, int mHeight, int mByteWidth)
+		{
+
+			long top, bottom;
+			byte[] buffer;
+			long topP;
+			long bottomP;
+			long rowBytes;
+
+			top = 0;
+			bottom = mHeight - 1;
+			rowBytes = mWidth * mByteWidth;
+			buffer = new byte[rowBytes];
+
+			while (top < bottom) {
+				topP = top * rowBytes;
+				bottomP = bottom * rowBytes;
+
+				/*
+				* Save and swap scanlines.
+				*
+				* This code does a simple in-place exchange with a temp buffer.
+				* If you need to reformat the pixels, replace the first two Array.Copy
+				* calls with your own custom pixel reformatter.
+				*/
+
+				Array.Copy (mData, topP, buffer, 0, rowBytes);
+				Array.Copy (mData, bottomP, mData, topP, rowBytes);
+				Array.Copy (buffer, 0, mData, bottomP, rowBytes);
+
+				++top;
+				--bottom;
+
+			}
+		}
 
         public void SetData<T>(T[] data, int startIndex, int elementCount, SetDataOptions options)
         {
-            throw new NotImplementedException();
+            if (data == null) {
+				throw new ArgumentNullException ("Argument data can not be null.");
+			}
+			
+			if (startIndex < 0 || startIndex > data.Length - 1) {
+				throw new ArgumentNullException ("Argument startIndex in invalid.");
+			}			
+
+			if (elementCount < 0 || (startIndex + elementCount) > data.Length) {
+				throw new ArgumentNullException ("Argument elementCount is invalid.");
+			}			
+			
+			byte[] textureData = AllocColorData ();
+			// we now have a texture not based on an outside image source
+			// now we check what type was passed
+			if (typeof(T) == typeof(Color)) {
+
+				for (int x = startIndex; x < elementCount; x++) {
+					var color = (Color)(object)data [x];
+					SetData (x, color.R, color.G, color.B, color.A, textureData);
+					
+				}
+				
+				// For RenderTextures we need to flip the data.
+				if (texture == null) {
+					flipImageData (textureData, _width, _height, 4);
+				}
+			}
+			
+			// when we are all done we need apply the changes
+			Apply (textureData);
         }
 
         public void SetData<T>(int level, Rectangle? rect, T[] data, int startIndex, int elementCount, SetDataOptions options)
         {
-            throw new NotImplementedException();
+            if (data == null) {
+				throw new ArgumentException ("data cannot be null");
+			}
+
+			if (data.Length < startIndex + elementCount) {
+				throw new ArgumentException ("The data passed has a length of " + data.Length + " but " + elementCount + " pixels have been requested.");
+			}
+
+			Rectangle r;
+			if (rect != null) {
+				r = rect.Value;
+			} else {
+				r = new Rectangle (0, 0, Width, Height);
+			}
         }
 
         private byte[] GetImageData(int level)
@@ -927,6 +1065,47 @@ namespace Microsoft.Xna.Framework.Graphics
                                 (float)OpenTK.Graphics.ES11.TextureWrapMode.Repeat);
 #endif
         }
+		
+		private void Apply (byte[] textureData)
+		{
+			if (GraphicsDevice.OpenGLESVersion == OpenTK.Graphics.GLContextVersion.Gles2_0)
+            {
+						
+				GL20.BindTexture (ALL20.Texture2D, (uint)_textureId);			
+				if (_mipmap) {
+					// Taken from http://www.flexicoder.com/blog/index.php/2009/11/iphone-mipmaps/
+					GL20.TexParameter (ALL20.Texture2D, ALL20.TextureMinFilter, (int)ALL20.LinearMipmapNearest);
+					GL20.TexParameter (ALL20.Texture2D, ALL20.TextureMagFilter, (int)ALL20.Linear);
+					GL20.TexParameter (ALL20.Texture2D, ALL20.GenerateMipmapHint, (int)ALL20.True);
+				} else {
+					GL20.TexParameter (ALL20.Texture2D, ALL20.TextureMinFilter, (int)ALL20.Linear);
+					GL20.TexParameter (ALL20.Texture2D, ALL20.TextureMagFilter, (int)ALL20.Linear);
+				}			
+				IntPtr pointer = Marshal.AllocHGlobal(textureData.Length);
+            	Marshal.Copy(textureData, 0, pointer, textureData.Length);
+				GL20.TexImage2D (ALL20.Texture2D, 0, (int)ALL20.Rgba, _width, _height, 0, ALL20.Rgba, ALL20.UnsignedByte, pointer);
+            	Marshal.FreeHGlobal(pointer);
+				
+				
+			}
+			else
+			{
+				GL11.BindTexture (ALL11.Texture2D, (uint)_textureId);			
+				if (_mipmap) {
+					// Taken from http://www.flexicoder.com/blog/index.php/2009/11/iphone-mipmaps/
+					GL11.TexParameter (ALL11.Texture2D, ALL11.TextureMinFilter, (int)ALL11.LinearMipmapNearest);
+					GL11.TexParameter (ALL11.Texture2D, ALL11.TextureMagFilter, (int)ALL11.Linear);
+					GL11.TexParameter (ALL11.Texture2D, ALL11.GenerateMipmap, (int)ALL11.True);
+				} else {
+					GL11.TexParameter (ALL11.Texture2D, ALL11.TextureMinFilter, (int)ALL11.Linear);
+					GL11.TexParameter (ALL11.Texture2D, ALL11.TextureMagFilter, (int)ALL11.Linear);
+				}			
+				IntPtr pointer = Marshal.AllocHGlobal(textureData.Length);
+            	Marshal.Copy(textureData, 0, pointer, textureData.Length);
+				GL11.TexImage2D (ALL11.Texture2D, 0, (int)ALL11.Rgba, _width, _height, 0, ALL11.Rgba, ALL11.UnsignedByte, pointer);
+            	Marshal.FreeHGlobal(pointer);
+			}
+		}
 	}
 }
 
