@@ -70,6 +70,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 
         internal static void Initialise(Game game)
         {
+			MonoGameGamerServicesHelper.Initialise(game);        
         }
 
 	    delegate string ShowKeyboardInputDelegate(
@@ -272,6 +273,8 @@ namespace Microsoft.Xna.Framework.GamerServices
 				new ArgumentException("paneCount Can only be 1 on iPhone");
 				return;
 			}
+			
+			MonoGameGamerServicesHelper.ShowSigninSheet();
 
 			if (GamerServicesComponent.LocalNetworkGamer == null)
 			{
@@ -381,5 +384,6 @@ namespace Microsoft.Xna.Framework.GamerServices
 			set;
 		}
 		#endregion
+		
 	}
 }
