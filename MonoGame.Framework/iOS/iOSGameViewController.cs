@@ -100,14 +100,21 @@ namespace Microsoft.Xna.Framework
 
         public override bool ShouldAutorotateToInterfaceOrientation(UIInterfaceOrientation toInterfaceOrientation)
         {
-            var manager = (GraphicsDeviceManager)_platform.Game.Services.GetService(typeof(IGraphicsDeviceManager));
-            if (manager == null)
-                return toInterfaceOrientation == UIInterfaceOrientation.Portrait;
+            return toInterfaceOrientation == UIInterfaceOrientation.Portrait;
 
-            var supportedOrientations = OrientationConverter.Normalize(manager.SupportedOrientations);
-            var toOrientation = OrientationConverter.ToDisplayOrientation(toInterfaceOrientation);
+            // Supporting ShouldAutorotateToInterfaceOrientation interferes with
+            // SpriteBatch's matrices.  It also shows the view-is-rotating
+            // animation, which may not be desirable.  So, for now, only allow
+            // Portrait.
 
-            return (toOrientation & supportedOrientations) == toOrientation;
+//            var manager = (GraphicsDeviceManager)_platform.Game.Services.GetService(typeof(IGraphicsDeviceManager));
+//            if (manager == null)
+//                return toInterfaceOrientation == UIInterfaceOrientation.Portrait;
+//
+//            var supportedOrientations = OrientationConverter.Normalize(manager.SupportedOrientations);
+//            var toOrientation = OrientationConverter.ToDisplayOrientation(toInterfaceOrientation);
+//
+//            return (toOrientation & supportedOrientations) == toOrientation;
         }
     }
 }
