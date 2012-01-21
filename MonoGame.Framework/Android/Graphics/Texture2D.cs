@@ -528,7 +528,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 			
 			if (GraphicsDevice.OpenGLESVersion == OpenTK.Graphics.GLContextVersion.Gles2_0)
-            {
+            {				
 				GL20.ReadPixels(0,0,_width, _height, ALL20.Rgba, ALL20.UnsignedByte, imageInfo);
 				GL20.FramebufferRenderbuffer(ALL20.Framebuffer, ALL20.DepthAttachment, ALL20.Renderbuffer, 0);
 				GL20.DeleteRenderbuffers(1, ref renderBufferID);
@@ -1071,20 +1071,21 @@ namespace Microsoft.Xna.Framework.Graphics
 			if (GraphicsDevice.OpenGLESVersion == OpenTK.Graphics.GLContextVersion.Gles2_0)
             {
 						
-				GL20.BindTexture (ALL20.Texture2D, (uint)_textureId);			
+				GL20.BindTexture (ALL20.Texture2D, (uint)this.ID);			
 				if (_mipmap) {
 					// Taken from http://www.flexicoder.com/blog/index.php/2009/11/iphone-mipmaps/
 					GL20.TexParameter (ALL20.Texture2D, ALL20.TextureMinFilter, (int)ALL20.LinearMipmapNearest);
 					GL20.TexParameter (ALL20.Texture2D, ALL20.TextureMagFilter, (int)ALL20.Linear);
 					GL20.TexParameter (ALL20.Texture2D, ALL20.GenerateMipmapHint, (int)ALL20.True);
 				} else {
-					GL20.TexParameter (ALL20.Texture2D, ALL20.TextureMinFilter, (int)ALL20.Linear);
-					GL20.TexParameter (ALL20.Texture2D, ALL20.TextureMagFilter, (int)ALL20.Linear);
-				}			
-				IntPtr pointer = Marshal.AllocHGlobal(textureData.Length);
-            	Marshal.Copy(textureData, 0, pointer, textureData.Length);
-				GL20.TexImage2D (ALL20.Texture2D, 0, (int)ALL20.Rgba, _width, _height, 0, ALL20.Rgba, ALL20.UnsignedByte, pointer);
-            	Marshal.FreeHGlobal(pointer);
+					GL20.TexParameter(ALL20.Texture2D, ALL20.TextureMinFilter, (int)ALL20.Linear);
+                	GL20.TexParameter(ALL20.Texture2D, ALL20.TextureMagFilter, (int)ALL20.Linear);                
+				}	
+				int len = textureData.Length;
+				IntPtr data = Marshal.AllocHGlobal(len);
+            	Marshal.Copy(textureData, 0, data, len);
+				GL20.TexImage2D(ALL20.Texture2D, 0, (int)ALL20.Rgba, (int)_width, (int)_height, 0, ALL20.Rgba, ALL20.UnsignedByte, data);
+            	Marshal.FreeHGlobal(data);
 				
 				
 			}
