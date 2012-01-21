@@ -1,8 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Windows.Forms;
 using System.Diagnostics;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -17,7 +16,7 @@ namespace Microsoft.Xna.Framework.GamerServices
         public static void ShowSigninSheet()
         {
             guide.Enabled = true;
-            guide.Visible = true;
+			guide.Visible = true;
             Guide.IsVisible = true;
         }
     
@@ -98,7 +97,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 
         public override void Draw(GameTime gameTime)
         {
-            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
+            spriteBatch.Begin();//SpriteSortMode.Immediate, BlendState.AlphaBlend);
 
             Vector2 center = new Vector2(this.Game.GraphicsDevice.PresentationParameters.BackBufferWidth / 2, this.Game.GraphicsDevice.PresentationParameters.BackBufferHeight - 100);
             Vector2 loc = Vector2.Zero;
@@ -130,17 +129,32 @@ namespace Microsoft.Xna.Framework.GamerServices
 
             if ((gameTime.TotalGameTime - gt).TotalSeconds > 5) // close after 10 seconds
             {
-                string strUsr = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
-
-                if (strUsr.Contains(@"\"))
-                {
-                    int idx = strUsr.IndexOf(@"\") + 1;
-                    strUsr = strUsr.Substring(idx, strUsr.Length - idx);
-                }
-
+				
+				string name = "androiduser";
+				try
+				{
+					Android.Accounts.AccountManager mgr = (Android.Accounts.AccountManager)Android.App.Application.Context.GetSystemService(Android.App.Activity.AccountService);
+					if (mgr != null)
+					{
+						var accounts = mgr.GetAccounts();
+						if (accounts != null && accounts.Length > 0)
+						{							
+							name = accounts[0].Name;
+							if (name.Contains("@"))
+							{
+								// its an email 
+								name = name.Substring(0, name.IndexOf("@"));
+							}
+						}
+					}
+				}
+				catch
+				{
+				}
+				
                 SignedInGamer sig = new SignedInGamer();
-                sig.DisplayName = strUsr;
-                sig.Gamertag = strUsr;
+                sig.DisplayName = name;
+                sig.Gamertag = name;
 
                 Gamer.SignedInGamers.Add(sig);
 
@@ -154,3 +168,5 @@ namespace Microsoft.Xna.Framework.GamerServices
 
     }
 }
+
+
