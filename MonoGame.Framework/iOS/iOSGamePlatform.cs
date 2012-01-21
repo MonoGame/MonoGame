@@ -92,14 +92,17 @@ namespace Microsoft.Xna.Framework
         private UIWindow _mainWindow;
         private NSObject _rotationObserver;
         private List<NSObject> _applicationObservers;
-	private OpenALSoundController soundControllerInstance = null;
+		private OpenALSoundController soundControllerInstance = null;
+		
+		private int _ourTask;
 
         public iOSGamePlatform(Game game) :
             base(game)
         {
             game.Services.AddService(typeof(iOSGamePlatform), this);
-		// Setup our OpenALSoundController to handle our SoundBuffer pools
-		soundControllerInstance = OpenALSoundController.GetInstance;
+			
+			// Setup our OpenALSoundController to handle our SoundBuffer pools
+			soundControllerInstance = OpenALSoundController.GetInstance;
 			
             Directory.SetCurrentDirectory(NSBundle.MainBundle.ResourcePath);
 
@@ -159,9 +162,7 @@ namespace Microsoft.Xna.Framework
             //       CreateFrameBuffer and OnLoad would both need to be changed
             //       to be idempotent per create-destroy cycle of the OpenGL
             //       context.
-
-            _viewController.View.Run(1 / Game.TargetElapsedTime.TotalSeconds);
-            _viewController.View.Pause();
+            _viewController.View.Run(1.0 / Game.TargetElapsedTime.TotalSeconds);
         }
 
         public override void RunLoop()
@@ -179,8 +180,7 @@ namespace Microsoft.Xna.Framework
             BeginObservingDeviceRotation();
 
             _viewController.View.BecomeFirstResponder();
-            _viewController.View.Resume();
-        }
+		}
 
         private void GameWindow_Load(object sender, EventArgs e)
         {
@@ -293,12 +293,70 @@ namespace Microsoft.Xna.Framework
         {
             // FIXME: What needs to be done here?
             //throw new NotImplementedException();
+			_ourTask =  UIApplication.SharedApplication.BeginBackgroundTask(delegate
+			{    //this is the action that will run when the task expires
+				if (_ourTask != 0) //this check is because we want to avoid ending the same task twice
+				{
+				    UIApplication.SharedApplication.EndBackgroundTask(_ourTask); //end the task
+				    _ourTask = 0; //reset the id
+				}
+			});
+
+		    //we start an asynchronous operation
+		    //so that we make sure that DidEnterBackground
+		    //executes normally
+		    new System.Action(delegate
+		    {
+		        Game.Platform_Activated(null, null);
+		
+		        //Since we are in an asynchronous method,
+		        //we have to make sure that EndBackgroundTask
+		        //will run on the application's main thread
+		        //or we might have unexpected behavior.
+		        UIApplication.SharedApplication.BeginInvokeOnMainThread(delegate
+		        {
+			            if (_ourTask != 0) //same as above
+			            {
+			                UIApplication.SharedApplication.EndBackgroundTask(_ourTask);
+			                _ourTask = 0;
+			            }
+			       });
+			}).BeginInvoke(null, null);	
         }
 
         private void Application_DidEnterBackground(NSNotification notification)
         {
             // FIXME: What needs to be done here?
             //throw new NotImplementedException();
+			_ourTask = UIApplication.SharedApplication.BeginBackgroundTask(delegate
+			{    //this is the action that will run when the task expires
+				if (_ourTask != 0) //this check is because we want to avoid ending the same task twice
+				{
+				    UIApplication.SharedApplication.EndBackgroundTask(_ourTask); //end the task
+				    _ourTask = 0; //reset the id
+				}
+			});
+
+		    //we start an asynchronous operation
+		    //so that we make sure that DidEnterBackground
+		    //executes normally
+		    new System.Action(delegate
+		    {
+		        Game.Platform_Deactivated(null, null);
+		
+		        //Since we are in an asynchronous method,
+		        //we have to make sure that EndBackgroundTask
+		        //will run on the application's main thread
+		        //or we might have unexpected behavior.
+		        UIApplication.SharedApplication.BeginInvokeOnMainThread(delegate
+		        {
+			            if (_ourTask != 0) //same as above
+			            {
+			                UIApplication.SharedApplication.EndBackgroundTask(_ourTask);
+			                _ourTask = 0;
+			            }
+			       });
+			}).BeginInvoke(null, null);
         }
 
         private void Application_DidBecomeActive(NSNotification notification)
@@ -315,6 +373,10 @@ namespace Microsoft.Xna.Framework
         private void Application_WillTerminate(NSNotification notification)
         {
             // FIXME: Cleanly end the run loop.
+			if ( Game != null )
+			{
+				// TODO MonoGameGame.Terminate();
+			}
         }
 
         private void Application_DidReceiveMemoryWarning(NSNotification notification)
