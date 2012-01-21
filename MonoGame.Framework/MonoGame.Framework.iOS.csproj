@@ -366,6 +366,8 @@
     <Compile Include="iOS\iOSGamePlatform.cs" />
     <Compile Include="iOS\iOSGameViewController.cs" />
     <Compile Include="iOS\OrientationConverter.cs" />
+    <Compile Include="iOS\Media\VideoPlayer+StreamingAudioPlayer.cs" />
+    <Compile Include="Media\VideoSoundTrackType.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>

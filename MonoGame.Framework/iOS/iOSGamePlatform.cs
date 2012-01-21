@@ -116,15 +116,6 @@ namespace Microsoft.Xna.Framework
             get { return GameRunBehavior.Asynchronous; }
         }
 
-        public bool IsPlayingVideo { get; set; }
-
-        // FIXME: VideoPlayer 'needs' this to set up its own movie player view
-        //        controller.
-        public iOSGameViewController ViewController
-        {
-            get { return _viewController; }
-        }
-
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);
@@ -199,15 +190,11 @@ namespace Microsoft.Xna.Framework
 
         public override bool BeforeDraw(GameTime gameTime)
         {
-            if (IsPlayingVideo)
-                return false;
             return true;
         }
 
         public override bool BeforeUpdate(GameTime gameTime)
         {
-            if (IsPlayingVideo)
-                return false;
             return true;
         }
 
