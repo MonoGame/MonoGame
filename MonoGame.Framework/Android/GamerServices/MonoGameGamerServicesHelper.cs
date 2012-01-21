@@ -1,8 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Windows.Forms;
 using System.Diagnostics;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -70,12 +69,10 @@ namespace Microsoft.Xna.Framework.GamerServices
             if (gt == TimeSpan.Zero) gt = gameTime.TotalGameTime;
 
             if ((gameTime.TotalGameTime - gt).TotalSeconds > 10) // close after 10 seconds
-            {
-                string strUsr = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
-
+            {                
                 SignedInGamer sig = new SignedInGamer();
-                sig.DisplayName = strUsr;
-                sig.Gamertag = strUsr;
+                sig.DisplayName = "android";
+                sig.Gamertag = "android";
 
                 Gamer.SignedInGamers.Add(sig);
 
@@ -88,3 +85,5 @@ namespace Microsoft.Xna.Framework.GamerServices
 
     }
 }
+
+

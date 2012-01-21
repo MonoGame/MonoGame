@@ -146,5 +146,15 @@ namespace Microsoft.Xna.Framework
         public override void ExitFullScreen()
         {
         }
+
+        public override void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight)
+        {
+            
+        }
+
+        public override void BeginScreenDeviceChange(bool willBeFullScreen)
+        {
+            
+        }
     }
 }
