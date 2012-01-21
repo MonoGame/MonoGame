@@ -404,9 +404,10 @@ namespace Microsoft.Xna.Framework.Net
 
 		internal static string GetMyLocalIpAddress ()
 		{
-
-			IPHostEntry host;
 			string localIP = "?";
+#if !WINDOWS_PHONE
+			IPHostEntry host;
+			
 			host = Dns.GetHostEntry (Dns.GetHostName ());
 			foreach (IPAddress ip in host.AddressList) {
 				// We only want those of type InterNetwork
@@ -416,6 +417,9 @@ namespace Microsoft.Xna.Framework.Net
 					break;
 				}
 			}
+#else
+			
+#endif			
 			return localIP;
 		}
 

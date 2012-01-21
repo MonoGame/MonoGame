@@ -39,11 +39,16 @@
 #endregion License
 
 using System;
+using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework.Net
 {
-
+#if !WINDOWS_PHONE
 	[SerializableAttribute]
+#else
+    [DataContract]
+#endif
+    
 	public class NetworkException : Exception
 	{
 
