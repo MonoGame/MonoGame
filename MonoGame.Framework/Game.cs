@@ -553,20 +553,21 @@ namespace Microsoft.Xna.Framework
         /// sorting and filtering based on a configurable sort comparer, filter
         /// predicate, and associate change events.
         /// </summary>
-        class SortingFilteringCollection<T> : ICollection<T>, IComparer<T>
+        class SortingFilteringCollection<T> : ICollection<T>
         {
-            private List<T> _items;
-            private List<T> _addJournal;
-            private List<int> _removeJournal;
-            private List<T> _cachedFilteredItems;
+            private readonly List<T> _items;
+            private readonly List<AddJournalEntry> _addJournal;
+            private readonly Comparison<AddJournalEntry> _addJournalSortComparison;
+            private readonly List<int> _removeJournal;
+            private readonly List<T> _cachedFilteredItems;
             private bool _shouldRebuildCache;
 
-            private Predicate<T> _filter;
-            private Comparison<T> _sort;
-            private Action<T, EventHandler> _filterChangedSubscriber;
-            private Action<T, EventHandler> _filterChangedUnsubscriber;
-            private Action<T, EventHandler> _sortChangedSubscriber;
-            private Action<T, EventHandler> _sortChangedUnsubscriber;
+            private readonly Predicate<T> _filter;
+            private readonly Comparison<T> _sort;
+            private readonly Action<T, EventHandler> _filterChangedSubscriber;
+            private readonly Action<T, EventHandler> _filterChangedUnsubscriber;
+            private readonly Action<T, EventHandler> _sortChangedSubscriber;
+            private readonly Action<T, EventHandler> _sortChangedUnsubscriber;
 
             public SortingFilteringCollection(
                 Predicate<T> filter,
@@ -577,7 +578,7 @@ namespace Microsoft.Xna.Framework
                 Action<T, EventHandler> sortChangedUnsubscriber)
             {
                 _items = new List<T>();
-                _addJournal = new List<T>();
+                _addJournal = new List<AddJournalEntry>();
                 _removeJournal = new List<int>();
                 _cachedFilteredItems = new List<T>();
                 _shouldRebuildCache = true;
@@ -588,6 +589,14 @@ namespace Microsoft.Xna.Framework
                 _sort = sort;
                 _sortChangedSubscriber = sortChangedSubscriber;
                 _sortChangedUnsubscriber = sortChangedUnsubscriber;
+
+                _addJournalSortComparison = (x, y) =>
+                {
+                    int result = _sort(x.Item, y.Item);
+                    if (result != 0)
+                        return result;
+                    return x.Order - y.Order;
+                };
             }
 
             public void ForEachFilteredItem<TUserData>(Action<T, TUserData> action, TUserData userData)
@@ -620,13 +629,13 @@ namespace Microsoft.Xna.Framework
             {
                 // NOTE: We subscribe to item events after items in _addJournal
                 //       have been merged.
-                _addJournal.Add(item);
+                _addJournal.Add(new AddJournalEntry(_addJournal.Count, item));
                 InvalidateCache();
             }
 
             public bool Remove(T item)
             {
-                if (_addJournal.Remove(item))
+                if (_addJournal.Remove(AddJournalEntry.CreateKey(item)))
                     return true;
 
                 var index = _items.IndexOf(item);
@@ -708,14 +717,14 @@ namespace Microsoft.Xna.Framework
 
                 // Prepare the _addJournal to be merge-sorted with _items.
                 // _items is already sorted (because it is always sorted).
-                _addJournal.Sort(_sort);
+                _addJournal.Sort(_addJournalSortComparison);
 
                 int iAddJournal = 0;
                 int iItems = 0;
 
                 while (iItems < _items.Count && iAddJournal < _addJournal.Count)
                 {
-                    var addJournalItem = _addJournal[iAddJournal];
+                    var addJournalItem = _addJournal[iAddJournal].Item;
                     // If addJournalItem is less than (belongs before)
                     // _items[iItems], insert it.
                     if (_sort(addJournalItem, _items[iItems]) < 0)
@@ -733,7 +742,7 @@ namespace Microsoft.Xna.Framework
                 // If _addJournal had any "tail" items, append them all now.
                 for (; iAddJournal < _addJournal.Count; ++iAddJournal)
                 {
-                    var addJournalItem = _addJournal[iAddJournal];
+                    var addJournalItem = _addJournal[iAddJournal].Item;
                     SubscribeToItemEvents(addJournalItem);
                     _items.Add(addJournalItem);
                 }
@@ -768,7 +777,7 @@ namespace Microsoft.Xna.Framework
                 var item = (T)sender;
                 var index = _items.IndexOf(item);
 
-                _addJournal.Add(item);
+                _addJournal.Add(new AddJournalEntry(_addJournal.Count, item));
                 _removeJournal.Add(index);
 
                 // Until the item is back in place, we don't care about its
@@ -777,12 +786,31 @@ namespace Microsoft.Xna.Framework
                 InvalidateCache();
             }
 
-            #region IComparer<T> implementation
-            int IComparer<T>.Compare(T x, T y)
+            private struct AddJournalEntry
             {
-                return _sort(x, y);
+                public readonly int Order;
+                public readonly T Item;
+
+                public AddJournalEntry(int order, T item)
+                {
+                    Order = order;
+                    Item = item;
+                }
+
+                public static AddJournalEntry CreateKey(T item)
+                {
+                    return new AddJournalEntry(-1, item);
+                }
+
+                public override bool Equals(object obj)
+                {
+                    if (!(obj is AddJournalEntry))
+                        return false;
+
+                    return EqualityComparer<T>.Default.Equals(
+                        Item, ((AddJournalEntry)obj).Item);
+                }
             }
-            #endregion
         }
     }
 
