@@ -291,72 +291,12 @@ namespace Microsoft.Xna.Framework
 
         private void Application_WillEnterForeground(NSNotification notification)
         {
-            // FIXME: What needs to be done here?
-            //throw new NotImplementedException();
-			_ourTask =  UIApplication.SharedApplication.BeginBackgroundTask(delegate
-			{    //this is the action that will run when the task expires
-				if (_ourTask != 0) //this check is because we want to avoid ending the same task twice
-				{
-				    UIApplication.SharedApplication.EndBackgroundTask(_ourTask); //end the task
-				    _ourTask = 0; //reset the id
-				}
-			});
-
-		    //we start an asynchronous operation
-		    //so that we make sure that DidEnterBackground
-		    //executes normally
-		    new System.Action(delegate
-		    {
-		        Game.Platform_Activated(null, null);
-		
-		        //Since we are in an asynchronous method,
-		        //we have to make sure that EndBackgroundTask
-		        //will run on the application's main thread
-		        //or we might have unexpected behavior.
-		        UIApplication.SharedApplication.BeginInvokeOnMainThread(delegate
-		        {
-			            if (_ourTask != 0) //same as above
-			            {
-			                UIApplication.SharedApplication.EndBackgroundTask(_ourTask);
-			                _ourTask = 0;
-			            }
-			       });
-			}).BeginInvoke(null, null);	
+			// Already handled in Application_DidBecomeActive. See below for IsActive state change.	
         }
 
         private void Application_DidEnterBackground(NSNotification notification)
         {
-            // FIXME: What needs to be done here?
-            //throw new NotImplementedException();
-			_ourTask = UIApplication.SharedApplication.BeginBackgroundTask(delegate
-			{    //this is the action that will run when the task expires
-				if (_ourTask != 0) //this check is because we want to avoid ending the same task twice
-				{
-				    UIApplication.SharedApplication.EndBackgroundTask(_ourTask); //end the task
-				    _ourTask = 0; //reset the id
-				}
-			});
-
-		    //we start an asynchronous operation
-		    //so that we make sure that DidEnterBackground
-		    //executes normally
-		    new System.Action(delegate
-		    {
-		        Game.Platform_Deactivated(null, null);
-		
-		        //Since we are in an asynchronous method,
-		        //we have to make sure that EndBackgroundTask
-		        //will run on the application's main thread
-		        //or we might have unexpected behavior.
-		        UIApplication.SharedApplication.BeginInvokeOnMainThread(delegate
-		        {
-			            if (_ourTask != 0) //same as above
-			            {
-			                UIApplication.SharedApplication.EndBackgroundTask(_ourTask);
-			                _ourTask = 0;
-			            }
-			       });
-			}).BeginInvoke(null, null);
+			// Already handled in Application_WillResignActive. See below for IsActive state change.
         }
 
         private void Application_DidBecomeActive(NSNotification notification)
