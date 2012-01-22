@@ -66,7 +66,9 @@ namespace Microsoft.Xna.Framework
 		private DateTime _lastUpdate;
 		private DateTime _now;
 		private NSTrackingArea _trackingArea;
-
+		private bool _needsToResetElapsedTime = false;
+		private bool _isFirstTime = true;
+		private TimeSpan _extraElapsedTime;
 		#region UIVIew Methods		
 		public GameWindow(Game game, RectangleF frame) : base (frame)
 		{
@@ -116,11 +118,11 @@ namespace Microsoft.Xna.Framework
 			//MultipleTouchEnabled = true;
 
 			// Initialize GameTime
-			_updateGameTime = new GameTime ();
-			_drawGameTime = new GameTime (); 
+			//_updateGameTime = new GameTime ();
+			//_drawGameTime = new GameTime ();
 
 			// Initialize _lastUpdate
-			_lastUpdate = DateTime.Now;
+			//_lastUpdate = DateTime.Now;
 		}
 
 		~GameWindow ()
@@ -130,12 +132,19 @@ namespace Microsoft.Xna.Framework
 
 		#endregion
 
-        public void StartRunLoop(double updateRate)
-        {
-            _lastUpdate = DateTime.Now;
-            Run(updateRate);
-        }
+		public void StartRunLoop(double updateRate)
+		{
+			Run(updateRate);
+			// Initialize GameTime
+			_updateGameTime = new GameTime ();
+			_drawGameTime = new GameTime ();
+			_now = _lastUpdate = DateTime.Now;
+		}
 
+		public void ResetElapsedTime ()
+		{
+			_needsToResetElapsedTime = true;
+		}
 		#region MonoMacGameView Methods
 
 		protected override void OnClosed (EventArgs e)
@@ -157,18 +166,75 @@ namespace Microsoft.Xna.Framework
 		{
 			base.OnRenderFrame (e);
 
-			// This code was commented to make the code base more iPhone like.
-			// More speed testing is required, to see if this is worse or better
-			// game.DoStep();	
-
 			if (_game != null) {
+
+				_now = DateTime.Now;
+				if (_isFirstTime) {
+					// Initialize GameTime
+					_updateGameTime = new GameTime ();
+					_drawGameTime = new GameTime ();
+					_lastUpdate = DateTime.Now;
+					_isFirstTime = false;
+				}
+
+				if (_needsToResetElapsedTime) {
+					_drawGameTime.ResetElapsedTime();
+				}
+
+				// Try to catch up with frames
 				_drawGameTime.Update (_now - _lastUpdate);
-				_lastUpdate = _now;
+				TimeSpan catchup = _drawGameTime.ElapsedGameTime;
+				if (catchup > _game.TargetElapsedTime) {
+					while (catchup > _game.TargetElapsedTime) {
+						//Console.WriteLine("Catching up " + (catchup - _game.TargetElapsedTime));
+						catchup -= _game.TargetElapsedTime;
+						_drawGameTime.ElapsedGameTime = _game.TargetElapsedTime;
+						_game.DoUpdate (_drawGameTime);
+						_extraElapsedTime += catchup;
+					}
+					if (_extraElapsedTime > _game.TargetElapsedTime) {
+						//Console.WriteLine("FastForward " + _extraElapsedTime);
+						_game.DoUpdate (_drawGameTime);
+						_extraElapsedTime = TimeSpan.Zero;
+					}
+				}
+				else {
+					_game.DoUpdate (_drawGameTime);
+				}
+
+				//Console.WriteLine("Render " + _drawGameTime.ElapsedGameTime);
+//				_game.DoUpdate(_drawGameTime);
 				_game.DoDraw (_drawGameTime);
+				_lastUpdate = _now;
 			}
 
 		}
-
+//		protected override void OnUpdateFrame (FrameEventArgs e)
+//		{
+//			base.OnUpdateFrame (e);
+//
+//			if (_game != null) {
+//				Console.WriteLine("Update");
+//				if (_isFirstTime) {
+//					// Initialize GameTime
+//					_updateGameTime = new GameTime ();
+//					_drawGameTime = new GameTime ();
+//					_lastUpdate = DateTime.Now;
+//					_now = DateTime.Now;
+//				}
+//				else {
+//					_now = DateTime.Now;
+//					_updateGameTime.Update (_now - _lastUpdate);
+//					if (_needsToResetElapsedTime) {
+//						_updateGameTime.ResetElapsedTime();
+//						_drawGameTime.ResetElapsedTime();
+//						_needsToResetElapsedTime = false;
+//					}
+//				}
+//				_isFirstTime = false;
+//				_game.DoUpdate (_updateGameTime);
+//			}
+//		}
 		protected override void OnResize (EventArgs e)
 		{
             var manager = (GraphicsDeviceManager)_game.Services.GetService(typeof(IGraphicsDeviceManager));
@@ -211,17 +277,6 @@ namespace Microsoft.Xna.Framework
 		protected override void OnUnload (EventArgs e)
 		{
 			base.OnUnload (e);
-		}
-
-		protected override void OnUpdateFrame (FrameEventArgs e)
-		{			
-			base.OnUpdateFrame (e);	
-
-			if (_game != null) {
-				_now = DateTime.Now;
-				_updateGameTime.Update (_now - _lastUpdate);
-				_game.DoUpdate (_updateGameTime);
-			}
 		}
 
 		protected override void OnVisibleChanged (EventArgs e)

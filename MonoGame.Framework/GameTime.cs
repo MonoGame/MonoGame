@@ -53,6 +53,10 @@ namespace Microsoft.Xna.Framework
             {
                 return elapsedTime;
             }
+            internal set
+            {
+                elapsedTime = value;
+            }
         }
         public TimeSpan ElapsedRealTime
         {
@@ -94,9 +98,15 @@ namespace Microsoft.Xna.Framework
 
         internal void Update(TimeSpan elapsed)
         {
+		//Console.WriteLine("Update " + elapsed);
             elapsedTime = elapsed;
             totalTime += elapsed;
         }				
+
+        internal void ResetElapsedTime()
+        {
+            elapsedTime = TimeSpan.Zero;
+        }
     }
 }
 

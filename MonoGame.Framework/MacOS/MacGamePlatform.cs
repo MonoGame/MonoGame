@@ -181,7 +181,7 @@ namespace Microsoft.Xna.Framework
 
         public override void StartRunLoop()
         {
-		_gameWindow.Run(1 / Game.TargetElapsedTime.TotalSeconds);
+		_gameWindow.StartRunLoop(1 / Game.TargetElapsedTime.TotalSeconds);
 		var graphicsDeviceManager = (GraphicsDeviceManager)Game.Services.GetService(typeof(IGraphicsDeviceManager));
 		// This is a hack and it should go in MonoMacGameView.  Until that is done we will set the SwapInterval ourselves
 		// Using DisplayLink does not play nicely with background thread loading.
@@ -192,6 +192,9 @@ namespace Microsoft.Xna.Framework
         {
 		// Update our OpenAL sound buffer pools
 		soundControllerInstance.Update();
+		if (_needsToResetElapsedTime) {
+			_needsToResetElapsedTime = false;
+		}
 		if (!_isShouldDraw)
 				return false;
             if (IsPlayingVideo || Guide.isVisible)
@@ -223,16 +226,12 @@ namespace Microsoft.Xna.Framework
 		{
 			_isShouldDraw = false;
 			IsActive = false;
-//			if (Deactivated != null)
-//				Deactivated.Invoke (this, null);
 		}
 
 		public void EnterForeground ()
 		{
 			_isShouldDraw = true;
 			IsActive = true;
-//			if (Activated != null)
-//				Activated.Invoke (this, null);
 		}
 
         public override void EnterFullScreen()
@@ -380,6 +379,27 @@ namespace Microsoft.Xna.Framework
 		public override void EndScreenDeviceChange (string screenDeviceName, int clientWidth,int clientHeight)
 		{
 
+		}
+
+		public override void ResetElapsedTime ()
+		{
+			_gameWindow.ResetElapsedTime();
+		}
+
+		public TimeSpan InactiveSleepTime
+		{
+			get
+			{
+				return this._inactiveSleepTime;
+			}
+			set
+			{
+				if (value < TimeSpan.Zero)
+				{
+				  throw new ArgumentOutOfRangeException("value", "Value can not be zero");
+				}
+				this._inactiveSleepTime = value;
+			}
 		}
     }
 }

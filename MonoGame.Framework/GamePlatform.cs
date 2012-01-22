@@ -72,8 +72,12 @@ namespace Microsoft.Xna.Framework
 {
     abstract class GamePlatform : IDisposable
     {
-        #region Construction/Destruction
 
+	#region
+	protected TimeSpan _inactiveSleepTime = TimeSpan.FromMilliseconds(20.0);
+	protected bool _needsToResetElapsedTime = false;
+	#endregion
+        #region Construction/Destruction
         public static GamePlatform Create(Game game)
         {
 #if IPHONE
@@ -298,6 +302,7 @@ namespace Microsoft.Xna.Framework
         /// Game.TargetElapsedTime has been set.
         /// </summary>
         public virtual void TargetElapsedTimeChanged() {}
+        public virtual void ResetElapsedTime() {}
 
         protected virtual void OnIsMouseVisibleChanged() {}
 
