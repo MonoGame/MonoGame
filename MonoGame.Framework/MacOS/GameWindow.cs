@@ -166,10 +166,6 @@ namespace Microsoft.Xna.Framework
 		{
 			base.OnRenderFrame (e);
 
-			// This code was commented to make the code base more iPhone like.
-			// More speed testing is required, to see if this is worse or better
-			// game.DoStep();	
-
 			if (_game != null) {
 
 				_now = DateTime.Now;
@@ -179,6 +175,10 @@ namespace Microsoft.Xna.Framework
 					_drawGameTime = new GameTime ();
 					_lastUpdate = DateTime.Now;
 					_isFirstTime = false;
+				}
+
+				if (_needsToResetElapsedTime) {
+					_drawGameTime.ResetElapsedTime();
 				}
 
 				// Try to catch up with frames
@@ -200,10 +200,6 @@ namespace Microsoft.Xna.Framework
 				}
 				else {
 					_game.DoUpdate (_drawGameTime);
-				}
-
-				if (_needsToResetElapsedTime) {
-					_drawGameTime.ResetElapsedTime();
 				}
 
 				//Console.WriteLine("Render " + _drawGameTime.ElapsedGameTime);
