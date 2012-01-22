@@ -102,6 +102,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Graphics\Effect\AlphaTestEffect.cs" />
+    <Compile Include="Graphics\Effect\AlphaTestEffectCode.cs" />
+    <Compile Include="Graphics\Effect\EffectHelpers.cs" />
+    <Compile Include="Graphics\PackedVector\NormalizedShort2.cs" />
+    <Compile Include="Graphics\Vertices\VertexPositionColorTexture.cs" />
     <Compile Include="Input\GamePadDeadZone.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Audio\AudioChannels.cs" />

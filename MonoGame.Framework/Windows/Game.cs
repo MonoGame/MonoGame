@@ -81,6 +81,7 @@ namespace Microsoft.Xna.Framework
 
 		public Game()
 		{
+		    Exiting += OnExiting;
 
 			// Initialize collections
 			_services = new GameServiceContainer();
@@ -99,7 +100,12 @@ namespace Microsoft.Xna.Framework
 			
 		}
 
-		public void Dispose ()
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+
+        protected virtual void Dispose(bool disposing)
 		{
 			// do nothing
 		}
@@ -439,6 +445,10 @@ namespace Microsoft.Xna.Framework
 		            }
 				}
 			}
+        }
+
+        protected virtual void OnExiting(object sender, EventArgs args)
+        {
         }
 
         public void Exit()
