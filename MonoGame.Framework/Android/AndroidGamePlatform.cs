@@ -221,6 +221,11 @@ namespace Microsoft.Xna.Framework
 			Android.Util.Log.Debug("MonoGameDebug", Message);
 #endif
 		}
+		
+		public override void ResetElapsedTime ()
+		{
+			this.Window.ResetElapsedTime();			
+		}
 					
     }
 }
