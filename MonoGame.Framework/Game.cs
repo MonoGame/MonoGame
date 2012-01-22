@@ -363,17 +363,27 @@ namespace Microsoft.Xna.Framework
             }
         }
 
+        private static readonly Action<IDrawable, GameTime> DrawAction =
+            (drawable, gameTime) => drawable.Draw(gameTime);
+
         protected virtual void Draw(GameTime gameTime)
         {
 #if ANDROID
+            // TODO: It should be possible to move this call to
+            //       PrimaryThreadLoader.DoLoads into
+            //       AndroidGamePlatform.BeforeDraw and remove the need for the
+            //       #if ANDROID check.
             PrimaryThreadLoader.DoLoads();
 #endif
-            _drawables.ForEachFilteredItem(d => d.Draw(gameTime));
+            _drawables.ForEachFilteredItem(DrawAction, gameTime);
         }
+
+        private static readonly Action<IUpdateable, GameTime> UpdateAction =
+            (updateable, gameTime) => updateable.Update(gameTime);
 
         protected virtual void Update(GameTime gameTime)
         {
-            _updateables.ForEachFilteredItem(u => u.Update(gameTime));
+            _updateables.ForEachFilteredItem(UpdateAction, gameTime);
         }
 
         #endregion Protected Methods
@@ -580,7 +590,7 @@ namespace Microsoft.Xna.Framework
                 _sortChangedUnsubscriber = sortChangedUnsubscriber;
             }
 
-            public void ForEachFilteredItem(Action<T> action)
+            public void ForEachFilteredItem<TUserData>(Action<T, TUserData> action, TUserData userData)
             {
                 if (_shouldRebuildCache)
                 {
@@ -589,15 +599,15 @@ namespace Microsoft.Xna.Framework
 
                     // Rebuild the cache
                     _cachedFilteredItems.Clear();
-                    _items.ForEach(item => {
-                        if (_filter(item))
-                            _cachedFilteredItems.Add(item);
-                    });
+                    for (int i = 0; i < _items.Count; ++i)
+                        if (_filter(_items[i]))
+                            _cachedFilteredItems.Add(_items[i]);
 
                     _shouldRebuildCache = false;
                 }
 
-                _cachedFilteredItems.ForEach(action);
+                for (int i = 0; i < _cachedFilteredItems.Count; ++i)
+                    action(_cachedFilteredItems[i], userData);
 
                 // If the cache was invalidated as a result of processing items,
                 // now is a good time to clear it and give the GC (more of) a
@@ -632,10 +642,11 @@ namespace Microsoft.Xna.Framework
 
             public void Clear()
             {
-                _items.ForEach(item => {
-                    _filterChangedUnsubscriber(item, Item_FilterPropertyChanged);
-                    _sortChangedUnsubscriber(item, Item_SortPropertyChanged);
-                });
+                for (int i = 0; i < _items.Count; ++i)
+                {
+                    _filterChangedUnsubscriber(_items[i], Item_FilterPropertyChanged);
+                    _sortChangedUnsubscriber(_items[i], Item_SortPropertyChanged);
+                }
 
                 _addJournal.Clear();
                 _removeJournal.Clear();
@@ -674,6 +685,8 @@ namespace Microsoft.Xna.Framework
                 return ((System.Collections.IEnumerable)_items).GetEnumerator();
             }
 
+            private static readonly Comparison<int> RemoveJournalSortComparison =
+                (x, y) => y - x; // Sort high to low
             private void ProcessRemoveJournal()
             {
                 if (_removeJournal.Count == 0)
@@ -682,8 +695,9 @@ namespace Microsoft.Xna.Framework
                 // Remove items in reverse.  (Technically there exist faster
                 // ways to bulk-remove from a variable-length array, but List<T>
                 // does not provide such a method.)
-                _removeJournal.Sort((x, y) => y - x); // Sort high to low
-                _removeJournal.ForEach(index => { _items.RemoveAt(index); });
+                _removeJournal.Sort(RemoveJournalSortComparison);
+                for (int i = 0; i < _removeJournal.Count; ++i)
+                    _items.RemoveAt(_removeJournal[i]);
                 _removeJournal.Clear();
             }
 
