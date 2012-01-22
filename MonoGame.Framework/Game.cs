@@ -368,7 +368,6 @@ namespace Microsoft.Xna.Framework
             {
                 LoadContent();
             }			
-			ResetElapsedTime();
         }
 
         private static readonly Action<IDrawable, GameTime> DrawAction =
