@@ -39,8 +39,6 @@
 // #endregion License
 // 
 
-#if DEBUG
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -58,22 +56,44 @@ namespace Microsoft.Xna.Framework
 		
 		public override string ToString ()
 		{
-			return string.Format("[{0}({1}%)\t HitCount={2}\t TotalTime={3}ms\t MaxTime={4}ms\t AverageTime={5}ms]", Name,(100*TotalTime)/PerformanceCounter.ElapsedTime,HitCount,TotalTime, MaxTime, TotalTime/HitCount);
+			return string.Format("[{0}({1}%)\t HitCount={2}\t TotalTime={3}ms\t MaxTime={4}ms\t Variance={5:F2}ms^2 AverageTime={6}ms]", Name,(100*TotalTime)/PerformanceCounter.ElapsedTime,HitCount,TotalTime, MaxTime, SqrDiffSum/HitCount, TotalTime/HitCount);
 		}
 
 		public long PreviousTime {get;set;}
 		public long TotalTime {get;set;}
 		public long MaxTime {get;set;}
+		public double SqrDiffSum {get; set;} // used for approximation of variance.
 		public long HitCount {get;set;}
 		public string Name {get;set;}
 	}
 	
+	internal class PerformanceEvent
+	{
+		public void Dump()
+		{
+			Console.WriteLine(ToString());
+		}
+		
+		public override string ToString ()
+		{
+			return string.Format("[{0} : {1} Time: {2}]", Name, FrameNum, Time);
+		}
+
+		public long Time {get;set;}
+		public long FrameNum {get; set;}
+		public string Name {get;set;}
+	}
+		
+	
 	public static class PerformanceCounter
 	{
 		private static Dictionary<string,PerformanceItem> _list = new Dictionary<string, PerformanceItem>();
+		private static Dictionary<string,long> _lastEventTimeByType = new Dictionary<string, long>();
 		private static long _startTime = Environment.TickCount;
 		private static long _endTime;
-		
+		private static List<PerformanceEvent> _events = new List<PerformanceEvent>();
+
+		[Conditional("PERF_COUNTERS")]
 		public static void Dump()
 		{
 			_endTime = Environment.TickCount;
@@ -84,12 +104,26 @@ namespace Microsoft.Xna.Framework
 			
 			foreach (PerformanceItem item in _list.Values)
 			{
+				if(item.HitCount != 0)
+				{
+					item.Dump();
+				}
+			}
+			
+			Console.WriteLine("==== EVENTS =============");
+			
+			foreach (PerformanceEvent item in _events)
+			{
 				item.Dump();
 			}
 			
+			_events.Clear();
+			
 			Console.WriteLine("=========================");
+			Console.WriteLine("Memory: " + GC.GetTotalMemory(false).ToString());
 		}
 		
+		[Conditional("PERF_COUNTERS")]
 		public static void Begin()
 		{
 			_startTime = Environment.TickCount;
@@ -103,6 +137,7 @@ namespace Microsoft.Xna.Framework
 			}
 		}
 		
+		[Conditional("PERF_COUNTERS")]
 		public static void BeginMensure(string Name)
 		{			
 			PerformanceItem item;
@@ -119,11 +154,13 @@ namespace Microsoft.Xna.Framework
 
 				item = new PerformanceItem();
 				item.Name = "ID: " + Name+" In " + methodBase.ReflectedType.ToString()+"::"+methodBase.Name; 
-				item.PreviousTime = Environment.TickCount;			
+				item.PreviousTime = Environment.TickCount;	
+				item.SqrDiffSum = 0.0;
 				_list.Add(Name,item);
 			}			
 		}
 		
+		[Conditional("PERF_COUNTERS")]
 		public static void EndMensure(string Name)
 		{
 			PerformanceItem item = _list[Name];
@@ -132,9 +169,36 @@ namespace Microsoft.Xna.Framework
 			{
 				item.MaxTime = elapsedTime;
 			}
-			item.TotalTime += elapsedTime;
 			item.HitCount ++;
-		}	}
+			item.TotalTime += elapsedTime;
+			
+			var diff = elapsedTime - ((double)item.TotalTime / item.HitCount);
+			item.SqrDiffSum += diff*diff;
+		}
+		
+		[Conditional("PERF_COUNTERS")]
+		public static void Event(string Name, int framenum)
+		{
+			var newevent = new PerformanceEvent() { FrameNum = framenum, Name = Name, Time = Environment.TickCount };
+			_events.Add( newevent );	
+		}
+		
+		[Conditional("PERF_COUNTERS")]
+		public static void Event(string Name, bool showDelta)
+		{
+			var newevent = new PerformanceEvent() { FrameNum = 0, Name = Name, Time = Environment.TickCount };
+			if(showDelta)
+			{
+				long oldEventTime;
+				if(_lastEventTimeByType.TryGetValue(Name, out oldEventTime))
+				{
+					newevent.FrameNum = newevent.Time - oldEventTime;
+				}
+				_lastEventTimeByType[Name] = newevent.Time;
+				
+			}
+			_events.Add( newevent );	
+		}
+	}
 }
 
-#endif

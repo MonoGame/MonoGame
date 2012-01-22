@@ -289,8 +289,14 @@ namespace Microsoft.Xna.Framework
 			
 			GraphicsDevice.Viewport = _vp;	
 			
-			_view.Run( FramesPerSecond / ( FramesPerSecond * TargetElapsedTime.TotalSeconds ) );	
-			
+			if(this._isFixedTimeStep)
+			{
+				_view.Run(FramesPerSecond / ( FramesPerSecond * TargetElapsedTime.TotalSeconds ) );	
+			}
+			else
+			{
+				_view.Run ();
+			}
 			_view.MainContext = _view.EAGLContext;
 			_view.ShareGroup = _view.MainContext.ShareGroup;
 			_view.BackgroundContext = new MonoTouch.OpenGLES.EAGLContext(_view.ContextRenderingApi, _view.ShareGroup);

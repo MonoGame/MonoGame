@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Framework.iOS", "M
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lidgren.Network.iOS", "ThirdParty\Lidgren.Network\Lidgren.Network.iOS.csproj", "{734EAA48-F1CA-481A-B391-0285BC0E8B40}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGameTest", "..\..\Projects\MonoGameTest\MonoGameTest\MonoGameTest.csproj", "{14DC80B1-D9D8-4CDE-9B35-745DA3005791}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|iPhoneSimulator = Debug|iPhoneSimulator
@@ -19,6 +21,26 @@ Global
 		Distribution|iPhoneSimulator = Distribution|iPhoneSimulator
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{14DC80B1-D9D8-4CDE-9B35-745DA3005791}.Debug|Any CPU.ActiveCfg = Debug|iPhoneSimulator
+		{14DC80B1-D9D8-4CDE-9B35-745DA3005791}.Debug|Any CPU.Build.0 = Debug|iPhoneSimulator
+		{14DC80B1-D9D8-4CDE-9B35-745DA3005791}.Debug|iPhone.ActiveCfg = Debug|iPhone
+		{14DC80B1-D9D8-4CDE-9B35-745DA3005791}.Debug|iPhone.Build.0 = Debug|iPhone
+		{14DC80B1-D9D8-4CDE-9B35-745DA3005791}.Debug|iPhoneSimulator.ActiveCfg = Debug|iPhoneSimulator
+		{14DC80B1-D9D8-4CDE-9B35-745DA3005791}.Debug|iPhoneSimulator.Build.0 = Debug|iPhoneSimulator
+		{14DC80B1-D9D8-4CDE-9B35-745DA3005791}.Debug|x86.ActiveCfg = Debug|iPhoneSimulator
+		{14DC80B1-D9D8-4CDE-9B35-745DA3005791}.Debug|x86.Build.0 = Debug|iPhoneSimulator
+		{14DC80B1-D9D8-4CDE-9B35-745DA3005791}.Distribution|iPhone.ActiveCfg = Debug|iPhone
+		{14DC80B1-D9D8-4CDE-9B35-745DA3005791}.Distribution|iPhone.Build.0 = Debug|iPhone
+		{14DC80B1-D9D8-4CDE-9B35-745DA3005791}.Distribution|iPhoneSimulator.ActiveCfg = Debug|iPhoneSimulator
+		{14DC80B1-D9D8-4CDE-9B35-745DA3005791}.Distribution|iPhoneSimulator.Build.0 = Debug|iPhoneSimulator
+		{14DC80B1-D9D8-4CDE-9B35-745DA3005791}.Release|Any CPU.ActiveCfg = Release|iPhoneSimulator
+		{14DC80B1-D9D8-4CDE-9B35-745DA3005791}.Release|Any CPU.Build.0 = Release|iPhoneSimulator
+		{14DC80B1-D9D8-4CDE-9B35-745DA3005791}.Release|iPhone.ActiveCfg = Release|iPhone
+		{14DC80B1-D9D8-4CDE-9B35-745DA3005791}.Release|iPhone.Build.0 = Release|iPhone
+		{14DC80B1-D9D8-4CDE-9B35-745DA3005791}.Release|iPhoneSimulator.ActiveCfg = Release|iPhoneSimulator
+		{14DC80B1-D9D8-4CDE-9B35-745DA3005791}.Release|iPhoneSimulator.Build.0 = Release|iPhoneSimulator
+		{14DC80B1-D9D8-4CDE-9B35-745DA3005791}.Release|x86.ActiveCfg = Release|iPhoneSimulator
+		{14DC80B1-D9D8-4CDE-9B35-745DA3005791}.Release|x86.Build.0 = Release|iPhoneSimulator
 		{734EAA48-F1CA-481A-B391-0285BC0E8B40}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{734EAA48-F1CA-481A-B391-0285BC0E8B40}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{734EAA48-F1CA-481A-B391-0285BC0E8B40}.Debug|iPhone.ActiveCfg = Debug|Any CPU
@@ -57,6 +79,6 @@ Global
 		{DB8508BB-9849-4CC2-BC0F-8EB5DACB3C47}.Release|x86.Build.0 = Release|iPhoneSimulator
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = MonoGame.Framework\MonoGame.Framework.iOS.csproj
+		StartupItem = ..\..\Projects\MonoGameTest\MonoGameTest\MonoGameTest.csproj
 	EndGlobalSection
 EndGlobal
