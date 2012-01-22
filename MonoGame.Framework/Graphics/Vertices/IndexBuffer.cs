@@ -10,9 +10,8 @@ using System.Runtime.InteropServices;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-    public class IndexBuffer
+    public class IndexBuffer : GraphicsResource
     {
-        private GraphicsDevice _graphics;
         internal Type _type;
         internal int _count;
 		private object _buffer;
@@ -34,12 +33,12 @@ namespace Microsoft.Xna.Framework.Graphics
 			_delayedBufferDelegates.Clear();
 		}		
 		
-        public IndexBuffer(GraphicsDevice Graphics, Type type, int count, BufferUsage bufferUsage)
+        public IndexBuffer(GraphicsDevice graphics, Type type, int count, BufferUsage bufferUsage)
         {
 			if (type != typeof(uint) && type != typeof(ushort) && type != typeof(byte))
 				throw new NotSupportedException("The only types that are supported are: uint, ushort and byte");
 			
-            this._graphics = Graphics;
+            this.graphicsDevice = graphics;
             this._type = type;
             this._count = count;
             this._bufferUsage = bufferUsage;
@@ -64,17 +63,19 @@ namespace Microsoft.Xna.Framework.Graphics
 			_allBuffers[_bufferIndex] = this;			
         }
 		
-		public void Dispose ()
+		public override void Dispose ()
 		{
 			GL11.GenBuffers(0, ref _bufferStore);
-		}		
+            base.Dispose();
+        }		
     }
 
 	
 	
     public class DynamicIndexBuffer : IndexBuffer
     {
-        public DynamicIndexBuffer(GraphicsDevice Graphics, Type type, int count, BufferUsage bufferUsage) : base(Graphics, type, count, bufferUsage)
+        public DynamicIndexBuffer(GraphicsDevice graphics, Type type, int count, BufferUsage bufferUsage) 
+            : base(graphics, type, count, bufferUsage)
         {
         }
     }
