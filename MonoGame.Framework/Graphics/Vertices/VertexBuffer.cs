@@ -1,21 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Runtime.InteropServices;
-
-using OpenTK.Graphics.ES20;
-using OpenTK.Graphics.ES11;
 using GL11 = OpenTK.Graphics.ES11.GL;
-using GL20 = OpenTK.Graphics.ES20.GL;
 using All11 = OpenTK.Graphics.ES11.All;
-using All20 = OpenTK.Graphics.ES20.All;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-    public class VertexBuffer : IDisposable
+    public class VertexBuffer : GraphicsResource
     {
-        private GraphicsDevice Graphics;
         internal Type _type;
         private int _vertexCount;
         private BufferUsage _bufferUsage;
@@ -25,13 +17,14 @@ namespace Microsoft.Xna.Framework.Graphics
 		internal int _size;		
         internal static int _bufferCount = 0;
 		internal uint _bufferStore; 
+
 		// allow for 50 buffers initially
 		internal static VertexBuffer[] _allBuffers = new VertexBuffer[50];
 		internal static List<Action> _delayedBufferDelegates = new List<Action>();
 
-        public VertexBuffer(GraphicsDevice Graphics, Type type, int vertexCount, BufferUsage bufferUsage)
+        public VertexBuffer(GraphicsDevice graphics, Type type, int vertexCount, BufferUsage bufferUsage)
         {
-            this.Graphics = Graphics;
+            this.graphicsDevice = graphics;
             this._type = type;
             this._vertexCount = vertexCount;
             this._bufferUsage = bufferUsage;
@@ -60,7 +53,7 @@ namespace Microsoft.Xna.Framework.Graphics
             GL11.BufferData<T>(All11.ArrayBuffer, (IntPtr)_size, (T[])_buffer, bufferUsage);			
 		}
 		
-        public unsafe void GetData<T>(T[] vertices) where T : IVertexType
+        public void GetData<T>(T[] vertices) where T : IVertexType
         {
             if (_buffer == null)
                 throw new Exception("Can't get data on an empty buffer");
@@ -70,7 +63,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 vertices[i] = _tbuff[i];
         }
 
-        public unsafe void SetData<T>(T[] vertices) where T : struct, IVertexType
+        public void SetData<T>(T[] vertices) where T : struct, IVertexType
         {
 			//the creation of the buffer should mb be moved to the constructor and then glMapBuffer and Unmap should be used to update it
 			//glMapBuffer - sets data
@@ -88,9 +81,10 @@ namespace Microsoft.Xna.Framework.Graphics
             // TODO: Kill buffers in PhoneOSGameView.DestroyFrameBuffer()
         }
 		
-		public void Dispose ()
+		public override void Dispose ()
 		{
 			GL11.GenBuffers(0, ref _bufferStore);
+            base.Dispose();
 		}
     }
 	

@@ -47,10 +47,6 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		internal GraphicsDevice graphicsDevice;
 		
-		public GraphicsResource ()
-		{
-		}
-		
 		protected virtual void DoDisposing(EventArgs e) 
 		{
 			if (Disposing != null)
