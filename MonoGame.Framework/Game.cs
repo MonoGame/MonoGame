@@ -277,6 +277,7 @@ namespace Microsoft.Xna.Framework
             //        Now that things are more unified, it may be possible to
             //        consolidate this logic back into the Game class.
             //        Regardless, an empty implementation is not correct.
+            _platform.ResetElapsedTime();
         }
 
         public void Run()
