@@ -35,7 +35,7 @@ namespace Lidgren.Network
 "MAN:\"ssdp:discover\"\r\n" +
 "MX:3\r\n\r\n";
 
-			byte[] arr = System.Text.Encoding.ASCII.GetBytes(str);
+			byte[] arr = System.Text.Encoding.UTF8.GetBytes(str);
 
 			peer.Socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, true);
 			peer.RawSend(arr, 0, arr.Length, new IPEndPoint(IPAddress.Broadcast, 1900));

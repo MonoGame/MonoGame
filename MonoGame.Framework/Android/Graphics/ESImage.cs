@@ -45,7 +45,7 @@ using System.Drawing;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-    internal class ESImage
+    internal class ESImage : IDisposable
     {
         // The OpenGL texture to be used for this image
         private ESTexture2D texture;
@@ -65,6 +65,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private int textureOffsetX;
         // The Y offset to use when looking for our image
         private int textureOffsetY;
+        private bool disposed;
 
         public ESImage()
         {
@@ -243,6 +244,20 @@ namespace Microsoft.Xna.Framework.Graphics
             get
             {
                 return texture.PixelFormat;
+            }
+        }
+
+        public void RetryToCreateTexture()
+        {
+            texture.RetryToCreateTexture();
+        }
+
+        public virtual void Dispose()
+        {
+            if (!disposed)
+            {
+                if(texture != null)
+                    texture.Dispose();
             }
         }
     }

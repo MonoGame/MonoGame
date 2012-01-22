@@ -1104,7 +1104,30 @@ namespace Microsoft.Xna.Framework
             result = CreateTranslation(xPosition, yPosition, zPosition);
         }
 
+        public static Matrix CreateWorld(Vector3 position, Vector3 forward, Vector3 up)
+        {
+            Matrix ret;
+                        CreateWorld(ref position, ref forward, ref up, out ret);
+                        return ret;
+        }
 
+        public static void CreateWorld(ref Vector3 position, ref Vector3 forward, ref Vector3 up, out Matrix result)
+        {
+                        Vector3 x, y, z;
+                        Vector3.Normalize(ref forward, out z);
+                        Vector3.Cross(ref forward, ref up, out x);
+                        Vector3.Cross(ref x, ref forward, out y);
+                        x.Normalize();
+                        y.Normalize();            
+                        
+                        result = new Matrix();
+                        result.Right = x;
+                        result.Up = y;
+                        result.Forward = z;
+                        result.Translation = position;
+                        result.M44 = 1f;
+        }
+		
         public float Determinant()
         {
             float num22 = this.M11;

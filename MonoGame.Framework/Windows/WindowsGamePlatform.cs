@@ -71,18 +71,25 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+using Microsoft.Xna.Framework.Audio;
+
 namespace Microsoft.Xna.Framework
 {
     class WindowsGamePlatform : GamePlatform
     {
         private WindowsGameWindow _view;
-
-        public WindowsGamePlatform(Game game)
+		private OpenALSoundController soundControllerInstance = null;
+        
+		public WindowsGamePlatform(Game game)
             : base(game)
         {
             _view = new WindowsGameWindow();
             _view.Game = game;
             this.Window = _view;
+			
+			// Setup our OpenALSoundController to handle our SoundBuffer pools
+			soundControllerInstance = OpenALSoundController.GetInstance;
+			
         }
 
         public override GameRunBehavior DefaultRunBehavior
@@ -110,7 +117,7 @@ namespace Microsoft.Xna.Framework
         {
             throw new NotImplementedException();
         }
-
+        
         public override void Exit()
         {
             if (!_view.OpenTkGameWindow.IsExiting)
@@ -122,6 +129,8 @@ namespace Microsoft.Xna.Framework
 
         public override bool BeforeUpdate(GameTime gameTime)
         {
+			// Update our OpenAL sound buffer pools
+			soundControllerInstance.Update();			
             return true;
         }
 

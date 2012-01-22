@@ -197,7 +197,11 @@ namespace Microsoft.Xna.Framework.Content
 				
 				assetName = TitleContainer.GetFilename(assetName);
 				
-				if ((typeof(T) == typeof(Texture2D)))
+				if ((typeof(T) == typeof(Curve))) 
+                {				
+                    assetName = CurveReader.Normalize(assetName);
+                }
+                else if ((typeof(T) == typeof(Texture2D)))
 				{
 					assetName = Texture2DReader.Normalize(assetName);
 				}
@@ -253,8 +257,8 @@ namespace Microsoft.Xna.Framework.Content
 			
 			if (loadXnb) {
 				// Try to load as XNB file
-				using (stream)
-				{
+                try
+                {
 					using(BinaryReader xnbReader = new BinaryReader(stream))
 					{
 						// The first 4 bytes should be the "XNB" header. i use that to detect an invalid file
@@ -297,6 +301,18 @@ namespace Microsoft.Xna.Framework.Content
 							int decodedBytes = 0;
 							long startPos = stream.Position;
 							long pos = startPos;
+							
+#if ANDROID
+                            // Android native stream does not support the Position property. LzxDecoder.Decompress also uses
+                            // Seek.  So we read the entirity of the stream into a memory stream and replace stream with the
+                            // memory stream.
+                            MemoryStream memStream = new MemoryStream();
+                            stream.CopyTo(memStream);
+                            memStream.Seek(0, SeekOrigin.Begin);
+                            stream.Dispose();
+                            stream = memStream;
+                            pos = -14;
+#endif
 	
 							while (pos-startPos < compressedSize)
 							{
@@ -358,6 +374,13 @@ namespace Microsoft.Xna.Framework.Content
 						}
 					}
 				}
+				finally
+                {
+                    if (stream != null)
+                    {
+                        stream.Dispose();
+                    }
+                }
 
 			}
 
@@ -383,6 +406,111 @@ namespace Microsoft.Xna.Framework.Content
 
 			return (T)result;
 		}
+		
+		protected void ReloadContent()
+        {
+            foreach (var asset in loadedAssets)
+            {
+                ReloadAsset(asset.Key, asset.Value);
+            }
+        }
+        
+        protected void ReloadAsset(string originalAssetName, object currentAsset)
+        {
+			if (string.IsNullOrEmpty(assetName))
+			{
+				throw new ArgumentNullException("assetName");
+			}
+			if (disposed)
+			{
+				throw new ObjectDisposedException("ContentManager");
+			}
+			
+			string originalAssetName = assetName;
+			object result = null;
+
+			if (this.graphicsDeviceService == null)
+			{
+				this.graphicsDeviceService = serviceProvider.GetService(typeof(IGraphicsDeviceService)) as IGraphicsDeviceService;
+				if (this.graphicsDeviceService == null)
+				{
+					throw new InvalidOperationException("No Graphics Device Service");
+				}
+			}
+			
+			Stream stream = null;
+			bool loadXnb = false;
+			try {
+				//try load it traditionally
+				stream = OpenStream(assetName);
+				stream.Close()
+			} catch (ContentLoadException ex) {
+				//MonoGame try to load as a non-content file
+				
+				assetName = TitleContainer.GetFilename(assetName);
+				
+                if ((currentAsset is Curve))
+                {
+                    assetName = CurveReader.Normalize(assetName);
+                }
+                else if ((currentAsset is Texture2D))
+                {
+                    assetName = Texture2DReader.Normalize(assetName);
+                }
+                else if ((currentAsset is SpriteFont))
+                {
+                    assetName = SpriteFontReader.Normalize(assetName);
+                }
+                else if ((currentAsset is Effect))
+                {
+                    assetName = Effect.Normalize(assetName);
+                }
+                else if ((currentAsset is Song))
+                {
+                    assetName = SongReader.Normalize(assetName);
+                }
+                else if ((currentAsset is SoundEffect))
+                {
+                    assetName = SoundEffectReader.Normalize(assetName);
+                }
+                else if ((currentAsset is Video))
+                {
+                    assetName = Video.Normalize(assetName);
+                }
+
+                if (string.IsNullOrEmpty(assetName))
+                {
+                    throw new ContentLoadException("Could not load " + originalAssetName + " asset!");
+                }
+			
+                if ((currentAsset is Texture2D))
+                {
+                    using (Stream assetStream = OpenStream(assetName))
+                    {
+                        var asset = currentAsset as Texture2D;
+                        asset.Reload(assetStream);
+                    }
+                }
+                else if ((currentAsset is SpriteFont))
+                {
+                }
+                else if ((currentAsset is Song))
+                {
+                }
+                else if ((currentAsset is SoundEffect))
+                {
+                }
+                else if ((currentAsset is Video))
+                {
+                }
+                else if ((currentAsset is Effect))
+                {
+                }
+			}
+			
+
+		}
+    
 
 		public virtual void Unload()
 		{
@@ -415,4 +543,3 @@ namespace Microsoft.Xna.Framework.Content
 		}
 	}
 }
-

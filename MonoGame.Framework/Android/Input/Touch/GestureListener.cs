@@ -23,8 +23,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			if ((TouchPanel.EnabledGestures & GestureType.DoubleTap) != 0)
 			{				
 				Vector2 positon = new Vector2(e.GetX(), e.GetY());
-				activity.Game.Window.UpdateTouchPosition(ref positon);
-				var gs = new GestureSample(GestureType.DoubleTap, activity.Game.TargetElapsedTime, 
+				AndroidGameActivity.Game.Window.UpdateTouchPosition(ref positon);
+				var gs = new GestureSample(GestureType.DoubleTap, AndroidGameActivity.Game.TargetElapsedTime, 
 					positon, Vector2.Zero, Vector2.Zero, Vector2.Zero);
 				TouchPanel.GestureList.Enqueue(gs);
 			}
@@ -42,8 +42,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			if ((TouchPanel.EnabledGestures & GestureType.Tap) != 0)
 			{
 				Vector2 positon = new Vector2(e.GetX(), e.GetY());
-				activity.Game.Window.UpdateTouchPosition(ref positon);
-				var gs = new GestureSample(GestureType.Tap, activity.Game.TargetElapsedTime, 
+				AndroidGameActivity.Game.Window.UpdateTouchPosition(ref positon);
+				var gs = new GestureSample(GestureType.Tap, AndroidGameActivity.Game.TargetElapsedTime, 
 					positon, Vector2.Zero, Vector2.Zero, Vector2.Zero);
 				TouchPanel.GestureList.Enqueue(gs);
 			}
@@ -56,10 +56,10 @@ namespace Microsoft.Xna.Framework.Input.Touch
             if ((TouchPanel.EnabledGestures & GestureType.Flick) != 0)
             {
 				Vector2 positon = new Vector2(e1.GetX(), e1.GetY());
-				activity.Game.Window.UpdateTouchPosition(ref positon);
+				AndroidGameActivity.Game.Window.UpdateTouchPosition(ref positon);
 				Vector2 positon2 = new Vector2(e2.GetX(), e2.GetY());
-				activity.Game.Window.UpdateTouchPosition(ref positon2);
-                var gs = new GestureSample(GestureType.Flick, activity.Game.TargetElapsedTime,
+				AndroidGameActivity.Game.Window.UpdateTouchPosition(ref positon2);
+                var gs = new GestureSample(GestureType.Flick, AndroidGameActivity.Game.TargetElapsedTime,
                     positon,
                     positon2,
                     new Vector2(velocityX, velocityY),
@@ -74,13 +74,14 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			if ((TouchPanel.EnabledGestures & GestureType.Hold) != 0)
 			{
 				Vector2 positon = new Vector2(e.GetX(), e.GetY());
-				activity.Game.Window.UpdateTouchPosition(ref positon);
-				var gs = new GestureSample(GestureType.Hold, activity.Game.TargetElapsedTime, 
+				AndroidGameActivity.Game.Window.UpdateTouchPosition(ref positon);
+				var gs = new GestureSample(GestureType.Hold, AndroidGameActivity.Game.TargetElapsedTime, 
 					positon, Vector2.Zero, Vector2.Zero, Vector2.Zero);
 				TouchPanel.GestureList.Enqueue(gs);
 			}
 			base.OnLongPress (e);
 		}
+		
 	}
 }
 

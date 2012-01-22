@@ -95,14 +95,31 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 		
-		internal Texture2D(ESImage theImage)
+		internal Texture2D(GraphicsDevice graphicsDevice, ESImage theImage)
 		{
-			texture = theImage;
-			_width = texture.ImageWidth;
-			_height = texture.ImageHeight;
-			_format = texture.Format;
-			_textureId = (int)theImage.Name;
+			SetInfoFromESImage(theImage);
+		    this.graphicsDevice = graphicsDevice;
+
+            Disposing += Texture2D_Disposing;
 		}
+
+        void SetInfoFromESImage(ESImage image)
+        {
+            texture = image;
+            _width = texture.ImageWidth;
+            _height = texture.ImageHeight;
+            _format = texture.Format;
+            _textureId = (int)image.Name;
+        }
+
+        void Texture2D_Disposing(object sender, EventArgs e)
+        {
+            if (texture != null)
+            {
+                texture.Dispose();
+                texture = null;
+            }
+        }
 		
 		public Texture2D(GraphicsDevice graphicsDevice, int width, int height) : 
 			this (graphicsDevice, width, height, false, SurfaceFormat.Color)
@@ -140,8 +157,10 @@ namespace Microsoft.Xna.Framework.Graphics
             else
                 generateOpenGLTexture();
 #else
-            	    generateOpenGLTexture();
+            	generateOpenGLTexture();
 #endif
+
+            Disposing += Texture2D_Disposing;
         }
 		
 		private void generateOpenGLTexture() 
@@ -225,9 +244,25 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 			
 			ESImage theTexture = new ESImage(image, graphicsDevice.PreferedFilter);			
-			Texture2D result = new Texture2D(theTexture);
+			Texture2D result = new Texture2D(graphicsDevice, theTexture);
 			
 			return result;
+        }
+
+        internal void Reload(Stream textureStream)
+        {
+            texture.Dispose();
+            texture = null;
+
+            Bitmap image = BitmapFactory.DecodeStream(textureStream);
+
+            if (image == null)
+            {
+                throw new ContentLoadException("Error loading Texture2D Stream");
+            }
+
+            ESImage esImage = new ESImage(image, graphicsDevice.PreferedFilter);
+            SetInfoFromESImage(esImage);
         }
 
         public static Texture2D FromFile(GraphicsDevice graphicsDevice, Stream textureStream, int numberBytes)
@@ -252,7 +287,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 			
 			ESImage theTexture = new ESImage(image, graphicsDevice.PreferedFilter);
-			Texture2D result = new Texture2D(theTexture);
+			Texture2D result = new Texture2D(graphicsDevice, theTexture);
 			result.Name = Path.GetFileNameWithoutExtension(filename);
 			return result;
         }
@@ -273,31 +308,59 @@ namespace Microsoft.Xna.Framework.Graphics
             int framebufferId = -1;
             int renderBufferID = -1;
             
-            // create framebuffer
-            GL11.Oes.GenFramebuffers(1, ref framebufferId);
-            GL11.Oes.BindFramebuffer(ALL11.FramebufferOes, framebufferId);
-
-            //renderBufferIDs = new int[currentRenderTargets];
-            GL11.Oes.GenRenderbuffers(1, ref renderBufferID);
-
-            // attach the texture to FBO color attachment point
-            GL11.Oes.FramebufferTexture2D(ALL11.FramebufferOes, ALL11.ColorAttachment0Oes,
-                ALL11.Texture2D, ID, 0);
-
-            // create a renderbuffer object to store depth info
-            GL11.Oes.BindRenderbuffer(ALL11.RenderbufferOes, renderBufferID);
-            GL11.Oes.RenderbufferStorage(ALL11.RenderbufferOes, ALL11.DepthComponent24Oes,
-                _width, _height);
-
-            // attach the renderbuffer to depth attachment point
-            GL11.Oes.FramebufferRenderbuffer(ALL11.FramebufferOes, ALL11.DepthAttachmentOes,
-                ALL11.RenderbufferOes, renderBufferID);
-
-            ALL11 status = GL11.Oes.CheckFramebufferStatus(ALL11.FramebufferOes);
-
-            if (status != ALL11.FramebufferCompleteOes)
-                throw new Exception("Error creating framebuffer: " + status);
-
+			if (GraphicsDevice.OpenGLESVersion == OpenTK.Graphics.GLContextVersion.Gles2_0)
+            {
+				GL20.GenFramebuffers(1, ref framebufferId);
+				GL20.BindFramebuffer(ALL20.Framebuffer, framebufferId);
+				//renderBufferIDs = new int[currentRenderTargets];
+	            GL20.GenRenderbuffers(1, ref renderBufferID);
+	
+	            // attach the texture to FBO color attachment point
+	            GL20.FramebufferTexture2D(ALL20.Framebuffer, ALL20.ColorAttachment0,
+	                ALL20.Texture2D, ID, 0);
+	
+	            // create a renderbuffer object to store depth info
+	            GL20.BindRenderbuffer(ALL20.Renderbuffer, renderBufferID);
+	            GL20.RenderbufferStorage(ALL20.Renderbuffer, ALL20.DepthComponent24Oes,
+	                _width, _height);
+	
+	            // attach the renderbuffer to depth attachment point
+	            GL20.FramebufferRenderbuffer(ALL20.Framebuffer, ALL20.DepthAttachment,
+	                ALL20.Renderbuffer, renderBufferID);
+	
+	            ALL20 status = GL20.CheckFramebufferStatus(ALL20.Framebuffer);
+	
+	            if (status != ALL20.FramebufferComplete)
+	                throw new Exception("Error creating framebuffer: " + status);	
+				
+			}
+			else
+			{
+	            // create framebuffer
+	            GL11.Oes.GenFramebuffers(1, ref framebufferId);
+	            GL11.Oes.BindFramebuffer(ALL11.FramebufferOes, framebufferId);
+	
+	            //renderBufferIDs = new int[currentRenderTargets];
+	            GL11.Oes.GenRenderbuffers(1, ref renderBufferID);
+	
+	            // attach the texture to FBO color attachment point
+	            GL11.Oes.FramebufferTexture2D(ALL11.FramebufferOes, ALL11.ColorAttachment0Oes,
+	                ALL11.Texture2D, ID, 0);
+	
+	            // create a renderbuffer object to store depth info
+	            GL11.Oes.BindRenderbuffer(ALL11.RenderbufferOes, renderBufferID);
+	            GL11.Oes.RenderbufferStorage(ALL11.RenderbufferOes, ALL11.DepthComponent24Oes,
+	                _width, _height);
+	
+	            // attach the renderbuffer to depth attachment point
+	            GL11.Oes.FramebufferRenderbuffer(ALL11.FramebufferOes, ALL11.DepthAttachmentOes,
+	                ALL11.RenderbufferOes, renderBufferID);
+	
+	            ALL11 status = GL11.Oes.CheckFramebufferStatus(ALL11.FramebufferOes);
+	
+	            if (status != ALL11.FramebufferCompleteOes)
+	                throw new Exception("Error creating framebuffer: " + status);				
+			}
             byte[] imageInfo;
             int sz = 0;
 
@@ -325,19 +388,29 @@ namespace Microsoft.Xna.Framework.Graphics
                 default:
                     throw new NotSupportedException("Texture format");
             }
-
-            GL11.ReadPixels(0, 0, _width, _height, ALL11.Rgba, ALL11.UnsignedByte, imageInfo);
-
-            // Detach the render buffers.
-            GL11.Oes.FramebufferRenderbuffer(ALL11.FramebufferOes, ALL11.DepthAttachmentOes,
-                    ALL11.RenderbufferOes, 0);
-            // delete the RBO's
-            GL11.Oes.DeleteRenderbuffers(1, ref renderBufferID);
-            // delete the FBO
-            GL11.Oes.DeleteFramebuffers(1, ref framebufferId);
-            // Set the frame buffer back to the system window buffer
-            GL11.Oes.BindFramebuffer(ALL11.FramebufferOes, 0);
-
+			
+			if (GraphicsDevice.OpenGLESVersion == OpenTK.Graphics.GLContextVersion.Gles2_0)
+            {
+				GL20.ReadPixels(0,0,_width, _height, ALL20.Rgba, ALL20.UnsignedByte, imageInfo);
+				GL20.FramebufferRenderbuffer(ALL20.Framebuffer, ALL20.DepthAttachment, ALL20.Renderbuffer, 0);
+				GL20.DeleteRenderbuffers(1, ref renderBufferID);
+				GL20.DeleteFramebuffers(1, ref framebufferId);
+				GL20.BindFramebuffer(ALL20.Framebuffer, 0);
+			}
+			else
+			{
+	            GL11.ReadPixels(0, 0, _width, _height, ALL11.Rgba, ALL11.UnsignedByte, imageInfo);
+	
+	            // Detach the render buffers.
+	            GL11.Oes.FramebufferRenderbuffer(ALL11.FramebufferOes, ALL11.DepthAttachmentOes,
+	                    ALL11.RenderbufferOes, 0);
+	            // delete the RBO's
+	            GL11.Oes.DeleteRenderbuffers(1, ref renderBufferID);
+	            // delete the FBO
+	            GL11.Oes.DeleteFramebuffers(1, ref framebufferId);
+	            // Set the frame buffer back to the system window buffer
+	            GL11.Oes.BindFramebuffer(ALL11.FramebufferOes, 0);
+			}
             return imageInfo;
 
         }
@@ -561,6 +634,14 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (texture == null) return;
 
+            if (_textureId == 0)
+            {
+                texture.RetryToCreateTexture();
+                if (texture.Name != 0)
+                {
+                    _textureId = (int)texture.Name;
+                }
+            }
 #if IPHONE
               if (GraphicsDevice.OpenGLESVersion == MonoTouch.OpenGLES.EAGLRenderingAPI.OpenGLES2)
             {
@@ -610,46 +691,219 @@ namespace Microsoft.Xna.Framework.Graphics
             if (GraphicsDevice.OpenGLESVersion == OpenTK.Graphics.GLContextVersion.Gles2_0)
             {
                 GL20.BindTexture(ALL20.Texture2D, (uint)_textureId);
-                if (_mipmap)
+                //if (_mipmap)
+                //{
+                //    // Taken from http://www.flexicoder.com/blog/index.php/2009/11/iphone-mipmaps/
+                //    GL20.TexParameter(ALL20.Texture2D, ALL20.TextureMinFilter,
+                //                    (int)ALL20.LinearMipmapNearest);
+                //    GL20.TexParameter(ALL20.Texture2D, ALL20.TextureMagFilter, (int)ALL20.Linear);
+                //    GL20.TexParameter(ALL20.Texture2D, ALL20.GenerateMipmapHint, (int)ALL20.True);
+                //}
+                //else
+                //{
+                //    GL20.TexParameter(ALL20.Texture2D, ALL20.TextureMinFilter, (int)ALL20.Linear);
+                //    GL20.TexParameter(ALL20.Texture2D, ALL20.TextureMagFilter, (int)ALL20.Linear);
+                //}
+
+                //GL20.TexParameter(ALL20.Texture2D, ALL20.TextureWrapS,
+                //                (float)OpenTK.Graphics.ES20.TextureWrapMode.Repeat);
+                //GL20.TexParameter(ALL20.Texture2D, ALL20.TextureWrapT,
+                //                (float)OpenTK.Graphics.ES20.TextureWrapMode.Repeat);
+
+                var ss = graphicsDevice.SamplerStates[0];
+
+                switch (ss.Filter)
                 {
-                    // Taken from http://www.flexicoder.com/blog/index.php/2009/11/iphone-mipmaps/
-                    GL20.TexParameter(ALL20.Texture2D, ALL20.TextureMinFilter,
-                                    (int)ALL20.LinearMipmapNearest);
-                    GL20.TexParameter(ALL20.Texture2D, ALL20.TextureMagFilter, (int)ALL20.Linear);
-                    GL20.TexParameter(ALL20.Texture2D, ALL20.GenerateMipmapHint, (int)ALL20.True);
-                }
-                else
-                {
-                    GL20.TexParameter(ALL20.Texture2D, ALL20.TextureMinFilter, (int)ALL20.Linear);
-                    GL20.TexParameter(ALL20.Texture2D, ALL20.TextureMagFilter, (int)ALL20.Linear);
+                    case TextureFilter.Anisotropic:
+                        throw new NotImplementedException();
+                        break;
+                    case TextureFilter.LinearMipPoint:
+                        GL20.TexParameter(ALL20.Texture2D, ALL20.TextureMinFilter, (int)ALL20.LinearMipmapLinear);
+                        GL20.TexParameter(ALL20.Texture2D, ALL20.TextureMagFilter, (int)ALL20.Linear);
+                        GL20.TexParameter(ALL20.Texture2D, ALL20.GenerateMipmapHint, (int)ALL20.True);
+                        break;
+                    case TextureFilter.Linear:
+                        GL20.TexParameter(ALL20.Texture2D, ALL20.TextureMinFilter, (int)ALL20.Linear);
+                        GL20.TexParameter(ALL20.Texture2D, ALL20.TextureMagFilter, (int)ALL20.Linear);
+                        break;
+                    case TextureFilter.Point:
+                        GL20.TexParameter(ALL20.Texture2D, ALL20.TextureMinFilter, (int)ALL20.Nearest);
+                        GL20.TexParameter(ALL20.Texture2D, ALL20.TextureMagFilter, (int)ALL20.Nearest);
+                        break;
+                    case TextureFilter.PointMipLinear:
+                        GL20.TexParameter(ALL20.Texture2D, ALL20.TextureMinFilter, (int)ALL20.NearestMipmapLinear);
+                        GL20.TexParameter(ALL20.Texture2D, ALL20.TextureMagFilter, (int)ALL20.Nearest);
+                        GL20.TexParameter(ALL20.Texture2D, ALL20.GenerateMipmapHint, (int)ALL20.True);
+                        break;
+                    case TextureFilter.MinPointMagLinearMipLinear:
+                        GL20.TexParameter(ALL20.Texture2D, ALL20.TextureMinFilter, (int)ALL20.NearestMipmapLinear);
+                        GL20.TexParameter(ALL20.Texture2D, ALL20.TextureMagFilter, (int)ALL20.Linear);
+                        GL20.TexParameter(ALL20.Texture2D, ALL20.GenerateMipmapHint, (int)ALL20.True);
+                        break;
+                    case TextureFilter.MinPointMagLinearMipPoint:
+                        GL20.TexParameter(ALL20.Texture2D, ALL20.TextureMinFilter, (int)ALL20.NearestMipmapNearest);
+                        GL20.TexParameter(ALL20.Texture2D, ALL20.TextureMagFilter, (int)ALL20.Linear);
+                        GL20.TexParameter(ALL20.Texture2D, ALL20.GenerateMipmapHint, (int)ALL20.True);
+                        break;
+                    case TextureFilter.MinLinearMagPointMipLinear:
+                        GL20.TexParameter(ALL20.Texture2D, ALL20.TextureMinFilter, (int)ALL20.LinearMipmapLinear);
+                        GL20.TexParameter(ALL20.Texture2D, ALL20.TextureMagFilter, (int)ALL20.Nearest);
+                        GL20.TexParameter(ALL20.Texture2D, ALL20.GenerateMipmapHint, (int)ALL20.True);
+                        break;
+                    case TextureFilter.MinLinearMagPointMipPoint:
+                        GL20.TexParameter(ALL20.Texture2D, ALL20.TextureMinFilter, (int)ALL20.LinearMipmapNearest);
+                        GL20.TexParameter(ALL20.Texture2D, ALL20.TextureMagFilter, (int)ALL20.Nearest);
+                        GL20.TexParameter(ALL20.Texture2D, ALL20.GenerateMipmapHint, (int)ALL20.True);
+                        break;
+                    default:
+                        throw new NotImplementedException();
                 }
 
-                GL20.TexParameter(ALL20.Texture2D, ALL20.TextureWrapS,
-                                (float)OpenTK.Graphics.ES20.TextureWrapMode.Repeat);
-                GL20.TexParameter(ALL20.Texture2D, ALL20.TextureWrapT,
-                                (float)OpenTK.Graphics.ES20.TextureWrapMode.Repeat);
+                switch (ss.AddressU)
+                {
+                    case TextureAddressMode.Clamp:
+                        GL20.TexParameter(ALL20.Texture2D, ALL20.TextureWrapS, (float)OpenTK.Graphics.ES20.TextureWrapMode.ClampToEdge);
+                        break;
+                    case TextureAddressMode.Mirror:
+                        GL20.TexParameter(ALL20.Texture2D, ALL20.TextureWrapS, (float)OpenTK.Graphics.ES20.TextureWrapMode.MirroredRepeat);
+                        break;
+                    case TextureAddressMode.Wrap:
+                        GL20.TexParameter(ALL20.Texture2D, ALL20.TextureWrapS, (float)OpenTK.Graphics.ES20.TextureWrapMode.Repeat);
+                        break;
+                    default:
+                        throw new NotImplementedException();
+                }
+
+                switch (ss.AddressV)
+                {
+                    case TextureAddressMode.Clamp:
+                        GL20.TexParameter(ALL20.Texture2D, ALL20.TextureWrapT, (float)OpenTK.Graphics.ES20.TextureWrapMode.ClampToEdge);
+                        break;
+                    case TextureAddressMode.Mirror:
+                        GL20.TexParameter(ALL20.Texture2D, ALL20.TextureWrapT, (float)OpenTK.Graphics.ES20.TextureWrapMode.MirroredRepeat);
+                        break;
+                    case TextureAddressMode.Wrap:
+                        GL20.TexParameter(ALL20.Texture2D, ALL20.TextureWrapT, (float)OpenTK.Graphics.ES20.TextureWrapMode.Repeat);
+                        break;
+                    default:
+                        throw new NotImplementedException();
+                }
+
+                switch (ss.AddressW)
+                {
+                    case TextureAddressMode.Clamp:
+                        GL20.TexParameter(ALL20.Texture2D, ALL20.TextureWrapROes, (float)OpenTK.Graphics.ES20.TextureWrapMode.ClampToEdge);
+                        break;
+                    case TextureAddressMode.Mirror:
+                        GL20.TexParameter(ALL20.Texture2D, ALL20.TextureWrapROes, (float)OpenTK.Graphics.ES20.TextureWrapMode.MirroredRepeat);
+                        break;
+                    case TextureAddressMode.Wrap:
+                        GL20.TexParameter(ALL20.Texture2D, ALL20.TextureWrapROes, (float)OpenTK.Graphics.ES20.TextureWrapMode.Repeat);
+                        break;
+                    default:
+                        throw new NotImplementedException();
+                }
             }
             else
             {
                 GL11.BindTexture(ALL11.Texture2D, (uint)_textureId);
-                if (_mipmap)
+                //if (_mipmap)
+                //{
+                //    // Taken from http://www.flexicoder.com/blog/index.php/2009/11/iphone-mipmaps/
+                //    GL11.TexParameter(ALL11.Texture2D, ALL11.TextureMinFilter,
+                //                    (int)ALL11.LinearMipmapNearest);
+                //    GL11.TexParameter(ALL11.Texture2D, ALL11.TextureMagFilter, (int)ALL11.Linear);
+                //    GL11.TexParameter(ALL11.Texture2D, ALL11.GenerateMipmapHint, (int)ALL11.True);
+                //}
+                //else
+                //{
+                //    GL11.TexParameter(ALL11.Texture2D, ALL11.TextureMinFilter, (int)ALL11.Linear);
+                //    GL11.TexParameter(ALL11.Texture2D, ALL11.TextureMagFilter, (int)ALL11.Linear);
+                //}
+
+                //GL11.TexParameter(ALL11.Texture2D, ALL11.TextureWrapS,
+                //                (float)OpenTK.Graphics.ES11.TextureWrapMode.Repeat);
+                //GL11.TexParameter(ALL11.Texture2D, ALL11.TextureWrapT,
+                //                (float)OpenTK.Graphics.ES11.TextureWrapMode.Repeat);
+
+                var ss = graphicsDevice.SamplerStates[0];
+
+                switch (ss.Filter)
                 {
-                    // Taken from http://www.flexicoder.com/blog/index.php/2009/11/iphone-mipmaps/
-                    GL11.TexParameter(ALL11.Texture2D, ALL11.TextureMinFilter,
-                                    (int)ALL11.LinearMipmapNearest);
-                    GL11.TexParameter(ALL11.Texture2D, ALL11.TextureMagFilter, (int)ALL11.Linear);
-                    GL11.TexParameter(ALL11.Texture2D, ALL11.GenerateMipmapHint, (int)ALL11.True);
-                }
-                else
-                {
-                    GL11.TexParameter(ALL11.Texture2D, ALL11.TextureMinFilter, (int)ALL11.Linear);
-                    GL11.TexParameter(ALL11.Texture2D, ALL11.TextureMagFilter, (int)ALL11.Linear);
+                    case TextureFilter.Anisotropic:
+                        throw new NotImplementedException();
+                        break;
+                    case TextureFilter.LinearMipPoint:
+                        GL11.TexParameter(ALL11.Texture2D, ALL11.TextureMinFilter, (int)ALL11.LinearMipmapLinear);
+                        GL11.TexParameter(ALL11.Texture2D, ALL11.TextureMagFilter, (int)ALL11.Linear);
+                        GL11.TexParameter(ALL11.Texture2D, ALL11.GenerateMipmapHint, (int)ALL11.True);
+                        break;
+                    case TextureFilter.Linear:
+                        GL11.TexParameter(ALL11.Texture2D, ALL11.TextureMinFilter, (int)ALL11.Linear);
+                        GL11.TexParameter(ALL11.Texture2D, ALL11.TextureMagFilter, (int)ALL11.Linear);
+                        break;
+                    case TextureFilter.Point:
+                        GL11.TexParameter(ALL11.Texture2D, ALL11.TextureMinFilter, (int)ALL11.Nearest);
+                        GL11.TexParameter(ALL11.Texture2D, ALL11.TextureMagFilter, (int)ALL11.Nearest);
+                        break;
+                    case TextureFilter.PointMipLinear:
+                        GL11.TexParameter(ALL11.Texture2D, ALL11.TextureMinFilter, (int)ALL11.NearestMipmapLinear);
+                        GL11.TexParameter(ALL11.Texture2D, ALL11.TextureMagFilter, (int)ALL11.Nearest);
+                        GL11.TexParameter(ALL11.Texture2D, ALL11.GenerateMipmapHint, (int)ALL11.True);
+                        break;
+                    case TextureFilter.MinPointMagLinearMipLinear:
+                        GL11.TexParameter(ALL11.Texture2D, ALL11.TextureMinFilter, (int)ALL11.NearestMipmapLinear);
+                        GL11.TexParameter(ALL11.Texture2D, ALL11.TextureMagFilter, (int)ALL11.Linear);
+                        GL11.TexParameter(ALL11.Texture2D, ALL11.GenerateMipmapHint, (int)ALL11.True);
+                        break;
+                    case TextureFilter.MinPointMagLinearMipPoint:
+                        GL11.TexParameter(ALL11.Texture2D, ALL11.TextureMinFilter, (int)ALL11.NearestMipmapNearest);
+                        GL11.TexParameter(ALL11.Texture2D, ALL11.TextureMagFilter, (int)ALL11.Linear);
+                        GL11.TexParameter(ALL11.Texture2D, ALL11.GenerateMipmapHint, (int)ALL11.True);
+                        break;
+                    case TextureFilter.MinLinearMagPointMipLinear:
+                        GL11.TexParameter(ALL11.Texture2D, ALL11.TextureMinFilter, (int)ALL11.LinearMipmapLinear);
+                        GL11.TexParameter(ALL11.Texture2D, ALL11.TextureMagFilter, (int)ALL11.Nearest);
+                        GL11.TexParameter(ALL11.Texture2D, ALL11.GenerateMipmapHint, (int)ALL11.True);
+                        break;
+                    case TextureFilter.MinLinearMagPointMipPoint:
+                        GL11.TexParameter(ALL11.Texture2D, ALL11.TextureMinFilter, (int)ALL11.LinearMipmapNearest);
+                        GL11.TexParameter(ALL11.Texture2D, ALL11.TextureMagFilter, (int)ALL11.Nearest);
+                        GL11.TexParameter(ALL11.Texture2D, ALL11.GenerateMipmapHint, (int)ALL11.True);
+                        break;
+                    default:
+                        throw new NotImplementedException();
                 }
 
-                GL11.TexParameter(ALL11.Texture2D, ALL11.TextureWrapS,
-                                (float)OpenTK.Graphics.ES11.TextureWrapMode.Repeat);
-                GL11.TexParameter(ALL11.Texture2D, ALL11.TextureWrapT,
-                                (float)OpenTK.Graphics.ES11.TextureWrapMode.Repeat);
+                switch (ss.AddressU)
+                {
+                    case TextureAddressMode.Clamp:
+                        GL11.TexParameter(ALL11.Texture2D, ALL11.TextureWrapS, (float)OpenTK.Graphics.ES11.TextureWrapMode.ClampToEdge);
+                        break;
+                    case TextureAddressMode.Mirror:
+                        throw new NotImplementedException();
+                        break;
+                    case TextureAddressMode.Wrap:
+                        GL11.TexParameter(ALL11.Texture2D, ALL11.TextureWrapS, (float)OpenTK.Graphics.ES11.TextureWrapMode.Repeat);
+                        break;
+                    default:
+                        throw new NotImplementedException();
+                }
+
+                switch (ss.AddressV)
+                {
+                    case TextureAddressMode.Clamp:
+                        GL11.TexParameter(ALL11.Texture2D, ALL11.TextureWrapT, (float)OpenTK.Graphics.ES11.TextureWrapMode.ClampToEdge);
+                        break;
+                    case TextureAddressMode.Mirror:
+                        throw new NotImplementedException();
+                        break;
+                    case TextureAddressMode.Wrap:
+                        GL11.TexParameter(ALL11.Texture2D, ALL11.TextureWrapT, (float)OpenTK.Graphics.ES11.TextureWrapMode.Repeat);
+                        break;
+                    default:
+                        throw new NotImplementedException();
+                }
             }
 #else
             GL11.BindTexture(ALL11.Texture2D, (uint)_textureId);
