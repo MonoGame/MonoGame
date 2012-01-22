@@ -132,6 +132,12 @@ namespace Microsoft.Xna.Framework
         {
             Dispose(false);
         }
+		
+		[System.Diagnostics.Conditional("DEBUG")]
+		internal void Log(string Message)
+		{
+			if (_platform != null) _platform.Log(Message);
+		}
 
         #region IDisposable Implementation
 
@@ -303,7 +309,7 @@ namespace Microsoft.Xna.Framework
             _platform.BeforeInitialize();
             Initialize();
             _initialized = true;
-
+						
             BeginRun();
             switch (runBehavior)
             {
@@ -361,7 +367,7 @@ namespace Microsoft.Xna.Framework
                 _graphicsDeviceService.GraphicsDevice != null)
             {
                 LoadContent();
-            }
+            }			
         }
 
         private static readonly Action<IDrawable, GameTime> DrawAction =
@@ -469,7 +475,8 @@ namespace Microsoft.Xna.Framework
         }
 
         internal void DoInitialize()
-        {
+        {		
+			_platform.BeforeInitialize();
             Initialize();
         }
 

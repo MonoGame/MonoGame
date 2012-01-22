@@ -42,8 +42,9 @@ using System;
 
 namespace Microsoft.Xna.Framework.Net
 {
-
+#if !WINDOWS_PHONE
 	[SerializableAttribute]
+#endif
 	public class NetworkSessionJoinException : NetworkException
 	{
 		#region Methods
