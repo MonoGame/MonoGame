@@ -96,9 +96,9 @@ namespace Microsoft.Xna.Framework
         public Color(int r, int g, int b)
         {
             _packedValue = 0;
-            R = (byte)r;
-            G = (byte)g;
-            B = (byte)b;
+            R = (byte)MathHelper.Clamp(r, Byte.MinValue, Byte.MaxValue);
+            G = (byte)MathHelper.Clamp(g, Byte.MinValue, Byte.MaxValue);
+            B = (byte)MathHelper.Clamp(b, Byte.MinValue, Byte.MaxValue);
             A = (byte)255;
         }
 
@@ -106,10 +106,10 @@ namespace Microsoft.Xna.Framework
         public Color(int r, int g, int b, int alpha)
         {
             _packedValue = 0;
-            R = (byte)r;
-            G = (byte)g;
-            B = (byte)b;
-            A = (byte)alpha;
+            R = (byte)MathHelper.Clamp(r, Byte.MinValue, Byte.MaxValue);
+            G = (byte)MathHelper.Clamp(g, Byte.MinValue, Byte.MaxValue);
+            B = (byte)MathHelper.Clamp(b, Byte.MinValue, Byte.MaxValue);
+            A = (byte)MathHelper.Clamp(alpha, Byte.MinValue, Byte.MaxValue);;
         }
 
         public Color(float r, float g, float b, float alpha)
