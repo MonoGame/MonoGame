@@ -179,6 +179,7 @@ namespace Microsoft.Xna.Framework
 
 				if (_needsToResetElapsedTime) {
 					_drawGameTime.ResetElapsedTime();
+					_needsToResetElapsedTime = false;
 				}
 
 				// Try to catch up with frames
