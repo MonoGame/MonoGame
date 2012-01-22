@@ -1,0 +1,523 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!--This file represents the results of running a test suite-->
+<test-results name="MonoGame.Tests" total="62" errors="9" failures="11" not-run="1" inconclusive="0" ignored="1" skipped="0" invalid="0" date="2012-01-24" time="20:04:56">
+  <environment nunit-version="2.5.10.11092" clr-version="4.0.30319.1" os-version="Unix 11.2.0.0" platform="Unix" cwd="/Users/chris/projects/lib/MonoGame/MonoGame.Tests/bin/Debug" machine-name="chrismacpro.local" user="chris" user-domain="chrismacpro.local" />
+  <culture-info current-culture="en-US" current-uiculture="en-US" />
+  <test-suite type="Project" name="Test" executed="True" result="Failure" success="False" time="1.502" asserts="0">
+    <results>
+      <test-suite type="Assembly" name="/Users/chris/projects/lib/monogame/MonoGame.Tests/bin/Debug/MonoGame.Tests.MacOS.exe" executed="True" result="Failure" success="False" time="1.490" asserts="0">
+        <results>
+          <test-suite type="Namespace" name="MonoGame" executed="True" result="Failure" success="False" time="1.490" asserts="0">
+            <results>
+              <test-suite type="Namespace" name="Framework" executed="True" result="Failure" success="False" time="1.489" asserts="0">
+                <results>
+                  <test-suite type="Namespace" name="Tests" executed="True" result="Failure" success="False" time="1.489" asserts="0">
+                    <results>
+                      <test-suite type="TestFixture" name="GameTest+Behaviors" executed="True" result="Failure" success="False" time="0.281" asserts="0">
+                        <results>
+                          <test-case name="MonoGame.Framework.Tests.GameTest+Behaviors.Fixed_time_step_skips_draw_when_update_is_slow" executed="False" result="Ignored">
+                            <reason>
+                              <message><![CDATA[]]></message>
+                            </reason>
+                          </test-case>
+                          <test-case name="MonoGame.Framework.Tests.GameTest+Behaviors.Nongraphical_run_succeeds" executed="True" result="Error" success="False" time="0.273" asserts="0">
+                            <failure>
+                              <message><![CDATA[System.InvalidOperationException : No Graphics Device Manager]]></message>
+                              <stack-trace><![CDATA[at Microsoft.Xna.Framework.Game.get_graphicsDeviceManager () [0x00036] in /Users/chris/projects/lib/monogame/MonoGame.Framework/Game.cs:542
+at Microsoft.Xna.Framework.Game.Run (GameRunBehavior runBehavior) [0x00017] in /Users/chris/projects/lib/monogame/MonoGame.Framework/Game.cs:335
+at MonoGame.Framework.Tests.GameTest+MockGameBase.Run () [0x00000] in /Users/chris/projects/lib/monogame/MonoGame.Tests/GameTest.cs:154
+at MonoGame.Framework.Tests.GameTest+Behaviors.Nongraphical_run_succeeds () [0x00000] in /Users/chris/projects/lib/monogame/MonoGame.Tests/GameTest.cs:116
+]]></stack-trace>
+                            </failure>
+                          </test-case>
+                        </results>
+                      </test-suite>
+                      <test-suite type="TestFixture" name="GameTest+Disposal" executed="True" result="Failure" success="False" time="0.830" asserts="0">
+                        <results>
+                          <test-suite type="ParameterizedTest" name="Method_throws_after_Dispose" executed="True" result="Failure" success="False" time="0.396" asserts="0">
+                            <results>
+                              <test-case name="MonoGame.Framework.Tests.GameTest+Disposal.Method_throws_after_Dispose(&quot;Run&quot;,True)" executed="True" result="Success" success="True" time="0.169" asserts="1">
+                                <reason>
+                                  <message><![CDATA[Warning: Test changed the CurrentDirectory]]></message>
+                                </reason>
+                              </test-case>
+                              <test-case name="MonoGame.Framework.Tests.GameTest+Disposal.Method_throws_after_Dispose(&quot;RunOneFrame&quot;,False)" executed="True" result="Error" success="False" time="0.050" asserts="0">
+                                <failure>
+                                  <message><![CDATA[System.NullReferenceException : Object reference not set to an instance of an object]]></message>
+                                  <stack-trace><![CDATA[at MonoGame.Framework.Tests.GameTest+Disposal+<Method_throws_after_Dispose>c__AnonStorey1.<>m__1 () [0x00000] in /Users/chris/projects/lib/monogame/MonoGame.Tests/GameTest.cs:76
+at MonoGame.Framework.Tests.GameTest+Disposal.RunDisposeAndTry (System.Action action, System.String name, Boolean shouldThrow) [0x00008] in /Users/chris/projects/lib/monogame/MonoGame.Tests/GameTest.cs:92
+at MonoGame.Framework.Tests.GameTest+Disposal.Method_throws_after_Dispose (System.String methodName, Boolean shouldThrow) [0x00037] in /Users/chris/projects/lib/monogame/MonoGame.Tests/GameTest.cs:77
+]]></stack-trace>
+                                </failure>
+                              </test-case>
+                              <test-case name="MonoGame.Framework.Tests.GameTest+Disposal.Method_throws_after_Dispose(&quot;Tick&quot;,False)" executed="True" result="Error" success="False" time="0.040" asserts="0">
+                                <failure>
+                                  <message><![CDATA[System.NullReferenceException : Object reference not set to an instance of an object]]></message>
+                                  <stack-trace><![CDATA[at MonoGame.Framework.Tests.GameTest+Disposal+<Method_throws_after_Dispose>c__AnonStorey1.<>m__1 () [0x00000] in /Users/chris/projects/lib/monogame/MonoGame.Tests/GameTest.cs:76
+at MonoGame.Framework.Tests.GameTest+Disposal.RunDisposeAndTry (System.Action action, System.String name, Boolean shouldThrow) [0x00008] in /Users/chris/projects/lib/monogame/MonoGame.Tests/GameTest.cs:92
+at MonoGame.Framework.Tests.GameTest+Disposal.Method_throws_after_Dispose (System.String methodName, Boolean shouldThrow) [0x00037] in /Users/chris/projects/lib/monogame/MonoGame.Tests/GameTest.cs:77
+]]></stack-trace>
+                                </failure>
+                              </test-case>
+                              <test-case name="MonoGame.Framework.Tests.GameTest+Disposal.Method_throws_after_Dispose(&quot;Exit&quot;,False)" executed="True" result="Success" success="True" time="0.036" asserts="1">
+                                <reason>
+                                  <message><![CDATA[Warning: Test changed the CurrentDirectory]]></message>
+                                </reason>
+                              </test-case>
+                              <test-case name="MonoGame.Framework.Tests.GameTest+Disposal.Method_throws_after_Dispose(&quot;ResetElapsedTime&quot;,False)" executed="True" result="Error" success="False" time="0.033" asserts="0">
+                                <failure>
+                                  <message><![CDATA[System.Reflection.TargetInvocationException : Exception has been thrown by the target of an invocation.
+  ----> System.NullReferenceException : Object reference not set to an instance of an object]]></message>
+                                  <stack-trace><![CDATA[at System.Reflection.MethodBase.Invoke (System.Object obj, System.Object[] parameters) [0x00000] in /private/tmp/monobuild/build/BUILD/mono-2.10.8.1/mcs/class/corlib/System.Reflection/MethodBase.cs:96
+at MonoGame.Framework.Tests.GameTest+Disposal+<Method_throws_after_Dispose>c__AnonStorey1.<>m__1 () [0x00000] in /Users/chris/projects/lib/monogame/MonoGame.Tests/GameTest.cs:76
+at MonoGame.Framework.Tests.GameTest+Disposal.RunDisposeAndTry (System.Action action, System.String name, Boolean shouldThrow) [0x00008] in /Users/chris/projects/lib/monogame/MonoGame.Tests/GameTest.cs:92
+--NullReferenceException
+at Microsoft.Xna.Framework.MacGamePlatform.ResetElapsedTime () [0x00000] in /Users/chris/projects/lib/monogame/MonoGame.Framework/MacOS/MacGamePlatform.cs:363
+at Microsoft.Xna.Framework.Game.ResetElapsedTime () [0x00000] in /Users/chris/projects/lib/monogame/MonoGame.Framework/Game.cs:314
+]]></stack-trace>
+                                </failure>
+                              </test-case>
+                              <test-case name="MonoGame.Framework.Tests.GameTest+Disposal.Method_throws_after_Dispose(&quot;SuppressDraw&quot;,False)" executed="True" result="Error" success="False" time="0.036" asserts="0">
+                                <failure>
+                                  <message><![CDATA[System.NullReferenceException : Object reference not set to an instance of an object]]></message>
+                                  <stack-trace><![CDATA[at MonoGame.Framework.Tests.GameTest+Disposal+<Method_throws_after_Dispose>c__AnonStorey1.<>m__1 () [0x00000] in /Users/chris/projects/lib/monogame/MonoGame.Tests/GameTest.cs:76
+at MonoGame.Framework.Tests.GameTest+Disposal.RunDisposeAndTry (System.Action action, System.String name, Boolean shouldThrow) [0x00008] in /Users/chris/projects/lib/monogame/MonoGame.Tests/GameTest.cs:92
+at MonoGame.Framework.Tests.GameTest+Disposal.Method_throws_after_Dispose (System.String methodName, Boolean shouldThrow) [0x00037] in /Users/chris/projects/lib/monogame/MonoGame.Tests/GameTest.cs:77
+]]></stack-trace>
+                                </failure>
+                              </test-case>
+                              <test-case name="MonoGame.Framework.Tests.GameTest+Disposal.Method_throws_after_Dispose(&quot;Dispose&quot;,False)" executed="True" result="Success" success="True" time="0.032" asserts="1">
+                                <reason>
+                                  <message><![CDATA[Warning: Test changed the CurrentDirectory]]></message>
+                                </reason>
+                              </test-case>
+                            </results>
+                          </test-suite>
+                          <test-suite type="ParameterizedTest" name="Property_throws_after_Dispose" executed="True" result="Failure" success="False" time="0.434" asserts="0">
+                            <results>
+                              <test-case name="MonoGame.Framework.Tests.GameTest+Disposal.Property_throws_after_Dispose(&quot;Window&quot;,False)" executed="True" result="Success" success="True" time="0.048" asserts="1">
+                                <reason>
+                                  <message><![CDATA[Warning: Test changed the CurrentDirectory]]></message>
+                                </reason>
+                              </test-case>
+                              <test-case name="MonoGame.Framework.Tests.GameTest+Disposal.Property_throws_after_Dispose(&quot;GraphicsDevice&quot;,False)" executed="True" result="Success" success="True" time="0.042" asserts="1">
+                                <reason>
+                                  <message><![CDATA[Warning: Test changed the CurrentDirectory]]></message>
+                                </reason>
+                              </test-case>
+                              <test-case name="MonoGame.Framework.Tests.GameTest+Disposal.Property_throws_after_Dispose(&quot;Content&quot;,False)" executed="True" result="Success" success="True" time="0.042" asserts="1">
+                                <reason>
+                                  <message><![CDATA[Warning: Test changed the CurrentDirectory]]></message>
+                                </reason>
+                              </test-case>
+                              <test-case name="MonoGame.Framework.Tests.GameTest+Disposal.Property_throws_after_Dispose(&quot;Components&quot;,False)" executed="True" result="Success" success="True" time="0.036" asserts="1">
+                                <reason>
+                                  <message><![CDATA[Warning: Test changed the CurrentDirectory]]></message>
+                                </reason>
+                              </test-case>
+                              <test-case name="MonoGame.Framework.Tests.GameTest+Disposal.Property_throws_after_Dispose(&quot;IsActive&quot;,False)" executed="True" result="Success" success="True" time="0.032" asserts="1">
+                                <reason>
+                                  <message><![CDATA[Warning: Test changed the CurrentDirectory]]></message>
+                                </reason>
+                              </test-case>
+                              <test-case name="MonoGame.Framework.Tests.GameTest+Disposal.Property_throws_after_Dispose(&quot;InactiveSleepTime&quot;,False)" executed="True" result="Error" success="False" time="0.050" asserts="0">
+                                <failure>
+                                  <message><![CDATA[System.NotImplementedException : The requested feature is not implemented.]]></message>
+                                  <stack-trace><![CDATA[at Microsoft.Xna.Framework.Game.get_InactiveSleepTime () [0x00000] in /Users/chris/projects/lib/monogame/MonoGame.Framework/Game.cs:195
+at (wrapper delegate-invoke) <Module>:invoke_TimeSpan__this___Game (Microsoft.Xna.Framework.Game)
+at System.Reflection.MonoProperty.GetterAdapterFrame[Game,TimeSpan] (System.Reflection.Getter`2 getter, System.Object obj) [0x00000] in /private/tmp/monobuild/build/BUILD/mono-2.10.8.1/mcs/class/corlib/System.Reflection/MonoProperty.cs:246
+at System.Reflection.MonoProperty.GetValue (System.Object obj, System.Object[] index) [0x00064] in /private/tmp/monobuild/build/BUILD/mono-2.10.8.1/mcs/class/corlib/System.Reflection/MonoProperty.cs:305
+at MonoGame.Framework.Tests.GameTest+Disposal+<Property_throws_after_Dispose>c__AnonStorey0.<>m__0 () [0x00000] in /Users/chris/projects/lib/monogame/MonoGame.Tests/GameTest.cs:60
+at MonoGame.Framework.Tests.GameTest+Disposal.RunDisposeAndTry (System.Action action, System.String name, Boolean shouldThrow) [0x00008] in /Users/chris/projects/lib/monogame/MonoGame.Tests/GameTest.cs:92
+at MonoGame.Framework.Tests.GameTest+Disposal.Property_throws_after_Dispose (System.String propertyName, Boolean shouldThrow) [0x0003d] in /Users/chris/projects/lib/monogame/MonoGame.Tests/GameTest.cs:63
+]]></stack-trace>
+                                </failure>
+                              </test-case>
+                              <test-case name="MonoGame.Framework.Tests.GameTest+Disposal.Property_throws_after_Dispose(&quot;TargetElapsedTime&quot;,False)" executed="True" result="Success" success="True" time="0.035" asserts="1">
+                                <reason>
+                                  <message><![CDATA[Warning: Test changed the CurrentDirectory]]></message>
+                                </reason>
+                              </test-case>
+                              <test-case name="MonoGame.Framework.Tests.GameTest+Disposal.Property_throws_after_Dispose(&quot;Services&quot;,False)" executed="True" result="Success" success="True" time="0.033" asserts="1">
+                                <reason>
+                                  <message><![CDATA[Warning: Test changed the CurrentDirectory]]></message>
+                                </reason>
+                              </test-case>
+                              <test-case name="MonoGame.Framework.Tests.GameTest+Disposal.Property_throws_after_Dispose(&quot;LaunchParameters&quot;,False)" executed="True" result="Error" success="False" time="0.034" asserts="0">
+                                <failure>
+                                  <message><![CDATA[System.NotImplementedException : The requested feature is not implemented.]]></message>
+                                  <stack-trace><![CDATA[at Microsoft.Xna.Framework.Game.get_LaunchParameters () [0x00000] in /Users/chris/projects/lib/monogame/MonoGame.Framework/Game.cs:189
+at (wrapper delegate-invoke) <Module>:invoke_LaunchParameters__this___Game (Microsoft.Xna.Framework.Game)
+at System.Reflection.MonoProperty.GetterAdapterFrame[Game,LaunchParameters] (System.Reflection.Getter`2 getter, System.Object obj) [0x00000] in /private/tmp/monobuild/build/BUILD/mono-2.10.8.1/mcs/class/corlib/System.Reflection/MonoProperty.cs:246
+at System.Reflection.MonoProperty.GetValue (System.Object obj, System.Object[] index) [0x00064] in /private/tmp/monobuild/build/BUILD/mono-2.10.8.1/mcs/class/corlib/System.Reflection/MonoProperty.cs:305
+at MonoGame.Framework.Tests.GameTest+Disposal+<Property_throws_after_Dispose>c__AnonStorey0.<>m__0 () [0x00000] in /Users/chris/projects/lib/monogame/MonoGame.Tests/GameTest.cs:60
+at MonoGame.Framework.Tests.GameTest+Disposal.RunDisposeAndTry (System.Action action, System.String name, Boolean shouldThrow) [0x00008] in /Users/chris/projects/lib/monogame/MonoGame.Tests/GameTest.cs:92
+at MonoGame.Framework.Tests.GameTest+Disposal.Property_throws_after_Dispose (System.String propertyName, Boolean shouldThrow) [0x0003d] in /Users/chris/projects/lib/monogame/MonoGame.Tests/GameTest.cs:63
+]]></stack-trace>
+                                </failure>
+                              </test-case>
+                              <test-case name="MonoGame.Framework.Tests.GameTest+Disposal.Property_throws_after_Dispose(&quot;IsMouseVisible&quot;,False)" executed="True" result="Success" success="True" time="0.035" asserts="1">
+                                <reason>
+                                  <message><![CDATA[Warning: Test changed the CurrentDirectory]]></message>
+                                </reason>
+                              </test-case>
+                              <test-case name="MonoGame.Framework.Tests.GameTest+Disposal.Property_throws_after_Dispose(&quot;IsFixedTimeStep&quot;,False)" executed="True" result="Success" success="True" time="0.047" asserts="1">
+                                <reason>
+                                  <message><![CDATA[Warning: Test changed the CurrentDirectory]]></message>
+                                </reason>
+                              </test-case>
+                            </results>
+                          </test-suite>
+                        </results>
+                      </test-suite>
+                      <test-suite type="TestFixture" name="GameTest+Properties+Components" executed="True" result="Success" success="True" time="0.031" asserts="0">
+                        <results>
+                          <test-case name="MonoGame.Framework.Tests.GameTest+Properties+Components.Is_available_before_Run" executed="True" result="Success" success="True" time="0.022" asserts="1">
+                            <reason>
+                              <message><![CDATA[Warning: Test changed the CurrentDirectory]]></message>
+                            </reason>
+                          </test-case>
+                          <test-case name="MonoGame.Framework.Tests.GameTest+Properties+Components.Is_read_only" executed="True" result="Success" success="True" time="0.006" asserts="0">
+                            <reason>
+                              <message><![CDATA[Warning: Test changed the CurrentDirectory]]></message>
+                            </reason>
+                          </test-case>
+                        </results>
+                      </test-suite>
+                      <test-suite type="TestFixture" name="GameTest+Properties+Content" executed="True" result="Failure" success="False" time="0.045" asserts="0">
+                        <results>
+                          <test-case name="MonoGame.Framework.Tests.GameTest+Properties+Content.Is_available_before_Run" executed="True" result="Success" success="True" time="0.007" asserts="1">
+                            <reason>
+                              <message><![CDATA[Warning: Test changed the CurrentDirectory]]></message>
+                            </reason>
+                          </test-case>
+                          <test-case name="MonoGame.Framework.Tests.GameTest+Properties+Content.Is_not_provided_as_a_service" executed="True" result="Success" success="True" time="0.006" asserts="1">
+                            <reason>
+                              <message><![CDATA[Warning: Test changed the CurrentDirectory]]></message>
+                            </reason>
+                          </test-case>
+                          <test-case name="MonoGame.Framework.Tests.GameTest+Properties+Content.Is_read_write" executed="True" result="Failure" success="False" time="0.008" asserts="0">
+                            <failure>
+                              <message><![CDATA[Property Content is not writeable.]]></message>
+                              <stack-trace><![CDATA[at MonoGame.Framework.Tests.GameTest+Properties+ReadWritePropertyFixtureBase`1[Microsoft.Xna.Framework.Content.ContentManager].Is_read_write () [0x0003e] in /Users/chris/projects/lib/monogame/MonoGame.Tests/GameTest+Properties.cs:363
+]]></stack-trace>
+                            </failure>
+                          </test-case>
+                          <test-suite type="ParameterizedTest" name="Can_set_legal_value" executed="True" result="Failure" success="False" time="0.012" asserts="0">
+                            <results>
+                              <test-case name="MonoGame.Framework.Tests.GameTest+Properties+Content.Can_set_legal_value(Microsoft.Xna.Framework.Content.ContentManager)" executed="True" result="Failure" success="False" time="0.012" asserts="0">
+                                <failure>
+                                  <message><![CDATA[Unexpected exception: System.ArgumentException
+]]></message>
+                                  <stack-trace><![CDATA[at MonoGame.Framework.Tests.GameTest+Properties+ReadWritePropertyFixtureBase`1[Microsoft.Xna.Framework.Content.ContentManager].Can_set_legal_value (Microsoft.Xna.Framework.Content.ContentManager value) [0x00014] in /Users/chris/projects/lib/monogame/MonoGame.Tests/GameTest+Properties.cs:391
+]]></stack-trace>
+                                </failure>
+                              </test-case>
+                            </results>
+                          </test-suite>
+                          <test-suite type="ParameterizedTest" name="Cannot_set_illegal_value" executed="True" result="Failure" success="False" time="0.011" asserts="0">
+                            <results>
+                              <test-case name="MonoGame.Framework.Tests.GameTest+Properties+Content.Cannot_set_illegal_value((, System.ArgumentNullException))" executed="True" result="Failure" success="False" time="0.011" asserts="1">
+                                <failure>
+                                  <message><![CDATA[  Expected: <System.ArgumentNullException>
+  But was:  <System.ArgumentException>
+]]></message>
+                                  <stack-trace><![CDATA[at MonoGame.Framework.Tests.GameTest+Properties+ReadWritePropertyFixtureBase`1[Microsoft.Xna.Framework.Content.ContentManager].Cannot_set_illegal_value (System.Tuple`2 valueAndException) [0x00020] in /Users/chris/projects/lib/monogame/MonoGame.Tests/GameTest+Properties.cs:399
+]]></stack-trace>
+                                </failure>
+                              </test-case>
+                            </results>
+                          </test-suite>
+                        </results>
+                      </test-suite>
+                      <test-suite type="TestFixture" name="GameTest+Properties+GraphicsDevice_" executed="True" result="Success" success="True" time="0.060" asserts="0">
+                        <results>
+                          <test-case name="MonoGame.Framework.Tests.GameTest+Properties+GraphicsDevice_.Is_invalid_without_IGraphicsDeviceService" executed="True" result="Success" success="True" time="0.007" asserts="2">
+                            <reason>
+                              <message><![CDATA[Warning: Test changed the CurrentDirectory]]></message>
+                            </reason>
+                          </test-case>
+                          <test-case name="MonoGame.Framework.Tests.GameTest+Properties+GraphicsDevice_.Is_not_available_in_graphical_game_before_Run" executed="True" result="Success" success="True" time="0.004" asserts="1">
+                            <reason>
+                              <message><![CDATA[Warning: Test changed the CurrentDirectory]]></message>
+                            </reason>
+                          </test-case>
+                          <test-case name="MonoGame.Framework.Tests.GameTest+Properties+GraphicsDevice_.Is_read_only" executed="True" result="Success" success="True" time="0.004" asserts="0">
+                            <reason>
+                              <message><![CDATA[Warning: Test changed the CurrentDirectory]]></message>
+                            </reason>
+                          </test-case>
+                          <test-case name="MonoGame.Framework.Tests.GameTest+Properties+GraphicsDevice_.Is_valid_with_IGraphicsDeviceService" executed="True" result="Success" success="True" time="0.044" asserts="1">
+                            <reason>
+                              <message><![CDATA[Warning: Test changed the CurrentDirectory]]></message>
+                            </reason>
+                          </test-case>
+                        </results>
+                      </test-suite>
+                      <test-suite type="TestFixture" name="GameTest+Properties+InactiveSleepTime" executed="True" result="Failure" success="False" time="0.044" asserts="0">
+                        <results>
+                          <test-case name="MonoGame.Framework.Tests.GameTest+Properties+InactiveSleepTime.Has_correct_default_value" executed="True" result="Error" success="False" time="0.006" asserts="1">
+                            <failure>
+                              <message><![CDATA[System.NotImplementedException : The requested feature is not implemented.]]></message>
+                              <stack-trace><![CDATA[at Microsoft.Xna.Framework.Game.get_InactiveSleepTime () [0x00000] in /Users/chris/projects/lib/monogame/MonoGame.Framework/Game.cs:195
+at (wrapper delegate-invoke) <Module>:invoke_TimeSpan__this___Game (Microsoft.Xna.Framework.Game)
+at System.Reflection.MonoProperty.GetterAdapterFrame[Game,TimeSpan] (System.Reflection.Getter`2 getter, System.Object obj) [0x00000] in /private/tmp/monobuild/build/BUILD/mono-2.10.8.1/mcs/class/corlib/System.Reflection/MonoProperty.cs:246
+at System.Reflection.MonoProperty.GetValue (System.Object obj, System.Object[] index) [0x00076] in /private/tmp/monobuild/build/BUILD/mono-2.10.8.1/mcs/class/corlib/System.Reflection/MonoProperty.cs:308
+at NUnit.Framework.Constraints.PropertyConstraint.Matches (System.Object actual) [0x00000] in <filename unknown>:0
+at MonoGame.Framework.Tests.GameTest+Properties+PropertyFixtureBase`1[System.TimeSpan].Has_correct_default_value () [0x0001b] in /Users/chris/projects/lib/monogame/MonoGame.Tests/GameTest+Properties.cs:295
+]]></stack-trace>
+                            </failure>
+                          </test-case>
+                          <test-case name="MonoGame.Framework.Tests.GameTest+Properties+InactiveSleepTime.Is_read_write" executed="True" result="Success" success="True" time="0.005" asserts="0">
+                            <reason>
+                              <message><![CDATA[Warning: Test changed the CurrentDirectory]]></message>
+                            </reason>
+                          </test-case>
+                          <test-suite type="ParameterizedTest" name="Can_set_legal_value" executed="True" result="Failure" success="False" time="0.020" asserts="0">
+                            <results>
+                              <test-case name="MonoGame.Framework.Tests.GameTest+Properties+InactiveSleepTime.Can_set_legal_value(00:00:00)" executed="True" result="Failure" success="False" time="0.006" asserts="0">
+                                <failure>
+                                  <message><![CDATA[Unexpected exception: System.NotImplementedException
+]]></message>
+                                  <stack-trace><![CDATA[at MonoGame.Framework.Tests.GameTest+Properties+ReadWritePropertyFixtureBase`1[System.TimeSpan].Can_set_legal_value (TimeSpan value) [0x00014] in /Users/chris/projects/lib/monogame/MonoGame.Tests/GameTest+Properties.cs:391
+]]></stack-trace>
+                                </failure>
+                              </test-case>
+                              <test-case name="MonoGame.Framework.Tests.GameTest+Properties+InactiveSleepTime.Can_set_legal_value(00:00:00)" executed="True" result="Failure" success="False" time="0.004" asserts="0">
+                                <failure>
+                                  <message><![CDATA[Unexpected exception: System.NotImplementedException
+]]></message>
+                                  <stack-trace><![CDATA[at MonoGame.Framework.Tests.GameTest+Properties+ReadWritePropertyFixtureBase`1[System.TimeSpan].Can_set_legal_value (TimeSpan value) [0x00014] in /Users/chris/projects/lib/monogame/MonoGame.Tests/GameTest+Properties.cs:391
+]]></stack-trace>
+                                </failure>
+                              </test-case>
+                              <test-case name="MonoGame.Framework.Tests.GameTest+Properties+InactiveSleepTime.Can_set_legal_value(00:00:01)" executed="True" result="Failure" success="False" time="0.004" asserts="0">
+                                <failure>
+                                  <message><![CDATA[Unexpected exception: System.NotImplementedException
+]]></message>
+                                  <stack-trace><![CDATA[at MonoGame.Framework.Tests.GameTest+Properties+ReadWritePropertyFixtureBase`1[System.TimeSpan].Can_set_legal_value (TimeSpan value) [0x00014] in /Users/chris/projects/lib/monogame/MonoGame.Tests/GameTest+Properties.cs:391
+]]></stack-trace>
+                                </failure>
+                              </test-case>
+                              <test-case name="MonoGame.Framework.Tests.GameTest+Properties+InactiveSleepTime.Can_set_legal_value(10675199.02:48:05.4775807)" executed="True" result="Failure" success="False" time="0.004" asserts="0">
+                                <failure>
+                                  <message><![CDATA[Unexpected exception: System.NotImplementedException
+]]></message>
+                                  <stack-trace><![CDATA[at MonoGame.Framework.Tests.GameTest+Properties+ReadWritePropertyFixtureBase`1[System.TimeSpan].Can_set_legal_value (TimeSpan value) [0x00014] in /Users/chris/projects/lib/monogame/MonoGame.Tests/GameTest+Properties.cs:391
+]]></stack-trace>
+                                </failure>
+                              </test-case>
+                            </results>
+                          </test-suite>
+                          <test-suite type="ParameterizedTest" name="Cannot_set_illegal_value" executed="True" result="Failure" success="False" time="0.013" asserts="0">
+                            <results>
+                              <test-case name="MonoGame.Framework.Tests.GameTest+Properties+InactiveSleepTime.Cannot_set_illegal_value((-00:00:01, System.ArgumentOutOfRangeException))" executed="True" result="Failure" success="False" time="0.007" asserts="1">
+                                <failure>
+                                  <message><![CDATA[  Expected: <System.ArgumentOutOfRangeException>
+  But was:  <System.NotImplementedException>
+]]></message>
+                                  <stack-trace><![CDATA[at MonoGame.Framework.Tests.GameTest+Properties+ReadWritePropertyFixtureBase`1[System.TimeSpan].Cannot_set_illegal_value (System.Tuple`2 valueAndException) [0x00020] in /Users/chris/projects/lib/monogame/MonoGame.Tests/GameTest+Properties.cs:399
+]]></stack-trace>
+                                </failure>
+                              </test-case>
+                              <test-case name="MonoGame.Framework.Tests.GameTest+Properties+InactiveSleepTime.Cannot_set_illegal_value((-10675199.02:48:05.4775808, System.ArgumentOutOfRangeException))" executed="True" result="Failure" success="False" time="0.006" asserts="1">
+                                <failure>
+                                  <message><![CDATA[  Expected: <System.ArgumentOutOfRangeException>
+  But was:  <System.NotImplementedException>
+]]></message>
+                                  <stack-trace><![CDATA[at MonoGame.Framework.Tests.GameTest+Properties+ReadWritePropertyFixtureBase`1[System.TimeSpan].Cannot_set_illegal_value (System.Tuple`2 valueAndException) [0x00020] in /Users/chris/projects/lib/monogame/MonoGame.Tests/GameTest+Properties.cs:399
+]]></stack-trace>
+                                </failure>
+                              </test-case>
+                            </results>
+                          </test-suite>
+                        </results>
+                      </test-suite>
+                      <test-suite type="TestFixture" name="GameTest+Properties+IsActive" executed="True" result="Success" success="True" time="0.024" asserts="0">
+                        <results>
+                          <test-case name="MonoGame.Framework.Tests.GameTest+Properties+IsActive.Has_correct_default_value" executed="True" result="Success" success="True" time="0.017" asserts="1">
+                            <reason>
+                              <message><![CDATA[Warning: Test changed the CurrentDirectory]]></message>
+                            </reason>
+                          </test-case>
+                          <test-case name="MonoGame.Framework.Tests.GameTest+Properties+IsActive.Is_read_only" executed="True" result="Success" success="True" time="0.005" asserts="0">
+                            <reason>
+                              <message><![CDATA[Warning: Test changed the CurrentDirectory]]></message>
+                            </reason>
+                          </test-case>
+                        </results>
+                      </test-suite>
+                      <test-suite type="TestFixture" name="GameTest+Properties+IsFixedTimeStep" executed="True" result="Success" success="True" time="0.022" asserts="0">
+                        <results>
+                          <test-case name="MonoGame.Framework.Tests.GameTest+Properties+IsFixedTimeStep.Has_correct_default_value" executed="True" result="Success" success="True" time="0.004" asserts="1">
+                            <reason>
+                              <message><![CDATA[Warning: Test changed the CurrentDirectory]]></message>
+                            </reason>
+                          </test-case>
+                          <test-case name="MonoGame.Framework.Tests.GameTest+Properties+IsFixedTimeStep.Is_read_write" executed="True" result="Success" success="True" time="0.005" asserts="0">
+                            <reason>
+                              <message><![CDATA[Warning: Test changed the CurrentDirectory]]></message>
+                            </reason>
+                          </test-case>
+                          <test-suite type="ParameterizedTest" name="Can_set_legal_value" executed="True" result="Success" success="True" time="0.013" asserts="0">
+                            <results>
+                              <test-case name="MonoGame.Framework.Tests.GameTest+Properties+IsFixedTimeStep.Can_set_legal_value(True)" executed="True" result="Success" success="True" time="0.006" asserts="0">
+                                <reason>
+                                  <message><![CDATA[Warning: Test changed the CurrentDirectory]]></message>
+                                </reason>
+                              </test-case>
+                              <test-case name="MonoGame.Framework.Tests.GameTest+Properties+IsFixedTimeStep.Can_set_legal_value(False)" executed="True" result="Success" success="True" time="0.007" asserts="0">
+                                <reason>
+                                  <message><![CDATA[Warning: Test changed the CurrentDirectory]]></message>
+                                </reason>
+                              </test-case>
+                            </results>
+                          </test-suite>
+                        </results>
+                      </test-suite>
+                      <test-suite type="TestFixture" name="GameTest+Properties+IsMouseVisible" executed="True" result="Success" success="True" time="0.019" asserts="0">
+                        <results>
+                          <test-case name="MonoGame.Framework.Tests.GameTest+Properties+IsMouseVisible.Has_correct_default_value" executed="True" result="Success" success="True" time="0.005" asserts="1">
+                            <reason>
+                              <message><![CDATA[Warning: Test changed the CurrentDirectory]]></message>
+                            </reason>
+                          </test-case>
+                          <test-case name="MonoGame.Framework.Tests.GameTest+Properties+IsMouseVisible.Is_read_write" executed="True" result="Success" success="True" time="0.004" asserts="0">
+                            <reason>
+                              <message><![CDATA[Warning: Test changed the CurrentDirectory]]></message>
+                            </reason>
+                          </test-case>
+                          <test-suite type="ParameterizedTest" name="Can_set_legal_value" executed="True" result="Success" success="True" time="0.009" asserts="0">
+                            <results>
+                              <test-case name="MonoGame.Framework.Tests.GameTest+Properties+IsMouseVisible.Can_set_legal_value(True)" executed="True" result="Success" success="True" time="0.005" asserts="0">
+                                <reason>
+                                  <message><![CDATA[Warning: Test changed the CurrentDirectory]]></message>
+                                </reason>
+                              </test-case>
+                              <test-case name="MonoGame.Framework.Tests.GameTest+Properties+IsMouseVisible.Can_set_legal_value(False)" executed="True" result="Success" success="True" time="0.004" asserts="0">
+                                <reason>
+                                  <message><![CDATA[Warning: Test changed the CurrentDirectory]]></message>
+                                </reason>
+                              </test-case>
+                            </results>
+                          </test-suite>
+                        </results>
+                      </test-suite>
+                      <test-suite type="TestFixture" name="GameTest+Properties+LaunchParameters_" executed="True" result="Failure" success="False" time="0.012" asserts="0">
+                        <results>
+                          <test-case name="MonoGame.Framework.Tests.GameTest+Properties+LaunchParameters_.Is_available_before_Run" executed="True" result="Error" success="False" time="0.005" asserts="1">
+                            <failure>
+                              <message><![CDATA[System.NotImplementedException : The requested feature is not implemented.]]></message>
+                              <stack-trace><![CDATA[at Microsoft.Xna.Framework.Game.get_LaunchParameters () [0x00000] in /Users/chris/projects/lib/monogame/MonoGame.Framework/Game.cs:189
+at (wrapper delegate-invoke) <Module>:invoke_LaunchParameters__this___Game (Microsoft.Xna.Framework.Game)
+at System.Reflection.MonoProperty.GetterAdapterFrame[Game,LaunchParameters] (System.Reflection.Getter`2 getter, System.Object obj) [0x00000] in /private/tmp/monobuild/build/BUILD/mono-2.10.8.1/mcs/class/corlib/System.Reflection/MonoProperty.cs:246
+at System.Reflection.MonoProperty.GetValue (System.Object obj, System.Object[] index) [0x00076] in /private/tmp/monobuild/build/BUILD/mono-2.10.8.1/mcs/class/corlib/System.Reflection/MonoProperty.cs:308
+at NUnit.Framework.Constraints.PropertyConstraint.Matches (System.Object actual) [0x00000] in <filename unknown>:0
+at MonoGame.Framework.Tests.GameTest+Properties+LaunchParameters_.Is_available_before_Run () [0x00000] in /Users/chris/projects/lib/monogame/MonoGame.Tests/GameTest+Properties.cs:182
+]]></stack-trace>
+                            </failure>
+                          </test-case>
+                          <test-case name="MonoGame.Framework.Tests.GameTest+Properties+LaunchParameters_.Is_read_only" executed="True" result="Failure" success="False" time="0.005" asserts="0">
+                            <failure>
+                              <message><![CDATA[Property LaunchParameters is writeable.]]></message>
+                              <stack-trace><![CDATA[at MonoGame.Framework.Tests.GameTest+Properties+ReadOnlyPropertyFixtureBase`1[Microsoft.Xna.Framework.LaunchParameters].Is_read_only () [0x0003e] in /Users/chris/projects/lib/monogame/MonoGame.Tests/GameTest+Properties.cs:336
+]]></stack-trace>
+                            </failure>
+                          </test-case>
+                        </results>
+                      </test-suite>
+                      <test-suite type="TestFixture" name="GameTest+Properties+Services" executed="True" result="Success" success="True" time="0.011" asserts="0">
+                        <results>
+                          <test-case name="MonoGame.Framework.Tests.GameTest+Properties+Services.Is_available_before_Run" executed="True" result="Success" success="True" time="0.005" asserts="1">
+                            <reason>
+                              <message><![CDATA[Warning: Test changed the CurrentDirectory]]></message>
+                            </reason>
+                          </test-case>
+                          <test-case name="MonoGame.Framework.Tests.GameTest+Properties+Services.Is_read_only" executed="True" result="Success" success="True" time="0.004" asserts="0">
+                            <reason>
+                              <message><![CDATA[Warning: Test changed the CurrentDirectory]]></message>
+                            </reason>
+                          </test-case>
+                        </results>
+                      </test-suite>
+                      <test-suite type="TestFixture" name="GameTest+Properties+TargetElapsedTime" executed="True" result="Failure" success="False" time="0.038" asserts="0">
+                        <results>
+                          <test-suite type="ParameterizedTest" name="Can_set_legal_value" executed="True" result="Success" success="True" time="0.012" asserts="0">
+                            <results>
+                              <test-case name="MonoGame.Framework.Tests.GameTest+Properties+TargetElapsedTime.Can_set_legal_value(00:00:01)" executed="True" result="Success" success="True" time="0.005" asserts="0">
+                                <reason>
+                                  <message><![CDATA[Warning: Test changed the CurrentDirectory]]></message>
+                                </reason>
+                              </test-case>
+                              <test-case name="MonoGame.Framework.Tests.GameTest+Properties+TargetElapsedTime.Can_set_legal_value(10675199.02:48:05.4775807)" executed="True" result="Success" success="True" time="0.007" asserts="0">
+                                <reason>
+                                  <message><![CDATA[Warning: Test changed the CurrentDirectory]]></message>
+                                </reason>
+                              </test-case>
+                            </results>
+                          </test-suite>
+                          <test-suite type="ParameterizedTest" name="Cannot_set_illegal_value" executed="True" result="Success" success="True" time="0.015" asserts="0">
+                            <results>
+                              <test-case name="MonoGame.Framework.Tests.GameTest+Properties+TargetElapsedTime.Cannot_set_illegal_value((00:00:00, System.ArgumentOutOfRangeException))" executed="True" result="Success" success="True" time="0.006" asserts="1">
+                                <reason>
+                                  <message><![CDATA[Warning: Test changed the CurrentDirectory]]></message>
+                                </reason>
+                              </test-case>
+                              <test-case name="MonoGame.Framework.Tests.GameTest+Properties+TargetElapsedTime.Cannot_set_illegal_value((-00:00:01, System.ArgumentOutOfRangeException))" executed="True" result="Success" success="True" time="0.005" asserts="1">
+                                <reason>
+                                  <message><![CDATA[Warning: Test changed the CurrentDirectory]]></message>
+                                </reason>
+                              </test-case>
+                              <test-case name="MonoGame.Framework.Tests.GameTest+Properties+TargetElapsedTime.Cannot_set_illegal_value((-10675199.02:48:05.4775808, System.ArgumentOutOfRangeException))" executed="True" result="Success" success="True" time="0.004" asserts="1">
+                                <reason>
+                                  <message><![CDATA[Warning: Test changed the CurrentDirectory]]></message>
+                                </reason>
+                              </test-case>
+                            </results>
+                          </test-suite>
+                          <test-case name="MonoGame.Framework.Tests.GameTest+Properties+TargetElapsedTime.Has_correct_default_value" executed="True" result="Failure" success="False" time="0.006" asserts="1">
+                            <failure>
+                              <message><![CDATA[  Expected: property TargetElapsedTime equal to 00:00:00.0166667
+  But was:  00:00:00.0170000
+]]></message>
+                              <stack-trace><![CDATA[at MonoGame.Framework.Tests.GameTest+Properties+PropertyFixtureBase`1[System.TimeSpan].Has_correct_default_value () [0x0001b] in /Users/chris/projects/lib/monogame/MonoGame.Tests/GameTest+Properties.cs:295
+]]></stack-trace>
+                            </failure>
+                          </test-case>
+                          <test-case name="MonoGame.Framework.Tests.GameTest+Properties+TargetElapsedTime.Is_read_write" executed="True" result="Success" success="True" time="0.004" asserts="0">
+                            <reason>
+                              <message><![CDATA[Warning: Test changed the CurrentDirectory]]></message>
+                            </reason>
+                          </test-case>
+                        </results>
+                      </test-suite>
+                      <test-suite type="TestFixture" name="GameTest+Properties+Window" executed="True" result="Success" success="True" time="0.016" asserts="0">
+                        <results>
+                          <test-case name="MonoGame.Framework.Tests.GameTest+Properties+Window.Is_available_before_Run" executed="True" result="Success" success="True" time="0.005" asserts="1">
+                            <reason>
+                              <message><![CDATA[Warning: Test changed the CurrentDirectory]]></message>
+                            </reason>
+                          </test-case>
+                          <test-case name="MonoGame.Framework.Tests.GameTest+Properties+Window.Is_available_in_non_graphical_game" executed="True" result="Success" success="True" time="0.005" asserts="1">
+                            <reason>
+                              <message><![CDATA[Warning: Test changed the CurrentDirectory]]></message>
+                            </reason>
+                          </test-case>
+                          <test-case name="MonoGame.Framework.Tests.GameTest+Properties+Window.Is_read_only" executed="True" result="Success" success="True" time="0.005" asserts="0">
+                            <reason>
+                              <message><![CDATA[Warning: Test changed the CurrentDirectory]]></message>
+                            </reason>
+                          </test-case>
+                        </results>
+                      </test-suite>
+                    </results>
+                  </test-suite>
+                </results>
+              </test-suite>
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+    </results>
+  </test-suite>
+</test-results>
