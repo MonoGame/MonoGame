@@ -93,8 +93,6 @@ namespace Microsoft.Xna.Framework
         private NSObject _rotationObserver;
         private List<NSObject> _applicationObservers;
 		private OpenALSoundController soundControllerInstance = null;
-		
-		private int _ourTask;
 
         public iOSGamePlatform(Game game) :
             base(game)
