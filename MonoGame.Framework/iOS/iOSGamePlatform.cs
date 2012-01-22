@@ -92,14 +92,15 @@ namespace Microsoft.Xna.Framework
         private UIWindow _mainWindow;
         private NSObject _rotationObserver;
         private List<NSObject> _applicationObservers;
-	private OpenALSoundController soundControllerInstance = null;
+		private OpenALSoundController soundControllerInstance = null;
 
         public iOSGamePlatform(Game game) :
             base(game)
         {
             game.Services.AddService(typeof(iOSGamePlatform), this);
-		// Setup our OpenALSoundController to handle our SoundBuffer pools
-		soundControllerInstance = OpenALSoundController.GetInstance;
+			
+			// Setup our OpenALSoundController to handle our SoundBuffer pools
+			soundControllerInstance = OpenALSoundController.GetInstance;
 			
             Directory.SetCurrentDirectory(NSBundle.MainBundle.ResourcePath);
 
@@ -159,9 +160,7 @@ namespace Microsoft.Xna.Framework
             //       CreateFrameBuffer and OnLoad would both need to be changed
             //       to be idempotent per create-destroy cycle of the OpenGL
             //       context.
-
-            _viewController.View.Run(1 / Game.TargetElapsedTime.TotalSeconds);
-            _viewController.View.Pause();
+            _viewController.View.Run(1.0 / Game.TargetElapsedTime.TotalSeconds);
         }
 
         public override void RunLoop()
@@ -179,8 +178,7 @@ namespace Microsoft.Xna.Framework
             BeginObservingDeviceRotation();
 
             _viewController.View.BecomeFirstResponder();
-            _viewController.View.Resume();
-        }
+		}
 
         private void GameWindow_Load(object sender, EventArgs e)
         {
@@ -291,14 +289,12 @@ namespace Microsoft.Xna.Framework
 
         private void Application_WillEnterForeground(NSNotification notification)
         {
-            // FIXME: What needs to be done here?
-            //throw new NotImplementedException();
+			// Already handled in Application_DidBecomeActive. See below for IsActive state change.	
         }
 
         private void Application_DidEnterBackground(NSNotification notification)
         {
-            // FIXME: What needs to be done here?
-            //throw new NotImplementedException();
+			// Already handled in Application_WillResignActive. See below for IsActive state change.
         }
 
         private void Application_DidBecomeActive(NSNotification notification)
@@ -315,6 +311,10 @@ namespace Microsoft.Xna.Framework
         private void Application_WillTerminate(NSNotification notification)
         {
             // FIXME: Cleanly end the run loop.
+			if ( Game != null )
+			{
+				// TODO MonoGameGame.Terminate();
+			}
         }
 
         private void Application_DidReceiveMemoryWarning(NSNotification notification)
