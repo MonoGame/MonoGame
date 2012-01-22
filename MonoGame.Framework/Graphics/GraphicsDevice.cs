@@ -861,7 +861,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 GL11.DrawArrays(PrimitiveTypeGL11(primitiveType), vertexStart, GetElementCountArray(primitiveType, primitiveCount));
         }
 
-        public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int vertexCount, ushort[] indexData, int indexOffset, int primitiveCount) where T : struct, IVertexType
+        public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int vertexCount, short[] indexData, int indexOffset, int primitiveCount) where T : struct, IVertexType
         {
             ////////////////////////////
             //This has not been tested//
