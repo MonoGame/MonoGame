@@ -659,7 +659,7 @@ namespace Microsoft.Xna.Framework.Graphics
             GL11.DrawArrays(PrimitiveTypeGL11(primitiveType), vertexStart, GetElementCountArray(primitiveType, primitiveCount));
         }
 
-        public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int vertexCount, ushort[] indexData, int indexOffset, int primitiveCount) where T : struct, IVertexType
+        public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int vertexCount, short[] indexData, int indexOffset, int primitiveCount) where T : struct, IVertexType
         {
             ////////////////////////////
             //This has not been tested//
@@ -691,7 +691,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             //Buffer data to VBO; This should use stream when we move to ES2.0
             GL11.BufferData(ALL11.ArrayBuffer, (IntPtr)(vd.VertexStride * GetElementCountArray(primitiveType, primitiveCount)), new IntPtr(handle.AddrOfPinnedObject().ToInt64() + (vertexOffset * vd.VertexStride)), ALL11.DynamicDraw);
-            GL11.BufferData(ALL11.ElementArrayBuffer, (IntPtr)(sizeof(ushort) * GetElementCountArray(primitiveType, primitiveCount)), indexData, ALL11.DynamicDraw);
+            GL11.BufferData(ALL11.ElementArrayBuffer, (IntPtr)(sizeof(short) * GetElementCountArray(primitiveType, primitiveCount)), indexData, ALL11.DynamicDraw);
 
             //Setup VertexDeclaration
             VertexDeclaration.PrepareForUse(vd);
