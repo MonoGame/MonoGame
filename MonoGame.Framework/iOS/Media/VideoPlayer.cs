@@ -120,8 +120,7 @@ namespace Microsoft.Xna.Framework.Media
 			_video.MovieView.MoviePlayer.Stop();
 			_state = MediaState.Stopped;
 			_platform.IsPlayingVideo = false;
-            _platform.ViewController.DismissViewController(
-                animated: false, completionHandler: () => {});
+            _platform.ViewController.DismissModalViewControllerAnimated(false);
             // HACK: End of pausing to prevent GL context re-creation.
             _platform.Window.Resume();
         }
