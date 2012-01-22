@@ -67,6 +67,11 @@ namespace Microsoft.Xna.Framework.Graphics
         // Stored until texture is created
         private Bitmap _originalBitmap;
         private ALL11 _originalFilter;
+		
+		internal Size Size
+		{
+			get { return _size;}
+		}
 
         public ESTexture2D(IntPtr data, SurfaceFormat pixelFormat, int width, int height, Size size, ALL11 filter)
         {
