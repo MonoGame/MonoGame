@@ -412,12 +412,12 @@ namespace Microsoft.Xna.Framework
             EndRun();
         }
 
-        private void Platform_Activated(object sender, EventArgs e)
+        internal void Platform_Activated(object sender, EventArgs e)
         {
             Raise(Activated, e);
         }
 
-        private void Platform_Deactivated(object sender, EventArgs e)
+        internal void Platform_Deactivated(object sender, EventArgs e)
         {
             Raise(Deactivated, e);
         }

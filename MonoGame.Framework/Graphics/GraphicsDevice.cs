@@ -48,7 +48,6 @@ using MonoTouch.OpenGLES;
 #if ANDROID
 using Android.Opengl;
 using Android.Views;
-using Microsoft.Xna.Framework.Content;
 using OpenTK.Graphics;
 #endif
 
@@ -59,6 +58,7 @@ using ALL20 = OpenTK.Graphics.ES20.All;
 
 
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
