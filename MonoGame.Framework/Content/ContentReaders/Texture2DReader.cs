@@ -102,7 +102,7 @@ namespace Microsoft.Xna.Framework.Content
 				imagePtr = Marshal.AllocHGlobal (imageData.Length);
 				Marshal.Copy (imageData, 0, imagePtr, imageData.Length);					
 				ESTexture2D esTexture = new ESTexture2D (imagePtr, surfaceFormat, width, height, new Size (width, height), All.Linear);
-				texture = new Texture2D (new ESImage (esTexture));
+				texture = new Texture2D (reader.GraphicsDevice, new ESImage (esTexture));
 			}
 			finally 
 			{		

@@ -98,8 +98,9 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 		
-		internal Texture2D(ESImage theImage)
+		internal Texture2D(GraphicsDevice graphicsDevice, ESImage theImage)
 		{
+            this.graphicsDevice = graphicsDevice;
 			texture = theImage;
 			_width = texture.ImageWidth;
 			_height = texture.ImageHeight;
@@ -110,11 +111,14 @@ namespace Microsoft.Xna.Framework.Graphics
 		public Texture2D(GraphicsDevice graphicsDevice, int width, int height): 
 			this (graphicsDevice, width, height, false, SurfaceFormat.Color)
 		{
+            throw new Exception();
 			
 		}
 		
 		public Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipMap, SurfaceFormat format)
 		{
+            throw new Exception();
+            
 			this.graphicsDevice = graphicsDevice;	
 			
 			this._format = format;
@@ -228,7 +232,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 			
 			ESImage theTexture = new ESImage(image, graphicsDevice.PreferedFilter);			
-			Texture2D result = new Texture2D(theTexture);
+			Texture2D result = new Texture2D(graphicsDevice, theTexture);
 			
 			return result;
         }
@@ -245,7 +249,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 			
 			ESImage theTexture = new ESImage(image, graphicsDevice.PreferedFilter);			
-			Texture2D result = new Texture2D(theTexture);
+			Texture2D result = new Texture2D(graphicsDevice, theTexture);
 			
 			return result;
         }
@@ -278,7 +282,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				var small = image.Scale (new SizeF (width, height));
 				theTexture = new ESImage(small, graphicsDevice.PreferedFilter);
 			}
-			Texture2D result = new Texture2D(theTexture);
+			Texture2D result = new Texture2D(graphicsDevice, theTexture);
 			// result.Name = Path.GetFileNameWithoutExtension(filename);
 			result.Name = filename;
 			return result;					
@@ -570,11 +574,12 @@ namespace Microsoft.Xna.Framework.Graphics
                 GL.TexParameter(All.Texture2D, All.TextureMinFilter, (int)All.Linear);
                 GL.TexParameter(All.Texture2D, All.TextureMagFilter, (int)All.Linear);
             }
-
-            GL.TexParameter(All.Texture2D, All.TextureWrapS,
-                            (float)TextureWrapMode.Repeat);
-            GL.TexParameter(All.Texture2D, All.TextureWrapT,
-                            (float)TextureWrapMode.Repeat);
+   
+            // todo: how to work with multitexturing?
+            // consider using sampler0.Activate() ?
+            var sampler0 = this.graphicsDevice.SamplerStates[0];
+            GL.TexParameter( All.Texture2D, All.TextureWrapS, (int)sampler0.AddressU ); // TextureAddressMode enum's constants are made to match OpenGL's.
+            GL.TexParameter( All.Texture2D, All.TextureWrapT, (int)sampler0.AddressV );
         }
 	}
 }

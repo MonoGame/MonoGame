@@ -137,6 +137,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			// Init RasterizerState
 			RasterizerState = new RasterizerState();
+            
+            // Init Default SamplerState
+            _samplerStates = new SamplerStateCollection();
 
             // Initialize OpenGL states
             GL11.Disable(ALL11.DepthTest);

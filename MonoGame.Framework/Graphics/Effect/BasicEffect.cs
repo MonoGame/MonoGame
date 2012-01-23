@@ -40,7 +40,7 @@ namespace Microsoft.Xna.Framework.Graphics
             GLStateManager.WorldView(World, View);
 
 			base.Apply();
-
+            
             GLStateManager.Textures2D(Texture != null);
 
             GLStateManager.ColorArray(VertexColorEnabled);
