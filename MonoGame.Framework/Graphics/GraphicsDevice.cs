@@ -661,9 +661,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int vertexCount, short[] indexData, int indexOffset, int primitiveCount) where T : struct, IVertexType
         {
-            ////////////////////////////
-            //This has not been tested//
-            ////////////////////////////
+            if(indexOffset != 0)
+                throw new NotImplementedException();
 
             // Unbind the VBOs
             GL11.BindBuffer(ALL11.ArrayBuffer, 0);
@@ -697,7 +696,8 @@ namespace Microsoft.Xna.Framework.Graphics
             VertexDeclaration.PrepareForUse(vd);
 
             //Draw
-            GL11.DrawElements(PrimitiveTypeGL11(primitiveType), GetElementCountArray(primitiveType, primitiveCount), ALL11.UnsignedInt248Oes, (IntPtr)(indexOffset * sizeof(ushort)));
+			// note: GL supports only unsigned types, xna's method signature indicates signed. just ignore the sign bit.
+            GL11.DrawElements(PrimitiveTypeGL11(primitiveType), GetElementCountArray(primitiveType, primitiveCount), ALL11.UnsignedShort, (IntPtr)(indexOffset * sizeof(short)));
 
 
             // Free resources
