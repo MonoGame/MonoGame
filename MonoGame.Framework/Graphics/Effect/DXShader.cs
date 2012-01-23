@@ -1,13 +1,20 @@
 using System;
 using System.Runtime.InteropServices;
 
+#if MONOTOUCH
 using MonoMac.OpenGL;
+#else
+using OpenTK.Graphics.ES20;
+using ShaderType = OpenTK.Graphics.ES20.All;
+using ShaderParameter = OpenTK.Graphics.ES20.All;
+using TextureUnit = OpenTK.Graphics.ES20.All;
+using TextureTarget = OpenTK.Graphics.ES20.All;
+#endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
 	internal class DXShader
 	{
-		
 		public ShaderType shaderType;
 		public int shader;
 		
@@ -129,15 +136,25 @@ namespace Microsoft.Xna.Framework.Graphics
 			glslCode = GLSLOptimizer.Optimize (glslCode, shaderType);
 			
 			shader = GL.CreateShader (shaderType);
+#if IPHONE
+			GL.ShaderSource (shader, 1, new string[]{glslCode}, (int[])null);
+#else			
 			GL.ShaderSource (shader, glslCode);
+#endif
 			GL.CompileShader(shader);
 			
 			int compiled = 0;
+#if IPHONE
+			GL.GetShader (shader, ShaderParameter.CompileStatus, ref compiled);
+#else
 			GL.GetShader (shader, ShaderParameter.CompileStatus, out compiled);
+#endif
 			if (compiled == (int)All.False) {
 				string log;
+#if !IPHONE
 				GL.GetShaderInfoLog(shader, out log);
 				Console.WriteLine (log);
+#endif
 				
 				GL.DeleteShader (shader);
 				throw new Exception("Shader Compilation Failed");

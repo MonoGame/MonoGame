@@ -1,7 +1,12 @@
 using System;
 using System.Runtime.InteropServices;
 
+#if MONOTOUCH
 using MonoMac.OpenGL;
+#else
+using OpenTK.Graphics.ES20;
+using ShaderType = OpenTK.Graphics.ES20.All;
+#endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {

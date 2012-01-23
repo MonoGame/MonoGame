@@ -39,10 +39,7 @@
 #endregion License
 
 using System;
-using GL11 = OpenTK.Graphics.ES11.GL;
-using GL20 = OpenTK.Graphics.ES20.GL;
-using ALL11 = OpenTK.Graphics.ES11.All;
-using ALL20 = OpenTK.Graphics.ES20.All;
+using OpenTK.Graphics.ES20;
 
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -75,41 +72,16 @@ namespace Microsoft.Xna.Framework.Graphics
 			:base (graphicsDevice, width, height, mipMap, preferredFormat)
 		{
 
-
-#if IPHONE
-			if(GraphicsDevice.OpenGLESVersion == MonoTouch.OpenGLES.EAGLRenderingAPI.OpenGLES2)
-
-			{
-				GL20.GenFramebuffers(1, ref frameBuffer);
-			}
-			else
-			{
-				RenderTargetUsage = usage;
-				DepthStencilFormat = preferredDepthFormat;
-			}
-#elif ANDROID
-            if (GraphicsDevice.OpenGLESVersion == OpenTK.Graphics.GLContextVersion.Gles2_0)
-            {
-                GL20.GenFramebuffers(1, ref frameBuffer);
-            }
-            else
-            {
-                RenderTargetUsage = usage;
-                DepthStencilFormat = preferredDepthFormat;
-            }
-#else
-				RenderTargetUsage = usage;
-				DepthStencilFormat = preferredDepthFormat;
-#endif
-
-
+			GL.GenFramebuffers(1, ref frameBuffer);
+			RenderTargetUsage = usage;
+            DepthStencilFormat = preferredDepthFormat;
         }
 		
 		public override void Dispose ()
 		{
 			base.Dispose ();
 			
-			GL20.DeleteFramebuffers(1, ref frameBuffer);
+			GL.DeleteFramebuffers(1, ref frameBuffer);
 		}
 	}
 }

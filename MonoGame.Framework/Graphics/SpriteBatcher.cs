@@ -44,25 +44,14 @@ using System.Collections.Generic;
 
 #if MONOMAC
 using MonoMac.OpenGL;
-
-using GL11 = MonoMac.OpenGL.GL;
-using GL20 = MonoMac.OpenGL.GL;
-using ALL11 = MonoMac.OpenGL.All;
-using ALL20 = MonoMac.OpenGL.All;
-
-using TextureUnit20 = MonoMac.OpenGL.TextureUnit;
-using TextureTarget20 = MonoMac.OpenGL.TextureTarget;
-using TextureUnit11 = MonoMac.OpenGL.TextureUnit;
-using TextureTarget11 = MonoMac.OpenGL.TextureTarget;
 #else
-using GL11 = OpenTK.Graphics.ES11.GL;
-using GL20 = OpenTK.Graphics.ES20.GL;
-using ALL11 = OpenTK.Graphics.ES11.All;
-using ALL20 = OpenTK.Graphics.ES20.All;
+using OpenTK.Graphics.ES20;
 
+using VertexAttribPointerType = OpenTK.Graphics.ES20.All;
+using TextureUnit = OpenTK.Graphics.ES20.All;
+using TextureTarget = OpenTK.Graphics.ES20.All;
+using DrawElementsType = OpenTK.Graphics.ES20.All;
 /*
-using VertexAttribPointerType = ALL20;
-
 using VertexPointerType = OpenTK.Graphics.ES11.All;
 using ColorPointerType = OpenTK.Graphics.ES11.All;
 using TexCoordPointerType = OpenTK.Graphics.ES11.All;
@@ -96,9 +85,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		public int attributeTexCoord = 1;
 		public int attributeTint = 2;
 		
-		bool gl20;
-		
-		public SpriteBatcher (bool gl20)
+		public SpriteBatcher ()
 		{
 			_batchItemList = new List<SpriteBatchItem>(InitialBatchSize);
 			_freeBatchItemQueue = new Queue<SpriteBatchItem>(InitialBatchSize);
@@ -117,8 +104,6 @@ namespace Microsoft.Xna.Framework.Graphics
 				_index[i*6+4] = (ushort)(i*4+3);
 				_index[i*6+5] = (ushort)(i*4+2);
 			}
-			
-			this.gl20 = gl20;
 			
 		}
 		
@@ -168,19 +153,28 @@ namespace Microsoft.Xna.Framework.Graphics
 				break;
 			}
 			
-			if (gl20) {
-				GL20.EnableVertexAttribArray(attributePosition);
-				GL20.EnableVertexAttribArray(attributeTexCoord);
-				
-				int size = VertexPosition2ColorTexture.GetSize();
-				GL20.VertexAttribPointer(attributePosition,2,VertexAttribPointerType.Float,false,size,_vertexHandle.AddrOfPinnedObject());
-				GL20.VertexAttribPointer(attributeTexCoord,2,VertexAttribPointerType.Float,false,size,(IntPtr)((uint)_vertexHandle.AddrOfPinnedObject()+(uint)(sizeof(float)*2+sizeof(uint))));
-			} else {
-				int size = sizeof(float)*4+sizeof(uint);
-				GL11.VertexPointer(2,VertexPointerType.Float,size,_vertexHandle.AddrOfPinnedObject() );
-				GL11.ColorPointer(4, ColorPointerType.UnsignedByte,size,(IntPtr)((uint)_vertexHandle.AddrOfPinnedObject()+(uint)(sizeof(float)*2)));
-				GL11.TexCoordPointer(2, TexCoordPointerType.Float,size,(IntPtr)((uint)_vertexHandle.AddrOfPinnedObject()+(uint)(sizeof(float)*2+sizeof(uint))) );
-			}
+#if ES11
+			int size = sizeof(float)*4+sizeof(uint);
+			GL11.VertexPointer(2,VertexPointerType.Float,size,_vertexHandle.AddrOfPinnedObject() );
+			GL11.ColorPointer(4, ColorPointerType.UnsignedByte,size,(IntPtr)((uint)_vertexHandle.AddrOfPinnedObject()+(uint)(sizeof(float)*2)));
+			GL11.TexCoordPointer(2, TexCoordPointerType.Float,size,(IntPtr)((uint)_vertexHandle.AddrOfPinnedObject()+(uint)(sizeof(float)*2+sizeof(uint))) );
+#else
+			GL.EnableVertexAttribArray(attributePosition);
+			GL.EnableVertexAttribArray(attributeTexCoord);
+			
+			int size = VertexPosition2ColorTexture.GetSize();
+			GL.VertexAttribPointer(attributePosition,
+			                       2,
+			                       VertexAttribPointerType.Float,
+			                       false,
+			                       size,_vertexHandle.AddrOfPinnedObject());
+			GL.VertexAttribPointer(attributeTexCoord,
+			                       2,
+			                       VertexAttribPointerType.Float,
+			                       false,
+			                       size,
+			                       (IntPtr)((uint)_vertexHandle.AddrOfPinnedObject()+(uint)(sizeof(float)*2+sizeof(uint))));
+#endif
 				
 			// setup the vertexArray array
 			int startIndex = 0;
@@ -195,38 +189,33 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			foreach ( SpriteBatchItem item in _batchItemList )
 			{
-				if (gl20) {
-					//Tint Color
-					Vector4 vtint = item.Tint.ToVector4();
-					//vtint /= 255;
-					//GL20.VertexAttrib4(attributeTint, vtint.X, vtint.Y, vtint.Z, vtint.W);
-				}
+#if !ES11
+				//Tint Color
+				Vector4 vtint = item.Tint.ToVector4();
+				//vtint /= 255;
+				//GL20.VertexAttrib4(attributeTint, vtint.X, vtint.Y, vtint.Z, vtint.W);
+#endif
 
 				// if the texture changed, we need to flush and bind the new texture
 				bool shouldFlush = item.TextureID != texID;
-				if (gl20)
-				{
+#if !ES11
 					shouldFlush = shouldFlush || item.Tint != lastTint;
-				}
+#endif
 				if ( shouldFlush )
 				{
 					FlushVertexArray( startIndex, index );
 					startIndex = index;
 					texID = item.TextureID;
 					
-					if (gl20) {
-						lastTint = item.Tint;
-						GL20.ActiveTexture(TextureUnit20.Texture0);
-						GL20.BindTexture ( TextureTarget20.Texture2D, texID );
-						//QQQ
-						//GL20.Uniform1(texID, 0);
-						//GL20.VertexAttrib4(attributeTint,vtint.X, vtint.Y, vtint.Z, vtint.W);
-					} else {
-						//??
-						GL11.ActiveTexture(TextureUnit11.Texture0);
-						
-						GL11.BindTexture ( TextureTarget11.Texture2D, texID );
-					}
+					
+					GL.ActiveTexture(TextureUnit.Texture0);
+					GL.BindTexture ( TextureTarget.Texture2D, texID );
+#if !ES11
+					lastTint = item.Tint;
+					//QQQ
+					//GL20.Uniform1(texID, 0);
+					//GL20.VertexAttrib4(attributeTint,vtint.X, vtint.Y, vtint.Z, vtint.W);
+#endif
 				}
 				// store the SpriteBatchItem data in our vertexArray
 				_vertexArray[index++] = item.vertexTL;
@@ -272,11 +261,15 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			// draw stuff
 			if ( start != end ) {
-				if (gl20) {
-					GL20.DrawElements ( BeginMode.Triangles, (end-start)/2*3, DrawElementsType.UnsignedShort,(IntPtr)((uint)_indexHandle.AddrOfPinnedObject()+(uint)(start/2*3*sizeof(short))) );
-				} else {
-					GL11.DrawElements ( BeginMode.Triangles, (end-start)/2*3, DrawElementsType.UnsignedShort,(IntPtr)((uint)_indexHandle.AddrOfPinnedObject()+(uint)(start/2*3*sizeof(short))) );
-				}
+				GL.DrawElements (
+#if IPHONE
+				                 All.Triangles,
+#else
+								 BeginMode.Triangles,
+#endif
+				                 (end-start)/2*3,
+				                 DrawElementsType.UnsignedShort,
+				                 (IntPtr)((uint)_indexHandle.AddrOfPinnedObject()+(uint)(start/2*3*sizeof(short))) );
 			}
 		}
 	}

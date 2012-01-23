@@ -262,7 +262,8 @@ namespace Microsoft.Xna.Framework.Content
 				{
 					using (Stream assetStream = new FileStream(assetName, FileMode.Open, FileAccess.Read, FileShare.Read))
 					{
-						Texture2D texture = Texture2D.FromStream(graphicsDeviceService.GraphicsDevice, assetStream);
+						Texture2D texture = Texture2D.FromStream(
+							graphicsDeviceService.GraphicsDevice, assetStream);
 						texture.Name = originalAssetName;
 						result = texture;
 					}

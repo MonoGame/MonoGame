@@ -47,12 +47,24 @@ using MonoMac.AppKit;
 using MonoMac.CoreGraphics;
 using MonoMac.Foundation;
 using MonoMac.OpenGL;
-#elif IOS
+using GLPixelFormat = MonoMac.OpenGL.PixelFormat;
+#elif IPHONE
 using MonoTouch.UIKit;
 using MonoTouch.CoreGraphics;
 using MonoTouch.Foundation;
 
-using OpenTK.Graphics.ES11
+#if ES11
+using OpenTK.Graphics.ES11;
+#else
+using OpenTK.Graphics.ES20;
+using TextureTarget = OpenTK.Graphics.ES20.All;
+using PixelType = OpenTK.Graphics.ES20.All;
+using TextureParameterName = OpenTK.Graphics.ES20.All;
+using PixelInternalFormat = OpenTK.Graphics.ES20.All;
+using GLPixelFormat = OpenTK.Graphics.ES20.All;
+using VertexPointerType = OpenTK.Graphics.ES20.All;
+#endif
+
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -71,13 +83,20 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			InitWithData (data, dataLength, pixelFormat, width, height, size, filter);
 		}
-
+		
+#if MONOTOUCH
 		public ESTexture2D (NSImage nsImage, All filter)
 		{
 			// TODO InitWithCGImage(nsImage,filter);
 			CGImage image = nsImage.AsCGImage (RectangleF.Empty, null, null);
 			InitWithCGImage (image, filter);
 		}
+#elif IPHONE
+		public ESTexture2D(UIImage uiImage, All filter)
+		{
+			InitWithCGImage(uiImage.CGImage,filter);
+		}
+#endif
 
 		public ESTexture2D (CGImage cgImage, All filter)
 		{
@@ -96,7 +115,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			CGAffineTransform transform;
 			Size imageSize;
 			SurfaceFormat pixelFormat;
-			//bool sizeToFit = false;
+			
 
 			if (image == null) {
 				throw new ArgumentException (" NSImage is invalid! " );
@@ -125,7 +144,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			// The Mac opengl version supports non power of 2 textures
 			// so we do not have to make them so
 			// TODO: Check for the extension instead
-#if IOS
+#if IPHONE
+			bool sizeToFit = false;
 			if ((width != 1) && ((width & (width - 1)) != 0)) {
 				i = 1;
 				while ((sizeToFit ? 2 * i : i) < width)
@@ -136,7 +156,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			height = imageSize.Height;
 
-#if IOS
+#if IPHONE
 			if ((height != 1) && ((height & (height - 1)) != 0)) {
 				i = 1;
 				while ((sizeToFit ? 2 * i : i) < height)
@@ -170,7 +190,11 @@ namespace Microsoft.Xna.Framework.Graphics
 				colorSpace = CGColorSpace.CreateDeviceRGB ();
 				dataLength = height * width * 4;
 				data = Marshal.AllocHGlobal (dataLength);
-				context = new CGBitmapContext (data, width, height, 8, 4 * width, colorSpace,CGImageAlphaInfo.PremultipliedLast);
+				context = new CGBitmapContext (data,
+				                               width, height,
+				                               8, 4 * width,
+				                               colorSpace,
+				                               CGImageAlphaInfo.PremultipliedLast);
 				colorSpace.Dispose ();
 				break;	
 			case SurfaceFormat.Alpha8:
@@ -327,32 +351,78 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void InitWithData (IntPtr data, int dataLength, SurfaceFormat pixelFormat, int width, int height, Size size, All filter)
 		{		
+#if IPHONE
+			GL.GenTextures (1, ref _name);
+#else			
 			GL.GenTextures (1, out _name);
+#endif			
 			GL.BindTexture (TextureTarget.Texture2D, _name);
-			GL.TexParameter (TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)filter);
-			GL.TexParameter (TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)filter);
+			GL.TexParameter (TextureTarget.Texture2D,
+			                 TextureParameterName.TextureMinFilter, (int)filter);
+			GL.TexParameter (TextureTarget.Texture2D,
+			                 TextureParameterName.TextureMagFilter, (int)filter);
 			Console.WriteLine (pixelFormat.ToString ());
 			switch (pixelFormat) {				
 			case SurfaceFormat.Color /*kTexture2DPixelFormat_RGBA8888*/:
-				GL.TexImage2D (TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, (int)width, (int)height, 0, MonoMac.OpenGL.PixelFormat.Rgba, PixelType.UnsignedByte, data);
+				GL.TexImage2D (TextureTarget.Texture2D, 0,
+#if IPHONE
+				               (int)PixelInternalFormat.Rgba,
+#else				               
+				               PixelInternalFormat.Rgba,
+#endif
+				               (int)width, (int)height, 0,
+				               GLPixelFormat.Rgba, PixelType.UnsignedByte, data);
 				break;
+#if !IPHONE
 			case SurfaceFormat.Dxt1:
-				GL.CompressedTexImage2D (TextureTarget.Texture2D, 0, PixelInternalFormat.CompressedRgbaS3tcDxt1Ext, (int)width, (int)height, 0, dataLength, data);
+				GL.CompressedTexImage2D (TextureTarget.Texture2D, 0,
+				                         (int)PixelInternalFormat.CompressedRgbaS3tcDxt1Ext,		                         
+				                         (int)width, (int)height, 0,
+				                         dataLength, data);
 				break;
 			case SurfaceFormat.Dxt3:
-				GL.CompressedTexImage2D (TextureTarget.Texture2D, 0, PixelInternalFormat.CompressedRgbaS3tcDxt3Ext, (int)width, (int)height, 0, dataLength, data);
+				GL.CompressedTexImage2D (TextureTarget.Texture2D, 0,
+				                         PixelInternalFormat.CompressedRgbaS3tcDxt3Ext,
+				                         (int)width, (int)height, 0,
+				                         dataLength, data);
 				break;
 			case SurfaceFormat.Dxt5:
-				GL.CompressedTexImage2D (TextureTarget.Texture2D, 0, PixelInternalFormat.CompressedRgbaS3tcDxt5Ext, (int)width, (int)height, 0, dataLength, data);
+				GL.CompressedTexImage2D (TextureTarget.Texture2D, 0,
+				                         PixelInternalFormat.CompressedRgbaS3tcDxt5Ext,
+				                         (int)width, (int)height, 0,
+				                         dataLength, data);
 				break;
+#endif
 			case SurfaceFormat.Bgra4444 /*kTexture2DPixelFormat_RGBA4444*/:
-				GL.TexImage2D (TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, (int)width, (int)height, 0, MonoMac.OpenGL.PixelFormat.Rgba, PixelType.UnsignedShort4444, data);
+				GL.TexImage2D (TextureTarget.Texture2D, 0,
+				               
+#if IPHONE
+				               (int)PixelInternalFormat.Rgba,
+#else				               
+				               PixelInternalFormat.Rgba,
+#endif
+				               (int)width, (int)height, 0,
+				               GLPixelFormat.Rgba, PixelType.UnsignedShort4444, data);
 				break;
 			case SurfaceFormat.Bgra5551 /*kTexture2DPixelFormat_RGB5A1*/:
-				GL.TexImage2D (TextureTarget.Texture2D, 0,  PixelInternalFormat.Rgba, (int)width, (int)height, 0, MonoMac.OpenGL.PixelFormat.Rgba, PixelType.UnsignedShort5551, data);
+				GL.TexImage2D (TextureTarget.Texture2D, 0, 
+#if IPHONE
+				               (int)PixelInternalFormat.Rgba,
+#else				               
+				               PixelInternalFormat.Rgba,
+#endif
+				               (int)width, (int)height, 0,
+				               GLPixelFormat.Rgba, PixelType.UnsignedShort5551, data);
 				break;
 			case SurfaceFormat.Alpha8 /*kTexture2DPixelFormat_A8*/:
-				GL.TexImage2D (TextureTarget.Texture2D, 0, PixelInternalFormat.Alpha, (int)width, (int)height, 0, MonoMac.OpenGL.PixelFormat.Alpha, PixelType.UnsignedByte, data);
+				GL.TexImage2D (TextureTarget.Texture2D, 0,
+#if IPHONE
+				               (int)PixelInternalFormat.Alpha,
+#else				               
+				               PixelInternalFormat.Alpha,
+#endif
+				               (int)width, (int)height, 0,
+				               GLPixelFormat.Alpha, PixelType.UnsignedByte, data);
 				break;
 			default:
 				throw new NotSupportedException ("Texture format");
@@ -387,17 +457,45 @@ namespace Microsoft.Xna.Framework.Graphics
 			case SurfaceFormat.Color /*kTexture2DPixelFormat_RGBA8888*/:
 				byte[] pixelInfo = new byte[4] { red, green, blue, alpha };
 				Marshal.Copy (pixelInfo, ((y-1) * _width) + (x-1), _pixelData, 4);
-				GL.TexImage2D (TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, _width, _height, 0, MonoMac.OpenGL.PixelFormat.Rgba, PixelType.UnsignedByte, _pixelData);
+				GL.TexImage2D (TextureTarget.Texture2D, 0,
+#if IPHONE
+				               (int)PixelInternalFormat.Rgba,
+#else				               
+				               PixelInternalFormat.Rgba,
+#endif
+				               _width, _height, 0,
+				               GLPixelFormat.Rgba, PixelType.UnsignedByte, _pixelData);
 				break;
 			// TODO: Implement the rest of these but lack of knowledge and examples prevents this for now
 			case SurfaceFormat.Bgra4444 /*kTexture2DPixelFormat_RGBA4444*/:
-				GL.TexImage2D (TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, _width, _height, 0, MonoMac.OpenGL.PixelFormat.Rgba, PixelType.UnsignedShort4444, _pixelData);
+				GL.TexImage2D (TextureTarget.Texture2D, 0,
+#if IPHONE
+				               (int)PixelInternalFormat.Rgba,
+#else				               
+				               PixelInternalFormat.Rgba,
+#endif
+				               _width, _height, 0,
+				               GLPixelFormat.Rgba, PixelType.UnsignedShort4444, _pixelData);
 				break;
 			case SurfaceFormat.Bgra5551 /*kTexture2DPixelFormat_RGB5A1*/:
-				GL.TexImage2D (TextureTarget.Texture2D, 0,  PixelInternalFormat.Rgba, _width, _height, 0, MonoMac.OpenGL.PixelFormat.Rgba, PixelType.UnsignedShort5551, _pixelData);
+				GL.TexImage2D (TextureTarget.Texture2D, 0, 
+#if IPHONE
+				               (int)PixelInternalFormat.Rgba,
+#else				               
+				               PixelInternalFormat.Rgba,
+#endif
+				               _width, _height, 0,
+				               GLPixelFormat.Rgba, PixelType.UnsignedShort5551, _pixelData);
 				break;
 			case SurfaceFormat.Alpha8 /*kTexture2DPixelFormat_A8*/:
-				GL.TexImage2D (TextureTarget.Texture2D, 0, PixelInternalFormat.Alpha, _width, _height, 0, MonoMac.OpenGL.PixelFormat.Alpha, PixelType.UnsignedByte, _pixelData);
+				GL.TexImage2D (TextureTarget.Texture2D, 0,
+#if IPHONE
+				               (int)PixelInternalFormat.Alpha,
+#else				               
+				               PixelInternalFormat.Alpha,
+#endif
+				               _width, _height, 0,
+				               GLPixelFormat.Alpha, PixelType.UnsignedByte, _pixelData);
 				break;
 			default:
 				throw new NotSupportedException ("Texture format");
@@ -415,22 +513,29 @@ namespace Microsoft.Xna.Framework.Graphics
 								width / 2.0f + point.X,	-height / 2.0f + point.Y,	0.0f,
 								-width / 2.0f + point.X,	height / 2.0f + point.Y,	0.0f,
 								width / 2.0f + point.X,	height / 2.0f + point.Y,	0.0f };
-
+#if ES11
 			GL.BindTexture (TextureTarget.Texture2D, _name);
 			GL.VertexPointer (3, VertexPointerType.Float, 0, vertices);
 			GL.TexCoordPointer (2, TexCoordPointerType.Float, 0, coordinates);
 			GL.DrawArrays (BeginMode.TriangleStrip, 0, 4);
+#else
+			throw new NotImplementedException();
+#endif			
 		}
 
 		public void DrawInRect (Rectangle rect)
 		{
 			float[]	 coordinates = {  0, _maxT,_maxS, _maxT,0, 0,_maxS,	0  };
 			float[]	vertices = { rect.Left,	rect.Top, 0.0f, rect.Right, rect.Top,0.0f,rect.Left,rect.Bottom,0.0f,rect.Right,rect.Bottom,0.0f };
-
+			
+#if ES11
 			GL.BindTexture (TextureTarget.Texture2D, _name);
 			GL.VertexPointer (3, VertexPointerType.Float, 0, vertices);
 			GL.TexCoordPointer (2, TexCoordPointerType.Float, 0, coordinates);
 			GL.DrawArrays (BeginMode.TriangleStrip, 0, 4);
+#else
+			throw new NotImplementedException();
+#endif			
 		}
 
 		public Size ContentSize {

@@ -47,7 +47,11 @@ using MonoTouch.UIKit;
 using MonoTouch.CoreGraphics;
 using MonoTouch.Foundation;
 
+#if ES11
 using OpenTK.Graphics.ES11;
+#else
+using OpenTK.Graphics.ES20;
+#endif
 
 using Microsoft.Xna.Framework.Content;
 
@@ -120,29 +124,25 @@ namespace Microsoft.Xna.Framework.Graphics
 			this._format = format;
 			this._mipmap = mipMap;
 				
+#if ES11
+			// This is needed in OpenGL ES 1.1 as it only supports power of 2 textures
+			int xTexSize = 1;
+			int yTexSize = 1;
+			while (width > xTexSize && height > yTexSize)
+			{
+				if (width > xTexSize) xTexSize *= 2;
+				if (height > yTexSize) yTexSize *= 2;
+			}
 			
-			if(GraphicsDevice.OpenGLESVersion == MonoTouch.OpenGLES.EAGLRenderingAPI.OpenGLES2)
-			{
-				this._width = width;
-				this._height = height;
-				texture = new ESImage(width, height);
-			}
-			else
-			{
-				// This is needed in OpenGL ES 1.1 as it only supports power of 2 textures
-				int xTexSize = 1;
-				int yTexSize = 1;
-				while (width > xTexSize && height > yTexSize)
-				{
-					if (width > xTexSize) xTexSize *= 2;
-					if (height > yTexSize) yTexSize *= 2;
-				}
+			this._width = xTexSize;
+			this._height = yTexSize;
 				
-				this._width = xTexSize;
-				this._height = yTexSize;
-					
-				generateOpenGLTexture();			
-			}
+			generateOpenGLTexture();
+#else
+			this._width = width;
+			this._height = height;
+			texture = new ESImage(width, height);
+#endif
 		}
 		
 		private void generateOpenGLTexture() 
@@ -158,7 +158,11 @@ namespace Microsoft.Xna.Framework.Graphics
 				// Taken from http://www.flexicoder.com/blog/index.php/2009/11/iphone-mipmaps/
 				GL.TexParameter(All.Texture2D, All.TextureMinFilter, (int)All.LinearMipmapNearest);
 				GL.TexParameter(All.Texture2D, All.TextureMagFilter, (int)All.Linear);
+#if ES11
 				GL.TexParameter(All.Texture2D, All.GenerateMipmap, (int)All.True);
+#else
+				GL.TexParameter(All.Texture2D, All.GenerateMipmapHint, (int)All.True);
+#endif		
 			}
 			else
 			{
@@ -233,7 +237,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			return result;
         }
 
-        public static Texture2D FromFile(GraphicsDevice graphicsDevice, Stream textureStream)
+        public static Texture2D FromStream(GraphicsDevice graphicsDevice, Stream textureStream)
         {
             MonoTouch.Foundation.NSData nsData = MonoTouch.Foundation.NSData.FromStream(textureStream);
 
@@ -250,12 +254,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			return result;
         }
 
-        public static Texture2D FromFile(GraphicsDevice graphicsDevice, Stream textureStream, int numberBytes)
-        {
-            throw new NotImplementedException();
-        }
 
-        public static Texture2D FromFile(GraphicsDevice graphicsDevice, string filename, int width, int height)
+        public static Texture2D FromStream(GraphicsDevice graphicsDevice, string filename, int width, int height)
         {
 			UIImage image;
 			if(filename.Contains(".pdf"))
@@ -284,11 +284,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			return result;					
         }
 
-        public static Texture2D FromFile(GraphicsDevice graphicsDevice, string filename)
-		{
-			return FromFile( graphicsDevice, filename, 0, 0 );
-        }
-
 		// Not sure what this should do in iOS will leave it non implemented for now.
 		internal void Reload(Stream textureStream)
 		{
@@ -311,28 +306,28 @@ namespace Microsoft.Xna.Framework.Graphics
 			int renderBufferID = -1;
 			
 			// create framebuffer
-			GL.Oes.GenFramebuffers(1, ref framebufferId);
-			GL.Oes.BindFramebuffer(All.FramebufferOes, framebufferId);
+			GL.GenFramebuffers(1, ref framebufferId);
+			GL.BindFramebuffer(All.Framebuffer, framebufferId);
 			
 			//renderBufferIDs = new int[currentRenderTargets];
-			GL.Oes.GenRenderbuffers(1, ref renderBufferID);
+			GL.GenRenderbuffers(1, ref renderBufferID);
 			
 			// attach the texture to FBO color attachment point
-			GL.Oes.FramebufferTexture2D(All.FramebufferOes, All.ColorAttachment0Oes,
+			GL.FramebufferTexture2D(All.Framebuffer, All.ColorAttachment0,
 				All.Texture2D, ID,0);
 			
 			// create a renderbuffer object to store depth info
-			GL.Oes.BindRenderbuffer(All.RenderbufferOes, renderBufferID);
-			GL.Oes.RenderbufferStorage(All.RenderbufferOes, All.DepthComponent24Oes,
+			GL.BindRenderbuffer(All.Renderbuffer, renderBufferID);
+			GL.RenderbufferStorage(All.Renderbuffer, All.DepthComponent24Oes,
 				_width, _height);
 			
 			// attach the renderbuffer to depth attachment point
-			GL.Oes.FramebufferRenderbuffer(All.FramebufferOes, All.DepthAttachmentOes,
-				All.RenderbufferOes, renderBufferID);
+			GL.FramebufferRenderbuffer(All.Framebuffer, All.DepthAttachment,
+				All.Renderbuffer, renderBufferID);
 				
-			All status = GL.Oes.CheckFramebufferStatus(All.FramebufferOes);
+			All status = GL.CheckFramebufferStatus(All.Framebuffer);
 			
-			if (status != All.FramebufferCompleteOes)
+			if (status != All.FramebufferComplete)
 				throw new Exception("Error creating framebuffer: " + status);
 			
 			byte[] imageInfo;
@@ -365,14 +360,14 @@ namespace Microsoft.Xna.Framework.Graphics
 			GL.ReadPixels(0,0, _width, _height, All.Rgba, All.UnsignedByte, imageInfo);
 
 			// Detach the render buffers.
-			GL.Oes.FramebufferRenderbuffer(All.FramebufferOes, All.DepthAttachmentOes,
-					All.RenderbufferOes, 0);
+			GL.FramebufferRenderbuffer(All.Framebuffer, All.DepthAttachment,
+					All.Renderbuffer, 0);
 			// delete the RBO's
-			GL.Oes.DeleteRenderbuffers(1,ref renderBufferID);
+			GL.DeleteRenderbuffers(1,ref renderBufferID);
 			// delete the FBO
-			GL.Oes.DeleteFramebuffers(1, ref framebufferId);
+			GL.DeleteFramebuffers(1, ref framebufferId);
 			// Set the frame buffer back to the system window buffer
-			GL.Oes.BindFramebuffer(All.FramebufferOes, 0);			
+			GL.BindFramebuffer(All.Framebuffer, 0);			
 
 			return imageInfo;
 					
@@ -584,7 +579,11 @@ namespace Microsoft.Xna.Framework.Graphics
                 GL.TexParameter(All.Texture2D, All.TextureMinFilter,
                                 (int)All.LinearMipmapNearest);
                 GL.TexParameter(All.Texture2D, All.TextureMagFilter, (int)All.Linear);
+#if ES11
                 GL.TexParameter(All.Texture2D, All.GenerateMipmap, (int)All.True);
+#else
+				GL.TexParameter(All.Texture2D, All.GenerateMipmapHint, (int)All.True);
+#endif
             }
             else
             {

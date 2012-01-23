@@ -4,16 +4,8 @@ using System.Collections.Generic;
 
 #if MONOMAC
 using MonoMac.OpenGL;
-
-using GL11 = MonoMac.OpenGL.GL;
-using GL20 = MonoMac.OpenGL.GL;
-using ALL11 = MonoMac.OpenGL.All;
-using ALL20 = MonoMac.OpenGL.All;
 #else
-using GL11 = OpenTK.Graphics.ES11.GL;
-using GL20 = OpenTK.Graphics.ES20.GL;
-using ALL11 = OpenTK.Graphics.ES11.All;
-using ALL20 = OpenTK.Graphics.ES20.All;
+using OpenTK.Graphics.ES20;
 #endif
 
 using Microsoft.Xna.Framework;
@@ -44,16 +36,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			this.graphicsDevice = graphicsDevice;
 			//use a custon SpriteEffect so we can control the transformation matrix
 			spriteEffect = new Effect (this.graphicsDevice, SpriteEffectCode.Code);	
-			
-#if IPHONE
-			_batcher = new SpriteBatcher (
-				GraphicsDevice.OpenGLESVersion == MonoTouch.OpenGLES.EAGLRenderingAPI.OpenGLES2);
-#elif ANDROID
-			_batcher = new SpriteBatcher (
-				GraphicsDevice.OpenGLESVersion == OpenTK.Graphics.GLContextVersion.Gles2_0);
-#else
-			_batcher = new SpriteBatcher (false);
-#endif
+
+			_batcher = new SpriteBatcher ();
 		}
 
 		public void Begin ()
@@ -151,10 +135,10 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 		
 		void Flush() {
+#if ES11
 			// set camera
 			GL.MatrixMode (MatrixMode.Projection);
 			GL.LoadIdentity ();		
-			
 			
 			// Switch on the flags.
 #if ANDROID
@@ -208,13 +192,15 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 #endif
 
+#endif
+
 			// Enable Scissor Tests if necessary
 			//if (this.graphicsDevice.RasterizerState.ScissorTestEnable) {
 			//	GL.Enable (EnableCap.ScissorTest);				
 			//}
 			
 			
-			GL.MatrixMode (MatrixMode.Modelview);
+			//GL.MatrixMode (MatrixMode.Modelview);
 			 
 			 
 			// Enable Scissor Tests if necessary
@@ -226,17 +212,19 @@ namespace Microsoft.Xna.Framework.Graphics
 			//GLStateManager.SetDepthStencilState(_depthStencilState);
 
 			//GL.Disable (EnableCap.DepthTest);
-			
+#if ES11
 			GL.TexEnv (TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)All.BlendSrc);
 			GLStateManager.Textures2D(true);
 			GLStateManager.VertexArray(true);
 			GLStateManager.ColorArray(true);
 			GLStateManager.TextureCoordArray(true);
-
+#endif
 			// Enable Culling for better performance
+			
+			/*QQQ
 			GL.Enable (EnableCap.CullFace);
 			GL.FrontFace (FrontFaceDirection.Cw);
-			GL.Color4 (1.0f, 1.0f, 1.0f, 1.0f);
+			GL.Color4 (1.0f, 1.0f, 1.0f, 1.0f);*/
 
 			_batcher.DrawBatch (_sortMode, graphicsDevice.SamplerStates[0]);
 	

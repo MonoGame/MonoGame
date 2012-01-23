@@ -46,19 +46,16 @@ using System.Runtime.InteropServices;
 using MonoMac.OpenGL;
 #else
 
-#if IPHONE
-using MonoTouch.OpenGLES;
-#elif ANDROID
-using Android.Opengl;
-using Android.Views;
-using Android.Views;
-#endif
-//using OpenTK.Graphics;
-
 #if ES11
 using OpenTK.Graphics.ES11;
+using EnableCap = OpenTK.Graphics.ES11.All;
+using BufferTarget = OpenTK.Graphics.ES11.All;
 #else
 using OpenTK.Graphics.ES20;
+using EnableCap = OpenTK.Graphics.ES20.All;
+using BufferTarget = OpenTK.Graphics.ES20.All;
+using BufferUsageHint = OpenTK.Graphics.ES20.All;
+using DrawElementsType = OpenTK.Graphics.ES20.All;
 #endif
 
 #endif
@@ -217,7 +214,11 @@ namespace Microsoft.Xna.Framework.Graphics
 		public void Clear (ClearOptions options, Vector4 color, float depth, int stencil)
 		{
 			GL.ClearColor (color.X, color.Y, color.Z, color.W);
+#if IPHONE
+			GL.Clear ((uint)CreateClearOptions(options, depth, stencil));
+#else
 			GL.Clear (CreateClearOptions(options, depth, stencil));
+#endif
 		}
 
 		private ClearBufferMask CreateClearOptions (ClearOptions clearOptions, float depth, int stencil)
@@ -606,7 +607,25 @@ namespace Microsoft.Xna.Framework.Graphics
         public void ResolveBackBuffer(ResolveTexture2D resolveTexture)
         {
         }
+		
+#if IPHONE
+		internal All PrimitiveTypeGL(PrimitiveType primitiveType)
+        {
+            switch (primitiveType)
+            {
+                case PrimitiveType.LineList:
+                    return All.Lines;
+                case PrimitiveType.LineStrip:
+                    return All.LineStrip;
+                case PrimitiveType.TriangleList:
+                    return All.Triangles;
+                case PrimitiveType.TriangleStrip:
+                    return All.TriangleStrip;
+            }
 
+            throw new NotImplementedException();
+        }
+#else
         internal BeginMode PrimitiveTypeGL(PrimitiveType primitiveType)
         {
             switch (primitiveType)
@@ -623,6 +642,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
             throw new NotImplementedException();
         }
+#endif
+
 
         public void SetVertexBuffer(VertexBuffer vertexBuffer)
         {
@@ -642,7 +663,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		internal void SetGraphicsStates ()
 		{
-			GL.PushMatrix();
+			//GL.PushMatrix();
 			// Set up our Rasterizer States
 			GLStateManager.SetRasterizerStates(RasterizerState);
 			GLStateManager.SetBlendStates(BlendState);
@@ -656,13 +677,15 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			// if primitives were used then we need to reset them
 			if (resetVertexStates) {
+#if ES11
 				GLStateManager.VertexArray(false);
 				GLStateManager.ColorArray(false);
 				GLStateManager.NormalArray(false);
 				GLStateManager.TextureCoordArray(false);
+#endif
 				resetVertexStates = false;
 			}
-			GL.PopMatrix();
+			//GL.PopMatrix();
 		}
 		
 
@@ -682,17 +705,28 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
 
             //Create VBO if not created already
+#if IPHONE
+			if (VboIdArray == 0)
+                GL.GenBuffers(1, ref VboIdArray);
+            if (VboIdElement == 0)
+                GL.GenBuffers(1, ref VboIdElement);
+#else
             if (VboIdArray == 0)
                 GL.GenBuffers(1, out VboIdArray);
             if (VboIdElement == 0)
                 GL.GenBuffers(1, out VboIdElement);
-
+#endif
+			
             // Bind the VBO
             GL.BindBuffer(BufferTarget.ArrayBuffer, VboIdArray);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, VboIdElement);
             ////Clear previous data
-            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)0, (IntPtr)null, BufferUsageHint.DynamicDraw);
-            GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)0, (IntPtr)null, BufferUsageHint.DynamicDraw);
+            GL.BufferData(BufferTarget.ArrayBuffer,
+			              (IntPtr)0, (IntPtr)null,
+			              BufferUsageHint.DynamicDraw);
+            GL.BufferData(BufferTarget.ElementArrayBuffer,
+			              (IntPtr)0, (IntPtr)null,
+			              BufferUsageHint.DynamicDraw);
 
 			//Get VertexDeclaration
 			var vd = _vertexBuffer.VertexDeclaration;
@@ -748,9 +782,14 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
 
             //Create VBO if not created already
+#if IPHONE
+            if (VboIdArray == 0)
+                GL.GenBuffers(1, ref VboIdArray);
+#else
             if (VboIdArray == 0)
                 GL.GenBuffers(1, out VboIdArray);
-
+#endif
+			
             // Bind the VBO
             GL.BindBuffer(BufferTarget.ArrayBuffer, VboIdArray);
             ////Clear previous data
@@ -775,7 +814,7 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.DrawArrays(PrimitiveTypeGL(primitiveType),
 			              vertexOffset,
 			              GetElementCountArray(primitiveType,
-			                     primitiveCount));
+			              primitiveCount));
 
             // Free resources
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
@@ -799,9 +838,14 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
 
             //Create VBO if not created already
+#if IPHONE
+			if (VboIdArray == 0)
+                GL.GenBuffers(1, ref VboIdArray);
+#else
             if (VboIdArray == 0)
                 GL.GenBuffers(1, out VboIdArray);
-
+#endif
+			
             // Bind the VBO
             GL.BindBuffer(BufferTarget.ArrayBuffer, VboIdArray);
             ////Clear previous data
@@ -849,11 +893,18 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
 
             //Create VBO if not created already
+#if IPHONE
+			if (VboIdArray == 0)
+                GL.GenBuffers(1, ref VboIdArray);
+            if (VboIdElement == 0)
+                GL.GenBuffers(1, ref VboIdElement);
+#else
             if (VboIdArray == 0)
                 GL.GenBuffers(1, out VboIdArray);
             if (VboIdElement == 0)
                 GL.GenBuffers(1, out VboIdElement);
-
+#endif
+			
             // Bind the VBO
             GL.BindBuffer(BufferTarget.ArrayBuffer, VboIdArray);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, VboIdElement);
@@ -904,11 +955,17 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
 
             //Create VBO if not created already
+#if IPHONE
+			if (VboIdArray == 0)
+                GL.GenBuffers(1, ref VboIdArray);
+            if (VboIdElement == 0)
+                GL.GenBuffers(1, ref VboIdElement);
+#else
             if (VboIdArray == 0)
                 GL.GenBuffers(1, out VboIdArray);
             if (VboIdElement == 0)
                 GL.GenBuffers(1, out VboIdElement);
-
+#endif
             // Bind the VBO
             GL.BindBuffer(BufferTarget.ArrayBuffer, VboIdArray);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, VboIdElement);
@@ -954,11 +1011,17 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
 
             //Create VBO if not created already
+#if IPHONE
+			if (VboIdArray == 0)
+                GL.GenBuffers(1, ref VboIdArray);
+            if (VboIdElement == 0)
+                GL.GenBuffers(1, ref VboIdElement);
+#else
             if (VboIdArray == 0)
                 GL.GenBuffers(1, out VboIdArray);
             if (VboIdElement == 0)
                 GL.GenBuffers(1, out VboIdElement);
-
+#endif
             // Bind the VBO
             GL.BindBuffer(BufferTarget.ArrayBuffer, VboIdArray);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, VboIdElement);

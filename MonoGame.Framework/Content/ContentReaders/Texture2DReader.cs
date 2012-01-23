@@ -34,7 +34,11 @@ using System.Drawing;
 #if MONOMAC
 using MonoMac.OpenGL;
 #else
+#if ES11
 using OpenTK.Graphics.ES11;
+#else
+using OpenTK.Graphics.ES20;
+#endif
 #endif
 
 using Microsoft.Xna;
@@ -117,7 +121,7 @@ namespace Microsoft.Xna.Framework.Content
 			byte[] imageBytes = reader.ReadBytes (imageLength);
 			
 			switch(surfaceFormat) {
-#if IOS
+#if IPHONE
 			//no Dxt in OpenGL ES
 			case SurfaceFormat.Dxt1:
 				imageBytes = DxtUtil.DecompressDxt1(imageBytes, width, height);
@@ -151,7 +155,8 @@ namespace Microsoft.Xna.Framework.Content
 			try 
 			{
 				Marshal.Copy (imageBytes, 0, ptr, imageLength);					
-				ESTexture2D temp = new ESTexture2D(ptr, imageLength, surfaceFormat, width, height, new Size (width, height), All.Linear);
+				ESTexture2D temp = new ESTexture2D(
+					ptr, imageLength, surfaceFormat, width, height, new Size (width, height), All.Linear);
 				texture = new Texture2D (new ESImage (temp));					
 			} 
 			finally 

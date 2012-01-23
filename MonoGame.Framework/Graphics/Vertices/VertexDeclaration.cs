@@ -86,6 +86,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public static void PrepareForUse(VertexDeclaration vd)
         {
+#if ES11			
             GLStateManager.VertexArray(true);
 
             bool normal = false;
@@ -139,6 +140,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
             GLStateManager.TextureCoordArray(texcoord);
             GLStateManager.NormalArray(normal);
+#else
+			throw new NotImplementedException();
+#endif			
         }
 
         public VertexElement[] GetVertexElements()

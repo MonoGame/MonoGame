@@ -2,21 +2,32 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using All11 = OpenTK.Graphics.ES11.All;
-using All20 = OpenTK.Graphics.ES20.All;
+
+#if MONOMAC
+using MonoMac.OpenGL;
+#else
+using OpenTK.Graphics.ES20;
+using VertexPointerType = OpenTK.Graphics.ES20.All;
+using ColorPointerType = OpenTK.Graphics.ES20.All;
+using NormalPointerType = OpenTK.Graphics.ES20.All;
+using TexCoordPointerType = OpenTK.Graphics.ES20.All;
+using BlendEquationMode = OpenTK.Graphics.ES20.All;
+using BlendingFactorSrc = OpenTK.Graphics.ES20.All;
+using BlendingFactorDest = OpenTK.Graphics.ES20.All;
+#endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
     public static class GraphicsExtensions
     {
-        public static All11 OpenGL11(this CullMode cull)
+        public static All OpenGL11(CullMode cull)
         {
             switch (cull)
             {
                 case CullMode.CullClockwiseFace:
-                    return All11.Cw;
+                    return All.Cw;
                 case CullMode.CullCounterClockwiseFace:
-                    return All11.Ccw;
+                    return All.Ccw;
                 default:
                     throw new NotImplementedException();
             }
@@ -66,7 +77,7 @@ namespace Microsoft.Xna.Framework.Graphics
             throw new NotImplementedException();
         }
 
-        public static All11 OpenGLValueType(this VertexElementFormat elementFormat)
+        public static VertexPointerType OpenGLVertexPointerType(this VertexElementFormat elementFormat)
         {
             switch (elementFormat)
             {
@@ -74,38 +85,177 @@ namespace Microsoft.Xna.Framework.Graphics
                     throw new NotImplementedException();
 
                 case VertexElementFormat.Vector2:
-                    return All11.Float;
+                    return VertexPointerType.Float;
 
                 case VertexElementFormat.Vector3:
-                    return All11.Float;
+                    return VertexPointerType.Float;
 
                 case VertexElementFormat.Vector4:
-                    return All11.Float;
+                    return VertexPointerType.Float;
 
                 case VertexElementFormat.Color:
-                    return All11.UnsignedByte;
+                    return VertexPointerType.Short;
 
                 case VertexElementFormat.Byte4:
-                    return All11.UnsignedByte;
+                    return VertexPointerType.Short;
 
                 case VertexElementFormat.Short2:
-                    return All11.UnsignedShort;
+                    return VertexPointerType.Short;
 
                 case VertexElementFormat.Short4:
-                    return All11.UnsignedShort;
+                    return VertexPointerType.Short;
 
                 case VertexElementFormat.NormalizedShort2:
-                    return All11.UnsignedShort;
+                    return VertexPointerType.Short;
 
                 case VertexElementFormat.NormalizedShort4:
-                    return All11.UnsignedShort;
+                    return VertexPointerType.Short;
 
                 case VertexElementFormat.HalfVector2:
-                    return All11.Float;
+                    return VertexPointerType.Float;
 
                 case VertexElementFormat.HalfVector4:
-                    return All11.Float;
+                    return VertexPointerType.Float;
             }
+
+            throw new NotImplementedException();
+        }
+
+        public static ColorPointerType OpenGLColorPointerType(this VertexElementFormat elementFormat)
+        {
+            switch (elementFormat)
+            {
+                case VertexElementFormat.Single:
+                    throw new NotImplementedException();
+
+                case VertexElementFormat.Vector2:
+                    return ColorPointerType.Float;
+
+                case VertexElementFormat.Vector3:
+                    return ColorPointerType.Float;
+
+                case VertexElementFormat.Vector4:
+                    return ColorPointerType.Float;
+
+                case VertexElementFormat.Color:
+                    //return ColorPointerType.UnsignedByte;
+                    return ColorPointerType.UnsignedByte;
+
+                case VertexElementFormat.Byte4:
+                    return ColorPointerType.UnsignedByte;
+
+                case VertexElementFormat.Short2:
+                    return ColorPointerType.Short;
+
+                case VertexElementFormat.Short4:
+                    return ColorPointerType.Short;
+
+                case VertexElementFormat.NormalizedShort2:
+                    return ColorPointerType.UnsignedShort;
+
+                case VertexElementFormat.NormalizedShort4:
+                    return ColorPointerType.UnsignedShort;
+				
+#if !IPHONE
+                case VertexElementFormat.HalfVector2:
+                    return ColorPointerType.HalfFloat;
+
+                case VertexElementFormat.HalfVector4:
+                    return ColorPointerType.HalfFloat;
+#endif
+			}
+
+            throw new NotImplementedException();
+        }
+
+       public static NormalPointerType OpenGLNormalPointerType(this VertexElementFormat elementFormat)
+        {
+            switch (elementFormat)
+            {
+                case VertexElementFormat.Single:
+                    throw new NotImplementedException();
+
+                case VertexElementFormat.Vector2:
+                    return NormalPointerType.Float;
+
+                case VertexElementFormat.Vector3:
+                    return NormalPointerType.Float;
+
+                case VertexElementFormat.Vector4:
+                    return NormalPointerType.Float;
+
+                case VertexElementFormat.Color:
+                    return NormalPointerType.Byte;
+
+                case VertexElementFormat.Byte4:
+                    return NormalPointerType.Byte;
+
+                case VertexElementFormat.Short2:
+                    return NormalPointerType.Short;
+
+                case VertexElementFormat.Short4:
+                    return NormalPointerType.Short;
+
+                case VertexElementFormat.NormalizedShort2:
+                    return NormalPointerType.Short;
+
+                case VertexElementFormat.NormalizedShort4:
+                    return NormalPointerType.Short;
+				
+#if !IPHONE
+                case VertexElementFormat.HalfVector2:
+                    return NormalPointerType.HalfFloat;
+
+                case VertexElementFormat.HalfVector4:
+                    return NormalPointerType.HalfFloat;
+#endif
+			}
+
+            throw new NotImplementedException();
+        }
+
+       public static TexCoordPointerType OpenGLTexCoordPointerType(this VertexElementFormat elementFormat)
+        {
+            switch (elementFormat)
+            {
+                case VertexElementFormat.Single:
+                    throw new NotImplementedException();
+
+                case VertexElementFormat.Vector2:
+                    return TexCoordPointerType.Float;
+
+                case VertexElementFormat.Vector3:
+                    return TexCoordPointerType.Float;
+
+                case VertexElementFormat.Vector4:
+                    return TexCoordPointerType.Float;
+
+                case VertexElementFormat.Color:
+                    return TexCoordPointerType.Float;
+
+                case VertexElementFormat.Byte4:
+                    return TexCoordPointerType.Float;
+
+                case VertexElementFormat.Short2:
+                    return TexCoordPointerType.Short;
+
+                case VertexElementFormat.Short4:
+                    return TexCoordPointerType.Short;
+
+                case VertexElementFormat.NormalizedShort2:
+                    return TexCoordPointerType.Short;
+
+                case VertexElementFormat.NormalizedShort4:
+                    return TexCoordPointerType.Short;
+				
+#if !IPHONE
+                case VertexElementFormat.HalfVector2:
+                    return TexCoordPointerType.HalfFloat;
+
+                case VertexElementFormat.HalfVector4:
+                    return TexCoordPointerType.HalfFloat;
+#endif
+			}
 
             throw new NotImplementedException();
         }
@@ -128,7 +278,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     throw new NotImplementedException();
             }
         }
-
+		
         public static int GetTypeSize(this VertexElementFormat elementFormat)
         {
             switch (elementFormat)
@@ -171,5 +321,109 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             return 0;
         }
+
+		public static BlendEquationMode GetBlendEquationMode (this BlendFunction function)
+		{
+			switch (function) {
+			case BlendFunction.Add:
+				return BlendEquationMode.FuncAdd;
+#if IPHONE
+			case BlendFunction.Max:
+				return BlendEquationMode.MaxExt;
+			case BlendFunction.Min:
+				return BlendEquationMode.MinExt;
+#else
+			case BlendFunction.Max:
+				return BlendEquationMode.Max;
+			case BlendFunction.Min:
+				return BlendEquationMode.Min;
+#endif			
+			case BlendFunction.ReverseSubtract:
+				return BlendEquationMode.FuncReverseSubtract;
+			case BlendFunction.Subtract:
+				return BlendEquationMode.FuncSubtract;
+			default:
+				return BlendEquationMode.FuncAdd;
+			}
+		}
+
+		public static BlendingFactorSrc GetBlendFactorSrc (this Blend blend)
+		{
+			switch (blend) {
+			case Blend.DestinationAlpha:
+				return BlendingFactorSrc.DstAlpha;
+			case Blend.DestinationColor:
+				return BlendingFactorSrc.DstColor;
+			case Blend.InverseDestinationAlpha:
+				return BlendingFactorSrc.OneMinusDstAlpha;
+			case Blend.InverseDestinationColor:
+				return BlendingFactorSrc.OneMinusDstColor;
+			case Blend.InverseSourceAlpha:
+				return BlendingFactorSrc.OneMinusSrcAlpha;
+			case Blend.InverseSourceColor:
+#if MONOMAC
+				return BlendingFactorSrc.OneMinusSrc1Color;
+#else
+				return BlendingFactorSrc.OneMinusConstantColor;
+#endif
+			case Blend.One:
+				return BlendingFactorSrc.One;
+			case Blend.SourceAlpha:
+				return BlendingFactorSrc.SrcAlpha;
+			case Blend.SourceAlphaSaturation:
+				return BlendingFactorSrc.SrcAlphaSaturate;
+			case Blend.SourceColor:
+#if MONOMAC
+				return BlendingFactorSrc.Src1Color;
+#else
+				return BlendingFactorSrc.ConstantColor;
+#endif
+			case Blend.Zero:
+				return BlendingFactorSrc.Zero;
+			default:
+				return BlendingFactorSrc.One;
+			}
+
+		}
+
+		public static BlendingFactorDest GetBlendFactorDest (this Blend blend)
+		{
+			switch (blend) {
+			case Blend.DestinationAlpha:
+				return BlendingFactorDest.DstAlpha;
+//			case Blend.DestinationColor:
+//				return BlendingFactorDest.DstColor;
+			case Blend.InverseDestinationAlpha:
+				return BlendingFactorDest.OneMinusDstAlpha;
+//			case Blend.InverseDestinationColor:
+//				return BlendingFactorDest.OneMinusDstColor;
+			case Blend.InverseSourceAlpha:
+				return BlendingFactorDest.OneMinusSrcAlpha;
+			case Blend.InverseSourceColor:
+#if MONOMAC
+				return BlendingFactorDest.OneMinusSrc1Color;
+#else
+				return BlendingFactorDest.OneMinusConstantColor;
+#endif
+			case Blend.One:
+				return BlendingFactorDest.One;
+			case Blend.SourceAlpha:
+				return BlendingFactorDest.SrcAlpha;
+//			case Blend.SourceAlphaSaturation:
+//				return BlendingFactorDest.SrcAlphaSaturate;
+			case Blend.SourceColor:
+#if MONOMAC
+				return BlendingFactorDest.Src1Color;
+#else
+				return BlendingFactorDest.ConstantColor;
+#endif
+			case Blend.Zero:
+				return BlendingFactorDest.Zero;
+			default:
+				return BlendingFactorDest.One;
+			}
+
+		}
+
     }
 }

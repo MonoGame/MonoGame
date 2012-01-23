@@ -329,8 +329,6 @@
     <Compile Include="Net\NetworkMessageType.cs" />
     <Compile Include="iOS\GamerServices\SignedInGamer.cs" />
     <Compile Include="iOS\Graphics\ESImage.cs" />
-    <Compile Include="iOS\Graphics\ESTexture2D.cs" />
-    <Compile Include="iOS\Graphics\GraphicsAdapter.cs" />
     <Compile Include="iOS\Graphics\PresentationParameters.cs" />
     <Compile Include="iOS\Graphics\Texture2D.cs" />
     <Compile Include="iOS\Input\GamePad.cs" />
@@ -345,7 +343,6 @@
     <Compile Include="iOS\GamerServices\TextFieldAlertView.cs" />
     <Compile Include="iOS\Net\MonoGamePeerPickerControllerDelegate.cs" />
     <Compile Include="iOS\Net\MonoGameSessionDelegate.cs" />
-    <Compile Include="iOS\Content\ContentManager.cs" />
     <Compile Include="Graphics\Extender.cs" />
     <Compile Include="Audio\NoAudioHardwareException.cs" />
     <Compile Include="Storage\StorageDeviceHelper.cs" />
@@ -381,6 +378,24 @@
     <Compile Include="MacOS\Audio\SoundEffectInstance.cs">
       <Link>iOS\Audio\SoundEffectInstance.cs</Link>
     </Compile>
+    <Compile Include="Graphics\Effect\AlphaTestEffect.cs" />
+    <Compile Include="Graphics\Effect\AlphaTestEffectCode.cs" />
+    <Compile Include="Graphics\Effect\BasicEffectCode.cs" />
+    <Compile Include="Graphics\Effect\DXEffectObject.cs" />
+    <Compile Include="Graphics\Effect\DXExpression.cs" />
+    <Compile Include="Graphics\Effect\DXHelper.cs" />
+    <Compile Include="Graphics\Effect\DXPreshader.cs" />
+    <Compile Include="Graphics\Effect\DXShader.cs" />
+    <Compile Include="Graphics\Effect\EffectAnnotation.cs" />
+    <Compile Include="Graphics\Effect\EffectAnnotationCollection.cs" />
+    <Compile Include="Graphics\Effect\EffectHelpers.cs" />
+    <Compile Include="Graphics\Effect\GLSLOptimizer.cs" />
+    <Compile Include="Graphics\Effect\MojoShader.cs" />
+    <Compile Include="Graphics\Effect\SpriteEffect.cs" />
+    <Compile Include="Graphics\Effect\SpriteEffectCode.cs" />
+    <Compile Include="Graphics\GraphicsAdapter.cs" />
+    <Compile Include="Audio\AudioCategory.cs" />
+    <Compile Include="Graphics\ESTexture2D.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
