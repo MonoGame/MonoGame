@@ -132,6 +132,12 @@ namespace Microsoft.Xna.Framework
             Dispose(false);
         }
 
+		[System.Diagnostics.Conditional("DEBUG")]
+		internal void Log(string Message)
+		{
+			if (_platform != null) _platform.Log(Message);
+		}
+
         #region IDisposable Implementation
 
         private bool _isDisposed;
@@ -490,6 +496,7 @@ namespace Microsoft.Xna.Framework
         internal void DoInitialize()
         {
             AssertNotDisposed();
+            _platform.BeforeInitialize();
             Initialize();
         }
 

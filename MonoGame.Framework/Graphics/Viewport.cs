@@ -188,7 +188,10 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 
 
-       
+        public override string ToString ()
+		{
+			return string.Format ("[Viewport: X={0} Y={1} Width={2} Height={3}]", X,Y, Width,Height);
+		}
     }
 }
 

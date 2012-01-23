@@ -1071,6 +1071,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			if (GraphicsDevice.OpenGLESVersion == OpenTK.Graphics.GLContextVersion.Gles2_0)
             {
 						
+				var s = texture.Size;
 				GL20.BindTexture (ALL20.Texture2D, (uint)this.ID);			
 				if (_mipmap) {
 					// Taken from http://www.flexicoder.com/blog/index.php/2009/11/iphone-mipmaps/
@@ -1084,7 +1085,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				int len = textureData.Length;
 				IntPtr data = Marshal.AllocHGlobal(len);
             	Marshal.Copy(textureData, 0, data, len);
-				GL20.TexImage2D(ALL20.Texture2D, 0, (int)ALL20.Rgba, (int)_width, (int)_height, 0, ALL20.Rgba, ALL20.UnsignedByte, data);
+				GL20.TexImage2D(ALL20.Texture2D, 0, (int)ALL20.Rgba, (int)s.Width, (int)s.Height, 0, ALL20.Rgba, ALL20.UnsignedByte, data);
             	Marshal.FreeHGlobal(data);
 				
 				
