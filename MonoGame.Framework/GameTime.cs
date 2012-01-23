@@ -101,7 +101,7 @@ namespace Microsoft.Xna.Framework
 		//Console.WriteLine("Update " + elapsed);
             elapsedTime = elapsed;
             totalTime += elapsed;
-        }
+        }				
 
         internal void ResetElapsedTime()
         {
