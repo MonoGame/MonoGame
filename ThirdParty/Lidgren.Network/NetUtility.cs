@@ -184,31 +184,38 @@ namespace Lidgren.Network
 			}
 #endif		
 #if IS_FULL_NET_AVAILABLE
-			NetworkInterface ni = GetNetworkInterface();
-			if (ni == null)
+			try
 			{
-				return null;
-			}
-
-			IPInterfaceProperties properties = ni.GetIPProperties();
-			foreach (UnicastIPAddressInformation unicastAddress in properties.UnicastAddresses)
-			{
-				if (unicastAddress != null && unicastAddress.Address != null && unicastAddress.Address.AddressFamily == AddressFamily.InterNetwork)
+				NetworkInterface ni = GetNetworkInterface();
+				if (ni == null)
 				{
-					var mask = unicastAddress.IPv4Mask;
-					byte[] ipAdressBytes = unicastAddress.Address.GetAddressBytes();
-			        byte[] subnetMaskBytes = mask.GetAddressBytes();
-			
-			        if (ipAdressBytes.Length != subnetMaskBytes.Length)
-			            throw new ArgumentException("Lengths of IP address and subnet mask do not match.");
-			
-			        byte[] broadcastAddress = new byte[ipAdressBytes.Length];
-			        for (int i = 0; i < broadcastAddress.Length; i++)
-			        {
-			            broadcastAddress[i] = (byte)(ipAdressBytes[i] | (subnetMaskBytes[i] ^ 255));
-			        }
-			        return new IPAddress(broadcastAddress);				
+					return null;
 				}
+	
+				IPInterfaceProperties properties = ni.GetIPProperties();
+				foreach (UnicastIPAddressInformation unicastAddress in properties.UnicastAddresses)
+				{
+					if (unicastAddress != null && unicastAddress.Address != null && unicastAddress.Address.AddressFamily == AddressFamily.InterNetwork)
+					{
+						var mask = unicastAddress.IPv4Mask;
+						byte[] ipAdressBytes = unicastAddress.Address.GetAddressBytes();
+				        byte[] subnetMaskBytes = mask.GetAddressBytes();
+				
+				        if (ipAdressBytes.Length != subnetMaskBytes.Length)
+				            throw new ArgumentException("Lengths of IP address and subnet mask do not match.");
+				
+				        byte[] broadcastAddress = new byte[ipAdressBytes.Length];
+				        for (int i = 0; i < broadcastAddress.Length; i++)
+				        {
+				            broadcastAddress[i] = (byte)(ipAdressBytes[i] | (subnetMaskBytes[i] ^ 255));
+				        }
+				        return new IPAddress(broadcastAddress);				
+					}
+				}
+			}
+			catch // Catch any errors 
+			{
+			    return IPAddress.Broadcast;
 			}
 #endif		
 			return IPAddress.Broadcast;
