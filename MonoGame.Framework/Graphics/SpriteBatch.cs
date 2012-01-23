@@ -401,34 +401,8 @@ namespace Microsoft.Xna.Framework.Graphics
 				}
 			}					
 #else			
-			switch (this.graphicsDevice.PresentationParameters.DisplayOrientation)
-	        {
-				case DisplayOrientation.LandscapeLeft:
-                {
-					GL11.Rotate(-90, 0, 0, 1);
-					break;
-				}
-				
-				case DisplayOrientation.LandscapeRight:
-                {
-					GL11.Rotate(90, 0, 0, 1);					
-					break;
-				}
-				
-				case DisplayOrientation.PortraitUpsideDown:
-                {
-					GL11.Rotate(180, 0, 0, 1); 
-					break;
-				}
-				
-				default:
-				{
-					break;
-				}
-			}
-			
 			GL11.Ortho(0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height, 0, -1, 1);
-#endif			
+#endif		
 			
 			// Enable Scissor Tests if necessary
 			if ( this.graphicsDevice.RasterizerState.ScissorTestEnable )
@@ -439,19 +413,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			GL11.MatrixMode(ALL11.Modelview);			
 			
-#if !ANDROID			
-			// Only swap our viewport if Width is greater than height
-			if ((this.graphicsDevice.Viewport.Width > this.graphicsDevice.Viewport.Height)
-				&& ((this.graphicsDevice.PresentationParameters.DisplayOrientation == DisplayOrientation.LandscapeLeft )
-				|| (this.graphicsDevice.PresentationParameters.DisplayOrientation == DisplayOrientation.LandscapeRight ) ) )
-			{
-				GL11.Viewport(0, 0, this.graphicsDevice.Viewport.Height, this.graphicsDevice.Viewport.Width);
-			}
-			else
-#endif								
-			{
-				GL11.Viewport(0, 0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height);
-			}
+			GL11.Viewport(0, 0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height);
 			
 			// Enable Scissor Tests if necessary
 			if ( this.graphicsDevice.RasterizerState.ScissorTestEnable )
@@ -484,6 +446,14 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		private void UpdateWorldMatrixOrientation()
 		{
+#if IPHONE
+			matViewScreen = Matrix4.CreateRotationZ((float)Math.PI)*
+							Matrix4.CreateRotationY((float)Math.PI)*
+							Matrix4.CreateTranslation(-this.graphicsDevice.Viewport.Width/2,
+								this.graphicsDevice.Viewport.Height/2,
+								0);
+							matWVPScreen = matViewScreen * matProjection;
+#else
 			// Configure Display Orientation:
 			if(lastDisplayOrientation != graphicsDevice.PresentationParameters.DisplayOrientation)
 			{
@@ -536,6 +506,7 @@ namespace Microsoft.Xna.Framework.Graphics
 					}
 				}
 			}
+#endif
 		}
 		
 		public void Draw 
