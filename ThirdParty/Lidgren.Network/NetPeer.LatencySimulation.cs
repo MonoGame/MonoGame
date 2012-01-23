@@ -116,8 +116,13 @@ namespace Lidgren.Network
 			try
 			{
 				// TODO: refactor this check outta here
-				if (target.Address == IPAddress.Broadcast)
-					m_socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, true);
+                if (target.Address == IPAddress.Broadcast)
+                {
+                    
+                    // HACK for Local Networks
+                    target.Address = m_configuration.BroadcastAddress;
+                    m_socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, true);
+                }
 
 				int bytesSent = m_socket.SendTo(data, 0, numBytes, SocketFlags.None, target);
 				if (numBytes != bytesSent)

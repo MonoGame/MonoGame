@@ -81,7 +81,6 @@ using Microsoft.Xna.Framework.Input.Touch;
 namespace Microsoft.Xna.Framework
 {
     public class Game : IDisposable
-
     {
         private const float DefaultTargetFramesPerSecond = 60.0f;
 
@@ -133,8 +132,15 @@ namespace Microsoft.Xna.Framework
             Dispose(false);
         }
 
+		[System.Diagnostics.Conditional("DEBUG")]
+		internal void Log(string Message)
+		{
+			if (_platform != null) _platform.Log(Message);
+		}
+
         #region IDisposable Implementation
 
+        private bool _isDisposed;
         public void Dispose()
         {
             Dispose(true);
@@ -146,6 +152,18 @@ namespace Microsoft.Xna.Framework
             if (disposing)
             {
                 _platform.Dispose();
+            }
+            _isDisposed = true;
+        }
+
+        [System.Diagnostics.DebuggerNonUserCode]
+        private void AssertNotDisposed()
+        {
+            if (_isDisposed)
+            {
+                string name = GetType().Name;
+                throw new ObjectDisposedException(
+                    name, string.Format("The {0} object was used after being Disposed.", name));
             }
         }
 
@@ -287,6 +305,7 @@ namespace Microsoft.Xna.Framework
 
         public void Run(GameRunBehavior runBehavior)
         {
+            AssertNotDisposed();
             if (!_platform.BeforeRun())
                 return;
 
@@ -408,6 +427,8 @@ namespace Microsoft.Xna.Framework
 
         private void Platform_AsyncRunLoopEnded(object sender, EventArgs e)
         {
+            AssertNotDisposed();
+
             var platform = (GamePlatform)sender;
             platform.AsyncRunLoopEnded -= Platform_AsyncRunLoopEnded;
             EndRun();
@@ -415,11 +436,13 @@ namespace Microsoft.Xna.Framework
 
         private void Platform_Activated(object sender, EventArgs e)
         {
+            AssertNotDisposed();
             Raise(Activated, e);
         }
 
         private void Platform_Deactivated(object sender, EventArgs e)
         {
+            AssertNotDisposed();
             Raise(Deactivated, e);
         }
 
@@ -452,12 +475,14 @@ namespace Microsoft.Xna.Framework
 
         internal void DoUpdate(GameTime gameTime)
         {
+            AssertNotDisposed();
             if (_platform.BeforeUpdate(gameTime))
                 Update(gameTime);
         }
 
         internal void DoDraw(GameTime gameTime)
         {
+            AssertNotDisposed();
             // Draw and EndDraw should not be called if BeginDraw returns false.
             // http://stackoverflow.com/questions/4054936/manual-control-over-when-to-redraw-the-screen/4057180#4057180
             // http://stackoverflow.com/questions/4235439/xna-3-1-to-4-0-requires-constant-redraw-or-will-display-a-purple-screen
@@ -470,6 +495,8 @@ namespace Microsoft.Xna.Framework
 
         internal void DoInitialize()
         {
+            AssertNotDisposed();
+            _platform.BeforeInitialize();
             Initialize();
         }
 

@@ -42,8 +42,9 @@ using System;
 
 namespace Microsoft.Xna.Framework.GamerServices
 {
-
+#if !WINDOWS_PHONE
 	[SerializableAttribute]
+#endif
 	public class GuideAlreadyVisibleException : Exception
 	{
 

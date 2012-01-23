@@ -44,6 +44,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using OpenTK.Graphics.ES20;
+using System.Linq;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -51,6 +52,8 @@ namespace Microsoft.Xna.Framework.Graphics
     {
         public EffectParameterCollection Parameters { get; set; }
         public EffectTechniqueCollection Techniques { get; set; }		
+		
+		internal List<EffectParameter> _textureMappings = new List<EffectParameter>();
 
 		private int fragment_handle;
         private int vertex_handle;
@@ -141,7 +144,11 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		internal Effect (GraphicsDevice aGraphicsDevice, string aFileName) : this(aGraphicsDevice)
 		{
+#if ANDROID
+			StreamReader streamReader = new StreamReader(Game.Activity.Assets.Open(aFileName));
+#else			
 			StreamReader streamReader = new StreamReader (aFileName);
+#endif			
 			string text = streamReader.ReadToEnd ();
 			streamReader.Close ();
 			
@@ -201,12 +208,16 @@ namespace Microsoft.Xna.Framework.Graphics
 			tech.Name = techniqueName;
 			EffectPass pass = new EffectPass(tech);
 			pass.Name = passName;
-			/* TODO pass.VertexIndex = vertexIndex;
+#if ANDROID			
+			pass.VertexIndex = vertexIndex;
 			pass.FragmentIndex = fragmentIndex;
-			pass.ApplyPass(); */
+			pass.ApplyPass(); 
+#endif			
 			tech.Passes._passes.Add(pass);
 			Techniques._techniques.Add(tech);
-			// TODO LogShaderParameters(String.Format("Technique {0} - Pass {1} :" ,tech.Name ,pass.Name), pass.shaderProgram);
+#if ANDROID			
+			LogShaderParameters(String.Format("Technique {0} - Pass {1} :" ,tech.Name ,pass.Name), pass.shaderProgram);
+#endif			
 			
 		}
 		
@@ -229,8 +240,40 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 		}
 		
+		private static string TryFindAnyCased(string search, string[] arr, params string[] extensions)
+        {
+            return arr.FirstOrDefault(s => extensions.Any(ext => s.ToLower() == (search.ToLower() + ext)));
+        }
+
+        private static bool Contains(string search, string[] arr)
+        {
+            return arr.Any(s => s == search);
+        }
+		
 		internal static string Normalize(string FileName)
 		{
+#if ANDROID
+			int index = FileName.LastIndexOf(Path.DirectorySeparatorChar);
+            string path = string.Empty;
+            string file = FileName;
+            if (index >= 0)
+            {
+                file = FileName.Substring(index + 1, FileName.Length - index - 1);
+                path = FileName.Substring(0, index);
+            }
+            string[] files = Game.Activity.Assets.List(path);
+
+            if (Contains(file, files))
+                return FileName;
+			
+			// Check the file extension
+			if (!string.IsNullOrEmpty(Path.GetExtension(FileName)))
+			{
+				return null;
+			}
+			
+            return Path.Combine(path, TryFindAnyCased(file, files, ".fsh", ".vsh"));
+#else			
 			if (File.Exists(FileName))
 				return FileName;
 			
@@ -247,11 +290,61 @@ namespace Microsoft.Xna.Framework.Graphics
 				return FileName+".vsh";
 			
 			return null;
+#endif			
 		}
 		
 		public EffectTechnique CurrentTechnique 
 		{ 
 			get; set; 
+		}
+		
+		private int GetUniformUserInedx(string uniformName)
+		{
+			int sPos = uniformName.LastIndexOf("_s");
+			int index;
+			
+			// if there's no such construct on the string or it's not followed by numbers only
+			if (sPos == -1 || !int.TryParse(uniformName.Substring(sPos + 2), out index))
+			    return -1; // no user index
+				
+			return index;
+		}
+		
+		// Output the log of an object
+		private void LogShaderParameters (string whichObj, int obj)
+		{
+			int actUnis = 0;
+			Parameters._parameters.Clear();
+			
+			GL.GetProgram (obj, All.ActiveUniforms, ref @actUnis);
+
+			int size;
+			All type = All.BoolVec2;
+			string name = new StringBuilder(100).ToString();
+			int length;
+			
+			for (int x =0; x < actUnis; x++) 
+			{
+				int uniformLocation, userIndex;
+				string uniformName;
+				size = length = 0;
+				
+				GL.GetActiveUniform((uint)obj,(uint)x,100,ref length,ref size, ref type, name);
+				
+				uniformName = name.ToString();
+				
+				userIndex = GetUniformUserInedx(uniformName);
+				
+				uniformLocation = GL.GetUniformLocation(obj, uniformName);
+				
+				EffectParameter efp = new EffectParameter(this, uniformName, x, userIndex, uniformLocation,
+				                                          type.ToString(), length);
+				Parameters._parameters.Add(efp.Name, efp);
+				if (efp.ParameterType == EffectParameterType.Texture2D) {
+					_textureMappings.Add(efp);
+				}
+			}
+			
 		}
 	}
 }
