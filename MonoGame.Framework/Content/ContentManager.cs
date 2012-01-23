@@ -60,6 +60,37 @@ namespace Microsoft.Xna.Framework.Content
 		Dictionary<string, object> loadedAssets = new Dictionary<string, object>();
 		List<IDisposable> disposableAssets = new List<IDisposable>();
 		bool disposed;
+		
+		private static object ContentManagerLock = new object();
+        private static List<ContentManager> ContentManagers = new List<ContentManager>();
+
+        private static void AddContentManager(ContentManager contentManager)
+        {
+            lock (ContentManagerLock)
+            {
+                ContentManagers.Add(contentManager);
+            }
+        }
+
+        private static void RemoveContentManager(ContentManager contentManager)
+        {
+            lock (ContentManagerLock)
+            {
+                if(ContentManagers.Contains(contentManager))
+                    ContentManagers.Remove(contentManager);
+            }
+        }
+
+        internal static void ReloadAllContent()
+        {
+            lock (ContentManagerLock)
+            {
+                foreach (var contentManager in ContentManagers)
+                {
+                    contentManager.ReloadContent();
+                }
+            }
+        }
 
 		// Use C# destructor syntax for finalization code.
 		// This destructor will run only if the Dispose method
@@ -414,9 +445,12 @@ namespace Microsoft.Xna.Framework.Content
                 ReloadAsset(asset.Key, asset.Value);
             }
         }
+		
+		
         
         protected void ReloadAsset(string originalAssetName, object currentAsset)
         {
+			string assetName = originalAssetName;
 			if (string.IsNullOrEmpty(assetName))
 			{
 				throw new ArgumentNullException("assetName");
@@ -425,8 +459,6 @@ namespace Microsoft.Xna.Framework.Content
 			{
 				throw new ObjectDisposedException("ContentManager");
 			}
-			
-			string originalAssetName = assetName;
 
 			if (this.graphicsDeviceService == null)
 			{
@@ -442,7 +474,7 @@ namespace Microsoft.Xna.Framework.Content
 			try {
 				//try load it traditionally
 				stream = OpenStream(assetName);
-				stream.Close()
+				stream.Close();
 			} catch (ContentLoadException ex) {
 				//MonoGame try to load as a non-content file
 				
@@ -459,10 +491,6 @@ namespace Microsoft.Xna.Framework.Content
                 else if ((currentAsset is SpriteFont))
                 {
                     assetName = SpriteFontReader.Normalize(assetName);
-                }
-                else if ((currentAsset is Effect))
-                {
-                    assetName = Effect.Normalize(assetName);
                 }
                 else if ((currentAsset is Song))
                 {
@@ -502,14 +530,10 @@ namespace Microsoft.Xna.Framework.Content
                 else if ((currentAsset is Video))
                 {
                 }
-                else if ((currentAsset is Effect))
-                {
-                }
 			}
 			
 
 		}
-    
 
 		public virtual void Unload()
 		{
