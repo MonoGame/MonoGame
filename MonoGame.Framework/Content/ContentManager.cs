@@ -427,7 +427,6 @@ namespace Microsoft.Xna.Framework.Content
 			}
 			
 			string originalAssetName = assetName;
-			object result = null;
 
 			if (this.graphicsDeviceService == null)
 			{

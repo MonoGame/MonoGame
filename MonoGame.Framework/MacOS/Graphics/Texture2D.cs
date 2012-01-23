@@ -283,7 +283,12 @@ namespace Microsoft.Xna.Framework.Graphics
 		public void SaveAsJpeg (Stream stream, int width, int height) {
 			throw new NotImplementedException();
 		}
-		
+
+		// Not sure what this should do in Mac will leave it non implemented for now.
+		internal void Reload(Stream textureStream)
+		{
+		}
+
 		internal void Apply ()
 		{
 			if (texture == null)
