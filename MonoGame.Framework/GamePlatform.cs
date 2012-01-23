@@ -72,11 +72,11 @@ namespace Microsoft.Xna.Framework
 {
     abstract class GamePlatform : IDisposable
     {
+        #region
+        protected TimeSpan _inactiveSleepTime = TimeSpan.FromMilliseconds(20.0);
+        protected bool _needsToResetElapsedTime = false;
+        #endregion
 
-	#region
-	protected TimeSpan _inactiveSleepTime = TimeSpan.FromMilliseconds(20.0);
-	protected bool _needsToResetElapsedTime = false;
-	#endregion
         #region Construction/Destruction
         public static GamePlatform Create(Game game)
         {
@@ -271,32 +271,34 @@ namespace Microsoft.Xna.Framework
         {
             return value;
         }
-		/// <summary>
-		/// Starts a device transition (windowed to full screen or vice versa).
-		/// </summary>
-		/// <param name='willBeFullScreen'>
-		/// Specifies whether the device will be in full-screen mode upon completion of the change.
-		/// </param>
-	public abstract void BeginScreenDeviceChange (
-	         bool willBeFullScreen
-	);
-		/// <summary>
-		/// Completes a device transition.
-		/// </summary>
-		/// <param name='screenDeviceName'>
-		/// Screen device name.
-		/// </param>
-		/// <param name='clientWidth'>
-		/// The new width of the game's client window.
-		/// </param>
-		/// <param name='clientHeight'>
-		/// The new height of the game's client window.
-		/// </param>
-	public abstract void EndScreenDeviceChange (
-	         string screenDeviceName,
-	         int clientWidth,
-	         int clientHeight
-	);
+        /// <summary>
+        /// Starts a device transition (windowed to full screen or vice versa).
+        /// </summary>
+        /// <param name='willBeFullScreen'>
+        /// Specifies whether the device will be in full-screen mode upon completion of the change.
+        /// </param>
+        public abstract void BeginScreenDeviceChange (
+                 bool willBeFullScreen
+        );
+
+        /// <summary>
+        /// Completes a device transition.
+        /// </summary>
+        /// <param name='screenDeviceName'>
+        /// Screen device name.
+        /// </param>
+        /// <param name='clientWidth'>
+        /// The new width of the game's client window.
+        /// </param>
+        /// <param name='clientHeight'>
+        /// The new height of the game's client window.
+        /// </param>
+        public abstract void EndScreenDeviceChange (
+                 string screenDeviceName,
+                 int clientWidth,
+                 int clientHeight
+        );
+
         /// <summary>
         /// Gives derived classes an opportunity to take action after
         /// Game.TargetElapsedTime has been set.
