@@ -160,7 +160,6 @@
     <Compile Include="Graphics\MultiSampleType.cs" />
     <Compile Include="Graphics\SwapEffect.cs" />
     <Compile Include="Graphics\RenderTargetUsage.cs" />
-    <Compile Include="MacOS\Graphics\Vertices\VertexBuffer.cs" />
     <Compile Include="Graphics\TextureUsage.cs" />
     <Compile Include="Graphics\SetDataOptions.cs" />
     <Compile Include="MacOS\Graphics\SpriteFont.cs" />
@@ -220,9 +219,6 @@
     <Compile Include="Graphics\Vertices\VertexPositionColor.cs" />
     <Compile Include="Graphics\Vertices\VertexPositionNormalTexture.cs" />
     <Compile Include="Graphics\Vertices\VertexPositionTexture.cs" />
-    <Compile Include="MacOS\Graphics\GraphicsExtensions.cs" />
-    <Compile Include="MacOS\Graphics\States\GLStateManager.cs" />
-    <Compile Include="MacOS\Graphics\Effect\EffectPass.cs" />
     <Compile Include="MacOS\Graphics\Vertices\IndexBuffer.cs" />
     <Compile Include="MacOS\Graphics\Vertices\VertexDeclaration.cs" />
     <Compile Include="MacOS\GameWindow.cs" />
@@ -364,6 +360,10 @@
     <Compile Include="MacOS\Audio\SoundEffect.cs" />
     <Compile Include="MacOS\Audio\SoundEffectInstance.cs" />
     <Compile Include="PrimaryThreadLoader.cs" />
+    <Compile Include="Graphics\States\GLStateManager.cs" />
+    <Compile Include="Graphics\Effect\EffectPass.cs" />
+    <Compile Include="Graphics\GraphicsExtensions.cs" />
+    <Compile Include="Graphics\Vertices\VertexBuffer.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />
@@ -376,8 +376,6 @@
     <Folder Include="MacOS\Audio\" />
     <Folder Include="Media\" />
     <Folder Include="MacOS\Media\" />
-    <Folder Include="MacOS\Graphics\States\" />
-    <Folder Include="MacOS\Graphics\Effect\" />
     <Folder Include="MacOS\Input\" />
     <Folder Include="MacOS\GamerServices\" />
     <Folder Include="MacOS\Storage\" />

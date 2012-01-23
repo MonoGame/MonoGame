@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-#if MONOTOUCH
+#if MONOMAC
 using MonoMac.OpenGL;
 #else
 using OpenTK.Graphics.ES20;

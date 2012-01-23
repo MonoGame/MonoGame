@@ -84,7 +84,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			InitWithData (data, dataLength, pixelFormat, width, height, size, filter);
 		}
 		
-#if MONOTOUCH
+#if MONOMAC
 		public ESTexture2D (NSImage nsImage, All filter)
 		{
 			// TODO InitWithCGImage(nsImage,filter);
@@ -376,7 +376,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #if !IPHONE
 			case SurfaceFormat.Dxt1:
 				GL.CompressedTexImage2D (TextureTarget.Texture2D, 0,
-				                         (int)PixelInternalFormat.CompressedRgbaS3tcDxt1Ext,		                         
+				                         PixelInternalFormat.CompressedRgbaS3tcDxt1Ext,
 				                         (int)width, (int)height, 0,
 				                         dataLength, data);
 				break;

@@ -1,7 +1,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-#if MONOTOUCH
+#if MONOMAC
 using MonoMac.OpenGL;
 #else
 using OpenTK.Graphics.ES20;

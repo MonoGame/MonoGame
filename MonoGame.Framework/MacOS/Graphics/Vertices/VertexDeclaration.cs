@@ -83,7 +83,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public static void PrepareForUse(VertexDeclaration vd)
         {
-
+#if ES11
 		GLStateManager.VertexArray(true);
             bool normal = false;
             bool texcoord = false;
@@ -135,10 +135,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
             GLStateManager.ColorArray (color);
             GLStateManager.NormalArray(normal);
-		GLStateManager.TextureCoordArray(texcoord);			
-
-
-
+		GLStateManager.TextureCoordArray(texcoord);
+#else
+            throw new NotImplementedException();
+#endif
         }
 
         public VertexElement[] GetVertexElements()
