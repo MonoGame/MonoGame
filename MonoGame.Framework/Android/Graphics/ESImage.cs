@@ -188,6 +188,11 @@ namespace Microsoft.Xna.Framework.Graphics
                 imageHeight = value;
             }
         }
+		
+		internal Size Size
+		{
+			get { return texture.Size; }
+		}
 
         public ESImage GetSubImageAtPoint(Vector2 point, int subImageWidth, int subImageHeight, float subImageScale)
         {
