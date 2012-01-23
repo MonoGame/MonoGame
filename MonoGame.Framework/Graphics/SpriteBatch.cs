@@ -498,67 +498,12 @@ namespace Microsoft.Xna.Framework.Graphics
 #else		
 		private void UpdateWorldMatrixOrientation()
 		{
-#if IPHONE
 			matViewScreen = Matrix4.CreateRotationZ((float)Math.PI)*
 							Matrix4.CreateRotationY((float)Math.PI)*
 							Matrix4.CreateTranslation(-this.graphicsDevice.Viewport.Width/2,
 								this.graphicsDevice.Viewport.Height/2,
 								0);
 							matWVPScreen = matViewScreen * matProjection;
-#else
-			// Configure Display Orientation:
-			if(lastDisplayOrientation != graphicsDevice.PresentationParameters.DisplayOrientation)
-			{
-				// updates last display orientation (optimization)
-				lastDisplayOrientation = graphicsDevice.PresentationParameters.DisplayOrientation;
-				switch (this.graphicsDevice.PresentationParameters.DisplayOrientation)
-		        {
-					case DisplayOrientation.LandscapeLeft:
-	                {
-						matViewScreen = Matrix4.CreateRotationZ(-(float)Math.PI/2)*
-							Matrix4.CreateRotationY((float)Math.PI)*
-							Matrix4.CreateTranslation(this.graphicsDevice.Viewport.Width/2,
-								this.graphicsDevice.Viewport.Height/2,
-								0);	
-						matWVPScreen = matViewScreen * matProjection;
-						break;
-					}
-					
-					case DisplayOrientation.LandscapeRight:
-	                {
-						matViewScreen = Matrix4.CreateRotationZ((float)Math.PI/2)*
-							Matrix4.CreateRotationY((float)Math.PI)*
-							Matrix4.CreateTranslation(-this.graphicsDevice.Viewport.Width/2,
-								-this.graphicsDevice.Viewport.Height/2,
-								0);	
-						matWVPScreen = matViewScreen * matProjection;
-						break;
-					}
-					
-					case DisplayOrientation.PortraitUpsideDown:
-	                {
-						matViewScreen = Matrix4.CreateRotationZ(0)*
-							Matrix4.CreateRotationY((float)Math.PI)*
-							Matrix4.CreateTranslation(this.graphicsDevice.Viewport.Width/2,
-								-this.graphicsDevice.Viewport.Height/2,
-								0);
-						matWVPScreen = matViewScreen * matProjection;
-						break;
-					}
-					
-					default:
-					{
-						matViewScreen = Matrix4.CreateRotationZ((float)Math.PI)*
-							Matrix4.CreateRotationY((float)Math.PI)*
-							Matrix4.CreateTranslation(-this.graphicsDevice.Viewport.Width/2,
-								this.graphicsDevice.Viewport.Height/2,
-								0);
-							matWVPScreen = matViewScreen * matProjection;
-						break;
-					}
-				}
-			}
-#endif
 		}
 #endif		
 		public void Draw 
