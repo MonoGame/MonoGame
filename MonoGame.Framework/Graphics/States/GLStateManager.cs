@@ -80,24 +80,15 @@ namespace Microsoft.Xna.Framework.Graphics
         public static void Projection(Matrix projection)
         {
             GL11.MatrixMode(All11.Projection);
-            GL11.LoadIdentity();
-            GL11.LoadMatrix(Matrix.ToFloatArray(projection));
+            GL11.LoadMatrix(ref projection.M11);
             //GL11.Ortho(0, _device.DisplayMode.Width, _device.DisplayMode.Height, 0, -1, 1);
         }
 
-        public static void View(Matrix view)
-        {
-            GL11.MatrixMode(All11.Viewport);
-            GL11.LoadIdentity();
-            GL11.LoadMatrix(Matrix.ToFloatArray(view));
-            //GL11.Ortho(0, _device.DisplayMode.Width, _device.DisplayMode.Height, 0, -1, 1);
-        }
-
-        public static void World(Matrix world)
+        public static void WorldView(Matrix world, Matrix view)
         {
             GL11.MatrixMode(All11.Modelview);
-            GL11.LoadIdentity();
-            GL11.LoadMatrix(Matrix.ToFloatArray(world));
+            GL11.LoadMatrix(ref view.M11);
+			GL11.MultMatrix(ref world.M11);
             //GL11.Ortho(0, _device.DisplayMode.Width, _device.DisplayMode.Height, 0, -1, 1);
         }
 

@@ -39,14 +39,15 @@
 // #endregion License
 // 
 using System;
+using OpenTK.Graphics.ES11;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
 	public enum TextureAddressMode
 	{
-		Clamp,
-		Mirror,
-		Wrap,
+		Clamp = All.ClampToEdge,
+		Mirror = All.MirroredRepeatOes,
+		Wrap = All.Repeat
 	}
 }
 

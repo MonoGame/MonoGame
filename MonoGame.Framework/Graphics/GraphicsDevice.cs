@@ -137,6 +137,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			// Init RasterizerState
 			RasterizerState = new RasterizerState();
+            
+            // Init Default SamplerState
+            _samplerStates = new SamplerStateCollection();
 
             // Initialize OpenGL states
             GL11.Disable(ALL11.DepthTest);
@@ -659,11 +662,10 @@ namespace Microsoft.Xna.Framework.Graphics
             GL11.DrawArrays(PrimitiveTypeGL11(primitiveType), vertexStart, GetElementCountArray(primitiveType, primitiveCount));
         }
 
-        public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int vertexCount, ushort[] indexData, int indexOffset, int primitiveCount) where T : struct, IVertexType
+        public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int vertexCount, short[] indexData, int indexOffset, int primitiveCount) where T : struct, IVertexType
         {
-            ////////////////////////////
-            //This has not been tested//
-            ////////////////////////////
+            if(indexOffset != 0)
+                throw new NotImplementedException();
 
             // Unbind the VBOs
             GL11.BindBuffer(ALL11.ArrayBuffer, 0);
@@ -691,13 +693,14 @@ namespace Microsoft.Xna.Framework.Graphics
 
             //Buffer data to VBO; This should use stream when we move to ES2.0
             GL11.BufferData(ALL11.ArrayBuffer, (IntPtr)(vd.VertexStride * GetElementCountArray(primitiveType, primitiveCount)), new IntPtr(handle.AddrOfPinnedObject().ToInt64() + (vertexOffset * vd.VertexStride)), ALL11.DynamicDraw);
-            GL11.BufferData(ALL11.ElementArrayBuffer, (IntPtr)(sizeof(ushort) * GetElementCountArray(primitiveType, primitiveCount)), indexData, ALL11.DynamicDraw);
+            GL11.BufferData(ALL11.ElementArrayBuffer, (IntPtr)(sizeof(short) * GetElementCountArray(primitiveType, primitiveCount)), indexData, ALL11.DynamicDraw);
 
             //Setup VertexDeclaration
             VertexDeclaration.PrepareForUse(vd);
 
             //Draw
-            GL11.DrawElements(PrimitiveTypeGL11(primitiveType), GetElementCountArray(primitiveType, primitiveCount), ALL11.UnsignedInt248Oes, (IntPtr)(indexOffset * sizeof(ushort)));
+			// note: GL supports only unsigned types, xna's method signature indicates signed. just ignore the sign bit.
+            GL11.DrawElements(PrimitiveTypeGL11(primitiveType), GetElementCountArray(primitiveType, primitiveCount), ALL11.UnsignedShort, (IntPtr)(indexOffset * sizeof(short)));
 
 
             // Free resources

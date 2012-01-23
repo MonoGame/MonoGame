@@ -749,7 +749,7 @@ namespace Microsoft.Xna.Framework
 
         public static Matrix CreateOrthographicOffCenter(float left, float right, float bottom, float top, float zNearPlane, float zFarPlane)
         {
-			Matrix result = identity;
+            Matrix result = identity;
 
             float invRL = 1 / (right - left);
             float invTB = 1 / (top - bottom);
@@ -763,8 +763,7 @@ namespace Microsoft.Xna.Framework
             result.M42 = -(top + bottom) * invTB;
             result.M43 = -(zFarPlane + zNearPlane) * invFN;
             result.M44 = 1;
-			
-			return result;
+            return result;
         }
         
         public static void CreateOrthographicOffCenter(float left, float right, float bottom, float top,
