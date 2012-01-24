@@ -91,6 +91,16 @@ namespace Microsoft.Xna.Framework.Audio
 				wave.Pause ();
 			}
 		}
+                
+		public void Resume() {
+			if (complexSound) {
+				foreach (XactClip clip in soundClips) {
+					clip.Play();
+				}
+			} else {
+				wave.Resume ();
+			}
+		}
 		
 		public float Volume {
 			get {
