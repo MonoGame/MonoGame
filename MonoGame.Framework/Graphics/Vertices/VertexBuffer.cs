@@ -1,43 +1,63 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+
+#if MONOMAC
+using MonoMac.OpenGL;
+#else
 using GL11 = OpenTK.Graphics.ES11.GL;
 using All11 = OpenTK.Graphics.ES11.All;
+#endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
     public class VertexBuffer : GraphicsResource
     {
+        private readonly BufferUsage _bufferUsage;
+        private readonly VertexDeclaration vertexDeclaration;
+
         internal Type _type;
-        private int _vertexCount;
-        private BufferUsage _bufferUsage;
-        internal object _buffer = null;
+        internal object _buffer;
         internal IntPtr _bufferPtr;
-        internal int _bufferIndex = 0;
+        internal int _bufferIndex;
 		internal int _size;		
-        internal static int _bufferCount = 0;
-		internal uint _bufferStore; 
+		internal uint _bufferStore;
 
 		// allow for 50 buffers initially
-		internal static VertexBuffer[] _allBuffers = new VertexBuffer[50];
+        internal static int _bufferCount;
+        internal static VertexBuffer[] _allBuffers = new VertexBuffer[50];
 		internal static List<Action> _delayedBufferDelegates = new List<Action>();
 
         public VertexBuffer(GraphicsDevice graphics, Type type, int vertexCount, BufferUsage bufferUsage)
         {
-            this.graphicsDevice = graphics;
-            this._type = type;
-            this._vertexCount = vertexCount;
-            this._bufferUsage = bufferUsage;
+            graphicsDevice = graphics;
+            _type = type;
+			VertexCount = vertexCount;
+            _bufferUsage = bufferUsage;
         }
-        
-		public int VertexCount { get; set; }
 		
-		internal static void CreateFrameBuffers()
+		public VertexBuffer (GraphicsDevice graphics, VertexDeclaration vertexDecs, int vertexCount, BufferUsage bufferUsage)
+			: this (graphics, vertexDecs.GetType(), vertexCount, bufferUsage)
+		{
+			vertexDeclaration = vertexDecs;
+		}
+		
+		public int VertexCount { get; private set; }
+
+		public VertexDeclaration VertexDeclaration 
+        {
+			get 
+            {
+				return vertexDeclaration;
+			}
+		}
+
+		internal static void CreateFrameBuffers ()
 		{
 			foreach (var action in _delayedBufferDelegates)
-				action.Invoke();
-			
-			_delayedBufferDelegates.Clear();
+				action.Invoke ();
+
+			_delayedBufferDelegates.Clear ();
 		}
 		
 		internal void GenerateBuffer<T>() where T : struct, IVertexType
@@ -46,21 +66,33 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			_size = vd.VertexStride * ((T[])_buffer).Length;
 			
-            All11 bufferUsage = (_bufferUsage == BufferUsage.WriteOnly) ? All11.StaticDraw : All11.DynamicDraw;
+			#if MONOMAC
+
+			BufferUsageHint bufferUsage = (_bufferUsage == BufferUsage.WriteOnly) ? BufferUsageHint.StaticDraw : BufferUsageHint.DynamicDraw;
+
+			GL.GenBuffers (1, out _bufferStore);
+			GL.BindBuffer (BufferTarget.ArrayBuffer, _bufferStore);
+			GL.BufferData<T> (BufferTarget.ArrayBuffer, (IntPtr)_size, (T[])_buffer, bufferUsage);			
+			
+			#else
+			
+            var bufferUsage = (_bufferUsage == BufferUsage.WriteOnly) ? All11.StaticDraw : All11.DynamicDraw;
 			
             GL11.GenBuffers(1, ref _bufferStore);
             GL11.BindBuffer(All11.ArrayBuffer, _bufferStore);
             GL11.BufferData<T>(All11.ArrayBuffer, (IntPtr)_size, (T[])_buffer, bufferUsage);			
+
+			#endif
 		}
-		
-        public void GetData<T>(T[] vertices) where T : IVertexType
+
+        public void GetData<T>(T[] vertices) where T : struct, IVertexType
         {
             if (_buffer == null)
                 throw new Exception("Can't get data on an empty buffer");
 
-            var _tbuff = (T[])_buffer;
-            for (int i = 0; i < _tbuff.Length; i++)
-                vertices[i] = _tbuff[i];
+            var tbuff = (T[])_buffer;
+            for (var i = 0; i < tbuff.Length; i++)
+                vertices[i] = tbuff[i];
         }
 
         public void SetData<T>(T[] vertices) where T : struct, IVertexType
@@ -81,19 +113,55 @@ namespace Microsoft.Xna.Framework.Graphics
             // TODO: Kill buffers in PhoneOSGameView.DestroyFrameBuffer()
         }
 
+		public void SetData<T> (
+			int offsetInBytes,
+			T[] data,
+			int startIndex,
+			int elementCount,
+			int vertexStride
+            ) where T : struct, IVertexType
+		{
+			throw new NotImplementedException();
+		}
+
 		public override void Dispose ()
 		{
-			GL11.GenBuffers(0, ref _bufferStore);
+			#if MONOMAC
+			GL.GenBuffers (0, out _bufferStore);
+			#else
+			GL11.GenBuffers(0, ref _bufferStore);			
+			#endif
+			
             base.Dispose();
 		}
-    }
-	
+
+        #if MONOMAC
+
+        // TODO: This is not part of the XNA 
+        // API... does MacOS need this?  Can it
+        // be done another way?
+		public bool IsContentLost 
+		{ 
+			get 
+			{
+				return Graphics.IsContentLost;
+			}
+		}
+
+        #endif
+	}
+
     public class DynamicVertexBuffer : VertexBuffer
     {
         public DynamicVertexBuffer(GraphicsDevice graphics, Type type, int vertexCount, BufferUsage bufferUsage)
             : base(graphics, type, vertexCount, bufferUsage)
         {
         }
+
+		public DynamicVertexBuffer (GraphicsDevice graphics, VertexDeclaration vertexDecs, int vertexCount, BufferUsage bufferUsage)
+			: base (graphics,vertexDecs.GetType(), vertexCount,bufferUsage)
+		{
+		}
 
         public void SetData<T>(T[] data, int startIndex, int elementCount, SetDataOptions options) where T : struct, IVertexType
         {
