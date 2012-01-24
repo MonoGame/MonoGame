@@ -44,36 +44,36 @@ using System;
 
 namespace Microsoft.Xna.Framework.Graphics.PackedVector
 {
-	public struct Short2 : IPackedVector<uint>, IEquatable<Short2>
+	public struct NormalizedShort2 : IPackedVector<uint>, IEquatable<NormalizedShort2>
 	{
-		private uint _short2Packed;
+		private uint short2Packed;
 
-		public Short2 (Vector2 vector)
+        public NormalizedShort2(Vector2 vector)
 		{
-			_short2Packed = PackInTwo (vector.X, vector.Y);
+            short2Packed = PackInTwo(vector.X, vector.Y);
 		}
 
-		public Short2 (Single x,Single y)
+        public NormalizedShort2(float x, float y)
 		{
-			_short2Packed = PackInTwo (x, y);
+            short2Packed = PackInTwo(x, y);
 		}
 
-		public static bool operator !=(Short2 a, Short2 b)
+        public static bool operator !=(NormalizedShort2 a, NormalizedShort2 b)
 		{
 			return !a.Equals (b);
 		}
 
-		public static bool operator ==(Short2 a, Short2 b)
+        public static bool operator ==(NormalizedShort2 a, NormalizedShort2 b)
 		{
 			return a.Equals (b);
 		}
 
 		public uint PackedValue { 
 			get { 
-				return _short2Packed; 
+				return short2Packed; 
 			} 
 			set { 
-				_short2Packed = value; 
+				short2Packed = value; 
 			} 
 		}
 
@@ -82,35 +82,35 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
 			throw new NotImplementedException ();
 		}
 
-		public bool Equals (Short2 other)
+        public bool Equals(NormalizedShort2 other)
 		{
 			throw new NotImplementedException ();
 		}
 
 		public override int GetHashCode ()
 		{
-			return _short2Packed.GetHashCode();
+			return short2Packed.GetHashCode();
 		}
 
 		public override string ToString ()
 		{
 			// not sure what to return here
 			// microsoft returns some funky formatted string
-			return string.Format("{0} / {1}", (short)(_short2Packed & 0xFFFF), (short)(_short2Packed >> 0x10) );
+			return string.Format("{0} / {1}", (short)(short2Packed & 0xFFFF), (short)(short2Packed >> 0x10) );
 		}
 
 		public Vector2 ToVector2 ()
 		{
 			var v2 = new Vector2 ();
-			v2.X = (short)(_short2Packed & 0xFFFF);
-			v2.Y = (short)(_short2Packed >> 0x10);
+			v2.X = (short)(short2Packed & 0xFFFF);
+			v2.Y = (short)(short2Packed >> 0x10);
 			return v2;
 		}
 
 		private static uint PackInTwo (float vectorX, float vectorY)
 		{
-			const float maxPos = 0x7FFF; // Largest two byte positive number 0xFFFF >> 1; 
-			const float minNeg = ~(int)maxPos; // two's complement
+			const float maxPos = 0x7FFF;
+			const float minNeg = ~(int)maxPos;
 
 			// clamp the value between min and max values
 			var word2 = (uint)((int)Math.Max (Math.Min (vectorX, maxPos), minNeg) & 0xFFFF);
@@ -121,14 +121,14 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
 
 		void IPackedVector.PackFromVector4 (Vector4 vector)
 		{
-			_short2Packed = Short2.PackInTwo (vector.X, vector.Y);
+            short2Packed = PackInTwo(vector.X, vector.Y);
 		}
 
 		Vector4 IPackedVector.ToVector4 ()
 		{
 			var v4 = new Vector4 (0,0,0,1);
-			v4.X = (short)(_short2Packed & 0xFFFF);
-			v4.Y = (short)(_short2Packed >> 0x10);
+			v4.X = (short)(short2Packed & 0xFFFF);
+			v4.Y = (short)(short2Packed >> 0x10);
 			return v4;
 		}
 	}
