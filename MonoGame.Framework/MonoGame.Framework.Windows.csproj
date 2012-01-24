@@ -106,6 +106,7 @@
     <Compile Include="Game.cs" />
     <Compile Include="GamePlatform.cs" />
     <Compile Include="Graphics\Vertices\IndexBuffer.cs" />
+    <Compile Include="Graphics\Vertices\IndexElementSize.cs" />
     <Compile Include="Graphics\Vertices\VertexBuffer.cs" />
     <Compile Include="Input\GamePadDeadZone.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
