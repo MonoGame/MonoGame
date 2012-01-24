@@ -21,11 +21,13 @@ namespace Microsoft.Xna.Framework.Graphics
 		internal IntPtr _bufferPtr;
 		internal IntPtr _sizePtr;
         private readonly BufferUsage _bufferUsage;
-		internal static IndexBuffer[] _allBuffers = new IndexBuffer[50];
-		internal static int _bufferCount;
 		internal int _bufferIndex;
 		internal int _size;
 		internal uint _bufferStore;
+
+        // TODO: Remove this IB limit!
+        internal static IndexBuffer[] _allBuffers = new IndexBuffer[50];
+        internal static int _bufferCount;
 
 		internal static List<Action> _delayedBufferDelegates = new List<Action>(); 
 		
