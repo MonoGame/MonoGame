@@ -785,7 +785,13 @@ namespace Microsoft.Xna.Framework.Graphics
 //			{
 //				throw new NotImplementedException();
 //			}
+
+           
 		}
+
+        internal void Reload(Stream Stream)
+        {
+        }
 	}
 }
 
