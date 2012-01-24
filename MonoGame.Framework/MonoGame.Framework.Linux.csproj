@@ -9,7 +9,6 @@
     <OutputType>Library</OutputType>
     <RootNamespace>MonoGame.Framework.Linux</RootNamespace>
     <AssemblyName>MonoGame.Framework.Linux</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>true</DebugSymbols>
@@ -46,8 +45,7 @@
     <Reference Include="GamepadBridge, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\ThirdParty\GamepadConfig\GamepadBridge.dll</HintPath>
     </Reference>
-    <Reference Include="OpenTK, Version=1.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="OpenTK">
       <HintPath>..\ThirdParty\Libs\OpenTK.dll</HintPath>
     </Reference>
   </ItemGroup>
@@ -246,12 +244,9 @@
     <Compile Include="Graphics\Effect\IEffectLights.cs" />
     <Compile Include="Graphics\Effect\IEffectMatrices.cs" />
     <Compile Include="Graphics\DirectionalLight.cs" />
-    <Compile Include="Linux\Input\Mouse.cs" />
-    <Compile Include="Linux\Input\MouseState.cs" />
     <Compile Include="Linux\Input\Keyboard.cs" />
     <Compile Include="Graphics\States\TextureAddressMode.cs" />
     <Compile Include="Graphics\States\TextureFilter.cs" />
-    <Compile Include="Linux\Input\GamePad.cs" />
     <Compile Include="Input\ButtonDefinition.cs" />
     <Compile Include="Input\ThumbStickDefinition.cs" />
     <Compile Include="Linux\GamerServices\SignedInGamer.cs" />
@@ -334,6 +329,9 @@
     <Compile Include="Audio\XactClip.cs" />
     <Compile Include="Audio\XactSound.cs" />
     <Compile Include="Linux\Graphics\RenderTarget2D.cs" />
+    <Compile Include="Desktop\Input\GamePad.cs" />
+    <Compile Include="Desktop\Input\Mouse.cs" />
+    <Compile Include="Desktop\Input\MouseState.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.Linux.csproj">
