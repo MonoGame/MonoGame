@@ -156,5 +156,10 @@ namespace Microsoft.Xna.Framework
         {
             
         }
+
+        public override void Log(string Message)
+        {
+            Console.WriteLine(Message);
+        }
     }
 }
