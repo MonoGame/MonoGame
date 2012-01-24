@@ -4,6 +4,10 @@ using System.Linq;
 using System.Text;
 using OpenTK.Graphics.ES20;
  
+#if !WINDOWS
+using TextureUnit = OpenTK.Graphics.ES20.All;
+using TextureTarget = OpenTK.Graphics.ES20.All;
+#endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -35,7 +39,12 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			get { return uniformLocation; }	
 		}
-		
+
+        internal int InternalIndex
+        {
+            get { return internalIndex; }
+        }
+
 		internal EffectParameter(Effect parent, string paramName, int paramIndex, int userIndex, int uniformLocation,
 		                         string paramSType, int paramLength)
 		{
@@ -283,8 +292,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		public void SetValue (Texture value)
 		{
 			GL.UseProgram(_parentEffect.CurrentTechnique.Passes[0].shaderProgram);
-			GL.ActiveTexture(All.Texture1);
-			GL.BindTexture(All.Texture2D,value._textureId);
+			GL.ActiveTexture(TextureUnit.Texture1);
+			GL.BindTexture(TextureTarget.Texture2D,value._textureId);
 			GL.Uniform1(internalIndex, value._textureId);
 			_cachedValue = value._textureId;
 			GL.UseProgram(0);

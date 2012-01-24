@@ -95,7 +95,7 @@ namespace Microsoft.Xna.Framework.Graphics
                                     GL.UseProgram(_effect.CurrentTechnique.Passes[0].shaderProgram);
                                     GL.ActiveTexture((TextureUnit)texOffset + index);
                                     GL.BindTexture(TextureTarget.Texture2D, tex2._textureId);
-                                    GL.Uniform1(tex.internalIndex, tex2._textureId);
+                                    GL.Uniform1(tex.InternalIndex, tex2._textureId);
                                     GL.UseProgram(0);
                                 }
                             }
