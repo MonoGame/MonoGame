@@ -58,6 +58,7 @@
     <Compile Include="BoundingFrustum.cs" />
     <Compile Include="BoundingSphere.cs" />
     <Compile Include="ContainmentType.cs" />
+    <Compile Include="Content\ContentReaders\Vector2Reader.cs" />
     <Compile Include="Curve.cs" />
     <Compile Include="CurveContinuity.cs" />
     <Compile Include="CurveKey.cs" />

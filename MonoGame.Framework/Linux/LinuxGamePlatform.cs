@@ -163,5 +163,15 @@ namespace Microsoft.Xna.Framework
 
             IsActive = wasActive;
         }
+
+        public override void BeginScreenDeviceChange(bool willBeFullScreen)
+        {
+            
+        }
+
+        public override void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight)
+        {
+            
+        }
     }
 }
