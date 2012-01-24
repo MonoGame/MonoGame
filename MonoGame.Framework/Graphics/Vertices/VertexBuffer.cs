@@ -135,8 +135,8 @@ namespace Microsoft.Xna.Framework.Graphics
             base.Dispose();
 		}
 
-        #if MONOMAC
-
+        #if !MONOMAC && !ANDROID && !IOS
+		// TODO: kjpou1 Will need to talk to Tom abuot this.
         // TODO: This is not part of the XNA 
         // API... does MacOS need this?  Can it
         // be done another way?

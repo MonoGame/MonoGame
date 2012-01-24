@@ -353,6 +353,7 @@
     <Compile Include="MacOS\Audio\OpenALSupport.cs" />
     <Compile Include="MacOS\Audio\SoundEffect.cs" />
     <Compile Include="MacOS\Audio\SoundEffectInstance.cs" />
+    <Compile Include="MacOS\MacGamePlatform+Synchronous.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />

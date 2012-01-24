@@ -70,18 +70,26 @@ using System;
 using System.Drawing;
 using System.IO;
 
-using Microsoft.Xna.Framework.Graphics;
-
 using MonoMac.AppKit;
 using MonoMac.Foundation;
-using Microsoft.Xna.Framework.Input;
+
 using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.GamerServices;
 
 namespace Microsoft.Xna.Framework
 {
-    class MacGamePlatform : GamePlatform
+    partial class MacGamePlatform : GamePlatform
     {
+        private enum RunState
+        {
+            NotStarted,
+            Running,
+            Exiting,
+            Exited
+        }
+
         private MacGameNSWindow _mainWindow;
         private GameWindow _gameWindow;
         private bool _wasResizeable;
@@ -90,20 +98,32 @@ namespace Microsoft.Xna.Framework
         public MacGamePlatform(Game game) :
             base(game)
         {
+            _state = RunState.NotStarted;
             game.Services.AddService(typeof(MacGamePlatform), this);
 
             // Setup our OpenALSoundController to handle our SoundBuffer pools
             soundControllerInstance = OpenALSoundController.GetInstance;
 
+            InitializeMainWindow();
+
+            // We set the current directory to the ResourcePath on Mac
+            Directory.SetCurrentDirectory(NSBundle.MainBundle.ResourcePath);
+        }
+
+        private void InitializeMainWindow()
+        {
             RectangleF frame = new RectangleF(
                 0, 0,
                 PresentationParameters._defaultBackBufferWidth,
                 PresentationParameters._defaultBackBufferHeight);
 
-            // Create a window
             _mainWindow = new MacGameNSWindow(
                 frame, NSWindowStyle.Titled | NSWindowStyle.Closable,
                 NSBackingStore.Buffered, true);
+
+            _mainWindow.WindowController = new NSWindowController(_mainWindow);
+            _mainWindow.Delegate = new MainWindowDelegate(this);
+
             _mainWindow.IsOpaque = true;
             _mainWindow.EnableCursorRects();
             _mainWindow.AcceptsMouseMovedEvents = false;
@@ -112,42 +132,46 @@ namespace Microsoft.Xna.Framework
             _gameWindow = new GameWindow(Game, frame);
             Window = _gameWindow;
             _mainWindow.ContentView.AddSubview(_gameWindow);
-
-            // We set the current directory to the ResourcePath on Mac
-            Directory.SetCurrentDirectory(NSBundle.MainBundle.ResourcePath);
-
-            // Leave these here for when we implement the Activate and Deactivated
-            _mainWindow.DidBecomeKey += delegate(object sender, EventArgs e) {
-                //if (!IsMouseVisible)
-                //    _gameWindow.HideCursor();
-                //Console.WriteLine("BecomeKey");
-                IsActive = true;
-            };
-
-            _mainWindow.DidResignKey += delegate(object sender, EventArgs e) {
-                //if (!IsMouseVisible)
-                //    _gameWindow.UnHideCursor();
-                //Console.WriteLine("ResignKey");
-                IsActive = false;
-            };
-
-            _mainWindow.DidBecomeMain += delegate(object sender, EventArgs e) {
-                //if (!IsMouseVisible)
-                //    _gameWindow.HideCursor();
-                ////Console.WriteLine("BecomeMain");
-            };
-
-            _mainWindow.DidResignMain += delegate(object sender, EventArgs e) {
-                //if (!IsMouseVisible)
-                //    _gameWindow.UnHideCursor();
-                //Console.WriteLine("ResignMain");
-            };
         }
 
-        ~MacGamePlatform()
+        protected override void Dispose(bool disposing)
         {
-            // FIXME: Does this really apply on OS X?
-            // TODO NSDevice.CurrentDevice.EndGeneratingDeviceOrientationNotifications();
+            if (disposing)
+            {
+                // No need to dispose _gameWindow.  It will be released by the
+                // nearest NSAutoreleasePool.
+                if (_gameWindow != null)
+                    _gameWindow = null;
+
+                // No need to dispose _mainWindow.  It will be released by the
+                // nearest NSAutoreleasePool.
+                if (_mainWindow != null)
+                    _mainWindow = null;
+            }
+
+            base.Dispose(disposing);
+        }
+
+        private RunState _state;
+        private RunState State
+        {
+            get { return _state; }
+            set { _state = value; }
+        }
+
+        public bool IsRunning
+        {
+            get { return _state == RunState.Running; }
+        }
+
+        public bool IsExiting
+        {
+            get { return _state == RunState.Exiting; }
+        }
+
+        public bool HasExited
+        {
+            get { return _state == RunState.Exited; }
         }
 
         private int _suspendUpdatingAndDrawingLevel;
@@ -155,6 +179,20 @@ namespace Microsoft.Xna.Framework
         {
             get { return _suspendUpdatingAndDrawingLevel > 0; }
         }
+
+        public TimeSpan InactiveSleepTime
+        {
+            get { return _inactiveSleepTime; }
+            set
+            {
+                if (value < TimeSpan.Zero)
+                    throw new ArgumentOutOfRangeException("value", "Value cannot be negative");
+                _inactiveSleepTime = value;
+            }
+        }
+
+        [Obsolete("IsPlayingVideo must be removed once VideoPlayer is implemented according to the XNA contract")]
+        public bool IsPlayingVideo { get; set; }
 
         private void SuspendUpdatingAndDrawing()
         {
@@ -168,86 +206,30 @@ namespace Microsoft.Xna.Framework
             _suspendUpdatingAndDrawingLevel--;
         }
 
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                // No need to dispose _gameWindow.  It will be released by the
-                // nearest NSAutoreleasePool.
-                if (_gameWindow != null)
-                {
-                    _gameWindow.RemoveFromSuperview();
-                    _gameWindow = null;
-                }
-
-                // No need to dispose _mainWindow.  It will be released by the
-                // nearest NSAutoreleasePool.
-                if (_mainWindow != null)
-                    _mainWindow = null;
-            }
-
-            base.Dispose(disposing);
-        }
+        #region GamePlatform Implementation
 
         public override GameRunBehavior DefaultRunBehavior
         {
             get { return GameRunBehavior.Asynchronous; }
         }
 
-        public bool IsPlayingVideo { get; set; }
-
-        #region GamePlatform Implementation
+        public override bool BeforeRun()
+        {
+            State = RunState.Running;
+            return true;
+        }
 
         public override void Exit()
         {
-            NSApplication.SharedApplication.Stop(new NSObject());
-        }
+            if (_state != RunState.Running)
+                return;
 
-        public override void RunLoop()
-        {
-            var application = NSApplication.SharedApplication;
+            _state = RunState.Exiting;
 
-            using (var appDelegate = new SynchronousApplicationDelegate())
-            using (var windowDelegate = new SynchronousWindowDelegate())
+            if (_mainWindow != null)
             {
-                application.Delegate = appDelegate;
-                _mainWindow.Delegate = windowDelegate;
-
-                // We can't use NSApplicationDelegate.DidFinishLaunching as we
-                // normally would, since multiple separate Game instances may be
-                // created serially and only the first one will be able to react
-                // to DidFinishLaunching (which is only sent once).
-                application.BeginInvokeOnMainThread(() =>
-                {
-                    _mainWindow.MakeKeyAndOrderFront(_mainWindow);
-                    ResetWindowBounds();
-                    _gameWindow.StartRunLoop(1 / Game.TargetElapsedTime.TotalSeconds);
-                });
-                application.Run();
-
-                application.Delegate = null;
-                _mainWindow.Delegate = null;
-            }
-        }
-
-        private class SynchronousApplicationDelegate : NSApplicationDelegate
-        {
-            public override bool ApplicationShouldTerminateAfterLastWindowClosed(NSApplication sender)
-            {
-                return false;
-            }
-        }
-
-        private class SynchronousWindowDelegate : NSWindowDelegate
-        {
-            public override void WillClose(NSNotification notification)
-            {
-                var application = NSApplication.SharedApplication;
-                // Invoke asynchronously on the main thread (even though that's
-                // almost certainly the current thread) to give final events a
-                // chance to be processed before we stop the application loop.
-                application.BeginInvokeOnMainThread(() =>
-                    NSApplication.SharedApplication.Stop(this));
+                var windowController = (NSWindowController)_mainWindow.WindowController;
+                windowController.Close();
             }
         }
 
@@ -272,32 +254,16 @@ namespace Microsoft.Xna.Framework
             if (_needsToResetElapsedTime)
                 _needsToResetElapsedTime = false;
 
-            if (AreUpdatingAndDrawingSuspended)
-                return false;
-            if (IsPlayingVideo || Guide.isVisible)
+            if (AreUpdatingAndDrawingSuspended || IsPlayingVideo || Guide.isVisible)
                 return false;
             return true;
         }
 
         public override bool BeforeDraw(GameTime gameTime)
         {
-            if (AreUpdatingAndDrawingSuspended)
-                return false;
-            if (IsPlayingVideo || Guide.isVisible)
+            if (AreUpdatingAndDrawingSuspended || IsPlayingVideo || Guide.isVisible)
                 return false;
             return true;
-        }
-
-        public void EnterBackground()
-        {
-            SuspendUpdatingAndDrawing();
-            IsActive = false;
-        }
-
-        public void EnterForeground()
-        {
-            ResumeUpdatingAndDrawing();
-            IsActive = true;
         }
 
         public override void EnterFullScreen()
@@ -326,14 +292,11 @@ namespace Microsoft.Xna.Framework
                 if (oldTitle != null)
                     _gameWindow.Title = oldTitle;
 
-                Window.Window.IsVisible = false;
-                // FIXME: This currently interferes with Synchronous run mode
-                //        because EnterFullScreen is called very early in the
-                //        creation process.  I'm hoping as XNA conformance tests
-                //        become available, this problem will be worked out
-                //        automatically.  For now, I hope it doesn't cause too
-                //        much trouble.
-                //Window.Window.MakeKeyAndOrderFront(Window);
+                _mainWindow.IsVisible = false;
+                // FIXME: EnterFullScreen gets called very early and interferes
+                //        with Synchronous mode, so disabling this for now.
+                //        Hopefully this does not cause excessive havoc.
+                //_mainWindow.MakeKeyAndOrderFront(Window);
                 ResetWindowBounds();
                 _mainWindow.HidesOnDeactivate = true;
                 Mouse.ResetMouse();
@@ -370,14 +333,11 @@ namespace Microsoft.Xna.Framework
                 // Set the level here to normal
                 _mainWindow.Level = NSWindowLevel.Normal;
 
-                Window.Window.IsVisible = false;
-                // FIXME: This currently interferes with Synchronous run mode
-                //        because EnterFullScreen is called very early in the
-                //        creation process.  I'm hoping as XNA conformance tests
-                //        become available, this problem will be worked out
-                //        automatically.  For now, I hope it doesn't cause too
-                //        much trouble.
-                //Window.Window.MakeKeyAndOrderFront(Window);
+                _mainWindow.IsVisible = false;
+                // FIXME: EnterFullScreen gets called very early and interferes
+                //        with Synchronous mode, so disabling this for now.
+                //        Hopefully this does not cause excessive havoc.
+                //_mainWindow.MakeKeyAndOrderFront(Window);
                 ResetWindowBounds();
                 _mainWindow.HidesOnDeactivate = false;
                 Mouse.ResetMouse();
@@ -390,12 +350,37 @@ namespace Microsoft.Xna.Framework
             _mainWindow.InvalidateCursorRectsForView(_gameWindow);
         }
 
+        public override void BeginScreenDeviceChange(bool willBeFullScreen)
+        {
+        }
+
+        public override void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight)
+        {
+        }
+
+        public override void ResetElapsedTime()
+        {
+            _gameWindow.ResetElapsedTime();
+        }
+
         #endregion
 
         private bool AllowUserResizing
         {
             get { return (_mainWindow.StyleMask & NSWindowStyle.Resizable) != 0; }
             set { _mainWindow.StyleMask ^= NSWindowStyle.Resizable; }
+        }
+
+        public void EnterBackground()
+        {
+            SuspendUpdatingAndDrawing();
+            IsActive = false;
+        }
+
+        public void EnterForeground()
+        {
+            ResumeUpdatingAndDrawing();
+            IsActive = true;
         }
 
         private void ResetWindowBounds()
@@ -433,9 +418,9 @@ namespace Microsoft.Xna.Framework
 
             // Now we set our Presentation Parameters
             var device = (GraphicsDevice)graphicsDeviceManager.GraphicsDevice;
-            // HACK: Eliminate the need for null checks by only calling
-            //       ResetWindowBounds after the device is ready.  Or,
-            //       possibly break this method into smaller methods.
+            // FIXME: Eliminate the need for null checks by only calling
+            //        ResetWindowBounds after the device is ready.  Or,
+            //        possibly break this method into smaller methods.
             if (device != null)
             {
                 PresentationParameters parms = device.PresentationParameters;
@@ -452,33 +437,52 @@ namespace Microsoft.Xna.Framework
             return _mainWindow.Frame.Height - contentRect.Height;
         }
 
-        public override void BeginScreenDeviceChange(bool willBeFullScreen)
-        {
-        }
 
-        public override void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight)
+        private class MainWindowDelegate : NSWindowDelegate
         {
-        }
-
-        public override void ResetElapsedTime()
-        {
-            _gameWindow.ResetElapsedTime();
-        }
-
-        public TimeSpan InactiveSleepTime
-        {
-            get
+            private readonly MacGamePlatform _owner;
+            public MainWindowDelegate(MacGamePlatform owner)
             {
-                return this._inactiveSleepTime;
+                if (owner == null)
+                    throw new ArgumentNullException("owner");
+                _owner = owner;
             }
-            set
+
+            public override void DidBecomeKey(NSNotification notification)
             {
-                if (value < TimeSpan.Zero)
-                {
-                  throw new ArgumentOutOfRangeException("value", "Value can not be zero");
-                }
-                this._inactiveSleepTime = value;
+                //if (!IsMouseVisible)
+                //    _gameWindow.HideCursor();
+                _owner.IsActive = true;
+            }
+
+            public override void DidResignKey(NSNotification notification)
+            {
+                //if (!IsMouseVisible)
+                //    _gameWindow.UnHideCursor();
+                _owner.IsActive = false;
+            }
+
+            public override void DidBecomeMain(NSNotification notification)
+            {
+                //if (!IsMouseVisible)
+                //    _gameWindow.HideCursor();
+            }
+
+            public override void DidResignMain(NSNotification notification)
+            {
+                //if (!IsMouseVisible)
+                //    _gameWindow.UnHideCursor();
+            }
+
+            public override void WillClose(NSNotification notification)
+            {
+                NSApplication.SharedApplication.BeginInvokeOnMainThread(() =>
+                    _owner.State = MacGamePlatform.RunState.Exited);
             }
         }
+
+        #region _mainWindow Event Handlers
+
+        #endregion _mainWindow Event Handlers
     }
 }
