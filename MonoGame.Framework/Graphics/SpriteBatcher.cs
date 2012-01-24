@@ -155,9 +155,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 #if ES11
 			int size = sizeof(float)*4+sizeof(uint);
-			GL11.VertexPointer(2,VertexPointerType.Float,size,_vertexHandle.AddrOfPinnedObject() );
-			GL11.ColorPointer(4, ColorPointerType.UnsignedByte,size,(IntPtr)((uint)_vertexHandle.AddrOfPinnedObject()+(uint)(sizeof(float)*2)));
-			GL11.TexCoordPointer(2, TexCoordPointerType.Float,size,(IntPtr)((uint)_vertexHandle.AddrOfPinnedObject()+(uint)(sizeof(float)*2+sizeof(uint))) );
+			GL.VertexPointer(2,VertexPointerType.Float,size,_vertexHandle.AddrOfPinnedObject() );
+			GL.ColorPointer(4, ColorPointerType.UnsignedByte,size,(IntPtr)((uint)_vertexHandle.AddrOfPinnedObject()+(uint)(sizeof(float)*2)));
+			GL.TexCoordPointer(2, TexCoordPointerType.Float,size,(IntPtr)((uint)_vertexHandle.AddrOfPinnedObject()+(uint)(sizeof(float)*2+sizeof(uint))) );
 #else
 			GL.EnableVertexAttribArray(attributePosition);
 			GL.EnableVertexAttribArray(attributeTexCoord);
