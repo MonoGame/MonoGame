@@ -892,9 +892,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int vertexCount, short[] indexData, int indexOffset, int primitiveCount) where T : struct, IVertexType
         {
-            ////////////////////////////
-            //This has not been tested//
-            ////////////////////////////
+			// we need to reset vertex states afterwards
+			resetVertexStates = true;
+
+			// Set up our Graphics States
+			SetGraphicsStates();
+
            // Unbind the VBOs
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
@@ -941,7 +944,8 @@ namespace Microsoft.Xna.Framework.Graphics
             //Draw
             GL.DrawElements(PrimitiveTypeGL(primitiveType),
 			                GetElementCountArray(primitiveType, primitiveCount),
-                            DrawElementsType.UnsignedInt/* .UnsignedInt248Oes*/, (IntPtr) (indexOffset*sizeof (ushort)));
+                            DrawElementsType.UnsignedShort/* .UnsignedInt248Oes*/,
+			                (IntPtr) (indexOffset*sizeof (ushort)));
 
 
             // Free resources
@@ -949,10 +953,19 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
             handle.Free();
             handle2.Free();
+
+			// Unset our Graphics States
+			UnsetGraphicsStates();
         }
 		
 		public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int vertexCount, int[] indexData, int indexOffset, int primitiveCount) where T : struct, IVertexType
         {
+			// we need to reset vertex states afterwards
+			resetVertexStates = true;
+
+			// Set up our Graphics States
+			SetGraphicsStates();
+
 			// Unbind the VBOs
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
@@ -1002,6 +1015,9 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
             handle.Free();
             handle2.Free();
+
+			// Unset our Graphics States
+			UnsetGraphicsStates();
         }
 
         internal int GetElementCountArray(PrimitiveType primitiveType, int primitiveCount)

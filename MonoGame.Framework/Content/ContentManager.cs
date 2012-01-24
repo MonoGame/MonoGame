@@ -226,7 +226,7 @@ namespace Microsoft.Xna.Framework.Content
 			} catch (ContentLoadException ex) {
 				//MonoGame try to load as a non-content file
 				
-				assetName = TitleContainer.GetFilename(assetName);
+				assetName = TitleContainer.GetFilename(Path.Combine (_rootDirectory, assetName));
 				
 				if ((typeof(T) == typeof(Curve))) 
                 {				

@@ -162,7 +162,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			                       2,
 			                       VertexAttribPointerType.Float,
 			                       false,
-			                       size,_vertexHandle.AddrOfPinnedObject());
+			                       size,
+			                       _vertexHandle.AddrOfPinnedObject());
 			GL.VertexAttribPointer(GraphicsDevice.attributeTexCoord,
 			                       2,
 			                       VertexAttribPointerType.Float,
