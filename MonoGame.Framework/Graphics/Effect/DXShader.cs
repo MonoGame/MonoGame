@@ -29,6 +29,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		MojoShader.MOJOSHADER_symbol[] symbols;
 		MojoShader.MOJOSHADER_sampler[] samplers;
+		MojoShader.MOJOSHADER_attribute[] attributes;
 		
 		DXPreshader preshader;
 		
@@ -79,8 +80,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			samplers = DXHelper.UnmarshalArray<MojoShader.MOJOSHADER_sampler>(
 					parseData.samplers, parseData.sampler_count);
 			
-			MojoShader.MOJOSHADER_attribute[] attributes = 
-				DXHelper.UnmarshalArray<MojoShader.MOJOSHADER_attribute>(
+			attributes = DXHelper.UnmarshalArray<MojoShader.MOJOSHADER_attribute>(
 					parseData.attributes, parseData.attribute_count);
 			
 			foreach (MojoShader.MOJOSHADER_symbol symbol in symbols) {
@@ -105,12 +105,11 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			glslCode = parseData.output;
 			
-			//MojoShader wants us to handle vertex input attributes ourselves
-			//to get around some directx fetures that opengl's entry points
-			//don't support. We just hack around it for now
 			foreach (MojoShader.MOJOSHADER_attribute attrb in attributes) {
 				if (shaderType == ShaderType.VertexShader) {
 					switch (attrb.usage) {
+#if ES11
+					//use builtin attributes in GL 1.1
 					case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_COLOR:
 						glslCode = glslCode.Replace ("attribute vec4 "+attrb.name+";",
 						                               "#define "+attrb.name+" gl_Color");
@@ -127,6 +126,23 @@ namespace Microsoft.Xna.Framework.Graphics
 						glslCode = glslCode.Replace ("attribute vec4 "+attrb.name+";",
 						                               "#define "+attrb.name+" gl_Normal");
 						break;
+#else
+					//use standard attribute names so we can bind them in EffectPass, 
+					//since attributes are bound to programs, not shaders
+					//Can't just bind to builtin names as that causes perforance issues
+					case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_COLOR:
+						glslCode = glslCode.Replace (attrb.name, "g_Color");
+						break;
+					case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_POSITION:
+						glslCode = glslCode.Replace (attrb.name, "g_Position");
+						break;
+					case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_TEXCOORD:
+						glslCode = glslCode.Replace (attrb.name, "g_TexCoord");
+						break;
+					case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_NORMAL:
+						glslCode = glslCode.Replace (attrb.name, "g_Normal");
+						break;
+#endif
 					default:
 						throw new NotImplementedException();
 					}
@@ -179,7 +195,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			int float4_index = 0;
 			int int4_index = 0;
 			
-			//only populate modified stuff?
+			//TODO: only populate modified stuff?
 			foreach (MojoShader.MOJOSHADER_symbol symbol in symbols) {
 				//todo: support array parameters
 				EffectParameter parameter = parameters[symbol.name];
@@ -234,9 +250,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				preshader.Run (parameters, uniforms_float4);
 			}
 			
-			
 			//Upload the uniforms
-			
 			string prefix;
 			switch(shaderType) {
 			case ShaderType.FragmentShader:

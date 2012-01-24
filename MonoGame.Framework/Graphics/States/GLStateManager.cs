@@ -88,6 +88,14 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             GL.Enable(EnableCap.Blend);
         }
+
+		public static void VertexAttribArray(int index, bool enable) {
+			if (enable) {
+				GL.EnableVertexAttribArray(index);
+			} else {
+				GL.DisableVertexAttribArray(index);
+			}
+		}
 		
 #if ES11
         public static void Projection(Matrix projection)

@@ -15,6 +15,8 @@ namespace Microsoft.Xna.Framework.Graphics
     public class EffectPass
     {
         EffectTechnique _technique = null;
+		GraphicsDevice _graphicsDevice;
+		
 		string name;
 		int shaderProgram = 0;
 		DXEffectObject.d3dx_state[] states;
@@ -24,6 +26,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		public EffectPass(EffectTechnique technique, DXEffectObject.d3dx_pass pass)
         {
             _technique = technique;
+			_graphicsDevice = _technique._effect.GraphicsDevice;
 			
 			name = pass.name;
 			states = pass.states;
@@ -123,6 +126,22 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 			
 			if (relink) {
+#if !ES11
+				//bind attributes. Default ones use in GL 1.1
+				GL.BindAttribLocation(shaderProgram,
+				                      GraphicsDevice.attributePosition,
+				                      "g_Position");
+				GL.BindAttribLocation(shaderProgram,
+					                  GraphicsDevice.attributeTexCoord,
+					                  "g_TexCoord");
+				GL.BindAttribLocation(shaderProgram,
+				                      GraphicsDevice.attributeColor,
+				                      "g_Color");
+				GL.BindAttribLocation(shaderProgram,
+				                      GraphicsDevice.attributeNormal,
+				                      "g_Normal");
+#endif
+				
 				GL.LinkProgram (shaderProgram);
 			}
 			
@@ -131,12 +150,12 @@ namespace Microsoft.Xna.Framework.Graphics
 			if (pixelShader != null) {
 				pixelShader.Apply((uint)shaderProgram,
 				                  _technique._effect.Parameters,
-				                  _technique._effect.GraphicsDevice);
+				                  _graphicsDevice);
 			}
 			if (vertexShader != null) {
 				vertexShader.Apply((uint)shaderProgram,
 				                  _technique._effect.Parameters,
-				                  _technique._effect.GraphicsDevice);
+				                  _graphicsDevice);
 			}
 
 		}

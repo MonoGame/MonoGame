@@ -80,11 +80,6 @@ namespace Microsoft.Xna.Framework.Graphics
 		GCHandle _vertexHandle;
 		GCHandle _indexHandle;
 		
-		// OpenGL ES2.0 Variables
-		public int attributePosition = 0;
-		public int attributeTexCoord = 1;
-		public int attributeTint = 2;
-		
 		public SpriteBatcher ()
 		{
 			_batchItemList = new List<SpriteBatchItem>(InitialBatchSize);
@@ -159,16 +154,16 @@ namespace Microsoft.Xna.Framework.Graphics
 			GL.ColorPointer(4, ColorPointerType.UnsignedByte,size,(IntPtr)((uint)_vertexHandle.AddrOfPinnedObject()+(uint)(sizeof(float)*2)));
 			GL.TexCoordPointer(2, TexCoordPointerType.Float,size,(IntPtr)((uint)_vertexHandle.AddrOfPinnedObject()+(uint)(sizeof(float)*2+sizeof(uint))) );
 #else
-			GL.EnableVertexAttribArray(attributePosition);
-			GL.EnableVertexAttribArray(attributeTexCoord);
+			GL.EnableVertexAttribArray(GraphicsDevice.attributePosition);
+			GL.EnableVertexAttribArray(GraphicsDevice.attributeTexCoord);
 			
 			int size = VertexPosition2ColorTexture.GetSize();
-			GL.VertexAttribPointer(attributePosition,
+			GL.VertexAttribPointer(GraphicsDevice.attributePosition,
 			                       2,
 			                       VertexAttribPointerType.Float,
 			                       false,
 			                       size,_vertexHandle.AddrOfPinnedObject());
-			GL.VertexAttribPointer(attributeTexCoord,
+			GL.VertexAttribPointer(GraphicsDevice.attributeTexCoord,
 			                       2,
 			                       VertexAttribPointerType.Float,
 			                       false,

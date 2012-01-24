@@ -85,6 +85,9 @@ namespace Microsoft.Xna.Framework.Graphics
         {
 #if ES11
 		GLStateManager.VertexArray(true);
+#else
+			GLStateManager.VertexAttribArray(GraphicsDevice.attributePosition, true);
+#endif
             bool normal = false;
             bool texcoord = false;
 			bool color = false;
@@ -94,50 +97,87 @@ namespace Microsoft.Xna.Framework.Graphics
                     switch (ve.VertexElementUsage)
                     {
                         case VertexElementUsage.Position:
+#if ES11
                             GL.VertexPointer(
                                 ve.VertexElementFormat.OpenGLNumberOfElements(),
                                 ve.VertexElementFormat.OpenGLVertexPointerType(),
                                 vd.VertexStride,
                                 (IntPtr)ve.Offset
                                 );
-
+#else
+							GL.VertexAttribPointer(GraphicsDevice.attributePosition,
+					            ve.VertexElementFormat.OpenGLNumberOfElements(),
+					            ve.VertexElementFormat.OpenGLVertexAttribPointerType(),
+					            false,
+					            vd.VertexStride,
+					            (IntPtr)ve.Offset);
+#endif
                             break;
                         case VertexElementUsage.Color:
+#if ES11
                             GL.ColorPointer(
                                 ve.VertexElementFormat.OpenGLNumberOfElements(),
                                 ve.VertexElementFormat.OpenGLColorPointerType(),
                                 vd.VertexStride,
                                 (IntPtr)ve.Offset
                                 );
+#else
+							GL.VertexAttribPointer(GraphicsDevice.attributeColor,
+					            ve.VertexElementFormat.OpenGLNumberOfElements(),
+					            ve.VertexElementFormat.OpenGLVertexAttribPointerType(),
+					            false,
+					            vd.VertexStride,
+					            (IntPtr)ve.Offset);
+#endif
                             color = true;
                             break;
                         case VertexElementUsage.Normal:
+#if ES11
                             GL.NormalPointer(
                             ve.VertexElementFormat.OpenGLNormalPointerType(),
                             vd.VertexStride,
                             (IntPtr)ve.Offset
                             );
+#else
+							GL.VertexAttribPointer(GraphicsDevice.attributeNormal,
+					            ve.VertexElementFormat.OpenGLNumberOfElements(),
+					            ve.VertexElementFormat.OpenGLVertexAttribPointerType(),
+					            false,
+					            vd.VertexStride,
+					            (IntPtr)ve.Offset);
+#endif
 					normal = true;
                             break;
                         case VertexElementUsage.TextureCoordinate:
+#if ES11
                             GL.TexCoordPointer(
                             ve.VertexElementFormat.OpenGLNumberOfElements(),
                             ve.VertexElementFormat.OpenGLTexCoordPointerType(),
                             vd.VertexStride,
                             (IntPtr)ve.Offset
                             );
+#else
+							GL.VertexAttribPointer(GraphicsDevice.attributeTexCoord,
+					            ve.VertexElementFormat.OpenGLNumberOfElements(),
+					            ve.VertexElementFormat.OpenGLVertexAttribPointerType(),
+					            false,
+					            vd.VertexStride,
+					            (IntPtr)ve.Offset);
+#endif
                             texcoord = true;
                             break;
                         default:
                             throw new NotImplementedException();
                     }
             }
-
+#if ES11
             GLStateManager.ColorArray (color);
             GLStateManager.NormalArray(normal);
 		GLStateManager.TextureCoordArray(texcoord);
 #else
-            throw new NotImplementedException();
+			GLStateManager.VertexAttribArray(GraphicsDevice.attributeColor, color);
+			GLStateManager.VertexAttribArray(GraphicsDevice.attributeTexCoord, texcoord);
+			GLStateManager.VertexAttribArray(GraphicsDevice.attributeNormal, normal);
 #endif
         }
 

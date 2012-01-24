@@ -86,6 +86,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private RenderTargetBinding[] currentRenderTargets;
 		
+		// OpenGL ES2.0 attribute locations
+		internal static int attributePosition = 0;
+		internal static int attributeTexCoord = 1;
+		internal static int attributeTint = 2;
+		internal static int attributeColor = 3;
+		internal static int attributeNormal = 4;
+		
 		// TODO Graphics Device events need implementing
 		public event EventHandler<EventArgs> DeviceLost;
 		public event EventHandler<EventArgs> DeviceReset;

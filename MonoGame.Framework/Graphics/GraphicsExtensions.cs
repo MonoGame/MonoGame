@@ -14,6 +14,7 @@ using TexCoordPointerType = OpenTK.Graphics.ES20.All;
 using BlendEquationMode = OpenTK.Graphics.ES20.All;
 using BlendingFactorSrc = OpenTK.Graphics.ES20.All;
 using BlendingFactorDest = OpenTK.Graphics.ES20.All;
+using VertexAttribPointerType = OpenTK.Graphics.ES20.All;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -116,6 +117,51 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 case VertexElementFormat.HalfVector4:
                     return VertexPointerType.Float;
+            }
+
+            throw new NotImplementedException();
+        }
+
+		public static VertexAttribPointerType OpenGLVertexAttribPointerType(this VertexElementFormat elementFormat)
+        {
+            switch (elementFormat)
+            {
+                case VertexElementFormat.Single:
+                    throw new NotImplementedException();
+
+                case VertexElementFormat.Vector2:
+                    return VertexAttribPointerType.Float;
+
+                case VertexElementFormat.Vector3:
+                    return VertexAttribPointerType.Float;
+
+                case VertexElementFormat.Vector4:
+                    return VertexAttribPointerType.Float;
+
+                case VertexElementFormat.Color:
+					return VertexAttribPointerType.UnsignedByte;
+
+                case VertexElementFormat.Byte4:
+					return VertexAttribPointerType.UnsignedByte;
+
+                case VertexElementFormat.Short2:
+                    return VertexAttribPointerType.Short;
+
+                case VertexElementFormat.Short4:
+                    return VertexAttribPointerType.Short;
+
+                case VertexElementFormat.NormalizedShort2:
+                    return VertexAttribPointerType.UnsignedShort;
+
+                case VertexElementFormat.NormalizedShort4:
+                    return VertexAttribPointerType.UnsignedShort;
+#if !IPHONE
+                case VertexElementFormat.HalfVector2:
+                    return VertexAttribPointerType.HalfFloat;
+
+                case VertexElementFormat.HalfVector4:
+                    return VertexAttribPointerType.HalfFloat;
+#endif
             }
 
             throw new NotImplementedException();
