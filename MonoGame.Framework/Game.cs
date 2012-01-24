@@ -618,13 +618,15 @@ namespace Microsoft.Xna.Framework
                 _sortChangedSubscriber = sortChangedSubscriber;
                 _sortChangedUnsubscriber = sortChangedUnsubscriber;
 
-                _addJournalSortComparison = (x, y) =>
-                {
-                    int result = _sort(x.Item, y.Item);
-                    if (result != 0)
-                        return result;
-                    return x.Order - y.Order;
-                };
+                _addJournalSortComparison = CompareAddJournalEntry;
+            }
+
+            private int CompareAddJournalEntry(AddJournalEntry x, AddJournalEntry y)
+            {
+                int result = _sort((T)x.Item, (T)y.Item);
+                if (result != 0)
+                    return result;
+                return x.Order - y.Order;
             }
 
             public void ForEachFilteredItem<TUserData>(Action<T, TUserData> action, TUserData userData)
@@ -752,7 +754,7 @@ namespace Microsoft.Xna.Framework
 
                 while (iItems < _items.Count && iAddJournal < _addJournal.Count)
                 {
-                    var addJournalItem = _addJournal[iAddJournal].Item;
+                    var addJournalItem = (T)_addJournal[iAddJournal].Item;
                     // If addJournalItem is less than (belongs before)
                     // _items[iItems], insert it.
                     if (_sort(addJournalItem, _items[iItems]) < 0)
@@ -770,7 +772,7 @@ namespace Microsoft.Xna.Framework
                 // If _addJournal had any "tail" items, append them all now.
                 for (; iAddJournal < _addJournal.Count; ++iAddJournal)
                 {
-                    var addJournalItem = _addJournal[iAddJournal].Item;
+                    var addJournalItem = (T)_addJournal[iAddJournal].Item;
                     SubscribeToItemEvents(addJournalItem);
                     _items.Add(addJournalItem);
                 }
@@ -813,31 +815,38 @@ namespace Microsoft.Xna.Framework
                 UnsubscribeFromItemEvents(item);
                 InvalidateCache();
             }
+        }
 
-            private struct AddJournalEntry
+        // For iOS, the AOT compiler can't seem to handle a
+        // List<AddJournalEntry<T>>, so unfortunately we'll use object
+        // for storage.
+        private struct AddJournalEntry
+        {
+            public readonly int Order;
+            public readonly object Item;
+
+            public AddJournalEntry(int order, object item)
             {
-                public readonly int Order;
-                public readonly T Item;
+                Order = order;
+                Item = item;
+            }
 
-                public AddJournalEntry(int order, T item)
-                {
-                    Order = order;
-                    Item = item;
-                }
+            public static AddJournalEntry CreateKey(object item)
+            {
+                return new AddJournalEntry(-1, item);
+            }
 
-                public static AddJournalEntry CreateKey(T item)
-                {
-                    return new AddJournalEntry(-1, item);
-                }
+            public override int GetHashCode()
+            {
+                return Item.GetHashCode();
+            }
 
-                public override bool Equals(object obj)
-                {
-                    if (!(obj is AddJournalEntry))
-                        return false;
+            public override bool Equals(object obj)
+            {
+                if (!(obj is AddJournalEntry))
+                    return false;
 
-                    return EqualityComparer<T>.Default.Equals(
-                        Item, ((AddJournalEntry)obj).Item);
-                }
+                return object.Equals(Item, ((AddJournalEntry)obj).Item);
             }
         }
     }
