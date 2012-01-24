@@ -153,7 +153,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         }
 				
-		public unsafe void Dispose ()
+		public void Dispose ()
 		{
 			if(_name != 0) 
 			{
@@ -275,7 +275,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			return b;
 		}
 
-        public unsafe void DrawAtPoint(Vector2 point)
+        public void DrawAtPoint(Vector2 point)
 		{
 			float []coordinates = { 0,	_maxT, _maxS, _maxT, 0, 0,_maxS, 0 };
 			float width = (float)_width * _maxS;
@@ -291,7 +291,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			GL.DrawArrays(BeginMode.TriangleStrip, 0, 4);
 		}
 		
-		public unsafe void DrawInRect(Rectangle rect)
+		public void DrawInRect(Rectangle rect)
 		{
 			float[]	 coordinates = {  0, _maxT,_maxS, _maxT,0, 0,_maxS,	0  };
 			float[]	vertices = { rect.Left,	rect.Top, 0.0f, rect.Right, rect.Top,0.0f,rect.Left,rect.Bottom,0.0f,rect.Right,rect.Bottom,0.0f };

@@ -117,6 +117,8 @@ namespace Microsoft.Xna.Framework
 
         public Game()
         {
+		    Exiting += OnExiting;
+
             _services = new GameServiceContainer();
             _components = new GameComponentCollection();
             _content = new ContentManager(_services);
@@ -404,6 +406,10 @@ namespace Microsoft.Xna.Framework
         protected virtual void Update(GameTime gameTime)
         {
             _updateables.ForEachFilteredItem(UpdateAction, gameTime);
+        }
+
+        protected virtual void OnExiting(object sender, EventArgs args)
+        {
         }
 
         #endregion Protected Methods
