@@ -117,8 +117,8 @@ namespace Microsoft.Xna.Framework
 
         public Game()
         {
+            _instance = this;
 		    Exiting += OnExiting;
-
             _services = new GameServiceContainer();
             _components = new GameComponentCollection();
             _content = new ContentManager(_services);
@@ -176,6 +176,8 @@ namespace Microsoft.Xna.Framework
 #if ANDROID
         public static AndroidGameActivity Activity { get; set; }
 #endif
+        private static Game _instance = null;
+        internal static Game Instance { get { return Game._instance; } }
 
         public GameComponentCollection Components
         {
