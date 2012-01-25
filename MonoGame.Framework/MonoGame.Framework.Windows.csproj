@@ -8,7 +8,7 @@
     <ProjectGuid>{7DE47032-A904-4C29-BD22-2D235E8D91BA}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>MonoGame.Framework</RootNamespace>
+    <RootNamespace>Microsoft.Xna.Framework</RootNamespace>
     <AssemblyName>MonoGame.Framework.Windows</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <FileUpgradeFlags>
@@ -103,12 +103,22 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Desktop\Audio\SoundEffectInstance.cs" />
+    <Compile Include="Desktop\Input\GamePad.cs" />
+    <Compile Include="Desktop\Input\Mouse.cs" />
+    <Compile Include="Desktop\Input\MouseState.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="GamePlatform.cs" />
+    <Compile Include="GamerServices\GamerServicesDispatcher.cs" />
+    <Compile Include="Graphics\Effect\AlphaTestEffect.cs" />
+    <Compile Include="Graphics\Effect\AlphaTestEffectCode.cs" />
+    <Compile Include="Graphics\Effect\EffectHelpers.cs" />
+    <Compile Include="Graphics\PackedVector\NormalizedShort2.cs" />
     <Compile Include="Graphics\Vertices\IndexBuffer.cs" />
     <Compile Include="Graphics\Vertices\IndexElementSize.cs" />
     <Compile Include="Graphics\Vertices\VertexBuffer.cs" />
+    <Compile Include="Graphics\Vertices\VertexPositionColorTexture.cs" />
     <Compile Include="Input\GamePadDeadZone.cs" />
+    <Compile Include="LaunchParameters.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Audio\AudioChannels.cs" />
     <Compile Include="Audio\AudioEmitter.cs" />
@@ -272,7 +282,6 @@
     <Compile Include="Windows\Graphics\SpriteBatch.cs" />
     <Compile Include="Windows\Graphics\SpriteBatcher.cs" />
     <Compile Include="Windows\Graphics\Texture2D.cs" />
-    <Compile Include="Windows\Input\GamePad.cs" />
     <Compile Include="Windows\Input\Keyboard.cs" />
     <Compile Include="Windows\Media\Video.cs" />
     <Compile Include="Windows\WindowsGamePlatform.cs" />
@@ -387,8 +396,6 @@
     <Compile Include="Windows\TitleContainer.cs" />
     <Compile Include="Content\ContentReaders\CurveReader.cs" />
     <Compile Include="Graphics\Vertices\VertexElementColor.cs" />
-    <Compile Include="Windows\Input\Mouse.cs" />
-    <Compile Include="Windows\Input\MouseState.cs" />
     <Compile Include="Audio\XactClip.cs" />
     <Compile Include="Audio\XactSound.cs" />
     <Compile Include="Desktop\Graphics\States\GLStateManager.cs" />

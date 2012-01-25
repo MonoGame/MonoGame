@@ -248,7 +248,7 @@
     <Compile Include="MacOS\KeyUtil.cs" />
     <Compile Include="Graphics\States\TextureAddressMode.cs" />
     <Compile Include="Graphics\States\TextureFilter.cs" />
-    <Compile Include="MacOS\Input\GamePad.cs" />
+    <Compile Include="Desktop\Input\GamePad.cs" />
     <Compile Include="Input\ButtonDefinition.cs" />
     <Compile Include="Input\ThumbStickDefinition.cs" />
     <Compile Include="MacOS\GamerServices\SignedInGamer.cs" />
@@ -354,6 +354,7 @@
     <Compile Include="MacOS\Audio\SoundEffect.cs" />
     <Compile Include="MacOS\Audio\SoundEffectInstance.cs" />
     <Compile Include="MacOS\MacGamePlatform+Synchronous.cs" />
+    <Compile Include="LaunchParameters.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />
