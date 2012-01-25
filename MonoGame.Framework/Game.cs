@@ -85,7 +85,6 @@ namespace Microsoft.Xna.Framework
         private const float DefaultTargetFramesPerSecond = 60.0f;
 
         private GameComponentCollection _components;
-        private ContentManager _content;
         private GameServiceContainer _services;
         private GamePlatform _platform;
 
@@ -121,7 +120,7 @@ namespace Microsoft.Xna.Framework
 		    Exiting += OnExiting;
             _services = new GameServiceContainer();
             _components = new GameComponentCollection();
-            _content = new ContentManager(_services);
+            Content = new ContentManager(_services);
 
             _platform = GamePlatform.Create(this);
             _platform.Activated += Platform_Activated;
@@ -226,10 +225,7 @@ namespace Microsoft.Xna.Framework
             get { return _services; }
         }
 
-        public ContentManager Content
-        {
-            get { return _content; }
-        }
+        public ContentManager Content { get; set; }
 
         public GraphicsDevice GraphicsDevice
         {
