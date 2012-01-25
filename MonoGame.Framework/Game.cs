@@ -77,6 +77,7 @@ using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
+using MonoGame.Framework;
 
 namespace Microsoft.Xna.Framework
 {
@@ -117,6 +118,7 @@ namespace Microsoft.Xna.Framework
         public Game()
         {
             _instance = this;
+            LaunchParameters = new LaunchParameters();
 		    Exiting += OnExiting;
             _services = new GameServiceContainer();
             _components = new GameComponentCollection();
@@ -177,6 +179,8 @@ namespace Microsoft.Xna.Framework
 #endif
         private static Game _instance = null;
         internal static Game Instance { get { return Game._instance; } }
+
+        public LaunchParameters LaunchParameters { get; private set; }
 
         public GameComponentCollection Components
         {
