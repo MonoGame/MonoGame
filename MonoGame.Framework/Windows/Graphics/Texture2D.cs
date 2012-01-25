@@ -817,6 +817,16 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        public void SaveAsJpeg(Stream stream, int width, int height)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SaveAsPng(Stream stream, int width, int height)
+        {
+            throw new NotImplementedException();
+        }
+
         internal void Reload(Stream assetStream)
         {
             
