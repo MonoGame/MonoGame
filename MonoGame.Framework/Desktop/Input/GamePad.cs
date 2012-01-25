@@ -375,7 +375,9 @@ namespace Microsoft.Xna.Framework.Input
             if (device == IntPtr.Zero || c == null)
                 return GamePadState.InitializedState;
 
-            GamePadThumbSticks sticks = new GamePadThumbSticks(new Vector2(c.LeftStick.ReadAxisPair(device)), new Vector2(c.RightStick.ReadAxisPair(device)));
+            var leftStick = c.LeftStick.ReadAxisPair(device);
+            var rightStick = c.RightStick.ReadAxisPair(device);
+            GamePadThumbSticks sticks = new GamePadThumbSticks(new Vector2(leftStick.X, leftStick.Y), new Vector2(rightStick.X, rightStick.Y));
             sticks.ApplyDeadZone(deadZone, DeadZoneSize);
             GamePadTriggers triggers = new GamePadTriggers(c.LeftTrigger.ReadFloat(device), c.RightTrigger.ReadFloat(device));
             GamePadButtons buttons = new GamePadButtons(ReadButtons(device, c, DeadZoneSize));
