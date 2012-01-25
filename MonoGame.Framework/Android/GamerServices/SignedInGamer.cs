@@ -54,6 +54,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 		
 		private AchievementCollection gamerAchievements;
 		private FriendCollection friendCollection;
+		private bool isSignedInToLive = true;
 		
 		delegate void AuthenticationDelegate();
 		
@@ -253,7 +254,10 @@ namespace Microsoft.Xna.Framework.GamerServices
 		{ 
 			get
 			{
-				return true;
+				return isSignedInToLive;
+			}
+			internal set{
+				isSignedInToLive = value;
 			}
 		}
 		

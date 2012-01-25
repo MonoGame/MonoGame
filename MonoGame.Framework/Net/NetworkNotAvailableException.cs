@@ -42,7 +42,9 @@ using System;
 
 namespace Microsoft.Xna.Framework.Net
 {
-	[SerializableAttribute]
+#if !WINDOWS_PHONE
+    [SerializableAttribute]
+#endif
 	public class NetworkNotAvailableException : NetworkException
 	{
 		public NetworkNotAvailableException()

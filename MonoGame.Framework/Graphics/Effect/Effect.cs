@@ -46,13 +46,10 @@ using System.IO;
 namespace Microsoft.Xna.Framework.Graphics
 {
 	public class Effect : GraphicsResource
-	{
-		public EffectParameterCollection Parameters { get; set; }
-
-		public EffectTechniqueCollection Techniques { get; set; }
-		
+    {
+        public EffectParameterCollection Parameters { get; set; }
 		internal List<EffectParameter> _textureMappings = new List<EffectParameter>();
-		
+
 		DXEffectObject effectObject;
 		
 		protected Effect (GraphicsDevice graphicsDevice)
@@ -64,6 +61,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			Techniques = new EffectTechniqueCollection ();
 			Parameters = new EffectParameterCollection();
 		}
+
+        public EffectTechniqueCollection Techniques { get; set; }		
 
 		protected Effect (Effect cloneSource)
 		{

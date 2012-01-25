@@ -147,8 +147,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 				case DisplayOrientation.LandscapeRight:
                 {
-					GL11.Rotate(180, 0, 0, 1); 
-					GL11.Ortho(0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height,  0, -1, 1);
+					GL.Rotate(180, 0, 0, 1); 
+					GL.Ortho(0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height,  0, -1, 1);
 					break;
 				}
 				
@@ -156,40 +156,12 @@ namespace Microsoft.Xna.Framework.Graphics
 				case DisplayOrientation.PortraitUpsideDown:
                 default:
 				{
-					GL11.Ortho(0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height, 0, -1, 1);
+					GL.Ortho(0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height, 0, -1, 1);
 					break;
 				}
 			}
 #else
-			// Switch on the flags.
-			switch (this.graphicsDevice.PresentationParameters.DisplayOrientation) {
-			case DisplayOrientation.LandscapeLeft:
-				{
-					GL.Rotate (-90, 0, 0, 1); 
-					GL.Ortho (0, this.graphicsDevice.Viewport.Height, this.graphicsDevice.Viewport.Width, 0, -1, 1);
-					break;
-				}
-
-			case DisplayOrientation.LandscapeRight:
-				{
-					GL.Rotate (90, 0, 0, 1); 
-					GL.Ortho (0, this.graphicsDevice.Viewport.Height, this.graphicsDevice.Viewport.Width, 0, -1, 1);
-					break;
-				}
-
-			case DisplayOrientation.PortraitUpsideDown:
-				{
-					GL.Rotate (180, 0, 0, 1); 
-					GL.Ortho (0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height, 0, -1, 1);
-					break;
-				}
-
-			default:
-				{
-					GL.Ortho (0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height, 0, -1, 1);
-					break;
-				}
-			}
+			GL.Ortho(0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height, 0, -1, 1);
 #endif
 
 #endif

@@ -339,7 +339,10 @@
     <Compile Include="Android\Input\Touch\GestureListener.cs" />
     <Compile Include="Audio\XactSound.cs" />
     <Compile Include="Android\Media\Song.cs" />
+    <Compile Include="Audio\NoAudioHardwareException.cs" />
     <Compile Include="Android\GamerServices\MonoGameGamerServicesHelper.cs" />
+    <Compile Include="Audio\InstancePlayLimitException.cs" />
+    <Compile Include="Graphics\Vertices\IndexElementSize.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />

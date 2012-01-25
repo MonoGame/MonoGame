@@ -74,6 +74,9 @@ namespace Microsoft.Xna.Framework
 		private DateTime _now;
         private DisplayOrientation _currentOrientation;
 		private GestureDetector gesture = null;
+		private bool _needsToResetElapsedTime = false;
+		private bool _isFirstTime = true;
+		private TimeSpan _extraElapsedTime;		
 
         public AndroidGameWindow(Context context, Game game) : base(context)
         {
@@ -101,6 +104,11 @@ namespace Microsoft.Xna.Framework
 
             this.SetOnTouchListener(this);
         }
+
+		public void ResetElapsedTime ()
+		{
+			_needsToResetElapsedTime = true;
+		}
 		
 		void GameWindow_Closed(object sender,EventArgs e)
         {        
@@ -143,7 +151,7 @@ namespace Microsoft.Xna.Framework
 		
 		protected override void CreateFrameBuffer()
 		{	    
-#if !GL20			
+#if true			
 			try
             {
                 GLContextVersion = GLContextVersion.Gles2_0;
@@ -176,9 +184,9 @@ namespace Microsoft.Xna.Framework
                 MakeCurrent();
 
             if (_game != null) {
-                _drawGameTime.Update(_now - _lastUpdate);
-                _lastUpdate = _now;
+                _drawGameTime.Update(_now - _lastUpdate);                
                 _game.DoDraw(_drawGameTime);
+				_lastUpdate = _now;
             }
             try
             {
@@ -196,11 +204,42 @@ namespace Microsoft.Xna.Framework
 			
 			if (_game != null )
 			{
-                //ObserveDeviceRotation();
-
+                //ObserveDeviceRotation();				
 				_now = DateTime.Now;
+				
+				if (_isFirstTime) {
+					// Initialize GameTime
+					_updateGameTime = new GameTime ();
+					_drawGameTime = new GameTime ();
+					_lastUpdate = DateTime.Now;
+					_isFirstTime = false;
+				}
+
+				if (_needsToResetElapsedTime) {
+					_drawGameTime.ResetElapsedTime();
+					_needsToResetElapsedTime = false;
+				}
+				
+				
 				_updateGameTime.Update(_now - _lastUpdate);
-            	_game.DoUpdate(_updateGameTime);
+				
+				TimeSpan catchup = _updateGameTime.ElapsedGameTime;
+				if (catchup > _game.TargetElapsedTime) {
+					while (catchup > _game.TargetElapsedTime) {
+						catchup -= _game.TargetElapsedTime;
+						_updateGameTime.ElapsedGameTime = _game.TargetElapsedTime;
+						_game.DoUpdate (_updateGameTime);
+						_extraElapsedTime += catchup;
+					}
+					if (_extraElapsedTime > _game.TargetElapsedTime) {
+						_game.DoUpdate (_updateGameTime);
+						_extraElapsedTime = TimeSpan.Zero;
+					}
+				}
+				else {
+					_game.DoUpdate (_updateGameTime);
+				}
+								
 			}
 		}
 		
@@ -215,7 +254,7 @@ namespace Microsoft.Xna.Framework
                 return;
 
             // Calculate supported orientations if it has been left as "default" and only default
-            DisplayOrientation supportedOrientations = (deviceManager as GraphicsDeviceManager).SupportedOrientations;			
+            DisplayOrientation supportedOrientations = (deviceManager as GraphicsDeviceManager).SupportedOrientations;					
 			var allowedOrientation = DisplayOrientation.LandscapeLeft; 				
 			if ((supportedOrientations == DisplayOrientation.Default))
 			{
@@ -273,6 +312,16 @@ namespace Microsoft.Xna.Framework
 			{
 				actualOrientation = DisplayOrientation.LandscapeRight;
 			}	
+			/*else 
+			if (_game.GraphicsDevice.PresentationParameters.BackBufferHeight < _game.GraphicsDevice.PresentationParameters.BackBufferWidth)
+			{
+				actualOrientation = DisplayOrientation.LandscapeLeft;
+			}
+			else 
+			if (_game.GraphicsDevice.PresentationParameters.BackBufferHeight > _game.GraphicsDevice.PresentationParameters.BackBufferWidth)
+			{
+				actualOrientation = DisplayOrientation.Portrait;
+			}*/
 			
             switch (currentorientation) {
 
@@ -295,7 +344,7 @@ namespace Microsoft.Xna.Framework
             }
 			
 			
-			CurrentOrientation = actualOrientation;
+			CurrentOrientation = actualOrientation;      
             _game.GraphicsDevice.PresentationParameters.DisplayOrientation = actualOrientation;
             TouchPanel.DisplayOrientation = actualOrientation;
         }
@@ -434,9 +483,13 @@ namespace Microsoft.Xna.Framework
                     _currentOrientation = value;
 
                     if (_currentOrientation == DisplayOrientation.Portrait || _currentOrientation == DisplayOrientation.PortraitUpsideDown)
-                        Game.Activity.SetRequestedOrientation(ScreenOrientation.Portrait);
+				    {
+                        Game.Activity.SetRequestedOrientation(ScreenOrientation.Portrait);						
+				    }
                     else if (_currentOrientation == DisplayOrientation.LandscapeLeft || _currentOrientation == DisplayOrientation.LandscapeRight)
-                        Game.Activity.SetRequestedOrientation(ScreenOrientation.Landscape);
+				    {
+                        Game.Activity.SetRequestedOrientation(ScreenOrientation.Landscape);						
+				    }	
 
                     if (OrientationChanged != null)
                     {

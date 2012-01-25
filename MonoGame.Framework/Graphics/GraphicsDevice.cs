@@ -372,57 +372,10 @@ namespace Microsoft.Xna.Framework.Graphics
             set
             {
                 _scissorRectangle = value;
-
-                switch (this.PresentationParameters.DisplayOrientation)
-                {
-                    case DisplayOrientation.Portrait:
-                        {
-                            _scissorRectangle.Y = _viewport.Height - _scissorRectangle.Y - _scissorRectangle.Height;
-                            break;
-                        }
-
-                    case DisplayOrientation.LandscapeLeft:
-                        {
-                            var x = _scissorRectangle.X;
-                            _scissorRectangle.X = _viewport.Width - _scissorRectangle.Height - _scissorRectangle.Y;
-                            _scissorRectangle.Y = _viewport.Height - _scissorRectangle.Width - x;
-
-                            // Swap Width and Height
-                            var w = _scissorRectangle.Width;
-                            _scissorRectangle.Width = _scissorRectangle.Height;
-                            _scissorRectangle.Height = w;
-                            break;
-                        }
-
-                    case DisplayOrientation.LandscapeRight:
-                        {
-                            // Swap X and Y
-                            var x = _scissorRectangle.X;
-                            _scissorRectangle.X = _scissorRectangle.Y;
-                            _scissorRectangle.Y = x;
-
-                            // Swap Width and Height
-                            var w = _scissorRectangle.Width;
-                            _scissorRectangle.Width = _scissorRectangle.Height;
-                            _scissorRectangle.Height = w;
-                            break;
-                        }
-
-                    case DisplayOrientation.PortraitUpsideDown:
-                        {
-                            _scissorRectangle.Y = _viewport.Height - _scissorRectangle.Height - _scissorRectangle.Y;
-                            _scissorRectangle.X = _viewport.Width - _scissorRectangle.Width - _scissorRectangle.X;
-                            break;
-                        }
-
-                    case DisplayOrientation.Default:
-                        {
-                            _scissorRectangle.Y = _viewport.Height - _scissorRectangle.Y - _scissorRectangle.Height;
-                            break;
-                        }
-                }
 				
 				GLStateManager.SetScissor(_scissorRectangle);
+				
+				_scissorRectangle.Y = _viewport.Height - _scissorRectangle.Y - _scissorRectangle.Height;
             }
         }
 
@@ -1037,7 +990,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
             throw new NotSupportedException();
         }
+		
+		
+		internal void SetViewPort(int Width, int Height)
+		{
+			this._viewport.Width = Width;
+			this._viewport.Height = Height;
+		}
 
     }
 }
-

@@ -70,238 +70,279 @@ using System;
 using System.Drawing;
 using System.IO;
 
-using Microsoft.Xna.Framework.Graphics;
-
 using MonoMac.AppKit;
 using MonoMac.Foundation;
-using Microsoft.Xna.Framework.Input;
+
 using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.GamerServices;
 
 namespace Microsoft.Xna.Framework
 {
-    class MacGamePlatform : GamePlatform
+    partial class MacGamePlatform : GamePlatform
     {
+        private enum RunState
+        {
+            NotStarted,
+            Running,
+            Exiting,
+            Exited
+        }
+
         private MacGameNSWindow _mainWindow;
         private GameWindow _gameWindow;
         private bool _wasResizeable;
-	private OpenALSoundController soundControllerInstance = null;
-	private bool _isShouldDraw = true;
+        private OpenALSoundController soundControllerInstance = null;
 
         public MacGamePlatform(Game game) :
             base(game)
         {
+            _state = RunState.NotStarted;
             game.Services.AddService(typeof(MacGamePlatform), this);
 
-			// Setup our OpenALSoundController to handle our SoundBuffer pools
-			soundControllerInstance = OpenALSoundController.GetInstance;
+            // Setup our OpenALSoundController to handle our SoundBuffer pools
+            soundControllerInstance = OpenALSoundController.GetInstance;
 
+            InitializeMainWindow();
+
+            // We set the current directory to the ResourcePath on Mac
+            Directory.SetCurrentDirectory(NSBundle.MainBundle.ResourcePath);
+        }
+
+        private void InitializeMainWindow()
+        {
             RectangleF frame = new RectangleF(
                 0, 0,
                 PresentationParameters._defaultBackBufferWidth,
                 PresentationParameters._defaultBackBufferHeight);
 
-            // Create a window
             _mainWindow = new MacGameNSWindow(
                 frame, NSWindowStyle.Titled | NSWindowStyle.Closable,
                 NSBackingStore.Buffered, true);
+
+            _mainWindow.WindowController = new NSWindowController(_mainWindow);
+            _mainWindow.Delegate = new MainWindowDelegate(this);
+
             _mainWindow.IsOpaque = true;
             _mainWindow.EnableCursorRects();
             _mainWindow.AcceptsMouseMovedEvents = false;
             _mainWindow.Center();
 
-            _gameWindow = new GameWindow(game, frame);
+            _gameWindow = new GameWindow(Game, frame);
             Window = _gameWindow;
             _mainWindow.ContentView.AddSubview(_gameWindow);
-
-            // We set the current directory to the ResourcePath on Mac
-            Directory.SetCurrentDirectory(NSBundle.MainBundle.ResourcePath);
-
-            // Leave these here for when we implement the Activate and Deactivated
-            _mainWindow.DidBecomeKey += delegate(object sender, EventArgs e) {
-                //if (!IsMouseVisible)
-                //    _gameWindow.HideCursor();
-                //Console.WriteLine("BecomeKey");
-                IsActive = true;
-            };
-
-            _mainWindow.DidResignKey += delegate(object sender, EventArgs e) {
-                //if (!IsMouseVisible)
-                //    _gameWindow.UnHideCursor();
-                //Console.WriteLine("ResignKey");
-                IsActive = false;
-            };
-
-            _mainWindow.DidBecomeMain += delegate(object sender, EventArgs e) {
-                //if (!IsMouseVisible)
-                //    _gameWindow.HideCursor();
-                ////Console.WriteLine("BecomeMain");
-            };
-
-            _mainWindow.DidResignMain += delegate(object sender, EventArgs e) {
-                //if (!IsMouseVisible)
-                //    _gameWindow.UnHideCursor();
-                //Console.WriteLine("ResignMain");
-            };
         }
 
-        ~MacGamePlatform()
+        protected override void Dispose(bool disposing)
         {
-            // FIXME: Does this really apply on OS X?
-            // TODO NSDevice.CurrentDevice.EndGeneratingDeviceOrientationNotifications();
+            if (disposing)
+            {
+                // No need to dispose _gameWindow.  It will be released by the
+                // nearest NSAutoreleasePool.
+                if (_gameWindow != null)
+                    _gameWindow = null;
+
+                // No need to dispose _mainWindow.  It will be released by the
+                // nearest NSAutoreleasePool.
+                if (_mainWindow != null)
+                    _mainWindow = null;
+            }
+
+            base.Dispose(disposing);
         }
+
+        private RunState _state;
+        private RunState State
+        {
+            get { return _state; }
+            set { _state = value; }
+        }
+
+        public bool IsRunning
+        {
+            get { return _state == RunState.Running; }
+        }
+
+        public bool IsExiting
+        {
+            get { return _state == RunState.Exiting; }
+        }
+
+        public bool HasExited
+        {
+            get { return _state == RunState.Exited; }
+        }
+
+        private int _suspendUpdatingAndDrawingLevel;
+        private bool AreUpdatingAndDrawingSuspended
+        {
+            get { return _suspendUpdatingAndDrawingLevel > 0; }
+        }
+
+        public TimeSpan InactiveSleepTime
+        {
+            get { return _inactiveSleepTime; }
+            set
+            {
+                if (value < TimeSpan.Zero)
+                    throw new ArgumentOutOfRangeException("value", "Value cannot be negative");
+                _inactiveSleepTime = value;
+            }
+        }
+
+        [Obsolete("IsPlayingVideo must be removed once VideoPlayer is implemented according to the XNA contract")]
+        public bool IsPlayingVideo { get; set; }
+
+        private void SuspendUpdatingAndDrawing()
+        {
+            _suspendUpdatingAndDrawingLevel++;
+        }
+
+        private void ResumeUpdatingAndDrawing()
+        {
+            if (_suspendUpdatingAndDrawingLevel <= 0)
+                throw new InvalidOperationException("Too many calls to ResumeUpdateAndDraw");
+            _suspendUpdatingAndDrawingLevel--;
+        }
+
+        #region GamePlatform Implementation
 
         public override GameRunBehavior DefaultRunBehavior
         {
             get { return GameRunBehavior.Asynchronous; }
         }
 
-        public bool IsPlayingVideo { get; set; }
-
-        #region GamePlatform Implementation
-
-        public override void Exit()
-        {
-            // FIXME: Should we not simply terminate our run loop, rather than
-            //        forcefully destroying the whole application?
-            NSApplication.SharedApplication.Terminate(new NSObject());
-        }
-
         public override bool BeforeRun()
         {
-            _mainWindow.MakeKeyAndOrderFront(_mainWindow);
-            ResetWindowBounds();
+            State = RunState.Running;
             return true;
         }
 
-        public override void RunLoop()
+        public override void Exit()
         {
-            throw new NotSupportedException("Blocking run loops are not supported on this platform");
+            if (_state != RunState.Running)
+                return;
+
+            _state = RunState.Exiting;
+
+            if (_mainWindow != null)
+            {
+                var windowController = (NSWindowController)_mainWindow.WindowController;
+                windowController.Close();
+            }
         }
 
         public override void StartRunLoop()
         {
-		_gameWindow.StartRunLoop(1 / Game.TargetElapsedTime.TotalSeconds);
-		var graphicsDeviceManager = (GraphicsDeviceManager)Game.Services.GetService(typeof(IGraphicsDeviceManager));
-		// This is a hack and it should go in MonoMacGameView.  Until that is done we will set the SwapInterval ourselves
-		// Using DisplayLink does not play nicely with background thread loading.
-		_gameWindow.OpenGLContext.SwapInterval = graphicsDeviceManager.SynchronizeWithVerticalRetrace;
+            _mainWindow.MakeKeyAndOrderFront(_mainWindow);
+            ResetWindowBounds();
+            _gameWindow.StartRunLoop(1 / Game.TargetElapsedTime.TotalSeconds);
+
+            // This is a hack and it should go in MonoMacGameView.  Until that
+            // is done we will set the SwapInterval ourselves
+            // Using DisplayLink does not play nicely with background thread
+            // loading.
+            var graphicsDeviceManager = (GraphicsDeviceManager)Game.Services.GetService(typeof(IGraphicsDeviceManager));
+            _gameWindow.OpenGLContext.SwapInterval = graphicsDeviceManager.SynchronizeWithVerticalRetrace;
         }
 
         public override bool BeforeUpdate(GameTime gameTime)
         {
-		// Update our OpenAL sound buffer pools
-		soundControllerInstance.Update();
-		if (_needsToResetElapsedTime) {
-			_needsToResetElapsedTime = false;
-		}
-		if (!_isShouldDraw)
-				return false;
-            if (IsPlayingVideo || Guide.isVisible)
+            // Update our OpenAL sound buffer pools
+            soundControllerInstance.Update();
+            if (_needsToResetElapsedTime)
+                _needsToResetElapsedTime = false;
+
+            if (AreUpdatingAndDrawingSuspended || IsPlayingVideo || Guide.isVisible)
                 return false;
             return true;
         }
-
-		internal bool IsCanUpdateDraw {
-			get {
-				return _isShouldDraw;
-			}
-			set {
-				if (_isShouldDraw != value) {
-					_isShouldDraw = value;
-				}
-			}
-		}
 
         public override bool BeforeDraw(GameTime gameTime)
         {
-		if (!_isShouldDraw)
-				return false;
-            if (IsPlayingVideo || Guide.isVisible)
+            if (AreUpdatingAndDrawingSuspended || IsPlayingVideo || Guide.isVisible)
                 return false;
             return true;
         }
 
-		public void EnterBackground ()
-		{
-			_isShouldDraw = false;
-			IsActive = false;
-		}
-
-		public void EnterForeground ()
-		{
-			_isShouldDraw = true;
-			IsActive = true;
-		}
-
         public override void EnterFullScreen()
         {
-            bool wasActive = IsCanUpdateDraw;
-            IsCanUpdateDraw = false;
+            // Changing window style forces a redraw. Some games
+            // have fail-logic and toggle fullscreen in their draw function,
+            // so temporarily become inactive so it won't execute.
+            SuspendUpdatingAndDrawing();
+            try
+            {
+                // I will leave this here just in case someone can figure out
+                // how to do a full screen with this and still get Alt + Tab to
+                // friggin work.
+                //_mainWindow.ContentView.EnterFullscreenModeWithOptions(NSScreen.MainScreen,new NSDictionary());
 
-            // I will leave this here just in case someone can figure out how
-            // to do a full screen with this and still get Alt + Tab to friggin
-            // work.
-            //_mainWindow.ContentView.EnterFullscreenModeWithOptions(NSScreen.MainScreen,new NSDictionary());
+                _wasResizeable = AllowUserResizing;
 
-            _wasResizeable = AllowUserResizing;
+                string oldTitle = _gameWindow.Title;
 
-            string oldTitle = _gameWindow.Title;
+                NSMenu.MenuBarVisible = false;
+                _mainWindow.StyleMask = NSWindowStyle.Borderless;
 
-            NSMenu.MenuBarVisible = false;
-            _mainWindow.StyleMask = NSWindowStyle.Borderless;
+                // Set the level here to normal
+                _mainWindow.Level = NSWindowLevel.Floating;
 
-            // Set the level here to normal
-            _mainWindow.Level = NSWindowLevel.Floating;
+                if (oldTitle != null)
+                    _gameWindow.Title = oldTitle;
 
-            if (oldTitle != null)
-                _gameWindow.Title = oldTitle;
-
-            Window.Window.IsVisible = false;
-            Window.Window.MakeKeyAndOrderFront(Window);
-            ResetWindowBounds();
-            _mainWindow.HidesOnDeactivate = true;
-            Window.Window.HidesOnDeactivate = true;
-            Mouse.ResetMouse();
-
-            IsCanUpdateDraw = wasActive;
+                _mainWindow.IsVisible = false;
+                // FIXME: EnterFullScreen gets called very early and interferes
+                //        with Synchronous mode, so disabling this for now.
+                //        Hopefully this does not cause excessive havoc.
+                //_mainWindow.MakeKeyAndOrderFront(Window);
+                ResetWindowBounds();
+                _mainWindow.HidesOnDeactivate = true;
+                Mouse.ResetMouse();
+            }
+            finally { ResumeUpdatingAndDrawing(); }
         }
 
         public override void ExitFullScreen()
         {
-            _wasResizeable = AllowUserResizing;
-
             // Changing window style forces a redraw. Some games
             // have fail-logic and toggle fullscreen in their draw function,
             // so temporarily become inactive so it won't execute.
-            bool wasActive = IsCanUpdateDraw;
-            IsCanUpdateDraw = false;
+            SuspendUpdatingAndDrawing();
+            try
+            {
+                _wasResizeable = AllowUserResizing;
 
-            // I will leave this here just in case someone can figure out how to do
-            //  a full screen with this and still get Alt + Tab to friggin work.
-//            _mainWindow.ContentView.ExitFullscreenModeWithOptions(new NSDictionary());
+                // I will leave this here just in case someone can figure out
+                // how to do a full screen with this and still get Alt + Tab to
+                // friggin work.
+                // _mainWindow.ContentView.ExitFullscreenModeWithOptions(new NSDictionary());
 
-            //Changing window style resets the title. Save it.
-            string oldTitle = _gameWindow.Title;
+                //Changing window style resets the title. Save it.
+                string oldTitle = _gameWindow.Title;
 
-            NSMenu.MenuBarVisible = true;
-            _mainWindow.StyleMask = NSWindowStyle.Titled | NSWindowStyle.Closable;
-            if (_wasResizeable)
-                _mainWindow.StyleMask |= NSWindowStyle.Resizable;
+                NSMenu.MenuBarVisible = true;
+                _mainWindow.StyleMask = NSWindowStyle.Titled | NSWindowStyle.Closable;
+                if (_wasResizeable)
+                    _mainWindow.StyleMask |= NSWindowStyle.Resizable;
 
-            if (oldTitle != null)
-                _gameWindow.Title = oldTitle;
+                if (oldTitle != null)
+                    _gameWindow.Title = oldTitle;
 
-            // Set the level here to normal
-            _mainWindow.Level = NSWindowLevel.Normal;
+                // Set the level here to normal
+                _mainWindow.Level = NSWindowLevel.Normal;
 
-            Window.Window.IsVisible = false;
-            Window.Window.MakeKeyAndOrderFront(Window);
-            ResetWindowBounds();
-            _mainWindow.HidesOnDeactivate = false;
-            Mouse.ResetMouse();
-
-            IsCanUpdateDraw = wasActive;
+                _mainWindow.IsVisible = false;
+                // FIXME: EnterFullScreen gets called very early and interferes
+                //        with Synchronous mode, so disabling this for now.
+                //        Hopefully this does not cause excessive havoc.
+                //_mainWindow.MakeKeyAndOrderFront(Window);
+                ResetWindowBounds();
+                _mainWindow.HidesOnDeactivate = false;
+                Mouse.ResetMouse();
+            }
+            finally { ResumeUpdatingAndDrawing(); }
         }
 
         protected override void OnIsMouseVisibleChanged()
@@ -309,12 +350,37 @@ namespace Microsoft.Xna.Framework
             _mainWindow.InvalidateCursorRectsForView(_gameWindow);
         }
 
+        public override void BeginScreenDeviceChange(bool willBeFullScreen)
+        {
+        }
+
+        public override void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight)
+        {
+        }
+
+        public override void ResetElapsedTime()
+        {
+            _gameWindow.ResetElapsedTime();
+        }
+
         #endregion
 
-        internal bool AllowUserResizing
+        private bool AllowUserResizing
         {
             get { return (_mainWindow.StyleMask & NSWindowStyle.Resizable) != 0; }
             set { _mainWindow.StyleMask ^= NSWindowStyle.Resizable; }
+        }
+
+        public void EnterBackground()
+        {
+            SuspendUpdatingAndDrawing();
+            IsActive = false;
+        }
+
+        public void EnterForeground()
+        {
+            ResumeUpdatingAndDrawing();
+            IsActive = true;
         }
 
         private void ResetWindowBounds()
@@ -352,9 +418,9 @@ namespace Microsoft.Xna.Framework
 
             // Now we set our Presentation Parameters
             var device = (GraphicsDevice)graphicsDeviceManager.GraphicsDevice;
-            // HACK: Eliminate the need for null checks by only calling
-            //       ResetWindowBounds after the device is ready.  Or,
-            //       possibly break this method into smaller methods.
+            // FIXME: Eliminate the need for null checks by only calling
+            //        ResetWindowBounds after the device is ready.  Or,
+            //        possibly break this method into smaller methods.
             if (device != null)
             {
                 PresentationParameters parms = device.PresentationParameters;
@@ -371,35 +437,52 @@ namespace Microsoft.Xna.Framework
             return _mainWindow.Frame.Height - contentRect.Height;
         }
 
-		public override void BeginScreenDeviceChange (bool willBeFullScreen)
-		{
 
-		}
+        private class MainWindowDelegate : NSWindowDelegate
+        {
+            private readonly MacGamePlatform _owner;
+            public MainWindowDelegate(MacGamePlatform owner)
+            {
+                if (owner == null)
+                    throw new ArgumentNullException("owner");
+                _owner = owner;
+            }
 
-		public override void EndScreenDeviceChange (string screenDeviceName, int clientWidth,int clientHeight)
-		{
+            public override void DidBecomeKey(NSNotification notification)
+            {
+                //if (!IsMouseVisible)
+                //    _gameWindow.HideCursor();
+                _owner.IsActive = true;
+            }
 
-		}
+            public override void DidResignKey(NSNotification notification)
+            {
+                //if (!IsMouseVisible)
+                //    _gameWindow.UnHideCursor();
+                _owner.IsActive = false;
+            }
 
-		public override void ResetElapsedTime ()
-		{
-			_gameWindow.ResetElapsedTime();
-		}
+            public override void DidBecomeMain(NSNotification notification)
+            {
+                //if (!IsMouseVisible)
+                //    _gameWindow.HideCursor();
+            }
 
-		public TimeSpan InactiveSleepTime
-		{
-			get
-			{
-				return this._inactiveSleepTime;
-			}
-			set
-			{
-				if (value < TimeSpan.Zero)
-				{
-				  throw new ArgumentOutOfRangeException("value", "Value can not be zero");
-				}
-				this._inactiveSleepTime = value;
-			}
-		}
+            public override void DidResignMain(NSNotification notification)
+            {
+                //if (!IsMouseVisible)
+                //    _gameWindow.UnHideCursor();
+            }
+
+            public override void WillClose(NSNotification notification)
+            {
+                NSApplication.SharedApplication.BeginInvokeOnMainThread(() =>
+                    _owner.State = MacGamePlatform.RunState.Exited);
+            }
+        }
+
+        #region _mainWindow Event Handlers
+
+        #endregion _mainWindow Event Handlers
     }
 }

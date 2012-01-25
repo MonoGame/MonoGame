@@ -396,6 +396,7 @@
     <Compile Include="Graphics\GraphicsAdapter.cs" />
     <Compile Include="Audio\AudioCategory.cs" />
     <Compile Include="Graphics\ESTexture2D.cs" />
+    <Compile Include="Graphics\Vertices\IndexElementSize.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>

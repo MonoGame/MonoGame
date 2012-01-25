@@ -16,40 +16,39 @@ namespace Microsoft.Xna.Framework.Graphics
 {
 	public class VertexBuffer : GraphicsResource
 	{
-		private GraphicsDevice Graphics;
+	    private readonly BufferUsage _bufferUsage;
+	    private readonly VertexDeclaration _vertexDeclaration;
+
 		internal Type _type;
-		//private int _vertexCount;
-		private BufferUsage _bufferUsage;
-		internal object _buffer = null;
+		internal object _buffer;
 		internal IntPtr _bufferPtr;
-		internal int _bufferIndex = 0;
+		internal int _bufferIndex;
 		internal int _size;
-		internal static int _bufferCount = 0;
-		internal uint _bufferStore; 
-		// allow for 50 buffers initially
+		internal uint _bufferStore;
+		// TODO: Remove this VB limit!
+		internal static int _bufferCount;
 		internal static VertexBuffer[] _allBuffers = new VertexBuffer[50];
 		internal static List<Action> _delayedBufferDelegates = new List<Action> ();
-		private VertexDeclaration vertexDeclaration = null;
 
-		public VertexBuffer (GraphicsDevice Graphics, Type type, int vertexCount, BufferUsage bufferUsage)
+		public VertexBuffer (GraphicsDevice graphics, Type type, int vertexCount, BufferUsage bufferUsage)
 		{
-			this.Graphics = Graphics;
-			this._type = type;
+			graphicsDevice = graphics;
+			_type = type;
 			VertexCount = vertexCount;
-			this._bufferUsage = bufferUsage;
+			_bufferUsage = bufferUsage;
 		}
 		
 		public VertexBuffer (GraphicsDevice Graphics, VertexDeclaration vertexDecs, int vertexCount, BufferUsage bufferUsage)
 			: this (Graphics, vertexDecs.GetType(), vertexCount, bufferUsage)
 		{
-			vertexDeclaration = vertexDecs;
+			_vertexDeclaration = vertexDecs;
 		}
 		
 		public int VertexCount { get; set; }
 
 		public VertexDeclaration VertexDeclaration {
 			get {
-				return vertexDeclaration;
+				return _vertexDeclaration;
 			}
 		}
 
@@ -61,7 +60,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			_delayedBufferDelegates.Clear ();
 		}
 
-		//internal void GenerateBuffer<T>() where T : struct, IVertexType
 		internal void GenerateBuffer<T> () where T : struct
 		{
 			var vd = VertexDeclaration.FromType (_type);
@@ -76,10 +74,10 @@ namespace Microsoft.Xna.Framework.Graphics
 			GL.GenBuffers (1, out _bufferStore);
 #endif
 			GL.BindBuffer (BufferTarget.ArrayBuffer, _bufferStore);
-			GL.BufferData<T> (BufferTarget.ArrayBuffer, (IntPtr)_size, (T[])_buffer, bufferUsage);			
+			GL.BufferData (BufferTarget.ArrayBuffer, (IntPtr)_size, (T[])_buffer, bufferUsage);			
 		}
 
-		public unsafe void GetData<T> (T[] vertices) where T : IVertexType
+		public void GetData<T> (T[] vertices) where T : struct
 		{
 			if (_buffer == null)
 				throw new Exception ("Can't get data on an empty buffer");
@@ -89,8 +87,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				vertices [i] = _tbuff [i];
 		}
 
-		//public unsafe void SetData<T>(T[] vertices) where T : struct, IVertexType
-		public unsafe void SetData<T> (T[] vertices) where T : struct
+		public void SetData<T> (T[] vertices) where T : struct
 		{
 			//the creation of the buffer should mb be moved to the constructor and then glMapBuffer and Unmap should be used to update it
 			//glMapBuffer - sets data
@@ -118,19 +115,14 @@ namespace Microsoft.Xna.Framework.Graphics
 			throw new NotImplementedException();
 		}
 
-		public void Dispose ()
+		public override void Dispose ()
 		{
 #if IPHONE
 			GL.GenBuffers(0, ref _bufferStore);
 #else			
 			GL.GenBuffers (0, out _bufferStore);
 #endif
-		}
-
-		public bool IsContentLost { 
-			get {
-				return Graphics.IsContentLost;
-			}
+            base.Dispose();
 		}
 	}
 
@@ -145,6 +137,16 @@ namespace Microsoft.Xna.Framework.Graphics
 			: base (graphics,vertexDecs, vertexCount,bufferUsage)
 		{
 
+		}
+		
+		public void SetData<T>(T[] data, int startIndex, int elementCount, SetDataOptions options) where T : struct
+		{
+		    throw new NotImplementedException();
+		}
+		
+		public void SetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, SetDataOptions options) where T : struct
+		{
+		    throw new NotImplementedException();
 		}
 	}
 }

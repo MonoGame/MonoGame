@@ -61,6 +61,8 @@ namespace Microsoft.Xna.Framework
 		//private readonly Rectangle clientBounds;
 		private Rectangle clientBounds;
 		private Game _game;
+        private MacGamePlatform _platform;
+
 		private GameTime _updateGameTime;
 		private GameTime _drawGameTime;
 		private DateTime _lastUpdate;
@@ -75,6 +77,7 @@ namespace Microsoft.Xna.Framework
             if (game == null)
                 throw new ArgumentNullException("game");
             _game = game;
+            _platform = (MacGamePlatform)_game.Services.GetService(typeof(MacGamePlatform));
 
 			//LayerRetainsBacking = false; 
 			//LayerColorFormat	= EAGLColorFormat.RGBA8;
@@ -166,6 +169,12 @@ namespace Microsoft.Xna.Framework
 		{
 			base.OnRenderFrame (e);
 
+            // FIXME: Since Game.Exit may be called during an Update loop (and
+            //        in fact that is quite likely to happen), this code is now
+            //        littered with checks to _platform.IsRunning.  It would be
+            //        nice if there weren't quite so many.  The move to a
+            //        Game.Tick-centric architecture may eliminate this problem
+            //        automatically.
 			if (_game != null) {
 
 				_now = DateTime.Now;
@@ -190,22 +199,26 @@ namespace Microsoft.Xna.Framework
 						//Console.WriteLine("Catching up " + (catchup - _game.TargetElapsedTime));
 						catchup -= _game.TargetElapsedTime;
 						_drawGameTime.ElapsedGameTime = _game.TargetElapsedTime;
-						_game.DoUpdate (_drawGameTime);
+                        if (_platform.IsRunning)
+    						_game.DoUpdate (_drawGameTime);
 						_extraElapsedTime += catchup;
 					}
 					if (_extraElapsedTime > _game.TargetElapsedTime) {
 						//Console.WriteLine("FastForward " + _extraElapsedTime);
-						_game.DoUpdate (_drawGameTime);
+                        if (_platform.IsRunning)
+    						_game.DoUpdate (_drawGameTime);
 						_extraElapsedTime = TimeSpan.Zero;
 					}
 				}
 				else {
-					_game.DoUpdate (_drawGameTime);
+                    if (_platform.IsRunning)
+    					_game.DoUpdate (_drawGameTime);
 				}
 
 				//Console.WriteLine("Render " + _drawGameTime.ElapsedGameTime);
 //				_game.DoUpdate(_drawGameTime);
-				_game.DoDraw (_drawGameTime);
+                if (_platform.IsRunning)
+    				_game.DoDraw (_drawGameTime);
 				_lastUpdate = _now;
 			}
 

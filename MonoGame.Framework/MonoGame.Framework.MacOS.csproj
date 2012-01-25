@@ -219,7 +219,6 @@
     <Compile Include="Graphics\Vertices\VertexPositionColor.cs" />
     <Compile Include="Graphics\Vertices\VertexPositionNormalTexture.cs" />
     <Compile Include="Graphics\Vertices\VertexPositionTexture.cs" />
-    <Compile Include="MacOS\Graphics\Vertices\IndexBuffer.cs" />
     <Compile Include="MacOS\Graphics\Vertices\VertexDeclaration.cs" />
     <Compile Include="MacOS\GameWindow.cs" />
     <Compile Include="PreparingDeviceSettingsEventArgs.cs" />
@@ -320,6 +319,8 @@
     <Compile Include="Input\GamePadType.cs" />
     <Compile Include="Graphics\Vertices\VertexElementColor.cs" />
     <Compile Include="Graphics\Vertices\IndexElementSize.cs" />
+    <Compile Include="Graphics\Vertices\IndexBuffer.cs" />
+    <Compile Include="Graphics\Vertices\VertexBuffer.cs" />
     <Compile Include="Audio\XactSound.cs" />
     <Compile Include="Audio\XactClip.cs" />
     <Compile Include="Game.cs" />
@@ -363,7 +364,7 @@
     <Compile Include="Graphics\States\GLStateManager.cs" />
     <Compile Include="Graphics\Effect\EffectPass.cs" />
     <Compile Include="Graphics\GraphicsExtensions.cs" />
-    <Compile Include="Graphics\Vertices\VertexBuffer.cs" />
+    <Compile Include="MacOS\MacGamePlatform+Synchronous.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />

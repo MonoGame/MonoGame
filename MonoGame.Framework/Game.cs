@@ -81,7 +81,6 @@ using Microsoft.Xna.Framework.Input.Touch;
 namespace Microsoft.Xna.Framework
 {
     public class Game : IDisposable
-
     {
         private const float DefaultTargetFramesPerSecond = 60.0f;
 
@@ -118,6 +117,8 @@ namespace Microsoft.Xna.Framework
 
         public Game()
         {
+            _instance = this;
+		    Exiting += OnExiting;
             _services = new GameServiceContainer();
             _components = new GameComponentCollection();
             _content = new ContentManager(_services);
@@ -133,8 +134,15 @@ namespace Microsoft.Xna.Framework
             Dispose(false);
         }
 
+		[System.Diagnostics.Conditional("DEBUG")]
+		internal void Log(string Message)
+		{
+			if (_platform != null) _platform.Log(Message);
+		}
+
         #region IDisposable Implementation
 
+        private bool _isDisposed;
         public void Dispose()
         {
             Dispose(true);
@@ -147,6 +155,18 @@ namespace Microsoft.Xna.Framework
             {
                 _platform.Dispose();
             }
+            _isDisposed = true;
+        }
+
+        [System.Diagnostics.DebuggerNonUserCode]
+        private void AssertNotDisposed()
+        {
+            if (_isDisposed)
+            {
+                string name = GetType().Name;
+                throw new ObjectDisposedException(
+                    name, string.Format("The {0} object was used after being Disposed.", name));
+            }
         }
 
         #endregion IDisposable Implementation
@@ -156,6 +176,8 @@ namespace Microsoft.Xna.Framework
 #if ANDROID
         public static AndroidGameActivity Activity { get; set; }
 #endif
+        private static Game _instance = null;
+        internal static Game Instance { get { return Game._instance; } }
 
         public GameComponentCollection Components
         {
@@ -263,10 +285,6 @@ namespace Microsoft.Xna.Framework
         #endregion
 
         #region Public Methods
-        
-        protected virtual void OnExiting (Object sender, EventArgs args) {
-          
-        }
 
         public void Exit()
         {
@@ -292,6 +310,7 @@ namespace Microsoft.Xna.Framework
 
         public void Run(GameRunBehavior runBehavior)
         {
+            AssertNotDisposed();
             if (!_platform.BeforeRun())
                 return;
 
@@ -392,6 +411,10 @@ namespace Microsoft.Xna.Framework
             _updateables.ForEachFilteredItem(UpdateAction, gameTime);
         }
 
+        protected virtual void OnExiting(object sender, EventArgs args)
+        {
+        }
+
         #endregion Protected Methods
 
         #region Event Handlers
@@ -413,6 +436,8 @@ namespace Microsoft.Xna.Framework
 
         private void Platform_AsyncRunLoopEnded(object sender, EventArgs e)
         {
+            AssertNotDisposed();
+
             var platform = (GamePlatform)sender;
             platform.AsyncRunLoopEnded -= Platform_AsyncRunLoopEnded;
             EndRun();
@@ -420,11 +445,13 @@ namespace Microsoft.Xna.Framework
 
         private void Platform_Activated(object sender, EventArgs e)
         {
+            AssertNotDisposed();
             Raise(Activated, e);
         }
 
         private void Platform_Deactivated(object sender, EventArgs e)
         {
+            AssertNotDisposed();
             Raise(Deactivated, e);
         }
 
@@ -457,12 +484,14 @@ namespace Microsoft.Xna.Framework
 
         internal void DoUpdate(GameTime gameTime)
         {
+            AssertNotDisposed();
             if (_platform.BeforeUpdate(gameTime))
                 Update(gameTime);
         }
 
         internal void DoDraw(GameTime gameTime)
         {
+            AssertNotDisposed();
             // Draw and EndDraw should not be called if BeginDraw returns false.
             // http://stackoverflow.com/questions/4054936/manual-control-over-when-to-redraw-the-screen/4057180#4057180
             // http://stackoverflow.com/questions/4235439/xna-3-1-to-4-0-requires-constant-redraw-or-will-display-a-purple-screen
@@ -475,6 +504,8 @@ namespace Microsoft.Xna.Framework
 
         internal void DoInitialize()
         {
+            AssertNotDisposed();
+            _platform.BeforeInitialize();
             Initialize();
         }
 
@@ -596,13 +627,15 @@ namespace Microsoft.Xna.Framework
                 _sortChangedSubscriber = sortChangedSubscriber;
                 _sortChangedUnsubscriber = sortChangedUnsubscriber;
 
-                _addJournalSortComparison = (x, y) =>
-                {
-                    int result = _sort(x.Item, y.Item);
-                    if (result != 0)
-                        return result;
-                    return x.Order - y.Order;
-                };
+                _addJournalSortComparison = CompareAddJournalEntry;
+            }
+
+            private int CompareAddJournalEntry(AddJournalEntry x, AddJournalEntry y)
+            {
+                int result = _sort((T)x.Item, (T)y.Item);
+                if (result != 0)
+                    return result;
+                return x.Order - y.Order;
             }
 
             public void ForEachFilteredItem<TUserData>(Action<T, TUserData> action, TUserData userData)
@@ -730,7 +763,7 @@ namespace Microsoft.Xna.Framework
 
                 while (iItems < _items.Count && iAddJournal < _addJournal.Count)
                 {
-                    var addJournalItem = _addJournal[iAddJournal].Item;
+                    var addJournalItem = (T)_addJournal[iAddJournal].Item;
                     // If addJournalItem is less than (belongs before)
                     // _items[iItems], insert it.
                     if (_sort(addJournalItem, _items[iItems]) < 0)
@@ -748,7 +781,7 @@ namespace Microsoft.Xna.Framework
                 // If _addJournal had any "tail" items, append them all now.
                 for (; iAddJournal < _addJournal.Count; ++iAddJournal)
                 {
-                    var addJournalItem = _addJournal[iAddJournal].Item;
+                    var addJournalItem = (T)_addJournal[iAddJournal].Item;
                     SubscribeToItemEvents(addJournalItem);
                     _items.Add(addJournalItem);
                 }
@@ -791,31 +824,38 @@ namespace Microsoft.Xna.Framework
                 UnsubscribeFromItemEvents(item);
                 InvalidateCache();
             }
+        }
 
-            private struct AddJournalEntry
+        // For iOS, the AOT compiler can't seem to handle a
+        // List<AddJournalEntry<T>>, so unfortunately we'll use object
+        // for storage.
+        private struct AddJournalEntry
+        {
+            public readonly int Order;
+            public readonly object Item;
+
+            public AddJournalEntry(int order, object item)
             {
-                public readonly int Order;
-                public readonly T Item;
+                Order = order;
+                Item = item;
+            }
 
-                public AddJournalEntry(int order, T item)
-                {
-                    Order = order;
-                    Item = item;
-                }
+            public static AddJournalEntry CreateKey(object item)
+            {
+                return new AddJournalEntry(-1, item);
+            }
 
-                public static AddJournalEntry CreateKey(T item)
-                {
-                    return new AddJournalEntry(-1, item);
-                }
+            public override int GetHashCode()
+            {
+                return Item.GetHashCode();
+            }
 
-                public override bool Equals(object obj)
-                {
-                    if (!(obj is AddJournalEntry))
-                        return false;
+            public override bool Equals(object obj)
+            {
+                if (!(obj is AddJournalEntry))
+                    return false;
 
-                    return EqualityComparer<T>.Default.Equals(
-                        Item, ((AddJournalEntry)obj).Item);
-                }
+                return object.Equals(Item, ((AddJournalEntry)obj).Item);
             }
         }
     }

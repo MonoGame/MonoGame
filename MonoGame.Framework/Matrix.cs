@@ -1755,6 +1755,12 @@ namespace Microsoft.Xna.Framework
             result.M43 = matrix.M34;
             result.M44 = matrix.M44;
         }
+
+        public bool Decompose(out Vector3 scale, out Quaternion rotation, out Vector3 translation)
+        {
+            throw new NotImplementedException();
+        }
+
         #endregion Public Methods
 		
 		#region Private Static Methods

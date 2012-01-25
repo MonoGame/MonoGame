@@ -86,6 +86,9 @@
     <Reference Include="GamepadConfigControls">
       <HintPath>..\ThirdParty\GamepadConfig\GamepadConfigControls.dll</HintPath>
     </Reference>
+    <Reference Include="OpenTK, Version=1.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
+      <HintPath>..\ThirdParty\Libs\OpenTK.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Web" />
@@ -97,20 +100,15 @@
     <Reference Include="Tao.Sdl">
       <HintPath>..\ThirdParty\GamepadConfig\Tao.Sdl.dll</HintPath>
     </Reference>
-    <Reference Include="OpenTK">
-      <HintPath>..\..\OpenTK1.0\Binaries\OpenTK\Release\OpenTK.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Desktop\Audio\SoundEffectInstance.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="GamePlatform.cs" />
+    <Compile Include="Graphics\Vertices\IndexBuffer.cs" />
+    <Compile Include="Graphics\Vertices\IndexElementSize.cs" />
+    <Compile Include="Graphics\Vertices\VertexBuffer.cs" />
     <Compile Include="Input\GamePadDeadZone.cs" />
-    <Compile Include="Linux\Graphics\GraphicsDevice.cs" />
-    <Compile Include="Linux\Graphics\RenderTarget2D.cs" />
-    <Compile Include="Linux\Graphics\Vertices\IndexBuffer.cs" />
-    <Compile Include="Linux\Graphics\Vertices\VertexBuffer.cs" />
-    <Compile Include="Linux\Graphics\Vertices\VertexDeclaration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Audio\AudioChannels.cs" />
     <Compile Include="Audio\AudioEmitter.cs" />
@@ -267,8 +265,10 @@
     <Compile Include="Windows\Graphics\ESImage.cs" />
     <Compile Include="Windows\Graphics\ESTexture2D.cs" />
     <Compile Include="Windows\Graphics\GraphicsAdapter.cs" />
+    <Compile Include="Windows\Graphics\GraphicsDevice.cs" />
     <Compile Include="Windows\Graphics\PresentationParameters.cs" />
     <Compile Include="Windows\Graphics\RenderState.cs" />
+    <Compile Include="Windows\Graphics\RenderTarget2D.cs" />
     <Compile Include="Windows\Graphics\SpriteBatch.cs" />
     <Compile Include="Windows\Graphics\SpriteBatcher.cs" />
     <Compile Include="Windows\Graphics\Texture2D.cs" />

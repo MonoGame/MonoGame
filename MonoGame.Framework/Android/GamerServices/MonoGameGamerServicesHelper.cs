@@ -155,6 +155,7 @@ namespace Microsoft.Xna.Framework.GamerServices
                 SignedInGamer sig = new SignedInGamer();
                 sig.DisplayName = name;
                 sig.Gamertag = name;
+				sig.IsSignedInToLive = false;
 
                 Gamer.SignedInGamers.Add(sig);
 

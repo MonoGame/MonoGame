@@ -35,7 +35,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 #if ES11
         public static void TextureCoordArray(bool enable)
-        {
+        {			
             if (enable && (_textureCoordArray != GLStateEnabled.True))
                 GL.EnableClientState(ArrayCap.TextureCoordArray);
             else
