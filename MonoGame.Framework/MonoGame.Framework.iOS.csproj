@@ -382,6 +382,7 @@
       <Link>iOS\Audio\SoundEffectInstance.cs</Link>
     </Compile>
     <Compile Include="Graphics\Vertices\IndexElementSize.cs" />
+    <Compile Include="LaunchParameters.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
