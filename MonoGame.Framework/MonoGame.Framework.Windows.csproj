@@ -105,6 +105,7 @@
     <Compile Include="Desktop\Audio\SoundEffectInstance.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="GamePlatform.cs" />
+    <Compile Include="GamerServices\GamerServicesDispatcher.cs" />
     <Compile Include="Graphics\Effect\AlphaTestEffect.cs" />
     <Compile Include="Graphics\Effect\AlphaTestEffectCode.cs" />
     <Compile Include="Graphics\Effect\EffectHelpers.cs" />
