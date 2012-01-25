@@ -8,7 +8,7 @@
     <ProjectGuid>{7DE47032-A904-4C29-BD22-2D235E8D91BA}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>MonoGame.Framework</RootNamespace>
+    <RootNamespace>Microsoft.Xna.Framework</RootNamespace>
     <AssemblyName>MonoGame.Framework.Windows</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <FileUpgradeFlags>
