@@ -150,12 +150,22 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 #if ES11
 			int size = sizeof(float)*4+sizeof(uint);
-			GL.VertexPointer(2,VertexPointerType.Float,size,_vertexHandle.AddrOfPinnedObject() );
-			GL.ColorPointer(4, ColorPointerType.UnsignedByte,size,(IntPtr)((uint)_vertexHandle.AddrOfPinnedObject()+(uint)(sizeof(float)*2)));
-			GL.TexCoordPointer(2, TexCoordPointerType.Float,size,(IntPtr)((uint)_vertexHandle.AddrOfPinnedObject()+(uint)(sizeof(float)*2+sizeof(uint))) );
+			GL.VertexPointer(2,
+			                 VertexPointerType.Float,
+			                 size,
+			                 _vertexHandle.AddrOfPinnedObject() );
+			GL.ColorPointer(4,
+			                ColorPointerType.UnsignedByte,
+			                size,
+			                (IntPtr)((uint)_vertexHandle.AddrOfPinnedObject()+(uint)(sizeof(float)*2)));
+			GL.TexCoordPointer(2,
+			                   TexCoordPointerType.Float,
+			                   size,
+			                   (IntPtr)((uint)_vertexHandle.AddrOfPinnedObject()+(uint)(sizeof(float)*2+sizeof(uint))) );
 #else
 			GL.EnableVertexAttribArray(GraphicsDevice.attributePosition);
 			GL.EnableVertexAttribArray(GraphicsDevice.attributeTexCoord);
+			GL.EnableVertexAttribArray(GraphicsDevice.attributeColor);
 			
 			int size = VertexPosition2ColorTexture.GetSize();
 			GL.VertexAttribPointer(GraphicsDevice.attributePosition,
@@ -164,12 +174,22 @@ namespace Microsoft.Xna.Framework.Graphics
 			                       false,
 			                       size,
 			                       _vertexHandle.AddrOfPinnedObject());
+
+			GL.VertexAttribPointer(GraphicsDevice.attributeColor,
+			                       4,
+			                       VertexAttribPointerType.UnsignedByte,
+			                       false,
+			                       size,
+			                       (IntPtr)((uint)_vertexHandle.AddrOfPinnedObject()
+			         					+(uint)(sizeof(float)*2)));
+
 			GL.VertexAttribPointer(GraphicsDevice.attributeTexCoord,
 			                       2,
 			                       VertexAttribPointerType.Float,
 			                       false,
 			                       size,
-			                       (IntPtr)((uint)_vertexHandle.AddrOfPinnedObject()+(uint)(sizeof(float)*2+sizeof(uint))));
+			                       (IntPtr)((uint)_vertexHandle.AddrOfPinnedObject()
+			         					+(uint)(sizeof(float)*2+sizeof(uint))));
 #endif
 				
 			// setup the vertexArray array

@@ -29,7 +29,6 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		MojoShader.MOJOSHADER_symbol[] symbols;
 		MojoShader.MOJOSHADER_sampler[] samplers;
-		MojoShader.MOJOSHADER_attribute[] attributes;
 		
 		DXPreshader preshader;
 		
@@ -80,9 +79,10 @@ namespace Microsoft.Xna.Framework.Graphics
 			samplers = DXHelper.UnmarshalArray<MojoShader.MOJOSHADER_sampler>(
 					parseData.samplers, parseData.sampler_count);
 			
-			attributes = DXHelper.UnmarshalArray<MojoShader.MOJOSHADER_attribute>(
+			MojoShader.MOJOSHADER_attribute[] attributes =
+				DXHelper.UnmarshalArray<MojoShader.MOJOSHADER_attribute>(
 					parseData.attributes, parseData.attribute_count);
-			
+
 			foreach (MojoShader.MOJOSHADER_symbol symbol in symbols) {
 				switch (symbol.register_set) {
 				case MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_BOOL:
@@ -131,16 +131,16 @@ namespace Microsoft.Xna.Framework.Graphics
 					//since attributes are bound to programs, not shaders
 					//Can't just bind to builtin names as that causes perforance issues
 					case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_COLOR:
-						glslCode = glslCode.Replace (attrb.name, "g_Color");
+						glslCode = glslCode.Replace (attrb.name, "aColor");
 						break;
 					case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_POSITION:
-						glslCode = glslCode.Replace (attrb.name, "g_Position");
+						glslCode = glslCode.Replace (attrb.name, "aVertex");
 						break;
 					case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_TEXCOORD:
-						glslCode = glslCode.Replace (attrb.name, "g_TexCoord");
+						glslCode = glslCode.Replace (attrb.name, "aTexCoord");
 						break;
 					case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_NORMAL:
-						glslCode = glslCode.Replace (attrb.name, "g_Normal");
+						glslCode = glslCode.Replace (attrb.name, "aNormal");
 						break;
 #endif
 					default:

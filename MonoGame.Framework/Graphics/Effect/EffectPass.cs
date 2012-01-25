@@ -71,10 +71,30 @@ namespace Microsoft.Xna.Framework.Graphics
 			//If we have what we need, link now
 			if ( (needPixelShader == (pixelShader != null)) &&
 				 (needVertexShader == (vertexShader != null))) {
-				GL.LinkProgram (shaderProgram);
+				Link();
 			}
 			
         }
+
+		private void Link ()
+		{
+#if !ES11
+			//bind attributes. Default ones use in GL 1.1
+			GL.BindAttribLocation(shaderProgram,
+			                      GraphicsDevice.attributePosition,
+			                      "aPosition");
+			GL.BindAttribLocation(shaderProgram,
+				                  GraphicsDevice.attributeTexCoord,
+				                  "aTexCoord");
+			GL.BindAttribLocation(shaderProgram,
+			                      GraphicsDevice.attributeColor,
+			                      "aColor");
+			GL.BindAttribLocation(shaderProgram,
+			                      GraphicsDevice.attributeNormal,
+			                      "aNormal");
+#endif
+			GL.LinkProgram (shaderProgram);
+		}
 		
 		public void Apply ()
 		{
@@ -126,23 +146,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 			
 			if (relink) {
-#if !ES11
-				//bind attributes. Default ones use in GL 1.1
-				GL.BindAttribLocation(shaderProgram,
-				                      GraphicsDevice.attributePosition,
-				                      "g_Position");
-				GL.BindAttribLocation(shaderProgram,
-					                  GraphicsDevice.attributeTexCoord,
-					                  "g_TexCoord");
-				GL.BindAttribLocation(shaderProgram,
-				                      GraphicsDevice.attributeColor,
-				                      "g_Color");
-				GL.BindAttribLocation(shaderProgram,
-				                      GraphicsDevice.attributeNormal,
-				                      "g_Normal");
-#endif
-				
-				GL.LinkProgram (shaderProgram);
+				Link ();
 			}
 			
 			GL.UseProgram (shaderProgram);
