@@ -125,7 +125,7 @@ namespace Microsoft.Xna.Framework.Graphics
 							GL.VertexAttribPointer(GraphicsDevice.attributeColor,
 					            ve.VertexElementFormat.OpenGLNumberOfElements(),
 					            ve.VertexElementFormat.OpenGLVertexAttribPointerType(),
-					            false,
+					            true,
 					            vd.VertexStride,
 					            (IntPtr)ve.Offset);
 #endif
