@@ -68,7 +68,7 @@ non-infringement.
 
 using System.Collections.Generic;
 
-namespace MonoGame.Framework
+namespace Microsoft.Xna.Framework
 {
     public class LaunchParameters : Dictionary<string, string>
     {
