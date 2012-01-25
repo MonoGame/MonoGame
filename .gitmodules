@@ -1,0 +1,3 @@
+[submodule "ThirdParty/Libs"]
+	path = ThirdParty/Libs
+	url = git://github.com/kungfubanana/MonoGame-Dependencies.git
