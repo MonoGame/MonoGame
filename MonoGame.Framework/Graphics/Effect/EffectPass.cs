@@ -79,7 +79,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		private void Link ()
 		{
 #if !ES11
-			//bind attributes. Default ones use in GL 1.1
+			//bind attributes. Builtin ones used in ES 1.1
 			GL.BindAttribLocation(shaderProgram,
 			                      GraphicsDevice.attributePosition,
 			                      "aPosition");

@@ -127,14 +127,14 @@ namespace Microsoft.Xna.Framework.Graphics
 						                               "#define "+attrb.name+" gl_Normal");
 						break;
 #else
-					//use standard attribute names so we can bind them in EffectPass, 
+					//use standard attribute names so we can bind them in EffectPass,
 					//since attributes are bound to programs, not shaders
 					//Can't just bind to builtin names as that causes perforance issues
 					case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_COLOR:
 						glslCode = glslCode.Replace (attrb.name, "aColor");
 						break;
 					case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_POSITION:
-						glslCode = glslCode.Replace (attrb.name, "aVertex");
+						glslCode = glslCode.Replace (attrb.name, "aPosition");
 						break;
 					case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_TEXCOORD:
 						glslCode = glslCode.Replace (attrb.name, "aTexCoord");

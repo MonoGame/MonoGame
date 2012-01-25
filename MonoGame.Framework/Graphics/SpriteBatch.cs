@@ -185,7 +185,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			//GL.Disable (EnableCap.DepthTest);
 #if ES11
-			GL.TexEnv (TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)All.BlendSrc);
+			//GL.TexEnv (TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)All.BlendSrc);
 			GLStateManager.Textures2D(true);
 			GLStateManager.VertexArray(true);
 			GLStateManager.ColorArray(true);
