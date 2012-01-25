@@ -183,7 +183,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			GL.VertexAttribPointer(GraphicsDevice.attributeColor,
 			                       4,
 			                       VertexAttribPointerType.UnsignedByte,
-			                       false,
+			                       true,
 			                       size,
 			                       (IntPtr)((uint)_vertexHandle.AddrOfPinnedObject()
 			         					+(uint)(sizeof(float)*2)));
