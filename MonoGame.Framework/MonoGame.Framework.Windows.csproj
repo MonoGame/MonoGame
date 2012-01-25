@@ -86,6 +86,9 @@
     <Reference Include="GamepadConfigControls">
       <HintPath>..\ThirdParty\GamepadConfig\GamepadConfigControls.dll</HintPath>
     </Reference>
+    <Reference Include="OpenTK, Version=1.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
+      <HintPath>..\ThirdParty\Libs\OpenTK.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Web" />
@@ -97,12 +100,12 @@
     <Reference Include="Tao.Sdl">
       <HintPath>..\ThirdParty\GamepadConfig\Tao.Sdl.dll</HintPath>
     </Reference>
-    <Reference Include="OpenTK">
-      <HintPath>..\..\OpenTK1.0\Binaries\OpenTK\Release\OpenTK.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Desktop\Audio\SoundEffectInstance.cs" />
+    <Compile Include="Desktop\Input\GamePad.cs" />
+    <Compile Include="Desktop\Input\Mouse.cs" />
+    <Compile Include="Desktop\Input\MouseState.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="GamePlatform.cs" />
     <Compile Include="GamerServices\GamerServicesDispatcher.cs" />
@@ -279,7 +282,6 @@
     <Compile Include="Windows\Graphics\SpriteBatch.cs" />
     <Compile Include="Windows\Graphics\SpriteBatcher.cs" />
     <Compile Include="Windows\Graphics\Texture2D.cs" />
-    <Compile Include="Windows\Input\GamePad.cs" />
     <Compile Include="Windows\Input\Keyboard.cs" />
     <Compile Include="Windows\Media\Video.cs" />
     <Compile Include="Windows\WindowsGamePlatform.cs" />
@@ -394,8 +396,6 @@
     <Compile Include="Windows\TitleContainer.cs" />
     <Compile Include="Content\ContentReaders\CurveReader.cs" />
     <Compile Include="Graphics\Vertices\VertexElementColor.cs" />
-    <Compile Include="Windows\Input\Mouse.cs" />
-    <Compile Include="Windows\Input\MouseState.cs" />
     <Compile Include="Audio\XactClip.cs" />
     <Compile Include="Audio\XactSound.cs" />
     <Compile Include="Desktop\Graphics\States\GLStateManager.cs" />
