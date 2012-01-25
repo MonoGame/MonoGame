@@ -231,7 +231,6 @@
     <Compile Include="MacOS\Graphics\GraphicsExtensions.cs" />
     <Compile Include="MacOS\Graphics\States\GLStateManager.cs" />
     <Compile Include="MacOS\Graphics\Effect\EffectPass.cs" />
-    <Compile Include="MacOS\Graphics\Vertices\VertexDeclaration.cs" />
     <Compile Include="MacOS\GameWindow.cs" />
     <Compile Include="PreparingDeviceSettingsEventArgs.cs" />
     <Compile Include="GraphicsDeviceInformation.cs" />
@@ -249,6 +248,7 @@
     <Compile Include="Graphics\States\TextureAddressMode.cs" />
     <Compile Include="Graphics\States\TextureFilter.cs" />
     <Compile Include="Desktop\Input\GamePad.cs" />
+    <Compile Include="Desktop\Graphics\Vertices\VertexDeclaration.cs" />
     <Compile Include="Input\ButtonDefinition.cs" />
     <Compile Include="Input\ThumbStickDefinition.cs" />
     <Compile Include="MacOS\GamerServices\SignedInGamer.cs" />

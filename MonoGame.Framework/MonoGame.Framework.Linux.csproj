@@ -235,7 +235,6 @@
     <Compile Include="Linux\Graphics\Effect\BasicEffect.cs" />
     <Compile Include="Linux\Graphics\Effect\EffectPass.cs" />
     <Compile Include="Linux\Graphics\Vertices\IndexBuffer.cs" />
-    <Compile Include="Linux\Graphics\Vertices\VertexDeclaration.cs" />
     <Compile Include="Linux\GameWindow.cs" />
     <Compile Include="PreparingDeviceSettingsEventArgs.cs" />
     <Compile Include="GraphicsDeviceInformation.cs" />
@@ -334,6 +333,7 @@
     <Compile Include="Desktop\Input\GamePad.cs" />
     <Compile Include="Desktop\Input\Mouse.cs" />
     <Compile Include="Desktop\Input\MouseState.cs" />
+	<Compile Include="Desktop\Graphics\Vertices\VertexDeclaration.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.Linux.csproj">
