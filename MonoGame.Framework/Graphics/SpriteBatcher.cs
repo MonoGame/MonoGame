@@ -149,6 +149,11 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 			
 #if ES11
+			GLStateManager.Textures2D(true);
+			GLStateManager.VertexArray(true);
+			GLStateManager.ColorArray(true);
+			GLStateManager.TextureCoordArray(true);
+
 			int size = sizeof(float)*4+sizeof(uint);
 			GL.VertexPointer(2,
 			                 VertexPointerType.Float,
@@ -226,6 +231,8 @@ namespace Microsoft.Xna.Framework.Graphics
 					
 					GL.ActiveTexture(TextureUnit.Texture0);
 					GL.BindTexture ( TextureTarget.Texture2D, texID );
+
+					samplerState.Activate();
 #if !ES11
 					lastTint = item.Tint;
 					//QQQ

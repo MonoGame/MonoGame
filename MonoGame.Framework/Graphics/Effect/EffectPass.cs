@@ -94,6 +94,16 @@ namespace Microsoft.Xna.Framework.Graphics
 			                      "aNormal");
 #endif
 			GL.LinkProgram (shaderProgram);
+
+			int linked = 0;
+			GL.GetProgram (shaderProgram, ProgramParameter.LinkStatus, out linked);
+			if (linked == 0) {
+				string log = GL.GetProgramInfoLog(shaderProgram);
+				Console.WriteLine (log);
+
+				throw new InvalidOperationException("Unable to link effect program");
+			}
+
 		}
 		
 		public void Apply ()

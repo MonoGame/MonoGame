@@ -166,9 +166,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			GL.GetShader (shader, ShaderParameter.CompileStatus, out compiled);
 #endif
 			if (compiled == (int)All.False) {
-				string log;
+
 #if !IPHONE
-				GL.GetShaderInfoLog(shader, out log);
+				string log = GL.GetShaderInfoLog(shader);
 				Console.WriteLine (log);
 #endif
 				
