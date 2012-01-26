@@ -352,6 +352,10 @@ namespace Microsoft.Xna.Framework
 
         public override void BeginScreenDeviceChange(bool willBeFullScreen)
         {
+            // This is a hack and it should go in MonoMacGameView.  Until that
+            // is done we will set the SwapInterval ourselves
+            // Using DisplayLink does not play nicely with background thread
+            // loading.
            var graphicsDeviceManager = (GraphicsDeviceManager)Game.Services.GetService(typeof(IGraphicsDeviceManager));
             _gameWindow.OpenGLContext.SwapInterval = graphicsDeviceManager.SynchronizeWithVerticalRetrace;
         }
