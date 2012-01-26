@@ -26,10 +26,7 @@ SOFTWARE.
 #endregion License
 
 using System;
-using System.IO;
-using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Microsoft.Xna.Framework.Content
@@ -84,6 +81,11 @@ namespace Microsoft.Xna.Framework.Content
                 Vector3Reader hVector3Reader = new Vector3Reader();
                 Vector4Reader hVector4Reader = new Vector4Reader();
                 CurveReader hCurveReader = new CurveReader();
+                var hIndexBufferReader = new IndexBufferReader();
+                var hBoundingBoxReader = new BoundingBoxReader();
+                var hMatrixReader = new MatrixReader();
+                var hBasicEffectReader = new BasicEffectReader();
+                var hVertexBufferReader = new VertexBufferReader();
             }
 #pragma warning restore 0219, 0649
 
