@@ -1,7 +1,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-#if MACOSX
+#if MONOMAC
 using MonoMac.OpenGL;
 #else
 using OpenTK.Graphics.OpenGL;
