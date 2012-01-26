@@ -29,6 +29,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		MojoShader.MOJOSHADER_symbol[] symbols;
 		MojoShader.MOJOSHADER_sampler[] samplers;
+		MojoShader.MOJOSHADER_attribute[] attributes;
 		
 		DXPreshader preshader;
 		
@@ -79,8 +80,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			samplers = DXHelper.UnmarshalArray<MojoShader.MOJOSHADER_sampler>(
 					parseData.samplers, parseData.sampler_count);
 			
-			MojoShader.MOJOSHADER_attribute[] attributes =
-				DXHelper.UnmarshalArray<MojoShader.MOJOSHADER_attribute>(
+			attributes = DXHelper.UnmarshalArray<MojoShader.MOJOSHADER_attribute>(
 					parseData.attributes, parseData.attribute_count);
 
 			foreach (MojoShader.MOJOSHADER_symbol symbol in symbols) {
@@ -104,11 +104,12 @@ namespace Microsoft.Xna.Framework.Graphics
 			uniforms_bool = new int[uniforms_bool_count];
 			
 			glslCode = parseData.output;
-			
-			foreach (MojoShader.MOJOSHADER_attribute attrb in attributes) {
-				if (shaderType == ShaderType.VertexShader) {
-					switch (attrb.usage) {
+
 #if ES11
+			if (shaderType == ShaderType.VertexShader) {
+				foreach (MojoShader.MOJOSHADER_attribute attrb in attributes) {
+					switch (attrb.usage) {
+
 					//use builtin attributes in GL 1.1
 					case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_COLOR:
 						glslCode = glslCode.Replace ("attribute vec4 "+attrb.name+";",
@@ -126,28 +127,12 @@ namespace Microsoft.Xna.Framework.Graphics
 						glslCode = glslCode.Replace ("attribute vec4 "+attrb.name+";",
 						                               "#define "+attrb.name+" gl_Normal");
 						break;
-#else
-					//use standard attribute names so we can bind them in EffectPass,
-					//since attributes are bound to programs, not shaders
-					//Can't just bind to builtin names as that causes perforance issues
-					case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_COLOR:
-						glslCode = glslCode.Replace (attrb.name, "aColor");
-						break;
-					case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_POSITION:
-						glslCode = glslCode.Replace (attrb.name, "aPosition");
-						break;
-					case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_TEXCOORD:
-						glslCode = glslCode.Replace (attrb.name, "aTexCoord");
-						break;
-					case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_NORMAL:
-						glslCode = glslCode.Replace (attrb.name, "aNormal");
-						break;
-#endif
 					default:
 						throw new NotImplementedException();
 					}
 				}
 			}
+#endif
 			
 			glslCode = GLSLOptimizer.Optimize (glslCode, shaderType);
 			
@@ -179,9 +164,32 @@ namespace Microsoft.Xna.Framework.Graphics
 			//MojoShader.NativeMethods.MOJOSHADER_freeParseData(parseDataPtr);
 			//TODO: dispose properly - DXPreshader holds unmanaged data
 		}
+
+		public void OnLink(int program) {
+#if !ES11
+			if (shaderType == ShaderType.VertexShader) {
+				//bind attributes
+				foreach (MojoShader.MOJOSHADER_attribute attrb in attributes) {
+					switch (attrb.usage) {
+					case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_COLOR:
+						GL.BindAttribLocation(program, GraphicsDevice.attributeColor, attrb.name);
+						break;
+					case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_POSITION:
+						GL.BindAttribLocation(program, GraphicsDevice.attributePosition, attrb.name);
+						break;
+					case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_TEXCOORD:
+						GL.BindAttribLocation(program, GraphicsDevice.attributeTexCoord, attrb.name);
+						break;
+					case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_NORMAL:
+						GL.BindAttribLocation(program, GraphicsDevice.attributeNormal, attrb.name);
+						break;
+					}
+				}
+			}
+#endif		
+		}
 		
-		
-		public void Apply(uint program,
+		public void Apply(int program,
 		                  EffectParameterCollection parameters,
 		                  GraphicsDevice graphicsDevice) {
 			

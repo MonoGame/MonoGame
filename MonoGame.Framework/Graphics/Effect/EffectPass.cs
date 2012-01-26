@@ -22,6 +22,25 @@ namespace Microsoft.Xna.Framework.Graphics
 		DXEffectObject.d3dx_state[] states;
 		DXShader pixelShader;
 		DXShader vertexShader;
+
+		static string passthroughVertexShaderSrc = @"
+				uniform mat4 transformMatrix;
+
+				attribute vec4 aPosition;
+				attribute vec4 aTexCoord;
+				attribute vec4 aColor;
+
+				varying vec4 vTexCoord0;
+				varying vec4 vFrontColor;
+				void main() {
+					vTexCoord0.xy = aTexCoord.xy;
+					vFrontColor = aColor;
+
+					gl_Position = transformMatrix * aPosition;
+				}";
+		static int? passthroughVertexShader;
+
+		bool passthroughVertexShaderAttached = false;
 		
 		public EffectPass(EffectTechnique technique, DXEffectObject.d3dx_pass pass)
         {
@@ -78,21 +97,35 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		private void Link ()
 		{
+			if (vertexShader == null && !passthroughVertexShaderAttached) {
+				if (!passthroughVertexShader.HasValue) {
+					int shader = GL.CreateShader(ShaderType.VertexShader);
+					GL.ShaderSource(shader, passthroughVertexShaderSrc);
+					GL.CompileShader(shader);
+
+					passthroughVertexShader = shader;
+				}
+
+				GL.AttachShader(shaderProgram, passthroughVertexShader.Value);
 #if !ES11
-			//bind attributes. Builtin ones used in ES 1.1
-			GL.BindAttribLocation(shaderProgram,
-			                      GraphicsDevice.attributePosition,
-			                      "aPosition");
-			GL.BindAttribLocation(shaderProgram,
-				                  GraphicsDevice.attributeTexCoord,
-				                  "aTexCoord");
-			GL.BindAttribLocation(shaderProgram,
-			                      GraphicsDevice.attributeColor,
-			                      "aColor");
-			GL.BindAttribLocation(shaderProgram,
-			                      GraphicsDevice.attributeNormal,
-			                      "aNormal");
+				GL.BindAttribLocation(shaderProgram, GraphicsDevice.attributePosition, "aPosition");
+				GL.BindAttribLocation(shaderProgram, GraphicsDevice.attributeTexCoord, "aTexCoord");
+				GL.BindAttribLocation(shaderProgram, GraphicsDevice.attributeColor, "aColor");
 #endif
+
+				passthroughVertexShaderAttached = true;
+			} else if (vertexShader != null && passthroughVertexShaderAttached) {
+				GL.DetachShader(shaderProgram, passthroughVertexShader.Value);
+				passthroughVertexShaderAttached = false;
+			}
+
+			if (vertexShader != null) {
+				vertexShader.OnLink(shaderProgram);
+			}
+			if (pixelShader != null) {
+				pixelShader.OnLink (shaderProgram);
+			}
+
 			GL.LinkProgram (shaderProgram);
 
 			int linked = 0;
@@ -160,14 +193,24 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 			
 			GL.UseProgram (shaderProgram);
-			
-			if (pixelShader != null) {
-				pixelShader.Apply((uint)shaderProgram,
+
+			if (vertexShader != null) {
+				vertexShader.Apply(shaderProgram,
 				                  _technique._effect.Parameters,
 				                  _graphicsDevice);
+			} else {
+				//passthrough shader is attached
+				Viewport vp = _graphicsDevice.Viewport;
+				Matrix projection = Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, 0, 1);
+				Matrix halfPixelOffset = Matrix.CreateTranslation(-0.5f, -0.5f, 0);
+				Matrix transform = halfPixelOffset * projection;
+
+				int uniform = GL.GetUniformLocation(shaderProgram, "transformMatrix");
+				GL.UniformMatrix4(uniform, 1, false, Matrix.ToFloatArray(transform));
 			}
-			if (vertexShader != null) {
-				vertexShader.Apply((uint)shaderProgram,
+
+			if (pixelShader != null) {
+				pixelShader.Apply(shaderProgram,
 				                  _technique._effect.Parameters,
 				                  _graphicsDevice);
 			}
