@@ -861,7 +861,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 GL11.DrawArrays(PrimitiveTypeGL11(primitiveType), vertexStart, GetElementCountArray(primitiveType, primitiveCount));
         }
 
-        public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int vertexCount, ushort[] indexData, int indexOffset, int primitiveCount) where T : struct, IVertexType
+        public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int vertexCount, short[] indexData, int indexOffset, int primitiveCount) where T : struct, IVertexType
         {
             ////////////////////////////
             //This has not been tested//
@@ -912,7 +912,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 //Draw
                 GL20.DrawElements(PrimitiveTypeGL20(primitiveType), GetElementCountArray(primitiveType, primitiveCount),
-                                  ALL20.UnsignedInt248Oes, (IntPtr) (indexOffset*sizeof (ushort)));
+                                  ALL20.UnsignedShort, (IntPtr) (indexOffset*sizeof (ushort)));
 
 
                 // Free resources
@@ -960,7 +960,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 //Draw
                 GL11.DrawElements(PrimitiveTypeGL11(primitiveType), GetElementCountArray(primitiveType, primitiveCount),
-                                  ALL11.UnsignedInt248Oes, (IntPtr)(indexOffset * sizeof(ushort)));
+                                  ALL11.UnsignedShort, (IntPtr)(indexOffset * sizeof(ushort)));
 
 
                 // Free resources
