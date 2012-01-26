@@ -355,6 +355,11 @@
     <Compile Include="MacOS\Audio\SoundEffectInstance.cs" />
     <Compile Include="LaunchParameters.cs" />
     <Compile Include="MacOS\MacGamePlatform+Synchronous.cs" />
+    <Compile Include="Content\ContentReaders\IndexBufferReader.cs" />
+    <Compile Include="Content\ContentReaders\BasicEffectReader.cs" />
+    <Compile Include="Content\ContentReaders\BoundingBoxReader.cs" />
+    <Compile Include="Content\ContentReaders\MatrixReader.cs" />
+    <Compile Include="Content\ContentReaders\VertexBufferReader.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />
