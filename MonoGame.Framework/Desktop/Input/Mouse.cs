@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 /*
 Microsoft Public License (Ms-PL)
 MonoGame - Copyright © 2009 The MonoGame Team
@@ -37,26 +37,69 @@ permitted under your local laws, the contributors exclude the implied warranties
 purpose and non-infringement.
 */
 #endregion License
-
+﻿
+using MouseInfo = OpenTK.Input.Mouse;
 using System;
 
-namespace Microsoft.Xna.Framework.GamerServices
+namespace Microsoft.Xna.Framework.Input
 {
-    public static class GamerServicesDispatcher
-    {
-        public static void Initialize ( IServiceProvider serviceProvider )
-        {
-            throw new NotImplementedException();   
-        }
+	// TODO on opentk 1.1 release this class should be reviewed to decouple it from GameWindow
+	// OpenTK.Input.Mouse and OpenTK.Input.Mouse.GetState should be enough
+	
+	// TODO verify if why mouse middle button is laggy (maybe it's my mouse or the opentk implementation)
+	
+	public static class Mouse
+	{
+		private static OpenTK.Input.MouseDevice _mouse = null;
+		private static int _x, _y;
+		
+		internal static void UpdateMouseInfo(OpenTK.Input.MouseDevice mouse)
+		{
+			_mouse = mouse;
+			_mouse.Move += HandleWindowMouseMove;
+		}
+		
 
-        public static void Update ()
-        {            
-        }
+		internal static void HandleWindowMouseMove (object sender, OpenTK.Input.MouseMoveEventArgs e)
+		{
+			SetPosition(e.X, e.Y);
+		}
+		
+		#region Public interface		
+		
+		public static MouseState GetState ()
+		{	
+			// no multiple mouse supported (yet!)
+			//OpenTK.Input.MouseState mState = MouseInfo.GetState(0); // to be implemented on opentk 1.1
+			
+			//bool b = (bool)_mouse.GetType().GetProperty("Item").GetValue(OpenTK.Input.MouseButton.Left, null);
+			
+			// maybe someone is tring to get mouse before initialize
+			if (_mouse == null)
+			{
+				return new MouseState(0, 0);
+			}
+			
+			MouseState ms = new MouseState(_x, _y);
 
-        public static bool IsInitialized { get { return false;  } }
+			ms.LeftButton = _mouse[OpenTK.Input.MouseButton.Left] ? ButtonState.Pressed : ButtonState.Released;
+			ms.RightButton = _mouse[OpenTK.Input.MouseButton.Right] ? ButtonState.Pressed : ButtonState.Released;
+			ms.MiddleButton = _mouse[OpenTK.Input.MouseButton.Middle] ? ButtonState.Pressed : ButtonState.Released;;
+			ms.ScrollWheelValue = _mouse.Wheel;
+			
+			
+			return ms;
+		}
 
-        public static IntPtr WindowHandle { get; set; }
-
-        public static event EventHandler<EventArgs> InstallingTitleUpdate;
-    }
+		public static void SetPosition (int x, int y)
+		{
+			// TODO propagate change to opentk mouse object (requires opentk 1.1)
+			//throw new NotImplementedException("Feature not implemented.");
+			_x = x;
+			_y = y;
+		}
+		
+		#endregion
+	}
 }
+

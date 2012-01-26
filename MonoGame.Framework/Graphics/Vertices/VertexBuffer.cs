@@ -87,8 +87,15 @@ namespace Microsoft.Xna.Framework.Graphics
 				vertices [i] = _tbuff [i];
 		}
 
-		public void SetData<T> (T[] vertices) where T : struct
-		{
+        public void SetData<T>(T[] vertices) where T : struct
+        {
+            // TODO: This is fundimentally broken in that it is not 
+            // assured that the incoming vertex array will exist unmodified
+            // long enough for the delayed buffer creation to occur. 
+            //
+            // We either need to remove the concept of delayed buffer 
+            // creation or copy the data here for safe keeping.
+
 			//the creation of the buffer should mb be moved to the constructor and then glMapBuffer and Unmap should be used to update it
 			//glMapBuffer - sets data
 			//glUnmapBuffer - finished setting data
@@ -103,6 +110,11 @@ namespace Microsoft.Xna.Framework.Graphics
 			_bufferCount++;
 			// TODO: Kill buffers in PhoneOSGameView.DestroyFrameBuffer()
 		}
+
+        public void SetData<T> (T[] data, int startIndex, int elementCount) where T : struct
+        {
+            throw new NotImplementedException();           
+        }
 
 		public void SetData<T> (
 			int offsetInBytes,

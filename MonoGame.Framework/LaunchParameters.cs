@@ -1,3 +1,5 @@
+#region License
+/*
 Microsoft Public License (Ms-PL)
 MonoGame - Copyright © 2009-2012 The MonoGame Team
 
@@ -61,3 +63,14 @@ additional consumer rights under your local laws which this license cannot
 change. To the extent permitted under your local laws, the contributors exclude
 the implied warranties of merchantability, fitness for a particular purpose and
 non-infringement.
+*/
+#endregion License
+
+using System.Collections.Generic;
+
+namespace Microsoft.Xna.Framework
+{
+    public class LaunchParameters : Dictionary<string, string>
+    {
+    }
+}

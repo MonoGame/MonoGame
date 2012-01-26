@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 /*
 Microsoft Public License (Ms-PL)
 MonoGame - Copyright © 2009 The MonoGame Team
@@ -37,26 +37,82 @@ permitted under your local laws, the contributors exclude the implied warranties
 purpose and non-infringement.
 */
 #endregion License
+﻿using System;
 
-using System;
+namespace Microsoft.Xna.Framework.Input
+{    
+	public struct MouseState
+	{
+		int _x, _y;
+		int _scrollWheelValue;
+		ButtonState _leftButton;
+		ButtonState _rightButton;
+		ButtonState _middleButton;
+		
+		internal MouseState (int x,int y)
+		{
+			_x = x;
+			_y = y;
+			
+			_scrollWheelValue = 0;
+			
+			_leftButton = ButtonState.Released;
+			_rightButton = ButtonState.Released;
+			_middleButton = ButtonState.Released;
+		}
 
-namespace Microsoft.Xna.Framework.GamerServices
-{
-    public static class GamerServicesDispatcher
-    {
-        public static void Initialize ( IServiceProvider serviceProvider )
-        {
-            throw new NotImplementedException();   
-        }
+		public int X {
+			get {
+				return _x;
+			}
 
-        public static void Update ()
-        {            
-        }
+		}
 
-        public static bool IsInitialized { get { return false;  } }
+		public int Y {
+			get {
+				return _y;
+			}
+		}
 
-        public static IntPtr WindowHandle { get; set; }
+		public ButtonState LeftButton { 
+			get {
+				return _leftButton;
+			}
+			internal set { _leftButton = value; }
+		}
 
-        public static event EventHandler<EventArgs> InstallingTitleUpdate;
-    }
+		public ButtonState MiddleButton { 
+			get {
+				return _middleButton;
+			}
+			internal set { _middleButton = value; }			
+		}
+
+		public ButtonState RightButton { 
+			get {
+				return _rightButton;
+			}
+			internal set { _rightButton = value; }
+		}
+
+		public int ScrollWheelValue { 
+			get {
+				return _scrollWheelValue;
+			}
+			internal set { _scrollWheelValue = value; }
+		}
+
+		public ButtonState XButton1 { 
+			get {
+				return ButtonState.Released;
+			}
+		}
+
+		public ButtonState XButton2 { 
+			get {
+				return ButtonState.Released;
+			}
+		}
+	}
 }
+

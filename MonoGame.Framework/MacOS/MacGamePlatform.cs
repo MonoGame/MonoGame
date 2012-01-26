@@ -221,10 +221,10 @@ namespace Microsoft.Xna.Framework
 
         public override void Exit()
         {
-            if (_state != RunState.Running)
+            if (State != RunState.Running)
                 return;
 
-            _state = RunState.Exiting;
+            State = RunState.Exiting;
 
             if (_mainWindow != null)
             {
@@ -480,9 +480,5 @@ namespace Microsoft.Xna.Framework
                     _owner.State = MacGamePlatform.RunState.Exited);
             }
         }
-
-        #region _mainWindow Event Handlers
-
-        #endregion _mainWindow Event Handlers
     }
 }

@@ -8,7 +8,7 @@
     <ProjectGuid>{36C538E6-C32A-4A8D-A39C-566173D7118E}</ProjectGuid>
     <ProjectTypeGuids>{948B3504-5B70-4649-8FE4-BDE1FB46EC69};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
-    <RootNamespace>Microsoft.Xna.Framework.GamerServices</RootNamespace>
+    <RootNamespace>Microsoft.Xna.Framework</RootNamespace>
     <AssemblyName>MonoGame.Framework.MacOS</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -236,7 +236,7 @@
     <Compile Include="MacOS\KeyUtil.cs" />
     <Compile Include="Graphics\States\TextureAddressMode.cs" />
     <Compile Include="Graphics\States\TextureFilter.cs" />
-    <Compile Include="MacOS\Input\GamePad.cs" />
+    <Compile Include="Desktop\Input\GamePad.cs" />
     <Compile Include="Input\ButtonDefinition.cs" />
     <Compile Include="Input\ThumbStickDefinition.cs" />
     <Compile Include="MacOS\GamerServices\SignedInGamer.cs" />
@@ -364,6 +364,7 @@
     <Compile Include="Graphics\States\GLStateManager.cs" />
     <Compile Include="Graphics\Effect\EffectPass.cs" />
     <Compile Include="Graphics\GraphicsExtensions.cs" />
+    <Compile Include="LaunchParameters.cs" />
     <Compile Include="MacOS\MacGamePlatform+Synchronous.cs" />
   </ItemGroup>
   <ItemGroup>
