@@ -8,6 +8,7 @@ using MonoMac.OpenGL;
 #else
 using OpenTK.Graphics.ES20;
 using ShaderType = OpenTK.Graphics.ES20.All;
+using ProgramParameter = OpenTK.Graphics.ES20.All;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -100,7 +101,13 @@ namespace Microsoft.Xna.Framework.Graphics
 			if (vertexShader == null && !passthroughVertexShaderAttached) {
 				if (!passthroughVertexShader.HasValue) {
 					int shader = GL.CreateShader(ShaderType.VertexShader);
+#if IPHONE
+					GL.ShaderSource (shader, 1,
+					                new string[]{passthroughVertexShaderSrc}, (int[])null);
+#else
 					GL.ShaderSource(shader, passthroughVertexShaderSrc);
+#endif
+
 					GL.CompileShader(shader);
 
 					passthroughVertexShader = shader;
@@ -129,11 +136,16 @@ namespace Microsoft.Xna.Framework.Graphics
 			GL.LinkProgram (shaderProgram);
 
 			int linked = 0;
+#if IPHONE
+			GL.GetProgram (shaderProgram, ProgramParameter.LinkStatus, ref linked);
+#else
 			GL.GetProgram (shaderProgram, ProgramParameter.LinkStatus, out linked);
+#endif
 			if (linked == 0) {
+#if !IPHONE
 				string log = GL.GetProgramInfoLog(shaderProgram);
 				Console.WriteLine (log);
-
+#endif
 				throw new InvalidOperationException("Unable to link effect program");
 			}
 

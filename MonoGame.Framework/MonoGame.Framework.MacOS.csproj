@@ -219,7 +219,6 @@
     <Compile Include="Graphics\Vertices\VertexPositionColor.cs" />
     <Compile Include="Graphics\Vertices\VertexPositionNormalTexture.cs" />
     <Compile Include="Graphics\Vertices\VertexPositionTexture.cs" />
-    <Compile Include="MacOS\Graphics\Vertices\VertexDeclaration.cs" />
     <Compile Include="MacOS\GameWindow.cs" />
     <Compile Include="PreparingDeviceSettingsEventArgs.cs" />
     <Compile Include="GraphicsDeviceInformation.cs" />
@@ -366,13 +365,13 @@
     <Compile Include="Graphics\GraphicsExtensions.cs" />
     <Compile Include="LaunchParameters.cs" />
     <Compile Include="MacOS\MacGamePlatform+Synchronous.cs" />
+    <Compile Include="Graphics\Vertices\VertexDeclaration.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />
     <Folder Include="Graphics\" />
     <Folder Include="Graphics\Vertices\" />
     <Folder Include="MacOS\Graphics\" />
-    <Folder Include="MacOS\Graphics\Vertices\" />
     <Folder Include="Content\ContentReaders\" />
     <Folder Include="GamerServices\" />
     <Folder Include="MacOS\Audio\" />
@@ -383,13 +382,15 @@
     <Folder Include="MacOS\Storage\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="libmojoshader.dylib">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Include="MonoGame.Framework.MacOS.dll.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="libmesaglsl2.dylib">
+    <None Include="..\ThirdParty\Libs\libmojoshader_mac.dylib">
+      <Link>libmojoshader_mac.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Libs\libglsl_optimizer_mac.dylib">
+      <Link>libglsl_optimizer_mac.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

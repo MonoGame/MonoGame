@@ -398,6 +398,7 @@
     <Compile Include="Graphics\ESTexture2D.cs" />
     <Compile Include="Graphics\Vertices\IndexElementSize.cs" />
     <Compile Include="LaunchParameters.cs" />
+    <Compile Include="Content\ContentReaders\EffectReader.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>

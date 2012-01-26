@@ -12,6 +12,12 @@ namespace Microsoft.Xna.Framework.Graphics
 {
 	internal class GLSLOptimizer
 	{
+
+#if IPHONE
+		const string libglsl_optmizer_dll = "__Internal";
+#else
+		const string libglsl_optmizer_dll = "libglsl_optimizer.dll";
+#endif
 		
 		enum glslopt_shader_type {
 			kGlslOptShaderVertex = 0,
@@ -24,25 +30,25 @@ namespace Microsoft.Xna.Framework.Graphics
 			kGlslOptionNotFullShader = (1<<1), // Passed shader is not the full shader source. This makes some optimizations weaker.
 		};
 		
-		[DllImportAttribute("libmesaglsl2.dll", EntryPoint="_Z18glslopt_initializeb")]
+		[DllImportAttribute(libglsl_optmizer_dll, EntryPoint="_Z18glslopt_initializeb")]
 		static extern IntPtr glslopt_initialize(bool openglES);
 		
-		[DllImportAttribute("libmesaglsl2.dll", EntryPoint="_Z15glslopt_cleanupP11glslopt_ctx")]
+		[DllImportAttribute(libglsl_optmizer_dll, EntryPoint="_Z15glslopt_cleanupP11glslopt_ctx")]
 		static extern IntPtr glslopt_cleanup(IntPtr ctx);
 		
-		[DllImportAttribute("libmesaglsl2.dll", EntryPoint="_Z16glslopt_optimizeP11glslopt_ctx19glslopt_shader_typePKcj")]
+		[DllImportAttribute(libglsl_optmizer_dll, EntryPoint="_Z16glslopt_optimizeP11glslopt_ctx19glslopt_shader_typePKcj")]
 		static extern IntPtr glslopt_optimize(IntPtr context, glslopt_shader_type type, string shaderSource, uint options);
 				
-		[DllImportAttribute("libmesaglsl2.dll", EntryPoint="_Z18glslopt_get_statusP14glslopt_shader")]
+		[DllImportAttribute(libglsl_optmizer_dll, EntryPoint="_Z18glslopt_get_statusP14glslopt_shader")]
 		static extern bool glslopt_get_status(IntPtr shader);
 		
-		[DllImportAttribute("libmesaglsl2.dll", EntryPoint="_Z18glslopt_get_outputP14glslopt_shader")]
+		[DllImportAttribute(libglsl_optmizer_dll, EntryPoint="_Z18glslopt_get_outputP14glslopt_shader")]
 		static extern string glslopt_get_output(IntPtr shader);
 		
-		[DllImportAttribute("libmesaglsl2.dll", EntryPoint="_Z15glslopt_get_logP14glslopt_shader")]
+		[DllImportAttribute(libglsl_optmizer_dll, EntryPoint="_Z15glslopt_get_logP14glslopt_shader")]
 		static extern string glslopt_get_log(IntPtr shader);
 		
-		[DllImportAttribute("libmesaglsl2.dll", EntryPoint="_Z21glslopt_shader_deleteP14glslopt_shader")]
+		[DllImportAttribute(libglsl_optmizer_dll, EntryPoint="_Z21glslopt_shader_deleteP14glslopt_shader")]
 		static extern void glslopt_shader_delete(IntPtr shader);
 		
 		static IntPtr ctx = IntPtr.Zero; //todo: dispose properly

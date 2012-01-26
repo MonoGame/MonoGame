@@ -5,6 +5,12 @@ namespace Microsoft.Xna.Framework.Graphics
 {
 	internal class MojoShader
 	{
+#if IPHONE
+		const string mojoshader_dll = "__Internal";
+#else
+		const string mojoshader_dll = "libmojoshader.dll";
+#endif
+		
 		public partial class NativeConstants {
 		    
 		    /// _INCL_MOJOSHADER_H_ -> 
@@ -2773,27 +2779,27 @@ namespace Microsoft.Xna.Framework.Graphics
 		public partial class NativeMethods {
 		    
 		    /// Return Type: int
-		    [DllImportAttribute("libmojoshader.dll", EntryPoint="MOJOSHADER_version")]
+		    [DllImportAttribute(mojoshader_dll, EntryPoint="MOJOSHADER_version")]
 		public static extern  int MOJOSHADER_version() ;
 		
 		    
 		    /// Return Type: char*
-		    [DllImportAttribute("libmojoshader.dll", EntryPoint="MOJOSHADER_changeset")]
+		    [DllImportAttribute(mojoshader_dll, EntryPoint="MOJOSHADER_changeset")]
 		public static extern  IntPtr MOJOSHADER_changeset() ;
 		
 		    
 		    /// Return Type: int
 		    ///profile: char*
-		    [DllImportAttribute("libmojoshader.dll", EntryPoint="MOJOSHADER_maxShaderModel")]
+		    [DllImportAttribute(mojoshader_dll, EntryPoint="MOJOSHADER_maxShaderModel")]
 		public static extern  int MOJOSHADER_maxShaderModel([InAttribute()] [MarshalAsAttribute(UnmanagedType.LPStr)] string profile) ;
 		
 			
 			
 			
-			[DllImportAttribute("libmojoshader.dll", EntryPoint="MOJOSHADER_parseExpression")]
+			[DllImportAttribute(mojoshader_dll, EntryPoint="MOJOSHADER_parseExpression")]
 		public static extern  IntPtr MOJOSHADER_parseExpression([InAttribute()] byte[] tokenbuf, int bufsize, IntPtr/*MOJOSHADER_malloc*/ m, IntPtr/*MOJOSHADER_free*/ f, IntPtr d) ;
 			
-			[DllImportAttribute("libmojoshader.dll", EntryPoint="MOJOSHADER_runPreshader")]
+			[DllImportAttribute(mojoshader_dll, EntryPoint="MOJOSHADER_runPreshader")]
 		public static extern void MOJOSHADER_runPreshader(ref MOJOSHADER_preshader preshader, [InAttribute()] float[] inregs, float[] outregs);
 		    
 		    /// Return Type: MOJOSHADER_parseData*
@@ -2805,13 +2811,13 @@ namespace Microsoft.Xna.Framework.Graphics
 		    ///m: MOJOSHADER_malloc
 		    ///f: MOJOSHADER_free
 		    ///d: void*
-		    [DllImportAttribute("libmojoshader.dll", EntryPoint="MOJOSHADER_parse")]
+		    [DllImportAttribute(mojoshader_dll, EntryPoint="MOJOSHADER_parse")]
 		public static extern  IntPtr MOJOSHADER_parse([InAttribute()] [MarshalAsAttribute(UnmanagedType.LPStr)] string profile, [InAttribute()] byte[] tokenbuf, int bufsize, IntPtr/*ref MOJOSHADER_swizzle*/ swiz, int swizcount, IntPtr/*MOJOSHADER_malloc*/ m, IntPtr/*MOJOSHADER_free*/ f, IntPtr d) ;
 		
 		    
 		    /// Return Type: void
 		    ///data: MOJOSHADER_parseData*
-		    [DllImportAttribute("libmojoshader.dll", EntryPoint="MOJOSHADER_freeParseData")]
+		    [DllImportAttribute(mojoshader_dll, EntryPoint="MOJOSHADER_freeParseData")]
 		public static extern  void MOJOSHADER_freeParseData(IntPtr /*ref MOJOSHADER_parseData*/ data) ;
 		
 		    
@@ -2824,13 +2830,13 @@ namespace Microsoft.Xna.Framework.Graphics
 		    ///m: MOJOSHADER_malloc
 		    ///f: MOJOSHADER_free
 		    ///d: void*
-		    [DllImportAttribute("libmojoshader.dll", EntryPoint="MOJOSHADER_parseEffect")]
+		    [DllImportAttribute(mojoshader_dll, EntryPoint="MOJOSHADER_parseEffect")]
 		public static extern  IntPtr MOJOSHADER_parseEffect([InAttribute()] [MarshalAsAttribute(UnmanagedType.LPStr)] string profile, [InAttribute()] [MarshalAsAttribute(UnmanagedType.LPStr)] string buf, int _len, ref MOJOSHADER_swizzle swiz, int swizcount, MOJOSHADER_malloc m, MOJOSHADER_free f, IntPtr d) ;
 		
 		    
 		    /// Return Type: void
 		    ///effect: MOJOSHADER_effect*
-		    [DllImportAttribute("libmojoshader.dll", EntryPoint="MOJOSHADER_freeEffect")]
+		    [DllImportAttribute(mojoshader_dll, EntryPoint="MOJOSHADER_freeEffect")]
 		public static extern  void MOJOSHADER_freeEffect(ref MOJOSHADER_effect effect) ;
 		
 		    
@@ -2845,13 +2851,13 @@ namespace Microsoft.Xna.Framework.Graphics
 		    ///m: MOJOSHADER_malloc
 		    ///f: MOJOSHADER_free
 		    ///d: void*
-		    [DllImportAttribute("libmojoshader.dll", EntryPoint="MOJOSHADER_preprocess")]
+		    [DllImportAttribute(mojoshader_dll, EntryPoint="MOJOSHADER_preprocess")]
 		public static extern  IntPtr MOJOSHADER_preprocess([InAttribute()] [MarshalAsAttribute(UnmanagedType.LPStr)] string filename, [InAttribute()] [MarshalAsAttribute(UnmanagedType.LPStr)] string source, uint sourcelen, ref MOJOSHADER_preprocessorDefine defines, uint define_count, MOJOSHADER_includeOpen include_open, MOJOSHADER_includeClose include_close, MOJOSHADER_malloc m, MOJOSHADER_free f, IntPtr d) ;
 		
 		    
 		    /// Return Type: void
 		    ///data: MOJOSHADER_preprocessData*
-		    [DllImportAttribute("libmojoshader.dll", EntryPoint="MOJOSHADER_freePreprocessData")]
+		    [DllImportAttribute(mojoshader_dll, EntryPoint="MOJOSHADER_freePreprocessData")]
 		public static extern  void MOJOSHADER_freePreprocessData(ref MOJOSHADER_preprocessData data) ;
 		
 		    
@@ -2870,7 +2876,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    ///m: MOJOSHADER_malloc
 		    ///f: MOJOSHADER_free
 		    ///d: void*
-		    [DllImportAttribute("libmojoshader.dll", EntryPoint="MOJOSHADER_assemble")]
+		    [DllImportAttribute(mojoshader_dll, EntryPoint="MOJOSHADER_assemble")]
 		public static extern  IntPtr MOJOSHADER_assemble([InAttribute()] [MarshalAsAttribute(UnmanagedType.LPStr)] string filename, [InAttribute()] [MarshalAsAttribute(UnmanagedType.LPStr)] string source, uint sourcelen, ref IntPtr comments, uint comment_count, ref MOJOSHADER_symbol symbols, uint symbol_count, ref MOJOSHADER_preprocessorDefine defines, uint define_count, MOJOSHADER_includeOpen include_open, MOJOSHADER_includeClose include_close, MOJOSHADER_malloc m, MOJOSHADER_free f, IntPtr d) ;
 		
 		    
@@ -2886,13 +2892,13 @@ namespace Microsoft.Xna.Framework.Graphics
 		    ///m: MOJOSHADER_malloc
 		    ///f: MOJOSHADER_free
 		    ///d: void*
-		    [DllImportAttribute("libmojoshader.dll", EntryPoint="MOJOSHADER_parseAst")]
+		    [DllImportAttribute(mojoshader_dll, EntryPoint="MOJOSHADER_parseAst")]
 		public static extern  IntPtr MOJOSHADER_parseAst([InAttribute()] [MarshalAsAttribute(UnmanagedType.LPStr)] string srcprofile, [InAttribute()] [MarshalAsAttribute(UnmanagedType.LPStr)] string filename, [InAttribute()] [MarshalAsAttribute(UnmanagedType.LPStr)] string source, uint sourcelen, ref MOJOSHADER_preprocessorDefine defs, uint define_count, MOJOSHADER_includeOpen include_open, MOJOSHADER_includeClose include_close, MOJOSHADER_malloc m, MOJOSHADER_free f, IntPtr d) ;
 		
 		    
 		    /// Return Type: void
 		    ///data: MOJOSHADER_astData*
-		    [DllImportAttribute("libmojoshader.dll", EntryPoint="MOJOSHADER_freeAstData")]
+		    [DllImportAttribute(mojoshader_dll, EntryPoint="MOJOSHADER_freeAstData")]
 		public static extern  void MOJOSHADER_freeAstData(ref MOJOSHADER_astData data) ;
 		
 		    
@@ -2908,13 +2914,13 @@ namespace Microsoft.Xna.Framework.Graphics
 		    ///m: MOJOSHADER_malloc
 		    ///f: MOJOSHADER_free
 		    ///d: void*
-		    [DllImportAttribute("libmojoshader.dll", EntryPoint="MOJOSHADER_compile")]
+		    [DllImportAttribute(mojoshader_dll, EntryPoint="MOJOSHADER_compile")]
 		public static extern  IntPtr MOJOSHADER_compile([InAttribute()] [MarshalAsAttribute(UnmanagedType.LPStr)] string srcprofile, [InAttribute()] [MarshalAsAttribute(UnmanagedType.LPStr)] string filename, [InAttribute()] [MarshalAsAttribute(UnmanagedType.LPStr)] string source, uint sourcelen, ref MOJOSHADER_preprocessorDefine defs, uint define_count, MOJOSHADER_includeOpen include_open, MOJOSHADER_includeClose include_close, MOJOSHADER_malloc m, MOJOSHADER_free f, IntPtr d) ;
 		
 		    
 		    /// Return Type: void
 		    ///data: MOJOSHADER_compileData*
-		    [DllImportAttribute("libmojoshader.dll", EntryPoint="MOJOSHADER_freeCompileData")]
+		    [DllImportAttribute(mojoshader_dll, EntryPoint="MOJOSHADER_freeCompileData")]
 		public static extern  void MOJOSHADER_freeCompileData(ref MOJOSHADER_compileData data) ;
 		
 		    
@@ -2923,25 +2929,25 @@ namespace Microsoft.Xna.Framework.Graphics
 		    ///d: void*
 		    ///profs: char**
 		    ///size: int
-		    [DllImportAttribute("libmojoshader.dll", EntryPoint="MOJOSHADER_glAvailableProfiles")]
+		    [DllImportAttribute(mojoshader_dll, EntryPoint="MOJOSHADER_glAvailableProfiles")]
 		public static extern  int MOJOSHADER_glAvailableProfiles(MOJOSHADER_glGetProcAddress lookup, IntPtr d, ref IntPtr profs, int size) ;
 		
 		    
 		    /// Return Type: char*
 		    ///lookup: MOJOSHADER_glGetProcAddress
 		    ///d: void*
-		    [DllImportAttribute("libmojoshader.dll", EntryPoint="MOJOSHADER_glBestProfile")]
+		    [DllImportAttribute(mojoshader_dll, EntryPoint="MOJOSHADER_glBestProfile")]
 		public static extern  IntPtr MOJOSHADER_glBestProfile(MOJOSHADER_glGetProcAddress lookup, IntPtr d) ;
 		
 		    
 		    /// Return Type: char*
-		    [DllImportAttribute("libmojoshader.dll", EntryPoint="MOJOSHADER_glGetError")]
+		    [DllImportAttribute(mojoshader_dll, EntryPoint="MOJOSHADER_glGetError")]
 		public static extern  IntPtr MOJOSHADER_glGetError() ;
 		
 		    
 		    /// Return Type: int
 		    ///shader_type: MOJOSHADER_shaderType->Anonymous_cb045d1a_42aa_4c79_8706_255b4ceba853
-		    [DllImportAttribute("libmojoshader.dll", EntryPoint="MOJOSHADER_glMaxUniforms")]
+		    [DllImportAttribute(mojoshader_dll, EntryPoint="MOJOSHADER_glMaxUniforms")]
 		public static extern  int MOJOSHADER_glMaxUniforms(MOJOSHADER_shaderType shader_type) ;
 		
 		    
@@ -2949,7 +2955,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    ///idx: unsigned int
 		    ///data: float*
 		    ///vec4count: unsigned int
-		    [DllImportAttribute("libmojoshader.dll", EntryPoint="MOJOSHADER_glSetVertexShaderUniformF")]
+		    [DllImportAttribute(mojoshader_dll, EntryPoint="MOJOSHADER_glSetVertexShaderUniformF")]
 		public static extern  void MOJOSHADER_glSetVertexShaderUniformF(uint idx, ref float data, uint vec4count) ;
 		
 		    
@@ -2957,7 +2963,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    ///idx: unsigned int
 		    ///data: float*
 		    ///vec4count: unsigned int
-		    [DllImportAttribute("libmojoshader.dll", EntryPoint="MOJOSHADER_glGetVertexShaderUniformF")]
+		    [DllImportAttribute(mojoshader_dll, EntryPoint="MOJOSHADER_glGetVertexShaderUniformF")]
 		public static extern  void MOJOSHADER_glGetVertexShaderUniformF(uint idx, ref float data, uint vec4count) ;
 		
 		    
@@ -2965,7 +2971,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    ///idx: unsigned int
 		    ///data: int*
 		    ///ivec4count: unsigned int
-		    [DllImportAttribute("libmojoshader.dll", EntryPoint="MOJOSHADER_glSetVertexShaderUniformI")]
+		    [DllImportAttribute(mojoshader_dll, EntryPoint="MOJOSHADER_glSetVertexShaderUniformI")]
 		public static extern  void MOJOSHADER_glSetVertexShaderUniformI(uint idx, ref int data, uint ivec4count) ;
 		
 		    
@@ -2973,7 +2979,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    ///idx: unsigned int
 		    ///data: int*
 		    ///ivec4count: unsigned int
-		    [DllImportAttribute("libmojoshader.dll", EntryPoint="MOJOSHADER_glGetVertexShaderUniformI")]
+		    [DllImportAttribute(mojoshader_dll, EntryPoint="MOJOSHADER_glGetVertexShaderUniformI")]
 		public static extern  void MOJOSHADER_glGetVertexShaderUniformI(uint idx, ref int data, uint ivec4count) ;
 		
 		    
@@ -2981,7 +2987,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    ///idx: unsigned int
 		    ///data: int*
 		    ///bcount: unsigned int
-		    [DllImportAttribute("libmojoshader.dll", EntryPoint="MOJOSHADER_glSetVertexShaderUniformB")]
+		    [DllImportAttribute(mojoshader_dll, EntryPoint="MOJOSHADER_glSetVertexShaderUniformB")]
 		public static extern  void MOJOSHADER_glSetVertexShaderUniformB(uint idx, ref int data, uint bcount) ;
 		
 		    
@@ -2989,7 +2995,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    ///idx: unsigned int
 		    ///data: int*
 		    ///bcount: unsigned int
-		    [DllImportAttribute("libmojoshader.dll", EntryPoint="MOJOSHADER_glGetVertexShaderUniformB")]
+		    [DllImportAttribute(mojoshader_dll, EntryPoint="MOJOSHADER_glGetVertexShaderUniformB")]
 		public static extern  void MOJOSHADER_glGetVertexShaderUniformB(uint idx, ref int data, uint bcount) ;
 		
 		    
@@ -2997,7 +3003,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    ///idx: unsigned int
 		    ///data: float*
 		    ///vec4count: unsigned int
-		    [DllImportAttribute("libmojoshader.dll", EntryPoint="MOJOSHADER_glSetPixelShaderUniformF")]
+		    [DllImportAttribute(mojoshader_dll, EntryPoint="MOJOSHADER_glSetPixelShaderUniformF")]
 		public static extern  void MOJOSHADER_glSetPixelShaderUniformF(uint idx, ref float data, uint vec4count) ;
 		
 		    
@@ -3005,7 +3011,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    ///idx: unsigned int
 		    ///data: float*
 		    ///vec4count: unsigned int
-		    [DllImportAttribute("libmojoshader.dll", EntryPoint="MOJOSHADER_glGetPixelShaderUniformF")]
+		    [DllImportAttribute(mojoshader_dll, EntryPoint="MOJOSHADER_glGetPixelShaderUniformF")]
 		public static extern  void MOJOSHADER_glGetPixelShaderUniformF(uint idx, ref float data, uint vec4count) ;
 		
 		    
@@ -3013,7 +3019,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    ///idx: unsigned int
 		    ///data: int*
 		    ///ivec4count: unsigned int
-		    [DllImportAttribute("libmojoshader.dll", EntryPoint="MOJOSHADER_glSetPixelShaderUniformI")]
+		    [DllImportAttribute(mojoshader_dll, EntryPoint="MOJOSHADER_glSetPixelShaderUniformI")]
 		public static extern  void MOJOSHADER_glSetPixelShaderUniformI(uint idx, ref int data, uint ivec4count) ;
 		
 		    
@@ -3021,7 +3027,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    ///idx: unsigned int
 		    ///data: int*
 		    ///ivec4count: unsigned int
-		    [DllImportAttribute("libmojoshader.dll", EntryPoint="MOJOSHADER_glGetPixelShaderUniformI")]
+		    [DllImportAttribute(mojoshader_dll, EntryPoint="MOJOSHADER_glGetPixelShaderUniformI")]
 		public static extern  void MOJOSHADER_glGetPixelShaderUniformI(uint idx, ref int data, uint ivec4count) ;
 		
 		    
@@ -3029,7 +3035,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    ///idx: unsigned int
 		    ///data: int*
 		    ///bcount: unsigned int
-		    [DllImportAttribute("libmojoshader.dll", EntryPoint="MOJOSHADER_glSetPixelShaderUniformB")]
+		    [DllImportAttribute(mojoshader_dll, EntryPoint="MOJOSHADER_glSetPixelShaderUniformB")]
 		public static extern  void MOJOSHADER_glSetPixelShaderUniformB(uint idx, ref int data, uint bcount) ;
 		
 		    
@@ -3037,7 +3043,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    ///idx: unsigned int
 		    ///data: int*
 		    ///bcount: unsigned int
-		    [DllImportAttribute("libmojoshader.dll", EntryPoint="MOJOSHADER_glGetPixelShaderUniformB")]
+		    [DllImportAttribute(mojoshader_dll, EntryPoint="MOJOSHADER_glGetPixelShaderUniformB")]
 		public static extern  void MOJOSHADER_glGetPixelShaderUniformB(uint idx, ref int data, uint bcount) ;
 		
 		    
@@ -3049,7 +3055,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    ///normalized: int
 		    ///stride: unsigned int
 		    ///ptr: void*
-		    [DllImportAttribute("libmojoshader.dll", EntryPoint="MOJOSHADER_glSetVertexAttribute")]
+		    [DllImportAttribute(mojoshader_dll, EntryPoint="MOJOSHADER_glSetVertexAttribute")]
 		public static extern  void MOJOSHADER_glSetVertexAttribute(MOJOSHADER_usage usage, int index, uint size, MOJOSHADER_attributeType type, int normalized, uint stride, IntPtr ptr) ;
 		
 		    
@@ -3057,7 +3063,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    ///idx: unsigned int
 		    ///data: float*
 		    ///vec4n: unsigned int
-		    [DllImportAttribute("libmojoshader.dll", EntryPoint="MOJOSHADER_glSetVertexPreshaderUniformF")]
+		    [DllImportAttribute(mojoshader_dll, EntryPoint="MOJOSHADER_glSetVertexPreshaderUniformF")]
 		public static extern  void MOJOSHADER_glSetVertexPreshaderUniformF(uint idx, ref float data, uint vec4n) ;
 		
 		    
@@ -3065,7 +3071,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    ///idx: unsigned int
 		    ///data: float*
 		    ///vec4n: unsigned int
-		    [DllImportAttribute("libmojoshader.dll", EntryPoint="MOJOSHADER_glGetVertexPreshaderUniformF")]
+		    [DllImportAttribute(mojoshader_dll, EntryPoint="MOJOSHADER_glGetVertexPreshaderUniformF")]
 		public static extern  void MOJOSHADER_glGetVertexPreshaderUniformF(uint idx, ref float data, uint vec4n) ;
 		
 		    
@@ -3073,7 +3079,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    ///idx: unsigned int
 		    ///data: float*
 		    ///vec4n: unsigned int
-		    [DllImportAttribute("libmojoshader.dll", EntryPoint="MOJOSHADER_glSetPixelPreshaderUniformF")]
+		    [DllImportAttribute(mojoshader_dll, EntryPoint="MOJOSHADER_glSetPixelPreshaderUniformF")]
 		public static extern  void MOJOSHADER_glSetPixelPreshaderUniformF(uint idx, ref float data, uint vec4n) ;
 		
 		    
@@ -3081,12 +3087,12 @@ namespace Microsoft.Xna.Framework.Graphics
 		    ///idx: unsigned int
 		    ///data: float*
 		    ///vec4n: unsigned int
-		    [DllImportAttribute("libmojoshader.dll", EntryPoint="MOJOSHADER_glGetPixelPreshaderUniformF")]
+		    [DllImportAttribute(mojoshader_dll, EntryPoint="MOJOSHADER_glGetPixelPreshaderUniformF")]
 		public static extern  void MOJOSHADER_glGetPixelPreshaderUniformF(uint idx, ref float data, uint vec4n) ;
 		
 		    
 		    /// Return Type: void
-		    [DllImportAttribute("libmojoshader.dll", EntryPoint="MOJOSHADER_glProgramReady")]
+		    [DllImportAttribute(mojoshader_dll, EntryPoint="MOJOSHADER_glProgramReady")]
 		public static extern  void MOJOSHADER_glProgramReady() ;
 		
 		}

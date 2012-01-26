@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 #if MONOMAC
 using MonoMac.OpenGL;
 #else
+using System.Text;
 using OpenTK.Graphics.ES20;
 using ShaderType = OpenTK.Graphics.ES20.All;
 using ShaderParameter = OpenTK.Graphics.ES20.All;
@@ -136,6 +137,13 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			glslCode = GLSLOptimizer.Optimize (glslCode, shaderType);
 			
+#if IPHONE
+			glslCode = glslCode.Replace("#version 110\n", "");
+			glslCode = @"precision mediump float;
+						 precision mediump int;
+						"+glslCode;
+#endif
+			
 			shader = GL.CreateShader (shaderType);
 #if IPHONE
 			GL.ShaderSource (shader, 1, new string[]{glslCode}, (int[])null);
@@ -151,14 +159,22 @@ namespace Microsoft.Xna.Framework.Graphics
 			GL.GetShader (shader, ShaderParameter.CompileStatus, out compiled);
 #endif
 			if (compiled == (int)All.False) {
-
-#if !IPHONE
+#if IPHONE
+				string log = "";
+				int length = 0;
+				GL.GetShader (shader, ShaderParameter.InfoLogLength, ref length);
+				if (length > 0) {
+					var logBuilder = new StringBuilder(length);
+					GL.GetShaderInfoLog(shader, length, ref length, logBuilder);
+					log = logBuilder.ToString();
+				}
+#else
 				string log = GL.GetShaderInfoLog(shader);
-				Console.WriteLine (log);
 #endif
+				Console.WriteLine (log);
 				
 				GL.DeleteShader (shader);
-				throw new Exception("Shader Compilation Failed");
+				throw new InvalidOperationException("Shader Compilation Failed");
 			}
 				
 			//MojoShader.NativeMethods.MOJOSHADER_freeParseData(parseDataPtr);
