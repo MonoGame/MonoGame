@@ -343,6 +343,7 @@
     <Compile Include="Android\GamerServices\MonoGameGamerServicesHelper.cs" />
     <Compile Include="Audio\InstancePlayLimitException.cs" />
     <Compile Include="Graphics\Vertices\IndexElementSize.cs" />
+    <Compile Include="LaunchParameters.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />

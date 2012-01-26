@@ -171,7 +171,7 @@ namespace Microsoft.Xna.Framework
 		{	    
 			if(isPausing)
 				return; // See note on isPausing
-			
+#if !TEST1_1
 			try
 			{
 				ContextRenderingApi = EAGLRenderingAPI.OpenGLES2;
@@ -187,7 +187,8 @@ namespace Microsoft.Xna.Framework
 					renderbufferHeight = height;
 				}
 		    } 
-			catch (Exception) 
+			catch (Exception)
+#endif
 			{
 		        // device doesn't support OpenGLES 2.0; retry with 1.1:
 		        ContextRenderingApi = EAGLRenderingAPI.OpenGLES1;
@@ -451,42 +452,52 @@ namespace Microsoft.Xna.Framework
             //        or more Changed notifications, and then one of the final-
             //        state notifications (Recognized, Failed, etc)
             if (sender.State == UIGestureRecognizerState.Began)
-			    TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.Hold, new TimeSpan(_nowUpdate.Ticks), translatedTouchPosition, new Vector2 (sender.LocationInView (sender.View)), new Vector2(0,0), new Vector2(0,0)));
+			{
+				var point = sender.LocationInView(sender.View);
+			    TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.Hold, new TimeSpan(_nowUpdate.Ticks), translatedTouchPosition, new Vector2 (point.X, point.Y), new Vector2(0,0), new Vector2(0,0)));
+			}
 		}
 		
 		
 		[Export("PanGestureRecognizer")]
 		public void PanGestureRecognizer (UIPanGestureRecognizer sender)
 		{
+			var point = sender.LocationInView(sender.View);
 			if (sender.State==UIGestureRecognizerState.Ended || sender.State==UIGestureRecognizerState.Cancelled || sender.State==UIGestureRecognizerState.Failed)
-				TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.DragComplete, new TimeSpan(_nowUpdate.Ticks), translatedTouchPosition, new Vector2(0,0), new Vector2 (sender.TranslationInView(sender.View)), new Vector2(0,0)));
+				TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.DragComplete, new TimeSpan(_nowUpdate.Ticks), translatedTouchPosition, new Vector2(0,0), new Vector2 (point.X, point.Y), new Vector2(0,0)));
 			else
-				TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.FreeDrag, new TimeSpan(_nowUpdate.Ticks), translatedTouchPosition, new Vector2(0,0), new Vector2 (sender.TranslationInView(sender.View)), new Vector2(0,0)));
+				TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.FreeDrag, new TimeSpan(_nowUpdate.Ticks), translatedTouchPosition, new Vector2(0,0), new Vector2 (point.X, point.Y), new Vector2(0,0)));
 		}
 			
 		[Export("PinchGestureRecognizer")]
 		public void PinchGestureRecognizer (UIPinchGestureRecognizer sender)
 		{
-			TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.Pinch, new TimeSpan(_nowUpdate.Ticks), new Vector2 (sender.LocationOfTouch(0,sender.View)), new Vector2 (sender.LocationOfTouch(1,sender.View)), new Vector2(0,0), new Vector2(0,0)));
+			var point0 = sender.LocationOfTouch(0, sender.View);
+			var point1 = sender.LocationOfTouch(1, sender.View);
+			TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.Pinch, new TimeSpan(_nowUpdate.Ticks), new Vector2 (point0.X, point0.Y), new Vector2 (point1.X, point1.Y), new Vector2(0,0), new Vector2(0,0)));
 		}
 		
 		
 		[Export("RotationGestureRecognizer")]
 		public void RotationGestureRecognizer (UIRotationGestureRecognizer sender)
 		{
-			TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.Rotation, new TimeSpan(_nowUpdate.Ticks), new Vector2 (sender.LocationInView (sender.View)), new Vector2 (sender.LocationInView (sender.View)), new Vector2(0,0), new Vector2(0,0)));
+			var point0 = sender.LocationOfTouch(0, sender.View);
+			var point1 = sender.LocationOfTouch(1, sender.View);
+			TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.Rotation, new TimeSpan(_nowUpdate.Ticks), new Vector2 (point0.X, point0.Y), new Vector2 (point1.X, point1.Y), new Vector2(0,0), new Vector2(0,0)));
 		}
 		
 		[Export("SwipeGestureRecognizer")]
 		public void SwipeGestureRecognizer (UISwipeGestureRecognizer sender)
 		{
-			TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.Flick, new TimeSpan(_nowUpdate.Ticks), new Vector2 (sender.LocationInView (sender.View)), new Vector2 (sender.LocationInView (sender.View)), new Vector2(0,0), new Vector2(0,0)));		
+			var point = sender.LocationInView(sender.View);
+			TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.Flick, new TimeSpan(_nowUpdate.Ticks), new Vector2 (point.X, point.Y), new Vector2 (point.X, point.Y), new Vector2(0,0), new Vector2(0,0)));		
 		}
 		
 		[Export("TapGestureRecognizer")]
 		public void TapGestureRecognizer (UITapGestureRecognizer sender)
 		{
-			TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.Tap, new TimeSpan(_nowUpdate.Ticks), translatedTouchPosition, new Vector2 (sender.LocationInView (sender.View)), new Vector2(0,0), new Vector2(0,0)));
+			var point = sender.LocationInView(sender.View);
+			TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.Tap, new TimeSpan(_nowUpdate.Ticks), translatedTouchPosition, new Vector2 (point.X, point.Y), new Vector2(0,0), new Vector2(0,0)));
 		}
 		
 		private void FillTouchCollection(NSSet touches)
@@ -500,7 +511,8 @@ namespace Microsoft.Xna.Framework
 				UITouch touch = touchesArray[i];
 				
 				//Get position touch
-				Vector2 position = new Vector2 (touch.LocationInView (touch.View));
+				var point = touch.LocationInView(touch.View);
+				Vector2 position = new Vector2 (point.X, point.Y);
 				translatedTouchPosition = GetOffsetPosition(position, true);
 				
 				TouchLocation tlocation;
