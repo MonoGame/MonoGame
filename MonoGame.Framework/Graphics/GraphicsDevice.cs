@@ -912,7 +912,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 //Draw
                 GL20.DrawElements(PrimitiveTypeGL20(primitiveType), GetElementCountArray(primitiveType, primitiveCount),
-                                  ALL11.UnsignedShort, (IntPtr) (indexOffset*sizeof (ushort)));
+                                  ALL20.UnsignedShort, (IntPtr) (indexOffset*sizeof (ushort)));
 
 
                 // Free resources
