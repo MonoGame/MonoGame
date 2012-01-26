@@ -62,15 +62,19 @@ contributors give no express warranties, guarantees or conditions. You may have
 additional consumer rights under your local laws which this license cannot
 change. To the extent permitted under your local laws, the contributors exclude
 the implied warranties of merchantability, fitness for a particular purpose and
-non-infringement.
+non-infringement
 */
 #endregion License
 
-using System.Collections.Generic;
+using System;
 
-namespace Microsoft.Xna.Framework
+namespace MonoGame.Tests
 {
-    public class LaunchParameters : Dictionary<string, string>
-    {
-    }
+	static class Program
+	{
+		static void Main(string [] args)
+		{
+			CommandLineInterface.RunMain(args);
+		}
+	}
 }

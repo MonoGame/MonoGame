@@ -334,6 +334,7 @@
     <Compile Include="Desktop\Input\GamePad.cs" />
     <Compile Include="Desktop\Input\Mouse.cs" />
     <Compile Include="Desktop\Input\MouseState.cs" />
+    <Compile Include="LaunchParameters.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.Linux.csproj">

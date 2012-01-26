@@ -84,7 +84,7 @@ namespace Microsoft.Xna.Framework
 
         public override GameRunBehavior DefaultRunBehavior
         {
-            get { return GameRunBehavior.Asynchronous; }
+            get { return GameRunBehavior.Synchronous; }
         }
 
         public override void Exit()
@@ -99,13 +99,13 @@ namespace Microsoft.Xna.Framework
 
         public override void RunLoop()
         {
-            throw new NotImplementedException();
+            ResetWindowBounds(false);
+            Window.Run(1 / Game.TargetElapsedTime.TotalSeconds);
         }
 
         public override void StartRunLoop()
         {
-            ResetWindowBounds(false);
-            Window.Run(1 / Game.TargetElapsedTime.TotalSeconds);
+			throw new NotImplementedException("Asynchronous Game loops are not supported on this platform.");
         }
 
         public override bool BeforeUpdate(GameTime gameTime)

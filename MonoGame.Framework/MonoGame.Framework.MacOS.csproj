@@ -8,7 +8,7 @@
     <ProjectGuid>{36C538E6-C32A-4A8D-A39C-566173D7118E}</ProjectGuid>
     <ProjectTypeGuids>{948B3504-5B70-4649-8FE4-BDE1FB46EC69};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
-    <RootNamespace>Microsoft.Xna.Framework.GamerServices</RootNamespace>
+    <RootNamespace>Microsoft.Xna.Framework</RootNamespace>
     <AssemblyName>MonoGame.Framework.MacOS</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -353,8 +353,8 @@
     <Compile Include="MacOS\Audio\OpenALSupport.cs" />
     <Compile Include="MacOS\Audio\SoundEffect.cs" />
     <Compile Include="MacOS\Audio\SoundEffectInstance.cs" />
-    <Compile Include="MacOS\MacGamePlatform+Synchronous.cs" />
     <Compile Include="LaunchParameters.cs" />
+    <Compile Include="MacOS\MacGamePlatform+Synchronous.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />

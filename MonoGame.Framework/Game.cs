@@ -187,6 +187,12 @@ namespace Microsoft.Xna.Framework
             get { return _components; }
         }
 
+        public TimeSpan InactiveSleepTime
+        {
+            get { throw new NotImplementedException(); }
+            set { throw new NotImplementedException(); }
+        }
+
         public bool IsActive
         {
             get { return _platform.IsActive; }
