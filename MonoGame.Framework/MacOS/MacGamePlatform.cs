@@ -352,6 +352,8 @@ namespace Microsoft.Xna.Framework
 
         public override void BeginScreenDeviceChange(bool willBeFullScreen)
         {
+           var graphicsDeviceManager = (GraphicsDeviceManager)Game.Services.GetService(typeof(IGraphicsDeviceManager));
+            _gameWindow.OpenGLContext.SwapInterval = graphicsDeviceManager.SynchronizeWithVerticalRetrace;
         }
 
         public override void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight)

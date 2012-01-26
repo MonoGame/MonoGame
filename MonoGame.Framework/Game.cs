@@ -470,6 +470,7 @@ namespace Microsoft.Xna.Framework
 
         internal void applyChanges(GraphicsDeviceManager manager)
         {
+			_platform.BeginScreenDeviceChange(GraphicsDevice.PresentationParameters.IsFullScreen);
             if (GraphicsDevice.PresentationParameters.IsFullScreen)
                 _platform.EnterFullScreen();
             else
@@ -485,6 +486,7 @@ namespace Microsoft.Xna.Framework
             viewport.Height = GraphicsDevice.PresentationParameters.BackBufferHeight;
 
             GraphicsDevice.Viewport = viewport;
+			_platform.EndScreenDeviceChange(string.Empty, viewport.Width, viewport.Height);
         }
 
         internal void DoUpdate(GameTime gameTime)
