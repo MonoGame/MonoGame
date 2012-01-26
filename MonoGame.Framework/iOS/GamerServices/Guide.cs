@@ -68,10 +68,10 @@ namespace Microsoft.Xna.Framework.GamerServices
 		}
 		public override bool ShouldAutorotateToInterfaceOrientation (UIInterfaceOrientation toInterfaceOrientation)
 		{
-
-			var manager = GameWindow.game.graphicsDeviceManager as GraphicsDeviceManager;
-			Console.WriteLine(manager == null);
-			if(manager == null)
+            // FIXME: Where can we get GraphicsDeviceManager?
+			var manager = (GraphicsDeviceManager)null;
+            // FIXME: Is this wise?
+			if (manager == null)
 				return true;
 			DisplayOrientation supportedOrientations = manager.SupportedOrientations;
 			switch(toInterfaceOrientation)
@@ -87,8 +87,6 @@ namespace Microsoft.Xna.Framework.GamerServices
 			default :
 				return false;
 			}
-			return true;
-			//return base.ShouldAutorotateToInterfaceOrientation (toInterfaceOrientation);
 		}
 
 		public override void DidRotate (UIInterfaceOrientation fromInterfaceOrientation)

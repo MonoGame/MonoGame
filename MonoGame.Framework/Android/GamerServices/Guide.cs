@@ -45,9 +45,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Runtime.Remoting.Messaging;
-
+using Android.App;
+using Android.Content;
 using Android.Views;
-
+using Android.Widget;
 using Microsoft.Xna.Framework.Net;
 using Microsoft.Xna.Framework.Storage;
 
@@ -69,6 +70,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 
         internal static void Initialise(Game game)
         {
+			MonoGameGamerServicesHelper.Initialise(game);        
         }
 
 	    delegate string ShowKeyboardInputDelegate(
@@ -93,7 +95,35 @@ namespace Microsoft.Xna.Framework.GamerServices
 			}
 			
 			isVisible = isKeyboardInputShowing;
-			return result;
+
+		    var alert = new AlertDialog.Builder(Game.Activity);
+
+		    alert.SetTitle(title);
+		    alert.SetMessage(description);
+
+		    var input = new EditText(Game.Activity) {Text = defaultText};
+		    alert.SetView(input);
+
+		    alert.SetPositiveButton("Ok", (dialog, whichButton) =>
+		                                      {
+		                                          result = input.Text;
+		                                          isVisible = false;
+		                                      });
+
+		    alert.SetNegativeButton("Cancel", (dialog, whichButton) =>
+		                                          {
+		                                              result = null;
+                                                      isVisible = false;
+                                                  });
+
+            Game.Activity.RunOnUiThread(() => alert.Show());
+
+		    while (isVisible)
+		    {
+		        Thread.Sleep(1);
+		    }
+
+            return result;
 		}
 
 		public static IAsyncResult BeginShowKeyboardInput (
@@ -243,6 +273,8 @@ namespace Microsoft.Xna.Framework.GamerServices
 				new ArgumentException("paneCount Can only be 1 on iPhone");
 				return;
 			}
+			
+			MonoGameGamerServicesHelper.ShowSigninSheet();
 
 			if (GamerServicesComponent.LocalNetworkGamer == null)
 			{
@@ -352,5 +384,6 @@ namespace Microsoft.Xna.Framework.GamerServices
 			set;
 		}
 		#endregion
+		
 	}
 }

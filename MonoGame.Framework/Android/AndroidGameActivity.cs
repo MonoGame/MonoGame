@@ -16,7 +16,7 @@ namespace Microsoft.Xna.Framework
 {
     public class AndroidGameActivity : Activity
     {
-        public Game Game { get; set; }
+        public static Game Game { get; set; }
 		
 		private OrientationListener o;		
 		
@@ -27,20 +27,44 @@ namespace Microsoft.Xna.Framework
 			if (o.CanDetectOrientation())
 			{
 				o.Enable();				
-			}						
-		}	
-				
+			}
+
+            RequestWindowFeature(WindowFeatures.NoTitle);
+		}
+
+        public static event EventHandler Paused;
+
+		public override void OnConfigurationChanged (Android.Content.Res.Configuration newConfig)
+		{
+			// we need to refresh the viewport here.			
+			base.OnConfigurationChanged (newConfig);
+		}
+
         protected override void OnPause()
         {
             base.OnPause();
-            if (Game != null) Game.EnterBackground();
+            if (Paused != null)
+                Paused(this, EventArgs.Empty);
+            Game.GraphicsDevice.ResourcesLost = true;
+
+            ((FrameLayout)Game.Window.Parent).RemoveAllViews();
         }
 
+        public static event EventHandler Resumed;
         protected override void OnResume()
         {
             base.OnResume();
-            if (Game != null) Game.EnterForeground();
+            if (Resumed != null)
+                Resumed(this, EventArgs.Empty);
+
+            var deviceManager = (IGraphicsDeviceManager)Game.Services.GetService(typeof(IGraphicsDeviceManager));
+            if (deviceManager == null)
+                return;
+            (deviceManager as GraphicsDeviceManager).ForceSetFullScreen();
+            Game.Window.RequestFocus();
+            Game.GraphicsDevice.Initialize();
         }
+
     }
 	
 	internal class OrientationListener : OrientationEventListener
@@ -82,7 +106,10 @@ namespace Microsoft.Xna.Framework
 						break;
 				}
 				
-				activity.Game.Window.SetOrientation(disporientation);
+				if (AndroidGameActivity.Game.Window.CurrentOrientation != disporientation)
+				{
+				AndroidGameActivity.Game.Window.SetOrientation(disporientation);
+				}
 				inprogress = false;
 			}
 			

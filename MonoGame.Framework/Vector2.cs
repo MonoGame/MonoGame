@@ -85,12 +85,6 @@ namespace Microsoft.Xna.Framework
             this.Y = y;
         }
 		 
-		public Vector2(PointF value)
-        {
-            this.X = value.X;
-            this.Y = value.Y;
-        }
-
         public Vector2(float value)
         {
             this.X = value;

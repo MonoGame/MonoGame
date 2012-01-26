@@ -149,7 +149,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 //		public void Clear (Color color)
 //		{
-//			Vector4 vector = color.ToEAGLColor ();
+//			Vector4 vector = color.ToVector4 ();
 //			// The following was not working with Color.Transparent
 //			// Once we get some regression tests take the following out			
 //			//GL.ClearColor (vector.X, vector.Y, vector.Z, 1.0f);
@@ -159,7 +159,7 @@ namespace Microsoft.Xna.Framework.Graphics
 //
 //		public void Clear (ClearOptions options, Color color, float depth, int stencil)
 //		{
-//			Clear (options, color.ToEAGLColor (), depth, stencil);
+//			Clear (options, color.ToVector4 (), depth, stencil);
 //		}
 //
 //		public void Clear (ClearOptions options, Vector4 color, float depth, int stencil)
@@ -175,12 +175,12 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		public void Clear (Color color)
 		{
-			Clear (ClearOptions.Target, color.ToEAGLColor(), 0, 0);
+			Clear (ClearOptions.Target, color.ToVector4(), 0, 0);
 		}
 
 		public void Clear (ClearOptions options, Color color, float depth, int stencil)
 		{
-			Clear (options, color.ToEAGLColor (), depth, stencil);
+			Clear (options, color.ToVector4 (), depth, stencil);
 		}
 
 		public void Clear (ClearOptions options, Vector4 color, float depth, int stencil)
@@ -508,7 +508,12 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			
 		}
-
+		
+		public RenderTargetBinding[] GetRenderTargets ()
+		{
+			return currentRenderTargets;
+		}
+		
 		public void ResolveBackBuffer (ResolveTexture2D resolveTexture)
 		{
 		}

@@ -45,6 +45,7 @@ using System.Runtime.InteropServices;
 using MonoMac.AppKit;
 using MonoMac.CoreGraphics;
 using MonoMac.Foundation;
+using MonoMac.ImageIO;
 
 using MonoMac.OpenGL;
 
@@ -289,7 +290,12 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			return FromFile (graphicsDevice, filename, 0, 0);
 		}
-		
+
+		// Not sure what this should do in Mac will leave it non implemented for now.
+		internal void Reload(Stream textureStream)
+		{
+		}
+
 		internal void Apply ()
 		{
 			if (texture == null)
@@ -543,6 +549,11 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			GL.GetTexImage (TextureTarget.Texture2D, level, PixelFormat.Rgba, PixelType.UnsignedByte, imageInfo);
 
+			// For RenderTextures we need to flip the data.
+			if (texture == null) {
+				flipImageData (imageInfo, _width, _height, 4);
+			}
+
 			return imageInfo;
 					
 		}
@@ -582,7 +593,24 @@ namespace Microsoft.Xna.Framework.Graphics
 			byte[] imageInfo = GetImageData (0);
 
 			// Get the Color values
-			if ((typeof(T) == typeof(Color))) {
+			if (typeof(T) == typeof(uint))
+			{
+				Color[] colors = new Color[elementCount];
+				GetData<Color>(level, rect, colors, startIndex, elementCount);
+				uint[] final = data as uint[];
+				for (int i = 0; i < final.Length; i++)
+				{
+					final[i] = (uint)
+					(
+						colors[i].R << 24 |
+						colors[i].G << 16 |
+						colors[i].B << 8 |
+						colors[i].A
+					);
+				}
+			}
+			// Get the Color values
+			else if ((typeof(T) == typeof(Color))) {
 
 
 				// Left this here for documentation - Not sure what it does but the
@@ -614,36 +642,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				int rWidth = r.Width;
 				int rHeight = r.Height;
 
-//				if (texture == null) {
-//					// For rendertargets we need to loop through and load the elements
-//					// backwards because the texture data is flipped vertically and horizontally
-//					var dataEnd = (rWidth * rHeight) - 1;
-//					var dataPos = 0;
-//					var dataRowColOffset = 0;
-//					for (int y = r.Top; y < rHeight; y++) {
-//						for (int x = r.Left; x < rWidth; x++) {
-//							var result = new Color (0, 0, 0, 0);						
-//							dataRowColOffset = ((y * rWidth) + x);
-//							switch (_format) {
-//							case SurfaceFormat.Color : //kTexture2DPixelFormat_RGBA8888
-//							case SurfaceFormat.Dxt3 :
-//								
-//								dataPos = dataRowColOffset * 4;								
-//															
-//								result.R = imageInfo [dataPos];
-//								result.G = imageInfo [dataPos + 1];
-//								result.B = imageInfo [dataPos + 2];
-//								result.A = imageInfo [dataPos + 3];
-//								break;
-//							default:
-//								throw new NotSupportedException ("Texture format");
-//							}
-//							data [dataEnd - dataRowColOffset] = (T)(object)result;
-//						}
-//
-//
-//					}
-//				} else {
+
 					// Loop through and extract the data but we need to load it 
 					var dataRowColOffset = 0;
 					var sz = 0;
@@ -714,9 +713,103 @@ namespace Microsoft.Xna.Framework.Graphics
 							data [((y - r.Top) * r.Width) + (x - r.Left)] = (T)(object)result;
 						}
 					}
-				//}
 			} else {
 				throw new NotImplementedException ("GetData not implemented for type.");
+			}
+		}
+
+		private CGImage createRGBImageFromBufferData (int mByteWidth, int mWidth, int mHeight)
+		{
+
+			CGColorSpace cSpace = CGColorSpace.CreateDeviceRGB ();
+
+			CGImageAlphaInfo ai = (CGImageAlphaInfo)((int)CGImageAlphaInfo.NoneSkipFirst | (int)CGBitmapFlags.ByteOrder32Little) ;
+
+			CGBitmapContext bitmap;
+			byte[] mData = GetImageData(0);
+			try {
+				unsafe {
+
+					fixed (byte* ptr = mData) {
+						bitmap = new CGBitmapContext ((IntPtr)ptr,mWidth,mHeight,8,mByteWidth,cSpace, ai);
+					}
+				}
+			} catch {
+
+			}
+
+			CGImage image = bitmap.ToImage ();
+
+			return image;
+
+
+		}
+
+		public void SaveAsJpeg (Stream stream, int width, int height)
+		{
+			int mByteWidth = width * 4;         // Assume 4 bytes/pixel for now
+			mByteWidth = (mByteWidth + 3) & ~3;    // Align to 4 bytes
+
+			CGImage imageRef = createRGBImageFromBufferData (mByteWidth, width, height);
+	
+//			CGImageDestination dest = CGImageDestination.FromUrl (url, "public.tiff", 1, null);
+//			dest.AddImage (imageRef, null);
+//
+//			bool success = dest.Close ();
+			//                        if (success == false)
+			//                                Console.WriteLine("did not work");
+			//                        else
+			//                                Console.WriteLine("did work");
+
+			// *** NOTE ** CGImageDestination is not working for some reason
+			//  so we will write this out using .net
+
+			//  get an NSBitmapImageRep of the CGImage
+			NSBitmapImageRep rep = new NSBitmapImageRep (imageRef);
+			//  obtain the NSData as Tiff image format
+			NSData data = rep.RepresentationUsingTypeProperties (NSBitmapImageFileType.Jpeg, new NSDictionary ());
+			//  write the Tiff formatted data as a stream to the out file.
+			WriteImageToStream (data.AsStream (), stream);
+		}
+
+		public void SaveAsPng (Stream stream, int width, int height)
+		{
+			int mByteWidth = width * 4;         // Assume 4 bytes/pixel for now
+			mByteWidth = (mByteWidth + 3) & ~3;    // Align to 4 bytes
+
+			CGImage imageRef = createRGBImageFromBufferData (mByteWidth, width, height);
+	
+//			CGImageDestination dest = CGImageDestination.FromUrl (url, "public.tiff", 1, null);
+//			dest.AddImage (imageRef, null);
+//
+//			bool success = dest.Close ();
+			//                        if (success == false)
+			//                                Console.WriteLine("did not work");
+			//                        else
+			//                                Console.WriteLine("did work");
+
+			// *** NOTE ** CGImageDestination is not working for some reason
+			//  so we will write this out using .net
+
+			//  get an NSBitmapImageRep of the CGImage
+			NSBitmapImageRep rep = new NSBitmapImageRep (imageRef);
+			//  obtain the NSData as Tiff image format
+			NSData data = rep.RepresentationUsingTypeProperties (NSBitmapImageFileType.Png, new NSDictionary ());
+			//  write the Tiff formatted data as a stream to the out file.
+			WriteImageToStream (data.AsStream (), stream);
+		}
+
+		private void WriteImageToStream (Stream source, Stream target)
+		{
+			byte[] buffer = new byte[0x10000];
+			int bytes;
+			try {
+				while ((bytes = source.Read (buffer, 0, buffer.Length)) > 0) {
+					target.Write (buffer, 0, bytes);
+				}
+			} finally {
+				target.Close ();
+	
 			}
 		}
 	}

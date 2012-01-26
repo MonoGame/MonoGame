@@ -131,6 +131,11 @@ using System.Collections.Generic;
 			return capabilities;
         }
 
+        internal void SetBack()
+        {
+            _buttons |= (int)Buttons.Back;
+        }
+
         internal void Update(MotionEvent e)
         {
             Vector2 location = new Vector2(e.GetX(), e.GetY());
@@ -251,16 +256,25 @@ using System.Collections.Generic;
         }
 
         public static GamePadState GetState(PlayerIndex playerIndex)
-        {    
-			return new GamePadState();
-			// TODO return new GamePadState((Buttons)GamePad.Instance._buttons,GamePad.Instance._leftStick,GamePad.Instance._rightStick);
+        {
+            var instance = GamePad.Instance;
+            var state = new GamePadState(new GamePadThumbSticks(), new GamePadTriggers(), new GamePadButtons((Buttons)instance._buttons), new GamePadDPad());
+            instance.Reset();
+            return state;
         }
 
         public static bool SetVibration(PlayerIndex playerIndex, float leftMotor, float rightMotor)
         {	
-            Vibrator vibrator = (Vibrator)Game.contextInstance.GetSystemService(Context.VibratorService);
-			vibrator.Vibrate(500);
-            return true;
+			try
+			{
+	            Vibrator vibrator = (Vibrator)Game.Activity.GetSystemService(Context.VibratorService);
+				vibrator.Vibrate(500);
+	            return true;
+			}
+			catch
+			{
+				return false;
+			}
         }
 		
 		public static ThumbStickDefinition LeftThumbStickDefinition

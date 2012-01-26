@@ -8,7 +8,7 @@
     <ProjectGuid>{36C538E6-C32A-4A8D-A39C-566173D7118E}</ProjectGuid>
     <ProjectTypeGuids>{948B3504-5B70-4649-8FE4-BDE1FB46EC69};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
-    <RootNamespace>Microsoft.Xna.Framework.GamerServices</RootNamespace>
+    <RootNamespace>Microsoft.Xna.Framework</RootNamespace>
     <AssemblyName>MonoGame.Framework.MacOS</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -134,9 +134,6 @@
     <Compile Include="Storage\StorageContainer.cs" />
     <Compile Include="Storage\StorageDevice.cs" />
     <Compile Include="Audio\AudioChannels.cs" />
-    <Compile Include="MacOS\Audio\Sound.cs" />
-    <Compile Include="Audio\SoundEffect.cs" />
-    <Compile Include="Audio\SoundEffectInstance.cs" />
     <Compile Include="Media\MediaPlayer.cs" />
     <Compile Include="Media\Song.cs" />
     <Compile Include="Media\MediaState.cs" />
@@ -169,7 +166,6 @@
     <Compile Include="Graphics\RenderTargetUsage.cs" />
     <Compile Include="MacOS\Graphics\ESImage.cs" />
     <Compile Include="MacOS\Graphics\ESTexture2D.cs" />
-    <Compile Include="MacOS\Graphics\Vertices\VertexBuffer.cs" />
     <Compile Include="Graphics\TextureUsage.cs" />
     <Compile Include="Graphics\SetDataOptions.cs" />
     <Compile Include="MacOS\Content\Texture2DReader.cs" />
@@ -184,6 +180,9 @@
     <Compile Include="Content\ContentReaders\StringReader.cs" />
     <Compile Include="Content\ContentReaders\RectangleReader.cs" />
     <Compile Include="Content\ContentReaders\Vector3Reader.cs" />
+    <Compile Include="Content\ContentReaders\PlaneReader.cs" />
+    <Compile Include="Content\ContentReaders\QuaternionReader.cs" />
+    <Compile Include="Content\ContentReaders\Vector4Reader.cs" />
     <Compile Include="Input\Touch\GestureType.cs" />
     <Compile Include="Input\Touch\TouchCollection.cs" />
     <Compile Include="Input\Touch\TouchLocation.cs" />
@@ -196,7 +195,6 @@
     <Compile Include="MacOS\Graphics\SpriteBatcher.cs" />
     <Compile Include="Graphics\SpriteBatchItem.cs" />
     <Compile Include="Graphics\SpriteEffects.cs" />
-    <Compile Include="MacOS\Game.cs" />
     <Compile Include="GameComponent.cs" />
     <Compile Include="DrawableGameComponent.cs" />
     <Compile Include="Audio\InstancePlayLimitException.cs" />
@@ -233,7 +231,6 @@
     <Compile Include="MacOS\Graphics\GraphicsExtensions.cs" />
     <Compile Include="MacOS\Graphics\States\GLStateManager.cs" />
     <Compile Include="MacOS\Graphics\Effect\EffectPass.cs" />
-    <Compile Include="MacOS\Graphics\Vertices\IndexBuffer.cs" />
     <Compile Include="MacOS\Graphics\Vertices\VertexDeclaration.cs" />
     <Compile Include="MacOS\GameWindow.cs" />
     <Compile Include="PreparingDeviceSettingsEventArgs.cs" />
@@ -251,7 +248,7 @@
     <Compile Include="MacOS\KeyUtil.cs" />
     <Compile Include="Graphics\States\TextureAddressMode.cs" />
     <Compile Include="Graphics\States\TextureFilter.cs" />
-    <Compile Include="MacOS\Input\GamePad.cs" />
+    <Compile Include="Desktop\Input\GamePad.cs" />
     <Compile Include="Input\ButtonDefinition.cs" />
     <Compile Include="Input\ThumbStickDefinition.cs" />
     <Compile Include="MacOS\GamerServices\SignedInGamer.cs" />
@@ -344,8 +341,20 @@
     <Compile Include="MacOS\Graphics\Effect\VSBasicEffectcs" />
     <Compile Include="Graphics\Vertices\VertexElementColor.cs" />
     <Compile Include="Graphics\Vertices\IndexElementSize.cs" />
+    <Compile Include="Graphics\Vertices\IndexBuffer.cs" />
+    <Compile Include="Graphics\Vertices\VertexBuffer.cs" />
     <Compile Include="Audio\XactSound.cs" />
     <Compile Include="Audio\XactClip.cs" />
+    <Compile Include="Game.cs" />
+    <Compile Include="GamePlatform.cs" />
+    <Compile Include="MacOS\MacGamePlatform.cs" />
+    <Compile Include="MacOS\Audio\OALSoundBuffer.cs" />
+    <Compile Include="MacOS\Audio\OpenALSoundController.cs" />
+    <Compile Include="MacOS\Audio\OpenALSupport.cs" />
+    <Compile Include="MacOS\Audio\SoundEffect.cs" />
+    <Compile Include="MacOS\Audio\SoundEffectInstance.cs" />
+    <Compile Include="LaunchParameters.cs" />
+    <Compile Include="MacOS\MacGamePlatform+Synchronous.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />
@@ -358,7 +367,6 @@
     <Folder Include="MacOS\Audio\" />
     <Folder Include="Media\" />
     <Folder Include="MacOS\Content\" />
-    <Folder Include="MacOS\Graphics\" />
     <Folder Include="MacOS\Media\" />
     <Folder Include="MacOS\Graphics\States\" />
     <Folder Include="MacOS\Graphics\Effect\" />

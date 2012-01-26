@@ -89,6 +89,10 @@ namespace Microsoft.Xna.Framework.Input
             maps[Keycode.Home] = Keys.Home;
 			maps[Keycode.Enter] = Keys.Enter;
             // TODO: put in all the other mappings
+            maps[Keycode.Menu] = Keys.Help;
+            maps[Keycode.Search] = Keys.BrowserSearch;
+            maps[Keycode.VolumeUp] = Keys.VolumeUp;
+            maps[Keycode.VolumeDown] = Keys.VolumeDown;
             return maps;
         }
 

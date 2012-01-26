@@ -372,7 +372,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 name = new StringBuilder(100);
                 GL.GetActiveUniform(obj, x, 100, out length, out size, out type, name);
                 Console.WriteLine("{0}: {1} {2} {3}", x, name, type, length);
-                EffectParameter efp = new EffectParameter(this, name.ToString(), x, type.ToString(), length);
+                EffectParameter efp = new EffectParameter(this, name.ToString(), x, -1, -1, type.ToString(), length);
                 Parameters._parameters.Add(efp.Name, efp);
                 if (efp.ParameterType == EffectParameterType.Texture2D)
                 {

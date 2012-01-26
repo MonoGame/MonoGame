@@ -43,7 +43,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-
+using System.Linq;
 #endregion Using clause
 
 namespace Microsoft.Xna.Framework.GamerServices
@@ -61,7 +61,20 @@ namespace Microsoft.Xna.Framework.GamerServices
 		}
  
 		internal void AddGamer (T item) {
-			base.Items.Add (item);
+            // need to add gamers at the correct index based on GamerTag           
+            if (base.Items.Count > 0)
+            {
+                for (int i = 0; i < base.Items.Count(); i++)
+                {
+                    if (item.Gamertag.CompareTo(base.Items[i].Gamertag) > 0)
+                    {
+                        base.Items.Insert(i, item);
+                        return;
+                    }
+                }
+            }
+            base.Items.Add(item);            
+            
 		}
 		
 		internal void RemoveGamer (T item) {
@@ -77,7 +90,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 //            return this.GetEnumerator();
 //        }
 		
-	IEnumerator IEnumerable.GetEnumerator()
+	    IEnumerator IEnumerable.GetEnumerator()
         {
             return this.GetEnumerator();
         }

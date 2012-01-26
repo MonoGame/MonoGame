@@ -54,6 +54,12 @@ namespace Microsoft.Xna.Framework.Audio
 		private string _filename = "";
 		private byte[] _data;
 		
+		internal float Rate { get; set; }
+
+		//internal ALFormat Format { get; set; }
+
+		internal int Size { get; set; }
+		
 		internal SoundEffect(string fileName)
 		{
 			_filename = fileName;		
@@ -182,7 +188,48 @@ namespace Microsoft.Xna.Framework.Audio
 				_masterVolume = value;	
 			}
 		}
-				
+
+		static float _distanceScale = 1f;
+
+		public static float DistanceScale {
+			get {
+				return _distanceScale;
+			}
+			set {
+				if (value <= 0f) {
+					throw new ArgumentOutOfRangeException ("value of DistanceScale");
+				}
+				_distanceScale = value;
+			}
+		}
+
+		static float _dopplerScale = 1f;
+
+		public static float DopplerScale {
+			get {
+				return _dopplerScale;
+			}
+			set {
+				// As per documenation it does not look like the value can be less than 0
+				//   although the documentation does not say it throws an error we will anyway
+				//   just so it is like the DistanceScale
+				if (value < 0f) {
+					throw new ArgumentOutOfRangeException ("value of DopplerScale");
+				}
+				_dopplerScale = value;
+			}
+		}
+
+		static float speedOfSound = 343.5f;
+
+		public static float SpeedOfSound {
+			get {
+				return speedOfSound;
+			}
+			set {
+				speedOfSound = value;
+			}
+		}						
     }
 }
 

@@ -154,7 +154,6 @@
     <Compile Include="Input\Mouse.cs" />
     <Compile Include="Input\MouseState.cs" />
     <Compile Include="Audio\AudioChannels.cs" />
-    <Compile Include="Audio\SoundEffect.cs" />
     <Compile Include="Audio\SoundState.cs" />
     <Compile Include="Media\MediaPlayer.cs" />
     <Compile Include="Media\MediaState.cs" />
@@ -171,6 +170,9 @@
     <Compile Include="Content\ContentReaders\Vector3Reader.cs" />
     <Compile Include="Content\ContentReaders\SongReader.cs" />
     <Compile Include="Content\ContentReaders\SoundEffectReader.cs" />
+    <Compile Include="Content\ContentReaders\PlaneReader.cs" />
+    <Compile Include="Content\ContentReaders\QuaternionReader.cs" />
+    <Compile Include="Content\ContentReaders\Vector4Reader.cs" />
     <Compile Include="Media\MediaSourceType.cs" />
     <Compile Include="Media\Playlist.cs" />
     <Compile Include="ReusableItemList.cs" />
@@ -199,7 +201,6 @@
     <Compile Include="Input\KeyboardState.cs" />
     <Compile Include="Input\Keys.cs" />
     <Compile Include="Input\Keyboard.cs" />
-    <Compile Include="Audio\SoundEffectInstance.cs" />
     <Compile Include="Input\KeyState.cs" />
     <Compile Include="IUpdateable.cs" />
     <Compile Include="Net\NetworkSessionJoinError.cs" />
@@ -333,10 +334,8 @@
     <Compile Include="iOS\Graphics\PresentationParameters.cs" />
     <Compile Include="iOS\Graphics\Texture2D.cs" />
     <Compile Include="iOS\Input\GamePad.cs" />
-    <Compile Include="iOS\Game.cs" />
     <Compile Include="iOS\IOSGameWindow.cs" />
     <Compile Include="iOS\PowerStatus.cs" />
-    <Compile Include="iOS\Audio\Sound.cs" />
     <Compile Include="iOS\Media\MediaSource.cs" />
     <Compile Include="iOS\Media\MediaLibrary.cs" />
     <Compile Include="iOS\Input\Accelerometer.cs" />
@@ -344,7 +343,6 @@
     <Compile Include="iOS\Media\VideoPlayer.cs" />
     <Compile Include="iOS\GamerServices\Guide.cs" />
     <Compile Include="iOS\GamerServices\TextFieldAlertView.cs" />
-    <Compile Include="iOS\Program.cs" />
     <Compile Include="iOS\Net\MonoGamePeerPickerControllerDelegate.cs" />
     <Compile Include="iOS\Net\MonoGameSessionDelegate.cs" />
     <Compile Include="iOS\Content\ContentManager.cs" />
@@ -363,6 +361,28 @@
     <Compile Include="Graphics\Vertices\VertexElementColor.cs" />
     <Compile Include="Audio\XactClip.cs" />
     <Compile Include="Audio\XactSound.cs" />
+    <Compile Include="Game.cs" />
+    <Compile Include="GamePlatform.cs" />
+    <Compile Include="iOS\iOSGamePlatform.cs" />
+    <Compile Include="iOS\iOSGameViewController.cs" />
+    <Compile Include="iOS\OrientationConverter.cs" />
+    <Compile Include="MacOS\Audio\OALSoundBuffer.cs">
+      <Link>iOS\Audio\OALSoundBuffer.cs</Link>
+    </Compile>
+    <Compile Include="MacOS\Audio\OpenALSoundController.cs">
+      <Link>iOS\Audio\OpenALSoundController.cs</Link>
+    </Compile>
+    <Compile Include="MacOS\Audio\OpenALSupport.cs">
+      <Link>iOS\Audio\OpenALSupport.cs</Link>
+    </Compile>
+    <Compile Include="MacOS\Audio\SoundEffect.cs">
+      <Link>iOS\Audio\SoundEffect.cs</Link>
+    </Compile>
+    <Compile Include="MacOS\Audio\SoundEffectInstance.cs">
+      <Link>iOS\Audio\SoundEffectInstance.cs</Link>
+    </Compile>
+    <Compile Include="Graphics\Vertices\IndexElementSize.cs" />
+    <Compile Include="LaunchParameters.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>

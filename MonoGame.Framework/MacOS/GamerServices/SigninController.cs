@@ -51,11 +51,12 @@ namespace Microsoft.Xna.Framework.GamerServices
 		// Shared initialization code
 		void Initialize ()
 		{
+			//window = new NSWindow(new RectangleF(0,0, 470, 250), NSWindowStyle.Titled | NSWindowStyle.Closable, NSBackingStore.Buffered, false);
 			window = new NSWindow(new RectangleF(0,0, 470, 250), NSWindowStyle.Titled, NSBackingStore.Buffered, false);
 			window.HasShadow = true;
 			NSView content = window.ContentView;
 			window.WindowController = this;
-			
+			window.Title = "Sign In";
 			NSTextField signInLabel = new NSTextField(new RectangleF(17, 190, 109, 17));
 			signInLabel.StringValue = "Sign In:";
 			signInLabel.Editable = false;

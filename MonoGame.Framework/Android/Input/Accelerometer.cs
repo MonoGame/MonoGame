@@ -57,10 +57,11 @@ namespace Microsoft.Xna.Framework.Input
 		
 		public static void SetupAccelerometer()
 		{
-            _sensorManger = (SensorManager)Game.contextInstance.GetSystemService(Context.SensorService);
+            _sensorManger = (SensorManager)Game.Activity.GetSystemService(Context.SensorService);
             _sensor = _sensorManger.GetDefaultSensor(SensorType.Accelerometer);
 
-            if (_sensor != null) {
+            if (_sensor != null) 
+            {
                 _state = new AccelerometerState { IsConnected = true };                
             }
             else _state = new AccelerometerState { IsConnected = false };
@@ -86,13 +87,26 @@ namespace Microsoft.Xna.Framework.Input
             public void OnSensorChanged(SensorEvent e)
             {
                 try {
-                    if (e != null && e.Values != null)
+					
+					if (e != null && e.Sensor.Type == SensorType.Accelerometer) 
 					{
-						_accelerometerVector.X = e.Values[0];
-						_accelerometerVector.Y = e.Values[1];
-						_accelerometerVector.Z = e.Values[2];
-                        _state.Acceleration = _accelerometerVector;
-					}
+     				    var values = e.Values;
+				        try 
+						{
+				            if (values != null && values.Count == 3) {
+				                _accelerometerVector.X = values[0];
+				                _accelerometerVector.Y = values[1];
+				                _accelerometerVector.Z = values[2];  
+							    _state.Acceleration = _accelerometerVector;
+				            }
+				        } 
+						finally 
+						{
+				            IDisposable d = values as IDisposable;
+				            if (d != null)
+				                d.Dispose ();
+				        }
+    				}                
                 }
                 catch (NullReferenceException ex) {
                     //Occassionally an NullReferenceException is thrown when accessing e.Values??
@@ -105,12 +119,12 @@ namespace Microsoft.Xna.Framework.Input
 
         internal static void Pause()
         {
-            if (_sensorManger != null && _sensor == null) _sensorManger.UnregisterListener(listener, _sensor);
+            if (_sensorManger != null && _sensor != null) _sensorManger.UnregisterListener(listener, _sensor);
         }
 
         internal static void Resume()
         {
-            if (_sensorManger != null && _sensor == null) _sensorManger.RegisterListener(listener, _sensor, SensorDelay.Game);            
+            if (_sensorManger != null && _sensor != null) _sensorManger.RegisterListener(listener, _sensor, SensorDelay.Game);            
         }
     }
 }

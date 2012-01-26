@@ -57,7 +57,7 @@ namespace Microsoft.Xna.Framework.Content
                 file = FileName.Substring(index + 1, FileName.Length - index - 1);
                 path = FileName.Substring(0, index);
             }
-		    string[] files = Game.contextInstance.Assets.List(path);
+		    string[] files = Game.Activity.Assets.List(path);
 
             if (Contains(file, files))
 				return FileName;
@@ -107,7 +107,7 @@ namespace Microsoft.Xna.Framework.Content
 				imagePtr = Marshal.AllocHGlobal (imageData.Length);
 				Marshal.Copy (imageData, 0, imagePtr, imageData.Length);					
 				ESTexture2D esTexture = new ESTexture2D (imagePtr, surfaceFormat, width, height, new Size (width, height), All.Linear);
-				texture = new Texture2D (new ESImage (esTexture));
+				texture = new Texture2D (reader.GraphicsDevice ,new ESImage (esTexture));
 			}
 			finally 
 			{		

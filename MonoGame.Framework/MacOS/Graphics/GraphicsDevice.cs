@@ -144,12 +144,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void Clear (Color color)
 		{
-			Clear (ClearOptions.Target, color.ToEAGLColor(), 0, 0);
+			Clear (ClearOptions.Target, color.ToVector4(), 0, 0);
 		}
 
 		public void Clear (ClearOptions options, Color color, float depth, int stencil)
 		{
-			Clear (options, color.ToEAGLColor (), depth, stencil);
+			Clear (options, color.ToVector4 (), depth, stencil);
 		}
 
 		public void Clear (ClearOptions options, Vector4 color, float depth, int stencil)
@@ -397,6 +397,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
 					ClearOptions clearOptions = ClearOptions.Target | ClearOptions.DepthBuffer;
 
+					// create framebuffer
+					GL.GenFramebuffers(1, out frameBufferIDs[i]);
+					GL.BindFramebuffer(FramebufferTarget.DrawFramebuffer, frameBufferIDs[i]);
+
+					// attach stencil buffer
 					switch (target.DepthStencilFormat) {
 					case DepthFormat.Depth16:
 						GL.RenderbufferStorage(RenderbufferTarget.RenderbufferExt, RenderbufferStorage.DepthComponent16,
@@ -418,10 +423,6 @@ namespace Microsoft.Xna.Framework.Graphics
 							target.Width, target.Height);
 						break;
 					}
-					
-					// create framebuffer
-					GL.GenFramebuffers(1, out frameBufferIDs[i]);
-					GL.BindFramebuffer(FramebufferTarget.DrawFramebuffer, frameBufferIDs[i]);
 					
 					// attach the texture to FBO color attachment point
 					GL.FramebufferTexture2D(FramebufferTarget.FramebufferExt, FramebufferAttachment.ColorAttachment0,
@@ -464,6 +465,11 @@ namespace Microsoft.Xna.Framework.Graphics
 			}						
 		}
 
+		public RenderTargetBinding[] GetRenderTargets ()
+		{
+			return currentRenderTargets;
+		}
+		
 		public void ResolveBackBuffer (ResolveTexture2D resolveTexture)
 		{
 		}

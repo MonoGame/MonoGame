@@ -56,7 +56,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             get
             {
-                return (int)Game.contextInstance.Resources.DisplayMetrics.WidthPixels;
+                return (int)Game.Activity.Resources.DisplayMetrics.WidthPixels;
             }
         }
 
@@ -64,8 +64,15 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             get
             {
-                return (int)Game.contextInstance.Resources.DisplayMetrics.HeightPixels;
+                return (int)Game.Activity.Resources.DisplayMetrics.HeightPixels;
             }
         }
+		
+#if DEBUG		
+		public override string ToString ()
+		{
+			return string.Format ("[DisplayMode: AspectRatio={0}, Width={1}, Height={2}]", AspectRatio, Width, Height);
+		}
+#endif		
     }
 }

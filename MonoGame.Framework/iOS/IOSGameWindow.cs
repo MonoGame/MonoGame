@@ -67,7 +67,7 @@ namespace Microsoft.Xna.Framework
     public class GameWindow : iPhoneOSGameView
     {
 		private readonly Rectangle clientBounds;
-		internal static Game game;
+		private iOSGamePlatform _platform;
 		private GameTime _updateGameTime;
         private GameTime _drawGameTime;
         private DateTime _lastUpdate;
@@ -109,8 +109,12 @@ namespace Microsoft.Xna.Framework
 				
 		#region UIVIew Methods
 
-		public GameWindow() : base (UIScreen.MainScreen.Bounds)
+		internal GameWindow(iOSGamePlatform platform) : base (UIScreen.MainScreen.Bounds)
 		{
+            if (platform == null)
+                throw new ArgumentNullException("platform");
+            _platform = platform;
+
 			LayerRetainsBacking = false; 
 			LayerColorFormat	= EAGLColorFormat.RGBA8;
 			ContentScaleFactor  = UIScreen.MainScreen.Scale;
@@ -143,6 +147,11 @@ namespace Microsoft.Xna.Framework
 		{
 			return iPhoneOSGameView.GetLayerClass ();
 		}
+
+        public override bool CanBecomeFirstResponder
+        {
+            get { return true; }
+        }
 		
 		protected override void ConfigureLayer(CAEAGLLayer eaglLayer) 
 		{
@@ -162,10 +171,9 @@ namespace Microsoft.Xna.Framework
 		{	    
 			if(isPausing)
 				return; // See note on isPausing
-			
+#if !TEST1_1
 			try
 			{
-#if ES20
 				ContextRenderingApi = EAGLRenderingAPI.OpenGLES2;
 				base.CreateFrameBuffer();
 				
@@ -178,24 +186,9 @@ namespace Microsoft.Xna.Framework
 					renderbufferWidth = width;
 					renderbufferHeight = height;
 				}
-#else
-				ContextRenderingApi = EAGLRenderingAPI.OpenGLES1;
-				base.CreateFrameBuffer();
-				
-				// Determine actual render buffer size (due to possible Retina Display scaling)
-				// http://developer.apple.com/library/ios/#documentation/iphone/conceptual/iphoneosprogrammingguide/SupportingResolutionIndependence/SupportingResolutionIndependence.html#//apple_ref/doc/uid/TP40007072-CH10-SW11
-				unsafe
-				{
-					int width = 0, height = 0;
-					OpenTK.Graphics.ES11.GL.Oes.GetRenderbufferParameter(OpenTK.Graphics.ES11.All.RenderbufferOes, OpenTK.Graphics.ES11.All.RenderbufferWidthOes, &width);
-					OpenTK.Graphics.ES11.GL.Oes.GetRenderbufferParameter(OpenTK.Graphics.ES11.All.RenderbufferOes, OpenTK.Graphics.ES11.All.RenderbufferHeightOes, &height);
-	
-					renderbufferWidth = width;
-					renderbufferHeight = height;
-				}
-#endif
 		    } 
-			catch (Exception) 
+			catch (Exception)
+#endif
 			{
 		        // device doesn't support OpenGLES 2.0; retry with 1.1:
 		        ContextRenderingApi = EAGLRenderingAPI.OpenGLES1;
@@ -402,13 +395,10 @@ namespace Microsoft.Xna.Framework
 			// More speed testing is required, to see if this is worse or better
 			// game.DoStep();	
 			
-			if (game != null )
-			{
-				_nowDraw = DateTime.Now;
-				_drawGameTime.Update(_nowDraw - _lastDraw);
-            	_lastDraw = _nowDraw;
-            	game.DoDraw(_drawGameTime);
-			}
+			_nowDraw = DateTime.Now;
+			_drawGameTime.Update(_nowDraw - _lastDraw);
+			_lastDraw = _nowDraw;
+			_platform.Game.DoDraw(_drawGameTime);
 						
 			SwapBuffers();
 		}
@@ -432,13 +422,10 @@ namespace Microsoft.Xna.Framework
 		{			
 			base.OnUpdateFrame(e);	
 			
-			if (game != null )
-			{
-				_nowUpdate = DateTime.Now;
-				_updateGameTime.Update(_nowUpdate - _lastUpdate);
-				_lastUpdate = _nowUpdate;
-            	game.DoUpdate(_updateGameTime);
-			}
+			_nowUpdate = DateTime.Now;
+			_updateGameTime.Update(_nowUpdate - _lastUpdate);
+			_lastUpdate = _nowUpdate;
+			_platform.Game.DoUpdate(_updateGameTime);
 		}
 		
 		protected override void OnVisibleChanged(EventArgs e)
@@ -454,45 +441,63 @@ namespace Microsoft.Xna.Framework
 		#endregion
 				
 		#region UIVIew Methods	
+
 		[Export("LongPressGestureRecognizer")]
 		public void LongPressGestureRecognizer (UILongPressGestureRecognizer sender)
 		{
-			TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.Hold, new TimeSpan(_nowUpdate.Ticks), translatedTouchPosition, new Vector2 (sender.LocationInView (sender.View)), new Vector2(0,0), new Vector2(0,0)));
+            // FIXME: Determine the appropriate action to take here.  The XNA
+            //        docs say, "This is a single event, and not continuously
+            //        generated while the user is holding the touchpoint."
+            //        However, iOS generates Began for that condition, then zero
+            //        or more Changed notifications, and then one of the final-
+            //        state notifications (Recognized, Failed, etc)
+            if (sender.State == UIGestureRecognizerState.Began)
+			{
+				var point = sender.LocationInView(sender.View);
+			    TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.Hold, new TimeSpan(_nowUpdate.Ticks), translatedTouchPosition, new Vector2 (point.X, point.Y), new Vector2(0,0), new Vector2(0,0)));
+			}
 		}
 		
 		
 		[Export("PanGestureRecognizer")]
 		public void PanGestureRecognizer (UIPanGestureRecognizer sender)
 		{
+			var point = sender.LocationInView(sender.View);
 			if (sender.State==UIGestureRecognizerState.Ended || sender.State==UIGestureRecognizerState.Cancelled || sender.State==UIGestureRecognizerState.Failed)
-				TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.DragComplete, new TimeSpan(_nowUpdate.Ticks), translatedTouchPosition, new Vector2(0,0), new Vector2 (sender.TranslationInView(sender.View)), new Vector2(0,0)));
+				TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.DragComplete, new TimeSpan(_nowUpdate.Ticks), translatedTouchPosition, new Vector2(0,0), new Vector2 (point.X, point.Y), new Vector2(0,0)));
 			else
-				TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.FreeDrag, new TimeSpan(_nowUpdate.Ticks), translatedTouchPosition, new Vector2(0,0), new Vector2 (sender.TranslationInView(sender.View)), new Vector2(0,0)));
+				TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.FreeDrag, new TimeSpan(_nowUpdate.Ticks), translatedTouchPosition, new Vector2(0,0), new Vector2 (point.X, point.Y), new Vector2(0,0)));
 		}
 			
 		[Export("PinchGestureRecognizer")]
 		public void PinchGestureRecognizer (UIPinchGestureRecognizer sender)
 		{
-			TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.Pinch, new TimeSpan(_nowUpdate.Ticks), new Vector2 (sender.LocationOfTouch(0,sender.View)), new Vector2 (sender.LocationOfTouch(1,sender.View)), new Vector2(0,0), new Vector2(0,0)));
+			var point0 = sender.LocationOfTouch(0, sender.View);
+			var point1 = sender.LocationOfTouch(1, sender.View);
+			TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.Pinch, new TimeSpan(_nowUpdate.Ticks), new Vector2 (point0.X, point0.Y), new Vector2 (point1.X, point1.Y), new Vector2(0,0), new Vector2(0,0)));
 		}
 		
 		
 		[Export("RotationGestureRecognizer")]
 		public void RotationGestureRecognizer (UIRotationGestureRecognizer sender)
 		{
-			TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.Rotation, new TimeSpan(_nowUpdate.Ticks), new Vector2 (sender.LocationInView (sender.View)), new Vector2 (sender.LocationInView (sender.View)), new Vector2(0,0), new Vector2(0,0)));
+			var point0 = sender.LocationOfTouch(0, sender.View);
+			var point1 = sender.LocationOfTouch(1, sender.View);
+			TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.Rotation, new TimeSpan(_nowUpdate.Ticks), new Vector2 (point0.X, point0.Y), new Vector2 (point1.X, point1.Y), new Vector2(0,0), new Vector2(0,0)));
 		}
 		
 		[Export("SwipeGestureRecognizer")]
 		public void SwipeGestureRecognizer (UISwipeGestureRecognizer sender)
 		{
-			TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.Flick, new TimeSpan(_nowUpdate.Ticks), new Vector2 (sender.LocationInView (sender.View)), new Vector2 (sender.LocationInView (sender.View)), new Vector2(0,0), new Vector2(0,0)));		
+			var point = sender.LocationInView(sender.View);
+			TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.Flick, new TimeSpan(_nowUpdate.Ticks), new Vector2 (point.X, point.Y), new Vector2 (point.X, point.Y), new Vector2(0,0), new Vector2(0,0)));		
 		}
 		
 		[Export("TapGestureRecognizer")]
 		public void TapGestureRecognizer (UITapGestureRecognizer sender)
 		{
-			TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.Tap, new TimeSpan(_nowUpdate.Ticks), translatedTouchPosition, new Vector2 (sender.LocationInView (sender.View)), new Vector2(0,0), new Vector2(0,0)));
+			var point = sender.LocationInView(sender.View);
+			TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.Tap, new TimeSpan(_nowUpdate.Ticks), translatedTouchPosition, new Vector2 (point.X, point.Y), new Vector2(0,0), new Vector2(0,0)));
 		}
 		
 		private void FillTouchCollection(NSSet touches)
@@ -506,7 +511,8 @@ namespace Microsoft.Xna.Framework
 				UITouch touch = touchesArray[i];
 				
 				//Get position touch
-				Vector2 position = new Vector2 (touch.LocationInView (touch.View));
+				var point = touch.LocationInView(touch.View);
+				Vector2 position = new Vector2 (point.X, point.Y);
 				translatedTouchPosition = GetOffsetPosition(position, true);
 				
 				TouchLocation tlocation;
@@ -685,6 +691,7 @@ namespace Microsoft.Xna.Framework
                     {
                         OrientationChanged(this, EventArgs.Empty);
                     }
+				
                 }
             }
 		}

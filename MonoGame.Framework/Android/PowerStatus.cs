@@ -55,7 +55,7 @@ namespace Microsoft.Xna.Framework
         static PowerStatus()
         {
             _batteryStatusReceiver = new BatteryStatusBroadCastReceiver();
-            Game.contextInstance.RegisterReceiver(_batteryStatusReceiver, new IntentFilter(Intent.ActionBatteryChanged));
+            Game.Activity.RegisterReceiver(_batteryStatusReceiver, new IntentFilter(Intent.ActionBatteryChanged));
         }
 
         private class BatteryStatusBroadCastReceiver : BroadcastReceiver
