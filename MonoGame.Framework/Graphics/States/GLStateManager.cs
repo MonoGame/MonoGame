@@ -8,6 +8,25 @@ using MonoMac.OpenGL;
 #elif WINDOWS
 using OpenTK.Graphics.OpenGL;
 #else
+
+#if ES11
+using OpenTK.Graphics.ES11;
+
+#if IPHONE
+using EnableCap = OpenTK.Graphics.ES11.All;
+using FrontFaceDirection = OpenTK.Graphics.ES11.All;
+using CullFaceMode = OpenTK.Graphics.ES11.All;
+using StencilFunction = OpenTK.Graphics.ES11.All;
+using StencilOp = OpenTK.Graphics.ES11.All;
+using BlendingFactorSrc = OpenTK.Graphics.ES11.All;
+using BlendingFactorDest = OpenTK.Graphics.ES11.All;
+using ArrayCap = OpenTK.Graphics.ES11.All;
+using MatrixMode = OpenTK.Graphics.ES11.All;
+using BlendEquationMode = OpenTK.Graphics.ES11.All;
+
+#endif
+
+#else
 using OpenTK.Graphics.ES20;
 
 #if IPHONE
@@ -19,6 +38,7 @@ using StencilFunction = OpenTK.Graphics.ES20.All;
 using StencilOp = OpenTK.Graphics.ES20.All;
 using BlendingFactorSrc = OpenTK.Graphics.ES20.All;
 using BlendingFactorDest = OpenTK.Graphics.ES20.All;
+#endif
 #endif
 
 #endif
@@ -72,38 +92,7 @@ namespace Microsoft.Xna.Framework.Graphics
             else
                 GL.DisableClientState(ArrayCap.NormalArray);
         }
-#endif
 
-        public static void Textures2D(bool enable)
-        {
-            if (enable && (_textures2D != GLStateEnabled.True))
-                GL.Enable(EnableCap.Texture2D);
-            else
-                GL.Disable(EnableCap.Texture2D);
-        }
-
-        public static void DepthTest(bool enable)
-        {
-            if (enable && (_depthTest != GLStateEnabled.True))
-                GL.Enable(EnableCap.DepthTest);
-            else
-                GL.Disable(EnableCap.DepthTest);
-        }
-
-        public static void Blend(bool enable)
-        {
-            GL.Enable(EnableCap.Blend);
-        }
-
-		public static void VertexAttribArray(int index, bool enable) {
-			if (enable) {
-				GL.EnableVertexAttribArray(index);
-			} else {
-				GL.DisableVertexAttribArray(index);
-			}
-		}
-		
-#if ES11
         public static void Projection(Matrix projection)
         {
             GL.MatrixMode(MatrixMode.Projection);
@@ -137,13 +126,48 @@ namespace Microsoft.Xna.Framework.Graphics
 			GL.LoadMatrix(Matrix.ToFloatArray(worldView));
 		}
 #endif
+		
+#if !ES11
+		public static void VertexAttribArray(int index, bool enable) {
+			if (enable) {
+				GL.EnableVertexAttribArray(index);
+			} else {
+				GL.DisableVertexAttribArray(index);
+			}
+		}
+#endif
+		
+		public static void Textures2D(bool enable)
+        {
+            if (enable && (_textures2D != GLStateEnabled.True))
+                GL.Enable(EnableCap.Texture2D);
+            else
+                GL.Disable(EnableCap.Texture2D);
+        }
+
+        public static void DepthTest(bool enable)
+        {
+            if (enable && (_depthTest != GLStateEnabled.True))
+                GL.Enable(EnableCap.DepthTest);
+            else
+                GL.Disable(EnableCap.DepthTest);
+        }
+
+        public static void Blend(bool enable)
+        {
+            GL.Enable(EnableCap.Blend);
+        }
 
 		public static void SetBlendStates (BlendState state)
 		{
 			// Set blending mode
 			BlendEquationMode blendMode = state.ColorBlendFunction.GetBlendEquationMode();
+#if ES11 && IPHONE
+			GL.Oes.BlendEquation (blendMode);
+#else
 			GL.BlendEquation (blendMode);
-
+#endif			
+			
 			// Set blending function
 			BlendingFactorSrc bfs = state.ColorSourceBlend.GetBlendFactorSrc();
 			BlendingFactorDest bfd = state.ColorDestinationBlend.GetBlendFactorDest();
@@ -283,12 +307,14 @@ namespace Microsoft.Xna.Framework.Graphics
 				return StencilOp.Keep;
 			case StencilOperation.Decrement:
 				return StencilOp.Decr;
+#if !ES11
 			case StencilOperation.DecrementSaturation:
 				return StencilOp.DecrWrap;
-			case StencilOperation.Increment:
-				return StencilOp.Incr;
 			case StencilOperation.IncrementSaturation:
 				return StencilOp.IncrWrap;
+#endif
+			case StencilOperation.Increment:
+				return StencilOp.Incr;
 			case StencilOperation.Invert:
 				return StencilOp.Invert;
 			case StencilOperation.Replace:

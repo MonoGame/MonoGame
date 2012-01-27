@@ -48,6 +48,9 @@ using OpenTK.Graphics.OpenGL;
 
 #if ES11
 using OpenTK.Graphics.ES11;
+using TextureTarget = OpenTK.Graphics.ES11.All;
+using TextureMinFilter = OpenTK.Graphics.ES11.All;
+using TextureParameterName = OpenTK.Graphics.ES11.All;
 #else
 using OpenTK.Graphics.ES20;
 using TextureTarget = OpenTK.Graphics.ES20.All;
@@ -162,7 +165,11 @@ namespace Microsoft.Xna.Framework.Graphics
 			case TextureAddressMode.Wrap:
 				return (int)TextureWrapMode.Repeat;
 			case TextureAddressMode.Mirror:
+#if IPHONE && ES11
+				return (int)All.MirroredRepeatOes;
+#else
 				return (int)TextureWrapMode.MirroredRepeat;
+#endif
 			default:
 				throw new NotImplementedException("No support for " + textureAddressMode);
 			}

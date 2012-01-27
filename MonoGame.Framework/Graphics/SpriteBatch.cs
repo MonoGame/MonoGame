@@ -7,7 +7,12 @@ using MonoMac.OpenGL;
 #elif WINDOWS
 using OpenTK.Graphics.OpenGL;
 #else
+#if ES11
+using OpenTK.Graphics.ES11;
+using MatrixMode = OpenTK.Graphics.ES11.All;
+#else
 using OpenTK.Graphics.ES20;
+#endif
 #endif
 
 using Microsoft.Xna.Framework;
@@ -36,8 +41,11 @@ namespace Microsoft.Xna.Framework.Graphics
 			}	
 
 			this.graphicsDevice = graphicsDevice;
+			
+#if !ES11
 			//use a custon SpriteEffect so we can control the transformation matrix
 			spriteEffect = new Effect (this.graphicsDevice, SpriteEffectCode.Code);	
+#endif
 
 			_batcher = new SpriteBatcher ();
 		}
@@ -93,11 +101,13 @@ namespace Microsoft.Xna.Framework.Graphics
 			// clear out the textures
 			graphicsDevice.Textures._textures.Clear ();
 			
+#if !ES11
 			// unbinds shader
 			if (_effect != null) {
 				GL.UseProgram (0);
 				_effect = null;
 			}
+#endif
 
 		}
 		
@@ -107,43 +117,13 @@ namespace Microsoft.Xna.Framework.Graphics
 			graphicsDevice.RasterizerState = _rasterizerState;
 			graphicsDevice.SamplerStates[0] = _samplerState;
 			
-			if (_effect == null) {
-				Viewport vp = graphicsDevice.Viewport;
-				Matrix projection = Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, 0, 1);
-				Matrix halfPixelOffset = Matrix.CreateTranslation(-0.5f, -0.5f, 0);
-				Matrix transform = _matrix * (halfPixelOffset * projection);
-				spriteEffect.Parameters["MatrixTransform"].SetValue (transform);
-				
-				spriteEffect.CurrentTechnique.Passes[0].Apply();
-			} else {
-				// apply the custom effect if there is one
-				_effect.CurrentTechnique.Passes[0].Apply ();
-				/*
-				if (graphicsDevice.Textures._textures.Count > 0) {
-					foreach (EffectParameter ep in _effect._textureMappings) {
-						// if user didn't inform the texture index, we can't bind it
-						if (ep.UserInedx == -1)
-							continue;
-
-						Texture tex = graphicsDevice.Textures [ep.UserInedx];
-
-						// Need to support multiple passes as well
-						GL.ActiveTexture ((TextureUnit)((int)TextureUnit.Texture0 + ep.UserInedx));
-						GL.BindTexture (TextureTarget.Texture2D, tex._textureId);
-						GL.Uniform1 (ep.UniformLocation, ep.UserInedx);
-					}
-				}*/
-			}
-		}
-		
-		void Flush() {
 #if ES11
 			// set camera
 			GL.MatrixMode (MatrixMode.Projection);
 			GL.LoadIdentity ();		
 			
 			// Switch on the flags.
-#if ANDROID
+ #if ANDROID
 	        switch (this.graphicsDevice.PresentationParameters.DisplayOrientation)
 	        {
 			
@@ -162,12 +142,34 @@ namespace Microsoft.Xna.Framework.Graphics
 					break;
 				}
 			}
-#else
+ #else
 			GL.Ortho(0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height, 0, -1, 1);
-#endif
+ #endif
+			
+			
+			//These needed?
+			GL.MatrixMode(MatrixMode.Modelview);
+			GL.Viewport (graphicsDevice.Viewport.X, graphicsDevice.Viewport.Y,
+			             graphicsDevice.Viewport.Width, graphicsDevice.Viewport.Height);
+			GL.LoadMatrix (Matrix.ToFloatArray(_matrix));
 
+#else
+			if (_effect == null) {
+				Viewport vp = graphicsDevice.Viewport;
+				Matrix projection = Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, 0, 1);
+				Matrix halfPixelOffset = Matrix.CreateTranslation(-0.5f, -0.5f, 0);
+				Matrix transform = _matrix * (halfPixelOffset * projection);
+				spriteEffect.Parameters["MatrixTransform"].SetValue (transform);
+				
+				spriteEffect.CurrentTechnique.Passes[0].Apply();
+			} else {
+				// apply the custom effect if there is one
+				_effect.CurrentTechnique.Passes[0].Apply ();
+			}
 #endif
-
+		}
+		
+		void Flush() {
 			_batcher.DrawBatch (_sortMode, graphicsDevice.SamplerStates[0]);
 
 		}

@@ -44,19 +44,29 @@ using System.Runtime.InteropServices;
 
 #if MONOMAC
 using MonoMac.OpenGL;
+using GL_Oes = MonoMac.OpenGL.GL;
 #elif WINDOWS
 using OpenTK.Graphics.OpenGL;
+using GL_Oes = OpenTK.Graphics.OpenGL.GL;
 #else
 
 #if ES11
 using OpenTK.Graphics.ES11;
+using GL_Oes = OpenTK.Graphics.ES11.GL.Oes;
 #if IPHONE
 using EnableCap = OpenTK.Graphics.ES11.All;
+using TextureTarget = OpenTK.Graphics.ES11.All;
 using BufferTarget = OpenTK.Graphics.ES11.All;
 using BufferUsageHint = OpenTK.Graphics.ES11.All;
 using DrawElementsType = OpenTK.Graphics.ES11.All;
 using TextureEnvTarget = OpenTK.Graphics.ES11.All;
 using TextureEnvParameter = OpenTK.Graphics.ES11.All;
+using GetPName = OpenTK.Graphics.ES11.All;
+using FramebufferErrorCode = OpenTK.Graphics.ES11.All;
+using FramebufferTarget = OpenTK.Graphics.ES11.All;
+using FramebufferAttachment = OpenTK.Graphics.ES11.All;
+using RenderbufferTarget = OpenTK.Graphics.ES11.All;
+using RenderbufferStorage = OpenTK.Graphics.ES11.All;
 #endif
 #else
 using OpenTK.Graphics.ES20;
@@ -105,6 +115,34 @@ namespace Microsoft.Xna.Framework.Graphics
 		internal static int attributeTint = 2;
 		internal static int attributeColor = 3;
 		internal static int attributeNormal = 4;
+		
+#if ES11
+		//OpenGL ES1.1 consts
+#if IPHONE
+		const FramebufferTarget GLFramebuffer = FramebufferTarget.FramebufferOes;
+		const RenderbufferTarget GLRenderbuffer = RenderbufferTarget.RenderbufferOes;
+		const FramebufferAttachment GLDepthAttachment = FramebufferAttachment.DepthAttachmentOes;
+		const FramebufferAttachment GLStencilAttachment = FramebufferAttachment.StencilAttachmentOes;
+		const FramebufferAttachment GLColorAttachment0 = FramebufferAttachment.ColorAttachment0Oes;
+		const GetPName GLFramebufferBinding = GetPName.FramebufferBindingOes;
+		const RenderbufferStorage GLDepthComponent16 = RenderbufferStorage.DepthComponent16Oes;
+		const RenderbufferStorage GLDepthComponent24 = RenderbufferStorage.DepthComponent24Oes;
+		const RenderbufferStorage GLDepth24Stencil8 = RenderbufferStorage.Depth24Stencil8Oes;
+		const FramebufferErrorCode GLFramebufferComplete = FramebufferErrorCode.FramebufferCompleteOes;
+		
+#else
+		const FramebufferTarget GLFramebuffer = FramebufferTarget.FramebufferExt;
+		const RenderbufferTarget GLRenderbuffer = RenderbufferTarget.RenderbufferExt;
+		const FramebufferAttachment GLDepthAttachment = FramebufferAttachment.DepthAttachmentExt;
+		const FramebufferAttachment GLStencilAttachment = FramebufferAttachment.StencilAttachment;
+		const FramebufferAttachment GLColorAttachment0 = FramebufferAttachment.ColorAttachment0;
+		const GetPName GLFramebufferBinding = GetPName.FramebufferBinding;
+		const RenderbufferStorage GLDepthComponent16 = RenderbufferStorage.DepthComponent16;
+		const RenderbufferStorage GLDepthComponent24 = RenderbufferStorage.DepthComponent24;
+		const RenderbufferStorage GLDepth24Stencil8 = RenderbufferStorage.Depth24Stencil8;
+		const FramebufferErrorCode GLFramebufferComplete = FramebufferErrorCode.FramebufferComplete;
+#endif
+#endif
 		
 		// TODO Graphics Device events need implementing
 		public event EventHandler<EventArgs> DeviceLost;
@@ -406,19 +444,21 @@ namespace Microsoft.Xna.Framework.Graphics
                 byte[] imageInfo = new byte[4];
                 GL.ReadPixels(0, 0, 1, 1, All.Rgba, All.UnsignedByte, imageInfo);
 #endif
+				
                 // Detach the render buffers.
-                GL.FramebufferRenderbuffer(FramebufferTarget.FramebufferExt,
-				                           FramebufferAttachment.DepthAttachmentExt,
-                                           RenderbufferTarget.RenderbufferExt, 0);
+                GL_Oes.FramebufferRenderbuffer(
+				                           GLFramebuffer,
+				                           GLDepthAttachment,
+                                           GLRenderbuffer, 0);
 
                 // delete the RBO's
-                GL.DeleteRenderbuffers(renderBufferIDs.Length, renderBufferIDs);
+                GL_Oes.DeleteRenderbuffers(renderBufferIDs.Length, renderBufferIDs);
 
                 // delete the FBO
-                GL.DeleteFramebuffers(frameBufferIDs.Length, frameBufferIDs);
+                GL_Oes.DeleteFramebuffers(frameBufferIDs.Length, frameBufferIDs);
 
                 // Set the frame buffer back to the system window buffer
-                GL.BindFramebuffer(FramebufferTarget.FramebufferExt, originalFbo);
+                GL_Oes.BindFramebuffer(GLFramebuffer, originalFbo);
 
                 // We need to reset our GraphicsDevice viewport back to what it was
                 // before rendering.
@@ -483,67 +523,80 @@ namespace Microsoft.Xna.Framework.Graphics
                 // http://www.songho.ca/opengl/gl_fbo.html
 
                 // Get the currently bound frame buffer object. On most platforms this just gives 0.
-                GL.GetInteger(GetPName.FramebufferBinding, out originalFbo);
-				
+#if IPHONE
+				GL.GetInteger(GLFramebufferBinding, ref originalFbo);
+#else
+				GL.GetInteger(GLFramebufferBinding, out originalFbo);
+#endif
 				
 				frameBufferIDs = new int[currentRenderTargets.Length];
 				
 				renderBufferIDs = new int[currentRenderTargets.Length];
-				GL.GenRenderbuffers(currentRenderTargets.Length, renderBufferIDs);
+				
+				GL_Oes.GenRenderbuffers(currentRenderTargets.Length, renderBufferIDs);
 				
 				for (int i = 0; i < currentRenderTargets.Length; i++) {
 					RenderTarget2D target = (RenderTarget2D)currentRenderTargets[i].RenderTarget;
 
 					// create a renderbuffer object to store depth info
-					GL.BindRenderbuffer(RenderbufferTarget.RenderbufferExt, renderBufferIDs[i]);
+					GL_Oes.BindRenderbuffer(GLRenderbuffer, renderBufferIDs[i]);
 
 					ClearOptions clearOptions = ClearOptions.Target | ClearOptions.DepthBuffer;
 
 					// create framebuffer
-					GL.GenFramebuffers(1, out frameBufferIDs[i]);
-					GL.BindFramebuffer(FramebufferTarget.DrawFramebuffer, frameBufferIDs[i]);
+#if IPHONE
+					GL_Oes.GenFramebuffers(1, ref frameBufferIDs[i]);
+#else
+					GL_Oes.GenFramebuffers(1, out frameBufferIDs[i]);
+#endif
+
+#if IPHONE
+					GL_Oes.BindFramebuffer(GLFramebuffer, frameBufferIDs[i]);
+#else
+					GL_Oes.BindFramebuffer(FramebufferTarget.DrawFramebuffer, frameBufferIDs[i]);
+#endif
 					
 					//allocate depth buffer
 					switch (target.DepthStencilFormat) {
 					case DepthFormat.Depth16:
-						GL.RenderbufferStorage(RenderbufferTarget.RenderbufferExt, RenderbufferStorage.DepthComponent16,
+						GL_Oes.RenderbufferStorage(GLRenderbuffer, GLDepthComponent16,
 							target.Width, target.Height);
 						break;
 					case DepthFormat.Depth24:
-						GL.RenderbufferStorage(RenderbufferTarget.RenderbufferExt, RenderbufferStorage.DepthComponent24,
+						GL_Oes.RenderbufferStorage(GLRenderbuffer, GLDepthComponent24,
 							target.Width, target.Height);
 						break;
 					case DepthFormat.Depth24Stencil8:
-						GL.RenderbufferStorage(RenderbufferTarget.RenderbufferExt, RenderbufferStorage.Depth24Stencil8,
+						GL_Oes.RenderbufferStorage(GLRenderbuffer, GLDepth24Stencil8,
 							target.Width, target.Height);
 						// attach stencil buffer
-						GL.FramebufferRenderbuffer(FramebufferTarget.FramebufferExt, FramebufferAttachment.StencilAttachmentExt,
-							RenderbufferTarget.RenderbufferExt, renderBufferIDs[i]);
+						GL_Oes.FramebufferRenderbuffer(GLFramebuffer, GLStencilAttachment,
+							GLRenderbuffer, renderBufferIDs[i]);
 						clearOptions = clearOptions | ClearOptions.Stencil;
 						break;
 					default:
-						GL.RenderbufferStorage(RenderbufferTarget.RenderbufferExt, RenderbufferStorage.DepthComponent24,
+						GL_Oes.RenderbufferStorage(GLRenderbuffer, GLDepthComponent24,
 							target.Width, target.Height);
 						break;
 					}
 					
 					// attach the texture to FBO color attachment point
-					GL.FramebufferTexture2D(FramebufferTarget.FramebufferExt, FramebufferAttachment.ColorAttachment0,
+					GL_Oes.FramebufferTexture2D(GLFramebuffer, GLColorAttachment0,
 						TextureTarget.Texture2D, target.ID,0);
 					
 					// attach the renderbuffer to depth attachment point
-					GL.FramebufferRenderbuffer(FramebufferTarget.FramebufferExt, FramebufferAttachment.DepthAttachmentExt,
-						RenderbufferTarget.RenderbufferExt, renderBufferIDs[i]);					
+					GL_Oes.FramebufferRenderbuffer(GLFramebuffer, GLDepthAttachment,
+						GLRenderbuffer, renderBufferIDs[i]);					
 					
 					if (target.RenderTargetUsage == RenderTargetUsage.DiscardContents)
 						Clear (clearOptions, Color.Transparent, 0, 0);
 					
-					GL.BindRenderbuffer(RenderbufferTarget.RenderbufferExt, 0);
+					GL_Oes.BindRenderbuffer(GLRenderbuffer, 0);
 				}
 				
-				FramebufferErrorCode status = GL.CheckFramebufferStatus(FramebufferTarget.FramebufferExt);
+				FramebufferErrorCode status = GL_Oes.CheckFramebufferStatus(GLFramebuffer);
 				
-				if (status != FramebufferErrorCode.FramebufferComplete)
+				if (status != GLFramebufferComplete)
 					throw new Exception("Error creating framebuffer: " + status);
 
 				// We need to start saving off the ViewPort and setting the current ViewPort to
@@ -645,9 +698,11 @@ namespace Microsoft.Xna.Framework.Graphics
 		bool resetVertexStates = false;
 		internal void UnsetGraphicsStates ()
 		{
+#if !ES11
 			// Make sure we are not user any shaders
 			GL.UseProgram(0);
-
+#endif
+			
 			// if primitives were used then we need to reset them
 			if (resetVertexStates) {
 #if ES11
@@ -965,6 +1020,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			                GetElementCountArray(primitiveType, primitiveCount),
 #if WINDOWS
                             (DrawElementsType)All.UnsignedInt,
+#elif IPHONE
+			                DrawElementsType.UnsignedInt248Oes,
 #else
 			                DrawElementsType.UnsignedInt,
 #endif

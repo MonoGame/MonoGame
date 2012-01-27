@@ -65,6 +65,16 @@ using MonoTouch.Foundation;
 
 #if ES11
 using OpenTK.Graphics.ES11;
+#if IPHONE
+using TextureTarget = OpenTK.Graphics.ES11.All;
+using PixelType = OpenTK.Graphics.ES11.All;
+using TextureParameterName = OpenTK.Graphics.ES11.All;
+using PixelInternalFormat = OpenTK.Graphics.ES11.All;
+using VertexPointerType = OpenTK.Graphics.ES11.All;
+using GLPixelFormat = OpenTK.Graphics.ES11.All;
+using TexCoordPointerType = OpenTK.Graphics.ES11.All;
+using BeginMode = OpenTK.Graphics.ES11.All;
+#endif
 #else
 using OpenTK.Graphics.ES20;
 

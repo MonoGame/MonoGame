@@ -54,6 +54,9 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		protected Effect (GraphicsDevice graphicsDevice)
 		{
+#if ES11
+			throw new NotSupportedException("Programmable shaders unavailable in OpenGL ES 1.1");
+#endif
 			if (graphicsDevice == null) {
 				throw new ArgumentNullException ("Graphics Device Cannot Be Null");
 			}
@@ -73,6 +76,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			GraphicsDevice graphicsDevice,
 			byte[] effectCode)
 		{
+#if ES11
+			throw new NotSupportedException("Programmable shaders unavailable in OpenGL ES 1.1");
+#endif
 
 			if (graphicsDevice == null) {
 				throw new ArgumentNullException ("Graphics Device Cannot Be Null");

@@ -47,6 +47,17 @@ using MonoMac.OpenGL;
 #elif WINDOWS
 using OpenTK.Graphics.OpenGL;
 #else
+
+#if ES11
+using OpenTK.Graphics.ES11;
+using VertexPointerType = OpenTK.Graphics.ES11.All;
+using ColorPointerType = OpenTK.Graphics.ES11.All;
+using TexCoordPointerType = OpenTK.Graphics.ES11.All;
+using TextureUnit = OpenTK.Graphics.ES11.All;
+using TextureTarget = OpenTK.Graphics.ES11.All;
+using DrawElementsType = OpenTK.Graphics.ES11.All;
+
+#else
 using OpenTK.Graphics.ES20;
 
 #if IPHONE
@@ -54,6 +65,7 @@ using VertexAttribPointerType = OpenTK.Graphics.ES20.All;
 using TextureUnit = OpenTK.Graphics.ES20.All;
 using TextureTarget = OpenTK.Graphics.ES20.All;
 using DrawElementsType = OpenTK.Graphics.ES20.All;
+#endif
 #endif
 
 #endif
@@ -147,6 +159,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			GLStateManager.VertexArray(true);
 			GLStateManager.ColorArray(true);
 			GLStateManager.TextureCoordArray(true);
+			
+			GL.TexEnv (All.TextureEnv, All.TextureEnvMode, (int)All.SrcAlpha);
 
 			int size = sizeof(float)*4+sizeof(uint);
 			GL.VertexPointer(2,

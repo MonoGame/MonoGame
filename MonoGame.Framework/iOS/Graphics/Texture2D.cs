@@ -49,8 +49,10 @@ using MonoTouch.Foundation;
 
 #if ES11
 using OpenTK.Graphics.ES11;
+using GL_Oes = OpenTK.Graphics.ES11.GL.Oes;
 #else
 using OpenTK.Graphics.ES20;
+using GL_Oes = OpenTK.Graphics.ES20.GL;
 #endif
 
 using Microsoft.Xna.Framework.Content;
@@ -60,6 +62,26 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public class Texture2D : Texture
     {
+		
+		//OpenGL ES1.1 consts
+#if ES11
+		const All GLFramebuffer = All.FramebufferOes;
+		const All GLRenderbuffer = All.RenderbufferOes;
+		const All GLDepthAttachment = All.DepthAttachmentOes;
+		const All GLColorAttachment0 = All.ColorAttachment0Oes;
+		const All GLDepthComponent24 = All.DepthComponent24Oes;
+		const All GLFramebufferComplete = All.FramebufferCompleteOes;
+#else
+		const All GLFramebuffer = All.Framebuffer;
+		const All GLRenderbuffer = All.Renderbuffer;
+		const All GLDepthAttachment = All.DepthAttachment;
+		const All GLColorAttachment0 = All.ColorAttachment0;
+		const All GLDepthComponent24 = All.DepthComponent24Oes;
+		const All GLFramebufferComplete = All.FramebufferComplete;
+#endif
+		
+		
+		
 		private ESImage texture;
 		
 		// Moved as per kjpou1 protected int textureId = -1;
@@ -306,28 +328,28 @@ namespace Microsoft.Xna.Framework.Graphics
 			int renderBufferID = -1;
 			
 			// create framebuffer
-			GL.GenFramebuffers(1, ref framebufferId);
-			GL.BindFramebuffer(All.Framebuffer, framebufferId);
+			GL_Oes.GenFramebuffers(1, ref framebufferId);
+			GL_Oes.BindFramebuffer(GLFramebuffer, framebufferId);
 			
 			//renderBufferIDs = new int[currentRenderTargets];
-			GL.GenRenderbuffers(1, ref renderBufferID);
+			GL_Oes.GenRenderbuffers(1, ref renderBufferID);
 			
 			// attach the texture to FBO color attachment point
-			GL.FramebufferTexture2D(All.Framebuffer, All.ColorAttachment0,
+			GL_Oes.FramebufferTexture2D(GLFramebuffer, GLColorAttachment0,
 				All.Texture2D, ID,0);
 			
 			// create a renderbuffer object to store depth info
-			GL.BindRenderbuffer(All.Renderbuffer, renderBufferID);
-			GL.RenderbufferStorage(All.Renderbuffer, All.DepthComponent24Oes,
+			GL_Oes.BindRenderbuffer(GLRenderbuffer, renderBufferID);
+			GL_Oes.RenderbufferStorage(GLRenderbuffer, GLDepthComponent24,
 				_width, _height);
 			
 			// attach the renderbuffer to depth attachment point
-			GL.FramebufferRenderbuffer(All.Framebuffer, All.DepthAttachment,
-				All.Renderbuffer, renderBufferID);
+			GL_Oes.FramebufferRenderbuffer(GLFramebuffer, GLDepthAttachment,
+				GLRenderbuffer, renderBufferID);
 				
-			All status = GL.CheckFramebufferStatus(All.Framebuffer);
+			All status = GL_Oes.CheckFramebufferStatus(GLFramebuffer);
 			
-			if (status != All.FramebufferComplete)
+			if (status != GLFramebufferComplete)
 				throw new Exception("Error creating framebuffer: " + status);
 			
 			byte[] imageInfo;
@@ -335,7 +357,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			switch (_format) {
 			case SurfaceFormat.Color : //kTexture2DPixelFormat_RGBA8888
-			case SurfaceFormat.Dxt3 :
 				
 				sz = 4;
 				imageInfo = new byte[(_width * _height) * sz];
@@ -360,14 +381,14 @@ namespace Microsoft.Xna.Framework.Graphics
 			GL.ReadPixels(0,0, _width, _height, All.Rgba, All.UnsignedByte, imageInfo);
 
 			// Detach the render buffers.
-			GL.FramebufferRenderbuffer(All.Framebuffer, All.DepthAttachment,
-					All.Renderbuffer, 0);
+			GL_Oes.FramebufferRenderbuffer(GLFramebuffer, GLDepthAttachment,
+					GLRenderbuffer, 0);
 			// delete the RBO's
-			GL.DeleteRenderbuffers(1,ref renderBufferID);
+			GL_Oes.DeleteRenderbuffers(1,ref renderBufferID);
 			// delete the FBO
-			GL.DeleteFramebuffers(1, ref framebufferId);
+			GL_Oes.DeleteFramebuffers(1, ref framebufferId);
 			// Set the frame buffer back to the system window buffer
-			GL.BindFramebuffer(All.Framebuffer, 0);			
+			GL_Oes.BindFramebuffer(GLFramebuffer, 0);			
 
 			return imageInfo;
 					
@@ -474,7 +495,6 @@ namespace Microsoft.Xna.Framework.Graphics
 							dataRowColOffset = ((y * rWidth) + x);
 							switch (_format) {
 							case SurfaceFormat.Color : //kTexture2DPixelFormat_RGBA8888
-							case SurfaceFormat.Dxt3 :
 								
 								dataPos = dataRowColOffset * 4;								
 															
@@ -502,7 +522,6 @@ namespace Microsoft.Xna.Framework.Graphics
 							dataRowColOffset = ((y * _width) + x);
 							switch (_format) {
 							case SurfaceFormat.Color : //kTexture2DPixelFormat_RGBA8888
-							case SurfaceFormat.Dxt3 :
 								sz = 4;
 								pixelOffset = dataRowColOffset * sz;
 								result.R = imageInfo [pixelOffset];

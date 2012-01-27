@@ -8,6 +8,20 @@ using MonoMac.OpenGL;
 #elif WINDOWS
 using OpenTK.Graphics.OpenGL;
 #else
+#if ES11
+using OpenTK.Graphics.ES11;
+#if IPHONE
+using BlendEquationMode = OpenTK.Graphics.ES11.All;
+using BlendingFactorSrc = OpenTK.Graphics.ES11.All;
+using BlendingFactorDest = OpenTK.Graphics.ES11.All;
+using VertexAttribPointerType = OpenTK.Graphics.ES11.All;
+#endif
+using VertexPointerType = OpenTK.Graphics.ES11.All;
+using ColorPointerType = OpenTK.Graphics.ES11.All;
+using NormalPointerType = OpenTK.Graphics.ES11.All;
+using TexCoordPointerType = OpenTK.Graphics.ES11.All;
+
+#else
 using OpenTK.Graphics.ES20;
 #if IPHONE
 using BlendEquationMode = OpenTK.Graphics.ES20.All;
@@ -19,6 +33,8 @@ using VertexPointerType = OpenTK.Graphics.ES20.All;
 using ColorPointerType = OpenTK.Graphics.ES20.All;
 using NormalPointerType = OpenTK.Graphics.ES20.All;
 using TexCoordPointerType = OpenTK.Graphics.ES20.All;
+#endif
+
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -371,27 +387,41 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             return 0;
         }
-
+		
 		public static BlendEquationMode GetBlendEquationMode (this BlendFunction function)
 		{
 			switch (function) {
+#if ES11 && IPHONE
 			case BlendFunction.Add:
-				return BlendEquationMode.FuncAdd;
-#if IPHONE
+				return BlendEquationMode.FuncAddOes;
 			case BlendFunction.Max:
 				return BlendEquationMode.MaxExt;
 			case BlendFunction.Min:
 				return BlendEquationMode.MinExt;
-#elif MONOMAC
+			case BlendFunction.ReverseSubtract:
+				return BlendEquationMode.FuncReverseSubtractOes;
+			case BlendFunction.Subtract:
+				return BlendEquationMode.FuncSubtractOes;
+
+#else
+			case BlendFunction.Add:
+				return BlendEquationMode.FuncAdd;
+ #if IPHONE
+			case BlendFunction.Max:
+				return BlendEquationMode.MaxExt;
+			case BlendFunction.Min:
+				return BlendEquationMode.MinExt;
+ #elif MONOMAC
 			case BlendFunction.Max:
 				return BlendEquationMode.Max;
 			case BlendFunction.Min:
 				return BlendEquationMode.Min;
-#endif
+ #endif
 			case BlendFunction.ReverseSubtract:
 				return BlendEquationMode.FuncReverseSubtract;
 			case BlendFunction.Subtract:
 				return BlendEquationMode.FuncSubtract;
+#endif
 			default:
                 throw new NotImplementedException();
 			}
@@ -413,6 +443,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			case Blend.InverseSourceColor:
 #if MONOMAC
 				return BlendingFactorSrc.OneMinusSrc1Color;
+#elif IPHONE
+				return BlendingFactorSrc.OneMinusSrcColor;
 #else
 				return BlendingFactorSrc.OneMinusConstantColor;
 #endif
@@ -425,6 +457,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			case Blend.SourceColor:
 #if MONOMAC
 				return BlendingFactorSrc.Src1Color;
+#elif IPHONE
+				return BlendingFactorSrc.SrcColor;
 #else
 				return BlendingFactorSrc.ConstantColor;
 #endif
@@ -452,6 +486,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			case Blend.InverseSourceColor:
 #if MONOMAC
 				return BlendingFactorDest.OneMinusSrc1Color;
+#elif IPHONE
+				return BlendingFactorDest.OneMinusSrcColor;
 #else
 				return BlendingFactorDest.OneMinusConstantColor;
 #endif
@@ -464,6 +500,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			case Blend.SourceColor:
 #if MONOMAC
 				return BlendingFactorDest.Src1Color;
+#elif IPHONE
+				return BlendingFactorDest.SrcColor;
 #else
 				return BlendingFactorDest.ConstantColor;
 #endif
