@@ -168,38 +168,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #endif
 
-			// Enable Scissor Tests if necessary
-			//if (this.graphicsDevice.RasterizerState.ScissorTestEnable) {
-			//	GL.Enable (EnableCap.ScissorTest);				
-			//}
-			
-			
-			//GL.MatrixMode (MatrixMode.Modelview);
-			 
-			 
-			// Enable Scissor Tests if necessary
-			//if (this.graphicsDevice.RasterizerState.ScissorTestEnable) {
-			//	GL.Scissor (this.graphicsDevice.ScissorRectangle.X, this.graphicsDevice.ScissorRectangle.Y, this.graphicsDevice.ScissorRectangle.Width, this.graphicsDevice.ScissorRectangle.Height);
-			//}
-
-			// Initialize OpenGL states (ideally move this to initialize somewhere else)
-			//GLStateManager.SetDepthStencilState(_depthStencilState);
-
-			//GL.Disable (EnableCap.DepthTest);
-			
-			// Enable Culling for better performance
-			
-			/*QQQ
-			GL.Enable (EnableCap.CullFace);
-			GL.FrontFace (FrontFaceDirection.Cw);
-			GL.Color4 (1.0f, 1.0f, 1.0f, 1.0f);*/
-
 			_batcher.DrawBatch (_sortMode, graphicsDevice.SamplerStates[0]);
-	
-			// Disable Scissor Tests if necessary
-			//if (this.graphicsDevice.RasterizerState.ScissorTestEnable) {
-			//	GL.Disable (EnableCap.ScissorTest);
-			//}
 
 		}
 
