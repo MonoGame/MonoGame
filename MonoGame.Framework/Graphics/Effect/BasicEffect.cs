@@ -37,8 +37,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			OnApply();
 			
             GLStateManager.Projection(Projection);
-            GLStateManager.World(World);
-            GLStateManager.View(View);
+            GLStateManager.WorldView(World, View);
 
 			base.Apply();
 
