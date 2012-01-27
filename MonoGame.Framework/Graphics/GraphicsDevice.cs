@@ -702,10 +702,6 @@ namespace Microsoft.Xna.Framework.Graphics
 				vd = VertexDeclaration.FromType(_vertexBuffer._type);
 			}
 
-            //Pin data
-            //var handle = GCHandle.Alloc(_vertexBuffer, GCHandleType.Pinned);
-            //var handle2 = GCHandle.Alloc(_vertexBuffer, GCHandleType.Pinned);
-
             //Buffer data to VBO; This should use stream when we move to ES2.0
             GL.BufferData(BufferTarget.ArrayBuffer,
 				(IntPtr)(vd.VertexStride * GetElementCountArray(primitiveType, primitiveCount)),
@@ -730,8 +726,6 @@ namespace Microsoft.Xna.Framework.Graphics
             // Free resources
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
-            //handle.Free();
-            //handle2.Free();
 
 			UnsetGraphicsStates();
         }
@@ -824,8 +818,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
 				vd = VertexDeclaration.FromType(_vertexBuffer._type);
 			}
-            //Pin data
-            var handle = GCHandle.Alloc(_vertexBuffer, GCHandleType.Pinned);
 
             //Buffer data to VBO; This should use stream when we move to ES2.0
             GL.BufferData(BufferTarget.ArrayBuffer,
@@ -844,7 +836,6 @@ namespace Microsoft.Xna.Framework.Graphics
             // Free resources
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
-            handle.Free();
 
 			// Unset our Graphics States
 			UnsetGraphicsStates();
