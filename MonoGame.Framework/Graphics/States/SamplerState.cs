@@ -42,8 +42,19 @@ using System;
 
 #if MONOMAC
 using MonoMac.OpenGL;
-#else
+#elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
+#else
+
+#if ES11
+using OpenTK.Graphics.ES11;
+#else
+using OpenTK.Graphics.ES20;
+using TextureTarget = OpenTK.Graphics.ES20.All;
+using TextureMinFilter = OpenTK.Graphics.ES20.All;
+using TextureParameterName = OpenTK.Graphics.ES20.All;
+#endif
+
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics

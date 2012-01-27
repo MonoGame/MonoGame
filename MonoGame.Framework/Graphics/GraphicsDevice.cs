@@ -50,8 +50,14 @@ using OpenTK.Graphics.OpenGL;
 
 #if ES11
 using OpenTK.Graphics.ES11;
+#if IPHONE
 using EnableCap = OpenTK.Graphics.ES11.All;
 using BufferTarget = OpenTK.Graphics.ES11.All;
+using BufferUsageHint = OpenTK.Graphics.ES11.All;
+using DrawElementsType = OpenTK.Graphics.ES11.All;
+using TextureEnvTarget = OpenTK.Graphics.ES11.All;
+using TextureEnvParameter = OpenTK.Graphics.ES11.All;
+#endif
 #else
 using OpenTK.Graphics.ES20;
 #if IPHONE

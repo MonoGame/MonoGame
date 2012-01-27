@@ -12,8 +12,10 @@ using OpenTK.Graphics.OpenGL;
 using OpenTK.Graphics.ES20;
 #if IPHONE
 using BufferTarget = OpenTK.Graphics.ES20.All;
-#endif
+using BufferUsageHint = OpenTK.Graphics.ES20.All;
+#else
 using BufferUsageHint = OpenTK.Graphics.ES20.BufferUsage;
+#endif
 
 #endif
 

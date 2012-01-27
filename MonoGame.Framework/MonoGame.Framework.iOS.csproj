@@ -216,7 +216,6 @@
     <Compile Include="Input\GamePadDPad.cs" />
     <Compile Include="Input\GamePadTriggers.cs" />
     <Compile Include="Graphics\CompilerOptions.cs" />
-    <Compile Include="Graphics\RenderState.cs" />
     <Compile Include="Audio\AudioListener.cs" />
     <Compile Include="Audio\AudioEmitter.cs" />
     <Compile Include="DisplayOrientation.cs" />
@@ -348,7 +347,6 @@
     <Compile Include="Storage\StorageDeviceHelper.cs" />
     <Compile Include="Content\ContentManager.cs" />
     <Compile Include="Content\LzxDecoder.cs" />
-    <Compile Include="Graphics\States\SamplerState.ES.cs" />
     <Compile Include="Content\ContentReaders\CurveReader.cs" />
     <Compile Include="Input\GamePadDeadZone.cs" />
     <Compile Include="Content\ContentReaders\ColorReader.cs" />
@@ -399,6 +397,7 @@
     <Compile Include="Graphics\Vertices\IndexElementSize.cs" />
     <Compile Include="LaunchParameters.cs" />
     <Compile Include="Content\ContentReaders\EffectReader.cs" />
+    <Compile Include="Graphics\States\SamplerState.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>

@@ -39,9 +39,12 @@ purpose and non-infringement.
 #endregion License
 using System;
 using System.Drawing;
-using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using System.IO;
+
+#if !IPHONE
+using System.Drawing.Imaging;
+#endif
 
 #if MONOMAC
 using MonoMac.AppKit;
@@ -96,7 +99,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			InitWithData (data, dataLength, pixelFormat, width, height, size, filter);
 		}
-
+		
+#if !IPHONE
         public ESTexture2D(Bitmap image, All filter)
         {
             InitWithBitmap(image, filter);
@@ -111,6 +115,7 @@ namespace Microsoft.Xna.Framework.Graphics
             InitWithData(bitmapData.Scan0, image.Width*image.Height*4, _format, image.Width, image.Height, new Size(image.Width, image.Height), filter);
             image.UnlockBits(bitmapData);
         }
+#endif
 		
 #if MONOMAC
 		public ESTexture2D (NSImage nsImage, All filter)
