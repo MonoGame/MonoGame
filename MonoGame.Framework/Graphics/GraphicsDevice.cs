@@ -44,6 +44,8 @@ using System.Runtime.InteropServices;
 
 #if MONOMAC
 using MonoMac.OpenGL;
+#elif WINDOWS
+using OpenTK.Graphics.OpenGL;
 #else
 
 #if ES11
@@ -52,10 +54,15 @@ using EnableCap = OpenTK.Graphics.ES11.All;
 using BufferTarget = OpenTK.Graphics.ES11.All;
 #else
 using OpenTK.Graphics.ES20;
+#if IPHONE
 using EnableCap = OpenTK.Graphics.ES20.All;
 using BufferTarget = OpenTK.Graphics.ES20.All;
 using BufferUsageHint = OpenTK.Graphics.ES20.All;
 using DrawElementsType = OpenTK.Graphics.ES20.All;
+#else
+using BufferUsageHint = OpenTK.Graphics.ES20.BufferUsage;
+#endif
+
 #endif
 
 #endif
@@ -696,8 +703,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 
             //Pin data
-            var handle = GCHandle.Alloc(_vertexBuffer, GCHandleType.Pinned);
-            var handle2 = GCHandle.Alloc(_vertexBuffer, GCHandleType.Pinned);
+            //var handle = GCHandle.Alloc(_vertexBuffer, GCHandleType.Pinned);
+            //var handle2 = GCHandle.Alloc(_vertexBuffer, GCHandleType.Pinned);
 
             //Buffer data to VBO; This should use stream when we move to ES2.0
             GL.BufferData(BufferTarget.ArrayBuffer,
@@ -723,8 +730,8 @@ namespace Microsoft.Xna.Framework.Graphics
             // Free resources
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
-            handle.Free();
-            handle2.Free();
+            //handle.Free();
+            //handle2.Free();
 
 			UnsetGraphicsStates();
         }
@@ -959,7 +966,11 @@ namespace Microsoft.Xna.Framework.Graphics
             //Draw
             GL.DrawElements(PrimitiveTypeGL(primitiveType),
 			                GetElementCountArray(primitiveType, primitiveCount),
+#if WINDOWS
+                            (DrawElementsType)All.UnsignedInt,
+#else
 			                DrawElementsType.UnsignedInt,
+#endif
 			                (IntPtr)(indexOffset * sizeof(uint)));
 
 

@@ -102,6 +102,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Audio\AudioCategory.cs" />
+    <Compile Include="Content\ContentReaders\EffectReader.cs" />
+    <Compile Include="Content\ContentReaders\Texture2DReader.cs" />
     <Compile Include="Desktop\Audio\SoundEffectInstance.cs" />
     <Compile Include="Desktop\Input\GamePad.cs" />
     <Compile Include="Desktop\Input\Mouse.cs" />
@@ -109,13 +112,37 @@
     <Compile Include="Game.cs" />
     <Compile Include="GamePlatform.cs" />
     <Compile Include="GamerServices\GamerServicesDispatcher.cs" />
+    <Compile Include="Graphics\CompareFunction.cs" />
+    <Compile Include="Graphics\DisplayMode.cs" />
     <Compile Include="Graphics\Effect\AlphaTestEffect.cs" />
     <Compile Include="Graphics\Effect\AlphaTestEffectCode.cs" />
+    <Compile Include="Graphics\Effect\BasicEffectCode.cs" />
+    <Compile Include="Graphics\Effect\DXEffectObject.cs" />
+    <Compile Include="Graphics\Effect\DXExpression.cs" />
+    <Compile Include="Graphics\Effect\DXHelper.cs" />
+    <Compile Include="Graphics\Effect\DXPreshader.cs" />
+    <Compile Include="Graphics\Effect\DXShader.cs" />
+    <Compile Include="Graphics\Effect\Effect.cs" />
+    <Compile Include="Graphics\Effect\EffectAnnotation.cs" />
+    <Compile Include="Graphics\Effect\EffectAnnotationCollection.cs" />
     <Compile Include="Graphics\Effect\EffectHelpers.cs" />
+    <Compile Include="Graphics\Effect\EffectPass.cs" />
+    <Compile Include="Graphics\Effect\GLSLOptimizer.cs" />
+    <Compile Include="Graphics\Effect\MojoShader.cs" />
+    <Compile Include="Graphics\ESImage.cs" />
+    <Compile Include="Graphics\ESTexture2D.cs" />
+    <Compile Include="Graphics\GraphicsAdapter.cs" />
+    <Compile Include="Graphics\GraphicsDevice.cs" />
+    <Compile Include="Graphics\GraphicsExtensions.cs" />
     <Compile Include="Graphics\PackedVector\NormalizedShort2.cs" />
+    <Compile Include="Graphics\SpriteBatch.cs" />
+    <Compile Include="Graphics\SpriteBatcher.cs" />
+    <Compile Include="Graphics\States\GLStateManager.cs" />
+    <Compile Include="Graphics\StencilOperation.cs" />
     <Compile Include="Graphics\Vertices\IndexBuffer.cs" />
     <Compile Include="Graphics\Vertices\IndexElementSize.cs" />
     <Compile Include="Graphics\Vertices\VertexBuffer.cs" />
+    <Compile Include="Graphics\Vertices\VertexDeclaration.cs" />
     <Compile Include="Graphics\Vertices\VertexPositionColorTexture.cs" />
     <Compile Include="Input\GamePadDeadZone.cs" />
     <Compile Include="LaunchParameters.cs" />
@@ -258,29 +285,16 @@
     <Compile Include="Net\QualityOfService.cs" />
     <Compile Include="Net\SendDataOptions.cs" />
     <Compile Include="Storage\StorageDeviceHelper.cs" />
-    <Compile Include="TitleContainer.cs" />
     <Compile Include="Windows\Audio\AudioLoader.cs" />
     <Compile Include="Windows\Audio\Sound.cs" />
-    <Compile Include="Windows\Content\ContentManager.cs" />
     <Compile Include="Windows\Content\ContentReaders\SongReader.cs" />
     <Compile Include="Windows\Content\ContentReaders\SoundEffectReader.cs" />
     <Compile Include="Windows\Content\ContentReaders\SpriteFontReader.cs" />
-    <Compile Include="Windows\Content\ContentReaders\Texture2DReader.cs" />
     <Compile Include="Windows\GamerServices\Guide.cs" />
     <Compile Include="Windows\GamerServices\MonoGameGamerServicesHelper.cs" />
     <Compile Include="Windows\GamerServices\SignedInGamer.cs" />
-    <Compile Include="Windows\Graphics\DisplayMode.cs" />
-    <Compile Include="Windows\Graphics\Effect.cs" />
-    <Compile Include="Windows\Graphics\Effect\EffectPass.cs" />
-    <Compile Include="Windows\Graphics\ESImage.cs" />
-    <Compile Include="Windows\Graphics\ESTexture2D.cs" />
-    <Compile Include="Windows\Graphics\GraphicsAdapter.cs" />
-    <Compile Include="Windows\Graphics\GraphicsDevice.cs" />
     <Compile Include="Windows\Graphics\PresentationParameters.cs" />
-    <Compile Include="Windows\Graphics\RenderState.cs" />
     <Compile Include="Windows\Graphics\RenderTarget2D.cs" />
-    <Compile Include="Windows\Graphics\SpriteBatch.cs" />
-    <Compile Include="Windows\Graphics\SpriteBatcher.cs" />
     <Compile Include="Windows\Graphics\Texture2D.cs" />
     <Compile Include="Windows\Input\Keyboard.cs" />
     <Compile Include="Windows\Media\Video.cs" />
@@ -398,9 +412,6 @@
     <Compile Include="Graphics\Vertices\VertexElementColor.cs" />
     <Compile Include="Audio\XactClip.cs" />
     <Compile Include="Audio\XactSound.cs" />
-    <Compile Include="Desktop\Graphics\States\GLStateManager.cs" />
-    <Compile Include="Desktop\Graphics\GraphicsExtensions.cs" />
-    <Compile Include="Desktop\Graphics\Vertices\VertexDeclaration.cs" />
     <Compile Include="Desktop\Audio\OALSoundBuffer.cs" />
     <Compile Include="Desktop\Audio\OpenALSoundController.cs" />
     <Compile Include="Desktop\Audio\SoundEffect.cs" />
@@ -422,5 +433,10 @@
       <Name>Lidgren.Network.Windows</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="..\ThirdParty\Libs\libmojoshader.dll">
+      <Link>libmojoshader.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>

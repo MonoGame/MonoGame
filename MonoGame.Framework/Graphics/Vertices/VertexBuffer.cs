@@ -6,10 +6,15 @@ using System.Runtime.InteropServices;
 
 #if MONOMAC
 using MonoMac.OpenGL;
+#elif WINDOWS
+using OpenTK.Graphics.OpenGL;
 #else
 using OpenTK.Graphics.ES20;
-using BufferUsageHint = OpenTK.Graphics.ES20.All;
+#if IPHONE
 using BufferTarget = OpenTK.Graphics.ES20.All;
+#endif
+using BufferUsageHint = OpenTK.Graphics.ES20.BufferUsage;
+
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics

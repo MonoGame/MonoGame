@@ -5,16 +5,20 @@ using System.Text;
 
 #if MONOMAC
 using MonoMac.OpenGL;
+#elif WINDOWS
+using OpenTK.Graphics.OpenGL;
 #else
 using OpenTK.Graphics.ES20;
-using VertexPointerType = OpenTK.Graphics.ES20.All;
-using ColorPointerType = OpenTK.Graphics.ES20.All;
-using NormalPointerType = OpenTK.Graphics.ES20.All;
-using TexCoordPointerType = OpenTK.Graphics.ES20.All;
+#if IPHONE
 using BlendEquationMode = OpenTK.Graphics.ES20.All;
 using BlendingFactorSrc = OpenTK.Graphics.ES20.All;
 using BlendingFactorDest = OpenTK.Graphics.ES20.All;
 using VertexAttribPointerType = OpenTK.Graphics.ES20.All;
+#endif
+using VertexPointerType = OpenTK.Graphics.ES20.All;
+using ColorPointerType = OpenTK.Graphics.ES20.All;
+using NormalPointerType = OpenTK.Graphics.ES20.All;
+using TexCoordPointerType = OpenTK.Graphics.ES20.All;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -155,7 +159,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 case VertexElementFormat.NormalizedShort4:
                     return VertexAttribPointerType.UnsignedShort;
-#if !IPHONE
+#if MONOMAC
                 case VertexElementFormat.HalfVector2:
                     return VertexAttribPointerType.HalfFloat;
 
@@ -202,7 +206,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 case VertexElementFormat.NormalizedShort4:
                     return ColorPointerType.UnsignedShort;
 				
-#if !IPHONE
+#if MONOMAC
                 case VertexElementFormat.HalfVector2:
                     return ColorPointerType.HalfFloat;
 
@@ -248,7 +252,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 case VertexElementFormat.NormalizedShort4:
                     return NormalPointerType.Short;
 				
-#if !IPHONE
+#if MONOMAC
                 case VertexElementFormat.HalfVector2:
                     return NormalPointerType.HalfFloat;
 
@@ -294,7 +298,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 case VertexElementFormat.NormalizedShort4:
                     return TexCoordPointerType.Short;
 				
-#if !IPHONE
+#if MONOMAC
                 case VertexElementFormat.HalfVector2:
                     return TexCoordPointerType.HalfFloat;
 
@@ -378,18 +382,18 @@ namespace Microsoft.Xna.Framework.Graphics
 				return BlendEquationMode.MaxExt;
 			case BlendFunction.Min:
 				return BlendEquationMode.MinExt;
-#else
+#elif MONOMAC
 			case BlendFunction.Max:
 				return BlendEquationMode.Max;
 			case BlendFunction.Min:
 				return BlendEquationMode.Min;
-#endif			
+#endif
 			case BlendFunction.ReverseSubtract:
 				return BlendEquationMode.FuncReverseSubtract;
 			case BlendFunction.Subtract:
 				return BlendEquationMode.FuncSubtract;
 			default:
-				return BlendEquationMode.FuncAdd;
+                throw new NotImplementedException();
 			}
 		}
 

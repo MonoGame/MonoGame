@@ -39,6 +39,7 @@ purpose and non-infringement.
 #endregion License
 using System;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using System.IO;
 
@@ -48,21 +49,33 @@ using MonoMac.CoreGraphics;
 using MonoMac.Foundation;
 using MonoMac.OpenGL;
 using GLPixelFormat = MonoMac.OpenGL.PixelFormat;
-#elif IPHONE
+#elif WINDOWS
+using OpenTK.Graphics.OpenGL;
+using GLPixelFormat = OpenTK.Graphics.OpenGL.PixelFormat;
+#else
+
+#if IPHONE
 using MonoTouch.UIKit;
 using MonoTouch.CoreGraphics;
 using MonoTouch.Foundation;
+#endif
 
 #if ES11
 using OpenTK.Graphics.ES11;
 #else
 using OpenTK.Graphics.ES20;
+
+#if IPHONE
 using TextureTarget = OpenTK.Graphics.ES20.All;
 using PixelType = OpenTK.Graphics.ES20.All;
 using TextureParameterName = OpenTK.Graphics.ES20.All;
 using PixelInternalFormat = OpenTK.Graphics.ES20.All;
-using GLPixelFormat = OpenTK.Graphics.ES20.All;
 using VertexPointerType = OpenTK.Graphics.ES20.All;
+using GLPixelFormat = OpenTK.Graphics.ES20.All;
+#else
+using GLPixelFormat = OpenTK.Graphics.ES20.PixelFormat;
+#endif
+
 #endif
 
 #endif
@@ -83,6 +96,21 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			InitWithData (data, dataLength, pixelFormat, width, height, size, filter);
 		}
+
+        public ESTexture2D(Bitmap image, All filter)
+        {
+            InitWithBitmap(image, filter);
+        }
+
+        public void InitWithBitmap(Bitmap image, All filter)
+        {
+            BitmapData bitmapData = image.LockBits(new System.Drawing.Rectangle(0, 0, image.Width, image.Height), ImageLockMode.ReadOnly,
+                           System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+            _format = SurfaceFormat.Color;
+            InitWithData(bitmapData.Scan0, image.Width*image.Height*4, _format, image.Width, image.Height, new Size(image.Width, image.Height), filter);
+            image.UnlockBits(bitmapData);
+        }
 		
 #if MONOMAC
 		public ESTexture2D (NSImage nsImage, All filter)
@@ -98,6 +126,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 #endif
 
+#if MONOMAC || IPHONE
 		public ESTexture2D (CGImage cgImage, All filter)
 		{
 			InitWithCGImage (cgImage, filter);
@@ -243,6 +272,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			context.Dispose ();
 			Marshal.FreeHGlobal (data);	
 		}
+#endif
 
 		public void Dispose ()
 		{

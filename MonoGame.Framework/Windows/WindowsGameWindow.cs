@@ -42,6 +42,7 @@ purpose and non-infringement.
 using System;
 using System.ComponentModel;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Graphics;
 using OpenTK;
 using OpenTK.Graphics;
 using System.Collections.Generic;
@@ -528,7 +529,15 @@ namespace Microsoft.Xna.Framework
 
         private void OnResize(object sender, EventArgs e)
         {
-            Game.GraphicsDevice.SizeChanged(OpenTkGameWindow.ClientRectangle.Width, OpenTkGameWindow.ClientRectangle.Height);
+            //Game.GraphicsDevice.SizeChanged(OpenTkGameWindow.ClientRectangle.Width, OpenTkGameWindow.ClientRectangle.Height);
+            Viewport vp = new Viewport();
+            vp.X = OpenTkGameWindow.ClientRectangle.X;
+            vp.Y = OpenTkGameWindow.ClientRectangle.Y;
+            vp.Width = OpenTkGameWindow.ClientRectangle.Width;
+            vp.Height = OpenTkGameWindow.ClientRectangle.Height;
+
+            Game.GraphicsDevice.Viewport = vp;
+
             OnClientSizeChanged();
         }
 

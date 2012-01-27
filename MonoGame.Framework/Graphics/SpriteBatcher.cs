@@ -44,23 +44,17 @@ using System.Collections.Generic;
 
 #if MONOMAC
 using MonoMac.OpenGL;
+#elif WINDOWS
+using OpenTK.Graphics.OpenGL;
 #else
 using OpenTK.Graphics.ES20;
 
+#if IPHONE
 using VertexAttribPointerType = OpenTK.Graphics.ES20.All;
 using TextureUnit = OpenTK.Graphics.ES20.All;
 using TextureTarget = OpenTK.Graphics.ES20.All;
 using DrawElementsType = OpenTK.Graphics.ES20.All;
-/*
-using VertexPointerType = OpenTK.Graphics.ES11.All;
-using ColorPointerType = OpenTK.Graphics.ES11.All;
-using TexCoordPointerType = OpenTK.Graphics.ES11.All;
-
-using TextureUnit20 = OpenTK.Graphics.ES20.All;
-using TextureTarget20 = OpenTK.Graphics.ES20.All;
-using TextureUnit11 = OpenTK.Graphics.ES11.All;
-using TextureTarget11 = OpenTK.Graphics.ES11.All;
-*/
+#endif
 
 #endif
 

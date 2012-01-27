@@ -33,6 +33,8 @@ using System.Drawing;
 
 #if MONOMAC
 using MonoMac.OpenGL;
+#elif WINDOWS
+using OpenTK.Graphics.OpenGL;
 #else
 #if ES11
 using OpenTK.Graphics.ES11;

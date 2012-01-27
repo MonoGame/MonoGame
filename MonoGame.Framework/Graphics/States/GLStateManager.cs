@@ -5,8 +5,12 @@ using System.Text;
 
 #if MONOMAC
 using MonoMac.OpenGL;
+#elif WINDOWS
+using OpenTK.Graphics.OpenGL;
 #else
 using OpenTK.Graphics.ES20;
+
+#if IPHONE
 using EnableCap = OpenTK.Graphics.ES20.All;
 using FrontFaceDirection = OpenTK.Graphics.ES20.All;
 using BlendEquationMode = OpenTK.Graphics.ES20.All;
@@ -15,6 +19,8 @@ using StencilFunction = OpenTK.Graphics.ES20.All;
 using StencilOp = OpenTK.Graphics.ES20.All;
 using BlendingFactorSrc = OpenTK.Graphics.ES20.All;
 using BlendingFactorDest = OpenTK.Graphics.ES20.All;
+#endif
+
 #endif
 
 using Microsoft.Xna.Framework;
@@ -152,11 +158,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public static void FillMode (RasterizerState state)
 		{
-#if IPHONE
-			if (state.FillMode != Microsoft.Xna.Framework.Graphics.FillMode.Solid) {
-				throw new NotImplementedException();
-			}
-#else
+#if MONOMAC
 			switch (state.FillMode) {
 			case Microsoft.Xna.Framework.Graphics.FillMode.Solid:
 				GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
@@ -164,6 +166,10 @@ namespace Microsoft.Xna.Framework.Graphics
 			case Microsoft.Xna.Framework.Graphics.FillMode.WireFrame:
 				GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
 				break;
+			}
+#else
+			if (state.FillMode != Microsoft.Xna.Framework.Graphics.FillMode.Solid) {
+				throw new NotImplementedException();
 			}
 #endif
 		}

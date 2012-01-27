@@ -68,6 +68,10 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             _screen = screen;
         }
+#else
+        internal GraphicsAdapter()
+        {
+        }
 #endif
         
         public void Dispose()
@@ -92,6 +96,8 @@ namespace Microsoft.Xna.Framework.Graphics
                        (int)(_screen.Bounds.Height * _screen.Scale),
                        60,
                        SurfaceFormat.Color);
+#else
+                return new DisplayMode(800, 600, 60, SurfaceFormat.Color);
 #endif
             }
         }
@@ -114,6 +120,9 @@ namespace Microsoft.Xna.Framework.Graphics
 #elif IPHONE
 					adapters = new ReadOnlyCollection<GraphicsAdapter>(
 						new GraphicsAdapter[] {new GraphicsAdapter(UIScreen.MainScreen)});
+#else
+                    adapters = new ReadOnlyCollection<GraphicsAdapter>(
+						new GraphicsAdapter[] {new GraphicsAdapter()});
 #endif
                 }
                 return adapters;

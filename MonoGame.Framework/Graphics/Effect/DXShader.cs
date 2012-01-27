@@ -3,13 +3,17 @@ using System.Runtime.InteropServices;
 
 #if MONOMAC
 using MonoMac.OpenGL;
+#elif WINDOWS
+using OpenTK.Graphics.OpenGL;
 #else
 using System.Text;
 using OpenTK.Graphics.ES20;
+#if IPHONE
 using ShaderType = OpenTK.Graphics.ES20.All;
 using ShaderParameter = OpenTK.Graphics.ES20.All;
 using TextureUnit = OpenTK.Graphics.ES20.All;
 using TextureTarget = OpenTK.Graphics.ES20.All;
+#endif
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -135,7 +139,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 #endif
 			
-			glslCode = GLSLOptimizer.Optimize (glslCode, shaderType);
+			//glslCode = GLSLOptimizer.Optimize (glslCode, shaderType);
 			
 #if IPHONE
 			glslCode = glslCode.Replace("#version 110\n", "");
@@ -310,7 +314,7 @@ namespace Microsoft.Xna.Framework.Graphics
 					GL.Uniform1 (loc, sampler.index);
 					
 					if (sampler.type == MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_2D) {
-						MojoShader.MOJOSHADER_symbol? samplerSymbol;
+						MojoShader.MOJOSHADER_symbol? samplerSymbol = null;
 						foreach (MojoShader.MOJOSHADER_symbol symbol in symbols) {
 							if (symbol.register_set ==
 							    	MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_SAMPLER &&

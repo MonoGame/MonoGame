@@ -46,11 +46,21 @@ using MonoMac.AppKit;
 using MonoMac.CoreGraphics;
 using MonoMac.CoreImage;
 using MonoMac.OpenGL;
-using Image = MonoMac.AppKit.NSImage;
-#elif IPHONE
+using AppleImage = MonoMac.AppKit.NSImage;
+#elif WINDOWS
+using OpenTK.Graphics.OpenGL;
+#else
+#if IPHONE
 using MonoTouch.UIKit;
+using AppleImage = MonoTouch.UIKit.UIImage;
+#endif
+
+#if ES11
 using OpenTK.Graphics.ES11;
-using Image = MonoTouch.UIKit.UIImage;
+#else
+using OpenTK.Graphics.ES20;
+#endif
+
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -122,26 +132,50 @@ namespace Microsoft.Xna.Framework.Graphics
 			texture = tex;
 			Initialize(imageScale);
 		}
-		
-		public ESImage(Image image)
+
+#if IPHONE || MONOMAC
+        public ESImage(AppleImage image)
 		{
 			// By default set the scale to 1.0f and the filtering to GL_NEAREST
 			texture = new ESTexture2D(image,All.Nearest);
 			Initialize(1.0f/*TODO image.CurrentScale*/);			
 		}
 
-		public ESImage(Image image, All filter)
+        public ESImage(AppleImage image, All filter)
 		{			
 			// By default set the scale to 1.0f
 			texture = new ESTexture2D(image,filter);
 			Initialize(1.0f/*TODO image.CurrentScale*/);
 		}
-		
-		public ESImage(Image image, float imageScale, All filter)
+
+        public ESImage(AppleImage image, float imageScale, All filter)
 		{
 			texture = new ESTexture2D(image,filter);
 			Initialize(imageScale);
 		}
+#endif
+
+        public ESImage(Bitmap image)
+        {
+            // By default set the scale to 1.0f and the filtering to GL_NEAREST
+            texture = new ESTexture2D(image, All.Nearest);
+            Initialize(1.0f);
+        }
+
+        public ESImage(Bitmap image, All filter)
+        {
+            // By default set the scale to 1.0f
+            texture = new ESTexture2D(image, filter);
+            Initialize(1.0f);
+        }
+
+        public ESImage(Bitmap image, float imageScale, All filter)
+        {
+            texture = new ESTexture2D(image, filter);
+            Initialize(imageScale);
+        }
+
+
 		
 		public void Dispose ()
 		{
