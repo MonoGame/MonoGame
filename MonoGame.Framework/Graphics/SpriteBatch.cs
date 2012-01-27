@@ -547,10 +547,12 @@ namespace Microsoft.Xna.Framework.Graphics
 				// We are initially flipped vertically so we need to flip the corners so that
 				//  the image is bottom side up to display correctly
 				texCoordTL.X = tempRect.X*texWidthRatio;
-				texCoordTL.Y = (tempRect.Y+tempRect.Height) * texHeightRatio;
+				//texCoordTL.Y = (tempRect.Y + tempRect.Height) * texHeightRatio;
+				texCoordTL.Y = 1.0f - tempRect.Y * texHeightRatio;
 				
 				texCoordBR.X = (tempRect.X+tempRect.Width)*texWidthRatio;
-				texCoordBR.Y = tempRect.Y*texHeightRatio;
+				//texCoordBR.Y = tempRect.Y * texHeightRatio;
+				texCoordBR.Y = 1.0f - ( tempRect.Y+tempRect.Height )*texHeightRatio;
 				
 			}
 			else {
@@ -630,10 +632,12 @@ namespace Microsoft.Xna.Framework.Graphics
 				// We are initially flipped vertically so we need to flip the corners so that
 				//  the image is bottom side up to display correctly
 				texCoordTL.X = tempRect.X*texWidthRatio;
-				texCoordTL.Y = (tempRect.Y+tempRect.Height) * texHeightRatio;
+				//texCoordTL.Y = (tempRect.Y + tempRect.Height) * texHeightRatio;
+				texCoordTL.Y = 1.0f - tempRect.Y * texHeightRatio;
 				
 				texCoordBR.X = (tempRect.X+tempRect.Width)*texWidthRatio;
-				texCoordBR.Y = tempRect.Y*texHeightRatio;
+				//texCoordBR.Y = tempRect.Y * texHeightRatio;
+				texCoordBR.Y = 1.0f - ( tempRect.Y+tempRect.Height )*texHeightRatio;
 				
 			}
 			else {
@@ -710,10 +714,12 @@ namespace Microsoft.Xna.Framework.Graphics
 				// We are initially flipped vertically so we need to flip the corners so that
 				//  the image is bottom side up to display correctly
 				texCoordTL.X = tempRect.X*texWidthRatio;
-				texCoordTL.Y = (tempRect.Y+tempRect.Height) * texHeightRatio;
+				//texCoordTL.Y = (tempRect.Y + tempRect.Height) * texHeightRatio;
+				texCoordTL.Y = 1.0f - tempRect.Y * texHeightRatio;
 				
 				texCoordBR.X = (tempRect.X+tempRect.Width)*texWidthRatio;
-				texCoordBR.Y = tempRect.Y*texHeightRatio;
+				//texCoordBR.Y = tempRect.Y * texHeightRatio;
+				texCoordBR.Y = 1.0f - ( tempRect.Y+tempRect.Height )*texHeightRatio;
 				
 			}
 			else {
@@ -783,10 +789,12 @@ namespace Microsoft.Xna.Framework.Graphics
 				// We are initially flipped vertically so we need to flip the corners so that
 				//  the image is bottom side up to display correctly
 				texCoordTL.X = tempRect.X*texWidthRatio;
-				texCoordTL.Y = (tempRect.Y+tempRect.Height) * texHeightRatio;
+				//texCoordTL.Y = (tempRect.Y + tempRect.Height) * texHeightRatio;
+				texCoordTL.Y = 1.0f - tempRect.Y * texHeightRatio;
 				
 				texCoordBR.X = (tempRect.X+tempRect.Width)*texWidthRatio;
-				texCoordBR.Y = tempRect.Y*texHeightRatio;
+				//texCoordBR.Y = tempRect.Y * texHeightRatio;
+				texCoordBR.Y = 1.0f - ( tempRect.Y+tempRect.Height )*texHeightRatio;
 				
 			}
 			else {
@@ -829,10 +837,12 @@ namespace Microsoft.Xna.Framework.Graphics
 				// We are initially flipped vertically so we need to flip the corners so that
 				//  the image is bottom side up to display correctly
 				texCoordTL.X = tempRect.X*texWidthRatio;
-				texCoordTL.Y = (tempRect.Y+tempRect.Height) * texHeightRatio;
+				//texCoordTL.Y = (tempRect.Y + tempRect.Height) * texHeightRatio;
+				texCoordTL.Y = 1.0f - tempRect.Y * texHeightRatio;
 				
 				texCoordBR.X = (tempRect.X+tempRect.Width)*texWidthRatio;
-				texCoordBR.Y = tempRect.Y*texHeightRatio;
+				//texCoordBR.Y = tempRect.Y * texHeightRatio;
+				texCoordBR.Y = 1.0f - ( tempRect.Y+tempRect.Height )*texHeightRatio;
 				
 			}
 			else {
@@ -881,10 +891,12 @@ namespace Microsoft.Xna.Framework.Graphics
 				// We are initially flipped vertically so we need to flip the corners so that
 				//  the image is bottom side up to display correctly
 				texCoordTL.X = tempRect.X*texWidthRatio;
-				texCoordTL.Y = (tempRect.Y+tempRect.Height) * texHeightRatio;
+				//texCoordTL.Y = (tempRect.Y + tempRect.Height) * texHeightRatio;
+				texCoordTL.Y = 1.0f - tempRect.Y * texHeightRatio;
 				
 				texCoordBR.X = (tempRect.X+tempRect.Width)*texWidthRatio;
-				texCoordBR.Y = tempRect.Y*texHeightRatio;
+				//texCoordBR.Y = tempRect.Y * texHeightRatio;
+				texCoordBR.Y = 1.0f - ( tempRect.Y+tempRect.Height )*texHeightRatio;
 				
 			}
 			else {
@@ -929,10 +941,12 @@ namespace Microsoft.Xna.Framework.Graphics
 				// We are initially flipped vertically so we need to flip the corners so that
 				//  the image is bottom side up to display correctly
 				texCoordTL.X = tempRect.X*texWidthRatio;
-				texCoordTL.Y = (tempRect.Y+tempRect.Height) * texHeightRatio;
+				//texCoordTL.Y = (tempRect.Y + tempRect.Height) * texHeightRatio;
+				texCoordTL.Y = 1.0f - tempRect.Y * texHeightRatio;
 				
 				texCoordBR.X = (tempRect.X+tempRect.Width)*texWidthRatio;
-				texCoordBR.Y = tempRect.Y*texHeightRatio;
+				//texCoordBR.Y = tempRect.Y * texHeightRatio;
+				texCoordBR.Y = 1.0f - ( tempRect.Y+tempRect.Height )*texHeightRatio;
 				
 			}
 			else {
