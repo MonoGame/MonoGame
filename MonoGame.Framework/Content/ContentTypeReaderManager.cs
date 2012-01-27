@@ -86,6 +86,7 @@ namespace Microsoft.Xna.Framework.Content
                 var hMatrixReader = new MatrixReader();
                 var hBasicEffectReader = new BasicEffectReader();
                 var hVertexBufferReader = new VertexBufferReader();
+                var hAlphaTestEffectReader = new AlphaTestEffectReader();
             }
 #pragma warning restore 0219, 0649
 
