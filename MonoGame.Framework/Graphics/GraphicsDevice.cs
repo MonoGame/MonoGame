@@ -107,7 +107,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private uint VboIdArray;
         private uint VboIdElement;
 
-        private RenderTargetBinding[] currentRenderTargets;
+        private RenderTargetBinding[] currentRenderTargetBindings;
 		
 		// OpenGL ES2.0 attribute locations
 		internal static int attributePosition = 0;
@@ -115,10 +115,9 @@ namespace Microsoft.Xna.Framework.Graphics
 		internal static int attributeTint = 2;
 		internal static int attributeColor = 3;
 		internal static int attributeNormal = 4;
-		
-#if ES11
-		//OpenGL ES1.1 consts
-#if IPHONE
+
+		//OpenGL ES 1.1 extension consts
+#if IPHONE && ES11
 		const FramebufferTarget GLFramebuffer = FramebufferTarget.FramebufferOes;
 		const RenderbufferTarget GLRenderbuffer = RenderbufferTarget.RenderbufferOes;
 		const FramebufferAttachment GLDepthAttachment = FramebufferAttachment.DepthAttachmentOes;
@@ -142,7 +141,6 @@ namespace Microsoft.Xna.Framework.Graphics
 		const RenderbufferStorage GLDepth24Stencil8 = RenderbufferStorage.Depth24Stencil8;
 		const FramebufferErrorCode GLFramebufferComplete = FramebufferErrorCode.FramebufferComplete;
 #endif
-#endif
 		
 		// TODO Graphics Device events need implementing
 		public event EventHandler<EventArgs> DeviceLost;
@@ -151,8 +149,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		//public event EventHandler<ResourceCreatedEventArgs> ResourceCreated;
 		//public event EventHandler<ResourceDestroyedEventArgs> ResourceDestroyed;
 
-        public static int FrameBufferScreen;
-        public static bool DefaultFrameBuffer = true;
+        private int glFramebuffer;
 
 		public RasterizerState RasterizerState {
 			get {
@@ -208,11 +205,8 @@ namespace Microsoft.Xna.Framework.Graphics
         public GraphicsDevice()
         {
             // Initialize the main viewport
-            _viewport = new Viewport();
-            _viewport.X = 0;
-            _viewport.Y = 0;
-            _viewport.Width = DisplayMode.Width;
-            _viewport.Height = DisplayMode.Height;
+            _viewport = new Viewport(0, 0,
+			                         DisplayMode.Width, DisplayMode.Height);
             _viewport.MinDepth = 0.0f;
             _viewport.MaxDepth = 1.0f;
             Textures = new TextureCollection();
@@ -430,74 +424,14 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        public void SetRenderTarget(RenderTarget2D renderTarget)
-        {
-#if ES11
-			 // We check if the rendertarget being passed is null or if we already have a rendertarget
-            // NetRumble sample does not set the the renderTarget to null before setting another
-            // rendertarget.  We handle that by checking first if we have a current render target set
-            // if we do then we unbind the current rendertarget, reset the viewport and set the
-            // rendertarget to the new one being passed if it is not null
-            if (renderTarget == null || currentRenderTargets != null)
-            {
-#if ANDROID
-                byte[] imageInfo = new byte[4];
-                GL.ReadPixels(0, 0, 1, 1, All.Rgba, All.UnsignedByte, imageInfo);
-#endif
-				
-                // Detach the render buffers.
-                GL_Oes.FramebufferRenderbuffer(
-				                           GLFramebuffer,
-				                           GLDepthAttachment,
-                                           GLRenderbuffer, 0);
-
-                // delete the RBO's
-                GL_Oes.DeleteRenderbuffers(renderBufferIDs.Length, renderBufferIDs);
-
-                // delete the FBO
-                GL_Oes.DeleteFramebuffers(frameBufferIDs.Length, frameBufferIDs);
-
-                // Set the frame buffer back to the system window buffer
-                GL_Oes.BindFramebuffer(GLFramebuffer, originalFbo);
-
-                // We need to reset our GraphicsDevice viewport back to what it was
-                // before rendering.
-                Viewport = savedViewport;
-
-                if (renderTarget == null)
-                    currentRenderTargets = null;
-                else
-                {
-                    SetRenderTargets(new RenderTargetBinding(renderTarget));
-                }
-            }
-            else
-            {
-                SetRenderTargets(new RenderTargetBinding(renderTarget));
-            }
-
-#else
-			/*
-            if (renderTarget == null)
-            {
-                GL.BindFramebuffer(FramebufferTarget.Framebuffer, FrameBufferScreen);
-                DefaultFrameBuffer = true;
-            }
-            else
-            {
-                GL.BindFramebuffer(FramebufferTarget.Framebuffer, renderTarget.frameBuffer);
-                GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, TextureTarget.Texture2D, rendertarget.ID, 0);
-
-                FramebufferErrorCode status = GL.CheckFramebufferStatus(FramebufferTarget.Framebuffer);
-                if (status != FramebufferErrorCode.FramebufferComplete)
-                    throw new Exception("GL20: Error creating framebuffer: " + status);
-
-                DefaultFrameBuffer = false;
-            }*/
-			throw new NotImplementedException();
-#endif
-        }
-
+		public void SetRenderTarget (RenderTarget2D renderTarget)
+		{
+			if (renderTarget == null)
+				this.SetRenderTargets(null);
+			else
+				this.SetRenderTargets(new RenderTargetBinding(renderTarget));
+		}
+		
         int[] frameBufferIDs;
         int[] renderBufferIDs;
         int originalFbo = -1;
@@ -510,124 +444,80 @@ namespace Microsoft.Xna.Framework.Graphics
         //  Depth and Stencil formats	- To be determined
         Viewport savedViewport;
 
-        public void SetRenderTargets(params RenderTargetBinding[] renderTargets)
-        {
-#if ES11
-            currentRenderTargets = renderTargets;
-
-            if (currentRenderTargets != null)
-            {
-                // TODO: For speed we need to consider using FBO switching instead
-                // of multiple FBO's if they are the same size.
-
-                // http://www.songho.ca/opengl/gl_fbo.html
-
-                // Get the currently bound frame buffer object. On most platforms this just gives 0.
+		public void SetRenderTargets (params RenderTargetBinding[] renderTargets) 
+		{			
+			var previousRenderTargetBindings = this.currentRenderTargetBindings;
+			this.currentRenderTargetBindings = renderTargets;
+			
+			//GLExt.DiscardFramebuffer(All.Framebuffer, 2, discards);
+			
+			if (this.currentRenderTargetBindings == null || this.currentRenderTargetBindings.Length == 0)
+			{
+				GL.BindFramebuffer(GLFramebuffer, 0);
+				this.Viewport = new Viewport(0, 0,
+					this.PresentationParameters.BackBufferWidth, 
+					this.PresentationParameters.BackBufferHeight);
+			}
+			else
+			{
+				if (this.glFramebuffer == 0)
+				{
 #if IPHONE
-				GL.GetInteger(GLFramebufferBinding, ref originalFbo);
+					GL.GenFramebuffers(1, ref this.glFramebuffer);
 #else
-				GL.GetInteger(GLFramebufferBinding, out originalFbo);
+					GL.GenFramebuffers(1, out this.glFramebuffer);
 #endif
-				
-				frameBufferIDs = new int[currentRenderTargets.Length];
-				
-				renderBufferIDs = new int[currentRenderTargets.Length];
-				
-				GL_Oes.GenRenderbuffers(currentRenderTargets.Length, renderBufferIDs);
-				
-				for (int i = 0; i < currentRenderTargets.Length; i++) {
-					RenderTarget2D target = (RenderTarget2D)currentRenderTargets[i].RenderTarget;
-
-					// create a renderbuffer object to store depth info
-					GL_Oes.BindRenderbuffer(GLRenderbuffer, renderBufferIDs[i]);
-
-					ClearOptions clearOptions = ClearOptions.Target | ClearOptions.DepthBuffer;
-
-					// create framebuffer
-#if IPHONE
-					GL_Oes.GenFramebuffers(1, ref frameBufferIDs[i]);
-#else
-					GL_Oes.GenFramebuffers(1, out frameBufferIDs[i]);
-#endif
-
-#if IPHONE
-					GL_Oes.BindFramebuffer(GLFramebuffer, frameBufferIDs[i]);
-#else
-					GL_Oes.BindFramebuffer(FramebufferTarget.DrawFramebuffer, frameBufferIDs[i]);
-#endif
-					
-					//allocate depth buffer
-					switch (target.DepthStencilFormat) {
-					case DepthFormat.Depth16:
-						GL_Oes.RenderbufferStorage(GLRenderbuffer, GLDepthComponent16,
-							target.Width, target.Height);
-						break;
-					case DepthFormat.Depth24:
-						GL_Oes.RenderbufferStorage(GLRenderbuffer, GLDepthComponent24,
-							target.Width, target.Height);
-						break;
-					case DepthFormat.Depth24Stencil8:
-						GL_Oes.RenderbufferStorage(GLRenderbuffer, GLDepth24Stencil8,
-							target.Width, target.Height);
-						// attach stencil buffer
-						GL_Oes.FramebufferRenderbuffer(GLFramebuffer, GLStencilAttachment,
-							GLRenderbuffer, renderBufferIDs[i]);
-						clearOptions = clearOptions | ClearOptions.Stencil;
-						break;
-					default:
-						GL_Oes.RenderbufferStorage(GLRenderbuffer, GLDepthComponent24,
-							target.Width, target.Height);
-						break;
-					}
-					
-					// attach the texture to FBO color attachment point
-					GL_Oes.FramebufferTexture2D(GLFramebuffer, GLColorAttachment0,
-						TextureTarget.Texture2D, target.ID,0);
-					
-					// attach the renderbuffer to depth attachment point
-					GL_Oes.FramebufferRenderbuffer(GLFramebuffer, GLDepthAttachment,
-						GLRenderbuffer, renderBufferIDs[i]);					
-					
-					if (target.RenderTargetUsage == RenderTargetUsage.DiscardContents)
-						Clear (clearOptions, Color.Transparent, 0, 0);
-					
-					GL_Oes.BindRenderbuffer(GLRenderbuffer, 0);
 				}
 				
-				FramebufferErrorCode status = GL_Oes.CheckFramebufferStatus(GLFramebuffer);
-				
+				var renderTarget = this.currentRenderTargetBindings[0].RenderTarget as RenderTarget2D;
+				GL.BindFramebuffer(GLFramebuffer, this.glFramebuffer);
+				GL.FramebufferTexture2D(GLFramebuffer, GLColorAttachment0, TextureTarget.Texture2D, renderTarget.ID, 0);
+				if (renderTarget.DepthStencilFormat != DepthFormat.None)
+				{
+					GL.FramebufferRenderbuffer(GLFramebuffer, GLDepthAttachment, GLRenderbuffer, renderTarget.glDepthStencilBuffer);
+					if (renderTarget.DepthStencilFormat == DepthFormat.Depth24Stencil8)
+					{
+						GL.FramebufferRenderbuffer(GLFramebuffer, GLStencilAttachment, GLRenderbuffer, renderTarget.glDepthStencilBuffer);
+					}
+				}
+
+				var status = GL.CheckFramebufferStatus(GLFramebuffer);
 				if (status != GLFramebufferComplete)
-					throw new Exception("Error creating framebuffer: " + status);
-
-				// We need to start saving off the ViewPort and setting the current ViewPort to
-				// the width and height of the texture.  Then when we pop off the rendertarget
-				// it needs to be reset.  This causes drawing problems if we do not set the viewport.
-				// Makes sense once you follow the flow (hits head on desk)
-				// For an example of this take a look at NetRumble's sample for the BloomPostprocess
-
-				// Save off the current viewport to be reset later
-				savedViewport = Viewport;
-
-				// Create a new Viewport
-				Viewport renderTargetViewPort = new Viewport();
-
-				// Set the new viewport to the width and height of the render target
-				Texture2D target2 = (Texture2D)currentRenderTargets[0].RenderTarget;
-				renderTargetViewPort.Width = target2.Width;
-				renderTargetViewPort.Height = target2.Height;
-
-				// now we set our viewport to the new rendertarget viewport just created.
-				Viewport = renderTargetViewPort;
-
-            }
-#else
-			throw new NotImplementedException();
-#endif
-        }
+				{
+					string message = "Framebuffer Incomplete.";
+					switch (status)
+					{
+					case FramebufferErrorCode.FramebufferIncompleteAttachment: message = "Not all framebuffer attachment points are framebuffer attachment complete."; break;
+					case FramebufferErrorCode.FramebufferIncompleteMissingAttachment : message = "No images are attached to the framebuffer."; break;
+					case FramebufferErrorCode.FramebufferUnsupported : message = "The combination of internal formats of the attached images violates an implementation-dependent set of restrictions."; break;
+					//case FramebufferErrorCode.FramebufferIncompleteDimensions : message = "Not all attached images have the same width and height."; break;
+					}
+					throw new InvalidOperationException(message);
+				}
+				this.Viewport = new Viewport(0, 0, renderTarget.Width, renderTarget.Height);
+			}
+			
+			if (previousRenderTargetBindings != null)
+			{
+				for (var i = 0; i < previousRenderTargetBindings.Length; ++i)
+				{
+					var renderTarget = previousRenderTargetBindings[i].RenderTarget;
+					/*if (renderTarget.LevelCount > 1)
+					{
+						GL.ActiveTexture(TextureUnit.Texture0);
+						GL.BindTexture(TextureTarget.Texture2D, renderTarget.ID);
+						GL.GenerateMipmap(TextureTarget.Texture2D);
+						GL.BindTexture(TextureTarget.Texture2D, 0);
+					}*/
+				}
+			}
+		}
 
 		public RenderTargetBinding[] GetRenderTargets ()
 		{
-			return currentRenderTargets;
+			if (this.currentRenderTargetBindings == null)
+				return new RenderTargetBinding[0];
+			return currentRenderTargetBindings;
 		}
 		
         public void ResolveBackBuffer(ResolveTexture2D resolveTexture)

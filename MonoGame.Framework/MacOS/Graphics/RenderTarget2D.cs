@@ -40,59 +40,66 @@
 
 using System;
 
+#if MONOMAC
 using MonoMac.OpenGL;
+#else
+#if ES11
+
+#else
+using OpenTK.Graphics.ES20;
+#endif
+#endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-	// modified to inherit directly from Texture2D as per
-	// http://blogs.msdn.com/b/shawnhar/archive/2010/03/26/rendertarget-changes-in-xna-game-studio-4-0.aspx
-	// 	and
-	// http://msdn.microsoft.com/en-us/library/bb198676.aspx
-	//
 	public class RenderTarget2D : Texture2D
 	{
-
-		public RenderTargetUsage RenderTargetUsage { get; internal set; }
-		public DepthFormat DepthStencilFormat { get; internal set; }
+		internal uint glDepthStencilBuffer;
 		
-		public RenderTarget2D (GraphicsDevice graphicsDevice, int width, int height)
-			: this(graphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None) 
-		{}
+		public DepthFormat DepthStencilFormat { get; private set; }
 		
-		public RenderTarget2D (GraphicsDevice graphicsDevice, int width, int height, bool mipMap, 
-			SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat)
-			:this (graphicsDevice, width, height, mipMap, preferredFormat, 
-				DepthFormat.None, 0, RenderTargetUsage.PreserveContents) 
-		{}
+		public int MultiSampleCount { get; private set; }
 		
-		public RenderTarget2D (GraphicsDevice graphicsDevice, int width, int height, bool mipMap, 
-			SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage)
+		public RenderTargetUsage RenderTargetUsage { get; private set; }
+		
+		public RenderTarget2D (GraphicsDevice graphicsDevice, int width, int height, bool mipMap, SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage)
 			:base (graphicsDevice, width, height, mipMap, preferredFormat)
 		{
-			RenderTargetUsage = usage;
-			DepthStencilFormat = preferredDepthFormat;
-			//allocateOpenGLTexture();
+			this.DepthStencilFormat = preferredDepthFormat;
+			this.MultiSampleCount = preferredMultiSampleCount;
+			this.RenderTargetUsage = usage;
+			
+			if (preferredDepthFormat != DepthFormat.None)
+			{
+#if IPHONE
+				GL.GenRenderbuffers(1, ref glDepthStencilBuffer);
+#else
+				GL.GenRenderbuffers(1, out glDepthStencilBuffer);
+#endif
+				GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, this.glDepthStencilBuffer);
+				var glDepthStencilFormat = RenderbufferStorage.DepthComponent16;
+				switch (preferredDepthFormat)
+				{
+				case DepthFormat.Depth16 : glDepthStencilFormat = RenderbufferStorage.DepthComponent16; break;
+				case DepthFormat.Depth24 : glDepthStencilFormat = RenderbufferStorage.DepthComponent24; break;
+				case DepthFormat.Depth24Stencil8: glDepthStencilFormat = RenderbufferStorage.Depth24Stencil8; break;
+				}
+				GL.RenderbufferStorage(RenderbufferTarget.Renderbuffer, glDepthStencilFormat, this._width, this._height);
+			}
 		}
 		
-		private void allocateOpenGLTexture() 
+		public RenderTarget2D (GraphicsDevice graphicsDevice, int width, int height, bool mipMap, SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat)
+			:this (graphicsDevice, width, height, mipMap, preferredFormat, preferredDepthFormat, 0, RenderTargetUsage.DiscardContents) 
+		{}
+		
+		public RenderTarget2D (GraphicsDevice graphicsDevice, int width, int height)
+			: this(graphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.DiscardContents) 
+		{}
+
+		/*protected override void ReleaseUnmanagedResources ()
 		{
-			// modeled after this
-			// http://steinsoft.net/index.php?site=Programming/Code%20Snippets/OpenGL/no9
-			
-			// Allocate the space needed for the texture
-			GL.BindTexture (TextureTarget.Texture2D, this._textureId);
-			
-			// it seems like we do not need to allocate any buffer space
-			//byte[] data = new byte[_width * _height * 4];
-			// Use offset instead of pointer to indictate that we want to use data copied from a PBO 
-			//GL.TexImage2D (TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, _width, _height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, data);
-			GL.TexImage2D (TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, _width, _height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, IntPtr.Zero);
-			
-			GL.BindTexture (TextureTarget.Texture2D, 0);
-			//data = null;
-
-		}
-
-
+			base.ReleaseUnmanagedResources();
+			GL.DeleteRenderbuffers(1, ref this.glDepthStencilBuffer);
+		}*/
 	}
 }

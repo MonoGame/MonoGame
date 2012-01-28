@@ -476,14 +476,9 @@ namespace Microsoft.Xna.Framework
             else
                 _platform.ExitFullScreen();
 
-            // FIXME: Is this the correct/best way to set the viewport?  There
-            //        are/were several snippets like this through the project.
-            var viewport = new Viewport();
-
-            viewport.X = 0;
-            viewport.Y = 0;
-            viewport.Width = GraphicsDevice.PresentationParameters.BackBufferWidth;
-            viewport.Height = GraphicsDevice.PresentationParameters.BackBufferHeight;
+            var viewport = new Viewport(0, 0,
+			                            GraphicsDevice.PresentationParameters.BackBufferWidth,
+			                            GraphicsDevice.PresentationParameters.BackBufferHeight);
 
             GraphicsDevice.Viewport = viewport;
 			_platform.EndScreenDeviceChange(string.Empty, viewport.Width, viewport.Height);
