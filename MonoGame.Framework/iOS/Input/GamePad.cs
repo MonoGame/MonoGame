@@ -135,8 +135,10 @@
 	
 	        public static GamePadState GetState(PlayerIndex playerIndex)
 	        {		
-				return new GamePadState(); // Please fix
-				// TODO return new GamePadState((Buttons)GamePad.Instance._buttons,GamePad.Instance._leftStick,GamePad.Instance._rightStick);
+			//return new GamePadState(); // Please fix - Does not return triggers or buttons.
+		 	Buttons[] p = new Buttons[0];
+			 	
+			return new GamePadState(Instance._leftStick, Instance._rightStick, 0f, 0f, p);
 	        }
 	
 	        public static bool SetVibration(PlayerIndex playerIndex, float leftMotor, float rightMotor)
