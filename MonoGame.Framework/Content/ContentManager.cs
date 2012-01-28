@@ -57,8 +57,7 @@ namespace Microsoft.Xna.Framework.Content
 		private string _rootDirectory = string.Empty;
 		private IServiceProvider serviceProvider;
 		private IGraphicsDeviceService graphicsDeviceService;
-		Dictionary<string, object> loadedAssets = new Dictionary<string, object>();
-		List<IDisposable> disposableAssets = new List<IDisposable>();
+		protected Dictionary<string, object> loadedAssets = new Dictionary<string, object>();
 		bool disposed;
 		
 		private static object ContentManagerLock = new object();
@@ -168,8 +167,13 @@ namespace Microsoft.Xna.Framework.Content
 				}
 			}
 
-			asset = ReadAsset<T>(assetName, null);
-			return (T)asset;
+            // Load the asset.
+			var result = ReadAsset<T>(assetName, null);
+			
+			// Cache the result.
+			loadedAssets.Add(assetName, result);
+			
+			return result;
 		}
 		
 		protected virtual Stream OpenStream(string assetName)
@@ -420,22 +424,10 @@ namespace Microsoft.Xna.Framework.Content
 			{
 				throw new ContentLoadException("Could not load " + originalAssetName + " asset!");
 			}
-
-			// Store references to the asset for later use
-			T asset = (T)result;
-			if (asset is IDisposable)
-			{
-				if (recordDisposableObject != null)
-				{
-					recordDisposableObject(asset as IDisposable);
-				}
-				else
-				{
-					disposableAssets.Add(asset as IDisposable);
-				}
-			}
-			loadedAssets.Add(originalAssetName, asset);
-
+			
+			if ( recordDisposableObject != null && result is IDisposable )
+			    recordDisposableObject(result as IDisposable);
+			    
 			return (T)result;
 		}
 		
@@ -538,12 +530,15 @@ namespace Microsoft.Xna.Framework.Content
 
 		public virtual void Unload()
 		{
-			foreach (IDisposable asset in disposableAssets)
-			{
-				asset.Dispose();
-			}
-			disposableAssets.Clear();
-			loadedAssets.Clear();
+		    // Look for disposable assets.
+		    foreach (var pair in loadedAssets)
+		    {
+		        var disposable = pair.Value as IDisposable;
+		        if (disposable != null )
+		            disposable.Dispose();
+		    }
+		    RemoveContentManager(this);
+		    loadedAssets.Clear();
 		}
 
 		public string RootDirectory

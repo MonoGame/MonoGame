@@ -235,7 +235,6 @@
     <Compile Include="Linux\Graphics\Effect\BasicEffect.cs" />
     <Compile Include="Linux\Graphics\Effect\EffectPass.cs" />
     <Compile Include="Linux\Graphics\Vertices\IndexBuffer.cs" />
-    <Compile Include="Linux\Graphics\Vertices\VertexDeclaration.cs" />
     <Compile Include="Linux\GameWindow.cs" />
     <Compile Include="PreparingDeviceSettingsEventArgs.cs" />
     <Compile Include="GraphicsDeviceInformation.cs" />
@@ -294,6 +293,13 @@
     <Compile Include="Content\ContentReaders\UInt16Reader.cs" />
     <Compile Include="Content\ContentReaders\UInt32Reader.cs" />
     <Compile Include="Content\ContentReaders\UInt64Reader.cs" />
+    <Compile Include="Content\ContentReaders\BoundingFrustumReader.cs" />
+    <Compile Include="Content\ContentReaders\BoundingSphereReader.cs" />
+    <Compile Include="Content\ContentReaders\ByteReader.cs" />
+    <Compile Include="Content\ContentReaders\DateTimeReader.cs" />
+    <Compile Include="Content\ContentReaders\DecimalReader.cs" />
+    <Compile Include="Content\ContentReaders\RayReader.cs" />
+    <Compile Include="Content\ContentReaders\SByteReader.cs" />
     <Compile Include="Graphics\Effect\EffectParameterClass.cs" />
     <Compile Include="Graphics\Effect\EffectParameterType.cs" />
     <Compile Include="Graphics\Effect\SpriteEffect.cs" />
@@ -334,6 +340,7 @@
     <Compile Include="Desktop\Input\GamePad.cs" />
     <Compile Include="Desktop\Input\Mouse.cs" />
     <Compile Include="Desktop\Input\MouseState.cs" />
+    <Compile Include="Desktop\Graphics\Vertices\VertexDeclaration.cs" />
     <Compile Include="LaunchParameters.cs" />
   </ItemGroup>
   <ItemGroup>

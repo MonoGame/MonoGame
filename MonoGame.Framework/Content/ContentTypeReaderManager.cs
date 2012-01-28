@@ -26,10 +26,7 @@ SOFTWARE.
 #endregion License
 
 using System;
-using System.IO;
-using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Microsoft.Xna.Framework.Content
@@ -71,19 +68,31 @@ namespace Microsoft.Xna.Framework.Content
             {
                 // Dummy variables required for it to work on iDevices ** DO NOT DELETE ** 
                 // This forces the classes not to be optimized out when deploying to iDevices
-                ListReader<Char> hCharListReader = new ListReader<Char>();
-                ListReader<Rectangle> hRectangleListReader = new ListReader<Rectangle>();
-                ListReader<Vector3> hVector3ListReader = new ListReader<Vector3>();
-                ListReader<StringReader> hStringListReader = new ListReader<StringReader>();
-                SpriteFontReader hSpriteFontReader = new SpriteFontReader();
-                Texture2DReader hTexture2DReader = new Texture2DReader();
-                CharReader hCharReader = new CharReader();
-                RectangleReader hRectangleReader = new RectangleReader();
-                StringReader hStringReader = new StringReader();
-                Vector2Reader hVector2Reader = new Vector2Reader();
-                Vector3Reader hVector3Reader = new Vector3Reader();
-                Vector4Reader hVector4Reader = new Vector4Reader();
-                CurveReader hCurveReader = new CurveReader();
+                var hByteReader = new ByteReader();
+                var hSByteReader = new SByteReader();
+                var hDateTimeReader = new DateTimeReader();
+                var hDecimalReader = new DecimalReader();
+                var hBoundingSphereReader = new BoundingSphereReader();
+                var hBoundingFrustumReader = new BoundingFrustumReader();
+                var hRayReader = new RayReader();
+                var hCharListReader = new ListReader<Char>();
+                var hRectangleListReader = new ListReader<Rectangle>();
+                var hVector3ListReader = new ListReader<Vector3>();
+                var hStringListReader = new ListReader<StringReader>();
+                var hSpriteFontReader = new SpriteFontReader();
+                var hTexture2DReader = new Texture2DReader();
+                var hCharReader = new CharReader();
+                var hRectangleReader = new RectangleReader();
+                var hStringReader = new StringReader();
+                var hVector2Reader = new Vector2Reader();
+                var hVector3Reader = new Vector3Reader();
+                var hVector4Reader = new Vector4Reader();
+                var hCurveReader = new CurveReader();
+                var hIndexBufferReader = new IndexBufferReader();
+                var hBoundingBoxReader = new BoundingBoxReader();
+                var hMatrixReader = new MatrixReader();
+                var hBasicEffectReader = new BasicEffectReader();
+                var hVertexBufferReader = new VertexBufferReader();
             }
 #pragma warning restore 0219, 0649
 
