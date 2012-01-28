@@ -245,6 +245,38 @@ namespace Microsoft.Xna.Framework.Graphics
 			if (state.DepthBufferEnable) {
 				// enable Depth Buffer
 				GL.Enable( EnableCap.DepthTest);
+
+				DepthFunction func = DepthFunction.Always;
+				switch (state.DepthBufferFunction) {
+				case CompareFunction.Always:
+					func = DepthFunction.Always;
+					break;
+				case CompareFunction.Equal:
+					func = DepthFunction.Equal;
+					break;
+				case CompareFunction.Greater:
+					func = DepthFunction.Greater;
+					break;
+				case CompareFunction.GreaterEqual:
+					func = DepthFunction.Gequal;
+					break;
+				case CompareFunction.Less:
+					func = DepthFunction.Less;
+					break;
+				case CompareFunction.LessEqual:
+					func = DepthFunction.Lequal;
+					break;
+				case CompareFunction.Never:
+					func = DepthFunction.Never;
+					break;
+				case CompareFunction.NotEqual:
+					func = DepthFunction.Notequal;
+					break;
+				}
+
+				GL.DepthFunc(func);
+
+				GL.DepthMask (state.DepthBufferWriteEnable);
 			}
 			else {
 				GL.Disable (EnableCap.DepthTest);

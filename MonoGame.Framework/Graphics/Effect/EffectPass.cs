@@ -30,11 +30,11 @@ namespace Microsoft.Xna.Framework.Graphics
 		DXShader vertexShader;
 		
 		bool setBlendState = false;
-		BlendState blendState = BlendState.Opaque;
+		BlendState blendState;
 		bool setDepthStencilState = false;
-		DepthStencilState depthStencilState = DepthStencilState.Default;
+		DepthStencilState depthStencilState;
 		bool setRasterizerState = false;
-		RasterizerState rasterizerState = RasterizerState.CullCounterClockwise;
+		RasterizerState rasterizerState;
 		
 
 		static string passthroughVertexShaderSrc = @"
@@ -63,6 +63,10 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			name = pass.name;
 			states = pass.states;
+			
+			blendState = new BlendState();
+			depthStencilState = new DepthStencilState();
+			rasterizerState = new RasterizerState();
 			
 			Console.WriteLine (technique.Name);
 			

@@ -211,17 +211,21 @@ namespace Microsoft.Xna.Framework.Graphics
             _viewport.MaxDepth = 1.0f;
             Textures = new TextureCollection();
 
-            // Init RasterizerState
-            //RasterizerState = new RasterizerState();
+			Initialize();
         }
 
         internal void Initialize()
         {
-            //Initialize OpenGl states
-            GL.Disable(EnableCap.DepthTest);
+
 #if ES11
+			//Is this needed?
 			GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)All.BlendSrc);
 #endif
+
+			BlendState = BlendState.Opaque;
+			DepthStencilState = DepthStencilState.Default;
+			RasterizerState = RasterizerState.CullCounterClockwise;
+
             VboIdArray = 0;
             VboIdElement = 0;
         }
@@ -255,7 +259,14 @@ namespace Microsoft.Xna.Framework.Graphics
         }
         public void Clear(Color color)
         {
-            Clear (ClearOptions.Target, color.ToVector4(), 0, 0);
+			ClearOptions options = ClearOptions.Target;
+			if (DepthStencilState.DepthBufferEnable) {
+				options |= ClearOptions.DepthBuffer;
+			}
+			if (DepthStencilState.StencilEnable) {
+				options |= ClearOptions.Stencil;
+			}
+            Clear (options, color.ToVector4(), Viewport.MaxDepth, 0);
         }
 
         public void Clear(ClearOptions options, Color color, float depth, int stencil)
@@ -266,31 +277,26 @@ namespace Microsoft.Xna.Framework.Graphics
 		public void Clear (ClearOptions options, Vector4 color, float depth, int stencil)
 		{
 			GL.ClearColor (color.X, color.Y, color.Z, color.W);
-#if IPHONE
-			GL.Clear ((uint)CreateClearOptions(options, depth, stencil));
-#else
-			GL.Clear (CreateClearOptions(options, depth, stencil));
-#endif
-		}
 
-		private ClearBufferMask CreateClearOptions (ClearOptions clearOptions, float depth, int stencil)
-		{
 			ClearBufferMask bufferMask = 0;
-			if (clearOptions.HasFlag(ClearOptions.Target)) {
+			if (options.HasFlag(ClearOptions.Target)) {
 				bufferMask = bufferMask | ClearBufferMask.ColorBufferBit;
 			}
-			if (clearOptions.HasFlag(ClearOptions.Stencil)) {
+			if (options.HasFlag(ClearOptions.Stencil)) {
 				GL.ClearStencil (stencil);
 				bufferMask = bufferMask | ClearBufferMask.StencilBufferBit;
 			}
-			if (clearOptions.HasFlag(ClearOptions.DepthBuffer)) {
+			if (options.HasFlag(ClearOptions.DepthBuffer)) {
 				GL.ClearDepth (depth);
 				bufferMask = bufferMask | ClearBufferMask.DepthBufferBit;
 			}
 
-			return bufferMask;
+#if IPHONE
+			GL.Clear ((uint)bufferMask);
+#else
+			GL.Clear (bufferMask);
+#endif
 		}
-		
 		
         public void Clear(ClearOptions options, Color color, float depth, int stencil, Rectangle[] regions)
         {
@@ -392,6 +398,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 _viewport = value;
 				GL.Viewport (value.X, value.Y, value.Width, value.Height);
+				GL.DepthRange(value.MinDepth, value.MaxDepth);
             }
         }
 
@@ -412,7 +419,9 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             get
             {
-                return _scissorRectangle;
+				if (RasterizerState.ScissorTestEnable)
+                	return _scissorRectangle;
+				return _viewport.Bounds;
             }
             set
             {
