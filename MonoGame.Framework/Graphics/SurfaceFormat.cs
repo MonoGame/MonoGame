@@ -63,7 +63,13 @@ namespace Microsoft.Xna.Framework.Graphics
         HalfSingle = 16,
         HalfVector2 = 17,
         HalfVector4 = 18,
-        HdrBlendable = 19
+        HdrBlendable = 19,
+
+		// PowerVR texture compression (iOS)
+		RgbPvrtc2Bpp = 20,
+		RgbPvrtc4Bpp = 21,
+		RgbaPvrtc2Bpp = 22,
+		RgbaPvrtc4Bpp = 23,
     }
 }
 
