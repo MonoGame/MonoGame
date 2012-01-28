@@ -407,6 +407,12 @@ namespace Microsoft.Xna.Framework
                         tlocation.State = TouchLocationState.Released;
                         collection[index] = tlocation;
                     }
+					if ((TouchPanel.EnabledGestures & GestureType.DragComplete) != 0)
+					{				
+						var gs = new GestureSample(GestureType.DragComplete, AndroidGameActivity.Game.TargetElapsedTime, 
+							position, Vector2.Zero, Vector2.Zero, Vector2.Zero);
+						TouchPanel.GestureList.Enqueue(gs);
+					}
                     break;
                 // MOVE                
                 case 2:
@@ -424,6 +430,14 @@ namespace Microsoft.Xna.Framework
                             collection[index] = tlocation;
                         }
                     }
+					if ((TouchPanel.EnabledGestures & GestureType.FreeDrag) != 0)
+					{				
+						Vector2 positon = new Vector2(e.GetX(), e.GetY());
+						UpdateTouchPosition(ref positon);
+						var gs = new GestureSample(GestureType.FreeDrag, AndroidGameActivity.Game.TargetElapsedTime, 
+							positon, Vector2.Zero, Vector2.Zero, Vector2.Zero);
+						TouchPanel.GestureList.Enqueue(gs);
+					}
                     break;
                 // CANCEL, OUTSIDE                
                 case 3:
@@ -436,6 +450,8 @@ namespace Microsoft.Xna.Framework
                     }
                     break;
             }
+			
+			
 			if (gesture != null) gesture.OnTouchEvent(e);
 
             return true;
