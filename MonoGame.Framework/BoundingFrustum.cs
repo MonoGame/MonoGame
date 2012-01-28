@@ -139,11 +139,6 @@ namespace Microsoft.Xna.Framework
             return result;
         }
 
-        public void GetCorners(Vector3[] corners)
-        {
-            throw new NotImplementedException();
-        }
-
         public void Contains(ref BoundingBox box, out ContainmentType result)
         {
             // FIXME: Is this a bug?
@@ -360,7 +355,15 @@ namespace Microsoft.Xna.Framework
 
         public Vector3[] GetCorners()
         {
-            return corners;
+            return (Vector3[])this.corners.Clone();
+        }
+		
+		public void GetCorners(Vector3[] corners)
+        {
+			if (corners == null) throw new ArgumentNullException("corners");
+		    if (corners.Length < 8) throw new ArgumentOutOfRangeException("corners");
+
+            this.corners.CopyTo(corners, 0);
         }
 
         public override int GetHashCode()
@@ -370,13 +373,17 @@ namespace Microsoft.Xna.Framework
 
         public bool Intersects(BoundingBox box)
         {
-            throw new NotImplementedException();
+			var result = false;
+			this.Intersects(ref box, out result);
+			return result;
         }
 
         public void Intersects(ref BoundingBox box, out bool result)
         {
-            throw new NotImplementedException();
-        }
+			var containment = ContainmentType.Disjoint;
+			this.Contains(ref box, out containment);
+			result = containment != ContainmentType.Disjoint;
+		}
 
         public bool Intersects(BoundingFrustum frustum)
         {
