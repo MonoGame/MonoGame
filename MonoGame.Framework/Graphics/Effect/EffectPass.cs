@@ -28,6 +28,14 @@ namespace Microsoft.Xna.Framework.Graphics
 		DXEffectObject.d3dx_state[] states;
 		DXShader pixelShader;
 		DXShader vertexShader;
+		
+		bool setBlendState = false;
+		BlendState blendState = BlendState.Opaque;
+		bool setDepthStencilState = false;
+		DepthStencilState depthStencilState = DepthStencilState.Default;
+		bool setRasterizerState = false;
+		RasterizerState rasterizerState = RasterizerState.CullCounterClockwise;
+		
 
 		static string passthroughVertexShaderSrc = @"
 				uniform mat4 transformMatrix;
@@ -87,6 +95,60 @@ namespace Microsoft.Xna.Framework.Graphics
 					if (state.type == DXEffectObject.STATE_TYPE.CONSTANT) {
 						vertexShader = (DXShader)state.parameter.data;
 						GL.AttachShader (shaderProgram, vertexShader.shader);
+					}
+				} else if (state.operation.class_ == DXEffectObject.STATE_CLASS.RENDERSTATE) {
+					if (state.type != DXEffectObject.STATE_TYPE.CONSTANT) {
+						throw new NotImplementedException();
+					}
+					switch (state.operation.op) {
+					case (uint)DXEffectObject.D3DRENDERSTATETYPE.STENCILENABLE:
+						depthStencilState.StencilEnable = (bool)state.parameter.data;
+						setDepthStencilState = true;
+						break;
+					case (uint)DXEffectObject.D3DRENDERSTATETYPE.SCISSORTESTENABLE:
+						rasterizerState.ScissorTestEnable = (bool)state.parameter.data;
+						setRasterizerState = true;
+						break;
+					case (uint)DXEffectObject.D3DRENDERSTATETYPE.BLENDOP:
+						blendState.ColorBlendFunction = (BlendFunction)state.parameter.data;
+						setBlendState = true;
+						break;
+					case (uint)DXEffectObject.D3DRENDERSTATETYPE.SRCBLEND:
+						blendState.ColorSourceBlend = (Blend)state.parameter.data;
+						setBlendState = true;
+						break;
+					case (uint)DXEffectObject.D3DRENDERSTATETYPE.DESTBLEND:
+						blendState.ColorDestinationBlend = (Blend)state.parameter.data;
+						setBlendState = true;
+						break;
+					case (uint)DXEffectObject.D3DRENDERSTATETYPE.ALPHABLENDENABLE:
+						break; //not sure what to do
+					case (uint)DXEffectObject.D3DRENDERSTATETYPE.CULLMODE:
+						rasterizerState.CullMode = (CullMode)state.parameter.data;
+						setRasterizerState = true;
+						break;
+					case (uint)DXEffectObject.D3DRENDERSTATETYPE.COLORWRITEENABLE:
+						blendState.ColorWriteChannels = (ColorWriteChannels)state.parameter.data;
+						setBlendState = true;
+						break;
+					case (uint)DXEffectObject.D3DRENDERSTATETYPE.STENCILFUNC:
+						depthStencilState.StencilFunction = (CompareFunction)state.parameter.data;
+						setDepthStencilState = true;
+						break;
+					case (uint)DXEffectObject.D3DRENDERSTATETYPE.STENCILPASS:
+						depthStencilState.StencilPass = (StencilOperation)state.parameter.data;
+						setDepthStencilState = true;
+						break;
+					case (uint)DXEffectObject.D3DRENDERSTATETYPE.STENCILFAIL:
+						depthStencilState.StencilFail = (StencilOperation)state.parameter.data;
+						setDepthStencilState = true;
+						break;
+					case (uint)DXEffectObject.D3DRENDERSTATETYPE.STENCILREF:
+						depthStencilState.ReferenceStencil = (int)state.parameter.data;
+						setDepthStencilState = true;
+						break;
+					default:
+						throw new NotImplementedException();
 					}
 				} else {
 					throw new NotImplementedException();
@@ -210,6 +272,17 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 			
 			GL.UseProgram (shaderProgram);
+			
+			
+			if (setRasterizerState) {
+				_graphicsDevice.RasterizerState = rasterizerState;
+			}
+			if (setBlendState) {
+				_graphicsDevice.BlendState = blendState;
+			}
+			if (setDepthStencilState) {
+				_graphicsDevice.DepthStencilState = depthStencilState;
+			}
 
 			if (vertexShader != null) {
 				vertexShader.Apply(shaderProgram,

@@ -7,7 +7,7 @@ namespace Microsoft.Xna.Framework.Graphics
 	public class DXEffectObject
 	{
 
-		enum D3DRENDERSTATETYPE {
+		public enum D3DRENDERSTATETYPE {
 		    ZENABLE                   =   7,
 		    FILLMODE                  =   8,
 		    SHADEMODE                 =   9,
@@ -115,7 +115,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    FORCE_DWORD               = 0x7fffffff
 		}
 		
-		enum D3DTEXTURESTAGESTATETYPE {
+		public enum D3DTEXTURESTAGESTATETYPE {
 		    COLOROP               =  1,
 		    COLORARG1             =  2,
 		    COLORARG2             =  3,
@@ -138,7 +138,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    FORCE_DWORD           = 0x7fffffff
 		}
 		
-		enum D3DTRANSFORMSTATETYPE {
+		public enum D3DTRANSFORMSTATETYPE {
 		    VIEW            =  2,
 		    PROJECTION      =  3,
 		    TEXTURE0        = 16,
@@ -553,7 +553,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			uint tag = BitConverter.ToUInt32(effectCode, 0);
 			if (tag == 0xBCF00BCF) {
 				//handling this extra stuff should really be in the Effect class
-				baseOffset += 16;
+				baseOffset += BitConverter.ToUInt32(effectCode, 4);
 			} else if (tag != 0xFEFF0901) {
 				//effect too old or too new, or ascii which we can't compile atm
 				throw new NotImplementedException();
@@ -699,7 +699,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				
 				uint nameLength_ = effectReader.ReadUInt32 ();
 				string name = parse_name (effectStream.Position-4);
-				effectStream.Seek (nameLength_, SeekOrigin.Current);
+				effectStream.Seek ((nameLength_+3) & ~3, SeekOrigin.Current);
 				
 				foreach (d3dx_parameter findParam in parameter_handles) {
 					if (findParam.name == name) {
@@ -719,7 +719,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				uint length = effectReader.ReadUInt32 ();
 				uint nameLength = effectReader.ReadUInt32 ();
 				string paramName = parse_name (effectStream.Position-4);
-				effectStream.Seek (nameLength, SeekOrigin.Current);
+				effectStream.Seek ( (nameLength+3) & ~3, SeekOrigin.Current);
 				byte[] expressionData = effectReader.ReadBytes ((int)(length-4-nameLength));
 				
 				param.data = new DXExpression(paramName, expressionData);
@@ -991,6 +991,96 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			long valueOffset = effectReader.ReadInt32 ();
 			parse_init_value(valueOffset, ret.parameter);
+			
+			if (ret.operation.class_ == STATE_CLASS.RENDERSTATE) {
+				//parse the render parameter
+				switch (ret.operation.op) {
+				case (uint)D3DRENDERSTATETYPE.STENCILENABLE:
+				case (uint)D3DRENDERSTATETYPE.ALPHABLENDENABLE:
+				case (uint)D3DRENDERSTATETYPE.SCISSORTESTENABLE:
+					ret.parameter.data = BitConverter.ToInt32 ((byte[])ret.parameter.data, 0) != 0;
+					break;
+				case (uint)D3DRENDERSTATETYPE.COLORWRITEENABLE:
+					ret.parameter.data = (ColorWriteChannels)BitConverter.ToInt32 ((byte[])ret.parameter.data, 0);
+					break;
+				case (uint)D3DRENDERSTATETYPE.BLENDOP:
+					switch (BitConverter.ToInt32((byte[])ret.parameter.data, 0)) {
+					case 1: ret.parameter.data = BlendFunction.Add; break;
+					case 2: ret.parameter.data = BlendFunction.Subtract; break;
+					case 3: ret.parameter.data = BlendFunction.ReverseSubtract; break;
+					case 4: ret.parameter.data = BlendFunction.Min; break;
+					case 5: ret.parameter.data = BlendFunction.Max; break;
+					default:
+						throw new NotSupportedException();
+					}
+					break;
+				case (uint)D3DRENDERSTATETYPE.SRCBLEND:
+				case (uint)D3DRENDERSTATETYPE.DESTBLEND:
+					switch (BitConverter.ToInt32((byte[])ret.parameter.data, 0)) {
+					case 1: ret.parameter.data = Blend.Zero; break;
+					case 2: ret.parameter.data = Blend.One; break;
+					case 3: ret.parameter.data = Blend.SourceColor; break;
+					case 4: ret.parameter.data = Blend.InverseSourceColor; break;
+					case 5: ret.parameter.data = Blend.SourceAlpha; break;
+					case 6: ret.parameter.data = Blend.InverseSourceAlpha; break;
+					case 7: ret.parameter.data = Blend.DestinationAlpha; break;
+					case 8: ret.parameter.data = Blend.InverseDestinationAlpha; break;
+					case 9: ret.parameter.data = Blend.DestinationColor; break;
+					case 10: ret.parameter.data = Blend.InverseDestinationColor; break;
+					case 11: ret.parameter.data = Blend.SourceAlphaSaturation; break;
+					case 14: ret.parameter.data = Blend.BlendFactor; break;
+					case 15: ret.parameter.data = Blend.InverseDestinationAlpha; break;
+					default:
+						throw new NotSupportedException();
+					}
+					break;
+				case (uint)D3DRENDERSTATETYPE.CULLMODE:
+					switch (BitConverter.ToInt32 ((byte[])ret.parameter.data, 0)) {
+					case 1: ret.parameter.data = CullMode.None; break;
+					case 2: ret.parameter.data = CullMode.CullClockwiseFace; break;
+					case 3: ret.parameter.data = CullMode.CullCounterClockwiseFace; break;
+					default:
+						throw new NotSupportedException();
+					}
+					break;
+				case (uint)D3DRENDERSTATETYPE.STENCILFUNC:
+					switch (BitConverter.ToInt32 ((byte[])ret.parameter.data, 0)) {
+					case 1: ret.parameter.data = CompareFunction.Never; break;
+					case 2: ret.parameter.data = CompareFunction.Less; break;
+					case 3: ret.parameter.data = CompareFunction.Equal; break;
+					case 4: ret.parameter.data = CompareFunction.LessEqual; break;
+					case 5: ret.parameter.data = CompareFunction.Greater; break;
+					case 6: ret.parameter.data = CompareFunction.NotEqual; break;
+					case 7: ret.parameter.data = CompareFunction.GreaterEqual; break;
+					case 8: ret.parameter.data = CompareFunction.Always; break;
+					default:
+						throw new NotSupportedException();
+					}
+					break;
+				case (uint)D3DRENDERSTATETYPE.STENCILFAIL:
+				case (uint)D3DRENDERSTATETYPE.STENCILPASS:
+					switch (BitConverter.ToInt32 ((byte[])ret.parameter.data, 0)) {
+					case 1: ret.parameter.data = StencilOperation.Keep; break;
+					case 2: ret.parameter.data = StencilOperation.Zero; break;
+					case 3: ret.parameter.data = StencilOperation.Replace; break;
+					case 4: ret.parameter.data = StencilOperation.IncrementSaturation; break;
+					case 5: ret.parameter.data = StencilOperation.DecrementSaturation; break;
+					case 6: ret.parameter.data = StencilOperation.Invert; break;
+					case 7: ret.parameter.data = StencilOperation.Increment; break;
+					case 8: ret.parameter.data = StencilOperation.Decrement; break;
+					default:
+						throw new NotSupportedException();
+					}
+					break;
+				case (uint)D3DRENDERSTATETYPE.STENCILREF:
+					ret.parameter.data = BitConverter.ToInt32 ((byte[])ret.parameter.data, 0);
+					break;
+				default:
+					throw new NotImplementedException();
+				}
+			}
+			
+			
 			
 			return ret;
 		}
