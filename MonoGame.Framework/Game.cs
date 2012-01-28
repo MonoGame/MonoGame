@@ -94,7 +94,7 @@ namespace Microsoft.Xna.Framework
                 d => d.Visible,
                 (d, handler) => d.VisibleChanged += handler,
                 (d, handler) => d.VisibleChanged -= handler,
-                (d1, d2) => d1.DrawOrder - d2.DrawOrder,
+                (d1 ,d2) => Comparer<int>.Default.Compare(d1.DrawOrder, d2.DrawOrder),
                 (d, handler) => d.DrawOrderChanged += handler,
                 (d, handler) => d.DrawOrderChanged -= handler);
 
@@ -103,7 +103,7 @@ namespace Microsoft.Xna.Framework
                 u => u.Enabled,
                 (u, handler) => u.EnabledChanged += handler,
                 (u, handler) => u.EnabledChanged -= handler,
-                (u1, u2) => u1.UpdateOrder - u2.UpdateOrder,
+                (u1, u2) => Comparer<int>.Default.Compare(u1.UpdateOrder, u2.UpdateOrder),
                 (u, handler) => u.UpdateOrderChanged += handler,
                 (u, handler) => u.UpdateOrderChanged -= handler);
 
@@ -548,14 +548,14 @@ namespace Microsoft.Xna.Framework
         //       Components.ComponentAdded.
         private void InitializeExistingComponents()
         {
-            for (int i = Components.Count - 1; i >= 0; --i)
+            for (int i = 0; i < Components.Count; ++i)
                 Components[i].Initialize();
         }
 
         private void CategorizeComponents()
         {
             DecategorizeComponents();
-            for (int i = Components.Count - 1; i >= 0; --i)
+            for (int i = 0; i < Components.Count; ++i)
                 CategorizeComponent(Components[i]);
         }
 
@@ -741,7 +741,7 @@ namespace Microsoft.Xna.Framework
             }
 
             private static readonly Comparison<int> RemoveJournalSortComparison =
-                (x, y) => y - x; // Sort high to low
+                (x, y) => Comparer<int>.Default.Compare(y, x); // Sort high to low
             private void ProcessRemoveJournal()
             {
                 if (_removeJournal.Count == 0)
