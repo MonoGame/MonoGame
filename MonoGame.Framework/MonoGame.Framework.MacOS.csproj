@@ -367,6 +367,7 @@
     <Compile Include="Content\ContentReaders\BoundingBoxReader.cs" />
     <Compile Include="Content\ContentReaders\MatrixReader.cs" />
     <Compile Include="Content\ContentReaders\VertexBufferReader.cs" />
+    <Compile Include="Content\ContentReaders\AlphaTestEffectReader.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />
