@@ -102,6 +102,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Content\ContentReaders\AlphaTestEffectReader.cs" />
     <Compile Include="Content\ContentReaders\BasicEffectReader.cs" />
     <Compile Include="Content\ContentReaders\BoundingBoxReader.cs" />
     <Compile Include="Content\ContentReaders\IndexBufferReader.cs" />
