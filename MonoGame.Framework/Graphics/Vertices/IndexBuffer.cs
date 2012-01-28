@@ -108,14 +108,4 @@ namespace Microsoft.Xna.Framework.Graphics
             base.Dispose();
         }		
     }
-	
-	
-    public class DynamicIndexBuffer : IndexBuffer
-    {
-        public DynamicIndexBuffer(GraphicsDevice graphics, Type type, int count, BufferUsage bufferUsage) 
-            : base(graphics, type, count, bufferUsage)
-        {
-        }
-    }
-
 }

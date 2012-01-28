@@ -350,6 +350,8 @@
     <Compile Include="Graphics\Vertices\IndexElementSize.cs" />
     <Compile Include="Graphics\Vertices\IndexBuffer.cs" />
     <Compile Include="Graphics\Vertices\VertexBuffer.cs" />
+    <Compile Include="Graphics\Vertices\DynamicIndexBuffer.cs" />
+    <Compile Include="Graphics\Vertices\DynamicVertexBuffer.cs" />
     <Compile Include="Audio\XactSound.cs" />
     <Compile Include="Audio\XactClip.cs" />
     <Compile Include="Game.cs" />
