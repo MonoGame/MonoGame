@@ -141,17 +141,20 @@ namespace Microsoft.Xna.Framework.Graphics
 //				imageSize.Width /= 2;
 //				imageSize.Height /= 2;
 //			}
-			
-			float size = Math.Max(width,height);
-			if(size > 1024) 
-			{
-				float ratio = 1024 / size;
-				width = (int)(width * ratio);
-				height = (int)(height * ratio);
-				transform = CGAffineTransform.MakeScale(ratio, ratio);
-				imageSize.Width = (int)(imageSize.Width * ratio);
-				imageSize.Height = (int)(imageSize.Height * ratio);;
-			}
+
+			// I am going to take the following out right now to see how it reacts.  It seems to be causing
+			// a few problems for people.  We may need to come up with another way to solve these issues as
+			// one size is not fitting all.
+//			float size = Math.Max(width,height);
+//			if(size > 1024) 
+//			{
+//				float ratio = 1024 / size;
+//				width = (int)(width * ratio);
+//				height = (int)(height * ratio);
+//				transform = CGAffineTransform.MakeScale(ratio, ratio);
+//				imageSize.Width = (int)(imageSize.Width * ratio);
+//				imageSize.Height = (int)(imageSize.Height * ratio);;
+//			}
 			
 			switch (pixelFormat) {		
 			case SurfaceFormat.Color:
