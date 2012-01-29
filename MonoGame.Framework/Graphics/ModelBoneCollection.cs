@@ -6,6 +6,8 @@ using System.Reflection;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
+	// Summary:
+	//     Represents a set of bones associated with a model.
 	public class ModelBoneCollection : ReadOnlyCollection<ModelBone>
 	{
 		public ModelBoneCollection(IList<ModelBone> list)
@@ -14,40 +16,48 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		}
 
-	}
+	    // Summary:
+	    //     Retrieves a ModelBone from the collection, given the name of the bone.
+	    //
+	    // Parameters:
+	    //   boneName:
+	    //     The name of the bone to retrieve.
+	    public ModelBone this[string boneName]
+		{
+			get {
+				ModelBone ret;
+				if (TryGetValue(boneName, out ret)) {
+					return ret;
+				}
+				throw new KeyNotFoundException();
+			}
+		}
 
-
-	//// Summary:
-	////     Represents a set of bones associated with a model.
-	//public sealed class ModelBoneCollection : ReadOnlyCollection<ModelBone>
-	//{
-	//    internal ModelBoneCollection()
-	//        : base(new List<ModelBone>())
-	//    {
-	//    }
-
-	//    // Summary:
-	//    //     Retrieves a ModelBone from the collection, given the name of the bone.
-	//    //
-	//    // Parameters:
-	//    //   boneName:
-	//    //     The name of the bone to retrieve.
-	//    public ModelBone this[string boneName] { get { throw new NotImplementedException(); } }
-
-	//    // Summary:
+	 //   // Summary:
 	//    //     Returns a ModelBoneCollection.Enumerator that can iterate through a ModelBoneCollection.
 	//    public ModelBoneCollection.Enumerator GetEnumerator() { throw new NotImplementedException(); }
-	//    //
-	//    // Summary:
-	//    //     Finds a bone with a given name if it exists in the collection.
-	//    //
-	//    // Parameters:
-	//    //   boneName:
-	//    //     The name of the bone to find.
-	//    //
-	//    //   value:
-	//    //     [OutAttribute] The bone named boneName, if found.
-	//    public bool TryGetValue(string boneName, out ModelBone value) { throw new NotImplementedException(); }
+	    //
+	    // Summary:
+	    //     Finds a bone with a given name if it exists in the collection.
+	    //
+	    // Parameters:
+	    //   boneName:
+	    //     The name of the bone to find.
+	    //
+	    //   value:
+	    //     [OutAttribute] The bone named boneName, if found.
+	    public bool TryGetValue(string boneName, out ModelBone value)
+		{
+			foreach (ModelBone bone in base.Items)
+			{
+				if (bone.Name == boneName) {
+					value = bone;
+					return true;
+				}
+			}
+			value = null;
+			return false;
+		}
 
 	//    // Summary:
 	//    //     Provides the ability to iterate through the bones in an ModelBoneCollection.
@@ -80,5 +90,5 @@ namespace Microsoft.Xna.Framework.Graphics
 
 	//        #endregion
 	//    }
-	//}
+	}
 }

@@ -43,6 +43,10 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 
+//For laoding from resources
+using System.Reflection;
+
+
 namespace Microsoft.Xna.Framework.Graphics
 {
 	public class Effect : GraphicsResource
@@ -119,6 +123,17 @@ namespace Microsoft.Xna.Framework.Graphics
 		protected internal virtual void OnApply ()
 		{
 
+		}
+
+		internal static byte[] LoadEffectResource(string name)
+		{
+			Assembly assembly = Assembly.GetExecutingAssembly();
+			var stream = assembly.GetManifestResourceStream("Microsoft.Xna.Framework.Graphics.Effect."+name+".bin");
+			using (MemoryStream ms = new MemoryStream())
+			{
+				stream.CopyTo(ms);
+				return ms.ToArray();
+			}
 		}
 
 	}

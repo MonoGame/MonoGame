@@ -1,121 +1,120 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Runtime.InteropServices;
 
 #if MONOMAC
 using MonoMac.OpenGL;
 #else
-using GL11 = OpenTK.Graphics.ES11.GL;
-using GL20 = OpenTK.Graphics.ES20.GL;
-using All11 = OpenTK.Graphics.ES11.All;
-using All20 = OpenTK.Graphics.ES20.All;
+using OpenTK.Graphics.ES20;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
+
+
     public class IndexBuffer : GraphicsResource
     {
-        internal Type _type;
-        internal int _count;
-		private object _buffer;
-		internal IntPtr _bufferPtr;
-		internal IntPtr _sizePtr;
-        private readonly BufferUsage _bufferUsage;
-		internal int _bufferIndex;
-		internal int _size;
-		internal uint _bufferStore;
-
-        // TODO: Remove this IB limit!
-        internal static IndexBuffer[] _allBuffers = new IndexBuffer[50];
-        internal static int _bufferCount;
-
-		internal static List<Action> _delayedBufferDelegates = new List<Action>(); 
+		public BufferUsage BufferUsage { get; private set; }
+		public int IndexCount { get; private set; }
+		public IndexElementSize IndexElementSize { get; private set; }
 		
-		internal static void CreateFrameBuffers()
-		{
-			foreach (var action in _delayedBufferDelegates)
-				action.Invoke();
-			
-			_delayedBufferDelegates.Clear();
-		}		
-
-		public IndexElementSize IndexElementSize { get; internal set; }
+		internal uint ibo;	
 		
-		public int IndexCount { get; internal set; }
-
-        public IndexBuffer (GraphicsDevice graphics, Type type, int count, BufferUsage bufferUsage)
+		protected IndexBuffer(GraphicsDevice graphicsDevice, IndexElementSize indexElementSize, int indexCount, BufferUsage bufferUsage, bool dynamic)
         {
-			if (type != typeof(int) && type != typeof(short) && type != typeof(byte) && type != typeof(ushort))
-				throw new NotSupportedException ("The only types that are supported are: int, short, byte, ushort");
+			if (graphicsDevice == null)
+            {
+                throw new ArgumentNullException("Graphics Device Cannot Be Null");
+            }
+			this.graphicsDevice = graphicsDevice;
+			this.IndexElementSize = indexElementSize;	
+            this.IndexCount = indexCount;
+            this.BufferUsage = bufferUsage;
+			
+			var sizeInBytes = indexCount * (this.IndexElementSize == IndexElementSize.SixteenBits ? 2 : 4);
 
-            graphicsDevice = graphics;
-            _type = type;
-			if (type == typeof(short))
-				IndexElementSize = IndexElementSize.SixteenBits;
-			else
-				IndexElementSize = IndexElementSize.ThirtyTwoBits;
-			IndexCount = count;
-            _bufferUsage = bufferUsage;
+            GL.GenBuffers(1, out ibo);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, ibo);
+            GL.BufferData(BufferTarget.ElementArrayBuffer,
+			              (IntPtr)sizeInBytes, IntPtr.Zero, dynamic ? BufferUsageHint.StreamDraw : BufferUsageHint.StaticDraw);
+		}
+		
+		public IndexBuffer(GraphicsDevice graphicsDevice, IndexElementSize indexElementSize, int indexCount, BufferUsage bufferUsage) :
+			this(graphicsDevice, indexElementSize, indexCount, bufferUsage, false)
+		{
+		}
+		
+		internal void Apply()
+		{
+			GL.BindBuffer(BufferTarget.ElementArrayBuffer, ibo);
+		}
+		
+		public void GetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount) where T : struct
+        {
+			throw new NotSupportedException();
         }
-
-		public IndexBuffer (GraphicsDevice graphics, IndexElementSize size, int count, BufferUsage bufferUsage)
+		
+		public unsafe void GetData<T>(T[] data, int startIndex, int elementCount)
 		{
-            graphicsDevice = graphics;
-			_type = (size == IndexElementSize.SixteenBits) ? typeof(short) : typeof(int);
-			IndexCount = count;
-			IndexElementSize = size;
-			_bufferUsage = bufferUsage;
-		}
-
-		internal void GenerateBuffer<T>() where T : struct
-		{
-			#if MONOMAC		
-			
-			BufferUsageHint bufferUsage = (_bufferUsage == BufferUsage.WriteOnly) ? BufferUsageHint.StaticDraw : BufferUsageHint.DynamicDraw;
-			GL.GenBuffers (1, out _bufferStore);
-			GL.BindBuffer (BufferTarget.ElementArrayBuffer, _bufferStore);
-			GL.BufferData<T> (BufferTarget.ElementArrayBuffer, (IntPtr)_size, (T[])_buffer, bufferUsage);			
-			
-			#else
-						
-            var bufferUsage = (_bufferUsage == BufferUsage.WriteOnly) ? All11.StaticDraw : All11.DynamicDraw;
-            GL11.GenBuffers(1, ref _bufferStore);
-            GL11.BindBuffer(All11.ElementArrayBuffer, _bufferStore);
-            GL11.BufferData<T>(All11.ElementArrayBuffer, (IntPtr)_size, (T[])_buffer, bufferUsage);			
-
-			#endif
+			throw new NotSupportedException();
 		}
 		
-		public void SetData<T>(T[] indicesData) where T : struct
+		public unsafe void GetData<T>(T[] data)
+		{
+			throw new NotSupportedException();
+		}
+		
+		public unsafe void SetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount) where T : struct
         {
-			_bufferIndex = _bufferCount + 1;
-            _buffer = indicesData;
-			_size = indicesData.Length * Marshal.SizeOf(_type);
-            _bufferPtr = GCHandle.Alloc(_buffer, GCHandleType.Pinned).AddrOfPinnedObject();
-			_delayedBufferDelegates.Add(GenerateBuffer<T>);
+			if (data == null) throw new ArgumentNullException("data");
+			
+			var elementSizeInByte = sizeof(T);
+			var sizeInBytes = elementSizeInByte * elementCount;
+			var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+			var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startIndex * elementSizeInByte);
+		
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, ibo);
+            GL.BufferSubData(BufferTarget.ElementArrayBuffer, (IntPtr)offsetInBytes, (IntPtr)sizeInBytes, dataPtr);
+			
+			dataHandle.Free();
+		}
+		
+		public unsafe void SetData<T>(T[] data, int startIndex, int elementCount) where T : struct
+        {
+			if (data == null) throw new ArgumentNullException("data");
+			
+			var elementSizeInByte = sizeof(T);
+			var sizeInBytes = elementSizeInByte * elementCount;
+			var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+			var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startIndex * elementSizeInByte);
+		
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, ibo);
+            GL.BufferSubData(BufferTarget.ElementArrayBuffer, IntPtr.Zero, (IntPtr)sizeInBytes, dataPtr);
+			
+			dataHandle.Free();
+		}
+		
+        public unsafe void SetData<T>(T[] data) where T : struct
+        {
+			if (data == null) throw new ArgumentNullException("data");
+			
+			var elementSizeInByte = sizeof(T);
+			var sizeInBytes = elementSizeInByte * data.Length;
+			var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+			var dataPtr = dataHandle.AddrOfPinnedObject();
 
-			_allBuffers[_bufferIndex] = this;			
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, ibo);
+            GL.BufferSubData(BufferTarget.ElementArrayBuffer, IntPtr.Zero, (IntPtr)sizeInBytes, dataPtr);
+			
+			dataHandle.Free();
         }
 		
 		public override void Dispose ()
 		{
-			#if MONOMAC		
-			GL.GenBuffers (0, out _bufferStore);
-			#else					
-			GL11.GenBuffers(0, ref _bufferStore);
-			#endif
-						
-            base.Dispose();
-        }		
-    }
-	
-	
-    public class DynamicIndexBuffer : IndexBuffer
-    {
-        public DynamicIndexBuffer(GraphicsDevice graphics, Type type, int count, BufferUsage bufferUsage) 
-            : base(graphics, type, count, bufferUsage)
-        {
-        }
-    }
-
+			GL.DeleteBuffers(1, ref ibo);
+			base.Dispose();
+		}
+	}
 }

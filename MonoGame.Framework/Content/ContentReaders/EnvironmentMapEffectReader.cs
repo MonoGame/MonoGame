@@ -37,29 +37,24 @@ permitted under your local laws, the contributors exclude the implied warranties
 purpose and non-infringement.
 */
 #endregion License
-
+using System;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Microsoft.Xna.Framework.Content
 {
-    class BasicEffectReader : ContentTypeReader<BasicEffect>
+    class EnvironmentMapEffectReader : ContentTypeReader<EnvironmentMapEffect>
     {
-        protected internal override BasicEffect Read(ContentReader input, BasicEffect existingInstance)
+        protected internal override EnvironmentMapEffect Read(ContentReader input, EnvironmentMapEffect existingInstance)
         {
-            var effect = new BasicEffect(input.GraphicsDevice);
-            var texture = input.ReadExternalReference<Texture>() as Texture2D;
-            if (texture != null)
-            {
-                effect.Texture = texture;
-                effect.TextureEnabled = true;
-            }
-
-            effect.DiffuseColor = input.ReadVector3();
-            effect.EmissiveColor = input.ReadVector3();
-            effect.SpecularColor = input.ReadVector3();
-            effect.SpecularPower = input.ReadSingle();
-            effect.Alpha = input.ReadSingle();
-            effect.VertexColorEnabled = input.ReadBoolean();
+            var effect = new EnvironmentMapEffect(input.GraphicsDevice);
+            effect.Texture = input.ReadExternalReference<Texture>() as Texture2D;
+			effect.EnvironmentMap = input.ReadExternalReference<TextureCube>() as TextureCube;
+			effect.EnvironmentMapAmount = input.ReadSingle ();
+			effect.EnvironmentMapSpecular = input.ReadVector3 ();
+			effect.FresnelFactor = input.ReadSingle ();
+			effect.DiffuseColor = input.ReadVector3 ();
+			effect.EmissiveColor = input.ReadVector3 ();
+			effect.Alpha = input.ReadSingle ();
             return effect;
         }
     }

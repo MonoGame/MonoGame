@@ -27,7 +27,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			Effects = new ModelEffectCollection();
 		}
 		
-		internal void BuildEffectList()
+		/*internal void BuildEffectList()
 		{
 			List<Effect> effects = new List<Effect>();
 			foreach (ModelMeshPart item in parts) 
@@ -39,7 +39,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				}
 			}
 			Effects = new ModelEffectCollection(effects);
-		}
+		}*/
 		
 		// Summary:
 		//     Gets the BoundingSphere that contains this mesh.

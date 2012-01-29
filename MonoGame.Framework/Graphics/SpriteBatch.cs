@@ -44,7 +44,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 #if !ES11
 			//use a custon SpriteEffect so we can control the transformation matrix
-			spriteEffect = new Effect (this.graphicsDevice, SpriteEffectCode.Code);	
+			spriteEffect = new Effect (this.graphicsDevice, Effect.LoadEffectResource("SpriteEffect"));	
 #endif
 
 			_batcher = new SpriteBatcher ();

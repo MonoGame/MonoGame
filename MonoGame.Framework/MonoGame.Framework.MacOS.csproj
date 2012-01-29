@@ -46,15 +46,14 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Drawing" />
-    <Reference Include="MonoMac, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\mono\monomac\src\MonoMac.dll</HintPath>
-    </Reference>
     <Reference Include="Tao.Sdl">
       <HintPath>..\ThirdParty\GamepadConfig\Tao.Sdl.dll</HintPath>
     </Reference>
     <Reference Include="GamepadBridge">
       <HintPath>..\ThirdParty\GamepadConfig\GamepadBridge.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoMac, Version=0.0.0.0, Culture=neutral">
+      <Private>False</Private>
     </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
@@ -339,10 +338,8 @@
     <Compile Include="Graphics\Effect\DXShader.cs" />
     <Compile Include="Graphics\Effect\DXEffectObject.cs" />
     <Compile Include="Graphics\Effect\MojoShader.cs" />
-    <Compile Include="Graphics\Effect\SpriteEffectCode.cs" />
     <Compile Include="Graphics\Effect\DXExpression.cs" />
     <Compile Include="Graphics\Effect\BasicEffect.cs" />
-    <Compile Include="Graphics\Effect\BasicEffectCode.cs" />
     <Compile Include="Graphics\Effect\DXPreshader.cs" />
     <Compile Include="Graphics\Effect\DXHelper.cs" />
     <Compile Include="GamerServices\GuideAlreadyVisibleException.cs" />
@@ -351,7 +348,6 @@
     <Compile Include="Graphics\Effect\Effect.cs" />
     <Compile Include="Graphics\Effect\EffectParameter.cs" />
     <Compile Include="Graphics\Effect\AlphaTestEffect.cs" />
-    <Compile Include="Graphics\Effect\AlphaTestEffectCode.cs" />
     <Compile Include="Graphics\Effect\GLSLOptimizer.cs" />
     <Compile Include="Graphics\ESTexture2D.cs" />
     <Compile Include="Graphics\GraphicsAdapter.cs" />
@@ -388,6 +384,16 @@
     <Compile Include="Graphics\ModelMeshPartCollection.cs" />
     <Compile Include="Content\ContentReaders\ModelReader.cs" />
     <Compile Include="Content\ContentReaders\VertexDeclarationReader.cs" />
+    <Compile Include="Graphics\Effect\DualTextureEffect.cs" />
+    <Compile Include="Graphics\Effect\SkinnedEffect.cs" />
+    <Compile Include="Graphics\Effect\EnvironmentMapEffect.cs" />
+    <Compile Include="Content\ContentReaders\EnvironmentMapEffectReader.cs" />
+    <Compile Include="Graphics\TextureCube.cs" />
+    <Compile Include="Content\ContentReaders\TextureCubeReader.cs" />
+    <Compile Include="Graphics\CubeMapFace.cs" />
+    <Compile Include="Content\ContentReaders\TextureReader.cs" />
+    <Compile Include="Content\ContentReaders\SkinnedEffectReader.cs" />
+    <Compile Include="Content\ContentReaders\DualTextureEffectReader.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />
@@ -421,5 +427,13 @@
       <Project>{AE483C29-042E-4226-BA52-D247CE7676DA}</Project>
       <Name>Lidgren.Network.MacOS</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Graphics\Effect\AlphaTestEffect.bin" />
+    <EmbeddedResource Include="Graphics\Effect\BasicEffect.bin" />
+    <EmbeddedResource Include="Graphics\Effect\DualTextureEffect.bin" />
+    <EmbeddedResource Include="Graphics\Effect\EnvironmentMapEffect.bin" />
+    <EmbeddedResource Include="Graphics\Effect\SkinnedEffect.bin" />
+    <EmbeddedResource Include="Graphics\Effect\SpriteEffect.bin" />
   </ItemGroup>
 </Project>

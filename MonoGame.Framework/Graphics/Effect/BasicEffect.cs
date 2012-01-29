@@ -363,7 +363,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// Creates a new BasicEffect with default parameter settings.
         /// </summary>
         public BasicEffect(GraphicsDevice device)
-            : base(device, BasicEffectCode.Code)
+            : base(device, Effect.LoadEffectResource("BasicEffect"))
         {
             CacheEffectParameters(null);
 

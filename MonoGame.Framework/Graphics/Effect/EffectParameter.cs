@@ -218,7 +218,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			throw new NotImplementedException();
 		}
 
-		public Matrix[] GetValueMatrixArray ()
+		public Matrix[] GetValueMatrixArray (int count)
 		{
 			throw new NotImplementedException();
 		}
@@ -274,7 +274,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public Texture2D GetValueTexture2D ()
 		{
-			throw new NotImplementedException();
+			return (Texture2D)data;
 		}
 
 		//		public Texture3D GetValueTexture3D ()
@@ -282,10 +282,10 @@ namespace Microsoft.Xna.Framework.Graphics
 		//			return new Texture3D ();
 		//		}
 
-		//		public TextureCube GetValueTextureCube ()
-		//		{
-		//			return null; //new TextureCube ();
-		//		}
+		public TextureCube GetValueTextureCube ()
+		{
+			throw new NotImplementedException();
+		}
 
 		public Vector2 GetValueVector2 ()
 		{
@@ -349,7 +349,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void SetValue (Matrix[] value)
 		{
-			throw new NotImplementedException();
+			for (int i=0; i<value.Length; i++) {
+				Elements[i].SetValue (value[i]);
+			}
 		}
 
 		public void SetValue (Quaternion value)

@@ -60,6 +60,38 @@ namespace Microsoft.Xna.Framework.Input
 			_rightButton = ButtonState.Released;
 			_middleButton = ButtonState.Released;
 		}
+		
+		public MouseState (
+			int x,
+			int y,
+			int scrollWheel,
+			ButtonState leftButton,
+			ButtonState middleButton,
+			ButtonState rightButton,
+			ButtonState xButton1,
+			ButtonState xButton2)
+		{
+			_x = x;
+			_y = y;
+			_scrollWheelValue = scrollWheel;
+			_leftButton = leftButton;
+			_middleButton = middleButton;
+			_rightButton = rightButton;
+		}
+		
+		public static bool operator ==(MouseState left, MouseState right)
+		{
+			return left._x == right._x &&
+				   left._y == right._y &&
+				   left._leftButton == right._leftButton &&
+				   left._middleButton == right._middleButton &&
+				   left._rightButton == right._rightButton;
+		}
+		
+		public static bool operator !=(MouseState left, MouseState right)
+		{
+			return !(left == right);
+		}
 
 		public int X {
 			get {

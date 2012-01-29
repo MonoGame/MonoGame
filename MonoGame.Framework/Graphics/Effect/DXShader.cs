@@ -198,11 +198,19 @@ namespace Microsoft.Xna.Framework.Graphics
 						GL.BindAttribLocation(program, GraphicsDevice.attributePosition, attrb.name);
 						break;
 					case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_TEXCOORD:
-						GL.BindAttribLocation(program, GraphicsDevice.attributeTexCoord, attrb.name);
+						GL.BindAttribLocation(program, GraphicsDevice.attributeTexCoord + attrb.index, attrb.name);
 						break;
 					case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_NORMAL:
 						GL.BindAttribLocation(program, GraphicsDevice.attributeNormal, attrb.name);
 						break;
+					case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_BLENDINDICES:
+						GL.BindAttribLocation(program, GraphicsDevice.attributeBlendIndicies, attrb.name);
+						break;
+					case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_BLENDWEIGHT:
+						GL.BindAttribLocation(program, GraphicsDevice.attributeBlendWeight, attrb.name);
+						break;
+					default:
+						throw new NotImplementedException();
 					}
 				}
 			}
@@ -250,10 +258,11 @@ namespace Microsoft.Xna.Framework.Graphics
 						break;
 					case EffectParameterClass.Vector:
 					case EffectParameterClass.Matrix:
+						long rows = Math.Min (symbol.register_count, parameter.RowCount);
 						if (parameter.Elements.Count > 0) {
-							throw new NotImplementedException();
+							rows = Math.Min (symbol.register_count, parameter.Elements.Count*parameter.RowCount);
 						}
-						for (int y=0; y<Math.Min (symbol.register_count, parameter.RowCount); y++) {
+						for (int y=0; y<rows; y++) {
 							for (int x=0; x<parameter.ColumnCount; x++) {
 								uniforms_float4[(float4_index+y)*4+x] = (float)data[y*parameter.ColumnCount+x];
 							}

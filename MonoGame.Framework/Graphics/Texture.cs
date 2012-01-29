@@ -39,6 +39,18 @@
 // #endregion License
 // 
 using System;
+
+#if MONOMAC
+using MonoMac.OpenGL;
+#else
+ #if ES11
+using OpenTK.Graphics.ES11;
+ #else
+using OpenTK.Graphics.ES20;
+ #endif
+#endif
+
+
 namespace Microsoft.Xna.Framework.Graphics
 {
 	public abstract class Texture : GraphicsResource
@@ -56,6 +68,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			get { return _levelCount; }
 		}
+		
 	}
 }
 

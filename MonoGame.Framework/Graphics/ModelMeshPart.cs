@@ -17,7 +17,7 @@ namespace Microsoft.Xna.Framework.Graphics
 					return;
 				}
 				_effect = value;
-				//parent.Effects.Add (value);
+				parent.Effects.Add (value);
 			}
 		}
 		//

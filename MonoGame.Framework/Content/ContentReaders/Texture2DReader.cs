@@ -160,6 +160,7 @@ namespace Microsoft.Xna.Framework.Content
 				ESTexture2D temp = new ESTexture2D(
 					ptr, imageLength, surfaceFormat, width, height, new Size (width, height), All.Linear);
 				texture = new Texture2D (new ESImage (temp));					
+				texture.graphicsDevice = reader.GraphicsDevice;
 			} 
 			finally 
 			{		

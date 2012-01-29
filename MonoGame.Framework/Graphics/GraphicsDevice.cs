@@ -111,10 +111,11 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		// OpenGL ES2.0 attribute locations
 		internal static int attributePosition = 0;
-		internal static int attributeTexCoord = 1;
-		internal static int attributeTint = 2;
-		internal static int attributeColor = 3;
-		internal static int attributeNormal = 4;
+		internal static int attributeColor = 1;
+		internal static int attributeNormal = 2;
+		internal static int attributeBlendIndicies = 3;
+		internal static int attributeBlendWeight = 4;
+		internal static int attributeTexCoord = 5; //must be the last one, texture index locations are added to it
 
 		//OpenGL ES 1.1 extension consts
 #if IPHONE && ES11
@@ -511,13 +512,15 @@ namespace Microsoft.Xna.Framework.Graphics
 				for (var i = 0; i < previousRenderTargetBindings.Length; ++i)
 				{
 					var renderTarget = previousRenderTargetBindings[i].RenderTarget;
-					/*if (renderTarget.LevelCount > 1)
+					if (renderTarget.LevelCount > 1)
 					{
+						throw new NotImplementedException();
+						/*
 						GL.ActiveTexture(TextureUnit.Texture0);
 						GL.BindTexture(TextureTarget.Texture2D, renderTarget.ID);
 						GL.GenerateMipmap(TextureTarget.Texture2D);
-						GL.BindTexture(TextureTarget.Texture2D, 0);
-					}*/
+						GL.BindTexture(TextureTarget.Texture2D, 0);*/
+					}
 				}
 			}
 		}
@@ -573,13 +576,13 @@ namespace Microsoft.Xna.Framework.Graphics
         public void SetVertexBuffer(VertexBuffer vertexBuffer)
         {
             _vertexBuffer = vertexBuffer;
-			//GL.BindBuffer (BufferTarget.ArrayBuffer, vertexBuffer._bufferStore);
+			_vertexBuffer.Apply();
         }
 
         private void SetIndexBuffer(IndexBuffer indexBuffer)
         {
             _indexBuffer = indexBuffer;
-			//GL.BindBuffer (BufferTarget.ElementArrayBuffer, indexBuffer._bufferStore);
+			_indexBuffer.Apply ();
         }
 
         public IndexBuffer Indices { set { SetIndexBuffer(value); } }
@@ -588,68 +591,25 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void DrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int minVertexIndex, int numbVertices, int startIndex, int primitiveCount)
         {
-			if (minVertexIndex > 0 || baseVertex > 0)
-				throw new NotImplementedException ("baseVertex > 0 and minVertexIndex > 0 are not supported");
-
-            // Unbind the VBOs
-            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
-
-            //Create VBO if not created already
-#if IPHONE
-			if (VboIdArray == 0)
-                GL.GenBuffers(1, ref VboIdArray);
-            if (VboIdElement == 0)
-                GL.GenBuffers(1, ref VboIdElement);
-#else
-            if (VboIdArray == 0)
-                GL.GenBuffers(1, out VboIdArray);
-            if (VboIdElement == 0)
-                GL.GenBuffers(1, out VboIdElement);
-#endif
-			
-            // Bind the VBO
-            GL.BindBuffer(BufferTarget.ArrayBuffer, VboIdArray);
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, VboIdElement);
-            ////Clear previous data
-            GL.BufferData(BufferTarget.ArrayBuffer,
-			              (IntPtr)0, (IntPtr)null,
-			              BufferUsageHint.DynamicDraw);
-            GL.BufferData(BufferTarget.ElementArrayBuffer,
-			              (IntPtr)0, (IntPtr)null,
-			              BufferUsageHint.DynamicDraw);
-
-			//Get VertexDeclaration
-			var vd = _vertexBuffer.VertexDeclaration;
-			if (vd == null) {
-
-				vd = VertexDeclaration.FromType(_vertexBuffer._type);
-			}
-
-            //Buffer data to VBO; This should use stream when we move to ES2.0
-            GL.BufferData(BufferTarget.ArrayBuffer,
-				(IntPtr)(vd.VertexStride * GetElementCountArray(primitiveType, primitiveCount)),
-				_vertexBuffer._bufferPtr,
-				BufferUsageHint.DynamicDraw);
-
-            GL.BufferData(BufferTarget.ElementArrayBuffer,
-				(IntPtr)(sizeof(ushort) * GetElementCountArray(primitiveType, primitiveCount)),
-				_indexBuffer._bufferPtr,
-				BufferUsageHint.DynamicDraw);
-
-            //Setup VertexDeclaration
-            VertexDeclaration.PrepareForUse(vd);
-
-            //Draw
-            GL.DrawElements(PrimitiveTypeGL(primitiveType),
-				GetElementCountArray(primitiveType, primitiveCount),
-				DrawElementsType.UnsignedShort,
-				(IntPtr)(startIndex * sizeof(ushort)));
+			if (minVertexIndex > 0)
+				throw new NotImplementedException ("minVertexIndex > 0 is supported");
 
 
-            // Free resources
-            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
+			var indexElementType = DrawElementsType.UnsignedShort;
+			var indexElementSize = 2;
+			var indexOffsetInBytes = (IntPtr)(startIndex * indexElementSize);
+			var indexElementCount = GetElementCountArray(primitiveType, primitiveCount);
+			var target = PrimitiveTypeGL(primitiveType);
+			var vertexOffset = (IntPtr)(_vertexBuffer.VertexDeclaration.VertexStride * baseVertex);
+
+
+			_vertexBuffer.VertexDeclaration.Apply (vertexOffset);
+
+			GL.DrawElements (target,
+			                 indexElementCount,
+			                 indexElementType,
+			                 indexOffsetInBytes);
+
         }
 
         public void DrawUserPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int primitiveCount) where T : struct, IVertexType
@@ -686,13 +646,12 @@ namespace Microsoft.Xna.Framework.Graphics
 			              BufferUsageHint.DynamicDraw);
 
             //Setup VertexDeclaration
-            VertexDeclaration.PrepareForUse(vd);
+            vd.Apply ();
 
             //Draw
             GL.DrawArrays(PrimitiveTypeGL(primitiveType),
 			              vertexOffset,
-			              GetElementCountArray(primitiveType,
-			              primitiveCount));
+			              GetElementCountArray(primitiveType, primitiveCount));
 
             // Free resources
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
@@ -703,49 +662,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void DrawPrimitives(PrimitiveType primitiveType, int vertexStart, int primitiveCount)
         {
+			_vertexBuffer.VertexDeclaration.Apply ();
 
-           // Unbind the VBOs
-            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
-
-            //Create VBO if not created already
-#if IPHONE
-			if (VboIdArray == 0)
-                GL.GenBuffers(1, ref VboIdArray);
-#else
-            if (VboIdArray == 0)
-                GL.GenBuffers(1, out VboIdArray);
-#endif
-			
-            // Bind the VBO
-            GL.BindBuffer(BufferTarget.ArrayBuffer, VboIdArray);
-            ////Clear previous data
-            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)0, (IntPtr)null, BufferUsageHint.DynamicDraw);
-
-			//Get VertexDeclaration
-			var vd = _vertexBuffer.VertexDeclaration;
-			if (vd == null) {
-
-				vd = VertexDeclaration.FromType(_vertexBuffer._type);
-			}
-
-            //Buffer data to VBO; This should use stream when we move to ES2.0
-            GL.BufferData(BufferTarget.ArrayBuffer,
-				(IntPtr)(vd.VertexStride * GetElementCountArray(primitiveType, primitiveCount)),
-				_vertexBuffer._bufferPtr,
-				BufferUsageHint.DynamicDraw);
-
-            //Setup VertexDeclaration
-            VertexDeclaration.PrepareForUse(vd);
-
-            //Draw
-            GL.DrawArrays(PrimitiveTypeGL(primitiveType),
+			GL.DrawArrays(PrimitiveTypeGL(primitiveType),
 			              vertexStart,
-			              GetElementCountArray(primitiveType, primitiveCount));
-
-            // Free resources
-            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
+			              GetElementCountArray(primitiveType,primitiveCount));
 		}
 
         public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int vertexCount, short[] indexData, int indexOffset, int primitiveCount) where T : struct, IVertexType
@@ -792,7 +713,7 @@ namespace Microsoft.Xna.Framework.Graphics
                             indexData, BufferUsageHint.DynamicDraw);
 
             //Setup VertexDeclaration
-            VertexDeclaration.PrepareForUse(vd);
+            vd.Apply ();
 
             //Draw
             GL.DrawElements(PrimitiveTypeGL(primitiveType),
@@ -846,7 +767,7 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(sizeof(uint) * GetElementCountArray(primitiveType, primitiveCount)), indexData, BufferUsageHint.DynamicDraw);
 
             //Setup VertexDeclaration
-            VertexDeclaration.PrepareForUse(vd);
+            vd.Apply ();
 
             //Draw
             GL.DrawElements(PrimitiveTypeGL(primitiveType),

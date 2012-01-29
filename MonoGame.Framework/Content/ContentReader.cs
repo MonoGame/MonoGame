@@ -265,20 +265,6 @@ namespace Microsoft.Xna.Framework.Content
                     }));
             }
         }
-		
-		internal int ReadSharedResource()
-        {
-            int resourceId = Read7BitEncodedInt();
-
-            if (resourceId != 0)
-            {
-                return (int)resourceId - 1;
-            }
-            else
-            {
-                return -1;
-            }
-        }
 
         public Vector2 ReadVector2()
         {
@@ -328,28 +314,5 @@ namespace Microsoft.Xna.Framework.Content
             var radius = ReadSingle();
             return new BoundingSphere(position, radius);
 		}
-		
-		internal string ReadXNBString()
-        {
-            int stringLength = Read7BitEncodedInt();
-
-            int endOfString = (int)BaseStream.Position + stringLength;
-
-            string result = string.Empty;
-
-            while (BaseStream.Position < endOfString)
-            {
-                result += ReadChar();
-            }
-
-            return result;
-        }
-		
-        internal string ReadObjectString()
-        {
-            int typeId = Read7BitEncodedInt();
-
-            return ReadXNBString();
-        }
     }
 }

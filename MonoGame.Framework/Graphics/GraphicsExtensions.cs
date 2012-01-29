@@ -512,6 +512,78 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 
 		}
+		
+		
+		internal static void GetGLFormat(this SurfaceFormat format,
+		                                 out PixelInternalFormat glInternalFormat,
+		                                 out PixelFormat glFormat,
+		                                 out PixelType glType)
+		{
+			glInternalFormat = PixelInternalFormat.Rgba;
+			glFormat = PixelFormat.Rgba;
+			glType = PixelType.UnsignedByte;
+			
+			switch (format)
+			{
+			case SurfaceFormat.Color:
+				glInternalFormat = PixelInternalFormat.Rgba;
+				glFormat = PixelFormat.Rgba;
+				glType = PixelType.UnsignedByte;
+				break;
+			case SurfaceFormat.Bgr565 : 
+				glInternalFormat = PixelInternalFormat.Rgb;
+				glFormat = PixelFormat.Rgb;
+				glType = PixelType.UnsignedShort565;
+				break;
+			case SurfaceFormat.Bgra4444 : 
+				glInternalFormat = PixelInternalFormat.Rgba;
+				glFormat = PixelFormat.Rgba;
+				glType = PixelType.UnsignedShort4444;
+				break;
+			case SurfaceFormat.Bgra5551 : 
+				glInternalFormat = PixelInternalFormat.Rgba;
+				glFormat = PixelFormat.Rgba;
+				glType = PixelType.UnsignedShort5551;
+				break;
+			case SurfaceFormat.Alpha8 : 
+				glInternalFormat = PixelInternalFormat.Luminance;
+				glFormat = PixelFormat.Luminance;
+				glType = PixelType.UnsignedByte;
+				break;
+			case SurfaceFormat.Dxt1:
+				glInternalFormat = PixelInternalFormat.CompressedRgbaS3tcDxt1Ext;
+				glFormat = (PixelFormat)All.CompressedTextureFormats;
+				break;
+			case SurfaceFormat.Dxt3:
+				glInternalFormat = PixelInternalFormat.CompressedRgbaS3tcDxt3Ext;
+				glFormat = (PixelFormat)All.CompressedTextureFormats;
+				break;
+			case SurfaceFormat.Dxt5:
+				glInternalFormat = PixelInternalFormat.CompressedRgbaS3tcDxt5Ext;
+				glFormat = (PixelFormat)All.CompressedTextureFormats;
+				break;
+#if IPHONE
+			case SurfaceFormat.RgbPvrtc2Bpp:
+				glInternalFormat = PixelInternalFormat.CompressedRgbPvrtc2Bppv1Img;
+				glFormat = (PixelFormat)All.CompressedTextureFormats;
+				break;
+			case SurfaceFormat.RgbPvrtc4Bpp:
+				glInternalFormat = PixelInternalFormat.CompressedRgbPvrtc4Bppv1Img;
+				glFormat = (PixelFormat)All.CompressedTextureFormats;
+				break;
+			case SurfaceFormat.RgbaPvrtc2Bpp:
+				glInternalFormat = PixelInternalFormat.CompressedRgbaPvrtc2Bppv1Img;
+				glFormat = (PixelFormat)All.CompressedTextureFormats;
+				break;
+			case SurfaceFormat.RgbaPvrtc4Bpp:
+				glInternalFormat = PixelInternalFormat.CompressedRgbaPvrtc4Bppv1Img;
+				glFormat = (PixelFormat)All.CompressedTextureFormats;
+				break;
+#endif
+			default:
+				throw new NotSupportedException();
+			}
+		}
 
     }
 }

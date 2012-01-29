@@ -49,7 +49,7 @@ namespace Microsoft.Xna.Framework.Content
 	{
 		List<VertexBuffer> vertexBuffers = new List<VertexBuffer>();
         List<IndexBuffer> indexBuffers = new List<IndexBuffer>();
-		List<BasicEffect> basicEffects = new List<BasicEffect>();
+		List<Effect> effects = new List<Effect>();
 		List<GraphicsResource> sharedResources = new List<GraphicsResource>();
 
 		public ModelReader ()
@@ -95,7 +95,7 @@ namespace Microsoft.Xna.Framework.Content
 
             for (uint i = 0; i < boneCount; i++)
             {
-                string name = reader.ReadObjectString();
+                string name = reader.ReadObject<string>();
 				var matrix = reader.ReadMatrix();
                 var bone = new ModelBone { Transform = matrix, Index = (int)i, Name = name };
                 bones.Add(bone);
@@ -145,7 +145,7 @@ namespace Microsoft.Xna.Framework.Content
             {
 
                 Console.WriteLine("Mesh {0}", i);
-                var name = reader.ReadObjectString();
+                string name = reader.ReadObject<string>();
                 var parentBoneIndex = ReadBoneReference(reader, boneCount);
 				var boundingSphere = reader.ReadBoundingSphere();
 
@@ -168,26 +168,23 @@ namespace Microsoft.Xna.Framework.Content
                     part.PrimitiveCount = reader.ReadInt32();
 
                     // tag
-                    reader.ReadObject<object>();
-
-                    part.VertexBufferIndex = reader.ReadSharedResource();
-                    part.IndexBufferIndex = reader.ReadSharedResource();
-                    part.EffectIndex = reader.ReadSharedResource();
+                    part.Tag = reader.ReadObject<object>();
 					
 					parts.Add(part);
 					
-					/*reader.ReadSharedResource<VertexBuffer>(delegate (VertexBuffer v)
+					int jj = (int)j;
+					reader.ReadSharedResource<VertexBuffer>(delegate (VertexBuffer v)
 					{
-						parts[j].VertexBuffer = v;
+						parts[jj].VertexBuffer = v;
 					});
 					reader.ReadSharedResource<IndexBuffer>(delegate (IndexBuffer v)
 					{
-						parts[j].IndexBuffer = v;
+						parts[jj].IndexBuffer = v;
 					});
 					reader.ReadSharedResource<Effect>(delegate (Effect v)
 					{
-						parts[j].Effect = v;
-					});*/
+						parts[jj].Effect = v;
+					});
 
 					
                 }
@@ -209,51 +206,7 @@ namespace Microsoft.Xna.Framework.Content
 			model.BuildHierarchy();
 			
 			// Tag?
-            reader.ReadObject<object>();
-			
-			
-			 // Read any shared resource instances.
-			 
-			// Should use ReadSharedResource callbacks as above, but that doesn't seem to work -espes
-            for (uint i = 0; i < reader.sharedResourceCount; i++)
-            {
-                Console.WriteLine("Shared resource {0}:", i);
-
-                var resource = reader.ReadObject<object>();
-				
-				if (resource is VertexBuffer)
-                {
-					sharedResources.Add(resource as VertexBuffer);
-                    vertexBuffers.Add(resource as VertexBuffer);
-                }
-                else if (resource is IndexBuffer)
-                {
-					sharedResources.Add(resource as IndexBuffer);
-                    indexBuffers.Add(resource as IndexBuffer);
-                }
-				else if (resource is BasicEffect)
-				{
-					sharedResources.Add(resource as BasicEffect);
-					basicEffects.Add(resource as BasicEffect);
-				}
-			}
-			reader.sharedResourceCount = 0;
-
-			// connect parts of the mesh
-			if (model != null)
-			{
-				foreach (var mesh in model.Meshes)
-				{
-					foreach (var meshPart in mesh.MeshParts)
-					{
-						meshPart.Effect = sharedResources[meshPart.EffectIndex] as BasicEffect;
-						meshPart.VertexBuffer = sharedResources[meshPart.VertexBufferIndex] as VertexBuffer;
-						meshPart.IndexBuffer = sharedResources[meshPart.IndexBufferIndex] as IndexBuffer;
-					}
-					
-					mesh.BuildEffectList();
-				}
-			}
+            model.Tag = reader.ReadObject<object>();
 			
 			return model;
 		}
