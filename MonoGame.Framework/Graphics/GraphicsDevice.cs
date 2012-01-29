@@ -110,12 +110,12 @@ namespace Microsoft.Xna.Framework.Graphics
         private RenderTargetBinding[] currentRenderTargetBindings;
 		
 		// OpenGL ES2.0 attribute locations
-		internal static int attributePosition = 0;
-		internal static int attributeColor = 1;
-		internal static int attributeNormal = 2;
-		internal static int attributeBlendIndicies = 3;
-		internal static int attributeBlendWeight = 4;
-		internal static int attributeTexCoord = 5; //must be the last one, texture index locations are added to it
+		internal static int attributePosition = 0; //there can be a couple positions binded
+		internal static int attributeColor = 3;
+		internal static int attributeNormal = 4;
+		internal static int attributeBlendIndicies = 5;
+		internal static int attributeBlendWeight = 6;
+		internal static int attributeTexCoord = 7; //must be the last one, texture index locations are added to it
 
 		//OpenGL ES 1.1 extension consts
 #if IPHONE && ES11

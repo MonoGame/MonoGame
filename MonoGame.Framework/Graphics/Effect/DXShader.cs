@@ -195,7 +195,7 @@ namespace Microsoft.Xna.Framework.Graphics
 						GL.BindAttribLocation(program, GraphicsDevice.attributeColor, attrb.name);
 						break;
 					case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_POSITION:
-						GL.BindAttribLocation(program, GraphicsDevice.attributePosition, attrb.name);
+						GL.BindAttribLocation(program, GraphicsDevice.attributePosition + attrb.index, attrb.name);
 						break;
 					case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_TEXCOORD:
 						GL.BindAttribLocation(program, GraphicsDevice.attributeTexCoord + attrb.index, attrb.name);

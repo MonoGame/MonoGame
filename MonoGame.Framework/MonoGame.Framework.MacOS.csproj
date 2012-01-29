@@ -394,6 +394,8 @@
     <Compile Include="Content\ContentReaders\TextureReader.cs" />
     <Compile Include="Content\ContentReaders\SkinnedEffectReader.cs" />
     <Compile Include="Content\ContentReaders\DualTextureEffectReader.cs" />
+    <Compile Include="Graphics\Vertices\DynamicVertexBuffer.cs" />
+    <Compile Include="Graphics\Vertices\DynamicIndexBuffer.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />

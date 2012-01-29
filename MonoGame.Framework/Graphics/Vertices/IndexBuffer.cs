@@ -45,6 +45,13 @@ namespace Microsoft.Xna.Framework.Graphics
 			this(graphicsDevice, indexElementSize, indexCount, bufferUsage, false)
 		{
 		}
+
+		public IndexBuffer(GraphicsDevice graphicsDevice, Type indexType, int indexCount, BufferUsage usage) :
+			this(graphicsDevice,
+			     (indexType == typeof(short) || indexType == typeof(ushort)) ? IndexElementSize.SixteenBits : IndexElementSize.ThirtyTwoBits,
+			     indexCount, usage)
+		{
+		}
 		
 		internal void Apply()
 		{

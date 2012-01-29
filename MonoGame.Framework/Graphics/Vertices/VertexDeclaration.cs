@@ -165,7 +165,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				bool normalized = false;
 				
 				switch (ve.VertexElementUsage) {
-				case VertexElementUsage.Position: attributeLocation = GraphicsDevice.attributePosition; break;
+				case VertexElementUsage.Position: attributeLocation = GraphicsDevice.attributePosition + ve.UsageIndex; break;
 				case VertexElementUsage.Normal: attributeLocation = GraphicsDevice.attributeNormal; break;
 				case VertexElementUsage.Color: attributeLocation = GraphicsDevice.attributeColor; normalized = true; break;
 				case VertexElementUsage.BlendIndices: attributeLocation = GraphicsDevice.attributeBlendIndicies; break;
