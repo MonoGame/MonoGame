@@ -215,7 +215,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             get
             {
-                return _width;
+                return texture != null ? texture.Size.Width : _width;
             }
         }
 
@@ -223,7 +223,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             get
             {
-                return _height;
+                return  texture != null ? texture.Size.Height : _height;
             }
         }
 
