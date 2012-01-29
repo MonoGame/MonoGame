@@ -10,6 +10,11 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		public GestureListener(AndroidGameActivity activity) : base()
 		{
 			this.activity = activity;
+		}				
+						
+		public override bool OnScroll (MotionEvent e1, MotionEvent e2, float distanceX, float distanceY)
+		{			
+			return base.OnScroll (e1, e2, distanceX, distanceY);
 		}
 		
 		/// <summary>
