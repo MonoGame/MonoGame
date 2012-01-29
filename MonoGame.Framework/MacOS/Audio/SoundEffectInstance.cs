@@ -89,6 +89,7 @@ namespace Microsoft.Xna.Framework.Audio
 		{
 			sourceId = 0;
 			hasSourceId = false;
+			soundState = SoundState.Stopped;
 			//Console.WriteLine ("recycled: " + soundEffect.Name);
 		}
 

@@ -40,6 +40,7 @@ purpose and non-infringement.
 ﻿
 using System;
 using System.IO;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 using Microsoft.Xna;
@@ -65,6 +66,9 @@ namespace Microsoft.Xna.Framework.Audio
 		private string _name = "";
 		private string _filename = "";
 		internal byte[] _data;
+		List<SoundEffectInstance> playing = null;
+		List<SoundEffectInstance> available = null;
+		List<SoundEffectInstance> toBeRecycled = null;
 
 		internal float Rate { get; set; }
 
@@ -200,7 +204,43 @@ namespace Microsoft.Xna.Framework.Audio
 		public bool Play (float volume, float pitch, float pan)
 		{
 			if (MasterVolume > 0.0f) {
-				SoundEffectInstance instance = CreateInstance ();
+				if (playing == null) {
+					playing = new List<SoundEffectInstance>();
+					available = new List<SoundEffectInstance>();
+					toBeRecycled = new List<SoundEffectInstance>();
+				}
+				else {
+					// Lets cycle through our playing list and see if any are stopped
+					// so that we can recycle them.
+					if (playing.Count > 0) {
+
+						foreach(var instance2 in playing) {
+							if (instance2.State == SoundState.Stopped) {
+								toBeRecycled.Add(instance2);
+							}
+						}
+					}
+				}
+
+				SoundEffectInstance instance = null;
+				if (toBeRecycled.Count > 0) {
+					foreach(var recycle in toBeRecycled) {
+						available.Add(recycle);
+						playing.Remove(recycle);
+					}
+					toBeRecycled.Clear();
+				}
+				if (available.Count > 0) {
+					instance = available[0];
+					playing.Add(instance);
+					available.Remove(instance);
+					//System.Console.WriteLine("from pool = " + playing.Count);
+				}
+				else {
+					instance = CreateInstance ();
+					playing.Add (instance);
+					//System.Console.WriteLine("pooled = "  + playing.Count);
+				}
 				instance.Volume = volume;
 				instance.Pitch = pitch;
 				instance.Pan = pan;
