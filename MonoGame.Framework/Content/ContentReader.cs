@@ -44,6 +44,7 @@ namespace Microsoft.Xna.Framework.Content
         private List<KeyValuePair<int, Action<object>>> sharedResourceFixups;
         private ContentTypeReader[] typeReaders;
 		internal int version;
+		internal int sharedResourceCount;
 
         internal ContentTypeReader[] TypeReaders
         {
@@ -97,7 +98,7 @@ namespace Microsoft.Xna.Framework.Content
                 r.Initialize(typeReaderManager);
             }
 
-            int sharedResourceCount = Read7BitEncodedInt();
+            sharedResourceCount = Read7BitEncodedInt();
             sharedResourceFixups = new List<KeyValuePair<int, Action<object>>>();
 
             // Read primary object
@@ -225,7 +226,7 @@ namespace Microsoft.Xna.Framework.Content
 
         public T ReadRawObject<T>()
         {
-            throw new NotImplementedException();
+			return (T)ReadRawObject<T> (default(T));
         }
 
         public T ReadRawObject<T>(ContentTypeReader typeReader)
@@ -262,6 +263,20 @@ namespace Microsoft.Xna.Framework.Content
                         }
                         fixup((T)v);
                     }));
+            }
+        }
+		
+		internal int ReadSharedResource()
+        {
+            int resourceId = Read7BitEncodedInt();
+
+            if (resourceId != 0)
+            {
+                return (int)resourceId - 1;
+            }
+            else
+            {
+                return -1;
             }
         }
 
@@ -305,6 +320,36 @@ namespace Microsoft.Xna.Framework.Content
         internal new int Read7BitEncodedInt()
         {
             return base.Read7BitEncodedInt();
+        }
+		
+		internal BoundingSphere ReadBoundingSphere()
+		{
+			var position = ReadVector3();
+            var radius = ReadSingle();
+            return new BoundingSphere(position, radius);
+		}
+		
+		internal string ReadXNBString()
+        {
+            int stringLength = Read7BitEncodedInt();
+
+            int endOfString = (int)BaseStream.Position + stringLength;
+
+            string result = string.Empty;
+
+            while (BaseStream.Position < endOfString)
+            {
+                result += ReadChar();
+            }
+
+            return result;
+        }
+		
+        internal string ReadObjectString()
+        {
+            int typeId = Read7BitEncodedInt();
+
+            return ReadXNBString();
         }
     }
 }

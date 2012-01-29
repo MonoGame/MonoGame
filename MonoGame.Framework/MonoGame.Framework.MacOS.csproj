@@ -378,6 +378,16 @@
     <Compile Include="Content\ContentReaders\BoundingBoxReader.cs" />
     <Compile Include="Content\ContentReaders\MatrixReader.cs" />
     <Compile Include="Content\ContentReaders\VertexBufferReader.cs" />
+    <Compile Include="Graphics\Model.cs" />
+    <Compile Include="Graphics\ModelBone.cs" />
+    <Compile Include="Graphics\ModelBoneCollection.cs" />
+    <Compile Include="Graphics\ModelEffectCollection.cs" />
+    <Compile Include="Graphics\ModelMesh.cs" />
+    <Compile Include="Graphics\ModelMeshCollection.cs" />
+    <Compile Include="Graphics\ModelMeshPart.cs" />
+    <Compile Include="Graphics\ModelMeshPartCollection.cs" />
+    <Compile Include="Content\ContentReaders\ModelReader.cs" />
+    <Compile Include="Content\ContentReaders\VertexDeclarationReader.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />
