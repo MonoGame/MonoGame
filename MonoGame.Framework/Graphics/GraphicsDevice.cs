@@ -260,10 +260,10 @@ namespace Microsoft.Xna.Framework.Graphics
         public void Clear(Color color)
         {
 			ClearOptions options = ClearOptions.Target;
-			if (DepthStencilState.DepthBufferEnable) {
+			if (true) { //TODO: Clear only if current backbuffer has a depth component
 				options |= ClearOptions.DepthBuffer;
 			}
-			if (DepthStencilState.StencilEnable) {
+			if (true) { //TODO: Clear only if current backbuffer has a stencil component
 				options |= ClearOptions.Stencil;
 			}
             Clear (options, color.ToVector4(), Viewport.MaxDepth, 0);
