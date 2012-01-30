@@ -287,9 +287,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		internal override void Apply ()
 		{
-			if (texture == null)
-				return;
-
 			GL.BindTexture (TextureTarget.Texture2D, (uint)_textureId);
 		}
 		
