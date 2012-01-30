@@ -152,7 +152,6 @@
     <Compile Include="Graphics\GraphicsProfile.cs" />
     <Compile Include="Graphics\SpriteSortMode.cs" />
     <Compile Include="Graphics\ResolveTexture2D.cs" />
-    <Compile Include="MacOS\Graphics\RenderTarget2D.cs" />
     <Compile Include="MacOS\Graphics\Texture2D.cs" />
     <Compile Include="Graphics\RenderTarget.cs" />
     <Compile Include="Graphics\SurfaceFormat.cs" />
@@ -229,8 +228,6 @@
     <Compile Include="Graphics\Effect\IEffectMatrices.cs" />
     <Compile Include="Graphics\DirectionalLight.cs" />
     <Compile Include="MacOS\Input\Mouse.cs" />
-    <Compile Include="MacOS\Input\MouseState.cs" />
-    <Compile Include="MacOS\Input\Keyboard.cs" />
     <Compile Include="MacOS\KeyUtil.cs" />
     <Compile Include="Graphics\States\TextureAddressMode.cs" />
     <Compile Include="Graphics\States\TextureFilter.cs" />
@@ -396,6 +393,9 @@
     <Compile Include="Content\ContentReaders\DualTextureEffectReader.cs" />
     <Compile Include="Graphics\Vertices\DynamicVertexBuffer.cs" />
     <Compile Include="Graphics\Vertices\DynamicIndexBuffer.cs" />
+    <Compile Include="Graphics\RenderTarget2D.cs" />
+    <Compile Include="Input\Keyboard.cs" />
+    <Compile Include="Input\MouseState.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />
