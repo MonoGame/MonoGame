@@ -503,7 +503,7 @@ namespace Microsoft.Xna.Framework.Graphics
 							Matrix4.CreateTranslation(-this.graphicsDevice.Viewport.Width/2,
 								this.graphicsDevice.Viewport.Height/2,
 								0);
-							matWVPScreen = matViewScreen * matProjection;
+							matWVPScreen =  _matrix.ToOpenTK() * matViewScreen * matProjection;
 		}
 #endif		
 		public void Draw 
