@@ -99,9 +99,16 @@ namespace Microsoft.Xna.Framework
 		
 		UILongPressGestureRecognizer recognizerLongPress;
 		UIPanGestureRecognizer recognizerPan;
+		UIPanGestureRecognizer recognizerVerticalPan;
+		UIPanGestureRecognizer recognizerHorizontalPan;
 		UIRotationGestureRecognizer recognizerRotation;
 		
 		Vector2 translatedTouchPosition;
+		private Vector2 _lastPanPosition;
+		private Vector2 _lastVerticalPanPosition;
+		private Vector2 _lastHorizontalPanPosition;
+		private Vector2 _lastPinchPosition1;
+		private Vector2 _lastPinchPosition2;
 		
 		public EAGLContext MainContext;
 	    public EAGLContext BackgroundContext;
@@ -131,6 +138,13 @@ namespace Microsoft.Xna.Framework
 			// Initialize _lastUpdate and _lastDraw
 			_lastUpdate = DateTime.Now;
 			_lastDraw = DateTime.Now;
+			
+			// Initialize last touch locations
+			_lastPanPosition = new Vector2(0,0);
+			_lastVerticalPanPosition = new Vector2(0,0);
+			_lastHorizontalPanPosition = new Vector2(0,0);
+			_lastPinchPosition1 = new Vector2(0,0);
+			_lastPinchPosition2 = new Vector2(0,0);
 		}	
 		
 		~GameWindow()
@@ -154,7 +168,7 @@ namespace Microsoft.Xna.Framework
 			if(UIScreen.MainScreen.Scale != 1)
 				eaglLayer.ContentsScale = UIScreen.MainScreen.Scale;
 		}
-		
+		 
 		int renderbufferWidth;
 		int renderbufferHeight;
 		
@@ -325,6 +339,36 @@ namespace Microsoft.Xna.Framework
 				recognizerPan = null;
 			}
 			
+			if ((enabledGestures & GestureType.VerticalDrag) != 0)
+			{
+				if (recognizerVerticalPan == null)
+				{
+					recognizerVerticalPan = new UIPanGestureRecognizer(this, new Selector("VerticalPanGestureRecognizer"));
+					recognizerVerticalPan.CancelsTouchesInView = false;
+					AddGestureRecognizer(recognizerVerticalPan);
+				}
+			}
+			else if (recognizerVerticalPan != null)
+			{
+				RemoveGestureRecognizer(recognizerVerticalPan);
+				recognizerVerticalPan = null;
+			}
+			
+			if ((enabledGestures & GestureType.HorizontalDrag) != 0)
+			{
+				if (recognizerHorizontalPan == null)
+				{
+					recognizerHorizontalPan = new UIPanGestureRecognizer(this, new Selector("HorizontalPanGestureRecognizer"));
+					recognizerHorizontalPan.CancelsTouchesInView = false;
+					AddGestureRecognizer(recognizerHorizontalPan);
+				}
+			}
+			else if (recognizerHorizontalPan != null)
+			{
+				RemoveGestureRecognizer(recognizerHorizontalPan);
+				recognizerHorizontalPan = null;
+			}
+			
 			if ((enabledGestures & GestureType.Flick) != 0)
 			{
 				if (recognizerLeftRightSwipe == null)
@@ -457,7 +501,15 @@ namespace Microsoft.Xna.Framework
 		[Export("LongPressGestureRecognizer")]
 		public void LongPressGestureRecognizer (UILongPressGestureRecognizer sender)
 		{
-			TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.Hold, new TimeSpan(_nowUpdate.Ticks), translatedTouchPosition, new Vector2 (sender.LocationInView (sender.View)), new Vector2(0,0), new Vector2(0,0)));
+			TouchPanel.GestureList.Enqueue(
+				new GestureSample(
+					GestureType.Hold, 
+					new TimeSpan(_nowUpdate.Ticks), 
+					translatedTouchPosition, 
+					new Vector2(0,0), 
+					new Vector2(0,0), 
+					new Vector2(0,0)
+				));
 		}
 		
 		
@@ -465,34 +517,207 @@ namespace Microsoft.Xna.Framework
 		public void PanGestureRecognizer (UIPanGestureRecognizer sender)
 		{
 			if (sender.State==UIGestureRecognizerState.Ended || sender.State==UIGestureRecognizerState.Cancelled || sender.State==UIGestureRecognizerState.Failed)
-				TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.DragComplete, new TimeSpan(_nowUpdate.Ticks), translatedTouchPosition, new Vector2(0,0), new Vector2 (sender.TranslationInView(sender.View)), new Vector2(0,0)));
+			{
+				TouchPanel.GestureList.Enqueue(
+					new GestureSample(
+						GestureType.DragComplete, 
+						new TimeSpan(_nowUpdate.Ticks), 
+						translatedTouchPosition, 
+						new Vector2(0,0), 
+						translatedTouchPosition - _lastPanPosition, 
+						new Vector2(0,0)
+					));
+				_lastPanPosition = new Vector2(0,0);
+			}
 			else
-				TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.FreeDrag, new TimeSpan(_nowUpdate.Ticks), translatedTouchPosition, new Vector2(0,0), new Vector2 (sender.TranslationInView(sender.View)), new Vector2(0,0)));
+			{
+				if (_lastPanPosition.X == 0 && _lastPanPosition.Y == 0) 
+					_lastPanPosition = translatedTouchPosition;
+				TouchPanel.GestureList.Enqueue(
+					new GestureSample(
+						GestureType.FreeDrag, 
+						new TimeSpan(_nowUpdate.Ticks), 
+						translatedTouchPosition, 
+						new Vector2(0,0), 
+						translatedTouchPosition - _lastPanPosition, 
+						new Vector2(0,0)
+					));
+				_lastPanPosition = translatedTouchPosition; 
+			}
+		}
+		
+		[Export("VerticalPanGestureRecognizer")]
+		public void VerticalPanGestureRecognizer (UIPanGestureRecognizer sender)
+		{
+			if (sender.State==UIGestureRecognizerState.Ended || sender.State==UIGestureRecognizerState.Cancelled || sender.State==UIGestureRecognizerState.Failed)
+			{
+				TouchPanel.GestureList.Enqueue(
+					new GestureSample(
+						GestureType.DragComplete, 
+						new TimeSpan(_nowUpdate.Ticks), 
+						new Vector2(0, translatedTouchPosition.Y), 
+						new Vector2(0,0), 
+						GetCorrectedRelativeCoordinates(new Vector2(0, sender.TranslationInView(sender.View).Y)), 
+						new Vector2(0,0)
+					));
+				_lastVerticalPanPosition = new Vector2(0,0);
+			}
+			else
+			{
+				if (_lastVerticalPanPosition.X == 0 && _lastVerticalPanPosition.Y == 0) 
+					_lastVerticalPanPosition = translatedTouchPosition;
+				TouchPanel.GestureList.Enqueue(
+					new GestureSample(
+						GestureType.VerticalDrag, 
+						new TimeSpan(_nowUpdate.Ticks), 
+						new Vector2(0, translatedTouchPosition.Y),
+						new Vector2(0,0), 
+						GetCorrectedRelativeCoordinates(new Vector2(0, sender.TranslationInView(sender.View).Y)), 
+						new Vector2(0,0)
+					));
+				_lastVerticalPanPosition = translatedTouchPosition; 
+			}
+		}
+		
+		[Export("HorizontalPanGestureRecognizer")]
+		public void HorizontalPanGestureRecognizer (UIPanGestureRecognizer sender)
+		{
+			if (sender.State==UIGestureRecognizerState.Ended || sender.State==UIGestureRecognizerState.Cancelled || sender.State==UIGestureRecognizerState.Failed)
+			{
+				TouchPanel.GestureList.Enqueue(
+					new GestureSample(
+						GestureType.DragComplete, 
+						new TimeSpan(_nowUpdate.Ticks), 
+						new Vector2(translatedTouchPosition.X, 0), 
+						new Vector2(0,0), 
+						new Vector2(translatedTouchPosition.X - _lastHorizontalPanPosition.X, 0), 
+						new Vector2(0,0)
+					));
+				_lastHorizontalPanPosition = new Vector2(0,0);
+			}
+			else
+			{
+				if (_lastHorizontalPanPosition.X == 0 && _lastHorizontalPanPosition.Y == 0) 
+					_lastHorizontalPanPosition = translatedTouchPosition;
+				TouchPanel.GestureList.Enqueue(
+					new GestureSample(
+						GestureType.HorizontalDrag, 
+						new TimeSpan(_nowUpdate.Ticks), 
+						new Vector2(translatedTouchPosition.X, 0),
+						new Vector2(0,0), 
+						new Vector2(translatedTouchPosition.X - _lastHorizontalPanPosition.X, 0), 
+						new Vector2(0,0)
+					));
+				_lastHorizontalPanPosition = translatedTouchPosition;
+			}
 		}
 			
 		[Export("PinchGestureRecognizer")]
 		public void PinchGestureRecognizer (UIPinchGestureRecognizer sender)
 		{
-			TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.Pinch, new TimeSpan(_nowUpdate.Ticks), new Vector2 (sender.LocationOfTouch(0,sender.View)), new Vector2 (sender.LocationOfTouch(1,sender.View)), new Vector2(0,0), new Vector2(0,0)));
+			if (sender.State==UIGestureRecognizerState.Ended || sender.State==UIGestureRecognizerState.Cancelled || sender.State==UIGestureRecognizerState.Failed || sender.NumberOfTouches<2)
+			{
+				_lastPinchPosition1 = new Vector2(0,0);
+				_lastPinchPosition2 = new Vector2(0,0);
+			}
+			else {
+				Vector2 position1 = GetOffsetPosition(new Vector2(sender.LocationOfTouch(0,sender.View)), true);
+				Vector2 position2 = GetOffsetPosition(new Vector2(sender.LocationOfTouch(1,sender.View)), true);
+				if (_lastPinchPosition1.X == 0 && _lastPinchPosition1.Y == 0) 
+					_lastPinchPosition1 = position1;
+				if (_lastPinchPosition2.X == 0 && _lastPinchPosition2.Y == 0) 
+					_lastPinchPosition2 = position2;
+				TouchPanel.GestureList.Enqueue(
+					new GestureSample(
+						GestureType.Pinch, 
+						new TimeSpan(_nowUpdate.Ticks), 
+						position1, 
+						position2, 
+						position1 - _lastPinchPosition1,
+						position2 - _lastPinchPosition2
+					));
+				_lastPinchPosition1 = position1;
+				_lastPinchPosition2 = position2;
+			}
 		}
 		
 		
 		[Export("RotationGestureRecognizer")]
 		public void RotationGestureRecognizer (UIRotationGestureRecognizer sender)
 		{
-			TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.Rotation, new TimeSpan(_nowUpdate.Ticks), new Vector2 (sender.LocationInView (sender.View)), new Vector2 (sender.LocationInView (sender.View)), new Vector2(0,0), new Vector2(0,0)));
+			// This shouldn't even exist, given it doesn't in XNA?
+			TouchPanel.GestureList.Enqueue(
+				new GestureSample(
+					GestureType.Rotation, 
+			        new TimeSpan(_nowUpdate.Ticks),
+					GetOffsetPosition(new Vector2(sender.LocationOfTouch(0,sender.View)), true), 
+					GetOffsetPosition(new Vector2(sender.LocationOfTouch(1,sender.View)), true), 
+					new Vector2(sender.Rotation, sender.Velocity),  // If it does, exist these 2 values are arbitrarily set to describe the rotation
+					new Vector2(0,0)
+				));
 		}
 		
 		[Export("SwipeGestureRecognizer")]
 		public void SwipeGestureRecognizer (UISwipeGestureRecognizer sender)
 		{
-			TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.Flick, new TimeSpan(_nowUpdate.Ticks), new Vector2 (sender.LocationInView (sender.View)), new Vector2 (sender.LocationInView (sender.View)), new Vector2(0,0), new Vector2(0,0)));		
+			Vector2 delta = new Vector2(0,0);
+			float velocity = 100f; // Arbitrary speed in pixels/second
+			
+			switch (sender.Direction)
+			{
+				case UISwipeGestureRecognizerDirection.Left:
+					delta.X = -velocity;
+					break;
+				case UISwipeGestureRecognizerDirection.Right:
+					delta.X = velocity;
+					break;
+				case UISwipeGestureRecognizerDirection.Up:
+					delta.Y = -velocity;
+					break;
+				case UISwipeGestureRecognizerDirection.Down:
+					delta.Y = velocity;
+					break;
+			}
+			delta = GetCorrectedRelativeCoordinates(delta);
+			
+			TouchPanel.GestureList.Enqueue(
+				new GestureSample(
+					GestureType.Flick, 
+					new TimeSpan(_nowUpdate.Ticks), 
+					new Vector2(0,0), 
+					new Vector2(0,0), 
+					delta,
+					new Vector2(0,0)
+				));		
 		}
 		
 		[Export("TapGestureRecognizer")]
 		public void TapGestureRecognizer (UITapGestureRecognizer sender)
 		{
-			TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.Tap, new TimeSpan(_nowUpdate.Ticks), translatedTouchPosition, new Vector2 (sender.LocationInView (sender.View)), new Vector2(0,0), new Vector2(0,0)));
+			if (sender.NumberOfTapsRequired == 1)
+			{
+				TouchPanel.GestureList.Enqueue(
+					new GestureSample(
+						GestureType.Tap, 
+						new TimeSpan(_nowUpdate.Ticks), 
+				    	translatedTouchPosition, 
+						new Vector2(0,0), 
+						new Vector2(0,0), 
+						new Vector2(0,0)
+					));
+			}
+			else
+			{
+				TouchPanel.GestureList.Enqueue(
+					new GestureSample(
+						GestureType.DoubleTap, 
+						new TimeSpan(_nowUpdate.Ticks), 
+				    	translatedTouchPosition, 
+						new Vector2(0,0), 
+						new Vector2(0,0), 
+						new Vector2(0,0)
+					));
+			}
 		}
 		
 		private void FillTouchCollection(NSSet touches)
@@ -567,6 +792,41 @@ namespace Microsoft.Xna.Framework
 						break;					
 				}
 			}			
+		}
+		
+		internal Vector2 GetCorrectedRelativeCoordinates(Vector2 coordinates)
+		{
+			Vector2 newCoordinates = coordinates;
+			
+			switch (CurrentOrientation)
+			{
+				case DisplayOrientation.Portrait :
+				{																		
+					break;
+				}
+
+				case DisplayOrientation.LandscapeRight :
+				{				
+					newCoordinates.X = -coordinates.Y;
+					newCoordinates.Y = coordinates.X;							
+					break;
+				}
+
+				case DisplayOrientation.LandscapeLeft :
+				{							
+					newCoordinates.X = coordinates.Y;
+					newCoordinates.Y = -coordinates.X;							
+					break;
+				}
+
+				case DisplayOrientation.PortraitUpsideDown :
+				{				
+					newCoordinates.X = -coordinates.X;
+					newCoordinates.Y = -coordinates.Y;							
+					break;
+				}
+			}
+			return newCoordinates;
 		}
 		
 		internal Vector2 GetOffsetPosition(Vector2 position, bool useScale)
