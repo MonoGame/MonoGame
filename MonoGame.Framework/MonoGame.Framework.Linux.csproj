@@ -342,6 +342,7 @@
     <Compile Include="Desktop\Input\MouseState.cs" />
     <Compile Include="Desktop\Graphics\Vertices\VertexDeclaration.cs" />
     <Compile Include="LaunchParameters.cs" />
+    <Compile Include="XnaToOpenTK.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.Linux.csproj">
