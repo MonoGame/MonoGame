@@ -370,6 +370,7 @@
     <Compile Include="Content\ContentReaders\MatrixReader.cs" />
     <Compile Include="Content\ContentReaders\VertexBufferReader.cs" />
     <Compile Include="Content\ContentReaders\AlphaTestEffectReader.cs" />
+    <Compile Include="XnaToOpenTK.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />
