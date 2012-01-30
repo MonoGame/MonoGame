@@ -925,11 +925,14 @@ namespace Microsoft.Xna.Framework
         public static Matrix CreateRotationY(float radians)
         {
             Matrix returnMatrix = Matrix.Identity;
-
-            returnMatrix.M11 = (float)Math.Cos(radians);
-            returnMatrix.M13 = (float)Math.Sin(radians);
-            returnMatrix.M31 = -returnMatrix.M13;
-            returnMatrix.M33 = returnMatrix.M11;
+			
+			var val1 = (float)Math.Cos(radians);
+			var val2 = (float)Math.Sin(radians);
+			
+            returnMatrix.M11 = val1;
+            returnMatrix.M13 = -val2;
+            returnMatrix.M31 = val2;
+            returnMatrix.M33 = val1;
 
             return returnMatrix;
         }
@@ -939,10 +942,13 @@ namespace Microsoft.Xna.Framework
         {
             result = Matrix.Identity;
 
-            result.M11 = (float)Math.Cos(radians);
-            result.M13 = (float)Math.Sin(radians);
-            result.M31 = -result.M13;
-            result.M33 = result.M11;
+            var val1 = (float)Math.Cos(radians);
+			var val2 = (float)Math.Sin(radians);
+			
+            result.M11 = val1;
+            result.M13 = -val2;
+            result.M31 = val2;
+            result.M33 = val1;
         }
 
 
