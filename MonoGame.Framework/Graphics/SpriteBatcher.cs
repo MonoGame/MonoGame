@@ -154,6 +154,10 @@ namespace Microsoft.Xna.Framework.Graphics
 				break;
 			}
 			
+			//Unbind VBOs
+			GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+			GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
+			
 #if ES11
 			GLStateManager.Textures2D(true);
 			GLStateManager.VertexArray(true);
@@ -204,10 +208,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			                       (IntPtr)((uint)_vertexHandle.AddrOfPinnedObject()
 			         					+(uint)(sizeof(float)*2+sizeof(uint))));
 #endif
-			//Unbind VBOs
-			GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
-			GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
-			
 			
 			// setup the vertexArray array
 			int startIndex = 0;
