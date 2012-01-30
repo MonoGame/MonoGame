@@ -40,7 +40,11 @@ purpose and non-infringement.
 
 using System;
 
+#if MONOMAC
 using MonoMac.AppKit;
+#elif IPHONE
+using MonoTouch.UIKit;
+#endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {

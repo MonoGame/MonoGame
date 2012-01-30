@@ -39,49 +39,69 @@
 #endregion License
 
 using System;
-using OpenTK.Graphics.ES20;
 
+#if MONOMAC
+using MonoMac.OpenGL;
+#elif WINDOWS || LINUX
+using OpenTK.Graphics.OpenGL;
+#else
+ #if ES11
+using OpenTK.Graphics.ES11;
+ #else
+using OpenTK.Graphics.ES20;
+ #endif
+#endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-	// modified to inherit directly from Texture2D as per
-	// http://blogs.msdn.com/b/shawnhar/archive/2010/03/26/rendertarget-changes-in-xna-game-studio-4-0.aspx
-	// 	and
-	// http://msdn.microsoft.com/en-us/library/bb198676.aspx
-	//
 	public class RenderTarget2D : Texture2D
-	{		
-		// OpenGL ES 2.0 frameBuffer reference.
-		internal int frameBuffer;
+	{
+		internal uint glDepthStencilBuffer;
 		
-		public RenderTargetUsage RenderTargetUsage { get; internal set; }
-		public DepthFormat DepthStencilFormat { get; internal set; }
+		public DepthFormat DepthStencilFormat { get; private set; }
 		
-		public RenderTarget2D (GraphicsDevice graphicsDevice, int width, int height)
-			: this(graphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None) 
-		{}
+		public int MultiSampleCount { get; private set; }
 		
-		public RenderTarget2D (GraphicsDevice graphicsDevice, int width, int height, bool mipMap, 
-			SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat)
-			:this (graphicsDevice, width, height, mipMap, preferredFormat, 
-				DepthFormat.None, 0, RenderTargetUsage.PreserveContents) 
-		{}
+		public RenderTargetUsage RenderTargetUsage { get; private set; }
 		
-		public RenderTarget2D (GraphicsDevice graphicsDevice, int width, int height, bool mipMap, 
-			SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage)
+		public RenderTarget2D (GraphicsDevice graphicsDevice, int width, int height, bool mipMap, SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage)
 			:base (graphicsDevice, width, height, mipMap, preferredFormat)
 		{
-
-			GL.GenFramebuffers(1, ref frameBuffer);
-			RenderTargetUsage = usage;
-            DepthStencilFormat = preferredDepthFormat;
-        }
-		
-		public override void Dispose ()
-		{
-			base.Dispose ();
+			this.DepthStencilFormat = preferredDepthFormat;
+			this.MultiSampleCount = preferredMultiSampleCount;
+			this.RenderTargetUsage = usage;
 			
-			GL.DeleteFramebuffers(1, ref frameBuffer);
+			if (preferredDepthFormat != DepthFormat.None)
+			{
+#if IPHONE
+				GL.GenRenderbuffers(1, ref glDepthStencilBuffer);
+#else
+				GL.GenRenderbuffers(1, out glDepthStencilBuffer);
+#endif
+				GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, this.glDepthStencilBuffer);
+				var glDepthStencilFormat = RenderbufferStorage.DepthComponent16;
+				switch (preferredDepthFormat)
+				{
+				case DepthFormat.Depth16 : glDepthStencilFormat = RenderbufferStorage.DepthComponent16; break;
+				case DepthFormat.Depth24 : glDepthStencilFormat = RenderbufferStorage.DepthComponent24; break;
+				case DepthFormat.Depth24Stencil8: glDepthStencilFormat = RenderbufferStorage.Depth24Stencil8; break;
+				}
+				GL.RenderbufferStorage(RenderbufferTarget.Renderbuffer, glDepthStencilFormat, this._width, this._height);
+			}
 		}
+		
+		public RenderTarget2D (GraphicsDevice graphicsDevice, int width, int height, bool mipMap, SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat)
+			:this (graphicsDevice, width, height, mipMap, preferredFormat, preferredDepthFormat, 0, RenderTargetUsage.DiscardContents) 
+		{}
+		
+		public RenderTarget2D (GraphicsDevice graphicsDevice, int width, int height)
+			: this(graphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.DiscardContents) 
+		{}
+
+		/*protected override void ReleaseUnmanagedResources ()
+		{
+			base.ReleaseUnmanagedResources();
+			GL.DeleteRenderbuffers(1, ref this.glDepthStencilBuffer);
+		}*/
 	}
 }

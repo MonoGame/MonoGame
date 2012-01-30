@@ -75,15 +75,15 @@ using Microsoft.Xna.Framework.Audio;
 
 namespace Microsoft.Xna.Framework
 {
-    class WindowsGamePlatform : GamePlatform
+    class OpenTKGamePlatform : GamePlatform
     {
-        private WindowsGameWindow _view;
+        private OpenTKGameWindow _view;
 		private OpenALSoundController soundControllerInstance = null;
         
-		public WindowsGamePlatform(Game game)
+		public OpenTKGamePlatform(Game game)
             : base(game)
         {
-            _view = new WindowsGameWindow();
+            _view = new OpenTKGameWindow();
             _view.Game = game;
             this.Window = _view;
 			
@@ -99,18 +99,8 @@ namespace Microsoft.Xna.Framework
 
         public override void RunLoop()
         {
-            //Need to execute this on the rendering thread
-            // FIXME: Is this needed?
-            /*_view.OpenTkGameWindow.RenderFrame += delegate
-            {
-                if (!_devicesLoaded)
-                {
-                    Initialize();
-                    _devicesLoaded = true;
-                }
-            };*/
-
-            _view.OpenTkGameWindow.Run(1 / Game.TargetElapsedTime.TotalSeconds);
+            ResetWindowBounds(false);
+            _view.Window.Run(1 / Game.TargetElapsedTime.TotalSeconds);
         }
 
         public override void StartRunLoop()
@@ -120,10 +110,10 @@ namespace Microsoft.Xna.Framework
         
         public override void Exit()
         {
-            if (!_view.OpenTkGameWindow.IsExiting)
+            if (!_view.Window.IsExiting)
             {
                 Net.NetworkSession.Exit();
-                _view.OpenTkGameWindow.Exit();
+                _view.Window.Exit();
             }
         }
 
@@ -145,6 +135,44 @@ namespace Microsoft.Xna.Framework
 
         public override void ExitFullScreen()
         {
+        }
+
+        internal void ResetWindowBounds(bool toggleFullScreen)
+        {
+            Rectangle bounds;
+
+            bounds = Window.ClientBounds;
+
+            //Changing window style forces a redraw. Some games
+            //have fail-logic and toggle fullscreen in their draw function,
+            //so temporarily become inactive so it won't execute.
+
+            bool wasActive = IsActive;
+            IsActive = false;
+
+            var graphicsDeviceManager = (GraphicsDeviceManager)
+                Game.Services.GetService(typeof(IGraphicsDeviceManager));
+
+            if (graphicsDeviceManager.IsFullScreen)
+            {
+                bounds = new Rectangle(0, 0,
+                                       OpenTK.DisplayDevice.Default.Width,
+                                       OpenTK.DisplayDevice.Default.Height);
+            }
+            else
+            {
+                bounds.Width = graphicsDeviceManager.PreferredBackBufferWidth;
+                bounds.Height = graphicsDeviceManager.PreferredBackBufferHeight;
+            }
+
+            if (toggleFullScreen)
+                _view.ToggleFullScreen();
+
+            // we only change window bounds if we are not fullscreen
+            if (!graphicsDeviceManager.IsFullScreen)
+                _view.ChangeClientBounds(bounds);
+
+            IsActive = wasActive;
         }
 
         public override void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight)

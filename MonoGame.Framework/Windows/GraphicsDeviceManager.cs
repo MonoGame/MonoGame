@@ -37,11 +37,8 @@ permitted under your local laws, the contributors exclude the implied warranties
 purpose and non-infringement.
 */
 #endregion License
-
 using System;
-using System.Drawing;
-using System.Windows.Forms;
-using OpenTK;
+
 using OpenTK.Graphics.OpenGL;
 
 using Microsoft.Xna.Framework.Graphics;
@@ -50,12 +47,12 @@ namespace Microsoft.Xna.Framework
 {
     public class GraphicsDeviceManager : IGraphicsDeviceService, IDisposable, IGraphicsDeviceManager
     {
-		private Game _game;
-		private GraphicsDevice _graphicsDevice;
-		private int _preferredBackBufferHeight;
-		private int _preferredBackBufferWidth;
-		private bool _preferMultiSampling;
-		private DisplayOrientation _supportedOrientations;
+        private Game _game;
+        private GraphicsDevice _graphicsDevice;
+        private int _preferredBackBufferHeight;
+        private int _preferredBackBufferWidth;
+        private bool _preferMultiSampling;
+        private DisplayOrientation _supportedOrientations;
 
         public GraphicsDeviceManager(Game game)
         {
@@ -63,56 +60,59 @@ namespace Microsoft.Xna.Framework
             {
                 throw new ArgumentNullException("Game Cannot Be Null");
             }
-            
-			_game = game;
-			_preferredBackBufferHeight = game.Window.ClientBounds.Height;
-			_preferredBackBufferWidth = game.Window.ClientBounds.Width;
-			_supportedOrientations = DisplayOrientation.Default;
-			
+
+            _game = game;
+
+            _supportedOrientations = DisplayOrientation.Default;
+
             if (game.Services.GetService(typeof(IGraphicsDeviceManager)) != null)
             {
                 throw new ArgumentException("Graphics Device Manager Already Present");
             }
-			
+
             game.Services.AddService(typeof(IGraphicsDeviceManager), this);
-            game.Services.AddService(typeof(IGraphicsDeviceService), this);	
+            game.Services.AddService(typeof(IGraphicsDeviceService), this);
+
+            CreateDevice();
         }
-		
-		public void CreateDevice ()
-		{
+
+        public void CreateDevice()
+        {
             _graphicsDevice = new GraphicsDevice();
             _graphicsDevice.PresentationParameters = new PresentationParameters();
+
+            _preferredBackBufferHeight = _graphicsDevice.PresentationParameters.BackBufferHeight;
+            _preferredBackBufferWidth = _graphicsDevice.PresentationParameters.BackBufferWidth;
 
             Initialize();
 
             OnDeviceCreated(EventArgs.Empty);
-		}
+        }
 
-		public bool BeginDraw ()
-		{
-			throw new NotImplementedException();
-		}
+        public bool BeginDraw()
+        {
+            throw new NotImplementedException();
+        }
 
-		public void EndDraw ()
-		{
-			throw new NotImplementedException();
-		}
-		
-		 #region IGraphicsDeviceService Members
+        public void EndDraw()
+        {
+            throw new NotImplementedException();
+        }
+
+        #region IGraphicsDeviceService Members
 
         public event EventHandler<EventArgs> DeviceCreated;
         public event EventHandler<EventArgs> DeviceDisposing;
         public event EventHandler<EventArgs> DeviceReset;
-        public event EventHandler<EventArgs> DeviceResetting;	
-		public event EventHandler<PreparingDeviceSettingsEventArgs> PreparingDeviceSettings;
-        private bool wantFullScreen;
-		
-		internal void OnDeviceDisposing (EventArgs e)
-		{
-			var h = DeviceDisposing;
-			if (h != null)
-				h (this, e);
-		}
+        public event EventHandler<EventArgs> DeviceResetting;
+        public event EventHandler<PreparingDeviceSettingsEventArgs> PreparingDeviceSettings;
+
+        internal void OnDeviceDisposing(EventArgs e)
+        {
+            var h = DeviceDisposing;
+            if (h != null)
+                h(this, e);
+        }
 
         internal void OnDeviceResetting(EventArgs e)
         {
@@ -137,6 +137,7 @@ namespace Microsoft.Xna.Framework
 
         #endregion
 
+
         #region IDisposable Members
 
         public void Dispose()
@@ -147,45 +148,28 @@ namespace Microsoft.Xna.Framework
 
         public void ApplyChanges()
         {
-            var wGameWindow = _game.Window as WindowsGameWindow;
+            _game.ResizeWindow(false);
+        }
 
-            if (IsFullScreen)
+        private void Initialize()
+        {
+            _graphicsDevice.PresentationParameters.IsFullScreen = false;
+
+            if (_preferMultiSampling)
             {
-                wGameWindow.OpenTkGameWindow.WindowBorder = WindowBorder.Hidden;
-                wGameWindow.OpenTkGameWindow.WindowState = OpenTK.WindowState.Fullscreen;
-                (_game.Window as WindowsGameWindow).OpenTkGameWindow.ClientSize = new Size(wGameWindow.OpenTkGameWindow.ClientRectangle.Width, wGameWindow.OpenTkGameWindow.ClientRectangle.Height);
+                _graphicsDevice.PreferedFilter = All.Linear;
             }
             else
             {
-                wGameWindow.OpenTkGameWindow.WindowState = OpenTK.WindowState.Normal;
-                wGameWindow.OpenTkGameWindow.WindowBorder =  _game.Window.AllowUserResizing ? WindowBorder.Resizable : WindowBorder.Fixed;
-                (_game.Window as WindowsGameWindow).OpenTkGameWindow.ClientSize = new Size(PreferredBackBufferWidth, PreferredBackBufferHeight);
+                _graphicsDevice.PreferedFilter = All.Nearest;
             }
-            
         }
 
-		private void Initialize()
-		{
-            _graphicsDevice.PresentationParameters.IsFullScreen = IsFullScreen;
-
-            if (_preferMultiSampling) 
-			{
-				_graphicsDevice.PreferedFilter = All.Linear;
-			}
-			else 
-			{
-				_graphicsDevice.PreferedFilter = All.Nearest;
-			}
-
-            ApplyChanges();
-           
-		}
-		
         public void ToggleFullScreen()
         {
-			IsFullScreen = !IsFullScreen;
+            IsFullScreen = !IsFullScreen;
         }
-		
+
         public Microsoft.Xna.Framework.Graphics.GraphicsDevice GraphicsDevice
         {
             get
@@ -198,21 +182,14 @@ namespace Microsoft.Xna.Framework
         {
             get
             {
-                if (_graphicsDevice != null)
-                {
-                    if (_graphicsDevice.PresentationParameters.IsFullScreen != wantFullScreen) _graphicsDevice.PresentationParameters.IsFullScreen = wantFullScreen;
-                    return _graphicsDevice.PresentationParameters.IsFullScreen;
-                }
-                else
-                    return wantFullScreen;
+                return _graphicsDevice.PresentationParameters.IsFullScreen;
             }
             set
             {
-                wantFullScreen = value;
-                if ( _graphicsDevice != null && IsFullScreen != value)
-                {
-                    _graphicsDevice.PresentationParameters.IsFullScreen = value;                    
-                }
+                bool changed = value != _graphicsDevice.PresentationParameters.IsFullScreen;
+                _graphicsDevice.PresentationParameters.IsFullScreen = value;
+
+                _game.ResizeWindow(changed);
             }
         }
 
@@ -224,17 +201,14 @@ namespace Microsoft.Xna.Framework
             }
             set
             {
-				_preferMultiSampling = value;
-                if (_graphicsDevice != null)
+                _preferMultiSampling = value;
+                if (_preferMultiSampling)
                 {
-                    if (_preferMultiSampling)
-                    {
-                        _graphicsDevice.PreferedFilter = All.Linear;
-                    }
-                    else
-                    {
-                        _graphicsDevice.PreferedFilter = All.Nearest;
-                    }
+                    _graphicsDevice.PreferedFilter = All.Linear;
+                }
+                else
+                {
+                    _graphicsDevice.PreferedFilter = All.Nearest;
                 }
             }
         }
@@ -258,8 +232,7 @@ namespace Microsoft.Xna.Framework
             }
             set
             {
-				_preferredBackBufferHeight = value;
-
+                _preferredBackBufferHeight = value;
             }
         }
 
@@ -271,7 +244,7 @@ namespace Microsoft.Xna.Framework
             }
             set
             {
-				_preferredBackBufferWidth = value;				
+                _preferredBackBufferWidth = value;
             }
         }
 
@@ -296,19 +269,18 @@ namespace Microsoft.Xna.Framework
             {
             }
         }
-		
-		public DisplayOrientation SupportedOrientations 
-		{ 
-			get
-			{
-				return _supportedOrientations;
-			}
-			set
-			{
-				_supportedOrientations = value;
-			}
-		}
+
+        public DisplayOrientation SupportedOrientations
+        {
+            get
+            {
+                return _supportedOrientations;
+            }
+            set
+            {
+                _supportedOrientations = value;
+            }
+        }
 
     }
 }
-

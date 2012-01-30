@@ -511,10 +511,10 @@ namespace Microsoft.Xna.Framework
             Initialize();
         }
 
-#if LINUX
+#if LINUX || WINDOWS
         internal void ResizeWindow(bool changed)
         {
-            ((LinuxGamePlatform)_platform).ResetWindowBounds(changed);
+            ((OpenTKGamePlatform)_platform).ResetWindowBounds(changed);
         }
 #endif
 

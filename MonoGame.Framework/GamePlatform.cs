@@ -85,7 +85,7 @@ namespace Microsoft.Xna.Framework
 #elif MONOMAC
             return new MacGamePlatform(game);
 #elif WINDOWS
-            return new WindowsGamePlatform(game);
+            return new OpenTKGamePlatform(game);
 #elif ANDROID
             return new AndroidGamePlatform(game);
 #elif LINUX

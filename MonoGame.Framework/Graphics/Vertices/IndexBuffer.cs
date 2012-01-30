@@ -6,6 +6,8 @@ using System.Runtime.InteropServices;
 
 #if MONOMAC
 using MonoMac.OpenGL;
+#elif WINDOWS || LINUX
+using OpenTK.Graphics.OpenGL;
 #else
 using OpenTK.Graphics.ES20;
 #endif
@@ -73,11 +75,11 @@ namespace Microsoft.Xna.Framework.Graphics
 			throw new NotSupportedException();
 		}
 		
-		public unsafe void SetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount) where T : struct
+		public void SetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount) where T : struct
         {
 			if (data == null) throw new ArgumentNullException("data");
 			
-			var elementSizeInByte = sizeof(T);
+			var elementSizeInByte = Marshal.SizeOf(typeof(T));
 			var sizeInBytes = elementSizeInByte * elementCount;
 			var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
 			var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startIndex * elementSizeInByte);
@@ -88,11 +90,11 @@ namespace Microsoft.Xna.Framework.Graphics
 			dataHandle.Free();
 		}
 		
-		public unsafe void SetData<T>(T[] data, int startIndex, int elementCount) where T : struct
+		public void SetData<T>(T[] data, int startIndex, int elementCount) where T : struct
         {
 			if (data == null) throw new ArgumentNullException("data");
-			
-			var elementSizeInByte = sizeof(T);
+
+            var elementSizeInByte = Marshal.SizeOf(typeof(T));
 			var sizeInBytes = elementSizeInByte * elementCount;
 			var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
 			var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startIndex * elementSizeInByte);
@@ -103,11 +105,11 @@ namespace Microsoft.Xna.Framework.Graphics
 			dataHandle.Free();
 		}
 		
-        public unsafe void SetData<T>(T[] data) where T : struct
+        public void SetData<T>(T[] data) where T : struct
         {
 			if (data == null) throw new ArgumentNullException("data");
-			
-			var elementSizeInByte = sizeof(T);
+
+            var elementSizeInByte = Marshal.SizeOf(typeof(T));
 			var sizeInBytes = elementSizeInByte * data.Length;
 			var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
 			var dataPtr = dataHandle.AddrOfPinnedObject();

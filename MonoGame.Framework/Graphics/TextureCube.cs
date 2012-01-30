@@ -3,6 +3,8 @@ using System.Runtime.InteropServices;
 
 #if MONOMAC
 using MonoMac.OpenGL;
+#elif WINDOWS || LINUX
+using OpenTK.Graphics.OpenGL;
 #else
 using OpenTK.Graphics.ES20;
 #endif
@@ -44,12 +46,12 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 		}
 		
-		public unsafe void SetData<T>(CubeMapFace face, int level, Rectangle? rect,
+		public void SetData<T>(CubeMapFace face, int level, Rectangle? rect,
 		                       T[] data, int startIndex, int elementCount) where T : struct
 		{
             if (data == null) throw new ArgumentNullException("data");
-			
-			var elementSizeInByte = sizeof(T);
+
+            var elementSizeInByte = Marshal.SizeOf(typeof(T));
 			var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
 			var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startIndex * elementSizeInByte);
 			
