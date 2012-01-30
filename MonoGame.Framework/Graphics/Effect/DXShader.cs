@@ -334,7 +334,7 @@ namespace Microsoft.Xna.Framework.Graphics
 							}
 						}
 						
-						Texture2D tex = null;
+						Texture tex = null;
 						if (samplerSymbol.HasValue) {
 							DXEffectObject.d3dx_sampler samplerState =
 								(DXEffectObject.d3dx_sampler)parameters[samplerSymbol.Value.name].data;
@@ -342,7 +342,7 @@ namespace Microsoft.Xna.Framework.Graphics
 								string textureName = samplerState.states[0].parameter.name;
 								EffectParameter textureParameter = parameters[textureName];
 								if (textureParameter != null) {
-									tex = (Texture2D)textureParameter.data;
+									tex = (Texture)textureParameter.data;
 								}
 							}
 						}
@@ -352,13 +352,12 @@ namespace Microsoft.Xna.Framework.Graphics
 								continue;
 							}
 							//are smapler indexes always normal texture indexes?
-							tex = (Texture2D)textures [sampler.index];
+							tex = (Texture)textures [sampler.index];
 						}
 
 						GL.ActiveTexture( (TextureUnit)((int)TextureUnit.Texture0 + sampler.index) );
-						
-						//just to tex.Apply() instead?
-						GL.BindTexture (TextureTarget.Texture2D, tex._textureId);
+
+						tex.Apply ();
 						
 						samplerStates[sampler.index].Activate();
 						

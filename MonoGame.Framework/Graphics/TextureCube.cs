@@ -11,7 +11,6 @@ namespace Microsoft.Xna.Framework.Graphics
 {
 	public class TextureCube : Texture
 	{
-		int textureId;
 		protected int size;
 		
 		PixelInternalFormat glInternalFormat;
@@ -79,6 +78,12 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			dataHandle.Free ();
 		}
+
+		internal override void Apply()
+		{
+			GL.BindTexture(TextureTarget.TextureCubeMap, _textureId);
+		}
+
 		
 		private TextureTarget GetGLCubeFace(CubeMapFace face) {
 			switch (face) {
@@ -91,7 +96,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 			throw new ArgumentException();
 		}
-		
+
 	}
 }
 

@@ -639,79 +639,27 @@ namespace Microsoft.Xna.Framework
 
         public static Matrix CreateLookAt(Vector3 cameraPosition, Vector3 cameraTarget, Vector3 cameraUpVector)
         {
-			
-            Matrix m = identity;
-		    float[] x = new float[3]; 
-			float[] y = new float[3]; 
-			float[] z = new float[3]; 
-		    float mag;
-		    
-		    // Make rotation matrix
-		    
-		    // Z vector
-		    z[0] = cameraPosition.X - cameraTarget.X;
-		    z[1] = cameraPosition.Y - cameraTarget.Y;
-		    z[2] = cameraPosition.Z - cameraTarget.Z;
-		    mag = (float)System.Math.Sqrt((z[0] * z[0] + z[1] * z[1] + z[2] * z[2]));
-		    if (mag > 0) {          // mpichler, 19950515
-		        z[0] /= mag;
-		        z[1] /= mag;
-		        z[2] /= mag;
-		    }
-		    
-		    // Y vector
-		    y[0] = cameraUpVector.X;
-		    y[1] = cameraUpVector.Y;
-		    y[2] = cameraUpVector.Z;
-		    
-		    // X vector = Y cross Z
-		    x[0] = y[1] * z[2] - y[2] * z[1];
-		    x[1] = -y[0] * z[2] + y[2] * z[0];
-		    x[2] = y[0] * z[1] - y[1] * z[0];
-		    
-		    // Recompute Y = Z cross X
-		    y[0] = z[1] * x[2] - z[2] * x[1];
-		    y[1] = -z[0] * x[2] + z[2] * x[0];
-		    y[2] = z[0] * x[1] - z[1] * x[0];
-		    
-		    // mpichler, 19950515
-		    // cross product gives area of parallelogram, which is < 1.0 for
-		    // non-perpendicular unit-length vectors; so normalize x, y here
-		    //
-		    
-		    mag = (float)System.Math.Sqrt(x[0] * x[0] + x[1] * x[1] + x[2] * x[2]);
-		    if (mag>0) {
-		        x[0] /= mag;
-		        x[1] /= mag;
-		        x[2] /= mag;
-		    }
-		    
-		    mag = (float)System.Math.Sqrt(y[0] * y[0] + y[1] * y[1] + y[2] * y[2]);
-		    if (mag>0) {
-		        y[0] /= mag;
-		        y[1] /= mag;
-		        y[2] /= mag;
-		    }
-		    
-		
-		    m.M11 = x[0];
-		    m.M12 = x[1];
-		    m.M13 = x[2];
-		    m.M14 = 0.0f;
-		    m.M21 = y[0];
-		    m.M22 = y[1];
-		    m.M23 = y[2];
-		    m.M24 = 0.0f;
-		    m.M31 = z[0];
-		    m.M32 = z[1];
-		    m.M33 = z[2];
-		    m.M34 = 0.0f;
-		    m.M41 = -1.0f * (x[0]*cameraPosition.X + x[1]*cameraPosition.Y + x[2]*cameraPosition.Z);
-		    m.M42 = -1.0f * (y[0]*cameraPosition.X + y[1]*cameraPosition.Y + y[2]*cameraPosition.Z);
-		    m.M43 = -1.0f * (z[0]*cameraPosition.X + z[1]*cameraPosition.Y + z[2]*cameraPosition.Z);
-		    m.M44 = 1.0f;
-			
-			return m;
+			Vector3 vector3_1 = Vector3.Normalize(cameraPosition - cameraTarget);
+			Vector3 vector3_2 = Vector3.Normalize(Vector3.Cross(cameraUpVector, vector3_1));
+			Vector3 vector1 = Vector3.Cross(vector3_1, vector3_2);
+			Matrix matrix;
+			matrix.M11 = vector3_2.X;
+			matrix.M12 = vector1.X;
+			matrix.M13 = vector3_1.X;
+			matrix.M14 = 0.0f;
+			matrix.M21 = vector3_2.Y;
+			matrix.M22 = vector1.Y;
+			matrix.M23 = vector3_1.Y;
+			matrix.M24 = 0.0f;
+			matrix.M31 = vector3_2.Z;
+			matrix.M32 = vector1.Z;
+			matrix.M33 = vector3_1.Z;
+			matrix.M34 = 0.0f;
+			matrix.M41 = -Vector3.Dot(vector3_2, cameraPosition);
+			matrix.M42 = -Vector3.Dot(vector1, cameraPosition);
+			matrix.M43 = -Vector3.Dot(vector3_1, cameraPosition);
+			matrix.M44 = 1f;
+			return matrix;
         }
 
         public static void CreateLookAt(ref Vector3 cameraPosition, ref Vector3 cameraTarget, ref Vector3 cameraUpVector, out Matrix result)

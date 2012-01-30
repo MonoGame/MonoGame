@@ -68,6 +68,10 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			get { return _levelCount; }
 		}
+
+		internal virtual void Apply()
+		{
+		}
 		
 	}
 }
