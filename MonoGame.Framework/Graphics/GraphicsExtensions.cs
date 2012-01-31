@@ -62,7 +62,7 @@ namespace Microsoft.Xna.Framework.Graphics
             switch (elementFormat)
             {
                 case VertexElementFormat.Single:
-                    throw new NotImplementedException();
+                    return 1;
 
                 case VertexElementFormat.Vector2:
                     return 2;
@@ -106,7 +106,7 @@ namespace Microsoft.Xna.Framework.Graphics
             switch (elementFormat)
             {
                 case VertexElementFormat.Single:
-                    throw new NotImplementedException();
+                    return VertexPointerType.Float;
 
                 case VertexElementFormat.Vector2:
                     return VertexPointerType.Float;
@@ -150,7 +150,7 @@ namespace Microsoft.Xna.Framework.Graphics
             switch (elementFormat)
             {
                 case VertexElementFormat.Single:
-                    throw new NotImplementedException();
+                    return VertexAttribPointerType.Float;
 
                 case VertexElementFormat.Vector2:
                     return VertexAttribPointerType.Float;
@@ -195,7 +195,7 @@ namespace Microsoft.Xna.Framework.Graphics
             switch (elementFormat)
             {
                 case VertexElementFormat.Single:
-                    throw new NotImplementedException();
+                    return ColorPointerType.Float;
 
                 case VertexElementFormat.Vector2:
                     return ColorPointerType.Float;
@@ -242,7 +242,7 @@ namespace Microsoft.Xna.Framework.Graphics
             switch (elementFormat)
             {
                 case VertexElementFormat.Single:
-                    throw new NotImplementedException();
+                    return NormalPointerType.Float;
 
                 case VertexElementFormat.Vector2:
                     return NormalPointerType.Float;
@@ -288,7 +288,7 @@ namespace Microsoft.Xna.Framework.Graphics
             switch (elementFormat)
             {
                 case VertexElementFormat.Single:
-                    throw new NotImplementedException();
+                    return TexCoordPointerType.Float;
 
                 case VertexElementFormat.Vector2:
                     return TexCoordPointerType.Float;
