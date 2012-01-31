@@ -49,6 +49,8 @@ using OpenTK.Graphics.OpenGL;
 using OpenTK.Graphics.ES11;
  #else
 using OpenTK.Graphics.ES20;
+using RenderbufferTarget = OpenTK.Graphics.ES20.All;
+using RenderbufferStorage = OpenTK.Graphics.ES20.All;
  #endif
 #endif
 
@@ -56,6 +58,25 @@ namespace Microsoft.Xna.Framework.Graphics
 {
 	public class RenderTarget2D : Texture2D
 	{
+#if IPHONE && ES11
+		const RenderbufferTarget GLRenderbuffer = RenderbufferTarget.RenderbufferOes;
+		const RenderbufferStorage GLDepthComponent16 = RenderbufferStorage.DepthComponent16Oes;
+		const RenderbufferStorage GLDepthComponent24 = RenderbufferStorage.DepthComponent24Oes;
+		const RenderbufferStorage GLDepth24Stencil8 = RenderbufferStorage.Depth24Stencil8Oes;
+#elif IPHONE
+		const RenderbufferTarget GLRenderbuffer = RenderbufferTarget.Renderbuffer;
+		const RenderbufferStorage GLDepthComponent16 = RenderbufferStorage.DepthComponent16;
+		const RenderbufferStorage GLDepthComponent24 = RenderbufferStorage.DepthComponent24Oes;
+		const RenderbufferStorage GLDepth24Stencil8 = RenderbufferStorage.Depth24Stencil8Oes;
+#else
+		const RenderbufferTarget GLRenderbuffer = RenderbufferTarget.RenderbufferExt;
+		const RenderbufferStorage GLDepthComponent16 = RenderbufferStorage.DepthComponent16;
+		const RenderbufferStorage GLDepthComponent24 = RenderbufferStorage.DepthComponent24;
+		const RenderbufferStorage GLDepth24Stencil8 = RenderbufferStorage.Depth24Stencil8;
+#endif
+
+
+		
 		internal uint glDepthStencilBuffer;
 		
 		public DepthFormat DepthStencilFormat { get; private set; }
@@ -79,14 +100,14 @@ namespace Microsoft.Xna.Framework.Graphics
 				GL.GenRenderbuffers(1, out glDepthStencilBuffer);
 #endif
 				GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, this.glDepthStencilBuffer);
-				var glDepthStencilFormat = RenderbufferStorage.DepthComponent16;
+				var glDepthStencilFormat = GLDepthComponent16;
 				switch (preferredDepthFormat)
 				{
-				case DepthFormat.Depth16 : glDepthStencilFormat = RenderbufferStorage.DepthComponent16; break;
-				case DepthFormat.Depth24 : glDepthStencilFormat = RenderbufferStorage.DepthComponent24; break;
-				case DepthFormat.Depth24Stencil8: glDepthStencilFormat = RenderbufferStorage.Depth24Stencil8; break;
+				case DepthFormat.Depth16 : glDepthStencilFormat = GLDepthComponent16; break;
+				case DepthFormat.Depth24 : glDepthStencilFormat = GLDepthComponent24; break;
+				case DepthFormat.Depth24Stencil8: glDepthStencilFormat = GLDepth24Stencil8; break;
 				}
-				GL.RenderbufferStorage(RenderbufferTarget.Renderbuffer, glDepthStencilFormat, this._width, this._height);
+				GL.RenderbufferStorage(GLRenderbuffer, glDepthStencilFormat, this._width, this._height);
 			}
 		}
 		

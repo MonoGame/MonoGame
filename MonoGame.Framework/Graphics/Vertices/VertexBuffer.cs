@@ -43,7 +43,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			//GLExt.Oes.GenVertexArrays(1, out this.vao);
 			//GLExt.Oes.BindVertexArray(this.vao);
+#if IPHONE
+			GL.GenBuffers(1, ref this.vbo);
+#else
 			GL.GenBuffers(1, out this.vbo);
+#endif
 			GL.BindBuffer(BufferTarget.ArrayBuffer, this.vbo);
             GL.BufferData(BufferTarget.ArrayBuffer,
 			              (IntPtr)(vertexDeclaration.VertexStride * vertexCount), IntPtr.Zero,

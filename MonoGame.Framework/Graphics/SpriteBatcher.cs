@@ -65,6 +65,7 @@ using VertexAttribPointerType = OpenTK.Graphics.ES20.All;
 using TextureUnit = OpenTK.Graphics.ES20.All;
 using TextureTarget = OpenTK.Graphics.ES20.All;
 using DrawElementsType = OpenTK.Graphics.ES20.All;
+using BufferTarget = OpenTK.Graphics.ES20.All;
 #endif
 #endif
 

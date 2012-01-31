@@ -72,9 +72,16 @@ using RenderbufferStorage = OpenTK.Graphics.ES11.All;
 using OpenTK.Graphics.ES20;
 #if IPHONE
 using EnableCap = OpenTK.Graphics.ES20.All;
+using TextureTarget = OpenTK.Graphics.ES20.All;
 using BufferTarget = OpenTK.Graphics.ES20.All;
 using BufferUsageHint = OpenTK.Graphics.ES20.All;
 using DrawElementsType = OpenTK.Graphics.ES20.All;
+using GetPName = OpenTK.Graphics.ES20.All;
+using FramebufferErrorCode = OpenTK.Graphics.ES20.All;
+using FramebufferTarget = OpenTK.Graphics.ES20.All;
+using FramebufferAttachment = OpenTK.Graphics.ES20.All;
+using RenderbufferTarget = OpenTK.Graphics.ES20.All;
+using RenderbufferStorage = OpenTK.Graphics.ES20.All;
 #else
 using BufferUsageHint = OpenTK.Graphics.ES20.BufferUsage;
 #endif
@@ -129,7 +136,17 @@ namespace Microsoft.Xna.Framework.Graphics
 		const RenderbufferStorage GLDepthComponent24 = RenderbufferStorage.DepthComponent24Oes;
 		const RenderbufferStorage GLDepth24Stencil8 = RenderbufferStorage.Depth24Stencil8Oes;
 		const FramebufferErrorCode GLFramebufferComplete = FramebufferErrorCode.FramebufferCompleteOes;
-		
+#elif IPHONE
+		const FramebufferTarget GLFramebuffer = FramebufferTarget.Framebuffer;
+		const RenderbufferTarget GLRenderbuffer = RenderbufferTarget.Renderbuffer;
+		const FramebufferAttachment GLDepthAttachment = FramebufferAttachment.DepthAttachment;
+		const FramebufferAttachment GLStencilAttachment = FramebufferAttachment.StencilAttachment;
+		const FramebufferAttachment GLColorAttachment0 = FramebufferAttachment.ColorAttachment0;
+		const GetPName GLFramebufferBinding = GetPName.FramebufferBinding;
+		const RenderbufferStorage GLDepthComponent16 = RenderbufferStorage.DepthComponent16;
+		const RenderbufferStorage GLDepthComponent24 = RenderbufferStorage.DepthComponent24Oes;
+		const RenderbufferStorage GLDepth24Stencil8 = RenderbufferStorage.Depth24Stencil8Oes;
+		const FramebufferErrorCode GLFramebufferComplete = FramebufferErrorCode.FramebufferComplete;
 #else
 		const FramebufferTarget GLFramebuffer = FramebufferTarget.FramebufferExt;
 		const RenderbufferTarget GLRenderbuffer = RenderbufferTarget.RenderbufferExt;
@@ -150,7 +167,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		//public event EventHandler<ResourceCreatedEventArgs> ResourceCreated;
 		//public event EventHandler<ResourceDestroyedEventArgs> ResourceDestroyed;
 
-        private int glFramebuffer;
+        internal int glFramebuffer;
 
 		public RasterizerState RasterizerState {
 			get {

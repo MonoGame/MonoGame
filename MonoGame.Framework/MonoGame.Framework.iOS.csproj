@@ -335,7 +335,6 @@
     <Compile Include="Net\NetworkMessageType.cs" />
     <Compile Include="iOS\GamerServices\SignedInGamer.cs" />
     <Compile Include="iOS\Graphics\ESImage.cs" />
-    <Compile Include="iOS\Graphics\PresentationParameters.cs" />
     <Compile Include="iOS\Graphics\Texture2D.cs" />
     <Compile Include="iOS\Input\GamePad.cs" />
     <Compile Include="iOS\IOSGameWindow.cs" />
@@ -384,8 +383,6 @@
       <Link>iOS\Audio\SoundEffectInstance.cs</Link>
     </Compile>
     <Compile Include="Graphics\Effect\AlphaTestEffect.cs" />
-    <Compile Include="Graphics\Effect\AlphaTestEffectCode.cs" />
-    <Compile Include="Graphics\Effect\BasicEffectCode.cs" />
     <Compile Include="Graphics\Effect\DXEffectObject.cs" />
     <Compile Include="Graphics\Effect\DXExpression.cs" />
     <Compile Include="Graphics\Effect\DXHelper.cs" />
@@ -397,7 +394,6 @@
     <Compile Include="Graphics\Effect\GLSLOptimizer.cs" />
     <Compile Include="Graphics\Effect\MojoShader.cs" />
     <Compile Include="Graphics\Effect\SpriteEffect.cs" />
-    <Compile Include="Graphics\Effect\SpriteEffectCode.cs" />
     <Compile Include="Graphics\GraphicsAdapter.cs" />
     <Compile Include="Audio\AudioCategory.cs" />
     <Compile Include="Graphics\ESTexture2D.cs" />
@@ -405,6 +401,32 @@
     <Compile Include="LaunchParameters.cs" />
     <Compile Include="Content\ContentReaders\EffectReader.cs" />
     <Compile Include="Graphics\States\SamplerState.cs" />
+    <Compile Include="Graphics\Effect\DualTextureEffect.cs" />
+    <Compile Include="Graphics\Effect\EnvironmentMapEffect.cs" />
+    <Compile Include="Graphics\Effect\SkinnedEffect.cs" />
+    <Compile Include="Graphics\PresentationParameters.cs" />
+    <Compile Include="Graphics\TextureCube.cs" />
+    <Compile Include="Graphics\Model.cs" />
+    <Compile Include="Graphics\ModelBone.cs" />
+    <Compile Include="Graphics\ModelBoneCollection.cs" />
+    <Compile Include="Graphics\ModelEffectCollection.cs" />
+    <Compile Include="Graphics\ModelMesh.cs" />
+    <Compile Include="Graphics\ModelMeshCollection.cs" />
+    <Compile Include="Graphics\ModelMeshPart.cs" />
+    <Compile Include="Graphics\ModelMeshPartCollection.cs" />
+    <Compile Include="Graphics\CubeMapFace.cs" />
+    <Compile Include="Content\ContentReaders\BasicEffectReader.cs" />
+    <Compile Include="Content\ContentReaders\BoundingBoxReader.cs" />
+    <Compile Include="Content\ContentReaders\DualTextureEffectReader.cs" />
+    <Compile Include="Content\ContentReaders\EnvironmentMapEffectReader.cs" />
+    <Compile Include="Content\ContentReaders\IndexBufferReader.cs" />
+    <Compile Include="Content\ContentReaders\MatrixReader.cs" />
+    <Compile Include="Content\ContentReaders\ModelReader.cs" />
+    <Compile Include="Content\ContentReaders\SkinnedEffectReader.cs" />
+    <Compile Include="Content\ContentReaders\TextureCubeReader.cs" />
+    <Compile Include="Content\ContentReaders\TextureReader.cs" />
+    <Compile Include="Content\ContentReaders\VertexBufferReader.cs" />
+    <Compile Include="Content\ContentReaders\VertexDeclarationReader.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
@@ -432,5 +454,13 @@
       <Project>{734EAA48-F1CA-481A-B391-0285BC0E8B40}</Project>
       <Name>Lidgren.Network.iOS</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Graphics\Effect\AlphaTestEffect.bin" />
+    <EmbeddedResource Include="Graphics\Effect\BasicEffect.bin" />
+    <EmbeddedResource Include="Graphics\Effect\DualTextureEffect.bin" />
+    <EmbeddedResource Include="Graphics\Effect\EnvironmentMapEffect.bin" />
+    <EmbeddedResource Include="Graphics\Effect\SkinnedEffect.bin" />
+    <EmbeddedResource Include="Graphics\Effect\SpriteEffect.bin" />
   </ItemGroup>
 </Project>

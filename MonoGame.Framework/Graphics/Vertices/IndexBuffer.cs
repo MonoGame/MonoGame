@@ -10,6 +10,8 @@ using MonoMac.OpenGL;
 using OpenTK.Graphics.OpenGL;
 #else
 using OpenTK.Graphics.ES20;
+using BufferTarget = OpenTK.Graphics.ES20.All;
+using BufferUsageHint = OpenTK.Graphics.ES20.All;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -36,8 +38,12 @@ namespace Microsoft.Xna.Framework.Graphics
             this.BufferUsage = bufferUsage;
 			
 			var sizeInBytes = indexCount * (this.IndexElementSize == IndexElementSize.SixteenBits ? 2 : 4);
-
+			
+#if IPHONE
+			GL.GenBuffers(1, ref ibo);
+#else
             GL.GenBuffers(1, out ibo);
+#endif
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, ibo);
             GL.BufferData(BufferTarget.ElementArrayBuffer,
 			              (IntPtr)sizeInBytes, IntPtr.Zero, dynamic ? BufferUsageHint.StreamDraw : BufferUsageHint.StaticDraw);

@@ -9,10 +9,10 @@ using MonoMac.OpenGL;
 using OpenTK.Graphics.OpenGL;
 #else
 
-#if ES11
+ #if ES11
 using OpenTK.Graphics.ES11;
 
-#if IPHONE
+  #if IPHONE
 using EnableCap = OpenTK.Graphics.ES11.All;
 using FrontFaceDirection = OpenTK.Graphics.ES11.All;
 using CullFaceMode = OpenTK.Graphics.ES11.All;
@@ -24,12 +24,12 @@ using ArrayCap = OpenTK.Graphics.ES11.All;
 using MatrixMode = OpenTK.Graphics.ES11.All;
 using BlendEquationMode = OpenTK.Graphics.ES11.All;
 
-#endif
+  #endif
 
-#else
+ #else
 using OpenTK.Graphics.ES20;
 
-#if IPHONE
+  #if IPHONE
 using EnableCap = OpenTK.Graphics.ES20.All;
 using FrontFaceDirection = OpenTK.Graphics.ES20.All;
 using BlendEquationMode = OpenTK.Graphics.ES20.All;
@@ -38,7 +38,8 @@ using StencilFunction = OpenTK.Graphics.ES20.All;
 using StencilOp = OpenTK.Graphics.ES20.All;
 using BlendingFactorSrc = OpenTK.Graphics.ES20.All;
 using BlendingFactorDest = OpenTK.Graphics.ES20.All;
-#endif
+using DepthFunction = OpenTK.Graphics.ES20.All;
+  #endif
 #endif
 
 #endif

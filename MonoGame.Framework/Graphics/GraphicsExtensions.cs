@@ -8,32 +8,35 @@ using MonoMac.OpenGL;
 #elif WINDOWS
 using OpenTK.Graphics.OpenGL;
 #else
-#if ES11
+ #if ES11
 using OpenTK.Graphics.ES11;
-#if IPHONE
+  #if IPHONE
 using BlendEquationMode = OpenTK.Graphics.ES11.All;
 using BlendingFactorSrc = OpenTK.Graphics.ES11.All;
 using BlendingFactorDest = OpenTK.Graphics.ES11.All;
 using VertexAttribPointerType = OpenTK.Graphics.ES11.All;
-#endif
+  #endif
 using VertexPointerType = OpenTK.Graphics.ES11.All;
 using ColorPointerType = OpenTK.Graphics.ES11.All;
 using NormalPointerType = OpenTK.Graphics.ES11.All;
 using TexCoordPointerType = OpenTK.Graphics.ES11.All;
 
-#else
+ #else
 using OpenTK.Graphics.ES20;
-#if IPHONE
+  #if IPHONE
 using BlendEquationMode = OpenTK.Graphics.ES20.All;
 using BlendingFactorSrc = OpenTK.Graphics.ES20.All;
 using BlendingFactorDest = OpenTK.Graphics.ES20.All;
 using VertexAttribPointerType = OpenTK.Graphics.ES20.All;
-#endif
+using PixelInternalFormat = OpenTK.Graphics.ES20.All;
+using PixelType = OpenTK.Graphics.ES20.All;
+using PixelFormat = OpenTK.Graphics.ES20.All;
+  #endif
 using VertexPointerType = OpenTK.Graphics.ES20.All;
 using ColorPointerType = OpenTK.Graphics.ES20.All;
 using NormalPointerType = OpenTK.Graphics.ES20.All;
 using TexCoordPointerType = OpenTK.Graphics.ES20.All;
-#endif
+ #endif
 
 #endif
 
@@ -550,6 +553,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				glFormat = PixelFormat.Luminance;
 				glType = PixelType.UnsignedByte;
 				break;
+#if !IPHONE
 			case SurfaceFormat.Dxt1:
 				glInternalFormat = PixelInternalFormat.CompressedRgbaS3tcDxt1Ext;
 				glFormat = (PixelFormat)All.CompressedTextureFormats;
@@ -562,6 +566,8 @@ namespace Microsoft.Xna.Framework.Graphics
 				glInternalFormat = PixelInternalFormat.CompressedRgbaS3tcDxt5Ext;
 				glFormat = (PixelFormat)All.CompressedTextureFormats;
 				break;
+#endif
+				
 #if IPHONE
 			case SurfaceFormat.RgbPvrtc2Bpp:
 				glInternalFormat = PixelInternalFormat.CompressedRgbPvrtc2Bppv1Img;

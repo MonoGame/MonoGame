@@ -97,12 +97,17 @@ namespace Microsoft.Xna.Framework.Input
 			get {
 				return _x;
 			}
-
+			internal set {
+				_x = value;
+			}
 		}
 
 		public int Y {
 			get {
 				return _y;
+			}
+			internal set {
+				_y = value;
 			}
 		}
 
