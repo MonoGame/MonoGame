@@ -107,28 +107,31 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 		}
 		
-		public Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipMap, SurfaceFormat format)
-		{
-			this.graphicsDevice = graphicsDevice;
-			
-			// This is needed in OpenGL ES 1.1 as it only supports power of 2 textures
+		  public Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipMap, SurfaceFormat format)
+        {
+            this.graphicsDevice = graphicsDevice;
+
+            // This is needed in OpenGL ES 1.1 as it only supports power of 2 textures
             int xTexSize = 1;
             int yTexSize = 1;
-            while (width > xTexSize && height > yTexSize)
+            while (width > xTexSize)
             {
                 if (width > xTexSize) xTexSize *= 2;
+            }
+
+            while (height > yTexSize)
+            {
                 if (height > yTexSize) yTexSize *= 2;
             }
 
             this._width = xTexSize;
             this._height = yTexSize;
-			
-			this._format = format;
-			this._mipmap = mipMap;
-			
-			generateOpenGLTexture();
-		}
-		
+
+            this._format = format;
+            this._mipmap = mipMap;
+
+            generateOpenGLTexture();
+        }		
 		private void generateOpenGLTexture() 
 		{
 			// modeled after this
