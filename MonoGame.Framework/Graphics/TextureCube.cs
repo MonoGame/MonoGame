@@ -46,7 +46,11 @@ namespace Microsoft.Xna.Framework.Graphics
 				if (glFormat == (PixelFormat)All.CompressedTextureFormats) {
 					throw new NotImplementedException();
 				} else {
+#if IPHONE
 					GL.TexImage2D (target, 0, (int)glInternalFormat, size, size, 0, glFormat, glType, IntPtr.Zero);
+#else
+					GL.TexImage2D (target, 0, glInternalFormat, size, size, 0, glFormat, glType, IntPtr.Zero);
+#endif
 				}
 				
 				if (mipMap)
@@ -90,15 +94,14 @@ namespace Microsoft.Xna.Framework.Graphics
 			if (glFormat == (PixelFormat)All.CompressedTextureFormats) {
 				throw new NotImplementedException();
 			} else {
-				GL.TexSubImage2D(target, level, xOffset, yOffset, width, height, glFormat, glType, data);
+				GL.TexSubImage2D(target, level, xOffset, yOffset, width, height, glFormat, glType, dataPtr);
 			}
 			
 			dataHandle.Free ();
 		}
-
-		internal override void Apply()
-		{
-			GL.BindTexture(TextureTarget.TextureCubeMap, _textureId);
+		
+		internal override TextureTarget GLTarget {
+			get { return TextureTarget.TextureCubeMap; }
 		}
 
 		

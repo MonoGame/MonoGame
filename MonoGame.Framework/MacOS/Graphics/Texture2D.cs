@@ -284,11 +284,6 @@ namespace Microsoft.Xna.Framework.Graphics
 		internal void Reload(Stream textureStream)
 		{
 		}
-
-		internal override void Apply ()
-		{
-			GL.BindTexture (TextureTarget.Texture2D, (uint)_textureId);
-		}
 		
 		private void Apply (byte[] textureData)
 		{
@@ -305,6 +300,10 @@ namespace Microsoft.Xna.Framework.Graphics
 			}			
 
 			GL.TexImage2D (TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, _width, _height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, textureData);
+		}
+		
+		internal override TextureTarget GLTarget {
+			get { return TextureTarget.Texture2D; }
 		}
 		
 		private void SetPixel (int x, int y, byte red, byte green, byte blue, byte alpha)

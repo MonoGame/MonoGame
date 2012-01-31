@@ -359,7 +359,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 						tex.Apply ();
 						
-						samplerStates[sampler.index].Activate();
+						samplerStates[sampler.index].Activate(tex.GLTarget);
 						
 					}
 	

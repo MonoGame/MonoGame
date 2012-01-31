@@ -214,8 +214,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			int startIndex = 0;
 			int index = 0;
 			int texID = -1;
-            // store last tint color
-			Color lastTint =  new Color(0.0f,0.0f,0.0f,0.0f);
 
 			// make sure the vertexArray has enough space
 			if ( _batchItemList.Count*4 > _vertexArray.Length )
@@ -223,18 +221,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			foreach ( SpriteBatchItem item in _batchItemList )
 			{
-#if !ES11
-				//Tint Color
-				Vector4 vtint = item.Tint.ToVector4();
-				//vtint /= 255;
-				//GL20.VertexAttrib4(attributeTint, vtint.X, vtint.Y, vtint.Z, vtint.W);
-#endif
-
 				// if the texture changed, we need to flush and bind the new texture
 				bool shouldFlush = item.TextureID != texID;
-#if !ES11
-					shouldFlush = shouldFlush || item.Tint != lastTint;
-#endif
 				if ( shouldFlush )
 				{
 					FlushVertexArray( startIndex, index );
@@ -245,13 +233,7 @@ namespace Microsoft.Xna.Framework.Graphics
 					GL.ActiveTexture(TextureUnit.Texture0);
 					GL.BindTexture ( TextureTarget.Texture2D, texID );
 
-					samplerState.Activate();
-#if !ES11
-					lastTint = item.Tint;
-					//QQQ
-					//GL20.Uniform1(texID, 0);
-					//GL20.VertexAttrib4(attributeTint,vtint.X, vtint.Y, vtint.Z, vtint.W);
-#endif
+					samplerState.Activate(TextureTarget.Texture2D);
 				}
 				// store the SpriteBatchItem data in our vertexArray
 				_vertexArray[index++] = item.vertexTL;

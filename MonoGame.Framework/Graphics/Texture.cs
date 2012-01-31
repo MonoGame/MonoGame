@@ -71,6 +71,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		internal virtual void Apply()
 		{
+			GL.BindTexture(GLTarget, _textureId);
+		}
+		
+		internal virtual TextureTarget GLTarget
+		{
+			get { throw new NotImplementedException(); }
 		}
 		
 	}
