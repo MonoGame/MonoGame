@@ -42,6 +42,9 @@ using System;
 
 namespace Microsoft.Xna.Framework
 {
+// HACK: Just getting this to compile on MacOS again.  MonoMac doesn't have an
+//       OpenTK namespace, so this will need to be aliased.
+#if !MONOMAC
 	internal static class XnaToOpenTK
 	{
 		
@@ -53,6 +56,6 @@ namespace Microsoft.Xna.Framework
 			                          m.M41, m.M42, m.M43, m.M44);
 		}
 	}
-	
+#endif
 }
 
