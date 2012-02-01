@@ -389,10 +389,4 @@
     <Folder Include="MacOS\GamerServices\" />
     <Folder Include="MacOS\Storage\" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.MacOS.csproj">
-      <Project>{AE483C29-042E-4226-BA52-D247CE7676DA}</Project>
-      <Name>Lidgren.Network.MacOS</Name>
-    </ProjectReference>
-  </ItemGroup>
 </Project>
