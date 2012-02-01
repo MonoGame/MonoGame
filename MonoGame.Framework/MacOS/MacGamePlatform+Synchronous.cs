@@ -72,106 +72,64 @@ using System.Runtime.InteropServices;
 using MonoMac.AppKit;
 using MonoMac.Foundation;
 
-namespace Microsoft.Xna.Framework
-{
-    partial class MacGamePlatform
-    {
-        public override void RunLoop()
-        {
-            var application = NSApplication.SharedApplication;
+namespace Microsoft.Xna.Framework {
+	partial class MacGamePlatform {
+		public override void RunLoop ()
+		{
+			var application = NSApplication.SharedApplication;
 
-            using (var appDelegate = new SynchronousApplicationDelegate())
-            using (var windowDelegate = new SynchronousWindowDelegate(this))
-            {
-                var savedAppDelegate = application.Delegate;
-                var savedWindowDelegate = _mainWindow.Delegate;
+			using (var appDelegate = new SynchronousApplicationDelegate ())
+			using (var windowDelegate = new SynchronousWindowDelegate (this)) {
+				var savedAppDelegate = application.Delegate;
+				var savedWindowDelegate = _mainWindow.Delegate;
 
-                application.Delegate = appDelegate;
-                _mainWindow.Delegate = windowDelegate;
+				application.Delegate = appDelegate;
+				_mainWindow.Delegate = windowDelegate;
 
-                try
-                {
-                    // We can't use NSApplicationDelegate.DidFinishLaunching as
-                    // is normal, since multiple separate Game instances may be
-                    // created serially and only the first one will be able to
-                    // react to DidFinishLaunching (which is sent only once).
-                    // So, instead invoke asynchronously on the main thread.
-                    application.BeginInvokeOnMainThread(() => StartRunLoop());
-                    application.Run();
-                }
-                finally
-                {
-                    application.Delegate = savedAppDelegate;
-                    _mainWindow.Delegate = savedWindowDelegate;
-                }
-            }
-        }
+				try {
+					StartRunLoop ();
+					application.Run ();
+				} finally {
+					application.Delegate = savedAppDelegate;
+					_mainWindow.Delegate = savedWindowDelegate;
+				}
+			}
+		}
 
-        private class SynchronousApplicationDelegate : NSApplicationDelegate
-        {
-            public override bool ApplicationShouldTerminateAfterLastWindowClosed(NSApplication sender)
-            {
-                return false;
-            }
-        }
+		private class SynchronousApplicationDelegate : NSApplicationDelegate {
+			public override bool ApplicationShouldTerminateAfterLastWindowClosed (NSApplication sender)
+			{
+				return false;
+			}
+		}
 
-        private class SynchronousWindowDelegate : MainWindowDelegate
-        {
-            public SynchronousWindowDelegate(MacGamePlatform owner)
-                : base(owner)
-            { }
+		private class SynchronousWindowDelegate : MainWindowDelegate {
+			public SynchronousWindowDelegate (MacGamePlatform owner)
+				: base(owner)
+			{
+			}
 
-            public override void WillClose(NSNotification notification)
-            {
-                base.WillClose(notification);
+			public override void WillClose (NSNotification notification)
+			{
+				base.WillClose (notification);
 
-                var application = NSApplication.SharedApplication;
-                // Invoke asynchronously on the main thread (even though that's
-                // almost certainly the current thread) to give final events a
-                // chance to be processed before we stop the application loop.
-                application.BeginInvokeOnMainThread(() =>
-                {
-                    // HACK: For reasons not yet understood, the event loop gets
-                    //       starved when stopping in Synchronous mode, so that
-                    //       NSApplication.Stop does not cause NSApplication.Run
-                    //       to return at once.  An event is needed before this
-                    //       will happen.
-                    //
-                    //       So, here we send a key down, then key up for
-                    //       whatever key happens to be represented by 0.  This
-                    //       un-hangs NSApplication.Run and allows it to return,
-                    //       but it's not the most beautiful thing in the world.
-                    var evtDown = NativeMethods.CGEventCreateKeyboardEvent(IntPtr.Zero, 0, true);
-                    NativeMethods.CGEventPost(NativeMethods.kCGHIDEventTap, evtDown);
-                    NativeMethods.CFRelease(evtDown);
-
-                    var evtUp = NativeMethods.CGEventCreateKeyboardEvent(IntPtr.Zero, 0, false);
-                    NativeMethods.CGEventPost(NativeMethods.kCGHIDEventTap, evtUp);
-                    NativeMethods.CFRelease(evtUp);
-
-                    application.Stop(this);
-                });
-            }
-        }
-
-        private static class NativeMethods
-        {
-            public const int kCGHIDEventTap = 0;
-
-            private const string ApplicationServicesLibrary =
-                "/System/Library/Frameworks/ApplicationServices.framework/Versions/A/ApplicationServices";
-
-            [DllImport(ApplicationServicesLibrary, CharSet=CharSet.Unicode)]
-            public extern static IntPtr CGEventCreateKeyboardEvent(
-                IntPtr source,
-                int virtualKey,
-                bool keyDown);
-
-            [DllImport(ApplicationServicesLibrary, CharSet=CharSet.Unicode)]
-            public extern static void CGEventPost(int tap, IntPtr source);
-
-            [DllImport(MonoMac.Constants.CoreFoundationLibrary, CharSet=CharSet.Unicode)]
-            public extern static void CFRelease(IntPtr cf);
-        }
-    }
+				var application = NSApplication.SharedApplication;
+				application.Stop (application);
+				// NSApplication.Stop merely signals the run
+				// loop to stop after the next processed event.
+				// For an immediate stop, we send a do-nothing
+				// event to ensure that there is at least one
+				// event in the queue.
+				application.PostEvent (NSEvent.OtherEvent (
+					NSEventType.ApplicationDefined,
+					System.Drawing.PointF.Empty,
+					(NSEventModifierMask)0,
+					0, 0,
+					// HACK: Graphics context should be
+					//       null, but MonoMac throws.
+					new NSGraphicsContext (),
+					0, 0, 0), true);
+			}
+		}
+	}
 }
