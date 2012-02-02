@@ -53,6 +53,7 @@ using GL_Oes = OpenTK.Graphics.ES11.GL.Oes;
 #else
 using OpenTK.Graphics.ES20;
 using GL_Oes = OpenTK.Graphics.ES20.GL;
+using TextureTarget = OpenTK.Graphics.ES20.All;
 #endif
 
 using Microsoft.Xna.Framework.Content;
@@ -587,34 +588,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 		
-		internal void Apply()
-        {
-            if (texture == null) return;
-
-            GL.BindTexture(All.Texture2D, (uint)_textureId);
-            if (_mipmap)
-            {
-                // Taken from http://www.flexicoder.com/blog/index.php/2009/11/iphone-mipmaps/
-                GL.TexParameter(All.Texture2D, All.TextureMinFilter,
-                                (int)All.LinearMipmapNearest);
-                GL.TexParameter(All.Texture2D, All.TextureMagFilter, (int)All.Linear);
-#if ES11
-                GL.TexParameter(All.Texture2D, All.GenerateMipmap, (int)All.True);
-#else
-				GL.TexParameter(All.Texture2D, All.GenerateMipmapHint, (int)All.True);
-#endif
-            }
-            else
-            {
-                GL.TexParameter(All.Texture2D, All.TextureMinFilter, (int)All.Linear);
-                GL.TexParameter(All.Texture2D, All.TextureMagFilter, (int)All.Linear);
-            }
-
-            GL.TexParameter(All.Texture2D, All.TextureWrapS,
-                            (float)TextureWrapMode.Repeat);
-            GL.TexParameter(All.Texture2D, All.TextureWrapT,
-                            (float)TextureWrapMode.Repeat);
-        }
+		internal override TextureTarget GLTarget {
+			get { return TextureTarget.Texture2D; }
+		}
 	}
 }
 

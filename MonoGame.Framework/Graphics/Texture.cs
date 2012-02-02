@@ -49,6 +49,9 @@ using OpenTK.Graphics.OpenGL;
 using OpenTK.Graphics.ES11;
  #else
 using OpenTK.Graphics.ES20;
+  #if IPHONE
+using TextureTarget = OpenTK.Graphics.ES20.All;
+  #endif
  #endif
 #endif
 
