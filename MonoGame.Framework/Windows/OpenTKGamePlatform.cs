@@ -72,6 +72,7 @@ using System.Linq;
 using System.Text;
 
 using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Microsoft.Xna.Framework
 {
@@ -163,6 +164,18 @@ namespace Microsoft.Xna.Framework
             {
                 bounds.Width = graphicsDeviceManager.PreferredBackBufferWidth;
                 bounds.Height = graphicsDeviceManager.PreferredBackBufferHeight;
+            }
+
+            // Now we set our Presentation Parameters
+            var device = (GraphicsDevice)graphicsDeviceManager.GraphicsDevice;
+            // FIXME: Eliminate the need for null checks by only calling
+            //        ResetWindowBounds after the device is ready.  Or,
+            //        possibly break this method into smaller methods.
+            if (device != null)
+            {
+                PresentationParameters parms = device.PresentationParameters;
+                parms.BackBufferHeight = (int)bounds.Height;
+                parms.BackBufferWidth = (int)bounds.Width;
             }
 
             if (toggleFullScreen)

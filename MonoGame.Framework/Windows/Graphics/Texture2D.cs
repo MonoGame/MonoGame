@@ -321,24 +321,9 @@ namespace Microsoft.Xna.Framework.Graphics
             return FromFile(graphicsDevice, filename, 0, 0);
         }
 
-        internal void Apply()
+        internal override TextureTarget GLTarget
         {
-
-            GL.BindTexture(TextureTarget.Texture2D, (uint)_textureId);
-            if (_mipmap)
-            {
-                // Taken from http://www.flexicoder.com/blog/index.php/2009/11/iphone-mipmaps/
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)All.LinearMipmapNearest);
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)All.Linear);
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.GenerateMipmap, (int)All.True);
-            }
-            else
-            {
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)All.Linear);
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)All.Linear);
-            }
-
-            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, _width, _height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Rgba, PixelType.UnsignedByte, textureData);
+            get { return TextureTarget.Texture2D; }
         }
 
         private void SetPixel(int x, int y, byte red, byte green, byte blue, byte alpha)
@@ -409,7 +394,21 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
 
                 // when we are all done we need apply the changes
-                Apply();
+                GL.BindTexture(TextureTarget.Texture2D, (uint)_textureId);
+                if (_mipmap)
+                {
+                    // Taken from http://www.flexicoder.com/blog/index.php/2009/11/iphone-mipmaps/
+                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)All.LinearMipmapNearest);
+                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)All.Linear);
+                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.GenerateMipmap, (int)All.True);
+                }
+                else
+                {
+                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)All.Linear);
+                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)All.Linear);
+                }
+
+                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, _width, _height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Rgba, PixelType.UnsignedByte, textureData);
             }
         }
 

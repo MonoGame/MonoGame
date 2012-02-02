@@ -64,6 +64,8 @@ namespace Microsoft.Xna.Framework
             _game = game;
 
             _supportedOrientations = DisplayOrientation.Default;
+            _preferredBackBufferHeight = PresentationParameters._defaultBackBufferHeight;
+            _preferredBackBufferWidth = PresentationParameters._defaultBackBufferWidth;
 
             if (game.Services.GetService(typeof(IGraphicsDeviceManager)) != null)
             {
@@ -80,9 +82,6 @@ namespace Microsoft.Xna.Framework
         {
             _graphicsDevice = new GraphicsDevice();
             _graphicsDevice.PresentationParameters = new PresentationParameters();
-
-            _preferredBackBufferHeight = _graphicsDevice.PresentationParameters.BackBufferHeight;
-            _preferredBackBufferWidth = _graphicsDevice.PresentationParameters.BackBufferWidth;
 
             Initialize();
 

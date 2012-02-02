@@ -42,6 +42,8 @@ using System;
 
 #if MONOMAC
 using MonoMac.OpenGL;
+#elif WINDOWS || LINUX
+using OpenTK.Graphics.OpenGL;
 #else
  #if ES11
 using OpenTK.Graphics.ES11;
