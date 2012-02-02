@@ -149,7 +149,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				return new Rectangle(x,y,width,height);
 			}
 		}
-
+		
 		public Viewport(int x, int y, int width, int height)
 		{
 			this.x = x;

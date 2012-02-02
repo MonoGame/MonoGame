@@ -28,7 +28,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public override string ToString()
         {
-            return string.Format("{{Position:{0} Normal:{1} TextureCoordinate:{2}}}", new object[] { this.Position, this.Color, this.TextureCoordinate });
+            return string.Format("{{Position:{0} Color:{1} TextureCoordinate:{2}}}", new object[] { this.Position, this.Color, this.TextureCoordinate });
         }
 
         public static bool operator ==(VertexPositionColorTexture left, VertexPositionColorTexture right)

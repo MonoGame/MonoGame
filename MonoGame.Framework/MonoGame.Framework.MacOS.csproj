@@ -323,6 +323,8 @@
     <Compile Include="Graphics\Vertices\IndexElementSize.cs" />
     <Compile Include="Graphics\Vertices\IndexBuffer.cs" />
     <Compile Include="Graphics\Vertices\VertexBuffer.cs" />
+    <Compile Include="Graphics\Vertices\DynamicIndexBuffer.cs" />
+    <Compile Include="Graphics\Vertices\DynamicVertexBuffer.cs" />
     <Compile Include="Audio\XactSound.cs" />
     <Compile Include="Audio\XactClip.cs" />
     <Compile Include="Game.cs" />
@@ -396,6 +398,7 @@
     <Compile Include="Graphics\RenderTarget2D.cs" />
     <Compile Include="Input\Keyboard.cs" />
     <Compile Include="Input\MouseState.cs" />
+    <Compile Include="Content\ContentReaders\AlphaTestEffectReader.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />

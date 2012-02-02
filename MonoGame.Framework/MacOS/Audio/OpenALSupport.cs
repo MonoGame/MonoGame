@@ -99,9 +99,19 @@ namespace Microsoft.Xna.Framework.Audio
 				audioBufferList.Buffers [0].DataByteSize = maxBufferSize;
 				audioBufferList.Buffers [0].NumberChannels = outputFormat.ChannelsPerFrame;
 
+
+
+				// This a hack so if there is a problem speak to kjpou1 -Kenneth
+				// the cleanest way is to copy the buffer to the pointer already allocated
+				// but what we are going to do is replace the pointer with our own and restore it later
+				//
 				GCHandle meBePinned = GCHandle.Alloc (dataBuffer, GCHandleType.Pinned);
 				IntPtr meBePointer = meBePinned.AddrOfPinnedObject ();
 
+				// Let's not use copy for right now while we test this.  For very large files this
+				//  might show some stutter in the sound loading
+				//Marshal.Copy(dataBuffer, 0, audioBufferList.Buffers[0].Data, maxBufferSize);
+				IntPtr savedDataPtr = audioBufferList.Buffers [0].Data;
 				audioBufferList.Buffers [0].Data = meBePointer;
 
 
@@ -132,7 +142,11 @@ namespace Microsoft.Xna.Framework.Audio
 				} finally {
 					// Don't forget to free our dataBuffer memory pointer that was pinned above
 					meBePinned.Free ();
+					// and restore what was allocated to beginwith
+					audioBufferList.Buffers[0].Data = savedDataPtr;
 				}
+
+
 			}
 			return true;
 		}

@@ -111,6 +111,7 @@
     <Compile Include="Content\ContentReaders\SongReader.cs" />
     <Compile Include="Content\ContentReaders\SpriteFontReader.cs" />
     <Compile Include="Content\ContentReaders\Texture2DReader.cs" />
+    <Compile Include="Content\ContentReaders\AlphaTestEffectReader.cs" />
     <Compile Include="Content\ContentReaders\BasicEffectReader.cs" />
     <Compile Include="Content\ContentReaders\BoundingBoxReader.cs" />
     <Compile Include="Content\ContentReaders\IndexBufferReader.cs" />
@@ -447,6 +448,7 @@
     <Compile Include="Desktop\Audio\OALSoundBuffer.cs" />
     <Compile Include="Desktop\Audio\OpenALSoundController.cs" />
     <Compile Include="Desktop\Audio\SoundEffect.cs" />
+    <Compile Include="XnaToOpenTK.cs" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />

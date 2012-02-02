@@ -449,16 +449,35 @@ namespace Microsoft.Xna.Framework
             result.Z = value.Z * factor;
         }
 
-        public static Vector3 Reflect(Vector3 vector, Vector3 normal)
-        {
-            throw new NotImplementedException();
-        }
+	public static Vector3 Reflect(Vector3 vector, Vector3 normal)
+	{
+		// I is the original array
+		// N is the normal of the incident plane
+		// R = I - (2 * N * ( DotProduct[ I,N] ))
+		Vector3 reflectedVector;
+		// inline the dotProduct here instead of calling method
+		float dotProduct = ((vector.X * normal.X) + (vector.Y * normal.Y)) + (vector.Z * normal.Z);
+		reflectedVector.X = vector.X - (2.0f * normal.X) * dotProduct;
+		reflectedVector.Y = vector.Y - (2.0f * normal.Y) * dotProduct;
+		reflectedVector.Z = vector.Z - (2.0f * normal.Z) * dotProduct;
 
-        public static void Reflect(ref Vector3 vector, ref Vector3 normal, out Vector3 result)
-        {
-            throw new NotImplementedException();
-        }
+		return reflectedVector;
+	}
 
+	public static void Reflect(ref Vector3 vector, ref Vector3 normal, out Vector3 result)
+	{
+		// I is the original array
+		// N is the normal of the incident plane
+		// R = I - (2 * N * ( DotProduct[ I,N] ))
+
+		// inline the dotProduct here instead of calling method
+		float dotProduct = ((vector.X * normal.X) + (vector.Y * normal.Y)) + (vector.Z * normal.Z);
+		result.X = vector.X - (2.0f * normal.X) * dotProduct;
+		result.Y = vector.Y - (2.0f * normal.Y) * dotProduct;
+		result.Z = vector.Z - (2.0f * normal.Z) * dotProduct;
+
+	}
+		
         public static Vector3 SmoothStep(Vector3 value1, Vector3 value2, float amount)
         {
             return new Vector3(

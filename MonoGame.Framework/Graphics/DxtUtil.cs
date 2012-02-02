@@ -261,7 +261,12 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
             }
         }
-
+        		
+		private static byte[] PackRGBA(byte r, byte g, byte b, byte a)
+		{
+			return new byte[] {r, g, b, a};
+		}
+		
         private static byte[] ConvertRgb565ToRgb888(ushort color)
         {
             int temp;

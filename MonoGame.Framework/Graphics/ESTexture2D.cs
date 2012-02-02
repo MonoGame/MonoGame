@@ -208,25 +208,28 @@ namespace Microsoft.Xna.Framework.Graphics
 				height = i;
 			}
 			// TODO: kMaxTextureSize = 1024
-			while ((width > 1024) || (height > 1024)) {
-				width /= 2;
-				height /= 2;
-				transform = CGAffineTransform.MakeScale (0.5f, 0.5f);
-				imageSize.Width /= 2;
-				imageSize.Height /= 2;
-			}
+//			while ((width > 1024) || (height > 1024)) {
+//				width /= 2;
+//				height /= 2;
+//				transform = CGAffineTransform.MakeScale (0.5f, 0.5f);
+//				imageSize.Width /= 2;
+//				imageSize.Height /= 2;
+//			}
+
+			// I am going to take the following out right now to see how it reacts.  It seems to be causing
+			// a few problems for people.  We may need to come up with another way to solve these issues as
+			// one size is not fitting all.
+//			float size = Math.Max(width,height);
+//			if(size > 1024) 
+//			{
+//				float ratio = 1024 / size;
+//				width = (int)(width * ratio);
+//				height = (int)(height * ratio);
+//				transform = CGAffineTransform.MakeScale(ratio, ratio);
+//				imageSize.Width = (int)(imageSize.Width * ratio);
+//				imageSize.Height = (int)(imageSize.Height * ratio);;
+//			}
 #endif
-			
-			float size = Math.Max(width,height);
-			if(size > 1024) 
-			{
-				float ratio = 1024 / size;
-				width = (int)(width * ratio);
-				height = (int)(height * ratio);
-				transform = CGAffineTransform.MakeScale(ratio, ratio);
-				imageSize.Width = (int)(imageSize.Width * ratio);
-				imageSize.Height = (int)(imageSize.Height * ratio);;
-			}
 			
 			int dataLength;
 			switch (pixelFormat) {		

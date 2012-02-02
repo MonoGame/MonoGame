@@ -9,7 +9,13 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		
 		public GestureListener(AndroidGameActivity activity) : base()
 		{
-			this.activity = activity;
+			this.activity = activity;			
+		}			
+			
+						
+		public override bool OnScroll (MotionEvent e1, MotionEvent e2, float distanceX, float distanceY)
+		{			
+			return base.OnScroll (e1, e2, distanceX, distanceY);
 		}
 		
 		/// <summary>
@@ -80,6 +86,30 @@ namespace Microsoft.Xna.Framework.Input.Touch
 				TouchPanel.GestureList.Enqueue(gs);
 			}
 			base.OnLongPress (e);
+		}
+		
+		internal static void CheckForDrag(MotionEvent e, Vector2 position)
+		{
+			switch (e.ActionMasked)
+            {
+				case 1:
+                case 6:
+                    if ((TouchPanel.EnabledGestures & GestureType.DragComplete) != 0)
+					{				
+						var gs = new GestureSample(GestureType.DragComplete, AndroidGameActivity.Game.TargetElapsedTime, 
+							position, Vector2.Zero, Vector2.Zero, Vector2.Zero);
+						TouchPanel.GestureList.Enqueue(gs);
+					}
+                    break;
+				case 2:
+					if ((TouchPanel.EnabledGestures & GestureType.FreeDrag) != 0)
+					{				
+						var gs = new GestureSample(GestureType.FreeDrag, AndroidGameActivity.Game.TargetElapsedTime, 
+							position, Vector2.Zero, Vector2.Zero, Vector2.Zero);
+						TouchPanel.GestureList.Enqueue(gs);
+					}
+                    break;
+			}
 		}
 		
 	}

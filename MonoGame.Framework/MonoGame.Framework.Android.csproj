@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -23,7 +23,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;ANDROID</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;ANDROID;GLES</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -34,7 +34,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE;ANDROID</DefineConstants>
+    <DefineConstants>TRACE;ANDROID;GLES</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AndroidUseSharedRuntime>false</AndroidUseSharedRuntime>
@@ -106,6 +106,8 @@
     <Compile Include="Graphics\Vertices\IVertexType.cs" />
     <Compile Include="Graphics\Vertices\PrimitiveType.cs" />
     <Compile Include="Graphics\Vertices\VertexBuffer.cs" />
+    <Compile Include="Graphics\Vertices\DynamicIndexBuffer.cs" />
+    <Compile Include="Graphics\Vertices\DynamicVertexBuffer.cs" />
     <Compile Include="Graphics\Vertices\VertexColorTexture.cs" />
     <Compile Include="Graphics\Vertices\VertexDeclaration.cs" />
     <Compile Include="Graphics\Vertices\VertexElement.cs" />
@@ -356,6 +358,11 @@
     <Compile Include="Content\ContentReaders\IndexBufferReader.cs" />
     <Compile Include="Content\ContentReaders\MatrixReader.cs" />
     <Compile Include="Content\ContentReaders\VertexBufferReader.cs" />
+    <Compile Include="Content\ContentReaders\AlphaTestEffectReader.cs" />
+    <Compile Include="Graphics\Effect\AlphaTestEffect.cs" />
+    <Compile Include="Graphics\Effect\AlphaTestEffectCode.cs" />
+    <Compile Include="Graphics\Effect\EffectHelpers.cs" />
+    <Compile Include="XnaToOpenTK.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />

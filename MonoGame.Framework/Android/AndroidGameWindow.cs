@@ -406,8 +406,8 @@ namespace Microsoft.Xna.Framework
                     {
                         tlocation.State = TouchLocationState.Released;
                         collection[index] = tlocation;
-                    }
-                    break;
+                    }	
+				break;
                 // MOVE                
                 case 2:
                     for (int i = 0; i < e.PointerCount; i++)
@@ -424,7 +424,7 @@ namespace Microsoft.Xna.Framework
                             collection[index] = tlocation;
                         }
                     }
-                    break;
+					break;
                 // CANCEL, OUTSIDE                
                 case 3:
                 case 4:
@@ -436,7 +436,13 @@ namespace Microsoft.Xna.Framework
                     }
                     break;
             }
-			if (gesture != null) gesture.OnTouchEvent(e);
+			
+			
+			if (gesture != null)
+			{
+				GestureListener.CheckForDrag(e, position);
+				gesture.OnTouchEvent(e);
+			}
 
             return true;
         }
