@@ -72,10 +72,36 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			get { return _size;}
 		}
+		
+		public ESTexture2D(byte[] data, SurfaceFormat pixelFormat, int width, int height, Size size, ALL11 filter)
+        {
+			if (GraphicsDevice.OpenGLESVersion != OpenTK.Graphics.GLContextVersion.Gles2_0)
+            {
+				using(Bitmap bm = Bitmap.CreateBitmap(width, height, Bitmap.Config.Argb8888))
+				{
+				  bm.CopyPixelsFromBuffer(ByteBuffer.Wrap(data));
+			      InitWithBitmap(bm, filter);            						
+				}
+			}
+			else
+			{
+				var imagePtr = IntPtr.Zero;
+				try 
+				{
+					imagePtr = Marshal.AllocHGlobal (data.Length);
+					Marshal.Copy (data, 0, imagePtr, data.Length);	
+					InitWithData(imagePtr, pixelFormat, width, height, size, filter);
+				}
+				finally 
+				{		
+					Marshal.FreeHGlobal (imagePtr);
+				}
+			}
+        }
 
         public ESTexture2D(IntPtr data, SurfaceFormat pixelFormat, int width, int height, Size size, ALL11 filter)
-        {
-            InitWithData(data, pixelFormat, width, height, size, filter);
+        {			
+			InitWithData(data, pixelFormat, width, height, size, filter);
         }
 
         public ESTexture2D(Bitmap image, ALL11 filter)
@@ -131,7 +157,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     )
                 {
                     Canvas can = new Canvas(imagePadded);
-                    can.DrawARGB(0, 0, 0, 0);
+                    can.DrawARGB(0, 0, 0, 0);					
                     can.DrawBitmap(imageSource, 0, 0, null);
                     if (GraphicsDevice.OpenGLESVersion ==
                         OpenTK.Graphics.GLContextVersion.Gles2_0)
@@ -216,8 +242,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 GL11.TexParameter(ALL11.Texture2D, ALL11.TextureWrapT, (int)ALL11.ClampToEdge);
 
                 int sz = 0;
-
-                switch (pixelFormat)
+				
+				switch (pixelFormat)
                 {
                     case SurfaceFormat.Color /*kTexture2DPixelFormat_RGBA8888*/:
                     case SurfaceFormat.Dxt1:
@@ -241,13 +267,13 @@ namespace Microsoft.Xna.Framework.Graphics
                         throw new NotSupportedException("Texture format");
                 }
             }
-
-            _size = size;
-            _width = width;
-            _height = height;
+			
+			_size = size;
+			_width = width;
+			_height = height;
             _format = pixelFormat;
-            _maxS = size.Width / (float)width;
-            _maxT = size.Height / (float)height;
+            _maxS = size.Width / (float)_width;
+            _maxT = size.Height / (float)_height;
         }
 
         public void RetryToCreateTexture()
