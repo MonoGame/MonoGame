@@ -393,8 +393,6 @@
     <Compile Include="Content\ContentReaders\TextureReader.cs" />
     <Compile Include="Content\ContentReaders\SkinnedEffectReader.cs" />
     <Compile Include="Content\ContentReaders\DualTextureEffectReader.cs" />
-    <Compile Include="Graphics\Vertices\DynamicVertexBuffer.cs" />
-    <Compile Include="Graphics\Vertices\DynamicIndexBuffer.cs" />
     <Compile Include="Graphics\RenderTarget2D.cs" />
     <Compile Include="Input\Keyboard.cs" />
     <Compile Include="Input\MouseState.cs" />
@@ -418,12 +416,12 @@
     <None Include="MonoGame.Framework.MacOS.dll.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\ThirdParty\Libs\libmojoshader_mac.dylib">
-      <Link>libmojoshader_mac.dylib</Link>
+    <None Include="..\ThirdParty\Libs\libglsl_optimizer.dylib">
+      <Link>libglsl_optimizer.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\ThirdParty\Libs\libglsl_optimizer_mac.dylib">
-      <Link>libglsl_optimizer_mac.dylib</Link>
+    <None Include="..\ThirdParty\Libs\libmojoshader.dylib">
+      <Link>libmojoshader.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
