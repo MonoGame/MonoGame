@@ -1,11 +1,11 @@
-namespace Microsoft.Xna.Framework.Android
+namespace Microsoft.Xna.Framework
 {
     /// <summary>
     /// Properties that change from how XNA works by default
     /// </summary>
-    public static class Compatibility
+    public static class AndroidCompatibility
     {
-        static Compatibility()
+        static AndroidCompatibility()
         {
             DoCatchupUpdates = false;
             ScaleImageToPowerOf2 = true;

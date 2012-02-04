@@ -1,4 +1,4 @@
-#region License
+﻿#region License
 /*
 Microsoft Public License (Ms-PL)
 XnaTouch - Copyright © 2009 The XnaTouch Team
@@ -48,7 +48,6 @@ using Android.Content.PM;
 using Android.Content.Res;
 using Android.Util;
 using Android.Views;
-using Microsoft.Xna.Framework.Android;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using OpenTK.Platform.Android;
@@ -225,7 +224,7 @@ namespace Microsoft.Xna.Framework
 				_updateGameTime.Update(_now - _lastUpdate);
 
                 TimeSpan catchup = _updateGameTime.ElapsedGameTime;
-                if (Compatibility.DoCatchupUpdates && catchup > _game.TargetElapsedTime)
+                if (AndroidCompatibility.DoCatchupUpdates && catchup > _game.TargetElapsedTime)
                 {
                     while (catchup > _game.TargetElapsedTime)
                     {

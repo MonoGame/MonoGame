@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -17,6 +17,7 @@
     <MandroidI18n />
     <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>
     <AndroidApplication>True</AndroidApplication>
+    <DeployExternal>False</DeployExternal>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -51,6 +52,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Android\AndroidCompatibility.cs" />
     <Compile Include="Android\AndroidGamePlatform.cs" />
     <Compile Include="Android\Input\Mouse.cs" />
     <Compile Include="Content\ContentManager.cs" />
