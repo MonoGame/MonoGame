@@ -151,7 +151,7 @@ namespace Microsoft.Xna.Framework
 		
 		protected override void CreateFrameBuffer()
 		{	    
-#if true			
+#if !GL20			
 			try
             {
                 GLContextVersion = GLContextVersion.Gles2_0;
@@ -215,30 +215,30 @@ namespace Microsoft.Xna.Framework
 					_isFirstTime = false;
 				}
 
-				if (_needsToResetElapsedTime) {
-					_drawGameTime.ResetElapsedTime();
-					_needsToResetElapsedTime = false;
-				}
+                //if (_needsToResetElapsedTime) {
+                //    _drawGameTime.ResetElapsedTime();
+                //    _needsToResetElapsedTime = false;
+                //}
 				
 				
 				_updateGameTime.Update(_now - _lastUpdate);
 				
-				TimeSpan catchup = _updateGameTime.ElapsedGameTime;
-				if (catchup > _game.TargetElapsedTime) {
-					while (catchup > _game.TargetElapsedTime) {
-						catchup -= _game.TargetElapsedTime;
-						_updateGameTime.ElapsedGameTime = _game.TargetElapsedTime;
-						_game.DoUpdate (_updateGameTime);
-						_extraElapsedTime += catchup;
-					}
-					if (_extraElapsedTime > _game.TargetElapsedTime) {
-						_game.DoUpdate (_updateGameTime);
-						_extraElapsedTime = TimeSpan.Zero;
-					}
-				}
-				else {
+                //TimeSpan catchup = _updateGameTime.ElapsedGameTime;
+                //if (catchup > _game.TargetElapsedTime) {
+                //    while (catchup > _game.TargetElapsedTime) {
+                //        catchup -= _game.TargetElapsedTime;
+                //        _updateGameTime.ElapsedGameTime = _game.TargetElapsedTime;
+                //        _game.DoUpdate (_updateGameTime);
+                //        _extraElapsedTime += catchup;
+                //    }
+                //    if (_extraElapsedTime > _game.TargetElapsedTime) {
+                //        _game.DoUpdate (_updateGameTime);
+                //        _extraElapsedTime = TimeSpan.Zero;
+                //    }
+                //}
+                //else {
 					_game.DoUpdate (_updateGameTime);
-				}
+                //}
 								
 			}
 		}
