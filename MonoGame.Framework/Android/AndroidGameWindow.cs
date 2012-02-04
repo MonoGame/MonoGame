@@ -48,6 +48,7 @@ using Android.Content.PM;
 using Android.Content.Res;
 using Android.Util;
 using Android.Views;
+using Microsoft.Xna.Framework.Android;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using OpenTK.Platform.Android;
@@ -215,30 +216,34 @@ namespace Microsoft.Xna.Framework
 					_isFirstTime = false;
 				}
 
-                //if (_needsToResetElapsedTime) {
-                //    _drawGameTime.ResetElapsedTime();
-                //    _needsToResetElapsedTime = false;
-                //}
+                if (_needsToResetElapsedTime) {
+                    _drawGameTime.ResetElapsedTime();
+                    _needsToResetElapsedTime = false;
+                }
 				
 				
 				_updateGameTime.Update(_now - _lastUpdate);
-				
-                //TimeSpan catchup = _updateGameTime.ElapsedGameTime;
-                //if (catchup > _game.TargetElapsedTime) {
-                //    while (catchup > _game.TargetElapsedTime) {
-                //        catchup -= _game.TargetElapsedTime;
-                //        _updateGameTime.ElapsedGameTime = _game.TargetElapsedTime;
-                //        _game.DoUpdate (_updateGameTime);
-                //        _extraElapsedTime += catchup;
-                //    }
-                //    if (_extraElapsedTime > _game.TargetElapsedTime) {
-                //        _game.DoUpdate (_updateGameTime);
-                //        _extraElapsedTime = TimeSpan.Zero;
-                //    }
-                //}
-                //else {
-					_game.DoUpdate (_updateGameTime);
-                //}
+
+                TimeSpan catchup = _updateGameTime.ElapsedGameTime;
+                if (Compatibility.DoCatchupUpdates && catchup > _game.TargetElapsedTime)
+                {
+                    while (catchup > _game.TargetElapsedTime)
+                    {
+                        catchup -= _game.TargetElapsedTime;
+                        _updateGameTime.ElapsedGameTime = _game.TargetElapsedTime;
+                        _game.DoUpdate(_updateGameTime);
+                        _extraElapsedTime += catchup;
+                    }
+                    if (_extraElapsedTime > _game.TargetElapsedTime)
+                    {
+                        _game.DoUpdate(_updateGameTime);
+                        _extraElapsedTime = TimeSpan.Zero;
+                    }
+                }
+                else
+                {
+                    _game.DoUpdate(_updateGameTime);
+                }
 								
 			}
 		}
