@@ -3,12 +3,6 @@ using Microsoft.Xna.Framework.Content;
 using System;
 using System.Collections.Generic;
 
-#if MONOMAC
-using MonoMac.OpenGL;
-#else
-using OpenTK.Graphics.ES11;
-#endif
-
 using System.Collections.ObjectModel;
 
 namespace Microsoft.Xna.Framework.Graphics
