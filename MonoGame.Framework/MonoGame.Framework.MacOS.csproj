@@ -169,7 +169,6 @@
     <Compile Include="Graphics\TextureUsage.cs" />
     <Compile Include="Graphics\SetDataOptions.cs" />
     <Compile Include="MacOS\Content\Texture2DReader.cs" />
-    <Compile Include="MacOS\Graphics\SpriteFont.cs" />
     <Compile Include="Content\ContentReaders\SpriteFontReader.cs" />
     <Compile Include="Content\ContentReaders\SongReader.cs" />
     <Compile Include="Content\ContentReaders\SoundEffectReader.cs" />
@@ -371,6 +370,7 @@
     <Compile Include="Content\ContentReaders\VertexBufferReader.cs" />
     <Compile Include="Content\ContentReaders\AlphaTestEffectReader.cs" />
     <Compile Include="XnaToOpenTK.cs" />
+    <Compile Include="Graphics\SpriteFont.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />
