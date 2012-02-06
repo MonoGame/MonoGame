@@ -415,7 +415,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			GL11.MatrixMode(ALL11.Modelview);			
 			
-			GL11.Viewport(0, 0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height);
+			//GL11.Viewport(0, 0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height);
 			
 			// Enable Scissor Tests if necessary
 			if ( this.graphicsDevice.RasterizerState.ScissorTestEnable )

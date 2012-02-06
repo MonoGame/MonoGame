@@ -46,7 +46,6 @@ using System.IO;
 using Android.Graphics;
 
 using Java.Nio;
-
 using GL11 = OpenTK.Graphics.ES11.GL;
 using GL20 = OpenTK.Graphics.ES20.GL;
 using ALL11 = OpenTK.Graphics.ES11.All;
@@ -132,7 +131,12 @@ namespace Microsoft.Xna.Framework.Graphics
                 {
                     Canvas can = new Canvas(imagePadded);
                     can.DrawARGB(0, 0, 0, 0);
-                    can.DrawBitmap(imageSource, 0, 0, null);
+
+                    if(AndroidCompatibility.ScaleImageToPowerOf2)
+                        can.DrawBitmap(imageSource, new Rect(0, 0, imageSource.Width, imageSource.Height),  new Rect(0, 0, _width, _height), null); //Scale to texture
+                    else
+                        can.DrawBitmap(imageSource, 0, 0, null);
+
                     if (GraphicsDevice.OpenGLESVersion ==
                         OpenTK.Graphics.GLContextVersion.Gles2_0)
                     {
