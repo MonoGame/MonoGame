@@ -80,13 +80,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (fragmentblocklength != 0)
             {
-                fragment_handle = GL.CreateShader( All.FragmentShader );
+                fragment_handle = GL.CreateShader( ShaderType.FragmentShader );
                 fragment = true;
             }
 
             if (vertexblocklength != 0)
             {
-                vertex_handle = GL.CreateShader( All.VertexShader );
+                vertex_handle = GL.CreateShader( ShaderType.VertexShader );
                 vertex = true;
             }
 
@@ -110,7 +110,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 GL.CompileShader(fragment_handle);
 				
-				GL.GetShader(fragment_handle, All.CompileStatus, ref compiled );
+				GL.GetShader(fragment_handle, ShaderParameter.CompileStatus, out compiled );
 				if (compiled == (int)All.False)
 				{
 					Console.Write("Fragment Compilation Failed!");
@@ -120,7 +120,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (vertex)
             {
                 GL.CompileShader(vertex_handle);
-				GL.GetShader(vertex_handle, All.CompileStatus, ref compiled );
+				GL.GetShader(vertex_handle, ShaderParameter.CompileStatus, out compiled );
 				if (compiled == (int)All.False)
 				{
 					Console.Write("Vertex Compilation Failed!");
@@ -181,7 +181,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		protected void CreateVertexShaderFromSource(string source)
 		{
-			int shader = GL.CreateShader (All.VertexShader);
+			int shader = GL.CreateShader (ShaderType.VertexShader);
 			// Attach the loaded source string to the shader object
 			// TODO GL.ShaderSource(shader, source);
 			// Compile the shader
@@ -193,7 +193,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		protected void CreateFragmentShaderFromSource(string source)
 		{
-			int shader = GL.CreateShader (All.FragmentShader);
+			int shader = GL.CreateShader (ShaderType.FragmentShader);
 			// Attach the loaded source string to the shader object
 			// TODO GL.ShaderSource (shader, source);
 			// Compile the shader
@@ -316,11 +316,11 @@ namespace Microsoft.Xna.Framework.Graphics
 			int actUnis = 0;
 			Parameters._parameters.Clear();
 			
-			GL.GetProgram (obj, All.ActiveUniforms, ref @actUnis);
+			GL.GetProgram (obj, ProgramParameter.ActiveUniforms, out @actUnis);
 
 			int size;
-			All type = All.BoolVec2;
-			string name = new StringBuilder(100).ToString();
+			ActiveUniformType type = ActiveUniformType.BoolVec2;
+			var name = new StringBuilder(100);
 			int length;
 			
 			for (int x =0; x < actUnis; x++) 
@@ -329,7 +329,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				string uniformName;
 				size = length = 0;
 				
-				GL.GetActiveUniform((uint)obj,(uint)x,100,ref length,ref size, ref type, name);
+				GL.GetActiveUniform((uint)obj,(uint)x,100, out length, out size, out type, name);
 				
 				uniformName = name.ToString();
 				

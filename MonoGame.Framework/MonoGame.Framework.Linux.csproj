@@ -172,7 +172,6 @@
     <Compile Include="Content\ContentReaders\SongReader.cs" />
     <Compile Include="Content\ContentReaders\SoundEffectReader.cs" />
     <Compile Include="Linux\Media\Video.cs" />
-    <Compile Include="Linux\Graphics\Effect.cs" />
     <Compile Include="Graphics\CompilerOptions.cs" />
     <Compile Include="Content\ContentReaders\ListReader.cs" />
     <Compile Include="Content\ContentReaders\CharReader.cs" />
@@ -227,11 +226,8 @@
     <Compile Include="Graphics\Vertices\VertexPositionColor.cs" />
     <Compile Include="Graphics\Vertices\VertexPositionNormalTexture.cs" />
     <Compile Include="Graphics\Vertices\VertexPositionTexture.cs" />
-    <Compile Include="Linux\Graphics\GraphicsExtensions.cs" />
     <Compile Include="Linux\Graphics\States\GLStateManager.cs" />
-    <Compile Include="Linux\Graphics\Effect\BasicEffect.cs" />
     <Compile Include="Linux\Graphics\Effect\EffectPass.cs" />
-    <Compile Include="Linux\Graphics\Vertices\IndexBuffer.cs" />
     <Compile Include="Linux\GameWindow.cs" />
     <Compile Include="PreparingDeviceSettingsEventArgs.cs" />
     <Compile Include="GraphicsDeviceInformation.cs" />
@@ -341,6 +337,20 @@
     <Compile Include="LaunchParameters.cs" />
     <Compile Include="XnaToOpenTK.cs" />
     <Compile Include="Graphics\SpriteFont.cs" />
+    <Compile Include="Content\ContentReaders\IndexBufferReader.cs" />
+    <Compile Include="Content\ContentReaders\BoundingBoxReader.cs" />
+    <Compile Include="Content\ContentReaders\MatrixReader.cs" />
+    <Compile Include="Content\ContentReaders\BasicEffectReader.cs" />
+    <Compile Include="Content\ContentReaders\VertexBufferReader.cs" />
+    <Compile Include="Content\ContentReaders\AlphaTestEffectReader.cs" />
+    <Compile Include="Graphics\Effect\AlphaTestEffect.cs" />
+    <Compile Include="Graphics\Effect\EffectHelpers.cs" />
+    <Compile Include="Graphics\Effect\Effect.cs" />
+    <Compile Include="Graphics\Effect\BasicEffect.cs" />
+    <Compile Include="Desktop\Graphics\GraphicsExtensions.cs" />
+    <Compile Include="Graphics\Vertices\IndexElementSize.cs" />
+    <Compile Include="Graphics\Vertices\IndexBuffer.cs" />
+    <Compile Include="Graphics\Effect\AlphaTestEffectCode.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.Linux.csproj">
