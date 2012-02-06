@@ -315,6 +315,10 @@ namespace Microsoft.Xna.Framework
 		
 		internal void ChangeClientBounds(Rectangle clientBounds)
 		{	
+			Window.ClientRectangle = new System.Drawing.Rectangle(
+				clientBounds.X, clientBounds.Y,
+				clientBounds.Width, clientBounds.Height);
+			
 			updateClientBounds = true;			
 			this.clientBounds = clientBounds;
 		}

@@ -319,7 +319,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 		
-		private void Apply() 
+		internal void Apply() 
 		{
 			
 			GL.BindTexture (TextureTarget.Texture2D, (uint)_textureId);			
