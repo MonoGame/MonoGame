@@ -146,7 +146,7 @@ namespace Microsoft.Xna.Framework.Graphics
 					GL.ActiveTexture(TextureUnit.Texture0);
 					GL.BindTexture ( TextureTarget.Texture2D, texID );
 
-					samplerState.ApplyTo(TextureTarget.Texture2D);
+					samplerState.Activate ();
 				}
 				// store the SpriteBatchItem data in our vertexArray
 				_vertexArray[index++] = item.vertexTL;
