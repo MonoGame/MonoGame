@@ -61,17 +61,12 @@ namespace Microsoft.Xna.Framework
 		//private readonly Rectangle clientBounds;
 		private Rectangle clientBounds;
 		private Game _game;
-        private MacGamePlatform _platform;
+		private MacGamePlatform _platform;
 
-		private GameTime _updateGameTime;
-		private GameTime _drawGameTime;
-		private DateTime _lastUpdate;
-		private DateTime _now;
 		private NSTrackingArea _trackingArea;
 		private bool _needsToResetElapsedTime = false;
-		private bool _isFirstTime = true;
-		private TimeSpan _extraElapsedTime;
-		#region UIVIew Methods		
+
+		#region GameWindow Methods
 		public GameWindow(Game game, RectangleF frame) : base (frame)
 		{
             if (game == null)
@@ -92,13 +87,6 @@ namespace Microsoft.Xna.Framework
 
 			// Enable multi-touch
 			//MultipleTouchEnabled = true;
-
-			// Initialize GameTime
-			_updateGameTime = new GameTime ();
-			_drawGameTime = new GameTime (); 
-
-			// Initialize _lastUpdate
-			_lastUpdate = DateTime.Now;
 		}
 
 		public GameWindow(Game game, RectangleF frame, NSOpenGLContext context) :
@@ -120,12 +108,6 @@ namespace Microsoft.Xna.Framework
 			// Enable multi-touch
 			//MultipleTouchEnabled = true;
 
-			// Initialize GameTime
-			//_updateGameTime = new GameTime ();
-			//_drawGameTime = new GameTime ();
-
-			// Initialize _lastUpdate
-			//_lastUpdate = DateTime.Now;
 		}
 
 		~GameWindow ()
@@ -138,10 +120,6 @@ namespace Microsoft.Xna.Framework
 		public void StartRunLoop(double updateRate)
 		{
 			Run(updateRate);
-			// Initialize GameTime
-			_updateGameTime = new GameTime ();
-			_drawGameTime = new GameTime ();
-			_now = _lastUpdate = DateTime.Now;
 		}
 
 		public void ResetElapsedTime ()
@@ -175,79 +153,14 @@ namespace Microsoft.Xna.Framework
             //        nice if there weren't quite so many.  The move to a
             //        Game.Tick-centric architecture may eliminate this problem
             //        automatically.
-			if (_game != null) {
-
-				_now = DateTime.Now;
-				if (_isFirstTime) {
-					// Initialize GameTime
-					_updateGameTime = new GameTime ();
-					_drawGameTime = new GameTime ();
-					_lastUpdate = DateTime.Now;
-					_isFirstTime = false;
-				}
-
-				if (_needsToResetElapsedTime) {
-					_drawGameTime.ResetElapsedTime();
-					_needsToResetElapsedTime = false;
-				}
-
-				// Try to catch up with frames
-				_drawGameTime.Update (_now - _lastUpdate);
-				TimeSpan catchup = _drawGameTime.ElapsedGameTime;
-				if (catchup > _game.TargetElapsedTime) {
-					while (catchup > _game.TargetElapsedTime) {
-						//Console.WriteLine("Catching up " + (catchup - _game.TargetElapsedTime));
-						catchup -= _game.TargetElapsedTime;
-						_drawGameTime.ElapsedGameTime = _game.TargetElapsedTime;
-                        if (_platform.IsRunning)
-    						_game.DoUpdate (_drawGameTime);
-						_extraElapsedTime += catchup;
-					}
-					if (_extraElapsedTime > _game.TargetElapsedTime) {
-						//Console.WriteLine("FastForward " + _extraElapsedTime);
-                        if (_platform.IsRunning)
-    						_game.DoUpdate (_drawGameTime);
-						_extraElapsedTime = TimeSpan.Zero;
-					}
-				}
-				else {
-                    if (_platform.IsRunning)
-    					_game.DoUpdate (_drawGameTime);
-				}
-
-				//Console.WriteLine("Render " + _drawGameTime.ElapsedGameTime);
-//				_game.DoUpdate(_drawGameTime);
-                if (_platform.IsRunning)
-    				_game.DoDraw (_drawGameTime);
-				_lastUpdate = _now;
+			if (_game != null && _platform.IsRunning) {
+				_game.Tick();
 			}
-
 		}
 //		protected override void OnUpdateFrame (FrameEventArgs e)
 //		{
 //			base.OnUpdateFrame (e);
 //
-//			if (_game != null) {
-//				Console.WriteLine("Update");
-//				if (_isFirstTime) {
-//					// Initialize GameTime
-//					_updateGameTime = new GameTime ();
-//					_drawGameTime = new GameTime ();
-//					_lastUpdate = DateTime.Now;
-//					_now = DateTime.Now;
-//				}
-//				else {
-//					_now = DateTime.Now;
-//					_updateGameTime.Update (_now - _lastUpdate);
-//					if (_needsToResetElapsedTime) {
-//						_updateGameTime.ResetElapsedTime();
-//						_drawGameTime.ResetElapsedTime();
-//						_needsToResetElapsedTime = false;
-//					}
-//				}
-//				_isFirstTime = false;
-//				_game.DoUpdate (_updateGameTime);
-//			}
 //		}
 		protected override void OnResize (EventArgs e)
 		{
