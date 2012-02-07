@@ -83,12 +83,6 @@ namespace Microsoft.Xna.Framework
 			this.Closed +=	new EventHandler<EventArgs>(GameWindow_Closed);            
 			clientBounds = new Rectangle(0, 0, Context.Resources.DisplayMetrics.WidthPixels, Context.Resources.DisplayMetrics.HeightPixels);
 
-            // Initialize GameTime
-            new GameTime();
-            new GameTime();
-
-            // Initialize _lastUpdate
-
             gesture = new GestureDetector(new GestureListener((AndroidGameActivity)this.Context));
 			
             this.RequestFocus();
