@@ -609,7 +609,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 				texCoordBR.X = (tempRect.X + tempRect.Width) * texWidthRatio;
 				//texCoordBR.Y = tempRect.Y * texHeightRatio;
-				texCoordBR.Y = 1.0f - ( tempRect.Y+tempRect.Height )*texHeightRatio;
+				texCoordBR.Y = 1.0f - (tempRect.Y + tempRect.Height) * texHeightRatio;
 
 
 			} else {
@@ -630,206 +630,62 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void DrawString (SpriteFont spriteFont, string text, Vector2 position, Color color)
 		{
-			if (spriteFont == null) {
-				throw new ArgumentException ("spriteFont");
-			}
+			if (spriteFont == null)
+				throw new ArgumentNullException ("spriteFont");
 
-			Vector2 p = position;
-
-			foreach (char c in text) {
-				if (c == '\n') {
-					p.Y += spriteFont.LineSpacing;
-					p.X = position.X;
-					continue;
-				}
-				if (spriteFont.characterData.ContainsKey (c) == false) 
-					continue;
-				GlyphData g = spriteFont.characterData [c];
-
-				SpriteBatchItem item = _batcher.CreateBatchItem ();
-
-				item.Depth = 0.0f;
-				item.TextureID = (int)spriteFont._texture.ID;
-
-				texCoordTL.X = spriteFont._texture.Image.GetTextureCoordX (g.Glyph.X);
-				texCoordTL.Y = spriteFont._texture.Image.GetTextureCoordY (g.Glyph.Y);
-				texCoordBR.X = spriteFont._texture.Image.GetTextureCoordX (g.Glyph.X + g.Glyph.Width);
-				texCoordBR.Y = spriteFont._texture.Image.GetTextureCoordY (g.Glyph.Y + g.Glyph.Height);
-
-				item.Set (p.X, 
-						p.Y + g.Cropping.Y, 
-						g.Glyph.Width, 
-						g.Glyph.Height, 
-						color, 
-						texCoordTL, 
-						texCoordBR);
-
-				p.X += (g.Kerning.Y + g.Kerning.Z + spriteFont.Spacing);
-			}			
+			spriteFont.DrawInto (
+				this, text, position, color, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0f);
 		}
 
-		public void DrawString (SpriteFont spriteFont, 
-			string text, 
-			Vector2 position,
-			Color color,
-			float rotation,
-			Vector2 origin,
-			float scale,
-			SpriteEffects effects,
-			float depth)
+		public void DrawString (
+			SpriteFont spriteFont, string text, Vector2 position, Color color,
+			float rotation, Vector2 origin, float scale, SpriteEffects effects, float depth)
 		{
-			if (spriteFont == null) {
-				throw new ArgumentException ("spriteFont");
-			}
+			if (spriteFont == null)
+				throw new ArgumentNullException ("spriteFont");
 
-			Vector2 p = new Vector2 (-origin.X,-origin.Y);
-
-			float sin = (float)Math.Sin (rotation);
-			float cos = (float)Math.Cos (rotation);
-
-			foreach (char c in text) {
-				if (c == '\n') {
-					p.Y += spriteFont.LineSpacing;
-					p.X = -origin.X;
-					continue;
-				}
-				if (spriteFont.characterData.ContainsKey (c) == false) 
-					continue;
-				GlyphData g = spriteFont.characterData [c];
-
-				SpriteBatchItem item = _batcher.CreateBatchItem ();
-
-				item.Depth = depth;
-				item.TextureID = (int)spriteFont._texture.ID;
-
-				texCoordTL.X = spriteFont._texture.Image.GetTextureCoordX (g.Glyph.X);
-				texCoordTL.Y = spriteFont._texture.Image.GetTextureCoordY (g.Glyph.Y);
-				texCoordBR.X = spriteFont._texture.Image.GetTextureCoordX (g.Glyph.X + g.Glyph.Width);
-				texCoordBR.Y = spriteFont._texture.Image.GetTextureCoordY (g.Glyph.Y + g.Glyph.Height);
-
-				if ((effects & SpriteEffects.FlipVertically) != 0) {
-					float temp = texCoordBR.Y;
-					texCoordBR.Y = texCoordTL.Y;
-					texCoordTL.Y = temp;
-				}
-				if ((effects & SpriteEffects.FlipHorizontally) != 0) {
-					float temp = texCoordBR.X;
-					texCoordBR.X = texCoordTL.X;
-					texCoordTL.X = temp;
-				}
-
-				item.Set (position.X, 
-						position.Y, 
-						p.X * scale, 
-						(p.Y + g.Cropping.Y) * scale, 
-						g.Glyph.Width * scale, 
-						g.Glyph.Height * scale, 
-						sin, 
-						cos, 
-						color, 
-						texCoordTL, 
-						texCoordBR);
-
-				p.X += (g.Kerning.Y + g.Kerning.Z + spriteFont.Spacing);
-			}			
+			var scaleVec = new Vector2 (scale, scale);
+			spriteFont.DrawInto (this, text, position, color, rotation, origin, scaleVec, effects, depth);
 		}
 
-		public void DrawString (SpriteFont spriteFont, 
-			string text, 
-			Vector2 position,
-			Color color,
-			float rotation,
-			Vector2 origin,
-			Vector2 scale,
-			SpriteEffects effects,
-			float depth)
-		{			
-			if (spriteFont == null) {
-				throw new ArgumentException ("spriteFont");
-			}
+		public void DrawString (
+			SpriteFont spriteFont, string text, Vector2 position, Color color,
+			float rotation, Vector2 origin, Vector2 scale, SpriteEffects effect, float depth)
+		{
+			if (spriteFont == null)
+				throw new ArgumentNullException ("spriteFont");
 
-			Vector2 p = new Vector2 (-origin.X,-origin.Y);
-
-			float sin = (float)Math.Sin (rotation);
-			float cos = (float)Math.Cos (rotation);
-
-			foreach (char c in text) {
-				if (c == '\n') {
-					p.Y += spriteFont.LineSpacing;
-					p.X = -origin.X;
-					continue;
-				}
-				if (spriteFont.characterData.ContainsKey (c) == false) 
-					continue;
-				GlyphData g = spriteFont.characterData [c];
-
-				SpriteBatchItem item = _batcher.CreateBatchItem ();
-
-				item.Depth = depth;
-				item.TextureID = (int)spriteFont._texture.ID;
-
-				texCoordTL.X = spriteFont._texture.Image.GetTextureCoordX (g.Glyph.X);
-				texCoordTL.Y = spriteFont._texture.Image.GetTextureCoordY (g.Glyph.Y);
-				texCoordBR.X = spriteFont._texture.Image.GetTextureCoordX (g.Glyph.X + g.Glyph.Width);
-				texCoordBR.Y = spriteFont._texture.Image.GetTextureCoordY (g.Glyph.Y + g.Glyph.Height);
-
-				if ((effects & SpriteEffects.FlipVertically) != 0) {
-					float temp = texCoordBR.Y;
-					texCoordBR.Y = texCoordTL.Y;
-					texCoordTL.Y = temp;
-				}
-				if ((effects & SpriteEffects.FlipHorizontally) != 0) {
-					float temp = texCoordBR.X;
-					texCoordBR.X = texCoordTL.X;
-					texCoordTL.X = temp;
-				}
-
-				item.Set (position.X, 
-						position.Y, 
-						p.X * scale.X, 
-						(p.Y + g.Cropping.Y) * scale.Y, 
-						g.Glyph.Width * scale.X, 
-						g.Glyph.Height * scale.Y, 
-						sin, 
-						cos, 
-						color, 
-						texCoordTL, 
-						texCoordBR);
-
-				p.X += (g.Kerning.Y + g.Kerning.Z + spriteFont.Spacing);
-			}			
+			spriteFont.DrawInto (this, text, position, color, rotation, origin, scale, effect, depth);
 		}
 
 		public void DrawString (SpriteFont spriteFont, StringBuilder text, Vector2 position, Color color)
 		{
-			DrawString (spriteFont, text.ToString (), position, color);
+			if (spriteFont == null)
+				throw new ArgumentNullException ("spriteFont");
+
+			spriteFont.DrawInto (
+				this, text, position, color, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0f);
 		}
 
-		public void DrawString (SpriteFont spriteFont, 
-			StringBuilder text, 
-			Vector2 position,
-			Color color,
-			float rotation,
-			Vector2 origin,
-			float scale,
-			SpriteEffects effects,
-			float depth)
+		public void DrawString (
+			SpriteFont spriteFont, StringBuilder text, Vector2 position, Color color,
+			float rotation, Vector2 origin, float scale, SpriteEffects effects, float depth)
 		{
-			DrawString (spriteFont, text.ToString (), position, color, rotation, origin, scale, effects, depth);
+			if (spriteFont == null)
+				throw new ArgumentNullException ("spriteFont");
+
+			var scaleVec = new Vector2 (scale, scale);
+			spriteFont.DrawInto (this, text, position, color, rotation, origin, scaleVec, effects, depth);
 		}
 
-		public void DrawString (SpriteFont spriteFont, 
-			StringBuilder text, 
-			Vector2 position,
-			Color color,
-			float rotation,
-			Vector2 origin,
-			Vector2 scale,
-			SpriteEffects effects,
-			float depth)
+		public void DrawString (
+			SpriteFont spriteFont, StringBuilder text, Vector2 position, Color color,
+			float rotation, Vector2 origin, Vector2 scale, SpriteEffects effect, float depth)
 		{
-			DrawString (spriteFont, text.ToString (), position, color, rotation, origin, scale, effects, depth);
+			if (spriteFont == null)
+				throw new ArgumentNullException ("spriteFont");
+
+			spriteFont.DrawInto (this, text, position, color, rotation, origin, scale, effect, depth);
 		}
 	}
 }
-
