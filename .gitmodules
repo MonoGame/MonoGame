@@ -7,3 +7,6 @@
 [submodule "Samples"]
 	path = Samples
 	url = https://github.com/CartBlanche/MonoGame-Samples.git
+[submodule "StarterKits"]
+	path = StarterKits
+	url = https://github.com/kungfubanana/MonoGame-StarterKits.git
