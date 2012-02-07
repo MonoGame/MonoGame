@@ -370,7 +370,7 @@ namespace Microsoft.Xna.Framework
                 max = max <= 0 ? 1 : max;   //Make sure at least 1 update is called
 
                 //Setup
-                _gameTime.ElapsedGameTime = TargetElapsedTime;
+                _gameTime.Update(TargetElapsedTime);
 
                 while (_totalTime >= TargetElapsedTime)
                 {
