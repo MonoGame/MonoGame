@@ -103,11 +103,11 @@ namespace Microsoft.Xna.Framework.Graphics
 				var glDepthStencilFormat = GLDepthComponent16;
 				switch (preferredDepthFormat)
 				{
-				case DepthFormat.Depth16 : glDepthStencilFormat = GLDepthComponent16; break;
-				case DepthFormat.Depth24 : glDepthStencilFormat = GLDepthComponent24; break;
+				case DepthFormat.Depth16: glDepthStencilFormat = GLDepthComponent16; break;
+				case DepthFormat.Depth24: glDepthStencilFormat = GLDepthComponent24; break;
 				case DepthFormat.Depth24Stencil8: glDepthStencilFormat = GLDepth24Stencil8; break;
 				}
-				GL.RenderbufferStorage(GLRenderbuffer, glDepthStencilFormat, this._width, this._height);
+				GL.RenderbufferStorage(GLRenderbuffer, glDepthStencilFormat, this.width, this.height);
 			}
 		}
 		

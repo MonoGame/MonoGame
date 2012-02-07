@@ -60,28 +60,26 @@ namespace Microsoft.Xna.Framework.Graphics
 {
 	public abstract class Texture : GraphicsResource
 	{
-		protected SurfaceFormat _format;
-		protected int _levelCount;
-		internal int _textureId = -1;
+		protected SurfaceFormat format;
+		protected int levelCount;
+
+		internal int glTexture = -1;
+		internal TextureTarget glTarget;
 		
 		public SurfaceFormat Format
 		{
-			get { return _format; }
+			get { return format; }
 		}
 		
 		public int LevelCount
 		{
-			get { return _levelCount; }
-		}
-
-		internal virtual void Apply()
-		{
-			GL.BindTexture(GLTarget, _textureId);
+			get { return levelCount; }
 		}
 		
-		internal virtual TextureTarget GLTarget
+		
+		internal virtual void Activate()
 		{
-			get { throw new NotImplementedException(); }
+			GL.BindTexture(glTarget, this.glTexture);
 		}
 		
 	}

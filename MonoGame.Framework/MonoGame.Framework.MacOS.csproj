@@ -348,9 +348,7 @@
     <Compile Include="Graphics\Effect\EffectParameter.cs" />
     <Compile Include="Graphics\Effect\AlphaTestEffect.cs" />
     <Compile Include="Graphics\Effect\GLSLOptimizer.cs" />
-    <Compile Include="Graphics\ESTexture2D.cs" />
     <Compile Include="Graphics\GraphicsAdapter.cs" />
-    <Compile Include="Graphics\ESImage.cs" />
     <Compile Include="Graphics\PresentationParameters.cs" />
     <Compile Include="Graphics\SpriteBatcher.cs" />
     <Compile Include="Content\ContentReaders\Texture2DReader.cs" />
@@ -426,17 +424,17 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.MacOS.csproj">
-      <Project>{AE483C29-042E-4226-BA52-D247CE7676DA}</Project>
-      <Name>Lidgren.Network.MacOS</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Graphics\Effect\AlphaTestEffect.bin" />
     <EmbeddedResource Include="Graphics\Effect\BasicEffect.bin" />
     <EmbeddedResource Include="Graphics\Effect\DualTextureEffect.bin" />
     <EmbeddedResource Include="Graphics\Effect\EnvironmentMapEffect.bin" />
     <EmbeddedResource Include="Graphics\Effect\SkinnedEffect.bin" />
     <EmbeddedResource Include="Graphics\Effect\SpriteEffect.bin" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.MacOS.csproj">
+      <Project>{AE483C29-042E-4226-BA52-D247CE7676DA}</Project>
+      <Name>Lidgren.Network.MacOS</Name>
+    </ProjectReference>
   </ItemGroup>
 </Project>

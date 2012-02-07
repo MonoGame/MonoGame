@@ -32,6 +32,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		int uniforms_int4_count = 0;
 		int uniforms_bool_count = 0;
 		
+		float[] posFixup = new float[4];
+		
 		MojoShader.MOJOSHADER_symbol[] symbols;
 		MojoShader.MOJOSHADER_sampler[] samplers;
 		MojoShader.MOJOSHADER_attribute[] attributes;
@@ -80,7 +82,15 @@ namespace Microsoft.Xna.Framework.Graphics
 			symbols = DXHelper.UnmarshalArray<MojoShader.MOJOSHADER_symbol>(
 					parseData.symbols, parseData.symbol_count);
 			
-			Array.Sort (symbols, (a, b) => a.register_index.CompareTo(b.register_index));
+			//try to put the symbols in the order they are eventually packed into the uniform arrays
+			//this /should/ be done by pulling the info from mojoshader
+			Array.Sort (symbols, delegate (MojoShader.MOJOSHADER_symbol a, MojoShader.MOJOSHADER_symbol b) {
+				uint va = a.register_index;
+				if (a.info.elements == 1) va += 1024; //hax. mojoshader puts array objects first
+				uint vb = b.register_index;
+				if (b.info.elements == 1) vb += 1024;
+				return va.CompareTo(vb);
+			});//(a, b) => ((int)(a.info.elements > 1))a.register_index.CompareTo(b.register_index));
 			
 			samplers = DXHelper.UnmarshalArray<MojoShader.MOJOSHADER_sampler>(
 					parseData.samplers, parseData.sampler_count);
@@ -260,11 +270,18 @@ namespace Microsoft.Xna.Framework.Graphics
 					case EffectParameterClass.Matrix:
 						long rows = Math.Min (symbol.register_count, parameter.RowCount);
 						if (parameter.Elements.Count > 0) {
-							rows = Math.Min (symbol.register_count, parameter.Elements.Count*parameter.RowCount);
-						}
-						for (int y=0; y<rows; y++) {
-							for (int x=0; x<parameter.ColumnCount; x++) {
-								uniforms_float4[(float4_index+y)*4+x] = (float)data[y*parameter.ColumnCount+x];
+							//rows = Math.Min (symbol.register_count, parameter.Elements.Count*parameter.RowCount);
+							if (symbol.register_count*4 != data.Length) {
+								throw new NotImplementedException();
+							}
+							for (int i=0; i<data.Length; i++) {
+								uniforms_float4[float4_index*4+i] = data[i];
+							}
+						} else {
+							for (int y=0; y<rows; y++) {
+								for (int x=0; x<parameter.ColumnCount; x++) {
+									uniforms_float4[(float4_index+y)*4+x] = (float)data[y*parameter.ColumnCount+x];
+								}
 							}
 						}
 						break;
@@ -357,13 +374,56 @@ namespace Microsoft.Xna.Framework.Graphics
 
 						GL.ActiveTexture( (TextureUnit)((int)TextureUnit.Texture0 + sampler.index) );
 
-						tex.Apply ();
+						tex.Activate ();
 						
-						samplerStates[sampler.index].Activate(tex.GLTarget);
+						samplerStates[sampler.index].Activate(tex.glTarget);
 						
 					}
 	
 				}
+			} else if (shaderType == ShaderType.VertexShader) {
+
+
+				// The following two lines are appended to the end of vertex shaders
+				// to account for rendering differences between OpenGL and DirectX:
+				//
+				// gl_Position.y = gl_Position.y * posFixup.y;
+				// gl_Position.xy += posFixup.zw * gl_Position.ww;
+				//
+				// (the following paraphrased from wine, wined3d/state.c and wined3d/glsl_shader.c)
+				//
+				// - We need to flip along the y-axis in case of offscreen rendering.
+				// - D3D coordinates refer to pixel centers while GL coordinates refer
+				//   to pixel corners.
+				// - D3D has a top-left filling convention. We need to maintain this
+				//   even after the y-flip mentioned above.
+				// In order to handle the last two points, we translate by
+				// (63.0 / 128.0) / VPw and (63.0 / 128.0) / VPh. This is equivalent to
+				// translating slightly less than half a pixel. We want the difference to
+				// be large enough that it doesn't get lost due to rounding inside the
+				// driver, but small enough to prevent it from interfering with any
+				// anti-aliasing.
+				//
+				// OpenGL coordinates specify the center of the pixel while d3d coords specify
+				// the corner. The offsets are stored in z and w in posFixup. posFixup.y contains
+				// 1.0 or -1.0 to turn the rendering upside down for offscreen rendering. PosFixup.x
+				// contains 1.0 to allow a mad.
+
+				int posFixupLoc = GL.GetUniformLocation(program, "posFixup");
+				
+				posFixup[0] = 1.0f;
+				posFixup[1] = 1.0f;
+				posFixup[2] = (63.0f / 64.0f) / vp.Width;
+				posFixup[3] = -(63.0f / 64.0f) / vp.Height;
+				
+				//If we have a render target bound (rendering offscreen)
+				if (graphicsDevice.GetRenderTargets().Length > 0) {
+					//flip vertically
+					posFixup[1] *= -1.0f;
+					posFixup[3] *= -1.0f;
+				}
+				
+				GL.Uniform4 (posFixupLoc, 1, posFixup);
 			}
 		}
 		
