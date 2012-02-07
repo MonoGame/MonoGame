@@ -306,6 +306,7 @@ namespace Microsoft.Xna.Framework
             //        consolidate this logic back into the Game class.
             //        Regardless, an empty implementation is not correct.
             _platform.ResetElapsedTime();
+            _gameTime.ResetElapsedTime();
         }
 
         public void Run()
@@ -347,6 +348,54 @@ namespace Microsoft.Xna.Framework
             default:
                 throw new NotImplementedException(string.Format(
                     "Handling for the run behavior {0} is not implemented.", runBehavior));
+            }
+        }
+
+        private DateTime _now;
+        private DateTime _lastUpdate = DateTime.Now;
+        private GameTime _gameTime = new GameTime();
+        private TimeSpan _totalTime = TimeSpan.Zero;
+
+        public void Tick()
+        {
+            bool doDraw = false;
+
+            _now = DateTime.Now;
+
+            if (IsFixedTimeStep)
+            {
+                _totalTime += _gameTime.ElapsedGameTime;
+                int max = (500/TargetElapsedTime.Milliseconds);    //Only do updates for half a second worth of updates
+                int iterations = 0;
+
+                max = max <= 0 ? 1 : max;   //Make sure at least 1 update is called
+
+                //Setup
+                _gameTime.ElapsedGameTime = TargetElapsedTime;
+
+                while (_totalTime >= TargetElapsedTime)
+                {
+                    _totalTime -= TargetElapsedTime;
+                    DoUpdate(_gameTime);
+                    doDraw = true;
+                        
+                    iterations++;
+                    if (iterations >= max)  //Reset catchup if to many updates have been called
+                    {
+                        _totalTime = TimeSpan.Zero;
+                    }
+                }
+            }
+            else
+            {
+                DoUpdate(_gameTime);
+                doDraw = true;
+            }
+
+            if (doDraw)
+            {
+                DoDraw(_gameTime);
+                _platform.SwapBuffers();
             }
         }
 

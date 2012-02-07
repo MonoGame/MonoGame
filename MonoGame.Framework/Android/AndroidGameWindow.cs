@@ -68,15 +68,8 @@ namespace Microsoft.Xna.Framework
     {
 		private Rectangle clientBounds;
 		private Game _game;
-		private GameTime _updateGameTime;
-        private GameTime _drawGameTime;
-        private DateTime _lastUpdate;
-		private DateTime _now;
         private DisplayOrientation _currentOrientation;
 		private GestureDetector gesture = null;
-		private bool _needsToResetElapsedTime = false;
-		private bool _isFirstTime = true;
-		private TimeSpan _extraElapsedTime;		
 
         public AndroidGameWindow(Context context, Game game) : base(context)
         {
@@ -91,13 +84,12 @@ namespace Microsoft.Xna.Framework
 			clientBounds = new Rectangle(0, 0, Context.Resources.DisplayMetrics.WidthPixels, Context.Resources.DisplayMetrics.HeightPixels);
 
             // Initialize GameTime
-            _updateGameTime = new GameTime();
-            _drawGameTime = new GameTime();
+            new GameTime();
+            new GameTime();
 
             // Initialize _lastUpdate
-            _lastUpdate = DateTime.Now;
-					
-			gesture = new GestureDetector(new GestureListener((AndroidGameActivity)this.Context));
+
+            gesture = new GestureDetector(new GestureListener((AndroidGameActivity)this.Context));
 			
             this.RequestFocus();
             this.FocusableInTouchMode = true;
@@ -107,7 +99,6 @@ namespace Microsoft.Xna.Framework
 
 		public void ResetElapsedTime ()
 		{
-			_needsToResetElapsedTime = true;
 		}
 		
 		void GameWindow_Closed(object sender,EventArgs e)
@@ -150,24 +141,43 @@ namespace Microsoft.Xna.Framework
 		}
 		
 		protected override void CreateFrameBuffer()
-		{	    
-#if !GL20			
-			try
-            {
-                GLContextVersion = GLContextVersion.Gles2_0;
-                GraphicsDevice.OpenGLESVersion = GLContextVersion;
-				base.CreateFrameBuffer();
-		    } 
-			catch (Exception) 
-#endif			
-			{
-		        //device doesn't support OpenGLES 2.0; retry with 1.1:
-                GLContextVersion = GLContextVersion.Gles1_1;
-                GraphicsDevice.OpenGLESVersion = GLContextVersion;
-				base.CreateFrameBuffer();
+		{
+		    switch (AndroidCompatibility.ESVersion)
+		    {
+		        case AndroidCompatibility.ESVersions.v1_1:
+                    StartES1_1();
+                    break;
+                case AndroidCompatibility.ESVersions.v2_0:
+                    StartES2_0();
+                    break;
+                default:
+                    throw new NotImplementedException();
 		    }
 			_game.GraphicsDevice.Initialize();
 		}
+
+        private void StartES2_0()
+        {
+            try
+            {
+                GLContextVersion = GLContextVersion.Gles2_0;
+                GraphicsDevice.OpenGLESVersion = GLContextVersion;
+                base.CreateFrameBuffer();
+            }
+            catch (Exception)
+            {
+                //device doesn't support OpenGLES 2.0; retry with 1.1:
+                StartES1_1();
+            }
+            
+        }
+
+        private void StartES1_1()
+        {
+            GLContextVersion = GLContextVersion.Gles1_1;
+            GraphicsDevice.OpenGLESVersion = GLContextVersion;
+            base.CreateFrameBuffer();
+        }
 	
 
         #region AndroidGameView Methods
@@ -183,70 +193,12 @@ namespace Microsoft.Xna.Framework
             if (!GraphicsContext.IsCurrent)
                 MakeCurrent();
 
-            if (_game != null) {
-                _drawGameTime.Update(_now - _lastUpdate);                
-                _game.DoDraw(_drawGameTime);
-				_lastUpdate = _now;
-            }
-            try
+            if (_game != null ) //Only call draw if an update has occured
             {
-                SwapBuffers();
-            }
-            catch(Exception ex)
-            {
-                Android.Util.Log.Error("Error in swap buffers", ex.ToString());
+                _game.Tick();
             }
         }
 
-        protected override void OnUpdateFrame(FrameEventArgs e)
-		{			
-			base.OnUpdateFrame(e);
-			
-			if (_game != null )
-			{
-                //ObserveDeviceRotation();				
-				_now = DateTime.Now;
-				
-				if (_isFirstTime) {
-					// Initialize GameTime
-					_updateGameTime = new GameTime ();
-					_drawGameTime = new GameTime ();
-					_lastUpdate = DateTime.Now;
-					_isFirstTime = false;
-				}
-
-                if (_needsToResetElapsedTime) {
-                    _drawGameTime.ResetElapsedTime();
-                    _needsToResetElapsedTime = false;
-                }
-				
-				
-				_updateGameTime.Update(_now - _lastUpdate);
-
-                TimeSpan catchup = _updateGameTime.ElapsedGameTime;
-                if (AndroidCompatibility.DoCatchupUpdates && catchup > _game.TargetElapsedTime)
-                {
-                    while (catchup > _game.TargetElapsedTime)
-                    {
-                        catchup -= _game.TargetElapsedTime;
-                        _updateGameTime.ElapsedGameTime = _game.TargetElapsedTime;
-                        _game.DoUpdate(_updateGameTime);
-                        _extraElapsedTime += catchup;
-                    }
-                    if (_extraElapsedTime > _game.TargetElapsedTime)
-                    {
-                        _game.DoUpdate(_updateGameTime);
-                        _extraElapsedTime = TimeSpan.Zero;
-                    }
-                }
-                else
-                {
-                    _game.DoUpdate(_updateGameTime);
-                }
-								
-			}
-		}
-		
 		#endregion
 		
 		
