@@ -160,7 +160,6 @@
     <Compile Include="Graphics\RenderTargetUsage.cs" />
     <Compile Include="Graphics\TextureUsage.cs" />
     <Compile Include="Graphics\SetDataOptions.cs" />
-    <Compile Include="MacOS\Graphics\SpriteFont.cs" />
     <Compile Include="Content\ContentReaders\SpriteFontReader.cs" />
     <Compile Include="Content\ContentReaders\SongReader.cs" />
     <Compile Include="Content\ContentReaders\SoundEffectReader.cs" />
@@ -397,6 +396,7 @@
     <Compile Include="Input\Keyboard.cs" />
     <Compile Include="Input\MouseState.cs" />
     <Compile Include="Content\ContentReaders\AlphaTestEffectReader.cs" />
+    <Compile Include="Graphics\SpriteFont.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />
