@@ -39,7 +39,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			var sizeInBytes = indexCount * (this.IndexElementSize == IndexElementSize.SixteenBits ? 2 : 4);
 			
-#if IPHONE
+#if GLES
 			GL.GenBuffers(1, ref ibo);
 #else
             GL.GenBuffers(1, out ibo);

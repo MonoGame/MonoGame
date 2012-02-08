@@ -151,22 +151,21 @@ namespace Microsoft.Xna.Framework
 		
 		protected override void CreateFrameBuffer()
 		{	    
-#if true			
+#if !ES11			
 			try
             {
                 GLContextVersion = GLContextVersion.Gles2_0;
-                GraphicsDevice.OpenGLESVersion = GLContextVersion;
 				base.CreateFrameBuffer();
 		    } 
 			catch (Exception) 
-#endif			
+#endif
 			{
 		        //device doesn't support OpenGLES 2.0; retry with 1.1:
                 GLContextVersion = GLContextVersion.Gles1_1;
-                GraphicsDevice.OpenGLESVersion = GLContextVersion;
 				base.CreateFrameBuffer();
 		    }
-			_game.GraphicsDevice.Initialize();
+
+            _game.GraphicsDevice.Initialize();
 		}
 	
 

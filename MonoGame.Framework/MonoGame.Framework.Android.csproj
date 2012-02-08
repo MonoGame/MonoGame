@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -53,6 +53,7 @@
   <ItemGroup>
     <Compile Include="Android\AndroidGamePlatform.cs" />
     <Compile Include="Android\Input\Mouse.cs" />
+    <Compile Include="Audio\AudioCategory.cs" />
     <Compile Include="Content\ContentManager.cs" />
     <Compile Include="Content\ContentReaders\ArrayReader.cs" />
     <Compile Include="Content\ContentReaders\BoundingFrustumReader.cs" />
@@ -60,19 +61,54 @@
     <Compile Include="Content\ContentReaders\ByteReader.cs" />
     <Compile Include="Content\ContentReaders\DateTimeReader.cs" />
     <Compile Include="Content\ContentReaders\DecimalReader.cs" />
+    <Compile Include="Content\ContentReaders\DualTextureEffectReader.cs" />
+    <Compile Include="Content\ContentReaders\EffectReader.cs" />
+    <Compile Include="Content\ContentReaders\EnvironmentMapEffectReader.cs" />
+    <Compile Include="Content\ContentReaders\ModelReader.cs" />
     <Compile Include="Content\ContentReaders\NullableReader.cs" />
     <Compile Include="Content\ContentReaders\PlaneReader.cs" />
     <Compile Include="Content\ContentReaders\PointReader.cs" />
     <Compile Include="Content\ContentReaders\QuaternionReader.cs" />
     <Compile Include="Content\ContentReaders\RayReader.cs" />
     <Compile Include="Content\ContentReaders\SByteReader.cs" />
+    <Compile Include="Content\ContentReaders\SkinnedEffectReader.cs" />
+    <Compile Include="Content\ContentReaders\TextureCubeReader.cs" />
+    <Compile Include="Content\ContentReaders\TextureReader.cs" />
     <Compile Include="Content\ContentReaders\UInt16Reader.cs" />
     <Compile Include="Content\ContentReaders\UInt32Reader.cs" />
     <Compile Include="Content\ContentReaders\UInt64Reader.cs" />
     <Compile Include="Content\ContentReaders\Vector2Reader.cs" />
     <Compile Include="Content\ContentReaders\Vector4Reader.cs" />
+    <Compile Include="Content\ContentReaders\VertexDeclarationReader.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="GamePlatform.cs" />
+    <Compile Include="GraphicsDeviceManager.cs" />
+    <Compile Include="Graphics\CompareFunction.cs" />
+    <Compile Include="Graphics\CubeMapFace.cs" />
+    <Compile Include="Graphics\Effect\DualTextureEffect.cs" />
+    <Compile Include="Graphics\Effect\DXEffectObject.cs" />
+    <Compile Include="Graphics\Effect\DXExpression.cs" />
+    <Compile Include="Graphics\Effect\DXHelper.cs" />
+    <Compile Include="Graphics\Effect\DXPreshader.cs" />
+    <Compile Include="Graphics\Effect\DXShader.cs" />
+    <Compile Include="Graphics\Effect\EffectAnnotation.cs" />
+    <Compile Include="Graphics\Effect\EffectAnnotationCollection.cs" />
+    <Compile Include="Graphics\Effect\EnvironmentMapEffect.cs" />
+    <Compile Include="Graphics\Effect\GLSLOptimizer.cs" />
+    <Compile Include="Graphics\Effect\MojoShader.cs" />
+    <Compile Include="Graphics\Effect\SkinnedEffect.cs" />
+    <Compile Include="Graphics\Effect\SpriteEffect.cs" />
+    <Compile Include="Graphics\Model.cs" />
+    <Compile Include="Graphics\ModelBone.cs" />
+    <Compile Include="Graphics\ModelBoneCollection.cs" />
+    <Compile Include="Graphics\ModelEffectCollection.cs" />
+    <Compile Include="Graphics\ModelMesh.cs" />
+    <Compile Include="Graphics\ModelMeshCollection.cs" />
+    <Compile Include="Graphics\ModelMeshPart.cs" />
+    <Compile Include="Graphics\ModelMeshPartCollection.cs" />
+    <Compile Include="Graphics\States\SamplerState.cs" />
+    <Compile Include="Graphics\StencilOperation.cs" />
+    <Compile Include="Graphics\TextureCube.cs" />
     <Compile Include="PrimaryThreadLoader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Android\AndroidGameActivity.cs" />
@@ -124,7 +160,6 @@
     <Compile Include="Android\Content\ContentReaders\SoundEffectReader.cs" />
     <Compile Include="Android\Content\ContentReaders\SpriteFontReader.cs" />
     <Compile Include="Android\Content\ContentReaders\Texture2DReader.cs" />
-    <Compile Include="Android\GraphicsDeviceManager.cs" />
     <Compile Include="Android\Graphics\DisplayMode.cs" />
     <Compile Include="Android\Graphics\ESImage.cs" />
     <Compile Include="Android\Graphics\ESTexture2D.cs" />
@@ -225,7 +260,6 @@
     <Compile Include="Graphics\GraphicsResource.cs" />
     <Compile Include="Graphics\IGraphicsDeviceService.cs" />
     <Compile Include="Graphics\MultiSampleType.cs" />
-    <Compile Include="Graphics\RenderState.cs" />
     <Compile Include="Graphics\RenderTarget.cs" />
     <Compile Include="Graphics\RenderTarget2D.cs" />
     <Compile Include="Graphics\RenderTargetUsage.cs" />
@@ -334,7 +368,6 @@
     <Compile Include="Android\TitleContainer.cs" />
     <Compile Include="Content\LzxDecoder.cs" />
     <Compile Include="Android\Content\ContentManager.cs" />
-    <Compile Include="Graphics\States\SamplerState.ES.cs" />
     <Compile Include="Android\Content\ContentReaders\CurveReader.cs" />
     <Compile Include="Audio\AudioEngine.cs" />
     <Compile Include="Audio\WaveBank.cs" />
@@ -360,9 +393,7 @@
     <Compile Include="Content\ContentReaders\VertexBufferReader.cs" />
     <Compile Include="Content\ContentReaders\AlphaTestEffectReader.cs" />
     <Compile Include="Graphics\Effect\AlphaTestEffect.cs" />
-    <Compile Include="Graphics\Effect\AlphaTestEffectCode.cs" />
     <Compile Include="Graphics\Effect\EffectHelpers.cs" />
-    <Compile Include="XnaToOpenTK.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />

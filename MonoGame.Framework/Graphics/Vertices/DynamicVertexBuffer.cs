@@ -55,6 +55,16 @@ namespace Microsoft.Xna.Framework.Graphics
             : base(graphicsDevice, VertexDeclaration.FromType(type), vertexCount, bufferUsage, true)
         {
         }
+
+  		public void SetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride, SetDataOptions options) where T : struct
+        {
+            base.SetData(offsetInBytes, data, startIndex, elementCount, vertexStride);
+        }
+
+        public void SetData<T>(T[] data, int startIndex, int elementCount, SetDataOptions options) where T : struct
+        {
+            base.SetData(data, startIndex, elementCount);
+        }
     }
 }
 

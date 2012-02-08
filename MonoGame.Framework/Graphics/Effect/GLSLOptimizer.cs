@@ -7,7 +7,7 @@ using MonoMac.OpenGL;
 using OpenTK.Graphics.OpenGL;
 #else
 using OpenTK.Graphics.ES20;
-#if IPHONE
+#if GLES
 using ShaderType = OpenTK.Graphics.ES20.All;
 #endif
 #endif

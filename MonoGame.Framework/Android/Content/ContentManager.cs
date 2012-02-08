@@ -53,7 +53,23 @@ namespace Microsoft.Xna.Framework.Content
 
         protected virtual Stream OpenStream(string assetName)
         {
-            Stream stream = Game.Activity.Assets.Open(assetName);
+            Stream stream = null;
+            try
+            {
+                stream = Game.Activity.Assets.Open(assetName + ".xnb");
+            }
+            catch (FileNotFoundException fileNotFound)
+            {
+                throw new ContentLoadException("The content file was not found.", fileNotFound);
+            }
+            catch (DirectoryNotFoundException directoryNotFound)
+            {
+                throw new ContentLoadException("The directory was not found.", directoryNotFound);
+            }
+            catch (Exception exception)
+            {
+                throw new ContentLoadException("Opening stream error.", exception);
+            }
             return stream;
         }
     }
