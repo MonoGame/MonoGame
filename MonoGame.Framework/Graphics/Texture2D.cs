@@ -55,8 +55,14 @@ using MonoTouch.Foundation;
 
 #if MONOMAC
 using MonoMac.OpenGL;
+using GLPixelFormat = MonoMac.OpenGL.PixelFormat;
+#elif WINDOWS || LINUX
+using System.Drawing.Imaging;
+using OpenTK.Graphics.OpenGL;
+using GLPixelFormat = OpenTK.Graphics.OpenGL.PixelFormat;
 #else
 using OpenTK.Graphics.ES20;
+using GLPixelFormat = OpenTK.Graphics.ES20.All;
 #endif
 
 using Microsoft.Xna.Framework.Content;
@@ -103,11 +109,11 @@ namespace Microsoft.Xna.Framework.Graphics
 			                (int)TextureWrapMode.ClampToEdge);
 			
 			PixelInternalFormat glInternalFormat = PixelInternalFormat.Rgba;
-			PixelFormat glFormat = PixelFormat.Rgba;
+			GLPixelFormat glFormat = GLPixelFormat.Rgba;
 			PixelType glType = PixelType.UnsignedByte;
 			format.GetGLFormat(out glInternalFormat, out glFormat, out glType);
 
-			if (glFormat == (PixelFormat)All.CompressedTextureFormats)
+			if (glFormat == (GLPixelFormat)All.CompressedTextureFormats)
 			{
 				var imageSize = 0;
 				switch (format) {
@@ -179,11 +185,11 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 		}
 
-        public unsafe void SetData<T>(int level, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct 
+        public void SetData<T>(int level, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct 
         {
             if (data == null) throw new ArgumentNullException("data");
-			
-			var elementSizeInByte = sizeof(T);
+
+            var elementSizeInByte = Marshal.SizeOf(typeof(T));
 			var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
 			var startBytes = startIndex * elementSizeInByte;
 			var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
@@ -204,15 +210,15 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.BindTexture(TextureTarget.Texture2D, this.glTexture);
 			
 			var glInternalFormat = PixelInternalFormat.Rgba;
-			var glFormat = PixelFormat.Rgba;
+			var glFormat = GLPixelFormat.Rgba;
 			var glType = PixelType.UnsignedByte;
 			format.GetGLFormat(out glInternalFormat, out glFormat, out glType);
 			
-			if (glFormat == (PixelFormat)All.CompressedTextureFormats)
+			if (glFormat == (GLPixelFormat)All.CompressedTextureFormats)
 			{
 				GL.CompressedTexSubImage2D(TextureTarget.Texture2D, level,
 				                           0, 0, width, height,
-				                           (PixelFormat)glInternalFormat, data.Length-startBytes, dataPtr);
+				                           (GLPixelFormat)glInternalFormat, data.Length-startBytes, dataPtr);
 			}
 			else
             	GL.TexSubImage2D(TextureTarget.Texture2D, level,
@@ -249,6 +255,11 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		public static Texture2D FromStream(GraphicsDevice graphicsDevice, Stream stream)
 		{
+            //todo: partial classes would be cleaner
+#if IPHONE || MONOMAC
+            
+
+
 #if IPHONE
 			using (var uiImage = UIImage.LoadFromData(NSData.FromStream(stream)))
 #elif MONOMAC
@@ -277,6 +288,26 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 				return texture;
 			}
+#else
+            using (Bitmap image = (Bitmap)Bitmap.FromStream(stream))
+            {
+                // Fix up the Image to match the expected format
+                image.RGBToBGR();
+
+                Texture2D texture = new Texture2D(graphicsDevice, image.Width, image.Height);
+                var data = new byte[texture.Width * texture.Height * 4];
+
+                BitmapData bitmapData = image.LockBits(new System.Drawing.Rectangle(0, 0, image.Width, image.Height),
+                    ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+                if (bitmapData.Stride != image.Width * 4) throw new NotImplementedException();
+                Marshal.Copy(bitmapData.Scan0, data, 0, data.Length);
+                image.UnlockBits(bitmapData);
+
+                texture.SetData(data);
+
+                return texture;
+            }
+#endif
 		}
 		
 		//What was this for again?
