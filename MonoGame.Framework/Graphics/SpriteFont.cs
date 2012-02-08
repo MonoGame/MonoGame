@@ -369,7 +369,7 @@ namespace Microsoft.Xna.Framework.Graphics {
 				}
 
 				if (HasCurrentGlyph)
-					Offset.X += CurrentGlyph.WidthIncludingBearings;
+					Offset.X += _font.Spacing + CurrentGlyph.WidthIncludingBearings;
 
 				HasCurrentGlyph = _font.ResolveGlyphWithFallback (c, out CurrentGlyph);
 				if (!HasCurrentGlyph)
