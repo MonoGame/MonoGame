@@ -1,0 +1,3 @@
+#define a(b,c) b##c
+a(RI, GHT)
+

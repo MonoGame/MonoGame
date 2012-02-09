@@ -176,6 +176,7 @@ namespace Microsoft.Xna.Framework.Content
 			return result;
 		}
 		
+#if !ANDROID
 		protected virtual Stream OpenStream(string assetName)
 		{
 			Stream stream;
@@ -197,6 +198,7 @@ namespace Microsoft.Xna.Framework.Content
 			}
 			return stream;
 		}
+#endif
 
 		protected T ReadAsset<T>(string assetName, Action<IDisposable> recordDisposableObject)
 		{
@@ -227,12 +229,17 @@ namespace Microsoft.Xna.Framework.Content
 				//try load it traditionally
 				stream = OpenStream(assetName);
 				loadXnb = true;
-			} catch (ContentLoadException ex) {
+			} catch (ContentLoadException) {
 				//MonoGame try to load as a non-content file
 				
-				assetName = TitleContainer.GetFilename(Path.Combine (_rootDirectory, assetName));
-				
-				if ((typeof(T) == typeof(Curve))) 
+#if ANDROID
+                // On Android, the content is not accessible via TitleContainer
+                assetName = GetFilename(assetName);
+#else
+				assetName = TitleContainer.GetFilename(Path.Combine (_rootDirectory, assetName.Replace('\\', Path.DirectorySeparatorChar)));
+#endif
+
+                if ((typeof(T) == typeof(Curve))) 
                 {				
                     assetName = CurveReader.Normalize(assetName);
                 }
@@ -468,10 +475,13 @@ namespace Microsoft.Xna.Framework.Content
 				//try load it traditionally
 				stream = OpenStream(assetName);
 				stream.Close();
-			} catch (ContentLoadException ex) {
+			} catch (ContentLoadException) {
 				//MonoGame try to load as a non-content file
-				
+#if ANDROID
+                assetName = GetFilename(assetName);
+#else
 				assetName = TitleContainer.GetFilename(assetName);
+#endif
 				
                 if ((currentAsset is Curve))
                 {

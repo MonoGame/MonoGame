@@ -52,3 +52,8 @@ monodroid*.msi
 
 #Unix temporary files
 *~
+
+#CMake files
+CMakeCache.txt
+CMakeFiles
+cmake_install.cmake

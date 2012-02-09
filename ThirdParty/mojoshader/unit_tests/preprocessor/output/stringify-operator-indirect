@@ -1,0 +1,7 @@
+// Should produce RIGHT and not WRONG.
+#define WRONG RIGHT
+#define STRINGIFY2(x) #x
+#define STRINGIFY(x) STRINGIFY2(x)
+
+STRINGIFY(WRONG)
+

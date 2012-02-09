@@ -12,7 +12,7 @@ using OpenTK.Graphics.OpenGL;
  #if ES11
 using OpenTK.Graphics.ES11;
 
-  #if IPHONE
+  #if GLES
 using EnableCap = OpenTK.Graphics.ES11.All;
 using FrontFaceDirection = OpenTK.Graphics.ES11.All;
 using CullFaceMode = OpenTK.Graphics.ES11.All;
@@ -29,7 +29,7 @@ using BlendEquationMode = OpenTK.Graphics.ES11.All;
  #else
 using OpenTK.Graphics.ES20;
 
-  #if IPHONE
+  #if GLES
 using EnableCap = OpenTK.Graphics.ES20.All;
 using FrontFaceDirection = OpenTK.Graphics.ES20.All;
 using BlendEquationMode = OpenTK.Graphics.ES20.All;
@@ -163,7 +163,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			// Set blending mode
 			BlendEquationMode blendMode = state.ColorBlendFunction.GetBlendEquationMode();
-#if ES11 && IPHONE
+#if ES11 && GLES
 			GL.Oes.BlendEquation (blendMode);
 #else
 			GL.BlendEquation (blendMode);
@@ -172,7 +172,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			// Set blending function
 			BlendingFactorSrc bfs = state.ColorSourceBlend.GetBlendFactorSrc();
 			BlendingFactorDest bfd = state.ColorDestinationBlend.GetBlendFactorDest();
-#if IPHONE
+#if GLES
 			GL.BlendFunc ((All)bfs, (All)bfd);
 #else
 			GL.BlendFunc (bfs, bfd);

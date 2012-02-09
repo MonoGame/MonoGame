@@ -319,16 +319,6 @@ namespace Microsoft.Xna.Framework
             if (!_platform.BeforeRun())
                 return;
 
-            // In an original XNA game the GraphicsDevice property is null
-            // during initialization but before the Game's Initialize method is
-            // called the property is available so we can only assume that it
-            // should be created somewhere in here.  We cannot set the viewport
-            // values correctly based on the Preferred settings which is causing
-            // some problems on some Microsoft samples which we are not handling
-            // correctly.
-            graphicsDeviceManager.CreateDevice();
-            applyChanges(graphicsDeviceManager);
-
             _platform.BeforeInitialize();
             Initialize();
             _initialized = true;
@@ -419,6 +409,16 @@ namespace Microsoft.Xna.Framework
             // GameComponents in Components at the time Initialize() is called
             // are initialized.
             // http://msdn.microsoft.com/en-us/library/microsoft.xna.framework.game.initialize.aspx
+
+            // In an original XNA game the GraphicsDevice property is null
+            // during initialization but before the Game's Initialize method is
+            // called the property is available so we can only assume that it
+            // should be created somewhere in here.  We cannot set the viewport
+            // values correctly based on the Preferred settings which is causing
+            // some problems on some Microsoft samples which we are not handling
+            // correctly.
+            graphicsDeviceManager.CreateDevice();
+            applyChanges(graphicsDeviceManager);
 
             // 1. Categorize components into IUpdateable and IDrawable lists.
             // 2. Initialize all existing components

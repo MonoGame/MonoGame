@@ -1,0 +1,5 @@
+// x() should be considered one (blank) argument when there is a macro which
+//  has one parameter. It should produce "RIGHT" and not "RIGHT()", and no
+//  errors.
+#define x(a) RIGHT a
+x()

@@ -108,7 +108,7 @@ namespace Microsoft.Xna.Framework.Input
 				        }
     				}                
                 }
-                catch (NullReferenceException ex) {
+                catch (NullReferenceException) {
                     //Occassionally an NullReferenceException is thrown when accessing e.Values??
                     // mono    : Unhandled Exception: System.NullReferenceException: Object reference not set to an instance of an object
                     // mono    :   at Android.Runtime.JNIEnv.GetObjectField (IntPtr jobject, IntPtr jfieldID) [0x00000] in <filename unknown>:0 

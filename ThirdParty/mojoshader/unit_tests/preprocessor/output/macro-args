@@ -1,0 +1,4 @@
+/* This should produce "RIGHT ANDRIGHT" instead of "WRONG ANDWRONG" */
+#define x(WRONG, ANDWRONG) WRONG ANDWRONG
+x(RIGHT, ANDRIGHT)
+

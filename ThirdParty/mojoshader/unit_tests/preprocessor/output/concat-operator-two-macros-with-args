@@ -1,0 +1,4 @@
+#define y(a) a
+#define x(a) y(a)##y(a)
+
+x(RIGHT)

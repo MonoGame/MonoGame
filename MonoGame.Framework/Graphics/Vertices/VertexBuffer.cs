@@ -10,7 +10,7 @@ using MonoMac.OpenGL;
 using OpenTK.Graphics.OpenGL;
 #else
 using OpenTK.Graphics.ES20;
-#if IPHONE
+#if GLES
 using BufferTarget = OpenTK.Graphics.ES20.All;
 using BufferUsageHint = OpenTK.Graphics.ES20.All;
 #else
@@ -43,7 +43,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			//GLExt.Oes.GenVertexArrays(1, out this.vao);
 			//GLExt.Oes.BindVertexArray(this.vao);
-#if IPHONE
+#if GLES
 			GL.GenBuffers(1, ref this.vbo);
 #else
 			GL.GenBuffers(1, out this.vbo);
@@ -85,14 +85,13 @@ namespace Microsoft.Xna.Framework.Graphics
 			throw new NotSupportedException();
 		}
 		
-		public void SetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount) where T : struct
+		public void SetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride) where T : struct
         {
 			if (data == null) throw new ArgumentNullException("data");
 
-            var elementSizeInByte = Marshal.SizeOf(typeof(T));
-			var sizeInBytes = elementSizeInByte * elementCount;
+			var sizeInBytes = vertexStride * elementCount;
 			var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-			var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startIndex * elementSizeInByte);
+			var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startIndex * vertexStride);
 		
             GL.BindBuffer(BufferTarget.ArrayBuffer, vbo);
             GL.BufferSubData(BufferTarget.ArrayBuffer, (IntPtr)offsetInBytes, (IntPtr)sizeInBytes, dataPtr);
