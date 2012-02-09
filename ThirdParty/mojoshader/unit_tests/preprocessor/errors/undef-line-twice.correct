@@ -1,0 +1,1 @@
+preprocessor/errors/undef-line-twice:3: ERROR: undefining "__LINE__"

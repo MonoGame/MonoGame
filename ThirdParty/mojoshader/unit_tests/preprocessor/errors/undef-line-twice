@@ -1,0 +1,4 @@
+// this should only produce one warning.
+#undef __LINE__
+#undef __LINE__
+

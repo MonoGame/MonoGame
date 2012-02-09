@@ -1,0 +1,10 @@
+/Volumes/Data/Compiling/terraria/mojoshader/CMakeFiles/availableprofiles.dir
+/Volumes/Data/Compiling/terraria/mojoshader/CMakeFiles/bestprofile.dir
+/Volumes/Data/Compiling/terraria/mojoshader/CMakeFiles/finderrors.dir
+/Volumes/Data/Compiling/terraria/mojoshader/CMakeFiles/glcaps.dir
+/Volumes/Data/Compiling/terraria/mojoshader/CMakeFiles/lemon.dir
+/Volumes/Data/Compiling/terraria/mojoshader/CMakeFiles/mojoshader.dir
+/Volumes/Data/Compiling/terraria/mojoshader/CMakeFiles/mojoshader-compiler.dir
+/Volumes/Data/Compiling/terraria/mojoshader/CMakeFiles/test.dir
+/Volumes/Data/Compiling/terraria/mojoshader/CMakeFiles/testoutput.dir
+/Volumes/Data/Compiling/terraria/mojoshader/CMakeFiles/testparse.dir

@@ -7,6 +7,8 @@ namespace Microsoft.Xna.Framework.Graphics
 	{
 #if IPHONE
 		const string mojoshader_dll = "__Internal";
+#elif ANDROID
+        const string mojoshader_dll = "libmojoshader.so";
 #else
 		const string mojoshader_dll = "libmojoshader.dll";
 #endif
@@ -468,10 +470,10 @@ namespace Microsoft.Xna.Framework.Graphics
 		    public IntPtr preshader;
 		    
 		    /// MOJOSHADER_malloc
-		    public MOJOSHADER_malloc malloc;
+		    public IntPtr malloc;
 		    
 		    /// MOJOSHADER_free
-		    public MOJOSHADER_free free;
+		    public IntPtr free;
 		    
 		    /// void*
 		    public IntPtr malloc_data;

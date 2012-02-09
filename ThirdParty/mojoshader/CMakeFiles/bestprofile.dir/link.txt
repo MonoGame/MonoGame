@@ -1,0 +1,1 @@
+/opt/local/bin/gcc   -arch i386 -arch x86_64 -isysroot /Developer/SDKs/MacOSX10.6.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/bestprofile.dir/utils/bestprofile.c.o  -o bestprofile  libmojoshader.dylib -framework SDL -framework Cocoa -lm 

@@ -1,0 +1,24 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Volumes/Data/Compiling/terraria/mojoshader/misc/lemon.c
+stdio.h
+-
+stdarg.h
+-
+string.h
+-
+ctype.h
+-
+stdlib.h
+-
+assert.h
+-
+unistd.h
+-
+

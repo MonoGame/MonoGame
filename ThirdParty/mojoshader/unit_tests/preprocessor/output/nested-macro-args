@@ -1,0 +1,6 @@
+/* This should produce "RIGHT" instead of "WRONG" */
+#define x(a) a
+#define y(WRONG) x(WRONG)
+
+y(RIGHT)
+

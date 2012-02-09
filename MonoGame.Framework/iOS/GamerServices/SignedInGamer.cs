@@ -266,7 +266,16 @@ namespace Microsoft.Xna.Framework.GamerServices
 		}
 		
 		delegate void AwardAchievementDelegate(string achievementId, double percentageComplete);
-		
+
+		public IAsyncResult BeginAwardAchievement(
+         string achievementId,
+         AsyncCallback callback,
+         Object state
+		)
+		{
+			return BeginAwardAchievement(achievementId, 100.0, callback, state);
+		}
+
 		public IAsyncResult BeginAwardAchievement(
          string achievementId,
 		 double percentageComplete,

@@ -1,0 +1,593 @@
+/**
+ * MojoShader; generate shader programs from bytecode of compiled
+ *  Direct3D shaders.
+ *
+ * Please see the file LICENSE.txt in the source's root directory.
+ *
+ *  This file written by Ryan C. Gordon.
+ */
+
+// This is a Lemon Parser grammar for HLSL. It is based on an ANSI C YACC
+//  grammar by Jeff Lee: http://www.lysator.liu.se/c/ANSI-C-grammar-y.html
+
+// Lemon is here: http://www.hwaci.com/sw/lemon/  ...  the source is included
+//  with MojoShader, and built with the library, so you don't have to track
+//  down the dependency.
+
+// HLSL syntax is described, informally, here:
+//  http://msdn.microsoft.com/en-us/library/bb509615(VS.85).aspx
+
+%name ParseHLSL
+
+// Some shift-reduce conflicts are basically unavoidable, but if the final
+//  conflict count matches this value, we consider it known and acceptable.
+%expect 2
+
+%start_symbol shader
+%token_prefix TOKEN_HLSL_
+%token_type { TokenData }
+%extra_argument { Context *ctx }
+
+%include {
+#ifndef __MOJOSHADER_HLSL_COMPILER__
+#error Do not compile this file directly.
+#endif
+}
+
+%syntax_error {
+    // !!! FIXME: make this a proper fail() function.
+    fail(ctx, "Syntax error");
+}
+
+%parse_failure {
+    // !!! FIXME: make this a proper fail() function.
+    fail(ctx, "Giving up. Parser is hopelessly lost...");
+}
+
+%stack_overflow {
+    // !!! FIXME: make this a proper fail() function.
+    fail(ctx, "Giving up. Parser stack overflow");
+}
+
+// operator precedence (matches C spec)...
+
+%left COMMA.
+%right ASSIGN ADDASSIGN SUBASSIGN MULASSIGN DIVASSIGN MODASSIGN LSHIFTASSIGN
+       RSHIFTASSIGN ANDASSIGN ORASSIGN XORASSIGN.
+%right QUESTION.
+%left OROR.
+%left ANDAND.
+%left OR.
+%left XOR.
+%left AND.
+%left EQL NEQ.
+%left LT LEQ GT GEQ.
+%left LSHIFT RSHIFT.
+%left PLUS MINUS.
+%left STAR SLASH PERCENT.
+%right TYPECAST EXCLAMATION COMPLEMENT MINUSMINUS PLUSPLUS.
+%left DOT LBRACKET RBRACKET LPAREN RPAREN.
+
+// bump up the precedence of ELSE, to avoid shift/reduce conflict on the
+//  usual "dangling else ambiguity" ...
+%right ELSE.
+
+
+// The rules...
+
+shader ::= compilation_units(B). { assert(ctx->ast == NULL); REVERSE_LINKED_LIST(MOJOSHADER_astCompilationUnit, B); ctx->ast = (MOJOSHADER_astNode *) B; }
+
+%type compilation_units { MOJOSHADER_astCompilationUnit * }
+%destructor compilation_units { delete_compilation_unit(ctx, $$); }
+compilation_units(A) ::= compilation_unit(B). { A = B; }
+compilation_units(A) ::= compilation_units(B) compilation_unit(C). { if (C) { C->next = B; A = C; } }
+
+%type compilation_unit { MOJOSHADER_astCompilationUnit * }
+%destructor compilation_unit { delete_compilation_unit(ctx, $$); }
+//compilation_unit(A) ::= PRAGMA . { A = NULL; }   // !!! FIXME: deal with pragmas.
+compilation_unit(A) ::= variable_declaration(B). { A = new_global_variable(ctx, B); }
+compilation_unit(A) ::= function_signature(B) SEMICOLON. { A = new_function(ctx, B, NULL); }
+compilation_unit(A) ::= function_signature(B) statement_block(C). { A = new_function(ctx, B, C); }
+compilation_unit(A) ::= typedef(B). { A = new_global_typedef(ctx, B); }
+compilation_unit(A) ::= struct_declaration(B) SEMICOLON. { A = new_global_struct(ctx, B); }
+//compilation_unit(A) ::= error SEMICOLON. { A = NULL; }  // !!! FIXME: research using the error nonterminal
+
+%type typedef { MOJOSHADER_astTypedef * }
+%destructor typedef { delete_typedef(ctx, $$); }
+// !!! FIXME: should CONST be here, or in datatype?
+typedef(A) ::= TYPEDEF CONST datatype(B) scalar_or_array(C). { A = new_typedef(ctx, 1, B, C); push_usertype(ctx, C->identifier, A->datatype); }
+typedef(A) ::= TYPEDEF datatype(B) scalar_or_array(C). { A = new_typedef(ctx, 0, B, C); push_usertype(ctx, C->identifier, A->datatype); }
+
+%type function_signature { MOJOSHADER_astFunctionSignature * }
+%destructor function_signature { delete_function_signature(ctx, $$); }
+function_signature(A) ::= function_storageclass(B) function_details(C) semantic(D). { A = C; A->storage_class = B; A->semantic = D; }
+function_signature(A) ::= function_storageclass(B) function_details(C). { A = C; A->storage_class = B; }
+function_signature(A) ::= function_details(B) semantic(C). { A = B; A->semantic = C; }
+function_signature(A) ::= function_details(B). { A = B; }
+
+%type function_details { MOJOSHADER_astFunctionSignature * }
+%destructor function_details { delete_function_signature(ctx, $$); }
+function_details(A) ::= datatype(B) IDENTIFIER(C) LPAREN function_parameters(D) RPAREN. { A = new_function_signature(ctx, B, C.string, D); }
+function_details(A) ::= VOID IDENTIFIER(B) LPAREN function_parameters(C) RPAREN. { A = new_function_signature(ctx, NULL, B.string, C); }
+
+// !!! FIXME: there is a "target" storage class that is the name of the
+// !!! FIXME:  platform that this function is meant for...but I don't know
+// !!! FIXME:  what tokens are valid here.
+
+// !!! FIXME: Also, the docs say "one of" inline or target, but I bet you can
+// !!! FIXME:  specify both.
+%type function_storageclass { MOJOSHADER_astFunctionStorageClass }
+//function_storageclass(A) ::= target(B). { A = B; }
+function_storageclass(A) ::= INLINE. { A = MOJOSHADER_AST_FNSTORECLS_INLINE; }
+
+%type function_parameters { MOJOSHADER_astFunctionParameters * }
+%destructor function_parameters { delete_function_params(ctx, $$); }
+function_parameters(A) ::= VOID. { A = NULL; }
+function_parameters(A) ::= function_parameter_list(B). { REVERSE_LINKED_LIST(MOJOSHADER_astFunctionParameters, B); A = B; }
+function_parameters(A) ::= . { A = NULL; }
+
+%type function_parameter_list { MOJOSHADER_astFunctionParameters * }
+%destructor function_parameter_list { delete_function_params(ctx, $$); }
+function_parameter_list(A) ::= function_parameter(B). { A = B; }
+function_parameter_list(A) ::= function_parameter_list(B) COMMA function_parameter(C). { C->next = B; A = C; }
+
+// !!! FIXME: this is pretty unreadable.
+// !!! FIXME: CONST?
+%type function_parameter { MOJOSHADER_astFunctionParameters * }
+%destructor function_parameter { delete_function_params(ctx, $$); }
+function_parameter(A) ::= input_modifier(B) datatype(C) IDENTIFIER(D) semantic(E) interpolation_mod(F) initializer(G). { A = new_function_param(ctx, B, C, D.string, E, F, G); }
+function_parameter(A) ::= input_modifier(B) datatype(C) IDENTIFIER(D) semantic(E) interpolation_mod(F). { A = new_function_param(ctx, B, C, D.string, E, F, NULL); }
+function_parameter(A) ::= input_modifier(B) datatype(C) IDENTIFIER(D) semantic(E) initializer(F). { A = new_function_param(ctx, B, C, D.string, E, MOJOSHADER_AST_INTERPMOD_NONE, F); }
+function_parameter(A) ::= input_modifier(B) datatype(C) IDENTIFIER(D) semantic(E). { A = new_function_param(ctx, B, C, D.string, E, MOJOSHADER_AST_INTERPMOD_NONE, NULL); }
+function_parameter(A) ::= input_modifier(B) datatype(C) IDENTIFIER(D) interpolation_mod(E) initializer(F). { A = new_function_param(ctx, B, C, D.string, NULL, E, F); }
+function_parameter(A) ::= input_modifier(B) datatype(C) IDENTIFIER(D) interpolation_mod(E). { A = new_function_param(ctx, B, C, D.string, NULL, E, NULL); }
+function_parameter(A) ::= input_modifier(B) datatype(C) IDENTIFIER(D) initializer(E). { A = new_function_param(ctx, B, C, D.string, NULL, MOJOSHADER_AST_INTERPMOD_NONE, E); }
+function_parameter(A) ::= input_modifier(B) datatype(C) IDENTIFIER(D). { A = new_function_param(ctx, B, C, D.string, NULL, MOJOSHADER_AST_INTERPMOD_NONE, NULL); }
+function_parameter(A) ::= datatype(B) IDENTIFIER(C) semantic(D) interpolation_mod(E) initializer(F). { A = new_function_param(ctx, MOJOSHADER_AST_INPUTMOD_NONE, B, C.string, D, E, F); }
+function_parameter(A) ::= datatype(B) IDENTIFIER(C) semantic(D) interpolation_mod(E). { A = new_function_param(ctx, MOJOSHADER_AST_INPUTMOD_NONE, B, C.string, D, E, NULL); }
+function_parameter(A) ::= datatype(B) IDENTIFIER(C) semantic(D) initializer(E). { A = new_function_param(ctx, MOJOSHADER_AST_INPUTMOD_NONE, B, C.string, D, MOJOSHADER_AST_INTERPMOD_NONE, E); }
+function_parameter(A) ::= datatype(B) IDENTIFIER(C) semantic(D). { A = new_function_param(ctx, MOJOSHADER_AST_INPUTMOD_NONE, B, C.string, D, MOJOSHADER_AST_INTERPMOD_NONE, NULL); }
+function_parameter(A) ::= datatype(B) IDENTIFIER(C) interpolation_mod(D) initializer(E). { A = new_function_param(ctx, MOJOSHADER_AST_INPUTMOD_NONE, B, C.string, NULL, D, E); }
+function_parameter(A) ::= datatype(B) IDENTIFIER(C) interpolation_mod(D). { A = new_function_param(ctx, MOJOSHADER_AST_INPUTMOD_NONE, B, C.string, NULL, D, NULL); }
+function_parameter(A) ::= datatype(B) IDENTIFIER(C) initializer(D). { A = new_function_param(ctx, MOJOSHADER_AST_INPUTMOD_NONE, B, C.string, NULL, MOJOSHADER_AST_INTERPMOD_NONE, D); }
+function_parameter(A) ::= datatype(B) IDENTIFIER(C). { A = new_function_param(ctx, MOJOSHADER_AST_INPUTMOD_NONE, B, C.string, NULL, MOJOSHADER_AST_INTERPMOD_NONE, NULL); }
+
+%type input_modifier { MOJOSHADER_astInputModifier }
+input_modifier(A) ::= IN. { A = MOJOSHADER_AST_INPUTMOD_IN; }
+input_modifier(A) ::= INOUT. { A = MOJOSHADER_AST_INPUTMOD_INOUT; }
+input_modifier(A) ::= OUT. { A = MOJOSHADER_AST_INPUTMOD_OUT; }
+input_modifier(A) ::= IN OUT. { A = MOJOSHADER_AST_INPUTMOD_INOUT; }
+input_modifier(A) ::= OUT IN. { A = MOJOSHADER_AST_INPUTMOD_INOUT; }
+input_modifier(A) ::= UNIFORM. { A = MOJOSHADER_AST_INPUTMOD_UNIFORM; }
+
+%type semantic { const char * }
+semantic(A) ::= COLON IDENTIFIER(B). { A = B.string; }
+
+// DX10 only?
+%type interpolation_mod { MOJOSHADER_astInterpolationModifier }
+interpolation_mod(A) ::= LINEAR. { A = MOJOSHADER_AST_INTERPMOD_LINEAR; }
+interpolation_mod(A) ::= CENTROID. { A = MOJOSHADER_AST_INTERPMOD_CENTROID; }
+interpolation_mod(A) ::= NOINTERPOLATION. { A = MOJOSHADER_AST_INTERPMOD_NOINTERPOLATION; }
+interpolation_mod(A) ::= NOPERSPECTIVE. { A = MOJOSHADER_AST_INTERPMOD_NOPERSPECTIVE; }
+interpolation_mod(A) ::= SAMPLE. { A = MOJOSHADER_AST_INTERPMOD_SAMPLE; }
+
+%type variable_declaration { MOJOSHADER_astVariableDeclaration * }
+%destructor variable_declaration { delete_variable_declaration(ctx, $$); }
+variable_declaration(A) ::= variable_attribute_list(B) datatype(C) variable_declaration_details_list(D) SEMICOLON. { REVERSE_LINKED_LIST(MOJOSHADER_astVariableDeclaration, D); A = D; A->attributes = B; A->datatype = C; }
+variable_declaration(A) ::= datatype(B) variable_declaration_details_list(C) SEMICOLON. { REVERSE_LINKED_LIST(MOJOSHADER_astVariableDeclaration, C); A = C; A->datatype = B; }
+// !!! FIXME: this expects "struct Identifier {} varname" ... that "Identifier" is wrong.
+variable_declaration(A) ::= struct_declaration(B) variable_declaration_details_list(C) SEMICOLON. { REVERSE_LINKED_LIST(MOJOSHADER_astVariableDeclaration, C); A = C; A->anonymous_datatype = B; }
+
+%type variable_attribute_list { int }
+variable_attribute_list(A) ::= variable_attribute(B). { A = B; }
+variable_attribute_list(A) ::= variable_attribute_list(B) variable_attribute(C). { A = B | C; }
+
+%type variable_attribute { int }
+variable_attribute(A) ::= EXTERN. { A = MOJOSHADER_AST_VARATTR_EXTERN; }
+variable_attribute(A) ::= NOINTERPOLATION. { A = MOJOSHADER_AST_VARATTR_NOINTERPOLATION; }
+variable_attribute(A) ::= SHARED. { A = MOJOSHADER_AST_VARATTR_SHARED; }
+variable_attribute(A) ::= STATIC. { A = MOJOSHADER_AST_VARATTR_STATIC; }
+variable_attribute(A) ::= UNIFORM. { A = MOJOSHADER_AST_VARATTR_UNIFORM; }
+variable_attribute(A) ::= VOLATILE. { A = MOJOSHADER_AST_VARATTR_VOLATILE; }
+variable_attribute(A) ::= CONST. { A = MOJOSHADER_AST_VARATTR_CONST; }
+variable_attribute(A) ::= ROWMAJOR. { A = MOJOSHADER_AST_VARATTR_ROWMAJOR; }
+variable_attribute(A) ::= COLUMNMAJOR. { A = MOJOSHADER_AST_VARATTR_COLUMNMAJOR; }
+
+%type variable_declaration_details_list { MOJOSHADER_astVariableDeclaration * }
+%destructor variable_declaration_details_list { delete_variable_declaration(ctx, $$); }
+variable_declaration_details_list(A) ::= variable_declaration_details(B). { A = B; }
+variable_declaration_details_list(A) ::= variable_declaration_details_list(B) COMMA variable_declaration_details(C). { A = C; A->next = B; }
+
+%type variable_declaration_details { MOJOSHADER_astVariableDeclaration * }
+%destructor variable_declaration_details { delete_variable_declaration(ctx, $$); }
+variable_declaration_details(A) ::= scalar_or_array(B) semantic(C) annotations(D) initializer(E) variable_lowlevel(F). { A = new_variable_declaration(ctx, B, C, D, E, F); }
+variable_declaration_details(A) ::= scalar_or_array(B) semantic(C) annotations(D) initializer(E). { A = new_variable_declaration(ctx, B, C, D, E, NULL); }
+variable_declaration_details(A) ::= scalar_or_array(B) semantic(C) annotations(D) variable_lowlevel(E). { A = new_variable_declaration(ctx, B, C, D, NULL, E); }
+variable_declaration_details(A) ::= scalar_or_array(B) semantic(C) annotations(D). { A = new_variable_declaration(ctx, B, C, D, NULL, NULL); }
+variable_declaration_details(A) ::= scalar_or_array(B) semantic(C) initializer(D) variable_lowlevel(E). { A = new_variable_declaration(ctx, B, C, NULL, D, E); }
+variable_declaration_details(A) ::= scalar_or_array(B) semantic(C) initializer(D). { A = new_variable_declaration(ctx, B, C, NULL, D, NULL); }
+variable_declaration_details(A) ::= scalar_or_array(B) semantic(C) variable_lowlevel(D). { A = new_variable_declaration(ctx, B, C, NULL, NULL, D); }
+variable_declaration_details(A) ::= scalar_or_array(B) semantic(C). { A = new_variable_declaration(ctx, B, C, NULL, NULL, NULL); }
+variable_declaration_details(A) ::= scalar_or_array(B) annotations(C) initializer(D) variable_lowlevel(E). { A = new_variable_declaration(ctx, B, NULL, C, D, E); }
+variable_declaration_details(A) ::= scalar_or_array(B) annotations(C) initializer(D). { A = new_variable_declaration(ctx, B, NULL, C, D, NULL); }
+variable_declaration_details(A) ::= scalar_or_array(B) annotations(C) variable_lowlevel(D). { A = new_variable_declaration(ctx, B, NULL, C, NULL, D); }
+variable_declaration_details(A) ::= scalar_or_array(B) annotations(C). { A = new_variable_declaration(ctx, B, NULL, C, NULL, NULL); }
+variable_declaration_details(A) ::= scalar_or_array(B) initializer(C) variable_lowlevel(D). { A = new_variable_declaration(ctx, B, NULL, NULL, C, D); }
+variable_declaration_details(A) ::= scalar_or_array(B) initializer(C). { A = new_variable_declaration(ctx, B, NULL, NULL, C, NULL); }
+variable_declaration_details(A) ::= scalar_or_array(B) variable_lowlevel(C). { A = new_variable_declaration(ctx, B, NULL, NULL, NULL, C); }
+variable_declaration_details(A) ::= scalar_or_array(B). { A = new_variable_declaration(ctx, B, NULL, NULL, NULL, NULL); }
+
+// !!! FIXME: we don't handle full sampler declarations at the moment.
+
+
+%type struct_declaration { MOJOSHADER_astStructDeclaration * }
+%destructor struct_declaration { delete_struct_declaration(ctx, $$); }
+struct_declaration(A) ::= struct_intro(B) LBRACE struct_member_list(C) RBRACE. { REVERSE_LINKED_LIST(MOJOSHADER_astStructMembers, C); A = new_struct_declaration(ctx, B, C); }
+
+// This has to be separate from struct_declaration so that the struct is in the usertypemap when parsing its members.
+%type struct_intro { const char * }
+struct_intro(A) ::= STRUCT IDENTIFIER(B). { A = B.string; push_usertype(ctx, A, &ctx->dt_none); }  // datatype is bogus until semantic analysis.
+
+%type struct_member_list { MOJOSHADER_astStructMembers * }
+%destructor struct_member_list { delete_struct_member(ctx, $$); }
+struct_member_list(A) ::= struct_member(B). { A = B; }
+struct_member_list(A) ::= struct_member_list(B) struct_member(C). { A = C; MOJOSHADER_astStructMembers *i = A; while (i->next) { i = i->next; } i->next = B; }
+
+%type struct_member { MOJOSHADER_astStructMembers * }
+%destructor struct_member { delete_struct_member(ctx, $$); }
+struct_member(A) ::= interpolation_mod(B) struct_member_details(C). { MOJOSHADER_astStructMembers *i = C; A = C; while (i) { i->interpolation_mod = B; i = i->next; } }
+struct_member(A) ::= struct_member_details(B). { A = B; }
+
+%type struct_member_details { MOJOSHADER_astStructMembers * }
+%destructor struct_member_details { delete_struct_member(ctx, $$); }
+struct_member_details(A) ::= datatype(B) struct_member_item_list(C) SEMICOLON. { MOJOSHADER_astStructMembers *i = C; A = C; while (i) { i->datatype = B; i = i->next; } }
+
+%type struct_member_item_list { MOJOSHADER_astStructMembers * }
+%destructor struct_member_item_list { delete_struct_member(ctx, $$); }
+struct_member_item_list(A) ::= scalar_or_array(B). { A = new_struct_member(ctx, B, NULL); }
+struct_member_item_list(A) ::= scalar_or_array(B) semantic(C). { A = new_struct_member(ctx, B, C); }
+struct_member_item_list(A) ::= struct_member_item_list(B) COMMA IDENTIFIER(C). { A = new_struct_member(ctx, new_scalar_or_array(ctx, C.string, 0, NULL), NULL); A->next = B; A->semantic = B->semantic; }
+
+%type variable_lowlevel { MOJOSHADER_astVariableLowLevel * }
+%destructor variable_lowlevel { delete_variable_lowlevel(ctx, $$); }
+variable_lowlevel(A) ::= packoffset(B) register(C). { A = new_variable_lowlevel(ctx, B, C); }
+variable_lowlevel(A) ::= register(B) packoffset(C). { A = new_variable_lowlevel(ctx, C, B); }
+variable_lowlevel(A) ::= packoffset(B). { A = new_variable_lowlevel(ctx, B, NULL); }
+variable_lowlevel(A) ::= register(B). { A = new_variable_lowlevel(ctx, NULL, B); }
+
+// !!! FIXME: I sort of hate this type name.
+%type scalar_or_array { MOJOSHADER_astScalarOrArray * }
+%destructor scalar_or_array { delete_scalar_or_array(ctx, $$); }
+scalar_or_array(A) ::= IDENTIFIER(B) LBRACKET RBRACKET. { A = new_scalar_or_array(ctx, B.string, 1, NULL); }
+scalar_or_array(A) ::= IDENTIFIER(B) LBRACKET expression(C) RBRACKET. { A = new_scalar_or_array(ctx, B.string, 1, C); }
+scalar_or_array(A) ::= IDENTIFIER(B). { A = new_scalar_or_array(ctx, B.string, 0, NULL); }
+
+%type packoffset { MOJOSHADER_astPackOffset * }
+%destructor packoffset { delete_pack_offset(ctx, $$); }
+packoffset(A) ::= COLON PACKOFFSET LPAREN IDENTIFIER(B) DOT IDENTIFIER(C) RPAREN. { A = new_pack_offset(ctx, B.string, C.string); }
+packoffset(A) ::= COLON PACKOFFSET LPAREN IDENTIFIER(B) RPAREN. { A = new_pack_offset(ctx, B.string, NULL); }
+
+// !!! FIXME: can take a profile, like ": register(ps_5_0, s)"
+// !!! FIXME: IDENTIFIER is wrong: "s[2]" works, apparently. Use scalar_or_array instead?
+// !!! FIXME: (these might be SM4 features)
+%type register { const char * }
+register(A) ::= COLON REGISTER LPAREN IDENTIFIER(B) RPAREN. { A = B.string; }
+
+%type annotations { MOJOSHADER_astAnnotations * }
+%destructor annotations { delete_annotation(ctx, $$); }
+annotations(A) ::= LT annotation_list(B) GT. { REVERSE_LINKED_LIST(MOJOSHADER_astAnnotations, B); A = B; }
+
+%type annotation_list { MOJOSHADER_astAnnotations * }
+%destructor annotation_list { delete_annotation(ctx, $$); }
+annotation_list(A) ::= annotation(B). { A = B; }
+annotation_list(A) ::= annotation_list(B) annotation(C). { A = C; A->next = B; }
+
+// !!! FIXME: can this take a USERTYPE if we typedef'd a scalar type?
+%type annotation { MOJOSHADER_astAnnotations * }
+%destructor annotation { delete_annotation(ctx, $$); }
+annotation(A) ::= datatype_scalar(B) initializer(C) SEMICOLON. { A = new_annotation(ctx, B, C); }
+
+%type initializer_block_list { MOJOSHADER_astExpression * }
+%destructor initializer_block_list { delete_expr(ctx, $$); }
+initializer_block_list(A) ::= expression(B). { A = B; }
+initializer_block_list(A) ::= LBRACE initializer_block_list(B) RBRACE. { A = B; }
+initializer_block_list(A) ::= initializer_block_list(B) COMMA initializer_block_list(C). { A = new_binary_expr(ctx, MOJOSHADER_AST_OP_COMMA, B, C); }
+
+%type initializer_block { MOJOSHADER_astExpression * }
+%destructor initializer_block { delete_expr(ctx, $$); }
+initializer_block(A) ::= LBRACE initializer_block_list(B) RBRACE. { A = B; }
+
+%type initializer { MOJOSHADER_astExpression * }
+%destructor initializer { delete_expr(ctx, $$); }
+initializer(A) ::= ASSIGN initializer_block(B). { A = B; }
+initializer(A) ::= ASSIGN expression(B). { A = B; }
+
+%type intrinsic_datatype { const MOJOSHADER_astDataType * }
+intrinsic_datatype(A) ::= datatype_vector(B). { A = B; }
+intrinsic_datatype(A) ::= datatype_matrix(B). { A = B; }
+intrinsic_datatype(A) ::= datatype_scalar(B). { A = B; }
+intrinsic_datatype(A) ::= datatype_sampler(B). { A = B; }
+intrinsic_datatype(A) ::= datatype_buffer(B). { A = B; }
+
+%type datatype { const MOJOSHADER_astDataType * }
+datatype(A) ::= intrinsic_datatype(B). { A = B; }
+datatype(A) ::= USERTYPE(B). { A = B.datatype; }
+
+%type datatype_sampler { const MOJOSHADER_astDataType * }
+datatype_sampler(A) ::= SAMPLER. { A = &ctx->dt_sampler2d; }
+datatype_sampler(A) ::= SAMPLER1D. { A = &ctx->dt_sampler1d; }
+datatype_sampler(A) ::= SAMPLER2D. { A = &ctx->dt_sampler2d; }
+datatype_sampler(A) ::= SAMPLER3D. { A = &ctx->dt_sampler3d; }
+datatype_sampler(A) ::= SAMPLERCUBE. { A = &ctx->dt_samplercube; }
+datatype_sampler(A) ::= SAMPLER_STATE. { A = &ctx->dt_samplerstate; }
+datatype_sampler(A) ::= SAMPLERSTATE. { A = &ctx->dt_samplerstate; }
+datatype_sampler(A) ::= SAMPLERCOMPARISONSTATE. { A = &ctx->dt_samplercompstate; }
+
+%type datatype_scalar { const MOJOSHADER_astDataType * }
+datatype_scalar(A) ::= BOOL. { A = &ctx->dt_bool; }
+datatype_scalar(A) ::= INT. { A = &ctx->dt_int; }
+datatype_scalar(A) ::= UINT. { A = &ctx->dt_uint; }
+datatype_scalar(A) ::= HALF. { A = &ctx->dt_half; }
+datatype_scalar(A) ::= FLOAT. { A = &ctx->dt_float; }
+datatype_scalar(A) ::= DOUBLE. { A = &ctx->dt_double; }
+datatype_scalar(A) ::= STRING. { A = &ctx->dt_string; } // this is for the effects framework, not HLSL.
+datatype_scalar(A) ::= SNORM FLOAT. { A = &ctx->dt_float_snorm; }
+datatype_scalar(A) ::= UNORM FLOAT. { A = &ctx->dt_float_unorm; }
+
+%type datatype_buffer { const MOJOSHADER_astDataType * }
+datatype_buffer(A) ::= BUFFER LT BOOL GT. { A = &ctx->dt_buf_bool; }
+datatype_buffer(A) ::= BUFFER LT INT GT. { A = &ctx->dt_buf_int; }
+datatype_buffer(A) ::= BUFFER LT UINT GT. { A = &ctx->dt_buf_uint; }
+datatype_buffer(A) ::= BUFFER LT HALF GT. { A = &ctx->dt_buf_half; }
+datatype_buffer(A) ::= BUFFER LT FLOAT GT. { A = &ctx->dt_buf_float; }
+datatype_buffer(A) ::= BUFFER LT DOUBLE GT. { A = &ctx->dt_buf_double; }
+datatype_buffer(A) ::= BUFFER LT SNORM FLOAT GT. { A = &ctx->dt_buf_float_snorm; }
+datatype_buffer(A) ::= BUFFER LT UNORM FLOAT GT. { A = &ctx->dt_buf_float_unorm; }
+
+%type datatype_vector { const MOJOSHADER_astDataType * }
+datatype_vector(A) ::= VECTOR LT datatype_scalar(B) COMMA INT_CONSTANT(C) GT. { A = new_datatype_vector(ctx, B, (int) C.i64); }
+
+%type datatype_matrix { const MOJOSHADER_astDataType * }
+datatype_matrix(A) ::= MATRIX LT datatype_scalar(B) COMMA INT_CONSTANT(C) COMMA INT_CONSTANT(D) GT. { A = new_datatype_matrix(ctx, B, (int) C.i64, (int) D.i64); }
+
+%type statement_block { MOJOSHADER_astStatement * }
+%destructor statement_block { delete_statement(ctx, $$); }
+statement_block(A) ::= LBRACE RBRACE. { A = new_block_statement(ctx, NULL); }
+statement_block(A) ::= LBRACE statement_list(B) RBRACE. { REVERSE_LINKED_LIST(MOJOSHADER_astStatement, B); A = new_block_statement(ctx, B); }
+
+%type statement_list { MOJOSHADER_astStatement * }
+%destructor statement_list { delete_statement(ctx, $$); }
+statement_list(A) ::= statement(B). { A = B; }
+statement_list(A) ::= statement_list(B) statement(C). { A = C; A->next = B; }
+
+// These are for Shader Model 4 and Xbox 360 only, apparently.
+// !!! FIXME: ...so we ignore them for now.
+// !!! FIXME: can these stack?  "[isolate][unused]{}" or something?
+%type statement_attribute { int }
+statement_attribute(A) ::= ISOLATE. { A = 0; }  // !!! FIXME
+statement_attribute(A) ::= MAXINSTRUCTIONCOUNT LPAREN INT_CONSTANT RPAREN. { A = 0; }  // !!! FIXME
+statement_attribute(A) ::= NOEXPRESSIONOPTIMIZATIONS. { A = 0; }  // !!! FIXME
+statement_attribute(A) ::= REMOVEUNUSEDINPUTS. { A = 0; }  // !!! FIXME
+statement_attribute(A) ::= UNUSED. { A = 0; }  // !!! FIXME
+statement_attribute(A) ::= XPS. { A = 0; }  // !!! FIXME
+
+%type statement { MOJOSHADER_astStatement * }
+%destructor statement { delete_statement(ctx, $$); }
+statement(A) ::= BREAK SEMICOLON. { A = new_break_statement(ctx); }
+statement(A) ::= CONTINUE SEMICOLON. { A = new_continue_statement(ctx); }
+statement(A) ::= DISCARD SEMICOLON. { A = new_discard_statement(ctx); }
+statement(A) ::= LBRACKET statement_attribute(B) RBRACKET statement_block(C). { A = C; /* !!! FIXME: A->attributes = B;*/ B = 0; }
+statement(A) ::= variable_declaration(B). { A = new_vardecl_statement(ctx, B); }
+statement(A) ::= struct_declaration(B) SEMICOLON. { A = new_struct_statement(ctx, B); }
+statement(A) ::= do_intro(B) DO statement(C) WHILE LPAREN expression(D) RPAREN SEMICOLON. { A = new_do_statement(ctx, B, C, D); }
+statement(A) ::= while_intro(B) LPAREN expression(C) RPAREN statement(D). { A = new_while_statement(ctx, B, C, D); }
+statement(A) ::= if_intro(B) LPAREN expression(C) RPAREN statement(D). { A = new_if_statement(ctx, B, C, D, NULL); }
+statement(A) ::= if_intro(B) LPAREN expression(C) RPAREN statement(D) ELSE statement(E). { A = new_if_statement(ctx, B, C, D, E); }
+statement(A) ::= switch_intro(B) LPAREN expression(C) RPAREN LBRACE switch_case_list(D) RBRACE. { REVERSE_LINKED_LIST(MOJOSHADER_astSwitchCases, D); A = new_switch_statement(ctx, B, C, D); }
+statement(A) ::= typedef(B). { A = new_typedef_statement(ctx, B); }
+statement(A) ::= SEMICOLON. { A = new_empty_statement(ctx); }
+statement(A) ::= expression(B) SEMICOLON. { A = new_expr_statement(ctx, B); }
+statement(A) ::= RETURN SEMICOLON. { A = new_return_statement(ctx, NULL); }
+statement(A) ::= RETURN expression(B) SEMICOLON. { A = new_return_statement(ctx, B); }
+statement(A) ::= statement_block(B). { A = B; }
+statement(A) ::= for_statement(B). { A = B; }
+//statement(A) ::= error SEMICOLON. { A = NULL; }  // !!! FIXME: research using the error nonterminal
+
+%type while_intro { int }
+while_intro(A) ::= LBRACKET UNROLL LPAREN INT_CONSTANT(B) RPAREN RBRACKET WHILE. { A = (B.i64 < 0) ? 0 : B.i64; }
+while_intro(A) ::= LBRACKET UNROLL RBRACKET WHILE. { A = -1; }
+while_intro(A) ::= LBRACKET LOOP RBRACKET WHILE. { A = 0; }
+while_intro(A) ::= WHILE. { A = -2; }
+
+%type for_statement { MOJOSHADER_astStatement * }
+%destructor for_statement { delete_statement(ctx, $$); }
+for_statement(A) ::= for_intro(B) for_details(C). { A = C; ((MOJOSHADER_astForStatement *) A)->unroll = B; }
+
+%type for_intro { int }
+for_intro(A) ::= LBRACKET UNROLL LPAREN INT_CONSTANT(B) RPAREN RBRACKET FOR. { A = (B.i64 < 0) ? 0 : B.i64; }
+for_intro(A) ::= LBRACKET UNROLL RBRACKET FOR. { A = -1; }
+for_intro(A) ::= LBRACKET LOOP RBRACKET FOR. { A = 0; }
+for_intro(A) ::= FOR. { A = -2; }
+
+%type for_details { MOJOSHADER_astStatement * }
+%destructor for_details { delete_statement(ctx, $$); }
+for_details(A) ::= LPAREN expression(B) SEMICOLON expression(C) SEMICOLON expression(D) RPAREN statement(E). { A = new_for_statement(ctx, NULL, B, C, D, E); }
+for_details(A) ::= LPAREN SEMICOLON SEMICOLON RPAREN statement(B). { A = new_for_statement(ctx, NULL, NULL, NULL, NULL, B); }
+for_details(A) ::= LPAREN SEMICOLON SEMICOLON expression(B) RPAREN statement(C). { A = new_for_statement(ctx, NULL, NULL, NULL, B, C); }
+for_details(A) ::= LPAREN SEMICOLON expression(B) SEMICOLON RPAREN statement(C). { A = new_for_statement(ctx, NULL, NULL, B, NULL, C); }
+for_details(A) ::= LPAREN SEMICOLON expression(B) SEMICOLON expression(C) RPAREN statement(D). { A = new_for_statement(ctx, NULL, NULL, B, C, D); }
+for_details(A) ::= LPAREN expression(B) SEMICOLON SEMICOLON RPAREN statement(C). { A = new_for_statement(ctx, NULL, B, NULL, NULL, C); }
+for_details(A) ::= LPAREN expression(B) SEMICOLON SEMICOLON expression(C) RPAREN statement(D). { A = new_for_statement(ctx, NULL, B, NULL, C, D); }
+for_details(A) ::= LPAREN expression(B) SEMICOLON expression(C) SEMICOLON RPAREN statement(D). { A = new_for_statement(ctx, NULL, B, C, NULL, D); }
+for_details(A) ::= LPAREN variable_declaration(B) expression(C) SEMICOLON expression(D) RPAREN statement(E). { A = new_for_statement(ctx, B, NULL, C, D, E); }
+for_details(A) ::= LPAREN variable_declaration(B) SEMICOLON RPAREN statement(C).  { A = new_for_statement(ctx, B, NULL, NULL, NULL, C); }
+for_details(A) ::= LPAREN variable_declaration(B) SEMICOLON expression(C) RPAREN statement(D). { A = new_for_statement(ctx, B, NULL, C, NULL, D); }
+for_details(A) ::= LPAREN variable_declaration(B) expression(C) SEMICOLON RPAREN statement(D). { A = new_for_statement(ctx, B, NULL, C, NULL, D); }
+
+%type do_intro { int }
+do_intro(A) ::= LBRACKET UNROLL LPAREN INT_CONSTANT(B) RPAREN RBRACKET DO. { A = (B.i64 < 0) ? 0 : (int) B.i64; }
+do_intro(A) ::= LBRACKET UNROLL RBRACKET DO. { A = -1; }
+do_intro(A) ::= LBRACKET LOOP RBRACKET DO. { A = 0; }
+do_intro(A) ::= DO. { A = -2; }
+
+%type if_intro { int }
+if_intro(A) ::= LBRACKET BRANCH RBRACKET IF. { A = MOJOSHADER_AST_IFATTR_BRANCH; }
+if_intro(A) ::= LBRACKET FLATTEN RBRACKET IF. { A = MOJOSHADER_AST_IFATTR_FLATTEN; }
+if_intro(A) ::= LBRACKET IFALL RBRACKET IF. { A = MOJOSHADER_AST_IFATTR_IFALL; }
+if_intro(A) ::= LBRACKET IFANY RBRACKET IF. { A = MOJOSHADER_AST_IFATTR_IFANY; }
+if_intro(A) ::= LBRACKET PREDICATE RBRACKET IF. { A = MOJOSHADER_AST_IFATTR_PREDICATE; }
+if_intro(A) ::= LBRACKET PREDICATEBLOCK RBRACKET IF. { A = MOJOSHADER_AST_IFATTR_PREDICATEBLOCK; }
+if_intro(A) ::= IF. { A = MOJOSHADER_AST_IFATTR_NONE; }
+
+%type switch_intro { int }
+switch_intro(A) ::= LBRACKET FLATTEN RBRACKET SWITCH. { A = MOJOSHADER_AST_SWITCHATTR_FLATTEN; }
+switch_intro(A) ::= LBRACKET BRANCH RBRACKET SWITCH. { A = MOJOSHADER_AST_SWITCHATTR_BRANCH; }
+switch_intro(A) ::= LBRACKET FORCECASE RBRACKET SWITCH. { A = MOJOSHADER_AST_SWITCHATTR_FORCECASE; }
+switch_intro(A) ::= LBRACKET CALL RBRACKET SWITCH. { A = MOJOSHADER_AST_SWITCHATTR_CALL; }
+switch_intro(A) ::= SWITCH. { A = MOJOSHADER_AST_SWITCHATTR_NONE; }
+
+%type switch_case_list { MOJOSHADER_astSwitchCases * }
+%destructor switch_case_list { delete_switch_case(ctx, $$); }
+switch_case_list(A) ::= switch_case(B). { A = B; }
+switch_case_list(A) ::= switch_case_list(B) switch_case(C). { A = C; A->next = B; }
+
+// You can do math here, apparently, as long as it produces an int constant.
+//  ...so "case 3+2:" works.
+%type switch_case { MOJOSHADER_astSwitchCases * }
+%destructor switch_case { delete_switch_case(ctx, $$); }
+switch_case(A) ::= CASE expression(B) COLON statement_list(C). { REVERSE_LINKED_LIST(MOJOSHADER_astStatement, C); A = new_switch_case(ctx, B, C); }
+switch_case(A) ::= CASE expression(B) COLON. { A = new_switch_case(ctx, B, NULL); }
+switch_case(A) ::= DEFAULT COLON statement_list(B). { REVERSE_LINKED_LIST(MOJOSHADER_astStatement, B); A = new_switch_case(ctx, NULL, B); }
+switch_case(A) ::= DEFAULT COLON. { A = new_switch_case(ctx, NULL, NULL); }
+
+// the expression stuff is based on Jeff Lee's ANSI C grammar.
+%type primary_expr { MOJOSHADER_astExpression * }
+%destructor primary_expr { delete_expr(ctx, $$); }
+primary_expr(A) ::= IDENTIFIER(B). { A = new_identifier_expr(ctx, B.string); }
+primary_expr(A) ::= INT_CONSTANT(B). { A = new_literal_int_expr(ctx, B.i64); }
+primary_expr(A) ::= FLOAT_CONSTANT(B). { A = new_literal_float_expr(ctx, B.dbl); }
+primary_expr(A) ::= STRING_LITERAL(B). { A = new_literal_string_expr(ctx, B.string); }
+primary_expr(A) ::= TRUE. { A = new_literal_boolean_expr(ctx, 1); }
+primary_expr(A) ::= FALSE. { A = new_literal_boolean_expr(ctx, 0); }
+primary_expr(A) ::= LPAREN expression(B) RPAREN. { A = B; }
+
+%type postfix_expr { MOJOSHADER_astExpression * }
+%destructor postfix_expr { delete_expr(ctx, $$); }
+postfix_expr(A) ::= primary_expr(B). { A = B; }
+postfix_expr(A) ::= postfix_expr(B) LBRACKET expression(C) RBRACKET. { A = new_binary_expr(ctx, MOJOSHADER_AST_OP_DEREF_ARRAY, B, C); }
+postfix_expr(A) ::= IDENTIFIER(B) arguments(C). { A = new_callfunc_expr(ctx, B.string, C); }
+postfix_expr(A) ::= datatype(B) arguments(C). { A = new_constructor_expr(ctx, B, C); } // HLSL constructor
+postfix_expr(A) ::= postfix_expr(B) DOT IDENTIFIER(C). { A = new_deref_struct_expr(ctx, B, C.string); }
+postfix_expr(A) ::= postfix_expr(B) PLUSPLUS. { A = new_unary_expr(ctx, MOJOSHADER_AST_OP_POSTINCREMENT, B); }
+postfix_expr(A) ::= postfix_expr(B) MINUSMINUS. { A = new_unary_expr(ctx, MOJOSHADER_AST_OP_POSTDECREMENT, B); }
+
+%type arguments { MOJOSHADER_astArguments * }
+%destructor arguments { delete_arguments(ctx, $$); }
+arguments(A) ::= LPAREN RPAREN. { A = NULL; }
+arguments(A) ::= LPAREN argument_list(B) RPAREN. { REVERSE_LINKED_LIST(MOJOSHADER_astArguments, B); A = B; }
+
+%type argument_list { MOJOSHADER_astArguments * }
+%destructor argument_list { delete_arguments(ctx, $$); }
+argument_list(A) ::= assignment_expr(B). { A = new_argument(ctx, B); }
+argument_list(A) ::= argument_list(B) COMMA assignment_expr(C). { A = new_argument(ctx, C); A->next = B; }
+
+%type unary_expr { MOJOSHADER_astExpression * }
+%destructor unary_expr { delete_expr(ctx, $$); }
+unary_expr(A) ::= postfix_expr(B). { A = B; }
+unary_expr(A) ::= PLUSPLUS unary_expr(B). { A = new_unary_expr(ctx, MOJOSHADER_AST_OP_PREINCREMENT, B); }
+unary_expr(A) ::= MINUSMINUS unary_expr(B). { A = new_unary_expr(ctx, MOJOSHADER_AST_OP_PREDECREMENT, B); }
+unary_expr(A) ::= PLUS cast_expr(B). { A = B; }  // unary "+x" is always a no-op, so throw it away here.
+unary_expr(A) ::= MINUS cast_expr(B). { A = new_unary_expr(ctx, MOJOSHADER_AST_OP_NEGATE, B); }
+unary_expr(A) ::= COMPLEMENT cast_expr(B). { A = new_unary_expr(ctx, MOJOSHADER_AST_OP_COMPLEMENT, B); }
+unary_expr(A) ::= EXCLAMATION cast_expr(B). { A = new_unary_expr(ctx, MOJOSHADER_AST_OP_NOT, B); }
+
+%type cast_expr { MOJOSHADER_astExpression * }
+%destructor cast_expr { delete_expr(ctx, $$); }
+cast_expr(A) ::= unary_expr(B). { A = B; }
+cast_expr(A) ::= LPAREN datatype(B) RPAREN cast_expr(C). { A = new_cast_expr(ctx, B, C); }
+
+%type multiplicative_expr { MOJOSHADER_astExpression * }
+%destructor multiplicative_expr { delete_expr(ctx, $$); }
+multiplicative_expr(A) ::= cast_expr(B). { A = B; }
+multiplicative_expr(A) ::= multiplicative_expr(B) STAR cast_expr(C). { A = new_binary_expr(ctx, MOJOSHADER_AST_OP_MULTIPLY, B, C); }
+multiplicative_expr(A) ::= multiplicative_expr(B) SLASH cast_expr(C). { A = new_binary_expr(ctx, MOJOSHADER_AST_OP_DIVIDE, B, C); }
+multiplicative_expr(A) ::= multiplicative_expr(B) PERCENT cast_expr(C). { A = new_binary_expr(ctx, MOJOSHADER_AST_OP_MODULO, B, C); }
+
+%type additive_expr { MOJOSHADER_astExpression * }
+%destructor additive_expr { delete_expr(ctx, $$); }
+additive_expr(A) ::= multiplicative_expr(B). { A = B; }
+additive_expr(A) ::= additive_expr(B) PLUS multiplicative_expr(C). { A = new_binary_expr(ctx, MOJOSHADER_AST_OP_ADD, B, C); }
+additive_expr(A) ::= additive_expr(B) MINUS multiplicative_expr(C). { A = new_binary_expr(ctx, MOJOSHADER_AST_OP_SUBTRACT, B, C); }
+
+%type shift_expr { MOJOSHADER_astExpression * }
+%destructor shift_expr { delete_expr(ctx, $$); }
+shift_expr(A) ::= additive_expr(B). { A = B; }
+shift_expr(A) ::= shift_expr(B) LSHIFT additive_expr(C). { A = new_binary_expr(ctx, MOJOSHADER_AST_OP_LSHIFT, B, C); }
+shift_expr(A) ::= shift_expr(B) RSHIFT additive_expr(C). { A = new_binary_expr(ctx, MOJOSHADER_AST_OP_RSHIFT, B, C); }
+
+%type relational_expr { MOJOSHADER_astExpression * }
+%destructor relational_expr { delete_expr(ctx, $$); }
+relational_expr(A) ::= shift_expr(B). { A = B; }
+relational_expr(A) ::= relational_expr(B) LT shift_expr(C). { A = new_binary_expr(ctx, MOJOSHADER_AST_OP_LESSTHAN, B, C); }
+relational_expr(A) ::= relational_expr(B) GT shift_expr(C). { A = new_binary_expr(ctx, MOJOSHADER_AST_OP_GREATERTHAN, B, C); }
+relational_expr(A) ::= relational_expr(B) LEQ shift_expr(C). { A = new_binary_expr(ctx, MOJOSHADER_AST_OP_LESSTHANOREQUAL, B, C); }
+relational_expr(A) ::= relational_expr(B) GEQ shift_expr(C). { A = new_binary_expr(ctx, MOJOSHADER_AST_OP_GREATERTHANOREQUAL, B, C); }
+
+%type equality_expr { MOJOSHADER_astExpression * }
+%destructor equality_expr { delete_expr(ctx, $$); }
+equality_expr(A) ::= relational_expr(B). { A = B; }
+equality_expr(A) ::= equality_expr(B) EQL relational_expr(C). { A = new_binary_expr(ctx, MOJOSHADER_AST_OP_EQUAL, B, C); }
+equality_expr(A) ::= equality_expr(B) NEQ relational_expr(C). { A = new_binary_expr(ctx, MOJOSHADER_AST_OP_NOTEQUAL, B, C); }
+
+%type and_expr { MOJOSHADER_astExpression * }
+%destructor and_expr { delete_expr(ctx, $$); }
+and_expr(A) ::= equality_expr(B). { A = B; }
+and_expr(A) ::= and_expr(B) AND equality_expr(C). { A = new_binary_expr(ctx, MOJOSHADER_AST_OP_BINARYAND, B, C); }
+
+%type exclusive_or_expr { MOJOSHADER_astExpression * }
+%destructor exclusive_or_expr { delete_expr(ctx, $$); }
+exclusive_or_expr(A) ::= and_expr(B). { A = B; }
+exclusive_or_expr(A) ::= exclusive_or_expr(B) XOR and_expr(C). { A = new_binary_expr(ctx, MOJOSHADER_AST_OP_BINARYXOR, B, C); }
+
+%type inclusive_or_expr { MOJOSHADER_astExpression * }
+%destructor inclusive_or_expr { delete_expr(ctx, $$); }
+inclusive_or_expr(A) ::= exclusive_or_expr(B). { A = B; }
+inclusive_or_expr(A) ::= inclusive_or_expr(B) OR exclusive_or_expr(C). { A = new_binary_expr(ctx, MOJOSHADER_AST_OP_BINARYOR, B, C); }
+
+%type logical_and_expr { MOJOSHADER_astExpression * }
+%destructor logical_and_expr { delete_expr(ctx, $$); }
+logical_and_expr(A) ::= inclusive_or_expr(B). { A = B; }
+logical_and_expr(A) ::= logical_and_expr(B) ANDAND inclusive_or_expr(C). { A = new_binary_expr(ctx, MOJOSHADER_AST_OP_LOGICALAND, B, C); }
+
+%type logical_or_expr { MOJOSHADER_astExpression * }
+%destructor logical_or_expr { delete_expr(ctx, $$); }
+logical_or_expr(A) ::= logical_and_expr(B). { A = B; }
+logical_or_expr(A) ::= logical_or_expr(B) OROR logical_and_expr(C). { A = new_binary_expr(ctx, MOJOSHADER_AST_OP_LOGICALOR, B, C); }
+
+%type conditional_expr { MOJOSHADER_astExpression * }
+%destructor conditional_expr { delete_expr(ctx, $$); }
+conditional_expr(A) ::= logical_or_expr(B). { A = B; }
+conditional_expr(A) ::= logical_or_expr(B) QUESTION logical_or_expr(C) COLON conditional_expr(D). { A = new_ternary_expr(ctx, MOJOSHADER_AST_OP_CONDITIONAL, B, C, D); }
+
+%type assignment_expr { MOJOSHADER_astExpression * }
+%destructor assignment_expr { delete_expr(ctx, $$); }
+assignment_expr(A) ::= conditional_expr(B). { A = B; }
+assignment_expr(A) ::= unary_expr(B) ASSIGN assignment_expr(C). { A = new_binary_expr(ctx, MOJOSHADER_AST_OP_ASSIGN, B, C); }
+assignment_expr(A) ::= unary_expr(B) MULASSIGN assignment_expr(C). { A = new_binary_expr(ctx, MOJOSHADER_AST_OP_MULASSIGN, B, C); }
+assignment_expr(A) ::= unary_expr(B) DIVASSIGN assignment_expr(C). { A = new_binary_expr(ctx, MOJOSHADER_AST_OP_DIVASSIGN, B, C); }
+assignment_expr(A) ::= unary_expr(B) MODASSIGN assignment_expr(C). { A = new_binary_expr(ctx, MOJOSHADER_AST_OP_MODASSIGN, B, C); }
+assignment_expr(A) ::= unary_expr(B) ADDASSIGN assignment_expr(C). { A = new_binary_expr(ctx, MOJOSHADER_AST_OP_ADDASSIGN, B, C); }
+assignment_expr(A) ::= unary_expr(B) SUBASSIGN assignment_expr(C). { A = new_binary_expr(ctx, MOJOSHADER_AST_OP_SUBASSIGN, B, C); }
+assignment_expr(A) ::= unary_expr(B) LSHIFTASSIGN assignment_expr(C). { A = new_binary_expr(ctx, MOJOSHADER_AST_OP_LSHIFTASSIGN, B, C); }
+assignment_expr(A) ::= unary_expr(B) RSHIFTASSIGN assignment_expr(C). { A = new_binary_expr(ctx, MOJOSHADER_AST_OP_RSHIFTASSIGN, B, C); }
+assignment_expr(A) ::= unary_expr(B) ANDASSIGN assignment_expr(C). { A = new_binary_expr(ctx, MOJOSHADER_AST_OP_ANDASSIGN, B, C); }
+assignment_expr(A) ::= unary_expr(B) XORASSIGN assignment_expr(C). { A = new_binary_expr(ctx, MOJOSHADER_AST_OP_XORASSIGN, B, C); }
+assignment_expr(A) ::= unary_expr(B) ORASSIGN assignment_expr(C). { A = new_binary_expr(ctx, MOJOSHADER_AST_OP_ORASSIGN, B, C); }
+
+%type expression { MOJOSHADER_astExpression * }
+%destructor expression { delete_expr(ctx, $$); }
+expression(A) ::= assignment_expr(B). { A = B; }
+expression(A) ::= expression(B) COMMA assignment_expr(C). { A = new_binary_expr(ctx, MOJOSHADER_AST_OP_COMMA, B, C); }
+
+// end of mojoshader_parser_hlsl.lemon ...
+

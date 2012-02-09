@@ -60,14 +60,22 @@ namespace Microsoft.Xna.Framework.Content
 			}
 			
 			// Concat the file name with valid extensions
+#if IPHONE || MONOMAC
 			if (File.Exists(FileName+".aiff"))
 				return FileName+".aiff";
+#endif
 			if (File.Exists(FileName+".wav"))
 				return FileName+".wav";
+#if IPHONE || MONOMAC
 			if (File.Exists(FileName+".ac3"))
 				return FileName+".ac3";
-			if (File.Exists(FileName+".mp3"))
+#endif
+            if (File.Exists(FileName+".mp3"))
 				return FileName+".mp3";
+#if ANDROID
+            if (File.Exists(FileName + ".ogg"))
+                return FileName + ".ogg";
+#endif
 			if (File.Exists(FileName+".xnb"))
 				return FileName+".xnb";
 			
@@ -100,8 +108,9 @@ namespace Microsoft.Xna.Framework.Content
 			
 			writer.Close();
 			mStream.Close();
-			
-			return new SoundEffect(input.AssetName, mStream.ToArray());
+			//FIXME: Temporary measure
+			//return new SoundEffect(input.AssetName, mStream.ToArray());
+			return new SoundEffect(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}, 11025, AudioChannels.Mono);
 		}
 	}
 }

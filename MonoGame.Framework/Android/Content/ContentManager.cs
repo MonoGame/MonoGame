@@ -56,7 +56,7 @@ namespace Microsoft.Xna.Framework.Content
             Stream stream = null;
             try
             {
-                stream = Game.Activity.Assets.Open(assetName + ".xnb");
+                stream = Game.Activity.Assets.Open(GetFilename(assetName) + ".xnb");
             }
             catch (FileNotFoundException fileNotFound)
             {

@@ -1,0 +1,1 @@
+/opt/local/bin/gcc   -arch i386 -arch x86_64 -isysroot /Developer/SDKs/MacOSX10.6.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/lemon.dir/misc/lemon.c.o  -o lemon  

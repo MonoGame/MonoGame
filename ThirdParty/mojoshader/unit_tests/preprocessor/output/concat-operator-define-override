@@ -1,0 +1,6 @@
+// This should produce "RIGHT" and not "WRONG"
+#define RI WR
+#define GHT ONG
+#define REPLACE(RI, GHT) RI##GHT
+REPLACE(RI, GHT)
+

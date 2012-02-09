@@ -198,8 +198,10 @@ namespace Microsoft.Xna.Framework
 				wantFullScreen = value;
 				if (_graphicsDevice != null) 
 				{
-					_graphicsDevice.PresentationParameters.IsFullScreen = value;	
+					_graphicsDevice.PresentationParameters.IsFullScreen = value;
+#if ANDROID
                     ForceSetFullScreen();
+#endif
 				}
             }
         }

@@ -1,0 +1,9 @@
+// This triggered an error before, when the "== D0" would not pop_source().
+#define D0 0
+#if DA == D0
+RIGHT
+#elif D5 >= D4
+WRONG
+#else
+ALSOWRONG
+#endif

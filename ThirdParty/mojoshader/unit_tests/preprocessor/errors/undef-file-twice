@@ -1,0 +1,4 @@
+// this should only produce one warning.
+#undef __FILE__
+#undef __FILE__
+

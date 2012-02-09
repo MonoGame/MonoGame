@@ -179,6 +179,10 @@ namespace Microsoft.Xna.Framework.Graphics
                     //sz = 2;
                     GL.TexImage2D(BufferTarget.Texture2D, 0, (int)All.Rgba, (int)width, (int)height, 0, All.Rgba, All.UnsignedShort5551, data);
                     break;
+                case SurfaceFormat.Bgr565 /*kTexture2DPixelFormat_RGB565*/:
+                    //sz = 2;
+                    GL.TexImage2D(BufferTarget.Texture2D, 0, (int)All.Rgb565, (int)width, (int)height, 0, All.Rgb565, All.UnsignedShort565, data);
+                    break;
                 case SurfaceFormat.Alpha8 /*kTexture2DPixelFormat_A8*/:
                     //sz = 1;
                     GL.TexImage2D(BufferTarget.Texture2D, 0, (int)All.Alpha, (int)width, (int)height, 0, All.Alpha, All.UnsignedByte, data);

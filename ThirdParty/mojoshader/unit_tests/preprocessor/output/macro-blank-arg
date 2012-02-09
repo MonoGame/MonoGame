@@ -1,0 +1,4 @@
+// This shouldn't produce an error (the "()" should be treated as one
+//  blank argument.
+#define x(y) y
+x()

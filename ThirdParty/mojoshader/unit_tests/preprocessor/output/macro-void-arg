@@ -1,0 +1,4 @@
+// This should not trigger a preprocessor error.
+//  Nor should it produce "RIGHT()".
+#define x() RIGHT
+x()

@@ -165,7 +165,10 @@ namespace Microsoft.Xna.Framework
 				base.CreateFrameBuffer();
 		    }
 
-            _game.GraphicsDevice.Initialize();
+            if (_game.GraphicsDevice != null)
+            {
+                _game.GraphicsDevice.Initialize();
+            }
 		}
 	
 
@@ -343,8 +346,11 @@ namespace Microsoft.Xna.Framework
             }
 			
 			
-			CurrentOrientation = actualOrientation;      
-            _game.GraphicsDevice.PresentationParameters.DisplayOrientation = actualOrientation;
+			CurrentOrientation = actualOrientation;
+            if (_game.GraphicsDevice != null)
+            {
+                _game.GraphicsDevice.PresentationParameters.DisplayOrientation = actualOrientation;
+            }
             TouchPanel.DisplayOrientation = actualOrientation;
         }
 

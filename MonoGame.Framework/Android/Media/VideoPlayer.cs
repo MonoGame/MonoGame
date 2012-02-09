@@ -89,14 +89,14 @@ namespace Microsoft.Xna.Framework.Media
             _video.Player.Start();
 
             _state = MediaState.Playing;
-            AndroidGamePlatform.IsPlayingVdeo = true;
+            AndroidGamePlatform.IsPlayingVideo = true;
         }
 
         public void Stop()
         {
             _video.Player.Stop();
 			_state = MediaState.Stopped;
-            AndroidGamePlatform.IsPlayingVdeo = false;
+            AndroidGamePlatform.IsPlayingVideo = false;
            _video.Player.SetDisplay(null);
         }
 

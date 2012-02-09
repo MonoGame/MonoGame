@@ -1,0 +1,40 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Volumes/Data/Compiling/terraria/mojoshader/mojoshader.c
+mojoshader_internal.h
+/Volumes/Data/Compiling/terraria/mojoshader/mojoshader_internal.h
+mojoshader_internal.h
+/Volumes/Data/Compiling/terraria/mojoshader/mojoshader_internal.h
+
+/Volumes/Data/Compiling/terraria/mojoshader/mojoshader.h
+mojoshader_version.h
+/Volumes/Data/Compiling/terraria/mojoshader/mojoshader_version.h
+
+/Volumes/Data/Compiling/terraria/mojoshader/mojoshader_internal.h
+stdio.h
+-
+string.h
+-
+stdlib.h
+-
+stdarg.h
+-
+assert.h
+-
+mojoshader.h
+/Volumes/Data/Compiling/terraria/mojoshader/mojoshader.h
+malloc.h
+-
+stdint.h
+-
+alloca.h
+-
+
+/Volumes/Data/Compiling/terraria/mojoshader/mojoshader_version.h
+
