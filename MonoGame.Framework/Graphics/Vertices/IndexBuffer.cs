@@ -65,21 +65,50 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			GL.BindBuffer(BufferTarget.ElementArrayBuffer, ibo);
 		}
-		
-		public void GetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount) where T : struct
+
+        public unsafe void GetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount) where T : struct
         {
-			throw new NotSupportedException();
+            GL.BindBuffer(BufferTarget.ArrayBuffer, ibo);
+            var elementSizeInByte = Marshal.SizeOf(typeof(T));
+            IntPtr ptr = new IntPtr();
+            ptr = GL.Arb.MapBuffer(BufferTargetArb.ArrayBuffer, ArbVertexBufferObject.ReadOnlyArb | ArbVertexBufferObject.ArrayBufferArb);
+
+            if (ptr != null && ptr.ToInt32() != 0)
+            {
+                byte* byt = (byte*)ptr.ToPointer();
+                byt = byt + offsetInBytes;
+
+                for (int j = 0; j < elementCount; j++)
+                {
+                    byte[] bytes = new byte[elementSizeInByte];
+                    for (int i = 0; i < elementSizeInByte; i++)
+                    {
+                        if (i < elementSizeInByte)
+                            bytes[i] = *byt;
+                        byt++;
+                    }
+
+                    IntPtr buffer = Marshal.AllocHGlobal(elementSizeInByte);
+                    Marshal.Copy(bytes, 0, buffer, elementSizeInByte);
+                    object retobj = Marshal.PtrToStructure(buffer, typeof(T));
+                    data[j] = (T)retobj;
+                    Marshal.Release(buffer);
+                }
+
+                GL.Arb.UnmapBuffer(BufferTargetArb.ArrayBuffer);
+                Marshal.Release(ptr);
+            }
         }
-		
-		public unsafe void GetData<T>(T[] data, int startIndex, int elementCount)
-		{
-			throw new NotSupportedException();
-		}
-		
-		public unsafe void GetData<T>(T[] data)
-		{
-			throw new NotSupportedException();
-		}
+
+        public unsafe void GetData<T>(T[] data, int startIndex) where T : struct
+        {            
+            this.GetData<T>(0, data, startIndex, data.Count());
+        }
+
+        public unsafe void GetData<T>(T[] data) where T : struct
+        {
+            this.GetData<T>(0, data, 0, data.Count());
+        }
 		
 		public void SetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount) where T : struct
         {
