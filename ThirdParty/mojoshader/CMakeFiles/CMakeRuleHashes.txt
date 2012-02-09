@@ -1,4 +1,0 @@
-# Hashes of file build rules.
-6b8b164446f7b5f2e7458c28764decb4 CMakeFiles/test
-73e80ff8472ac5e6af8eb22efbc2119c mojoshader_lexer.c
-e45c13431bfd51612f579f4cbf63fab3 mojoshader_parser_hlsl.h
