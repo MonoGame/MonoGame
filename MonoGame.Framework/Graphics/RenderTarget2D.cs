@@ -58,12 +58,12 @@ namespace Microsoft.Xna.Framework.Graphics
 {
 	public class RenderTarget2D : Texture2D
 	{
-#if IPHONE && ES11
+#if GLES && ES11
 		const RenderbufferTarget GLRenderbuffer = RenderbufferTarget.RenderbufferOes;
 		const RenderbufferStorage GLDepthComponent16 = RenderbufferStorage.DepthComponent16Oes;
 		const RenderbufferStorage GLDepthComponent24 = RenderbufferStorage.DepthComponent24Oes;
 		const RenderbufferStorage GLDepth24Stencil8 = RenderbufferStorage.Depth24Stencil8Oes;
-#elif IPHONE
+#elif GLES
 		const RenderbufferTarget GLRenderbuffer = RenderbufferTarget.Renderbuffer;
 		const RenderbufferStorage GLDepthComponent16 = RenderbufferStorage.DepthComponent16;
 		const RenderbufferStorage GLDepthComponent24 = RenderbufferStorage.DepthComponent24Oes;
@@ -94,7 +94,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			if (preferredDepthFormat != DepthFormat.None)
 			{
-#if IPHONE
+#if GLES
 				GL.GenRenderbuffers(1, ref glDepthStencilBuffer);
 #else
 				GL.GenRenderbuffers(1, out glDepthStencilBuffer);

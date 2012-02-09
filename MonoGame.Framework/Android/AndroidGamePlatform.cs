@@ -98,7 +98,7 @@ namespace Microsoft.Xna.Framework
         }
 
         private bool _initialized;
-        public static bool IsPlayingVdeo { get; set; }
+        public static bool IsPlayingVideo { get; set; }
 
         public override void Exit()
         {
@@ -136,7 +136,7 @@ namespace Microsoft.Xna.Framework
 
         public override bool BeforeDraw(GameTime gameTime)
         {
-            return !IsPlayingVdeo;
+            return !IsPlayingVideo;
         }
 
         public override void BeforeInitialize()
@@ -176,12 +176,12 @@ namespace Microsoft.Xna.Framework
 
         public override void BeginScreenDeviceChange(bool willBeFullScreen)
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
 
         public override void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight)
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
 
         // EnterForeground

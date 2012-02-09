@@ -1,0 +1,1 @@
+preprocessor/errors/too-many-macro-args:3: ERROR: macro 'x' passed 2 arguments, but requires 1

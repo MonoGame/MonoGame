@@ -1,0 +1,5 @@
+// This should produce THIS_IS_THE_MACRO_ARG and not THIS_IS_THE_DEFINE.
+#define x THIS_IS_THE_DEFINE
+#define b(x) x
+#define z(x) b(x)
+z(THIS_IS_THE_MACRO_ARG)

@@ -1,0 +1,1 @@
+preprocessor/errors/redefinition-line:2: ERROR: '__LINE__' already defined

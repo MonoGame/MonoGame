@@ -47,10 +47,21 @@ using Android.Graphics;
 
 using Java.Nio;
 
-using GL11 = OpenTK.Graphics.ES11.GL;
-using GL20 = OpenTK.Graphics.ES20.GL;
-using ALL11 = OpenTK.Graphics.ES11.All;
-using ALL20 = OpenTK.Graphics.ES20.All;
+#if ES11
+using OpenTK.Graphics.ES11;
+using TextureParam = OpenTK.Graphics.ES11.All;
+using TextureParamName = OpenTK.Graphics.ES20.All;
+using BufferTarget = OpenTK.Graphics.ES20.All;
+
+#else
+using OpenTK.Graphics.ES20;
+
+#if GLES
+using TextureParam = OpenTK.Graphics.ES20.All;
+using TextureParamName = OpenTK.Graphics.ES20.All;
+using BufferTarget = OpenTK.Graphics.ES20.All;
+#endif
+#endif
 
 using Buffer = System.Buffer;
 
@@ -66,24 +77,24 @@ namespace Microsoft.Xna.Framework.Graphics
         private float _maxS, _maxT;
         // Stored until texture is created
         private Bitmap _originalBitmap;
-        private ALL11 _originalFilter;
+        private All _originalFilter;
 		
 		internal Size Size
 		{
 			get { return _size;}
 		}
 
-        public ESTexture2D(IntPtr data, SurfaceFormat pixelFormat, int width, int height, Size size, ALL11 filter)
+        public ESTexture2D(IntPtr data, SurfaceFormat pixelFormat, int width, int height, Size size, All filter)
         {
             InitWithData(data, pixelFormat, width, height, size, filter);
         }
 
-        public ESTexture2D(Bitmap image, ALL11 filter)
+        public ESTexture2D(Bitmap image, All filter)
         {
             InitWithBitmap(image, filter);
         }
 
-        public void InitWithBitmap(Bitmap imageSource, ALL11 filter)
+        public void InitWithBitmap(Bitmap imageSource, All filter)
         {
             //TODO:  Android.Opengl.GLUtils.GetInternalFormat()
 
@@ -91,31 +102,20 @@ namespace Microsoft.Xna.Framework.Graphics
             if (imageSource.HasAlpha)
                 _format = SurfaceFormat.Color;
 
-            if (GraphicsDevice.OpenGLESVersion == OpenTK.Graphics.GLContextVersion.Gles2_0)
-            {
-                _width = imageSource.Width;
-                _height = imageSource.Height;
-            }
-            else
-            {
-                //scale up bitmap to be power of 2 dimensions but dont exceed 1024x1024.
-                //Note: may not have to do this with OpenGL 2+
-                _width = (int)Math.Pow(2, Math.Min(10, Math.Ceiling(Math.Log10(imageSource.Width) / Math.Log10(2))));
-                _height = (int)Math.Pow(2, Math.Min(10, Math.Ceiling(Math.Log10(imageSource.Height) / Math.Log10(2))));
-            }
+#if ES11
+            //scale up bitmap to be power of 2 dimensions but dont exceed 1024x1024.
+            //Note: may not have to do this with OpenGL 2+
+            _width = (int)Math.Pow(2, Math.Min(10, Math.Ceiling(Math.Log10(imageSource.Width) / Math.Log10(2))));
+            _height = (int)Math.Pow(2, Math.Min(10, Math.Ceiling(Math.Log10(imageSource.Height) / Math.Log10(2))));
+#else
+            _width = imageSource.Width;
+            _height = imageSource.Height;
+#endif
 
             _size.Width = _width;
             _size.Height = _height;
 
-            if (GraphicsDevice.OpenGLESVersion ==
-                OpenTK.Graphics.GLContextVersion.Gles2_0)
-            {
-                GL20.GenTextures(1, ref _name);
-            }
-            else
-            {
-                GL11.GenTextures(1, ref _name);
-            }
+            GL.GenTextures(1, ref _name);
 
             if (_name == 0)
             {
@@ -125,44 +125,28 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             else
             {
-                using (
-                    Bitmap imagePadded = Bitmap.CreateBitmap(_width, _height,
-                                                             Bitmap.Config.Argb8888)
-                    )
+                using (Bitmap imagePadded = Bitmap.CreateBitmap(_width, _height, Bitmap.Config.Argb8888))
                 {
                     Canvas can = new Canvas(imagePadded);
                     can.DrawARGB(0, 0, 0, 0);
                     can.DrawBitmap(imageSource, 0, 0, null);
-                    if (GraphicsDevice.OpenGLESVersion ==
-                        OpenTK.Graphics.GLContextVersion.Gles2_0)
-                    {
-                        GL20.BindTexture(ALL20.Texture2D, _name);
-                        GL20.TexParameter(ALL20.Texture2D, ALL20.TextureMinFilter,
-                                          (int)filter);
-                        GL20.TexParameter(ALL20.Texture2D, ALL20.TextureMagFilter,
-                                          (int)filter);
-                        Android.Opengl.GLUtils.TexImage2D((int)ALL20.Texture2D, 0,
-                                                          imagePadded, 0);
 
-                        // error checking
-                        //int errAndroidGL = Android.Opengl.GLES20.GlGetError();
-                        //ALL20 errGenericGL = GL20.GetError();
-                        //if (errAndroidGL != Android.Opengl.GLES20.GlNoError || errGenericGL != ALL20.NoError)
-                        //    Console.WriteLine(string.Format("OpenGL ES 2.0:\n\tAndroid error: {0,10:X}\n\tGeneric error: {1, 10:X}", errAndroidGL, errGenericGL));
-                    }
-                    else
-                    {
-                        GL11.BindTexture(ALL11.Texture2D, _name);
-                        GL11.TexParameter(ALL11.Texture2D, ALL11.TextureMinFilter,
-                                          (int)filter);
-                        GL11.TexParameter(ALL11.Texture2D, ALL11.TextureMagFilter,
-                                          (int)filter);
-                        Android.Opengl.GLUtils.TexImage2D((int)ALL11.Texture2D, 0,
-                                                          imagePadded, 0);
+                    GL.BindTexture(BufferTarget.Texture2D, _name);
+                    GL.TexParameter(BufferTarget.Texture2D, BufferTarget.TextureMinFilter,
+                                        (int)filter);
+                    GL.TexParameter(BufferTarget.Texture2D, BufferTarget.TextureMagFilter,
+                                        (int)filter);
+                    Android.Opengl.GLUtils.TexImage2D((int)BufferTarget.Texture2D, 0,
+                                                        imagePadded, 0);
 
-                        // free bitmap
-                        imageSource.Recycle();
-                    }
+                    // error checking
+                    //int errAndroidGL = Android.Opengl.GLES20.GlGetError();
+                    //ALL20 errGenericGL = GL20.GetError();
+                    //if (errAndroidGL != Android.Opengl.GLES20.GlNoError || errGenericGL != ALL20.NoError)
+                    //    Console.WriteLine(string.Format("OpenGL ES 2.0:\n\tAndroid error: {0,10:X}\n\tGeneric error: {1, 10:X}", errAndroidGL, errGenericGL));
+
+                    // free bitmap
+                    imageSource.Recycle();
                 }
             }
 
@@ -170,76 +154,41 @@ namespace Microsoft.Xna.Framework.Graphics
             _maxT = _size.Height / (float)_height;
         }
 
-        public void InitWithData(IntPtr data, SurfaceFormat pixelFormat, int width, int height, Size size, ALL11 filter)
+        public void InitWithData(IntPtr data, SurfaceFormat pixelFormat, int width, int height, Size size, All filter)
         {
-            if (GraphicsDevice.OpenGLESVersion == OpenTK.Graphics.GLContextVersion.Gles2_0)
+            GL.GenTextures(1, ref _name);
+            GL.BindTexture(BufferTarget.Texture2D, _name);
+            GL.TexParameter(BufferTarget.Texture2D, TextureParamName.TextureMinFilter, (int)filter);
+            GL.TexParameter(BufferTarget.Texture2D, TextureParamName.TextureMagFilter, (int)filter);
+            GL.TexParameter(BufferTarget.Texture2D, TextureParamName.TextureWrapS, (int)TextureParam.ClampToEdge);
+            GL.TexParameter(BufferTarget.Texture2D, TextureParamName.TextureWrapT, (int)TextureParam.ClampToEdge);
+
+            switch (pixelFormat)
             {
-
-                GL20.GenTextures(1, ref _name);
-                GL20.BindTexture(ALL20.Texture2D, _name);
-                GL20.TexParameter(ALL20.Texture2D, ALL20.TextureMinFilter, (int)filter);
-                GL20.TexParameter(ALL20.Texture2D, ALL20.TextureMagFilter, (int)filter);
-                GL20.TexParameter(ALL20.Texture2D, ALL20.TextureWrapS, (int)ALL20.ClampToEdge);
-                GL20.TexParameter(ALL20.Texture2D, ALL20.TextureWrapT, (int)ALL20.ClampToEdge);
-
-                switch (pixelFormat)
-                {
-                    case SurfaceFormat.Color /*kTexture2DPixelFormat_RGBA8888*/:
-                    case SurfaceFormat.Dxt1:
-                    case SurfaceFormat.Dxt3:
-                        //sz = 4;
-                        GL20.TexImage2D(ALL20.Texture2D, 0, (int)ALL20.Rgba, (int)width, (int)height, 0, ALL20.Rgba, ALL20.UnsignedByte, data);
-                        break;
-                    case SurfaceFormat.Bgra4444 /*kTexture2DPixelFormat_RGBA4444*/:
-                        //sz = 2;
-                        GL20.TexImage2D(ALL20.Texture2D, 0, (int)ALL20.Rgba, (int)width, (int)height, 0, ALL20.Rgba, ALL20.UnsignedShort4444, data);
-                        break;
-                    case SurfaceFormat.Bgra5551 /*kTexture2DPixelFormat_RGB5A1*/:
-                        //sz = 2;
-                        GL20.TexImage2D(ALL20.Texture2D, 0, (int)ALL20.Rgba, (int)width, (int)height, 0, ALL20.Rgba, ALL20.UnsignedShort5551, data);
-                        break;
-                    case SurfaceFormat.Alpha8 /*kTexture2DPixelFormat_A8*/:
-                        //sz = 1;
-                        GL20.TexImage2D(ALL20.Texture2D, 0, (int)ALL20.Alpha, (int)width, (int)height, 0, ALL20.Alpha, ALL20.UnsignedByte, data);
-                        break;
-                    default:
-                        throw new NotSupportedException("Texture format");
-                }
-            }
-            else
-            {
-                GL11.GenTextures(1, ref _name);
-                GL11.BindTexture(ALL11.Texture2D, _name);
-                GL11.TexParameter(ALL11.Texture2D, ALL11.TextureMinFilter, (int)filter);
-                GL11.TexParameter(ALL11.Texture2D, ALL11.TextureMagFilter, (int)filter);
-                GL11.TexParameter(ALL11.Texture2D, ALL11.TextureWrapS, (int)ALL11.ClampToEdge);
-                GL11.TexParameter(ALL11.Texture2D, ALL11.TextureWrapT, (int)ALL11.ClampToEdge);
-
-                int sz = 0;
-
-                switch (pixelFormat)
-                {
-                    case SurfaceFormat.Color /*kTexture2DPixelFormat_RGBA8888*/:
-                    case SurfaceFormat.Dxt1:
-                    case SurfaceFormat.Dxt3:
-                        sz = 4;
-                        GL11.TexImage2D(ALL11.Texture2D, 0, (int)ALL11.Rgba, (int)width, (int)height, 0, ALL11.Rgba, ALL11.UnsignedByte, data);
-                        break;
-                    case SurfaceFormat.Bgra4444 /*kTexture2DPixelFormat_RGBA4444*/:
-                        sz = 2;
-                        GL11.TexImage2D(ALL11.Texture2D, 0, (int)ALL11.Rgba, (int)width, (int)height, 0, ALL11.Rgba, ALL11.UnsignedShort4444, data);
-                        break;
-                    case SurfaceFormat.Bgra5551 /*kTexture2DPixelFormat_RGB5A1*/:
-                        sz = 2;
-                        GL11.TexImage2D(ALL11.Texture2D, 0, (int)ALL11.Rgba, (int)width, (int)height, 0, ALL11.Rgba, ALL11.UnsignedShort5551, data);
-                        break;
-                    case SurfaceFormat.Alpha8 /*kTexture2DPixelFormat_A8*/:
-                        sz = 1;
-                        GL11.TexImage2D(ALL11.Texture2D, 0, (int)ALL11.Alpha, (int)width, (int)height, 0, ALL11.Alpha, ALL11.UnsignedByte, data);
-                        break;
-                    default:
-                        throw new NotSupportedException("Texture format");
-                }
+                case SurfaceFormat.Color /*kTexture2DPixelFormat_RGBA8888*/:
+                case SurfaceFormat.Dxt1:
+                case SurfaceFormat.Dxt3:
+                    //sz = 4;
+                    GL.TexImage2D(BufferTarget.Texture2D, 0, (int)All.Rgba, (int)width, (int)height, 0, All.Rgba, All.UnsignedByte, data);
+                    break;
+                case SurfaceFormat.Bgra4444 /*kTexture2DPixelFormat_RGBA4444*/:
+                    //sz = 2;
+                    GL.TexImage2D(BufferTarget.Texture2D, 0, (int)All.Rgba, (int)width, (int)height, 0, All.Rgba, All.UnsignedShort4444, data);
+                    break;
+                case SurfaceFormat.Bgra5551 /*kTexture2DPixelFormat_RGB5A1*/:
+                    //sz = 2;
+                    GL.TexImage2D(BufferTarget.Texture2D, 0, (int)All.Rgba, (int)width, (int)height, 0, All.Rgba, All.UnsignedShort5551, data);
+                    break;
+                case SurfaceFormat.Bgr565 /*kTexture2DPixelFormat_RGB565*/:
+                    //sz = 2;
+                    GL.TexImage2D(BufferTarget.Texture2D, 0, (int)All.Rgb565, (int)width, (int)height, 0, All.Rgb565, All.UnsignedShort565, data);
+                    break;
+                case SurfaceFormat.Alpha8 /*kTexture2DPixelFormat_A8*/:
+                    //sz = 1;
+                    GL.TexImage2D(BufferTarget.Texture2D, 0, (int)All.Alpha, (int)width, (int)height, 0, All.Alpha, All.UnsignedByte, data);
+                    break;
+                default:
+                    throw new NotSupportedException("Texture format");
             }
 
             _size = size;
@@ -272,10 +221,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (_name != 0)
             {
-                if (GraphicsDevice.OpenGLESVersion == OpenTK.Graphics.GLContextVersion.Gles2_0)
-                    GL20.DeleteTextures(1, ref _name);
-                else
-                    GL11.DeleteTextures(1, ref _name);
+                GL.DeleteTextures(1, ref _name);
             }
         }
 
@@ -353,7 +299,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // Copy bits
             IntPtr pointer = Marshal.AllocHGlobal(length);
             Marshal.Copy(b, 0, pointer, length);
-            ESTexture2D result = new ESTexture2D(pointer, SurfaceFormat.Dxt3, width, height, new Size(width, height), ALL11.Linear);
+            ESTexture2D result = new ESTexture2D(pointer, SurfaceFormat.Dxt3, width, height, new Size(width, height), All.Linear);
             Marshal.FreeHGlobal(pointer);
             return result;
         }
@@ -394,33 +340,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
             }
             return b;
-        }
-
-        public void DrawAtPoint(Vector2 point)
-        {
-            float[] coordinates = { 0, _maxT, _maxS, _maxT, 0, 0, _maxS, 0 };
-            float width = (float)_width * _maxS;
-            float height = (float)_height * _maxT;
-            float[] vertices = {	-width / 2.0f + point.X, -height / 2.0f + point.Y,	0.0f,
-								width / 2.0f + point.X,	-height / 2.0f + point.Y,	0.0f,
-								-width / 2.0f + point.X,	height / 2.0f + point.Y,	0.0f,
-								width / 2.0f + point.X,	height / 2.0f + point.Y,	0.0f };
-
-            GL11.BindTexture(ALL11.Texture2D, _name);
-            GL11.VertexPointer(3, ALL11.Float, 0, vertices);
-            GL11.TexCoordPointer(2, ALL11.Float, 0, coordinates);
-            GL11.DrawArrays(ALL11.TriangleStrip, 0, 4);
-        }
-
-        public void DrawInRect(Rectangle rect)
-        {
-            float[] coordinates = { 0, _maxT, _maxS, _maxT, 0, 0, _maxS, 0 };
-            float[] vertices = { rect.Left, rect.Top, 0.0f, rect.Right, rect.Top, 0.0f, rect.Left, rect.Bottom, 0.0f, rect.Right, rect.Bottom, 0.0f };
-
-            GL11.BindTexture(ALL11.Texture2D, _name);
-            GL11.VertexPointer(3, ALL11.Float, 0, vertices);
-            GL11.TexCoordPointer(2, ALL11.Float, 0, coordinates);
-            GL11.DrawArrays(ALL11.TriangleStrip, 0, 4);
         }
 
         public Size ContentSize

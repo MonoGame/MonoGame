@@ -1,0 +1,4 @@
+// This should produce "10.05h" and not "10.05 h"
+10.05h
+// This should produce "10.05e10h" and not "10.05e10 h"
+10.05e10h

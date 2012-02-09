@@ -83,11 +83,6 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			
 		}
 		
-		public bool Contains(TouchLocation item)
-		{
-			return (this.IndexOf(item) >= 0);
-		}
-		
 		internal void Update()
 		{ 
 			//Console.WriteLine("----------------"+this.Count+"--------------------");
@@ -115,27 +110,6 @@ namespace Microsoft.Xna.Framework.Input.Touch
 				this.Remove(touch);
 		}
 		
-		public void CopyTo (TouchLocation[] array, int arrayIndex)
-		{
-			if (array == null)
-			{
-				throw new ArgumentNullException("array");
-			}
-			if (arrayIndex < 0)
-			{
-				throw new ArgumentOutOfRangeException("arrayIndex");
-			}
-			long num = arrayIndex + this.Count;
-			if (array.Length < num)
-			{
-				throw new ArgumentOutOfRangeException("arrayIndex");
-			}
-			for(int i = 0; i < this.Count; i++)
-			{
-				array[arrayIndex+i] = this[i];
-			}
-		}
-		
 		public int FindById(int id, out TouchLocation touchLocation)
 		{
 			for (int i = 0; i < this.Count; i++)
@@ -150,19 +124,5 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			touchLocation = new TouchLocation();
 			return -1;
 		}
-		
-		
-		public int IndexOf(TouchLocation item)
-		{
-			for (int i = 0; i < this.Count; i++)
-			{
-				if (this[i] == item)
-				{
-					return i;
-				}
-			}
-			return -1;
-		}
-		
 	}
 }

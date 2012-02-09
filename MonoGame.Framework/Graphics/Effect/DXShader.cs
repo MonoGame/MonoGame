@@ -8,7 +8,7 @@ using OpenTK.Graphics.OpenGL;
 #else
 using System.Text;
 using OpenTK.Graphics.ES20;
-#if IPHONE
+#if GLES
 using ShaderType = OpenTK.Graphics.ES20.All;
 using ShaderParameter = OpenTK.Graphics.ES20.All;
 using TextureUnit = OpenTK.Graphics.ES20.All;
@@ -141,7 +141,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			//glslCode = GLSLOptimizer.Optimize (glslCode, shaderType);
 			
-#if IPHONE
+#if GLES
 			glslCode = glslCode.Replace("#version 110\n", "");
 			glslCode = @"precision mediump float;
 						 precision mediump int;
@@ -149,7 +149,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 			
 			shader = GL.CreateShader (shaderType);
-#if IPHONE
+#if GLES
 			GL.ShaderSource (shader, 1, new string[]{glslCode}, (int[])null);
 #else			
 			GL.ShaderSource (shader, glslCode);
@@ -157,13 +157,13 @@ namespace Microsoft.Xna.Framework.Graphics
 			GL.CompileShader(shader);
 			
 			int compiled = 0;
-#if IPHONE
+#if GLES
 			GL.GetShader (shader, ShaderParameter.CompileStatus, ref compiled);
 #else
 			GL.GetShader (shader, ShaderParameter.CompileStatus, out compiled);
 #endif
 			if (compiled == (int)All.False) {
-#if IPHONE
+#if GLES
 				string log = "";
 				int length = 0;
 				GL.GetShader (shader, ShaderParameter.InfoLogLength, ref length);

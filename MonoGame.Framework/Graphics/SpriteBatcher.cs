@@ -60,7 +60,7 @@ using DrawElementsType = OpenTK.Graphics.ES11.All;
 #else
 using OpenTK.Graphics.ES20;
 
-#if IPHONE
+#if GLES
 using VertexAttribPointerType = OpenTK.Graphics.ES20.All;
 using TextureUnit = OpenTK.Graphics.ES20.All;
 using TextureTarget = OpenTK.Graphics.ES20.All;
@@ -280,7 +280,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			// draw stuff
 			if ( start != end ) {
 				GL.DrawElements (
-#if IPHONE
+#if GLES
 				                 All.Triangles,
 #else
 								 BeginMode.Triangles,

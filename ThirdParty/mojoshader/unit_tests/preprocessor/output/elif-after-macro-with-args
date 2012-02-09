@@ -1,0 +1,8 @@
+#define D0(x) 0
+#if DA == D0(5)
+RIGHT
+#elif D5 >= D4
+WRONG
+#else
+ALSOWRONG
+#endif

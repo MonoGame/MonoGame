@@ -227,7 +227,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void SetData<T>(T[] data)
         {
-			throw new NotImplementedException();
+			GL.BindTexture(All.Texture2D, _textureId);
+			GL.CopyTexImage2D(All.Texture2D, 0, All.Rgba, 0, 0, Width, Height, 0);
         }
 
         public int Width

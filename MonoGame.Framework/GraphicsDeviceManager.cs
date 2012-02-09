@@ -39,6 +39,10 @@ purpose and non-infringement.
 #endregion License
 
 using System;
+#if ANDROID
+using Android.Content.PM;
+using Android.Views;
+#endif
 
 #if ES11
 using OpenTK.Graphics.ES11;
@@ -194,10 +198,23 @@ namespace Microsoft.Xna.Framework
 				wantFullScreen = value;
 				if (_graphicsDevice != null) 
 				{
-					_graphicsDevice.PresentationParameters.IsFullScreen = value;	
+					_graphicsDevice.PresentationParameters.IsFullScreen = value;
+#if ANDROID
+                    ForceSetFullScreen();
+#endif
 				}
             }
         }
+
+#if ANDROID
+        internal void ForceSetFullScreen()
+        {
+            if (IsFullScreen)
+                Game.Activity.Window.SetFlags(WindowManagerFlags.Fullscreen, WindowManagerFlags.Fullscreen);
+            else
+                Game.Activity.Window.SetFlags(WindowManagerFlags.ForceNotFullscreen, WindowManagerFlags.ForceNotFullscreen);
+        }
+#endif
 
         public bool PreferMultiSampling
         {

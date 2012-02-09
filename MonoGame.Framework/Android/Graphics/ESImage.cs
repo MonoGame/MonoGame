@@ -40,8 +40,22 @@ purpose and non-infringement.
 
 using System;
 using Android.Graphics;
-using OpenTK.Graphics.ES11;
 using System.Drawing;
+#if ES11
+using OpenTK.Graphics.ES11;
+using TextureParam = OpenTK.Graphics.ES11.All;
+using TextureParamName = OpenTK.Graphics.ES20.All;
+using BufferTarget = OpenTK.Graphics.ES20.All;
+
+#else
+using OpenTK.Graphics.ES20;
+
+#if GLES
+using TextureParam = OpenTK.Graphics.ES20.All;
+using TextureParamName = OpenTK.Graphics.ES20.All;
+using BufferTarget = OpenTK.Graphics.ES20.All;
+#endif
+#endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {

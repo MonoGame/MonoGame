@@ -462,6 +462,16 @@ namespace Microsoft.Xna.Framework.Graphics
 				               (int)width, (int)height, 0,
 				               GLPixelFormat.Rgba, PixelType.UnsignedShort5551, data);
 				break;
+			case SurfaceFormat.Bgr565 /*kTexture2DPixelFormat_RGB565*/:
+				GL.TexImage2D (TextureTarget.Texture2D, 0, 
+#if IPHONE
+				               (int)PixelInternalFormat.Rgb,
+#else				               
+				               PixelInternalFormat.Rgb,
+#endif
+				               (int)width, (int)height, 0,
+				               GLPixelFormat.Rgba, PixelType.UnsignedShort565, data);
+				break;
 			case SurfaceFormat.Alpha8 /*kTexture2DPixelFormat_A8*/:
 				GL.TexImage2D (TextureTarget.Texture2D, 0,
 #if IPHONE

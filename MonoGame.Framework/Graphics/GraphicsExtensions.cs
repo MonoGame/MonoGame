@@ -10,7 +10,7 @@ using OpenTK.Graphics.OpenGL;
 #else
  #if ES11
 using OpenTK.Graphics.ES11;
-  #if IPHONE
+  #if GLES
 using BlendEquationMode = OpenTK.Graphics.ES11.All;
 using BlendingFactorSrc = OpenTK.Graphics.ES11.All;
 using BlendingFactorDest = OpenTK.Graphics.ES11.All;
@@ -23,7 +23,7 @@ using TexCoordPointerType = OpenTK.Graphics.ES11.All;
 
  #else
 using OpenTK.Graphics.ES20;
-  #if IPHONE
+  #if GLES
 using BlendEquationMode = OpenTK.Graphics.ES20.All;
 using BlendingFactorSrc = OpenTK.Graphics.ES20.All;
 using BlendingFactorDest = OpenTK.Graphics.ES20.All;
@@ -394,7 +394,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		public static BlendEquationMode GetBlendEquationMode (this BlendFunction function)
 		{
 			switch (function) {
-#if ES11 && IPHONE
+#if ES11 && GLES
 			case BlendFunction.Add:
 				return BlendEquationMode.FuncAddOes;
 			case BlendFunction.Max:
@@ -446,7 +446,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			case Blend.InverseSourceColor:
 #if MONOMAC
 				return BlendingFactorSrc.OneMinusSrc1Color;
-#elif IPHONE
+#elif GLES
 				return BlendingFactorSrc.OneMinusSrcColor;
 #else
 				return BlendingFactorSrc.OneMinusConstantColor;
@@ -460,7 +460,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			case Blend.SourceColor:
 #if MONOMAC
 				return BlendingFactorSrc.Src1Color;
-#elif IPHONE
+#elif GLES
 				return BlendingFactorSrc.SrcColor;
 #else
 				return BlendingFactorSrc.ConstantColor;
@@ -489,7 +489,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			case Blend.InverseSourceColor:
 #if MONOMAC
 				return BlendingFactorDest.OneMinusSrc1Color;
-#elif IPHONE
+#elif GLES
 				return BlendingFactorDest.OneMinusSrcColor;
 #else
 				return BlendingFactorDest.OneMinusConstantColor;
@@ -503,7 +503,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			case Blend.SourceColor:
 #if MONOMAC
 				return BlendingFactorDest.Src1Color;
-#elif IPHONE
+#elif GLES
 				return BlendingFactorDest.SrcColor;
 #else
 				return BlendingFactorDest.ConstantColor;
@@ -553,7 +553,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				glFormat = PixelFormat.Luminance;
 				glType = PixelType.UnsignedByte;
 				break;
-#if !IPHONE
+#if !GLES
 			case SurfaceFormat.Dxt1:
 				glInternalFormat = PixelInternalFormat.CompressedRgbaS3tcDxt1Ext;
 				glFormat = (PixelFormat)All.CompressedTextureFormats;

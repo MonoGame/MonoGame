@@ -1,0 +1,6 @@
+// Should produce RIGHT and not WRONG
+#define RI WR
+#define GHT ONG
+#define z(a) RI##GHT
+z(1)
+

@@ -70,7 +70,7 @@ using RenderbufferStorage = OpenTK.Graphics.ES11.All;
 #endif
 #else
 using OpenTK.Graphics.ES20;
-#if IPHONE
+#if GLES
 using EnableCap = OpenTK.Graphics.ES20.All;
 using TextureTarget = OpenTK.Graphics.ES20.All;
 using BufferTarget = OpenTK.Graphics.ES20.All;
@@ -125,7 +125,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		internal static int attributeTexCoord = 7; //must be the last one, texture index locations are added to it
 
 		//OpenGL ES 1.1 extension consts
-#if IPHONE && ES11
+#if GLES && ES11
 		const FramebufferTarget GLFramebuffer = FramebufferTarget.FramebufferOes;
 		const RenderbufferTarget GLRenderbuffer = RenderbufferTarget.RenderbufferOes;
 		const FramebufferAttachment GLDepthAttachment = FramebufferAttachment.DepthAttachmentOes;
@@ -136,7 +136,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		const RenderbufferStorage GLDepthComponent24 = RenderbufferStorage.DepthComponent24Oes;
 		const RenderbufferStorage GLDepth24Stencil8 = RenderbufferStorage.Depth24Stencil8Oes;
 		const FramebufferErrorCode GLFramebufferComplete = FramebufferErrorCode.FramebufferCompleteOes;
-#elif IPHONE
+#elif GLES
 		const FramebufferTarget GLFramebuffer = FramebufferTarget.Framebuffer;
 		const RenderbufferTarget GLRenderbuffer = RenderbufferTarget.Renderbuffer;
 		const FramebufferAttachment GLDepthAttachment = FramebufferAttachment.DepthAttachment;
@@ -309,7 +309,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				bufferMask = bufferMask | ClearBufferMask.DepthBufferBit;
 			}
 
-#if IPHONE
+#if GLES
 			GL.Clear ((uint)bufferMask);
 #else
 			GL.Clear (bufferMask);
@@ -489,7 +489,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			{
 				if (this.glFramebuffer == 0)
 				{
-#if IPHONE
+#if GLES
 					GL.GenFramebuffers(1, ref this.glFramebuffer);
 #else
 					GL.GenFramebuffers(1, out this.glFramebuffer);
@@ -553,7 +553,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
         }
 		
-#if IPHONE
+#if GLES
 		internal All PrimitiveTypeGL(PrimitiveType primitiveType)
         {
             switch (primitiveType)
@@ -637,7 +637,7 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
 
             //Create VBO if not created already
-#if IPHONE
+#if GLES
             if (VboIdArray == 0)
                 GL.GenBuffers(1, ref VboIdArray);
 #else
@@ -694,7 +694,7 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
 
             //Create VBO if not created already
-#if IPHONE
+#if GLES
 			if (VboIdArray == 0)
                 GL.GenBuffers(1, ref VboIdArray);
             if (VboIdElement == 0)
@@ -754,7 +754,7 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
 
             //Create VBO if not created already
-#if IPHONE
+#if GLES
 			if (VboIdArray == 0)
                 GL.GenBuffers(1, ref VboIdArray);
             if (VboIdElement == 0)
@@ -791,7 +791,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			                GetElementCountArray(primitiveType, primitiveCount),
 #if WINDOWS
                             (DrawElementsType)All.UnsignedInt,
-#elif IPHONE
+#elif GLES
 			                DrawElementsType.UnsignedInt248Oes,
 #else
 			                DrawElementsType.UnsignedInt,

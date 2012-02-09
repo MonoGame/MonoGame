@@ -1,0 +1,3 @@
+#define right(   x   )       x
+right(     RIGHT    )
+

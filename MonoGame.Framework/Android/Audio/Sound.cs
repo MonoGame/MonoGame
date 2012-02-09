@@ -107,7 +107,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         public Sound(byte[] audiodata, float volume, bool looping)
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
 
         internal static void IncreaseMediaVolume()
