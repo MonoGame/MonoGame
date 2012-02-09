@@ -109,12 +109,14 @@ namespace Microsoft.Xna.Framework.Media
 		
 		internal void Prepare()
 		{
-			_view = new MPMoviePlayerViewController(new NSUrl(FileName));
+            var url = NSUrl.FromFilename(Path.GetFullPath(FileName));
+
+			_view = new MPMoviePlayerViewController(url);
 			_view.MoviePlayer.ScalingMode = MPMovieScalingMode.AspectFill;
 			_view.MoviePlayer.MovieControlMode = MPMovieControlMode.Hidden;
 			_view.MoviePlayer.PrepareToPlay();
 			
-			Vector4 color = BackgroundColor.ToEAGLColor();
+			Vector4 color = BackgroundColor.ToVector4();
 			_view.MoviePlayer.BackgroundColor = new MonoTouch.UIKit.UIColor(color.X,color.Y,color.Z,color.W);
 		}
 		

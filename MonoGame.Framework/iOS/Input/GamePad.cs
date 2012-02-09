@@ -135,8 +135,12 @@
 	
 	        public static GamePadState GetState(PlayerIndex playerIndex)
 	        {		
-				return new GamePadState(); // Please fix
-				// TODO return new GamePadState((Buttons)GamePad.Instance._buttons,GamePad.Instance._leftStick,GamePad.Instance._rightStick);
+			return new GamePadState(
+					new GamePadThumbSticks(Instance._leftStick, Instance._rightStick), 
+		                        new GamePadTriggers(0f, 0f), 
+					new GamePadButtons((Buttons)Instance._buttons), 
+					new GamePadDPad(0,0,0,0)
+				);
 	        }
 	
 	        public static bool SetVibration(PlayerIndex playerIndex, float leftMotor, float rightMotor)
@@ -191,7 +195,8 @@
 				UITouch []touchesArray = touches.ToArray<UITouch>();
 				foreach(UITouch touch in touchesArray)
 				{
-					Vector2 location = new Vector2(touch.LocationInView(touch.View));
+					var point = touch.LocationInView(touch.View);
+					Vector2 location = new Vector2(point.X, point.Y);
 					location = window.GetOffsetPosition(location,false);
 					// Check where is the touch
 					bool hitInButton = false;
@@ -241,7 +246,8 @@
 				UITouch []touchesArray = touches.ToArray<UITouch>();
 				foreach(UITouch touch in touchesArray)
 				{
-					Vector2 location = new Vector2(touch.LocationInView(touch.View));
+					var point = touch.LocationInView(touch.View);
+					Vector2 location = new Vector2(point.X, point.Y);
 					location = window.GetOffsetPosition(location,false);
 					
 					var oldItem = GetTouchesObject(touch);
@@ -349,7 +355,8 @@
 				UITouch []touchesArray = touches.ToArray<UITouch>();
 				foreach(UITouch touch in touchesArray)
 				{
-					Vector2 location = new Vector2(touch.LocationInView(touch.View).X, touch.LocationInView(touch.View).Y);
+					var point = touch.LocationInView(touch.View);
+					Vector2 location = new Vector2(point.X, point.Y);
 					location = window.GetOffsetPosition(location,false);
 					// Check where is the touch
 					if (Visible)

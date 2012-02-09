@@ -38,220 +38,103 @@
 // */
 // #endregion License
 // 
-
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
-using OpenTK.Graphics.ES20;
+
+//For laoding from resources
+using System.Reflection;
+
 
 namespace Microsoft.Xna.Framework.Graphics
 {
 	public class Effect : GraphicsResource
     {
         public EffectParameterCollection Parameters { get; set; }
+		internal List<EffectParameter> _textureMappings = new List<EffectParameter>();
+
+		DXEffectObject effectObject;
+		
+		protected Effect (GraphicsDevice graphicsDevice)
+		{
+#if ES11
+			throw new NotSupportedException("Programmable shaders unavailable in OpenGL ES 1.1");
+#endif
+			if (graphicsDevice == null) {
+				throw new ArgumentNullException ("Graphics Device Cannot Be Null");
+			}
+			this.graphicsDevice = graphicsDevice;
+			Techniques = new EffectTechniqueCollection ();
+			Parameters = new EffectParameterCollection();
+		}
+
         public EffectTechniqueCollection Techniques { get; set; }		
 
-		private int fragment_handle;
-        private int vertex_handle;
-        private bool fragment;
-        private bool vertex;
-		
-		internal List<int> vertexShaders = new List<int>();
-		internal List<int> fragmentShaders = new List<int>();
-
-		protected Effect(Effect cloneSource) : this(cloneSource.GraphicsDevice)
+		protected Effect (Effect cloneSource)
 		{
-			this.CurrentTechnique = cloneSource.CurrentTechnique;
-			this.Name = cloneSource.Name;
-			this.Parameters = cloneSource.Parameters;
-			this.Tag = cloneSource.Tag;
-			this.Techniques = cloneSource.Techniques;
+
 		}
 
-		public Effect(GraphicsDevice aGraphicsDevice, byte[] effectCode): this(aGraphicsDevice)
-		{						
-			int fragmentblocklength = BitConverter.ToInt32(effectCode, 0);
-
-            int vertexblocklength = BitConverter.ToInt32(effectCode, fragmentblocklength + 4);
-
-            if (fragmentblocklength != 0)
-            {
-                fragment_handle = GL.CreateShader( All.FragmentShader );
-                fragment = true;
-            }
-
-            if (vertexblocklength != 0)
-            {
-                vertex_handle = GL.CreateShader( All.VertexShader );
-                vertex = true;
-            }
-
-            if (fragment)
-            {
-                string[] fragmentstring = new string[1] { Encoding.UTF8.GetString(effectCode, 4, fragmentblocklength) };
-                int[] fragmentLength = new int[1] { fragmentstring[0].Length };
-                GL.ShaderSource(fragment_handle, 1, fragmentstring, fragmentLength);
-            }
-
-            if (vertex)
-            {
-                string[] vertexstring = new string[1] { Encoding.UTF8.GetString(effectCode, fragmentblocklength + 8, vertexblocklength) };
-                int[] vertexLength = new int[1] { vertexstring[0].Length };
-                GL.ShaderSource(vertex_handle, 1, vertexstring, vertexLength);
-            }
-			
-			int compiled = 0;
-
-            if (fragment)
-            {
-                GL.CompileShader(fragment_handle);
-				
-				GL.GetShader(fragment_handle, All.CompileStatus, ref compiled );
-				if (compiled == (int)All.False)
-				{
-					Console.Write("Fragment Compilation Failed!");
-				}
-            }
-
-            if (vertex)
-            {
-                GL.CompileShader(vertex_handle);
-				GL.GetShader(vertex_handle, All.CompileStatus, ref compiled );
-				if (compiled == (int)All.False)
-				{
-					Console.Write("Vertex Compilation Failed!");
-				}
-            }
-
-		}
-		
-		internal Effect(GraphicsDevice aGraphicsDevice)
-        {
-            if (aGraphicsDevice == null)
-            {
-                throw new ArgumentNullException("Graphics Device Cannot Be Null");
-            }
-			this.graphicsDevice = aGraphicsDevice;
-			
-            Parameters = new EffectParameterCollection();
-            Techniques = new EffectTechniqueCollection();
-            CurrentTechnique = new EffectTechnique(this);
-        }
-		
-		internal Effect (GraphicsDevice aGraphicsDevice, string aFileName) : this(aGraphicsDevice)
+		public Effect (
+			GraphicsDevice graphicsDevice,
+			byte[] effectCode)
 		{
-			StreamReader streamReader = new StreamReader (aFileName);
-			string text = streamReader.ReadToEnd ();
-			streamReader.Close ();
-			
-			if ( aFileName.ToLower().Contains("fsh") )
-			{
-				CreateFragmentShaderFromSource(text);
+#if ES11
+			throw new NotSupportedException("Programmable shaders unavailable in OpenGL ES 1.1");
+#endif
+
+			if (graphicsDevice == null) {
+				throw new ArgumentNullException ("Graphics Device Cannot Be Null");
 			}
-			else if ( aFileName.ToLower().Contains("vsh") )
-			{
-				CreateVertexShaderFromSource(text);
-			}			
-			else
-			{
-				throw new ArgumentException( aFileName + " not supported!" );
+			this.graphicsDevice = graphicsDevice;
+			
+			
+			effectObject = new DXEffectObject(effectCode);
+			
+			Parameters = new EffectParameterCollection();
+			foreach (DXEffectObject.d3dx_parameter parameter in effectObject.parameter_handles) {
+				Parameters._parameters.Add (new EffectParameter(parameter));
 			}
 			
-			DefineTechnique ("Technique1", "Pass1", 0, 0);
-			CurrentTechnique = Techniques ["Technique1"];
+			Techniques = new EffectTechniqueCollection();
+			foreach (DXEffectObject.d3dx_technique technique in effectObject.technique_handles) {
+				Techniques._techniques.Add (new EffectTechnique(this, technique));
+			}
+			
+			CurrentTechnique = Techniques[0];
+			
 		}
 
-        internal virtual void Apply()
-        {
-     
-        }
-		
+		public virtual Effect Clone ()
+		{
+			throw new NotImplementedException();
+		}
+
+		public void End ()
+		{
+		}
+
+		public EffectTechnique CurrentTechnique { 
+			get;
+			set; 
+		}
+
 		protected internal virtual void OnApply ()
 		{
-			
+
 		}
-		
-		protected void CreateVertexShaderFromSource(string source)
+
+		internal static byte[] LoadEffectResource(string name)
 		{
-			int shader = GL.CreateShader (All.VertexShader);
-			// Attach the loaded source string to the shader object
-			// TODO GL.ShaderSource(shader, source);
-			// Compile the shader
-			GL.CompileShader (shader);
-			
-			vertexShaders.Add(shader);			
-		}
-		
-		
-		protected void CreateFragmentShaderFromSource(string source)
-		{
-			int shader = GL.CreateShader (All.FragmentShader);
-			// Attach the loaded source string to the shader object
-			// TODO GL.ShaderSource (shader, source);
-			// Compile the shader
-			GL.CompileShader (shader);
-			
-			fragmentShaders.Add(shader);			
-		}
-		
-		protected void DefineTechnique (string techniqueName, string passName, int vertexIndex, int fragmentIndex)
-		{
-			EffectTechnique tech = new EffectTechnique(this);
-			tech.Name = techniqueName;
-			EffectPass pass = new EffectPass(tech);
-			pass.Name = passName;
-			/* TODO pass.VertexIndex = vertexIndex;
-			pass.FragmentIndex = fragmentIndex;
-			pass.ApplyPass(); */
-			tech.Passes._passes.Add(pass);
-			Techniques._techniques.Add(tech);
-			// TODO LogShaderParameters(String.Format("Technique {0} - Pass {1} :" ,tech.Name ,pass.Name), pass.shaderProgram);
-			
-		}
-		
-		public void Begin()
-		{
-		}
-		
-		public void Begin(SaveStateMode saveStateMode)
-		{
-			
-		}
-		
-		public virtual Effect Clone()
-		{
-			Effect ef = new Effect(this);
-			return ef;
-		}
-		
-		public void End()
-		{
-		}
-		
-		internal static string Normalize(string FileName)
-		{
-			if (File.Exists(FileName))
-				return FileName;
-			
-			// Check the file extension
-			if (!string.IsNullOrEmpty(Path.GetExtension(FileName)))
+			Assembly assembly = Assembly.GetExecutingAssembly();
+			var stream = assembly.GetManifestResourceStream("Microsoft.Xna.Framework.Graphics.Effect."+name+".bin");
+			using (MemoryStream ms = new MemoryStream())
 			{
-				return null;
+				stream.CopyTo(ms);
+				return ms.ToArray();
 			}
-			
-			// Concat the file name with valid extensions
-			if (File.Exists(FileName+".fsh"))
-				return FileName+".fsh";
-			if (File.Exists(FileName+".vsh"))
-				return FileName+".vsh";
-			
-			return null;
 		}
-		
-		public EffectTechnique CurrentTechnique 
-		{ 
-			get; set; 
-		}
+
 	}
 }

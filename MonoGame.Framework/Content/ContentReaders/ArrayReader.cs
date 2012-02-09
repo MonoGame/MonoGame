@@ -50,22 +50,26 @@ namespace Microsoft.Xna.Framework.Content
 
         protected internal override T[] Read(ContentReader input, T[] existingInstance)
         {
-            int count = input.ReadInt32();
+            uint count = input.ReadUInt32();
             T[] array = existingInstance;
-            if (array == null) array = new T[count];
-            for (int i = 0; i < count; i++)
-            {
-				Type objectType = typeof(T);
-				if(objectType.IsValueType)
-				{
+            if (array == null)
+                array = new T[count];
+			Type objectType = typeof(T);
+			if(objectType.IsValueType)
+			{
+                for (uint i = 0; i < count; i++)
+                {
                 	array[i] = input.ReadObject<T>(elementReader);
-				}
-				else
-				{
-					int readerType = input.ReadByte();
-                	array[i] = input.ReadObject<T>(input.TypeReaders[readerType - 1]);
-				}
-            }
+                }
+			}
+			else
+			{
+                for (uint i = 0; i < count; i++)
+                {
+                    int readerType = input.Read7BitEncodedInt();
+                	array[i] = readerType > 0 ? input.ReadObject<T>(input.TypeReaders[readerType - 1]) : default(T);
+                }
+			}
             return array;
         }
     }

@@ -18,10 +18,10 @@ namespace Microsoft.Xna.Framework.Audio
 		}
 		
 		class EventPlayWave : ClipEvent {
-			public Sound wave;
+			public SoundEffectInstance wave;
 			public override void Play() {
 				wave.Volume = clip.Volume;
-				if (wave.Playing) wave.Stop ();
+				if (wave.State == SoundState.Playing) wave.Stop ();
 				wave.Play ();
 			}
 			public override void Stop() {
@@ -32,7 +32,7 @@ namespace Microsoft.Xna.Framework.Audio
 			}
 			public override bool Playing {
 				get {
-					return wave.Playing;
+					return wave.State == SoundState.Playing;
 				}
 			}
 			public override float Volume {

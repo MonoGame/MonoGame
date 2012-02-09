@@ -42,33 +42,71 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
-#if ANDROID
-using OpenTK.Graphics;
+#if MONOMAC
+using MonoMac.OpenGL;
+using GL_Oes = MonoMac.OpenGL.GL;
+#elif WINDOWS
+using OpenTK.Graphics.OpenGL;
+using GL_Oes = OpenTK.Graphics.OpenGL.GL;
 #else
-using MonoTouch.OpenGLES;
+
+#if ES11
+using OpenTK.Graphics.ES11;
+using GL_Oes = OpenTK.Graphics.ES11.GL.Oes;
+#if IPHONE
+using EnableCap = OpenTK.Graphics.ES11.All;
+using TextureTarget = OpenTK.Graphics.ES11.All;
+using BufferTarget = OpenTK.Graphics.ES11.All;
+using BufferUsageHint = OpenTK.Graphics.ES11.All;
+using DrawElementsType = OpenTK.Graphics.ES11.All;
+using TextureEnvTarget = OpenTK.Graphics.ES11.All;
+using TextureEnvParameter = OpenTK.Graphics.ES11.All;
+using GetPName = OpenTK.Graphics.ES11.All;
+using FramebufferErrorCode = OpenTK.Graphics.ES11.All;
+using FramebufferTarget = OpenTK.Graphics.ES11.All;
+using FramebufferAttachment = OpenTK.Graphics.ES11.All;
+using RenderbufferTarget = OpenTK.Graphics.ES11.All;
+using RenderbufferStorage = OpenTK.Graphics.ES11.All;
+#endif
+#else
+using OpenTK.Graphics.ES20;
+#if IPHONE
+using EnableCap = OpenTK.Graphics.ES20.All;
+using TextureTarget = OpenTK.Graphics.ES20.All;
+using BufferTarget = OpenTK.Graphics.ES20.All;
+using BufferUsageHint = OpenTK.Graphics.ES20.All;
+using DrawElementsType = OpenTK.Graphics.ES20.All;
+using GetPName = OpenTK.Graphics.ES20.All;
+using FramebufferErrorCode = OpenTK.Graphics.ES20.All;
+using FramebufferTarget = OpenTK.Graphics.ES20.All;
+using FramebufferAttachment = OpenTK.Graphics.ES20.All;
+using RenderbufferTarget = OpenTK.Graphics.ES20.All;
+using RenderbufferStorage = OpenTK.Graphics.ES20.All;
+#else
+using BufferUsageHint = OpenTK.Graphics.ES20.BufferUsage;
 #endif
 
-using GL11 = OpenTK.Graphics.ES11.GL;
-using GL20 = OpenTK.Graphics.ES20.GL;
-using ALL11 = OpenTK.Graphics.ES11.All;
-using ALL20 = OpenTK.Graphics.ES20.All;
+#endif
 
+#endif
 
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 
 namespace Microsoft.Xna.Framework.Graphics
-{	
+{
     public class GraphicsDevice : IDisposable
     {
-		private ALL11 _preferedFilter;
-		private int _activeTexture = -1;
-		private Viewport _viewport;
-		
-		private bool _isDisposed = false;
-		public TextureCollection Textures { get; set; }
-		private BlendState _blendState = BlendState.Opaque;
-		private DepthStencilState _depthStencilState = DepthStencilState.Default;
-		private SamplerStateCollection _samplerStates = new SamplerStateCollection ();
+        private All _preferedFilter;
+        private int _activeTexture = -1;
+        private Viewport _viewport;
+
+        private bool _isDisposed = false;
+        public TextureCollection Textures { get; set; }
+        private BlendState _blendState = BlendState.Opaque;
+        private DepthStencilState _depthStencilState = DepthStencilState.Default;
+		private RasterizerState _rasterizerState = RasterizerState.CullCounterClockwise;
+        private SamplerStateCollection _samplerStates = new SamplerStateCollection();
 
         internal List<IntPtr> _pointerCache = new List<IntPtr>();
         private VertexBuffer _vertexBuffer = null;
@@ -76,198 +114,266 @@ namespace Microsoft.Xna.Framework.Graphics
         private uint VboIdArray;
         private uint VboIdElement;
 
-        public RasterizerState RasterizerState { get; set; }
+        private RenderTargetBinding[] currentRenderTargetBindings;
 		
-		private RenderTargetBinding[] currentRenderTargets;
-		
-		//OpenGL Rendering API
-#if ANDROID
-		public static GLContextVersion OpenGLESVersion;
+		// OpenGL ES2.0 attribute locations
+		internal static int attributePosition = 0; //there can be a couple positions binded
+		internal static int attributeColor = 3;
+		internal static int attributeNormal = 4;
+		internal static int attributeBlendIndicies = 5;
+		internal static int attributeBlendWeight = 6;
+		internal static int attributeTexCoord = 7; //must be the last one, texture index locations are added to it
+
+		//OpenGL ES 1.1 extension consts
+#if IPHONE && ES11
+		const FramebufferTarget GLFramebuffer = FramebufferTarget.FramebufferOes;
+		const RenderbufferTarget GLRenderbuffer = RenderbufferTarget.RenderbufferOes;
+		const FramebufferAttachment GLDepthAttachment = FramebufferAttachment.DepthAttachmentOes;
+		const FramebufferAttachment GLStencilAttachment = FramebufferAttachment.StencilAttachmentOes;
+		const FramebufferAttachment GLColorAttachment0 = FramebufferAttachment.ColorAttachment0Oes;
+		const GetPName GLFramebufferBinding = GetPName.FramebufferBindingOes;
+		const RenderbufferStorage GLDepthComponent16 = RenderbufferStorage.DepthComponent16Oes;
+		const RenderbufferStorage GLDepthComponent24 = RenderbufferStorage.DepthComponent24Oes;
+		const RenderbufferStorage GLDepth24Stencil8 = RenderbufferStorage.Depth24Stencil8Oes;
+		const FramebufferErrorCode GLFramebufferComplete = FramebufferErrorCode.FramebufferCompleteOes;
+#elif IPHONE
+		const FramebufferTarget GLFramebuffer = FramebufferTarget.Framebuffer;
+		const RenderbufferTarget GLRenderbuffer = RenderbufferTarget.Renderbuffer;
+		const FramebufferAttachment GLDepthAttachment = FramebufferAttachment.DepthAttachment;
+		const FramebufferAttachment GLStencilAttachment = FramebufferAttachment.StencilAttachment;
+		const FramebufferAttachment GLColorAttachment0 = FramebufferAttachment.ColorAttachment0;
+		const GetPName GLFramebufferBinding = GetPName.FramebufferBinding;
+		const RenderbufferStorage GLDepthComponent16 = RenderbufferStorage.DepthComponent16;
+		const RenderbufferStorage GLDepthComponent24 = RenderbufferStorage.DepthComponent24Oes;
+		const RenderbufferStorage GLDepth24Stencil8 = RenderbufferStorage.Depth24Stencil8Oes;
+		const FramebufferErrorCode GLFramebufferComplete = FramebufferErrorCode.FramebufferComplete;
 #else
-		public static EAGLRenderingAPI OpenGLESVersion;
+		const FramebufferTarget GLFramebuffer = FramebufferTarget.FramebufferExt;
+		const RenderbufferTarget GLRenderbuffer = RenderbufferTarget.RenderbufferExt;
+		const FramebufferAttachment GLDepthAttachment = FramebufferAttachment.DepthAttachmentExt;
+		const FramebufferAttachment GLStencilAttachment = FramebufferAttachment.StencilAttachment;
+		const FramebufferAttachment GLColorAttachment0 = FramebufferAttachment.ColorAttachment0;
+		const GetPName GLFramebufferBinding = GetPName.FramebufferBinding;
+		const RenderbufferStorage GLDepthComponent16 = RenderbufferStorage.DepthComponent16;
+		const RenderbufferStorage GLDepthComponent24 = RenderbufferStorage.DepthComponent24;
+		const RenderbufferStorage GLDepth24Stencil8 = RenderbufferStorage.Depth24Stencil8;
+		const FramebufferErrorCode GLFramebufferComplete = FramebufferErrorCode.FramebufferComplete;
 #endif
 		
-		public static int FrameBufferScreen;
-		public static bool DefaultFrameBuffer = true;
-		
-		internal ALL11 PreferedFilter 
-		{
-			get 
-			{
-				return _preferedFilter;
-			}
-			set 
-			{
-				_preferedFilter = value;
-			}
-		
-		}
-		
-		internal int ActiveTexture
-		{
-			get 
-			{
-				return _activeTexture;
-			}
-			set 
-			{
-				_activeTexture = value;
-			}
-		}
-		
-		public bool IsDisposed 
-		{ 
-			get
-			{
-				return _isDisposed;
-			}
-		}
-				
-		public GraphicsDevice()
-        {	
-			// Initialize the main viewport
-			_viewport = new Viewport();
-			_viewport.X = 0;
-			_viewport.Y = 0;						
-			_viewport.Width = DisplayMode.Width;
-			_viewport.Height = DisplayMode.Height;
-			_viewport.MinDepth = 0.0f;
-			_viewport.MaxDepth = 1.0f;
-            Textures = new TextureCollection();
-			
-			// Init RasterizerState
-			RasterizerState = new RasterizerState();
+		// TODO Graphics Device events need implementing
+		public event EventHandler<EventArgs> DeviceLost;
+		public event EventHandler<EventArgs> DeviceReset;
+		public event EventHandler<EventArgs> DeviceResetting;
+		//public event EventHandler<ResourceCreatedEventArgs> ResourceCreated;
+		//public event EventHandler<ResourceDestroyedEventArgs> ResourceDestroyed;
 
-            // Initialize OpenGL states
-            GL11.Disable(ALL11.DepthTest);
-            GL11.TexEnv(ALL11.TextureEnv, ALL11.TextureEnvMode, (int)ALL11.BlendSrc);
-        }
+        internal int glFramebuffer;
 
-        public BlendState BlendState
+		public RasterizerState RasterizerState {
+			get {
+				return _rasterizerState;
+			}
+			set {
+				_rasterizerState = value;
+				GLStateManager.SetRasterizerStates(value);
+			}
+		}
+		
+        internal All PreferedFilter
         {
-            get { return _blendState; }
+            get
+            {
+                return _preferedFilter;
+            }
             set
             {
-                // ToDo check for invalid state
-                _blendState = value;
+                _preferedFilter = value;
+            }
 
-                // Disable Blending by default = BlendState.Opaque
-                GL11.Disable(ALL11.Blend);
+        }
 
-                // set the blend mode
-                if (_blendState == BlendState.NonPremultiplied)
-                {
-                    GL11.BlendFunc(ALL11.SrcAlpha, ALL11.OneMinusSrcAlpha);
-                    GL11.Enable(ALL11.Blend);
-                }
-
-                if (_blendState == BlendState.AlphaBlend)
-                {
-                    GL11.BlendFunc(ALL11.One, ALL11.OneMinusSrcAlpha);
-                    GL11.Enable(ALL11.Blend);
-                }
-
-                if (_blendState == BlendState.Additive)
-                {
-                    GL11.BlendFunc(ALL11.SrcAlpha, ALL11.One);
-                    GL11.Enable(ALL11.Blend);
-                }
+        internal int ActiveTexture
+        {
+            get
+            {
+                return _activeTexture;
+            }
+            set
+            {
+                _activeTexture = value;
             }
         }
 
-		public DepthStencilState DepthStencilState {
-			get { return _depthStencilState; }
-			set { 
-				_depthStencilState = value;
+        public bool IsDisposed
+        {
+            get
+            {
+                return _isDisposed;
+            }
+        }
+		
+		public bool IsContentLost { 
+			get {
+				// We will just return IsDisposed for now
+				// as that is the only case I can see for now
+				return IsDisposed;
 			}
 		}
 
-		public SamplerStateCollection SamplerStates { 
-			get {
-				var temp = _samplerStates;
-				return temp;
-			} 
+        public GraphicsDevice()
+        {
+            // Initialize the main viewport
+            _viewport = new Viewport(0, 0,
+			                         DisplayMode.Width, DisplayMode.Height);
+            _viewport.MinDepth = 0.0f;
+            _viewport.MaxDepth = 1.0f;
+            Textures = new TextureCollection();
+
+			Initialize();
+        }
+
+        internal void Initialize()
+        {
+
+#if ES11
+			//Is this needed?
+			GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)All.BlendSrc);
+#endif
+
+			BlendState = BlendState.Opaque;
+			DepthStencilState = DepthStencilState.Default;
+			RasterizerState = RasterizerState.CullCounterClockwise;
+
+            VboIdArray = 0;
+            VboIdElement = 0;
+        }
+
+		public BlendState BlendState {
+			get { return _blendState; }
+			set { 
+				// ToDo check for invalid state
+				_blendState = value;
+				GLStateManager.SetBlendStates(value);
+			}
 		}
+
+        public DepthStencilState DepthStencilState
+        {
+            get { return _depthStencilState; }
+            set
+            {
+                _depthStencilState = value;
+				GLStateManager.SetDepthStencilState(value);
+            }
+        }
+
+        public SamplerStateCollection SamplerStates
+        {
+            get
+            {
+                //var temp = _samplerStates;
+                return _samplerStates;
+            }
+        }
         public void Clear(Color color)
         {
-			Vector4 vector = color.ToEAGLColor();			
-			GL11.ClearColor (vector.X,vector.Y,vector.Z,vector.W);
-			GL11.Clear ((uint) ALL11.ColorBufferBit);
+			ClearOptions options = ClearOptions.Target;
+			if (true) { //TODO: Clear only if current backbuffer has a depth component
+				options |= ClearOptions.DepthBuffer;
+			}
+			if (true) { //TODO: Clear only if current backbuffer has a stencil component
+				options |= ClearOptions.Stencil;
+			}
+            Clear (options, color.ToVector4(), Viewport.MaxDepth, 0);
         }
 
         public void Clear(ClearOptions options, Color color, float depth, int stencil)
         {
-			Clear(options,color.ToEAGLColor(),depth,stencil);
+            Clear (options, color.ToVector4 (), depth, stencil);
         }
 
-        public void Clear(ClearOptions options, Vector4 color, float depth, int stencil)
-        {
-            uint mask = 0;
+		public void Clear (ClearOptions options, Vector4 color, float depth, int stencil)
+		{
+			GL.ClearColor (color.X, color.Y, color.Z, color.W);
 
-            if (color.X != 0f || color.Y != 0f || color.Z != 0f || color.W != 0f)
-            {
-                GL11.ClearColor(color.X, color.Y, color.Z, color.W);
+			ClearBufferMask bufferMask = 0;
+			if (options.HasFlag(ClearOptions.Target)) {
+				bufferMask = bufferMask | ClearBufferMask.ColorBufferBit;
+			}
+			if (options.HasFlag(ClearOptions.Stencil)) {
+				GL.ClearStencil (stencil);
+				bufferMask = bufferMask | ClearBufferMask.StencilBufferBit;
+			}
+			if (options.HasFlag(ClearOptions.DepthBuffer)) {
+				GL.ClearDepth (depth);
+				bufferMask = bufferMask | ClearBufferMask.DepthBufferBit;
+			}
 
-                mask = (uint)ALL11.ColorBufferBit | mask;
-            }
-
-            GL11.ClearDepth(depth);
-            mask = (uint)ALL11.DepthBufferBit | mask;
-
-            GL11.ClearStencil(stencil);
-            mask = (uint)ALL11.StencilBufferBit | mask;
-
-            GL11.Clear(mask);
-        }
-
+#if IPHONE
+			GL.Clear ((uint)bufferMask);
+#else
+			GL.Clear (bufferMask);
+#endif
+		}
+		
         public void Clear(ClearOptions options, Color color, float depth, int stencil, Rectangle[] regions)
         {
-			throw new NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public void Clear(ClearOptions options, Vector4 color, float depth, int stencil, Rectangle[] regions)
         {
-			throw new NotImplementedException();
+            throw new NotImplementedException();
         }
 
-		public void Dispose()
-		{
-			_isDisposed = true;
-		}
-		
-		protected virtual void Dispose(bool aReleaseEverything)
-		{
-			if (aReleaseEverything)
-			{
-				
-			}
-			
-			_isDisposed = true;
-		}
-		
+        public void Dispose()
+        {
+            _isDisposed = true;
+        }
+
+        protected virtual void Dispose(bool aReleaseEverything)
+        {
+            if (aReleaseEverything)
+            {
+
+            }
+
+            _isDisposed = true;
+        }
+
         public void Present()
         {
-			GL11.Flush();
+			GL.Flush ();
         }
-		
+
         public void Present(Rectangle? sourceRectangle, Rectangle? destinationRectangle, IntPtr overrideWindowHandle)
         {
-  			throw new NotImplementedException();
-		}
-				
+            throw new NotImplementedException();
+        }
+
         public void Reset()
         {
-			throw new NotImplementedException();
+            _viewport.Width = DisplayMode.Width;
+            _viewport.Height = DisplayMode.Height;
+
+            if (ResourcesLost)
+            {
+                ContentManager.ReloadAllContent();
+                ResourcesLost = false;
+            }
+
+            if(DeviceReset != null)
+                DeviceReset(null, new EventArgs());
         }
 
         public void Reset(Microsoft.Xna.Framework.Graphics.PresentationParameters presentationParameters)
         {
-			throw new NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public void Reset(Microsoft.Xna.Framework.Graphics.PresentationParameters presentationParameters, GraphicsAdapter graphicsAdapter)
         {
-			throw new NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public Microsoft.Xna.Framework.Graphics.DisplayMode DisplayMode
@@ -297,337 +403,252 @@ namespace Microsoft.Xna.Framework.Graphics
         public Microsoft.Xna.Framework.Graphics.PresentationParameters PresentationParameters
         {
             get;
-			set;
+            set;
         }
 
         public Microsoft.Xna.Framework.Graphics.Viewport Viewport
         {
             get
             {
-				return _viewport;
-			}
-			set
-			{
-				_viewport = value;
-			}
-		}	
-		
-		public Microsoft.Xna.Framework.Graphics.GraphicsProfile GraphicsProfile 
-		{ 
-			get; 
-			set;
-		}	
-		
-		public VertexDeclaration VertexDeclaration 
-		{ 
-			get; 
-			set; 
-		}
-			
-		Rectangle _scissorRectangle;
-		public Rectangle ScissorRectangle 
-		{ 
-			get
-			{
-				return _scissorRectangle;
-			}
-			set
-			{
-				_scissorRectangle = value;
+                return _viewport;
+            }
+            set
+            {
+                _viewport = value;
+				GL.Viewport (value.X, value.Y, value.Width, value.Height);
+				GL.DepthRange(value.MinDepth, value.MaxDepth);
+            }
+        }
+
+        public Microsoft.Xna.Framework.Graphics.GraphicsProfile GraphicsProfile
+        {
+            get;
+            set;
+        }
+
+        public VertexDeclaration VertexDeclaration
+        {
+            get;
+            set;
+        }
+
+        Rectangle _scissorRectangle;
+        public Rectangle ScissorRectangle
+        {
+            get
+            {
+				if (RasterizerState.ScissorTestEnable)
+                	return _scissorRectangle;
+				return _viewport.Bounds;
+            }
+            set
+            {
+                _scissorRectangle = value;
 				
-				switch (this.PresentationParameters.DisplayOrientation )
-				{
-					case DisplayOrientation.Portrait :
-					{	
-						_scissorRectangle.Y = _viewport.Height - _scissorRectangle.Y - _scissorRectangle.Height;
-						break;
-					}
-					
-					case DisplayOrientation.LandscapeLeft :
-					{								
-						var x = _scissorRectangle.X;
-						_scissorRectangle.X = _viewport.Width - _scissorRectangle.Height - _scissorRectangle.Y;
-						_scissorRectangle.Y = _viewport.Height - _scissorRectangle.Width - x;
-					
-						// Swap Width and Height
-						var w = _scissorRectangle.Width;
-						_scissorRectangle.Width = _scissorRectangle.Height;
-						_scissorRectangle.Height = w;	
-						break;
-					}
-					
-					case DisplayOrientation.LandscapeRight :
-					{			
-						// Swap X and Y
-						var x = _scissorRectangle.X;
-						_scissorRectangle.X = _scissorRectangle.Y;
-						_scissorRectangle.Y = x;
-						
-						// Swap Width and Height
-						var w = _scissorRectangle.Width;
-						_scissorRectangle.Width = _scissorRectangle.Height;
-						_scissorRectangle.Height = w;
-						break;
-					}					
-					
-					case DisplayOrientation.PortraitUpsideDown :
-					{								
-						_scissorRectangle.X = _viewport.Width - _scissorRectangle.Width - _scissorRectangle.X;
-						break;
-					}
-					
-					case DisplayOrientation.Default :
-					{
-						_scissorRectangle.Y = _viewport.Height - _scissorRectangle.Y - _scissorRectangle.Height;
-						break;
-					}
-				}
-			}
-		}
-		
+				GLStateManager.SetScissor(_scissorRectangle);
+				
+				_scissorRectangle.Y = _viewport.Height - _scissorRectangle.Y - _scissorRectangle.Height;
+            }
+        }
+
 		public void SetRenderTarget (RenderTarget2D renderTarget)
-		{	
-#if ANDROID
-			if(OpenGLESVersion == GLContextVersion.Gles2_0)
-#else
-			if(OpenGLESVersion == EAGLRenderingAPI.OpenGLES2)
-#endif
-				SetRenderTargetGL20(renderTarget);
-			else
-				SetRenderTargetGL11(renderTarget);
-		}
-		
-		public void SetRenderTargetGL20 (RenderTarget2D rendertarget)
 		{
-			if (rendertarget == null)
-			{
-				GL20.BindFramebuffer(ALL20.Framebuffer,FrameBufferScreen);
-				DefaultFrameBuffer = true;
-			}
+			if (renderTarget == null)
+				this.SetRenderTargets(null);
 			else
-			{
-				GL20.BindFramebuffer(ALL20.Framebuffer, rendertarget.frameBuffer);
-				GL20.FramebufferTexture2D(ALL20.Framebuffer, ALL20.ColorAttachment0, ALL20.Texture2D, rendertarget.ID,0);
-			
-				ALL20 status = GL20.CheckFramebufferStatus(ALL20.Framebuffer);
-				DefaultFrameBuffer = false;
-				
-				if (status != ALL20.FramebufferComplete)
-					throw new Exception("GL20: Error creating framebuffer: " + status);
-			}
+				this.SetRenderTargets(new RenderTargetBinding(renderTarget));
 		}
 		
-		public void SetRenderTargetGL11 (RenderTarget2D renderTarget)
-		{
-			// We check if the rendertarget being passed is null or if we already have a rendertarget
-			// NetRumble sample does not set the the renderTarget to null before setting another
-			// rendertarget.  We handle that by checking first if we have a current render target set
-			// if we do then we unbind the current rendertarget, reset the viewport and set the
-			// rendertarget to the new one being passed if it is not null
-			if (renderTarget == null || currentRenderTargets != null)
-			{
-#if ANDROID
-                byte[] imageInfo = new byte[4];
-                GL11.ReadPixels(0, 0, 1, 1, ALL11.Rgba, ALL11.UnsignedByte, imageInfo);
-#endif
-				// Detach the render buffers.
-				GL11.Oes.FramebufferRenderbuffer(ALL11.FramebufferOes, ALL11.DepthAttachmentOes,
-						ALL11.RenderbufferOes, 0);
-				
-				// delete the RBO's
-				GL11.Oes.DeleteRenderbuffers(renderBufferIDs.Length,renderBufferIDs);
-				
-				// delete the FBO
-				GL11.Oes.DeleteFramebuffers(frameBufferIDs.Length, frameBufferIDs);
-				
-				// Set the frame buffer back to the system window buffer
-				GL11.Oes.BindFramebuffer(ALL11.FramebufferOes, originalFbo);
+        int[] frameBufferIDs;
+        int[] renderBufferIDs;
+        int originalFbo = -1;
 
-				// We need to reset our GraphicsDevice viewport back to what it was
-				// before rendering.
-				Viewport = savedViewport;
+        // TODO: We need to come up with a state save and restore of the GraphicsDevice
+        //  This would probably work with a Stack that allows pushing and popping of the current
+        //  Graphics device state.
+        //  Right now here is the list of state values that should be implemented
+        //  Viewport - Used for RenderTargets
+        //  Depth and Stencil formats	- To be determined
+        Viewport savedViewport;
 
-				if (renderTarget == null)
-					currentRenderTargets = null;
-				else {
-					SetRenderTargets(new RenderTargetBinding(renderTarget));
-				}
-			}
-			else {
-				SetRenderTargets(new RenderTargetBinding(renderTarget));
-			}
-		}
-		
-		int[] frameBufferIDs;
-		int[] renderBufferIDs;
-		int originalFbo = -1;
-		
-		// TODO: We need to come up with a state save and restore of the GraphicsDevice
-		//  This would probably work with a Stack that allows pushing and popping of the current
-		//  Graphics device state.
-		//  Right now here is the list of state values that should be implemented
-		//  Viewport - Used for RenderTargets
-		//  Depth and Stencil formats	- To be determined
-		Viewport savedViewport;
-		
 		public void SetRenderTargets (params RenderTargetBinding[] renderTargets) 
-		{
+		{			
+			var previousRenderTargetBindings = this.currentRenderTargetBindings;
+			this.currentRenderTargetBindings = renderTargets;
 			
-			currentRenderTargets = renderTargets;
+			//GLExt.DiscardFramebuffer(All.Framebuffer, 2, discards);
 			
-			if (currentRenderTargets != null) 
-			{				
-				// TODO: For speed we need to consider using FBO switching instead
-				// of multiple FBO's if they are the same size.
-				
-				// http://www.songho.ca/opengl/gl_fbo.html
-				
-				// Get the currently bound frame buffer object. On most platforms this just gives 0.				
-				GL11.GetInteger(ALL11.FramebufferBindingOes, ref originalFbo);
-				
-				frameBufferIDs = new int[currentRenderTargets.Length];
-				
-				renderBufferIDs = new int[currentRenderTargets.Length];
-				GL11.Oes.GenRenderbuffers(currentRenderTargets.Length, renderBufferIDs);
-				
-				for (int i = 0; i < currentRenderTargets.Length; i++) 
+			if (this.currentRenderTargetBindings == null || this.currentRenderTargetBindings.Length == 0)
+			{
+ 				GL.BindFramebuffer(GLFramebuffer, 0);
+				this.Viewport = new Viewport(0, 0,
+					this.PresentationParameters.BackBufferWidth, 
+					this.PresentationParameters.BackBufferHeight);
+			}
+			else
+			{
+				if (this.glFramebuffer == 0)
 				{
-					RenderTarget2D target = (RenderTarget2D)currentRenderTargets[i].RenderTarget;
-					
-					// create a renderbuffer object to store depth info
-					GL11.Oes.BindRenderbuffer(ALL11.RenderbufferOes, renderBufferIDs[i]);
-					
-					ClearOptions clearOptions = ClearOptions.Target | ClearOptions.DepthBuffer;
-					
-					switch (target.DepthStencilFormat) 
-					{
-						case DepthFormat.Depth16:
-							GL11.Oes.RenderbufferStorage(ALL11.RenderbufferOes, ALL11.DepthComponent16Oes,
-							target.Width, target.Height);
-							break;
-						case DepthFormat.Depth24:
-							GL11.Oes.RenderbufferStorage(ALL11.RenderbufferOes, ALL11.DepthComponent24Oes,
-							target.Width, target.Height);
-							break;
-						case DepthFormat.Depth24Stencil8:
-							GL11.Oes.RenderbufferStorage(ALL11.RenderbufferOes, ALL11.Depth24Stencil8Oes,
-							target.Width, target.Height);
-							GL11.Oes.FramebufferRenderbuffer(ALL11.FramebufferOes, ALL11.StencilAttachmentOes,
-							ALL11.RenderbufferOes, renderBufferIDs[i]);
-							clearOptions = clearOptions | ClearOptions.Stencil;
-							break;
-						default :
-							GL11.Oes.RenderbufferStorage(ALL11.RenderbufferOes, ALL11.DepthComponent24Oes,
-							target.Width, target.Height);
-							break;
-					}					
-					
-					// create framebuffer
-					GL11.Oes.GenFramebuffers(1, ref frameBufferIDs[i]);
-					GL11.Oes.BindFramebuffer(ALL11.FramebufferOes, frameBufferIDs[i]);
-					
-					// attach the texture to FBO color attachment point
-					GL11.Oes.FramebufferTexture2D(ALL11.FramebufferOes, ALL11.ColorAttachment0Oes, ALL11.Texture2D, target.ID, 0);
-					
-					// attach the renderbuffer to depth attachment point
-					GL11.Oes.FramebufferRenderbuffer(ALL11.FramebufferOes, ALL11.DepthAttachmentOes,
-							ALL11.RenderbufferOes, renderBufferIDs[i]);							
-					
-					if (target.RenderTargetUsage == RenderTargetUsage.DiscardContents)
-						Clear (clearOptions, Color.Transparent, 0, 0);
-					
-					GL11.Oes.BindRenderbuffer(ALL11.FramebufferOes, originalFbo);
-						
+#if IPHONE
+					GL.GenFramebuffers(1, ref this.glFramebuffer);
+#else
+					GL.GenFramebuffers(1, out this.glFramebuffer);
+#endif
 				}
 				
-				ALL11 status = GL11.Oes.CheckFramebufferStatus(ALL11.FramebufferOes);
-				
-				if (status != ALL11.FramebufferCompleteOes)
-					throw new Exception("Error creating framebuffer: " + status);
-				
-				// We need to start saving off the ViewPort and setting the current ViewPort to
-				// the width and height of the texture.  Then when we pop off the rendertarget
-				// it needs to be reset.  This causes drawing problems if we do not set the viewport.
-				// Makes sense once you follow the flow (hits head on desk)
-				// For an example of this take a look at NetRumble's sample for the BloomPostprocess
-               
-				// Save off the current viewport to be reset later
-				savedViewport = Viewport;
+				var renderTarget = this.currentRenderTargetBindings[0].RenderTarget as RenderTarget2D;
+				GL.BindFramebuffer(GLFramebuffer, this.glFramebuffer);
+				GL.FramebufferTexture2D(GLFramebuffer, GLColorAttachment0, TextureTarget.Texture2D, renderTarget.ID, 0);
+				if (renderTarget.DepthStencilFormat != DepthFormat.None)
+				{
+					GL.FramebufferRenderbuffer(GLFramebuffer, GLDepthAttachment, GLRenderbuffer, renderTarget.glDepthStencilBuffer);
+					if (renderTarget.DepthStencilFormat == DepthFormat.Depth24Stencil8)
+					{
+						GL.FramebufferRenderbuffer(GLFramebuffer, GLStencilAttachment, GLRenderbuffer, renderTarget.glDepthStencilBuffer);
+					}
+				}
 
-				// Create a new Viewport
-				Viewport renderTargetViewPort = new Viewport();
-
-				// Set the new viewport to the width and height of the render target
-				Texture2D target2 = (Texture2D)currentRenderTargets[0].RenderTarget;
-				renderTargetViewPort.Width = target2.Width;
-				renderTargetViewPort.Height = target2.Height;
-
-				// now we set our viewport to the new rendertarget viewport just created.
-				Viewport = renderTargetViewPort;				
+				var status = GL.CheckFramebufferStatus(GLFramebuffer);
+				if (status != GLFramebufferComplete)
+				{
+					string message = "Framebuffer Incomplete.";
+					switch (status)
+					{
+					case FramebufferErrorCode.FramebufferIncompleteAttachment: message = "Not all framebuffer attachment points are framebuffer attachment complete."; break;
+					case FramebufferErrorCode.FramebufferIncompleteMissingAttachment : message = "No images are attached to the framebuffer."; break;
+					case FramebufferErrorCode.FramebufferUnsupported : message = "The combination of internal formats of the attached images violates an implementation-dependent set of restrictions."; break;
+					//case FramebufferErrorCode.FramebufferIncompleteDimensions : message = "Not all attached images have the same width and height."; break;
+					}
+					throw new InvalidOperationException(message);
+				}
+				this.Viewport = new Viewport(0, 0, renderTarget.Width, renderTarget.Height);
+			}
+			
+			if (previousRenderTargetBindings != null)
+			{
+				for (var i = 0; i < previousRenderTargetBindings.Length; ++i)
+				{
+					var renderTarget = previousRenderTargetBindings[i].RenderTarget;
+					if (renderTarget.LevelCount > 1)
+					{
+						throw new NotImplementedException();
+						/*
+						GL.ActiveTexture(TextureUnit.Texture0);
+						GL.BindTexture(TextureTarget.Texture2D, renderTarget.ID);
+						GL.GenerateMipmap(TextureTarget.Texture2D);
+						GL.BindTexture(TextureTarget.Texture2D, 0);*/
+					}
+				}
 			}
 		}
-		
-		public void ResolveBackBuffer( ResolveTexture2D resolveTexture )
+
+		public RenderTargetBinding[] GetRenderTargets ()
 		{
+			if (this.currentRenderTargetBindings == null)
+				return new RenderTargetBinding[0];
+			return currentRenderTargetBindings;
 		}
 		
-        public ALL11 PrimitiveTypeGL11(PrimitiveType primitiveType)
+        public void ResolveBackBuffer(ResolveTexture2D resolveTexture)
+        {
+        }
+		
+#if IPHONE
+		internal All PrimitiveTypeGL(PrimitiveType primitiveType)
         {
             switch (primitiveType)
             {
                 case PrimitiveType.LineList:
-                    return ALL11.Lines;
+                    return All.Lines;
                 case PrimitiveType.LineStrip:
-                    return ALL11.LineStrip;
+                    return All.LineStrip;
                 case PrimitiveType.TriangleList:
-                    return ALL11.Triangles;
+                    return All.Triangles;
                 case PrimitiveType.TriangleStrip:
-                    return ALL11.TriangleStrip;
+                    return All.TriangleStrip;
             }
 
             throw new NotImplementedException();
         }
+#else
+        internal BeginMode PrimitiveTypeGL(PrimitiveType primitiveType)
+        {
+            switch (primitiveType)
+            {
+                case PrimitiveType.LineList:
+                    return BeginMode.Lines;
+                case PrimitiveType.LineStrip:
+                    return BeginMode.LineStrip;
+                case PrimitiveType.TriangleList:
+                    return BeginMode.Triangles;
+                case PrimitiveType.TriangleStrip:
+                    return BeginMode.TriangleStrip;
+            }
+
+            throw new NotImplementedException();
+        }
+#endif
+
 
         public void SetVertexBuffer(VertexBuffer vertexBuffer)
         {
             _vertexBuffer = vertexBuffer;
-            GL11.BindBuffer(ALL11.ArrayBuffer, vertexBuffer._bufferStore);
+			_vertexBuffer.Apply();
         }
 
         private void SetIndexBuffer(IndexBuffer indexBuffer)
         {
             _indexBuffer = indexBuffer;
-            GL11.BindBuffer(ALL11.ElementArrayBuffer, indexBuffer._bufferStore);
+			_indexBuffer.Apply ();
         }
 
         public IndexBuffer Indices { set { SetIndexBuffer(value); } }
 
+        public bool ResourcesLost { get; set; }
+
         public void DrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int minVertexIndex, int numbVertices, int startIndex, int primitiveCount)
         {
-            if (minVertexIndex > 0 || baseVertex > 0)
-                throw new NotImplementedException("baseVertex > 0 and minVertexIndex > 0 are not supported");
+			if (minVertexIndex > 0)
+				throw new NotImplementedException ("minVertexIndex > 0 is supported");
 
-            var vd = VertexDeclaration.FromType(_vertexBuffer._type);
-            // Hmm, can the pointer here be changed with baseVertex?
-            VertexDeclaration.PrepareForUse(vd);
 
-            GL11.DrawElements(PrimitiveTypeGL11(primitiveType), _indexBuffer._count, ALL11.UnsignedShort, new IntPtr(startIndex));
+			var indexElementType = DrawElementsType.UnsignedShort;
+			var indexElementSize = 2;
+			var indexOffsetInBytes = (IntPtr)(startIndex * indexElementSize);
+			var indexElementCount = GetElementCountArray(primitiveType, primitiveCount);
+			var target = PrimitiveTypeGL(primitiveType);
+			var vertexOffset = (IntPtr)(_vertexBuffer.VertexDeclaration.VertexStride * baseVertex);
+
+
+			_vertexBuffer.VertexDeclaration.Apply (vertexOffset);
+
+			GL.DrawElements (target,
+			                 indexElementCount,
+			                 indexElementType,
+			                 indexOffsetInBytes);
+
         }
 
         public void DrawUserPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int primitiveCount) where T : struct, IVertexType
         {
-            // Unbind the VBOs
-            GL11.BindBuffer(ALL11.ArrayBuffer, 0);
-            GL11.BindBuffer(ALL11.ElementArrayBuffer, 0);
+
+           // Unbind the VBOs
+            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
 
             //Create VBO if not created already
+#if IPHONE
             if (VboIdArray == 0)
-                GL11.GenBuffers(1, ref VboIdArray);
-
+                GL.GenBuffers(1, ref VboIdArray);
+#else
+            if (VboIdArray == 0)
+                GL.GenBuffers(1, out VboIdArray);
+#endif
+			
             // Bind the VBO
-            GL11.BindBuffer(ALL11.ArrayBuffer, VboIdArray);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, VboIdArray);
             ////Clear previous data
-            GL11.BufferData(ALL11.ArrayBuffer, (IntPtr)0, (IntPtr)null, ALL11.DynamicDraw);
+            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)0, (IntPtr)null, BufferUsageHint.DynamicDraw);
 
             //Get VertexDeclaration
             var vd = VertexDeclaration.FromType(typeof(T));
@@ -636,123 +657,154 @@ namespace Microsoft.Xna.Framework.Graphics
             var handle = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
 
             //Buffer data to VBO; This should use stream when we move to ES2.0
-            GL11.BufferData(ALL11.ArrayBuffer, (IntPtr)(vd.VertexStride * GetElementCountArray(primitiveType, primitiveCount)), vertexData, ALL11.DynamicDraw);
+            GL.BufferData(BufferTarget.ArrayBuffer,
+			              (IntPtr)(vd.VertexStride * GetElementCountArray(primitiveType, primitiveCount)),
+			              vertexData,
+			              BufferUsageHint.DynamicDraw);
 
             //Setup VertexDeclaration
-            VertexDeclaration.PrepareForUse(vd);
+            vd.Apply ();
 
             //Draw
-            GL11.DrawArrays(PrimitiveTypeGL11(primitiveType), vertexOffset, GetElementCountArray(primitiveType, primitiveCount));
-
+            GL.DrawArrays(PrimitiveTypeGL(primitiveType),
+			              vertexOffset,
+			              GetElementCountArray(primitiveType, primitiveCount));
 
             // Free resources
-            GL11.BindBuffer(ALL11.ArrayBuffer, 0);
-            GL11.BindBuffer(ALL11.ElementArrayBuffer, 0);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
             handle.Free();
-        }
+
+		}
 
         public void DrawPrimitives(PrimitiveType primitiveType, int vertexStart, int primitiveCount)
         {
-            var vd = VertexDeclaration.FromType(_vertexBuffer._type);
-            VertexDeclaration.PrepareForUse(vd);
+			_vertexBuffer.VertexDeclaration.Apply ();
 
-            GL11.DrawArrays(PrimitiveTypeGL11(primitiveType), vertexStart, GetElementCountArray(primitiveType, primitiveCount));
-        }
+			GL.DrawArrays(PrimitiveTypeGL(primitiveType),
+			              vertexStart,
+			              GetElementCountArray(primitiveType,primitiveCount));
+		}
 
-        public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int vertexCount, ushort[] indexData, int indexOffset, int primitiveCount) where T : struct, IVertexType
+        public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int vertexCount, short[] indexData, int indexOffset, int primitiveCount) where T : struct, IVertexType
         {
-            ////////////////////////////
-            //This has not been tested//
-            ////////////////////////////
 
-            // Unbind the VBOs
-            GL11.BindBuffer(ALL11.ArrayBuffer, 0);
-            GL11.BindBuffer(ALL11.ElementArrayBuffer, 0);
+           // Unbind the VBOs
+            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
 
             //Create VBO if not created already
-            if (VboIdArray == 0)
-                GL11.GenBuffers(1, ref VboIdArray);
+#if IPHONE
+			if (VboIdArray == 0)
+                GL.GenBuffers(1, ref VboIdArray);
             if (VboIdElement == 0)
-                GL11.GenBuffers(1, ref VboIdElement);
-
+                GL.GenBuffers(1, ref VboIdElement);
+#else
+            if (VboIdArray == 0)
+                GL.GenBuffers(1, out VboIdArray);
+            if (VboIdElement == 0)
+                GL.GenBuffers(1, out VboIdElement);
+#endif
+			
             // Bind the VBO
-            GL11.BindBuffer(ALL11.ArrayBuffer, VboIdArray);
-            GL11.BindBuffer(ALL11.ElementArrayBuffer, VboIdElement);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, VboIdArray);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, VboIdElement);
             ////Clear previous data
-            GL11.BufferData(ALL11.ArrayBuffer, (IntPtr)0, (IntPtr)null, ALL11.DynamicDraw);
-            GL11.BufferData(ALL11.ElementArrayBuffer, (IntPtr)0, (IntPtr)null, ALL11.DynamicDraw);
+            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)0, (IntPtr)null, BufferUsageHint.DynamicDraw);
+            GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)0, (IntPtr)null, BufferUsageHint.DynamicDraw);
 
             //Get VertexDeclaration
-            var vd = VertexDeclaration.FromType(typeof(T));
+            var vd = VertexDeclaration.FromType(typeof (T));
 
             //Pin data
             var handle = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
             var handle2 = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
 
             //Buffer data to VBO; This should use stream when we move to ES2.0
-            GL11.BufferData(ALL11.ArrayBuffer, (IntPtr)(vd.VertexStride * GetElementCountArray(primitiveType, primitiveCount)), new IntPtr(handle.AddrOfPinnedObject().ToInt64() + (vertexOffset * vd.VertexStride)), ALL11.DynamicDraw);
-            GL11.BufferData(ALL11.ElementArrayBuffer, (IntPtr)(sizeof(ushort) * GetElementCountArray(primitiveType, primitiveCount)), indexData, ALL11.DynamicDraw);
+            GL.BufferData(BufferTarget.ArrayBuffer,
+                            (IntPtr) (vd.VertexStride*GetElementCountArray(primitiveType, primitiveCount)),
+                            new IntPtr(handle.AddrOfPinnedObject().ToInt64() + (vertexOffset*vd.VertexStride)),
+                            BufferUsageHint.DynamicDraw);
+            GL.BufferData(BufferTarget.ElementArrayBuffer,
+                            (IntPtr) (sizeof (ushort)*GetElementCountArray(primitiveType, primitiveCount)),
+                            indexData, BufferUsageHint.DynamicDraw);
 
             //Setup VertexDeclaration
-            VertexDeclaration.PrepareForUse(vd);
+            vd.Apply ();
 
             //Draw
-            GL11.DrawElements(PrimitiveTypeGL11(primitiveType), GetElementCountArray(primitiveType, primitiveCount), ALL11.UnsignedInt248Oes, (IntPtr)(indexOffset * sizeof(ushort)));
+            GL.DrawElements(PrimitiveTypeGL(primitiveType),
+			                GetElementCountArray(primitiveType, primitiveCount),
+                            DrawElementsType.UnsignedShort/* .UnsignedInt248Oes*/,
+			                (IntPtr) (indexOffset*sizeof (ushort)));
 
 
             // Free resources
-            GL11.BindBuffer(ALL11.ArrayBuffer, 0);
-            GL11.BindBuffer(ALL11.ElementArrayBuffer, 0);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
             handle.Free();
             handle2.Free();
         }
-
-        public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int vertexCount, uint[] indexData, int indexOffset, int primitiveCount) where T : struct, IVertexType
+		
+		public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int vertexCount, int[] indexData, int indexOffset, int primitiveCount) where T : struct, IVertexType
         {
-            ////////////////////////////
-            //This has not been tested//
-            ////////////////////////////
 
-            // Unbind the VBOs
-            GL11.BindBuffer(ALL11.ArrayBuffer, 0);
-            GL11.BindBuffer(ALL11.ElementArrayBuffer, 0);
+			// Unbind the VBOs
+            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
 
             //Create VBO if not created already
-            if (VboIdArray == 0)
-                GL11.GenBuffers(1, ref VboIdArray);
+#if IPHONE
+			if (VboIdArray == 0)
+                GL.GenBuffers(1, ref VboIdArray);
             if (VboIdElement == 0)
-                GL11.GenBuffers(1, ref VboIdElement);
-
+                GL.GenBuffers(1, ref VboIdElement);
+#else
+            if (VboIdArray == 0)
+                GL.GenBuffers(1, out VboIdArray);
+            if (VboIdElement == 0)
+                GL.GenBuffers(1, out VboIdElement);
+#endif
             // Bind the VBO
-            GL11.BindBuffer(ALL11.ArrayBuffer, VboIdArray);
-            GL11.BindBuffer(ALL11.ElementArrayBuffer, VboIdElement);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, VboIdArray);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, VboIdElement);
             ////Clear previous data
-            GL11.BufferData(ALL11.ArrayBuffer, (IntPtr)0, (IntPtr)null, ALL11.DynamicDraw);
-            GL11.BufferData(ALL11.ElementArrayBuffer, (IntPtr)0, (IntPtr)null, ALL11.DynamicDraw);
-
-            //Get VertexDeclaration
-            var vd = VertexDeclaration.FromType(typeof(T));
-
+            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)0, (IntPtr)null, BufferUsageHint.DynamicDraw);
+            GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)0, (IntPtr)null, BufferUsageHint.DynamicDraw);
+			
+			//Get VertexDeclaration
+            var vd = VertexDeclaration.FromType(typeof (T));
+			
             //Pin data
             var handle = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
             var handle2 = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
 
             //Buffer data to VBO; This should use stream when we move to ES2.0
-            GL11.BufferData(ALL11.ArrayBuffer, (IntPtr)(vd.VertexStride * GetElementCountArray(primitiveType, primitiveCount)), new IntPtr(handle.AddrOfPinnedObject().ToInt64() + (vertexOffset * vd.VertexStride)), ALL11.DynamicDraw);
-            GL11.BufferData(ALL11.ElementArrayBuffer, (IntPtr)(sizeof(uint) * GetElementCountArray(primitiveType, primitiveCount)), indexData, ALL11.DynamicDraw);
+            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vd.VertexStride * GetElementCountArray(primitiveType, primitiveCount)), new IntPtr(handle.AddrOfPinnedObject().ToInt64() + (vertexOffset * vd.VertexStride)), BufferUsageHint.DynamicDraw);
+            GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(sizeof(uint) * GetElementCountArray(primitiveType, primitiveCount)), indexData, BufferUsageHint.DynamicDraw);
 
             //Setup VertexDeclaration
-            VertexDeclaration.PrepareForUse(vd);
+            vd.Apply ();
 
             //Draw
-            GL11.DrawElements(PrimitiveTypeGL11(primitiveType), GetElementCountArray(primitiveType, primitiveCount), ALL11.UnsignedInt248Oes, (IntPtr)(indexOffset * sizeof(uint)));
+            GL.DrawElements(PrimitiveTypeGL(primitiveType),
+			                GetElementCountArray(primitiveType, primitiveCount),
+#if WINDOWS
+                            (DrawElementsType)All.UnsignedInt,
+#elif IPHONE
+			                DrawElementsType.UnsignedInt248Oes,
+#else
+			                DrawElementsType.UnsignedInt,
+#endif
+			                (IntPtr)(indexOffset * sizeof(uint)));
 
 
             // Free resources
-            GL11.BindBuffer(ALL11.ArrayBuffer, 0);
-            GL11.BindBuffer(ALL11.ElementArrayBuffer, 0);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
             handle.Free();
             handle2.Free();
+
         }
 
         internal int GetElementCountArray(PrimitiveType primitiveType, int primitiveCount)
@@ -772,7 +824,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
             throw new NotSupportedException();
         }
+		
+		
+		internal void SetViewPort(int Width, int Height)
+		{
+			this._viewport.Width = Width;
+			this._viewport.Height = Height;
+		}
 
-	}
+    }
 }
-

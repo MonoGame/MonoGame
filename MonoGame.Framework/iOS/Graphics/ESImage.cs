@@ -40,7 +40,11 @@ purpose and non-infringement.
 
 using System;
 using MonoTouch.UIKit;
+#if ES11
 using OpenTK.Graphics.ES11;
+#else
+using OpenTK.Graphics.ES20;
+#endif
 using System.Drawing;
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -80,7 +84,11 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		public ESImage(int width, int height)
 		{
-			texture = new ESTexture2D(IntPtr.Zero,SurfaceFormat.Color,width,height,new Size(width,height),All.Linear);
+			texture = new ESTexture2D(IntPtr.Zero, 0,
+			                          SurfaceFormat.Color,
+			                          width,height,
+			                          new Size(width,height),
+			                          All.Linear);
 			imageWidth = textureWidth = width;
 			imageHeight = textureHeight = height;
 			texWidthRatio = 1.0f / width;

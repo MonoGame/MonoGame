@@ -39,61 +39,90 @@
 #endregion License
 
 using System;
-using GL11 = OpenTK.Graphics.ES11.GL;
-using GL20 = OpenTK.Graphics.ES20.GL;
-using ALL11 = OpenTK.Graphics.ES11.All;
-using ALL20 = OpenTK.Graphics.ES20.All;
 
+#if MONOMAC
+using MonoMac.OpenGL;
+#elif WINDOWS || LINUX
+using OpenTK.Graphics.OpenGL;
+#else
+ #if ES11
+using OpenTK.Graphics.ES11;
+ #else
+using OpenTK.Graphics.ES20;
+using RenderbufferTarget = OpenTK.Graphics.ES20.All;
+using RenderbufferStorage = OpenTK.Graphics.ES20.All;
+ #endif
+#endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-	// modified to inherit directly from Texture2D as per
-	// http://blogs.msdn.com/b/shawnhar/archive/2010/03/26/rendertarget-changes-in-xna-game-studio-4-0.aspx
-	// 	and
-	// http://msdn.microsoft.com/en-us/library/bb198676.aspx
-	//
 	public class RenderTarget2D : Texture2D
-	{		
-		// OpenGL ES 2.0 frameBuffer reference.
-		internal int frameBuffer;
+	{
+#if IPHONE && ES11
+		const RenderbufferTarget GLRenderbuffer = RenderbufferTarget.RenderbufferOes;
+		const RenderbufferStorage GLDepthComponent16 = RenderbufferStorage.DepthComponent16Oes;
+		const RenderbufferStorage GLDepthComponent24 = RenderbufferStorage.DepthComponent24Oes;
+		const RenderbufferStorage GLDepth24Stencil8 = RenderbufferStorage.Depth24Stencil8Oes;
+#elif IPHONE
+		const RenderbufferTarget GLRenderbuffer = RenderbufferTarget.Renderbuffer;
+		const RenderbufferStorage GLDepthComponent16 = RenderbufferStorage.DepthComponent16;
+		const RenderbufferStorage GLDepthComponent24 = RenderbufferStorage.DepthComponent24Oes;
+		const RenderbufferStorage GLDepth24Stencil8 = RenderbufferStorage.Depth24Stencil8Oes;
+#else
+		const RenderbufferTarget GLRenderbuffer = RenderbufferTarget.RenderbufferExt;
+		const RenderbufferStorage GLDepthComponent16 = RenderbufferStorage.DepthComponent16;
+		const RenderbufferStorage GLDepthComponent24 = RenderbufferStorage.DepthComponent24;
+		const RenderbufferStorage GLDepth24Stencil8 = RenderbufferStorage.Depth24Stencil8;
+#endif
+
+
 		
-		public RenderTargetUsage RenderTargetUsage { get; internal set; }
-		public DepthFormat DepthStencilFormat { get; internal set; }
+		internal uint glDepthStencilBuffer;
 		
-		public RenderTarget2D (GraphicsDevice graphicsDevice, int width, int height)
-			: this(graphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None) 
-		{}
+		public DepthFormat DepthStencilFormat { get; private set; }
 		
-		public RenderTarget2D (GraphicsDevice graphicsDevice, int width, int height, bool mipMap, 
-			SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat)
-			:this (graphicsDevice, width, height, mipMap, preferredFormat, 
-				DepthFormat.None, 0, RenderTargetUsage.PreserveContents) 
-		{}
+		public int MultiSampleCount { get; private set; }
 		
-		public RenderTarget2D (GraphicsDevice graphicsDevice, int width, int height, bool mipMap, 
-			SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage)
+		public RenderTargetUsage RenderTargetUsage { get; private set; }
+		
+		public RenderTarget2D (GraphicsDevice graphicsDevice, int width, int height, bool mipMap, SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage)
 			:base (graphicsDevice, width, height, mipMap, preferredFormat)
 		{
-#if ANDROID
-			if(GraphicsDevice.OpenGLESVersion == OpenTK.Graphics.GLContextVersion.Gles2_0)
+			this.DepthStencilFormat = preferredDepthFormat;
+			this.MultiSampleCount = preferredMultiSampleCount;
+			this.RenderTargetUsage = usage;
+			
+			if (preferredDepthFormat != DepthFormat.None)
+			{
+#if IPHONE
+				GL.GenRenderbuffers(1, ref glDepthStencilBuffer);
 #else
-			if(GraphicsDevice.OpenGLESVersion == MonoTouch.OpenGLES.EAGLRenderingAPI.OpenGLES2)
+				GL.GenRenderbuffers(1, out glDepthStencilBuffer);
 #endif
-			{
-				GL20.GenFramebuffers(1, ref frameBuffer);
-			}
-			else
-			{
-				RenderTargetUsage = usage;
-				DepthStencilFormat = preferredDepthFormat;
+				GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, this.glDepthStencilBuffer);
+				var glDepthStencilFormat = GLDepthComponent16;
+				switch (preferredDepthFormat)
+				{
+				case DepthFormat.Depth16 : glDepthStencilFormat = GLDepthComponent16; break;
+				case DepthFormat.Depth24 : glDepthStencilFormat = GLDepthComponent24; break;
+				case DepthFormat.Depth24Stencil8: glDepthStencilFormat = GLDepth24Stencil8; break;
+				}
+				GL.RenderbufferStorage(GLRenderbuffer, glDepthStencilFormat, this._width, this._height);
 			}
 		}
 		
-		public override void Dispose ()
+		public RenderTarget2D (GraphicsDevice graphicsDevice, int width, int height, bool mipMap, SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat)
+			:this (graphicsDevice, width, height, mipMap, preferredFormat, preferredDepthFormat, 0, RenderTargetUsage.DiscardContents) 
+		{}
+		
+		public RenderTarget2D (GraphicsDevice graphicsDevice, int width, int height)
+			: this(graphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.DiscardContents) 
+		{}
+
+		/*protected override void ReleaseUnmanagedResources ()
 		{
-			base.Dispose ();
-			
-			GL20.DeleteFramebuffers(1, ref frameBuffer);
-		}
+			base.ReleaseUnmanagedResources();
+			GL.DeleteRenderbuffers(1, ref this.glDepthStencilBuffer);
+		}*/
 	}
 }

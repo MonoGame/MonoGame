@@ -8,7 +8,7 @@
     <ProjectGuid>{36C538E6-C32A-4A8D-A39C-566173D7118E}</ProjectGuid>
     <ProjectTypeGuids>{948B3504-5B70-4649-8FE4-BDE1FB46EC69};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
-    <RootNamespace>Microsoft.Xna.Framework.GamerServices</RootNamespace>
+    <RootNamespace>Microsoft.Xna.Framework</RootNamespace>
     <AssemblyName>MonoGame.Framework.MacOS</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -46,15 +46,14 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Drawing" />
-    <Reference Include="MonoMac, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\mono\monomac\src\MonoMac.dll</HintPath>
-    </Reference>
     <Reference Include="Tao.Sdl">
       <HintPath>..\ThirdParty\GamepadConfig\Tao.Sdl.dll</HintPath>
     </Reference>
     <Reference Include="GamepadBridge">
       <HintPath>..\ThirdParty\GamepadConfig\GamepadBridge.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoMac, Version=0.0.0.0, Culture=neutral">
+      <Private>False</Private>
     </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
@@ -134,9 +133,6 @@
     <Compile Include="Storage\StorageContainer.cs" />
     <Compile Include="Storage\StorageDevice.cs" />
     <Compile Include="Audio\AudioChannels.cs" />
-    <Compile Include="MacOS\Audio\Sound.cs" />
-    <Compile Include="Audio\SoundEffect.cs" />
-    <Compile Include="Audio\SoundEffectInstance.cs" />
     <Compile Include="Media\MediaPlayer.cs" />
     <Compile Include="Media\Song.cs" />
     <Compile Include="Media\MediaState.cs" />
@@ -144,14 +140,11 @@
     <Compile Include="Content\ContentReader.cs" />
     <Compile Include="Graphics\IGraphicsDeviceService.cs" />
     <Compile Include="Content\ContentTypeReader.cs" />
-    <Compile Include="MacOS\Graphics\GraphicsDevice.cs" />
     <Compile Include="Content\ContentTypeReaderManager.cs" />
     <Compile Include="Graphics\Viewport.cs" />
     <Compile Include="Graphics\DisplayMode.cs" />
     <Compile Include="Graphics\DisplayModeCollection.cs" />
     <Compile Include="Graphics\ClearOptions.cs" />
-    <Compile Include="MacOS\Graphics\PresentationParameters.cs" />
-    <Compile Include="MacOS\Graphics\GraphicsAdapter.cs" />
     <Compile Include="Graphics\GraphicsDeviceCapabilities.cs" />
     <Compile Include="Graphics\GraphicsDeviceInformation.cs" />
     <Compile Include="Graphics\GraphicsDeviceStatus.cs" />
@@ -159,20 +152,14 @@
     <Compile Include="Graphics\GraphicsProfile.cs" />
     <Compile Include="Graphics\SpriteSortMode.cs" />
     <Compile Include="Graphics\ResolveTexture2D.cs" />
-    <Compile Include="MacOS\Graphics\RenderTarget2D.cs" />
     <Compile Include="MacOS\Graphics\Texture2D.cs" />
     <Compile Include="Graphics\RenderTarget.cs" />
-    <Compile Include="MacOS\Graphics\RenderState.cs" />
     <Compile Include="Graphics\SurfaceFormat.cs" />
     <Compile Include="Graphics\MultiSampleType.cs" />
     <Compile Include="Graphics\SwapEffect.cs" />
     <Compile Include="Graphics\RenderTargetUsage.cs" />
-    <Compile Include="MacOS\Graphics\ESImage.cs" />
-    <Compile Include="MacOS\Graphics\ESTexture2D.cs" />
-    <Compile Include="MacOS\Graphics\Vertices\VertexBuffer.cs" />
     <Compile Include="Graphics\TextureUsage.cs" />
     <Compile Include="Graphics\SetDataOptions.cs" />
-    <Compile Include="MacOS\Content\Texture2DReader.cs" />
     <Compile Include="MacOS\Graphics\SpriteFont.cs" />
     <Compile Include="Content\ContentReaders\SpriteFontReader.cs" />
     <Compile Include="Content\ContentReaders\SongReader.cs" />
@@ -184,6 +171,9 @@
     <Compile Include="Content\ContentReaders\StringReader.cs" />
     <Compile Include="Content\ContentReaders\RectangleReader.cs" />
     <Compile Include="Content\ContentReaders\Vector3Reader.cs" />
+    <Compile Include="Content\ContentReaders\PlaneReader.cs" />
+    <Compile Include="Content\ContentReaders\QuaternionReader.cs" />
+    <Compile Include="Content\ContentReaders\Vector4Reader.cs" />
     <Compile Include="Input\Touch\GestureType.cs" />
     <Compile Include="Input\Touch\TouchCollection.cs" />
     <Compile Include="Input\Touch\TouchLocation.cs" />
@@ -192,11 +182,8 @@
     <Compile Include="Input\Touch\TouchPanel.cs" />
     <Compile Include="Input\Touch\GestureSample.cs" />
     <Compile Include="GameComponentCollection.cs" />
-    <Compile Include="MacOS\Graphics\SpriteBatch.cs" />
-    <Compile Include="MacOS\Graphics\SpriteBatcher.cs" />
     <Compile Include="Graphics\SpriteBatchItem.cs" />
     <Compile Include="Graphics\SpriteEffects.cs" />
-    <Compile Include="MacOS\Game.cs" />
     <Compile Include="GameComponent.cs" />
     <Compile Include="DrawableGameComponent.cs" />
     <Compile Include="Audio\InstancePlayLimitException.cs" />
@@ -230,11 +217,6 @@
     <Compile Include="Graphics\Vertices\VertexPositionColor.cs" />
     <Compile Include="Graphics\Vertices\VertexPositionNormalTexture.cs" />
     <Compile Include="Graphics\Vertices\VertexPositionTexture.cs" />
-    <Compile Include="MacOS\Graphics\GraphicsExtensions.cs" />
-    <Compile Include="MacOS\Graphics\States\GLStateManager.cs" />
-    <Compile Include="MacOS\Graphics\Effect\EffectPass.cs" />
-    <Compile Include="MacOS\Graphics\Vertices\IndexBuffer.cs" />
-    <Compile Include="MacOS\Graphics\Vertices\VertexDeclaration.cs" />
     <Compile Include="MacOS\GameWindow.cs" />
     <Compile Include="PreparingDeviceSettingsEventArgs.cs" />
     <Compile Include="GraphicsDeviceInformation.cs" />
@@ -246,12 +228,10 @@
     <Compile Include="Graphics\Effect\IEffectMatrices.cs" />
     <Compile Include="Graphics\DirectionalLight.cs" />
     <Compile Include="MacOS\Input\Mouse.cs" />
-    <Compile Include="MacOS\Input\MouseState.cs" />
-    <Compile Include="MacOS\Input\Keyboard.cs" />
     <Compile Include="MacOS\KeyUtil.cs" />
     <Compile Include="Graphics\States\TextureAddressMode.cs" />
     <Compile Include="Graphics\States\TextureFilter.cs" />
-    <Compile Include="MacOS\Input\GamePad.cs" />
+    <Compile Include="Desktop\Input\GamePad.cs" />
     <Compile Include="Input\ButtonDefinition.cs" />
     <Compile Include="Input\ThumbStickDefinition.cs" />
     <Compile Include="MacOS\GamerServices\SignedInGamer.cs" />
@@ -297,11 +277,15 @@
     <Compile Include="Content\ContentReaders\UInt16Reader.cs" />
     <Compile Include="Content\ContentReaders\UInt32Reader.cs" />
     <Compile Include="Content\ContentReaders\UInt64Reader.cs" />
+    <Compile Include="Content\ContentReaders\BoundingFrustumReader.cs" />
+    <Compile Include="Content\ContentReaders\BoundingSphereReader.cs" />
+    <Compile Include="Content\ContentReaders\ByteReader.cs" />
+    <Compile Include="Content\ContentReaders\DateTimeReader.cs" />
+    <Compile Include="Content\ContentReaders\DecimalReader.cs" />
+    <Compile Include="Content\ContentReaders\RayReader.cs" />
+    <Compile Include="Content\ContentReaders\SByteReader.cs" />
     <Compile Include="Graphics\Effect\EffectParameterClass.cs" />
     <Compile Include="Graphics\Effect\EffectParameterType.cs" />
-    <Compile Include="Graphics\Effect\SpriteEffect.cs" />
-    <Compile Include="Graphics\Effect\SpriteEffectCode.cs" />
-    <Compile Include="MacOS\Graphics\Effect\EffectParameter.cs" />
     <Compile Include="Audio\AudioEngine.cs" />
     <Compile Include="Audio\AudioStopOptions.cs" />
     <Compile Include="Audio\Cue.cs" />
@@ -327,49 +311,132 @@
     <Compile Include="Content\ContentReaders\PointReader.cs" />
     <Compile Include="Content\ContentReaders\Vector2Reader.cs" />
     <Compile Include="MacOS\Storage\StorageDeviceHelper.cs" />
-    <Compile Include="Graphics\Effect\AlphaTestEffectCode.cs" />
-    <Compile Include="Graphics\Effect\AlphaTestEffect.cs" />
     <Compile Include="Graphics\Effect\EffectHelpers.cs" />
     <Compile Include="Content\LzxDecoder.cs" />
     <Compile Include="Content\ContentManager.cs" />
-    <Compile Include="MacOS\Content\ContentManager.cs" />
     <Compile Include="MacOS\Media\VideoPlayer.cs" />
     <Compile Include="MacOS\MacGameNSWindow.cs" />
     <Compile Include="Content\ContentReaders\CurveReader.cs" />
     <Compile Include="Input\GamePadDeadZone.cs" />
     <Compile Include="Input\GamePadType.cs" />
-    <Compile Include="MacOS\Graphics\Effect\Effect.cs" />
-    <Compile Include="MacOS\Graphics\Effect\BasicEffect.cs" />
-    <Compile Include="MacOS\Graphics\Effect\PSBasicEffect.cs" />
-    <Compile Include="MacOS\Graphics\Effect\VSBasicEffectcs" />
     <Compile Include="Graphics\Vertices\VertexElementColor.cs" />
     <Compile Include="Graphics\Vertices\IndexElementSize.cs" />
+    <Compile Include="Graphics\Vertices\IndexBuffer.cs" />
+    <Compile Include="Graphics\Vertices\VertexBuffer.cs" />
+    <Compile Include="Graphics\Vertices\DynamicIndexBuffer.cs" />
+    <Compile Include="Graphics\Vertices\DynamicVertexBuffer.cs" />
     <Compile Include="Audio\XactSound.cs" />
     <Compile Include="Audio\XactClip.cs" />
+    <Compile Include="Game.cs" />
+    <Compile Include="GamePlatform.cs" />
+    <Compile Include="MacOS\MacGamePlatform.cs" />
+    <Compile Include="Graphics\Effect\SpriteEffect.cs" />
+    <Compile Include="Content\ContentReaders\EffectReader.cs" />
+    <Compile Include="Graphics\Effect\EffectAnnotation.cs" />
+    <Compile Include="Graphics\Effect\EffectAnnotationCollection.cs" />
+    <Compile Include="Graphics\Effect\DXShader.cs" />
+    <Compile Include="Graphics\Effect\DXEffectObject.cs" />
+    <Compile Include="Graphics\Effect\MojoShader.cs" />
+    <Compile Include="Graphics\Effect\DXExpression.cs" />
+    <Compile Include="Graphics\Effect\BasicEffect.cs" />
+    <Compile Include="Graphics\Effect\DXPreshader.cs" />
+    <Compile Include="Graphics\Effect\DXHelper.cs" />
+    <Compile Include="GamerServices\GuideAlreadyVisibleException.cs" />
+    <Compile Include="GamerServices\GamerServicesDispatcher.cs" />
+    <Compile Include="Audio\AudioCategory.cs" />
+    <Compile Include="Graphics\Effect\Effect.cs" />
+    <Compile Include="Graphics\Effect\EffectParameter.cs" />
+    <Compile Include="Graphics\Effect\AlphaTestEffect.cs" />
+    <Compile Include="Graphics\Effect\GLSLOptimizer.cs" />
+    <Compile Include="Graphics\ESTexture2D.cs" />
+    <Compile Include="Graphics\GraphicsAdapter.cs" />
+    <Compile Include="Graphics\ESImage.cs" />
+    <Compile Include="Graphics\PresentationParameters.cs" />
+    <Compile Include="Graphics\SpriteBatcher.cs" />
+    <Compile Include="Content\ContentReaders\Texture2DReader.cs" />
+    <Compile Include="Graphics\SpriteBatch.cs" />
+    <Compile Include="Graphics\GraphicsDevice.cs" />
+    <Compile Include="MacOS\Audio\OALSoundBuffer.cs" />
+    <Compile Include="MacOS\Audio\OpenALSoundController.cs" />
+    <Compile Include="MacOS\Audio\OpenALSupport.cs" />
+    <Compile Include="MacOS\Audio\SoundEffect.cs" />
+    <Compile Include="MacOS\Audio\SoundEffectInstance.cs" />
+    <Compile Include="PrimaryThreadLoader.cs" />
+    <Compile Include="Graphics\States\GLStateManager.cs" />
+    <Compile Include="Graphics\Effect\EffectPass.cs" />
+    <Compile Include="Graphics\GraphicsExtensions.cs" />
+    <Compile Include="LaunchParameters.cs" />
+    <Compile Include="MacOS\MacGamePlatform+Synchronous.cs" />
+    <Compile Include="Graphics\Vertices\VertexDeclaration.cs" />
+    <Compile Include="Content\ContentReaders\IndexBufferReader.cs" />
+    <Compile Include="Content\ContentReaders\BasicEffectReader.cs" />
+    <Compile Include="Content\ContentReaders\BoundingBoxReader.cs" />
+    <Compile Include="Content\ContentReaders\MatrixReader.cs" />
+    <Compile Include="Content\ContentReaders\VertexBufferReader.cs" />
+    <Compile Include="Graphics\Model.cs" />
+    <Compile Include="Graphics\ModelBone.cs" />
+    <Compile Include="Graphics\ModelBoneCollection.cs" />
+    <Compile Include="Graphics\ModelEffectCollection.cs" />
+    <Compile Include="Graphics\ModelMesh.cs" />
+    <Compile Include="Graphics\ModelMeshCollection.cs" />
+    <Compile Include="Graphics\ModelMeshPart.cs" />
+    <Compile Include="Graphics\ModelMeshPartCollection.cs" />
+    <Compile Include="Content\ContentReaders\ModelReader.cs" />
+    <Compile Include="Content\ContentReaders\VertexDeclarationReader.cs" />
+    <Compile Include="Graphics\Effect\DualTextureEffect.cs" />
+    <Compile Include="Graphics\Effect\SkinnedEffect.cs" />
+    <Compile Include="Graphics\Effect\EnvironmentMapEffect.cs" />
+    <Compile Include="Content\ContentReaders\EnvironmentMapEffectReader.cs" />
+    <Compile Include="Graphics\TextureCube.cs" />
+    <Compile Include="Content\ContentReaders\TextureCubeReader.cs" />
+    <Compile Include="Graphics\CubeMapFace.cs" />
+    <Compile Include="Content\ContentReaders\TextureReader.cs" />
+    <Compile Include="Content\ContentReaders\SkinnedEffectReader.cs" />
+    <Compile Include="Content\ContentReaders\DualTextureEffectReader.cs" />
+    <Compile Include="Graphics\RenderTarget2D.cs" />
+    <Compile Include="Input\Keyboard.cs" />
+    <Compile Include="Input\MouseState.cs" />
+    <Compile Include="Content\ContentReaders\AlphaTestEffectReader.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />
     <Folder Include="Graphics\" />
     <Folder Include="Graphics\Vertices\" />
     <Folder Include="MacOS\Graphics\" />
-    <Folder Include="MacOS\Graphics\Vertices\" />
     <Folder Include="Content\ContentReaders\" />
     <Folder Include="GamerServices\" />
     <Folder Include="MacOS\Audio\" />
     <Folder Include="Media\" />
-    <Folder Include="MacOS\Content\" />
-    <Folder Include="MacOS\Graphics\" />
     <Folder Include="MacOS\Media\" />
-    <Folder Include="MacOS\Graphics\States\" />
-    <Folder Include="MacOS\Graphics\Effect\" />
     <Folder Include="MacOS\Input\" />
     <Folder Include="MacOS\GamerServices\" />
     <Folder Include="MacOS\Storage\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="MonoGame.Framework.MacOS.dll.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Libs\libglsl_optimizer.dylib">
+      <Link>libglsl_optimizer.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Libs\libmojoshader.dylib">
+      <Link>libmojoshader.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.MacOS.csproj">
       <Project>{AE483C29-042E-4226-BA52-D247CE7676DA}</Project>
       <Name>Lidgren.Network.MacOS</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Graphics\Effect\AlphaTestEffect.bin" />
+    <EmbeddedResource Include="Graphics\Effect\BasicEffect.bin" />
+    <EmbeddedResource Include="Graphics\Effect\DualTextureEffect.bin" />
+    <EmbeddedResource Include="Graphics\Effect\EnvironmentMapEffect.bin" />
+    <EmbeddedResource Include="Graphics\Effect\SkinnedEffect.bin" />
+    <EmbeddedResource Include="Graphics\Effect\SpriteEffect.bin" />
   </ItemGroup>
 </Project>

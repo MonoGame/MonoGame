@@ -46,15 +46,17 @@ namespace Microsoft.Xna.Framework.Input
 
 
 	public static class Keyboard
-	{		
+	{
 		public static KeyboardState GetState()
 		{
-			return new KeyboardState(new Keys[4]); // TODO Not used on iPhone or Zune
+            return State; // TODO Not used on iPhone or Zune
 		}
 		
 		public static KeyboardState GetState(PlayerIndex playerIndex)
 		{
-			return new KeyboardState(new Keys[4]);  // TODO Not used on iPhone or Zune
+            return State;  // TODO Not used on iPhone or Zune
 		}
+
+        internal static KeyboardState State { private get; set; }
 	}
 }

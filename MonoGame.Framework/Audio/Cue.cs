@@ -126,7 +126,7 @@ namespace Microsoft.Xna.Framework.Audio
 		public void Resume()
 		{
 			if (curSound != null) {
-				curSound.Play ();
+				curSound.Resume ();
 			}
 			paused = false;
 		}
@@ -159,6 +159,14 @@ namespace Microsoft.Xna.Framework.Audio
 				throw new NotImplementedException();
 			}
 		}
+		
+		public void Apply3D(AudioListener listener, AudioEmitter emitter) {
+			
+		}
+		
+		public bool IsDisposed { get { return false; } }
+		
+		
 		
 		#region IDisposable implementation
 		public void Dispose ()

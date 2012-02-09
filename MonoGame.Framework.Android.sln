@@ -19,8 +19,8 @@ Global
 		{BA9476CF-99BA-4D03-92F2-73D2C5E58883}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BA9476CF-99BA-4D03-92F2-73D2C5E58883}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BA9476CF-99BA-4D03-92F2-73D2C5E58883}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F05F90DC-DD37-4967-A96A-8D36C1C23E81}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
-		{F05F90DC-DD37-4967-A96A-8D36C1C23E81}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{616BBFA6-52F2-40A1-AA76-1CF2BD6390D5}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{616BBFA6-52F2-40A1-AA76-1CF2BD6390D5}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = MonoGame.Framework\MonoGame.Framework.Android.csproj

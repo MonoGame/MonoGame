@@ -1,158 +1,206 @@
-using Microsoft.Xna.Framework.Graphics;
 using System;
-using GL11 = OpenTK.Graphics.ES11.GL;
-using GL20 = OpenTK.Graphics.ES20.GL;
-using All11 = OpenTK.Graphics.ES11.All;
-using All20 = OpenTK.Graphics.ES20.All;
 using System.Runtime.InteropServices;
+
+#if MONOMAC
+using MonoMac.OpenGL;
+#elif WINDOWS
+using OpenTK.Graphics.OpenGL;
+#else
+
+#if ES11
+using OpenTK.Graphics.ES11;
+#else
+using OpenTK.Graphics.ES20;
+#endif
+
+#endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-    public class VertexDeclaration : GraphicsResource
-    {
-        // Fields
-        internal VertexElement[] _elements;
-        internal int _vertexStride;
+	public class VertexDeclaration : GraphicsResource
+	{
+		// Fields
+		internal VertexElement[] _elements;
+		internal int _vertexStride;
 
-        public VertexDeclaration(params VertexElement[] elements)
-        {
-            if ((elements == null) || (elements.Length == 0))
-            {
-                throw new ArgumentNullException("elements", "Elements cannot be empty");
-            }
-            else
-            {
-                VertexElement[] elementArray = (VertexElement[]) elements.Clone();
-                this._elements = elementArray;
-                this._vertexStride = getVertexStride(elementArray);
-            }
-        }
+		public VertexDeclaration(params VertexElement[] elements)
+		{
+			if ((elements == null) || (elements.Length == 0))
+			{
+				throw new ArgumentNullException("elements", "Elements cannot be empty");
+			}
+			else
+			{
+				VertexElement[] elementArray = (VertexElement[]) elements.Clone();
+				this._elements = elementArray;
+				this._vertexStride = getVertexStride(elementArray);
+			}
+		}
 
-        private static int getVertexStride(VertexElement[] elements)
-        {
-            int max = 0;
-            for (int i = 0; i < elements.Length; i++)
-            {
-                int start = elements[i].Offset + elements[i].VertexElementFormat.GetTypeSize();
-                if (max < start)
-                {
-                    max = start;
-                }
-            }
+		private static int getVertexStride(VertexElement[] elements)
+		{
+			int max = 0;
+			for (int i = 0; i < elements.Length; i++)
+			{
+				int start = elements[i].Offset + elements[i].VertexElementFormat.GetTypeSize();
+				if (max < start)
+				{
+					max = start;
+				}
+			}
 
-            return max;
-        }
+			return max;
+		}
 
-        public VertexDeclaration(int vertexStride, params VertexElement[] elements)
-        {
-            if ((elements == null) || (elements.Length == 0))
-            {
-                throw new ArgumentNullException("elements", "Elements cannot be empty");
-            }
-            else
-            {
-                VertexElement[] elementArray = (VertexElement[]) elements.Clone();
-                this._elements = elementArray;
-                this._vertexStride = vertexStride;
-            }
-        }
+		public VertexDeclaration(int vertexStride, params VertexElement[] elements)
+		{
+			if ((elements == null) || (elements.Length == 0))
+			{
+				throw new ArgumentNullException("elements", "Elements cannot be empty");
+			}
+			else
+			{
+				VertexElement[] elementArray = (VertexElement[]) elements.Clone();
+				this._elements = elementArray;
+				this._vertexStride = vertexStride;
+			}
+		}
 
-        internal static VertexDeclaration FromType(Type vertexType)
-        {
-            if (vertexType == null)
-            {
-                throw new ArgumentNullException("vertexType", "Cannot be null");
-            }
-            if (!vertexType.IsValueType)
-            {
-                object[] args = new object[] { vertexType };
-                throw new ArgumentException("vertexType", "Must be value type");
-            }
-            IVertexType type = Activator.CreateInstance(vertexType) as IVertexType;
-            if (type == null)
-            {
-                object[] objArray3 = new object[] { vertexType };
-                throw new ArgumentException("vertexData does not inherit IVertexType");
-            }
-            VertexDeclaration vertexDeclaration = type.VertexDeclaration;
-            if (vertexDeclaration == null)
-            {
-                object[] objArray2 = new object[] { vertexType };
-                throw new Exception("VertexDeclaration cannot be null");
-            }
+		internal static VertexDeclaration FromType(Type vertexType)
+		{
+			if (vertexType == null)
+			{
+				throw new ArgumentNullException("vertexType", "Cannot be null");
+			}
+			if (!vertexType.IsValueType)
+			{
+				object[] args = new object[] { vertexType };
+				throw new ArgumentException("vertexType", "Must be value type");
+			}
+			IVertexType type = Activator.CreateInstance(vertexType) as IVertexType;
+			if (type == null)
+			{
+				object[] objArray3 = new object[] { vertexType };
+				throw new ArgumentException("vertexData does not inherit IVertexType");
+			}
+			VertexDeclaration vertexDeclaration = type.VertexDeclaration;
+			if (vertexDeclaration == null)
+			{
+				object[] objArray2 = new object[] { vertexType };
+				throw new Exception("VertexDeclaration cannot be null");
+			}
 
-            return vertexDeclaration;
-        }
+			return vertexDeclaration;
+		}
+		
+		internal void Apply()
+		{
+			Apply (IntPtr.Zero);
+		}
 
-        public static void PrepareForUse(VertexDeclaration vd)
-        {
-            GLStateManager.VertexArray(true);
+		internal void Apply(IntPtr offset)
+		{
+#if ES11
+			GLStateManager.VertexArray(true);
 
-            bool normal = false;
-            bool texcoord = false;
+			bool normal = false;
+			bool texcoord = false;
+			bool color = false;
 			
-            foreach (var ve in vd.GetVertexElements())
-            {
-                switch (ve.VertexElementUsage)
-                {
-                    case VertexElementUsage.Position:
-                        GL11.VertexPointer(
-                            ve.VertexElementFormat.OpenGLNumberOfElements(),
-                            ve.VertexElementFormat.OpenGLValueType(),
-                            vd.VertexStride,
-                            //ve.Offset
-                            (IntPtr)ve.Offset
-                            );
-                        break;
-                    case VertexElementUsage.Color:
-                        GL11.ColorPointer(
-                            ve.VertexElementFormat.OpenGLNumberOfElements(),
-                            ve.VertexElementFormat.OpenGLValueType(),
-                            vd.VertexStride,
-                            //ve.Offset
-                            (IntPtr)ve.Offset
-                            );
-                        break;
-                    case VertexElementUsage.Normal:
-                        GL11.NormalPointer(
-                            ve.VertexElementFormat.OpenGLValueType(),
-                            vd.VertexStride,
-                            //ve.Offset
-                            (IntPtr)ve.Offset
-                            );
-                        normal = true;
-                        break;
-                    case VertexElementUsage.TextureCoordinate:
-                        GL11.TexCoordPointer(
-                            ve.VertexElementFormat.OpenGLNumberOfElements(),
-                            ve.VertexElementFormat.OpenGLValueType(),
-                            vd.VertexStride,
-                            //ve.Offset
-                            (IntPtr)ve.Offset
-                            );
-                        texcoord = true;
-                        break;
-                    default:
-                        throw new NotImplementedException();
-                }
-            }
+			foreach (var ve in this.GetVertexElements())
+			{
+				IntPtr elementOffset = (IntPtr)(offset.ToInt64 () + ve.Offset);
+				switch (ve.VertexElementUsage)
+				{
+				case VertexElementUsage.Position:
+					GL.VertexPointer(
+						ve.VertexElementFormat.OpenGLNumberOfElements(),
+						ve.VertexElementFormat.OpenGLVertexPointerType(),
+						this.VertexStride,
+						elementOffset);
+					GL.VertexAttribPointer(GraphicsDevice.attributePosition,
+						ve.VertexElementFormat.OpenGLNumberOfElements(),
+						ve.VertexElementFormat.OpenGLVertexAttribPointerType(),
+						false,
+						this.VertexStride,
+						elementOffset);
+					break;
+				case VertexElementUsage.Color:
+					GL.ColorPointer(
+						ve.VertexElementFormat.OpenGLNumberOfElements(),
+						ve.VertexElementFormat.OpenGLColorPointerType(),
+						this.VertexStride,
+						elementOffset);
+					color = true;
+					break;
+				case VertexElementUsage.Normal:
+					GL.NormalPointer(
+						ve.VertexElementFormat.OpenGLNormalPointerType(),
+						this.VertexStride,
+						elementOffset);
+					normal = true;
+					break;
+				case VertexElementUsage.TextureCoordinate:
+					GL.TexCoordPointer(
+						ve.VertexElementFormat.OpenGLNumberOfElements(),
+						ve.VertexElementFormat.OpenGLTexCoordPointerType(),
+						this.VertexStride,
+						elementOffset
+					);
+					texcoord = true;
+					break;
+				default:
+					throw new NotImplementedException();
+				}
+			}
+			GLStateManager.ColorArray (color);
+			GLStateManager.NormalArray(normal);
+			GLStateManager.TextureCoordArray(texcoord);
+#else
+			bool[] enabledAttributes = new bool[16];
+			foreach (var ve in this.GetVertexElements())
+			{
+				IntPtr elementOffset = (IntPtr)(offset.ToInt64 () + ve.Offset);
+				int attributeLocation = -1;
+				bool normalized = false;
+				
+				switch (ve.VertexElementUsage) {
+				case VertexElementUsage.Position: attributeLocation = GraphicsDevice.attributePosition + ve.UsageIndex; break;
+				case VertexElementUsage.Normal: attributeLocation = GraphicsDevice.attributeNormal; break;
+				case VertexElementUsage.Color: attributeLocation = GraphicsDevice.attributeColor; normalized = true; break;
+				case VertexElementUsage.BlendIndices: attributeLocation = GraphicsDevice.attributeBlendIndicies; break;
+				case VertexElementUsage.BlendWeight: attributeLocation = GraphicsDevice.attributeBlendWeight; break;
+				case VertexElementUsage.TextureCoordinate: attributeLocation = GraphicsDevice.attributeTexCoord + ve.UsageIndex; break;
+				default:
+					throw new NotImplementedException();
+				}
+				GL.VertexAttribPointer(attributeLocation,
+				                       ve.VertexElementFormat.OpenGLNumberOfElements(),
+				                       ve.VertexElementFormat.OpenGLVertexAttribPointerType(),
+				                       normalized,
+				                       this.VertexStride,
+				                       elementOffset);
+				enabledAttributes[attributeLocation] = true;
+			}
+			
+			for (int i=0; i<16; i++) {
+				GLStateManager.VertexAttribArray(i, enabledAttributes[i]);
+			}
+#endif
+		}
 
-            GLStateManager.TextureCoordArray(texcoord);
-            GLStateManager.NormalArray(normal);
-        }
+		public VertexElement[] GetVertexElements()
+		{
+			return (VertexElement[]) this._elements.Clone();
+		}
 
-        public VertexElement[] GetVertexElements()
-        {
-            return (VertexElement[]) this._elements.Clone();
-        }
-
-        // Properties
-        public int VertexStride
-        {
-            get
-            {
-                return this._vertexStride;
-            }
-        }
-    }
+		// Properties
+		public int VertexStride
+		{
+			get
+			{
+				return this._vertexStride;
+			}
+		}
+	}
 }

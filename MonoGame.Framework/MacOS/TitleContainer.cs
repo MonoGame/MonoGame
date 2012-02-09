@@ -49,8 +49,15 @@ namespace Microsoft.Xna.Framework
 	{
 		public static Stream OpenStream (string name)
 		{
-			var file = Path.Combine(NSBundle.MainBundle.ResourcePath, name);
-			return new FileStream(file, FileMode.Open);
+			return File.OpenRead (GetFilename (name));
+		}
+		
+		internal static string GetFilename(string name)
+		{
+			// Replace Windows path separators with local path separators
+			name = name.Replace('\\', Path.DirectorySeparatorChar);
+			string fileName = Path.Combine(NSBundle.MainBundle.ResourcePath, name);
+			return fileName;
 		}
 	}
 }

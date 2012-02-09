@@ -19,7 +19,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\iPhoneSimulator\Debug</OutputPath>
-    <DefineConstants>DEBUG;IPHONE</DefineConstants>
+    <DefineConstants>DEBUG;IPHONE;GLES</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CustomCommands>
@@ -40,7 +40,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DefineConstants>IPHONE</DefineConstants>
+    <DefineConstants>IPHONE;GLES</DefineConstants>
     <AssemblyName>MonoGame.Framework.iOS</AssemblyName>
     <MtouchUseArmv7>false</MtouchUseArmv7>
   </PropertyGroup>
@@ -49,7 +49,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\iPhone\Debug</OutputPath>
-    <DefineConstants>DEBUG;IPHONE</DefineConstants>
+    <DefineConstants>DEBUG;IPHONE;GLES</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
@@ -65,7 +65,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DefineConstants>IPHONE</DefineConstants>
+    <DefineConstants>IPHONE;GLES</DefineConstants>
     <AssemblyName>MonoGame.Framework</AssemblyName>
     <MtouchUseArmv7>false</MtouchUseArmv7>
   </PropertyGroup>
@@ -154,7 +154,6 @@
     <Compile Include="Input\Mouse.cs" />
     <Compile Include="Input\MouseState.cs" />
     <Compile Include="Audio\AudioChannels.cs" />
-    <Compile Include="Audio\SoundEffect.cs" />
     <Compile Include="Audio\SoundState.cs" />
     <Compile Include="Media\MediaPlayer.cs" />
     <Compile Include="Media\MediaState.cs" />
@@ -171,6 +170,9 @@
     <Compile Include="Content\ContentReaders\Vector3Reader.cs" />
     <Compile Include="Content\ContentReaders\SongReader.cs" />
     <Compile Include="Content\ContentReaders\SoundEffectReader.cs" />
+    <Compile Include="Content\ContentReaders\PlaneReader.cs" />
+    <Compile Include="Content\ContentReaders\QuaternionReader.cs" />
+    <Compile Include="Content\ContentReaders\Vector4Reader.cs" />
     <Compile Include="Media\MediaSourceType.cs" />
     <Compile Include="Media\Playlist.cs" />
     <Compile Include="ReusableItemList.cs" />
@@ -199,7 +201,6 @@
     <Compile Include="Input\KeyboardState.cs" />
     <Compile Include="Input\Keys.cs" />
     <Compile Include="Input\Keyboard.cs" />
-    <Compile Include="Audio\SoundEffectInstance.cs" />
     <Compile Include="Input\KeyState.cs" />
     <Compile Include="IUpdateable.cs" />
     <Compile Include="Net\NetworkSessionJoinError.cs" />
@@ -215,7 +216,6 @@
     <Compile Include="Input\GamePadDPad.cs" />
     <Compile Include="Input\GamePadTriggers.cs" />
     <Compile Include="Graphics\CompilerOptions.cs" />
-    <Compile Include="Graphics\RenderState.cs" />
     <Compile Include="Audio\AudioListener.cs" />
     <Compile Include="Audio\AudioEmitter.cs" />
     <Compile Include="DisplayOrientation.cs" />
@@ -246,6 +246,8 @@
     <Compile Include="Graphics\Vertices\IVertexType.cs" />
     <Compile Include="Graphics\Vertices\PrimitiveType.cs" />
     <Compile Include="Graphics\Vertices\VertexBuffer.cs" />
+    <Compile Include="Graphics\Vertices\DynamicIndexBuffer.cs" />
+    <Compile Include="Graphics\Vertices\DynamicVertexBuffer.cs" />
     <Compile Include="Graphics\Vertices\VertexColorTexture.cs" />
     <Compile Include="Graphics\Vertices\VertexDeclaration.cs" />
     <Compile Include="Graphics\Vertices\VertexElement.cs" />
@@ -308,6 +310,13 @@
     <Compile Include="Content\ContentReaders\UInt64Reader.cs" />
     <Compile Include="Content\ContentReaders\NullableReader.cs" />
     <Compile Include="Content\ContentReaders\ArrayReader.cs" />
+    <Compile Include="Content\ContentReaders\BoundingFrustumReader.cs" />
+    <Compile Include="Content\ContentReaders\BoundingSphereReader.cs" />
+    <Compile Include="Content\ContentReaders\ByteReader.cs" />
+    <Compile Include="Content\ContentReaders\DateTimeReader.cs" />
+    <Compile Include="Content\ContentReaders\DecimalReader.cs" />
+    <Compile Include="Content\ContentReaders\RayReader.cs" />
+    <Compile Include="Content\ContentReaders\SByteReader.cs" />
     <Compile Include="Graphics\SamplerStateCollection.cs" />
     <Compile Include="Graphics\Effect\EffectParameterClass.cs" />
     <Compile Include="Graphics\Effect\EffectParameterType.cs" />
@@ -328,15 +337,10 @@
     <Compile Include="Net\NetworkMessageType.cs" />
     <Compile Include="iOS\GamerServices\SignedInGamer.cs" />
     <Compile Include="iOS\Graphics\ESImage.cs" />
-    <Compile Include="iOS\Graphics\ESTexture2D.cs" />
-    <Compile Include="iOS\Graphics\GraphicsAdapter.cs" />
-    <Compile Include="iOS\Graphics\PresentationParameters.cs" />
     <Compile Include="iOS\Graphics\Texture2D.cs" />
     <Compile Include="iOS\Input\GamePad.cs" />
-    <Compile Include="iOS\Game.cs" />
     <Compile Include="iOS\IOSGameWindow.cs" />
     <Compile Include="iOS\PowerStatus.cs" />
-    <Compile Include="iOS\Audio\Sound.cs" />
     <Compile Include="iOS\Media\MediaSource.cs" />
     <Compile Include="iOS\Media\MediaLibrary.cs" />
     <Compile Include="iOS\Input\Accelerometer.cs" />
@@ -344,16 +348,13 @@
     <Compile Include="iOS\Media\VideoPlayer.cs" />
     <Compile Include="iOS\GamerServices\Guide.cs" />
     <Compile Include="iOS\GamerServices\TextFieldAlertView.cs" />
-    <Compile Include="iOS\Program.cs" />
     <Compile Include="iOS\Net\MonoGamePeerPickerControllerDelegate.cs" />
     <Compile Include="iOS\Net\MonoGameSessionDelegate.cs" />
-    <Compile Include="iOS\Content\ContentManager.cs" />
     <Compile Include="Graphics\Extender.cs" />
     <Compile Include="Audio\NoAudioHardwareException.cs" />
     <Compile Include="Storage\StorageDeviceHelper.cs" />
     <Compile Include="Content\ContentManager.cs" />
     <Compile Include="Content\LzxDecoder.cs" />
-    <Compile Include="Graphics\States\SamplerState.ES.cs" />
     <Compile Include="Content\ContentReaders\CurveReader.cs" />
     <Compile Include="Input\GamePadDeadZone.cs" />
     <Compile Include="Content\ContentReaders\ColorReader.cs" />
@@ -363,6 +364,72 @@
     <Compile Include="Graphics\Vertices\VertexElementColor.cs" />
     <Compile Include="Audio\XactClip.cs" />
     <Compile Include="Audio\XactSound.cs" />
+    <Compile Include="Game.cs" />
+    <Compile Include="GamePlatform.cs" />
+    <Compile Include="iOS\iOSGamePlatform.cs" />
+    <Compile Include="iOS\iOSGameViewController.cs" />
+    <Compile Include="iOS\OrientationConverter.cs" />
+    <Compile Include="MacOS\Audio\OALSoundBuffer.cs">
+      <Link>iOS\Audio\OALSoundBuffer.cs</Link>
+    </Compile>
+    <Compile Include="MacOS\Audio\OpenALSoundController.cs">
+      <Link>iOS\Audio\OpenALSoundController.cs</Link>
+    </Compile>
+    <Compile Include="MacOS\Audio\OpenALSupport.cs">
+      <Link>iOS\Audio\OpenALSupport.cs</Link>
+    </Compile>
+    <Compile Include="MacOS\Audio\SoundEffect.cs">
+      <Link>iOS\Audio\SoundEffect.cs</Link>
+    </Compile>
+    <Compile Include="MacOS\Audio\SoundEffectInstance.cs">
+      <Link>iOS\Audio\SoundEffectInstance.cs</Link>
+    </Compile>
+    <Compile Include="Graphics\Effect\AlphaTestEffect.cs" />
+    <Compile Include="Graphics\Effect\DXEffectObject.cs" />
+    <Compile Include="Graphics\Effect\DXExpression.cs" />
+    <Compile Include="Graphics\Effect\DXHelper.cs" />
+    <Compile Include="Graphics\Effect\DXPreshader.cs" />
+    <Compile Include="Graphics\Effect\DXShader.cs" />
+    <Compile Include="Graphics\Effect\EffectAnnotation.cs" />
+    <Compile Include="Graphics\Effect\EffectAnnotationCollection.cs" />
+    <Compile Include="Graphics\Effect\EffectHelpers.cs" />
+    <Compile Include="Graphics\Effect\GLSLOptimizer.cs" />
+    <Compile Include="Graphics\Effect\MojoShader.cs" />
+    <Compile Include="Graphics\Effect\SpriteEffect.cs" />
+    <Compile Include="Graphics\GraphicsAdapter.cs" />
+    <Compile Include="Audio\AudioCategory.cs" />
+    <Compile Include="Graphics\ESTexture2D.cs" />
+    <Compile Include="Graphics\Vertices\IndexElementSize.cs" />
+    <Compile Include="LaunchParameters.cs" />
+    <Compile Include="Content\ContentReaders\EffectReader.cs" />
+    <Compile Include="Graphics\States\SamplerState.cs" />
+    <Compile Include="Graphics\Effect\DualTextureEffect.cs" />
+    <Compile Include="Graphics\Effect\EnvironmentMapEffect.cs" />
+    <Compile Include="Graphics\Effect\SkinnedEffect.cs" />
+    <Compile Include="Graphics\PresentationParameters.cs" />
+    <Compile Include="Graphics\TextureCube.cs" />
+    <Compile Include="Graphics\Model.cs" />
+    <Compile Include="Graphics\ModelBone.cs" />
+    <Compile Include="Graphics\ModelBoneCollection.cs" />
+    <Compile Include="Graphics\ModelEffectCollection.cs" />
+    <Compile Include="Graphics\ModelMesh.cs" />
+    <Compile Include="Graphics\ModelMeshCollection.cs" />
+    <Compile Include="Graphics\ModelMeshPart.cs" />
+    <Compile Include="Graphics\ModelMeshPartCollection.cs" />
+    <Compile Include="Graphics\CubeMapFace.cs" />
+    <Compile Include="Content\ContentReaders\BasicEffectReader.cs" />
+    <Compile Include="Content\ContentReaders\BoundingBoxReader.cs" />
+    <Compile Include="Content\ContentReaders\DualTextureEffectReader.cs" />
+    <Compile Include="Content\ContentReaders\EnvironmentMapEffectReader.cs" />
+    <Compile Include="Content\ContentReaders\IndexBufferReader.cs" />
+    <Compile Include="Content\ContentReaders\MatrixReader.cs" />
+    <Compile Include="Content\ContentReaders\ModelReader.cs" />
+    <Compile Include="Content\ContentReaders\SkinnedEffectReader.cs" />
+    <Compile Include="Content\ContentReaders\TextureCubeReader.cs" />
+    <Compile Include="Content\ContentReaders\TextureReader.cs" />
+    <Compile Include="Content\ContentReaders\VertexBufferReader.cs" />
+    <Compile Include="Content\ContentReaders\VertexDeclarationReader.cs" />
+    <Compile Include="Content\ContentReaders\AlphaTestEffectReader.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
@@ -390,5 +457,13 @@
       <Project>{734EAA48-F1CA-481A-B391-0285BC0E8B40}</Project>
       <Name>Lidgren.Network.iOS</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Graphics\Effect\AlphaTestEffect.bin" />
+    <EmbeddedResource Include="Graphics\Effect\BasicEffect.bin" />
+    <EmbeddedResource Include="Graphics\Effect\DualTextureEffect.bin" />
+    <EmbeddedResource Include="Graphics\Effect\EnvironmentMapEffect.bin" />
+    <EmbeddedResource Include="Graphics\Effect\SkinnedEffect.bin" />
+    <EmbeddedResource Include="Graphics\Effect\SpriteEffect.bin" />
   </ItemGroup>
 </Project>

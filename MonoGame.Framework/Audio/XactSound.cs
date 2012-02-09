@@ -7,7 +7,7 @@ namespace Microsoft.Xna.Framework.Audio
 	{
 		bool complexSound;
 		XactClip[] soundClips;
-		Sound wave;
+		SoundEffectInstance wave;
 		
 		public XactSound (SoundBank soundBank, BinaryReader soundReader, uint soundOffset)
 		{
@@ -53,18 +53,21 @@ namespace Microsoft.Xna.Framework.Audio
 			soundReader.BaseStream.Seek (oldPosition, SeekOrigin.Begin);
 		}
 		
-		public XactSound (Sound sound) {
+//		public XactSound (Sound sound) {
+//			complexSound = false;
+//			wave = sound;
+//		}
+		public XactSound (SoundEffectInstance sound) {
 			complexSound = false;
 			wave = sound;
-		}
-		
+		}		
 		public void Play() {
 			if (complexSound) {
 				foreach (XactClip clip in soundClips) {
 					clip.Play();
 				}
 			} else {
-				if (wave.Playing) wave.Stop ();
+				if (wave.State == SoundState.Playing) wave.Stop ();
 				wave.Play ();
 			}
 		}
@@ -86,6 +89,16 @@ namespace Microsoft.Xna.Framework.Audio
 				}
 			} else {
 				wave.Pause ();
+			}
+		}
+                
+		public void Resume() {
+			if (complexSound) {
+				foreach (XactClip clip in soundClips) {
+					clip.Play();
+				}
+			} else {
+				wave.Resume ();
 			}
 		}
 		
@@ -116,7 +129,7 @@ namespace Microsoft.Xna.Framework.Audio
 					}
 					return false;
 				} else {
-					return wave.Playing;
+					return wave.State == SoundState.Playing;
 				}
 			}
 		}

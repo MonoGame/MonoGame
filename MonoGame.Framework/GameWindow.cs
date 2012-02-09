@@ -15,7 +15,7 @@ namespace Microsoft.Xna.Framework
         public abstract void BeginScreenDeviceChange(bool willBeFullScreen);
         public abstract void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight);
 
-        public void EndScreenDeviceChange(string screenDeviceName) { }
+        public virtual void EndScreenDeviceChange(string screenDeviceName) { }
 
         protected void OnActivated(){}
 

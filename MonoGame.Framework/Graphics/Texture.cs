@@ -39,6 +39,23 @@
 // #endregion License
 // 
 using System;
+
+#if MONOMAC
+using MonoMac.OpenGL;
+#elif WINDOWS || LINUX
+using OpenTK.Graphics.OpenGL;
+#else
+ #if ES11
+using OpenTK.Graphics.ES11;
+ #else
+using OpenTK.Graphics.ES20;
+  #if IPHONE
+using TextureTarget = OpenTK.Graphics.ES20.All;
+  #endif
+ #endif
+#endif
+
+
 namespace Microsoft.Xna.Framework.Graphics
 {
 	public abstract class Texture : GraphicsResource
@@ -56,6 +73,17 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			get { return _levelCount; }
 		}
+
+		internal virtual void Apply()
+		{
+			GL.BindTexture(GLTarget, _textureId);
+		}
+		
+		internal virtual TextureTarget GLTarget
+		{
+			get { throw new NotImplementedException(); }
+		}
+		
 	}
 }
 

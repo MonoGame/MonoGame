@@ -42,14 +42,13 @@ using System;
 
 namespace Microsoft.Xna.Framework
 {   
-    public class GameComponent : IGameComponent, IComparable<GameComponent>, IDisposable
+    public class GameComponent : IGameComponent, IUpdateable, IComparable<GameComponent>, IDisposable
     {
         Game _game;
         int _updateOrder;
         bool _enabled;
         public event EventHandler UpdateOrderChanged;
         public event EventHandler EnabledChanged;
-        bool _initialized = false;
         public GameComponent(Game game)
         {
             _game = game;
@@ -66,93 +65,71 @@ namespace Microsoft.Xna.Framework
 
         public virtual void Initialize()
         {
-            if (!_initialized)
-            {
-                LoadContent();
-				_initialized = true;
-            }
         }
 
         public virtual void Update(GameTime gameTime)
         {
         }
-
-        protected virtual void LoadContent()
+        
+        public Graphics.GraphicsDevice GraphicsDevice
         {
+            get 
+            {
+                return _game.GraphicsDevice;
+            }
         }
-
-        protected virtual void UnloadContent()
-        {
-        }
-
-        protected virtual void LoadGraphicsContent(bool loadContent)
-        {
-
-        }
-		
-		public Graphics.GraphicsDevice GraphicsDevice
-		{
-			get 
-			{
-				return _game.GraphicsDevice;
-			}
-		}
 
         public bool Enabled
         {
-            get{return _enabled;}
+            get { return _enabled; }
             set
             {
                 _enabled = value;
-                if(EnabledChanged != null)
-                    EnabledChanged(this, null);
-
+                Raise(EnabledChanged, EventArgs.Empty);
                 OnEnabledChanged(this, null);
             }
         }
 
         public int UpdateOrder
         {
-            get
-            {
-                return _updateOrder;
-            }
+            get { return _updateOrder; }
             set
             {
                 _updateOrder = value;
-                if(UpdateOrderChanged != null)
-                    UpdateOrderChanged(this, null);
-
+                Raise(UpdateOrderChanged, EventArgs.Empty);
                 OnUpdateOrderChanged(this, null);
             }
         }
 
+        private void Raise(EventHandler handler, EventArgs e)
+        {
+            if (handler != null)
+                handler(this, e);
+        }
+
         protected virtual void OnUpdateOrderChanged(object sender, EventArgs args)
         {
-
         }
 
         protected virtual void OnEnabledChanged(object sender, EventArgs args)
         {
-
         }
 
-		/// <summary>
+        /// <summary>
         /// Shuts down the component.
         /// </summary>
         protected virtual void Dispose(bool disposing)
         {
-			
-	}
-		
-		/// <summary>
+        }
+        
+        /// <summary>
         /// Shuts down the component.
         /// </summary>
         public virtual void Dispose()
         {
-		Dispose(true);
-	}
-		
+            Dispose(true);
+        }
+        
         #region IComparable<GameComponent> Members
 
         public int CompareTo(GameComponent other)

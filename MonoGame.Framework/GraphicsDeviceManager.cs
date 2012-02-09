@@ -40,7 +40,11 @@ purpose and non-infringement.
 
 using System;
 
+#if ES11
 using OpenTK.Graphics.ES11;
+#else
+using OpenTK.Graphics.ES20;
+#endif
 
 using Microsoft.Xna.Framework.Graphics;
 

@@ -249,37 +249,27 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        public static Texture2D FromFile(GraphicsDevice graphicsDevice, Stream textureStream)
+        public static Texture2D FromStream(GraphicsDevice graphicsDevice, Stream stream)
         {
-            Bitmap image = (Bitmap)Bitmap.FromStream(textureStream);
+            var image = (Bitmap)Bitmap.FromStream(stream);
             if (image == null)
-            {
                 throw new ContentLoadException("Error loading Texture2D Stream");
-            }
 
             // Fix up the Image to match the expected format
             image.RGBToBGR();
 
-            ESImage theTexture = new ESImage(image, graphicsDevice.PreferedFilter);
-            Texture2D result = new Texture2D(theTexture);
-
-
+            var theTexture = new ESImage(image, graphicsDevice.PreferedFilter);
+            var result = new Texture2D(theTexture);
 
             return result;
         }
 
-        public static Texture2D FromFile(GraphicsDevice graphicsDevice, Stream textureStream, int numberBytes)
+        public static Texture2D FromStream(GraphicsDevice graphicsDevice, Stream stream, int width, int height, bool zoom)
         {
-            throw new NotImplementedException();
-        }
-
-        public static Texture2D FromFile(GraphicsDevice graphicsDevice, string filename, int width, int height)
-        {
-            Bitmap image = (Bitmap)Bitmap.FromFile(filename);
+            var image = (Bitmap)Bitmap.FromStream(stream);
             if (image == null)
-            {
-                throw new ContentLoadException("Error loading file: " + filename);
-            }
+                throw new ContentLoadException("Error loading Texture2D Stream");
+
             // Fix up the Image to match the expected format
             image.RGBToBGR();
 
@@ -296,7 +286,27 @@ namespace Microsoft.Xna.Framework.Graphics
                 //theTexture = new ESImage(small, graphicsDevice.PreferedFilter);
                 theTexture = new ESImage(image, graphicsDevice.PreferedFilter);
             }
-            Texture2D result = new Texture2D(theTexture);
+
+            var result = new Texture2D(theTexture);
+            return result;            
+        }
+
+        [Obsolete]
+        public static Texture2D FromFile(GraphicsDevice graphicsDevice, Stream stream)
+        {
+            return FromStream(graphicsDevice, stream);
+        }
+
+        [Obsolete]
+        public static Texture2D FromFile(GraphicsDevice graphicsDevice, Stream textureStream, int numberBytes)
+        {
+            throw new NotImplementedException();
+        }
+
+        [Obsolete]
+        public static Texture2D FromFile(GraphicsDevice graphicsDevice, string filename, int width, int height)
+        {
+            var result = FromStream(graphicsDevice, new FileStream(filename, FileMode.Open, FileAccess.Read), width, height, false);
             // result.Name = Path.GetFileNameWithoutExtension(filename);
             result.Name = filename;
             //			_width = theTexture.ImageWidth;
@@ -305,29 +315,15 @@ namespace Microsoft.Xna.Framework.Graphics
             return result;
         }
 
+        [Obsolete]
         public static Texture2D FromFile(GraphicsDevice graphicsDevice, string filename)
         {
             return FromFile(graphicsDevice, filename, 0, 0);
         }
 
-        internal void Apply()
+        internal override TextureTarget GLTarget
         {
-
-            GL.BindTexture(TextureTarget.Texture2D, (uint)_textureId);
-            if (_mipmap)
-            {
-                // Taken from http://www.flexicoder.com/blog/index.php/2009/11/iphone-mipmaps/
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)All.LinearMipmapNearest);
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)All.Linear);
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.GenerateMipmap, (int)All.True);
-            }
-            else
-            {
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)All.Linear);
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)All.Linear);
-            }
-
-            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, _width, _height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Rgba, PixelType.UnsignedByte, textureData);
+            get { return TextureTarget.Texture2D; }
         }
 
         private void SetPixel(int x, int y, byte red, byte green, byte blue, byte alpha)
@@ -398,7 +394,21 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
 
                 // when we are all done we need apply the changes
-                Apply();
+                GL.BindTexture(TextureTarget.Texture2D, (uint)_textureId);
+                if (_mipmap)
+                {
+                    // Taken from http://www.flexicoder.com/blog/index.php/2009/11/iphone-mipmaps/
+                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)All.LinearMipmapNearest);
+                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)All.Linear);
+                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.GenerateMipmap, (int)All.True);
+                }
+                else
+                {
+                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)All.Linear);
+                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)All.Linear);
+                }
+
+                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, _width, _height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Rgba, PixelType.UnsignedByte, textureData);
             }
         }
 
@@ -815,6 +825,21 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 throw new NotImplementedException();
             }
+        }
+
+        public void SaveAsJpeg(Stream stream, int width, int height)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SaveAsPng(Stream stream, int width, int height)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal void Reload(Stream assetStream)
+        {
+            
         }
     }
 }

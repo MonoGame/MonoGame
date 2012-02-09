@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual C# Express 2010
+# Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Framework.Windows", "MonoGame.Framework\MonoGame.Framework.Windows.csproj", "{7DE47032-A904-4C29-BD22-2D235E8D91BA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lidgren.Network.Windows", "ThirdParty\Lidgren.Network\Lidgren.Network.Windows.csproj", "{AE483C29-042E-4226-BA52-D247CE7676DA}"
@@ -42,14 +42,6 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{36CDED1D-BE90-4C12-BC0A-F923AB92B98D} = {2362889B-880E-4EBA-AA76-3E1D27158F55}
-		{5FAEAF4E-75EC-41E4-8D01-EF1CBB9EEAB6} = {2362889B-880E-4EBA-AA76-3E1D27158F55}
-		{8CFEF1FE-9E32-43EB-A730-EB3AACDC77B1} = {2362889B-880E-4EBA-AA76-3E1D27158F55}
-		{B117412F-9538-4CE0-B8F1-B279561AF17E} = {E186B87F-A589-42E5-9106-484545FCA486}
-		{E31D6E96-3539-4EB7-9529-34A59EF03DDA} = {B117412F-9538-4CE0-B8F1-B279561AF17E}
-		{6DE82385-D762-4275-9185-F42995282478} = {B117412F-9538-4CE0-B8F1-B279561AF17E}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = MonoGame.Framework\MonoGame.Framework.Windows.csproj

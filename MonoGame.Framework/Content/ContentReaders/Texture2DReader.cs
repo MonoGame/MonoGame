@@ -31,7 +31,17 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Drawing;
 
+#if MONOMAC
+using MonoMac.OpenGL;
+#elif WINDOWS
+using OpenTK.Graphics.OpenGL;
+#else
+#if ES11
 using OpenTK.Graphics.ES11;
+#else
+using OpenTK.Graphics.ES20;
+#endif
+#endif
 
 using Microsoft.Xna;
 using Microsoft.Xna.Framework;
@@ -42,10 +52,10 @@ namespace Microsoft.Xna.Framework.Content
 {
     internal class Texture2DReader : ContentTypeReader<Texture2D>
     {
-        internal Texture2DReader()
-        {
-            // Do nothing
-        }
+		internal Texture2DReader()
+		{
+			// Do nothing
+		}
 
 		public static string Normalize(string FileName)
 		{
@@ -73,6 +83,8 @@ namespace Microsoft.Xna.Framework.Content
 				return FileName+".gif";
 			if (File.Exists(FileName+".pict"))
 				return FileName+".pict";
+			if (File.Exists(FileName+".tga"))
+				return FileName+".tga";
 			
 			return null;
 		}
@@ -81,32 +93,78 @@ namespace Microsoft.Xna.Framework.Content
 		{
 			Texture2D texture = null;
 			
-			SurfaceFormat surfaceFormat = (SurfaceFormat)reader.ReadInt32 ();
-			int width = reader.ReadInt32();
-			int height = reader.ReadInt32();
-			int levelCount = reader.ReadInt32();
-			int imageLength = reader.ReadInt32();
-						
-			byte[] imageData = reader.ReadBytes(imageLength);
+			SurfaceFormat surfaceFormat;
+			if (reader.version < 5) {
+				SurfaceFormat_Legacy legacyFormat = (SurfaceFormat_Legacy)reader.ReadInt32 ();
+				switch(legacyFormat) {
+				case SurfaceFormat_Legacy.Dxt1:
+					surfaceFormat = SurfaceFormat.Dxt1;
+					break;
+				case SurfaceFormat_Legacy.Dxt3:
+					surfaceFormat = SurfaceFormat.Dxt3;
+					break;
+				case SurfaceFormat_Legacy.Dxt5:
+					surfaceFormat = SurfaceFormat.Dxt5;
+					break;
+				case SurfaceFormat_Legacy.Color:
+					surfaceFormat = SurfaceFormat.Color;
+					break;
+				default:
+					throw new NotImplementedException();
+				}
+			} else {
+				surfaceFormat = (SurfaceFormat)reader.ReadInt32 ();
+			}
+			int width = (reader.ReadInt32 ());
+			int height = (reader.ReadInt32 ());
+			int levelCount = (reader.ReadInt32 ());
+			int imageLength = (reader.ReadInt32 ());
 			
-			switch(surfaceFormat)
-			{
-				case SurfaceFormat.Dxt1: imageData = DxtUtil.DecompressDxt1(imageData, width, height); break;
-				case SurfaceFormat.Dxt3: imageData = DxtUtil.DecompressDxt3(imageData, width, height); break;
-			}				
+			byte[] imageBytes = reader.ReadBytes (imageLength);
 			
-			IntPtr imagePtr = IntPtr.Zero;
+			switch(surfaceFormat) {
+#if IPHONE
+			//no Dxt in OpenGL ES
+			case SurfaceFormat.Dxt1:
+				imageBytes = DxtUtil.DecompressDxt1(imageBytes, width, height);
+				surfaceFormat = SurfaceFormat.Color;
+				break;
+			case SurfaceFormat.Dxt3:
+				imageBytes = DxtUtil.DecompressDxt3(imageBytes, width, height);
+				surfaceFormat = SurfaceFormat.Color;
+				break;
+			case SurfaceFormat.Dxt5:
+				imageBytes = DxtUtil.DecompressDxt5(imageBytes, width, height);
+				surfaceFormat = SurfaceFormat.Color;
+				break;
+#endif
+			case SurfaceFormat.NormalizedByte4:
+				int pitch = width*4;
+				for (int y=0; y<height; y++) {
+					for (int x=0; x<width; x++) {
+						int color = BitConverter.ToInt32(imageBytes, y*pitch+x*4);
+						imageBytes[y*pitch+x*4]   = (byte)(((color >> 16) & 0xff)); //R:=W
+						imageBytes[y*pitch+x*4+1] = (byte)(((color >> 8 ) & 0xff)); //G:=V
+						imageBytes[y*pitch+x*4+2] = (byte)(((color      ) & 0xff)); //B:=U
+						imageBytes[y*pitch+x*4+3] = (byte)(((color >> 24) & 0xff)); //A:=Q
+					}
+				}
+				surfaceFormat = SurfaceFormat.Color;
+				break;
+			}
 			
+			IntPtr ptr = Marshal.AllocHGlobal (imageLength);
 			try 
 			{
-				imagePtr = Marshal.AllocHGlobal (imageData.Length);
-				Marshal.Copy (imageData, 0, imagePtr, imageData.Length);					
-				ESTexture2D esTexture = new ESTexture2D (imagePtr, surfaceFormat, width, height, new Size (width, height), All.Linear);
-				texture = new Texture2D (new ESImage (esTexture));
-			}
+				Marshal.Copy (imageBytes, 0, ptr, imageLength);					
+				ESTexture2D temp = new ESTexture2D(
+					ptr, imageLength, surfaceFormat, width, height, new Size (width, height), All.Linear);
+				texture = new Texture2D (new ESImage (temp));					
+				texture.graphicsDevice = reader.GraphicsDevice;
+			} 
 			finally 
 			{		
-				Marshal.FreeHGlobal (imagePtr);
+				Marshal.FreeHGlobal (ptr);
 			}
 			
 			return texture;

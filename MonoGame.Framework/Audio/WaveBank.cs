@@ -31,7 +31,7 @@ namespace Microsoft.Xna.Framework.Audio
 {
     public class WaveBank : IDisposable
     {
-        internal Sound[] sounds;
+        internal SoundEffectInstance[] sounds;
         internal string BankName;
 
         struct Segment
@@ -176,7 +176,7 @@ namespace Microsoft.Xna.Framework.Audio
                 entry_name[wavebankdata.EntryNameElementSize] = 0;
             }
 
-            sounds = new Sound[wavebankdata.EntryCount];
+            sounds = new SoundEffectInstance[wavebankdata.EntryCount];
 
             for (int current_entry = 0; current_entry < wavebankdata.EntryCount; current_entry++)
             {
@@ -346,7 +346,7 @@ namespace Microsoft.Xna.Framework.Audio
                     writer.Close();
                     mStream.Close();
 					
-                    sounds[current_entry] = new Sound(mStream.ToArray(), 1.0f, false);
+                    sounds[current_entry] = new SoundEffect(mStream.ToArray(), rate, AudioChannels.Mono).CreateInstance();
 					
                 } else if (codec == MiniForamtTag_WMA) { //WMA or xWMA (or XMA2)
                     byte[] wmaSig = {0x30, 0x26, 0xb2, 0x75, 0x8e, 0x66, 0xcf, 0x11, 0xa6, 0xd9, 0x0, 0xaa, 0x0, 0x62, 0xce, 0x6c};
@@ -395,7 +395,7 @@ namespace Microsoft.Xna.Framework.Audio
                         audioFile.Write(audiodata, 0, audiodata.Length);
                         audioFile.Close();
                         
-                        sounds[current_entry] = new Sound(filename, 1.0f, false);
+                        sounds[current_entry] = new SoundEffect(filename).CreateInstance();
                     } else {
                         //An xWMA or XMA2 file. Can't be played atm :(
                         throw new NotImplementedException();
@@ -408,6 +408,14 @@ namespace Microsoft.Xna.Framework.Audio
 			
 			audioEngine.Wavebanks[BankName] = this;
         }
+		
+		public WaveBank(AudioEngine audioEngine, string streamingWaveBankFilename, int offset, short packetsize)
+			: this(audioEngine, streamingWaveBankFilename)
+		{
+			if (offset != 0) {
+				throw new NotImplementedException();
+			}
+		}
 
 		#region IDisposable implementation
 		public void Dispose ()

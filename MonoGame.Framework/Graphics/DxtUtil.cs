@@ -179,7 +179,94 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
             }
         }
+		
+        internal static byte[] DecompressDxt5(byte[] imageData, int width, int height)
+        {
+            using (MemoryStream imageStream = new MemoryStream(imageData))
+                return DecompressDxt5(imageStream, width, height);
+        }
+        
+        internal static byte[] DecompressDxt5(Stream imageStream, int width, int height) {
+            byte[] imageData = new byte[width * height * 4];
 
+            using (BinaryReader imageReader = new BinaryReader(imageStream))
+            {
+                int blockCountX = (width + 3) / 4;
+                int blockCountY = (height + 3) / 4;
+                
+                for (int y = 0; y < blockCountY; y++)
+                {
+                    for (int x = 0; x < blockCountX; x++)
+                    {
+                        DecompressDxt5Block(imageReader, x, y, blockCountX, imageData);
+                    }
+                }
+            }
+
+            return imageData;
+        }
+        
+        private static void DecompressDxt5Block(BinaryReader imageReader, int x, int y, int width, byte[] imageData)
+        {
+            byte alpha0 = imageReader.ReadByte();
+            byte alpha1 = imageReader.ReadByte();
+            
+            ulong alphaMask = imageReader.ReadUInt32 ();
+            alphaMask <<= 16;
+            alphaMask += imageReader.ReadUInt16 ();
+            
+            ushort c0 = imageReader.ReadUInt16();
+            ushort c1 = imageReader.ReadUInt16();
+
+            byte[] color0 = ConvertRgb565ToRgb888(c0);
+            byte[] color1 = ConvertRgb565ToRgb888(c1);
+
+            uint lookupTable = imageReader.ReadUInt32();
+
+            for (int blockY = 0; blockY < 4; blockY++)
+            {
+                for (int blockX = 0; blockX < 4; blockX++)
+                {
+                    byte[] finalColor = new byte[4];
+                    uint index = (lookupTable >> 2 * (4 * blockY + blockX)) & 0x03;
+                    
+                    byte alpha;
+                    uint alphaIndex = (uint)((alphaMask >> 3 * (4 * blockY + blockX)) & 0x07);
+                    if (alphaIndex == 0) {
+                        alpha = alpha0;
+                    } else if (alphaIndex == 1) {
+                        alpha = alpha1;
+                    } else if (alpha0 > alpha1) {
+                        alpha = (byte)(((8 - alphaIndex) * alpha0 + (alphaIndex - 1) * alpha1) / 7);
+                    } else if (alphaIndex == 6) {
+                        alpha = 0;
+                    } else if (alphaIndex == 7) {
+                        alpha = 0xff;
+                    } else {
+                        alpha = (byte)(((6 - alphaIndex) * alpha0 + (alphaIndex - 1) * alpha1) / 5);
+                    }
+                    
+                    switch (index)
+                    {
+                        case 0: finalColor = GetRgba(color0[0], color0[1], color0[2], alpha); break;
+                        case 1: finalColor = GetRgba(color1[0], color1[1], color1[2], alpha); break;
+                        case 2: finalColor = GetRgba((byte)((2 * color0[0] + color1[0]) / 3), (byte)((2 * color0[1] + color1[1]) / 3), (byte)((2 * color0[2] + color1[2]) / 3), alpha); break;
+                        case 3: finalColor = GetRgba((byte)((color0[0] + 2 * color1[0]) / 3), (byte)((color0[1] + 2 * color1[1]) / 3), (byte)((color0[2] + 2 * color1[2]) / 3), alpha); break;
+                    }
+
+                    imageData[y * width * 64 + blockY * width * 16 + x * 16 + blockX * 4] = finalColor[0];
+                    imageData[y * width * 64 + blockY * width * 16 + x * 16 + blockX * 4 + 1] = finalColor[1];
+                    imageData[y * width * 64 + blockY * width * 16 + x * 16 + blockX * 4 + 2] = finalColor[2];
+                    imageData[y * width * 64 + blockY * width * 16 + x * 16 + blockX * 4 + 3] = finalColor[3];
+                }
+            }
+        }
+        		
+		private static byte[] PackRGBA(byte r, byte g, byte b, byte a)
+		{
+			return new byte[] {r, g, b, a};
+		}
+		
         private static byte[] ConvertRgb565ToRgb888(ushort color)
         {
             int temp;

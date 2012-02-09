@@ -47,7 +47,14 @@ using MonoTouch.UIKit;
 using MonoTouch.CoreGraphics;
 using MonoTouch.Foundation;
 
+#if ES11
 using OpenTK.Graphics.ES11;
+using GL_Oes = OpenTK.Graphics.ES11.GL.Oes;
+#else
+using OpenTK.Graphics.ES20;
+using GL_Oes = OpenTK.Graphics.ES20.GL;
+using TextureTarget = OpenTK.Graphics.ES20.All;
+#endif
 
 using Microsoft.Xna.Framework.Content;
 
@@ -56,6 +63,26 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public class Texture2D : Texture
     {
+		
+		//OpenGL ES1.1 consts
+#if ES11
+		const All GLFramebuffer = All.FramebufferOes;
+		const All GLRenderbuffer = All.RenderbufferOes;
+		const All GLDepthAttachment = All.DepthAttachmentOes;
+		const All GLColorAttachment0 = All.ColorAttachment0Oes;
+		const All GLDepthComponent24 = All.DepthComponent24Oes;
+		const All GLFramebufferComplete = All.FramebufferCompleteOes;
+#else
+		const All GLFramebuffer = All.Framebuffer;
+		const All GLRenderbuffer = All.Renderbuffer;
+		const All GLDepthAttachment = All.DepthAttachment;
+		const All GLColorAttachment0 = All.ColorAttachment0;
+		const All GLDepthComponent24 = All.DepthComponent24Oes;
+		const All GLFramebufferComplete = All.FramebufferComplete;
+#endif
+		
+		
+		
 		private ESImage texture;
 		
 		// Moved as per kjpou1 protected int textureId = -1;
@@ -120,29 +147,25 @@ namespace Microsoft.Xna.Framework.Graphics
 			this._format = format;
 			this._mipmap = mipMap;
 				
+#if ES11
+			// This is needed in OpenGL ES 1.1 as it only supports power of 2 textures
+			int xTexSize = 1;
+			int yTexSize = 1;
+			while (width > xTexSize && height > yTexSize)
+			{
+				if (width > xTexSize) xTexSize *= 2;
+				if (height > yTexSize) yTexSize *= 2;
+			}
 			
-			if(GraphicsDevice.OpenGLESVersion == MonoTouch.OpenGLES.EAGLRenderingAPI.OpenGLES2)
-			{
-				this._width = width;
-				this._height = height;
-				texture = new ESImage(width, height);
-			}
-			else
-			{
-				// This is needed in OpenGL ES 1.1 as it only supports power of 2 textures
-				int xTexSize = 1;
-				int yTexSize = 1;
-				while (width > xTexSize && height > yTexSize)
-				{
-					if (width > xTexSize) xTexSize *= 2;
-					if (height > yTexSize) yTexSize *= 2;
-				}
+			this._width = xTexSize;
+			this._height = yTexSize;
 				
-				this._width = xTexSize;
-				this._height = yTexSize;
-					
-				generateOpenGLTexture();			
-			}
+			generateOpenGLTexture();
+#else
+			this._width = width;
+			this._height = height;
+			texture = new ESImage(width, height);
+#endif
 		}
 		
 		private void generateOpenGLTexture() 
@@ -158,7 +181,11 @@ namespace Microsoft.Xna.Framework.Graphics
 				// Taken from http://www.flexicoder.com/blog/index.php/2009/11/iphone-mipmaps/
 				GL.TexParameter(All.Texture2D, All.TextureMinFilter, (int)All.LinearMipmapNearest);
 				GL.TexParameter(All.Texture2D, All.TextureMagFilter, (int)All.Linear);
+#if ES11
 				GL.TexParameter(All.Texture2D, All.GenerateMipmap, (int)All.True);
+#else
+				GL.TexParameter(All.Texture2D, All.GenerateMipmapHint, (int)All.True);
+#endif		
 			}
 			else
 			{
@@ -233,7 +260,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			return result;
         }
 
-        public static Texture2D FromFile(GraphicsDevice graphicsDevice, Stream textureStream)
+        public static Texture2D FromStream(GraphicsDevice graphicsDevice, Stream textureStream)
         {
             MonoTouch.Foundation.NSData nsData = MonoTouch.Foundation.NSData.FromStream(textureStream);
 
@@ -250,12 +277,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			return result;
         }
 
-        public static Texture2D FromFile(GraphicsDevice graphicsDevice, Stream textureStream, int numberBytes)
-        {
-            throw new NotImplementedException();
-        }
 
-        public static Texture2D FromFile(GraphicsDevice graphicsDevice, string filename, int width, int height)
+        public static Texture2D FromStream(GraphicsDevice graphicsDevice, string filename, int width, int height)
         {
 			UIImage image;
 			if(filename.Contains(".pdf"))
@@ -284,11 +307,11 @@ namespace Microsoft.Xna.Framework.Graphics
 			return result;					
         }
 
-        public static Texture2D FromFile(GraphicsDevice graphicsDevice, string filename)
+		// Not sure what this should do in iOS will leave it non implemented for now.
+		internal void Reload(Stream textureStream)
 		{
-			return FromFile( graphicsDevice, filename, 0, 0 );
-        }
-		
+		}
+
         public void SetData<T>(T[] data, int startIndex, int elementCount, SetDataOptions options)
         {
             throw new NotImplementedException();
@@ -306,28 +329,28 @@ namespace Microsoft.Xna.Framework.Graphics
 			int renderBufferID = -1;
 			
 			// create framebuffer
-			GL.Oes.GenFramebuffers(1, ref framebufferId);
-			GL.Oes.BindFramebuffer(All.FramebufferOes, framebufferId);
+			GL_Oes.GenFramebuffers(1, ref framebufferId);
+			GL_Oes.BindFramebuffer(GLFramebuffer, framebufferId);
 			
 			//renderBufferIDs = new int[currentRenderTargets];
-			GL.Oes.GenRenderbuffers(1, ref renderBufferID);
+			GL_Oes.GenRenderbuffers(1, ref renderBufferID);
 			
 			// attach the texture to FBO color attachment point
-			GL.Oes.FramebufferTexture2D(All.FramebufferOes, All.ColorAttachment0Oes,
+			GL_Oes.FramebufferTexture2D(GLFramebuffer, GLColorAttachment0,
 				All.Texture2D, ID,0);
 			
 			// create a renderbuffer object to store depth info
-			GL.Oes.BindRenderbuffer(All.RenderbufferOes, renderBufferID);
-			GL.Oes.RenderbufferStorage(All.RenderbufferOes, All.DepthComponent24Oes,
+			GL_Oes.BindRenderbuffer(GLRenderbuffer, renderBufferID);
+			GL_Oes.RenderbufferStorage(GLRenderbuffer, GLDepthComponent24,
 				_width, _height);
 			
 			// attach the renderbuffer to depth attachment point
-			GL.Oes.FramebufferRenderbuffer(All.FramebufferOes, All.DepthAttachmentOes,
-				All.RenderbufferOes, renderBufferID);
+			GL_Oes.FramebufferRenderbuffer(GLFramebuffer, GLDepthAttachment,
+				GLRenderbuffer, renderBufferID);
 				
-			All status = GL.Oes.CheckFramebufferStatus(All.FramebufferOes);
+			All status = GL_Oes.CheckFramebufferStatus(GLFramebuffer);
 			
-			if (status != All.FramebufferCompleteOes)
+			if (status != GLFramebufferComplete)
 				throw new Exception("Error creating framebuffer: " + status);
 			
 			byte[] imageInfo;
@@ -335,7 +358,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			switch (_format) {
 			case SurfaceFormat.Color : //kTexture2DPixelFormat_RGBA8888
-			case SurfaceFormat.Dxt3 :
 				
 				sz = 4;
 				imageInfo = new byte[(_width * _height) * sz];
@@ -360,14 +382,14 @@ namespace Microsoft.Xna.Framework.Graphics
 			GL.ReadPixels(0,0, _width, _height, All.Rgba, All.UnsignedByte, imageInfo);
 
 			// Detach the render buffers.
-			GL.Oes.FramebufferRenderbuffer(All.FramebufferOes, All.DepthAttachmentOes,
-					All.RenderbufferOes, 0);
+			GL_Oes.FramebufferRenderbuffer(GLFramebuffer, GLDepthAttachment,
+					GLRenderbuffer, 0);
 			// delete the RBO's
-			GL.Oes.DeleteRenderbuffers(1,ref renderBufferID);
+			GL_Oes.DeleteRenderbuffers(1,ref renderBufferID);
 			// delete the FBO
-			GL.Oes.DeleteFramebuffers(1, ref framebufferId);
+			GL_Oes.DeleteFramebuffers(1, ref framebufferId);
 			// Set the frame buffer back to the system window buffer
-			GL.Oes.BindFramebuffer(All.FramebufferOes, 0);			
+			GL_Oes.BindFramebuffer(GLFramebuffer, 0);			
 
 			return imageInfo;
 					
@@ -414,7 +436,23 @@ namespace Microsoft.Xna.Framework.Graphics
 			byte[] imageInfo = GetImageData (0);
 
 			// Get the Color values
-			if ((typeof(T) == typeof(Color))) {
+			if (typeof(T) == typeof(uint))
+			{
+				Color[] colors = new Color[elementCount];
+				GetData<Color>(level, rect, colors, startIndex, elementCount);
+				uint[] final = data as uint[];
+				for (int i = 0; i < final.Length; i++)
+				{
+					final[i] = (uint)
+					(
+						colors[i].R << 24 |
+						colors[i].G << 16 |
+						colors[i].B << 8 |
+						colors[i].A
+					);
+				}
+			}
+			else if ((typeof(T) == typeof(Color))) {
 
 
 				// Left this here for documentation - Not sure what it does but the
@@ -458,7 +496,6 @@ namespace Microsoft.Xna.Framework.Graphics
 							dataRowColOffset = ((y * rWidth) + x);
 							switch (_format) {
 							case SurfaceFormat.Color : //kTexture2DPixelFormat_RGBA8888
-							case SurfaceFormat.Dxt3 :
 								
 								dataPos = dataRowColOffset * 4;								
 															
@@ -486,7 +523,6 @@ namespace Microsoft.Xna.Framework.Graphics
 							dataRowColOffset = ((y * _width) + x);
 							switch (_format) {
 							case SurfaceFormat.Color : //kTexture2DPixelFormat_RGBA8888
-							case SurfaceFormat.Dxt3 :
 								sz = 4;
 								pixelOffset = dataRowColOffset * sz;
 								result.R = imageInfo [pixelOffset];
@@ -552,30 +588,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 		
-		internal void Apply()
-        {
-            if (texture == null) return;
-
-            GL.BindTexture(All.Texture2D, (uint)_textureId);
-            if (_mipmap)
-            {
-                // Taken from http://www.flexicoder.com/blog/index.php/2009/11/iphone-mipmaps/
-                GL.TexParameter(All.Texture2D, All.TextureMinFilter,
-                                (int)All.LinearMipmapNearest);
-                GL.TexParameter(All.Texture2D, All.TextureMagFilter, (int)All.Linear);
-                GL.TexParameter(All.Texture2D, All.GenerateMipmap, (int)All.True);
-            }
-            else
-            {
-                GL.TexParameter(All.Texture2D, All.TextureMinFilter, (int)All.Linear);
-                GL.TexParameter(All.Texture2D, All.TextureMagFilter, (int)All.Linear);
-            }
-
-            GL.TexParameter(All.Texture2D, All.TextureWrapS,
-                            (float)TextureWrapMode.Repeat);
-            GL.TexParameter(All.Texture2D, All.TextureWrapT,
-                            (float)TextureWrapMode.Repeat);
-        }
+		internal override TextureTarget GLTarget {
+			get { return TextureTarget.Texture2D; }
+		}
 	}
 }
 

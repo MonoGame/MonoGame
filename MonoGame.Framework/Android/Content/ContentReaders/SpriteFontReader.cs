@@ -53,7 +53,7 @@ namespace Microsoft.Xna.Framework.Content
                 file = FileName.Substring(index + 1, FileName.Length - index - 1);
                 path = FileName.Substring(0, index);
             }
-            string[] files = Game.contextInstance.Assets.List(path);
+            string[] files = Game.Activity.Assets.List(path);
 
             if (Contains(file, files))
                 return FileName;

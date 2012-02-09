@@ -41,6 +41,11 @@ namespace Microsoft.Xna.Framework.Audio
             s_soundPool.Unload(_soundId);
         }
 
+        public void Resume()
+        {
+            s_soundPool.Resume(_soundId);
+        }
+
         public float Volume { get; set; }
         public bool Looping { get; set; }
         public float Rate { get; set; }
@@ -66,7 +71,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         public void Play()
         {
-            AudioManager audioManager = (AudioManager)Game.contextInstance.GetSystemService(Context.AudioService);
+            AudioManager audioManager = (AudioManager)Game.Activity.GetSystemService(Context.AudioService);
 
             float streamVolumeCurrent = audioManager.GetStreamVolume(Stream.Music);
             float streamVolumeMax = audioManager.GetStreamMaxVolume(Stream.Music);
@@ -86,11 +91,6 @@ namespace Microsoft.Xna.Framework.Audio
             s_soundPool.Pause(_streamId);
         }
 		
-		public void Resume()
-        {
-            s_soundPool.Resume(_streamId);
-        }
-
         public void Stop()
         {
             s_soundPool.Stop(_streamId);
@@ -98,7 +98,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         public Sound(string filename, float volume, bool looping)
         {
-            using (AssetFileDescriptor fd = Game.contextInstance.Assets.OpenFd(filename))
+            using (AssetFileDescriptor fd = Game.Activity.Assets.OpenFd(filename))
                 _soundId = s_soundPool.Load(fd.FileDescriptor, fd.StartOffset, fd.Length, 1);
 
             this.Looping = looping;
@@ -108,6 +108,20 @@ namespace Microsoft.Xna.Framework.Audio
         public Sound(byte[] audiodata, float volume, bool looping)
         {
             throw new NotImplementedException();
+        }
+
+        internal static void IncreaseMediaVolume()
+        {
+            AudioManager audioManager = (AudioManager)Game.Activity.GetSystemService(Context.AudioService);
+
+            audioManager.AdjustStreamVolume(Stream.Music, Adjust.Raise, VolumeNotificationFlags.ShowUi);
+        }
+
+        internal static void DecreaseMediaVolume()
+        {
+            AudioManager audioManager = (AudioManager)Game.Activity.GetSystemService(Context.AudioService);
+
+            audioManager.AdjustStreamVolume(Stream.Music, Adjust.Lower, VolumeNotificationFlags.ShowUi);
         }
     }
 }
