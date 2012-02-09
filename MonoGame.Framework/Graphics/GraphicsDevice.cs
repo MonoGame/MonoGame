@@ -480,7 +480,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			if (this.currentRenderTargetBindings == null || this.currentRenderTargetBindings.Length == 0)
 			{
-				GL.BindFramebuffer(GLFramebuffer, 0);
+ 				GL.BindFramebuffer(GLFramebuffer, 0);
 				this.Viewport = new Viewport(0, 0,
 					this.PresentationParameters.BackBufferWidth, 
 					this.PresentationParameters.BackBufferHeight);

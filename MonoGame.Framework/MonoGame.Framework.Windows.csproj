@@ -79,6 +79,12 @@
     <PlatformTarget>x86</PlatformTarget>
     <DefineConstants>TRACE;WINDOWS</DefineConstants>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>MonogameKey.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="GamepadBridge">
       <HintPath>..\ThirdParty\GamepadConfig\GamepadBridge.dll</HintPath>
@@ -103,6 +109,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Audio\AudioCategory.cs" />
+    <Compile Include="Content\ResourceContentManager.cs" />
     <Compile Include="Content\ContentReaders\DualTextureEffectReader.cs" />
     <Compile Include="Content\ContentReaders\EffectReader.cs" />
     <Compile Include="Content\ContentReaders\EnvironmentMapEffectReader.cs" />
@@ -158,6 +165,8 @@
     <Compile Include="Graphics\ModelMeshCollection.cs" />
     <Compile Include="Graphics\ModelMeshPart.cs" />
     <Compile Include="Graphics\ModelMeshPartCollection.cs" />
+    <Compile Include="Graphics\PackedVector\HalfSingle.cs" />
+    <Compile Include="Graphics\PackedVector\HalfTypeHelper.cs" />
     <Compile Include="Graphics\PackedVector\NormalizedShort2.cs" />
     <Compile Include="Graphics\PresentationParameters.cs" />
     <Compile Include="Graphics\RenderTarget2D.cs" />
@@ -467,10 +476,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\ThirdParty\Libs\libmojoshader.dll">
-      <Link>libmojoshader.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <EmbeddedResource Include="Graphics\Effect\AlphaTestEffect.bin" />
     <EmbeddedResource Include="Graphics\Effect\BasicEffect.bin" />
     <EmbeddedResource Include="Graphics\Effect\DualTextureEffect.bin" />
@@ -478,5 +483,12 @@
     <EmbeddedResource Include="Graphics\Effect\SkinnedEffect.bin" />
     <EmbeddedResource Include="Graphics\Effect\SpriteEffect.bin" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="libmojoshader.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="MonogameKey.snk" />
+  </ItemGroup>
 </Project>
