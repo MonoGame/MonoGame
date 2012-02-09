@@ -63,6 +63,11 @@ using GLPixelFormat = OpenTK.Graphics.OpenGL.PixelFormat;
 #else
 using OpenTK.Graphics.ES20;
 using GLPixelFormat = OpenTK.Graphics.ES20.All;
+using TextureTarget = OpenTK.Graphics.ES20.All;
+using TextureParameterName = OpenTK.Graphics.ES20.All;
+using TextureMinFilter = OpenTK.Graphics.ES20.All;
+using PixelInternalFormat = OpenTK.Graphics.ES20.All;
+using PixelType = OpenTK.Graphics.ES20.All;
 #endif
 
 using Microsoft.Xna.Framework.Content;
@@ -97,7 +102,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			this.glTarget = TextureTarget.Texture2D;
 			
+#if IPHONE
+			GL.GenTextures(1, ref this.glTexture);
+#else
 			GL.GenTextures(1, out this.glTexture);
+#endif
 			GL.BindTexture(TextureTarget.Texture2D, this.glTexture);
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter,
 			                mipmap ? (int)TextureMinFilter.LinearMipmapLinear : (int)TextureMinFilter.Linear);
@@ -142,15 +151,25 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 			else
 			{
-				GL.TexImage2D(TextureTarget.Texture2D, 0, glInternalFormat,
+				GL.TexImage2D(TextureTarget.Texture2D, 0,
+#if IPHONE
+				              (int)glInternalFormat,
+#else				           
+				              glInternalFormat,
+#endif				              
 				              this.width, this.height, 0,
 				              glFormat, glType, IntPtr.Zero);
 			}
 			
 			if (mipmap)
 			{
-				//GL.GenerateMipmap(All.Texture2D);
-				GL.TexParameter (TextureTarget.Texture2D, TextureParameterName.GenerateMipmap, (int)All.True);
+#if IPHONE
+				GL.GenerateMipmap(TextureTarget.Texture2D);
+#else
+				GL.TexParameter (TextureTarget.Texture2D,
+				                 TextureParameterName.GenerateMipmap,
+				                 (int)All.True);
+#endif
 				
 				int size = Math.Max(this.width, this.height);
 				while (size > 1)

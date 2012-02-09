@@ -13,6 +13,7 @@ using PixelFormat = OpenTK.Graphics.ES20.All;
 using PixelType = OpenTK.Graphics.ES20.All;
 using TextureTarget = OpenTK.Graphics.ES20.All;
 using TextureParameterName = OpenTK.Graphics.ES20.All;
+using TextureMinFilter = OpenTK.Graphics.ES20.All;
  #endif
 #endif
 
@@ -35,7 +36,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			this.glTarget = TextureTarget.TextureCubeMap;
 
 #if IPHONE
-			GL.GenTextures(1, ref _textureId);
+			GL.GenTextures(1, ref this.glTexture);
 #else
 			GL.GenTextures(1, out this.glTexture);
 #endif
@@ -69,7 +70,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			if (mipMap)
 			{
 #if IPHONE
-				GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.GenerateMipmapHint, (int)All.True);
+				GL.GenerateMipmap(TextureTarget.TextureCubeMap);
 #else
 				GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.GenerateMipmap, (int)All.True);
 #endif
