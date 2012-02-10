@@ -350,6 +350,56 @@ namespace Microsoft.Xna.Framework
             }
         }
 
+        private DateTime _now;
+        private DateTime _lastUpdate = DateTime.Now;
+        private readonly GameTime _gameTime = new GameTime();
+        private readonly GameTime _fixedTimeStepTime = new GameTime();
+        private TimeSpan _totalTime = TimeSpan.Zero;
+
+        public void Tick()
+        {
+            bool doDraw = false;
+
+            _now = DateTime.Now;
+
+            _gameTime.Update(_now - _lastUpdate);
+            _lastUpdate = _now;
+
+            if (IsFixedTimeStep)
+            {
+                _totalTime += _gameTime.ElapsedGameTime;
+                int max = (500/TargetElapsedTime.Milliseconds);    //Only do updates for half a second worth of updates
+                int iterations = 0;
+
+                max = max <= 0 ? 1 : max;   //Make sure at least 1 update is called
+
+                while (_totalTime >= TargetElapsedTime)
+                {
+                    _fixedTimeStepTime.Update(TargetElapsedTime);
+                    _totalTime -= TargetElapsedTime;
+                    DoUpdate(_fixedTimeStepTime);
+                    doDraw = true;
+                        
+                    iterations++;
+                    if (iterations >= max)  //Reset catchup if to many updates have been called
+                    {
+                        _totalTime = TimeSpan.Zero;
+                    }
+                }
+            }
+            else
+            {
+                DoUpdate(_gameTime);
+                doDraw = true;
+            }
+
+            if (doDraw)
+            {
+                DoDraw(_gameTime);
+                _platform.SwapBuffers();
+            }
+        }
+
         #endregion
 
         #region Protected Methods
