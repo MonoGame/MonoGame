@@ -120,6 +120,7 @@
     <Compile Include="Content\ContentReaders\TextureReader.cs" />
     <Compile Include="Content\ContentReaders\VertexBufferReader.cs" />
     <Compile Include="Content\ContentReaders\VertexDeclarationReader.cs" />
+    <Compile Include="Content\ResourceContentManager.cs" />
     <Compile Include="Desktop\Audio\SoundEffectInstance.cs" />
     <Compile Include="Desktop\Input\GamePad.cs" />
     <Compile Include="Desktop\Input\Mouse.cs" />
@@ -156,6 +157,8 @@
     <Compile Include="Graphics\ModelMeshCollection.cs" />
     <Compile Include="Graphics\ModelMeshPart.cs" />
     <Compile Include="Graphics\ModelMeshPartCollection.cs" />
+    <Compile Include="Graphics\PackedVector\HalfSingle.cs" />
+    <Compile Include="Graphics\PackedVector\HalfTypeHelper.cs" />
     <Compile Include="Graphics\PackedVector\NormalizedShort2.cs" />
     <Compile Include="Graphics\PresentationParameters.cs" />
     <Compile Include="Graphics\RenderTarget2D.cs" />
@@ -465,10 +468,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\ThirdParty\Libs\libmojoshader.dll">
-      <Link>libmojoshader.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <EmbeddedResource Include="Graphics\Effect\AlphaTestEffect.bin" />
     <EmbeddedResource Include="Graphics\Effect\BasicEffect.bin" />
     <EmbeddedResource Include="Graphics\Effect\DualTextureEffect.bin" />
