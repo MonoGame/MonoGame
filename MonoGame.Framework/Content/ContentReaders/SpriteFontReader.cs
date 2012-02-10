@@ -67,7 +67,6 @@ namespace Microsoft.Xna.Framework.Content
         protected internal override SpriteFont Read(ContentReader input, SpriteFont existingInstance)
         {
             Texture2D texture = input.ReadObject<Texture2D>();
-			texture.IsSpriteFontTexture = true;
             List<Rectangle> glyphs = input.ReadObject<List<Rectangle>>();
             List<Rectangle> cropping = input.ReadObject<List<Rectangle>>();
             List<char> charMap = input.ReadObject<List<char>>();

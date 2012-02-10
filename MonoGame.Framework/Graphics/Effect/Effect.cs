@@ -42,6 +42,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using System.Linq;
 
 //For laoding from resources
 using System.Reflection;
@@ -69,7 +70,29 @@ namespace Microsoft.Xna.Framework.Graphics
 			Parameters = new EffectParameterCollection();
 		}
 
-        public EffectTechniqueCollection Techniques { get; set; }		
+        public EffectTechniqueCollection Techniques { get; set; }
+		
+		
+		//cache effect objects so we don't create a bunch of instances
+		//of the same shader
+		//(Some programs create heaps of instances of BasicEffect,
+		// which was causing ridiculous memory usage)
+		private class ByteArrayComparer : IEqualityComparer<byte[]> {
+			public bool Equals(byte[] left, byte[] right) {
+				if ( left == null || right == null ) {
+					return left == right;
+				}
+				return left.SequenceEqual(right);
+			}
+			public int GetHashCode(byte[] key) {
+				if (key == null)
+					throw new ArgumentNullException("key");
+				return key.Sum(b => b);
+			}
+		}
+		private static Dictionary<byte[], DXEffectObject> effectObjectCache =
+			new Dictionary<byte[], DXEffectObject>(new ByteArrayComparer());
+		
 
 		protected Effect (Effect cloneSource)
 		{
@@ -89,8 +112,12 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 			this.graphicsDevice = graphicsDevice;
 			
-			
-			effectObject = new DXEffectObject(effectCode);
+			//try getting a cached effect object
+			if (!effectObjectCache.TryGetValue(effectCode, out effectObject))
+			{
+				effectObject = new DXEffectObject(effectCode);
+				effectObjectCache.Add (effectCode, effectObject);
+			}
 			
 			Parameters = new EffectParameterCollection();
 			foreach (DXEffectObject.d3dx_parameter parameter in effectObject.parameter_handles) {

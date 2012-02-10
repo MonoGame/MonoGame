@@ -13,6 +13,7 @@ using PixelFormat = OpenTK.Graphics.ES20.All;
 using PixelType = OpenTK.Graphics.ES20.All;
 using TextureTarget = OpenTK.Graphics.ES20.All;
 using TextureParameterName = OpenTK.Graphics.ES20.All;
+using TextureMinFilter = OpenTK.Graphics.ES20.All;
  #endif
 #endif
 
@@ -30,12 +31,24 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			
 			this.size = size;
+			this.levelCount = 1;
+
+			this.glTarget = TextureTarget.TextureCubeMap;
+
 #if IPHONE
-			GL.GenTextures(1, ref _textureId);
+			GL.GenTextures(1, ref this.glTexture);
 #else
-			GL.GenTextures(1, out _textureId);
+			GL.GenTextures(1, out this.glTexture);
 #endif
-			GL.BindTexture (TextureTarget.TextureCubeMap, _textureId);
+			GL.BindTexture (TextureTarget.TextureCubeMap, this.glTexture);
+			GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureMinFilter,
+			                mipMap ? (int)TextureMinFilter.LinearMipmapLinear : (int)TextureMinFilter.Linear);
+			GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureMagFilter,
+			                (int)TextureMagFilter.Linear);
+			GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureWrapS,
+			                (int)TextureWrapMode.ClampToEdge);
+			GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureWrapT,
+			                (int)TextureWrapMode.ClampToEdge);
 			
 
 			format.GetGLFormat (out glInternalFormat, out glFormat, out glType);
@@ -52,14 +65,21 @@ namespace Microsoft.Xna.Framework.Graphics
 					GL.TexImage2D (target, 0, glInternalFormat, size, size, 0, glFormat, glType, IntPtr.Zero);
 #endif
 				}
-				
-				if (mipMap)
-				{
+			}
+			
+			if (mipMap)
+			{
 #if IPHONE
-					GL.TexParameter(target, TextureParameterName.GenerateMipmapHint, (int)All.True);
+				GL.GenerateMipmap(TextureTarget.TextureCubeMap);
 #else
-					GL.TexParameter(target, TextureParameterName.GenerateMipmap, (int)All.True);
+				GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.GenerateMipmap, (int)All.True);
 #endif
+				
+				int v = this.size;
+				while (v > 1)
+				{
+					v /= 2;
+					this.levelCount++;
 				}
 			}
 			
@@ -76,8 +96,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			var xOffset = 0;
 			var yOffset = 0;
-			var width = this.size;
-			var height = this.size;
+			var width = Math.Max (1, this.size >> level);
+			var height = Math.Max (1, this.size >> level);
 			
 			if (rect.HasValue)
 			{
@@ -87,10 +107,9 @@ namespace Microsoft.Xna.Framework.Graphics
 				height = rect.Value.Height;
 			}
 			
+			GL.BindTexture (TextureTarget.TextureCubeMap, this.glTexture);
+			
 			TextureTarget target = GetGLCubeFace(face);
-			
-			GL.BindTexture (target, _textureId);
-			
 			if (glFormat == (PixelFormat)All.CompressedTextureFormats) {
 				throw new NotImplementedException();
 			} else {
@@ -99,11 +118,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			dataHandle.Free ();
 		}
-		
-		internal override TextureTarget GLTarget {
-			get { return TextureTarget.TextureCubeMap; }
-		}
-
 		
 		private TextureTarget GetGLCubeFace(CubeMapFace face) {
 			switch (face) {

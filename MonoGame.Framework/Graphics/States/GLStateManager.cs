@@ -199,7 +199,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 		}
 
-		public static void Cull(RasterizerState state)
+		public static void Cull(RasterizerState state, bool offscreen)
 		{
 			switch (state.CullMode) {
 			case CullMode.None:
@@ -212,7 +212,13 @@ namespace Microsoft.Xna.Framework.Graphics
 				// Set our direction
 				// I know this seems weird and maybe it is but based
 				//  on the samples these seem to be reversed in OpenGL and DirectX
-				GL.FrontFace(FrontFaceDirection.Ccw);
+
+				//Also reversed again if we render offscreen, since we flip all the verticies
+				if (offscreen) {
+					GL.FrontFace(FrontFaceDirection.Cw);
+				} else {
+					GL.FrontFace(FrontFaceDirection.Ccw);
+				}
 				break;
 			case CullMode.CullCounterClockwiseFace:
 				GL.Enable(EnableCap.CullFace);
@@ -220,13 +226,19 @@ namespace Microsoft.Xna.Framework.Graphics
 				GL.CullFace(CullFaceMode.Back);
 				// I know this seems weird and maybe it is but based
 				//  on the samples these seem to be reversed in OpenGL and DirectX
-				GL.FrontFace(FrontFaceDirection.Cw);
+
+				//Also reversed again if we render offscreen, since we flip all the verticies
+				if (offscreen) {
+					GL.FrontFace(FrontFaceDirection.Ccw);
+				} else {
+					GL.FrontFace(FrontFaceDirection.Cw);
+				}
 				break;
 			}
 		}
 
-		public static void SetRasterizerStates (RasterizerState state) {
-			Cull(state);
+		public static void SetRasterizerStates (RasterizerState state, bool offscreen) {
+			Cull(state, offscreen);
 			FillMode(state);
 			if (state.ScissorTestEnable)
 			{

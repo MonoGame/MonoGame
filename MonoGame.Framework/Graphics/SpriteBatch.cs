@@ -243,7 +243,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			SpriteBatchItem item = _batcher.CreateBatchItem ();
 
 			item.Depth = depth;
-			item.TextureID = (int)texture.ID;
+			item.TextureID = texture.glTexture;
 
 			if (sourceRectangle.HasValue) {
 				tempRect = sourceRectangle.Value;
@@ -253,24 +253,11 @@ namespace Microsoft.Xna.Framework.Graphics
 				tempRect.Width = texture.Width;
 				tempRect.Height = texture.Height;				
 			}
-
-			if (texture.Image == null) {
-				float texWidthRatio = 1.0f / (float)texture.Width;
-				float texHeightRatio = 1.0f / (float)texture.Height;
-				// We are initially flipped vertically so we need to flip the corners so that
-				//  the image is bottom side up to display correctly
-				texCoordTL.X = tempRect.X * texWidthRatio;
-				texCoordTL.Y = 1.0f - tempRect.Y * texHeightRatio;
-
-				texCoordBR.X = (tempRect.X + tempRect.Width) * texWidthRatio;
-				texCoordBR.Y = 1.0f - ( tempRect.Y + tempRect.Height )*texHeightRatio;
-
-			} else {
-				texCoordTL.X = texture.Image.GetTextureCoordX (tempRect.X);
-				texCoordTL.Y = texture.Image.GetTextureCoordY (tempRect.Y);
-				texCoordBR.X = texture.Image.GetTextureCoordX (tempRect.X + tempRect.Width);
-				texCoordBR.Y = texture.Image.GetTextureCoordY (tempRect.Y + tempRect.Height);
-			}
+			
+			texCoordTL.X = tempRect.X / (float)texture.Width;
+			texCoordTL.Y = tempRect.Y / (float)texture.Height;
+			texCoordBR.X = (tempRect.X + tempRect.Width) / (float)texture.Width;
+			texCoordBR.Y = (tempRect.Y + tempRect.Height) / (float)texture.Height;
 
 			if ((effect & SpriteEffects.FlipVertically) != 0) {
 				float temp = texCoordBR.Y;
