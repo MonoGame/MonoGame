@@ -334,8 +334,6 @@ namespace Microsoft.Xna.Framework
 			
 
         #endregion
-
-	public virtual void SwapBuffers() {}		
     }
 }
 
