@@ -42,9 +42,11 @@
 using System;
 using System.IO;
 
-namespace Microsoft.Xna.Framework
+using Microsoft.Xna.Framework.Media;
+
+namespace Microsoft.Xna.Framework.Content
 {
-	internal class SongReader
+	internal class SongReader : ContentTypeReader<Song>
 	{
 		public static string Normalize(string FileName)
 		{
@@ -61,6 +63,16 @@ namespace Microsoft.Xna.Framework
 			if (File.Exists(FileName+".mp3"))
 				return FileName+".mp3";
 			return null;
+		}
+
+		protected internal override Song Read(ContentReader input, Song existingInstance)
+		{
+			string path = input.ReadString();
+			path = Path.Combine (input.ContentManager.RootDirectory, path);
+			path = TitleContainer.GetFilename(path);
+
+			int duration = input.ReadObject<int>();
+			return new Song(path);
 		}
 	}
 }

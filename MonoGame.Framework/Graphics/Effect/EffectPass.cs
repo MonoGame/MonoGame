@@ -39,6 +39,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		static string passthroughVertexShaderSrc = @"
 				uniform mat4 transformMatrix;
+				uniform vec4 posFixup;
 
 				attribute vec4 aPosition;
 				attribute vec4 aTexCoord;
@@ -51,6 +52,9 @@ namespace Microsoft.Xna.Framework.Graphics
 					vFrontColor = aColor;
 
 					gl_Position = transformMatrix * aPosition;
+
+					gl_Position.y = gl_Position.y * posFixup.y;
+					gl_Position.xy += posFixup.zw * gl_Position.ww;
 				}";
 		static int? passthroughVertexShader;
 

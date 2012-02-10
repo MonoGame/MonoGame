@@ -336,8 +336,6 @@
     <Compile Include="Net\MonoGamerPeer.cs" />
     <Compile Include="Net\NetworkMessageType.cs" />
     <Compile Include="iOS\GamerServices\SignedInGamer.cs" />
-    <Compile Include="iOS\Graphics\ESImage.cs" />
-    <Compile Include="iOS\Graphics\Texture2D.cs" />
     <Compile Include="iOS\Input\GamePad.cs" />
     <Compile Include="iOS\IOSGameWindow.cs" />
     <Compile Include="iOS\PowerStatus.cs" />
@@ -398,7 +396,6 @@
     <Compile Include="Graphics\Effect\SpriteEffect.cs" />
     <Compile Include="Graphics\GraphicsAdapter.cs" />
     <Compile Include="Audio\AudioCategory.cs" />
-    <Compile Include="Graphics\ESTexture2D.cs" />
     <Compile Include="Graphics\Vertices\IndexElementSize.cs" />
     <Compile Include="LaunchParameters.cs" />
     <Compile Include="Content\ContentReaders\EffectReader.cs" />
@@ -430,6 +427,7 @@
     <Compile Include="Content\ContentReaders\VertexBufferReader.cs" />
     <Compile Include="Content\ContentReaders\VertexDeclarationReader.cs" />
     <Compile Include="Content\ContentReaders\AlphaTestEffectReader.cs" />
+    <Compile Include="Graphics\Texture2D.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
@@ -445,12 +443,10 @@
     <Folder Include="Content\ContentReaders\" />
     <Folder Include="Graphics\" />
     <Folder Include="iOS\GamerServices\" />
-    <Folder Include="iOS\Graphics\" />
     <Folder Include="iOS\Input\" />
     <Folder Include="iOS\Audio\" />
     <Folder Include="iOS\Media\" />
     <Folder Include="iOS\Net\" />
-    <Folder Include="iOS\Content\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.iOS.csproj">
