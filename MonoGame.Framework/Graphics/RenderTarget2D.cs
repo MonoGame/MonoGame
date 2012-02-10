@@ -119,10 +119,10 @@ namespace Microsoft.Xna.Framework.Graphics
 			: this(graphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.DiscardContents) 
 		{}
 
-		/*protected override void ReleaseUnmanagedResources ()
+		public override void Dispose ()
 		{
-			base.ReleaseUnmanagedResources();
 			GL.DeleteRenderbuffers(1, ref this.glDepthStencilBuffer);
-		}*/
+			base.Dispose();
+		}
 	}
 }
