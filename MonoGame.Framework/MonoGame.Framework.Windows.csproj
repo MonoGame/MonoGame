@@ -145,8 +145,6 @@
     <Compile Include="Graphics\Effect\GLSLOptimizer.cs" />
     <Compile Include="Graphics\Effect\MojoShader.cs" />
     <Compile Include="Graphics\Effect\SkinnedEffect.cs" />
-    <Compile Include="Graphics\ESImage.cs" />
-    <Compile Include="Graphics\ESTexture2D.cs" />
     <Compile Include="Graphics\GraphicsAdapter.cs" />
     <Compile Include="Graphics\GraphicsDevice.cs" />
     <Compile Include="Graphics\GraphicsExtensions.cs" />
@@ -165,6 +163,7 @@
     <Compile Include="Graphics\SpriteBatcher.cs" />
     <Compile Include="Graphics\States\GLStateManager.cs" />
     <Compile Include="Graphics\StencilOperation.cs" />
+    <Compile Include="Graphics\Texture2D.cs" />
     <Compile Include="Graphics\TextureCube.cs" />
     <Compile Include="Graphics\Vertices\DynamicIndexBuffer.cs" />
     <Compile Include="Graphics\Vertices\DynamicVertexBuffer.cs" />
@@ -328,7 +327,6 @@
     <Compile Include="Windows\GamerServices\Guide.cs" />
     <Compile Include="Windows\GamerServices\MonoGameGamerServicesHelper.cs" />
     <Compile Include="Windows\GamerServices\SignedInGamer.cs" />
-    <Compile Include="Windows\Graphics\Texture2D.cs" />
     <Compile Include="Windows\Input\KeyboardUtil.cs" />
     <Compile Include="Windows\Media\Video.cs" />
     <Compile Include="Windows\OpenTKGamePlatform.cs" />

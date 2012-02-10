@@ -175,7 +175,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 			set {
 				_rasterizerState = value;
-				GLStateManager.SetRasterizerStates(value);
+				GLStateManager.SetRasterizerStates(value, GetRenderTargets().Length > 0);
 			}
 		}
 		
@@ -498,7 +498,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				
 				var renderTarget = this.currentRenderTargetBindings[0].RenderTarget as RenderTarget2D;
 				GL.BindFramebuffer(GLFramebuffer, this.glFramebuffer);
-				GL.FramebufferTexture2D(GLFramebuffer, GLColorAttachment0, TextureTarget.Texture2D, renderTarget.ID, 0);
+				GL.FramebufferTexture2D(GLFramebuffer, GLColorAttachment0, TextureTarget.Texture2D, renderTarget.glTexture, 0);
 				if (renderTarget.DepthStencilFormat != DepthFormat.None)
 				{
 					GL.FramebufferRenderbuffer(GLFramebuffer, GLDepthAttachment, GLRenderbuffer, renderTarget.glDepthStencilBuffer);
@@ -540,12 +540,17 @@ namespace Microsoft.Xna.Framework.Graphics
 					}
 				}
 			}
+
+			//Reset the cull mode, because we flip verticies when rendering offscreen
+			//and thus flip the cull direction
+			GLStateManager.Cull (RasterizerState, GetRenderTargets().Length > 0);
 		}
 
+		static RenderTargetBinding[] emptyRenderTargetBinding = new RenderTargetBinding[0];
 		public RenderTargetBinding[] GetRenderTargets ()
 		{
 			if (this.currentRenderTargetBindings == null)
-				return new RenderTargetBinding[0];
+				return emptyRenderTargetBinding;
 			return currentRenderTargetBindings;
 		}
 		

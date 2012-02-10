@@ -55,12 +55,13 @@ namespace Microsoft.Xna.Framework.Graphics
 		[DllImportAttribute(libglsl_optmizer_dll, EntryPoint="_Z21glslopt_shader_deleteP14glslopt_shader")]
 		static extern void glslopt_shader_delete(IntPtr shader);
 		
-		static IntPtr ctx = IntPtr.Zero; //todo: dispose properly
+		static IntPtr ctx = IntPtr.Zero; //todo: instantiate and batch optimizations
+		static GLSLOptimizer()
+		{
+			ctx = glslopt_initialize(false);
+		}
+		
 		public static string Optimize(string shaderCode, ShaderType shaderType) {
-			if (ctx == IntPtr.Zero) {
-				ctx = glslopt_initialize(false);
-			}
-			
 			glslopt_shader_type glslType;
 			switch (shaderType) {
 			case ShaderType.FragmentShader:

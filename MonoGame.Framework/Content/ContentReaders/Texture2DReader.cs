@@ -115,56 +115,70 @@ namespace Microsoft.Xna.Framework.Content
 			} else {
 				surfaceFormat = (SurfaceFormat)reader.ReadInt32 ();
 			}
+			
 			int width = (reader.ReadInt32 ());
 			int height = (reader.ReadInt32 ());
 			int levelCount = (reader.ReadInt32 ());
-			int imageLength = (reader.ReadInt32 ());
-			
-			byte[] imageBytes = reader.ReadBytes (imageLength);
-			
-			switch(surfaceFormat) {
+
+			SurfaceFormat convertedFormat = surfaceFormat;
+			switch (surfaceFormat)
+			{
 #if IPHONE
-			//no Dxt in OpenGL ES
-			case SurfaceFormat.Dxt1:
-				imageBytes = DxtUtil.DecompressDxt1(imageBytes, width, height);
-				surfaceFormat = SurfaceFormat.Color;
-				break;
-			case SurfaceFormat.Dxt3:
-				imageBytes = DxtUtil.DecompressDxt3(imageBytes, width, height);
-				surfaceFormat = SurfaceFormat.Color;
-				break;
-			case SurfaceFormat.Dxt5:
-				imageBytes = DxtUtil.DecompressDxt5(imageBytes, width, height);
-				surfaceFormat = SurfaceFormat.Color;
-				break;
+				case SurfaceFormat.Dxt1:
+				case SurfaceFormat.Dxt3:
+				case SurfaceFormat.Dxt5:
+					convertedFormat = SurfaceFormat.Color;
+					break;
+#else
+				//dxt formats don't need mipmaps set
+				case SurfaceFormat.Dxt1:
+				case SurfaceFormat.Dxt3:
+				case SurfaceFormat.Dxt5:
+					levelCount = 1;
+					break;
 #endif
-			case SurfaceFormat.NormalizedByte4:
-				int pitch = width*4;
-				for (int y=0; y<height; y++) {
-					for (int x=0; x<width; x++) {
-						int color = BitConverter.ToInt32(imageBytes, y*pitch+x*4);
-						imageBytes[y*pitch+x*4]   = (byte)(((color >> 16) & 0xff)); //R:=W
-						imageBytes[y*pitch+x*4+1] = (byte)(((color >> 8 ) & 0xff)); //G:=V
-						imageBytes[y*pitch+x*4+2] = (byte)(((color      ) & 0xff)); //B:=U
-						imageBytes[y*pitch+x*4+3] = (byte)(((color >> 24) & 0xff)); //A:=Q
-					}
-				}
-				surfaceFormat = SurfaceFormat.Color;
-				break;
+				case SurfaceFormat.NormalizedByte4:
+					convertedFormat = SurfaceFormat.Color;
+					break;
 			}
 			
-			IntPtr ptr = Marshal.AllocHGlobal (imageLength);
-			try 
+			texture = new Texture2D(reader.GraphicsDevice, width, height, levelCount > 1, convertedFormat);
+			
+			for (int level=0; level<levelCount; level++)
 			{
-				Marshal.Copy (imageBytes, 0, ptr, imageLength);					
-				ESTexture2D temp = new ESTexture2D(
-					ptr, imageLength, surfaceFormat, width, height, new Size (width, height), All.Linear);
-				texture = new Texture2D (new ESImage (temp));					
-				texture.graphicsDevice = reader.GraphicsDevice;
-			} 
-			finally 
-			{		
-				Marshal.FreeHGlobal (ptr);
+				int levelDataSizeInBytes = (reader.ReadInt32 ());
+				byte[] levelData = reader.ReadBytes (levelDataSizeInBytes);
+			
+				//Convert the image data if required
+				switch(surfaceFormat) {
+#if IPHONE
+				//no Dxt in OpenGL ES
+				case SurfaceFormat.Dxt1:
+					levelData = DxtUtil.DecompressDxt1(levelData, width, height);
+					break;
+				case SurfaceFormat.Dxt3:
+					levelData = DxtUtil.DecompressDxt3(levelData, width, height);
+					break;
+				case SurfaceFormat.Dxt5:
+					levelData = DxtUtil.DecompressDxt5(levelData, width, height);
+					break;
+#endif
+				case SurfaceFormat.NormalizedByte4:
+					int pitch = width*4;
+					for (int y=0; y<height; y++) {
+						for (int x=0; x<width; x++) {
+							int color = BitConverter.ToInt32(levelData, y*pitch+x*4);
+							levelData[y*pitch+x*4]   = (byte)(((color >> 16) & 0xff)); //R:=W
+							levelData[y*pitch+x*4+1] = (byte)(((color >> 8 ) & 0xff)); //G:=V
+							levelData[y*pitch+x*4+2] = (byte)(((color      ) & 0xff)); //B:=U
+							levelData[y*pitch+x*4+3] = (byte)(((color >> 24) & 0xff)); //A:=Q
+						}
+					}
+					break;
+				}
+				
+				texture.SetData(level, null, levelData, 0, levelData.Length);
+				
 			}
 			
 			return texture;
