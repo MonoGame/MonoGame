@@ -109,8 +109,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Audio\AudioCategory.cs" />
-    <Compile Include="Content\ResourceContentManager.cs" />
+    <Compile Include="Audio\AudioCategory.cs" />    
     <Compile Include="Content\ContentReaders\DualTextureEffectReader.cs" />
     <Compile Include="Content\ContentReaders\EffectReader.cs" />
     <Compile Include="Content\ContentReaders\EnvironmentMapEffectReader.cs" />
