@@ -86,7 +86,8 @@
     <Reference Include="GamepadConfigControls">
       <HintPath>..\ThirdParty\GamepadConfig\GamepadConfigControls.dll</HintPath>
     </Reference>
-    <Reference Include="OpenTK, Version=1.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
+    <Reference Include="OpenTK, Version=1.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\ThirdParty\Libs\OpenTK.dll</HintPath>
     </Reference>
     <Reference Include="System" />
@@ -477,5 +478,9 @@
     <EmbeddedResource Include="Graphics\Effect\SkinnedEffect.bin" />
     <EmbeddedResource Include="Graphics\Effect\SpriteEffect.bin" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="libmojoshader.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 </Project>

@@ -282,12 +282,12 @@ namespace Microsoft.Xna.Framework
             clientBounds = new Rectangle(window.ClientRectangle.X, window.ClientRectangle.Y,
                                          window.ClientRectangle.Width, window.ClientRectangle.Height);
             windowState = window.WindowState;
-
+            Mouse.setWindows(window);
             keys = new List<Keys>();
 
             // mouse
             // TODO review this when opentk 1.1 is released
-            Mouse.UpdateMouseInfo(window.Mouse);
+            //Mouse.UpdateMouseInfo(window.Mouse);
 
             // Initialize GameTime
             _updateGameTime = new GameTime();

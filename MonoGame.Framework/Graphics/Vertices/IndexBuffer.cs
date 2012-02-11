@@ -73,6 +73,7 @@ namespace Microsoft.Xna.Framework.Graphics
             IntPtr ptr = new IntPtr();
             ptr = GL.Arb.MapBuffer(BufferTargetArb.ArrayBuffer, ArbVertexBufferObject.ReadOnlyArb | ArbVertexBufferObject.ArrayBufferArb);
 
+            IntPtr buffer = Marshal.AllocHGlobal(elementSizeInByte);
             if (ptr != null && ptr.ToInt32() != 0)
             {
                 byte* byt = (byte*)ptr.ToPointer();
@@ -86,14 +87,13 @@ namespace Microsoft.Xna.Framework.Graphics
                         bytes[i] = *byt;
                         byt++;
                     }
-
-                    IntPtr buffer = Marshal.AllocHGlobal(elementSizeInByte);
+                                        
                     Marshal.Copy(bytes, 0, buffer, elementSizeInByte);
                     object retobj = Marshal.PtrToStructure(buffer, typeof(T));
                     data[j] = (T)retobj;
-                    Marshal.Release(buffer);
+                    
                 }
-
+                Marshal.Release(buffer);
                 GL.Arb.UnmapBuffer(BufferTargetArb.ArrayBuffer);
                 Marshal.Release(ptr);
             }

@@ -45,59 +45,48 @@ namespace Microsoft.Xna.Framework.Input
 {
 	// TODO on opentk 1.1 release this class should be reviewed to decouple it from GameWindow
 	// OpenTK.Input.Mouse and OpenTK.Input.Mouse.GetState should be enough
+    // -- Cant use this cause Mouse in 1.1 do not use a "human" coordinate system, cant convert it to screen coordinates
+    //maybe only if store the original x,y and keep adding/removing the values when mouse moves ....
 	
 	// TODO verify if why mouse middle button is laggy (maybe it's my mouse or the opentk implementation)
 	
 	public static class Mouse
 	{
-		private static OpenTK.Input.MouseDevice _mouse = null;
-		private static int _x, _y;
-		
-		internal static void UpdateMouseInfo(OpenTK.Input.MouseDevice mouse)
-		{
-			_mouse = mouse;
-			_mouse.Move += HandleWindowMouseMove;
-		}
-		
-
-		internal static void HandleWindowMouseMove (object sender, OpenTK.Input.MouseMoveEventArgs e)
-		{
-			SetPosition(e.X, e.Y);
-		}
-		
+        static OpenTK.GameWindow Window;        
+        internal static void setWindows(OpenTK.GameWindow window)
+        {
+            Window = window;
+        }
 		#region Public interface		
 		
 		public static MouseState GetState ()
 		{	
 			// no multiple mouse supported (yet!)
-			//OpenTK.Input.MouseState mState = MouseInfo.GetState(0); // to be implemented on opentk 1.1
-			
-			//bool b = (bool)_mouse.GetType().GetProperty("Item").GetValue(OpenTK.Input.MouseButton.Left, null);
-			
-			// maybe someone is tring to get mouse before initialize
-			if (_mouse == null)
-			{
-				return new MouseState(0, 0);
-			}
-			
-			MouseState ms = new MouseState(_x, _y);
+            //OpenTk Input give mouse values in "magic coordinates" (cant be converted to screen coordinates according to their documentation, so its is not usefull to us, lets use Opentk Window coordinates so)
+            //OpenTK.Input.MouseState mState = OpenTK.Input.Mouse.GetState(0);             
 
-			ms.LeftButton = _mouse[OpenTK.Input.MouseButton.Left] ? ButtonState.Pressed : ButtonState.Released;
-			ms.RightButton = _mouse[OpenTK.Input.MouseButton.Right] ? ButtonState.Pressed : ButtonState.Released;
-			ms.MiddleButton = _mouse[OpenTK.Input.MouseButton.Middle] ? ButtonState.Pressed : ButtonState.Released;;
-			ms.ScrollWheelValue = _mouse.Wheel;
-			
-			
+            MouseState ms = new MouseState(Window.Mouse.X, Window.Mouse.Y);
+            ms.LeftButton = Window.Mouse[OpenTK.Input.MouseButton.Left] ? ButtonState.Pressed : ButtonState.Released;
+            ms.RightButton = Window.Mouse[OpenTK.Input.MouseButton.Right] ? ButtonState.Pressed : ButtonState.Released;
+            ms.MiddleButton = Window.Mouse[OpenTK.Input.MouseButton.Middle] ? ButtonState.Pressed : ButtonState.Released; ;
+            ms.ScrollWheelValue = Window.Mouse.Wheel;			
+
+            if (ms.LeftButton == ButtonState.Pressed)
+            {
+            }
+
+
 			return ms;
 		}
 
 		public static void SetPosition (int x, int y)
-		{
-			// TODO propagate change to opentk mouse object (requires opentk 1.1)
-			//throw new NotImplementedException("Feature not implemented.");
-			_x = x;
-			_y = y;
-		}
+		{            
+            ///correcting the coordinate system
+            ///Only way to set the mouse position !!!
+            ///Somehow a Hack !
+            System.Drawing.Point pt = Window.PointToScreen(new System.Drawing.Point(x, y));
+            OpenTK.Input.Mouse.SetPosition(pt.X, pt.Y);
+		}       
 		
 		#endregion
 	}

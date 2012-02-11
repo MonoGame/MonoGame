@@ -412,14 +412,80 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        public void SetData<T>(T[] data, int startIndex, int elementCount, SetDataOptions options)
+        public void SetData<T>(T[] data, int startIndex, int elementCount, SetDataOptions options) where T : struct
+        {
+            SetData<T>(0, data, startIndex, elementCount);
+        }
+
+        public void SetData<T>(int level, Rectangle? rect, T[] data, int startIndex, int elementCount, SetDataOptions options) where T : struct
         {
             throw new NotImplementedException();
         }
 
-        public void SetData<T>(int level, Rectangle? rect, T[] data, int startIndex, int elementCount, SetDataOptions options)
-        {
-            throw new NotImplementedException();
+        public void SetData<T>(int offsetInBytes,T[] data, int startIndex, int elementCount, bool isCompressed = false) where T : struct
+        {            
+            if(_levelCount > 1)
+                throw new NotSupportedException("Mipmap number must be one");
+
+            GL.BindTexture(TextureTarget.Texture2D, ID);
+
+            GCHandle handle = GCHandle.Alloc(data, GCHandleType.Pinned);
+                        
+            int mipmapByteSize = data.Length;
+
+            try
+            {
+                IntPtr dataPointer = handle.AddrOfPinnedObject();
+                // Go to the starting point.
+                dataPointer += startIndex;
+
+                
+                if (isCompressed)
+                {
+                    GL.CompressedTexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba,
+                        Width, Height, 0, mipmapByteSize, dataPointer);
+
+                }
+                else
+                {
+                    GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba,
+                        Width, Height, 0, PixelFormat.Rgba,
+                        PixelType.UnsignedByte, dataPointer);
+                }
+
+                ///one for now
+                ///Now mipmap support !
+                int numberOfMipMaps = 1;
+                int mipmapWidth = Width;
+                int mipmapHeight = Height;
+                for (int index = 1; index < numberOfMipMaps; index++)
+                {
+                    dataPointer += mipmapByteSize;
+                    mipmapByteSize /= 4;
+                    mipmapWidth /= 2;
+                    mipmapHeight /= 2;
+                    mipmapWidth = Math.Max(mipmapWidth, 1);
+                    mipmapHeight = Math.Max(mipmapHeight, 1);
+
+                    if (isCompressed)
+                    {
+                        GL.CompressedTexImage2D(TextureTarget.Texture2D, index,
+                            PixelInternalFormat.Rgba, Width, Height, 0, mipmapByteSize, dataPointer);
+
+                    }
+                    else
+                    {
+                        GL.TexImage2D(TextureTarget.Texture2D, index, PixelInternalFormat.Rgba,
+                            mipmapWidth, mipmapHeight, 0, PixelFormat.Rgba,
+                            PixelType.UnsignedByte, dataPointer);
+
+                    }
+                }
+            }
+            finally
+            {
+                handle.Free();
+            }
         }
 
         public void GetData<T>(T[] data)

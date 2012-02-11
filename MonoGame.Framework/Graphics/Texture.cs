@@ -61,7 +61,7 @@ namespace Microsoft.Xna.Framework.Graphics
 	public abstract class Texture : GraphicsResource
 	{
 		protected SurfaceFormat _format;
-		protected int _levelCount;
+		protected int _levelCount = 1;
 		internal int _textureId = -1;
 		
 		public SurfaceFormat Format
