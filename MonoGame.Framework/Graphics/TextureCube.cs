@@ -21,6 +21,14 @@ namespace Microsoft.Xna.Framework.Graphics
 	public class TextureCube : Texture
 	{
 		protected int size;
+
+        public int Size
+        {
+            get
+            {
+                return size;
+            }
+        }
 		
 		PixelInternalFormat glInternalFormat;
 		PixelFormat glFormat;

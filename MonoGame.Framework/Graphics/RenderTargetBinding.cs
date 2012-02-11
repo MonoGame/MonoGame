@@ -44,22 +44,21 @@ using System;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-    // http://msdn.microsoft.com/en-us/library/ff434403.aspx
-    // TODO: Implement RenderTargetCube
-    public struct RenderTargetBinding
-    {
-        internal Texture _renderTarget;
-        internal bool isTargetCube;
+	// http://msdn.microsoft.com/en-us/library/ff434403.aspx
+	// TODO: Implement RenderTargetCube
+	public struct RenderTargetBinding
+	{
+		internal Texture _renderTarget;
+		internal bool isTargetCube;
 
-        public RenderTargetBinding(RenderTarget2D renderTarget)
-        {
-            if (renderTarget == null)
-            {
-                throw new ArgumentNullException("renderTarget");
-            }
-            _renderTarget = renderTarget;
-            isTargetCube = false;
-        }
+		public RenderTargetBinding (RenderTarget2D renderTarget)
+			{
+			if (renderTarget == null) {
+				throw new ArgumentNullException ("renderTarget");
+			}
+			_renderTarget = renderTarget;
+			isTargetCube = false;
+		}
 
         public static implicit operator RenderTargetBinding(RenderTarget2D renderTarget)
         {
@@ -67,12 +66,10 @@ namespace Microsoft.Xna.Framework.Graphics
             return RenderTargetBinding;
         }
 
-        public Texture RenderTarget
-        {
-            get
-            {
-                return _renderTarget;
-            }
-        }
-    }
+		public Texture RenderTarget {
+			get {
+				return _renderTarget;
+			}
+		}
+	}
 }
