@@ -77,7 +77,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (ptr != null && ptr.ToInt32() != 0)
             {
                 byte* byt = (byte*)ptr.ToPointer();
-                byt = byt + offsetInBytes;
+                byt = byt + offsetInBytes + startIndex * elementSizeInByte;
 
                 for (int j = 0; j < elementCount; j++)
                 {

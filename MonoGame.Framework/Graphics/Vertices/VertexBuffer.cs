@@ -81,7 +81,7 @@ namespace Microsoft.Xna.Framework.Graphics
             ///its dark magic time
             if (ptr != null && ptr.ToInt32() != 0)
             {
-                ptr = ptr + offsetInBytes;
+                ptr = ptr + offsetInBytes + startIndex * vertexStride;
 
                 byte[] bytes = new byte[vertexStride * data.Count()];
                 Marshal.Copy(ptr, bytes, 0, vertexStride * data.Count());
