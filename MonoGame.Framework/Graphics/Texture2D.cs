@@ -79,6 +79,10 @@ namespace Microsoft.Xna.Framework.Graphics
     {
 		protected int width;
 		protected int height;
+
+		PixelInternalFormat glInternalFormat;
+		GLPixelFormat glFormat;
+		PixelType glType;
 		
         public Rectangle Bounds
         {
@@ -117,9 +121,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT,
 			                (int)TextureWrapMode.ClampToEdge);
 			
-			PixelInternalFormat glInternalFormat = PixelInternalFormat.Rgba;
-			GLPixelFormat glFormat = GLPixelFormat.Rgba;
-			PixelType glType = PixelType.UnsignedByte;
+			glInternalFormat = PixelInternalFormat.Rgba;
+			glFormat = GLPixelFormat.Rgba;
+			glType = PixelType.UnsignedByte;
 			format.GetGLFormat(out glInternalFormat, out glFormat, out glType);
 
 			if (glFormat == (GLPixelFormat)All.CompressedTextureFormats)
@@ -228,11 +232,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
             GL.BindTexture(TextureTarget.Texture2D, this.glTexture);
 			
-			var glInternalFormat = PixelInternalFormat.Rgba;
-			var glFormat = GLPixelFormat.Rgba;
-			var glType = PixelType.UnsignedByte;
-			format.GetGLFormat(out glInternalFormat, out glFormat, out glType);
-			
 			if (glFormat == (GLPixelFormat)All.CompressedTextureFormats)
 			{
 				GL.CompressedTexSubImage2D(TextureTarget.Texture2D, level,
@@ -257,17 +256,33 @@ namespace Microsoft.Xna.Framework.Graphics
 			this.SetData(0, null, data, 0, data.Length);
         }
 		
-		public void GetData<T>(int level, Rectangle? rect, T[] data, int startIndex, int elementCount)
+		public void GetData<T>(int level, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
         {
-           throw new NotImplementedException();
+#if IPHONE || ANDROID
+			throw new NotImplementedException();
+#else
+
+			GL.BindTexture(TextureTarget.Texture2D, this.glTexture);
+
+			if (rect.HasValue) {
+				throw new NotImplementedException();
+			}
+
+			if (glFormat == (GLPixelFormat)All.CompressedTextureFormats) {
+				throw new NotImplementedException();
+			} else {
+				GL.GetTexImage(TextureTarget.Texture2D, level, this.glFormat, this.glType, data);
+			}
+
+#endif
         }
 
-		public void GetData<T>(T[] data, int startIndex, int elementCount)
+		public void GetData<T>(T[] data, int startIndex, int elementCount) where T : struct
 		{
 			this.GetData(0, null, data, startIndex, elementCount);
 		}
 		
-		public void GetData<T> (T[] data)
+		public void GetData<T> (T[] data) where T : struct
 		{
 			this.GetData(0, null, data, 0, data.Length);
 		}

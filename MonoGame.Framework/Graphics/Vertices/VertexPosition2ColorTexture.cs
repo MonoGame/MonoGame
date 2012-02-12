@@ -19,7 +19,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		public VertexPosition2ColorTexture ( Vector2 position, Color color, Vector2 texCoord )
 		{
 			Position = position;
-			Color = color.GLPackedValue;
+			Color = color.PackedValue;
 			TextureCoordinate = texCoord;
 		}
 		
