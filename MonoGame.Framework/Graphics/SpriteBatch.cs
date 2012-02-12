@@ -246,7 +246,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			      depth);
 		}
 
-		public void Draw (Texture2D texture,
+		private void Draw (Texture2D texture,
 			Vector4 destinationRectangle,
 			Rectangle? sourceRectangle,
 			Color color,
