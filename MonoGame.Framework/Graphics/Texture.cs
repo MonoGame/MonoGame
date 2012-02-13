@@ -81,6 +81,12 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			GL.BindTexture(glTarget, this.glTexture);
 		}
+
+		public override void Dispose()
+		{
+			GL.DeleteTextures(1, ref glTexture);
+			base.Dispose();
+		}
 		
 	}
 }

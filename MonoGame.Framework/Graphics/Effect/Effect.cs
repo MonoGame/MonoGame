@@ -90,7 +90,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				return key.Sum(b => b);
 			}
 		}
-		private static Dictionary<byte[], DXEffectObject> effectObjectCache =
+		internal static Dictionary<byte[], DXEffectObject> effectObjectCache =
 			new Dictionary<byte[], DXEffectObject>(new ByteArrayComparer());
 		
 
