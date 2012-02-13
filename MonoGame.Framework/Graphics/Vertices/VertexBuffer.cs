@@ -10,7 +10,7 @@ using MonoMac.OpenGL;
 using OpenTK.Graphics.OpenGL;
 #else
 using OpenTK.Graphics.ES20;
-#if IPHONE
+#if IPHONE || ANDROID
 using BufferTarget = OpenTK.Graphics.ES20.All;
 using BufferUsageHint = OpenTK.Graphics.ES20.All;
 #else
@@ -43,7 +43,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			//GLExt.Oes.GenVertexArrays(1, out this.vao);
 			//GLExt.Oes.BindVertexArray(this.vao);
-#if IPHONE
+#if IPHONE || ANDROID
 			GL.GenBuffers(1, ref this.vbo);
 #else
 			GL.GenBuffers(1, out this.vbo);

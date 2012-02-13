@@ -50,6 +50,16 @@ namespace Microsoft.Xna.Framework.Graphics
 			base(graphicsDevice, indexElementSize, indexCount, bufferUsage, true)
 		{
 		}
-	}
+
+        public void SetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, SetDataOptions options) where T : struct
+        {
+            SetData(offsetInBytes, data, startIndex, elementCount);
+        }
+
+        public void SetData<T>(T[] data, int startIndex, int elementCount, SetDataOptions options) where T : struct
+        {
+            SetData(data, startIndex, elementCount);
+        }
+    }
 }
 

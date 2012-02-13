@@ -28,7 +28,9 @@ namespace Microsoft.Xna.Framework.Graphics
 		DepthStencilState _depthStencilState; 
 		RasterizerState _rasterizerState;		
 		Effect _effect;	
-		Effect spriteEffect;
+#if !ES11
+		static Effect spriteEffect;
+#endif
 		Matrix _matrix;
 		Rectangle tempRect = new Rectangle (0,0,0,0);
 		Vector2 texCoordTL = new Vector2 (0,0);
@@ -42,11 +44,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			this.graphicsDevice = graphicsDevice;
 			
-#if !ES11
-			//use a custon SpriteEffect so we can control the transformation matrix
-			spriteEffect = new Effect (this.graphicsDevice, Effect.LoadEffectResource("SpriteEffect"));	
-#endif
-
 			_batcher = new SpriteBatcher ();
 		}
 
@@ -155,6 +152,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #else
 			if (_effect == null) {
+                if (spriteEffect == null)
+                {
+                    // Use a custom SpriteEffect so we can control the transformation matrix
+                    spriteEffect = new Effect(this.graphicsDevice, Effect.LoadEffectResource("SpriteEffect"));
+                }
 				Viewport vp = graphicsDevice.Viewport;
 				Matrix projection = Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, 0, 1);
 				Matrix halfPixelOffset = Matrix.CreateTranslation(-0.5f, -0.5f, 0);

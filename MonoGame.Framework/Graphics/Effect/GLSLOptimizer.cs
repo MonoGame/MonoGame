@@ -1,3 +1,5 @@
+#if GLSLOPTIMIZER
+
 using System;
 using System.Runtime.InteropServices;
 
@@ -7,7 +9,7 @@ using MonoMac.OpenGL;
 using OpenTK.Graphics.OpenGL;
 #else
 using OpenTK.Graphics.ES20;
-#if IPHONE
+#if IPHONE || ANDROID
 using ShaderType = OpenTK.Graphics.ES20.All;
 #endif
 #endif
@@ -16,9 +18,10 @@ namespace Microsoft.Xna.Framework.Graphics
 {
 	internal class GLSLOptimizer
 	{
-
 #if IPHONE
 		const string libglsl_optmizer_dll = "__Internal";
+#elif ANDROID
+		const string libglsl_optmizer_dll = "libglsl_optimizer.so";
 #else
 		const string libglsl_optmizer_dll = "libglsl_optimizer.dll";
 #endif
@@ -97,3 +100,4 @@ namespace Microsoft.Xna.Framework.Graphics
 	}
 }
 
+#endif

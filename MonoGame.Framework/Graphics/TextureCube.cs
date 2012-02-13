@@ -7,7 +7,7 @@ using MonoMac.OpenGL;
 using OpenTK.Graphics.OpenGL;
 #else
 using OpenTK.Graphics.ES20;
- #if IPHONE
+ #if IPHONE || ANDROID
 using PixelInternalFormat = OpenTK.Graphics.ES20.All;
 using PixelFormat = OpenTK.Graphics.ES20.All;
 using PixelType = OpenTK.Graphics.ES20.All;
@@ -35,7 +35,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			this.glTarget = TextureTarget.TextureCubeMap;
 
-#if IPHONE
+#if IPHONE || ANDROID
 			GL.GenTextures(1, ref this.glTexture);
 #else
 			GL.GenTextures(1, out this.glTexture);
@@ -59,7 +59,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				if (glFormat == (PixelFormat)All.CompressedTextureFormats) {
 					throw new NotImplementedException();
 				} else {
-#if IPHONE
+#if IPHONE || ANDROID
 					GL.TexImage2D (target, 0, (int)glInternalFormat, size, size, 0, glFormat, glType, IntPtr.Zero);
 #else
 					GL.TexImage2D (target, 0, glInternalFormat, size, size, 0, glFormat, glType, IntPtr.Zero);
@@ -69,7 +69,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			if (mipMap)
 			{
-#if IPHONE
+#if IPHONE || ANDROID
 				GL.GenerateMipmap(TextureTarget.TextureCubeMap);
 #else
 				GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.GenerateMipmap, (int)All.True);

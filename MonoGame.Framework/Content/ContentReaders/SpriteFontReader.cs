@@ -28,8 +28,6 @@ SOFTWARE.
 
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.IO;
 
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -42,28 +40,13 @@ namespace Microsoft.Xna.Framework.Content
         {
         }
 
-		public static string Normalize(string FileName)
-		{
-			if (File.Exists(FileName))
-				return FileName;
-			
-			// Check the file extension
-			if (!string.IsNullOrEmpty(Path.GetExtension(FileName)))
-			{
-				return null;
-			}
-			
-			// Concat the file name with valid extensions
-			if (File.Exists(FileName+".xnb"))
-				return FileName+".xnb";
-			
-			// Concat the file name with valid extensions
-			if (File.Exists(FileName+".spritefont"))
-				return FileName+".spritefont";
-			
-			return null;
-		}
-		
+        static string[] supportedExtensions = new string[] { ".spritefont" };
+
+        internal static string Normalize(string fileName)
+        {
+            return Normalize(fileName, supportedExtensions);
+        }
+	
         protected internal override SpriteFont Read(ContentReader input, SpriteFont existingInstance)
         {
             Texture2D texture = input.ReadObject<Texture2D>();

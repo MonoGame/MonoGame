@@ -232,11 +232,7 @@ namespace Microsoft.Xna.Framework.Content
 				
 				assetName = TitleContainer.GetFilename(Path.Combine (_rootDirectory, assetName));
 				
-				if ((typeof(T) == typeof(Curve))) 
-                {				
-                    assetName = CurveReader.Normalize(assetName);
-                }
-                else if ((typeof(T) == typeof(Texture2D)))
+                if ((typeof(T) == typeof(Texture2D)))
 				{
 					assetName = Texture2DReader.Normalize(assetName);
 				}
@@ -463,21 +459,17 @@ namespace Microsoft.Xna.Framework.Content
 			}
 			
 			Stream stream = null;
-			bool loadXnb = false;
+			//bool loadXnb = false;
 			try {
 				//try load it traditionally
 				stream = OpenStream(assetName);
 				stream.Close();
 			} catch (ContentLoadException ex) {
 				//MonoGame try to load as a non-content file
+
+				assetName = TitleContainer.GetFilename(Path.Combine (_rootDirectory, assetName));
 				
-				assetName = TitleContainer.GetFilename(assetName);
-				
-                if ((currentAsset is Curve))
-                {
-                    assetName = CurveReader.Normalize(assetName);
-                }
-                else if ((currentAsset is Texture2D))
+                if ((currentAsset is Texture2D))
                 {
                     assetName = Texture2DReader.Normalize(assetName);
                 }

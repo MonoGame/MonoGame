@@ -117,8 +117,7 @@ namespace Microsoft.Xna.Framework.Content
 				readerTypeString = PrepareType(readerTypeString);
 
 				Type l_readerType = Type.GetType(readerTypeString);
-				
-            	if(l_readerType !=null)
+                if (l_readerType != null)
 					contentReaders[i] = (ContentTypeReader)Activator.CreateInstance(l_readerType,true);
             	else
 					throw new ContentLoadException("Could not find matching content reader of type " + originalReaderTypeString + " (" + readerTypeString + ")");

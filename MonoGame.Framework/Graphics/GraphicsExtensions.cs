@@ -23,7 +23,7 @@ using TexCoordPointerType = OpenTK.Graphics.ES11.All;
 
  #else
 using OpenTK.Graphics.ES20;
-  #if IPHONE
+  #if IPHONE || ANDROID
 using BlendEquationMode = OpenTK.Graphics.ES20.All;
 using BlendingFactorSrc = OpenTK.Graphics.ES20.All;
 using BlendingFactorDest = OpenTK.Graphics.ES20.All;
@@ -446,7 +446,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			case Blend.InverseSourceColor:
 #if MONOMAC
 				return BlendingFactorSrc.OneMinusSrc1Color;
-#elif IPHONE
+#elif IPHONE || ANDROID
 				return BlendingFactorSrc.OneMinusSrcColor;
 #else
 				return BlendingFactorSrc.OneMinusConstantColor;
@@ -460,7 +460,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			case Blend.SourceColor:
 #if MONOMAC
 				return BlendingFactorSrc.Src1Color;
-#elif IPHONE
+#elif IPHONE || ANDROID
 				return BlendingFactorSrc.SrcColor;
 #else
 				return BlendingFactorSrc.ConstantColor;
@@ -489,7 +489,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			case Blend.InverseSourceColor:
 #if MONOMAC
 				return BlendingFactorDest.OneMinusSrc1Color;
-#elif IPHONE
+#elif IPHONE || ANDROID
 				return BlendingFactorDest.OneMinusSrcColor;
 #else
 				return BlendingFactorDest.OneMinusConstantColor;
@@ -503,7 +503,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			case Blend.SourceColor:
 #if MONOMAC
 				return BlendingFactorDest.Src1Color;
-#elif IPHONE
+#elif IPHONE || ANDROID
 				return BlendingFactorDest.SrcColor;
 #else
 				return BlendingFactorDest.ConstantColor;
@@ -553,7 +553,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				glFormat = PixelFormat.Luminance;
 				glType = PixelType.UnsignedByte;
 				break;
-#if !IPHONE
+#if !IPHONE && !ANDROID
 			case SurfaceFormat.Dxt1:
 				glInternalFormat = PixelInternalFormat.CompressedRgbaS3tcDxt1Ext;
 				glFormat = (PixelFormat)All.CompressedTextureFormats;
@@ -568,7 +568,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				break;
 #endif
 				
-#if IPHONE
+#if IPHONE || ANDROID
 			case SurfaceFormat.RgbPvrtc2Bpp:
 				glInternalFormat = PixelInternalFormat.CompressedRgbPvrtc2Bppv1Img;
 				glFormat = (PixelFormat)All.CompressedTextureFormats;
