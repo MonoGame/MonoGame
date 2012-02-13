@@ -29,7 +29,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		RasterizerState _rasterizerState;		
 		Effect _effect;	
 #if !ES11
-		static Effect spriteEffect;
+		Effect spriteEffect;
 #endif
 		Matrix _matrix;
 		Rectangle tempRect = new Rectangle (0,0,0,0);
@@ -43,8 +43,11 @@ namespace Microsoft.Xna.Framework.Graphics
 			}	
 
 			this.graphicsDevice = graphicsDevice;
-			
-			_batcher = new SpriteBatcher ();
+
+            // Use a custom SpriteEffect so we can control the transformation matrix
+            spriteEffect = new Effect(this.graphicsDevice, Effect.LoadEffectResource("SpriteEffect"));
+            
+            _batcher = new SpriteBatcher();
 		}
 
 		public void Begin ()
@@ -152,11 +155,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #else
 			if (_effect == null) {
-                if (spriteEffect == null)
-                {
-                    // Use a custom SpriteEffect so we can control the transformation matrix
-                    spriteEffect = new Effect(this.graphicsDevice, Effect.LoadEffectResource("SpriteEffect"));
-                }
 				Viewport vp = graphicsDevice.Viewport;
 				Matrix projection = Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, 0, 1);
 				Matrix halfPixelOffset = Matrix.CreateTranslation(-0.5f, -0.5f, 0);
