@@ -249,6 +249,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			//New graphics context, clear the effect cache
 			Effect.effectObjectCache.Clear ();
+			EffectPass.passthroughVertexShader = null;
         }
 
 		public BlendState BlendState {

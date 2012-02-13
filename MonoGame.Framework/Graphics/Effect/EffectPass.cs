@@ -57,7 +57,7 @@ namespace Microsoft.Xna.Framework.Graphics
 					gl_Position.y = gl_Position.y * posFixup.y;
 					gl_Position.xy += posFixup.zw * gl_Position.ww;
 				}";
-		static int? passthroughVertexShader;
+		internal static int? passthroughVertexShader;
 
 		bool passthroughVertexShaderAttached = false;
 		
