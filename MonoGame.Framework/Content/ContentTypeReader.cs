@@ -26,9 +26,9 @@ SOFTWARE.
 #endregion License
 
 using System;
+using System.IO;
 
 #if ANDROID
-using System.IO;
 using System.Linq;
 #endif
 
