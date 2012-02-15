@@ -444,12 +444,10 @@ namespace Microsoft.Xna.Framework.Graphics
 			case Blend.InverseSourceAlpha:
 				return BlendingFactorSrc.OneMinusSrcAlpha;
 			case Blend.InverseSourceColor:
-#if MONOMAC
-				return BlendingFactorSrc.OneMinusSrc1Color;
-#elif IPHONE || ANDROID
-				return BlendingFactorSrc.OneMinusSrcColor;
+#if MONOMAC || WINDOWS
+				return (BlendingFactorSrc)All.OneMinusSrcColor;
 #else
-				return BlendingFactorSrc.OneMinusConstantColor;
+				return BlendingFactorSrc.OneMinusSrcColor;
 #endif
 			case Blend.One:
 				return BlendingFactorSrc.One;
@@ -458,12 +456,10 @@ namespace Microsoft.Xna.Framework.Graphics
 			case Blend.SourceAlphaSaturation:
 				return BlendingFactorSrc.SrcAlphaSaturate;
 			case Blend.SourceColor:
-#if MONOMAC
-				return BlendingFactorSrc.Src1Color;
-#elif IPHONE || ANDROID
-				return BlendingFactorSrc.SrcColor;
+#if MONOMAC || WINDOWS
+				return (BlendingFactorSrc)All.SrcColor;
 #else
-				return BlendingFactorSrc.ConstantColor;
+				return BlendingFactorSrc.SrcColor;
 #endif
 			case Blend.Zero:
 				return BlendingFactorSrc.Zero;
@@ -487,12 +483,10 @@ namespace Microsoft.Xna.Framework.Graphics
 			case Blend.InverseSourceAlpha:
 				return BlendingFactorDest.OneMinusSrcAlpha;
 			case Blend.InverseSourceColor:
-#if MONOMAC
-				return BlendingFactorDest.OneMinusSrc1Color;
-#elif IPHONE || ANDROID
-				return BlendingFactorDest.OneMinusSrcColor;
+#if MONOMAC || WINDOWS
+				return (BlendingFactorDest)All.OneMinusSrcColor;
 #else
-				return BlendingFactorDest.OneMinusConstantColor;
+				return BlendingFactorDest.OneMinusSrcColor;
 #endif
 			case Blend.One:
 				return BlendingFactorDest.One;
@@ -501,12 +495,10 @@ namespace Microsoft.Xna.Framework.Graphics
 //			case Blend.SourceAlphaSaturation:
 //				return BlendingFactorDest.SrcAlphaSaturate;
 			case Blend.SourceColor:
-#if MONOMAC
-				return BlendingFactorDest.Src1Color;
-#elif IPHONE || ANDROID
-				return BlendingFactorDest.SrcColor;
+#if MONOMAC || WINDOWS
+				return (BlendingFactorDest)All.SrcColor;
 #else
-				return BlendingFactorDest.ConstantColor;
+				return BlendingFactorDest.SrcColor;
 #endif
 			case Blend.Zero:
 				return BlendingFactorDest.Zero;

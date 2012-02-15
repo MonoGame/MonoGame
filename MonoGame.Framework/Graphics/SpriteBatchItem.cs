@@ -23,25 +23,25 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			vertexTL.Position.X = x;
             vertexTL.Position.Y = y;
-			vertexTL.Color = color.GLPackedValue;
+			vertexTL.Color = color.PackedValue;
 			vertexTL.TextureCoordinate.X = texCoordTL.X;
             vertexTL.TextureCoordinate.Y = texCoordTL.Y;
 
 			vertexTR.Position.X = x+w;
             vertexTR.Position.Y = y;
-			vertexTR.Color = color.GLPackedValue;
+			vertexTR.Color = color.PackedValue;
             vertexTR.TextureCoordinate.X = texCoordBR.X;
             vertexTR.TextureCoordinate.Y = texCoordTL.Y;
 
 			vertexBL.Position.X = x;
             vertexBL.Position.Y = y+h;
-			vertexBL.Color = color.GLPackedValue;
+			vertexBL.Color = color.PackedValue;
 			vertexBL.TextureCoordinate.X = texCoordTL.X;
             vertexBL.TextureCoordinate.Y = texCoordBR.Y;
 
 			vertexBR.Position.X = x+w;
             vertexBR.Position.Y = y+h;
-			vertexBR.Color = color.GLPackedValue;
+			vertexBR.Color = color.PackedValue;
 			vertexBR.TextureCoordinate.X = texCoordBR.X;
             vertexBR.TextureCoordinate.Y = texCoordBR.Y;
 		}
@@ -49,25 +49,25 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			vertexTL.Position.X = x+dx*cos-dy*sin;
             vertexTL.Position.Y = y+dx*sin+dy*cos;
-			vertexTL.Color = color.GLPackedValue;
+			vertexTL.Color = color.PackedValue;
             vertexTL.TextureCoordinate.X = texCoordTL.X;
             vertexTL.TextureCoordinate.Y = texCoordTL.Y;
 
 			vertexTR.Position.X = x+(dx+w)*cos-dy*sin;
             vertexTR.Position.Y = y+(dx+w)*sin+dy*cos;
-			vertexTR.Color = color.GLPackedValue;
+			vertexTR.Color = color.PackedValue;
             vertexTR.TextureCoordinate.X = texCoordBR.X;
             vertexTR.TextureCoordinate.Y = texCoordTL.Y;
 
 			vertexBL.Position.X = x+dx*cos-(dy+h)*sin;
             vertexBL.Position.Y = y+dx*sin+(dy+h)*cos;
-			vertexBL.Color = color.GLPackedValue;
+			vertexBL.Color = color.PackedValue;
             vertexBL.TextureCoordinate.X = texCoordTL.X;
             vertexBL.TextureCoordinate.Y = texCoordBR.Y;
 
 			vertexBR.Position.X = x+(dx+w)*cos-(dy+h)*sin;
             vertexBR.Position.Y = y+(dx+w)*sin+(dy+h)*cos;
-			vertexBR.Color = color.GLPackedValue;
+			vertexBR.Color = color.PackedValue;
             vertexBR.TextureCoordinate.X = texCoordBR.X;
             vertexBR.TextureCoordinate.Y = texCoordBR.Y;
 		}

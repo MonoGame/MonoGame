@@ -35,7 +35,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		DepthStencilState depthStencilState;
 		bool setRasterizerState = false;
 		RasterizerState rasterizerState;
-		
+
+		static float[] posFixup = new float[4];
 
 		static string passthroughVertexShaderSrc = @"
 				uniform mat4 transformMatrix;
@@ -56,7 +57,7 @@ namespace Microsoft.Xna.Framework.Graphics
 					gl_Position.y = gl_Position.y * posFixup.y;
 					gl_Position.xy += posFixup.zw * gl_Position.ww;
 				}";
-		static int? passthroughVertexShader;
+		internal static int? passthroughVertexShader;
 
 		bool passthroughVertexShaderAttached = false;
 		
@@ -306,6 +307,48 @@ namespace Microsoft.Xna.Framework.Graphics
 				int uniform = GL.GetUniformLocation(shaderProgram, "transformMatrix");
 				GL.UniformMatrix4(uniform, 1, false, Matrix.ToFloatArray(transform));
 			}
+
+
+			// Apply vertex shader fix:
+			// The following two lines are appended to the end of vertex shaders
+			// to account for rendering differences between OpenGL and DirectX:
+			//
+			// gl_Position.y = gl_Position.y * posFixup.y;
+			// gl_Position.xy += posFixup.zw * gl_Position.ww;
+			//
+			// (the following paraphrased from wine, wined3d/state.c and wined3d/glsl_shader.c)
+			//
+			// - We need to flip along the y-axis in case of offscreen rendering.
+			// - D3D coordinates refer to pixel centers while GL coordinates refer
+			//   to pixel corners.
+			// - D3D has a top-left filling convention. We need to maintain this
+			//   even after the y-flip mentioned above.
+			// In order to handle the last two points, we translate by
+			// (63.0 / 128.0) / VPw and (63.0 / 128.0) / VPh. This is equivalent to
+			// translating slightly less than half a pixel. We want the difference to
+			// be large enough that it doesn't get lost due to rounding inside the
+			// driver, but small enough to prevent it from interfering with any
+			// anti-aliasing.
+			//
+			// OpenGL coordinates specify the center of the pixel while d3d coords specify
+			// the corner. The offsets are stored in z and w in posFixup. posFixup.y contains
+			// 1.0 or -1.0 to turn the rendering upside down for offscreen rendering. PosFixup.x
+			// contains 1.0 to allow a mad.
+
+			posFixup[0] = 1.0f;
+			posFixup[1] = 1.0f;
+			posFixup[2] = (63.0f / 64.0f) / _graphicsDevice.Viewport.Width;
+			posFixup[3] = -(63.0f / 64.0f) / _graphicsDevice.Viewport.Height;
+			//If we have a render target bound (rendering offscreen)
+			if (_graphicsDevice.GetRenderTargets().Length > 0) {
+				//flip vertically
+				posFixup[1] *= -1.0f;
+				posFixup[3] *= -1.0f;
+			}
+			int posFixupLoc = GL.GetUniformLocation(shaderProgram, "posFixup");
+			GL.Uniform4 (posFixupLoc, 1, posFixup);
+
+			
 
 			if (pixelShader != null) {
 				pixelShader.Apply(shaderProgram,
