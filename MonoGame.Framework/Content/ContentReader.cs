@@ -143,17 +143,19 @@ namespace Microsoft.Xna.Framework.Content
 
         public T ReadExternalReference<T>()
 		{
-            string externalAssetName = ReadString();
-            if (!String.IsNullOrEmpty(externalAssetName))
+            string externalReference = ReadString();
+            if (!String.IsNullOrEmpty(externalReference))
             {
+                externalReference = externalReference.Replace('\\', Path.DirectorySeparatorChar);
+
                 // Use Path.GetFullPath to help resolve relative directories
                 string fullRootPath = Path.GetFullPath(contentManager.RootDirectory);
-                string fullAssetPath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Path.Combine(fullRootPath, assetName)), externalAssetName));
+                string fullAssetPath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Path.Combine(fullRootPath, assetName)), externalReference));
 
 #if ANDROID
-                externalAssetName = fullAssetPath.Substring(fullRootPath.Length + 3);
+                string externalAssetName = fullAssetPath.Substring(fullRootPath.Length);
 #else				
-                externalAssetName = fullAssetPath.Substring(fullRootPath.Length + 1);
+                string externalAssetName = fullAssetPath.Substring(fullRootPath.Length + 1);
 #endif
                 return contentManager.Load<T>(externalAssetName);
             }

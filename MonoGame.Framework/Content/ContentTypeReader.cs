@@ -26,6 +26,11 @@ SOFTWARE.
 #endregion License
 
 using System;
+using System.IO;
+
+#if ANDROID
+using System.Linq;
+#endif
 
 namespace Microsoft.Xna.Framework.Content
 {
@@ -73,6 +78,56 @@ namespace Microsoft.Xna.Framework.Content
         protected internal abstract object Read(ContentReader input, object existingInstance);
 
         #endregion Protected Methods
+
+        #region Internal Static Helper Methods
+#if ANDROID
+        internal static string Normalize(string fileName, string[] extensions)
+        {
+            int index = fileName.LastIndexOf(Path.DirectorySeparatorChar);
+            string path = string.Empty;
+            string file = fileName;
+            if (index >= 0)
+            {
+                file = fileName.Substring(index + 1, fileName.Length - index - 1);
+                path = fileName.Substring(0, index);
+            }
+            string[] files = Game.Activity.Assets.List(path);
+
+            if (files.Any(s => s == file))
+                return fileName;
+
+            // Check the file extension
+            if (!string.IsNullOrEmpty(Path.GetExtension(fileName)))
+            {
+                return null;
+            }
+
+            return Path.Combine(path, files.FirstOrDefault(s => extensions.Any(ext => s.ToLower() == (file.ToLower() + ext))));
+        }
+#else
+		public static string Normalize(string fileName, string[] extensions)
+		{
+			if (File.Exists(fileName))
+				return fileName;
+			
+			// Check the file extension
+			if (!string.IsNullOrEmpty(Path.GetExtension(fileName)))
+			{
+				return null;
+			}
+			
+            foreach (string ext in extensions)
+            {
+			    // Concat the file name with valid extensions
+                string fileNamePlusExt = fileName + ext;
+			    if (File.Exists(fileNamePlusExt))
+				    return fileNamePlusExt;
+            }
+			
+			return null;
+		}
+#endif
+        #endregion
     }
 
     public abstract class ContentTypeReader<T> : ContentTypeReader

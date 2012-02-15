@@ -64,7 +64,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 {
                     for (int x = 0; x < blockCountX; x++)
                     {
-						DecompressDxt1Block(imageReader, x, y, blockCountX, imageData);
+						DecompressDxt1Block(imageReader, x, y, blockCountX, width, height, imageData);
 					}
                 }
             }
@@ -72,7 +72,7 @@ namespace Microsoft.Xna.Framework.Graphics
             return imageData;
         }
 
-        private static void DecompressDxt1Block(BinaryReader imageReader, int x, int y, int width, byte[] imageData)
+        private static void DecompressDxt1Block(BinaryReader imageReader, int x, int y, int blockCountX, int width, int height, byte[] imageData)
         {
             ushort c0 = imageReader.ReadUInt16();
             ushort c1 = imageReader.ReadUInt16();
@@ -109,11 +109,21 @@ namespace Microsoft.Xna.Framework.Graphics
                             case 3: finalColor = GetRgba(0, 0, 0); break;
                         }
                     }
-					
-					imageData[y * width * 64 + blockY * width * 16 + x * 16 + blockX * 4] = finalColor[0];
-					imageData[y * width * 64 + blockY * width * 16 + x * 16 + blockX * 4 + 1] = finalColor[1];
-					imageData[y * width * 64 + blockY * width * 16 + x * 16 + blockX * 4 + 2] = finalColor[2];
-					imageData[y * width * 64 + blockY * width * 16 + x * 16 + blockX * 4 + 3] = finalColor[3];
+
+                    int py = y * 4 + blockY;
+                    if (py < height)
+                    {
+                        int px = x * 4 + blockX;
+                        int offset = y * blockCountX * 64 + blockY * (blockCountX - 1) * 16 + x * 16 + blockX * 4;
+                        if (px < width)
+                            imageData[offset] = finalColor[0];
+                        if ((px + 1) < width)
+                            imageData[offset + 1] = finalColor[1];
+                        if ((px + 2) < width)
+                            imageData[offset + 2] = finalColor[2];
+                        if ((px + 3) < width)
+                            imageData[offset + 3] = finalColor[3];
+                    }
                 }
 			}
         }
@@ -137,7 +147,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 {
                     for (int x = 0; x < blockCountX; x++)
                     {
-                        DecompressDxt3Block(imageReader, x, y, blockCountX, imageData);
+                        DecompressDxt3Block(imageReader, x, y, blockCountX, width, height, imageData);
 					}
                 }
             }
@@ -145,7 +155,7 @@ namespace Microsoft.Xna.Framework.Graphics
             return imageData;
         }
 
-        private static void DecompressDxt3Block(BinaryReader imageReader, int x, int y, int width, byte[] imageData)
+        private static void DecompressDxt3Block(BinaryReader imageReader, int x, int y, int blockCountX, int width, int height, byte[] imageData)
         {
             byte[] alpha = imageReader.ReadBytes(8);
             
@@ -172,10 +182,20 @@ namespace Microsoft.Xna.Framework.Graphics
                         case 3: finalColor = GetRgba((byte)((color0[0] + 2 * color1[0]) / 3), (byte)((color0[1] + 2 * color1[1]) / 3), (byte)((color0[2] + 2 * color1[2]) / 3), Convert8BitTo4Bit(alpha[(4 * blockY + blockX) / 2])[(4 * blockY + blockX) % 2]); break;
                     }
 
-					imageData[y * width * 64 + blockY * width * 16 + x * 16 + blockX * 4] = finalColor[0];
-					imageData[y * width * 64 + blockY * width * 16 + x * 16 + blockX * 4 + 1] = finalColor[1];
-					imageData[y * width * 64 + blockY * width * 16 + x * 16 + blockX * 4 + 2] = finalColor[2];
-					imageData[y * width * 64 + blockY * width * 16 + x * 16 + blockX * 4 + 3] = finalColor[3];
+                    int py = y * 4 + blockY;
+                    if (py < height)
+                    {
+                        int px = x * 4 + blockX;
+                        int offset = y * blockCountX * 64 + blockY * (blockCountX - 1) * 16 + x * 16 + blockX * 4;
+                        if (px < width)
+                            imageData[offset] = finalColor[0];
+                        if ((px + 1) < width)
+                            imageData[offset + 1] = finalColor[1];
+                        if ((px + 2) < width)
+                            imageData[offset + 2] = finalColor[2];
+                        if ((px + 3) < width)
+                            imageData[offset + 3] = finalColor[3];
+                    }
                 }
             }
         }
@@ -198,15 +218,15 @@ namespace Microsoft.Xna.Framework.Graphics
                 {
                     for (int x = 0; x < blockCountX; x++)
                     {
-                        DecompressDxt5Block(imageReader, x, y, blockCountX, imageData);
+                        DecompressDxt5Block(imageReader, x, y, blockCountX, width, height, imageData);
                     }
                 }
             }
 
             return imageData;
         }
-        
-        private static void DecompressDxt5Block(BinaryReader imageReader, int x, int y, int width, byte[] imageData)
+
+        private static void DecompressDxt5Block(BinaryReader imageReader, int x, int y, int blockCountX, int width, int height, byte[] imageData)
         {
             byte alpha0 = imageReader.ReadByte();
             byte alpha1 = imageReader.ReadByte();
@@ -254,19 +274,24 @@ namespace Microsoft.Xna.Framework.Graphics
                         case 3: finalColor = GetRgba((byte)((color0[0] + 2 * color1[0]) / 3), (byte)((color0[1] + 2 * color1[1]) / 3), (byte)((color0[2] + 2 * color1[2]) / 3), alpha); break;
                     }
 
-                    imageData[y * width * 64 + blockY * width * 16 + x * 16 + blockX * 4] = finalColor[0];
-                    imageData[y * width * 64 + blockY * width * 16 + x * 16 + blockX * 4 + 1] = finalColor[1];
-                    imageData[y * width * 64 + blockY * width * 16 + x * 16 + blockX * 4 + 2] = finalColor[2];
-                    imageData[y * width * 64 + blockY * width * 16 + x * 16 + blockX * 4 + 3] = finalColor[3];
+                    int py = y * 4 + blockY;
+                    if (py < height)
+                    {
+                        int px = x * 4 + blockX;
+                        int offset = y * blockCountX * 64 + blockY * (blockCountX - 1) * 16 + x * 16 + blockX * 4;
+                        if (px < width)
+                            imageData[offset] = finalColor[0];
+                        if ((px + 1) < width)
+                            imageData[offset + 1] = finalColor[1];
+                        if ((px + 2) < width)
+                            imageData[offset + 2] = finalColor[2];
+                        if ((px + 3) < width)
+                            imageData[offset + 3] = finalColor[3];
+                    }
                 }
             }
         }
         		
-		private static byte[] PackRGBA(byte r, byte g, byte b, byte a)
-		{
-			return new byte[] {r, g, b, a};
-		}
-		
         private static byte[] ConvertRgb565ToRgb888(ushort color)
         {
             int temp;

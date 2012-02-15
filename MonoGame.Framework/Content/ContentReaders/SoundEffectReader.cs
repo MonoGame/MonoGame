@@ -48,32 +48,17 @@ namespace Microsoft.Xna.Framework.Content
 {
 	internal class SoundEffectReader : ContentTypeReader<SoundEffect>
 	{
-		public static string Normalize(string FileName)
-		{
-			if (File.Exists(FileName))
-				return FileName;
-			
-			// Check the file extension
-			if (!string.IsNullOrEmpty(Path.GetExtension(FileName)))
-			{
-				return null;
-			}
-			
-			// Concat the file name with valid extensions
-			if (File.Exists(FileName+".aiff"))
-				return FileName+".aiff";
-			if (File.Exists(FileName+".wav"))
-				return FileName+".wav";
-			if (File.Exists(FileName+".ac3"))
-				return FileName+".ac3";
-			if (File.Exists(FileName+".mp3"))
-				return FileName+".mp3";
-			if (File.Exists(FileName+".xnb"))
-				return FileName+".xnb";
-			
-			return null;
-		}
-		
+#if ANDROID
+        static string[] supportedExtensions = new string[] { ".wav", ".mp3", ".ogg", ".mid" };
+#else
+        static string[] supportedExtensions = new string[] { ".wav", ".aiff", ".ac3", "mp3" };
+#endif
+
+        internal static string Normalize(string fileName)
+        {
+            return Normalize(fileName, supportedExtensions);
+        }
+
 		protected internal override SoundEffect Read(ContentReader input, SoundEffect existingInstance)
 		{                    
 			byte[] header = input.ReadBytes(input.ReadInt32());

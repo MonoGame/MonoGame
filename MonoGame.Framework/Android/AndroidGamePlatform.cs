@@ -160,6 +160,7 @@ namespace Microsoft.Xna.Framework
         {
             // Get the Accelerometer going
             Accelerometer.SetupAccelerometer();
+
             Window.Run(1 / Game.TargetElapsedTime.TotalSeconds);
             //Window.Pause();
 
@@ -176,12 +177,14 @@ namespace Microsoft.Xna.Framework
 
         public override void BeginScreenDeviceChange(bool willBeFullScreen)
         {
-            throw new NotImplementedException();
+            // FIXME: Can't throw NotImplemented if it is called as a standard part of graphics device creation
+            //throw new NotImplementedException();
         }
 
         public override void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight)
         {
-            throw new NotImplementedException();
+            // FIXME: Can't throw NotImplemented if it is called as a standard part of graphics device creation
+            //throw new NotImplementedException();
         }
 
         // EnterForeground

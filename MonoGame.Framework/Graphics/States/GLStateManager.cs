@@ -29,7 +29,7 @@ using BlendEquationMode = OpenTK.Graphics.ES11.All;
  #else
 using OpenTK.Graphics.ES20;
 
-  #if IPHONE
+  #if IPHONE || ANDROID
 using EnableCap = OpenTK.Graphics.ES20.All;
 using FrontFaceDirection = OpenTK.Graphics.ES20.All;
 using BlendEquationMode = OpenTK.Graphics.ES20.All;

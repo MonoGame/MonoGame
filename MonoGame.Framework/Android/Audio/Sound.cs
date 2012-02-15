@@ -38,12 +38,18 @@ namespace Microsoft.Xna.Framework.Audio
 
         public void Dispose()
         {
-            s_soundPool.Unload(_soundId);
+            if (_soundId != 0)
+            {
+                s_soundPool.Unload(_soundId);
+            }
         }
 
         public void Resume()
         {
-            s_soundPool.Resume(_soundId);
+            if (_soundId != 0)
+            {
+                s_soundPool.Resume(_soundId);
+            }
         }
 
         public float Volume { get; set; }
@@ -71,6 +77,9 @@ namespace Microsoft.Xna.Framework.Audio
 
         public void Play()
         {
+            if (_soundId == 0)
+                return;
+
             AudioManager audioManager = (AudioManager)Game.Activity.GetSystemService(Context.AudioService);
 
             float streamVolumeCurrent = audioManager.GetStreamVolume(Stream.Music);
@@ -107,7 +116,8 @@ namespace Microsoft.Xna.Framework.Audio
 
         public Sound(byte[] audiodata, float volume, bool looping)
         {
-            throw new NotImplementedException();
+            _soundId = 0;
+            //throw new NotImplementedException();
         }
 
         internal static void IncreaseMediaVolume()
