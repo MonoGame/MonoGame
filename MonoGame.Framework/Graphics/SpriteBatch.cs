@@ -194,7 +194,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				h = sourceRectangle.Value.Height*scale.Y;
 			}
 			Draw (texture,
-				new Rectangle((int)position.X, (int)position.Y, (int)w, (int)h),
+				new Vector4(position.X, position.Y, w, h),
 				sourceRectangle,
 				color,
 				rotation,
@@ -226,6 +226,28 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void Draw (Texture2D texture,
 			Rectangle destinationRectangle,
+			Rectangle? sourceRectangle,
+			Color color,
+			float rotation,
+			Vector2 origin,
+			SpriteEffects effect,
+			float depth)
+		{
+			Draw (texture,
+			      new Vector4(destinationRectangle.X,
+			                  destinationRectangle.Y,
+			                  destinationRectangle.Width,
+			                  destinationRectangle.Height),
+			      sourceRectangle,
+			      color,
+			      rotation,
+			      origin,
+			      effect,
+			      depth);
+		}
+
+		private void Draw (Texture2D texture,
+			Vector4 destinationRectangle,
 			Rectangle? sourceRectangle,
 			Color color,
 			float rotation,
@@ -270,12 +292,12 @@ namespace Microsoft.Xna.Framework.Graphics
 				texCoordTL.X = temp;
 			}
 
-			item.Set (destinationRectangle.X, 
+			item.Set (destinationRectangle.X,
 					destinationRectangle.Y, 
 					-origin.X, 
 					-origin.Y, 
-					destinationRectangle.Width, 
-					destinationRectangle.Height, 
+					destinationRectangle.Z,
+					destinationRectangle.W,
 					(float)Math.Sin (rotation), 
 					(float)Math.Cos (rotation), 
 					color, 
