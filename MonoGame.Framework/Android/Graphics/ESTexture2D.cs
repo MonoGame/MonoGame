@@ -74,12 +74,16 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		public ESTexture2D(byte[] data, SurfaceFormat pixelFormat, int width, int height, Size size, ALL11 filter)
         {
+
 			if (GraphicsDevice.OpenGLESVersion != OpenTK.Graphics.GLContextVersion.Gles2_0)
             {
 				using(Bitmap bm = Bitmap.CreateBitmap(width, height, Bitmap.Config.Argb8888))
 				{
-				  bm.CopyPixelsFromBuffer(ByteBuffer.Wrap(data));
-			      InitWithBitmap(bm, filter);            						
+					using (var buffer = ByteBuffer.Wrap(data))
+					{
+				      bm.CopyPixelsFromBuffer(buffer);
+					}
+				    InitWithBitmap(bm, filter);            
 				}
 			}
 			else
@@ -101,11 +105,11 @@ namespace Microsoft.Xna.Framework.Graphics
         public ESTexture2D(IntPtr data, SurfaceFormat pixelFormat, int width, int height, Size size, ALL11 filter)
         {			
 			InitWithData(data, pixelFormat, width, height, size, filter);
-        }
+		}
 
         public ESTexture2D(Bitmap image, ALL11 filter)
         {
-            InitWithBitmap(image, filter);
+			InitWithBitmap(image, filter);		
         }
 
         public void InitWithBitmap(Bitmap imageSource, ALL11 filter)
