@@ -390,7 +390,7 @@ namespace Microsoft.Xna.Framework
                 // DOWN                
                 case 0:
                 case 5:
-                    index = collection.FindById(e.GetPointerId(e.ActionIndex), out tlocation);
+                    index = collection.FindIndexById(e.GetPointerId(e.ActionIndex), out tlocation);
                     if (index < 0)
                     {
                         tlocation = new TouchLocation(id, TouchLocationState.Pressed, position);
@@ -405,7 +405,7 @@ namespace Microsoft.Xna.Framework
                 // UP                
                 case 1:
                 case 6:
-                    index = collection.FindById(e.GetPointerId(e.ActionIndex), out tlocation);
+                    index = collection.FindIndexById(e.GetPointerId(e.ActionIndex), out tlocation);
                     if (index >= 0)
                     {
                         tlocation.State = TouchLocationState.Released;
@@ -420,7 +420,7 @@ namespace Microsoft.Xna.Framework
                         position.X = e.GetX(i);
                         position.Y = e.GetY(i);
                         UpdateTouchPosition(ref position);
-                        index = collection.FindById(id, out tlocation);
+                        index = collection.FindIndexById(id, out tlocation);
                         if (index >= 0)
                         {
                             tlocation.State = TouchLocationState.Moved;
@@ -432,7 +432,7 @@ namespace Microsoft.Xna.Framework
                 // CANCEL, OUTSIDE                
                 case 3:
                 case 4:
-                    index = collection.FindById(id, out tlocation);
+                    index = collection.FindIndexById(id, out tlocation);
                     if (index >= 0)
                     {
                         tlocation.State = TouchLocationState.Invalid;
