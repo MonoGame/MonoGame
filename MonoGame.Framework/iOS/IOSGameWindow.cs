@@ -522,7 +522,7 @@ namespace Microsoft.Xna.Framework
 				{
 					case UITouchPhase.Stationary:
 					case UITouchPhase.Moved:
-						index = collection.FindById(touch.Handle.ToInt32(), out tlocation);
+						index = collection.FindIndexById(touch.Handle.ToInt32(), out tlocation);
 						if (index >= 0)
 					    {
 							tlocation.State = TouchLocationState.Moved;
@@ -547,7 +547,7 @@ namespace Microsoft.Xna.Framework
 						}
 						break;
 					case UITouchPhase.Ended	:
-						index = collection.FindById(touch.Handle.ToInt32(), out tlocation);
+						index = collection.FindIndexById(touch.Handle.ToInt32(), out tlocation);
 						if (index >= 0)
 						{
 							tlocation.State = TouchLocationState.Released;							
@@ -562,7 +562,7 @@ namespace Microsoft.Xna.Framework
 						}
 						break;
 					case UITouchPhase.Cancelled:
-						index = collection.FindById(touch.Handle.ToInt32(), out tlocation);
+						index = collection.FindIndexById(touch.Handle.ToInt32(), out tlocation);
 						if (index >= 0)
 						{
 							tlocation.State = TouchLocationState.Invalid;
