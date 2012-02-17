@@ -47,6 +47,8 @@ using MonoMac.AppKit;
 using MonoMac.Foundation;
 #elif IPHONE
 using MonoTouch.UIKit;
+#elif ANDROID
+using Android.Views;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -67,6 +69,12 @@ namespace Microsoft.Xna.Framework.Graphics
         internal GraphicsAdapter(UIScreen screen)
         {
             _screen = screen;
+        }
+#elif ANDROID
+        private View _view;
+        internal GraphicsAdapter(View screen)
+        {
+            _view = screen;
         }
 #else
         internal GraphicsAdapter()
@@ -96,6 +104,8 @@ namespace Microsoft.Xna.Framework.Graphics
                        (int)(_screen.Bounds.Height * _screen.Scale),
                        60,
                        SurfaceFormat.Color);
+#elif ANDROID
+                return new DisplayMode(_view.Width, _view.Height, 60, SurfaceFormat.Color);
 #else
                 return new DisplayMode(800, 600, 60, SurfaceFormat.Color);
 #endif
@@ -120,6 +130,8 @@ namespace Microsoft.Xna.Framework.Graphics
 #elif IPHONE
 					adapters = new ReadOnlyCollection<GraphicsAdapter>(
 						new GraphicsAdapter[] {new GraphicsAdapter(UIScreen.MainScreen)});
+#elif ANDROID
+                    adapters = new ReadOnlyCollection<GraphicsAdapter>(new GraphicsAdapter[] { new GraphicsAdapter(Game.Instance.Window) });
 #else
                     adapters = new ReadOnlyCollection<GraphicsAdapter>(
 						new GraphicsAdapter[] {new GraphicsAdapter()});

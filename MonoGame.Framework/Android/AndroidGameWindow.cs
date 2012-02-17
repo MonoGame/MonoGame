@@ -81,7 +81,7 @@ namespace Microsoft.Xna.Framework
         public AndroidGameWindow(Context context, Game game) : base(context)
         {
             _game = game;
-            Initialize();							
+            Initialize();
         }		
 						
         private void Initialize()
@@ -155,7 +155,6 @@ namespace Microsoft.Xna.Framework
 			try
             {
                 GLContextVersion = GLContextVersion.Gles2_0;
-                GraphicsDevice.OpenGLESVersion = GLContextVersion;
 				base.CreateFrameBuffer();
 		    } 
 			catch (Exception) 
@@ -163,10 +162,14 @@ namespace Microsoft.Xna.Framework
 			{
 		        //device doesn't support OpenGLES 2.0; retry with 1.1:
                 GLContextVersion = GLContextVersion.Gles1_1;
-                GraphicsDevice.OpenGLESVersion = GLContextVersion;
 				base.CreateFrameBuffer();
 		    }
-			_game.GraphicsDevice.Initialize();
+            if (_game.GraphicsDevice != null)
+            {
+                _game.GraphicsDevice.Initialize();
+                if (!GraphicsContext.IsCurrent)
+                    MakeCurrent();
+            }
 		}
 	
 
@@ -344,8 +347,11 @@ namespace Microsoft.Xna.Framework
             }
 			
 			
-			CurrentOrientation = actualOrientation;      
-            _game.GraphicsDevice.PresentationParameters.DisplayOrientation = actualOrientation;
+			CurrentOrientation = actualOrientation;
+            if (_game.GraphicsDevice != null)
+            {
+                _game.GraphicsDevice.PresentationParameters.DisplayOrientation = actualOrientation;
+            }
             TouchPanel.DisplayOrientation = actualOrientation;
         }
 

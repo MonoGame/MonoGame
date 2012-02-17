@@ -7,6 +7,8 @@ namespace Microsoft.Xna.Framework.Graphics
 	{
 #if IPHONE
 		const string mojoshader_dll = "__Internal";
+#elif ANDROID
+		const string mojoshader_dll = "libmojoshader.so";
 #else
 		const string mojoshader_dll = "libmojoshader.dll";
 #endif

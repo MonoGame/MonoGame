@@ -23,7 +23,7 @@ using TexCoordPointerType = OpenTK.Graphics.ES11.All;
 
  #else
 using OpenTK.Graphics.ES20;
-  #if IPHONE
+  #if IPHONE || ANDROID
 using BlendEquationMode = OpenTK.Graphics.ES20.All;
 using BlendingFactorSrc = OpenTK.Graphics.ES20.All;
 using BlendingFactorDest = OpenTK.Graphics.ES20.All;
@@ -545,7 +545,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				glFormat = PixelFormat.Luminance;
 				glType = PixelType.UnsignedByte;
 				break;
-#if !IPHONE
+#if !IPHONE && !ANDROID
 			case SurfaceFormat.Dxt1:
 				glInternalFormat = PixelInternalFormat.CompressedRgbaS3tcDxt1Ext;
 				glFormat = (PixelFormat)All.CompressedTextureFormats;
@@ -560,7 +560,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				break;
 #endif
 				
-#if IPHONE
+#if IPHONE || ANDROID
 			case SurfaceFormat.RgbPvrtc2Bpp:
 				glInternalFormat = PixelInternalFormat.CompressedRgbPvrtc2Bppv1Img;
 				glFormat = (PixelFormat)All.CompressedTextureFormats;

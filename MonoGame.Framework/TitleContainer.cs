@@ -41,7 +41,9 @@
 using System;
 using System.IO;
 
+#if IPHONE
 using MonoTouch.Foundation;
+#endif
 
 namespace Microsoft.Xna.Framework
 {
@@ -49,15 +51,21 @@ namespace Microsoft.Xna.Framework
 	{
 		public static Stream OpenStream (string name)
 		{
+#if IPHONE
 			return File.OpenRead (GetFilename (name));
+#elif ANDROID
+            return Game.Activity.Assets.Open(GetFilename(name));
+#endif
 		}
 		
 		internal static string GetFilename(string name)
 		{
 			// Replace Windows path separators with local path separators
 			name = name.Replace('\\', Path.DirectorySeparatorChar);
-			string fileName = Path.Combine(NSBundle.MainBundle.ResourcePath, name);
-			return fileName;
+#if IPHONE
+			name = Path.Combine(NSBundle.MainBundle.ResourcePath, name);
+#endif
+			return name;
 		}
 	}
 }

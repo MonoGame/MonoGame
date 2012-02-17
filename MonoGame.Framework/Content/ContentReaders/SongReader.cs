@@ -48,21 +48,15 @@ namespace Microsoft.Xna.Framework.Content
 {
 	internal class SongReader : ContentTypeReader<Song>
 	{
-		public static string Normalize(string FileName)
+#if ANDROID
+        static string[] supportedExtensions = new string[] { ".mp3", ".ogg", ".mid" };
+#else
+        static string[] supportedExtensions = new string[] { ".mp3" };
+#endif
+
+        internal static string Normalize(string fileName)
 		{
-			if (File.Exists(FileName))
-				return FileName;
-			
-			// Check the file extension
-			if (!string.IsNullOrEmpty(Path.GetExtension(FileName)))
-			{
-				return null;
-			}
-			
-			// Concat the file name with valid extensions
-			if (File.Exists(FileName+".mp3"))
-				return FileName+".mp3";
-			return null;
+			return Normalize(fileName, supportedExtensions);
 		}
 
 		protected internal override Song Read(ContentReader input, Song existingInstance)
@@ -71,7 +65,7 @@ namespace Microsoft.Xna.Framework.Content
 			path = Path.Combine (input.ContentManager.RootDirectory, path);
 			path = TitleContainer.GetFilename(path);
 
-			int duration = input.ReadObject<int>();
+			/*int durationMS =*/ input.ReadObject<int>();
 			return new Song(path);
 		}
 	}

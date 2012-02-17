@@ -57,39 +57,18 @@ namespace Microsoft.Xna.Framework.Content
 			// Do nothing
 		}
 
-		public static string Normalize(string FileName)
-		{
-			if (File.Exists(FileName))
-				return FileName;
-			
-			// Check the file extension
-			if (!string.IsNullOrEmpty(Path.GetExtension(FileName)))
-			{
-				return null;
-			}
-			
-			// Concat the file name with valid extensions
-			if (File.Exists(FileName+".xnb"))
-				return FileName+".xnb";
-			if (File.Exists(FileName+".jpg"))
-				return FileName+".jpg";
-			if (File.Exists(FileName+".bmp"))
-				return FileName+".bmp";
-			if (File.Exists(FileName+".jpeg"))
-				return FileName+".jpeg";
-			if (File.Exists(FileName+".png"))
-				return FileName+".png";
-			if (File.Exists(FileName+".gif"))
-				return FileName+".gif";
-			if (File.Exists(FileName+".pict"))
-				return FileName+".pict";
-			if (File.Exists(FileName+".tga"))
-				return FileName+".tga";
-			
-			return null;
-		}
-		
-		protected internal override Texture2D Read(ContentReader reader, Texture2D existingInstance)
+#if ANDROID
+        static string[] supportedExtensions = new string[] { ".jpg", ".bmp", ".jpeg", ".png", ".gif" };
+#else
+        static string[] supportedExtensions = new string[] { ".jpg", ".bmp", ".jpeg", ".png", ".gif", ".pict", ".tga" };
+#endif
+
+        internal static string Normalize(string fileName)
+        {
+            return Normalize(fileName, supportedExtensions);
+        }
+
+        protected internal override Texture2D Read(ContentReader reader, Texture2D existingInstance)
 		{
 			Texture2D texture = null;
 			
@@ -112,7 +91,9 @@ namespace Microsoft.Xna.Framework.Content
 				default:
 					throw new NotImplementedException();
 				}
-			} else {
+			}
+            else
+            {
 				surfaceFormat = (SurfaceFormat)reader.ReadInt32 ();
 			}
 			
@@ -123,7 +104,7 @@ namespace Microsoft.Xna.Framework.Content
 			SurfaceFormat convertedFormat = surfaceFormat;
 			switch (surfaceFormat)
 			{
-#if IPHONE
+#if IPHONE || ANDROID
 				case SurfaceFormat.Dxt1:
 				case SurfaceFormat.Dxt3:
 				case SurfaceFormat.Dxt5:
@@ -148,25 +129,28 @@ namespace Microsoft.Xna.Framework.Content
 			{
 				int levelDataSizeInBytes = (reader.ReadInt32 ());
 				byte[] levelData = reader.ReadBytes (levelDataSizeInBytes);
-			
+                int levelWidth = width >> level;
+                int levelHeight = height >> level;
 				//Convert the image data if required
 				switch(surfaceFormat) {
-#if IPHONE
+#if IPHONE || ANDROID
 				//no Dxt in OpenGL ES
 				case SurfaceFormat.Dxt1:
-					levelData = DxtUtil.DecompressDxt1(levelData, width, height);
+					levelData = DxtUtil.DecompressDxt1(levelData, levelWidth, levelHeight);
 					break;
 				case SurfaceFormat.Dxt3:
-					levelData = DxtUtil.DecompressDxt3(levelData, width, height);
+                    levelData = DxtUtil.DecompressDxt3(levelData, levelWidth, levelHeight);
 					break;
 				case SurfaceFormat.Dxt5:
-					levelData = DxtUtil.DecompressDxt5(levelData, width, height);
+                    levelData = DxtUtil.DecompressDxt5(levelData, levelWidth, levelHeight);
 					break;
 #endif
 				case SurfaceFormat.NormalizedByte4:
-					int pitch = width*4;
-					for (int y=0; y<height; y++) {
-						for (int x=0; x<width; x++) {
+                    int pitch = levelWidth * 4;
+                    for (int y = 0; y < levelHeight; y++)
+                    {
+                        for (int x = 0; x < levelWidth; x++)
+                        {
 							int color = BitConverter.ToInt32(levelData, y*pitch+x*4);
 							levelData[y*pitch+x*4]   = (byte)(((color >> 16) & 0xff)); //R:=W
 							levelData[y*pitch+x*4+1] = (byte)(((color >> 8 ) & 0xff)); //G:=V

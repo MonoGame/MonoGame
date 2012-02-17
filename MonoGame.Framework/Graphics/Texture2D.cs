@@ -72,6 +72,9 @@ using PixelType = OpenTK.Graphics.ES20.All;
 
 using Microsoft.Xna.Framework.Content;
 
+#if ANDROID
+using Android.Graphics;
+#endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -106,7 +109,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			this.glTarget = TextureTarget.Texture2D;
 			
-#if IPHONE
+#if IPHONE || ANDROID
 			GL.GenTextures(1, ref this.glTexture);
 #else
 			GL.GenTextures(1, out this.glTexture);
@@ -156,7 +159,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			else
 			{
 				GL.TexImage2D(TextureTarget.Texture2D, 0,
-#if IPHONE
+#if IPHONE || ANDROID
 				              (int)glInternalFormat,
 #else				           
 				              glInternalFormat,
@@ -167,7 +170,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			if (mipmap)
 			{
-#if IPHONE
+#if IPHONE || ANDROID
 				GL.GenerateMipmap(TextureTarget.Texture2D);
 #else
 				GL.TexParameter (TextureTarget.Texture2D,
@@ -322,6 +325,35 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 				return texture;
 			}
+#elif ANDROID
+            Bitmap image = BitmapFactory.DecodeStream(stream);
+
+            var width = image.Width;
+            var height = image.Height;
+#if ES11
+            //scale up bitmap to be power of 2 dimensions but dont exceed 1024x1024.
+            //Note: may not have to do this with OpenGL 2+
+            width = (int)Math.Pow(2, Math.Min(10, Math.Ceiling(Math.Log10(imageSource.Width) / Math.Log10(2))));
+            height = (int)Math.Pow(2, Math.Min(10, Math.Ceiling(Math.Log10(imageSource.Height) / Math.Log10(2))));
+#endif
+            var texture = new Texture2D(graphicsDevice, width, height, false, SurfaceFormat.Color);
+
+            int[] pixels = new int[width * height];
+            if ((width != image.Width) || (height != image.Height))
+            {
+                Bitmap imagePadded = Bitmap.CreateBitmap(width, height, Bitmap.Config.Argb8888);
+                Canvas canvas = new Canvas(imagePadded);
+                canvas.DrawARGB(0, 0, 0, 0);
+                canvas.DrawBitmap(image, 0, 0, null);
+                imagePadded.GetPixels(pixels, 0, width, 0, 0, width, height);
+            }
+            else
+            {
+                image.GetPixels(pixels, 0, width, 0, 0, width, height);
+            }
+            texture.SetData<int>(pixels);
+
+            return texture;
 #else
             using (Bitmap image = (Bitmap)Bitmap.FromStream(stream))
             {
@@ -342,7 +374,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 return texture;
             }
 #endif
-		}
+        }
 		
 		//What was this for again?
 		internal void Reload(Stream textureStream)
