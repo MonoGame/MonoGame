@@ -47,7 +47,7 @@ namespace Microsoft.Xna.Framework
 	{
 		public static Stream OpenStream (string name)
 		{
-			return new FileStream(name, FileMode.Open, FileAccess.Read, FileShare.Read); 
+			return new FileStream(name, FileMode.Open, FileAccess.Read, FileShare.Read);
 		}
 	}
 }
