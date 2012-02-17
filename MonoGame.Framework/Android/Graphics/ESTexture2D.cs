@@ -67,7 +67,8 @@ namespace Microsoft.Xna.Framework.Graphics
         // Stored until texture is created
         private Bitmap _originalBitmap;
         private ALL11 _originalFilter;
-		
+		private ALL11 _originalWrap;
+
 		internal Size Size
 		{
 			get { return _size;}
@@ -85,17 +86,29 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void InitWithBitmap(Bitmap imageSource, ALL11 filter)
         {
-            //TODO:  Android.Opengl.GLUtils.GetInternalFormat()
+			// The default wrap mode is Repeat
+			InitWithBitmap(imageSource, filter, ALL11.Repeat);
+		}
+
+		public void InitWithBitmap(Bitmap imageSource, ALL11 filter, ALL11 wrap)
+		{
+			//TODO:  Android.Opengl.GLUtils.GetInternalFormat()
 
             _format = SurfaceFormat.Color;
             if (imageSource.HasAlpha)
                 _format = SurfaceFormat.Color;
 
-			// On a Google Nexus S, it appears that textures still require to be pow2
-			if (false) //GraphicsDevice.OpenGLESVersion == OpenTK.Graphics.GLContextVersion.Gles2_0)
+			if (GraphicsDevice.OpenGLESVersion == OpenTK.Graphics.GLContextVersion.Gles2_0)
             {
                 _width = imageSource.Width;
                 _height = imageSource.Height;
+
+				// There are rules for npot textures that we must abide by (wrap = ClampToEdge and filter = Nearest or Linear)
+				if (!MathHelper.IsPowerOfTwo(_width) || !MathHelper.IsPowerOfTwo(_height))
+				{
+					filter = ALL11.Linear;
+					wrap = ALL11.ClampToEdge;
+				}
             }
             else
             {
@@ -122,6 +135,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 _originalBitmap = imageSource;
                 _originalFilter = filter;
+				_originalWrap = wrap;
                 PrimaryThreadLoader.AddToList(this);
             }
             else
@@ -142,7 +156,9 @@ namespace Microsoft.Xna.Framework.Graphics
                                           (int)filter);
                         GL20.TexParameter(ALL20.Texture2D, ALL20.TextureMagFilter,
                                           (int)filter);
-                        Android.Opengl.GLUtils.TexImage2D((int)ALL20.Texture2D, 0,
+						GL20.TexParameter(ALL20.Texture2D, ALL20.TextureWrapS, (int)wrap);
+						GL20.TexParameter(ALL20.Texture2D, ALL20.TextureWrapT, (int)wrap);
+						Android.Opengl.GLUtils.TexImage2D((int)ALL20.Texture2D, 0,
                                                           imagePadded, 0);
 
                         // error checking
@@ -158,7 +174,9 @@ namespace Microsoft.Xna.Framework.Graphics
                                           (int)filter);
                         GL11.TexParameter(ALL11.Texture2D, ALL11.TextureMagFilter,
                                           (int)filter);
-                        Android.Opengl.GLUtils.TexImage2D((int)ALL11.Texture2D, 0,
+						GL11.TexParameter(ALL11.Texture2D, ALL11.TextureWrapS, (int)wrap);
+						GL11.TexParameter(ALL11.Texture2D, ALL11.TextureWrapT, (int)wrap);
+						Android.Opengl.GLUtils.TexImage2D((int)ALL11.Texture2D, 0,
                                                           imagePadded, 0);
 
                         // free bitmap
@@ -173,15 +191,24 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void InitWithData(IntPtr data, SurfaceFormat pixelFormat, int width, int height, Size size, ALL11 filter)
         {
+			InitWithData(data, pixelFormat, width, height, size, filter, ALL11.Repeat);
+		}
+
+		public void InitWithData(IntPtr data, SurfaceFormat pixelFormat, int width, int height, Size size, ALL11 filter, ALL11 wrap)
+		{
             if (GraphicsDevice.OpenGLESVersion == OpenTK.Graphics.GLContextVersion.Gles2_0)
             {
-
+				if (!MathHelper.IsPowerOfTwo(width) || !MathHelper.IsPowerOfTwo(height))
+				{
+					filter = ALL11.Linear;
+					wrap = ALL11.ClampToEdge;
+				}
                 GL20.GenTextures(1, ref _name);
                 GL20.BindTexture(ALL20.Texture2D, _name);
                 GL20.TexParameter(ALL20.Texture2D, ALL20.TextureMinFilter, (int)filter);
                 GL20.TexParameter(ALL20.Texture2D, ALL20.TextureMagFilter, (int)filter);
-                GL20.TexParameter(ALL20.Texture2D, ALL20.TextureWrapS, (int)ALL20.ClampToEdge);
-                GL20.TexParameter(ALL20.Texture2D, ALL20.TextureWrapT, (int)ALL20.ClampToEdge);
+                GL20.TexParameter(ALL20.Texture2D, ALL20.TextureWrapS, (int)wrap);
+                GL20.TexParameter(ALL20.Texture2D, ALL20.TextureWrapT, (int)wrap);
 
                 switch (pixelFormat)
                 {
@@ -216,26 +243,20 @@ namespace Microsoft.Xna.Framework.Graphics
                 GL11.TexParameter(ALL11.Texture2D, ALL11.TextureWrapS, (int)ALL11.ClampToEdge);
                 GL11.TexParameter(ALL11.Texture2D, ALL11.TextureWrapT, (int)ALL11.ClampToEdge);
 
-                int sz = 0;
-
                 switch (pixelFormat)
                 {
                     case SurfaceFormat.Color /*kTexture2DPixelFormat_RGBA8888*/:
                     case SurfaceFormat.Dxt1:
                     case SurfaceFormat.Dxt3:
-                        sz = 4;
                         GL11.TexImage2D(ALL11.Texture2D, 0, (int)ALL11.Rgba, (int)width, (int)height, 0, ALL11.Rgba, ALL11.UnsignedByte, data);
                         break;
                     case SurfaceFormat.Bgra4444 /*kTexture2DPixelFormat_RGBA4444*/:
-                        sz = 2;
                         GL11.TexImage2D(ALL11.Texture2D, 0, (int)ALL11.Rgba, (int)width, (int)height, 0, ALL11.Rgba, ALL11.UnsignedShort4444, data);
                         break;
                     case SurfaceFormat.Bgra5551 /*kTexture2DPixelFormat_RGB5A1*/:
-                        sz = 2;
                         GL11.TexImage2D(ALL11.Texture2D, 0, (int)ALL11.Rgba, (int)width, (int)height, 0, ALL11.Rgba, ALL11.UnsignedShort5551, data);
                         break;
                     case SurfaceFormat.Alpha8 /*kTexture2DPixelFormat_A8*/:
-                        sz = 1;
                         GL11.TexImage2D(ALL11.Texture2D, 0, (int)ALL11.Alpha, (int)width, (int)height, 0, ALL11.Alpha, ALL11.UnsignedByte, data);
                         break;
                     default:
@@ -255,7 +276,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (_originalBitmap == null) return;
 
-            InitWithBitmap(_originalBitmap, _originalFilter);
+            InitWithBitmap(_originalBitmap, _originalFilter, _originalWrap);
             if (_name != 0)
             {
                 _originalBitmap.Dispose();
