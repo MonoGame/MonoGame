@@ -463,6 +463,16 @@ namespace Microsoft.Xna.Framework.Graphics
 			// Configure Display Orientation:
 			if(lastDisplayOrientation != graphicsDevice.PresentationParameters.DisplayOrientation)
 			{
+				// check the display width and height make sure it matches the target orientation
+				// before updating the matrix
+				if (graphicsDevice.PresentationParameters.DisplayOrientation == DisplayOrientation.Portrait)
+				{
+				   if (graphicsDevice.DisplayMode.Width > graphicsDevice.DisplayMode.Height) return;	
+				}
+				else
+				{
+					if (graphicsDevice.DisplayMode.Width < graphicsDevice.DisplayMode.Height) return;
+				}
 				// updates last display orientation (optimization)				
 				lastDisplayOrientation = graphicsDevice.PresentationParameters.DisplayOrientation;
 				
