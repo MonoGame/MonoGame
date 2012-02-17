@@ -91,7 +91,8 @@ namespace Microsoft.Xna.Framework.Graphics
             if (imageSource.HasAlpha)
                 _format = SurfaceFormat.Color;
 
-            if (GraphicsDevice.OpenGLESVersion == OpenTK.Graphics.GLContextVersion.Gles2_0)
+			// On a Google Nexus S, it appears that textures still require to be pow2
+			if (false) //GraphicsDevice.OpenGLESVersion == OpenTK.Graphics.GLContextVersion.Gles2_0)
             {
                 _width = imageSource.Width;
                 _height = imageSource.Height;
