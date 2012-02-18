@@ -147,7 +147,7 @@ namespace Microsoft.Xna.Framework
                 default:
                     throw new NotImplementedException();
 		    }
-			_game.GraphicsDevice.Initialize();
+			_game.GraphicsDevice.Initialize(_game.Platform);
 		}
 
         private void StartES2_0()

@@ -64,6 +64,7 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public class GraphicsDevice : IDisposable
     {
+        private GamePlatform _platform;
         private ALL11 _preferedFilter;
         private int _activeTexture = -1;
         private Viewport _viewport;
@@ -78,7 +79,10 @@ namespace Microsoft.Xna.Framework.Graphics
         private VertexBuffer _vertexBuffer = null;
         private IndexBuffer _indexBuffer = null;
         private uint VboIdArray;
+        private uint[] VboIdArrays;
         private uint VboIdElement;
+        private int _currentArray;
+        private int _vbosAllocated = 1;
 
         public RasterizerState RasterizerState { get; set; }
 
@@ -127,6 +131,94 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        /// <summary>
+        /// This value indicates the # of VBO's the DrawUserPrimitive calls can cylce between.
+        /// Increase this to improve performance per frame.  Though, the more you have allocated
+        /// the more video memory permanently consumed.
+        /// </summary>
+        public int VBOsAllocated
+        {
+            get { return _vbosAllocated; }
+
+            set
+            {
+                var generate = false;
+                if (VboIdArrays != null)
+                {
+                    generate = true;
+                    if(_vbosAllocated > 0)
+                    {
+#if IPHONE
+			if(OpenGLESVersion == EAGLRenderingAPI.OpenGLES2)
+#elif ANDROID
+                        if (OpenGLESVersion == GLContextVersion.Gles2_0)
+#else
+            if (false)
+#endif
+                        {
+                            GL20.DeleteBuffers(_vbosAllocated, VboIdArrays);
+                        }
+                        else
+                        {
+                            GL11.DeleteBuffers(_vbosAllocated, VboIdArrays);
+                        }
+                    }
+                }
+
+                _vbosAllocated = value;
+
+                if(generate)
+                    GenerateVBOs();
+            }
+        }
+
+        private void GenerateVBOs()
+        {
+#if IPHONE
+			if(OpenGLESVersion == EAGLRenderingAPI.OpenGLES2)
+#elif ANDROID
+            if (OpenGLESVersion == GLContextVersion.Gles2_0)
+#else
+            if (false)
+#endif
+            {
+                OpenTK.Graphics.ES20.GL.GetError();
+
+                VboIdArrays = new uint[_vbosAllocated];
+                GL20.GenBuffers(_vbosAllocated, VboIdArrays);
+
+                var er = OpenTK.Graphics.ES20.GL.GetError();
+                if (er != OpenTK.Graphics.ES20.All.NoError)
+                {
+                    VboIdArrays = null;
+                }
+            }
+            else
+            {
+                OpenTK.Graphics.ES11.GL.GetError();
+
+                VboIdArrays = new uint[_vbosAllocated];
+                GL11.GenBuffers(_vbosAllocated, VboIdArrays);
+
+                var er = OpenTK.Graphics.ES11.GL.GetError();
+                if (er != OpenTK.Graphics.ES11.All.NoError)
+                {
+                    VboIdArrays = null;
+                }
+            }
+            _currentArray = 0;
+        }
+
+        private void MoveToNextVBO()
+        {
+            _currentArray++;
+
+            if (_currentArray >= _vbosAllocated)
+            {
+                _currentArray = 0;
+            }
+        }
+
         public bool IsDisposed
         {
             get
@@ -151,8 +243,9 @@ namespace Microsoft.Xna.Framework.Graphics
             RasterizerState = new RasterizerState();
         }
 
-        internal void Initialize()
+        internal void Initialize(GamePlatform platform)
         {
+            _platform = platform;
             
 #if IPHONE
             if (OpenGLESVersion == EAGLRenderingAPI.OpenGLES2)
@@ -167,7 +260,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }else{
                 // Initialize OpenGL states
                 GL11.Disable(ALL11.DepthTest);
-                GL11.TexEnv(ALL11.TextureEnv, ALL11.TextureEnvMode, (int)ALL11.BlendSrc);
+                GL11.TexEnv(ALL11.TextureEnv, ALL11.TextureEnvMode, (int)ALL11.Replace);
             }
             VboIdArray = 0;
             VboIdElement = 0;
@@ -351,6 +444,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void Present()
         {
+#if ANDROID
+            _platform.Present();
+#else
 #if IPHONE
             if (OpenGLESVersion == EAGLRenderingAPI.OpenGLES2)
 #elif ANDROID
@@ -361,6 +457,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 GL20.Flush();
             else
                 GL11.Flush();
+#endif
         }
 
         public void Present(Rectangle? sourceRectangle, Rectangle? destinationRectangle, IntPtr overrideWindowHandle)
@@ -810,13 +907,13 @@ namespace Microsoft.Xna.Framework.Graphics
                 GL11.BindBuffer(ALL11.ElementArrayBuffer, 0);
 
                 //Create VBO if not created already
-                if (VboIdArray == 0)
-                    GL11.GenBuffers(1, ref VboIdArray);
+                if (VboIdArrays == null)
+                {
+                    GenerateVBOs();
+                }
 
                 // Bind the VBO
-                GL11.BindBuffer(ALL11.ArrayBuffer, VboIdArray);
-                ////Clear previous data
-                GL11.BufferData(ALL11.ArrayBuffer, (IntPtr)0, (IntPtr)null, ALL11.DynamicDraw);
+                GL11.BindBuffer(ALL11.ArrayBuffer, VboIdArrays[_currentArray]);
 
                 //Get VertexDeclaration
                 var vd = VertexDeclaration.FromType(typeof(T));
@@ -828,6 +925,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 GL11.BufferData(ALL11.ArrayBuffer,
                                 (IntPtr)(vd.VertexStride * GetElementCountArray(primitiveType, primitiveCount) + vertexOffset * vd.VertexStride),
                                 vertexData, ALL11.DynamicDraw);
+                handle.Free();
 
                 //Setup VertexDeclaration
                 VertexDeclaration.PrepareForUse(vd);
@@ -839,8 +937,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 // Free resources
                 GL11.BindBuffer(ALL11.ArrayBuffer, 0);
-                GL11.BindBuffer(ALL11.ElementArrayBuffer, 0);
-                handle.Free();
+
+                MoveToNextVBO();
             }
         }
 

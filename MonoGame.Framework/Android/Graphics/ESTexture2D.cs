@@ -161,6 +161,7 @@ namespace Microsoft.Xna.Framework.Graphics
                                           (int)filter);
                         GL11.TexParameter(ALL11.Texture2D, ALL11.TextureMagFilter,
                                           (int)filter);
+                        GL11.TexParameter(ALL11.Texture2D, ALL11.GenerateMipmap, 1);
                         Android.Opengl.GLUtils.TexImage2D((int)ALL11.Texture2D, 0,
                                                           imagePadded, 0);
 

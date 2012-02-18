@@ -227,7 +227,7 @@ namespace Microsoft.Xna.Framework
 			this.Window.ResetElapsedTime();			
 		}
 
-        public override void SwapBuffers()
+        public override void Present()
         {
             try
             {

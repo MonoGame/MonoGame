@@ -87,7 +87,7 @@ namespace Microsoft.Xna.Framework
 
         private GameComponentCollection _components;
         private GameServiceContainer _services;
-        private GamePlatform _platform;
+        internal GamePlatform Platform;
 
         private SortingFilteringCollection<IDrawable> _drawables =
             new SortingFilteringCollection<IDrawable>(
@@ -124,10 +124,10 @@ namespace Microsoft.Xna.Framework
             _components = new GameComponentCollection();
             Content = new ContentManager(_services);
 
-            _platform = GamePlatform.Create(this);
-            _platform.Activated += Platform_Activated;
-            _platform.Deactivated += Platform_Deactivated;
-            _services.AddService(typeof(GamePlatform), _platform);
+            Platform = GamePlatform.Create(this);
+            Platform.Activated += Platform_Activated;
+            Platform.Deactivated += Platform_Deactivated;
+            _services.AddService(typeof(GamePlatform), Platform);
         }
 
         ~Game()
@@ -138,7 +138,7 @@ namespace Microsoft.Xna.Framework
 		[System.Diagnostics.Conditional("DEBUG")]
 		internal void Log(string Message)
 		{
-			if (_platform != null) _platform.Log(Message);
+			if (Platform != null) Platform.Log(Message);
 		}
 
         #region IDisposable Implementation
@@ -154,7 +154,7 @@ namespace Microsoft.Xna.Framework
         {
             if (disposing)
             {
-                _platform.Dispose();
+                Platform.Dispose();
             }
             _isDisposed = true;
         }
@@ -195,13 +195,13 @@ namespace Microsoft.Xna.Framework
 
         public bool IsActive
         {
-            get { return _platform.IsActive; }
+            get { return Platform.IsActive; }
         }
 
         public bool IsMouseVisible
         {
-            get { return _platform.IsMouseVisible; }
-            set { _platform.IsMouseVisible = value; }
+            get { return Platform.IsMouseVisible; }
+            set { Platform.IsMouseVisible = value; }
         }
 
         public TimeSpan TargetElapsedTime
@@ -211,7 +211,7 @@ namespace Microsoft.Xna.Framework
             {
                 // Give GamePlatform implementations an opportunity to override
                 // the new value.
-                value = _platform.TargetElapsedTimeChanging(value);
+                value = Platform.TargetElapsedTimeChanging(value);
 
                 if (value <= TimeSpan.Zero)
                     throw new ArgumentOutOfRangeException(
@@ -220,7 +220,7 @@ namespace Microsoft.Xna.Framework
                 if (value != _targetElapsedTime)
                 {
                     _targetElapsedTime = value;
-                    _platform.TargetElapsedTimeChanged();
+                    Platform.TargetElapsedTimeChanged();
                 }
             }
         }
@@ -256,7 +256,7 @@ namespace Microsoft.Xna.Framework
 #if ANDROID
         public AndroidGameWindow Window
         {
-            get { return _platform.Window; }
+            get { return Platform.Window; }
         }
 #else
         public GameWindow Window
@@ -294,7 +294,7 @@ namespace Microsoft.Xna.Framework
         public void Exit()
         {
             Raise(Exiting, EventArgs.Empty);
-            _platform.Exit();
+            Platform.Exit();
         }
 
         public void ResetElapsedTime()
@@ -305,19 +305,19 @@ namespace Microsoft.Xna.Framework
             //        Now that things are more unified, it may be possible to
             //        consolidate this logic back into the Game class.
             //        Regardless, an empty implementation is not correct.
-            _platform.ResetElapsedTime();
+            Platform.ResetElapsedTime();
             _gameTime.ResetElapsedTime();
         }
 
         public void Run()
         {
-            Run(_platform.DefaultRunBehavior);
+            Run(Platform.DefaultRunBehavior);
         }
 
         public void Run(GameRunBehavior runBehavior)
         {
             AssertNotDisposed();
-            if (!_platform.BeforeRun())
+            if (!Platform.BeforeRun())
                 return;
 
             // In an original XNA game the GraphicsDevice property is null
@@ -330,7 +330,7 @@ namespace Microsoft.Xna.Framework
             graphicsDeviceManager.CreateDevice();
             applyChanges(graphicsDeviceManager);
 
-            _platform.BeforeInitialize();
+            Platform.BeforeInitialize();
             Initialize();
             _initialized = true;
 
@@ -338,11 +338,11 @@ namespace Microsoft.Xna.Framework
             switch (runBehavior)
             {
             case GameRunBehavior.Asynchronous:
-                _platform.AsyncRunLoopEnded += Platform_AsyncRunLoopEnded;
-                _platform.StartRunLoop();
+                Platform.AsyncRunLoopEnded += Platform_AsyncRunLoopEnded;
+                Platform.StartRunLoop();
                 break;
             case GameRunBehavior.Synchronous:
-                _platform.RunLoop();
+                Platform.RunLoop();
                 EndRun();
                 break;
             default:
@@ -397,7 +397,7 @@ namespace Microsoft.Xna.Framework
             if (doDraw)
             {
                 DoDraw(_gameTime);
-                _platform.SwapBuffers();
+                GraphicsDevice.Present();
             }
         }
 
@@ -521,11 +521,11 @@ namespace Microsoft.Xna.Framework
 
         internal void applyChanges(GraphicsDeviceManager manager)
         {
-			_platform.BeginScreenDeviceChange(GraphicsDevice.PresentationParameters.IsFullScreen);
+			Platform.BeginScreenDeviceChange(GraphicsDevice.PresentationParameters.IsFullScreen);
             if (GraphicsDevice.PresentationParameters.IsFullScreen)
-                _platform.EnterFullScreen();
+                Platform.EnterFullScreen();
             else
-                _platform.ExitFullScreen();
+                Platform.ExitFullScreen();
 
             // FIXME: Is this the correct/best way to set the viewport?  There
             //        are/were several snippets like this through the project.
@@ -537,13 +537,13 @@ namespace Microsoft.Xna.Framework
             viewport.Height = GraphicsDevice.PresentationParameters.BackBufferHeight;
 
             GraphicsDevice.Viewport = viewport;
-			_platform.EndScreenDeviceChange(string.Empty, viewport.Width, viewport.Height);
+			Platform.EndScreenDeviceChange(string.Empty, viewport.Width, viewport.Height);
         }
 
         internal void DoUpdate(GameTime gameTime)
         {
             AssertNotDisposed();
-            if (_platform.BeforeUpdate(gameTime))
+            if (Platform.BeforeUpdate(gameTime))
                 Update(gameTime);
         }
 
@@ -553,7 +553,7 @@ namespace Microsoft.Xna.Framework
             // Draw and EndDraw should not be called if BeginDraw returns false.
             // http://stackoverflow.com/questions/4054936/manual-control-over-when-to-redraw-the-screen/4057180#4057180
             // http://stackoverflow.com/questions/4235439/xna-3-1-to-4-0-requires-constant-redraw-or-will-display-a-purple-screen
-            if (_platform.BeforeDraw(gameTime) && BeginDraw())
+            if (Platform.BeforeDraw(gameTime) && BeginDraw())
             {
                 Draw(gameTime);
                 EndDraw();
@@ -563,7 +563,7 @@ namespace Microsoft.Xna.Framework
         internal void DoInitialize()
         {
             AssertNotDisposed();
-            _platform.BeforeInitialize();
+            Platform.BeforeInitialize();
             Initialize();
         }
 
