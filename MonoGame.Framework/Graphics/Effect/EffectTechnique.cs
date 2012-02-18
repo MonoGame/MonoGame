@@ -20,6 +20,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				Passes._passes.Add (new EffectPass(this, technique.pass_handles[i]));
 			}
         }
+
         public EffectTechnique(Effect effect, GLSLEffectObject.glslTechnique technique)
         {
             Passes = new EffectPassCollection(this);
