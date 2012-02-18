@@ -16,7 +16,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug</OutputPath>
-    <DefineConstants>DEBUG;MONOMAC</DefineConstants>
+    <DefineConstants>DEBUG;MONOMAC;GLSL_EFFECTS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
@@ -395,6 +395,8 @@
     <Compile Include="Content\ContentReaders\AlphaTestEffectReader.cs" />
     <Compile Include="Graphics\Texture2D.cs" />
     <Compile Include="Graphics\SpriteFont.cs" />
+    <Compile Include="Graphics\Effect\GLSLEffectObject.cs" />
+    <Compile Include="Graphics\Effect\GLSLShader.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />
@@ -429,7 +431,9 @@
     <EmbeddedResource Include="Graphics\Effect\DualTextureEffect.bin" />
     <EmbeddedResource Include="Graphics\Effect\EnvironmentMapEffect.bin" />
     <EmbeddedResource Include="Graphics\Effect\SkinnedEffect.bin" />
+    <EmbeddedResource Include="Graphics\Effect\SpriteEffectGLSL.bin" />
     <EmbeddedResource Include="Graphics\Effect\SpriteEffect.bin" />
+    <EmbeddedResource Include="Graphics\Effect\BasicEffectGLSL.bin" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.MacOS.csproj">
