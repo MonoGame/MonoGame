@@ -16,7 +16,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug</OutputPath>
-    <DefineConstants>DEBUG;MONOMAC;GLSL_EFFECTS</DefineConstants>
+    <DefineConstants>DEBUG;MONOMAC</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
@@ -434,6 +434,10 @@
     <EmbeddedResource Include="Graphics\Effect\SpriteEffectGLSL.bin" />
     <EmbeddedResource Include="Graphics\Effect\SpriteEffect.bin" />
     <EmbeddedResource Include="Graphics\Effect\BasicEffectGLSL.bin" />
+    <EmbeddedResource Include="Graphics\Effect\AlphaTestEffectGLSL.bin" />
+    <EmbeddedResource Include="Graphics\Effect\DualTextureEffectGLSL.bin" />
+    <EmbeddedResource Include="Graphics\Effect\EnvironmentMapEffectGLSL.bin" />
+    <EmbeddedResource Include="Graphics\Effect\SkinnedEffectGLSL.bin" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.MacOS.csproj">
