@@ -25,7 +25,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private static All11 _cull = All11.Ccw; // default
 
         public static void TextureCoordArray(bool enable)
-        {			
+        {						
             if (enable && (_textureCoordArray != GLStateEnabled.True))
                 GL11.EnableClientState(All11.TextureCoordArray);
             else
