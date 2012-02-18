@@ -53,9 +53,6 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		/// </summary>
 		private bool isConnected;
 		
-		//Helpers
-		private List<TouchLocation> aux;
-		
 		#region Properties
 		public bool IsConnected
 		{
@@ -75,7 +72,6 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		
 		public TouchCollection()
 		{
-			aux = new List<TouchLocation>();
 		}
 		
 		internal TouchCollection(IEnumerable<TouchLocation> locations)	: base (locations)
@@ -83,16 +79,10 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			
 		}
 		
-		public bool Contains(TouchLocation item)
-		{
-			return (this.IndexOf(item) >= 0);
-		}
-		
 		internal void Update()
 		{ 
 			//Console.WriteLine("----------------"+this.Count+"--------------------");
-			aux.Clear();
-			for (int i = 0;  i <  this.Count; i++)
+			for (int i = this.Count - 1; i >= 0; --i)
 			{
 				TouchLocation t = this[i];
 				switch (t.State)
@@ -107,36 +97,25 @@ namespace Microsoft.Xna.Framework.Input.Touch
 						this[i] = t;
 					break;
 					case TouchLocationState.Released:
-						aux.Add(t);
+						this.RemoveAt(i);
 					break;
 				}
 			}
-			foreach(TouchLocation touch in aux)
-				this.Remove(touch);
 		}
-		
-		public void CopyTo (TouchLocation[] array, int arrayIndex)
+
+		public bool FindById(int id, out TouchLocation touchLocation)
 		{
-			if (array == null)
+			int index = this.FindIndex((t) => { return t.Id == id; });
+			if (index >= 0)
 			{
-				throw new ArgumentNullException("array");
+				touchLocation = this[index];
+				return true;
 			}
-			if (arrayIndex < 0)
-			{
-				throw new ArgumentOutOfRangeException("arrayIndex");
-			}
-			long num = arrayIndex + this.Count;
-			if (array.Length < num)
-			{
-				throw new ArgumentOutOfRangeException("arrayIndex");
-			}
-			for(int i = 0; i < this.Count; i++)
-			{
-				array[arrayIndex+i] = this[i];
-			}
+			touchLocation = default(TouchLocation);
+			return false;
 		}
-		
-		public int FindById(int id, out TouchLocation touchLocation)
+
+		internal int FindIndexById(int id, out TouchLocation touchLocation)
 		{
 			for (int i = 0; i < this.Count; i++)
 			{
@@ -147,22 +126,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
 					return i;
 				}
 			}
-			touchLocation = new TouchLocation();
+			touchLocation = default(TouchLocation);
 			return -1;
 		}
-		
-		
-		public int IndexOf(TouchLocation item)
-		{
-			for (int i = 0; i < this.Count; i++)
-			{
-				if (this[i] == item)
-				{
-					return i;
-				}
-			}
-			return -1;
-		}
-		
 	}
 }
