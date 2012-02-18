@@ -8,6 +8,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		internal List<EffectAnnotation> _annotations;
 		public EffectAnnotationCollection ()
 		{
+			_annotations = new List<EffectAnnotation>();
 		}
 		
 		public int Count {
