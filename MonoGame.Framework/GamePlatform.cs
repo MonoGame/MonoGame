@@ -84,12 +84,10 @@ namespace Microsoft.Xna.Framework
             return new iOSGamePlatform(game);
 #elif MONOMAC
             return new MacGamePlatform(game);
-#elif WINDOWS
+#elif WINDOWS || LINUX
             return new OpenTKGamePlatform(game);
 #elif ANDROID
             return new AndroidGamePlatform(game);
-#elif LINUX
-            return new LinuxGamePlatform(game);
 #endif
         }
 

@@ -45,7 +45,7 @@ using System.Runtime.InteropServices;
 #if MONOMAC
 using MonoMac.OpenGL;
 using GL_Oes = MonoMac.OpenGL.GL;
-#elif WINDOWS
+#elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
 using GL_Oes = OpenTK.Graphics.OpenGL.GL;
 #else
