@@ -1665,7 +1665,6 @@ namespace Microsoft.Xna.Framework
 			result.M44 = m44;
         }
 
-
         public static Matrix Multiply(Matrix matrix1, float factor)
         {
             matrix1.M11 *= factor;

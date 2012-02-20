@@ -99,7 +99,7 @@ namespace Microsoft.Xna.Framework.GamerServices
         {
             spriteBatch.Begin();//SpriteSortMode.Immediate, BlendState.AlphaBlend);
 
-            Vector2 center = new Vector2(this.Game.GraphicsDevice.PresentationParameters.BackBufferWidth / 2, this.Game.GraphicsDevice.PresentationParameters.BackBufferHeight - 100);
+            Vector2 center = new Vector2(this.Game.GraphicsDevice.Viewport.Width / 2, this.Game.GraphicsDevice.Viewport.Height - 100);
             Vector2 loc = Vector2.Zero;
             alphaColor.A = startalpha;
             for (int i = 0; i < 12; i++)

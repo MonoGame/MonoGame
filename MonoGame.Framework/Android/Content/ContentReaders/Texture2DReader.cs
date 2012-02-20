@@ -102,17 +102,12 @@ namespace Microsoft.Xna.Framework.Content
 			
 			IntPtr imagePtr = IntPtr.Zero;
 			
-			try 
-			{
-				imagePtr = Marshal.AllocHGlobal (imageData.Length);
-				Marshal.Copy (imageData, 0, imagePtr, imageData.Length);					
-				ESTexture2D esTexture = new ESTexture2D (imagePtr, surfaceFormat, width, height, new Size (width, height), All.Linear);
+					
+				// Changed to load the raw data
+				// currentony only ARGB8888 is supported
+				ESTexture2D esTexture = new ESTexture2D (imageData, surfaceFormat, width, height, new Size (width, height), All.Linear);
 				texture = new Texture2D (reader.GraphicsDevice ,new ESImage (esTexture));
-			}
-			finally 
-			{		
-				Marshal.FreeHGlobal (imagePtr);
-			}			
+						
 			
 			return texture;
 		}
