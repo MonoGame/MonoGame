@@ -62,7 +62,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		DepthStencilState _depthStencilState; 
 		RasterizerState _rasterizerState;		
 		Effect _effect;		
-		Matrix _matrix;
+		Matrix _matrix = Matrix.Identity;
 		DisplayOrientation lastDisplayOrientation;
 		
 		Rectangle tempRect = new Rectangle(0,0,0,0);
@@ -220,17 +220,6 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			uniformWVP = GL20.GetUniformLocation(program, "uMVPMatrix");
 			uniformTex = GL20.GetUniformLocation(program, "sTexture");
-		}
-		
-		private void SetUniformMatrix4(int location, bool transpose, ref Matrix4 matrix)
-		{
-			unsafe
-			{
-				fixed (float* matrix_ptr = &matrix.Row0.X)
-				{
-					GL20.UniformMatrix4(location,1,transpose,matrix_ptr);
-				}
-			}
 		}
 		
 		private void SetUniformMatrix(int location, bool transpose, ref Matrix matrix)
@@ -504,8 +493,8 @@ namespace Microsoft.Xna.Framework.Graphics
 				
 				
 				
-				matWVPScreen = matViewScreen * matProjection;				
-				matWVPFramebuffer = matViewFramebuffer * matProjection;
+				matWVPScreen = _matrix * matViewScreen * matProjection;				
+				matWVPFramebuffer = _matrix * matViewFramebuffer *  matProjection;
 				
 				AndroidGameActivity.Game.Log("--------------- Start Change -----------");
 				AndroidGameActivity.Game.Log(String.Format("DisplayMode = {0}", this.graphicsDevice.DisplayMode.ToString()));
