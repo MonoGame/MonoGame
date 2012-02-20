@@ -463,8 +463,12 @@ namespace Microsoft.Xna.Framework
 
         protected virtual void Update(GameTime gameTime)
         {
+			System.Diagnostics.Debug.WriteLine(gameTime.ElapsedGameTime.TotalSeconds);
             _updateables.ForEachFilteredItem(UpdateAction, gameTime);
-        }
+#if ANDROID || LINUX || WINDOWS
+			Threading.Run();
+#endif
+		}
 
         protected virtual void OnExiting(object sender, EventArgs args)
         {
