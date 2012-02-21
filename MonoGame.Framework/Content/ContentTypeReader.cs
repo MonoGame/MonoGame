@@ -39,6 +39,11 @@ namespace Microsoft.Xna.Framework.Content
         #region Private Member Variables
 
         private Type targetType;
+#if ANDROID
+		// Keep this static so we only call Game.Activity.Assets.List() once
+		// No need to call it for each file if the list will never change
+		static string[] files = null;
+#endif
 
         #endregion Private Member Variables
 
@@ -91,7 +96,10 @@ namespace Microsoft.Xna.Framework.Content
                 file = fileName.Substring(index + 1, fileName.Length - index - 1);
                 path = fileName.Substring(0, index);
             }
-            string[] files = Game.Activity.Assets.List(path);
+
+			// Only read the assets file list once
+			if (files == null)
+				files = Game.Activity.Assets.List(path);
 
             if (files.Any(s => s == file))
                 return fileName;
@@ -102,7 +110,12 @@ namespace Microsoft.Xna.Framework.Content
                 return null;
             }
 
-            return Path.Combine(path, files.FirstOrDefault(s => extensions.Any(ext => s.ToLower() == (file.ToLower() + ext))));
+			// FirstOrDefault returns null as the default if the file is not found. This crashed Path.Combine so check
+			// for it first.
+			string file2 = files.FirstOrDefault(s => extensions.Any(ext => s.ToLower() == (file.ToLower() + ext)));
+			if (String.IsNullOrEmpty(file2))
+				return null;
+            return Path.Combine(path, file2);
         }
 #else
 		public static string Normalize(string fileName, string[] extensions)
