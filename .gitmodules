@@ -1,0 +1,9 @@
+[submodule "MonoGame-Samples"]
+	path = MonoGame-Samples
+	url = git://github.com/CartBlanche/MonoGame-Samples.git
+[submodule "MonoGame-StarterKits"]
+	path = MonoGame-StarterKits
+	url = git://github.com/kungfubanana/MonoGame-StarterKits.git
+[submodule "MonoGame-Tests"]
+	path = MonoGame-Tests
+	url = git://github.com/kungfubanana/MonoGame-Tests.git
