@@ -114,19 +114,20 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
 			GL.GenTextures(1, out this.glTexture);
 #endif
+			// For best compatibility and to keep the default wrap mode of XNA, only set ClampToEdge if either
+			// dimension is not a power of two.
+			TextureWrapMode wrap = TextureWrapMode.Repeat;
+			if (((width & (width - 1)) != 0) || ((height & (height - 1)) != 0))
+				wrap = TextureWrapMode.ClampToEdge;
+
 			GL.BindTexture(TextureTarget.Texture2D, this.glTexture);
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter,
 			                mipmap ? (int)TextureMinFilter.LinearMipmapLinear : (int)TextureMinFilter.Linear);
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter,
 			                (int)TextureMagFilter.Linear);
-			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS,
-			                (int)TextureWrapMode.ClampToEdge);
-			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT,
-			                (int)TextureWrapMode.ClampToEdge);
+			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS,	(int)wrap);
+			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)wrap);
 			
-			glInternalFormat = PixelInternalFormat.Rgba;
-			glFormat = GLPixelFormat.Rgba;
-			glType = PixelType.UnsignedByte;
 			format.GetGLFormat(out glInternalFormat, out glFormat, out glType);
 
 			if (glFormat == (GLPixelFormat)All.CompressedTextureFormats)
@@ -185,8 +186,6 @@ namespace Microsoft.Xna.Framework.Graphics
 					this.levelCount++;
 				}
 			}
-
-			
 		}
 				
 		public Texture2D(GraphicsDevice graphicsDevice, int width, int height) : 
@@ -351,7 +350,15 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 image.GetPixels(pixels, 0, width, 0, 0, width, height);
             }
-            texture.SetData<int>(pixels);
+
+			// Convert from ARGB to ABGR
+			for (int i = 0; i < width * height; ++i)
+			{
+				uint pixel = (uint)pixels[i];
+				pixels[i] = (int)((pixel & 0xFF00FF00) | ((pixel & 0x00FF0000) >> 16) | ((pixel & 0x000000FF) << 16));
+			}
+
+			texture.SetData<int>(pixels);
 
             return texture;
 #else

@@ -334,7 +334,7 @@ namespace Microsoft.Xna.Framework.Graphics
             switch (surfaceFormat)
             {
                 case SurfaceFormat.Color:
-                    return 0;
+                    return 4;
                 case SurfaceFormat.Dxt3:
                     return 4;
                 case SurfaceFormat.Bgra4444:
@@ -343,6 +343,8 @@ namespace Microsoft.Xna.Framework.Graphics
                     return 2;
                 case SurfaceFormat.Alpha8:
                     return 1;
+				case SurfaceFormat.NormalizedByte4:
+					return 4;
                 default:
                     throw new NotImplementedException();
             }
@@ -525,22 +527,22 @@ namespace Microsoft.Xna.Framework.Graphics
 				glFormat = PixelFormat.Rgba;
 				glType = PixelType.UnsignedByte;
 				break;
-			case SurfaceFormat.Bgr565 : 
+			case SurfaceFormat.Bgr565:
 				glInternalFormat = PixelInternalFormat.Rgb;
 				glFormat = PixelFormat.Rgb;
 				glType = PixelType.UnsignedShort565;
 				break;
-			case SurfaceFormat.Bgra4444 : 
-				glInternalFormat = PixelInternalFormat.Rgba;
+			case SurfaceFormat.Bgra4444:
+				glInternalFormat = PixelInternalFormat.Rgba4;
 				glFormat = PixelFormat.Rgba;
 				glType = PixelType.UnsignedShort4444;
 				break;
-			case SurfaceFormat.Bgra5551 : 
+			case SurfaceFormat.Bgra5551:
 				glInternalFormat = PixelInternalFormat.Rgba;
 				glFormat = PixelFormat.Rgba;
 				glType = PixelType.UnsignedShort5551;
 				break;
-			case SurfaceFormat.Alpha8 : 
+			case SurfaceFormat.Alpha8:
 				glInternalFormat = PixelInternalFormat.Luminance;
 				glFormat = PixelFormat.Luminance;
 				glType = PixelType.UnsignedByte;
