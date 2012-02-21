@@ -470,10 +470,10 @@ namespace Microsoft.Xna.Framework.Graphics
 		    public IntPtr preshader;
 		    
 		    /// MOJOSHADER_malloc
-		    public MOJOSHADER_malloc malloc;
+		    public IntPtr malloc;
 		    
 		    /// MOJOSHADER_free
-		    public MOJOSHADER_free free;
+		    public IntPtr free;
 		    
 		    /// void*
 		    public IntPtr malloc_data;

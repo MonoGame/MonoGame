@@ -533,7 +533,11 @@ namespace Microsoft.Xna.Framework.Graphics
 				glType = PixelType.UnsignedShort565;
 				break;
 			case SurfaceFormat.Bgra4444:
+#if IPHONE
+				glInternalFormat = PixelInternalFormat.Rgba;
+#else
 				glInternalFormat = PixelInternalFormat.Rgba4;
+#endif
 				glFormat = PixelFormat.Rgba;
 				glType = PixelType.UnsignedShort4444;
 				break;

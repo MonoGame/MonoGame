@@ -159,7 +159,7 @@ namespace Microsoft.Xna.Framework
 		{			
 			// Set "full screen"  as default
 			_graphicsDevice.PresentationParameters.IsFullScreen = true;
-
+			_graphicsDevice.glFramebuffer = _game.Window.Framebuffer;
 			if (_preferMultiSampling) 
 			{
 				_graphicsDevice.PreferedFilter = All.Linear;
