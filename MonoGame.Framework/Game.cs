@@ -570,7 +570,7 @@ namespace Microsoft.Xna.Framework
 #if LINUX
         internal void ResizeWindow(bool changed)
         {
-            ((LinuxGamePlatform)_platform).ResetWindowBounds(changed);
+            ((LinuxGamePlatform)Platform).ResetWindowBounds(changed);
         }
 #endif
 
