@@ -840,7 +840,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             var vd = VertexDeclaration.FromType(_vertexBuffer._type);
             // Hmm, can the pointer here be changed with baseVertex?
-            VertexDeclaration.PrepareForUse(vd);
+            VertexDeclaration.PrepareForUse(vd, IntPtr.Zero);
 
 #if IPHONE
 			if(OpenGLESVersion == EAGLRenderingAPI.OpenGLES2)
@@ -889,7 +889,7 @@ namespace Microsoft.Xna.Framework.Graphics
                                 vertexData, ALL20.DynamicDraw);
 
                 //Setup VertexDeclaration
-                VertexDeclaration.PrepareForUse(vd);
+                VertexDeclaration.PrepareForUse(vd, IntPtr.Zero);
 
                 //Draw
                 GL20.DrawArrays(PrimitiveTypeGL20(primitiveType), vertexOffset,
@@ -907,13 +907,13 @@ namespace Microsoft.Xna.Framework.Graphics
                 GL11.BindBuffer(ALL11.ElementArrayBuffer, 0);
 
                 //Create VBO if not created already
-                if (VboIdArrays == null)
-                {
-                    GenerateVBOs();
-                }
+                //if (VboIdArrays == null)
+                //{
+                //    GenerateVBOs();
+                //}
 
                 // Bind the VBO
-                GL11.BindBuffer(ALL11.ArrayBuffer, VboIdArrays[_currentArray]);
+                //GL11.BindBuffer(ALL11.ArrayBuffer, VboIdArrays[_currentArray]);
 
                 //Get VertexDeclaration
                 var vd = VertexDeclaration.FromType(typeof(T));
@@ -922,30 +922,33 @@ namespace Microsoft.Xna.Framework.Graphics
                 var handle = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
 
                 //Buffer data to VBO; This should use stream when we move to ES2.0
-                GL11.BufferData(ALL11.ArrayBuffer,
-                                (IntPtr)(vd.VertexStride * GetElementCountArray(primitiveType, primitiveCount) + vertexOffset * vd.VertexStride),
-                                vertexData, ALL11.DynamicDraw);
-                handle.Free();
+                //GL11.BufferData(ALL11.ArrayBuffer,
+                //                (IntPtr)(vd.VertexStride * GetElementCountArray(primitiveType, primitiveCount) + vertexOffset * vd.VertexStride),
+                //                vertexData, ALL11.DynamicDraw);
+                
 
                 //Setup VertexDeclaration
-                VertexDeclaration.PrepareForUse(vd);
+                VertexDeclaration.PrepareForUse(vd, handle.AddrOfPinnedObject());
 
                 //Draw
                 GL11.DrawArrays(PrimitiveTypeGL11(primitiveType), vertexOffset,
                                 GetElementCountArray(primitiveType, primitiveCount));
 
+                GL11.Flush();
+
+                handle.Free();
 
                 // Free resources
-                GL11.BindBuffer(ALL11.ArrayBuffer, 0);
+                //GL11.BindBuffer(ALL11.ArrayBuffer, 0);
 
-                MoveToNextVBO();
+                //MoveToNextVBO();
             }
         }
 
         public void DrawPrimitives(PrimitiveType primitiveType, int vertexStart, int primitiveCount)
         {
             var vd = VertexDeclaration.FromType(_vertexBuffer._type);
-            VertexDeclaration.PrepareForUse(vd);
+            VertexDeclaration.PrepareForUse(vd, IntPtr.Zero);
 
 #if IPHONE
 			if(OpenGLESVersion == EAGLRenderingAPI.OpenGLES2)
@@ -1006,7 +1009,7 @@ namespace Microsoft.Xna.Framework.Graphics
                                 indexData, ALL20.DynamicDraw);
 
                 //Setup VertexDeclaration
-                VertexDeclaration.PrepareForUse(vd);
+                VertexDeclaration.PrepareForUse(vd, IntPtr.Zero);
 
                 //Draw
                 GL20.DrawElements(PrimitiveTypeGL20(primitiveType), GetElementCountArray(primitiveType, primitiveCount),
@@ -1054,7 +1057,7 @@ namespace Microsoft.Xna.Framework.Graphics
                                 indexData, ALL11.DynamicDraw);
 
                 //Setup VertexDeclaration
-                VertexDeclaration.PrepareForUse(vd);
+                VertexDeclaration.PrepareForUse(vd, IntPtr.Zero);
 
                 //Draw
                 GL11.DrawElements(PrimitiveTypeGL11(primitiveType), GetElementCountArray(primitiveType, primitiveCount),
@@ -1117,7 +1120,7 @@ namespace Microsoft.Xna.Framework.Graphics
                                 ALL20.DynamicDraw);
 
                 //Setup VertexDeclaration
-                VertexDeclaration.PrepareForUse(vd);
+                VertexDeclaration.PrepareForUse(vd, IntPtr.Zero);
 
                 //Draw
                 GL20.DrawElements(PrimitiveTypeGL20(primitiveType), GetElementCountArray(primitiveType, primitiveCount),
@@ -1165,7 +1168,7 @@ namespace Microsoft.Xna.Framework.Graphics
                                 ALL11.DynamicDraw);
 
                 //Setup VertexDeclaration
-                VertexDeclaration.PrepareForUse(vd);
+                VertexDeclaration.PrepareForUse(vd, IntPtr.Zero);
 
                 //Draw
                 GL11.DrawElements(PrimitiveTypeGL11(primitiveType), GetElementCountArray(primitiveType, primitiveCount),
@@ -1228,7 +1231,7 @@ namespace Microsoft.Xna.Framework.Graphics
                                 ALL20.DynamicDraw);
 
                 //Setup VertexDeclaration
-                VertexDeclaration.PrepareForUse(vd);
+                VertexDeclaration.PrepareForUse(vd, IntPtr.Zero);
 
                 //Draw
                 GL20.DrawElements(PrimitiveTypeGL20(primitiveType), GetElementCountArray(primitiveType, primitiveCount),
@@ -1276,7 +1279,7 @@ namespace Microsoft.Xna.Framework.Graphics
                                 ALL11.DynamicDraw);
 
                 //Setup VertexDeclaration
-                VertexDeclaration.PrepareForUse(vd);
+                VertexDeclaration.PrepareForUse(vd, IntPtr.Zero);
 
                 //Draw
                 GL11.DrawElements(PrimitiveTypeGL11(primitiveType), GetElementCountArray(primitiveType, primitiveCount),

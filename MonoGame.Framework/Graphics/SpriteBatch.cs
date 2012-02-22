@@ -71,7 +71,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		//OpenGLES2 variables
 		int program;
-		Matrix4 matWVPScreen, matWVPFramebuffer, matProjection, matViewScreen, matViewFramebuffer;
+		Matrix matWVPScreen, matWVPFramebuffer, matProjection, matViewScreen, matViewFramebuffer;
 		int uniformWVP, uniformTex;
 		
         public SpriteBatch ( GraphicsDevice graphicsDevice )
@@ -233,6 +233,17 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 		
+		private void SetUniformMatrix(int location, bool transpose, ref Matrix matrix)
+		{
+			unsafe
+			{				
+				fixed (float* matrix_ptr = &matrix.M11)
+				{
+					GL20.UniformMatrix4(location,1,transpose,matrix_ptr);
+				}
+			}
+		}
+		
 		public void Begin()
 		{
 			Begin( SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Matrix.Identity );			
@@ -334,12 +345,12 @@ namespace Microsoft.Xna.Framework.Graphics
 			if (GraphicsDevice.DefaultFrameBuffer)
 			{
 				GL20.CullFace(ALL20.Back);
-				SetUniformMatrix4(uniformWVP, false, ref matWVPScreen);
+				SetUniformMatrix(uniformWVP, false, ref matWVPScreen);
 			}
 			else
 			{
 				GL20.CullFace(ALL20.Front);
-				SetUniformMatrix4(uniformWVP,false,ref matWVPFramebuffer);
+				SetUniformMatrix(uniformWVP,false,ref matWVPFramebuffer);
 				GL20.ClearColor(0.0f,0.0f,0.0f,0.0f);
 				GL20.Clear((int) (ALL20.ColorBufferBit | ALL20.DepthBufferBit));
 			}
@@ -452,37 +463,48 @@ namespace Microsoft.Xna.Framework.Graphics
 			// Configure Display Orientation:
 			if(lastDisplayOrientation != graphicsDevice.PresentationParameters.DisplayOrientation)
 			{
+				// check the display width and height make sure it matches the target orientation
+				// before updating the matrix
+				if (graphicsDevice.PresentationParameters.DisplayOrientation == DisplayOrientation.Portrait)
+				{
+				   if (graphicsDevice.DisplayMode.Width > graphicsDevice.DisplayMode.Height) return;	
+				}
+				else
+				{
+					if (graphicsDevice.DisplayMode.Width < graphicsDevice.DisplayMode.Height) return;
+				}
 				// updates last display orientation (optimization)				
 				lastDisplayOrientation = graphicsDevice.PresentationParameters.DisplayOrientation;
 				
 				// make sure the viewport is correct
 				this.graphicsDevice.SetViewPort(graphicsDevice.DisplayMode.Width, graphicsDevice.DisplayMode.Height);
 				
-				matViewScreen = Matrix4.CreateRotationZ((float)Math.PI)*
-							     	Matrix4.CreateRotationY((float)Math.PI)*
-									Matrix4.CreateTranslation(-this.graphicsDevice.Viewport.Width/2,
+				matViewScreen = Matrix.CreateRotationZ((float)Math.PI)*
+							     	Matrix.CreateRotationY((float)Math.PI)*
+									Matrix.CreateTranslation(-this.graphicsDevice.Viewport.Width/2,
 									this.graphicsDevice.Viewport.Height/2,
 									1);
-				matProjection = Matrix4.CreateOrthographic(this.graphicsDevice.Viewport.Width,
+				matProjection = Matrix.CreateOrthographic(this.graphicsDevice.Viewport.Width,
 							this.graphicsDevice.Viewport.Height,
 							-1f,1f);
 				if (graphicsDevice.PresentationParameters.DisplayOrientation == DisplayOrientation.LandscapeRight)
 				{
 					// flip the viewport	
-					matProjection = Matrix4.CreateOrthographic(-this.graphicsDevice.Viewport.Width,
+					matProjection = Matrix.CreateOrthographic(-this.graphicsDevice.Viewport.Width,
 							-this.graphicsDevice.Viewport.Height,
 							-1f,1f);
 				}
 				
 
-				matViewFramebuffer = Matrix4.CreateTranslation(-this.graphicsDevice.Viewport.Width/2,
+				matViewFramebuffer = Matrix.CreateTranslation(-this.graphicsDevice.Viewport.Width/2,
 							-this.graphicsDevice.Viewport.Height/2,
 							1);
 
 
 				
 				
-				matWVPScreen = matViewScreen * matProjection;
+				
+				matWVPScreen = matViewScreen * matProjection;				
 				matWVPFramebuffer = matViewFramebuffer * matProjection;
 				
 				AndroidGameActivity.Game.Log("--------------- Start Change -----------");
@@ -498,12 +520,12 @@ namespace Microsoft.Xna.Framework.Graphics
 #else		
 		private void UpdateWorldMatrixOrientation()
 		{
-			matViewScreen = Matrix4.CreateRotationZ((float)Math.PI)*
-							Matrix4.CreateRotationY((float)Math.PI)*
-							Matrix4.CreateTranslation(-this.graphicsDevice.Viewport.Width/2,
+			matViewScreen = Matrix.CreateRotationZ((float)Math.PI)*
+							Matrix.CreateRotationY((float)Math.PI)*
+							Matrix.CreateTranslation(-this.graphicsDevice.Viewport.Width/2,
 								this.graphicsDevice.Viewport.Height/2,
 								0);
-							matWVPScreen =  _matrix.ToOpenTK() * matViewScreen * matProjection;
+							matWVPScreen =  _matrix * matViewScreen * matProjection;
 		}
 #endif		
 		public void Draw 
