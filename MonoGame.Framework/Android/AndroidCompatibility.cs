@@ -5,13 +5,20 @@ namespace Microsoft.Xna.Framework
     /// </summary>
     public static class AndroidCompatibility
     {
-        static AndroidCompatibility()
+        public enum ESVersions
         {
-            DoCatchupUpdates = false;
-            ScaleImageToPowerOf2 = true;
+            v1_1,
+            v2_0
         }
 
-        public static bool DoCatchupUpdates { get; set; }
+        static AndroidCompatibility()
+        {
+            ScaleImageToPowerOf2 = true;
+            ESVersion = ESVersions.v2_0;
+        }
+
         public static bool ScaleImageToPowerOf2 { get; set; }
+        public static ESVersions ESVersion { get; set; }
+
     }
 }

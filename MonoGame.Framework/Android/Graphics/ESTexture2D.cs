@@ -175,7 +175,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     )
                 {
                     Canvas can = new Canvas(imagePadded);
-                    can.DrawARGB(0, 0, 0, 0);					
+                    can.DrawARGB(0, 0, 0, 0);
 
                     if(AndroidCompatibility.ScaleImageToPowerOf2)
                         can.DrawBitmap(imageSource, new Rect(0, 0, imageSource.Width, imageSource.Height),  new Rect(0, 0, _width, _height), null); //Scale to texture
@@ -210,7 +210,8 @@ namespace Microsoft.Xna.Framework.Graphics
                                           (int)filter);
 						GL11.TexParameter(ALL11.Texture2D, ALL11.TextureWrapS, (int)wrap);
 						GL11.TexParameter(ALL11.Texture2D, ALL11.TextureWrapT, (int)wrap);
-						Android.Opengl.GLUtils.TexImage2D((int)ALL11.Texture2D, 0,
+                        GL11.TexParameter(ALL11.Texture2D, ALL11.GenerateMipmap, 1);
+                        Android.Opengl.GLUtils.TexImage2D((int)ALL11.Texture2D, 0,
                                                           imagePadded, 0);
 
                         // free bitmap
