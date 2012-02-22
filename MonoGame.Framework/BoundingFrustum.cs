@@ -215,7 +215,7 @@ namespace Microsoft.Xna.Framework
 			
             Vector3.Dot(ref bottom.Normal, ref sphere.Center, out dist);
 			dist += bottom.D;
-			if (dist < -sphere.Radius)
+			if (dist > sphere.Radius)
 			{
 				result = ContainmentType.Disjoint;
 				return;
@@ -225,7 +225,7 @@ namespace Microsoft.Xna.Framework
 			
             Vector3.Dot(ref top.Normal, ref sphere.Center, out dist);
 			dist += top.D;
-			if (dist < -sphere.Radius)
+			if (dist > sphere.Radius)
 			{
 				result = ContainmentType.Disjoint;
 				return;
@@ -235,7 +235,7 @@ namespace Microsoft.Xna.Framework
 			
 			Vector3.Dot(ref near.Normal, ref sphere.Center, out dist);
 			dist += near.D;
-			if (dist < -sphere.Radius)
+			if (dist > sphere.Radius)
 			{
 				result = ContainmentType.Disjoint;
 				return;
@@ -245,7 +245,7 @@ namespace Microsoft.Xna.Framework
 			
 			Vector3.Dot(ref far.Normal, ref sphere.Center, out dist);
 			dist += far.D;
-			if (dist < -sphere.Radius)
+			if (dist > sphere.Radius)
 			{
 				result = ContainmentType.Disjoint;
 				return;
@@ -255,7 +255,7 @@ namespace Microsoft.Xna.Framework
 			
 			Vector3.Dot(ref left.Normal, ref sphere.Center, out dist);
 			dist += left.D;
-			if (dist < -sphere.Radius)
+			if (dist > sphere.Radius)
 			{
 				result = ContainmentType.Disjoint;
 				return;
@@ -265,7 +265,7 @@ namespace Microsoft.Xna.Framework
 
 			Vector3.Dot(ref right.Normal, ref sphere.Center, out dist);
 			dist += right.D;
-			if (dist < -sphere.Radius)
+			if (dist > sphere.Radius)
 			{
 				result = ContainmentType.Disjoint;
 				return;

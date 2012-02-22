@@ -159,7 +159,9 @@ namespace Microsoft.Xna.Framework
 		{			
 			// Set "full screen"  as default
 			_graphicsDevice.PresentationParameters.IsFullScreen = true;
+#if IPHONE
 			_graphicsDevice.glFramebuffer = _game.Window.Framebuffer;
+#endif
 			if (_preferMultiSampling) 
 			{
 				_graphicsDevice.PreferedFilter = All.Linear;
