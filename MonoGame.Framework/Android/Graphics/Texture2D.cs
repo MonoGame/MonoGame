@@ -768,7 +768,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        internal void Apply()
+        public void Apply()
         {
             if (texture == null) return;
 
