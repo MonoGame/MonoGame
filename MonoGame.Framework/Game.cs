@@ -261,7 +261,7 @@ namespace Microsoft.Xna.Framework
 #else
         public GameWindow Window
         {
-            get { return _platform.Window; }
+            get { return Platform.Window; }
         }
 #endif
 
