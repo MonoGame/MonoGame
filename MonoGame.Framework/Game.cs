@@ -306,6 +306,7 @@ namespace Microsoft.Xna.Framework
             //        consolidate this logic back into the Game class.
             //        Regardless, an empty implementation is not correct.
             _platform.ResetElapsedTime();
+			_lastUpdate = DateTime.Now;
         }
 
         public void Run()
