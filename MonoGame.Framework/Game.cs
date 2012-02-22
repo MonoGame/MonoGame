@@ -261,7 +261,7 @@ namespace Microsoft.Xna.Framework
 #else
         public GameWindow Window
         {
-            get { return _platform.Window; }
+            get { return Platform.Window; }
         }
 #endif
 
@@ -570,7 +570,7 @@ namespace Microsoft.Xna.Framework
 #if LINUX
         internal void ResizeWindow(bool changed)
         {
-            ((LinuxGamePlatform)_platform).ResetWindowBounds(changed);
+            ((LinuxGamePlatform)Platform).ResetWindowBounds(changed);
         }
 #endif
 
