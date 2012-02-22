@@ -58,6 +58,7 @@ namespace Microsoft.Xna.Framework.Content
 		private IServiceProvider serviceProvider;
 		private IGraphicsDeviceService graphicsDeviceService;
 		protected Dictionary<string, object> loadedAssets = new Dictionary<string, object>();
+		List<IDisposable> disposableAssets = new List<IDisposable>();
 		bool disposed;
 		
 		private static object ContentManagerLock = new object();
@@ -420,9 +421,14 @@ namespace Microsoft.Xna.Framework.Content
 			{
 				throw new ContentLoadException("Could not load " + originalAssetName + " asset!");
 			}
-			
-			if ( recordDisposableObject != null && result is IDisposable )
-			    recordDisposableObject(result as IDisposable);
+
+			if (result is IDisposable)
+			{
+				if (recordDisposableObject != null)
+					recordDisposableObject(result as IDisposable);
+				else
+					disposableAssets.Add(result as IDisposable);
+			}
 			    
 			return (T)result;
 		}
@@ -434,8 +440,6 @@ namespace Microsoft.Xna.Framework.Content
                 ReloadAsset(asset.Key, asset.Value);
             }
         }
-		
-		
         
         protected void ReloadAsset(string originalAssetName, object currentAsset)
         {
@@ -460,11 +464,14 @@ namespace Microsoft.Xna.Framework.Content
 			
 			Stream stream = null;
 			//bool loadXnb = false;
-			try {
+			try
+			{
 				//try load it traditionally
 				stream = OpenStream(assetName);
 				stream.Close();
-			} catch (ContentLoadException ex) {
+			}
+			catch (ContentLoadException ex)
+			{
 				//MonoGame try to load as a non-content file
 
 				assetName = TitleContainer.GetFilename(Path.Combine (_rootDirectory, assetName));
@@ -516,20 +523,18 @@ namespace Microsoft.Xna.Framework.Content
                 {
                 }
 			}
-			
-
 		}
 
 		public virtual void Unload()
 		{
 		    // Look for disposable assets.
-		    foreach (var pair in loadedAssets)
+		    foreach (var disposable in disposableAssets)
 		    {
-		        var disposable = pair.Value as IDisposable;
-		        if (disposable != null )
+		        if (disposable != null)
 		            disposable.Dispose();
 		    }
 		    RemoveContentManager(this);
+			disposableAssets.Clear();
 		    loadedAssets.Clear();
 		}
 
