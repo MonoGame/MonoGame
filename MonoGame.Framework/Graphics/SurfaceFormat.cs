@@ -65,11 +65,20 @@ namespace Microsoft.Xna.Framework.Graphics
         HalfVector4 = 18,
         HdrBlendable = 19,
         
-		// PowerVR texture compression (iOS)
-		RgbPvrtc2Bpp = 20,
-		RgbPvrtc4Bpp = 21,
-		RgbaPvrtc2Bpp = 22,
-		RgbaPvrtc4Bpp = 23,
+		// Good explanation of compressed formats for mobile devices (aimed at Android, but describes PVRTC)
+		// http://developer.motorola.com/docstools/library/understanding-texture-compression/
+
+		// PowerVR texture compression (iOS and Android)
+		RgbPvrtc2Bpp = 50,
+		RgbPvrtc4Bpp = 51,
+		RgbaPvrtc2Bpp = 52,
+		RgbaPvrtc4Bpp = 53,
+
+		// Ericcson Texture Compression (Android)
+		RgbEtc1 = 60,
+		// ETC1 does not normally support alpha, but this example from ARM describes how
+		// http://www.malideveloper.com/developer-resources/sample-code/index.php
+		RgbaEtc1 = 61,
     }
     
     public enum SurfaceFormat_Legacy

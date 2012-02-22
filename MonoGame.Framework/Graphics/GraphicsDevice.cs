@@ -168,6 +168,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		//public event EventHandler<ResourceCreatedEventArgs> ResourceCreated;
 		//public event EventHandler<ResourceDestroyedEventArgs> ResourceDestroyed;
 
+		List<string> extensions = new List<string>();
+
         internal int glFramebuffer;
 
 		public RasterizerState RasterizerState {
@@ -235,6 +237,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void Initialize()
         {
+			extensions.AddRange(GL.GetString(RenderbufferStorage.Extensions).Split(' '));
+			System.Diagnostics.Debug.WriteLine("Supported extensions:");
+			foreach (string extension in extensions)
+				System.Diagnostics.Debug.WriteLine(extension);
 
 #if ES11
 			//Is this needed?
@@ -608,13 +614,15 @@ namespace Microsoft.Xna.Framework.Graphics
         public void SetVertexBuffer(VertexBuffer vertexBuffer)
         {
             _vertexBuffer = vertexBuffer;
-			_vertexBuffer.Apply();
+			if (_vertexBuffer != null)
+				_vertexBuffer.Apply();
         }
 
         private void SetIndexBuffer(IndexBuffer indexBuffer)
         {
             _indexBuffer = indexBuffer;
-			_indexBuffer.Apply ();
+			if (_indexBuffer != null)
+				_indexBuffer.Apply ();
         }
 
         public IndexBuffer Indices { set { SetIndexBuffer(value); } }
