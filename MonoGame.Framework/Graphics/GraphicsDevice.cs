@@ -237,7 +237,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void Initialize()
         {
-			extensions.AddRange(GL.GetString(RenderbufferStorage.Extensions).Split(' '));
+			extensions.AddRange(GL.GetString(StringName.Extensions).Split(' '));
 			System.Diagnostics.Debug.WriteLine("Supported extensions:");
 			foreach (string extension in extensions)
 				System.Diagnostics.Debug.WriteLine(extension);
