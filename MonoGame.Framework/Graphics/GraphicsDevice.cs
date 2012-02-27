@@ -48,6 +48,7 @@ using GL_Oes = MonoMac.OpenGL.GL;
 #elif WINDOWS
 using OpenTK.Graphics.OpenGL;
 using GL_Oes = OpenTK.Graphics.OpenGL.GL;
+using RenderbufferStorage = OpenTK.Graphics.OpenGL.All;
 #else
 
 #if ES11
@@ -237,7 +238,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void Initialize()
         {
+			
+#if MONOMAC
+			extensions.AddRange(GL.GetString(MonoMac.OpenGL.StringName.Extensions).Split(' '));
+#else
 			extensions.AddRange(GL.GetString(RenderbufferStorage.Extensions).Split(' '));
+#endif
 			System.Diagnostics.Debug.WriteLine("Supported extensions:");
 			foreach (string extension in extensions)
 				System.Diagnostics.Debug.WriteLine(extension);
