@@ -261,7 +261,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			int int4_index = 0;
 
 			int numUniforms = 0;
-#if MONOMAC
+#if MONOMAC || WINDOWS
 			GL.GetProgram(program, ProgramParameter.ActiveUniforms, out numUniforms);
 #else
 			GL.GetProgram(program, ProgramParameter.ActiveUniforms, ref numUniforms);
