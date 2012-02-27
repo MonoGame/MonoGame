@@ -11,6 +11,7 @@ using OpenTK.Graphics.OpenGL;
 using System.Text;
 using OpenTK.Graphics.ES20;
 #if IPHONE
+using ProgramParameter = OpenTK.Graphics.ES20.All;
 using ShaderType = OpenTK.Graphics.ES20.All;
 using ShaderParameter = OpenTK.Graphics.ES20.All;
 using TextureUnit = OpenTK.Graphics.ES20.All;
@@ -238,7 +239,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #if IPHONE
 			public All GLSLType {get; set; }
 #else
-			public ActiveUniformType glType { get;  set; }
+			public ActiveUniformType GLSLType { get;  set; }
 #endif
 			//public EffectParameterValue Value { get; set; }
 		}
@@ -260,17 +261,23 @@ namespace Microsoft.Xna.Framework.Graphics
 			int int4_index = 0;
 
 			int numUniforms = 0;
+#if MONOMAC || WINDOWS
 			GL.GetProgram(program, ProgramParameter.ActiveUniforms, out numUniforms);
+#else
+			GL.GetProgram(program, ProgramParameter.ActiveUniforms, ref numUniforms);
+#endif
 			for (int index = 0; index < numUniforms; index++) {
 				int size = 0;
 				int length = 0;
 #if IPHONE
-				All type;
+				All type = 0;
+				String str = String.Empty;
+				GL.GetActiveUniform(program, index, 255, ref length, ref size, ref type, str);
 #else
 				ActiveUniformType type;
-#endif
 				StringBuilder sb2 = new StringBuilder();
 				GL.GetActiveUniform(program, index, 255, out length, out size, out type, sb2);
+#endif
 			}
 
 			//var parameters = new List<EffectParameter>();
@@ -295,13 +302,16 @@ namespace Microsoft.Xna.Framework.Graphics
 					int length = 0;
 					int size = 0;
 #if IPHONE
-					All glType;
+					All glType = 0;
+					String uniformName = String.Empty;
+					GL.GetActiveUniform(program, iUniform, 256, ref length, ref size, ref glType, uniformName);
 #else
 					ActiveUniformType glType = 0;
-#endif
 					var uniformNameStringBuilder = new StringBuilder(256);
 					GL.GetActiveUniform(program, iUniform, 256, out length, out size, out glType, uniformNameStringBuilder);
 					var uniformName = uniformNameStringBuilder.ToString();
+#endif
+					
 					var uniformLocation = GL.GetUniformLocation(program, uniformName);
 					var parameterIndex = -1;
 					if (!parameterIndexByName.TryGetValue(uniformName, out parameterIndex))
@@ -313,7 +323,7 @@ namespace Microsoft.Xna.Framework.Graphics
 					uniform.EffectParameterIndex = parameterIndex;
 					uniform.Location = uniformLocation;
 					uniform.Name = uniformName;
-					uniform.glType = glType;
+					uniform.GLSLType = glType;
 					//uniform.Value = default(EffectParameterValue); // TODO: retrieve actual default value from program
 				}
 //			}
@@ -329,42 +339,45 @@ namespace Microsoft.Xna.Framework.Graphics
 					continue;
 
 #if IPHONE
-				switch (uniform.glType)
+				switch (uniform.GLSLType)
 				{
 				case All.Float :
 				{
-					if (parameter.value.Float != uniform.Value.Float)
-						GL.Uniform1(uniform.Location, parameter.value.Float);
+					// if (parameter.value.Float != uniform.Value.Float)
+						GL.Uniform1(uniform.Location, parameter.GetValueSingle());
 					break;
 				}
 				case All.Int:
 				{
-					if (parameter.value.Int != uniform.Value.Int)
-						GL.Uniform1(uniform.Location, parameter.value.Int);
+					//if (parameter.value.Int != uniform.Value.Int)
+						GL.Uniform1(uniform.Location, parameter.GetValueInt32());
 					break;
 				}
 				case All.Bool:
 				{
-					if (parameter.value.Bool != uniform.Value.Bool)
-						GL.Uniform1(uniform.Location, parameter.value.Bool ? 1 : 0);
+					//if (parameter.value.Bool != uniform.Value.Bool)
+						GL.Uniform1(uniform.Location, parameter.GetValueBoolean() ? 1 : 0);
 					break;
 				}
 				case All.FloatVec2:
 				{
-					if (parameter.value.Vector2 != uniform.Value.Vector2)
-						GL.Uniform2(uniform.Location, 1, ref parameter.value.Vector2.X);
+					//if (parameter.value.Vector2 != uniform.Value.Vector2)
+						Vector2 val2 = parameter.GetValueVector2();
+						GL.Uniform2(uniform.Location, 1, ref val2.X);
 					break;
 				}
 				case All.FloatVec3:
 				{
-					if (parameter.value.Vector3 != uniform.Value.Vector3)
-						GL.Uniform3(uniform.Location, 1, ref parameter.value.Vector3.X);
+					//if (parameter.value.Vector3 != uniform.Value.Vector3)
+						Vector3 val3 = parameter.GetValueVector3();
+						GL.Uniform3(uniform.Location, 1, ref val3.X);
 					break;
 				}
 				case All.FloatVec4:
 				{
-					if (parameter.value.Vector4 != uniform.Value.Vector4)
-						GL.Uniform4(uniform.Location, 1, ref parameter.value.Vector4.X);
+					//if (parameter.value.Vector4 != uniform.Value.Vector4)
+						Vector4 val4 = parameter.GetValueVector4();
+						GL.Uniform4(uniform.Location, 1, ref val4.X);
 					break;
 				}
 				//case All.IntVec2:
@@ -376,32 +389,88 @@ namespace Microsoft.Xna.Framework.Graphics
 				//case All.FloatMat2:
 				case All.FloatMat3:
 				{
-					if (parameter.value.Matrix != uniform.Value.Matrix)
+					// if (parameter.value.Matrix != uniform.Value.Matrix)
 					{
-						this.matrix3[0] = parameter.value.Matrix.M11;
-						this.matrix3[1] = parameter.value.Matrix.M12;
-						this.matrix3[2] = parameter.value.Matrix.M13;
-						this.matrix3[3] = parameter.value.Matrix.M21;
-						this.matrix3[4] = parameter.value.Matrix.M22;
-						this.matrix3[5] = parameter.value.Matrix.M23;
-						this.matrix3[6] = parameter.value.Matrix.M31;
-						this.matrix3[7] = parameter.value.Matrix.M32;
-						this.matrix3[8] = parameter.value.Matrix.M33;
+						this.matrix3[0] = parameter.GetValueMatrix().M11;
+						this.matrix3[1] = parameter.GetValueMatrix().M12;
+						this.matrix3[2] = parameter.GetValueMatrix().M13;
+						this.matrix3[3] = parameter.GetValueMatrix().M21;
+						this.matrix3[4] = parameter.GetValueMatrix().M22;
+						this.matrix3[5] = parameter.GetValueMatrix().M23;
+						this.matrix3[6] = parameter.GetValueMatrix().M31;
+						this.matrix3[7] = parameter.GetValueMatrix().M32;
+						this.matrix3[8] = parameter.GetValueMatrix().M33;
 						GL.UniformMatrix3(uniform.Location, 1, false, this.matrix3);
 					}
 					break;
 				}
 				case All.FloatMat4:
 				{
-					if (parameter.value.Matrix != uniform.Value.Matrix)
-						GL.UniformMatrix4(uniform.Location, 1, false, ref parameter.value.Matrix.M11);
+					//if (parameter.value.Matrix != uniform.Value.Matrix)
+						float[] mat4 = (float[])parameter.data;
+						GL.UniformMatrix4(uniform.Location, 1, true, ref mat4[0]);
 					break;
 				}
 				case All.Sampler2D:
 				{
-					this.GraphicsDevice.Textures[parameter.usageIndex] = (Texture2D)parameter.value.Object;
-					if (!object.ReferenceEquals(parameter.value.Object, uniform.Value.Object))
-						GL.Uniform1(uniform.Location, parameter.usageIndex);
+					var sampler = new GLSLEffectObject.SamplerIndexInfo();
+
+					foreach (var sii in samplerIndices) {
+						if (parameter.Name == sii.Name) {
+							sampler = sii;
+							break;
+						}
+
+					}
+					//this.GraphicsDevice.Textures[usageIndex] = (Texture2D)parameter.GetValueTexture2D();
+					//Texture tex = (Texture)parameter.data;
+					//this.GraphicsDevice.Textures[parameter.usageIndex] = (Texture2D)parameter.GetValueTexture2D();
+//					if (!object.ReferenceEquals(parameter.value.Object, uniform.Value.Object))
+						GL.Uniform1(uniform.Location, sampler.Index);
+					//int loc = GL.GetUniformLocation (program, sampler.name);
+					
+					//set the sampler texture slot
+					//GL.Uniform1 (loc, sampler.index);
+					
+//					if (sampler.type == MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_2D) {
+//						MojoShader.MOJOSHADER_symbol? samplerSymbol = null;
+//						foreach (MojoShader.MOJOSHADER_symbol symbol in symbols) {
+//							if (symbol.register_set ==
+//							    	MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_SAMPLER &&
+//							    symbol.register_index == sampler.index) {
+//
+//								samplerSymbol = symbol;
+//								break;
+//							}
+//						}
+
+						Texture tex = null;
+//						if (samplerSymbol.HasValue) {
+//							DXEffectObject.d3dx_sampler samplerState =
+//								(DXEffectObject.d3dx_sampler)parameters[samplerSymbol.Value.name].data;
+//							if (samplerState.state_count > 0) {
+//								string textureName = samplerState.states[0].parameter.name;
+//								EffectParameter textureParameter = parameters[textureName];
+//								if (textureParameter != null) {
+//									tex = (Texture)textureParameter.data;
+//								}
+//							}
+//						}
+						tex = (Texture)parameter.data;
+						if (tex == null) {
+							//texutre 0 will be set in drawbatch :/
+							if (sampler.Index == 0) {
+								continue;
+							}
+							//are smapler indexes always normal texture indexes?
+							tex = (Texture)textures [sampler.Index];
+						}
+
+						GL.ActiveTexture( (TextureUnit)((int)TextureUnit.Texture0 + sampler.Index) );
+
+						tex.Activate ();
+						
+						samplerStates[sampler.Index].Activate(tex.glTarget);
 					break;
 				}
 	//				case All.SamplerCube:
@@ -414,7 +483,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				//uniform.Value = parameter.value;
 			//}
 #else
-				switch (uniform.glType)
+				switch (uniform.GLSLType)
 				{
 				case ActiveUniformType.Float :
 
