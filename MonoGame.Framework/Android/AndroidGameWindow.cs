@@ -70,13 +70,16 @@ namespace Microsoft.Xna.Framework
 		private Game _game;
 		private GameTime _updateGameTime;
         private GameTime _drawGameTime;
-        private DateTime _lastUpdate;
-		private DateTime _now;
         private DisplayOrientation _currentOrientation;
 		private GestureDetector gesture = null;
-		private bool _needsToResetElapsedTime = false;
-		private bool _isFirstTime = true;
-		private TimeSpan _extraElapsedTime;		
+		private bool resetUpdateElapsedTime = false;
+        private bool resetRenderElapsedTime = false;
+        double updateFrameElapsed;
+        double renderFrameElapsed;
+        double updateFrameTotal;
+        double renderFrameTotal;
+        double updateFrameLast;
+        double renderFrameLast;
 
         public AndroidGameWindow(Context context, Game game) : base(context)
         {
@@ -94,9 +97,6 @@ namespace Microsoft.Xna.Framework
             _updateGameTime = new GameTime();
             _drawGameTime = new GameTime();
 
-            // Initialize _lastUpdate
-            _lastUpdate = DateTime.Now;
-					
 			gesture = new GestureDetector(new GestureListener((AndroidGameActivity)this.Context));
 			
             this.RequestFocus();
@@ -107,7 +107,8 @@ namespace Microsoft.Xna.Framework
 
 		public void ResetElapsedTime ()
 		{
-			_needsToResetElapsedTime = true;
+			resetUpdateElapsedTime = true;
+            resetRenderElapsedTime = true;
 		}
 		
 		void GameWindow_Closed(object sender,EventArgs e)
@@ -126,7 +127,7 @@ namespace Microsoft.Xna.Framework
         {
             Keyboard.KeyDown(keyCode);
             // we need to handle the Back key here because it doesnt work any other way
-            if (keyCode == Keycode.Back) //_game.Exit();
+            if (keyCode == Keycode.Back)
                 GamePad.Instance.SetBack();
 
             if (keyCode == Keycode.VolumeUp)
@@ -186,11 +187,28 @@ namespace Microsoft.Xna.Framework
             if (!GraphicsContext.IsCurrent)
                 MakeCurrent();
 
-            if (_game != null) {
-                _drawGameTime.Update(_now - _lastUpdate);                
+            if (_game != null)
+            {
+                // Allow any UI marshalled calls to happen
+                Threading.Run();
+
+                double targetElapsed = _game.TargetElapsedTime.TotalSeconds;
+                renderFrameElapsed += e.Time;
+                if (renderFrameElapsed < (renderFrameLast + targetElapsed))
+                    return;
+
+                if (resetRenderElapsedTime)
+                {
+                    renderFrameElapsed = renderFrameLast + targetElapsed;
+                    resetRenderElapsedTime = false;
+                }
+
+                _drawGameTime.Update(TimeSpan.FromSeconds(renderFrameElapsed));
+                // If the elapsed time is more than the target elapsed time (plus a 10% allowance), the game is running slowly
+                _drawGameTime.IsRunningSlowly = renderFrameElapsed > (targetElapsed * 1.1);
                 _game.DoDraw(_drawGameTime);
-				_lastUpdate = _now;
             }
+
             try
             {
                 SwapBuffers();
@@ -204,45 +222,42 @@ namespace Microsoft.Xna.Framework
         protected override void OnUpdateFrame(FrameEventArgs e)
 		{			
 			base.OnUpdateFrame(e);
-			
+
 			if (_game != null )
 			{
-                //ObserveDeviceRotation();				
-				_now = DateTime.Now;
-				
-				if (_isFirstTime) {
-					// Initialize GameTime
-					_updateGameTime = new GameTime ();
-					_drawGameTime = new GameTime ();
-					_lastUpdate = DateTime.Now;
-					_isFirstTime = false;
+                // Allow any UI marshalled calls to happen
+                Threading.Run();
+
+                double targetElapsed = _game.TargetElapsedTime.TotalSeconds;
+                updateFrameElapsed += e.Time;
+                if (updateFrameElapsed < (updateFrameLast + targetElapsed))
+                    return;
+
+				if (resetUpdateElapsedTime)
+                {
+                    updateFrameElapsed = updateFrameLast + targetElapsed;
+					resetUpdateElapsedTime = false;
 				}
 
-				if (_needsToResetElapsedTime) {
-					_drawGameTime.ResetElapsedTime();
-					_needsToResetElapsedTime = false;
-				}
-				
-				
-				_updateGameTime.Update(_now - _lastUpdate);
-				
-				TimeSpan catchup = _updateGameTime.ElapsedGameTime;
-				if (catchup > _game.TargetElapsedTime) {
-					while (catchup > _game.TargetElapsedTime) {
-						catchup -= _game.TargetElapsedTime;
-						_updateGameTime.ElapsedGameTime = _game.TargetElapsedTime;
-						_game.DoUpdate (_updateGameTime);
-						_extraElapsedTime += catchup;
-					}
-					if (_extraElapsedTime > _game.TargetElapsedTime) {
-						_game.DoUpdate (_updateGameTime);
-						_extraElapsedTime = TimeSpan.Zero;
-					}
-				}
-				else {
-					_game.DoUpdate (_updateGameTime);
-				}
-								
+                if (_game.IsFixedTimeStep)
+                {
+                    // If we will be calling Update two or more times, the game is running slowly
+                    _updateGameTime.IsRunningSlowly = updateFrameElapsed >= updateFrameLast + (targetElapsed * 2.0);
+                    while (updateFrameElapsed >= targetElapsed)
+                    {
+                        _updateGameTime.Update(TimeSpan.FromSeconds(targetElapsed));
+                        _game.DoUpdate(_updateGameTime);
+                        updateFrameElapsed -= targetElapsed;
+                    }
+                }
+                else
+                {
+                    // No fixed step, so just update once with a potentially large elapsed time
+                    _updateGameTime.Update(TimeSpan.FromSeconds(updateFrameElapsed));
+                    // If the elapsed time is more than the target elapsed time (plus a 10% allowance), the game is running slowly
+                    _updateGameTime.IsRunningSlowly = updateFrameElapsed > (targetElapsed * 1.1);
+                    _game.DoUpdate(_updateGameTime);
+                }
 			}
 		}
 		

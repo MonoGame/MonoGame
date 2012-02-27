@@ -97,95 +97,99 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		public Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipmap, SurfaceFormat format)
 		{
-			if (graphicsDevice == null)
+            if (graphicsDevice == null)
             {
                 throw new ArgumentNullException("Graphics Device Cannot Be Null");
             }
-			this.graphicsDevice = graphicsDevice;
-			this.width = width;
-			this.height = height;
-			this.format = format;
-			this.levelCount = 1;
+            this.graphicsDevice = graphicsDevice;
+            this.width = width;
+            this.height = height;
+            this.format = format;
+            this.levelCount = 1;
 
-			this.glTarget = TextureTarget.Texture2D;
-			
+            this.glTarget = TextureTarget.Texture2D;
+            
+            Threading.BlockOnUIThread(() =>
+            {
 #if IPHONE || ANDROID
-			GL.GenTextures(1, ref this.glTexture);
+				GL.GenTextures(1, ref this.glTexture);
 #else
-			GL.GenTextures(1, out this.glTexture);
+				GL.GenTextures(1, out this.glTexture);
 #endif
-			// For best compatibility and to keep the default wrap mode of XNA, only set ClampToEdge if either
-			// dimension is not a power of two.
-			TextureWrapMode wrap = TextureWrapMode.Repeat;
-			if (((width & (width - 1)) != 0) || ((height & (height - 1)) != 0))
-				wrap = TextureWrapMode.ClampToEdge;
+			    // For best compatibility and to keep the default wrap mode of XNA, only set ClampToEdge if either
+			    // dimension is not a power of two.
+			    TextureWrapMode wrap = TextureWrapMode.Repeat;
+			    if (((width & (width - 1)) != 0) || ((height & (height - 1)) != 0))
+				    wrap = TextureWrapMode.ClampToEdge;
 
-			GL.BindTexture(TextureTarget.Texture2D, this.glTexture);
-			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter,
-			                mipmap ? (int)TextureMinFilter.LinearMipmapLinear : (int)TextureMinFilter.Linear);
-			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter,
-			                (int)TextureMagFilter.Linear);
-			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS,	(int)wrap);
-			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)wrap);
+			    GL.BindTexture(TextureTarget.Texture2D, this.glTexture);
+			    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter,
+			                    mipmap ? (int)TextureMinFilter.LinearMipmapLinear : (int)TextureMinFilter.Linear);
+			    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter,
+			                    (int)TextureMagFilter.Linear);
+			    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS,	(int)wrap);
+			    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)wrap);
 			
-			format.GetGLFormat(out glInternalFormat, out glFormat, out glType);
+			    format.GetGLFormat(out glInternalFormat, out glFormat, out glType);
 
-			if (glFormat == (GLPixelFormat)All.CompressedTextureFormats)
-			{
-				var imageSize = 0;
-				switch (format) {
-				case SurfaceFormat.RgbPvrtc2Bpp:
-				case SurfaceFormat.RgbaPvrtc2Bpp:
-					imageSize = (Math.Max(this.width, 8) * Math.Max(this.height, 8) * 2 + 7) / 8;
-					break;
-				case SurfaceFormat.RgbPvrtc4Bpp:
-				case SurfaceFormat.RgbaPvrtc4Bpp:
-					imageSize = (Math.Max(this.width, 16) * Math.Max(this.height, 8) * 4 + 7) / 8;
-					break;
-				case SurfaceFormat.Dxt1:
-					imageSize = ((this.width+3)/4)*((this.height+3)/4)*8 * 1;
-					break;
-				case SurfaceFormat.Dxt3:
-				case SurfaceFormat.Dxt5:
-					imageSize = ((this.width+3)/4)*((this.height+3)/4)*16 * 1;
-					break;
-				default:
-					throw new NotImplementedException();
-				}
+			    if (glFormat == (GLPixelFormat)All.CompressedTextureFormats)
+			    {
+				    var imageSize = 0;
+                    switch (format)
+                    {
+                        case SurfaceFormat.RgbPvrtc2Bpp:
+                        case SurfaceFormat.RgbaPvrtc2Bpp:
+                            imageSize = (Math.Max(this.width, 8) * Math.Max(this.height, 8) * 2 + 7) / 8;
+                            break;
+                        case SurfaceFormat.RgbPvrtc4Bpp:
+                        case SurfaceFormat.RgbaPvrtc4Bpp:
+                            imageSize = (Math.Max(this.width, 16) * Math.Max(this.height, 8) * 4 + 7) / 8;
+                            break;
+                        case SurfaceFormat.Dxt1:
+                            imageSize = ((this.width + 3) / 4) * ((this.height + 3) / 4) * 8 * 1;
+                            break;
+                        case SurfaceFormat.Dxt3:
+                        case SurfaceFormat.Dxt5:
+                            imageSize = ((this.width + 3) / 4) * ((this.height + 3) / 4) * 16 * 1;
+                            break;
+                        default:
+                            throw new NotImplementedException();
+                    }
 				
-				GL.CompressedTexImage2D(TextureTarget.Texture2D, 0, glInternalFormat,
-				                        this.width, this.height, 0,
-				                        imageSize, IntPtr.Zero);
-			}
-			else
-			{
-				GL.TexImage2D(TextureTarget.Texture2D, 0,
+				    GL.CompressedTexImage2D(TextureTarget.Texture2D, 0, glInternalFormat,
+				                            this.width, this.height, 0,
+				                            imageSize, IntPtr.Zero);
+			    }
+			    else
+			    {
+				    GL.TexImage2D(TextureTarget.Texture2D, 0,
 #if IPHONE || ANDROID
-				              (int)glInternalFormat,
+						(int)glInternalFormat,
 #else				           
-				              glInternalFormat,
-#endif				              
-				              this.width, this.height, 0,
-				              glFormat, glType, IntPtr.Zero);
-			}
-			
-			if (mipmap)
-			{
+						glInternalFormat,
+#endif
+						this.width, this.height, 0,
+						glFormat, glType, IntPtr.Zero);
+				}
+
+				if (mipmap)
+				{
 #if IPHONE || ANDROID
-				GL.GenerateMipmap(TextureTarget.Texture2D);
+					GL.GenerateMipmap(TextureTarget.Texture2D);
 #else
-				GL.TexParameter (TextureTarget.Texture2D,
-				                 TextureParameterName.GenerateMipmap,
-				                 (int)All.True);
+					GL.TexParameter (TextureTarget.Texture2D,
+						TextureParameterName.GenerateMipmap,
+						(int)All.True);
 #endif
 				
-				int size = Math.Max(this.width, this.height);
-				while (size > 1)
-				{
-					size = size / 2;
-					this.levelCount++;
-				}
-			}
+				    int size = Math.Max(this.width, this.height);
+				    while (size > 1)
+				    {
+					    size = size / 2;
+					    this.levelCount++;
+				    }
+			    }
+			});
 		}
 				
 		public Texture2D(GraphicsDevice graphicsDevice, int width, int height) : 
@@ -212,40 +216,47 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void SetData<T>(int level, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct 
         {
-            if (data == null) throw new ArgumentNullException("data");
+            if (data == null)
+				throw new ArgumentNullException("data");
 
-            var elementSizeInByte = Marshal.SizeOf(typeof(T));
-			var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-			var startBytes = startIndex * elementSizeInByte;
-			var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
-			
-			var xOffset = 0;
-			var yOffset = 0;
-			var width = this.width;
-			var height = this.height;
-			
-			if (rect.HasValue)
-			{
-				xOffset = rect.Value.X;
-				yOffset = rect.Value.Y;
-				width = rect.Value.Width;
-				height = rect.Value.Height;
-			}
+            Threading.BlockOnUIThread(() =>
+            {
+                var elementSizeInByte = Marshal.SizeOf(typeof(T));
+                var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+                var startBytes = startIndex * elementSizeInByte;
+                var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
+                int x, y, w, h;
+                if (rect.HasValue)
+                {
+                    x = rect.Value.X;
+                    y = rect.Value.Y;
+                    w = rect.Value.Width;
+                    h = rect.Value.Height;
+                }
+                else
+                {
+                    x = 0;
+                    y = 0;
+                    w = width;
+                    h = height;
+                }
 
-            GL.BindTexture(TextureTarget.Texture2D, this.glTexture);
-			
-			if (glFormat == (GLPixelFormat)All.CompressedTextureFormats)
-			{
-				GL.CompressedTexSubImage2D(TextureTarget.Texture2D, level,
-				                           0, 0, width, height,
-				                           (GLPixelFormat)glInternalFormat, data.Length-startBytes, dataPtr);
-			}
-			else
-            	GL.TexSubImage2D(TextureTarget.Texture2D, level,
-			                 xOffset, yOffset, width, height,
-			                 glFormat, glType, dataPtr);
-			
-			dataHandle.Free();
+                GL.BindTexture(TextureTarget.Texture2D, this.glTexture);
+
+                if (glFormat == (GLPixelFormat)All.CompressedTextureFormats)
+                {
+                    GL.CompressedTexSubImage2D(TextureTarget.Texture2D, level,
+                                               x, y, w, h,
+                                               (GLPixelFormat)glInternalFormat, data.Length - startBytes, dataPtr);
+                }
+                else
+                {
+                    GL.TexSubImage2D(TextureTarget.Texture2D, level,
+                                 x, y, w, h,
+                                 glFormat, glType, dataPtr);
+                }
+                dataHandle.Free();
+            });
         }
 		
 		public void SetData<T>(T[] data, int startIndex, int elementCount) where T : struct
@@ -311,22 +322,33 @@ namespace Microsoft.Xna.Framework.Graphics
 				var width = cgImage.Width;
 				var height = cgImage.Height;
 				
-				var texture = new Texture2D(graphicsDevice, width, height, false, SurfaceFormat.Color);			
-				var data = new byte[texture.width * texture.height * 4];
+				var data = new byte[width * height * 4];
 				
 				var colorSpace = CGColorSpace.CreateDeviceRGB();
-				var bitmapContext = new CGBitmapContext(data, texture.width, texture.height, 8, texture.width * 4, colorSpace, CGBitmapFlags.PremultipliedLast);
-				bitmapContext.DrawImage(new RectangleF(0, 0, texture.width, texture.height), cgImage);
+				var bitmapContext = new CGBitmapContext(data, width, height, 8, width * 4, colorSpace, CGBitmapFlags.PremultipliedLast);
+				bitmapContext.DrawImage(new RectangleF(0, 0, width, height), cgImage);
 				bitmapContext.Dispose();
 				colorSpace.Dispose();
 				
-				texture.SetData(data);
+                Texture2D texture = null;
+                Threading.BlockOnUIThread(() =>
+                {
+				    texture = new Texture2D(graphicsDevice, width, height, false, SurfaceFormat.Color);			
+    				texture.SetData(data);
+                });
 			
 				return texture;
 			}
 #elif ANDROID
-            Bitmap image = BitmapFactory.DecodeStream(stream);
-
+            // Work-around for "The program 'Mono' has exited with code 255 (0xff)."
+			// Based on http://stackoverflow.com/questions/7535503/mono-for-android-exit-code-255-on-bitmapfactory-decodestream
+            //Bitmap image = BitmapFactory.DecodeStream(stream);
+			Bitmap image = null;
+			using (MemoryStream memStream = new MemoryStream())
+			{
+				stream.CopyTo(memStream);
+				image = BitmapFactory.DecodeByteArray(memStream.GetBuffer(), 0, (int)memStream.Length);
+			}
             var width = image.Width;
             var height = image.Height;
 #if ES11
@@ -335,8 +357,6 @@ namespace Microsoft.Xna.Framework.Graphics
             width = (int)Math.Pow(2, Math.Min(10, Math.Ceiling(Math.Log10(imageSource.Width) / Math.Log10(2))));
             height = (int)Math.Pow(2, Math.Min(10, Math.Ceiling(Math.Log10(imageSource.Height) / Math.Log10(2))));
 #endif
-            var texture = new Texture2D(graphicsDevice, width, height, false, SurfaceFormat.Color);
-
             int[] pixels = new int[width * height];
             if ((width != image.Width) || (height != image.Height))
             {
@@ -358,8 +378,12 @@ namespace Microsoft.Xna.Framework.Graphics
 				pixels[i] = (int)((pixel & 0xFF00FF00) | ((pixel & 0x00FF0000) >> 16) | ((pixel & 0x000000FF) << 16));
 			}
 
-			texture.SetData<int>(pixels);
-
+            Texture2D texture = null;
+            Threading.BlockOnUIThread(() =>
+            {
+                texture = new Texture2D(graphicsDevice, width, height, false, SurfaceFormat.Color);
+                texture.SetData<int>(pixels);
+            });
             return texture;
 #else
             using (Bitmap image = (Bitmap)Bitmap.FromStream(stream))
@@ -367,8 +391,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 // Fix up the Image to match the expected format
                 image.RGBToBGR();
 
-                Texture2D texture = new Texture2D(graphicsDevice, image.Width, image.Height);
-                var data = new byte[texture.Width * texture.Height * 4];
+                var data = new byte[image.Width * image.Height * 4];
 
                 BitmapData bitmapData = image.LockBits(new System.Drawing.Rectangle(0, 0, image.Width, image.Height),
                     ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
@@ -376,7 +399,12 @@ namespace Microsoft.Xna.Framework.Graphics
                 Marshal.Copy(bitmapData.Scan0, data, 0, data.Length);
                 image.UnlockBits(bitmapData);
 
-                texture.SetData(data);
+                Texture2D texture = null;
+                Threading.BlockOnUIThread(() =>
+                {
+                    texture = new Texture2D(graphicsDevice, image.Width, image.Height);
+                    texture.SetData(data);
+                });
 
                 return texture;
             }

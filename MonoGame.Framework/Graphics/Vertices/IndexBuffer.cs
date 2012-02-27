@@ -38,15 +38,18 @@ namespace Microsoft.Xna.Framework.Graphics
             this.BufferUsage = bufferUsage;
 			
 			var sizeInBytes = indexCount * (this.IndexElementSize == IndexElementSize.SixteenBits ? 2 : 4);
-			
+
+            Threading.BlockOnUIThread(() =>
+                {
 #if IPHONE || ANDROID
-			GL.GenBuffers(1, ref ibo);
+                    GL.GenBuffers(1, ref ibo);
 #else
             GL.GenBuffers(1, out ibo);
 #endif
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, ibo);
-            GL.BufferData(BufferTarget.ElementArrayBuffer,
-			              (IntPtr)sizeInBytes, IntPtr.Zero, dynamic ? BufferUsageHint.StreamDraw : BufferUsageHint.StaticDraw);
+                    GL.BindBuffer(BufferTarget.ElementArrayBuffer, ibo);
+                    GL.BufferData(BufferTarget.ElementArrayBuffer,
+                                  (IntPtr)sizeInBytes, IntPtr.Zero, dynamic ? BufferUsageHint.StreamDraw : BufferUsageHint.StaticDraw);
+                });
 		}
 		
 		public IndexBuffer(GraphicsDevice graphicsDevice, IndexElementSize indexElementSize, int indexCount, BufferUsage bufferUsage) :
@@ -84,46 +87,55 @@ namespace Microsoft.Xna.Framework.Graphics
 		public void SetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount) where T : struct
         {
 			if (data == null) throw new ArgumentNullException("data");
-			
-			var elementSizeInByte = Marshal.SizeOf(typeof(T));
-			var sizeInBytes = elementSizeInByte * elementCount;
-			var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-			var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startIndex * elementSizeInByte);
-		
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, ibo);
-            GL.BufferSubData(BufferTarget.ElementArrayBuffer, (IntPtr)offsetInBytes, (IntPtr)sizeInBytes, dataPtr);
-			
-			dataHandle.Free();
+
+            Threading.BlockOnUIThread(() =>
+                {
+                    var elementSizeInByte = Marshal.SizeOf(typeof(T));
+                    var sizeInBytes = elementSizeInByte * elementCount;
+                    var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+                    var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startIndex * elementSizeInByte);
+
+                    GL.BindBuffer(BufferTarget.ElementArrayBuffer, ibo);
+                    GL.BufferSubData(BufferTarget.ElementArrayBuffer, (IntPtr)offsetInBytes, (IntPtr)sizeInBytes, dataPtr);
+
+                    dataHandle.Free();
+                });
 		}
 		
 		public void SetData<T>(T[] data, int startIndex, int elementCount) where T : struct
         {
 			if (data == null) throw new ArgumentNullException("data");
 
-            var elementSizeInByte = Marshal.SizeOf(typeof(T));
-			var sizeInBytes = elementSizeInByte * elementCount;
-			var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-			var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startIndex * elementSizeInByte);
-		
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, ibo);
-            GL.BufferSubData(BufferTarget.ElementArrayBuffer, IntPtr.Zero, (IntPtr)sizeInBytes, dataPtr);
-			
-			dataHandle.Free();
+            Threading.BlockOnUIThread(() =>
+                {
+                    var elementSizeInByte = Marshal.SizeOf(typeof(T));
+                    var sizeInBytes = elementSizeInByte * elementCount;
+                    var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+                    var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startIndex * elementSizeInByte);
+
+                    GL.BindBuffer(BufferTarget.ElementArrayBuffer, ibo);
+                    GL.BufferSubData(BufferTarget.ElementArrayBuffer, IntPtr.Zero, (IntPtr)sizeInBytes, dataPtr);
+
+                    dataHandle.Free();
+                });
 		}
 		
         public void SetData<T>(T[] data) where T : struct
         {
 			if (data == null) throw new ArgumentNullException("data");
 
-            var elementSizeInByte = Marshal.SizeOf(typeof(T));
-			var sizeInBytes = elementSizeInByte * data.Length;
-			var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-			var dataPtr = dataHandle.AddrOfPinnedObject();
+            Threading.BlockOnUIThread(() =>
+                {
+                    var elementSizeInByte = Marshal.SizeOf(typeof(T));
+                    var sizeInBytes = elementSizeInByte * data.Length;
+                    var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+                    var dataPtr = dataHandle.AddrOfPinnedObject();
 
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, ibo);
-            GL.BufferSubData(BufferTarget.ElementArrayBuffer, IntPtr.Zero, (IntPtr)sizeInBytes, dataPtr);
-			
-			dataHandle.Free();
+                    GL.BindBuffer(BufferTarget.ElementArrayBuffer, ibo);
+                    GL.BufferSubData(BufferTarget.ElementArrayBuffer, IntPtr.Zero, (IntPtr)sizeInBytes, dataPtr);
+
+                    dataHandle.Free();
+                });
         }
 		
 		public override void Dispose ()
