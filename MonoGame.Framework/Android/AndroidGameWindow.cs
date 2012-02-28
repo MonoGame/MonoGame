@@ -203,11 +203,12 @@ namespace Microsoft.Xna.Framework
                     resetRenderElapsedTime = false;
                 }
 
-                _drawGameTime.Update(TimeSpan.FromSeconds(renderFrameElapsed));
-                // If the elapsed time is more than the target elapsed time (plus a 10% allowance), the game is running slowly
-                _drawGameTime.IsRunningSlowly = renderFrameElapsed > targetElapsed;
+                double delta = renderFrameElapsed - renderFrameLast;
+                _drawGameTime.Update(TimeSpan.FromSeconds(delta));
+                // If the elapsed time is more than the target elapsed time, the game is running slowly
+                _drawGameTime.IsRunningSlowly = delta > targetElapsed;
                 _game.DoDraw(_drawGameTime);
-                renderFrameElapsed = 0.0;
+                renderFrameLast = renderFrameElapsed;
             }
 
             try
@@ -240,26 +241,27 @@ namespace Microsoft.Xna.Framework
 					resetUpdateElapsedTime = false;
 				}
 
+                double delta = updateFrameElapsed - updateFrameLast;
                 if (_game.IsFixedTimeStep)
                 {
                     // If we will be calling Update two or more times, the game is running slowly
                     _updateGameTime.IsRunningSlowly = updateFrameElapsed >= updateFrameLast + (targetElapsed * 2.0);
-                    while (updateFrameElapsed >= targetElapsed)
+                    while (delta >= targetElapsed)
                     {
                         _updateGameTime.Update(TimeSpan.FromSeconds(targetElapsed));
                         _game.DoUpdate(_updateGameTime);
-                        updateFrameElapsed -= targetElapsed;
+                        delta -= targetElapsed;
                     }
                 }
                 else
                 {
                     // No fixed step, so just update once with a potentially large elapsed time
-                    _updateGameTime.Update(TimeSpan.FromSeconds(updateFrameElapsed));
+                    _updateGameTime.Update(TimeSpan.FromSeconds(delta));
                     // If the elapsed time is more than the target elapsed time, the game is running slowly
-                    _updateGameTime.IsRunningSlowly = updateFrameElapsed > targetElapsed;
+                    _updateGameTime.IsRunningSlowly = delta > targetElapsed;
                     _game.DoUpdate(_updateGameTime);
-                    updateFrameElapsed = 0.0;
                 }
+                updateFrameLast = updateFrameElapsed;
 			}
 		}
 		
