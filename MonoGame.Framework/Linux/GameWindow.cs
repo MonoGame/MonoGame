@@ -96,7 +96,7 @@ namespace Microsoft.Xna.Framework
 			}
 		}
 		
-		public string Title
+		public override string Title
         {
             get { return window.Title; }
             set { SetTitle(value); }

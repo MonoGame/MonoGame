@@ -79,25 +79,13 @@ namespace Microsoft.Xna.Framework
 
         #region Public Properties
 
-        public override IntPtr Handle
-        {
-            get { return IntPtr.Zero; }
-        }
+        public override IntPtr Handle { get { return IntPtr.Zero; } }
 
-        public override string ScreenDeviceName
-        {
-            get { return string.Empty; }
-        }
+        public override string ScreenDeviceName { get { return window.Title; } }
 
-        public override Rectangle ClientBounds
-        {
-            get
-            {
-                return clientBounds;
-            }
-        }
+        public override Rectangle ClientBounds { get { return clientBounds; } }
 
-        public new string Title
+        public override string Title
         {
             get { return window.Title; }
             set { SetTitle(value); }
