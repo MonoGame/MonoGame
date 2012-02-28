@@ -59,7 +59,6 @@ namespace Microsoft.Xna.Framework
         private DateTime _lastUpdate;
         private DateTime _now;
         private bool _allowUserResizing;
-        private bool _transitiveAllowUserResizing;
         private DisplayOrientation _currentOrientation;
         private OpenTK.GameWindow window;
         protected Game game;
@@ -69,6 +68,7 @@ namespace Microsoft.Xna.Framework
         private WindowState windowState;
         private Rectangle clientBounds;
         private bool updateClientBounds;
+        private WindowBorder _transitiveWindowBorder; // Holds the correct window state while resizing.
 
         #region Internal Properties
 
@@ -110,12 +110,20 @@ namespace Microsoft.Xna.Framework
             get { return _allowUserResizing; }
             set
             {
-                _allowUserResizing = _transitiveAllowUserResizing = value;
+                _allowUserResizing = value;
                 if (_allowUserResizing)
                     window.WindowBorder = WindowBorder.Resizable;
                 else
                     window.WindowBorder = WindowBorder.Fixed; // OTK's buggy here, let's wait for 1.1
             }
+        }
+
+        // Because on Linux we must allow a user-resizable window
+        // to resize a window, check if our AllowUserResizing and
+        // windowstate match
+        private bool WindowStateIsValid
+        {
+            get { return (window.WindowBorder == WindowBorder.Resizable) == AllowUserResizing; }
         }
 
         public override DisplayOrientation CurrentOrientation
@@ -215,10 +223,10 @@ namespace Microsoft.Xna.Framework
             // we should wait until window's not fullscreen to resize
             if (updateClientBounds && window.WindowState == WindowState.Normal)
             {
-                // it seems, at least on linux, we can't resize if we disallow user resizing			
-                // make next state the current state
-                _transitiveAllowUserResizing = AllowUserResizing;
-                // allow resize to resize window
+                // it seems, at least on linux, we can't resize if we disallow user resizing
+                // save the window state while we resize the ClientRectangle
+                _transitiveWindowBorder = window.WindowBorder;
+
                 window.WindowBorder = WindowBorder.Resizable;
 
                 window.ClientRectangle = new System.Drawing.Rectangle(clientBounds.X,
@@ -226,10 +234,10 @@ namespace Microsoft.Xna.Framework
 
                 updateClientBounds = false;
             }
-            else if (_transitiveAllowUserResizing != _allowUserResizing)
+            else if (!WindowStateIsValid)
             {
                 // reset previous value
-                AllowUserResizing = _transitiveAllowUserResizing;
+                window.WindowBorder = _transitiveWindowBorder;
             }
 
             if (window.WindowState != windowState)
