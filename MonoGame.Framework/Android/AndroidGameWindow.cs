@@ -205,8 +205,9 @@ namespace Microsoft.Xna.Framework
 
                 _drawGameTime.Update(TimeSpan.FromSeconds(renderFrameElapsed));
                 // If the elapsed time is more than the target elapsed time (plus a 10% allowance), the game is running slowly
-                _drawGameTime.IsRunningSlowly = renderFrameElapsed > (targetElapsed * 1.1);
+                _drawGameTime.IsRunningSlowly = renderFrameElapsed > targetElapsed;
                 _game.DoDraw(_drawGameTime);
+                renderFrameElapsed = 0.0;
             }
 
             try
@@ -254,9 +255,10 @@ namespace Microsoft.Xna.Framework
                 {
                     // No fixed step, so just update once with a potentially large elapsed time
                     _updateGameTime.Update(TimeSpan.FromSeconds(updateFrameElapsed));
-                    // If the elapsed time is more than the target elapsed time (plus a 10% allowance), the game is running slowly
-                    _updateGameTime.IsRunningSlowly = updateFrameElapsed > (targetElapsed * 1.1);
+                    // If the elapsed time is more than the target elapsed time, the game is running slowly
+                    _updateGameTime.IsRunningSlowly = updateFrameElapsed > targetElapsed;
                     _game.DoUpdate(_updateGameTime);
+                    updateFrameElapsed = 0.0;
                 }
 			}
 		}
