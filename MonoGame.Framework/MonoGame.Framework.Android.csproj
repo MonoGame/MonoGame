@@ -91,6 +91,7 @@
     <Compile Include="Game.cs" />
     <Compile Include="GamePlatform.cs" />
     <Compile Include="GraphicsDeviceManager.cs" />
+    <Compile Include="Graphics\CompareFunction.cs" />
     <Compile Include="Graphics\CubeMapFace.cs" />
     <Compile Include="Graphics\DisplayMode.cs" />
     <Compile Include="Graphics\Effect\DualTextureEffect.cs" />
@@ -102,7 +103,9 @@
     <Compile Include="Graphics\Effect\EffectAnnotation.cs" />
     <Compile Include="Graphics\Effect\EffectAnnotationCollection.cs" />
     <Compile Include="Graphics\Effect\EnvironmentMapEffect.cs" />
+    <Compile Include="Graphics\Effect\GLSLEffectObject.cs" />
     <Compile Include="Graphics\Effect\GLSLOptimizer.cs" />
+    <Compile Include="Graphics\Effect\GLSLShader.cs" />
     <Compile Include="Graphics\Effect\MojoShader.cs" />
     <Compile Include="Graphics\Effect\SkinnedEffect.cs" />
     <Compile Include="Graphics\Effect\SpriteEffect.cs" />
@@ -115,8 +118,10 @@
     <Compile Include="Graphics\ModelMeshCollection.cs" />
     <Compile Include="Graphics\ModelMeshPart.cs" />
     <Compile Include="Graphics\ModelMeshPartCollection.cs" />
+    <Compile Include="Graphics\PackedVector\NormalizedShort2.cs" />
     <Compile Include="Graphics\PresentationParameters.cs" />
     <Compile Include="Graphics\States\SamplerState.cs" />
+    <Compile Include="Graphics\StencilOperation.cs" />
     <Compile Include="Graphics\Texture2D.cs" />
     <Compile Include="Graphics\TextureCube.cs" />
     <Compile Include="PrimaryThreadLoader.cs" />
@@ -415,6 +420,12 @@
     <EmbeddedResource Include="Graphics\Effect\EnvironmentMapEffect.bin" />
     <EmbeddedResource Include="Graphics\Effect\SkinnedEffect.bin" />
     <EmbeddedResource Include="Graphics\Effect\SpriteEffect.bin" />
+    <None Include="Graphics\Effect\AlphaTestEffectGLSL.bin" />
+    <None Include="Graphics\Effect\BasicEffectGLSL.bin" />
+    <None Include="Graphics\Effect\DualTextureEffectGLSL.bin" />
+    <None Include="Graphics\Effect\EnvironmentMapEffectGLSL.bin" />
+    <None Include="Graphics\Effect\SkinnedEffectGLSL.bin" />
+    <None Include="Graphics\Effect\SpriteEffectGLSL.bin" />
     <None Include="Properties\AndroidManifest.xml" />
   </ItemGroup>
   <ItemGroup />

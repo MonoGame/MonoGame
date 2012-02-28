@@ -56,7 +56,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		internal List<EffectParameter> _textureMappings = new List<EffectParameter>();
 
 		DXEffectObject effectObject;
-		
+		GLSLEffectObject glslEffectObject;
+
 		protected Effect (GraphicsDevice graphicsDevice)
 		{
 #if ES11
@@ -99,6 +100,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		}
 
+		internal Effect (GraphicsDevice graphicsDevice, string assetName)
+		{
+
+		}
+
 		public Effect (
 			GraphicsDevice graphicsDevice,
 			byte[] effectCode)
@@ -111,24 +117,44 @@ namespace Microsoft.Xna.Framework.Graphics
 				throw new ArgumentNullException ("Graphics Device Cannot Be Null");
 			}
 			this.graphicsDevice = graphicsDevice;
-			
-			//try getting a cached effect object
-			if (!effectObjectCache.TryGetValue(effectCode, out effectObject))
-			{
-				effectObject = new DXEffectObject(effectCode);
-				effectObjectCache.Add (effectCode, effectObject);
+
+			uint magic = BitConverter.ToUInt32(effectCode,0);
+			//0xBCF00BCF XNA 4 effects
+			//0xFEFF0901 effect too old or too new, or ascii which we can't compile atm
+			//0x6151EFFE GLSL
+
+			if (magic == 0x6151EFFE) {// GLSL shader is to be used from fxg file
+				glslEffectObject = new GLSLEffectObject(effectCode);
+
+				Parameters = new EffectParameterCollection();
+				foreach (GLSLEffectObject.glslParameter parameter in glslEffectObject.parameter_handles) {
+					Parameters._parameters.Add (new EffectParameter(parameter));
+				}
+
+				Techniques = new EffectTechniqueCollection();
+				foreach (GLSLEffectObject.glslTechnique technique in glslEffectObject.technique_handles) {
+					Techniques._techniques.Add (new EffectTechnique(this, technique));
+				}
 			}
-			
-			Parameters = new EffectParameterCollection();
-			foreach (DXEffectObject.d3dx_parameter parameter in effectObject.parameter_handles) {
-				Parameters._parameters.Add (new EffectParameter(parameter));
+			else {
+				//try getting a cached effect object
+				if (!effectObjectCache.TryGetValue(effectCode, out effectObject))
+				{
+					effectObject = new DXEffectObject(effectCode);
+					effectObjectCache.Add (effectCode, effectObject);
+				}
+	
+				Parameters = new EffectParameterCollection();
+				foreach (DXEffectObject.d3dx_parameter parameter in effectObject.parameter_handles) {
+					Parameters._parameters.Add (new EffectParameter(parameter));
+				}
+	
+				Techniques = new EffectTechniqueCollection();
+				foreach (DXEffectObject.d3dx_technique technique in effectObject.technique_handles) {
+					Techniques._techniques.Add (new EffectTechnique(this, technique));
+				}
 			}
-			
-			Techniques = new EffectTechniqueCollection();
-			foreach (DXEffectObject.d3dx_technique technique in effectObject.technique_handles) {
-				Techniques._techniques.Add (new EffectTechnique(this, technique));
-			}
-			
+
 			CurrentTechnique = Techniques[0];
 			
 		}
@@ -155,7 +181,11 @@ namespace Microsoft.Xna.Framework.Graphics
 		internal static byte[] LoadEffectResource(string name)
 		{
 			Assembly assembly = Assembly.GetExecutingAssembly();
+#if GLSL_EFFECTS
+			var stream = assembly.GetManifestResourceStream("Microsoft.Xna.Framework.Graphics.Effect."+name+"GLSL.bin");
+#else
 			var stream = assembly.GetManifestResourceStream("Microsoft.Xna.Framework.Graphics.Effect."+name+".bin");
+#endif
 			using (MemoryStream ms = new MemoryStream())
 			{
 				stream.CopyTo(ms);

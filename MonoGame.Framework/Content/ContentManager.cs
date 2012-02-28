@@ -257,6 +257,10 @@ namespace Microsoft.Xna.Framework.Content
 				{
 					assetName = Video.Normalize(assetName);
 				}
+				else if ((typeof(T) == typeof(Effect)))
+				{
+					assetName = EffectReader.Normalize(assetName);
+				}
 	
 				if (string.IsNullOrEmpty(assetName))
 				{
@@ -289,6 +293,17 @@ namespace Microsoft.Xna.Framework.Content
 				else if ((typeof(T) == typeof(Video)))
 				{
 					result = new Video(assetName);
+				}
+				else if ((typeof(T) == typeof(Effect)))
+				{
+					using (Stream assetStream = new FileStream(assetName, FileMode.Open, FileAccess.Read, FileShare.Read))
+					{
+						MemoryStream effectStream = new MemoryStream ((int) assetStream.Length);
+						assetStream.Read (effectStream.GetBuffer(), 0, (int) assetStream.Length);
+						byte[] aad = effectStream.GetBuffer();
+						result = new Effect(this.graphicsDeviceService.GraphicsDevice, effectStream.GetBuffer());
+						effectStream.Close();
+					}
 				}
 			}
 			

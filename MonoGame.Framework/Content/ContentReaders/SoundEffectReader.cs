@@ -51,7 +51,7 @@ namespace Microsoft.Xna.Framework.Content
 #if ANDROID
         static string[] supportedExtensions = new string[] { ".wav", ".mp3", ".ogg", ".mid" };
 #else
-        static string[] supportedExtensions = new string[] { ".wav", ".aiff", ".ac3", "mp3" };
+        static string[] supportedExtensions = new string[] { ".wav", ".aiff", ".ac3", ".mp3" };
 #endif
 
         internal static string Normalize(string fileName)
