@@ -75,12 +75,12 @@ namespace Microsoft.Xna.Framework.Graphics
 			throw new NotSupportedException();
         }
 		
-		public unsafe void GetData<T>(T[] data, int startIndex, int elementCount)
+		public void GetData<T>(T[] data, int startIndex, int elementCount)
 		{
 			throw new NotSupportedException();
 		}
 		
-		public unsafe void GetData<T>(T[] data)
+		public void GetData<T>(T[] data)
 		{
 			throw new NotSupportedException();
 		}
