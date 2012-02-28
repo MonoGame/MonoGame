@@ -382,8 +382,13 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 #endif
         }
-		
-		//What was this for again?
+
+        public void SaveAsJpeg(Stream stream, int width, int height)
+        {
+            throw new NotImplementedException();
+        }
+
+        //What was this for again?
 		internal void Reload(Stream textureStream)
 		{
 		}
