@@ -187,6 +187,7 @@ namespace Microsoft.Xna.Framework
             _viewController.View.MainContext = _viewController.View.EAGLContext;
             _viewController.View.ShareGroup = _viewController.View.MainContext.ShareGroup;
             _viewController.View.BackgroundContext = new EAGLContext(_viewController.View.ContextRenderingApi, _viewController.View.ShareGroup);
+			Threading.BackgroundContext = _viewController.View.BackgroundContext;
         }
 
         private void GameWindow_Unload(object sender, EventArgs e)

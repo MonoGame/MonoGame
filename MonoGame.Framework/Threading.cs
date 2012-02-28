@@ -41,21 +41,31 @@ purpose and non-infringement.
 using System;
 using System.Collections.Generic;
 using System.Threading;
+#if IPHONE
+using MonoTouch.Foundation;
+using MonoTouch.OpenGLES;
+#if ES11
+using OpenTK.Graphics.ES11;
+#else
+using OpenTK.Graphics.ES20;
+#endif
+#endif
 
 namespace Microsoft.Xna.Framework
 {
     internal class Threading
     {
+        static int mainThreadId;
 #if ANDROID || LINUX || WINDOWS
         static List<Action> actions = new List<Action>();
-        static int mainThreadId;
         static Mutex actionsMutex = new Mutex();
-
+#elif IPHONE
+		public static EAGLContext BackgroundContext;
+#endif
         static Threading()
         {
             mainThreadId = Thread.CurrentThread.ManagedThreadId;
         }
-#endif
 
         /// <summary>
         /// Runs the given action on the UI thread and blocks the current thread while the action is running.
@@ -73,14 +83,17 @@ namespace Microsoft.Xna.Framework
                 return;
             }
 
+#if IPHONE
+			lock (BackgroundContext)
+			{
+				if (EAGLContext.CurrentContext != BackgroundContext)
+					EAGLContext.SetCurrentContext(BackgroundContext);
+				action();
+			}
+#else
             System.Threading.ManualResetEventSlim resetEvent = new System.Threading.ManualResetEventSlim(false);
 #if MONOMAC
             MonoMac.AppKit.NSApplication.SharedApplication.BeginInvokeOnMainThread(() =>
-#elif IPHONE
-            new NSObject().InvokeOnUIThread(() =>
-//#elif ANDROID
-            // Activity.RunOnUiThread does not appear to actually run on the UI thread 
-//            Game.Activity.RunOnUiThread(() =>
 #else
             Add(() =>
 #endif
@@ -91,6 +104,7 @@ namespace Microsoft.Xna.Framework
                 resetEvent.Set();
             });
             resetEvent.Wait();
+#endif
         }
 
 #if ANDROID || LINUX || WINDOWS
