@@ -36,6 +36,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			// May need to be moved elsewhere within this method
 			OnApply();
 			
+            GLStateManager.Viewport(Game.Instance.Window.ClientBounds);
             GLStateManager.Projection(Projection);
             GLStateManager.WorldView(World, View);
 

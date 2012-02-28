@@ -38,8 +38,6 @@ purpose and non-infringement.
 */
 #endregion License
 
-using System;
-
 namespace Microsoft.Xna.Framework.Graphics
 {
     public struct DisplayMode
@@ -48,7 +46,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             get
             {
-                return Width  / Height;
+                return (float)Game.Activity.Resources.DisplayMetrics.WidthPixels / (float)Game.Activity.Resources.DisplayMetrics.HeightPixels;
             }
         }
 
@@ -56,7 +54,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             get
             {
-                return (int)Game.Activity.Resources.DisplayMetrics.WidthPixels;
+                return Game.Activity.Resources.DisplayMetrics.WidthPixels;
             }
         }
 
@@ -64,7 +62,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             get
             {
-                return (int)Game.Activity.Resources.DisplayMetrics.HeightPixels;
+                return Game.Activity.Resources.DisplayMetrics.HeightPixels;
             }
         }
 		
