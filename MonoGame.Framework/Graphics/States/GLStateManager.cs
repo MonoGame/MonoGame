@@ -183,7 +183,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public static void FillMode (RasterizerState state)
 		{
-#if MONOMAC
 			switch (state.FillMode) {
 			case Microsoft.Xna.Framework.Graphics.FillMode.Solid:
 				GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
@@ -192,11 +191,6 @@ namespace Microsoft.Xna.Framework.Graphics
 				GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
 				break;
 			}
-#else
-			if (state.FillMode != Microsoft.Xna.Framework.Graphics.FillMode.Solid) {
-				throw new NotImplementedException();
-			}
-#endif
 		}
 
 		public static void Cull(RasterizerState state, bool offscreen)

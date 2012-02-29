@@ -69,21 +69,59 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			GL.BindBuffer(BufferTarget.ArrayBuffer, vbo);
 		}
-		
-        public void GetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride) where T : struct
+
+        public unsafe void GetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride) where T : struct
         {
-			throw new NotSupportedException();
+            GL.BindBuffer(BufferTarget.ArrayBuffer, vbo);
+            var elementSizeInByte = Marshal.SizeOf(typeof(T));
+            IntPtr ptr = new IntPtr();
+            //ptr = GL.Arb.MapBuffer(BufferTargetArb.ArrayBuffer, ArbVertexBufferObject.ReadOnlyArb | ArbVertexBufferObject.ArrayBufferArb);
+            ptr = GL.MapBuffer(BufferTarget.ArrayBuffer, BufferAccess.ReadOnly);
+            ErrorCode e = GL.GetError();
+
+            ///its dark magic time
+            if (ptr != null && ptr.ToInt32() != 0)
+            {
+                ptr = ptr + offsetInBytes + startIndex * vertexStride;
+
+                byte[] bytes = new byte[vertexStride * data.Count()];
+                Marshal.Copy(ptr, bytes, 0, vertexStride * data.Count());
+
+                byte[] by = new byte[elementSizeInByte];
+
+                GL.UnmapBuffer( BufferTarget.ArrayBuffer);
+                Marshal.Release(ptr);
+
+                IntPtr buffer = Marshal.AllocHGlobal(elementSizeInByte);
+
+                for (int j = 0; j < elementCount; j++)
+                {
+                    Array.ConstrainedCopy(bytes, j * vertexStride, by, 0, elementSizeInByte);
+
+                    Marshal.Copy(by, 0, buffer, elementSizeInByte);
+                    object retobj = Marshal.PtrToStructure(buffer, typeof(T));
+                    data[j] = (T)retobj;
+                }
+
+                Marshal.Release(buffer);
+            }
+            else
+            {
+                throw new Exception("Could not decode the Vertex Buffer");
+            }
         }
-		
-		public void GetData<T>(T[] data, int startIndex, int elementCount)
-		{
-			throw new NotSupportedException();
-		}
-		
-		public void GetData<T>(T[] data)
-		{
-			throw new NotSupportedException();
-		}
+
+        public void GetData<T>(T[] data, int startIndex, int elementCount) where T : struct
+        {
+            var elementSizeInByte = Marshal.SizeOf(typeof(T));
+            this.GetData<T>(0, data, startIndex, elementCount, elementSizeInByte);
+        }
+
+        public void GetData<T>(T[] data) where T : struct
+        {
+            var elementSizeInByte = Marshal.SizeOf(typeof(T));
+            this.GetData<T>(0, data, 0, data.Count(), elementSizeInByte);
+        }
 		
 		public void SetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount) where T : struct
         {
