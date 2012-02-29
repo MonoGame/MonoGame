@@ -179,11 +179,16 @@ namespace Microsoft.Xna.Framework.Graphics
                 GL11.TexParameter(ALL11.Texture2D, ALL11.TextureMinFilter, (int)ALL11.LinearMipmapNearest);
                 GL11.TexParameter(ALL11.Texture2D, ALL11.TextureMagFilter, (int)ALL11.Linear);
                 GL11.TexParameter(ALL11.Texture2D, ALL11.GenerateMipmap, (int)ALL11.True);
+				GL11.TexParameter(ALL11.Texture2D, ALL11.TextureWrapS, (int)ALL11.ClampToEdge);
+				GL11.TexParameter(ALL11.Texture2D, ALL11.TextureWrapT, (int)ALL11.ClampToEdge);
 			}
 			else
 			{
-                GL11.TexParameter(ALL11.Texture2D, ALL11.TextureMinFilter, (int)ALL11.Linear);
-                GL11.TexParameter(ALL11.Texture2D, ALL11.TextureMagFilter, (int)ALL11.Linear);
+                GL11.TexParameter(ALL11.Texture2D, ALL11.TextureMinFilter, (int)ALL11.Nearest);
+                GL11.TexParameter(ALL11.Texture2D, ALL11.TextureMagFilter, (int)ALL11.Nearest);
+				GL11.TexParameter(ALL11.Texture2D, ALL11.GenerateMipmap, (int)ALL11.False);
+				GL11.TexParameter(ALL11.Texture2D, ALL11.TextureWrapS, (int)ALL11.ClampToEdge);
+				GL11.TexParameter(ALL11.Texture2D, ALL11.TextureWrapT, (int)ALL11.ClampToEdge);
 			}
 			
 			byte[] textureData = new byte[(_width * _height) * 4];
