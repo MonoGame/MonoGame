@@ -600,9 +600,16 @@ namespace Microsoft.Xna.Framework.Graphics
             // rendertarget to the new one being passed if it is not null
             if (renderTarget == null || currentRenderTargets != null)
             {
-#if ANDROID
-                byte[] imageInfo = new byte[4];
-                GL11.ReadPixels(0, 0, 1, 1, ALL11.Rgba, ALL11.UnsignedByte, imageInfo);
+#if ANDROID					
+				try
+				{
+					// This is a work around for android gl1.1
+                  byte[] imageInfo = new byte[4];
+                  GL11.ReadPixels(0, 0, 1, 1, ALL11.Rgba, ALL11.UnsignedByte, imageInfo);
+				}
+				catch
+				{ 
+				}
 #endif
                 // Detach the render buffers.
                 GL11.Oes.FramebufferRenderbuffer(ALL11.FramebufferOes, ALL11.DepthAttachmentOes,
@@ -724,7 +731,7 @@ namespace Microsoft.Xna.Framework.Graphics
                         if (target.RenderTargetUsage == RenderTargetUsage.DiscardContents)
                             Clear(clearOptions, Color.Transparent, 0, 0);
 
-                        GL11.Oes.BindRenderbuffer(ALL11.FramebufferOes, originalFbo);
+                       // GL11.Oes.BindRenderbuffer(ALL11.FramebufferOes, originalFbo);
 
                     }
 

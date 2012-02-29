@@ -147,8 +147,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 _height = (int)Math.Pow(2, Math.Min(10, Math.Ceiling(Math.Log10(imageSource.Height) / Math.Log10(2))));
             }
 
-            _size.Width = _width;
-            _size.Height = _height;
+            _size.Width = imageSource.Width;
+            _size.Height = imageSource.Height;
 
             if (GraphicsDevice.OpenGLESVersion ==
                 OpenTK.Graphics.GLContextVersion.Gles2_0)
