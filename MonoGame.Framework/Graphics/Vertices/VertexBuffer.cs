@@ -70,7 +70,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			GL.BindBuffer(BufferTarget.ArrayBuffer, vbo);
 		}
 
-        public unsafe void GetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride) where T : struct
+        public void GetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride) where T : struct
         {
             GL.BindBuffer(BufferTarget.ArrayBuffer, vbo);
             var elementSizeInByte = Marshal.SizeOf(typeof(T));
