@@ -757,8 +757,8 @@ namespace Microsoft.Xna.Framework.Graphics
 				( 
 				 destinationRectangle.X, 
 				 destinationRectangle.Y, 
-				 -origin.X, 
-				 -origin.Y, 
+				 -origin.X * ((float)destinationRectangle.Width  / (float)tempRect.Width),  //JEPJ
+		         -origin.Y * ((float)destinationRectangle.Height / (float)tempRect.Height), //JEPJ 
 				 destinationRectangle.Width,
 				 destinationRectangle.Height,
 				 (float)Math.Sin(rotation),
