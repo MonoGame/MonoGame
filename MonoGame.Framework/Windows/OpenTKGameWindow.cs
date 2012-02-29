@@ -59,7 +59,6 @@ namespace Microsoft.Xna.Framework
         private DateTime _lastUpdate;
         private DateTime _now;
         private bool _allowUserResizing;
-        private bool _transitiveAllowUserResizing;
         private DisplayOrientation _currentOrientation;
         private OpenTK.GameWindow window;
         protected Game game;
@@ -80,25 +79,13 @@ namespace Microsoft.Xna.Framework
 
         #region Public Properties
 
-        public override IntPtr Handle
-        {
-            get { return IntPtr.Zero; }
-        }
+        public override IntPtr Handle { get { return IntPtr.Zero; } }
 
-        public override string ScreenDeviceName
-        {
-            get { return string.Empty; }
-        }
+        public override string ScreenDeviceName { get { return window.Title; } }
 
-        public override Rectangle ClientBounds
-        {
-            get
-            {
-                return clientBounds;
-            }
-        }
+        public override Rectangle ClientBounds { get { return clientBounds; } }
 
-        public new string Title
+        public override string Title
         {
             get { return window.Title; }
             set { SetTitle(value); }
@@ -110,7 +97,7 @@ namespace Microsoft.Xna.Framework
             get { return _allowUserResizing; }
             set
             {
-                _allowUserResizing = _transitiveAllowUserResizing = value;
+                _allowUserResizing = value;
                 if (_allowUserResizing)
                     window.WindowBorder = WindowBorder.Resizable;
                 else
@@ -215,21 +202,10 @@ namespace Microsoft.Xna.Framework
             // we should wait until window's not fullscreen to resize
             if (updateClientBounds && window.WindowState == WindowState.Normal)
             {
-                // it seems, at least on linux, we can't resize if we disallow user resizing			
-                // make next state the current state
-                _transitiveAllowUserResizing = AllowUserResizing;
-                // allow resize to resize window
-                window.WindowBorder = WindowBorder.Resizable;
-
                 window.ClientRectangle = new System.Drawing.Rectangle(clientBounds.X,
                                      clientBounds.Y, clientBounds.Width, clientBounds.Height);
 
                 updateClientBounds = false;
-            }
-            else if (_transitiveAllowUserResizing != _allowUserResizing)
-            {
-                // reset previous value
-                AllowUserResizing = _transitiveAllowUserResizing;
             }
 
             if (window.WindowState != windowState)

@@ -53,7 +53,7 @@ namespace Microsoft.Xna.Framework
         public abstract IntPtr Handle { get; }
         public abstract string ScreenDeviceName { get; }
 
-        public string Title { get; set; }
+        public virtual string Title { get; set; }
         protected abstract void SetTitle(string title);
     }
 }
