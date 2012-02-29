@@ -253,7 +253,7 @@ namespace Microsoft.Xna.Framework.Graphics
             this.SetData(0, null, data, startIndex, elementCount);
         }
 		
-		public unsafe void SetData<T>(T[] data) where T : struct
+		public void SetData<T>(T[] data) where T : struct
         {
 			this.SetData(0, null, data, 0, data.Length);
         }

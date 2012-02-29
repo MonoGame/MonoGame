@@ -71,7 +71,7 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.BindBuffer(BufferTarget.ArrayBuffer, ibo);
             var elementSizeInByte = Marshal.SizeOf(typeof(T));
             IntPtr ptr = new IntPtr();
-            ptr = GL.Arb.MapBuffer(BufferTargetArb.ArrayBuffer, ArbVertexBufferObject.ReadOnlyArb | ArbVertexBufferObject.ArrayBufferArb);
+            ptr = GL.MapBuffer(BufferTarget.ArrayBuffer, BufferAccess.ReadOnly);
 
             IntPtr buffer = Marshal.AllocHGlobal(elementSizeInByte);
             if (ptr != null && ptr.ToInt32() != 0)
@@ -94,7 +94,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 }
                 Marshal.Release(buffer);
-                GL.Arb.UnmapBuffer(BufferTargetArb.ArrayBuffer);
+                GL.UnmapBuffer(BufferTarget.ArrayBuffer);
                 Marshal.Release(ptr);
             }
         }

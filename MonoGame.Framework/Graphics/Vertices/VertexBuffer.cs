@@ -89,7 +89,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 byte[] by = new byte[elementSizeInByte];
 
-                GL.Arb.UnmapBuffer(BufferTargetArb.ArrayBuffer);
+                GL.UnmapBuffer( BufferTarget.ArrayBuffer);
                 Marshal.Release(ptr);
 
                 IntPtr buffer = Marshal.AllocHGlobal(elementSizeInByte);
@@ -111,18 +111,17 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        public unsafe void GetData<T>(T[] data, int startIndex, int elementCount) where T : struct
+        public void GetData<T>(T[] data, int startIndex, int elementCount) where T : struct
         {
             var elementSizeInByte = Marshal.SizeOf(typeof(T));
             this.GetData<T>(0, data, startIndex, elementCount, elementSizeInByte);
         }
 
-        public unsafe void GetData<T>(T[] data) where T : struct
+        public void GetData<T>(T[] data) where T : struct
         {
             var elementSizeInByte = Marshal.SizeOf(typeof(T));
             this.GetData<T>(0, data, 0, data.Count(), elementSizeInByte);
         }
-
 		
 		public void SetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount) where T : struct
         {
