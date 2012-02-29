@@ -172,13 +172,21 @@ namespace Microsoft.Xna.Framework
 
         public float? Intersects(Plane plane)
         {
-            throw new NotImplementedException();
+            float? result;
+            Intersects(ref plane, out result);
+            return result;
         }
 
         public void Intersects(ref Plane plane, out float? result)
         {
-            throw new NotImplementedException();
-			
+            var den = Vector3.Dot(Direction, plane.Normal);
+            if (Math.Abs(den) < 0.0001f)
+            {
+                result = null;
+                return;
+            }
+
+            result = -Vector3.Dot(plane.Normal, Position) / den;
         }
 
         public void Intersects(ref BoundingSphere sphere, out float? result)
