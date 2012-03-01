@@ -329,7 +329,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 			if (options.HasFlag(ClearOptions.DepthBuffer)) {
 				GL.ClearDepth (depth);
-				bufferMask = bufferMask | ClearBufferMask.DepthBufferBit;
+                bufferMask = bufferMask | ClearBufferMask.DepthBufferBit | ClearBufferMask.ColorBufferBit;
 			}
 
 #if IPHONE || ANDROID
