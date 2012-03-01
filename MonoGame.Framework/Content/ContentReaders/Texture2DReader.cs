@@ -115,10 +115,8 @@ namespace Microsoft.Xna.Framework.Content
 				case SurfaceFormat.Dxt1:
 				case SurfaceFormat.Dxt3:
 				case SurfaceFormat.Dxt5:
-#if !WINDOWS
-					levelCount = 1;
-#endif
 					break;
+
 				case SurfaceFormat.NormalizedByte4:
 					convertedFormat = SurfaceFormat.Color;
 					break;
