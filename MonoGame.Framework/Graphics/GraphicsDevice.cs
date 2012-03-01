@@ -665,7 +665,7 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
 
             //Create VBO if not created already
-#if IPHONE
+#if IPHONE || ANDROID
             if (VboIdArray == 0)
                 GL.GenBuffers(1, ref VboIdArray);
 #else
@@ -721,7 +721,7 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
 
             //Create VBO if not created already
-#if IPHONE
+#if IPHONE  || ANDROID
 			if (VboIdArray == 0)
                 GL.GenBuffers(1, ref VboIdArray);
             if (VboIdElement == 0)
@@ -782,7 +782,7 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
 
             //Create VBO if not created already
-#if IPHONE
+#if IPHONE || ANDROID
 			if (VboIdArray == 0)
                 GL.GenBuffers(1, ref VboIdArray);
             if (VboIdElement == 0)
