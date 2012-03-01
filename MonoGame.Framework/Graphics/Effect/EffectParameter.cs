@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-#if ISO || ANDROID
+#if IPHONE || ANDROID
 using OpenTK.Graphics.ES20;
 #else
 using OpenTK.Graphics.OpenGL;
