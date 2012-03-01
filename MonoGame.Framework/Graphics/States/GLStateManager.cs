@@ -183,7 +183,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public static void FillMode(RasterizerState state)
         {
-#if MONOMAC || WINDOWS
+#if MONOMAC || WINDOWS || LINUX
 			switch (state.FillMode) {
 			case Microsoft.Xna.Framework.Graphics.FillMode.Solid:
 				GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);

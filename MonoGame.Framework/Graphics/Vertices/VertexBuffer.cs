@@ -76,8 +76,11 @@ namespace Microsoft.Xna.Framework.Graphics
             var elementSizeInByte = Marshal.SizeOf(typeof(T));
             IntPtr ptr = new IntPtr();
             //ptr = GL.Arb.MapBuffer(BufferTargetArb.ArrayBuffer, ArbVertexBufferObject.ReadOnlyArb | ArbVertexBufferObject.ArrayBufferArb);
-            //ptr = OpenTK.Graphics.ES20.GL.Oes.MapBuffer(OpenTK.Graphics.ES20.All.ArrayBuffer, (OpenTK.Graphics.ES20.All)0);
+#if IPHONE || ANDROID
+            ptr = OpenTK.Graphics.ES20.GL.Oes.MapBuffer(OpenTK.Graphics.ES20.All.ArrayBuffer, (OpenTK.Graphics.ES20.All)0);
+#else
             ptr = GL.MapBuffer(BufferTarget.ArrayBuffer, BufferAccess.ReadOnly);
+#endif
             //ErrorCode e = GL.GetError();
 
             ///its dark magic time
@@ -90,7 +93,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 byte[] by = new byte[elementSizeInByte];
 
-                GL.UnmapBuffer( BufferTarget.ArrayBuffer);
+#if IPHONE || ANDROID
+            OpenTK.Graphics.ES20.GL.Oes.UnmapBuffer(BufferUsageHint.ArrayBuffer);
+#else
+            GL.UnmapBuffer( BufferTarget.ArrayBuffer);
+#endif
+
+
                 Marshal.Release(ptr);
 
                 IntPtr buffer = Marshal.AllocHGlobal(elementSizeInByte);
