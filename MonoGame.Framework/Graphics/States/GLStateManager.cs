@@ -181,9 +181,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			GL.Enable (EnableCap.Blend);
 		}
 
-		public static void FillMode (RasterizerState state)
-		{
-#if MONOMAC
+        public static void FillMode(RasterizerState state)
+        {
+#if MONOMAC || WINDOWS
 			switch (state.FillMode) {
 			case Microsoft.Xna.Framework.Graphics.FillMode.Solid:
 				GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
@@ -193,11 +193,13 @@ namespace Microsoft.Xna.Framework.Graphics
 				break;
 			}
 #else
-			if (state.FillMode != Microsoft.Xna.Framework.Graphics.FillMode.Solid) {
-				throw new NotImplementedException();
-			}
+            if (state.FillMode != Microsoft.Xna.Framework.Graphics.FillMode.Solid)
+            {
+                throw new NotImplementedException();
+            }
 #endif
-		}
+        }
+
 
 		public static void Cull(RasterizerState state, bool offscreen)
 		{

@@ -591,12 +591,15 @@ namespace Microsoft.Xna.Framework
         /// <param name="vec">The vector to transform.</param>
         /// <param name="quat">The quaternion to rotate the vector by.</param>
         /// <param name="result">The result of the operation.</param>
-        public static void Transform(ref Vector3 vec, ref Quaternion quat, out Vector3 result)
+        public static void Transform(ref Vector3 value, ref Quaternion rotation, out Vector3 result)
         {
-			// This has not been tested
-			// TODO:  This could probably be unrolled so will look into it later
-			Matrix matrix = quat.ToMatrix();
-			Transform(ref vec, ref matrix, out result);
+            float x = 2 * (rotation.Y * value.Z - rotation.Z * value.Y);
+            float y = 2 * (rotation.Z * value.X - rotation.X * value.Z);
+            float z = 2 * (rotation.X * value.Y - rotation.Y * value.X);
+
+            result.X = value.X + x * rotation.W + (rotation.Y * z - rotation.Z * y);
+            result.Y = value.Y + y * rotation.W + (rotation.Z * x - rotation.X * z);
+            result.Z = value.Z + z * rotation.W + (rotation.X * y - rotation.Y * x);
         }
 
         public static Vector3 TransformNormal(Vector3 normal, Matrix matrix)

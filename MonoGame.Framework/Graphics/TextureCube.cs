@@ -22,6 +22,14 @@ namespace Microsoft.Xna.Framework.Graphics
 	public class TextureCube : Texture
 	{
 		protected int size;
+
+        public int Size
+        {
+            get
+            {
+                return size;
+            }
+        }
 		
 		PixelInternalFormat glInternalFormat;
 		PixelFormat glFormat;
@@ -84,6 +92,24 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 			
 		}
+
+        /// <summary>
+        /// Gets a copy of cube texture data specifying a cubemap face.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="cubeMapFace">The cube map face.</param>
+        /// <param name="data">The data.</param>
+        public void GetData<T>(CubeMapFace cubeMapFace, T[] data) where T : struct
+        {
+            TextureTarget target = GetGLCubeFace(cubeMapFace);
+            GL.BindTexture(target, this.glTexture);
+            // 4 bytes per pixel
+            if (data.Length < size * size * 4)
+                throw new ArgumentException("data");
+
+            GL.GetTexImage<T>(target, 0, PixelFormat.Bgra,
+                PixelType.UnsignedByte, data);
+        }
 		
 		public void SetData<T>(CubeMapFace face, int level, Rectangle? rect,
 		                       T[] data, int startIndex, int elementCount) where T : struct
