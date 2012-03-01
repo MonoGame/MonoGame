@@ -116,6 +116,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 
         TimeSpan gt = TimeSpan.Zero;
         TimeSpan last = TimeSpan.Zero;
+		int delay = 2;
 
         public override void Update(GameTime gameTime)
         {
@@ -127,7 +128,7 @@ namespace Microsoft.Xna.Framework.GamerServices
                 startalpha += 255 / 12;
             }
 
-            if ((gameTime.TotalGameTime - gt).TotalSeconds > 5) // close after 10 seconds
+            if ((gameTime.TotalGameTime - gt).TotalSeconds > delay) // close after 10 seconds
             {
 				
 				string name = "androiduser";
