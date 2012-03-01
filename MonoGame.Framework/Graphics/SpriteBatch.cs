@@ -321,7 +321,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			UpdateWorldMatrixOrientation();
 			
 			// Configure ViewPort
-			GL20.Viewport(0, 0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height); 
+		    var client = Game.Instance.Window.ClientBounds;
+			GL20.Viewport(client.X, client.Y, client.Width, client.Height); 
 			GL20.UseProgram(program);
 			
             // Enable Scissor Tests if necessary
@@ -414,8 +415,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			
 			GL11.MatrixMode(ALL11.Modelview);			
-			
-			//GL11.Viewport(0, 0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height);
+
+		    var viewClient = Game.Instance.Window.ClientBounds;
+			GL11.Viewport(viewClient.X, viewClient.Y, viewClient.Width, viewClient.Height);
 			
 			// Enable Scissor Tests if necessary
 			if ( this.graphicsDevice.RasterizerState.ScissorTestEnable )
@@ -466,7 +468,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				lastDisplayOrientation = graphicsDevice.PresentationParameters.DisplayOrientation;
 				
 				// make sure the viewport is correct
-				this.graphicsDevice.SetViewPort(graphicsDevice.DisplayMode.Width, graphicsDevice.DisplayMode.Height);
+				this.graphicsDevice.SetViewPort(Game.Instance.Window.ClientBounds.Width, Game.Instance.Window.ClientBounds.Height);
 				
 				matViewScreen = Matrix.CreateRotationZ((float)Math.PI)*
 							     	Matrix.CreateRotationY((float)Math.PI)*

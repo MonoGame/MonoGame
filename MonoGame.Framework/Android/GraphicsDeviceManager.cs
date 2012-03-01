@@ -239,6 +239,7 @@ namespace Microsoft.Xna.Framework
             set
             {
 				_preferredBackBufferHeight = value;
+                ResetClientBounds();
             }
         }
 
@@ -251,6 +252,39 @@ namespace Microsoft.Xna.Framework
             set
             {
 				_preferredBackBufferWidth = value;				
+                ResetClientBounds();
+            }
+        }
+
+        private void ResetClientBounds()
+        {
+            var clientBounds = Game.Instance.Window.ClientBounds;
+
+            var aspectRatio = (float)_preferredBackBufferWidth/_preferredBackBufferHeight;
+
+            if (GraphicsDevice.DisplayMode.AspectRatio > aspectRatio)
+            {
+                var newClientBounds = new Rectangle();
+
+                newClientBounds.Height = GraphicsDevice.DisplayMode.Height;
+                newClientBounds.Width = (int) (newClientBounds.Height*aspectRatio);
+                newClientBounds.X = (GraphicsDevice.DisplayMode.Width - newClientBounds.Width)/2;
+
+                Game.Instance.Window.ClientBounds = newClientBounds;
+            }
+            else if (GraphicsDevice.DisplayMode.AspectRatio < aspectRatio)
+            {
+                var newClientBounds = new Rectangle();
+
+                newClientBounds.Width = GraphicsDevice.DisplayMode.Width;
+                newClientBounds.Height = (int)(newClientBounds.Width / aspectRatio);
+                newClientBounds.Y = (GraphicsDevice.DisplayMode.Height - newClientBounds.Height) / 2;
+
+                Game.Instance.Window.ClientBounds = newClientBounds;
+            }
+            else
+            {
+                Game.Instance.Window.ClientBounds = new Rectangle(0, 0, _preferredBackBufferWidth, _preferredBackBufferHeight);
             }
         }
 

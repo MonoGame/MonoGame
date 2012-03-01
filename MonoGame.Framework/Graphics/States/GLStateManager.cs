@@ -77,6 +77,11 @@ namespace Microsoft.Xna.Framework.Graphics
             GL11.Enable(All11.Blend);
         }
 
+        public static void Viewport(Rectangle viewport)
+        {
+            GL11.Viewport(viewport.X, viewport.Y, viewport.Width, viewport.Height);
+        }
+
         public static void Projection(Matrix projection)
         {
             GL11.MatrixMode(All11.Projection);
