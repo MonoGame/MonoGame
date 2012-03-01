@@ -79,12 +79,12 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
 
 		public override bool Equals (object obj)
 		{
-			throw new NotImplementedException ();
+            return (obj is NormalizedShort2) && Equals((NormalizedShort2)obj);
 		}
 
         public bool Equals(NormalizedShort2 other)
 		{
-			throw new NotImplementedException ();
+            return short2Packed.Equals(other.short2Packed);
 		}
 
 		public override int GetHashCode ()
