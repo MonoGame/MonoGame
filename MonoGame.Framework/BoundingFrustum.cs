@@ -141,55 +141,63 @@ namespace Microsoft.Xna.Framework
 
         public void Contains(ref BoundingBox box, out ContainmentType result)
         {
-            // FIXME: Is this a bug?
-            // If the bounding box is of W * D * H = 0, then return disjoint
-            if (box.Min == box.Max)
+            var intersects = false;
+
+            var type = box.Intersects(near);
+            if ( type == PlaneIntersectionType.Front )
             {
                 result = ContainmentType.Disjoint;
                 return;
             }
+            if ( type == PlaneIntersectionType.Intersecting )
+                intersects = true;
 
-            int i;
-            ContainmentType contained;
-            Vector3[] corners = box.GetCorners();
-
-            // First we assume completely disjoint. So if we find a point that is contained, we break out of this loop
-            for (i = 0; i < corners.Length; i++)
-            {
-                this.Contains(ref corners[i], out contained);
-                if (contained != ContainmentType.Disjoint)
-                    break;
-            }
-
-            if (i == corners.Length) // This means we checked all the corners and they were all disjoint
+            type = box.Intersects(left);
+            if ( type == PlaneIntersectionType.Front )
             {
                 result = ContainmentType.Disjoint;
                 return;
             }
+            if ( type == PlaneIntersectionType.Intersecting )
+                intersects = true;
 
-            if (i != 0)             // if i is not equal to zero, we can fastpath and say that this box intersects
-            {                       // because we know at least one point is outside and one is inside.
-                result = ContainmentType.Intersects;
+            type = box.Intersects(right);
+            if ( type == PlaneIntersectionType.Front )
+            {
+                result = ContainmentType.Disjoint;
                 return;
             }
+            if ( type == PlaneIntersectionType.Intersecting )
+                intersects = true;
 
-            // If we get here, it means the first (and only) point we checked was actually contained in the frustum.
-            // So we assume that all other points will also be contained. If one of the points is disjoint, we can
-            // exit immediately saying that the result is Intersects
-            i++;
-            for (; i < corners.Length; i++)
+            type = box.Intersects(top);
+            if (type == PlaneIntersectionType.Front)
             {
-                this.Contains(ref corners[i], out contained);
-                if (contained != ContainmentType.Contains)
-                {
-                    result = ContainmentType.Intersects;
-                    return;
-                }
+                result = ContainmentType.Disjoint;
+                return;
             }
+            if (type == PlaneIntersectionType.Intersecting)
+                intersects = true;
 
-            // If we get here, then we know all the points were actually contained, therefore result is Contains
-            result = ContainmentType.Contains;
-            return;
+            type = box.Intersects(bottom);
+            if (type == PlaneIntersectionType.Front)
+            {
+                result = ContainmentType.Disjoint;
+                return;
+            }
+            if (type == PlaneIntersectionType.Intersecting)
+                intersects = true;
+
+            type = box.Intersects(far);
+            if (type == PlaneIntersectionType.Front)
+            {
+                result = ContainmentType.Disjoint;
+                return;
+            }
+            if (type == PlaneIntersectionType.Intersecting)
+                intersects = true;
+
+            result = intersects ? ContainmentType.Intersects : ContainmentType.Contains;
         }
 
         // TODO: Implement this
