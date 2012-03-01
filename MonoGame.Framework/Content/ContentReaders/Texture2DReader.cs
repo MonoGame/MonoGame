@@ -111,12 +111,6 @@ namespace Microsoft.Xna.Framework.Content
 					convertedFormat = SurfaceFormat.Color;
 					break;
 #endif
-				//dxt formats don't need mipmaps set
-				case SurfaceFormat.Dxt1:
-				case SurfaceFormat.Dxt3:
-				case SurfaceFormat.Dxt5:
-					break;
-
 				case SurfaceFormat.NormalizedByte4:
 					convertedFormat = SurfaceFormat.Color;
 					break;
