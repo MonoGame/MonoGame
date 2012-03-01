@@ -331,8 +331,8 @@
     <Compile Include="Windows\GamerServices\SignedInGamer.cs" />
     <Compile Include="Windows\Input\KeyboardUtil.cs" />
     <Compile Include="Windows\Media\Video.cs" />
-    <Compile Include="Windows\OpenTKGamePlatform.cs" />
-    <Compile Include="Windows\OpenTKGameWindow.cs" />
+    <Compile Include="Desktop\OpenTKGamePlatform.cs" />
+    <Compile Include="Desktop\OpenTKGameWindow.cs" />
     <Compile Include="BatteryChargeStatus.cs" />
     <Compile Include="BoundingBox.cs" />
     <Compile Include="BoundingFrustum.cs" />
@@ -441,7 +441,7 @@
     <Compile Include="Graphics\DirectionalLight.cs" />
     <Compile Include="Color.cs" />
     <Compile Include="Windows\GraphicsDeviceManager.cs" />
-    <Compile Include="Windows\TitleContainer.cs" />
+    <Compile Include="Desktop\TitleContainer.cs" />
     <Compile Include="Content\ContentReaders\CurveReader.cs" />
     <Compile Include="Graphics\Vertices\VertexElementColor.cs" />
     <Compile Include="Audio\XactClip.cs" />

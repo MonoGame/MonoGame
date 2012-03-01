@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 #if MONOMAC
 using MonoMac.OpenGL;
-#elif WINDOWS
+#elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
 #else
 using System.Text;
@@ -261,7 +261,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			int int4_index = 0;
 
 			int numUniforms = 0;
-#if MONOMAC || WINDOWS
+#if MONOMAC || WINDOWS || LINUX
 			GL.GetProgram(program, ProgramParameter.ActiveUniforms, out numUniforms);
 #else
 			GL.GetProgram(program, ProgramParameter.ActiveUniforms, ref numUniforms);

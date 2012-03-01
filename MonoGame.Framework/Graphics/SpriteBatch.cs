@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 #if MONOMAC
 using MonoMac.OpenGL;
-#elif WINDOWS
+#elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
 #else
 #if ES11
