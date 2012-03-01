@@ -80,6 +80,11 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.Enable(EnableCap.Blend);
         }
 
+        public static void Viewport(Rectangle viewport)
+        {
+            GL.Viewport(viewport.X, viewport.Y, viewport.Width, viewport.Height);
+        } 
+
         public static void Projection(Matrix projection)
         {
             GL.MatrixMode(MatrixMode.Projection);
