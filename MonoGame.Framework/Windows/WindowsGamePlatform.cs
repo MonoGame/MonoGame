@@ -72,6 +72,8 @@ using System.Linq;
 using System.Text;
 
 using Microsoft.Xna.Framework.Audio;
+using System.Windows.Forms;
+using System.IO;
 
 namespace Microsoft.Xna.Framework
 {
@@ -89,7 +91,9 @@ namespace Microsoft.Xna.Framework
 			
 			// Setup our OpenALSoundController to handle our SoundBuffer pools
 			soundControllerInstance = OpenALSoundController.GetInstance;
-			
+
+            //Initialize cursor visibility based on default value
+            OnIsMouseVisibleChanged();
         }
 
         public override GameRunBehavior DefaultRunBehavior
@@ -155,6 +159,18 @@ namespace Microsoft.Xna.Framework
         public override void BeginScreenDeviceChange(bool willBeFullScreen)
         {
             
+        }
+
+        protected override void OnIsMouseVisibleChanged()
+        {
+            if (IsMouseVisible)
+            {
+                Cursor.Show();
+            }
+            else
+            {
+                Cursor.Hide();
+            }
         }
 
         public override void Log(string Message)
