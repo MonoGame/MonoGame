@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 
 #if MONOMAC
 using MonoMac.OpenGL;
-#elif WINDOWS
+#elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
 #else
 using OpenTK.Graphics.ES20;
@@ -76,8 +76,9 @@ namespace Microsoft.Xna.Framework.Graphics
             var elementSizeInByte = Marshal.SizeOf(typeof(T));
             IntPtr ptr = new IntPtr();
             //ptr = GL.Arb.MapBuffer(BufferTargetArb.ArrayBuffer, ArbVertexBufferObject.ReadOnlyArb | ArbVertexBufferObject.ArrayBufferArb);
+            //ptr = OpenTK.Graphics.ES20.GL.Oes.MapBuffer(OpenTK.Graphics.ES20.All.ArrayBuffer, (OpenTK.Graphics.ES20.All)0);
             ptr = GL.MapBuffer(BufferTarget.ArrayBuffer, BufferAccess.ReadOnly);
-            ErrorCode e = GL.GetError();
+            //ErrorCode e = GL.GetError();
 
             ///its dark magic time
             if (ptr != null && ptr.ToInt32() != 0)
