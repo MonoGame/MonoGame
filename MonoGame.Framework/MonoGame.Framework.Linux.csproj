@@ -406,11 +406,15 @@
     <EmbeddedResource Include="Graphics\Effect\SpriteEffect.bin" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\ThirdParty\Libs\libmojoshader.so">
-      <Link>libmojoshader.so</Link>
+    <None Include="MonoGame.Framework.Linux.dll.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="MonoGame.Framework.Linux.dll.config">
+    <None Include="..\ThirdParty\Libs\libmojoshader_32.so">
+      <Link>libmojoshader_32.so</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Libs\libmojoshader_64.so">
+      <Link>libmojoshader_64.so</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

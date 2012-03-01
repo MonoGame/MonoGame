@@ -238,12 +238,10 @@ namespace Microsoft.Xna.Framework.Graphics
         internal void Initialize()
         {
 			
-#if MONOMAC
-			extensions.AddRange(GL.GetString(MonoMac.OpenGL.StringName.Extensions).Split(' '));
-#elif WINDOWS
-			extensions.AddRange(GL.GetString(OpenTK.Graphics.OpenGL.StringName.Extensions).Split(' '));
-#else
+#if IPHONE || ANDROID
 			extensions.AddRange(GL.GetString(RenderbufferStorage.Extensions).Split(' '));
+#else
+			extensions.AddRange(GL.GetString(StringName.Extensions).Split(' '));	
 #endif
 			System.Diagnostics.Debug.WriteLine("Supported extensions:");
 			foreach (string extension in extensions)
