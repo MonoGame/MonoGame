@@ -78,6 +78,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework;
+using System.Reflection;
 
 namespace Microsoft.Xna.Framework
 {
@@ -128,6 +129,24 @@ namespace Microsoft.Xna.Framework
             _platform.Activated += Platform_Activated;
             _platform.Deactivated += Platform_Deactivated;
             _services.AddService(typeof(GamePlatform), _platform);
+
+
+            // Set the window title.
+            // TODO: Get the title from the WindowsPhoneManifest.xml for WP7 projects.
+            string windowTitle = string.Empty;
+            var assembly = Assembly.GetCallingAssembly();
+
+            //Use the Title attribute of the Assembly if possible.
+            var assemblyTitleAtt = ((AssemblyTitleAttribute)AssemblyTitleAttribute.GetCustomAttribute(assembly, typeof(AssemblyTitleAttribute)));
+            if (assemblyTitleAtt != null)
+                windowTitle = assemblyTitleAtt.Title;
+
+            // Otherwise, fallback to the Name of the assembly.
+            if (string.IsNullOrEmpty(windowTitle))
+                windowTitle = assembly.GetName().Name;
+
+            Window.Title = windowTitle;
+
         }
 
         ~Game()

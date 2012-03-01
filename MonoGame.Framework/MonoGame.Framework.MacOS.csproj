@@ -52,8 +52,8 @@
     <Reference Include="GamepadBridge">
       <HintPath>..\ThirdParty\GamepadConfig\GamepadBridge.dll</HintPath>
     </Reference>
-    <Reference Include="MonoMac, Version=0.0.0.0, Culture=neutral">
-      <Private>False</Private>
+    <Reference Include="MonoMac">
+      <HintPath>..\ThirdParty\Libs\MonoMac.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
@@ -395,6 +395,8 @@
     <Compile Include="Content\ContentReaders\AlphaTestEffectReader.cs" />
     <Compile Include="Graphics\Texture2D.cs" />
     <Compile Include="Graphics\SpriteFont.cs" />
+    <Compile Include="Graphics\Effect\GLSLEffectObject.cs" />
+    <Compile Include="Graphics\Effect\GLSLShader.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />
@@ -429,7 +431,13 @@
     <EmbeddedResource Include="Graphics\Effect\DualTextureEffect.bin" />
     <EmbeddedResource Include="Graphics\Effect\EnvironmentMapEffect.bin" />
     <EmbeddedResource Include="Graphics\Effect\SkinnedEffect.bin" />
+    <EmbeddedResource Include="Graphics\Effect\SpriteEffectGLSL.bin" />
     <EmbeddedResource Include="Graphics\Effect\SpriteEffect.bin" />
+    <EmbeddedResource Include="Graphics\Effect\BasicEffectGLSL.bin" />
+    <EmbeddedResource Include="Graphics\Effect\AlphaTestEffectGLSL.bin" />
+    <EmbeddedResource Include="Graphics\Effect\DualTextureEffectGLSL.bin" />
+    <EmbeddedResource Include="Graphics\Effect\EnvironmentMapEffectGLSL.bin" />
+    <EmbeddedResource Include="Graphics\Effect\SkinnedEffectGLSL.bin" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.MacOS.csproj">
