@@ -348,7 +348,7 @@
     <Compile Include="iOS\GamerServices\TextFieldAlertView.cs" />
     <Compile Include="iOS\Net\MonoGamePeerPickerControllerDelegate.cs" />
     <Compile Include="iOS\Net\MonoGameSessionDelegate.cs" />
-    <Compile Include="Graphics\Extender.cs" />
+    <Compile Include="iOS\Extender.cs" />
     <Compile Include="Audio\NoAudioHardwareException.cs" />
     <Compile Include="Storage\StorageDeviceHelper.cs" />
     <Compile Include="Content\ContentManager.cs" />

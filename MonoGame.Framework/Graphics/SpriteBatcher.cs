@@ -44,7 +44,7 @@ using System.Collections.Generic;
 
 #if MONOMAC
 using MonoMac.OpenGL;
-#elif WINDOWS
+#elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
 #else
 
@@ -175,11 +175,11 @@ namespace Microsoft.Xna.Framework.Graphics
 			GL.ColorPointer(4,
 			                ColorPointerType.UnsignedByte,
 			                size,
-			                (IntPtr)((uint)_vertexHandle.AddrOfPinnedObject()+(uint)(sizeof(float)*2)));
+			                (IntPtr)(_vertexHandle.AddrOfPinnedObject().ToInt64()+(sizeof(float)*2)));
 			GL.TexCoordPointer(2,
 			                   TexCoordPointerType.Float,
 			                   size,
-			                   (IntPtr)((uint)_vertexHandle.AddrOfPinnedObject()+(uint)(sizeof(float)*2+sizeof(uint))) );
+			                   (IntPtr)(_vertexHandle.AddrOfPinnedObject().ToInt64()+(sizeof(float)*2+sizeof(uint))) );
 #else
 			GL.EnableVertexAttribArray(GraphicsDevice.attributePosition);
 			GL.EnableVertexAttribArray(GraphicsDevice.attributeTexCoord);
@@ -198,16 +198,16 @@ namespace Microsoft.Xna.Framework.Graphics
 			                       VertexAttribPointerType.UnsignedByte,
 			                       true,
 			                       size,
-			                       (IntPtr)((uint)_vertexHandle.AddrOfPinnedObject()
-			         					+(uint)(sizeof(float)*2)));
+			                       (IntPtr)(_vertexHandle.AddrOfPinnedObject().ToInt64()
+			         					+(sizeof(float)*2)));
 
 			GL.VertexAttribPointer(GraphicsDevice.attributeTexCoord,
 			                       2,
 			                       VertexAttribPointerType.Float,
 			                       false,
 			                       size,
-			                       (IntPtr)((uint)_vertexHandle.AddrOfPinnedObject()
-			         					+(uint)(sizeof(float)*2+sizeof(uint))));
+			                       (IntPtr)(_vertexHandle.AddrOfPinnedObject().ToInt64()
+			         					+(sizeof(float)*2+sizeof(uint))));
 #endif
 			
 			// setup the vertexArray array
@@ -287,7 +287,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 				                 (end-start)/2*3,
 				                 DrawElementsType.UnsignedShort,
-				                 (IntPtr)((uint)_indexHandle.AddrOfPinnedObject()+(uint)(start/2*3*sizeof(short))) );
+				                 (IntPtr)(_indexHandle.AddrOfPinnedObject().ToInt64()+(start/2*3*sizeof(short))) );
 			}
 		}
 	}
