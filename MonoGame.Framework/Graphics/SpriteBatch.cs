@@ -161,15 +161,15 @@ namespace Microsoft.Xna.Framework.Graphics
 				UpdateWorldMatrixOrientation();
 #else			
 				lastDisplayOrientation = graphicsDevice.PresentationParameters.DisplayOrientation;
-				matViewScreen = Matrix4.CreateRotationZ((float)Math.PI)*
-						Matrix4.CreateRotationY((float)Math.PI)*
-						Matrix4.CreateTranslation(-this.graphicsDevice.Viewport.Width/2,
+				matViewScreen = Matrix.CreateRotationZ((float)Math.PI)*
+						Matrix.CreateRotationY((float)Math.PI)*
+						Matrix.CreateTranslation(-this.graphicsDevice.Viewport.Width/2,
 							this.graphicsDevice.Viewport.Height/2,
 							1);
-				matViewFramebuffer = Matrix4.CreateTranslation(-this.graphicsDevice.Viewport.Width/2,
+				matViewFramebuffer = Matrix.CreateTranslation(-this.graphicsDevice.Viewport.Width/2,
 							-this.graphicsDevice.Viewport.Height/2,
 							1);
-				matProjection = Matrix4.CreateOrthographic(this.graphicsDevice.Viewport.Width,
+				matProjection = Matrix.CreateOrthographic(this.graphicsDevice.Viewport.Width,
 							this.graphicsDevice.Viewport.Height,
 							-1f,1f);
 				
