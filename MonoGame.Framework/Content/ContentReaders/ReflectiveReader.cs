@@ -103,13 +103,15 @@ namespace Microsoft.Xna.Framework.Content
             return obj;
         }
 
-        private void Read(object parent, ContentReader input, MemberInfo member)
+        private void Read( object parent, ContentReader input, MemberInfo member)
         {
             PropertyInfo property = member as PropertyInfo;
             FieldInfo field = member as FieldInfo;
-            if (property != null && property.CanWrite == false) return;
+            if (property != null && property.CanWrite == false)
+                return;
             Attribute attr = Attribute.GetCustomAttribute(member, typeof(ContentSerializerIgnoreAttribute));
-            if (attr != null) return;
+            if (attr != null) 
+                return;
             Attribute attr2 = Attribute.GetCustomAttribute(member, typeof(ContentSerializerAttribute));
             bool isSharedResource = false;
             if (attr2 != null)
@@ -145,9 +147,9 @@ namespace Microsoft.Xna.Framework.Content
             if (!isSharedResource)
             {
                 object existingChildObject = CreateChildObject(property, field);
-                object obj2 = null;
+                object obj2;
 				
-                obj2 = input.ReadObject<object>(reader, existingChildObject);
+                obj2 = input.ReadObject(reader, existingChildObject);
 				
                 if (property != null)
                 {
@@ -173,7 +175,7 @@ namespace Microsoft.Xna.Framework.Content
                         field.SetValue(parent, value);
                     }
                 };
-                input.ReadSharedResource<object>(action);
+                input.ReadSharedResource(action);
             }
         }
         
@@ -191,15 +193,19 @@ namespace Microsoft.Xna.Framework.Content
 			
 			if(baseTypeReader != null)
 				baseTypeReader.Read(input, obj);
-			
-            foreach (PropertyInfo property in properties)
-            {
-                Read(obj, input, property);
-            }
-            foreach (FieldInfo field in fields)
-            {
-                Read(obj, input, field);
-            }
+
+            // Box the type.
+            var boxed = (object)obj;
+
+            foreach (var property in properties)
+                Read(boxed, input, property);
+
+            foreach (var field in fields)
+                Read(boxed, input, field);
+
+            // Unbox it... required for value types.
+            obj = (T)boxed;
+
             return obj;
         }
     }
