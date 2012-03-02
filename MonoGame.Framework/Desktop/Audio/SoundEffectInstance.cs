@@ -41,10 +41,10 @@
 #region Using Statements
 using System;
 
-#if IPHONE || WINDOWS
-using OpenTK.Audio.OpenAL;
-#elif MONOMAC
+#if MONOMAC
 using MonoMac.OpenAL;
+#else
+using OpenTK.Audio.OpenAL;
 #endif
 
 using Microsoft.Xna.Framework;
