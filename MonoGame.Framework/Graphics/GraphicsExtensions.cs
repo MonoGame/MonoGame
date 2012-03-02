@@ -174,10 +174,10 @@ namespace Microsoft.Xna.Framework.Graphics
                     return VertexAttribPointerType.Short;
 
                 case VertexElementFormat.NormalizedShort2:
-                    return VertexAttribPointerType.UnsignedShort;
+                    return VertexAttribPointerType.Short;
 
                 case VertexElementFormat.NormalizedShort4:
-                    return VertexAttribPointerType.UnsignedShort;
+                    return VertexAttribPointerType.Short;
 #if MONOMAC
                 case VertexElementFormat.HalfVector2:
                     return VertexAttribPointerType.HalfFloat;
@@ -188,6 +188,22 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
             throw new NotImplementedException();
+        }
+
+        public static bool OpenGLVertexAttribNormalized(this VertexElement element)
+        {
+            if (element.VertexElementUsage == VertexElementUsage.Color)
+                return true;
+
+            switch (element.VertexElementFormat)
+            {
+                case VertexElementFormat.NormalizedShort2:
+                case VertexElementFormat.NormalizedShort4:
+                    return true;
+
+                default:
+                    return false;
+            }
         }
 
         public static ColorPointerType OpenGLColorPointerType(this VertexElementFormat elementFormat)

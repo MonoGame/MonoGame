@@ -110,13 +110,6 @@ namespace Microsoft.Xna.Framework.Content
 				case SurfaceFormat.Dxt5:
 					convertedFormat = SurfaceFormat.Color;
 					break;
-#else
-				//dxt formats don't need mipmaps set
-				case SurfaceFormat.Dxt1:
-				case SurfaceFormat.Dxt3:
-				case SurfaceFormat.Dxt5:
-					levelCount = 1;
-					break;
 #endif
 				case SurfaceFormat.NormalizedByte4:
 					convertedFormat = SurfaceFormat.Color;
