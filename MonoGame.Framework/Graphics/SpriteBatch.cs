@@ -466,7 +466,13 @@ namespace Microsoft.Xna.Framework.Graphics
 				}
 				// updates last display orientation (optimization)				
 				lastDisplayOrientation = graphicsDevice.PresentationParameters.DisplayOrientation;
-				
+
+                var deviceManager = (IGraphicsDeviceManager)Game.Instance.Services.GetService(typeof(IGraphicsDeviceManager));
+                if (deviceManager == null)
+                    return;
+
+                (deviceManager as GraphicsDeviceManager).ResetClientBounds();
+
 				// make sure the viewport is correct
 				this.graphicsDevice.SetViewPort(Game.Instance.Window.ClientBounds.Width, Game.Instance.Window.ClientBounds.Height);
 				

@@ -12,7 +12,7 @@
     <MonoAndroidAssetsPrefix>Assets</MonoAndroidAssetsPrefix>
     <MonoAndroidResourcePrefix>Resources</MonoAndroidResourcePrefix>
     <AssemblyName>Lidgren.Network.Android</AssemblyName>
-    <AndroidSupportedAbis>armeabi-v7a</AndroidSupportedAbis>
+    <AndroidSupportedAbis>armeabi</AndroidSupportedAbis>
     <AndroidStoreUncompressedFileExtensions />
     <MandroidI18n />
   </PropertyGroup>
