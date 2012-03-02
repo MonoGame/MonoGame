@@ -41,6 +41,10 @@ purpose and non-infringement.
 using System;
 using System.Collections.Generic;
 using System.Threading;
+#if ANDROID
+using OpenTK.Graphics;
+using OpenTK.Platform;
+#endif
 #if IPHONE
 using MonoTouch.Foundation;
 using MonoTouch.OpenGLES;
@@ -56,11 +60,14 @@ namespace Microsoft.Xna.Framework
     internal class Threading
     {
         static int mainThreadId;
-#if ANDROID || LINUX || WINDOWS
+#if LINUX || WINDOWS
         static List<Action> actions = new List<Action>();
         static Mutex actionsMutex = new Mutex();
 #elif IPHONE
 		public static EAGLContext BackgroundContext;
+#elif ANDROID
+        public static GraphicsContext BackgroundContext;
+        public static IWindowInfo WindowInfo;
 #endif
         static Threading()
         {
@@ -90,6 +97,16 @@ namespace Microsoft.Xna.Framework
 					EAGLContext.SetCurrentContext(BackgroundContext);
 				action();
 			}
+#elif ANDROID
+            lock (BackgroundContext)
+            {
+                if (GraphicsContext.CurrentContext != BackgroundContext)
+                {
+                    BackgroundContext.MakeCurrent(null);
+                    BackgroundContext.MakeCurrent(WindowInfo);
+                }
+                action();
+            }
 #else
             System.Threading.ManualResetEventSlim resetEvent = new System.Threading.ManualResetEventSlim(false);
 #if MONOMAC
@@ -107,7 +124,7 @@ namespace Microsoft.Xna.Framework
 #endif
         }
 
-#if ANDROID || LINUX || WINDOWS
+#if LINUX || WINDOWS
         static void Add(Action action)
         {
             lock (actions)

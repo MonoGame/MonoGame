@@ -144,9 +144,9 @@ namespace Microsoft.Xna.Framework
             // Otherwise, fallback to the Name of the assembly.
             if (string.IsNullOrEmpty(windowTitle))
                 windowTitle = assembly.GetName().Name;
-
+#if !ANDROID && !IPHONE
             Window.Title = windowTitle;
-
+#endif
         }
 
         ~Game()

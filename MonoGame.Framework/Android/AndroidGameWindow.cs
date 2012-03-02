@@ -80,6 +80,7 @@ namespace Microsoft.Xna.Framework
         double renderFrameTotal;
         double updateFrameLast;
         double renderFrameLast;
+        public GraphicsContext BackgroundContext;
 
         public AndroidGameWindow(Context context, Game game) : base(context)
         {
@@ -89,8 +90,8 @@ namespace Microsoft.Xna.Framework
 						
         private void Initialize()
         {
-            
-			this.Closed +=	new EventHandler<EventArgs>(GameWindow_Closed);            
+
+            this.Closed +=	new EventHandler<EventArgs>(GameWindow_Closed);            
 			clientBounds = new Rectangle(0, 0, Context.Resources.DisplayMetrics.WidthPixels, Context.Resources.DisplayMetrics.HeightPixels);
 
             // Initialize GameTime
@@ -151,7 +152,10 @@ namespace Microsoft.Xna.Framework
 		}
 		
 		protected override void CreateFrameBuffer()
-		{	    
+		{
+            // Allow threaded resource loading
+            OpenTK.Graphics.GraphicsContext.ShareContexts = true;
+
 #if true			
 			try
             {
@@ -168,11 +172,31 @@ namespace Microsoft.Xna.Framework
             if (_game.GraphicsDevice != null)
             {
                 _game.GraphicsDevice.Initialize();
-                if (!GraphicsContext.IsCurrent)
-                    MakeCurrent();
             }
+
+            if (!GraphicsContext.IsCurrent)
+                MakeCurrent();
+
+            // Create a context for the background loading
+            GraphicsContextFlags flags = GraphicsContextFlags.Default;
+#if DEBUG
+            //flags |= GraphicsContextFlags.Debug;
+#endif
+            GraphicsMode mode = new GraphicsMode();
+            BackgroundContext = new GraphicsContext(mode, WindowInfo, 2, 0, flags);
+            Threading.BackgroundContext = BackgroundContext;
+            Threading.WindowInfo = WindowInfo;
 		}
-	
+
+        protected override void OnLoad(EventArgs e)
+        {
+            MakeCurrent();
+
+            // Make sure an Update is called before a Draw
+            updateFrameElapsed = _game.TargetElapsedTime.TotalSeconds;
+
+            base.OnLoad(e);
+        }
 
         #region AndroidGameView Methods
 
@@ -189,9 +213,6 @@ namespace Microsoft.Xna.Framework
 
             if (_game != null)
             {
-                // Allow any UI marshalled calls to happen
-                Threading.Run();
-
                 double targetElapsed = _game.TargetElapsedTime.TotalSeconds;
                 renderFrameElapsed += e.Time;
                 if (renderFrameElapsed < (renderFrameLast + targetElapsed))
@@ -227,9 +248,6 @@ namespace Microsoft.Xna.Framework
 
 			if (_game != null )
 			{
-                // Allow any UI marshalled calls to happen
-                Threading.Run();
-
                 double targetElapsed = _game.TargetElapsedTime.TotalSeconds;
                 updateFrameElapsed += e.Time;
                 if (updateFrameElapsed < (updateFrameLast + targetElapsed))
