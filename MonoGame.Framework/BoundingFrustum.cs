@@ -143,7 +143,8 @@ namespace Microsoft.Xna.Framework
         {
             var intersects = false;
 
-            var type = box.Intersects(near);
+            PlaneIntersectionType type;
+            box.Intersects(ref near, out type);
             if ( type == PlaneIntersectionType.Front )
             {
                 result = ContainmentType.Disjoint;
@@ -152,7 +153,7 @@ namespace Microsoft.Xna.Framework
             if ( type == PlaneIntersectionType.Intersecting )
                 intersects = true;
 
-            type = box.Intersects(left);
+            box.Intersects(ref left, out type);
             if ( type == PlaneIntersectionType.Front )
             {
                 result = ContainmentType.Disjoint;
@@ -161,7 +162,7 @@ namespace Microsoft.Xna.Framework
             if ( type == PlaneIntersectionType.Intersecting )
                 intersects = true;
 
-            type = box.Intersects(right);
+            box.Intersects(ref right, out type);
             if ( type == PlaneIntersectionType.Front )
             {
                 result = ContainmentType.Disjoint;
@@ -170,7 +171,7 @@ namespace Microsoft.Xna.Framework
             if ( type == PlaneIntersectionType.Intersecting )
                 intersects = true;
 
-            type = box.Intersects(top);
+            box.Intersects(ref top, out type);
             if (type == PlaneIntersectionType.Front)
             {
                 result = ContainmentType.Disjoint;
@@ -179,7 +180,7 @@ namespace Microsoft.Xna.Framework
             if (type == PlaneIntersectionType.Intersecting)
                 intersects = true;
 
-            type = box.Intersects(bottom);
+            box.Intersects(ref bottom, out type);
             if (type == PlaneIntersectionType.Front)
             {
                 result = ContainmentType.Disjoint;
@@ -188,7 +189,7 @@ namespace Microsoft.Xna.Framework
             if (type == PlaneIntersectionType.Intersecting)
                 intersects = true;
 
-            type = box.Intersects(far);
+            box.Intersects(ref far, out type);
             if (type == PlaneIntersectionType.Front)
             {
                 result = ContainmentType.Disjoint;
