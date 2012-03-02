@@ -44,92 +44,88 @@ using System;
 
 namespace Microsoft.Xna.Framework.Graphics.PackedVector
 {
-	public struct NormalizedShort2 : IPackedVector<uint>, IEquatable<NormalizedShort2>
+    public struct NormalizedShort4 : IPackedVector<ulong>, IEquatable<NormalizedShort4>
 	{
-		private uint short2Packed;
+		private ulong short4Packed;
 
-        public NormalizedShort2(Vector2 vector)
+        public NormalizedShort4(Vector4 vector)
 		{
-            short2Packed = PackInTwo(vector.X, vector.Y);
+            short4Packed = PackInFour(vector.X, vector.Y, vector.Z, vector.W);
 		}
 
-        public NormalizedShort2(float x, float y)
+        public NormalizedShort4(float x, float y, float z, float w)
 		{
-            short2Packed = PackInTwo(x, y);
+            short4Packed = PackInFour(x, y, z, w);
 		}
 
-        public static bool operator !=(NormalizedShort2 a, NormalizedShort2 b)
+        public static bool operator !=(NormalizedShort4 a, NormalizedShort4 b)
 		{
 			return !a.Equals (b);
 		}
 
-        public static bool operator ==(NormalizedShort2 a, NormalizedShort2 b)
+        public static bool operator ==(NormalizedShort4 a, NormalizedShort4 b)
 		{
 			return a.Equals (b);
 		}
 
-		public uint PackedValue { 
+        public ulong PackedValue
+        {
 			get { 
-				return short2Packed; 
+				return short4Packed; 
 			} 
 			set { 
-				short2Packed = value; 
+				short4Packed = value; 
 			} 
 		}
 
-		public override bool Equals (object obj)
-		{
-            return (obj is NormalizedShort2) && Equals((NormalizedShort2)obj);
-		}
+        public override bool Equals(object obj)
+        {
+            return (obj is NormalizedShort4) && Equals((NormalizedShort4)obj);
+        }
 
-        public bool Equals(NormalizedShort2 other)
-		{
-            return short2Packed.Equals(other.short2Packed);
-		}
+        public bool Equals(NormalizedShort4 other)
+        {
+            return short4Packed.Equals(other.short4Packed);
+        }
 
 		public override int GetHashCode ()
 		{
-			return short2Packed.GetHashCode();
+			return short4Packed.GetHashCode();
 		}
 
 		public override string ToString ()
 		{
-            return short2Packed.ToString("X");
+            return short4Packed.ToString("X");
 		}
 
-		public Vector2 ToVector2 ()
-		{
-            const float maxVal = 0x7FFF;
-
-			var v2 = new Vector2 ();
-            v2.X = ((short)(short2Packed & 0xFFFF)) / maxVal;
-            v2.Y = (short)(short2Packed >> 0x10) / maxVal;
-			return v2;
-		}
-
-		private static uint PackInTwo (float vectorX, float vectorY)
+        private static ulong PackInFour(float vectorX, float vectorY, float vectorZ, float vectorW)
 		{
 			const float maxPos = 0x7FFF;
 			const float minNeg = ~(int)maxPos;
 
 			// clamp the value between min and max values
-            // Round rather than truncate.
-            var word2 = (uint)((int)MathHelper.Clamp((float)Math.Round(vectorX * maxPos), minNeg, maxPos) & 0xFFFF);
-            var word1 = (uint)(((int)MathHelper.Clamp((float)Math.Round(vectorY * maxPos), minNeg, maxPos) & 0xFFFF) << 0x10);
+            var word4 = (ulong)((int)MathHelper.Clamp((float)Math.Round(vectorX * maxPos), minNeg, maxPos) & 0xFFFFFFFF);
+            var word3 = (ulong)(((int)MathHelper.Clamp((float)Math.Round(vectorY * maxPos), minNeg, maxPos) & 0xFFFFFFFF) << 0x10);
+            var word2 = (ulong)(((int)MathHelper.Clamp((float)Math.Round(vectorZ * maxPos), minNeg, maxPos) & 0xFFFFFFFF) << 0x20);
+            var word1 = (ulong)(((int)MathHelper.Clamp((float)Math.Round(vectorW * maxPos), minNeg, maxPos) & 0xFFFFFFFF) << 0x30);
 
-			return (word2 | word1);
+			return ( word4 | word3 | word2 | word1 );
 		}
 
 		void IPackedVector.PackFromVector4 (Vector4 vector)
 		{
-            short2Packed = PackInTwo(vector.X, vector.Y);
+            short4Packed = PackInFour(vector.X, vector.Y, vector.Z, vector.W);
 		}
 
-		Vector4 IPackedVector.ToVector4 ()
+		public Vector4 ToVector4 ()
 		{
-			var v4 = new Vector4 (0,0,0,1);
-			v4.X = (short)(short2Packed & 0xFFFF);
-			v4.Y = (short)(short2Packed >> 0x10);
+            const float maxVal = 0x7FFF;
+
+			var v4 = new Vector4 ();
+            v4.X = ((short)(short4Packed & 0xFFFFFFFF)) / maxVal;
+            v4.Y = ((short)(short4Packed >> 0x10) & 0xFFFFFFFF) / maxVal;
+            v4.Z = ((short)(short4Packed >> 0x20) & 0xFFFFFFFF) / maxVal;
+            v4.W = (short)(short4Packed >> 0x30) / maxVal;
 			return v4;
 		}
 	}

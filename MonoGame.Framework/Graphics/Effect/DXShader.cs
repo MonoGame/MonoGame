@@ -374,7 +374,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 						tex.Activate ();
 						
-						samplerStates[sampler.index].Activate(tex.glTarget);
+						samplerStates[sampler.index].Activate(tex.glTarget, tex.LevelCount > 1);
 						
 					}
 	

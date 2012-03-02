@@ -157,17 +157,20 @@ namespace Microsoft.Xna.Framework.Graphics
 			GLStateManager.NormalArray(normal);
 			GLStateManager.TextureCoordArray(texcoord);
 #else
+
+            // TODO: This is executed on every draw call... can we not
+            // allocate a vertex declaration once and just re-apply it?
+
 			bool[] enabledAttributes = new bool[16];
 			foreach (var ve in this.GetVertexElements())
 			{
 				IntPtr elementOffset = (IntPtr)(offset.ToInt64 () + ve.Offset);
 				int attributeLocation = -1;
-				bool normalized = false;
 				
 				switch (ve.VertexElementUsage) {
 				case VertexElementUsage.Position: attributeLocation = GraphicsDevice.attributePosition + ve.UsageIndex; break;
 				case VertexElementUsage.Normal: attributeLocation = GraphicsDevice.attributeNormal; break;
-				case VertexElementUsage.Color: attributeLocation = GraphicsDevice.attributeColor; normalized = true; break;
+				case VertexElementUsage.Color: attributeLocation = GraphicsDevice.attributeColor; break;
 				case VertexElementUsage.BlendIndices: attributeLocation = GraphicsDevice.attributeBlendIndicies; break;
 				case VertexElementUsage.BlendWeight: attributeLocation = GraphicsDevice.attributeBlendWeight; break;
 				case VertexElementUsage.TextureCoordinate: attributeLocation = GraphicsDevice.attributeTexCoord + ve.UsageIndex; break;
@@ -177,7 +180,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				GL.VertexAttribPointer(attributeLocation,
 				                       ve.VertexElementFormat.OpenGLNumberOfElements(),
 				                       ve.VertexElementFormat.OpenGLVertexAttribPointerType(),
-				                       normalized,
+                                       ve.OpenGLVertexAttribNormalized(),
 				                       this.VertexStride,
 				                       elementOffset);
 				enabledAttributes[attributeLocation] = true;

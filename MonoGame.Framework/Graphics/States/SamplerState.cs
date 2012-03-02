@@ -130,10 +130,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		public int MaxMipLevel { get; set; }
 		public float MipMapLevelOfDetailBias { get; set; }
 		
-		internal void Activate(TextureTarget target)
+		internal void Activate(TextureTarget target, bool useMipmaps = false)
 		{
-			// Set up texture sample filtering.
-			bool useMipmaps = MaxMipLevel > 0;
 			switch(Filter)
 			{
 			case TextureFilter.Point:

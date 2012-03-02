@@ -615,7 +615,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 						tex.Activate ();
 						
-						samplerStates[sampler.Index].Activate(tex.glTarget);
+						samplerStates[sampler.Index].Activate(tex.glTarget, tex.LevelCount > 1);
 					break;
 
 	//				case All.SamplerCube:
