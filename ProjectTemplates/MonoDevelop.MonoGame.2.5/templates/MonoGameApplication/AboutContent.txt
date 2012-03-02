@@ -1,0 +1,18 @@
+This is where you place links to your XNA content. You can use raw content files (png,jpeg,wav,mp3) but you
+can also use the compiled content files from XNA (.xnb files).
+
+When adding these files to the Content folder make sure they are Flagged as AndroidAsset. Then you can use the 
+ContentManager.Load method as normal to load the Assets.
+
+If you are loading xml Documents you will need to change your code to load the xml document via the Android Asset System.
+
+
+var document;
+#if ANDROID
+   using (var stream = Game.Activity.Assets.Open("Content/somedocument.xml"))
+   {
+       document = XDocument.Load(stream);
+   }
+#else
+   document = XDocument.Load("Content/somedocument.xml"); 
+#endif
