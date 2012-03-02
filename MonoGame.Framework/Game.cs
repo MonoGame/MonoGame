@@ -115,6 +115,9 @@ namespace Microsoft.Xna.Framework
 
         private TimeSpan _targetElapsedTime = TimeSpan.FromSeconds(1 / DefaultTargetFramesPerSecond);
 
+        private int previousDisplayWidth;
+        private int previousDisplayHeight;
+
         public Game()
         {
             _instance = this;
@@ -456,6 +459,14 @@ namespace Microsoft.Xna.Framework
             //       #if ANDROID check.
             PrimaryThreadLoader.DoLoads();
 #endif
+            if (GraphicsDevice.DisplayMode.Width != previousDisplayWidth ||
+                GraphicsDevice.DisplayMode.Height != previousDisplayHeight)
+            {
+                previousDisplayHeight = GraphicsDevice.DisplayMode.Height;
+                previousDisplayWidth = GraphicsDevice.DisplayMode.Width;
+                graphicsDeviceManager.ResetClientBounds();
+            }
+            
             _drawables.ForEachFilteredItem(DrawAction, gameTime);
         }
 

@@ -256,7 +256,7 @@ namespace Microsoft.Xna.Framework
             }
         }
 
-        private void ResetClientBounds()
+        internal void ResetClientBounds()
         {
             var clientBounds = Game.Instance.Window.ClientBounds;
 
