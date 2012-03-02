@@ -204,5 +204,12 @@ namespace Microsoft.Xna.Framework
         {
             Console.WriteLine(Message);
         }
+
+        public override void SwapBuffers()
+        {
+            base.SwapBuffers();
+
+            _view.Window.SwapBuffers();
+        }
     }
 }

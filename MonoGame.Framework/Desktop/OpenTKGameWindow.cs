@@ -210,27 +210,14 @@ namespace Microsoft.Xna.Framework
 
             if (window.WindowState != windowState)
                 window.WindowState = windowState;
-
-            if (Game != null)
-            {
-                _drawGameTime.Update(_now - _lastUpdate);
-                _lastUpdate = _now;
-                Game.DoDraw(_drawGameTime);
-            }
-
-            window.SwapBuffers();
         }
 
         private void OnUpdateFrame(object sender, FrameEventArgs e)
         {
             if (Game != null)
             {
-
                 HandleInput();
-
-                _now = DateTime.Now;
-                _updateGameTime.Update(_now - _lastUpdate);
-                Game.DoUpdate(_updateGameTime);
+                Game.Tick();
             }
         }
 
@@ -263,7 +250,11 @@ namespace Microsoft.Xna.Framework
 
             // mouse
             // TODO review this when opentk 1.1 is released
+#if !WINDOWS
             Mouse.UpdateMouseInfo(window.Mouse);
+#else
+            Mouse.setWindows(window);
+#endif
 
             // Initialize GameTime
             _updateGameTime = new GameTime();
