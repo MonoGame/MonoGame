@@ -309,6 +309,11 @@ namespace Microsoft.Xna.Framework
 			}
 		}
 
+
+        internal void ResetClientBounds()
+        {
+           // do nothing for now
+        }
     }
 }
 
