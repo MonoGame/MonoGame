@@ -660,7 +660,7 @@ namespace Microsoft.Xna.Framework.Graphics
         public void DrawUserPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int primitiveCount) where T : struct, IVertexType
         {
 
-           // Unbind the VBOs
+            // Unbind the VBOs
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
 
@@ -672,38 +672,37 @@ namespace Microsoft.Xna.Framework.Graphics
             if (VboIdArray == 0)
                 GL.GenBuffers(1, out VboIdArray);
 #endif
-			
+            //Get VertexDeclaration
+            var vd = VertexDeclaration.FromType(typeof(T));
+
             // Bind the VBO
             GL.BindBuffer(BufferTarget.ArrayBuffer, VboIdArray);
             ////Clear previous data
-            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)0, (IntPtr)null, BufferUsageHint.DynamicDraw);
-
-            //Get VertexDeclaration
-            var vd = VertexDeclaration.FromType(typeof(T));
+            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vd.VertexStride * vertexData.Length - vertexOffset * vd.VertexStride), (IntPtr)null, BufferUsageHint.StreamDraw);
 
             //Pin data
             var handle = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
 
             //Buffer data to VBO; This should use stream when we move to ES2.0
             GL.BufferData(BufferTarget.ArrayBuffer,
-			              (IntPtr)(vd.VertexStride * GetElementCountArray(primitiveType, primitiveCount)),
-			              vertexData,
-			              BufferUsageHint.DynamicDraw);
+                            (IntPtr)(vd.VertexStride * vertexData.Length - vertexOffset * vd.VertexStride),
+                            new IntPtr(handle.AddrOfPinnedObject().ToInt64() + vertexOffset * vd.VertexStride),
+                            BufferUsageHint.StreamDraw);
 
             //Setup VertexDeclaration
-            vd.Apply ();
+            vd.Apply();
 
             //Draw
             GL.DrawArrays(PrimitiveTypeGL(primitiveType),
-			              vertexOffset,
-			              GetElementCountArray(primitiveType, primitiveCount));
+                          vertexOffset,
+                          GetElementCountArray(primitiveType, primitiveCount));
 
             // Free resources
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
             handle.Free();
 
-		}
+        }
 
         public void DrawPrimitives(PrimitiveType primitiveType, int vertexStart, int primitiveCount)
         {
@@ -717,13 +716,13 @@ namespace Microsoft.Xna.Framework.Graphics
         public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int vertexCount, short[] indexData, int indexOffset, int primitiveCount) where T : struct, IVertexType
         {
 
-           // Unbind the VBOs
+            // Unbind the VBOs
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
 
             //Create VBO if not created already
-#if IPHONE || ANDROID
-            if (VboIdArray == 0)
+#if IPHONE  || ANDROID
+			if (VboIdArray == 0)
                 GL.GenBuffers(1, ref VboIdArray);
             if (VboIdElement == 0)
                 GL.GenBuffers(1, ref VboIdElement);
@@ -733,38 +732,39 @@ namespace Microsoft.Xna.Framework.Graphics
             if (VboIdElement == 0)
                 GL.GenBuffers(1, out VboIdElement);
 #endif
-			
+            //Get VertexDeclaration
+            var vd = VertexDeclaration.FromType(typeof(T));
+
             // Bind the VBO
             GL.BindBuffer(BufferTarget.ArrayBuffer, VboIdArray);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, VboIdElement);
             ////Clear previous data
-            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)0, (IntPtr)null, BufferUsageHint.DynamicDraw);
-            GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)0, (IntPtr)null, BufferUsageHint.DynamicDraw);
-
-            //Get VertexDeclaration
-            var vd = VertexDeclaration.FromType(typeof (T));
+            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vd.VertexStride * vertexData.Length - vertexOffset * vd.VertexStride), (IntPtr)null, BufferUsageHint.StreamDraw);
+            GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(sizeof(ushort) * indexData.Length), (IntPtr)null, BufferUsageHint.StreamDraw);
 
             //Pin data
             var handle = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
             var handle2 = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
 
+
             //Buffer data to VBO; This should use stream when we move to ES2.0
             GL.BufferData(BufferTarget.ArrayBuffer,
-                            (IntPtr) (vd.VertexStride*GetElementCountArray(primitiveType, primitiveCount)),
-                            new IntPtr(handle.AddrOfPinnedObject().ToInt64() + (vertexOffset*vd.VertexStride)),
-                            BufferUsageHint.DynamicDraw);
+                            (IntPtr)(vd.VertexStride * vertexData.Length - vertexOffset * vd.VertexStride),
+                            new IntPtr(handle.AddrOfPinnedObject().ToInt64() + vertexOffset * vd.VertexStride),
+                            BufferUsageHint.StreamDraw);
+
             GL.BufferData(BufferTarget.ElementArrayBuffer,
-                            (IntPtr) (sizeof (ushort)*GetElementCountArray(primitiveType, primitiveCount)),
+                            (IntPtr)(sizeof(ushort) * indexData.Length),
                             indexData, BufferUsageHint.DynamicDraw);
 
             //Setup VertexDeclaration
-            vd.Apply ();
+            vd.Apply();
 
             //Draw
             GL.DrawElements(PrimitiveTypeGL(primitiveType),
-			                GetElementCountArray(primitiveType, primitiveCount),
+                            GetElementCountArray(primitiveType, primitiveCount),
                             DrawElementsType.UnsignedShort/* .UnsignedInt248Oes*/,
-			                (IntPtr) (indexOffset*sizeof (ushort)));
+                            (IntPtr)(indexOffset * sizeof(ushort)));
 
 
             // Free resources
@@ -773,17 +773,17 @@ namespace Microsoft.Xna.Framework.Graphics
             handle.Free();
             handle2.Free();
         }
-		
-		public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int vertexCount, int[] indexData, int indexOffset, int primitiveCount) where T : struct, IVertexType
+
+        public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int vertexCount, int[] indexData, int indexOffset, int primitiveCount) where T : struct, IVertexType
         {
 
-			// Unbind the VBOs
+            // Unbind the VBOs
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
 
             //Create VBO if not created already
 #if IPHONE || ANDROID
-            if (VboIdArray == 0)
+			if (VboIdArray == 0)
                 GL.GenBuffers(1, ref VboIdArray);
             if (VboIdElement == 0)
                 GL.GenBuffers(1, ref VboIdElement);
@@ -793,38 +793,39 @@ namespace Microsoft.Xna.Framework.Graphics
             if (VboIdElement == 0)
                 GL.GenBuffers(1, out VboIdElement);
 #endif
+            //Get VertexDeclaration
+            var vd = VertexDeclaration.FromType(typeof(T));
+
             // Bind the VBO
             GL.BindBuffer(BufferTarget.ArrayBuffer, VboIdArray);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, VboIdElement);
             ////Clear previous data
-            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)0, (IntPtr)null, BufferUsageHint.DynamicDraw);
-            GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)0, (IntPtr)null, BufferUsageHint.DynamicDraw);
-			
-			//Get VertexDeclaration
-            var vd = VertexDeclaration.FromType(typeof (T));
-			
+            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vd.VertexStride * vertexData.Length - vertexOffset * vd.VertexStride), (IntPtr)null, BufferUsageHint.StreamDraw);
+            GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(sizeof(uint) * indexData.Length), (IntPtr)null, BufferUsageHint.StreamDraw);
+
             //Pin data
             var handle = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
             var handle2 = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
 
+
             //Buffer data to VBO; This should use stream when we move to ES2.0
-            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vd.VertexStride * GetElementCountArray(primitiveType, primitiveCount)), new IntPtr(handle.AddrOfPinnedObject().ToInt64() + (vertexOffset * vd.VertexStride)), BufferUsageHint.DynamicDraw);
-            GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(sizeof(uint) * GetElementCountArray(primitiveType, primitiveCount)), indexData, BufferUsageHint.DynamicDraw);
+            GL.BufferData(BufferTarget.ArrayBuffer,
+                            (IntPtr)(vd.VertexStride * vertexData.Length - vertexOffset * vd.VertexStride),
+                            new IntPtr(handle.AddrOfPinnedObject().ToInt64() + vertexOffset * vd.VertexStride),
+                            BufferUsageHint.StreamDraw);
+
+            GL.BufferData(BufferTarget.ElementArrayBuffer,
+                            (IntPtr)(sizeof(uint) * indexData.Length),
+                            indexData, BufferUsageHint.DynamicDraw);
 
             //Setup VertexDeclaration
-            vd.Apply ();
+            vd.Apply();
 
             //Draw
             GL.DrawElements(PrimitiveTypeGL(primitiveType),
-			                GetElementCountArray(primitiveType, primitiveCount),
-#if WINDOWS
-                            (DrawElementsType)All.UnsignedInt,
-#elif IPHONE || ANDROID
-                            DrawElementsType.UnsignedInt248Oes,
-#else
-			                DrawElementsType.UnsignedInt,
-#endif
-			                (IntPtr)(indexOffset * sizeof(uint)));
+                            GetElementCountArray(primitiveType, primitiveCount),
+                            DrawElementsType.UnsignedInt/* .UnsignedInt248Oes*/,
+                            (IntPtr)(indexOffset * sizeof(uint)));
 
 
             // Free resources
@@ -832,7 +833,6 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
             handle.Free();
             handle2.Free();
-
         }
 
         internal int GetElementCountArray(PrimitiveType primitiveType, int primitiveCount)
