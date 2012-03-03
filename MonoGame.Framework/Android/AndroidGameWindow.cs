@@ -70,13 +70,17 @@ namespace Microsoft.Xna.Framework
 		private Game _game;
 		private GameTime _updateGameTime;
         private GameTime _drawGameTime;
-        private DateTime _lastUpdate;
-		private DateTime _now;
         private DisplayOrientation _currentOrientation;
 		private GestureDetector gesture = null;
-		private bool _needsToResetElapsedTime = false;
-		private bool _isFirstTime = true;
-		private TimeSpan _extraElapsedTime;		
+		private bool resetUpdateElapsedTime = false;
+        private bool resetRenderElapsedTime = false;
+        double updateFrameElapsed;
+        double renderFrameElapsed;
+        double updateFrameTotal;
+        double renderFrameTotal;
+        double updateFrameLast;
+        double renderFrameLast;
+        public GraphicsContext BackgroundContext;
 
         public AndroidGameWindow(Context context, Game game) : base(context)
         {
@@ -86,17 +90,14 @@ namespace Microsoft.Xna.Framework
 						
         private void Initialize()
         {
-            
-			this.Closed +=	new EventHandler<EventArgs>(GameWindow_Closed);            
+
+            this.Closed +=	new EventHandler<EventArgs>(GameWindow_Closed);            
 			clientBounds = new Rectangle(0, 0, Context.Resources.DisplayMetrics.WidthPixels, Context.Resources.DisplayMetrics.HeightPixels);
 
             // Initialize GameTime
             _updateGameTime = new GameTime();
             _drawGameTime = new GameTime();
 
-            // Initialize _lastUpdate
-            _lastUpdate = DateTime.Now;
-					
 			gesture = new GestureDetector(new GestureListener((AndroidGameActivity)this.Context));
 			
             this.RequestFocus();
@@ -107,7 +108,8 @@ namespace Microsoft.Xna.Framework
 
 		public void ResetElapsedTime ()
 		{
-			_needsToResetElapsedTime = true;
+			resetUpdateElapsedTime = true;
+            resetRenderElapsedTime = true;
 		}
 		
 		void GameWindow_Closed(object sender,EventArgs e)
@@ -126,7 +128,7 @@ namespace Microsoft.Xna.Framework
         {
             Keyboard.KeyDown(keyCode);
             // we need to handle the Back key here because it doesnt work any other way
-            if (keyCode == Keycode.Back) //_game.Exit();
+            if (keyCode == Keycode.Back)
                 GamePad.Instance.SetBack();
 
             if (keyCode == Keycode.VolumeUp)
@@ -150,7 +152,10 @@ namespace Microsoft.Xna.Framework
 		}
 		
 		protected override void CreateFrameBuffer()
-		{	    
+		{
+            // Allow threaded resource loading
+            OpenTK.Graphics.GraphicsContext.ShareContexts = true;
+
 #if true			
 			try
             {
@@ -160,18 +165,43 @@ namespace Microsoft.Xna.Framework
 			catch (Exception) 
 #endif			
 			{
-		        //device doesn't support OpenGLES 2.0; retry with 1.1:
+#if ES11
+                //device doesn't support OpenGLES 2.0; retry with 1.1:
                 GLContextVersion = GLContextVersion.Gles1_1;
 				base.CreateFrameBuffer();
+#else
+                throw new NotSupportedException("Could not create OpenGLES 2.0 frame buffer");
+#endif
 		    }
             if (_game.GraphicsDevice != null)
             {
                 _game.GraphicsDevice.Initialize();
-                if (!GraphicsContext.IsCurrent)
-                    MakeCurrent();
             }
+
+            if (!GraphicsContext.IsCurrent)
+                MakeCurrent();
+
+            // Create a context for the background loading
+            GraphicsContextFlags flags = GraphicsContextFlags.Default;
+#if DEBUG
+            //flags |= GraphicsContextFlags.Debug;
+#endif
+            GraphicsMode mode = new GraphicsMode();
+            BackgroundContext = new GraphicsContext(mode, WindowInfo, 2, 0, flags);
+            Threading.BackgroundContext = BackgroundContext;
+            Threading.WindowInfo = WindowInfo;
 		}
-	
+
+        protected override void OnLoad(EventArgs e)
+        {
+            // FIXME: Uncomment this line when moving to Mono for Android 4.0.5
+            //MakeCurrent();
+
+            // Make sure an Update is called before a Draw
+            updateFrameElapsed = _game.TargetElapsedTime.TotalSeconds;
+
+            base.OnLoad(e);
+        }
 
         #region AndroidGameView Methods
 
@@ -186,11 +216,27 @@ namespace Microsoft.Xna.Framework
             if (!GraphicsContext.IsCurrent)
                 MakeCurrent();
 
-            if (_game != null) {
-                _drawGameTime.Update(_now - _lastUpdate);                
+            if (_game != null)
+            {
+                double targetElapsed = _game.TargetElapsedTime.TotalSeconds;
+                renderFrameElapsed += e.Time;
+                if (renderFrameElapsed < (renderFrameLast + targetElapsed))
+                    return;
+
+                if (resetRenderElapsedTime)
+                {
+                    renderFrameElapsed = renderFrameLast + targetElapsed;
+                    resetRenderElapsedTime = false;
+                }
+
+                double delta = renderFrameElapsed - renderFrameLast;
+                _drawGameTime.Update(TimeSpan.FromSeconds(delta));
+                // If the elapsed time is more than the target elapsed time, the game is running slowly
+                _drawGameTime.IsRunningSlowly = delta > targetElapsed;
                 _game.DoDraw(_drawGameTime);
-				_lastUpdate = _now;
+                renderFrameLast = renderFrameElapsed;
             }
+
             try
             {
                 SwapBuffers();
@@ -204,45 +250,43 @@ namespace Microsoft.Xna.Framework
         protected override void OnUpdateFrame(FrameEventArgs e)
 		{			
 			base.OnUpdateFrame(e);
-			
+
 			if (_game != null )
 			{
-                //ObserveDeviceRotation();				
-				_now = DateTime.Now;
-				
-				if (_isFirstTime) {
-					// Initialize GameTime
-					_updateGameTime = new GameTime ();
-					_drawGameTime = new GameTime ();
-					_lastUpdate = DateTime.Now;
-					_isFirstTime = false;
+                double targetElapsed = _game.TargetElapsedTime.TotalSeconds;
+                updateFrameElapsed += e.Time;
+                if (updateFrameElapsed < (updateFrameLast + targetElapsed))
+                    return;
+
+				if (resetUpdateElapsedTime)
+                {
+                    updateFrameElapsed = updateFrameLast + targetElapsed;
+					resetUpdateElapsedTime = false;
 				}
 
-				if (_needsToResetElapsedTime) {
-					_drawGameTime.ResetElapsedTime();
-					_needsToResetElapsedTime = false;
-				}
-				
-				
-				_updateGameTime.Update(_now - _lastUpdate);
-				
-				TimeSpan catchup = _updateGameTime.ElapsedGameTime;
-				if (catchup > _game.TargetElapsedTime) {
-					while (catchup > _game.TargetElapsedTime) {
-						catchup -= _game.TargetElapsedTime;
-						_updateGameTime.ElapsedGameTime = _game.TargetElapsedTime;
-						_game.DoUpdate (_updateGameTime);
-						_extraElapsedTime += catchup;
-					}
-					if (_extraElapsedTime > _game.TargetElapsedTime) {
-						_game.DoUpdate (_updateGameTime);
-						_extraElapsedTime = TimeSpan.Zero;
-					}
-				}
-				else {
-					_game.DoUpdate (_updateGameTime);
-				}
-								
+                double delta = updateFrameElapsed - updateFrameLast;
+                if (_game.IsFixedTimeStep)
+                {
+                    // If we will be calling Update two or more times, the game is running slowly
+                    _updateGameTime.IsRunningSlowly = updateFrameElapsed >= updateFrameLast + (targetElapsed * 2.0);
+                    double start = updateFrameLast;
+                    while ((delta >= targetElapsed) && ((updateFrameLast - start) < 0.5))
+                    {
+                        _updateGameTime.Update(TimeSpan.FromSeconds(targetElapsed));
+                        _game.DoUpdate(_updateGameTime);
+                        delta -= targetElapsed;
+                        updateFrameLast += targetElapsed;
+                    }
+                }
+                else
+                {
+                    // No fixed step, so just update once with a potentially large elapsed time
+                    _updateGameTime.Update(TimeSpan.FromSeconds(delta));
+                    // If the elapsed time is more than the target elapsed time, the game is running slowly
+                    _updateGameTime.IsRunningSlowly = delta > targetElapsed;
+                    _game.DoUpdate(_updateGameTime);
+                    updateFrameLast = updateFrameElapsed;
+                }
 			}
 		}
 		

@@ -387,6 +387,7 @@
     <Compile Include="Ray.cs" />
     <Compile Include="Rectangle.cs" />
     <Compile Include="ReusableItemList.cs" />
+    <Compile Include="Threading.cs" />
     <Compile Include="Vector2.cs" />
     <Compile Include="Vector3.cs" />
     <Compile Include="Vector4.cs" />

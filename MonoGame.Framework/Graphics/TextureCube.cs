@@ -101,6 +101,8 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="data">The data.</param>
         public void GetData<T>(CubeMapFace cubeMapFace, T[] data) where T : struct
         {
+            //FIXME Does not compile on Android or iOS
+/*
             TextureTarget target = GetGLCubeFace(cubeMapFace);
             GL.BindTexture(target, this.glTexture);
             // 4 bytes per pixel
@@ -109,6 +111,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             GL.GetTexImage<T>(target, 0, PixelFormat.Bgra,
                 PixelType.UnsignedByte, data);
+ */
         }
 		
 		public void SetData<T>(CubeMapFace face, int level, Rectangle? rect,

@@ -149,31 +149,35 @@ namespace Microsoft.Xna.Framework.Content
 
 		public virtual T Load<T>(string assetName)
 		{
-			if (string.IsNullOrEmpty(assetName))
-			{
-				throw new ArgumentNullException("assetName");
-			}
-			if (disposed)
-			{
-				throw new ObjectDisposedException("ContentManager");
-			}
+            if (string.IsNullOrEmpty(assetName))
+            {
+                throw new ArgumentNullException("assetName");
+            }
+            if (disposed)
+            {
+                throw new ObjectDisposedException("ContentManager");
+            }
 
-			// Check for a previously loaded asset first
-			object asset = null;
-			if (loadedAssets.TryGetValue(assetName, out asset))
-			{
-				if (asset is T)
-				{
-					return (T)asset;
-				}
-			}
+            T result = default(T);
+            // Serialize access to loadedAssets with a lock
+            lock (ContentManagerLock)
+            {
+                // Check for a previously loaded asset first
+                object asset = null;
+                if (loadedAssets.TryGetValue(assetName, out asset))
+                {
+                    if (asset is T)
+                    {
+                        return (T)asset;
+                    }
+                }
 
-            // Load the asset.
-			var result = ReadAsset<T>(assetName, null);
-			
-			// Cache the result.
-			loadedAssets.Add(assetName, result);
-			
+                // Load the asset.
+                result = ReadAsset<T>(assetName, null);
+
+                // Cache the result.
+                loadedAssets.Add(assetName, result);
+            }
 			return result;
 		}
 		
@@ -419,6 +423,8 @@ namespace Microsoft.Xna.Framework.Content
 						using(reader)
 						{
 							result = reader.ReadAsset<T>();
+                            if (result is GraphicsResource)
+                                ((GraphicsResource)result).Name = originalAssetName;
 						}
 					}
 				}
