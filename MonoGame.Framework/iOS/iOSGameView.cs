@@ -167,14 +167,14 @@ namespace Microsoft.Xna.Framework {
 			//strVersion = OpenTK.Graphics.ES20.GL.GetString (OpenTK.Graphics.ES20.All.Version);
 			//var version = Version.Parse (strVersion);
 
-			EAGLRenderingAPI eagleRenderingAPI;
+			EAGLRenderingAPI eaglRenderingAPI;
 			try {
 				_graphicsContext = new GraphicsContext (null, null, 2, 0, GraphicsContextFlags.Embedded);
-				eagleRenderingAPI = EAGLRenderingAPI.OpenGLES2;
+				eaglRenderingAPI = EAGLRenderingAPI.OpenGLES2;
 				_glapi = new Gles20Api ();
 			} catch {
 				_graphicsContext = new GraphicsContext (null, null, 1, 1, GraphicsContextFlags.Embedded);
-				eagleRenderingAPI = EAGLRenderingAPI.OpenGLES1;
+				eaglRenderingAPI = EAGLRenderingAPI.OpenGLES1;
 				_glapi = new Gles11Api ();
 			}
 
@@ -183,7 +183,7 @@ namespace Microsoft.Xna.Framework {
 
 			// FIXME: These static methods on GraphicsDevice need
 			// to go away someday.
-			GraphicsDevice.OpenGLESVersion = eagleRenderingAPI;
+			GraphicsDevice.OpenGLESVersion = eaglRenderingAPI;
 		}
 
 		private void DestroyContext ()
