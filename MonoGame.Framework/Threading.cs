@@ -60,9 +60,7 @@ namespace Microsoft.Xna.Framework
     internal class Threading
     {
         static int mainThreadId;
-#if LINUX || WINDOWS
-        static List<Action> actions = new List<Action>();
-#elif IPHONE
+#if IPHONE
 		public static EAGLContext BackgroundContext;
 #elif ANDROID
         public static GraphicsContext BackgroundContext;
@@ -75,6 +73,9 @@ namespace Microsoft.Xna.Framework
             mainThreadId = Thread.CurrentThread.ManagedThreadId;
         }
 
+        /// <summary>
+        /// To be called prior to any GL calls that may happen on a secondary thread. If called on a A shared context
+        /// </summary>
         internal static void Begin()
         {
             if (mainThreadId != Thread.CurrentThread.ManagedThreadId)
@@ -93,91 +94,13 @@ namespace Microsoft.Xna.Framework
             }
         }
 
+        /// <summary>
+        /// To be called after the GL calls that may happen on a secondary thread.
+        /// </summary>
         internal static void End()
         {
             if (mainThreadId != Thread.CurrentThread.ManagedThreadId)
                 contextMutex.ReleaseMutex();
         }
-
-        /// <summary>
-        /// Runs the given action on the UI thread and blocks the current thread while the action is running.
-        /// If the current thread is the UI thread, the action will run immediately.
-        /// </summary>
-        /// <param name="action">The action to be run on the UI thread</param>
-        internal static void BlockOnUIThread(Action action)
-        {
-            if (action == null)
-                throw new ArgumentNullException("action cannot be null");
-
-            if (mainThreadId == Thread.CurrentThread.ManagedThreadId)
-            {
-                action();
-                return;
-            }
-
-#if IPHONE
-			lock (BackgroundContext)
-			{
-				if (EAGLContext.CurrentContext != BackgroundContext)
-					EAGLContext.SetCurrentContext(BackgroundContext);
-				action();
-			}
-#elif ANDROID
-            // Due to errors in creating a secondary GL context, threaded creation of GPU is not currently supported on Android.
-            // This should be addressed in a future release of Mono for Android.
-            throw new NotImplementedException("Threaded creation of GPU resources is not currently supported on Android");
-            /*
-            lock (BackgroundContext)
-            {
-                if (GraphicsContext.CurrentContext != BackgroundContext)
-                {
-                    BackgroundContext.MakeCurrent(null);
-                    BackgroundContext.MakeCurrent(WindowInfo);
-                }
-                action();
-            }
-             */
-#else
-            System.Threading.ManualResetEventSlim resetEvent = new System.Threading.ManualResetEventSlim(false);
-#if MONOMAC
-            MonoMac.AppKit.NSApplication.SharedApplication.BeginInvokeOnMainThread(() =>
-#else
-            Add(() =>
-#endif
-            {
-                if (!Game.Instance.Window.GraphicsContext.IsCurrent)
-                    Game.Instance.Window.MakeCurrent();
-                action();
-                resetEvent.Set();
-            });
-            resetEvent.Wait();
-#endif
-        }
-
-#if LINUX || WINDOWS
-        static void Add(Action action)
-        {
-            lock (actions)
-            {
-                actions.Add(action);
-            }
-        }
-
-        /// <summary>
-        /// Runs all pending actions.  Must be called from the UI thread.
-        /// </summary>
-        internal static void Run()
-        {
-            System.Diagnostics.Debug.Assert(mainThreadId == Thread.CurrentThread.ManagedThreadId, "Threading.Run must be called from the UI thread");
-            lock (actions)
-            {
-                foreach (Action action in actions)
-                {
-                    action();
-                }
-                actions.Clear();
-            }
-        }
-#endif
     }
 }
