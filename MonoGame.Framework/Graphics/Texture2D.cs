@@ -109,32 +109,33 @@ namespace Microsoft.Xna.Framework.Graphics
 
             this.glTarget = TextureTarget.Texture2D;
             
-            Threading.BlockOnUIThread(() =>
+            Threading.Begin();
+            try
             {
 #if IPHONE || ANDROID
-				GL.GenTextures(1, ref this.glTexture);
+                GL.GenTextures(1, ref this.glTexture);
 #else
-				GL.GenTextures(1, out this.glTexture);
+			    GL.GenTextures(1, out this.glTexture);
 #endif
-			    // For best compatibility and to keep the default wrap mode of XNA, only set ClampToEdge if either
-			    // dimension is not a power of two.
-			    TextureWrapMode wrap = TextureWrapMode.Repeat;
-			    if (((width & (width - 1)) != 0) || ((height & (height - 1)) != 0))
-				    wrap = TextureWrapMode.ClampToEdge;
+                // For best compatibility and to keep the default wrap mode of XNA, only set ClampToEdge if either
+                // dimension is not a power of two.
+                TextureWrapMode wrap = TextureWrapMode.Repeat;
+                if (((width & (width - 1)) != 0) || ((height & (height - 1)) != 0))
+                    wrap = TextureWrapMode.ClampToEdge;
 
-			    GL.BindTexture(TextureTarget.Texture2D, this.glTexture);
-			    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter,
-			                    mipmap ? (int)TextureMinFilter.LinearMipmapLinear : (int)TextureMinFilter.Linear);
-			    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter,
-			                    (int)TextureMagFilter.Linear);
-			    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS,	(int)wrap);
-			    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)wrap);
-			
-			    format.GetGLFormat(out glInternalFormat, out glFormat, out glType);
+                GL.BindTexture(TextureTarget.Texture2D, this.glTexture);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter,
+                                mipmap ? (int)TextureMinFilter.LinearMipmapLinear : (int)TextureMinFilter.Linear);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter,
+                                (int)TextureMagFilter.Linear);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)wrap);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)wrap);
 
-			    if (glFormat == (GLPixelFormat)All.CompressedTextureFormats)
-			    {
-				    var imageSize = 0;
+                format.GetGLFormat(out glInternalFormat, out glFormat, out glType);
+
+                if (glFormat == (GLPixelFormat)All.CompressedTextureFormats)
+                {
+                    var imageSize = 0;
                     switch (format)
                     {
                         case SurfaceFormat.RgbPvrtc2Bpp:
@@ -155,42 +156,46 @@ namespace Microsoft.Xna.Framework.Graphics
                         default:
                             throw new NotImplementedException();
                     }
-				
-				    GL.CompressedTexImage2D(TextureTarget.Texture2D, 0, glInternalFormat,
-				                            this.width, this.height, 0,
-				                            imageSize, IntPtr.Zero);
-			    }
-			    else
-			    {
-				    GL.TexImage2D(TextureTarget.Texture2D, 0,
-#if IPHONE || ANDROID
-						(int)glInternalFormat,
-#else				           
-						glInternalFormat,
-#endif
-						this.width, this.height, 0,
-						glFormat, glType, IntPtr.Zero);
-				}
 
-				if (mipmap)
-				{
+                    GL.CompressedTexImage2D(TextureTarget.Texture2D, 0, glInternalFormat,
+                                            this.width, this.height, 0,
+                                            imageSize, IntPtr.Zero);
+                }
+                else
+                {
+                    GL.TexImage2D(TextureTarget.Texture2D, 0,
 #if IPHONE || ANDROID
-					GL.GenerateMipmap(TextureTarget.Texture2D);
-#else
-					GL.TexParameter (TextureTarget.Texture2D,
-						TextureParameterName.GenerateMipmap,
-						(int)All.True);
+                        (int)glInternalFormat,
+#else				           
+					    glInternalFormat,
 #endif
-				
-				    int size = Math.Max(this.width, this.height);
-				    while (size > 1)
-				    {
-					    size = size / 2;
-					    this.levelCount++;
-				    }
-			    }
-			});
-		}
+                        this.width, this.height, 0,
+                        glFormat, glType, IntPtr.Zero);
+                }
+
+                if (mipmap)
+                {
+#if IPHONE || ANDROID
+                    GL.GenerateMipmap(TextureTarget.Texture2D);
+#else
+				    GL.TexParameter (TextureTarget.Texture2D,
+					    TextureParameterName.GenerateMipmap,
+					    (int)All.True);
+#endif
+
+                    int size = Math.Max(this.width, this.height);
+                    while (size > 1)
+                    {
+                        size = size / 2;
+                        this.levelCount++;
+                    }
+                }
+            }
+            finally
+            {
+                Threading.End();
+            }
+        }
 				
 		public Texture2D(GraphicsDevice graphicsDevice, int width, int height) : 
 			this(graphicsDevice, width, height, false, SurfaceFormat.Color)
@@ -219,7 +224,8 @@ namespace Microsoft.Xna.Framework.Graphics
             if (data == null)
 				throw new ArgumentNullException("data");
 
-            Threading.BlockOnUIThread(() =>
+            Threading.Begin();
+            try
             {
                 var elementSizeInByte = Marshal.SizeOf(typeof(T));
                 var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
@@ -256,7 +262,11 @@ namespace Microsoft.Xna.Framework.Graphics
                                  glFormat, glType, dataPtr);
                 }
                 dataHandle.Free();
-            });
+            }
+            finally
+            {
+                Threading.End();
+            }
         }
 		
 		public void SetData<T>(T[] data, int startIndex, int elementCount) where T : struct
@@ -331,11 +341,16 @@ namespace Microsoft.Xna.Framework.Graphics
 				colorSpace.Dispose();
 				
                 Texture2D texture = null;
-                Threading.BlockOnUIThread(() =>
+                Threading.Begin();
+                try
                 {
 				    texture = new Texture2D(graphicsDevice, width, height, false, SurfaceFormat.Color);			
     				texture.SetData(data);
-                });
+                }
+                finally
+                {
+                    Threading.End();
+                }
 			
 				return texture;
 			}
@@ -379,11 +394,16 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 
             Texture2D texture = null;
-            Threading.BlockOnUIThread(() =>
+            Threading.Begin();
+            try
             {
                 texture = new Texture2D(graphicsDevice, width, height, false, SurfaceFormat.Color);
                 texture.SetData<int>(pixels);
-            });
+            }
+            finally
+            {
+                Threading.End();
+            }
             return texture;
 #else
             using (Bitmap image = (Bitmap)Bitmap.FromStream(stream))
@@ -400,11 +420,16 @@ namespace Microsoft.Xna.Framework.Graphics
                 image.UnlockBits(bitmapData);
 
                 Texture2D texture = null;
-                Threading.BlockOnUIThread(() =>
+                Threading.Begin();
+                try
                 {
                     texture = new Texture2D(graphicsDevice, image.Width, image.Height);
                     texture.SetData(data);
-                });
+                }
+                finally
+                {
+                    Threading.End();
+                }
 
                 return texture;
             }

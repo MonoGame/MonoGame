@@ -165,9 +165,13 @@ namespace Microsoft.Xna.Framework
 			catch (Exception) 
 #endif			
 			{
-		        //device doesn't support OpenGLES 2.0; retry with 1.1:
+#if ES11
+                //device doesn't support OpenGLES 2.0; retry with 1.1:
                 GLContextVersion = GLContextVersion.Gles1_1;
 				base.CreateFrameBuffer();
+#else
+                throw new NotSupportedException("Could not create OpenGLES 2.0 frame buffer");
+#endif
 		    }
             if (_game.GraphicsDevice != null)
             {
@@ -190,7 +194,8 @@ namespace Microsoft.Xna.Framework
 
         protected override void OnLoad(EventArgs e)
         {
-            MakeCurrent();
+            // FIXME: Uncomment this line when moving to Mono for Android 4.0.5
+            //MakeCurrent();
 
             // Make sure an Update is called before a Draw
             updateFrameElapsed = _game.TargetElapsedTime.TotalSeconds;
@@ -264,11 +269,13 @@ namespace Microsoft.Xna.Framework
                 {
                     // If we will be calling Update two or more times, the game is running slowly
                     _updateGameTime.IsRunningSlowly = updateFrameElapsed >= updateFrameLast + (targetElapsed * 2.0);
-                    while (delta >= targetElapsed)
+                    double start = updateFrameLast;
+                    while ((delta >= targetElapsed) && ((updateFrameLast - start) < 0.5))
                     {
                         _updateGameTime.Update(TimeSpan.FromSeconds(targetElapsed));
                         _game.DoUpdate(_updateGameTime);
                         delta -= targetElapsed;
+                        updateFrameLast += targetElapsed;
                     }
                 }
                 else
@@ -278,8 +285,8 @@ namespace Microsoft.Xna.Framework
                     // If the elapsed time is more than the target elapsed time, the game is running slowly
                     _updateGameTime.IsRunningSlowly = delta > targetElapsed;
                     _game.DoUpdate(_updateGameTime);
+                    updateFrameLast = updateFrameElapsed;
                 }
-                updateFrameLast = updateFrameElapsed;
 			}
 		}
 		

@@ -79,7 +79,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			rasterizerState = new RasterizerState();
 			
 			Console.WriteLine (technique.Name);
-            Threading.BlockOnUIThread(() =>
+            Threading.Begin();
+            try
             {
                 shaderProgram = GL.CreateProgram();
 
@@ -184,11 +185,15 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 //If we have what we need, link now
                 if ((needPixelShader == (pixelShader != null)) &&
-                     (needVertexShader == (vertexShader != null)))
+                        (needVertexShader == (vertexShader != null)))
                 {
                     Link();
                 }
-            });
+            }
+            finally
+            {
+                Threading.End();
+            }
         }
 
 		public EffectPass(EffectTechnique technique, GLSLEffectObject.glslPass pass)

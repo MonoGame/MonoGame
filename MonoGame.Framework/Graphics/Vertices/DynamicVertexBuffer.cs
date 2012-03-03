@@ -58,12 +58,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void SetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, SetDataOptions options) where T : struct
         {
-            SetData(offsetInBytes, data, startIndex, elementCount);
+            base.SetData<T>(offsetInBytes, data, startIndex, elementCount, VertexDeclaration.VertexStride);
         }
 
         public void SetData<T>(T[] data, int startIndex, int elementCount, SetDataOptions options) where T : struct
         {
-            SetData(data, startIndex, elementCount);
+            base.SetData<T>(0, data, startIndex, elementCount, VertexDeclaration.VertexStride);
         }
     }
 }

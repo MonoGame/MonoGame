@@ -62,16 +62,41 @@ namespace Microsoft.Xna.Framework
         static int mainThreadId;
 #if LINUX || WINDOWS
         static List<Action> actions = new List<Action>();
-        static Mutex actionsMutex = new Mutex();
 #elif IPHONE
 		public static EAGLContext BackgroundContext;
 #elif ANDROID
         public static GraphicsContext BackgroundContext;
         public static IWindowInfo WindowInfo;
 #endif
+        static Mutex contextMutex = new Mutex();
+
         static Threading()
         {
             mainThreadId = Thread.CurrentThread.ManagedThreadId;
+        }
+
+        internal static void Begin()
+        {
+            if (mainThreadId != Thread.CurrentThread.ManagedThreadId)
+            {
+                contextMutex.WaitOne();
+#if IPHONE
+			    if (EAGLContext.CurrentContext != BackgroundContext)
+				    EAGLContext.SetCurrentContext(BackgroundContext);
+#elif ANDROID
+                // FIXME: To be implemented
+                throw new NotImplementedException("Threaded creation of GPU resources is not currently supported on Android");
+#else
+                // FIXME: To be implemented
+                throw new NotImplementedException("Threaded creation of GPU resources is not currently supported on this platform");
+#endif
+            }
+        }
+
+        internal static void End()
+        {
+            if (mainThreadId != Thread.CurrentThread.ManagedThreadId)
+                contextMutex.ReleaseMutex();
         }
 
         /// <summary>
@@ -98,6 +123,10 @@ namespace Microsoft.Xna.Framework
 				action();
 			}
 #elif ANDROID
+            // Due to errors in creating a secondary GL context, threaded creation of GPU is not currently supported on Android.
+            // This should be addressed in a future release of Mono for Android.
+            throw new NotImplementedException("Threaded creation of GPU resources is not currently supported on Android");
+            /*
             lock (BackgroundContext)
             {
                 if (GraphicsContext.CurrentContext != BackgroundContext)
@@ -107,6 +136,7 @@ namespace Microsoft.Xna.Framework
                 }
                 action();
             }
+             */
 #else
             System.Threading.ManualResetEventSlim resetEvent = new System.Threading.ManualResetEventSlim(false);
 #if MONOMAC
