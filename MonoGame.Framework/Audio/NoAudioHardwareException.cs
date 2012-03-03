@@ -40,11 +40,16 @@
 // 
 using System;
 using System.Runtime.InteropServices;
+using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework.Audio
 {
-	[SerializableAttribute]
-	public sealed class NoAudioHardwareException : ExternalException
+#if WINRT
+    [DataContract]
+#else
+    [Serializable]
+#endif
+    public sealed class NoAudioHardwareException : ExternalException
 	{
 	}
 }
