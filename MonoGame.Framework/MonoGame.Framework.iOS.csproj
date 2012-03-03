@@ -405,8 +405,8 @@
     <Compile Include="iOS\iOSGameWindow.cs" />
     <Compile Include="GameWindow.cs" />
     <Compile Include="iOS\iOSGameView.cs" />
-    <Compile Include="iOS\iOSGameView+GLAbstraction.cs" />
-    <Compile Include="iOS\iOSGameView+Touch.cs" />
+    <Compile Include="iOS\iOSGameView_GLAbstraction.cs" />
+    <Compile Include="iOS\iOSGameView_Touch.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
