@@ -85,12 +85,6 @@ namespace Microsoft.Xna.Framework
 
         public override Rectangle ClientBounds { get { return clientBounds; } }
 
-        public override string Title
-        {
-            get { return window.Title; }
-            set { SetTitle(value); }
-        }
-
         // TODO: this is buggy on linux - report to opentk team
         public override bool AllowUserResizing
         {
@@ -107,18 +101,12 @@ namespace Microsoft.Xna.Framework
 
         public override DisplayOrientation CurrentOrientation
         {
-            get
-            {
-                return _currentOrientation;
-            }
-            internal set
-            {
-                if (value != _currentOrientation)
-                {
-                    _currentOrientation = value;
-                    OnOrientationChanged();
-                }
-            }
+            get { return DisplayOrientation.LandscapeLeft; }
+        }
+
+        protected internal override void SetSupportedOrientations(DisplayOrientation orientations)
+        {
+            // Do nothing.  Desktop platforms don't do orientation.
         }
 
         #endregion
@@ -308,8 +296,6 @@ namespace Microsoft.Xna.Framework
         {
 
         }
-
-        public override void EndScreenDeviceChange(string screenDeviceName) { }
 
         #endregion
 
