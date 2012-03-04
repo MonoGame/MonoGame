@@ -199,7 +199,7 @@ namespace Microsoft.Xna.Framework
 
         internal void SetOrientation(DisplayOrientation currentorientation)
         {
-            var deviceManager = (IGraphicsDeviceManager)_game.Services.GetService(typeof(IGraphicsDeviceManager));
+            var deviceManager = (GraphicsDeviceManager)_game.Services.GetService(typeof(IGraphicsDeviceManager));
             if (deviceManager == null)
                 return;
 
@@ -241,6 +241,17 @@ namespace Microsoft.Xna.Framework
 			  // if we have default only we only allow Landscape
 			  allowedOrientation = allowedOrientation | DisplayOrientation.Portrait; 				
 			}
+			if (deviceManager.PreferredBackBufferSetByUser)
+			{
+				if (_game.GraphicsDevice.PresentationParameters.BackBufferHeight < _game.GraphicsDevice.PresentationParameters.BackBufferWidth)
+				{
+					allowedOrientation = DisplayOrientation.LandscapeLeft;
+				}				
+				if (_game.GraphicsDevice.PresentationParameters.BackBufferHeight > _game.GraphicsDevice.PresentationParameters.BackBufferWidth)
+				{
+					allowedOrientation = DisplayOrientation.Portrait;
+				}	
+			}
 			
 			// ok we default to landscape left
 			var actualOrientation = DisplayOrientation.LandscapeLeft;
@@ -262,16 +273,16 @@ namespace Microsoft.Xna.Framework
 			{
 				actualOrientation = DisplayOrientation.LandscapeRight;
 			}	
-			/*else 
-			if (_game.GraphicsDevice.PresentationParameters.BackBufferHeight < _game.GraphicsDevice.PresentationParameters.BackBufferWidth)
+			else 				
+			if (_game.GraphicsDevice.PresentationParameters.BackBufferHeight < _game.GraphicsDevice.PresentationParameters.BackBufferWidth && deviceManager.PreferredBackBufferSetByUser)
 			{
 				actualOrientation = DisplayOrientation.LandscapeLeft;
 			}
 			else 
-			if (_game.GraphicsDevice.PresentationParameters.BackBufferHeight > _game.GraphicsDevice.PresentationParameters.BackBufferWidth)
+			if (_game.GraphicsDevice.PresentationParameters.BackBufferHeight > _game.GraphicsDevice.PresentationParameters.BackBufferWidth && deviceManager.PreferredBackBufferSetByUser)
 			{
 				actualOrientation = DisplayOrientation.Portrait;
-			}*/
+			}
 			
             switch (currentorientation) {
 
