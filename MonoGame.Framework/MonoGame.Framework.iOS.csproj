@@ -143,6 +143,7 @@
     <Compile Include="PowerLineStatus.cs" />
     <Compile Include="Quaternion.cs" />
     <Compile Include="Rectangle.cs" />
+    <Compile Include="Threading.cs" />
     <Compile Include="Vector2.cs" />
     <Compile Include="Vector3.cs" />
     <Compile Include="Vector4.cs" />
@@ -431,6 +432,9 @@
     <Compile Include="Graphics\Vertices\VertexPositionColorTexture.cs" />
     <Compile Include="Graphics\Effect\GLSLEffectObject.cs" />
     <Compile Include="Graphics\Effect\GLSLShader.cs" />
+    <Compile Include="Graphics\CompareFunction.cs" />
+    <Compile Include="Graphics\StencilOperation.cs" />
+    <Compile Include="Graphics\PackedVector\NormalizedShort2.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
@@ -464,5 +468,13 @@
     <EmbeddedResource Include="Graphics\Effect\EnvironmentMapEffect.bin" />
     <EmbeddedResource Include="Graphics\Effect\SkinnedEffect.bin" />
     <EmbeddedResource Include="Graphics\Effect\SpriteEffect.bin" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Graphics\Effect\AlphaTestEffectGLSL.bin" />
+    <None Include="Graphics\Effect\BasicEffectGLSL.bin" />
+    <None Include="Graphics\Effect\DualTextureEffectGLSL.bin" />
+    <None Include="Graphics\Effect\EnvironmentMapEffectGLSL.bin" />
+    <None Include="Graphics\Effect\SkinnedEffectGLSL.bin" />
+    <None Include="Graphics\Effect\SpriteEffectGLSL.bin" />
   </ItemGroup>
 </Project>

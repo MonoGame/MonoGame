@@ -61,23 +61,7 @@ namespace Microsoft.Xna.Framework
             }
         }
 
-        public TimeSpan ElapsedRealTime
-        {
-            get
-            {
-                return _elapsedTime;
-            }
-        }
-
         public TimeSpan TotalGameTime
-        {
-            get
-            {
-                return _totalTime;
-            }
-        }
-
-        public TimeSpan TotalRealTime
         {
             get
             {

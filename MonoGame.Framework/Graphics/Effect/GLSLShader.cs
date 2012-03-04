@@ -10,7 +10,7 @@ using OpenTK.Graphics.OpenGL;
 #else
 using System.Text;
 using OpenTK.Graphics.ES20;
-#if IPHONE
+#if IPHONE || ANDROID
 using ProgramParameter = OpenTK.Graphics.ES20.All;
 using ShaderType = OpenTK.Graphics.ES20.All;
 using ShaderParameter = OpenTK.Graphics.ES20.All;
@@ -114,7 +114,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			uniforms_int4 = new int[uniforms_int4_count*4];
 			uniforms_bool = new int[uniforms_bool_count];
 
-#if IPHONE
+#if IPHONE || ANDROID
 			glslCode = shaderProgram.shaderCode;
 #else
 			glslCode = GLSL_DESKTOP + shaderProgram.shaderCode;
@@ -151,7 +151,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			//glslCode = GLSLOptimizer.Optimize (glslCode, shaderType);
 			
-#if IPHONE
+#if IPHONE || ANDROID
 			glslCode = glslCode.Replace("#version 110\n", "");
 			glslCode = @"precision mediump float;
 						 precision mediump int;
@@ -159,7 +159,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 			
 			shader = GL.CreateShader (shaderType);
-#if IPHONE
+#if IPHONE || ANDROID
 			GL.ShaderSource (shader, 1, new string[]{glslCode}, (int[])null);
 #else			
 			GL.ShaderSource (shader, glslCode);
@@ -167,13 +167,13 @@ namespace Microsoft.Xna.Framework.Graphics
 			GL.CompileShader(shader);
 			
 			int compiled = 0;
-#if IPHONE
+#if IPHONE || ANDROID
 			GL.GetShader (shader, ShaderParameter.CompileStatus, ref compiled);
 #else
 			GL.GetShader (shader, ShaderParameter.CompileStatus, out compiled);
 #endif
 			if (compiled == (int)All.False) {
-#if IPHONE
+#if IPHONE || ANDROID
 				string log = "";
 				int length = 0;
 				GL.GetShader (shader, ShaderParameter.InfoLogLength, ref length);
@@ -236,7 +236,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			public int Location { get; set; }
 			public int EffectParameterIndex { get; set; }
 			public string Name { get; set; }
-#if IPHONE
+#if IPHONE || ANDROID
 			public All GLSLType {get; set; }
 #else
 			public ActiveUniformType GLSLType { get;  set; }
@@ -269,7 +269,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			for (int index = 0; index < numUniforms; index++) {
 				int size = 0;
 				int length = 0;
-#if IPHONE
+#if IPHONE || ANDROID
 				All type = 0;
 				String str = String.Empty;
 				GL.GetActiveUniform(program, index, 255, ref length, ref size, ref type, str);
@@ -287,7 +287,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 				//var program = this.programs[i];
 				var uniformCount = 0;
-#if IPHONE
+#if IPHONE || ANDROID
 				GL.GetProgram(program, All.ActiveUniforms, ref uniformCount);
 #else
 				GL.GetProgram (program, ProgramParameter.ActiveUniforms, out uniformCount);
@@ -301,7 +301,7 @@ namespace Microsoft.Xna.Framework.Graphics
 					uniforms[iUniform] = uniform;
 					int length = 0;
 					int size = 0;
-#if IPHONE
+#if IPHONE || ANDROID
 					All glType = 0;
 					String uniformName = String.Empty;
 					GL.GetActiveUniform(program, iUniform, 256, ref length, ref size, ref glType, uniformName);
@@ -338,7 +338,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				if (parameter == null)
 					continue;
 
-#if IPHONE
+#if IPHONE || ANDROID
 				switch (uniform.GLSLType)
 				{
 				case All.Float :
