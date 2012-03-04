@@ -63,7 +63,9 @@ namespace Microsoft.Xna.Framework.Graphics
 		RasterizerState _rasterizerState;		
 		Effect _effect;		
 		Matrix _matrix = Matrix.Identity;
-		DisplayOrientation lastDisplayOrientation;
+#if ANDROID
+		DisplayOrientation lastDisplayOrientation = DisplayOrientation.Unknown;
+#endif
 		
 		Rectangle tempRect = new Rectangle(0,0,0,0);
 		Vector2 texCoordTL = new Vector2(0,0);
@@ -156,26 +158,7 @@ namespace Microsoft.Xna.Framework.Graphics
 	                throw new InvalidOperationException ("Unable to link program");
 	            }
 	
-#if ANDROID			
-			    lastDisplayOrientation = DisplayOrientation.Unknown;
-				UpdateWorldMatrixOrientation();
-#else			
-				lastDisplayOrientation = graphicsDevice.PresentationParameters.DisplayOrientation;
-				matViewScreen = Matrix.CreateRotationZ((float)Math.PI)*
-						Matrix.CreateRotationY((float)Math.PI)*
-						Matrix.CreateTranslation(-this.graphicsDevice.Viewport.Width/2,
-							this.graphicsDevice.Viewport.Height/2,
-							1);
-				matViewFramebuffer = Matrix.CreateTranslation(-this.graphicsDevice.Viewport.Width/2,
-							-this.graphicsDevice.Viewport.Height/2,
-							1);
-				matProjection = Matrix.CreateOrthographic(this.graphicsDevice.Viewport.Width,
-							this.graphicsDevice.Viewport.Height,
-							-1f,1f);
-				
-				matWVPScreen = matViewScreen * matProjection;
-				matWVPFramebuffer = matViewFramebuffer * matProjection;
-#endif				
+			UpdateWorldMatrixOrientation();
 				GetUniformVariables();
 			
 			}
@@ -517,12 +500,22 @@ namespace Microsoft.Xna.Framework.Graphics
 #else		
 		private void UpdateWorldMatrixOrientation()
 		{
-			matViewScreen = Matrix.CreateRotationZ((float)Math.PI)*
-							Matrix.CreateRotationY((float)Math.PI)*
-							Matrix.CreateTranslation(-this.graphicsDevice.Viewport.Width/2,
-								this.graphicsDevice.Viewport.Height/2,
-								0);
-							matWVPScreen =  _matrix * matViewScreen * matProjection;
+			// TODO: It may be desirable to do a last display
+			//       orientation here like Android does, to
+			//       avoid calculating these matrices again
+			//       and again.
+			var viewport = graphicsDevice.Viewport;
+			matViewScreen =
+				Matrix.CreateRotationZ((float)Math.PI) *
+				Matrix.CreateRotationY((float)Math.PI) *
+				Matrix.CreateTranslation(-viewport.Width / 2, viewport.Height / 2, 1);
+
+			matViewFramebuffer = Matrix.CreateTranslation(-viewport.Width / 2, -viewport.Height/2, 1);
+
+			matProjection = Matrix.CreateOrthographic(viewport.Width, viewport.Height, -1f, 1f);
+
+			matWVPScreen = matViewScreen * matProjection;
+			matWVPFramebuffer = matViewFramebuffer * matProjection;
 		}
 #endif		
 		public void Draw 

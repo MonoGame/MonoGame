@@ -80,8 +80,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		}
 		
 		internal void Update()
-		{ 
-			//Console.WriteLine("----------------"+this.Count+"--------------------");
+		{
+			//Console.WriteLine(">>> Touches: {0}", Count);
 			for (int i = this.Count - 1; i >= 0; --i)
 			{
 				TouchLocation t = this[i];
@@ -97,10 +97,12 @@ namespace Microsoft.Xna.Framework.Input.Touch
 						this[i] = t;
 					break;
 					case TouchLocationState.Released:
-						this.RemoveAt(i);
+					case TouchLocationState.Invalid:
+						RemoveAt(i);
 					break;
 				}
 			}
+			//Console.WriteLine("<<< Touches: {0}", Count);
 		}
 
 		public bool FindById(int id, out TouchLocation touchLocation)
@@ -128,6 +130,34 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			}
 			touchLocation = default(TouchLocation);
 			return -1;
+		}
+
+		internal void Add(int id, Vector2 position) {
+			for (int i = 0; i < Count; i++) {
+				if (this[i].Id == id) {
+					Console.WriteLine("Error: Attempted to re-add the same touch as a press.");
+					Clear ();
+				}
+			}
+			Add(new TouchLocation(id, TouchLocationState.Pressed, position));
+		}
+
+		internal void Update(int id, TouchLocationState state, Vector2 position)
+		{
+			if (state == TouchLocationState.Pressed)
+				throw new ArgumentException("Argument 'state' cannot be TouchLocationState.Pressed.");
+
+			for (int i = 0; i < Count; i++) {
+				if (this[i].Id == id) {
+					var touchLocation = this[i];
+					touchLocation.Position = position;
+					touchLocation.State = state;
+					this[i] = touchLocation;
+					return;
+				}
+			}
+			Console.WriteLine("Error: Attempted to mark a non-existent touch {0} as {1}.", id, state);
+			Clear ();
 		}
 	}
 }
