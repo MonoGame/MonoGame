@@ -208,7 +208,7 @@ namespace Microsoft.Xna.Framework {
 			//       on all but the first call.  Nevertheless, it
 			//       works.  Still, it would be nice to know why it
 			//       claims to have failed.
-			var result = ctx.EAGLContext.RenderBufferStorage ((uint) All.Renderbuffer, Layer);
+			ctx.EAGLContext.RenderBufferStorage ((uint) All.Renderbuffer, Layer);
 
 			_glapi.GenFramebuffers (1, ref _framebuffer);
 			_glapi.BindFramebuffer (All.Framebuffer, _framebuffer);
@@ -231,11 +231,11 @@ namespace Microsoft.Xna.Framework {
 			_glapi.Viewport (0, 0, unscaledViewportWidth, unscaledViewportHeight);
 			_glapi.Scissor (0, 0, unscaledViewportWidth, unscaledViewportHeight);
 
-			var gdm = (GraphicsDeviceManager) _platform.Game.Services.GetService (
-				typeof (IGraphicsDeviceManager));
+			var gds = (IGraphicsDeviceService) _platform.Game.Services.GetService (
+				typeof (IGraphicsDeviceService));
 
-			if (gdm != null) {
-				gdm.GraphicsDevice.Viewport = new Viewport (
+			if (gds != null) {
+				gds.GraphicsDevice.Viewport = new Viewport (
 					0, 0,
 					(int) (Layer.Bounds.Width * Layer.ContentsScale),
 					(int) (Layer.Bounds.Height * Layer.ContentsScale));
@@ -243,7 +243,7 @@ namespace Microsoft.Xna.Framework {
 				// FIXME: The GraphicsDevice should be in charge of the
 				//        framebuffer.  Pushing the value into it from
 				//        here is messy.
-				gdm.GraphicsDevice.glFramebuffer = _framebuffer;
+				gds.GraphicsDevice.glFramebuffer = _framebuffer;
 			}
 		}
 
@@ -260,7 +260,7 @@ namespace Microsoft.Xna.Framework {
 			//        So we call it manually.
 			//ctx.EAGLContext.RenderBufferStorage((uint)All.Renderbuffer, null);
 			var selector = new Selector("renderbufferStorage:fromDrawable:");
-			var result = Messaging.bool_objc_msgSend_UInt32_IntPtr(
+			Messaging.bool_objc_msgSend_UInt32_IntPtr(
 				ctx.EAGLContext.Handle, selector.Handle, (uint)All.Renderbuffer, IntPtr.Zero);
 
 			_glapi.DeleteFramebuffers (1, ref _framebuffer);
