@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 /*
 Microsoft Public License (Ms-PL)
 MonoGame - Copyright © 2009-2012 The MonoGame Team
@@ -67,88 +67,82 @@ non-infringement.
 #endregion License
 
 using System;
-using System.ComponentModel;
+
+using MonoTouch.UIKit;
 
 namespace Microsoft.Xna.Framework {
-	public abstract class GameWindow {
-		#region Properties
+	class iOSGameWindow : GameWindow {
+		private readonly iOSGameViewController _viewController;
 
-		[DefaultValue(false)]
-		public abstract bool AllowUserResizing { get; set; }
+		public iOSGameWindow (iOSGameViewController viewController)
+		{
+			if (viewController == null)
+				throw new ArgumentNullException("viewController");
+			_viewController = viewController;
+		}
 
-		public abstract Rectangle ClientBounds { get; }
+		#region GameWindow Members
 
-		public abstract DisplayOrientation CurrentOrientation { get; }
+		public override bool AllowUserResizing {
+			get { return false; }
+			set { /* Do nothing. */ }
+		}
 
-		public abstract IntPtr Handle { get; }
-
-		public abstract string ScreenDeviceName { get; }
-
-		private string _title;
-		public string Title {
-			get { return _title; }
-			set {
-				if (_title != value) {
-					SetTitle(value);
-					_title = value;
-				}
+		public override Rectangle ClientBounds {
+			get {
+				var bounds = _viewController.View.Bounds;
+				var screen = _viewController.View.Window.Screen;
+				return new Rectangle(
+					(int)(bounds.X * screen.Scale), (int)(bounds.Y * screen.Scale),
+					(int)(bounds.Width * screen.Scale), (int)(bounds.Height * screen.Scale));
 			}
 		}
 
-		#endregion Properties
-
-		#region Events
-
-		public event EventHandler<EventArgs> ClientSizeChanged;
-		public event EventHandler<EventArgs> OrientationChanged;
-		public event EventHandler<EventArgs> ScreenDeviceNameChanged;
-
-		#endregion Events
-
-		public abstract void BeginScreenDeviceChange (bool willBeFullScreen);
-
-		public abstract void EndScreenDeviceChange (
-			string screenDeviceName, int clientWidth, int clientHeight);
-
-		public void EndScreenDeviceChange (string screenDeviceName)
-		{
-			EndScreenDeviceChange(screenDeviceName, ClientBounds.Width, ClientBounds.Height);
+		public override DisplayOrientation CurrentOrientation {
+			get {
+				return OrientationConverter.ToDisplayOrientation(_viewController.InterfaceOrientation);
+			}
 		}
 
-		protected void OnActivated ()
-		{
+		public override IntPtr Handle {
+			get {
+				// TODO: Verify that View.Handle is a sensible
+				//       value to return here.
+				return _viewController.View.Handle;
+			}
 		}
 
-		protected void OnClientSizeChanged ()
-		{
-			var handler = ClientSizeChanged;
-			if (handler != null)
-				handler (this, EventArgs.Empty);
+		public override string ScreenDeviceName {
+			get {
+				var screen = _viewController.View.Window.Screen;
+				if (screen == UIScreen.MainScreen)
+					return "Main Display";
+				else
+					return "External Display";
+			}
 		}
 
-		protected void OnDeactivated ()
+		public override void BeginScreenDeviceChange (bool willBeFullScreen)
 		{
+			throw new NotImplementedException ();
 		}
 
-		protected void OnOrientationChanged ()
+		public override void EndScreenDeviceChange (
+			string screenDeviceName, int clientWidth, int clientHeight)
 		{
-			var handler = OrientationChanged;
-			if (handler != null)
-				OrientationChanged (this, EventArgs.Empty);
+			throw new NotImplementedException ();
 		}
 
-		protected void OnPaint ()
+		internal protected override void SetSupportedOrientations (DisplayOrientation orientations)
 		{
+			_viewController.SupportedOrientations = orientations;
 		}
 
-		protected void OnScreenDeviceNameChanged ()
+		protected override void SetTitle (string title)
 		{
-			var handler = ScreenDeviceNameChanged;
-			if (handler != null)
-				handler (this, EventArgs.Empty);
+			_viewController.Title = title;
 		}
 
-		protected internal abstract void SetSupportedOrientations (DisplayOrientation orientations);
-		protected abstract void SetTitle (string title);
+		#endregion GameWindow Members
 	}
 }

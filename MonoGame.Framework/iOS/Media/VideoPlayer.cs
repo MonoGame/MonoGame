@@ -92,8 +92,6 @@ namespace Microsoft.Xna.Framework.Media
 
             _video.MovieView.MoviePlayer.RepeatMode = _isLooped ? MPMovieRepeatMode.One : MPMovieRepeatMode.None;
 
-            // HACK: Pause window to prevent GL context re-creation.
-            _platform.Window.Pause();
             _platform.ViewController.PresentModalViewController(_video.MovieView, animated: false);
             _video.MovieView.MoviePlayer.Play();
 		}
@@ -121,8 +119,6 @@ namespace Microsoft.Xna.Framework.Media
 			_state = MediaState.Stopped;
 			_platform.IsPlayingVideo = false;
             _platform.ViewController.DismissModalViewControllerAnimated(false);
-            // HACK: End of pausing to prevent GL context re-creation.
-            _platform.Window.Resume();
         }
 
         public bool IsLooped
