@@ -98,12 +98,24 @@ namespace Microsoft.Xna.Framework.Graphics
         //OpenGL Rendering API
 
 #if ANDROID
+		[Obsolete(
+			"GraphicsDevice should be responsible for the version someday.  " +
+			"It shouldn't need to be told, it should be doing the telling")]
 		public static GLContextVersion OpenGLESVersion;
 #else
+		[Obsolete(
+			"GraphicsDevice should be responsible for the version someday.  " +
+			"It shouldn't need to be told, it should be doing the telling")]
 		public static EAGLRenderingAPI OpenGLESVersion;
 #endif
 
+		[Obsolete(
+			"GraphicsDevice should be responsible for the framebuffer someday.  " +
+			"It shouldn't need to be told, it should be doing the telling")]
         public static int FrameBufferScreen;
+		[Obsolete(
+			"GraphicsDevice should be responsible for the DeafultFramebuffer someday.  " +
+			"It shouldn't need to be told, it should be doing the telling")]
         public static bool DefaultFrameBuffer = true;
 
         internal ALL11 PreferedFilter

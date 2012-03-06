@@ -1,59 +1,154 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.Xna.Framework;
+﻿#region License
+/*
+Microsoft Public License (Ms-PL)
+MonoGame - Copyright © 2009-2012 The MonoGame Team
 
-namespace Microsoft.Xna.Framework
-{
-    public abstract class GameWindow
-    {
-        public event EventHandler<EventArgs> ClientSizeChanged;
-        public event EventHandler<EventArgs> OrientationChanged;
-        public event EventHandler<EventArgs> ScreenDeviceNameChanged;
+All rights reserved.
 
-        public abstract void BeginScreenDeviceChange(bool willBeFullScreen);
-        public abstract void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight);
+This license governs use of the accompanying software. If you use the software,
+you accept this license. If you do not accept the license, do not use the
+software.
 
-        public void EndScreenDeviceChange(string screenDeviceName) { }
+1. Definitions
 
-        protected void OnActivated(){}
+The terms "reproduce," "reproduction," "derivative works," and "distribution"
+have the same meaning here as under U.S. copyright law.
 
-        protected void OnClientSizeChanged()
-        {
-            if (ClientSizeChanged != null)
-            {
-                ClientSizeChanged(this, EventArgs.Empty);
-            }
-        }
+A "contribution" is the original software, or any additions or changes to the
+software.
 
-        protected void OnDeactivated(){}
+A "contributor" is any person that distributes its contribution under this
+license.
 
-        protected void OnOrientationChanged()
-        {
-            if (OrientationChanged != null)
-            {
-                OrientationChanged(this, EventArgs.Empty);
-            }
-        }
+"Licensed patents" are a contributor's patent claims that read directly on its
+contribution.
 
-        protected void OnPaint(){}
+2. Grant of Rights
 
-        protected void OnScreenDeviceNameChanged()
-        {
-            if (ScreenDeviceNameChanged != null)
-            {
-                ScreenDeviceNameChanged(this, EventArgs.Empty);
-            }
-        }
-        
-        public abstract bool AllowUserResizing { get; set; }
-        public abstract Rectangle ClientBounds { get; }
-        public abstract DisplayOrientation CurrentOrientation { get; internal set; }
-        public abstract IntPtr Handle { get; }
-        public abstract string ScreenDeviceName { get; }
+(A) Copyright Grant- Subject to the terms of this license, including the
+license conditions and limitations in section 3, each contributor grants you a
+non-exclusive, worldwide, royalty-free copyright license to reproduce its
+contribution, prepare derivative works of its contribution, and distribute its
+contribution or any derivative works that you create.
 
-        public string Title { get; set; }
-        protected abstract void SetTitle(string title);
-    }
+(B) Patent Grant- Subject to the terms of this license, including the license
+conditions and limitations in section 3, each contributor grants you a
+non-exclusive, worldwide, royalty-free license under its licensed patents to
+make, have made, use, sell, offer for sale, import, and/or otherwise dispose of
+its contribution in the software or derivative works of the contribution in the
+software.
+
+3. Conditions and Limitations
+
+(A) No Trademark License- This license does not grant you rights to use any
+contributors' name, logo, or trademarks.
+
+(B) If you bring a patent claim against any contributor over patents that you
+claim are infringed by the software, your patent license from such contributor
+to the software ends automatically.
+
+(C) If you distribute any portion of the software, you must retain all
+copyright, patent, trademark, and attribution notices that are present in the
+software.
+
+(D) If you distribute any portion of the software in source code form, you may
+do so only under this license by including a complete copy of this license with
+your distribution. If you distribute any portion of the software in compiled or
+object code form, you may only do so under a license that complies with this
+license.
+
+(E) The software is licensed "as-is." You bear the risk of using it. The
+contributors give no express warranties, guarantees or conditions. You may have
+additional consumer rights under your local laws which this license cannot
+change. To the extent permitted under your local laws, the contributors exclude
+the implied warranties of merchantability, fitness for a particular purpose and
+non-infringement.
+*/
+#endregion License
+
+using System;
+using System.ComponentModel;
+
+namespace Microsoft.Xna.Framework {
+	public abstract class GameWindow {
+		#region Properties
+
+		[DefaultValue(false)]
+		public abstract bool AllowUserResizing { get; set; }
+
+		public abstract Rectangle ClientBounds { get; }
+
+		public abstract DisplayOrientation CurrentOrientation { get; }
+
+		public abstract IntPtr Handle { get; }
+
+		public abstract string ScreenDeviceName { get; }
+
+		private string _title;
+		public string Title {
+			get { return _title; }
+			set {
+				if (_title != value) {
+					SetTitle(value);
+					_title = value;
+				}
+			}
+		}
+
+		#endregion Properties
+
+		#region Events
+
+		public event EventHandler<EventArgs> ClientSizeChanged;
+		public event EventHandler<EventArgs> OrientationChanged;
+		public event EventHandler<EventArgs> ScreenDeviceNameChanged;
+
+		#endregion Events
+
+		public abstract void BeginScreenDeviceChange (bool willBeFullScreen);
+
+		public abstract void EndScreenDeviceChange (
+			string screenDeviceName, int clientWidth, int clientHeight);
+
+		public void EndScreenDeviceChange (string screenDeviceName)
+		{
+			EndScreenDeviceChange(screenDeviceName, ClientBounds.Width, ClientBounds.Height);
+		}
+
+		protected void OnActivated ()
+		{
+		}
+
+		protected void OnClientSizeChanged ()
+		{
+			var handler = ClientSizeChanged;
+			if (handler != null)
+				handler (this, EventArgs.Empty);
+		}
+
+		protected void OnDeactivated ()
+		{
+		}
+
+		protected void OnOrientationChanged ()
+		{
+			var handler = OrientationChanged;
+			if (handler != null)
+				OrientationChanged (this, EventArgs.Empty);
+		}
+
+		protected void OnPaint ()
+		{
+		}
+
+		protected void OnScreenDeviceNameChanged ()
+		{
+			var handler = ScreenDeviceNameChanged;
+			if (handler != null)
+				handler (this, EventArgs.Empty);
+		}
+
+		protected internal abstract void SetSupportedOrientations (DisplayOrientation orientations);
+		protected abstract void SetTitle (string title);
+	}
 }

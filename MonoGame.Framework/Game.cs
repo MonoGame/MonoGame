@@ -402,6 +402,16 @@ namespace Microsoft.Xna.Framework
                 DoDraw(_gameTime);
                 GraphicsDevice.Present();
             }
+
+            if (IsFixedTimeStep)
+            {
+                var currentTime = (DateTime.Now - _lastUpdate) + _totalTime;
+
+                if (currentTime < TargetElapsedTime)
+                {
+                    System.Threading.Thread.Sleep((TargetElapsedTime - currentTime).Milliseconds);
+                }
+            }
         }
 
         #endregion
