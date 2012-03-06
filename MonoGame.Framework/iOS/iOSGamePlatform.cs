@@ -177,23 +177,30 @@ namespace Microsoft.Xna.Framework
 
         private void Tick()
         {
-            if (PerformPendingExit())
-                return;
-            if (IsPlayingVideo)
-                return;
+            try {
+                if (PerformPendingExit())
+                    return;
+                if (IsPlayingVideo)
+                    return;
 
-            // FIXME: Remove this call, and the whole Tick method, once
-            //        GraphicsDevice is where platform-specific Present
-            //        functionality is actually implemented.  At that
-            //        point, it should be possible to pass Game.Tick directly
-            //        to NSTimer.CreateRepeatingTimer.
-            _viewController.View.MakeCurrent();
-            Game.Tick ();
+                // FIXME: Remove this call, and the whole Tick method, once
+                //        GraphicsDevice is where platform-specific Present
+                //        functionality is actually implemented.  At that
+                //        point, it should be possible to pass Game.Tick
+                //        directly to NSTimer.CreateRepeatingTimer.
+                _viewController.View.MakeCurrent();
+                Game.Tick ();
 
-            if (!IsPlayingVideo)
-                _viewController.View.Present ();
+                if (!IsPlayingVideo)
+                    _viewController.View.Present ();
 
-            PerformPendingExit();
+                PerformPendingExit();
+            } catch (Exception ex) {
+                Console.WriteLine(
+                    "Error while processing the main game loop: {0}\n{1}",
+                    ex.Message, ex.StackTrace);
+                Game.Exit ();
+            }
         }
 
         private bool PerformPendingExit()
