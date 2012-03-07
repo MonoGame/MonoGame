@@ -171,7 +171,8 @@ namespace Microsoft.Xna.Framework.Graphics
 	           int shader = GL20.CreateShader(type);
 	
 	           if ( shader == 0 )
-	                   throw new InvalidOperationException("Unable to create shader");
+	                   throw new InvalidOperationException(string.Format(
+					"Unable to create shader: {0}", GL20.GetError ()));
 	        
 	           // Load the shader source
 	           int length = 0;
@@ -324,8 +325,13 @@ namespace Microsoft.Xna.Framework.Graphics
 			{
 				GL20.CullFace(ALL20.Front);
 				SetUniformMatrix(uniformWVP,false,ref matWVPFramebuffer);
-				GL20.ClearColor(0.0f,0.0f,0.0f,0.0f);
-				GL20.Clear((int) (ALL20.ColorBufferBit | ALL20.DepthBufferBit));
+
+				// FIXME: Why clear the framebuffer during End?
+				//        Doing so makes it so that only the
+				//        final Begin/End pair in a frame can
+				//        ever be shown.  Is that desirable?
+				//GL20.ClearColor(0.0f,0.0f,0.0f,0.0f);
+				//GL20.Clear((int) (ALL20.ColorBufferBit | ALL20.DepthBufferBit));
 			}
 
 			_batcher.DrawBatchGL20 ( _sortMode );
