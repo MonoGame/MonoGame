@@ -80,11 +80,12 @@ namespace Microsoft.Xna.Framework.Graphics
 				
 				if (part.PrimitiveCount > 0)
 				{
-					for (int j = 0; j < effect.CurrentTechnique.Passes.Count; j++) {
+                    this.graphicsDevice.SetVertexBuffer(part.VertexBuffer);
+                    this.graphicsDevice.Indices = part.IndexBuffer;
+                    
+                    for (int j = 0; j < effect.CurrentTechnique.Passes.Count; j++)
+                    {
 						effect.CurrentTechnique.Passes[j].Apply ();
-						
-						this.graphicsDevice.SetVertexBuffer(part.VertexBuffer);
-						this.graphicsDevice.Indices = part.IndexBuffer;
 						this.graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, part.VertexOffset, 0, part.NumVertices, part.StartIndex, part.PrimitiveCount);
 					}
 				}

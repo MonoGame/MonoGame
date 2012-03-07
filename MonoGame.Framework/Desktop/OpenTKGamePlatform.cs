@@ -211,5 +211,13 @@ namespace Microsoft.Xna.Framework
 
             _view.Window.SwapBuffers();
         }
+		
+        protected override void Dispose(bool disposing)
+        {
+            _view.Dispose ();
+			
+			base.Dispose(disposing);
+        }
+			
     }
 }

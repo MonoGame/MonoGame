@@ -146,9 +146,9 @@ namespace Microsoft.Xna.Framework
             // Otherwise, fallback to the Name of the assembly.
             if (string.IsNullOrEmpty(windowTitle))
                 windowTitle = assembly.GetName().Name;
-
+#if !ANDROID && !IPHONE
             Window.Title = windowTitle;
-
+#endif
         }
 
         ~Game()
@@ -341,8 +341,7 @@ namespace Microsoft.Xna.Framework
             if (!_platform.BeforeRun())
                 return;
 
-            _platform.BeforeInitialize();
-            Initialize();
+            DoInitialize();
             _initialized = true;
 
             BeginRun();
@@ -486,7 +485,7 @@ namespace Microsoft.Xna.Framework
         protected virtual void Update(GameTime gameTime)
         {
             _updateables.ForEachFilteredItem(UpdateAction, gameTime);
-        }
+		}
 
         protected virtual void OnExiting(object sender, EventArgs args)
         {

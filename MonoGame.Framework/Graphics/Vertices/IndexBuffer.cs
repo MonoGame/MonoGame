@@ -38,15 +38,23 @@ namespace Microsoft.Xna.Framework.Graphics
             this.BufferUsage = bufferUsage;
 			
 			var sizeInBytes = indexCount * (this.IndexElementSize == IndexElementSize.SixteenBits ? 2 : 4);
-			
+
+            Threading.Begin();
+            try
+            {
 #if IPHONE || ANDROID
-			GL.GenBuffers(1, ref ibo);
+                GL.GenBuffers(1, ref ibo);
 #else
-            GL.GenBuffers(1, out ibo);
+                GL.GenBuffers(1, out ibo);
 #endif
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, ibo);
-            GL.BufferData(BufferTarget.ElementArrayBuffer,
-			              (IntPtr)sizeInBytes, IntPtr.Zero, dynamic ? BufferUsageHint.StreamDraw : BufferUsageHint.StaticDraw);
+                GL.BindBuffer(BufferTarget.ElementArrayBuffer, ibo);
+                GL.BufferData(BufferTarget.ElementArrayBuffer,
+                              (IntPtr)sizeInBytes, IntPtr.Zero, dynamic ? BufferUsageHint.StreamDraw : BufferUsageHint.StaticDraw);
+            }
+            finally
+            {
+                Threading.End();
+            }
 		}
 		
 		public IndexBuffer(GraphicsDevice graphicsDevice, IndexElementSize indexElementSize, int indexCount, BufferUsage bufferUsage) :
@@ -65,68 +73,100 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			GL.BindBuffer(BufferTarget.ElementArrayBuffer, ibo);
 		}
-		
-		public void GetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount) where T : struct
+
+        public void GetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount) where T : struct
         {
-			throw new NotSupportedException();
+            if (data == null)
+                throw new ArgumentNullException("data is null");
+            if (data.Length < (startIndex + elementCount))
+                throw new InvalidOperationException("The array specified in the data parameter is not the correct size for the amount of data requested.");
+            if (BufferUsage == BufferUsage.WriteOnly)
+                throw new NotSupportedException("This IndexBuffer was created with a usage type of BufferUsage.WriteOnly. Calling GetData on a resource that was created with BufferUsage.WriteOnly is not supported.");
+
+            Threading.Begin();
+            try
+            {
+                GL.BindBuffer(BufferTarget.ArrayBuffer, ibo);
+                var elementSizeInByte = Marshal.SizeOf(typeof(T));
+#if IPHONE || ANDROID
+                IntPtr ptr = GL.Oes.MapBuffer(All.ArrayBuffer, (All)0);
+#else
+                IntPtr ptr = GL.MapBuffer(BufferTarget.ArrayBuffer, BufferAccess.ReadOnly);
+#endif
+                // Pointer to the start of data to read in the index buffer
+                ptr = new IntPtr(ptr.ToInt64() + offsetInBytes);
+                if (data is byte[])
+                {
+                    byte[] buffer = data as byte[];
+                    // If data is already a byte[] we can skip the temporary buffer
+                    // Copy from the index buffer to the destination array
+                    Marshal.Copy(ptr, buffer, 0, buffer.Length);
+                }
+                else
+                {
+                    // Temporary buffer to store the copied section of data
+                    byte[] buffer = new byte[elementCount * elementSizeInByte];
+                    // Copy from the index buffer to the temporary buffer
+                    Marshal.Copy(ptr, buffer, 0, buffer.Length);
+                    // Copy from the temporary buffer to the destination array
+                    Buffer.BlockCopy(buffer, 0, data, startIndex * elementSizeInByte, elementCount * elementSizeInByte);
+                }
+#if IPHONE || ANDROID
+                GL.Oes.UnmapBuffer(All.ArrayBuffer);
+#else
+                GL.UnmapBuffer(BufferTarget.ArrayBuffer);
+#endif
+            }
+            finally
+            {
+                Threading.End();
+            }
         }
-		
-		public void GetData<T>(T[] data, int startIndex, int elementCount)
-		{
-			throw new NotSupportedException();
-		}
-		
-		public void GetData<T>(T[] data)
-		{
-			throw new NotSupportedException();
-		}
+
+        public void GetData<T>(T[] data, int startIndex, int elementCount) where T : struct
+        {
+            this.GetData<T>(0, data, startIndex, elementCount);
+        }
+
+        public void GetData<T>(T[] data) where T : struct
+        {
+            this.GetData<T>(0, data, 0, data.Length);
+        }
 		
 		public void SetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount) where T : struct
         {
 			if (data == null) throw new ArgumentNullException("data");
-			
-			var elementSizeInByte = Marshal.SizeOf(typeof(T));
-			var sizeInBytes = elementSizeInByte * elementCount;
-			var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-			var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startIndex * elementSizeInByte);
-		
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, ibo);
-            GL.BufferSubData(BufferTarget.ElementArrayBuffer, (IntPtr)offsetInBytes, (IntPtr)sizeInBytes, dataPtr);
-			
-			dataHandle.Free();
+
+            Threading.Begin();
+            try
+            {
+                var elementSizeInByte = Marshal.SizeOf(typeof(T));
+                var sizeInBytes = elementSizeInByte * elementCount;
+                var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+                var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startIndex * elementSizeInByte);
+
+                GL.BindBuffer(BufferTarget.ElementArrayBuffer, ibo);
+                GL.BufferSubData(BufferTarget.ElementArrayBuffer, (IntPtr)offsetInBytes, (IntPtr)sizeInBytes, dataPtr);
+
+                dataHandle.Free();
+            }
+            finally
+            {
+                Threading.End();
+            }
 		}
 		
 		public void SetData<T>(T[] data, int startIndex, int elementCount) where T : struct
         {
-			if (data == null) throw new ArgumentNullException("data");
-
-            var elementSizeInByte = Marshal.SizeOf(typeof(T));
-			var sizeInBytes = elementSizeInByte * elementCount;
-			var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-			var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startIndex * elementSizeInByte);
-		
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, ibo);
-            GL.BufferSubData(BufferTarget.ElementArrayBuffer, IntPtr.Zero, (IntPtr)sizeInBytes, dataPtr);
-			
-			dataHandle.Free();
+            SetData<T>(0, data, startIndex, elementCount);
 		}
 		
         public void SetData<T>(T[] data) where T : struct
         {
-			if (data == null) throw new ArgumentNullException("data");
-
-            var elementSizeInByte = Marshal.SizeOf(typeof(T));
-			var sizeInBytes = elementSizeInByte * data.Length;
-			var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-			var dataPtr = dataHandle.AddrOfPinnedObject();
-
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, ibo);
-            GL.BufferSubData(BufferTarget.ElementArrayBuffer, IntPtr.Zero, (IntPtr)sizeInBytes, dataPtr);
-			
-			dataHandle.Free();
+            SetData<T>(0, data, 0, data.Length);
         }
 		
-		public override void Dispose ()
+		public override void Dispose()
 		{
 			GL.DeleteBuffers(1, ref ibo);
 			base.Dispose();

@@ -255,7 +255,11 @@ namespace Microsoft.Xna.Framework
 
             // mouse
             // TODO review this when opentk 1.1 is released
+#if !WINDOWS
             Mouse.UpdateMouseInfo(window.Mouse);
+#else
+            Mouse.setWindows(window);
+#endif
 
             // Initialize GameTime
             _updateGameTime = new GameTime();
