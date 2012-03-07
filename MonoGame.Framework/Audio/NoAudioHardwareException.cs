@@ -44,13 +44,15 @@ using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework.Audio
 {
+
 #if WINRT
     [DataContract]
+    public sealed class NoAudioHardwareException : Exception
 #else
     [Serializable]
-#endif
     public sealed class NoAudioHardwareException : ExternalException
-	{
-	}
+#endif
+    {
+    }
 }
 
