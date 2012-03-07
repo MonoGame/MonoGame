@@ -76,8 +76,25 @@ namespace Microsoft.Xna.Framework
 			
             game.Services.AddService(typeof(IGraphicsDeviceManager), this);
             game.Services.AddService(typeof(IGraphicsDeviceService), this);	
-			
+									
 			Initialize();
+			
+			// Read the ActivityAttribute and check if the ScreenOrientation is set
+			// and set the window Orientation to match
+			var attribute = Game.Activity.GetActivityAttribute();
+			if (attribute != null)
+			{
+				switch (attribute.ScreenOrientation)
+				{
+					case Android.Content.PM.ScreenOrientation.Portrait:
+						_game.Window.SetOrientation(DisplayOrientation.Portrait);
+					    break;
+					case Android.Content.PM.ScreenOrientation.Landscape:
+					default :
+						_game.Window.SetOrientation(DisplayOrientation.LandscapeLeft);
+						break;
+				}
+			}
         }
 		
 		public void CreateDevice ()
@@ -244,7 +261,10 @@ namespace Microsoft.Xna.Framework
             }
             set
             {
-				_preferredBackBufferSetByUser = true;
+				if (_supportedOrientations == DisplayOrientation.Default)
+				{
+				   _preferredBackBufferSetByUser = true;
+				}
 				_preferredBackBufferHeight = value;
                 ResetClientBounds();
             }
@@ -258,7 +278,10 @@ namespace Microsoft.Xna.Framework
             }
             set
             {
-				_preferredBackBufferSetByUser = true;
+				if (_supportedOrientations == DisplayOrientation.Default)
+				{				
+				   _preferredBackBufferSetByUser = true;
+				}
 				_preferredBackBufferWidth = value;				
                 ResetClientBounds();
             }

@@ -274,12 +274,12 @@ namespace Microsoft.Xna.Framework
 				actualOrientation = DisplayOrientation.LandscapeRight;
 			}	
 			else 				
-			if (_game.GraphicsDevice.PresentationParameters.BackBufferHeight < _game.GraphicsDevice.PresentationParameters.BackBufferWidth && deviceManager.PreferredBackBufferSetByUser)
+			if (_game.GraphicsDevice != null && _game.GraphicsDevice.PresentationParameters.BackBufferHeight < _game.GraphicsDevice.PresentationParameters.BackBufferWidth && deviceManager.PreferredBackBufferSetByUser)
 			{
 				actualOrientation = DisplayOrientation.LandscapeLeft;
 			}
 			else 
-			if (_game.GraphicsDevice.PresentationParameters.BackBufferHeight > _game.GraphicsDevice.PresentationParameters.BackBufferWidth && deviceManager.PreferredBackBufferSetByUser)
+			if (_game.GraphicsDevice != null && _game.GraphicsDevice.PresentationParameters.BackBufferHeight > _game.GraphicsDevice.PresentationParameters.BackBufferWidth && deviceManager.PreferredBackBufferSetByUser)
 			{
 				actualOrientation = DisplayOrientation.Portrait;
 			}
