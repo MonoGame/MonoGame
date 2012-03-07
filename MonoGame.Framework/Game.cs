@@ -122,7 +122,6 @@ namespace Microsoft.Xna.Framework
         {
             _instance = this;
             LaunchParameters = new LaunchParameters();
-		    Exiting += OnExiting;
             _services = new GameServiceContainer();
             _components = new GameComponentCollection();
             Content = new ContentManager(_services);
@@ -296,18 +295,11 @@ namespace Microsoft.Xna.Framework
 
         public void Exit()
         {
-            Raise(Exiting, EventArgs.Empty);
             Platform.Exit();
         }
 
         public void ResetElapsedTime()
         {
-            // FIXME: This method didn't actually do anything before.  It
-            //        may need to call a new method in GamePlatform to allow
-            //        platforms to handle elapsed time in their own way.
-            //        Now that things are more unified, it may be possible to
-            //        consolidate this logic back into the Game class.
-            //        Regardless, an empty implementation is not correct.
             Platform.ResetElapsedTime();
             _gameTime.ResetElapsedTime();
         }
@@ -347,6 +339,7 @@ namespace Microsoft.Xna.Framework
             case GameRunBehavior.Synchronous:
                 Platform.RunLoop();
                 EndRun();
+                OnExiting(this, EventArgs.Empty);
                 break;
             default:
                 throw new NotImplementedException(string.Format(
@@ -490,6 +483,7 @@ namespace Microsoft.Xna.Framework
 
         protected virtual void OnExiting(object sender, EventArgs args)
         {
+            Raise(Exiting, args);
         }
 
         #endregion Protected Methods
@@ -518,6 +512,7 @@ namespace Microsoft.Xna.Framework
             var platform = (GamePlatform)sender;
             platform.AsyncRunLoopEnded -= Platform_AsyncRunLoopEnded;
             EndRun();
+            OnExiting(this, EventArgs.Empty);
         }
 
         private void Platform_Activated(object sender, EventArgs e)

@@ -70,13 +70,13 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Input.Touch;
-
 using MonoTouch.Foundation;
 using MonoTouch.OpenGLES;
 using MonoTouch.UIKit;
+
 using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Input.Touch;
 
 namespace Microsoft.Xna.Framework
 {
@@ -87,6 +87,7 @@ namespace Microsoft.Xna.Framework
         private List<NSObject> _applicationObservers;
 		private OpenALSoundController soundControllerInstance = null;
         private NSTimer _runTimer;
+        private bool _isExitPending;
 
         public iOSGamePlatform(Game game) :
             base(game)
@@ -134,21 +135,26 @@ namespace Microsoft.Xna.Framework
             base.Dispose(disposing);
             if (disposing)
             {
+                if (_viewController != null)
+                {
+                    _viewController.View.RemoveFromSuperview ();
+                    _viewController.RemoveFromParentViewController ();
+                    _viewController.Dispose();
+                    _viewController = null;
+                }
+
                 if (_mainWindow != null)
                 {
                     _mainWindow.Dispose();
                     _mainWindow = null;
-                }
-                if (_viewController != null)
-                {
-                    _viewController.Dispose();
-                    _viewController = null;
                 }
             }
         }
 
         public override void BeforeInitialize()
         {
+            base.BeforeInitialize ();
+            _viewController.View.MakeCurrent ();
             TouchPanel.Reset();
         }
 
@@ -171,19 +177,46 @@ namespace Microsoft.Xna.Framework
 
         private void Tick()
         {
-            if (IsPlayingVideo)
-                return;
+            try {
+                if (PerformPendingExit())
+                    return;
+                if (IsPlayingVideo)
+                    return;
 
-            // FIXME: Remove this call, and the whole Tick method, once
-            //        GraphicsDevice is where platform-specific Present
-            //        functionality is actually implemented.  At that
-            //        point, it should be possible to pass Game.Tick directly
-            //        to NSTimer.CreateRepeatingTimer.
-            _viewController.View.MakeCurrent();
-            Game.Tick ();
+                // FIXME: Remove this call, and the whole Tick method, once
+                //        GraphicsDevice is where platform-specific Present
+                //        functionality is actually implemented.  At that
+                //        point, it should be possible to pass Game.Tick
+                //        directly to NSTimer.CreateRepeatingTimer.
+                _viewController.View.MakeCurrent();
+                Game.Tick ();
 
-            if (!IsPlayingVideo)
-                _viewController.View.Present ();
+                if (!IsPlayingVideo)
+                    _viewController.View.Present ();
+
+                PerformPendingExit();
+            } catch (Exception ex) {
+                Console.WriteLine(
+                    "Error while processing the main game loop: {0}\n{1}",
+                    ex.Message, ex.StackTrace);
+                Game.Exit ();
+            }
+        }
+
+        private bool PerformPendingExit()
+        {
+            if (!_isExitPending)
+                return false;
+
+            _isExitPending = false;
+            if (_runTimer != null) {
+                _runTimer.Invalidate ();
+                _runTimer.Dispose ();
+                _runTimer = null;
+            }
+            StopObservingUIApplication ();
+            RaiseAsyncRunLoopEnded ();
+            return true;
         }
 
         public override bool BeforeDraw(GameTime gameTime)
@@ -214,17 +247,7 @@ namespace Microsoft.Xna.Framework
 
         public override void Exit()
         {
-            if (_runTimer != null) {
-                _runTimer.Invalidate ();
-                _runTimer.Dispose ();
-                _runTimer = null;
-            }
-            StopObservingUIApplication();
-
-            // FIXME: Need to terminate the run loop.  On iOS, this probably means
-            //        destroying _mainWindow.  But should async platforms try to kill the
-            //        whole program?
-            //throw new NotImplementedException();
+            _isExitPending = true;
         }
 
         private void BeginObservingUIApplication()
