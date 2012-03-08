@@ -5,6 +5,8 @@ using System.Runtime.InteropServices;
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
+#elif WINRT
+// TODO
 #else
 using OpenTK.Graphics.ES20;
  #if IPHONE || ANDROID
@@ -31,9 +33,13 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 		
+#if WINRT
+
+#else
 		PixelInternalFormat glInternalFormat;
 		PixelFormat glFormat;
 		PixelType glType;
+#endif
 		
 		public TextureCube (GraphicsDevice graphicsDevice, int size, bool mipMap, SurfaceFormat format)
 		{
@@ -41,6 +47,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			this.size = size;
 			this.levelCount = 1;
 
+#if WINRT
+
+#else
 			this.glTarget = TextureTarget.TextureCubeMap;
 
 #if IPHONE || ANDROID
@@ -90,7 +99,7 @@ namespace Microsoft.Xna.Framework.Graphics
 					this.levelCount++;
 				}
 			}
-			
+#endif			
 		}
 
         /// <summary>
@@ -117,7 +126,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		public void SetData<T>(CubeMapFace face, int level, Rectangle? rect,
 		                       T[] data, int startIndex, int elementCount) where T : struct
 		{
-            if (data == null) throw new ArgumentNullException("data");
+            if (data == null) 
+                throw new ArgumentNullException("data");
 
             var elementSizeInByte = Marshal.SizeOf(typeof(T));
 			var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
@@ -136,6 +146,9 @@ namespace Microsoft.Xna.Framework.Graphics
 				height = rect.Value.Height;
 			}
 			
+#if WINRT
+
+#else
 			GL.BindTexture (TextureTarget.TextureCubeMap, this.glTexture);
 			
 			TextureTarget target = GetGLCubeFace(face);
@@ -144,10 +157,11 @@ namespace Microsoft.Xna.Framework.Graphics
 			} else {
 				GL.TexSubImage2D(target, level, xOffset, yOffset, width, height, glFormat, glType, dataPtr);
 			}
-			
+#endif			
 			dataHandle.Free ();
 		}
 		
+#if !WINRT
 		private TextureTarget GetGLCubeFace(CubeMapFace face) {
 			switch (face) {
 			case CubeMapFace.PositiveX: return TextureTarget.TextureCubeMapPositiveX;
@@ -159,6 +173,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 			throw new ArgumentException();
 		}
+#endif
 
 	}
 }

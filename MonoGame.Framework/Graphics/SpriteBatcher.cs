@@ -46,6 +46,8 @@ using System.Collections.Generic;
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
+#elif WINRT
+// TODO
 #else
 
 #if ES11
@@ -155,6 +157,9 @@ namespace Microsoft.Xna.Framework.Graphics
 				break;
 			}
 			
+#if WINRT
+
+#else
 			//Unbind VBOs
 			GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
 			GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
@@ -209,6 +214,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			                       (IntPtr)(_vertexHandle.AddrOfPinnedObject().ToInt64()
 			         					+(sizeof(float)*2+sizeof(uint))));
 #endif
+#endif
 			
 			// setup the vertexArray array
 			int startIndex = 0;
@@ -229,12 +235,15 @@ namespace Microsoft.Xna.Framework.Graphics
 					startIndex = index;
 					texID = item.TextureID;
 					
-					
+#if WINRT
+			
+#else
 					GL.ActiveTexture(TextureUnit.Texture0);
 					GL.BindTexture ( TextureTarget.Texture2D, texID );
 
 					samplerState.Activate(TextureTarget.Texture2D);
-				}
+#endif
+                }
 				// store the SpriteBatchItem data in our vertexArray
 				_vertexArray[index++] = item.vertexTL;
 				_vertexArray[index++] = item.vertexTR;
@@ -275,10 +284,15 @@ namespace Microsoft.Xna.Framework.Graphics
 				_index[i*6+5] = (ushort)(i*4+2);
 			}
 		}
+
 		void FlushVertexArray ( int start, int end )
 		{
+#if WINRT
+
+#else
 			// draw stuff
-			if ( start != end ) {
+			if ( start != end )
+            {
 				GL.DrawElements(
 #if IPHONE || ANDROID
                                 All.Triangles,
@@ -289,6 +303,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				                 DrawElementsType.UnsignedShort,
 				                 (IntPtr)(_indexHandle.AddrOfPinnedObject().ToInt64()+(start/2*3*sizeof(short))) );
 			}
+#endif
 		}
 	}
 }

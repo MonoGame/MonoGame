@@ -38,86 +38,29 @@ purpose and non-infringement.
 */
 #endregion License
 
-#region Using Statements
-//﻿using System;
-//using System.IO;
-//using System.Reflection;
-//using Microsoft.Xna;
-//using Microsoft.Xna.Framework;
-//using Microsoft.Xna.Framework.Storage;
-#endregion
-
-
-//namespace Microsoft.Xna.Framework.Storage
-//{
-//    public class StorageContainer : IDisposable
-//    {
-//		private readonly string _path;
-//		private readonly StorageDevice _device;
-//		private readonly string _name;
-//
-//        public StorageContainer(StorageDevice device, string name)
-//        {
-//			_device = device;
-//			_name = name;
-//			_path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)+System.IO.Path.DirectorySeparatorChar+name;
-//			// Creathe the "device" if need
-//			if (!Directory.Exists(_path))
-//			{
-//				Directory.CreateDirectory(_path);
-//			}
-//        }
-//
-//        public string Path
-//        {
-//            get
-//            {
-//                return _path;
-//            }
-//        }
-//		
-//		 public Microsoft.Xna.Framework.Storage.StorageDevice StorageDevice
-//        {
-//            get
-//            {
-//				return _device;
-//            }
-//        }
-//
-//		public static string TitleLocation 
-//		{ 
-//			get
-//			{
-//				return Directory.GetParent(Assembly.GetEntryAssembly().Location).ToString();
-//			}
-//		}
-//		
-//        public string TitleName
-//        {
-//            get
-//            {
-//				return _name;
-//            }
-//        }
-//
-//
-//        #region IDisposable Members
-//
-//        public void Dispose()
-//        {
-//            
-//        }
-//
-//        #endregion
-//    }
-//}
-
 #region Assembly Microsoft.Xna.Framework.Storage.dll, v4.0.30319
 // C:\Program Files (x86)\Microsoft XNA\XNA Game Studio\v4.0\References\Windows\x86\Microsoft.Xna.Framework.Storage.dll
 #endregion
 using Microsoft.Xna.Framework;
 using System;
 using System.IO;
+
+#if WINRT
+namespace System.IO
+{
+    public enum FileMode
+    {
+    }
+
+    public enum FileAccess
+    {
+    }
+
+    public enum FileShare
+    {
+    }
+}
+#endif
 
 namespace Microsoft.Xna.Framework.Storage
 {

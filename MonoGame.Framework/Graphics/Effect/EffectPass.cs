@@ -7,6 +7,8 @@ using System.Text;
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
+#elif WINRT
+
 #else
 using OpenTK.Graphics.ES20;
 
@@ -25,6 +27,9 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		string name;
 		int shaderProgram = 0;
+#if WINRT
+
+#else
 		DXEffectObject.d3dx_state[] states;
 		DXShader pixelShader;
 		DXShader vertexShader;
@@ -33,6 +38,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		GLSLShader glslPixelShader;
 		GLSLShader glslVertexShader;
 		bool isGLSL = false;
+#endif
 
 		bool setBlendState = false;
 		BlendState blendState;

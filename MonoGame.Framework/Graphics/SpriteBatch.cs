@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
+#elif WINRT
+// TODO
 #else
 #if ES11
 using OpenTK.Graphics.ES11;
@@ -101,7 +103,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			// clear out the textures
 			graphicsDevice.Textures._textures.Clear ();
 			
-#if !ES11
+#if !WINRT && !ES11
 			// unbinds shader
 			if (_effect != null) {
 				GL.UseProgram (0);

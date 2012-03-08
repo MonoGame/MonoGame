@@ -48,8 +48,9 @@ using GL_Oes = MonoMac.OpenGL.GL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
 using GL_Oes = OpenTK.Graphics.OpenGL.GL;
-#else
+#elif WINRT
 
+#else
 #if ES11
 using OpenTK.Graphics.ES11;
 using GL_Oes = OpenTK.Graphics.ES11.GL.Oes;
@@ -92,7 +93,7 @@ using BufferUsageHint = OpenTK.Graphics.ES20.BufferUsage;
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Input.Touch;
+//using Microsoft.Xna.Framework.Input.Touch;
 
 namespace Microsoft.Xna.Framework.Graphics
 {

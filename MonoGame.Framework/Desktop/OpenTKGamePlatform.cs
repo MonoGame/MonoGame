@@ -71,7 +71,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+#if !WINRT
 using Microsoft.Xna.Framework.Audio;
+#endif
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Microsoft.Xna.Framework

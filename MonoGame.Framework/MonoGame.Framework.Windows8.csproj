@@ -43,9 +43,7 @@
     <Compile Include="Content\ContentReaders\EnvironmentMapEffectReader.cs" />
     <Compile Include="Content\ContentReaders\ModelReader.cs" />
     <Compile Include="Content\ContentReaders\SkinnedEffectReader.cs" />
-    <Compile Include="Content\ContentReaders\SongReader.cs" />
     <Compile Include="Content\ContentReaders\SpriteFontReader.cs" />
-    <Compile Include="Content\ContentReaders\Texture2DReader.cs" />
     <Compile Include="Content\ContentReaders\AlphaTestEffectReader.cs" />
     <Compile Include="Content\ContentReaders\BasicEffectReader.cs" />
     <Compile Include="Content\ContentReaders\BoundingBoxReader.cs" />
@@ -83,7 +81,6 @@
     <Compile Include="Graphics\PackedVector\NormalizedShort2.cs" />
     <Compile Include="Graphics\PackedVector\NormalizedShort4.cs" />
     <Compile Include="Graphics\PresentationParameters.cs" />
-    <Compile Include="Graphics\RenderTarget2D.cs" />
     <Compile Include="Graphics\SpriteBatch.cs" />
     <Compile Include="Graphics\SpriteBatcher.cs" />
     <Compile Include="Graphics\StencilOperation.cs" />
@@ -91,9 +88,13 @@
     <Compile Include="Graphics\TextureCube.cs" />
     <Compile Include="Graphics\Vertices\DynamicIndexBuffer.cs" />
     <Compile Include="Graphics\Vertices\DynamicVertexBuffer.cs" />
-    <Compile Include="Graphics\Vertices\IndexBuffer.cs" />
+    <Compile Include="Graphics\Vertices\IndexBuffer.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Graphics\Vertices\IndexElementSize.cs" />
-    <Compile Include="Graphics\Vertices\VertexBuffer.cs" />
+    <Compile Include="Graphics\Vertices\VertexBuffer.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Graphics\Vertices\VertexDeclaration.cs" />
     <Compile Include="Graphics\Vertices\VertexPositionColorTexture.cs" />
     <Compile Include="IServiceProvider.cs" />
@@ -113,7 +114,6 @@
     <Compile Include="Content\ContentReaders\PointReader.cs" />
     <Compile Include="Content\ContentReaders\ReflectiveReader.cs" />
     <Compile Include="Content\ContentReaders\SingleReader.cs" />
-    <Compile Include="Content\ContentReaders\SoundEffectReader.cs" />
     <Compile Include="Content\ContentReaders\TimeSpanReader.cs" />
     <Compile Include="Content\ContentReaders\UInt16Reader.cs" />
     <Compile Include="Content\ContentReaders\UInt32Reader.cs" />

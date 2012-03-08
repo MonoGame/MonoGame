@@ -8,6 +8,7 @@ using System.Runtime.InteropServices;
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
+#elif WINRT
 #else
 using OpenTK.Graphics.ES20;
 using BufferTarget = OpenTK.Graphics.ES20.All;

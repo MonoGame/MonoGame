@@ -74,8 +74,10 @@ using System.IO;
 
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+#if !WINRT
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
+#endif
 using Microsoft.Xna.Framework;
 using System.Reflection;
 #if !WINRT

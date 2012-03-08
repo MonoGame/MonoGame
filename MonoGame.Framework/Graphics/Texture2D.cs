@@ -60,6 +60,8 @@ using GLPixelFormat = MonoMac.OpenGL.PixelFormat;
 using System.Drawing.Imaging;
 using OpenTK.Graphics.OpenGL;
 using GLPixelFormat = OpenTK.Graphics.OpenGL.PixelFormat;
+#elif WINRT
+// TODO
 #else
 using OpenTK.Graphics.ES20;
 using GLPixelFormat = OpenTK.Graphics.ES20.All;
@@ -83,10 +85,13 @@ namespace Microsoft.Xna.Framework.Graphics
 		protected int width;
 		protected int height;
 
+#if WINRT
+#else
 		PixelInternalFormat glInternalFormat;
 		GLPixelFormat glFormat;
 		PixelType glType;
-		
+#endif
+	
         public Rectangle Bounds
         {
             get
@@ -107,6 +112,9 @@ namespace Microsoft.Xna.Framework.Graphics
             this.format = format;
             this.levelCount = 1;
 
+#if WINRT
+
+#else
             this.glTarget = TextureTarget.Texture2D;
             
             Threading.Begin();
@@ -195,6 +203,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 Threading.End();
             }
+#endif
         }
 				
 		public Texture2D(GraphicsDevice graphicsDevice, int width, int height) : 
@@ -224,9 +233,12 @@ namespace Microsoft.Xna.Framework.Graphics
             if (data == null)
 				throw new ArgumentNullException("data");
 
+#if !WINRT
+            // WTF is this? Document your code people!
             Threading.Begin();
             try
             {
+#endif
                 var elementSizeInByte = Marshal.SizeOf(typeof(T));
                 var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
                 var startBytes = startIndex * elementSizeInByte;
@@ -247,6 +259,8 @@ namespace Microsoft.Xna.Framework.Graphics
                     h = height;
                 }
 
+#if WINRT
+#else
                 GL.BindTexture(TextureTarget.Texture2D, this.glTexture);
 
                 if (glFormat == (GLPixelFormat)All.CompressedTextureFormats)
@@ -261,12 +275,17 @@ namespace Microsoft.Xna.Framework.Graphics
                                  x, y, w, h,
                                  glFormat, glType, dataPtr);
                 }
+#endif
+
                 dataHandle.Free();
+
+#if !WINRT
             }
             finally
             {
                 Threading.End();
             }
+#endif
         }
 		
 		public void SetData<T>(T[] data, int startIndex, int elementCount) where T : struct
@@ -283,6 +302,8 @@ namespace Microsoft.Xna.Framework.Graphics
         {
 #if IPHONE || ANDROID
 			throw new NotImplementedException();
+#elif WINRT
+
 #else
 
 			GL.BindTexture(TextureTarget.Texture2D, this.glTexture);
@@ -405,6 +426,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 Threading.End();
             }
             return texture;
+#elif WINRT
+
 #else
             using (Bitmap image = (Bitmap)Bitmap.FromStream(stream))
             {

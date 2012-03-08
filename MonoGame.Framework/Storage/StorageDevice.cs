@@ -71,7 +71,11 @@ using Microsoft.Xna.Framework;
 using System;
 using System.IO;
 
+#if WINRT
+using Windows.Storage;
+#else
 using System.Runtime.Remoting.Messaging;
+#endif
 
 namespace Microsoft.Xna.Framework.Storage
 {
@@ -109,8 +113,12 @@ namespace Microsoft.Xna.Framework.Storage
 				// I do not know if the DriveInfo is is implemented on Mac or not
 				// thus the try catch
 				try {
-					return new DriveInfo(GetDevicePath).AvailableFreeSpace;
-				}
+#if WINRT
+                    return long.MaxValue;
+#else
+                    return new DriveInfo(GetDevicePath).AvailableFreeSpace;
+#endif
+                }
 				catch (Exception) {
 					StorageDeviceHelper.Path = StorageRoot;
 					return StorageDeviceHelper.FreeSpace;
@@ -125,8 +133,12 @@ namespace Microsoft.Xna.Framework.Storage
 				// I do not know if the DriveInfo is is implemented on Mac or not
 				// thus the try catch
 				try {
+#if WINRT
+                    return true;
+#else
 					return new DriveInfo(GetDevicePath).IsReady;
-				}
+#endif
+                }
 				catch (Exception) {
 					return true;
 				}
@@ -141,9 +153,14 @@ namespace Microsoft.Xna.Framework.Storage
 				// I do not know if the DriveInfo is is implemented on Mac or not
 				// thus the try catch
 				try {
+#if WINRT
+                    return long.MaxValue;
+#else
+
 					// Not sure if this should be TotalSize or TotalFreeSize
 					return new DriveInfo(GetDevicePath).TotalSize;
-				}
+#endif
+                }
 				catch (Exception) {
 					StorageDeviceHelper.Path = StorageRoot;
 					return StorageDeviceHelper.TotalSpace;
@@ -341,18 +358,17 @@ namespace Microsoft.Xna.Framework.Storage
 			StorageContainer returnValue = null;
 			try {
 				// Retrieve the delegate.
-				AsyncResult asyncResult = (AsyncResult)result;
+                var asyncResult = result.AsyncState as OpenContainerAsynchronous;
 
 				// Wait for the WaitHandle to become signaled.
 				result.AsyncWaitHandle.WaitOne ();
 
 				// Call EndInvoke to retrieve the results.
-				if (asyncResult.AsyncDelegate is OpenContainerAsynchronous) {
-					returnValue = ((OpenContainerAsynchronous)asyncResult.AsyncDelegate).EndInvoke (result);
-				}	
+                if (asyncResult != null)
+                    returnValue = asyncResult.EndInvoke(result);
 			} finally {
 				// Close the wait handle.
-				result.AsyncWaitHandle.Close ();	 
+				result.AsyncWaitHandle.Dispose ();	 
 			}
 			
 			return returnValue;
@@ -371,18 +387,18 @@ namespace Microsoft.Xna.Framework.Storage
 			StorageDevice returnValue = null;
 			try {
 				// Retrieve the delegate.
-				AsyncResult asyncResult = (AsyncResult)result;
+                var asyncResult = result.AsyncState as ShowSelectorAsynchronousShow;
 
 				// Wait for the WaitHandle to become signaled.
 				result.AsyncWaitHandle.WaitOne ();
 
 				// Call EndInvoke to retrieve the results.
-				if (asyncResult.AsyncDelegate is ShowSelectorAsynchronousShow) {
-					returnValue = ((ShowSelectorAsynchronousShow)asyncResult.AsyncDelegate).EndInvoke (result);
+				if (asyncResult!=null) {
+					returnValue = asyncResult.EndInvoke (result);
 				}	
 			} finally {
 				// Close the wait handle.
-				result.AsyncWaitHandle.Close ();	 
+				result.AsyncWaitHandle.Dispose ();	 
 			}
 			
 			return returnValue;
@@ -392,8 +408,12 @@ namespace Microsoft.Xna.Framework.Storage
 		internal static string StorageRoot
 		{
 			get {
-				return Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-			}
+#if WINRT
+                return ApplicationData.Current.LocalFolder.Path; 
+#else
+                return Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+#endif
+            }
 		}
 	}
 }

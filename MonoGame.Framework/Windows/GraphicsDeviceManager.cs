@@ -39,7 +39,11 @@ purpose and non-infringement.
 #endregion License
 using System;
 
+#if WINRT
+// TODO
+#else
 using OpenTK.Graphics.OpenGL;
+#endif
 
 using Microsoft.Xna.Framework.Graphics;
 
