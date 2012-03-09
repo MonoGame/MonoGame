@@ -19,8 +19,13 @@ namespace Microsoft.Xna.Framework.Graphics
 		Effect _parentEffect;
 		
 		internal bool rawParameter = false;
+
+#if WINRT
+
+#else
 		internal DXEffectObject.D3DXPARAMETER_TYPE rawType;
 		internal GLSLEffectObject.glslEffectParameterType rawGLSLType;
+#endif
 
 		internal object data;
 		

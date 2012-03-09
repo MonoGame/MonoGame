@@ -55,10 +55,17 @@ namespace Microsoft.Xna.Framework.Graphics
         public EffectParameterCollection Parameters { get; set; }
 		internal List<EffectParameter> _textureMappings = new List<EffectParameter>();
 
+#if WINRT
+
+#else
 		DXEffectObject effectObject;
 		GLSLEffectObject glslEffectObject;
 
-		protected Effect (GraphicsDevice graphicsDevice)
+		internal static Dictionary<byte[], DXEffectObject> effectObjectCache =
+			new Dictionary<byte[], DXEffectObject>(new ByteArrayComparer());
+#endif
+
+        protected Effect (GraphicsDevice graphicsDevice)
 		{
 #if ES11
 			throw new NotSupportedException("Programmable shaders unavailable in OpenGL ES 1.1");
@@ -90,19 +97,14 @@ namespace Microsoft.Xna.Framework.Graphics
 					throw new ArgumentNullException("key");
 				return key.Sum(b => b);
 			}
-		}
-		internal static Dictionary<byte[], DXEffectObject> effectObjectCache =
-			new Dictionary<byte[], DXEffectObject>(new ByteArrayComparer());
-		
+		}		
 
 		protected Effect (Effect cloneSource)
 		{
-
 		}
 
 		internal Effect (GraphicsDevice graphicsDevice, string assetName)
 		{
-
 		}
 
 		public Effect (
@@ -118,7 +120,11 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 			this.graphicsDevice = graphicsDevice;
 
+#if WINRT
+
+#else
 			uint magic = BitConverter.ToUInt32(effectCode,0);
+
 			//0xBCF00BCF XNA 4 effects
 			//0xFEFF0901 effect too old or too new, or ascii which we can't compile atm
 			//0x6151EFFE GLSL
@@ -155,8 +161,9 @@ namespace Microsoft.Xna.Framework.Graphics
 				}
 			}
 
-			CurrentTechnique = Techniques[0];
-			
+#endif
+
+			CurrentTechnique = Techniques[0];			
 		}
 
 		public virtual Effect Clone ()
@@ -180,13 +187,17 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		internal static byte[] LoadEffectResource(string name)
 		{
-			Assembly assembly = Assembly.GetExecutingAssembly();
-#if GLSL_EFFECTS
-			var stream = assembly.GetManifestResourceStream("Microsoft.Xna.Framework.Graphics.Effect."+name+"GLSL.bin");
+            var assembly = typeof(Effect).GetTypeInfo().Assembly;
+
+#if WINRT
+            name += ".hlsl";
+#elif GLSL_EFFECTS
+            name += "GLSL.bin";
 #else
-			var stream = assembly.GetManifestResourceStream("Microsoft.Xna.Framework.Graphics.Effect."+name+".bin");
+            name += ".bin";
 #endif
-			using (MemoryStream ms = new MemoryStream())
+            var stream = assembly.GetManifestResourceStream("Microsoft.Xna.Framework.Graphics.Effect." + name);
+            using (MemoryStream ms = new MemoryStream())
 			{
 				stream.CopyTo(ms);
 				return ms.ToArray();

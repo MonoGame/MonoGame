@@ -65,8 +65,12 @@ namespace Microsoft.Xna.Framework.Graphics
 		protected SurfaceFormat format;
 		protected int levelCount;
 
+#if WINRT
+
+#else
 		internal int glTexture = -1;
 		internal TextureTarget glTarget;
+#endif
 		
 		public SurfaceFormat Format
 		{
@@ -81,13 +85,19 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		internal virtual void Activate()
 		{
+#if WINRT
+#else
 			GL.BindTexture(glTarget, this.glTexture);
-		}
+#endif
+        }
 
 		public override void Dispose()
 		{
+#if WINRT
+#else
 			GL.DeleteTextures(1, ref glTexture);
-			base.Dispose();
+#endif
+            base.Dispose();
 		}
 		
 	}

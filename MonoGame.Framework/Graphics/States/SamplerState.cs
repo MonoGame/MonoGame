@@ -132,6 +132,9 @@ namespace Microsoft.Xna.Framework.Graphics
 		public int MaxMipLevel { get; set; }
 		public float MipMapLevelOfDetailBias { get; set; }
 		
+#if WINRT
+
+#else
 		internal void Activate(TextureTarget target, bool useMipmaps = false)
 		{
 			switch(Filter)
@@ -157,7 +160,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			GL.TexParameter(target, TextureParameterName.TextureWrapS, (int)GetWrapMode(AddressU));
 			GL.TexParameter(target, TextureParameterName.TextureWrapT, (int)GetWrapMode(AddressV));
 		}
-		
+
 		private int GetWrapMode(TextureAddressMode textureAddressMode)
 		{
 			switch(textureAddressMode)
@@ -176,6 +179,8 @@ namespace Microsoft.Xna.Framework.Graphics
 				throw new NotImplementedException("No support for " + textureAddressMode);
 			}
 		}
+#endif
+
 	}
 }
 
