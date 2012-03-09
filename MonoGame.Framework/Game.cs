@@ -162,19 +162,19 @@ namespace Microsoft.Xna.Framework
         }
 
 #if WINRT
-        void Initialize(CoreApplicationView applicationView)
+        public void Initialize(CoreApplicationView applicationView)
         {
         }
 
-        void Load(string entryPoint)
+        public void Load(string entryPoint)
         {
         }
 
-        void SetWindow(CoreWindow window)
+        public void SetWindow(CoreWindow window)
         {
         }
 
-        void Uninitialize()
+        public void Uninitialize()
         {
         }
 #endif

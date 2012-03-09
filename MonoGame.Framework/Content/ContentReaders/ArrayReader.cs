@@ -54,8 +54,7 @@ namespace Microsoft.Xna.Framework.Content
             T[] array = existingInstance;
             if (array == null)
                 array = new T[count];
-			Type objectType = typeof(T);
-			if(objectType.IsValueType)
+			if(default(T) == null) // Type.IsValueType check compatible with WinRT
 			{
                 for (uint i = 0; i < count; i++)
                 {

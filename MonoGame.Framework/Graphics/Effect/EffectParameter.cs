@@ -20,14 +20,13 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		internal bool rawParameter = false;
 
+        internal object data;
+
 #if WINRT
 
 #else
 		internal DXEffectObject.D3DXPARAMETER_TYPE rawType;
 		internal GLSLEffectObject.glslEffectParameterType rawGLSLType;
-#endif
-
-		internal object data;
 		
 		internal EffectParameter( DXEffectObject.d3dx_parameter parameter )
 		{
@@ -318,8 +317,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 			
 		}
+#endif
 
-		public int ColumnCount {
+        public int ColumnCount {
 			get { return colCount; }
 		}
 

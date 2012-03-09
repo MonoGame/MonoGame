@@ -99,7 +99,6 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public class GraphicsDevice : IDisposable
     {
-        private All _preferedFilter;
         private int _activeTexture = -1;
         private Viewport _viewport;
 
@@ -126,6 +125,12 @@ namespace Microsoft.Xna.Framework.Graphics
 		internal static int attributeBlendWeight = 6;
 		internal static int attributeTexCoord = 7; //must be the last one, texture index locations are added to it
 
+#if WINRT
+
+#else
+        private All _preferedFilter;
+#endif
+
 		//OpenGL ES 1.1 extension consts
 #if (IPHONE || ANDROID) && ES11
 		const FramebufferTarget GLFramebuffer = FramebufferTarget.FramebufferOes;
@@ -149,7 +154,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		const RenderbufferStorage GLDepthComponent24 = RenderbufferStorage.DepthComponent24Oes;
 		const RenderbufferStorage GLDepth24Stencil8 = RenderbufferStorage.Depth24Stencil8Oes;
 		const FramebufferErrorCode GLFramebufferComplete = FramebufferErrorCode.FramebufferComplete;
-#else
+#elif !WINRT
 		const FramebufferTarget GLFramebuffer = FramebufferTarget.FramebufferExt;
 		const RenderbufferTarget GLRenderbuffer = RenderbufferTarget.RenderbufferExt;
 		const FramebufferAttachment GLDepthAttachment = FramebufferAttachment.DepthAttachmentExt;
@@ -179,10 +184,16 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 			set {
 				_rasterizerState = value;
+
+#if WINRT
+#else
 				GLStateManager.SetRasterizerStates(value, GetRenderTargets().Length > 0);
-			}
+#endif
+            }
 		}
 		
+#if WINRT
+#else
         internal All PreferedFilter
         {
             get
@@ -195,6 +206,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
         }
+#endif
 
         internal int ActiveTexture
         {
@@ -275,8 +287,11 @@ namespace Microsoft.Xna.Framework.Graphics
 			set { 
 				// ToDo check for invalid state
 				_blendState = value;
+#if WINRT
+#else
 				GLStateManager.SetBlendStates(value);
-			}
+#endif
+            }
 		}
 
         public DepthStencilState DepthStencilState
@@ -285,7 +300,10 @@ namespace Microsoft.Xna.Framework.Graphics
             set
             {
                 _depthStencilState = value;
+#if WINRT
+#else
 				GLStateManager.SetDepthStencilState(value);
+#endif
             }
         }
 
@@ -297,6 +315,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 return _samplerStates;
             }
         }
+
         public void Clear(Color color)
         {
 			ClearOptions options = ClearOptions.Target;
@@ -316,6 +335,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void Clear (ClearOptions options, Vector4 color, float depth, int stencil)
 		{
+#if WINRT
+#else
 			GL.ClearColor (color.X, color.Y, color.Z, color.W);
 
 			ClearBufferMask bufferMask = 0;
@@ -335,6 +356,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			GL.Clear ((uint)bufferMask);
 #else
 			GL.Clear (bufferMask);
+#endif
 #endif
 		}
 		
@@ -365,7 +387,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void Present()
         {
+#if WINRT
+#else
 			GL.Flush ();
+#endif
         }
 
         public void Present(Rectangle? sourceRectangle, Rectangle? destinationRectangle, IntPtr overrideWindowHandle)
@@ -437,8 +462,11 @@ namespace Microsoft.Xna.Framework.Graphics
             set
             {
                 _viewport = value;
+#if WINRT
+#else
 				GL.Viewport (value.X, value.Y, value.Width, value.Height);
 				GL.DepthRange(value.MinDepth, value.MaxDepth);
+#endif
             }
         }
 
@@ -466,10 +494,12 @@ namespace Microsoft.Xna.Framework.Graphics
             set
             {
                 _scissorRectangle = value;
-				
-				GLStateManager.SetScissor(_scissorRectangle);
-				
+
+#if WINRT
+#else			
+				GLStateManager.SetScissor(_scissorRectangle);				
 				_scissorRectangle.Y = _viewport.Height - _scissorRectangle.Y - _scissorRectangle.Height;
+#endif
             }
         }
 
@@ -502,13 +532,18 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			if (this.currentRenderTargetBindings == null || this.currentRenderTargetBindings.Length == 0)
 			{
+#if WINRT
+#else
 				GL.BindFramebuffer(GLFramebuffer, 0);
-				this.Viewport = new Viewport(0, 0,
+#endif
+                this.Viewport = new Viewport(0, 0,
 					this.PresentationParameters.BackBufferWidth, 
 					this.PresentationParameters.BackBufferHeight);
 			}
 			else
 			{
+#if WINRT
+#else
 				if (this.glFramebuffer == 0)
 				{
 #if IPHONE || ANDROID
@@ -544,6 +579,7 @@ namespace Microsoft.Xna.Framework.Graphics
 					throw new InvalidOperationException(message);
 				}
 				this.Viewport = new Viewport(0, 0, renderTarget.Width, renderTarget.Height);
+#endif
 			}
 			
 			if (previousRenderTargetBindings != null)
@@ -563,10 +599,13 @@ namespace Microsoft.Xna.Framework.Graphics
 				}
 			}
 
+#if WINRT
+#else
 			//Reset the cull mode, because we flip verticies when rendering offscreen
 			//and thus flip the cull direction
 			GLStateManager.Cull (RasterizerState, GetRenderTargets().Length > 0);
-		}
+#endif
+        }
 
 		static RenderTargetBinding[] emptyRenderTargetBinding = new RenderTargetBinding[0];
 		public RenderTargetBinding[] GetRenderTargets ()
@@ -597,6 +636,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
             throw new NotImplementedException();
         }
+#elif WINRT
+        
 #else
         internal BeginMode PrimitiveTypeGL(PrimitiveType primitiveType)
         {
@@ -640,7 +681,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			if (minVertexIndex > 0)
 				throw new NotImplementedException ("minVertexIndex > 0 is supported");
 
-
+#if WINRT
+#else
 			var indexElementType = DrawElementsType.UnsignedShort;
 			var indexElementSize = 2;
 			var indexOffsetInBytes = (IntPtr)(startIndex * indexElementSize);
@@ -655,12 +697,13 @@ namespace Microsoft.Xna.Framework.Graphics
 			                 indexElementCount,
 			                 indexElementType,
 			                 indexOffsetInBytes);
-
+#endif
         }
 
         public void DrawUserPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int primitiveCount) where T : struct, IVertexType
         {
-
+#if WINRT
+#else
             // Unbind the VBOs
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
@@ -702,21 +745,25 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
             handle.Free();
-
+#endif
         }
 
         public void DrawPrimitives(PrimitiveType primitiveType, int vertexStart, int primitiveCount)
         {
 			_vertexBuffer.VertexDeclaration.Apply ();
 
+#if WINRT
+#else
 			GL.DrawArrays(PrimitiveTypeGL(primitiveType),
 			              vertexStart,
 			              GetElementCountArray(primitiveType,primitiveCount));
-		}
+#endif
+        }
 
         public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int vertexCount, short[] indexData, int indexOffset, int primitiveCount) where T : struct, IVertexType
         {
-
+#if WINRT
+#else
             // Unbind the VBOs
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
@@ -773,11 +820,13 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
             handle.Free();
             handle2.Free();
+#endif
         }
 
         public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int vertexCount, int[] indexData, int indexOffset, int primitiveCount) where T : struct, IVertexType
         {
-
+#if WINRT
+#else
             // Unbind the VBOs
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
@@ -834,6 +883,7 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
             handle.Free();
             handle2.Free();
+#endif
         }
 
         internal int GetElementCountArray(PrimitiveType primitiveType, int primitiveCount)

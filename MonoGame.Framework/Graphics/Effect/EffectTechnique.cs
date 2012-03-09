@@ -8,6 +8,9 @@ namespace Microsoft.Xna.Framework.Graphics
         public EffectPassCollection Passes { get; set; }
 		public EffectAnnotationCollection Annotations { get; set; }
 
+#if WINRT
+
+#else
         public EffectTechnique(Effect effect, DXEffectObject.d3dx_technique technique)
         {
             Passes = new EffectPassCollection(this);
@@ -33,7 +36,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				Passes._passes.Add (new EffectPass(this, technique.pass_handles[i]));
 			}
         }
-
+#endif
 		
 		public string Name {
 			get { return name; }
