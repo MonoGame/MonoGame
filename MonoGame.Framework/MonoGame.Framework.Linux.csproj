@@ -351,6 +351,9 @@
     <Compile Include="Graphics\Effect\AlphaTestEffectCode.cs" />
     <Compile Include="Graphics\States\GLStateManager.cs" />
     <Compile Include="Windows\Graphics\Effect.cs" />
+    <Compile Include="Graphics\Model.cs" />
+    <Compile Include="Graphics\ModelBone.cs" />
+    <Compile Include="Graphics\ModelMesh.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.Linux.csproj">

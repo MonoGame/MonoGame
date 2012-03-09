@@ -371,6 +371,9 @@
     <Compile Include="Content\ContentReaders\AlphaTestEffectReader.cs" />
     <Compile Include="XnaToOpenTK.cs" />
     <Compile Include="Graphics\SpriteFont.cs" />
+    <Compile Include="Graphics\Model.cs" />
+    <Compile Include="Graphics\ModelBone.cs" />
+    <Compile Include="Graphics\ModelMesh.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />
