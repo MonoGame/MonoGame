@@ -18,6 +18,7 @@
 		
 		<Project name = "${ProjectName}" directory = "." type = "MonoDroid">
 			<Options
+				TargetFrameworkVersion = "4.0" 
 				AndroidApplication="true"
 				AndroidResgenFile="Resources/Resource.designer.cs"
 				AndroidResgenClass="Resource" />
@@ -27,6 +28,8 @@
 				<Reference type="Gac" refto="System.Core, Version=2.0.5.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />				
 				<Reference type="Gac" refto="Mono.Android" />
 				<Reference type="Gac" refto="OpenTK" />
+				<Reference type="Gac" refto="MonoGame.Framework.Android" />
+				<Reference type="Gac" refto="Lidgren.Network.Android" />
 			</References>
 			<Files>
 				<File name="Activity1.cs" src="MonoGameApplication/Activity1.cs" />
@@ -43,7 +46,7 @@
 					</Directory>
 				</Directory>
 				<Directory name="Properties">
-					<File name="AssemblyInfo.cs" src="MonoGameApplication/AssemblyInfo.cs" />
+					<File name="AssemblyInfo.cs" src="MonoGameApplication/AndroidAssemblyInfo.cs" />
 				</Directory>
 				<Directory name="Assets">
 					<RawFile name="AboutAssets.txt" src="MonoGameApplication/AboutAssets.txt" />
