@@ -603,6 +603,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			GL.DrawArrays (PrimitiveTypeGL11 (primitiveType), vertexOffset, getElementCountArray (primitiveType, primitiveCount));
 		}
+		
+		public void DrawUserIndexedPrimitives<T> (PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int vertexCount, short[] indexData, int indexOffset, int primitiveCount) where T : IVertexType
+		{
+			throw new NotImplementedException();	
+		}
 
 		public int getElementCountArray (PrimitiveType primitiveType, int primitiveCount)
 		{
