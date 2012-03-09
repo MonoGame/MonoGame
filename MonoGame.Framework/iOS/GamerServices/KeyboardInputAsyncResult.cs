@@ -66,29 +66,96 @@ non-infringement.
 */
 #endregion License
 
-
-#region Using Statements
 using System;
+using System.Threading;
 
-using Microsoft.Xna.Framework.Net;
-#endregion Statements
+using MonoTouch.CoreFoundation;
+using MonoTouch.Foundation;
+using MonoTouch.UIKit;
 
-namespace Microsoft.Xna.Framework.GamerServices {
-	public class GamerServicesComponent : GameComponent {
-		private static LocalNetworkGamer lng;
-
-		internal static LocalNetworkGamer LocalNetworkGamer { get { return lng; } set { lng = value; } }
-
-		public GamerServicesComponent(Game game)
-			: base(game)
+namespace Microsoft.Xna.Framework {
+	class KeyboardInputAsyncResult : IAsyncResult {
+		private readonly KeyboardInputViewController _viewController;
+		private readonly AsyncCallback _callback;
+		public KeyboardInputAsyncResult (
+			KeyboardInputViewController viewController, AsyncCallback callback, object asyncState)
 		{
-			Guide.Initialise(game);
-			//lng = new LocalNetworkGamer();
+			if (viewController == null)
+				throw new ArgumentNullException ("viewController");
+
+			_viewController = viewController;
+			_callback = callback;
+			_asyncState = asyncState;
+			_asyncWaitHandle = new Lazy<ManualResetEvent>(
+				() => new ManualResetEvent(false),
+				LazyThreadSafetyMode.ExecutionAndPublication);
+
+			_viewController.View.InputAccepted += ViewController_InputAccepted;
+			_viewController.View.InputCanceled += ViewController_InputCanceled;
 		}
 
-		public override void Update (GameTime gameTime)
+		private string _result;
+		public string GetResult ()
 		{
-
+			// FIXME: CFRunLoop.CFDefaultRunLoopMode is currently
+			//        returning null.  So for now, cast from the
+			//        CLR string version.
+			var mode = (NSString)CFRunLoop.ModeDefault;
+			while (!_isCompleted)
+				CFRunLoop.Main.RunInMode (mode, 0.1, false);
+			return _result;
 		}
+
+		private void ViewController_InputAccepted (object sender, EventArgs e)
+		{
+			UnsubscribeViewEvents ();
+			MarkComplete (_viewController.View.Text);
+		}
+
+		private void ViewController_InputCanceled (object sender, EventArgs e)
+		{
+			UnsubscribeViewEvents ();
+			MarkComplete (null);
+		}
+
+		private void MarkComplete (string result)
+		{
+			_result = result;
+			_isCompleted = true;
+			if (_asyncWaitHandle.IsValueCreated)
+				_asyncWaitHandle.Value.Set ();
+
+			if (_callback != null)
+				UIApplication.SharedApplication.BeginInvokeOnMainThread(() => _callback (this));
+		}
+
+		private void UnsubscribeViewEvents ()
+		{
+			_viewController.View.InputAccepted -= ViewController_InputAccepted;
+			_viewController.View.InputCanceled -= ViewController_InputCanceled;
+		}
+
+		#region IAsyncResult Members
+
+		private readonly object _asyncState;
+		public object AsyncState {
+			get { return _asyncState; }
+		}
+
+		private readonly Lazy<ManualResetEvent> _asyncWaitHandle;
+		public WaitHandle AsyncWaitHandle {
+			get { return _asyncWaitHandle.Value; }
+		}
+
+		public bool CompletedSynchronously {
+			get { return false; }
+		}
+
+		private bool _isCompleted;
+		public bool IsCompleted {
+			get { return _isCompleted; }
+		}
+
+		#endregion IAsyncResult Members
 	}
 }
