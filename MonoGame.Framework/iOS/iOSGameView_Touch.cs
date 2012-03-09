@@ -208,7 +208,15 @@ namespace Microsoft.Xna.Framework {
 
 		private void TouchPanel_EnabledGesturesChanged (object sender, EventArgs e)
 		{
+			SyncTouchRecognizers ();
+		}
+
+		private void SyncTouchRecognizers()
+		{
 			foreach (GestureType gestureType in Enum.GetValues(typeof(GestureType))) {
+				if (gestureType == GestureType.None)
+					continue;
+
 				UIGestureRecognizer [] recognizers;
 
 				bool enabled = (gestureType & TouchPanel.EnabledGestures) == gestureType;
@@ -238,7 +246,7 @@ namespace Microsoft.Xna.Framework {
 			switch (gestureType) {
 			case GestureType.DoubleTap:
 				return new UIGestureRecognizer[] {
-					new UITapGestureRecognizer (this, new Selector ("OnTapGesture")) {
+					new UITapGestureRecognizer (this, new Selector ("OnDoubleTapGesture")) {
 						CancelsTouchesInView = false,
 						NumberOfTapsRequired = 2
 					}
@@ -425,6 +433,17 @@ namespace Microsoft.Xna.Framework {
 			var position = GetOffsetPosition (new Vector2 (location.X, location.Y), true);
 			TouchPanel.GestureList.Enqueue (new GestureSample (
 				GestureType.Tap, new TimeSpan (DateTime.Now.Ticks),
+				position, Vector2.Zero,
+				Vector2.Zero, Vector2.Zero));
+		}
+
+		[Export]
+		public void OnDoubleTapGesture (UITapGestureRecognizer sender)
+		{
+			var location = sender.LocationInView (sender.View);
+			var position = GetOffsetPosition (new Vector2 (location.X, location.Y), true);
+			TouchPanel.GestureList.Enqueue (new GestureSample (
+				GestureType.DoubleTap, new TimeSpan (DateTime.Now.Ticks),
 				position, Vector2.Zero,
 				Vector2.Zero, Vector2.Zero));
 		}
