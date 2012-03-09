@@ -35,9 +35,6 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <!-- A reference to the entire .Net Framework and Windows SDK are automatically included -->
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="Content\ContentReaders\DualTextureEffectReader.cs" />
     <Compile Include="Content\ContentReaders\EffectReader.cs" />
     <Compile Include="Content\ContentReaders\EnvironmentMapEffectReader.cs" />
@@ -266,6 +263,14 @@
     <Compile Include="Desktop\TitleContainer.cs" />
     <Compile Include="Content\ContentReaders\CurveReader.cs" />
     <Compile Include="Graphics\Vertices\VertexElementColor.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="SharpDX">
+      <HintPath>..\ThirdParty\SharpDX\SharpDX.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.Direct3D11">
+      <HintPath>..\ThirdParty\SharpDX\SharpDX.Direct3D11.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' ">
     <VisualStudioVersion>11.0</VisualStudioVersion>
