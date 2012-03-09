@@ -71,7 +71,10 @@ namespace Microsoft.Xna.Framework.Graphics
 		internal static int? passthroughVertexShader;
 
 		bool passthroughVertexShaderAttached = false;
+
+#if WINRT
 		
+#else
 		public EffectPass(EffectTechnique technique, DXEffectObject.d3dx_pass pass)
         {
             _technique = technique;
@@ -313,9 +316,13 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 
         }
+#endif
 
 		private void Link ()
 		{
+#if WINRT
+
+#else
 			if (vertexShader == null && !passthroughVertexShaderAttached) {
 				if (!passthroughVertexShader.HasValue) {
 					int shader = GL.CreateShader(ShaderType.VertexShader);
@@ -366,13 +373,16 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 				throw new InvalidOperationException("Unable to link effect program");
 			}
-
+#endif
 		}
 		
 		public void Apply ()
 		{
 			_technique._effect.OnApply();
 
+#if WINRT
+
+#else
 			if (isGLSL) {
 				GLSLApply();
 				return;
@@ -504,10 +514,12 @@ namespace Microsoft.Xna.Framework.Graphics
 				                  _graphicsDevice);
 			}
 
+#endif
 		}
 		
 		public string Name { get { return name; } }
 
+#if !WINRT
 		private void glslLink ()
 		{
 			if (glslVertexShader == null && !passthroughVertexShaderAttached) {
@@ -693,5 +705,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 
 		}
+#endif
     }
 }
