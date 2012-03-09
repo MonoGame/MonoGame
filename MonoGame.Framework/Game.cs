@@ -71,22 +71,26 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Drawing;
 using System.IO;
+using System.Reflection;
 
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-#if !WINRT
+using Microsoft.Xna.Framework;
+#if WINRT
+using Windows.ApplicationModel.Core;
+using Windows.UI.Core;
+#else
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
-#endif
-using Microsoft.Xna.Framework;
-using System.Reflection;
-#if !WINRT
 using Microsoft.Xna.Framework.GamerServices;
 #endif
 
 namespace Microsoft.Xna.Framework
 {
     public class Game : IDisposable
+#if WINRT
+        , IFrameworkView
+#endif
     {
         private const float DefaultTargetFramesPerSecond = 60.0f;
 
@@ -134,7 +138,7 @@ namespace Microsoft.Xna.Framework
             _platform.Deactivated += Platform_Deactivated;
             _services.AddService(typeof(GamePlatform), _platform);
 
-
+#if MONOMAC || WINDOWS || LINUX
             // Set the window title.
             // TODO: Get the title from the WindowsPhoneManifest.xml for WP7 projects.
             string windowTitle = string.Empty;
@@ -148,7 +152,6 @@ namespace Microsoft.Xna.Framework
             // Otherwise, fallback to the Name of the assembly.
             if (string.IsNullOrEmpty(windowTitle))
                 windowTitle = assembly.GetName().Name;
-#if !ANDROID && !IPHONE
             Window.Title = windowTitle;
 #endif
         }
@@ -157,6 +160,24 @@ namespace Microsoft.Xna.Framework
         {
             Dispose(false);
         }
+
+#if WINRT
+        void Initialize(CoreApplicationView applicationView)
+        {
+        }
+
+        void Load(string entryPoint)
+        {
+        }
+
+        void SetWindow(CoreWindow window)
+        {
+        }
+
+        void Uninitialize()
+        {
+        }
+#endif
 
 		[System.Diagnostics.Conditional("DEBUG")]
 		internal void Log(string Message)
