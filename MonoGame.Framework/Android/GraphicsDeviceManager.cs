@@ -81,6 +81,7 @@ namespace Microsoft.Xna.Framework
 			
 			// Read the ActivityAttribute and check if the ScreenOrientation is set
 			// and set the window Orientation to match
+			/*
 			var attribute = Game.Activity.GetActivityAttribute();
 			if (attribute != null)
 			{
@@ -94,7 +95,7 @@ namespace Microsoft.Xna.Framework
 						_game.Window.SetOrientation(DisplayOrientation.LandscapeLeft);
 						break;
 				}
-			}
+			}*/
         }
 		
 		public void CreateDevice ()
