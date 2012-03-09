@@ -75,6 +75,7 @@ using MonoTouch.OpenGLES;
 using MonoTouch.UIKit;
 
 using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
 
@@ -100,6 +101,8 @@ namespace Microsoft.Xna.Framework
             Directory.SetCurrentDirectory(NSBundle.MainBundle.ResourcePath);
 
             _applicationObservers = new List<NSObject>();
+
+            UIApplication.SharedApplication.SetStatusBarHidden(true, UIStatusBarAnimation.Fade);
 
             // Create a full-screen window
             _mainWindow = new UIWindow(UIScreen.MainScreen.Bounds);
@@ -156,6 +159,16 @@ namespace Microsoft.Xna.Framework
             base.BeforeInitialize ();
             _viewController.View.MakeCurrent ();
             TouchPanel.Reset();
+
+            // HACK: Because GraphicsDevice doesn't know anything, we need to
+            //       tell it the current viewport size.  Once GraphicsDevice is
+            //       capable of querying PresentationParameters
+            //       DeviceWindowHandle for the size, this will no longer be
+            //       needed.
+            var gds = (IGraphicsDeviceService)Game.Services.GetService(typeof(IGraphicsDeviceService));
+            if (gds != null && gds.GraphicsDevice != null) {
+                gds.GraphicsDevice.Viewport = new Viewport(0, 0, Window.ClientBounds.Width, Window.ClientBounds.Height);
+            }
         }
 
         public override void RunLoop()

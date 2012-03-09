@@ -67,6 +67,7 @@ non-infringement.
 #endregion License
 
 using System;
+using System.Drawing;
 
 using MonoTouch.CoreAnimation;
 using MonoTouch.Foundation;
@@ -89,8 +90,8 @@ namespace Microsoft.Xna.Framework {
 		private int _framebuffer;
 
 		#region Construction/Destruction
-		public iOSGameView (iOSGamePlatform platform)
-			: base(UIScreen.MainScreen.Bounds)
+		public iOSGameView (iOSGamePlatform platform, RectangleF frame)
+			: base(frame)
 		{
 			if (platform == null)
 				throw new ArgumentNullException ("platform");
