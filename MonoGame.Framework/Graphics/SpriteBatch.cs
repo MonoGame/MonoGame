@@ -443,65 +443,78 @@ namespace Microsoft.Xna.Framework.Graphics
 			// Configure Display Orientation:
 			if(lastDisplayOrientation != graphicsDevice.PresentationParameters.DisplayOrientation)
 			{
+				bool update = true;
 				// check the display width and height make sure it matches the target orientation
 				// before updating the matrix
 				if (graphicsDevice.PresentationParameters.DisplayOrientation == DisplayOrientation.Portrait)
 				{
-				   if (graphicsDevice.DisplayMode.Width > graphicsDevice.DisplayMode.Height) return;	
+				   if (graphicsDevice.DisplayMode.Width > graphicsDevice.DisplayMode.Height) update = false;	
 				}
 				else
 				{
-					if (graphicsDevice.DisplayMode.Width < graphicsDevice.DisplayMode.Height) return;
+					if (graphicsDevice.DisplayMode.Width < graphicsDevice.DisplayMode.Height) update = false;
 				}
-				// updates last display orientation (optimization)				
-				lastDisplayOrientation = graphicsDevice.PresentationParameters.DisplayOrientation;
-
-                var deviceManager = (IGraphicsDeviceManager)Game.Instance.Services.GetService(typeof(IGraphicsDeviceManager));
-                if (deviceManager == null)
-                    return;
-
-                (deviceManager as GraphicsDeviceManager).ResetClientBounds();
-
-				// make sure the viewport is correct
-				this.graphicsDevice.SetViewPort(Game.Instance.Window.ClientBounds.Width, Game.Instance.Window.ClientBounds.Height);
-				
-				matViewScreen = Matrix.CreateRotationZ((float)Math.PI)*
-							     	Matrix.CreateRotationY((float)Math.PI)*
-									Matrix.CreateTranslation(-this.graphicsDevice.Viewport.Width/2,
-									this.graphicsDevice.Viewport.Height/2,
-									1);
+				if (update)
+				{
+					// updates last display orientation (optimization)				
+					lastDisplayOrientation = graphicsDevice.PresentationParameters.DisplayOrientation;
+	
+	                var deviceManager = (IGraphicsDeviceManager)Game.Instance.Services.GetService(typeof(IGraphicsDeviceManager));
+	                if (deviceManager == null)
+	                    return;
+	
+	                (deviceManager as GraphicsDeviceManager).ResetClientBounds();
+	
+					// make sure the viewport is correct
+					this.graphicsDevice.SetViewPort(Game.Instance.Window.ClientBounds.Width, Game.Instance.Window.ClientBounds.Height);
+						
+					/*
+					AndroidGameActivity.Game.Log("--------------- Start Change -----------");
+					AndroidGameActivity.Game.Log(String.Format("DisplayMode = {0}", this.graphicsDevice.DisplayMode.ToString()));
+					AndroidGameActivity.Game.Log(String.Format("Orientation = {0}", this.graphicsDevice.PresentationParameters.DisplayOrientation.ToString()));
+					AndroidGameActivity.Game.Log(String.Format("ViewPort = {0}", this.graphicsDevice.Viewport.ToString()));
+					AndroidGameActivity.Game.Log(String.Format("ViewScreen = {0}", matViewScreen.ToString()));
+					AndroidGameActivity.Game.Log(String.Format("Projection = {0}", matProjection.ToString()));
+					AndroidGameActivity.Game.Log(String.Format("ViewFramebuffer = {0}", matViewFramebuffer.ToString()));
+					AndroidGameActivity.Game.Log("--------------- End Change -------------");
+					*/
+				}
+			}
+			
+			if (!GraphicsDevice.DefaultFrameBuffer)
+			{
 				matProjection = Matrix.CreateOrthographic(this.graphicsDevice.Viewport.Width,
 							this.graphicsDevice.Viewport.Height,
 							-1f,1f);
-				if (graphicsDevice.PresentationParameters.DisplayOrientation == DisplayOrientation.LandscapeRight)
-				{
-					// flip the viewport	
-					matProjection = Matrix.CreateOrthographic(-this.graphicsDevice.Viewport.Width,
-							-this.graphicsDevice.Viewport.Height,
-							-1f,1f);
-				}
-				
-
+				// we are using a render target so update
 				matViewFramebuffer = Matrix.CreateTranslation(-this.graphicsDevice.Viewport.Width/2,
 							-this.graphicsDevice.Viewport.Height/2,
-							1);
-
-
+							1);	
 				
-				
-				
-				matWVPScreen = _matrix * matViewScreen * matProjection;				
 				matWVPFramebuffer = _matrix * matViewFramebuffer *  matProjection;
-				
-				AndroidGameActivity.Game.Log("--------------- Start Change -----------");
-				AndroidGameActivity.Game.Log(String.Format("DisplayMode = {0}", this.graphicsDevice.DisplayMode.ToString()));
-				AndroidGameActivity.Game.Log(String.Format("Orientation = {0}", this.graphicsDevice.PresentationParameters.DisplayOrientation.ToString()));
-				AndroidGameActivity.Game.Log(String.Format("ViewPort = {0}", this.graphicsDevice.Viewport.ToString()));
-				AndroidGameActivity.Game.Log(String.Format("ViewScreen = {0}", matViewScreen.ToString()));
-				AndroidGameActivity.Game.Log(String.Format("Projection = {0}", matProjection.ToString()));
-				AndroidGameActivity.Game.Log(String.Format("ViewFramebuffer = {0}", matViewFramebuffer.ToString()));
-				AndroidGameActivity.Game.Log("--------------- End Change -------------");
 			}
+			else
+			{
+					matViewScreen = Matrix.CreateRotationZ((float)Math.PI)*
+								     	Matrix.CreateRotationY((float)Math.PI)*
+										Matrix.CreateTranslation(-this.graphicsDevice.Viewport.Width/2,
+										this.graphicsDevice.Viewport.Height/2,
+										1);
+					matProjection = Matrix.CreateOrthographic(this.graphicsDevice.Viewport.Width,
+								this.graphicsDevice.Viewport.Height,
+								-1f,1f);
+					if (graphicsDevice.PresentationParameters.DisplayOrientation == DisplayOrientation.LandscapeRight)
+					{
+						// flip the viewport	
+						matProjection = Matrix.CreateOrthographic(-this.graphicsDevice.Viewport.Width,
+								-this.graphicsDevice.Viewport.Height,
+								-1f,1f);
+					}
+						
+					matWVPScreen = _matrix * matViewScreen * matProjection;								    
+			}
+			
+			
 		}
 #else		
 		private void UpdateWorldMatrixOrientation()
@@ -520,8 +533,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			matProjection = Matrix.CreateOrthographic(viewport.Width, viewport.Height, -1f, 1f);
 
-			matWVPScreen = matViewScreen * matProjection;
-			matWVPFramebuffer = matViewFramebuffer * matProjection;
+			matWVPScreen = _matrix * matViewScreen * matProjection;
+			matWVPFramebuffer = _matrix * matViewFramebuffer * matProjection;
 		}
 #endif		
 		public void Draw 
