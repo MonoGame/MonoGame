@@ -605,12 +605,14 @@ namespace Microsoft.Xna.Framework
             Initialize();
         }
 
-#if LINUX || WINDOWS
         internal void ResizeWindow(bool changed)
         {
+#if WINRT
+
+#elif LINUX || WINDOWS
             ((OpenTKGamePlatform)_platform).ResetWindowBounds(changed);
-        }
 #endif
+        }
 
         #endregion Internal Methods
 

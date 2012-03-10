@@ -33,6 +33,10 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
+#if WINRT
+using System.Reflection;
+#endif
+
 namespace Microsoft.Xna.Framework.Content
 {
     public sealed class ContentReader : BinaryReader
@@ -143,9 +147,12 @@ namespace Microsoft.Xna.Framework.Content
 
         public T ReadExternalReference<T>()
 		{
-            string externalReference = ReadString();
+            var externalReference = ReadString();
             if (!String.IsNullOrEmpty(externalReference))
             {
+#if WINRT
+                return contentManager.Load<T>(externalReference);
+#else
                 externalReference = externalReference.Replace('\\', Path.DirectorySeparatorChar);
 
                 // Use Path.GetFullPath to help resolve relative directories
@@ -158,6 +165,7 @@ namespace Microsoft.Xna.Framework.Content
                 string externalAssetName = fullAssetPath.Substring(fullRootPath.Length + 1);
 #endif
                 return contentManager.Load<T>(externalAssetName);
+#endif
             }
             return default(T);
         }
@@ -211,7 +219,7 @@ namespace Microsoft.Xna.Framework.Content
 
         public T ReadObject<T>(ContentTypeReader typeReader, T existingInstance)
         {
-            if (!typeReader.TargetType.IsValueType)
+            if (!typeReader.TargetType.GetTypeInfo().IsValueType)
                 return (T)ReadObject<object>();
             return (T)typeReader.Read(this, existingInstance);
         }

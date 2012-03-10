@@ -88,6 +88,8 @@ namespace Microsoft.Xna.Framework
             return new OpenTKGamePlatform(game);
 #elif ANDROID
             return new AndroidGamePlatform(game);
+#elif WINRT
+            return null;
 #endif
         }
 

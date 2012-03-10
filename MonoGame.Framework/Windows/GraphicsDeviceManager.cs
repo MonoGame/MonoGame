@@ -158,14 +158,7 @@ namespace Microsoft.Xna.Framework
         {
             _graphicsDevice.PresentationParameters.IsFullScreen = false;
 
-            if (_preferMultiSampling)
-            {
-                _graphicsDevice.PreferedFilter = All.Linear;
-            }
-            else
-            {
-                _graphicsDevice.PreferedFilter = All.Nearest;
-            }
+            PreferMultiSampling = _preferMultiSampling;
         }
 
         public void ToggleFullScreen()
@@ -202,17 +195,16 @@ namespace Microsoft.Xna.Framework
             {
                 return _preferMultiSampling;
             }
+
             set
             {
                 _preferMultiSampling = value;
+#if !WINRT
                 if (_preferMultiSampling)
-                {
                     _graphicsDevice.PreferedFilter = All.Linear;
-                }
                 else
-                {
                     _graphicsDevice.PreferedFilter = All.Nearest;
-                }
+#endif
             }
         }
 

@@ -42,6 +42,9 @@ namespace Microsoft.Xna.Framework.Graphics
             this.VertexCount = vertexCount;
             this.BufferUsage = bufferUsage;
 
+#if WINRT
+
+#else
             Threading.Begin();
             try
             {
@@ -61,6 +64,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 Threading.End();
             }
+#endif
 		}
 
         public VertexBuffer(GraphicsDevice graphicsDevice, VertexDeclaration vertexDeclaration, int vertexCount, BufferUsage bufferUsage) :
@@ -75,8 +79,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		internal void Apply()
 		{
+#if WINRT
+#else
 			GL.BindBuffer(BufferTarget.ArrayBuffer, vbo);
-		}
+#endif
+        }
 
         public void GetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride) where T : struct
         {
@@ -89,6 +96,8 @@ namespace Microsoft.Xna.Framework.Graphics
             if ((vertexStride > (VertexCount * VertexDeclaration.VertexStride)) || (vertexStride < VertexDeclaration.VertexStride))
                 throw new ArgumentOutOfRangeException("One of the following conditions is true:\nThe vertex stride is larger than the vertex buffer.\nThe vertex stride is too small for the type of data requested.");
 
+#if WINRT
+#else
             Threading.Begin();
             try
             {
@@ -129,6 +138,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 Threading.End();
             }
+#endif
         }
 
         public void GetData<T>(T[] data, int startIndex, int elementCount) where T : struct
@@ -154,6 +164,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
             var elementSizeInByte = Marshal.SizeOf(typeof(T));
             var sizeInBytes = elementSizeInByte * elementCount;
+
+#if WINRT
+#else
             Threading.Begin();
             try
             {
@@ -164,6 +177,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 Threading.End();
             }
+#endif
 		}
 		
 		public void SetData<T>(T[] data, int startIndex, int elementCount) where T : struct
@@ -178,8 +192,11 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		public override void Dispose()
 		{
+#if WINRT
+#else
 			GL.DeleteBuffers(1, ref vbo);
-			base.Dispose();
+#endif
+            base.Dispose();
 		}
     }
 }

@@ -6,7 +6,7 @@ using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
 #elif WINRT
-
+using System.Reflection;
 #else
 
 #if ES11
@@ -74,8 +74,12 @@ namespace Microsoft.Xna.Framework.Graphics
 			{
 				throw new ArgumentNullException("vertexType", "Cannot be null");
 			}
+#if WINRT
+            if (!vertexType.GetTypeInfo().IsValueType)
+#else
 			if (!vertexType.IsValueType)
-			{
+#endif
+            {
 				object[] args = new object[] { vertexType };
 				throw new ArgumentException("vertexType", "Must be value type");
 			}
@@ -102,7 +106,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		internal void Apply(IntPtr offset)
 		{
-#if ES11
+#if WINRT
+
+#elif ES11
 			GLStateManager.VertexArray(true);
 
 			bool normal = false;

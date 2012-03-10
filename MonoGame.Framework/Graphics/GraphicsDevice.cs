@@ -253,9 +253,10 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 #if IPHONE || ANDROID
 			extensions.AddRange(GL.GetString(RenderbufferStorage.Extensions).Split(' '));
-#else
+#elif !WINRT
 			extensions.AddRange(GL.GetString(StringName.Extensions).Split(' '));	
 #endif
+
 			System.Diagnostics.Debug.WriteLine("Supported extensions:");
 			foreach (string extension in extensions)
 				System.Diagnostics.Debug.WriteLine(extension);

@@ -427,7 +427,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             return texture;
 #elif WINRT
-
+            return null;
 #else
             using (Bitmap image = (Bitmap)Bitmap.FromStream(stream))
             {

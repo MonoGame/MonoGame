@@ -40,6 +40,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			var sizeInBytes = indexCount * (this.IndexElementSize == IndexElementSize.SixteenBits ? 2 : 4);
 
+#if WINRT
+#else
             Threading.Begin();
             try
             {
@@ -56,6 +58,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 Threading.End();
             }
+#endif
 		}
 		
 		public IndexBuffer(GraphicsDevice graphicsDevice, IndexElementSize indexElementSize, int indexCount, BufferUsage bufferUsage) :
@@ -72,8 +75,11 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		internal void Apply()
 		{
+#if WINRT
+#else
 			GL.BindBuffer(BufferTarget.ElementArrayBuffer, ibo);
-		}
+#endif
+        }
 
         public void GetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount) where T : struct
         {
@@ -84,6 +90,8 @@ namespace Microsoft.Xna.Framework.Graphics
             if (BufferUsage == BufferUsage.WriteOnly)
                 throw new NotSupportedException("This IndexBuffer was created with a usage type of BufferUsage.WriteOnly. Calling GetData on a resource that was created with BufferUsage.WriteOnly is not supported.");
 
+#if WINRT
+#else        
             Threading.Begin();
             try
             {
@@ -122,6 +130,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 Threading.End();
             }
+#endif
         }
 
         public void GetData<T>(T[] data, int startIndex, int elementCount) where T : struct
@@ -136,8 +145,11 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		public void SetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount) where T : struct
         {
-			if (data == null) throw new ArgumentNullException("data");
+			if (data == null) 
+                throw new ArgumentNullException("data");
 
+#if WINRT
+#else
             Threading.Begin();
             try
             {
@@ -155,6 +167,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 Threading.End();
             }
+#endif
 		}
 		
 		public void SetData<T>(T[] data, int startIndex, int elementCount) where T : struct
@@ -169,8 +182,11 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		public override void Dispose()
 		{
+#if WINRT
+#else
 			GL.DeleteBuffers(1, ref ibo);
-			base.Dispose();
+#endif
+            base.Dispose();
 		}
 	}
 }

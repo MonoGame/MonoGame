@@ -1,8 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using System;
+using System.Diagnostics;
 using System.Collections.Generic;
-
 using System.Collections.ObjectModel;
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -74,7 +74,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				s += "\t";
 			}
 			
-			Console.WriteLine("{0}:{1}", s, node.Name);
+			Debug.WriteLine("{0}:{1}", s, node.Name);
 		}
 		
 		float dt = 0;

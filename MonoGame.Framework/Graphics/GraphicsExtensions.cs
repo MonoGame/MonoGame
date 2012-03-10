@@ -7,6 +7,7 @@ using System.Text;
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
+#elif WINRT
 #else
  #if ES11
 using OpenTK.Graphics.ES11;
@@ -44,6 +45,7 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public static class GraphicsExtensions
     {
+#if !WINRT
         public static All OpenGL11(CullMode cull)
         {
             switch (cull)
@@ -345,69 +347,6 @@ namespace Microsoft.Xna.Framework.Graphics
             throw new NotImplementedException();
         }
 
-        public static int Size(this SurfaceFormat surfaceFormat)
-        {
-            switch (surfaceFormat)
-            {
-                case SurfaceFormat.Color:
-                    return 4;
-                case SurfaceFormat.Dxt3:
-                    return 4;
-                case SurfaceFormat.Bgra4444:
-                    return 2;
-                case SurfaceFormat.Bgra5551:
-                    return 2;
-                case SurfaceFormat.Alpha8:
-                    return 1;
-				case SurfaceFormat.NormalizedByte4:
-					return 4;
-                default:
-                    throw new NotImplementedException();
-            }
-        }
-		
-        public static int GetTypeSize(this VertexElementFormat elementFormat)
-        {
-            switch (elementFormat)
-            {
-                case VertexElementFormat.Single:
-                    return 4;
-
-                case VertexElementFormat.Vector2:
-                    return 8;
-
-                case VertexElementFormat.Vector3:
-                    return 12;
-
-                case VertexElementFormat.Vector4:
-                    return 0x10;
-
-                case VertexElementFormat.Color:
-                    return 4;
-
-                case VertexElementFormat.Byte4:
-                    return 4;
-
-                case VertexElementFormat.Short2:
-                    return 4;
-
-                case VertexElementFormat.Short4:
-                    return 8;
-
-                case VertexElementFormat.NormalizedShort2:
-                    return 4;
-
-                case VertexElementFormat.NormalizedShort4:
-                    return 8;
-
-                case VertexElementFormat.HalfVector2:
-                    return 4;
-
-                case VertexElementFormat.HalfVector4:
-                    return 8;
-            }
-            return 0;
-        }
 		
 		public static BlendEquationMode GetBlendEquationMode (this BlendFunction function)
 		{
@@ -427,17 +366,17 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
 			case BlendFunction.Add:
 				return BlendEquationMode.FuncAdd;
- #if IPHONE
+#if IPHONE
 			case BlendFunction.Max:
 				return BlendEquationMode.MaxExt;
 			case BlendFunction.Min:
 				return BlendEquationMode.MinExt;
- #elif MONOMAC
+#elif MONOMAC
 			case BlendFunction.Max:
 				return BlendEquationMode.Max;
 			case BlendFunction.Min:
 				return BlendEquationMode.Min;
- #endif
+#endif
 			case BlendFunction.ReverseSubtract:
 				return BlendEquationMode.FuncReverseSubtract;
 			case BlendFunction.Subtract:
@@ -605,5 +544,70 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 
+#endif
+
+        public static int Size(this SurfaceFormat surfaceFormat)
+        {
+            switch (surfaceFormat)
+            {
+                case SurfaceFormat.Color:
+                    return 4;
+                case SurfaceFormat.Dxt3:
+                    return 4;
+                case SurfaceFormat.Bgra4444:
+                    return 2;
+                case SurfaceFormat.Bgra5551:
+                    return 2;
+                case SurfaceFormat.Alpha8:
+                    return 1;
+				case SurfaceFormat.NormalizedByte4:
+					return 4;
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+		
+        public static int GetTypeSize(this VertexElementFormat elementFormat)
+        {
+            switch (elementFormat)
+            {
+                case VertexElementFormat.Single:
+                    return 4;
+
+                case VertexElementFormat.Vector2:
+                    return 8;
+
+                case VertexElementFormat.Vector3:
+                    return 12;
+
+                case VertexElementFormat.Vector4:
+                    return 0x10;
+
+                case VertexElementFormat.Color:
+                    return 4;
+
+                case VertexElementFormat.Byte4:
+                    return 4;
+
+                case VertexElementFormat.Short2:
+                    return 4;
+
+                case VertexElementFormat.Short4:
+                    return 8;
+
+                case VertexElementFormat.NormalizedShort2:
+                    return 4;
+
+                case VertexElementFormat.NormalizedShort4:
+                    return 8;
+
+                case VertexElementFormat.HalfVector2:
+                    return 4;
+
+                case VertexElementFormat.HalfVector4:
+                    return 8;
+            }
+            return 0;
+        }
     }
 }
