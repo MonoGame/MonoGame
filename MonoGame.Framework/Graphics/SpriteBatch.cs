@@ -520,8 +520,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			matProjection = Matrix.CreateOrthographic(viewport.Width, viewport.Height, -1f, 1f);
 
-			matWVPScreen = matViewScreen * matProjection;
-			matWVPFramebuffer = matViewFramebuffer * matProjection;
+			// FIXME: It is a significant weakness to have separate
+			//        matrices for the screen and framebuffer.  It
+			//        means that visual unit tests can't
+			//        necessarily be trusted.  Screens are just
+			//        another kind of framebuffer.
+			matWVPScreen = _matrix * matViewScreen * matProjection;
+			matWVPFramebuffer = _matrix * matViewFramebuffer * matProjection;
 		}
 #endif		
 		public void Draw 
