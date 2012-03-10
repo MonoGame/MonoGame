@@ -33,10 +33,6 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-#if WINRT
-using System.Reflection;
-#endif
-
 namespace Microsoft.Xna.Framework.Content
 {
     public sealed class ContentReader : BinaryReader
@@ -219,7 +215,7 @@ namespace Microsoft.Xna.Framework.Content
 
         public T ReadObject<T>(ContentTypeReader typeReader, T existingInstance)
         {
-            if (!typeReader.TargetType.GetTypeInfo().IsValueType)
+            if (!typeReader.TargetType.GetIsValueType())
                 return (T)ReadObject<object>();
             return (T)typeReader.Read(this, existingInstance);
         }

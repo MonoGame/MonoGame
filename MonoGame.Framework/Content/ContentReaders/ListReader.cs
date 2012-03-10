@@ -59,7 +59,7 @@ namespace Microsoft.Xna.Framework.Content
                 // list.Add(input.ReadObject<T>(elementReader));
 				
 				Type objectType = typeof(T);
-				if(objectType.IsValueType)
+				if(objectType.GetIsValueType())
 				{
                 	list.Add(input.ReadObject<T>(elementReader));
 				}

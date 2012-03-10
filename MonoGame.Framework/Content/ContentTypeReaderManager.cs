@@ -40,8 +40,11 @@ namespace Microsoft.Xna.Framework.Content
 		
 		static ContentTypeReaderManager()
 		{
+            // TODO: I need another design to make this work for WinRT.
+#if !WINRT
 			assemblyName = Assembly.GetExecutingAssembly().FullName;
-		}
+#endif
+        }
 
         public ContentTypeReaderManager(ContentReader reader)
         {
@@ -157,7 +160,8 @@ namespace Microsoft.Xna.Framework.Content
 			//Handle non generic types
 			if(preparedType.Contains("PublicKeyToken"))
 				preparedType = Regex.Replace(preparedType, @"(.+?), Version=.+?$", "$1");
-			
+
+			// TODO: For WinRT this is most likely broken!
 			preparedType = preparedType.Replace(", Microsoft.Xna.Framework.Graphics", string.Format(", {0}", assemblyName));
 			preparedType = preparedType.Replace(", Microsoft.Xna.Framework", string.Format(", {0}", assemblyName));
 			
