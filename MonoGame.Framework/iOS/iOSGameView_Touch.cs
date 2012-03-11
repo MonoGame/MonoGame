@@ -213,31 +213,39 @@ namespace Microsoft.Xna.Framework {
 
 		private void SyncTouchRecognizers()
 		{
+			foreach (var entry in _gestureRecognizers) {
+				foreach (var recognizer in entry.Value) {
+					RemoveGestureRecognizer (recognizer);
+				}
+			}
+
+			_gestureRecognizers.Clear ();
 			foreach (GestureType gestureType in Enum.GetValues(typeof(GestureType))) {
 				if (gestureType == GestureType.None)
 					continue;
 
 				UIGestureRecognizer [] recognizers;
 
-				bool enabled = (gestureType & TouchPanel.EnabledGestures) == gestureType;
-				if (enabled == _gestureRecognizers.TryGetValue (gestureType, out recognizers))
-					// Things are as they should be.
+				if ((gestureType & TouchPanel.EnabledGestures) == 0)
 					continue;
 
-				if (enabled) {
-					recognizers = CreateGestureRecognizer (gestureType);
-					if (recognizers != null) {
-						_gestureRecognizers.Add (gestureType, recognizers);
-						foreach (var recognizer in recognizers) {
-							recognizer.Delegate = _gestureRecognizerDelegate;
-							AddGestureRecognizer (recognizer);
-						}
+				recognizers = CreateGestureRecognizer (gestureType);
+				if (recognizers != null) {
+					_gestureRecognizers.Add (gestureType, recognizers);
+					foreach (var recognizer in recognizers) {
+						recognizer.Delegate = _gestureRecognizerDelegate;
+						AddGestureRecognizer (recognizer);
 					}
-				} else {
-					_gestureRecognizers.Remove (gestureType);
-					foreach (var recognizer in recognizers)
-						RemoveGestureRecognizer (recognizer);
 				}
+			}
+
+			// TODO: A more flexible system for determining
+			//       require-fail dependencies may be desirable.
+			UIGestureRecognizer[] singleTapRecognizer;
+			UIGestureRecognizer[] doubleTapRecognizer;
+			if (_gestureRecognizers.TryGetValue(GestureType.Tap, out singleTapRecognizer) &&
+			    _gestureRecognizers.TryGetValue(GestureType.DoubleTap, out doubleTapRecognizer)) {
+				singleTapRecognizer[0].RequireGestureRecognizerToFail (doubleTapRecognizer[0]);
 			}
 		}
 

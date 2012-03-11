@@ -305,8 +305,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			UpdateWorldMatrixOrientation();
 			
 			// Configure ViewPort
-		    var client = Game.Instance.Window.ClientBounds;
-			GL20.Viewport(client.X, client.Y, client.Width, client.Height); 
+			var viewport = GraphicsDevice.Viewport;
+			GL20.Viewport(viewport.X, viewport.Y, viewport.Width, viewport.Height);
 			GL20.UseProgram(program);
 			
             // Enable Scissor Tests if necessary
@@ -405,8 +405,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			GL11.MatrixMode(ALL11.Modelview);			
 
-		    var viewClient = Game.Instance.Window.ClientBounds;
-			GL11.Viewport(viewClient.X, viewClient.Y, viewClient.Width, viewClient.Height);
+			var viewport = GraphicsDevice.Viewport;
+			GL11.Viewport(viewport.X, viewport.Y, viewport.Width, viewport.Height);
 			
 			// Enable Scissor Tests if necessary
 			if ( this.graphicsDevice.RasterizerState.ScissorTestEnable )

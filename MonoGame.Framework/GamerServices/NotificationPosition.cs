@@ -66,29 +66,18 @@ non-infringement.
 */
 #endregion License
 
-
-#region Using Statements
 using System;
 
-using Microsoft.Xna.Framework.Net;
-#endregion Statements
-
 namespace Microsoft.Xna.Framework.GamerServices {
-	public class GamerServicesComponent : GameComponent {
-		private static LocalNetworkGamer lng;
-
-		internal static LocalNetworkGamer LocalNetworkGamer { get { return lng; } set { lng = value; } }
-
-		public GamerServicesComponent(Game game)
-			: base(game)
-		{
-			Guide.Initialise(game);
-			//lng = new LocalNetworkGamer();
-		}
-
-		public override void Update (GameTime gameTime)
-		{
-
-		}
+	public enum NotificationPosition {
+		TopLeft,
+		TopCenter,
+		TopRight,
+		CenterLeft,
+		Center,
+		CenterRight,
+		BottomLeft,
+		BottomCenter,
+		BottomRight
 	}
 }
