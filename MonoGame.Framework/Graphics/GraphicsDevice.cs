@@ -93,7 +93,9 @@ using BufferUsageHint = OpenTK.Graphics.ES20.BufferUsage;
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
+#if !WINRT
 using Microsoft.Xna.Framework.Input.Touch;
+#endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -272,7 +274,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
             PresentationParameters = new PresentationParameters()
             {
+#if !WINRT
                 DisplayOrientation = TouchPanel.DisplayOrientation
+#endif
             };
 
             VboIdArray = 0;
