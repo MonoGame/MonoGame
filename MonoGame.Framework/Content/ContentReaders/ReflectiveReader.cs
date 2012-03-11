@@ -67,17 +67,17 @@ namespace Microsoft.Xna.Framework.Content
         {
             base.Initialize(manager);
             this.manager = manager;
-			
-			if(targetType.BaseType != null && targetType.BaseType != typeof(object))
+
+            var type = targetType.GetBaseType();
+            if (type != null && type != typeof(object))
 			{
-				baseType = targetType.BaseType;
+				baseType = type;
 				baseTypeReader = manager.GetTypeReader(baseType);
 			}
 			
-            BindingFlags attrs = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly;
-			constructor = targetType.GetConstructor(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance, null, new Type[0], null);
-            properties = targetType.GetProperties(attrs);
-            fields = targetType.GetFields(attrs);
+            constructor = targetType.GetDefaultConstructor();
+            properties = targetType.GetAllProperties();
+            fields = targetType.GetAllFields();
         }
 
         object CreateChildObject(PropertyInfo property, FieldInfo field)
@@ -92,9 +92,9 @@ namespace Microsoft.Xna.Framework.Content
             {
                 t = field.FieldType;
             }
-            if (t.IsClass && !t.IsAbstract)
+            if (t.GetIsConcreteClass())
             {
-                ConstructorInfo constructor = t.GetConstructor(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance, null, new Type[0], null);
+                var constructor = t.GetDefaultConstructor();
                 if (constructor != null)
                 {
                     obj = constructor.Invoke(null);                
