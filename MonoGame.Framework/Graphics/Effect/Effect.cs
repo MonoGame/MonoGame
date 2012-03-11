@@ -187,7 +187,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		internal static byte[] LoadEffectResource(string name)
 		{
+#if WINRT
             var assembly = typeof(Effect).GetTypeInfo().Assembly;
+#else
+            var assembly = typeof(Effect).Assembly;
+#endif
 
 #if WINRT
             name += ".hlsl";

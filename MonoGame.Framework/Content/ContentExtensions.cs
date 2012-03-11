@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Reflection;
 
 #if WINRT
-using System.Reflection;
 using System.Reflection.Emit;
 using System.Linq;
 #endif

@@ -93,7 +93,7 @@ using BufferUsageHint = OpenTK.Graphics.ES20.BufferUsage;
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
-//using Microsoft.Xna.Framework.Input.Touch;
+using Microsoft.Xna.Framework.Input.Touch;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
