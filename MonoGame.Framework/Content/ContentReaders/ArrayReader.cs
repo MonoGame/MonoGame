@@ -25,8 +25,10 @@ SOFTWARE.
 */
 #endregion License
 
-
 using System;
+#if WINRT
+using System.Reflection;
+#endif
 
 namespace Microsoft.Xna.Framework.Content
 {

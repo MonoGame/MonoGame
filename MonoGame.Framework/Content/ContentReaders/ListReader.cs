@@ -29,6 +29,9 @@ SOFTWARE.
 using System;
 using System.Collections.Generic;
 using System.Text;
+#if WINRT
+using System.Reflection;
+#endif
 
 using Microsoft.Xna.Framework.Content;
 
