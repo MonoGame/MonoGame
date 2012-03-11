@@ -158,6 +158,8 @@ namespace Microsoft.Xna.Framework
 			} else {
 				_graphicsDevice.PreferedFilter = All.Nearest;
 			}
+
+            ApplyChanges();
 		}
 
 		public void ToggleFullScreen ()
