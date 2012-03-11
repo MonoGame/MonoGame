@@ -10,24 +10,6 @@ namespace Microsoft.Xna.Framework.Content
 {
     public static class ContentExtensions
     {
-        public static bool GetIsValueType(this Type type)
-        {
-#if WINRT
-            return type.GetTypeInfo().IsValueType;
-#else
-            return type.IsValueType;
-#endif
-        }
-
-        public static Type GetBaseType(this Type type)
-        {
-#if WINRT
-            return type.GetTypeInfo().BaseType;
-#else
-            return type.BaseType;
-#endif
-        }
-
         public static bool GetIsConcreteClass(this Type type)
         {
 #if WINRT

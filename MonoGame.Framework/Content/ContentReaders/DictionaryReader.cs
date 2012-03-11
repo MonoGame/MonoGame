@@ -79,7 +79,11 @@ namespace Microsoft.Xna.Framework.Content
 				TKey key;
 				TValue value;
 
-                if (keyType.GetIsValueType())
+#if WINRT
+                if (keyType.GetTypeInfo().IsValueType)
+#else
+                if (keyType.IsValueType)
+#endif
                 {
                 	key = input.ReadObject<TKey>(keyReader);
 				}
@@ -89,7 +93,11 @@ namespace Microsoft.Xna.Framework.Content
                 	key = input.ReadObject<TKey>(input.TypeReaders[readerType - 1]);
 				}
 
-                if (valueType.GetIsValueType())
+#if WINRT
+                if (valueType.GetTypeInfo().IsValueType)
+#else
+                if (valueType.IsValueType)
+#endif
 				{
                 	value = input.ReadObject<TValue>(valueReader);
 				}

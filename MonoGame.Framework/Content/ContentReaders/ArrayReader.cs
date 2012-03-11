@@ -27,10 +27,6 @@ SOFTWARE.
 
 
 using System;
-using System.Collections.Generic;
-using System.Text;
-
-using Microsoft.Xna.Framework.Content;
 
 namespace Microsoft.Xna.Framework.Content
 {
@@ -54,7 +50,12 @@ namespace Microsoft.Xna.Framework.Content
             T[] array = existingInstance;
             if (array == null)
                 array = new T[count];
-			if(typeof(T).GetIsValueType())
+
+#if WINRT
+            if (typeof(T).GetTypeInfo().IsValueType)
+#else
+            if (typeof(T).IsValueType)
+#endif
 			{
                 for (uint i = 0; i < count; i++)
                 {

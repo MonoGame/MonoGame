@@ -215,7 +215,11 @@ namespace Microsoft.Xna.Framework.Content
 
         public T ReadObject<T>(ContentTypeReader typeReader, T existingInstance)
         {
-            if (!typeReader.TargetType.GetIsValueType())
+#if WINRT
+            if (!typeReader.TargetType.GetTypeInfo().IsValueType)
+#else
+            if (!typeReader.TargetType.IsValueType)
+#endif
                 return (T)ReadObject<object>();
             return (T)typeReader.Read(this, existingInstance);
         }

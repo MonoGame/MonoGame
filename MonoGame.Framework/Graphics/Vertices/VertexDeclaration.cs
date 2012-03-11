@@ -1,6 +1,5 @@
 using System;
 using System.Runtime.InteropServices;
-using Microsoft.Xna.Framework.Content;
 
 #if MONOMAC
 using MonoMac.OpenGL;
@@ -76,7 +75,11 @@ namespace Microsoft.Xna.Framework.Graphics
 				throw new ArgumentNullException("vertexType", "Cannot be null");
 			}
 
-			if (!vertexType.GetIsValueType())
+#if WINRT
+            if (!vertexType.GetTypeInfo().IsValueType)
+#else
+            if (!vertexType.IsValueType)
+#endif
             {
 				object[] args = new object[] { vertexType };
 				throw new ArgumentException("vertexType", "Must be value type");

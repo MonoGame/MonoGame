@@ -43,8 +43,6 @@ purpose and non-infringement.
 using System;
 using System.Reflection;
 
-using Microsoft.Xna.Framework.Content;
-
 namespace Microsoft.Xna.Framework.Content
 {
     internal class ReflectiveReader<T> : ContentTypeReader
@@ -68,7 +66,11 @@ namespace Microsoft.Xna.Framework.Content
             base.Initialize(manager);
             this.manager = manager;
 
-            var type = targetType.GetBaseType();
+#if WINRT
+            var type = targetType.GetTypeInfo().BaseType;
+#else
+            var type = targetType.BaseType;
+#endif
             if (type != null && type != typeof(object))
 			{
 				baseType = type;
@@ -80,7 +82,7 @@ namespace Microsoft.Xna.Framework.Content
             fields = targetType.GetAllFields();
         }
 
-        object CreateChildObject(PropertyInfo property, FieldInfo field)
+        static object CreateChildObject(PropertyInfo property, FieldInfo field)
         {
             object obj = null;
             Type t;
