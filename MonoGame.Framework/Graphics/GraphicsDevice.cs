@@ -588,6 +588,10 @@ namespace Microsoft.Xna.Framework.Graphics
             if (rendertarget == null)
             {
                 GL20.BindFramebuffer(ALL20.Framebuffer, FrameBufferScreen);
+				
+				// Save off the current viewport to be reset later
+                Viewport = savedViewport;
+				
                 DefaultFrameBuffer = true;
             }
             else
@@ -598,7 +602,21 @@ namespace Microsoft.Xna.Framework.Graphics
                 ALL20 status = GL20.CheckFramebufferStatus(ALL20.Framebuffer);
                 if (status != ALL20.FramebufferComplete)
                     throw new Exception("GL20: Error creating framebuffer: " + status);
+				
+				// Save off the current viewport to be reset later
+                    savedViewport = Viewport;
 
+                    // Create a new Viewport
+                    Viewport renderTargetViewPort = new Viewport();
+
+                    // Set the new viewport to the width and height of the render target
+                    Texture2D target2 = (Texture2D) rendertarget;
+                    renderTargetViewPort.Width = target2.Width;
+                    renderTargetViewPort.Height = target2.Height;
+
+                    // now we set our viewport to the new rendertarget viewport just created.
+                    Viewport = renderTargetViewPort;
+				
                 DefaultFrameBuffer = false;
             }
         }
