@@ -105,12 +105,13 @@ namespace Microsoft.Xna.Framework
             UIApplication.SharedApplication.SetStatusBarHidden(true, UIStatusBarAnimation.Fade);
 
             // Create a full-screen window
-            _mainWindow = new UIWindow(UIScreen.MainScreen.Bounds);
-            game.Services.AddService(typeof(UIWindow), _mainWindow);
+            _mainWindow = new UIWindow (UIScreen.MainScreen.Bounds);
+            game.Services.AddService (typeof(UIWindow), _mainWindow);
 
             _viewController = new iOSGameViewController(this);
             _viewController.InterfaceOrientationChanged += ViewController_InterfaceOrientationChanged;
-            Window = new iOSGameWindow(_viewController);
+            game.Services.AddService (typeof(UIViewController), _viewController);
+            Window = new iOSGameWindow (_viewController);
 
             _mainWindow.RootViewController = _viewController;
             _mainWindow.Add (_viewController.View);
@@ -227,6 +228,7 @@ namespace Microsoft.Xna.Framework
                 _runTimer.Dispose ();
                 _runTimer = null;
             }
+            UIApplication.SharedApplication.SetStatusBarHidden(false, UIStatusBarAnimation.Fade);
             StopObservingUIApplication ();
             RaiseAsyncRunLoopEnded ();
             return true;
