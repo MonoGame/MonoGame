@@ -96,7 +96,7 @@ namespace Microsoft.Xna.Framework.Content
             }
 
 #if WINRT
-            var ti = type.GetTypeInfo();
+            var ti = t.GetTypeInfo();
             if (ti.IsClass && !ti.IsAbstract)
 #else
             if (t.IsClass && !t.IsAbstract)
