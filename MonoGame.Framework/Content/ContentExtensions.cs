@@ -10,16 +10,6 @@ namespace Microsoft.Xna.Framework.Content
 {
     public static class ContentExtensions
     {
-        public static bool GetIsConcreteClass(this Type type)
-        {
-#if WINRT
-            var info = type.GetTypeInfo();
-            return info.IsClass && !info.IsAbstract;
-#else
-            return type.IsClass && !type.IsAbstract;
-#endif
-        }
-
         public static ConstructorInfo GetDefaultConstructor(this Type type)
         {
 #if WINRT

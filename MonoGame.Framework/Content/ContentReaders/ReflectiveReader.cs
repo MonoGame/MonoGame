@@ -94,7 +94,13 @@ namespace Microsoft.Xna.Framework.Content
             {
                 t = field.FieldType;
             }
-            if (t.GetIsConcreteClass())
+
+#if WINRT
+            var ti = type.GetTypeInfo();
+            if (ti.IsClass && !ti.IsAbstract)
+#else
+            if (t.IsClass && !t.IsAbstract)
+#endif
             {
                 var constructor = t.GetDefaultConstructor();
                 if (constructor != null)
