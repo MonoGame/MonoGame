@@ -11,6 +11,11 @@ using Lidgren.Network;
 
 namespace Microsoft.Xna.Framework.Net
 {
+    public class MonoGameNetworkConfiguration
+    {
+        public static IPAddress Broadcast = IPAddress.None;
+    }
+
 	internal class MonoGamerPeer
 	{
 		private BackgroundWorker MGServerWorker = new BackgroundWorker ();
@@ -568,7 +573,7 @@ namespace Microsoft.Xna.Framework.Net
 		}		
 
 		static NetPeer netPeer;
-		static List<NetIncomingMessage> discoveryMsgs;
+		static List<NetIncomingMessage> discoveryMsgs;        
 
 		internal static void Find (NetworkSessionType sessionType)
 		{
@@ -579,6 +584,10 @@ namespace Microsoft.Xna.Framework.Net
 			} else {
 				config.EnableMessageType (NetIncomingMessageType.DiscoveryRequest);
 			}
+            if (MonoGameNetworkConfiguration.Broadcast != IPAddress.None)
+            {
+                config.BroadcastAddress = MonoGameNetworkConfiguration.Broadcast;
+            }
 			netPeer = new NetPeer (config);
 			netPeer.Start ();
 

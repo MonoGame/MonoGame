@@ -2078,130 +2078,34 @@ namespace Microsoft.Xna.Framework
 		
         #endregion Private Static Methods
 		
-		public unsafe void Decompose(out Vector3 scale, out Quaternion rotation, out Vector3 translation)
-		{
-			// This code is TOTAL SHIT, huge look of disaproval upon it!
-			var s = Forward.Length();
-			scale = new Vector3(s,s,s);
-			
-			rotation = Quaternion.Identity;
-			translation = this.Translation;
-			
-			/*bool flag = true;
-		      fixed (float* numPtr = &scale.X)
-		      {
-		        Matrix.VectorBasis vectorBasis;
-		        Vector3** vector3Ptr1 = (Vector3**) &vectorBasis;
-		        Matrix identity = Matrix.Identity;
-		        Matrix.CanonicalBasis canonicalBasis = new Matrix.CanonicalBasis();
-		        Vector3* vector3Ptr2 = &canonicalBasis.Row0;
-		        canonicalBasis.Row0 = new Vector3(1f, 0.0f, 0.0f);
-		        canonicalBasis.Row1 = new Vector3(0.0f, 1f, 0.0f);
-		        canonicalBasis.Row2 = new Vector3(0.0f, 0.0f, 1f);
-		        translation.X = this.M41;
-		        translation.Y = this.M42;
-		        translation.Z = this.M43;
-		        *vector3Ptr1 = (Vector3*) &identity.M11;
-		        vector3Ptr1[1] = (Vector3*) &identity.M21;
-		        vector3Ptr1[2] = (Vector3*) &identity.M31;
-		        **vector3Ptr1 = new Vector3(this.M11, this.M12, this.M13);
-		        *vector3Ptr1[1] = new Vector3(this.M21, this.M22, this.M23);
-		        *vector3Ptr1[2] = new Vector3(this.M31, this.M32, this.M33);
-		        scale.X = (*vector3Ptr1)->Length();
-		        scale.Y = vector3Ptr1[1]->Length();
-		        scale.Z = vector3Ptr1[2]->Length();
-		        float num1 = *numPtr;
-		        float num2 = numPtr[1];
-		        float num3 = numPtr[2];
-		        uint index1;
-		        uint index2;
-		        uint index3;
-		        if ((double) num1 < (double) num2)
-		        {
-		          if ((double) num2 < (double) num3)
-		          {
-		            index1 = 2U;
-		            index2 = 1U;
-		            index3 = 0U;
-		          }
-		          else
-		          {
-		            index1 = 1U;
-		            if ((double) num1 < (double) num3)
-		            {
-		              index2 = 2U;
-		              index3 = 0U;
-		            }
-		            else
-		            {
-		              index2 = 0U;
-		              index3 = 2U;
-		            }
-		          }
-		        }
-		        else if ((double) num1 < (double) num3)
-		        {
-		          index1 = 2U;
-		          index2 = 0U;
-		          index3 = 1U;
-		        }
-		        else
-		        {
-		          index1 = 0U;
-		          if ((double) num2 < (double) num3)
-		          {
-		            index2 = 2U;
-		            index3 = 1U;
-		          }
-		          else
-		          {
-		            index2 = 1U;
-		            index3 = 2U;
-		          }
-		        }
-		        if ((double) numPtr[index1] < 9.99999974737875E-05)
-		          *(Vector3*) *(IntPtr*) ((IntPtr) vector3Ptr1 + (IntPtr) ((long) index1 * (long) sizeof (Vector3*))) = *(Vector3*) ((IntPtr) vector3Ptr2 + (IntPtr) ((long) index1 * (long) sizeof (Vector3)));
-		        ((Vector3*) *(IntPtr*) ((IntPtr) vector3Ptr1 + (IntPtr) ((long) index1 * (long) sizeof (Vector3*))))->Normalize();
-		        if ((double) numPtr[index2] < 9.99999974737875E-05)
-		        {
-		          float num4 = Math.Abs(((Vector3*) *(IntPtr*) ((IntPtr) vector3Ptr1 + (IntPtr) ((long) index1 * (long) sizeof (Vector3*))))->X);
-		          float num5 = Math.Abs(((Vector3*) *(IntPtr*) ((IntPtr) vector3Ptr1 + (IntPtr) ((long) index1 * (long) sizeof (Vector3*))))->Y);
-		          float num6 = Math.Abs(((Vector3*) *(IntPtr*) ((IntPtr) vector3Ptr1 + (IntPtr) ((long) index1 * (long) sizeof (Vector3*))))->Z);
-		          uint num7 = (double) num4 >= (double) num5 ? ((double) num4 >= (double) num6 ? ((double) num5 >= (double) num6 ? 2U : 1U) : 1U) : ((double) num5 >= (double) num6 ? ((double) num4 >= (double) num6 ? 2U : 0U) : 0U);
+		public bool Decompose(out Vector3 scale, out Quaternion rotation, out Vector3 translation)
+        {
+                translation.X = this.M41;
+                translation.Y = this.M42;
+                translation.Z = this.M43;
+                
+                float xs = (Math.Sign(M11 * M12 * M13 * M14) < 0) ? -1f : 1f;
+                float ys = (Math.Sign(M21 * M22 * M23 * M24) < 0) ? -1f : 1f;
+				float zs = (Math.Sign(M31 * M32 * M33 * M34) < 0) ? -1f : 1f;                               
+                
+                scale.X = xs * (float)Math.Sqrt(this.M11 * this.M11 + this.M12 * this.M12 + this.M13 * this.M13);
+                scale.Y = ys * (float)Math.Sqrt(this.M21 * this.M21 + this.M22 * this.M22 + this.M23 * this.M23);
+                scale.Z = zs * (float)Math.Sqrt(this.M31 * this.M31 + this.M32 * this.M32 + this.M33 * this.M33);
+                
+                if (scale.X == 0.0 || scale.Y == 0.0 || scale.Z == 0.0)
+                {
+                        rotation = Quaternion.Identity;
+                        return false;
+                }
 
-					Vector3 v1 = (Vector3) *(IntPtr*) ((IntPtr) vector3Ptr1 + (IntPtr) ((long) index2 * (long) sizeof (Vector3*)));
-					Vector3 v2 = (Vector3) *(IntPtr*) ((IntPtr) vector3Ptr1 + (IntPtr) ((long) index1 * (long) sizeof (Vector3*)));
-					
-		          	Vector3.Cross(
-						ref v1, ref v2, (Vector3) ((IntPtr) vector3Ptr2 + (IntPtr) ((long) num7 * (long) sizeof (Vector3))));
-		        }
-		        ((Vector3*) *(IntPtr*) ((IntPtr) vector3Ptr1 + (IntPtr) ((long) index2 * (long) sizeof (Vector3*))))->Normalize();
-		        if ((double) numPtr[index3] < 9.99999974737875E-05)
-		        {
-		          	var v1 = (Vector3) *(IntPtr*) ((IntPtr) vector3Ptr1 + (IntPtr) ((long) index3 * (long) sizeof(Vector3*)));
-					var v2 = (Vector3) *(IntPtr*) ((IntPtr) vector3Ptr1 + (IntPtr) ((long) index1 * (long) sizeof (Vector3*)));
-		         	Vector3.Cross(v1, v2, 
-						(Vector3) *(IntPtr*) ((IntPtr) vector3Ptr1 + (IntPtr) ((long) index2 * (long) sizeof (Vector3*))));
-		        }
-		        ((Vector3*) *(IntPtr*) ((IntPtr) vector3Ptr1 + (IntPtr) ((long) index3 * (long) sizeof (Vector3*))))->Normalize();
-		        float num8 = identity.Determinant();
-		        if ((double) num8 < 0.0)
-		        {
-		          numPtr[index1] = -numPtr[index1];
-		          *(Vector3*) *(IntPtr*) ((IntPtr) vector3Ptr1 + (IntPtr) ((long) index1 * (long) sizeof (Vector3*))) = -*(Vector3*) *(IntPtr*) ((IntPtr) vector3Ptr1 + (IntPtr) ((long) index1 * (long) sizeof (Vector3*)));
-		          num8 = -num8;
-		        }
-		        float num9 = num8 - 1f;
-		        if (9.99999974737875E-05 < (double) (num9 * num9))
-		        {
-		          rotation = Quaternion.Identity;
-		          flag = false;
-		        }
-		        else
-		          Quaternion.CreateFromRotationMatrix(ref identity, out rotation);
-		      }
-		      return flag;*/
-		}
-		
+                Matrix m1 = new Matrix(this.M11/scale.X, M12/scale.X, M13/scale.X, 0,
+                       				   this.M21/scale.Y, M22/scale.Y, M23/scale.Y, 0,
+                       				   this.M31/scale.Z, M32/scale.Z, M33/scale.Z, 0,
+                       				   0, 0, 0, 1);
+                
+                rotation = Quaternion.CreateFromRotationMatrix(m1);
+                return true;
+        }
+			
     }
 }

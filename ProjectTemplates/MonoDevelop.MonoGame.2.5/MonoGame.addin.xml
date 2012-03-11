@@ -22,6 +22,8 @@
     
     <Extension path = "/MonoDevelop/Ide/ProjectTemplates">
         <ProjectTemplate id = "MonoGameForAndroidProject" file = "templates/MonoGameAndroidProject.xpt.xml"/>                
+        <ProjectTemplate id = "MonoGameForWindowsProject" file = "templates/MonoGameWindowsProject.xpt.xml"/>                
+        <ProjectTemplate id = "MonoGameForLinuxProject" file = "templates/MonoGameLinuxProject.xpt.xml"/> 
     </Extension>
 
 	
