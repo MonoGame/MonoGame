@@ -117,10 +117,18 @@ namespace Microsoft.Xna.Framework.Content
             FieldInfo field = member as FieldInfo;
             if (property != null && property.CanWrite == false)
                 return;
+#if WINRT
+            Attribute attr = member.GetCustomAttribute(typeof(ContentSerializerIgnoreAttribute));
+#else
             Attribute attr = Attribute.GetCustomAttribute(member, typeof(ContentSerializerIgnoreAttribute));
+#endif
             if (attr != null) 
                 return;
+#if WINRT
+            Attribute attr2 = member.GetCustomAttribute(typeof(ContentSerializerAttribute));
+#else
             Attribute attr2 = Attribute.GetCustomAttribute(member, typeof(ContentSerializerAttribute));
+#endif
             bool isSharedResource = false;
             if (attr2 != null)
             {
@@ -131,11 +139,18 @@ namespace Microsoft.Xna.Framework.Content
             {
                 if (property != null)
                 {
+#if WINRT
+                    if ( property.GetMethod != null && !property.GetMethod.IsPublic )
+                        return;
+                    if ( property.SetMethod != null && !property.SetMethod.IsPublic )
+                        return;
+#else
                     foreach (MethodInfo info in property.GetAccessors(true))
                     {
                         if (info.IsPublic == false)
                             return;
                     }
+#endif
                 }
                 else
                 {
