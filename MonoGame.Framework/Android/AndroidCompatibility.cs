@@ -19,6 +19,7 @@ namespace Microsoft.Xna.Framework
 
         public static bool ScaleImageToPowerOf2 { get; set; }
         public static ESVersions ESVersion { get; set; }
+        public static bool KeepTexturesInMemory { get; set; }
 
     }
 }

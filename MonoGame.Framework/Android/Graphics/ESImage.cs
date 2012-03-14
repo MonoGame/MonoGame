@@ -257,6 +257,11 @@ namespace Microsoft.Xna.Framework.Graphics
             texture.RetryToCreateTexture();
         }
 
+        public void ForceRetryToCreateTexture()
+        {
+            texture.ForceRetryToCreateTexture();
+        }
+
         public virtual void Dispose()
         {
             if (!disposed)
