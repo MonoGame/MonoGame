@@ -224,8 +224,8 @@ namespace Microsoft.Xna.Framework.Graphics
                             GL11.TexParameter(ALL11.Texture2D, ALL11.TextureWrapS, (int) wrap);
                             GL11.TexParameter(ALL11.Texture2D, ALL11.TextureWrapT, (int) wrap);
                             GL11.TexParameter(ALL11.Texture2D, ALL11.GenerateMipmap, 1);
-                            //Android.Opengl.GLUtils.TexImage2D((int) ALL11.Texture2D, 0,
-                            //                                  imagePadded, 0);
+                            Android.Opengl.GLUtils.TexImage2D((int) ALL11.Texture2D, 0,
+                                                              imagePadded, 0);
                         }
                     }
                 }
