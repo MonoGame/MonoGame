@@ -187,7 +187,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void Clear(Color color)
         {
-            Vector4 vector = color.ToEAGLColor();
+            Vector4 vector = color.ToVector4();
             // The following was not working with Color.Transparent
             // Once we get some regression tests take the following out			
             //GL.ClearColor (vector.X, vector.Y, vector.Z, 1.0f);
@@ -197,7 +197,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void Clear(ClearOptions options, Color color, float depth, int stencil)
         {
-            Clear(options, color.ToEAGLColor(), depth, stencil);
+            Clear(options, color.ToVector4(), depth, stencil);
         }
 
         public void Clear(ClearOptions options, Vector4 color, float depth, int stencil)
@@ -439,9 +439,9 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.DrawArrays(PrimitiveTypeGL11(primitiveType), vertexStart, getElementCountArray(primitiveType, primitiveCount));
         }
 
-        public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int vertexCount, int[] indexData, int indexOffset, int primitiveCount) where T : IVertexType
+        public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int vertexCount, int[] indexData, int indexOffset, int primitiveCount) where T : struct
         {
-            // NOT TESTED
+            // TODO: This needs testing!
 
             if (indexOffset > 0 || vertexOffset > 0)
                 throw new NotImplementedException("vertexOffset and indexOffset is not yet supported.");
@@ -451,10 +451,23 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
 
             var vd = VertexDeclaration.FromType(typeof(T));
+            VertexDeclaration.PrepareForUse(vd);
 
-            IntPtr arrayStart = GCHandle.Alloc(vertexData, GCHandleType.Pinned).AddrOfPinnedObject();
-            if (vertexOffset > 0)
-                arrayStart = new IntPtr(arrayStart.ToInt32() + vertexOffset);
+            GL.DrawElements(PrimitiveTypeGL11(primitiveType), vertexCount, DrawElementsType.UnsignedInt, indexData);
+        }
+
+        public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int vertexCount, short[] indexData, int indexOffset, int primitiveCount) where T : struct
+        {
+            // TODO: This needs testing!
+
+            if (indexOffset > 0 || vertexOffset > 0)
+                throw new NotImplementedException("vertexOffset and indexOffset is not yet supported.");
+
+            // Unload the VBOs
+            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
+
+            var vd = VertexDeclaration.FromType(typeof(T));
             VertexDeclaration.PrepareForUse(vd);
 
             GL.DrawElements(PrimitiveTypeGL11(primitiveType), vertexCount, DrawElementsType.UnsignedShort, indexData);
@@ -542,6 +555,11 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 			
 			
+		}
+		
+		public RenderTargetBinding[] GetRenderTargets ()
+		{
+			return currentRenderTargets;
 		}
     }
 }

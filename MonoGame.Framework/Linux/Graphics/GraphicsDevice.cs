@@ -149,7 +149,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 //		public void Clear (Color color)
 //		{
-//			Vector4 vector = color.ToEAGLColor ();
+//			Vector4 vector = color.ToVector4 ();
 //			// The following was not working with Color.Transparent
 //			// Once we get some regression tests take the following out			
 //			//GL.ClearColor (vector.X, vector.Y, vector.Z, 1.0f);
@@ -159,7 +159,7 @@ namespace Microsoft.Xna.Framework.Graphics
 //
 //		public void Clear (ClearOptions options, Color color, float depth, int stencil)
 //		{
-//			Clear (options, color.ToEAGLColor (), depth, stencil);
+//			Clear (options, color.ToVector4 (), depth, stencil);
 //		}
 //
 //		public void Clear (ClearOptions options, Vector4 color, float depth, int stencil)
@@ -175,12 +175,12 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		public void Clear (Color color)
 		{
-			Clear (ClearOptions.Target, color.ToEAGLColor(), 0, 0);
+			Clear (ClearOptions.Target, color.ToVector4(), 0, 0);
 		}
 
 		public void Clear (ClearOptions options, Color color, float depth, int stencil)
 		{
-			Clear (options, color.ToEAGLColor (), depth, stencil);
+			Clear (options, color.ToVector4 (), depth, stencil);
 		}
 
 		public void Clear (ClearOptions options, Vector4 color, float depth, int stencil)
@@ -508,7 +508,12 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			
 		}
-
+		
+		public RenderTargetBinding[] GetRenderTargets ()
+		{
+			return currentRenderTargets;
+		}
+		
 		public void ResolveBackBuffer (ResolveTexture2D resolveTexture)
 		{
 		}
@@ -550,7 +555,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			var vd = VertexDeclaration.FromType (_vertexBuffer._type);
 			// Hmm, can the pointer here be changed with baseVertex?
-			VertexDeclaration.PrepareForUse (vd, IntPtr.Zero);
+			VertexDeclaration.PrepareForUse (vd);
 
 			GL.DrawElements (PrimitiveTypeGL11 (primitiveType), _indexBuffer._count, DrawElementsType.UnsignedShort, new IntPtr (startIndex));
 		}
@@ -568,7 +573,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			if (vertexOffset > 0)
 				arrayStart = new IntPtr (arrayStart.ToInt32 () + (vertexOffset * vd.VertexStride));
 
-			VertexDeclaration.PrepareForUse (vd, arrayStart);
+			VertexDeclaration.PrepareForUse (vd);
 
 			GL.DrawArrays (PrimitiveTypeGL11 (primitiveType), vertexOffset, getElementCountArray (primitiveType, primitiveCount));
 		}
@@ -576,7 +581,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		public void DrawPrimitives (PrimitiveType primitiveType, int vertexStart, int primitiveCount)
 		{
 			var vd = VertexDeclaration.FromType (_vertexBuffer._type);
-			VertexDeclaration.PrepareForUse (vd, IntPtr.Zero);
+			VertexDeclaration.PrepareForUse (vd);
 
 			GL.DrawArrays (PrimitiveTypeGL11 (primitiveType), vertexStart, getElementCountArray (primitiveType, primitiveCount));
 		}
@@ -594,9 +599,14 @@ namespace Microsoft.Xna.Framework.Graphics
 			if (vertexOffset > 0)
 				arrayStart = new IntPtr (arrayStart.ToInt32 () + (vertexOffset * vd.VertexStride));
 
-			VertexDeclaration.PrepareForUse (vd, arrayStart);
+			VertexDeclaration.PrepareForUse (vd);
 
 			GL.DrawArrays (PrimitiveTypeGL11 (primitiveType), vertexOffset, getElementCountArray (primitiveType, primitiveCount));
+		}
+		
+		public void DrawUserIndexedPrimitives<T> (PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int vertexCount, short[] indexData, int indexOffset, int primitiveCount) where T : IVertexType
+		{
+			throw new NotImplementedException();	
 		}
 
 		public int getElementCountArray (PrimitiveType primitiveType, int primitiveCount)

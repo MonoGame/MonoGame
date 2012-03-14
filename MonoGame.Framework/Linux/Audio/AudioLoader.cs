@@ -62,6 +62,11 @@ namespace Microsoft.Xna.Framework.Audio
 
             // WAVE header
             string format_signature = new string(reader.ReadChars(4));
+			if (format_signature == "bext") {
+				Int32 skip = reader.ReadInt32();
+				reader.ReadChars(skip - 1);
+				format_signature = new string(reader.ReadChars(4));
+			}
             if (format_signature != "fmt ")
             {
                 throw new NotSupportedException("Specified wave file is not supported.");
@@ -90,7 +95,7 @@ namespace Microsoft.Xna.Framework.Audio
 			
 			while (data_signature.ToLower() != "data")
             {
-                reader.ReadChars(reader.ReadInt32());
+                reader.ReadChars(reader.ReadInt32() - 1);
                 data_signature = new string(reader.ReadChars(4));
             }
 

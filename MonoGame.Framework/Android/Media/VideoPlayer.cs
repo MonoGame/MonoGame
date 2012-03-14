@@ -52,10 +52,10 @@ namespace Microsoft.Xna.Framework.Media
 		private bool _isLooped;
 		private Game _game;
 
-        public VideoPlayer(Game game)
+        public VideoPlayer()
         {
 			_state = MediaState.Stopped;
-			_game = game;
+			_game = Game.Instance;
         }
 
         public Texture2D GetTexture()
@@ -89,14 +89,14 @@ namespace Microsoft.Xna.Framework.Media
             _video.Player.Start();
 
             _state = MediaState.Playing;
-            Game._playingVideo = true;		
+            AndroidGamePlatform.IsPlayingVdeo = true;
         }
 
         public void Stop()
         {
             _video.Player.Stop();
 			_state = MediaState.Stopped;
-			Game._playingVideo = false;
+            AndroidGamePlatform.IsPlayingVdeo = false;
            _video.Player.SetDisplay(null);
         }
 

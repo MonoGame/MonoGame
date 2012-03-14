@@ -1,7 +1,8 @@
-﻿#region License
+﻿
+#region License
 /*
 MIT License
-Copyright ¬© 2006 The Mono.Xna Team
+Copyright © 2006 The Mono.Xna Team
 
 All rights reserved.
 
@@ -30,334 +31,492 @@ SOFTWARE.
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.ComponentModel;
+using System.Runtime.InteropServices;
+using System.Text;
 
 namespace Microsoft.Xna.Framework
 {
-    public struct BoundingSphere : IEquatable<BoundingSphere>
+    public class BoundingFrustum : IEquatable<BoundingFrustum>
     {
+        #region Private Fields
+
+        private Matrix matrix;
+        private Plane bottom;
+        private Plane far;
+        private Plane left;
+        private Plane right;
+        private Plane near;
+        private Plane top;
+        private Vector3[] corners;
+
+        #endregion Private Fields
+
         #region Public Fields
+        public const int CornerCount = 8;
+        #endregion
 
-        public Vector3 Center;
-        public float Radius;
+        #region Public Constructors
 
-        #endregion Public Fields
-
-
-        #region Constructors
-
-        public BoundingSphere(Vector3 center, float radius)
+        public BoundingFrustum(Matrix value)
         {
-            this.Center = center;
-            this.Radius = radius;
+            this.matrix = value;
+            CreatePlanes();
+            CreateCorners();
         }
 
-        #endregion Constructors
+        #endregion Public Constructors
+
+
+        #region Public Properties
+
+        public Plane Bottom
+        {
+            get { return this.bottom; }
+        }
+
+        public Plane Far
+        {
+            get { return this.far; }
+        }
+
+        public Plane Left
+        {
+            get { return this.left; }
+        }
+
+        public Matrix Matrix
+        {
+            get { return this.matrix; }
+            set
+            {
+                this.matrix = value;
+                this.CreatePlanes();    // FIXME: The odds are the planes will be used a lot more often than the matrix
+            	this.CreateCorners();   // is updated, so this should help performance. I hope ;)
+			}
+        }
+
+        public Plane Near
+        {
+            get { return this.near; }
+        }
+
+        public Plane Right
+        {
+            get { return this.right; }
+        }
+
+        public Plane Top
+        {
+            get { return this.top; }
+        }
+
+        #endregion Public Properties
 
 
         #region Public Methods
 
-        public BoundingSphere Transform(Matrix matrix)
+        public static bool operator ==(BoundingFrustum a, BoundingFrustum b)
         {
-            BoundingSphere sphere = new BoundingSphere();
-            sphere.Center = Vector3.Transform(this.Center, matrix);
-            sphere.Radius = this.Radius * ((float)Math.Sqrt((double)Math.Max(((matrix.M11 * matrix.M11) + (matrix.M12 * matrix.M12)) + (matrix.M13 * matrix.M13), Math.Max(((matrix.M21 * matrix.M21) + (matrix.M22 * matrix.M22)) + (matrix.M23 * matrix.M23), ((matrix.M31 * matrix.M31) + (matrix.M32 * matrix.M32)) + (matrix.M33 * matrix.M33)))));
-            return sphere;
+            if (object.Equals(a, null))
+                return (object.Equals(b, null));
+
+            if (object.Equals(b, null))
+                return (object.Equals(a, null));
+
+            return a.matrix == (b.matrix);
         }
 
-        public void Transform(ref Matrix matrix, out BoundingSphere result)
+        public static bool operator !=(BoundingFrustum a, BoundingFrustum b)
         {
-            result.Center = Vector3.Transform(this.Center, matrix);
-            result.Radius = this.Radius * ((float)Math.Sqrt((double)Math.Max(((matrix.M11 * matrix.M11) + (matrix.M12 * matrix.M12)) + (matrix.M13 * matrix.M13), Math.Max(((matrix.M21 * matrix.M21) + (matrix.M22 * matrix.M22)) + (matrix.M23 * matrix.M23), ((matrix.M31 * matrix.M31) + (matrix.M32 * matrix.M32)) + (matrix.M33 * matrix.M33)))));
+            return !(a == b);
         }
 
         public ContainmentType Contains(BoundingBox box)
         {
-            //check if all corner is in sphere
-            bool inside = true;
-            foreach (Vector3 corner in box.GetCorners())
-            {
-                if (this.Contains(corner) == ContainmentType.Disjoint)
-                {
-                    inside = false;
-                    break;
-                }
-            }
-
-            if (inside)
-                return ContainmentType.Contains;
-
-            //check if the distance from sphere center to cube face < radius
-            double dmin = 0;
-
-            if (Center.X < box.Min.X)
-				dmin += (Center.X - box.Min.X) * (Center.X - box.Min.X);
-
-			else if (Center.X > box.Max.X)
-					dmin += (Center.X - box.Max.X) * (Center.X - box.Max.X);
-
-			if (Center.Y < box.Min.Y)
-				dmin += (Center.Y - box.Min.Y) * (Center.Y - box.Min.Y);
-
-			else if (Center.Y > box.Max.Y)
-				dmin += (Center.Y - box.Max.Y) * (Center.Y - box.Max.Y);
-
-			if (Center.Z < box.Min.Z)
-				dmin += (Center.Z - box.Min.Z) * (Center.Z - box.Min.Z);
-
-			else if (Center.Z > box.Max.Z)
-				dmin += (Center.Z - box.Max.Z) * (Center.Z - box.Max.Z);
-
-			if (dmin <= Radius * Radius) 
-				return ContainmentType.Intersects;
-            
-            //else disjoint
-            return ContainmentType.Disjoint;
-
+            ContainmentType result;
+            this.Contains(ref box, out result);
+            return result;
         }
 
         public void Contains(ref BoundingBox box, out ContainmentType result)
         {
-            result = this.Contains(box);
-        }
-
-        public ContainmentType Contains(BoundingFrustum frustum)
-        {
-            //check if all corner is in sphere
-            bool inside = true;
-
-            Vector3[] corners = frustum.GetCorners();
-            foreach (Vector3 corner in corners)
+            // FIXME: Is this a bug?
+            // If the bounding box is of W * D * H = 0, then return disjoint
+            if (box.Min == box.Max)
             {
-                if (this.Contains(corner) == ContainmentType.Disjoint)
-                {
-                    inside = false;
+                result = ContainmentType.Disjoint;
+                return;
+            }
+
+            int i;
+            ContainmentType contained;
+            Vector3[] corners = box.GetCorners();
+
+            // First we assume completely disjoint. So if we find a point that is contained, we break out of this loop
+            for (i = 0; i < corners.Length; i++)
+            {
+                this.Contains(ref corners[i], out contained);
+                if (contained != ContainmentType.Disjoint)
                     break;
+            }
+
+            if (i == corners.Length) // This means we checked all the corners and they were all disjoint
+            {
+                result = ContainmentType.Disjoint;
+                return;
+            }
+
+            if (i != 0)             // if i is not equal to zero, we can fastpath and say that this box intersects
+            {                       // because we know at least one point is outside and one is inside.
+                result = ContainmentType.Intersects;
+                return;
+            }
+
+            // If we get here, it means the first (and only) point we checked was actually contained in the frustum.
+            // So we assume that all other points will also be contained. If one of the points is disjoint, we can
+            // exit immediately saying that the result is Intersects
+            i++;
+            for (; i < corners.Length; i++)
+            {
+                this.Contains(ref corners[i], out contained);
+                if (contained != ContainmentType.Contains)
+                {
+                    result = ContainmentType.Intersects;
+                    return;
                 }
             }
-            if (inside)
-                return ContainmentType.Contains;
 
-            //check if the distance from sphere center to frustrum face < radius
-            double dmin = 0;
-            //TODO : calcul dmin
+            // If we get here, then we know all the points were actually contained, therefore result is Contains
+            result = ContainmentType.Contains;
+            return;
+        }
 
-            if (dmin <= Radius * Radius)
-                return ContainmentType.Intersects;
+        // TODO: Implement this
+        public ContainmentType Contains(BoundingFrustum frustum)
+        {
+            if (this == frustum)                // We check to see if the two frustums are equal
+                return ContainmentType.Contains;// If they are, there's no need to go any further.
 
-            //else disjoint
-            return ContainmentType.Disjoint;
+            throw new NotImplementedException();
         }
 
         public ContainmentType Contains(BoundingSphere sphere)
         {
-            float val = Vector3.Distance(sphere.Center, Center);
-
-            if (val > sphere.Radius + Radius)
-                return ContainmentType.Disjoint;
-
-            else if (val <= Radius - sphere.Radius)
-                return ContainmentType.Contains;
-
-            else
-                return ContainmentType.Intersects;
+            ContainmentType result;
+            this.Contains(ref sphere, out result);
+            return result;
         }
 
         public void Contains(ref BoundingSphere sphere, out ContainmentType result)
         {
-            result = Contains(sphere);
+            float val;
+            ContainmentType contained;
+
+            // We first check if the sphere is inside the frustum
+            this.Contains(ref sphere.Center, out contained);
+
+            // The sphere is inside. Now we need to check if it's fully contained or not
+            // So we see if the perpendicular distance to each plane is less than or equal to the sphere's radius.
+            // If the perpendicular distance is less, just return Intersects.
+            if (contained == ContainmentType.Contains)
+            {
+                val = PlaneHelper.PerpendicularDistance(ref sphere.Center, ref this.bottom);
+                if (val < sphere.Radius)
+                {
+                    result = ContainmentType.Intersects;
+                    return;
+                }
+
+                val = PlaneHelper.PerpendicularDistance(ref sphere.Center, ref this.far);
+                if (val < sphere.Radius)
+                {
+                    result = ContainmentType.Intersects;
+                    return;
+                }
+
+                val = PlaneHelper.PerpendicularDistance(ref sphere.Center, ref this.left);
+                if (val < sphere.Radius)
+                {
+                    result = ContainmentType.Intersects;
+                    return;
+                }
+
+                val = PlaneHelper.PerpendicularDistance(ref sphere.Center, ref this.near);
+                if (val < sphere.Radius)
+                {
+                    result = ContainmentType.Intersects;
+                    return;
+                }
+
+                val = PlaneHelper.PerpendicularDistance(ref sphere.Center, ref this.right);
+                if (val < sphere.Radius)
+                {
+                    result = ContainmentType.Intersects;
+                    return;
+                }
+
+                val = PlaneHelper.PerpendicularDistance(ref sphere.Center, ref this.top);
+                if (val < sphere.Radius)
+                {
+                    result = ContainmentType.Intersects;
+                    return;
+                }
+
+                // If we get here, the sphere is fully contained
+                result = ContainmentType.Contains;
+                return;
+            }
+            //duff idea : test if all corner is in same side of a plane if yes and outside it is disjoint else intersect
+            // issue is that we can have some times when really close aabb 
+
+
+
+            // If we're here, the the sphere's centre was outside of the frustum. This makes things hard :(
+            // We can't use perpendicular distance anymore. I'm not sure how to code this.
+            throw new NotImplementedException();
         }
 
         public ContainmentType Contains(Vector3 point)
         {
-            float distance = Vector3.Distance(point, Center);
-
-            if (distance > this.Radius)
-                return ContainmentType.Disjoint;
-
-            else if (distance < this.Radius)
-                return ContainmentType.Contains;
-
-            return ContainmentType.Intersects;
+            ContainmentType result;
+            this.Contains(ref point, out result);
+            return result;
         }
 
         public void Contains(ref Vector3 point, out ContainmentType result)
         {
-            result = Contains(point);
-        }
+            float val;
+            // If a point is on the POSITIVE side of the plane, then the point is not contained within the frustum
 
-        public static BoundingSphere CreateFromBoundingBox(BoundingBox box)
-        {
-            // Find the center of the box.
-            Vector3 center = new Vector3((box.Min.X + box.Max.X) / 2.0f,
-                                         (box.Min.Y + box.Max.Y) / 2.0f,
-                                         (box.Min.Z + box.Max.Z) / 2.0f);
-
-            // Find the distance between the center and one of the corners of the box.
-            float radius = Vector3.Distance(center, box.Max);
-
-            return new BoundingSphere(center, radius);
-        }
-
-        public static void CreateFromBoundingBox(ref BoundingBox box, out BoundingSphere result)
-        {
-            result = CreateFromBoundingBox(box);
-        }
-
-        public static BoundingSphere CreateFromFrustum(BoundingFrustum frustum)
-        {
-            return BoundingSphere.CreateFromPoints(frustum.GetCorners());
-        }
-
-        public static BoundingSphere CreateFromPoints(IEnumerable<Vector3> points)
-        {
-            if (points == null)
-                throw new ArgumentNullException("points");
-
-            float radius = 0;
-            Vector3 center = new Vector3();
-            // First, we'll find the center of gravity for the point 'cloud'.
-            int num_points = 0; // The number of points (there MUST be a better way to get this instead of counting the number of points one by one?)
-            
-            foreach (Vector3 v in points)
+            // Check the top
+            val = PlaneHelper.ClassifyPoint(ref point, ref this.top);
+            if (val > 0)
             {
-                center += v;    // If we actually knew the number of points, we'd get better accuracy by adding v / num_points.
-                ++num_points;
-            }
-            
-            center /= (float)num_points;
-
-            // Calculate the radius of the needed sphere (it equals the distance between the center and the point further away).
-            foreach (Vector3 v in points)
-            {
-                float distance = ((Vector3)(v - center)).Length();
-                
-                if (distance > radius)
-                    radius = distance;
+                result = ContainmentType.Disjoint;
+                return;
             }
 
-            return new BoundingSphere(center, radius);
-        }
-
-        public static BoundingSphere CreateMerged(BoundingSphere original, BoundingSphere additional)
-        {
-            Vector3 ocenterToaCenter = Vector3.Subtract(additional.Center, original.Center);
-            float distance = ocenterToaCenter.Length();
-            if (distance <= original.Radius + additional.Radius)//intersect
+            // Check the bottom
+            val = PlaneHelper.ClassifyPoint(ref point, ref this.bottom);
+            if (val > 0)
             {
-                if (distance <= original.Radius - additional.Radius)//original contain additional
-                    return original;
-                if (distance <= additional.Radius - original.Radius)//additional contain original
-                    return additional;
+                result = ContainmentType.Disjoint;
+                return;
             }
 
-            //else find center of new sphere and radius
-            float leftRadius = Math.Max(original.Radius - distance, additional.Radius);
-            float Rightradius = Math.Max(original.Radius + distance, additional.Radius);
-            ocenterToaCenter = ocenterToaCenter + (((leftRadius - Rightradius) / (2 * ocenterToaCenter.Length())) * ocenterToaCenter);//oCenterToResultCenter
-            
-            BoundingSphere result = new BoundingSphere();
-            result.Center = original.Center + ocenterToaCenter;
-            result.Radius = (leftRadius + Rightradius) / 2;
-            return result;
+            // Check the left
+            val = PlaneHelper.ClassifyPoint(ref point, ref this.left);
+            if (val > 0)
+            {
+                result = ContainmentType.Disjoint;
+                return;
+            }
+
+            // Check the right
+            val = PlaneHelper.ClassifyPoint(ref point, ref this.right);
+            if (val > 0)
+            {
+                result = ContainmentType.Disjoint;
+                return;
+            }
+
+            // Check the near
+            val = PlaneHelper.ClassifyPoint(ref point, ref this.near);
+            if (val > 0)
+            {
+                result = ContainmentType.Disjoint;
+                return;
+            }
+
+            // Check the far
+            val = PlaneHelper.ClassifyPoint(ref point, ref this.far);
+            if (val > 0)
+            {
+                result = ContainmentType.Disjoint;
+                return;
+            }
+
+            // If we get here, it means that the point was on the correct side of each plane to be
+            // contained. Therefore this point is contained
+            result = ContainmentType.Contains;
         }
 
-        public static void CreateMerged(ref BoundingSphere original, ref BoundingSphere additional, out BoundingSphere result)
+        public bool Equals(BoundingFrustum other)
         {
-            result = BoundingSphere.CreateMerged(original, additional);
-        }
-
-        public bool Equals(BoundingSphere other)
-        {
-            return this.Center == other.Center && this.Radius == other.Radius;
+            return (this == other);
         }
 
         public override bool Equals(object obj)
         {
-            if (obj is BoundingSphere)
-                return this.Equals((BoundingSphere)obj);
+            BoundingFrustum f = obj as BoundingFrustum;
+            return (object.Equals(f, null)) ? false : (this == f);
+        }
 
-            return false;
+        public Vector3[] GetCorners()
+        {
+            return (Vector3[])this.corners.Clone();
+        }
+		
+		public void GetCorners(Vector3[] corners)
+        {
+			if (corners == null) throw new ArgumentNullException("corners");
+		    if (corners.Length < 8) throw new ArgumentOutOfRangeException("corners");
+
+            this.corners.CopyTo(corners, 0);
         }
 
         public override int GetHashCode()
         {
-            return this.Center.GetHashCode() + this.Radius.GetHashCode();
+            return this.matrix.GetHashCode();
         }
 
         public bool Intersects(BoundingBox box)
         {
-			return box.Intersects(this);
+			var result = false;
+			this.Intersects(ref box, out result);
+			return result;
         }
 
         public void Intersects(ref BoundingBox box, out bool result)
         {
-			result = Intersects(box);
-        }
+			var containment = ContainmentType.Disjoint;
+			this.Contains(ref box, out containment);
+			result = containment != ContainmentType.Disjoint;
+		}
 
         public bool Intersects(BoundingFrustum frustum)
         {
-            if (frustum == null)
-                throw new NullReferenceException();
-
             throw new NotImplementedException();
         }
 
         public bool Intersects(BoundingSphere sphere)
         {
-            float val = Vector3.Distance(sphere.Center, Center);
-			if (val > sphere.Radius + Radius)
-				return false;
-			return true;
+            throw new NotImplementedException();
         }
 
         public void Intersects(ref BoundingSphere sphere, out bool result)
         {
-			result = Intersects(sphere);
+            throw new NotImplementedException();
         }
 
         public PlaneIntersectionType Intersects(Plane plane)
         {
-			float distance = Vector3.Dot(plane.Normal, this.Center) + plane.D;
-			if (distance > this.Radius)
-				return PlaneIntersectionType.Front;
-			if (distance < -this.Radius)
-				return PlaneIntersectionType.Back;
-			//else it intersect
-			return PlaneIntersectionType.Intersecting;
+            throw new NotImplementedException();
         }
 
         public void Intersects(ref Plane plane, out PlaneIntersectionType result)
         {
-			result = Intersects(plane);
+            throw new NotImplementedException();
         }
 
         public Nullable<float> Intersects(Ray ray)
         {
-            return ray.Intersects(this);
+            throw new NotImplementedException();
         }
 
         public void Intersects(ref Ray ray, out Nullable<float> result)
         {
-			result = Intersects(ray);
-        }
-
-        public static bool operator == (BoundingSphere a, BoundingSphere b)
-        {
-            return a.Equals(b);
-        }
-
-        public static bool operator != (BoundingSphere a, BoundingSphere b)
-        {
-            return !a.Equals(b);
+            throw new NotImplementedException();
         }
 
         public override string ToString()
         {
-            return string.Format(CultureInfo.CurrentCulture, "{{Center:{0} Radius:{1}}}", this.Center.ToString(), this.Radius.ToString());
+            StringBuilder sb = new StringBuilder(256);
+            sb.Append("{Near:");
+            sb.Append(this.near.ToString());
+            sb.Append(" Far:");
+            sb.Append(this.far.ToString());
+            sb.Append(" Left:");
+            sb.Append(this.left.ToString());
+            sb.Append(" Right:");
+            sb.Append(this.right.ToString());
+            sb.Append(" Top:");
+            sb.Append(this.top.ToString());
+            sb.Append(" Bottom:");
+            sb.Append(this.bottom.ToString());
+            sb.Append("}");
+            return sb.ToString();
         }
 
         #endregion Public Methods
+
+
+        #region Private Methods
+
+#warning Move this to the PlaneHelper class
+        private void CreateCorners()
+        {
+            this.corners = new Vector3[8];
+            this.corners[0] = IntersectionPoint(ref this.near, ref this.left, ref this.top);
+            this.corners[1] = IntersectionPoint(ref this.near, ref this.right, ref this.top);
+            this.corners[2] = IntersectionPoint(ref this.near, ref this.right, ref this.bottom);
+            this.corners[3] = IntersectionPoint(ref this.near, ref this.left, ref this.bottom);
+            this.corners[4] = IntersectionPoint(ref this.far, ref this.left, ref this.top);
+            this.corners[5] = IntersectionPoint(ref this.far, ref this.right, ref this.top);
+            this.corners[6] = IntersectionPoint(ref this.far, ref this.right, ref this.bottom);
+            this.corners[7] = IntersectionPoint(ref this.far, ref this.left, ref this.bottom);
+        }
+
+        private void CreatePlanes()
+        {
+            // Pre-calculate the different planes needed
+            this.left = new Plane(-this.matrix.M14 - this.matrix.M11, -this.matrix.M24 - this.matrix.M21,
+                                  -this.matrix.M34 - this.matrix.M31, -this.matrix.M44 - this.matrix.M41);
+
+            this.right = new Plane(this.matrix.M11 - this.matrix.M14, this.matrix.M21 - this.matrix.M24,
+                                   this.matrix.M31 - this.matrix.M34, this.matrix.M41 - this.matrix.M44);
+
+            this.top = new Plane(this.matrix.M12 - this.matrix.M14, this.matrix.M22 - this.matrix.M24,
+                                 this.matrix.M32 - this.matrix.M34, this.matrix.M42 - this.matrix.M44);
+
+            this.bottom = new Plane(-this.matrix.M14 - this.matrix.M12, -this.matrix.M24 - this.matrix.M22,
+                                    -this.matrix.M34 - this.matrix.M32, -this.matrix.M44 - this.matrix.M42);
+
+            this.near = new Plane(-this.matrix.M13, -this.matrix.M23, -this.matrix.M33, -this.matrix.M43);
+
+
+            this.far = new Plane(this.matrix.M13 - this.matrix.M14, this.matrix.M23 - this.matrix.M24,
+                                 this.matrix.M33 - this.matrix.M34, this.matrix.M43 - this.matrix.M44);
+
+            this.NormalizePlane(ref this.left);
+            this.NormalizePlane(ref this.right);
+            this.NormalizePlane(ref this.top);
+            this.NormalizePlane(ref this.bottom);
+            this.NormalizePlane(ref this.near);
+            this.NormalizePlane(ref this.far);
+        }
+
+        private static Vector3 IntersectionPoint(ref Plane a, ref Plane b, ref Plane c)
+        {
+            // Formula used
+            //                d1 ( N2 * N3 ) + d2 ( N3 * N1 ) + d3 ( N1 * N2 )
+            //P = 	-------------------------------------------------------------------------
+            //                             N1 . ( N2 * N3 )
+            //
+            // Note: N refers to the normal, d refers to the displacement. '.' means dot product. '*' means cross product
+
+            Vector3 v1, v2, v3;
+            float f = -Vector3.Dot(a.Normal, Vector3.Cross(b.Normal, c.Normal));
+
+            v1 = (a.D * (Vector3.Cross(b.Normal, c.Normal)));
+            v2 = (b.D * (Vector3.Cross(c.Normal, a.Normal)));
+            v3 = (c.D * (Vector3.Cross(a.Normal, b.Normal)));
+
+            Vector3 vec = new Vector3(v1.X + v2.X + v3.X, v1.Y + v2.Y + v3.Y, v1.Z + v2.Z + v3.Z);
+            return vec / f;
+        }
+        
+        private void NormalizePlane(ref Plane p)
+        {
+            float factor = 1f / p.Normal.Length();
+            p.Normal.X *= factor;
+            p.Normal.Y *= factor;
+            p.Normal.Z *= factor;
+            p.D *= factor;
+        }
+
+        #endregion
     }
 }
+

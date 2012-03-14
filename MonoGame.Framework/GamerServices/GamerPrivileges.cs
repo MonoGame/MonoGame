@@ -43,7 +43,9 @@ using System;
 
 namespace Microsoft.Xna.Framework.GamerServices
 {
+#if !WINDOWS_PHONE
 	[SerializableAttribute]
+#endif
 	public class GamerPrivilegeException : Exception
 	{
 		

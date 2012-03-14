@@ -44,21 +44,28 @@ namespace Microsoft.Xna.Framework
 {
     public class GameTime
     {
-        TimeSpan elapsedTime;
-        TimeSpan totalTime;
+        TimeSpan _elapsedTime;
+        TimeSpan _totalTime;
+
+        public bool IsRunningSlowly { get; set; }
 
         public TimeSpan ElapsedGameTime
         {
             get
             {
-                return elapsedTime;
+                return _elapsedTime;
+            }
+            internal set
+            {
+                _elapsedTime = value;
             }
         }
+
         public TimeSpan ElapsedRealTime
         {
             get
             {
-                return elapsedTime;
+                return _elapsedTime;
             }
         }
 
@@ -66,36 +73,46 @@ namespace Microsoft.Xna.Framework
         {
             get
             {
-                return totalTime;
+                return _totalTime;
             }
         }
+
         public TimeSpan TotalRealTime
         {
             get
             {
-                return totalTime;
+                return _totalTime;
             }
         }
 
         public GameTime()
         {
-            elapsedTime = totalTime = TimeSpan.Zero;
+            _elapsedTime = _totalTime = TimeSpan.Zero;
         }
-		
-		public GameTime ( TimeSpan totalRealTime, TimeSpan elapsedRealTime, TimeSpan totalGameTime, TimeSpan elapsedGameTime )
+
+        public GameTime(TimeSpan totalGameTime, TimeSpan elapsedGameTime)
+        {
+            _totalTime = totalGameTime;
+            _elapsedTime = elapsedGameTime;
+        }
+
+		public GameTime (TimeSpan totalRealTime, TimeSpan elapsedRealTime, bool isRunningSlowly)
 		{
-			
-		}
-		
-		public GameTime ( TimeSpan totalRealTime, TimeSpan elapsedRealTime, TimeSpan totalGameTime, TimeSpan elapsedGameTime, bool isRunningSlowly)
-		{
-			
+            _totalTime = totalRealTime;
+            _elapsedTime = elapsedRealTime;
+		    IsRunningSlowly = isRunningSlowly;
 		}
 
         internal void Update(TimeSpan elapsed)
         {
-            elapsedTime = elapsed;
-            totalTime += elapsed;
+		//Console.WriteLine("Update " + elapsed);
+            _elapsedTime = elapsed;
+            _totalTime += elapsed;
+        }				
+
+        internal void ResetElapsedTime()
+        {
+            _elapsedTime = TimeSpan.Zero;
         }
     }
 }

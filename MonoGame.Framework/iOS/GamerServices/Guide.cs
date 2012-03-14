@@ -1,94 +1,93 @@
 #region License
 /*
 Microsoft Public License (Ms-PL)
-MonoGame - Copyright © 2009 The MonoGame Team
+MonoGame - Copyright © 2009-2012 The MonoGame Team
 
 All rights reserved.
 
-This license governs use of the accompanying software. If you use the software, you accept this license. If you do not
-accept the license, do not use the software.
+This license governs use of the accompanying software. If you use the software,
+you accept this license. If you do not accept the license, do not use the
+software.
 
 1. Definitions
-The terms "reproduce," "reproduction," "derivative works," and "distribution" have the same meaning here as under 
-U.S. copyright law.
 
-A "contribution" is the original software, or any additions or changes to the software.
-A "contributor" is any person that distributes its contribution under this license.
-"Licensed patents" are a contributor's patent claims that read directly on its contribution.
+The terms "reproduce," "reproduction," "derivative works," and "distribution"
+have the same meaning here as under U.S. copyright law.
+
+A "contribution" is the original software, or any additions or changes to the
+software.
+
+A "contributor" is any person that distributes its contribution under this
+license.
+
+"Licensed patents" are a contributor's patent claims that read directly on its
+contribution.
 
 2. Grant of Rights
-(A) Copyright Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-each contributor grants you a non-exclusive, worldwide, royalty-free copyright license to reproduce its contribution, prepare derivative works of its contribution, and distribute its contribution or any derivative works that you create.
-(B) Patent Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-each contributor grants you a non-exclusive, worldwide, royalty-free license under its licensed patents to make, have made, use, sell, offer for sale, import, and/or otherwise dispose of its contribution in the software or derivative works of the contribution in the software.
+
+(A) Copyright Grant- Subject to the terms of this license, including the
+license conditions and limitations in section 3, each contributor grants you a
+non-exclusive, worldwide, royalty-free copyright license to reproduce its
+contribution, prepare derivative works of its contribution, and distribute its
+contribution or any derivative works that you create.
+
+(B) Patent Grant- Subject to the terms of this license, including the license
+conditions and limitations in section 3, each contributor grants you a
+non-exclusive, worldwide, royalty-free license under its licensed patents to
+make, have made, use, sell, offer for sale, import, and/or otherwise dispose of
+its contribution in the software or derivative works of the contribution in the
+software.
 
 3. Conditions and Limitations
-(A) No Trademark License- This license does not grant you rights to use any contributors' name, logo, or trademarks.
-(B) If you bring a patent claim against any contributor over patents that you claim are infringed by the software, 
-your patent license from such contributor to the software ends automatically.
-(C) If you distribute any portion of the software, you must retain all copyright, patent, trademark, and attribution 
-notices that are present in the software.
-(D) If you distribute any portion of the software in source code form, you may do so only under this license by including 
-a complete copy of this license with your distribution. If you distribute any portion of the software in compiled or object 
-code form, you may only do so under a license that complies with this license.
-(E) The software is licensed "as-is." You bear the risk of using it. The contributors give no express warranties, guarantees
-or conditions. You may have additional consumer rights under your local laws which this license cannot change. To the extent
-permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular
-purpose and non-infringement.
+
+(A) No Trademark License- This license does not grant you rights to use any
+contributors' name, logo, or trademarks.
+
+(B) If you bring a patent claim against any contributor over patents that you
+claim are infringed by the software, your patent license from such contributor
+to the software ends automatically.
+
+(C) If you distribute any portion of the software, you must retain all
+copyright, patent, trademark, and attribution notices that are present in the
+software.
+
+(D) If you distribute any portion of the software in source code form, you may
+do so only under this license by including a complete copy of this license with
+your distribution. If you distribute any portion of the software in compiled or
+object code form, you may only do so under a license that complies with this
+license.
+
+(E) The software is licensed "as-is." You bear the risk of using it. The
+contributors give no express warranties, guarantees or conditions. You may have
+additional consumer rights under your local laws which this license cannot
+change. To the extent permitted under your local laws, the contributors exclude
+the implied warranties of merchantability, fitness for a particular purpose and
+non-infringement.
 */
 #endregion License
 
-#region Using clause
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Runtime.Remoting.Messaging;
+using System.Threading;
 
-using MonoTouch.UIKit;
 using MonoTouch.Foundation;
 using MonoTouch.GameKit;
+using MonoTouch.UIKit;
 
 using Microsoft.Xna.Framework.Net;
 using Microsoft.Xna.Framework.Storage;
 using Microsoft.Xna.Framework.Input.Touch;
 
-
-#endregion Using clause
-
 namespace Microsoft.Xna.Framework.GamerServices
 {
-	
-	internal class GameVc : UIViewController
+	class GuideViewController : UIViewController
 	{
-		
-		public GameVc():base()
-		{
-		}
 		public override bool ShouldAutorotateToInterfaceOrientation (UIInterfaceOrientation toInterfaceOrientation)
 		{
-
-			var manager = GameWindow.game.graphicsDeviceManager as GraphicsDeviceManager;
-			Console.WriteLine(manager == null);
-			if(manager == null)
-				return true;
-			DisplayOrientation supportedOrientations = manager.SupportedOrientations;
-			switch(toInterfaceOrientation)
-			{
-			case UIInterfaceOrientation.LandscapeLeft :
-				return (supportedOrientations & DisplayOrientation.LandscapeLeft) != 0;
-			case UIInterfaceOrientation.LandscapeRight:
-				return (supportedOrientations & DisplayOrientation.LandscapeRight) != 0;
-			case UIInterfaceOrientation.Portrait:
-				return (supportedOrientations & DisplayOrientation.Portrait) != 0;
-			case UIInterfaceOrientation.PortraitUpsideDown :
-				return (supportedOrientations & DisplayOrientation.PortraitUpsideDown) != 0;
-			default :
-				return false;
-			}
-			return true;
-			//return base.ShouldAutorotateToInterfaceOrientation (toInterfaceOrientation);
+			return this.ParentViewController.ShouldAutorotateToInterfaceOrientation(toInterfaceOrientation);
 		}
 
 		public override void DidRotate (UIInterfaceOrientation fromInterfaceOrientation)
@@ -109,140 +108,144 @@ namespace Microsoft.Xna.Framework.GamerServices
 			*/
 			base.DidRotate (fromInterfaceOrientation);
 		}
-
-
 	}
 
 	public static class Guide
 	{
-		private static bool isScreenSaverEnabled;
-		private static bool isTrialMode;
-		private static bool isVisible;
-		private static bool simulateTrialMode;
+		private static int _showKeyboardInputRequestCount;
+
 		private static bool isMessageBoxShowing = false;
-		private static bool isKeyboardInputShowing = false;
 		private static GKLeaderboardViewController leaderboardController;
 		private static GKAchievementViewController achievementController;
 		private static GKPeerPickerController peerPickerController;
 		private static GKMatchmakerViewController matchmakerViewController;
-		private static GameVc viewController = null;
-		private static NSObject invokeOnMainThredObj = null;
+		private static GuideViewController viewController = null;
 		private static GestureType prevGestures;
-		
-		private static NSObject GetInvokeOnMainThredObj()
-		{
-			
-			if ( invokeOnMainThredObj == null )
-			{
-				invokeOnMainThredObj = new NSObject();
-			}
-			return invokeOnMainThredObj;
-		}
-			
-		internal static void Initialise(Game game) {
-			
-		}
-		delegate string ShowKeyboardInputDelegate(
-		 PlayerIndex player,           
-         string title,
-         string description,
-         string defaultText,
-		 bool usePasswordMode);
 
-		public static string ShowKeyboardInput(
-		 PlayerIndex player,           
-         string title,
-         string description,
-         string defaultText,
-		 bool usePasswordMode)
+		private static bool _isInitialised;
+		private static UIWindow _window;
+		private static UIViewController _gameViewController;
+
+		internal static void Initialise(Game game)
 		{
-			string result = defaultText; 
-			if (!isKeyboardInputShowing)
-			{
-				isKeyboardInputShowing = true;				
-	
-				TextFieldAlertView myAlertView = new TextFieldAlertView(usePasswordMode, title, defaultText);
-	
-	
-				myAlertView.Title = title;
-				myAlertView.Message = description;
-	
-				myAlertView.Clicked += delegate(object sender, UIButtonEventArgs e)
-						{
-							if (e.ButtonIndex == 1)
-							{
-									result = ((UIAlertView) sender).Subviews.OfType<UITextField>().Single().Text;
-									isKeyboardInputShowing = false;
-							}
-						};
-				
-				myAlertView.Dismissed += delegate(object sender, UIButtonEventArgs e) 
-								{ 
-									result = defaultText;
-									isKeyboardInputShowing = false;
-								};
-				
-				myAlertView.Transform = MonoTouch.CoreGraphics.CGAffineTransform.MakeTranslation (0f, 110f);
-				
-				GetInvokeOnMainThredObj().InvokeOnMainThread(delegate {    
-	       		 		myAlertView.Show();  
-	    			});
+			_window = (UIWindow)game.Services.GetService (typeof(UIWindow));
+			if (_window == null)
+				throw new InvalidOperationException(
+					"iOSGamePlatform must add the main UIWindow to Game.Services");
+
+			_gameViewController = (UIViewController)game.Services.GetService (typeof(UIViewController));
+			if (_gameViewController == null)
+				throw new InvalidOperationException(
+					"iOSGamePlatform must add the game UIViewController to Game.Services");
+
+			game.Exiting += Game_Exiting;
+
+			_isInitialised = true;
+		}
+
+		private static void Uninitialise(Game game)
+		{
+			game.Exiting -= Game_Exiting;
+			_window = null;
+			_gameViewController = null;
+			_isInitialised = false;
+		}
+
+		#region Properties
+
+		public static bool IsScreenSaverEnabled { get; set; }
+
+		private static bool isTrialMode;
+		public static bool IsTrialMode {
+			get { return isTrialMode || SimulateTrialMode; }
+			set { isTrialMode = value; }
+		}
+
+		private static bool isVisible;
+		public static bool IsVisible {
+			get {
+				AssertInitialised ();
+				return isVisible;
 			}
-			
-			isVisible = isKeyboardInputShowing;
-			return result;
+			set {
+				AssertInitialised ();
+				// FIXME: Need to hide any visible UI here.
+				isVisible = value;
+			}
+		}
+
+		public static bool SimulateTrialMode { get; set; }
+
+		public static NotificationPosition NotificationPosition { get; set; }
+
+		#endregion
+
+		private static void Game_Exiting (object sender, EventArgs e)
+		{
+			Uninitialise ((Game) sender);
+		}
+
+		private static void AssertInitialised ()
+		{
+			if (!_isInitialised)
+				throw new InvalidOperationException(
+					"Gamer services functionality has not been initialized.");
 		}
 
 		public static IAsyncResult BeginShowKeyboardInput (
-         PlayerIndex player,
-         string title,
-         string description,
-         string defaultText,
-         AsyncCallback callback,
-         Object state)
+			PlayerIndex player, string title, string description, string defaultText,
+			AsyncCallback callback, Object state)
 		{
+			AssertInitialised ();
 			return BeginShowKeyboardInput(player, title, description, defaultText, callback, state, false );
 		}
 
 		public static IAsyncResult BeginShowKeyboardInput (
-         PlayerIndex player,
-         string title,
-         string description,
-         string defaultText,
-         AsyncCallback callback,
-         Object state,
-         bool usePasswordMode)
+			PlayerIndex player, string title, string description, string defaultText,
+			AsyncCallback callback, Object state, bool usePasswordMode)
 		{
-			ShowKeyboardInputDelegate ski = ShowKeyboardInput; 
+			AssertInitialised ();
 
-			return ski.BeginInvoke(player, title, description, defaultText, usePasswordMode, callback, ski);
+			int requestCount = Interlocked.Increment (ref _showKeyboardInputRequestCount);
+			if (requestCount != 1) {
+				Interlocked.Decrement (ref _showKeyboardInputRequestCount);
+				// FIXME: Return the in-progress IAsyncResult?
+				return null;
+			}
+
+			isVisible = true;
+			var viewController = new KeyboardInputViewController(
+				title, description, defaultText, usePasswordMode);
+			_gameViewController.PresentViewController (viewController, true, () => {});
+
+			viewController.View.InputAccepted += (sender, e) => {
+				_gameViewController.DismissViewController (true, () => {});
+				Interlocked.Decrement (ref _showKeyboardInputRequestCount);
+			};
+
+			viewController.View.InputCanceled += (sender, e) => {
+				_gameViewController.DismissViewController (true, () => {});
+				Interlocked.Decrement (ref _showKeyboardInputRequestCount);
+			};
+
+			return new KeyboardInputAsyncResult (viewController, callback, state);
 		}
 
 		public static string EndShowKeyboardInput (IAsyncResult result)
 		{
-			try 
-			{
-				ShowKeyboardInputDelegate ski = (ShowKeyboardInputDelegate)result.AsyncState; 
+			AssertInitialised ();
 
-				return ski.EndInvoke(result);
-			} 
-			finally 
-			{
-				isVisible = false;
-			}			
+			if (!(result is KeyboardInputAsyncResult))
+				throw new ArgumentException ("result");
+
+			return (result as KeyboardInputAsyncResult).GetResult();
 		}
 
-		delegate Nullable<int> ShowMessageBoxDelegate( string title,
-         string text,
-         IEnumerable<string> buttons,
-         int focusButton,
-         MessageBoxIcon icon);
+		delegate Nullable<int> ShowMessageBoxDelegate(
+			string title, string text, IEnumerable<string> buttons, int focusButton, MessageBoxIcon icon);
 
-		public static Nullable<int> ShowMessageBox( string title,
-         string text,
-         IEnumerable<string> buttons,
-         int focusButton,
-         MessageBoxIcon icon)
+		private static Nullable<int> ShowMessageBox(
+			string title, string text, IEnumerable<string> buttons, int focusButton, MessageBoxIcon icon)
 		{
 			Nullable<int> result = null;
 			
@@ -268,9 +271,9 @@ namespace Microsoft.Xna.Framework.GamerServices
 									isMessageBoxShowing = false;
 								};
 				
-				GetInvokeOnMainThredObj().InvokeOnMainThread(delegate {    
-       		 		alert.Show();   
-    			});
+				UIApplication.SharedApplication.InvokeOnMainThread(delegate {
+					alert.Show();
+				});
 				
 			}
 			
@@ -280,15 +283,8 @@ namespace Microsoft.Xna.Framework.GamerServices
 		}
 
 		public static IAsyncResult BeginShowMessageBox(
-         PlayerIndex player,
-         string title,
-         string text,
-         IEnumerable<string> buttons,
-         int focusButton,
-         MessageBoxIcon icon,
-         AsyncCallback callback,
-         Object state
-		)
+			PlayerIndex player, string title, string text, IEnumerable<string> buttons, int focusButton,
+			MessageBoxIcon icon, AsyncCallback callback, Object state)
 		{	
 			ShowMessageBoxDelegate smb = ShowMessageBox; 
 
@@ -296,13 +292,8 @@ namespace Microsoft.Xna.Framework.GamerServices
 		}
 
 		public static IAsyncResult BeginShowMessageBox (
-         string title,
-         string text,
-         IEnumerable<string> buttons,
-         int focusButton,
-         MessageBoxIcon icon,
-         AsyncCallback callback,
-         Object state
+			string title, string text, IEnumerable<string> buttons, int focusButton, MessageBoxIcon icon,
+			AsyncCallback callback, Object state
 		)
 		{
 			return BeginShowMessageBox(PlayerIndex.One, title, text, buttons, focusButton, icon, callback, state);
@@ -323,22 +314,20 @@ namespace Microsoft.Xna.Framework.GamerServices
 		}
 
 
-		public static void ShowMarketplace (PlayerIndex player )
+		public static void ShowMarketplace (PlayerIndex player)
 		{
-			NSUrl url = new NSUrl("http://phobos.apple.com/WebObjects/MZStore.woa/wa/viewSoftware?id=306469222&mt=8");
-		            if (!UIApplication.SharedApplication.OpenUrl(url))
-		            {
-						// Error
-					}
-		}
+			AssertInitialised ();
 
-		public static void Show ()
-		{
-			ShowSignIn(1, false);
+			NSUrl url = new NSUrl("http://phobos.apple.com/WebObjects/MZStore.woa/wa/viewSoftware?id=306469222&mt=8");
+			if (!UIApplication.SharedApplication.OpenUrl(url)) {
+				// Error
+			}
 		}
 
 		public static void ShowSignIn (int paneCount, bool onlineOnly)
 		{
+			AssertInitialised ();
+
 			if ( paneCount != 1 )
 			{
 				new ArgumentException("paneCount Can only be 1 on iPhone");
@@ -357,6 +346,8 @@ namespace Microsoft.Xna.Framework.GamerServices
 
 		public static void ShowLeaderboard()
 		{
+			AssertInitialised ();
+
 			if ( ( Gamer.SignedInGamers.Count > 0 ) && ( Gamer.SignedInGamers[0].IsSignedInToLive ) )
 			{
 				// Lazy load it
@@ -374,12 +365,12 @@ namespace Microsoft.Xna.Framework.GamerServices
 						TouchPanel.EnabledGestures=prevGestures;
  					};
 
-					if (Window !=null)
+					if (_window != null)
 					{						
 						if(viewController == null)
 						{
-							viewController = new GameVc();
-							Window.Add(viewController.View);
+							viewController = new GuideViewController();
+							_window.Add(viewController.View);
 							viewController.View.Hidden = true;
 						}
 						
@@ -400,6 +391,8 @@ namespace Microsoft.Xna.Framework.GamerServices
 
 		public static void ShowAchievements()
 		{
+			AssertInitialised ();
+
 			if ( ( Gamer.SignedInGamers.Count > 0 ) && ( Gamer.SignedInGamers[0].IsSignedInToLive ) )
 			{
 				// Lazy load it
@@ -417,12 +410,12 @@ namespace Microsoft.Xna.Framework.GamerServices
 						TouchPanel.EnabledGestures=prevGestures;
 					};
 
-					if (Window !=null)
+					if (_window != null)
 					{
 						if(viewController == null)
 						{
-							viewController = new GameVc();
-							Window.Add(viewController.View);
+							viewController = new GuideViewController();
+							_window.Add(viewController.View);
 							viewController.View.Hidden = true;
 						}
 
@@ -443,6 +436,8 @@ namespace Microsoft.Xna.Framework.GamerServices
 		
 		public static void ShowPeerPicker(GKPeerPickerControllerDelegate aPeerPickerControllerDelegate)
 		{
+			AssertInitialised ();
+
 			if ( ( Gamer.SignedInGamers.Count > 0 ) && ( Gamer.SignedInGamers[0].IsSignedInToLive ) )
 			{
 				// Lazy load it
@@ -463,6 +458,8 @@ namespace Microsoft.Xna.Framework.GamerServices
 		
 		public static void ShowMatchMaker()
 		{
+			AssertInitialised ();
+
 			if ( ( Gamer.SignedInGamers.Count > 0 ) && ( Gamer.SignedInGamers[0].IsSignedInToLive ) )
 			{
 				// Lazy load it
@@ -493,12 +490,12 @@ namespace Microsoft.Xna.Framework.GamerServices
 						TouchPanel.EnabledGestures=prevGestures;
 					};
 
-					if (Window !=null)
+					if (_window != null)
 					{
 						if(viewController == null)
 						{
-							viewController = new GameVc();
-							Window.Add(viewController.View);
+							viewController = new GuideViewController();
+							_window.Add(viewController.View);
 							viewController.View.Hidden = true;
 						}
 
@@ -511,7 +508,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 			}
 		}
 
-		public static IAsyncResult BeginShowStorageDeviceSelector( AsyncCallback callback, object state )
+		public static IAsyncResult BeginShowStorageDeviceSelector( AsyncCallback callback, Object state )
 		{
 			return null;
 		}
@@ -520,61 +517,5 @@ namespace Microsoft.Xna.Framework.GamerServices
 		{
 			return null;
 		}
-
-		#region Properties
-		public static bool IsScreenSaverEnabled 
-		{ 
-			get
-			{
-				return isScreenSaverEnabled;
-			}
-			set
-			{
-				isScreenSaverEnabled = value;
-			}
-		}
-
-		public static bool IsTrialMode 
-		{ 
-			get
-			{
-				return isTrialMode;
-			}
-			set
-			{
-				isTrialMode = value;
-			}
-		}
-
-		public static bool IsVisible 
-		{ 
-			get
-			{
-				return isVisible;
-			}
-			set
-			{
-				isVisible = value;
-			}
-		}
-
-		public static bool SimulateTrialMode 
-		{ 
-			get
-			{
-				return simulateTrialMode;
-			}
-			set
-			{
-				simulateTrialMode = value;
-			}
-		}
-
-		public static GameWindow Window 
-		{ 
-			get;
-			set;
-		}
-		#endregion
 	}
 }

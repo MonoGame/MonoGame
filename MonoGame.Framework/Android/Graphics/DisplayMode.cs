@@ -38,8 +38,6 @@ purpose and non-infringement.
 */
 #endregion License
 
-using System;
-
 namespace Microsoft.Xna.Framework.Graphics
 {
     public struct DisplayMode
@@ -48,7 +46,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             get
             {
-                return Width  / Height;
+                return (float)Game.Activity.Resources.DisplayMetrics.WidthPixels / (float)Game.Activity.Resources.DisplayMetrics.HeightPixels;
             }
         }
 
@@ -56,7 +54,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             get
             {
-                return (int)Game.contextInstance.Resources.DisplayMetrics.WidthPixels;
+                return Game.Activity.Resources.DisplayMetrics.WidthPixels;
             }
         }
 
@@ -64,8 +62,15 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             get
             {
-                return (int)Game.contextInstance.Resources.DisplayMetrics.HeightPixels;
+                return Game.Activity.Resources.DisplayMetrics.HeightPixels;
             }
         }
+		
+#if DEBUG		
+		public override string ToString ()
+		{
+			return string.Format ("[DisplayMode: AspectRatio={0}, Width={1}, Height={2}]", AspectRatio, Width, Height);
+		}
+#endif		
     }
 }

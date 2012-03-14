@@ -149,6 +149,20 @@ namespace Microsoft.Xna.Framework.Graphics
 				return new Rectangle(x,y,width,height);
 			}
 		}
+		
+		public Viewport(int x, int y, int width, int height)
+		{
+			this.x = x;
+		    this.y = y;
+		    this.width = width;
+		    this.height = height;
+		    this.minDepth = 0.0f;
+		    this.maxDepth = 1.0f;
+		}
+		
+		public Viewport(Rectangle bounds) : this(bounds.X, bounds.Y, bounds.Width, bounds.Height)
+		{
+		}
 
         public Vector3 Project(Vector3 source, Matrix projection, Matrix view, Matrix world)
         {
@@ -188,7 +202,10 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 
 
-       
+        public override string ToString ()
+		{
+			return string.Format ("[Viewport: X={0} Y={1} Width={2} Height={3}]", X,Y, Width,Height);
+		}
     }
 }
 

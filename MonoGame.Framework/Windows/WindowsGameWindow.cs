@@ -480,7 +480,6 @@ namespace Microsoft.Xna.Framework
         {
             OpenTkGameWindow = new OpenTK.GameWindow();            
             OpenTkGameWindow.RenderFrame += OnRenderFrame;
-            OpenTkGameWindow.UpdateFrame += OnUpdateFrame;
             OpenTkGameWindow.Closing += new EventHandler<CancelEventArgs>(OpenTkGameWindow_Closing);
             OpenTkGameWindow.Resize += OnResize;
             OpenTkGameWindow.Keyboard.KeyDown += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyDown);
@@ -542,6 +541,10 @@ namespace Microsoft.Xna.Framework
                 OpenTkGameWindow.MakeCurrent();
 
             if (Game != null) {
+                _now = DateTime.Now;
+		_updateGameTime.Update(_now - _lastUpdate);
+            	Game.DoUpdate(_updateGameTime);
+
                 _drawGameTime.Update(_now - _lastUpdate);
                 _lastUpdate = _now;
                 Game.DoDraw(_drawGameTime);
@@ -550,23 +553,6 @@ namespace Microsoft.Xna.Framework
             OpenTkGameWindow.SwapBuffers();
         }
 
-        private void OnUpdateFrame(object sender, FrameEventArgs e)
-		{			
-			if (Game != null ) {
-			  
-                HandleInput();
-
-                _now = DateTime.Now;
-				_updateGameTime.Update(_now - _lastUpdate);
-            	Game.DoUpdate(_updateGameTime);
-			}
-		}
-
-        private void HandleInput()
-        {
-			// mouse doesn't need to be treated here, Mouse class does it alone
-        }
-		
 		#endregion
 
         public override IntPtr Handle
@@ -612,22 +598,15 @@ namespace Microsoft.Xna.Framework
             }
         }
 
-        private DisplayOrientation _currentOrientation;
 		public override DisplayOrientation CurrentOrientation 
 		{
-            get
-            {
-                return _currentOrientation;
-            }
-            internal set
-            {
-                if (value != _currentOrientation)
-                {
-                    _currentOrientation = value;
-                    OnOrientationChanged();
-                }
-            }
+            get { return DisplayOrientation.LandscapeLeft; }
 		}
+
+        protected internal override void SetSupportedOrientations(DisplayOrientation orientations)
+        {
+            // Do nothing.  Desktop platforms don't do orientations.
+        }
 
         public override void BeginScreenDeviceChange(bool willBeFullScreen)
         {

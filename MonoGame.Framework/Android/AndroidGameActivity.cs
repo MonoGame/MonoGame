@@ -16,7 +16,7 @@ namespace Microsoft.Xna.Framework
 {
     public class AndroidGameActivity : Activity
     {
-        public Game Game { get; set; }
+        public static Game Game { get; set; }
 		
 		private OrientationListener o;		
 		
@@ -27,20 +27,46 @@ namespace Microsoft.Xna.Framework
 			if (o.CanDetectOrientation())
 			{
 				o.Enable();				
-			}						
-		}	
-				
+			}					
+
+            RequestWindowFeature(WindowFeatures.NoTitle);
+		}
+
+        public static event EventHandler Paused;
+
+		public override void OnConfigurationChanged (Android.Content.Res.Configuration newConfig)
+		{
+			// we need to refresh the viewport here.			
+			base.OnConfigurationChanged (newConfig);
+		}
+
         protected override void OnPause()
         {
             base.OnPause();
-            if (Game != null) Game.EnterBackground();
+            if (Paused != null)
+                Paused(this, EventArgs.Empty);
+            Game.GraphicsDevice.ResourcesLost = true;
+			if (Game.Window != null && Game.Window.Parent != null && (Game.Window.Parent is FrameLayout))
+			{				
+              ((FrameLayout)Game.Window.Parent).RemoveAllViews();
+			}
         }
 
+        public static event EventHandler Resumed;
         protected override void OnResume()
         {
             base.OnResume();
-            if (Game != null) Game.EnterForeground();
+            if (Resumed != null)
+                Resumed(this, EventArgs.Empty);
+
+            var deviceManager = (IGraphicsDeviceManager)Game.Services.GetService(typeof(IGraphicsDeviceManager));
+            if (deviceManager == null)
+                return;
+            (deviceManager as GraphicsDeviceManager).ForceSetFullScreen();
+            Game.Window.RequestFocus();
+            Game.GraphicsDevice.Initialize(Game.Platform);
         }
+
     }
 	
 	internal class OrientationListener : OrientationEventListener
@@ -82,12 +108,28 @@ namespace Microsoft.Xna.Framework
 						break;
 				}
 				
-				activity.Game.Window.SetOrientation(disporientation);
+				if (AndroidGameActivity.Game.Window.CurrentOrientation != disporientation)
+				{
+				AndroidGameActivity.Game.Window.SetOrientation(disporientation);
+				}
 				inprogress = false;
 			}
 			
 
 		}
 	}
-			
+	
+	public static class ActivityExtensions
+    {
+        public static ActivityAttribute GetActivityAttribute(this AndroidGameActivity obj)
+        {			
+            var attr = obj.GetType().GetCustomAttributes(typeof(ActivityAttribute), true);
+			if (attr != null)
+			{
+            	return ((ActivityAttribute)attr[0]);
+			}
+			return null;
+        }
+    }
+
 }

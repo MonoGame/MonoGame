@@ -62,7 +62,10 @@ namespace Microsoft.Xna.Framework.Graphics
 		DepthStencilState _depthStencilState; 
 		RasterizerState _rasterizerState;		
 		Effect _effect;		
-		Matrix _matrix;
+		Matrix _matrix = Matrix.Identity;
+#if ANDROID
+		DisplayOrientation lastDisplayOrientation = DisplayOrientation.Unknown;
+#endif
 		
 		Rectangle tempRect = new Rectangle(0,0,0,0);
 		Vector2 texCoordTL = new Vector2(0,0);
@@ -70,7 +73,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		//OpenGLES2 variables
 		int program;
-		Matrix4 matWVPScreen, matWVPFramebuffer, matProjection, matViewScreen, matViewFramebuffer, matWorld;
+		Matrix matWVPScreen, matWVPFramebuffer, matProjection, matViewScreen, matViewFramebuffer;
 		int uniformWVP, uniformTex;
 		
         public SpriteBatch ( GraphicsDevice graphicsDevice )
@@ -83,12 +86,14 @@ namespace Microsoft.Xna.Framework.Graphics
 			this.graphicsDevice = graphicsDevice;
 			
 			_batcher = new SpriteBatcher();
-#if ANDROID
-			if(GraphicsDevice.OpenGLESVersion == OpenTK.Graphics.GLContextVersion.Gles2_0)
-#else
+
+#if IPHONE
 			if(GraphicsDevice.OpenGLESVersion == MonoTouch.OpenGLES.EAGLRenderingAPI.OpenGLES2)
-#endif
 				InitGL20();
+#elif ANDROID
+            if (GraphicsDevice.OpenGLESVersion == OpenTK.Graphics.GLContextVersion.Gles2_0)
+                InitGL20();
+#endif
 		}
 		
 			/// <summary>
@@ -146,29 +151,14 @@ namespace Microsoft.Xna.Framework.Graphics
 	                if (length > 0) {
 	                    var log = new StringBuilder (length);
 	                    GL20.GetProgramInfoLog (program, length, ref length, log);
-	                    Console.WriteLine ("GL2" + log.ToString ());
+	                    Console.WriteLine ("GL2.0 error: " + log.ToString ());
 	                }
 	
 	                GL20.DeleteProgram (program);
 	                throw new InvalidOperationException ("Unable to link program");
 	            }
 	
-				matWorld = Matrix4.Identity;
-				matViewScreen = Matrix4.CreateRotationZ((float)Math.PI)*
-						Matrix4.CreateRotationY((float)Math.PI)*
-						Matrix4.CreateTranslation(-this.graphicsDevice.Viewport.Width/2,
-							this.graphicsDevice.Viewport.Height/2,
-							1);
-				matViewFramebuffer = Matrix4.CreateTranslation(-this.graphicsDevice.Viewport.Width/2,
-							-this.graphicsDevice.Viewport.Height/2,
-							1);
-				matProjection = Matrix4.CreateOrthographic(this.graphicsDevice.Viewport.Width,
-							this.graphicsDevice.Viewport.Height,
-							-1f,1f);
-				
-				matWVPScreen = matWorld * matViewScreen * matProjection;
-				matWVPFramebuffer = matWorld * matViewFramebuffer * matProjection;
-				
+			UpdateWorldMatrixOrientation();
 				GetUniformVariables();
 			
 			}
@@ -181,7 +171,8 @@ namespace Microsoft.Xna.Framework.Graphics
 	           int shader = GL20.CreateShader(type);
 	
 	           if ( shader == 0 )
-	                   throw new InvalidOperationException("Unable to create shader");
+	                   throw new InvalidOperationException(string.Format(
+					"Unable to create shader: {0}", GL20.GetError ()));
 	        
 	           // Load the shader source
 	           int length = 0;
@@ -215,11 +206,11 @@ namespace Microsoft.Xna.Framework.Graphics
 			uniformTex = GL20.GetUniformLocation(program, "sTexture");
 		}
 		
-		private void SetUniformMatrix4(int location, bool transpose, ref Matrix4 matrix)
+		private void SetUniformMatrix(int location, bool transpose, ref Matrix matrix)
 		{
 			unsafe
-			{
-				fixed (float* matrix_ptr = &matrix.Row0.X)
+			{				
+				fixed (float* matrix_ptr = &matrix.M11)
 				{
 					GL20.UniformMatrix4(location,1,transpose,matrix_ptr);
 				}
@@ -263,14 +254,20 @@ namespace Microsoft.Xna.Framework.Graphics
 		public void End()
 		{
 			// OpenGL ES Version 
-#if ANDROID
-			if(GraphicsDevice.OpenGLESVersion == OpenTK.Graphics.GLContextVersion.Gles2_0)
-#else
+#if IPHONE
 			if(GraphicsDevice.OpenGLESVersion == MonoTouch.OpenGLES.EAGLRenderingAPI.OpenGLES2)
-#endif
 				EndGL20();
 			else
 				EndGL11();
+#elif ANDROID
+            if (GraphicsDevice.OpenGLESVersion == OpenTK.Graphics.GLContextVersion.Gles2_0)
+                EndGL20();
+            else
+                EndGL11();
+#else
+            EndGL11();
+#endif
+
 		}
 		
 		private void EndGL20()
@@ -281,14 +278,14 @@ namespace Microsoft.Xna.Framework.Graphics
 			// set the blend mode
 			if ( _blendState == BlendState.NonPremultiplied )
 			{
-				GL20.BlendFunc(ALL20.One, ALL20.OneMinusSrcAlpha);
+				GL20.BlendFunc(ALL20.SrcAlpha, ALL20.OneMinusSrcAlpha);
 				GL20.Enable(ALL20.Blend);
 				GL20.BlendEquation(ALL20.FuncAdd);
 			}
 			
 			if ( _blendState == BlendState.AlphaBlend )
 			{
-				GL20.BlendFunc(ALL20.SrcAlpha, ALL20.OneMinusSrcAlpha);
+				GL20.BlendFunc(ALL20.One, ALL20.OneMinusSrcAlpha);
 				GL20.Enable(ALL20.Blend);
 				GL20.BlendEquation(ALL20.FuncAdd);
 			}
@@ -304,24 +301,47 @@ namespace Microsoft.Xna.Framework.Graphics
 			GL20.FrontFace(ALL20.Cw);
 			GL20.Enable(ALL20.CullFace);
 			
+			
+			UpdateWorldMatrixOrientation();
+			
 			// Configure ViewPort
-			GL20.Viewport(0, 0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height); 
+			var viewport = GraphicsDevice.Viewport;
+			GL20.Viewport(viewport.X, viewport.Y, viewport.Width, viewport.Height);
 			GL20.UseProgram(program);
 			
+            // Enable Scissor Tests if necessary
+            if (this.graphicsDevice.RasterizerState.ScissorTestEnable)
+            {
+                GL20.Enable(ALL20.ScissorTest);
+                GL20.Scissor(this.graphicsDevice.ScissorRectangle.X, this.graphicsDevice.ScissorRectangle.Y, this.graphicsDevice.ScissorRectangle.Width, this.graphicsDevice.ScissorRectangle.Height);
+            }
+                        
 			if (GraphicsDevice.DefaultFrameBuffer)
 			{
 				GL20.CullFace(ALL20.Back);
-				SetUniformMatrix4(uniformWVP, false, ref matWVPScreen);
+				SetUniformMatrix(uniformWVP, false, ref matWVPScreen);
 			}
 			else
 			{
 				GL20.CullFace(ALL20.Front);
-				SetUniformMatrix4(uniformWVP,false,ref matWVPFramebuffer);
-				GL20.ClearColor(0.0f,0.0f,0.0f,0.0f);
-				GL20.Clear((int) (ALL20.ColorBufferBit | ALL20.DepthBufferBit));
+				SetUniformMatrix(uniformWVP,false,ref matWVPFramebuffer);
+
+				// FIXME: Why clear the framebuffer during End?
+				//        Doing so makes it so that only the
+				//        final Begin/End pair in a frame can
+				//        ever be shown.  Is that desirable?
+				//GL20.ClearColor(0.0f,0.0f,0.0f,0.0f);
+				//GL20.Clear((int) (ALL20.ColorBufferBit | ALL20.DepthBufferBit));
 			}
 
 			_batcher.DrawBatchGL20 ( _sortMode );
+
+            if (this.graphicsDevice.RasterizerState.ScissorTestEnable)
+            {
+                GL20.Disable(ALL20.ScissorTest);
+            }
+
+            GL20.Disable(ALL20.Texture2D);
 		}
 		
 		public void EndGL11()
@@ -373,34 +393,8 @@ namespace Microsoft.Xna.Framework.Graphics
 				}
 			}					
 #else			
-			switch (this.graphicsDevice.PresentationParameters.DisplayOrientation)
-	        {
-				case DisplayOrientation.LandscapeLeft:
-                {
-					GL11.Rotate(-90, 0, 0, 1);
-					break;
-				}
-				
-				case DisplayOrientation.LandscapeRight:
-                {
-					GL11.Rotate(90, 0, 0, 1);					
-					break;
-				}
-				
-				case DisplayOrientation.PortraitUpsideDown:
-                {
-					GL11.Rotate(180, 0, 0, 1); 
-					break;
-				}
-				
-				default:
-				{
-					break;
-				}
-			}
-			
 			GL11.Ortho(0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height, 0, -1, 1);
-#endif			
+#endif		
 			
 			// Enable Scissor Tests if necessary
 			if ( this.graphicsDevice.RasterizerState.ScissorTestEnable )
@@ -410,20 +404,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			
 			GL11.MatrixMode(ALL11.Modelview);			
-			
-#if !ANDROID			
-			// Only swap our viewport if Width is greater than height
-			if ((this.graphicsDevice.Viewport.Width > this.graphicsDevice.Viewport.Height)
-				&& ((this.graphicsDevice.PresentationParameters.DisplayOrientation == DisplayOrientation.LandscapeLeft )
-				|| (this.graphicsDevice.PresentationParameters.DisplayOrientation == DisplayOrientation.LandscapeRight ) ) )
-			{
-				GL11.Viewport(0, 0, this.graphicsDevice.Viewport.Height, this.graphicsDevice.Viewport.Width);
-			}
-			else
-#endif								
-			{
-				GL11.Viewport(0, 0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height);
-			}
+
+			var viewport = GraphicsDevice.Viewport;
+			GL11.Viewport(viewport.X, viewport.Y, viewport.Width, viewport.Height);
 			
 			// Enable Scissor Tests if necessary
 			if ( this.graphicsDevice.RasterizerState.ScissorTestEnable )
@@ -435,7 +418,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			// Initialize OpenGL states (ideally move this to initialize somewhere else)	
 			GL11.Disable(ALL11.DepthTest);
-			GL11.TexEnv(ALL11.TextureEnv, ALL11.TextureEnvMode,(int) ALL11.BlendSrc);
+			GL11.TexEnv(ALL11.TextureEnv, ALL11.TextureEnvMode,(int) ALL11.SrcAlpha);
 			GL11.Enable(ALL11.Texture2D);
 			GL11.EnableClientState(ALL11.VertexArray);
 			GL11.EnableClientState(ALL11.ColorArray);
@@ -454,6 +437,111 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 		}
 		
+#if ANDROID
+		private void UpdateWorldMatrixOrientation()
+		{
+			// Configure Display Orientation:
+			if(lastDisplayOrientation != graphicsDevice.PresentationParameters.DisplayOrientation)
+			{
+				bool update = true;
+				// check the display width and height make sure it matches the target orientation
+				// before updating the matrix
+				if (graphicsDevice.PresentationParameters.DisplayOrientation == DisplayOrientation.Portrait)
+				{
+				   if (graphicsDevice.DisplayMode.Width > graphicsDevice.DisplayMode.Height) update = false;	
+				}
+				else
+				{
+					if (graphicsDevice.DisplayMode.Width < graphicsDevice.DisplayMode.Height) update = false;
+				}
+				if (update)
+				{
+					// updates last display orientation (optimization)				
+					lastDisplayOrientation = graphicsDevice.PresentationParameters.DisplayOrientation;
+	
+	                var deviceManager = (IGraphicsDeviceManager)Game.Instance.Services.GetService(typeof(IGraphicsDeviceManager));
+	                if (deviceManager == null)
+	                    return;
+	
+	                (deviceManager as GraphicsDeviceManager).ResetClientBounds();
+	
+					// make sure the viewport is correct
+					this.graphicsDevice.SetViewPort(Game.Instance.Window.ClientBounds.Width, Game.Instance.Window.ClientBounds.Height);
+						
+					/*
+					AndroidGameActivity.Game.Log("--------------- Start Change -----------");
+					AndroidGameActivity.Game.Log(String.Format("DisplayMode = {0}", this.graphicsDevice.DisplayMode.ToString()));
+					AndroidGameActivity.Game.Log(String.Format("Orientation = {0}", this.graphicsDevice.PresentationParameters.DisplayOrientation.ToString()));
+					AndroidGameActivity.Game.Log(String.Format("ViewPort = {0}", this.graphicsDevice.Viewport.ToString()));
+					AndroidGameActivity.Game.Log(String.Format("ViewScreen = {0}", matViewScreen.ToString()));
+					AndroidGameActivity.Game.Log(String.Format("Projection = {0}", matProjection.ToString()));
+					AndroidGameActivity.Game.Log(String.Format("ViewFramebuffer = {0}", matViewFramebuffer.ToString()));
+					AndroidGameActivity.Game.Log("--------------- End Change -------------");
+					*/
+				}
+			}
+			
+			if (!GraphicsDevice.DefaultFrameBuffer)
+			{
+				matProjection = Matrix.CreateOrthographic(this.graphicsDevice.Viewport.Width,
+							this.graphicsDevice.Viewport.Height,
+							-1f,1f);
+				// we are using a render target so update
+				matViewFramebuffer = Matrix.CreateTranslation(-this.graphicsDevice.Viewport.Width/2,
+							-this.graphicsDevice.Viewport.Height/2,
+							1);	
+				
+				matWVPFramebuffer = _matrix * matViewFramebuffer *  matProjection;
+			}
+			else
+			{
+					matViewScreen = Matrix.CreateRotationZ((float)Math.PI)*
+								     	Matrix.CreateRotationY((float)Math.PI)*
+										Matrix.CreateTranslation(-this.graphicsDevice.Viewport.Width/2,
+										this.graphicsDevice.Viewport.Height/2,
+										1);
+					matProjection = Matrix.CreateOrthographic(this.graphicsDevice.Viewport.Width,
+								this.graphicsDevice.Viewport.Height,
+								-1f,1f);
+					if (graphicsDevice.PresentationParameters.DisplayOrientation == DisplayOrientation.LandscapeRight)
+					{
+						// flip the viewport	
+						matProjection = Matrix.CreateOrthographic(-this.graphicsDevice.Viewport.Width,
+								-this.graphicsDevice.Viewport.Height,
+								-1f,1f);
+					}
+						
+					matWVPScreen = _matrix * matViewScreen * matProjection;								    
+			}
+			
+			
+		}
+#else		
+		private void UpdateWorldMatrixOrientation()
+		{
+			// TODO: It may be desirable to do a last display
+			//       orientation here like Android does, to
+			//       avoid calculating these matrices again
+			//       and again.
+			var viewport = graphicsDevice.Viewport;
+			matViewScreen =
+				Matrix.CreateRotationZ((float)Math.PI) *
+				Matrix.CreateRotationY((float)Math.PI) *
+				Matrix.CreateTranslation(-viewport.Width / 2, viewport.Height / 2, 1);
+
+			matViewFramebuffer = Matrix.CreateTranslation(-viewport.Width / 2, -viewport.Height/2, 1);
+
+			matProjection = Matrix.CreateOrthographic(viewport.Width, viewport.Height, -1f, 1f);
+
+			// FIXME: It is a significant weakness to have separate
+			//        matrices for the screen and framebuffer.  It
+			//        means that visual unit tests can't
+			//        necessarily be trusted.  Screens are just
+			//        another kind of framebuffer.
+			matWVPScreen = _matrix * matViewScreen * matProjection;
+			matWVPFramebuffer = _matrix * matViewFramebuffer * matProjection;
+		}
+#endif		
 		public void Draw 
 			( 
 			 Texture2D texture,
@@ -495,10 +583,12 @@ namespace Microsoft.Xna.Framework.Graphics
 				// We are initially flipped vertically so we need to flip the corners so that
 				//  the image is bottom side up to display correctly
 				texCoordTL.X = tempRect.X*texWidthRatio;
-				texCoordTL.Y = (tempRect.Y+tempRect.Height) * texHeightRatio;
+				//texCoordTL.Y = (tempRect.Y + tempRect.Height) * texHeightRatio;
+				texCoordTL.Y = 1.0f - tempRect.Y * texHeightRatio;
 				
 				texCoordBR.X = (tempRect.X+tempRect.Width)*texWidthRatio;
-				texCoordBR.Y = tempRect.Y*texHeightRatio;
+				//texCoordBR.Y = tempRect.Y * texHeightRatio;
+				texCoordBR.Y = 1.0f - ( tempRect.Y+tempRect.Height )*texHeightRatio;
 				
 			}
 			else {
@@ -578,10 +668,12 @@ namespace Microsoft.Xna.Framework.Graphics
 				// We are initially flipped vertically so we need to flip the corners so that
 				//  the image is bottom side up to display correctly
 				texCoordTL.X = tempRect.X*texWidthRatio;
-				texCoordTL.Y = (tempRect.Y+tempRect.Height) * texHeightRatio;
+				//texCoordTL.Y = (tempRect.Y + tempRect.Height) * texHeightRatio;
+				texCoordTL.Y = 1.0f - tempRect.Y * texHeightRatio;
 				
 				texCoordBR.X = (tempRect.X+tempRect.Width)*texWidthRatio;
-				texCoordBR.Y = tempRect.Y*texHeightRatio;
+				//texCoordBR.Y = tempRect.Y * texHeightRatio;
+				texCoordBR.Y = 1.0f - ( tempRect.Y+tempRect.Height )*texHeightRatio;
 				
 			}
 			else {
@@ -658,10 +750,12 @@ namespace Microsoft.Xna.Framework.Graphics
 				// We are initially flipped vertically so we need to flip the corners so that
 				//  the image is bottom side up to display correctly
 				texCoordTL.X = tempRect.X*texWidthRatio;
-				texCoordTL.Y = (tempRect.Y+tempRect.Height) * texHeightRatio;
+				//texCoordTL.Y = (tempRect.Y + tempRect.Height) * texHeightRatio;
+				texCoordTL.Y = 1.0f - tempRect.Y * texHeightRatio;
 				
 				texCoordBR.X = (tempRect.X+tempRect.Width)*texWidthRatio;
-				texCoordBR.Y = tempRect.Y*texHeightRatio;
+				//texCoordBR.Y = tempRect.Y * texHeightRatio;
+				texCoordBR.Y = 1.0f - ( tempRect.Y+tempRect.Height )*texHeightRatio;
 				
 			}
 			else {
@@ -688,8 +782,8 @@ namespace Microsoft.Xna.Framework.Graphics
 				( 
 				 destinationRectangle.X, 
 				 destinationRectangle.Y, 
-				 -origin.X, 
-				 -origin.Y, 
+				 -origin.X * ((float)destinationRectangle.Width  / (float)tempRect.Width),  //JEPJ
+		         -origin.Y * ((float)destinationRectangle.Height / (float)tempRect.Height), //JEPJ 
 				 destinationRectangle.Width,
 				 destinationRectangle.Height,
 				 (float)Math.Sin(rotation),
@@ -731,10 +825,12 @@ namespace Microsoft.Xna.Framework.Graphics
 				// We are initially flipped vertically so we need to flip the corners so that
 				//  the image is bottom side up to display correctly
 				texCoordTL.X = tempRect.X*texWidthRatio;
-				texCoordTL.Y = (tempRect.Y+tempRect.Height) * texHeightRatio;
+				//texCoordTL.Y = (tempRect.Y + tempRect.Height) * texHeightRatio;
+				texCoordTL.Y = 1.0f - tempRect.Y * texHeightRatio;
 				
 				texCoordBR.X = (tempRect.X+tempRect.Width)*texWidthRatio;
-				texCoordBR.Y = tempRect.Y*texHeightRatio;
+				//texCoordBR.Y = tempRect.Y * texHeightRatio;
+				texCoordBR.Y = 1.0f - ( tempRect.Y+tempRect.Height )*texHeightRatio;
 				
 			}
 			else {
@@ -777,10 +873,12 @@ namespace Microsoft.Xna.Framework.Graphics
 				// We are initially flipped vertically so we need to flip the corners so that
 				//  the image is bottom side up to display correctly
 				texCoordTL.X = tempRect.X*texWidthRatio;
-				texCoordTL.Y = (tempRect.Y+tempRect.Height) * texHeightRatio;
+				//texCoordTL.Y = (tempRect.Y + tempRect.Height) * texHeightRatio;
+				texCoordTL.Y = 1.0f - tempRect.Y * texHeightRatio;
 				
 				texCoordBR.X = (tempRect.X+tempRect.Width)*texWidthRatio;
-				texCoordBR.Y = tempRect.Y*texHeightRatio;
+				//texCoordBR.Y = tempRect.Y * texHeightRatio;
+				texCoordBR.Y = 1.0f - ( tempRect.Y+tempRect.Height )*texHeightRatio;
 				
 			}
 			else {
@@ -829,10 +927,12 @@ namespace Microsoft.Xna.Framework.Graphics
 				// We are initially flipped vertically so we need to flip the corners so that
 				//  the image is bottom side up to display correctly
 				texCoordTL.X = tempRect.X*texWidthRatio;
-				texCoordTL.Y = (tempRect.Y+tempRect.Height) * texHeightRatio;
+				//texCoordTL.Y = (tempRect.Y + tempRect.Height) * texHeightRatio;
+				texCoordTL.Y = 1.0f - tempRect.Y * texHeightRatio;
 				
 				texCoordBR.X = (tempRect.X+tempRect.Width)*texWidthRatio;
-				texCoordBR.Y = tempRect.Y*texHeightRatio;
+				//texCoordBR.Y = tempRect.Y * texHeightRatio;
+				texCoordBR.Y = 1.0f - ( tempRect.Y+tempRect.Height )*texHeightRatio;
 				
 			}
 			else {
@@ -877,10 +977,12 @@ namespace Microsoft.Xna.Framework.Graphics
 				// We are initially flipped vertically so we need to flip the corners so that
 				//  the image is bottom side up to display correctly
 				texCoordTL.X = tempRect.X*texWidthRatio;
-				texCoordTL.Y = (tempRect.Y+tempRect.Height) * texHeightRatio;
+				//texCoordTL.Y = (tempRect.Y + tempRect.Height) * texHeightRatio;
+				texCoordTL.Y = 1.0f - tempRect.Y * texHeightRatio;
 				
 				texCoordBR.X = (tempRect.X+tempRect.Width)*texWidthRatio;
-				texCoordBR.Y = tempRect.Y*texHeightRatio;
+				//texCoordBR.Y = tempRect.Y * texHeightRatio;
+				texCoordBR.Y = 1.0f - ( tempRect.Y+tempRect.Height )*texHeightRatio;
 				
 			}
 			else {
@@ -901,243 +1003,65 @@ namespace Microsoft.Xna.Framework.Graphics
 				 texCoordBR
 			    );
 		}
-		
-		
-		public void DrawString(SpriteFont spriteFont, string text, Vector2 position, Color color)
+
+		public void DrawString (SpriteFont spriteFont, string text, Vector2 position, Color color)
 		{
-			if (spriteFont == null )
-			{
-				throw new ArgumentException("spriteFont");
-			}
-			
-			Vector2 p = position;
-			
-            foreach (char c in text)
-            {
-                if (c == '\n')
-                {
-                    p.Y += spriteFont.LineSpacing;
-                    p.X = position.X;
-                    continue;
-                }
-                if (spriteFont.characterData.ContainsKey(c) == false) 
-					continue;
-                GlyphData g = spriteFont.characterData[c];
-				
-				SpriteBatchItem item = _batcher.CreateBatchItem();
-				
-				item.Depth = 0.0f;
-				item.TextureID = (int) spriteFont._texture.ID;
+			if (spriteFont == null)
+				throw new ArgumentNullException ("spriteFont");
 
-				texCoordTL.X = spriteFont._texture.Image.GetTextureCoordX( g.Glyph.X );
-				texCoordTL.Y = spriteFont._texture.Image.GetTextureCoordY( g.Glyph.Y );
-				texCoordBR.X = spriteFont._texture.Image.GetTextureCoordX( g.Glyph.X+g.Glyph.Width );
-				texCoordBR.Y = spriteFont._texture.Image.GetTextureCoordY( g.Glyph.Y+g.Glyph.Height );
-
-				item.Set
-					(
-					 p.X,
-					 p.Y+g.Cropping.Y,
-					 g.Glyph.Width,
-					 g.Glyph.Height,
-					 color,
-					 texCoordTL,
-					 texCoordBR
-					 );
-		                
-				p.X += (g.Kerning.Y + g.Kerning.Z + spriteFont.Spacing);
-            }			
+			spriteFont.DrawInto (
+				this, text, position, color, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0f);
 		}
-		
-		public void DrawString
-			(
-			SpriteFont spriteFont, 
-			string text, 
-			Vector2 position,
-			Color color,
-			float rotation,
-			Vector2 origin,
-			float scale,
-			SpriteEffects effects,
-			float depth
-			)
+
+		public void DrawString (
+			SpriteFont spriteFont, string text, Vector2 position, Color color,
+			float rotation, Vector2 origin, float scale, SpriteEffects effects, float depth)
 		{
-			if (spriteFont == null )
-			{
-				throw new ArgumentException("spriteFont");
-			}
-			
-			Vector2 p = new Vector2(-origin.X,-origin.Y);
-			
-			float sin = (float)Math.Sin(rotation);
-			float cos = (float)Math.Cos(rotation);
-			
-            foreach (char c in text)
-            {
-                if (c == '\n')
-                {
-                    p.Y += spriteFont.LineSpacing;
-                    p.X = -origin.X;
-                    continue;
-                }
-                if (spriteFont.characterData.ContainsKey(c) == false) 
-					continue;
-                GlyphData g = spriteFont.characterData[c];
-				
-				SpriteBatchItem item = _batcher.CreateBatchItem();
-				
-				item.Depth = depth;
-				item.TextureID = (int) spriteFont._texture.ID;
+			if (spriteFont == null)
+				throw new ArgumentNullException ("spriteFont");
 
-				texCoordTL.X = spriteFont._texture.Image.GetTextureCoordX( g.Glyph.X );
-				texCoordTL.Y = spriteFont._texture.Image.GetTextureCoordY( g.Glyph.Y );
-				texCoordBR.X = spriteFont._texture.Image.GetTextureCoordX( g.Glyph.X+g.Glyph.Width );
-				texCoordBR.Y = spriteFont._texture.Image.GetTextureCoordY( g.Glyph.Y+g.Glyph.Height );
-				
-				if ( effects == SpriteEffects.FlipVertically )
-				{
-					float temp = texCoordBR.Y;
-					texCoordBR.Y = texCoordTL.Y;
-					texCoordTL.Y = temp;
-				}
-				else if ( effects == SpriteEffects.FlipHorizontally )
-				{
-					float temp = texCoordBR.X;
-					texCoordBR.X = texCoordTL.X;
-					texCoordTL.X = temp;
-				}
-				
-				item.Set
-					(
-					 position.X,
-					 position.Y,
-					 p.X*scale,
-					 (p.Y+g.Cropping.Y)*scale,
-					 g.Glyph.Width*scale,
-					 g.Glyph.Height*scale,
-					 sin,
-					 cos,
-					 color,
-					 texCoordTL,
-					 texCoordBR
-					 );
-
-				p.X += (g.Kerning.Y + g.Kerning.Z + spriteFont.Spacing);
-            }			
+			var scaleVec = new Vector2 (scale, scale);
+			spriteFont.DrawInto (this, text, position, color, rotation, origin, scaleVec, effects, depth);
 		}
-		
-		public void DrawString
-			(
-			SpriteFont spriteFont, 
-			string text, 
-			Vector2 position,
-			Color color,
-			float rotation,
-			Vector2 origin,
-			Vector2 scale,
-			SpriteEffects effects,
-			float depth
-			)
-		{			
-			if (spriteFont == null )
-			{
-				throw new ArgumentException("spriteFont");
-			}
-			
-			Vector2 p = new Vector2(-origin.X,-origin.Y);
-			
-			float sin = (float)Math.Sin(rotation);
-			float cos = (float)Math.Cos(rotation);
-			
-            foreach (char c in text)
-            {
-                if (c == '\n')
-                {
-                    p.Y += spriteFont.LineSpacing;
-                    p.X = -origin.X;
-                    continue;
-                }
-                if (spriteFont.characterData.ContainsKey(c) == false) 
-					continue;
-                GlyphData g = spriteFont.characterData[c];
-				
-				SpriteBatchItem item = _batcher.CreateBatchItem();
-				
-				item.Depth = depth;
-				item.TextureID = (int) spriteFont._texture.ID;
 
-				texCoordTL.X = spriteFont._texture.Image.GetTextureCoordX( g.Glyph.X );
-				texCoordTL.Y = spriteFont._texture.Image.GetTextureCoordY( g.Glyph.Y );
-				texCoordBR.X = spriteFont._texture.Image.GetTextureCoordX( g.Glyph.X+g.Glyph.Width );
-				texCoordBR.Y = spriteFont._texture.Image.GetTextureCoordY( g.Glyph.Y+g.Glyph.Height );
-				
-				if ( effects == SpriteEffects.FlipVertically )
-				{
-					float temp = texCoordBR.Y;
-					texCoordBR.Y = texCoordTL.Y;
-					texCoordTL.Y = temp;
-				}
-				else if ( effects == SpriteEffects.FlipHorizontally )
-				{
-					float temp = texCoordBR.X;
-					texCoordBR.X = texCoordTL.X;
-					texCoordTL.X = temp;
-				}
-				
-				item.Set
-					(
-					 position.X,
-					 position.Y,
-					 p.X*scale.X,
-					 (p.Y+g.Cropping.Y)*scale.Y,
-					 g.Glyph.Width*scale.X,
-					 g.Glyph.Height*scale.Y,
-					 sin,
-					 cos,
-					 color,
-					 texCoordTL,
-					 texCoordBR
-					 );
-
-				p.X += (g.Kerning.Y + g.Kerning.Z + spriteFont.Spacing);
-            }			
-		}
-		
-		public void DrawString(SpriteFont spriteFont, StringBuilder text, Vector2 position, Color color)
+		public void DrawString (
+			SpriteFont spriteFont, string text, Vector2 position, Color color,
+			float rotation, Vector2 origin, Vector2 scale, SpriteEffects effect, float depth)
 		{
-			DrawString ( spriteFont, text.ToString(), position, color );
+			if (spriteFont == null)
+				throw new ArgumentNullException ("spriteFont");
+
+			spriteFont.DrawInto (this, text, position, color, rotation, origin, scale, effect, depth);
 		}
-		
-		public void DrawString
-			(
-			SpriteFont spriteFont, 
-			StringBuilder text, 
-			Vector2 position,
-			Color color,
-			float rotation,
-			Vector2 origin,
-			float scale,
-			SpriteEffects effects,
-			float depth
-			)
+
+		public void DrawString (SpriteFont spriteFont, StringBuilder text, Vector2 position, Color color)
 		{
-			DrawString ( spriteFont, text.ToString(), position, color, rotation, origin, scale, effects, depth );
+			if (spriteFont == null)
+				throw new ArgumentNullException ("spriteFont");
+
+			spriteFont.DrawInto (
+				this, text, position, color, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0f);
 		}
-		
-		public void DrawString
-			(
-			SpriteFont spriteFont, 
-			StringBuilder text, 
-			Vector2 position,
-			Color color,
-			float rotation,
-			Vector2 origin,
-			Vector2 scale,
-			SpriteEffects effects,
-			float depth
-			)
+
+		public void DrawString (
+			SpriteFont spriteFont, StringBuilder text, Vector2 position, Color color,
+			float rotation, Vector2 origin, float scale, SpriteEffects effects, float depth)
 		{
-			DrawString ( spriteFont, text.ToString(), position, color, rotation, origin, scale, effects, depth );
+			if (spriteFont == null)
+				throw new ArgumentNullException ("spriteFont");
+
+			var scaleVec = new Vector2 (scale, scale);
+			spriteFont.DrawInto (this, text, position, color, rotation, origin, scaleVec, effects, depth);
+		}
+
+		public void DrawString (
+			SpriteFont spriteFont, StringBuilder text, Vector2 position, Color color,
+			float rotation, Vector2 origin, Vector2 scale, SpriteEffects effect, float depth)
+		{
+			if (spriteFont == null)
+				throw new ArgumentNullException ("spriteFont");
+
+			spriteFont.DrawInto (this, text, position, color, rotation, origin, scale, effect, depth);
 		}
 	}
 }

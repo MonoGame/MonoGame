@@ -17,13 +17,14 @@
     <MandroidI18n />
     <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>
     <AndroidApplication>True</AndroidApplication>
+    <DeployExternal>False</DeployExternal>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;ANDROID</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;ANDROID;GLES</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -34,7 +35,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE;ANDROID</DefineConstants>
+    <DefineConstants>TRACE;ANDROID;GLES</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AndroidUseSharedRuntime>false</AndroidUseSharedRuntime>
@@ -51,7 +52,30 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Android\AndroidCompatibility.cs" />
+    <Compile Include="Android\AndroidGamePlatform.cs" />
+    <Compile Include="Android\Input\Mouse.cs" />
     <Compile Include="Content\ContentManager.cs" />
+    <Compile Include="Content\ContentReaders\ArrayReader.cs" />
+    <Compile Include="Content\ContentReaders\BoundingFrustumReader.cs" />
+    <Compile Include="Content\ContentReaders\BoundingSphereReader.cs" />
+    <Compile Include="Content\ContentReaders\ByteReader.cs" />
+    <Compile Include="Content\ContentReaders\DateTimeReader.cs" />
+    <Compile Include="Content\ContentReaders\DecimalReader.cs" />
+    <Compile Include="Content\ContentReaders\NullableReader.cs" />
+    <Compile Include="Content\ContentReaders\PlaneReader.cs" />
+    <Compile Include="Content\ContentReaders\PointReader.cs" />
+    <Compile Include="Content\ContentReaders\QuaternionReader.cs" />
+    <Compile Include="Content\ContentReaders\RayReader.cs" />
+    <Compile Include="Content\ContentReaders\SByteReader.cs" />
+    <Compile Include="Content\ContentReaders\UInt16Reader.cs" />
+    <Compile Include="Content\ContentReaders\UInt32Reader.cs" />
+    <Compile Include="Content\ContentReaders\UInt64Reader.cs" />
+    <Compile Include="Content\ContentReaders\Vector2Reader.cs" />
+    <Compile Include="Content\ContentReaders\Vector4Reader.cs" />
+    <Compile Include="Game.cs" />
+    <Compile Include="GamePlatform.cs" />
+    <Compile Include="PrimaryThreadLoader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Android\AndroidGameActivity.cs" />
     <Compile Include="Audio\AudioChannels.cs" />
@@ -84,6 +108,8 @@
     <Compile Include="Graphics\Vertices\IVertexType.cs" />
     <Compile Include="Graphics\Vertices\PrimitiveType.cs" />
     <Compile Include="Graphics\Vertices\VertexBuffer.cs" />
+    <Compile Include="Graphics\Vertices\DynamicIndexBuffer.cs" />
+    <Compile Include="Graphics\Vertices\DynamicVertexBuffer.cs" />
     <Compile Include="Graphics\Vertices\VertexColorTexture.cs" />
     <Compile Include="Graphics\Vertices\VertexDeclaration.cs" />
     <Compile Include="Graphics\Vertices\VertexElement.cs" />
@@ -131,7 +157,6 @@
     <Compile Include="CurveTangent.cs" />
     <Compile Include="DisplayOrientation.cs" />
     <Compile Include="DrawableGameComponent.cs" />
-    <Compile Include="Android\Game.cs" />
     <Compile Include="GameComponent.cs" />
     <Compile Include="GameComponentCollection.cs" />
     <Compile Include="GameComponentCollectionEventArgs.cs" />
@@ -156,7 +181,6 @@
     <Compile Include="Android\Input\Keyboard.cs" />
     <Compile Include="Input\Keys.cs" />
     <Compile Include="Input\KeyState.cs" />
-    <Compile Include="Input\Mouse.cs" />
     <Compile Include="Input\MouseState.cs" />
     <Compile Include="Input\ThumbStickDefinition.cs" />
     <Compile Include="IUpdateable.cs" />
@@ -167,7 +191,6 @@
     <Compile Include="Media\MediaState.cs" />
     <Compile Include="Media\Playlist.cs" />
     <Compile Include="Media\PlaylistCollection.cs" />
-    <Compile Include="Media\Song.cs" />
     <Compile Include="Media\SongCollection.cs" />
     <Compile Include="PerformanceCounter.cs" />
     <Compile Include="Plane.cs" />
@@ -326,6 +349,22 @@
     <Compile Include="Audio\XactClip.cs" />
     <Compile Include="Android\Input\Touch\GestureListener.cs" />
     <Compile Include="Audio\XactSound.cs" />
+    <Compile Include="Android\Media\Song.cs" />
+    <Compile Include="Audio\NoAudioHardwareException.cs" />
+    <Compile Include="Android\GamerServices\MonoGameGamerServicesHelper.cs" />
+    <Compile Include="Audio\InstancePlayLimitException.cs" />
+    <Compile Include="Graphics\Vertices\IndexElementSize.cs" />
+    <Compile Include="LaunchParameters.cs" />
+    <Compile Include="Content\ContentReaders\BasicEffectReader.cs" />
+    <Compile Include="Content\ContentReaders\BoundingBoxReader.cs" />
+    <Compile Include="Content\ContentReaders\IndexBufferReader.cs" />
+    <Compile Include="Content\ContentReaders\MatrixReader.cs" />
+    <Compile Include="Content\ContentReaders\VertexBufferReader.cs" />
+    <Compile Include="Content\ContentReaders\AlphaTestEffectReader.cs" />
+    <Compile Include="Graphics\Effect\AlphaTestEffect.cs" />
+    <Compile Include="Graphics\Effect\AlphaTestEffectCode.cs" />
+    <Compile Include="Graphics\Effect\EffectHelpers.cs" />
+    <Compile Include="XnaToOpenTK.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
@@ -345,7 +384,5 @@
   <ItemGroup>
     <None Include="Properties\AndroidManifest.xml" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Android\Input\Touch\" />
-  </ItemGroup>
+  <ItemGroup />
 </Project>

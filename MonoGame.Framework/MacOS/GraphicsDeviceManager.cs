@@ -1,4 +1,4 @@
-#region License
+﻿#region License
 /*
 Microsoft Public License (Ms-PL)
 MonoGame - Copyright © 2009 The MonoGame Team
@@ -54,6 +54,7 @@ namespace Microsoft.Xna.Framework
 		private bool _preferMultiSampling;
 		private DisplayOrientation _supportedOrientations;
 		private bool wantFullScreen = false;
+		private bool synchronizedWithVerticalRefresh = true;
 
 		public GraphicsDeviceManager (Game game)
 		{
@@ -103,34 +104,42 @@ namespace Microsoft.Xna.Framework
 		public event EventHandler<EventArgs> DeviceReset;
 		public event EventHandler<EventArgs> DeviceResetting;
 		public event EventHandler<PreparingDeviceSettingsEventArgs> PreparingDeviceSettings;
-		
+
+        // FIXME: Why does the GraphicsDeviceManager not know enough about the
+        //        GraphicsDevice to raise these events without help?
 		internal void OnDeviceDisposing (EventArgs e)
 		{
-			var h = DeviceDisposing;
-			if (h != null)
-				h (this, e);
+            Raise(DeviceDisposing, e);
 		}
-		
+
+        // FIXME: Why does the GraphicsDeviceManager not know enough about the
+        //        GraphicsDevice to raise these events without help?
 		internal void OnDeviceResetting (EventArgs e)
 		{
-			var h = DeviceResetting;
-			if (h != null)
-				h (this, e);
+            Raise(DeviceResetting, e);
 		}
 
+        // FIXME: Why does the GraphicsDeviceManager not know enough about the
+        //        GraphicsDevice to raise these events without help?
 		internal void OnDeviceReset (EventArgs e)
 		{
-			var h = DeviceReset;
-			if (h != null)
-				h (this, e);
+            Raise(DeviceReset, e);
 		}
 
+        // FIXME: Why does the GraphicsDeviceManager not know enough about the
+        //        GraphicsDevice to raise these events without help?
 		internal void OnDeviceCreated (EventArgs e)
 		{
-			var h = DeviceCreated;
-			if (h != null)
-				h (this, e);
+            Raise(DeviceCreated, e);
 		}
+
+
+        private void Raise<TEventArgs>(EventHandler<TEventArgs> handler, TEventArgs e)
+            where TEventArgs : EventArgs
+        {
+            if (handler != null)
+                handler(this, e);
+        }
 		
 		#endregion
 		
@@ -192,20 +201,8 @@ namespace Microsoft.Xna.Framework
 			}
 			set {
 				wantFullScreen = value;
-				if (_graphicsDevice != null) {
-					
-					bool wasFullScreen = _graphicsDevice.PresentationParameters.IsFullScreen;
-
-					PresentationParameters presParams = _graphicsDevice.PresentationParameters;
-					presParams.IsFullScreen = value;
-					_graphicsDevice.PresentationParameters = presParams;
-
-					if (value && !wasFullScreen) {
-						_game.GoFullScreen();
-					} else if (!value && wasFullScreen) {
-						_game.GoWindowed();
-					}
-				}
+                if (_graphicsDevice != null)
+                    ApplyChanges();
 			}
 		}
 
@@ -261,9 +258,10 @@ namespace Microsoft.Xna.Framework
 
 		public bool SynchronizeWithVerticalRetrace {
 			get {
-				throw new NotImplementedException ();
+				return synchronizedWithVerticalRefresh;
 			}
 			set {
+				synchronizedWithVerticalRefresh = value;
 			}
 		}
 
@@ -275,6 +273,12 @@ namespace Microsoft.Xna.Framework
 				_supportedOrientations = value;
 			}
 		}
+		
+		
+        internal void ResetClientBounds()
+        {
+            // do nothing for now
+        }
 
 	}
 }

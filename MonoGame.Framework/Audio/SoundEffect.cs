@@ -39,6 +39,7 @@ purpose and non-infringement.
 #endregion License
 ﻿
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 using Microsoft.Xna;
@@ -53,6 +54,13 @@ namespace Microsoft.Xna.Framework.Audio
 		private string _name = "";
 		private string _filename = "";
 		private byte[] _data;
+        private SoundEffectInstance _instance;
+		
+		internal float Rate { get; set; }
+
+		//internal ALFormat Format { get; set; }
+
+		internal int Size { get; set; }
 		
 		internal SoundEffect(string fileName)
 		{
@@ -118,12 +126,13 @@ namespace Microsoft.Xna.Framework.Audio
         {
 			if ( MasterVolume > 0.0f )
 			{
-				SoundEffectInstance instance = CreateInstance();
-				instance.Volume = volume;
-				instance.Pitch = pitch;
-				instance.Pan = pan;
-				instance.Play();
-				return instance.Sound.Playing;
+                if(_instance == null)
+				    _instance = CreateInstance();
+				_instance.Volume = volume;
+				_instance.Pitch = pitch;
+				_instance.Pan = pan;
+				_instance.Play();
+				return _instance.Sound.Playing;
 			}
 			return false;
         }
@@ -182,7 +191,48 @@ namespace Microsoft.Xna.Framework.Audio
 				_masterVolume = value;	
 			}
 		}
-				
+
+		static float _distanceScale = 1f;
+
+		public static float DistanceScale {
+			get {
+				return _distanceScale;
+			}
+			set {
+				if (value <= 0f) {
+					throw new ArgumentOutOfRangeException ("value of DistanceScale");
+				}
+				_distanceScale = value;
+			}
+		}
+
+		static float _dopplerScale = 1f;
+
+		public static float DopplerScale {
+			get {
+				return _dopplerScale;
+			}
+			set {
+				// As per documenation it does not look like the value can be less than 0
+				//   although the documentation does not say it throws an error we will anyway
+				//   just so it is like the DistanceScale
+				if (value < 0f) {
+					throw new ArgumentOutOfRangeException ("value of DopplerScale");
+				}
+				_dopplerScale = value;
+			}
+		}
+
+		static float speedOfSound = 343.5f;
+
+		public static float SpeedOfSound {
+			get {
+				return speedOfSound;
+			}
+			set {
+				speedOfSound = value;
+			}
+		}						
     }
 }
 

@@ -319,7 +319,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 		
-		private void Apply() 
+		internal void Apply() 
 		{
 			
 			GL.BindTexture (TextureTarget.Texture2D, (uint)_textureId);			
@@ -370,9 +370,27 @@ namespace Microsoft.Xna.Framework.Graphics
 			throw new NotImplementedException ();
 		}
 
-        public void GetData<T>(T[] data)
-        {	
-			throw new NotImplementedException();
+		public void GetData<T>(T[] data) where T : struct
+		{
+			if (typeof(T) == typeof(Color) && texture == null) {
+				GL.BindTexture (TextureTarget.Texture2D, _textureId);
+				GL.GetTexImage<T> (TextureTarget.Texture2D, 0, PixelFormat.Bgra, PixelType.UnsignedByte, data);
+
+				// OpenGL likes its images bottom-up instead of
+				// top-down.  So we must flip it--flip it good.
+				var tempRow = new T [Width];
+				int indexLowRow = 0;
+				int indexHighRow = Width * (Height - 1);
+				do {
+					Array.Copy (data, indexLowRow, tempRow, 0, Width);
+					Array.Copy (data, indexHighRow, data, indexLowRow, Width);
+					Array.Copy (tempRow, 0, data, indexHighRow, Width);
+					indexLowRow += Width;
+					indexHighRow -= Width;
+				} while (indexLowRow < indexHighRow);
+			} else {
+				throw new NotImplementedException();
+			}
 			// TODO Causese AV on Device, but not simulator GetData<T>(0, null, data, 0, Width * Height);
 //			
 //			if (data == null )
@@ -785,7 +803,13 @@ namespace Microsoft.Xna.Framework.Graphics
 //			{
 //				throw new NotImplementedException();
 //			}
+
+           
 		}
+
+        internal void Reload(Stream Stream)
+        {
+        }
 	}
 }
 

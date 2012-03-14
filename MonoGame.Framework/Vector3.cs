@@ -27,6 +27,7 @@ SOFTWARE.
 
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Text;
 
 namespace Microsoft.Xna.Framework
@@ -448,16 +449,35 @@ namespace Microsoft.Xna.Framework
             result.Z = value.Z * factor;
         }
 
-        public static Vector3 Reflect(Vector3 vector, Vector3 normal)
-        {
-            throw new NotImplementedException();
-        }
+	public static Vector3 Reflect(Vector3 vector, Vector3 normal)
+	{
+		// I is the original array
+		// N is the normal of the incident plane
+		// R = I - (2 * N * ( DotProduct[ I,N] ))
+		Vector3 reflectedVector;
+		// inline the dotProduct here instead of calling method
+		float dotProduct = ((vector.X * normal.X) + (vector.Y * normal.Y)) + (vector.Z * normal.Z);
+		reflectedVector.X = vector.X - (2.0f * normal.X) * dotProduct;
+		reflectedVector.Y = vector.Y - (2.0f * normal.Y) * dotProduct;
+		reflectedVector.Z = vector.Z - (2.0f * normal.Z) * dotProduct;
 
-        public static void Reflect(ref Vector3 vector, ref Vector3 normal, out Vector3 result)
-        {
-            throw new NotImplementedException();
-        }
+		return reflectedVector;
+	}
 
+	public static void Reflect(ref Vector3 vector, ref Vector3 normal, out Vector3 result)
+	{
+		// I is the original array
+		// N is the normal of the incident plane
+		// R = I - (2 * N * ( DotProduct[ I,N] ))
+
+		// inline the dotProduct here instead of calling method
+		float dotProduct = ((vector.X * normal.X) + (vector.Y * normal.Y)) + (vector.Z * normal.Z);
+		result.X = vector.X - (2.0f * normal.X) * dotProduct;
+		result.Y = vector.Y - (2.0f * normal.Y) * dotProduct;
+		result.Z = vector.Z - (2.0f * normal.Z) * dotProduct;
+
+	}
+		
         public static Vector3 SmoothStep(Vector3 value1, Vector3 value2, float amount)
         {
             return new Vector3(
@@ -513,6 +533,23 @@ namespace Microsoft.Xna.Framework
             result = new Vector3((position.X * matrix.M11) + (position.Y * matrix.M21) + (position.Z * matrix.M31) + matrix.M41,
                                  (position.X * matrix.M12) + (position.Y * matrix.M22) + (position.Z * matrix.M32) + matrix.M42,
                                  (position.X * matrix.M13) + (position.Y * matrix.M23) + (position.Z * matrix.M33) + matrix.M43);
+        }
+
+        public static void Transform(Vector3[] sourceArray, ref Matrix matrix, Vector3[] destinationArray)
+        {
+            Debug.Assert(destinationArray.Length >= sourceArray.Length, "The destination array is smaller than the source array.");
+
+            // TODO: Are there options on some platforms to implement a vectorized version of this?
+
+            for (var i = 0; i < sourceArray.Length; i++)
+            {
+                var position = sourceArray[i];                
+                destinationArray[i] =
+                    new Vector3(
+                        (position.X*matrix.M11) + (position.Y*matrix.M21) + (position.Z*matrix.M31) + matrix.M41,
+                        (position.X*matrix.M12) + (position.Y*matrix.M22) + (position.Z*matrix.M32) + matrix.M42,
+                        (position.X*matrix.M13) + (position.Y*matrix.M23) + (position.Z*matrix.M33) + matrix.M43);
+            }
         }
 
 	/// <summary>

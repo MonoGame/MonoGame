@@ -288,7 +288,12 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			return FromFile( graphicsDevice, filename, 0, 0 );
         }
-		
+
+		// Not sure what this should do in iOS will leave it non implemented for now.
+		internal void Reload(Stream textureStream)
+		{
+		}
+
         public void SetData<T>(T[] data, int startIndex, int elementCount, SetDataOptions options)
         {
             throw new NotImplementedException();
@@ -414,7 +419,23 @@ namespace Microsoft.Xna.Framework.Graphics
 			byte[] imageInfo = GetImageData (0);
 
 			// Get the Color values
-			if ((typeof(T) == typeof(Color))) {
+			if (typeof(T) == typeof(uint))
+			{
+				Color[] colors = new Color[elementCount];
+				GetData<Color>(level, rect, colors, startIndex, elementCount);
+				uint[] final = data as uint[];
+				for (int i = 0; i < final.Length; i++)
+				{
+					final[i] = (uint)
+					(
+						colors[i].R << 24 |
+						colors[i].G << 16 |
+						colors[i].B << 8 |
+						colors[i].A
+					);
+				}
+			}
+			else if ((typeof(T) == typeof(Color))) {
 
 
 				// Left this here for documentation - Not sure what it does but the

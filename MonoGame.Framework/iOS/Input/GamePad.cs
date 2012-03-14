@@ -135,8 +135,12 @@
 	
 	        public static GamePadState GetState(PlayerIndex playerIndex)
 	        {		
-				return new GamePadState(); // Please fix
-				// TODO return new GamePadState((Buttons)GamePad.Instance._buttons,GamePad.Instance._leftStick,GamePad.Instance._rightStick);
+			return new GamePadState(
+					new GamePadThumbSticks(Instance._leftStick, Instance._rightStick), 
+		                        new GamePadTriggers(0f, 0f), 
+					new GamePadButtons((Buttons)Instance._buttons), 
+					new GamePadDPad(0,0,0,0)
+				);
 	        }
 	
 	        public static bool SetVibration(PlayerIndex playerIndex, float leftMotor, float rightMotor)
@@ -182,7 +186,7 @@
 				return  thumbRect.Contains(location); 
 			}
 			
-			internal void TouchesBegan( MonoTouch.Foundation.NSSet touches, MonoTouch.UIKit.UIEvent e, GameWindow window)
+			internal void TouchesBegan( MonoTouch.Foundation.NSSet touches, MonoTouch.UIKit.UIEvent e, iOSGameView view)
 			{
 				// Reset State		
 				//Reset();
@@ -191,8 +195,10 @@
 				UITouch []touchesArray = touches.ToArray<UITouch>();
 				foreach(UITouch touch in touchesArray)
 				{
-					Vector2 location = new Vector2(touch.LocationInView(touch.View));
-					location = window.GetOffsetPosition(location,false);
+					var point = touch.LocationInView(touch.View);
+					Vector2 location = new Vector2(point.X, point.Y);
+					location = view.GetOffsetPosition(location, true);
+
 					// Check where is the touch
 					bool hitInButton = false;
 					
@@ -236,13 +242,14 @@
 				// do nothing
 			}
 			
-			internal void TouchesMoved( MonoTouch.Foundation.NSSet touches, MonoTouch.UIKit.UIEvent e,GameWindow window)
+			internal void TouchesMoved( MonoTouch.Foundation.NSSet touches, MonoTouch.UIKit.UIEvent e, iOSGameView view)
 			{
 				UITouch []touchesArray = touches.ToArray<UITouch>();
 				foreach(UITouch touch in touchesArray)
 				{
-					Vector2 location = new Vector2(touch.LocationInView(touch.View));
-					location = window.GetOffsetPosition(location,false);
+					var point = touch.LocationInView(touch.View);
+					Vector2 location = new Vector2(point.X, point.Y);
+					location = view.GetOffsetPosition(location, true);
 					
 					var oldItem = GetTouchesObject(touch);
 					// Check if touch any button
@@ -344,13 +351,15 @@
 				}	
 			}
 			
-			internal void TouchesEnded( MonoTouch.Foundation.NSSet touches, MonoTouch.UIKit.UIEvent e, GameWindow window)
+			internal void TouchesEnded( MonoTouch.Foundation.NSSet touches, MonoTouch.UIKit.UIEvent e, iOSGameView view)
 			{						
 				UITouch []touchesArray = touches.ToArray<UITouch>();
 				foreach(UITouch touch in touchesArray)
 				{
-					Vector2 location = new Vector2(touch.LocationInView(touch.View).X, touch.LocationInView(touch.View).Y);
-					location = window.GetOffsetPosition(location,false);
+					var point = touch.LocationInView(touch.View);
+					Vector2 location = new Vector2(point.X, point.Y);
+					location = view.GetOffsetPosition(location, true);
+
 					// Check where is the touch
 					if (Visible)
 					{

@@ -19,7 +19,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\iPhoneSimulator\Debug</OutputPath>
-    <DefineConstants>DEBUG;IPHONE</DefineConstants>
+    <DefineConstants>DEBUG;IPHONE;GLES</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CustomCommands>
@@ -40,7 +40,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DefineConstants>IPHONE</DefineConstants>
+    <DefineConstants>IPHONE;GLES</DefineConstants>
     <AssemblyName>MonoGame.Framework.iOS</AssemblyName>
     <MtouchUseArmv7>false</MtouchUseArmv7>
   </PropertyGroup>
@@ -49,7 +49,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\iPhone\Debug</OutputPath>
-    <DefineConstants>DEBUG;IPHONE</DefineConstants>
+    <DefineConstants>DEBUG;IPHONE;GLES</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
@@ -65,7 +65,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DefineConstants>IPHONE</DefineConstants>
+    <DefineConstants>IPHONE;GLES</DefineConstants>
     <AssemblyName>MonoGame.Framework</AssemblyName>
     <MtouchUseArmv7>false</MtouchUseArmv7>
   </PropertyGroup>
@@ -154,7 +154,6 @@
     <Compile Include="Input\Mouse.cs" />
     <Compile Include="Input\MouseState.cs" />
     <Compile Include="Audio\AudioChannels.cs" />
-    <Compile Include="Audio\SoundEffect.cs" />
     <Compile Include="Audio\SoundState.cs" />
     <Compile Include="Media\MediaPlayer.cs" />
     <Compile Include="Media\MediaState.cs" />
@@ -171,6 +170,9 @@
     <Compile Include="Content\ContentReaders\Vector3Reader.cs" />
     <Compile Include="Content\ContentReaders\SongReader.cs" />
     <Compile Include="Content\ContentReaders\SoundEffectReader.cs" />
+    <Compile Include="Content\ContentReaders\PlaneReader.cs" />
+    <Compile Include="Content\ContentReaders\QuaternionReader.cs" />
+    <Compile Include="Content\ContentReaders\Vector4Reader.cs" />
     <Compile Include="Media\MediaSourceType.cs" />
     <Compile Include="Media\Playlist.cs" />
     <Compile Include="ReusableItemList.cs" />
@@ -199,7 +201,6 @@
     <Compile Include="Input\KeyboardState.cs" />
     <Compile Include="Input\Keys.cs" />
     <Compile Include="Input\Keyboard.cs" />
-    <Compile Include="Audio\SoundEffectInstance.cs" />
     <Compile Include="Input\KeyState.cs" />
     <Compile Include="IUpdateable.cs" />
     <Compile Include="Net\NetworkSessionJoinError.cs" />
@@ -246,6 +247,8 @@
     <Compile Include="Graphics\Vertices\IVertexType.cs" />
     <Compile Include="Graphics\Vertices\PrimitiveType.cs" />
     <Compile Include="Graphics\Vertices\VertexBuffer.cs" />
+    <Compile Include="Graphics\Vertices\DynamicIndexBuffer.cs" />
+    <Compile Include="Graphics\Vertices\DynamicVertexBuffer.cs" />
     <Compile Include="Graphics\Vertices\VertexColorTexture.cs" />
     <Compile Include="Graphics\Vertices\VertexDeclaration.cs" />
     <Compile Include="Graphics\Vertices\VertexElement.cs" />
@@ -254,6 +257,7 @@
     <Compile Include="Graphics\Vertices\VertexElementUsage.cs" />
     <Compile Include="Graphics\Vertices\VertexPosition2ColorTexture.cs" />
     <Compile Include="Graphics\Vertices\VertexPositionColor.cs" />
+    <Compile Include="Graphics\Vertices\VertexPositionColorTexture.cs" />
     <Compile Include="Graphics\Vertices\VertexPositionNormalTexture.cs" />
     <Compile Include="Graphics\Vertices\VertexPositionTexture.cs" />
     <Compile Include="PreparingDeviceSettingsEventArgs.cs" />
@@ -308,6 +312,13 @@
     <Compile Include="Content\ContentReaders\UInt64Reader.cs" />
     <Compile Include="Content\ContentReaders\NullableReader.cs" />
     <Compile Include="Content\ContentReaders\ArrayReader.cs" />
+    <Compile Include="Content\ContentReaders\BoundingFrustumReader.cs" />
+    <Compile Include="Content\ContentReaders\BoundingSphereReader.cs" />
+    <Compile Include="Content\ContentReaders\ByteReader.cs" />
+    <Compile Include="Content\ContentReaders\DateTimeReader.cs" />
+    <Compile Include="Content\ContentReaders\DecimalReader.cs" />
+    <Compile Include="Content\ContentReaders\RayReader.cs" />
+    <Compile Include="Content\ContentReaders\SByteReader.cs" />
     <Compile Include="Graphics\SamplerStateCollection.cs" />
     <Compile Include="Graphics\Effect\EffectParameterClass.cs" />
     <Compile Include="Graphics\Effect\EffectParameterType.cs" />
@@ -333,10 +344,7 @@
     <Compile Include="iOS\Graphics\PresentationParameters.cs" />
     <Compile Include="iOS\Graphics\Texture2D.cs" />
     <Compile Include="iOS\Input\GamePad.cs" />
-    <Compile Include="iOS\Game.cs" />
-    <Compile Include="iOS\IOSGameWindow.cs" />
     <Compile Include="iOS\PowerStatus.cs" />
-    <Compile Include="iOS\Audio\Sound.cs" />
     <Compile Include="iOS\Media\MediaSource.cs" />
     <Compile Include="iOS\Media\MediaLibrary.cs" />
     <Compile Include="iOS\Input\Accelerometer.cs" />
@@ -344,7 +352,6 @@
     <Compile Include="iOS\Media\VideoPlayer.cs" />
     <Compile Include="iOS\GamerServices\Guide.cs" />
     <Compile Include="iOS\GamerServices\TextFieldAlertView.cs" />
-    <Compile Include="iOS\Program.cs" />
     <Compile Include="iOS\Net\MonoGamePeerPickerControllerDelegate.cs" />
     <Compile Include="iOS\Net\MonoGameSessionDelegate.cs" />
     <Compile Include="iOS\Content\ContentManager.cs" />
@@ -363,13 +370,57 @@
     <Compile Include="Graphics\Vertices\VertexElementColor.cs" />
     <Compile Include="Audio\XactClip.cs" />
     <Compile Include="Audio\XactSound.cs" />
+    <Compile Include="Game.cs" />
+    <Compile Include="GamePlatform.cs" />
+    <Compile Include="iOS\iOSGamePlatform.cs" />
+    <Compile Include="iOS\iOSGameViewController.cs" />
+    <Compile Include="iOS\OrientationConverter.cs" />
+    <Compile Include="MacOS\Audio\OALSoundBuffer.cs">
+      <Link>iOS\Audio\OALSoundBuffer.cs</Link>
+    </Compile>
+    <Compile Include="MacOS\Audio\OpenALSoundController.cs">
+      <Link>iOS\Audio\OpenALSoundController.cs</Link>
+    </Compile>
+    <Compile Include="MacOS\Audio\OpenALSupport.cs">
+      <Link>iOS\Audio\OpenALSupport.cs</Link>
+    </Compile>
+    <Compile Include="MacOS\Audio\SoundEffect.cs">
+      <Link>iOS\Audio\SoundEffect.cs</Link>
+    </Compile>
+    <Compile Include="MacOS\Audio\SoundEffectInstance.cs">
+      <Link>iOS\Audio\SoundEffectInstance.cs</Link>
+    </Compile>
+    <Compile Include="Graphics\Vertices\IndexElementSize.cs" />
+    <Compile Include="LaunchParameters.cs" />
+    <Compile Include="Content\ContentReaders\AlphaTestEffectReader.cs" />
+    <Compile Include="Content\ContentReaders\BasicEffectReader.cs" />
+    <Compile Include="Content\ContentReaders\BoundingBoxReader.cs" />
+    <Compile Include="Content\ContentReaders\IndexBufferReader.cs" />
+    <Compile Include="Content\ContentReaders\MatrixReader.cs" />
+    <Compile Include="Content\ContentReaders\VertexBufferReader.cs" />
+    <Compile Include="Graphics\Effect\AlphaTestEffect.cs" />
+    <Compile Include="Graphics\Effect\EffectHelpers.cs" />
+    <Compile Include="Graphics\Effect\AlphaTestEffectCode.cs" />
+    <Compile Include="XnaToOpenTK.cs" />
+    <Compile Include="iOS\iOSGameWindow.cs" />
+    <Compile Include="GameWindow.cs" />
+    <Compile Include="iOS\iOSGameView.cs" />
+    <Compile Include="iOS\iOSGameView_GLAbstraction.cs" />
+    <Compile Include="iOS\iOSGameView_Touch.cs" />
+    <Compile Include="Graphics\Model.cs" />
+    <Compile Include="Graphics\ModelBone.cs" />
+    <Compile Include="Graphics\ModelMesh.cs" />
+    <Compile Include="GamerServices\NotificationPosition.cs" />
+    <Compile Include="iOS\GamerServices\KeyboardInputViewController.cs" />
+    <Compile Include="iOS\GamerServices\KeyboardInputView.cs" />
+    <Compile Include="iOS\GamerServices\KeyboardInputAsyncResult.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
     <MonoDevelop>
       <Properties>
         <Policies>
-          <StandardHeader Text="#region License&#xD;&#xA;/*&#xD;&#xA;Microsoft Public License (Ms-PL)&#xD;&#xA;MonoGame - Copyright © 2009 The MonoGame Team&#xD;&#xA;&#xD;&#xA;All rights reserved.&#xD;&#xA;&#xD;&#xA;This license governs use of the accompanying software. If you use the software, you accept this license. If you do not&#xD;&#xA;accept the license, do not use the software.&#xD;&#xA;&#xD;&#xA;1. Definitions&#xD;&#xA;The terms &quot;reproduce,&quot; &quot;reproduction,&quot; &quot;derivative works,&quot; and &quot;distribution&quot; have the same meaning here as under &#xD;&#xA;U.S. copyright law.&#xD;&#xA;&#xD;&#xA;A &quot;contribution&quot; is the original software, or any additions or changes to the software.&#xD;&#xA;A &quot;contributor&quot; is any person that distributes its contribution under this license.&#xD;&#xA;&quot;Licensed patents&quot; are a contributor's patent claims that read directly on its contribution.&#xD;&#xA;&#xD;&#xA;2. Grant of Rights&#xD;&#xA;(A) Copyright Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, &#xD;&#xA;each contributor grants you a non-exclusive, worldwide, royalty-free copyright license to reproduce its contribution, prepare derivative works of its contribution, and distribute its contribution or any derivative works that you create.&#xD;&#xA;(B) Patent Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, &#xD;&#xA;each contributor grants you a non-exclusive, worldwide, royalty-free license under its licensed patents to make, have made, use, sell, offer for sale, import, and/or otherwise dispose of its contribution in the software or derivative works of the contribution in the software.&#xD;&#xA;&#xD;&#xA;3. Conditions and Limitations&#xD;&#xA;(A) No Trademark License- This license does not grant you rights to use any contributors' name, logo, or trademarks.&#xD;&#xA;(B) If you bring a patent claim against any contributor over patents that you claim are infringed by the software, &#xD;&#xA;your patent license from such contributor to the software ends automatically.&#xD;&#xA;(C) If you distribute any portion of the software, you must retain all copyright, patent, trademark, and attribution &#xD;&#xA;notices that are present in the software.&#xD;&#xA;(D) If you distribute any portion of the software in source code form, you may do so only under this license by including &#xD;&#xA;a complete copy of this license with your distribution. If you distribute any portion of the software in compiled or object &#xD;&#xA;code form, you may only do so under a license that complies with this license.&#xD;&#xA;(E) The software is licensed &quot;as-is.&quot; You bear the risk of using it. The contributors give no express warranties, guarantees&#xD;&#xA;or conditions. You may have additional consumer rights under your local laws which this license cannot change. To the extent&#xD;&#xA;permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular&#xD;&#xA;purpose and non-infringement.&#xD;&#xA;*/&#xD;&#xA;#endregion License&#xD;&#xA;" IncludeInNewFiles="True" />
+          <StandardHeader Text="" IncludeInNewFiles="False" />
         </Policies>
       </Properties>
     </MonoDevelop>

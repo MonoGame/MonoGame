@@ -36,9 +36,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			// May need to be moved elsewhere within this method
 			OnApply();
 			
+            GLStateManager.Viewport(Game.Instance.Window.ClientBounds);
             GLStateManager.Projection(Projection);
-            GLStateManager.World(World);
-            GLStateManager.View(View);
+            GLStateManager.WorldView(World, View);
 
 			base.Apply();
 
@@ -212,5 +212,46 @@ namespace Microsoft.Xna.Framework.Graphics
 			get; set;
 		}
 		#endregion
-    }
+
+
+		#region FIXME Stubs
+
+		[Obsolete ("PreferPerPixelLighting is currently a stub")]
+		public bool PreferPerPixelLighting {
+			get { throw new NotImplementedException (); }
+			set { throw new NotImplementedException (); }
+		}
+
+		[Obsolete ("SpecularColor is currently a stub")]
+		public Vector3 SpecularColor {
+			get { throw new NotImplementedException (); }
+			set { throw new NotImplementedException (); }
+		}
+
+		[Obsolete ("SpecularPower is currently a stub")]
+		public float SpecularPower {
+			get { throw new NotImplementedException (); }
+			set { throw new NotImplementedException (); }
+		}
+
+		[Obsolete ("DirectionalLight0 is currently a stub")]
+		public DirectionalLight DirectionalLight0 {
+			get { throw new NotImplementedException (); }
+			set { throw new NotImplementedException (); }
+		}
+
+		[Obsolete ("DirectionalLight1 is currently a stub")]
+		public DirectionalLight DirectionalLight1 {
+			get { throw new NotImplementedException (); }
+			set { throw new NotImplementedException (); }
+		}
+
+		[Obsolete ("DirectionalLight2 is currently a stub")]
+		public DirectionalLight DirectionalLight2 {
+			get { throw new NotImplementedException (); }
+			set { throw new NotImplementedException (); }
+		}
+
+		#endregion
+	}
 }

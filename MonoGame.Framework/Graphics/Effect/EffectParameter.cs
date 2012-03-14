@@ -2,6 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+#if IPHONE || ANDROID
+using OpenTK.Graphics.ES20;
+#else
+using OpenTK.Graphics.OpenGL;
+#endif
+ 
+#if !WINDOWS
+using TextureUnit = OpenTK.Graphics.ES20.All;
+using TextureTarget = OpenTK.Graphics.ES20.All;
+#endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -15,29 +25,82 @@ namespace Microsoft.Xna.Framework.Graphics
 		EffectParameterCollection elements;
 		string semantic;
 		EffectParameterCollection structMembers;
-		internal int internalIndex;  // used by opengl processes.
+		object _cachedValue = null;
+		
+		private int internalIndex;   // used by opengl processes.
+		private int uniformLocation; 
+		private int userIndex;		 // desired index by the user
+		
 		int internalLength;
 		Effect _parentEffect;
+	
+		internal int UserInedx
+		{
+			get { return userIndex; }	
+		}
 		
-		internal EffectParameter(Effect parent, string paramName, int paramIndex, string paramSType, int paramLength)
+		internal int UniformLocation
+		{
+			get { return uniformLocation; }	
+		}
+
+        internal int InternalIndex
+        {
+            get { return internalIndex; }
+        }
+
+		internal EffectParameter(Effect parent, string paramName, int paramIndex, int userIndex, int uniformLocation,
+		                         string paramSType, int paramLength)
 		{
 			_parentEffect = parent;
 			name = paramName;
 			internalIndex = paramIndex;
 			internalLength = paramLength;
 			
+			this.userIndex = userIndex;
+			this.uniformLocation = uniformLocation;
+			
 			switch (paramSType ){
+			case "Float":
+				paramType = EffectParameterType.Single;
+				paramClass = EffectParameterClass.Scalar;
+				rowCount = 1;
+				colCount = 1;
+				_cachedValue = 0.0f;
+				break;				
 			case "FloatVec2":
 				paramType = EffectParameterType.Single;
 				paramClass = EffectParameterClass.Vector;
 				rowCount = 1;
 				colCount = 2;
+				_cachedValue = OpenTK.Vector2.Zero;
 				break;
+			case "FloatVec3":
+				paramType = EffectParameterType.Single;
+				paramClass = EffectParameterClass.Vector;
+				rowCount = 1;
+				colCount = 3;
+				_cachedValue =OpenTK.Vector3.Zero;
+				break;	
+			case "FloatVec4":
+				paramType = EffectParameterType.Single;
+				paramClass = EffectParameterClass.Vector;
+				rowCount = 1;
+				colCount = 4;
+				_cachedValue = OpenTK.Vector4.Zero;
+				break;				
 			case "Sampler2D":
 				paramType = EffectParameterType.Texture2D;
 				paramClass = EffectParameterClass.Object;
 				rowCount = 0;
 				colCount = 0;
+				break;				
+			case "FloatMat4":
+				paramType = EffectParameterType.Single;
+				paramClass = EffectParameterClass.Matrix;
+				rowCount = 4;
+				colCount = 4;
+				_cachedValue = OpenTK.Matrix4.Identity;
 				break;				
 				
 			}
@@ -215,6 +278,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void SetValue (Single value)
 		{
+			GL.UseProgram(_parentEffect.CurrentTechnique.Passes[0].shaderProgram);			
+			//MonoMac.OpenGL.Vector2 vect2 = new MonoMac.OpenGL.Vector2(value.X, value.Y);
+			_cachedValue = value;
+			GL.Uniform1(internalIndex,value);
+			GL.UseProgram(0);		
 		}
 
 		public void SetValue (Single[] value)
@@ -227,10 +295,21 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void SetValue (Texture value)
 		{
+			GL.UseProgram(_parentEffect.CurrentTechnique.Passes[0].shaderProgram);
+			GL.ActiveTexture(TextureUnit.Texture1);
+			GL.BindTexture(TextureTarget.Texture2D,value._textureId);
+			GL.Uniform1(internalIndex, value._textureId);
+			_cachedValue = value._textureId;
+			GL.UseProgram(0);
 		}
 
 		public void SetValue (Vector2 value)
 		{
+			GL.UseProgram(_parentEffect.CurrentTechnique.Passes[0].shaderProgram);			
+			OpenTK.Vector2 vect2 = new OpenTK.Vector2(value.X, value.Y);
+			_cachedValue = vect2;
+			GL.Uniform2(internalIndex,vect2.X, vect2.Y);
+			GL.UseProgram(0);
 		}
 
 		public void SetValue (Vector2[] value)
@@ -239,6 +318,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void SetValue (Vector3 value)
 		{
+			GL.UseProgram(_parentEffect.CurrentTechnique.Passes[0].shaderProgram);			
+			OpenTK.Vector3 vect3 = new OpenTK.Vector3(value.X, value.Y, value.Z);
+			_cachedValue = vect3;
+			GL.Uniform3(internalIndex,vect3.X, vect3.Y, vect3.Z);
+			GL.UseProgram(0);			
 		}
 
 		public void SetValue (Vector3[] value)
@@ -247,10 +331,35 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void SetValue (Vector4 value)
 		{
+			GL.UseProgram(_parentEffect.CurrentTechnique.Passes[0].shaderProgram);			
+			OpenTK.Vector4 vect4 = new OpenTK.Vector4(value.X, value.Y, value.Z, value.W);
+			_cachedValue = vect4;
+			GL.Uniform4(internalIndex,vect4.X, vect4.Y, vect4.Z, vect4.W);
+			GL.UseProgram(0);	
 		}
 
 		public void SetValue (Vector4[] value)
 		{
+		}
+
+		internal void ApplyEffectValue() 
+		{
+			
+			switch (ParameterClass) {
+			case EffectParameterClass.Vector:
+				ApplyVectorValue();
+				break;
+			}
+		}
+		
+		private void ApplyVectorValue() 
+		{
+			switch (rowCount) {
+			case 2:
+				var v2 = (OpenTK.Vector2)_cachedValue;
+				GL.Uniform2(internalIndex,v2.X, v2.Y);
+				break;
+			}
 		}
 	}
 }

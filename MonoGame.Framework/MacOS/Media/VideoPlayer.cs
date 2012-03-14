@@ -53,15 +53,17 @@ namespace Microsoft.Xna.Framework.Media
 		private Video  _video;
 		private MediaState _state;
 		private bool _isLooped;
-		private Game _game;		
+		private Game _game;
+        private MacGamePlatform _platform;
 		
 		// TODO Needed to bind OpenGL to Quicktime private QTVisualContextRef  textureContext;
     	// TODO Needed to grab frame as a texture private CVOpenGLTextureRef  currentFrame;
 		
-        public VideoPlayer(Game game)
+        public VideoPlayer()
         {
 			_state = MediaState.Stopped;
-			_game = game;
+			_game = Game.Instance;
+            _platform = (MacGamePlatform)_game.Services.GetService(typeof(MacGamePlatform));
         }
 
         public Texture2D GetTexture()
@@ -119,7 +121,9 @@ namespace Microsoft.Xna.Framework.Media
 				_video.MovieView.Play(new NSObject());	
 				
 				_state = MediaState.Playing;
-				Game._playingVideo = true;
+                // FIXME: I'm not crazy about keeping track of IsPlayingVideo in MacGamePlatform, but where else can
+                //        this concept be expressed?
+				_platform.IsPlayingVideo = true;
 			}
 		}
 
@@ -137,7 +141,9 @@ namespace Microsoft.Xna.Framework.Media
 				_video.MovieView.Pause(o);
 				_video.MovieView.GotoBeginning(o);
 				_state = MediaState.Stopped;
-				Game._playingVideo = false;
+                // FIXME: I'm not crazy about keeping track of IsPlayingVideo in MacGamePlatform, but where else can
+                //        this concept be expressed?
+                _platform.IsPlayingVideo = false;
 				_video.MovieView.RemoveFromSuperview();
 			}
         }
