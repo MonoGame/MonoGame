@@ -118,6 +118,9 @@
     <Compile Include="Graphics\Effect\AlphaTestEffect.cs" />
     <Compile Include="Graphics\Effect\AlphaTestEffectCode.cs" />
     <Compile Include="Graphics\Effect\EffectHelpers.cs" />
+    <Compile Include="Graphics\Model.cs" />
+    <Compile Include="Graphics\ModelBone.cs" />
+    <Compile Include="Graphics\ModelMesh.cs" />
     <Compile Include="Graphics\PackedVector\NormalizedShort2.cs" />
     <Compile Include="Graphics\Vertices\DynamicIndexBuffer.cs" />
     <Compile Include="Graphics\Vertices\DynamicVertexBuffer.cs" />

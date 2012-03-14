@@ -16,8 +16,9 @@ A group of multi-platform XNA Samples can be downloaded from : http://github.com
 
 # ROADMAP
 
-    The 2.x series will be released frequently to provide bug fixes and performance optimisations.
-    The 3.x series will extend MonoGame with support for the XNA 3D APIs as well as something we are working on, which we believe the whole MonoGame will love.
+    The 2.5 release will support OpenGL ES 2.0 with basic shader support.
+    The 3.x series will extend MonoGame with support for the XNA 3D APIs.
+    After 3.x is released work will begin on support for Sony PlayStation Suite SDK and Windows 8/WinRT
 
 # HOW YOU CAN HELP
 

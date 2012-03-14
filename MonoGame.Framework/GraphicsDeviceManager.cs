@@ -84,6 +84,7 @@ namespace Microsoft.Xna.Framework
 			_graphicsDevice.PresentationParameters = new PresentationParameters();
 
 			Initialize();
+			ApplyChanges ();
 			
 			OnDeviceCreated(EventArgs.Empty);
 		}
@@ -146,6 +147,7 @@ namespace Microsoft.Xna.Framework
 
         public void ApplyChanges()
         {
+            _game.Window.SetSupportedOrientations(_supportedOrientations);
         }
 
 		private void Initialize()
@@ -286,6 +288,11 @@ namespace Microsoft.Xna.Framework
 				_supportedOrientations = value;
 			}
 		}
+
+        internal void ResetClientBounds()
+        {
+            // do nothing for now
+        }
 
     }
 }

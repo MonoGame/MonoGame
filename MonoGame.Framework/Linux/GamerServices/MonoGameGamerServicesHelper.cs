@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Windows.Forms;
 using System.Diagnostics;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -69,6 +68,12 @@ namespace Microsoft.Xna.Framework.GamerServices
 
             if ((gameTime.TotalGameTime - gt).TotalSeconds > 10) // close after 10 seconds
             {
+                SignedInGamer sig = new SignedInGamer();
+                sig.DisplayName = "MonoGamer";
+                sig.Gamertag = "MonoGamer";
+
+                Gamer.SignedInGamers.Add(sig);
+
                 this.Enabled = false;
                 Guide.IsVisible = false;
                 gt = TimeSpan.Zero;                

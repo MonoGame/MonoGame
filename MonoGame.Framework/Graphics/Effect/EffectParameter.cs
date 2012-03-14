@@ -2,7 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+#if IPHONE || ANDROID
 using OpenTK.Graphics.ES20;
+#else
+using OpenTK.Graphics.OpenGL;
+#endif
  
 #if !WINDOWS
 using TextureUnit = OpenTK.Graphics.ES20.All;

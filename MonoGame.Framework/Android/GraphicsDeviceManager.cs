@@ -55,6 +55,7 @@ namespace Microsoft.Xna.Framework
 		private int _preferredBackBufferWidth;
 		private bool _preferMultiSampling;
 		private DisplayOrientation _supportedOrientations;
+		private bool _preferredBackBufferSetByUser = false;
 
         public GraphicsDeviceManager(Game game)
         {
@@ -75,8 +76,26 @@ namespace Microsoft.Xna.Framework
 			
             game.Services.AddService(typeof(IGraphicsDeviceManager), this);
             game.Services.AddService(typeof(IGraphicsDeviceService), this);	
-			
+									
 			Initialize();
+			
+			// Read the ActivityAttribute and check if the ScreenOrientation is set
+			// and set the window Orientation to match
+			/*
+			var attribute = Game.Activity.GetActivityAttribute();
+			if (attribute != null)
+			{
+				switch (attribute.ScreenOrientation)
+				{
+					case Android.Content.PM.ScreenOrientation.Portrait:
+						_game.Window.SetOrientation(DisplayOrientation.Portrait);
+					    break;
+					case Android.Content.PM.ScreenOrientation.Landscape:
+					default :
+						_game.Window.SetOrientation(DisplayOrientation.LandscapeLeft);
+						break;
+				}
+			}*/
         }
 		
 		public void CreateDevice ()
@@ -168,6 +187,11 @@ namespace Microsoft.Xna.Framework
 			IsFullScreen = !IsFullScreen;
         }
 		
+		internal bool PreferredBackBufferSetByUser
+		{
+			get {return _preferredBackBufferSetByUser; }
+		}
+		
         public Microsoft.Xna.Framework.Graphics.GraphicsDevice GraphicsDevice
         {
             get
@@ -238,6 +262,10 @@ namespace Microsoft.Xna.Framework
             }
             set
             {
+				if (_supportedOrientations == DisplayOrientation.Default)
+				{
+				   _preferredBackBufferSetByUser = true;
+				}
 				_preferredBackBufferHeight = value;
                 ResetClientBounds();
             }
@@ -251,6 +279,10 @@ namespace Microsoft.Xna.Framework
             }
             set
             {
+				if (_supportedOrientations == DisplayOrientation.Default)
+				{				
+				   _preferredBackBufferSetByUser = true;
+				}
 				_preferredBackBufferWidth = value;				
                 ResetClientBounds();
             }
@@ -259,6 +291,9 @@ namespace Microsoft.Xna.Framework
         internal void ResetClientBounds()
         {
             var clientBounds = Game.Instance.Window.ClientBounds;
+			
+			if (_preferredBackBufferSetByUser)
+			{
 
             var aspectRatio = (float)_preferredBackBufferWidth/_preferredBackBufferHeight;
 
@@ -286,6 +321,11 @@ namespace Microsoft.Xna.Framework
             {
                 Game.Instance.Window.ClientBounds = new Rectangle(0, 0, _preferredBackBufferWidth, _preferredBackBufferHeight);
             }
+			}
+			else
+			{
+				   Game.Instance.Window.ClientBounds = new Rectangle(0, 0, GraphicsDevice.DisplayMode.Width, GraphicsDevice.DisplayMode.Height);
+			}
         }
 
         public DepthFormat PreferredDepthStencilFormat
@@ -318,6 +358,7 @@ namespace Microsoft.Xna.Framework
 			}
 			set
 			{
+				this._preferredBackBufferSetByUser = false;
 				_supportedOrientations = value;
 			}
 		}
