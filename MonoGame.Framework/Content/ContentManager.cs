@@ -367,12 +367,18 @@ namespace Microsoft.Xna.Framework.Content
             {
                 if ((typeof(T) == typeof(Texture2D)))
                 {
+#if IPHONE
+					Texture2D texture = Texture2D.FromFile(graphicsDeviceService.GraphicsDevice, assetName);
+                    texture.Name = originalAssetName;
+                    result = texture;
+#else
                     using (Stream assetStream = OpenStream(assetName))
                     {
                         Texture2D texture = Texture2D.FromFile(graphicsDeviceService.GraphicsDevice, assetStream);
                         texture.Name = originalAssetName;
                         result = texture;
                     }
+#endif
                 }
                 else if ((typeof(T) == typeof(SpriteFont)))
                 {
