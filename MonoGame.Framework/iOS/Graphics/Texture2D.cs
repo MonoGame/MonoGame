@@ -261,7 +261,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			if(filename.Contains(".pdf"))
 				image = Extender.FromPdf(filename,width,height);
 			else
-				image = UIImage.FromFile(filename);
+				image = UIImage.FromBundle(filename);
 			if (image == null)
 			{
 				throw new ContentLoadException("Error loading file: " + filename);
