@@ -99,7 +99,9 @@ namespace Microsoft.Xna.Framework.GamerServices
 												{
 													if ( error != null )
 													{
+#if DEBUG									
 														Console.WriteLine(error);
+#endif
 													}
 													else
 													{
@@ -117,7 +119,9 @@ namespace Microsoft.Xna.Framework.GamerServices
 			}
 			catch (Exception ex) 
 			{
+#if DEBUG				
 				Console.WriteLine(ex.Message);
+#endif
 			}
 		}
 		
