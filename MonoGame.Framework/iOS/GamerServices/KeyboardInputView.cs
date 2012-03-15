@@ -130,7 +130,7 @@ namespace Microsoft.Xna.Framework {
 			AutoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight;
 			AutosizesSubviews = false;
 			Opaque = true;
-			BackgroundColor = UIColor.GroupTableViewBackgroundColor;
+			BackgroundColor = UIColor.FromRGB (0xC5, 0xCC, 0xD4);
 
 			SetNeedsLayout ();
 		}
