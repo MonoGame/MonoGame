@@ -589,7 +589,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 GL20.BindFramebuffer(ALL20.Framebuffer, FrameBufferScreen);
 				
-				// Save off the current viewport to be reset later
+				// restore the saved Viewport
                 Viewport = savedViewport;
 				
                 DefaultFrameBuffer = true;

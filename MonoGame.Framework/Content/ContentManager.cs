@@ -57,8 +57,7 @@ namespace Microsoft.Xna.Framework.Content
         private IServiceProvider serviceProvider;
         private IGraphicsDeviceService graphicsDeviceService;
         protected Dictionary<string, object> loadedAssets = new Dictionary<string, object>();
-        bool disposed;
-		LzxDecoder dec = new LzxDecoder(16);                            
+        bool disposed;		                        
 
         private static object ContentManagerLock = new object();
         private static List<ContentManager> ContentManagers = new List<ContentManager>();
@@ -281,6 +280,8 @@ namespace Microsoft.Xna.Framework.Content
                         ContentReader reader;
                         if (compressed)
                         {
+							
+							LzxDecoder dec = new LzxDecoder(16);  							
                             //decompress the xnb
                             //thanks to ShinAli (https://bitbucket.org/alisci01/xnbdecompressor)
                             int compressedSize = xnbLength - 14;
@@ -366,18 +367,12 @@ namespace Microsoft.Xna.Framework.Content
             {
                 if ((typeof(T) == typeof(Texture2D)))
                 {
-#if IPHONE
-					Texture2D texture = Texture2D.FromFile(graphicsDeviceService.GraphicsDevice, assetName);
-                    texture.Name = originalAssetName;
-                    result = texture;
-#else
                     using (Stream assetStream = OpenStream(assetName))
                     {
                         Texture2D texture = Texture2D.FromFile(graphicsDeviceService.GraphicsDevice, assetStream);
                         texture.Name = originalAssetName;
                         result = texture;
                     }
-#endif
                 }
                 else if ((typeof(T) == typeof(SpriteFont)))
                 {
