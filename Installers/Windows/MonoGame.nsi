@@ -8,6 +8,7 @@ SetCompressor /SOLID /FINAL lzma
 
 ;Include Modern UI
 
+!include "Sections.nsh"
 !include "MUI2.nsh"
 !include "InstallOptions.nsh"
 
@@ -39,7 +40,7 @@ RequestExecutionLevel admin
 ;Languages
 
 !insertmacro MUI_LANGUAGE "English"
-
+!insertmacro MUI_PAGE_COMPONENTS
 !insertmacro MUI_PAGE_INSTFILES
 
 !insertmacro MUI_UNPAGE_CONFIRM
@@ -48,39 +49,18 @@ RequestExecutionLevel admin
 ;--------------------------------
 
 
-Function .onInit
-FunctionEnd
 
 ; The stuff to install
-Section "" ;No components page, name is not important
-  ; Set output path to the installation directory.
-  SetOutPath $INSTDIR
-  ; check pre-requsites
-  ReadRegStr $0 HKLM 'SOFTWARE\Wow6432Node\Xamarin\MonoDevelop' "Path"
-  ${If} $0 == "" ; check on 32 bit machines just in case
-  ReadRegStr $0 HKLM 'SOFTWARE\Xamarin\MonoDevelop' "Path"
-  ${EndIf}
-  
-  ${If} $0 == ""
-  DetailPrint "MonoDevelop Not Found."
-  Abort
-  ${Else}
-  DetailPrint "MonoDevelop Found at $0"
-  ${EndIf}
-
-
-  SetOutPath "$0AddIns\MonoDevelop.MonoGame"
-  ; install the Templates for MonoDevelop
-  File /r '..\..\ProjectTemplates\MonoDevelop.MonoGame.${VERSION}\*.*'
-  
+Section "MonoGame Core Components" ;No components page, name is not important
+  SectionIn RO
   SetOutPath '$INSTDIR\Assemblies'
   File '..\monogame.ico'
   File /r '..\..\ThirdParty\Lidgren.Network\bin\Release\*.dll'
   File /r '..\..\ThirdParty\Lidgren.Network\bin\Release\*.xml'
-  
+
   File /r '..\..\MonoGame.Framework\bin\Release\*.dll'
   File /r '..\..\MonoGame.Framework\bin\Release\*.xml'
-  
+
   IfFileExists $WINDIR\SYSWOW64\*.* Is64bit Is32bit
   Is32bit:
     WriteRegStr HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies'
@@ -90,8 +70,6 @@ Section "" ;No components page, name is not important
     WriteRegStr HKLM 'SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies'
 
   End32Bitvs64BitCheck:
-  
-
   ; Add remote programs
   WriteRegStr HKLM 'Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}' 'DisplayName' '${APPNAME}'
   WriteRegStr HKLM 'Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}' 'DisplayVersion' '${VERSION}'
@@ -105,6 +83,55 @@ Section "" ;No components page, name is not important
 
 
 SectionEnd
+
+Section "MonoDevelop Templates"
+
+; Set output path to the installation directory.
+  SetOutPath $INSTDIR
+  ; check pre-requsites
+  ReadRegStr $0 HKLM 'SOFTWARE\Wow6432Node\Xamarin\MonoDevelop' "Path"
+  ${If} $0 == "" ; check on 32 bit machines just in case
+  ReadRegStr $0 HKLM 'SOFTWARE\Xamarin\MonoDevelop' "Path"
+  ${EndIf}
+
+  ${If} $0 == ""
+  DetailPrint "MonoDevelop Not Found."
+  Abort
+  ${Else}
+  DetailPrint "MonoDevelop Found at $0"
+  ${EndIf}
+
+
+  SetOutPath "$0AddIns\MonoDevelop.MonoGame"
+  ; install the Templates for MonoDevelop
+  File /r '..\..\ProjectTemplates\MonoDevelop.MonoGame.${VERSION}\*.*'
+  
+SectionEnd
+
+
+Section "Visual Studio 2010 Templates"
+
+  IfFileExists `$DOCUMENTS\Visual Studio 2010\Templates\ProjectTemplates\Visual C#\*.*` InstallTemplates CannotInstallTemplates
+  InstallTemplates:
+    ; Set output path to the installation directory.
+    SetOutPath "$DOCUMENTS\Visual Studio 2010\Templates\ProjectTemplates\Visual C#\MonoGame"
+
+    ; install the Templates for MonoDevelop
+    File /r '..\..\ProjectTemplates\VisualStudio2010.MonoGame.${VERSION}\*.*'
+    GOTO EndTemplates
+  CannotInstallTemplates:
+  
+    DetailPrint "Visual Studio 2010 not found"
+  EndTemplates:
+
+SectionEnd
+
+
+Function .onInit
+
+  IntOp $0 ${SF_SELECTED} | ${SF_RO}
+  SectionSetFlags ${core_id} $0
+FunctionEnd
 
 ;--------------------------------
 ;Uninstaller Section
@@ -131,8 +158,11 @@ Section "Uninstall"
   ${Else}
   RMDir /r "$0\AddIns\MonoDevelop.MonoGame"
   ${EndIf}
+  
+  RMDir /r "$DOCUMENTS\Visual Studio 2010\Templates\ProjectTemplates\Visual C#\MonoGame"
 
   Delete "$INSTDIR\Uninstall.exe"
   RMDir /r "$INSTDIR"
 
 SectionEnd
+
