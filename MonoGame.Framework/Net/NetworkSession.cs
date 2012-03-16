@@ -242,7 +242,9 @@ namespace Microsoft.Xna.Framework.Net
 		
 		public void Dispose (bool disposing) 
 		{
+#if DEBUG
 			Console.WriteLine("Network Session Disposing");
+#endif
 			if (disposing) {
 				
 				foreach (Gamer gamer in _allGamers) {
@@ -715,7 +717,9 @@ namespace Microsoft.Xna.Framework.Net
 				}
 			} 
 			catch (Exception exc) {
+#if DEBUG				
 				Console.WriteLine("Error in NetworkSession Update: " + exc.Message);
+#endif	
 			}
 			finally {
 			}

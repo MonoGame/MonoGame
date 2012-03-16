@@ -676,7 +676,9 @@ namespace Microsoft.Xna.Framework.Net
 						//
 						// Just print diagnostic messages to console
 						//
+#if DEBUG
 						Console.WriteLine ("Find: " + msg.ReadString ());
+#endif
 						break;
 					}
 				}

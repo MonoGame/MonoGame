@@ -73,9 +73,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			/* TODO if (infoLogLen > 0)
 				infoLog = GL.GetProgramInfoLog (obj); */
-
+#if DEBUG
 			Console.WriteLine ("{0} {1}", whichObj, infoLog);
-
+#endif
 		}	
     }
 }

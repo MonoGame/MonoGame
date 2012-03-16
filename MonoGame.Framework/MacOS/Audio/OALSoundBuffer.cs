@@ -26,7 +26,9 @@ namespace Microsoft.Xna.Framework.Audio
 			AL.GenBuffers (1, out openALDataBuffer);
 			alError = AL.GetError ();
 			if (alError != ALError.NoError) {
+#if DEBUG
 				Console.WriteLine ("Failed to generate OpenAL data buffer: ", AL.GetErrorString (alError));
+#endif
 			}
 		}
 
@@ -56,7 +58,9 @@ namespace Microsoft.Xna.Framework.Audio
 
 			ALError alError = AL.GetError ();
 			if (alError != ALError.NoError) {
+#if DEBUG				
 				Console.WriteLine ("Failed to get buffer attributes: ", AL.GetErrorString (alError));
+#endif
 				Duration = -1;
 			} else {
 				Duration = (float)(size / ((bits / 8) * channels)) / (float)sampleRate;

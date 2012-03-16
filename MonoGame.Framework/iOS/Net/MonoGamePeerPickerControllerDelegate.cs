@@ -65,7 +65,9 @@ namespace Microsoft.Xna.Framework.Net
 		
 		public override void ConnectionTypeSelected(GKPeerPickerController picker, GKPeerPickerConnectionType type)
 		{
+#if DEBUG			
 			Console.WriteLine( "User Selected a ConnectionType of : " + type);
+#endif
 			if (type == GKPeerPickerConnectionType.Online) 
 			{
 
@@ -86,7 +88,9 @@ namespace Microsoft.Xna.Framework.Net
 		
 		public override void PeerConnected(GKPeerPickerController picker, string peerId, GKSession toSession)		
 		{
+#if DEBUG			
 			Console.WriteLine( "Peer ID " + peerId + " Connected to Session ID : " + toSession.SessionID );
+#endif
 			
 			// Use a retaining property to take ownership of the session.
     		this.gkSession = toSession;
@@ -106,7 +110,9 @@ namespace Microsoft.Xna.Framework.Net
 		
 		public override void ControllerCancelled(GKPeerPickerController picker)
 		{
+#if DEBUG
 			Console.WriteLine( "ControllerCancelled");
+#endif
 			picker.Delegate = null;
 		}
 	}
