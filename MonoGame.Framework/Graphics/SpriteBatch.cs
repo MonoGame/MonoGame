@@ -151,7 +151,9 @@ namespace Microsoft.Xna.Framework.Graphics
 	                if (length > 0) {
 	                    var log = new StringBuilder (length);
 	                    GL20.GetProgramInfoLog (program, length, ref length, log);
-	                    Console.WriteLine ("GL2.0 error: " + log.ToString ());
+#if DEBUG
+	                    //Console.WriteLine ("GL2.0 error: " + log.ToString ());
+#endif
 	                }
 	
 	                GL20.DeleteProgram (program);
@@ -189,7 +191,9 @@ namespace Microsoft.Xna.Framework.Graphics
 	                if (length > 0) {
 	                    var log = new StringBuilder (length);
 	                    GL20.GetShaderInfoLog (shader, length, ref length, log);
+#if DEBUG					
 	                    Console.WriteLine("GL2" + log.ToString ());
+#endif
 	                }
 	
 	                GL20.DeleteShader (shader);
