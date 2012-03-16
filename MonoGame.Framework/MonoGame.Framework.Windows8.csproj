@@ -52,6 +52,7 @@
     <Compile Include="Content\ContentReaders\TextureReader.cs" />
     <Compile Include="Content\ContentReaders\VertexBufferReader.cs" />
     <Compile Include="Content\ContentReaders\VertexDeclarationReader.cs" />
+    <Compile Include="Desktop\Input\Mouse.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="GamePlatform.cs" />
     <Compile Include="Graphics\CompareFunction.cs" />
@@ -115,7 +116,6 @@
     <Compile Include="Input\KeyboardState.cs" />
     <Compile Include="Input\Keys.cs" />
     <Compile Include="Input\KeyState.cs" />
-    <Compile Include="Input\Mouse.cs" />
     <Compile Include="Input\MouseState.cs" />
     <Compile Include="Input\ThumbStickDefinition.cs" />
     <Compile Include="Input\Touch\GestureSample.cs" />
@@ -294,6 +294,7 @@
     <Compile Include="Desktop\TitleContainer.cs" />
     <Compile Include="Content\ContentReaders\CurveReader.cs" />
     <Compile Include="Graphics\Vertices\VertexElementColor.cs" />
+    <Compile Include="Windows\Input\KeyboardUtil.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="SharpDX">
