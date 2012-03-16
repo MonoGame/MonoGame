@@ -113,7 +113,9 @@ namespace Microsoft.Xna.Framework.Graphics
 				GL.GetShader(fragment_handle, All.CompileStatus, ref compiled );
 				if (compiled == (int)All.False)
 				{
+#if DEBUG					
 					Console.Write("Fragment Compilation Failed!");
+#endif
 				}
             }
 
@@ -123,7 +125,9 @@ namespace Microsoft.Xna.Framework.Graphics
 				GL.GetShader(vertex_handle, All.CompileStatus, ref compiled );
 				if (compiled == (int)All.False)
 				{
+#if DEBUG					
 					Console.Write("Vertex Compilation Failed!");
+#endif
 				}
             }
 
