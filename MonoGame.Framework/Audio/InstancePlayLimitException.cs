@@ -46,10 +46,11 @@ namespace Microsoft.Xna.Framework.Audio
 {
 #if WINRT
     [DataContract]
+    public sealed class InstancePlayLimitException : Exception
 #else
     [Serializable]
-#endif
     public sealed class InstancePlayLimitException : ExternalException
+#endif
 	{
 	}
 }

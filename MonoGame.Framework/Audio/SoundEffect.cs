@@ -107,8 +107,8 @@ namespace Microsoft.Xna.Framework.Audio
 			writer.Write((int)buffer.Length); //data size
 			writer.Write(buffer);
 			
-			writer.Close();
-			mStream.Close();
+			writer.Dispose();
+            mStream.Dispose();
 			
 			_data = mStream.ToArray();
 			_name = "";
