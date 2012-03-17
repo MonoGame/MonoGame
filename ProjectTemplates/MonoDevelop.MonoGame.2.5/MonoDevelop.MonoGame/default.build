@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<project name="Aurora Ion Build Script" default="build" basedir=".">
+	<description>Default Ion Automated Build script</description>
+	<property name="os" value="${operating-system::get-platform(environment::get-operating-system())}" />
+
+
+
+	<target name="build" description="Build Visual Studio Templates">
+		 <if test="${os == 'Win32NT'}">
+			<exec program="msbuild " commandline="MonoDevelop.MonoGame.sln /t:Build /p:Configuration=Release" />			
+		</if>
+		<if test="${os == 'Unix'}">
+			<exec program="xbuild" commandline="/t:Build /p:Configuration=Release MonoDevelop.MonoGame.sln" />
+		</if>	
+	</target>
+
+
+	
+	
+</project>

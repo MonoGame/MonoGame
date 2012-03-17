@@ -3,7 +3,7 @@ SetCompressor /SOLID /FINAL lzma
 !define FrameworkPath "C:\Sandbox\MonoGame\"
 !define VERSION "2.5"
 !define REVISION "0.0"
-!define INSTALLERFILENAME "MonoGame-MonoDevelop"
+!define INSTALLERFILENAME "MonoGame"
 !define APPNAME "MonoGame"
 
 ;Include Modern UI
@@ -53,8 +53,9 @@ RequestExecutionLevel admin
 ; The stuff to install
 Section "MonoGame Core Components" ;No components page, name is not important
   SectionIn RO
-  SetOutPath '$INSTDIR\Assemblies'
+  SetOutPath $INSTDIR
   File '..\monogame.ico'
+  SetOutPath '$INSTDIR\Assemblies'
   File /r '..\..\ThirdParty\Lidgren.Network\bin\Release\*.dll'
   File /r '..\..\ThirdParty\Lidgren.Network\bin\Release\*.xml'
 
@@ -104,7 +105,13 @@ Section "MonoDevelop Templates"
 
   SetOutPath "$0AddIns\MonoDevelop.MonoGame"
   ; install the Templates for MonoDevelop
-  File /r '..\..\ProjectTemplates\MonoDevelop.MonoGame.${VERSION}\*.*'
+  File '..\..\ProjectTemplates\MonoDevelop.MonoGame.${VERSION}\*.*'
+  File '..\..\ProjectTemplates\MonoDevelop.MonoGame.${VERSION}\MonoDevelop.MonoGame\MonoDevelop.MonoGame\bin\Release\MonoDevelop.MonoGame.dll'
+  SetOutPath "$0AddIns\MonoDevelop.MonoGame\icons"
+  File /r '..\..\ProjectTemplates\MonoDevelop.MonoGame.${VERSION}\icons\*.*'
+  SetOutPath "$0AddIns\MonoDevelop.MonoGame\templates"
+  File /r '..\..\ProjectTemplates\MonoDevelop.MonoGame.${VERSION}\templates\*.*'
+
   
 SectionEnd
 

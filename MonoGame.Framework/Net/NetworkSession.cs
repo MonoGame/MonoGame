@@ -567,7 +567,11 @@ namespace Microsoft.Xna.Framework.Net
 		{
 			int hostGamer = -1;
 			hostGamer = GetHostingGamerIndex(localGamers);
+#if WINDOWS_PHONE
+            return Find(sessionType, hostGamer, 4, null);
+#else
 			return EndFind(BeginFind(sessionType, hostGamer, 4, searchProperties,null,null));
+#endif
 		}
 
 		public static AvailableNetworkSessionCollection Find (
@@ -610,7 +614,11 @@ namespace Microsoft.Xna.Framework.Net
 
 		public static NetworkSession Join (AvailableNetworkSession availableSession)
 		{
+#if WINDOWS_PHONE
+            return JoinSession(availableSession);
+#else
 			return EndJoin(BeginJoin(availableSession, null, null));
+#endif
 
 		}
 		
