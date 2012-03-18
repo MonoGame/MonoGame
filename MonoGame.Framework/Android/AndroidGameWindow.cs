@@ -241,17 +241,19 @@ namespace Microsoft.Xna.Framework
 			  // if we have default only we only allow Landscape
 			  allowedOrientation = allowedOrientation | DisplayOrientation.Portrait; 				
 			}
-			if (deviceManager.PreferredBackBufferSetByUser)
-			{
-				if (_game.GraphicsDevice.PresentationParameters.BackBufferHeight < _game.GraphicsDevice.PresentationParameters.BackBufferWidth)
-				{
-					allowedOrientation = DisplayOrientation.LandscapeLeft;
-				}				
-				if (_game.GraphicsDevice.PresentationParameters.BackBufferHeight > _game.GraphicsDevice.PresentationParameters.BackBufferWidth)
-				{
-					allowedOrientation = DisplayOrientation.Portrait;
-				}	
-			}
+
+            //What is this for?  This does not allow the application to use landscapeleft.
+            //if (deviceManager.PreferredBackBufferSetByUser)
+            //{
+            //    if (_game.GraphicsDevice.PresentationParameters.BackBufferHeight < _game.GraphicsDevice.PresentationParameters.BackBufferWidth)
+            //    {
+            //        allowedOrientation = DisplayOrientation.LandscapeLeft;
+            //    }				
+            //    if (_game.GraphicsDevice.PresentationParameters.BackBufferHeight > _game.GraphicsDevice.PresentationParameters.BackBufferWidth)
+            //    {
+            //        allowedOrientation = DisplayOrientation.Portrait;
+            //    }	
+            //}
 			
 			// ok we default to landscape left
 			var actualOrientation = DisplayOrientation.LandscapeLeft;

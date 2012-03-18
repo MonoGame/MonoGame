@@ -219,26 +219,11 @@
             {
                 if ((currentAsset is Texture2D))
                 {
-#if ANDROID
-                    if (AndroidCompatibility.KeepTexturesInMemory)
-                    {
-                        var asset = currentAsset as Texture2D;
-                        asset.Reload();
-                    }else
-                    {
-                        using (Stream assetStream = OpenStream(assetName))
-                        {
-                            var asset = currentAsset as Texture2D;
-                            asset.Reload(assetStream);
-                        }
-                    }
-#else
                     using (Stream assetStream = OpenStream(assetName))
                     {
                         var asset = currentAsset as Texture2D;
                         asset.Reload(assetStream);
                     }
-#endif
                 }
                 else if ((currentAsset is SpriteFont))
                 {
