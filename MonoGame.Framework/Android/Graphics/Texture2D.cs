@@ -271,6 +271,11 @@ namespace Microsoft.Xna.Framework.Graphics
             SetInfoFromESImage(esImage);
         }
 
+        internal void Reload()
+        {
+            texture.ForceRetryToCreateTexture();
+        }
+
         public static Texture2D FromFile(GraphicsDevice graphicsDevice, Stream textureStream, int numberBytes)
         {
             throw new NotImplementedException();

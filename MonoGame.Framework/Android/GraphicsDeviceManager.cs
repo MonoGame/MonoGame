@@ -262,10 +262,7 @@ namespace Microsoft.Xna.Framework
             }
             set
             {
-				if (_supportedOrientations == DisplayOrientation.Default)
-				{
-				   _preferredBackBufferSetByUser = true;
-				}
+				_preferredBackBufferSetByUser = true;
 				_preferredBackBufferHeight = value;
                 ResetClientBounds();
             }
@@ -279,10 +276,7 @@ namespace Microsoft.Xna.Framework
             }
             set
             {
-				if (_supportedOrientations == DisplayOrientation.Default)
-				{				
-				   _preferredBackBufferSetByUser = true;
-				}
+				_preferredBackBufferSetByUser = true;
 				_preferredBackBufferWidth = value;				
                 ResetClientBounds();
             }
