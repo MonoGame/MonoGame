@@ -312,9 +312,11 @@ namespace Microsoft.Xna.Framework {
 			case GestureType.PinchComplete:
 			case GestureType.VerticalDrag:
 			default:
+#if DEBUG
 				Console.WriteLine (
 					"Warning: Failed to create gesture recognizer of type {0}.",
 					gestureType);
+#endif
 				return null;
 			}
 		}

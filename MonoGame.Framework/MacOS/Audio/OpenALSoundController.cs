@@ -77,10 +77,12 @@ namespace Microsoft.Xna.Framework.Audio
 			}
 
 			string errorFmt = "OpenAL Error: {0}";
+#if DEBUG			
 			Console.WriteLine (String.Format ("{0} - {1}",
 							operation,
 							//string.Format (errorFmt, Alc.GetString (_device, _lastOpenALError))));
 							string.Format (errorFmt, _lastOpenALError)));
+#endif
 		}
 
 		private void CleanUpOpenAL ()

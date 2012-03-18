@@ -210,9 +210,11 @@ namespace Microsoft.Xna.Framework
 
                 PerformPendingExit();
             } catch (Exception ex) {
+#if DEBUG				
                 Console.WriteLine(
                     "Error while processing the main game loop: {0}\n{1}",
                     ex.Message, ex.StackTrace);
+#endif
                 Game.Exit ();
             }
         }

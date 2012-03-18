@@ -151,7 +151,9 @@ namespace Microsoft.Xna.Framework.Graphics
 	                if (length > 0) {
 	                    var log = new StringBuilder (length);
 	                    GL20.GetProgramInfoLog (program, length, ref length, log);
-	                    Console.WriteLine ("GL2.0 error: " + log.ToString ());
+#if DEBUG
+	                    //Console.WriteLine ("GL2.0 error: " + log.ToString ());
+#endif
 	                }
 	
 	                GL20.DeleteProgram (program);
@@ -189,7 +191,9 @@ namespace Microsoft.Xna.Framework.Graphics
 	                if (length > 0) {
 	                    var log = new StringBuilder (length);
 	                    GL20.GetShaderInfoLog (shader, length, ref length, log);
+#if DEBUG					
 	                    Console.WriteLine("GL2" + log.ToString ());
+#endif
 	                }
 	
 	                GL20.DeleteShader (shader);
@@ -305,8 +309,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			UpdateWorldMatrixOrientation();
 			
 			// Configure ViewPort
-			var viewport = GraphicsDevice.Viewport;
-			GL20.Viewport(viewport.X, viewport.Y, viewport.Width, viewport.Height);
+			var client = Game.Instance.Window.ClientBounds;
+			GL20.Viewport(client.X, client.Y, client.Width, client.Height);
 			GL20.UseProgram(program);
 			
             // Enable Scissor Tests if necessary
@@ -405,8 +409,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			GL11.MatrixMode(ALL11.Modelview);			
 
-			var viewport = GraphicsDevice.Viewport;
-			GL11.Viewport(viewport.X, viewport.Y, viewport.Width, viewport.Height);
+			var client = Game.Instance.Window.ClientBounds;
+			GL11.Viewport(client.X, client.Y, client.Width, client.Height);
 			
 			// Enable Scissor Tests if necessary
 			if ( this.graphicsDevice.RasterizerState.ScissorTestEnable )

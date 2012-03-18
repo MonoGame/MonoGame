@@ -64,6 +64,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private SurfaceFormat _format;
         private float _maxS, _maxT;
         // Stored until texture is created
+        private bool _textureCreated;
         private Bitmap _originalBitmap;
         private ALL11 _originalFilter;
 		private ALL11 _originalWrap;
@@ -148,8 +149,8 @@ namespace Microsoft.Xna.Framework.Graphics
 	                _height = (int)Math.Pow(2, Math.Min(10, Math.Ceiling(Math.Log10(imageSource.Height) / Math.Log10(2))));
 	            }
 	
-	            _size.Width = imageSource.Width;
-	            _size.Height = imageSource.Height;
+	            _size.Width = _width;
+	            _size.Height = _height;
 	
 	            if (GraphicsDevice.OpenGLESVersion ==
 	                OpenTK.Graphics.GLContextVersion.Gles2_0)
@@ -167,9 +168,13 @@ namespace Microsoft.Xna.Framework.Graphics
 	                _originalFilter = filter;
 					_originalWrap = wrap;
 	                PrimaryThreadLoader.AddToList(this);
+                    _textureCreated = false;
 	            }
 	            else
 	            {
+                    _originalBitmap = null;
+                    _textureCreated = true;
+
 	                using (
 	                    Bitmap imagePadded = Bitmap.CreateBitmap(_width, _height,
 	                                                             Bitmap.Config.Argb8888)
@@ -224,8 +229,11 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 			finally
 			{
-				// free bitmap
-				imageSource.Recycle();
+                if (_originalBitmap != imageSource)
+                {
+                    // free bitmap
+                    imageSource.Dispose();
+                }
 			}
 
             _maxS = _size.Width / (float)_width;
@@ -317,14 +325,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void RetryToCreateTexture()
         {
-            if (_originalBitmap == null) return;
+            if (_originalBitmap == null || _textureCreated) return;
 
             InitWithBitmap(_originalBitmap, _originalFilter, _originalWrap);
-            if (_name != 0)
-            {
-                _originalBitmap.Dispose();
-                _originalBitmap = null;
-            }
         }
 
         public void Dispose()
@@ -549,6 +552,22 @@ namespace Microsoft.Xna.Framework.Graphics
             RetryToCreateTexture();
 
             return _originalBitmap == null;
+        }
+
+        public void ForceRetryToCreateTexture()
+        {
+            if (_name != 0)
+            {
+                if (GraphicsDevice.OpenGLESVersion == OpenTK.Graphics.GLContextVersion.Gles2_0)
+                    GL20.DeleteTextures(1, ref _name);
+                else
+                    GL11.DeleteTextures(1, ref _name);
+
+                _name = 0;
+            }
+
+            _textureCreated = false;
+            RetryToCreateTexture();
         }
     }
 }
