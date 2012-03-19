@@ -11,10 +11,26 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		{
 			this.activity = activity;			
 		}			
+		
+		private static bool dragging = false;
 			
 						
 		public override bool OnScroll (MotionEvent e1, MotionEvent e2, float distanceX, float distanceY)
 		{			
+			
+			if ((TouchPanel.EnabledGestures & GestureType.FreeDrag) != 0)
+			{								
+				if (!dragging) dragging = true;
+		
+				Vector2 position = new Vector2(e2.GetX(), e2.GetY());
+				Android.Util.Log.Info("MonoGame", position.ToString());
+				AndroidGameActivity.Game.Window.UpdateTouchPosition(ref position);
+				
+				var gs = new GestureSample(GestureType.FreeDrag, AndroidGameActivity.Game.TargetElapsedTime, 
+					position, Vector2.Zero, Vector2.Zero, Vector2.Zero);
+				TouchPanel.GestureList.Enqueue(gs);
+			}
+			
 			return base.OnScroll (e1, e2, distanceX, distanceY);
 		}
 		
@@ -37,6 +53,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			return base.OnDoubleTap (e);
 		}
 		
+		
+		
 		/// <summary>
 		/// Process the Single Tag into a Gesture
 		/// </summary>
@@ -44,14 +62,15 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		/// If set to <c>true</c> e.
 		/// </param>
 		public override bool OnSingleTapConfirmed (MotionEvent e)
-		{
+		{		
 			if ((TouchPanel.EnabledGestures & GestureType.Tap) != 0)
 			{
-				Vector2 positon = new Vector2(e.GetX(), e.GetY());
-				AndroidGameActivity.Game.Window.UpdateTouchPosition(ref positon);
+				Vector2 position = new Vector2(e.GetX(), e.GetY());
+				AndroidGameActivity.Game.Window.UpdateTouchPosition(ref position);
 				var gs = new GestureSample(GestureType.Tap, AndroidGameActivity.Game.TargetElapsedTime, 
-					positon, Vector2.Zero, Vector2.Zero, Vector2.Zero);
+					position, Vector2.Zero, Vector2.Zero, Vector2.Zero);
 				TouchPanel.GestureList.Enqueue(gs);
+				Android.Util.Log.Info("MonoGame", "Tap");
 			}
 			return base.OnSingleTapConfirmed (e);
 		}
@@ -90,25 +109,21 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		
 		internal static void CheckForDrag(MotionEvent e, Vector2 position)
 		{
+			
 			switch (e.ActionMasked)
             {
 				case 1:
-                case 6:
-                    if ((TouchPanel.EnabledGestures & GestureType.DragComplete) != 0)
+                case 6:				
+                    if ((dragging && (TouchPanel.EnabledGestures & GestureType.DragComplete) != 0))
 					{				
 						var gs = new GestureSample(GestureType.DragComplete, AndroidGameActivity.Game.TargetElapsedTime, 
 							position, Vector2.Zero, Vector2.Zero, Vector2.Zero);
 						TouchPanel.GestureList.Enqueue(gs);
+					   dragging = false;
+					   Android.Util.Log.Info("MonoGame", "DragComplete");
 					}
                     break;
-				case 2:
-					if ((TouchPanel.EnabledGestures & GestureType.FreeDrag) != 0)
-					{				
-						var gs = new GestureSample(GestureType.FreeDrag, AndroidGameActivity.Game.TargetElapsedTime, 
-							position, Vector2.Zero, Vector2.Zero, Vector2.Zero);
-						TouchPanel.GestureList.Enqueue(gs);
-					}
-                    break;
+			
 			}
 		}
 		

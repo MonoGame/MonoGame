@@ -1,28 +1,28 @@
 ﻿#region Using Statements
 using System;
-
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Storage;
 using Microsoft.Xna.Framework.Input;
-
+using Microsoft.Xna.Framework.Storage;
+using Microsoft.Xna.Framework.GamerServices;
 #endregion
 
-namespace ${Namespace}
+namespace $safeprojectname$
 {
-	/// <summary>
+    /// <summary>
     /// This is the main type for your game
     /// </summary>
     public class Game1 : Game
     {
         GraphicsDeviceManager graphics;
-        SpriteBatch spriteBatch;		
-
-        public Game1()
+        SpriteBatch spriteBatch;
+        
+        public Game1() : base()
         {
             graphics = new GraphicsDeviceManager(this);
-            Content.RootDirectory = "Content";	            
-			graphics.IsFullScreen = true;		
+            Content.RootDirectory = "Content";
         }
 
         /// <summary>
@@ -34,8 +34,8 @@ namespace ${Namespace}
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
+
             base.Initialize();
-				
         }
 
         /// <summary>
@@ -47,7 +47,16 @@ namespace ${Namespace}
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            //TODO: use this.Content to load your game content here 
+            // TODO: use this.Content to load your game content here
+        }
+
+        /// <summary>
+        /// UnloadContent will be called once per game and is the place to unload
+        /// all content.
+        /// </summary>
+        protected override void UnloadContent()
+        {
+            // TODO: Unload any non ContentManager content here
         }
 
         /// <summary>
@@ -57,12 +66,11 @@ namespace ${Namespace}
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            // For Mobile devices, this logic will close the Game when the Back button is pressed
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
-			{
-				Exit();
-			}
-            // TODO: Add your update logic here			
+            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
+                Exit();
+
+            // TODO: Add your update logic here
+
             base.Update(gameTime);
         }
 
@@ -72,10 +80,10 @@ namespace ${Namespace}
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-           	graphics.GraphicsDevice.Clear(Color.CornflowerBlue);
-		
-            //TODO: Add your drawing code here
-            
+            GraphicsDevice.Clear(Color.CornflowerBlue);
+
+            // TODO: Add your drawing code here
+
             base.Draw(gameTime);
         }
     }
