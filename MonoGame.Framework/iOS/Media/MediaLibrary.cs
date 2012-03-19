@@ -40,6 +40,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 using MonoTouch.MediaPlayer;
 
@@ -60,6 +61,16 @@ namespace Microsoft.Xna.Framework.Media
 
         public void Dispose()
         {
+        }
+
+        public void SavePicture(string name, byte[] imageBuffer)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SavePicture(string name, Stream source)
+        {
+            throw new NotImplementedException();
         }
 
 /*        public AlbumCollection Albums
