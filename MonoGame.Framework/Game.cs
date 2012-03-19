@@ -549,8 +549,13 @@ namespace Microsoft.Xna.Framework
 
             viewport.X = 0;
             viewport.Y = 0;
+#if WINDOWS || LINUX
+            viewport.Width = manager.PreferredBackBufferWidth;// GraphicsDevice.PresentationParameters.BackBufferWidth;
+            viewport.Height = manager.PreferredBackBufferHeight;// GraphicsDevice.PresentationParameters.BackBufferHeight;
+#else
             viewport.Width = GraphicsDevice.PresentationParameters.BackBufferWidth;
             viewport.Height = GraphicsDevice.PresentationParameters.BackBufferHeight;
+#endif
 
             GraphicsDevice.Viewport = viewport;
 			Platform.EndScreenDeviceChange(string.Empty, viewport.Width, viewport.Height);
