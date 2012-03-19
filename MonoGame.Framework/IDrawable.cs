@@ -47,8 +47,8 @@ namespace Microsoft.Xna.Framework
         int DrawOrder { get; }
         bool Visible { get; }
 		
-		event EventHandler DrawOrderChanged;
-        event EventHandler VisibleChanged;
+		event EventHandler<EventArgs> DrawOrderChanged;
+        event EventHandler<EventArgs> VisibleChanged;
 
         void Draw(GameTime gameTime);      
     }

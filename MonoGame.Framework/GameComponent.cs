@@ -47,8 +47,8 @@ namespace Microsoft.Xna.Framework
         Game _game;
         int _updateOrder;
         bool _enabled;
-        public event EventHandler UpdateOrderChanged;
-        public event EventHandler EnabledChanged;
+        public event EventHandler<EventArgs> UpdateOrderChanged;
+        public event EventHandler<EventArgs> EnabledChanged;
         public GameComponent(Game game)
         {
             _game = game;
@@ -101,7 +101,7 @@ namespace Microsoft.Xna.Framework
             }
         }
 
-        private void Raise(EventHandler handler, EventArgs e)
+        private void Raise(EventHandler<EventArgs> handler, EventArgs e)
         {
             if (handler != null)
                 handler(this, e);
