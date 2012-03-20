@@ -115,7 +115,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			return b.Depth.CompareTo(a.Depth);
 		}
 		
-		public void DrawBatchGL20 ( SpriteSortMode sortMode )
+		public void DrawBatchGL20 ( SpriteSortMode sortMode, SamplerState samplerState )
 		{
 			// nothing to do
 			if ( _batchItemList.Count == 0 )
@@ -171,6 +171,8 @@ namespace Microsoft.Xna.Framework.Graphics
 					GL20.BindTexture ( ALL20.Texture2D, texID );
 					GL20.Uniform1(texID, 0);
 					GL20.VertexAttrib4(attributeTint,vtint.X, vtint.Y, vtint.Z, vtint.W);
+
+					samplerState.Activate();
 				}
 				// store the SpriteBatchItem data in our vertexArray
 				_vertexArray[index++] = item.vertexTL;
