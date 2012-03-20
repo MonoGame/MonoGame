@@ -338,7 +338,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				//GL20.Clear((int) (ALL20.ColorBufferBit | ALL20.DepthBufferBit));
 			}
 
-			_batcher.DrawBatchGL20 ( _sortMode );
+			_batcher.DrawBatchGL20 ( _sortMode, _samplerState );
 
             if (this.graphicsDevice.RasterizerState.ScissorTestEnable)
             {
