@@ -104,7 +104,7 @@ namespace Microsoft.Xna.Framework
             var normalized = orientation;
 			
 			// Xna's "default" displayorientation is Landscape Left/Right.
-            if (normalized & DisplayOrientation.Default)
+            if ((normalized & DisplayOrientation.Default) != 0)
             {
                 normalized |= DisplayOrientation.LandscapeLeft;
 				normalized |= DisplayOrientation.LandscapeRight;
