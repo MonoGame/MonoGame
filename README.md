@@ -7,7 +7,7 @@ MonoGame is an OpenSource, OpenGL implementation of Microsoft's XNA 4 APIs that 
 v2.5 is nearing public release. Stay tuned.
 
 # FEATURED GAMES
-[Infinite Flight](http://itunes.apple.com/us/app/infinite-flight/id471341991?ls=1&mt=8)
+### [Infinite Flight](http://itunes.apple.com/us/app/infinite-flight/id471341991?ls=1&mt=8)
 
 This awesome flight simulator is now available on the [Apple App Store](http://itunes.apple.com/us/app/infinite-flight/id471341991?ls=1&mt=8). 
 
@@ -21,10 +21,10 @@ Here are some quotes from people how have played it already....
 
 This is MonoGame's first 3D game and we are very grateful that [Inflight Dev Studio](http://flyingdevstudio.blogspot.co.uk) donated their changes back to our codebase, thus speeding up our 3D implementation immeasurably. 
 
-# PREVIOUSLY FEATURED GAMES
-[Bastion](https://chrome.google.com/webstore/detail/oohphhdkahjlioohbalmicpokoefkgid)
 
-This game has won numerous awards for its narration and music, when it was released on XBox 360,
+### [Bastion](https://chrome.google.com/webstore/detail/oohphhdkahjlioohbalmicpokoefkgid)
+
+This game has won [numerous awards](http://supergiantgames.com/?p=1286) for its narration and music, when it was released on XBox 360,
 The development team used a modified MonoGame engine to port their game to Google's Native Client and therefore onto Google App Store.
 We are hoping to find out what mods they made to MonoGame and how others could submit their games to Google's App Store.
 
