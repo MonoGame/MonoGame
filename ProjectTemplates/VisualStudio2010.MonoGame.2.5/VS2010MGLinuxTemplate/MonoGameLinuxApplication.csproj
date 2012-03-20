@@ -43,6 +43,9 @@
     <Reference Include="OpenTK, Version=1.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL" />
     <Reference Include="MonoGame.Framework.Linux, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <Reference Include="Lidgren.Network, Version=2011.3.12.0, Culture=neutral, PublicKeyToken=null" />
+    <Reference Include="GamepadBridge, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"/>
+    <Reference Include="GamepadConfigControls, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"/>
+    <Reference Include="Tao.Sdl, Version=1.2.13.0, Culture=neutral, PublicKeyToken=9c7a200e36c0094e, processorArchitecture=MSIL"/>
     <Reference Include="System" />
     <Reference Include="System.Xml" />
   </ItemGroup>
