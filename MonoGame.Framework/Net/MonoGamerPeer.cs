@@ -801,6 +801,8 @@ namespace Microsoft.Xna.Framework.Net
 				peer.SendUnconnectedMessage (om, m_masterServer); // send message to peer
 			}
 		}
+
+        internal bool IsReady { get { return this.peer != null; } }
 	}
 
 

@@ -15,7 +15,7 @@ namespace ${Namespace}
 	           MainLauncher = true,
 	           Icon = "@drawable/icon",
 	           Theme = "@style/Theme.Splash",
-	           LaunchMode=LaunchMode.SingleInstance,
+	           LaunchMode=Android.Content.PM.LaunchMode.SingleInstance,
 	           ConfigurationChanges = Android.Content.PM.ConfigChanges.Orientation | 
 	                                  Android.Content.PM.ConfigChanges.KeyboardHidden | 
 	                                  Android.Content.PM.ConfigChanges.Keyboard)]

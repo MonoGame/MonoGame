@@ -40,9 +40,12 @@
 	<Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="OpenTK, Version=1.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL" />
-    <Reference Include="MonoGame.Framework.Linux, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
-    <Reference Include="Lidgren.Network, Version=2011.3.12.0, Culture=neutral, PublicKeyToken=null" />
+    <Reference Include="OpenTK" />
+    <Reference Include="MonoGame.Framework.Linux" />
+    <Reference Include="Lidgren.Network" />
+    <Reference Include="GamepadBridge"/>
+    <Reference Include="GamepadConfigControls"/>
+    <Reference Include="Tao.Sdl"/>
     <Reference Include="System" />
     <Reference Include="System.Xml" />
   </ItemGroup>
