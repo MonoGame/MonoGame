@@ -688,7 +688,7 @@ namespace Microsoft.Xna.Framework.Net
 		{
 			// Updates the state of the multiplayer session. 
 			try {
-				while (commandQueue.Count > 0) {
+				while (commandQueue.Count > 0 && networkPeer.IsReady) {
 					var command = (CommandEvent)commandQueue.Dequeue();
 					
 					// for some screwed up reason we are dequeueing something
