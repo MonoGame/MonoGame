@@ -104,7 +104,8 @@ namespace Microsoft.Xna.Framework
             var normalized = orientation;
             if ((normalized & DisplayOrientation.Default) == DisplayOrientation.Default)
             {
-                normalized |= DisplayOrientation.Portrait;
+                normalized |= DisplayOrientation.LandscapeLeft;
+				normalized |= DisplayOrientation.LandscapeRight;
                 normalized &= ~DisplayOrientation.Default;
             }
             return normalized;
