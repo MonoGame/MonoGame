@@ -18,7 +18,6 @@
 		
 		<Project name = "${ProjectName}" directory = "." type = "MonoDroid">
 			<Options
-				TargetFrameworkVersion = "4.0" 
 				AndroidApplication="true"
 				AndroidResgenFile="Resources/Resource.designer.cs"
 				AndroidResgenClass="Resource" />
