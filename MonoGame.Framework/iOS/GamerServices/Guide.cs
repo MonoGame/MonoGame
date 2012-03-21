@@ -39,13 +39,12 @@ purpose and non-infringement.
 #endregion License
 
 #region Using clause
-
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Remoting.Messaging;
 using System.Threading;
+using System.Runtime.Remoting.Messaging;
 
 using MonoTouch.UIKit;
 using MonoTouch.Foundation;
@@ -138,12 +137,8 @@ namespace Microsoft.Xna.Framework.GamerServices
 			return invokeOnMainThredObj;
 		}
 			
-		private static UIWindow _window;
 		internal static void Initialise(Game game) {
-			_window = (UIWindow)game.Services.GetService(typeof(UIWindow));
-			if (_window == null)
-				throw new InvalidOperationException(
-					"iOSGamePlatform must add the main UIWindow to Game.Services");
+			
 		}
 		delegate string ShowKeyboardInputDelegate(
 		 PlayerIndex player,           
@@ -377,12 +372,12 @@ namespace Microsoft.Xna.Framework.GamerServices
 						TouchPanel.EnabledGestures=prevGestures;
  					};
 
-					if (_window != null)
+					if (Window !=null)
 					{						
 						if(viewController == null)
 						{
 							viewController = new GameVc();
-							_window.Add(viewController.View);
+							Window.Add(viewController.View);
 							viewController.View.Hidden = true;
 						}
 						
@@ -420,12 +415,12 @@ namespace Microsoft.Xna.Framework.GamerServices
 						TouchPanel.EnabledGestures=prevGestures;
 					};
 
-					if (_window != null)
+					if (Window !=null)
 					{
 						if(viewController == null)
 						{
 							viewController = new GameVc();
-							_window.Add(viewController.View);
+							Window.Add(viewController.View);
 							viewController.View.Hidden = true;
 						}
 
@@ -496,12 +491,12 @@ namespace Microsoft.Xna.Framework.GamerServices
 						TouchPanel.EnabledGestures=prevGestures;
 					};
 
-					if (_window != null)
+					if (Window !=null)
 					{
 						if(viewController == null)
 						{
 							viewController = new GameVc();
-							_window.Add(viewController.View);
+							Window.Add(viewController.View);
 							viewController.View.Hidden = true;
 						}
 
@@ -571,6 +566,12 @@ namespace Microsoft.Xna.Framework.GamerServices
 			{
 				simulateTrialMode = value;
 			}
+		}
+
+		public static GameWindow Window 
+		{ 
+			get;
+			set;
 		}
 		#endregion
 	}

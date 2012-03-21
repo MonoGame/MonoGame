@@ -70,24 +70,29 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
+using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Input.Touch;
+
 using MonoTouch.Foundation;
 using MonoTouch.OpenGLES;
 using MonoTouch.UIKit;
-
 using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Input.Touch;
 
 namespace Microsoft.Xna.Framework
 {
     class iOSGamePlatform : GamePlatform
     {
+        // FIXME: Previously components were being initialized on a background thread, apparently.  We may need to
+        //        express this concept somewhere within the Game-GamePlatform contract.  Not sure where yet.
+//        EAGLContext.SetCurrentContext(_window.BackgroundContext);
+//        Initialize all components...
+//        EAGLContext.SetCurrentContext(_window.MainContext);
+
         private iOSGameViewController _viewController;
         private UIWindow _mainWindow;
+        private NSObject _rotationObserver;
         private List<NSObject> _applicationObservers;
 		private OpenALSoundController soundControllerInstance = null;
-        private NSTimer _runTimer;
-        private bool _isExitPending;
 
         public iOSGamePlatform(Game game) :
             base(game)
@@ -103,14 +108,13 @@ namespace Microsoft.Xna.Framework
 
             // Create a full-screen window
             _mainWindow = new UIWindow(UIScreen.MainScreen.Bounds);
-            game.Services.AddService(typeof(UIWindow), _mainWindow);
 
             _viewController = new iOSGameViewController(this);
-            _viewController.InterfaceOrientationChanged += ViewController_InterfaceOrientationChanged;
-            Window = new iOSGameWindow(_viewController);
+            _viewController.View.Load += GameWindow_Load;
+            _viewController.View.Unload += GameWindow_Unload;
+            Window = _viewController.View;
 
             _mainWindow.RootViewController = _viewController;
-            _mainWindow.Add (_viewController.View);
         }
 
         public override GameRunBehavior DefaultRunBehavior
@@ -118,9 +122,6 @@ namespace Microsoft.Xna.Framework
             get { return GameRunBehavior.Asynchronous; }
         }
 
-        [Obsolete(
-            "iOSGamePlatform.IsPlayingVideo must be removed when MonoGame " +
-            "fully implements the XNA VideoPlayer contract.")]
         public bool IsPlayingVideo { get; set; }
 
         // FIXME: VideoPlayer 'needs' this to set up its own movie player view
@@ -135,27 +136,31 @@ namespace Microsoft.Xna.Framework
             base.Dispose(disposing);
             if (disposing)
             {
-                if (_viewController != null)
-                {
-                    _viewController.View.RemoveFromSuperview ();
-                    _viewController.RemoveFromParentViewController ();
-                    _viewController.Dispose();
-                    _viewController = null;
-                }
-
                 if (_mainWindow != null)
                 {
                     _mainWindow.Dispose();
                     _mainWindow = null;
+                }
+                if (_viewController != null)
+                {
+                    _viewController.Dispose();
+                    _viewController = null;
                 }
             }
         }
 
         public override void BeforeInitialize()
         {
-            base.BeforeInitialize ();
-            _viewController.View.MakeCurrent ();
             TouchPanel.Reset();
+
+            // HACK: Force the OpenGL context to be created before any
+            //       components are initialized.  This hack could be eliminated
+            //       by implementing a custom Initialize method in
+            //       iOSGameWindow that calls CreateFrameBuffer and OnLoad.
+            //       CreateFrameBuffer and OnLoad would both need to be changed
+            //       to be idempotent per create-destroy cycle of the OpenGL
+            //       context.
+            _viewController.View.Run(1.0 / Game.TargetElapsedTime.TotalSeconds);
         }
 
         public override void RunLoop()
@@ -170,54 +175,31 @@ namespace Microsoft.Xna.Framework
 
             Accelerometer.SetupAccelerometer();
             BeginObservingUIApplication();
+            BeginObservingDeviceRotation();
 
             _viewController.View.BecomeFirstResponder();
-            _runTimer = NSTimer.CreateRepeatingScheduledTimer(Game.TargetElapsedTime, Tick);
 		}
 
-        private void Tick()
+        private void GameWindow_Load(object sender, EventArgs e)
         {
-            try {
-                if (PerformPendingExit())
-                    return;
-                if (IsPlayingVideo)
-                    return;
-
-                // FIXME: Remove this call, and the whole Tick method, once
-                //        GraphicsDevice is where platform-specific Present
-                //        functionality is actually implemented.  At that
-                //        point, it should be possible to pass Game.Tick directly
-                //        to NSTimer.CreateRepeatingTimer.
-                _viewController.View.MakeCurrent();
-                Game.Tick ();
-    
-                if (!IsPlayingVideo)
-                    _viewController.View.Present ();
-
-                PerformPendingExit();
-            } catch (Exception ex) {
-                Console.WriteLine(
-                    "Error while processing the main game loop: {0}\n{1}",
-                    ex.Message, ex.StackTrace);
-                Game.Exit ();
-            }
+            // FIXME: Surely this activity should be performed by some other
+            //        class.  iOSGameViewController or the iOS GameWindow.
+            _viewController.View.MainContext = _viewController.View.EAGLContext;
+            _viewController.View.ShareGroup = _viewController.View.MainContext.ShareGroup;
+            _viewController.View.BackgroundContext = new EAGLContext(_viewController.View.ContextRenderingApi, _viewController.View.ShareGroup);
+			Threading.BackgroundContext = _viewController.View.BackgroundContext;
         }
 
-        private bool PerformPendingExit()
+        private void GameWindow_Unload(object sender, EventArgs e)
         {
-            if (!_isExitPending)
-                return false;
-
-            _isExitPending = false;
-            if (_runTimer != null) {
-                _runTimer.Invalidate ();
-                _runTimer.Dispose ();
-                _runTimer = null;
-            }
-            StopObservingUIApplication ();
-            RaiseAsyncRunLoopEnded ();
-            return true;
-         }
+            // FIXME: Surely this activity should be performed by some other
+            //        class.  iOSGameViewController or the iOS GameWindow.
+            _viewController.View.MainContext = null;
+            _viewController.View.ShareGroup = null;
+            // FIXME: Dispose BackgroundContext first?  We created it in
+            //        GameWindow_Load.
+            _viewController.View.BackgroundContext = null;
+        }
 
         public override bool BeforeDraw(GameTime gameTime)
         {
@@ -247,7 +229,12 @@ namespace Microsoft.Xna.Framework
 
         public override void Exit()
         {
-            _isExitPending = true;
+            StopObservingUIApplication();
+            StopObservingDeviceRotation();
+            // FIXME: Need to terminate the run loop.  On iOS, this probably means
+            //        destroying _mainWindow.  But should async platforms try to kill the
+            //        whole program?
+            //throw new NotImplementedException();
         }
 
         private void BeginObservingUIApplication()
@@ -282,6 +269,21 @@ namespace Microsoft.Xna.Framework
         {
             NSNotificationCenter.DefaultCenter.RemoveObservers(_applicationObservers);
             _applicationObservers.Clear();
+        }
+
+        private void BeginObservingDeviceRotation()
+        {
+            _rotationObserver = NSNotificationCenter.DefaultCenter.AddObserver(
+                new NSString("UIDeviceOrientationDidChangeNotification"),
+                Device_OrientationDidChange);
+
+            UIDevice.CurrentDevice.BeginGeneratingDeviceOrientationNotifications();
+        }
+
+        private void StopObservingDeviceRotation()
+        {
+            NSNotificationCenter.DefaultCenter.RemoveObserver(_rotationObserver);
+            UIDevice.CurrentDevice.EndGeneratingDeviceOrientationNotifications();
         }
 
         #region Notification Handling
@@ -323,33 +325,49 @@ namespace Microsoft.Xna.Framework
             GC.Collect();
         }
 
-        #endregion Notification Handling
-
-		private void ViewController_InterfaceOrientationChanged (object sender, EventArgs e)
+        private void Device_OrientationDidChange(NSNotification notification)
         {
-			var orientation = OrientationConverter.ToDisplayOrientation (
-				_viewController.InterfaceOrientation);
+            var orientation = OrientationConverter.UIDeviceOrientationToDisplayOrientation(
+                UIDevice.CurrentDevice.Orientation);
 
-			// FIXME: The presentation parameters for the GraphicsDevice should
-			//        be managed by the GraphicsDevice itself.  Not by
-			//        iOSGamePlatform.
-			var gdm = (GraphicsDeviceManager) Game.Services.GetService (typeof (IGraphicsDeviceManager));
+            // Calculate supported orientations if it has been left as "default"
+            var gdm = (GraphicsDeviceManager)Game.Services.GetService(typeof(IGraphicsDeviceManager));
+            DisplayOrientation supportedOrientations = gdm.SupportedOrientations;
 
-			if (gdm != null) {
             var presentParams = gdm.GraphicsDevice.PresentationParameters;
+
+            if (presentParams.BackBufferWidth != gdm.PreferredBackBufferWidth)
                 presentParams.BackBufferWidth = gdm.PreferredBackBufferWidth;
+
+            if (presentParams.BackBufferHeight != gdm.PreferredBackBufferHeight)
                 presentParams.BackBufferHeight = gdm.PreferredBackBufferHeight;
-                presentParams.DisplayOrientation = orientation;
+
+            if ((supportedOrientations & DisplayOrientation.Default) != 0)
+            {
+                if (presentParams.BackBufferWidth > presentParams.BackBufferHeight)
+                    supportedOrientations = DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight;
+                else
+                    supportedOrientations = DisplayOrientation.Portrait | DisplayOrientation.PortraitUpsideDown;
             }
-			TouchPanel.DisplayOrientation = orientation;
+
+            if ((supportedOrientations & orientation) == orientation)
+            {
+                _viewController.View.CurrentOrientation = orientation;
+                presentParams.DisplayOrientation = orientation;
+                TouchPanel.DisplayOrientation = orientation;
+            }
         }
 
+        #endregion Notification Handling
 		public override void BeginScreenDeviceChange (bool willBeFullScreen)
 		{
+
 		}
 
 		public override void EndScreenDeviceChange (string screenDeviceName, int clientWidth,int clientHeight)
 		{
+
 		}		
     }
 }
+

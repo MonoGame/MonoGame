@@ -39,7 +39,7 @@ purpose and non-infringement.
 #endregion License
 
 #region Using Statements
-using System;
+﻿using System;
 
 using Microsoft.Xna.Framework.Net;
 #endregion Statements
@@ -55,6 +55,7 @@ namespace Microsoft.Xna.Framework.GamerServices
         public GamerServicesComponent(Game game) : base(game)
         {
 			lng = new LocalNetworkGamer();
+			Guide.Window = game.Window;
             Guide.Initialise(game);
         }
 		

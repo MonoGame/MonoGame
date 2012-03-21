@@ -338,11 +338,7 @@
     <Compile Include="Net\NetworkMessageType.cs" />
     <Compile Include="iOS\GamerServices\SignedInGamer.cs" />
     <Compile Include="iOS\Input\GamePad.cs" />
-    <Compile Include="iOS\iOSGameWindow.cs" />
-    <Compile Include="GameWindow.cs" />
-    <Compile Include="iOS\iOSGameView.cs" />
-    <Compile Include="iOS\iOSGameView_GLAbstraction.cs" />
-    <Compile Include="iOS\iOSGameView_Touch.cs" />
+    <Compile Include="iOS\IOSGameWindow.cs" />
     <Compile Include="iOS\PowerStatus.cs" />
     <Compile Include="iOS\Media\MediaSource.cs" />
     <Compile Include="iOS\Media\MediaLibrary.cs" />

@@ -45,6 +45,14 @@ namespace Microsoft.Xna.Framework
         public override DisplayOrientation CurrentOrientation
         {
             get { return nativeWindow.CurrentOrientation; }
+            internal set
+            {
+                if (nativeWindow.CurrentOrientation != value)
+                {
+                    //nativeWindow.CurrentOrientation = value;
+                    OnOrientationChanged();
+                }
+            }
         }
 
         public override IntPtr Handle
@@ -60,12 +68,6 @@ namespace Microsoft.Xna.Framework
         protected override void SetTitle(string title)
         {
             nativeWindow.Title = title;
-        }
-
-        // FIXME: Implement SetSupportedOrientations
-        protected internal override void SetSupportedOrientations(DisplayOrientation orientations)
-        {
-            Console.WriteLine("Android needs to implement GameWindow.SetSupportedOrientations!");
         }
     }
 }

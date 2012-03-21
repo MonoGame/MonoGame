@@ -91,7 +91,6 @@ namespace Microsoft.Xna.Framework
 			_graphicsDevice = new GraphicsDevice();
 
 			Initialize();
-			ApplyChanges();
 			
 			OnDeviceCreated(EventArgs.Empty);
 		}
@@ -154,15 +153,16 @@ namespace Microsoft.Xna.Framework
 
         public void ApplyChanges()
         {
-            _game.Window.SetSupportedOrientations(_supportedOrientations);
         }
 
 		private void Initialize()
 		{			
 			// Set "full screen"  as default
 			_graphicsDevice.PresentationParameters.IsFullScreen = true;
-
-			if (_preferMultiSampling)
+#if IPHONE
+			_graphicsDevice.glFramebuffer = _game.Window.Framebuffer;
+#endif
+			if (_preferMultiSampling) 
 			{
 				_graphicsDevice.PreferedFilter = All.Linear;
 			}

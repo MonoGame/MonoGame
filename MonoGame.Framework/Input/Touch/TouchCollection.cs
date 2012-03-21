@@ -53,6 +53,9 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		/// </summary>
 		private bool isConnected;
 		
+		//Helpers
+		private List<TouchLocation> aux;
+		
 		#region Properties
 		public bool IsConnected
 		{
@@ -72,6 +75,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		
 		public TouchCollection()
 		{
+			aux = new List<TouchLocation>();
 		}
 		
 		internal TouchCollection(IEnumerable<TouchLocation> locations)	: base (locations)
@@ -79,10 +83,16 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			
 		}
 		
-		internal void Update()
+		public bool Contains(TouchLocation item)
 		{
-			//Console.WriteLine(">>> Touches: {0}", Count);
-			for (int i = this.Count - 1; i >= 0; --i)
+			return (this.IndexOf(item) >= 0);
+		}
+		
+		internal void Update()
+		{ 
+			//Console.WriteLine("----------------"+this.Count+"--------------------");
+			aux.Clear();
+			for (int i = 0;  i <  this.Count; i++)
 			{
 				TouchLocation t = this[i];
 				switch (t.State)
@@ -97,27 +107,36 @@ namespace Microsoft.Xna.Framework.Input.Touch
 						this[i] = t;
 					break;
 					case TouchLocationState.Released:
-					case TouchLocationState.Invalid:
-						RemoveAt(i);
+						aux.Add(t);
 					break;
 				}
 			}
-			//Console.WriteLine("<<< Touches: {0}", Count);
+			foreach(TouchLocation touch in aux)
+				this.Remove(touch);
 		}
-
-		public bool FindById(int id, out TouchLocation touchLocation)
+		
+		public void CopyTo (TouchLocation[] array, int arrayIndex)
 		{
-			int index = this.FindIndex((t) => { return t.Id == id; });
-			if (index >= 0)
+			if (array == null)
 			{
-				touchLocation = this[index];
-				return true;
+				throw new ArgumentNullException("array");
 			}
-			touchLocation = default(TouchLocation);
-			return false;
+			if (arrayIndex < 0)
+			{
+				throw new ArgumentOutOfRangeException("arrayIndex");
+			}
+			long num = arrayIndex + this.Count;
+			if (array.Length < num)
+			{
+				throw new ArgumentOutOfRangeException("arrayIndex");
+			}
+			for(int i = 0; i < this.Count; i++)
+			{
+				array[arrayIndex+i] = this[i];
+			}
 		}
-
-		internal int FindIndexById(int id, out TouchLocation touchLocation)
+		
+		public int FindById(int id, out TouchLocation touchLocation)
 		{
 			for (int i = 0; i < this.Count; i++)
 			{
@@ -128,36 +147,22 @@ namespace Microsoft.Xna.Framework.Input.Touch
 					return i;
 				}
 			}
-			touchLocation = default(TouchLocation);
+			touchLocation = new TouchLocation();
 			return -1;
 		}
-
-		internal void Add(int id, Vector2 position) {
-			for (int i = 0; i < Count; i++) {
-				if (this[i].Id == id) {
-					Console.WriteLine("Error: Attempted to re-add the same touch as a press.");
-					Clear ();
-				}
-			}
-			Add(new TouchLocation(id, TouchLocationState.Pressed, position));
-		}
-
-		internal void Update(int id, TouchLocationState state, Vector2 position)
+		
+		
+		public int IndexOf(TouchLocation item)
 		{
-			if (state == TouchLocationState.Pressed)
-				throw new ArgumentException("Argument 'state' cannot be TouchLocationState.Pressed.");
-
-			for (int i = 0; i < Count; i++) {
-				if (this[i].Id == id) {
-					var touchLocation = this[i];
-					touchLocation.Position = position;
-					touchLocation.State = state;
-					this[i] = touchLocation;
-					return;
+			for (int i = 0; i < this.Count; i++)
+			{
+				if (this[i] == item)
+				{
+					return i;
 				}
 			}
-			Console.WriteLine("Error: Attempted to mark a non-existent touch {0} as {1}.", id, state);
-			Clear ();
+			return -1;
 		}
+		
 	}
 }

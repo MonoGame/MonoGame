@@ -1,7 +1,7 @@
 #region License
 /*
 Microsoft Public License (Ms-PL)
-MonoGame - Copyright © 2009-2012 The MonoGame Team
+MonoGame - Copyright © 2009-2011 The MonoGame Team
 
 All rights reserved.
 
@@ -65,96 +65,49 @@ the implied warranties of merchantability, fitness for a particular purpose and
 non-infringement.
 */
 #endregion
+
 using System;
 
 using MonoTouch.UIKit;
-using MonoTouch.Foundation;
 
-namespace Microsoft.Xna.Framework {
-	class iOSGameViewController : UIViewController {
-		iOSGamePlatform _platform;
+namespace Microsoft.Xna.Framework
+{
+    class iOSGameViewController : UIViewController
+    {
+        iOSGamePlatform _platform;
+        public iOSGameViewController(iOSGamePlatform platform)
+        {
+            if (platform == null)
+                throw new ArgumentNullException("platform");
+            _platform = platform;
+        }
 
-		public iOSGameViewController (iOSGamePlatform platform)
-		{
-			if (platform == null)
-				throw new ArgumentNullException ("platform");
-			_platform = platform;
-			SupportedOrientations = DisplayOrientation.Default;
-		}
+        public override void LoadView()
+        {
+            base.View = new GameWindow(_platform);
+        }
 
-		public event EventHandler<EventArgs> InterfaceOrientationChanged;
+        // HACK: Just adding a 'new' property here because it is convenient at
+        //       the moment.  Eventually, GameWindow will be a common abstract
+        //       base class, and each platform will implement it in its own way.
+        //       For iOS, it should probably be the object that owns this view
+        //       controller, rather than inheriting from iPhoneOSGameView.  But,
+        //       that change is a little ways off.
+        public new GameWindow View
+        {
+            get { return (GameWindow)base.View; }
+        }
 
-		public DisplayOrientation SupportedOrientations { get; set; }
+        public override bool ShouldAutorotateToInterfaceOrientation(UIInterfaceOrientation toInterfaceOrientation)
+        {
+            var manager = (GraphicsDeviceManager)_platform.Game.Services.GetService(typeof(IGraphicsDeviceManager));
+            if (manager == null)
+                return toInterfaceOrientation == UIInterfaceOrientation.Portrait;
 
-		public override void LoadView ()
-		{
-			base.View = new iOSGameView (_platform);
-		}
+            var supportedOrientations = OrientationConverter.Normalize(manager.SupportedOrientations);
+            var toOrientation = OrientationConverter.ToDisplayOrientation(toInterfaceOrientation);
 
-		public new iOSGameView View {
-			get { return (iOSGameView) base.View; }
-		}
-
-		public override bool ShouldAutorotateToInterfaceOrientation (UIInterfaceOrientation toInterfaceOrientation)
-		{
-			DisplayOrientation supportedOrientations;
-			if (SupportedOrientations == DisplayOrientation.Default) {
-				supportedOrientations = GetDefaultSupportedOrientations();
-			} else {
-				supportedOrientations = OrientationConverter.Normalize (SupportedOrientations);
-			}
-			var toOrientation = OrientationConverter.ToDisplayOrientation (toInterfaceOrientation);
-			return (toOrientation & supportedOrientations) == toOrientation;
-		}
-
-		public override void DidRotate (UIInterfaceOrientation fromInterfaceOrientation)
-		{
-			base.DidRotate (fromInterfaceOrientation);
-
-			var handler = InterfaceOrientationChanged;
-			if (handler != null)
-				handler (this, EventArgs.Empty);
-		}
-
-		private DisplayOrientation? _defaultSupportedOrientations;
-		/// <summary>
-		/// Gets the default supported orientations as specified in the
-		/// Info.plist for the application.
-		/// </summary>
-		private DisplayOrientation GetDefaultSupportedOrientations ()
-		{
-			if (_defaultSupportedOrientations.HasValue)
-				return _defaultSupportedOrientations.Value;
-
-			var key = new NSString ("UISupportedInterfaceOrientations");
-			NSObject arrayObj;
-			if (!NSBundle.MainBundle.InfoDictionary.TryGetValue (key, out arrayObj)) {
-				_defaultSupportedOrientations = OrientationConverter.Normalize (DisplayOrientation.Default);
-				return _defaultSupportedOrientations.Value;
-			}
-
-			DisplayOrientation orientations = (DisplayOrientation)0;
-			var supportedOrientationStrings = NSArray.ArrayFromHandle<NSString> (arrayObj.Handle);
-
-			foreach (var orientationString in supportedOrientationStrings) {
-				var s = (string)orientationString;
-				if (!s.StartsWith("UIInterfaceOrientation"))
-					continue;
-				s = s.Substring ("UIInterfaceOrientation".Length);
-
-				try {
-					var supportedOrientation = (UIInterfaceOrientation)Enum.Parse(
-						typeof(UIInterfaceOrientation), s);
-					orientations |= OrientationConverter.ToDisplayOrientation (supportedOrientation);
-				} catch {
-				}
-			}
-
-			if (orientations == (DisplayOrientation)0)
-				orientations = OrientationConverter.Normalize (DisplayOrientation.Default);
-
-			_defaultSupportedOrientations = orientations;
-			return _defaultSupportedOrientations.Value;
-		}
-	}
+            return (toOrientation & supportedOrientations) == toOrientation;
+        }
+    }
 }

@@ -186,7 +186,7 @@
 				return  thumbRect.Contains(location); 
 			}
 			
-			internal void TouchesBegan( MonoTouch.Foundation.NSSet touches, MonoTouch.UIKit.UIEvent e, iOSGameView view)
+			internal void TouchesBegan( MonoTouch.Foundation.NSSet touches, MonoTouch.UIKit.UIEvent e, GameWindow window)
 			{
 				// Reset State		
 				//Reset();
@@ -197,8 +197,7 @@
 				{
 					var point = touch.LocationInView(touch.View);
 					Vector2 location = new Vector2(point.X, point.Y);
-					location = view.GetOffsetPosition(location, true);
-
+					location = window.GetOffsetPosition(location,false);
 					// Check where is the touch
 					bool hitInButton = false;
 					
@@ -242,14 +241,14 @@
 				// do nothing
 			}
 			
-			internal void TouchesMoved( MonoTouch.Foundation.NSSet touches, MonoTouch.UIKit.UIEvent e, iOSGameView view)
+			internal void TouchesMoved( MonoTouch.Foundation.NSSet touches, MonoTouch.UIKit.UIEvent e,GameWindow window)
 			{
 				UITouch []touchesArray = touches.ToArray<UITouch>();
 				foreach(UITouch touch in touchesArray)
 				{
 					var point = touch.LocationInView(touch.View);
 					Vector2 location = new Vector2(point.X, point.Y);
-					location = view.GetOffsetPosition(location, true);
+					location = window.GetOffsetPosition(location,false);
 					
 					var oldItem = GetTouchesObject(touch);
 					// Check if touch any button
@@ -351,15 +350,14 @@
 				}	
 			}
 			
-			internal void TouchesEnded( MonoTouch.Foundation.NSSet touches, MonoTouch.UIKit.UIEvent e, iOSGameView view)
+			internal void TouchesEnded( MonoTouch.Foundation.NSSet touches, MonoTouch.UIKit.UIEvent e, GameWindow window)
 			{						
 				UITouch []touchesArray = touches.ToArray<UITouch>();
 				foreach(UITouch touch in touchesArray)
 				{
 					var point = touch.LocationInView(touch.View);
 					Vector2 location = new Vector2(point.X, point.Y);
-					location = view.GetOffsetPosition(location, true);
-
+					location = window.GetOffsetPosition(location,false);
 					// Check where is the touch
 					if (Visible)
 					{
