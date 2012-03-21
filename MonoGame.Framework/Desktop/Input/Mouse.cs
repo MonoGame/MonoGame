@@ -38,8 +38,15 @@ purpose and non-infringement.
 */
 #endregion License
 ﻿
-using MouseInfo = OpenTK.Input.Mouse;
 using System;
+
+#if WINRT
+using Windows.UI.Core;
+using Windows.UI.Xaml;
+using Windows.System;
+#else
+using MouseInfo = OpenTK.Input.Mouse;
+#endif
 
 namespace Microsoft.Xna.Framework.Input
 {
@@ -50,9 +57,13 @@ namespace Microsoft.Xna.Framework.Input
 	
 	public static class Mouse
 	{
+#if !WINRT
 		private static OpenTK.Input.MouseDevice _mouse = null;			
+#endif
 
-#if WINDOWS
+#if WINRT
+        // Nothing to do!
+#elif WINDOWS
         static OpenTK.GameWindow Window;
         internal static void setWindows(OpenTK.GameWindow window)
         {
@@ -76,15 +87,23 @@ namespace Microsoft.Xna.Framework.Input
         #region Public interface
 
         public static MouseState GetState ()
-		{	
-			
+		{				
+#if !WINRT
 			// maybe someone is tring to get mouse before initialize
 			if (_mouse == null)
 			{
 				return new MouseState(0, 0);
 			}
-			
-#if WINDOWS                
+#endif
+	
+#if WINRT
+            var window = Window.Current.CoreWindow;
+            var pos = window.PointerPosition;
+
+            // TODO: Probably the wrong way to convert to pixels!
+            var ms = new MouseState((int)pos.X, (int)pos.Y);
+
+#elif WINDOWS                
             //MouseState ms = new MouseState(Window.Mouse.X, Window.Mouse.Y);
             POINT p = new POINT();
             GetCursorPos(out p);
@@ -92,17 +111,29 @@ namespace Microsoft.Xna.Framework.Input
             MouseState ms = new MouseState(pc.X, pc.Y);
 #else
             MouseState ms = new MouseState(_x, _y);
-#endif            
+#endif   
+    
+#if WINRT
+            ms.LeftButton = window.GetAsyncKeyState(VirtualKey.LeftButton) == CoreVirtualKeyStates.Down ? ButtonState.Pressed : ButtonState.Released;
+            ms.RightButton = window.GetAsyncKeyState(VirtualKey.RightButton) == CoreVirtualKeyStates.Down ? ButtonState.Pressed : ButtonState.Released;
+            ms.MiddleButton = window.GetAsyncKeyState(VirtualKey.MiddleButton) == CoreVirtualKeyStates.Down ? ButtonState.Pressed : ButtonState.Released;
+            ms.ScrollWheelValue = 0; // TODO: How do i get the scroll wheel state?
+#else
             ms.LeftButton = _mouse[OpenTK.Input.MouseButton.Left] ? ButtonState.Pressed : ButtonState.Released;
 			ms.RightButton = _mouse[OpenTK.Input.MouseButton.Right] ? ButtonState.Pressed : ButtonState.Released;
 			ms.MiddleButton = _mouse[OpenTK.Input.MouseButton.Middle] ? ButtonState.Pressed : ButtonState.Released;;
 			ms.ScrollWheelValue = _mouse.Wheel;
-			
-			
+#endif			
+
 			return ms;
 		}
 
-#if WINDOWS
+#if WINRT
+        public static void SetPosition(int x, int y)
+        {
+            // TODO: How do i do this in WinRT... i can't right?
+        }   
+#elif WINDOWS
         public static void SetPosition(int x, int y)
         {
             ///correcting the coordinate system
@@ -121,10 +152,7 @@ namespace Microsoft.Xna.Framework.Input
 
 #endif
 
-
-
-
-#if WINDOWS
+#if !WINRT && WINDOWS
         [System.Runtime.InteropServices.DllImportAttribute("user32.dll", EntryPoint = "SetCursorPos")]
         [return: System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.Bool)]
         public static extern bool SetCursorPos(int X, int Y);
@@ -153,8 +181,8 @@ namespace Microsoft.Xna.Framework.Input
         public static extern bool GetCursorPos(out POINT lpPoint);
       
 #endif
-		
-		#endregion
-	}
+
+        #endregion
+    }
 }
 

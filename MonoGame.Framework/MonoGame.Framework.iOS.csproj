@@ -439,6 +439,7 @@
     <Compile Include="Graphics\CompareFunction.cs" />
     <Compile Include="Graphics\StencilOperation.cs" />
     <Compile Include="Graphics\PackedVector\NormalizedShort2.cs" />
+    <Compile Include="Content\ContentExtensions.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
