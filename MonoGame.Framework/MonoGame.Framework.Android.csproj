@@ -18,6 +18,8 @@
     <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>
     <AndroidApplication>True</AndroidApplication>
     <DeployExternal>false</DeployExternal>
+    <ReleaseVersion>2.5.0.0</ReleaseVersion>
+    <SynchReleaseVersion>false</SynchReleaseVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
