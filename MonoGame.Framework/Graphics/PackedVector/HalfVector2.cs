@@ -24,16 +24,16 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
 
         private static uint PackHelper(float vectorX, float vectorY)
         {
-            uint num2 = HalfUtils.Pack(vectorX);
-            uint num = (uint)(HalfUtils.Pack(vectorY) << 0x10);
+            uint num2 = HalfTypeHelper.convert(vectorX);
+            uint num = (uint)(HalfTypeHelper.convert(vectorY) << 0x10);
             return (num2 | num);
         }
 
         public Vector2 ToVector2()
         {
             Vector2 vector;
-            vector.X = HalfUtils.Unpack((ushort)this.packedValue);
-            vector.Y = HalfUtils.Unpack((ushort)(this.packedValue >> 0x10));
+            vector.X = HalfTypeHelper.convert((ushort)this.packedValue);
+            vector.Y = HalfTypeHelper.convert((ushort)(this.packedValue >> 0x10));
             return vector;
         }
 
