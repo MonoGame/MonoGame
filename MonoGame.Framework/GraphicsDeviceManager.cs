@@ -154,7 +154,11 @@ namespace Microsoft.Xna.Framework
 
         public void ApplyChanges()
         {
-            _game.Window.SetOrientation(_supportedOrientations);
+            #if ANDROID
+                _game.Window.SetOrientation(_supportedOrientations);
+            #elif IPHONE
+                _game.Window.SetSupportedOrientations(_supportedOrientations);
+            #endif
         }
 
 		private void Initialize()
