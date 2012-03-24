@@ -81,8 +81,6 @@ namespace Microsoft.Xna.Framework
         double updateFrameLast;
         double renderFrameLast;
         public GraphicsContext BackgroundContext;
-        private DisplayOrientation _currentOrientation;
-		private GestureDetector gesture = null;
 
         public AndroidGameWindow(Context context, Game game) : base(context)
         {
@@ -239,10 +237,7 @@ namespace Microsoft.Xna.Framework
                 renderFrameLast = renderFrameElapsed;
             }
 
-            try
-            {
-                _game.Tick();
-            }
+            _game.Tick();
         }
 
         protected override void OnUpdateFrame(FrameEventArgs e)

@@ -205,9 +205,9 @@ namespace Microsoft.Xna.Framework
             Console.WriteLine(Message);
         }
 
-        public override void SwapBuffers()
+        public override void Present()
         {
-            base.SwapBuffers();
+            base.Present();
 
             _view.Window.SwapBuffers();
         }

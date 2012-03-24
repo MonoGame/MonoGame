@@ -217,11 +217,6 @@ namespace Microsoft.Xna.Framework {
 			_glapi.FramebufferRenderbuffer (
 				All.Framebuffer, All.ColorAttachment0, All.Renderbuffer, _renderbuffer);
 
-			var status = _glapi.CheckFramebufferStatus (All.Framebuffer);
-			if (status != All.FramebufferComplete)
-				throw new InvalidOperationException (
-					"Framebuffer was not created correctly: " + status);
-
 			// HACK:  GraphicsDevice itself should be calling
 			//        glViewport, so we shouldn't need to do it
 			//        here and then force the state into
@@ -251,7 +246,7 @@ namespace Microsoft.Xna.Framework {
 
 			// FIXME: These static methods on GraphicsDevice need
 			//        to go away someday.
-			GraphicsDevice.FrameBufferScreen = _framebuffer;
+			gds.GraphicsDevice.glFramebuffer = _framebuffer;
 		}
 
 		private void DestroyFramebuffer ()
