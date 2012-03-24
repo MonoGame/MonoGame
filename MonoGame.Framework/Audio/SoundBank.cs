@@ -64,7 +64,9 @@ namespace Microsoft.Xna.Framework.Audio
 			uint toolVersion = soundbankreader.ReadUInt16 ();
 			uint formatVersion = soundbankreader.ReadUInt16 ();
 			if (formatVersion != 46) {
+#if DEBUG
 				Console.WriteLine ("Warning: SoundBank format not supported");
+#endif
 			}
 			
 			uint crc = soundbankreader.ReadUInt16 ();

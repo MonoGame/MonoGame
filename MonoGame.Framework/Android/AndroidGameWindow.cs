@@ -81,6 +81,8 @@ namespace Microsoft.Xna.Framework
         double updateFrameLast;
         double renderFrameLast;
         public GraphicsContext BackgroundContext;
+        private DisplayOrientation _currentOrientation;
+		private GestureDetector gesture = null;
 
         public AndroidGameWindow(Context context, Game game) : base(context)
         {
@@ -239,11 +241,7 @@ namespace Microsoft.Xna.Framework
 
             try
             {
-                SwapBuffers();
-            }
-            catch(Exception ex)
-            {
-                Android.Util.Log.Error("Error in swap buffers", ex.ToString());
+                _game.Tick();
             }
         }
 
@@ -296,7 +294,7 @@ namespace Microsoft.Xna.Framework
 
         internal void SetOrientation(DisplayOrientation currentorientation)
         {
-            var deviceManager = (IGraphicsDeviceManager)_game.Services.GetService(typeof(IGraphicsDeviceManager));
+            var deviceManager = (GraphicsDeviceManager)_game.Services.GetService(typeof(IGraphicsDeviceManager));
             if (deviceManager == null)
                 return;
 
@@ -338,6 +336,19 @@ namespace Microsoft.Xna.Framework
 			  // if we have default only we only allow Landscape
 			  allowedOrientation = allowedOrientation | DisplayOrientation.Portrait; 				
 			}
+
+            //What is this for?  This does not allow the application to use landscapeleft.
+            //if (deviceManager.PreferredBackBufferSetByUser)
+            //{
+            //    if (_game.GraphicsDevice.PresentationParameters.BackBufferHeight < _game.GraphicsDevice.PresentationParameters.BackBufferWidth)
+            //    {
+            //        allowedOrientation = DisplayOrientation.LandscapeLeft;
+            //    }				
+            //    if (_game.GraphicsDevice.PresentationParameters.BackBufferHeight > _game.GraphicsDevice.PresentationParameters.BackBufferWidth)
+            //    {
+            //        allowedOrientation = DisplayOrientation.Portrait;
+            //    }	
+            //}
 			
 			// ok we default to landscape left
 			var actualOrientation = DisplayOrientation.LandscapeLeft;
@@ -359,16 +370,16 @@ namespace Microsoft.Xna.Framework
 			{
 				actualOrientation = DisplayOrientation.LandscapeRight;
 			}	
-			/*else 
-			if (_game.GraphicsDevice.PresentationParameters.BackBufferHeight < _game.GraphicsDevice.PresentationParameters.BackBufferWidth)
+			else 				
+			if (_game.GraphicsDevice != null && _game.GraphicsDevice.PresentationParameters.BackBufferHeight < _game.GraphicsDevice.PresentationParameters.BackBufferWidth && deviceManager.PreferredBackBufferSetByUser)
 			{
 				actualOrientation = DisplayOrientation.LandscapeLeft;
 			}
 			else 
-			if (_game.GraphicsDevice.PresentationParameters.BackBufferHeight > _game.GraphicsDevice.PresentationParameters.BackBufferWidth)
+			if (_game.GraphicsDevice != null && _game.GraphicsDevice.PresentationParameters.BackBufferHeight > _game.GraphicsDevice.PresentationParameters.BackBufferWidth && deviceManager.PreferredBackBufferSetByUser)
 			{
 				actualOrientation = DisplayOrientation.Portrait;
-			}*/
+			}
 			
             switch (currentorientation) {
 
@@ -416,8 +427,14 @@ namespace Microsoft.Xna.Framework
                 position.X = this.Width - position.X;
                 position.Y = this.Height - position.Y;
             }
-            position.X = (position.X / Width) * _game.GraphicsDevice.Viewport.Width;
-            position.Y = (position.Y / Height) * _game.GraphicsDevice.Viewport.Height;
+
+            //Fix for ClientBounds
+            position.X -= ClientBounds.X;
+            position.Y -= ClientBounds.Y;
+
+            //Fix for Viewport
+            position.X = (position.X / ClientBounds.Width) * _game.GraphicsDevice.Viewport.Width;
+            position.Y = (position.Y / ClientBounds.Height) * _game.GraphicsDevice.Viewport.Height;
             //Android.Util.Log.Info("MonoGameInfo", String.Format("Touch {0}x{1}", position.X, position.Y));
         }
 
@@ -436,7 +453,7 @@ namespace Microsoft.Xna.Framework
                 // DOWN                
                 case 0:
                 case 5:
-                    index = collection.FindById(e.GetPointerId(e.ActionIndex), out tlocation);
+                    index = collection.FindIndexById(e.GetPointerId(e.ActionIndex), out tlocation);
                     if (index < 0)
                     {
                         tlocation = new TouchLocation(id, TouchLocationState.Pressed, position);
@@ -451,7 +468,7 @@ namespace Microsoft.Xna.Framework
                 // UP                
                 case 1:
                 case 6:
-                    index = collection.FindById(e.GetPointerId(e.ActionIndex), out tlocation);
+                    index = collection.FindIndexById(e.GetPointerId(e.ActionIndex), out tlocation);
                     if (index >= 0)
                     {
                         tlocation.State = TouchLocationState.Released;
@@ -466,7 +483,7 @@ namespace Microsoft.Xna.Framework
                         position.X = e.GetX(i);
                         position.Y = e.GetY(i);
                         UpdateTouchPosition(ref position);
-                        index = collection.FindById(id, out tlocation);
+                        index = collection.FindIndexById(id, out tlocation);
                         if (index >= 0)
                         {
                             tlocation.State = TouchLocationState.Moved;
@@ -478,7 +495,7 @@ namespace Microsoft.Xna.Framework
                 // CANCEL, OUTSIDE                
                 case 3:
                 case 4:
-                    index = collection.FindById(id, out tlocation);
+                    index = collection.FindIndexById(id, out tlocation);
                     if (index >= 0)
                     {
                         tlocation.State = TouchLocationState.Invalid;
@@ -512,6 +529,12 @@ namespace Microsoft.Xna.Framework
 			{
 				return clientBounds;
 			}
+            internal set
+            {
+                clientBounds = value;
+                //if(ClientSizeChanged != null)
+                //    ClientSizeChanged(this, EventArgs.Empty);
+            }
 		}
 		
 		public bool AllowUserResizing 

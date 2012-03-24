@@ -176,7 +176,10 @@ namespace Microsoft.Xna.Framework.Content
                 result = ReadAsset<T>(assetName, null);
 
                 // Cache the result.
-                loadedAssets.Add(assetName, result);
+                if (!loadedAssets.ContainsKey(assetName))
+                {
+                    loadedAssets.Add(assetName, result);
+                }
             }
 			return result;
 		}

@@ -53,7 +53,9 @@ namespace Microsoft.Xna.Framework
 	{		
 		public void Dump()
 		{
+#if DEBUG
 			Console.WriteLine(ToString());
+#endif		
 		}
 		
 		public override string ToString ()
@@ -77,17 +79,19 @@ namespace Microsoft.Xna.Framework
 		public static void Dump()
 		{
 			_endTime = Environment.TickCount;
-			
+#if DEBUG			
 			Console.WriteLine("Performance count results");
 			Console.WriteLine("=========================");
 			Console.WriteLine("Execution Time: " + ElapsedTime + "ms.");
+#endif
 			
 			foreach (PerformanceItem item in _list.Values)
 			{
 				item.Dump();
 			}
-			
+#if DEBUG
 			Console.WriteLine("=========================");
+#endif
 		}
 		
 		public static void Begin()

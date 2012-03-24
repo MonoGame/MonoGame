@@ -208,28 +208,44 @@ namespace Microsoft.Xna.Framework {
 
 		private void TouchPanel_EnabledGesturesChanged (object sender, EventArgs e)
 		{
-			foreach (GestureType gestureType in Enum.GetValues(typeof(GestureType))) {
-				UIGestureRecognizer [] recognizers;
+			SyncTouchRecognizers ();
+		}
 
-				bool enabled = (gestureType & TouchPanel.EnabledGestures) == gestureType;
-				if (enabled == _gestureRecognizers.TryGetValue (gestureType, out recognizers))
-					// Things are as they should be.
+		private void SyncTouchRecognizers()
+		{
+			foreach (var entry in _gestureRecognizers) {
+				foreach (var recognizer in entry.Value) {
+					RemoveGestureRecognizer (recognizer);
+				}
+			}
+
+			_gestureRecognizers.Clear ();
+			foreach (GestureType gestureType in Enum.GetValues(typeof(GestureType))) {
+				if (gestureType == GestureType.None)
 					continue;
 
-				if (enabled) {
-					recognizers = CreateGestureRecognizer (gestureType);
-					if (recognizers != null) {
-						_gestureRecognizers.Add (gestureType, recognizers);
-						foreach (var recognizer in recognizers) {
-							recognizer.Delegate = _gestureRecognizerDelegate;
-							AddGestureRecognizer (recognizer);
-						}
+				UIGestureRecognizer [] recognizers;
+
+				if ((gestureType & TouchPanel.EnabledGestures) == 0)
+					continue;
+
+				recognizers = CreateGestureRecognizer (gestureType);
+				if (recognizers != null) {
+					_gestureRecognizers.Add (gestureType, recognizers);
+					foreach (var recognizer in recognizers) {
+						recognizer.Delegate = _gestureRecognizerDelegate;
+						AddGestureRecognizer (recognizer);
 					}
-				} else {
-					_gestureRecognizers.Remove (gestureType);
-					foreach (var recognizer in recognizers)
-						RemoveGestureRecognizer (recognizer);
 				}
+			}
+
+			// TODO: A more flexible system for determining
+			//       require-fail dependencies may be desirable.
+			UIGestureRecognizer[] singleTapRecognizer;
+			UIGestureRecognizer[] doubleTapRecognizer;
+			if (_gestureRecognizers.TryGetValue(GestureType.Tap, out singleTapRecognizer) &&
+			    _gestureRecognizers.TryGetValue(GestureType.DoubleTap, out doubleTapRecognizer)) {
+				singleTapRecognizer[0].RequireGestureRecognizerToFail (doubleTapRecognizer[0]);
 			}
 		}
 
@@ -238,7 +254,7 @@ namespace Microsoft.Xna.Framework {
 			switch (gestureType) {
 			case GestureType.DoubleTap:
 				return new UIGestureRecognizer[] {
-					new UITapGestureRecognizer (this, new Selector ("OnTapGesture")) {
+					new UITapGestureRecognizer (this, new Selector ("OnDoubleTapGesture")) {
 						CancelsTouchesInView = false,
 						NumberOfTapsRequired = 2
 					}
@@ -296,9 +312,11 @@ namespace Microsoft.Xna.Framework {
 			case GestureType.PinchComplete:
 			case GestureType.VerticalDrag:
 			default:
+#if DEBUG
 				Console.WriteLine (
 					"Warning: Failed to create gesture recognizer of type {0}.",
 					gestureType);
+#endif
 				return null;
 			}
 		}
@@ -425,6 +443,17 @@ namespace Microsoft.Xna.Framework {
 			var position = GetOffsetPosition (new Vector2 (location.X, location.Y), true);
 			TouchPanel.GestureList.Enqueue (new GestureSample (
 				GestureType.Tap, new TimeSpan (DateTime.Now.Ticks),
+				position, Vector2.Zero,
+				Vector2.Zero, Vector2.Zero));
+		}
+
+		[Export]
+		public void OnDoubleTapGesture (UITapGestureRecognizer sender)
+		{
+			var location = sender.LocationInView (sender.View);
+			var position = GetOffsetPosition (new Vector2 (location.X, location.Y), true);
+			TouchPanel.GestureList.Enqueue (new GestureSample (
+				GestureType.DoubleTap, new TimeSpan (DateTime.Now.Ticks),
 				position, Vector2.Zero,
 				Vector2.Zero, Vector2.Zero));
 		}

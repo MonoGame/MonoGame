@@ -242,7 +242,9 @@ namespace Microsoft.Xna.Framework.Net
 		
 		public void Dispose (bool disposing) 
 		{
+#if DEBUG
 			Console.WriteLine("Network Session Disposing");
+#endif
 			if (disposing) {
 				
 				foreach (Gamer gamer in _allGamers) {
@@ -567,7 +569,11 @@ namespace Microsoft.Xna.Framework.Net
 		{
 			int hostGamer = -1;
 			hostGamer = GetHostingGamerIndex(localGamers);
+#if WINDOWS_PHONE
+            return Find(sessionType, hostGamer, 4, null);
+#else
 			return EndFind(BeginFind(sessionType, hostGamer, 4, searchProperties,null,null));
+#endif
 		}
 
 		public static AvailableNetworkSessionCollection Find (
@@ -610,7 +616,11 @@ namespace Microsoft.Xna.Framework.Net
 
 		public static NetworkSession Join (AvailableNetworkSession availableSession)
 		{
+#if WINDOWS_PHONE
+            return JoinSession(availableSession);
+#else
 			return EndJoin(BeginJoin(availableSession, null, null));
+#endif
 
 		}
 		
@@ -678,7 +688,7 @@ namespace Microsoft.Xna.Framework.Net
 		{
 			// Updates the state of the multiplayer session. 
 			try {
-				while (commandQueue.Count > 0) {
+				while (commandQueue.Count > 0 && networkPeer.IsReady) {
 					var command = (CommandEvent)commandQueue.Dequeue();
 					
 					// for some screwed up reason we are dequeueing something
@@ -715,7 +725,9 @@ namespace Microsoft.Xna.Framework.Net
 				}
 			} 
 			catch (Exception exc) {
+#if DEBUG				
 				Console.WriteLine("Error in NetworkSession Update: " + exc.Message);
+#endif	
 			}
 			finally {
 			}

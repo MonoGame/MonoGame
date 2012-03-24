@@ -85,17 +85,23 @@ namespace Microsoft.Xna.Framework.Net
 
 		public override void PeerConnectionRequest(GKSession session, string peerID)
 		{
+#if DEBUG			
 			Console.WriteLine( " Session : " + session.SessionID + " PeerID : " + peerID );
+#endif
 		}
 
 		public override void PeerConnectionFailed(GKSession session, string peerID, NSError error)
 		{
+#if DEBUG			
 			Console.WriteLine( " Session : " + session.SessionID + " PeerID : " + peerID +" PeerConnectionFailed : " + error );
+#endif
 		}
 
 		public override void FailedWithError(GKSession session, NSError error)
 		{
+#if DEBUG
 			Console.WriteLine( " Session : " + session.SessionID + " FailedWithError : " + error );
+#endif
 		}
 	}
 }

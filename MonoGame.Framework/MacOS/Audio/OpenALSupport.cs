@@ -47,7 +47,9 @@ namespace Microsoft.Xna.Framework.Audio
 			// Don't know how to handle sounds with more than 2 channels (i.e. stereo)
 			// Remember that OpenAL sound effects must be mono to be spatialized anyway.
 			if (fileFormat.ChannelsPerFrame > 2) {
+#if DEBUG				
 				Console.WriteLine ("Unsupported Format: Channel count [0] is greater than stereo.", fileFormat.ChannelsPerFrame);
+#endif
 				return null;
 			}
 
@@ -133,11 +135,15 @@ namespace Microsoft.Xna.Framework.Audio
 
 						sampleRate = outputFormat.SampleRate;
 					} else {
+#if DEBUG						
 						Console.WriteLine ("ExtAudioFile.Read failed, Error = " + errorStatus);
+#endif
 						return false;
 					}
 				} catch (Exception exc) {
+#if DEBUG
 					Console.WriteLine ("ExtAudioFile.Read failed: " + exc.Message);
+#endif
 					return false;
 				} finally {
 					// Don't forget to free our dataBuffer memory pointer that was pinned above
@@ -171,7 +177,9 @@ namespace Microsoft.Xna.Framework.Audio
 			try {
 				extFile = GetExtAudioFile (file_url, out outputFormat);
 			} catch (Exception extExc) {
+#if DEBUG				
 				Console.WriteLine ("ExtAudioFile.OpenUrl failed, Error : " + extExc.Message);
+#endif
 				return null;
 			}
 
@@ -179,7 +187,9 @@ namespace Microsoft.Xna.Framework.Audio
 			try {
 				fileLengthInFrames = extFile.FileLengthFrames;
 			} catch (Exception exc) {
+#if DEBUG				
 				Console.WriteLine ("ExtAudioFile.FileLengthFranes failed, Error : " + exc.Message);
+#endif
 				return null;
 			}
 
