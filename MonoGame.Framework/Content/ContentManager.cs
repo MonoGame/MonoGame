@@ -269,7 +269,7 @@ namespace Microsoft.Xna.Framework.Content
 			
 				if ((typeof(T) == typeof(Texture2D)))
 				{
-					using (Stream assetStream = new FileStream(assetName, FileMode.Open, FileAccess.Read, FileShare.Read))
+					using (Stream assetStream = TitleContainer.OpenStream(assetName))
 					{
 						Texture2D texture = Texture2D.FromStream(
 							graphicsDeviceService.GraphicsDevice, assetStream);
