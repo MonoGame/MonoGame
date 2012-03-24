@@ -42,6 +42,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 #endregion Using clause
 
 namespace Microsoft.Xna.Framework.Input.Touch
@@ -135,7 +136,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		internal void Add(int id, Vector2 position) {
 			for (int i = 0; i < Count; i++) {
 				if (this[i].Id == id) {
-					Console.WriteLine("Error: Attempted to re-add the same touch as a press.");
+                    Debug.WriteLine("Error: Attempted to re-add the same touch as a press.");
 					Clear ();
 				}
 			}
@@ -156,7 +157,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 					return;
 				}
 			}
-			Console.WriteLine("Error: Attempted to mark a non-existent touch {0} as {1}.", id, state);
+			Debug.WriteLine("Error: Attempted to mark a non-existent touch {0} as {1}.", id, state);
 			Clear ();
 		}
 	}
