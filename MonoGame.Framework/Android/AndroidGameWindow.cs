@@ -70,6 +70,7 @@ namespace Microsoft.Xna.Framework
 		private Game _game;
 		private GameTime _updateGameTime;
         private GameTime _drawGameTime;
+        private DisplayOrientation supportedOrientations = DisplayOrientation.Default;
         private DisplayOrientation _currentOrientation;
 		private GestureDetector gesture = null;
 		private bool resetUpdateElapsedTime = false;
@@ -293,110 +294,44 @@ namespace Microsoft.Xna.Framework
 		#endregion
 		
 		
-
-        internal void SetOrientation(DisplayOrientation currentorientation)
+        internal void SetSupportedOrientations(DisplayOrientation orientations)
         {
-            var deviceManager = (IGraphicsDeviceManager)_game.Services.GetService(typeof(IGraphicsDeviceManager));
-            if (deviceManager == null)
-                return;
+            supportedOrientations = orientations;
+        }
 
+        internal void SetOrientation(DisplayOrientation newOrientation)
+        {
+            DisplayOrientation supported = supportedOrientations;
             // Calculate supported orientations if it has been left as "default" and only default
-            DisplayOrientation supportedOrientations = (deviceManager as GraphicsDeviceManager).SupportedOrientations;					
-			var allowedOrientation = DisplayOrientation.LandscapeLeft; 				
-			if ((supportedOrientations == DisplayOrientation.Default))
-			{
-			  // if we have default only we only allow Landscape
-			  allowedOrientation = allowedOrientation | DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight; 				
-			}
-			if ((supportedOrientations == DisplayOrientation.LandscapeLeft))
-			{
-			  // if we have default only we only allow Landscape
-			  allowedOrientation = DisplayOrientation.LandscapeLeft; 				
-			}
-			if ((supportedOrientations & DisplayOrientation.LandscapeLeft) != 0)
-			{
-			  // if we have default only we only allow Landscape
-			  allowedOrientation = allowedOrientation | DisplayOrientation.LandscapeLeft; 				
-			}
-			if ((supportedOrientations == DisplayOrientation.LandscapeRight))
-			{
-			  // if we have default only we only allow Landscape
-			  allowedOrientation = DisplayOrientation.LandscapeRight; 				
-			}
-			if ((supportedOrientations & DisplayOrientation.LandscapeRight) != 0)
-			{
-			  // if we have default only we only allow Landscape
-			  allowedOrientation = allowedOrientation | DisplayOrientation.LandscapeRight; 				
-			}
-			if ((supportedOrientations == DisplayOrientation.Portrait))
-			{
-			  // if we have Portrait only we only allow Landscape
-			  allowedOrientation = DisplayOrientation.Portrait; 				
-			}
-			if ((supportedOrientations & DisplayOrientation.Portrait) != 0)
-			{
-			  // if we have default only we only allow Landscape
-			  allowedOrientation = allowedOrientation | DisplayOrientation.Portrait; 				
-			}
-			
-			// ok we default to landscape left
-			var actualOrientation = DisplayOrientation.LandscapeLeft;
-			// now based on the  orientation of the device we 
-			// decide of we honour the device orientation or force our own
-			
-			// so if we are in Portrait but we allow only LandScape we stay in landscape
-			if (allowedOrientation == DisplayOrientation.Portrait)
-			{
-				actualOrientation = DisplayOrientation.Portrait;
-			}
-			else
-			if (allowedOrientation == DisplayOrientation.LandscapeLeft)
-			{
-				actualOrientation = DisplayOrientation.LandscapeLeft;
-			}
-			else
-			if (allowedOrientation == DisplayOrientation.LandscapeRight)
-			{
-				actualOrientation = DisplayOrientation.LandscapeRight;
-			}	
-			/*else 
-			if (_game.GraphicsDevice.PresentationParameters.BackBufferHeight < _game.GraphicsDevice.PresentationParameters.BackBufferWidth)
-			{
-				actualOrientation = DisplayOrientation.LandscapeLeft;
-			}
-			else 
-			if (_game.GraphicsDevice.PresentationParameters.BackBufferHeight > _game.GraphicsDevice.PresentationParameters.BackBufferWidth)
-			{
-				actualOrientation = DisplayOrientation.Portrait;
-			}*/
-			
-            switch (currentorientation) {
+            if (supported == DisplayOrientation.Default)
+            {
+                var deviceManagerIntf = (IGraphicsDeviceManager)_game.Services.GetService(typeof(IGraphicsDeviceManager));
+                if (deviceManagerIntf == null)
+                    return;
+                GraphicsDeviceManager deviceManager = deviceManagerIntf as GraphicsDeviceManager;
+                if (deviceManager.PreferredBackBufferWidth > deviceManager.PreferredBackBufferHeight)
+                    supported = DisplayOrientation.Portrait;
+                else
+                    supported = DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight;
+            }
 
-			case DisplayOrientation.Portrait:
-                    if ((allowedOrientation & DisplayOrientation.Portrait) != 0) {
-                        actualOrientation = DisplayOrientation.Portrait;
-                    }
-                    break;
-				case DisplayOrientation.LandscapeRight:	
-				    if ((allowedOrientation & DisplayOrientation.LandscapeRight) != 0) {
-                        actualOrientation = DisplayOrientation.LandscapeRight;
-                    }				    
-				    break;
-                case DisplayOrientation.LandscapeLeft:				     
-                default:
-					if ((allowedOrientation & DisplayOrientation.LandscapeLeft) != 0) {
-				    	actualOrientation = DisplayOrientation.LandscapeLeft;
-					}
-                    break;
+            // If the new orientation is not supported, force a supported orientation
+            if ((supported & newOrientation) == 0)
+            {
+                if ((supported & DisplayOrientation.LandscapeLeft) != 0)
+                    newOrientation = DisplayOrientation.LandscapeLeft;
+                else if ((supported & DisplayOrientation.LandscapeRight) != 0)
+                    newOrientation = DisplayOrientation.LandscapeRight;
+                else if ((supported & DisplayOrientation.Portrait) != 0)
+                    newOrientation = DisplayOrientation.Portrait;
             }
 			
-			
-			CurrentOrientation = actualOrientation;
+			CurrentOrientation = newOrientation;
             if (_game.GraphicsDevice != null)
             {
-                _game.GraphicsDevice.PresentationParameters.DisplayOrientation = actualOrientation;
+                _game.GraphicsDevice.PresentationParameters.DisplayOrientation = newOrientation;
             }
-            TouchPanel.DisplayOrientation = actualOrientation;
+            TouchPanel.DisplayOrientation = newOrientation;
         }
 
         private Dictionary<IntPtr, TouchLocation> _previousTouches = new Dictionary<IntPtr, TouchLocation>();
@@ -436,28 +371,23 @@ namespace Microsoft.Xna.Framework
                 // DOWN                
                 case 0:
                 case 5:
-                    index = collection.FindById(e.GetPointerId(e.ActionIndex), out tlocation);
+                    index = collection.FindIndexById(id, out tlocation);
                     if (index < 0)
                     {
                         tlocation = new TouchLocation(id, TouchLocationState.Pressed, position);
                         collection.Add(tlocation);
                     }
-                    else
-                    {
-                        tlocation.State = TouchLocationState.Pressed;
-                        tlocation.Position = position;
-                    }
                     break;
                 // UP                
                 case 1:
                 case 6:
-                    index = collection.FindById(e.GetPointerId(e.ActionIndex), out tlocation);
+                    index = collection.FindIndexById(id, out tlocation);
                     if (index >= 0)
                     {
                         tlocation.State = TouchLocationState.Released;
                         collection[index] = tlocation;
                     }	
-				break;
+				    break;
                 // MOVE                
                 case 2:
                     for (int i = 0; i < e.PointerCount; i++)
@@ -466,7 +396,7 @@ namespace Microsoft.Xna.Framework
                         position.X = e.GetX(i);
                         position.Y = e.GetY(i);
                         UpdateTouchPosition(ref position);
-                        index = collection.FindById(id, out tlocation);
+                        index = collection.FindIndexById(id, out tlocation);
                         if (index >= 0)
                         {
                             tlocation.State = TouchLocationState.Moved;
@@ -478,7 +408,7 @@ namespace Microsoft.Xna.Framework
                 // CANCEL, OUTSIDE                
                 case 3:
                 case 4:
-                    index = collection.FindById(id, out tlocation);
+                    index = collection.FindIndexById(id, out tlocation);
                     if (index >= 0)
                     {
                         tlocation.State = TouchLocationState.Invalid;

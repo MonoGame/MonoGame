@@ -124,7 +124,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 				TouchLocation location = this[i];
 				if (location.Id == id)
 				{
-					touchLocation = this[i];
+					touchLocation = location;
 					return i;
 				}
 			}
