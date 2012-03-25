@@ -154,7 +154,7 @@ namespace Microsoft.Xna.Framework
 
         public void ApplyChanges()
         {
-			_game.Window.SetSupportedOrientations(_supportedOrientations);
+            _game.Window.SetSupportedOrientations(_supportedOrientations);
         }
 
 		private void Initialize()
