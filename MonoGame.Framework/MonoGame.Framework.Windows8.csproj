@@ -66,6 +66,9 @@
     <Compile Include="Desktop\Input\Mouse.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="GamePlatform.cs" />
+    <Compile Include="GamerServices\MessageBoxIcon.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Graphics\CompareFunction.cs" />
     <Compile Include="Graphics\CubeMapFace.cs" />
     <Compile Include="Graphics\DisplayMode.cs" />
@@ -323,6 +326,7 @@
     <Compile Include="Graphics\Effect\IEffectMatrices.cs" />
     <Compile Include="Graphics\DirectionalLight.cs" />
     <Compile Include="Color.cs" />
+    <Compile Include="Windows\GamerServices\Guide.cs" />
     <Compile Include="Windows\GraphicsDeviceManager.cs" />
     <Compile Include="Desktop\TitleContainer.cs" />
     <Compile Include="Content\ContentReaders\CurveReader.cs" />

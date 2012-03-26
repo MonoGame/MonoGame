@@ -44,11 +44,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using System.Runtime.Remoting.Messaging;
-
-using Microsoft.Xna.Framework.Net;
 using Microsoft.Xna.Framework.Storage;
 
+#if !WINRT
+using System.Runtime.Remoting.Messaging;
+using Microsoft.Xna.Framework.Net;
+#endif
 
 #endregion Using clause
 
@@ -222,6 +223,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 				return;
 			}
 
+#if !WINRT
             Microsoft.Xna.Framework.GamerServices.MonoGameGamerServicesHelper.ShowSigninSheet();            
 
             if (GamerServicesComponent.LocalNetworkGamer == null)
@@ -232,6 +234,7 @@ namespace Microsoft.Xna.Framework.GamerServices
             {
                 GamerServicesComponent.LocalNetworkGamer.SignedInGamer.BeginAuthentication(null, null);
             }
+#endif
 		}
 
 		public static void ShowLeaderboard()
@@ -370,7 +373,9 @@ namespace Microsoft.Xna.Framework.GamerServices
 
         internal static void Initialise(Game game)
         {
+#if !WINRT
             MonoGameGamerServicesHelper.Initialise(game);
+#endif
         }
     }
 }
