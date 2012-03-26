@@ -27,7 +27,7 @@ namespace Microsoft.Xna.Framework
 			if (o.CanDetectOrientation())
 			{
 				o.Enable();				
-			}
+			}					
 
             RequestWindowFeature(WindowFeatures.NoTitle);
 		}
@@ -66,7 +66,7 @@ namespace Microsoft.Xna.Framework
             Game.Window.RequestFocus();
             if (Game.GraphicsDevice != null)
             {
-                Game.GraphicsDevice.Initialize();
+                Game.GraphicsDevice.platform = Game.Platform;
             }
         }
 
@@ -121,5 +121,18 @@ namespace Microsoft.Xna.Framework
 
 		}
 	}
-			
+	
+	public static class ActivityExtensions
+    {
+        public static ActivityAttribute GetActivityAttribute(this AndroidGameActivity obj)
+        {			
+            var attr = obj.GetType().GetCustomAttributes(typeof(ActivityAttribute), true);
+			if (attr != null)
+			{
+            	return ((ActivityAttribute)attr[0]);
+			}
+			return null;
+        }
+    }
+
 }

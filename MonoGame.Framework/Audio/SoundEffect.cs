@@ -39,6 +39,7 @@ purpose and non-infringement.
 #endregion License
 ﻿
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 using Microsoft.Xna;
@@ -53,6 +54,7 @@ namespace Microsoft.Xna.Framework.Audio
 		private string _name = "";
 		private string _filename = "";
 		private byte[] _data;
+        private SoundEffectInstance _instance;
 		
 		internal float Rate { get; set; }
 
@@ -124,12 +126,13 @@ namespace Microsoft.Xna.Framework.Audio
         {
 			if ( MasterVolume > 0.0f )
 			{
-				SoundEffectInstance instance = CreateInstance();
-				instance.Volume = volume;
-				instance.Pitch = pitch;
-				instance.Pan = pan;
-				instance.Play();
-				return instance.Sound.Playing;
+                if(_instance == null)
+				    _instance = CreateInstance();
+				_instance.Volume = volume;
+				_instance.Pitch = pitch;
+				_instance.Pan = pan;
+				_instance.Play();
+				return _instance.Sound.Playing;
 			}
 			return false;
         }

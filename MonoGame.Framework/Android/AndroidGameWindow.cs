@@ -238,14 +238,7 @@ namespace Microsoft.Xna.Framework
                 renderFrameLast = renderFrameElapsed;
             }
 
-            try
-            {
-                SwapBuffers();
-            }
-            catch(Exception ex)
-            {
-                Android.Util.Log.Error("Error in swap buffers", ex.ToString());
-            }
+            _game.Tick();
         }
 
         protected override void OnUpdateFrame(FrameEventArgs e)
@@ -351,8 +344,14 @@ namespace Microsoft.Xna.Framework
                 position.X = this.Width - position.X;
                 position.Y = this.Height - position.Y;
             }
-            position.X = (position.X / Width) * _game.GraphicsDevice.Viewport.Width;
-            position.Y = (position.Y / Height) * _game.GraphicsDevice.Viewport.Height;
+
+            //Fix for ClientBounds
+            position.X -= ClientBounds.X;
+            position.Y -= ClientBounds.Y;
+
+            //Fix for Viewport
+            position.X = (position.X / ClientBounds.Width) * _game.GraphicsDevice.Viewport.Width;
+            position.Y = (position.Y / ClientBounds.Height) * _game.GraphicsDevice.Viewport.Height;
             //Android.Util.Log.Info("MonoGameInfo", String.Format("Touch {0}x{1}", position.X, position.Y));
         }
 
@@ -442,6 +441,12 @@ namespace Microsoft.Xna.Framework
 			{
 				return clientBounds;
 			}
+            internal set
+            {
+                clientBounds = value;
+                //if(ClientSizeChanged != null)
+                //    ClientSizeChanged(this, EventArgs.Empty);
+            }
 		}
 		
 		public bool AllowUserResizing 

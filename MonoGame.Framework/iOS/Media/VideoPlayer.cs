@@ -54,10 +54,10 @@ namespace Microsoft.Xna.Framework.Media
 		private Game _game;
         private iOSGamePlatform _platform;
 		
-        public VideoPlayer(Game game)
+        public VideoPlayer()
         {
 			_state = MediaState.Stopped;
-			_game = game;
+			_game = Game.Instance;
             _platform = (iOSGamePlatform)_game.Services.GetService(typeof(iOSGamePlatform));
             if (_platform == null)
                 throw new InvalidOperationException("No iOSGamePlatform instance was available");
