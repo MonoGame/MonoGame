@@ -98,6 +98,7 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public class GraphicsDevice : IDisposable
     {
+        internal GamePlatform platform;
         private All _preferedFilter;
         private int _activeTexture = -1;
         private Viewport _viewport;
@@ -364,7 +365,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void Present()
         {
-			GL.Flush ();
+#if ANDROID
+			platform.Present();
+#else
+            GL.Flush();
+#endif
         }
 
         public void Present(Rectangle? sourceRectangle, Rectangle? destinationRectangle, IntPtr overrideWindowHandle)

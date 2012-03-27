@@ -48,8 +48,8 @@ namespace Microsoft.Xna.Framework
         private bool _isVisible;
         private int _drawOrder;
 
-        public event EventHandler DrawOrderChanged;
-        public event EventHandler VisibleChanged;
+        public event EventHandler<EventArgs> DrawOrderChanged;
+        public event EventHandler<EventArgs> VisibleChanged;
 
         public DrawableGameComponent(Game game)
             : base(game)
