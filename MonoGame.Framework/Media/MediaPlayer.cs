@@ -61,6 +61,7 @@ using Microsoft.Xna.Framework.Audio;
 
         public static void Play(Song song)
         {
+        		Stop ();
 			if ( song != null )
 			{
 				_song = song;
