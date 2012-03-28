@@ -76,7 +76,7 @@ namespace Microsoft.Xna.Framework.Audio
             ALFormat format;
             int size;
             int freq;
-            byte[] data;
+            //byte[] data;
             Stream s;
 
             try
@@ -88,7 +88,7 @@ namespace Microsoft.Xna.Framework.Audio
                 throw new Content.ContentLoadException("Could not load audio data", e);
             }
 
-            data = LoadAudioStream(s, 1.0f, false);
+            _data = LoadAudioStream(s, 1.0f, false);
 
             s.Close();			
 		}
