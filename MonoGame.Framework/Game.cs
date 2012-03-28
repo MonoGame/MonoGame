@@ -438,7 +438,11 @@ namespace Microsoft.Xna.Framework
             // values correctly based on the Preferred settings which is causing
             // some problems on some Microsoft samples which we are not handling
             // correctly.
-            graphicsDeviceManager.CreateDevice();
+
+			//graphicsDeviceManager.CreateDevice();
+			//Or not, we definitely create the device in BeforeInitialize now...
+
+
             applyChanges(graphicsDeviceManager);
 
             // According to the information given on MSDN (see link below), all

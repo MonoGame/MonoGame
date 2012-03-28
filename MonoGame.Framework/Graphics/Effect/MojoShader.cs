@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Runtime.InteropServices;
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -2780,6 +2781,23 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		public partial class NativeMethods {
 		    
+#if WINDOWS
+			//Hack to handle 64-bit and 32-bit dll loading on Windows.
+			//Seems to be the cleanest way to do it.
+			static NativeMethods()
+			{
+				if (IntPtr.Size == 4)
+				{
+					File.Copy("libmojoshader_32.dll", mojoshader_dll, true);
+				}
+				else
+				{
+					File.Copy("libmojoshader_64.dll", mojoshader_dll, true);
+				}
+			}
+#endif
+
+
 		    /// Return Type: int
 		    [DllImportAttribute(mojoshader_dll, EntryPoint="MOJOSHADER_version")]
 		public static extern  int MOJOSHADER_version() ;
