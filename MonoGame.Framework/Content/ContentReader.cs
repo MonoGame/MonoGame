@@ -147,6 +147,7 @@ namespace Microsoft.Xna.Framework.Content
         public T ReadExternalReference<T>()
 		{
             var externalReference = ReadString();
+			
             if (!String.IsNullOrEmpty(externalReference))
             {
 #if WINRT
@@ -156,15 +157,22 @@ namespace Microsoft.Xna.Framework.Content
 
                 // Use Path.GetFullPath to help resolve relative directories
                 string fullRootPath = Path.GetFullPath(contentManager.RootDirectory);
-                string fullAssetPath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Path.Combine(fullRootPath, assetName)), externalReference));
+				
+				// iOS won't find the right name if the \'s are facing the wrong way. be certian we're good here.
+				var fullAssetName = Path.Combine(fullRootPath, assetName.Replace('\\', Path.DirectorySeparatorChar)); 
+				var pathDirectory = Path.GetDirectoryName(fullAssetName);
+				var dirExtCombined = Path.Combine(pathDirectory, externalReference);
+				
+                string fullAssetPath = Path.GetFullPath(dirExtCombined);
 
 #if ANDROID
                 string externalAssetName = fullAssetPath.Substring(fullRootPath.Length);
 #else				
                 string externalAssetName = fullAssetPath.Substring(fullRootPath.Length + 1);
 #endif
-                return contentManager.Load<T>(externalAssetName);
 #endif
+                return contentManager.Load<T>(externalAssetName);
+
             }
             return default(T);
         }
