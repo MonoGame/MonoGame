@@ -313,10 +313,7 @@ namespace Microsoft.Xna.Framework {
 		public override void WillMoveToWindow (UIWindow window)
 		{
 			base.WillMoveToWindow (window);
-
-			if (Window != null)
-				TouchPanel.EnabledGesturesChanged -= TouchPanel_EnabledGesturesChanged;
-
+			
 			if (_framebuffer != 0 || _renderbuffer != 0)
 				DestroyFramebuffer();
 		}
@@ -325,8 +322,7 @@ namespace Microsoft.Xna.Framework {
 		public virtual void DidMoveToWindow ()
 		{
 			if (Window != null) {
-				TouchPanel.EnabledGesturesChanged += TouchPanel_EnabledGesturesChanged;
-
+				
 				if (_graphicsContext == null)
 					CreateContext ();
 				if (_framebuffer == 0 || _renderbuffer == 0)
