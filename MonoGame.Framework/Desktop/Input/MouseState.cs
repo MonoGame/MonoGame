@@ -113,6 +113,26 @@ namespace Microsoft.Xna.Framework.Input
 				return ButtonState.Released;
 			}
 		}
+
+        public override int GetHashCode()
+        {
+            return (((((((this._x.GetHashCode() ^ this._y.GetHashCode()) ^ this._leftButton.GetHashCode()) ^ this._rightButton.GetHashCode()) ^ this._middleButton.GetHashCode()) ^ this.XButton1.GetHashCode()) ^ this.XButton2.GetHashCode()) ^ this._scrollWheelValue.GetHashCode());
+        }
+
+        public override bool Equals(object obj)
+        {
+            return ((obj is MouseState) && (this == ((MouseState)obj)));
+        }
+
+        public static bool operator ==(MouseState left, MouseState right)
+        {
+            return (((((left._x == right._x) && (left._y == right._y)) && ((left.LeftButton == right.LeftButton) && (left.RightButton == right.RightButton))) && (((left.MiddleButton == right.MiddleButton) && (left.XButton1 == right.XButton1)) && (left.XButton2 == right.XButton2))) && (left.ScrollWheelValue == right.ScrollWheelValue));
+        }
+
+        public static bool operator !=(MouseState left, MouseState right)
+        {
+            return !(left == right);
+        }
 	}
 }
 
