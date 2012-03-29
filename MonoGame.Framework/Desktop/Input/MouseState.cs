@@ -113,6 +113,20 @@ namespace Microsoft.Xna.Framework.Input
 				return ButtonState.Released;
 			}
 		}
+
+        public static bool operator ==(MouseState left, MouseState right)
+        {
+            return left._x == right._x &&
+                   left._y == right._y &&
+                   left._leftButton == right._leftButton &&
+                   left._middleButton == right._middleButton &&
+                   left._rightButton == right._rightButton;
+        }
+
+        public static bool operator !=(MouseState left, MouseState right)
+        {
+            return !(left == right);
+        }
 	}
 }
 
