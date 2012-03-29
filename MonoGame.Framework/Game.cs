@@ -428,14 +428,14 @@ namespace Microsoft.Xna.Framework
             // http://msdn.microsoft.com/en-us/library/microsoft.xna.framework.game.initialize.aspx
 
             // 1. Categorize components into IUpdateable and IDrawable lists.
-            // 2. Initialize all existing components
-            // 3. Subscribe to Added/Removed events to keep the categorized
+            // 2. Subscribe to Added/Removed events to keep the categorized
             //    lists synced and to Initialize future components as they are
             //    added.
+            // 3. Initialize all existing components
             CategorizeComponents();
-            InitializeExistingComponents();
             _components.ComponentAdded += Components_ComponentAdded;
             _components.ComponentRemoved += Components_ComponentRemoved;
+            InitializeExistingComponents();
 
             _graphicsDeviceService = (IGraphicsDeviceService)
                 Services.GetService(typeof(IGraphicsDeviceService));
@@ -620,8 +620,12 @@ namespace Microsoft.Xna.Framework
         //       Components.ComponentAdded.
         private void InitializeExistingComponents()
         {
-            for (int i = 0; i < Components.Count; ++i)
-                Components[i].Initialize();
+            // TODO: Would be nice to get rid of this copy, but since it only
+            //       happens once per game, it's fairly low priority.
+            var copy = new IGameComponent[Components.Count];
+            Components.CopyTo(copy, 0);
+            foreach (var component in copy)
+                component.Initialize();
         }
 
         private void CategorizeComponents()
