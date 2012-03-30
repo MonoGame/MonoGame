@@ -434,7 +434,6 @@
     <Compile Include="Content\ContentReaders\VertexDeclarationReader.cs" />
     <Compile Include="Content\ContentReaders\AlphaTestEffectReader.cs" />
     <Compile Include="Graphics\Texture2D.cs" />
-    <Compile Include="Graphics\Vertices\VertexPositionColorTexture.cs" />
     <Compile Include="Graphics\Effect\GLSLEffectObject.cs" />
     <Compile Include="Graphics\Effect\GLSLShader.cs" />
     <Compile Include="Graphics\CompareFunction.cs" />
