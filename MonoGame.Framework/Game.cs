@@ -402,7 +402,7 @@ namespace Microsoft.Xna.Framework
             if (doDraw)
             {
                 DoDraw(_gameTime);
-                GraphicsDevice.Present();
+                Platform.Present();
             }
 
             if (IsFixedTimeStep)
