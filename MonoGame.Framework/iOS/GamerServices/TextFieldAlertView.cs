@@ -7,7 +7,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 {
 	public class TextFieldAlertView : UIAlertView
 	{
-		private UITextField _tf;
+		private UITextField _tf = null;
 		private bool _secureTextEntry;
 		
 		private string _initEditValue;
@@ -38,8 +38,12 @@ namespace Microsoft.Xna.Framework.GamerServices
 			_secureTextEntry = secureTextEntry;
 			this.AddButton("Cancel");
 			this.AddButton("Ok");
-			// shift the control up so the keyboard won't hide the control when activated.
-			this.Transform = MonoTouch.CoreGraphics.CGAffineTransform.MakeTranslation(0f, 110f);
+			
+			// build out the text field
+			_tf = ComposeTextFieldControl(_secureTextEntry);
+			
+			// add the text field to the alert view
+			this.AddSubview(_tf);
 		}
 		
 		public string EnteredText 
@@ -50,23 +54,13 @@ namespace Microsoft.Xna.Framework.GamerServices
 			} 
 		}
 		
-		
 		public override void LayoutSubviews ()
 		{
 			// layout the stock UIAlertView control
 			base.LayoutSubviews ();
 			
-			// build out the text field
-			_tf = ComposeTextFieldControl(_secureTextEntry);
-			
-			// add the text field to the alert view
-			this.AddSubview(_tf);
-			
 			// We can only force it to become a First Responder after it has been added to the MainView.
 			_tf.BecomeFirstResponder();
-			
-			// shift the contents of the alert view around to accomodate the extra text field
-			AdjustControlSize();
 		}
 
 		private UITextField ComposeTextFieldControl(bool secureTextEntry)
@@ -83,6 +77,14 @@ namespace Microsoft.Xna.Framework.GamerServices
 			textField.Placeholder = _placeHolderValue;
 			textField.BecomeFirstResponder();
 			return textField;
+		}
+		
+		public override void Show ()
+		{
+			base.Show ();
+			
+			// shift the contents of the alert view around to accomodate the extra text field
+			this.AdjustControlSize();
 		}
 		
 		private void AdjustControlSize()
