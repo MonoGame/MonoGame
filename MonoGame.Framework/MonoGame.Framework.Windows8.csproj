@@ -23,7 +23,7 @@
     <DefineConstants>WINRT;DEBUG;TRACE;NETFX_CORE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -238,6 +238,7 @@
     <Compile Include="Graphics\Vertices\VertexPositionTexture.cs" />
     <Compile Include="Storage\StorageDeviceHelper.cs" />
     <Compile Include="Windows8\GameFrameworkViewSource.cs" />
+    <Compile Include="Windows8\MetroGamePlatform.cs" />
     <Compile Include="Windows\Audio\Sound.cs" />
     <Compile Include="Windows\Content\ContentReaders\SoundEffectReader.cs" />
     <Compile Include="BatteryChargeStatus.cs" />

@@ -89,7 +89,7 @@ namespace Microsoft.Xna.Framework
 #elif ANDROID
             return new AndroidGamePlatform(game);
 #elif WINRT
-            return null;
+            return new MetroGamePlatform(game);
 #endif
         }
 
