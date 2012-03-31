@@ -239,6 +239,7 @@
     <Compile Include="Storage\StorageDeviceHelper.cs" />
     <Compile Include="Windows8\GameFrameworkViewSource.cs" />
     <Compile Include="Windows8\MetroGamePlatform.cs" />
+    <Compile Include="Windows8\MetroGameWindow.cs" />
     <Compile Include="Windows\Audio\Sound.cs" />
     <Compile Include="Windows\Content\ContentReaders\SoundEffectReader.cs" />
     <Compile Include="BatteryChargeStatus.cs" />

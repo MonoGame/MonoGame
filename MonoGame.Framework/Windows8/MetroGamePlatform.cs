@@ -79,15 +79,15 @@ namespace Microsoft.Xna.Framework
 {
     class MetroGamePlatform : GamePlatform
     {
-        //private OpenTKGameWindow _view;
+        private MetroGameWindow _window;
 		//private OpenALSoundController soundControllerInstance = null;
 
         public MetroGamePlatform(Game game)
             : base(game)
         {
-            //_view = new OpenTKGameWindow();
-            //_view.Game = game;
-            //this.Window = _view;
+            _window = new MetroGameWindow();
+            _window.Game = game;
+            this.Window = _window;
 			
 			// Setup our OpenALSoundController to handle our SoundBuffer pools
 			//soundControllerInstance = OpenALSoundController.GetInstance;			
@@ -101,7 +101,7 @@ namespace Microsoft.Xna.Framework
         public override void RunLoop()
         {
             ResetWindowBounds(false);
-            //_view.Window.Run(1 / Game.TargetElapsedTime.TotalSeconds);
+            //_window.Window.Run(1 / Game.TargetElapsedTime.TotalSeconds);
         }
 
         public override void StartRunLoop()
@@ -112,10 +112,10 @@ namespace Microsoft.Xna.Framework
         public override void Exit()
         {
             /*
-            if (!_view.Window.IsExiting)
+            if (!_window.IsExiting)
             {
                 Net.NetworkSession.Exit();
-                _view.Window.Exit();
+                _window.Exit();
             }
             */
         }
@@ -212,14 +212,12 @@ namespace Microsoft.Xna.Framework
         public override void SwapBuffers()
         {
             base.SwapBuffers();
-
-            //_view.Window.SwapBuffers();
+            //_window.SwapBuffers();
         }
 		
         protected override void Dispose(bool disposing)
         {
-            //_view.Dispose ();
-			
+            _window.Dispose();			
 			base.Dispose(disposing);
         }
 			
