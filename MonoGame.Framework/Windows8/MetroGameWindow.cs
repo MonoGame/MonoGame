@@ -53,12 +53,6 @@ namespace Microsoft.Xna.Framework
 {
     public class MetroGameWindow : GameWindow
     {
-        private GameTime _updateGameTime;
-        private GameTime _drawGameTime;
-        private DateTime _lastUpdate;
-        private DateTime _now;
-
-        private DisplayOrientation _currentOrientation;
         private CoreWindow _coreWindow;
         protected Game game;
         private readonly List<Keys> _keys;
@@ -66,7 +60,6 @@ namespace Microsoft.Xna.Framework
         // we need this variables to make changes beetween threads
         //private WindowState windowState;
         private Rectangle clientBounds;
-        private bool updateClientBounds;
 
         #region Internal Properties
 
@@ -141,26 +134,6 @@ namespace Microsoft.Xna.Framework
                 _keys.Add(xnaKey);
         }
 
-        protected void OnClientSizeChanged()
-        {
-            if (ClientSizeChanged != null)
-                ClientSizeChanged(this, EventArgs.Empty);
-        }
-
-        protected void OnOrientationChanged()
-        {
-            if (OrientationChanged != null)
-                OrientationChanged(this, EventArgs.Empty);
-        }
-
-        protected void OnPaint() { }
-
-        protected void OnScreenDeviceNameChanged()
-        {
-            if (ScreenDeviceNameChanged != null)
-                ScreenDeviceNameChanged(this, EventArgs.Empty);
-        }
-
         #endregion
 
         private void OnResize(object sender, EventArgs e)
@@ -191,8 +164,6 @@ namespace Microsoft.Xna.Framework
             // Set the window icon.
             //window.Icon = Icon.ExtractAssociatedIcon(Assembly.GetEntryAssembly().Location);
 
-            updateClientBounds = false;
-
             /*
             clientBounds = new Rectangle(window.ClientRectangle.X, window.ClientRectangle.Y,
                                          window.ClientRectangle.Width, window.ClientRectangle.Height);
@@ -208,13 +179,6 @@ namespace Microsoft.Xna.Framework
             Mouse.setWindows(window);
 #endif
             */
-
-            // Initialize GameTime
-            _updateGameTime = new GameTime();
-            _drawGameTime = new GameTime();
-
-            // Initialize _lastUpdate
-            _lastUpdate = DateTime.Now;         
         }
 
         protected override void SetTitle(string title)
@@ -222,8 +186,20 @@ namespace Microsoft.Xna.Framework
             //window.Title = title;
         }
 
+        internal void SetCursor(bool visible)
+        {
+            if ( _coreWindow == null )
+                return;
+
+            if (visible)
+                _coreWindow.PointerCursor = new CoreCursor(CoreCursorType.Arrow, 0);
+            else
+                _coreWindow.PointerCursor = null;
+        }
+
         internal void RunLoop()
         {
+            SetCursor(Game.IsMouseVisible);
             _coreWindow.Activate();
 
             while (true)
@@ -255,7 +231,6 @@ namespace Microsoft.Xna.Framework
 
         internal void ChangeClientBounds(Rectangle clientBounds)
         {
-            updateClientBounds = true;
             this.clientBounds = clientBounds;
         }
 
@@ -274,14 +249,6 @@ namespace Microsoft.Xna.Framework
         {
 
         }
-
-        #endregion
-
-        #region Events
-
-        public event EventHandler<EventArgs> ClientSizeChanged;
-        public event EventHandler<EventArgs> OrientationChanged;
-        public event EventHandler<EventArgs> ScreenDeviceNameChanged;
 
         #endregion
     }

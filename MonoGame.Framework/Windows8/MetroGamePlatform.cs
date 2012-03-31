@@ -212,6 +212,11 @@ namespace Microsoft.Xna.Framework
             base.SwapBuffers();
             //_window.SwapBuffers();
         }
+
+        protected override void OnIsMouseVisibleChanged() 
+        {
+            _window.SetCursor(Game.IsMouseVisible);
+        }
 		
         protected override void Dispose(bool disposing)
         {
