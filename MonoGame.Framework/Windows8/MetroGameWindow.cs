@@ -46,7 +46,7 @@ using System.Drawing;
 using System.Reflection;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-
+using Windows.UI.Core;
 #endregion Using Statements
 
 namespace Microsoft.Xna.Framework
@@ -59,9 +59,9 @@ namespace Microsoft.Xna.Framework
         private DateTime _now;
 
         private DisplayOrientation _currentOrientation;
-        //private OpenTK.GameWindow window;
+        private CoreWindow _coreWindow;
         protected Game game;
-        private List<Microsoft.Xna.Framework.Input.Keys> keys;
+        private readonly List<Keys> _keys;
 
         // we need this variables to make changes beetween threads
         //private WindowState windowState;
@@ -71,6 +71,8 @@ namespace Microsoft.Xna.Framework
         #region Internal Properties
 
         internal Game Game { get; set; }
+
+        internal bool IsExiting { get; set; }
 
         //internal OpenTK.GameWindow Window { get { return window; } }
 
@@ -107,7 +109,7 @@ namespace Microsoft.Xna.Framework
 
         public MetroGameWindow()
         {
-            Initialize();
+            _keys = new List<Keys>();   
         }
 
         #region Restricted Methods
@@ -119,29 +121,31 @@ namespace Microsoft.Xna.Framework
         {
             Game.Exit();
         }
-
-        private void Keyboard_KeyUp(object sender, OpenTK.Input.KeyboardKeyEventArgs e)
-        {
-            Keys xnaKey = KeyboardUtil.ToXna(e.Key);
-            if (keys.Contains(xnaKey)) keys.Remove(xnaKey);
-        }
-
-        private void Keyboard_KeyDown(object sender, OpenTK.Input.KeyboardKeyEventArgs e)
-        {
-            Keys xnaKey = KeyboardUtil.ToXna(e.Key);
-            if (!keys.Contains(xnaKey)) keys.Add(xnaKey);
-        }
         */
 
-        protected void OnActivated() { }
+        private void Keyboard_KeyUp(CoreWindow sender, KeyEventArgs args)
+        {
+            // VirtualKey maps pretty much to XNA keys.
+            var xnaKey = (Keys)args.VirtualKey;
+
+            if (_keys.Contains(xnaKey))
+                _keys.Remove(xnaKey);
+        }
+
+        private void Keyboard_KeyDown(CoreWindow sender, KeyEventArgs args)
+        {
+            // VirtualKey maps directly to XNA keys.
+            var xnaKey = (Keys)args.VirtualKey;
+
+            if (!_keys.Contains(xnaKey))
+                _keys.Add(xnaKey);
+        }
 
         protected void OnClientSizeChanged()
         {
             if (ClientSizeChanged != null)
                 ClientSizeChanged(this, EventArgs.Empty);
         }
-
-        protected void OnDeactivated() { }
 
         protected void OnOrientationChanged()
         {
@@ -164,66 +168,28 @@ namespace Microsoft.Xna.Framework
             //Game.GraphicsDevice.Viewport = new Viewport(0, 0, window.ClientRectangle.Width, window.ClientRectangle.Height);
             OnClientSizeChanged();
         }
-
-        /*
-        private void OnRenderFrame(object sender, FrameEventArgs e)
-        {
-            if (GraphicsContext.CurrentContext == null || GraphicsContext.CurrentContext.IsDisposed)
-                return;
-
-            //Should not happen at all..
-            if (!GraphicsContext.CurrentContext.IsCurrent)
-                window.MakeCurrent();
-
-            // we should wait until window's not fullscreen to resize
-            if (updateClientBounds && window.WindowState == WindowState.Normal)
-            {
-                window.ClientRectangle = new System.Drawing.Rectangle(clientBounds.X,
-                                     clientBounds.Y, clientBounds.Width, clientBounds.Height);
-
-                updateClientBounds = false;
-            }
-
-            if (window.WindowState != windowState)
-                window.WindowState = windowState;
-        }
-        */
-
-        /*
-        private void OnUpdateFrame(object sender, FrameEventArgs e)
-        {
-            if (Game != null)
-            {
-                HandleInput();
-                Game.Tick();
-            }
-        }
-        */
-
+        
         private void HandleInput()
         {
             // mouse doesn't need to be treated here, Mouse class does it alone
 
             // keyboard
-            Keyboard.State = new KeyboardState(keys.ToArray());
+            Keyboard.State = new KeyboardState(_keys.ToArray());
         }
 
         #endregion
 
-        private void Initialize()
+        public void Initialize(CoreWindow coreWindow)
         {
-            /*
-            window = new OpenTK.GameWindow();
-            window.RenderFrame += OnRenderFrame;
-            window.UpdateFrame += OnUpdateFrame;
-            window.Closing += new EventHandler<CancelEventArgs>(OpenTkGameWindow_Closing);
-            window.Resize += OnResize;
-            window.Keyboard.KeyDown += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyDown);
-            window.Keyboard.KeyUp += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyUp);
+            _coreWindow = coreWindow;
+           
+            //window.Closing += new EventHandler<CancelEventArgs>(OpenTkGameWindow_Closing);
+            //window.Resize += OnResize;
+            _coreWindow.KeyDown += Keyboard_KeyDown;
+            _coreWindow.KeyUp += Keyboard_KeyUp;
 
             // Set the window icon.
-            window.Icon = Icon.ExtractAssociatedIcon(Assembly.GetEntryAssembly().Location);
-            */
+            //window.Icon = Icon.ExtractAssociatedIcon(Assembly.GetEntryAssembly().Location);
 
             updateClientBounds = false;
 
@@ -232,8 +198,6 @@ namespace Microsoft.Xna.Framework
                                          window.ClientRectangle.Width, window.ClientRectangle.Height);
             windowState = window.WindowState;
             */
-
-            keys = new List<Keys>();
 
             /*
             // mouse
@@ -258,9 +222,25 @@ namespace Microsoft.Xna.Framework
             //window.Title = title;
         }
 
-        internal void Run(double updateRate)
+        internal void RunLoop()
         {
-            //window.Run(updateRate);
+            _coreWindow.Activate();
+
+            while (true)
+            {
+                // Process events incoming to the window.
+                _coreWindow.Dispatcher.ProcessEvents(CoreProcessEventsOption.ProcessAllIfPresent);
+
+                // Process the game.
+                if (Game != null)
+                {
+                    HandleInput();
+                    Game.Tick();
+                }
+
+                if (IsExiting)
+                    break;
+            }
         }
 
         internal void ToggleFullScreen()

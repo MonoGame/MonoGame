@@ -3,10 +3,7 @@ using System;
 namespace Microsoft.Xna.Framework.Input
 {
 	internal static class KeyboardUtil
-	{	
-#if WINRT
-
-#else
+	{
 		// TODO make a dictionary for fast mapping
         public static Keys ToXna(OpenTK.Input.Key key)
         {
@@ -404,7 +401,6 @@ namespace Microsoft.Xna.Framework.Input
                     
             }
         }
-#endif
     }
 }
 

@@ -101,7 +101,7 @@ namespace Microsoft.Xna.Framework
         public override void RunLoop()
         {
             ResetWindowBounds(false);
-            //_window.Window.Run(1 / Game.TargetElapsedTime.TotalSeconds);
+            _window.RunLoop();
         }
 
         public override void StartRunLoop()
@@ -111,13 +111,11 @@ namespace Microsoft.Xna.Framework
         
         public override void Exit()
         {
-            /*
             if (!_window.IsExiting)
             {
-                Net.NetworkSession.Exit();
-                _window.Exit();
+                //Net.NetworkSession.Exit();
+                _window.IsExiting = true;
             }
-            */
         }
 
         public override bool BeforeUpdate(GameTime gameTime)
