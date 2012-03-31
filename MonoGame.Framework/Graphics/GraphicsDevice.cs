@@ -347,7 +347,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // Allocate new references
             _d2dFactory = new SharpDX.Direct2D1.Factory1(SharpDX.Direct2D1.FactoryType.SingleThreaded, debugLevel);
             _dwriteFactory = new SharpDX.DirectWrite.Factory(SharpDX.DirectWrite.FactoryType.Shared);
-            //_wicFactory = new SharpDX.WIC.ImagingFactory2();
+            _wicFactory = new SharpDX.WIC.ImagingFactory2();
         }
 
         /// <summary>
@@ -380,11 +380,11 @@ namespace Microsoft.Xna.Framework.Graphics
             _d3dContext = _d3dDevice.ImmediateContext.QueryInterface<SharpDX.Direct3D11.DeviceContext1>();
 
             // Create the Direct2D device.
-            //using (var dxgiDevice = _d3dDevice.QueryInterface<SharpDX.DXGI.Device>())
-                //_d2dDevice = new SharpDX.Direct2D1.Device(_d2dFactory, dxgiDevice);
+            using (var dxgiDevice = _d3dDevice.QueryInterface<SharpDX.DXGI.Device>())
+                _d2dDevice = new SharpDX.Direct2D1.Device(_d2dFactory, dxgiDevice);
 
             // Create Direct2D context
-            //_d2dContext = new SharpDX.Direct2D1.DeviceContext(_d2dDevice, SharpDX.Direct2D1.DeviceContextOptions.None);
+            _d2dContext = new SharpDX.Direct2D1.DeviceContext(_d2dDevice, SharpDX.Direct2D1.DeviceContextOptions.None);
         }
 
 #endif // WINRT

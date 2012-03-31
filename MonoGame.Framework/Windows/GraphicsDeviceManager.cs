@@ -145,6 +145,11 @@ namespace Microsoft.Xna.Framework
 
         public void Dispose()
         {
+            if (_graphicsDevice != null)
+            {
+                _graphicsDevice.Dispose();
+                _graphicsDevice = null;
+            }
         }
 
         #endregion
