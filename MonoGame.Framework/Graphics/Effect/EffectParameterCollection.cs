@@ -40,5 +40,10 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             return _parameters.GetEnumerator();
         }
+
+        internal void Add(EffectParameter param)
+        {
+            _parameters.Add(param);
+        }
     }
 }

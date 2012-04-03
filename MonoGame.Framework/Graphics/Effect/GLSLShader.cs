@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
+using System.Reflection;
+using System.IO;
 #else
 using System.Text;
 using OpenTK.Graphics.ES20;
@@ -21,15 +23,18 @@ using TextureTarget = OpenTK.Graphics.ES20.All;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-
 	internal class GLSLShader
 	{
 		public ShaderType shaderType;
-		public int shader;
+		public int shaderHandle;
 		public GLSLEffectObject.VertexAttributeInfo[] attributes;
 		public GLSLEffectObject.SamplerIndexInfo[] samplerIndices;
 		string glslCode;
+        string shaderPath;
 		const string GLSL_DESKTOP = "#define DESKTOP\n";
+
+        public List<String> attributeList;
+        public List<String> uniformsList;
 
 		float[] uniforms_float4;
 		int[] uniforms_int4;
@@ -43,6 +48,89 @@ namespace Microsoft.Xna.Framework.Graphics
 //		MojoShader.MOJOSHADER_attribute[] attributes;
 //		
 //		DXPreshader preshader;
+
+#if NOMOJO
+
+        public GLSLShader(ShaderType shadertype, string filePath)
+        {
+            // First decide if this is a fragment or pixel shader.
+
+            shaderPath = filePath;
+            glslCode = GetShaderFromAssembly(filePath);
+
+            shaderType = shadertype;
+
+            shaderHandle = GL.CreateShader(shaderType);
+            // Attach the loaded source string to the shader object
+            GL.ShaderSource(shaderHandle, glslCode);
+            // Compile the shader
+            GL.CompileShader(shaderHandle);
+
+            int compiled = 0;
+            //Error check.
+            GL.GetShader(shaderHandle, ShaderParameter.CompileStatus, out compiled);
+            if (compiled == (int)All.False)
+            {
+                string log = GL.GetShaderInfoLog(shaderHandle);
+                Console.WriteLine(log);
+                throw new ArgumentNullException();
+            }
+
+            // Shader looks good. Lets grab the variables we'll need from it.
+
+            // Read in and save all of our attribute names to bind them later.
+            if (shaderType == ShaderType.VertexShader)
+            {
+                attributeList = new List<String>();
+                buildVariablesList("attribute", attributeList);
+            }
+
+            // Build our uniforms.
+            if (shaderType == ShaderType.VertexShader || shaderType == ShaderType.FragmentShader)
+            {
+                uniformsList = new List<String>();
+                buildVariablesList("uniform", uniformsList);
+            }
+            else
+                throw new NotSupportedException();
+        }
+
+        private void buildVariablesList(string glslVariableType, List<String> variableList)
+        {
+            // Because OpenGL ES2.0 have precision specifiers, we have to jump around the strings a bit. =/
+            string nameOfAttribute;
+            var includes = glslCode.Substring(0, glslCode.IndexOf("void main"));
+            for (int curPos = includes.IndexOf(glslVariableType); curPos != -1 && curPos < includes.Length; )
+            {
+                // Find the attribute name.
+                var nextSemicolonIndex = includes.IndexOf(';', curPos);
+                var length = nextSemicolonIndex - curPos;
+
+                var spaceIndex = includes.LastIndexOf(' ', nextSemicolonIndex);
+                nameOfAttribute = includes.Substring(spaceIndex, nextSemicolonIndex - spaceIndex).Trim();
+
+                // Find the type name.
+                var nextSpaceIndex = includes.LastIndexOf(' ', spaceIndex - 1);
+                var typeOfAttribute = includes.Substring(nextSpaceIndex, spaceIndex - nextSpaceIndex).Trim();
+
+                variableList.Add(nameOfAttribute);
+
+                curPos = includes.IndexOf(glslVariableType, nextSemicolonIndex);
+            }
+        }
+
+        private string GetShaderFromAssembly(string filePath)
+        {
+            Assembly assembly = typeof(Effect).Assembly;//Assembly.GetExecutingAssembly();
+            var stream = assembly.GetManifestResourceStream(filePath);
+            StreamReader streamReader = new StreamReader(stream);
+            var shaderCode = streamReader.ReadToEnd();
+            streamReader.Close();
+
+            return shaderCode;
+        }
+
+#endif
 		
 		public GLSLShader (GLSLEffectObject.ShaderProg shaderProgram)
 		{
@@ -157,20 +245,20 @@ namespace Microsoft.Xna.Framework.Graphics
 						 precision mediump int;
 						"+glslCode;
 #endif
-			
-			shader = GL.CreateShader (shaderType);
+
+            shaderHandle = GL.CreateShader(shaderType);
 #if IPHONE || ANDROID
 			GL.ShaderSource (shader, 1, new string[]{glslCode}, (int[])null);
 #else			
-			GL.ShaderSource (shader, glslCode);
+            GL.ShaderSource(shaderHandle, glslCode);
 #endif
-			GL.CompileShader(shader);
+            GL.CompileShader(shaderHandle);
 			
 			int compiled = 0;
 #if IPHONE || ANDROID
 			GL.GetShader (shader, ShaderParameter.CompileStatus, ref compiled);
 #else
-			GL.GetShader (shader, ShaderParameter.CompileStatus, out compiled);
+            GL.GetShader(shaderHandle, ShaderParameter.CompileStatus, out compiled);
 #endif
 			if (compiled == (int)All.False) {
 #if IPHONE || ANDROID
@@ -183,11 +271,11 @@ namespace Microsoft.Xna.Framework.Graphics
 					log = logBuilder.ToString();
 				}
 #else
-				string log = GL.GetShaderInfoLog(shader);
+                string log = GL.GetShaderInfoLog(shaderHandle);
 #endif
 				Console.WriteLine (log);
-				
-				GL.DeleteShader (shader);
+
+                GL.DeleteShader(shaderHandle);
 				throw new InvalidOperationException("Shader Compilation Failed");
 			}
 				
@@ -243,6 +331,116 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 			//public EffectParameterValue Value { get; set; }
 		}
+
+#if NOMOJO
+        public void Apply(int program,
+                  EffectParameterCollection parameters,
+                  GraphicsDevice graphicsDevice)
+        {
+            TextureCollection textures = graphicsDevice.Textures;
+            SamplerStateCollection samplerStates = graphicsDevice.SamplerStates;
+
+            // Relink our attributes.
+            if (shaderType == ShaderType.VertexShader)
+            {
+                int location = 0;
+                //bind attributes
+                foreach (var attribute in attributeList)
+                {
+                    if (attribute.Contains("Position"))
+                        location = GraphicsDevice.attributePosition;
+                    else if (attribute.Contains("Normal"))
+                        location = GraphicsDevice.attributeNormal;
+                    else if (attribute.Contains("TextureCoordinate"))
+                        location = GraphicsDevice.attributeTexCoord;
+                    else if (attribute.Contains("Color"))
+                        location = GraphicsDevice.attributeColor;
+                    else
+                        throw new NotSupportedException();
+
+                    GL.BindAttribLocation(program, location, attribute);
+                }
+            }
+
+            // Set our uniforms.
+            foreach (var param in parameters)
+            {
+                int uniformLocation = GL.GetUniformLocation(program, param.Name);
+
+                var error = GL.GetError();
+
+                if (uniformLocation == -1 || param.Name.Contains("ShaderIndex"))
+                    continue;
+
+                // Only set uniforms if they exist for this shader.
+                if (!uniformsList.Contains(param.Name))
+                    continue;
+
+                switch (param.activeUniformType)
+                {
+                    case ActiveUniformType.FloatVec2:
+                        var v2 = param.GetValueVector2();
+                        GL.Uniform2(uniformLocation, v2.X, v2.Y);
+                        break;
+
+                    case ActiveUniformType.FloatVec3:
+                        var v3 = param.GetValueVector3();
+                        GL.Uniform3(uniformLocation, v3.X, v3.Y, v3.Z);
+                        break;
+
+                    case ActiveUniformType.FloatVec4:
+                        var v4 = param.GetValueVector4();
+                        GL.Uniform4(uniformLocation, v4.X, v4.Y, v4.Z, v4.W);
+                        break;
+
+                    case ActiveUniformType.Float:
+                        GL.Uniform1(uniformLocation, param.GetValueSingle());
+                        break;
+
+                    case ActiveUniformType.FloatMat4:
+                        var mat4 = (Matrix)param.data;
+                        GL.UniformMatrix4(uniformLocation, 1, false, ref mat4.M11);
+                        break;
+
+                    case ActiveUniformType.FloatMat3:
+                        float[] mat3 = (float[])param.data;
+                        GL.UniformMatrix3(uniformLocation, 1, false, ref mat3[0]);
+                        break;
+
+                    case ActiveUniformType.Bool:
+                        GL.Uniform1(uniformLocation, (param.GetValueBoolean()) ? 1 : 0);
+                        break;
+
+                    case ActiveUniformType.Int:
+                        GL.Uniform1(uniformLocation, param.GetValueInt32());
+                        break;
+
+                    case ActiveUniformType.Sampler2D:
+                        var samplerIndex = (int)TextureTarget.Texture2D;
+                        GL.Uniform1(uniformLocation, samplerIndex);
+                        Texture tex = null;
+						tex = (Texture)param.data;
+						if (tex == null) 
+                        {
+							//texutre 0 will be set in drawbatch :/
+                            if (samplerIndex == 0)
+								continue;
+
+							//are smapler indexes always normal texture indexes?
+                            tex = (Texture)textures[samplerIndex];
+						}
+
+                        GL.ActiveTexture((TextureUnit)((int)TextureUnit.Texture0 + samplerIndex));
+						tex.Activate();
+                        samplerStates[samplerIndex].Activate(tex.glTarget, tex.LevelCount > 1);
+                        break;
+
+                    default:
+                        throw new NotSupportedException();
+                }
+            }
+        }
+#else
 
 		private float[] matrix3 = new float[9];
 		public void Apply(int program,
@@ -765,6 +963,7 @@ namespace Microsoft.Xna.Framework.Graphics
 //				}
 //			}
 		}
+#endif
 
 	}
 }

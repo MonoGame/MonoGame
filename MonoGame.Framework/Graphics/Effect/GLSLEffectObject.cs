@@ -1210,7 +1210,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			shader.samplerIndices = samplIndices;
 
 			prog.glslShaderObject = shader;
-			prog.shaderId = shader.shader;
+			prog.shaderId = shader.shaderHandle;
 			param.data = prog;
 
 		}

@@ -47,11 +47,26 @@ using System.Linq;
 //For laoding from resources
 using System.Reflection;
 
+#if WINDOWS
+using OpenTK.Graphics.OpenGL;
+#endif
+
 
 namespace Microsoft.Xna.Framework.Graphics
 {
 	public class Effect : GraphicsResource
     {
+        internal protected EffectParameter shaderIndexParam;
+
+#if NOMOJO
+
+        static internal Dictionary<int, GLSLShader[]> shaderObjectLookup = new Dictionary<int, GLSLShader[]>();
+
+        internal static Dictionary<Type, int[]> programsByType = new Dictionary<Type, int[]>();
+        internal int[] shaderIndexLookupTable;
+
+#endif
+
         public EffectParameterCollection Parameters { get; set; }
 		internal List<EffectParameter> _textureMappings = new List<EffectParameter>();
 
@@ -60,6 +75,8 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
 		DXEffectObject effectObject;
 		GLSLEffectObject glslEffectObject;
+
+        internal int CurrentProgram = 0;
 
 		internal static Dictionary<byte[], DXEffectObject> effectObjectCache =
 			new Dictionary<byte[], DXEffectObject>(new ByteArrayComparer());
@@ -107,18 +124,74 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 		}
 
+#if NOMOJO
+
+        internal Effect(GraphicsDevice graphicsDevice, string[] vertexShaderFilenames, string[] fragmentShaderFilenames, Tuple<int, int>[] programShaderIndexPairs)
+        {
+            if (graphicsDevice == null)
+                throw new ArgumentNullException("Graphics Device Cannot Be Null");
+
+            this.graphicsDevice = graphicsDevice;
+
+            var type = this.GetType();
+            if (!programsByType.TryGetValue(GetType(), out shaderIndexLookupTable))
+                initializeEffects(vertexShaderFilenames, fragmentShaderFilenames, programShaderIndexPairs);
+            
+            this.Parameters = new EffectParameterCollection();
+            this.Techniques = new EffectTechniqueCollection();
+
+            shaderIndexParam = new EffectParameter(ActiveUniformType.Int, "ShaderIndex");
+            shaderIndexParam.SetValue(0);
+            Parameters.Add(shaderIndexParam);
+        }
+
+        private void initializeEffects(string[] vertexShaderFilenames, string[] fragmentShaderFilenames, Tuple<int, int>[] programShaderIndexPairs)
+        {
+            var type = this.GetType();
+
+            var programCount = programShaderIndexPairs.Length;
+
+            shaderIndexLookupTable = new int[programCount];
+            programsByType.Add(type, shaderIndexLookupTable);
+
+            var vertexShaderCount = vertexShaderFilenames.Length;
+            var vertexShaders = new GLSLShader[vertexShaderCount];
+            for (var i = 0; i < vertexShaderCount; ++i)
+                vertexShaders[i] = new GLSLShader(ShaderType.VertexShader, vertexShaderFilenames[i]);
+
+            var fragmentShaderCount = fragmentShaderFilenames.Length;
+            var fragmentShaders = new GLSLShader[fragmentShaderCount];
+            for (var i = 0; i < fragmentShaderCount; ++i)
+                fragmentShaders[i] = new GLSLShader(ShaderType.FragmentShader, fragmentShaderFilenames[i]);
+
+            for (var i = 0; i < programCount; ++i)
+            {
+                var programShaderIndexPair = programShaderIndexPairs[i];
+                shaderIndexLookupTable[i] = this.CreateProgram(vertexShaders[programShaderIndexPair.Item1], fragmentShaders[programShaderIndexPair.Item2]);
+                shaderObjectLookup.Add(shaderIndexLookupTable[i], new GLSLShader[2] { vertexShaders[programShaderIndexPair.Item1], fragmentShaders[programShaderIndexPair.Item2] });
+            }
+        }
+#endif //NOMOJO
+
+        internal virtual void Initialize()
+        {
+
+        }
+
 		public Effect (
 			GraphicsDevice graphicsDevice,
 			byte[] effectCode)
 		{
 #if ES11
 			throw new NotSupportedException("Programmable shaders unavailable in OpenGL ES 1.1");
-#endif
+#endif // ES11
 
 			if (graphicsDevice == null) {
 				throw new ArgumentNullException ("Graphics Device Cannot Be Null");
 			}
 			this.graphicsDevice = graphicsDevice;
+
+            shaderIndexParam = new EffectParameter(ActiveUniformType.Int, "ShaderIndex");
 
 #if WINRT
 
@@ -161,10 +234,149 @@ namespace Microsoft.Xna.Framework.Graphics
 				}
 			}
 
-#endif
-
+#endif // WINRT
 			CurrentTechnique = Techniques[0];			
 		}
+
+        private int CreateProgram(GLSLShader glVertexShader, GLSLShader glFragmentShader)
+        {
+            var glProgram = GL.CreateProgram();
+
+            GL.AttachShader(glProgram, glVertexShader.shaderHandle);
+            GL.AttachShader(glProgram, glFragmentShader.shaderHandle);
+
+            GL.BindAttribLocation(glProgram, GraphicsDevice.attributePosition, "Position");
+            GL.BindAttribLocation(glProgram, GraphicsDevice.attributeNormal, "Normal");
+            GL.BindAttribLocation(glProgram, GraphicsDevice.attributeColor, "Color");
+            GL.BindAttribLocation(glProgram, GraphicsDevice.attributeTexCoord, "TextureCoordinate");
+
+            GL.LinkProgram(glProgram);
+
+            var error = GL.GetError();
+
+            int result = 0;
+#if IPHONE || ANDROID
+            GL.GetProgram(glProgram, ProgramParameter.LinkStatus, ref result);
+#else
+            GL.GetProgram(glProgram, ProgramParameter.LinkStatus, out result);
+#endif // IPHONE || ANDROID
+            if (result == 0)
+            {
+                var maxInfoLogLength = 0;
+#if IPHONE|| ANDROID
+                GL.GetProgram(glProgram, ProgramParameter.InfoLogLength, ref maxInfoLogLength);
+#else
+                GL.GetProgram(glProgram, ProgramParameter.InfoLogLength, out maxInfoLogLength);
+#endif //IPHONE || ANDROID
+                if (maxInfoLogLength > 0)
+                {
+                    var infoLogLength = 0;
+                    var infoLog = new StringBuilder(maxInfoLogLength);
+#if IPHONE || ANDROID
+                    GL.GetProgramInfoLog(glProgram, maxInfoLogLength, ref infoLogLength, infoLog);
+#else
+                    GL.GetProgramInfoLog(glProgram, maxInfoLogLength, out infoLogLength, infoLog);
+#endif // IPHONE || ANDROID
+                    System.Diagnostics.Debug.WriteLine(infoLog.ToString());
+                }
+            }
+
+            return glProgram;
+        }
+
+        private int CreateShader(ShaderType shaderType, string filePath)
+        {
+            var assembly = typeof(Effect).Assembly;//Assembly assembly = Assembly.GetExecutingAssembly();
+            var stream = assembly.GetManifestResourceStream(filePath);
+            StreamReader streamReader = new StreamReader(stream);
+            string glslCode = streamReader.ReadToEnd();
+            streamReader.Close();
+
+#if ES11
+			if (shaderType == ShaderType.VertexShader) {
+				foreach (MojoShader.MOJOSHADER_attribute attrb in attributes) {
+					switch (attrb.usage) {
+
+					//use builtin attributes in GL 1.1
+					case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_COLOR:
+						glslCode = glslCode.Replace ("attribute vec4 "+attrb.name+";",
+						                               "#define "+attrb.name+" gl_Color");
+						break;
+					case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_POSITION:
+						glslCode = glslCode.Replace ("attribute vec4 "+attrb.name+";",
+						                               "#define "+attrb.name+" gl_Vertex");
+						break;
+					case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_TEXCOORD:
+						glslCode = glslCode.Replace ("attribute vec4 "+attrb.name+";",
+						                               "#define "+attrb.name+" gl_MultiTexCoord0");
+						break;
+					case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_NORMAL:
+						glslCode = glslCode.Replace ("attribute vec4 "+attrb.name+";",
+						                               "#define "+attrb.name+" gl_Normal");
+						break;
+					default:
+						throw new NotImplementedException();
+					}
+				}
+			}
+#endif // ES11
+            int shaderHandle;
+
+#if GLSLOPTIMIZER
+			//glslCode = GLSLOptimizer.Optimize (glslCode, shaderType);
+#endif // GLSLOPTIMIZER
+
+#if IPHONE || ANDROID
+			glslCode = glslCode.Replace("#version 110\n", "");
+			glslCode = "precision mediump float;\nprecision mediump int;\n" + glslCode;
+#endif // IPHOPNE || ANDROID
+            Threading.Begin();
+            try
+            {
+                shaderHandle = GL.CreateShader(shaderType);
+#if IPHONE || ANDROID
+                GL.ShaderSource(shader, 1, new string[] { glslCode }, (int[])null);
+#else
+                GL.ShaderSource(shaderHandle, glslCode);
+#endif // IPHONE || ANDROID
+                GL.CompileShader(shaderHandle);
+
+                int compiled = 0;
+#if IPHONE || ANDROID
+                GL.GetShader(shaderHandle, ShaderParameter.CompileStatus, ref compiled);
+#else
+                GL.GetShader(shaderHandle, ShaderParameter.CompileStatus, out compiled);
+#endif //IPHONE || ANDROID
+                if (compiled == (int)All.False)
+                {
+#if IPHONE || ANDROID
+                    string log = "";
+                    int length = 0;
+                    GL.GetShader(shaderHandle, ShaderParameter.InfoLogLength, ref length);
+                    if (length > 0)
+                    {
+                        var logBuilder = new StringBuilder(length);
+                        GL.GetShaderInfoLog(shaderHandle, length, ref length, logBuilder);
+                        log = logBuilder.ToString();
+                    }
+#else
+                    string log = GL.GetShaderInfoLog(shaderHandle);
+#endif // IPHONE || ANDROID
+                    Console.WriteLine(log);
+
+                    GL.DeleteShader(shaderHandle);
+                    throw new InvalidOperationException("Shader Compilation Failed");
+                }
+            }
+            finally
+            {
+                Threading.End();
+            }
+            //MojoShader.NativeMethods.MOJOSHADER_freeParseData(parseDataPtr);
+            //TODO: dispose properly - DXPreshader holds unmanaged data
+
+            return shaderHandle;
+        }
 
 		public virtual Effect Clone ()
 		{
@@ -191,7 +403,7 @@ namespace Microsoft.Xna.Framework.Graphics
             var assembly = typeof(Effect).GetTypeInfo().Assembly;
 #else
             var assembly = typeof(Effect).Assembly;
-#endif
+#endif //WINRT
 
 #if WINRT
             name += ".hlsl";
@@ -199,7 +411,7 @@ namespace Microsoft.Xna.Framework.Graphics
             name += "GLSL.bin";
 #else
             name += ".bin";
-#endif
+#endif // WINRT elif GLSL_EFFECTS
             var stream = assembly.GetManifestResourceStream("Microsoft.Xna.Framework.Graphics.Effect." + name);
             using (MemoryStream ms = new MemoryStream())
 			{
