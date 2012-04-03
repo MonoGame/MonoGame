@@ -100,7 +100,6 @@ namespace Microsoft.Xna.Framework
 
         public override void RunLoop()
         {
-            ResetWindowBounds(false);
             _window.RunLoop();
         }
 
@@ -132,74 +131,20 @@ namespace Microsoft.Xna.Framework
 
         public override void EnterFullScreen()
         {
-            ResetWindowBounds(false);
+            // Metro has no concept of fullscreen vs windowed!
         }
 
         public override void ExitFullScreen()
         {
-            ResetWindowBounds(false);
+            // Metro has no concept of fullscreen vs windowed!
         }
-
-        internal void ResetWindowBounds(bool toggleFullScreen)
-        {
-            Rectangle bounds;
-
-            bounds = Window.ClientBounds;
-
-            //Changing window style forces a redraw. Some games
-            //have fail-logic and toggle fullscreen in their draw function,
-            //so temporarily become inactive so it won't execute.
-
-            bool wasActive = IsActive;
-            IsActive = false;
-
-            var graphicsDeviceManager = (GraphicsDeviceManager)
-                Game.Services.GetService(typeof(IGraphicsDeviceManager));
-
-            /*
-            if (graphicsDeviceManager.IsFullScreen)
-            {
-                bounds = new Rectangle(0, 0,
-                                       OpenTK.DisplayDevice.Default.Width,
-                                       OpenTK.DisplayDevice.Default.Height);
-            }
-            else
-            {
-                bounds.Width = graphicsDeviceManager.PreferredBackBufferWidth;
-                bounds.Height = graphicsDeviceManager.PreferredBackBufferHeight;
-            }
-
-            // Now we set our Presentation Parameters
-            var device = (GraphicsDevice)graphicsDeviceManager.GraphicsDevice;
-            // FIXME: Eliminate the need for null checks by only calling
-            //        ResetWindowBounds after the device is ready.  Or,
-            //        possibly break this method into smaller methods.
-            if (device != null)
-            {
-                PresentationParameters parms = device.PresentationParameters;
-                parms.BackBufferHeight = (int)bounds.Height;
-                parms.BackBufferWidth = (int)bounds.Width;
-            }
-
-            if (toggleFullScreen)
-                _view.ToggleFullScreen();
-
-            // we only change window bounds if we are not fullscreen
-            if (!graphicsDeviceManager.IsFullScreen)
-                _view.ChangeClientBounds(bounds);
-            */
-
-            IsActive = wasActive;
-        }
-
+        
         public override void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight)
         {
-            
         }
 
         public override void BeginScreenDeviceChange(bool willBeFullScreen)
         {
-            
         }
 
         public override void Log(string Message)
@@ -210,7 +155,10 @@ namespace Microsoft.Xna.Framework
         public override void SwapBuffers()
         {
             base.SwapBuffers();
-            //_window.SwapBuffers();
+
+            var device = Game.GraphicsDevice;
+            if ( device != null )
+                device.Present();
         }
 
         protected override void OnIsMouseVisibleChanged() 
