@@ -46,15 +46,22 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			this.graphicsDevice = graphicsDevice;
 
+#if NOMOJO
+            spriteEffect = new SpriteEffect(this.graphicsDevice);
+#else
             // Use a custom SpriteEffect so we can control the transformation matrix
             spriteEffect = new Effect(this.graphicsDevice, Effect.LoadEffectResource("SpriteEffect"));
-            
+#endif
             _batcher = new SpriteBatcher();
 		}
 
 		public void Begin ()
 		{
-			Begin (SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Matrix.Identity);			
+#if NOMOJO
+            Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, spriteEffect, Matrix.Identity);	
+#else
+            Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Matrix.Identity);	
+#endif
 		}
 
 		public void Begin (SpriteSortMode sortMode, BlendState blendState, SamplerState samplerState, DepthStencilState depthStencilState, RasterizerState rasterizerState, Effect effect, Matrix transformMatrix)
@@ -106,7 +113,11 @@ namespace Microsoft.Xna.Framework.Graphics
 #if !WINRT && !ES11
 			// unbinds shader
 			if (_effect != null) {
-				GL.UseProgram (0);
+#if NOMOJO
+				_effect.CurrentProgram = 0;
+#else
+                GL.UseProgram(0);
+#endif// NOMOJO
 				_effect = null;
 			}
 #endif
