@@ -72,11 +72,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		bool passthroughVertexShaderAttached = false;
 
-#if WINRT
-		
-#else
-
-
 #if NOMOJO
         public EffectPass(EffectTechnique technique)
         {
@@ -274,6 +269,10 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 #endif // NOMOJO
 
+
+#if WINRT
+
+#else
 		public EffectPass(EffectTechnique technique, DXEffectObject.d3dx_pass pass)
         {
             _technique = technique;
@@ -517,7 +516,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 #endif
 
-		private void Link ()
+        private void Link ()
 		{
 #if WINRT
 

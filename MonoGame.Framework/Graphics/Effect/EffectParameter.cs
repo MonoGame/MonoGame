@@ -11,7 +11,6 @@ namespace Microsoft.Xna.Framework.Graphics
 {
 	public class EffectParameter
 	{
-        internal ActiveUniformType activeUniformType;
 		EffectParameterType paramType;
 		EffectParameterClass paramClass;
 		int rowCount;
@@ -30,6 +29,8 @@ namespace Microsoft.Xna.Framework.Graphics
 #if WINRT
 
 #else
+        internal ActiveUniformType activeUniformType;
+
 		internal DXEffectObject.D3DXPARAMETER_TYPE rawType;
 		internal GLSLEffectObject.glslEffectParameterType rawGLSLType;
 

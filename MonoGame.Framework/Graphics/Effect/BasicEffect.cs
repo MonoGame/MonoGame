@@ -14,7 +14,9 @@ using Microsoft.Xna.Framework.Graphics;
 
 
 using System;
+#if !WINRT
 using OpenTK.Graphics.OpenGL;
+#endif
 #endregion
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -481,6 +483,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal override void Initialize()
         {
+#if !WINRT
             textureParam = new EffectParameter(ActiveUniformType.Sampler2D, "Texture");
             Parameters.Add(textureParam);
             diffuseColorParam = new EffectParameter(ActiveUniformType.FloatVec4, "DiffuseColor");
@@ -503,6 +506,7 @@ namespace Microsoft.Xna.Framework.Graphics
             Parameters.Add(worldInverseTransposeParam);
             worldViewProjParam = new EffectParameter(ActiveUniformType.FloatMat4, "WorldViewProj");
             Parameters.Add(worldViewProjParam);
+#endif
         }
 
 
