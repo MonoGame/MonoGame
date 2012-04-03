@@ -53,8 +53,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public GLSLShader(ShaderType shadertype, string filePath)
         {
-            // First decide if this is a fragment or pixel shader.
-
             shaderPath = filePath;
             glslCode = GetShaderFromAssembly(filePath);
 
@@ -338,7 +336,7 @@ namespace Microsoft.Xna.Framework.Graphics
                   GraphicsDevice graphicsDevice)
         {
             TextureCollection textures = graphicsDevice.Textures;
-            SamplerStateCollection samplerStates = graphicsDevice.SamplerStates;
+            var samplerState = graphicsDevice.SamplerStates[0];
 
             // Relink our attributes.
             if (shaderType == ShaderType.VertexShader)
@@ -417,22 +415,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
                     case ActiveUniformType.Sampler2D:
                         var samplerIndex = (int)TextureTarget.Texture2D;
+                        Texture tex = (Texture)param.data;
                         GL.Uniform1(uniformLocation, samplerIndex);
-                        Texture tex = null;
-						tex = (Texture)param.data;
-						if (tex == null) 
-                        {
-							//texutre 0 will be set in drawbatch :/
-                            if (samplerIndex == 0)
-								continue;
 
-							//are smapler indexes always normal texture indexes?
-                            tex = (Texture)textures[samplerIndex];
-						}
-
-                        GL.ActiveTexture((TextureUnit)((int)TextureUnit.Texture0 + samplerIndex));
+                        GL.ActiveTexture((TextureUnit)(samplerIndex));
 						tex.Activate();
-                        samplerStates[samplerIndex].Activate(tex.glTarget, tex.LevelCount > 1);
+                        samplerState.Activate(tex.glTarget, tex.LevelCount > 1);
                         break;
 
                     default:

@@ -488,9 +488,9 @@ namespace Microsoft.Xna.Framework.Graphics
             Parameters.Add(textureParam);
             diffuseColorParam = new EffectParameter(ActiveUniformType.FloatVec4, "DiffuseColor");
             Parameters.Add(diffuseColorParam);
-            emissiveColorParam = new EffectParameter(ActiveUniformType.FloatVec4, "EmissiveColor");
+            emissiveColorParam = new EffectParameter(ActiveUniformType.FloatVec3, "EmissiveColor");
             Parameters.Add(emissiveColorParam);
-            specularColorParam = new EffectParameter(ActiveUniformType.FloatVec4, "SpecularColor");
+            specularColorParam = new EffectParameter(ActiveUniformType.FloatVec3, "SpecularColor");
             Parameters.Add(specularColorParam);
             specularPowerParam = new EffectParameter(ActiveUniformType.Float, "SpecularPower");
             Parameters.Add(specularPowerParam);
@@ -502,7 +502,7 @@ namespace Microsoft.Xna.Framework.Graphics
             Parameters.Add(fogVectorParam);
             worldParam = new EffectParameter(ActiveUniformType.FloatMat4, "World");
             Parameters.Add(worldParam);
-            worldInverseTransposeParam = new EffectParameter(ActiveUniformType.FloatMat3, "WorldInverseTranspose");
+            worldInverseTransposeParam = new EffectParameter(ActiveUniformType.FloatMat4, "WorldInverseTranspose");
             Parameters.Add(worldInverseTransposeParam);
             worldViewProjParam = new EffectParameter(ActiveUniformType.FloatMat4, "WorldViewProj");
             Parameters.Add(worldViewProjParam);

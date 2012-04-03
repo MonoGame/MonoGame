@@ -89,13 +89,16 @@ namespace Microsoft.Xna.Framework.Graphics
             // Set/get the correct shader handle/cleanups.
 			_technique._effect.OnApply();
 
-            // No work to do if we don't need to switch shaders.
-            if (shaderProgram == _technique._effect.CurrentProgram && shaderProgram != 0)
-               return;
-
             var effect = _technique._effect;
 
-            shaderProgram = _technique._effect.CurrentProgram =  effect.shaderIndexLookupTable[effect.Parameters["ShaderIndex"].GetValueInt32()];
+            var currentProgram = effect.shaderIndexLookupTable[effect.Parameters["ShaderIndex"].GetValueInt32()];
+
+            // No work to do if we don't need to switch shaders.
+            //if (currentProgram == _technique._effect.CurrentProgram && shaderProgram != 0)
+               //return;
+
+
+            shaderProgram = _technique._effect.CurrentProgram = currentProgram;
 
             GL.UseProgram(shaderProgram);
 
