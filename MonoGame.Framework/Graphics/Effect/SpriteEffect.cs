@@ -15,7 +15,9 @@ using Microsoft.Xna.Framework.Graphics;
 
 
 using System;
+#if !WINRT
 using OpenTK.Graphics.OpenGL;
+#endif
 #endregion
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -111,8 +113,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal override void Initialize()
         {
+#if !WINRT
             matrixParam = new EffectParameter(ActiveUniformType.FloatMat4, "MatrixTransform");
             Parameters.Add(matrixParam);
+#endif
         }
 
 

@@ -191,11 +191,11 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 			this.graphicsDevice = graphicsDevice;
 
-            shaderIndexParam = new EffectParameter(ActiveUniformType.Int, "ShaderIndex");
-
 #if WINRT
 
 #else
+            shaderIndexParam = new EffectParameter(ActiveUniformType.Int, "ShaderIndex");
+
 			uint magic = BitConverter.ToUInt32(effectCode,0);
 
 			//0xBCF00BCF XNA 4 effects
@@ -235,9 +235,10 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 
 #endif // WINRT
-			CurrentTechnique = Techniques[0];			
+            CurrentTechnique = Techniques[0];			
 		}
 
+#if !WINRT
         private int CreateProgram(GLSLShader glVertexShader, GLSLShader glFragmentShader)
         {
             var glProgram = GL.CreateProgram();
@@ -377,6 +378,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             return shaderHandle;
         }
+#endif // !WINRT
 
 		public virtual Effect Clone ()
 		{
