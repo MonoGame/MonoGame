@@ -5,6 +5,12 @@ using System.Text;
 
 #if WINDOWS
 using OpenTK.Graphics.OpenGL;
+
+#elif ANDROID || IPHONE
+using OpenTK.Graphics.ES20;
+
+using ActiveUniformType = OpenTK.Graphics.ES20.All;
+
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics

@@ -49,6 +49,12 @@ using System.Reflection;
 
 #if WINDOWS
 using OpenTK.Graphics.OpenGL;
+#elif IPHONE || ANDROID
+using OpenTK.Graphics.ES20;
+using ShaderType = OpenTK.Graphics.ES20.All;
+using ActiveUniformType = OpenTK.Graphics.ES20.All;
+using ProgramParameter = OpenTK.Graphics.ES20.All;
+using ShaderParameter = OpenTK.Graphics.ES20.All;
 #endif
 
 
@@ -336,7 +342,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 shaderHandle = GL.CreateShader(shaderType);
 #if IPHONE || ANDROID
-                GL.ShaderSource(shader, 1, new string[] { glslCode }, (int[])null);
+                GL.ShaderSource(shaderHandle, 1, new string[] { glslCode }, (int[])null);
 #else
                 GL.ShaderSource(shaderHandle, glslCode);
 #endif // IPHONE || ANDROID

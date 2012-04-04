@@ -11,7 +11,13 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
+
+#if WINDOWS
 using OpenTK.Graphics.OpenGL;
+#elif IPHONE || ANDROID
+using OpenTK.Graphics.ES20;
+using ActiveUniformType = OpenTK.Graphics.ES20.All;
+#endif
 #endregion
 
 namespace Microsoft.Xna.Framework.Graphics

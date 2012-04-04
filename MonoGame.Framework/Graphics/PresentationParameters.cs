@@ -144,7 +144,7 @@ namespace Microsoft.Xna.Framework.Graphics
             get { return multiSampleCount; }
             set { multiSampleCount = value; }
         }
-
+		
         public PresentInterval PresentationInterval { get; set; }
 
 		public DisplayOrientation DisplayOrientation 

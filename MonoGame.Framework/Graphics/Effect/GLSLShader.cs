@@ -10,9 +10,10 @@ using OpenTK.Graphics.OpenGL;
 using System.Reflection;
 using System.IO;
 #else
-using System.Text;
 using OpenTK.Graphics.ES20;
 #if IPHONE || ANDROID
+using System.Reflection;
+using System.IO;
 using ProgramParameter = OpenTK.Graphics.ES20.All;
 using ShaderType = OpenTK.Graphics.ES20.All;
 using ShaderParameter = OpenTK.Graphics.ES20.All;
@@ -58,21 +59,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             shaderType = shadertype;
 
-            shaderHandle = GL.CreateShader(shaderType);
-            // Attach the loaded source string to the shader object
-            GL.ShaderSource(shaderHandle, glslCode);
-            // Compile the shader
-            GL.CompileShader(shaderHandle);
-
-            int compiled = 0;
-            //Error check.
-            GL.GetShader(shaderHandle, ShaderParameter.CompileStatus, out compiled);
-            if (compiled == (int)All.False)
-            {
-                string log = GL.GetShaderInfoLog(shaderHandle);
-                Console.WriteLine(log);
-                throw new ArgumentNullException();
-            }
+            shaderHandle = CreateAndCompileShaderFromSource(shaderType, glslCode);
 
             // Shader looks good. Lets grab the variables we'll need from it.
 
@@ -102,14 +89,9 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 // Find the attribute name.
                 var nextSemicolonIndex = includes.IndexOf(';', curPos);
-                var length = nextSemicolonIndex - curPos;
 
                 var spaceIndex = includes.LastIndexOf(' ', nextSemicolonIndex);
                 nameOfAttribute = includes.Substring(spaceIndex, nextSemicolonIndex - spaceIndex).Trim();
-
-                // Find the type name.
-                var nextSpaceIndex = includes.LastIndexOf(' ', spaceIndex - 1);
-                var typeOfAttribute = includes.Substring(nextSpaceIndex, spaceIndex - nextSpaceIndex).Trim();
 
                 variableList.Add(nameOfAttribute);
 
@@ -119,7 +101,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private string GetShaderFromAssembly(string filePath)
         {
-            Assembly assembly = typeof(Effect).Assembly;//Assembly.GetExecutingAssembly();
+            Assembly assembly = typeof(Effect).Assembly;
             var stream = assembly.GetManifestResourceStream(filePath);
             StreamReader streamReader = new StreamReader(stream);
             var shaderCode = streamReader.ReadToEnd();
@@ -244,39 +226,57 @@ namespace Microsoft.Xna.Framework.Graphics
 						"+glslCode;
 #endif
 
-            shaderHandle = GL.CreateShader(shaderType);
-#if IPHONE || ANDROID
-			GL.ShaderSource (shader, 1, new string[]{glslCode}, (int[])null);
-#else			
-            GL.ShaderSource(shaderHandle, glslCode);
-#endif
-            GL.CompileShader(shaderHandle);
+            shaderHandle = CreateAndCompileShaderFromSource(shaderType, glslCode);
+				
+		}
+		
+		/// <summary>
+		/// Creates, Compiles, error checks, and returns a shader from a string of GLSL code.
+		/// </summary>
+		public static int CreateAndCompileShaderFromSource(ShaderType shdrtype, string shaderCode)
+		{
+			var handle = GL.CreateShader(shdrtype);
+            // Attach the loaded source string to the shader object
 			
-			int compiled = 0;
 #if IPHONE || ANDROID
-			GL.GetShader (shader, ShaderParameter.CompileStatus, ref compiled);
+			GL.ShaderSource (handle, 1, new string[]{shaderCode}, (int[])null);
 #else
-            GL.GetShader(shaderHandle, ShaderParameter.CompileStatus, out compiled);
+			GL.ShaderSource(handle, glslCode);
 #endif
-			if (compiled == (int)All.False) {
+            
+            // Compile the shader
+            GL.CompileShader(handle);
+
+            int compiled = 0;
+            //Error check.
+			
 #if IPHONE || ANDROID
-				string log = "";
+			GL.GetShader(handle, ShaderParameter.CompileStatus, ref compiled);
+#else
+			GL.GetShader(handle, ShaderParameter.CompileStatus, out compiled);
+#endif
+            
+            if (compiled == (int)All.False)
+            {
+				string log = string.Empty;
+#if IPHONE || ANDROID
 				int length = 0;
-				GL.GetShader (shader, ShaderParameter.InfoLogLength, ref length);
-				if (length > 0) {
-					var logBuilder = new StringBuilder(length);
-					GL.GetShaderInfoLog(shader, length, ref length, logBuilder);
-					log = logBuilder.ToString();
+				GL.GetShader(handle, ShaderParameter.InfoLogLength, ref length );
+				if (length > 0)
+				{
+					var logbuilder = new StringBuilder(length);
+					GL.GetShaderInfoLog(handle, length, ref length, logbuilder);
+					log = logbuilder.ToString();
 				}
 #else
-                string log = GL.GetShaderInfoLog(shaderHandle);
+				log = GL.GetShaderInfoLog(handle);
 #endif
-				Console.WriteLine (log);
-
-                GL.DeleteShader(shaderHandle);
-				throw new InvalidOperationException("Shader Compilation Failed");
-			}
-				
+                
+                Console.WriteLine(log);
+                throw new Exception("Shader Failed to Compile");
+            }
+			
+			return handle;
 		}
 
 		public void OnLink(int program) {

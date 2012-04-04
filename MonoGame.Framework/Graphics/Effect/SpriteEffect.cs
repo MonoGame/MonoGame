@@ -16,7 +16,15 @@ using Microsoft.Xna.Framework.Graphics;
 
 using System;
 #if !WINRT
+
+#if WINDOWS
+
 using OpenTK.Graphics.OpenGL;
+#elif ANDROID || IPHONE
+using OpenTK.Graphics.ES20;
+using ActiveUniformType = OpenTK.Graphics.ES20.All;
+#endif
+
 #endif
 #endregion
 
