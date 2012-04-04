@@ -241,7 +241,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #if IPHONE || ANDROID
 			GL.ShaderSource (handle, 1, new string[]{shaderCode}, (int[])null);
 #else
-			GL.ShaderSource(handle, glslCode);
+            GL.ShaderSource(handle, shaderCode);
 #endif
             
             // Compile the shader
