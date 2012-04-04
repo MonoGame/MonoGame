@@ -13,6 +13,7 @@ using OpenTK.Graphics.OpenGL;
 using OpenTK.Graphics.ES20;
 
 #if IPHONE || ANDROID
+using ActiveUniformType = OpenTK.Graphics.ES20.All;
 using ShaderType = OpenTK.Graphics.ES20.All;
 using ProgramParameter = OpenTK.Graphics.ES20.All;
 #endif

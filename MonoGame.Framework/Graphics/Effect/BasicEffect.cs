@@ -15,7 +15,13 @@ using Microsoft.Xna.Framework.Graphics;
 
 using System;
 #if !WINRT
+
+#if WINDOWS
 using OpenTK.Graphics.OpenGL;
+#elif ANDROID || IPHONE
+using OpenTK.Graphics.ES20;
+using ActiveUniformType = OpenTK.Graphics.ES20.All;
+#endif
 #endif
 #endregion
 
@@ -511,6 +517,9 @@ namespace Microsoft.Xna.Framework.Graphics
             worldViewProjParam = new EffectParameter(ActiveUniformType.FloatMat4, "WorldViewProj");
             Parameters.Add(worldViewProjParam);
 
+            dirParam1 = new EffectParameter(ActiveUniformType.FloatVec3, "DirLight0Direction");
+            dirParam2 = new EffectParameter(ActiveUniformType.FloatVec3, "DirLight0DiffuseColor");
+            dirParam3 = new EffectParameter(ActiveUniformType.FloatVec3, "DirLight0SpecularColor");
             Parameters.Add(dirParam1);
             Parameters.Add(dirParam2);
             Parameters.Add(dirParam3);

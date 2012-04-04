@@ -115,6 +115,27 @@ namespace Microsoft.Xna.Framework {
 			if (handler != null)
 				handler (this, EventArgs.Empty);
 		}
+		
+		public override void TouchesBegan (NSSet touches, UIEvent evt)
+		{
+			base.TouchesBegan (touches, evt);
+		}
+
+		public override void TouchesEnded (NSSet touches, UIEvent evt)
+		{
+			base.TouchesEnded (touches, evt);
+			
+		}
+
+		public override void TouchesMoved (NSSet touches, UIEvent evt)
+		{
+			base.TouchesMoved (touches, evt);
+		}
+
+		public override void TouchesCancelled (NSSet touches, UIEvent evt)
+		{
+			base.TouchesCancelled (touches, evt);
+		}
 
 		private DisplayOrientation? _defaultSupportedOrientations;
 		/// <summary>

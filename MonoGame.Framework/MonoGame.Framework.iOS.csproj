@@ -19,7 +19,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\iPhoneSimulator\Debug</OutputPath>
-    <DefineConstants>DEBUG;IPHONE;GLES</DefineConstants>
+    <DefineConstants>DEBUG;IPHONE;GLES;NOMOJO</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CustomCommands>
@@ -89,7 +89,6 @@
     <Compile Include="Graphics\Effect\EffectPool.cs" />
     <Compile Include="Graphics\Effect\EffectTechnique.cs" />
     <Compile Include="Graphics\Effect\EffectTechniqueCollection.cs" />
-    <Compile Include="Content\ContentLoadException.cs" />
     <Compile Include="GamerServices\Gamer.cs" />
     <Compile Include="GamerServices\GamerPrivileges.cs" />
     <Compile Include="GamerServices\GamerServicesComponent.cs" />
@@ -150,7 +149,6 @@
     <Compile Include="CurveLoopType.cs" />
     <Compile Include="CurveContinuity.cs" />
     <Compile Include="Graphics\DeviceType.cs" />
-    <Compile Include="Graphics\SwapEffect.cs" />
     <Compile Include="Input\ThumbStickDefinition.cs" />
     <Compile Include="Input\Mouse.cs" />
     <Compile Include="Input\MouseState.cs" />
@@ -159,21 +157,6 @@
     <Compile Include="Media\MediaPlayer.cs" />
     <Compile Include="Media\MediaState.cs" />
     <Compile Include="Media\Song.cs" />
-    <Compile Include="Content\ContentReader.cs" />
-    <Compile Include="Content\ContentTypeReader.cs" />
-    <Compile Include="Content\ContentTypeReaderManager.cs" />
-    <Compile Include="Content\ContentReaders\CharReader.cs" />
-    <Compile Include="Content\ContentReaders\ListReader.cs" />
-    <Compile Include="Content\ContentReaders\RectangleReader.cs" />
-    <Compile Include="Content\ContentReaders\SpriteFontReader.cs" />
-    <Compile Include="Content\ContentReaders\StringReader.cs" />
-    <Compile Include="Content\ContentReaders\Texture2DReader.cs" />
-    <Compile Include="Content\ContentReaders\Vector3Reader.cs" />
-    <Compile Include="Content\ContentReaders\SongReader.cs" />
-    <Compile Include="Content\ContentReaders\SoundEffectReader.cs" />
-    <Compile Include="Content\ContentReaders\PlaneReader.cs" />
-    <Compile Include="Content\ContentReaders\QuaternionReader.cs" />
-    <Compile Include="Content\ContentReaders\Vector4Reader.cs" />
     <Compile Include="Media\MediaSourceType.cs" />
     <Compile Include="Media\Playlist.cs" />
     <Compile Include="ReusableItemList.cs" />
@@ -278,8 +261,6 @@
     <Compile Include="Media\PlaylistCollection.cs" />
     <Compile Include="Media\SongCollection.cs" />
     <Compile Include="Graphics\Texture.cs" />
-    <Compile Include="Content\ContentSerializerIgnoreAttribute.cs" />
-    <Compile Include="Content\ContentSerializerAttribute.cs" />
     <Compile Include="Audio\InstancePlayLimitException.cs" />
     <Compile Include="Graphics\TextureCollection.cs" />
     <Compile Include="Graphics\States\Blend.cs" />
@@ -294,30 +275,9 @@
     <Compile Include="TitleContainer.cs" />
     <Compile Include="Graphics\States\TextureAddressMode.cs" />
     <Compile Include="Graphics\States\TextureFilter.cs" />
-    <Compile Include="Content\ContentReaders\DictionaryReader.cs" />
-    <Compile Include="Content\ContentReaders\DoubleReader.cs" />
-    <Compile Include="Content\ContentReaders\EnumReader.cs" />
     <Compile Include="Color.cs" />
     <Compile Include="Graphics\DxtUtil.cs" />
-    <Compile Include="Content\ContentReaders\Int16Reader.cs" />
-    <Compile Include="Content\ContentReaders\Int32Reader.cs" />
-    <Compile Include="Content\ContentReaders\Int64Reader.cs" />
-    <Compile Include="Content\ContentReaders\ReflectiveReader.cs" />
-    <Compile Include="Content\ContentReaders\SingleReader.cs" />
-    <Compile Include="Content\ContentReaders\BooleanReader.cs" />
     <Compile Include="Graphics\RenderTargetBinding.cs" />
-    <Compile Include="Content\ContentReaders\UInt16Reader.cs" />
-    <Compile Include="Content\ContentReaders\UInt32Reader.cs" />
-    <Compile Include="Content\ContentReaders\UInt64Reader.cs" />
-    <Compile Include="Content\ContentReaders\NullableReader.cs" />
-    <Compile Include="Content\ContentReaders\ArrayReader.cs" />
-    <Compile Include="Content\ContentReaders\BoundingFrustumReader.cs" />
-    <Compile Include="Content\ContentReaders\BoundingSphereReader.cs" />
-    <Compile Include="Content\ContentReaders\ByteReader.cs" />
-    <Compile Include="Content\ContentReaders\DateTimeReader.cs" />
-    <Compile Include="Content\ContentReaders\DecimalReader.cs" />
-    <Compile Include="Content\ContentReaders\RayReader.cs" />
-    <Compile Include="Content\ContentReaders\SByteReader.cs" />
     <Compile Include="Graphics\SamplerStateCollection.cs" />
     <Compile Include="Graphics\Effect\EffectParameterClass.cs" />
     <Compile Include="Graphics\Effect\EffectParameterType.cs" />
@@ -338,7 +298,6 @@
     <Compile Include="Net\NetworkMessageType.cs" />
     <Compile Include="iOS\GamerServices\SignedInGamer.cs" />
     <Compile Include="iOS\Input\GamePad.cs" />
-    <Compile Include="iOS\iOSGameWindow.cs" />
     <Compile Include="GameWindow.cs" />
     <Compile Include="iOS\iOSGameView.cs" />
     <Compile Include="iOS\iOSGameView_GLAbstraction.cs" />
@@ -356,14 +315,7 @@
     <Compile Include="iOS\Extender.cs" />
     <Compile Include="Audio\NoAudioHardwareException.cs" />
     <Compile Include="Storage\StorageDeviceHelper.cs" />
-    <Compile Include="Content\ContentManager.cs" />
-    <Compile Include="Content\LzxDecoder.cs" />
-    <Compile Include="Content\ContentReaders\CurveReader.cs" />
     <Compile Include="Input\GamePadDeadZone.cs" />
-    <Compile Include="Content\ContentReaders\ColorReader.cs" />
-    <Compile Include="Content\ContentReaders\Vector2Reader.cs" />
-    <Compile Include="Content\ContentReaders\TimeSpanReader.cs" />
-    <Compile Include="Content\ContentReaders\PointReader.cs" />
     <Compile Include="Graphics\Vertices\VertexElementColor.cs" />
     <Compile Include="Audio\XactClip.cs" />
     <Compile Include="Audio\XactSound.cs" />
@@ -403,7 +355,6 @@
     <Compile Include="Audio\AudioCategory.cs" />
     <Compile Include="Graphics\Vertices\IndexElementSize.cs" />
     <Compile Include="LaunchParameters.cs" />
-    <Compile Include="Content\ContentReaders\EffectReader.cs" />
     <Compile Include="Graphics\States\SamplerState.cs" />
     <Compile Include="Graphics\Effect\DualTextureEffect.cs" />
     <Compile Include="Graphics\Effect\EnvironmentMapEffect.cs" />
@@ -419,19 +370,6 @@
     <Compile Include="Graphics\ModelMeshPart.cs" />
     <Compile Include="Graphics\ModelMeshPartCollection.cs" />
     <Compile Include="Graphics\CubeMapFace.cs" />
-    <Compile Include="Content\ContentReaders\BasicEffectReader.cs" />
-    <Compile Include="Content\ContentReaders\BoundingBoxReader.cs" />
-    <Compile Include="Content\ContentReaders\DualTextureEffectReader.cs" />
-    <Compile Include="Content\ContentReaders\EnvironmentMapEffectReader.cs" />
-    <Compile Include="Content\ContentReaders\IndexBufferReader.cs" />
-    <Compile Include="Content\ContentReaders\MatrixReader.cs" />
-    <Compile Include="Content\ContentReaders\ModelReader.cs" />
-    <Compile Include="Content\ContentReaders\SkinnedEffectReader.cs" />
-    <Compile Include="Content\ContentReaders\TextureCubeReader.cs" />
-    <Compile Include="Content\ContentReaders\TextureReader.cs" />
-    <Compile Include="Content\ContentReaders\VertexBufferReader.cs" />
-    <Compile Include="Content\ContentReaders\VertexDeclarationReader.cs" />
-    <Compile Include="Content\ContentReaders\AlphaTestEffectReader.cs" />
     <Compile Include="Graphics\Texture2D.cs" />
     <Compile Include="Graphics\Vertices\VertexPositionColorTexture.cs" />
     <Compile Include="Graphics\Effect\GLSLEffectObject.cs" />
@@ -440,6 +378,70 @@
     <Compile Include="Graphics\StencilOperation.cs" />
     <Compile Include="Graphics\PackedVector\NormalizedShort2.cs" />
     <Compile Include="Content\ContentExtensions.cs" />
+    <Compile Include="Content\ContentLoadException.cs" />
+    <Compile Include="Content\ContentManager.cs" />
+    <Compile Include="Content\ContentReader.cs" />
+    <Compile Include="Content\ContentSerializerAttribute.cs" />
+    <Compile Include="Content\ContentSerializerIgnoreAttribute.cs" />
+    <Compile Include="Content\ContentTypeReader.cs" />
+    <Compile Include="Content\ContentTypeReaderManager.cs" />
+    <Compile Include="Content\LzxDecoder.cs" />
+    <Compile Include="Content\ResourceContentManager.cs" />
+    <Compile Include="Content\ContentReaders\AlphaTestEffectReader.cs" />
+    <Compile Include="Content\ContentReaders\ArrayReader.cs" />
+    <Compile Include="Content\ContentReaders\BasicEffectReader.cs" />
+    <Compile Include="Content\ContentReaders\BooleanReader.cs" />
+    <Compile Include="Content\ContentReaders\BoundingBoxReader.cs" />
+    <Compile Include="Content\ContentReaders\BoundingFrustumReader.cs" />
+    <Compile Include="Content\ContentReaders\BoundingSphereReader.cs" />
+    <Compile Include="Content\ContentReaders\ByteReader.cs" />
+    <Compile Include="Content\ContentReaders\CharReader.cs" />
+    <Compile Include="Content\ContentReaders\ColorReader.cs" />
+    <Compile Include="Content\ContentReaders\CurveReader.cs" />
+    <Compile Include="Content\ContentReaders\DateTimeReader.cs" />
+    <Compile Include="Content\ContentReaders\DecimalReader.cs" />
+    <Compile Include="Content\ContentReaders\DictionaryReader.cs" />
+    <Compile Include="Content\ContentReaders\DoubleReader.cs" />
+    <Compile Include="Content\ContentReaders\DualTextureEffectReader.cs" />
+    <Compile Include="Content\ContentReaders\EffectReader.cs" />
+    <Compile Include="Content\ContentReaders\EnumReader.cs" />
+    <Compile Include="Content\ContentReaders\EnvironmentMapEffectReader.cs" />
+    <Compile Include="Content\ContentReaders\IndexBufferReader.cs" />
+    <Compile Include="Content\ContentReaders\Int16Reader.cs" />
+    <Compile Include="Content\ContentReaders\Int32Reader.cs" />
+    <Compile Include="Content\ContentReaders\Int64Reader.cs" />
+    <Compile Include="Content\ContentReaders\ListReader.cs" />
+    <Compile Include="Content\ContentReaders\MatrixReader.cs" />
+    <Compile Include="Content\ContentReaders\ModelReader.cs" />
+    <Compile Include="Content\ContentReaders\NullableReader.cs" />
+    <Compile Include="Content\ContentReaders\PlaneReader.cs" />
+    <Compile Include="Content\ContentReaders\PointReader.cs" />
+    <Compile Include="Content\ContentReaders\QuaternionReader.cs" />
+    <Compile Include="Content\ContentReaders\RayReader.cs" />
+    <Compile Include="Content\ContentReaders\RectangleReader.cs" />
+    <Compile Include="Content\ContentReaders\ReflectiveReader.cs" />
+    <Compile Include="Content\ContentReaders\SByteReader.cs" />
+    <Compile Include="Content\ContentReaders\SingleReader.cs" />
+    <Compile Include="Content\ContentReaders\SkinnedEffectReader.cs" />
+    <Compile Include="Content\ContentReaders\SongReader.cs" />
+    <Compile Include="Content\ContentReaders\SoundEffectReader.cs" />
+    <Compile Include="Content\ContentReaders\SpriteFontReader.cs" />
+    <Compile Include="Content\ContentReaders\StringReader.cs" />
+    <Compile Include="Content\ContentReaders\Texture2DReader.cs" />
+    <Compile Include="Content\ContentReaders\TextureCubeReader.cs" />
+    <Compile Include="Content\ContentReaders\TextureReader.cs" />
+    <Compile Include="Content\ContentReaders\TimeSpanReader.cs" />
+    <Compile Include="Content\ContentReaders\UInt16Reader.cs" />
+    <Compile Include="Content\ContentReaders\UInt32Reader.cs" />
+    <Compile Include="Content\ContentReaders\UInt64Reader.cs" />
+    <Compile Include="Content\ContentReaders\Vector2Reader.cs" />
+    <Compile Include="Content\ContentReaders\Vector3Reader.cs" />
+    <Compile Include="Content\ContentReaders\Vector4Reader.cs" />
+    <Compile Include="Content\ContentReaders\VertexBufferReader.cs" />
+    <Compile Include="Content\ContentReaders\VertexDeclarationReader.cs" />
+    <Compile Include="Content\ContentReaders\VideoReader.cs" />
+    <Compile Include="iOS\iOSGameWindow.cs" />
+    <Compile Include="Graphics\PresentInterval.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
@@ -452,7 +454,6 @@
     </MonoDevelop>
   </ProjectExtensions>
   <ItemGroup>
-    <Folder Include="Content\ContentReaders\" />
     <Folder Include="Graphics\" />
     <Folder Include="iOS\GamerServices\" />
     <Folder Include="iOS\Input\" />
@@ -473,6 +474,52 @@
     <EmbeddedResource Include="Graphics\Effect\EnvironmentMapEffect.bin" />
     <EmbeddedResource Include="Graphics\Effect\SkinnedEffect.bin" />
     <EmbeddedResource Include="Graphics\Effect\SpriteEffect.bin" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect\PSAlphaTestEqNe.glsl" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect\PSAlphaTestEqNeNoFog.glsl" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect\PSAlphaTestLtGt.glsl" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect\PSAlphaTestLtGtNoFog.glsl" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect\VSAlphaTest.glsl" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect\VSAlphaTestNoFog.glsl" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect\VSAlphaTestVc.glsl" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect\VSAlphaTestVcNoFog.glsl" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\PSBasic.glsl" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\PSBasicNoFog.glsl" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\PSBasicPixelLighting.glsl" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\PSBasicPixelLightingTx.glsl" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\PSBasicTx.glsl" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\PSBasicTxNoFog.glsl" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\PSBasicVertexLighting.glsl" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\PSBasicVertexLightingNoFog.glsl" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\PSBasicVertexLightingTx.glsl" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\PSBasicVertexLightingTxNoFog.glsl" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\VSBasic.glsl" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\VSBasicNoFog.glsl" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\VSBasicOneLight.glsl" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\VSBasicOneLightTx.glsl" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\VSBasicOneLightTxVc.glsl" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\VSBasicOneLightVc.glsl" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\VSBasicPixelLighting.glsl" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\VSBasicPixelLightingTx.glsl" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\VSBasicPixelLightingTxVc.glsl" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\VSBasicPixelLightingVc.glsl" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\VSBasicTx.glsl" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\VSBasicTxNoFog.glsl" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\VSBasicTxVc.glsl" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\VSBasicTxVcNoFog.glsl" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\VSBasicVc.glsl" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\VSBasicVcNoFog.glsl" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\VSBasicVertexLighting.glsl" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\VSBasicVertexLightingTx.glsl" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\VSBasicVertexLightingTxVc.glsl" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\VSBasicVertexLightingVc.glsl" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\DualTextureEffect\PSDualTexture.glsl" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\DualTextureEffect\PSDualTextureNoFog.glsl" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\DualTextureEffect\VSDualTexture.glsl" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\DualTextureEffect\VSDualTextureNoFog.glsl" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\DualTextureEffect\VSDualTextureVc.glsl" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\DualTextureEffect\VSDualTextureVcNoFog.glsl" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\SpriteEffect\PSSprite.glsl" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\SpriteEffect\VSSprite.glsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Graphics\Effect\AlphaTestEffectGLSL.bin" />
@@ -481,5 +528,11 @@
     <None Include="Graphics\Effect\EnvironmentMapEffectGLSL.bin" />
     <None Include="Graphics\Effect\SkinnedEffectGLSL.bin" />
     <None Include="Graphics\Effect\SpriteEffectGLSL.bin" />
+  </ItemGroup>
+  <ItemGroup>
+    <NativeReference Include="..\ThirdParty\Libs\libmojoshader.dylib">
+      <IsCxx>false</IsCxx>
+      <Kind>Static</Kind>
+    </NativeReference>
   </ItemGroup>
 </Project>

@@ -160,7 +160,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 shaderHandle = GL.CreateShader(shaderType);
 #if IPHONE || ANDROID
-                GL.ShaderSource(shader, 1, new string[] { glslCode }, (int[])null);
+                GL.ShaderSource(shaderHandle, 1, new string[] { glslCode }, (int[])null);
 #else			
                 GL.ShaderSource(shaderHandle, glslCode);
 #endif
@@ -168,7 +168,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 int compiled = 0;
 #if IPHONE || ANDROID
-                GL.GetShader(shader, ShaderParameter.CompileStatus, ref compiled);
+                GL.GetShader(shaderHandle, ShaderParameter.CompileStatus, ref compiled);
 #else
                 GL.GetShader(shaderHandle, ShaderParameter.CompileStatus, out compiled);
 #endif
@@ -177,11 +177,11 @@ namespace Microsoft.Xna.Framework.Graphics
 #if IPHONE || ANDROID
                     string log = "";
                     int length = 0;
-                    GL.GetShader(shader, ShaderParameter.InfoLogLength, ref length);
+                    GL.GetShader(shaderHandle, ShaderParameter.InfoLogLength, ref length);
                     if (length > 0)
                     {
                         var logBuilder = new StringBuilder(length);
-                        GL.GetShaderInfoLog(shader, length, ref length, logBuilder);
+                        GL.GetShaderInfoLog(shaderHandle, length, ref length, logBuilder);
                         log = logBuilder.ToString();
                     }
 #else
