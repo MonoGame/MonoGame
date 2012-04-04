@@ -24,9 +24,14 @@ namespace Microsoft.Xna.Framework.Graphics
 {
 	public class VertexBuffer : GraphicsResource
 	{			
+#if WINRT
+        internal SharpDX.Direct3D11.VertexBufferBinding _binding;
+        private SharpDX.Direct3D11.Buffer _buffer;
+#else
 		//internal uint vao;
 		internal uint vbo;
-		
+#endif
+	
 		public int VertexCount { get; private set; }
 		public VertexDeclaration VertexDeclaration { get; private set; }
 		public BufferUsage BufferUsage { get; private set; }
@@ -43,7 +48,19 @@ namespace Microsoft.Xna.Framework.Graphics
             this.BufferUsage = bufferUsage;
 
 #if WINRT
+            // TODO: To use Immutable resources we would need to delay creation of 
+            // the Buffer until SetData() and recreate them if set more than once.
 
+            _buffer = new SharpDX.Direct3D11.Buffer(    graphicsDevice._d3dDevice, 
+                                                        vertexDeclaration.VertexStride * vertexCount,
+                                                        dynamic ? SharpDX.Direct3D11.ResourceUsage.Dynamic : SharpDX.Direct3D11.ResourceUsage.Default,
+                                                        SharpDX.Direct3D11.BindFlags.VertexBuffer,
+                                                        0, // CpuAccessFlags
+                                                        0, // OptionFlags                                                          
+                                                        0  // StructureSizeInBytes
+                                                        );
+
+            _binding = new SharpDX.Direct3D11.VertexBufferBinding(_buffer, VertexDeclaration.VertexStride, 0);
 #else
             Threading.Begin();
             try
@@ -75,14 +92,6 @@ namespace Microsoft.Xna.Framework.Graphics
 		public VertexBuffer(GraphicsDevice graphicsDevice, Type type, int vertexCount, BufferUsage bufferUsage) :
 			this(graphicsDevice, VertexDeclaration.FromType(type), vertexCount, bufferUsage, false)
 		{
-        }
-
-		internal void Apply()
-		{
-#if WINRT
-#else
-			GL.BindBuffer(BufferTarget.ArrayBuffer, vbo);
-#endif
         }
 
         public void GetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride) where T : struct
@@ -166,6 +175,29 @@ namespace Microsoft.Xna.Framework.Graphics
             var sizeInBytes = elementSizeInByte * elementCount;
 
 #if WINRT
+            //using(var stream = new SharpDX.DataStream(sizeInBytes, false, true))
+            {
+                var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+                var startBytes = startIndex * elementSizeInByte;
+                var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
+
+                //stream.WriteRange(data, 0, elementCount);
+                //var box = new SharpDX.DataBox(stream.DataPointer, elementSizeInByte, 0);
+                var box = new SharpDX.DataBox(dataPtr, elementSizeInByte, 0);
+
+                var region = new SharpDX.Direct3D11.ResourceRegion();
+                region.Top = 0;
+                region.Front = 0;
+                region.Back = 1;
+                region.Bottom = 1;
+                region.Left = offsetInBytes / elementSizeInByte;
+                region.Right = elementCount;
+
+                // TODO: We need to deal with threaded contexts here!
+                graphicsDevice._d3dContext.UpdateSubresource(box, _buffer, 0, region);
+
+                dataHandle.Free();
+            }
 #else
             Threading.Begin();
             try
@@ -193,6 +225,11 @@ namespace Microsoft.Xna.Framework.Graphics
 		public override void Dispose()
 		{
 #if WINRT
+            if (_buffer != null)
+            {
+                _buffer.Dispose();
+                _buffer = null;
+            }
 #else
 			GL.DeleteBuffers(1, ref vbo);
 #endif

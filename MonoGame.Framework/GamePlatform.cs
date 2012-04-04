@@ -203,7 +203,12 @@ namespace Microsoft.Xna.Framework
             IsActive = true;
             if (this.Game.GraphicsDevice == null) {
                var graphicsDeviceManager = (GraphicsDeviceManager)Game.Services.GetService(typeof(IGraphicsDeviceManager));
+			   
+			   // TODO: This happens in Game.Initialize() so we're creating
+			   // the device multiple times by leaving it here.
+			   #if !WINRT
                graphicsDeviceManager.CreateDevice();
+			   #endif
             }
         }
 

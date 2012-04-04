@@ -47,6 +47,8 @@ using System.Reflection;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Windows.UI.Core;
+using System.Runtime.InteropServices;
+using Windows.Graphics.Display;
 #endregion Using Statements
 
 namespace Microsoft.Xna.Framework
@@ -57,9 +59,7 @@ namespace Microsoft.Xna.Framework
         protected Game game;
         private readonly List<Keys> _keys;
 
-        // we need this variables to make changes beetween threads
-        //private WindowState windowState;
-        private Rectangle clientBounds;
+        private Rectangle _clientBounds;
 
         #region Internal Properties
 
@@ -67,17 +67,15 @@ namespace Microsoft.Xna.Framework
 
         internal bool IsExiting { get; set; }
 
-        //internal OpenTK.GameWindow Window { get { return window; } }
-
         #endregion
 
         #region Public Properties
 
-        public override IntPtr Handle { get { return IntPtr.Zero; } }
+        public override IntPtr Handle { get { return Marshal.GetIUnknownForObject(_coreWindow); } }
 
         public override string ScreenDeviceName { get { return String.Empty; } } // window.Title
 
-        public override Rectangle ClientBounds { get { return clientBounds; } }
+        public override Rectangle ClientBounds { get { return _clientBounds; } }
 
         public override bool AllowUserResizing
         {
@@ -136,12 +134,6 @@ namespace Microsoft.Xna.Framework
 
         #endregion
 
-        private void OnResize(object sender, EventArgs e)
-        {
-            //Game.GraphicsDevice.Viewport = new Viewport(0, 0, window.ClientRectangle.Width, window.ClientRectangle.Height);
-            OnClientSizeChanged();
-        }
-        
         private void HandleInput()
         {
             // mouse doesn't need to be treated here, Mouse class does it alone
@@ -155,20 +147,20 @@ namespace Microsoft.Xna.Framework
         public void Initialize(CoreWindow coreWindow)
         {
             _coreWindow = coreWindow;
-           
+
+            _coreWindow.SizeChanged += Window_SizeChanged;
+            _coreWindow.Closed += Window_Closed;
+
             //window.Closing += new EventHandler<CancelEventArgs>(OpenTkGameWindow_Closing);
             //window.Resize += OnResize;
             _coreWindow.KeyDown += Keyboard_KeyDown;
             _coreWindow.KeyUp += Keyboard_KeyUp;
 
+            var bounds = _coreWindow.Bounds;
+            SetClientBounds(bounds.Width, bounds.Height);
+
             // Set the window icon.
             //window.Icon = Icon.ExtractAssociatedIcon(Assembly.GetEntryAssembly().Location);
-
-            /*
-            clientBounds = new Rectangle(window.ClientRectangle.X, window.ClientRectangle.Y,
-                                         window.ClientRectangle.Width, window.ClientRectangle.Height);
-            windowState = window.WindowState;
-            */
 
             /*
             // mouse
@@ -179,6 +171,26 @@ namespace Microsoft.Xna.Framework
             Mouse.setWindows(window);
 #endif
             */
+        }
+
+        private void Window_Closed(CoreWindow sender, CoreWindowEventArgs args)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void SetClientBounds(double width, double height)
+        {
+            var dpi = DisplayProperties.LogicalDpi;
+            var pwidth = width * dpi / 96.0;
+            var pheight = height * dpi / 96.0;
+
+            _clientBounds = new Rectangle(0, 0, (int)pwidth, (int)pheight);
+        }
+
+        private void Window_SizeChanged(CoreWindow sender, WindowSizeChangedEventArgs args)
+        {
+            SetClientBounds( args.Size.Width, args.Size.Height );
+            OnClientSizeChanged();
         }
 
         protected override void SetTitle(string title)
@@ -217,21 +229,6 @@ namespace Microsoft.Xna.Framework
                 if (IsExiting)
                     break;
             }
-        }
-
-        internal void ToggleFullScreen()
-        {
-            /*
-            if (windowState == WindowState.Fullscreen)
-                windowState = WindowState.Normal;
-            else
-                windowState = WindowState.Fullscreen;
-            */
-        }
-
-        internal void ChangeClientBounds(Rectangle clientBounds)
-        {
-            this.clientBounds = clientBounds;
         }
 
         #region Public Methods

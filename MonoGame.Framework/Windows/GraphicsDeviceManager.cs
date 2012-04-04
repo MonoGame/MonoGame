@@ -38,14 +38,11 @@ purpose and non-infringement.
 */
 #endregion License
 using System;
+using Microsoft.Xna.Framework.Graphics;
 
-#if WINRT
-// TODO
-#else
+#if !WINRT
 using OpenTK.Graphics.OpenGL;
 #endif
-
-using Microsoft.Xna.Framework.Graphics;
 
 namespace Microsoft.Xna.Framework
 {
@@ -79,13 +76,15 @@ namespace Microsoft.Xna.Framework
             game.Services.AddService(typeof(IGraphicsDeviceManager), this);
             game.Services.AddService(typeof(IGraphicsDeviceService), this);
 
+            // TODO: This should not occur here... it occurs during Game.Initialize().
+#if !WINRT
             CreateDevice();
+#endif
         }
 
         public void CreateDevice()
         {
             _graphicsDevice = new GraphicsDevice();
-            _graphicsDevice.PresentationParameters = new PresentationParameters();
 
             Initialize();
 
@@ -162,6 +161,8 @@ namespace Microsoft.Xna.Framework
         private void Initialize()
         {
             _graphicsDevice.PresentationParameters.IsFullScreen = false;
+            _graphicsDevice.PresentationParameters.DeviceWindowHandle = _game.Window.Handle;
+            _graphicsDevice.Initialize();
 
             PreferMultiSampling = _preferMultiSampling;
         }
