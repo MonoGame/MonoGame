@@ -258,10 +258,16 @@ namespace Microsoft.Xna.Framework.Graphics
         public static Texture2D FromFile(GraphicsDevice graphicsDevice, string filename, int width, int height)
         {
 			UIImage image;
-			if(filename.Contains(".pdf"))
+			
+			if (filename.Contains(".pdf"))
+			{
 				image = Extender.FromPdf(filename,width,height);
+			} 
 			else
-				image = UIImage.FromBundle(filename);
+			{
+				image = UIImage.FromFile(filename);
+			}
+			
 			if (image == null)
 			{
 				throw new ContentLoadException("Error loading file: " + filename);
@@ -278,6 +284,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				var small = image.Scale (new SizeF (width, height));
 				theTexture = new ESImage(small, graphicsDevice.PreferedFilter);
 			}
+			
 			Texture2D result = new Texture2D(theTexture);
 			// result.Name = Path.GetFileNameWithoutExtension(filename);
 			result.Name = filename;
