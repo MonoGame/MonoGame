@@ -49,7 +49,9 @@ using GL_Oes = MonoMac.OpenGL.GL;
 using OpenTK.Graphics.OpenGL;
 using GL_Oes = OpenTK.Graphics.OpenGL.GL;
 #elif WINRT
-
+using SharpDX;
+using SharpDX.Direct3D;
+using Windows.Graphics.Display;
 #else
 #if ES11
 using OpenTK.Graphics.ES11;
@@ -93,9 +95,7 @@ using BufferUsageHint = OpenTK.Graphics.ES20.BufferUsage;
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
-#if !WINRT
 using Microsoft.Xna.Framework.Input.Touch;
-#endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -129,6 +129,21 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if WINRT
 
+        // Declare Direct2D Objects
+        protected SharpDX.Direct2D1.Factory1 _d2dFactory;
+        protected SharpDX.Direct2D1.Device _d2dDevice;
+        protected SharpDX.Direct2D1.DeviceContext _d2dContext;
+
+        // Declare DirectWrite & Windows Imaging Component Objects
+        protected SharpDX.DirectWrite.Factory _dwriteFactory;
+        protected SharpDX.WIC.ImagingFactory2 _wicFactory;
+
+        // Direct3D Objects
+        protected SharpDX.Direct3D11.Device1 _d3dDevice;
+        protected SharpDX.Direct3D11.DeviceContext1 _d3dContext;
+        protected FeatureLevel _featureLevel;
+
+        protected float _dpi;
 #else
         private All _preferedFilter;
 #endif
@@ -195,6 +210,21 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 		
 #if WINRT
+        internal float Dpi
+        {
+            get { return _dpi; }
+            set
+            {
+                if (_dpi == value)
+                    return;
+
+                _dpi = value;
+                _d2dContext.DotsPerInch = new DrawingSizeF(_dpi, _dpi);
+
+                //if (OnDpiChanged != null)
+                    //OnDpiChanged(this);
+            }
+        }
 #else
         internal All PreferedFilter
         {
@@ -251,11 +281,12 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         internal void Initialize()
-        {
-			
+        {			
+            // Setup extensions.
+#if !WINRT
 #if IPHONE || ANDROID
 			extensions.AddRange(GL.GetString(RenderbufferStorage.Extensions).Split(' '));
-#elif !WINRT
+#else
 			extensions.AddRange(GL.GetString(StringName.Extensions).Split(' '));	
 #endif
 
@@ -263,7 +294,13 @@ namespace Microsoft.Xna.Framework.Graphics
 			foreach (string extension in extensions)
 				System.Diagnostics.Debug.WriteLine(extension);
 
-#if ES11
+#endif
+
+#if WINRT
+            CreateDeviceIndependentResources();
+            CreateDeviceResources();
+            Dpi = DisplayProperties.LogicalDpi;
+#elif ES11
 			//Is this needed?
 			GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)All.BlendSrc);
 #endif
@@ -274,9 +311,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             PresentationParameters = new PresentationParameters()
             {
-#if !WINRT
                 DisplayOrientation = TouchPanel.DisplayOrientation
-#endif
             };
 
             VboIdArray = 0;
@@ -289,7 +324,72 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
         }
 
-		public BlendState BlendState {
+#if WINRT
+
+        /// <summary>
+        /// Creates resources not tied the active graphics device.
+        /// </summary>
+        protected void CreateDeviceIndependentResources()
+        {
+#if DEBUG
+            var debugLevel = SharpDX.Direct2D1.DebugLevel.Information;
+#else 
+            var debugLevel = SharpDX.Direct2D1.DebugLevel.None; 
+#endif
+            // Dispose previous references.
+            if (_d2dFactory != null)
+                _d2dFactory.Dispose();
+            if (_dwriteFactory != null)
+                _dwriteFactory.Dispose();
+            if (_wicFactory != null)
+                _wicFactory.Dispose();
+
+            // Allocate new references
+            _d2dFactory = new SharpDX.Direct2D1.Factory1(SharpDX.Direct2D1.FactoryType.SingleThreaded, debugLevel);
+            _dwriteFactory = new SharpDX.DirectWrite.Factory(SharpDX.DirectWrite.FactoryType.Shared);
+            _wicFactory = new SharpDX.WIC.ImagingFactory2();
+        }
+
+        /// <summary>
+        /// Create graphics device specific resources.
+        /// </summary>
+        protected virtual void CreateDeviceResources()
+        {
+            // Dispose previous references.
+            if (_d3dDevice != null)
+                _d3dDevice.Dispose();
+            if (_d3dContext != null)
+                _d3dContext.Dispose();
+            if (_d2dDevice != null)
+                _d2dDevice.Dispose();
+            if (_d2dContext != null)
+                _d2dContext.Dispose();
+
+            // Retrieve the Direct3D 11.1 device amd device context
+            var creationFlags = SharpDX.Direct3D11.DeviceCreationFlags.BgraSupport;
+#if DEBUG
+            creationFlags |= SharpDX.Direct3D11.DeviceCreationFlags.Debug;
+#endif
+
+            // Create the Direct3D device.
+            using (var defaultDevice = new SharpDX.Direct3D11.Device(DriverType.Hardware, creationFlags))
+                _d3dDevice = defaultDevice.QueryInterface<SharpDX.Direct3D11.Device1>();
+            _featureLevel = _d3dDevice.FeatureLevel;
+
+            // Get Direct3D 11.1 context
+            _d3dContext = _d3dDevice.ImmediateContext.QueryInterface<SharpDX.Direct3D11.DeviceContext1>();
+
+            // Create the Direct2D device.
+            using (var dxgiDevice = _d3dDevice.QueryInterface<SharpDX.DXGI.Device>())
+                _d2dDevice = new SharpDX.Direct2D1.Device(_d2dFactory, dxgiDevice);
+
+            // Create Direct2D context
+            _d2dContext = new SharpDX.Direct2D1.DeviceContext(_d2dDevice, SharpDX.Direct2D1.DeviceContextOptions.None);
+        }
+
+#endif // WINRT
+
+        public BlendState BlendState {
 			get { return _blendState; }
 			set { 
 				// ToDo check for invalid state
@@ -379,14 +479,50 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void Dispose()
         {
-            _isDisposed = true;
+            Dispose(true);
         }
 
         protected virtual void Dispose(bool aReleaseEverything)
         {
             if (aReleaseEverything)
             {
-
+#if WINRT
+                if (_d3dDevice != null)
+                {
+                    _d3dDevice.Dispose();
+                    _d3dDevice = null;
+                }
+                if (_d3dContext != null)
+                {
+                    _d3dContext.Dispose();
+                    _d3dContext = null;
+                }
+                if (_d2dDevice != null)
+                {
+                    _d2dDevice.Dispose();
+                    _d2dDevice = null;
+                }
+                if (_d2dContext != null)
+                {
+                    _d2dContext.Dispose();
+                    _d2dContext = null;
+                }
+                if (_d2dFactory != null)
+                {
+                    _d2dFactory.Dispose();
+                    _d2dFactory = null;
+                }
+                if (_dwriteFactory != null)
+                {
+                    _dwriteFactory.Dispose();
+                    _dwriteFactory = null;
+                }
+                if (_wicFactory != null)
+                {
+                    _wicFactory.Dispose();
+                    _wicFactory = null;
+                }
+#endif
             }
 
             _isDisposed = true;

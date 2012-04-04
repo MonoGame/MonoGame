@@ -171,6 +171,7 @@ namespace Microsoft.Xna.Framework
 
         public void SetWindow(CoreWindow window)
         {
+            (Window as MetroGameWindow).Initialize(window);
         }
 
         public void Uninitialize()

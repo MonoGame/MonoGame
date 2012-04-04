@@ -21,7 +21,7 @@ namespace Microsoft.Xna.Framework.Graphics
 	internal class DXShader
 	{
 		public ShaderType shaderType;
-		public int shader;
+		public int shaderHandle;
 		
 		string glslCode;
 		
@@ -158,19 +158,19 @@ namespace Microsoft.Xna.Framework.Graphics
             Threading.Begin();
             try
             {
-                shader = GL.CreateShader(shaderType);
+                shaderHandle = GL.CreateShader(shaderType);
 #if IPHONE || ANDROID
                 GL.ShaderSource(shader, 1, new string[] { glslCode }, (int[])null);
 #else			
-			    GL.ShaderSource (shader, glslCode);
+                GL.ShaderSource(shaderHandle, glslCode);
 #endif
-                GL.CompileShader(shader);
+                GL.CompileShader(shaderHandle);
 
                 int compiled = 0;
 #if IPHONE || ANDROID
                 GL.GetShader(shader, ShaderParameter.CompileStatus, ref compiled);
 #else
-			    GL.GetShader (shader, ShaderParameter.CompileStatus, out compiled);
+                GL.GetShader(shaderHandle, ShaderParameter.CompileStatus, out compiled);
 #endif
                 if (compiled == (int)All.False)
                 {
@@ -185,11 +185,11 @@ namespace Microsoft.Xna.Framework.Graphics
                         log = logBuilder.ToString();
                     }
 #else
-				    string log = GL.GetShaderInfoLog(shader);
+                    string log = GL.GetShaderInfoLog(shaderHandle);
 #endif
                     Console.WriteLine(log);
 
-                    GL.DeleteShader(shader);
+                    GL.DeleteShader(shaderHandle);
                     throw new InvalidOperationException("Shader Compilation Failed");
                 }
             }

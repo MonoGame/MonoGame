@@ -72,8 +72,276 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		bool passthroughVertexShaderAttached = false;
 
+#if NOMOJO
+        public EffectPass(EffectTechnique technique)
+        {
+            _technique = technique;
+
+            _graphicsDevice = _technique._effect.GraphicsDevice;
+
+            blendState = new BlendState();
+            depthStencilState = new DepthStencilState();
+            rasterizerState = new RasterizerState();
+        }
+
+        public void Apply()
+        {
+            // Set/get the correct shader handle/cleanups.
+			_technique._effect.OnApply();
+
+            var effect = _technique._effect;
+
+            var currentProgram = effect.shaderIndexLookupTable[effect.Parameters["ShaderIndex"].GetValueInt32()];
+
+            // No work to do if we don't need to switch shaders.
+            //if (currentProgram == _technique._effect.CurrentProgram && shaderProgram != 0)
+               //return;
+
+            shaderProgram = _technique._effect.CurrentProgram = currentProgram;
+
+            GL.UseProgram(shaderProgram);
+
+            if (setRasterizerState)
+                _graphicsDevice.RasterizerState = rasterizerState;
+
+            if (setBlendState)
+                _graphicsDevice.BlendState = blendState;
+
+            if (setDepthStencilState)
+                _graphicsDevice.DepthStencilState = depthStencilState;
+
+            glslVertexShader = Effect.shaderObjectLookup[shaderProgram][0];
+
+            // Set Program Attributes.
+            int location = 0;
+            //bind attributes
+            foreach (var attribute in glslVertexShader.attributeList)
+            {
+                if (attribute.Contains("Position"))
+                    location = GraphicsDevice.attributePosition;
+                else if (attribute.Contains("Normal"))
+                    location = GraphicsDevice.attributeNormal;
+                else if (attribute.Contains("TextureCoordinate"))
+                    location = GraphicsDevice.attributeTexCoord;
+                else if (attribute.Contains("Color"))
+                    location = GraphicsDevice.attributeColor;
+                else
+                    throw new NotSupportedException();
+
+                GL.BindAttribLocation(shaderProgram, location, attribute);
+            }
+
+            var samplerState = _graphicsDevice.SamplerStates[0];
+            // Set Program Uniforms
+            foreach (var param in _technique._effect.Parameters)
+            {
+                int uniformLocation = GL.GetUniformLocation(shaderProgram, param.Name);
+
+                var error = GL.GetError();
+
+                if (uniformLocation == -1 || param.Name.Contains("ShaderIndex"))
+                    continue;
+
+                switch (param.activeUniformType)
+                {
+                    case ActiveUniformType.FloatVec2:
+                        var v2 = param.GetValueVector2();
+                        GL.Uniform2(uniformLocation, v2.X, v2.Y);
+                        break;
+
+                    case ActiveUniformType.FloatVec3:
+                        var v3 = param.GetValueVector3();
+                        GL.Uniform3(uniformLocation, v3.X, v3.Y, v3.Z);
+                        break;
+
+                    case ActiveUniformType.FloatVec4:
+                        var v4 = param.GetValueVector4();
+                        GL.Uniform4(uniformLocation, v4.X, v4.Y, v4.Z, v4.W);
+                        break;
+
+                    case ActiveUniformType.Float:
+                        GL.Uniform1(uniformLocation, param.GetValueSingle());
+                        break;
+
+                        // RAY TODO: Temporary. Can handle data as matrix...?
+                    case ActiveUniformType.FloatMat4:
+                        var mat4 = (Matrix)param.data;
+                        var sa4 = new float[] { mat4.M11, mat4.M12, mat4.M13, mat4.M14, mat4.M21, mat4.M22, mat4.M23, mat4.M24, mat4.M31, mat4.M32, mat4.M33, mat4.M34, mat4.M41, mat4.M42, mat4.M43, mat4.M44 };
+                        GL.UniformMatrix4(uniformLocation, 1, false, sa4);
+                        break;
+
+                    case ActiveUniformType.FloatMat3:
+                        var mat = (Matrix)param.data;
+                        var mat3 = new float[] { mat.M11, mat.M12, mat.M13, mat.M21, mat.M22, mat.M23, mat.M31, mat.M32, mat.M33 };
+                        GL.UniformMatrix3(uniformLocation, 1, false, mat3);
+                        break;
+
+                    case ActiveUniformType.Bool:
+                        GL.Uniform1(uniformLocation, (param.GetValueBoolean()) ? 1 : 0);
+                        break;
+
+                    case ActiveUniformType.Int:
+                        GL.Uniform1(uniformLocation, param.GetValueInt32());
+                        break;
+
+                    case ActiveUniformType.Sampler2D:
+                        Texture tex = (Texture)param.data;
+                        tex.Activate();
+                        samplerState.Activate(tex.glTarget, tex.LevelCount > 1);
+                        break;
+
+                    default:
+                        throw new NotSupportedException();
+                }
+            }
+        }
+#else
+        public void Apply()
+		{
+            // Set/get the correct shader handle/cleanups.
+			_technique._effect.OnApply();
+
 #if WINRT
-		
+
+#else
+			if (isGLSL) {
+				GLSLApply();
+				return;
+			}
+
+			//Console.WriteLine (_technique._effect.Name+" - "+_technique.Name+" - "+Name);
+			bool relink = false;
+			foreach ( DXEffectObject.d3dx_state state in states) {
+				
+				//constants handled on init
+				if (state.type == DXEffectObject.STATE_TYPE.CONSTANT) continue;
+				
+				if (state.operation.class_ == DXEffectObject.STATE_CLASS.PIXELSHADER ||
+					state.operation.class_ == DXEffectObject.STATE_CLASS.VERTEXSHADER) {
+					
+					DXShader shader;
+					switch (state.type) {
+					case DXEffectObject.STATE_TYPE.EXPRESSIONINDEX:
+						shader = (DXShader) (((DXExpression)state.parameter.data)
+							.Evaluate (_technique._effect.Parameters));
+						break;
+					case DXEffectObject.STATE_TYPE.PARAMETER:
+						//should be easy, but haven't seen it
+					default:
+						throw new NotImplementedException();
+					}
+					
+					if (shader.shaderType == ShaderType.FragmentShader) {
+						if (shader != pixelShader) {
+							if (pixelShader != null) {
+                                GL.DetachShader(shaderProgram, pixelShader.shaderHandle);
+							}
+							relink = true;
+							pixelShader = shader;
+                            GL.AttachShader(shaderProgram, pixelShader.shaderHandle);
+						}
+					} else if (shader.shaderType == ShaderType.VertexShader) {
+						if (shader != vertexShader) {
+							if (vertexShader != null) {
+                                GL.DetachShader(shaderProgram, vertexShader.shaderHandle);
+							}
+							relink = true;
+							vertexShader = shader;
+                            GL.AttachShader(shaderProgram, vertexShader.shaderHandle);
+						}
+					}
+					
+				}
+				
+			}
+			
+			if (relink) {
+				Link ();
+			}
+			
+			GL.UseProgram (shaderProgram);
+			
+			
+			if (setRasterizerState) {
+				_graphicsDevice.RasterizerState = rasterizerState;
+			}
+			if (setBlendState) {
+				_graphicsDevice.BlendState = blendState;
+			}
+			if (setDepthStencilState) {
+				_graphicsDevice.DepthStencilState = depthStencilState;
+			}
+
+			if (vertexShader != null) {
+				vertexShader.Apply(shaderProgram,
+				                  _technique._effect.Parameters,
+				                  _graphicsDevice);
+			} else {
+				//passthrough shader is attached
+				Viewport vp = _graphicsDevice.Viewport;
+				Matrix projection = Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, 0, 1);
+				Matrix halfPixelOffset = Matrix.CreateTranslation(-0.5f, -0.5f, 0);
+				Matrix transform = halfPixelOffset * projection;
+
+				int uniform = GL.GetUniformLocation(shaderProgram, "transformMatrix");
+				GL.UniformMatrix4(uniform, 1, false, Matrix.ToFloatArray(transform));
+			}
+
+
+			// Apply vertex shader fix:
+			// The following two lines are appended to the end of vertex shaders
+			// to account for rendering differences between OpenGL and DirectX:
+			//
+			// gl_Position.y = gl_Position.y * posFixup.y;
+			// gl_Position.xy += posFixup.zw * gl_Position.ww;
+			//
+			// (the following paraphrased from wine, wined3d/state.c and wined3d/glsl_shader.c)
+			//
+			// - We need to flip along the y-axis in case of offscreen rendering.
+			// - D3D coordinates refer to pixel centers while GL coordinates refer
+			//   to pixel corners.
+			// - D3D has a top-left filling convention. We need to maintain this
+			//   even after the y-flip mentioned above.
+			// In order to handle the last two points, we translate by
+			// (63.0 / 128.0) / VPw and (63.0 / 128.0) / VPh. This is equivalent to
+			// translating slightly less than half a pixel. We want the difference to
+			// be large enough that it doesn't get lost due to rounding inside the
+			// driver, but small enough to prevent it from interfering with any
+			// anti-aliasing.
+			//
+			// OpenGL coordinates specify the center of the pixel while d3d coords specify
+			// the corner. The offsets are stored in z and w in posFixup. posFixup.y contains
+			// 1.0 or -1.0 to turn the rendering upside down for offscreen rendering. PosFixup.x
+			// contains 1.0 to allow a mad.
+
+			posFixup[0] = 1.0f;
+			posFixup[1] = 1.0f;
+			posFixup[2] = (63.0f / 64.0f) / _graphicsDevice.Viewport.Width;
+			posFixup[3] = -(63.0f / 64.0f) / _graphicsDevice.Viewport.Height;
+			//If we have a render target bound (rendering offscreen)
+			if (_graphicsDevice.GetRenderTargets().Length > 0) {
+				//flip vertically
+				posFixup[1] *= -1.0f;
+				posFixup[3] *= -1.0f;
+			}
+			int posFixupLoc = GL.GetUniformLocation(shaderProgram, "posFixup");
+			GL.Uniform4 (posFixupLoc, 1, posFixup);
+
+			
+
+			if (pixelShader != null) {
+				pixelShader.Apply(shaderProgram,
+				                  _technique._effect.Parameters,
+				                  _graphicsDevice);
+			}
+
+#endif
+		}
+#endif // NOMOJO
+
+
+#if WINRT
+
 #else
 		public EffectPass(EffectTechnique technique, DXEffectObject.d3dx_pass pass)
         {
@@ -116,7 +384,7 @@ namespace Microsoft.Xna.Framework.Graphics
                         if (state.type == DXEffectObject.STATE_TYPE.CONSTANT)
                         {
                             pixelShader = (DXShader)state.parameter.data;
-                            GL.AttachShader(shaderProgram, pixelShader.shader);
+                            GL.AttachShader(shaderProgram, pixelShader.shaderHandle);
                         }
                     }
                     else if (state.operation.class_ == DXEffectObject.STATE_CLASS.VERTEXSHADER)
@@ -125,7 +393,7 @@ namespace Microsoft.Xna.Framework.Graphics
                         if (state.type == DXEffectObject.STATE_TYPE.CONSTANT)
                         {
                             vertexShader = (DXShader)state.parameter.data;
-                            GL.AttachShader(shaderProgram, vertexShader.shader);
+                            GL.AttachShader(shaderProgram, vertexShader.shaderHandle);
                         }
                     }
                     else if (state.operation.class_ == DXEffectObject.STATE_CLASS.RENDERSTATE)
@@ -242,13 +510,13 @@ namespace Microsoft.Xna.Framework.Graphics
 					needPixelShader = true;
 					if (state.type == GLSLEffectObject.STATE_TYPE.CONSTANT) {
 						glslPixelShader = ((GLSLEffectObject.ShaderProg)state.parameter.data).glslShaderObject;
-						GL.AttachShader (shaderProgram, glslPixelShader.shader);
+                        GL.AttachShader(shaderProgram, glslPixelShader.shaderHandle);
 					}
 				} else if (state.operation.class_ == GLSLEffectObject.STATE_CLASS.VERTEXSHADER) {
 					needVertexShader = true;
 					if (state.type == GLSLEffectObject.STATE_TYPE.CONSTANT) {
 						glslVertexShader = ((GLSLEffectObject.ShaderProg)state.parameter.data).glslShaderObject;
-						GL.AttachShader (shaderProgram, glslVertexShader.shader);
+                        GL.AttachShader(shaderProgram, glslVertexShader.shaderHandle);
 					}
 				} else if (state.operation.class_ == GLSLEffectObject.STATE_CLASS.RENDERSTATE) {
 					if (state.type != GLSLEffectObject.STATE_TYPE.CONSTANT) {
@@ -318,7 +586,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 #endif
 
-		private void Link ()
+        private void Link ()
 		{
 #if WINRT
 
@@ -376,146 +644,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 		}
 		
-		public void Apply ()
-		{
-			_technique._effect.OnApply();
-
-#if WINRT
-
-#else
-			if (isGLSL) {
-				GLSLApply();
-				return;
-			}
-
-			//Console.WriteLine (_technique._effect.Name+" - "+_technique.Name+" - "+Name);
-			bool relink = false;
-			foreach ( DXEffectObject.d3dx_state state in states) {
-				
-				//constants handled on init
-				if (state.type == DXEffectObject.STATE_TYPE.CONSTANT) continue;
-				
-				if (state.operation.class_ == DXEffectObject.STATE_CLASS.PIXELSHADER ||
-					state.operation.class_ == DXEffectObject.STATE_CLASS.VERTEXSHADER) {
-					
-					DXShader shader;
-					switch (state.type) {
-					case DXEffectObject.STATE_TYPE.EXPRESSIONINDEX:
-						shader = (DXShader) (((DXExpression)state.parameter.data)
-							.Evaluate (_technique._effect.Parameters));
-						break;
-					case DXEffectObject.STATE_TYPE.PARAMETER:
-						//should be easy, but haven't seen it
-					default:
-						throw new NotImplementedException();
-					}
-					
-					if (shader.shaderType == ShaderType.FragmentShader) {
-						if (shader != pixelShader) {
-							if (pixelShader != null) {
-								GL.DetachShader (shaderProgram, pixelShader.shader);
-							}
-							relink = true;
-							pixelShader = shader;
-							GL.AttachShader (shaderProgram, pixelShader.shader);
-						}
-					} else if (shader.shaderType == ShaderType.VertexShader) {
-						if (shader != vertexShader) {
-							if (vertexShader != null) {
-								GL.DetachShader(shaderProgram, vertexShader.shader);
-							}
-							relink = true;
-							vertexShader = shader;
-							GL.AttachShader (shaderProgram, vertexShader.shader);
-						}
-					}
-					
-				}
-				
-			}
-			
-			if (relink) {
-				Link ();
-			}
-			
-			GL.UseProgram (shaderProgram);
-			
-			
-			if (setRasterizerState) {
-				_graphicsDevice.RasterizerState = rasterizerState;
-			}
-			if (setBlendState) {
-				_graphicsDevice.BlendState = blendState;
-			}
-			if (setDepthStencilState) {
-				_graphicsDevice.DepthStencilState = depthStencilState;
-			}
-
-			if (vertexShader != null) {
-				vertexShader.Apply(shaderProgram,
-				                  _technique._effect.Parameters,
-				                  _graphicsDevice);
-			} else {
-				//passthrough shader is attached
-				Viewport vp = _graphicsDevice.Viewport;
-				Matrix projection = Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, 0, 1);
-				Matrix halfPixelOffset = Matrix.CreateTranslation(-0.5f, -0.5f, 0);
-				Matrix transform = halfPixelOffset * projection;
-
-				int uniform = GL.GetUniformLocation(shaderProgram, "transformMatrix");
-				GL.UniformMatrix4(uniform, 1, false, Matrix.ToFloatArray(transform));
-			}
-
-
-			// Apply vertex shader fix:
-			// The following two lines are appended to the end of vertex shaders
-			// to account for rendering differences between OpenGL and DirectX:
-			//
-			// gl_Position.y = gl_Position.y * posFixup.y;
-			// gl_Position.xy += posFixup.zw * gl_Position.ww;
-			//
-			// (the following paraphrased from wine, wined3d/state.c and wined3d/glsl_shader.c)
-			//
-			// - We need to flip along the y-axis in case of offscreen rendering.
-			// - D3D coordinates refer to pixel centers while GL coordinates refer
-			//   to pixel corners.
-			// - D3D has a top-left filling convention. We need to maintain this
-			//   even after the y-flip mentioned above.
-			// In order to handle the last two points, we translate by
-			// (63.0 / 128.0) / VPw and (63.0 / 128.0) / VPh. This is equivalent to
-			// translating slightly less than half a pixel. We want the difference to
-			// be large enough that it doesn't get lost due to rounding inside the
-			// driver, but small enough to prevent it from interfering with any
-			// anti-aliasing.
-			//
-			// OpenGL coordinates specify the center of the pixel while d3d coords specify
-			// the corner. The offsets are stored in z and w in posFixup. posFixup.y contains
-			// 1.0 or -1.0 to turn the rendering upside down for offscreen rendering. PosFixup.x
-			// contains 1.0 to allow a mad.
-
-			posFixup[0] = 1.0f;
-			posFixup[1] = 1.0f;
-			posFixup[2] = (63.0f / 64.0f) / _graphicsDevice.Viewport.Width;
-			posFixup[3] = -(63.0f / 64.0f) / _graphicsDevice.Viewport.Height;
-			//If we have a render target bound (rendering offscreen)
-			if (_graphicsDevice.GetRenderTargets().Length > 0) {
-				//flip vertically
-				posFixup[1] *= -1.0f;
-				posFixup[3] *= -1.0f;
-			}
-			int posFixupLoc = GL.GetUniformLocation(shaderProgram, "posFixup");
-			GL.Uniform4 (posFixupLoc, 1, posFixup);
-
-			
-
-			if (pixelShader != null) {
-				pixelShader.Apply(shaderProgram,
-				                  _technique._effect.Parameters,
-				                  _graphicsDevice);
-			}
-
-#endif
-		}
+		
 		
 		public string Name { get { return name; } }
 
@@ -606,20 +735,20 @@ namespace Microsoft.Xna.Framework.Graphics
 					if (shader.shaderType == ShaderType.FragmentShader) {
 						if (shader != glslPixelShader) {
 							if (glslPixelShader != null) {
-								GL.DetachShader (shaderProgram, glslPixelShader.shader);
+								GL.DetachShader (shaderProgram, glslPixelShader.shaderHandle);
 							}
 							relink = true;
 							glslPixelShader = shader;
-							GL.AttachShader (shaderProgram, glslPixelShader.shader);
+                            GL.AttachShader(shaderProgram, glslPixelShader.shaderHandle);
 						}
 					} else if (shader.shaderType == ShaderType.VertexShader) {
 						if (shader != glslVertexShader) {
 							if (glslVertexShader != null) {
-								GL.DetachShader(shaderProgram, glslVertexShader.shader);
+                                GL.DetachShader(shaderProgram, glslVertexShader.shaderHandle);
 							}
 							relink = true;
 							glslVertexShader = shader;
-							GL.AttachShader (shaderProgram, glslVertexShader.shader);
+                            GL.AttachShader(shaderProgram, glslVertexShader.shaderHandle);
 						}
 					}
 
@@ -627,12 +756,10 @@ namespace Microsoft.Xna.Framework.Graphics
 				
 			}
 			
-			if (relink) {
+			if (relink)
 				Link ();
-			}
 			
 			GL.UseProgram (shaderProgram);
-
 			
 			if (setRasterizerState) {
 				_graphicsDevice.RasterizerState = rasterizerState;

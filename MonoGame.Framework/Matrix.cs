@@ -2079,7 +2079,7 @@ namespace Microsoft.Xna.Framework
 		
         #endregion Private Static Methods
 		
-		public unsafe void Decompose(out Vector3 scale, out Quaternion rotation, out Vector3 translation)
+		public void Decompose(out Vector3 scale, out Quaternion rotation, out Vector3 translation)
 		{
 			// This code is TOTAL SHIT, huge look of disaproval upon it!
 			var s = Forward.Length();

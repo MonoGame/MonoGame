@@ -23,7 +23,7 @@
     <DefineConstants>WINRT;DEBUG;TRACE;NETFX_CORE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -66,6 +66,9 @@
     <Compile Include="Desktop\Input\Mouse.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="GamePlatform.cs" />
+    <Compile Include="GamerServices\MessageBoxIcon.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Graphics\CompareFunction.cs" />
     <Compile Include="Graphics\CubeMapFace.cs" />
     <Compile Include="Graphics\DisplayMode.cs" />
@@ -93,6 +96,7 @@
     <Compile Include="Graphics\PackedVector\NormalizedShort2.cs" />
     <Compile Include="Graphics\PackedVector\NormalizedShort4.cs" />
     <Compile Include="Graphics\PresentationParameters.cs" />
+    <Compile Include="Graphics\PresentInterval.cs" />
     <Compile Include="Graphics\RenderTarget2D.cs" />
     <Compile Include="Graphics\SpriteBatch.cs" />
     <Compile Include="Graphics\SpriteBatcher.cs" />
@@ -235,6 +239,9 @@
     <Compile Include="Graphics\Vertices\VertexPositionTexture.cs" />
     <Compile Include="Storage\StorageDeviceHelper.cs" />
     <Compile Include="Windows8\GameFrameworkViewSource.cs" />
+    <Compile Include="Windows8\MetroGamePlatform.cs" />
+    <Compile Include="Windows8\MetroGameWindow.cs" />
+    <Compile Include="Windows8\SharpDXHelper.cs" />
     <Compile Include="Windows\Audio\Sound.cs" />
     <Compile Include="Windows\Content\ContentReaders\SoundEffectReader.cs" />
     <Compile Include="BatteryChargeStatus.cs" />
@@ -313,7 +320,6 @@
     <Compile Include="Graphics\SpriteFont.cs" />
     <Compile Include="Graphics\SpriteSortMode.cs" />
     <Compile Include="Graphics\SurfaceFormat.cs" />
-    <Compile Include="Graphics\SwapEffect.cs" />
     <Compile Include="Graphics\TextureUsage.cs" />
     <Compile Include="Graphics\Viewport.cs" />
     <Compile Include="Storage\StorageContainer.cs" />
@@ -323,19 +329,29 @@
     <Compile Include="Graphics\Effect\IEffectMatrices.cs" />
     <Compile Include="Graphics\DirectionalLight.cs" />
     <Compile Include="Color.cs" />
+    <Compile Include="Windows\GamerServices\Guide.cs" />
     <Compile Include="Windows\GraphicsDeviceManager.cs" />
     <Compile Include="Desktop\TitleContainer.cs" />
     <Compile Include="Content\ContentReaders\CurveReader.cs" />
     <Compile Include="Graphics\Vertices\VertexElementColor.cs" />
-    <Compile Include="Windows\Input\KeyboardUtil.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="SharpDX">
       <HintPath>..\ThirdParty\SharpDX\SharpDX.dll</HintPath>
     </Reference>
+    <Reference Include="SharpDX.Direct2D1">
+      <HintPath>..\ThirdParty\SharpDX\SharpDX.Direct2D1.dll</HintPath>
+    </Reference>
     <Reference Include="SharpDX.Direct3D11">
       <HintPath>..\ThirdParty\SharpDX\SharpDX.Direct3D11.dll</HintPath>
     </Reference>
+    <Reference Include="SharpDX.DXGI, Version=2.0.4.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\ThirdParty\SharpDX\SharpDX.DXGI.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Windows\Input\" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' ">
     <VisualStudioVersion>11.0</VisualStudioVersion>

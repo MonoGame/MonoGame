@@ -86,6 +86,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		protected int height;
 
 #if WINRT
+        internal SharpDX.Direct3D11.Texture2D _texture2D;
 #else
 		PixelInternalFormat glInternalFormat;
 		GLPixelFormat glFormat;
@@ -113,7 +114,14 @@ namespace Microsoft.Xna.Framework.Graphics
             this.levelCount = 1;
 
 #if WINRT
+            // TODO: Move this to SetData() if we want to make Immutable textures!
+            var desc = new SharpDX.Direct3D11.Texture2DDescription();
+            desc.Width = width;
+            desc.Height = height;
+            desc.MipLevels = 0;
+            desc.Format = SharpDXHelper.ToFormat(format);
 
+            _texture2D = new SharpDX.Direct3D11.Texture2D(graphicsDevice._d3dDevice, desc);
 #else
             this.glTarget = TextureTarget.Texture2D;
             
@@ -208,8 +216,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				
 		public Texture2D(GraphicsDevice graphicsDevice, int width, int height) : 
 			this(graphicsDevice, width, height, false, SurfaceFormat.Color)
-		{
-			
+		{			
 		}
 
         public int Width
@@ -260,6 +267,18 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
 
 #if WINRT
+                var box = new SharpDX.DataBox(dataPtr, w * elementSizeInByte, 0);
+
+                var region = new SharpDX.Direct3D11.ResourceRegion();
+                region.Top = y;
+                region.Front = 0;
+                region.Back = 1;
+                region.Bottom = y + h;
+                region.Left = x;
+                region.Right = x + w;
+
+                // TODO: We need to deal with threaded contexts here!
+                graphicsDevice._d3dContext.UpdateSubresource(box, _texture2D, level, region);
 #else
                 GL.BindTexture(TextureTarget.Texture2D, this.glTexture);
 
@@ -303,7 +322,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #if IPHONE || ANDROID
 			throw new NotImplementedException();
 #elif WINRT
-
+            throw new NotImplementedException();
 #else
 
 			GL.BindTexture(TextureTarget.Texture2D, this.glTexture);
@@ -468,6 +487,20 @@ namespace Microsoft.Xna.Framework.Graphics
 		internal void Reload(Stream textureStream)
 		{
 		}
+
+        public override void Dispose()
+        {
+#if WINRT
+            if (_texture2D != null)
+            {
+                _texture2D.Dispose();
+                _texture2D = null;
+            }
+#endif
+
+            base.Dispose();
+        }
+
 	}
 }
 
