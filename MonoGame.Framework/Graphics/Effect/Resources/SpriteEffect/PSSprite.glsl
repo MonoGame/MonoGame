@@ -1,7 +1,7 @@
 uniform sampler2D Texture;
 
-varying vec4 Diffuse;
-varying vec2 TexCoord;
+varying lowp vec4 Diffuse;
+varying mediump vec2 TexCoord;
 
 void main()
 {

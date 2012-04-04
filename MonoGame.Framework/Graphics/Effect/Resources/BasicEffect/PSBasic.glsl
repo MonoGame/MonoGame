@@ -1,7 +1,7 @@
-uniform vec3 FogColor;
+uniform lowp vec3 FogColor;
 
-varying vec4 Diffuse;
-varying vec4 Specular;
+varying lowp vec4 Diffuse;
+varying lowp vec4 Specular;
 
 void main()
 {

@@ -55,13 +55,20 @@ namespace Microsoft.Xna.Framework.Graphics
         public GLSLShader(ShaderType shadertype, string filePath)
         {
             shaderPath = filePath;
+            shaderType = shadertype;
             glslCode = GetShaderFromAssembly(filePath);
 
-            shaderType = shadertype;
+#if !ANDROID && !IPHONE
+
+            // Remove any precision specificers that may be around.
+            glslCode = glslCode.Replace("lowp ", "");
+            glslCode = glslCode.Replace("mediump ", "");
+            glslCode = glslCode.Replace("highp ", "");
+#endif
 
             shaderHandle = CreateAndCompileShaderFromSource(shaderType, glslCode);
 
-            // Shader looks good. Lets grab the variables we'll need from it.
+            // Shader looks good. Grab the variables we'll need from it.
 
             // Read in and save all of our attribute names to bind them later.
             if (shaderType == ShaderType.VertexShader)
