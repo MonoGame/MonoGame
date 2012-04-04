@@ -97,7 +97,6 @@ namespace Microsoft.Xna.Framework.Graphics
             //if (currentProgram == _technique._effect.CurrentProgram && shaderProgram != 0)
                //return;
 
-
             shaderProgram = _technique._effect.CurrentProgram = currentProgram;
 
             GL.UseProgram(shaderProgram);
@@ -112,20 +111,88 @@ namespace Microsoft.Xna.Framework.Graphics
                 _graphicsDevice.DepthStencilState = depthStencilState;
 
             glslVertexShader = Effect.shaderObjectLookup[shaderProgram][0];
-            glslPixelShader = Effect.shaderObjectLookup[shaderProgram][1];
 
-            if (glslVertexShader != null)
+            // Set Program Attributes.
+            int location = 0;
+            //bind attributes
+            foreach (var attribute in glslVertexShader.attributeList)
             {
-                glslVertexShader.Apply(shaderProgram,
-                    _technique._effect.Parameters,
-                    _graphicsDevice);
+                if (attribute.Contains("Position"))
+                    location = GraphicsDevice.attributePosition;
+                else if (attribute.Contains("Normal"))
+                    location = GraphicsDevice.attributeNormal;
+                else if (attribute.Contains("TextureCoordinate"))
+                    location = GraphicsDevice.attributeTexCoord;
+                else if (attribute.Contains("Color"))
+                    location = GraphicsDevice.attributeColor;
+                else
+                    throw new NotSupportedException();
+
+                GL.BindAttribLocation(shaderProgram, location, attribute);
             }
 
-            if (glslPixelShader != null)
+            var samplerState = _graphicsDevice.SamplerStates[0];
+            // Set Program Uniforms
+            foreach (var param in _technique._effect.Parameters)
             {
-                glslPixelShader.Apply(shaderProgram,
-                                  _technique._effect.Parameters,
-                                  _graphicsDevice);
+                int uniformLocation = GL.GetUniformLocation(shaderProgram, param.Name);
+
+                var error = GL.GetError();
+
+                if (uniformLocation == -1 || param.Name.Contains("ShaderIndex"))
+                    continue;
+
+                switch (param.activeUniformType)
+                {
+                    case ActiveUniformType.FloatVec2:
+                        var v2 = param.GetValueVector2();
+                        GL.Uniform2(uniformLocation, v2.X, v2.Y);
+                        break;
+
+                    case ActiveUniformType.FloatVec3:
+                        var v3 = param.GetValueVector3();
+                        GL.Uniform3(uniformLocation, v3.X, v3.Y, v3.Z);
+                        break;
+
+                    case ActiveUniformType.FloatVec4:
+                        var v4 = param.GetValueVector4();
+                        GL.Uniform4(uniformLocation, v4.X, v4.Y, v4.Z, v4.W);
+                        break;
+
+                    case ActiveUniformType.Float:
+                        GL.Uniform1(uniformLocation, param.GetValueSingle());
+                        break;
+
+                        // RAY TODO: Temporary. Can handle data as matrix...?
+                    case ActiveUniformType.FloatMat4:
+                        var mat4 = (Matrix)param.data;
+                        var sa4 = new float[] { mat4.M11, mat4.M12, mat4.M13, mat4.M14, mat4.M21, mat4.M22, mat4.M23, mat4.M24, mat4.M31, mat4.M32, mat4.M33, mat4.M34, mat4.M41, mat4.M42, mat4.M43, mat4.M44 };
+                        GL.UniformMatrix4(uniformLocation, 1, false, sa4);
+                        break;
+
+                    case ActiveUniformType.FloatMat3:
+                        var mat = (Matrix)param.data;
+                        var mat3 = new float[] { mat.M11, mat.M12, mat.M13, mat.M21, mat.M22, mat.M23, mat.M31, mat.M32, mat.M33 };
+                        GL.UniformMatrix3(uniformLocation, 1, false, mat3);
+                        break;
+
+                    case ActiveUniformType.Bool:
+                        GL.Uniform1(uniformLocation, (param.GetValueBoolean()) ? 1 : 0);
+                        break;
+
+                    case ActiveUniformType.Int:
+                        GL.Uniform1(uniformLocation, param.GetValueInt32());
+                        break;
+
+                    case ActiveUniformType.Sampler2D:
+                        Texture tex = (Texture)param.data;
+                        tex.Activate();
+                        samplerState.Activate(tex.glTarget, tex.LevelCount > 1);
+                        break;
+
+                    default:
+                        throw new NotSupportedException();
+                }
             }
         }
 #else

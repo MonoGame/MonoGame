@@ -45,9 +45,9 @@ namespace Microsoft.Xna.Framework.Graphics
 {
 	public sealed class DirectionalLight
 	{
-		EffectParameter diffuseColorParameter;
-		EffectParameter directionParameter;
-		EffectParameter specularColorParameter;
+		internal EffectParameter diffuseColorParameter;
+		internal EffectParameter directionParameter;
+		internal EffectParameter specularColorParameter;
 		
 		Vector3 diffuseColor;
 		Vector3 direction;

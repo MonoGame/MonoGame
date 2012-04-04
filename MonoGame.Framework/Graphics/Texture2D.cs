@@ -490,11 +490,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public override void Dispose()
         {
+#if WINRT
             if (_texture2D != null)
             {
                 _texture2D.Dispose();
                 _texture2D = null;
             }
+#endif
 
             base.Dispose();
         }

@@ -40,6 +40,10 @@ namespace Microsoft.Xna.Framework.Graphics
         EffectParameter worldInverseTransposeParam;
         EffectParameter worldViewProjParam;
 
+        EffectParameter dirParam1;
+        EffectParameter dirParam2;
+        EffectParameter dirParam3;
+
         #endregion
 
         #region Fields
@@ -502,10 +506,14 @@ namespace Microsoft.Xna.Framework.Graphics
             Parameters.Add(fogVectorParam);
             worldParam = new EffectParameter(ActiveUniformType.FloatMat4, "World");
             Parameters.Add(worldParam);
-            worldInverseTransposeParam = new EffectParameter(ActiveUniformType.FloatMat4, "WorldInverseTranspose");
+            worldInverseTransposeParam = new EffectParameter(ActiveUniformType.FloatMat3, "WorldInverseTranspose");
             Parameters.Add(worldInverseTransposeParam);
             worldViewProjParam = new EffectParameter(ActiveUniformType.FloatMat4, "WorldViewProj");
             Parameters.Add(worldViewProjParam);
+
+            Parameters.Add(dirParam1);
+            Parameters.Add(dirParam2);
+            Parameters.Add(dirParam3);
 #endif
         }
 
@@ -614,6 +622,12 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 // Recompute the world inverse transpose and eye position?
                 dirtyFlags = EffectHelpers.SetLightingMatrices(dirtyFlags, ref world, ref view, worldParam, worldInverseTransposeParam, eyePositionParam);
+
+                //RAY TODO: TEMPORARY HACK
+                dirParam1 = light0.directionParameter;
+                dirParam2 = light0.diffuseColorParameter;
+                dirParam3 = light0.specularColorParameter;
+
                 
                 // Check if we can use the only-bother-with-the-first-light shader optimization.
                 bool newOneLight = !light1.Enabled && !light2.Enabled;
