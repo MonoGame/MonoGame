@@ -26,11 +26,10 @@ namespace Microsoft.Xna.Framework.Graphics
         EffectTechnique _technique = null;
 		GraphicsDevice _graphicsDevice;
 		
-		string name;
 		int shaderProgram = 0;
-#if WINRT
 
-#else
+#if !NOMOJO
+
 		DXEffectObject.d3dx_state[] states;
 		DXShader pixelShader;
 		DXShader vertexShader;
@@ -39,14 +38,6 @@ namespace Microsoft.Xna.Framework.Graphics
 		GLSLShader glslPixelShader;
 		GLSLShader glslVertexShader;
 		bool isGLSL = false;
-#endif
-
-		bool setBlendState = false;
-		BlendState blendState;
-		bool setDepthStencilState = false;
-		DepthStencilState depthStencilState;
-		bool setRasterizerState = false;
-		RasterizerState rasterizerState;
 
 		static float[] posFixup = new float[4];
 
@@ -73,17 +64,278 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		bool passthroughVertexShaderAttached = false;
 
+#endif
+
+		bool setBlendState = false;
+		BlendState blendState;
+		bool setDepthStencilState = false;
+		DepthStencilState depthStencilState;
+		bool setRasterizerState = false;
+		RasterizerState rasterizerState;
+
+        public string Name { get; private set; }
+
 #if NOMOJO
+
         public EffectPass(EffectTechnique technique)
         {
             _technique = technique;
 
             _graphicsDevice = _technique._effect.GraphicsDevice;
 
-            blendState = new BlendState();
-            depthStencilState = new DepthStencilState();
-            rasterizerState = new RasterizerState();
+
+            // Currently unused as we only support StockEffects.
+            //blendState = new BlendState();
+            //depthStencilState = new DepthStencilState();
+            //rasterizerState = new RasterizerState();
         }
+
+#else
+
+		public EffectPass(EffectTechnique technique, DXEffectObject.d3dx_pass pass)
+        {
+            _technique = technique;
+			_graphicsDevice = _technique._effect.GraphicsDevice;
+			
+			Name = pass.name;
+			states = pass.states;
+			
+			blendState = new BlendState();
+			depthStencilState = new DepthStencilState();
+			rasterizerState = new RasterizerState();
+			
+			Debug.WriteLine (technique.Name);
+            Threading.Begin();
+            try
+            {
+                shaderProgram = GL.CreateProgram();
+
+                // Set the parameters
+                //is this nesesary, or just for VR?
+                /*GL.ProgramParameter (shaderProgram,
+                    AssemblyProgramParameterArb.GeometryInputType,(int)All.Lines);
+                GL.ProgramParameter (shaderProgram,
+                    AssemblyProgramParameterArb.GeometryOutputType, (int)All.Line);*/
+
+                // Set the max vertices
+                /*int maxVertices;
+                GL.GetInteger (GetPName.MaxGeometryOutputVertices, out maxVertices);
+                GL.ProgramParameter (shaderProgram,
+                    AssemblyProgramParameterArb.GeometryVerticesOut, maxVertices);*/
+
+                bool needPixelShader = false;
+                bool needVertexShader = false;
+                foreach (DXEffectObject.d3dx_state state in states)
+                {
+                    if (state.operation.class_ == DXEffectObject.STATE_CLASS.PIXELSHADER)
+                    {
+                        needPixelShader = true;
+                        if (state.type == DXEffectObject.STATE_TYPE.CONSTANT)
+                        {
+                            pixelShader = (DXShader)state.parameter.data;
+                            GL.AttachShader(shaderProgram, pixelShader.shaderHandle);
+                        }
+                    }
+                    else if (state.operation.class_ == DXEffectObject.STATE_CLASS.VERTEXSHADER)
+                    {
+                        needVertexShader = true;
+                        if (state.type == DXEffectObject.STATE_TYPE.CONSTANT)
+                        {
+                            vertexShader = (DXShader)state.parameter.data;
+                            GL.AttachShader(shaderProgram, vertexShader.shaderHandle);
+                        }
+                    }
+                    else if (state.operation.class_ == DXEffectObject.STATE_CLASS.RENDERSTATE)
+                    {
+                        if (state.type != DXEffectObject.STATE_TYPE.CONSTANT)
+                        {
+                            throw new NotImplementedException();
+                        }
+                        switch (state.operation.op)
+                        {
+                            case (uint)DXEffectObject.D3DRENDERSTATETYPE.STENCILENABLE:
+                                depthStencilState.StencilEnable = (bool)state.parameter.data;
+                                setDepthStencilState = true;
+                                break;
+                            case (uint)DXEffectObject.D3DRENDERSTATETYPE.SCISSORTESTENABLE:
+                                rasterizerState.ScissorTestEnable = (bool)state.parameter.data;
+                                setRasterizerState = true;
+                                break;
+                            case (uint)DXEffectObject.D3DRENDERSTATETYPE.BLENDOP:
+                                blendState.ColorBlendFunction = (BlendFunction)state.parameter.data;
+                                setBlendState = true;
+                                break;
+                            case (uint)DXEffectObject.D3DRENDERSTATETYPE.SRCBLEND:
+                                blendState.ColorSourceBlend = (Blend)state.parameter.data;
+                                setBlendState = true;
+                                break;
+                            case (uint)DXEffectObject.D3DRENDERSTATETYPE.DESTBLEND:
+                                blendState.ColorDestinationBlend = (Blend)state.parameter.data;
+                                setBlendState = true;
+                                break;
+                            case (uint)DXEffectObject.D3DRENDERSTATETYPE.ALPHABLENDENABLE:
+                                break; //not sure what to do
+                            case (uint)DXEffectObject.D3DRENDERSTATETYPE.CULLMODE:
+                                rasterizerState.CullMode = (CullMode)state.parameter.data;
+                                setRasterizerState = true;
+                                break;
+                            case (uint)DXEffectObject.D3DRENDERSTATETYPE.COLORWRITEENABLE:
+                                blendState.ColorWriteChannels = (ColorWriteChannels)state.parameter.data;
+                                setBlendState = true;
+                                break;
+                            case (uint)DXEffectObject.D3DRENDERSTATETYPE.STENCILFUNC:
+                                depthStencilState.StencilFunction = (CompareFunction)state.parameter.data;
+                                setDepthStencilState = true;
+                                break;
+                            case (uint)DXEffectObject.D3DRENDERSTATETYPE.STENCILPASS:
+                                depthStencilState.StencilPass = (StencilOperation)state.parameter.data;
+                                setDepthStencilState = true;
+                                break;
+                            case (uint)DXEffectObject.D3DRENDERSTATETYPE.STENCILFAIL:
+                                depthStencilState.StencilFail = (StencilOperation)state.parameter.data;
+                                setDepthStencilState = true;
+                                break;
+                            case (uint)DXEffectObject.D3DRENDERSTATETYPE.STENCILREF:
+                                depthStencilState.ReferenceStencil = (int)state.parameter.data;
+                                setDepthStencilState = true;
+                                break;
+                            default:
+                                throw new NotImplementedException();
+                        }
+                    }
+                    else
+                    {
+                        throw new NotImplementedException();
+                    }
+                }
+
+                //If we have what we need, link now
+                if ((needPixelShader == (pixelShader != null)) &&
+                        (needVertexShader == (vertexShader != null)))
+                {
+                    Link();
+                }
+            }
+            finally
+            {
+                Threading.End();
+            }
+        }
+
+		public EffectPass(EffectTechnique technique, GLSLEffectObject.glslPass pass)
+		{
+			isGLSL = true;
+			_technique = technique;
+			_graphicsDevice = _technique._effect.GraphicsDevice;
+
+			Name = pass.name;
+			glslStates = pass.states;
+
+			blendState = new BlendState();
+			depthStencilState = new DepthStencilState();
+			rasterizerState = new RasterizerState();
+
+			Debug.WriteLine ("GLSL: " + technique.Name);
+
+			shaderProgram = GL.CreateProgram ();
+
+			// Set the parameters
+			//is this nesesary, or just for VR?
+			/*GL.ProgramParameter (shaderProgram,
+				AssemblyProgramParameterArb.GeometryInputType,(int)All.Lines);
+			GL.ProgramParameter (shaderProgram,
+				AssemblyProgramParameterArb.GeometryOutputType, (int)All.Line);*/
+
+			// Set the max vertices
+			/*int maxVertices;
+			GL.GetInteger (GetPName.MaxGeometryOutputVertices, out maxVertices);
+			GL.ProgramParameter (shaderProgram,
+				AssemblyProgramParameterArb.GeometryVerticesOut, maxVertices);*/
+
+			bool needPixelShader = false;
+			bool needVertexShader = false;
+			foreach ( GLSLEffectObject.glsl_state state in glslStates) {
+				if (state.operation.class_ == GLSLEffectObject.STATE_CLASS.PIXELSHADER) {
+					needPixelShader = true;
+					if (state.type == GLSLEffectObject.STATE_TYPE.CONSTANT) {
+						glslPixelShader = ((GLSLEffectObject.ShaderProg)state.parameter.data).glslShaderObject;
+                        GL.AttachShader(shaderProgram, glslPixelShader.shaderHandle);
+					}
+				} else if (state.operation.class_ == GLSLEffectObject.STATE_CLASS.VERTEXSHADER) {
+					needVertexShader = true;
+					if (state.type == GLSLEffectObject.STATE_TYPE.CONSTANT) {
+						glslVertexShader = ((GLSLEffectObject.ShaderProg)state.parameter.data).glslShaderObject;
+                        GL.AttachShader(shaderProgram, glslVertexShader.shaderHandle);
+					}
+				} else if (state.operation.class_ == GLSLEffectObject.STATE_CLASS.RENDERSTATE) {
+					if (state.type != GLSLEffectObject.STATE_TYPE.CONSTANT) {
+						throw new NotImplementedException();
+					}
+					switch (state.operation.op) {
+					case (uint)GLSLEffectObject.GLSLRENDERSTATETYPE.STENCILENABLE:
+						depthStencilState.StencilEnable = (bool)state.parameter.data;
+						setDepthStencilState = true;
+						break;
+					case (uint)GLSLEffectObject.GLSLRENDERSTATETYPE.SCISSORTESTENABLE:
+						rasterizerState.ScissorTestEnable = (bool)state.parameter.data;
+						setRasterizerState = true;
+						break;
+					case (uint)GLSLEffectObject.GLSLRENDERSTATETYPE.BLENDOP:
+						blendState.ColorBlendFunction = (BlendFunction)state.parameter.data;
+						setBlendState = true;
+						break;
+					case (uint)GLSLEffectObject.GLSLRENDERSTATETYPE.SRCBLEND:
+						blendState.ColorSourceBlend = (Blend)state.parameter.data;
+						setBlendState = true;
+						break;
+					case (uint)GLSLEffectObject.GLSLRENDERSTATETYPE.DESTBLEND:
+						blendState.ColorDestinationBlend = (Blend)state.parameter.data;
+						setBlendState = true;
+						break;
+					case (uint)GLSLEffectObject.GLSLRENDERSTATETYPE.ALPHABLENDENABLE:
+						break; //not sure what to do
+					case (uint)GLSLEffectObject.GLSLRENDERSTATETYPE.CULLMODE:
+						rasterizerState.CullMode = (CullMode)state.parameter.data;
+						setRasterizerState = true;
+						break;
+					case (uint)GLSLEffectObject.GLSLRENDERSTATETYPE.COLORWRITEENABLE:
+						blendState.ColorWriteChannels = (ColorWriteChannels)state.parameter.data;
+						setBlendState = true;
+						break;
+					case (uint)GLSLEffectObject.GLSLRENDERSTATETYPE.STENCILFUNC:
+						depthStencilState.StencilFunction = (CompareFunction)state.parameter.data;
+						setDepthStencilState = true;
+						break;
+					case (uint)GLSLEffectObject.GLSLRENDERSTATETYPE.STENCILPASS:
+						depthStencilState.StencilPass = (StencilOperation)state.parameter.data;
+						setDepthStencilState = true;
+						break;
+					case (uint)GLSLEffectObject.GLSLRENDERSTATETYPE.STENCILFAIL:
+						depthStencilState.StencilFail = (StencilOperation)state.parameter.data;
+						setDepthStencilState = true;
+						break;
+					case (uint)GLSLEffectObject.GLSLRENDERSTATETYPE.STENCILREF:
+						depthStencilState.ReferenceStencil = (int)state.parameter.data;
+						setDepthStencilState = true;
+						break;
+					default:
+						throw new NotImplementedException();
+					}
+				} else {
+					throw new NotImplementedException();
+				}
+			}
+			
+			//If we have what we need, link now
+			if ( (needPixelShader == (glslPixelShader != null)) &&
+				 (needVertexShader == (glslVertexShader != null))) {
+				glslLink();
+			}
+
+        }
+#endif
+
+#if NOMOJO
 
         public void Apply()
         {
@@ -102,6 +354,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
             GL.UseProgram(shaderProgram);
 
+            // Currently unused as we only support StockEffects.
+            /*
             if (setRasterizerState)
                 _graphicsDevice.RasterizerState = rasterizerState;
 
@@ -110,13 +364,15 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (setDepthStencilState)
                 _graphicsDevice.DepthStencilState = depthStencilState;
+            */
 
-            glslVertexShader = Effect.shaderObjectLookup[shaderProgram][0];
+            var vertexShader = Effect.shaderObjectLookup[shaderProgram][0];
 
             // Set Program Attributes.
             int location = 0;
+
             //bind attributes
-            foreach (var attribute in glslVertexShader.attributeList)
+            foreach (var attribute in vertexShader.attributeList)
             {
                 if (attribute.Contains("Position"))
                     location = GraphicsDevice.attributePosition;
@@ -196,15 +452,13 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
             }
         }
+
 #else
         public void Apply()
 		{
             // Set/get the correct shader handle/cleanups.
 			_technique._effect.OnApply();
 
-#if WINRT
-
-#else
 			if (isGLSL) {
 				GLSLApply();
 				return;
@@ -336,262 +590,10 @@ namespace Microsoft.Xna.Framework.Graphics
 				                  _graphicsDevice);
 			}
 
-#endif
 		}
-#endif // NOMOJO
-
-
-#if WINRT
-
-#else
-		public EffectPass(EffectTechnique technique, DXEffectObject.d3dx_pass pass)
-        {
-            _technique = technique;
-			_graphicsDevice = _technique._effect.GraphicsDevice;
-			
-			name = pass.name;
-			states = pass.states;
-			
-			blendState = new BlendState();
-			depthStencilState = new DepthStencilState();
-			rasterizerState = new RasterizerState();
-			
-			Console.WriteLine (technique.Name);
-            Threading.Begin();
-            try
-            {
-                shaderProgram = GL.CreateProgram();
-
-                // Set the parameters
-                //is this nesesary, or just for VR?
-                /*GL.ProgramParameter (shaderProgram,
-                    AssemblyProgramParameterArb.GeometryInputType,(int)All.Lines);
-                GL.ProgramParameter (shaderProgram,
-                    AssemblyProgramParameterArb.GeometryOutputType, (int)All.Line);*/
-
-                // Set the max vertices
-                /*int maxVertices;
-                GL.GetInteger (GetPName.MaxGeometryOutputVertices, out maxVertices);
-                GL.ProgramParameter (shaderProgram,
-                    AssemblyProgramParameterArb.GeometryVerticesOut, maxVertices);*/
-
-                bool needPixelShader = false;
-                bool needVertexShader = false;
-                foreach (DXEffectObject.d3dx_state state in states)
-                {
-                    if (state.operation.class_ == DXEffectObject.STATE_CLASS.PIXELSHADER)
-                    {
-                        needPixelShader = true;
-                        if (state.type == DXEffectObject.STATE_TYPE.CONSTANT)
-                        {
-                            pixelShader = (DXShader)state.parameter.data;
-                            GL.AttachShader(shaderProgram, pixelShader.shaderHandle);
-                        }
-                    }
-                    else if (state.operation.class_ == DXEffectObject.STATE_CLASS.VERTEXSHADER)
-                    {
-                        needVertexShader = true;
-                        if (state.type == DXEffectObject.STATE_TYPE.CONSTANT)
-                        {
-                            vertexShader = (DXShader)state.parameter.data;
-                            GL.AttachShader(shaderProgram, vertexShader.shaderHandle);
-                        }
-                    }
-                    else if (state.operation.class_ == DXEffectObject.STATE_CLASS.RENDERSTATE)
-                    {
-                        if (state.type != DXEffectObject.STATE_TYPE.CONSTANT)
-                        {
-                            throw new NotImplementedException();
-                        }
-                        switch (state.operation.op)
-                        {
-                            case (uint)DXEffectObject.D3DRENDERSTATETYPE.STENCILENABLE:
-                                depthStencilState.StencilEnable = (bool)state.parameter.data;
-                                setDepthStencilState = true;
-                                break;
-                            case (uint)DXEffectObject.D3DRENDERSTATETYPE.SCISSORTESTENABLE:
-                                rasterizerState.ScissorTestEnable = (bool)state.parameter.data;
-                                setRasterizerState = true;
-                                break;
-                            case (uint)DXEffectObject.D3DRENDERSTATETYPE.BLENDOP:
-                                blendState.ColorBlendFunction = (BlendFunction)state.parameter.data;
-                                setBlendState = true;
-                                break;
-                            case (uint)DXEffectObject.D3DRENDERSTATETYPE.SRCBLEND:
-                                blendState.ColorSourceBlend = (Blend)state.parameter.data;
-                                setBlendState = true;
-                                break;
-                            case (uint)DXEffectObject.D3DRENDERSTATETYPE.DESTBLEND:
-                                blendState.ColorDestinationBlend = (Blend)state.parameter.data;
-                                setBlendState = true;
-                                break;
-                            case (uint)DXEffectObject.D3DRENDERSTATETYPE.ALPHABLENDENABLE:
-                                break; //not sure what to do
-                            case (uint)DXEffectObject.D3DRENDERSTATETYPE.CULLMODE:
-                                rasterizerState.CullMode = (CullMode)state.parameter.data;
-                                setRasterizerState = true;
-                                break;
-                            case (uint)DXEffectObject.D3DRENDERSTATETYPE.COLORWRITEENABLE:
-                                blendState.ColorWriteChannels = (ColorWriteChannels)state.parameter.data;
-                                setBlendState = true;
-                                break;
-                            case (uint)DXEffectObject.D3DRENDERSTATETYPE.STENCILFUNC:
-                                depthStencilState.StencilFunction = (CompareFunction)state.parameter.data;
-                                setDepthStencilState = true;
-                                break;
-                            case (uint)DXEffectObject.D3DRENDERSTATETYPE.STENCILPASS:
-                                depthStencilState.StencilPass = (StencilOperation)state.parameter.data;
-                                setDepthStencilState = true;
-                                break;
-                            case (uint)DXEffectObject.D3DRENDERSTATETYPE.STENCILFAIL:
-                                depthStencilState.StencilFail = (StencilOperation)state.parameter.data;
-                                setDepthStencilState = true;
-                                break;
-                            case (uint)DXEffectObject.D3DRENDERSTATETYPE.STENCILREF:
-                                depthStencilState.ReferenceStencil = (int)state.parameter.data;
-                                setDepthStencilState = true;
-                                break;
-                            default:
-                                throw new NotImplementedException();
-                        }
-                    }
-                    else
-                    {
-                        throw new NotImplementedException();
-                    }
-                }
-
-                //If we have what we need, link now
-                if ((needPixelShader == (pixelShader != null)) &&
-                        (needVertexShader == (vertexShader != null)))
-                {
-                    Link();
-                }
-            }
-            finally
-            {
-                Threading.End();
-            }
-        }
-
-		public EffectPass(EffectTechnique technique, GLSLEffectObject.glslPass pass)
-		{
-			isGLSL = true;
-			_technique = technique;
-			_graphicsDevice = _technique._effect.GraphicsDevice;
-
-			name = pass.name;
-			glslStates = pass.states;
-
-			blendState = new BlendState();
-			depthStencilState = new DepthStencilState();
-			rasterizerState = new RasterizerState();
-
-			Console.WriteLine ("GLSL: " + technique.Name);
-
-			shaderProgram = GL.CreateProgram ();
-
-			// Set the parameters
-			//is this nesesary, or just for VR?
-			/*GL.ProgramParameter (shaderProgram,
-				AssemblyProgramParameterArb.GeometryInputType,(int)All.Lines);
-			GL.ProgramParameter (shaderProgram,
-				AssemblyProgramParameterArb.GeometryOutputType, (int)All.Line);*/
-
-			// Set the max vertices
-			/*int maxVertices;
-			GL.GetInteger (GetPName.MaxGeometryOutputVertices, out maxVertices);
-			GL.ProgramParameter (shaderProgram,
-				AssemblyProgramParameterArb.GeometryVerticesOut, maxVertices);*/
-
-			bool needPixelShader = false;
-			bool needVertexShader = false;
-			foreach ( GLSLEffectObject.glsl_state state in glslStates) {
-				if (state.operation.class_ == GLSLEffectObject.STATE_CLASS.PIXELSHADER) {
-					needPixelShader = true;
-					if (state.type == GLSLEffectObject.STATE_TYPE.CONSTANT) {
-						glslPixelShader = ((GLSLEffectObject.ShaderProg)state.parameter.data).glslShaderObject;
-                        GL.AttachShader(shaderProgram, glslPixelShader.shaderHandle);
-					}
-				} else if (state.operation.class_ == GLSLEffectObject.STATE_CLASS.VERTEXSHADER) {
-					needVertexShader = true;
-					if (state.type == GLSLEffectObject.STATE_TYPE.CONSTANT) {
-						glslVertexShader = ((GLSLEffectObject.ShaderProg)state.parameter.data).glslShaderObject;
-                        GL.AttachShader(shaderProgram, glslVertexShader.shaderHandle);
-					}
-				} else if (state.operation.class_ == GLSLEffectObject.STATE_CLASS.RENDERSTATE) {
-					if (state.type != GLSLEffectObject.STATE_TYPE.CONSTANT) {
-						throw new NotImplementedException();
-					}
-					switch (state.operation.op) {
-					case (uint)GLSLEffectObject.GLSLRENDERSTATETYPE.STENCILENABLE:
-						depthStencilState.StencilEnable = (bool)state.parameter.data;
-						setDepthStencilState = true;
-						break;
-					case (uint)GLSLEffectObject.GLSLRENDERSTATETYPE.SCISSORTESTENABLE:
-						rasterizerState.ScissorTestEnable = (bool)state.parameter.data;
-						setRasterizerState = true;
-						break;
-					case (uint)GLSLEffectObject.GLSLRENDERSTATETYPE.BLENDOP:
-						blendState.ColorBlendFunction = (BlendFunction)state.parameter.data;
-						setBlendState = true;
-						break;
-					case (uint)GLSLEffectObject.GLSLRENDERSTATETYPE.SRCBLEND:
-						blendState.ColorSourceBlend = (Blend)state.parameter.data;
-						setBlendState = true;
-						break;
-					case (uint)GLSLEffectObject.GLSLRENDERSTATETYPE.DESTBLEND:
-						blendState.ColorDestinationBlend = (Blend)state.parameter.data;
-						setBlendState = true;
-						break;
-					case (uint)GLSLEffectObject.GLSLRENDERSTATETYPE.ALPHABLENDENABLE:
-						break; //not sure what to do
-					case (uint)GLSLEffectObject.GLSLRENDERSTATETYPE.CULLMODE:
-						rasterizerState.CullMode = (CullMode)state.parameter.data;
-						setRasterizerState = true;
-						break;
-					case (uint)GLSLEffectObject.GLSLRENDERSTATETYPE.COLORWRITEENABLE:
-						blendState.ColorWriteChannels = (ColorWriteChannels)state.parameter.data;
-						setBlendState = true;
-						break;
-					case (uint)GLSLEffectObject.GLSLRENDERSTATETYPE.STENCILFUNC:
-						depthStencilState.StencilFunction = (CompareFunction)state.parameter.data;
-						setDepthStencilState = true;
-						break;
-					case (uint)GLSLEffectObject.GLSLRENDERSTATETYPE.STENCILPASS:
-						depthStencilState.StencilPass = (StencilOperation)state.parameter.data;
-						setDepthStencilState = true;
-						break;
-					case (uint)GLSLEffectObject.GLSLRENDERSTATETYPE.STENCILFAIL:
-						depthStencilState.StencilFail = (StencilOperation)state.parameter.data;
-						setDepthStencilState = true;
-						break;
-					case (uint)GLSLEffectObject.GLSLRENDERSTATETYPE.STENCILREF:
-						depthStencilState.ReferenceStencil = (int)state.parameter.data;
-						setDepthStencilState = true;
-						break;
-					default:
-						throw new NotImplementedException();
-					}
-				} else {
-					throw new NotImplementedException();
-				}
-			}
-			
-			//If we have what we need, link now
-			if ( (needPixelShader == (glslPixelShader != null)) &&
-				 (needVertexShader == (glslVertexShader != null))) {
-				glslLink();
-			}
-
-        }
-#endif
 
         private void Link ()
 		{
-#if WINRT
-
-#else
 			if (vertexShader == null && !passthroughVertexShaderAttached) {
 				if (!passthroughVertexShader.HasValue) {
 					int shader = GL.CreateShader(ShaderType.VertexShader);
@@ -601,7 +603,6 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
 					GL.ShaderSource(shader, passthroughVertexShaderSrc);
 #endif
-
 					GL.CompileShader(shader);
 
 					passthroughVertexShader = shader;
@@ -642,14 +643,8 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 				throw new InvalidOperationException("Unable to link effect program");
 			}
-#endif
-		}
-		
-		
-		
-		public string Name { get { return name; } }
+		}						
 
-#if !WINRT
 		private void glslLink ()
 		{
 			if (glslVertexShader == null && !passthroughVertexShaderAttached) {
@@ -707,9 +702,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void GLSLApply ()
 		{
-#if DEBUG
-			Console.WriteLine (_technique._effect.Name+" - GLSL -> "+_technique.Name+" - "+Name);
-#endif
+			Debug.WriteLine (_technique._effect.Name+" - GLSL -> "+_technique.Name+" - "+Name);
+
 			bool relink = false;
 			foreach ( GLSLEffectObject.glsl_state state in glslStates) {
 
