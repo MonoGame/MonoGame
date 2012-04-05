@@ -41,40 +41,21 @@ purpose and non-infringement.
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Input.Touch;
 
 #if MONOMAC
 using MonoMac.OpenGL;
-using GL_Oes = MonoMac.OpenGL.GL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
-using GL_Oes = OpenTK.Graphics.OpenGL.GL;
 #elif WINRT
 using SharpDX;
 using SharpDX.Direct3D;
 using Windows.Graphics.Display;
 using Windows.UI.Core;
-#else
-#if ES11
-using OpenTK.Graphics.ES11;
-using GL_Oes = OpenTK.Graphics.ES11.GL.Oes;
-#if IPHONE || ANDROID
-using EnableCap = OpenTK.Graphics.ES11.All;
-using TextureTarget = OpenTK.Graphics.ES11.All;
-using BufferTarget = OpenTK.Graphics.ES11.All;
-using BufferUsageHint = OpenTK.Graphics.ES11.All;
-using DrawElementsType = OpenTK.Graphics.ES11.All;
-using TextureEnvTarget = OpenTK.Graphics.ES11.All;
-using TextureEnvParameter = OpenTK.Graphics.ES11.All;
-using GetPName = OpenTK.Graphics.ES11.All;
-using FramebufferErrorCode = OpenTK.Graphics.ES11.All;
-using FramebufferTarget = OpenTK.Graphics.ES11.All;
-using FramebufferAttachment = OpenTK.Graphics.ES11.All;
-using RenderbufferTarget = OpenTK.Graphics.ES11.All;
-using RenderbufferStorage = OpenTK.Graphics.ES11.All;
-#endif
-#else
-using OpenTK.Graphics.ES20;
-#if IPHONE || ANDROID
+#elif GLES
+using BeginMode = OpenTK.Graphics.ES20.All;
 using EnableCap = OpenTK.Graphics.ES20.All;
 using TextureTarget = OpenTK.Graphics.ES20.All;
 using BufferTarget = OpenTK.Graphics.ES20.All;
@@ -86,17 +67,8 @@ using FramebufferTarget = OpenTK.Graphics.ES20.All;
 using FramebufferAttachment = OpenTK.Graphics.ES20.All;
 using RenderbufferTarget = OpenTK.Graphics.ES20.All;
 using RenderbufferStorage = OpenTK.Graphics.ES20.All;
-#else
-using BufferUsageHint = OpenTK.Graphics.ES20.BufferUsage;
 #endif
 
-#endif
-
-#endif
-
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Input.Touch;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -151,25 +123,17 @@ namespace Microsoft.Xna.Framework.Graphics
         protected SharpDX.DXGI.SwapChain1 _swapChain;
 
         protected float _dpi;
-#else
+
+#elif OPENGL
+
         private uint VboIdArray;
         private uint VboIdElement;
         private All _preferedFilter;
+
 #endif
 
-        //OpenGL ES 1.1 extension consts
-#if (IPHONE || ANDROID) && ES11
-		const FramebufferTarget GLFramebuffer = FramebufferTarget.FramebufferOes;
-		const RenderbufferTarget GLRenderbuffer = RenderbufferTarget.RenderbufferOes;
-		const FramebufferAttachment GLDepthAttachment = FramebufferAttachment.DepthAttachmentOes;
-		const FramebufferAttachment GLStencilAttachment = FramebufferAttachment.StencilAttachmentOes;
-		const FramebufferAttachment GLColorAttachment0 = FramebufferAttachment.ColorAttachment0Oes;
-		const GetPName GLFramebufferBinding = GetPName.FramebufferBindingOes;
-		const RenderbufferStorage GLDepthComponent16 = RenderbufferStorage.DepthComponent16Oes;
-		const RenderbufferStorage GLDepthComponent24 = RenderbufferStorage.DepthComponent24Oes;
-		const RenderbufferStorage GLDepth24Stencil8 = RenderbufferStorage.Depth24Stencil8Oes;
-		const FramebufferErrorCode GLFramebufferComplete = FramebufferErrorCode.FramebufferCompleteOes;
-#elif IPHONE || ANDROID
+
+#if GLES
 		const FramebufferTarget GLFramebuffer = FramebufferTarget.Framebuffer;
 		const RenderbufferTarget GLRenderbuffer = RenderbufferTarget.Renderbuffer;
 		const FramebufferAttachment GLDepthAttachment = FramebufferAttachment.DepthAttachment;
@@ -180,7 +144,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		const RenderbufferStorage GLDepthComponent24 = RenderbufferStorage.DepthComponent24Oes;
 		const RenderbufferStorage GLDepth24Stencil8 = RenderbufferStorage.Depth24Stencil8Oes;
 		const FramebufferErrorCode GLFramebufferComplete = FramebufferErrorCode.FramebufferComplete;
-#elif !WINRT
+#elif OPENGL
 		const FramebufferTarget GLFramebuffer = FramebufferTarget.FramebufferExt;
 		const RenderbufferTarget GLRenderbuffer = RenderbufferTarget.RenderbufferExt;
 		const FramebufferAttachment GLDepthAttachment = FramebufferAttachment.DepthAttachmentExt;
@@ -212,13 +176,15 @@ namespace Microsoft.Xna.Framework.Graphics
 				_rasterizerState = value;
 
 #if WINRT
-#else
+
+#elif OPENGL
 				GLStateManager.SetRasterizerStates(value, GetRenderTargets().Length > 0);
 #endif
             }
 		}
-		
+
 #if WINRT
+
         internal float Dpi
         {
             get { return _dpi; }
@@ -234,7 +200,9 @@ namespace Microsoft.Xna.Framework.Graphics
                     //OnDpiChanged(this);
             }
         }
-#else
+
+#elif OPENGL
+
         internal All PreferedFilter
         {
             get
@@ -292,8 +260,8 @@ namespace Microsoft.Xna.Framework.Graphics
         internal void Initialize()
         {			
             // Setup extensions.
-#if !WINRT
-#if IPHONE || ANDROID
+#if OPENGL
+#if GLES
 			extensions.AddRange(GL.GetString(RenderbufferStorage.Extensions).Split(' '));
 #else
 			extensions.AddRange(GL.GetString(StringName.Extensions).Split(' '));	
@@ -302,7 +270,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			System.Diagnostics.Debug.WriteLine("Supported extensions:");
 			foreach (string extension in extensions)
 				System.Diagnostics.Debug.WriteLine(extension);
-#endif
+
+#endif // OPENGL
 
             PresentationParameters.DisplayOrientation = TouchPanel.DisplayOrientation;
 
@@ -311,24 +280,21 @@ namespace Microsoft.Xna.Framework.Graphics
             CreateDeviceResources();
             Dpi = DisplayProperties.LogicalDpi;
             CreateSizeDependentResources();
-#elif ES11
-			//Is this needed?
-			GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)All.BlendSrc);
-#endif
 
 			BlendState = BlendState.Opaque;
 			DepthStencilState = DepthStencilState.Default;
 			RasterizerState = RasterizerState.CullCounterClockwise;
 
-#if !WINRT
+#elif OPENGL
+
             VboIdArray = 0;
             VboIdElement = 0;
-#endif
 
 #if !NOMOJO
             //New graphics context, clear the effect cache
 			Effect.effectObjectCache.Clear ();
 			EffectPass.passthroughVertexShader = null;
+#endif
 #endif
         }
 
@@ -523,13 +489,15 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #endif // WINRT
 
-        public BlendState BlendState {
+        public BlendState BlendState 
+        {
 			get { return _blendState; }
-			set { 
+			set 
+            { 
 				// ToDo check for invalid state
 				_blendState = value;
 #if WINRT
-#else
+#elif OPENGL
 				GLStateManager.SetBlendStates(value);
 #endif
             }
@@ -542,7 +510,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 _depthStencilState = value;
 #if WINRT
-#else
+#elif OPENGL
 				GLStateManager.SetDepthStencilState(value);
 #endif
             }
@@ -589,8 +557,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 flags |= SharpDX.Direct3D11.DepthStencilClearFlags.Stencil;
 
             if (flags != 0 && _depthStencilView != null)
-                _d3dContext.ClearDepthStencilView(_depthStencilView, flags, depth, (byte)stencil); 
-#else
+                _d3dContext.ClearDepthStencilView(_depthStencilView, flags, depth, (byte)stencil);
+#elif OPENGL
 			GL.ClearColor (color.X, color.Y, color.Z, color.W);
 
 			ClearBufferMask bufferMask = 0;
@@ -606,13 +574,13 @@ namespace Microsoft.Xna.Framework.Graphics
 				bufferMask = bufferMask | ClearBufferMask.DepthBufferBit;
 			}
 
-#if IPHONE || ANDROID
+#if GLES
 			GL.Clear ((uint)bufferMask);
 #else
 			GL.Clear (bufferMask);
 #endif
 #endif
-		}
+        }
 		
         public void Clear(ClearOptions options, Color color, float depth, int stencil, Rectangle[] regions)
         {
@@ -730,7 +698,7 @@ namespace Microsoft.Xna.Framework.Graphics
 						
 #elif ANDROID
 			platform.Present();
-#else
+#elif OPENGL
 			GL.Flush ();
 #endif
         }
@@ -806,8 +774,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 _viewport = value;
 #if WINRT
                 var viewport = new SharpDX.Direct3D11.Viewport(_viewport.X, _viewport.Y, (float)_viewport.Width, (float)_viewport.Height, _viewport.MinDepth, _viewport.MaxDepth);
-                _d3dContext.Rasterizer.SetViewports(viewport); 
-#else
+                _d3dContext.Rasterizer.SetViewports(viewport);
+#elif OPENGL
 				GL.Viewport (value.X, value.Y, value.Width, value.Height);
 				GL.DepthRange(value.MinDepth, value.MaxDepth);
 #endif
@@ -840,7 +808,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 _scissorRectangle = value;
 
 #if WINRT
-#else			
+#elif OPENGL		
 				GLStateManager.SetScissor(_scissorRectangle);				
 				_scissorRectangle.Y = _viewport.Height - _scissorRectangle.Y - _scissorRectangle.Height;
 #endif
@@ -877,7 +845,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			if (this.currentRenderTargetBindings == null || this.currentRenderTargetBindings.Length == 0)
 			{
 #if WINRT
-#else
+#elif OPENGL
 				GL.BindFramebuffer(GLFramebuffer, 0);
 #endif
                 this.Viewport = new Viewport(0, 0,
@@ -887,10 +855,10 @@ namespace Microsoft.Xna.Framework.Graphics
 			else
 			{
 #if WINRT
-#else
+#elif OPENGL
 				if (this.glFramebuffer == 0)
 				{
-#if IPHONE || ANDROID
+#if GLES
 					GL.GenFramebuffers(1, ref this.glFramebuffer);
 #else
 					GL.GenFramebuffers(1, out this.glFramebuffer);
@@ -924,7 +892,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				}
 				this.Viewport = new Viewport(0, 0, renderTarget.Width, renderTarget.Height);
 #endif
-			}
+            }
 			
 			if (previousRenderTargetBindings != null)
 			{
@@ -944,7 +912,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 
 #if WINRT
-#else
+#elif OPENGL
 			//Reset the cull mode, because we flip verticies when rendering offscreen
 			//and thus flip the cull direction
 			GLStateManager.Cull (RasterizerState, GetRenderTargets().Length > 0);
@@ -963,26 +931,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
         }
 
-#if IPHONE || ANDROID
-        internal All PrimitiveTypeGL(PrimitiveType primitiveType)
-        {
-            switch (primitiveType)
-            {
-                case PrimitiveType.LineList:
-                    return All.Lines;
-                case PrimitiveType.LineStrip:
-                    return All.LineStrip;
-                case PrimitiveType.TriangleList:
-                    return All.Triangles;
-                case PrimitiveType.TriangleStrip:
-                    return All.TriangleStrip;
-            }
-
-            throw new NotImplementedException();
-        }
-#elif WINRT
-        
-#else
+#if OPENGL
         internal BeginMode PrimitiveTypeGL(PrimitiveType primitiveType)
         {
             switch (primitiveType)
@@ -1010,7 +959,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 _d3dContext.InputAssembler.SetVertexBuffers(0, _vertexBuffer._binding);
             else
                 _d3dContext.InputAssembler.SetVertexBuffers(0, null);
-#else
+#elif OPENGL
             if (_vertexBuffer != null)
                 GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBuffer.vbo);
 #endif
@@ -1026,7 +975,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     _indexBuffer._buffer, 
                     _indexBuffer.IndexElementSize == IndexElementSize.SixteenBits ? SharpDX.DXGI.Format.R16_UInt : SharpDX.DXGI.Format.R32_UInt,
                     0 );
-#else
+#elif OPENGL
 			if (_indexBuffer != null)
                 GL.BindBuffer(BufferTarget.ElementArrayBuffer, _indexBuffer.ibo);
 #endif
@@ -1042,7 +991,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				throw new NotImplementedException ("minVertexIndex > 0 is supported");
 
 #if WINRT
-#else
+#elif OPENGL
 			var indexElementType = DrawElementsType.UnsignedShort;
 			var indexElementSize = 2;
 			var indexOffsetInBytes = (IntPtr)(startIndex * indexElementSize);
@@ -1063,13 +1012,13 @@ namespace Microsoft.Xna.Framework.Graphics
         public void DrawUserPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int primitiveCount) where T : struct, IVertexType
         {
 #if WINRT
-#else
+#elif OPENGL
             // Unbind the VBOs
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
 
             //Create VBO if not created already
-#if IPHONE || ANDROID
+#if GLES
             if (VboIdArray == 0)
                 GL.GenBuffers(1, ref VboIdArray);
 #else
@@ -1110,10 +1059,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void DrawPrimitives(PrimitiveType primitiveType, int vertexStart, int primitiveCount)
         {
-			_vertexBuffer.VertexDeclaration.Apply ();
+			_vertexBuffer.VertexDeclaration.Apply();
 
 #if WINRT
-#else
+#elif OPENGL
 			GL.DrawArrays(PrimitiveTypeGL(primitiveType),
 			              vertexStart,
 			              GetElementCountArray(primitiveType,primitiveCount));
@@ -1123,13 +1072,13 @@ namespace Microsoft.Xna.Framework.Graphics
         public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int vertexCount, short[] indexData, int indexOffset, int primitiveCount) where T : struct, IVertexType
         {
 #if WINRT
-#else
+#elif OPENGL
             // Unbind the VBOs
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
 
             //Create VBO if not created already
-#if IPHONE  || ANDROID
+#if GLES
 			if (VboIdArray == 0)
                 GL.GenBuffers(1, ref VboIdArray);
             if (VboIdElement == 0)
@@ -1186,13 +1135,13 @@ namespace Microsoft.Xna.Framework.Graphics
         public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int vertexCount, int[] indexData, int indexOffset, int primitiveCount) where T : struct, IVertexType
         {
 #if WINRT
-#else
+#elif OPENGL
             // Unbind the VBOs
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
 
             //Create VBO if not created already
-#if IPHONE || ANDROID
+#if GLES
 			if (VboIdArray == 0)
                 GL.GenBuffers(1, ref VboIdArray);
             if (VboIdElement == 0)
