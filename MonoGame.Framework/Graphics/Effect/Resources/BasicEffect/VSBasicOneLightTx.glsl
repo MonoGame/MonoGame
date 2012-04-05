@@ -32,11 +32,12 @@ void main()
 
 	vec3 Half = normalize(-DirLight0Direction + eyeVector);    
     float d = dot(worldNormal,Half);
-    float specularVal = pow(d, SpecularPower);
+    float specularVal = pow( max(d, 0), SpecularPower);
 	gl_Position =  WorldViewProj * Position;
 	
    	Diffuse  = vec4((DirLight0DiffuseColor * diffuse) * DiffuseColor.rgb + EmissiveColor, DiffuseColor.a);
     Specular = vec4((DirLight0SpecularColor * specularVal) * SpecularColor, clamp(dot(Position, FogVector), 0.0, 1.0));
     TexCoord = TextureCoordinate;
+	
 }
 
