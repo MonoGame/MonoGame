@@ -287,7 +287,6 @@
     <Compile Include="Graphics\SpriteFont.cs" />
     <Compile Include="Graphics\SpriteSortMode.cs" />
     <Compile Include="Graphics\SurfaceFormat.cs" />
-    <Compile Include="Graphics\SwapEffect.cs" />
     <Compile Include="Graphics\TextureUsage.cs" />
     <Compile Include="Graphics\Viewport.cs" />
     <Compile Include="Input\Touch\GestureSample.cs" />

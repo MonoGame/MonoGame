@@ -151,7 +151,6 @@
     <Compile Include="Graphics\RenderTarget.cs" />
     <Compile Include="Graphics\SurfaceFormat.cs" />
     <Compile Include="Graphics\MultiSampleType.cs" />
-    <Compile Include="Graphics\SwapEffect.cs" />
     <Compile Include="Graphics\RenderTargetUsage.cs" />
     <Compile Include="Graphics\TextureUsage.cs" />
     <Compile Include="Graphics\SetDataOptions.cs" />

@@ -156,7 +156,6 @@
     <Compile Include="Graphics\RenderTarget.cs" />
     <Compile Include="Graphics\SurfaceFormat.cs" />
     <Compile Include="Graphics\MultiSampleType.cs" />
-    <Compile Include="Graphics\SwapEffect.cs" />
     <Compile Include="Graphics\RenderTargetUsage.cs" />
     <Compile Include="Graphics\TextureUsage.cs" />
     <Compile Include="Graphics\SetDataOptions.cs" />
@@ -354,7 +353,6 @@
     <Compile Include="Graphics\Effect\AlphaTestEffect.cs" />
     <Compile Include="Graphics\Effect\GLSLOptimizer.cs" />
     <Compile Include="Graphics\GraphicsAdapter.cs" />
-    <Compile Include="Graphics\PresentationParameters.cs" />
     <Compile Include="Graphics\SpriteBatcher.cs" />
     <Compile Include="Content\ContentReaders\Texture2DReader.cs" />
     <Compile Include="Graphics\SpriteBatch.cs" />
