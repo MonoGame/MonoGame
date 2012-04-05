@@ -1,11 +1,11 @@
-uniform mat4 MatrixTransform;
+uniform highp mat4 MatrixTransform;
 
-attribute vec4 Position;
-attribute vec4 Color;
-attribute vec2 TextureCoordinate;
+attribute highp vec4 Position;
+attribute lowp vec4 Color;
+attribute mediump vec2 TextureCoordinate;
 
-varying vec4 Diffuse;
-varying vec2 TexCoord;
+varying lowp vec4 Diffuse;
+varying mediump vec2 TexCoord;
 
 void main()
 {

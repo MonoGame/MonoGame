@@ -73,7 +73,7 @@
     <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
     <BaseAddress>4194304</BaseAddress>
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <DefineConstants>TRACE;WINDOWS;NOMOJO</DefineConstants>
+    <DefineConstants>TRACE;WINDOWS</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Platform)' == 'x86' ">
     <PlatformTarget>x86</PlatformTarget>

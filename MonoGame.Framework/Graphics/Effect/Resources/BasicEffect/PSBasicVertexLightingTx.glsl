@@ -1,13 +1,13 @@
-uniform sampler2D Texture;
-uniform vec3 FogColor;
+uniform lowp sampler2D Texture;
+uniform lowp vec3 FogColor;
 
-varying vec4 Diffuse;
-varying vec4 Specular;
-varying vec2 TexCoord;
+varying lowp vec4 Diffuse;
+varying lowp vec4 Specular;
+varying mediump vec2 TexCoord;
 
 void main()
 {
-    vec4 color = texture2D(Texture, TexCoord) * Diffuse;
+    lowp vec4 color = texture2D(Texture, TexCoord) * Diffuse;
     color.rgb += Specular.rgb * color.a;
     color.rgb = mix(color.rgb, FogColor * color.a, Specular.w);
     

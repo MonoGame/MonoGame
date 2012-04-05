@@ -1,4 +1,4 @@
-varying vec4 Diffuse;
+varying lowp vec4 Diffuse;
 
 void main()
 {
