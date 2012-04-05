@@ -75,6 +75,7 @@ using MonoTouch.OpenGLES;
 using MonoTouch.UIKit;
 
 using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
 
@@ -101,13 +102,16 @@ namespace Microsoft.Xna.Framework
 
             _applicationObservers = new List<NSObject>();
 
+            UIApplication.SharedApplication.SetStatusBarHidden(true, UIStatusBarAnimation.Fade);
+
             // Create a full-screen window
-            _mainWindow = new UIWindow(UIScreen.MainScreen.Bounds);
-            game.Services.AddService(typeof(UIWindow), _mainWindow);
+            _mainWindow = new UIWindow (UIScreen.MainScreen.Bounds);
+            game.Services.AddService (typeof(UIWindow), _mainWindow);
 
             _viewController = new iOSGameViewController(this);
             _viewController.InterfaceOrientationChanged += ViewController_InterfaceOrientationChanged;
-            Window = new iOSGameWindow(_viewController);
+            game.Services.AddService (typeof(UIViewController), _viewController);
+            Window = new iOSGameWindow (_viewController);
 
             _mainWindow.RootViewController = _viewController;
             _mainWindow.Add (_viewController.View);
@@ -156,6 +160,16 @@ namespace Microsoft.Xna.Framework
             base.BeforeInitialize ();
             _viewController.View.MakeCurrent ();
             TouchPanel.Reset();
+
+            // HACK: Because GraphicsDevice doesn't know anything, we need to
+            //       tell it the current viewport size.  Once GraphicsDevice is
+            //       capable of querying PresentationParameters
+            //       DeviceWindowHandle for the size, this will no longer be
+            //       needed.
+            var gds = (IGraphicsDeviceService)Game.Services.GetService(typeof(IGraphicsDeviceService));
+            if (gds != null && gds.GraphicsDevice != null) {
+                gds.GraphicsDevice.Viewport = new Viewport(0, 0, Window.ClientBounds.Width, Window.ClientBounds.Height);
+            }
         }
 
         public override void RunLoop()
@@ -173,10 +187,13 @@ namespace Microsoft.Xna.Framework
 
             _viewController.View.BecomeFirstResponder();
             _runTimer = NSTimer.CreateRepeatingScheduledTimer(Game.TargetElapsedTime, Tick);
-		}
+        }
 
         private void Tick()
         {
+            if (!Game.IsActive)
+                return;
+
             try {
                 if (PerformPendingExit())
                     return;
@@ -186,19 +203,21 @@ namespace Microsoft.Xna.Framework
                 // FIXME: Remove this call, and the whole Tick method, once
                 //        GraphicsDevice is where platform-specific Present
                 //        functionality is actually implemented.  At that
-                //        point, it should be possible to pass Game.Tick directly
-                //        to NSTimer.CreateRepeatingTimer.
+                //        point, it should be possible to pass Game.Tick
+                //        directly to NSTimer.CreateRepeatingTimer.
                 _viewController.View.MakeCurrent();
                 Game.Tick ();
-    
+
                 if (!IsPlayingVideo)
                     _viewController.View.Present ();
 
                 PerformPendingExit();
             } catch (Exception ex) {
+#if DEBUG				
                 Console.WriteLine(
                     "Error while processing the main game loop: {0}\n{1}",
                     ex.Message, ex.StackTrace);
+#endif
                 Game.Exit ();
             }
         }
@@ -214,10 +233,11 @@ namespace Microsoft.Xna.Framework
                 _runTimer.Dispose ();
                 _runTimer = null;
             }
+            UIApplication.SharedApplication.SetStatusBarHidden(false, UIStatusBarAnimation.Fade);
             StopObservingUIApplication ();
             RaiseAsyncRunLoopEnded ();
             return true;
-         }
+        }
 
         public override bool BeforeDraw(GameTime gameTime)
         {
@@ -326,7 +346,7 @@ namespace Microsoft.Xna.Framework
         #endregion Notification Handling
 
 		private void ViewController_InterfaceOrientationChanged (object sender, EventArgs e)
-        {
+		{
 			var orientation = OrientationConverter.ToDisplayOrientation (
 				_viewController.InterfaceOrientation);
 
@@ -336,13 +356,13 @@ namespace Microsoft.Xna.Framework
 			var gdm = (GraphicsDeviceManager) Game.Services.GetService (typeof (IGraphicsDeviceManager));
 
 			if (gdm != null) {
-            var presentParams = gdm.GraphicsDevice.PresentationParameters;
-                presentParams.BackBufferWidth = gdm.PreferredBackBufferWidth;
-                presentParams.BackBufferHeight = gdm.PreferredBackBufferHeight;
-                presentParams.DisplayOrientation = orientation;
-            }
+				var presentParams = gdm.GraphicsDevice.PresentationParameters;
+				presentParams.BackBufferWidth = gdm.PreferredBackBufferWidth;
+				presentParams.BackBufferHeight = gdm.PreferredBackBufferHeight;
+				presentParams.DisplayOrientation = orientation;
+			}
 			TouchPanel.DisplayOrientation = orientation;
-        }
+		}
 
 		public override void BeginScreenDeviceChange (bool willBeFullScreen)
 		{
@@ -350,6 +370,6 @@ namespace Microsoft.Xna.Framework
 
 		public override void EndScreenDeviceChange (string screenDeviceName, int clientWidth,int clientHeight)
 		{
-		}		
-    }
+		}
+	}
 }

@@ -59,11 +59,11 @@ namespace Microsoft.Xna.Framework.Media
 		// TODO Needed to bind OpenGL to Quicktime private QTVisualContextRef  textureContext;
     	// TODO Needed to grab frame as a texture private CVOpenGLTextureRef  currentFrame;
 		
-        public VideoPlayer(Game game)
+        public VideoPlayer()
         {
 			_state = MediaState.Stopped;
-			_game = game;
-            _platform = (MacGamePlatform)game.Services.GetService(typeof(MacGamePlatform));
+			_game = Game.Instance;
+            _platform = (MacGamePlatform)_game.Services.GetService(typeof(MacGamePlatform));
         }
 
         public Texture2D GetTexture()

@@ -99,7 +99,7 @@ namespace Microsoft.Xna.Framework.GamerServices
         {
             spriteBatch.Begin();//SpriteSortMode.Immediate, BlendState.AlphaBlend);
 
-            Vector2 center = new Vector2(this.Game.GraphicsDevice.PresentationParameters.BackBufferWidth / 2, this.Game.GraphicsDevice.PresentationParameters.BackBufferHeight - 100);
+            Vector2 center = new Vector2(this.Game.GraphicsDevice.Viewport.Width / 2, this.Game.GraphicsDevice.Viewport.Height - 100);
             Vector2 loc = Vector2.Zero;
             alphaColor.A = startalpha;
             for (int i = 0; i < 12; i++)
@@ -116,6 +116,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 
         TimeSpan gt = TimeSpan.Zero;
         TimeSpan last = TimeSpan.Zero;
+		int delay = 2;
 
         public override void Update(GameTime gameTime)
         {
@@ -127,7 +128,7 @@ namespace Microsoft.Xna.Framework.GamerServices
                 startalpha += 255 / 12;
             }
 
-            if ((gameTime.TotalGameTime - gt).TotalSeconds > 5) // close after 10 seconds
+            if ((gameTime.TotalGameTime - gt).TotalSeconds > delay) // close after 10 seconds
             {
 				
 				string name = "androiduser";

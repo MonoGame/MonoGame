@@ -47,7 +47,7 @@ using System.Linq;
 //For laoding from resources
 using System.Reflection;
 
-#if WINDOWS
+#if !WINRT
 using OpenTK.Graphics.OpenGL;
 #elif IPHONE || ANDROID
 using OpenTK.Graphics.ES20;

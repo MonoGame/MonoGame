@@ -158,6 +158,8 @@ namespace Microsoft.Xna.Framework
 			} else {
 				_graphicsDevice.PreferedFilter = All.Nearest;
 			}
+
+            ApplyChanges();
 		}
 
 		public void ToggleFullScreen ()
@@ -247,6 +249,11 @@ namespace Microsoft.Xna.Framework
 				_supportedOrientations = value;
 			}
 		}
+
+        internal void ResetClientBounds()
+        {
+            // do nothing for now
+        }
 
 	}
 }

@@ -457,7 +457,6 @@ namespace Microsoft.Xna.Framework {
 				_previousPinchPositions [1] = position1;
 			}
 		}
-		
 
 		#endregion Gestures
 	}

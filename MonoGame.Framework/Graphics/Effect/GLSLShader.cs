@@ -64,6 +64,11 @@ namespace Microsoft.Xna.Framework.Graphics
             glslCode = glslCode.Replace("lowp ", "");
             glslCode = glslCode.Replace("mediump ", "");
             glslCode = glslCode.Replace("highp ", "");
+			
+#else
+			glslCode = @"precision mediump float;
+			 precision mediump int;
+			"+glslCode;
 #endif
 
             shaderHandle = CreateAndCompileShaderFromSource(shaderType, glslCode);

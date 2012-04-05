@@ -102,6 +102,8 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public class GraphicsDevice : IDisposable
     {
+        internal GamePlatform platform;
+
         private int _activeTexture = -1;
         private Viewport _viewport;
 
@@ -723,6 +725,9 @@ namespace Microsoft.Xna.Framework.Graphics
                     throw;
                 */
             }
+						
+#elif ANDROID
+			platform.Present();
 #else
 			GL.Flush ();
 #endif
@@ -1004,7 +1009,7 @@ namespace Microsoft.Xna.Framework.Graphics
             else
                 _d3dContext.InputAssembler.SetVertexBuffers(0, null);
 #else
-            if ( _vertexBuffer != null )
+            if (_vertexBuffer != null)
                 GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBuffer.vbo);
 #endif
         }

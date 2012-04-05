@@ -160,6 +160,7 @@
     <Compile Include="Graphics\ModelMeshPartCollection.cs" />
     <Compile Include="Graphics\PackedVector\HalfSingle.cs" />
     <Compile Include="Graphics\PackedVector\HalfTypeHelper.cs" />
+    <Compile Include="Graphics\PackedVector\HalfVector2.cs" />
     <Compile Include="Graphics\PackedVector\NormalizedShort2.cs" />
     <Compile Include="Graphics\PackedVector\NormalizedShort4.cs" />
     <Compile Include="Graphics\PresentationParameters.cs" />
@@ -471,10 +472,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\ThirdParty\Libs\libmojoshader.dll">
-      <Link>libmojoshader.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <EmbeddedResource Include="Graphics\Effect\AlphaTestEffect.bin" />
     <EmbeddedResource Include="Graphics\Effect\BasicEffect.bin" />
     <EmbeddedResource Include="Graphics\Effect\DualTextureEffect.bin" />
@@ -528,5 +525,14 @@
     <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect\VSAlphaTestVc.glsl" />
     <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect\VSAlphaTestVcNoFog.glsl" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="..\ThirdParty\Libs\libmojoshader_64.dll">
+      <Link>libmojoshader_64.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+	<None Include="..\ThirdParty\Libs\libmojoshader_32.dll">
+      <Link>libmojoshader_32.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>

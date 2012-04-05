@@ -61,18 +61,6 @@ namespace Microsoft.Xna.Framework
 #endif
         }
 
-        internal static Stream OpenDataStream(string name)
-        {
-#if WINRT
-            var localFolder = ApplicationData.Current.LocalFolder;
-            var file = localFolder.GetFileAsync(name).GetResults();
-            var stream = file.OpenReadAsync().GetResults();
-            return stream.AsStreamForRead();
-#else
-            return new FileStream(name, FileMode.Open, FileAccess.Read, FileShare.Read);
-#endif
-        }
-
         internal static string GetFilename(string name)
         {
 #if WINRT
