@@ -80,7 +80,6 @@ namespace Microsoft.Xna.Framework
 		public void CreateDevice ()
 		{
 			_graphicsDevice = new GraphicsDevice ();
-			_graphicsDevice.PresentationParameters = new PresentationParameters ();
 
 			Initialize();
 			
@@ -154,9 +153,7 @@ namespace Microsoft.Xna.Framework
 
 		public void ApplyChanges ()
 		{
-			PresentationParameters parms = _graphicsDevice.PresentationParameters;
-			parms.IsFullScreen = wantFullScreen;
-			_graphicsDevice.PresentationParameters = parms;
+            _graphicsDevice.PresentationParameters.IsFullScreen = wantFullScreen;
 
 			if (_preferMultiSampling) {
 				_graphicsDevice.PreferedFilter = All.Linear;
@@ -165,20 +162,19 @@ namespace Microsoft.Xna.Framework
 			}
 
 			_game.applyChanges(this);
-
 		}
 
 		private void Initialize ()
 		{
-			PresentationParameters parms = _graphicsDevice.PresentationParameters;
-			parms.IsFullScreen = wantFullScreen;
-			_graphicsDevice.PresentationParameters = parms;
+            _graphicsDevice.PresentationParameters.IsFullScreen = wantFullScreen;
 
 			if (_preferMultiSampling) {
 				_graphicsDevice.PreferedFilter = All.Linear;
 			} else {
 				_graphicsDevice.PreferedFilter = All.Nearest;
 			}
+
+            _graphicsDevice.Initialize();
 		}
 
 		public void ToggleFullScreen ()
