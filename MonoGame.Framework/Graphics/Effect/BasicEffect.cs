@@ -455,45 +455,33 @@ namespace Microsoft.Xna.Framework.Graphics
 
         #region Methods
 
-#if NOMOJO
-        public BasicEffect(GraphicsDevice device)
-            : base(device,
-                BasicEffect.vertexShaderFilenames,
-                BasicEffect.fragmentShaderFilenames,
-                BasicEffect.programIndices)
-        {
-
-            Initialize();
-
-            CacheEffectParameters(null);
-
-            Techniques.Add(new EffectTechnique(this));
-
-            DirectionalLight0.Enabled = true;
-
-            SpecularColor = Vector3.One;
-            SpecularPower = 16;
-        }
-#else
         /// <summary>
         /// Creates a new BasicEffect with default parameter settings.
         /// </summary>
         public BasicEffect(GraphicsDevice device)
-            : base(device, Effect.LoadEffectResource("BasicEffect"))
+            : base(device,
+#if NOMOJO
+                BasicEffect.vertexShaderFilenames,
+                BasicEffect.fragmentShaderFilenames,
+                BasicEffect.programIndices
+#else
+                Effect.LoadEffectResource("BasicEffect")
+#endif
+            )
         {
+            Initialize();
+
             CacheEffectParameters(null);
 
             DirectionalLight0.Enabled = true;
-
             SpecularColor = Vector3.One;
             SpecularPower = 16;
         }
-#endif
-
 
         internal override void Initialize()
         {
-#if !WINRT
+#if NOMOJO
+
             textureParam = new EffectParameter(ActiveUniformType.Sampler2D, "Texture");
             Parameters.Add(textureParam);
             diffuseColorParam = new EffectParameter(ActiveUniformType.FloatVec4, "DiffuseColor");
@@ -523,7 +511,11 @@ namespace Microsoft.Xna.Framework.Graphics
             Parameters.Add(dirParam1);
             Parameters.Add(dirParam2);
             Parameters.Add(dirParam3);
-#endif
+
+            Techniques.Add(new EffectTechnique(this));
+
+#endif // NOMOJO
+
         }
 
 

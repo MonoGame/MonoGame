@@ -43,8 +43,6 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using System.Linq;
-
-//For laoding from resources
 using System.Reflection;
 
 #if IPHONE || ANDROID
@@ -65,6 +63,12 @@ namespace Microsoft.Xna.Framework.Graphics
 {
 	public class Effect : GraphicsResource
     {
+        public EffectParameterCollection Parameters { get; set; }
+
+        public EffectTechniqueCollection Techniques { get; set; }
+
+        public EffectTechnique CurrentTechnique { get; set; }
+
         internal protected EffectParameter shaderIndexParam;
 
 #if NOMOJO
@@ -74,39 +78,14 @@ namespace Microsoft.Xna.Framework.Graphics
         internal static Dictionary<Type, int[]> programsByType = new Dictionary<Type, int[]>();
         internal int[] shaderIndexLookupTable;
 
-#endif
-
-        public EffectParameterCollection Parameters { get; set; }
-		internal List<EffectParameter> _textureMappings = new List<EffectParameter>();
-
-#if WINRT
-
 #else
+
 		DXEffectObject effectObject;
 		GLSLEffectObject glslEffectObject;
 
-        internal int CurrentProgram = 0;
-
-		internal static Dictionary<byte[], DXEffectObject> effectObjectCache =
+        internal static Dictionary<byte[], DXEffectObject> effectObjectCache =
 			new Dictionary<byte[], DXEffectObject>(new ByteArrayComparer());
-#endif
 
-        protected Effect (GraphicsDevice graphicsDevice)
-		{
-#if ES11
-			throw new NotSupportedException("Programmable shaders unavailable in OpenGL ES 1.1");
-#endif
-			if (graphicsDevice == null) {
-				throw new ArgumentNullException ("Graphics Device Cannot Be Null");
-			}
-			this.graphicsDevice = graphicsDevice;
-			Techniques = new EffectTechniqueCollection ();
-			Parameters = new EffectParameterCollection();
-		}
-
-        public EffectTechniqueCollection Techniques { get; set; }
-		
-		
 		//cache effect objects so we don't create a bunch of instances
 		//of the same shader
 		//(Some programs create heaps of instances of BasicEffect,
@@ -123,36 +102,88 @@ namespace Microsoft.Xna.Framework.Graphics
 					throw new ArgumentNullException("key");
 				return key.Sum(b => b);
 			}
-		}		
-
-		protected Effect (Effect cloneSource)
-		{
 		}
 
-		internal Effect (GraphicsDevice graphicsDevice, string assetName)
+#endif
+
+#if !WINRT
+        internal int CurrentProgram = 0;
+#endif
+
+        protected Effect (GraphicsDevice graphicsDevice)
+		{
+			if (graphicsDevice == null)
+				throw new ArgumentNullException ("Graphics Device Cannot Be Null");
+
+			this.graphicsDevice = graphicsDevice;
+			Techniques = new EffectTechniqueCollection ();
+			Parameters = new EffectParameterCollection();
+
+            shaderIndexParam = new EffectParameter(ActiveUniformType.Int, "ShaderIndex");
+		}
+			
+		protected Effect (Effect cloneSource)
 		{
 		}
 
 #if NOMOJO
 
-        internal Effect(GraphicsDevice graphicsDevice, string[] vertexShaderFilenames, string[] fragmentShaderFilenames, Tuple<int, int>[] programShaderIndexPairs)
+        internal Effect (GraphicsDevice graphicsDevice, string[] vertexShaderFilenames, string[] fragmentShaderFilenames, Tuple<int, int>[] programShaderIndexPairs)
+            : this(graphicsDevice)
         {
-            if (graphicsDevice == null)
-                throw new ArgumentNullException("Graphics Device Cannot Be Null");
-
-            this.graphicsDevice = graphicsDevice;
-
             var type = this.GetType();
             if (!programsByType.TryGetValue(GetType(), out shaderIndexLookupTable))
                 initializeEffects(vertexShaderFilenames, fragmentShaderFilenames, programShaderIndexPairs);
             
-            this.Parameters = new EffectParameterCollection();
-            this.Techniques = new EffectTechniqueCollection();
-
-            shaderIndexParam = new EffectParameter(ActiveUniformType.Int, "ShaderIndex");
             shaderIndexParam.SetValue(0);
             Parameters.Add(shaderIndexParam);
         }
+
+#else
+
+		public Effect (GraphicsDevice graphicsDevice, byte[] effectCode)
+            : this(graphicsDevice)
+		{
+			uint magic = BitConverter.ToUInt32(effectCode,0);
+
+			//0xBCF00BCF XNA 4 effects
+			//0xFEFF0901 effect too old or too new, or ascii which we can't compile atm
+			//0x6151EFFE GLSL
+
+			if (magic == 0x6151EFFE) {// GLSL shader is to be used from fxg file
+				glslEffectObject = new GLSLEffectObject(effectCode);
+
+				foreach (GLSLEffectObject.glslParameter parameter in glslEffectObject.parameter_handles) {
+					Parameters._parameters.Add (new EffectParameter(parameter));
+				}
+
+				foreach (GLSLEffectObject.glslTechnique technique in glslEffectObject.technique_handles) {
+					Techniques._techniques.Add (new EffectTechnique(this, technique));
+				}
+			}
+			else {
+				//try getting a cached effect object
+				if (!effectObjectCache.TryGetValue(effectCode, out effectObject))
+				{
+					effectObject = new DXEffectObject(effectCode);
+					effectObjectCache.Add (effectCode, effectObject);
+				}
+	
+				foreach (DXEffectObject.d3dx_parameter parameter in effectObject.parameter_handles) {
+					Parameters._parameters.Add (new EffectParameter(parameter));
+				}
+	
+				foreach (DXEffectObject.d3dx_technique technique in effectObject.technique_handles) {
+					Techniques._techniques.Add (new EffectTechnique(this, technique));
+				}
+			}
+
+            CurrentTechnique = Techniques[0];			
+		}
+
+#endif
+
+#if NOMOJO
 
         private void initializeEffects(string[] vertexShaderFilenames, string[] fragmentShaderFilenames, Tuple<int, int>[] programShaderIndexPairs)
         {
@@ -180,74 +211,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 shaderObjectLookup.Add(shaderIndexLookupTable[i], new GLSLShader[2] { vertexShaders[programShaderIndexPair.Item1], fragmentShaders[programShaderIndexPair.Item2] });
             }
         }
-#endif //NOMOJO
 
-        internal virtual void Initialize()
-        {
-
-        }
-
-		public Effect (
-			GraphicsDevice graphicsDevice,
-			byte[] effectCode)
-		{
-#if ES11
-			throw new NotSupportedException("Programmable shaders unavailable in OpenGL ES 1.1");
-#endif // ES11
-
-			if (graphicsDevice == null) {
-				throw new ArgumentNullException ("Graphics Device Cannot Be Null");
-			}
-			this.graphicsDevice = graphicsDevice;
-
-#if WINRT
-
-#else
-            shaderIndexParam = new EffectParameter(ActiveUniformType.Int, "ShaderIndex");
-
-			uint magic = BitConverter.ToUInt32(effectCode,0);
-
-			//0xBCF00BCF XNA 4 effects
-			//0xFEFF0901 effect too old or too new, or ascii which we can't compile atm
-			//0x6151EFFE GLSL
-
-			if (magic == 0x6151EFFE) {// GLSL shader is to be used from fxg file
-				glslEffectObject = new GLSLEffectObject(effectCode);
-
-				Parameters = new EffectParameterCollection();
-				foreach (GLSLEffectObject.glslParameter parameter in glslEffectObject.parameter_handles) {
-					Parameters._parameters.Add (new EffectParameter(parameter));
-				}
-
-				Techniques = new EffectTechniqueCollection();
-				foreach (GLSLEffectObject.glslTechnique technique in glslEffectObject.technique_handles) {
-					Techniques._techniques.Add (new EffectTechnique(this, technique));
-				}
-			}
-			else {
-				//try getting a cached effect object
-				if (!effectObjectCache.TryGetValue(effectCode, out effectObject))
-				{
-					effectObject = new DXEffectObject(effectCode);
-					effectObjectCache.Add (effectCode, effectObject);
-				}
-	
-				Parameters = new EffectParameterCollection();
-				foreach (DXEffectObject.d3dx_parameter parameter in effectObject.parameter_handles) {
-					Parameters._parameters.Add (new EffectParameter(parameter));
-				}
-	
-				Techniques = new EffectTechniqueCollection();
-				foreach (DXEffectObject.d3dx_technique technique in effectObject.technique_handles) {
-					Techniques._techniques.Add (new EffectTechnique(this, technique));
-				}
-			}
-
-#endif // WINRT
-            CurrentTechnique = Techniques[0];			
-		}
-
-#if !WINRT
         private int CreateProgram(GLSLShader glVertexShader, GLSLShader glFragmentShader)
         {
             var glProgram = GL.CreateProgram();
@@ -294,100 +258,30 @@ namespace Microsoft.Xna.Framework.Graphics
             return glProgram;
         }
 
-        private int CreateShader(ShaderType shaderType, string filePath)
-        {
-            var assembly = typeof(Effect).Assembly;//Assembly assembly = Assembly.GetExecutingAssembly();
-            var stream = assembly.GetManifestResourceStream(filePath);
-            StreamReader streamReader = new StreamReader(stream);
-            string glslCode = streamReader.ReadToEnd();
-            streamReader.Close();
+#else
 
-#if ES11
-			if (shaderType == ShaderType.VertexShader) {
-				foreach (MojoShader.MOJOSHADER_attribute attrb in attributes) {
-					switch (attrb.usage) {
+		internal static byte[] LoadEffectResource(string name)
+		{
+            var assembly = typeof(Effect).Assembly;
 
-					//use builtin attributes in GL 1.1
-					case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_COLOR:
-						glslCode = glslCode.Replace ("attribute vec4 "+attrb.name+";",
-						                               "#define "+attrb.name+" gl_Color");
-						break;
-					case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_POSITION:
-						glslCode = glslCode.Replace ("attribute vec4 "+attrb.name+";",
-						                               "#define "+attrb.name+" gl_Vertex");
-						break;
-					case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_TEXCOORD:
-						glslCode = glslCode.Replace ("attribute vec4 "+attrb.name+";",
-						                               "#define "+attrb.name+" gl_MultiTexCoord0");
-						break;
-					case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_NORMAL:
-						glslCode = glslCode.Replace ("attribute vec4 "+attrb.name+";",
-						                               "#define "+attrb.name+" gl_Normal");
-						break;
-					default:
-						throw new NotImplementedException();
-					}
-				}
+#if GLSL_EFFECTS
+            name += "GLSL.bin";
+#else
+            name += ".bin";
+#endif
+            var stream = assembly.GetManifestResourceStream("Microsoft.Xna.Framework.Graphics.Effect." + name);
+            using (MemoryStream ms = new MemoryStream())
+			{
+				stream.CopyTo(ms);
+				return ms.ToArray();
 			}
-#endif // ES11
-            int shaderHandle;
+		}
 
-#if GLSLOPTIMIZER
-			//glslCode = GLSLOptimizer.Optimize (glslCode, shaderType);
-#endif // GLSLOPTIMIZER
+#endif
 
-#if IPHONE || ANDROID
-			glslCode = glslCode.Replace("#version 110\n", "");
-			glslCode = "precision mediump float;\nprecision mediump int;\n" + glslCode;
-#endif // IPHOPNE || ANDROID
-            Threading.Begin();
-            try
-            {
-                shaderHandle = GL.CreateShader(shaderType);
-#if IPHONE || ANDROID
-                GL.ShaderSource(shaderHandle, 1, new string[] { glslCode }, (int[])null);
-#else
-                GL.ShaderSource(shaderHandle, glslCode);
-#endif // IPHONE || ANDROID
-                GL.CompileShader(shaderHandle);
-
-                int compiled = 0;
-#if IPHONE || ANDROID
-                GL.GetShader(shaderHandle, ShaderParameter.CompileStatus, ref compiled);
-#else
-                GL.GetShader(shaderHandle, ShaderParameter.CompileStatus, out compiled);
-#endif //IPHONE || ANDROID
-                if (compiled == (int)All.False)
-                {
-#if IPHONE || ANDROID
-                    string log = "";
-                    int length = 0;
-                    GL.GetShader(shaderHandle, ShaderParameter.InfoLogLength, ref length);
-                    if (length > 0)
-                    {
-                        var logBuilder = new StringBuilder(length);
-                        GL.GetShaderInfoLog(shaderHandle, length, ref length, logBuilder);
-                        log = logBuilder.ToString();
-                    }
-#else
-                    string log = GL.GetShaderInfoLog(shaderHandle);
-#endif // IPHONE || ANDROID
-                    Console.WriteLine(log);
-
-                    GL.DeleteShader(shaderHandle);
-                    throw new InvalidOperationException("Shader Compilation Failed");
-                }
-            }
-            finally
-            {
-                Threading.End();
-            }
-            //MojoShader.NativeMethods.MOJOSHADER_freeParseData(parseDataPtr);
-            //TODO: dispose properly - DXPreshader holds unmanaged data
-
-            return shaderHandle;
+        internal virtual void Initialize()
+        {
         }
-#endif // !WINRT
 
 		public virtual Effect Clone ()
 		{
@@ -398,38 +292,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 		}
 
-		public EffectTechnique CurrentTechnique { 
-			get;
-			set; 
-		}
-
 		protected internal virtual void OnApply ()
 		{
-
 		}
-
-		internal static byte[] LoadEffectResource(string name)
-		{
-#if WINRT
-            var assembly = typeof(Effect).GetTypeInfo().Assembly;
-#else
-            var assembly = typeof(Effect).Assembly;
-#endif //WINRT
-
-#if WINRT
-            name += ".hlsl";
-#elif GLSL_EFFECTS
-            name += "GLSL.bin";
-#else
-            name += ".bin";
-#endif // WINRT elif GLSL_EFFECTS
-            var stream = assembly.GetManifestResourceStream("Microsoft.Xna.Framework.Graphics.Effect." + name);
-            using (MemoryStream ms = new MemoryStream())
-			{
-				stream.CopyTo(ms);
-				return ms.ToArray();
-			}
-		}
-
 	}
 }
