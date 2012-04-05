@@ -361,7 +361,11 @@ namespace Microsoft.Xna.Framework.Graphics
         /// Creates a new EnvironmentMapEffect with default parameter settings.
         /// </summary>
         public EnvironmentMapEffect(GraphicsDevice device)
+#if NOMOJO
+            : base(device)
+#else
             : base(device, Effect.LoadEffectResource("EnvironmentMapEffect"))
+#endif
         {
             CacheEffectParameters(null);
 

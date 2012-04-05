@@ -323,7 +323,9 @@ namespace Microsoft.Xna.Framework.Graphics
 #if !WINRT
             VboIdArray = 0;
             VboIdElement = 0;
+#endif
 
+#if !NOMOJO
             //New graphics context, clear the effect cache
 			Effect.effectObjectCache.Clear ();
 			EffectPass.passthroughVertexShader = null;
