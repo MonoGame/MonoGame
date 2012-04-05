@@ -180,8 +180,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 case VertexElementFormat.NormalizedShort4:
                     return VertexAttribPointerType.Short;
-#if MONOMAC
-                case VertexElementFormat.HalfVector2:
+                
+#if MONOMAC || WINDOWS || LINUX
+               case VertexElementFormat.HalfVector2:
                     return VertexAttribPointerType.HalfFloat;
 
                 case VertexElementFormat.HalfVector4:

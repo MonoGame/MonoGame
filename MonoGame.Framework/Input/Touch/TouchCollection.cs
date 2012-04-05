@@ -124,7 +124,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 				TouchLocation location = this[i];
 				if (location.Id == id)
 				{
-					touchLocation = this[i];
+					touchLocation = location;
 					return i;
 				}
 			}
@@ -156,6 +156,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 					return;
 				}
 			}
+
 			Debug.WriteLine("Error: Attempted to mark a non-existent touch {0} as {1}.", id, state);
 			Clear ();
 		}

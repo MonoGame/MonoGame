@@ -66,6 +66,7 @@ non-infringement.
 */
 #endregion
 using System;
+using System.Drawing;
 
 using MonoTouch.UIKit;
 using MonoTouch.Foundation;
@@ -88,7 +89,20 @@ namespace Microsoft.Xna.Framework {
 
 		public override void LoadView ()
 		{
-			base.View = new iOSGameView (_platform);
+			RectangleF frame;
+			if (ParentViewController != null && ParentViewController.View != null) {
+				frame = new RectangleF(PointF.Empty, ParentViewController.View.Frame.Size);
+			} else {
+				UIScreen screen = UIScreen.MainScreen;
+				if (InterfaceOrientation == UIInterfaceOrientation.LandscapeLeft ||
+				    InterfaceOrientation == UIInterfaceOrientation.LandscapeRight) {
+					frame = new RectangleF(0, 0, screen.Bounds.Height, screen.Bounds.Width);
+				} else {
+					frame = new RectangleF(0, 0, screen.Bounds.Width, screen.Bounds.Height);
+				}
+			}
+
+			base.View = new iOSGameView (_platform, frame);
 		}
 
 		public new iOSGameView View {

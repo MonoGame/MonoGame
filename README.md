@@ -1,23 +1,44 @@
-# MonoGame Goes Multi-Plaform : MonoGame 2.0 Released
+# WHAT IS MONOGAME
+MonoGame is an OpenSource, OpenGL implementation of Microsoft's XNA 4 APIs that allows developers to build games that run on Android, iPhone, iPad, MacOS, Linux and soon PlayStation Suite and Windows Metro, all reusing their existing XNA code that runs on Xbox 360 or Windows Phone 7.
 
-MonoGame is an open source implementation of the XNA APIs that allows developers to build 2D games that run on Android, iPhone, iPad, Mac, Linux and Windows using the same code base, or reusing existing XNA code that runs on Xbox 360 or Windows Phone 7.
+# LATEST NEWS
+[Infinite Flight](http://itunes.apple.com/us/app/infinite-flight/id471341991?ls=1&mt=8), MonoGame's first 3D powered game, has been released.
 
-MonoGame 2.0 release is a major evolution of the platform. We went from only supporting the iPhone to becoming a cross-platform stack that now also runs on Android, Mac, Linux and Windows. To help developers get started, more than twenty individual samples and more than five complete starter kits are shipped with this release.
+v2.5 is nearing public release. Stay tuned.
 
-On the iOS platform, MonoGame runs on top of MonoTouch and there are at least eighteen games published on Apple’s AppStore built using the technology. This new release opens the doors for developers to publish games to the Mac AppStore using MonoMac, to Android Market using Mono for Android, and also to Windows and Linux systems using Mono.
+# FEATURED GAMES
+### [Infinite Flight](http://itunes.apple.com/us/app/infinite-flight/id471341991?ls=1&mt=8)
 
-This major advance in the MonoGame platform was made possible by an exponential growth in the number of contributors to the project in the last seven months.   New contributors took over major components of the stack, tuned the performance, added new platforms, tuned the engine and fixed hundreds of bugs to turn MonoGame into a solid 2D gaming platform.
+This awesome flight simulator is now available on the [Apple App Store](http://itunes.apple.com/us/app/infinite-flight/id471341991?ls=1&mt=8). 
 
-A new networking stack allows players on the same network to play with each other.   One player could be running the iOS client, while another one might be using a Mac and another one an Android device. All playing the same game.
+Here are some quotes from people how have played it already....
 
-The latest framework sources can be downloaded from : http://github.com/mono/MonoGame.
+    Looks great, very smooth, very complete. 5/5
+    
+    Wow, this is fantastic. I just finished flying from KLAZ-KSAN and it was amazing. I am really excited for A321,CRJ and all the other planes. X plane has been deleted :)))  5/5
+    
+    This simulator is fantastic!!!! Best yet!! Looking forward to more planes and cockpits :) 5/5
 
-A group of multi-platform XNA Samples can be downloaded from : http://github.com/CartBlanche/MonoGame-Samples
+This is MonoGame's first 3D game and we are very grateful that [Inflight Dev Studio](http://flyingdevstudio.blogspot.co.uk) donated their changes back to our codebase, thus speeding up our 3D implementation immeasurably. 
+
+
+### [Bastion](https://chrome.google.com/webstore/detail/oohphhdkahjlioohbalmicpokoefkgid)
+
+This game has won [numerous awards](http://supergiantgames.com/?p=1286) for its narration and music, when it was released on XBox 360,
+The development team used a modified MonoGame engine to port their game to Google's Native Client and therefore onto Google App Store.
+We are hoping to find out what mods they made to MonoGame and how others could submit their games to Google's App Store.
+
+This is what players had to say about the Google Chrome version of the game...
+
+    I finished the game, it was amazing! A beautiful game with excellent graphic and very interesting story, the voice of the narrator makes a good ambiance in the game 5/5    
+    
+    I've played through this game twice. It's a little laggy on chrome, but this is one of the best games of 2011. It stands toe to toe with Portal 2 and Skyrim. It's that good. 5/5
+    
+    This game is amazing. The post-apocalyptic scenario, the easy-to-use controls, and well, smashing things. It can be really hard sometimes (specially if you are using idols), and you've got to be quick and train at least a little with each weapon to get how to use it properly. They deserved my $15. 5/5
 
 # ROADMAP
-
-    The 2.x series will be released frequently to provide bug fixes and performance optimisations.
-    The 3.x series will extend MonoGame with support for the XNA 3D APIs as well as something we are working on, which we believe the whole MonoGame will love.
+    The 3.x series will extend MonoGame with support for the XNA 4 3D APIs.
+    After 3.x is released work will begin on support for Sony PlayStation Suite SDK and Windows 8/WinRT
 
 # HOW YOU CAN HELP
 

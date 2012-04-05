@@ -171,6 +171,11 @@ namespace Microsoft.Xna.Framework
         {
             IsFullScreen = !IsFullScreen;
         }
+        
+        internal void ResetClientBounds()
+        {
+            
+        }
 
         public Microsoft.Xna.Framework.Graphics.GraphicsDevice GraphicsDevice
         {

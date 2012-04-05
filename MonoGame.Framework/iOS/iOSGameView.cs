@@ -67,6 +67,7 @@ non-infringement.
 #endregion License
 
 using System;
+using System.Drawing;
 
 using MonoTouch.CoreAnimation;
 using MonoTouch.Foundation;
@@ -89,13 +90,14 @@ namespace Microsoft.Xna.Framework {
 		private int _framebuffer;
 
 		#region Construction/Destruction
-		public iOSGameView (iOSGamePlatform platform)
-			: base(UIScreen.MainScreen.Bounds)
+		public iOSGameView (iOSGamePlatform platform, RectangleF frame)
+			: base(frame)
 		{
 			if (platform == null)
 				throw new ArgumentNullException ("platform");
 			_platform = platform;
 			Initialize ();
+			SyncTouchRecognizers ();
 		}
 
 		private void Initialize ()
@@ -214,7 +216,7 @@ namespace Microsoft.Xna.Framework {
 			_glapi.BindFramebuffer (All.Framebuffer, _framebuffer);
 			_glapi.FramebufferRenderbuffer (
 				All.Framebuffer, All.ColorAttachment0, All.Renderbuffer, _renderbuffer);
-
+			
 			var status = _glapi.CheckFramebufferStatus (All.Framebuffer);
 			if (status != All.FramebufferComplete)
 				throw new InvalidOperationException (
@@ -234,15 +236,15 @@ namespace Microsoft.Xna.Framework {
 			var gds = (IGraphicsDeviceService) _platform.Game.Services.GetService (
 				typeof (IGraphicsDeviceService));
 
-			if (gds != null) {
+			if (gds != null && gds.GraphicsDevice != null)
+			{
 				gds.GraphicsDevice.Viewport = new Viewport (
 					0, 0,
 					(int) (Layer.Bounds.Width * Layer.ContentsScale),
 					(int) (Layer.Bounds.Height * Layer.ContentsScale));
-
-				// FIXME: The GraphicsDevice should be in charge of the
-				//        framebuffer.  Pushing the value into it from
-				//        here is messy.
+				
+				// FIXME: These static methods on GraphicsDevice need
+				//        to go away someday.
 				gds.GraphicsDevice.glFramebuffer = _framebuffer;
 			}
 		}

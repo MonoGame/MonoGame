@@ -82,7 +82,11 @@ namespace Microsoft.Xna.Framework.Storage
 	
 	// The delegate must have the same signature as the method
 	// it will call asynchronously.
-	public delegate StorageDevice ShowSelectorAsynchronousShow (PlayerIndex? player, int sizeInBytes, int directoryCount);
+	public delegate StorageDevice ShowSelectorAsynchronousShow (PlayerIndex player, int sizeInBytes, int directoryCount);
+	// The MonoTouch AOT cannot deal with nullable types in a delegate (or
+	// at least not the straightforward implementation), so we define two
+	// delegate types.
+	public delegate StorageDevice ShowSelectorAsynchronousShowNoPlayer (int sizeInBytes, int directoryCount);
 
 	// The delegate must have the same signature as the method
 	// it will call asynchronously.
@@ -241,8 +245,7 @@ namespace Microsoft.Xna.Framework.Storage
 		//     A user-created object used to uniquely identify the request, or null.
 		public static IAsyncResult BeginShowSelector (AsyncCallback callback, object state)
 		{
-			return ShowSelector(null, 0, 0, callback, state);
-
+			return BeginShowSelector (0, 0, callback, state);
 		}
 		//
 		// Summary:
@@ -263,7 +266,7 @@ namespace Microsoft.Xna.Framework.Storage
 		//     A user-created object used to uniquely identify the request, or null.
 		public static IAsyncResult BeginShowSelector (PlayerIndex player, AsyncCallback callback, object state)
 		{
-			return ShowSelector(null, 0, 0, callback, state);
+			return BeginShowSelector (player, 0, 0, callback, state);
 		}
 		//
 		// Summary:
@@ -287,7 +290,8 @@ namespace Microsoft.Xna.Framework.Storage
 		//     A user-created object used to uniquely identify the request, or null.
 		public static IAsyncResult BeginShowSelector (int sizeInBytes, int directoryCount, AsyncCallback callback, object state)
 		{
-			return ShowSelector(null, sizeInBytes, directoryCount, callback, state);
+			var del = new ShowSelectorAsynchronousShowNoPlayer (Show);
+			return del.BeginInvoke(sizeInBytes, directoryCount, callback, state);
 		}
 		
 		//
@@ -317,22 +321,19 @@ namespace Microsoft.Xna.Framework.Storage
 		//     A user-created object used to uniquely identify the request, or null.
 		public static IAsyncResult BeginShowSelector (PlayerIndex player, int sizeInBytes, int directoryCount, AsyncCallback callback, object state)
 		{
-			return ShowSelector(player, sizeInBytes, directoryCount, callback, state);
-		}
-		
-		private static IAsyncResult ShowSelector (PlayerIndex? player, int sizeInBytes, int directoryCount, AsyncCallback callback, object state)
-		{
-			try {
-				ShowSelectorAsynchronousShow AsynchronousShow = new ShowSelectorAsynchronousShow (Show);
-				return AsynchronousShow.BeginInvoke (player, sizeInBytes, directoryCount, callback, state);
-			} finally {
-			}
+			var del = new ShowSelectorAsynchronousShow (Show);
+			return del.BeginInvoke(player, sizeInBytes, directoryCount, callback, state);
 		}
 	
 		// Private method to handle the creation of the StorageDevice
-		private static StorageDevice Show (PlayerIndex? player, int sizeInBytes, int directoryCount) 
+		private static StorageDevice Show (PlayerIndex player, int sizeInBytes, int directoryCount)
 		{
 			return new StorageDevice(player, sizeInBytes, directoryCount);
+		}
+
+		private static StorageDevice Show (int sizeInBytes, int directoryCount)
+		{
+			return new StorageDevice (null, sizeInBytes, directoryCount);
 		}
 		
 		
@@ -384,25 +385,26 @@ namespace Microsoft.Xna.Framework.Storage
 		//     The IAsyncResult returned from BeginShowSelector.
 		public static StorageDevice EndShowSelector (IAsyncResult result) 
 		{
-			StorageDevice returnValue = null;
-			try {
-				// Retrieve the delegate.
-                var asyncResult = result.AsyncState as ShowSelectorAsynchronousShow;
+			// Retrieve the delegate.
+			AsyncResult asyncResult = (AsyncResult)result;
 
+			if (!result.IsCompleted) {
 				// Wait for the WaitHandle to become signaled.
-				result.AsyncWaitHandle.WaitOne ();
-
-				// Call EndInvoke to retrieve the results.
-				if (asyncResult!=null) {
-					returnValue = asyncResult.EndInvoke (result);
-				}	
-			} finally {
-				// Close the wait handle.
-				result.AsyncWaitHandle.Dispose ();	 
+				try {
+					result.AsyncWaitHandle.WaitOne ();
+				} finally {
+					result.AsyncWaitHandle.Close ();
+				}
 			}
-			
-			return returnValue;
 
+			var del = asyncResult.AsyncDelegate;
+
+			if (del is ShowSelectorAsynchronousShow)
+				return (del as ShowSelectorAsynchronousShow).EndInvoke (result);
+			else if (del is ShowSelectorAsynchronousShowNoPlayer)
+				return (del as ShowSelectorAsynchronousShowNoPlayer).EndInvoke (result);
+			else
+				throw new ArgumentException ("result");
 		}
 		
 		internal static string StorageRoot

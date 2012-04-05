@@ -179,7 +179,10 @@ namespace Microsoft.Xna.Framework.Content
                 result = ReadAsset<T>(assetName, null);
 
                 // Cache the result.
-                loadedAssets.Add(assetName, result);
+                if (!loadedAssets.ContainsKey(assetName))
+                {
+                    loadedAssets.Add(assetName, result);
+                }
             }
 			return result;
 		}
@@ -276,13 +279,7 @@ namespace Microsoft.Xna.Framework.Content
 			
 				if ((typeof(T) == typeof(Texture2D)))
 				{
-#if IPHONE
 					using (Stream assetStream = TitleContainer.OpenStream(assetName))
-					
-#else
-					using (Stream assetStream = TitleContainer.OpenDataStream(assetName))
-						
-#endif
 					{
 						Texture2D texture = Texture2D.FromStream(
 							graphicsDeviceService.GraphicsDevice, assetStream);

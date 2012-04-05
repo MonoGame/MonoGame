@@ -229,6 +229,17 @@ namespace Microsoft.Xna.Framework
 		{
 			this.Window.ResetElapsedTime();			
 		}
-					
+
+        public override void Present()
+        {
+            try
+            {
+                Window.SwapBuffers();
+            }
+            catch (Exception ex)
+            {
+                Android.Util.Log.Error("Error in swap buffers", ex.ToString());
+            }
+        }
     }
 }
