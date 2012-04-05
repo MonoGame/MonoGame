@@ -5,13 +5,11 @@ namespace Microsoft.Xna.Framework.Graphics
 	{
         internal static int id = 0;
         internal Effect _effect;
-		string name;
+
         public EffectPassCollection Passes { get; set; }
 		public EffectAnnotationCollection Annotations { get; set; }
 
-#if WINRT
-
-#else
+        public string Name { get; private set; }
 
 #if NOMOJO
 
@@ -21,14 +19,12 @@ namespace Microsoft.Xna.Framework.Graphics
             Passes = new EffectPassCollection(this);
             Annotations = new EffectAnnotationCollection();
 
-            name = string.Format("Technique{0}", ++id);
-
-            //Only supports a single pass.
+            Name = string.Format("{0}.Technique{1}", effect.Name, ++id);
+            
             Passes._passes.Add(new EffectPass(this));
-
-            this.name = effect.Name;
         }
-#endif // NOMOJO
+
+#else
 
         public EffectTechnique(Effect effect, DXEffectObject.d3dx_technique technique)
         {
@@ -36,7 +32,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			Annotations = new EffectAnnotationCollection();
             _effect = effect;
 			
-			name = technique.name;
+			Name = technique.name;
 			
 			for (int i=0; i<technique.pass_count; i++) {
 				Passes._passes.Add (new EffectPass(this, technique.pass_handles[i]));
@@ -49,17 +45,17 @@ namespace Microsoft.Xna.Framework.Graphics
 			Annotations = new EffectAnnotationCollection();
             _effect = effect;
 			
-			name = technique.name;
+			Name = technique.name;
 			
 			for (int i=0; i<technique.pass_count; i++) {
 				Passes._passes.Add (new EffectPass(this, technique.pass_handles[i]));
 			}
         }
-#endif
 		
-		public string Name {
-			get { return name; }
-		}
-	}
+#endif
+
+    }
+
+
 }
 

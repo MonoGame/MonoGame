@@ -15,11 +15,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public EffectPassCollection(EffectTechnique effectTechnique)
         {
-            _effectTechnique = effectTechnique;
-#if NOMOJO
-            _passes.Add(new EffectPass(_effectTechnique));
-#endif
-			
+            _effectTechnique = effectTechnique;		
         }
 
         public EffectPass this[int index]
