@@ -200,9 +200,8 @@ namespace Microsoft.Xna.Framework
         protected virtual void Dispose(bool disposing)
         {
             if (disposing)
-            {
                 Platform.Dispose();
-            }
+
             _isDisposed = true;
         }
 
@@ -638,7 +637,7 @@ namespace Microsoft.Xna.Framework
 
         #endregion Internal Methods
 
-        private GraphicsDeviceManager graphicsDeviceManager
+        internal GraphicsDeviceManager graphicsDeviceManager
         {
             get
             {

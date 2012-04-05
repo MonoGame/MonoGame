@@ -152,10 +152,8 @@ namespace Microsoft.Xna.Framework
             Debug.WriteLine(Message);
         }
 
-        public override void SwapBuffers()
+        public override void Present()
         {
-            base.SwapBuffers();
-
             var device = Game.GraphicsDevice;
             if ( device != null )
                 device.Present();
@@ -168,7 +166,13 @@ namespace Microsoft.Xna.Framework
 		
         protected override void Dispose(bool disposing)
         {
-            _window.Dispose();			
+            // Make sure we dispose the graphics system.
+            var graphicsDeviceManager = Game.graphicsDeviceManager;
+            if (graphicsDeviceManager != null)
+                graphicsDeviceManager.Dispose();
+
+            _window.Dispose();
+			
 			base.Dispose(disposing);
         }
 			

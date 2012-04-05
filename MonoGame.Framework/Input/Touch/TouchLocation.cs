@@ -40,7 +40,6 @@
 
 #region Using clause
 using System;
-using System.Timers;
 #endregion Using clause
 
 namespace Microsoft.Xna.Framework.Input.Touch

@@ -385,6 +385,11 @@ namespace Microsoft.Xna.Framework.Storage
 		//     The IAsyncResult returned from BeginShowSelector.
 		public static StorageDevice EndShowSelector (IAsyncResult result) 
 		{
+#if WINRT
+            throw new NotImplementedException();
+#else
+
+
 			// Retrieve the delegate.
 			AsyncResult asyncResult = (AsyncResult)result;
 
@@ -405,6 +410,7 @@ namespace Microsoft.Xna.Framework.Storage
 				return (del as ShowSelectorAsynchronousShowNoPlayer).EndInvoke (result);
 			else
 				throw new ArgumentException ("result");
+#endif
 		}
 		
 		internal static string StorageRoot
