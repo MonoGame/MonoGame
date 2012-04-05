@@ -59,6 +59,7 @@
     <Compile Include="Android\TitleContainer.cs" />
     <Compile Include="Audio\AudioCategory.cs" />
     <Compile Include="Content\ContentManager.cs" />
+    <Compile Include="Content\ContentExtensions.cs" />    
     <Compile Include="Content\ContentReaders\ArrayReader.cs" />
     <Compile Include="Content\ContentReaders\BoundingFrustumReader.cs" />
     <Compile Include="Content\ContentReaders\BoundingSphereReader.cs" />
