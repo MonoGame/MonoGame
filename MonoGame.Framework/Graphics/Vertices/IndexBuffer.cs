@@ -98,30 +98,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new NotSupportedException("This IndexBuffer was created with a usage type of BufferUsage.WriteOnly. Calling GetData on a resource that was created with BufferUsage.WriteOnly is not supported.");
 
 #if WINRT
-            //using(var stream = new SharpDX.DataStream(sizeInBytes, false, true))
-            {
-                var elementSizeInBytes = IndexElementSize == Graphics.IndexElementSize.SixteenBits ? 2 : 4;
-                var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-                var startBytes = startIndex * elementSizeInBytes;
-                var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
-
-                //stream.WriteRange(data, 0, elementCount);
-                //var box = new SharpDX.DataBox(stream.DataPointer, elementSizeInByte, 0);
-                var box = new SharpDX.DataBox(dataPtr, elementSizeInBytes, 0);
-
-                var region = new SharpDX.Direct3D11.ResourceRegion();
-                region.Top = 0;
-                region.Front = 0;
-                region.Back = 1;
-                region.Bottom = 1;
-                region.Left = offsetInBytes / elementSizeInBytes;
-                region.Right = elementCount;
-
-                // TODO: We need to deal with threaded contexts here!
-                graphicsDevice._d3dContext.UpdateSubresource(box, _buffer, 0, region);
-
-                dataHandle.Free();
-            }
 #else        
             Threading.Begin();
             try
@@ -180,6 +156,30 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new ArgumentNullException("data");
 
 #if WINRT
+            //using(var stream = new SharpDX.DataStream(sizeInBytes, false, true))
+            {
+                var elementSizeInBytes = IndexElementSize == Graphics.IndexElementSize.SixteenBits ? 2 : 4;
+                var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+                var startBytes = startIndex * elementSizeInBytes;
+                var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
+
+                //stream.WriteRange(data, 0, elementCount);
+                //var box = new SharpDX.DataBox(stream.DataPointer, elementSizeInByte, 0);
+                var box = new SharpDX.DataBox(dataPtr, elementSizeInBytes, 0);
+
+                var region = new SharpDX.Direct3D11.ResourceRegion();
+                region.Top = 0;
+                region.Front = 0;
+                region.Back = 1;
+                region.Bottom = 1;
+                region.Left = offsetInBytes / elementSizeInBytes;
+                region.Right = elementCount;
+
+                // TODO: We need to deal with threaded contexts here!
+                graphicsDevice._d3dContext.UpdateSubresource(box, _buffer, 0, region);
+
+                dataHandle.Free();
+            }
 #else
             Threading.Begin();
             try
