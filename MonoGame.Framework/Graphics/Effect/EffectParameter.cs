@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-#if !WINRT
-using OpenTK.Graphics.OpenGL;
-#elif ANDROID || IPHONE
+#if ANDROID || IPHONE
 using OpenTK.Graphics.ES20;
 using ActiveUniformType = OpenTK.Graphics.ES20.All;
+#elif !WINRT
+using OpenTK.Graphics.OpenGL;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
