@@ -88,7 +88,7 @@ namespace Microsoft.Xna.Framework.Audio
 			//buffer should contain 16-bit PCM wave data
 			short bitsPerSample = 16;
 			
-			using( var mStream = new MemoryStream(44+buffer.Length))
+			using (var mStream = new MemoryStream(44+buffer.Length))
             using (var writer = new BinaryWriter(mStream))
             {
                 writer.Write("RIFF".ToCharArray()); //chunk id
@@ -108,9 +108,10 @@ namespace Microsoft.Xna.Framework.Audio
                 writer.Write("data".ToCharArray()); //chunk id
                 writer.Write((int)buffer.Length); //data size
                 writer.Write(buffer);
+
+                _data = mStream.ToArray();
             }
 
-			_data = mStream.ToArray();
 			_name = "";
 			_sound = new Sound(_data, 1.0f, false);
 		}
