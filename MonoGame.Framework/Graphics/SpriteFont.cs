@@ -210,7 +210,7 @@ namespace Microsoft.Xna.Framework.Graphics {
 
 				if (flippedHorz)
 					p.X += PerThreadTypesetter.CurrentGlyph.BoundsInTexture.Width;
-				p.X += PerThreadTypesetter.CurrentGlyph.LeftSideBearing;
+				p.X += PerThreadTypesetter.CurrentGlyph.Cropping.X;
 
 				if (flippedVert)
 					p.Y += PerThreadTypesetter.CurrentGlyph.BoundsInTexture.Height - LineSpacing;
