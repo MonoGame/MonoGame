@@ -97,7 +97,6 @@ namespace Microsoft.Xna.Framework {
 				throw new ArgumentNullException ("platform");
 			_platform = platform;
 			Initialize ();
-			SyncTouchRecognizers ();
 		}
 
 		private void Initialize ()

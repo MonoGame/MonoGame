@@ -372,7 +372,6 @@
     <Compile Include="Graphics\ModelMeshPartCollection.cs" />
     <Compile Include="Graphics\CubeMapFace.cs" />
     <Compile Include="Graphics\Texture2D.cs" />
-    <Compile Include="Graphics\Vertices\VertexPositionColorTexture.cs" />
     <Compile Include="Graphics\Effect\GLSLEffectObject.cs" />
     <Compile Include="Graphics\Effect\GLSLShader.cs" />
     <Compile Include="Graphics\CompareFunction.cs" />
@@ -441,17 +440,11 @@
     <Compile Include="Content\ContentReaders\VertexBufferReader.cs" />
     <Compile Include="Content\ContentReaders\VertexDeclarationReader.cs" />
     <Compile Include="Graphics\PresentInterval.cs" />
-    <Compile Include="Content\ContentReaders\AlphaTestEffectReader.cs" />
-    <Compile Include="Graphics\Texture2D.cs" />
-    <Compile Include="Graphics\Effect\GLSLEffectObject.cs" />
-    <Compile Include="Graphics\Effect\GLSLShader.cs" />
-    <Compile Include="Graphics\CompareFunction.cs" />
-    <Compile Include="Graphics\StencilOperation.cs" />
-    <Compile Include="Graphics\PackedVector\NormalizedShort2.cs" />
     <Compile Include="GamerServices\NotificationPosition.cs" />
     <Compile Include="iOS\GamerServices\KeyboardInputViewController.cs" />
     <Compile Include="iOS\GamerServices\KeyboardInputView.cs" />
     <Compile Include="iOS\GamerServices\KeyboardInputAsyncResult.cs" />
+    <Compile Include="iOS\iOSGameWindow.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
