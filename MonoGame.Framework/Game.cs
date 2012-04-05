@@ -436,7 +436,12 @@ namespace Microsoft.Xna.Framework
 
                 if (currentTime < TargetElapsedTime)
                 {
-                    System.Threading.Thread.Sleep((TargetElapsedTime - currentTime).Milliseconds);
+                    var sleepMs = (TargetElapsedTime - currentTime).Milliseconds;
+#if WINRT
+                    new System.Threading.ManualResetEvent(false).WaitOne(sleepMs);
+#else
+                    System.Threading.Thread.Sleep(sleepMs);
+#endif
                 }
             }
         }
