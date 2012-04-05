@@ -16,7 +16,7 @@ void main()
 	if (abs(color.a - AlphaTest.x) < AlphaTest.y)
 		aTest = AlphaTest.z;
 	
-	if (aTest < 0)
+	if (aTest < 0.0)
 		discard;
 	
 	color.rgb = mix(color.rgb, FogColor * color.a, Specular.w);
