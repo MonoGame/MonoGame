@@ -53,6 +53,8 @@ using ShaderType = OpenTK.Graphics.ES20.All;
 using ActiveUniformType = OpenTK.Graphics.ES20.All;
 using ProgramParameter = OpenTK.Graphics.ES20.All;
 using ShaderParameter = OpenTK.Graphics.ES20.All;
+#elif MONOMAC
+using MonoMac.OpenGL;
 #elif !WINRT
 using OpenTK.Graphics.OpenGL;
 

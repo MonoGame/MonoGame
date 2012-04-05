@@ -6,6 +6,8 @@ using System.Text;
 #if ANDROID || IPHONE
 using OpenTK.Graphics.ES20;
 using ActiveUniformType = OpenTK.Graphics.ES20.All;
+#elif MONOMAC
+using MonoMac.OpenGL;
 #elif !WINRT
 using OpenTK.Graphics.OpenGL;
 #endif
