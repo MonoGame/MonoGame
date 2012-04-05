@@ -86,11 +86,6 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 #endif
 
-
-
-
-
-
         /// <summary>
         /// Creates a new SpriteEffect by cloning parameter settings from an existing instance.
         /// </summary>
@@ -125,7 +120,6 @@ namespace Microsoft.Xna.Framework.Graphics
             Parameters.Add(matrixParam);
 #endif
         }
-
 
         /// <summary>
         /// Lazily computes derived parameter values immediately before applying the effect.
