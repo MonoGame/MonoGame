@@ -59,6 +59,7 @@
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Mono\MonoMac\v0.0\Mono.MonoMac.targets" />
   <ItemGroup>
+    <Compile Include="Content\ContentExtensions.cs" />
     <Compile Include="Graphics\PresentInterval.cs" />
     <Compile Include="BatteryChargeStatus.cs" />
     <Compile Include="BoundingBox.cs" />
