@@ -47,14 +47,15 @@ using System.Linq;
 //For laoding from resources
 using System.Reflection;
 
-#if !WINRT
-using OpenTK.Graphics.OpenGL;
-#elif IPHONE || ANDROID
+#if IPHONE || ANDROID
 using OpenTK.Graphics.ES20;
 using ShaderType = OpenTK.Graphics.ES20.All;
 using ActiveUniformType = OpenTK.Graphics.ES20.All;
 using ProgramParameter = OpenTK.Graphics.ES20.All;
 using ShaderParameter = OpenTK.Graphics.ES20.All;
+#elif !WINRT
+using OpenTK.Graphics.OpenGL;
+
 #endif
 
 
