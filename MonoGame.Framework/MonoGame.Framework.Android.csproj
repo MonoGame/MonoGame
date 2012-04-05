@@ -126,6 +126,7 @@
     <Compile Include="Graphics\PackedVector\NormalizedShort2.cs" />
     <Compile Include="Graphics\PackedVector\NormalizedShort4.cs" />
     <Compile Include="Graphics\PresentationParameters.cs" />
+    <Compile Include="Graphics\PresentInterval.cs" />
     <Compile Include="Graphics\States\SamplerState.cs" />
     <Compile Include="Graphics\StencilOperation.cs" />
     <Compile Include="Graphics\Texture2D.cs" />

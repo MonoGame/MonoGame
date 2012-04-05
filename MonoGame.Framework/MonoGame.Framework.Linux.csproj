@@ -105,6 +105,7 @@
     <Compile Include="Input\GamePadState.cs" />
     <Compile Include="Input\KeyboardState.cs" />
     <Compile Include="Input\KeyState.cs" />
+    <Compile Include="Graphics\PresentInterval.cs" />
     <Compile Include="Input\GamePadThumbSticks.cs" />
     <Compile Include="Input\Buttons.cs" />
     <Compile Include="Input\GamePadCapabilities.cs" />
