@@ -265,7 +265,17 @@ namespace Microsoft.Xna.Framework.Graphics
 			} 
 			else
 			{
-				image = UIImage.FromFile(filename);
+				// If we are loading graphics from the Content folder then we can take advantage of the FromBundle methods ability
+				// to automatically cope with @2x graphics for high resolution devices.  If we are loading from somewhere else (e.g.
+				// the documents folder for our app) then FromBundle will not work and so we must call FromFile.
+				if (filename.StartsWith("Content/", StringComparison.OrdinalIgnoreCase) == true) 
+				{
+					image = UIImage.FromBundle(filename);
+				}
+				else 
+				{
+					image = UIImage.FromFile(filename);
+				}
 			}
 			
 			if (image == null)
