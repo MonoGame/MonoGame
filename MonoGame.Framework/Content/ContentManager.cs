@@ -308,11 +308,7 @@ namespace Microsoft.Xna.Framework.Content
 #endif
                 else if ((typeof(T) == typeof(Effect)))
 				{
-#if IPHONE
 					using (Stream assetStream = TitleContainer.OpenStream(assetName))
-#else
-                    using (Stream assetStream = TitleContainer.OpenDataStream(assetName))
-#endif
 					{
 						var data = new byte[assetStream.Length];
 						assetStream.Read (data, 0, (int)assetStream.Length);
