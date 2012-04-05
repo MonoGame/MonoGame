@@ -55,6 +55,7 @@ using SharpDX.Direct3D;
 using Windows.Graphics.Display;
 using Windows.UI.Core;
 #elif GLES
+using OpenTK.Graphics.ES20;
 using BeginMode = OpenTK.Graphics.ES20.All;
 using EnableCap = OpenTK.Graphics.ES20.All;
 using TextureTarget = OpenTK.Graphics.ES20.All;
