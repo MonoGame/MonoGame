@@ -173,6 +173,33 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 
 		public void OnLink(int program) {
+			if (shaderType == ShaderType.VertexShader) {
+				//bind attributes
+				foreach (MojoShader.MOJOSHADER_attribute attrb in attributes) {
+					switch (attrb.usage) {
+					case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_COLOR:
+						GL.BindAttribLocation(program, GraphicsDevice.attributeColor, attrb.name);
+						break;
+					case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_POSITION:
+						GL.BindAttribLocation(program, GraphicsDevice.attributePosition + attrb.index, attrb.name);
+						break;
+					case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_TEXCOORD:
+						GL.BindAttribLocation(program, GraphicsDevice.attributeTexCoord + attrb.index, attrb.name);
+						break;
+					case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_NORMAL:
+						GL.BindAttribLocation(program, GraphicsDevice.attributeNormal, attrb.name);
+						break;
+					case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_BLENDINDICES:
+						GL.BindAttribLocation(program, GraphicsDevice.attributeBlendIndicies, attrb.name);
+						break;
+					case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_BLENDWEIGHT:
+						GL.BindAttribLocation(program, GraphicsDevice.attributeBlendWeight, attrb.name);
+						break;
+					default:
+						throw new NotImplementedException();
+					}
+				}
+			}
 		}
 		
 		public void Apply(int program,

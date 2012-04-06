@@ -263,6 +263,33 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 
 		public void OnLink(int program) {
+			if (shaderType == ShaderType.VertexShader) {
+				//bind attributes
+				foreach (GLSLEffectObject.VertexAttributeInfo attInfo in attributes) {
+					switch (attInfo.Type) {
+					case GLSLEffectObject.VertexAttributeType.Position:
+						GL.BindAttribLocation(program, GraphicsDevice.attributePosition, attInfo.Name);
+						break;
+					case GLSLEffectObject.VertexAttributeType.Normal:
+						GL.BindAttribLocation(program, GraphicsDevice.attributeNormal, attInfo.Name);
+						break;
+					case GLSLEffectObject.VertexAttributeType.Color:
+						GL.BindAttribLocation(program, GraphicsDevice.attributeColor, attInfo.Name);
+						break;
+					case GLSLEffectObject.VertexAttributeType.TexCoord:
+						GL.BindAttribLocation(program, GraphicsDevice.attributeTexCoord, attInfo.Name);
+						break;
+//					case GLSLEffectObject.VertexAttributeType.TexCoord2:
+//						GL.BindAttribLocation(program, 8, attInfo.Name);
+//					case GLSLEffectObject.VertexAttributeType.BlendIndices:
+//						GL.BindAttribLocation(program, GraphicsDevice.attributeBlendIndicies, attInfo.Name);
+//					case GLSLEffectObject.VertexAttributeType.BlendWeight:
+//						GL.BindAttribLocation(program, GraphicsDevice.attributeBlendWeight, attInfo.Name);
+
+					}
+				}
+
+			}
 		}
 
 		private class ProgramInfo
