@@ -199,35 +199,6 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
 			glslCode = GLSL_DESKTOP + shaderProgram.shaderCode;
 #endif
-
-#if ES11
-			if (shaderType == ShaderType.VertexShader) {
-				foreach (MojoShader.MOJOSHADER_attribute attrb in attributes) {
-					switch (attrb.usage) {
-
-					//use builtin attributes in GL 1.1
-					case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_COLOR:
-						glslCode = glslCode.Replace ("attribute vec4 "+attrb.name+";",
-						                               "#define "+attrb.name+" gl_Color");
-						break;
-					case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_POSITION:
-						glslCode = glslCode.Replace ("attribute vec4 "+attrb.name+";",
-						                               "#define "+attrb.name+" gl_Vertex");
-						break;
-					case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_TEXCOORD:
-						glslCode = glslCode.Replace ("attribute vec4 "+attrb.name+";",
-						                               "#define "+attrb.name+" gl_MultiTexCoord0");
-						break;
-					case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_NORMAL:
-						glslCode = glslCode.Replace ("attribute vec4 "+attrb.name+";",
-						                               "#define "+attrb.name+" gl_Normal");
-						break;
-					default:
-						throw new NotImplementedException();
-					}
-				}
-			}
-#endif
 			
 			//glslCode = GLSLOptimizer.Optimize (glslCode, shaderType);
 			
@@ -292,35 +263,6 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 
 		public void OnLink(int program) {
-#if !ES11
-			if (shaderType == ShaderType.VertexShader) {
-				//bind attributes
-				foreach (GLSLEffectObject.VertexAttributeInfo attInfo in attributes) {
-					switch (attInfo.Type) {
-					case GLSLEffectObject.VertexAttributeType.Position:
-						GL.BindAttribLocation(program, GraphicsDevice.attributePosition, attInfo.Name);
-						break;
-					case GLSLEffectObject.VertexAttributeType.Normal:
-						GL.BindAttribLocation(program, GraphicsDevice.attributeNormal, attInfo.Name);
-						break;
-					case GLSLEffectObject.VertexAttributeType.Color:
-						GL.BindAttribLocation(program, GraphicsDevice.attributeColor, attInfo.Name);
-						break;
-					case GLSLEffectObject.VertexAttributeType.TexCoord:
-						GL.BindAttribLocation(program, GraphicsDevice.attributeTexCoord, attInfo.Name);
-						break;
-//					case GLSLEffectObject.VertexAttributeType.TexCoord2:
-//						GL.BindAttribLocation(program, 8, attInfo.Name);
-//					case GLSLEffectObject.VertexAttributeType.BlendIndices:
-//						GL.BindAttribLocation(program, GraphicsDevice.attributeBlendIndicies, attInfo.Name);
-//					case GLSLEffectObject.VertexAttributeType.BlendWeight:
-//						GL.BindAttribLocation(program, GraphicsDevice.attributeBlendWeight, attInfo.Name);
-
-					}
-				}
-
-			}
-#endif
 		}
 
 		private class ProgramInfo

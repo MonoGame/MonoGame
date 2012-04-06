@@ -41,7 +41,6 @@
 	using Microsoft.Xna.Framework;
 	using System;
 	using Microsoft.Xna.Framework.Graphics;
-	using OpenTK.Graphics.ES11;
 	using MonoTouch.UIKit;
 	using System.Collections.Generic;
 	using MonoTouch.AudioToolbox;

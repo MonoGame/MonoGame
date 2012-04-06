@@ -46,20 +46,11 @@ using MonoMac.OpenGL;
 using OpenTK.Graphics.OpenGL;
 #elif WINRT
 // TODO
-#else
-
-#if ES11
-using OpenTK.Graphics.ES11;
-using TextureTarget = OpenTK.Graphics.ES11.All;
-using TextureMinFilter = OpenTK.Graphics.ES11.All;
-using TextureParameterName = OpenTK.Graphics.ES11.All;
-#else
+#elif GLES
 using OpenTK.Graphics.ES20;
 using TextureTarget = OpenTK.Graphics.ES20.All;
 using TextureMinFilter = OpenTK.Graphics.ES20.All;
 using TextureParameterName = OpenTK.Graphics.ES20.All;
-#endif
-
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -134,7 +125,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 #if WINRT
 
-#else
+#elif OPENGL
 		internal void Activate(TextureTarget target, bool useMipmaps = false)
 		{
 			switch(Filter)
@@ -170,11 +161,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			case TextureAddressMode.Wrap:
 				return (int)TextureWrapMode.Repeat;
 			case TextureAddressMode.Mirror:
-#if IPHONE && ES11
-				return (int)All.MirroredRepeatOes;
-#else
 				return (int)TextureWrapMode.MirroredRepeat;
-#endif
 			default:
 				throw new NotImplementedException("No support for " + textureAddressMode);
 			}

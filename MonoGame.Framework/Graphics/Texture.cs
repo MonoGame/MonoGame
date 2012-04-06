@@ -46,15 +46,9 @@ using MonoMac.OpenGL;
 using OpenTK.Graphics.OpenGL;
 #elif WINRT
 // TODO
-#else
- #if ES11
-using OpenTK.Graphics.ES11;
- #else
+#elif GLES
 using OpenTK.Graphics.ES20;
-  #if IPHONE || ANDROID
 using TextureTarget = OpenTK.Graphics.ES20.All;
-  #endif
- #endif
 #endif
 
 
@@ -67,7 +61,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if WINRT
 
-#else
+#elif OPENGL
 		internal int glTexture = -1;
 		internal TextureTarget glTarget;
 #endif
@@ -86,7 +80,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		internal virtual void Activate()
 		{
 #if WINRT
-#else
+#elif OPENGL
 			GL.BindTexture(glTarget, this.glTexture);
 #endif
         }
@@ -94,7 +88,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		public override void Dispose()
 		{
 #if WINRT
-#else
+#elif OPENGL
 			GL.DeleteTextures(1, ref glTexture);
 #endif
             base.Dispose();

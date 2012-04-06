@@ -598,7 +598,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			if (vertexShader == null && !passthroughVertexShaderAttached) {
 				if (!passthroughVertexShader.HasValue) {
 					int shader = GL.CreateShader(ShaderType.VertexShader);
-#if IPHONE || ANDROID
+#if GLES
 					GL.ShaderSource (shader, 1,
 					                new string[]{passthroughVertexShaderSrc}, (int[])null);
 #else
@@ -610,11 +610,9 @@ namespace Microsoft.Xna.Framework.Graphics
 				}
 
 				GL.AttachShader(shaderProgram, passthroughVertexShader.Value);
-#if !ES11
 				GL.BindAttribLocation(shaderProgram, GraphicsDevice.attributePosition, "aPosition");
 				GL.BindAttribLocation(shaderProgram, GraphicsDevice.attributeTexCoord, "aTexCoord");
 				GL.BindAttribLocation(shaderProgram, GraphicsDevice.attributeColor, "aColor");
-#endif
 
 				passthroughVertexShaderAttached = true;
 			} else if (vertexShader != null && passthroughVertexShaderAttached) {
@@ -632,13 +630,13 @@ namespace Microsoft.Xna.Framework.Graphics
 			GL.LinkProgram (shaderProgram);
 
 			int linked = 0;
-#if IPHONE || ANDROID
+#if GLES
 			GL.GetProgram (shaderProgram, ProgramParameter.LinkStatus, ref linked);
 #else
 			GL.GetProgram (shaderProgram, ProgramParameter.LinkStatus, out linked);
 #endif
 			if (linked == 0) {
-#if !IPHONE && !ANDROID
+#if !GLES
 				string log = GL.GetProgramInfoLog(shaderProgram);
 				Console.WriteLine (log);
 #endif
@@ -651,7 +649,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			if (glslVertexShader == null && !passthroughVertexShaderAttached) {
 				if (!passthroughVertexShader.HasValue) {
 					int shader = GL.CreateShader(ShaderType.VertexShader);
-#if IPHONE || ANDROID
+#if GLES
 					GL.ShaderSource (shader, 1,
 					                new string[]{passthroughVertexShaderSrc}, (int[])null);
 #else
@@ -664,11 +662,10 @@ namespace Microsoft.Xna.Framework.Graphics
 				}
 
 				GL.AttachShader(shaderProgram, passthroughVertexShader.Value);
-#if !ES11
+
 				GL.BindAttribLocation(shaderProgram, GraphicsDevice.attributePosition, "aPosition");
 				GL.BindAttribLocation(shaderProgram, GraphicsDevice.attributeTexCoord, "aTexCoord");
 				GL.BindAttribLocation(shaderProgram, GraphicsDevice.attributeColor, "aColor");
-#endif
 
 				passthroughVertexShaderAttached = true;
 			} else if (glslVertexShader != null && passthroughVertexShaderAttached) {
@@ -686,13 +683,13 @@ namespace Microsoft.Xna.Framework.Graphics
 			GL.LinkProgram (shaderProgram);
 
 			int linked = 0;
-#if IPHONE || ANDROID
+#if GLES
 			GL.GetProgram (shaderProgram, ProgramParameter.LinkStatus, ref linked);
 #else
 			GL.GetProgram (shaderProgram, ProgramParameter.LinkStatus, out linked);
 #endif
 			if (linked == 0) {
-#if !IPHONE && !ANDROID
+#if !GLES
 				string log = GL.GetProgramInfoLog(shaderProgram);
 				Console.WriteLine (log);
 #endif

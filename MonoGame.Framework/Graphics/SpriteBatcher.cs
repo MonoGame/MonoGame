@@ -41,6 +41,8 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Collections.Generic;
+using System.Text;
+using Microsoft.Xna.Framework;
 
 #if MONOMAC
 using MonoMac.OpenGL;
@@ -48,33 +50,15 @@ using MonoMac.OpenGL;
 using OpenTK.Graphics.OpenGL;
 #elif WINRT
 // TODO
-#else
-
-#if ES11
-using OpenTK.Graphics.ES11;
-using VertexPointerType = OpenTK.Graphics.ES11.All;
-using ColorPointerType = OpenTK.Graphics.ES11.All;
-using TexCoordPointerType = OpenTK.Graphics.ES11.All;
-using TextureUnit = OpenTK.Graphics.ES11.All;
-using TextureTarget = OpenTK.Graphics.ES11.All;
-using DrawElementsType = OpenTK.Graphics.ES11.All;
-
-#else
+#elif GLES
 using OpenTK.Graphics.ES20;
-
-#if IPHONE || ANDROID
 using VertexAttribPointerType = OpenTK.Graphics.ES20.All;
 using TextureUnit = OpenTK.Graphics.ES20.All;
 using TextureTarget = OpenTK.Graphics.ES20.All;
 using DrawElementsType = OpenTK.Graphics.ES20.All;
 using BufferTarget = OpenTK.Graphics.ES20.All;
+using BeginMode = OpenTK.Graphics.ES20.All;
 #endif
-#endif
-
-#endif
-
-using Microsoft.Xna.Framework;
-using System.Text; // just for StringBuilder
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -159,33 +143,12 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 #if WINRT
 
-#else
+#elif OPENGL
+
 			//Unbind VBOs
 			GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
 			GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
 			
-#if ES11
-			GLStateManager.Textures2D(true);
-			GLStateManager.VertexArray(true);
-			GLStateManager.ColorArray(true);
-			GLStateManager.TextureCoordArray(true);
-			
-			GL.TexEnv (All.TextureEnv, All.TextureEnvMode, (int)All.SrcAlpha);
-
-			int size = sizeof(float)*4+sizeof(uint);
-			GL.VertexPointer(2,
-			                 VertexPointerType.Float,
-			                 size,
-			                 _vertexHandle.AddrOfPinnedObject() );
-			GL.ColorPointer(4,
-			                ColorPointerType.UnsignedByte,
-			                size,
-			                (IntPtr)(_vertexHandle.AddrOfPinnedObject().ToInt64()+(sizeof(float)*2)));
-			GL.TexCoordPointer(2,
-			                   TexCoordPointerType.Float,
-			                   size,
-			                   (IntPtr)(_vertexHandle.AddrOfPinnedObject().ToInt64()+(sizeof(float)*2+sizeof(uint))) );
-#else
 			GL.EnableVertexAttribArray(GraphicsDevice.attributePosition);
 			GL.EnableVertexAttribArray(GraphicsDevice.attributeTexCoord);
 			GL.EnableVertexAttribArray(GraphicsDevice.attributeColor);
@@ -214,8 +177,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			                       (IntPtr)(_vertexHandle.AddrOfPinnedObject().ToInt64()
 			         					+(sizeof(float)*2+sizeof(uint))));
 #endif
-#endif
-			
+
 			// setup the vertexArray array
 			int startIndex = 0;
 			int index = 0;
@@ -237,7 +199,7 @@ namespace Microsoft.Xna.Framework.Graphics
 					
 #if WINRT
 			
-#else
+#elif OPENGL
 					GL.ActiveTexture(TextureUnit.Texture0);
 					GL.BindTexture ( TextureTarget.Texture2D, texID );
 
@@ -289,16 +251,11 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 #if WINRT
 
-#else
+#elif OPENGL
 			// draw stuff
 			if ( start != end )
             {
-				GL.DrawElements(
-#if IPHONE || ANDROID
-                                All.Triangles,
-#else
-								 BeginMode.Triangles,
-#endif
+				GL.DrawElements( BeginMode.Triangles,
 				                 (end-start)/2*3,
 				                 DrawElementsType.UnsignedShort,
 				                 (IntPtr)(_indexHandle.AddrOfPinnedObject().ToInt64()+(start/2*3*sizeof(short))) );

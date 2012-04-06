@@ -46,43 +46,35 @@ using MonoMac.OpenGL;
 using OpenTK.Graphics.OpenGL;
 #elif WINRT
 // TODO
-#else
- #if ES11
-using OpenTK.Graphics.ES11;
- #else
+#elif GLES
 using OpenTK.Graphics.ES20;
 using RenderbufferTarget = OpenTK.Graphics.ES20.All;
 using RenderbufferStorage = OpenTK.Graphics.ES20.All;
- #endif
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
 	public class RenderTarget2D : Texture2D
 	{
-#if IPHONE && ES11
-		const RenderbufferTarget GLRenderbuffer = RenderbufferTarget.RenderbufferOes;
-		const RenderbufferStorage GLDepthComponent16 = RenderbufferStorage.DepthComponent16Oes;
-		const RenderbufferStorage GLDepthComponent24 = RenderbufferStorage.DepthComponent24Oes;
-		const RenderbufferStorage GLDepth24Stencil8 = RenderbufferStorage.Depth24Stencil8Oes;
-#elif IPHONE || ANDROID
+#if GLES
 		const RenderbufferTarget GLRenderbuffer = RenderbufferTarget.Renderbuffer;
 		const RenderbufferStorage GLDepthComponent16 = RenderbufferStorage.DepthComponent16;
 		const RenderbufferStorage GLDepthComponent24 = RenderbufferStorage.DepthComponent24Oes;
 		const RenderbufferStorage GLDepth24Stencil8 = RenderbufferStorage.Depth24Stencil8Oes;
-#elif WINRT
-
-#else
+#elif OPENGL
 		const RenderbufferTarget GLRenderbuffer = RenderbufferTarget.RenderbufferExt;
 		const RenderbufferStorage GLDepthComponent16 = RenderbufferStorage.DepthComponent16;
 		const RenderbufferStorage GLDepthComponent24 = RenderbufferStorage.DepthComponent24;
 		const RenderbufferStorage GLDepth24Stencil8 = RenderbufferStorage.Depth24Stencil8;
 #endif
 
-
-		
+#if WINRT
+        protected SharpDX.Direct3D11.RenderTargetView _renderTargetView;
+        protected SharpDX.Direct3D11.DepthStencilView _depthStencilView;
+#elif OPENGL
 		internal uint glDepthStencilBuffer;
-		
+#endif
+
 		public DepthFormat DepthStencilFormat { get; private set; }
 		
 		public int MultiSampleCount { get; private set; }
@@ -101,9 +93,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if WINRT
 
-#else
+#elif OPENGL
 
-#if IPHONE || ANDROID
+#if GLES
 			GL.GenRenderbuffers(1, ref glDepthStencilBuffer);
 #else
 			GL.GenRenderbuffers(1, out glDepthStencilBuffer);
@@ -131,8 +123,17 @@ namespace Microsoft.Xna.Framework.Graphics
 		public override void Dispose ()
 		{
 #if WINRT
-
-#else
+            if (_renderTargetView != null)
+            {
+                _renderTargetView.Dispose();
+                _renderTargetView = null;
+            }
+            if (_depthStencilView != null)
+            {
+                _depthStencilView.Dispose();
+                _depthStencilView = null;
+            }
+#elif OPENGL
 			GL.DeleteRenderbuffers(1, ref this.glDepthStencilBuffer);
 #endif
             base.Dispose();

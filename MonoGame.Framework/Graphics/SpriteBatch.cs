@@ -8,13 +8,8 @@ using MonoMac.OpenGL;
 using OpenTK.Graphics.OpenGL;
 #elif WINRT
 // TODO
-#else
-#if ES11
-using OpenTK.Graphics.ES11;
-using MatrixMode = OpenTK.Graphics.ES11.All;
-#else
+#elif GLES
 using OpenTK.Graphics.ES20;
-#endif
 #endif
 
 using Microsoft.Xna.Framework;
@@ -30,9 +25,9 @@ namespace Microsoft.Xna.Framework.Graphics
 		DepthStencilState _depthStencilState; 
 		RasterizerState _rasterizerState;		
 		Effect _effect;	
-#if !ES11
+
 		Effect spriteEffect;
-#endif
+
 		Matrix _matrix;
 		Rectangle tempRect = new Rectangle (0,0,0,0);
 		Vector2 texCoordTL = new Vector2 (0,0);
@@ -110,7 +105,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			// clear out the textures
 			graphicsDevice.Textures._textures.Clear ();
 			
-#if !WINRT && !ES11
+#if OPENGL
 			// unbinds shader
 			if (_effect != null) {
 #if NOMOJO
@@ -124,50 +119,15 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		}
 		
-		void Setup () {
+		void Setup () 
+        {
 			graphicsDevice.BlendState = _blendState;
 			graphicsDevice.DepthStencilState = _depthStencilState;
 			graphicsDevice.RasterizerState = _rasterizerState;
 			graphicsDevice.SamplerStates[0] = _samplerState;
 			
-#if ES11
-			// set camera
-			GL.MatrixMode (MatrixMode.Projection);
-			GL.LoadIdentity ();		
-			
-			// Switch on the flags.
- #if ANDROID
-	        switch (this.graphicsDevice.PresentationParameters.DisplayOrientation)
-	        {
-			
-				case DisplayOrientation.LandscapeRight:
-                {
-					GL.Rotate(180, 0, 0, 1); 
-					GL.Ortho(0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height,  0, -1, 1);
-					break;
-				}
-				
-				case DisplayOrientation.LandscapeLeft:
-				case DisplayOrientation.PortraitUpsideDown:
-                default:
-				{
-					GL.Ortho(0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height, 0, -1, 1);
-					break;
-				}
-			}
- #else
-			GL.Ortho(0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height, 0, -1, 1);
- #endif
-			
-			
-			//These needed?
-			GL.MatrixMode(MatrixMode.Modelview);
-			GL.Viewport (graphicsDevice.Viewport.X, graphicsDevice.Viewport.Y,
-			             graphicsDevice.Viewport.Width, graphicsDevice.Viewport.Height);
-			GL.LoadMatrix (Matrix.ToFloatArray(_matrix));
-
-#else
-			if (_effect == null) {
+			if (_effect == null) 
+            {
 				Viewport vp = graphicsDevice.Viewport;
 				Matrix projection = Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, 0, 1);
 				Matrix halfPixelOffset = Matrix.CreateTranslation(-0.5f, -0.5f, 0);
@@ -175,16 +135,17 @@ namespace Microsoft.Xna.Framework.Graphics
 				spriteEffect.Parameters["MatrixTransform"].SetValue (transform);
 				
 				spriteEffect.CurrentTechnique.Passes[0].Apply();
-			} else {
+			} 
+            else 
+            {
 				// apply the custom effect if there is one
 				_effect.CurrentTechnique.Passes[0].Apply ();
 			}
-#endif
 		}
 		
-		void Flush() {
+		void Flush() 
+        {
 			_batcher.DrawBatch (_sortMode, graphicsDevice.SamplerStates[0]);
-
 		}
 
 		public void Draw (Texture2D texture,

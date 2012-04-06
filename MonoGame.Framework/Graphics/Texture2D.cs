@@ -406,12 +406,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
             var width = image.Width;
             var height = image.Height;
-#if ES11
-            //scale up bitmap to be power of 2 dimensions but dont exceed 1024x1024.
-            //Note: may not have to do this with OpenGL 2+
-            width = (int)Math.Pow(2, Math.Min(10, Math.Ceiling(Math.Log10(imageSource.Width) / Math.Log10(2))));
-            height = (int)Math.Pow(2, Math.Min(10, Math.Ceiling(Math.Log10(imageSource.Height) / Math.Log10(2))));
-#endif
+
             int[] pixels = new int[width * height];
             if ((width != image.Width) || (height != image.Height))
             {
