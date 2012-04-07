@@ -258,10 +258,26 @@ namespace Microsoft.Xna.Framework.Graphics
         public static Texture2D FromFile(GraphicsDevice graphicsDevice, string filename, int width, int height)
         {
 			UIImage image;
-			if(filename.Contains(".pdf"))
+
+			if (filename.Contains(".pdf"))
+			{
 				image = Extender.FromPdf(filename,width,height);
+			} 
 			else
-				image = UIImage.FromBundle(filename);
+			{
+				// If we are loading graphics from the Content folder then we can take advantage of the FromBundle methods ability
+				// to automatically cope with @2x graphics for high resolution devices.  If we are loading from somewhere else (e.g.
+				// the documents folder for our app) then FromBundle will not work and so we must call FromFile.
+				if (filename.StartsWith("Content/", StringComparison.OrdinalIgnoreCase) == true) 
+				{
+					image = UIImage.FromBundle(filename);
+				}
+				else 
+				{
+					image = UIImage.FromFile(filename);
+				}
+			}
+			
 			if (image == null)
 			{
 				throw new ContentLoadException("Error loading file: " + filename);
@@ -278,6 +294,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				var small = image.Scale (new SizeF (width, height));
 				theTexture = new ESImage(small, graphicsDevice.PreferedFilter);
 			}
+			
 			Texture2D result = new Texture2D(theTexture);
 			// result.Name = Path.GetFileNameWithoutExtension(filename);
 			result.Name = filename;
