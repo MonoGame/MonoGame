@@ -598,7 +598,7 @@ namespace Microsoft.Xna.Framework.Graphics
                             (float)TextureWrapMode.Repeat);
         }
 		
-		private CGImage CreateRGBImageFromBufferData (int mByteWidth, int mWidth, int mHeight)
+		private CGImage CreateRGBImageFromBufferData(int mByteWidth, int mWidth, int mHeight)
 		{
 			CGColorSpace cgColorSpace = CGColorSpace.CreateDeviceRGB();
 
@@ -625,36 +625,61 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			return image;
 		}
-
-		public void SaveAsJpeg (string filename, int width, int height)
+		
+		public void SaveAsJpeg(string filename, int width, int height)
+		{
+			using (FileStream outStream = File.OpenWrite(filename))
+			{
+				SaveAsJpeg(outStream, width, height);
+			}
+		}
+		
+		public void SaveAsJpeg(Stream outStream, int width, int height)
 		{
 			int mByteWidth = width * 4;         // Assume 4 bytes/pixel for now
 			mByteWidth = (mByteWidth + 3) & ~3;    // Align to 4 bytes
 
 			CGImage cgImage = CreateRGBImageFromBufferData (mByteWidth, width, height);
 				
-			NSError err;
-			
 			using (UIImage uiImage = UIImage.FromImage(cgImage))
 			{
-            	uiImage.AsJPEG().Save(filename, true, out err);
-				// TODO - check err
+            	NSData data = uiImage.AsJPEG();
+				WriteNSDataToStream(data, outStream);
 			}
 		}
 
-		public void SaveAsPng (string filename, int width, int height)
+		public void SaveAsPng(string filename, int width, int height)
 		{
+			using (FileStream outStream = File.OpenWrite(filename))
+			{
+				SaveAsPng(outStream, width, height);
+			}
+		}
+		
+		public void SaveAsPng(Stream outStream, int width, int height)
+		{		
 			int mByteWidth = width * 4;         // Assume 4 bytes/pixel for now
 			mByteWidth = (mByteWidth + 3) & ~3;    // Align to 4 bytes
 
 			CGImage cgImage = CreateRGBImageFromBufferData (mByteWidth, width, height);
 	
-			NSError err;
-			
-			using (UIImage unImage = UIImage.FromImage(cgImage))
+			using (UIImage uiImage = UIImage.FromImage(cgImage))
 			{
-	            unImage.AsPNG().Save(filename, true, out err);				
-				// TODO - check err
+	            NSData data = uiImage.AsPNG();
+				WriteNSDataToStream(data, outStream);
+			}
+		}
+		
+		private void WriteNSDataToStream(NSData data, Stream outStream)
+		{
+			// Ideally we would just call data.AsStream() to get the stream of graphics data, however that throws the exception...
+			// Wrapper for NSMutableData is not supported, call new UnmanagedMemoryStream ((Byte*) mutableData.Bytes, mutableData.Length) instead
+			unsafe 
+			{
+				using (UnmanagedMemoryStream imageStream = new UnmanagedMemoryStream((byte*)data.Bytes, data.Length))
+				{
+					imageStream.CopyTo(outStream);
+				}
 			}
 		}
 	}
