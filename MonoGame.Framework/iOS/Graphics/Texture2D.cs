@@ -597,6 +597,66 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.TexParameter(All.Texture2D, All.TextureWrapT,
                             (float)TextureWrapMode.Repeat);
         }
+		
+		private CGImage CreateRGBImageFromBufferData (int mByteWidth, int mWidth, int mHeight)
+		{
+			CGColorSpace cgColorSpace = CGColorSpace.CreateDeviceRGB();
+
+			CGImageAlphaInfo alphaInfo = (CGImageAlphaInfo)((int)CGImageAlphaInfo.PremultipliedLast | (int)CGBitmapFlags.ByteOrderDefault);
+
+			CGBitmapContext bitmap;
+			byte[] mData = GetImageData(0);
+			
+			try 
+			{
+				unsafe 
+				{
+					fixed (byte* ptr = mData) 
+					{
+						bitmap = new CGBitmapContext ((IntPtr)ptr, mWidth, mHeight, 8, mByteWidth, cgColorSpace, alphaInfo);
+					}
+				}
+			} 
+			catch 
+			{
+			}
+
+			CGImage image = bitmap.ToImage ();
+
+			return image;
+		}
+
+		public void SaveAsJpeg (string filename, int width, int height)
+		{
+			int mByteWidth = width * 4;         // Assume 4 bytes/pixel for now
+			mByteWidth = (mByteWidth + 3) & ~3;    // Align to 4 bytes
+
+			CGImage cgImage = CreateRGBImageFromBufferData (mByteWidth, width, height);
+				
+			NSError err;
+			
+			using (UIImage uiImage = UIImage.FromImage(cgImage))
+			{
+            	uiImage.AsJPEG().Save(filename, true, out err);
+				// TODO - check err
+			}
+		}
+
+		public void SaveAsPng (string filename, int width, int height)
+		{
+			int mByteWidth = width * 4;         // Assume 4 bytes/pixel for now
+			mByteWidth = (mByteWidth + 3) & ~3;    // Align to 4 bytes
+
+			CGImage cgImage = CreateRGBImageFromBufferData (mByteWidth, width, height);
+	
+			NSError err;
+			
+			using (UIImage unImage = UIImage.FromImage(cgImage))
+			{
+	            unImage.AsPNG().Save(filename, true, out err);				
+				// TODO - check err
+			}
+		}
 	}
 }
 
