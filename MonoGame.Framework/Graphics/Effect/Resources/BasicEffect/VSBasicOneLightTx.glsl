@@ -32,7 +32,7 @@ void main()
 
 	vec3 Half = normalize(-DirLight0Direction + eyeVector);    
     float d = dot(worldNormal,Half);
-    float specularVal = pow( max(d, 0), SpecularPower);
+    float specularVal = pow( max(d, 0.0), SpecularPower);
 	gl_Position =  WorldViewProj * Position;
 	
    	Diffuse  = vec4((DirLight0DiffuseColor * diffuse) * DiffuseColor.rgb + EmissiveColor, DiffuseColor.a);
