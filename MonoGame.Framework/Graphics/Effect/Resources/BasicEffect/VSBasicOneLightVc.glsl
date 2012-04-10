@@ -33,7 +33,7 @@ void main()
     float zeroL = step(0.0, dotL);
 
     float diffuse  = zeroL * dotL;
-    float specular = pow(max(dotH, 0) * zeroL, SpecularPower);
+    float specular = pow(max(dotH, 0.0) * zeroL, SpecularPower);
 
 	gl_Position =  WorldViewProj * Position;
     Diffuse  = vec4((DirLight0DiffuseColor * diffuse)  * DiffuseColor.rgb + EmissiveColor, DiffuseColor.a) * Color;

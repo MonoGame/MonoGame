@@ -51,10 +51,10 @@ void main()
     vec3 dotL = -lightDirections * worldNormal;
     vec3 dotH = halfVectors * worldNormal;
     
-    vec3 zeroL = step(dotL, vec3(0));
+    vec3 zeroL = step(dotL, vec3(0.0));
 
     vec3 diffuse  = zeroL * dotL;
-    vec3 specular = pow(max(dotH, vec3(0)) * zeroL, vec3(SpecularPower));
+    vec3 specular = pow(max(dotH, vec3(0.0)) * zeroL, vec3(SpecularPower));
 
 	gl_Position =  WorldViewProj * Position;
     Diffuse  = vec4((lightDiffuse * diffuse)  * DiffuseColor.rgb + EmissiveColor, DiffuseColor.a) * Color;
