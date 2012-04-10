@@ -16,6 +16,6 @@ void main()
 	if (gl_FragColor.a < AlphaTest.x)
 		aTest = AlphaTest.z;
 	
-	if (aTest < 0)
+	if (aTest < 0.0)
 		discard;
 }
