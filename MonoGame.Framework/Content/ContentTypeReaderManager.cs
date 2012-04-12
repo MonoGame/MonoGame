@@ -82,6 +82,7 @@ namespace Microsoft.Xna.Framework.Content
                 var hRectangleListReader = new ListReader<Rectangle>();
                 var hVector3ListReader = new ListReader<Vector3>();
                 var hStringListReader = new ListReader<StringReader>();
+				var hIntListReader = new ListReader<Int32>();
                 var hSpriteFontReader = new SpriteFontReader();
                 var hTexture2DReader = new Texture2DReader();
                 var hCharReader = new CharReader();
@@ -118,13 +119,15 @@ namespace Microsoft.Xna.Framework.Content
 				string readerTypeString = originalReaderTypeString;
 								
 				readerTypeString = PrepareType(readerTypeString);
+				
+				
 
 				Type l_readerType = Type.GetType(readerTypeString);
                 if (l_readerType != null)
-					contentReaders[i] = (ContentTypeReader)Activator.CreateInstance(l_readerType,true);
+						contentReaders[i] = (ContentTypeReader)Activator.CreateInstance(l_readerType,true);
             	else
 					throw new ContentLoadException("Could not find matching content reader of type " + originalReaderTypeString + " (" + readerTypeString + ")");
-				
+
 				// I think the next 4 bytes refer to the "Version" of the type reader,
                 // although it always seems to be zero
                 int typeReaderVersion = _reader.ReadInt32();
