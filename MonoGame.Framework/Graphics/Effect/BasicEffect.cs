@@ -46,10 +46,6 @@ namespace Microsoft.Xna.Framework.Graphics
         EffectParameter worldInverseTransposeParam;
         EffectParameter worldViewProjParam;
 
-        EffectParameter dirParam1;
-        EffectParameter dirParam2;
-        EffectParameter dirParam3;
-
         #endregion
 
         #region Fields
@@ -95,7 +91,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			"Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect.VSBasicTxNoFog.glsl",
 			"Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect.VSBasicTxVc.glsl",
 			"Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect.VSBasicTxVcNoFog.glsl",
-			
 			"Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect.VSBasicVertexLighting.glsl",
 			"Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect.VSBasicVertexLightingVc.glsl",
 			"Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect.VSBasicVertexLightingTx.glsl",
@@ -505,12 +500,18 @@ namespace Microsoft.Xna.Framework.Graphics
             worldViewProjParam = new EffectParameter(ActiveUniformType.FloatMat4, "WorldViewProj");
             Parameters.Add(worldViewProjParam);
 
-            dirParam1 = new EffectParameter(ActiveUniformType.FloatVec3, "DirLight0Direction");
-            dirParam2 = new EffectParameter(ActiveUniformType.FloatVec3, "DirLight0DiffuseColor");
-            dirParam3 = new EffectParameter(ActiveUniformType.FloatVec3, "DirLight0SpecularColor");
-            Parameters.Add(dirParam1);
-            Parameters.Add(dirParam2);
-            Parameters.Add(dirParam3);
+             
+            Parameters.Add(new EffectParameter(ActiveUniformType.FloatVec3, "DirLight0Direction"));
+            Parameters.Add(new EffectParameter(ActiveUniformType.FloatVec3, "DirLight0DiffuseColor"));
+            Parameters.Add(new EffectParameter(ActiveUniformType.FloatVec3, "DirLight0SpecularColor"));
+			
+            Parameters.Add(new EffectParameter(ActiveUniformType.FloatVec3, "DirLight1Direction"));
+            Parameters.Add(new EffectParameter(ActiveUniformType.FloatVec3, "DirLight1DiffuseColor"));
+            Parameters.Add(new EffectParameter(ActiveUniformType.FloatVec3, "DirLight1SpecularColor"));
+			
+            Parameters.Add(new EffectParameter(ActiveUniformType.FloatVec3, "DirLight2Direction"));
+            Parameters.Add(new EffectParameter(ActiveUniformType.FloatVec3, "DirLight2DiffuseColor"));
+            Parameters.Add(new EffectParameter(ActiveUniformType.FloatVec3, "DirLight2SpecularColor"));
 
             Techniques.Add(new EffectTechnique(this));
 
@@ -529,7 +530,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             lightingEnabled = cloneSource.lightingEnabled;
             preferPerPixelLighting = cloneSource.preferPerPixelLighting;
-            fogEnabled = cloneSource.fogEnabled;
+            fogEnabled = cloneSource.fogEnabled;            
             textureEnabled = cloneSource.textureEnabled;
             vertexColorEnabled = cloneSource.vertexColorEnabled;
 
@@ -623,11 +624,6 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 // Recompute the world inverse transpose and eye position?
                 dirtyFlags = EffectHelpers.SetLightingMatrices(dirtyFlags, ref world, ref view, worldParam, worldInverseTransposeParam, eyePositionParam);
-
-                //RAY TODO: TEMPORARY HACK
-                dirParam1 = light0.directionParameter;
-                dirParam2 = light0.diffuseColorParameter;
-                dirParam3 = light0.specularColorParameter;
 
                 
                 // Check if we can use the only-bother-with-the-first-light shader optimization.
