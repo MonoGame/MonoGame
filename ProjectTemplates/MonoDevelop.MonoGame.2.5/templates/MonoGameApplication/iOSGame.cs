@@ -97,8 +97,7 @@ namespace ${Namespace}
 			spriteBatch.Begin();
 
 			// draw the logo
-			spriteBatch.Draw(logoTexture, new Vector2(150,150), null, Color.White, 
-		0.0, new Vector2(16,16), 1.0f, SpriteEffects.None, 0.0f);
+			spriteBatch.Draw(logoTexture, new Vector2 (130, 200), Color.White);
 
 			spriteBatch.End();
 

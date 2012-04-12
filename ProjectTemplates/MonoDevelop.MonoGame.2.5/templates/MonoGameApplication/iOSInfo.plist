@@ -3,15 +3,15 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleDisplayName</key>
-	<string>ChaseAndEvade</string>
+	<string>${Namespace}</string>
 	<key>CFBundleIconFiles</key>
 	<array>
 		<string>GameThumbnail.png</string>
 	</array>
 	<key>CFBundleIdentifier</key>
-	<string>project.MonoGame.ChaseAndEvade</string>
+	<string>project.MonoGame.${Namespace}</string>
 	<key>MinimumOSVersion</key>
-	<string>3.1</string>
+	<string>4.2</string>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
