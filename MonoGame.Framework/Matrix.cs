@@ -141,6 +141,8 @@ namespace Microsoft.Xna.Framework
 
 		
 		// required for OpenGL 2.0 projection matrix stuff
+        // TODO: have this work correctly for 3x3 Matrices. Needs to return
+        // a float[9] for a 3x3, and a float[16] for a 4x4
 		public static float[] ToFloatArray(Matrix mat)
         {
 			float [] matarray = {

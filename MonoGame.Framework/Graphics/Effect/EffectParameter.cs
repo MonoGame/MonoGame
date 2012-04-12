@@ -529,7 +529,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public Single[] GetValueSingleArray ()
 		{
-			if (Elements.Count > 0) {
+			if (Elements != null && Elements.Count > 0) {
 				Single[] ret = new Single[rowCount*colCount*Elements.Count];
 				for (int i=0; i<Elements.Count; i++) {
 					Single[] elmArray = Elements[i].GetValueSingleArray ();
@@ -545,7 +545,10 @@ namespace Microsoft.Xna.Framework.Graphics
 				return new Single[] { GetValueSingle () };
             case EffectParameterClass.Vector:
 			case EffectParameterClass.Matrix:
-                return (Single[])data;//return Matrix.ToFloatArray(((Matrix)data));
+                    if (data is Matrix)
+                        return Matrix.ToFloatArray((Matrix)data);
+                    else
+                        return (float[])data;
 			default:
 				throw new NotImplementedException();
 			}

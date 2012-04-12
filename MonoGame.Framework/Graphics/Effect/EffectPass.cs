@@ -395,8 +395,6 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 int uniformLocation = GL.GetUniformLocation(shaderProgram, param.Name);
 
-                var error = GL.GetError();
-
                 if (uniformLocation == -1 || param.Name.Contains("ShaderIndex"))
                     continue;
 
@@ -421,17 +419,14 @@ namespace Microsoft.Xna.Framework.Graphics
                         GL.Uniform1(uniformLocation, param.GetValueSingle());
                         break;
 
-                        // RAY TODO: Temporary. Can handle data as matrix...?
                     case ActiveUniformType.FloatMat4:
                         var mat4 = (Matrix)param.data;
-                        var sa4 = new float[] { mat4.M11, mat4.M12, mat4.M13, mat4.M14, mat4.M21, mat4.M22, mat4.M23, mat4.M24, mat4.M31, mat4.M32, mat4.M33, mat4.M34, mat4.M41, mat4.M42, mat4.M43, mat4.M44 };
-                        GL.UniformMatrix4(uniformLocation, 1, false, sa4);
+                        GL.UniformMatrix4(uniformLocation, 1, false, param.GetValueSingleArray());
                         break;
 
                     case ActiveUniformType.FloatMat3:
                         var mat = (Matrix)param.data;
-                        var mat3 = new float[] { mat.M11, mat.M12, mat.M13, mat.M21, mat.M22, mat.M23, mat.M31, mat.M32, mat.M33 };
-                        GL.UniformMatrix3(uniformLocation, 1, false, mat3);
+                        GL.UniformMatrix3(uniformLocation, 1, false, new float[] { mat.M11, mat.M12, mat.M13, mat.M21, mat.M22, mat.M23, mat.M31, mat.M32, mat.M33 });
                         break;
 
                     case ActiveUniformType.Bool:
