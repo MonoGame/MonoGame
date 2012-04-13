@@ -263,7 +263,13 @@ namespace Microsoft.Xna.Framework.Graphics
                     x = 0;
                     y = 0;
                     w = width;
-                    h = height;
+                	h = height;
+					
+					for(int counter = 0; counter < level; counter++)
+					{
+	                    w = Math.Max(w / 2, 1);
+                    	h = Math.Max(h / 2, 1);
+					}
                 }
 
 #if WINRT
