@@ -24,7 +24,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;ANDROID;GLES</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;ANDROID;GLES;OPENGL</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -35,7 +35,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE;ANDROID;GLES</DefineConstants>
+    <DefineConstants>TRACE;ANDROID;GLES;OPENGL</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AndroidUseSharedRuntime>false</AndroidUseSharedRuntime>
@@ -59,6 +59,7 @@
     <Compile Include="Android\TitleContainer.cs" />
     <Compile Include="Audio\AudioCategory.cs" />
     <Compile Include="Content\ContentManager.cs" />
+    <Compile Include="Content\ContentExtensions.cs" />    
     <Compile Include="Content\ContentReaders\ArrayReader.cs" />
     <Compile Include="Content\ContentReaders\BoundingFrustumReader.cs" />
     <Compile Include="Content\ContentReaders\BoundingSphereReader.cs" />
@@ -126,6 +127,7 @@
     <Compile Include="Graphics\PackedVector\NormalizedShort2.cs" />
     <Compile Include="Graphics\PackedVector\NormalizedShort4.cs" />
     <Compile Include="Graphics\PresentationParameters.cs" />
+    <Compile Include="Graphics\PresentInterval.cs" />
     <Compile Include="Graphics\States\SamplerState.cs" />
     <Compile Include="Graphics\StencilOperation.cs" />
     <Compile Include="Graphics\Texture2D.cs" />
@@ -287,7 +289,6 @@
     <Compile Include="Graphics\SpriteFont.cs" />
     <Compile Include="Graphics\SpriteSortMode.cs" />
     <Compile Include="Graphics\SurfaceFormat.cs" />
-    <Compile Include="Graphics\SwapEffect.cs" />
     <Compile Include="Graphics\TextureUsage.cs" />
     <Compile Include="Graphics\Viewport.cs" />
     <Compile Include="Input\Touch\GestureSample.cs" />

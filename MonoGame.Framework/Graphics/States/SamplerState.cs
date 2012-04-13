@@ -44,20 +44,13 @@ using System;
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
-#else
-
-#if ES11
-using OpenTK.Graphics.ES11;
-using TextureTarget = OpenTK.Graphics.ES11.All;
-using TextureMinFilter = OpenTK.Graphics.ES11.All;
-using TextureParameterName = OpenTK.Graphics.ES11.All;
-#else
+#elif WINRT
+// TODO
+#elif GLES
 using OpenTK.Graphics.ES20;
 using TextureTarget = OpenTK.Graphics.ES20.All;
 using TextureMinFilter = OpenTK.Graphics.ES20.All;
 using TextureParameterName = OpenTK.Graphics.ES20.All;
-#endif
-
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -130,6 +123,9 @@ namespace Microsoft.Xna.Framework.Graphics
 		public int MaxMipLevel { get; set; }
 		public float MipMapLevelOfDetailBias { get; set; }
 		
+#if WINRT
+
+#elif OPENGL
 		internal void Activate(TextureTarget target, bool useMipmaps = false)
 		{
 			switch(Filter)
@@ -155,7 +151,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			GL.TexParameter(target, TextureParameterName.TextureWrapS, (int)GetWrapMode(AddressU));
 			GL.TexParameter(target, TextureParameterName.TextureWrapT, (int)GetWrapMode(AddressV));
 		}
-		
+
 		private int GetWrapMode(TextureAddressMode textureAddressMode)
 		{
 			switch(textureAddressMode)
@@ -165,15 +161,13 @@ namespace Microsoft.Xna.Framework.Graphics
 			case TextureAddressMode.Wrap:
 				return (int)TextureWrapMode.Repeat;
 			case TextureAddressMode.Mirror:
-#if IPHONE && ES11
-				return (int)All.MirroredRepeatOes;
-#else
 				return (int)TextureWrapMode.MirroredRepeat;
-#endif
 			default:
 				throw new NotImplementedException("No support for " + textureAddressMode);
 			}
 		}
+#endif
+
 	}
 }
 

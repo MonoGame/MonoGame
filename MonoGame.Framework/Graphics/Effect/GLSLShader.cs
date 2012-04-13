@@ -7,10 +7,13 @@ using System.Collections.Generic;
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
+using System.Reflection;
+using System.IO;
 #else
-using System.Text;
 using OpenTK.Graphics.ES20;
 #if IPHONE || ANDROID
+using System.Reflection;
+using System.IO;
 using ProgramParameter = OpenTK.Graphics.ES20.All;
 using ShaderType = OpenTK.Graphics.ES20.All;
 using ShaderParameter = OpenTK.Graphics.ES20.All;
@@ -21,15 +24,18 @@ using TextureTarget = OpenTK.Graphics.ES20.All;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-
 	internal class GLSLShader
 	{
 		public ShaderType shaderType;
-		public int shader;
+		public int shaderHandle;
 		public GLSLEffectObject.VertexAttributeInfo[] attributes;
 		public GLSLEffectObject.SamplerIndexInfo[] samplerIndices;
 		string glslCode;
+        string shaderPath;
 		const string GLSL_DESKTOP = "#define DESKTOP\n";
+
+        public List<String> attributeList;
+        public List<String> uniformsList;
 
 		float[] uniforms_float4;
 		int[] uniforms_int4;
@@ -43,6 +49,80 @@ namespace Microsoft.Xna.Framework.Graphics
 //		MojoShader.MOJOSHADER_attribute[] attributes;
 //		
 //		DXPreshader preshader;
+
+#if NOMOJO
+
+        public GLSLShader(ShaderType shadertype, string filePath)
+        {
+            shaderPath = filePath;
+            shaderType = shadertype;
+            glslCode = GetShaderFromAssembly(filePath);
+
+#if !ANDROID && !IPHONE
+
+            // Remove any precision specificers that may be around.
+            glslCode = glslCode.Replace("lowp ", "");
+            glslCode = glslCode.Replace("mediump ", "");
+            glslCode = glslCode.Replace("highp ", "");
+			
+#else
+			glslCode = @"precision mediump float;
+			 precision mediump int;
+			"+glslCode;
+#endif
+
+            shaderHandle = CreateAndCompileShaderFromSource(shaderType, glslCode);
+
+            // Shader looks good. Grab the variables we'll need from it.
+
+            // Read in and save all of our attribute names to bind them later.
+            if (shaderType == ShaderType.VertexShader)
+            {
+                attributeList = new List<String>();
+                buildVariablesList("attribute", attributeList);
+            }
+
+            // Build our uniforms.
+            if (shaderType == ShaderType.VertexShader || shaderType == ShaderType.FragmentShader)
+            {
+                uniformsList = new List<String>();
+                buildVariablesList("uniform", uniformsList);
+            }
+            else
+                throw new NotSupportedException();
+        }
+
+        private void buildVariablesList(string glslVariableType, List<String> variableList)
+        {
+            // Because OpenGL ES2.0 have precision specifiers, we have to jump around the strings a bit. =/
+            string nameOfAttribute;
+            var includes = glslCode.Substring(0, glslCode.IndexOf("void main"));
+            for (int curPos = includes.IndexOf(glslVariableType); curPos != -1 && curPos < includes.Length; )
+            {
+                // Find the attribute name.
+                var nextSemicolonIndex = includes.IndexOf(';', curPos);
+
+                var spaceIndex = includes.LastIndexOf(' ', nextSemicolonIndex);
+                nameOfAttribute = includes.Substring(spaceIndex, nextSemicolonIndex - spaceIndex).Trim();
+
+                variableList.Add(nameOfAttribute);
+
+                curPos = includes.IndexOf(glslVariableType, nextSemicolonIndex);
+            }
+        }
+
+        private string GetShaderFromAssembly(string filePath)
+        {
+            Assembly assembly = typeof(Effect).Assembly;
+            var stream = assembly.GetManifestResourceStream(filePath);
+            StreamReader streamReader = new StreamReader(stream);
+            var shaderCode = streamReader.ReadToEnd();
+            streamReader.Close();
+
+            return shaderCode;
+        }
+
+#endif
 		
 		public GLSLShader (GLSLEffectObject.ShaderProg shaderProgram)
 		{
@@ -119,35 +199,6 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
 			glslCode = GLSL_DESKTOP + shaderProgram.shaderCode;
 #endif
-
-#if ES11
-			if (shaderType == ShaderType.VertexShader) {
-				foreach (MojoShader.MOJOSHADER_attribute attrb in attributes) {
-					switch (attrb.usage) {
-
-					//use builtin attributes in GL 1.1
-					case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_COLOR:
-						glslCode = glslCode.Replace ("attribute vec4 "+attrb.name+";",
-						                               "#define "+attrb.name+" gl_Color");
-						break;
-					case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_POSITION:
-						glslCode = glslCode.Replace ("attribute vec4 "+attrb.name+";",
-						                               "#define "+attrb.name+" gl_Vertex");
-						break;
-					case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_TEXCOORD:
-						glslCode = glslCode.Replace ("attribute vec4 "+attrb.name+";",
-						                               "#define "+attrb.name+" gl_MultiTexCoord0");
-						break;
-					case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_NORMAL:
-						glslCode = glslCode.Replace ("attribute vec4 "+attrb.name+";",
-						                               "#define "+attrb.name+" gl_Normal");
-						break;
-					default:
-						throw new NotImplementedException();
-					}
-				}
-			}
-#endif
 			
 			//glslCode = GLSLOptimizer.Optimize (glslCode, shaderType);
 			
@@ -157,44 +208,61 @@ namespace Microsoft.Xna.Framework.Graphics
 						 precision mediump int;
 						"+glslCode;
 #endif
+
+            shaderHandle = CreateAndCompileShaderFromSource(shaderType, glslCode);
+				
+		}
+		
+		/// <summary>
+		/// Creates, Compiles, error checks, and returns a shader from a string of GLSL code.
+		/// </summary>
+		public static int CreateAndCompileShaderFromSource(ShaderType shdrtype, string shaderCode)
+		{
+			var handle = GL.CreateShader(shdrtype);
+            // Attach the loaded source string to the shader object
 			
-			shader = GL.CreateShader (shaderType);
 #if IPHONE || ANDROID
-			GL.ShaderSource (shader, 1, new string[]{glslCode}, (int[])null);
-#else			
-			GL.ShaderSource (shader, glslCode);
-#endif
-			GL.CompileShader(shader);
-			
-			int compiled = 0;
-#if IPHONE || ANDROID
-			GL.GetShader (shader, ShaderParameter.CompileStatus, ref compiled);
+			GL.ShaderSource (handle, 1, new string[]{shaderCode}, (int[])null);
 #else
-			GL.GetShader (shader, ShaderParameter.CompileStatus, out compiled);
+            GL.ShaderSource(handle, shaderCode);
 #endif
-			if (compiled == (int)All.False) {
+            
+            // Compile the shader
+            GL.CompileShader(handle);
+
+            int compiled = 0;
+            //Error check.
+			
 #if IPHONE || ANDROID
-				string log = "";
+			GL.GetShader(handle, ShaderParameter.CompileStatus, ref compiled);
+#else
+			GL.GetShader(handle, ShaderParameter.CompileStatus, out compiled);
+#endif
+            
+            if (compiled == (int)All.False)
+            {
+				string log = string.Empty;
+#if IPHONE || ANDROID
 				int length = 0;
-				GL.GetShader (shader, ShaderParameter.InfoLogLength, ref length);
-				if (length > 0) {
-					var logBuilder = new StringBuilder(length);
-					GL.GetShaderInfoLog(shader, length, ref length, logBuilder);
-					log = logBuilder.ToString();
+				GL.GetShader(handle, ShaderParameter.InfoLogLength, ref length );
+				if (length > 0)
+				{
+					var logbuilder = new StringBuilder(length);
+					GL.GetShaderInfoLog(handle, length, ref length, logbuilder);
+					log = logbuilder.ToString();
 				}
 #else
-				string log = GL.GetShaderInfoLog(shader);
+				log = GL.GetShaderInfoLog(handle);
 #endif
-				Console.WriteLine (log);
-				
-				GL.DeleteShader (shader);
-				throw new InvalidOperationException("Shader Compilation Failed");
-			}
-				
+                
+                Console.WriteLine(log);
+                throw new Exception("Shader Failed to Compile");
+            }
+			
+			return handle;
 		}
 
 		public void OnLink(int program) {
-#if !ES11
 			if (shaderType == ShaderType.VertexShader) {
 				//bind attributes
 				foreach (GLSLEffectObject.VertexAttributeInfo attInfo in attributes) {
@@ -222,7 +290,6 @@ namespace Microsoft.Xna.Framework.Graphics
 				}
 
 			}
-#endif
 		}
 
 		private class ProgramInfo
@@ -243,6 +310,16 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 			//public EffectParameterValue Value { get; set; }
 		}
+
+#if NOMOJO
+        public void Apply(int program,
+                  EffectParameterCollection parameters,
+                  GraphicsDevice graphicsDevice)
+        {
+
+           
+        }
+#else
 
 		private float[] matrix3 = new float[9];
 		public void Apply(int program,
@@ -765,6 +842,7 @@ namespace Microsoft.Xna.Framework.Graphics
 //				}
 //			}
 		}
+#endif
 
 	}
 }

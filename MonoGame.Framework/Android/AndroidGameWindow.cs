@@ -55,7 +55,6 @@ using OpenTK.Platform.Android;
 using OpenTK;
 using OpenTK.Platform;
 using OpenTK.Graphics;
-//using OpenTK.Graphics.ES11;
 //using OpenTK.Graphics.ES20;
 
 using Microsoft.Xna.Framework.Input;
@@ -166,13 +165,7 @@ namespace Microsoft.Xna.Framework
 			catch (Exception) 
 #endif			
 			{
-#if ES11
-                //device doesn't support OpenGLES 2.0; retry with 1.1:
-                GLContextVersion = GLContextVersion.Gles1_1;
-				base.CreateFrameBuffer();
-#else
                 throw new NotSupportedException("Could not create OpenGLES 2.0 frame buffer");
-#endif
 		    }
             if (_game.GraphicsDevice != null)
             {

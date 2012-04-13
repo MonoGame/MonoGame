@@ -27,11 +27,16 @@ SOFTWARE.
 
 using System;
 using System.ComponentModel;
+using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework
 {
 	// TODO [TypeConverter(ExpandableObjectConverter)]
-	[Serializable]
+#if WINRT
+    [DataContract]
+#else
+    [Serializable]
+#endif
     public class Curve
     {
         #region Private Fields

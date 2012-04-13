@@ -3,6 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+#if ANDROID || IPHONE
+using OpenTK.Graphics.ES20;
+using ActiveUniformType = OpenTK.Graphics.ES20.All;
+#elif MONOMAC
+using MonoMac.OpenGL;
+#elif !WINRT
+using OpenTK.Graphics.OpenGL;
+#endif
+
 namespace Microsoft.Xna.Framework.Graphics
 {
 	public class EffectParameter
@@ -19,12 +28,128 @@ namespace Microsoft.Xna.Framework.Graphics
 		Effect _parentEffect;
 		
 		internal bool rawParameter = false;
+
+        internal object data;
+
+#if WINRT
+
+#else
+        internal ActiveUniformType activeUniformType;
+
 		internal DXEffectObject.D3DXPARAMETER_TYPE rawType;
 		internal GLSLEffectObject.glslEffectParameterType rawGLSLType;
 
-		internal object data;
-		
-		internal EffectParameter( DXEffectObject.d3dx_parameter parameter )
+        public static EffectParameterType GetEffectParameterType(ActiveUniformType glType)
+        {
+            switch (glType)
+            {
+                case ActiveUniformType.Float:
+                case ActiveUniformType.FloatVec2:
+                case ActiveUniformType.FloatVec3:
+                case ActiveUniformType.FloatVec4:
+                case ActiveUniformType.FloatMat2:
+                case ActiveUniformType.FloatMat3:
+                case ActiveUniformType.FloatMat4:
+                    return EffectParameterType.Single;
+                case ActiveUniformType.Int:
+                case ActiveUniformType.IntVec2:
+                case ActiveUniformType.IntVec3:
+                case ActiveUniformType.IntVec4:
+                    return EffectParameterType.Int32;
+                case ActiveUniformType.Bool:
+                case ActiveUniformType.BoolVec2:
+                case ActiveUniformType.BoolVec3:
+                case ActiveUniformType.BoolVec4:
+                    return EffectParameterType.Bool;
+                case ActiveUniformType.Sampler2D:
+                    return EffectParameterType.Texture2D;
+                case ActiveUniformType.SamplerCube:
+                    return EffectParameterType.TextureCube;
+            }
+            throw new NotSupportedException();
+        }
+
+        public static EffectParameterClass GetEffectParameterClass(ActiveUniformType glType)
+        {
+            switch (glType)
+            {
+                case ActiveUniformType.Float:
+                case ActiveUniformType.Int:
+                case ActiveUniformType.Bool:
+                    return EffectParameterClass.Scalar;
+                case ActiveUniformType.FloatVec2:
+                case ActiveUniformType.FloatVec3:
+                case ActiveUniformType.FloatVec4:
+                case ActiveUniformType.IntVec2:
+                case ActiveUniformType.IntVec3:
+                case ActiveUniformType.IntVec4:
+                case ActiveUniformType.BoolVec2:
+                case ActiveUniformType.BoolVec3:
+                case ActiveUniformType.BoolVec4:
+                    return EffectParameterClass.Vector;
+                case ActiveUniformType.FloatMat2:
+                case ActiveUniformType.FloatMat3:
+                case ActiveUniformType.FloatMat4:
+                    return EffectParameterClass.Matrix;
+                case ActiveUniformType.Sampler2D:
+                case ActiveUniformType.SamplerCube:
+                    return EffectParameterClass.Object;
+            }
+            throw new NotSupportedException();
+        }
+
+
+        internal EffectParameter(ActiveUniformType type, string uniformName)
+        {
+            this.activeUniformType = type;
+            this.paramClass = GetEffectParameterClass(type);
+            this.paramType = GetEffectParameterType(type);
+            this.name = uniformName;
+
+            switch (type)
+            {
+                case ActiveUniformType.Float:
+                    this.data = default(Single); break;
+                case ActiveUniformType.Int:
+                    this.data = default(int); break;
+                case ActiveUniformType.Bool:
+                    this.data = default(bool); break;
+                case ActiveUniformType.FloatVec2:
+                    this.data = default(Vector2); break;
+                case ActiveUniformType.FloatVec3:
+                    this.data = default(Vector3); break;
+                case ActiveUniformType.FloatVec4:
+                    this.data = default(Vector4); break;
+                case ActiveUniformType.IntVec2:
+                    this.data = new int[2]; break;
+                case ActiveUniformType.IntVec3:
+                    this.data = new int[3]; break;
+                case ActiveUniformType.IntVec4:
+                    this.data = new int[4]; break;
+                case ActiveUniformType.BoolVec2:
+                    this.data = new bool[2]; break;
+                case ActiveUniformType.BoolVec3:
+                    this.data = new bool[3]; break;
+                case ActiveUniformType.BoolVec4:
+                    this.data = new bool[4]; break;
+                case ActiveUniformType.FloatMat2:
+                case ActiveUniformType.FloatMat3:
+                    this.rowCount = 3;
+                    this.colCount = 3;
+                    this.data = default(Matrix);
+                    break;
+                case ActiveUniformType.FloatMat4:
+                    this.rowCount = 4;
+                    this.colCount = 4;
+                    this.data = default(Matrix);
+                    break;
+                case ActiveUniformType.Sampler2D:
+                case ActiveUniformType.SamplerCube:
+                    this.data = null; break;
+            }
+        }
+
+        internal EffectParameter( DXEffectObject.d3dx_parameter parameter )
 		{
 			switch (parameter.class_) {
 			case DXEffectObject.D3DXPARAMETER_CLASS.SCALAR:
@@ -313,8 +438,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 			
 		}
+#endif
 
-		public int ColumnCount {
+        public int ColumnCount {
 			get { return colCount; }
 		}
 
@@ -363,7 +489,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public int GetValueInt32 ()
 		{
-			throw new NotImplementedException();
+            return (int)data;
 		}
 
 		public int[] GetValueInt32Array ()
@@ -403,7 +529,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public Single[] GetValueSingleArray ()
 		{
-			if (Elements.Count > 0) {
+			if (Elements != null && Elements.Count > 0) {
 				Single[] ret = new Single[rowCount*colCount*Elements.Count];
 				for (int i=0; i<Elements.Count; i++) {
 					Single[] elmArray = Elements[i].GetValueSingleArray ();
@@ -417,9 +543,12 @@ namespace Microsoft.Xna.Framework.Graphics
 			switch(ParameterClass) {
 			case EffectParameterClass.Scalar:
 				return new Single[] { GetValueSingle () };
+            case EffectParameterClass.Vector:
 			case EffectParameterClass.Matrix:
-			case EffectParameterClass.Vector:
-				return (Single[])data;
+                    if (data is Matrix)
+                        return Matrix.ToFloatArray((Matrix)data);
+                    else
+                        return (float[])data;
 			default:
 				throw new NotImplementedException();
 			}
@@ -500,13 +629,18 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 
 		public void SetValue (Matrix value)
-		{ 
+		{
+            // TODO: Fix this to not work correctly in both cases!
+#if NOMOJO
+            data = value;
+#else
 			float[] matrixData = Matrix.ToFloatArray(Matrix.Transpose (value));
 			for (int y=0; y<RowCount; y++) {
 				for (int x=0; x<ColumnCount; x++) {
 					((float[])data)[y*ColumnCount+x] = matrixData[y*4+x];
 				}
 			}
+#endif
 		}
 
 		public void SetValue (Matrix[] value)

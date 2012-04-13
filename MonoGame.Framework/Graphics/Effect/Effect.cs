@@ -43,9 +43,20 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using System.Linq;
-
-//For laoding from resources
 using System.Reflection;
+
+#if IPHONE || ANDROID
+using OpenTK.Graphics.ES20;
+using ShaderType = OpenTK.Graphics.ES20.All;
+using ActiveUniformType = OpenTK.Graphics.ES20.All;
+using ProgramParameter = OpenTK.Graphics.ES20.All;
+using ShaderParameter = OpenTK.Graphics.ES20.All;
+#elif MONOMAC
+using MonoMac.OpenGL;
+#elif !WINRT
+using OpenTK.Graphics.OpenGL;
+
+#endif
 
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -53,27 +64,28 @@ namespace Microsoft.Xna.Framework.Graphics
 	public class Effect : GraphicsResource
     {
         public EffectParameterCollection Parameters { get; set; }
-		internal List<EffectParameter> _textureMappings = new List<EffectParameter>();
+
+        public EffectTechniqueCollection Techniques { get; set; }
+
+        public EffectTechnique CurrentTechnique { get; set; }
+
+        internal protected EffectParameter shaderIndexParam;
+
+#if NOMOJO
+
+        static internal Dictionary<int, GLSLShader[]> shaderObjectLookup = new Dictionary<int, GLSLShader[]>();
+
+        internal static Dictionary<Type, int[]> programsByType = new Dictionary<Type, int[]>();
+        internal int[] shaderIndexLookupTable;
+
+#else
 
 		DXEffectObject effectObject;
 		GLSLEffectObject glslEffectObject;
 
-		protected Effect (GraphicsDevice graphicsDevice)
-		{
-#if ES11
-			throw new NotSupportedException("Programmable shaders unavailable in OpenGL ES 1.1");
-#endif
-			if (graphicsDevice == null) {
-				throw new ArgumentNullException ("Graphics Device Cannot Be Null");
-			}
-			this.graphicsDevice = graphicsDevice;
-			Techniques = new EffectTechniqueCollection ();
-			Parameters = new EffectParameterCollection();
-		}
+        internal static Dictionary<byte[], DXEffectObject> effectObjectCache =
+			new Dictionary<byte[], DXEffectObject>(new ByteArrayComparer());
 
-        public EffectTechniqueCollection Techniques { get; set; }
-		
-		
 		//cache effect objects so we don't create a bunch of instances
 		//of the same shader
 		//(Some programs create heaps of instances of BasicEffect,
@@ -91,34 +103,49 @@ namespace Microsoft.Xna.Framework.Graphics
 				return key.Sum(b => b);
 			}
 		}
-		internal static Dictionary<byte[], DXEffectObject> effectObjectCache =
-			new Dictionary<byte[], DXEffectObject>(new ByteArrayComparer());
-		
 
-		protected Effect (Effect cloneSource)
-		{
-
-		}
-
-		internal Effect (GraphicsDevice graphicsDevice, string assetName)
-		{
-
-		}
-
-		public Effect (
-			GraphicsDevice graphicsDevice,
-			byte[] effectCode)
-		{
-#if ES11
-			throw new NotSupportedException("Programmable shaders unavailable in OpenGL ES 1.1");
 #endif
 
-			if (graphicsDevice == null) {
-				throw new ArgumentNullException ("Graphics Device Cannot Be Null");
-			}
-			this.graphicsDevice = graphicsDevice;
+#if !WINRT
+        internal int CurrentProgram = 0;
+#endif
 
+        protected Effect (GraphicsDevice graphicsDevice)
+		{
+			if (graphicsDevice == null)
+				throw new ArgumentNullException ("Graphics Device Cannot Be Null");
+
+			this.graphicsDevice = graphicsDevice;
+			Techniques = new EffectTechniqueCollection ();
+			Parameters = new EffectParameterCollection();
+
+            shaderIndexParam = new EffectParameter(ActiveUniformType.Int, "ShaderIndex");
+		}
+			
+		protected Effect (Effect cloneSource)
+		{
+		}
+
+#if NOMOJO
+
+        internal Effect (GraphicsDevice graphicsDevice, string[] vertexShaderFilenames, string[] fragmentShaderFilenames, Tuple<int, int>[] programShaderIndexPairs)
+            : this(graphicsDevice)
+        {
+            var type = this.GetType();
+            if (!programsByType.TryGetValue(GetType(), out shaderIndexLookupTable))
+                initializeEffects(vertexShaderFilenames, fragmentShaderFilenames, programShaderIndexPairs);
+            
+            shaderIndexParam.SetValue(0);
+            Parameters.Add(shaderIndexParam);
+        }
+
+#else
+
+		public Effect (GraphicsDevice graphicsDevice, byte[] effectCode)
+            : this(graphicsDevice)
+		{
 			uint magic = BitConverter.ToUInt32(effectCode,0);
+
 			//0xBCF00BCF XNA 4 effects
 			//0xFEFF0901 effect too old or too new, or ascii which we can't compile atm
 			//0x6151EFFE GLSL
@@ -126,12 +153,10 @@ namespace Microsoft.Xna.Framework.Graphics
 			if (magic == 0x6151EFFE) {// GLSL shader is to be used from fxg file
 				glslEffectObject = new GLSLEffectObject(effectCode);
 
-				Parameters = new EffectParameterCollection();
 				foreach (GLSLEffectObject.glslParameter parameter in glslEffectObject.parameter_handles) {
 					Parameters._parameters.Add (new EffectParameter(parameter));
 				}
 
-				Techniques = new EffectTechniqueCollection();
 				foreach (GLSLEffectObject.glslTechnique technique in glslEffectObject.technique_handles) {
 					Techniques._techniques.Add (new EffectTechnique(this, technique));
 				}
@@ -144,20 +169,119 @@ namespace Microsoft.Xna.Framework.Graphics
 					effectObjectCache.Add (effectCode, effectObject);
 				}
 	
-				Parameters = new EffectParameterCollection();
 				foreach (DXEffectObject.d3dx_parameter parameter in effectObject.parameter_handles) {
 					Parameters._parameters.Add (new EffectParameter(parameter));
 				}
 	
-				Techniques = new EffectTechniqueCollection();
 				foreach (DXEffectObject.d3dx_technique technique in effectObject.technique_handles) {
 					Techniques._techniques.Add (new EffectTechnique(this, technique));
 				}
 			}
 
-			CurrentTechnique = Techniques[0];
-			
+            CurrentTechnique = Techniques[0];			
 		}
+
+#endif
+
+#if NOMOJO
+
+        private void initializeEffects(string[] vertexShaderFilenames, string[] fragmentShaderFilenames, Tuple<int, int>[] programShaderIndexPairs)
+        {
+            var type = this.GetType();
+
+            var programCount = programShaderIndexPairs.Length;
+
+            shaderIndexLookupTable = new int[programCount];
+            programsByType.Add(type, shaderIndexLookupTable);
+
+            var vertexShaderCount = vertexShaderFilenames.Length;
+            var vertexShaders = new GLSLShader[vertexShaderCount];
+            for (var i = 0; i < vertexShaderCount; ++i)
+                vertexShaders[i] = new GLSLShader(ShaderType.VertexShader, vertexShaderFilenames[i]);
+
+            var fragmentShaderCount = fragmentShaderFilenames.Length;
+            var fragmentShaders = new GLSLShader[fragmentShaderCount];
+            for (var i = 0; i < fragmentShaderCount; ++i)
+                fragmentShaders[i] = new GLSLShader(ShaderType.FragmentShader, fragmentShaderFilenames[i]);
+
+            for (var i = 0; i < programCount; ++i)
+            {
+                var programShaderIndexPair = programShaderIndexPairs[i];
+                shaderIndexLookupTable[i] = this.CreateProgram(vertexShaders[programShaderIndexPair.Item1], fragmentShaders[programShaderIndexPair.Item2]);
+                shaderObjectLookup.Add(shaderIndexLookupTable[i], new GLSLShader[2] { vertexShaders[programShaderIndexPair.Item1], fragmentShaders[programShaderIndexPair.Item2] });
+            }
+        }
+
+        private int CreateProgram(GLSLShader glVertexShader, GLSLShader glFragmentShader)
+        {
+            var glProgram = GL.CreateProgram();
+
+            GL.AttachShader(glProgram, glVertexShader.shaderHandle);
+            GL.AttachShader(glProgram, glFragmentShader.shaderHandle);
+
+            GL.BindAttribLocation(glProgram, GraphicsDevice.attributePosition, "Position");
+            GL.BindAttribLocation(glProgram, GraphicsDevice.attributeNormal, "Normal");
+            GL.BindAttribLocation(glProgram, GraphicsDevice.attributeColor, "Color");
+            GL.BindAttribLocation(glProgram, GraphicsDevice.attributeTexCoord, "TextureCoordinate");
+
+            GL.LinkProgram(glProgram);
+
+            var error = GL.GetError();
+
+            int result = 0;
+#if IPHONE || ANDROID
+            GL.GetProgram(glProgram, ProgramParameter.LinkStatus, ref result);
+#else
+            GL.GetProgram(glProgram, ProgramParameter.LinkStatus, out result);
+#endif // IPHONE || ANDROID
+            if (result == 0)
+            {
+                var maxInfoLogLength = 0;
+#if IPHONE|| ANDROID
+                GL.GetProgram(glProgram, ProgramParameter.InfoLogLength, ref maxInfoLogLength);
+#else
+                GL.GetProgram(glProgram, ProgramParameter.InfoLogLength, out maxInfoLogLength);
+#endif //IPHONE || ANDROID
+                if (maxInfoLogLength > 0)
+                {
+                    var infoLogLength = 0;
+                    var infoLog = new StringBuilder(maxInfoLogLength);
+#if IPHONE || ANDROID
+                    GL.GetProgramInfoLog(glProgram, maxInfoLogLength, ref infoLogLength, infoLog);
+#else
+                    GL.GetProgramInfoLog(glProgram, maxInfoLogLength, out infoLogLength, infoLog);
+#endif // IPHONE || ANDROID
+                    System.Diagnostics.Debug.WriteLine(infoLog.ToString());
+                }
+            }
+
+            return glProgram;
+        }
+
+#else
+
+		internal static byte[] LoadEffectResource(string name)
+		{
+            var assembly = typeof(Effect).Assembly;
+
+#if GLSL_EFFECTS
+            name += "GLSL.bin";
+#else
+            name += ".bin";
+#endif
+            var stream = assembly.GetManifestResourceStream("Microsoft.Xna.Framework.Graphics.Effect." + name);
+            using (MemoryStream ms = new MemoryStream())
+			{
+				stream.CopyTo(ms);
+				return ms.ToArray();
+			}
+		}
+
+#endif
+
+        internal virtual void Initialize()
+        {
+        }
 
 		public virtual Effect Clone ()
 		{
@@ -168,30 +292,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 		}
 
-		public EffectTechnique CurrentTechnique { 
-			get;
-			set; 
-		}
-
 		protected internal virtual void OnApply ()
 		{
-
 		}
-
-		internal static byte[] LoadEffectResource(string name)
-		{
-			Assembly assembly = Assembly.GetExecutingAssembly();
-#if GLSL_EFFECTS
-			var stream = assembly.GetManifestResourceStream("Microsoft.Xna.Framework.Graphics.Effect."+name+"GLSL.bin");
-#else
-			var stream = assembly.GetManifestResourceStream("Microsoft.Xna.Framework.Graphics.Effect."+name+".bin");
-#endif
-			using (MemoryStream ms = new MemoryStream())
-			{
-				stream.CopyTo(ms);
-				return ms.ToArray();
-			}
-		}
-
 	}
 }

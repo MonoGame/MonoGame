@@ -21,7 +21,7 @@ namespace Microsoft.Xna.Framework.Graphics
 	internal class DXShader
 	{
 		public ShaderType shaderType;
-		public int shader;
+		public int shaderHandle;
 		
 		string glslCode;
 		
@@ -117,35 +117,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			uniforms_bool = new int[uniforms_bool_count];
 			
 			glslCode = parseData.output;
-
-#if ES11
-			if (shaderType == ShaderType.VertexShader) {
-				foreach (MojoShader.MOJOSHADER_attribute attrb in attributes) {
-					switch (attrb.usage) {
-
-					//use builtin attributes in GL 1.1
-					case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_COLOR:
-						glslCode = glslCode.Replace ("attribute vec4 "+attrb.name+";",
-						                               "#define "+attrb.name+" gl_Color");
-						break;
-					case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_POSITION:
-						glslCode = glslCode.Replace ("attribute vec4 "+attrb.name+";",
-						                               "#define "+attrb.name+" gl_Vertex");
-						break;
-					case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_TEXCOORD:
-						glslCode = glslCode.Replace ("attribute vec4 "+attrb.name+";",
-						                               "#define "+attrb.name+" gl_MultiTexCoord0");
-						break;
-					case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_NORMAL:
-						glslCode = glslCode.Replace ("attribute vec4 "+attrb.name+";",
-						                               "#define "+attrb.name+" gl_Normal");
-						break;
-					default:
-						throw new NotImplementedException();
-					}
-				}
-			}
-#endif
 			
 #if GLSLOPTIMIZER
 			//glslCode = GLSLOptimizer.Optimize (glslCode, shaderType);
@@ -158,38 +129,38 @@ namespace Microsoft.Xna.Framework.Graphics
             Threading.Begin();
             try
             {
-                shader = GL.CreateShader(shaderType);
+                shaderHandle = GL.CreateShader(shaderType);
 #if IPHONE || ANDROID
-                GL.ShaderSource(shader, 1, new string[] { glslCode }, (int[])null);
+                GL.ShaderSource(shaderHandle, 1, new string[] { glslCode }, (int[])null);
 #else			
-			    GL.ShaderSource (shader, glslCode);
+                GL.ShaderSource(shaderHandle, glslCode);
 #endif
-                GL.CompileShader(shader);
+                GL.CompileShader(shaderHandle);
 
                 int compiled = 0;
 #if IPHONE || ANDROID
-                GL.GetShader(shader, ShaderParameter.CompileStatus, ref compiled);
+                GL.GetShader(shaderHandle, ShaderParameter.CompileStatus, ref compiled);
 #else
-			    GL.GetShader (shader, ShaderParameter.CompileStatus, out compiled);
+                GL.GetShader(shaderHandle, ShaderParameter.CompileStatus, out compiled);
 #endif
                 if (compiled == (int)All.False)
                 {
 #if IPHONE || ANDROID
                     string log = "";
                     int length = 0;
-                    GL.GetShader(shader, ShaderParameter.InfoLogLength, ref length);
+                    GL.GetShader(shaderHandle, ShaderParameter.InfoLogLength, ref length);
                     if (length > 0)
                     {
                         var logBuilder = new StringBuilder(length);
-                        GL.GetShaderInfoLog(shader, length, ref length, logBuilder);
+                        GL.GetShaderInfoLog(shaderHandle, length, ref length, logBuilder);
                         log = logBuilder.ToString();
                     }
 #else
-				    string log = GL.GetShaderInfoLog(shader);
+                    string log = GL.GetShaderInfoLog(shaderHandle);
 #endif
                     Console.WriteLine(log);
 
-                    GL.DeleteShader(shader);
+                    GL.DeleteShader(shaderHandle);
                     throw new InvalidOperationException("Shader Compilation Failed");
                 }
             }
@@ -202,7 +173,6 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 
 		public void OnLink(int program) {
-#if !ES11
 			if (shaderType == ShaderType.VertexShader) {
 				//bind attributes
 				foreach (MojoShader.MOJOSHADER_attribute attrb in attributes) {
@@ -230,7 +200,6 @@ namespace Microsoft.Xna.Framework.Graphics
 					}
 				}
 			}
-#endif		
 		}
 		
 		public void Apply(int program,

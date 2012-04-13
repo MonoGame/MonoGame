@@ -16,7 +16,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug</OutputPath>
-    <DefineConstants>DEBUG;MONOMAC</DefineConstants>
+    <DefineConstants>DEBUG;MONOMAC;OPENGL</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
@@ -30,7 +30,7 @@
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DefineConstants>MONOMAC</DefineConstants>
+    <DefineConstants>MONOMAC;OPENGL</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Distribution|AnyCPU' ">
     <DebugType>none</DebugType>
@@ -38,7 +38,7 @@
     <OutputPath>bin\Distribution</OutputPath>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DefineConstants>MONOMAC</DefineConstants>
+    <DefineConstants>MONOMAC;OPENGL</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -59,6 +59,8 @@
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Mono\MonoMac\v0.0\Mono.MonoMac.targets" />
   <ItemGroup>
+    <Compile Include="Content\ContentExtensions.cs" />
+    <Compile Include="Graphics\PresentInterval.cs" />
     <Compile Include="BatteryChargeStatus.cs" />
     <Compile Include="BoundingBox.cs" />
     <Compile Include="BoundingFrustum.cs" />
@@ -156,7 +158,6 @@
     <Compile Include="Graphics\RenderTarget.cs" />
     <Compile Include="Graphics\SurfaceFormat.cs" />
     <Compile Include="Graphics\MultiSampleType.cs" />
-    <Compile Include="Graphics\SwapEffect.cs" />
     <Compile Include="Graphics\RenderTargetUsage.cs" />
     <Compile Include="Graphics\TextureUsage.cs" />
     <Compile Include="Graphics\SetDataOptions.cs" />
@@ -354,7 +355,6 @@
     <Compile Include="Graphics\Effect\AlphaTestEffect.cs" />
     <Compile Include="Graphics\Effect\GLSLOptimizer.cs" />
     <Compile Include="Graphics\GraphicsAdapter.cs" />
-    <Compile Include="Graphics\PresentationParameters.cs" />
     <Compile Include="Graphics\SpriteBatcher.cs" />
     <Compile Include="Content\ContentReaders\Texture2DReader.cs" />
     <Compile Include="Graphics\SpriteBatch.cs" />

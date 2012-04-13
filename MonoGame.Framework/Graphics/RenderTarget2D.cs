@@ -44,41 +44,37 @@ using System;
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
-#else
- #if ES11
-using OpenTK.Graphics.ES11;
- #else
+#elif WINRT
+// TODO
+#elif GLES
 using OpenTK.Graphics.ES20;
 using RenderbufferTarget = OpenTK.Graphics.ES20.All;
 using RenderbufferStorage = OpenTK.Graphics.ES20.All;
- #endif
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
 	public class RenderTarget2D : Texture2D
 	{
-#if IPHONE && ES11
-		const RenderbufferTarget GLRenderbuffer = RenderbufferTarget.RenderbufferOes;
-		const RenderbufferStorage GLDepthComponent16 = RenderbufferStorage.DepthComponent16Oes;
-		const RenderbufferStorage GLDepthComponent24 = RenderbufferStorage.DepthComponent24Oes;
-		const RenderbufferStorage GLDepth24Stencil8 = RenderbufferStorage.Depth24Stencil8Oes;
-#elif IPHONE || ANDROID
+#if GLES
 		const RenderbufferTarget GLRenderbuffer = RenderbufferTarget.Renderbuffer;
 		const RenderbufferStorage GLDepthComponent16 = RenderbufferStorage.DepthComponent16;
 		const RenderbufferStorage GLDepthComponent24 = RenderbufferStorage.DepthComponent24Oes;
 		const RenderbufferStorage GLDepth24Stencil8 = RenderbufferStorage.Depth24Stencil8Oes;
-#else
+#elif OPENGL
 		const RenderbufferTarget GLRenderbuffer = RenderbufferTarget.RenderbufferExt;
 		const RenderbufferStorage GLDepthComponent16 = RenderbufferStorage.DepthComponent16;
 		const RenderbufferStorage GLDepthComponent24 = RenderbufferStorage.DepthComponent24;
 		const RenderbufferStorage GLDepth24Stencil8 = RenderbufferStorage.Depth24Stencil8;
 #endif
 
-
-		
+#if WINRT
+        protected SharpDX.Direct3D11.RenderTargetView _renderTargetView;
+        protected SharpDX.Direct3D11.DepthStencilView _depthStencilView;
+#elif OPENGL
 		internal uint glDepthStencilBuffer;
-		
+#endif
+
 		public DepthFormat DepthStencilFormat { get; private set; }
 		
 		public int MultiSampleCount { get; private set; }
@@ -91,24 +87,29 @@ namespace Microsoft.Xna.Framework.Graphics
 			this.DepthStencilFormat = preferredDepthFormat;
 			this.MultiSampleCount = preferredMultiSampleCount;
 			this.RenderTargetUsage = usage;
-			
-			if (preferredDepthFormat != DepthFormat.None)
-			{
-#if IPHONE || ANDROID
-				GL.GenRenderbuffers(1, ref glDepthStencilBuffer);
+
+            if (preferredDepthFormat == DepthFormat.None)
+                return;
+
+#if WINRT
+
+#elif OPENGL
+
+#if GLES
+			GL.GenRenderbuffers(1, ref glDepthStencilBuffer);
 #else
-				GL.GenRenderbuffers(1, out glDepthStencilBuffer);
+			GL.GenRenderbuffers(1, out glDepthStencilBuffer);
 #endif
-				GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, this.glDepthStencilBuffer);
-				var glDepthStencilFormat = GLDepthComponent16;
-				switch (preferredDepthFormat)
-				{
-				case DepthFormat.Depth16: glDepthStencilFormat = GLDepthComponent16; break;
-				case DepthFormat.Depth24: glDepthStencilFormat = GLDepthComponent24; break;
-				case DepthFormat.Depth24Stencil8: glDepthStencilFormat = GLDepth24Stencil8; break;
-				}
-				GL.RenderbufferStorage(GLRenderbuffer, glDepthStencilFormat, this.width, this.height);
+			GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, this.glDepthStencilBuffer);
+			var glDepthStencilFormat = GLDepthComponent16;
+			switch (preferredDepthFormat)
+			{
+			case DepthFormat.Depth16: glDepthStencilFormat = GLDepthComponent16; break;
+			case DepthFormat.Depth24: glDepthStencilFormat = GLDepthComponent24; break;
+			case DepthFormat.Depth24Stencil8: glDepthStencilFormat = GLDepth24Stencil8; break;
 			}
+			GL.RenderbufferStorage(GLRenderbuffer, glDepthStencilFormat, this.width, this.height);
+#endif
 		}
 		
 		public RenderTarget2D (GraphicsDevice graphicsDevice, int width, int height, bool mipMap, SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat)
@@ -121,8 +122,21 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public override void Dispose ()
 		{
+#if WINRT
+            if (_renderTargetView != null)
+            {
+                _renderTargetView.Dispose();
+                _renderTargetView = null;
+            }
+            if (_depthStencilView != null)
+            {
+                _depthStencilView.Dispose();
+                _depthStencilView = null;
+            }
+#elif OPENGL
 			GL.DeleteRenderbuffers(1, ref this.glDepthStencilBuffer);
-			base.Dispose();
+#endif
+            base.Dispose();
 		}
 	}
 }

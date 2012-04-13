@@ -23,7 +23,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             get {
 				foreach (EffectParameter parameter in _parameters) {
-					if (parameter.Name == name) {
+					if (parameter != null && parameter.Name == name) {
 						return parameter;
 					}
 				}
@@ -39,6 +39,11 @@ namespace Microsoft.Xna.Framework.Graphics
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
             return _parameters.GetEnumerator();
+        }
+
+        internal void Add(EffectParameter param)
+        {
+            _parameters.Add(param);
         }
     }
 }

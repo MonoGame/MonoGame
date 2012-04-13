@@ -71,18 +71,26 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Drawing;
 using System.IO;
+using System.Reflection;
 
 using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework;
+#if WINRT
+using Windows.ApplicationModel.Core;
+using Windows.UI.Core;
+#else
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
-using Microsoft.Xna.Framework;
-using System.Reflection;
+using Microsoft.Xna.Framework.GamerServices;
+#endif
 
 namespace Microsoft.Xna.Framework
 {
     public class Game : IDisposable
+#if WINRT
+        , IFrameworkView
+#endif
     {
         private const float DefaultTargetFramesPerSecond = 60.0f;
 
@@ -132,7 +140,7 @@ namespace Microsoft.Xna.Framework
             Platform.Deactivated += Platform_Deactivated;
             _services.AddService(typeof(GamePlatform), Platform);
 
-
+#if MONOMAC || WINDOWS || LINUX
             // Set the window title.
             // TODO: Get the title from the WindowsPhoneManifest.xml for WP7 projects.
             string windowTitle = string.Empty;
@@ -146,7 +154,6 @@ namespace Microsoft.Xna.Framework
             // Otherwise, fallback to the Name of the assembly.
             if (string.IsNullOrEmpty(windowTitle))
                 windowTitle = assembly.GetName().Name;
-#if !ANDROID && !IPHONE
             Window.Title = windowTitle;
 #endif
         }
@@ -155,6 +162,25 @@ namespace Microsoft.Xna.Framework
         {
             Dispose(false);
         }
+
+#if WINRT
+        public void Initialize(CoreApplicationView applicationView)
+        {
+        }
+
+        public void Load(string entryPoint)
+        {
+        }
+
+        public void SetWindow(CoreWindow window)
+        {
+            (Window as MetroGameWindow).Initialize(window);
+        }
+
+        public void Uninitialize()
+        {
+        }
+#endif
 
 		[System.Diagnostics.Conditional("DEBUG")]
 		internal void Log(string Message)
@@ -174,9 +200,8 @@ namespace Microsoft.Xna.Framework
         protected virtual void Dispose(bool disposing)
         {
             if (disposing)
-            {
                 Platform.Dispose();
-            }
+
             _isDisposed = true;
         }
 
@@ -411,7 +436,12 @@ namespace Microsoft.Xna.Framework
 
                 if (currentTime < TargetElapsedTime)
                 {
-                    System.Threading.Thread.Sleep((TargetElapsedTime - currentTime).Milliseconds);
+                    var sleepMs = (TargetElapsedTime - currentTime).Milliseconds;
+#if WINRT
+                    new System.Threading.ManualResetEvent(false).WaitOne(sleepMs);
+#else
+                    System.Threading.Thread.Sleep(sleepMs);
+#endif
                 }
             }
         }
@@ -601,16 +631,18 @@ namespace Microsoft.Xna.Framework
             Initialize();
         }
 
-#if LINUX || WINDOWS
         internal void ResizeWindow(bool changed)
         {
+#if WINRT
+
+#elif LINUX || WINDOWS
             ((OpenTKGamePlatform)Platform).ResetWindowBounds(changed);
-        }
 #endif
+        }
 
         #endregion Internal Methods
 
-        private GraphicsDeviceManager graphicsDeviceManager
+        internal GraphicsDeviceManager graphicsDeviceManager
         {
             get
             {

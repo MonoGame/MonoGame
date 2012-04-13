@@ -59,6 +59,8 @@ using MonoMac.AudioUnit;
 using MonoMac.OpenAL;
 #endif
 
+using System.Diagnostics;
+
 namespace Microsoft.Xna.Framework.Audio
 {
 	public sealed partial class SoundEffect : IDisposable
@@ -171,7 +173,18 @@ namespace Microsoft.Xna.Framework.Audio
 			if (asbd.ChannelsPerFrame == 1) {
 				if (asbd.BitsPerChannel == 8) {
 					Format = ALFormat.Mono8;
-				} else {
+				}
+				else if (asbd.BitsPerChannel == 0) // This shouldn't happen. hackking around bad data for now.
+				{
+				//TODO: Remove this when sound's been fixed on iOS and other devices.
+					Format = ALFormat.Mono16;
+					Debug.WriteLine("Warning, bad decoded audio packet in SoundEffect.HandlePacketDecoded. Squelching sound.");
+					_duration = TimeSpan.Zero;
+					_data = audioData;
+					return;
+				}
+				else 
+				{
 					Format = ALFormat.Mono16;
 				}
 			} else {
@@ -182,6 +195,7 @@ namespace Microsoft.Xna.Framework.Audio
 				}
 			}
 			_data = audioData;
+
 
 			var _dblDuration = (e.Bytes / ((asbd.BitsPerChannel / 8) * asbd.ChannelsPerFrame)) / asbd.SampleRate;
 			_duration = TimeSpan.FromSeconds (_dblDuration);

@@ -88,31 +88,30 @@ namespace Microsoft.Xna.Framework.Audio
 			//buffer should contain 16-bit PCM wave data
 			short bitsPerSample = 16;
 			
-			MemoryStream mStream = new MemoryStream(44+buffer.Length);
-			BinaryWriter writer = new BinaryWriter(mStream);
-			
-			writer.Write("RIFF".ToCharArray()); //chunk id
-			writer.Write((int)(36+buffer.Length)); //chunk size
-			writer.Write("WAVE".ToCharArray()); //RIFF type
-			
-			writer.Write("fmt ".ToCharArray()); //chunk id
-			writer.Write((int)16); //format header size
-			writer.Write((short)1); //format (PCM)
-			writer.Write((short)channels);
-			writer.Write((int)sampleRate);
-			short blockAlign = (short)((bitsPerSample/8)*(int)channels);
-			writer.Write((int)(sampleRate*blockAlign)); //byte rate
-			writer.Write((short)blockAlign);
-			writer.Write((short)bitsPerSample);
-			
-			writer.Write("data".ToCharArray()); //chunk id
-			writer.Write((int)buffer.Length); //data size
-			writer.Write(buffer);
-			
-			writer.Close();
-			mStream.Close();
-			
-			_data = mStream.ToArray();
+			using (var mStream = new MemoryStream(44+buffer.Length))
+            using (var writer = new BinaryWriter(mStream))
+            {
+                writer.Write("RIFF".ToCharArray()); //chunk id
+                writer.Write((int)(36 + buffer.Length)); //chunk size
+                writer.Write("WAVE".ToCharArray()); //RIFF type
+
+                writer.Write("fmt ".ToCharArray()); //chunk id
+                writer.Write((int)16); //format header size
+                writer.Write((short)1); //format (PCM)
+                writer.Write((short)channels);
+                writer.Write((int)sampleRate);
+                short blockAlign = (short)((bitsPerSample / 8) * (int)channels);
+                writer.Write((int)(sampleRate * blockAlign)); //byte rate
+                writer.Write((short)blockAlign);
+                writer.Write((short)bitsPerSample);
+
+                writer.Write("data".ToCharArray()); //chunk id
+                writer.Write((int)buffer.Length); //data size
+                writer.Write(buffer);
+
+                _data = mStream.ToArray();
+            }
+
 			_name = "";
 			_sound = new Sound(_data, 1.0f, false);
 		}

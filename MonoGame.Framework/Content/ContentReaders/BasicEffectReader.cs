@@ -42,7 +42,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Microsoft.Xna.Framework.Content
 {
-    class BasicEffectReader : ContentTypeReader<BasicEffect>
+    internal class BasicEffectReader : ContentTypeReader<BasicEffect>
     {
         protected internal override BasicEffect Read(ContentReader input, BasicEffect existingInstance)
         {

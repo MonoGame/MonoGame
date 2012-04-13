@@ -5,14 +5,10 @@ using System.Runtime.InteropServices;
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
-#else
-
-#if ES11
-using OpenTK.Graphics.ES11;
+#elif WINRT
+using System.Reflection;
 #else
 using OpenTK.Graphics.ES20;
-#endif
-
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -72,8 +68,13 @@ namespace Microsoft.Xna.Framework.Graphics
 			{
 				throw new ArgumentNullException("vertexType", "Cannot be null");
 			}
-			if (!vertexType.IsValueType)
-			{
+
+#if WINRT
+            if (!vertexType.GetTypeInfo().IsValueType)
+#else
+            if (!vertexType.IsValueType)
+#endif
+            {
 				object[] args = new object[] { vertexType };
 				throw new ArgumentException("vertexType", "Must be value type");
 			}
@@ -100,63 +101,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		internal void Apply(IntPtr offset)
 		{
-#if ES11
-			GLStateManager.VertexArray(true);
+#if WINRT
 
-			bool normal = false;
-			bool texcoord = false;
-			bool color = false;
-			
-			foreach (var ve in this.GetVertexElements())
-			{
-				IntPtr elementOffset = (IntPtr)(offset.ToInt64 () + ve.Offset);
-				switch (ve.VertexElementUsage)
-				{
-				case VertexElementUsage.Position:
-					GL.VertexPointer(
-						ve.VertexElementFormat.OpenGLNumberOfElements(),
-						ve.VertexElementFormat.OpenGLVertexPointerType(),
-						this.VertexStride,
-						elementOffset);
-					GL.VertexAttribPointer(GraphicsDevice.attributePosition,
-						ve.VertexElementFormat.OpenGLNumberOfElements(),
-						ve.VertexElementFormat.OpenGLVertexAttribPointerType(),
-						false,
-						this.VertexStride,
-						elementOffset);
-					break;
-				case VertexElementUsage.Color:
-					GL.ColorPointer(
-						ve.VertexElementFormat.OpenGLNumberOfElements(),
-						ve.VertexElementFormat.OpenGLColorPointerType(),
-						this.VertexStride,
-						elementOffset);
-					color = true;
-					break;
-				case VertexElementUsage.Normal:
-					GL.NormalPointer(
-						ve.VertexElementFormat.OpenGLNormalPointerType(),
-						this.VertexStride,
-						elementOffset);
-					normal = true;
-					break;
-				case VertexElementUsage.TextureCoordinate:
-					GL.TexCoordPointer(
-						ve.VertexElementFormat.OpenGLNumberOfElements(),
-						ve.VertexElementFormat.OpenGLTexCoordPointerType(),
-						this.VertexStride,
-						elementOffset
-					);
-					texcoord = true;
-					break;
-				default:
-					throw new NotImplementedException();
-				}
-			}
-			GLStateManager.ColorArray (color);
-			GLStateManager.NormalArray(normal);
-			GLStateManager.TextureCoordArray(texcoord);
-#else
+#elif OPENGL
 
             // TODO: This is executed on every draw call... can we not
             // allocate a vertex declaration once and just re-apply it?

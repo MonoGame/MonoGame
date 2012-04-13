@@ -15,7 +15,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug</OutputPath>
-    <DefineConstants>DEBUG;LINUX</DefineConstants>
+    <DefineConstants>DEBUG;LINUX;OPENGL</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
@@ -31,7 +31,7 @@
     <PlatformTarget>x86</PlatformTarget>
     <ConsolePause>false</ConsolePause>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DefineConstants>LINUX</DefineConstants>
+    <DefineConstants>LINUX;OPENGL</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -50,6 +50,7 @@
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Compile Include="Audio\NoAudioHardwareException.cs" />
+    <Compile Include="Content\ContentExtensions.cs" />
     <Compile Include="BatteryChargeStatus.cs" />
     <Compile Include="BoundingBox.cs" />
     <Compile Include="BoundingFrustum.cs" />
@@ -105,6 +106,7 @@
     <Compile Include="Input\GamePadState.cs" />
     <Compile Include="Input\KeyboardState.cs" />
     <Compile Include="Input\KeyState.cs" />
+    <Compile Include="Graphics\PresentInterval.cs" />
     <Compile Include="Input\GamePadThumbSticks.cs" />
     <Compile Include="Input\Buttons.cs" />
     <Compile Include="Input\GamePadCapabilities.cs" />
@@ -151,7 +153,6 @@
     <Compile Include="Graphics\RenderTarget.cs" />
     <Compile Include="Graphics\SurfaceFormat.cs" />
     <Compile Include="Graphics\MultiSampleType.cs" />
-    <Compile Include="Graphics\SwapEffect.cs" />
     <Compile Include="Graphics\RenderTargetUsage.cs" />
     <Compile Include="Graphics\TextureUsage.cs" />
     <Compile Include="Graphics\SetDataOptions.cs" />

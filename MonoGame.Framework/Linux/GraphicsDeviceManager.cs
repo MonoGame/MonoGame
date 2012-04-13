@@ -69,15 +69,15 @@ namespace Microsoft.Xna.Framework
 			}
 
 			game.Services.AddService (typeof(IGraphicsDeviceManager), this);
-			game.Services.AddService (typeof(IGraphicsDeviceService), this);	
+			game.Services.AddService (typeof(IGraphicsDeviceService), this);
 
+            // TODO: This shouldn't occur here... it occurs during Game.Initialize().
 			CreateDevice();
 		}
 
 		public void CreateDevice ()
 		{
 			_graphicsDevice = new GraphicsDevice ();
-			_graphicsDevice.PresentationParameters = new PresentationParameters ();
 
 			_preferredBackBufferHeight = _graphicsDevice.PresentationParameters.BackBufferHeight;
 			_preferredBackBufferWidth = _graphicsDevice.PresentationParameters.BackBufferWidth;
@@ -158,6 +158,8 @@ namespace Microsoft.Xna.Framework
 			} else {
 				_graphicsDevice.PreferedFilter = All.Nearest;
 			}
+
+            _graphicsDevice.Initialize();
 
             ApplyChanges();
 		}

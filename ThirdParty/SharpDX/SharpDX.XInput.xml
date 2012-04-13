@@ -1,0 +1,1225 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>SharpDX.XInput</name>
+    </assembly>
+    <members>
+        <member name="T:SharpDX.XInput.Controller">
+            <summary>
+            A XInput controller.
+            </summary>
+        </member>
+        <member name="M:SharpDX.XInput.Controller.#ctor(SharpDX.XInput.UserIndex)">
+            <summary>
+            Initializes a new instance of the <see cref="T:SharpDX.XInput.Controller"/> class.
+            </summary>
+            <param name="userIndex">Index of the user.</param>
+        </member>
+        <member name="M:SharpDX.XInput.Controller.GetBatteryInformation(SharpDX.XInput.BatteryDeviceType)">
+            <summary>
+            Gets the battery information.
+            </summary>
+            <param name="batteryDeviceType">Type of the battery device.</param>
+            <returns></returns>
+            <unmanaged>unsigned int XInputGetBatteryInformation([In] XUSER_INDEX dwUserIndex,[In] BATTERY_DEVTYPE devType,[Out] XINPUT_BATTERY_INFORMATION* pBatteryInformation)</unmanaged>	
+        </member>
+        <member name="M:SharpDX.XInput.Controller.GetCapabilities(SharpDX.XInput.DeviceQueryType)">
+            <summary>
+            Gets the capabilities.
+            </summary>
+            <param name="deviceQueryType">Type of the device query.</param>
+            <returns></returns>
+            <unmanaged>unsigned int XInputGetCapabilities([In] XUSER_INDEX dwUserIndex,[In] XINPUT_DEVQUERYTYPE dwFlags,[Out] XINPUT_CAPABILITIES* pCapabilities)</unmanaged>	
+        </member>
+        <member name="M:SharpDX.XInput.Controller.GetKeystroke(SharpDX.XInput.DeviceQueryType,SharpDX.XInput.Keystroke@)">
+            <summary>
+            Gets the keystroke.
+            </summary>
+            <param name="deviceQueryType">The flag.</param>
+            <param name="keystroke">The keystroke.</param>
+            <returns></returns>
+            <unmanaged>unsigned int XInputGetKeystroke([In] XUSER_INDEX dwUserIndex,[In] unsigned int dwReserved,[Out] XINPUT_KEYSTROKE* pKeystroke)</unmanaged>	
+        </member>
+        <member name="M:SharpDX.XInput.Controller.GetState">
+            <summary>
+            Gets the state.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SharpDX.XInput.Controller.SetReporting(System.Boolean)">
+            <summary>
+            Sets the reporting.
+            </summary>
+            <param name="enableReporting">if set to <c>true</c> [enable reporting].</param>
+        </member>
+        <member name="M:SharpDX.XInput.Controller.SetVibration(SharpDX.XInput.Vibration)">
+            <summary>
+            Sets the vibration.
+            </summary>
+            <param name="vibration">The vibration.</param>
+            <returns></returns>
+        </member>
+        <member name="P:SharpDX.XInput.Controller.IsConnected">
+            <summary>
+            Gets a value indicating whether this instance is connected.
+            </summary>
+            <value>
+            	<c>true</c> if this instance is connected; otherwise, <c>false</c>.
+            </value>
+        </member>
+        <member name="P:SharpDX.XInput.Controller.SoundRenderGuid">
+            <summary>
+            Gets the sound render GUID.
+            </summary>
+        </member>
+        <member name="P:SharpDX.XInput.Controller.SoundCaptureGuid">
+            <summary>
+            Gets the sound capture GUID.
+            </summary>
+        </member>
+        <member name="T:SharpDX.XInput.Gamepad">
+            <summary>	
+            <code>	
+            typedef struct _XINPUT_GAMEPAD { WORD wButtons; BYTE bLeftTrigger; BYTE bRightTrigger; SHORT sThumbLX; SHORT sThumbLY; SHORT sThumbRX; SHORT sThumbRY;	
+            } <see cref="T:SharpDX.XInput.Gamepad"/>, *PXINPUT_GAMEPAD;	
+            </code>	
+             Members<list>	
+            <item><term>wButtons</term><description> Bitmask of the device digital buttons, as follows. A set bit indicates that the corresponding button is pressed.	
+            	
+            <code>	
+            #define <see cref="F:SharpDX.XInput.GamepadButtonFlags.DPadUp"/>          0x00000001	
+            #define <see cref="F:SharpDX.XInput.GamepadButtonFlags.DPadDown"/>        0x00000002	
+            #define <see cref="F:SharpDX.XInput.GamepadButtonFlags.DPadLeft"/>        0x00000004	
+            #define <see cref="F:SharpDX.XInput.GamepadButtonFlags.DPadRight"/>       0x00000008	
+            #define <see cref="F:SharpDX.XInput.GamepadButtonFlags.Start"/>            0x00000010	
+            #define <see cref="F:SharpDX.XInput.GamepadButtonFlags.Back"/>             0x00000020	
+            #define <see cref="F:SharpDX.XInput.GamepadButtonFlags.LeftThumb"/>       0x00000040	
+            #define <see cref="F:SharpDX.XInput.GamepadButtonFlags.RightThumb"/>      0x00000080	
+            #define <see cref="F:SharpDX.XInput.GamepadButtonFlags.LeftShoulder"/>    0x0100	
+            #define <see cref="F:SharpDX.XInput.GamepadButtonFlags.RightShoulder"/>   0x0200	
+            #define <see cref="F:SharpDX.XInput.GamepadButtonFlags.A"/>                0x1000	
+            #define <see cref="F:SharpDX.XInput.GamepadButtonFlags.B"/>                0x2000	
+            #define <see cref="F:SharpDX.XInput.GamepadButtonFlags.X"/>                0x4000	
+            #define <see cref="F:SharpDX.XInput.GamepadButtonFlags.Y"/>                0x8000	
+            </code>	
+             <para>Bits that are set but not defined above are reserved, and their state is undefined.</para>	
+             </description></item>	
+            <item><term>bLeftTrigger</term><description> The current value of the left trigger analog control. The value is between 0 and 255. </description></item>	
+            <item><term>bRightTrigger</term><description> The current value of the right trigger analog control. The value is between 0 and 255. </description></item>	
+            <item><term>sThumbLX</term><description> Left thumbstick x-axis value. Each of the thumbstick axis members is a signed value between -32768 and 32767 describing the position of the thumbstick. A value of 0 is centered. Negative values signify down or to the left. Positive values signify up or to the right. The constants <see cref="F:SharpDX.XInput.Gamepad.LeftThumbDeadZone"/> or <see cref="F:SharpDX.XInput.Gamepad.RightThumbDeadZone"/> can be used as a positive and negative value to filter a thumbstick input. </description></item>	
+            <item><term>sThumbLY</term><description> Left thumbstick y-axis value. The value is between -32768 and 32767. </description></item>	
+            <item><term>sThumbRX</term><description> Right thumbstick x-axis value. The value is between -32768 and 32767. </description></item>	
+            <item><term>sThumbRY</term><description> Right thumbstick y-axis value. The value is between -32768 and 32767. </description></item>	
+            </list>	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_GAMEPAD']/*"/>	
+            <unmanaged>XINPUT_GAMEPAD</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.Gamepad.TriggerThreshold">
+            <summary>Constant TriggerThreshold.</summary>
+            <unmanaged>XINPUT_GAMEPAD_TRIGGER_THRESHOLD</unmanaged>
+        </member>
+        <member name="F:SharpDX.XInput.Gamepad.LeftThumbDeadZone">
+            <summary>Constant LeftThumbDeadZone.</summary>
+            <unmanaged>XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE</unmanaged>
+        </member>
+        <member name="F:SharpDX.XInput.Gamepad.RightThumbDeadZone">
+            <summary>Constant RightThumbDeadZone.</summary>
+            <unmanaged>XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE</unmanaged>
+        </member>
+        <member name="F:SharpDX.XInput.Gamepad.Buttons">
+            <summary>	
+            Bitmask of the device digital buttons, as follows. A set bit indicates that the corresponding button is pressed.	
+            	
+            <code>	
+            #define <see cref="F:SharpDX.XInput.GamepadButtonFlags.DPadUp"/>          0x00000001	
+            #define <see cref="F:SharpDX.XInput.GamepadButtonFlags.DPadDown"/>        0x00000002	
+            #define <see cref="F:SharpDX.XInput.GamepadButtonFlags.DPadLeft"/>        0x00000004	
+            #define <see cref="F:SharpDX.XInput.GamepadButtonFlags.DPadRight"/>       0x00000008	
+            #define <see cref="F:SharpDX.XInput.GamepadButtonFlags.Start"/>            0x00000010	
+            #define <see cref="F:SharpDX.XInput.GamepadButtonFlags.Back"/>             0x00000020	
+            #define <see cref="F:SharpDX.XInput.GamepadButtonFlags.LeftThumb"/>       0x00000040	
+            #define <see cref="F:SharpDX.XInput.GamepadButtonFlags.RightThumb"/>      0x00000080	
+            #define <see cref="F:SharpDX.XInput.GamepadButtonFlags.LeftShoulder"/>    0x0100	
+            #define <see cref="F:SharpDX.XInput.GamepadButtonFlags.RightShoulder"/>   0x0200	
+            #define <see cref="F:SharpDX.XInput.GamepadButtonFlags.A"/>                0x1000	
+            #define <see cref="F:SharpDX.XInput.GamepadButtonFlags.B"/>                0x2000	
+            #define <see cref="F:SharpDX.XInput.GamepadButtonFlags.X"/>                0x4000	
+            #define <see cref="F:SharpDX.XInput.GamepadButtonFlags.Y"/>                0x8000	
+            </code>	
+             <para>Bits that are set but not defined above are reserved, and their state is undefined.</para>	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_GAMEPAD::wButtons']/*"/>	
+            <unmanaged>XINPUT_GAMEPAD_BUTTON_FLAGS wButtons</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.Gamepad.LeftTrigger">
+            <summary>	
+            The current value of the left trigger analog control. The value is between 0 and 255.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_GAMEPAD::bLeftTrigger']/*"/>	
+            <unmanaged>unsigned char bLeftTrigger</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.Gamepad.RightTrigger">
+            <summary>	
+            The current value of the right trigger analog control. The value is between 0 and 255.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_GAMEPAD::bRightTrigger']/*"/>	
+            <unmanaged>unsigned char bRightTrigger</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.Gamepad.LeftThumbX">
+            <summary>	
+            Left thumbstick x-axis value. Each of the thumbstick axis members is a signed value between -32768 and 32767 describing the position of the thumbstick. A value of 0 is centered. Negative values signify down or to the left. Positive values signify up or to the right. The constants <see cref="F:SharpDX.XInput.Gamepad.LeftThumbDeadZone"/> or <see cref="F:SharpDX.XInput.Gamepad.RightThumbDeadZone"/> can be used as a positive and negative value to filter a thumbstick input.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_GAMEPAD::sThumbLX']/*"/>	
+            <unmanaged>short sThumbLX</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.Gamepad.LeftThumbY">
+            <summary>	
+            Left thumbstick y-axis value. The value is between -32768 and 32767.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_GAMEPAD::sThumbLY']/*"/>	
+            <unmanaged>short sThumbLY</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.Gamepad.RightThumbX">
+            <summary>	
+            Right thumbstick x-axis value. The value is between -32768 and 32767.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_GAMEPAD::sThumbRX']/*"/>	
+            <unmanaged>short sThumbRX</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.Gamepad.RightThumbY">
+            <summary>	
+            Right thumbstick y-axis value. The value is between -32768 and 32767.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_GAMEPAD::sThumbRY']/*"/>	
+            <unmanaged>short sThumbRY</unmanaged>	
+        </member>
+        <member name="T:SharpDX.XInput.BatteryDeviceType">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='BATTERY_DEVTYPE']/*"/>	
+            <unmanaged>BATTERY_DEVTYPE</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.BatteryDeviceType.Gamepad">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='BATTERY_DEVTYPE_GAMEPAD']/*"/>	
+            <unmanaged>BATTERY_DEVTYPE_GAMEPAD</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.BatteryDeviceType.Headset">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='BATTERY_DEVTYPE_HEADSET']/*"/>	
+            <unmanaged>BATTERY_DEVTYPE_HEADSET</unmanaged>	
+        </member>
+        <member name="T:SharpDX.XInput.BatteryLevel">
+            <summary>	
+            The OID_WW_GEN_BATTERY_LEVEL OID requests the miniport driver to return the current charge of the battery as follows:	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='BATTERY_LEVEL']/*"/>	
+            <unmanaged>BATTERY_LEVEL</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.BatteryLevel.Empty">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='BATTERY_LEVEL_EMPTY']/*"/>	
+            <unmanaged>BATTERY_LEVEL_EMPTY</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.BatteryLevel.Low">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='BATTERY_LEVEL_LOW']/*"/>	
+            <unmanaged>BATTERY_LEVEL_LOW</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.BatteryLevel.Medium">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='BATTERY_LEVEL_MEDIUM']/*"/>	
+            <unmanaged>BATTERY_LEVEL_MEDIUM</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.BatteryLevel.Full">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='BATTERY_LEVEL_FULL']/*"/>	
+            <unmanaged>BATTERY_LEVEL_FULL</unmanaged>	
+        </member>
+        <member name="T:SharpDX.XInput.BatteryType">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='BATTERY_TYPE']/*"/>	
+            <unmanaged>BATTERY_TYPE</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.BatteryType.Disconnected">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='BATTERY_TYPE_DISCONNECTED']/*"/>	
+            <unmanaged>BATTERY_TYPE_DISCONNECTED</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.BatteryType.Wired">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='BATTERY_TYPE_WIRED']/*"/>	
+            <unmanaged>BATTERY_TYPE_WIRED</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.BatteryType.Alkaline">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='BATTERY_TYPE_ALKALINE']/*"/>	
+            <unmanaged>BATTERY_TYPE_ALKALINE</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.BatteryType.Nimh">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='BATTERY_TYPE_NIMH']/*"/>	
+            <unmanaged>BATTERY_TYPE_NIMH</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.BatteryType.Unknown">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='BATTERY_TYPE_UNKNOWN']/*"/>	
+            <unmanaged>BATTERY_TYPE_UNKNOWN</unmanaged>	
+        </member>
+        <member name="T:SharpDX.XInput.CapabilityFlags">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_CAPS_FLAGS']/*"/>	
+            <unmanaged>XINPUT_CAPS_FLAGS</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.CapabilityFlags.FfbSupported">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_CAPS_FFB_SUPPORTED']/*"/>	
+            <unmanaged>XINPUT_CAPS_FFB_SUPPORTED</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.CapabilityFlags.Wireless">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_CAPS_WIRELESS']/*"/>	
+            <unmanaged>XINPUT_CAPS_WIRELESS</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.CapabilityFlags.VoiceSupported">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_CAPS_VOICE_SUPPORTED']/*"/>	
+            <unmanaged>XINPUT_CAPS_VOICE_SUPPORTED</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.CapabilityFlags.PmdSupported">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_CAPS_PMD_SUPPORTED']/*"/>	
+            <unmanaged>XINPUT_CAPS_PMD_SUPPORTED</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.CapabilityFlags.NoNavigation">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_CAPS_NO_NAVIGATION']/*"/>	
+            <unmanaged>XINPUT_CAPS_NO_NAVIGATION</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.CapabilityFlags.None">
+            <summary>	
+            None.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='']/*"/>	
+            <unmanaged>None</unmanaged>	
+        </member>
+        <member name="T:SharpDX.XInput.DeviceQueryType">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_DEVQUERYTYPE']/*"/>	
+            <unmanaged>XINPUT_DEVQUERYTYPE</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.DeviceQueryType.Gamepad">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_FLAG_GAMEPAD']/*"/>	
+            <unmanaged>XINPUT_FLAG_GAMEPAD</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.DeviceQueryType.Any">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_FLAG_ANY']/*"/>	
+            <unmanaged>XINPUT_FLAG_ANY</unmanaged>	
+        </member>
+        <member name="T:SharpDX.XInput.DeviceSubType">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_DEVSUBTYPE']/*"/>	
+            <unmanaged>XINPUT_DEVSUBTYPE</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.DeviceSubType.Gamepad">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_DEVSUBTYPE_GAMEPAD']/*"/>	
+            <unmanaged>XINPUT_DEVSUBTYPE_GAMEPAD</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.DeviceSubType.Unknown">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_DEVSUBTYPE_UNKNOWN']/*"/>	
+            <unmanaged>XINPUT_DEVSUBTYPE_UNKNOWN</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.DeviceSubType.Wheel">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_DEVSUBTYPE_WHEEL']/*"/>	
+            <unmanaged>XINPUT_DEVSUBTYPE_WHEEL</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.DeviceSubType.ArcadeStick">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_DEVSUBTYPE_ARCADE_STICK']/*"/>	
+            <unmanaged>XINPUT_DEVSUBTYPE_ARCADE_STICK</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.DeviceSubType.FlightStick">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_DEVSUBTYPE_FLIGHT_STICK']/*"/>	
+            <unmanaged>XINPUT_DEVSUBTYPE_FLIGHT_STICK</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.DeviceSubType.DancePad">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_DEVSUBTYPE_DANCE_PAD']/*"/>	
+            <unmanaged>XINPUT_DEVSUBTYPE_DANCE_PAD</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.DeviceSubType.Guitar">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_DEVSUBTYPE_GUITAR']/*"/>	
+            <unmanaged>XINPUT_DEVSUBTYPE_GUITAR</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.DeviceSubType.GuitarAlternate">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_DEVSUBTYPE_GUITAR_ALTERNATE']/*"/>	
+            <unmanaged>XINPUT_DEVSUBTYPE_GUITAR_ALTERNATE</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.DeviceSubType.DrumKit">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_DEVSUBTYPE_DRUM_KIT']/*"/>	
+            <unmanaged>XINPUT_DEVSUBTYPE_DRUM_KIT</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.DeviceSubType.GuitarBass">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_DEVSUBTYPE_GUITAR_BASS']/*"/>	
+            <unmanaged>XINPUT_DEVSUBTYPE_GUITAR_BASS</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.DeviceSubType.ArcadePad">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_DEVSUBTYPE_ARCADE_PAD']/*"/>	
+            <unmanaged>XINPUT_DEVSUBTYPE_ARCADE_PAD</unmanaged>	
+        </member>
+        <member name="T:SharpDX.XInput.DeviceType">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_DEVTYPE']/*"/>	
+            <unmanaged>XINPUT_DEVTYPE</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.DeviceType.Gamepad">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_DEVTYPE_GAMEPAD']/*"/>	
+            <unmanaged>XINPUT_DEVTYPE_GAMEPAD</unmanaged>	
+        </member>
+        <member name="T:SharpDX.XInput.GamepadButtonFlags">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_GAMEPAD_BUTTON_FLAGS']/*"/>	
+            <unmanaged>XINPUT_GAMEPAD_BUTTON_FLAGS</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.GamepadButtonFlags.DPadUp">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_GAMEPAD_DPAD_UP']/*"/>	
+            <unmanaged>XINPUT_GAMEPAD_DPAD_UP</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.GamepadButtonFlags.DPadDown">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_GAMEPAD_DPAD_DOWN']/*"/>	
+            <unmanaged>XINPUT_GAMEPAD_DPAD_DOWN</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.GamepadButtonFlags.DPadLeft">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_GAMEPAD_DPAD_LEFT']/*"/>	
+            <unmanaged>XINPUT_GAMEPAD_DPAD_LEFT</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.GamepadButtonFlags.DPadRight">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_GAMEPAD_DPAD_RIGHT']/*"/>	
+            <unmanaged>XINPUT_GAMEPAD_DPAD_RIGHT</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.GamepadButtonFlags.Start">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_GAMEPAD_START']/*"/>	
+            <unmanaged>XINPUT_GAMEPAD_START</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.GamepadButtonFlags.Back">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_GAMEPAD_BACK']/*"/>	
+            <unmanaged>XINPUT_GAMEPAD_BACK</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.GamepadButtonFlags.LeftThumb">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_GAMEPAD_LEFT_THUMB']/*"/>	
+            <unmanaged>XINPUT_GAMEPAD_LEFT_THUMB</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.GamepadButtonFlags.RightThumb">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_GAMEPAD_RIGHT_THUMB']/*"/>	
+            <unmanaged>XINPUT_GAMEPAD_RIGHT_THUMB</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.GamepadButtonFlags.LeftShoulder">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_GAMEPAD_LEFT_SHOULDER']/*"/>	
+            <unmanaged>XINPUT_GAMEPAD_LEFT_SHOULDER</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.GamepadButtonFlags.RightShoulder">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_GAMEPAD_RIGHT_SHOULDER']/*"/>	
+            <unmanaged>XINPUT_GAMEPAD_RIGHT_SHOULDER</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.GamepadButtonFlags.A">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_GAMEPAD_A']/*"/>	
+            <unmanaged>XINPUT_GAMEPAD_A</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.GamepadButtonFlags.B">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_GAMEPAD_B']/*"/>	
+            <unmanaged>XINPUT_GAMEPAD_B</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.GamepadButtonFlags.X">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_GAMEPAD_X']/*"/>	
+            <unmanaged>XINPUT_GAMEPAD_X</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.GamepadButtonFlags.Y">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_GAMEPAD_Y']/*"/>	
+            <unmanaged>XINPUT_GAMEPAD_Y</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.GamepadButtonFlags.None">
+            <summary>	
+            None.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='']/*"/>	
+            <unmanaged>None</unmanaged>	
+        </member>
+        <member name="T:SharpDX.XInput.GamepadKeyCode">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_GAMEPAD_KEY_CODE']/*"/>	
+            <unmanaged>XINPUT_GAMEPAD_KEY_CODE</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.GamepadKeyCode.A">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='VK_PAD_A']/*"/>	
+            <unmanaged>VK_PAD_A</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.GamepadKeyCode.B">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='VK_PAD_B']/*"/>	
+            <unmanaged>VK_PAD_B</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.GamepadKeyCode.X">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='VK_PAD_X']/*"/>	
+            <unmanaged>VK_PAD_X</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.GamepadKeyCode.Y">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='VK_PAD_Y']/*"/>	
+            <unmanaged>VK_PAD_Y</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.GamepadKeyCode.RightShoulder">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='VK_PAD_RSHOULDER']/*"/>	
+            <unmanaged>VK_PAD_RSHOULDER</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.GamepadKeyCode.LeftShoulder">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='VK_PAD_LSHOULDER']/*"/>	
+            <unmanaged>VK_PAD_LSHOULDER</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.GamepadKeyCode.LeftTrigger">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='VK_PAD_LTRIGGER']/*"/>	
+            <unmanaged>VK_PAD_LTRIGGER</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.GamepadKeyCode.RightTrigger">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='VK_PAD_RTRIGGER']/*"/>	
+            <unmanaged>VK_PAD_RTRIGGER</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.GamepadKeyCode.DPadUp">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='VK_PAD_DPAD_UP']/*"/>	
+            <unmanaged>VK_PAD_DPAD_UP</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.GamepadKeyCode.DPadDown">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='VK_PAD_DPAD_DOWN']/*"/>	
+            <unmanaged>VK_PAD_DPAD_DOWN</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.GamepadKeyCode.DPadLeft">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='VK_PAD_DPAD_LEFT']/*"/>	
+            <unmanaged>VK_PAD_DPAD_LEFT</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.GamepadKeyCode.DPadRight">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='VK_PAD_DPAD_RIGHT']/*"/>	
+            <unmanaged>VK_PAD_DPAD_RIGHT</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.GamepadKeyCode.Start">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='VK_PAD_START']/*"/>	
+            <unmanaged>VK_PAD_START</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.GamepadKeyCode.Back">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='VK_PAD_BACK']/*"/>	
+            <unmanaged>VK_PAD_BACK</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.GamepadKeyCode.LeftThumbPress">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='VK_PAD_LTHUMB_PRESS']/*"/>	
+            <unmanaged>VK_PAD_LTHUMB_PRESS</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.GamepadKeyCode.RightThumbPress">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='VK_PAD_RTHUMB_PRESS']/*"/>	
+            <unmanaged>VK_PAD_RTHUMB_PRESS</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.GamepadKeyCode.LeftThumbUp">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='VK_PAD_LTHUMB_UP']/*"/>	
+            <unmanaged>VK_PAD_LTHUMB_UP</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.GamepadKeyCode.LeftThumbDown">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='VK_PAD_LTHUMB_DOWN']/*"/>	
+            <unmanaged>VK_PAD_LTHUMB_DOWN</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.GamepadKeyCode.LeftThumbRight">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='VK_PAD_LTHUMB_RIGHT']/*"/>	
+            <unmanaged>VK_PAD_LTHUMB_RIGHT</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.GamepadKeyCode.LeftThumbLeft">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='VK_PAD_LTHUMB_LEFT']/*"/>	
+            <unmanaged>VK_PAD_LTHUMB_LEFT</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.GamepadKeyCode.RightThumbUpLeft">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='VK_PAD_LTHUMB_UPLEFT']/*"/>	
+            <unmanaged>VK_PAD_LTHUMB_UPLEFT</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.GamepadKeyCode.LeftThumbUpright">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='VK_PAD_LTHUMB_UPRIGHT']/*"/>	
+            <unmanaged>VK_PAD_LTHUMB_UPRIGHT</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.GamepadKeyCode.LeftThumbDownright">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='VK_PAD_LTHUMB_DOWNRIGHT']/*"/>	
+            <unmanaged>VK_PAD_LTHUMB_DOWNRIGHT</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.GamepadKeyCode.RightThumbDownLeft">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='VK_PAD_LTHUMB_DOWNLEFT']/*"/>	
+            <unmanaged>VK_PAD_LTHUMB_DOWNLEFT</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.GamepadKeyCode.RightThumbUp">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='VK_PAD_RTHUMB_UP']/*"/>	
+            <unmanaged>VK_PAD_RTHUMB_UP</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.GamepadKeyCode.RightThumbDown">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='VK_PAD_RTHUMB_DOWN']/*"/>	
+            <unmanaged>VK_PAD_RTHUMB_DOWN</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.GamepadKeyCode.RightThumbRight">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='VK_PAD_RTHUMB_RIGHT']/*"/>	
+            <unmanaged>VK_PAD_RTHUMB_RIGHT</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.GamepadKeyCode.RightThumbLeft">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='VK_PAD_RTHUMB_LEFT']/*"/>	
+            <unmanaged>VK_PAD_RTHUMB_LEFT</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.GamepadKeyCode.RightThumbUpleft">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='VK_PAD_RTHUMB_UPLEFT']/*"/>	
+            <unmanaged>VK_PAD_RTHUMB_UPLEFT</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.GamepadKeyCode.RightThumbUpRight">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='VK_PAD_RTHUMB_UPRIGHT']/*"/>	
+            <unmanaged>VK_PAD_RTHUMB_UPRIGHT</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.GamepadKeyCode.RightThumbDownRight">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='VK_PAD_RTHUMB_DOWNRIGHT']/*"/>	
+            <unmanaged>VK_PAD_RTHUMB_DOWNRIGHT</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.GamepadKeyCode.RightThumbDownleft">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='VK_PAD_RTHUMB_DOWNLEFT']/*"/>	
+            <unmanaged>VK_PAD_RTHUMB_DOWNLEFT</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.GamepadKeyCode.None">
+            <summary>	
+            None.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='']/*"/>	
+            <unmanaged>None</unmanaged>	
+        </member>
+        <member name="T:SharpDX.XInput.KeyStrokeFlags">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_KEYSTROKE_FLAGS']/*"/>	
+            <unmanaged>XINPUT_KEYSTROKE_FLAGS</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.KeyStrokeFlags.KeyDown">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_KEYSTROKE_KEYDOWN']/*"/>	
+            <unmanaged>XINPUT_KEYSTROKE_KEYDOWN</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.KeyStrokeFlags.KeyUp">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_KEYSTROKE_KEYUP']/*"/>	
+            <unmanaged>XINPUT_KEYSTROKE_KEYUP</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.KeyStrokeFlags.Repeat">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_KEYSTROKE_REPEAT']/*"/>	
+            <unmanaged>XINPUT_KEYSTROKE_REPEAT</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.KeyStrokeFlags.None">
+            <summary>	
+            None.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='']/*"/>	
+            <unmanaged>None</unmanaged>	
+        </member>
+        <member name="T:SharpDX.XInput.UserIndex">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XUSER_INDEX']/*"/>	
+            <unmanaged>XUSER_INDEX</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.UserIndex.Any">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XUSER_INDEX_ANY']/*"/>	
+            <unmanaged>XUSER_INDEX_ANY</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.UserIndex.One">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XUSER_INDEX_ONE']/*"/>	
+            <unmanaged>XUSER_INDEX_ONE</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.UserIndex.Two">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XUSER_INDEX_TWO']/*"/>	
+            <unmanaged>XUSER_INDEX_TWO</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.UserIndex.Three">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XUSER_INDEX_THREE']/*"/>	
+            <unmanaged>XUSER_INDEX_THREE</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.UserIndex.Four">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XUSER_INDEX_FOUR']/*"/>	
+            <unmanaged>XUSER_INDEX_FOUR</unmanaged>	
+        </member>
+        <member name="T:SharpDX.XInput.XInput">
+            <summary>	
+            Functions	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='SharpDX.XInput.XInput']/*"/>	
+        </member>
+        <member name="M:SharpDX.XInput.XInput.XInputGetKeystroke(System.Int32,System.Int32,SharpDX.XInput.Keystroke@)">
+            <summary>	
+            <code>	
+            DWORD <see cref="M:SharpDX.XInput.XInput.XInputGetKeystroke(System.Int32,System.Int32,SharpDX.XInput.Keystroke@)"/>( DWORD 	
+            </code>	
+              Parameters<list>	
+            <item><term>dwUserIndex</term><description>[in]  Index of the signed-in gamer associated with the device.  Can be a value in the range 0?XUSER_MAX_COUNT???1, or <see cref="F:SharpDX.XInput.UserIndex.Any"/> to fetch the next available input event from any user. </description></item>	
+            <item><term>dwReserved</term><description>[in]  Input flags that identify the device type. ValueDescriptionXINPUT_FLAG_GAMEPADLimit input event fetch to the gamepad.? </description></item>	
+            <item><term>pKeystroke</term><description>[out]  Pointer to an <see cref="T:SharpDX.XInput.Keystroke"/> structure that receives an input event. </description></item>	
+            </list>	
+             Return Value <para>If the function succeeds, the return value is <see cref="F:SharpDX.Win32.ErrorCode.Success"/>.</para>	
+             <para>If no new keys have been pressed, the return value is <see cref="F:SharpDX.Win32.ErrorCode.Empty"/>.</para>	
+             <para>If the controller is not connected or the user has not activated it, the return value is <see cref="F:SharpDX.Win32.ErrorCode.DeviceNotConnected"/>. (See Remarks.)</para>	
+             <para>If the function fails, the return value is an error code defined in Winerror.h. The function does not use  SetLastError to set the calling thread's last-error code.</para>	
+            </summary>	
+            <param name="dwUserIndex">[in]  Index of the signed-in gamer associated with the device.  Can be a value in the range 0?XUSER_MAX_COUNT???1, or <see cref="F:SharpDX.XInput.UserIndex.Any"/> to fetch the next available input event from any user.</param>	
+            <param name="dwReserved">[in]  Input flags that identify the device type. ValueDescriptionXINPUT_FLAG_GAMEPADLimit input event fetch to the gamepad.?</param>	
+            <param name="keystrokeRef">[out]  Pointer to an <see cref="T:SharpDX.XInput.Keystroke"/> structure that receives an input event.</param>	
+            <returns><para>If the function succeeds, the return value is <see cref="F:SharpDX.Win32.ErrorCode.Success"/>.</para> <para>If no new keys have been pressed, the return value is <see cref="F:SharpDX.Win32.ErrorCode.Empty"/>.</para> <para>If the controller is not connected or the user has not activated it, the return value is <see cref="F:SharpDX.Win32.ErrorCode.DeviceNotConnected"/>. (See Remarks.)</para> <para>If the function fails, the return value is an error code defined in Winerror.h. The function does not use  SetLastError to set the calling thread's last-error code.</para></returns>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XInputGetKeystroke']/*"/>	
+            <unmanaged>unsigned int XInputGetKeystroke([In] unsigned int dwUserIndex,[In] unsigned int dwReserved,[Out] XINPUT_KEYSTROKE* pKeystroke)</unmanaged>	
+        </member>
+        <member name="M:SharpDX.XInput.XInput.XInputSetState(System.Int32,SharpDX.XInput.Vibration)">
+            <summary>	
+            <code>	
+            DWORD <see cref="M:SharpDX.XInput.XInput.XInputSetState(System.Int32,SharpDX.XInput.Vibration)"/>( DWORD 	
+            </code>	
+              Parameters<list>	
+            <item><term>dwUserIndex</term><description>[in]  Index of the user's controller. Can be a value from 0 to 3. For information about how this value is determined and how the value maps to indicators on the controller, see Multiple Controllers. </description></item>	
+            <item><term>pVibration</term><description>[in, out]  Pointer to an <see cref="T:SharpDX.XInput.Vibration"/> structure containing the vibration information to send to the controller. </description></item>	
+            </list>	
+             Return Value <para>If the function succeeds, the return value is <see cref="F:SharpDX.Win32.ErrorCode.Success"/>.</para>	
+             <para>If the controller is not connected, the return value is <see cref="F:SharpDX.Win32.ErrorCode.DeviceNotConnected"/>.</para>	
+             <para>If the function fails, the return value is an error code defined in Winerror.h. The function does not use SetLastError to set the calling thread's last-error code.</para>	
+            </summary>	
+            <param name="dwUserIndex">[in]  Index of the user's controller. Can be a value from 0 to 3. For information about how this value is determined and how the value maps to indicators on the controller, see Multiple Controllers.</param>	
+            <param name="vibrationRef">[in, out]  Pointer to an <see cref="T:SharpDX.XInput.Vibration"/> structure containing the vibration information to send to the controller.</param>	
+            <returns><para>If the function succeeds, the return value is <see cref="F:SharpDX.Win32.ErrorCode.Success"/>.</para> <para>If the controller is not connected, the return value is <see cref="F:SharpDX.Win32.ErrorCode.DeviceNotConnected"/>.</para> <para>If the function fails, the return value is an error code defined in Winerror.h. The function does not use SetLastError to set the calling thread's last-error code.</para></returns>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XInputSetState']/*"/>	
+            <unmanaged>unsigned int XInputSetState([In] unsigned int dwUserIndex,[In] XINPUT_VIBRATION* pVibration)</unmanaged>	
+        </member>
+        <member name="M:SharpDX.XInput.XInput.XInputGetDSoundAudioDeviceGuids(System.Int32,System.Guid@,System.Guid@)">
+            <summary>	
+            <code>	
+            DWORD <see cref="M:SharpDX.XInput.XInput.XInputGetDSoundAudioDeviceGuids(System.Int32,System.Guid@,System.Guid@)"/>( DWORD 	
+            </code>	
+              Parameters<list>	
+            <item><term>dwUserIndex</term><description>[in]  Index of the user's controller. It can be a value in the range 0?3.  For information about how this value is determined and how the value maps to indicators  on the controller, see Multiple Controllers. </description></item>	
+            <item><term>pDSoundRenderGuid</term><description>[out, optional]  Pointer that receives the <see cref="T:System.Guid"/> of the headset sound rendering device. </description></item>	
+            <item><term>pDSoundCaptureGuid</term><description>[out, optional]  Pointer that receives the <see cref="T:System.Guid"/> of the headset sound capture device. </description></item>	
+            </list>	
+             Return Value <para>If the function successfully retrieves the device IDs for render and capture,  the return code is <see cref="F:SharpDX.Win32.ErrorCode.Success"/>.</para>	
+             <para>If there is no headset connected to the controller, the function also retrieves <see cref="F:SharpDX.Win32.ErrorCode.Success"/> with GUID_NULL as the values for pDSoundRenderGuid and pDSoundCaptureGuid.</para>	
+             <para>If the controller port device is not physically connected, the function  returns <see cref="F:SharpDX.Win32.ErrorCode.DeviceNotConnected"/>.</para>	
+             <para>If the function fails, it returns a valid Win32 error code.</para>	
+            </summary>	
+            <param name="dwUserIndex">[in]  Index of the user's controller. It can be a value in the range 0?3.  For information about how this value is determined and how the value maps to indicators  on the controller, see Multiple Controllers.</param>	
+            <param name="dSoundRenderGuidRef">[out, optional]  Pointer that receives the <see cref="T:System.Guid"/> of the headset sound rendering device.</param>	
+            <param name="dSoundCaptureGuidRef">[out, optional]  Pointer that receives the <see cref="T:System.Guid"/> of the headset sound capture device.</param>	
+            <returns><para>If the function successfully retrieves the device IDs for render and capture,  the return code is <see cref="F:SharpDX.Win32.ErrorCode.Success"/>.</para> <para>If there is no headset connected to the controller, the function also retrieves <see cref="F:SharpDX.Win32.ErrorCode.Success"/> with GUID_NULL as the values for pDSoundRenderGuid and pDSoundCaptureGuid.</para> <para>If the controller port device is not physically connected, the function  returns <see cref="F:SharpDX.Win32.ErrorCode.DeviceNotConnected"/>.</para> <para>If the function fails, it returns a valid Win32 error code.</para></returns>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XInputGetDSoundAudioDeviceGuids']/*"/>	
+            <unmanaged>unsigned int XInputGetDSoundAudioDeviceGuids([In] unsigned int dwUserIndex,[Out, Optional] GUID* pDSoundRenderGuid,[Out, Optional] GUID* pDSoundCaptureGuid)</unmanaged>	
+        </member>
+        <member name="M:SharpDX.XInput.XInput.XInputGetState(System.Int32,SharpDX.XInput.State@)">
+            <summary>	
+            <code>	
+            DWORD <see cref="M:SharpDX.XInput.XInput.XInputGetState(System.Int32,SharpDX.XInput.State@)"/>( DWORD 	
+            </code>	
+              Parameters<list>	
+            <item><term>dwUserIndex</term><description>[in]  Index of the user's controller. Can be a value from 0 to 3. For information about how this value is determined and how the value maps to indicators on the controller, see Multiple Controllers. </description></item>	
+            <item><term>pState</term><description>[out]  Pointer to an <see cref="T:SharpDX.XInput.State"/> structure that receives the current state of the controller. </description></item>	
+            </list>	
+             Return Value <para>If the function succeeds, the return value is <see cref="F:SharpDX.Win32.ErrorCode.Success"/>.</para>	
+             <para>If the controller is not connected, the return value is <see cref="F:SharpDX.Win32.ErrorCode.DeviceNotConnected"/>.</para>	
+             <para>If the function fails, the return value is an error code defined in Winerror.h. The function does not use SetLastError to set the calling thread's last-error code.</para>	
+            </summary>	
+            <param name="dwUserIndex">[in]  Index of the user's controller. Can be a value from 0 to 3. For information about how this value is determined and how the value maps to indicators on the controller, see Multiple Controllers.</param>	
+            <param name="stateRef">[out]  Pointer to an <see cref="T:SharpDX.XInput.State"/> structure that receives the current state of the controller.</param>	
+            <returns><para>If the function succeeds, the return value is <see cref="F:SharpDX.Win32.ErrorCode.Success"/>.</para> <para>If the controller is not connected, the return value is <see cref="F:SharpDX.Win32.ErrorCode.DeviceNotConnected"/>.</para> <para>If the function fails, the return value is an error code defined in Winerror.h. The function does not use SetLastError to set the calling thread's last-error code.</para></returns>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XInputGetState']/*"/>	
+            <unmanaged>unsigned int XInputGetState([In] unsigned int dwUserIndex,[Out] XINPUT_STATE* pState)</unmanaged>	
+        </member>
+        <member name="M:SharpDX.XInput.XInput.XInputEnable(System.Boolean)">
+            <summary>	
+            <code>	
+            void <see cref="M:SharpDX.XInput.XInput.XInputEnable(System.Boolean)"/>( <see cref="T:System.Boolean"/> 	
+            </code>	
+              Parameters<list>	
+            <item><term>enable</term><description> If enable is <see cref="F:SharpDX.Result.False"/>, XInput will only send neutral data in response to <see cref="M:SharpDX.XInput.XInput.XInputGetState(System.Int32,SharpDX.XInput.State@)"/> (all buttons up, axes centered, and triggers at 0). <see cref="M:SharpDX.XInput.XInput.XInputSetState(System.Int32,SharpDX.XInput.Vibration)"/> calls will be registered but not sent to the device. Sending any value other than <see cref="F:SharpDX.Result.False"/> will restore reading and writing functionality to normal. </description></item>	
+            </list>	
+             Return ValueNone.	
+            </summary>	
+            <param name="enable">If enable is <see cref="F:SharpDX.Result.False"/>, XInput will only send neutral data in response to <see cref="M:SharpDX.XInput.XInput.XInputGetState(System.Int32,SharpDX.XInput.State@)"/> (all buttons up, axes centered, and triggers at 0). <see cref="M:SharpDX.XInput.XInput.XInputSetState(System.Int32,SharpDX.XInput.Vibration)"/> calls will be registered but not sent to the device. Sending any value other than <see cref="F:SharpDX.Result.False"/> will restore reading and writing functionality to normal.</param>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XInputEnable']/*"/>	
+            <unmanaged>void XInputEnable([In] BOOL enable)</unmanaged>	
+        </member>
+        <member name="M:SharpDX.XInput.XInput.XInputGetCapabilities(System.Int32,SharpDX.XInput.DeviceQueryType,SharpDX.XInput.Capabilities@)">
+            <summary>	
+            <code>	
+            DWORD <see cref="M:SharpDX.XInput.XInput.XInputGetCapabilities(System.Int32,SharpDX.XInput.DeviceQueryType,SharpDX.XInput.Capabilities@)"/>( DWORD 	
+            </code>	
+              Parameters<list>	
+            <item><term>dwUserIndex</term><description>[in]  Index of the user's controller. Can be a value in the range 0?3. For information about how this value is determined and how the value maps to indicators on the controller, see Multiple Controllers. </description></item>	
+            <item><term>dwFlags</term><description>[in]  Input flags that identify the controller type. If this value is 0, then the capabilities of all controllers connected to the system are returned. Currently, only one value is supported:		 ValueDescriptionXINPUT_FLAG_GAMEPADLimit query to devices of Xbox 360 Controller type.? <para>Any value of dwflags other than the above or 0 is illegal and will result in an error break when debugging.</para>	
+             </description></item>	
+            <item><term>pCapabilities</term><description>[out]  Pointer to an <see cref="T:SharpDX.XInput.Capabilities"/> structure that receives the controller capabilities. </description></item>	
+            </list>	
+             Return Value <para>If the function succeeds, the return value is <see cref="F:SharpDX.Win32.ErrorCode.Success"/>.</para>	
+             <para>If the controller is not connected, the return value is <see cref="F:SharpDX.Win32.ErrorCode.DeviceNotConnected"/>.</para>	
+             <para>If the function fails, the return value is an error code defined in Winerror.h. The function does not use SetLastError to set the calling thread's last-error code.</para>	
+            </summary>	
+            <param name="dwUserIndex">[in]  Index of the user's controller. Can be a value in the range 0?3. For information about how this value is determined and how the value maps to indicators on the controller, see Multiple Controllers.</param>	
+            <param name="dwFlags">[in]  Input flags that identify the controller type. If this value is 0, then the capabilities of all controllers connected to the system are returned. Currently, only one value is supported:		 ValueDescriptionXINPUT_FLAG_GAMEPADLimit query to devices of Xbox 360 Controller type.? <para>Any value of dwflags other than the above or 0 is illegal and will result in an error break when debugging.</para></param>	
+            <param name="capabilitiesRef">[out]  Pointer to an <see cref="T:SharpDX.XInput.Capabilities"/> structure that receives the controller capabilities.</param>	
+            <returns><para>If the function succeeds, the return value is <see cref="F:SharpDX.Win32.ErrorCode.Success"/>.</para> <para>If the controller is not connected, the return value is <see cref="F:SharpDX.Win32.ErrorCode.DeviceNotConnected"/>.</para> <para>If the function fails, the return value is an error code defined in Winerror.h. The function does not use SetLastError to set the calling thread's last-error code.</para></returns>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XInputGetCapabilities']/*"/>	
+            <unmanaged>unsigned int XInputGetCapabilities([In] unsigned int dwUserIndex,[In] XINPUT_DEVQUERYTYPE dwFlags,[Out] XINPUT_CAPABILITIES* pCapabilities)</unmanaged>	
+        </member>
+        <member name="M:SharpDX.XInput.XInput.XInputGetAudioEndpointIds(System.Int32,System.IntPtr,System.IntPtr,System.IntPtr,System.IntPtr)">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <param name="dwUserIndex">No documentation.</param>	
+            <param name="renderEndpointIdRef">No documentation.</param>	
+            <param name="renderCountRef">No documentation.</param>	
+            <param name="captureEndpointIdRef">No documentation.</param>	
+            <param name="captureCountRef">No documentation.</param>	
+            <returns>No documentation.</returns>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XInputGetAudioEndpointIds']/*"/>	
+            <unmanaged>unsigned int XInputGetAudioEndpointIds([In] unsigned int dwUserIndex,[Out, Buffer, Optional] wchar_t* pRenderEndpointId,[InOut, Optional] unsigned int* pRenderCount,[Out, Buffer, Optional] wchar_t* pCaptureEndpointId,[InOut, Optional] unsigned int* pCaptureCount)</unmanaged>	
+        </member>
+        <member name="M:SharpDX.XInput.XInput.XInputGetBatteryInformation(System.Int32,SharpDX.XInput.BatteryDeviceType,SharpDX.XInput.BatteryInformation@)">
+            <summary>	
+            <code>	
+            DWORD <see cref="M:SharpDX.XInput.XInput.XInputGetBatteryInformation(System.Int32,SharpDX.XInput.BatteryDeviceType,SharpDX.XInput.BatteryInformation@)"/>( DWORD 	
+            </code>	
+              Parameters<list>	
+            <item><term>dwUserIndex</term><description>[in]  Index of the signed-in gamer associated with the device. Can be a value in the range 0?XUSER_MAX_COUNT???1. </description></item>	
+            <item><term>devType</term><description>[in]  Specifies which device associated with this user index should be queried.   Must be <see cref="F:SharpDX.XInput.BatteryDeviceType.Gamepad"/> or <see cref="F:SharpDX.XInput.BatteryDeviceType.Headset"/>. </description></item>	
+            <item><term>pBatteryInformation</term><description>[out]  Pointer to an <see cref="T:SharpDX.XInput.BatteryInformation"/> structure that receives the battery information. </description></item>	
+            </list>	
+             Return Value <para>If the function succeeds, the return value is <see cref="F:SharpDX.Win32.ErrorCode.Success"/>.</para>	
+            </summary>	
+            <param name="dwUserIndex">[in]  Index of the signed-in gamer associated with the device. Can be a value in the range 0?XUSER_MAX_COUNT???1.</param>	
+            <param name="devType">[in]  Specifies which device associated with this user index should be queried.   Must be <see cref="F:SharpDX.XInput.BatteryDeviceType.Gamepad"/> or <see cref="F:SharpDX.XInput.BatteryDeviceType.Headset"/>.</param>	
+            <param name="batteryInformationRef">[out]  Pointer to an <see cref="T:SharpDX.XInput.BatteryInformation"/> structure that receives the battery information.</param>	
+            <returns><para>If the function succeeds, the return value is <see cref="F:SharpDX.Win32.ErrorCode.Success"/>.</para></returns>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XInputGetBatteryInformation']/*"/>	
+            <unmanaged>unsigned int XInputGetBatteryInformation([In] unsigned int dwUserIndex,[In] BATTERY_DEVTYPE devType,[Out] XINPUT_BATTERY_INFORMATION* pBatteryInformation)</unmanaged>	
+        </member>
+        <member name="T:SharpDX.XInput.BatteryInformation">
+            <summary>	
+            <code>	
+            typedef struct _XINPUT_BATTERY_INFORMATION { BYTE BatteryType; BYTE BatteryLevel;	
+            } <see cref="T:SharpDX.XInput.BatteryInformation"/>, *PXINPUT_BATTERY_INFORMATION;	
+            </code>	
+             Members<list>	
+            <item><term>BatteryType</term><description> The type of battery.  BatteryType will be one of the following values. ValueDescriptionBATTERY_TYPE_DISCONNECTEDThe device is not connected.?BATTERY_TYPE_WIREDThe device is a wired device and does not have a battery.?BATTERY_TYPE_ALKALINEThe device has an alkaline battery.?BATTERY_TYPE_NIMHThe device has a nickel metal hydride battery.?BATTERY_TYPE_UNKNOWNThe device has an unknown  battery type.? </description></item>	
+            <item><term>BatteryLevel</term><description> The charge state of the battery.  This value is only valid for wireless devices with a known battery type.   BatteryLevel will be one of the following values. ValueBATTERY_LEVEL_EMPTYBATTERY_LEVEL_LOWBATTERY_LEVEL_MEDIUMBATTERY_LEVEL_FULL </description></item>	
+            </list>	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_BATTERY_INFORMATION']/*"/>	
+            <unmanaged>XINPUT_BATTERY_INFORMATION</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.BatteryInformation.BatteryType">
+            <summary>	
+            The type of battery.  BatteryType will be one of the following values. ValueDescriptionBATTERY_TYPE_DISCONNECTEDThe device is not connected.?BATTERY_TYPE_WIREDThe device is a wired device and does not have a battery.?BATTERY_TYPE_ALKALINEThe device has an alkaline battery.?BATTERY_TYPE_NIMHThe device has a nickel metal hydride battery.?BATTERY_TYPE_UNKNOWNThe device has an unknown  battery type.?	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_BATTERY_INFORMATION::BatteryType']/*"/>	
+            <unmanaged>BATTERY_TYPE BatteryType</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.BatteryInformation.BatteryLevel">
+            <summary>	
+            The charge state of the battery.  This value is only valid for wireless devices with a known battery type.   BatteryLevel will be one of the following values. ValueBATTERY_LEVEL_EMPTYBATTERY_LEVEL_LOWBATTERY_LEVEL_MEDIUMBATTERY_LEVEL_FULL	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_BATTERY_INFORMATION::BatteryLevel']/*"/>	
+            <unmanaged>BATTERY_LEVEL BatteryLevel</unmanaged>	
+        </member>
+        <member name="T:SharpDX.XInput.Capabilities">
+            <summary>	
+            XInputGetCapabilities	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_CAPABILITIES']/*"/>	
+            <unmanaged>XINPUT_CAPABILITIES</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.Capabilities.Type">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_CAPABILITIES::Type']/*"/>	
+            <unmanaged>XINPUT_DEVTYPE Type</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.Capabilities.SubType">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_CAPABILITIES::SubType']/*"/>	
+            <unmanaged>XINPUT_DEVSUBTYPE SubType</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.Capabilities.Flags">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_CAPABILITIES::Flags']/*"/>	
+            <unmanaged>XINPUT_CAPS_FLAGS Flags</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.Capabilities.Gamepad">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_CAPABILITIES::Gamepad']/*"/>	
+            <unmanaged>XINPUT_GAMEPAD Gamepad</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.Capabilities.Vibration">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_CAPABILITIES::Vibration']/*"/>	
+            <unmanaged>XINPUT_VIBRATION Vibration</unmanaged>	
+        </member>
+        <member name="T:SharpDX.XInput.Keystroke">
+            <summary>	
+            XInputGetKeystroke	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_KEYSTROKE']/*"/>	
+            <unmanaged>XINPUT_KEYSTROKE</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.Keystroke.VirtualKey">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_KEYSTROKE::VirtualKey']/*"/>	
+            <unmanaged>XINPUT_GAMEPAD_KEY_CODE VirtualKey</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.Keystroke.Unicode">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_KEYSTROKE::Unicode']/*"/>	
+            <unmanaged>wchar_t Unicode</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.Keystroke.Flags">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_KEYSTROKE::Flags']/*"/>	
+            <unmanaged>XINPUT_KEYSTROKE_FLAGS Flags</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.Keystroke.UserIndex">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_KEYSTROKE::UserIndex']/*"/>	
+            <unmanaged>XUSER_INDEX UserIndex</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.Keystroke.HidCode">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_KEYSTROKE::HidCode']/*"/>	
+            <unmanaged>unsigned char HidCode</unmanaged>	
+        </member>
+        <member name="T:SharpDX.XInput.State">
+            <summary>	
+            <code>	
+            typedef struct _XINPUT_STATE { DWORD dwPacketNumber; <see cref="T:SharpDX.XInput.Gamepad"/> Gamepad;	
+            } <see cref="T:SharpDX.XInput.State"/>, *PXINPUT_STATE;	
+            </code>	
+             Members<list>	
+            <item><term>dwPacketNumber</term><description> State packet number. The packet number indicates whether there have been any changes in the state of the controller. If the dwPacketNumber member is the same in sequentially returned <see cref="T:SharpDX.XInput.State"/> structures, the controller state has not changed. </description></item>	
+            <item><term>Gamepad</term><description> <see cref="T:SharpDX.XInput.Gamepad"/> structure containing the current state of an Xbox 360 Controller. </description></item>	
+            </list>	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_STATE']/*"/>	
+            <unmanaged>XINPUT_STATE</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.State.PacketNumber">
+            <summary>	
+            State packet number. The packet number indicates whether there have been any changes in the state of the controller. If the dwPacketNumber member is the same in sequentially returned <see cref="T:SharpDX.XInput.State"/> structures, the controller state has not changed.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_STATE::dwPacketNumber']/*"/>	
+            <unmanaged>unsigned int dwPacketNumber</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.State.Gamepad">
+            <summary>	
+            <see cref="T:SharpDX.XInput.Gamepad"/> structure containing the current state of an Xbox 360 Controller.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_STATE::Gamepad']/*"/>	
+            <unmanaged>XINPUT_GAMEPAD Gamepad</unmanaged>	
+        </member>
+        <member name="T:SharpDX.XInput.Vibration">
+            <summary>	
+            <code>	
+            typedef struct _XINPUT_VIBRATION { WORD wLeftMotorSpeed; WORD wRightMotorSpeed;	
+            } <see cref="T:SharpDX.XInput.Vibration"/>, *PXINPUT_VIBRATION;	
+            </code>	
+             Members<list>	
+            <item><term>wLeftMotorSpeed</term><description> Speed of the left motor. Valid values are in the range 0 to 65,535. Zero signifies no motor use; 65,535 signifies 100 percent motor use. </description></item>	
+            <item><term>wRightMotorSpeed</term><description> Speed of the right motor. Valid values are in the range 0 to 65,535. Zero signifies no motor use; 65,535 signifies 100 percent motor use. </description></item>	
+            </list>	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_VIBRATION']/*"/>	
+            <unmanaged>XINPUT_VIBRATION</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.Vibration.LeftMotorSpeed">
+            <summary>	
+            Speed of the left motor. Valid values are in the range 0 to 65,535. Zero signifies no motor use; 65,535 signifies 100 percent motor use.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_VIBRATION::wLeftMotorSpeed']/*"/>	
+            <unmanaged>unsigned short wLeftMotorSpeed</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XInput.Vibration.RightMotorSpeed">
+            <summary>	
+            Speed of the right motor. Valid values are in the range 0 to 65,535. Zero signifies no motor use; 65,535 signifies 100 percent motor use.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XINPUT_VIBRATION::wRightMotorSpeed']/*"/>	
+            <unmanaged>unsigned short wRightMotorSpeed</unmanaged>	
+        </member>
+        <member name="T:SharpDX.XInput.ResultCode">
+            <summary>
+            Common error code from XInput
+            </summary>
+        </member>
+        <member name="F:SharpDX.XInput.ResultCode.NotConnected">
+            <summary>
+            Device is not connected
+            </summary>
+        </member>
+    </members>
+</doc>

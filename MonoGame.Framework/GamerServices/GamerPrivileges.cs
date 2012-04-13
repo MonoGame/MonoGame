@@ -40,13 +40,16 @@ purpose and non-infringement.
 
 
 using System;
+using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework.GamerServices
 {
-#if !WINDOWS_PHONE
-	[SerializableAttribute]
+#if WINRT || WINDOWS_PHONE
+    [DataContract]
+#else
+    [Serializable]
 #endif
-	public class GamerPrivilegeException : Exception
+    public class GamerPrivilegeException : Exception
 	{
 		
 	}
