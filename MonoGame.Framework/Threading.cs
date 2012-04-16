@@ -48,11 +48,7 @@ using OpenTK.Platform;
 #if IPHONE
 using MonoTouch.Foundation;
 using MonoTouch.OpenGLES;
-#if ES11
-using OpenTK.Graphics.ES11;
-#else
 using OpenTK.Graphics.ES20;
-#endif
 #endif
 
 namespace Microsoft.Xna.Framework

@@ -15,8 +15,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public EffectPassCollection(EffectTechnique effectTechnique)
         {
-            _effectTechnique = effectTechnique;
-			
+            _effectTechnique = effectTechnique;		
         }
 
         public EffectPass this[int index]

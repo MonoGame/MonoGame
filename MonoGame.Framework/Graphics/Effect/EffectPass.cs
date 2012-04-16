@@ -2,15 +2,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Diagnostics;
 
 #if MONOMAC
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
+#elif WINRT
+
 #else
 using OpenTK.Graphics.ES20;
 
 #if IPHONE || ANDROID
+using ActiveUniformType = OpenTK.Graphics.ES20.All;
 using ShaderType = OpenTK.Graphics.ES20.All;
 using ProgramParameter = OpenTK.Graphics.ES20.All;
 #endif
@@ -23,8 +27,10 @@ namespace Microsoft.Xna.Framework.Graphics
         EffectTechnique _technique = null;
 		GraphicsDevice _graphicsDevice;
 		
-		string name;
 		int shaderProgram = 0;
+
+#if !NOMOJO
+
 		DXEffectObject.d3dx_state[] states;
 		DXShader pixelShader;
 		DXShader vertexShader;
@@ -33,13 +39,6 @@ namespace Microsoft.Xna.Framework.Graphics
 		GLSLShader glslPixelShader;
 		GLSLShader glslVertexShader;
 		bool isGLSL = false;
-
-		bool setBlendState = false;
-		BlendState blendState;
-		bool setDepthStencilState = false;
-		DepthStencilState depthStencilState;
-		bool setRasterizerState = false;
-		RasterizerState rasterizerState;
 
 		static float[] posFixup = new float[4];
 
@@ -65,20 +64,48 @@ namespace Microsoft.Xna.Framework.Graphics
 		internal static int? passthroughVertexShader;
 
 		bool passthroughVertexShaderAttached = false;
-		
+
+#endif
+
+		bool setBlendState = false;
+		BlendState blendState;
+		bool setDepthStencilState = false;
+		DepthStencilState depthStencilState;
+		bool setRasterizerState = false;
+		RasterizerState rasterizerState;
+
+        public string Name { get; private set; }
+
+#if NOMOJO
+
+        public EffectPass(EffectTechnique technique)
+        {
+            _technique = technique;
+
+            _graphicsDevice = _technique._effect.GraphicsDevice;
+
+
+            // Currently unused as we only support StockEffects.
+            //blendState = new BlendState();
+            //depthStencilState = new DepthStencilState();
+            //rasterizerState = new RasterizerState();
+        }
+
+#else
+
 		public EffectPass(EffectTechnique technique, DXEffectObject.d3dx_pass pass)
         {
             _technique = technique;
 			_graphicsDevice = _technique._effect.GraphicsDevice;
 			
-			name = pass.name;
+			Name = pass.name;
 			states = pass.states;
 			
 			blendState = new BlendState();
 			depthStencilState = new DepthStencilState();
 			rasterizerState = new RasterizerState();
 			
-			Console.WriteLine (technique.Name);
+			Debug.WriteLine (technique.Name);
             Threading.Begin();
             try
             {
@@ -107,7 +134,7 @@ namespace Microsoft.Xna.Framework.Graphics
                         if (state.type == DXEffectObject.STATE_TYPE.CONSTANT)
                         {
                             pixelShader = (DXShader)state.parameter.data;
-                            GL.AttachShader(shaderProgram, pixelShader.shader);
+                            GL.AttachShader(shaderProgram, pixelShader.shaderHandle);
                         }
                     }
                     else if (state.operation.class_ == DXEffectObject.STATE_CLASS.VERTEXSHADER)
@@ -116,7 +143,7 @@ namespace Microsoft.Xna.Framework.Graphics
                         if (state.type == DXEffectObject.STATE_TYPE.CONSTANT)
                         {
                             vertexShader = (DXShader)state.parameter.data;
-                            GL.AttachShader(shaderProgram, vertexShader.shader);
+                            GL.AttachShader(shaderProgram, vertexShader.shaderHandle);
                         }
                     }
                     else if (state.operation.class_ == DXEffectObject.STATE_CLASS.RENDERSTATE)
@@ -202,14 +229,14 @@ namespace Microsoft.Xna.Framework.Graphics
 			_technique = technique;
 			_graphicsDevice = _technique._effect.GraphicsDevice;
 
-			name = pass.name;
+			Name = pass.name;
 			glslStates = pass.states;
 
 			blendState = new BlendState();
 			depthStencilState = new DepthStencilState();
 			rasterizerState = new RasterizerState();
 
-			Console.WriteLine ("GLSL: " + technique.Name);
+			Debug.WriteLine ("GLSL: " + technique.Name);
 
 			shaderProgram = GL.CreateProgram ();
 
@@ -233,13 +260,13 @@ namespace Microsoft.Xna.Framework.Graphics
 					needPixelShader = true;
 					if (state.type == GLSLEffectObject.STATE_TYPE.CONSTANT) {
 						glslPixelShader = ((GLSLEffectObject.ShaderProg)state.parameter.data).glslShaderObject;
-						GL.AttachShader (shaderProgram, glslPixelShader.shader);
+                        GL.AttachShader(shaderProgram, glslPixelShader.shaderHandle);
 					}
 				} else if (state.operation.class_ == GLSLEffectObject.STATE_CLASS.VERTEXSHADER) {
 					needVertexShader = true;
 					if (state.type == GLSLEffectObject.STATE_TYPE.CONSTANT) {
 						glslVertexShader = ((GLSLEffectObject.ShaderProg)state.parameter.data).glslShaderObject;
-						GL.AttachShader (shaderProgram, glslVertexShader.shader);
+                        GL.AttachShader(shaderProgram, glslVertexShader.shaderHandle);
 					}
 				} else if (state.operation.class_ == GLSLEffectObject.STATE_CLASS.RENDERSTATE) {
 					if (state.type != GLSLEffectObject.STATE_TYPE.CONSTANT) {
@@ -307,64 +334,125 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 
         }
+#endif
 
-		private void Link ()
-		{
-			if (vertexShader == null && !passthroughVertexShaderAttached) {
-				if (!passthroughVertexShader.HasValue) {
-					int shader = GL.CreateShader(ShaderType.VertexShader);
-#if IPHONE || ANDROID
-					GL.ShaderSource (shader, 1,
-					                new string[]{passthroughVertexShaderSrc}, (int[])null);
+#if NOMOJO
+
+        public void Apply()
+        {
+            // Set/get the correct shader handle/cleanups.
+			_technique._effect.OnApply();
+
+            var effect = _technique._effect;
+
+            var currentProgram = effect.shaderIndexLookupTable[effect.Parameters["ShaderIndex"].GetValueInt32()];
+
+            // No work to do if we don't need to switch shaders.
+            //if (currentProgram == _technique._effect.CurrentProgram && shaderProgram != 0)
+               //return;
+
+            shaderProgram = _technique._effect.CurrentProgram = currentProgram;
+
+            GL.UseProgram(shaderProgram);
+
+            // Currently unused as we only support StockEffects.
+            /*
+            if (setRasterizerState)
+                _graphicsDevice.RasterizerState = rasterizerState;
+
+            if (setBlendState)
+                _graphicsDevice.BlendState = blendState;
+
+            if (setDepthStencilState)
+                _graphicsDevice.DepthStencilState = depthStencilState;
+            */
+
+            var vertexShader = Effect.shaderObjectLookup[shaderProgram][0];
+
+            // Set Program Attributes.
+            int location = 0;
+
+            //bind attributes
+            foreach (var attribute in vertexShader.attributeList)
+            {
+                if (attribute.Contains("Position"))
+                    location = GraphicsDevice.attributePosition;
+                else if (attribute.Contains("Normal"))
+                    location = GraphicsDevice.attributeNormal;
+                else if (attribute.Contains("TextureCoordinate"))
+                    location = GraphicsDevice.attributeTexCoord;
+                else if (attribute.Contains("Color"))
+                    location = GraphicsDevice.attributeColor;
+                else
+                    throw new NotSupportedException();
+
+                GL.BindAttribLocation(shaderProgram, location, attribute);
+            }
+
+            var samplerState = _graphicsDevice.SamplerStates[0];
+            // Set Program Uniforms
+            foreach (var param in _technique._effect.Parameters)
+            {
+                int uniformLocation = GL.GetUniformLocation(shaderProgram, param.Name);
+
+                if (uniformLocation == -1 || param.Name.Contains("ShaderIndex"))
+                    continue;
+
+                switch (param.activeUniformType)
+                {
+                    case ActiveUniformType.FloatVec2:
+                        var v2 = param.GetValueVector2();
+                        GL.Uniform2(uniformLocation, v2.X, v2.Y);
+                        break;
+
+                    case ActiveUniformType.FloatVec3:
+                        var v3 = param.GetValueVector3();
+                        GL.Uniform3(uniformLocation, v3.X, v3.Y, v3.Z);
+                        break;
+
+                    case ActiveUniformType.FloatVec4:
+                        var v4 = param.GetValueVector4();
+                        GL.Uniform4(uniformLocation, v4.X, v4.Y, v4.Z, v4.W);
+                        break;
+
+                    case ActiveUniformType.Float:
+                        GL.Uniform1(uniformLocation, param.GetValueSingle());
+                        break;
+
+                    case ActiveUniformType.FloatMat4:
+                        var mat4 = (Matrix)param.data;
+                        GL.UniformMatrix4(uniformLocation, 1, false, param.GetValueSingleArray());
+                        break;
+
+                    case ActiveUniformType.FloatMat3:
+                        var mat = (Matrix)param.data;
+                        GL.UniformMatrix3(uniformLocation, 1, false, new float[] { mat.M11, mat.M12, mat.M13, mat.M21, mat.M22, mat.M23, mat.M31, mat.M32, mat.M33 });
+                        break;
+
+                    case ActiveUniformType.Bool:
+                        GL.Uniform1(uniformLocation, (param.GetValueBoolean()) ? 1 : 0);
+                        break;
+
+                    case ActiveUniformType.Int:
+                        GL.Uniform1(uniformLocation, param.GetValueInt32());
+                        break;
+
+                    case ActiveUniformType.Sampler2D:
+                        Texture tex = (Texture)param.data;
+                        tex.Activate();
+                        samplerState.Activate(tex.glTarget, tex.LevelCount > 1);
+                        break;
+
+                    default:
+                        throw new NotSupportedException();
+                }
+            }
+        }
+
 #else
-					GL.ShaderSource(shader, passthroughVertexShaderSrc);
-#endif
-
-					GL.CompileShader(shader);
-
-					passthroughVertexShader = shader;
-				}
-
-				GL.AttachShader(shaderProgram, passthroughVertexShader.Value);
-#if !ES11
-				GL.BindAttribLocation(shaderProgram, GraphicsDevice.attributePosition, "aPosition");
-				GL.BindAttribLocation(shaderProgram, GraphicsDevice.attributeTexCoord, "aTexCoord");
-				GL.BindAttribLocation(shaderProgram, GraphicsDevice.attributeColor, "aColor");
-#endif
-
-				passthroughVertexShaderAttached = true;
-			} else if (vertexShader != null && passthroughVertexShaderAttached) {
-				GL.DetachShader(shaderProgram, passthroughVertexShader.Value);
-				passthroughVertexShaderAttached = false;
-			}
-
-			if (vertexShader != null) {
-				vertexShader.OnLink(shaderProgram);
-			}
-			if (pixelShader != null) {
-				pixelShader.OnLink (shaderProgram);
-			}
-
-			GL.LinkProgram (shaderProgram);
-
-			int linked = 0;
-#if IPHONE || ANDROID
-			GL.GetProgram (shaderProgram, ProgramParameter.LinkStatus, ref linked);
-#else
-			GL.GetProgram (shaderProgram, ProgramParameter.LinkStatus, out linked);
-#endif
-			if (linked == 0) {
-#if !IPHONE && !ANDROID
-				string log = GL.GetProgramInfoLog(shaderProgram);
-				Console.WriteLine (log);
-#endif
-				throw new InvalidOperationException("Unable to link effect program");
-			}
-
-		}
-		
-		public void Apply ()
+        public void Apply()
 		{
+            // Set/get the correct shader handle/cleanups.
 			_technique._effect.OnApply();
 
 			if (isGLSL) {
@@ -397,20 +485,20 @@ namespace Microsoft.Xna.Framework.Graphics
 					if (shader.shaderType == ShaderType.FragmentShader) {
 						if (shader != pixelShader) {
 							if (pixelShader != null) {
-								GL.DetachShader (shaderProgram, pixelShader.shader);
+                                GL.DetachShader(shaderProgram, pixelShader.shaderHandle);
 							}
 							relink = true;
 							pixelShader = shader;
-							GL.AttachShader (shaderProgram, pixelShader.shader);
+                            GL.AttachShader(shaderProgram, pixelShader.shaderHandle);
 						}
 					} else if (shader.shaderType == ShaderType.VertexShader) {
 						if (shader != vertexShader) {
 							if (vertexShader != null) {
-								GL.DetachShader(shaderProgram, vertexShader.shader);
+                                GL.DetachShader(shaderProgram, vertexShader.shaderHandle);
 							}
 							relink = true;
 							vertexShader = shader;
-							GL.AttachShader (shaderProgram, vertexShader.shader);
+                            GL.AttachShader(shaderProgram, vertexShader.shaderHandle);
 						}
 					}
 					
@@ -499,15 +587,64 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 
 		}
-		
-		public string Name { get { return name; } }
+
+        private void Link ()
+		{
+			if (vertexShader == null && !passthroughVertexShaderAttached) {
+				if (!passthroughVertexShader.HasValue) {
+					int shader = GL.CreateShader(ShaderType.VertexShader);
+#if GLES
+					GL.ShaderSource (shader, 1,
+					                new string[]{passthroughVertexShaderSrc}, (int[])null);
+#else
+					GL.ShaderSource(shader, passthroughVertexShaderSrc);
+#endif
+					GL.CompileShader(shader);
+
+					passthroughVertexShader = shader;
+				}
+
+				GL.AttachShader(shaderProgram, passthroughVertexShader.Value);
+				GL.BindAttribLocation(shaderProgram, GraphicsDevice.attributePosition, "aPosition");
+				GL.BindAttribLocation(shaderProgram, GraphicsDevice.attributeTexCoord, "aTexCoord");
+				GL.BindAttribLocation(shaderProgram, GraphicsDevice.attributeColor, "aColor");
+
+				passthroughVertexShaderAttached = true;
+			} else if (vertexShader != null && passthroughVertexShaderAttached) {
+				GL.DetachShader(shaderProgram, passthroughVertexShader.Value);
+				passthroughVertexShaderAttached = false;
+			}
+
+			if (vertexShader != null) {
+				vertexShader.OnLink(shaderProgram);
+			}
+			if (pixelShader != null) {
+				pixelShader.OnLink (shaderProgram);
+			}
+
+			GL.LinkProgram (shaderProgram);
+
+			int linked = 0;
+#if GLES
+			GL.GetProgram (shaderProgram, ProgramParameter.LinkStatus, ref linked);
+#else
+			GL.GetProgram (shaderProgram, ProgramParameter.LinkStatus, out linked);
+#endif
+			if (linked == 0) {
+#if !GLES
+				string log = GL.GetProgramInfoLog(shaderProgram);
+				Console.WriteLine (log);
+#endif
+				throw new InvalidOperationException("Unable to link effect program");
+			}
+		}						
 
 		private void glslLink ()
 		{
 			if (glslVertexShader == null && !passthroughVertexShaderAttached) {
 				if (!passthroughVertexShader.HasValue) {
 					int shader = GL.CreateShader(ShaderType.VertexShader);
-#if IPHONE || ANDROID
+#if GLES
 					GL.ShaderSource (shader, 1,
 					                new string[]{passthroughVertexShaderSrc}, (int[])null);
 #else
@@ -520,11 +657,10 @@ namespace Microsoft.Xna.Framework.Graphics
 				}
 
 				GL.AttachShader(shaderProgram, passthroughVertexShader.Value);
-#if !ES11
+
 				GL.BindAttribLocation(shaderProgram, GraphicsDevice.attributePosition, "aPosition");
 				GL.BindAttribLocation(shaderProgram, GraphicsDevice.attributeTexCoord, "aTexCoord");
 				GL.BindAttribLocation(shaderProgram, GraphicsDevice.attributeColor, "aColor");
-#endif
 
 				passthroughVertexShaderAttached = true;
 			} else if (glslVertexShader != null && passthroughVertexShaderAttached) {
@@ -542,13 +678,13 @@ namespace Microsoft.Xna.Framework.Graphics
 			GL.LinkProgram (shaderProgram);
 
 			int linked = 0;
-#if IPHONE || ANDROID
+#if GLES
 			GL.GetProgram (shaderProgram, ProgramParameter.LinkStatus, ref linked);
 #else
 			GL.GetProgram (shaderProgram, ProgramParameter.LinkStatus, out linked);
 #endif
 			if (linked == 0) {
-#if !IPHONE && !ANDROID
+#if !GLES
 				string log = GL.GetProgramInfoLog(shaderProgram);
 				Console.WriteLine (log);
 #endif
@@ -559,9 +695,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void GLSLApply ()
 		{
-#if DEBUG
-			Console.WriteLine (_technique._effect.Name+" - GLSL -> "+_technique.Name+" - "+Name);
-#endif
+			Debug.WriteLine (_technique._effect.Name+" - GLSL -> "+_technique.Name+" - "+Name);
+
 			bool relink = false;
 			foreach ( GLSLEffectObject.glsl_state state in glslStates) {
 
@@ -588,20 +723,20 @@ namespace Microsoft.Xna.Framework.Graphics
 					if (shader.shaderType == ShaderType.FragmentShader) {
 						if (shader != glslPixelShader) {
 							if (glslPixelShader != null) {
-								GL.DetachShader (shaderProgram, glslPixelShader.shader);
+								GL.DetachShader (shaderProgram, glslPixelShader.shaderHandle);
 							}
 							relink = true;
 							glslPixelShader = shader;
-							GL.AttachShader (shaderProgram, glslPixelShader.shader);
+                            GL.AttachShader(shaderProgram, glslPixelShader.shaderHandle);
 						}
 					} else if (shader.shaderType == ShaderType.VertexShader) {
 						if (shader != glslVertexShader) {
 							if (glslVertexShader != null) {
-								GL.DetachShader(shaderProgram, glslVertexShader.shader);
+                                GL.DetachShader(shaderProgram, glslVertexShader.shaderHandle);
 							}
 							relink = true;
 							glslVertexShader = shader;
-							GL.AttachShader (shaderProgram, glslVertexShader.shader);
+                            GL.AttachShader(shaderProgram, glslVertexShader.shaderHandle);
 						}
 					}
 
@@ -609,12 +744,10 @@ namespace Microsoft.Xna.Framework.Graphics
 				
 			}
 			
-			if (relink) {
+			if (relink)
 				Link ();
-			}
 			
 			GL.UseProgram (shaderProgram);
-
 			
 			if (setRasterizerState) {
 				_graphicsDevice.RasterizerState = rasterizerState;
@@ -687,5 +820,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 
 		}
+#endif
     }
 }

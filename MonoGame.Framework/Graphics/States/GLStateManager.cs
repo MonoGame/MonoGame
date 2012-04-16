@@ -2,34 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Microsoft.Xna.Framework;
 
 #if MONOMAC
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
-#else
-
- #if ES11
-using OpenTK.Graphics.ES11;
-
-  #if IPHONE
-using EnableCap = OpenTK.Graphics.ES11.All;
-using FrontFaceDirection = OpenTK.Graphics.ES11.All;
-using CullFaceMode = OpenTK.Graphics.ES11.All;
-using StencilFunction = OpenTK.Graphics.ES11.All;
-using StencilOp = OpenTK.Graphics.ES11.All;
-using BlendingFactorSrc = OpenTK.Graphics.ES11.All;
-using BlendingFactorDest = OpenTK.Graphics.ES11.All;
-using ArrayCap = OpenTK.Graphics.ES11.All;
-using MatrixMode = OpenTK.Graphics.ES11.All;
-using BlendEquationMode = OpenTK.Graphics.ES11.All;
-
-  #endif
-
- #else
+#elif GLES
 using OpenTK.Graphics.ES20;
-
-  #if IPHONE || ANDROID
 using EnableCap = OpenTK.Graphics.ES20.All;
 using FrontFaceDirection = OpenTK.Graphics.ES20.All;
 using BlendEquationMode = OpenTK.Graphics.ES20.All;
@@ -39,12 +19,8 @@ using StencilOp = OpenTK.Graphics.ES20.All;
 using BlendingFactorSrc = OpenTK.Graphics.ES20.All;
 using BlendingFactorDest = OpenTK.Graphics.ES20.All;
 using DepthFunction = OpenTK.Graphics.ES20.All;
-  #endif
 #endif
 
-#endif
-
-using Microsoft.Xna.Framework;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -59,76 +35,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private static BlendingFactorSrc _blendFuncSource;
         private static BlendingFactorDest _blendFuncDest;
         private static All _cull = All.Ccw; // default
-		
-#if ES11
-        public static void TextureCoordArray(bool enable)
-        {						
-            if (enable && (_textureCoordArray != GLStateEnabled.True))
-                GL.EnableClientState(ArrayCap.TextureCoordArray);
-            else
-                GL.DisableClientState(ArrayCap.TextureCoordArray);
-        }
-
-        public static void VertexArray(bool enable)
-        {
-            if (enable && (_vertextArray != GLStateEnabled.True))
-                GL.EnableClientState(ArrayCap.VertexArray);
-            else
-                GL.DisableClientState(ArrayCap.VertexArray);
-        }
-
-        public static void ColorArray(bool enable)
-        {
-            if (enable && (_colorArray != GLStateEnabled.True))
-                GL.EnableClientState(ArrayCap.ColorArray);
-            else
-                GL.DisableClientState(ArrayCap.ColorArray);
-			//GL.Enable(EnableCap.ColorArray);
-        }
-
-        public static void NormalArray(bool enable)
-        {
-            if (enable && (_normalArray != GLStateEnabled.True))
-                GL.EnableClientState(ArrayCap.NormalArray);
-            else
-                GL.DisableClientState(ArrayCap.NormalArray);
-        }
-
-        public static void Projection(Matrix projection)
-        {
-            GL.MatrixMode(MatrixMode.Projection);
-            GL.LoadIdentity();
-            GL.LoadMatrix(Matrix.ToFloatArray(projection));
-            //GL11.Ortho(0, _device.DisplayMode.Width, _device.DisplayMode.Height, 0, -1, 1);
-        }
-
-        public static void View(Matrix view)
-        {
-            GL.MatrixMode(MatrixMode.Modelview);
-            GL.LoadIdentity();
-            GL.LoadMatrix(Matrix.ToFloatArray(view));
-            //GL11.Ortho(0, _device.DisplayMode.Width, _device.DisplayMode.Height, 0, -1, 1);
-        }
-
-        public static void World(Matrix world)
-        {
-            GL.MatrixMode(MatrixMode.Modelview);
-            GL.LoadIdentity();
-            GL.LoadMatrix(Matrix.ToFloatArray(world));
-            //GL11.Ortho(0, _device.DisplayMode.Width, _device.DisplayMode.Height, 0, -1, 1);
-        }
-
-		public static void WorldView (Matrix world, Matrix view)
-		{
-			Matrix worldView;
-			Matrix.Multiply(ref world, ref view, out worldView);
-			GL.MatrixMode(MatrixMode.Modelview);
-			GL.LoadIdentity();
-			GL.LoadMatrix(Matrix.ToFloatArray(worldView));
-		}
-#endif
-		
-#if !ES11
+			
 		public static void VertexAttribArray(int index, bool enable) {
 			if (enable) {
 				GL.EnableVertexAttribArray(index);
@@ -136,7 +43,6 @@ namespace Microsoft.Xna.Framework.Graphics
 				GL.DisableVertexAttribArray(index);
 			}
 		}
-#endif
 		
 		public static void Textures2D(bool enable)
         {
@@ -163,11 +69,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			// Set blending mode
 			BlendEquationMode blendMode = state.ColorBlendFunction.GetBlendEquationMode();
-#if ES11 && IPHONE
-			GL.Oes.BlendEquation (blendMode);
-#else
-			GL.BlendEquation (blendMode);
-#endif			
+
+			GL.BlendEquation (blendMode);	
 			
 			// Set blending function
 			BlendingFactorSrc bfs = state.ColorSourceBlend.GetBlendFactorSrc();
@@ -354,12 +257,10 @@ namespace Microsoft.Xna.Framework.Graphics
 				return StencilOp.Keep;
 			case StencilOperation.Decrement:
 				return StencilOp.Decr;
-#if !ES11
 			case StencilOperation.DecrementSaturation:
 				return StencilOp.DecrWrap;
 			case StencilOperation.IncrementSaturation:
 				return StencilOp.IncrWrap;
-#endif
 			case StencilOperation.Increment:
 				return StencilOp.Incr;
 			case StencilOperation.Invert:

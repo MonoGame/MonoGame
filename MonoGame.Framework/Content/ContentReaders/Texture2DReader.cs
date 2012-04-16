@@ -35,12 +35,9 @@ using System.Drawing;
 using MonoMac.OpenGL;
 #elif WINDOWS
 using OpenTK.Graphics.OpenGL;
-#else
-#if ES11
-using OpenTK.Graphics.ES11;
-#else
+#elif WINRT
+#elif GLES
 using OpenTK.Graphics.ES20;
-#endif
 #endif
 
 using Microsoft.Xna;

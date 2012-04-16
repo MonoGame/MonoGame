@@ -106,6 +106,8 @@ namespace Microsoft.Xna.Framework
 
             // Create a full-screen window
             _mainWindow = new UIWindow (UIScreen.MainScreen.Bounds);
+			//_mainWindow.AutoresizingMask = UIViewAutoresizing.FlexibleDimensions;
+			
             game.Services.AddService (typeof(UIWindow), _mainWindow);
 
             _viewController = new iOSGameViewController(this);
@@ -355,11 +357,15 @@ namespace Microsoft.Xna.Framework
 			//        iOSGamePlatform.
 			var gdm = (GraphicsDeviceManager) Game.Services.GetService (typeof (IGraphicsDeviceManager));
 
-			if (gdm != null) {
+			if (gdm != null)
+			{	
 				var presentParams = gdm.GraphicsDevice.PresentationParameters;
 				presentParams.BackBufferWidth = gdm.PreferredBackBufferWidth;
 				presentParams.BackBufferHeight = gdm.PreferredBackBufferHeight;
 				presentParams.DisplayOrientation = orientation;
+
+				// Recalculate our views.
+				ViewController.View.LayoutSubviews();
 			}
 			TouchPanel.DisplayOrientation = orientation;
 		}

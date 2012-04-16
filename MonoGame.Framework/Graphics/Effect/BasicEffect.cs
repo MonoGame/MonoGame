@@ -10,6 +10,19 @@
 #region Using Statements
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+
+
+
+using System;
+
+#if ANDROID || IPHONE
+using OpenTK.Graphics.ES20;
+using ActiveUniformType = OpenTK.Graphics.ES20.All;
+#elif MONOMAC
+using MonoMac.OpenGL;
+#elif !WINRT
+using OpenTK.Graphics.OpenGL;
+#endif
 #endregion
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -32,7 +45,6 @@ namespace Microsoft.Xna.Framework.Graphics
         EffectParameter worldParam;
         EffectParameter worldInverseTransposeParam;
         EffectParameter worldViewProjParam;
-        EffectParameter shaderIndexParam;
 
         #endregion
 
@@ -67,6 +79,86 @@ namespace Microsoft.Xna.Framework.Graphics
         EffectDirtyFlags dirtyFlags = EffectDirtyFlags.All;
 
         #endregion
+
+#if NOMOJO
+        static readonly string[] vertexShaderFilenames = new string[] 
+		{
+			"Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect.VSBasic.glsl",
+			"Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect.VSBasicNoFog.glsl",
+			"Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect.VSBasicVc.glsl",
+			"Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect.VSBasicVcNoFog.glsl",
+			"Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect.VSBasicTx.glsl",
+			"Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect.VSBasicTxNoFog.glsl",
+			"Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect.VSBasicTxVc.glsl",
+			"Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect.VSBasicTxVcNoFog.glsl",
+			"Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect.VSBasicVertexLighting.glsl",
+			"Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect.VSBasicVertexLightingVc.glsl",
+			"Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect.VSBasicVertexLightingTx.glsl",
+			"Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect.VSBasicVertexLightingTxVc.glsl",
+			
+			"Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect.VSBasicOneLight.glsl",
+			"Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect.VSBasicOneLightVc.glsl",
+			"Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect.VSBasicOneLightTx.glsl",
+			"Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect.VSBasicOneLightTxVc.glsl",
+			
+			"Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect.VSBasicPixelLighting.glsl",
+			"Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect.VSBasicPixelLightingVc.glsl",
+			"Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect.VSBasicPixelLightingTx.glsl",
+			"Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect.VSBasicPixelLightingTxVc.glsl",
+		};
+
+        static readonly string[] fragmentShaderFilenames = new string[]
+		{
+			"Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect.PSBasic.glsl",
+			"Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect.PSBasicNoFog.glsl",
+			"Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect.PSBasicTx.glsl",
+			"Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect.PSBasicTxNoFog.glsl",
+			
+			"Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect.PSBasicVertexLighting.glsl",
+			"Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect.PSBasicVertexLightingNoFog.glsl",
+			"Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect.PSBasicVertexLightingTx.glsl",
+			"Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect.PSBasicVertexLightingTxNoFog.glsl",
+			
+			"Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect.PSBasicPixelLighting.glsl",
+			"Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect.PSBasicPixelLightingTx.glsl",
+		};
+
+        static readonly Tuple<int, int>[] programIndices = new Tuple<int, int>[]
+		{
+			new Tuple<int, int>(0, 0),
+			new Tuple<int, int>(1, 1),
+			new Tuple<int, int>(2, 0),
+			new Tuple<int, int>(3, 1),
+			new Tuple<int, int>(4, 2),
+			new Tuple<int, int>(5, 3),
+			new Tuple<int, int>(6, 2),
+			new Tuple<int, int>(7, 3),
+			new Tuple<int, int>(8, 4),
+			new Tuple<int, int>(8, 5),
+			new Tuple<int, int>(9, 4),
+			new Tuple<int, int>(9, 5),
+			new Tuple<int, int>(10, 6),
+			new Tuple<int, int>(10, 7),
+			new Tuple<int, int>(11, 6),
+			new Tuple<int, int>(11, 7),
+			new Tuple<int, int>(12, 4),
+			new Tuple<int, int>(12, 5),
+			new Tuple<int, int>(13, 4),
+			new Tuple<int, int>(13, 5),
+			new Tuple<int, int>(14, 6),
+			new Tuple<int, int>(14, 7),
+			new Tuple<int, int>(15, 6),
+			new Tuple<int, int>(15, 7),
+			new Tuple<int, int>(16, 8),
+			new Tuple<int, int>(16, 8),
+			new Tuple<int, int>(17, 8),
+			new Tuple<int, int>(17, 8),
+			new Tuple<int, int>(18, 9),
+			new Tuple<int, int>(18, 9),
+			new Tuple<int, int>(19, 9),
+			new Tuple<int, int>(19, 9),
+		};
+#endif
 
         #region Public Properties
 
@@ -358,19 +450,73 @@ namespace Microsoft.Xna.Framework.Graphics
 
         #region Methods
 
-
         /// <summary>
         /// Creates a new BasicEffect with default parameter settings.
         /// </summary>
         public BasicEffect(GraphicsDevice device)
-            : base(device, Effect.LoadEffectResource("BasicEffect"))
+            : base(device,
+#if NOMOJO
+                BasicEffect.vertexShaderFilenames,
+                BasicEffect.fragmentShaderFilenames,
+                BasicEffect.programIndices
+#else
+                Effect.LoadEffectResource("BasicEffect")
+#endif
+            )
         {
+            Initialize();
+
             CacheEffectParameters(null);
 
             DirectionalLight0.Enabled = true;
-
             SpecularColor = Vector3.One;
             SpecularPower = 16;
+        }
+
+        internal override void Initialize()
+        {
+#if NOMOJO
+
+            textureParam = new EffectParameter(ActiveUniformType.Sampler2D, "Texture");
+            Parameters.Add(textureParam);
+            diffuseColorParam = new EffectParameter(ActiveUniformType.FloatVec4, "DiffuseColor");
+            Parameters.Add(diffuseColorParam);
+            emissiveColorParam = new EffectParameter(ActiveUniformType.FloatVec3, "EmissiveColor");
+            Parameters.Add(emissiveColorParam);
+            specularColorParam = new EffectParameter(ActiveUniformType.FloatVec3, "SpecularColor");
+            Parameters.Add(specularColorParam);
+            specularPowerParam = new EffectParameter(ActiveUniformType.Float, "SpecularPower");
+            Parameters.Add(specularPowerParam);
+            eyePositionParam = new EffectParameter(ActiveUniformType.FloatVec3, "EyePosition");
+            Parameters.Add(eyePositionParam);
+            fogColorParam = new EffectParameter(ActiveUniformType.FloatVec3, "FogColor");
+            Parameters.Add(fogColorParam);
+            fogVectorParam = new EffectParameter(ActiveUniformType.FloatVec3, "FogVector");
+            Parameters.Add(fogVectorParam);
+            worldParam = new EffectParameter(ActiveUniformType.FloatMat4, "World");
+            Parameters.Add(worldParam);
+            worldInverseTransposeParam = new EffectParameter(ActiveUniformType.FloatMat3, "WorldInverseTranspose");
+            Parameters.Add(worldInverseTransposeParam);
+            worldViewProjParam = new EffectParameter(ActiveUniformType.FloatMat4, "WorldViewProj");
+            Parameters.Add(worldViewProjParam);
+
+             
+            Parameters.Add(new EffectParameter(ActiveUniformType.FloatVec3, "DirLight0Direction"));
+            Parameters.Add(new EffectParameter(ActiveUniformType.FloatVec3, "DirLight0DiffuseColor"));
+            Parameters.Add(new EffectParameter(ActiveUniformType.FloatVec3, "DirLight0SpecularColor"));
+			
+            Parameters.Add(new EffectParameter(ActiveUniformType.FloatVec3, "DirLight1Direction"));
+            Parameters.Add(new EffectParameter(ActiveUniformType.FloatVec3, "DirLight1DiffuseColor"));
+            Parameters.Add(new EffectParameter(ActiveUniformType.FloatVec3, "DirLight1SpecularColor"));
+			
+            Parameters.Add(new EffectParameter(ActiveUniformType.FloatVec3, "DirLight2Direction"));
+            Parameters.Add(new EffectParameter(ActiveUniformType.FloatVec3, "DirLight2DiffuseColor"));
+            Parameters.Add(new EffectParameter(ActiveUniformType.FloatVec3, "DirLight2SpecularColor"));
+
+            Techniques.Add(new EffectTechnique(this));
+
+#endif // NOMOJO
+
         }
 
 
@@ -384,7 +530,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             lightingEnabled = cloneSource.lightingEnabled;
             preferPerPixelLighting = cloneSource.preferPerPixelLighting;
-            fogEnabled = cloneSource.fogEnabled;
+            fogEnabled = cloneSource.fogEnabled;            
             textureEnabled = cloneSource.textureEnabled;
             vertexColorEnabled = cloneSource.vertexColorEnabled;
 
@@ -478,6 +624,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 // Recompute the world inverse transpose and eye position?
                 dirtyFlags = EffectHelpers.SetLightingMatrices(dirtyFlags, ref world, ref view, worldParam, worldInverseTransposeParam, eyePositionParam);
+
                 
                 // Check if we can use the only-bother-with-the-first-light shader optimization.
                 bool newOneLight = !light1.Enabled && !light2.Enabled;

@@ -8,6 +8,7 @@ using System.Runtime.InteropServices;
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
+#elif WINRT
 #else
 using OpenTK.Graphics.ES20;
 using BufferTarget = OpenTK.Graphics.ES20.All;
@@ -24,8 +25,12 @@ namespace Microsoft.Xna.Framework.Graphics
 		public int IndexCount { get; private set; }
 		public IndexElementSize IndexElementSize { get; private set; }
 		
+#if WINRT
+        internal SharpDX.Direct3D11.Buffer _buffer;
+#else
 		internal uint ibo;	
-		
+#endif
+	
 		protected IndexBuffer(GraphicsDevice graphicsDevice, IndexElementSize indexElementSize, int indexCount, BufferUsage bufferUsage, bool dynamic)
         {
 			if (graphicsDevice == null)
@@ -39,6 +44,19 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			var sizeInBytes = indexCount * (this.IndexElementSize == IndexElementSize.SixteenBits ? 2 : 4);
 
+#if WINRT
+            // TODO: To use Immutable resources we would need to delay creation of 
+            // the Buffer until SetData() and recreate them if set more than once.
+
+            _buffer = new SharpDX.Direct3D11.Buffer(    graphicsDevice._d3dDevice,
+                                                        sizeInBytes,
+                                                        dynamic ? SharpDX.Direct3D11.ResourceUsage.Dynamic : SharpDX.Direct3D11.ResourceUsage.Default,
+                                                        SharpDX.Direct3D11.BindFlags.IndexBuffer,
+                                                        0, // CpuAccessFlags
+                                                        0, // OptionFlags                                                          
+                                                        0  // StructureSizeInBytes
+                                                        );
+#else
             Threading.Begin();
             try
             {
@@ -55,6 +73,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 Threading.End();
             }
+#endif
 		}
 		
 		public IndexBuffer(GraphicsDevice graphicsDevice, IndexElementSize indexElementSize, int indexCount, BufferUsage bufferUsage) :
@@ -69,11 +88,6 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 		}
 		
-		internal void Apply()
-		{
-			GL.BindBuffer(BufferTarget.ElementArrayBuffer, ibo);
-		}
-
         public void GetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount) where T : struct
         {
             if (data == null)
@@ -83,6 +97,8 @@ namespace Microsoft.Xna.Framework.Graphics
             if (BufferUsage == BufferUsage.WriteOnly)
                 throw new NotSupportedException("This IndexBuffer was created with a usage type of BufferUsage.WriteOnly. Calling GetData on a resource that was created with BufferUsage.WriteOnly is not supported.");
 
+#if WINRT
+#else        
             Threading.Begin();
             try
             {
@@ -121,6 +137,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 Threading.End();
             }
+#endif
         }
 
         public void GetData<T>(T[] data, int startIndex, int elementCount) where T : struct
@@ -135,8 +152,35 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		public void SetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount) where T : struct
         {
-			if (data == null) throw new ArgumentNullException("data");
+			if (data == null) 
+                throw new ArgumentNullException("data");
 
+#if WINRT
+            //using(var stream = new SharpDX.DataStream(sizeInBytes, false, true))
+            {
+                var elementSizeInBytes = IndexElementSize == Graphics.IndexElementSize.SixteenBits ? 2 : 4;
+                var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+                var startBytes = startIndex * elementSizeInBytes;
+                var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
+
+                //stream.WriteRange(data, 0, elementCount);
+                //var box = new SharpDX.DataBox(stream.DataPointer, elementSizeInByte, 0);
+                var box = new SharpDX.DataBox(dataPtr, elementSizeInBytes, 0);
+
+                var region = new SharpDX.Direct3D11.ResourceRegion();
+                region.Top = 0;
+                region.Front = 0;
+                region.Back = 1;
+                region.Bottom = 1;
+                region.Left = offsetInBytes / elementSizeInBytes;
+                region.Right = elementCount;
+
+                // TODO: We need to deal with threaded contexts here!
+                graphicsDevice._d3dContext.UpdateSubresource(box, _buffer, 0, region);
+
+                dataHandle.Free();
+            }
+#else
             Threading.Begin();
             try
             {
@@ -154,6 +198,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 Threading.End();
             }
+#endif
 		}
 		
 		public void SetData<T>(T[] data, int startIndex, int elementCount) where T : struct
@@ -168,8 +213,16 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		public override void Dispose()
 		{
+#if WINRT
+            if (_buffer != null)
+            {
+                _buffer.Dispose();
+                _buffer = null;
+            }
+#else
 			GL.DeleteBuffers(1, ref ibo);
-			base.Dispose();
+#endif
+            base.Dispose();
 		}
 	}
 }

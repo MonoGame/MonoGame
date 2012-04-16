@@ -114,7 +114,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		    FORCE_DWORD               = 0x7fffffff
 		}
-		
+
 		public enum D3DTEXTURESTAGESTATETYPE {
 		    COLOROP               =  1,
 		    COLORARG1             =  2,
@@ -137,7 +137,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		    FORCE_DWORD           = 0x7fffffff
 		}
-		
+
 		public enum D3DTRANSFORMSTATETYPE {
 		    VIEW            =  2,
 		    PROJECTION      =  3,
@@ -152,11 +152,11 @@ namespace Microsoft.Xna.Framework.Graphics
 			WORLD           = 256,
 		    FORCE_DWORD     = 0x7fffffff
 		}
-		
+
 		public const int D3DX_PARAMETER_SHARED = 1;
 		public const int D3DX_PARAMETER_LITERAL = 2;
 		public const int D3DX_PARAMETER_ANNOTATION = 4;
-		
+
 		public enum D3DXPARAMETER_CLASS
 		{
 			SCALAR,
@@ -167,7 +167,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			STRUCT,
 			FORCE_DWORD = 0x7fffffff,
 		}
-		
+
 		public enum D3DXPARAMETER_TYPE
 		{
 			VOID,
@@ -192,7 +192,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			UNSUPPORTED,
 			FORCE_DWORD = 0x7fffffff,
 		}
-		
+
 		enum D3DSAMPLERSTATETYPE {
 		    ADDRESSU       = 1,
 		    ADDRESSV       = 2,
@@ -230,6 +230,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    UNKNOWN,
 		};
 
+
 		public enum MATERIAL_TYPE
 		{
 		    DIFFUSE,
@@ -265,7 +266,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    PSBOOL,
 		    PSINT,
 		}
-		
+
 		public enum STATE_TYPE
 		{
 			CONSTANT,
@@ -288,7 +289,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			public uint member_count;
 			public uint flags;
 			public uint bytes;
-			
+
 			public d3dx_parameter[] annotation_handles;
 			public d3dx_parameter[] member_handles;
 		}
@@ -300,7 +301,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			public STATE_TYPE type;
 			public d3dx_parameter parameter;
 		}
-		
+
 		public class d3dx_sampler
 		{
 			public uint state_count;
@@ -312,21 +313,20 @@ namespace Microsoft.Xna.Framework.Graphics
 			public string name;
 			public uint state_count;
 			public uint annotation_count;
-			
+
 			public d3dx_state[] states;
 			public d3dx_parameter[] annotation_handles;
 		}
-		
+
 		public class d3dx_technique
 		{
 			public string name;
 			public uint pass_count;
 			public uint annotation_count;
-			
+
 			public d3dx_parameter[] annotation_handles;
 			public d3dx_pass[] pass_handles;
 		}
-
 
 		public struct state_info
 		{
@@ -340,6 +340,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				this.name = name;
 			}
 		}
+
 		private state_info[] state_table =
 		{
 			new state_info(STATE_CLASS.RENDERSTATE, (uint)D3DRENDERSTATETYPE.ZENABLE, "ZENABLE"), /* 0x0 */
@@ -928,7 +929,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 
 		}
-		
+
 		private void parse_init_value(long offset, d3dx_parameter param)
 		{
 			long oldPos = effectStream.Position; effectStream.Seek (offset, SeekOrigin.Begin);
@@ -939,7 +940,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			effectStream.Seek (oldPos, SeekOrigin.Begin);
 		}
-		
+
 		private d3dx_parameter parse_effect_annotation()
 		{
 			d3dx_parameter ret = new d3dx_parameter();
@@ -1084,7 +1085,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			return ret;
 		}
-		
+
 		private d3dx_pass parse_effect_pass()
 		{
 			d3dx_pass ret = new d3dx_pass();

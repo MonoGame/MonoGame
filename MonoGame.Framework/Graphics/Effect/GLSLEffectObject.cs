@@ -8,67 +8,6 @@ namespace Microsoft.Xna.Framework.Graphics
 	public class GLSLEffectObject
 	{
 
-		public class glsl_state
-		{
-			public glslStateInfo operation;
-			public uint index;
-			public STATE_TYPE type;
-			public glslParameter parameter;
-		}
-
-		public enum STATE_TYPE
-		{
-			CONSTANT,
-			PARAMETER,
-			EXPRESSION,
-			EXPRESSIONINDEX,
-		}
-
-		// Effect States (Direct3D 9)
-		// http://msdn.microsoft.com/en-us/library/windows/desktop/bb173347(v=vs.85).aspx
-		public enum STATE_CLASS
-		{
-		    LIGHTENABLE,
-		    FVF,
-		    LIGHT,
-		    MATERIAL,
-		    NPATCHMODE,
-		    PIXELSHADER,
-		    RENDERSTATE,
-		    SETSAMPLER,
-		    SAMPLERSTATE,
-		    TEXTURE,
-		    TEXTURESTAGE,
-		    TRANSFORM,
-		    VERTEXSHADER,
-		    SHADERCONST,
-		    UNKNOWN,
-		};
-
-
-		public enum GLSLTEXTURESTAGESTATETYPE {
-		    COLOROP               =  1,
-		    COLORARG1             =  2,
-		    COLORARG2             =  3,
-		    ALPHAOP               =  4,
-		    ALPHAARG1             =  5,
-		    ALPHAARG2             =  6,
-		    BUMPENVMAT00          =  7,
-		    BUMPENVMAT01          =  8,
-		    BUMPENVMAT10          =  9,
-		    BUMPENVMAT11          = 10,
-		    TEXCOORDINDEX         = 11,
-		    BUMPENVLSCALE         = 22,
-		    BUMPENVLOFFSET        = 23,
-		    TEXTURETRANSFORMFLAGS = 24,
-		    COLORARG0             = 26,
-		    ALPHAARG0             = 27,
-		    RESULTARG             = 28,
-		    CONSTANT              = 32,
-		
-		    FORCE_DWORD           = 0x7fffffff
-		}
-
 		public enum GLSLRENDERSTATETYPE {
 		    ZENABLE                   =   7,
 		    FILLMODE                  =   8,
@@ -177,6 +116,29 @@ namespace Microsoft.Xna.Framework.Graphics
 		    FORCE_DWORD               = 0x7fffffff
 		}
 
+		public enum GLSLTEXTURESTAGESTATETYPE {
+		    COLOROP               =  1,
+		    COLORARG1             =  2,
+		    COLORARG2             =  3,
+		    ALPHAOP               =  4,
+		    ALPHAARG1             =  5,
+		    ALPHAARG2             =  6,
+		    BUMPENVMAT00          =  7,
+		    BUMPENVMAT01          =  8,
+		    BUMPENVMAT10          =  9,
+		    BUMPENVMAT11          = 10,
+		    TEXCOORDINDEX         = 11,
+		    BUMPENVLSCALE         = 22,
+		    BUMPENVLOFFSET        = 23,
+		    TEXTURETRANSFORMFLAGS = 24,
+		    COLORARG0             = 26,
+		    ALPHAARG0             = 27,
+		    RESULTARG             = 28,
+		    CONSTANT              = 32,
+		
+		    FORCE_DWORD           = 0x7fffffff
+		}
+
 		public enum GLSLTRANSFORMSTATETYPE {
 		    VIEW            =  2,
 		    PROJECTION      =  3,
@@ -191,6 +153,82 @@ namespace Microsoft.Xna.Framework.Graphics
 			WORLD           = 256,
 		    FORCE_DWORD     = 0x7fffffff
 		}
+
+		public const int PARAMETER_ANNOTATION = 4;
+
+		public enum glslEffectParameterClass
+		{
+			Scalar = 0,
+			Vector = 1,
+			MatrixRows = 2,
+			MatrixColumns = 3,
+			Object = 4,
+			Struct = 5,
+		}
+
+		public enum glslEffectParameterType
+		{
+			Void = 0,
+			Bool = 1,
+			Int32 = 2,
+			Single = 3,
+			String = 4,
+			Texture = 5,
+			Texture1D = 6,
+			Texture2D = 7,
+			Texture3D = 8,
+			TextureCube = 9,
+			Sampler = 10,
+			Sampler1D = 11,
+			Sampler2D = 12,
+			Sampler3D = 13,
+			SamplerCube = 14,
+			PixelShader = 15,
+			VertexShader = 16,
+			ShaderFunc = 17,
+			UInt32 = 18,
+			Struct = 19
+		}
+
+		enum GLSLSAMPLERSTATETYPE {
+		    ADDRESSU       = 1,
+		    ADDRESSV       = 2,
+		    ADDRESSW       = 3,
+		    BORDERCOLOR    = 4,
+		    MAGFILTER      = 5,
+		    MINFILTER      = 6,
+		    MIPFILTER      = 7,
+		    MIPMAPLODBIAS  = 8,
+		    MAXMIPLEVEL    = 9,
+		    MAXANISOTROPY  = 10,
+		    SRGBTEXTURE    = 11,
+		    ELEMENTINDEX   = 12,
+		    DMAPOFFSET     = 13,
+		                                
+		    FORCE_DWORD   = 0x7fffffff,
+		};
+
+		// Effect States (Direct3D 9)
+		// http://msdn.microsoft.com/en-us/library/windows/desktop/bb173347(v=vs.85).aspx
+		public enum STATE_CLASS
+		{
+		    LIGHTENABLE,
+		    FVF,
+		    LIGHT,
+		    MATERIAL,
+		    NPATCHMODE,
+		    PIXELSHADER,
+		    RENDERSTATE,
+		    SETSAMPLER,
+		    SAMPLERSTATE,
+		    TEXTURE,
+		    TEXTURESTAGE,
+		    TRANSFORM,
+		    VERTEXSHADER,
+		    SHADERCONST,
+		    UNKNOWN,
+		};
+
 
 		public enum MATERIAL_TYPE
 		{
@@ -228,25 +266,67 @@ namespace Microsoft.Xna.Framework.Graphics
 		    PSINT,
 		}
 
-		enum GLSLSAMPLERSTATETYPE {
-		    ADDRESSU       = 1,
-		    ADDRESSV       = 2,
-		    ADDRESSW       = 3,
-		    BORDERCOLOR    = 4,
-		    MAGFILTER      = 5,
-		    MINFILTER      = 6,
-		    MIPFILTER      = 7,
-		    MIPMAPLODBIAS  = 8,
-		    MAXMIPLEVEL    = 9,
-		    MAXANISOTROPY  = 10,
-		    SRGBTEXTURE    = 11,
-		    ELEMENTINDEX   = 12,
-		    DMAPOFFSET     = 13,
-		                                
-		    FORCE_DWORD   = 0x7fffffff,
-		};
+		public enum STATE_TYPE
+		{
+			CONSTANT,
+			PARAMETER,
+			EXPRESSION,
+			EXPRESSIONINDEX,
+		}
+		
+		public class glslParameter
+		{
+			public string name;
+			public string semantic;
+			public object data;
+			public glslEffectParameterClass class_;
+			public glslEffectParameterType  type;
+			public uint rows;
+			public uint columns;
+			public uint element_count;
+			public uint annotation_count;
+			public uint member_count;
+			public uint flags;
+			public uint bytes;
+			public glslVectorType vectorType;
 
-		public const int PARAMETER_ANNOTATION = 4;
+			public glslParameter[] annotation_handles;
+			public glslParameter[] member_handles;
+		}
+		
+		public class glsl_state
+		{
+			public glslStateInfo operation;
+			public uint index;
+			public STATE_TYPE type;
+			public glslParameter parameter;
+		}
+
+		public class glslSampler
+		{
+			public uint state_count;
+			public glsl_state[] states;
+		}
+		
+		public class glslPass
+		{
+			public string name;
+			public uint state_count;
+			public uint annotation_count;
+
+			public glsl_state[] states;
+			public glslParameter[] annotation_handles;
+		}
+
+		public class glslTechnique
+		{
+			public string name;
+			public uint pass_count;
+			public uint annotation_count;
+
+			public glslParameter[] annotation_handles;
+			public glslPass[] pass_handles;
+		}
 
 		public struct glslStateInfo
 		{
@@ -458,33 +538,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			new glslStateInfo(STATE_CLASS.SETSAMPLER, 0, "Sampler"),
 		};
 
-		public class glslSampler
-		{
-			public uint state_count;
-			public glsl_state[] states;
-		}
-		
-		public class glslPass
-		{
-			public string name;
-			public uint state_count;
-			public uint annotation_count;
-
-			public glsl_state[] states;
-			public glslParameter[] annotation_handles;
-		}
-
-		public class glslTechnique
-
-		{
-			public string name;
-			public uint pass_count;
-			public uint annotation_count;
-
-			public glslParameter[] annotation_handles;
-			public glslPass[] pass_handles;
-		}
-
 		internal struct ShaderProg
 		{
 			public string shaderName;
@@ -500,60 +553,6 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			public string FragProg;
 			public string VertProg;
-		}
-
-		public class glslParameter
-		{
-			public string name;
-			public string semantic;
-			public object data;
-			public glslEffectParameterClass class_;
-			public glslEffectParameterType  type;
-			public uint rows;
-			public uint columns;
-			public uint element_count;
-			public uint annotation_count;
-			public uint member_count;
-			public uint flags;
-			public uint bytes;
-			public glslVectorType vectorType;
-
-			public glslParameter[] annotation_handles;
-			public glslParameter[] member_handles;
-		}
-
-		public enum glslEffectParameterType
-		{
-			Void = 0,
-			Bool = 1,
-			Int32 = 2,
-			Single = 3,
-			String = 4,
-			Texture = 5,
-			Texture1D = 6,
-			Texture2D = 7,
-			Texture3D = 8,
-			TextureCube = 9,
-			Sampler = 10,
-			Sampler1D = 11,
-			Sampler2D = 12,
-			Sampler3D = 13,
-			SamplerCube = 14,
-			PixelShader = 15,
-			VertexShader = 16,
-			ShaderFunc = 17,
-			UInt32 = 18,
-			Struct = 19
-		}
-
-		public enum glslEffectParameterClass
-		{
-			Scalar = 0,
-			Vector = 1,
-			MatrixRows = 2,
-			MatrixColumns = 3,
-			Object = 4,
-			Struct = 5,
 		}
 
 		public enum TargetPlatform
@@ -604,15 +603,17 @@ namespace Microsoft.Xna.Framework.Graphics
 			public string Name { get; set; }
 		}
 
-		public glslParameter[] parameter_handles;
-		public glslTechnique[] technique_handles;
-		int objectIndex = 0;
-		int parameter_handles_index = 0;
-
-		public glslParameter[] objects;
 
 		MemoryStream effectCodeStream;
 		BinaryReader reader;
+
+		public glslParameter[] parameter_handles;
+		public glslTechnique[] technique_handles;
+		
+		public glslParameter[] objects;
+		
+		int objectIndex = 0;
+		int parameter_handles_index = 0;
 
 		public GLSLEffectObject (byte[] effectCode)
 		{
@@ -662,24 +663,19 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 
-		private glslParameter parseEffectParameter()
+		private string glslParseString ()
 		{
-			glslParameter param = new glslParameter();
-			param.flags = reader.ReadUInt32();
-			param.annotation_count = reader.ReadUInt32();
+			return glslParseString(reader);
+		}
 
-			parseDefType(param, null, param.flags);
+		private string glslParseString (BinaryReader reader)
+		{
+			byte stringCount = reader.ReadByte ();
+			byte[] bstr = new byte[(int)stringCount];
 
-			parseInitValue(param);
-
-			if (param.annotation_count > 0) {
-				param.annotation_handles = new glslParameter[param.annotation_count];
-				for (int i=0; i<param.annotation_count; i++) {
-					param.annotation_handles[i] = parse_effect_annotation();
-				}
-			}
-
-			return param;
+			reader.Read (bstr, 0, (int)stringCount);
+			reader.ReadByte();  // null terminated string
+			return Encoding.ASCII.GetString (bstr);
 		}
 
 		private void parseDefType(glslParameter param, glslParameter parent, uint flags)
@@ -793,12 +789,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 
-		private void parseInitValue(glslParameter param)
-		{
-			byte[] data = reader.ReadBytes((int)param.bytes);
-			parseValue(param, data);
-		}
-
 		private byte[] sliceBytes(byte[] data, uint start, uint stop) {
 			byte[] ret = new byte[stop-start];
 			for (uint i=start; i<stop; i++) {
@@ -872,56 +862,43 @@ namespace Microsoft.Xna.Framework.Graphics
 					break;
 				}
 			}
+
 		}
 
-		private glslTechnique parse_effect_technique()
+		private void parseInitValue(glslParameter param)
 		{
-			glslTechnique tech = new glslTechnique ();
-			tech.name = glslParseString ();
+			byte[] data = reader.ReadBytes((int)param.bytes);
+			parseValue(param, data);
+		}
 
-			tech.annotation_count = reader.ReadUInt32 ();
-			tech.pass_count = reader.ReadUInt32();
+		private glslParameter parse_effect_annotation()
+		{
+			glslParameter ret = new glslParameter();
+			ret.flags = PARAMETER_ANNOTATION;
+			ret.data = glslParseString();
+			return ret;
+		}
+		
+		private glslParameter parseEffectParameter()
+		{
+			glslParameter param = new glslParameter();
+			param.flags = reader.ReadUInt32();
+			param.annotation_count = reader.ReadUInt32();
 
-			if (tech.annotation_count > 0) {
-				tech.annotation_handles = new glslParameter[tech.annotation_count];
-				for (int i=0; i<tech.annotation_count; i++) {
-					tech.annotation_handles[i] = parse_effect_annotation();
+			parseDefType(param, null, param.flags);
+
+			parseInitValue(param);
+
+			if (param.annotation_count > 0) {
+				param.annotation_handles = new glslParameter[param.annotation_count];
+				for (int i=0; i<param.annotation_count; i++) {
+					param.annotation_handles[i] = parse_effect_annotation();
 				}
 			}
 
-			int passSize = reader.ReadInt32 ();  // not used right now
-			tech.pass_handles = new glslPass[tech.pass_count];
-
-			for (int j = 0; j < tech.pass_count; j++) {
-				tech.pass_handles [j] = parse_effect_pass();
-			}
-
-			return tech;
+			return param;
 		}
-
-		private glslPass parse_effect_pass()
-		{
-			glslPass pass = new glslPass ();
-			pass.name = glslParseString();
-			pass.annotation_count = reader.ReadUInt32();
-			pass.state_count = reader.ReadUInt32();
-
-			if (pass.annotation_count > 0) {
-				pass.annotation_handles = new glslParameter[pass.annotation_count];
-				for (int i=0; i<pass.annotation_count; i++) {
-					pass.annotation_handles[i] = parse_effect_annotation();
-				}
-			}
-
-			pass.states = new glsl_state[pass.state_count];
-			for (int i=0; i<pass.state_count; i++) {
-				pass.states[i] = parse_state();
-			}
-
-			return pass;
-		}
-
-
+		
 		private glsl_state parse_state()
 		{
 			glsl_state ret = new glsl_state();
@@ -1044,28 +1021,51 @@ namespace Microsoft.Xna.Framework.Graphics
 			return ret;
 		}
 
-
-		private string glslParseString ()
+		private glslPass parse_effect_pass()
 		{
-			return glslParseString(reader);
+			glslPass pass = new glslPass ();
+			pass.name = glslParseString();
+			pass.annotation_count = reader.ReadUInt32();
+			pass.state_count = reader.ReadUInt32();
+
+			if (pass.annotation_count > 0) {
+				pass.annotation_handles = new glslParameter[pass.annotation_count];
+				for (int i=0; i<pass.annotation_count; i++) {
+					pass.annotation_handles[i] = parse_effect_annotation();
+				}
+			}
+
+			pass.states = new glsl_state[pass.state_count];
+			for (int i=0; i<pass.state_count; i++) {
+				pass.states[i] = parse_state();
+			}
+
+			return pass;
 		}
-
-		private string glslParseString (BinaryReader reader)
+		
+		private glslTechnique parse_effect_technique()
 		{
-			byte stringCount = reader.ReadByte ();
-			byte[] bstr = new byte[(int)stringCount];
+			glslTechnique tech = new glslTechnique ();
+			tech.name = glslParseString ();
 
-			reader.Read (bstr, 0, (int)stringCount);
-			reader.ReadByte();  // null terminated string
-			return Encoding.ASCII.GetString (bstr);
-		}
+			tech.annotation_count = reader.ReadUInt32 ();
+			tech.pass_count = reader.ReadUInt32();
 
-		private glslParameter parse_effect_annotation()
-		{
-			glslParameter ret = new glslParameter();
-			ret.flags = PARAMETER_ANNOTATION;
-			ret.data = glslParseString();
-			return ret;
+			if (tech.annotation_count > 0) {
+				tech.annotation_handles = new glslParameter[tech.annotation_count];
+				for (int i=0; i<tech.annotation_count; i++) {
+					tech.annotation_handles[i] = parse_effect_annotation();
+				}
+			}
+
+			int passSize = reader.ReadInt32 ();  // not used right now
+			tech.pass_handles = new glslPass[tech.pass_count];
+
+			for (int j = 0; j < tech.pass_count; j++) {
+				tech.pass_handles [j] = parse_effect_pass();
+			}
+
+			return tech;
 		}
 
 //		private void glslParseVariables (BinaryReader reader, int varCount, List<EffectParameter> paramList, Dictionary<string, EffectParameter> paramDict, List<ShaderProg> shaderFuncs, List<ShaderProg> shaderProgs)
@@ -1210,7 +1210,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			shader.samplerIndices = samplIndices;
 
 			prog.glslShaderObject = shader;
-			prog.shaderId = shader.shader;
+			prog.shaderId = shader.shaderHandle;
 			param.data = prog;
 
 		}

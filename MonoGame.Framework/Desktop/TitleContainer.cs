@@ -33,7 +33,7 @@
 // code form, you may only do so under a license that complies with this license.
 // (E) The software is licensed "as-is." You bear the risk of using it. The contributors give no express warranties, guarantees
 // or conditions. You may have additional consumer rights under your local laws which this license cannot change. To the extent
-// permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular
+// permitted undr your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular
 // purpose and non-infringement.
 // */
 // #endregion License
@@ -41,19 +41,35 @@
 using System;
 using System.IO;
 
+#if WINRT
+using Windows.Storage;
+#endif
+
 namespace Microsoft.Xna.Framework
 {
     public static class TitleContainer
     {
         public static Stream OpenStream(string name)
         {
+#if WINRT
+            var package = Windows.ApplicationModel.Package.Current;
+            var file = package.InstalledLocation.GetFileAsync(name).GetResults();
+            var stream = file.OpenReadAsync().GetResults();
+            return stream.AsStreamForRead();
+#else
             return File.OpenRead(GetFilename(name));
+#endif
         }
 
         internal static string GetFilename(string name)
         {
+#if WINRT
+            // Replace non-windows seperators.
+            name = name.Replace('/', '\\');
+#else
             // Replace Windows path separators with local path separators
             name = name.Replace('\\', Path.DirectorySeparatorChar);
+#endif
             return name;
         }
     }

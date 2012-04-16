@@ -1,0 +1,1195 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>SharpDX.XAPO</name>
+    </assembly>
+    <members>
+        <member name="T:SharpDX.XAPO.AudioProcessor">
+            <summary>	
+            Process	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='IXAPO']/*"/>	
+            <unmanaged>IXAPO</unmanaged>	
+        </member>
+        <member name="M:SharpDX.XAPO.AudioProcessor.IsInputFormatSupported(SharpDX.Multimedia.WaveFormat,SharpDX.Multimedia.WaveFormat,SharpDX.Multimedia.WaveFormat@)">
+            <summary>	
+            Queries if a specific input format is supported for a given output format.	
+            </summary>	
+            <param name="outputFormat">Output format.</param>
+            <param name="requestedInputFormat">Input format to check for being supported.</param>
+            <param name="supportedInputFormat"> If not NULL, and the input format is not supported for the given output format, ppSupportedInputFormat returns a  pointer to the closest input format that is supported. Use {{XAPOFree}} to free the returned structure. </param>
+            <returns>No documentation.</returns>
+            <unmanaged>HRESULT IXAPO::IsInputFormatSupported([None] const WAVEFORMATEX* pOutputFormat,[None] const WAVEFORMATEX* pRequestedInputFormat,[Out, Optional] WAVEFORMATEX** ppSupportedInputFormat)</unmanaged>
+        </member>
+        <member name="M:SharpDX.XAPO.AudioProcessor.IsOutputFormatSupported(SharpDX.Multimedia.WaveFormat,SharpDX.Multimedia.WaveFormat,SharpDX.Multimedia.WaveFormat@)">
+            <summary>	
+            Queries if a specific output format is supported for a given input format.	
+            </summary>	
+            <param name="inputFormat">[in]  Input format. </param>
+            <param name="requestedOutputFormat">[in]  Output format to check for being supported. </param>
+            <param name="supportedOutputFormat">[out]  If not NULL and the output format is not supported for the given input format, ppSupportedOutputFormat returns a pointer to the closest output format that is supported. Use {{XAPOFree}} to free the returned structure. </param>
+            <returns>No documentation.</returns>
+            <unmanaged>HRESULT IXAPO::IsOutputFormatSupported([None] const WAVEFORMATEX* pInputFormat,[None] const WAVEFORMATEX* pRequestedOutputFormat,[Out, Optional] WAVEFORMATEX** ppSupportedOutputFormat)</unmanaged>
+        </member>
+        <member name="M:SharpDX.XAPO.AudioProcessor.Initialize(SharpDX.DataStream)">
+            <summary>	
+            Performs any effect-specific initialization.	
+            </summary>	
+            <param name="stream"> Effect-specific initialization parameters, may be NULL if DataByteSize is 0. </param>
+            <returns>No documentation.</returns>
+            <unmanaged>HRESULT IXAPO::Initialize([In, Buffer, Optional] const void* pData,[None] UINT32 DataByteSize)</unmanaged>
+        </member>
+        <member name="M:SharpDX.XAPO.AudioProcessor.Reset">
+            <summary>	
+            Resets variables dependent on frame history. 	
+            </summary>	
+            <unmanaged>void IXAPO::Reset()</unmanaged>
+        </member>
+        <member name="M:SharpDX.XAPO.AudioProcessor.LockForProcess(SharpDX.XAPO.LockParameters[],SharpDX.XAPO.LockParameters[])">
+            <summary>	
+            Called by XAudio2 to lock the input and output configurations of an XAPO allowing it to	
+            do any final initialization before {{Process}} is called on the realtime thread.	
+            </summary>	
+            <param name="inputLockedParameters"> Array of input <see cref="T:SharpDX.XAPO.LockParameters"/> structures.pInputLockedParameters may be NULL if InputLockedParameterCount is 0, otherwise itmust have InputLockedParameterCount elements.</param>
+            <param name="outputLockedParameters"> Array of output <see cref="T:SharpDX.XAPO.LockParameters"/> structures.pOutputLockedParameters may be NULL if OutputLockedParameterCount is 0, otherwise itmust have OutputLockedParameterCount elements.</param>
+            <returns>No documentation.</returns>
+            <unmanaged>HRESULT IXAPO::LockForProcess([None] UINT32 InputLockedParameterCount,[In, Buffer, Optional] const XAPO_LOCKFORPROCESS_BUFFER_PARAMETERS* pInputLockedParameters,[None] UINT32 OutputLockedParameterCount,[In, Buffer, Optional] const XAPO_LOCKFORPROCESS_BUFFER_PARAMETERS* pOutputLockedParameters)</unmanaged>
+        </member>
+        <member name="M:SharpDX.XAPO.AudioProcessor.UnlockForProcess">
+            <summary>	
+            Deallocates variables that were allocated with the {{LockForProcess}} method.	
+            </summary>	
+            <unmanaged>void IXAPO::UnlockForProcess()</unmanaged>
+        </member>
+        <member name="M:SharpDX.XAPO.AudioProcessor.Process(SharpDX.XAPO.BufferParameters[],SharpDX.XAPO.BufferParameters[],System.Boolean)">
+            <summary>	
+            Runs the XAPO's digital signal processing (DSP) code on the given input and output buffers.	
+            </summary>	
+            <param name="inputProcessParameters">[in]          Input array of  <see cref="T:SharpDX.XAPO.BufferParameters"/> structures.         </param>
+            <param name="outputProcessParameters">[in, out]          Output array of <see cref="T:SharpDX.XAPO.BufferParameters"/> structures.  On input, the value of <see cref="T:SharpDX.XAPO.BufferParameters"/>.ValidFrameCount indicates the number of frames  that the XAPO should write to the output buffer.  On output, the value of <see cref="T:SharpDX.XAPO.BufferParameters"/>.ValidFrameCount indicates the actual number of frames written.         </param>
+            <param name="isEnabled"> TRUE to process normally; FALSE to process thru.  See Remarks for additional information.         </param>
+            <unmanaged>void IXAPO::Process([None] UINT32 InputProcessParameterCount,[In, Buffer, Optional] const XAPO_PROCESS_BUFFER_PARAMETERS* pInputProcessParameters,[None] UINT32 OutputProcessParameterCount,[InOut, Buffer, Optional] XAPO_PROCESS_BUFFER_PARAMETERS* pOutputProcessParameters,[None] BOOL IsEnabled)</unmanaged>
+        </member>
+        <member name="M:SharpDX.XAPO.AudioProcessor.CalcInputFrames(System.Int32)">
+            <summary>	
+            Returns the number of input frames required to generate the given number of output frames.	
+            </summary>	
+            <param name="outputFrameCount">The number of output frames desired.</param>
+            <returns>No documentation.</returns>
+            <unmanaged>UINT32 IXAPO::CalcInputFrames([None] UINT32 OutputFrameCount)</unmanaged>
+        </member>
+        <member name="M:SharpDX.XAPO.AudioProcessor.CalcOutputFrames(System.Int32)">
+            <summary>	
+            Returns the number of output frames that will be generated from a given number of input frames.	
+            </summary>	
+            <param name="inputFrameCount">The number of input frames.</param>
+            <returns>No documentation.</returns>
+            <unmanaged>UINT32 IXAPO::CalcOutputFrames([None] UINT32 InputFrameCount)</unmanaged>
+        </member>
+        <member name="P:SharpDX.XAPO.AudioProcessor.RegistrationProperties">
+            <summary>	
+            Returns the registration properties of an XAPO.	
+            </summary>	
+            <returns> a <see cref="T:SharpDX.XAPO.RegistrationProperties"/> structure containing theregistration properties the XAPO was created with; use XAPOFree to free thestructure.</returns>
+            <unmanaged>HRESULT IXAPO::GetRegistrationProperties([Out] XAPO_REGISTRATION_PROPERTIES** ppRegistrationProperties)</unmanaged>
+        </member>
+        <member name="T:SharpDX.XAPO.AudioProcessorBase`1">
+            <summary>
+            Base AudioProcessor class that implements methods from <see cref="T:SharpDX.XAPO.AudioProcessor"/>. This class is 
+            also providing its parameter through a generic.
+            </summary>
+            <typeparam name="T">type of the parameter for this AudioProcessor</typeparam>
+        </member>
+        <member name="T:SharpDX.XAPO.ParameterProvider">
+            <summary>	
+            <code>	
+            <see cref="T:SharpDX.Result"/> QueryInterface( RFFIID 	
+            </code>	
+              Parameters<list>	
+            <item><term>riid</term><description> The requested interface ID.  For the <see cref="T:SharpDX.XAPO.AudioProcessor"/> interface this will be  __uuidof(<see cref="T:SharpDX.XAPO.AudioProcessor"/>), for the <see cref="T:SharpDX.XAPO.ParameterProvider"/> interface this will be  __uuidof(<see cref="T:SharpDX.XAPO.ParameterProvider"/>). </description></item>	
+            <item><term>ppv</term><description>If the requested interface is supported 	
+            ppv will be set to a reference to the interface and the object's reference count 	
+            will be incremented by 1.</description></item>	
+            </list>	
+             Return Value<para>Returns <see cref="F:SharpDX.Result.Ok"/> if the interface is supported; otherwise returns E_NOINTERFACE.</para>	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='IXAPOParameters']/*"/>	
+            <unmanaged>IXAPOParameters</unmanaged>	
+        </member>
+        <member name="M:SharpDX.XAPO.ParameterProvider.SetParameters(SharpDX.DataStream)">
+            <summary>	
+            Sets effect-specific parameters.	
+            </summary>	
+            <param name="parameters"> Effect-specific parameter block. </param>
+            <unmanaged>void IXAPOParameters::SetParameters([In, Buffer] const void* pParameters,[None] UINT32 ParameterByteSize)</unmanaged>
+        </member>
+        <member name="M:SharpDX.XAPO.ParameterProvider.GetParameters(SharpDX.DataStream)">
+            <summary>	
+            Gets the current values for any effect-specific parameters.	
+            </summary>	
+            <param name="parameters">[in, out]  Receives an effect-specific parameter block. </param>
+            <unmanaged>void IXAPOParameters::GetParameters([Out, Buffer] void* pParameters,[None] UINT32 ParameterByteSize)</unmanaged>
+        </member>
+        <member name="M:SharpDX.XAPO.AudioProcessorBase`1.IsInputFormatSupported(SharpDX.Multimedia.WaveFormat,SharpDX.Multimedia.WaveFormat,SharpDX.Multimedia.WaveFormat@)">
+            <summary>	
+            Queries if a specific input format is supported for a given output format.	
+            </summary>	
+            <param name="outputFormat">Output format.</param>
+            <param name="requestedInputFormat">Input format to check for being supported.</param>
+            <param name="supportedInputFormat"> If not NULL, and the input format is not supported for the given output format, ppSupportedInputFormat returns a  pointer to the closest input format that is supported. Use {{XAPOFree}} to free the returned structure. </param>
+            <returns>No documentation.</returns>
+            <unmanaged>HRESULT IXAPO::IsInputFormatSupported([None] const WAVEFORMATEX* pOutputFormat,[None] const WAVEFORMATEX* pRequestedInputFormat,[Out, Optional] WAVEFORMATEX** ppSupportedInputFormat)</unmanaged>
+        </member>
+        <member name="M:SharpDX.XAPO.AudioProcessorBase`1.IsOutputFormatSupported(SharpDX.Multimedia.WaveFormat,SharpDX.Multimedia.WaveFormat,SharpDX.Multimedia.WaveFormat@)">
+            <summary>	
+            Queries if a specific output format is supported for a given input format.	
+            </summary>	
+            <param name="inputFormat">[in]  Input format. </param>
+            <param name="requestedOutputFormat">[in]  Output format to check for being supported. </param>
+            <param name="supportedOutputFormat">[out]  If not NULL and the output format is not supported for the given input format, ppSupportedOutputFormat returns a pointer to the closest output format that is supported. Use {{XAPOFree}} to free the returned structure. </param>
+            <returns>No documentation.</returns>
+            <unmanaged>HRESULT IXAPO::IsOutputFormatSupported([None] const WAVEFORMATEX* pInputFormat,[None] const WAVEFORMATEX* pRequestedOutputFormat,[Out, Optional] WAVEFORMATEX** ppSupportedOutputFormat)</unmanaged>
+        </member>
+        <member name="M:SharpDX.XAPO.AudioProcessorBase`1.Initialize(SharpDX.DataStream)">
+            <summary>	
+            Performs any effect-specific initialization.	
+            </summary>	
+            <param name="stream"> Effect-specific initialization parameters, may be NULL if DataByteSize is 0. </param>
+            <returns>No documentation.</returns>
+            <unmanaged>HRESULT IXAPO::Initialize([In, Buffer, Optional] const void* pData,[None] UINT32 DataByteSize)</unmanaged>
+        </member>
+        <member name="M:SharpDX.XAPO.AudioProcessorBase`1.Reset">
+            <summary>	
+            Resets variables dependent on frame history. 	
+            </summary>	
+            <unmanaged>void IXAPO::Reset()</unmanaged>
+        </member>
+        <member name="M:SharpDX.XAPO.AudioProcessorBase`1.LockForProcess(SharpDX.XAPO.LockParameters[],SharpDX.XAPO.LockParameters[])">
+            <summary>	
+            Called by XAudio2 to lock the input and output configurations of an XAPO allowing it to	
+            do any final initialization before {{Process}} is called on the realtime thread.	
+            </summary>	
+            <param name="inputLockedParameters"> Array of input <see cref="T:SharpDX.XAPO.LockParameters"/> structures.pInputLockedParameters may be NULL if InputLockedParameterCount is 0, otherwise itmust have InputLockedParameterCount elements.</param>
+            <param name="outputLockedParameters"> Array of output <see cref="T:SharpDX.XAPO.LockParameters"/> structures.pOutputLockedParameters may be NULL if OutputLockedParameterCount is 0, otherwise itmust have OutputLockedParameterCount elements.</param>
+            <returns>No documentation.</returns>
+            <unmanaged>HRESULT IXAPO::LockForProcess([None] UINT32 InputLockedParameterCount,[In, Buffer, Optional] const XAPO_LOCKFORPROCESS_BUFFER_PARAMETERS* pInputLockedParameters,[None] UINT32 OutputLockedParameterCount,[In, Buffer, Optional] const XAPO_LOCKFORPROCESS_BUFFER_PARAMETERS* pOutputLockedParameters)</unmanaged>
+        </member>
+        <member name="M:SharpDX.XAPO.AudioProcessorBase`1.UnlockForProcess">
+            <summary>	
+            Deallocates variables that were allocated with the {{LockForProcess}} method.	
+            </summary>	
+            <unmanaged>void IXAPO::UnlockForProcess()</unmanaged>
+        </member>
+        <member name="M:SharpDX.XAPO.AudioProcessorBase`1.Process(SharpDX.XAPO.BufferParameters[],SharpDX.XAPO.BufferParameters[],System.Boolean)">
+            <summary>	
+            Runs the XAPO's digital signal processing (DSP) code on the given input and output buffers.	
+            </summary>	
+            <param name="inputProcessParameters">[in]          Input array of  <see cref="T:SharpDX.XAPO.BufferParameters"/> structures.         </param>
+            <param name="outputProcessParameters">[in, out]          Output array of <see cref="T:SharpDX.XAPO.BufferParameters"/> structures.  On input, the value of <see cref="T:SharpDX.XAPO.BufferParameters"/>.ValidFrameCount indicates the number of frames  that the XAPO should write to the output buffer.  On output, the value of <see cref="T:SharpDX.XAPO.BufferParameters"/>.ValidFrameCount indicates the actual number of frames written.         </param>
+            <param name="isEnabled"> TRUE to process normally; FALSE to process thru.  See Remarks for additional information.         </param>
+            <unmanaged>void IXAPO::Process([None] UINT32 InputProcessParameterCount,[In, Buffer, Optional] const XAPO_PROCESS_BUFFER_PARAMETERS* pInputProcessParameters,[None] UINT32 OutputProcessParameterCount,[InOut, Buffer, Optional] XAPO_PROCESS_BUFFER_PARAMETERS* pOutputProcessParameters,[None] BOOL IsEnabled)</unmanaged>
+        </member>
+        <member name="M:SharpDX.XAPO.AudioProcessorBase`1.CalcInputFrames(System.Int32)">
+            <summary>	
+            Returns the number of input frames required to generate the given number of output frames.	
+            </summary>	
+            <param name="outputFrameCount">The number of output frames desired.</param>
+            <returns>No documentation.</returns>
+            <unmanaged>UINT32 IXAPO::CalcInputFrames([None] UINT32 OutputFrameCount)</unmanaged>
+        </member>
+        <member name="M:SharpDX.XAPO.AudioProcessorBase`1.CalcOutputFrames(System.Int32)">
+            <summary>	
+            Returns the number of output frames that will be generated from a given number of input frames.	
+            </summary>	
+            <param name="inputFrameCount">The number of input frames.</param>
+            <returns>No documentation.</returns>
+            <unmanaged>UINT32 IXAPO::CalcOutputFrames([None] UINT32 InputFrameCount)</unmanaged>
+        </member>
+        <member name="M:SharpDX.XAPO.AudioProcessorBase`1.SharpDX#XAPO#ParameterProvider#SetParameters(SharpDX.DataStream)">
+            <summary>	
+            Sets effect-specific parameters.	
+            </summary>	
+            <param name="parameters"> Effect-specific parameter block. </param>
+            <unmanaged>void IXAPOParameters::SetParameters([In, Buffer] const void* pParameters,[None] UINT32 ParameterByteSize)</unmanaged>
+        </member>
+        <member name="M:SharpDX.XAPO.AudioProcessorBase`1.SharpDX#XAPO#ParameterProvider#GetParameters(SharpDX.DataStream)">
+            <summary>	
+            Gets the current values for any effect-specific parameters.	
+            </summary>	
+            <param name="parameters">[in, out]  Receives an effect-specific parameter block. </param>
+            <unmanaged>void IXAPOParameters::GetParameters([Out, Buffer] void* pParameters,[None] UINT32 ParameterByteSize)</unmanaged>
+        </member>
+        <member name="P:SharpDX.XAPO.AudioProcessorBase`1.Parameters">
+            <summary>
+             Return parameters
+            </summary>
+        </member>
+        <member name="P:SharpDX.XAPO.AudioProcessorBase`1.InputFormatLocked">
+            <summary>
+            Gets the input format locked.
+            </summary>
+            <value>The input format locked.</value>
+        </member>
+        <member name="P:SharpDX.XAPO.AudioProcessorBase`1.OutputFormatLocked">
+            <summary>
+            Gets the output format locked.
+            </summary>
+            <value>The output format locked.</value>
+        </member>
+        <member name="P:SharpDX.XAPO.AudioProcessorBase`1.MaxFrameCountLocked">
+            <summary>
+            Gets the max frame count locked.
+            </summary>
+            <value>The max frame count locked.</value>
+        </member>
+        <member name="P:SharpDX.XAPO.AudioProcessorBase`1.RegistrationProperties">
+            <summary>	
+            Returns the registration properties of an XAPO.	
+            </summary>	
+            <returns> a <see cref="T:SharpDX.XAPO.RegistrationProperties"/> structure containing theregistration properties the XAPO was created with; use XAPOFree to free thestructure.</returns>
+            <unmanaged>HRESULT IXAPO::GetRegistrationProperties([Out] XAPO_REGISTRATION_PROPERTIES** ppRegistrationProperties)</unmanaged>
+        </member>
+        <member name="T:SharpDX.XAPO.AudioProcessorShadow">
+            <summary>
+            Internal AudioProcessorShadow
+            </summary>
+            IXAPO GUID
+        </member>
+        <member name="M:SharpDX.XAPO.AudioProcessorShadow.ToIntPtr(SharpDX.XAPO.AudioProcessor)">
+            <summary>
+            Return a pointer to the unamanged version of this callback.
+            </summary>
+            <param name="callback">The callback.</param>
+            <returns>A pointer to a shadow c++ callback</returns>
+        </member>
+        <member name="T:SharpDX.XAPO.AudioProcessorShadow.AudioProcessorVtbl.GetRegistrationPropertiesDelegate">
+            <unmanaged>HRESULT IXAPO::GetRegistrationProperties([Out] XAPO_REGISTRATION_PROPERTIES** ppRegistrationProperties)</unmanaged>
+        </member>
+        <member name="T:SharpDX.XAPO.AudioProcessorShadow.AudioProcessorVtbl.IsInputFormatSupportedDelegate">
+            <unmanaged>HRESULT IXAPO::IsInputFormatSupported([None] const WAVEFORMATEX* pOutputFormat,[None] const WAVEFORMATEX* pRequestedInputFormat,[Out, Optional] WAVEFORMATEX** ppSupportedInputFormat)</unmanaged>
+        </member>
+        <member name="T:SharpDX.XAPO.AudioProcessorShadow.AudioProcessorVtbl.IsOutputFormatSupportedDelegate">
+            <unmanaged>HRESULT IXAPO::IsOutputFormatSupported([None] const WAVEFORMATEX* pInputFormat,[None] const WAVEFORMATEX* pRequestedOutputFormat,[Out, Optional] WAVEFORMATEX** ppSupportedOutputFormat)</unmanaged>
+        </member>
+        <member name="T:SharpDX.XAPO.AudioProcessorShadow.AudioProcessorVtbl.InitializeDelegate">
+            <unmanaged>HRESULT IXAPO::Initialize([In, Buffer, Optional] const void* pData,[None] UINT32 DataByteSize)</unmanaged>
+        </member>
+        <member name="T:SharpDX.XAPO.AudioProcessorShadow.AudioProcessorVtbl.ResetDelegate">
+            <unmanaged>void IXAPO::Reset()</unmanaged>
+        </member>
+        <member name="T:SharpDX.XAPO.AudioProcessorShadow.AudioProcessorVtbl.LockForProcessDelegate">
+            <unmanaged>HRESULT IXAPO::LockForProcess([None] UINT32 InputLockedParameterCount,[In, Buffer, Optional] const XAPO_LOCKFORPROCESS_BUFFER_PARAMETERS* pInputLockedParameters,[None] UINT32 OutputLockedParameterCount,[In, Buffer, Optional] const XAPO_LOCKFORPROCESS_BUFFER_PARAMETERS* pOutputLockedParameters)</unmanaged>
+        </member>
+        <member name="T:SharpDX.XAPO.AudioProcessorShadow.AudioProcessorVtbl.UnlockForProcessDelegate">
+            <summary>	
+            Deallocates variables that were allocated with the {{LockForProcess}} method.	
+            </summary>	
+            <unmanaged>void IXAPO::UnlockForProcess()</unmanaged>
+        </member>
+        <member name="T:SharpDX.XAPO.AudioProcessorShadow.AudioProcessorVtbl.ProcessDelegate">
+            <unmanaged>void IXAPO::Process([None] UINT32 InputProcessParameterCount,[In, Buffer, Optional] const XAPO_PROCESS_BUFFER_PARAMETERS* pInputProcessParameters,[None] UINT32 OutputProcessParameterCount,[InOut, Buffer, Optional] XAPO_PROCESS_BUFFER_PARAMETERS* pOutputProcessParameters,[None] BOOL IsEnabled)</unmanaged>
+        </member>
+        <member name="T:SharpDX.XAPO.AudioProcessorShadow.AudioProcessorVtbl.CalcInputFramesDelegate">
+            <summary>	
+            Returns the number of input frames required to generate the given number of output frames.	
+            </summary>
+            <param name="thisObject">This pointer</param>
+            <param name="outputFrameCount">The number of output frames desired.</param>
+            <returns>No documentation.</returns>
+            <unmanaged>UINT32 IXAPO::CalcInputFrames([None] UINT32 OutputFrameCount)</unmanaged>
+        </member>
+        <member name="T:SharpDX.XAPO.AudioProcessorShadow.AudioProcessorVtbl.CalcOutputFramesDelegate">
+            <summary>	
+            Returns the number of output frames that will be generated from a given number of input frames.	
+            </summary>	
+            <param name="thisObject">This Pointer</param>
+            <param name="inputFrameCount">The number of input frames.</param>
+            <returns>No documentation.</returns>
+            <unmanaged>UINT32 IXAPO::CalcOutputFrames([None] UINT32 InputFrameCount)</unmanaged>
+        </member>
+        <member name="T:SharpDX.XAPO.AudioProcessorNative">
+            <summary>
+            Native Accessor to an existing AudioProcessor instance
+            </summary>
+            <summary>	
+            Process	
+            </summary>	
+            <!-- Failed to insert some or all of included XML --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='IXAPO']/*"/>	
+            <unmanaged>IXAPO</unmanaged>	
+        </member>
+        <member name="M:SharpDX.XAPO.AudioProcessorNative.IsInputFormatSupported(SharpDX.Multimedia.WaveFormat,SharpDX.Multimedia.WaveFormat,SharpDX.Multimedia.WaveFormat@)">
+            <summary>	
+            Queries if a specific input format is supported for a given output format.	
+            </summary>	
+            <param name="outputFormat">Output format.</param>
+            <param name="requestedInputFormat">Input format to check for being supported.</param>
+            <param name="supportedInputFormat"> If not NULL, and the input format is not supported for the given output format, ppSupportedInputFormat returns a  pointer to the closest input format that is supported. Use {{XAPOFree}} to free the returned structure. </param>
+            <returns>No documentation.</returns>
+            <unmanaged>HRESULT IXAPO::IsInputFormatSupported([None] const WAVEFORMATEX* pOutputFormat,[None] const WAVEFORMATEX* pRequestedInputFormat,[Out, Optional] WAVEFORMATEX** ppSupportedInputFormat)</unmanaged>
+        </member>
+        <member name="M:SharpDX.XAPO.AudioProcessorNative.IsOutputFormatSupported(SharpDX.Multimedia.WaveFormat,SharpDX.Multimedia.WaveFormat,SharpDX.Multimedia.WaveFormat@)">
+            <summary>	
+            Queries if a specific output format is supported for a given input format.	
+            </summary>	
+            <param name="inputFormat">[in]  Input format. </param>
+            <param name="requestedOutputFormat">[in]  Output format to check for being supported. </param>
+            <param name="supportedOutputFormat">[out]  If not NULL and the output format is not supported for the given input format, ppSupportedOutputFormat returns a pointer to the closest output format that is supported. Use {{XAPOFree}} to free the returned structure. </param>
+            <returns>No documentation.</returns>
+            <unmanaged>HRESULT IXAPO::IsOutputFormatSupported([None] const WAVEFORMATEX* pInputFormat,[None] const WAVEFORMATEX* pRequestedOutputFormat,[Out, Optional] WAVEFORMATEX** ppSupportedOutputFormat)</unmanaged>
+        </member>
+        <member name="M:SharpDX.XAPO.AudioProcessorNative.Initialize(SharpDX.DataStream)">
+            <summary>	
+            Performs any effect-specific initialization.	
+            </summary>	
+            <param name="stream"> Effect-specific initialization parameters, may be NULL if DataByteSize is 0. </param>
+            <returns>No documentation.</returns>
+            <unmanaged>HRESULT IXAPO::Initialize([In, Buffer, Optional] const void* pData,[None] UINT32 DataByteSize)</unmanaged>
+        </member>
+        <member name="M:SharpDX.XAPO.AudioProcessorNative.Reset">
+            <summary>	
+            Resets variables dependent on frame history. 	
+            </summary>	
+            <unmanaged>void IXAPO::Reset()</unmanaged>
+        </member>
+        <member name="M:SharpDX.XAPO.AudioProcessorNative.LockForProcess(SharpDX.XAPO.LockParameters[],SharpDX.XAPO.LockParameters[])">
+            <summary>	
+            Called by XAudio2 to lock the input and output configurations of an XAPO allowing it to	
+            do any final initialization before {{Process}} is called on the realtime thread.	
+            </summary>	
+            <param name="inputLockedParameters"> Array of input <see cref="T:SharpDX.XAPO.LockParameters"/> structures.pInputLockedParameters may be NULL if InputLockedParameterCount is 0, otherwise itmust have InputLockedParameterCount elements.</param>
+            <param name="outputLockedParameters"> Array of output <see cref="T:SharpDX.XAPO.LockParameters"/> structures.pOutputLockedParameters may be NULL if OutputLockedParameterCount is 0, otherwise itmust have OutputLockedParameterCount elements.</param>
+            <returns>No documentation.</returns>
+            <unmanaged>HRESULT IXAPO::LockForProcess([None] UINT32 InputLockedParameterCount,[In, Buffer, Optional] const XAPO_LOCKFORPROCESS_BUFFER_PARAMETERS* pInputLockedParameters,[None] UINT32 OutputLockedParameterCount,[In, Buffer, Optional] const XAPO_LOCKFORPROCESS_BUFFER_PARAMETERS* pOutputLockedParameters)</unmanaged>
+        </member>
+        <member name="M:SharpDX.XAPO.AudioProcessorNative.UnlockForProcess">
+            <summary>	
+            Deallocates variables that were allocated with the {{LockForProcess}} method.	
+            </summary>	
+            <unmanaged>void IXAPO::UnlockForProcess()</unmanaged>
+        </member>
+        <member name="M:SharpDX.XAPO.AudioProcessorNative.Process(SharpDX.XAPO.BufferParameters[],SharpDX.XAPO.BufferParameters[],System.Boolean)">
+            <summary>	
+            Runs the XAPO's digital signal processing (DSP) code on the given input and output buffers.	
+            </summary>	
+            <param name="inputProcessParameters">[in]          Input array of  <see cref="T:SharpDX.XAPO.BufferParameters"/> structures.         </param>
+            <param name="outputProcessParameters">[in, out]          Output array of <see cref="T:SharpDX.XAPO.BufferParameters"/> structures.  On input, the value of <see cref="T:SharpDX.XAPO.BufferParameters"/>.ValidFrameCount indicates the number of frames  that the XAPO should write to the output buffer.  On output, the value of <see cref="T:SharpDX.XAPO.BufferParameters"/>.ValidFrameCount indicates the actual number of frames written.         </param>
+            <param name="isEnabled"> TRUE to process normally; FALSE to process thru.  See Remarks for additional information.         </param>
+            <unmanaged>void IXAPO::Process([None] UINT32 InputProcessParameterCount,[In, Buffer, Optional] const XAPO_PROCESS_BUFFER_PARAMETERS* pInputProcessParameters,[None] UINT32 OutputProcessParameterCount,[InOut, Buffer, Optional] XAPO_PROCESS_BUFFER_PARAMETERS* pOutputProcessParameters,[None] BOOL IsEnabled)</unmanaged>
+        </member>
+        <member name="M:SharpDX.XAPO.AudioProcessorNative.CalcInputFrames(System.Int32)">
+            <summary>	
+            Returns the number of input frames required to generate the given number of output frames.	
+            </summary>	
+            <param name="outputFrameCount">The number of output frames desired.</param>
+            <returns>No documentation.</returns>
+            <unmanaged>UINT32 IXAPO::CalcInputFrames([None] UINT32 OutputFrameCount)</unmanaged>
+        </member>
+        <member name="M:SharpDX.XAPO.AudioProcessorNative.CalcOutputFrames(System.Int32)">
+            <summary>	
+            Returns the number of output frames that will be generated from a given number of input frames.	
+            </summary>	
+            <param name="inputFrameCount">The number of input frames.</param>
+            <returns>No documentation.</returns>
+            <unmanaged>UINT32 IXAPO::CalcOutputFrames([None] UINT32 InputFrameCount)</unmanaged>
+        </member>
+        <member name="M:SharpDX.XAPO.AudioProcessorNative.#ctor(System.IntPtr)">
+            <summary>
+            Initializes a new instance of the <see cref="T:SharpDX.XAPO.AudioProcessorNative"/> class.
+            </summary>
+            <param name="nativePtr">The native pointer.</param>	
+        </member>
+        <member name="M:SharpDX.XAPO.AudioProcessorNative.GetRegistrationProperties_(SharpDX.XAPO.RegistrationProperties@)">
+            <summary>	
+            <code>	
+            virtual <see cref="T:SharpDX.Result"/> GetRegistrationProperties( <see cref="T:SharpDX.XAPO.RegistrationProperties"/> **	
+            </code>	
+              Parameters<list>	
+            <item><term>ppRegistrationProperties</term><description> Receives a reference to a <see cref="T:SharpDX.XAPO.RegistrationProperties"/> structure containing the	
+            registration properties the XAPO was created with; use XAPOFree to free the	
+            structure.	
+            </description></item>	
+            </list>	
+             Return Value<para>Returns <see cref="F:SharpDX.Result.Ok"/> if successful; returns an error code otherwise.</para>	
+            </summary>	
+            <param name="registrationPropertiesOut">Receives a reference to a <see cref="T:SharpDX.XAPO.RegistrationProperties"/> structure containing theregistration properties the XAPO was created with; use XAPOFree to free thestructure.</param>	
+            <returns><para>Returns <see cref="F:SharpDX.Result.Ok"/> if successful; returns an error code otherwise.</para></returns>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='IXAPO::GetRegistrationProperties']/*"/>	
+            <unmanaged>HRESULT IXAPO::GetRegistrationProperties([Out] XAPO_REGISTRATION_PROPERTIES** ppRegistrationProperties)</unmanaged>	
+        </member>
+        <member name="M:SharpDX.XAPO.AudioProcessorNative.IsInputFormatSupported_(SharpDX.Multimedia.WaveFormat@,SharpDX.Multimedia.WaveFormat@,SharpDX.Multimedia.WaveFormat@)">
+            <summary>	
+            <code>	
+            virtual <see cref="T:SharpDX.Result"/> IsInputFormatSupported( const <see cref="T:SharpDX.Multimedia.WaveFormat"/> *	
+            </code>	
+              Parameters<list>	
+            <item><term>pOutputFormat</term><description>Output format.</description></item>	
+            <item><term>pRequestedInputFormat</term><description>Input format to check for being supported.</description></item>	
+            <item><term>ppSupportedInputFormat</term><description> If not <c>null</c>, and the input format is not supported for the given output format, ppSupportedInputFormat returns a  reference to the closest input format that is supported. Use XAPOFree to free the returned structure. </description></item>	
+            </list>	
+             Return Value<para>Returns <see cref="F:SharpDX.Result.Ok"/> if the format pair is supported.  Returns XAPO_E_FORMAT_UNSUPPORTED if the format pair is not supported.</para>	
+            </summary>	
+            <param name="outputFormatRef">Output format.</param>	
+            <param name="requestedInputFormatRef">Input format to check for being supported.</param>	
+            <param name="supportedInputFormatOut">If not <c>null</c>, and the input format is not supported for the given output format, ppSupportedInputFormat returns a  reference to the closest input format that is supported. Use XAPOFree to free the returned structure.</param>	
+            <returns><para>Returns <see cref="F:SharpDX.Result.Ok"/> if the format pair is supported.  Returns XAPO_E_FORMAT_UNSUPPORTED if the format pair is not supported.</para></returns>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='IXAPO::IsInputFormatSupported']/*"/>	
+            <unmanaged>HRESULT IXAPO::IsInputFormatSupported([In] const WAVEFORMATEX* pOutputFormat,[In] const WAVEFORMATEX* pRequestedInputFormat,[Out, Optional] WAVEFORMATEX** ppSupportedInputFormat)</unmanaged>	
+        </member>
+        <member name="M:SharpDX.XAPO.AudioProcessorNative.IsOutputFormatSupported_(SharpDX.Multimedia.WaveFormat@,SharpDX.Multimedia.WaveFormat@,SharpDX.Multimedia.WaveFormat@)">
+            <summary>	
+            <code>	
+            virtual <see cref="T:SharpDX.Result"/> IsOutputFormatSupported( const <see cref="T:SharpDX.Multimedia.WaveFormat"/> *	
+            </code>	
+              Parameters<list>	
+            <item><term>pInputFormat</term><description>[in]  Input format. </description></item>	
+            <item><term>pRequestedOutputFormat</term><description>[in]  Output format to check for being supported. </description></item>	
+            <item><term>ppSupportedOutputFormat</term><description>[out]  If not <c>null</c> and the output format is not supported for the given input format, ppSupportedOutputFormat returns a reference to the closest output format that is supported. Use XAPOFree to free the returned structure. </description></item>	
+            </list>	
+             Return Value <para>Returns <see cref="F:SharpDX.Result.Ok"/> if the format pair is supported. Returns XAPO_E_FORMAT_UNSUPPORTED if the format pair is not supported.</para>	
+            </summary>	
+            <param name="inputFormatRef">[in]  Input format.</param>	
+            <param name="requestedOutputFormatRef">[in]  Output format to check for being supported.</param>	
+            <param name="supportedOutputFormatOut">[out]  If not <c>null</c> and the output format is not supported for the given input format, ppSupportedOutputFormat returns a reference to the closest output format that is supported. Use XAPOFree to free the returned structure.</param>	
+            <returns><para>Returns <see cref="F:SharpDX.Result.Ok"/> if the format pair is supported. Returns XAPO_E_FORMAT_UNSUPPORTED if the format pair is not supported.</para></returns>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='IXAPO::IsOutputFormatSupported']/*"/>	
+            <unmanaged>HRESULT IXAPO::IsOutputFormatSupported([In] const WAVEFORMATEX* pInputFormat,[In] const WAVEFORMATEX* pRequestedOutputFormat,[Out, Optional] WAVEFORMATEX** ppSupportedOutputFormat)</unmanaged>	
+        </member>
+        <member name="M:SharpDX.XAPO.AudioProcessorNative.Initialize_(System.IntPtr,System.Int32)">
+            <summary>	
+            <code>	
+            virtual <see cref="T:SharpDX.Result"/> Initialize( const void *	
+            </code>	
+              Parameters<list>	
+            <item><term>pData</term><description> Effect-specific initialization parameters, may be <c>null</c> if DataByteSize is 0. </description></item>	
+            <item><term>DataByteSize</term><description> Size of pData in bytes, may be 0 if pData is <c>null</c>. </description></item>	
+            </list>	
+             Return Value <para>Returns <see cref="F:SharpDX.Result.Ok"/> if successful, an error code otherwise.</para>	
+            </summary>	
+            <param name="dataRef">Effect-specific initialization parameters, may be <c>null</c> if DataByteSize is 0.</param>	
+            <param name="dataByteSize">Size of pData in bytes, may be 0 if pData is <c>null</c>.</param>	
+            <returns><para>Returns <see cref="F:SharpDX.Result.Ok"/> if successful, an error code otherwise.</para></returns>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='IXAPO::Initialize']/*"/>	
+            <unmanaged>HRESULT IXAPO::Initialize([In, Buffer, Optional] const void* pData,[In] unsigned int DataByteSize)</unmanaged>	
+        </member>
+        <member name="M:SharpDX.XAPO.AudioProcessorNative.Reset_">
+            <summary>	
+            <code>	
+            virtual void Reset() = 0	
+            </code>	
+              Return ValueNone.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='IXAPO::Reset']/*"/>	
+            <unmanaged>void IXAPO::Reset()</unmanaged>	
+        </member>
+        <member name="M:SharpDX.XAPO.AudioProcessorNative.LockForProcess_(System.Int32,SharpDX.XAPO.LockParameters[],System.Int32,SharpDX.XAPO.LockParameters[])">
+            <summary>	
+            Process	
+            </summary>	
+            <param name="inputLockedParameterCount">No documentation.</param>	
+            <param name="inputLockedParametersRef">No documentation.</param>	
+            <param name="outputLockedParameterCount">No documentation.</param>	
+            <param name="outputLockedParametersRef">No documentation.</param>	
+            <returns><para>Returns <see cref="F:SharpDX.Result.Ok"/> if successful, an error code otherwise.</para></returns>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='IXAPO::LockForProcess']/*"/>	
+            <unmanaged>HRESULT IXAPO::LockForProcess([In] unsigned int InputLockedParameterCount,[In, Buffer] const XAPO_LOCKFORPROCESS_BUFFER_PARAMETERS* pInputLockedParameters,[In] unsigned int OutputLockedParameterCount,[In, Buffer] const XAPO_LOCKFORPROCESS_BUFFER_PARAMETERS* pOutputLockedParameters)</unmanaged>	
+        </member>
+        <member name="M:SharpDX.XAPO.AudioProcessorNative.UnlockForProcess_">
+            <summary>	
+            LockForProcess	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='IXAPO::UnlockForProcess']/*"/>	
+            <unmanaged>void IXAPO::UnlockForProcess()</unmanaged>	
+        </member>
+        <member name="M:SharpDX.XAPO.AudioProcessorNative.Process_(System.Int32,SharpDX.XAPO.BufferParameters[],System.Int32,SharpDX.XAPO.BufferParameters[],System.Boolean)">
+            <summary>	
+            <code>	
+            virtual void Process( UINT32 	
+            </code>	
+              Parameters<list>	
+            <item><term>InputProcessParameterCount</term><description>[in]          Number of elements in pInputProcessParameters. Note XAudio2 currently supports only one input stream and one output stream. </description></item>	
+            <item><term>pInputProcessParameters</term><description>[in]          Input array of  <see cref="T:SharpDX.XAPO.BufferParameters"/> structures.         </description></item>	
+            <item><term>OutputProcessParameterCount</term><description>[in]          Number of elements in pOutputProcessParameters. Note XAudio2 currently supports only one input stream and one output stream. </description></item>	
+            <item><term>pOutputProcessParameters</term><description>[in, out]          Output array of <see cref="T:SharpDX.XAPO.BufferParameters"/> structures.  On input, the value of <see cref="T:SharpDX.XAPO.BufferParameters"/>.ValidFrameCount indicates the number of frames  that the XAPO should write to the output buffer.  On output, the value of <see cref="T:SharpDX.XAPO.BufferParameters"/>.ValidFrameCount indicates the actual number of frames written.         </description></item>	
+            <item><term>IsEnabled</term><description> TRUE to process normally; <see cref="F:SharpDX.Result.False"/> to process thru.  See Remarks for additional information.         </description></item>	
+            </list>	
+             Return ValueNone.	
+            </summary>	
+            <param name="inputProcessParameterCount">[in]          Number of elements in pInputProcessParameters. Note XAudio2 currently supports only one input stream and one output stream.</param>	
+            <param name="inputProcessParametersRef">[in]          Input array of  <see cref="T:SharpDX.XAPO.BufferParameters"/> structures.</param>	
+            <param name="outputProcessParameterCount">[in]          Number of elements in pOutputProcessParameters. Note XAudio2 currently supports only one input stream and one output stream.</param>	
+            <param name="outputProcessParametersRef">[in, out]          Output array of <see cref="T:SharpDX.XAPO.BufferParameters"/> structures.  On input, the value of <see cref="T:SharpDX.XAPO.BufferParameters"/>.ValidFrameCount indicates the number of frames  that the XAPO should write to the output buffer.  On output, the value of <see cref="T:SharpDX.XAPO.BufferParameters"/>.ValidFrameCount indicates the actual number of frames written.</param>	
+            <param name="isEnabled">to process normally; <see cref="F:SharpDX.Result.False"/> to process thru.  See Remarks for additional information.</param>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='IXAPO::Process']/*"/>	
+            <unmanaged>void IXAPO::Process([In] unsigned int InputProcessParameterCount,[In, Buffer, Optional] const XAPO_PROCESS_BUFFER_PARAMETERS* pInputProcessParameters,[In] unsigned int OutputProcessParameterCount,[In, Buffer] XAPO_PROCESS_BUFFER_PARAMETERS* pOutputProcessParameters,[In] BOOL IsEnabled)</unmanaged>	
+        </member>
+        <member name="M:SharpDX.XAPO.AudioProcessorNative.CalcInputFrames_(System.Int32)">
+            <summary>	
+            <code>	
+            virtual UINT32 CalcInputFrames( UINT32 	
+            </code>	
+              Parameters<list>	
+            <item><term>OutputFrameCount</term><description>The number of output frames desired.</description></item>	
+            </list>	
+             Return Value<para>Returns the number of input frames required.</para>	
+            </summary>	
+            <param name="outputFrameCount">The number of output frames desired.</param>	
+            <returns><para>Returns the number of input frames required.</para></returns>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='IXAPO::CalcInputFrames']/*"/>	
+            <unmanaged>unsigned int IXAPO::CalcInputFrames([In] unsigned int OutputFrameCount)</unmanaged>	
+        </member>
+        <member name="M:SharpDX.XAPO.AudioProcessorNative.CalcOutputFrames_(System.Int32)">
+            <summary>	
+            <code>	
+            virtual UINT32 CalcOutputFrames( UINT32 	
+            </code>	
+              Parameters<list>	
+            <item><term>InputFrameCount</term><description>The number of input frames.</description></item>	
+            </list>	
+             Return Value<para>Returns the number of output frames that will be produced.</para>	
+            </summary>	
+            <param name="inputFrameCount">The number of input frames.</param>	
+            <returns><para>Returns the number of output frames that will be produced.</para></returns>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='IXAPO::CalcOutputFrames']/*"/>	
+            <unmanaged>unsigned int IXAPO::CalcOutputFrames([In] unsigned int InputFrameCount)</unmanaged>	
+        </member>
+        <member name="P:SharpDX.XAPO.AudioProcessorNative.RegistrationProperties">
+            <summary>	
+            Returns the registration properties of an XAPO.	
+            </summary>	
+            <returns> a <see cref="T:SharpDX.XAPO.RegistrationProperties"/> structure containing theregistration properties the XAPO was created with; use XAPOFree to free thestructure.</returns>
+            <unmanaged>HRESULT IXAPO::GetRegistrationProperties([Out] XAPO_REGISTRATION_PROPERTIES** ppRegistrationProperties)</unmanaged>
+        </member>
+        <member name="T:SharpDX.XAPO.AudioProcessorParamNative`1">
+            <summary>
+            Implements this class to call an existing unmanaged AudioProcessor which supports parameter.
+            </summary>
+            <typeparam name="T">the parameter type of this AudioProcessor</typeparam>
+        </member>
+        <member name="M:SharpDX.XAPO.AudioProcessorParamNative`1.#ctor(System.IntPtr)">
+            <summary>
+            Initializes a new instance of the <see cref="T:SharpDX.XAPO.AudioProcessorParamNative`1"/> class.
+            </summary>
+            <param name="basePtr">The base PTR.</param>
+        </member>
+        <member name="M:SharpDX.XAPO.AudioProcessorParamNative`1.NativePointerUpdated(System.IntPtr)">
+            <summary>
+            Update the Native Poinder. Rebuild ParameterProviderNative.
+            </summary>
+        </member>
+        <member name="P:SharpDX.XAPO.AudioProcessorParamNative`1.Parameter">
+            <summary>
+            Get or Set the parameters for this AudioProcessor
+            </summary>
+        </member>
+        <member name="T:SharpDX.XAPO.Fx.XAPOFx">
+            <summary>	
+            Functions	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file="..\..\Documentation\CodeComments.xml" path="/comments/comment[@id='SharpDX.XAPO.Fx.XAPOFx']/*"/>	
+        </member>
+        <member name="M:SharpDX.XAPO.Fx.XAPOFx.CreateFX(System.Guid,SharpDX.ComObject,System.IntPtr,System.Int32)">
+            <summary>	
+            <code>	
+            <see cref="T:SharpDX.Result"/> CreateFX( CLSID 	
+            </code>	
+              Parameters<list>	
+            <item><term>clsid</term><description> ID of the effect to create. Use the __uuidof on the effect class name  to get the CLSID for an effect. For example, __uuidof(FXReverb) would provide  the CLSID for the FXReverb effect. For a list of effects provided by XAPOFX, see XAPOFX Overview. For an example  of retrieving the CLSID for an effect, see How to: Use XAPOFX in XAudio2. </description></item>	
+            <item><term>pEffect</term><description> Receives a reference to the created XAPO instance. If CreateFX fails, pEffect is untouched. </description></item>	
+            <item><term>pInitData</term><description>[optional]  Effect-specific initialization parameters. This may be <c>null</c>  if InitDataByteSize is zero. </description></item>	
+            <item><term>InitDataByteSize</term><description>[optional]  Size of pInitData in bytes. This may be zero if pInitData is <c>null</c>. </description></item>	
+            </list>	
+             Return ValueReturns <see cref="F:SharpDX.Result.Ok"/> if successful; otherwise, an error code.	
+            </summary>	
+            <param name="clsid">of the effect to create. Use the __uuidof on the effect class name  to get the CLSID for an effect. For example, __uuidof(FXReverb) would provide  the CLSID for the FXReverb effect. For a list of effects provided by XAPOFX, see XAPOFX Overview. For an example  of retrieving the CLSID for an effect, see How to: Use XAPOFX in XAudio2.</param>	
+            <param name="effectRef">Receives a reference to the created XAPO instance. If CreateFX fails, pEffect is untouched.</param>	
+            <param name="initDataRef">[optional]  Effect-specific initialization parameters. This may be <c>null</c>  if InitDataByteSize is zero.</param>	
+            <param name="initDataByteSize">[optional]  Size of pInitData in bytes. This may be zero if pInitData is <c>null</c>.</param>	
+            <returns>Returns <see cref="F:SharpDX.Result.Ok"/> if successful; otherwise, an error code.</returns>	
+            <!-- No matching elements were found for the following include tag --><include file="..\..\Documentation\CodeComments.xml" path="/comments/comment[@id='CreateFX']/*"/>	
+            <unmanaged>HRESULT CreateFX([In] const GUID&amp; clsid,[Out, Fast] IUnknown** pEffect,[In, Buffer, Optional] const void* pInitData,[In] unsigned int InitDataByteSize)</unmanaged>	
+        </member>
+        <member name="T:SharpDX.XAPO.BufferFlags">
+            <summary>	
+            <code>	
+            typedef enum <see cref="T:SharpDX.XAPO.BufferFlags"/>	
+            { <see cref="F:SharpDX.XAPO.BufferFlags.Silent"/>, <see cref="F:SharpDX.XAPO.BufferFlags.Valid"/>	
+            } <see cref="T:SharpDX.XAPO.BufferFlags"/>;	
+            </code>	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XAPO_BUFFER_FLAGS']/*"/>	
+            <unmanaged>XAPO_BUFFER_FLAGS</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XAPO.BufferFlags.Silent">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XAPO_BUFFER_SILENT']/*"/>	
+            <unmanaged>XAPO_BUFFER_SILENT</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XAPO.BufferFlags.Valid">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XAPO_BUFFER_VALID']/*"/>	
+            <unmanaged>XAPO_BUFFER_VALID</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XAPO.BufferFlags.None">
+            <summary>	
+            None.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='']/*"/>	
+            <unmanaged>None</unmanaged>	
+        </member>
+        <member name="T:SharpDX.XAPO.PropertyFlags">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XAPO_PROPERTY_TYPE']/*"/>	
+            <unmanaged>XAPO_PROPERTY_TYPE</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XAPO.PropertyFlags.ChannelsMustMatch">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XAPO_FLAG_CHANNELS_MUST_MATCH']/*"/>	
+            <unmanaged>XAPO_FLAG_CHANNELS_MUST_MATCH</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XAPO.PropertyFlags.FramerateMustMatch">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XAPO_FLAG_FRAMERATE_MUST_MATCH']/*"/>	
+            <unmanaged>XAPO_FLAG_FRAMERATE_MUST_MATCH</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XAPO.PropertyFlags.BitspersampleMustMatch">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XAPO_FLAG_BITSPERSAMPLE_MUST_MATCH']/*"/>	
+            <unmanaged>XAPO_FLAG_BITSPERSAMPLE_MUST_MATCH</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XAPO.PropertyFlags.BuffercountMustMatch">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XAPO_FLAG_BUFFERCOUNT_MUST_MATCH']/*"/>	
+            <unmanaged>XAPO_FLAG_BUFFERCOUNT_MUST_MATCH</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XAPO.PropertyFlags.InplaceRequired">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XAPO_FLAG_INPLACE_REQUIRED']/*"/>	
+            <unmanaged>XAPO_FLAG_INPLACE_REQUIRED</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XAPO.PropertyFlags.InplaceSupported">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XAPO_FLAG_INPLACE_SUPPORTED']/*"/>	
+            <unmanaged>XAPO_FLAG_INPLACE_SUPPORTED</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XAPO.PropertyFlags.Default">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XAPO_FLAG_DEFAULT']/*"/>	
+            <unmanaged>XAPO_FLAG_DEFAULT</unmanaged>	
+        </member>
+        <member name="T:SharpDX.XAPO.Fx.EchoInitdata">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file="..\..\Documentation\CodeComments.xml" path="/comments/comment[@id='FXECHO_INITDATA']/*"/>	
+            <unmanaged>FXECHO_INITDATA</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XAPO.Fx.EchoInitdata.MaxDelay">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file="..\..\Documentation\CodeComments.xml" path="/comments/comment[@id='FXECHO_INITDATA::MaxDelay']/*"/>	
+            <unmanaged>float MaxDelay</unmanaged>	
+        </member>
+        <member name="T:SharpDX.XAPO.Fx.EchoParameters">
+            <summary>	
+            <code>	
+            typedef struct <see cref="T:SharpDX.XAPO.Fx.EchoParameters"/> { float WetDryMix; float Feedback; float Delay;	
+            } <see cref="T:SharpDX.XAPO.Fx.EchoParameters"/>;	
+            </code>	
+             Members<list>	
+            <item><term>WetDryMix</term><description> Ratio of wet (processed) signal to dry (original) signal. </description></item>	
+            <item><term>Feedback</term><description> Amount of output to feed back into input. </description></item>	
+            <item><term>Delay</term><description> Delay to all channels in milliseconds. This value must be between FXECHO_MIN_DELAY and <see cref="T:SharpDX.XAPO.Fx.EchoInitdata"/>.MaxDelay. </description></item>	
+            </list>	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file="..\..\Documentation\CodeComments.xml" path="/comments/comment[@id='FXECHO_PARAMETERS']/*"/>	
+            <unmanaged>FXECHO_PARAMETERS</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XAPO.Fx.EchoParameters.WetDryMix">
+            <summary>	
+            Ratio of wet (processed) signal to dry (original) signal.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file="..\..\Documentation\CodeComments.xml" path="/comments/comment[@id='FXECHO_PARAMETERS::WetDryMix']/*"/>	
+            <unmanaged>float WetDryMix</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XAPO.Fx.EchoParameters.Feedback">
+            <summary>	
+            Amount of output to feed back into input.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file="..\..\Documentation\CodeComments.xml" path="/comments/comment[@id='FXECHO_PARAMETERS::Feedback']/*"/>	
+            <unmanaged>float Feedback</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XAPO.Fx.EchoParameters.Delay">
+            <summary>	
+            Delay to all channels in milliseconds. This value must be between FXECHO_MIN_DELAY and <see cref="T:SharpDX.XAPO.Fx.EchoInitdata"/>.MaxDelay.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file="..\..\Documentation\CodeComments.xml" path="/comments/comment[@id='FXECHO_PARAMETERS::Delay']/*"/>	
+            <unmanaged>float Delay</unmanaged>	
+        </member>
+        <member name="T:SharpDX.XAPO.Fx.EqualizerParameters">
+            <summary>	
+            <code>	
+            typedef struct <see cref="T:SharpDX.XAPO.Fx.EqualizerParameters"/> { float FrequencyCenter0; float Gain0; float Bandwidth0; float FrequencyCenter1; float Gain1; float Bandwidth1; float FrequencyCenter2; float Gain2; float Bandwidth2; float FrequencyCenter3; float Gain3; float Bandwidth3;	
+            } <see cref="T:SharpDX.XAPO.Fx.EqualizerParameters"/>;	
+            </code>	
+             Members<list>	
+            <item><term>FrequencyCenter0</term><description> Center frequency in Hz for band 0.   Must be between FXEQ_MIN_FREQUENCY_CENTER and FXEQ_MAX_FREQUENCY_CENTER. </description></item>	
+            <item><term>Gain0</term><description> The boost or decrease to frequencies in band 0. Must be between FXEQ_MIN_GAIN and FXEQ_MAX_GAIN </description></item>	
+            <item><term>Bandwidth0</term><description> Width of band 0.  Must be between FXEQ_MIN_BANDWIDTH and FXEQ_MAX_BANDWIDTH. </description></item>	
+            <item><term>FrequencyCenter1</term><description> Center frequency in Hz for band 1.   Must be between FXEQ_MIN_FREQUENCY_CENTER and FXEQ_MAX_FREQUENCY_CENTER. </description></item>	
+            <item><term>Gain1</term><description> The boost or decrease to frequencies in band 1.  Must be between FXEQ_MIN_GAIN and FXEQ_MAX_GAIN </description></item>	
+            <item><term>Bandwidth1</term><description> Width of band 1. Must be between FXEQ_MIN_BANDWIDTH and FXEQ_MAX_BANDWIDTH. </description></item>	
+            <item><term>FrequencyCenter2</term><description> Center frequency in Hz for band 2.   Must be between FXEQ_MIN_FREQUENCY_CENTER and FXEQ_MAX_FREQUENCY_CENTER. </description></item>	
+            <item><term>Gain2</term><description> The boost or decrease to frequencies in band 2.  Must be between FXEQ_MIN_GAIN and FXEQ_MAX_GAIN </description></item>	
+            <item><term>Bandwidth2</term><description> Width of band 2. Must be between FXEQ_MIN_BANDWIDTH and FXEQ_MAX_BANDWIDTH. </description></item>	
+            <item><term>FrequencyCenter3</term><description> Center frequency in Hz for band 3.   Must be between FXEQ_MIN_FREQUENCY_CENTER and FXEQ_MAX_FREQUENCY_CENTER. </description></item>	
+            <item><term>Gain3</term><description> The boost or decrease to frequencies in band 3.  Must be between FXEQ_MIN_GAIN and FXEQ_MAX_GAIN </description></item>	
+            <item><term>Bandwidth3</term><description> Width of band 3. Must be between FXEQ_MIN_BANDWIDTH and FXEQ_MAX_BANDWIDTH. </description></item>	
+            </list>	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file="..\..\Documentation\CodeComments.xml" path="/comments/comment[@id='FXEQ_PARAMETERS']/*"/>	
+            <unmanaged>FXEQ_PARAMETERS</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XAPO.Fx.EqualizerParameters.FrequencyCenter0">
+            <summary>	
+            Center frequency in Hz for band 0.   Must be between FXEQ_MIN_FREQUENCY_CENTER and FXEQ_MAX_FREQUENCY_CENTER.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file="..\..\Documentation\CodeComments.xml" path="/comments/comment[@id='FXEQ_PARAMETERS::FrequencyCenter0']/*"/>	
+            <unmanaged>float FrequencyCenter0</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XAPO.Fx.EqualizerParameters.Gain0">
+            <summary>	
+            The boost or decrease to frequencies in band 0. Must be between FXEQ_MIN_GAIN and FXEQ_MAX_GAIN	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file="..\..\Documentation\CodeComments.xml" path="/comments/comment[@id='FXEQ_PARAMETERS::Gain0']/*"/>	
+            <unmanaged>float Gain0</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XAPO.Fx.EqualizerParameters.Bandwidth0">
+            <summary>	
+            Width of band 0.  Must be between FXEQ_MIN_BANDWIDTH and FXEQ_MAX_BANDWIDTH.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file="..\..\Documentation\CodeComments.xml" path="/comments/comment[@id='FXEQ_PARAMETERS::Bandwidth0']/*"/>	
+            <unmanaged>float Bandwidth0</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XAPO.Fx.EqualizerParameters.FrequencyCenter1">
+            <summary>	
+            Center frequency in Hz for band 1.   Must be between FXEQ_MIN_FREQUENCY_CENTER and FXEQ_MAX_FREQUENCY_CENTER.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file="..\..\Documentation\CodeComments.xml" path="/comments/comment[@id='FXEQ_PARAMETERS::FrequencyCenter1']/*"/>	
+            <unmanaged>float FrequencyCenter1</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XAPO.Fx.EqualizerParameters.Gain1">
+            <summary>	
+            The boost or decrease to frequencies in band 1.  Must be between FXEQ_MIN_GAIN and FXEQ_MAX_GAIN	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file="..\..\Documentation\CodeComments.xml" path="/comments/comment[@id='FXEQ_PARAMETERS::Gain1']/*"/>	
+            <unmanaged>float Gain1</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XAPO.Fx.EqualizerParameters.Bandwidth1">
+            <summary>	
+            Width of band 1. Must be between FXEQ_MIN_BANDWIDTH and FXEQ_MAX_BANDWIDTH.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file="..\..\Documentation\CodeComments.xml" path="/comments/comment[@id='FXEQ_PARAMETERS::Bandwidth1']/*"/>	
+            <unmanaged>float Bandwidth1</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XAPO.Fx.EqualizerParameters.FrequencyCenter2">
+            <summary>	
+            Center frequency in Hz for band 2.   Must be between FXEQ_MIN_FREQUENCY_CENTER and FXEQ_MAX_FREQUENCY_CENTER.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file="..\..\Documentation\CodeComments.xml" path="/comments/comment[@id='FXEQ_PARAMETERS::FrequencyCenter2']/*"/>	
+            <unmanaged>float FrequencyCenter2</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XAPO.Fx.EqualizerParameters.Gain2">
+            <summary>	
+            The boost or decrease to frequencies in band 2.  Must be between FXEQ_MIN_GAIN and FXEQ_MAX_GAIN	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file="..\..\Documentation\CodeComments.xml" path="/comments/comment[@id='FXEQ_PARAMETERS::Gain2']/*"/>	
+            <unmanaged>float Gain2</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XAPO.Fx.EqualizerParameters.Bandwidth2">
+            <summary>	
+            Width of band 2. Must be between FXEQ_MIN_BANDWIDTH and FXEQ_MAX_BANDWIDTH.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file="..\..\Documentation\CodeComments.xml" path="/comments/comment[@id='FXEQ_PARAMETERS::Bandwidth2']/*"/>	
+            <unmanaged>float Bandwidth2</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XAPO.Fx.EqualizerParameters.FrequencyCenter3">
+            <summary>	
+            Center frequency in Hz for band 3.   Must be between FXEQ_MIN_FREQUENCY_CENTER and FXEQ_MAX_FREQUENCY_CENTER.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file="..\..\Documentation\CodeComments.xml" path="/comments/comment[@id='FXEQ_PARAMETERS::FrequencyCenter3']/*"/>	
+            <unmanaged>float FrequencyCenter3</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XAPO.Fx.EqualizerParameters.Gain3">
+            <summary>	
+            The boost or decrease to frequencies in band 3.  Must be between FXEQ_MIN_GAIN and FXEQ_MAX_GAIN	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file="..\..\Documentation\CodeComments.xml" path="/comments/comment[@id='FXEQ_PARAMETERS::Gain3']/*"/>	
+            <unmanaged>float Gain3</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XAPO.Fx.EqualizerParameters.Bandwidth3">
+            <summary>	
+            Width of band 3. Must be between FXEQ_MIN_BANDWIDTH and FXEQ_MAX_BANDWIDTH.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file="..\..\Documentation\CodeComments.xml" path="/comments/comment[@id='FXEQ_PARAMETERS::Bandwidth3']/*"/>	
+            <unmanaged>float Bandwidth3</unmanaged>	
+        </member>
+        <member name="T:SharpDX.XAPO.Fx.MasteringLimiterParameters">
+            <summary>	
+            <code>	
+            typedef struct <see cref="T:SharpDX.XAPO.Fx.MasteringLimiterParameters"/> { UINT32 Release; UINT32 Loudness;	
+            } <see cref="T:SharpDX.XAPO.Fx.MasteringLimiterParameters"/>;	
+            </code>	
+             Members<list>	
+            <item><term>Release</term><description> Speed at which the limiter stops affecting audio once it drops below the limiter's threshold. Value must be between <see cref="F:SharpDX.XAPO.Fx.MasteringLimiterParameters.MinimumRelease"/> and <see cref="F:SharpDX.XAPO.Fx.MasteringLimiterParameters.MaximumRelease"/>. </description></item>	
+            <item><term>Loudness</term><description> Threshold of the limiter. Value must be between <see cref="F:SharpDX.XAPO.Fx.MasteringLimiterParameters.MinimumLoudness"/> and <see cref="F:SharpDX.XAPO.Fx.MasteringLimiterParameters.MaximumLoudness"/>. </description></item>	
+            </list>	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file="..\..\Documentation\CodeComments.xml" path="/comments/comment[@id='FXMASTERINGLIMITER_PARAMETERS']/*"/>	
+            <unmanaged>FXMASTERINGLIMITER_PARAMETERS</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XAPO.Fx.MasteringLimiterParameters.DefaultRelease">
+            <summary>Constant DefaultRelease.</summary>
+            <unmanaged>FXMASTERINGLIMITER_DEFAULT_RELEASE</unmanaged>
+        </member>
+        <member name="F:SharpDX.XAPO.Fx.MasteringLimiterParameters.MaximumRelease">
+            <summary>Constant MaximumRelease.</summary>
+            <unmanaged>FXMASTERINGLIMITER_MAX_RELEASE</unmanaged>
+        </member>
+        <member name="F:SharpDX.XAPO.Fx.MasteringLimiterParameters.MinimumLoudness">
+            <summary>Constant MinimumLoudness.</summary>
+            <unmanaged>FXMASTERINGLIMITER_MIN_LOUDNESS</unmanaged>
+        </member>
+        <member name="F:SharpDX.XAPO.Fx.MasteringLimiterParameters.DefaultLoudness">
+            <summary>Constant DefaultLoudness.</summary>
+            <unmanaged>FXMASTERINGLIMITER_DEFAULT_LOUDNESS</unmanaged>
+        </member>
+        <member name="F:SharpDX.XAPO.Fx.MasteringLimiterParameters.MaximumLoudness">
+            <summary>Constant MaximumLoudness.</summary>
+            <unmanaged>FXMASTERINGLIMITER_MAX_LOUDNESS</unmanaged>
+        </member>
+        <member name="F:SharpDX.XAPO.Fx.MasteringLimiterParameters.MinimumRelease">
+            <summary>Constant MinimumRelease.</summary>
+            <unmanaged>FXMASTERINGLIMITER_MIN_RELEASE</unmanaged>
+        </member>
+        <member name="F:SharpDX.XAPO.Fx.MasteringLimiterParameters.Release">
+            <summary>	
+            Speed at which the limiter stops affecting audio once it drops below the limiter's threshold. Value must be between <see cref="F:SharpDX.XAPO.Fx.MasteringLimiterParameters.MinimumRelease"/> and <see cref="F:SharpDX.XAPO.Fx.MasteringLimiterParameters.MaximumRelease"/>.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file="..\..\Documentation\CodeComments.xml" path="/comments/comment[@id='FXMASTERINGLIMITER_PARAMETERS::Release']/*"/>	
+            <unmanaged>unsigned int Release</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XAPO.Fx.MasteringLimiterParameters.Loudness">
+            <summary>	
+            Threshold of the limiter. Value must be between <see cref="F:SharpDX.XAPO.Fx.MasteringLimiterParameters.MinimumLoudness"/> and <see cref="F:SharpDX.XAPO.Fx.MasteringLimiterParameters.MaximumLoudness"/>.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file="..\..\Documentation\CodeComments.xml" path="/comments/comment[@id='FXMASTERINGLIMITER_PARAMETERS::Loudness']/*"/>	
+            <unmanaged>unsigned int Loudness</unmanaged>	
+        </member>
+        <member name="T:SharpDX.XAPO.Fx.ReverbParameters">
+            <summary>	
+            <code>	
+            typedef struct <see cref="T:SharpDX.XAPO.Fx.ReverbParameters"/> { float Diffusion; float RoomSize;	
+            } <see cref="T:SharpDX.XAPO.Fx.ReverbParameters"/>;	
+            </code>	
+             Members<list>	
+            <item><term>Diffusion</term><description> Controls the character of the individual wall reflections. Set to minimum value to simulate a hard flat surface and to maximum value to simulate a diffuse surface.Value must be between FXREVERB_MIN_DIFFUSION and FXREVERB_MAX_DIFFUSION. </description></item>	
+            <item><term>RoomSize</term><description> Size of the room. Value must be between FXREVERB_MIN_ROOMSIZE and FXREVERB_MAX_ROOMSIZE. Note that physical meaning of RoomSize is subjective and not tied to any particular units. A smaller value will result in reflections reaching the listener more quickly while reflections will take longer with larger values for RoomSize. </description></item>	
+            </list>	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file="..\..\Documentation\CodeComments.xml" path="/comments/comment[@id='FXREVERB_PARAMETERS']/*"/>	
+            <unmanaged>FXREVERB_PARAMETERS</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XAPO.Fx.ReverbParameters.Diffusion">
+            <summary>	
+            Controls the character of the individual wall reflections. Set to minimum value to simulate a hard flat surface and to maximum value to simulate a diffuse surface.Value must be between FXREVERB_MIN_DIFFUSION and FXREVERB_MAX_DIFFUSION.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file="..\..\Documentation\CodeComments.xml" path="/comments/comment[@id='FXREVERB_PARAMETERS::Diffusion']/*"/>	
+            <unmanaged>float Diffusion</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XAPO.Fx.ReverbParameters.RoomSize">
+            <summary>	
+            Size of the room. Value must be between FXREVERB_MIN_ROOMSIZE and FXREVERB_MAX_ROOMSIZE. Note that physical meaning of RoomSize is subjective and not tied to any particular units. A smaller value will result in reflections reaching the listener more quickly while reflections will take longer with larger values for RoomSize.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file="..\..\Documentation\CodeComments.xml" path="/comments/comment[@id='FXREVERB_PARAMETERS::RoomSize']/*"/>	
+            <unmanaged>float RoomSize</unmanaged>	
+        </member>
+        <member name="T:SharpDX.XAPO.ParameterProviderNative">
+            <summary>	
+            <code>	
+            <see cref="T:SharpDX.Result"/> QueryInterface( RFFIID 	
+            </code>	
+              Parameters<list>	
+            <item><term>riid</term><description> The requested interface ID.  For the <see cref="T:SharpDX.XAPO.AudioProcessor"/> interface this will be  __uuidof(<see cref="T:SharpDX.XAPO.AudioProcessor"/>), for the <see cref="T:SharpDX.XAPO.ParameterProvider"/> interface this will be  __uuidof(<see cref="T:SharpDX.XAPO.ParameterProvider"/>). </description></item>	
+            <item><term>ppv</term><description>If the requested interface is supported 	
+            ppv will be set to a reference to the interface and the object's reference count 	
+            will be incremented by 1.</description></item>	
+            </list>	
+             Return Value<para>Returns <see cref="F:SharpDX.Result.Ok"/> if the interface is supported; otherwise returns E_NOINTERFACE.</para>	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='IXAPOParameters']/*"/>	
+            <unmanaged>IXAPOParameters</unmanaged>	
+        </member>
+        <member name="M:SharpDX.XAPO.ParameterProviderNative.#ctor(System.IntPtr)">
+            <summary>
+            Initializes a new instance of the <see cref="T:SharpDX.XAPO.ParameterProviderNative"/> class.
+            </summary>
+            <param name="nativePtr">The native pointer.</param>	
+        </member>
+        <member name="M:SharpDX.XAPO.ParameterProviderNative.SetParameters_(System.IntPtr,System.Int32)">
+            <summary>	
+            <code>	
+            virtual void SetParameters( const void *	
+            </code>	
+              Parameters<list>	
+            <item><term>pParameters</term><description> Effect-specific parameter block. </description></item>	
+            <item><term>ParameterByteSize</term><description> Size of pParameters, in bytes. </description></item>	
+            </list>	
+             Return ValueNone.	
+            </summary>	
+            <param name="parametersRef">Effect-specific parameter block.</param>	
+            <param name="parameterByteSize">Size of pParameters, in bytes.</param>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='IXAPOParameters::SetParameters']/*"/>	
+            <unmanaged>void IXAPOParameters::SetParameters([In, Buffer] const void* pParameters,[In] unsigned int ParameterByteSize)</unmanaged>	
+        </member>
+        <member name="M:SharpDX.XAPO.ParameterProviderNative.GetParameters_(System.IntPtr,System.Int32)">
+            <summary>	
+            <code>	
+            virtual void GetParameters( void *	
+            </code>	
+              Parameters<list>	
+            <item><term>pParameters</term><description>[in, out]  Receives an effect-specific parameter block. </description></item>	
+            <item><term>ParameterByteSize</term><description>[in]  Size of pParameters, in bytes. </description></item>	
+            </list>	
+             Return ValueNone.	
+            </summary>	
+            <param name="parametersRef">[in, out]  Receives an effect-specific parameter block.</param>	
+            <param name="parameterByteSize">[in]  Size of pParameters, in bytes.</param>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='IXAPOParameters::GetParameters']/*"/>	
+            <unmanaged>void IXAPOParameters::GetParameters([Out, Buffer] void* pParameters,[In] unsigned int ParameterByteSize)</unmanaged>	
+        </member>
+        <member name="T:SharpDX.XAPO.BufferParameters">
+            <summary>	
+            Process	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XAPO_PROCESS_BUFFER_PARAMETERS']/*"/>	
+            <unmanaged>XAPO_PROCESS_BUFFER_PARAMETERS</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XAPO.BufferParameters.Buffer">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XAPO_PROCESS_BUFFER_PARAMETERS::pBuffer']/*"/>	
+            <unmanaged>void* pBuffer</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XAPO.BufferParameters.BufferFlags">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XAPO_PROCESS_BUFFER_PARAMETERS::BufferFlags']/*"/>	
+            <unmanaged>XAPO_BUFFER_FLAGS BufferFlags</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XAPO.BufferParameters.ValidFrameCount">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XAPO_PROCESS_BUFFER_PARAMETERS::ValidFrameCount']/*"/>	
+            <unmanaged>unsigned int ValidFrameCount</unmanaged>	
+        </member>
+        <member name="T:SharpDX.XAPO.LockParameters">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XAPO_LOCKFORPROCESS_BUFFER_PARAMETERS']/*"/>	
+            <unmanaged>XAPO_LOCKFORPROCESS_BUFFER_PARAMETERS</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XAPO.LockParameters.FormatPointer">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XAPO_LOCKFORPROCESS_BUFFER_PARAMETERS::pFormat']/*"/>	
+            <unmanaged>const WAVEFORMATEX* pFormat</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XAPO.LockParameters.MaxFrameCount">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XAPO_LOCKFORPROCESS_BUFFER_PARAMETERS::MaxFrameCount']/*"/>	
+            <unmanaged>unsigned int MaxFrameCount</unmanaged>	
+        </member>
+        <member name="P:SharpDX.XAPO.LockParameters.Format">
+            <summary>
+            Gets or sets the waveformat.
+            </summary>
+            <value>The format.</value>
+        </member>
+        <member name="T:SharpDX.XAPO.RegistrationProperties">
+            <summary>	
+            IXAPO::GetRegistrationProperties	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XAPO_REGISTRATION_PROPERTIES']/*"/>	
+            <unmanaged>XAPO_REGISTRATION_PROPERTIES</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XAPO.RegistrationProperties.Clsid">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XAPO_REGISTRATION_PROPERTIES::clsid']/*"/>	
+            <unmanaged>GUID clsid</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XAPO.RegistrationProperties.FriendlyName">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XAPO_REGISTRATION_PROPERTIES::FriendlyName']/*"/>	
+            <unmanaged>wchar_t FriendlyName[256]</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XAPO.RegistrationProperties.CopyrightInfo">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XAPO_REGISTRATION_PROPERTIES::CopyrightInfo']/*"/>	
+            <unmanaged>wchar_t CopyrightInfo[256]</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XAPO.RegistrationProperties.MajorVersion">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XAPO_REGISTRATION_PROPERTIES::MajorVersion']/*"/>	
+            <unmanaged>unsigned int MajorVersion</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XAPO.RegistrationProperties.MinorVersion">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XAPO_REGISTRATION_PROPERTIES::MinorVersion']/*"/>	
+            <unmanaged>unsigned int MinorVersion</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XAPO.RegistrationProperties.Flags">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XAPO_REGISTRATION_PROPERTIES::Flags']/*"/>	
+            <unmanaged>XAPO_PROPERTY_TYPE Flags</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XAPO.RegistrationProperties.MinInputBufferCount">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XAPO_REGISTRATION_PROPERTIES::MinInputBufferCount']/*"/>	
+            <unmanaged>unsigned int MinInputBufferCount</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XAPO.RegistrationProperties.MaxInputBufferCount">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XAPO_REGISTRATION_PROPERTIES::MaxInputBufferCount']/*"/>	
+            <unmanaged>unsigned int MaxInputBufferCount</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XAPO.RegistrationProperties.MinOutputBufferCount">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XAPO_REGISTRATION_PROPERTIES::MinOutputBufferCount']/*"/>	
+            <unmanaged>unsigned int MinOutputBufferCount</unmanaged>	
+        </member>
+        <member name="F:SharpDX.XAPO.RegistrationProperties.MaxOutputBufferCount">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='XAPO_REGISTRATION_PROPERTIES::MaxOutputBufferCount']/*"/>	
+            <unmanaged>unsigned int MaxOutputBufferCount</unmanaged>	
+        </member>
+        <member name="T:SharpDX.XAPO.ParameterProviderShadow">
+            <summary>
+            Internal AudioProcessorShadow
+            </summary>
+            <unmanaged>IXAPOParameters</unmanaged>
+        </member>
+        <member name="M:SharpDX.XAPO.ParameterProviderShadow.ToIntPtr(SharpDX.XAPO.ParameterProvider)">
+            <summary>
+            Return a pointer to the unamanged version of this callback.
+            </summary>
+            <param name="callback">The callback.</param>
+            <returns>A pointer to a shadow c++ callback</returns>
+        </member>
+        <member name="M:SharpDX.XAPO.ParameterProviderShadow.ParameterProviderVtbl.SetParametersImpl(System.IntPtr,System.IntPtr,System.Int32)">
+            <summary>	
+            Sets effect-specific parameters.	
+            </summary>	
+            <param name="thisObject">This pointer</param>
+            <param name="paramPointer"> Effect-specific parameter block. </param>
+            <param name="paramSize">size of the parameters</param>
+            <unmanaged>void IXAPOParameters::SetParameters([In, Buffer] const void* pParameters,[None] UINT32 ParameterByteSize)</unmanaged>
+        </member>
+        <member name="M:SharpDX.XAPO.ParameterProviderShadow.ParameterProviderVtbl.GetParameters(System.IntPtr,System.IntPtr,System.Int32)">
+            <summary>	
+            Gets the current values for any effect-specific parameters.	
+            </summary>	
+            <param name="thisObject">This pointer</param>
+            <param name="paramPointer">[in, out]  Receives an effect-specific parameter block. </param>
+            <param name="paramSize">size of the parameters</param>
+            <unmanaged>void IXAPOParameters::GetParameters([Out, Buffer] void* pParameters,[None] UINT32 ParameterByteSize)</unmanaged>
+        </member>
+        <member name="T:SharpDX.XAPO.Fx.Echo">
+            <summary>
+            An Echo XAPO AudioProcessor
+            </summary>
+        </member>
+        <member name="M:SharpDX.XAPO.Fx.Echo.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:SharpDX.XAPO.Fx.Echo"/> class.
+            </summary>
+        </member>
+        <member name="T:SharpDX.XAPO.Fx.Equalizer">
+            <summary>
+            A Equalizer XAPO AudioProcessor
+            </summary>
+        </member>
+        <member name="M:SharpDX.XAPO.Fx.Equalizer.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:SharpDX.XAPO.Fx.Equalizer"/> class.
+            </summary>
+        </member>
+        <member name="T:SharpDX.XAPO.Fx.MasteringLimiter">
+            <summary>
+            A MateringLimiter XAPO AudioProcessor
+            </summary>
+        </member>
+        <member name="M:SharpDX.XAPO.Fx.MasteringLimiter.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:SharpDX.XAPO.Fx.MasteringLimiter"/> class.
+            </summary>
+        </member>
+        <member name="T:SharpDX.XAPO.Fx.Reverb">
+            <summary>
+            A Reverb XAPO AudioProcessor
+            </summary>
+        </member>
+        <member name="M:SharpDX.XAPO.Fx.Reverb.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:SharpDX.XAPO.Fx.Reverb"/> class.
+            </summary>
+        </member>
+    </members>
+</doc>
