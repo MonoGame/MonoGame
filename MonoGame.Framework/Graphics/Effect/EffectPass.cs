@@ -83,12 +83,6 @@ namespace Microsoft.Xna.Framework.Graphics
             _technique = technique;
 
             _graphicsDevice = _technique._effect.GraphicsDevice;
-
-
-            // Currently unused as we only support StockEffects.
-            //blendState = new BlendState();
-            //depthStencilState = new DepthStencilState();
-            //rasterizerState = new RasterizerState();
         }
 
 #else
@@ -355,18 +349,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
             GL.UseProgram(shaderProgram);
 
-            // Currently unused as we only support StockEffects.
-            /*
-            if (setRasterizerState)
-                _graphicsDevice.RasterizerState = rasterizerState;
-
-            if (setBlendState)
-                _graphicsDevice.BlendState = blendState;
-
-            if (setDepthStencilState)
-                _graphicsDevice.DepthStencilState = depthStencilState;
-            */
-
             var vertexShader = Effect.shaderObjectLookup[shaderProgram][0];
 
             // Set Program Attributes.
@@ -421,7 +403,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
                     case ActiveUniformType.FloatMat4:
                         var mat4 = (Matrix)param.data;
-                        GL.UniformMatrix4(uniformLocation, 1, false, param.GetValueSingleArray());
+						GL.UniformMatrix4(uniformLocation, 1, false, new float[] { mat4.M11, mat4.M12, mat4.M13, mat4.M14, mat4.M21, mat4.M22, mat4.M23, mat4.M24, mat4.M31, mat4.M32, mat4.M33, mat4.M34, mat4.M41, mat4.M42, mat4.M43, mat4.M44 });
+                        
                         break;
 
                     case ActiveUniformType.FloatMat3:

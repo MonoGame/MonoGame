@@ -305,11 +305,13 @@ namespace Microsoft.Xna.Framework.Graphics
                            AlphaTestEffect.fragmentShaderFilenames, 
                            AlphaTestEffect.programIndices)
         {
+			Initialize();
+			
             CacheEffectParameters();
 
             Techniques.Add(new EffectTechnique(this));
 
-            Initialize();
+            
 
         }
 #else
@@ -386,7 +388,7 @@ namespace Microsoft.Xna.Framework.Graphics
             Parameters.Add(alphaTestParam);
             fogColorParam = new EffectParameter(ActiveUniformType.FloatVec3, "FogColor");
             Parameters.Add(fogColorParam);
-            fogVectorParam = new EffectParameter(ActiveUniformType.FloatVec3, "FogVector");
+            fogVectorParam = new EffectParameter(ActiveUniformType.FloatVec4, "FogVector");
             Parameters.Add(fogVectorParam);
             worldViewProjParam = new EffectParameter(ActiveUniformType.FloatMat4, "WorldViewProj");
             Parameters.Add(worldViewProjParam);
