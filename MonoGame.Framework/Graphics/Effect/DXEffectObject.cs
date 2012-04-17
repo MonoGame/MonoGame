@@ -6,7 +6,8 @@ namespace Microsoft.Xna.Framework.Graphics
 {
 	public partial class DXEffectObject
 	{
-		public enum D3DRENDERSTATETYPE {
+		public enum D3DRENDERSTATETYPE
+        {
 		    ZENABLE                   =   7,
 		    FILLMODE                  =   8,
 		    SHADEMODE                 =   9,
@@ -114,7 +115,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		    FORCE_DWORD               = 0x7fffffff
 		}
 
-		public enum D3DTEXTURESTAGESTATETYPE {
+		public enum D3DTEXTURESTAGESTATETYPE
+        {
 		    COLOROP               =  1,
 		    COLORARG1             =  2,
 		    COLORARG2             =  3,
@@ -137,7 +139,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		    FORCE_DWORD           = 0x7fffffff
 		}
 
-		public enum D3DTRANSFORMSTATETYPE {
+		public enum D3DTRANSFORMSTATETYPE
+        {
 		    VIEW            =  2,
 		    PROJECTION      =  3,
 		    TEXTURE0        = 16,
@@ -192,7 +195,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			FORCE_DWORD = 0x7fffffff,
 		}
 
-		enum D3DSAMPLERSTATETYPE {
+		enum D3DSAMPLERSTATETYPE 
+        {
 		    ADDRESSU       = 1,
 		    ADDRESSV       = 2,
 		    ADDRESSW       = 3,
@@ -539,15 +543,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			/* Set sampler */
 			new state_info(STATE_CLASS.SETSAMPLER, 0, "Sampler"),
 		};
-
-		private MemoryStream effectStream;
-		private BinaryReader effectReader;
 		
 		public d3dx_parameter[] parameter_handles;
-		public d3dx_technique[] technique_handles;
-
-		public d3dx_parameter[] objects;
-
+		public d3dx_technique[] technique_handles;       
 	}
 }
 
