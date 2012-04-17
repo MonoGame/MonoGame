@@ -40,36 +40,6 @@ namespace Microsoft.Xna.Framework.Graphics
         EffectParameter fogVectorParam;
         EffectParameter worldViewProjParam;
 
-#if NOMOJO
-        static readonly string[] vertexShaderFilenames = new string[] 
-		{
-			"Microsoft.Xna.Framework.Graphics.Effect.Resources.AlphaTestEffect.VSAlphaTest.glsl",
-			"Microsoft.Xna.Framework.Graphics.Effect.Resources.AlphaTestEffect.VSAlphaTestNoFog.glsl",
-			"Microsoft.Xna.Framework.Graphics.Effect.Resources.AlphaTestEffect.VSAlphaTestVc.glsl",
-			"Microsoft.Xna.Framework.Graphics.Effect.Resources.AlphaTestEffect.VSAlphaTestVcNoFog.glsl"
-		};
-
-        static readonly string[] fragmentShaderFilenames = new string[]
-		{
-			"Microsoft.Xna.Framework.Graphics.Effect.Resources.AlphaTestEffect.PSAlphaTestLtGt.glsl",
-			"Microsoft.Xna.Framework.Graphics.Effect.Resources.AlphaTestEffect.PSAlphaTestLtGtNoFog.glsl",
-            "Microsoft.Xna.Framework.Graphics.Effect.Resources.AlphaTestEffect.PSAlphaTestEqNe.glsl",
-			"Microsoft.Xna.Framework.Graphics.Effect.Resources.AlphaTestEffect.PSAlphaTestEqNeNoFog.glsl"
-		};
-
-        static readonly Tuple<int, int>[] programIndices = new Tuple<int, int>[]
-		{
-			new Tuple<int, int>(0, 0),
-			new Tuple<int, int>(1, 1),
-			new Tuple<int, int>(2, 0),
-			new Tuple<int, int>(3, 1),
-			new Tuple<int, int>(0, 2),
-			new Tuple<int, int>(1, 3),
-			new Tuple<int, int>(2, 2),
-			new Tuple<int, int>(3, 3)
-		};
-
-#endif
         #endregion
 
         #region Fields
@@ -296,23 +266,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
         #region Methods
 
-#if NOMOJO
-        /// <summary>
-        /// Creates a new AlphaTestEffect with default parameter settings.
-        /// </summary>
-        public AlphaTestEffect(GraphicsDevice device)
-            : base(device, AlphaTestEffect.vertexShaderFilenames,
-                           AlphaTestEffect.fragmentShaderFilenames, 
-                           AlphaTestEffect.programIndices)
-        {
-            CacheEffectParameters();
-
-            Techniques.Add(new EffectTechnique(this));
-
-            Initialize();
-
-        }
-#else
         /// <summary>
         /// Creates a new AlphaTestEffect with default parameter settings.
         /// </summary>
@@ -321,8 +274,6 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             CacheEffectParameters();
         }
-#endif
-
 
         /// <summary>
         /// Creates a new AlphaTestEffect by cloning parameter settings from an existing instance.

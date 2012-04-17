@@ -380,11 +380,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// Creates a new SkinnedEffect with default parameter settings.
         /// </summary>
         public SkinnedEffect(GraphicsDevice device)
-#if NOMOJO
-            : base(device)
-#else
             : base(device, Effect.LoadEffectResource("SkinnedEffect"))
-#endif
         {
             CacheEffectParameters(null);
 

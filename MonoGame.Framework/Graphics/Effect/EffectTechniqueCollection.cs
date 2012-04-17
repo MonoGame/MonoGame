@@ -7,20 +7,6 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public class EffectTechniqueCollection : IEnumerable<EffectTechnique>
     {
-
-#if NOMOJO
-        public EffectTechniqueCollection() : base() { }
-
-
-        public EffectTechniqueCollection(Effect effect)
-        {
-            var tech = new EffectTechnique(effect);
-            tech.Passes = new EffectPassCollection(tech);
-            Add(tech);
-        }
-#endif
-
-
         // Modified to be a list instead of dictionary object because a dictionary does not guarantee
 		// the order is kept as it is a hash key.
 		internal List <EffectTechnique> _techniques = new List<EffectTechnique> ();
