@@ -298,7 +298,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		public class d3dx_state
 		{
-			public state_info operation;
+			public uint operation;
 			public uint index;
 			public STATE_TYPE type;
 			public d3dx_parameter parameter;
@@ -347,7 +347,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// The shared state definition table.
         /// </summary>
-		private static readonly state_info[] state_table =
+		public static readonly state_info[] state_table =
 		{
 			new state_info(STATE_CLASS.RENDERSTATE, (uint)D3DRENDERSTATETYPE.ZENABLE, "ZENABLE"), /* 0x0 */
 			new state_info(STATE_CLASS.RENDERSTATE, (uint)D3DRENDERSTATETYPE.FILLMODE, "FILLMODE"),
@@ -547,6 +547,10 @@ namespace Microsoft.Xna.Framework.Graphics
         public d3dx_parameter[] Parameters { get; private set; }
 
         public d3dx_technique[] Techniques { get; private set; }
+
+
+        private static readonly char[] Header = { 'M', 'G', 'F', 'X' };
+        private const int Version = 1;
 	}
 }
 
