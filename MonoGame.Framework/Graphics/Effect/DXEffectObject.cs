@@ -6,7 +6,6 @@ namespace Microsoft.Xna.Framework.Graphics
 {
 	public partial class DXEffectObject
 	{
-
 		public enum D3DRENDERSTATETYPE {
 		    ZENABLE                   =   7,
 		    FILLMODE                  =   8,
@@ -230,7 +229,6 @@ namespace Microsoft.Xna.Framework.Graphics
 		    UNKNOWN,
 		};
 
-
 		public enum MATERIAL_TYPE
 		{
 		    DIFFUSE,
@@ -328,20 +326,24 @@ namespace Microsoft.Xna.Framework.Graphics
 			public d3dx_pass[] pass_handles;
 		}
 
-		public struct state_info
+        public class state_info
 		{
-			public STATE_CLASS class_;
-			public uint op;
-			public string name;
+            public STATE_CLASS class_ { get; private set; }
+            public uint op { get; private set; }
+            public string name { get; private set; }
 
-			public state_info(STATE_CLASS class_, uint op, string name) {
+			public state_info(STATE_CLASS class_, uint op, string name) 
+            {
 				this.class_ = class_;
 				this.op = op;
 				this.name = name;
 			}
 		}
 
-		private state_info[] state_table =
+        /// <summary>
+        /// The shared state definition table.
+        /// </summary>
+		private static readonly state_info[] state_table =
 		{
 			new state_info(STATE_CLASS.RENDERSTATE, (uint)D3DRENDERSTATETYPE.ZENABLE, "ZENABLE"), /* 0x0 */
 			new state_info(STATE_CLASS.RENDERSTATE, (uint)D3DRENDERSTATETYPE.FILLMODE, "FILLMODE"),
@@ -537,8 +539,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			/* Set sampler */
 			new state_info(STATE_CLASS.SETSAMPLER, 0, "Sampler"),
 		};
-
-
 
 		private MemoryStream effectStream;
 		private BinaryReader effectReader;
