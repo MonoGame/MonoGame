@@ -543,9 +543,10 @@ namespace Microsoft.Xna.Framework.Graphics
 			/* Set sampler */
 			new state_info(STATE_CLASS.SETSAMPLER, 0, "Sampler"),
 		};
-		
-		public d3dx_parameter[] parameter_handles;
-		public d3dx_technique[] technique_handles;       
+
+        public d3dx_parameter[] Parameters { get; private set; }
+
+        public d3dx_technique[] Techniques { get; private set; }
 	}
 }
 
