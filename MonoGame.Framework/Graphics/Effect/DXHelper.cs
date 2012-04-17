@@ -5,7 +5,13 @@ namespace Microsoft.Xna.Framework.Graphics
 {
 	internal class DXHelper
 	{
-		
+        public static T Unmarshal<T>(IntPtr ptr)
+        {
+            var type = typeof(T);
+            var result = (T)Marshal.PtrToStructure(ptr, type);
+            return result;
+        }
+
 		public static T[] UnmarshalArray<T>(IntPtr ptr, int count) 
         {
 			var type = typeof(T);
@@ -20,7 +26,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			return ret;
 		}
-		
+
+        public static byte[] UnmarshalArray(IntPtr ptr, int count)
+        {
+            var result = new byte[count];
+            Marshal.Copy(ptr, result, 0, count);
+            return result;
+        }	
 	}
 }
 

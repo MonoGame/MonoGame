@@ -87,7 +87,8 @@ namespace Microsoft.Xna.Framework.Graphics
             var oldPos = reader.BaseStream.Position;
             reader.BaseStream.Seek(offset, SeekOrigin.Begin);
 
-            var rb = reader.ReadBytes(reader.ReadInt32());
+            var length = reader.ReadInt32();
+            var rb = reader.ReadBytes(length);
             var r = System.Text.ASCIIEncoding.ASCII.GetString(rb);
 			r = r.Replace ("\0", "");
 
@@ -206,7 +207,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 reader.BaseStream.Seek((nameLength + 3) & ~3, SeekOrigin.Current); // DWORD aligned!
                 var expressionData = reader.ReadBytes((int)(length - 4 - nameLength));
 				
-				param.data = new DXExpression(paramName, expressionData);
+                var preshader = DXPreshader.CreatePreshader(expressionData);
+                param.data = new DXExpression(paramName, preshader);
 				break;
 			default:
 				Debug.WriteLine ("Unknown usage "+usage.ToString());
