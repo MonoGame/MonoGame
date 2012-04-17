@@ -73,7 +73,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			//todo: cleanup and merge with DXShader :/
 			
 			//only populate modified stuff?
-            foreach (MojoShader.MOJOSHADER_symbol symbol in _symbols) 
+            foreach (var symbol in _symbols) 
             {
 				if (symbol.register_set != MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_FLOAT4)
 					throw new NotImplementedException();
@@ -84,7 +84,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				switch (parameter.ParameterClass) 
                 {
 				case EffectParameterClass.Scalar:
-					for (int i=0; i<data.Length; i++) 
+					for (var i=0; i<data.Length; i++) 
                     {
 						// Preshader scalar arrays map one to each vec4 register
                         _inRegs[symbol.register_index * 4 + i * 4] = (float)data[i];
