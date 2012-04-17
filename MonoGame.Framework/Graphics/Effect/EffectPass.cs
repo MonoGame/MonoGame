@@ -251,28 +251,27 @@ namespace Microsoft.Xna.Framework.Graphics
 				}				
 			}
 			
-			if (relink) {
-				Link ();
-			}
+			if (relink)
+				Link();
 			
-			GL.UseProgram (shaderProgram);
+			GL.UseProgram(shaderProgram);
 			
 			
-			if (setRasterizerState) {
+			if (setRasterizerState)
 				_graphicsDevice.RasterizerState = rasterizerState;
-			}
-			if (setBlendState) {
+			if (setBlendState)
 				_graphicsDevice.BlendState = blendState;
-			}
-			if (setDepthStencilState) {
+			if (setDepthStencilState)
 				_graphicsDevice.DepthStencilState = depthStencilState;
-			}
 
-			if (vertexShader != null) {
+			if (vertexShader != null) 
+            {
 				vertexShader.Apply(shaderProgram,
 				                  _technique._effect.Parameters,
 				                  _graphicsDevice);
-			} else {
+			} 
+            else 
+            {
 				//passthrough shader is attached
 				Viewport vp = _graphicsDevice.Viewport;
 				Matrix projection = Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, 0, 1);
@@ -315,7 +314,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			posFixup[2] = (63.0f / 64.0f) / _graphicsDevice.Viewport.Width;
 			posFixup[3] = -(63.0f / 64.0f) / _graphicsDevice.Viewport.Height;
 			//If we have a render target bound (rendering offscreen)
-			if (_graphicsDevice.GetRenderTargets().Length > 0) {
+			if (_graphicsDevice.GetRenderTargets().Length > 0) 
+            {
 				//flip vertically
 				posFixup[1] *= -1.0f;
 				posFixup[3] *= -1.0f;
@@ -325,12 +325,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			
 
-			if (pixelShader != null) {
+			if (pixelShader != null)
 				pixelShader.Apply(shaderProgram,
 				                  _technique._effect.Parameters,
 				                  _graphicsDevice);
-			}
-
 		}
 
         private void Link ()
@@ -360,22 +358,21 @@ namespace Microsoft.Xna.Framework.Graphics
 				passthroughVertexShaderAttached = false;
 			}
 
-			if (vertexShader != null) {
+			if (vertexShader != null)
 				vertexShader.OnLink(shaderProgram);
-			}
-			if (pixelShader != null) {
-				pixelShader.OnLink (shaderProgram);
-			}
+			if (pixelShader != null)
+				pixelShader.OnLink(shaderProgram);
 
-			GL.LinkProgram (shaderProgram);
+			GL.LinkProgram(shaderProgram);
 
 			int linked = 0;
 #if GLES
-			GL.GetProgram (shaderProgram, ProgramParameter.LinkStatus, ref linked);
+			GL.GetProgram(shaderProgram, ProgramParameter.LinkStatus, ref linked);
 #else
-			GL.GetProgram (shaderProgram, ProgramParameter.LinkStatus, out linked);
+			GL.GetProgram(shaderProgram, ProgramParameter.LinkStatus, out linked);
 #endif
-			if (linked == 0) {
+			if (linked == 0) 
+            {
 #if !GLES
 				string log = GL.GetProgramInfoLog(shaderProgram);
 				Console.WriteLine (log);
