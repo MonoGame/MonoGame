@@ -120,7 +120,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			// Try getting a cached effect object.
 			if (!effectObjectCache.TryGetValue(effectCode, out effectObject))
 			{
-				effectObject = new DXEffectObject(effectCode);
+                effectObject = DXEffectObject.FromCompiledD3DXEffect(effectCode);
 				effectObjectCache.Add (effectCode, effectObject);
 			}
 	
