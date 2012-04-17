@@ -102,7 +102,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 bool needVertexShader = false;
                 foreach (DXEffectObject.d3dx_state state in states)
                 {
-                    if (state.operation.class_ == DXEffectObject.STATE_CLASS.PIXELSHADER)
+                    var operation = DXEffectObject.state_table[state.operation];
+
+                    if (operation.class_ == DXEffectObject.STATE_CLASS.PIXELSHADER)
                     {
                         needPixelShader = true;
                         if (state.type == DXEffectObject.STATE_TYPE.CONSTANT)
@@ -111,7 +113,7 @@ namespace Microsoft.Xna.Framework.Graphics
                             GL.AttachShader(shaderProgram, pixelShader.shaderHandle);
                         }
                     }
-                    else if (state.operation.class_ == DXEffectObject.STATE_CLASS.VERTEXSHADER)
+                    else if (operation.class_ == DXEffectObject.STATE_CLASS.VERTEXSHADER)
                     {
                         needVertexShader = true;
                         if (state.type == DXEffectObject.STATE_TYPE.CONSTANT)
@@ -120,13 +122,13 @@ namespace Microsoft.Xna.Framework.Graphics
                             GL.AttachShader(shaderProgram, vertexShader.shaderHandle);
                         }
                     }
-                    else if (state.operation.class_ == DXEffectObject.STATE_CLASS.RENDERSTATE)
+                    else if (operation.class_ == DXEffectObject.STATE_CLASS.RENDERSTATE)
                     {
                         if (state.type != DXEffectObject.STATE_TYPE.CONSTANT)
                         {
                             throw new NotImplementedException();
                         }
-                        switch (state.operation.op)
+                        switch (operation.op)
                         {
                             case (uint)DXEffectObject.D3DRENDERSTATETYPE.STENCILENABLE:
                                 depthStencilState.StencilEnable = (bool)state.parameter.data;
@@ -203,17 +205,21 @@ namespace Microsoft.Xna.Framework.Graphics
 			_technique._effect.OnApply();
 
 			//Console.WriteLine (_technique._effect.Name+" - "+_technique.Name+" - "+Name);
-			bool relink = false;
-			foreach ( DXEffectObject.d3dx_state state in states) {
-				
+			var relink = false;
+			foreach (var state in states)
+            {				
 				//constants handled on init
-				if (state.type == DXEffectObject.STATE_TYPE.CONSTANT) continue;
-				
-				if (state.operation.class_ == DXEffectObject.STATE_CLASS.PIXELSHADER ||
-					state.operation.class_ == DXEffectObject.STATE_CLASS.VERTEXSHADER) {
-					
-					DXShader shader;
-					switch (state.type) {
+				if (state.type == DXEffectObject.STATE_TYPE.CONSTANT) 
+                    continue;
+
+                var operation = DXEffectObject.state_table[state.operation];
+
+                if (operation.class_ == DXEffectObject.STATE_CLASS.PIXELSHADER ||
+                    operation.class_ == DXEffectObject.STATE_CLASS.VERTEXSHADER)
+                {
+                    DXShader shader;
+					switch (state.type) 
+                    {
 					case DXEffectObject.STATE_TYPE.EXPRESSIONINDEX:
 						shader = (DXShader) (((DXExpression)state.parameter.data)
 							.Evaluate (_technique._effect.Parameters));
@@ -224,28 +230,25 @@ namespace Microsoft.Xna.Framework.Graphics
 						throw new NotImplementedException();
 					}
 					
-					if (shader.shaderType == ShaderType.FragmentShader) {
-						if (shader != pixelShader) {
-							if (pixelShader != null) {
-                                GL.DetachShader(shaderProgram, pixelShader.shaderHandle);
-							}
-							relink = true;
-							pixelShader = shader;
-                            GL.AttachShader(shaderProgram, pixelShader.shaderHandle);
-						}
-					} else if (shader.shaderType == ShaderType.VertexShader) {
-						if (shader != vertexShader) {
-							if (vertexShader != null) {
-                                GL.DetachShader(shaderProgram, vertexShader.shaderHandle);
-							}
-							relink = true;
-							vertexShader = shader;
-                            GL.AttachShader(shaderProgram, vertexShader.shaderHandle);
-						}
+					if (shader.shaderType == ShaderType.FragmentShader && shader != pixelShader) 
+                    {
+						if (pixelShader != null)
+                            GL.DetachShader(shaderProgram, pixelShader.shaderHandle);
+
+                        relink = true;
+						pixelShader = shader;
+                        GL.AttachShader(shaderProgram, pixelShader.shaderHandle);
 					}
-					
-				}
-				
+                    else if (shader.shaderType == ShaderType.VertexShader && shader != vertexShader) 
+                    {
+						if (vertexShader != null)
+                            GL.DetachShader(shaderProgram, vertexShader.shaderHandle);
+
+                        relink = true;
+						vertexShader = shader;
+                        GL.AttachShader(shaderProgram, vertexShader.shaderHandle);
+					}					
+				}				
 			}
 			
 			if (relink) {
