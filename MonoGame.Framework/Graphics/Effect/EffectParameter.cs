@@ -31,13 +31,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal object data;
 
-#if WINRT
-
-#else
         internal ActiveUniformType activeUniformType;
-
-		internal DXEffectObject.D3DXPARAMETER_TYPE rawType;
-		internal GLSLEffectObject.glslEffectParameterType rawGLSLType;
 
         public static EffectParameterType GetEffectParameterType(ActiveUniformType glType)
         {
@@ -208,7 +202,6 @@ namespace Microsoft.Xna.Framework.Graphics
 				rawParameter = true;
 				break;
 			}
-			rawType = parameter.type;
 			
 			name = parameter.name;
 			rowCount = (int)parameter.rows;
@@ -281,164 +274,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 			
 		}
-
-		internal EffectParameter( GLSLEffectObject.glslParameter parameter )
-		{
-			switch (parameter.class_) {
-			case GLSLEffectObject.glslEffectParameterClass.Scalar:
-				paramClass = EffectParameterClass.Scalar;
-				break;
-			case GLSLEffectObject.glslEffectParameterClass.Vector:
-				paramClass = EffectParameterClass.Vector;
-				break;
-			case GLSLEffectObject.glslEffectParameterClass.MatrixRows:
-			case GLSLEffectObject.glslEffectParameterClass.MatrixColumns:
-				paramClass = EffectParameterClass.Matrix;
-				break;
-			case GLSLEffectObject.glslEffectParameterClass.Object:
-				paramClass = EffectParameterClass.Object;
-				break;
-			case GLSLEffectObject.glslEffectParameterClass.Struct:
-				paramClass = EffectParameterClass.Struct;
-				break;
-			default:
-				throw new NotImplementedException();
-			}
-
-			switch (parameter.type) {
-			case GLSLEffectObject.glslEffectParameterType.Void:
-				paramType = EffectParameterType.Void;
-				break;
-			case GLSLEffectObject.glslEffectParameterType.Bool:
-				paramType = EffectParameterType.Bool;
-				break;
-			case GLSLEffectObject.glslEffectParameterType.Int32:
-				paramType = EffectParameterType.Int32;
-				break;
-			case GLSLEffectObject.glslEffectParameterType.Single:
-				paramType = EffectParameterType.Single;
-				break;
-			case GLSLEffectObject.glslEffectParameterType.String:
-				paramType = EffectParameterType.String;
-				break;
-			case GLSLEffectObject.glslEffectParameterType.Texture:
-				paramType = EffectParameterType.Texture;
-				break;
-			case GLSLEffectObject.glslEffectParameterType.Texture1D:
-				paramType = EffectParameterType.Texture1D;
-				break;
-			case GLSLEffectObject.glslEffectParameterType.Texture2D:
-				paramType = EffectParameterType.Texture2D;
-				break;
-			case GLSLEffectObject.glslEffectParameterType.Texture3D:
-				paramType = EffectParameterType.Texture3D;
-				break;
-			case GLSLEffectObject.glslEffectParameterType.TextureCube:
-				paramType = EffectParameterType.TextureCube;
-				break;
-			case GLSLEffectObject.glslEffectParameterType.Sampler:
-				paramType = EffectParameterType.Texture;
-				break;
-			case GLSLEffectObject.glslEffectParameterType.Sampler1D:
-				paramType = EffectParameterType.Texture1D;
-				break;
-			case GLSLEffectObject.glslEffectParameterType.Sampler2D:
-				paramType = EffectParameterType.Texture2D;
-				break;
-			case GLSLEffectObject.glslEffectParameterType.Sampler3D:
-				paramType = EffectParameterType.Texture3D;
-				break;
-			case GLSLEffectObject.glslEffectParameterType.SamplerCube:
-				paramType = EffectParameterType.TextureCube;
-				break;
-			default:
-				//we need types not normally exposed in XNA for internal use
-				rawParameter = true;
-				break;
-			}
-			rawGLSLType = parameter.type;
-			
-			name = parameter.name;
-			rowCount = (int)parameter.rows;
-			colCount = (int)parameter.columns;
-			semantic = parameter.semantic;
-			
-			annotations = new EffectAnnotationCollection();
-			for (int i=0; i<parameter.annotation_count; i++) {
-				EffectAnnotation annotation = new EffectAnnotation();
-				annotation.Name = (string)parameter.annotation_handles[i].data;
-				annotations._annotations.Add (annotation);
-			}
-			
-			elements = new EffectParameterCollection();
-			structMembers = new EffectParameterCollection();
-			if (parameter.element_count > 0) {
-				for (int i=0; i<parameter.element_count; i++) {
-					EffectParameter element = new EffectParameter(parameter.member_handles[i]);
-					elements._parameters.Add (element);
-				}
-			} else if (parameter.member_count > 0) {
-				for (int i=0; i<parameter.member_count; i++) {
-					EffectParameter member = new EffectParameter(parameter.member_handles[i]);
-					structMembers._parameters.Add (member);
-				}
-			} else {
-				if (rawParameter) {
-					data = parameter.data;
-				} else {
-					//interpret data
-					switch (paramClass) {
-					case EffectParameterClass.Scalar:
-						switch (paramType) {
-						case EffectParameterType.Bool:
-							data = BitConverter.ToBoolean((byte[])parameter.data, 0);
-							break;
-						case EffectParameterType.Int32:
-							data = BitConverter.ToInt32 ((byte[])parameter.data, 0);
-							break;
-						case EffectParameterType.Single:
-							data = BitConverter.ToSingle((byte[])parameter.data, 0);
-							break;
-						case EffectParameterType.Void:
-							data = null;
-							break;
-						case EffectParameterType.Texture:
-						case EffectParameterType.Texture1D:
-						case EffectParameterType.Texture2D:
-						case EffectParameterType.Texture3D:
-						case EffectParameterType.TextureCube:
-							data = null;
-							break;
-
-						default:
-							break;
-							//throw new NotSupportedException();
-						}
-						break;
-					case EffectParameterClass.Vector:
-					case EffectParameterClass.Matrix:
-						switch (paramType) {
-						case EffectParameterType.Single:
-							float[] vals = new float[rowCount*colCount];
-							//transpose maybe?
-							for (int i=0; i<rowCount*colCount; i++) {
-								vals[i] = BitConverter.ToSingle ((byte[])parameter.data, i*4);
-							}
-							data = vals;
-							break;
-						default:
-							break;
-						}
-						break;
-					default:
-						throw new NotSupportedException();
-						break;
-					}
-				}
-			}
-			
-		}
-#endif
 
         public int ColumnCount {
 			get { return colCount; }
@@ -630,17 +465,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void SetValue (Matrix value)
 		{
-            // TODO: Fix this to not work correctly in both cases!
-#if NOMOJO
-            data = value;
-#else
 			float[] matrixData = Matrix.ToFloatArray(Matrix.Transpose (value));
 			for (int y=0; y<RowCount; y++) {
 				for (int x=0; x<ColumnCount; x++) {
 					((float[])data)[y*ColumnCount+x] = matrixData[y*4+x];
 				}
 			}
-#endif
 		}
 
 		public void SetValue (Matrix[] value)
