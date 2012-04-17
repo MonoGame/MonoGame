@@ -97,17 +97,22 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		private static void parse_data(BinaryReader reader, d3dx_parameter param)
 		{
-            var size = reader.ReadUInt32();
 			switch (param.type)
 			{
+            default:
+                var dummy = reader.ReadUInt32();
+                Debug.Assert(dummy == 0, "Got bad dummy data!");
+                break;
+
 			case D3DXPARAMETER_TYPE.STRING:
-                param.data = parse_name(reader, reader.BaseStream.Position - 4);
-                reader.ReadBytes((int)((size + 3) & ~3));	
+                var offset = reader.ReadUInt32();
+                param.data = parse_name(reader, offset);
                 break;
 
 			case D3DXPARAMETER_TYPE.VERTEXSHADER:
             case D3DXPARAMETER_TYPE.PIXELSHADER:
-                var bytecode = reader.ReadBytes((int)((size + 3) & ~3));
+                var size = (int)reader.ReadUInt32();
+                var bytecode = reader.ReadBytes((size + 3) & ~3); // DWORD aligned!
                 param.data = new DXShader(bytecode);
 				break;
 			}
@@ -162,7 +167,7 @@ namespace Microsoft.Xna.Framework.Graphics
 					//assignment by FXLVM expression
 					state.type = STATE_TYPE.EXPRESSION;
                     var size = reader.ReadUInt32();
-                    param.data = reader.ReadBytes((int)((size + 3) & ~3));
+                    param.data = reader.ReadBytes((int)((size + 3) & ~3)); // DWORD aligned!
 					break;
 				
 				default:
@@ -176,7 +181,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 var nameLength_ = reader.ReadUInt32();
                 var name = parse_name(reader, reader.BaseStream.Position - 4);
-                reader.BaseStream.Seek((nameLength_ + 3) & ~3, SeekOrigin.Current);
+                reader.BaseStream.Seek((nameLength_ + 3) & ~3, SeekOrigin.Current); // DWORD aligned!
 				
 				foreach (d3dx_parameter findParam in Parameters) 
                 {
@@ -198,7 +203,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 var length = reader.ReadUInt32();
                 var nameLength = reader.ReadUInt32();
                 var paramName = parse_name(reader, reader.BaseStream.Position - 4);
-                reader.BaseStream.Seek((nameLength + 3) & ~3, SeekOrigin.Current);
+                reader.BaseStream.Seek((nameLength + 3) & ~3, SeekOrigin.Current); // DWORD aligned!
                 var expressionData = reader.ReadBytes((int)(length - 4 - nameLength));
 				
 				param.data = new DXExpression(paramName, expressionData);
