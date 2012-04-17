@@ -134,6 +134,7 @@
     <Compile Include="Graphics\Effect\AlphaTestEffect.cs" />
     <Compile Include="Graphics\Effect\DualTextureEffect.cs" />
     <Compile Include="Graphics\Effect\DXEffectObject.cs" />
+    <Compile Include="Graphics\Effect\DXEffectObject.fxparser.cs" />
     <Compile Include="Graphics\Effect\DXExpression.cs" />
     <Compile Include="Graphics\Effect\DXHelper.cs" />
     <Compile Include="Graphics\Effect\DXPreshader.cs" />
@@ -258,8 +259,6 @@
     <Compile Include="Graphics\Effect\EffectTechnique.cs" />
     <Compile Include="Graphics\Effect\EffectTechniqueCollection.cs" />
     <Compile Include="Graphics\Effect\SpriteEffect.cs" />
-    <Compile Include="Graphics\Effect\GLSLEffectObject.cs" />
-    <Compile Include="Graphics\Effect\GLSLShader.cs" />
     <Compile Include="Graphics\ImageEx.cs" />
     <Compile Include="Graphics\PackedVector\IPackedVector.cs" />
     <Compile Include="Graphics\PackedVector\Short2.cs" />
@@ -530,7 +529,7 @@
       <Link>libmojoshader_64.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-	<None Include="..\ThirdParty\Libs\libmojoshader_32.dll">
+    <None Include="..\ThirdParty\Libs\libmojoshader_32.dll">
       <Link>libmojoshader_32.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

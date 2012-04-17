@@ -6,13 +6,18 @@ namespace Microsoft.Xna.Framework.Graphics
 	internal class DXHelper
 	{
 		
-		public static T[] UnmarshalArray<T>(IntPtr ptr, int count) {
-			Type type = typeof(T);
-			T[] ret = new T[count];
-			for (int i=0; i<count; i++) {
-				ret[i] = (T)Marshal.PtrToStructure (ptr, type);
-				ptr = new IntPtr(ptr.ToInt64 () + Marshal.SizeOf (type));
-			}
+		public static T[] UnmarshalArray<T>(IntPtr ptr, int count) 
+        {
+			var type = typeof(T);
+            var size = Marshal.SizeOf(type);            
+            var ret = new T[count];
+
+            for (int i = 0; i < count; i++)
+            {
+                var offset = i * size;
+                ret[i] = (T)Marshal.PtrToStructure(ptr + offset, type);
+            }
+
 			return ret;
 		}
 		
