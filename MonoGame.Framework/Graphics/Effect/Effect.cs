@@ -124,10 +124,10 @@ namespace Microsoft.Xna.Framework.Graphics
 				effectObjectCache.Add (effectCode, effectObject);
 			}
 	
-			foreach (DXEffectObject.d3dx_parameter parameter in effectObject.parameter_handles)
+			foreach (var parameter in effectObject.Parameters)
 				Parameters._parameters.Add (new EffectParameter(parameter));
 
-			foreach (DXEffectObject.d3dx_technique technique in effectObject.technique_handles)
+            foreach (var technique in effectObject.Techniques)
 				Techniques._techniques.Add (new EffectTechnique(this, technique));
 
             CurrentTechnique = Techniques[0];			

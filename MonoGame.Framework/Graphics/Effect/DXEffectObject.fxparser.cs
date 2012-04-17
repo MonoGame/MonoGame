@@ -14,7 +14,7 @@ namespace Microsoft.Xna.Framework.Graphics
 	{
         // TODO: This seems to not be used at runtime, so we leave
         // it here only for offline tool support.
-        private d3dx_parameter[] objects;
+        public d3dx_parameter[] Objects { get; private set; }
 
         // Since parsing requires access to both the reader and the stream
         // it is easier to just make these private members.
@@ -64,15 +64,15 @@ namespace Microsoft.Xna.Framework.Graphics
                 _effectReader.ReadUInt32(); //unkn
                 uint objectCount = _effectReader.ReadUInt32();
 
-                objects = new d3dx_parameter[objectCount];
+                Objects = new d3dx_parameter[objectCount];
 
-                parameter_handles = new d3dx_parameter[parameterCount];
+                Parameters = new d3dx_parameter[parameterCount];
                 for (int i = 0; i < parameterCount; i++)
-                    parameter_handles[i] = parse_effect_parameter();
+                    Parameters[i] = parse_effect_parameter();
 
-                technique_handles = new d3dx_technique[techniqueCount];
+                Techniques = new d3dx_technique[techniqueCount];
                 for (int i = 0; i < techniqueCount; i++)
-                    technique_handles[i] = parse_effect_technique();
+                    Techniques[i] = parse_effect_technique();
 
                 uint stringCount = _effectReader.ReadUInt32();
                 uint resourceCount = _effectReader.ReadUInt32();
@@ -80,7 +80,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 for (int i = 0; i < stringCount; i++)
                 {
                     uint id = _effectReader.ReadUInt32();
-                    parse_data(objects[id]);
+                    parse_data(Objects[id]);
                 }
 
                 for (int i = 0; i < resourceCount; i++)
@@ -137,7 +137,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			uint usage = _effectReader.ReadUInt32 ();
 			
 			if (technique_index == 0xffffffff) {
-				d3dx_parameter parameter = parameter_handles[index];
+				d3dx_parameter parameter = Parameters[index];
 				
 				if (element_index != 0xffffffff) {
 					if (parameter.element_count != 0) {
@@ -148,7 +148,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				
 				state = sampler.states[state_index];
 			} else {
-				d3dx_technique technique = technique_handles[technique_index];
+				d3dx_technique technique = Techniques[technique_index];
 				d3dx_pass pass = technique.pass_handles[index];
 				
 				state = pass.states[state_index];
@@ -189,7 +189,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				string name = parse_name (_effectStream.Position-4);
 				_effectStream.Seek ((nameLength_+3) & ~3, SeekOrigin.Current);
 				
-				foreach (d3dx_parameter findParam in parameter_handles) {
+				foreach (d3dx_parameter findParam in Parameters) {
 					if (findParam.name == name) {
 						param.data = findParam.data;
 						param.name = findParam.name;
@@ -398,7 +398,7 @@ namespace Microsoft.Xna.Framework.Graphics
 					case D3DXPARAMETER_TYPE.PIXELSHADER:
 					case D3DXPARAMETER_TYPE.VERTEXSHADER:
 						uint id = _effectReader.ReadUInt32 ();
-						objects[id] = param;
+                        Objects[id] = param;
 						param.data = data;
 						break;
 					
