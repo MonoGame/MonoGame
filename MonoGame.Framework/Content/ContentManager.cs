@@ -308,18 +308,12 @@ namespace Microsoft.Xna.Framework.Content
 #endif
                 else if ((typeof(T) == typeof(Effect)))
 				{
-#if NOMOJO
-                    // We currently do not support effect files
-                    // when MojoShader is disabled!
-                    throw new NotImplementedException();
-#else
 					using (Stream assetStream = TitleContainer.OpenStream(assetName))
 					{
 						var data = new byte[assetStream.Length];
 						assetStream.Read (data, 0, (int)assetStream.Length);
 						result = new Effect(this.graphicsDeviceService.GraphicsDevice, data);
                     }
-#endif
                 }
 			}
 			
