@@ -29,7 +29,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		int shaderProgram = 0;
 
-		DXEffectObject.d3dx_state[] states;
+        DXEffectObject.d3dx_pass _pass;
+
 		DXShader pixelShader;
 		DXShader vertexShader;
 
@@ -65,16 +66,14 @@ namespace Microsoft.Xna.Framework.Graphics
 		bool setRasterizerState = false;
 		RasterizerState rasterizerState;
 
-        public string Name { get; private set; }
+        public string Name { get { return _pass.name; } }
 
 		public EffectPass(EffectTechnique technique, DXEffectObject.d3dx_pass pass)
         {
             _technique = technique;
 			_graphicsDevice = _technique._effect.GraphicsDevice;
-			
-			Name = pass.name;
-			states = pass.states;
-			
+            _pass = pass;
+
 			blendState = new BlendState();
 			depthStencilState = new DepthStencilState();
 			rasterizerState = new RasterizerState();
@@ -100,7 +99,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 bool needPixelShader = false;
                 bool needVertexShader = false;
-                foreach (DXEffectObject.d3dx_state state in states)
+                foreach (var state in _pass.states)
                 {
                     var operation = DXEffectObject.state_table[state.operation];
 
@@ -110,7 +109,7 @@ namespace Microsoft.Xna.Framework.Graphics
                         if (state.type == DXEffectObject.STATE_TYPE.CONSTANT)
                         {
                             pixelShader = (DXShader)state.parameter.data;
-                            GL.AttachShader(shaderProgram, pixelShader.shaderHandle);
+                            GL.AttachShader(shaderProgram, pixelShader.ShaderHandle);
                         }
                     }
                     else if (operation.class_ == DXEffectObject.STATE_CLASS.VERTEXSHADER)
@@ -119,15 +118,14 @@ namespace Microsoft.Xna.Framework.Graphics
                         if (state.type == DXEffectObject.STATE_TYPE.CONSTANT)
                         {
                             vertexShader = (DXShader)state.parameter.data;
-                            GL.AttachShader(shaderProgram, vertexShader.shaderHandle);
+                            GL.AttachShader(shaderProgram, vertexShader.ShaderHandle);
                         }
                     }
                     else if (operation.class_ == DXEffectObject.STATE_CLASS.RENDERSTATE)
                     {
                         if (state.type != DXEffectObject.STATE_TYPE.CONSTANT)
-                        {
                             throw new NotImplementedException();
-                        }
+
                         switch (operation.op)
                         {
                             case (uint)DXEffectObject.D3DRENDERSTATETYPE.STENCILENABLE:
@@ -181,17 +179,13 @@ namespace Microsoft.Xna.Framework.Graphics
                         }
                     }
                     else
-                    {
                         throw new NotImplementedException();
-                    }
                 }
 
-                //If we have what we need, link now
-                if ((needPixelShader == (pixelShader != null)) &&
-                        (needVertexShader == (vertexShader != null)))
-                {
+                // If we have what we need then link.
+                if (    needPixelShader == (pixelShader != null) && 
+                        needVertexShader == (vertexShader != null) )
                     Link();
-                }
             }
             finally
             {
@@ -206,9 +200,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			//Console.WriteLine (_technique._effect.Name+" - "+_technique.Name+" - "+Name);
 			var relink = false;
-			foreach (var state in states)
+            foreach (var state in _pass.states)
             {				
-				//constants handled on init
+				// Constants handled during initialization.
 				if (state.type == DXEffectObject.STATE_TYPE.CONSTANT) 
                     continue;
 
@@ -221,36 +215,35 @@ namespace Microsoft.Xna.Framework.Graphics
 					switch (state.type) 
                     {
 					case DXEffectObject.STATE_TYPE.EXPRESSIONINDEX:
-						shader = (DXShader) (((DXExpression)state.parameter.data)
-							.Evaluate (_technique._effect.Parameters));
+                        var expression = (DXExpression)state.parameter.data;
+                        shader = (DXShader)expression.Evaluate(_technique._effect.Parameters);
 						break;
 					case DXEffectObject.STATE_TYPE.PARAMETER:
-						//should be easy, but haven't seen it
 					default:
 						throw new NotImplementedException();
 					}
 					
-					if (shader.shaderType == ShaderType.FragmentShader && shader != pixelShader) 
+					if (shader.ShaderType == ShaderType.FragmentShader && shader != pixelShader) 
                     {
 						if (pixelShader != null)
-                            GL.DetachShader(shaderProgram, pixelShader.shaderHandle);
+                            GL.DetachShader(shaderProgram, pixelShader.ShaderHandle);
 
                         relink = true;
 						pixelShader = shader;
-                        GL.AttachShader(shaderProgram, pixelShader.shaderHandle);
+                        GL.AttachShader(shaderProgram, pixelShader.ShaderHandle);
 					}
-                    else if (shader.shaderType == ShaderType.VertexShader && shader != vertexShader) 
+                    else if (shader.ShaderType == ShaderType.VertexShader && shader != vertexShader) 
                     {
 						if (vertexShader != null)
-                            GL.DetachShader(shaderProgram, vertexShader.shaderHandle);
+                            GL.DetachShader(shaderProgram, vertexShader.ShaderHandle);
 
                         relink = true;
 						vertexShader = shader;
-                        GL.AttachShader(shaderProgram, vertexShader.shaderHandle);
+                        GL.AttachShader(shaderProgram, vertexShader.ShaderHandle);
 					}					
-				}				
+				}
 			}
-			
+
 			if (relink)
 				Link();
 			
@@ -273,12 +266,12 @@ namespace Microsoft.Xna.Framework.Graphics
             else 
             {
 				//passthrough shader is attached
-				Viewport vp = _graphicsDevice.Viewport;
-				Matrix projection = Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, 0, 1);
-				Matrix halfPixelOffset = Matrix.CreateTranslation(-0.5f, -0.5f, 0);
-				Matrix transform = halfPixelOffset * projection;
+				var vp = _graphicsDevice.Viewport;
+                var projection = Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, 0, 1);
+                var halfPixelOffset = Matrix.CreateTranslation(-0.5f, -0.5f, 0);
+                var transform = halfPixelOffset * projection;
 
-				int uniform = GL.GetUniformLocation(shaderProgram, "transformMatrix");
+                var uniform = GL.GetUniformLocation(shaderProgram, "transformMatrix");
 				GL.UniformMatrix4(uniform, 1, false, Matrix.ToFloatArray(transform));
 			}
 
@@ -320,7 +313,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				posFixup[1] *= -1.0f;
 				posFixup[3] *= -1.0f;
 			}
-			int posFixupLoc = GL.GetUniformLocation(shaderProgram, "posFixup");
+            var posFixupLoc = GL.GetUniformLocation(shaderProgram, "posFixup");
 			GL.Uniform4 (posFixupLoc, 1, posFixup);
 
 			
@@ -333,9 +326,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void Link ()
 		{
-			if (vertexShader == null && !passthroughVertexShaderAttached) {
-				if (!passthroughVertexShader.HasValue) {
-					int shader = GL.CreateShader(ShaderType.VertexShader);
+			if (vertexShader == null && !passthroughVertexShaderAttached) 
+            {
+				if (!passthroughVertexShader.HasValue) 
+                {
+					var shader = GL.CreateShader(ShaderType.VertexShader);
 #if GLES
 					GL.ShaderSource (shader, 1,
 					                new string[]{passthroughVertexShaderSrc}, (int[])null);
@@ -353,7 +348,9 @@ namespace Microsoft.Xna.Framework.Graphics
 				GL.BindAttribLocation(shaderProgram, GraphicsDevice.attributeColor, "aColor");
 
 				passthroughVertexShaderAttached = true;
-			} else if (vertexShader != null && passthroughVertexShaderAttached) {
+			} 
+            else if (vertexShader != null && passthroughVertexShaderAttached) 
+            {
 				GL.DetachShader(shaderProgram, passthroughVertexShader.Value);
 				passthroughVertexShaderAttached = false;
 			}
@@ -365,7 +362,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			GL.LinkProgram(shaderProgram);
 
-			int linked = 0;
+			var linked = 0;
 #if GLES
 			GL.GetProgram(shaderProgram, ProgramParameter.LinkStatus, ref linked);
 #else
