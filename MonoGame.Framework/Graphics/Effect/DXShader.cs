@@ -40,7 +40,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		public DXShader (byte[] shaderData)
 		{
-			IntPtr parseDataPtr = MojoShader.NativeMethods.MOJOSHADER_parse(
+			var parseDataPtr = MojoShader.NativeMethods.MOJOSHADER_parse(
 					"glsl",
 					shaderData,
 					shaderData.Length,
@@ -62,11 +62,11 @@ namespace Microsoft.Xna.Framework.Graphics
 				throw new Exception(errors[0].error);
 			}
 			
-			if (parseData.preshader != IntPtr.Zero) {
-				preshader = new DXPreshader(parseData.preshader);
-			}
+			if (parseData.preshader != IntPtr.Zero)
+                preshader = DXPreshader.CreatePreshader(parseData.preshader);
 			
-			switch(parseData.shader_type) {
+			switch(parseData.shader_type) 
+            {
 			case MojoShader.MOJOSHADER_shaderType.MOJOSHADER_TYPE_PIXEL:
 				shaderType = ShaderType.FragmentShader;
 				break;

@@ -548,8 +548,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public d3dx_technique[] Techniques { get; private set; }
 
-
         private static readonly char[] Header = { 'M', 'G', 'F', 'X' };
+
         private const int Version = 1;
 	}
 }

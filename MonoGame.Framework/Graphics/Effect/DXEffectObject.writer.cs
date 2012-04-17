@@ -6,11 +6,10 @@ namespace Microsoft.Xna.Framework.Graphics
 {
 	public partial class DXEffectObject
 	{
-
         /// <summary>
         /// Writes the effect for loading later.
         /// </summary>
-        public void Write( BinaryWriter writer )
+        public void Write(BinaryWriter writer)
         {
             // Write a very simple header for identification and versioning.
             writer.Write(Header);
