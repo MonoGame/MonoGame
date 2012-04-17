@@ -16,11 +16,6 @@ namespace Microsoft.Xna.Framework.Graphics
         // it here only for offline tool support.
         public d3dx_parameter[] Objects { get; private set; }
 
-        // Since parsing requires access to both the reader and the stream
-        // it is easier to just make these private members.
-        private MemoryStream _effectStream;
-        private BinaryReader _effectReader;
-
         /// <summary>
         /// Returns an effect from a compiled Microsoft D3DX Effect file.
         /// </summary>
@@ -33,7 +28,6 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             return new DXEffectObject(effectCode);
         }
-
 
 		private DXEffectObject(byte[] effectCode)
 		{
@@ -53,90 +47,81 @@ namespace Microsoft.Xna.Framework.Graphics
 
             var startoffset = BitConverter.ToUInt32(effectCode, (int)(baseOffset - 4));
 
-			using (_effectStream = new MemoryStream(effectCode, (int)baseOffset, (int)(effectCode.Length-baseOffset)))
-            using (_effectReader = new BinaryReader(_effectStream))
+			using (var stream = new MemoryStream(effectCode, (int)baseOffset, (int)(effectCode.Length-baseOffset)))
+            using (var reader = new BinaryReader(stream))
             {
                 // Move to the start of the effect data.
-                _effectStream.Seek(startoffset, SeekOrigin.Current);
+                reader.BaseStream.Seek(startoffset, SeekOrigin.Current);
 
-                var parameterCount = _effectReader.ReadUInt32();
-                var techniqueCount = _effectReader.ReadUInt32();
-                _effectReader.ReadUInt32(); //unkn
+                var parameterCount = reader.ReadUInt32();
+                var techniqueCount = reader.ReadUInt32();
+                reader.ReadUInt32(); //unkn
 
-                var objectCount = _effectReader.ReadUInt32();
+                var objectCount = reader.ReadUInt32();
                 Objects = new d3dx_parameter[objectCount];
 
                 Parameters = new d3dx_parameter[parameterCount];
                 for (var i = 0; i < parameterCount; i++)
-                    Parameters[i] = parse_effect_parameter();
+                    Parameters[i] = parse_effect_parameter(reader);
 
                 Techniques = new d3dx_technique[techniqueCount];
                 for (var i = 0; i < techniqueCount; i++)
-                    Techniques[i] = parse_effect_technique();
+                    Techniques[i] = parse_effect_technique(reader);
 
-                var stringCount = _effectReader.ReadUInt32();
-                var resourceCount = _effectReader.ReadUInt32();
+                var stringCount = reader.ReadUInt32();
+                var resourceCount = reader.ReadUInt32();
 
                 for (var i = 0; i < stringCount; i++)
                 {
-                    var id = _effectReader.ReadUInt32();
-                    parse_data(Objects[id]);
+                    var id = reader.ReadUInt32();
+                    parse_data(reader, Objects[id]);
                 }
 
                 for (var i = 0; i < resourceCount; i++)
-                    parse_resource();
+                    parse_resource(reader);
             }
-
-			_effectReader = null;
-			_effectStream = null;
 		}
-		
-		private string parse_name(long offset)
-		{
-            var oldPos = _effectStream.Position; 
-            _effectStream.Seek (offset, SeekOrigin.Begin);
 
-            var rb = _effectReader.ReadBytes(_effectReader.ReadInt32());
+        private static string parse_name(BinaryReader reader, long offset)
+		{
+            var oldPos = reader.BaseStream.Position;
+            reader.BaseStream.Seek(offset, SeekOrigin.Begin);
+
+            var rb = reader.ReadBytes(reader.ReadInt32());
             var r = System.Text.ASCIIEncoding.ASCII.GetString(rb);
 			r = r.Replace ("\0", "");
-			
-			_effectStream.Seek (oldPos, SeekOrigin.Begin);
+
+            reader.BaseStream.Seek(oldPos, SeekOrigin.Begin);
 			return r;
 		}
 		
-		private void parse_data(d3dx_parameter param)
+		private static void parse_data(BinaryReader reader, d3dx_parameter param)
 		{
-            var size = _effectReader.ReadUInt32();
+            var size = reader.ReadUInt32();
 			switch (param.type)
 			{
 			case D3DXPARAMETER_TYPE.STRING:
-				param.data = parse_name(_effectStream.Position-4);
-				_effectReader.ReadBytes((int)((size+3) & ~3));	
+                param.data = parse_name(reader, reader.BaseStream.Position - 4);
+                reader.ReadBytes((int)((size + 3) & ~3));	
                 break;
 
 			case D3DXPARAMETER_TYPE.VERTEXSHADER:
             case D3DXPARAMETER_TYPE.PIXELSHADER:
-                var bytecode = _effectReader.ReadBytes((int)((size + 3) & ~3));
+                var bytecode = reader.ReadBytes((int)((size + 3) & ~3));
                 param.data = new DXShader(bytecode);
 				break;
 			}
 		}
-		
-		private byte[] copy_data()
-		{
-			var size = _effectReader.ReadUInt32 ();
-			return _effectReader.ReadBytes((int)((size+3) & ~3));
-		}
-		
-		private void parse_resource()
+
+        private void parse_resource(BinaryReader reader)
 		{
 			d3dx_state state;
 
-            var technique_index = _effectReader.ReadUInt32();
-            var index = _effectReader.ReadUInt32();
-            var element_index = _effectReader.ReadUInt32();
-            var state_index = _effectReader.ReadUInt32();
-            var usage = _effectReader.ReadUInt32();
+            var technique_index = reader.ReadUInt32();
+            var index = reader.ReadUInt32();
+            var element_index = reader.ReadUInt32();
+            var state_index = reader.ReadUInt32();
+            var usage = reader.ReadUInt32();
 			
 			if (technique_index == 0xffffffff) 
             {
@@ -168,7 +153,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				case D3DXPARAMETER_TYPE.VERTEXSHADER:
 				case D3DXPARAMETER_TYPE.PIXELSHADER:
 					state.type = STATE_TYPE.CONSTANT;
-					parse_data(param);
+                    parse_data(reader, param);
 					break;
 				case D3DXPARAMETER_TYPE.BOOL:
 				case D3DXPARAMETER_TYPE.INT:
@@ -176,7 +161,8 @@ namespace Microsoft.Xna.Framework.Graphics
 				case D3DXPARAMETER_TYPE.STRING:
 					//assignment by FXLVM expression
 					state.type = STATE_TYPE.EXPRESSION;
-					param.data = copy_data();
+                    var size = reader.ReadUInt32();
+                    param.data = reader.ReadBytes((int)((size + 3) & ~3));
 					break;
 				
 				default:
@@ -188,9 +174,9 @@ namespace Microsoft.Xna.Framework.Graphics
 				//the state's parameter is another parameter
 				//the we are given its name
 
-                var nameLength_ = _effectReader.ReadUInt32();
-                var name = parse_name(_effectStream.Position - 4);
-				_effectStream.Seek ((nameLength_+3) & ~3, SeekOrigin.Current);
+                var nameLength_ = reader.ReadUInt32();
+                var name = parse_name(reader, reader.BaseStream.Position - 4);
+                reader.BaseStream.Seek((nameLength_ + 3) & ~3, SeekOrigin.Current);
 				
 				foreach (d3dx_parameter findParam in Parameters) 
                 {
@@ -209,11 +195,11 @@ namespace Microsoft.Xna.Framework.Graphics
 				//preceded by array name
 				
 				//annoying hax to extract the name
-                var length = _effectReader.ReadUInt32();
-                var nameLength = _effectReader.ReadUInt32();
-                var paramName = parse_name(_effectStream.Position - 4);
-				_effectStream.Seek ( (nameLength+3) & ~3, SeekOrigin.Current);
-                var expressionData = _effectReader.ReadBytes((int)(length - 4 - nameLength));
+                var length = reader.ReadUInt32();
+                var nameLength = reader.ReadUInt32();
+                var paramName = parse_name(reader, reader.BaseStream.Position - 4);
+                reader.BaseStream.Seek((nameLength + 3) & ~3, SeekOrigin.Current);
+                var expressionData = reader.ReadBytes((int)(length - 4 - nameLength));
 				
 				param.data = new DXExpression(paramName, expressionData);
 				break;
@@ -224,10 +210,10 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 		}
 		
-		private void parse_effect_typedef(long offset, d3dx_parameter param, d3dx_parameter parent, uint flags)
+		private static void parse_effect_typedef(BinaryReader reader, long offset, d3dx_parameter param, d3dx_parameter parent, uint flags)
 		{
-            var oldPos = _effectStream.Position; 
-            _effectStream.Seek(offset, SeekOrigin.Begin);
+            var oldPos = reader.BaseStream.Position;
+            reader.BaseStream.Seek(offset, SeekOrigin.Begin);
 			
 			param.flags = flags;
 			
@@ -248,30 +234,30 @@ namespace Microsoft.Xna.Framework.Graphics
 			} 
             else 
             {
-				param.type = (D3DXPARAMETER_TYPE)_effectReader.ReadUInt32();
-				param.class_ = (D3DXPARAMETER_CLASS)_effectReader.ReadUInt32();
-				param.name = parse_name(_effectReader.ReadUInt32 ());
-				param.semantic = parse_name(_effectReader.ReadUInt32());
-				param.element_count = _effectReader.ReadUInt32();
+                param.type = (D3DXPARAMETER_TYPE)reader.ReadUInt32();
+                param.class_ = (D3DXPARAMETER_CLASS)reader.ReadUInt32();
+                param.name = parse_name(reader, reader.ReadUInt32());
+                param.semantic = parse_name(reader, reader.ReadUInt32());
+                param.element_count = reader.ReadUInt32();
 				
 				switch (param.class_)
 				{
 				case D3DXPARAMETER_CLASS.VECTOR:
-					param.columns = _effectReader.ReadUInt32();
-					param.rows = _effectReader.ReadUInt32();
+					param.columns = reader.ReadUInt32();
+                    param.rows = reader.ReadUInt32();
 					param.bytes = 4 * param.rows * param.columns;
 					break;
 				
 				case D3DXPARAMETER_CLASS.SCALAR:
 				case D3DXPARAMETER_CLASS.MATRIX_ROWS:
 				case D3DXPARAMETER_CLASS.MATRIX_COLUMNS:
-					param.rows = _effectReader.ReadUInt32();
-					param.columns = _effectReader.ReadUInt32();
+                    param.rows = reader.ReadUInt32();
+                    param.columns = reader.ReadUInt32();
 					param.bytes = 4 * param.rows * param.columns;
 					break;
 				
 				case D3DXPARAMETER_CLASS.STRUCT:
-					param.member_count = _effectReader.ReadUInt32 ();
+                    param.member_count = reader.ReadUInt32();
 					break;
 					
 				case D3DXPARAMETER_CLASS.OBJECT:
@@ -325,7 +311,7 @@ namespace Microsoft.Xna.Framework.Graphics
 					param.member_handles[i] = new d3dx_parameter();
 
 					//we read the same typedef over and over...
-					parse_effect_typedef (_effectStream.Position, param.member_handles[i], param, flags);
+                    parse_effect_typedef(reader, reader.BaseStream.Position, param.member_handles[i], param, flags);
 					param_bytes += param.member_handles[i].bytes;
 				}
 				param.bytes = param_bytes;
@@ -337,25 +323,25 @@ namespace Microsoft.Xna.Framework.Graphics
                 {
 					param.member_handles[i] = new d3dx_parameter();
 
-					parse_effect_typedef(_effectStream.Position, param.member_handles[i], null, flags);
-					_effectStream.Seek(param.member_handles[i].bytes, SeekOrigin.Current);
+                    parse_effect_typedef(reader, reader.BaseStream.Position, param.member_handles[i], null, flags);
+                    reader.BaseStream.Seek(param.member_handles[i].bytes, SeekOrigin.Current);
 					param.bytes += param.member_handles[i].bytes;
 				}
 			}
-			
-			_effectStream.Seek (oldPos, SeekOrigin.Begin);
+
+            reader.BaseStream.Seek(oldPos, SeekOrigin.Begin);
 		}
-		
-		private d3dx_sampler parse_sampler()
+
+        private d3dx_sampler parse_sampler(BinaryReader reader)
 		{
             var ret = new d3dx_sampler();
-			
-			ret.state_count = _effectReader.ReadUInt32 ();
+
+            ret.state_count = reader.ReadUInt32();
 			if (ret.state_count > 0) 
             {
 				ret.states = new d3dx_state[ret.state_count];
 				for (int i=0; i<ret.state_count; i++)
-					ret.states[i] = parse_state();
+                    ret.states[i] = parse_state(reader);
 			}
 			
 			return ret;
@@ -370,7 +356,7 @@ namespace Microsoft.Xna.Framework.Graphics
             return ret;
 		}
 		
-		private void parse_value(d3dx_parameter param, byte[] data)
+		private void parse_value(BinaryReader reader, d3dx_parameter param, byte[] data)
 		{
 			if (param.element_count != 0) 
             {
@@ -378,7 +364,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				uint curOffset = 0;
                 for (var i = 0; i < param.element_count; i++) 
                 {
-					parse_value(param.member_handles[i],
+                    parse_value(reader, param.member_handles[i],
 						sliceBytes(data, curOffset, curOffset+param.member_handles[i].bytes));
 					curOffset += param.member_handles[i].bytes;
 				}
@@ -399,7 +385,7 @@ namespace Microsoft.Xna.Framework.Graphics
 					uint curOffset = 0;
                     for (var i = 0; i < param.member_count; i++)
                     {
-						parse_value(param.member_handles[i],
+                        parse_value(reader, param.member_handles[i],
 							sliceBytes(data, curOffset, curOffset+param.member_handles[i].bytes));
 						curOffset += param.member_handles[i].bytes;
 					}
@@ -417,7 +403,7 @@ namespace Microsoft.Xna.Framework.Graphics
 					case D3DXPARAMETER_TYPE.TEXTURECUBE:
 					case D3DXPARAMETER_TYPE.PIXELSHADER:
 					case D3DXPARAMETER_TYPE.VERTEXSHADER:
-                        var id = _effectReader.ReadUInt32();
+                        var id = reader.ReadUInt32();
                         Objects[id] = param;
 						param.data = data;
 						break;
@@ -427,7 +413,7 @@ namespace Microsoft.Xna.Framework.Graphics
 					case D3DXPARAMETER_TYPE.SAMPLER2D:
 					case D3DXPARAMETER_TYPE.SAMPLER3D:
 					case D3DXPARAMETER_TYPE.SAMPLERCUBE:
-						param.data = parse_sampler();
+                        param.data = parse_sampler(reader);
 						break;
 					}
 					
@@ -436,69 +422,69 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 
-		private void parse_init_value(long offset, d3dx_parameter param)
+		private void parse_init_value(BinaryReader reader, long offset, d3dx_parameter param)
 		{
-            var oldPos = _effectStream.Position; 
-            _effectStream.Seek(offset, SeekOrigin.Begin);
+            var oldPos = reader.BaseStream.Position;
+            reader.BaseStream.Seek(offset, SeekOrigin.Begin);
 
-            var data = _effectReader.ReadBytes((int)param.bytes);
-			_effectStream.Seek (offset, SeekOrigin.Begin);
-			parse_value(param, data);
-			
-			_effectStream.Seek (oldPos, SeekOrigin.Begin);
+            var data = reader.ReadBytes((int)param.bytes);
+            reader.BaseStream.Seek(offset, SeekOrigin.Begin);
+            parse_value(reader, param, data);
+
+            reader.BaseStream.Seek(oldPos, SeekOrigin.Begin);
 		}
 
-		private d3dx_parameter parse_effect_annotation()
+        private d3dx_parameter parse_effect_annotation(BinaryReader reader)
 		{
             var ret = new d3dx_parameter();
 			
 			ret.flags = D3DX_PARAMETER_ANNOTATION;
 
-            var typedefOffset = _effectReader.ReadInt32();
-			parse_effect_typedef(typedefOffset, ret, null, D3DX_PARAMETER_ANNOTATION);
+            var typedefOffset = reader.ReadInt32();
+            parse_effect_typedef(reader, typedefOffset, ret, null, D3DX_PARAMETER_ANNOTATION);
 
-            var valueOffset = _effectReader.ReadInt32();
-			parse_init_value(valueOffset, ret);
+            var valueOffset = reader.ReadInt32();
+            parse_init_value(reader, valueOffset, ret);
 			
 			return ret;
 		}
-		
-		private d3dx_parameter parse_effect_parameter()
+
+        private d3dx_parameter parse_effect_parameter(BinaryReader reader)
 		{
             var ret = new d3dx_parameter();
 
-            var typedefOffset = _effectReader.ReadInt32();
-            var valueOffset = _effectReader.ReadInt32();
-			ret.flags = _effectReader.ReadUInt32 ();
-			ret.annotation_count = _effectReader.ReadUInt32 ();
-			parse_effect_typedef(typedefOffset, ret, null, ret.flags);
-			
-			parse_init_value(valueOffset, ret);
+            var typedefOffset = reader.ReadInt32();
+            var valueOffset = reader.ReadInt32();
+            ret.flags = reader.ReadUInt32();
+            ret.annotation_count = reader.ReadUInt32();
+            parse_effect_typedef(reader, typedefOffset, ret, null, ret.flags);
+
+            parse_init_value(reader, valueOffset, ret);
 
 			if (ret.annotation_count > 0)
             {
 				ret.annotation_handles = new d3dx_parameter[ret.annotation_count];
                 for (var i = 0; i < ret.annotation_count; i++)
-					ret.annotation_handles[i] = parse_effect_annotation();
+                    ret.annotation_handles[i] = parse_effect_annotation(reader);
 			}
 			
 			return ret;
 		}
-		
-		private d3dx_state parse_state()
+
+        private d3dx_state parse_state(BinaryReader reader)
 		{
             var ret = new d3dx_state();
 			ret.parameter = new d3dx_parameter();
 
 			ret.type = STATE_TYPE.CONSTANT;
-			ret.operation = _effectReader.ReadUInt32();
-			ret.index = _effectReader.ReadUInt32();
+            ret.operation = reader.ReadUInt32();
+            ret.index = reader.ReadUInt32();
 
-            var typedefOffset = _effectReader.ReadInt32();
-			parse_effect_typedef(typedefOffset, ret.parameter, null, 0);
+            var typedefOffset = reader.ReadInt32();
+            parse_effect_typedef(reader, typedefOffset, ret.parameter, null, 0);
 
-            var valueOffset = _effectReader.ReadInt32();
-			parse_init_value(valueOffset, ret.parameter);
+            var valueOffset = reader.ReadInt32();
+            parse_init_value(reader, valueOffset, ret.parameter);
 
             var operation = state_table[ret.operation];
             if (operation.class_ == STATE_CLASS.RENDERSTATE) 
@@ -599,48 +585,48 @@ namespace Microsoft.Xna.Framework.Graphics
 			return ret;
 		}
 
-		private d3dx_pass parse_effect_pass()
+        private d3dx_pass parse_effect_pass(BinaryReader reader)
 		{
             var ret = new d3dx_pass();
-			
-			ret.name = parse_name (_effectReader.ReadUInt32());
-			ret.annotation_count = _effectReader.ReadUInt32 ();
-			ret.state_count = _effectReader.ReadUInt32 ();
+
+            ret.name = parse_name(reader, reader.ReadUInt32());
+            ret.annotation_count = reader.ReadUInt32();
+            ret.state_count = reader.ReadUInt32();
 
 			if (ret.annotation_count > 0) 
             {
 				ret.annotation_handles = new d3dx_parameter[ret.annotation_count];
                 for (var i = 0; i < ret.annotation_count; i++)
-					ret.annotation_handles[i] = parse_effect_annotation();
+                    ret.annotation_handles[i] = parse_effect_annotation(reader);
 			}
 			
 			ret.states = new d3dx_state[ret.state_count];
             for (var i = 0; i < ret.state_count; i++)
-				ret.states[i] = parse_state();
+                ret.states[i] = parse_state(reader);
 			
 			return ret;
 		}
-		
-		private d3dx_technique parse_effect_technique()
+
+        private d3dx_technique parse_effect_technique(BinaryReader reader)
 		{
             var ret = new d3dx_technique();
-			
-			ret.name = parse_name (_effectReader.ReadUInt32());
-			ret.annotation_count = _effectReader.ReadUInt32 ();
-			ret.pass_count = _effectReader.ReadUInt32 ();
+
+            ret.name = parse_name(reader, reader.ReadUInt32());
+            ret.annotation_count = reader.ReadUInt32();
+            ret.pass_count = reader.ReadUInt32();
 
 			if (ret.annotation_count > 0)
             {
 				ret.annotation_handles = new d3dx_parameter[ret.annotation_count];
                 for (var i = 0; i < ret.annotation_count; i++)
-					ret.annotation_handles[i] = parse_effect_annotation();
+                    ret.annotation_handles[i] = parse_effect_annotation(reader);
 			}
 
 			if (ret.pass_count > 0)
             {
 				ret.pass_handles = new d3dx_pass[ret.pass_count];
                 for (var i = 0; i < ret.pass_count; i++)
-					ret.pass_handles[i] = parse_effect_pass();
+                    ret.pass_handles[i] = parse_effect_pass(reader);
 			}
 			
 			return ret;
