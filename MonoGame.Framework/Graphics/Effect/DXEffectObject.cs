@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -276,7 +277,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			EXPRESSION,
 			EXPRESSIONINDEX,
 		}
-		
+
+        [DebuggerDisplay("{class_} {type} {name}")]
 		public class d3dx_parameter
 		{
 			public string name;
