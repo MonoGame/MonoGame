@@ -27,15 +27,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private readonly string _uniforms_float4_name;
         private readonly float[] _uniforms_float4;
-        private readonly int _uniforms_float4_count = 0;
 
         private readonly string _uniforms_int4_name;
         private readonly int[] _uniforms_int4;
-        private readonly int _uniforms_int4_count = 0;
 
         private readonly string _uniforms_bool_name;
         private readonly int[] _uniforms_bool;
-        private readonly int _uniforms_bool_count = 0;
 
         private readonly MojoShader.MOJOSHADER_symbol[] _symbols;
         private readonly MojoShader.MOJOSHADER_sampler[] _samplers;
@@ -43,12 +40,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private readonly DXPreshader _preshader;
 		
-		public DXShader (byte[] shaderData)
+		public DXShader (byte[] byteCode)
 		{
 			var parseDataPtr = MojoShader.NativeMethods.MOJOSHADER_parse(
 					"glsl",
-					shaderData,
-					shaderData.Length,
+                    byteCode,
+                    byteCode.Length,
 					IntPtr.Zero,
 					0,
 					IntPtr.Zero,
@@ -103,52 +100,55 @@ namespace Microsoft.Xna.Framework.Graphics
 			_attributes = DXHelper.UnmarshalArray<MojoShader.MOJOSHADER_attribute>(
 					parseData.attributes, parseData.attribute_count);
 
+            var float4_count = 0;
+            var int4_count = 0;
+            var bool_count = 0;
 			foreach (var symbol in _symbols) 
             {
 				switch (symbol.register_set) 
                 {
 				case MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_BOOL:
-					_uniforms_bool_count += (int)symbol.register_count;
+					bool_count += (int)symbol.register_count;
 					break;
 				case MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_FLOAT4:
-					_uniforms_float4_count += (int)symbol.register_count;
+                    float4_count += (int)symbol.register_count;
 					break;
 				case MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_INT4:
-					_uniforms_int4_count += (int)symbol.register_count;
+					int4_count += (int)symbol.register_count;
 					break;
 				default:
 					break;
 				}
 			}
-			
-			_uniforms_float4 = new float[_uniforms_float4_count*4];
-			_uniforms_int4 = new int[_uniforms_int4_count*4];
-			_uniforms_bool = new int[_uniforms_bool_count];
+
+            _uniforms_float4 = new float[float4_count * 4];
+            _uniforms_int4 = new int[int4_count * 4];
+			_uniforms_bool = new int[bool_count];
 			
 			_glslCode = parseData.output;
 			
 #if GLSLOPTIMIZER
-			//glslCode = GLSLOptimizer.Optimize (glslCode, shaderType);
+			//_glslCode = GLSLOptimizer.Optimize(_glslCode, ShaderType);
 #endif
-			
+
 #if IPHONE || ANDROID
-			glslCode = glslCode.Replace("#version 110\n", "");
-			glslCode = "precision mediump float;\nprecision mediump int;\n" + glslCode;
+			_glslCode = _glslCode.Replace("#version 110\n", "");
+			_glslCode = "precision mediump float;\nprecision mediump int;\n" + _glslCode;
 #endif
             Threading.Begin();
             try
             {
                 ShaderHandle = GL.CreateShader(ShaderType);
 #if IPHONE || ANDROID
-                GL.ShaderSource(shaderHandle, 1, new string[] { glslCode }, (int[])null);
-#else			
+                GL.ShaderSource(ShaderHandle, 1, new string[] { _glslCode }, (int[])null);
+#else
                 GL.ShaderSource(ShaderHandle, _glslCode);
 #endif
                 GL.CompileShader(ShaderHandle);
 
                 var compiled = 0;
 #if IPHONE || ANDROID
-                GL.GetShader(shaderHandle, ShaderParameter.CompileStatus, ref compiled);
+                GL.GetShader(ShaderHandle, ShaderParameter.CompileStatus, ref compiled);
 #else
                 GL.GetShader(ShaderHandle, ShaderParameter.CompileStatus, out compiled);
 #endif
@@ -157,11 +157,11 @@ namespace Microsoft.Xna.Framework.Graphics
 #if IPHONE || ANDROID
                     string log = "";
                     int length = 0;
-                    GL.GetShader(shaderHandle, ShaderParameter.InfoLogLength, ref length);
+                    GL.GetShader(ShaderHandle, ShaderParameter.InfoLogLength, ref length);
                     if (length > 0)
                     {
                         var logBuilder = new StringBuilder(length);
-                        GL.GetShaderInfoLog(shaderHandle, length, ref length, logBuilder);
+                        GL.GetShaderInfoLog(ShaderHandle, length, ref length, logBuilder);
                         log = logBuilder.ToString();
                     }
 #else
@@ -299,20 +299,20 @@ namespace Microsoft.Xna.Framework.Graphics
 				_preshader.Run(parameters, _uniforms_float4);
 			
 			// Upload the uniforms.				
-			if (_uniforms_float4_count > 0)
+            if (_uniforms_float4.Length > 0)
             {
                 var vec4_loc = GL.GetUniformLocation(program, _uniforms_float4_name);
-				GL.Uniform4(vec4_loc, _uniforms_float4_count, _uniforms_float4);
+                GL.Uniform4(vec4_loc, _uniforms_float4.Length / 4, _uniforms_float4);
 			}
-			if (_uniforms_int4_count > 0) 
+            if (_uniforms_int4_name.Length > 0) 
             {
                 var int4_loc = GL.GetUniformLocation(program, _uniforms_int4_name);
-				GL.Uniform4(int4_loc, _uniforms_int4_count, _uniforms_int4);
+                GL.Uniform4(int4_loc, _uniforms_int4.Length / 4, _uniforms_int4);
 			}
-			if (_uniforms_bool_count > 0) 
+            if (_uniforms_bool.Length > 0) 
             {
                 var bool_loc = GL.GetUniformLocation(program, _uniforms_bool_name);
-				GL.Uniform1(bool_loc, _uniforms_bool_count, _uniforms_bool);
+                GL.Uniform1(bool_loc, _uniforms_bool.Length, _uniforms_bool);
 			}
 			
 			if (ShaderType == ShaderType.FragmentShader) 

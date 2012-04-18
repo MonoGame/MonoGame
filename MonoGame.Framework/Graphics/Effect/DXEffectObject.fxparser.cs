@@ -175,6 +175,7 @@ namespace Microsoft.Xna.Framework.Graphics
 					throw new NotImplementedException();
 				}
 				break;
+
 			case 1:
 				state.type = STATE_TYPE.PARAMETER;
 				//the state's parameter is another parameter
@@ -184,7 +185,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 var name = parse_name(reader, reader.BaseStream.Position - 4);
                 reader.BaseStream.Seek((nameLength_ + 3) & ~3, SeekOrigin.Current); // DWORD aligned!
 				
-				foreach (d3dx_parameter findParam in Parameters) 
+				foreach (var findParam in Parameters) 
                 {
 					if (findParam.name == name) 
                     {
@@ -195,6 +196,7 @@ namespace Microsoft.Xna.Framework.Graphics
 					}
 				}
 				break;
+
 			case 2:
 				//Array index by FXLVM expression
 				state.type = STATE_TYPE.EXPRESSIONINDEX;
@@ -207,9 +209,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 reader.BaseStream.Seek((nameLength + 3) & ~3, SeekOrigin.Current); // DWORD aligned!
                 var expressionData = reader.ReadBytes((int)(length - 4 - nameLength));
 				
-                var preshader = DXPreshader.CreatePreshader(expressionData);
-                param.data = new DXExpression(paramName, preshader);
+                param.data = new DXExpression(paramName, expressionData);
 				break;
+
 			default:
 				Debug.WriteLine ("Unknown usage "+usage.ToString());
 				break;
