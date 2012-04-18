@@ -114,14 +114,14 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 		}
 
-		public Effect (GraphicsDevice graphicsDevice, byte[] effectCode)
+		public Effect (GraphicsDevice graphicsDevice, byte[] effectData)
             : this(graphicsDevice)
 		{
 			// Try getting a cached effect object.
-			if (!effectObjectCache.TryGetValue(effectCode, out effectObject))
+            if (!effectObjectCache.TryGetValue(effectData, out effectObject))
 			{
-                effectObject = DXEffectObject.FromCompiledD3DXEffect(effectCode);
-				effectObjectCache.Add (effectCode, effectObject);
+                effectObject = DXEffectObject.FromCompiledD3DXEffect(effectData);
+                effectObjectCache.Add(effectData, effectObject);
 			}
 	
 			foreach (var parameter in effectObject.Parameters)
