@@ -1,5 +1,5 @@
-﻿#if !ANDROID && !IOS
-#define IS_MAC_AVAILABLE
+﻿#if !ANDROID && !IOS && !PSS
+#define IS_FULL_NET_AVAILABLE
 #endif
 
 using System;
@@ -117,7 +117,7 @@ namespace Lidgren.Network
 				byte[] macBytes = new byte[8];
 				NetRandom.Instance.NextBytes(macBytes);
 
-#if IS_MAC_AVAILABLE
+#if IS_FULL_NET_AVAILABLE
 				try
 				{
 					System.Net.NetworkInformation.PhysicalAddress pa = NetUtility.GetMacAddress();
