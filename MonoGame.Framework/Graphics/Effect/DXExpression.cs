@@ -9,10 +9,10 @@ namespace Microsoft.Xna.Framework.Graphics
         private float[] _outRegs;
         private DXPreshader _preshader;
 
-        public DXExpression(string indexName, byte[] expressionData)
+        public DXExpression(string indexName, DXPreshader preshader)
         {
             _indexName = indexName;
-            _preshader = DXPreshader.CreatePreshader(expressionData);
+            _preshader = preshader;
             _outRegs = new float[4];
         }
 

@@ -138,6 +138,7 @@
     <Compile Include="Graphics\Effect\DXExpression.cs" />
     <Compile Include="Graphics\Effect\DXHelper.cs" />
     <Compile Include="Graphics\Effect\DXPreshader.cs" />
+    <Compile Include="Graphics\Effect\DXPreshader.runtime.cs" />
     <Compile Include="Graphics\Effect\DXShader.cs" />
     <Compile Include="Graphics\Effect\Effect.cs" />
     <Compile Include="Graphics\Effect\EffectAnnotation.cs" />
@@ -482,5 +483,8 @@
     <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect.mgfx" />
     <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect.mgfx" />
     <EmbeddedResource Include="Graphics\Effect\Resources\SpriteEffect.mgfx" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\DualTextureEffect.mgfx" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\EnvironmentMapEffect.mgfx" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\SkinnedEffect.mgfx" />
   </ItemGroup>
 </Project>

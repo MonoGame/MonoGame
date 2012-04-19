@@ -78,7 +78,8 @@ namespace Microsoft.Xna.Framework.Graphics
             else if (param.data is DXExpression)
             {
                 writer.Write((byte)1);
-                WriteExpression(writer, (DXExpression)param.data);
+                var preshader = (DXExpression)param.data;
+                preshader.Write(writer);
             }
             else if (param.data is DXShader)
             {
@@ -134,13 +135,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 writer.Write((byte)state.type);
                 WriteParameter(writer, state.parameter);
             }
-        }
-
-        private static void WriteExpression(BinaryWriter writer, DXExpression expression)
-        {
-            writer.Write(expression.IndexName);
-            writer.Write((ushort)expression.ExpressionCode.Length);
-            writer.Write(expression.ExpressionCode);
         }
 	}
 }
