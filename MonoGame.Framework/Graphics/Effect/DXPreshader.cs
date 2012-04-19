@@ -104,8 +104,8 @@ namespace Microsoft.Xna.Framework.Graphics
 				}
 			}
 
-            //RunPreshader(preshader, _inRegs, outRegs);
-            MojoShader.NativeMethods.MOJOSHADER_runPreshader(ref _preshader, _inRegs, outRegs);
+            RunPreshader(_preshader, _inRegs, outRegs);
+            //MojoShader.NativeMethods.MOJOSHADER_runPreshader(ref _preshader, _inRegs, outRegs);
 		}
 
         enum MOJOSHADER_preshaderOpcode
@@ -150,43 +150,31 @@ namespace Microsoft.Xna.Framework.Graphics
 
         enum MOJOSHADER_preshaderOperandType
         {
-            MOJOSHADER_PRESHADEROPERAND_INPUT,
-            MOJOSHADER_PRESHADEROPERAND_OUTPUT,
-            MOJOSHADER_PRESHADEROPERAND_LITERAL,
-            MOJOSHADER_PRESHADEROPERAND_TEMP,
+            MOJOSHADER_PRESHADEROPERAND_LITERAL = 1,
+            MOJOSHADER_PRESHADEROPERAND_INPUT = 2,
+            MOJOSHADER_PRESHADEROPERAND_OUTPUT = 4,
+            MOJOSHADER_PRESHADEROPERAND_TEMP = 7,
+            MOJOSHADER_PRESHADEROPERAND_UNKN = 0xff,
         };
 
         [StructLayoutAttribute(LayoutKind.Sequential)]
         struct MOJOSHADER_preshaderOperand
         {
-            //[FieldOffset(0)]
             public MOJOSHADER_preshaderOperandType type;
-            //[FieldOffset(4)]
             public uint index;
+	        public int indexingType;
+            public uint indexingIndex;
         };
 
-        [StructLayoutAttribute(LayoutKind.Explicit)]
+        [StructLayoutAttribute(LayoutKind.Sequential)]
         struct MOJOSHADER_preshaderInstruction
         {
-            [FieldOffset(0)]
             public MOJOSHADER_preshaderOpcode opcode;
-
-            [FieldOffset(4)]
             public uint element_count;
-
-            [FieldOffset(8)]
             public uint operand_count;
-
-            [FieldOffset(12)]
             public MOJOSHADER_preshaderOperand operand0;
-
-            [FieldOffset(22)]
             public MOJOSHADER_preshaderOperand operand1;
-
-            [FieldOffset(30)]
             public MOJOSHADER_preshaderOperand operand2;
-
-
 
             public MOJOSHADER_preshaderOperand operand(int index)
             {
@@ -240,10 +228,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     {
                         case MOJOSHADER_preshaderOperandType.MOJOSHADER_PRESHADEROPERAND_LITERAL:
                         {
-                            //assert((index + elems) <= preshader->literal_count);
-
-                            if (_literals.Length == 0)
-                                break;
+                            Debug.Assert((index + elems) <= preshader.literal_count);
 
                             if (!isscalar)
                                 for ( var cpy=0; cpy < elems; cpy++ )
@@ -258,6 +243,8 @@ namespace Microsoft.Xna.Framework.Graphics
                         }
 
                         case MOJOSHADER_preshaderOperandType.MOJOSHADER_PRESHADEROPERAND_INPUT:
+                            if (operand.indexingType == 2)
+                                index += (uint)inRegs[operand.indexingIndex] * 4;
                             if (isscalar)
                                 src[opiter, 0] = inRegs[index];
                             else
@@ -528,20 +515,19 @@ namespace Microsoft.Xna.Framework.Graphics
                         break;
                 }
 
-                //operand = inst.operand(opiter);
+                operand = inst.operand(opiter);
 
                 // Figure out where dst wants to be stored.
                 if (operand.type == MOJOSHADER_preshaderOperandType.MOJOSHADER_PRESHADEROPERAND_TEMP)
                 {
-                    //assert(preshader->temp_count >=
-                            //operand->index + (elemsbytes / sizeof (double)));
+                    //assert(preshader->temp_count >= operand->index + (elemsbytes / sizeof (double)));
 
                     for (var i = 0; i < elems; i++)
                         temps[operand.index + i] = dst[i];
                 }
                 else
                 {
-                    //assert(operand->type == MOJOSHADER_PRESHADEROPERAND_OUTPUT);
+                    Debug.Assert(operand.type == MOJOSHADER_preshaderOperandType.MOJOSHADER_PRESHADEROPERAND_OUTPUT);
 
                     for (var i = 0; i < elems; i++)
                         outRegs[operand.index + i] = (float)dst[i];

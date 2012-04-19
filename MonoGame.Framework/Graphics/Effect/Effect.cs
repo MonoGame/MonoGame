@@ -120,7 +120,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			// Try getting a cached effect object.
             if (!effectObjectCache.TryGetValue(effectData, out effectObject))
 			{
-                effectObject = DXEffectObject.FromCompiledD3DXEffect(effectData);
+                effectObject = DXEffectObject.FromMGFX(effectData);
                 effectObjectCache.Add(effectData, effectObject);
 			}
 	
@@ -136,13 +136,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		internal static byte[] LoadEffectResource(string name)
 		{
             var assembly = typeof(Effect).Assembly;
-
-#if GLSL_EFFECTS
-            name += "GLSL.bin";
-#else
-            name += ".bin";
-#endif
-            var stream = assembly.GetManifestResourceStream("Microsoft.Xna.Framework.Graphics.Effect." + name);
+            var stream = assembly.GetManifestResourceStream(name);
             using (MemoryStream ms = new MemoryStream())
 			{
 				stream.CopyTo(ms);

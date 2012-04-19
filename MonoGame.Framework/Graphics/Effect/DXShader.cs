@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.InteropServices;
+using System.IO;
 
 #if MONOMAC
 using MonoMac.OpenGL;
@@ -39,102 +40,66 @@ namespace Microsoft.Xna.Framework.Graphics
         private readonly MojoShader.MOJOSHADER_attribute[] _attributes;
 
         private readonly DXPreshader _preshader;
-		
-		public DXShader (byte[] byteCode)
-		{
-			var parseDataPtr = MojoShader.NativeMethods.MOJOSHADER_parse(
-					"glsl",
-                    byteCode,
-                    byteCode.Length,
-					IntPtr.Zero,
-					0,
-					IntPtr.Zero,
-					IntPtr.Zero,
-					IntPtr.Zero);
 
-            var parseData = DXHelper.Unmarshal<MojoShader.MOJOSHADER_parseData>(parseDataPtr);			
-			if (parseData.error_count > 0) 
+        public DXShader(BinaryReader reader)
+		{	
+			//if (parseData.preshader != IntPtr.Zero)
+                //_preshader = DXPreshader.CreatePreshader(parseData.preshader);
+
+            var isVertexShader = reader.ReadBoolean();
+            if (isVertexShader)
             {
-				var errors = DXHelper.UnmarshalArray<MojoShader.MOJOSHADER_error>(parseData.errors, parseData.error_count);
-				throw new Exception(errors[0].error);
-			}
-			
-			if (parseData.preshader != IntPtr.Zero)
-                _preshader = DXPreshader.CreatePreshader(parseData.preshader);
-			
-			switch(parseData.shader_type) 
+                ShaderType = ShaderType.VertexShader;
+                _uniforms_float4_name = "vs_uniforms_vec4";
+                _uniforms_int4_name = "vs_uniforms_ivec4";
+                _uniforms_bool_name = "vs_uniforms_bool";
+            }
+            else
             {
-			case MojoShader.MOJOSHADER_shaderType.MOJOSHADER_TYPE_PIXEL:
 				ShaderType = ShaderType.FragmentShader;
                 _uniforms_float4_name = "ps_uniforms_vec4";
                 _uniforms_int4_name = "ps_uniforms_ivec4";
                 _uniforms_bool_name = "ps_uniforms_bool";
-				break;
-			case MojoShader.MOJOSHADER_shaderType.MOJOSHADER_TYPE_VERTEX:
-				ShaderType = ShaderType.VertexShader;
-                _uniforms_float4_name = "vs_uniforms_vec4";
-                _uniforms_int4_name = "vs_uniforms_ivec4";
-                _uniforms_bool_name = "vs_uniforms_bool";
-				break;
-			default:
-				throw new NotSupportedException();
-			}
-			
-			_symbols = DXHelper.UnmarshalArray<MojoShader.MOJOSHADER_symbol>(
-					parseData.symbols, parseData.symbol_count);
-			
-			//try to put the symbols in the order they are eventually packed into the uniform arrays
-			//this /should/ be done by pulling the info from mojoshader
-			Array.Sort (_symbols, delegate (MojoShader.MOJOSHADER_symbol a, MojoShader.MOJOSHADER_symbol b) 
-            {
-				uint va = a.register_index;
-				if (a.info.elements == 1) va += 1024; //hax. mojoshader puts array objects first
-				uint vb = b.register_index;
-				if (b.info.elements == 1) vb += 1024;
-				return va.CompareTo(vb);
-			});//(a, b) => ((int)(a.info.elements > 1))a.register_index.CompareTo(b.register_index));
-			
-			_samplers = DXHelper.UnmarshalArray<MojoShader.MOJOSHADER_sampler>(
-					parseData.samplers, parseData.sampler_count);
-			
-			_attributes = DXHelper.UnmarshalArray<MojoShader.MOJOSHADER_attribute>(
-					parseData.attributes, parseData.attribute_count);
-
-            var float4_count = 0;
-            var int4_count = 0;
-            var bool_count = 0;
-			foreach (var symbol in _symbols) 
-            {
-				switch (symbol.register_set) 
-                {
-				case MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_BOOL:
-					bool_count += (int)symbol.register_count;
-					break;
-				case MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_FLOAT4:
-                    float4_count += (int)symbol.register_count;
-					break;
-				case MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_INT4:
-					int4_count += (int)symbol.register_count;
-					break;
-				default:
-					break;
-				}
 			}
 
-            _uniforms_float4 = new float[float4_count * 4];
+            _glslCode = reader.ReadString();
+
+            var bool_count = (int)reader.ReadByte();
+            var int4_count = (int)reader.ReadByte();
+            var float4_count = (int)reader.ReadByte();
+
+            _uniforms_bool = new int[bool_count];
             _uniforms_int4 = new int[int4_count * 4];
-			_uniforms_bool = new int[bool_count];
-			
-			_glslCode = parseData.output;
-			
-#if GLSLOPTIMIZER
-			//_glslCode = GLSLOptimizer.Optimize(_glslCode, ShaderType);
-#endif
+            _uniforms_float4 = new float[float4_count * 4];
 
-#if IPHONE || ANDROID
-			_glslCode = _glslCode.Replace("#version 110\n", "");
-			_glslCode = "precision mediump float;\nprecision mediump int;\n" + _glslCode;
-#endif
+            var symbolCount = (int)reader.ReadByte();
+            _symbols = new MojoShader.MOJOSHADER_symbol[symbolCount];
+            for (var s=0; s < symbolCount; s++)
+            {
+                _symbols[s].name = reader.ReadString();
+                _symbols[s].register_set = (MojoShader.MOJOSHADER_symbolRegisterSet)reader.ReadByte();
+                _symbols[s].register_index = (uint)reader.ReadByte();
+                _symbols[s].register_count = (uint)reader.ReadByte();
+            }
+
+            var samplerCount = (int)reader.ReadByte();
+            _samplers = new MojoShader.MOJOSHADER_sampler[samplerCount];
+            for (var s = 0; s < samplerCount; s++)
+            {
+                _samplers[s].name = reader.ReadString();
+                _samplers[s].type = (MojoShader.MOJOSHADER_samplerType)reader.ReadByte();
+                _samplers[s].index = (int)reader.ReadByte();
+            }
+
+            var attributeCount = (int)reader.ReadByte();
+            _attributes = new MojoShader.MOJOSHADER_attribute[attributeCount];
+            for (var a = 0; a < attributeCount; a++)
+            {
+                _attributes[a].name = reader.ReadString();
+                _attributes[a].usage = (MojoShader.MOJOSHADER_usage)reader.ReadByte();
+                _attributes[a].index = (int)reader.ReadByte();
+            }
+
             Threading.Begin();
             try
             {
@@ -177,9 +142,6 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 Threading.End();
             }
-
-            //MojoShader.NativeMethods.MOJOSHADER_freeParseData(parseDataPtr);
-			//TODO: dispose properly - DXPreshader holds unmanaged data
 		}
 
 		public void OnLink(int program) 

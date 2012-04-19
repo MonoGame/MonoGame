@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -12,24 +13,44 @@ namespace Microsoft.Xna.Framework.Graphics
         public void Write(BinaryWriter writer)
         {
             // Write a very simple header for identification and versioning.
-            writer.Write(Header);
+            writer.Write(Header.ToCharArray());
             writer.Write((byte)Version);
 
+            // Write the shared objects... we will write the index to
+            // the object later in the file.
+            writer.Write((byte)Objects.Length);
+            for (var o = 0; o < Objects.Length; o++)
+            {
+                var param = Objects[o];
+                writer.Write(param != null);
+                if (param == null)
+                    continue;
+
+                WriteParameter(writer, param);
+
+                // Shove a index in here for later.
+                param.object_id = o;
+            }
+
             // Write the parameters.
-            writer.Write(Parameters.Length);
+            writer.Write((byte)Parameters.Length);
             foreach (var param in Parameters)
                 WriteParameter(writer, param);
 
             // Write the techniques.
-            writer.Write(Techniques.Length);
+            writer.Write((byte)Techniques.Length);
             foreach (var technique in Techniques)
                 WriteTechnique(writer, technique);
         }
 
         private static void WriteParameter(BinaryWriter writer, d3dx_parameter param)
         {
-            writer.Write(param.name);
+            writer.Write((byte)param.object_id);
+            if (param.object_id != -1)
+                return;
+
             writer.Write((byte)param.class_);
+            writer.Write(param.name);
             writer.Write((byte)param.type);
             writer.Write((byte)param.rows);
             writer.Write((byte)param.columns);
@@ -46,11 +67,35 @@ namespace Microsoft.Xna.Framework.Graphics
             writer.Write((byte)count);
             for(var i=0; i < count; i++)
                 WriteParameter(writer, param.member_handles[i]);
-
-            // Now write the data.
-            writer.Write((short)param.bytes);
-            if ( param.bytes > 0 )
+            
+            // Write the data payload.
+            if (param.data is byte[])
+            {
+                writer.Write((byte)0);
+                writer.Write((short)param.bytes);
                 writer.Write((byte[])param.data);
+            }
+            else if (param.data is DXExpression)
+            {
+                writer.Write((byte)1);
+                WriteExpression(writer, (DXExpression)param.data);
+            }
+            else if (param.data is DXShader)
+            {
+                writer.Write((byte)2);
+                var shader = (DXShader)param.data;
+                shader.Write(writer);
+            }
+            else if (param.data is d3dx_sampler)
+            {
+                writer.Write((byte)3);
+                var sampler = (d3dx_sampler)param.data;
+                WriteStates(writer, sampler.states, sampler.state_count);
+            }
+            else
+            {
+                throw new Exception("Unknown data type!");
+            }
         }
 
         private static void WriteAnnotations(BinaryWriter writer, d3dx_parameter[] annotations, uint count)
@@ -73,18 +118,29 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 writer.Write(pass.name);
                 WriteAnnotations(writer, pass.annotation_handles, pass.annotation_count);
+                WriteStates(writer, pass.states, pass.state_count);
+            }
+        }
 
-                writer.Write((byte)pass.state_count);
-                for (var s = 0; s < pass.state_count; s++)
-                {
-                    var state = pass.states[s];
+        private static void WriteStates(BinaryWriter writer, d3dx_state [] states, uint count)
+        {
+            writer.Write((byte)count);
+            for (var s = 0; s < count; s++)
+            {
+                var state = states[s];
 
-                    writer.Write((byte)state.type);
-                    writer.Write((byte)state.operation);
+                writer.Write((ushort)state.index);
+                writer.Write((byte)state.operation);
+                writer.Write((byte)state.type);
+                WriteParameter(writer, state.parameter);
+            }
+        }
 
-                    WriteParameter(writer, state.parameter);
-                }
-            }             
+        private static void WriteExpression(BinaryWriter writer, DXExpression expression)
+        {
+            writer.Write(expression.IndexName);
+            writer.Write((ushort)expression.ExpressionCode.Length);
+            writer.Write(expression.ExpressionCode);
         }
 	}
 }

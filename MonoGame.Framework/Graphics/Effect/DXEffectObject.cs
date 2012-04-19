@@ -294,6 +294,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			public uint flags;
 			public uint bytes;
 
+            // Only used during serialization.
+            public int object_id = -1;
+
 			public d3dx_parameter[] annotation_handles;
 			public d3dx_parameter[] member_handles;
 		}
@@ -546,11 +549,13 @@ namespace Microsoft.Xna.Framework.Graphics
 			new state_info(STATE_CLASS.SETSAMPLER, 0, "Sampler"),
 		};
 
+        public d3dx_parameter[] Objects { get; private set; }
+
         public d3dx_parameter[] Parameters { get; private set; }
 
         public d3dx_technique[] Techniques { get; private set; }
 
-        private static readonly char[] Header = { 'M', 'G', 'F', 'X' };
+        private const string Header = "MGFX";
 
         private const int Version = 1;
 	}

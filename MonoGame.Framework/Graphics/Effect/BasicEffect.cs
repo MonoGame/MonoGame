@@ -374,7 +374,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// Creates a new BasicEffect with default parameter settings.
         /// </summary>
         public BasicEffect(GraphicsDevice device)
-            : base(device, Effect.LoadEffectResource("BasicEffect"))
+            : base(device, Effect.LoadEffectResource("Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect.mgfx"))
         {
             Initialize();
 

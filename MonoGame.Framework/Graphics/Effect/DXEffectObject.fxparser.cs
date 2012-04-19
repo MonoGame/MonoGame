@@ -12,10 +12,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
 	public partial class DXEffectObject
 	{
-        // TODO: This seems to not be used at runtime, so we leave
-        // it here only for offline tool support.
-        public d3dx_parameter[] Objects { get; private set; }
-
         /// <summary>
         /// Returns an effect from a compiled Microsoft D3DX Effect file.
         /// </summary>
@@ -207,8 +203,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 var nameLength = reader.ReadUInt32();
                 var paramName = parse_name(reader, reader.BaseStream.Position - 4);
                 reader.BaseStream.Seek((nameLength + 3) & ~3, SeekOrigin.Current); // DWORD aligned!
-                var expressionData = reader.ReadBytes((int)(length - 4 - nameLength));
-				
+
+                var expressionData = reader.ReadBytes((int)(length - 4 - nameLength));				
                 param.data = new DXExpression(paramName, expressionData);
 				break;
 
@@ -413,6 +409,7 @@ namespace Microsoft.Xna.Framework.Graphics
 					case D3DXPARAMETER_TYPE.PIXELSHADER:
 					case D3DXPARAMETER_TYPE.VERTEXSHADER:
                         var id = reader.ReadUInt32();
+                        Debug.Assert(Objects[id] == null, "Object id collision!");
                         Objects[id] = param;
 						param.data = data;
 						break;
