@@ -42,10 +42,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private readonly DXPreshader _preshader;
 
         public DXShader(BinaryReader reader)
-		{	
-			//if (parseData.preshader != IntPtr.Zero)
-                //_preshader = DXPreshader.CreatePreshader(parseData.preshader);
-
+		{
             var isVertexShader = reader.ReadBoolean();
             if (isVertexShader)
             {
@@ -61,6 +58,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 _uniforms_int4_name = "ps_uniforms_ivec4";
                 _uniforms_bool_name = "ps_uniforms_bool";
 			}
+
+            if (reader.ReadBoolean())
+                _preshader = DXPreshader.CreatePreshader(reader);
 
             _glslCode = reader.ReadString();
 

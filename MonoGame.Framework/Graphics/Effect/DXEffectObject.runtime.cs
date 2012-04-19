@@ -88,9 +88,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 case 1:                    
                     var indexName = reader.ReadString();
-                    var bytes = (int)reader.ReadUInt16();
-                    var expressionCode = reader.ReadBytes(bytes);
-                    param.data = new DXExpression(indexName, expressionCode);
+                    var preshader = DXPreshader.CreatePreshader(reader);
+                    param.data = new DXExpression(indexName, preshader);
                     break;
 
                 case 2:
