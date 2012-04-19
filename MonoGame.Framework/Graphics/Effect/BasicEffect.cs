@@ -384,7 +384,7 @@ namespace Microsoft.Xna.Framework.Graphics
             SpecularColor = Vector3.One;
             SpecularPower = 16;
         }
-        
+
         /// <summary>
         /// Creates a new BasicEffect by cloning parameter settings from an existing instance.
         /// </summary>

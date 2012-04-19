@@ -66,7 +66,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		bool setRasterizerState = false;
 		RasterizerState rasterizerState;
 
-        public string Name { get { return _pass.name; } }
+		public string Name { get { return _pass.name; } }
 
 		public EffectPass(EffectTechnique technique, DXEffectObject.d3dx_pass pass)
         {
@@ -198,7 +198,6 @@ namespace Microsoft.Xna.Framework.Graphics
             // Set/get the correct shader handle/cleanups.
 			_technique._effect.OnApply();
 
-			//Console.WriteLine (_technique._effect.Name+" - "+_technique.Name+" - "+Name);
 			var relink = false;
             foreach (var state in _pass.states)
             {				
@@ -207,7 +206,6 @@ namespace Microsoft.Xna.Framework.Graphics
                     continue;
 
                 var operation = DXEffectObject.state_table[state.operation];
-
                 if (operation.class_ == DXEffectObject.STATE_CLASS.PIXELSHADER ||
                     operation.class_ == DXEffectObject.STATE_CLASS.VERTEXSHADER)
                 {
