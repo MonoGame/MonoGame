@@ -27,6 +27,26 @@
     <Extension path = "/MonoDevelop/Core/StockIcons">
         <StockIcon stockid = "monogame-project" file = "icons/monogame-project-32.png" />
      </Extension>
+	
+	<Extension path = "/MonoDevelop/ProjectModel/MSBuildItemTypes">
+		<DotNetProjectSubtype id="MonoGame"
+			guid="{9b831fef-f496-498f-9fe8-180da5cb4258}"
+			type="MonoDevelop.MonoGame.MonoGameProject">			
+		</DotNetProjectSubtype>
+	</Extension>
+	
+	<Extension path = "/MonoDevelop/Core/MimeTypes">
+		<MimeType id="application/fx" _description="XNA 4.0 Effect File" isText="true">
+			<File pattern="*.fx" />
+		</MimeType>
+		<MimeType id="application/mgfx" _description="MonoGame Effect File" isText="true">
+			<File pattern="*.mgfx" />
+		</MimeType>
+	</Extension>
+	
+	<Extension path = "/MonoDevelop/ProjectModel/ProjectServiceExtensions">
+		<Class class = "MonoDevelop.MonoGame.MonoGameBuildExtension" insertafter="FinalStep" />		
+	</Extension>
 
     <Extension path = "/MonoDevelop/ProjectModel/ProjectBindings">  
         <ProjectBinding id = "MonoGame" class = "MonoDevelop.MonoGame.MonoGameProjectBinding" />  
@@ -37,6 +57,8 @@
         <ProjectTemplate id = "MonoGameForWindowsProject" file = "templates/MonoGameWindowsProject.xpt.xml"/>                
         <ProjectTemplate id = "MonoGameForLinuxProject" file = "templates/MonoGameLinuxProject.xpt.xml"/> 
     </Extension>
+	
+	
 
 	
 </Addin>
