@@ -491,7 +491,7 @@ namespace Microsoft.Xna.Framework.Graphics
             Parameters.Add(eyePositionParam);
             fogColorParam = new EffectParameter(ActiveUniformType.FloatVec3, "FogColor");
             Parameters.Add(fogColorParam);
-            fogVectorParam = new EffectParameter(ActiveUniformType.FloatVec3, "FogVector");
+            fogVectorParam = new EffectParameter(ActiveUniformType.FloatVec4, "FogVector");
             Parameters.Add(fogVectorParam);
             worldParam = new EffectParameter(ActiveUniformType.FloatMat4, "World");
             Parameters.Add(worldParam);
