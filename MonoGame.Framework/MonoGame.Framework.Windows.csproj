@@ -472,14 +472,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\ThirdParty\Libs\libmojoshader_64.dll">
-      <Link>libmojoshader_64.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\ThirdParty\Libs\libmojoshader_32.dll">
-      <Link>libmojoshader_32.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect.mgfx" />
     <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect.mgfx" />
     <EmbeddedResource Include="Graphics\Effect\Resources\SpriteEffect.mgfx" />
