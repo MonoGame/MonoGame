@@ -53,7 +53,7 @@ using Sce.Pss.Core;
 
 namespace Microsoft.Xna.Framework
 {
-    public class PSSGameWindow
+    public class PSSGameWindow : GameWindow
     {
 		private Rectangle clientBounds;
 		private Game _game;
@@ -111,28 +111,6 @@ namespace Microsoft.Xna.Framework
 			}
 		}
 
-        public override bool OnKeyDown(Keycode keyCode, KeyEvent e)
-        {
-            Keyboard.KeyDown(keyCode);
-            // we need to handle the Back key here because it doesnt work any other way
-            if (keyCode == Keycode.Back) //_game.Exit();
-                GamePad.Instance.SetBack();
-
-            if (keyCode == Keycode.VolumeUp)
-                Sound.IncreaseMediaVolume();
-
-            if (keyCode == Keycode.VolumeDown)
-                Sound.DecreaseMediaVolume();
-
-            return true;
-        }
-
-        public override bool OnKeyUp(Keycode keyCode, KeyEvent e)
-        {
-            Keyboard.KeyUp(keyCode);
-            return true;
-        }
-
         ~PSSGameWindow()
 		{
 			//
@@ -164,10 +142,8 @@ namespace Microsoft.Xna.Framework
 
         #region AndroidGameView Methods
 
-        protected override void OnRenderFrame(FrameEventArgs e)
+        internal void OnRenderFrame()
         {
-            base.OnRenderFrame(e);
-            
             if (GraphicsContext == null || GraphicsContext.IsDisposed)
                 return;
 
@@ -190,10 +166,8 @@ namespace Microsoft.Xna.Framework
             }
         }
 
-        protected override void OnUpdateFrame(FrameEventArgs e)
+        internal void OnUpdateFrame()
 		{			
-			base.OnUpdateFrame(e);
-			
 			if (_game != null )
 			{
                 //ObserveDeviceRotation();				
@@ -345,12 +319,12 @@ namespace Microsoft.Xna.Framework
         }
 
         private Dictionary<IntPtr, TouchLocation> _previousTouches = new Dictionary<IntPtr, TouchLocation>();
-
+		/* TODO
 		#region IOnTouchListener implementation
 		public bool OnTouch (View v, MotionEvent e)
         {
 			return OnTouchEvent(e);
-            }
+		}
 		#endregion
 
         internal void UpdateTouchPosition(ref Vector2 position)
@@ -441,7 +415,7 @@ namespace Microsoft.Xna.Framework
 
             return true;
         }
-        
+        */
         public string ScreenDeviceName 
 		{
 			get 

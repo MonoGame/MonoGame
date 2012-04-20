@@ -50,7 +50,7 @@ namespace Microsoft.Xna.Framework.Input
 	public static class Keyboard
 	{
         private static List<Keys> keys = new List<Keys>();
-
+		/* TODO
         private static readonly IDictionary<Keycode, Keys> KeyMap = LoadKeyMap();
 
         public static void KeyDown(Keycode keyCode)
@@ -96,7 +96,7 @@ namespace Microsoft.Xna.Framework.Input
             maps[Keycode.VolumeDown] = Keys.VolumeDown;
             return maps;
         }
-
+		 */
 	    public static KeyboardState GetState()
 		{
 			return new KeyboardState(keys.ToArray()); // TODO Not used on iPhone or Zune
