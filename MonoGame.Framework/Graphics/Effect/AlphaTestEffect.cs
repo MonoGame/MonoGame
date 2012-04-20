@@ -310,7 +310,6 @@ namespace Microsoft.Xna.Framework.Graphics
             return new AlphaTestEffect(this);
         }
 
-
         /// <summary>
         /// Looks up shortcut references to our effect parameters.
         /// </summary>
@@ -324,26 +323,7 @@ namespace Microsoft.Xna.Framework.Graphics
             worldViewProjParam  = Parameters["WorldViewProj"];
             shaderIndexParam    = Parameters["ShaderIndex"];
         }
-
-        internal override void Initialize()
-        {
-#if !WINRT
-            textureParam = new EffectParameter(ActiveUniformType.Sampler2D, "Texture");
-            Parameters.Add(textureParam);
-            diffuseColorParam = new EffectParameter(ActiveUniformType.FloatVec4, "DiffuseColor");
-            Parameters.Add(diffuseColorParam);
-            alphaTestParam = new EffectParameter(ActiveUniformType.FloatVec4, "AlphaTest");
-            Parameters.Add(alphaTestParam);
-            fogColorParam = new EffectParameter(ActiveUniformType.FloatVec3, "FogColor");
-            Parameters.Add(fogColorParam);
-            fogVectorParam = new EffectParameter(ActiveUniformType.FloatVec4, "FogVector");
-            Parameters.Add(fogVectorParam);
-            worldViewProjParam = new EffectParameter(ActiveUniformType.FloatMat4, "WorldViewProj");
-            Parameters.Add(worldViewProjParam);
-#endif
-        }
-
-
+        
         /// <summary>
         /// Lazily computes derived parameter values immediately before applying the effect.
         /// </summary>

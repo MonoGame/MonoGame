@@ -78,14 +78,6 @@ namespace Microsoft.Xna.Framework.Graphics
             matrixParam = Parameters["MatrixTransform"];
         }
 
-        internal override void Initialize()
-        {
-#if !WINRT
-            matrixParam = new EffectParameter(ActiveUniformType.FloatMat4, "MatrixTransform");
-            Parameters.Add(matrixParam);
-#endif
-        }
-
         /// <summary>
         /// Lazily computes derived parameter values immediately before applying the effect.
         /// </summary>
