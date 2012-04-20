@@ -414,11 +414,11 @@ namespace Microsoft.Xna.Framework.Graphics
                     case MOJOSHADER_preshaderOpcode.NOISE:
                     case MOJOSHADER_preshaderOpcode.DOT_SCALAR: // Just a MUL?
                     case MOJOSHADER_preshaderOpcode.NOISE_SCALAR:
-                    Debug.Fail("Unimplemented preshader opcode!");
+                    throw new Exception("Unimplemented preshader opcode!");
                     break;
 
                     default:
-                        Debug.Fail("Unknown preshader opcode!");
+                        throw new Exception("Unknown preshader opcode!");
                         break;
                 }
 
