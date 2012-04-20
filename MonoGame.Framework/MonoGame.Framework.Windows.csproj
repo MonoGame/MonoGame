@@ -146,7 +146,6 @@
     <Compile Include="Graphics\Effect\EffectHelpers.cs" />
     <Compile Include="Graphics\Effect\EffectPass.cs" />
     <Compile Include="Graphics\Effect\EnvironmentMapEffect.cs" />
-    <Compile Include="Graphics\Effect\GLSLOptimizer.cs" />
     <Compile Include="Graphics\Effect\MojoShader.cs" />
     <Compile Include="Graphics\Effect\SkinnedEffect.cs" />
     <Compile Include="Graphics\GraphicsAdapter.cs" />
