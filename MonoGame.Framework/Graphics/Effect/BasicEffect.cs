@@ -376,8 +376,6 @@ namespace Microsoft.Xna.Framework.Graphics
         public BasicEffect(GraphicsDevice device)
             : base(device, Effect.LoadEffectResource("Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect.mgfx"))
         {
-            Initialize();
-
             CacheEffectParameters(null);
 
             DirectionalLight0.Enabled = true;

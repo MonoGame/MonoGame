@@ -144,10 +144,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 
-        internal virtual void Initialize()
-        {
-        }
-
 		public virtual Effect Clone ()
 		{
 			throw new NotImplementedException();
