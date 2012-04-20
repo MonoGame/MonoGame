@@ -42,6 +42,7 @@
 using System;
 
 using Sce.Pss.Core.Environment;
+using Sce.Pss.Core.Input;
 
 namespace Microsoft.Xna.Framework.Input
 {
@@ -49,21 +50,11 @@ namespace Microsoft.Xna.Framework.Input
 	{
 		private static AccelerometerState _state;
 		private static AccelerometerCapabilities _capabilities = new AccelerometerCapabilities();
-        private static SensorManager _sensorManger;
-        private static Sensor _sensor;
 		private static Vector3 _accelerometerVector = new Vector3(0, 0, 0);
-        private static SensorListener listener = new SensorListener();
 		
 		public static void SetupAccelerometer()
 		{
-            _sensorManger = (SensorManager)Game.Activity.GetSystemService(Context.SensorService);
-            _sensor = _sensorManger.GetDefaultSensor(SensorType.Accelerometer);
-
-            if (_sensor != null) 
-            {
-                _state = new AccelerometerState { IsConnected = true };                
-            }
-            else _state = new AccelerometerState { IsConnected = false };
+            _state = new AccelerometerState { IsConnected = true };                
         }
 
 		public static AccelerometerCapabilities GetCapabilities()
@@ -75,55 +66,11 @@ namespace Microsoft.Xna.Framework.Input
 		{
 			return _state;
 		}
-
-        private class SensorListener // TOdO : Java.Lang.Object, ISensorEventListener
-        {
-            public void OnAccuracyChanged(Sensor sensor, int accuracy)
-            {
-               //do nothing
-            }
-
-            public void OnSensorChanged(SensorEvent e)
-            {
-                try {
-					
-					if (e != null && e.Sensor.Type == SensorType.Accelerometer) 
-					{
-     				    var values = e.Values;
-				        try 
-						{
-				            if (values != null && values.Count == 3) {
-				                _accelerometerVector.X = values[0];
-				                _accelerometerVector.Y = values[1];
-				                _accelerometerVector.Z = values[2];  
-							    _state.Acceleration = _accelerometerVector;
-				            }
-				        } 
-						finally 
-						{
-				            IDisposable d = values as IDisposable;
-				            if (d != null)
-				                d.Dispose ();
-				        }
-    				}                
-                }
-                catch (NullReferenceException ex) {
-                    //Occassionally an NullReferenceException is thrown when accessing e.Values??
-                    // mono    : Unhandled Exception: System.NullReferenceException: Object reference not set to an instance of an object
-                    // mono    :   at Android.Runtime.JNIEnv.GetObjectField (IntPtr jobject, IntPtr jfieldID) [0x00000] in <filename unknown>:0 
-                    // mono    :   at Android.Hardware.SensorEvent.get_Values () [0x00000] in <filename unknown>:0
-                }
-            }
-        }
-
-        internal static void Pause()
-        {
-            if (_sensorManger != null && _sensor != null) _sensorManger.UnregisterListener(listener, _sensor);
-        }
-
-        internal static void Resume()
-        {
-            if (_sensorManger != null && _sensor != null) _sensorManger.RegisterListener(listener, _sensor, SensorDelay.Game);            
-        }
+		
+		internal static void Update() //TODO: Call this regularly
+		{
+			var motionData = Motion.GetData(0);
+			_accelerometerVector = motionData.Acceleration;
+		}
     }
 }

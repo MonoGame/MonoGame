@@ -5,6 +5,8 @@ using System.Runtime.InteropServices;
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
+#elif PSS
+using Sce.Pss.Core.Graphics;
 #elif WINRT
 // TODO
 #else
