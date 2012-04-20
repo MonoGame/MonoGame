@@ -21,7 +21,8 @@ namespace Microsoft.Xna.Framework.Graphics
             for (int i = 0; i < count; i++)
             {
                 var offset = i * size;
-                ret[i] = (T)Marshal.PtrToStructure(ptr + offset, type);
+				var structPtr = new IntPtr(ptr.ToInt64() + offset);
+                ret[i] = (T)Marshal.PtrToStructure(structPtr, type);
             }
 
 			return ret;

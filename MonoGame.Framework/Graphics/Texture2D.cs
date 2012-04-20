@@ -70,6 +70,7 @@ using TextureParameterName = OpenTK.Graphics.ES20.All;
 using TextureMinFilter = OpenTK.Graphics.ES20.All;
 using PixelInternalFormat = OpenTK.Graphics.ES20.All;
 using PixelType = OpenTK.Graphics.ES20.All;
+using ErrorCode = OpenTK.Graphics.ES20.All;
 #endif
 
 using Microsoft.Xna.Framework.Content;
