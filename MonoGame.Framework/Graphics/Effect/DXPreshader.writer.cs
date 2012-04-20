@@ -37,7 +37,7 @@ namespace Microsoft.Xna.Framework.Graphics
             var symbols = DXHelper.UnmarshalArray<MojoShader.MOJOSHADER_symbol>(
                     preshaderData.symbols, (int)preshaderData.symbol_count);
 
-            var instructions = DXHelper.UnmarshalArray<MOJOSHADER_preshaderInstruction>(
+            var instructions = DXHelper.UnmarshalArray<MojoShader.MOJOSHADER_preshaderInstruction>(
                 preshaderData.instructions, (int)preshaderData.instruction_count);
 
             var literals = DXHelper.UnmarshalArray<double>(
@@ -89,7 +89,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 for (var o = 0; o < inst.operand_count; o++)
                 {
-                    var op = inst.operand(o);
+                    var op = inst.operands[o];
                     writer.Write((byte)op.type);
                     writer.Write((byte)op.index);
                     writer.Write((byte)op.indexingType);

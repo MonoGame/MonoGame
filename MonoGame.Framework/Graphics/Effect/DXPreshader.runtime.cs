@@ -29,23 +29,24 @@ namespace Microsoft.Xna.Framework.Graphics
                 literals[l] = reader.ReadDouble();
 
             var instructionCount = (int)reader.ReadByte();
-            var instructions = new MOJOSHADER_preshaderInstruction[instructionCount];
+            var instructions = new MojoShader.MOJOSHADER_preshaderInstruction[instructionCount];
             for (var i = 0; i < instructions.Length; i++)
             {
-                instructions[i].opcode = (MOJOSHADER_preshaderOpcode)reader.ReadByte();
+                instructions[i].opcode = (MojoShader.MOJOSHADER_preshaderOpcode)reader.ReadByte();
                 instructions[i].element_count = reader.ReadByte();
                 instructions[i].operand_count = reader.ReadByte();
+                instructions[i].operands = new MojoShader.MOJOSHADER_preshaderOperand[4];
 
                 for (var o = 0; o < instructions[i].operand_count; o++)
                 {
-                    var op = new MOJOSHADER_preshaderOperand();
+                    var op = new MojoShader.MOJOSHADER_preshaderOperand();
 
-                    op.type = (MOJOSHADER_preshaderOperandType)reader.ReadByte();
+                    op.type = (MojoShader.MOJOSHADER_preshaderOperandType)reader.ReadByte();
                     op.index = reader.ReadByte();
                     op.indexingType = reader.ReadByte();
                     op.indexingIndex = reader.ReadByte();
 
-                    instructions[i].operand(o, op);
+                    instructions[i].operands[o] = op;
                 }
             }
 
@@ -99,14 +100,13 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 
             RunPreshader(_inRegs, outRegs);
-            //MojoShader.NativeMethods.MOJOSHADER_runPreshader(ref _preshader, _inRegs, outRegs);
 		}
 
         private void RunPreshader(float[] inRegs, float[] outRegs)
         {
             // this is fairly straightforward, as there aren't any branching
             //  opcodes in the preshader instruction set (at the moment, at least).
-            const int scalarstart = (int)MOJOSHADER_preshaderOpcode.SCALAR_OPS;
+            const int scalarstart = (int)MojoShader.MOJOSHADER_preshaderOpcode.MOJOSHADER_PRESHADEROP_SCALAR_OPS;
             
             // TODO: Allocate this once at startup.
             var dst = new double [] { 0, 0, 0, 0 };
@@ -124,19 +124,19 @@ namespace Microsoft.Xna.Framework.Graphics
                 //assert(elems >= 0);
                 //assert(elems <= 4);
 
-                var operand = new MOJOSHADER_preshaderOperand();
+                var operand = new MojoShader.MOJOSHADER_preshaderOperand();
 
                 // load up our operands...
                 int opiter, elemiter;
                 for (opiter = 0; opiter < inst.operand_count-1; opiter++)
                 {
-                    operand = inst.operand(opiter);
+                    operand = inst.operands[opiter];
 
                     var isscalar = ((isscalarop) && (opiter == 0));
                     var index = operand.index;
                     switch (operand.type)
                     {
-                        case MOJOSHADER_preshaderOperandType.MOJOSHADER_PRESHADEROPERAND_LITERAL:
+                        case MojoShader.MOJOSHADER_preshaderOperandType.MOJOSHADER_PRESHADEROPERAND_LITERAL:
                         {
                             Debug.Assert((index + elems) <= _literals.Length);
 
@@ -152,7 +152,7 @@ namespace Microsoft.Xna.Framework.Graphics
                             break;
                         }
 
-                        case MOJOSHADER_preshaderOperandType.MOJOSHADER_PRESHADEROPERAND_INPUT:
+                        case MojoShader.MOJOSHADER_preshaderOperandType.MOJOSHADER_PRESHADEROPERAND_INPUT:
                             if (operand.indexingType == 2)
                                 index += (uint)inRegs[operand.indexingIndex] * 4;
                             if (isscalar)
@@ -164,7 +164,7 @@ namespace Microsoft.Xna.Framework.Graphics
                             }
                             break;
 
-                        case MOJOSHADER_preshaderOperandType.MOJOSHADER_PRESHADEROPERAND_OUTPUT:
+                        case MojoShader.MOJOSHADER_preshaderOperandType.MOJOSHADER_PRESHADEROPERAND_OUTPUT:
                             if (isscalar)
                                 src[opiter,0] = outRegs[index];
                             else
@@ -175,7 +175,7 @@ namespace Microsoft.Xna.Framework.Graphics
                             }
                             break;
 
-                        case MOJOSHADER_preshaderOperandType.MOJOSHADER_PRESHADEROPERAND_TEMP:
+                        case MojoShader.MOJOSHADER_preshaderOperandType.MOJOSHADER_PRESHADEROPERAND_TEMP:
                                 if (isscalar)
                                     src[opiter, 0] = _temps[index];
                                 else
@@ -193,213 +193,213 @@ namespace Microsoft.Xna.Framework.Graphics
                 // run the actual instruction, store result to dst.
                 switch (inst.opcode)
                 {
-                    case MOJOSHADER_preshaderOpcode.NOP:
+                    case MojoShader.MOJOSHADER_preshaderOpcode.MOJOSHADER_PRESHADEROP_NOP:
                         break;
 
-                    case MOJOSHADER_preshaderOpcode.MOV:
+                    case MojoShader.MOJOSHADER_preshaderOpcode.MOJOSHADER_PRESHADEROP_MOV:
                     {
                         for (var i = 0; i < elems; i++) 
                             dst[i] = src[0,i];
                         break; 
                     }
 
-                    case MOJOSHADER_preshaderOpcode.NEG:
+                    case MojoShader.MOJOSHADER_preshaderOpcode.MOJOSHADER_PRESHADEROP_NEG:
                     {
                         for (var i = 0; i < elems; i++) 
                             dst[i] = -src[0,i];
                         break; 
                     }
 
-                    case MOJOSHADER_preshaderOpcode.RCP:
+                    case MojoShader.MOJOSHADER_preshaderOpcode.MOJOSHADER_PRESHADEROP_RCP:
                     {
                         for (var i = 0; i < elems; i++) 
                             dst[i] = 1.0 / src[0,i];
                         break; 
                     }
 
-                    case MOJOSHADER_preshaderOpcode.FRC:
+                    case MojoShader.MOJOSHADER_preshaderOpcode.MOJOSHADER_PRESHADEROP_FRC:
                     {
                         for (var i = 0; i < elems; i++) 
                             dst[i] = src[0,i] - Math.Floor(src[0,i]);
                         break; 
                     }
 
-                    case MOJOSHADER_preshaderOpcode.EXP:
+                    case MojoShader.MOJOSHADER_preshaderOpcode.MOJOSHADER_PRESHADEROP_EXP:
                     {
                         for (var i = 0; i < elems; i++) 
                             dst[i] = Math.Exp(src[0,i]);
                         break; 
                     }
 
-                    case MOJOSHADER_preshaderOpcode.LOG:
+                    case MojoShader.MOJOSHADER_preshaderOpcode.MOJOSHADER_PRESHADEROP_LOG:
                     {
                         for (var i = 0; i < elems; i++) 
                             dst[i] = Math.Log(src[0,i]);
                         break; 
                     }
 
-                    case MOJOSHADER_preshaderOpcode.RSQ:
+                    case MojoShader.MOJOSHADER_preshaderOpcode.MOJOSHADER_PRESHADEROP_RSQ:
                     {
                         for (var i = 0; i < elems; i++) 
                             dst[i] = 1.0 / Math.Sqrt(src[0,i]);
                         break; 
                     }
 
-                    case MOJOSHADER_preshaderOpcode.SIN:
+                    case MojoShader.MOJOSHADER_preshaderOpcode.MOJOSHADER_PRESHADEROP_SIN:
                     {
                         for (var i = 0; i < elems; i++) 
                             dst[i] = Math.Sin(src[0,i]);
                         break; 
                     }
 
-                    case MOJOSHADER_preshaderOpcode.COS:
+                    case MojoShader.MOJOSHADER_preshaderOpcode.MOJOSHADER_PRESHADEROP_COS:
                     {
                         for (var i = 0; i < elems; i++) 
                             dst[i] = Math.Cos(src[0,i]);
                         break; 
                     }
 
-                    case MOJOSHADER_preshaderOpcode.ASIN:
+                    case MojoShader.MOJOSHADER_preshaderOpcode.MOJOSHADER_PRESHADEROP_ASIN:
                     {
                         for (var i = 0; i < elems; i++) 
                             dst[i] = Math.Asin(src[0,i]);
                         break; 
                     }
 
-                    case MOJOSHADER_preshaderOpcode.ACOS:
+                    case MojoShader.MOJOSHADER_preshaderOpcode.MOJOSHADER_PRESHADEROP_ACOS:
                     {
                         for (var i = 0; i < elems; i++) 
                             dst[i] = Math.Acos(src[0,i]);
                         break; 
                     }
 
-                    case MOJOSHADER_preshaderOpcode.ATAN:
+                    case MojoShader.MOJOSHADER_preshaderOpcode.MOJOSHADER_PRESHADEROP_ATAN:
                     {
                         for (var i = 0; i < elems; i++) 
                             dst[i] = Math.Atan(src[0,i]);
                         break; 
                     }
 
-                    case MOJOSHADER_preshaderOpcode.MIN:
+                    case MojoShader.MOJOSHADER_preshaderOpcode.MOJOSHADER_PRESHADEROP_MIN:
                     {
                         for (var i = 0; i < elems; i++) 
                             dst[i] = src[0,i] < src[1,i] ? src[0,i] : src[1,i];
                         break; 
                     }
 
-                    case MOJOSHADER_preshaderOpcode.MAX:
+                    case MojoShader.MOJOSHADER_preshaderOpcode.MOJOSHADER_PRESHADEROP_MAX:
                     {
                         for (var i = 0; i < elems; i++) 
                             dst[i] = src[0,i] > src[1,i] ? src[0,i] : src[1,i];
                         break; 
                     }
 
-                    case MOJOSHADER_preshaderOpcode.LT:
+                    case MojoShader.MOJOSHADER_preshaderOpcode.MOJOSHADER_PRESHADEROP_LT:
                     {
                         for (var i = 0; i < elems; i++) 
                             dst[i] = src[0,i] < src[1,i] ? 1.0 : 0.0;
                         break; 
                     }
 
-                    case MOJOSHADER_preshaderOpcode.GE:
+                    case MojoShader.MOJOSHADER_preshaderOpcode.MOJOSHADER_PRESHADEROP_GE:
                     {
                         for (var i = 0; i < elems; i++) 
                             dst[i] = src[0,i] >= src[1,i] ? 1.0 : 0.0;
                         break; 
                     }
 
-                    case MOJOSHADER_preshaderOpcode.ADD:
+                    case MojoShader.MOJOSHADER_preshaderOpcode.MOJOSHADER_PRESHADEROP_ADD:
                     {
                         for (var i = 0; i < elems; i++) 
                             dst[i] = src[0,i] + src[1,i];
                         break; 
                     }
 
-                    case MOJOSHADER_preshaderOpcode.MUL:
+                    case MojoShader.MOJOSHADER_preshaderOpcode.MOJOSHADER_PRESHADEROP_MUL:
                     {
                         for (var i = 0; i < elems; i++) 
                             dst[i] = src[0,i] * src[1,i];
                         break; 
                     }
 
-                    case MOJOSHADER_preshaderOpcode.DIV:
+                    case MojoShader.MOJOSHADER_preshaderOpcode.MOJOSHADER_PRESHADEROP_DIV:
                     {
                         for (var i = 0; i < elems; i++) 
                             dst[i] = src[0,i] / src[1,i];
                         break; 
                     }
 
-                    case MOJOSHADER_preshaderOpcode.ATAN2:
+                    case MojoShader.MOJOSHADER_preshaderOpcode.MOJOSHADER_PRESHADEROP_ATAN2:
                     {
                         for (var i = 0; i < elems; i++) 
                             dst[i] = Math.Atan2(src[0,i], src[1,i]);
                         break; 
                     }
 
-                    case MOJOSHADER_preshaderOpcode.CMP:
+                    case MojoShader.MOJOSHADER_preshaderOpcode.MOJOSHADER_PRESHADEROP_CMP:
                     {
                         for (var i = 0; i < elems; i++) 
                             dst[i] = src[0,i] >= 0.0 ? src[1,i] : src[2,i];
                         break; 
                     }
 
-                    case MOJOSHADER_preshaderOpcode.MIN_SCALAR:
+                    case MojoShader.MOJOSHADER_preshaderOpcode.MOJOSHADER_PRESHADEROP_MIN_SCALAR:
                     {
                         for (var i = 0; i < elems; i++) 
                             dst[i] = src[0,0] < src[1,i] ? src[0,0] : src[1,i];
                         break; 
                     }
 
-                    case MOJOSHADER_preshaderOpcode.MAX_SCALAR:
+                    case MojoShader.MOJOSHADER_preshaderOpcode.MOJOSHADER_PRESHADEROP_MAX_SCALAR:
                     {
                         for (var i = 0; i < elems; i++) 
                             dst[i] = src[0,0] > src[1,i] ? src[0,0] : src[1,i];
                         break; 
                     }
 
-                    case MOJOSHADER_preshaderOpcode.LT_SCALAR:
+                    case MojoShader.MOJOSHADER_preshaderOpcode.MOJOSHADER_PRESHADEROP_LT_SCALAR:
                     {
                         for (var i = 0; i < elems; i++) 
                             dst[i] = src[0,0] < src[1,i] ? 1.0 : 0.0;
                         break; 
                     }
 
-                    case MOJOSHADER_preshaderOpcode.GE_SCALAR:
+                    case MojoShader.MOJOSHADER_preshaderOpcode.MOJOSHADER_PRESHADEROP_GE_SCALAR:
                     {
                         for (var i = 0; i < elems; i++) 
                             dst[i] = src[0,0] >= src[1,i] ? 1.0 : 0.0;
                         break; 
                     }
 
-                    case MOJOSHADER_preshaderOpcode.ADD_SCALAR:
+                    case MojoShader.MOJOSHADER_preshaderOpcode.MOJOSHADER_PRESHADEROP_ADD_SCALAR:
                     {
                         for (var i = 0; i < elems; i++) 
                             dst[i] = src[0,0] + src[1,i];
                         break; 
                     }
 
-                    case MOJOSHADER_preshaderOpcode.MUL_SCALAR:
+                    case MojoShader.MOJOSHADER_preshaderOpcode.MOJOSHADER_PRESHADEROP_MUL_SCALAR:
                     {
                         for (var i = 0; i < elems; i++) 
                             dst[i] = src[0,0] * src[1,i];
                         break; 
                     }
 
-                    case MOJOSHADER_preshaderOpcode.DIV_SCALAR:
+                    case MojoShader.MOJOSHADER_preshaderOpcode.MOJOSHADER_PRESHADEROP_DIV_SCALAR:
                     {
                         for (var i = 0; i < elems; i++) 
                             dst[i] = src[0,0] / src[1,i];
                         break; 
                     }
 
-                    case MOJOSHADER_preshaderOpcode.ATAN2_SCALAR:
+                    case MojoShader.MOJOSHADER_preshaderOpcode.MOJOSHADER_PRESHADEROP_ATAN2_SCALAR:
                     {
                         for (var i = 0; i < elems; i++) 
                             dst[i] = Math.Atan2(src[0,0], src[1,i]);
                         break; 
                     }
 
-                    case MOJOSHADER_preshaderOpcode.DOT:
+                    case MojoShader.MOJOSHADER_preshaderOpcode.MOJOSHADER_PRESHADEROP_DOT:
                     {
                         var final = 0.0;
                         for (var i = 0; i < elems; i++)
@@ -410,10 +410,10 @@ namespace Microsoft.Xna.Framework.Graphics
                         break;
                     }
 
-                    case MOJOSHADER_preshaderOpcode.MOVC:
-                    case MOJOSHADER_preshaderOpcode.NOISE:
-                    case MOJOSHADER_preshaderOpcode.DOT_SCALAR: // Just a MUL?
-                    case MOJOSHADER_preshaderOpcode.NOISE_SCALAR:
+                    case MojoShader.MOJOSHADER_preshaderOpcode.MOJOSHADER_PRESHADEROP_MOVC:
+                    case MojoShader.MOJOSHADER_preshaderOpcode.MOJOSHADER_PRESHADEROP_NOISE:
+                    case MojoShader.MOJOSHADER_preshaderOpcode.MOJOSHADER_PRESHADEROP_DOT_SCALAR: // Just a MUL?
+                    case MojoShader.MOJOSHADER_preshaderOpcode.MOJOSHADER_PRESHADEROP_NOISE_SCALAR:
                     throw new Exception("Unimplemented preshader opcode!");
                     break;
 
@@ -422,10 +422,10 @@ namespace Microsoft.Xna.Framework.Graphics
                         break;
                 }
 
-                operand = inst.operand(opiter);
+                operand = inst.operands[opiter];
 
                 // Figure out where dst wants to be stored.
-                if (operand.type == MOJOSHADER_preshaderOperandType.MOJOSHADER_PRESHADEROPERAND_TEMP)
+                if (operand.type == MojoShader.MOJOSHADER_preshaderOperandType.MOJOSHADER_PRESHADEROPERAND_TEMP)
                 {
                     //assert(_temps.Length >= operand->index + (elemsbytes / sizeof (double)));
 
@@ -434,7 +434,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
                 else
                 {
-                    Debug.Assert(operand.type == MOJOSHADER_preshaderOperandType.MOJOSHADER_PRESHADEROPERAND_OUTPUT);
+                    Debug.Assert(operand.type == MojoShader.MOJOSHADER_preshaderOperandType.MOJOSHADER_PRESHADEROPERAND_OUTPUT);
 
                     for (var i = 0; i < elems; i++)
                         outRegs[operand.index + i] = (float)dst[i];
