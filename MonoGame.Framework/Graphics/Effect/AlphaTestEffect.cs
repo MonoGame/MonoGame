@@ -39,37 +39,8 @@ namespace Microsoft.Xna.Framework.Graphics
         EffectParameter fogColorParam;
         EffectParameter fogVectorParam;
         EffectParameter worldViewProjParam;
+        EffectParameter shaderIndexParam;
 
-#if NOMOJO
-        static readonly string[] vertexShaderFilenames = new string[] 
-		{
-			"Microsoft.Xna.Framework.Graphics.Effect.Resources.AlphaTestEffect.VSAlphaTest.glsl",
-			"Microsoft.Xna.Framework.Graphics.Effect.Resources.AlphaTestEffect.VSAlphaTestNoFog.glsl",
-			"Microsoft.Xna.Framework.Graphics.Effect.Resources.AlphaTestEffect.VSAlphaTestVc.glsl",
-			"Microsoft.Xna.Framework.Graphics.Effect.Resources.AlphaTestEffect.VSAlphaTestVcNoFog.glsl"
-		};
-
-        static readonly string[] fragmentShaderFilenames = new string[]
-		{
-			"Microsoft.Xna.Framework.Graphics.Effect.Resources.AlphaTestEffect.PSAlphaTestLtGt.glsl",
-			"Microsoft.Xna.Framework.Graphics.Effect.Resources.AlphaTestEffect.PSAlphaTestLtGtNoFog.glsl",
-            "Microsoft.Xna.Framework.Graphics.Effect.Resources.AlphaTestEffect.PSAlphaTestEqNe.glsl",
-			"Microsoft.Xna.Framework.Graphics.Effect.Resources.AlphaTestEffect.PSAlphaTestEqNeNoFog.glsl"
-		};
-
-        static readonly Tuple<int, int>[] programIndices = new Tuple<int, int>[]
-		{
-			new Tuple<int, int>(0, 0),
-			new Tuple<int, int>(1, 1),
-			new Tuple<int, int>(2, 0),
-			new Tuple<int, int>(3, 1),
-			new Tuple<int, int>(0, 2),
-			new Tuple<int, int>(1, 3),
-			new Tuple<int, int>(2, 2),
-			new Tuple<int, int>(3, 3)
-		};
-
-#endif
         #endregion
 
         #region Fields
@@ -296,35 +267,14 @@ namespace Microsoft.Xna.Framework.Graphics
 
         #region Methods
 
-#if NOMOJO
         /// <summary>
         /// Creates a new AlphaTestEffect with default parameter settings.
         /// </summary>
         public AlphaTestEffect(GraphicsDevice device)
-            : base(device, AlphaTestEffect.vertexShaderFilenames,
-                           AlphaTestEffect.fragmentShaderFilenames, 
-                           AlphaTestEffect.programIndices)
-        {
-			Initialize();
-			
-            CacheEffectParameters();
-
-            Techniques.Add(new EffectTechnique(this));
-
-            
-
-        }
-#else
-        /// <summary>
-        /// Creates a new AlphaTestEffect with default parameter settings.
-        /// </summary>
-        public AlphaTestEffect(GraphicsDevice device)
-            : base(device, Effect.LoadEffectResource("AlphaTestEffect"))
+            : base(device, Effect.LoadEffectResource("Microsoft.Xna.Framework.Graphics.Effect.Resources.AlphaTestEffect.mgfx"))
         {
             CacheEffectParameters();
         }
-#endif
-
 
         /// <summary>
         /// Creates a new AlphaTestEffect by cloning parameter settings from an existing instance.
@@ -353,7 +303,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
         }
 
-
         /// <summary>
         /// Creates a clone of the current AlphaTestEffect instance.
         /// </summary>
@@ -361,7 +310,6 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             return new AlphaTestEffect(this);
         }
-
 
         /// <summary>
         /// Looks up shortcut references to our effect parameters.
@@ -376,26 +324,7 @@ namespace Microsoft.Xna.Framework.Graphics
             worldViewProjParam  = Parameters["WorldViewProj"];
             shaderIndexParam    = Parameters["ShaderIndex"];
         }
-
-        internal override void Initialize()
-        {
-#if !WINRT
-            textureParam = new EffectParameter(ActiveUniformType.Sampler2D, "Texture");
-            Parameters.Add(textureParam);
-            diffuseColorParam = new EffectParameter(ActiveUniformType.FloatVec4, "DiffuseColor");
-            Parameters.Add(diffuseColorParam);
-            alphaTestParam = new EffectParameter(ActiveUniformType.FloatVec4, "AlphaTest");
-            Parameters.Add(alphaTestParam);
-            fogColorParam = new EffectParameter(ActiveUniformType.FloatVec3, "FogColor");
-            Parameters.Add(fogColorParam);
-            fogVectorParam = new EffectParameter(ActiveUniformType.FloatVec4, "FogVector");
-            Parameters.Add(fogVectorParam);
-            worldViewProjParam = new EffectParameter(ActiveUniformType.FloatMat4, "WorldViewProj");
-            Parameters.Add(worldViewProjParam);
-#endif
-        }
-
-
+        
         /// <summary>
         /// Lazily computes derived parameter values immediately before applying the effect.
         /// </summary>

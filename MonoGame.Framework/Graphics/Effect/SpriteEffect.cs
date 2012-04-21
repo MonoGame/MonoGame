@@ -42,49 +42,14 @@ namespace Microsoft.Xna.Framework.Graphics
 
         #region Methods
 
-#if NOMOJO
-
-        public static readonly string[] vertexShaderFilenames = new string[] 
-		{
-			"Microsoft.Xna.Framework.Graphics.Effect.Resources.SpriteEffect.VSSprite.glsl"
-		};
-
-        public static readonly string[] fragmentShaderFilenames = new string[]
-		{
-			"Microsoft.Xna.Framework.Graphics.Effect.Resources.SpriteEffect.PSSprite.glsl"
-		};
-
-        static readonly int[] vertexShaderIndices = new int[] { 0 };
-        static readonly int[] fragmentShaderIndices = new int[] { 0 };
-
-        public static readonly Tuple<int, int>[] programIndices = new Tuple<int, int>[]
-		{
-			new Tuple<int, int>(0, 0)
-		};
-
-
-        public SpriteEffect(GraphicsDevice device)
-            : base(device,
-                SpriteEffect.vertexShaderFilenames,
-                SpriteEffect.fragmentShaderFilenames,
-                SpriteEffect.programIndices)
-        {
-            Initialize();
-
-            CacheEffectParameters();
-
-            Techniques.Add(new EffectTechnique(this));
-        }
-#else
         /// <summary>
         /// Creates a new SpriteEffect.
         /// </summary>
         public SpriteEffect(GraphicsDevice device)
-            : base(device, Effect.LoadEffectResource("SpriteEffect"))
+            : base(device, Effect.LoadEffectResource("Microsoft.Xna.Framework.Graphics.Effect.Resources.SpriteEffect.mgfx"))
         {
             CacheEffectParameters();
         }
-#endif
 
         /// <summary>
         /// Creates a new SpriteEffect by cloning parameter settings from an existing instance.
@@ -111,14 +76,6 @@ namespace Microsoft.Xna.Framework.Graphics
         void CacheEffectParameters()
         {
             matrixParam = Parameters["MatrixTransform"];
-        }
-
-        internal override void Initialize()
-        {
-#if !WINRT
-            matrixParam = new EffectParameter(ActiveUniformType.FloatMat4, "MatrixTransform");
-            Parameters.Add(matrixParam);
-#endif
         }
 
         /// <summary>
