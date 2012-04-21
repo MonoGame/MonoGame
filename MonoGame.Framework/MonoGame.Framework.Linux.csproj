@@ -349,7 +349,6 @@
     <Compile Include="Graphics\Effect\EffectParameter.cs" />
     <Compile Include="Graphics\Effect\EffectPass.cs" />
     <Compile Include="Graphics\Effect\EnvironmentMapEffect.cs" />
-    <Compile Include="Graphics\Effect\GLSLOptimizer.cs" />
     <Compile Include="Graphics\Effect\MojoShader.cs" />
     <Compile Include="Graphics\Effect\SkinnedEffect.cs" />
     <Compile Include="Graphics\PackedVector\HalfSingle.cs" />
@@ -392,8 +391,8 @@
     <Compile Include="Input\MouseState.cs" />
     <Compile Include="Desktop\TitleContainer.cs" />
     <Compile Include="Input\Keyboard.cs" />
-    <Compile Include="Graphics\Effect\GLSLEffectObject.cs" />
-    <Compile Include="Graphics\Effect\GLSLShader.cs" />
+    <Compile Include="Graphics\Effect\DXEffectObject.runtime.cs" />
+    <Compile Include="Graphics\Effect\DXPreshader.runtime.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.Linux.csproj">
@@ -402,29 +401,15 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Graphics\Effect\AlphaTestEffect.bin" />
-    <EmbeddedResource Include="Graphics\Effect\BasicEffect.bin" />
-    <EmbeddedResource Include="Graphics\Effect\BasicEffectGLSL.bin" />
-    <EmbeddedResource Include="Graphics\Effect\DualTextureEffect.bin" />
-    <EmbeddedResource Include="Graphics\Effect\EnvironmentMapEffect.bin" />
-    <EmbeddedResource Include="Graphics\Effect\SkinnedEffect.bin" />
-    <EmbeddedResource Include="Graphics\Effect\SpriteEffect.bin" />
-    <EmbeddedResource Include="Graphics\Effect\SpriteEffectGLSL.bin" />
-    <EmbeddedResource Include="Graphics\Effect\AlphaTestEffectGLSL.bin" />
-    <EmbeddedResource Include="Graphics\Effect\DualTextureEffectGLSL.bin" />
-    <EmbeddedResource Include="Graphics\Effect\EnvironmentMapEffectGLSL.bin" />
-    <EmbeddedResource Include="Graphics\Effect\SkinnedEffectGLSL.bin" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect.mgfx" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect.mgfx" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\DualTextureEffect.mgfx" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\EnvironmentMapEffect.mgfx" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\SkinnedEffect.mgfx" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\SpriteEffect.mgfx" />
   </ItemGroup>
   <ItemGroup>
     <None Include="MonoGame.Framework.Linux.dll.config">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\ThirdParty\Libs\libmojoshader_32.so">
-      <Link>libmojoshader_32.so</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\ThirdParty\Libs\libmojoshader_64.so">
-      <Link>libmojoshader_64.so</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

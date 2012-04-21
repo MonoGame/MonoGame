@@ -70,9 +70,11 @@ using TextureParameterName = OpenTK.Graphics.ES20.All;
 using TextureMinFilter = OpenTK.Graphics.ES20.All;
 using PixelInternalFormat = OpenTK.Graphics.ES20.All;
 using PixelType = OpenTK.Graphics.ES20.All;
+using ErrorCode = OpenTK.Graphics.ES20.All;
 #endif
 
 using Microsoft.Xna.Framework.Content;
+using System.Diagnostics;
 
 #if ANDROID
 using Android.Graphics;
@@ -262,14 +264,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 {
                     x = 0;
                     y = 0;
-                    w = width;
-                	h = height;
-					
-					for(int counter = 0; counter < level; counter++)
-					{
-	                    w = Math.Max(w / 2, 1);
-                    	h = Math.Max(h / 2, 1);
-					}
+                    w = Math.Max(width >> level, 1);
+                    h = Math.Max(height >> level, 1);
                 }
 
 #if WINRT
@@ -300,6 +296,8 @@ namespace Microsoft.Xna.Framework.Graphics
                                  x, y, w, h,
                                  glFormat, glType, dataPtr);
                 }
+
+                Debug.Assert(GL.GetError() == ErrorCode.NoError);
 #endif
 
                 dataHandle.Free();
