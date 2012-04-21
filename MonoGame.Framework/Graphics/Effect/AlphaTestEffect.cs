@@ -39,6 +39,7 @@ namespace Microsoft.Xna.Framework.Graphics
         EffectParameter fogColorParam;
         EffectParameter fogVectorParam;
         EffectParameter worldViewProjParam;
+        EffectParameter shaderIndexParam;
 
         #endregion
 
