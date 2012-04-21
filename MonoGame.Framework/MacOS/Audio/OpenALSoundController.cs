@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 #if IPHONE
 using OpenTK.Audio.OpenAL;
 using OpenTK;
+using MonoTouch.AudioToolbox;
 #elif MONOMAC
 using MonoMac.OpenAL;
 #endif
@@ -57,6 +58,13 @@ namespace Microsoft.Xna.Framework.Audio
 			for (int x=0; x < MAX_NUMBER_OF_SOURCES; x++) {
 				availableSourcesCollection.Add (allSourcesArray [x]);
 			}
+#if IPHONE			
+			AudioSession.Initialize();
+			AudioSession.Category = AudioSessionCategory.SoloAmbientSound;
+			
+			AudioSession.Interrupted += (sender, e) => Alc.MakeContextCurrent(ContextHandle.Zero);
+			AudioSession.Resumed+= (sender, e) => Alc.MakeContextCurrent(_context);	
+#endif
 		}
 
 		public static OpenALSoundController GetInstance {
