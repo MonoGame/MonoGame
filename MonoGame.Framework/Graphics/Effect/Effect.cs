@@ -69,8 +69,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public EffectTechnique CurrentTechnique { get; set; }
 
-        internal protected EffectParameter shaderIndexParam;
-
 		DXEffectObject effectObject;
 
         internal static Dictionary<byte[], DXEffectObject> effectObjectCache =
@@ -106,8 +104,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			this.graphicsDevice = graphicsDevice;
 			Techniques = new EffectTechniqueCollection ();
 			Parameters = new EffectParameterCollection();
-
-            shaderIndexParam = new EffectParameter(ActiveUniformType.Int, "ShaderIndex");
 		}
 			
 		protected Effect (Effect cloneSource)
