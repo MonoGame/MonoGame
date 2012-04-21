@@ -170,10 +170,10 @@ namespace Microsoft.Xna.Framework.Content
 #else				
                 string externalAssetName = fullAssetPath.Substring(fullRootPath.Length + 1);
 #endif
-#endif
                 return contentManager.Load<T>(externalAssetName);
-
+#endif
             }
+
             return default(T);
         }
         
