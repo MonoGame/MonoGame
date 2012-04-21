@@ -6,25 +6,30 @@ using System.IO;
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
-#else
+#elif WINRT
+
+#elif GLES
 using System.Text;
 using OpenTK.Graphics.ES20;
-#if IPHONE || ANDROID
 using ShaderType = OpenTK.Graphics.ES20.All;
 using ShaderParameter = OpenTK.Graphics.ES20.All;
 using TextureUnit = OpenTK.Graphics.ES20.All;
 using TextureTarget = OpenTK.Graphics.ES20.All;
-#endif
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
 	internal class DXShader
 	{
+#if OPENGL
         public readonly ShaderType ShaderType;
+
         public readonly int ShaderHandle;
 
         private readonly string _glslCode;
+#elif DIRECTX
+
+#endif
 
         private readonly string _uniforms_float4_name;
         private readonly float[] _uniforms_float4;
@@ -44,6 +49,8 @@ namespace Microsoft.Xna.Framework.Graphics
         public DXShader(BinaryReader reader)
 		{
             var isVertexShader = reader.ReadBoolean();
+
+#if OPENGL
             if (isVertexShader)
             {
                 ShaderType = ShaderType.VertexShader;
@@ -58,12 +65,17 @@ namespace Microsoft.Xna.Framework.Graphics
                 _uniforms_int4_name = "ps_uniforms_ivec4";
                 _uniforms_bool_name = "ps_uniforms_bool";
 			}
+#elif DIRECTX
 
+#endif
             if (reader.ReadBoolean())
                 _preshader = DXPreshader.CreatePreshader(reader);
 
+#if OPENGL
             _glslCode = reader.ReadString();
+#elif DIRECTX
 
+#endif
             var bool_count = (int)reader.ReadByte();
             var int4_count = (int)reader.ReadByte();
             var float4_count = (int)reader.ReadByte();
@@ -100,11 +112,12 @@ namespace Microsoft.Xna.Framework.Graphics
                 _attributes[a].index = (int)reader.ReadByte();
             }
 
+#if OPENGL
             Threading.Begin();
             try
             {
                 ShaderHandle = GL.CreateShader(ShaderType);
-#if IPHONE || ANDROID
+#if GLES
                 GL.ShaderSource(ShaderHandle, 1, new string[] { _glslCode }, (int[])null);
 #else
                 GL.ShaderSource(ShaderHandle, _glslCode);
@@ -112,14 +125,14 @@ namespace Microsoft.Xna.Framework.Graphics
                 GL.CompileShader(ShaderHandle);
 
                 var compiled = 0;
-#if IPHONE || ANDROID
+#if GLES
                 GL.GetShader(ShaderHandle, ShaderParameter.CompileStatus, ref compiled);
 #else
                 GL.GetShader(ShaderHandle, ShaderParameter.CompileStatus, out compiled);
 #endif
                 if (compiled == (int)All.False)
                 {
-#if IPHONE || ANDROID
+#if GLES
                     string log = "";
                     int length = 0;
                     GL.GetShader(ShaderHandle, ShaderParameter.InfoLogLength, ref length);
@@ -142,10 +155,14 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 Threading.End();
             }
+#elif DIRECTX
+
+#endif
 		}
 
 		public void OnLink(int program) 
         {
+#if OPENGL
             if (ShaderType != ShaderType.VertexShader)
                 return;
 
@@ -176,6 +193,7 @@ namespace Microsoft.Xna.Framework.Graphics
 					throw new NotImplementedException();
 				}
 			}
+#endif
 		}
 		
 		public void Apply(  int program, 
@@ -260,6 +278,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			if (_preshader != null)
 				_preshader.Run(parameters, _uniforms_float4);
 			
+#if OPENGL
 			// Upload the uniforms.				
             if (_uniforms_float4.Length > 0)
             {
@@ -329,7 +348,8 @@ namespace Microsoft.Xna.Framework.Graphics
 					samplerStates[sampler.index].Activate(tex.glTarget, tex.LevelCount > 1);
 				}
 			}
-		}
+#endif // OPENGL
+        }
 		
 	}
 }
