@@ -27,12 +27,13 @@ namespace Microsoft.Xna.Framework.Graphics
         EffectTechnique _technique = null;
 		GraphicsDevice _graphicsDevice;
 		
-		int shaderProgram = 0;
-
         DXEffectObject.d3dx_pass _pass;
 
 		DXShader pixelShader;
 		DXShader vertexShader;
+
+#if OPENGL
+        int shaderProgram = 0;
 
 		static float[] posFixup = new float[4];
 
@@ -58,8 +59,9 @@ namespace Microsoft.Xna.Framework.Graphics
 		internal static int? passthroughVertexShader;
 
 		bool passthroughVertexShaderAttached = false;
+#endif // OPENGL
 
-		bool setBlendState = false;
+        bool setBlendState = false;
 		BlendState blendState;
 		bool setDepthStencilState = false;
 		DepthStencilState depthStencilState;
@@ -78,7 +80,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			depthStencilState = new DepthStencilState();
 			rasterizerState = new RasterizerState();
 			
-			Debug.WriteLine (technique.Name);
+#if OPENGL
             Threading.Begin();
             try
             {
@@ -191,6 +193,9 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 Threading.End();
             }
+#elif DIRECTX
+
+#endif
         }
 
         public void Apply()
@@ -222,7 +227,8 @@ namespace Microsoft.Xna.Framework.Graphics
 					default:
 						throw new NotImplementedException();
 					}
-					
+
+#if OPENGL
 					if (shader.ShaderType == ShaderType.FragmentShader && shader != pixelShader) 
                     {
 						if (pixelShader != null)
@@ -240,15 +246,21 @@ namespace Microsoft.Xna.Framework.Graphics
                         relink = true;
 						vertexShader = shader;
                         GL.AttachShader(shaderProgram, vertexShader.ShaderHandle);
-					}					
+					}	
+#elif DIRECTX
+
+#endif
 				}
 			}
 
 			if (relink)
 				Link();
 			
+#if OPENGL
 			GL.UseProgram(shaderProgram);
-			
+#elif DIRECTX
+
+#endif
 			
 			if (setRasterizerState)
 				_graphicsDevice.RasterizerState = rasterizerState;
@@ -257,6 +269,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			if (setDepthStencilState)
 				_graphicsDevice.DepthStencilState = depthStencilState;
 
+#if OPENGL
 			if (vertexShader != null) 
             {
 				vertexShader.Apply(shaderProgram,
@@ -315,17 +328,20 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
             var posFixupLoc = GL.GetUniformLocation(shaderProgram, "posFixup");
 			GL.Uniform4 (posFixupLoc, 1, posFixup);
-
 			
-
 			if (pixelShader != null)
 				pixelShader.Apply(shaderProgram,
 				                  _technique._effect.Parameters,
 				                  _graphicsDevice);
+
+#elif DIRECTX
+            
+#endif
 		}
 
-        private void Link ()
+        private void Link()
 		{
+#if OPENGL
 			if (vertexShader == null && !passthroughVertexShaderAttached) 
             {
 				if (!passthroughVertexShader.HasValue) 
@@ -376,6 +392,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 				throw new InvalidOperationException("Unable to link effect program");
 			}
+#endif
 		}		
 				
     }
