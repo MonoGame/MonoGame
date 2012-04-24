@@ -292,8 +292,7 @@ namespace Microsoft.Xna.Framework.Graphics
             VboIdElement = 0;
 
             //New graphics context, clear the effect cache
-			Effect.effectObjectCache.Clear ();
-			EffectPass.passthroughVertexShader = null;
+			Effect.effectObjectCache.Clear();
 #endif
         }
 
