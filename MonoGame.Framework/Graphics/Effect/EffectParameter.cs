@@ -16,7 +16,6 @@ namespace Microsoft.Xna.Framework.Graphics
 		string semantic;
 		EffectParameterCollection structMembers;
 		EffectAnnotationCollection annotations;
-		Effect _parentEffect;
 		
 		internal bool rawParameter = false;
 
