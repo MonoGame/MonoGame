@@ -40,13 +40,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #endif // OPENGL
 
-        private bool _setBlendState;
         private BlendState _blendState;
-
-        private bool _setDepthStencilState;
         private DepthStencilState _depthStencilState;
-
-        private bool _setRasterizerState;
         private RasterizerState _rasterizerState;
 
 		public string Name { get; private set; }
@@ -58,12 +53,10 @@ namespace Microsoft.Xna.Framework.Graphics
             _effect = effect;
 
             Name = pass.name;
+                
+            _pass_states = pass.states;
 
             Annotations = new EffectAnnotationCollection();
-
-			_blendState = new BlendState();
-			_depthStencilState = new DepthStencilState();
-			_rasterizerState = new RasterizerState();
 			
 #if OPENGL
             Threading.Begin();
@@ -71,7 +64,6 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 _shaderProgram = GL.CreateProgram();
 
-                _pass_states = pass.states;
                 foreach (var state in _pass_states)
                 {
                     if (state.type != DXEffectObject.STATE_TYPE.CONSTANT)
@@ -94,50 +86,50 @@ namespace Microsoft.Xna.Framework.Graphics
                         switch (operation.op)
                         {
                             case (uint)DXEffectObject.D3DRENDERSTATETYPE.STENCILENABLE:
+                                _depthStencilState = _depthStencilState ?? new DepthStencilState();
                                 _depthStencilState.StencilEnable = (bool)state.parameter.data;
-                                _setDepthStencilState = true;
                                 break;
                             case (uint)DXEffectObject.D3DRENDERSTATETYPE.SCISSORTESTENABLE:
+                                _rasterizerState = _rasterizerState ?? new RasterizerState();
                                 _rasterizerState.ScissorTestEnable = (bool)state.parameter.data;
-                                _setRasterizerState = true;
                                 break;
                             case (uint)DXEffectObject.D3DRENDERSTATETYPE.BLENDOP:
+                                _blendState = _blendState ?? new BlendState();
                                 _blendState.ColorBlendFunction = (BlendFunction)state.parameter.data;
-                                _setBlendState = true;
                                 break;
                             case (uint)DXEffectObject.D3DRENDERSTATETYPE.SRCBLEND:
+                                _blendState = _blendState ?? new BlendState();
                                 _blendState.ColorSourceBlend = (Blend)state.parameter.data;
-                                _setBlendState = true;
                                 break;
                             case (uint)DXEffectObject.D3DRENDERSTATETYPE.DESTBLEND:
+                                _blendState = _blendState ?? new BlendState();
                                 _blendState.ColorDestinationBlend = (Blend)state.parameter.data;
-                                _setBlendState = true;
                                 break;
                             case (uint)DXEffectObject.D3DRENDERSTATETYPE.ALPHABLENDENABLE:
                                 break; //not sure what to do
                             case (uint)DXEffectObject.D3DRENDERSTATETYPE.CULLMODE:
+                                _rasterizerState = _rasterizerState ?? new RasterizerState();
                                 _rasterizerState.CullMode = (CullMode)state.parameter.data;
-                                _setRasterizerState = true;
                                 break;
                             case (uint)DXEffectObject.D3DRENDERSTATETYPE.COLORWRITEENABLE:
+                                _blendState = _blendState ?? new BlendState();
                                 _blendState.ColorWriteChannels = (ColorWriteChannels)state.parameter.data;
-                                _setBlendState = true;
                                 break;
                             case (uint)DXEffectObject.D3DRENDERSTATETYPE.STENCILFUNC:
+                                _depthStencilState = _depthStencilState ?? new DepthStencilState();
                                 _depthStencilState.StencilFunction = (CompareFunction)state.parameter.data;
-                                _setDepthStencilState = true;
                                 break;
                             case (uint)DXEffectObject.D3DRENDERSTATETYPE.STENCILPASS:
+                                _depthStencilState = _depthStencilState ?? new DepthStencilState();
                                 _depthStencilState.StencilPass = (StencilOperation)state.parameter.data;
-                                _setDepthStencilState = true;
                                 break;
                             case (uint)DXEffectObject.D3DRENDERSTATETYPE.STENCILFAIL:
+                                _depthStencilState = _depthStencilState ?? new DepthStencilState();
                                 _depthStencilState.StencilFail = (StencilOperation)state.parameter.data;
-                                _setDepthStencilState = true;
                                 break;
                             case (uint)DXEffectObject.D3DRENDERSTATETYPE.STENCILREF:
+                                _depthStencilState = _depthStencilState ?? new DepthStencilState();
                                 _depthStencilState.ReferenceStencil = (int)state.parameter.data;
-                                _setDepthStencilState = true;
                                 break;
                             default:
                                 throw new NotImplementedException();
@@ -226,17 +218,18 @@ namespace Microsoft.Xna.Framework.Graphics
 
             var device = _effect.GraphicsDevice;
 
-			if (_setRasterizerState)
+            if (_rasterizerState != null)
                 device.RasterizerState = _rasterizerState;
-			if (_setBlendState)
+            if (_blendState != null)
                 device.BlendState = _blendState;
-			if (_setDepthStencilState)
+            if (_depthStencilState != null)
                 device.DepthStencilState = _depthStencilState;
 
 #if OPENGL
 
-			if (_vertexShader != null) 
-				_vertexShader.Apply(_shaderProgram, _effect.Parameters, device);
+            // We better have a vertex shader by now!
+            Debug.Assert(_vertexShader != null, "You must define a vertex shader!");
+			_vertexShader.Apply(_shaderProgram, _effect.Parameters, device);
 
 			// Apply vertex shader fix:
 			// The following two lines are appended to the end of vertex shaders
@@ -277,9 +270,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
             var posFixupLoc = GL.GetUniformLocation(_shaderProgram, "posFixup"); // TODO: Look this up on link!
 			GL.Uniform4 (posFixupLoc, 1, _posFixup);
-			
-			if (_pixelShader != null)
-				_pixelShader.Apply(_shaderProgram, _effect.Parameters, device);
+
+            Debug.Assert(_pixelShader != null, "You must define a pixel shader!");
+            _pixelShader.Apply(_shaderProgram, _effect.Parameters, device);
 
 #elif DIRECTX
             
@@ -289,10 +282,11 @@ namespace Microsoft.Xna.Framework.Graphics
         private void Link()
 		{
 #if OPENGL
-			if (_vertexShader != null)
-				_vertexShader.OnLink(_shaderProgram);
-			if (_pixelShader != null)
-				_pixelShader.OnLink(_shaderProgram);
+            Debug.Assert(_vertexShader != null, "You must define a vertex shader!");
+            Debug.Assert(_pixelShader != null, "You must define a pixel shader!");
+
+			_vertexShader.OnLink(_shaderProgram);
+			_pixelShader.OnLink(_shaderProgram);
 
 			GL.LinkProgram(_shaderProgram);
 
