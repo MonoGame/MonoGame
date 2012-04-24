@@ -63,9 +63,9 @@ namespace Microsoft.Xna.Framework.Graphics
 {
 	public class Effect : GraphicsResource
     {
-        public EffectParameterCollection Parameters { get; set; }
+        public EffectParameterCollection Parameters { get; private set; }
 
-        public EffectTechniqueCollection Techniques { get; set; }
+        public EffectTechniqueCollection Techniques { get; private set; }
 
         public EffectTechnique CurrentTechnique { get; set; }
 
@@ -96,7 +96,7 @@ namespace Microsoft.Xna.Framework.Graphics
         internal int CurrentProgram = 0;
 #endif
 
-        protected Effect (GraphicsDevice graphicsDevice)
+        internal Effect(GraphicsDevice graphicsDevice)
 		{
 			if (graphicsDevice == null)
 				throw new ArgumentNullException ("Graphics Device Cannot Be Null");
@@ -121,10 +121,10 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 	
 			foreach (var parameter in effectObject.Parameters)
-				Parameters._parameters.Add (new EffectParameter(parameter));
+				Parameters.Add(new EffectParameter(parameter));
 
             foreach (var technique in effectObject.Techniques)
-				Techniques._techniques.Add (new EffectTechnique(this, technique));
+				Techniques.Add(new EffectTechnique(this, technique));
 
             CurrentTechnique = Techniques[0];			
 		}

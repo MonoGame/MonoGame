@@ -3,25 +3,29 @@ namespace Microsoft.Xna.Framework.Graphics
 {
 	public class EffectTechnique
 	{
-        internal Effect _effect;
+        private Effect _effect;
 
-        public EffectPassCollection Passes { get; set; }
-		public EffectAnnotationCollection Annotations { get; set; }
+        public EffectPassCollection Passes { get; private set; }
+
+        public EffectAnnotationCollection Annotations { get; private set; }
 
         public string Name { get; private set; }
 
-        public EffectTechnique(Effect effect, DXEffectObject.d3dx_technique technique)
+        internal EffectTechnique(Effect effect, string name, EffectPassCollection passes, EffectAnnotationCollection annotations)
         {
             _effect = effect;
+            Name = name;
+            Passes = passes;
+            Annotations = annotations;
+        }
 
-            Name = technique.name;
-
+        public EffectTechnique(Effect effect, DXEffectObject.d3dx_technique technique)
+            : this( effect, technique.name, new EffectPassCollection(), new EffectAnnotationCollection() )
+        {
             // TODO: Set the annotations from the effect object!
-            Annotations = new EffectAnnotationCollection();
 
-            Passes = new EffectPassCollection(this);
             for (int i = 0; i < technique.pass_count; i++)
-				Passes._passes.Add (new EffectPass(this, technique.pass_handles[i]));
+                Passes.Add(new EffectPass(effect, technique.pass_handles[i]));
         }
 
     }

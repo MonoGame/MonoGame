@@ -24,8 +24,7 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public class EffectPass
     {
-        EffectTechnique _technique = null;
-		GraphicsDevice _graphicsDevice;
+        Effect _effect = null;
 		
         DXEffectObject.d3dx_pass _pass;
 
@@ -70,10 +69,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public string Name { get { return _pass.name; } }
 
-		public EffectPass(EffectTechnique technique, DXEffectObject.d3dx_pass pass)
+		internal EffectPass(Effect effect, DXEffectObject.d3dx_pass pass)
         {
-            _technique = technique;
-			_graphicsDevice = _technique._effect.GraphicsDevice;
+            _effect = effect;
             _pass = pass;
 
 			blendState = new BlendState();
@@ -201,7 +199,7 @@ namespace Microsoft.Xna.Framework.Graphics
         public void Apply()
 		{
             // Set/get the correct shader handle/cleanups.
-			_technique._effect.OnApply();
+            _effect.OnApply();
 
 			//Console.WriteLine (_technique._effect.Name+" - "+_technique.Name+" - "+Name);
 			var relink = false;
@@ -221,7 +219,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     {
 					case DXEffectObject.STATE_TYPE.EXPRESSIONINDEX:
                         var expression = (DXExpression)state.parameter.data;
-                        shader = (DXShader)expression.Evaluate(_technique._effect.Parameters);
+                        shader = (DXShader)expression.Evaluate(_effect.Parameters);
 						break;
 					case DXEffectObject.STATE_TYPE.PARAMETER:
 					default:
@@ -261,25 +259,25 @@ namespace Microsoft.Xna.Framework.Graphics
 #elif DIRECTX
 
 #endif
-			
+
+            var device = _effect.GraphicsDevice;
+
 			if (setRasterizerState)
-				_graphicsDevice.RasterizerState = rasterizerState;
+                device.RasterizerState = rasterizerState;
 			if (setBlendState)
-				_graphicsDevice.BlendState = blendState;
+                device.BlendState = blendState;
 			if (setDepthStencilState)
-				_graphicsDevice.DepthStencilState = depthStencilState;
+                device.DepthStencilState = depthStencilState;
 
 #if OPENGL
 			if (vertexShader != null) 
             {
-				vertexShader.Apply(shaderProgram,
-				                  _technique._effect.Parameters,
-				                  _graphicsDevice);
+				vertexShader.Apply(shaderProgram, _effect.Parameters, device);
 			} 
             else 
             {
 				//passthrough shader is attached
-				var vp = _graphicsDevice.Viewport;
+                var vp = device.Viewport;
                 var projection = Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, 0, 1);
                 var halfPixelOffset = Matrix.CreateTranslation(-0.5f, -0.5f, 0);
                 var transform = halfPixelOffset * projection;
@@ -317,10 +315,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			posFixup[0] = 1.0f;
 			posFixup[1] = 1.0f;
-			posFixup[2] = (63.0f / 64.0f) / _graphicsDevice.Viewport.Width;
-			posFixup[3] = -(63.0f / 64.0f) / _graphicsDevice.Viewport.Height;
+            posFixup[2] = (63.0f / 64.0f) / device.Viewport.Width;
+            posFixup[3] = -(63.0f / 64.0f) / device.Viewport.Height;
 			//If we have a render target bound (rendering offscreen)
-			if (_graphicsDevice.GetRenderTargets().Length > 0) 
+            if (device.GetRenderTargets().Length > 0) 
             {
 				//flip vertically
 				posFixup[1] *= -1.0f;
@@ -330,9 +328,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			GL.Uniform4 (posFixupLoc, 1, posFixup);
 			
 			if (pixelShader != null)
-				pixelShader.Apply(shaderProgram,
-				                  _technique._effect.Parameters,
-				                  _graphicsDevice);
+				pixelShader.Apply(shaderProgram, _effect.Parameters, device);
 
 #elif DIRECTX
             

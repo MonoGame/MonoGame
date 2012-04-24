@@ -98,12 +98,12 @@ namespace Microsoft.Xna.Framework.Graphics
 			if (parameter.element_count > 0) {
 				for (int i=0; i<parameter.element_count; i++) {
 					EffectParameter element = new EffectParameter(parameter.member_handles[i]);
-					elements._parameters.Add (element);
+					elements.Add(element);
 				}
 			} else if (parameter.member_count > 0) {
 				for (int i=0; i<parameter.member_count; i++) {
 					EffectParameter member = new EffectParameter(parameter.member_handles[i]);
-					structMembers._parameters.Add (member);
+					structMembers.Add(member);
 				}
 			} else {
 				if (rawParameter) {
