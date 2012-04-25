@@ -27,7 +27,6 @@ SOFTWARE.
 
 using System;
 using System.Text;
-using System.Drawing;
 using System.Globalization;
 
 namespace Microsoft.Xna.Framework
