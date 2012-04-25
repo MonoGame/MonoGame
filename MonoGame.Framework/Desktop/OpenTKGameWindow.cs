@@ -62,6 +62,7 @@ namespace Microsoft.Xna.Framework
         private DateTime _now;
         private bool _allowUserResizing;
         private DisplayOrientation _currentOrientation;
+        private IntPtr _windowHandle = IntPtr.Zero;
         private OpenTK.GameWindow window;
         protected Game game;
         private List<Microsoft.Xna.Framework.Input.Keys> keys;
@@ -81,7 +82,7 @@ namespace Microsoft.Xna.Framework
 
         #region Public Properties
 
-        public override IntPtr Handle { get { return IntPtr.Zero; } }
+        public override IntPtr Handle { get { return _windowHandle; } }
 
         public override string ScreenDeviceName { get { return window.Title; } }
 
@@ -239,6 +240,14 @@ namespace Microsoft.Xna.Framework
                                          window.ClientRectangle.Width, window.ClientRectangle.Height);
             windowState = window.WindowState;
 
+#if WINDOWS
+            {
+                var windowInfoType = window.WindowInfo.GetType();
+                var propertyInfo = windowInfoType.GetProperty("WindowHandle");
+                _windowHandle = (IntPtr)propertyInfo.GetValue(window.WindowInfo, null);
+            }
+#endif
+
             keys = new List<Keys>();
 
             // mouse
@@ -257,7 +266,7 @@ namespace Microsoft.Xna.Framework
             _lastUpdate = DateTime.Now;
 
             //Default no resizing
-            AllowUserResizing = false;            
+            AllowUserResizing = false;
         }
 
         protected override void SetTitle(string title)
