@@ -549,6 +549,56 @@ namespace Microsoft.Xna.Framework.Graphics
 			new state_info(STATE_CLASS.SETSAMPLER, 0, "Sampler"),
 		};
 
+        static public EffectParameterClass ToParameterClass( D3DXPARAMETER_CLASS class_ )
+        {
+			switch (class_) 
+            {
+			    case DXEffectObject.D3DXPARAMETER_CLASS.SCALAR:
+				    return EffectParameterClass.Scalar;
+			    case DXEffectObject.D3DXPARAMETER_CLASS.VECTOR:
+				    return EffectParameterClass.Vector;
+			    case DXEffectObject.D3DXPARAMETER_CLASS.MATRIX_ROWS:
+			    case DXEffectObject.D3DXPARAMETER_CLASS.MATRIX_COLUMNS:
+                    return EffectParameterClass.Matrix;
+			    case DXEffectObject.D3DXPARAMETER_CLASS.OBJECT:
+                    return EffectParameterClass.Object;
+			    case DXEffectObject.D3DXPARAMETER_CLASS.STRUCT:
+                    return EffectParameterClass.Struct;
+			    default:
+				    throw new NotImplementedException();
+			}
+        }
+
+        static public EffectParameterType ToParameterType(D3DXPARAMETER_TYPE type)
+        {
+			switch (type) 
+            {
+			    default:
+                    //throw new NotImplementedException();
+
+                case DXEffectObject.D3DXPARAMETER_TYPE.VOID:
+				    return EffectParameterType.Void;
+			    case DXEffectObject.D3DXPARAMETER_TYPE.BOOL:
+                    return EffectParameterType.Bool;
+			    case DXEffectObject.D3DXPARAMETER_TYPE.INT:
+				    return EffectParameterType.Int32;
+			    case DXEffectObject.D3DXPARAMETER_TYPE.FLOAT:
+				    return EffectParameterType.Single;
+			    case DXEffectObject.D3DXPARAMETER_TYPE.STRING:
+				    return EffectParameterType.String;
+			    case DXEffectObject.D3DXPARAMETER_TYPE.TEXTURE:
+				    return EffectParameterType.Texture;
+			    case DXEffectObject.D3DXPARAMETER_TYPE.TEXTURE1D:
+				    return EffectParameterType.Texture1D;
+			    case DXEffectObject.D3DXPARAMETER_TYPE.TEXTURE2D:
+				    return EffectParameterType.Texture2D;
+			    case DXEffectObject.D3DXPARAMETER_TYPE.TEXTURE3D:
+				    return EffectParameterType.Texture3D;
+			    case DXEffectObject.D3DXPARAMETER_TYPE.TEXTURECUBE:
+				    return  EffectParameterType.TextureCube;
+			}
+        }
+
         public d3dx_parameter[] Objects { get; private set; }
 
         public d3dx_parameter[] Parameters { get; private set; }
