@@ -78,6 +78,12 @@ namespace Microsoft.Xna.Framework.Input
             }
             return new MouseState(_x, _y);
         }
+
+        public static void SetPosition(int x, int y)
+        {
+            _x = x;
+            _y = y;
+        }
     }
 }
 
