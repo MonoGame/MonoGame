@@ -22,11 +22,13 @@ namespace Microsoft.Xna.Framework.Graphics
 	internal class DXShader
 	{
 #if OPENGL
+
         public readonly ShaderType ShaderType;
 
         public readonly int ShaderHandle;
 
         private readonly string _glslCode;
+
 #elif DIRECTX
 
 #endif
@@ -71,6 +73,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (reader.ReadBoolean())
                 _preshader = DXPreshader.CreatePreshader(reader);
 
+            // Read in the shader code.
 #if OPENGL
             _glslCode = reader.ReadString();
 #elif DIRECTX
@@ -217,6 +220,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				EffectParameter parameter = parameters[symbol.name];
 				switch (symbol.register_set) 
                 {
+
 				case MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_BOOL:
 					if (parameter.Elements.Count > 0)
 						throw new NotImplementedException();
@@ -258,6 +262,7 @@ namespace Microsoft.Xna.Framework.Graphics
 							}
 						}
 						break;
+
 					default:
 						throw new NotImplementedException();
 					}
@@ -323,12 +328,15 @@ namespace Microsoft.Xna.Framework.Graphics
 					Texture tex = null;
 					if (samplerSymbol.HasValue) 
                     {
+                        // TODO: Just store the full sampler state here and 
+                        // don't require this double lookup into the parameter list.
+
 						var samplerState = (DXEffectObject.d3dx_sampler)parameters[samplerSymbol.Value.name].data;
-						if (samplerState.state_count > 0) 
+                        if (samplerState != null && samplerState.state_count > 0) 
                         {
 							var textureName = samplerState.states[0].parameter.name;
 							var textureParameter = parameters[textureName];
-							if (textureParameter != null)
+							if (textureParameter != null && textureParameter.data is Texture)
 								tex = (Texture)textureParameter.data;
 						}
 					}
