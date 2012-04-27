@@ -205,6 +205,9 @@ namespace Microsoft.Xna.Framework.Graphics
             if (header != Header || version != Version)
                 throw new Exception("Unsupported MGFX format!");
 
+            // TODO: Maybe we should be reading in a string 
+            // table here to save some bytes in the file.
+
             // Read in all the shader objects.
             var shaderList = new List<DXShader>();
             var shaders = (int)reader.ReadByte();
@@ -222,7 +225,7 @@ namespace Microsoft.Xna.Framework.Graphics
             var techniques = (int)reader.ReadByte();
             for (var t = 0; t < techniques; t++)
             {
-                var name = reader.ReadString();
+                var name = string.Intern(reader.ReadString());
 
                 var annotations = ReadAnnotations(reader);
 
@@ -256,7 +259,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             for (var i = 0; i < count; i++)
             {
-                var name = reader.ReadString();
+                var name = string.Intern(reader.ReadString());
                 var annotations = ReadAnnotations(reader);
 
                 // Get the vertex shader.
@@ -288,8 +291,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 var class_ = (EffectParameterClass)reader.ReadByte();
                 var type = (EffectParameterType)reader.ReadByte();
 
-                var name = reader.ReadString();
-                var semantic = reader.ReadString();
+                var name = string.Intern(reader.ReadString());
+                var semantic = string.Intern(reader.ReadString());
                 var annotations = ReadAnnotations(reader);
 
                 var rowCount = (int)reader.ReadByte();
