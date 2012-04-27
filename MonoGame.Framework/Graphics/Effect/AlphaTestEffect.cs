@@ -68,6 +68,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
         EffectDirtyFlags dirtyFlags = EffectDirtyFlags.All;
 
+        static readonly byte[] Bytecode = LoadEffectResource("Microsoft.Xna.Framework.Graphics.Effect.Resources.AlphaTestEffect.mgfx");
+
         #endregion
 
         #region Public Properties
@@ -272,7 +274,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// Creates a new AlphaTestEffect with default parameter settings.
         /// </summary>
         public AlphaTestEffect(GraphicsDevice device)
-            : base(device, Effect.LoadEffectResource("Microsoft.Xna.Framework.Graphics.Effect.Resources.AlphaTestEffect.mgfx"))
+            : base(device, Bytecode)
         {
             CacheEffectParameters();
         }

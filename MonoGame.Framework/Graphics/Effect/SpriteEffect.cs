@@ -40,13 +40,15 @@ namespace Microsoft.Xna.Framework.Graphics
 
         #endregion
 
+        static internal readonly byte[] Bytecode = LoadEffectResource("Microsoft.Xna.Framework.Graphics.Effect.Resources.SpriteEffect.mgfx");
+
         #region Methods
 
         /// <summary>
         /// Creates a new SpriteEffect.
         /// </summary>
         public SpriteEffect(GraphicsDevice device)
-            : base(device, Effect.LoadEffectResource("Microsoft.Xna.Framework.Graphics.Effect.Resources.SpriteEffect.mgfx"))
+            : base(device, Bytecode)
         {
             CacheEffectParameters();
         }

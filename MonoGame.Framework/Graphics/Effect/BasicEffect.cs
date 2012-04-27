@@ -80,6 +80,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
         EffectDirtyFlags dirtyFlags = EffectDirtyFlags.All;
 
+        static readonly byte[] Bytecode = LoadEffectResource("Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect.mgfx");
+
         #endregion
         
         #region Public Properties
@@ -376,7 +378,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// Creates a new BasicEffect with default parameter settings.
         /// </summary>
         public BasicEffect(GraphicsDevice device)
-            : base(device, Effect.LoadEffectResource("Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect.mgfx"))
+            : base(device, Bytecode)
         {
             CacheEffectParameters(null);
 

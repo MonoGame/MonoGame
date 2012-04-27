@@ -42,7 +42,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			this.graphicsDevice = graphicsDevice;
 
             // Use a custom SpriteEffect so we can control the transformation matrix
-            spriteEffect = new Effect(this.graphicsDevice, Effect.LoadEffectResource("Microsoft.Xna.Framework.Graphics.Effect.Resources.SpriteEffect.mgfx"));
+            spriteEffect = new Effect(this.graphicsDevice, SpriteEffect.Bytecode);
 
             _batcher = new SpriteBatcher();
 		}

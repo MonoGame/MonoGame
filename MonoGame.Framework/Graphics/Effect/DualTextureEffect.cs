@@ -51,6 +51,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
         EffectDirtyFlags dirtyFlags = EffectDirtyFlags.All;
 
+        static readonly byte[] Bytecode = LoadEffectResource("Microsoft.Xna.Framework.Graphics.Effect.Resources.DualTextureEffect.mgfx");
+
         #endregion
 
         #region Public Properties
@@ -236,7 +238,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// Creates a new DualTextureEffect with default parameter settings.
         /// </summary>
         public DualTextureEffect(GraphicsDevice device)
-            : base(device, Effect.LoadEffectResource("Microsoft.Xna.Framework.Graphics.Effect.Resources.DualTextureEffect.mgfx"))
+            : base(device, Bytecode)
         {
             CacheEffectParameters();
         }
