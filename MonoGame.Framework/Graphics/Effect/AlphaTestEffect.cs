@@ -39,7 +39,8 @@ namespace Microsoft.Xna.Framework.Graphics
         EffectParameter fogColorParam;
         EffectParameter fogVectorParam;
         EffectParameter worldViewProjParam;
-        EffectParameter shaderIndexParam;
+
+        int _shaderIndex;
 
         #endregion
 
@@ -323,13 +324,12 @@ namespace Microsoft.Xna.Framework.Graphics
             fogColorParam       = Parameters["FogColor"];
             fogVectorParam      = Parameters["FogVector"];
             worldViewProjParam  = Parameters["WorldViewProj"];
-            shaderIndexParam    = Parameters["ShaderIndex"];
         }
         
         /// <summary>
         /// Lazily computes derived parameter values immediately before applying the effect.
         /// </summary>
-        protected internal override void OnApply()
+        protected internal override bool OnApply()
         {
             // Recompute the world+view+projection matrix or fog vector?
             dirtyFlags = EffectHelpers.SetWorldViewProjAndFog(dirtyFlags, ref world, ref view, ref projection, ref worldView, fogEnabled, fogStart, fogEnd, worldViewProjParam, fogVectorParam);
@@ -442,11 +442,18 @@ namespace Microsoft.Xna.Framework.Graphics
                 
                 if (isEqNe)
                     shaderIndex += 4;
-                
-                shaderIndexParam.SetValue(shaderIndex);
 
                 dirtyFlags &= ~EffectDirtyFlags.ShaderIndex;
+
+                if (_shaderIndex != shaderIndex)
+                {
+                    _shaderIndex = shaderIndex;
+                    CurrentTechnique = Techniques[_shaderIndex];
+                    return true;
+                }
             }
+
+            return false;
         }
 
 

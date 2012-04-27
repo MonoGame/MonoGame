@@ -450,139 +450,41 @@ float4 PSBasicPixelLightingTx(PSInputPixelLightingTx pin) : SV_Target0
 }
 
 
-VertexShader VSArray[20] =
-{
-    compile vs_2_0 VSBasic(),
-    compile vs_2_0 VSBasicNoFog(),
-    compile vs_2_0 VSBasicVc(),
-    compile vs_2_0 VSBasicVcNoFog(),
-    compile vs_2_0 VSBasicTx(),
-    compile vs_2_0 VSBasicTxNoFog(),
-    compile vs_2_0 VSBasicTxVc(),
-    compile vs_2_0 VSBasicTxVcNoFog(),
-    
-    compile vs_2_0 VSBasicVertexLighting(),
-    compile vs_2_0 VSBasicVertexLightingVc(),
-    compile vs_2_0 VSBasicVertexLightingTx(),
-    compile vs_2_0 VSBasicVertexLightingTxVc(),
-    
-    compile vs_2_0 VSBasicOneLight(),
-    compile vs_2_0 VSBasicOneLightVc(),
-    compile vs_2_0 VSBasicOneLightTx(),
-    compile vs_2_0 VSBasicOneLightTxVc(),
-    
-    compile vs_2_0 VSBasicPixelLighting(),
-    compile vs_2_0 VSBasicPixelLightingVc(),
-    compile vs_2_0 VSBasicPixelLightingTx(),
-    compile vs_2_0 VSBasicPixelLightingTxVc(),
-};
+// NOTE: The order of the techniques here are
+// defined to match the indexing in BasicEffect.cs.
 
+TECHNIQUE( BasicEffect,								VSBasic,			PSBasic );
+TECHNIQUE( BasicEffect_NoFog,						VSBasicNoFog,		PSBasicNoFog );
+TECHNIQUE( BasicEffect_VertexColor,					VSBasicVc,			PSBasic );
+TECHNIQUE( BasicEffect_VertexColor_NoFog,			VSBasicVcNoFog,		PSBasicNoFog );
+TECHNIQUE( BasicEffect_Texture,						VSBasicTx,			PSBasicTx );
+TECHNIQUE( BasicEffect_Texture_NoFog,				VSBasicTxNoFog,		PSBasicTxNoFog );
+TECHNIQUE( BasicEffect_Texture_VertexColor,			VSBasicTxVc,		PSBasicTx );
+TECHNIQUE( BasicEffect_Texture_VertexColor_NoFog,	VSBasicTxVcNoFog,	PSBasicTxNoFog );
 
-int VSIndices[32] =
-{
-    0,      // basic
-    1,      // no fog
-    2,      // vertex color
-    3,      // vertex color, no fog
-    4,      // texture
-    5,      // texture, no fog
-    6,      // texture + vertex color
-    7,      // texture + vertex color, no fog
-    
-    8,      // vertex lighting
-    8,      // vertex lighting, no fog
-    9,      // vertex lighting + vertex color
-    9,      // vertex lighting + vertex color, no fog
-    10,     // vertex lighting + texture
-    10,     // vertex lighting + texture, no fog
-    11,     // vertex lighting + texture + vertex color
-    11,     // vertex lighting + texture + vertex color, no fog
-    
-    12,     // one light
-    12,     // one light, no fog
-    13,     // one light + vertex color
-    13,     // one light + vertex color, no fog
-    14,     // one light + texture
-    14,     // one light + texture, no fog
-    15,     // one light + texture + vertex color
-    15,     // one light + texture + vertex color, no fog
-    
-    16,     // pixel lighting
-    16,     // pixel lighting, no fog
-    17,     // pixel lighting + vertex color
-    17,     // pixel lighting + vertex color, no fog
-    18,     // pixel lighting + texture
-    18,     // pixel lighting + texture, no fog
-    19,     // pixel lighting + texture + vertex color
-    19,     // pixel lighting + texture + vertex color, no fog
-};
+TECHNIQUE( BasicEffect_VertexLighting,								VSBasicVertexLighting,		PSBasicVertexLighting );
+TECHNIQUE( BasicEffect_VertexLighting_NoFog,						VSBasicVertexLighting,		PSBasicVertexLightingNoFog );
+TECHNIQUE( BasicEffect_VertexLighting_VertexColor,					VSBasicVertexLightingVc,	PSBasicVertexLighting );
+TECHNIQUE( BasicEffect_VertexLighting_VertexColor_NoFog,			VSBasicVertexLightingVc,	PSBasicVertexLightingNoFog );
+TECHNIQUE( BasicEffect_VertexLighting_Texture,						VSBasicVertexLightingTx,	PSBasicVertexLightingTx );
+TECHNIQUE( BasicEffect_VertexLighting_Texture_NoFog,				VSBasicVertexLightingTx,	PSBasicVertexLightingTxNoFog );
+TECHNIQUE( BasicEffect_VertexLighting_Texture_VertexColor,			VSBasicVertexLightingTxVc,	PSBasicVertexLightingTx );
+TECHNIQUE( BasicEffect_VertexLighting_Texture_VertexColor_NoFog,	VSBasicVertexLightingTxVc,	PSBasicVertexLightingTxNoFog );
 
+TECHNIQUE( BasicEffect_OneLight,							VSBasicOneLight,		PSBasicVertexLighting );
+TECHNIQUE( BasicEffect_OneLight_NoFog,						VSBasicOneLight,		PSBasicVertexLightingNoFog );
+TECHNIQUE( BasicEffect_OneLight_VertexColor,				VSBasicOneLightVc,		PSBasicVertexLighting );
+TECHNIQUE( BasicEffect_OneLight_VertexColor_NoFog,			VSBasicOneLightVc,		PSBasicVertexLightingNoFog );
+TECHNIQUE( BasicEffect_OneLight_Texture,					VSBasicOneLightTx,		PSBasicVertexLightingTx );
+TECHNIQUE( BasicEffect_OneLight_Texture_NoFog,				VSBasicOneLightTx,		PSBasicVertexLightingTxNoFog );
+TECHNIQUE( BasicEffect_OneLight_Texture_VertexColor,		VSBasicOneLightTxVc,	PSBasicVertexLightingTx );
+TECHNIQUE( BasicEffect_OneLight_Texture_VertexColor_NoFog,	VSBasicOneLightTxVc,	PSBasicVertexLightingTxNoFog );
 
-PixelShader PSArray[10] =
-{
-    compile ps_2_0 PSBasic(),
-    compile ps_2_0 PSBasicNoFog(),
-    compile ps_2_0 PSBasicTx(),
-    compile ps_2_0 PSBasicTxNoFog(),
-
-    compile ps_2_0 PSBasicVertexLighting(),
-    compile ps_2_0 PSBasicVertexLightingNoFog(),
-    compile ps_2_0 PSBasicVertexLightingTx(),
-    compile ps_2_0 PSBasicVertexLightingTxNoFog(),
-
-    compile ps_2_0 PSBasicPixelLighting(),
-    compile ps_2_0 PSBasicPixelLightingTx(),
-};
-
-
-int PSIndices[32] =
-{
-    0,      // basic
-    1,      // no fog
-    0,      // vertex color
-    1,      // vertex color, no fog
-    2,      // texture
-    3,      // texture, no fog
-    2,      // texture + vertex color
-    3,      // texture + vertex color, no fog
-    
-    4,      // vertex lighting
-    5,      // vertex lighting, no fog
-    4,      // vertex lighting + vertex color
-    5,      // vertex lighting + vertex color, no fog
-    6,      // vertex lighting + texture
-    7,      // vertex lighting + texture, no fog
-    6,      // vertex lighting + texture + vertex color
-    7,      // vertex lighting + texture + vertex color, no fog
-    
-    4,      // one light
-    5,      // one light, no fog
-    4,      // one light + vertex color
-    5,      // one light + vertex color, no fog
-    6,      // one light + texture
-    7,      // one light + texture, no fog
-    6,      // one light + texture + vertex color
-    7,      // one light + texture + vertex color, no fog
-    
-    8,      // pixel lighting
-    8,      // pixel lighting, no fog
-    8,      // pixel lighting + vertex color
-    8,      // pixel lighting + vertex color, no fog
-    9,      // pixel lighting + texture
-    9,      // pixel lighting + texture, no fog
-    9,      // pixel lighting + texture + vertex color
-    9,      // pixel lighting + texture + vertex color, no fog
-};
-
-
-int ShaderIndex = 0;
-
-
-Technique BasicEffect
-{
-    Pass
-    {
-        VertexShader = (VSArray[VSIndices[ShaderIndex]]);
-        PixelShader  = (PSArray[PSIndices[ShaderIndex]]);
-    }
-}
+TECHNIQUE( BasicEffect_PixelLighting,							VSBasicPixelLighting,		PSBasicPixelLighting );
+TECHNIQUE( BasicEffect_PixelLighting_NoFog,						VSBasicPixelLighting,		PSBasicPixelLighting );
+TECHNIQUE( BasicEffect_PixelLighting_VertexColor,				VSBasicPixelLightingVc,		PSBasicPixelLighting );
+TECHNIQUE( BasicEffect_PixelLighting_VertexColor_NoFog,			VSBasicPixelLightingVc,		PSBasicPixelLighting );
+TECHNIQUE( BasicEffect_PixelLighting_Texture,					VSBasicPixelLightingTx,		PSBasicPixelLightingTx );
+TECHNIQUE( BasicEffect_PixelLighting_Texture_NoFog,				VSBasicPixelLightingTx,		PSBasicPixelLightingTx );
+TECHNIQUE( BasicEffect_PixelLighting_Texture_VertexColor,		VSBasicPixelLightingTxVc,	PSBasicPixelLightingTx );
+TECHNIQUE( BasicEffect_PixelLighting_Texture_VertexColor_NoFog,	VSBasicPixelLightingTxVc,	PSBasicPixelLightingTx );

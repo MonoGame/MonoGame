@@ -9,6 +9,16 @@ namespace Microsoft.Xna.Framework.Graphics
     {
         private List<EffectParameter> _parameters = new List<EffectParameter>();
 
+        internal EffectParameterCollection()
+        {
+        }
+
+        internal EffectParameterCollection(EffectParameterCollection cloneSource)
+        {
+            foreach (var parameter in cloneSource)
+                Add(new EffectParameter(parameter));
+        }
+
         public int Count
         {
             get { return _parameters.Count; }

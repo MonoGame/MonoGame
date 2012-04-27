@@ -119,39 +119,10 @@ float4 PSDualTextureNoFog(PSInputTx2NoFog pin) : SV_Target0
 }
 
 
-VertexShader VSArray[4] =
-{
-    compile vs_2_0 VSDualTexture(),
-    compile vs_2_0 VSDualTextureNoFog(),
-    compile vs_2_0 VSDualTextureVc(),
-    compile vs_2_0 VSDualTextureVcNoFog(),
-};
+// NOTE: The order of the techniques here are
+// defined to match the indexing in DualTextureEffect.cs.
 
-
-PixelShader PSArray[2] =
-{
-    compile ps_2_0 PSDualTexture(),
-    compile ps_2_0 PSDualTextureNoFog(),
-};
-
-
-int PSIndices[4] =
-{
-    0,      // basic
-    1,      // no fog
-    0,      // vertex color
-    1,      // vertex color, no fog
-};
-
-
-int ShaderIndex = 0;
-
-
-Technique DualTextureEffect
-{
-    Pass
-    {
-        VertexShader = (VSArray[ShaderIndex]);
-        PixelShader  = (PSArray[PSIndices[ShaderIndex]]);
-    }
-}
+TECHNIQUE( DualTextureEffect,					VSDualTexture,			PSDualTexture );
+TECHNIQUE( DualTextureEffect_NoFog,				VSDualTextureNoFog,		PSDualTextureNoFog );
+TECHNIQUE( DualTextureEffect_VertexColor,		VSDualTextureVc,		PSDualTexture );
+TECHNIQUE( DualTextureEffect_VertexColor_NoFog,	VSDualTextureVcNoFog,	PSDualTextureNoFog );

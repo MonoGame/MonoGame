@@ -9,6 +9,16 @@ namespace Microsoft.Xna.Framework.Graphics
     {
 		private List<EffectPass> _passes = new List<EffectPass>();
 
+        internal EffectPassCollection()
+        {
+        }
+
+        internal EffectPassCollection(Effect effect, EffectPassCollection cloneSource)
+        {
+            foreach (var pass in cloneSource)
+                Add(new EffectPass(effect, pass));
+        }
+
         public EffectPass this[int index]
         {
             get { return _passes[index]; }

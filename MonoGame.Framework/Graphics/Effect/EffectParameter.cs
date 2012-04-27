@@ -6,141 +6,80 @@ using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-    [DebuggerDisplay("{paramClass} {paramType} {name} : {semantic}")]
+    [DebuggerDisplay("{ParameterClass} {ParameterType} {Name} : {Semantic}")]
 	public class EffectParameter
 	{
-		EffectParameterClass _class;
-        EffectParameterType _type;
-        string _name;
-        int _rowCount;
-		int _colCount;
-		EffectParameterCollection _elements;
-		string _semantic;
-		EffectParameterCollection _structMembers;
-		EffectAnnotationCollection _annotations;
-		
+        internal EffectParameter(   EffectParameterClass class_, 
+                                    EffectParameterType type, 
+                                    string name, 
+                                    int rowCount, 
+                                    int columnCount, 
+                                    string semantic, 
+                                    EffectAnnotationCollection annotations,
+                                    EffectParameterCollection elements,
+                                    EffectParameterCollection structMembers,
+                                    object data )
+		{
+            ParameterClass = class_;
+            ParameterType = type;
+
+            Name = name;
+            Semantic = semantic;
+            Annotations = annotations;
+
+            RowCount = rowCount;
+			ColumnCount = columnCount;
+
+            Elements = elements;
+            StructureMembers = structMembers;
+
+            Data = data;
+		}
+
+        internal EffectParameter(EffectParameter cloneSource)
+        {
+            // Share all the immutable types.
+            ParameterClass = cloneSource.ParameterClass;
+            ParameterType = cloneSource.ParameterType;
+            Name = cloneSource.Name;
+            Semantic = cloneSource.Semantic;
+            Annotations = cloneSource.Annotations;
+            RowCount = cloneSource.RowCount;
+            ColumnCount = cloneSource.ColumnCount;
+            
+            // Clone the mutable types.
+            Elements = new EffectParameterCollection(cloneSource.Elements);
+            StructureMembers = new EffectParameterCollection(cloneSource.StructureMembers);
+
+            // Data is mutable, but a new copy happens during
+            // boxing/unboxing so we can just assign it.
+            Data = cloneSource.Data;
+        }
+
+		public string Name { get; private set; }
+
+        public string Semantic { get; private set; }
+
+		public EffectParameterClass ParameterClass { get; private set; }
+
+		public EffectParameterType ParameterType { get; private set; }
+
+		public int RowCount { get; private set; }
+
+        public int ColumnCount { get; private set; }
+
+        public EffectParameterCollection Elements { get; private set; }
+
+        public EffectParameterCollection StructureMembers { get; private set; }
+
+        public EffectAnnotationCollection Annotations { get; private set; }
+
         // TODO: Using object adds alot of boxing/unboxing overhead
         // and garbage generation.  We should consider a templated
         // type implementation to fix this!
 
-        internal object data;
+        internal object Data { get; private set; }
 
-        internal EffectParameter(DXEffectObject.d3dx_parameter parameter)
-		{
-            _class = DXEffectObject.ToParameterClass(parameter.class_);
-            _type = DXEffectObject.ToParameterType(parameter.type);
-			
-			_name = parameter.name;
-			_rowCount = (int)parameter.rows;
-			_colCount = (int)parameter.columns;
-			_semantic = parameter.semantic;
-
-			_annotations = new EffectAnnotationCollection();
-            for (var i = 0; i < parameter.annotation_count; i++) 
-            {
-				var annotation = new EffectAnnotation();
-				_annotations._annotations.Add (annotation);
-			}
-			
-			_elements = new EffectParameterCollection();
-			_structMembers = new EffectParameterCollection();
-			if (parameter.element_count > 0) 
-            {
-                for (var i = 0; i < parameter.element_count; i++) 
-                {
-                    var element = new EffectParameter(parameter.member_handles[i]);
-					_elements.Add(element);
-				}
-			} 
-            else if (parameter.member_count > 0) 
-            {
-                for (var i = 0; i < parameter.member_count; i++) 
-                {
-					var member = new EffectParameter(parameter.member_handles[i]);
-					_structMembers.Add(member);
-				}
-			} 
-            else 
-            {
-				//interpret data
-				switch (_class) 
-                {
-				case EffectParameterClass.Scalar:
-					switch (_type) 
-                    {
-					case EffectParameterType.Bool:
-						data = BitConverter.ToBoolean((byte[])parameter.data, 0);
-						break;
-					case EffectParameterType.Int32:
-						data = BitConverter.ToInt32 ((byte[])parameter.data, 0);
-						break;
-					case EffectParameterType.Single:
-						data = BitConverter.ToSingle((byte[])parameter.data, 0);
-						break;
-					case EffectParameterType.Void:
-						data = null;
-						break;
-					default:
-						throw new NotSupportedException();
-                    }
-					break;
-				case EffectParameterClass.Vector:
-				case EffectParameterClass.Matrix:
-					switch (_type) 
-                    {
-					case EffectParameterType.Single:
-						var vals = new float[_rowCount*_colCount];
-						//transpose maybe?
-                        for (var i = 0; i < _rowCount * _colCount; i++)
-							vals[i] = BitConverter.ToSingle ((byte[])parameter.data, i*4);
-						data = vals;
-						break;
-					default:
-						break;
-					}
-					break;
-				default:
-                    data = parameter.data;
-					break;
-				}
-			}
-		}
-
-        public int ColumnCount {
-			get { return _colCount; }
-		}
-
-		public EffectParameterCollection Elements {
-			get { return _elements; }
-		}
-
-		public string Name {
-			get { return _name; }
-		}
-
-		public EffectParameterClass ParameterClass { 
-			get { return _class;} 
-		}
-
-		public EffectParameterType ParameterType { 
-			get { return _type;} 
-		}
-
-		public int RowCount {
-			get { return _rowCount; }
-		}
-
-		public string Semantic {
-			get { return _semantic; }
-		}
-
-		EffectParameterCollection StructureMembers {
-			get { return _structMembers; }
-		}
-
-		EffectAnnotationCollection Annotations {
-            get { return _annotations; }
-		}
 
 		public void SetValue (object value)
 		{
@@ -159,7 +98,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public int GetValueInt32 ()
 		{
-            return (int)data;
+            return (int)Data;
 		}
 
 		public int[] GetValueInt32Array ()
@@ -192,9 +131,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			switch(ParameterType) 
             {
 			case EffectParameterType.Int32:
-				return (Single)(int)data;
+				return (Single)(int)Data;
 			default:
-				return (Single)data;
+				return (Single)Data;
 			}
 		}
 
@@ -202,12 +141,12 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			if (Elements != null && Elements.Count > 0)
             {
-                var ret = new Single[_rowCount * _colCount * Elements.Count];
+                var ret = new Single[RowCount * ColumnCount * Elements.Count];
 				for (int i=0; i<Elements.Count; i++)
                 {
                     var elmArray = Elements[i].GetValueSingleArray();
                     for (var j = 0; j < elmArray.Length; j++)
-						ret[_rowCount*_colCount*i+j] = elmArray[j];
+						ret[RowCount*ColumnCount*i+j] = elmArray[j];
 				}
 				return ret;
 			}
@@ -218,10 +157,10 @@ namespace Microsoft.Xna.Framework.Graphics
 				return new Single[] { GetValueSingle () };
             case EffectParameterClass.Vector:
 			case EffectParameterClass.Matrix:
-                    if (data is Matrix)
-                        return Matrix.ToFloatArray((Matrix)data);
+                    if (Data is Matrix)
+                        return Matrix.ToFloatArray((Matrix)Data);
                     else
-                        return (float[])data;
+                        return (float[])Data;
 			default:
 				throw new NotImplementedException();
 			}
@@ -234,7 +173,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public Texture2D GetValueTexture2D ()
 		{
-			return (Texture2D)data;
+			return (Texture2D)Data;
 		}
 
         // TODO: Add Texture3D support!
@@ -250,7 +189,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public Vector2 GetValueVector2 ()
 		{
-            var vecInfo = (float[])data;
+            var vecInfo = (float[])Data;
 			return new Vector2(vecInfo[0],vecInfo[1]);
 		}
 
@@ -261,7 +200,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public Vector3 GetValueVector3 ()
 		{
-            var vecInfo = (float[])data;
+            var vecInfo = (float[])Data;
 			return new Vector3(vecInfo[0],vecInfo[1],vecInfo[2]);
 
 		}
@@ -273,7 +212,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public Vector4 GetValueVector4 ()
 		{
-            var vecInfo = (float[])data;
+            var vecInfo = (float[])Data;
 			return new Vector4(vecInfo[0],vecInfo[1],vecInfo[2],vecInfo[3]);
 		}
 
@@ -294,7 +233,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void SetValue (int value)
 		{
-			data = value;
+			Data = value;
 		}
 
 		public void SetValue (int[] value)
@@ -308,7 +247,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			for (var y=0; y<RowCount; y++) 
             {
 				for (var x=0; x<ColumnCount; x++)
-					((float[])data)[y*ColumnCount+x] = matrixData[y*4+x];
+					((float[])Data)[y*ColumnCount+x] = matrixData[y*4+x];
 			}
 		}
 
@@ -334,10 +273,10 @@ namespace Microsoft.Xna.Framework.Graphics
             {
 			case EffectParameterClass.Matrix:
 			case EffectParameterClass.Vector:
-				((float[])data)[0] = value;
+				((float[])Data)[0] = value;
 				break;
 			case EffectParameterClass.Scalar:
-				data = value;
+				Data = value;
 				break;
 			default:
 				throw new NotImplementedException();
@@ -357,12 +296,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void SetValue (Texture value)
 		{
-			data = value;
+			Data = value;
 		}
 
 		public void SetValue (Vector2 value)
 		{
-			data = new float[2] { value.X, value.Y };
+			Data = new float[2] { value.X, value.Y };
 		}
 
 		public void SetValue (Vector2[] value)
@@ -373,7 +312,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void SetValue (Vector3 value)
 		{
-			data = new float[3] { value.X, value.Y, value.Z };
+			Data = new float[3] { value.X, value.Y, value.Z };
 		}
 
 		public void SetValue (Vector3[] value)
@@ -384,7 +323,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void SetValue (Vector4 value)
 		{
-			data = new float[4] { value.X, value.Y, value.Z, value.W };
+			Data = new float[4] { value.X, value.Y, value.Z, value.W };
 		}
 
 		public void SetValue (Vector4[] value)
