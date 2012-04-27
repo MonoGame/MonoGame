@@ -5,29 +5,26 @@ namespace Microsoft.Xna.Framework.Graphics
 {
 	public class EffectAnnotationCollection : IEnumerable<EffectAnnotation>
 	{
-		internal List<EffectAnnotation> _annotations;
-		public EffectAnnotationCollection ()
-		{
-			_annotations = new List<EffectAnnotation>();
-		}
+        List<EffectAnnotation> _annotations = new List<EffectAnnotation>();
 		
-		public int Count {
+		public int Count 
+        {
 			get { return _annotations.Count; }
 		}
 		
 		public EffectAnnotation this[int index]
         {
             get { return _annotations[index]; }
-            internal set { _annotations[index] = value; }
         }
 		
 		public EffectAnnotation this[string name]
         {
-            get {
-				foreach (EffectAnnotation annotation in _annotations) {
-					if (annotation.Name == name) {
+            get 
+            {
+				foreach (var annotation in _annotations) 
+                {
+					if (annotation.Name == name)
 						return annotation;
-					}
 				}
 				return null;
 			}
@@ -41,6 +38,11 @@ namespace Microsoft.Xna.Framework.Graphics
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
             return _annotations.GetEnumerator();
+        }
+
+        internal void Add(EffectAnnotation annotation)
+        {
+            _annotations.Add(annotation);
         }
 	}
 }

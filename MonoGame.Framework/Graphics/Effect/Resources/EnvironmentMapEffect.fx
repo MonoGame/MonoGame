@@ -174,76 +174,23 @@ float4 PSEnvMapSpecularNoFog(PSInputTxEnvMap pin) : SV_Target0
 }
 
 
-VertexShader VSArray[4] =
-{
-    compile vs_2_0 VSEnvMap(),
-    compile vs_2_0 VSEnvMapFresnel(),
-    compile vs_2_0 VSEnvMapOneLight(),
-    compile vs_2_0 VSEnvMapOneLightFresnel(),
-};
+// NOTE: The order of the techniques here are
+// defined to match the indexing in EnvironmentMapEffect.cs.
 
+TECHNIQUE( EnvironmentMapEffect,						VSEnvMap,			PSEnvMap );
+TECHNIQUE( EnvironmentMapEffect_NoFog,					VSEnvMap,			PSEnvMapNoFog );
+TECHNIQUE( EnvironmentMapEffect_Fresnel,				VSEnvMapFresnel,	PSEnvMap );
+TECHNIQUE( EnvironmentMapEffect_Fresnel_NoFog,			VSEnvMapFresnel,	PSEnvMapNoFog );
+TECHNIQUE( EnvironmentMapEffect_Specular,				VSEnvMap,			PSEnvMapSpecular );
+TECHNIQUE( EnvironmentMapEffect_Specular_NoFog,			VSEnvMap,			PSEnvMapSpecularNoFog );
+TECHNIQUE( EnvironmentMapEffect_Fresnel_Specular,		VSEnvMapFresnel,	PSEnvMapSpecular );
+TECHNIQUE( EnvironmentMapEffect_Fresnel_Specular_NoFog,	VSEnvMapFresnel,	PSEnvMapSpecularNoFog );
 
-int VSIndices[16] =
-{
-    0,      // basic
-    0,      // basic, no fog
-    1,      // fresnel
-    1,      // fresnel, no fog
-    0,      // specular
-    0,      // specular, no fog
-    1,      // fresnel + specular
-    1,      // fresnel + specular, no fog
-
-    2,      // one light
-    2,      // one light, no fog
-    3,      // one light, fresnel
-    3,      // one light, fresnel, no fog
-    2,      // one light, specular
-    2,      // one light, specular, no fog
-    3,      // one light, fresnel + specular
-    3,      // one light, fresnel + specular, no fog
-};
-
-
-PixelShader PSArray[4] =
-{
-    compile ps_2_0 PSEnvMap(),
-    compile ps_2_0 PSEnvMapNoFog(),
-    compile ps_2_0 PSEnvMapSpecular(),
-    compile ps_2_0 PSEnvMapSpecularNoFog(),
-};
-
-
-int PSIndices[16] =
-{
-    0,      // basic
-    1,      // basic, no fog
-    0,      // fresnel
-    1,      // fresnel, no fog
-    2,      // specular
-    3,      // specular, no fog
-    2,      // fresnel + specular
-    3,      // fresnel + specular, no fog
-
-    0,      // one light
-    1,      // one light, no fog
-    0,      // one light, fresnel
-    1,      // one light, fresnel, no fog
-    2,      // one light, specular
-    3,      // one light, specular, no fog
-    2,      // one light, fresnel + specular
-    3,      // one light, fresnel + specular, no fog
-};
-
-
-int ShaderIndex = 0;
-
-
-Technique EnvironmentMapEffect
-{
-    Pass
-    {
-        VertexShader = (VSArray[VSIndices[ShaderIndex]]);
-        PixelShader  = (PSArray[PSIndices[ShaderIndex]]);
-    }
-}
+TECHNIQUE( EnvironmentMapEffect_OneLight,							VSEnvMapOneLight,			PSEnvMap );
+TECHNIQUE( EnvironmentMapEffect_OneLight_NoFog,						VSEnvMapOneLight,			PSEnvMapNoFog );
+TECHNIQUE( EnvironmentMapEffect_OneLight_Fresnel,					VSEnvMapOneLightFresnel,	PSEnvMap );
+TECHNIQUE( EnvironmentMapEffect_OneLight_Fresnel_NoFog,				VSEnvMapOneLightFresnel,	PSEnvMapNoFog );
+TECHNIQUE( EnvironmentMapEffect_OneLight_Specular,					VSEnvMapOneLight,			PSEnvMapSpecular );
+TECHNIQUE( EnvironmentMapEffect_OneLight_Specular_NoFog,			VSEnvMapOneLight,			PSEnvMapSpecularNoFog );
+TECHNIQUE( EnvironmentMapEffect_OneLight_Fresnel_Specular,			VSEnvMapOneLightFresnel,	PSEnvMapSpecular );
+TECHNIQUE( EnvironmentMapEffect_OneLight_Fresnel_Specular_NoFog,	VSEnvMapOneLightFresnel,	PSEnvMapSpecularNoFog );

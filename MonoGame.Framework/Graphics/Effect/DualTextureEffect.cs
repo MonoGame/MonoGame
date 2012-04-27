@@ -293,7 +293,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// Lazily computes derived parameter values immediately before applying the effect.
         /// </summary>
-        protected internal override void OnApply()
+        protected internal override bool OnApply()
         {
             // Recompute the world+view+projection matrix or fog vector?
             dirtyFlags = EffectHelpers.SetWorldViewProjAndFog(dirtyFlags, ref world, ref view, ref projection, ref worldView, fogEnabled, fogStart, fogEnd, worldViewProjParam, fogVectorParam);
@@ -321,6 +321,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 dirtyFlags &= ~EffectDirtyFlags.ShaderIndex;
             }
+
+            return false;
         }
 
 

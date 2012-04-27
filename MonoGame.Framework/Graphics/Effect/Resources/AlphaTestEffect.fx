@@ -135,60 +135,17 @@ float4 PSAlphaTestEqNeNoFog(PSInputTxNoFog pin) : SV_Target0
 }
 
 
-VertexShader VSArray[4] =
-{
-    compile vs_2_0 VSAlphaTest(),
-    compile vs_2_0 VSAlphaTestNoFog(),
-    compile vs_2_0 VSAlphaTestVc(),
-    compile vs_2_0 VSAlphaTestVcNoFog(),
-};
+// NOTE: The order of the techniques here are
+// defined to match the indexing in AlphaTestEffect.cs.
+
+TECHNIQUE( AlphaTestEffect_LTGT,					VSAlphaTest,		PSAlphaTestLtGt );
+TECHNIQUE( AlphaTestEffect_LTGT_NoFog,				VSAlphaTestNoFog,	PSAlphaTestLtGtNoFog );
+TECHNIQUE( AlphaTestEffect_LTGT_VertexColor,		VSAlphaTestVc,		PSAlphaTestLtGt );
+TECHNIQUE( AlphaTestEffect_LTGT_VertexColor_NoFog,	VSAlphaTestVcNoFog,	PSAlphaTestLtGtNoFog );
+
+TECHNIQUE( AlphaTestEffect_EQNE,					VSAlphaTest,		PSAlphaTestEqNe );
+TECHNIQUE( AlphaTestEffect_EQNE_NoFog,				VSAlphaTestNoFog,	PSAlphaTestEqNeNoFog );
+TECHNIQUE( AlphaTestEffect_EQNE_VertexColor,		VSAlphaTestVc,		PSAlphaTestEqNe );
+TECHNIQUE( AlphaTestEffect_EQNE_VertexColor_NoFog,	VSAlphaTestVcNoFog,	PSAlphaTestEqNeNoFog );
 
 
-int VSIndices[8] =
-{
-    0,      // lt/gt
-    1,      // lt/gt, no fog
-    2,      // lt/gt, vertex color
-    3,      // lt/gt, vertex color, no fog
-    
-    0,      // eq/ne
-    1,      // eq/ne, no fog
-    2,      // eq/ne, vertex color
-    3,      // eq/ne, vertex color, no fog
-};
-
-
-PixelShader PSArray[4] =
-{
-    compile ps_2_0 PSAlphaTestLtGt(),
-    compile ps_2_0 PSAlphaTestLtGtNoFog(),
-    compile ps_2_0 PSAlphaTestEqNe(),
-    compile ps_2_0 PSAlphaTestEqNeNoFog(),
-};
-
-
-int PSIndices[8] =
-{
-    0,      // lt/gt
-    1,      // lt/gt, no fog
-    0,      // lt/gt, vertex color
-    1,      // lt/gt, vertex color, no fog
-    
-    2,      // eq/ne
-    3,      // eq/ne, no fog
-    2,      // eq/ne, vertex color
-    3,      // eq/ne, vertex color, no fog
-};
-
-
-int ShaderIndex = 0;
-
-
-Technique AlphaTestEffect
-{
-    Pass
-    {
-        VertexShader = (VSArray[VSIndices[ShaderIndex]]);
-        PixelShader  = (PSArray[PSIndices[ShaderIndex]]);
-    }
-}

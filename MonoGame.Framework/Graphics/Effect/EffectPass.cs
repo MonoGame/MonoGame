@@ -26,19 +26,8 @@ namespace Microsoft.Xna.Framework.Graphics
     {
         private Effect _effect;
 
-        private DXEffectObject.d3dx_state[] _pass_states;
-
 		private DXShader _pixelShader;
-
         private DXShader _vertexShader;
-
-#if OPENGL
-
-        private int _shaderProgram;
-
-		static readonly float[] _posFixup = new float[4];
-
-#endif // OPENGL
 
         private BlendState _blendState;
         private DepthStencilState _depthStencilState;
@@ -48,170 +37,129 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public EffectAnnotationCollection Annotations { get; private set; }
 
-		internal EffectPass(Effect effect, DXEffectObject.d3dx_pass pass)
+#if OPENGL
+
+        private int _shaderProgram;
+
+        static readonly float[] _posFixup = new float[4];
+
+#endif // OPENGL
+
+        internal EffectPass(    Effect effect, 
+                                string name,
+                                DXShader vertexShader, 
+                                DXShader pixelShader, 
+                                BlendState blendState, 
+                                DepthStencilState depthStencilState, 
+                                RasterizerState rasterizerState,
+                                EffectAnnotationCollection annotations )
         {
+            Debug.Assert(effect != null, "Got a null effect!");
+            Debug.Assert(vertexShader != null, "Got a null vertex shader!");
+            Debug.Assert(pixelShader != null, "Got a null pixel shader!");
+            Debug.Assert(annotations != null, "Got a null annotation collection!");
+
             _effect = effect;
 
-            Name = pass.name;
-                
-            _pass_states = pass.states;
+            Name = name;
 
-            Annotations = new EffectAnnotationCollection();
-			
+            _vertexShader = vertexShader;
+            _pixelShader = pixelShader;
+
+            _blendState = blendState;
+            _depthStencilState = depthStencilState;
+            _rasterizerState = rasterizerState;
+
+            Annotations = annotations;
+
+            Initialize();
+        }
+
+        internal EffectPass(Effect effect, EffectPass cloneSource)
+        {
+            Debug.Assert(effect != null, "Got a null effect!");
+            Debug.Assert(cloneSource != null, "Got a null cloneSource!");
+
+            _effect = effect;
+
+            // Share all the immutable types.
+            Name = cloneSource.Name;
+            _blendState = cloneSource._blendState;
+            _depthStencilState = cloneSource._depthStencilState;
+            _rasterizerState = cloneSource._rasterizerState;
+            Annotations = cloneSource.Annotations;
+#if OPENGL
+            _shaderProgram = cloneSource._shaderProgram;
+#endif
+
+            // Clone the mutable types.
+            _vertexShader = new DXShader(cloneSource._vertexShader);
+            _pixelShader = new DXShader(cloneSource._pixelShader);
+        }
+
+        private void Initialize()
+        {
 #if OPENGL
             Threading.Begin();
             try
             {
+                // TODO: Shouldn't we be calling GL.DeleteProgram() somewhere?
+
+                // TODO: We could cache the various program combinations 
+                // of vertex/pixel shaders and share them across effects.
+
                 _shaderProgram = GL.CreateProgram();
 
-                foreach (var state in _pass_states)
+                GL.AttachShader(_shaderProgram, _vertexShader.ShaderHandle);
+                GL.AttachShader(_shaderProgram, _pixelShader.ShaderHandle);
+
+                _vertexShader.OnLink(_shaderProgram);
+                _pixelShader.OnLink(_shaderProgram);
+                GL.LinkProgram(_shaderProgram);
+
+                var linked = 0;
+
+#if GLES
+    			GL.GetProgram(shaderProgram, ProgramParameter.LinkStatus, ref linked);
+#else
+                GL.GetProgram(_shaderProgram, ProgramParameter.LinkStatus, out linked);
+#endif
+                if (linked == 0)
                 {
-                    if (state.type != DXEffectObject.STATE_TYPE.CONSTANT)
-                        continue;
-
-                    var operation = DXEffectObject.state_table[state.operation];
-
-                    if (operation.class_ == DXEffectObject.STATE_CLASS.PIXELSHADER)
-                    {
-                        _pixelShader = (DXShader)state.parameter.data;
-                        GL.AttachShader(_shaderProgram, _pixelShader.ShaderHandle);
-                    }
-                    else if (operation.class_ == DXEffectObject.STATE_CLASS.VERTEXSHADER)
-                    {
-                        _vertexShader = (DXShader)state.parameter.data;
-                        GL.AttachShader(_shaderProgram, _vertexShader.ShaderHandle);
-                    }
-                    else if (operation.class_ == DXEffectObject.STATE_CLASS.RENDERSTATE)
-                    {
-                        switch (operation.op)
-                        {
-                            case (uint)DXEffectObject.D3DRENDERSTATETYPE.STENCILENABLE:
-                                _depthStencilState = _depthStencilState ?? new DepthStencilState();
-                                _depthStencilState.StencilEnable = (bool)state.parameter.data;
-                                break;
-                            case (uint)DXEffectObject.D3DRENDERSTATETYPE.SCISSORTESTENABLE:
-                                _rasterizerState = _rasterizerState ?? new RasterizerState();
-                                _rasterizerState.ScissorTestEnable = (bool)state.parameter.data;
-                                break;
-                            case (uint)DXEffectObject.D3DRENDERSTATETYPE.BLENDOP:
-                                _blendState = _blendState ?? new BlendState();
-                                _blendState.ColorBlendFunction = (BlendFunction)state.parameter.data;
-                                break;
-                            case (uint)DXEffectObject.D3DRENDERSTATETYPE.SRCBLEND:
-                                _blendState = _blendState ?? new BlendState();
-                                _blendState.ColorSourceBlend = (Blend)state.parameter.data;
-                                break;
-                            case (uint)DXEffectObject.D3DRENDERSTATETYPE.DESTBLEND:
-                                _blendState = _blendState ?? new BlendState();
-                                _blendState.ColorDestinationBlend = (Blend)state.parameter.data;
-                                break;
-                            case (uint)DXEffectObject.D3DRENDERSTATETYPE.ALPHABLENDENABLE:
-                                break; //not sure what to do
-                            case (uint)DXEffectObject.D3DRENDERSTATETYPE.CULLMODE:
-                                _rasterizerState = _rasterizerState ?? new RasterizerState();
-                                _rasterizerState.CullMode = (CullMode)state.parameter.data;
-                                break;
-                            case (uint)DXEffectObject.D3DRENDERSTATETYPE.COLORWRITEENABLE:
-                                _blendState = _blendState ?? new BlendState();
-                                _blendState.ColorWriteChannels = (ColorWriteChannels)state.parameter.data;
-                                break;
-                            case (uint)DXEffectObject.D3DRENDERSTATETYPE.STENCILFUNC:
-                                _depthStencilState = _depthStencilState ?? new DepthStencilState();
-                                _depthStencilState.StencilFunction = (CompareFunction)state.parameter.data;
-                                break;
-                            case (uint)DXEffectObject.D3DRENDERSTATETYPE.STENCILPASS:
-                                _depthStencilState = _depthStencilState ?? new DepthStencilState();
-                                _depthStencilState.StencilPass = (StencilOperation)state.parameter.data;
-                                break;
-                            case (uint)DXEffectObject.D3DRENDERSTATETYPE.STENCILFAIL:
-                                _depthStencilState = _depthStencilState ?? new DepthStencilState();
-                                _depthStencilState.StencilFail = (StencilOperation)state.parameter.data;
-                                break;
-                            case (uint)DXEffectObject.D3DRENDERSTATETYPE.STENCILREF:
-                                _depthStencilState = _depthStencilState ?? new DepthStencilState();
-                                _depthStencilState.ReferenceStencil = (int)state.parameter.data;
-                                break;
-                            default:
-                                throw new NotImplementedException();
-                        }
-                    }
-                    else
-                        throw new NotImplementedException();
+#if !GLES
+                    string log = GL.GetProgramInfoLog(_shaderProgram);
+                    Console.WriteLine(log);
+#endif
+                    throw new InvalidOperationException("Unable to link effect program");
                 }
-
-                // If we both shaders then link them now.
-                if ( _pixelShader != null && _vertexShader != null )
-                    Link();
             }
             finally
             {
                 Threading.End();
             }
+
 #elif DIRECTX
+
 
 #endif
         }
 
         public void Apply()
-		{
+        {
             // Set/get the correct shader handle/cleanups.
-            _effect.OnApply();
-
-            // TODO: This is only nessasary because we allow for "expressions"
-            // in shader assignment... we should remove this functionality.
-			var relink = false;
-            foreach (var state in _pass_states)
-            {				
-				// Constants handled during initialization.
-				if (state.type == DXEffectObject.STATE_TYPE.CONSTANT) 
-                    continue;
-
-                var operation = DXEffectObject.state_table[state.operation];
-                if (operation.class_ == DXEffectObject.STATE_CLASS.PIXELSHADER ||
-                    operation.class_ == DXEffectObject.STATE_CLASS.VERTEXSHADER)
-                {
-                    DXShader shader;
-					switch (state.type) 
-                    {
-					case DXEffectObject.STATE_TYPE.EXPRESSIONINDEX:
-                        var expression = (DXExpression)state.parameter.data;
-                        shader = (DXShader)expression.Evaluate(_effect.Parameters);
-						break;
-					case DXEffectObject.STATE_TYPE.PARAMETER:
-					default:
-						throw new NotImplementedException();
-					}
+            //
+            // TODO: This "reapply" if the shader index changes
+            // trick is sort of ugly.  We should probably rework
+            // this to use some sort of "technique/pass redirect".
+            //
+            if (_effect.OnApply())
+            {
+                _effect.CurrentTechnique.Passes[0].Apply();
+                return;
+            }
 
 #if OPENGL
-					if (shader.ShaderType == ShaderType.FragmentShader && shader != _pixelShader) 
-                    {
-						if (_pixelShader != null)
-                            GL.DetachShader(_shaderProgram, _pixelShader.ShaderHandle);
-
-                        relink = true;
-						_pixelShader = shader;
-                        GL.AttachShader(_shaderProgram, _pixelShader.ShaderHandle);
-					}
-                    else if (shader.ShaderType == ShaderType.VertexShader && shader != _vertexShader) 
-                    {
-						if (_vertexShader != null)
-                            GL.DetachShader(_shaderProgram, _vertexShader.ShaderHandle);
-
-                        relink = true;
-						_vertexShader = shader;
-                        GL.AttachShader(_shaderProgram, _vertexShader.ShaderHandle);
-					}	
-#elif DIRECTX
-
-#endif
-				}
-			}
-
-			if (relink)
-				Link();
-			
-#if OPENGL
-			GL.UseProgram(_shaderProgram);
+            GL.UseProgram(_shaderProgram);
 #elif DIRECTX
 
 #endif
@@ -228,84 +176,56 @@ namespace Microsoft.Xna.Framework.Graphics
 #if OPENGL
 
             // We better have a vertex shader by now!
-            Debug.Assert(_vertexShader != null, "You must define a vertex shader!");
-			_vertexShader.Apply(_shaderProgram, _effect.Parameters, device);
+            Debug.Assert(_vertexShader != null, "Got a null vertex shader!");
+            _vertexShader.Apply(_shaderProgram, _effect.Parameters, device);
 
-			// Apply vertex shader fix:
-			// The following two lines are appended to the end of vertex shaders
-			// to account for rendering differences between OpenGL and DirectX:
-			//
-			// gl_Position.y = gl_Position.y * posFixup.y;
-			// gl_Position.xy += posFixup.zw * gl_Position.ww;
-			//
-			// (the following paraphrased from wine, wined3d/state.c and wined3d/glsl_shader.c)
-			//
-			// - We need to flip along the y-axis in case of offscreen rendering.
-			// - D3D coordinates refer to pixel centers while GL coordinates refer
-			//   to pixel corners.
-			// - D3D has a top-left filling convention. We need to maintain this
-			//   even after the y-flip mentioned above.
-			// In order to handle the last two points, we translate by
-			// (63.0 / 128.0) / VPw and (63.0 / 128.0) / VPh. This is equivalent to
-			// translating slightly less than half a pixel. We want the difference to
-			// be large enough that it doesn't get lost due to rounding inside the
-			// driver, but small enough to prevent it from interfering with any
-			// anti-aliasing.
-			//
-			// OpenGL coordinates specify the center of the pixel while d3d coords specify
-			// the corner. The offsets are stored in z and w in posFixup. posFixup.y contains
-			// 1.0 or -1.0 to turn the rendering upside down for offscreen rendering. PosFixup.x
-			// contains 1.0 to allow a mad.
+            // Apply vertex shader fix:
+            // The following two lines are appended to the end of vertex shaders
+            // to account for rendering differences between OpenGL and DirectX:
+            //
+            // gl_Position.y = gl_Position.y * posFixup.y;
+            // gl_Position.xy += posFixup.zw * gl_Position.ww;
+            //
+            // (the following paraphrased from wine, wined3d/state.c and wined3d/glsl_shader.c)
+            //
+            // - We need to flip along the y-axis in case of offscreen rendering.
+            // - D3D coordinates refer to pixel centers while GL coordinates refer
+            //   to pixel corners.
+            // - D3D has a top-left filling convention. We need to maintain this
+            //   even after the y-flip mentioned above.
+            // In order to handle the last two points, we translate by
+            // (63.0 / 128.0) / VPw and (63.0 / 128.0) / VPh. This is equivalent to
+            // translating slightly less than half a pixel. We want the difference to
+            // be large enough that it doesn't get lost due to rounding inside the
+            // driver, but small enough to prevent it from interfering with any
+            // anti-aliasing.
+            //
+            // OpenGL coordinates specify the center of the pixel while d3d coords specify
+            // the corner. The offsets are stored in z and w in posFixup. posFixup.y contains
+            // 1.0 or -1.0 to turn the rendering upside down for offscreen rendering. PosFixup.x
+            // contains 1.0 to allow a mad.
 
-			_posFixup[0] = 1.0f;
-			_posFixup[1] = 1.0f;
+            _posFixup[0] = 1.0f;
+            _posFixup[1] = 1.0f;
             _posFixup[2] = (63.0f / 64.0f) / device.Viewport.Width;
             _posFixup[3] = -(63.0f / 64.0f) / device.Viewport.Height;
-			//If we have a render target bound (rendering offscreen)
-            if (device.GetRenderTargets().Length > 0) 
+            //If we have a render target bound (rendering offscreen)
+            if (device.GetRenderTargets().Length > 0)
             {
-				//flip vertically
-				_posFixup[1] *= -1.0f;
-				_posFixup[3] *= -1.0f;
-			}
+                //flip vertically
+                _posFixup[1] *= -1.0f;
+                _posFixup[3] *= -1.0f;
+            }
             var posFixupLoc = GL.GetUniformLocation(_shaderProgram, "posFixup"); // TODO: Look this up on link!
-			GL.Uniform4 (posFixupLoc, 1, _posFixup);
+            GL.Uniform4(posFixupLoc, 1, _posFixup);
 
-            Debug.Assert(_pixelShader != null, "You must define a pixel shader!");
+            Debug.Assert(_pixelShader != null, "Got a null pixel shader!");
             _pixelShader.Apply(_shaderProgram, _effect.Parameters, device);
 
 #elif DIRECTX
             
 #endif
-		}
-
-        private void Link()
-		{
-#if OPENGL
-            Debug.Assert(_vertexShader != null, "You must define a vertex shader!");
-            Debug.Assert(_pixelShader != null, "You must define a pixel shader!");
-
-			_vertexShader.OnLink(_shaderProgram);
-			_pixelShader.OnLink(_shaderProgram);
-
-			GL.LinkProgram(_shaderProgram);
-
-			var linked = 0;
-#if GLES
-			GL.GetProgram(shaderProgram, ProgramParameter.LinkStatus, ref linked);
-#else
-			GL.GetProgram(_shaderProgram, ProgramParameter.LinkStatus, out linked);
-#endif
-			if (linked == 0) 
-            {
-#if !GLES
-				string log = GL.GetProgramInfoLog(_shaderProgram);
-				Console.WriteLine (log);
-#endif
-				throw new InvalidOperationException("Unable to link effect program");
-			}
-#endif
-		}		
-				
+        }
+		
     }
 }
