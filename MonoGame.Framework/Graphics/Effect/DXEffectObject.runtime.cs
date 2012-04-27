@@ -163,7 +163,271 @@ namespace Microsoft.Xna.Framework.Graphics
 
             return technique;
         }
+        
+        internal static BlendState GetBlendState(d3dx_state[] states)
+        {
+            BlendState result = null;
 
+            foreach (var state in states)
+            {
+                var operation = DXEffectObject.state_table[state.operation];
+                if (operation.class_ != DXEffectObject.STATE_CLASS.RENDERSTATE)
+                    continue;
+
+                if (state.type != DXEffectObject.STATE_TYPE.CONSTANT)
+                    throw new NotSupportedException("We do not support shader expressions!");
+
+                switch ((DXEffectObject.D3DRENDERSTATETYPE)operation.op)
+                {
+                    case DXEffectObject.D3DRENDERSTATETYPE.BLENDOP:
+                        result = result ?? new BlendState();
+                        result.ColorBlendFunction = (BlendFunction)state.parameter.data;
+                        break;
+
+                    case DXEffectObject.D3DRENDERSTATETYPE.SRCBLEND:
+                        result = result ?? new BlendState();
+                        result.ColorSourceBlend = (Blend)state.parameter.data;
+                        break;
+
+                    case DXEffectObject.D3DRENDERSTATETYPE.DESTBLEND:
+                        result = result ?? new BlendState();
+                        result.ColorDestinationBlend = (Blend)state.parameter.data;
+                        break;
+
+                    case DXEffectObject.D3DRENDERSTATETYPE.COLORWRITEENABLE:
+                        result = result ?? new BlendState();
+                        result.ColorWriteChannels = (ColorWriteChannels)state.parameter.data;
+                        break;
+
+                    case DXEffectObject.D3DRENDERSTATETYPE.ALPHABLENDENABLE:
+                        break; //not sure what to do
+                }
+            }
+
+            return result;
+        }
+
+        internal static RasterizerState GetRasterizerState(d3dx_state[] states)
+        {
+            RasterizerState result = null;
+
+            foreach (var state in states)
+            {
+                var operation = DXEffectObject.state_table[state.operation];
+                if (operation.class_ != DXEffectObject.STATE_CLASS.RENDERSTATE)
+                    continue;
+
+                if (state.type != DXEffectObject.STATE_TYPE.CONSTANT)
+                    throw new NotSupportedException("We do not support shader expressions!");
+
+                switch ((DXEffectObject.D3DRENDERSTATETYPE)operation.op)
+                {
+                    case DXEffectObject.D3DRENDERSTATETYPE.SCISSORTESTENABLE:
+                        result = result ?? new RasterizerState();
+                        result.ScissorTestEnable = (bool)state.parameter.data;
+                        break;
+
+                    case DXEffectObject.D3DRENDERSTATETYPE.CULLMODE:
+                        result = result ?? new RasterizerState();
+                        result.CullMode = (CullMode)state.parameter.data;
+                        break;
+                }
+            }
+
+            return result;
+        }
+
+        internal static DepthStencilState GetDepthStencilState(d3dx_state[] states)
+        {
+            DepthStencilState result = null;
+
+            foreach (var state in states)
+            {
+                var operation = DXEffectObject.state_table[state.operation];
+                if (operation.class_ != DXEffectObject.STATE_CLASS.RENDERSTATE)
+                    continue;
+
+                if (state.type != DXEffectObject.STATE_TYPE.CONSTANT)
+                    throw new NotSupportedException("We do not support shader expressions!");
+
+                switch ((DXEffectObject.D3DRENDERSTATETYPE)operation.op)
+                {
+                    case DXEffectObject.D3DRENDERSTATETYPE.STENCILENABLE:
+                        result = result ?? new DepthStencilState();
+                        result.StencilEnable = (bool)state.parameter.data;
+                        break;
+
+                    case DXEffectObject.D3DRENDERSTATETYPE.STENCILFUNC:
+                        result = result ?? new DepthStencilState();
+                        result.StencilFunction = (CompareFunction)state.parameter.data;
+                        break;
+
+                    case DXEffectObject.D3DRENDERSTATETYPE.STENCILPASS:
+                        result = result ?? new DepthStencilState();
+                        result.StencilPass = (StencilOperation)state.parameter.data;
+                        break;
+
+                    case DXEffectObject.D3DRENDERSTATETYPE.STENCILFAIL:
+                        result = result ?? new DepthStencilState();
+                        result.StencilFail = (StencilOperation)state.parameter.data;
+                        break;
+
+                    case DXEffectObject.D3DRENDERSTATETYPE.STENCILREF:
+                        result = result ?? new DepthStencilState();
+                        result.ReferenceStencil = (int)state.parameter.data;
+                        break;
+                }
+            }
+
+            return result;
+        }
+
+
+        internal static EffectParameterCollection CreateEffectParameters(DXEffectObject.d3dx_parameter[] parameters)
+        {
+            var collection = new EffectParameterCollection();
+            if (parameters == null)
+                return collection;
+
+            for (var i = 0; i < parameters.Length; i++)
+            {
+                var element = DXEffectObject.CreateEffectParameter(parameters[i]);
+                collection.Add(element);
+            }
+
+            return collection;
+        }
+
+        internal static EffectParameter CreateEffectParameter(DXEffectObject.d3dx_parameter parameter)
+        {
+            var class_ = DXEffectObject.ToParameterClass(parameter.class_);
+            var type = DXEffectObject.ToParameterType(parameter.type);
+
+            var annotations = DXEffectObject.CreateEffectAnnotations(parameter.annotation_handles);
+
+            EffectParameterCollection elements;
+            if (parameter.element_count > 0)
+                elements = CreateEffectParameters(parameter.member_handles);
+            else
+                elements = new EffectParameterCollection();
+
+            EffectParameterCollection structMembers;
+            if (parameter.member_count > 0)
+                structMembers = CreateEffectParameters(parameter.member_handles);
+            else
+                structMembers = new EffectParameterCollection();
+
+            object data = null;
+            if (elements.Count == 0 && structMembers.Count == 0)
+            {
+                //interpret data
+                switch (class_)
+                {
+                    case EffectParameterClass.Scalar:
+                        switch (type)
+                        {
+                            case EffectParameterType.Bool:
+                                data = BitConverter.ToBoolean((byte[])parameter.data, 0);
+                                break;
+                            case EffectParameterType.Int32:
+                                data = BitConverter.ToInt32((byte[])parameter.data, 0);
+                                break;
+                            case EffectParameterType.Single:
+                                data = BitConverter.ToSingle((byte[])parameter.data, 0);
+                                break;
+                            case EffectParameterType.Void:
+                                data = null;
+                                break;
+                            default:
+                                throw new NotSupportedException();
+                        }
+                        break;
+
+                    case EffectParameterClass.Vector:
+                    case EffectParameterClass.Matrix:
+                        switch (type)
+                        {
+                            case EffectParameterType.Single:
+                                var vals = new float[parameter.rows * parameter.columns];
+                                //transpose maybe?
+                                for (var i = 0; i < vals.Length; i++)
+                                    vals[i] = BitConverter.ToSingle((byte[])parameter.data, i * 4);
+                                data = vals;
+                                break;
+                            default:
+                                break;
+                        }
+                        break;
+
+                    default:
+                        data = parameter.data;
+                        break;
+                }
+            }
+
+            return new EffectParameter(class_, type, parameter.name,
+                (int)parameter.rows, (int)parameter.columns, parameter.semantic,
+                annotations, elements, structMembers, data);
+        }
+
+        internal static EffectTechniqueCollection CreateEffectTechniques(Effect effect, DXEffectObject.d3dx_technique[] techniques)
+        {
+            var collection = new EffectTechniqueCollection();
+            if (techniques == null)
+                return collection;
+
+            for (var i = 0; i < techniques.Length; i++)
+            {
+                var technique = new EffectTechnique(
+                    effect,
+                    techniques[i].name,
+                    DXEffectObject.CreateEffectPasses(effect, techniques[i].pass_handles),
+                    DXEffectObject.CreateEffectAnnotations(techniques[i].annotation_handles));
+
+                collection.Add(technique);
+            }
+
+            return collection;
+        }
+
+        internal static EffectPassCollection CreateEffectPasses(Effect effect, DXEffectObject.d3dx_pass[] passes)
+        {
+            var collection = new EffectPassCollection();
+            if (passes == null)
+                return collection;
+
+            for (var i = 0; i < passes.Length; i++)
+            {
+                var pass = new EffectPass(
+                    effect,
+                    passes[i].name,
+                    DXEffectObject.GetVertexShader(passes[i].states),
+                    DXEffectObject.GetPixelShader(passes[i].states),
+                    DXEffectObject.GetBlendState(passes[i].states),
+                    DXEffectObject.GetDepthStencilState(passes[i].states),
+                    DXEffectObject.GetRasterizerState(passes[i].states),
+                    DXEffectObject.CreateEffectAnnotations(passes[i].annotation_handles));
+
+                collection.Add(pass);
+            }
+
+            return collection;
+        }
+
+        internal static EffectAnnotationCollection CreateEffectAnnotations(DXEffectObject.d3dx_parameter[] parameters)
+        {
+            var collection = new EffectAnnotationCollection();
+            if (parameters == null)
+                return collection;
+
+            for (var i = 0; i < parameters.Length; i++)
+            {
+                var annotation = new EffectAnnotation();
+                collection.Add(annotation);
+            }
+
+            return collection;
+        }
 	}
 }
 

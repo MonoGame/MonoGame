@@ -599,11 +599,66 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
         }
 
+        static internal VertexElementUsage ToVertexElementUsage(MojoShader.MOJOSHADER_usage usage)
+        {
+            switch (usage)
+            {
+                case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_POSITION:
+                    return VertexElementUsage.Position;
+		        case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_BLENDWEIGHT:
+                    return VertexElementUsage.BlendWeight;
+                case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_BLENDINDICES:
+                    return VertexElementUsage.BlendIndices;
+		        case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_NORMAL:
+                    return VertexElementUsage.Normal;
+                case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_POINTSIZE:
+                    return VertexElementUsage.PointSize;
+                case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_TEXCOORD:
+                    return VertexElementUsage.TextureCoordinate;
+                case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_TANGENT:
+                    return VertexElementUsage.Tangent;
+                case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_BINORMAL:
+                    return VertexElementUsage.Binormal;
+                case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_TESSFACTOR:
+                    return VertexElementUsage.TessellateFactor;
+                case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_COLOR:
+                    return VertexElementUsage.Color;
+                case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_FOG:
+                    return VertexElementUsage.Fog;
+                case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_DEPTH:
+                    return VertexElementUsage.Depth;
+                case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_SAMPLE:
+                    return VertexElementUsage.Sample;
+
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        internal static int GetShaderIndex(DXEffectObject.STATE_CLASS type, d3dx_state[] states)
+        {
+            foreach (var state in states)
+            {
+                var operation = DXEffectObject.state_table[state.operation];
+                if (operation.class_ != type)
+                    continue;
+
+                if (state.type != DXEffectObject.STATE_TYPE.CONSTANT)
+                    throw new NotSupportedException("We do not support shader expressions!");
+
+                return (int)state.parameter.data;
+            }
+
+            return -1;
+        }
+        
         public d3dx_parameter[] Objects { get; private set; }
 
         public d3dx_parameter[] Parameters { get; private set; }
 
         public d3dx_technique[] Techniques { get; private set; }
+
+        public List<DXShader> Shaders { get; private set; }
 
         private const string Header = "MGFX";
 

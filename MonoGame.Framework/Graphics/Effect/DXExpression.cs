@@ -29,7 +29,7 @@ namespace Microsoft.Xna.Framework.Graphics
             var element = param.Elements[index];
 
             // Return the data object.
-            return element.data;
+            return element.Data;
 		}
 		
 	}
