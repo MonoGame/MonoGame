@@ -3,27 +3,28 @@ namespace Microsoft.Xna.Framework.Graphics
 {
 	public class EffectTechnique
 	{
-        internal Effect _effect;
+        public EffectPassCollection Passes { get; private set; }
 
-        public EffectPassCollection Passes { get; set; }
-		public EffectAnnotationCollection Annotations { get; set; }
+        public EffectAnnotationCollection Annotations { get; private set; }
 
         public string Name { get; private set; }
 
-        public EffectTechnique(Effect effect, DXEffectObject.d3dx_technique technique)
+        internal EffectTechnique(Effect effect, EffectTechnique cloneSource)
         {
-            _effect = effect;
+            // Share all the immutable types.
+            Name = cloneSource.Name;
+            Annotations = cloneSource.Annotations;
 
-            Name = technique.name;
-
-            // TODO: Set the annotations from the effect object!
-            Annotations = new EffectAnnotationCollection();
-
-            Passes = new EffectPassCollection(this);
-            for (int i = 0; i < technique.pass_count; i++)
-				Passes._passes.Add (new EffectPass(this, technique.pass_handles[i]));
+            // Clone the mutable types.
+            Passes = new EffectPassCollection(effect, cloneSource.Passes);
         }
 
+        internal EffectTechnique(Effect effect, string name, EffectPassCollection passes, EffectAnnotationCollection annotations)
+        {
+            Name = name;
+            Passes = passes;
+            Annotations = annotations;
+        }
     }
 
 

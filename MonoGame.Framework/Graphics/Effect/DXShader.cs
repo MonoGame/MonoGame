@@ -6,44 +6,123 @@ using System.IO;
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
-#else
+#elif WINRT
+using SharpDX;
+using SharpDX.Direct3D;
+using SharpDX.Direct3D11;
+using SharpDX.DXGI;
+#elif GLES
 using System.Text;
 using OpenTK.Graphics.ES20;
-#if IPHONE || ANDROID
 using ShaderType = OpenTK.Graphics.ES20.All;
 using ShaderParameter = OpenTK.Graphics.ES20.All;
 using TextureUnit = OpenTK.Graphics.ES20.All;
 using TextureTarget = OpenTK.Graphics.ES20.All;
-#endif
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
 	internal class DXShader
 	{
+#if OPENGL
+
         public readonly ShaderType ShaderType;
+
         public readonly int ShaderHandle;
 
+#if DEBUG
+        // We only keep around the GLSL code for debugging.
         private readonly string _glslCode;
+#endif
 
         private readonly string _uniforms_float4_name;
-        private readonly float[] _uniforms_float4;
-
         private readonly string _uniforms_int4_name;
-        private readonly int[] _uniforms_int4;
-
         private readonly string _uniforms_bool_name;
+
+#elif DIRECTX
+
+        private InputLayout _inputLayout;
+
+        private VertexShader _vertexShader;
+
+        private PixelShader _pixelShader;
+
+#endif
+
+        private readonly float[] _uniforms_float4;
+        private readonly int[] _uniforms_int4;
         private readonly int[] _uniforms_bool;
 
-        private readonly MojoShader.MOJOSHADER_symbol[] _symbols;
-        private readonly MojoShader.MOJOSHADER_sampler[] _samplers;
-        private readonly MojoShader.MOJOSHADER_attribute[] _attributes;
+        private enum RegisterSet
+        {
+            Bool,
+            Int4,
+            Float4,
+            Sampler,
+        }
 
-        private readonly DXPreshader _preshader;
+        public enum SamplerType
+        {
+            Sampler2D,
+            SamplerCube,
+            SamplerVolume,
+        }
 
-        public DXShader(BinaryReader reader)
-		{
+        private struct Sampler
+        {
+            public SamplerType type;
+            public int index;
+            public string name;
+            public string parameter;
+        }
+
+        private struct Symbol
+        {
+            public string name;
+            public RegisterSet register_set;
+            public int register_index;
+            public int register_count;
+        }
+
+        private struct Attribute
+        {
+            public VertexElementUsage usage;
+            public int index;
+            public string name;
+        }
+
+        private readonly Symbol[] _symbols;
+        private readonly Sampler[] _samplers;
+        private readonly Attribute[] _attributes;
+
+        internal DXShader(DXShader cloneSource)
+        {
+            // Share all the immutable types.
+#if OPENGL
+            ShaderType = cloneSource.ShaderType;
+            ShaderHandle = cloneSource.ShaderHandle;
+            _uniforms_float4_name = cloneSource._uniforms_float4_name;
+            _uniforms_int4_name = cloneSource._uniforms_int4_name;
+            _uniforms_bool_name = cloneSource._uniforms_bool_name;
+#if DEBUG 
+            _glslCode = cloneSource._glslCode;
+#endif
+#endif
+            _symbols = cloneSource._symbols;
+            _samplers = cloneSource._samplers;
+            _attributes = cloneSource._attributes;
+
+            // Clone the mutable types.
+            _uniforms_float4 = Array.ConvertAll( cloneSource._uniforms_float4, e => e );
+            _uniforms_int4 = Array.ConvertAll(cloneSource._uniforms_int4, e => e);
+            _uniforms_bool = Array.ConvertAll(cloneSource._uniforms_bool, e => e);
+        }
+
+        internal DXShader(BinaryReader reader)
+        {
             var isVertexShader = reader.ReadBoolean();
+
+#if OPENGL
             if (isVertexShader)
             {
                 ShaderType = ShaderType.VertexShader;
@@ -53,16 +132,23 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             else
             {
-				ShaderType = ShaderType.FragmentShader;
+                ShaderType = ShaderType.FragmentShader;
                 _uniforms_float4_name = "ps_uniforms_vec4";
                 _uniforms_int4_name = "ps_uniforms_ivec4";
                 _uniforms_bool_name = "ps_uniforms_bool";
-			}
+            }
+#elif DIRECTX
 
-            if (reader.ReadBoolean())
-                _preshader = DXPreshader.CreatePreshader(reader);
+#endif
 
-            _glslCode = reader.ReadString();
+            // Read in the shader code.
+#if OPENGL
+            var glslCode = reader.ReadString();
+#elif DIRECTX
+
+            var shaderLength = (int)reader.ReadUInt16();
+            var shaderBytecode = reader.ReadBytes(shaderLength);
+#endif
 
             var bool_count = (int)reader.ReadByte();
             var int4_count = (int)reader.ReadByte();
@@ -73,53 +159,60 @@ namespace Microsoft.Xna.Framework.Graphics
             _uniforms_float4 = new float[float4_count * 4];
 
             var symbolCount = (int)reader.ReadByte();
-            _symbols = new MojoShader.MOJOSHADER_symbol[symbolCount];
-            for (var s=0; s < symbolCount; s++)
+            _symbols = new Symbol[symbolCount];
+            for (var s = 0; s < symbolCount; s++)
             {
-                _symbols[s].name = reader.ReadString();
-                _symbols[s].register_set = (MojoShader.MOJOSHADER_symbolRegisterSet)reader.ReadByte();
-                _symbols[s].register_index = (uint)reader.ReadByte();
-                _symbols[s].register_count = (uint)reader.ReadByte();
+                _symbols[s].name = string.Intern(reader.ReadString());
+                _symbols[s].register_set = (RegisterSet)reader.ReadByte();
+                _symbols[s].register_index = reader.ReadByte();
+                _symbols[s].register_count = reader.ReadByte();
             }
 
             var samplerCount = (int)reader.ReadByte();
-            _samplers = new MojoShader.MOJOSHADER_sampler[samplerCount];
+            _samplers = new Sampler[samplerCount];
             for (var s = 0; s < samplerCount; s++)
             {
-                _samplers[s].name = reader.ReadString();
-                _samplers[s].type = (MojoShader.MOJOSHADER_samplerType)reader.ReadByte();
-                _samplers[s].index = (int)reader.ReadByte();
+                _samplers[s].name = string.Intern(reader.ReadString());
+                _samplers[s].parameter = string.Intern(reader.ReadString());
+                _samplers[s].type = (SamplerType)reader.ReadByte();
+                _samplers[s].index = reader.ReadByte();
             }
 
             var attributeCount = (int)reader.ReadByte();
-            _attributes = new MojoShader.MOJOSHADER_attribute[attributeCount];
+            _attributes = new Attribute[attributeCount];
             for (var a = 0; a < attributeCount; a++)
             {
-                _attributes[a].name = reader.ReadString();
-                _attributes[a].usage = (MojoShader.MOJOSHADER_usage)reader.ReadByte();
-                _attributes[a].index = (int)reader.ReadByte();
+                _attributes[a].name = string.Intern(reader.ReadString());
+                _attributes[a].usage = (VertexElementUsage)reader.ReadByte();
+                _attributes[a].index = reader.ReadByte();
             }
 
+#if OPENGL
             Threading.Begin();
             try
             {
                 ShaderHandle = GL.CreateShader(ShaderType);
-#if IPHONE || ANDROID
-                GL.ShaderSource(ShaderHandle, 1, new string[] { _glslCode }, (int[])null);
+#if GLES
+                GL.ShaderSource(ShaderHandle, 1, new string[] { glslCode }, (int[])null);
 #else
-                GL.ShaderSource(ShaderHandle, _glslCode);
+                GL.ShaderSource(ShaderHandle, glslCode);
 #endif
                 GL.CompileShader(ShaderHandle);
 
+#if DEBUG
+                // When debugging store this for later inspection.
+                _glslCode = glslCode;
+#endif
+
                 var compiled = 0;
-#if IPHONE || ANDROID
+#if GLES
                 GL.GetShader(ShaderHandle, ShaderParameter.CompileStatus, ref compiled);
 #else
                 GL.GetShader(ShaderHandle, ShaderParameter.CompileStatus, out compiled);
 #endif
                 if (compiled == (int)All.False)
                 {
-#if IPHONE || ANDROID
+#if GLES
                     string log = "";
                     int length = 0;
                     GL.GetShader(ShaderHandle, ShaderParameter.InfoLogLength, ref length);
@@ -142,40 +235,62 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 Threading.End();
             }
-		}
+#elif DIRECTX
+
+            var d3dDevice = GraphicsDevice.Current._d3dDevice;
+            if (isVertexShader)
+            {
+                _vertexShader = new VertexShader(d3dDevice, shaderBytecode, null);
+
+                // TODO: We need the specifics about the input format for DX!
+                var elements = new InputElement[_attributes.Length];
+                for (var i=0; i < _attributes.Length; i++)
+                {
+                    var attrib = _attributes[i];
+                    elements[i] = new InputElement(attrib.name, 0, Format.R32G32B32A32_Float, attrib.index, 0);
+                }
+
+                _inputLayout = new InputLayout(d3dDevice, shaderBytecode, elements);
+            }
+            else
+                _pixelShader = new PixelShader(d3dDevice, shaderBytecode);
+#endif
+        }
 
 		public void OnLink(int program) 
         {
+#if OPENGL
             if (ShaderType != ShaderType.VertexShader)
                 return;
 
-			//bind attributes
+			// Bind the vertex attributes to the shader program.
 			foreach (var attrb in _attributes) 
             {
 				switch (attrb.usage) 
                 {
-				case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_COLOR:
-					GL.BindAttribLocation(program, GraphicsDevice.attributeColor, attrb.name);
-					break;
-				case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_POSITION:
-					GL.BindAttribLocation(program, GraphicsDevice.attributePosition + attrb.index, attrb.name);
-					break;
-				case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_TEXCOORD:
-					GL.BindAttribLocation(program, GraphicsDevice.attributeTexCoord + attrb.index, attrb.name);
-					break;
-				case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_NORMAL:
-					GL.BindAttribLocation(program, GraphicsDevice.attributeNormal, attrb.name);
-					break;
-				case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_BLENDINDICES:
-					GL.BindAttribLocation(program, GraphicsDevice.attributeBlendIndicies, attrb.name);
-					break;
-				case MojoShader.MOJOSHADER_usage.MOJOSHADER_USAGE_BLENDWEIGHT:
-					GL.BindAttribLocation(program, GraphicsDevice.attributeBlendWeight, attrb.name);
-					break;
-				default:
-					throw new NotImplementedException();
+                    case VertexElementUsage.Color:
+					    GL.BindAttribLocation(program, GraphicsDevice.attributeColor, attrb.name);
+    					break;
+                    case VertexElementUsage.Position:
+	    				GL.BindAttribLocation(program, GraphicsDevice.attributePosition + attrb.index, attrb.name);
+		    			break;
+                    case VertexElementUsage.TextureCoordinate:
+			    		GL.BindAttribLocation(program, GraphicsDevice.attributeTexCoord + attrb.index, attrb.name);
+				    	break;
+				    case VertexElementUsage.Normal:
+    					GL.BindAttribLocation(program, GraphicsDevice.attributeNormal, attrb.name);
+	    				break;
+                    case VertexElementUsage.BlendIndices:
+					    GL.BindAttribLocation(program, GraphicsDevice.attributeBlendIndicies, attrb.name);
+					    break;
+                    case VertexElementUsage.BlendWeight:
+					    GL.BindAttribLocation(program, GraphicsDevice.attributeBlendWeight, attrb.name);
+					    break;
+				    default:
+					    throw new NotImplementedException();
 				}
 			}
+#endif
 		}
 		
 		public void Apply(  int program, 
@@ -185,81 +300,77 @@ namespace Microsoft.Xna.Framework.Graphics
 			var vp = graphicsDevice.Viewport;
 			var textures = graphicsDevice.Textures;
 			var samplerStates = graphicsDevice.SamplerStates;
-			
-			//Populate the uniform register arrays
-			//TODO: not necessarily packed contiguously, get info from mojoshader somehow
-			var bool_index = 0;
-            var float4_index = 0;
-            var int4_index = 0;
-			
-			//TODO: only populate modified stuff?
+					
+			// TODO: It would be much better if we kept track
+            // of dirty states and only update those parameters.
+
             foreach (var symbol in _symbols) 
             {
-				//todo: support array parameters
-				EffectParameter parameter = parameters[symbol.name];
+                var parameter = parameters[symbol.name];
+
 				switch (symbol.register_set) 
                 {
-				case MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_BOOL:
-					if (parameter.Elements.Count > 0)
-						throw new NotImplementedException();
-					_uniforms_bool[bool_index*4] = (int)parameter.data;
-					bool_index += (int)symbol.register_count;
-					break;
-
-				case MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_FLOAT4:
-
-                    var data = parameter.GetValueSingleArray();
-
-					switch (parameter.ParameterClass) 
+                    case RegisterSet.Bool:
                     {
-					case EffectParameterClass.Scalar:
-						if (parameter.Elements.Count > 0)
-							throw new NotImplementedException();
+                        if (parameter.Elements.Count > 0)
+                            throw new NotImplementedException();
+                        _uniforms_bool[symbol.register_index * 4] = (int)parameter.Data;
 
-						for (int i=0; i<data.Length; i++)
-							_uniforms_float4[float4_index*4+i] = (float)data[i];
-						break;
-					case EffectParameterClass.Vector:
-					case EffectParameterClass.Matrix:
-                        var rows = Math.Min(symbol.register_count, parameter.RowCount);
-						if (parameter.Elements.Count > 0) 
+                        break;
+                    }
+
+                    case RegisterSet.Float4:
+                    {
+                        var data = parameter.GetValueSingleArray();
+                        switch (parameter.ParameterClass)
                         {
-							//rows = Math.Min (symbol.register_count, parameter.Elements.Count*parameter.RowCount);
-							if (symbol.register_count*4 != data.Length)
-								throw new NotImplementedException();
+                            case EffectParameterClass.Scalar:
+                                if (parameter.Elements.Count > 0)
+                                    throw new NotImplementedException();
 
-                            for (var i = 0; i < data.Length; i++)
-								_uniforms_float4[float4_index*4+i] = data[i];
-						} 
-                        else 
-                        {
-                            for (var y = 0; y < rows; y++)
-                            {
-								for (int x=0; x<parameter.ColumnCount; x++)
-									_uniforms_float4[(float4_index+y)*4+x] = (float)data[y*parameter.ColumnCount+x];
-							}
-						}
-						break;
-					default:
-						throw new NotImplementedException();
-					}
-					float4_index += (int)symbol.register_count;
-					break;
+                                for (int i = 0; i < data.Length; i++)
+                                    _uniforms_float4[symbol.register_index * 4 + i] = (float)data[i];
+                                break;
+                            case EffectParameterClass.Vector:
+                            case EffectParameterClass.Matrix:
+                                var rows = Math.Min(symbol.register_count, parameter.RowCount);
+                                if (parameter.Elements.Count > 0)
+                                {
+                                    //rows = Math.Min (symbol.register_count, parameter.Elements.Count*parameter.RowCount);
+                                    if (symbol.register_count * 4 != data.Length)
+                                        throw new NotImplementedException();
 
-				case MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_SAMPLER:
-					break; //handled by ActivateTextures
+                                    for (var i = 0; i < data.Length; i++)
+                                        _uniforms_float4[symbol.register_index * 4 + i] = data[i];
+                                }
+                                else
+                                {
+                                    for (var y = 0; y < rows; y++)
+                                        for (int x = 0; x < parameter.ColumnCount; x++)
+                                            _uniforms_float4[(symbol.register_index + y) * 4 + x] = (float)data[y * parameter.ColumnCount + x];
+                                }
+                                break;
 
-                case MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_INT4:
-                default:
-					throw new NotImplementedException();
-				}
+                            default:
+                                throw new NotImplementedException();
+                        }
 
-            } // foreach (var symbol in symbols)
+                        break;
+                    }
+
+                    // We deal with samplers a little further down.
+                    case RegisterSet.Sampler:
+					    break;
+
+                    case RegisterSet.Int4:
+                    default:
+					    throw new NotImplementedException();
+
+                } // switch (symbol.register_set)
+
+            } // foreach (var symbol in _symbols)
 			
-			// Execute the preshader.
-			if (_preshader != null)
-				_preshader.Run(parameters, _uniforms_float4);
-			
+#if OPENGL
 			// Upload the uniforms.				
             if (_uniforms_float4.Length > 0)
             {
@@ -279,39 +390,25 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			if (ShaderType == ShaderType.FragmentShader) 
             {
-				//activate textures
+                // Activate the textures.
 				foreach (var sampler in _samplers) 
                 {
                     // Set the sampler texture slot.
+                    //
+                    // TODO: This seems like it only needs to be done once!
+                    //
                     var loc = GL.GetUniformLocation(program, sampler.name);
 					GL.Uniform1(loc, sampler.index);
-                    
-                    if (sampler.type != MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_2D)
+
+                    // TODO: Fix 3D and Volume samplers!
+                    if (sampler.type != SamplerType.Sampler2D)
                         continue;
 
-					MojoShader.MOJOSHADER_symbol? samplerSymbol = null;
-					foreach (var symbol in _symbols) 
-                    {
-						if (symbol.register_set ==
-							    MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_SAMPLER &&
-							symbol.register_index == sampler.index) 
-                        {
-							samplerSymbol = symbol;
-							break;
-						}
-					}
-						
 					Texture tex = null;
-					if (samplerSymbol.HasValue) 
+                    if (sampler.parameter.Length > 0) 
                     {
-						var samplerState = (DXEffectObject.d3dx_sampler)parameters[samplerSymbol.Value.name].data;
-						if (samplerState.state_count > 0) 
-                        {
-							var textureName = samplerState.states[0].parameter.name;
-							var textureParameter = parameters[textureName];
-							if (textureParameter != null)
-								tex = (Texture)textureParameter.data;
-						}
+                        var textureParameter = parameters[sampler.parameter];
+                        tex = textureParameter.Data as Texture;
 					}
 
 					if (tex == null) 
@@ -329,7 +426,8 @@ namespace Microsoft.Xna.Framework.Graphics
 					samplerStates[sampler.index].Activate(tex.glTarget, tex.LevelCount > 1);
 				}
 			}
-		}
+#endif // OPENGL
+        }
 		
 	}
 }

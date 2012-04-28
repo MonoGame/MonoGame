@@ -35,7 +35,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;WINDOWS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -44,16 +44,22 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;WINDOWS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="SharpDX">
-      <HintPath>..\..\..\trunk\packages\SharpDX.2.0.4\lib\net20\SharpDX.dll</HintPath>
+      <HintPath>..\..\ThirdParty\SharpDX\Windows\SharpDX.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.D3DCompiler">
-      <HintPath>..\..\..\trunk\packages\SharpDX.D3DCompiler.2.0.4\lib\net20\SharpDX.D3DCompiler.dll</HintPath>
+      <HintPath>..\..\ThirdParty\SharpDX\Windows\SharpDX.D3DCompiler.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.Direct3D11">
+      <HintPath>..\..\ThirdParty\SharpDX\Windows\SharpDX.Direct3D11.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.DXGI">
+      <HintPath>..\..\ThirdParty\SharpDX\Windows\SharpDX.DXGI.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -64,48 +70,25 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\MonoGame.Framework\Graphics\ColorWriteChannels.cs">
-      <Link>ColorWriteChannels.cs</Link>
-    </Compile>
-    <Compile Include="..\..\MonoGame.Framework\Graphics\Effect\DXEffectObject.cs">
-      <Link>DXEffectObject.cs</Link>
-    </Compile>
-    <Compile Include="..\..\MonoGame.Framework\Graphics\Effect\DXEffectObject.fxparser.cs">
-      <Link>DXEffectObject.fxparser.cs</Link>
-    </Compile>
-    <Compile Include="..\..\MonoGame.Framework\Graphics\Effect\DXEffectObject.writer.cs">
-      <Link>DXEffectObject.writer.cs</Link>
-    </Compile>
-    <Compile Include="..\..\MonoGame.Framework\Graphics\Effect\DXHelper.cs">
-      <Link>DXHelper.cs</Link>
-    </Compile>
-    <Compile Include="..\..\MonoGame.Framework\Graphics\Effect\DXPreshader.cs">
-      <Link>DXPreshader.cs</Link>
-    </Compile>
-    <Compile Include="..\..\MonoGame.Framework\Graphics\Effect\DXPreshader.writer.cs">
-      <Link>DXPreshader.writer.cs</Link>
-    </Compile>
-    <Compile Include="..\..\MonoGame.Framework\Graphics\Effect\MojoShader.cs">
-      <Link>MojoShader.cs</Link>
-    </Compile>
-    <Compile Include="..\..\MonoGame.Framework\Graphics\States\Blend.cs">
-      <Link>Blend.cs</Link>
-    </Compile>
-    <Compile Include="..\..\MonoGame.Framework\Graphics\States\BlendFunction.cs">
-      <Link>BlendFunction.cs</Link>
-    </Compile>
-    <Compile Include="..\..\MonoGame.Framework\Graphics\States\CompareFunction.cs">
-      <Link>CompareFunction.cs</Link>
-    </Compile>
-    <Compile Include="..\..\MonoGame.Framework\Graphics\States\CullMode.cs">
-      <Link>CullMode.cs</Link>
-    </Compile>
-    <Compile Include="..\..\MonoGame.Framework\Graphics\States\StencilOperation.cs">
-      <Link>StencilOperation.cs</Link>
-    </Compile>
+    <Compile Include="CommandLineParser.cs" />
     <Compile Include="CompilerInclude.cs" />
-    <Compile Include="DXExpression.cs" />
-    <Compile Include="DXShader.cs" />
+    <Compile Include="DXEffectObject.cs" />
+    <Compile Include="DXEffectObject.dxreflect.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DXEffectObject.fxparser.cs" />
+    <Compile Include="DXEffectObject.writer.cs" />
+    <Compile Include="DXExpression.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DXHelper.cs" />
+    <Compile Include="DXPreshader.cs" />
+    <Compile Include="DXPreshader.writer.cs" />
+    <Compile Include="DXShader.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="GLSLOptimizer.cs" />
+    <Compile Include="MojoShader.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -132,7 +115,16 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <ProjectReference Include="..\..\MonoGame.Framework\MonoGame.Framework.Windows.csproj">
+      <Project>{7DE47032-A904-4C29-BD22-2D235E8D91BA}</Project>
+      <Name>MonoGame.Framework.Windows</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\ThirdParty\Libs\libmojoshader_32.dll">
+      <Link>libmojoshader_32.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

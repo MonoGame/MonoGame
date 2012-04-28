@@ -33,12 +33,4 @@ float4 SpritePixelShader(float4 color : COLOR0,
     return SAMPLE_TEXTURE(Texture, texCoord) * color;
 }
 
-
-technique SpriteBatch
-{
-    pass
-    {
-        VertexShader = compile vs_2_0 SpriteVertexShader();
-        PixelShader  = compile ps_2_0 SpritePixelShader();
-    }
-}
+TECHNIQUE( SpriteBatch, SpriteVertexShader, SpritePixelShader );

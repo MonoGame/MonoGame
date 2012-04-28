@@ -99,15 +99,10 @@
     <Compile Include="Graphics\CubeMapFace.cs" />
     <Compile Include="Graphics\DisplayMode.cs" />
     <Compile Include="Graphics\Effect\DualTextureEffect.cs" />
-    <Compile Include="Graphics\Effect\DXEffectObject.cs" />
-    <Compile Include="Graphics\Effect\DXExpression.cs" />
-    <Compile Include="Graphics\Effect\DXHelper.cs" />
-    <Compile Include="Graphics\Effect\DXPreshader.cs" />
     <Compile Include="Graphics\Effect\DXShader.cs" />
     <Compile Include="Graphics\Effect\EffectAnnotation.cs" />
     <Compile Include="Graphics\Effect\EffectAnnotationCollection.cs" />
     <Compile Include="Graphics\Effect\EnvironmentMapEffect.cs" />
-    <Compile Include="Graphics\Effect\MojoShader.cs" />
     <Compile Include="Graphics\Effect\SkinnedEffect.cs" />
     <Compile Include="Graphics\Effect\SpriteEffect.cs" />
     <Compile Include="Graphics\GraphicsAdapter.cs" />
@@ -141,7 +136,6 @@
     <Compile Include="Graphics\Effect\EffectParameterCollection.cs" />
     <Compile Include="Graphics\Effect\EffectPass.cs" />
     <Compile Include="Graphics\Effect\EffectPassCollection.cs" />
-    <Compile Include="Graphics\Effect\EffectPool.cs" />
     <Compile Include="Graphics\Effect\EffectTechnique.cs" />
     <Compile Include="Graphics\Effect\EffectTechniqueCollection.cs" />
     <Compile Include="Graphics\States\BlendState.cs" />
@@ -401,8 +395,6 @@
     <Compile Include="Content\ContentReaders\AlphaTestEffectReader.cs" />
     <Compile Include="Graphics\Effect\AlphaTestEffect.cs" />
     <Compile Include="Graphics\Effect\EffectHelpers.cs" />
-    <Compile Include="Graphics\Effect\DXEffectObject.runtime.cs" />
-    <Compile Include="Graphics\Effect\DXPreshader.runtime.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />

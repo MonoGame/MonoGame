@@ -1,0 +1,1444 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>SharpDX.RawInput</name>
+    </assembly>
+    <members>
+        <member name="T:SharpDX.RawInput.KeyboardInputEventArgs">
+            <summary>
+            RawInput Keyboard event.
+            </summary>
+        </member>
+        <member name="T:SharpDX.RawInput.RawInputEventArgs">
+            <summary>
+            RawInput event arguments base.
+            </summary>
+        </member>
+        <member name="P:SharpDX.RawInput.RawInputEventArgs.Device">
+            <summary>
+            Gets or sets the RawInput device.
+            </summary>
+            <value>
+            The device.
+            </value>
+        </member>
+        <member name="M:SharpDX.RawInput.KeyboardInputEventArgs.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:SharpDX.RawInput.KeyboardInputEventArgs"/> class.
+            </summary>
+        </member>
+        <member name="M:SharpDX.RawInput.KeyboardInputEventArgs.#ctor(SharpDX.RawInput.RawInput@)">
+            <summary>
+            Initializes a new instance of the <see cref="T:SharpDX.RawInput.KeyboardInputEventArgs"/> class.
+            </summary>
+            <param name="rawInput">The raw input.</param>
+        </member>
+        <member name="P:SharpDX.RawInput.KeyboardInputEventArgs.Key">
+            <summary>
+            Gets or sets the key.
+            </summary>
+            <value>
+            The key.
+            </value>
+        </member>
+        <member name="P:SharpDX.RawInput.KeyboardInputEventArgs.MakeCode">
+            <summary>
+            Gets or sets the make code.
+            </summary>
+            <value>
+            The make code.
+            </value>
+        </member>
+        <member name="P:SharpDX.RawInput.KeyboardInputEventArgs.ScanCodeFlags">
+            <summary>
+            Gets or sets the scan code flags.
+            </summary>
+            <value>
+            The scan code flags.
+            </value>
+        </member>
+        <member name="P:SharpDX.RawInput.KeyboardInputEventArgs.State">
+            <summary>
+            Gets or sets the state.
+            </summary>
+            <value>
+            The state.
+            </value>
+        </member>
+        <member name="P:SharpDX.RawInput.KeyboardInputEventArgs.ExtraInformation">
+            <summary>
+            Gets or sets the extra information.
+            </summary>
+            <value>
+            The extra information.
+            </value>
+        </member>
+        <member name="T:SharpDX.RawInput.Device">
+            <summary>
+            Provides access to RawInput methods.
+            </summary>
+        </member>
+        <member name="M:SharpDX.RawInput.Device.GetDevices">
+            <summary>
+            Gets the devices.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SharpDX.RawInput.Device.RegisterDevice(SharpDX.Multimedia.UsagePage,SharpDX.Multimedia.UsageId,SharpDX.RawInput.DeviceFlags)">
+            <summary>
+            Registers the devices that supply the raw input data.
+            </summary>
+            <param name="usagePage">The usage page.</param>
+            <param name="usageId">The usage id.</param>
+            <param name="flags">The flags.</param>
+        </member>
+        <member name="M:SharpDX.RawInput.Device.RegisterDevice(SharpDX.Multimedia.UsagePage,SharpDX.Multimedia.UsageId,SharpDX.RawInput.DeviceFlags,System.IntPtr,System.Boolean)">
+            <summary>
+            Registers the devices that supply the raw input data.
+            </summary>
+            <param name="usagePage">The usage page.</param>
+            <param name="usageId">The usage id.</param>
+            <param name="flags">The flags.</param>
+            <param name="target">The target.</param>
+            <param name="addMessageFilter">if set to <c>true</c> register message filter to Application.AddMessageFilter.</param>
+        </member>
+        <member name="M:SharpDX.RawInput.Device.HandleMessage(System.IntPtr)">
+            <summary>
+            Handles a RawInput message manually.
+            </summary>
+            <param name="rawInputMessagePointer">A pointer to a RawInput message.</param>
+            <remarks>
+            This method can be used directly when handling RawInput messages from non-WinForms application.
+            </remarks>
+        </member>
+        <member name="E:SharpDX.RawInput.Device.KeyboardInput">
+            <summary>
+            Occurs when [keyboard input].
+            </summary>
+        </member>
+        <member name="E:SharpDX.RawInput.Device.MouseInput">
+            <summary>
+            Occurs when [mouse input].
+            </summary>
+        </member>
+        <member name="E:SharpDX.RawInput.Device.RawInput">
+            <summary>
+            Occurs when [raw input].
+            </summary>
+        </member>
+        <member name="T:SharpDX.RawInput.Device.RawInputMessageFilter">
+            <summary>
+            Internal RawInput message filtering
+            </summary>
+        </member>
+        <member name="F:SharpDX.RawInput.Device.RawInputMessageFilter.WmInput">
+            <summary>
+            WM_INPUT
+            </summary>
+        </member>
+        <member name="T:SharpDX.RawInput.MouseInputEventArgs">
+            <summary>
+            RawInput Mouse event.
+            </summary>
+        </member>
+        <member name="M:SharpDX.RawInput.MouseInputEventArgs.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:SharpDX.RawInput.MouseInputEventArgs"/> class.
+            </summary>
+        </member>
+        <member name="M:SharpDX.RawInput.MouseInputEventArgs.#ctor(SharpDX.RawInput.RawInput@)">
+            <summary>
+            Initializes a new instance of the <see cref="T:SharpDX.RawInput.MouseInputEventArgs"/> class.
+            </summary>
+            <param name="rawInput">The raw input.</param>
+        </member>
+        <member name="P:SharpDX.RawInput.MouseInputEventArgs.Mode">
+            <summary>
+            Gets or sets the mode.
+            </summary>
+            <value>
+            The mode.
+            </value>
+        </member>
+        <member name="P:SharpDX.RawInput.MouseInputEventArgs.ButtonFlags">
+            <summary>
+            Gets or sets the button flags.
+            </summary>
+            <value>
+            The button flags.
+            </value>
+        </member>
+        <member name="P:SharpDX.RawInput.MouseInputEventArgs.ExtraInformation">
+            <summary>
+            Gets or sets the extra information.
+            </summary>
+            <value>
+            The extra information.
+            </value>
+        </member>
+        <member name="P:SharpDX.RawInput.MouseInputEventArgs.Buttons">
+            <summary>
+            Gets or sets the raw buttons.
+            </summary>
+            <value>
+            The raw buttons.
+            </value>
+        </member>
+        <member name="P:SharpDX.RawInput.MouseInputEventArgs.WheelDelta">
+            <summary>
+            Gets or sets the wheel delta.
+            </summary>
+            <value>
+            The wheel delta.
+            </value>
+        </member>
+        <member name="P:SharpDX.RawInput.MouseInputEventArgs.X">
+            <summary>
+            Gets or sets the X.
+            </summary>
+            <value>
+            The X.
+            </value>
+        </member>
+        <member name="P:SharpDX.RawInput.MouseInputEventArgs.Y">
+            <summary>
+            Gets or sets the Y.
+            </summary>
+            <value>
+            The Y.
+            </value>
+        </member>
+        <member name="T:SharpDX.RawInput.KeyboardInfo">
+            <summary>
+            Defines the raw input data coming from the specified keyboard. 
+            </summary>
+            <unmanaged>RID_DEVICE_INFO_KEYBOARD</unmanaged>	
+        </member>
+        <member name="T:SharpDX.RawInput.DeviceInfo">
+            <summary>
+            Defines the raw input data coming from any device.
+            </summary>
+            <unmanaged>RID_DEVICE_INFO</unmanaged>	
+        </member>
+        <member name="M:SharpDX.RawInput.DeviceInfo.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:SharpDX.RawInput.DeviceInfo"/> class.
+            </summary>
+        </member>
+        <member name="M:SharpDX.RawInput.DeviceInfo.#ctor(SharpDX.RawInput.RawDeviceInformation@,System.String,System.IntPtr)">
+            <summary>
+            Initializes a new instance of the <see cref="T:SharpDX.RawInput.DeviceInfo"/> class.
+            </summary>
+            <param name="rawDeviceInfo">The raw device info.</param>
+            <param name="deviceName">Name of the device.</param>
+            <param name="deviceHandle">The device handle.</param>
+        </member>
+        <member name="M:SharpDX.RawInput.DeviceInfo.Convert(SharpDX.RawInput.RawDeviceInformation@,System.String,System.IntPtr)">
+            <summary>
+            Converts the specified raw device info to the <see cref="T:SharpDX.RawInput.DeviceInfo"/>.
+            </summary>
+            <param name="rawDeviceInfo">The raw device info.</param>
+            <param name="deviceName">Name of the device.</param>
+            <param name="deviceHandle">The device handle.</param>
+            <returns></returns>
+        </member>
+        <member name="P:SharpDX.RawInput.DeviceInfo.DeviceName">
+            <summary>
+            Gets or sets the name of the device.
+            </summary>
+            <value>
+            The name of the device.
+            </value>
+        </member>
+        <member name="P:SharpDX.RawInput.DeviceInfo.DeviceType">
+            <summary>
+            Gets or sets the type of the device.
+            </summary>
+            <value>
+            The type of the device.
+            </value>
+        </member>
+        <member name="P:SharpDX.RawInput.DeviceInfo.Handle">
+            <summary>
+            Gets or sets the handle.
+            </summary>
+            <value>
+            The handle.
+            </value>
+        </member>
+        <member name="M:SharpDX.RawInput.KeyboardInfo.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:SharpDX.RawInput.KeyboardInfo"/> class.
+            </summary>
+        </member>
+        <member name="M:SharpDX.RawInput.KeyboardInfo.#ctor(SharpDX.RawInput.RawDeviceInformation@,System.String,System.IntPtr)">
+            <summary>
+            Initializes a new instance of the <see cref="T:SharpDX.RawInput.KeyboardInfo"/> class.
+            </summary>
+            <param name="rawDeviceInfo">The raw device info.</param>
+            <param name="deviceName">Name of the device.</param>
+            <param name="deviceHandle">The device handle.</param>
+        </member>
+        <member name="P:SharpDX.RawInput.KeyboardInfo.KeyboardType">
+            <summary>
+            Gets or sets the type of the keyboard.
+            </summary>
+            <value>
+            The type of the keyboard.
+            </value>
+            <unmanaged>unsigned int dwType</unmanaged>	
+        </member>
+        <member name="P:SharpDX.RawInput.KeyboardInfo.Subtype">
+            <summary>
+            Gets or sets the subtype.
+            </summary>
+            <value>
+            The subtype.
+            </value>
+            <unmanaged>unsigned int dwSubType</unmanaged>	
+        </member>
+        <member name="P:SharpDX.RawInput.KeyboardInfo.KeyboardMode">
+            <summary>
+            Gets or sets the keyboard mode.
+            </summary>
+            <value>
+            The keyboard mode.
+            </value>
+            <unmanaged>unsigned int dwKeyboardMode</unmanaged>	
+        </member>
+        <member name="P:SharpDX.RawInput.KeyboardInfo.FunctionKeyCount">
+            <summary>
+            Gets or sets the function key count.
+            </summary>
+            <value>
+            The function key count.
+            </value>
+            <unmanaged>unsigned int dwNumberOfFunctionKeys</unmanaged>	
+        </member>
+        <member name="P:SharpDX.RawInput.KeyboardInfo.IndicatorCount">
+            <summary>
+            Gets or sets the indicator count.
+            </summary>
+            <value>
+            The indicator count.
+            </value>
+            <unmanaged>unsigned int dwNumberOfIndicators</unmanaged>	
+        </member>
+        <member name="P:SharpDX.RawInput.KeyboardInfo.TotalKeyCount">
+            <summary>
+            Gets or sets the total key count.
+            </summary>
+            <value>
+            The total key count.
+            </value>
+            <unmanaged>unsigned int dwNumberOfKeysTotal</unmanaged>	
+        </member>
+        <member name="T:SharpDX.RawInput.DeviceFlags">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RAW_DEVICE_FLAGS']/*"/>	
+            <unmanaged>RAW_DEVICE_FLAGS</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.DeviceFlags.Remove">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RIDEV_REMOVE']/*"/>	
+            <unmanaged>RIDEV_REMOVE</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.DeviceFlags.Exclude">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RIDEV_EXCLUDE']/*"/>	
+            <unmanaged>RIDEV_EXCLUDE</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.DeviceFlags.PageOnly">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RIDEV_PAGEONLY']/*"/>	
+            <unmanaged>RIDEV_PAGEONLY</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.DeviceFlags.NoLegacy">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RIDEV_NOLEGACY']/*"/>	
+            <unmanaged>RIDEV_NOLEGACY</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.DeviceFlags.InputSink">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RIDEV_INPUTSINK']/*"/>	
+            <unmanaged>RIDEV_INPUTSINK</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.DeviceFlags.CaptureMouse">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RIDEV_CAPTUREMOUSE']/*"/>	
+            <unmanaged>RIDEV_CAPTUREMOUSE</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.DeviceFlags.NoHotKeys">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RIDEV_NOHOTKEYS']/*"/>	
+            <unmanaged>RIDEV_NOHOTKEYS</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.DeviceFlags.AppKeys">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RIDEV_APPKEYS']/*"/>	
+            <unmanaged>RIDEV_APPKEYS</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.DeviceFlags.ExclusiveInputSink">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RIDEV_EXINPUTSINK']/*"/>	
+            <unmanaged>RIDEV_EXINPUTSINK</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.DeviceFlags.DeviceNotify">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RIDEV_DEVNOTIFY']/*"/>	
+            <unmanaged>RIDEV_DEVNOTIFY</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.DeviceFlags.None">
+            <summary>	
+            None.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='']/*"/>	
+            <unmanaged>None</unmanaged>	
+        </member>
+        <member name="T:SharpDX.RawInput.DeviceType">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RAW_DEVICE_TYPE']/*"/>	
+            <unmanaged>RAW_DEVICE_TYPE</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.DeviceType.Mouse">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RIM_TYPEMOUSE']/*"/>	
+            <unmanaged>RIM_TYPEMOUSE</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.DeviceType.Keyboard">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RIM_TYPEKEYBOARD']/*"/>	
+            <unmanaged>RIM_TYPEKEYBOARD</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.DeviceType.HumanInputDevice">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RIM_TYPEHID']/*"/>	
+            <unmanaged>RIM_TYPEHID</unmanaged>	
+        </member>
+        <member name="T:SharpDX.RawInput.KeyState">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RAW_KEY_STATE']/*"/>	
+            <unmanaged>RAW_KEY_STATE</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.KeyState.VirtualKeyToItem">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='WM_VKEYTOITEM']/*"/>	
+            <unmanaged>WM_VKEYTOITEM</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.KeyState.SetHotKey">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='WM_SETHOTKEY']/*"/>	
+            <unmanaged>WM_SETHOTKEY</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.KeyState.GetHotKey">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='WM_GETHOTKEY']/*"/>	
+            <unmanaged>WM_GETHOTKEY</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.KeyState.KeyFirst">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='WM_KEYFIRST']/*"/>	
+            <unmanaged>WM_KEYFIRST</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.KeyState.KeyDown">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='WM_KEYDOWN']/*"/>	
+            <unmanaged>WM_KEYDOWN</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.KeyState.KeyUp">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='WM_KEYUP']/*"/>	
+            <unmanaged>WM_KEYUP</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.KeyState.SystemKeyDown">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='WM_SYSKEYDOWN']/*"/>	
+            <unmanaged>WM_SYSKEYDOWN</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.KeyState.SystemKeyUp">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='WM_SYSKEYUP']/*"/>	
+            <unmanaged>WM_SYSKEYUP</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.KeyState.KeyLast">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='WM_KEYLAST']/*"/>	
+            <unmanaged>WM_KEYLAST</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.KeyState.ImeKeyLast">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='WM_IME_KEYLAST']/*"/>	
+            <unmanaged>WM_IME_KEYLAST</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.KeyState.ImeKeyDown">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='WM_IME_KEYDOWN']/*"/>	
+            <unmanaged>WM_IME_KEYDOWN</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.KeyState.ImeKeyUp">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='WM_IME_KEYUP']/*"/>	
+            <unmanaged>WM_IME_KEYUP</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.KeyState.HotKey">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='WM_HOTKEY']/*"/>	
+            <unmanaged>WM_HOTKEY</unmanaged>	
+        </member>
+        <member name="T:SharpDX.RawInput.MouseButtonFlags">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RAW_MOUSE_BUTTON_FLAGS']/*"/>	
+            <unmanaged>RAW_MOUSE_BUTTON_FLAGS</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.MouseButtonFlags.LeftButtonDown">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RI_MOUSE_LEFT_BUTTON_DOWN']/*"/>	
+            <unmanaged>RI_MOUSE_LEFT_BUTTON_DOWN</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.MouseButtonFlags.LeftButtonUp">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RI_MOUSE_LEFT_BUTTON_UP']/*"/>	
+            <unmanaged>RI_MOUSE_LEFT_BUTTON_UP</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.MouseButtonFlags.RightButtonDown">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RI_MOUSE_RIGHT_BUTTON_DOWN']/*"/>	
+            <unmanaged>RI_MOUSE_RIGHT_BUTTON_DOWN</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.MouseButtonFlags.RightButtonUp">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RI_MOUSE_RIGHT_BUTTON_UP']/*"/>	
+            <unmanaged>RI_MOUSE_RIGHT_BUTTON_UP</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.MouseButtonFlags.MiddleButtonDown">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RI_MOUSE_MIDDLE_BUTTON_DOWN']/*"/>	
+            <unmanaged>RI_MOUSE_MIDDLE_BUTTON_DOWN</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.MouseButtonFlags.MiddleButtonUp">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RI_MOUSE_MIDDLE_BUTTON_UP']/*"/>	
+            <unmanaged>RI_MOUSE_MIDDLE_BUTTON_UP</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.MouseButtonFlags.Button1Down">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RI_MOUSE_BUTTON_1_DOWN']/*"/>	
+            <unmanaged>RI_MOUSE_BUTTON_1_DOWN</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.MouseButtonFlags.Button1Up">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RI_MOUSE_BUTTON_1_UP']/*"/>	
+            <unmanaged>RI_MOUSE_BUTTON_1_UP</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.MouseButtonFlags.Button2Down">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RI_MOUSE_BUTTON_2_DOWN']/*"/>	
+            <unmanaged>RI_MOUSE_BUTTON_2_DOWN</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.MouseButtonFlags.Button2Up">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RI_MOUSE_BUTTON_2_UP']/*"/>	
+            <unmanaged>RI_MOUSE_BUTTON_2_UP</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.MouseButtonFlags.Button3Down">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RI_MOUSE_BUTTON_3_DOWN']/*"/>	
+            <unmanaged>RI_MOUSE_BUTTON_3_DOWN</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.MouseButtonFlags.Button3Up">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RI_MOUSE_BUTTON_3_UP']/*"/>	
+            <unmanaged>RI_MOUSE_BUTTON_3_UP</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.MouseButtonFlags.Button4Down">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RI_MOUSE_BUTTON_4_DOWN']/*"/>	
+            <unmanaged>RI_MOUSE_BUTTON_4_DOWN</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.MouseButtonFlags.Button4Up">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RI_MOUSE_BUTTON_4_UP']/*"/>	
+            <unmanaged>RI_MOUSE_BUTTON_4_UP</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.MouseButtonFlags.Button5Down">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RI_MOUSE_BUTTON_5_DOWN']/*"/>	
+            <unmanaged>RI_MOUSE_BUTTON_5_DOWN</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.MouseButtonFlags.Button5Up">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RI_MOUSE_BUTTON_5_UP']/*"/>	
+            <unmanaged>RI_MOUSE_BUTTON_5_UP</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.MouseButtonFlags.MouseWheel">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RI_MOUSE_WHEEL']/*"/>	
+            <unmanaged>RI_MOUSE_WHEEL</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.MouseButtonFlags.None">
+            <summary>	
+            None.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='']/*"/>	
+            <unmanaged>None</unmanaged>	
+        </member>
+        <member name="T:SharpDX.RawInput.MouseMode">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RAW_MOUSE_MODE']/*"/>	
+            <unmanaged>RAW_MOUSE_MODE</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.MouseMode.MoveRelative">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='MOUSE_MOVE_RELATIVE']/*"/>	
+            <unmanaged>MOUSE_MOVE_RELATIVE</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.MouseMode.MoveAbsolute">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='MOUSE_MOVE_ABSOLUTE']/*"/>	
+            <unmanaged>MOUSE_MOVE_ABSOLUTE</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.MouseMode.VirtualDesktop">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='MOUSE_VIRTUAL_DESKTOP']/*"/>	
+            <unmanaged>MOUSE_VIRTUAL_DESKTOP</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.MouseMode.AttributesChanged">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='MOUSE_ATTRIBUTES_CHANGED']/*"/>	
+            <unmanaged>MOUSE_ATTRIBUTES_CHANGED</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.MouseMode.MoveNoCoalesce">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='MOUSE_MOVE_NOCOALESCE']/*"/>	
+            <unmanaged>MOUSE_MOVE_NOCOALESCE</unmanaged>	
+        </member>
+        <member name="T:SharpDX.RawInput.RawInputDataType">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RAW_INPUT_DATA_TYPE']/*"/>	
+            <unmanaged>RAW_INPUT_DATA_TYPE</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.RawInputDataType.Input">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RID_INPUT']/*"/>	
+            <unmanaged>RID_INPUT</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.RawInputDataType.Header">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RID_HEADER']/*"/>	
+            <unmanaged>RID_HEADER</unmanaged>	
+        </member>
+        <member name="T:SharpDX.RawInput.RawInputDeviceInfoType">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RAW_INPUT_DEVICE_INFO_TYPE']/*"/>	
+            <unmanaged>RAW_INPUT_DEVICE_INFO_TYPE</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.RawInputDeviceInfoType.PreparsedData">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RIDI_PREPARSEDDATA']/*"/>	
+            <unmanaged>RIDI_PREPARSEDDATA</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.RawInputDeviceInfoType.DeviceName">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RIDI_DEVICENAME']/*"/>	
+            <unmanaged>RIDI_DEVICENAME</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.RawInputDeviceInfoType.DeviceInfo">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RIDI_DEVICEINFO']/*"/>	
+            <unmanaged>RIDI_DEVICEINFO</unmanaged>	
+        </member>
+        <member name="T:SharpDX.RawInput.ScanCodeFlags">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RAW_SCAN_CODE_FLAGS']/*"/>	
+            <unmanaged>RAW_SCAN_CODE_FLAGS</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.ScanCodeFlags.Make">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RI_KEY_MAKE']/*"/>	
+            <unmanaged>RI_KEY_MAKE</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.ScanCodeFlags.Break">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RI_KEY_BREAK']/*"/>	
+            <unmanaged>RI_KEY_BREAK</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.ScanCodeFlags.E0">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RI_KEY_E0']/*"/>	
+            <unmanaged>RI_KEY_E0</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.ScanCodeFlags.E1">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RI_KEY_E1']/*"/>	
+            <unmanaged>RI_KEY_E1</unmanaged>	
+        </member>
+        <member name="T:SharpDX.RawInput.RawInputFunctions">
+            <summary>	
+            Functions	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='SharpDX.RawInput.RawInputFunctions']/*"/>	
+        </member>
+        <member name="M:SharpDX.RawInput.RawInputFunctions.GetRawInputDeviceList(SharpDX.RawInput.RawInputDevicelist[],System.Int32@,System.Int32)">
+            <summary>	
+            Enumerates the raw input devices attached to the system.	
+            </summary>	
+            <param name="rawInputDeviceListRef"><para>An array of <see cref="T:SharpDX.RawInput.RawInputDevicelist"/> structures for the devices attached to the system. If <c>null</c>, the number of devices are returned in *puiNumDevices. </para></param>	
+            <param name="uiNumDevicesRef"><para>If pRawInputDeviceList is <c>null</c>, the function populates this variable with the number of devices attached to the system; otherwise, this variable specifies the number of <see cref="T:SharpDX.RawInput.RawInputDevicelist"/> structures that can be contained in the buffer to which pRawInputDeviceList points. If this value is less than the number of devices attached to the system, the function returns the actual number of devices in this variable and fails with <see cref="F:SharpDX.Win32.ErrorCode.InsufficientBuffer"/>.</para></param>	
+            <param name="cbSize"><para>The size of a <see cref="T:SharpDX.RawInput.RawInputDevicelist"/> structure, in bytes.</para></param>	
+            <returns>If the function is successful, the return value is the number of devices stored in the buffer pointed to by  pRawInputDeviceList.On any other error, the function returns (UINT) -1 and  GetLastError returns the error indication.</returns>	
+            <remarks>	
+            The devices returned from this function are the mouse, the keyboard, and other Human Interface Device (HID) devices.To get more detailed information about the attached devices, call GetRawInputDeviceInfo using the hDevice from <see cref="T:SharpDX.RawInput.RawInputDevicelist"/>.	
+            </remarks>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='GetRawInputDeviceList']/*"/>	
+            <unmanaged>unsigned int GetRawInputDeviceList([Out, Buffer, Optional] RAWINPUTDEVICELIST* pRawInputDeviceList,[InOut] unsigned int* puiNumDevices,[In] unsigned int cbSize)</unmanaged>	
+        </member>
+        <member name="M:SharpDX.RawInput.RawInputFunctions.RegisterRawInputDevices(SharpDX.RawInput.RawInputDevice[],System.Int32,System.Int32)">
+            <summary>	
+            Registers the devices that supply the raw input data.	
+            </summary>	
+            <param name="rawInputDevicesRef"><para>An array of <see cref="T:SharpDX.RawInput.RawInputDevice"/> structures that represent the devices that supply the raw input.</para></param>	
+            <param name="uiNumDevices"><para>The number of <see cref="T:SharpDX.RawInput.RawInputDevice"/> structures pointed to by pRawInputDevices.</para></param>	
+            <param name="cbSize"><para>The size, in bytes, of a <see cref="T:SharpDX.RawInput.RawInputDevice"/> structure.</para></param>	
+            <returns>TRUE if the function succeeds; otherwise, <see cref="F:SharpDX.Result.False"/>. If the function fails, call GetLastError for more information.</returns>	
+            <remarks>	
+            To receive WM_INPUT messages, an application must first register the raw input devices using RegisterRawInputDevices. By default, an application does not receive raw input.To receive WM_INPUT_DEVICE_CHANGE messages, an application must specify the  <see cref="F:SharpDX.RawInput.DeviceFlags.DeviceNotify"/> flag for each device class that is specified by the usUsagePage and usUsage fields of the  <see cref="T:SharpDX.RawInput.RawInputDevice"/> structure  .  By default, an application does not receive  WM_INPUT_DEVICE_CHANGE notifications for raw input device arrival and removal.If a <see cref="T:SharpDX.RawInput.RawInputDevice"/> structure has the <see cref="F:SharpDX.RawInput.DeviceFlags.Remove"/> flag set and the hwndTarget parameter is not set to <c>null</c>, then parameter validation will fail.	
+            </remarks>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RegisterRawInputDevices']/*"/>	
+            <unmanaged>BOOL RegisterRawInputDevices([In, Buffer] const RAWINPUTDEVICE* pRawInputDevices,[In] unsigned int uiNumDevices,[In] unsigned int cbSize)</unmanaged>	
+        </member>
+        <member name="M:SharpDX.RawInput.RawInputFunctions.GetRawInputBuffer(SharpDX.RawInput.RawInput[],System.Int32@,System.Int32)">
+            <summary>	
+            Performs a buffered read of the raw input data.	
+            </summary>	
+            <param name="dataRef"><para>A reference to a buffer of <see cref="T:SharpDX.RawInput.RawInput"/> structures that contain the raw input data. If <c>null</c>, the minimum required buffer, in bytes, is returned in *pcbSize. </para></param>	
+            <param name="cbSizeRef"><para>The size, in bytes, of a <see cref="T:SharpDX.RawInput.RawInput"/> structure. </para></param>	
+            <param name="cbSizeHeader"><para>The size, in bytes, of the <see cref="T:SharpDX.RawInput.RawInputHeader"/> structure. </para></param>	
+            <returns>If  pData is <c>null</c> and the function is successful, the return value is zero. If  pData is not <c>null</c> and the function is successful, the return value is the number of <see cref="T:SharpDX.RawInput.RawInput"/> structures written to  pData.If an error occurs, the return value is (UINT)-1. Call GetLastError for the error code.</returns>	
+            <remarks>	
+            Using GetRawInputBuffer, the raw input data is buffered in the array of <see cref="T:SharpDX.RawInput.RawInput"/> structures. For an unbuffered read, use the GetMessage function to read in the raw input data.The NEXTRAWINPUTBLOCK macro allows an application to traverse an array of <see cref="T:SharpDX.RawInput.RawInput"/> structures.Note??To get the correct size of the raw input buffer, do not use *pcbSize, use *pcbSize * 8 instead.   To ensure GetRawInputBuffer behaves properly on WOW64, you must align the <see cref="T:SharpDX.RawInput.RawInput"/> structure by 8 bytes. The following code shows how to align <see cref="T:SharpDX.RawInput.RawInput"/> for WOW64.<code>	
+            [StructLayout(LayoutKind.Explicit)]	
+            internal struct <see cref="T:SharpDX.RawInput.RawInput"/>	
+            { [FieldOffset(0)] public <see cref="T:SharpDX.RawInput.RawInputHeader"/> header; [FieldOffset(16+8)] public <see cref="T:SharpDX.RawInput.RawMouse"/> mouse; [FieldOffset(16+8)] public <see cref="T:SharpDX.RawInput.RawKeyboard"/> keyboard; [FieldOffset(16+8)] public <see cref="T:SharpDX.RawInput.RawHid"/> hid;	
+            }	
+            	
+            </code>	
+            </remarks>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='GetRawInputBuffer']/*"/>	
+            <unmanaged>unsigned int GetRawInputBuffer([Out, Buffer, Optional] RAWINPUT* pData,[InOut] unsigned int* pcbSize,[In] unsigned int cbSizeHeader)</unmanaged>	
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:SharpDX.RawInput.RawInputFunctions.GetRawInputData(System.IntPtr,SharpDX.RawInput.RawInputDataType,System.IntPtr,System.Int32@,System.Int32)" -->
+        <!-- Badly formed XML comment ignored for member "M:SharpDX.RawInput.RawInputFunctions.GetRawInputDeviceInfo(System.IntPtr,SharpDX.RawInput.RawInputDeviceInfoType,System.IntPtr,System.Int32@)" -->
+        <member name="M:SharpDX.RawInput.RawInputFunctions.GetRegisteredRawInputDevices(SharpDX.RawInput.RawInputDevice[],System.Int32@,System.Int32)">
+            <summary>	
+            Retrieves the information about the raw input devices for the current application.	
+            </summary>	
+            <param name="rawInputDevicesRef"><para>An array of <see cref="T:SharpDX.RawInput.RawInputDevice"/> structures for the application. </para></param>	
+            <param name="uiNumDevicesRef"><para>The number of <see cref="T:SharpDX.RawInput.RawInputDevice"/> structures in *pRawInputDevices. </para></param>	
+            <param name="cbSize"><para>The size, in bytes, of a <see cref="T:SharpDX.RawInput.RawInputDevice"/> structure. </para></param>	
+            <returns>If successful, the function returns a non-negative number that is the number of <see cref="T:SharpDX.RawInput.RawInputDevice"/> structures written to the buffer.If the pRawInputDevices buffer is too small or <c>null</c>, the function sets the last error as <see cref="F:SharpDX.Win32.ErrorCode.InsufficientBuffer"/>, returns -1, and sets puiNumDevices to the required number of devices. If the function fails for any other reason, it returns -1. For more details, call GetLastError.</returns>	
+            <remarks>	
+            To receive raw input from a device, an application must register it by using RegisterRawInputDevices.	
+            </remarks>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='GetRegisteredRawInputDevices']/*"/>	
+            <unmanaged>unsigned int GetRegisteredRawInputDevices([Out, Buffer, Optional] RAWINPUTDEVICE* pRawInputDevices,[InOut] unsigned int* puiNumDevices,[In] unsigned int cbSize)</unmanaged>	
+        </member>
+        <member name="T:SharpDX.RawInput.RawDeviceInformation">
+            <summary>	
+            Defines the raw input data coming from any device.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RID_DEVICE_INFO']/*"/>	
+            <unmanaged>RID_DEVICE_INFO</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.RawDeviceInformation.Size">
+            <summary>	
+            <para>The size, in bytes, of the <see cref="T:SharpDX.RawInput.RawDeviceInformation"/> structure. </para>	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RID_DEVICE_INFO::cbSize']/*"/>	
+            <unmanaged>unsigned int cbSize</unmanaged>	
+        </member>
+        <!-- Badly formed XML comment ignored for member "F:SharpDX.RawInput.RawDeviceInformation.Type" -->
+        <member name="F:SharpDX.RawInput.RawDeviceInformation.Mouse">
+            <summary>	
+            <para>If dwType is <see cref="F:SharpDX.RawInput.DeviceType.Mouse"/>, this is the <see cref="T:SharpDX.RawInput.RawDeviceInformationMouse"/> structure that defines the mouse. </para>	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RID_DEVICE_INFO::mouse']/*"/>	
+            <unmanaged>RID_DEVICE_INFO_MOUSE mouse</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.RawDeviceInformation.Keyboard">
+            <summary>	
+            <para>If dwType is <see cref="F:SharpDX.RawInput.DeviceType.Keyboard"/>, this is the <see cref="T:SharpDX.RawInput.RawDeviceInformationKeyboard"/> structure that defines the keyboard. </para>	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RID_DEVICE_INFO::keyboard']/*"/>	
+            <unmanaged>RID_DEVICE_INFO_KEYBOARD keyboard</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.RawDeviceInformation.Hid">
+            <summary>	
+            <para>If dwType is <see cref="F:SharpDX.RawInput.DeviceType.HumanInputDevice"/>, this is the <see cref="T:SharpDX.RawInput.RawDeviceInformationHid"/> structure that defines the HID device. </para>	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RID_DEVICE_INFO::hid']/*"/>	
+            <unmanaged>RID_DEVICE_INFO_HID hid</unmanaged>	
+        </member>
+        <member name="T:SharpDX.RawInput.RawDeviceInformationHid">
+            <summary>	
+            Defines the raw input data coming from the specified Human Interface Device (HID).	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RID_DEVICE_INFO_HID']/*"/>	
+            <unmanaged>RID_DEVICE_INFO_HID</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.RawDeviceInformationHid.VendorId">
+            <summary>	
+            <para>The vendor identifier for the HID. </para>	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RID_DEVICE_INFO_HID::dwVendorId']/*"/>	
+            <unmanaged>unsigned int dwVendorId</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.RawDeviceInformationHid.ProductId">
+            <summary>	
+            <para>The product identifier for the HID. </para>	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RID_DEVICE_INFO_HID::dwProductId']/*"/>	
+            <unmanaged>unsigned int dwProductId</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.RawDeviceInformationHid.VersionNumber">
+            <summary>	
+            <para>The version number for the HID. </para>	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RID_DEVICE_INFO_HID::dwVersionNumber']/*"/>	
+            <unmanaged>unsigned int dwVersionNumber</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.RawDeviceInformationHid.UsagePage">
+            <summary>	
+            <para>The top-level collection Usage Page for the device. </para>	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RID_DEVICE_INFO_HID::usUsagePage']/*"/>	
+            <unmanaged>HID_USAGE_PAGE usUsagePage</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.RawDeviceInformationHid.Usage">
+            <summary>	
+            <para>The top-level collection Usage for the device. </para>	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RID_DEVICE_INFO_HID::usUsage']/*"/>	
+            <unmanaged>HID_USAGE_ID usUsage</unmanaged>	
+        </member>
+        <member name="T:SharpDX.RawInput.RawDeviceInformationKeyboard">
+            <summary>	
+            Defines the raw input data coming from the specified keyboard.	
+            </summary>	
+            <remarks>	
+            For the keyboard, the Usage Page is 1 and the Usage is 6.	
+            </remarks>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RID_DEVICE_INFO_KEYBOARD']/*"/>	
+            <unmanaged>RID_DEVICE_INFO_KEYBOARD</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.RawDeviceInformationKeyboard.Type">
+            <summary>	
+            <para>The type of the keyboard. </para>	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RID_DEVICE_INFO_KEYBOARD::dwType']/*"/>	
+            <unmanaged>unsigned int dwType</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.RawDeviceInformationKeyboard.SubType">
+            <summary>	
+            <para>The subtype of the keyboard. </para>	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RID_DEVICE_INFO_KEYBOARD::dwSubType']/*"/>	
+            <unmanaged>unsigned int dwSubType</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.RawDeviceInformationKeyboard.KeyboardMode">
+            <summary>	
+            <para>The  scan code mode. </para>	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RID_DEVICE_INFO_KEYBOARD::dwKeyboardMode']/*"/>	
+            <unmanaged>unsigned int dwKeyboardMode</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.RawDeviceInformationKeyboard.NumberOfFunctionKeys">
+            <summary>	
+            <para>The number of function keys on the keyboard.</para>	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RID_DEVICE_INFO_KEYBOARD::dwNumberOfFunctionKeys']/*"/>	
+            <unmanaged>unsigned int dwNumberOfFunctionKeys</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.RawDeviceInformationKeyboard.NumberOfIndicators">
+            <summary>	
+            <para>The number of LED indicators on the keyboard.</para>	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RID_DEVICE_INFO_KEYBOARD::dwNumberOfIndicators']/*"/>	
+            <unmanaged>unsigned int dwNumberOfIndicators</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.RawDeviceInformationKeyboard.NumberOfKeysTotal">
+            <summary>	
+            <para>The total number of keys on the keyboard. </para>	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RID_DEVICE_INFO_KEYBOARD::dwNumberOfKeysTotal']/*"/>	
+            <unmanaged>unsigned int dwNumberOfKeysTotal</unmanaged>	
+        </member>
+        <member name="T:SharpDX.RawInput.RawDeviceInformationMouse">
+            <summary>	
+            Defines the raw input data coming from the specified mouse.	
+            </summary>	
+            <remarks>	
+            For the mouse, the Usage Page is 1 and the Usage is 2.	
+            </remarks>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RID_DEVICE_INFO_MOUSE']/*"/>	
+            <unmanaged>RID_DEVICE_INFO_MOUSE</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.RawDeviceInformationMouse.Id">
+            <summary>	
+            <para>The identifier of the mouse device.</para>	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RID_DEVICE_INFO_MOUSE::dwId']/*"/>	
+            <unmanaged>unsigned int dwId</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.RawDeviceInformationMouse.NumberOfButtons">
+            <summary>	
+            <para>The number of buttons for the mouse.</para>	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RID_DEVICE_INFO_MOUSE::dwNumberOfButtons']/*"/>	
+            <unmanaged>unsigned int dwNumberOfButtons</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.RawDeviceInformationMouse.SampleRate">
+            <summary>	
+            <para>The number of data points per second. This information may not be applicable for every mouse device.</para>	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RID_DEVICE_INFO_MOUSE::dwSampleRate']/*"/>	
+            <unmanaged>unsigned int dwSampleRate</unmanaged>	
+        </member>
+        <member name="P:SharpDX.RawInput.RawDeviceInformationMouse.HasHorizontalWheel">
+            <summary>	
+            <para>TRUE if the mouse has a wheel for horizontal scrolling; otherwise, <see cref="F:SharpDX.Result.False"/>. </para>	
+             Windows?XP:??This member is only supported starting with Windows?Vista.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RID_DEVICE_INFO_MOUSE::fHasHorizontalWheel']/*"/>	
+            <unmanaged>BOOL fHasHorizontalWheel</unmanaged>	
+        </member>
+        <member name="T:SharpDX.RawInput.RawHid">
+            <summary>	
+            Describes the format of the raw input from a Human Interface Device (HID).	
+            </summary>	
+            <remarks>	
+            Each WM_INPUT can indicate several inputs, but all of the inputs come from the same HID. The size of the bRawData array is dwSizeHid *	dwCount.	
+            </remarks>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RAWHID']/*"/>	
+            <unmanaged>RAWHID</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.RawHid.SizeHid">
+            <summary>	
+            <para>The size, in bytes, of each HID input in bRawData. </para>	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RAWHID::dwSizeHid']/*"/>	
+            <unmanaged>unsigned int dwSizeHid</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.RawHid.Count">
+            <summary>	
+            <para>The number of HID inputs in bRawData.</para>	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RAWHID::dwCount']/*"/>	
+            <unmanaged>unsigned int dwCount</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.RawHid.RawData">
+            <summary>	
+            <para>The raw input data, as an array of bytes. </para>	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RAWHID::bRawData']/*"/>	
+            <unmanaged>int bRawData</unmanaged>	
+        </member>
+        <member name="T:SharpDX.RawInput.RawInput">
+            <summary>	
+            Contains the raw input from a device.	
+            </summary>	
+            <remarks>	
+            The handle to this structure is passed in the lParam parameter of WM_INPUT.To get detailed information -- such as the header and the content of the raw input -- call GetRawInputData.To read the <see cref="T:SharpDX.RawInput.RawInput"/> in the message loop as a buffered read, call GetRawInputBuffer.To get device specific information, call GetRawInputDeviceInfo with the hDevice from <see cref="T:SharpDX.RawInput.RawInputHeader"/>.Raw input is available only when the application calls RegisterRawInputDevices with valid device specifications.	
+            </remarks>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RAWINPUT']/*"/>	
+            <unmanaged>RAWINPUT</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.RawInput.Header">
+            <summary>	
+            <para>The raw input data. </para>	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RAWINPUT::header']/*"/>	
+            <unmanaged>RAWINPUTHEADER header</unmanaged>	
+        </member>
+        <!-- Badly formed XML comment ignored for member "F:SharpDX.RawInput.RawInput.Data" -->
+        <member name="T:SharpDX.RawInput.RawInputDevice">
+            <summary>	
+            Defines information for the raw input devices.	
+            </summary>	
+            <remarks>	
+            If <see cref="F:SharpDX.RawInput.DeviceFlags.NoLegacy"/> is set for a mouse or a keyboard, the system does not generate any legacy message for that device for the application. For example, if the mouse TLC is set with <see cref="F:SharpDX.RawInput.DeviceFlags.NoLegacy"/>, WM_LBUTTONDOWN and related legacy mouse messages are not generated. Likewise, if the keyboard TLC is set with <see cref="F:SharpDX.RawInput.DeviceFlags.NoLegacy"/>, <see cref="F:SharpDX.RawInput.KeyState.KeyDown"/> and related legacy keyboard messages are not generated.If <see cref="F:SharpDX.RawInput.DeviceFlags.Remove"/> is set and the hwndTarget member is not set to <c>null</c>, then parameter validation will fail.	
+            </remarks>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RAWINPUTDEVICE']/*"/>	
+            <unmanaged>RAWINPUTDEVICE</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.RawInputDevice.UsagePage">
+            <summary>	
+            <para>Top level collection Usage page for the raw input device. </para>	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RAWINPUTDEVICE::usUsagePage']/*"/>	
+            <unmanaged>unsigned short usUsagePage</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.RawInputDevice.Usage">
+            <summary>	
+            <para>Top level collection Usage for the raw input device. </para>	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RAWINPUTDEVICE::usUsage']/*"/>	
+            <unmanaged>unsigned short usUsage</unmanaged>	
+        </member>
+        <!-- Badly formed XML comment ignored for member "F:SharpDX.RawInput.RawInputDevice.Flags" -->
+        <member name="F:SharpDX.RawInput.RawInputDevice.Target">
+            <summary>	
+            <para>A handle to the target window. If <c>null</c> it follows the keyboard focus.</para>	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RAWINPUTDEVICE::hwndTarget']/*"/>	
+            <unmanaged>HWND hwndTarget</unmanaged>	
+        </member>
+        <member name="T:SharpDX.RawInput.RawInputDevicelist">
+            <summary>	
+            Contains information about a raw input device.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RAWINPUTDEVICELIST']/*"/>	
+            <unmanaged>RAWINPUTDEVICELIST</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.RawInputDevicelist.Device">
+            <summary>	
+            <para>A handle to the raw input device. </para>	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RAWINPUTDEVICELIST::hDevice']/*"/>	
+            <unmanaged>void* hDevice</unmanaged>	
+        </member>
+        <!-- Badly formed XML comment ignored for member "F:SharpDX.RawInput.RawInputDevicelist.Type" -->
+        <member name="T:SharpDX.RawInput.RawInputHeader">
+            <summary>	
+            Contains the header information that is part of the raw input data.	
+            </summary>	
+            <remarks>	
+            To get more information on the device, use hDevice in a call to GetRawInputDeviceInfo.	
+            </remarks>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RAWINPUTHEADER']/*"/>	
+            <unmanaged>RAWINPUTHEADER</unmanaged>	
+        </member>
+        <!-- Badly formed XML comment ignored for member "F:SharpDX.RawInput.RawInputHeader.Type" -->
+        <member name="F:SharpDX.RawInput.RawInputHeader.Size">
+            <summary>	
+            <para>The size, in bytes, of the entire input packet of data. This includes <see cref="T:SharpDX.RawInput.RawInput"/> plus possible extra input reports in the <see cref="T:SharpDX.RawInput.RawHid"/> variable length array. </para>	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RAWINPUTHEADER::dwSize']/*"/>	
+            <unmanaged>unsigned int dwSize</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.RawInputHeader.Device">
+            <summary>	
+            <para>A handle to the device generating the raw input data. </para>	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RAWINPUTHEADER::hDevice']/*"/>	
+            <unmanaged>void* hDevice</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.RawInputHeader.Param">
+            <summary>	
+            <para>The value passed in the  wParam parameter of the WM_INPUT message. </para>	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RAWINPUTHEADER::wParam']/*"/>	
+            <unmanaged>UINT_PTR wParam</unmanaged>	
+        </member>
+        <member name="T:SharpDX.RawInput.RawInputInner0">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RAWINPUT_INNER_0']/*"/>	
+            <unmanaged>RAWINPUT_INNER_0</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.RawInputInner0.Mouse">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RAWINPUT_INNER_0::mouse']/*"/>	
+            <unmanaged>RAWMOUSE mouse</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.RawInputInner0.Keyboard">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RAWINPUT_INNER_0::keyboard']/*"/>	
+            <unmanaged>RAWKEYBOARD keyboard</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.RawInputInner0.Hid">
+            <summary>	
+            No documentation.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RAWINPUT_INNER_0::hid']/*"/>	
+            <unmanaged>RAWHID hid</unmanaged>	
+        </member>
+        <member name="T:SharpDX.RawInput.RawKeyboard">
+            <summary>	
+            Contains information about the state of the keyboard.	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RAWKEYBOARD']/*"/>	
+            <unmanaged>RAWKEYBOARD</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.RawKeyboard.MakeCode">
+            <summary>	
+            <para>The scan code from the key depression. The scan code for keyboard overrun is KEYBOARD_OVERRUN_MAKE_CODE. </para>	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RAWKEYBOARD::MakeCode']/*"/>	
+            <unmanaged>unsigned short MakeCode</unmanaged>	
+        </member>
+        <!-- Badly formed XML comment ignored for member "F:SharpDX.RawInput.RawKeyboard.Flags" -->
+        <member name="F:SharpDX.RawInput.RawKeyboard.Reserved">
+            <summary>	
+            <para>Reserved; must be zero. </para>	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RAWKEYBOARD::Reserved']/*"/>	
+            <unmanaged>unsigned short Reserved</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.RawKeyboard.VKey">
+            <summary>	
+            <para>Windows message compatible virtual-key code. For more information, see Virtual Key Codes. </para>	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RAWKEYBOARD::VKey']/*"/>	
+            <unmanaged>unsigned short VKey</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.RawKeyboard.Message">
+            <summary>	
+            <para>The corresponding window message, for example <see cref="F:SharpDX.RawInput.KeyState.KeyDown"/>, <see cref="F:SharpDX.RawInput.KeyState.SystemKeyDown"/>, and so forth. </para>	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RAWKEYBOARD::Message']/*"/>	
+            <unmanaged>RAW_KEY_STATE Message</unmanaged>	
+        </member>
+        <member name="F:SharpDX.RawInput.RawKeyboard.ExtraInformation">
+            <summary>	
+            <para>The device-specific additional information for the event. </para>	
+            </summary>	
+            <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RAWKEYBOARD::ExtraInformation']/*"/>	
+            <unmanaged>unsigned int ExtraInformation</unmanaged>	
+        </member>
+        <member name="T:SharpDX.RawInput.HidInputEventArgs">
+            <summary>
+            Describes the format of the raw input from a Human Interface Device (HID). 
+            </summary>
+        </member>
+        <member name="M:SharpDX.RawInput.HidInputEventArgs.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:SharpDX.RawInput.HidInputEventArgs"/> class.
+            </summary>
+        </member>
+        <member name="M:SharpDX.RawInput.HidInputEventArgs.#ctor(SharpDX.RawInput.RawInput@)">
+            <summary>
+            Initializes a new instance of the <see cref="T:SharpDX.RawInput.HidInputEventArgs"/> class.
+            </summary>
+            <param name="rawInput">The raw input.</param>
+        </member>
+        <member name="P:SharpDX.RawInput.HidInputEventArgs.Count">
+            <summary>
+            Gets or sets the number of Hid structure in the <see cref="P:SharpDX.RawInput.HidInputEventArgs.RawData"/>.
+            </summary>
+            <value>
+            The count.
+            </value>
+        </member>
+        <member name="P:SharpDX.RawInput.HidInputEventArgs.DataSize">
+            <summary>
+            Gets or sets the size of the Hid structure in the <see cref="P:SharpDX.RawInput.HidInputEventArgs.RawData"/>.
+            </summary>
+            <value>
+            The size of the data.
+            </value>
+        </member>
+        <member name="P:SharpDX.RawInput.HidInputEventArgs.RawData">
+            <summary>
+            Gets or sets the raw data.
+            </summary>
+            <value>
+            The raw data.
+            </value>
+        </member>
+        <member name="T:SharpDX.RawInput.RawMouse">
+            <summary>
+            Contains information about the state of the mouse.
+            </summary>
+        </member>
+        <member name="F:SharpDX.RawInput.RawMouse.Flags">
+            <summary>
+            The mouse state.
+            </summary>
+        </member>
+        <member name="F:SharpDX.RawInput.RawMouse.RawButtons">
+            <summary>
+            Raw button data.
+            </summary>
+        </member>
+        <member name="F:SharpDX.RawInput.RawMouse.LastX">
+            <summary>
+            The motion in the X direction. This is signed relative motion or
+            absolute motion, depending on the value of usFlags.
+            </summary>
+        </member>
+        <member name="F:SharpDX.RawInput.RawMouse.LastY">
+            <summary>
+            The motion in the Y direction. This is signed relative motion or absolute motion,
+            depending on the value of usFlags.
+            </summary>
+        </member>
+        <member name="F:SharpDX.RawInput.RawMouse.ExtraInformation">
+            <summary>
+            The device-specific additional information for the event.
+            </summary>
+        </member>
+        <member name="F:SharpDX.RawInput.RawMouse.RawMouseButtonsData.ButtonFlags">
+            <summary>
+            Flags for the event.
+            </summary>
+        </member>
+        <member name="F:SharpDX.RawInput.RawMouse.RawMouseButtonsData.ButtonData">
+            <summary>
+            If the mouse wheel is moved, this will contain the delta amount.
+            </summary>
+        </member>
+        <member name="T:SharpDX.RawInput.MouseInfo">
+            <summary>
+            Defines the raw input data coming from the specified mouse.
+            </summary>
+            <unmanaged>RID_DEVICE_INFO_MOUSE</unmanaged>	
+        </member>
+        <member name="M:SharpDX.RawInput.MouseInfo.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:SharpDX.RawInput.MouseInfo"/> class.
+            </summary>
+        </member>
+        <member name="M:SharpDX.RawInput.MouseInfo.#ctor(SharpDX.RawInput.RawDeviceInformation@,System.String,System.IntPtr)">
+            <summary>
+            Initializes a new instance of the <see cref="T:SharpDX.RawInput.MouseInfo"/> class.
+            </summary>
+            <param name="rawDeviceInfo">The raw device info.</param>
+            <param name="deviceName">Name of the device.</param>
+            <param name="deviceHandle">The device handle.</param>
+        </member>
+        <member name="P:SharpDX.RawInput.MouseInfo.Id">
+            <summary>
+            Gets or sets the id.
+            </summary>
+            <value>
+            The id.
+            </value>
+            <unmanaged>unsigned int dwId</unmanaged>	
+        </member>
+        <member name="P:SharpDX.RawInput.MouseInfo.ButtonCount">
+            <summary>
+            Gets or sets the button count.
+            </summary>
+            <value>
+            The button count.
+            </value>
+            <unmanaged>unsigned int dwNumberOfButtons</unmanaged>	
+        </member>
+        <member name="P:SharpDX.RawInput.MouseInfo.SampleRate">
+            <summary>
+            Gets or sets the sample rate.
+            </summary>
+            <value>
+            The sample rate.
+            </value>
+            <unmanaged>unsigned int dwSampleRate</unmanaged>	
+        </member>
+        <member name="P:SharpDX.RawInput.MouseInfo.HasHorizontalWheel">
+            <summary>
+            Gets or sets a value indicating whether this instance has horizontal wheel.
+            </summary>
+            <value>
+            	<c>true</c> if this instance has horizontal wheel; otherwise, <c>false</c>.
+            </value>
+            <unmanaged>BOOL fHasHorizontalWheel</unmanaged>	
+        </member>
+        <member name="T:SharpDX.RawInput.HidInfo">
+            <summary>
+            Defines the raw input data coming from the specified Human Interface Device (HID). 
+            </summary>
+        </member>
+        <member name="M:SharpDX.RawInput.HidInfo.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:SharpDX.RawInput.HidInfo"/> class.
+            </summary>
+        </member>
+        <member name="M:SharpDX.RawInput.HidInfo.#ctor(SharpDX.RawInput.RawDeviceInformation@,System.String,System.IntPtr)">
+            <summary>
+            Initializes a new instance of the <see cref="T:SharpDX.RawInput.HidInfo"/> class.
+            </summary>
+            <param name="rawDeviceInfo">The raw device info.</param>
+            <param name="deviceName">Name of the device.</param>
+            <param name="deviceHandle">The device handle.</param>
+        </member>
+        <member name="P:SharpDX.RawInput.HidInfo.VendorId">
+            <summary>
+            Gets or sets the vendor id.
+            </summary>
+            <value>
+            The vendor id.
+            </value>
+            <unmanaged>unsigned int dwVendorId</unmanaged>
+        </member>
+        <member name="P:SharpDX.RawInput.HidInfo.ProductId">
+            <summary>
+            Gets or sets the product id.
+            </summary>
+            <value>
+            The product id.
+            </value>
+            <unmanaged>unsigned int dwProductId</unmanaged>
+        </member>
+        <member name="P:SharpDX.RawInput.HidInfo.VersionNumber">
+            <summary>
+            Gets or sets the version number.
+            </summary>
+            <value>
+            The version number.
+            </value>
+            <unmanaged>unsigned int dwVersionNumber</unmanaged>
+        </member>
+        <member name="P:SharpDX.RawInput.HidInfo.UsagePage">
+            <summary>
+            Gets or sets the usage page.
+            </summary>
+            <value>
+            The usage page.
+            </value>
+            <unmanaged>HID_USAGE_PAGE usUsagePage</unmanaged>
+        </member>
+        <member name="P:SharpDX.RawInput.HidInfo.Usage">
+            <summary>
+            Gets or sets the usage.
+            </summary>
+            <value>
+            The usage.
+            </value>
+            <unmanaged>HID_USAGE_ID usUsage</unmanaged>
+        </member>
+    </members>
+</doc>

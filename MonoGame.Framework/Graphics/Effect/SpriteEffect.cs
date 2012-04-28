@@ -40,13 +40,15 @@ namespace Microsoft.Xna.Framework.Graphics
 
         #endregion
 
+        static internal readonly byte[] Bytecode = LoadEffectResource("Microsoft.Xna.Framework.Graphics.Effect.Resources.SpriteEffect.mgfx");
+
         #region Methods
 
         /// <summary>
         /// Creates a new SpriteEffect.
         /// </summary>
         public SpriteEffect(GraphicsDevice device)
-            : base(device, Effect.LoadEffectResource("Microsoft.Xna.Framework.Graphics.Effect.Resources.SpriteEffect.mgfx"))
+            : base(device, Bytecode)
         {
             CacheEffectParameters();
         }
@@ -81,14 +83,16 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// Lazily computes derived parameter values immediately before applying the effect.
         /// </summary>
-        protected internal override void OnApply()
+        protected internal override bool OnApply()
         {
-            Viewport viewport = GraphicsDevice.Viewport;
+            var viewport = GraphicsDevice.Viewport;
 
-            Matrix projection = Matrix.CreateOrthographicOffCenter(0, viewport.Width, viewport.Height, 0, 0, 1);
-            Matrix halfPixelOffset = Matrix.CreateTranslation(-0.5f, -0.5f, 0);
+            var projection = Matrix.CreateOrthographicOffCenter(0, viewport.Width, viewport.Height, 0, 0, 1);
+            var halfPixelOffset = Matrix.CreateTranslation(-0.5f, -0.5f, 0);
 
             matrixParam.SetValue(halfPixelOffset * projection);
+
+            return false;
         }
 
 
