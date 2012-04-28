@@ -5,15 +5,11 @@ using System.Runtime.InteropServices;
 namespace Microsoft.Xna.Framework.Graphics
 {
 	internal class MojoShader
-	{
-#if IPHONE
-		const string mojoshader_dll = "__Internal";
-#elif ANDROID
-		const string mojoshader_dll = "libmojoshader.so";
-#else
-		const string mojoshader_dll = "libmojoshader.dll";
+    {
+#if WINDOWS
+        const string mojoshader_dll = "libmojoshader_32.dll";
 #endif
-		
+
 		public partial class NativeConstants {
 		    
 		    /// _INCL_MOJOSHADER_H_ -> 
@@ -2785,22 +2781,6 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		public partial class NativeMethods {
 		    
-#if WINDOWS
-			//Hack to handle 64-bit and 32-bit dll loading on Windows.
-			//Seems to be the cleanest way to do it.
-			static NativeMethods()
-			{
-				if (IntPtr.Size == 4)
-				{
-					File.Copy("libmojoshader_32.dll", mojoshader_dll, true);
-				}
-				else
-				{
-					File.Copy("libmojoshader_64.dll", mojoshader_dll, true);
-				}
-			}
-#endif
-
 
 		    /// Return Type: int
 		    [DllImportAttribute(mojoshader_dll, EntryPoint="MOJOSHADER_version")]
