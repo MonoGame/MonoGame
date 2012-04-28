@@ -4,6 +4,75 @@
         <name>SharpDX.RawInput</name>
     </assembly>
     <members>
+        <member name="T:SharpDX.RawInput.KeyboardInputEventArgs">
+            <summary>
+            RawInput Keyboard event.
+            </summary>
+        </member>
+        <member name="T:SharpDX.RawInput.RawInputEventArgs">
+            <summary>
+            RawInput event arguments base.
+            </summary>
+        </member>
+        <member name="P:SharpDX.RawInput.RawInputEventArgs.Device">
+            <summary>
+            Gets or sets the RawInput device.
+            </summary>
+            <value>
+            The device.
+            </value>
+        </member>
+        <member name="M:SharpDX.RawInput.KeyboardInputEventArgs.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:SharpDX.RawInput.KeyboardInputEventArgs"/> class.
+            </summary>
+        </member>
+        <member name="M:SharpDX.RawInput.KeyboardInputEventArgs.#ctor(SharpDX.RawInput.RawInput@)">
+            <summary>
+            Initializes a new instance of the <see cref="T:SharpDX.RawInput.KeyboardInputEventArgs"/> class.
+            </summary>
+            <param name="rawInput">The raw input.</param>
+        </member>
+        <member name="P:SharpDX.RawInput.KeyboardInputEventArgs.Key">
+            <summary>
+            Gets or sets the key.
+            </summary>
+            <value>
+            The key.
+            </value>
+        </member>
+        <member name="P:SharpDX.RawInput.KeyboardInputEventArgs.MakeCode">
+            <summary>
+            Gets or sets the make code.
+            </summary>
+            <value>
+            The make code.
+            </value>
+        </member>
+        <member name="P:SharpDX.RawInput.KeyboardInputEventArgs.ScanCodeFlags">
+            <summary>
+            Gets or sets the scan code flags.
+            </summary>
+            <value>
+            The scan code flags.
+            </value>
+        </member>
+        <member name="P:SharpDX.RawInput.KeyboardInputEventArgs.State">
+            <summary>
+            Gets or sets the state.
+            </summary>
+            <value>
+            The state.
+            </value>
+        </member>
+        <member name="P:SharpDX.RawInput.KeyboardInputEventArgs.ExtraInformation">
+            <summary>
+            Gets or sets the extra information.
+            </summary>
+            <value>
+            The extra information.
+            </value>
+        </member>
         <member name="T:SharpDX.RawInput.Device">
             <summary>
             Provides access to RawInput methods.
@@ -67,6 +136,84 @@
             WM_INPUT
             </summary>
         </member>
+        <member name="T:SharpDX.RawInput.MouseInputEventArgs">
+            <summary>
+            RawInput Mouse event.
+            </summary>
+        </member>
+        <member name="M:SharpDX.RawInput.MouseInputEventArgs.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:SharpDX.RawInput.MouseInputEventArgs"/> class.
+            </summary>
+        </member>
+        <member name="M:SharpDX.RawInput.MouseInputEventArgs.#ctor(SharpDX.RawInput.RawInput@)">
+            <summary>
+            Initializes a new instance of the <see cref="T:SharpDX.RawInput.MouseInputEventArgs"/> class.
+            </summary>
+            <param name="rawInput">The raw input.</param>
+        </member>
+        <member name="P:SharpDX.RawInput.MouseInputEventArgs.Mode">
+            <summary>
+            Gets or sets the mode.
+            </summary>
+            <value>
+            The mode.
+            </value>
+        </member>
+        <member name="P:SharpDX.RawInput.MouseInputEventArgs.ButtonFlags">
+            <summary>
+            Gets or sets the button flags.
+            </summary>
+            <value>
+            The button flags.
+            </value>
+        </member>
+        <member name="P:SharpDX.RawInput.MouseInputEventArgs.ExtraInformation">
+            <summary>
+            Gets or sets the extra information.
+            </summary>
+            <value>
+            The extra information.
+            </value>
+        </member>
+        <member name="P:SharpDX.RawInput.MouseInputEventArgs.Buttons">
+            <summary>
+            Gets or sets the raw buttons.
+            </summary>
+            <value>
+            The raw buttons.
+            </value>
+        </member>
+        <member name="P:SharpDX.RawInput.MouseInputEventArgs.WheelDelta">
+            <summary>
+            Gets or sets the wheel delta.
+            </summary>
+            <value>
+            The wheel delta.
+            </value>
+        </member>
+        <member name="P:SharpDX.RawInput.MouseInputEventArgs.X">
+            <summary>
+            Gets or sets the X.
+            </summary>
+            <value>
+            The X.
+            </value>
+        </member>
+        <member name="P:SharpDX.RawInput.MouseInputEventArgs.Y">
+            <summary>
+            Gets or sets the Y.
+            </summary>
+            <value>
+            The Y.
+            </value>
+        </member>
+        <member name="T:SharpDX.RawInput.KeyboardInfo">
+            <summary>
+            Defines the raw input data coming from the specified keyboard. 
+            </summary>
+            <unmanaged>RID_DEVICE_INFO_KEYBOARD</unmanaged>	
+        </member>
         <member name="T:SharpDX.RawInput.DeviceInfo">
             <summary>
             Defines the raw input data coming from any device.
@@ -118,6 +265,73 @@
             <value>
             The handle.
             </value>
+        </member>
+        <member name="M:SharpDX.RawInput.KeyboardInfo.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:SharpDX.RawInput.KeyboardInfo"/> class.
+            </summary>
+        </member>
+        <member name="M:SharpDX.RawInput.KeyboardInfo.#ctor(SharpDX.RawInput.RawDeviceInformation@,System.String,System.IntPtr)">
+            <summary>
+            Initializes a new instance of the <see cref="T:SharpDX.RawInput.KeyboardInfo"/> class.
+            </summary>
+            <param name="rawDeviceInfo">The raw device info.</param>
+            <param name="deviceName">Name of the device.</param>
+            <param name="deviceHandle">The device handle.</param>
+        </member>
+        <member name="P:SharpDX.RawInput.KeyboardInfo.KeyboardType">
+            <summary>
+            Gets or sets the type of the keyboard.
+            </summary>
+            <value>
+            The type of the keyboard.
+            </value>
+            <unmanaged>unsigned int dwType</unmanaged>	
+        </member>
+        <member name="P:SharpDX.RawInput.KeyboardInfo.Subtype">
+            <summary>
+            Gets or sets the subtype.
+            </summary>
+            <value>
+            The subtype.
+            </value>
+            <unmanaged>unsigned int dwSubType</unmanaged>	
+        </member>
+        <member name="P:SharpDX.RawInput.KeyboardInfo.KeyboardMode">
+            <summary>
+            Gets or sets the keyboard mode.
+            </summary>
+            <value>
+            The keyboard mode.
+            </value>
+            <unmanaged>unsigned int dwKeyboardMode</unmanaged>	
+        </member>
+        <member name="P:SharpDX.RawInput.KeyboardInfo.FunctionKeyCount">
+            <summary>
+            Gets or sets the function key count.
+            </summary>
+            <value>
+            The function key count.
+            </value>
+            <unmanaged>unsigned int dwNumberOfFunctionKeys</unmanaged>	
+        </member>
+        <member name="P:SharpDX.RawInput.KeyboardInfo.IndicatorCount">
+            <summary>
+            Gets or sets the indicator count.
+            </summary>
+            <value>
+            The indicator count.
+            </value>
+            <unmanaged>unsigned int dwNumberOfIndicators</unmanaged>	
+        </member>
+        <member name="P:SharpDX.RawInput.KeyboardInfo.TotalKeyCount">
+            <summary>
+            Gets or sets the total key count.
+            </summary>
+            <value>
+            The total key count.
+            </value>
+            <unmanaged>unsigned int dwNumberOfKeysTotal</unmanaged>	
         </member>
         <member name="T:SharpDX.RawInput.DeviceFlags">
             <summary>	
@@ -642,8 +856,8 @@
             <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='GetRawInputBuffer']/*"/>	
             <unmanaged>unsigned int GetRawInputBuffer([Out, Buffer, Optional] RAWINPUT* pData,[InOut] unsigned int* pcbSize,[In] unsigned int cbSizeHeader)</unmanaged>	
         </member>
-        <!-- Badly formed XML comment ignored for member "M:SharpDX.RawInput.RawInputFunctions.GetRawInputDeviceInfo(System.IntPtr,SharpDX.RawInput.RawInputDeviceInfoType,System.IntPtr,System.Int32@)" -->
         <!-- Badly formed XML comment ignored for member "M:SharpDX.RawInput.RawInputFunctions.GetRawInputData(System.IntPtr,SharpDX.RawInput.RawInputDataType,System.IntPtr,System.Int32@,System.Int32)" -->
+        <!-- Badly formed XML comment ignored for member "M:SharpDX.RawInput.RawInputFunctions.GetRawInputDeviceInfo(System.IntPtr,SharpDX.RawInput.RawInputDeviceInfoType,System.IntPtr,System.Int32@)" -->
         <member name="M:SharpDX.RawInput.RawInputFunctions.GetRegisteredRawInputDevices(SharpDX.RawInput.RawInputDevice[],System.Int32@,System.Int32)">
             <summary>	
             Retrieves the information about the raw input devices for the current application.	
@@ -1026,6 +1240,143 @@
             <!-- No matching elements were found for the following include tag --><include file=".\..\Documentation\CodeComments.xml" path="/comments/comment[@id='RAWKEYBOARD::ExtraInformation']/*"/>	
             <unmanaged>unsigned int ExtraInformation</unmanaged>	
         </member>
+        <member name="T:SharpDX.RawInput.HidInputEventArgs">
+            <summary>
+            Describes the format of the raw input from a Human Interface Device (HID). 
+            </summary>
+        </member>
+        <member name="M:SharpDX.RawInput.HidInputEventArgs.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:SharpDX.RawInput.HidInputEventArgs"/> class.
+            </summary>
+        </member>
+        <member name="M:SharpDX.RawInput.HidInputEventArgs.#ctor(SharpDX.RawInput.RawInput@)">
+            <summary>
+            Initializes a new instance of the <see cref="T:SharpDX.RawInput.HidInputEventArgs"/> class.
+            </summary>
+            <param name="rawInput">The raw input.</param>
+        </member>
+        <member name="P:SharpDX.RawInput.HidInputEventArgs.Count">
+            <summary>
+            Gets or sets the number of Hid structure in the <see cref="P:SharpDX.RawInput.HidInputEventArgs.RawData"/>.
+            </summary>
+            <value>
+            The count.
+            </value>
+        </member>
+        <member name="P:SharpDX.RawInput.HidInputEventArgs.DataSize">
+            <summary>
+            Gets or sets the size of the Hid structure in the <see cref="P:SharpDX.RawInput.HidInputEventArgs.RawData"/>.
+            </summary>
+            <value>
+            The size of the data.
+            </value>
+        </member>
+        <member name="P:SharpDX.RawInput.HidInputEventArgs.RawData">
+            <summary>
+            Gets or sets the raw data.
+            </summary>
+            <value>
+            The raw data.
+            </value>
+        </member>
+        <member name="T:SharpDX.RawInput.RawMouse">
+            <summary>
+            Contains information about the state of the mouse.
+            </summary>
+        </member>
+        <member name="F:SharpDX.RawInput.RawMouse.Flags">
+            <summary>
+            The mouse state.
+            </summary>
+        </member>
+        <member name="F:SharpDX.RawInput.RawMouse.RawButtons">
+            <summary>
+            Raw button data.
+            </summary>
+        </member>
+        <member name="F:SharpDX.RawInput.RawMouse.LastX">
+            <summary>
+            The motion in the X direction. This is signed relative motion or
+            absolute motion, depending on the value of usFlags.
+            </summary>
+        </member>
+        <member name="F:SharpDX.RawInput.RawMouse.LastY">
+            <summary>
+            The motion in the Y direction. This is signed relative motion or absolute motion,
+            depending on the value of usFlags.
+            </summary>
+        </member>
+        <member name="F:SharpDX.RawInput.RawMouse.ExtraInformation">
+            <summary>
+            The device-specific additional information for the event.
+            </summary>
+        </member>
+        <member name="F:SharpDX.RawInput.RawMouse.RawMouseButtonsData.ButtonFlags">
+            <summary>
+            Flags for the event.
+            </summary>
+        </member>
+        <member name="F:SharpDX.RawInput.RawMouse.RawMouseButtonsData.ButtonData">
+            <summary>
+            If the mouse wheel is moved, this will contain the delta amount.
+            </summary>
+        </member>
+        <member name="T:SharpDX.RawInput.MouseInfo">
+            <summary>
+            Defines the raw input data coming from the specified mouse.
+            </summary>
+            <unmanaged>RID_DEVICE_INFO_MOUSE</unmanaged>	
+        </member>
+        <member name="M:SharpDX.RawInput.MouseInfo.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:SharpDX.RawInput.MouseInfo"/> class.
+            </summary>
+        </member>
+        <member name="M:SharpDX.RawInput.MouseInfo.#ctor(SharpDX.RawInput.RawDeviceInformation@,System.String,System.IntPtr)">
+            <summary>
+            Initializes a new instance of the <see cref="T:SharpDX.RawInput.MouseInfo"/> class.
+            </summary>
+            <param name="rawDeviceInfo">The raw device info.</param>
+            <param name="deviceName">Name of the device.</param>
+            <param name="deviceHandle">The device handle.</param>
+        </member>
+        <member name="P:SharpDX.RawInput.MouseInfo.Id">
+            <summary>
+            Gets or sets the id.
+            </summary>
+            <value>
+            The id.
+            </value>
+            <unmanaged>unsigned int dwId</unmanaged>	
+        </member>
+        <member name="P:SharpDX.RawInput.MouseInfo.ButtonCount">
+            <summary>
+            Gets or sets the button count.
+            </summary>
+            <value>
+            The button count.
+            </value>
+            <unmanaged>unsigned int dwNumberOfButtons</unmanaged>	
+        </member>
+        <member name="P:SharpDX.RawInput.MouseInfo.SampleRate">
+            <summary>
+            Gets or sets the sample rate.
+            </summary>
+            <value>
+            The sample rate.
+            </value>
+            <unmanaged>unsigned int dwSampleRate</unmanaged>	
+        </member>
+        <member name="P:SharpDX.RawInput.MouseInfo.HasHorizontalWheel">
+            <summary>
+            Gets or sets a value indicating whether this instance has horizontal wheel.
+            </summary>
+            <value>
+            	<c>true</c> if this instance has horizontal wheel; otherwise, <c>false</c>.
+            </value>
+            <unmanaged>BOOL fHasHorizontalWheel</unmanaged>	
+        </member>
         <member name="T:SharpDX.RawInput.HidInfo">
             <summary>
             Defines the raw input data coming from the specified Human Interface Device (HID). 
@@ -1088,357 +1439,6 @@
             The usage.
             </value>
             <unmanaged>HID_USAGE_ID usUsage</unmanaged>
-        </member>
-        <member name="T:SharpDX.RawInput.HidInputEventArgs">
-            <summary>
-            Describes the format of the raw input from a Human Interface Device (HID). 
-            </summary>
-        </member>
-        <member name="T:SharpDX.RawInput.RawInputEventArgs">
-            <summary>
-            RawInput event arguments base.
-            </summary>
-        </member>
-        <member name="P:SharpDX.RawInput.RawInputEventArgs.Device">
-            <summary>
-            Gets or sets the RawInput device.
-            </summary>
-            <value>
-            The device.
-            </value>
-        </member>
-        <member name="M:SharpDX.RawInput.HidInputEventArgs.#ctor">
-            <summary>
-            Initializes a new instance of the <see cref="T:SharpDX.RawInput.HidInputEventArgs"/> class.
-            </summary>
-        </member>
-        <member name="M:SharpDX.RawInput.HidInputEventArgs.#ctor(SharpDX.RawInput.RawInput@)">
-            <summary>
-            Initializes a new instance of the <see cref="T:SharpDX.RawInput.HidInputEventArgs"/> class.
-            </summary>
-            <param name="rawInput">The raw input.</param>
-        </member>
-        <member name="P:SharpDX.RawInput.HidInputEventArgs.Count">
-            <summary>
-            Gets or sets the number of Hid structure in the <see cref="P:SharpDX.RawInput.HidInputEventArgs.RawData"/>.
-            </summary>
-            <value>
-            The count.
-            </value>
-        </member>
-        <member name="P:SharpDX.RawInput.HidInputEventArgs.DataSize">
-            <summary>
-            Gets or sets the size of the Hid structure in the <see cref="P:SharpDX.RawInput.HidInputEventArgs.RawData"/>.
-            </summary>
-            <value>
-            The size of the data.
-            </value>
-        </member>
-        <member name="P:SharpDX.RawInput.HidInputEventArgs.RawData">
-            <summary>
-            Gets or sets the raw data.
-            </summary>
-            <value>
-            The raw data.
-            </value>
-        </member>
-        <member name="T:SharpDX.RawInput.KeyboardInfo">
-            <summary>
-            Defines the raw input data coming from the specified keyboard. 
-            </summary>
-            <unmanaged>RID_DEVICE_INFO_KEYBOARD</unmanaged>	
-        </member>
-        <member name="M:SharpDX.RawInput.KeyboardInfo.#ctor">
-            <summary>
-            Initializes a new instance of the <see cref="T:SharpDX.RawInput.KeyboardInfo"/> class.
-            </summary>
-        </member>
-        <member name="M:SharpDX.RawInput.KeyboardInfo.#ctor(SharpDX.RawInput.RawDeviceInformation@,System.String,System.IntPtr)">
-            <summary>
-            Initializes a new instance of the <see cref="T:SharpDX.RawInput.KeyboardInfo"/> class.
-            </summary>
-            <param name="rawDeviceInfo">The raw device info.</param>
-            <param name="deviceName">Name of the device.</param>
-            <param name="deviceHandle">The device handle.</param>
-        </member>
-        <member name="P:SharpDX.RawInput.KeyboardInfo.KeyboardType">
-            <summary>
-            Gets or sets the type of the keyboard.
-            </summary>
-            <value>
-            The type of the keyboard.
-            </value>
-            <unmanaged>unsigned int dwType</unmanaged>	
-        </member>
-        <member name="P:SharpDX.RawInput.KeyboardInfo.Subtype">
-            <summary>
-            Gets or sets the subtype.
-            </summary>
-            <value>
-            The subtype.
-            </value>
-            <unmanaged>unsigned int dwSubType</unmanaged>	
-        </member>
-        <member name="P:SharpDX.RawInput.KeyboardInfo.KeyboardMode">
-            <summary>
-            Gets or sets the keyboard mode.
-            </summary>
-            <value>
-            The keyboard mode.
-            </value>
-            <unmanaged>unsigned int dwKeyboardMode</unmanaged>	
-        </member>
-        <member name="P:SharpDX.RawInput.KeyboardInfo.FunctionKeyCount">
-            <summary>
-            Gets or sets the function key count.
-            </summary>
-            <value>
-            The function key count.
-            </value>
-            <unmanaged>unsigned int dwNumberOfFunctionKeys</unmanaged>	
-        </member>
-        <member name="P:SharpDX.RawInput.KeyboardInfo.IndicatorCount">
-            <summary>
-            Gets or sets the indicator count.
-            </summary>
-            <value>
-            The indicator count.
-            </value>
-            <unmanaged>unsigned int dwNumberOfIndicators</unmanaged>	
-        </member>
-        <member name="P:SharpDX.RawInput.KeyboardInfo.TotalKeyCount">
-            <summary>
-            Gets or sets the total key count.
-            </summary>
-            <value>
-            The total key count.
-            </value>
-            <unmanaged>unsigned int dwNumberOfKeysTotal</unmanaged>	
-        </member>
-        <member name="T:SharpDX.RawInput.KeyboardInputEventArgs">
-            <summary>
-            RawInput Keyboard event.
-            </summary>
-        </member>
-        <member name="M:SharpDX.RawInput.KeyboardInputEventArgs.#ctor">
-            <summary>
-            Initializes a new instance of the <see cref="T:SharpDX.RawInput.KeyboardInputEventArgs"/> class.
-            </summary>
-        </member>
-        <member name="M:SharpDX.RawInput.KeyboardInputEventArgs.#ctor(SharpDX.RawInput.RawInput@)">
-            <summary>
-            Initializes a new instance of the <see cref="T:SharpDX.RawInput.KeyboardInputEventArgs"/> class.
-            </summary>
-            <param name="rawInput">The raw input.</param>
-        </member>
-        <member name="P:SharpDX.RawInput.KeyboardInputEventArgs.Key">
-            <summary>
-            Gets or sets the key.
-            </summary>
-            <value>
-            The key.
-            </value>
-        </member>
-        <member name="P:SharpDX.RawInput.KeyboardInputEventArgs.MakeCode">
-            <summary>
-            Gets or sets the make code.
-            </summary>
-            <value>
-            The make code.
-            </value>
-        </member>
-        <member name="P:SharpDX.RawInput.KeyboardInputEventArgs.ScanCodeFlags">
-            <summary>
-            Gets or sets the scan code flags.
-            </summary>
-            <value>
-            The scan code flags.
-            </value>
-        </member>
-        <member name="P:SharpDX.RawInput.KeyboardInputEventArgs.State">
-            <summary>
-            Gets or sets the state.
-            </summary>
-            <value>
-            The state.
-            </value>
-        </member>
-        <member name="P:SharpDX.RawInput.KeyboardInputEventArgs.ExtraInformation">
-            <summary>
-            Gets or sets the extra information.
-            </summary>
-            <value>
-            The extra information.
-            </value>
-        </member>
-        <member name="T:SharpDX.RawInput.MouseInfo">
-            <summary>
-            Defines the raw input data coming from the specified mouse.
-            </summary>
-            <unmanaged>RID_DEVICE_INFO_MOUSE</unmanaged>	
-        </member>
-        <member name="M:SharpDX.RawInput.MouseInfo.#ctor">
-            <summary>
-            Initializes a new instance of the <see cref="T:SharpDX.RawInput.MouseInfo"/> class.
-            </summary>
-        </member>
-        <member name="M:SharpDX.RawInput.MouseInfo.#ctor(SharpDX.RawInput.RawDeviceInformation@,System.String,System.IntPtr)">
-            <summary>
-            Initializes a new instance of the <see cref="T:SharpDX.RawInput.MouseInfo"/> class.
-            </summary>
-            <param name="rawDeviceInfo">The raw device info.</param>
-            <param name="deviceName">Name of the device.</param>
-            <param name="deviceHandle">The device handle.</param>
-        </member>
-        <member name="P:SharpDX.RawInput.MouseInfo.Id">
-            <summary>
-            Gets or sets the id.
-            </summary>
-            <value>
-            The id.
-            </value>
-            <unmanaged>unsigned int dwId</unmanaged>	
-        </member>
-        <member name="P:SharpDX.RawInput.MouseInfo.ButtonCount">
-            <summary>
-            Gets or sets the button count.
-            </summary>
-            <value>
-            The button count.
-            </value>
-            <unmanaged>unsigned int dwNumberOfButtons</unmanaged>	
-        </member>
-        <member name="P:SharpDX.RawInput.MouseInfo.SampleRate">
-            <summary>
-            Gets or sets the sample rate.
-            </summary>
-            <value>
-            The sample rate.
-            </value>
-            <unmanaged>unsigned int dwSampleRate</unmanaged>	
-        </member>
-        <member name="P:SharpDX.RawInput.MouseInfo.HasHorizontalWheel">
-            <summary>
-            Gets or sets a value indicating whether this instance has horizontal wheel.
-            </summary>
-            <value>
-            	<c>true</c> if this instance has horizontal wheel; otherwise, <c>false</c>.
-            </value>
-            <unmanaged>BOOL fHasHorizontalWheel</unmanaged>	
-        </member>
-        <member name="T:SharpDX.RawInput.MouseInputEventArgs">
-            <summary>
-            RawInput Mouse event.
-            </summary>
-        </member>
-        <member name="M:SharpDX.RawInput.MouseInputEventArgs.#ctor">
-            <summary>
-            Initializes a new instance of the <see cref="T:SharpDX.RawInput.MouseInputEventArgs"/> class.
-            </summary>
-        </member>
-        <member name="M:SharpDX.RawInput.MouseInputEventArgs.#ctor(SharpDX.RawInput.RawInput@)">
-            <summary>
-            Initializes a new instance of the <see cref="T:SharpDX.RawInput.MouseInputEventArgs"/> class.
-            </summary>
-            <param name="rawInput">The raw input.</param>
-        </member>
-        <member name="P:SharpDX.RawInput.MouseInputEventArgs.Mode">
-            <summary>
-            Gets or sets the mode.
-            </summary>
-            <value>
-            The mode.
-            </value>
-        </member>
-        <member name="P:SharpDX.RawInput.MouseInputEventArgs.ButtonFlags">
-            <summary>
-            Gets or sets the button flags.
-            </summary>
-            <value>
-            The button flags.
-            </value>
-        </member>
-        <member name="P:SharpDX.RawInput.MouseInputEventArgs.ExtraInformation">
-            <summary>
-            Gets or sets the extra information.
-            </summary>
-            <value>
-            The extra information.
-            </value>
-        </member>
-        <member name="P:SharpDX.RawInput.MouseInputEventArgs.Buttons">
-            <summary>
-            Gets or sets the raw buttons.
-            </summary>
-            <value>
-            The raw buttons.
-            </value>
-        </member>
-        <member name="P:SharpDX.RawInput.MouseInputEventArgs.WheelDelta">
-            <summary>
-            Gets or sets the wheel delta.
-            </summary>
-            <value>
-            The wheel delta.
-            </value>
-        </member>
-        <member name="P:SharpDX.RawInput.MouseInputEventArgs.X">
-            <summary>
-            Gets or sets the X.
-            </summary>
-            <value>
-            The X.
-            </value>
-        </member>
-        <member name="P:SharpDX.RawInput.MouseInputEventArgs.Y">
-            <summary>
-            Gets or sets the Y.
-            </summary>
-            <value>
-            The Y.
-            </value>
-        </member>
-        <member name="T:SharpDX.RawInput.RawMouse">
-            <summary>
-            Contains information about the state of the mouse.
-            </summary>
-        </member>
-        <member name="F:SharpDX.RawInput.RawMouse.Flags">
-            <summary>
-            The mouse state.
-            </summary>
-        </member>
-        <member name="F:SharpDX.RawInput.RawMouse.RawButtons">
-            <summary>
-            Raw button data.
-            </summary>
-        </member>
-        <member name="F:SharpDX.RawInput.RawMouse.LastX">
-            <summary>
-            The motion in the X direction. This is signed relative motion or
-            absolute motion, depending on the value of usFlags.
-            </summary>
-        </member>
-        <member name="F:SharpDX.RawInput.RawMouse.LastY">
-            <summary>
-            The motion in the Y direction. This is signed relative motion or absolute motion,
-            depending on the value of usFlags.
-            </summary>
-        </member>
-        <member name="F:SharpDX.RawInput.RawMouse.ExtraInformation">
-            <summary>
-            The device-specific additional information for the event.
-            </summary>
-        </member>
-        <member name="F:SharpDX.RawInput.RawMouse.RawMouseButtonsData.ButtonFlags">
-            <summary>
-            Flags for the event.
-            </summary>
-        </member>
-        <member name="F:SharpDX.RawInput.RawMouse.RawMouseButtonsData.ButtonData">
-            <summary>
-            If the mouse wheel is moved, this will contain the delta amount.
-            </summary>
         </member>
     </members>
 </doc>
