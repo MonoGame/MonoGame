@@ -37,6 +37,7 @@
     <WarningLevel>4</WarningLevel>
     <DefineConstants>TRACE;WINDOWS;OPENGL</DefineConstants>
     <PlatformTarget>x86</PlatformTarget>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
