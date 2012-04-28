@@ -70,48 +70,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\MonoGame.Framework\Graphics\ColorWriteChannels.cs">
-      <Link>ColorWriteChannels.cs</Link>
-    </Compile>
-    <Compile Include="..\..\MonoGame.Framework\Graphics\Effect\EffectParameterClass.cs">
-      <Link>EffectParameterClass.cs</Link>
-    </Compile>
-    <Compile Include="..\..\MonoGame.Framework\Graphics\Effect\EffectParameterType.cs">
-      <Link>EffectParameterType.cs</Link>
-    </Compile>
-    <Compile Include="..\..\MonoGame.Framework\Graphics\States\Blend.cs">
-      <Link>Blend.cs</Link>
-    </Compile>
-    <Compile Include="..\..\MonoGame.Framework\Graphics\States\BlendFunction.cs">
-      <Link>BlendFunction.cs</Link>
-    </Compile>
-    <Compile Include="..\..\MonoGame.Framework\Graphics\States\CompareFunction.cs">
-      <Link>CompareFunction.cs</Link>
-    </Compile>
-    <Compile Include="..\..\MonoGame.Framework\Graphics\States\CullMode.cs">
-      <Link>CullMode.cs</Link>
-    </Compile>
-    <Compile Include="..\..\MonoGame.Framework\Graphics\States\DepthFormat.cs">
-      <Link>DepthFormat.cs</Link>
-    </Compile>
-    <Compile Include="..\..\MonoGame.Framework\Graphics\States\FillMode.cs">
-      <Link>FillMode.cs</Link>
-    </Compile>
-    <Compile Include="..\..\MonoGame.Framework\Graphics\States\SaveStateMode.cs">
-      <Link>SaveStateMode.cs</Link>
-    </Compile>
-    <Compile Include="..\..\MonoGame.Framework\Graphics\States\StencilOperation.cs">
-      <Link>StencilOperation.cs</Link>
-    </Compile>
-    <Compile Include="..\..\MonoGame.Framework\Graphics\States\TextureAddressMode.cs">
-      <Link>TextureAddressMode.cs</Link>
-    </Compile>
-    <Compile Include="..\..\MonoGame.Framework\Graphics\States\TextureFilter.cs">
-      <Link>TextureFilter.cs</Link>
-    </Compile>
-    <Compile Include="..\..\MonoGame.Framework\Graphics\Vertices\VertexElementUsage.cs">
-      <Link>VertexElementUsage.cs</Link>
-    </Compile>
     <Compile Include="CommandLineParser.cs" />
     <Compile Include="CompilerInclude.cs" />
     <Compile Include="DXEffectObject.cs" />
@@ -155,6 +113,12 @@
       <ProductName>Windows Installer 3.1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\MonoGame.Framework\MonoGame.Framework.Windows.csproj">
+      <Project>{7DE47032-A904-4C29-BD22-2D235E8D91BA}</Project>
+      <Name>MonoGame.Framework.Windows</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
