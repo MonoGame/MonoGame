@@ -305,7 +305,6 @@
     <Compile Include="Game.cs" />
     <Compile Include="Graphics\Effect\EffectAnnotationCollection.cs" />
     <Compile Include="Graphics\Effect\DXEffectObject.cs" />
-    <Compile Include="Graphics\Effect\GLSLEffectObject.cs" />
     <Compile Include="Graphics\Effect\EffectAnnotation.cs" />
     <Compile Include="Graphics\Vertices\VertexDeclaration.cs" />
     <Compile Include="Graphics\RenderTarget2D.cs" />
@@ -315,11 +314,17 @@
     <Compile Include="Graphics\Effect\DXShader.cs" />
     <Compile Include="Graphics\Vertices\IndexBuffer.cs" />
     <Compile Include="Graphics\Vertices\VertexBuffer.cs" />
-    <Compile Include="Graphics\Effect\GLSLShader.cs" />
     <Compile Include="LaunchParameters.cs" />
     <Compile Include="Input\MouseState.cs" />
     <Compile Include="GameWindow.cs" />
     <Compile Include="GraphicsDeviceManager.cs" />
+    <Compile Include="Graphics\PresentInterval.cs" />
+    <Compile Include="Graphics\SpriteBatcher.cs" />
+    <Compile Include="Graphics\CubeMapFace.cs" />
+    <Compile Include="Graphics\Effect\DXEffectObject.runtime.cs" />
+    <Compile Include="Graphics\Effect\DXPreshader.cs" />
+    <Compile Include="Graphics\Effect\DXPreshader.runtime.cs" />
+    <Compile Include="Graphics\Effect\MojoShader.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="PSSuite\" />

@@ -65,7 +65,7 @@ using GLPixelFormat = OpenTK.Graphics.OpenGL.PixelFormat;
 #elif WINRT
 // TODO
 #elif PSS
-//TODO
+using PssTexture2D = Sce.Pss.Core.Graphics.Texture2D;
 #else
 using OpenTK.Graphics.ES20;
 using GLPixelFormat = OpenTK.Graphics.ES20.All;
@@ -93,6 +93,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if WINRT
         internal SharpDX.Direct3D11.Texture2D _texture2D;
+#elif PSS
+		internal PssTexture2D _texture2D;
 #else
 		PixelInternalFormat glInternalFormat;
 		GLPixelFormat glFormat;
