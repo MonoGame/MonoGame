@@ -37,6 +37,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 #if WINRT
 
+#elif PSS
+		//TODO
 #else
 		PixelInternalFormat glInternalFormat;
 		PixelFormat glFormat;
@@ -51,6 +53,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if WINRT
 
+#elif PSS
+			//TODO
 #else
 			this.glTarget = TextureTarget.TextureCubeMap;
 
@@ -150,6 +154,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 #if WINRT
 
+#elif PSS
+			//TODO
 #else
 			GL.BindTexture (TextureTarget.TextureCubeMap, this.glTexture);
 			
@@ -163,7 +169,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			dataHandle.Free ();
 		}
 		
-#if !WINRT
+#if !WINRT && !PSS
 		private TextureTarget GetGLCubeFace(CubeMapFace face) {
 			switch (face) {
 			case CubeMapFace.PositiveX: return TextureTarget.TextureCubeMapPositiveX;

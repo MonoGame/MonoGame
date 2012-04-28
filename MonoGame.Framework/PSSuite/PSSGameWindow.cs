@@ -116,29 +116,6 @@ namespace Microsoft.Xna.Framework
 			//
 		}
 		
-		protected override void CreateFrameBuffer()
-		{	    
-#if true			
-			try
-            {
-                GLContextVersion = GLContextVersion.Gles2_0;
-				base.CreateFrameBuffer();
-		    } 
-			catch (Exception) 
-#endif			
-			{
-		        //device doesn't support OpenGLES 2.0; retry with 1.1:
-                GLContextVersion = GLContextVersion.Gles1_1;
-				base.CreateFrameBuffer();
-		    }
-            if (_game.GraphicsDevice != null)
-            {
-                _game.GraphicsDevice.Initialize();
-                if (!GraphicsContext.IsCurrent)
-                    MakeCurrent();
-            }
-		}
-	
 
         #region AndroidGameView Methods
 
@@ -211,112 +188,55 @@ namespace Microsoft.Xna.Framework
 		
 		#endregion
 		
+		#region GameWindow Overrides
+		protected internal override void SetSupportedOrientations(DisplayOrientation orientations)
+		{
+			// Do nothing.  PSS don't do orientation.
+		}
+
+		public override void BeginScreenDeviceChange(bool willBeFullScreen)
+		{
+		}
 		
+		public override void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight)
+		{
+		}
 
-        internal void SetOrientation(DisplayOrientation currentorientation)
-        {
-            var deviceManager = (IGraphicsDeviceManager)_game.Services.GetService(typeof(IGraphicsDeviceManager));
-            if (deviceManager == null)
-                return;
+		protected override void SetTitle(string title)
+		{
+			//FIXME window.Title = title;
+		}
+		
+		public override bool AllowUserResizing
+		{
+			get 
+			{
+				return false;
+			}
+			set 
+			{
+				// Do nothing; Ignore rather than raising and exception
+			}
+		}
 
-            // Calculate supported orientations if it has been left as "default" and only default
-            DisplayOrientation supportedOrientations = (deviceManager as GraphicsDeviceManager).SupportedOrientations;					
-			var allowedOrientation = DisplayOrientation.LandscapeLeft; 				
-			if ((supportedOrientations == DisplayOrientation.Default))
+		public override Rectangle ClientBounds 
+		{
+			get 
 			{
-			  // if we have default only we only allow Landscape
-			  allowedOrientation = allowedOrientation | DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight; 				
+				return clientBounds;
 			}
-			if ((supportedOrientations == DisplayOrientation.LandscapeLeft))
-			{
-			  // if we have default only we only allow Landscape
-			  allowedOrientation = DisplayOrientation.LandscapeLeft; 				
-			}
-			if ((supportedOrientations & DisplayOrientation.LandscapeLeft) != 0)
-			{
-			  // if we have default only we only allow Landscape
-			  allowedOrientation = allowedOrientation | DisplayOrientation.LandscapeLeft; 				
-			}
-			if ((supportedOrientations == DisplayOrientation.LandscapeRight))
-			{
-			  // if we have default only we only allow Landscape
-			  allowedOrientation = DisplayOrientation.LandscapeRight; 				
-			}
-			if ((supportedOrientations & DisplayOrientation.LandscapeRight) != 0)
-			{
-			  // if we have default only we only allow Landscape
-			  allowedOrientation = allowedOrientation | DisplayOrientation.LandscapeRight; 				
-			}
-			if ((supportedOrientations == DisplayOrientation.Portrait))
-			{
-			  // if we have Portrait only we only allow Landscape
-			  allowedOrientation = DisplayOrientation.Portrait; 				
-			}
-			if ((supportedOrientations & DisplayOrientation.Portrait) != 0)
-			{
-			  // if we have default only we only allow Landscape
-			  allowedOrientation = allowedOrientation | DisplayOrientation.Portrait; 				
-			}
-			
-			// ok we default to landscape left
-			var actualOrientation = DisplayOrientation.LandscapeLeft;
-			// now based on the  orientation of the device we 
-			// decide of we honour the device orientation or force our own
-			
-			// so if we are in Portrait but we allow only LandScape we stay in landscape
-			if (allowedOrientation == DisplayOrientation.Portrait)
-			{
-				actualOrientation = DisplayOrientation.Portrait;
-			}
-			else
-			if (allowedOrientation == DisplayOrientation.LandscapeLeft)
-			{
-				actualOrientation = DisplayOrientation.LandscapeLeft;
-			}
-			else
-			if (allowedOrientation == DisplayOrientation.LandscapeRight)
-			{
-				actualOrientation = DisplayOrientation.LandscapeRight;
-			}	
-			/*else 
-			if (_game.GraphicsDevice.PresentationParameters.BackBufferHeight < _game.GraphicsDevice.PresentationParameters.BackBufferWidth)
-			{
-				actualOrientation = DisplayOrientation.LandscapeLeft;
-			}
-			else 
-			if (_game.GraphicsDevice.PresentationParameters.BackBufferHeight > _game.GraphicsDevice.PresentationParameters.BackBufferWidth)
-			{
-				actualOrientation = DisplayOrientation.Portrait;
-			}*/
-			
-            switch (currentorientation) {
-
-			case DisplayOrientation.Portrait:
-                    if ((allowedOrientation & DisplayOrientation.Portrait) != 0) {
-                        actualOrientation = DisplayOrientation.Portrait;
-                    }
-                    break;
-				case DisplayOrientation.LandscapeRight:	
-				    if ((allowedOrientation & DisplayOrientation.LandscapeRight) != 0) {
-                        actualOrientation = DisplayOrientation.LandscapeRight;
-                    }				    
-				    break;
-                case DisplayOrientation.LandscapeLeft:				     
-                default:
-					if ((allowedOrientation & DisplayOrientation.LandscapeLeft) != 0) {
-				    	actualOrientation = DisplayOrientation.LandscapeLeft;
-					}
-                    break;
-            }
-			
-			
-			CurrentOrientation = actualOrientation;
-            if (_game.GraphicsDevice != null)
-            {
-                _game.GraphicsDevice.PresentationParameters.DisplayOrientation = actualOrientation;
-            }
-            TouchPanel.DisplayOrientation = actualOrientation;
-        }
+		}
+		
+		public override DisplayOrientation CurrentOrientation
+		{
+			get { return DisplayOrientation.LandscapeLeft; }
+		}
+		
+		public override IntPtr Handle { get { return IntPtr.Zero; } }
+		
+		public override string ScreenDeviceName { get { return ""; } } //FIXME
+		#endregion
+		
 
         private Dictionary<IntPtr, TouchLocation> _previousTouches = new Dictionary<IntPtr, TouchLocation>();
 		/* TODO
@@ -416,68 +336,6 @@ namespace Microsoft.Xna.Framework
             return true;
         }
         */
-        public string ScreenDeviceName 
-		{
-			get 
-			{
-				throw new System.NotImplementedException ();
-			}
-		}
-   
-
-        public Rectangle ClientBounds 
-		{
-			get 
-			{
-				return clientBounds;
-			}
-		}
-		
-		public bool AllowUserResizing 
-		{
-			get 
-			{
-				return false;
-			}
-			set 
-			{
-				// Do nothing; Ignore rather than raising and exception
-			}
-		}
-        
-		public DisplayOrientation CurrentOrientation 
-		{
-            get
-            {
-                return _currentOrientation;
-            }
-            private set
-            {
-                if (value != _currentOrientation)
-                {
-                    _currentOrientation = value;
-
-                    if (_currentOrientation == DisplayOrientation.Portrait || _currentOrientation == DisplayOrientation.PortraitUpsideDown)
-				    {
-                        Game.Activity.SetRequestedOrientation(ScreenOrientation.Portrait);						
-				    }
-                    else if (_currentOrientation == DisplayOrientation.LandscapeLeft || _currentOrientation == DisplayOrientation.LandscapeRight)
-				    {
-                        Game.Activity.SetRequestedOrientation(ScreenOrientation.Landscape);						
-				    }	
-
-                    if (OrientationChanged != null)
-                    {
-                        OrientationChanged(this, EventArgs.Empty);
-                    }
-                }
-            }
-		}
-
-        public event EventHandler<EventArgs> OrientationChanged;
-		public event EventHandler ClientSizeChanged;
-		public event EventHandler ScreenDeviceNameChanged;
-
     }
 }
 

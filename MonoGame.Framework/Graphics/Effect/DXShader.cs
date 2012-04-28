@@ -7,6 +7,11 @@ using MonoMac.OpenGL;
 using OpenTK.Graphics.OpenGL;
 #elif PSS
 using Sce.Pss.Core.Graphics;
+enum ShaderType //FIXME: Major Hack
+{
+	VertexShader,
+	FragmentShader
+}
 #else
 using System.Text;
 using OpenTK.Graphics.ES20;
