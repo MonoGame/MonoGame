@@ -26,19 +26,6 @@ SOFTWARE.
 #endregion License
 
 using System;
-using System.IO;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Drawing;
-
-#if MONOMAC
-using MonoMac.OpenGL;
-#elif WINDOWS
-using OpenTK.Graphics.OpenGL;
-#elif WINRT
-#elif GLES
-using OpenTK.Graphics.ES20;
-#endif
 
 using Microsoft.Xna;
 using Microsoft.Xna.Framework;
