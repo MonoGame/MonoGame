@@ -21,6 +21,9 @@ namespace TwoMGFX
                 return 0;
             }
 
+            // TODO: Make me an argument!
+            var isDirectX = false;
+
             // Validate the input file exits.
             var inputFilePath = args[0];
             if (!File.Exists(inputFilePath))
@@ -31,12 +34,31 @@ namespace TwoMGFX
 
             // Compile the effect file.
             byte[] byteCode;
+            SharpDX.D3DCompiler.ShaderBytecode shaderByteCode;
             try
             {
+                var profile = "fx_2_0";
+                SharpDX.Direct3D.ShaderMacro[] macros = null;
+
+                if (isDirectX)
+                {
+                    profile = "fx_5_0";
+                    macros = new[] { new SharpDX.Direct3D.ShaderMacro("SM4", 1) };
+                }
+
                 // First compile the effect into bytecode.                
                 using (var includer = new CompilerInclude())
                 {
-                    var shader = SharpDX.D3DCompiler.ShaderBytecode.CompileFromFile(inputFilePath, "fx_2_0", SharpDX.D3DCompiler.ShaderFlags.OptimizationLevel3, SharpDX.D3DCompiler.EffectFlags.None, null, includer);
+                    var result = SharpDX.D3DCompiler.ShaderBytecode.CompileFromFile(inputFilePath, profile, SharpDX.D3DCompiler.ShaderFlags.OptimizationLevel3, SharpDX.D3DCompiler.EffectFlags.None, macros, includer);
+                    if (result.HasErrors)
+                        throw new Exception(result.Message);
+
+                    var shader = result.Bytecode;
+                    shaderByteCode = shader;
+
+                    //var code = shader.Disassemble();
+                    //var reflect = new SharpDX.D3DCompiler.ShaderReflection(shader);
+
                     byteCode = DXHelper.UnmarshalArray(shader.BufferPointer, shader.BufferSize);
                 }
             }
@@ -51,7 +73,12 @@ namespace TwoMGFX
             DXEffectObject effect;
             try
             {
-                effect = DXEffectObject.FromCompiledD3DXEffect(byteCode);
+                //DXShader.IsDirectX = isDirectX;
+
+                if (isDirectX)
+                    effect = DXEffectObject.FromDX10Effect(shaderByteCode);
+                else
+                    effect = DXEffectObject.FromCompiledD3DXEffect(byteCode);
             }
             catch (Exception ex)
             {
