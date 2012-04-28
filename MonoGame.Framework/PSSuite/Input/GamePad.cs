@@ -64,8 +64,8 @@ using Microsoft.Xna.Framework.Graphics;
 		
 		#region PssButtons -> Buttons Map
 		private static Dictionary<PssGamePadButtons, Buttons> _buttonsMap = new Dictionary<PssGamePadButtons, Buttons>{
-			{ PssGamePadButtons.X, Buttons.A },
-			{ PssGamePadButtons.O, Buttons.B },
+			{ PssGamePadButtons.Cross, Buttons.A },
+			{ PssGamePadButtons.Circle, Buttons.B },
 			{ PssGamePadButtons.Square, Buttons.X },
 			{ PssGamePadButtons.Triangle, Buttons.Y },
 			
@@ -144,7 +144,7 @@ using Microsoft.Xna.Framework.Graphics;
 			foreach (var kvp in _buttonsMap)
 			{
 				if ((gamePadData.Buttons & kvp.Key) != 0)
-					_buttons |= kvp.Value;
+					_buttons |= (int)kvp.Value;
 			}
 			
 			//Analog sticks
@@ -161,17 +161,8 @@ using Microsoft.Xna.Framework.Graphics;
         }
 
         public static bool SetVibration(PlayerIndex playerIndex, float leftMotor, float rightMotor)
-        {	
-			try
-			{
-	            Vibrator vibrator = (Vibrator)Game.Activity.GetSystemService(Context.VibratorService);
-				vibrator.Vibrate(500);
-	            return true;
-			}
-			catch
-			{
-				return false;
-			}
+        {
+			return false; //No support on the Vita
         }
 	}
 	
