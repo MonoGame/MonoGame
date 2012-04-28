@@ -120,7 +120,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 var linked = 0;
 
 #if GLES
-    			GL.GetProgram(shaderProgram, ProgramParameter.LinkStatus, ref linked);
+    			GL.GetProgram(_shaderProgram, ProgramParameter.LinkStatus, ref linked);
 #else
                 GL.GetProgram(_shaderProgram, ProgramParameter.LinkStatus, out linked);
 #endif
