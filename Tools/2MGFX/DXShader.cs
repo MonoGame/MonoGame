@@ -2,6 +2,7 @@ using System;
 using System.Runtime.InteropServices;
 using System.IO;
 using System.Collections.Generic;
+using System.Text;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -13,10 +14,6 @@ namespace Microsoft.Xna.Framework.Graphics
         public int SharedIndex { get; private set; }
 
         private bool IsVertexShader;
-
-        private readonly DXPreshader _preshader;
-
-        private readonly string _glslCode;
 
         private readonly int _uniforms_float4_count = 0;
         private readonly int _uniforms_int4_count = 0;
@@ -43,11 +40,14 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public byte[] Bytecode { get; private set; }
 
+        public byte[] ShaderCode { get; private set; }
+
         public DXShader(byte[] byteCode, bool isVertexShader, int sharedIndex)
         {
             IsVertexShader = isVertexShader;
             SharedIndex = sharedIndex;
             Bytecode = byteCode;
+            ShaderCode = byteCode;
 
             _symbols = new MojoShader.MOJOSHADER_symbol[0];
             _samplers = new Sampler[0];
@@ -75,12 +75,6 @@ namespace Microsoft.Xna.Framework.Graphics
 				var errors = DXHelper.UnmarshalArray<MojoShader.MOJOSHADER_error>(parseData.errors, parseData.error_count);
 				throw new Exception(errors[0].error);
 			}
-
-            if (parseData.preshader != IntPtr.Zero)
-            {
-                var preshader = DXHelper.Unmarshal<MojoShader.MOJOSHADER_preshader>(parseData.preshader);
-                _preshader = DXPreshader.CreatePreshader(preshader);
-            }
 
             switch (parseData.shader_type)
             {
@@ -185,24 +179,27 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
             }
 		
-			_glslCode = parseData.output;
+			var glslCode = parseData.output;
 			
 #if GLSLOPTIMIZER
-			//_glslCode = GLSLOptimizer.Optimize(_glslCode, ShaderType);
+			//glslCode = GLSLOptimizer.Optimize(glslCode, ShaderType);
 #endif
 
             // TODO: This sort of sucks... why does MojoShader not produce
             // code valid for GLES out of the box?
 
             // GLES platforms do not like this.
-            _glslCode = _glslCode.Replace("#version 110\r\n", "");
+            glslCode = glslCode.Replace("#version 110\r\n", "");
 
             // Add the required precision specifiers for GLES.
-            _glslCode = "#ifdef GL_ES\r\n" +
+            glslCode = "#ifdef GL_ES\r\n" +
                         "precision highp float;\r\n" +
                         "precision mediump int;\r\n" +
                         "#endif\r\n" +
-                        _glslCode;
+                        glslCode;
+
+            // Store the code for serialization.
+            ShaderCode = Encoding.ASCII.GetBytes(glslCode);
 		}
 
         public void SetSamplerParameters(Dictionary<string, DXEffectObject.d3dx_parameter> parameters)
@@ -238,17 +235,8 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             writer.Write(IsVertexShader);
 
-            //writer.Write(_preshader != null);
-            //if (_preshader != null)
-                //_preshader.Write(writer);
-
-            if (IsDirectX)
-            {
-                writer.Write((ushort)Bytecode.Length);
-                writer.Write(Bytecode);
-            }
-            else
-                writer.Write(_glslCode);
+            writer.Write((ushort)ShaderCode.Length);
+            writer.Write(ShaderCode);
 
             writer.Write((byte)_uniforms_bool_count);
             writer.Write((byte)_uniforms_int4_count);

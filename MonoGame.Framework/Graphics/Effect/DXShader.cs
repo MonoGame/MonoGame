@@ -141,13 +141,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #endif
 
-            // Read in the shader code.
-#if OPENGL
-            var glslCode = reader.ReadString();
-#elif DIRECTX
-
             var shaderLength = (int)reader.ReadUInt16();
             var shaderBytecode = reader.ReadBytes(shaderLength);
+
+#if OPENGL
+            var glslCode = System.Text.Encoding.ASCII.GetString(shaderBytecode);
 #endif
 
             var bool_count = (int)reader.ReadByte();
