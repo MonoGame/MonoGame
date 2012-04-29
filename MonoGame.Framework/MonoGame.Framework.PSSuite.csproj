@@ -344,6 +344,9 @@
     <Compile Include="Graphics\Effect\BasicEffect.cs" />
     <Compile Include="Threading.cs" />
     <Compile Include="Graphics\Effect\DXExpression.cs" />
+    <Compile Include="Graphics\GraphicsExtensions.cs" />
+    <Compile Include="Content\ContentExtensions.cs" />
+    <Compile Include="Content\ContentReaders\EffectReader.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="PSSuite\" />
