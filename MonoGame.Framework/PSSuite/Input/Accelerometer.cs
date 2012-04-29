@@ -64,10 +64,11 @@ namespace Microsoft.Xna.Framework.Input
 		
 		public static AccelerometerState GetState()
 		{
+			Update();
 			return _state;
 		}
 		
-		internal static void Update() //TODO: Call this regularly
+		internal static void Update()
 		{
 			var motionData = Motion.GetData(0);
 			_accelerometerVector = new Vector3(motionData.Acceleration.X, motionData.Acceleration.Y, motionData.Acceleration.Z);
