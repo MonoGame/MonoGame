@@ -70,7 +70,7 @@ namespace Microsoft.Xna.Framework.Input
 		internal static void Update() //TODO: Call this regularly
 		{
 			var motionData = Motion.GetData(0);
-			_accelerometerVector = motionData.Acceleration;
+			_accelerometerVector = new Vector3(motionData.Acceleration.X, motionData.Acceleration.Y, motionData.Acceleration.Z);
 		}
     }
 }

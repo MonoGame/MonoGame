@@ -48,8 +48,15 @@ namespace Microsoft.Xna.Framework
 	public static class TitleContainer
 	{
 		public static Stream OpenStream (string name)
-		{			
-			return Sce.Pss.Core.Environment.Storage.Open(name);
+		{
+			return File.OpenRead (name);
+		}
+		
+		internal static string GetFilename(string name)
+		{
+			// Replace Windows path separators with local path separators
+			name = name.Replace('\\', Path.DirectorySeparatorChar);
+			return name;
 		}
 	}
 }
