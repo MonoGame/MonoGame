@@ -89,6 +89,7 @@ namespace Microsoft.Xna.Framework.Graphics
             public VertexElementUsage usage;
             public int index;
             public string name;
+            public short format;
         }
 
         private readonly Symbol[] _symbols;
@@ -113,9 +114,15 @@ namespace Microsoft.Xna.Framework.Graphics
             _attributes = cloneSource._attributes;
 
             // Clone the mutable types.
-            _uniforms_float4 = Array.ConvertAll( cloneSource._uniforms_float4, e => e );
-            _uniforms_int4 = Array.ConvertAll(cloneSource._uniforms_int4, e => e);
-            _uniforms_bool = Array.ConvertAll(cloneSource._uniforms_bool, e => e);
+            _uniforms_float4 = new float[cloneSource._uniforms_float4.Length];
+            for (var i = 0; i < _uniforms_float4.Length; i++)
+                _uniforms_float4[i] = cloneSource._uniforms_float4[i];
+            _uniforms_int4 = new int[cloneSource._uniforms_int4.Length];
+            for (var i = 0; i < _uniforms_int4.Length; i++)
+                _uniforms_int4[i] = cloneSource._uniforms_int4[i];
+            _uniforms_bool = new int[cloneSource._uniforms_bool.Length];
+            for (var i = 0; i < _uniforms_bool.Length; i++)
+                _uniforms_bool[i] = cloneSource._uniforms_bool[i];
         }
 
         internal DXShader(BinaryReader reader)
@@ -160,7 +167,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _symbols = new Symbol[symbolCount];
             for (var s = 0; s < symbolCount; s++)
             {
-                _symbols[s].name = string.Intern(reader.ReadString());
+                _symbols[s].name = reader.ReadString();
                 _symbols[s].register_set = (RegisterSet)reader.ReadByte();
                 _symbols[s].register_index = reader.ReadByte();
                 _symbols[s].register_count = reader.ReadByte();
@@ -170,8 +177,8 @@ namespace Microsoft.Xna.Framework.Graphics
             _samplers = new Sampler[samplerCount];
             for (var s = 0; s < samplerCount; s++)
             {
-                _samplers[s].name = string.Intern(reader.ReadString());
-                _samplers[s].parameter = string.Intern(reader.ReadString());
+                _samplers[s].name = reader.ReadString();
+                _samplers[s].parameter = reader.ReadString();
                 _samplers[s].type = (SamplerType)reader.ReadByte();
                 _samplers[s].index = reader.ReadByte();
             }
@@ -180,9 +187,10 @@ namespace Microsoft.Xna.Framework.Graphics
             _attributes = new Attribute[attributeCount];
             for (var a = 0; a < attributeCount; a++)
             {
-                _attributes[a].name = string.Intern(reader.ReadString());
+                _attributes[a].name = reader.ReadString();
                 _attributes[a].usage = (VertexElementUsage)reader.ReadByte();
                 _attributes[a].index = reader.ReadByte();
+                _attributes[a].format = reader.ReadInt16();
             }
 
 #if OPENGL
@@ -235,17 +243,18 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 #elif DIRECTX
 
+            // HACK: We should be getting the graphics device in the constructor!
             var d3dDevice = GraphicsDevice.Current._d3dDevice;
+
             if (isVertexShader)
             {
                 _vertexShader = new VertexShader(d3dDevice, shaderBytecode, null);
 
-                // TODO: We need the specifics about the input format for DX!
                 var elements = new InputElement[_attributes.Length];
                 for (var i=0; i < _attributes.Length; i++)
                 {
                     var attrib = _attributes[i];
-                    elements[i] = new InputElement(attrib.name, 0, Format.R32G32B32A32_Float, attrib.index, 0);
+                    elements[i] = new InputElement(attrib.name, 0, (Format)attrib.format, attrib.index * 4, 0);
                 }
 
                 _inputLayout = new InputLayout(d3dDevice, shaderBytecode, elements);
