@@ -130,27 +130,8 @@ namespace Microsoft.Xna.Framework.GamerServices
             if ((gameTime.TotalGameTime - gt).TotalSeconds > 5) // close after 10 seconds
             {
 				
-				string name = "androiduser";
-				try
-				{
-					Android.Accounts.AccountManager mgr = (Android.Accounts.AccountManager)Android.App.Application.Context.GetSystemService(Android.App.Activity.AccountService);
-					if (mgr != null)
-					{
-						var accounts = mgr.GetAccounts();
-						if (accounts != null && accounts.Length > 0)
-						{							
-							name = accounts[0].Name;
-							if (name.Contains("@"))
-							{
-								// its an email 
-								name = name.Substring(0, name.IndexOf("@"));
-							}
-						}
-					}
-				}
-				catch
-				{
-				}
+				string name = "pssuser";
+				//TODO: Try get a name from the system (If/When PSS Has something like this)
 				
                 SignedInGamer sig = new SignedInGamer();
                 sig.DisplayName = name;

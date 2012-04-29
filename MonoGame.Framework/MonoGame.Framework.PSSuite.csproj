@@ -286,7 +286,6 @@
     <Compile Include="PSSuite\GamerServices\SignedInGamer.cs" />
     <Compile Include="PSSuite\Media\Song.cs" />
     <Compile Include="PSSuite\Media\Video.cs" />
-    <Compile Include="PSSuite\Media\VideoPlayer.cs" />
     <Compile Include="PSSuite\Input\Touch\GestureListener.cs" />
     <Compile Include="PSSuite\Input\Accelerometer.cs" />
     <Compile Include="PSSuite\Input\AccelerometerCapabilities.cs" />

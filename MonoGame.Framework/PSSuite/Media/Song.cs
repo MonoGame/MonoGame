@@ -17,16 +17,16 @@ namespace Microsoft.Xna.Framework.Media
 
         internal Song(string fileName)
         {
-            _name = fileName;			
-			_bgm = new Bgm(_name);					
-            _bgmPlayer = _bgm.CreatePlayer();			
+            _name = fileName;
+			_bgm = new Bgm(_name);
+            _bgmPlayer = _bgm.CreatePlayer();
         }
 
         public void Dispose()
         {
 			_bgmPlayer.Stop();
 			_bgmPlayer.Dispose();
-			_bgm.Dispose();		
+			_bgm.Dispose();
         }
 
         private void Prepare()
@@ -172,7 +172,7 @@ namespace Microsoft.Xna.Framework.Media
         {
             get
             {
-                if (_androidPlayer != null)
+                if (_bgmPlayer != null)
                 {
                     return new TimeSpan(0, 0, /* (int)_bgmPlayer.CurrentPosition*/ 0);
                 }
