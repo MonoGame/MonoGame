@@ -86,6 +86,8 @@ namespace Microsoft.Xna.Framework.GamerServices
          string defaultText,
 		 bool usePasswordMode)
 		{
+			throw new NotImplementedException();
+			/* TODO Use UISystem etc (See Sample: UI/Overlay and others)
 			string result = defaultText; 
 			if (!isKeyboardInputShowing)
 			{
@@ -122,7 +124,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 		        Thread.Sleep(1);
 		    }
 
-            return result;
+            return result;*/
 		}
 
 		public static IAsyncResult BeginShowKeyboardInput (
