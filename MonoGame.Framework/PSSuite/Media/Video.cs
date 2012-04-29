@@ -42,13 +42,14 @@ using System;
 using System.IO;
 using System.Linq;
 
-using Sce.Pss.Core.Imaging;
 
 using Microsoft.Xna.Framework.Graphics;
 
-
 namespace Microsoft.Xna.Framework.Media
 {
+	/// <summary>
+	/// PlayStationSuite has no video support
+	/// </summary>
     public sealed class Video : IDisposable
     {
 		private string _fileName;
@@ -58,9 +59,8 @@ namespace Microsoft.Xna.Framework.Media
 		internal Video(string FileName)
 		{
 			_fileName = FileName;
-			Prepare();
 		}
-				
+		
 		public Color BackgroundColor
 		{
 			set
@@ -83,18 +83,8 @@ namespace Microsoft.Xna.Framework.Media
 		
 		internal static string Normalize(string FileName)
 		{
-            int index = FileName.LastIndexOf(Path.DirectorySeparatorChar);
-            string path = string.Empty;
-            string file = FileName;
-            if (index >= 0)
-            {
-                file = FileName.Substring(index + 1, FileName.Length - index - 1);
-                path = FileName.Substring(0, index);
-            }
-            string[] files = Game.Activity.Assets.List(path);
-
-            if (Contains(file, files))
-                return FileName;
+			if (File.Exists(FileName))
+				return FileName;
 			
 			// Check the file extension
 			if (!string.IsNullOrEmpty(Path.GetExtension(FileName)))
@@ -103,40 +93,21 @@ namespace Microsoft.Xna.Framework.Media
 			}
 			
 			// Concat the file name with valid extensions
-			return Path.Combine(path, TryFindAnyCased(file, files, ".3gp", ".mkv", ".mp4", ".ts", ".webm"));
-		}
-		
-		private static string TryFindAnyCased(string search, string[] arr, params string[] extensions)
-        {
-            return arr.FirstOrDefault(s => extensions.Any(ext => s.ToLower() == (search.ToLower() + ext)));
-        }
-
-        private static bool Contains(string search, string[] arr)
-        {
-            return arr.Any(s => s == search);
-        }
-
-		internal void Prepare()
-		{
-            Player = new Android.Media.MediaPlayer();
-			if (Player != null )
-			{
-				var afd = Game.Activity.Assets.OpenFd(_fileName);
-				if (afd != null)
-				{
-		            Player.SetDataSource(afd.FileDescriptor, afd.StartOffset, afd.Length);						
-		            Player.Prepare();
-				}
-			}
+			if (File.Exists(FileName+".mp4"))
+				return FileName+".mp4";
+			if (File.Exists(FileName+".mov"))
+				return FileName+".mov";
+			if (File.Exists(FileName+".avi"))
+				return FileName+".avi";
+			if (File.Exists(FileName+".m4v"))
+				return FileName+".m4v";
+			
+			
+			return null;
 		}
 		
 		public void Dispose()
 		{
-            if (Player != null)
-			{
-                Player.Dispose();
-                Player = null;
-			}
 		}
     }
 }
