@@ -209,47 +209,68 @@ namespace Microsoft.Xna.Framework.Graphics
                 return _height;
             }
         }
-
+        
+        public static Texture2D FromStream(GraphicsDevice graphicsDevice, Stream stream)
+        {
+            Bitmap image = (Bitmap)Bitmap.FromStream(stream);
+            
+            if (image == null)
+            {
+                throw new ContentLoadException("Error loading Texture2D Stream");
+            }
+            
+            var theTexture = new ESImage(image, graphicsDevice.PreferedFilter);
+            var result = new Texture2D(theTexture);
+            
+            return result;
+        }
+        
+        public static Texture2D FromStream(GraphicsDevice graphicsDevice, Stream stream, int width, int height, bool zoom)
+        {
+            Bitmap image = (Bitmap)Bitmap.FromStream(stream);
+            
+            if (image == null)
+            {
+                throw new ContentLoadException("Error loading Texture2D Stream");
+            }
+            
+            // TODO figure out the scaling
+            var theTexture = new ESImage(image, graphicsDevice.PreferedFilter);
+            var result = new Texture2D(theTexture);
+            
+            return result;
+        }
+        
+        [Obsolete]
         public static Texture2D FromFile(GraphicsDevice graphicsDevice, Stream textureStream)
         {
-            Bitmap image = (Bitmap)Bitmap.FromStream(textureStream);
-			
-			if (image == null)			
-			{
-				throw new ContentLoadException("Error loading Texture2D Stream");
-			}
-			
-			ESImage theTexture = new ESImage(image, graphicsDevice.PreferedFilter);			
-			Texture2D result = new Texture2D(theTexture);
-			
-			return result;
+            return FromStream(graphicsDevice, textureStream);
         }
-
+        
+        [Obsolete]
         public static Texture2D FromFile(GraphicsDevice graphicsDevice, Stream textureStream, int numberBytes)
         {
             throw new NotImplementedException();
         }
-
+        
+        [Obsolete]
         public static Texture2D FromFile(GraphicsDevice graphicsDevice, string filename, int width, int height)
         {
-            Bitmap image = (Bitmap)Bitmap.FromFile(filename);
-			if (image == null)
-			{
-				throw new ContentLoadException("Error loading file: " + filename);
-			}
-			
-			// TODO resize
-			ESImage theTexture = new ESImage(image, graphicsDevice.PreferedFilter);
-			Texture2D result = new Texture2D(theTexture);
-			result.Name = Path.GetFileNameWithoutExtension(filename);
-			return result;
+            var result = FromStream(graphicsDevice, new FileStream(filename, FileMode.Open, FileAccess.Read), width, height, false);
+            // result.Name = Path.GetFileNameWithoutExtension(filename);
+            result.Name = filename;
+            //          _width = theTexture.ImageWidth;
+            //          _height = theTexture.ImageHeight;
+            //          _format = theTexture.Format;			
+            return result;
         }
-
+        
+        [Obsolete]
         public static Texture2D FromFile(GraphicsDevice graphicsDevice, string filename)
-		{
-			return FromFile( graphicsDevice, filename, 0, 0 );
+        {
+            return FromFile(graphicsDevice, filename, 0, 0);
         }
-		
+        
 		private void generateOpenGLTexture ()
 		{
 			// modeled after this
