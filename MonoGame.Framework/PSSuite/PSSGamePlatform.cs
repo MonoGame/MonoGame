@@ -72,6 +72,7 @@ using System.Linq;
 using System.Text;
 
 using Sce.Pss.Core;
+using Sce.Pss.Core.Environment;
 
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Audio;
@@ -105,13 +106,20 @@ namespace Microsoft.Xna.Framework
 
         public override void RunLoop()
         {
-            throw new NotImplementedException();
+			bool loop = true;
+			while (loop) //TODO: Will need a much smarter run loop
+			{
+				SystemEvents.CheckEvents();
+				//TODO: Update TouchPanel
+				Window.OnUpdateFrame();
+				Window.OnRenderFrame();
+			}
         }
 
         public override void StartRunLoop()
         {
-            Window.Resume();
-        }
+			throw new NotImplementedException();
+		}
 
         public override bool BeforeUpdate(GameTime gameTime)
         {
@@ -129,29 +137,12 @@ namespace Microsoft.Xna.Framework
             return !IsPlayingVdeo;
         }
 
-        public override void BeforeInitialize()
-        {
-            switch (Window.Context.Resources.Configuration.Orientation)
-            {
-                case Android.Content.Res.Orientation.Portrait:
-                    Window.SetOrientation(DisplayOrientation.Portrait);				
-                    break;
-                case Android.Content.Res.Orientation.Landscape:
-                    Window.SetOrientation(DisplayOrientation.LandscapeLeft);
-                    break;
-                default:
-                    Window.SetOrientation(DisplayOrientation.LandscapeLeft);
-                    break;
-            }			
-            base.BeforeInitialize();
-        }
-
         public override bool BeforeRun()
         {
             // Get the Accelerometer going
             Accelerometer.SetupAccelerometer();
 
-            Window.Run(1 / Game.TargetElapsedTime.TotalSeconds);
+            //Window.Run(1 / Game.TargetElapsedTime.TotalSeconds);
             //Window.Pause();
 
             return false;
@@ -176,36 +167,12 @@ namespace Microsoft.Xna.Framework
             // FIXME: Can't throw NotImplemented if it is called as a standard part of graphics device creation
             //throw new NotImplementedException();
         }
-
-        // EnterForeground
-        void Activity_Resumed(object sender, EventArgs e)
-        {
-            if (!IsActive)
-            {
-                IsActive = true;
-                Window.Resume();
-                Accelerometer.Resume();
-                Sound.ResumeAll();
-                MediaPlayer.Resume();
-            }
-        }
-
-        // EnterBackground
-        void Activity_Paused(object sender, EventArgs e)
-        {
-            if (IsActive)
-            {
-                IsActive = false;
-                Window.Pause();
-                Accelerometer.Pause();
-                Sound.PauseAll();
-                MediaPlayer.Pause();
-            }
-        }
+		
+		//TODO: Will need something to listen to SystemEvents.???(Pause)??? And SystemEvents.OnRestored when they are properly implemented
 
         public override GameRunBehavior DefaultRunBehavior
         {
-            get { return GameRunBehavior.Asynchronous; }
+            get { return GameRunBehavior.Synchronous; }
         }
 		
 		public override void Log(string Message) 
@@ -217,8 +184,8 @@ namespace Microsoft.Xna.Framework
 		
 		public override void ResetElapsedTime ()
 		{
-			this.Window.ResetElapsedTime();			
+			this.Window.ResetElapsedTime();
 		}
-					
+		
     }
 }

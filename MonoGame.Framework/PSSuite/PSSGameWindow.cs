@@ -49,12 +49,14 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
 
 using Sce.Pss.Core;
+using Sce.Pss.Core.Graphics;
 #endregion Using Statements
 
 namespace Microsoft.Xna.Framework
 {
     public class PSSGameWindow : GameWindow
     {
+		private GraphicsContext _graphics;
 		private Rectangle clientBounds;
 		private Game _game;
 		private GameTime _updateGameTime;
@@ -65,7 +67,7 @@ namespace Microsoft.Xna.Framework
 		// TODO private GestureDetector gesture = null;
 		private bool _needsToResetElapsedTime = false;
 		private bool _isFirstTime = true;
-		private TimeSpan _extraElapsedTime;		
+		private TimeSpan _extraElapsedTime;
 
         public PSSGameWindow(Game game)
         {
@@ -75,9 +77,8 @@ namespace Microsoft.Xna.Framework
 						
         private void Initialize()
         {
-            
-			this.Closed +=	new EventHandler<EventArgs>(GameWindow_Closed);            
-			clientBounds = new Rectangle(0, 0, Context.Resources.DisplayMetrics.WidthPixels, Context.Resources.DisplayMetrics.HeightPixels);
+			_graphics = new GraphicsContext();
+			clientBounds = new Rectangle(0, 0, _graphics.Screen.Width, _graphics.Screen.Height);
 
             // Initialize GameTime
             _updateGameTime = new GameTime();
@@ -85,22 +86,26 @@ namespace Microsoft.Xna.Framework
 
             // Initialize _lastUpdate
             _lastUpdate = DateTime.Now;
-					
-			gesture = new GestureDetector(new GestureListener((AndroidGameActivity)this.Context));
 			
-            this.RequestFocus();
-            this.FocusableInTouchMode = true;
-
-            this.SetOnTouchListener(this);
+			//TODO gesture = new GestureDetector(new GestureListener((AndroidGameActivity)this.Context));
         }
 
 		public void ResetElapsedTime ()
 		{
 			_needsToResetElapsedTime = true;
 		}
+
+		public void Close ()
+		{
+			if (_graphics != null)
+			{
+				_graphics.Dispose();
+				_graphics = null;
+			}
+		}
 		
 		void GameWindow_Closed(object sender,EventArgs e)
-        {        
+        {
 			try
 			{
         		_game.Exit();
@@ -121,13 +126,6 @@ namespace Microsoft.Xna.Framework
 
         internal void OnRenderFrame()
         {
-            if (GraphicsContext == null || GraphicsContext.IsDisposed)
-                return;
-
-            //Should not happen at all..
-            if (!GraphicsContext.IsCurrent)
-                MakeCurrent();
-
             if (_game != null) {
                 _drawGameTime.Update(_now - _lastUpdate);                
                 _game.DoDraw(_drawGameTime);
@@ -135,19 +133,18 @@ namespace Microsoft.Xna.Framework
             }
             try
             {
-                SwapBuffers();
+                _graphics.SwapBuffers();
             }
             catch(Exception ex)
             {
-                Android.Util.Log.Error("Error in swap buffers", ex.ToString());
+                Console.WriteLine("Error in swap buffers", ex.ToString());
             }
         }
 
         internal void OnUpdateFrame()
-		{			
+		{
 			if (_game != null )
 			{
-                //ObserveDeviceRotation();				
 				_now = DateTime.Now;
 				
 				if (_isFirstTime) {
@@ -162,7 +159,6 @@ namespace Microsoft.Xna.Framework
 					_drawGameTime.ResetElapsedTime();
 					_needsToResetElapsedTime = false;
 				}
-				
 				
 				_updateGameTime.Update(_now - _lastUpdate);
 				
@@ -182,7 +178,6 @@ namespace Microsoft.Xna.Framework
 				else {
 					_game.DoUpdate (_updateGameTime);
 				}
-								
 			}
 		}
 		
@@ -191,7 +186,7 @@ namespace Microsoft.Xna.Framework
 		#region GameWindow Overrides
 		protected internal override void SetSupportedOrientations(DisplayOrientation orientations)
 		{
-			// Do nothing.  PSS don't do orientation.
+			// Do nothing.  PSS doesn't do orientation.
 		}
 
 		public override void BeginScreenDeviceChange(bool willBeFullScreen)
