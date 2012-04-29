@@ -15,7 +15,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug</OutputPath>
-    <DefineConstants>DEBUG;LINUX</DefineConstants>
+    <DefineConstants>DEBUG;LINUX;OPENGL</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
@@ -31,7 +31,7 @@
     <PlatformTarget>x86</PlatformTarget>
     <ConsolePause>false</ConsolePause>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DefineConstants>LINUX</DefineConstants>
+    <DefineConstants>LINUX;OPENGL</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -50,6 +50,7 @@
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Compile Include="Audio\NoAudioHardwareException.cs" />
+    <Compile Include="Content\ContentExtensions.cs" />
     <Compile Include="BatteryChargeStatus.cs" />
     <Compile Include="BoundingBox.cs" />
     <Compile Include="BoundingFrustum.cs" />
@@ -105,6 +106,7 @@
     <Compile Include="Input\GamePadState.cs" />
     <Compile Include="Input\KeyboardState.cs" />
     <Compile Include="Input\KeyState.cs" />
+    <Compile Include="Graphics\PresentInterval.cs" />
     <Compile Include="Input\GamePadThumbSticks.cs" />
     <Compile Include="Input\Buttons.cs" />
     <Compile Include="Input\GamePadCapabilities.cs" />
@@ -151,7 +153,6 @@
     <Compile Include="Graphics\RenderTarget.cs" />
     <Compile Include="Graphics\SurfaceFormat.cs" />
     <Compile Include="Graphics\MultiSampleType.cs" />
-    <Compile Include="Graphics\SwapEffect.cs" />
     <Compile Include="Graphics\RenderTargetUsage.cs" />
     <Compile Include="Graphics\TextureUsage.cs" />
     <Compile Include="Graphics\SetDataOptions.cs" />
@@ -348,7 +349,6 @@
     <Compile Include="Graphics\Effect\EffectParameter.cs" />
     <Compile Include="Graphics\Effect\EffectPass.cs" />
     <Compile Include="Graphics\Effect\EnvironmentMapEffect.cs" />
-    <Compile Include="Graphics\Effect\GLSLOptimizer.cs" />
     <Compile Include="Graphics\Effect\MojoShader.cs" />
     <Compile Include="Graphics\Effect\SkinnedEffect.cs" />
     <Compile Include="Graphics\PackedVector\HalfSingle.cs" />
@@ -391,8 +391,8 @@
     <Compile Include="Input\MouseState.cs" />
     <Compile Include="Desktop\TitleContainer.cs" />
     <Compile Include="Input\Keyboard.cs" />
-    <Compile Include="Graphics\Effect\GLSLEffectObject.cs" />
-    <Compile Include="Graphics\Effect\GLSLShader.cs" />
+    <Compile Include="Graphics\Effect\DXEffectObject.runtime.cs" />
+    <Compile Include="Graphics\Effect\DXPreshader.runtime.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.Linux.csproj">
@@ -401,29 +401,15 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Graphics\Effect\AlphaTestEffect.bin" />
-    <EmbeddedResource Include="Graphics\Effect\BasicEffect.bin" />
-    <EmbeddedResource Include="Graphics\Effect\BasicEffectGLSL.bin" />
-    <EmbeddedResource Include="Graphics\Effect\DualTextureEffect.bin" />
-    <EmbeddedResource Include="Graphics\Effect\EnvironmentMapEffect.bin" />
-    <EmbeddedResource Include="Graphics\Effect\SkinnedEffect.bin" />
-    <EmbeddedResource Include="Graphics\Effect\SpriteEffect.bin" />
-    <EmbeddedResource Include="Graphics\Effect\SpriteEffectGLSL.bin" />
-    <EmbeddedResource Include="Graphics\Effect\AlphaTestEffectGLSL.bin" />
-    <EmbeddedResource Include="Graphics\Effect\DualTextureEffectGLSL.bin" />
-    <EmbeddedResource Include="Graphics\Effect\EnvironmentMapEffectGLSL.bin" />
-    <EmbeddedResource Include="Graphics\Effect\SkinnedEffectGLSL.bin" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect.mgfx" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect.mgfx" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\DualTextureEffect.mgfx" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\EnvironmentMapEffect.mgfx" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\SkinnedEffect.mgfx" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\SpriteEffect.mgfx" />
   </ItemGroup>
   <ItemGroup>
     <None Include="MonoGame.Framework.Linux.dll.config">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\ThirdParty\Libs\libmojoshader_32.so">
-      <Link>libmojoshader_32.so</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\ThirdParty\Libs\libmojoshader_64.so">
-      <Link>libmojoshader_64.so</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

@@ -29,6 +29,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+#if WINRT
+using System.Reflection;
+#endif
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -143,14 +146,24 @@ namespace Microsoft.Xna.Framework.Content
 
         public T ReadExternalReference<T>()
 		{
-            string externalReference = ReadString();
+            var externalReference = ReadString();
+			
             if (!String.IsNullOrEmpty(externalReference))
             {
+#if WINRT
+                return contentManager.Load<T>(externalReference);
+#else
                 externalReference = externalReference.Replace('\\', Path.DirectorySeparatorChar);
 
                 // Use Path.GetFullPath to help resolve relative directories
                 string fullRootPath = Path.GetFullPath(contentManager.RootDirectory);
-                string fullAssetPath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Path.Combine(fullRootPath, assetName)), externalReference));
+				
+				// iOS won't find the right name if the \'s are facing the wrong way. be certian we're good here.
+				var fullAssetName = Path.Combine(fullRootPath, assetName.Replace('\\', Path.DirectorySeparatorChar)); 
+				var pathDirectory = Path.GetDirectoryName(fullAssetName);
+				var dirExtCombined = Path.Combine(pathDirectory, externalReference);
+				
+                string fullAssetPath = Path.GetFullPath(dirExtCombined);
 
 #if ANDROID
                 string externalAssetName = fullAssetPath.Substring(fullRootPath.Length);
@@ -158,7 +171,9 @@ namespace Microsoft.Xna.Framework.Content
                 string externalAssetName = fullAssetPath.Substring(fullRootPath.Length + 1);
 #endif
                 return contentManager.Load<T>(externalAssetName);
+#endif
             }
+
             return default(T);
         }
         
@@ -211,7 +226,11 @@ namespace Microsoft.Xna.Framework.Content
 
         public T ReadObject<T>(ContentTypeReader typeReader, T existingInstance)
         {
+#if WINRT
+            if (!typeReader.TargetType.GetTypeInfo().IsValueType)
+#else
             if (!typeReader.TargetType.IsValueType)
+#endif
                 return (T)ReadObject<object>();
             return (T)typeReader.Read(this, existingInstance);
         }

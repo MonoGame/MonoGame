@@ -349,6 +349,10 @@ namespace Microsoft.Xna.Framework.Graphics
 		    
 		    /// unsigned int
 		    public uint index;
+
+            public int indexingType;
+
+            public uint indexingIndex;
 		}
 		
 		[StructLayoutAttribute(LayoutKind.Sequential)]
@@ -363,8 +367,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		    /// unsigned int
 		    public uint operand_count;
 		    
-		    /// MOJOSHADER_preshaderOperand[3]
-		    [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst=3, ArraySubType=UnmanagedType.Struct)]
+		    /// MOJOSHADER_preshaderOperand[4]
+		    [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst=4, ArraySubType=UnmanagedType.Struct)]
 		    public MOJOSHADER_preshaderOperand[] operands;
 		}
 		

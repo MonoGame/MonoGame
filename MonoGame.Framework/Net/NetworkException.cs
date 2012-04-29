@@ -43,12 +43,12 @@ using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework.Net
 {
-#if !WINDOWS_PHONE
-	[SerializableAttribute]
-#else
+
+#if WINRT || WINDOWS_PHONE
     [DataContract]
+#else
+    [Serializable]
 #endif
-    
 	public class NetworkException : Exception
 	{
 

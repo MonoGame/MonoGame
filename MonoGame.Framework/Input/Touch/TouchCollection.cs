@@ -42,6 +42,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 #endregion Using clause
 
 namespace Microsoft.Xna.Framework.Input.Touch
@@ -88,7 +89,6 @@ namespace Microsoft.Xna.Framework.Input.Touch
 				switch (t.State)
 				{
 					case TouchLocationState.Pressed:
-						t.State = TouchLocationState.Moved;
 						t.PrevPosition = t.Position;
 						this[i] = t;
 					break;
@@ -135,9 +135,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		internal void Add(int id, Vector2 position) {
 			for (int i = 0; i < Count; i++) {
 				if (this[i].Id == id) {
-#if DEBUG
-					Console.WriteLine("Error: Attempted to re-add the same touch as a press.");
-#endif
+                    Debug.WriteLine("Error: Attempted to re-add the same touch as a press.");
 					Clear ();
 				}
 			}
@@ -158,9 +156,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
 					return;
 				}
 			}
-#if DEBUG			
-			Console.WriteLine("Error: Attempted to mark a non-existent touch {0} as {1}.", id, state);
-#endif
+
+			Debug.WriteLine("Error: Attempted to mark a non-existent touch {0} as {1}.", id, state);
 			Clear ();
 		}
 	}

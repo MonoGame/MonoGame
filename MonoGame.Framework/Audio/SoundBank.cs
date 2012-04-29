@@ -49,7 +49,8 @@ namespace Microsoft.Xna.Framework.Audio
 		}
 		
 		//Defer loading because some programs load soundbanks before wavebanks
-		private void Load() {	
+		private void Load() 
+        {	
 			FileStream soundbankstream = new FileStream(filename, FileMode.Open);
             BinaryReader soundbankreader = new BinaryReader(soundbankstream);
             

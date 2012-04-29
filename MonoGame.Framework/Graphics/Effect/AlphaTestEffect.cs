@@ -10,6 +10,18 @@
 #region Using Statements
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
+
+
+#if IPHONE || ANDROID
+using OpenTK.Graphics.ES20;
+using ActiveUniformType = OpenTK.Graphics.ES20.All;
+#elif MONOMAC
+using MonoMac.OpenGL;
+#elif !WINRT
+using OpenTK.Graphics.OpenGL;
+
+#endif
 #endregion
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -255,16 +267,14 @@ namespace Microsoft.Xna.Framework.Graphics
 
         #region Methods
 
-
         /// <summary>
         /// Creates a new AlphaTestEffect with default parameter settings.
         /// </summary>
         public AlphaTestEffect(GraphicsDevice device)
-            : base(device, Effect.LoadEffectResource("AlphaTestEffect"))
+            : base(device, Effect.LoadEffectResource("Microsoft.Xna.Framework.Graphics.Effect.Resources.AlphaTestEffect.mgfx"))
         {
             CacheEffectParameters();
         }
-
 
         /// <summary>
         /// Creates a new AlphaTestEffect by cloning parameter settings from an existing instance.
@@ -290,8 +300,8 @@ namespace Microsoft.Xna.Framework.Graphics
             
             alphaFunction = cloneSource.alphaFunction;
             referenceAlpha = cloneSource.referenceAlpha;
-        }
 
+        }
 
         /// <summary>
         /// Creates a clone of the current AlphaTestEffect instance.
@@ -300,7 +310,6 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             return new AlphaTestEffect(this);
         }
-
 
         /// <summary>
         /// Looks up shortcut references to our effect parameters.
@@ -315,8 +324,7 @@ namespace Microsoft.Xna.Framework.Graphics
             worldViewProjParam  = Parameters["WorldViewProj"];
             shaderIndexParam    = Parameters["ShaderIndex"];
         }
-
-
+        
         /// <summary>
         /// Lazily computes derived parameter values immediately before applying the effect.
         /// </summary>

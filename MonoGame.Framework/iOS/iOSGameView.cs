@@ -76,6 +76,7 @@ using MonoTouch.OpenGLES;
 using MonoTouch.UIKit;
 
 using OpenTK.Graphics;
+using OpenTK.Graphics.ES20;
 using OpenTK.Platform.iPhoneOS;
 
 using Microsoft.Xna.Framework.Graphics;
@@ -86,7 +87,8 @@ using All = OpenTK.Graphics.ES20.All;
 namespace Microsoft.Xna.Framework {
 	partial class iOSGameView : UIView {
 		private readonly iOSGamePlatform _platform;
-		private int _renderbuffer;
+		private int _colorbuffer;
+		private int _depthbuffer;
 		private int _framebuffer;
 
 		#region Construction/Destruction
@@ -97,7 +99,6 @@ namespace Microsoft.Xna.Framework {
 				throw new ArgumentNullException ("platform");
 			_platform = platform;
 			Initialize ();
-			SyncTouchRecognizers ();
 		}
 
 		private void Initialize ()
@@ -109,7 +110,7 @@ namespace Microsoft.Xna.Framework {
 		protected override void Dispose (bool disposing)
 		{
 			if (disposing) {
-				if (_graphicsContext != null)
+				if (__renderbuffergraphicsContext != null)
 					DestroyContext();
 			}
 
@@ -147,7 +148,7 @@ namespace Microsoft.Xna.Framework {
 		//        GraphicsContext into an iOS-specific GraphicsDevice.
 		//        Some level of cooperation with the UIView/Layer will
 		//        probably always be necessary, unfortunately.
-		private GraphicsContext _graphicsContext;
+		private GraphicsContext __renderbuffergraphicsContext;
 		private IOpenGLApi _glapi;
 		private void CreateContext ()
 		{
@@ -170,15 +171,15 @@ namespace Microsoft.Xna.Framework {
 			//var version = Version.Parse (strVersion);
 
 			try {
-				_graphicsContext = new GraphicsContext (null, null, 2, 0, GraphicsContextFlags.Embedded);
+				__renderbuffergraphicsContext = new GraphicsContext (null, null, 2, 0, GraphicsContextFlags.Embedded);
 				_glapi = new Gles20Api ();
 			} catch {
-				_graphicsContext = new GraphicsContext (null, null, 1, 1, GraphicsContextFlags.Embedded);
+				__renderbuffergraphicsContext = new GraphicsContext (null, null, 1, 1, GraphicsContextFlags.Embedded);
 				_glapi = new Gles11Api ();
 			}
 
-			_graphicsContext.MakeCurrent (null);
-			_graphicsContext.LoadAll ();
+			__renderbuffergraphicsContext.MakeCurrent (null);
+			__renderbuffergraphicsContext.LoadAll ();
 		}
 
 		private void DestroyContext ()
@@ -186,8 +187,8 @@ namespace Microsoft.Xna.Framework {
 			AssertNotDisposed ();
 			AssertValidContext ();
 
-			_graphicsContext.Dispose ();
-			_graphicsContext = null;
+			__renderbuffergraphicsContext.Dispose ();
+			__renderbuffergraphicsContext = null;
 			_glapi = null;
 		}
 
@@ -196,39 +197,46 @@ namespace Microsoft.Xna.Framework {
 			AssertNotDisposed ();
 			AssertValidContext ();
 
-			_graphicsContext.MakeCurrent (null);
+			__renderbuffergraphicsContext.MakeCurrent (null);
+			
+			// HACK:  GraphicsDevice itself should be calling
+			//        glViewport, so we shouldn't need to do it
+			//        here and then force the state into
+			//        GraphicsDevice.  However, that change is a
+			//        ways off, yet.
+			int unscaledViewportHeight = (int) Math.Round (Layer.Bounds.Size.Height);
+			int unscaledViewportWidth = (int) Math.Round (Layer.Bounds.Size.Width);
 
 			int previousRenderbuffer = 0;
 			_glapi.GetInteger (All.RenderbufferBinding, ref previousRenderbuffer);
+			
+			_glapi.GenFramebuffers (1, ref _framebuffer);
+			_glapi.BindFramebuffer (All.Framebuffer, _framebuffer);
+			
+			// Create our Depth buffer. Color buffer must be the last one bound
+			GL.GenRenderbuffers(1, ref _depthbuffer);
+			GL.BindRenderbuffer(All.Renderbuffer, _depthbuffer);
+			GL.RenderbufferStorage(All.Renderbuffer, All.DepthComponent16, unscaledViewportWidth * (int)Layer.ContentsScale, unscaledViewportHeight * (int)Layer.ContentsScale );
+			
+			GL.FramebufferRenderbuffer(All.Framebuffer, All.DepthAttachment, All.Renderbuffer, _depthbuffer);
 
-			_glapi.GenRenderbuffers (1, ref _renderbuffer);
-			_glapi.BindRenderbuffer (All.Renderbuffer, _renderbuffer);
+			_glapi.GenRenderbuffers (2, ref _colorbuffer);
+			_glapi.BindRenderbuffer (All.Renderbuffer, _colorbuffer);
 
-			var ctx = ((IGraphicsContextInternal) _graphicsContext).Implementation as iPhoneOSGraphicsContext;
+			var ctx = ((IGraphicsContextInternal) __renderbuffergraphicsContext).Implementation as iPhoneOSGraphicsContext;
 
 			// TODO: EAGLContext.RenderBufferStorage returns false
 			//       on all but the first call.  Nevertheless, it
 			//       works.  Still, it would be nice to know why it
 			//       claims to have failed.
 			ctx.EAGLContext.RenderBufferStorage ((uint) All.Renderbuffer, Layer);
-
-			_glapi.GenFramebuffers (1, ref _framebuffer);
-			_glapi.BindFramebuffer (All.Framebuffer, _framebuffer);
-			_glapi.FramebufferRenderbuffer (
-				All.Framebuffer, All.ColorAttachment0, All.Renderbuffer, _renderbuffer);
 			
-			var status = _glapi.CheckFramebufferStatus (All.Framebuffer);
+			_glapi.FramebufferRenderbuffer ( All.Framebuffer, All.ColorAttachment0, All.Renderbuffer, _colorbuffer);
+			
+			var status = GL.CheckFramebufferStatus (All.Framebuffer);
 			if (status != All.FramebufferComplete)
 				throw new InvalidOperationException (
 					"Framebuffer was not created correctly: " + status);
-
-			// HACK:  GraphicsDevice itself should be calling
-			//        glViewport, so we shouldn't need to do it
-			//        here and then force the state into
-			//        GraphicsDevice.  However, that change is a
-			//        ways off, yet.
-			int unscaledViewportWidth = (int) Math.Round (Layer.Bounds.Size.Width);
-			int unscaledViewportHeight = (int) Math.Round (Layer.Bounds.Size.Height);
 
 			_glapi.Viewport (0, 0, unscaledViewportWidth, unscaledViewportHeight);
 			_glapi.Scissor (0, 0, unscaledViewportWidth, unscaledViewportHeight);
@@ -240,8 +248,8 @@ namespace Microsoft.Xna.Framework {
 			{
 				gds.GraphicsDevice.Viewport = new Viewport (
 					0, 0,
-					(int) (Layer.Bounds.Width * Layer.ContentsScale),
-					(int) (Layer.Bounds.Height * Layer.ContentsScale));
+					(int) (unscaledViewportWidth * Layer.ContentsScale),
+					(int) (unscaledViewportHeight * Layer.ContentsScale));
 				
 				// FIXME: These static methods on GraphicsDevice need
 				//        to go away someday.
@@ -254,9 +262,9 @@ namespace Microsoft.Xna.Framework {
 			AssertNotDisposed ();
 			AssertValidContext ();
 
-			_graphicsContext.MakeCurrent (null);
+			__renderbuffergraphicsContext.MakeCurrent (null);
 
-			var ctx = ((IGraphicsContextInternal)_graphicsContext).Implementation as iPhoneOSGraphicsContext;
+			var ctx = ((IGraphicsContextInternal)__renderbuffergraphicsContext).Implementation as iPhoneOSGraphicsContext;
 			// FIXME: MonoTouch needs to allow null arguments to
 			//        RenderBufferStorage, but it doesn't right now.
 			//        So we call it manually.
@@ -268,8 +276,11 @@ namespace Microsoft.Xna.Framework {
 			_glapi.DeleteFramebuffers (1, ref _framebuffer);
 			_framebuffer = 0;
 
-			_glapi.DeleteRenderbuffers (1, ref _renderbuffer);
-			_renderbuffer = 0;
+			_glapi.DeleteRenderbuffers (1, ref _colorbuffer);
+			_colorbuffer = 0;
+			
+			_glapi.DeleteRenderbuffers (1, ref _depthbuffer);
+			_depthbuffer = 0;
 		}
 
 		// FIXME: This logic belongs in GraphicsDevice.Present, not
@@ -283,9 +294,9 @@ namespace Microsoft.Xna.Framework {
 			AssertNotDisposed ();
 			AssertValidContext ();
 
-			_graphicsContext.MakeCurrent (null);
+			__renderbuffergraphicsContext.MakeCurrent (null);
 
-			var ctx = ((IGraphicsContextInternal) _graphicsContext).Implementation as iPhoneOSGraphicsContext;
+			var ctx = ((IGraphicsContextInternal) __renderbuffergraphicsContext).Implementation as iPhoneOSGraphicsContext;
 			ctx.EAGLContext.PresentRenderBuffer ((uint) All.Renderbuffer);
 		}
 
@@ -296,16 +307,16 @@ namespace Microsoft.Xna.Framework {
 			AssertNotDisposed ();
 			AssertValidContext ();
 
-			_graphicsContext.MakeCurrent (null);
+			__renderbuffergraphicsContext.MakeCurrent (null);
 		}
 
 		public override void LayoutSubviews ()
 		{
 			base.LayoutSubviews ();
 
-			if (_framebuffer != 0 || _renderbuffer != 0)
+			if (_framebuffer + _colorbuffer + _depthbuffer != 0)
 				DestroyFramebuffer ();
-			if (_graphicsContext == null)
+			if (__renderbuffergraphicsContext == null)
 				CreateContext();
 			CreateFramebuffer ();
 		}
@@ -315,11 +326,8 @@ namespace Microsoft.Xna.Framework {
 		public override void WillMoveToWindow (UIWindow window)
 		{
 			base.WillMoveToWindow (window);
-
-			if (Window != null)
-				TouchPanel.EnabledGesturesChanged -= TouchPanel_EnabledGesturesChanged;
-
-			if (_framebuffer != 0 || _renderbuffer != 0)
+			
+			if (_framebuffer + _colorbuffer + _depthbuffer != 0)
 				DestroyFramebuffer();
 		}
 
@@ -327,11 +335,10 @@ namespace Microsoft.Xna.Framework {
 		public virtual void DidMoveToWindow ()
 		{
 			if (Window != null) {
-				TouchPanel.EnabledGesturesChanged += TouchPanel_EnabledGesturesChanged;
-
-				if (_graphicsContext == null)
+				
+				if (__renderbuffergraphicsContext == null)
 					CreateContext ();
-				if (_framebuffer == 0 || _renderbuffer == 0)
+				if (_framebuffer * _colorbuffer * _depthbuffer == 0)
 					CreateFramebuffer ();
 			}
 		}
@@ -346,7 +353,7 @@ namespace Microsoft.Xna.Framework {
 
 		private void AssertValidContext ()
 		{
-			if (_graphicsContext == null)
+			if (__renderbuffergraphicsContext == null)
 				throw new InvalidOperationException (
 					"GraphicsContext must be created for this operation to succeed.");
 		}

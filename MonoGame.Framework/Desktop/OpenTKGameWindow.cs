@@ -42,6 +42,8 @@ purpose and non-infringement.
 using System;
 using System.ComponentModel;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Reflection;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using OpenTK;
@@ -229,6 +231,9 @@ namespace Microsoft.Xna.Framework
             window.Keyboard.KeyDown += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyDown);
             window.Keyboard.KeyUp += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyUp);
 
+            // Set the window icon.
+            window.Icon = Icon.ExtractAssociatedIcon(Assembly.GetEntryAssembly().Location);
+
             updateClientBounds = false;
             clientBounds = new Rectangle(window.ClientRectangle.X, window.ClientRectangle.Y,
                                          window.ClientRectangle.Width, window.ClientRectangle.Height);
@@ -252,7 +257,7 @@ namespace Microsoft.Xna.Framework
             _lastUpdate = DateTime.Now;
 
             //Default no resizing
-            AllowUserResizing = false;
+            AllowUserResizing = false;            
         }
 
         protected override void SetTitle(string title)

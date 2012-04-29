@@ -5,46 +5,31 @@ namespace Microsoft.Xna.Framework.Graphics
 {
 	internal class DXExpression
 	{
-		string indexName;
-		float[] outRegs;
-		DXPreshader preshader;
-		
-		public DXExpression (string indexName, byte[] expressionData)
-		{
-			this.indexName = indexName;
-			
-			IntPtr parseDataPtr = MojoShader.NativeMethods.MOJOSHADER_parseExpression(
-				expressionData,
-				expressionData.Length,
-				IntPtr.Zero,
-				IntPtr.Zero,
-				IntPtr.Zero
-			);
-			
-			MojoShader.MOJOSHADER_parseData parseData =
-				(MojoShader.MOJOSHADER_parseData)Marshal.PtrToStructure(
-					parseDataPtr,
-					typeof(MojoShader.MOJOSHADER_parseData));
-			
-			if (parseData.error_count > 0) {
-				MojoShader.MOJOSHADER_error[] errors =
-					DXHelper.UnmarshalArray<MojoShader.MOJOSHADER_error>(
-						parseData.errors, parseData.error_count);
-				throw new Exception(errors[0].error);
-			}
-			
-			preshader = new DXPreshader(parseData.preshader);
-			outRegs = new float[4];
-			
-		}
-		
+		private string _indexName;
+        private float[] _outRegs;
+        private DXPreshader _preshader;
+
+        public DXExpression(string indexName, DXPreshader preshader)
+        {
+            _indexName = indexName;
+            _preshader = preshader;
+            _outRegs = new float[4];
+        }
+
 		public object Evaluate(EffectParameterCollection parameters)
 		{
-			preshader.Run (parameters, outRegs);
-			
-			int index = (int)outRegs[0];
-			
-			return parameters[indexName].Elements[index].data;
+            // Execute the preshader.
+			_preshader.Run(parameters, _outRegs);
+	
+		    // Get the output parameter.
+            var param = parameters[_indexName];
+
+            // Get the result element.
+            var index = (int)_outRegs[0];
+            var element = param.Elements[index];
+
+            // Return the data object.
+            return element.data;
 		}
 		
 	}

@@ -40,9 +40,7 @@ purpose and non-infringement.
 
 using System;
 
-#if ES11
-using OpenTK.Graphics.ES11;
-#else
+#if OPENGL
 using OpenTK.Graphics.ES20;
 #endif
 

@@ -32,6 +32,10 @@ using System.IO;
 using System.Linq;
 #endif
 
+#if WINRT
+using Windows.Storage;
+#endif
+
 namespace Microsoft.Xna.Framework.Content
 {
     public abstract class ContentTypeReader
@@ -120,21 +124,30 @@ namespace Microsoft.Xna.Framework.Content
 #else
 		public static string Normalize(string fileName, string[] extensions)
 		{
-			if (File.Exists(fileName))
+#if WINRT
+            var localFolder = ApplicationData.Current.LocalFolder;
+            if (localFolder.GetFileAsync(fileName).GetResults() != null)
+                return fileName;
+#else
+            if (File.Exists(fileName))
 				return fileName;
-			
+#endif
 			// Check the file extension
 			if (!string.IsNullOrEmpty(Path.GetExtension(fileName)))
-			{
 				return null;
-			}
 			
             foreach (string ext in extensions)
             {
 			    // Concat the file name with valid extensions
                 string fileNamePlusExt = fileName + ext;
+
+#if WINRT
+                if (localFolder.GetFileAsync(fileNamePlusExt).GetResults() != null)
+                    return fileNamePlusExt;
+#else
 			    if (File.Exists(fileNamePlusExt))
 				    return fileNamePlusExt;
+#endif
             }
 			
 			return null;

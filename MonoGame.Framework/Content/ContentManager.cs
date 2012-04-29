@@ -45,10 +45,13 @@ using System.Reflection;
 using System.Text;
 
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Media;
 using Path = System.IO.Path;
+
+#if !WINRT
+using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.Media;
+#endif
 
 namespace Microsoft.Xna.Framework.Content
 {
@@ -189,16 +192,18 @@ namespace Microsoft.Xna.Framework.Content
 			Stream stream;
 			try {
 				string assetPath = Path.Combine (_rootDirectory, assetName)+".xnb";
-				stream = TitleContainer.OpenStream(assetPath);
+                stream = TitleContainer.OpenStream(assetPath);
 			}
 			catch (FileNotFoundException fileNotFound)
 			{
 				throw new ContentLoadException("The content file was not found.", fileNotFound);
 			}
+#if !WINRT
 			catch (DirectoryNotFoundException directoryNotFound)
 			{
 				throw new ContentLoadException("The directory was not found.", directoryNotFound);
 			}
+#endif
 			catch (Exception exception)
 			{
 				throw new ContentLoadException("Opening stream error.", exception);
@@ -248,6 +253,7 @@ namespace Microsoft.Xna.Framework.Content
 				{
 					assetName = SpriteFontReader.Normalize(assetName);
 				}
+#if !WINRT
 				else if ((typeof(T) == typeof(Song)))
 				{
 					assetName = SongReader.Normalize(assetName);
@@ -260,7 +266,8 @@ namespace Microsoft.Xna.Framework.Content
 				{
 					assetName = Video.Normalize(assetName);
 				}
-				else if ((typeof(T) == typeof(Effect)))
+#endif
+                else if ((typeof(T) == typeof(Effect)))
 				{
 					assetName = EffectReader.Normalize(assetName);
 				}
@@ -285,6 +292,7 @@ namespace Microsoft.Xna.Framework.Content
 					//result = new SpriteFont(Texture2D.FromFile(graphicsDeviceService.GraphicsDevice,assetName), null, null, null, 0, 0.0f, null, null);
 					throw new NotImplementedException();
 				}
+#if !WINRT
 				else if ((typeof(T) == typeof(Song)))
 				{
 					result = new Song(assetName);
@@ -297,17 +305,16 @@ namespace Microsoft.Xna.Framework.Content
 				{
 					result = new Video(assetName);
 				}
-				else if ((typeof(T) == typeof(Effect)))
+#endif
+                else if ((typeof(T) == typeof(Effect)))
 				{
-					using (Stream assetStream = new FileStream(assetName, FileMode.Open, FileAccess.Read, FileShare.Read))
+					using (Stream assetStream = TitleContainer.OpenStream(assetName))
 					{
-						MemoryStream effectStream = new MemoryStream ((int) assetStream.Length);
-						assetStream.Read (effectStream.GetBuffer(), 0, (int) assetStream.Length);
-						byte[] aad = effectStream.GetBuffer();
-						result = new Effect(this.graphicsDeviceService.GraphicsDevice, effectStream.GetBuffer());
-						effectStream.Close();
-					}
-				}
+						var data = new byte[assetStream.Length];
+						assetStream.Read (data, 0, (int)assetStream.Length);
+						result = new Effect(this.graphicsDeviceService.GraphicsDevice, data);
+                    }
+                }
 			}
 			
 			if (loadXnb) {
@@ -492,7 +499,7 @@ namespace Microsoft.Xna.Framework.Content
 			{
 				//try load it traditionally
 				stream = OpenStream(assetName);
-				stream.Close();
+				stream.Dispose();
 			}
 			catch (ContentLoadException ex)
 			{
@@ -508,6 +515,7 @@ namespace Microsoft.Xna.Framework.Content
                 {
                     assetName = SpriteFontReader.Normalize(assetName);
                 }
+#if !WINRT
                 else if ((currentAsset is Song))
                 {
                     assetName = SongReader.Normalize(assetName);
@@ -520,7 +528,7 @@ namespace Microsoft.Xna.Framework.Content
                 {
                     assetName = Video.Normalize(assetName);
                 }
-
+#endif
                 if (string.IsNullOrEmpty(assetName))
                 {
                     throw new ContentLoadException("Could not load " + originalAssetName + " asset!");
@@ -537,6 +545,7 @@ namespace Microsoft.Xna.Framework.Content
                 else if ((currentAsset is SpriteFont))
                 {
                 }
+#if !WINRT
                 else if ((currentAsset is Song))
                 {
                 }
@@ -546,7 +555,8 @@ namespace Microsoft.Xna.Framework.Content
                 else if ((currentAsset is Video))
                 {
                 }
-			}
+#endif
+            }
 		}
 
 		public virtual void Unload()

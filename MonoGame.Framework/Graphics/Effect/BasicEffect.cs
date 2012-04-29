@@ -10,6 +10,19 @@
 #region Using Statements
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+
+
+
+using System;
+
+#if ANDROID || IPHONE
+using OpenTK.Graphics.ES20;
+using ActiveUniformType = OpenTK.Graphics.ES20.All;
+#elif MONOMAC
+using MonoMac.OpenGL;
+#elif !WINRT
+using OpenTK.Graphics.OpenGL;
+#endif
 #endregion
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -67,7 +80,7 @@ namespace Microsoft.Xna.Framework.Graphics
         EffectDirtyFlags dirtyFlags = EffectDirtyFlags.All;
 
         #endregion
-
+        
         #region Public Properties
 
 
@@ -358,21 +371,18 @@ namespace Microsoft.Xna.Framework.Graphics
 
         #region Methods
 
-
         /// <summary>
         /// Creates a new BasicEffect with default parameter settings.
         /// </summary>
         public BasicEffect(GraphicsDevice device)
-            : base(device, Effect.LoadEffectResource("BasicEffect"))
+            : base(device, Effect.LoadEffectResource("Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect.mgfx"))
         {
             CacheEffectParameters(null);
 
             DirectionalLight0.Enabled = true;
-
             SpecularColor = Vector3.One;
             SpecularPower = 16;
         }
-
 
         /// <summary>
         /// Creates a new BasicEffect by cloning parameter settings from an existing instance.
@@ -384,7 +394,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             lightingEnabled = cloneSource.lightingEnabled;
             preferPerPixelLighting = cloneSource.preferPerPixelLighting;
-            fogEnabled = cloneSource.fogEnabled;
+            fogEnabled = cloneSource.fogEnabled;            
             textureEnabled = cloneSource.textureEnabled;
             vertexColorEnabled = cloneSource.vertexColorEnabled;
 
@@ -478,6 +488,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 // Recompute the world inverse transpose and eye position?
                 dirtyFlags = EffectHelpers.SetLightingMatrices(dirtyFlags, ref world, ref view, worldParam, worldInverseTransposeParam, eyePositionParam);
+
                 
                 // Check if we can use the only-bother-with-the-first-light shader optimization.
                 bool newOneLight = !light1.Enabled && !light2.Enabled;

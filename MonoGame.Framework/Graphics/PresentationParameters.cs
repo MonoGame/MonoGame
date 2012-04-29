@@ -58,20 +58,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
         #region Private Fields
 
-        private DepthFormat autoDepthStencilFormat;
-        private DepthFormat depthStencilFormat; // Added for XNA 4.0
-        private int backBufferCount;
+        private DepthFormat depthStencilFormat;
         private SurfaceFormat backBufferFormat;
         private int backBufferHeight = _defaultBackBufferHeight;
         private int backBufferWidth = _defaultBackBufferWidth;
         private IntPtr deviceWindowHandle;
-        private bool enableAutoDepthStencil;
-        private int fullScreenRefreshRateInHz;
         private bool isFullScreen;
-        private int multiSampleCount; // Added for XNA 4.0
-        private int multiSampleQuality;
-        private MultiSampleType multiSampleType;
-        private SwapEffect swapEffect;
+        private int multiSampleCount;
         private bool disposed;
         
         internal static readonly int _defaultBackBufferHeight = 480;
@@ -93,22 +86,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         #endregion Constructors
 
-
-      
-
         #region Properties
-
-        public DepthFormat AutoDepthStencilFormat
-        {
-            get { return autoDepthStencilFormat; }
-            set { autoDepthStencilFormat = value; }
-        }
-
-        public int BackBufferCount
-        {
-            get { return backBufferCount; }
-            set { backBufferCount = value; }
-        }
 
         public SurfaceFormat BackBufferFormat
         {
@@ -128,6 +106,11 @@ namespace Microsoft.Xna.Framework.Graphics
             set { backBufferWidth = value; }
         }
 
+        public Rectangle Bounds 
+        {
+            get { return new Rectangle(0, 0, backBufferWidth, backBufferHeight); }
+        }
+
         public IntPtr DeviceWindowHandle
         {
             get { return deviceWindowHandle; }
@@ -138,17 +121,6 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             get { return depthStencilFormat; }
             set { depthStencilFormat = value; }
-        }
-        public bool EnableAutoDepthStencil
-        {
-            get { return enableAutoDepthStencil; }
-            set { enableAutoDepthStencil = value; }
-        }
-
-        public int FullScreenRefreshRateInHz
-        {
-            get { return fullScreenRefreshRateInHz; }
-            set { fullScreenRefreshRateInHz = value; }
         }
 
         public bool IsFullScreen
@@ -173,24 +145,8 @@ namespace Microsoft.Xna.Framework.Graphics
             set { multiSampleCount = value; }
         }
 		
-        public int MultiSampleQuality
-        {
-            get { return multiSampleQuality; }
-            set { multiSampleQuality = value; }
-        }
+        public PresentInterval PresentationInterval { get; set; }
 
-        public MultiSampleType MultiSampleType
-        {
-            get { return multiSampleType; }
-            set { multiSampleType = value; }
-        }
-
-        public SwapEffect SwapEffect
-        {
-            get { return swapEffect; }
-            set { swapEffect = value; }
-        }
-		
 		public DisplayOrientation DisplayOrientation 
 		{ 
 			get; 
@@ -206,8 +162,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void Clear()
         {
-            autoDepthStencilFormat = DepthFormat.None;
-            backBufferCount = 0;
             backBufferFormat = SurfaceFormat.Color;
 #if IPHONE
 			backBufferWidth = (int)(UIScreen.MainScreen.Bounds.Width * UIScreen.MainScreen.Scale);
@@ -217,39 +171,30 @@ namespace Microsoft.Xna.Framework.Graphics
             backBufferHeight = _defaultBackBufferHeight;     
 #endif
             deviceWindowHandle = IntPtr.Zero;
-            enableAutoDepthStencil = false;
-            fullScreenRefreshRateInHz = 0;
 #if IPHONE
 			isFullScreen = UIApplication.SharedApplication.StatusBarHidden;
 #else
             // isFullScreen = false;
 #endif
-            multiSampleQuality = 0;
             depthStencilFormat = DepthFormat.None;
             multiSampleCount = 0;
-            multiSampleType = MultiSampleType.None;
-            swapEffect = SwapEffect.Default;
-			this.DisplayOrientation = DisplayOrientation.Default;
+            PresentationInterval = PresentInterval.Default;
+            DisplayOrientation = DisplayOrientation.Default;
         }
 
         public PresentationParameters Clone()
         {
             PresentationParameters clone = new PresentationParameters();
-            clone.autoDepthStencilFormat = this.autoDepthStencilFormat;
-            clone.backBufferCount = this.backBufferCount;
             clone.backBufferFormat = this.backBufferFormat;
             clone.backBufferHeight = this.backBufferHeight;
             clone.backBufferWidth = this.backBufferWidth;
             clone.deviceWindowHandle = this.deviceWindowHandle;
             clone.disposed = this.disposed;
-            clone.enableAutoDepthStencil = this.enableAutoDepthStencil;
-            clone.fullScreenRefreshRateInHz = this.fullScreenRefreshRateInHz;
             clone.IsFullScreen = this.IsFullScreen;
-            clone.multiSampleQuality = this.multiSampleQuality;
-            clone.multiSampleType = this.multiSampleType;
-            clone.swapEffect = this.swapEffect;
             clone.depthStencilFormat = this.depthStencilFormat;
             clone.multiSampleCount = this.multiSampleCount;
+            clone.PresentationInterval = this.PresentationInterval;
+            clone.DisplayOrientation = this.DisplayOrientation;
             return clone;
         }
 

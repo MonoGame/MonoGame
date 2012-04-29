@@ -44,15 +44,11 @@ using System;
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
-#else
- #if ES11
-using OpenTK.Graphics.ES11;
- #else
+#elif WINRT
+// TODO
+#elif GLES
 using OpenTK.Graphics.ES20;
-  #if IPHONE || ANDROID
 using TextureTarget = OpenTK.Graphics.ES20.All;
-  #endif
- #endif
 #endif
 
 
@@ -63,8 +59,12 @@ namespace Microsoft.Xna.Framework.Graphics
 		protected SurfaceFormat format;
 		protected int levelCount;
 
+#if WINRT
+
+#elif OPENGL
 		internal int glTexture = -1;
 		internal TextureTarget glTarget;
+#endif
 		
 		public SurfaceFormat Format
 		{
@@ -79,13 +79,19 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		internal virtual void Activate()
 		{
+#if WINRT
+#elif OPENGL
 			GL.BindTexture(glTarget, this.glTexture);
-		}
+#endif
+        }
 
 		public override void Dispose()
 		{
+#if WINRT
+#elif OPENGL
 			GL.DeleteTextures(1, ref glTexture);
-			base.Dispose();
+#endif
+            base.Dispose();
 		}
 		
 	}

@@ -38,10 +38,11 @@ purpose and non-infringement.
 */
 #endregion License
 using System;
-
-using OpenTK.Graphics.OpenGL;
-
 using Microsoft.Xna.Framework.Graphics;
+
+#if !WINRT
+using OpenTK.Graphics.OpenGL;
+#endif
 
 namespace Microsoft.Xna.Framework
 {
@@ -75,13 +76,15 @@ namespace Microsoft.Xna.Framework
             game.Services.AddService(typeof(IGraphicsDeviceManager), this);
             game.Services.AddService(typeof(IGraphicsDeviceService), this);
 
+            // TODO: This should not occur here... it occurs during Game.Initialize().
+#if !WINRT
             CreateDevice();
+#endif
         }
 
         public void CreateDevice()
         {
             _graphicsDevice = new GraphicsDevice();
-            _graphicsDevice.PresentationParameters = new PresentationParameters();
 
             Initialize();
 
@@ -141,6 +144,11 @@ namespace Microsoft.Xna.Framework
 
         public void Dispose()
         {
+            if (_graphicsDevice != null)
+            {
+                _graphicsDevice.Dispose();
+                _graphicsDevice = null;
+            }
         }
 
         #endregion
@@ -153,15 +161,10 @@ namespace Microsoft.Xna.Framework
         private void Initialize()
         {
             _graphicsDevice.PresentationParameters.IsFullScreen = false;
+            _graphicsDevice.PresentationParameters.DeviceWindowHandle = _game.Window.Handle;
+            _graphicsDevice.Initialize();
 
-            if (_preferMultiSampling)
-            {
-                _graphicsDevice.PreferedFilter = All.Linear;
-            }
-            else
-            {
-                _graphicsDevice.PreferedFilter = All.Nearest;
-            }
+            PreferMultiSampling = _preferMultiSampling;
         }
 
         public void ToggleFullScreen()
@@ -203,17 +206,16 @@ namespace Microsoft.Xna.Framework
             {
                 return _preferMultiSampling;
             }
+
             set
             {
                 _preferMultiSampling = value;
+#if !WINRT
                 if (_preferMultiSampling)
-                {
                     _graphicsDevice.PreferedFilter = All.Linear;
-                }
                 else
-                {
                     _graphicsDevice.PreferedFilter = All.Nearest;
-                }
+#endif
             }
         }
 

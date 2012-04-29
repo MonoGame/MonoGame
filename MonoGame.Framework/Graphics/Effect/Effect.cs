@@ -43,9 +43,20 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using System.Linq;
-
-//For laoding from resources
 using System.Reflection;
+
+#if IPHONE || ANDROID
+using OpenTK.Graphics.ES20;
+using ShaderType = OpenTK.Graphics.ES20.All;
+using ActiveUniformType = OpenTK.Graphics.ES20.All;
+using ProgramParameter = OpenTK.Graphics.ES20.All;
+using ShaderParameter = OpenTK.Graphics.ES20.All;
+#elif MONOMAC
+using MonoMac.OpenGL;
+#elif !WINRT
+using OpenTK.Graphics.OpenGL;
+
+#endif
 
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -53,27 +64,16 @@ namespace Microsoft.Xna.Framework.Graphics
 	public class Effect : GraphicsResource
     {
         public EffectParameterCollection Parameters { get; set; }
-		internal List<EffectParameter> _textureMappings = new List<EffectParameter>();
-
-		DXEffectObject effectObject;
-		GLSLEffectObject glslEffectObject;
-
-		protected Effect (GraphicsDevice graphicsDevice)
-		{
-#if ES11
-			throw new NotSupportedException("Programmable shaders unavailable in OpenGL ES 1.1");
-#endif
-			if (graphicsDevice == null) {
-				throw new ArgumentNullException ("Graphics Device Cannot Be Null");
-			}
-			this.graphicsDevice = graphicsDevice;
-			Techniques = new EffectTechniqueCollection ();
-			Parameters = new EffectParameterCollection();
-		}
 
         public EffectTechniqueCollection Techniques { get; set; }
-		
-		
+
+        public EffectTechnique CurrentTechnique { get; set; }
+
+		DXEffectObject effectObject;
+
+        internal static Dictionary<byte[], DXEffectObject> effectObjectCache =
+			new Dictionary<byte[], DXEffectObject>(new ByteArrayComparer());
+
 		//cache effect objects so we don't create a bunch of instances
 		//of the same shader
 		//(Some programs create heaps of instances of BasicEffect,
@@ -91,72 +91,53 @@ namespace Microsoft.Xna.Framework.Graphics
 				return key.Sum(b => b);
 			}
 		}
-		internal static Dictionary<byte[], DXEffectObject> effectObjectCache =
-			new Dictionary<byte[], DXEffectObject>(new ByteArrayComparer());
-		
 
-		protected Effect (Effect cloneSource)
-		{
-
-		}
-
-		internal Effect (GraphicsDevice graphicsDevice, string assetName)
-		{
-
-		}
-
-		public Effect (
-			GraphicsDevice graphicsDevice,
-			byte[] effectCode)
-		{
-#if ES11
-			throw new NotSupportedException("Programmable shaders unavailable in OpenGL ES 1.1");
+#if !WINRT
+        internal int CurrentProgram = 0;
 #endif
 
-			if (graphicsDevice == null) {
+        protected Effect (GraphicsDevice graphicsDevice)
+		{
+			if (graphicsDevice == null)
 				throw new ArgumentNullException ("Graphics Device Cannot Be Null");
-			}
+
 			this.graphicsDevice = graphicsDevice;
-
-			uint magic = BitConverter.ToUInt32(effectCode,0);
-			//0xBCF00BCF XNA 4 effects
-			//0xFEFF0901 effect too old or too new, or ascii which we can't compile atm
-			//0x6151EFFE GLSL
-
-			if (magic == 0x6151EFFE) {// GLSL shader is to be used from fxg file
-				glslEffectObject = new GLSLEffectObject(effectCode);
-
-				Parameters = new EffectParameterCollection();
-				foreach (GLSLEffectObject.glslParameter parameter in glslEffectObject.parameter_handles) {
-					Parameters._parameters.Add (new EffectParameter(parameter));
-				}
-
-				Techniques = new EffectTechniqueCollection();
-				foreach (GLSLEffectObject.glslTechnique technique in glslEffectObject.technique_handles) {
-					Techniques._techniques.Add (new EffectTechnique(this, technique));
-				}
-			}
-			else {
-				//try getting a cached effect object
-				if (!effectObjectCache.TryGetValue(effectCode, out effectObject))
-				{
-					effectObject = new DXEffectObject(effectCode);
-					effectObjectCache.Add (effectCode, effectObject);
-				}
-	
-				Parameters = new EffectParameterCollection();
-				foreach (DXEffectObject.d3dx_parameter parameter in effectObject.parameter_handles) {
-					Parameters._parameters.Add (new EffectParameter(parameter));
-				}
-	
-				Techniques = new EffectTechniqueCollection();
-				foreach (DXEffectObject.d3dx_technique technique in effectObject.technique_handles) {
-					Techniques._techniques.Add (new EffectTechnique(this, technique));
-				}
-			}
-
-			CurrentTechnique = Techniques[0];
+			Techniques = new EffectTechniqueCollection ();
+			Parameters = new EffectParameterCollection();
+		}
 			
+		protected Effect (Effect cloneSource)
+		{
+		}
+
+		public Effect (GraphicsDevice graphicsDevice, byte[] effectData)
+            : this(graphicsDevice)
+		{
+			// Try getting a cached effect object.
+            if (!effectObjectCache.TryGetValue(effectData, out effectObject))
+			{
+                effectObject = DXEffectObject.FromMGFX(effectData);
+                effectObjectCache.Add(effectData, effectObject);
+			}
+	
+			foreach (var parameter in effectObject.Parameters)
+				Parameters._parameters.Add (new EffectParameter(parameter));
+
+            foreach (var technique in effectObject.Techniques)
+				Techniques._techniques.Add (new EffectTechnique(this, technique));
+
+            CurrentTechnique = Techniques[0];			
+		}
+
+		internal static byte[] LoadEffectResource(string name)
+		{
+            var assembly = typeof(Effect).Assembly;
+            var stream = assembly.GetManifestResourceStream(name);
+            using (MemoryStream ms = new MemoryStream())
+			{
+				stream.CopyTo(ms);
+				return ms.ToArray();
+			}
 		}
 
 		public virtual Effect Clone ()
@@ -168,30 +149,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 		}
 
-		public EffectTechnique CurrentTechnique { 
-			get;
-			set; 
-		}
-
 		protected internal virtual void OnApply ()
 		{
-
 		}
-
-		internal static byte[] LoadEffectResource(string name)
-		{
-			Assembly assembly = Assembly.GetExecutingAssembly();
-#if GLSL_EFFECTS
-			var stream = assembly.GetManifestResourceStream("Microsoft.Xna.Framework.Graphics.Effect."+name+"GLSL.bin");
-#else
-			var stream = assembly.GetManifestResourceStream("Microsoft.Xna.Framework.Graphics.Effect."+name+".bin");
-#endif
-			using (MemoryStream ms = new MemoryStream())
-			{
-				stream.CopyTo(ms);
-				return ms.ToArray();
-			}
-		}
-
 	}
 }

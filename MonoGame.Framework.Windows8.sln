@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 11
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Framework.Windows8", "MonoGame.Framework\MonoGame.Framework.Windows8.csproj", "{0518563C-ACCA-4A14-8C5D-DDBE93E2605F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0518563C-ACCA-4A14-8C5D-DDBE93E2605F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0518563C-ACCA-4A14-8C5D-DDBE93E2605F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0518563C-ACCA-4A14-8C5D-DDBE93E2605F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0518563C-ACCA-4A14-8C5D-DDBE93E2605F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

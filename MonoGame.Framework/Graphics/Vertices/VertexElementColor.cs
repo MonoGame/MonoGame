@@ -77,6 +77,11 @@ namespace Microsoft.Xna.Framework.Graphics
 			return (this == ((VertexElementColor)obj));
 		}
 
+        public override int GetHashCode()
+        {
+            return (int)PackedValue;
+        }
+
         public UInt32 PackedValue
         {
             get

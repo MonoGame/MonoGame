@@ -40,11 +40,17 @@
 // 
 using System;
 using System.Runtime.InteropServices;
+using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework.Audio
 {
-	[SerializableAttribute]
-	public sealed class InstancePlayLimitException : ExternalException
+#if WINRT
+    [DataContract]
+    public sealed class InstancePlayLimitException : Exception
+#else
+    [Serializable]
+    public sealed class InstancePlayLimitException : ExternalException
+#endif
 	{
 	}
 }

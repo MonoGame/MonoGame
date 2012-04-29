@@ -52,6 +52,12 @@ namespace Microsoft.Xna.Framework.Input
         {
             return State;
         }
+
+        public static void SetPosition(int x, int y)
+        {
+            State.X = x;
+            State.Y = y;
+        }
     }
 }
 

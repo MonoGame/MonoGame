@@ -361,7 +361,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// Creates a new EnvironmentMapEffect with default parameter settings.
         /// </summary>
         public EnvironmentMapEffect(GraphicsDevice device)
-            : base(device, Effect.LoadEffectResource("EnvironmentMapEffect"))
+            : base(device, Effect.LoadEffectResource("Microsoft.Xna.Framework.Graphics.Effect.Resources.EnvironmentMapEffect.mgfx"))
         {
             CacheEffectParameters(null);
 

@@ -4,8 +4,8 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>9.0.30729</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>    
-	<ProjectGuid>{7DE47032-A904-4C29-BD22-2D235E8D91BA}</ProjectGuid>	 
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{7DE47032-A904-4C29-BD22-2D235E8D91BA}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Microsoft.Xna.Framework</RootNamespace>
@@ -26,7 +26,7 @@
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DebugSymbols>true</DebugSymbols>
-    <DefineConstants>TRACE;WINDOWS</DefineConstants>
+    <DefineConstants>TRACE;WINDOWS;OPENGL</DefineConstants>
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
@@ -35,7 +35,7 @@
     <OutputPath>bin\Release\</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DefineConstants>TRACE;WINDOWS</DefineConstants>
+    <DefineConstants>TRACE;WINDOWS;OPENGL</DefineConstants>
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -48,7 +48,7 @@
     <RegisterForComInterop>False</RegisterForComInterop>
     <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
     <BaseAddress>4194304</BaseAddress>
-    <DefineConstants>TRACE;WINDOWS</DefineConstants>
+    <DefineConstants>TRACE;WINDOWS;OPENGL</DefineConstants>
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -60,7 +60,7 @@
     <RegisterForComInterop>False</RegisterForComInterop>
     <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
     <BaseAddress>4194304</BaseAddress>
-    <DefineConstants>TRACE;WINDOWS</DefineConstants>
+    <DefineConstants>TRACE;WINDOWS;OPENGL</DefineConstants>
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -73,11 +73,11 @@
     <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
     <BaseAddress>4194304</BaseAddress>
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <DefineConstants>TRACE;WINDOWS</DefineConstants>
+    <DefineConstants>TRACE;WINDOWS;OPENGL</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Platform)' == 'x86' ">
     <PlatformTarget>x86</PlatformTarget>
-    <DefineConstants>TRACE;WINDOWS</DefineConstants>
+    <DefineConstants>TRACE;WINDOWS;OPENGL</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="GamepadBridge">
@@ -103,6 +103,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Audio\AudioCategory.cs" />
+    <Compile Include="Content\ContentExtensions.cs" />
     <Compile Include="Content\ContentReaders\DualTextureEffectReader.cs" />
     <Compile Include="Content\ContentReaders\EffectReader.cs" />
     <Compile Include="Content\ContentReaders\EnvironmentMapEffectReader.cs" />
@@ -133,9 +134,11 @@
     <Compile Include="Graphics\Effect\AlphaTestEffect.cs" />
     <Compile Include="Graphics\Effect\DualTextureEffect.cs" />
     <Compile Include="Graphics\Effect\DXEffectObject.cs" />
+    <Compile Include="Graphics\Effect\DXEffectObject.runtime.cs" />
     <Compile Include="Graphics\Effect\DXExpression.cs" />
     <Compile Include="Graphics\Effect\DXHelper.cs" />
     <Compile Include="Graphics\Effect\DXPreshader.cs" />
+    <Compile Include="Graphics\Effect\DXPreshader.runtime.cs" />
     <Compile Include="Graphics\Effect\DXShader.cs" />
     <Compile Include="Graphics\Effect\Effect.cs" />
     <Compile Include="Graphics\Effect\EffectAnnotation.cs" />
@@ -143,7 +146,6 @@
     <Compile Include="Graphics\Effect\EffectHelpers.cs" />
     <Compile Include="Graphics\Effect\EffectPass.cs" />
     <Compile Include="Graphics\Effect\EnvironmentMapEffect.cs" />
-    <Compile Include="Graphics\Effect\GLSLOptimizer.cs" />
     <Compile Include="Graphics\Effect\MojoShader.cs" />
     <Compile Include="Graphics\Effect\SkinnedEffect.cs" />
     <Compile Include="Graphics\GraphicsAdapter.cs" />
@@ -163,6 +165,7 @@
     <Compile Include="Graphics\PackedVector\NormalizedShort2.cs" />
     <Compile Include="Graphics\PackedVector\NormalizedShort4.cs" />
     <Compile Include="Graphics\PresentationParameters.cs" />
+    <Compile Include="Graphics\PresentInterval.cs" />
     <Compile Include="Graphics\RenderTarget2D.cs" />
     <Compile Include="Graphics\SpriteBatch.cs" />
     <Compile Include="Graphics\SpriteBatcher.cs" />
@@ -256,14 +259,10 @@
     <Compile Include="Graphics\Effect\EffectTechnique.cs" />
     <Compile Include="Graphics\Effect\EffectTechniqueCollection.cs" />
     <Compile Include="Graphics\Effect\SpriteEffect.cs" />
-    <Compile Include="Graphics\Effect\GLSLEffectObject.cs" />
-    <Compile Include="Graphics\Effect\GLSLShader.cs" />
     <Compile Include="Graphics\ImageEx.cs" />
     <Compile Include="Graphics\PackedVector\IPackedVector.cs" />
     <Compile Include="Graphics\PackedVector\Short2.cs" />
-    <Compile Include="Graphics\RenderTarget.cs">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="Graphics\RenderTarget.cs" />
     <Compile Include="Graphics\RenderTargetBinding.cs" />
     <Compile Include="Graphics\SamplerStateCollection.cs" />
     <Compile Include="Graphics\States\CompareFunction.cs" />
@@ -428,7 +427,6 @@
     <Compile Include="Graphics\SpriteFont.cs" />
     <Compile Include="Graphics\SpriteSortMode.cs" />
     <Compile Include="Graphics\SurfaceFormat.cs" />
-    <Compile Include="Graphics\SwapEffect.cs" />
     <Compile Include="Graphics\TextureUsage.cs" />
     <Compile Include="Graphics\Viewport.cs" />
     <Compile Include="Input\Touch\GestureSample.cs" />
@@ -473,21 +471,11 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Graphics\Effect\AlphaTestEffect.bin" />
-    <EmbeddedResource Include="Graphics\Effect\BasicEffect.bin" />
-    <EmbeddedResource Include="Graphics\Effect\DualTextureEffect.bin" />
-    <EmbeddedResource Include="Graphics\Effect\EnvironmentMapEffect.bin" />
-    <EmbeddedResource Include="Graphics\Effect\SkinnedEffect.bin" />
-    <EmbeddedResource Include="Graphics\Effect\SpriteEffect.bin" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\ThirdParty\Libs\libmojoshader_64.dll">
-      <Link>libmojoshader_64.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-	<None Include="..\ThirdParty\Libs\libmojoshader_32.dll">
-      <Link>libmojoshader_32.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect.mgfx" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect.mgfx" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\SpriteEffect.mgfx" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\DualTextureEffect.mgfx" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\EnvironmentMapEffect.mgfx" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\SkinnedEffect.mgfx" />
   </ItemGroup>
 </Project>

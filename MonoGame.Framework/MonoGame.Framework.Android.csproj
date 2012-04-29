@@ -24,7 +24,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;ANDROID;GLES</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;ANDROID;GLES;OPENGL</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -35,7 +35,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE;ANDROID;GLES</DefineConstants>
+    <DefineConstants>TRACE;ANDROID;GLES;OPENGL</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AndroidUseSharedRuntime>false</AndroidUseSharedRuntime>
@@ -59,6 +59,7 @@
     <Compile Include="Android\TitleContainer.cs" />
     <Compile Include="Audio\AudioCategory.cs" />
     <Compile Include="Content\ContentManager.cs" />
+    <Compile Include="Content\ContentExtensions.cs" />    
     <Compile Include="Content\ContentReaders\ArrayReader.cs" />
     <Compile Include="Content\ContentReaders\BoundingFrustumReader.cs" />
     <Compile Include="Content\ContentReaders\BoundingSphereReader.cs" />
@@ -106,9 +107,6 @@
     <Compile Include="Graphics\Effect\EffectAnnotation.cs" />
     <Compile Include="Graphics\Effect\EffectAnnotationCollection.cs" />
     <Compile Include="Graphics\Effect\EnvironmentMapEffect.cs" />
-    <Compile Include="Graphics\Effect\GLSLEffectObject.cs" />
-    <Compile Include="Graphics\Effect\GLSLOptimizer.cs" />
-    <Compile Include="Graphics\Effect\GLSLShader.cs" />
     <Compile Include="Graphics\Effect\MojoShader.cs" />
     <Compile Include="Graphics\Effect\SkinnedEffect.cs" />
     <Compile Include="Graphics\Effect\SpriteEffect.cs" />
@@ -126,6 +124,7 @@
     <Compile Include="Graphics\PackedVector\NormalizedShort2.cs" />
     <Compile Include="Graphics\PackedVector\NormalizedShort4.cs" />
     <Compile Include="Graphics\PresentationParameters.cs" />
+    <Compile Include="Graphics\PresentInterval.cs" />
     <Compile Include="Graphics\States\SamplerState.cs" />
     <Compile Include="Graphics\StencilOperation.cs" />
     <Compile Include="Graphics\Texture2D.cs" />
@@ -287,7 +286,6 @@
     <Compile Include="Graphics\SpriteFont.cs" />
     <Compile Include="Graphics\SpriteSortMode.cs" />
     <Compile Include="Graphics\SurfaceFormat.cs" />
-    <Compile Include="Graphics\SwapEffect.cs" />
     <Compile Include="Graphics\TextureUsage.cs" />
     <Compile Include="Graphics\Viewport.cs" />
     <Compile Include="Input\Touch\GestureSample.cs" />
@@ -403,6 +401,8 @@
     <Compile Include="Content\ContentReaders\AlphaTestEffectReader.cs" />
     <Compile Include="Graphics\Effect\AlphaTestEffect.cs" />
     <Compile Include="Graphics\Effect\EffectHelpers.cs" />
+    <Compile Include="Graphics\Effect\DXEffectObject.runtime.cs" />
+    <Compile Include="Graphics\Effect\DXPreshader.runtime.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
@@ -420,19 +420,12 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Graphics\Effect\AlphaTestEffect.bin" />
-    <EmbeddedResource Include="Graphics\Effect\BasicEffect.bin" />
-    <EmbeddedResource Include="Graphics\Effect\DualTextureEffect.bin" />
-    <EmbeddedResource Include="Graphics\Effect\EnvironmentMapEffect.bin" />
-    <EmbeddedResource Include="Graphics\Effect\SkinnedEffect.bin" />
-    <EmbeddedResource Include="Graphics\Effect\SpriteEffect.bin" />
-    <None Include="Graphics\Effect\AlphaTestEffectGLSL.bin" />
-    <None Include="Graphics\Effect\BasicEffectGLSL.bin" />
-    <None Include="Graphics\Effect\DualTextureEffectGLSL.bin" />
-    <None Include="Graphics\Effect\EnvironmentMapEffectGLSL.bin" />
-    <None Include="Graphics\Effect\SkinnedEffectGLSL.bin" />
-    <None Include="Graphics\Effect\SpriteEffectGLSL.bin" />
-    <None Include="Properties\AndroidManifest.xml" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect.mgfx" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect.mgfx" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\DualTextureEffect.mgfx" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\EnvironmentMapEffect.mgfx" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\SkinnedEffect.mgfx" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\SpriteEffect.mgfx" />
   </ItemGroup>
   <ItemGroup />
 </Project>

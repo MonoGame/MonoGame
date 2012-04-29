@@ -18,23 +18,7 @@ namespace Microsoft.Xna.Framework.Content
 		
 		public static string Normalize(string FileName)
 		{
-			if (File.Exists(FileName))
-				return FileName;
-			
-			// Check the file extension
-			if (!string.IsNullOrEmpty(Path.GetExtension(FileName)))
-			{
-				return null;
-			}
-			
-			// Concat the file name with valid extensions
-			foreach (var item in supportedExtensions)
-			{
-				if (File.Exists(FileName+item))
-				  return FileName+item;
-			}
-			
-			return null;
+            return ContentTypeReader.Normalize(FileName, supportedExtensions);
 		}
 		
 		private static string TryFindAnyCased(string search, string[] arr, params string[] extensions)
