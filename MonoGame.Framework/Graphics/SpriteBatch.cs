@@ -229,7 +229,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			SpriteBatchItem item = _batcher.CreateBatchItem ();
 
 			item.Depth = depth;
-#if !WINRT
+#if !WINRT && !PSS
 			item.TextureID = texture.glTexture;
 #endif
 
