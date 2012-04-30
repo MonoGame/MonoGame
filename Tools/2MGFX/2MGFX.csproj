@@ -50,16 +50,16 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="SharpDX">
-      <HintPath>..\..\ThirdParty\SharpDX\Windows\SharpDX.dll</HintPath>
+      <HintPath>..\..\ThirdParty\Libs\SharpDX\Windows\SharpDX.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.D3DCompiler">
-      <HintPath>..\..\ThirdParty\SharpDX\Windows\SharpDX.D3DCompiler.dll</HintPath>
+      <HintPath>..\..\ThirdParty\Libs\SharpDX\Windows\SharpDX.D3DCompiler.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.Direct3D11">
-      <HintPath>..\..\ThirdParty\SharpDX\Windows\SharpDX.Direct3D11.dll</HintPath>
+      <HintPath>..\..\ThirdParty\Libs\SharpDX\Windows\SharpDX.Direct3D11.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.DXGI">
-      <HintPath>..\..\ThirdParty\SharpDX\Windows\SharpDX.DXGI.dll</HintPath>
+      <HintPath>..\..\ThirdParty\Libs\SharpDX\Windows\SharpDX.DXGI.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
