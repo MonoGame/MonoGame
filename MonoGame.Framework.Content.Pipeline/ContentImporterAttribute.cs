@@ -38,20 +38,59 @@
  */
 #endregion License
 
+using System;
+using System.Collections.Generic;
+
 namespace Microsoft.Xna.Framework.Content.Pipeline
 {
-    public class ContentItem
+    /// <summary>
+    /// Provides properties that identify and provide metadata about the importer, such as supported file extensions and caching information.
+    /// Importers are required to initialize this attribute.
+    /// </summary>
+    public class ContentImporterAttribute : Attribute
     {
-        OpaqueDataDictionary opaqueData = new OpaqueDataDictionary();
+        List<string> extensions = new List<string>();
 
-        public ContentIdentity Identity { get; set; }
+        /// <summary>
+        /// Gets and sets the caching of the content during importation.
+        /// </summary>
+        public bool CacheImportedData { get; set; }
 
-        public string Name { get; set; }
+        /// <summary>
+        /// Gets or sets the name of the default processor for content read by this importer.
+        /// </summary>
+        public string DefaultProcessor { get; set; }
 
-        public OpaqueDataDictionary OpaqueData { get { return opaqueData; } }
+        /// <summary>
+        /// Gets or sets the string representing the importer in a user interface. This name is not used by the content pipeline and should not be passed to the BuildAssets task (a custom MSBuild task used by XNA Game Studio). It is used for display purposes only.
+        /// </summary>
+        public virtual string DisplayName { get; set; }
 
-        public ContentItem()
+        /// <summary>
+        /// Gets the supported file name extensions of the importer.
+        /// </summary>
+        public IEnumerable<string> FileExtensions { get { return extensions; } }
+
+        /// <summary>
+        /// Initializes a new instance of ContentImporterAttribute and sets the file name extension supported by the importer.
+        /// </summary>
+        /// <param name="fileExtension">The list of file name extensions supported by the importer. Prefix each extension with a '.'.</param>
+        public ContentImporterAttribute(
+            string fileExtension
+            )
         {
+            extensions.Add(fileExtension);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of ContentImporterAttribute and sets the file name extensions supported by the importer.
+        /// </summary>
+        /// <param name="fileExtensions">The list of file name extensions supported by the importer. Prefix each extension with a '.'.</param>
+        public ContentImporterAttribute(
+            params string[] fileExtensions
+            )
+        {
+            extensions.AddRange(fileExtensions);
         }
     }
 }

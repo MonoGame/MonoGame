@@ -38,19 +38,68 @@
  */
 #endregion License
 
+using System;
+using System.Runtime.Serialization;
+
 namespace Microsoft.Xna.Framework.Content.Pipeline
 {
-    public class ContentItem
+    /// <summary>
+    /// Thrown when errors are encountered during a content pipeline build.
+    /// </summary>
+    [SerializableAttribute]
+    public class PipelineException : Exception
     {
-        OpaqueDataDictionary opaqueData = new OpaqueDataDictionary();
+        /// <summary>
+        /// Creates an instance of PipelineException.
+        /// </summary>
+        public PipelineException()
+        {
+        }
 
-        public ContentIdentity Identity { get; set; }
+        /// <summary>
+        /// Creates an instance of PipelineException with information on serialization and streaming context for the related content item.
+        /// </summary>
+        /// <param name="serializationInfo">Information necessary for serialization and deserialization of the content item.</param>
+        /// <param name="streamingContext">Information necessary for the source and destination of a given serialized stream. Also provides an additional caller-defined context.</param>
+        protected PipelineException(
+            SerializationInfo serializationInfo,
+            StreamingContext streamingContext
+            )
+        {
+        }
 
-        public string Name { get; set; }
+        /// <summary>
+        /// Initializes a new instance of the PipelineException class with the specified error message.
+        /// </summary>
+        /// <param name="message">A message that describes the error.</param>
+        public PipelineException(
+            string message
+            )
+        {
+        }
 
-        public OpaqueDataDictionary OpaqueData { get { return opaqueData; } }
+        /// <summary>
+        /// Initializes a new instance of the PipelineException class with the specified error message and a reference to the inner exception that is the cause of this exception.
+        /// </summary>
+        /// <param name="message">A message that describes the error.</param>
+        /// <param name="innerException">The exception that is the cause of the current exception. If innerException is not a null reference, the current exception is raised in a catch block that handles the inner exception.</param>
+        public PipelineException(
+            string message,
+            Exception innerException
+            )
+        {
+        }
 
-        public ContentItem()
+        /// <summary>
+        /// Initializes a new instance of the PipelineException class with the specified error message.
+        /// </summary>
+        /// <param name="message">A message that describes the error.</param>
+        /// <param name="messageArgs">Array of strings specifying message-related arguments.</param>
+        public PipelineException(
+            string message,
+            params Object[] messageArgs
+            )
+            : base(String.Format(message, messageArgs))
         {
         }
     }

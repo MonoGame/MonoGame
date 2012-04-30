@@ -42,14 +42,22 @@
   <ItemGroup>
     <Compile Include="ContentBuildLogger.cs" />
     <Compile Include="ContentIdentity.cs" />
+    <Compile Include="ContentImporterAttribute.cs" />
     <Compile Include="ContentItem.cs" />
+    <Compile Include="ContentProcessorAttribute.cs" />
     <Compile Include="ContentProcessorContext.cs" />
     <Compile Include="ExternalReference.cs" />
     <Compile Include="IContentProcessor.cs" />
+    <Compile Include="InvalidContentException.cs" />
     <Compile Include="NamedValueDictionary.cs" />
     <Compile Include="OpaqueDataDictionary.cs" />
+    <Compile Include="PipelineComponentScanner.cs" />
+    <Compile Include="PipelineException.cs" />
+    <Compile Include="ProcessorParameter.cs" />
+    <Compile Include="ProcessorParameterCollection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TargetPlatform.cs" />
+    <Compile Include="VideoContent.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.Windows.csproj">

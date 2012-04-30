@@ -38,20 +38,16 @@
  */
 #endregion License
 
+using System;
+using System.Collections.ObjectModel;
+
 namespace Microsoft.Xna.Framework.Content.Pipeline
 {
-    public class ContentItem
+    /// <summary>
+    /// Represents a collection of processor parameters, usually for a single processor. This class is primarily designed for internal use or for custom processor developers.
+    /// </summary>
+    [SerializableAttribute]
+    public sealed class ProcessorParameterCollection : ReadOnlyCollection<ProcessorParameter>
     {
-        OpaqueDataDictionary opaqueData = new OpaqueDataDictionary();
-
-        public ContentIdentity Identity { get; set; }
-
-        public string Name { get; set; }
-
-        public OpaqueDataDictionary OpaqueData { get { return opaqueData; } }
-
-        public ContentItem()
-        {
-        }
     }
 }

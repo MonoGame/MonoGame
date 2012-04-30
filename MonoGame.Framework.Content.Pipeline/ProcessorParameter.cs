@@ -38,20 +38,50 @@
  */
 #endregion License
 
+using System;
+using System.Collections.ObjectModel;
+
 namespace Microsoft.Xna.Framework.Content.Pipeline
 {
-    public class ContentItem
+    /// <summary>
+    /// Represents a processor parameter. Processor parameters are automatically discovered by the content pipeline. Therefore, only custom processor developers should use this class directly.
+    /// </summary>
+    [SerializableAttribute]
+    public sealed class ProcessorParameter
     {
-        OpaqueDataDictionary opaqueData = new OpaqueDataDictionary();
+        /// <summary>
+        /// Default value of the processor parameter.
+        /// </summary>
+        public Object DefaultValue { get; set; }
 
-        public ContentIdentity Identity { get; set; }
+        /// <summary>
+        /// Description of the parameter, as specified by the [Description] attribute.
+        /// </summary>
+        public string Description { get; set; }
 
-        public string Name { get; set; }
+        /// <summary>
+        /// Name of the parameter displayed in the designer, as specified by the [DisplayName] attribute.
+        /// </summary>
+        public string DisplayName { get; set; }
 
-        public OpaqueDataDictionary OpaqueData { get { return opaqueData; } }
+        /// <summary>
+        /// Gets a value indicating whether the parameter is an enumeration.
+        /// </summary>
+        public bool IsEnum { get; }
 
-        public ContentItem()
-        {
-        }
+        /// <summary>
+        /// Available options for enumerated type parameters. For parameters of other types, this value is null.
+        /// </summary>
+        public ReadOnlyCollection<string> PossibleEnumValues { get; }
+
+        /// <summary>
+        /// Name of the property, as defined in the C# code.
+        /// </summary>
+        public string PropertyName { get; }
+
+        /// <summary>
+        /// Type of the parameter.
+        /// </summary>
+        public string PropertyType { get; }
     }
 }

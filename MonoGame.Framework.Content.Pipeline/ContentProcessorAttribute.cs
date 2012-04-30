@@ -38,19 +38,24 @@
  */
 #endregion License
 
+using System;
+
 namespace Microsoft.Xna.Framework.Content.Pipeline
 {
-    public class ContentItem
+    /// <summary>
+    /// Gets any existing content processor components.
+    /// </summary>
+    public class ContentProcessorAttribute : Attribute
     {
-        OpaqueDataDictionary opaqueData = new OpaqueDataDictionary();
+        /// <summary>
+        /// Gets or sets the string representing the processor in a user interface. This name is not used by the content pipeline and should not be passed to the BuildAssets task (a custom MSBuild task used by XNA Game Studio). It is used for display purposes only.
+        /// </summary>
+        public virtual string DisplayName { get; set; }
 
-        public ContentIdentity Identity { get; set; }
-
-        public string Name { get; set; }
-
-        public OpaqueDataDictionary OpaqueData { get { return opaqueData; } }
-
-        public ContentItem()
+        /// <summary>
+        /// Initializes an instance of ContentProcessorAttribute.
+        /// </summary>
+        public ContentProcessorAttribute()
         {
         }
     }

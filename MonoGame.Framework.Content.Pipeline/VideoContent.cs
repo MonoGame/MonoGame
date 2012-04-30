@@ -38,20 +38,94 @@
  */
 #endregion License
 
+using System;
+using Microsoft.Xna.Framework.Media;
+
 namespace Microsoft.Xna.Framework.Content.Pipeline
 {
-    public class ContentItem
+    /// <summary>
+    /// Provides a base class for all video objects.
+    /// </summary>
+    public class VideoContent : ContentItem, IDisposable
     {
-        OpaqueDataDictionary opaqueData = new OpaqueDataDictionary();
+        bool disposed;
 
-        public ContentIdentity Identity { get; set; }
+        /// <summary>
+        /// Gets the bit rate for this video.
+        /// </summary>
+        public int BitsPerSecond { get; }
 
-        public string Name { get; set; }
+        /// <summary>
+        /// Gets the duration of this video.
+        /// </summary>
+        public TimeSpan Duration { get; }
 
-        public OpaqueDataDictionary OpaqueData { get { return opaqueData; } }
+        /// <summary>
+        /// Gets or sets the file name for this video.
+        /// </summary>
+        [ContentSerializerAttribute]
+        public string Filename { get; set; }
 
-        public ContentItem()
+        /// <summary>
+        /// Gets the frame rate for this video.
+        /// </summary>
+        public float FramesPerSecond { get; }
+
+        /// <summary>
+        /// Gets the height of this video.
+        /// </summary>
+        public int Height { get; }
+
+        /// <summary>
+        /// Gets or sets the type of soundtrack accompanying the video.
+        /// </summary>
+        [ContentSerializerAttribute]
+        public VideoSoundtrackType VideoSoundtrackType { get; set; }
+
+        /// <summary>
+        /// Gets the width of this video.
+        /// </summary>
+        public int Width { get; }
+
+        /// <summary>
+        /// Initializes a new copy of the VideoContent class for the specified video file.
+        /// </summary>
+        /// <param name="filename">The file name of the video to import.</param>
+        public VideoContent(
+            string filename
+            )
         {
+            // TODO: Open video and fill in properties
+            // ...
+        }
+
+        ~VideoContent()
+        {
+            Dispose(false);
+        }
+
+        /// <summary>
+        /// Immediately releases the unmanaged resources used by this object.
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposed)
+            {
+                if (disposing)
+                {
+                    // TODO: Free managed resources here
+                    // ...
+                }
+                // TODO: Free unmanaged resources here
+                // ...
+                disposed = true;
+            }
         }
     }
 }
