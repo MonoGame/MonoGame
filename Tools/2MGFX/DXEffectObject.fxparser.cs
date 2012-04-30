@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Diagnostics;
 using System.Collections.Generic;
 
@@ -22,7 +23,37 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <returns>A DXEffectObject for use at runtime.</returns>
         public static DXEffectObject FromCompiledD3DXEffect(byte[] effectCode)
         {
-            return new DXEffectObject(effectCode);
+            var effect = new DXEffectObject(effectCode);
+
+            // Do some fixups and cleanup.
+                        
+            // Remove unsupported types from the parameter lists!
+            var parameters = new List<d3dx_parameter>();
+            var samplers = new Dictionary<string,d3dx_parameter>();
+            foreach (var param in effect.Parameters)
+            {
+                if (param.type > D3DXPARAMETER_TYPE.TEXTURECUBE)
+                {
+                    // Store the samplers so we can fix up the shaders.
+                    if (    param.type >= D3DXPARAMETER_TYPE.SAMPLER &&
+                            param.type <= D3DXPARAMETER_TYPE.SAMPLERCUBE)
+                        samplers.Add(param.name,param);
+
+                    // These extended types we do not
+                    // store as parameters!
+                    continue;
+                }
+
+                parameters.Add(param);
+            }
+            effect.Parameters = parameters.ToArray();
+
+            // Fix up the samplers in the shaders to 
+            // include the parameter name.
+            foreach (var shader in effect.Shaders)
+                shader.SetSamplerParameters(samplers);
+
+            return effect;
         }
 
 		private DXEffectObject(byte[] effectCode)
@@ -42,6 +73,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 
             var startoffset = BitConverter.ToUInt32(effectCode, (int)(baseOffset - 4));
+
+            // Initialize the list of unique shaders.
+            Shaders = new List<DXShader>();
 
 			using (var stream = new MemoryStream(effectCode, (int)baseOffset, (int)(effectCode.Length-baseOffset)))
             using (var reader = new BinaryReader(stream))
@@ -92,7 +126,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			return r;
 		}
 		
-		private static void parse_data(BinaryReader reader, d3dx_parameter param)
+		private void parse_data(BinaryReader reader, d3dx_parameter param)
 		{
 			switch (param.type)
 			{
@@ -110,10 +144,26 @@ namespace Microsoft.Xna.Framework.Graphics
             case D3DXPARAMETER_TYPE.PIXELSHADER:
                 var size = (int)reader.ReadUInt32();
                 var bytecode = reader.ReadBytes((size + 3) & ~3); // DWORD aligned!
-                param.data = new DXShader(bytecode);
+                var index = CreateShader(bytecode);
+                param.data = index;
 				break;
 			}
 		}
+
+        private int CreateShader(byte[] bytecode)
+        {
+            // First look to see if we already created this same shader.
+            foreach (var shader in Shaders)
+            {
+                if (bytecode.SequenceEqual(shader.Bytecode))
+                    return shader.SharedIndex;
+            }
+
+            // Create a new shader.
+            var dxShader = new DXShader(bytecode, Shaders.Count);
+            Shaders.Add(dxShader);
+            return dxShader.SharedIndex;
+        }
 
         private void parse_resource(BinaryReader reader)
 		{

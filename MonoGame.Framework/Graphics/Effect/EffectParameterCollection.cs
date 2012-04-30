@@ -7,7 +7,17 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public class EffectParameterCollection : IEnumerable<EffectParameter>
     {
-        internal List<EffectParameter> _parameters = new List<EffectParameter>();
+        private List<EffectParameter> _parameters = new List<EffectParameter>();
+
+        internal EffectParameterCollection()
+        {
+        }
+
+        internal EffectParameterCollection(EffectParameterCollection cloneSource)
+        {
+            foreach (var parameter in cloneSource)
+                Add(new EffectParameter(parameter));
+        }
 
         public int Count
         {
@@ -21,12 +31,15 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		public EffectParameter this[string name]
         {
-            get {
-				foreach (EffectParameter parameter in _parameters) {
-					if (parameter != null && parameter.Name == name) {
+            get 
+            {
+                // TODO: Add a name to parameter lookup table.
+				foreach (var parameter in _parameters) 
+                {
+					if (parameter != null && parameter.Name == name) 
 						return parameter;
-					}
 				}
+
 				return null;
 			}
         }
