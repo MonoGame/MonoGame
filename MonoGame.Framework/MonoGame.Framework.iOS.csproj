@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -13,15 +13,13 @@
     <SynchReleaseVersion>false</SynchReleaseVersion>
     <ReleaseVersion>1.6</ReleaseVersion>
     <MtouchSdkVersion>3.0</MtouchSdkVersion>
-    <TargetFrameworkVersion>v1.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhoneSimulator' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\iPhoneSimulator\Debug</OutputPath>
-    <DefineConstants>DEBUG;IPHONE;GLES;OPENGL;NOMOJO</DefineConstants>
+    <DefineConstants>DEBUG;IPHONE;GLES;OPENGL</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CustomCommands>
@@ -42,7 +40,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DefineConstants>IPHONE;GLES;OPENGL;NOMOJO</DefineConstants>
+    <DefineConstants>IPHONE;GLES;OPENGL</DefineConstants>
     <AssemblyName>MonoGame.Framework.iOS</AssemblyName>
     <MtouchUseArmv7>false</MtouchUseArmv7>
   </PropertyGroup>
@@ -51,7 +49,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\iPhone\Debug</OutputPath>
-    <DefineConstants>DEBUG;IPHONE;GLES;OPENGL;NOMOJO</DefineConstants>
+    <DefineConstants>DEBUG;IPHONE;GLES;OPENGL</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
@@ -67,7 +65,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DefineConstants>IPHONE;GLES;OPENGL;NOMOJO</DefineConstants>
+    <DefineConstants>IPHONE;GLES;OPENGL</DefineConstants>
     <AssemblyName>MonoGame.Framework</AssemblyName>
     <MtouchUseArmv7>false</MtouchUseArmv7>
   </PropertyGroup>
@@ -351,7 +349,6 @@
     <Compile Include="Graphics\Effect\EffectAnnotation.cs" />
     <Compile Include="Graphics\Effect\EffectAnnotationCollection.cs" />
     <Compile Include="Graphics\Effect\EffectHelpers.cs" />
-    <Compile Include="Graphics\Effect\GLSLOptimizer.cs" />
     <Compile Include="Graphics\Effect\MojoShader.cs" />
     <Compile Include="Graphics\Effect\SpriteEffect.cs" />
     <Compile Include="Graphics\GraphicsAdapter.cs" />
@@ -374,8 +371,6 @@
     <Compile Include="Graphics\ModelMeshPartCollection.cs" />
     <Compile Include="Graphics\CubeMapFace.cs" />
     <Compile Include="Graphics\Texture2D.cs" />
-    <Compile Include="Graphics\Effect\GLSLEffectObject.cs" />
-    <Compile Include="Graphics\Effect\GLSLShader.cs" />
     <Compile Include="Graphics\CompareFunction.cs" />
     <Compile Include="Graphics\StencilOperation.cs" />
     <Compile Include="Graphics\PackedVector\NormalizedShort2.cs" />
@@ -447,6 +442,8 @@
     <Compile Include="iOS\GamerServices\KeyboardInputView.cs" />
     <Compile Include="iOS\GamerServices\KeyboardInputAsyncResult.cs" />
     <Compile Include="iOS\iOSGameWindow.cs" />
+    <Compile Include="Graphics\Effect\DXEffectObject.runtime.cs" />
+    <Compile Include="Graphics\Effect\DXPreshader.runtime.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
@@ -459,7 +456,13 @@
     </MonoDevelop>
   </ProjectExtensions>
   <ItemGroup>
+    <Folder Include="Graphics\" />
+    <Folder Include="iOS\GamerServices\" />
+    <Folder Include="iOS\Input\" />
     <Folder Include="iOS\Audio\" />
+    <Folder Include="iOS\Media\" />
+    <Folder Include="iOS\Net\" />
+    <Folder Include="Graphics\Effect\Resources\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.iOS.csproj">
@@ -468,71 +471,11 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Graphics\Effect\AlphaTestEffect.bin" />
-    <EmbeddedResource Include="Graphics\Effect\BasicEffect.bin" />
-    <EmbeddedResource Include="Graphics\Effect\DualTextureEffect.bin" />
-    <EmbeddedResource Include="Graphics\Effect\EnvironmentMapEffect.bin" />
-    <EmbeddedResource Include="Graphics\Effect\SkinnedEffect.bin" />
-    <EmbeddedResource Include="Graphics\Effect\SpriteEffect.bin" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect\PSAlphaTestEqNe.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect\PSAlphaTestEqNeNoFog.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect\PSAlphaTestLtGt.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect\PSAlphaTestLtGtNoFog.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect\VSAlphaTest.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect\VSAlphaTestNoFog.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect\VSAlphaTestVc.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect\VSAlphaTestVcNoFog.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\PSBasic.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\PSBasicNoFog.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\PSBasicPixelLighting.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\PSBasicPixelLightingTx.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\PSBasicTx.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\PSBasicTxNoFog.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\PSBasicVertexLighting.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\PSBasicVertexLightingNoFog.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\PSBasicVertexLightingTx.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\PSBasicVertexLightingTxNoFog.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\VSBasic.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\VSBasicNoFog.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\VSBasicOneLight.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\VSBasicOneLightTx.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\VSBasicOneLightTxVc.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\VSBasicOneLightVc.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\VSBasicPixelLighting.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\VSBasicPixelLightingTx.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\VSBasicPixelLightingTxVc.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\VSBasicPixelLightingVc.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\VSBasicTx.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\VSBasicTxNoFog.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\VSBasicTxVc.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\VSBasicTxVcNoFog.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\VSBasicVc.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\VSBasicVcNoFog.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\VSBasicVertexLighting.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\VSBasicVertexLightingTx.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\VSBasicVertexLightingTxVc.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\VSBasicVertexLightingVc.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\DualTextureEffect\PSDualTexture.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\DualTextureEffect\PSDualTextureNoFog.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\DualTextureEffect\VSDualTexture.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\DualTextureEffect\VSDualTextureNoFog.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\DualTextureEffect\VSDualTextureVc.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\DualTextureEffect\VSDualTextureVcNoFog.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\SpriteEffect\PSSprite.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\SpriteEffect\VSSprite.glsl" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Graphics\Effect\AlphaTestEffectGLSL.bin" />
-    <None Include="Graphics\Effect\BasicEffectGLSL.bin" />
-    <None Include="Graphics\Effect\DualTextureEffectGLSL.bin" />
-    <None Include="Graphics\Effect\EnvironmentMapEffectGLSL.bin" />
-    <None Include="Graphics\Effect\SkinnedEffectGLSL.bin" />
-    <None Include="Graphics\Effect\SpriteEffectGLSL.bin" />
-  </ItemGroup>
-  <ItemGroup>
-    <NativeReference Include="..\ThirdParty\Libs\libmojoshader.dylib">
-      <IsCxx>false</IsCxx>
-      <Kind>Static</Kind>
-    </NativeReference>
+    <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect.mgfx" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect.mgfx" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\DualTextureEffect.mgfx" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\EnvironmentMapEffect.mgfx" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\SkinnedEffect.mgfx" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\SpriteEffect.mgfx" />
   </ItemGroup>
 </Project>
