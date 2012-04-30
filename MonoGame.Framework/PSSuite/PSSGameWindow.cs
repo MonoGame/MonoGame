@@ -49,12 +49,14 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
 
 using Sce.Pss.Core;
+using Sce.Pss.Core.Graphics;
 #endregion Using Statements
 
 namespace Microsoft.Xna.Framework
 {
-    public class PSSGameWindow
+    public class PSSGameWindow : GameWindow
     {
+		private GraphicsContext _graphics;
 		private Rectangle clientBounds;
 		private Game _game;
 		private GameTime _updateGameTime;
@@ -65,7 +67,7 @@ namespace Microsoft.Xna.Framework
 		// TODO private GestureDetector gesture = null;
 		private bool _needsToResetElapsedTime = false;
 		private bool _isFirstTime = true;
-		private TimeSpan _extraElapsedTime;		
+		private TimeSpan _extraElapsedTime;
 
         public PSSGameWindow(Game game)
         {
@@ -75,9 +77,8 @@ namespace Microsoft.Xna.Framework
 						
         private void Initialize()
         {
-            
-			this.Closed +=	new EventHandler<EventArgs>(GameWindow_Closed);            
-			clientBounds = new Rectangle(0, 0, Context.Resources.DisplayMetrics.WidthPixels, Context.Resources.DisplayMetrics.HeightPixels);
+			_graphics = new GraphicsContext();
+			clientBounds = new Rectangle(0, 0, _graphics.Screen.Width, _graphics.Screen.Height);
 
             // Initialize GameTime
             _updateGameTime = new GameTime();
@@ -85,22 +86,26 @@ namespace Microsoft.Xna.Framework
 
             // Initialize _lastUpdate
             _lastUpdate = DateTime.Now;
-					
-			gesture = new GestureDetector(new GestureListener((AndroidGameActivity)this.Context));
 			
-            this.RequestFocus();
-            this.FocusableInTouchMode = true;
-
-            this.SetOnTouchListener(this);
+			//TODO gesture = new GestureDetector(new GestureListener((AndroidGameActivity)this.Context));
         }
 
 		public void ResetElapsedTime ()
 		{
 			_needsToResetElapsedTime = true;
 		}
+
+		public void Close ()
+		{
+			if (_graphics != null)
+			{
+				_graphics.Dispose();
+				_graphics = null;
+			}
+		}
 		
 		void GameWindow_Closed(object sender,EventArgs e)
-        {        
+        {
 			try
 			{
         		_game.Exit();
@@ -111,70 +116,16 @@ namespace Microsoft.Xna.Framework
 			}
 		}
 
-        public override bool OnKeyDown(Keycode keyCode, KeyEvent e)
-        {
-            Keyboard.KeyDown(keyCode);
-            // we need to handle the Back key here because it doesnt work any other way
-            if (keyCode == Keycode.Back) //_game.Exit();
-                GamePad.Instance.SetBack();
-
-            if (keyCode == Keycode.VolumeUp)
-                Sound.IncreaseMediaVolume();
-
-            if (keyCode == Keycode.VolumeDown)
-                Sound.DecreaseMediaVolume();
-
-            return true;
-        }
-
-        public override bool OnKeyUp(Keycode keyCode, KeyEvent e)
-        {
-            Keyboard.KeyUp(keyCode);
-            return true;
-        }
-
         ~PSSGameWindow()
 		{
 			//
 		}
 		
-		protected override void CreateFrameBuffer()
-		{	    
-#if true			
-			try
-            {
-                GLContextVersion = GLContextVersion.Gles2_0;
-				base.CreateFrameBuffer();
-		    } 
-			catch (Exception) 
-#endif			
-			{
-		        //device doesn't support OpenGLES 2.0; retry with 1.1:
-                GLContextVersion = GLContextVersion.Gles1_1;
-				base.CreateFrameBuffer();
-		    }
-            if (_game.GraphicsDevice != null)
-            {
-                _game.GraphicsDevice.Initialize();
-                if (!GraphicsContext.IsCurrent)
-                    MakeCurrent();
-            }
-		}
-	
 
         #region AndroidGameView Methods
 
-        protected override void OnRenderFrame(FrameEventArgs e)
+        internal void OnRenderFrame()
         {
-            base.OnRenderFrame(e);
-            
-            if (GraphicsContext == null || GraphicsContext.IsDisposed)
-                return;
-
-            //Should not happen at all..
-            if (!GraphicsContext.IsCurrent)
-                MakeCurrent();
-
             if (_game != null) {
                 _drawGameTime.Update(_now - _lastUpdate);                
                 _game.DoDraw(_drawGameTime);
@@ -182,21 +133,18 @@ namespace Microsoft.Xna.Framework
             }
             try
             {
-                SwapBuffers();
+                _graphics.SwapBuffers();
             }
             catch(Exception ex)
             {
-                Android.Util.Log.Error("Error in swap buffers", ex.ToString());
+                Console.WriteLine("Error in swap buffers", ex.ToString());
             }
         }
 
-        protected override void OnUpdateFrame(FrameEventArgs e)
-		{			
-			base.OnUpdateFrame(e);
-			
+        internal void OnUpdateFrame()
+		{
 			if (_game != null )
 			{
-                //ObserveDeviceRotation();				
 				_now = DateTime.Now;
 				
 				if (_isFirstTime) {
@@ -211,7 +159,6 @@ namespace Microsoft.Xna.Framework
 					_drawGameTime.ResetElapsedTime();
 					_needsToResetElapsedTime = false;
 				}
-				
 				
 				_updateGameTime.Update(_now - _lastUpdate);
 				
@@ -231,126 +178,68 @@ namespace Microsoft.Xna.Framework
 				else {
 					_game.DoUpdate (_updateGameTime);
 				}
-								
 			}
 		}
 		
 		#endregion
 		
+		#region GameWindow Overrides
+		protected internal override void SetSupportedOrientations(DisplayOrientation orientations)
+		{
+			// Do nothing.  PSS doesn't do orientation.
+		}
+
+		public override void BeginScreenDeviceChange(bool willBeFullScreen)
+		{
+		}
+		
+		public override void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight)
+		{
+		}
+
+		protected override void SetTitle(string title)
+		{
+			//FIXME window.Title = title;
+		}
+		
+		public override bool AllowUserResizing
+		{
+			get 
+			{
+				return false;
+			}
+			set 
+			{
+				// Do nothing; Ignore rather than raising and exception
+			}
+		}
+
+		public override Rectangle ClientBounds 
+		{
+			get 
+			{
+				return clientBounds;
+			}
+		}
+		
+		public override DisplayOrientation CurrentOrientation
+		{
+			get { return DisplayOrientation.LandscapeLeft; }
+		}
+		
+		public override IntPtr Handle { get { return IntPtr.Zero; } }
+		
+		public override string ScreenDeviceName { get { return ""; } } //FIXME
+		#endregion
 		
 
-        internal void SetOrientation(DisplayOrientation currentorientation)
-        {
-            var deviceManager = (IGraphicsDeviceManager)_game.Services.GetService(typeof(IGraphicsDeviceManager));
-            if (deviceManager == null)
-                return;
-
-            // Calculate supported orientations if it has been left as "default" and only default
-            DisplayOrientation supportedOrientations = (deviceManager as GraphicsDeviceManager).SupportedOrientations;					
-			var allowedOrientation = DisplayOrientation.LandscapeLeft; 				
-			if ((supportedOrientations == DisplayOrientation.Default))
-			{
-			  // if we have default only we only allow Landscape
-			  allowedOrientation = allowedOrientation | DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight; 				
-			}
-			if ((supportedOrientations == DisplayOrientation.LandscapeLeft))
-			{
-			  // if we have default only we only allow Landscape
-			  allowedOrientation = DisplayOrientation.LandscapeLeft; 				
-			}
-			if ((supportedOrientations & DisplayOrientation.LandscapeLeft) != 0)
-			{
-			  // if we have default only we only allow Landscape
-			  allowedOrientation = allowedOrientation | DisplayOrientation.LandscapeLeft; 				
-			}
-			if ((supportedOrientations == DisplayOrientation.LandscapeRight))
-			{
-			  // if we have default only we only allow Landscape
-			  allowedOrientation = DisplayOrientation.LandscapeRight; 				
-			}
-			if ((supportedOrientations & DisplayOrientation.LandscapeRight) != 0)
-			{
-			  // if we have default only we only allow Landscape
-			  allowedOrientation = allowedOrientation | DisplayOrientation.LandscapeRight; 				
-			}
-			if ((supportedOrientations == DisplayOrientation.Portrait))
-			{
-			  // if we have Portrait only we only allow Landscape
-			  allowedOrientation = DisplayOrientation.Portrait; 				
-			}
-			if ((supportedOrientations & DisplayOrientation.Portrait) != 0)
-			{
-			  // if we have default only we only allow Landscape
-			  allowedOrientation = allowedOrientation | DisplayOrientation.Portrait; 				
-			}
-			
-			// ok we default to landscape left
-			var actualOrientation = DisplayOrientation.LandscapeLeft;
-			// now based on the  orientation of the device we 
-			// decide of we honour the device orientation or force our own
-			
-			// so if we are in Portrait but we allow only LandScape we stay in landscape
-			if (allowedOrientation == DisplayOrientation.Portrait)
-			{
-				actualOrientation = DisplayOrientation.Portrait;
-			}
-			else
-			if (allowedOrientation == DisplayOrientation.LandscapeLeft)
-			{
-				actualOrientation = DisplayOrientation.LandscapeLeft;
-			}
-			else
-			if (allowedOrientation == DisplayOrientation.LandscapeRight)
-			{
-				actualOrientation = DisplayOrientation.LandscapeRight;
-			}	
-			/*else 
-			if (_game.GraphicsDevice.PresentationParameters.BackBufferHeight < _game.GraphicsDevice.PresentationParameters.BackBufferWidth)
-			{
-				actualOrientation = DisplayOrientation.LandscapeLeft;
-			}
-			else 
-			if (_game.GraphicsDevice.PresentationParameters.BackBufferHeight > _game.GraphicsDevice.PresentationParameters.BackBufferWidth)
-			{
-				actualOrientation = DisplayOrientation.Portrait;
-			}*/
-			
-            switch (currentorientation) {
-
-			case DisplayOrientation.Portrait:
-                    if ((allowedOrientation & DisplayOrientation.Portrait) != 0) {
-                        actualOrientation = DisplayOrientation.Portrait;
-                    }
-                    break;
-				case DisplayOrientation.LandscapeRight:	
-				    if ((allowedOrientation & DisplayOrientation.LandscapeRight) != 0) {
-                        actualOrientation = DisplayOrientation.LandscapeRight;
-                    }				    
-				    break;
-                case DisplayOrientation.LandscapeLeft:				     
-                default:
-					if ((allowedOrientation & DisplayOrientation.LandscapeLeft) != 0) {
-				    	actualOrientation = DisplayOrientation.LandscapeLeft;
-					}
-                    break;
-            }
-			
-			
-			CurrentOrientation = actualOrientation;
-            if (_game.GraphicsDevice != null)
-            {
-                _game.GraphicsDevice.PresentationParameters.DisplayOrientation = actualOrientation;
-            }
-            TouchPanel.DisplayOrientation = actualOrientation;
-        }
-
         private Dictionary<IntPtr, TouchLocation> _previousTouches = new Dictionary<IntPtr, TouchLocation>();
-
+		/* TODO
 		#region IOnTouchListener implementation
 		public bool OnTouch (View v, MotionEvent e)
         {
 			return OnTouchEvent(e);
-            }
+		}
 		#endregion
 
         internal void UpdateTouchPosition(ref Vector2 position)
@@ -441,69 +330,7 @@ namespace Microsoft.Xna.Framework
 
             return true;
         }
-        
-        public string ScreenDeviceName 
-		{
-			get 
-			{
-				throw new System.NotImplementedException ();
-			}
-		}
-   
-
-        public Rectangle ClientBounds 
-		{
-			get 
-			{
-				return clientBounds;
-			}
-		}
-		
-		public bool AllowUserResizing 
-		{
-			get 
-			{
-				return false;
-			}
-			set 
-			{
-				// Do nothing; Ignore rather than raising and exception
-			}
-		}
-        
-		public DisplayOrientation CurrentOrientation 
-		{
-            get
-            {
-                return _currentOrientation;
-            }
-            private set
-            {
-                if (value != _currentOrientation)
-                {
-                    _currentOrientation = value;
-
-                    if (_currentOrientation == DisplayOrientation.Portrait || _currentOrientation == DisplayOrientation.PortraitUpsideDown)
-				    {
-                        Game.Activity.SetRequestedOrientation(ScreenOrientation.Portrait);						
-				    }
-                    else if (_currentOrientation == DisplayOrientation.LandscapeLeft || _currentOrientation == DisplayOrientation.LandscapeRight)
-				    {
-                        Game.Activity.SetRequestedOrientation(ScreenOrientation.Landscape);						
-				    }	
-
-                    if (OrientationChanged != null)
-                    {
-                        OrientationChanged(this, EventArgs.Empty);
-                    }
-                }
-            }
-		}
-
-        public event EventHandler<EventArgs> OrientationChanged;
-		public event EventHandler ClientSizeChanged;
-		public event EventHandler ScreenDeviceNameChanged;
-
+        */
     }
 }
 

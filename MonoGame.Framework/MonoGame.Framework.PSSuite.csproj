@@ -133,7 +133,6 @@
     <Compile Include="Graphics\RenderTarget.cs" />
     <Compile Include="Graphics\SurfaceFormat.cs" />
     <Compile Include="Graphics\MultiSampleType.cs" />
-    <Compile Include="Graphics\SwapEffect.cs" />
     <Compile Include="Graphics\RenderTargetUsage.cs" />
     <Compile Include="Graphics\TextureUsage.cs" />
     <Compile Include="Graphics\SetDataOptions.cs" />
@@ -287,7 +286,6 @@
     <Compile Include="PSSuite\GamerServices\SignedInGamer.cs" />
     <Compile Include="PSSuite\Media\Song.cs" />
     <Compile Include="PSSuite\Media\Video.cs" />
-    <Compile Include="PSSuite\Media\VideoPlayer.cs" />
     <Compile Include="PSSuite\Input\Touch\GestureListener.cs" />
     <Compile Include="PSSuite\Input\Accelerometer.cs" />
     <Compile Include="PSSuite\Input\AccelerometerCapabilities.cs" />
@@ -306,7 +304,6 @@
     <Compile Include="Game.cs" />
     <Compile Include="Graphics\Effect\EffectAnnotationCollection.cs" />
     <Compile Include="Graphics\Effect\DXEffectObject.cs" />
-    <Compile Include="Graphics\Effect\GLSLEffectObject.cs" />
     <Compile Include="Graphics\Effect\EffectAnnotation.cs" />
     <Compile Include="Graphics\Vertices\VertexDeclaration.cs" />
     <Compile Include="Graphics\RenderTarget2D.cs" />
@@ -316,8 +313,39 @@
     <Compile Include="Graphics\Effect\DXShader.cs" />
     <Compile Include="Graphics\Vertices\IndexBuffer.cs" />
     <Compile Include="Graphics\Vertices\VertexBuffer.cs" />
-    <Compile Include="Graphics\Effect\GLSLShader.cs" />
     <Compile Include="LaunchParameters.cs" />
+    <Compile Include="Input\MouseState.cs" />
+    <Compile Include="GameWindow.cs" />
+    <Compile Include="GraphicsDeviceManager.cs" />
+    <Compile Include="Graphics\PresentInterval.cs" />
+    <Compile Include="Graphics\SpriteBatcher.cs" />
+    <Compile Include="Graphics\CubeMapFace.cs" />
+    <Compile Include="Graphics\Effect\DXEffectObject.runtime.cs" />
+    <Compile Include="Graphics\Effect\DXPreshader.cs" />
+    <Compile Include="Graphics\Effect\DXPreshader.runtime.cs" />
+    <Compile Include="Graphics\Effect\MojoShader.cs" />
+    <Compile Include="Storage\StorageDeviceHelper.cs" />
+    <Compile Include="Content\ContentReaders\BasicEffectReader.cs" />
+    <Compile Include="Content\ContentReaders\BoundingBoxReader.cs" />
+    <Compile Include="Content\ContentReaders\BoundingFrustumReader.cs" />
+    <Compile Include="Content\ContentReaders\BoundingSphereReader.cs" />
+    <Compile Include="Content\ContentReaders\ByteReader.cs" />
+    <Compile Include="Content\ContentReaders\DateTimeReader.cs" />
+    <Compile Include="Content\ContentReaders\DecimalReader.cs" />
+    <Compile Include="Content\ContentReaders\IndexBufferReader.cs" />
+    <Compile Include="Content\ContentReaders\MatrixReader.cs" />
+    <Compile Include="Content\ContentReaders\RayReader.cs" />
+    <Compile Include="Content\ContentReaders\SByteReader.cs" />
+    <Compile Include="Content\ContentReaders\Texture2DReader.cs" />
+    <Compile Include="Content\ContentReaders\Vector4Reader.cs" />
+    <Compile Include="Content\ContentReaders\AlphaTestEffectReader.cs" />
+    <Compile Include="Content\ContentReaders\VertexBufferReader.cs" />
+    <Compile Include="Graphics\Effect\BasicEffect.cs" />
+    <Compile Include="Threading.cs" />
+    <Compile Include="Graphics\Effect\DXExpression.cs" />
+    <Compile Include="Graphics\GraphicsExtensions.cs" />
+    <Compile Include="Content\ContentExtensions.cs" />
+    <Compile Include="Content\ContentReaders\EffectReader.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="PSSuite\" />

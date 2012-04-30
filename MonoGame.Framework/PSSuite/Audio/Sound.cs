@@ -1,16 +1,18 @@
 using System;
 
+using PssSound = Sce.Pss.Core.Audio.Sound;
 using Sce.Pss.Core.Audio;
 
 namespace Microsoft.Xna.Framework.Audio
 {
+	/// <summary>
+	/// Pause,Resume,Duration,CurrentPosition are unsupported on PSS
+	/// </summary>
     internal class Sound : IDisposable
     {
-		private Sound _sound;
+		private PssSound _sound;
         private SoundPlayer _soundPlayer;
 		
-		
-
         ~Sound()
         {
             Dispose();
@@ -25,10 +27,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         public void Resume()
         {
-            if (_soundId != 0)
-            {
-                s_soundPool.Resume(_soundId);
-            }
+			Play();
         }
 
         public float Volume { get; set; }
@@ -50,7 +49,7 @@ namespace Microsoft.Xna.Framework.Audio
         {
             get
             {
-                return _soundPlayer.Status == SoundStatus.Playing; // cant get this from soundpool.
+                return _soundPlayer.Status == SoundStatus.Playing;
             }
         }
 
@@ -85,8 +84,8 @@ namespace Microsoft.Xna.Framework.Audio
 
         public Sound(string filename, float volume, bool looping)
         {
-			_sound = new Sound(filename);
-            _soundPlayer = sound.CreatePlayer();           
+			_sound = new PssSound(filename);
+            _soundPlayer = _sound.CreatePlayer();           
 
             this.Looping = looping;
             this.Volume = volume;
@@ -94,8 +93,8 @@ namespace Microsoft.Xna.Framework.Audio
 
         public Sound(byte[] audiodata, float volume, bool looping)
         {
-			_sound = new Sound(audiodata);
-            _soundPlayer = sound.CreatePlayer();           
+			_sound = new PssSound(audiodata);
+            _soundPlayer = _sound.CreatePlayer();           
 
             this.Looping = looping;
             this.Volume = volume;

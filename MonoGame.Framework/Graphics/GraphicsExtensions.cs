@@ -27,7 +27,7 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public static class GraphicsExtensions
     {
-#if !WINRT
+#if !WINRT && !PSS
         public static All OpenGL11(CullMode cull)
         {
             switch (cull)
