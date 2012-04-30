@@ -11,6 +11,12 @@ using SharpDX;
 using SharpDX.Direct3D;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
+#elif PSS
+enum ShaderType //FIXME: Major Hack
+{
+	VertexShader,
+	FragmentShader
+}
 #elif GLES
 using System.Text;
 using OpenTK.Graphics.ES20;
