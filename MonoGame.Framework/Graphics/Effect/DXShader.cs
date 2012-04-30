@@ -6,6 +6,12 @@ using System.IO;
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
+#elif PSS
+enum ShaderType //FIXME: Major Hack
+{
+	VertexShader,
+	FragmentShader
+}
 #else
 using System.Text;
 using OpenTK.Graphics.ES20;
