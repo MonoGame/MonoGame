@@ -53,6 +53,8 @@ using ProgramParameter = OpenTK.Graphics.ES20.All;
 using ShaderParameter = OpenTK.Graphics.ES20.All;
 #elif MONOMAC
 using MonoMac.OpenGL;
+#elif PSS
+using Sce.Pss.Core.Graphics;
 #elif !WINRT
 using OpenTK.Graphics.OpenGL;
 
