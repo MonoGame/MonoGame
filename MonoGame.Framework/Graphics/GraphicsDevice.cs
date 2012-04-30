@@ -286,15 +286,16 @@ namespace Microsoft.Xna.Framework.Graphics
             Dpi = DisplayProperties.LogicalDpi;
             CreateSizeDependentResources();
 
-			BlendState = BlendState.Opaque;
-			DepthStencilState = DepthStencilState.Default;
-			RasterizerState = RasterizerState.CullCounterClockwise;
-
 #elif OPENGL
 
             VboIdArray = 0;
             VboIdElement = 0;
 #endif
+
+            // Set the default render states.
+            BlendState = BlendState.Opaque;
+            DepthStencilState = DepthStencilState.Default;
+            RasterizerState = RasterizerState.CullCounterClockwise;
         }
 
 #if WINRT
