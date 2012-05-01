@@ -2,14 +2,14 @@
 <VSTemplate Version="3.0.0" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" Type="Project">
   <TemplateData>
     <Name>MonoGame Metro Application for Windows</Name>
-    <Description>MonoGame Metro Application Template for Windows in Visual Studio 2012</Description>
+    <Description>MonoGame Metro Application Template for Windows in Visual Studio 11</Description>
     <TemplateID>MonoGame.CS.WinRT.BlankApplication</TemplateID>
     <TemplateGroupID>Tailored-Applications</TemplateGroupID>
     <ProjectType>CSharp</ProjectType>
     <ProjectSubType>Windows Tailored</ProjectSubType>
     <SortOrder>1000</SortOrder>
     <CreateNewFolder>true</CreateNewFolder>
-    <DefaultName>Application</DefaultName>
+    <DefaultName>MonoGameWindowsMetroApplication</DefaultName>
     <ProvideDefaultName>true</ProvideDefaultName>
     <LocationField>Enabled</LocationField>
     <EnableLocationBrowseButton>true</EnableLocationBrowseButton>
@@ -23,7 +23,6 @@
   <TemplateContent>
     <Project File="Application.csproj" ReplaceParameters="true">
       <ProjectItem ReplaceParameters="true" TargetFileName="Program.cs">Program.cs</ProjectItem>
-      <ProjectItem ReplaceParameters="true" TargetFileName="Game1.cs">Game1.cs</ProjectItem>
       <ProjectItem ReplaceParameters="true" TargetFileName="Properties\AssemblyInfo.cs">AssemblyInfo.cs</ProjectItem>
       <ProjectItem ReplaceParameters="true" TargetFileName="Package.appxmanifest">Package-managed.appxmanifest</ProjectItem>
       <ProjectItem ReplaceParameters="false" TargetFileName="Assets\Logo.png">Logo.png</ProjectItem>

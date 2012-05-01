@@ -1,14 +1,14 @@
 <VSTemplate Version="3.0.0" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" Type="Project">
   <TemplateData>
-    <Name>MonoGame Application for Linux</Name>
-    <Description>MonoGame Application Template for Linux in Visual Studio 2012</Description>
+    <Name>MonoGame Application for Windows</Name>
+    <Description>MonoGame Application Template for Windows in Visual Studio 11</Description>
     <ProjectType>CSharp</ProjectType>
     <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
     <ProjectSubType>
     </ProjectSubType>
     <SortOrder>1000</SortOrder>
     <CreateNewFolder>true</CreateNewFolder>
-    <DefaultName>MonoGameLinuxApplication</DefaultName>
+    <DefaultName>MonoGameWindowsApplication</DefaultName>
     <ProvideDefaultName>true</ProvideDefaultName>
     <LocationField>Enabled</LocationField>
     <EnableLocationBrowseButton>true</EnableLocationBrowseButton>
@@ -16,7 +16,7 @@
     <PreviewImage>__PreviewImage.png</PreviewImage>
   </TemplateData>
   <TemplateContent>
-    <Project TargetFileName="MonoGameLinuxApplication.csproj" File="MonoGameLinuxApplication.csproj" ReplaceParameters="true">
+    <Project TargetFileName="MonoGameWindowsApplication.csproj" File="MonoGameWindowsApplication.csproj" ReplaceParameters="true">
       <Folder Name="Content" TargetFolderName="Content" />
 	  <Folder Name="Properties" TargetFolderName="Properties">
         <ProjectItem ReplaceParameters="true" TargetFileName="AssemblyInfo.cs">AssemblyInfo.cs</ProjectItem>
