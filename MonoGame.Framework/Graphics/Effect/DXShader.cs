@@ -119,9 +119,9 @@ namespace Microsoft.Xna.Framework.Graphics
             _attributes = cloneSource._attributes;
 
             // Clone the mutable types.
-            _uniforms_float4 = Array.ConvertAll( cloneSource._uniforms_float4, e => e );
-            _uniforms_int4 = Array.ConvertAll(cloneSource._uniforms_int4, e => e);
-            _uniforms_bool = Array.ConvertAll(cloneSource._uniforms_bool, e => e);
+            _uniforms_float4 = (float[])cloneSource._uniforms_float4.Clone();
+            _uniforms_int4 = (int[])cloneSource._uniforms_int4.Clone();
+            _uniforms_bool = (int[])cloneSource._uniforms_bool.Clone();
         }
 
         internal DXShader(BinaryReader reader)
@@ -168,7 +168,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _symbols = new Symbol[symbolCount];
             for (var s = 0; s < symbolCount; s++)
             {
-                _symbols[s].name = string.Intern(reader.ReadString());
+                _symbols[s].name = reader.ReadString();
                 _symbols[s].register_set = (RegisterSet)reader.ReadByte();
                 _symbols[s].register_index = reader.ReadByte();
                 _symbols[s].register_count = reader.ReadByte();
@@ -178,8 +178,8 @@ namespace Microsoft.Xna.Framework.Graphics
             _samplers = new Sampler[samplerCount];
             for (var s = 0; s < samplerCount; s++)
             {
-                _samplers[s].name = string.Intern(reader.ReadString());
-                _samplers[s].parameter = string.Intern(reader.ReadString());
+                _samplers[s].name = reader.ReadString();
+                _samplers[s].parameter = reader.ReadString();
                 _samplers[s].type = (SamplerType)reader.ReadByte();
                 _samplers[s].index = reader.ReadByte();
             }
@@ -188,7 +188,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _attributes = new Attribute[attributeCount];
             for (var a = 0; a < attributeCount; a++)
             {
-                _attributes[a].name = string.Intern(reader.ReadString());
+                _attributes[a].name = reader.ReadString();
                 _attributes[a].usage = (VertexElementUsage)reader.ReadByte();
                 _attributes[a].index = reader.ReadByte();
             }
@@ -242,7 +242,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 Threading.End();
             }
 #elif DIRECTX
-
+            /*
             var d3dDevice = GraphicsDevice.Current._d3dDevice;
             if (isVertexShader)
             {
@@ -260,6 +260,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             else
                 _pixelShader = new PixelShader(d3dDevice, shaderBytecode);
+            */
 #endif
         }
 
