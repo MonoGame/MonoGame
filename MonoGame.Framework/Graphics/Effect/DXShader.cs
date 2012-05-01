@@ -120,15 +120,9 @@ namespace Microsoft.Xna.Framework.Graphics
             _attributes = cloneSource._attributes;
 
             // Clone the mutable types.
-            _uniforms_float4 = new float[cloneSource._uniforms_float4.Length];
-            for (var i = 0; i < _uniforms_float4.Length; i++)
-                _uniforms_float4[i] = cloneSource._uniforms_float4[i];
-            _uniforms_int4 = new int[cloneSource._uniforms_int4.Length];
-            for (var i = 0; i < _uniforms_int4.Length; i++)
-                _uniforms_int4[i] = cloneSource._uniforms_int4[i];
-            _uniforms_bool = new int[cloneSource._uniforms_bool.Length];
-            for (var i = 0; i < _uniforms_bool.Length; i++)
-                _uniforms_bool[i] = cloneSource._uniforms_bool[i];
+            _uniforms_float4 = (float[])cloneSource._uniforms_float4.Clone();
+            _uniforms_int4 = (int[])cloneSource._uniforms_int4.Clone();
+            _uniforms_bool = (int[])cloneSource._uniforms_bool.Clone();
         }
 
         internal DXShader(BinaryReader reader)
@@ -267,6 +261,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             else
                 _pixelShader = new PixelShader(d3dDevice, shaderBytecode);
+
 #endif
         }
 
