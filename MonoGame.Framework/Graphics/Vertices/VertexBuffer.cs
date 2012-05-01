@@ -53,11 +53,11 @@ namespace Microsoft.Xna.Framework.Graphics
             // TODO: To use Immutable resources we would need to delay creation of 
             // the Buffer until SetData() and recreate them if set more than once.
 
-            _buffer = new SharpDX.Direct3D11.Buffer(    graphicsDevice._d3dDevice, 
+            _buffer = new SharpDX.Direct3D11.Buffer(    graphicsDevice._d3dDevice,
                                                         vertexDeclaration.VertexStride * vertexCount,
-                                                        dynamic ? SharpDX.Direct3D11.ResourceUsage.Dynamic : SharpDX.Direct3D11.ResourceUsage.Default,
+                                                        SharpDX.Direct3D11.ResourceUsage.Dynamic,
                                                         SharpDX.Direct3D11.BindFlags.VertexBuffer,
-                                                        0, // CpuAccessFlags
+                                                        SharpDX.Direct3D11.CpuAccessFlags.Write,
                                                         0, // OptionFlags                                                          
                                                         0  // StructureSizeInBytes
                                                         );
