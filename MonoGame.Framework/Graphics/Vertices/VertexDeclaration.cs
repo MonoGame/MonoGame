@@ -17,9 +17,8 @@ namespace Microsoft.Xna.Framework.Graphics
 {
 	public class VertexDeclaration : GraphicsResource
 	{
-		// Fields
-		internal VertexElement[] _elements;
-		internal int _vertexStride;
+		private VertexElement[] _elements;
+        private int _vertexStride;
 
 		public VertexDeclaration(params VertexElement[] elements)
 		{
@@ -98,14 +97,18 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		internal void Apply()
 		{
+#if DIRECTX
+            // There is nothing to do there... vertex declarations
+            // and not needed in DX11 as the vertex layout is associated
+            // with the vertex shader and not the vertex buffer.
+#elif OPENGL
 			Apply (IntPtr.Zero);
+#endif
 		}
 
+#if OPENGL
 		internal void Apply(IntPtr offset)
 		{
-#if WINRT
-
-#elif OPENGL
 
             // TODO: This is executed on every draw call... can we not
             // allocate a vertex declaration once and just re-apply it?
@@ -138,10 +141,10 @@ namespace Microsoft.Xna.Framework.Graphics
 			for (int i=0; i<16; i++) {
 				GLStateManager.VertexAttribArray(i, enabledAttributes[i]);
 			}
-#endif
 		}
+#endif
 
-		public VertexElement[] GetVertexElements()
+        public VertexElement[] GetVertexElements()
 		{
 			return (VertexElement[]) this._elements.Clone();
 		}
