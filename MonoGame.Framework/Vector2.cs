@@ -27,9 +27,6 @@ SOFTWARE.
 
 using System;
 using System.Text;
-#if !PSS
-using System.Drawing;
-#endif
 using System.Globalization;
 
 namespace Microsoft.Xna.Framework

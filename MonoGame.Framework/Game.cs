@@ -471,9 +471,12 @@ namespace Microsoft.Xna.Framework
             // some problems on some Microsoft samples which we are not handling
             // correctly.
 
-			//graphicsDeviceManager.CreateDevice();
-			//Or not, we definitely create the device in BeforeInitialize now...
-
+            // TODO: We need to straighten out device initialization... there is
+            // only one correct place to do it.  WinRT is correct... the other platforms
+			// are not at the moment.
+#if WINRT
+			graphicsDeviceManager.CreateDevice();
+#endif
 
             applyChanges(graphicsDeviceManager);
 
