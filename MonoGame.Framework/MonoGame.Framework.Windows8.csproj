@@ -336,21 +336,21 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="SharpDX">
-      <HintPath>..\ThirdParty\Libs\SharpDX\SharpDX.dll</HintPath>
+      <HintPath>..\ThirdParty\Libs\SharpDX\Windows 8 Metro\SharpDX.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.D3DCompiler, Version=2.0.4.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\ThirdParty\Libs\SharpDX\SharpDX.D3DCompiler.dll</HintPath>
+      <HintPath>..\ThirdParty\Libs\SharpDX\Windows 8 Metro\SharpDX.D3DCompiler.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.Direct2D1">
-      <HintPath>..\ThirdParty\Libs\SharpDX\SharpDX.Direct2D1.dll</HintPath>
+      <HintPath>..\ThirdParty\Libs\SharpDX\Windows 8 Metro\SharpDX.Direct2D1.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.Direct3D11">
-      <HintPath>..\ThirdParty\Libs\SharpDX\SharpDX.Direct3D11.dll</HintPath>
+      <HintPath>..\ThirdParty\Libs\SharpDX\Windows 8 Metro\SharpDX.Direct3D11.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.DXGI, Version=2.0.4.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\ThirdParty\Libs\SharpDX\SharpDX.DXGI.dll</HintPath>
+      <HintPath>..\ThirdParty\Libs\SharpDX\Windows 8 Metro\SharpDX.DXGI.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
