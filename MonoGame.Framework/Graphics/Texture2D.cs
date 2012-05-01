@@ -223,6 +223,15 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 #endif
         }
+        
+#if PSS
+        private Texture2D(GraphicsDevice graphicsDevice, Stream stream)
+        {
+            byte[] bytes = new byte[stream.Length];
+            stream.Read(bytes, 0, (int)stream.Length);
+            _texture2D = new PssTexture2D(bytes, false);
+        }
+#endif
 				
 		public Texture2D(GraphicsDevice graphicsDevice, int width, int height) : 
 			this(graphicsDevice, width, height, false, SurfaceFormat.Color)
@@ -463,7 +472,7 @@ namespace Microsoft.Xna.Framework.Graphics
             return null;
 #elif PSS
 #warning Not Implemented, Could be implemented however! (Read to byte[] and new PssTexture2D(bytes)
-            return null;
+            return new Texture2D(graphicsDevice, stream);
 #else
             using (Bitmap image = (Bitmap)Bitmap.FromStream(stream))
             {

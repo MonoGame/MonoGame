@@ -145,7 +145,7 @@ namespace Microsoft.Xna.Framework
             //Window.Run(1 / Game.TargetElapsedTime.TotalSeconds);
             //Window.Pause();
 
-            return false;
+            return true;
         }
 
         public override void EnterFullScreen()
