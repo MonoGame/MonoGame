@@ -45,8 +45,58 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private readonly DXPreshader _preshader;
 
-        public DXShader(BinaryReader reader)
-		{
+        private struct Sampler
+        {
+            public SamplerType type;
+            public int index;
+            public string name;
+            public string parameter;
+        }
+
+        private struct Symbol
+        {
+            public string name;
+            public RegisterSet register_set;
+            public int register_index;
+            public int register_count;
+        }
+
+        private struct Attribute
+        {
+            public VertexElementUsage usage;
+            public int index;
+            public string name;
+        }
+
+        private readonly Symbol[] _symbols;
+        private readonly Sampler[] _samplers;
+        private readonly Attribute[] _attributes;
+
+        internal DXShader(DXShader cloneSource)
+        {
+            // Share all the immutable types.
+#if OPENGL
+            ShaderType = cloneSource.ShaderType;
+            ShaderHandle = cloneSource.ShaderHandle;
+            _uniforms_float4_name = cloneSource._uniforms_float4_name;
+            _uniforms_int4_name = cloneSource._uniforms_int4_name;
+            _uniforms_bool_name = cloneSource._uniforms_bool_name;
+#if DEBUG 
+            _glslCode = cloneSource._glslCode;
+#endif
+#endif
+            _symbols = cloneSource._symbols;
+            _samplers = cloneSource._samplers;
+            _attributes = cloneSource._attributes;
+
+            // Clone the mutable types.
+            _uniforms_float4 = (float[])cloneSource._uniforms_float4.Clone();
+            _uniforms_int4 = (int[])cloneSource._uniforms_int4.Clone();
+            _uniforms_bool = (int[])cloneSource._uniforms_bool.Clone();
+        }
+
+        internal DXShader(BinaryReader reader)
+        {
             var isVertexShader = reader.ReadBoolean();
             if (isVertexShader)
             {
@@ -82,9 +132,9 @@ namespace Microsoft.Xna.Framework.Graphics
             for (var s=0; s < symbolCount; s++)
             {
                 _symbols[s].name = reader.ReadString();
-                _symbols[s].register_set = (MojoShader.MOJOSHADER_symbolRegisterSet)reader.ReadByte();
-                _symbols[s].register_index = (uint)reader.ReadByte();
-                _symbols[s].register_count = (uint)reader.ReadByte();
+                _symbols[s].register_set = (RegisterSet)reader.ReadByte();
+                _symbols[s].register_index = reader.ReadByte();
+                _symbols[s].register_count = reader.ReadByte();
             }
 
             var samplerCount = (int)reader.ReadByte();
@@ -92,8 +142,9 @@ namespace Microsoft.Xna.Framework.Graphics
             for (var s = 0; s < samplerCount; s++)
             {
                 _samplers[s].name = reader.ReadString();
-                _samplers[s].type = (MojoShader.MOJOSHADER_samplerType)reader.ReadByte();
-                _samplers[s].index = (int)reader.ReadByte();
+                _samplers[s].parameter = reader.ReadString();
+                _samplers[s].type = (SamplerType)reader.ReadByte();
+                _samplers[s].index = reader.ReadByte();
             }
 
             var attributeCount = (int)reader.ReadByte();
@@ -101,8 +152,8 @@ namespace Microsoft.Xna.Framework.Graphics
             for (var a = 0; a < attributeCount; a++)
             {
                 _attributes[a].name = reader.ReadString();
-                _attributes[a].usage = (MojoShader.MOJOSHADER_usage)reader.ReadByte();
-                _attributes[a].index = (int)reader.ReadByte();
+                _attributes[a].usage = (VertexElementUsage)reader.ReadByte();
+                _attributes[a].index = reader.ReadByte();
             }
 
 #if OPENGL
@@ -149,6 +200,27 @@ namespace Microsoft.Xna.Framework.Graphics
                 Threading.End();
             }
 		}
+            /*
+            var d3dDevice = GraphicsDevice.Current._d3dDevice;
+            if (isVertexShader)
+            {
+                _vertexShader = new VertexShader(d3dDevice, shaderBytecode, null);
+
+                // TODO: We need the specifics about the input format for DX!
+                var elements = new InputElement[_attributes.Length];
+                for (var i=0; i < _attributes.Length; i++)
+                {
+                    var attrib = _attributes[i];
+                    elements[i] = new InputElement(attrib.name, 0, Format.R32G32B32A32_Float, attrib.index, 0);
+                }
+
+                _inputLayout = new InputLayout(d3dDevice, shaderBytecode, elements);
+            }
+            else
+                _pixelShader = new PixelShader(d3dDevice, shaderBytecode);
+            */
+#endif
+        }
 
 		public void OnLink(int program) 
         {

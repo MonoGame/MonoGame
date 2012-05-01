@@ -237,7 +237,7 @@ namespace Microsoft.Xna.Framework.Graphics
             var techniques = (int)reader.ReadByte();
             for (var t = 0; t < techniques; t++)
             {
-                var name = string.Intern(reader.ReadString());
+                var name = reader.ReadString();
 
                 var annotations = ReadAnnotations(reader);
 
@@ -271,7 +271,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             for (var i = 0; i < count; i++)
             {
-                var name = string.Intern(reader.ReadString());
+                var name = reader.ReadString();
                 var annotations = ReadAnnotations(reader);
 
                 // Get the vertex shader.
@@ -303,8 +303,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 var class_ = (EffectParameterClass)reader.ReadByte();
                 var type = (EffectParameterType)reader.ReadByte();
 
-                var name = string.Intern(reader.ReadString());
-                var semantic = string.Intern(reader.ReadString());
+                var name = reader.ReadString();
+                var semantic = reader.ReadString();
                 var annotations = ReadAnnotations(reader);
 
                 var rowCount = (int)reader.ReadByte();
