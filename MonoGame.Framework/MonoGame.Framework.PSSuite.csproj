@@ -339,6 +339,7 @@
     <Compile Include="Graphics\GraphicsExtensions.cs" />
     <Compile Include="Content\ContentExtensions.cs" />
     <Compile Include="Content\ContentReaders\EffectReader.cs" />
+    <Compile Include="PSSuite\PSSHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="PSSuite\" />
@@ -359,4 +360,15 @@
       <Name>Lidgren.Network.PSSuite</Name>
     </ProjectReference>
   </ItemGroup>
+  <ProjectExtensions>
+    <MonoDevelop>
+      <Properties>
+        <Policies>
+          <TextStylePolicy inheritsSet="null" scope="text/x-csharp" />
+          <CSharpFormattingPolicy inheritsSet="Mono" inheritsScope="text/x-csharp" scope="text/x-csharp" />
+          <TextStylePolicy FileWidth="120" inheritsSet="VisualStudio" inheritsScope="text/plain" scope="text/plain" />
+        </Policies>
+      </Properties>
+    </MonoDevelop>
+  </ProjectExtensions>
 </Project>
