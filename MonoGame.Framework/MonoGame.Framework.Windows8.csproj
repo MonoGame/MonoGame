@@ -240,6 +240,7 @@
     <Compile Include="Windows8\GameFrameworkViewSource.cs" />
     <Compile Include="Windows8\MetroGamePlatform.cs" />
     <Compile Include="Windows8\MetroGameWindow.cs" />
+    <Compile Include="Windows8\MetroHelper.cs" />
     <Compile Include="Windows8\SharpDXHelper.cs" />
     <Compile Include="Windows\Audio\Sound.cs" />
     <Compile Include="Windows\Content\ContentReaders\SoundEffectReader.cs" />
@@ -357,12 +358,12 @@
     <Folder Include="Windows\Input\" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect.mgfx" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect.mgfx" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\DualTextureEffect.mgfx" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\EnvironmentMapEffect.mgfx" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\SkinnedEffect.mgfx" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\SpriteEffect.mgfx" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect.dx11.mgfxo" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect.dx11.mgfxo" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\DualTextureEffect.dx11.mgfxo" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\EnvironmentMapEffect.dx11.mgfxo" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\SkinnedEffect.dx11.mgfxo" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\SpriteEffect.dx11.mgfxo" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' ">
     <VisualStudioVersion>11.0</VisualStudioVersion>

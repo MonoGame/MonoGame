@@ -67,7 +67,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
         EffectDirtyFlags dirtyFlags = EffectDirtyFlags.All;
 
-        static readonly byte[] Bytecode = LoadEffectResource("Microsoft.Xna.Framework.Graphics.Effect.Resources.EnvironmentMapEffect.mgfx");
+        static readonly byte[] Bytecode = LoadEffectResource(
+#if DIRECTX
+            "Microsoft.Xna.Framework.Graphics.Effect.Resources.EnvironmentMapEffect.dx11.mgfxo"
+#else
+            "Microsoft.Xna.Framework.Graphics.Effect.Resources.EnvironmentMapEffect.mgfx"
+#endif
+        );
 
         #endregion
 

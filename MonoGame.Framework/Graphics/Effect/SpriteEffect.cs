@@ -42,7 +42,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
         #endregion
 
-        static internal readonly byte[] Bytecode = LoadEffectResource("Microsoft.Xna.Framework.Graphics.Effect.Resources.SpriteEffect.mgfx");
+        static internal readonly byte[] Bytecode = LoadEffectResource(
+#if DIRECTX
+            "Microsoft.Xna.Framework.Graphics.Effect.Resources.SpriteEffect.dx11.mgfxo"
+#else
+            "Microsoft.Xna.Framework.Graphics.Effect.Resources.SpriteEffect.mgfx"
+#endif
+        );
 
         #region Methods
 

@@ -51,7 +51,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
         EffectDirtyFlags dirtyFlags = EffectDirtyFlags.All;
 
-        static readonly byte[] Bytecode = LoadEffectResource("Microsoft.Xna.Framework.Graphics.Effect.Resources.DualTextureEffect.mgfx");
+        static readonly byte[] Bytecode = LoadEffectResource(
+#if DIRECTX
+            "Microsoft.Xna.Framework.Graphics.Effect.Resources.DualTextureEffect.dx11.mgfxo"
+#else
+            "Microsoft.Xna.Framework.Graphics.Effect.Resources.DualTextureEffect.mgfx"
+#endif
+        );
 
         #endregion
 
