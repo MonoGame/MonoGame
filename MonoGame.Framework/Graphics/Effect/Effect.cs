@@ -213,7 +213,7 @@ namespace Microsoft.Xna.Framework.Graphics
             var shaders = (int)reader.ReadByte();
             for (var s = 0; s < shaders; s++)
             {
-                var shader = new DXShader(reader);
+                var shader = new DXShader(graphicsDevice, reader);
                 shaderList.Add(shader);
             }
 

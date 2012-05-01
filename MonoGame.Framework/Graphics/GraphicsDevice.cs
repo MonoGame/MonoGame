@@ -101,7 +101,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		internal static int attributeBlendWeight = 6;
 		internal static int attributeTexCoord = 7; //must be the last one, texture index locations are added to it
 
-#if WINRT
+#if DIRECTX
 
         // Declare Direct2D Objects
         protected SharpDX.Direct2D1.Factory1 _d2dFactory;
@@ -176,7 +176,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			set {
 				_rasterizerState = value;
 
-#if WINRT
+#if DIRECTX
 
 #elif OPENGL
 				GLStateManager.SetRasterizerStates(value, GetRenderTargets().Length > 0);
@@ -280,7 +280,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
             PresentationParameters.DisplayOrientation = TouchPanel.DisplayOrientation;
 
-#if WINRT
+#if DIRECTX
+
             CreateDeviceIndependentResources();
             CreateDeviceResources();
             Dpi = DisplayProperties.LogicalDpi;
@@ -298,7 +299,7 @@ namespace Microsoft.Xna.Framework.Graphics
             RasterizerState = RasterizerState.CullCounterClockwise;
         }
 
-#if WINRT
+#if DIRECTX
 
         /// <summary>
         /// Creates resources not tied the active graphics device.
@@ -487,7 +488,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _d2dContext.TextAntialiasMode = SharpDX.Direct2D1.TextAntialiasMode.Grayscale;
         }
 
-#endif // WINRT
+#endif // DIRECTX
 
         public BlendState BlendState 
         {
@@ -496,7 +497,7 @@ namespace Microsoft.Xna.Framework.Graphics
             { 
 				// ToDo check for invalid state
 				_blendState = value;
-#if WINRT
+#if DIRECTX
 #elif OPENGL
 				GLStateManager.SetBlendStates(value);
 #endif
@@ -509,7 +510,7 @@ namespace Microsoft.Xna.Framework.Graphics
             set
             {
                 _depthStencilState = value;
-#if WINRT
+#if DIRECTX
 #elif OPENGL
 				GLStateManager.SetDepthStencilState(value);
 #endif
@@ -544,7 +545,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void Clear (ClearOptions options, Vector4 color, float depth, int stencil)
 		{
-#if WINRT
+#if DIRECTX
+
             // Clear the diffuse render buffer.
             if ((options & ClearOptions.Target) != 0 && _renderTargetView != null)
                 _d3dContext.ClearRenderTargetView(_renderTargetView, new Color4(color.X, color.Y, color.Z, color.W));
@@ -558,7 +560,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (flags != 0 && _depthStencilView != null)
                 _d3dContext.ClearDepthStencilView(_depthStencilView, flags, depth, (byte)stencil);
+				
 #elif OPENGL
+
 			GL.ClearColor (color.X, color.Y, color.Z, color.W);
 
 			ClearBufferMask bufferMask = 0;
@@ -601,7 +605,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (aReleaseEverything)
             {
-#if WINRT
+#if DIRECTX
                 if (_swapChain != null)
                 {
                     _swapChain.Dispose();
@@ -659,7 +663,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     _wicFactory.Dispose();
                     _wicFactory = null;
                 }
-#endif
+#endif // DIRECTX
             }
 
             _isDisposed = true;
@@ -667,7 +671,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void Present()
         {
-#if WINRT
+#if DIRECTX
             // The application may optionally specify "dirty" or "scroll" rects to improve efficiency
             // in certain scenarios.  In this sample, however, we do not utilize those features.
             var parameters = new SharpDX.DXGI.PresentParameters();
@@ -772,7 +776,7 @@ namespace Microsoft.Xna.Framework.Graphics
             set
             {
                 _viewport = value;
-#if WINRT
+#if DIRECTX
                 var viewport = new SharpDX.Direct3D11.Viewport(_viewport.X, _viewport.Y, (float)_viewport.Width, (float)_viewport.Height, _viewport.MinDepth, _viewport.MaxDepth);
                 _d3dContext.Rasterizer.SetViewports(viewport);
 #elif OPENGL
@@ -807,7 +811,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 _scissorRectangle = value;
 
-#if WINRT
+#if DIRECTX
 #elif OPENGL		
 				GLStateManager.SetScissor(_scissorRectangle);				
 				_scissorRectangle.Y = _viewport.Height - _scissorRectangle.Y - _scissorRectangle.Height;
@@ -844,7 +848,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			if (this.currentRenderTargetBindings == null || this.currentRenderTargetBindings.Length == 0)
 			{
-#if WINRT
+#if DIRECTX
 #elif OPENGL
 				GL.BindFramebuffer(GLFramebuffer, 0);
 #endif
@@ -854,7 +858,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 			else
 			{
-#if WINRT
+#if DIRECTX
 #elif OPENGL
 				if (this.glFramebuffer == 0)
 				{
@@ -911,7 +915,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				}
 			}
 
-#if WINRT
+#if DIRECTX
 #elif OPENGL
 			//Reset the cull mode, because we flip verticies when rendering offscreen
 			//and thus flip the cull direction
@@ -948,13 +952,33 @@ namespace Microsoft.Xna.Framework.Graphics
 
             throw new NotImplementedException();
         }
+		
+#elif DIRECTX
+
+        internal PrimitiveTopology ToPrimitiveTopology(PrimitiveType primitiveType)
+        {
+            switch (primitiveType)
+            {
+                case PrimitiveType.LineList:
+                    return PrimitiveTopology.LineList;
+                case PrimitiveType.LineStrip:
+                    return PrimitiveTopology.LineStrip;
+                case PrimitiveType.TriangleList:
+                    return PrimitiveTopology.TriangleList;
+                case PrimitiveType.TriangleStrip:
+                    return PrimitiveTopology.TriangleStrip;
+            }
+
+            throw new NotImplementedException();
+        }
+		
 #endif
 
 
         public void SetVertexBuffer(VertexBuffer vertexBuffer)
         {
             _vertexBuffer = vertexBuffer;
-#if WINRT
+#if DIRECTX
             if (_vertexBuffer != null)
                 _d3dContext.InputAssembler.SetVertexBuffers(0, _vertexBuffer._binding);
             else
@@ -969,7 +993,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             _indexBuffer = indexBuffer;
 
-#if WINRT
+#if DIRECTX
             if (_indexBuffer != null)
                 _d3dContext.InputAssembler.SetIndexBuffer(
                     _indexBuffer._buffer, 
@@ -990,8 +1014,13 @@ namespace Microsoft.Xna.Framework.Graphics
 			if (minVertexIndex > 0)
 				throw new NotImplementedException ("minVertexIndex > 0 is supported");
 
-#if WINRT
+#if DIRECTX
+
+            _d3dContext.InputAssembler.PrimitiveTopology = ToPrimitiveTopology(primitiveType);
+            _d3dContext.DrawIndexed(primitiveCount, startIndex, baseVertex);
+			
 #elif OPENGL
+
 			var indexElementType = DrawElementsType.UnsignedShort;
 			var indexElementSize = 2;
 			var indexOffsetInBytes = (IntPtr)(startIndex * indexElementSize);
@@ -1011,7 +1040,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void DrawUserPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int primitiveCount) where T : struct, IVertexType
         {
-#if WINRT
+#if DIRECTX
+            throw new NotImplementedException();
 #elif OPENGL
             // Unbind the VBOs
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
@@ -1061,17 +1091,21 @@ namespace Microsoft.Xna.Framework.Graphics
         {
 			_vertexBuffer.VertexDeclaration.Apply();
 
-#if WINRT
+            var vertexCount = GetElementCountArray(primitiveType, primitiveCount);
+#if DIRECTX
+            _d3dContext.InputAssembler.PrimitiveTopology = ToPrimitiveTopology(primitiveType);
+            _d3dContext.Draw(vertexCount, vertexStart);
 #elif OPENGL
 			GL.DrawArrays(PrimitiveTypeGL(primitiveType),
 			              vertexStart,
-			              GetElementCountArray(primitiveType,primitiveCount));
+			              vertexCount);
 #endif
         }
 
         public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int vertexCount, short[] indexData, int indexOffset, int primitiveCount) where T : struct, IVertexType
         {
-#if WINRT
+#if DIRECTX
+            throw new NotImplementedException();
 #elif OPENGL
             // Unbind the VBOs
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
@@ -1134,7 +1168,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int vertexCount, int[] indexData, int indexOffset, int primitiveCount) where T : struct, IVertexType
         {
-#if WINRT
+#if DIRECTX
+            throw new NotImplementedException();
 #elif OPENGL
             // Unbind the VBOs
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);

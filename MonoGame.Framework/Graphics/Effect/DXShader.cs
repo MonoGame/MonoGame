@@ -114,6 +114,11 @@ namespace Microsoft.Xna.Framework.Graphics
 #if DEBUG 
             _glslCode = cloneSource._glslCode;
 #endif
+
+#elif DIRECTX
+            _pixelShader = cloneSource._pixelShader;
+            _vertexShader = cloneSource._vertexShader;
+            _inputLayout = cloneSource._inputLayout;
 #endif
             _symbols = cloneSource._symbols;
             _samplers = cloneSource._samplers;
@@ -125,7 +130,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _uniforms_bool = (int[])cloneSource._uniforms_bool.Clone();
         }
 
-        internal DXShader(BinaryReader reader)
+        internal DXShader(GraphicsDevice device, BinaryReader reader)
         {
             var isVertexShader = reader.ReadBoolean();
 
@@ -243,9 +248,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 #elif DIRECTX
 
-            // HACK: We should be getting the graphics device in the constructor!
-            var d3dDevice = GraphicsDevice.Current._d3dDevice;
-
+            var d3dDevice = device._d3dDevice;
             if (isVertexShader)
             {
                 _vertexShader = new VertexShader(d3dDevice, shaderBytecode, null);
@@ -304,11 +307,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		public void Apply(  int program, 
                             EffectParameterCollection parameters,
 		                    GraphicsDevice graphicsDevice) 
-        {			
-			var vp = graphicsDevice.Viewport;
-			var textures = graphicsDevice.Textures;
-			var samplerStates = graphicsDevice.SamplerStates;
-					
+        {							
 			// TODO: It would be much better if we kept track
             // of dirty states and only update those parameters.
 
@@ -378,7 +377,22 @@ namespace Microsoft.Xna.Framework.Graphics
 
             } // foreach (var symbol in _symbols)
 			
-#if OPENGL
+#if DIRECTX
+
+            var d3dContext = graphicsDevice._d3dContext;
+            if (_pixelShader != null)
+                d3dContext.PixelShader.Set(_pixelShader);
+            else
+            {
+                d3dContext.VertexShader.Set(_vertexShader );
+                d3dContext.InputAssembler.InputLayout = _inputLayout;
+            }
+
+#elif OPENGL
+
+            var textures = graphicsDevice.Textures;
+			var samplerStates = graphicsDevice.SamplerStates;
+
 			// Upload the uniforms.				
             if (_uniforms_float4.Length > 0)
             {
