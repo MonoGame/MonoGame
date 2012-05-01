@@ -126,14 +126,13 @@ namespace Microsoft.Xna.Framework.Graphics
             var desc = new SharpDX.Direct3D11.Texture2DDescription();
             desc.Width = width;
             desc.Height = height;
-            desc.MipLevels = 0;// mipmap ? 10 : 1;
+            desc.MipLevels = mipmap ? 0 : 1;
             desc.ArraySize = 1;
-            desc.Format = SharpDXHelper.ToFormat(SurfaceFormat.Color);
+            desc.Format = SharpDXHelper.ToFormat(format);
             desc.BindFlags = SharpDX.Direct3D11.BindFlags.ShaderResource;
-            desc.CpuAccessFlags = SharpDX.Direct3D11.CpuAccessFlags.Write;
+            desc.CpuAccessFlags = SharpDX.Direct3D11.CpuAccessFlags.None;
             desc.SampleDescription.Count = 1;
             desc.SampleDescription.Quality = 0;
-            desc.Usage = SharpDX.Direct3D11.ResourceUsage.Dynamic;
             desc.Usage = SharpDX.Direct3D11.ResourceUsage.Default;
             desc.OptionFlags = SharpDX.Direct3D11.ResourceOptionFlags.None;
 
