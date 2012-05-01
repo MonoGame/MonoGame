@@ -27,11 +27,12 @@ namespace Microsoft.Xna.Framework.Graphics
             public string parameter;
         }
 
-        private struct Attribute
+        public struct Attribute
         {
-            public VertexElementUsage usage;
             public int index;
             public string name;
+            public VertexElementUsage usage;
+            public short format;
         }
 
         private readonly MojoShader.MOJOSHADER_symbol[] _symbols;
@@ -42,7 +43,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public byte[] ShaderCode { get; private set; }
 
-        public DXShader(byte[] byteCode, bool isVertexShader, int sharedIndex)
+        public DXShader(byte[] byteCode, bool isVertexShader, int sharedIndex, Attribute[] attributes)
         {
             IsVertexShader = isVertexShader;
             SharedIndex = sharedIndex;
@@ -51,7 +52,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             _symbols = new MojoShader.MOJOSHADER_symbol[0];
             _samplers = new Sampler[0];
-            _attributes = new Attribute[0];
+            _attributes = attributes;
         }
 
         public DXShader(byte[] byteCode, int sharedIndex)
@@ -266,7 +267,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 writer.Write(attrib.name);
                 writer.Write((byte)attrib.usage);
                 writer.Write((byte)attrib.index);
-            }            
+                writer.Write(attrib.format);
+            }
         }
 	}
 }
