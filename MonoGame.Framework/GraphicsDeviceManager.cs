@@ -159,7 +159,10 @@ namespace Microsoft.Xna.Framework
 		{			
 			// Set "full screen"  as default
 			_graphicsDevice.PresentationParameters.IsFullScreen = true;
-
+            //TODO: This is here on the Windows version, why is it not on the generic?
+#if PSS
+            _graphicsDevice.Initialize();
+#endif
 #if !PSS
 			if (_preferMultiSampling)
 			{

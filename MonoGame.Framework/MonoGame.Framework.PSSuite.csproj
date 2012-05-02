@@ -340,6 +340,7 @@
     <Compile Include="Content\ContentExtensions.cs" />
     <Compile Include="Content\ContentReaders\EffectReader.cs" />
     <Compile Include="PSSuite\PSSHelper.cs" />
+    <Compile Include="PSSuite\PSSExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="PSSuite\" />
