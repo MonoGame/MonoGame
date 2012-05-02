@@ -121,19 +121,17 @@ namespace Microsoft.Xna.Framework {
 
 		protected void OnClientSizeChanged ()
 		{
-			var handler = ClientSizeChanged;
-			if (handler != null)
-				handler (this, EventArgs.Empty);
+			if (ClientSizeChanged != null)
+				ClientSizeChanged (this, EventArgs.Empty);
 		}
 
 		protected void OnDeactivated ()
 		{
 		}
-
+         
 		protected void OnOrientationChanged ()
 		{
-			var handler = OrientationChanged;
-			if (handler != null)
+			if (OrientationChanged != null)
 				OrientationChanged (this, EventArgs.Empty);
 		}
 
@@ -143,9 +141,8 @@ namespace Microsoft.Xna.Framework {
 
 		protected void OnScreenDeviceNameChanged ()
 		{
-			var handler = ScreenDeviceNameChanged;
-			if (handler != null)
-				handler (this, EventArgs.Empty);
+			if (ScreenDeviceNameChanged != null)
+				ScreenDeviceNameChanged (this, EventArgs.Empty);
 		}
 
 		protected internal abstract void SetSupportedOrientations (DisplayOrientation orientations);
