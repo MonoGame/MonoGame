@@ -82,10 +82,13 @@ namespace Microsoft.Xna.Framework
 {
     class PSSGamePlatform : GamePlatform
     {
+        Game _game;
+        
         public PSSGamePlatform(Game game)
             : base(game)
-        {            
+        {
             Window = new PSSGameWindow(game);
+            _game = game;
         }
 
         private bool _initialized;
@@ -145,7 +148,7 @@ namespace Microsoft.Xna.Framework
             //Window.Run(1 / Game.TargetElapsedTime.TotalSeconds);
             //Window.Pause();
 
-            return false;
+            return true;
         }
 
         public override void EnterFullScreen()
@@ -168,6 +171,10 @@ namespace Microsoft.Xna.Framework
             //throw new NotImplementedException();
         }
 		
+        public override void Present ()
+        {
+            _game.GraphicsDevice.Present();
+        }
 		//TODO: Will need something to listen to SystemEvents.???(Pause)??? And SystemEvents.OnRestored when they are properly implemented
 
         public override GameRunBehavior DefaultRunBehavior
