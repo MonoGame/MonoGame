@@ -138,7 +138,7 @@ namespace Microsoft.Xna.Framework
 			}
 			item.TotalTime += elapsedTime;
 			item.HitCount ++;
-		}	}
+		}
 }
 
 #endif
