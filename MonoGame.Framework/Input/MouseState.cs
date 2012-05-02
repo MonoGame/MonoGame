@@ -150,6 +150,18 @@ namespace Microsoft.Xna.Framework.Input
 				return ButtonState.Released;
 			}
 		}
+
+#if WINRT
+        internal void Update(Windows.UI.Core.PointerEventArgs args)
+        {
+            _leftButton = args.CurrentPoint.Properties.IsLeftButtonPressed ? ButtonState.Pressed : ButtonState.Released;
+            _rightButton = args.CurrentPoint.Properties.IsRightButtonPressed ? ButtonState.Pressed : ButtonState.Released;
+            _middleButton = args.CurrentPoint.Properties.IsMiddleButtonPressed ? ButtonState.Pressed : ButtonState.Released;
+            _x = (int)args.CurrentPoint.Position.X;
+            _y = (int)args.CurrentPoint.Position.Y;
+            _scrollWheelValue += args.CurrentPoint.Properties.MouseWheelDelta;
+        }
+#endif
 	}
 }
 

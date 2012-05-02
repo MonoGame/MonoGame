@@ -63,7 +63,6 @@
     <Compile Include="Content\ContentReaders\TextureReader.cs" />
     <Compile Include="Content\ContentReaders\VertexBufferReader.cs" />
     <Compile Include="Content\ContentReaders\VertexDeclarationReader.cs" />
-    <Compile Include="Desktop\Input\Mouse.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="GamePlatform.cs" />
     <Compile Include="GamerServices\MessageBoxIcon.cs">
@@ -131,6 +130,9 @@
     <Compile Include="Input\KeyboardState.cs" />
     <Compile Include="Input\Keys.cs" />
     <Compile Include="Input\KeyState.cs" />
+    <Compile Include="Input\Mouse.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Input\MouseState.cs" />
     <Compile Include="Input\ThumbStickDefinition.cs" />
     <Compile Include="Input\Touch\GestureSample.cs" />
@@ -336,24 +338,25 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="SharpDX">
-      <HintPath>..\ThirdParty\Libs\SharpDX\SharpDX.dll</HintPath>
+      <HintPath>..\ThirdParty\Libs\SharpDX\Windows 8 Metro\SharpDX.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.D3DCompiler, Version=2.0.4.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\ThirdParty\Libs\SharpDX\SharpDX.D3DCompiler.dll</HintPath>
+      <HintPath>..\ThirdParty\Libs\SharpDX\Windows 8 Metro\SharpDX.D3DCompiler.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.Direct2D1">
-      <HintPath>..\ThirdParty\Libs\SharpDX\SharpDX.Direct2D1.dll</HintPath>
+      <HintPath>..\ThirdParty\Libs\SharpDX\Windows 8 Metro\SharpDX.Direct2D1.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.Direct3D11">
-      <HintPath>..\ThirdParty\Libs\SharpDX\SharpDX.Direct3D11.dll</HintPath>
+      <HintPath>..\ThirdParty\Libs\SharpDX\Windows 8 Metro\SharpDX.Direct3D11.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.DXGI, Version=2.0.4.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\ThirdParty\Libs\SharpDX\SharpDX.DXGI.dll</HintPath>
+      <HintPath>..\ThirdParty\Libs\SharpDX\Windows 8 Metro\SharpDX.DXGI.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Desktop\Input\" />
     <Folder Include="Windows\Input\" />
   </ItemGroup>
   <ItemGroup>
