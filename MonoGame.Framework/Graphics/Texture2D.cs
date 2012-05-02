@@ -471,7 +471,6 @@ namespace Microsoft.Xna.Framework.Graphics
 #elif WINRT
             return null;
 #elif PSS
-#warning Not Implemented, Could be implemented however! (Read to byte[] and new PssTexture2D(bytes)
             return new Texture2D(graphicsDevice, stream);
 #else
             using (Bitmap image = (Bitmap)Bitmap.FromStream(stream))

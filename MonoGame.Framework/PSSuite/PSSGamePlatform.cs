@@ -174,7 +174,6 @@ namespace Microsoft.Xna.Framework
         public override void Present ()
         {
             _game.GraphicsDevice.Present();
-            base.Present ();
         }
 		//TODO: Will need something to listen to SystemEvents.???(Pause)??? And SystemEvents.OnRestored when they are properly implemented
 
