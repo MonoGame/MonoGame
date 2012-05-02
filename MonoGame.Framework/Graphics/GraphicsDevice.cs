@@ -54,6 +54,8 @@ using SharpDX;
 using SharpDX.Direct3D;
 using Windows.Graphics.Display;
 using Windows.UI.Core;
+#elif PSS
+using Sce.Pss.Core.Graphics;
 #elif GLES
 using OpenTK.Graphics.ES20;
 using BeginMode = OpenTK.Graphics.ES20.All;
@@ -125,6 +127,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
         protected float _dpi;
 
+#elif PSS
+        internal GraphicsContext _graphics;
 #elif OPENGL
 
         private uint VboIdArray;
@@ -286,6 +290,8 @@ namespace Microsoft.Xna.Framework.Graphics
             Dpi = DisplayProperties.LogicalDpi;
             CreateSizeDependentResources();
 
+#elif PSS
+            _graphics = new GraphicsContext();
 #elif OPENGL
 
             VboIdArray = 0;
@@ -558,6 +564,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (flags != 0 && _depthStencilView != null)
                 _d3dContext.ClearDepthStencilView(_depthStencilView, flags, depth, (byte)stencil);
+#elif PSS
+            _graphics.SetClearColor(color.ToPssVector4());
+            _graphics.Clear();
+
 #elif OPENGL
 			GL.ClearColor (color.X, color.Y, color.Z, color.W);
 
@@ -659,6 +669,12 @@ namespace Microsoft.Xna.Framework.Graphics
                     _wicFactory.Dispose();
                     _wicFactory = null;
                 }
+#elif PSS
+                if (_graphics != null)
+                {
+                    _graphics.Dispose();
+                    _graphics = null;
+                }
 #endif
             }
 
@@ -696,6 +712,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 */
             }
 						
+#elif PSS
+            _graphics.SwapBuffers();
 #elif ANDROID
 			platform.Present();
 #elif OPENGL

@@ -56,7 +56,7 @@ namespace Microsoft.Xna.Framework
 		{
 			// Replace Windows path separators with local path separators
 			name = name.Replace('\\', Path.DirectorySeparatorChar);
-			return name;
+			return Path.Combine("/Application", name);
 		}
 	}
 }
