@@ -156,11 +156,6 @@ namespace Microsoft.Xna.Framework
         {
             get; protected set;
         }
-#elif LINUX || WINDOWS
-        public OpenTKGameWindow Window
-        {
-            get; protected set;
-        }
 #else
         public GameWindow Window
         {

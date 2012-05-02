@@ -304,11 +304,6 @@ namespace Microsoft.Xna.Framework
         {
             get { return Platform.Window; }
         }
-#elif LINUX || WINDOWS
-        public OpenTKGameWindow Window
-        {
-            get { return Platform.Window; }
-        }
 #else
         public GameWindow Window
         {
