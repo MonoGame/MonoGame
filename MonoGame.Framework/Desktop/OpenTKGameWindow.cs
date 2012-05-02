@@ -140,12 +140,6 @@ namespace Microsoft.Xna.Framework
             Keys xnaKey = KeyboardUtil.ToXna(e.Key);
             if (!keys.Contains(xnaKey)) keys.Add(xnaKey);
         }
-
-        protected void OnActivated() { }
-
-        protected void OnDeactivated() { }
-        
-        protected void OnPaint() { }
         
         #endregion
 
