@@ -43,16 +43,105 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public byte[] ShaderCode { get; private set; }
 
-        public DXShader(byte[] byteCode, bool isVertexShader, int sharedIndex, Attribute[] attributes)
+        public DXShader(byte[] byteCode, SharpDX.Direct3D11.EffectShaderVariable variable, int sharedIndex)
         {
-            IsVertexShader = isVertexShader;
+            var shaderDesc = variable.GetShaderDescription(0);
+            var shaderVar = variable.AsShader();
+
+            if (variable.TypeInfo.Description.Type != SharpDX.D3DCompiler.ShaderVariableType.Vertexshader)
+            {
+                IsVertexShader = false;
+                _attributes = new Attribute[0];
+            }
+            else
+            {
+                IsVertexShader = true;
+
+                var componentX = SharpDX.D3DCompiler.RegisterComponentMaskFlags.ComponentX;
+                var componentXY = SharpDX.D3DCompiler.RegisterComponentMaskFlags.ComponentX |
+                                    SharpDX.D3DCompiler.RegisterComponentMaskFlags.ComponentY;
+                var componentXYZ = SharpDX.D3DCompiler.RegisterComponentMaskFlags.ComponentX |
+                                    SharpDX.D3DCompiler.RegisterComponentMaskFlags.ComponentY |
+                                    SharpDX.D3DCompiler.RegisterComponentMaskFlags.ComponentZ;
+                var componentXYZW = SharpDX.D3DCompiler.RegisterComponentMaskFlags.ComponentX |
+                                    SharpDX.D3DCompiler.RegisterComponentMaskFlags.ComponentY |
+                                    SharpDX.D3DCompiler.RegisterComponentMaskFlags.ComponentZ |
+                                    SharpDX.D3DCompiler.RegisterComponentMaskFlags.ComponentW;
+
+                _attributes = new DXShader.Attribute[shaderDesc.InputParameterCount];
+                var offset = 0;
+                for (var i = 0; i < _attributes.Length; i++)
+                {
+                    var element = shaderVar.GetInputSignatureElementDescription(0, i);
+
+                    _attributes[i].name = element.SemanticName;
+                    _attributes[i].index = offset;
+                    //_attributes[i].usage = ???
+
+                    var isX = (element.UsageMask & componentX) == componentX;
+                    var isXY = (element.UsageMask & componentXY) == componentXY;
+                    var isXYZ = (element.UsageMask & componentXYZ) == componentXYZ;
+                    var isXYZW = (element.UsageMask & componentXYZW) == componentXYZW;
+
+                    // Increment the offset.
+                    offset += isXYZW ? 4 : isXYZ ? 3 : isXY ? 2 : 1;
+
+                    SharpDX.DXGI.Format format;
+                    switch (element.ComponentType)
+                    {
+                        case SharpDX.D3DCompiler.RegisterComponentType.Float32:
+                            if (isXYZW)
+                                format = SharpDX.DXGI.Format.R32G32B32A32_Float;
+                            else if (isXYZ)
+                                format = SharpDX.DXGI.Format.R32G32B32_Float;
+                            else if (isXY)
+                                format = SharpDX.DXGI.Format.R32G32_Float;
+                            else if (isX)
+                                format = SharpDX.DXGI.Format.R32_Float;
+                            else
+                                throw new NotImplementedException("Got unknown vertex shader input!");
+                            break;
+
+                        case SharpDX.D3DCompiler.RegisterComponentType.Sint32:
+                            if (isXYZW)
+                                format = SharpDX.DXGI.Format.R32G32B32A32_SInt;
+                            else if (isXYZ)
+                                format = SharpDX.DXGI.Format.R32G32B32_SInt;
+                            else if (isXY)
+                                format = SharpDX.DXGI.Format.R32G32_SInt;
+                            else if (isX)
+                                format = SharpDX.DXGI.Format.R32_SInt;
+                            else
+                                throw new NotImplementedException("Got unknown vertex shader input!");
+                            break;
+
+                        case SharpDX.D3DCompiler.RegisterComponentType.Uint32:
+                            if (isXYZW)
+                                format = SharpDX.DXGI.Format.R32G32B32A32_UInt;
+                            else if (isXYZ)
+                                format = SharpDX.DXGI.Format.R32G32B32_UInt;
+                            else if (isXY)
+                                format = SharpDX.DXGI.Format.R32G32_UInt;
+                            else if (isX)
+                                format = SharpDX.DXGI.Format.R32_UInt;
+                            else
+                                throw new NotImplementedException("Got unknown vertex shader input!");
+                            break;
+
+                        default:
+                            throw new NotImplementedException("Got unknown vertex shader input!");
+                    }
+
+                    _attributes[i].format = (short)format;
+                }
+            }
+            
             SharedIndex = sharedIndex;
             Bytecode = byteCode;
             ShaderCode = byteCode;
 
             _symbols = new MojoShader.MOJOSHADER_symbol[0];
             _samplers = new Sampler[0];
-            _attributes = attributes;
         }
 
         public DXShader(byte[] byteCode, int sharedIndex)
