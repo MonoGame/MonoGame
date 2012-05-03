@@ -126,6 +126,17 @@ namespace Microsoft.Xna.Framework
 
         public override bool BeforeDraw(GameTime gameTime)
         {
+            var device = Game.GraphicsDevice;
+            if (device != null)
+            {
+                // For a Metro app we need to re-apply the
+                // render target before every draw.  
+                // 
+                // I guess the OS changes it and doesn't restore it?
+                var binding = device.GetRenderTargets();
+                device.SetRenderTargets(binding);
+            }
+
             return true;
         }
 
