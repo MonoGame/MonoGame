@@ -56,7 +56,6 @@ namespace Microsoft.Xna.Framework
 {
     public class PSSGameWindow : GameWindow
     {
-		private GraphicsContext _graphics;
 		private Rectangle clientBounds;
 		private Game _game;
 		private GameTime _updateGameTime;
@@ -77,8 +76,9 @@ namespace Microsoft.Xna.Framework
 						
         private void Initialize()
         {
-			_graphics = new GraphicsContext();
-			clientBounds = new Rectangle(0, 0, _graphics.Screen.Width, _graphics.Screen.Height);
+            //FIXME: GraphicsDevice hasn't been registered here so it is null
+            //clientBounds = new Rectangle(0, 0, _game.GraphicsDevice._graphics.Screen.Width, _game.GraphicsDevice._graphics.Screen.Height);
+            clientBounds = new Rectangle(0, 0, 960, 544);
 
             // Initialize GameTime
             _updateGameTime = new GameTime();
@@ -97,11 +97,6 @@ namespace Microsoft.Xna.Framework
 
 		public void Close ()
 		{
-			if (_graphics != null)
-			{
-				_graphics.Dispose();
-				_graphics = null;
-			}
 		}
 		
 		void GameWindow_Closed(object sender,EventArgs e)
@@ -126,18 +121,11 @@ namespace Microsoft.Xna.Framework
 
         internal void OnRenderFrame()
         {
-            if (_game != null) {
+            if (_game != null)
+            {
                 _drawGameTime.Update(_now - _lastUpdate);                
                 _game.DoDraw(_drawGameTime);
 				_lastUpdate = _now;
-            }
-            try
-            {
-                _graphics.SwapBuffers();
-            }
-            catch(Exception ex)
-            {
-                Console.WriteLine("Error in swap buffers", ex.ToString());
             }
         }
 
@@ -145,39 +133,7 @@ namespace Microsoft.Xna.Framework
 		{
 			if (_game != null )
 			{
-				_now = DateTime.Now;
-				
-				if (_isFirstTime) {
-					// Initialize GameTime
-					_updateGameTime = new GameTime ();
-					_drawGameTime = new GameTime ();
-					_lastUpdate = DateTime.Now;
-					_isFirstTime = false;
-				}
-
-				if (_needsToResetElapsedTime) {
-					_drawGameTime.ResetElapsedTime();
-					_needsToResetElapsedTime = false;
-				}
-				
-				_updateGameTime.Update(_now - _lastUpdate);
-				
-				TimeSpan catchup = _updateGameTime.ElapsedGameTime;
-				if (catchup > _game.TargetElapsedTime) {
-					while (catchup > _game.TargetElapsedTime) {
-						catchup -= _game.TargetElapsedTime;
-						_updateGameTime.ElapsedGameTime = _game.TargetElapsedTime;
-						_game.DoUpdate (_updateGameTime);
-						_extraElapsedTime += catchup;
-					}
-					if (_extraElapsedTime > _game.TargetElapsedTime) {
-						_game.DoUpdate (_updateGameTime);
-						_extraElapsedTime = TimeSpan.Zero;
-					}
-				}
-				else {
-					_game.DoUpdate (_updateGameTime);
-				}
+				_game.Tick();
 			}
 		}
 		

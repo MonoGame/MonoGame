@@ -130,6 +130,8 @@ namespace Microsoft.Xna.Framework.Graphics
             desc.Format = SharpDXHelper.ToFormat(format);
 
             _texture2D = new SharpDX.Direct3D11.Texture2D(graphicsDevice._d3dDevice, desc);
+#elif PSS
+			_texture2D = new Sce.Pss.Core.Graphics.Texture2D(width, height, mipmap, PSSHelper.ToFormat(format));
 #else
             this.glTarget = TextureTarget.Texture2D;
             
@@ -221,6 +223,15 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 #endif
         }
+        
+#if PSS
+        private Texture2D(GraphicsDevice graphicsDevice, Stream stream)
+        {
+            byte[] bytes = new byte[stream.Length];
+            stream.Read(bytes, 0, (int)stream.Length);
+            _texture2D = new PssTexture2D(bytes, false);
+        }
+#endif
 				
 		public Texture2D(GraphicsDevice graphicsDevice, int width, int height) : 
 			this(graphicsDevice, width, height, false, SurfaceFormat.Color)
@@ -254,10 +265,12 @@ namespace Microsoft.Xna.Framework.Graphics
             try
             {
 #endif
+#if !PSS
                 var elementSizeInByte = Marshal.SizeOf(typeof(T));
                 var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
                 var startBytes = startIndex * elementSizeInByte;
                 var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
+#endif
                 int x, y, w, h;
                 if (rect.HasValue)
                 {
@@ -287,6 +300,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 // TODO: We need to deal with threaded contexts here!
                 graphicsDevice._d3dContext.UpdateSubresource(box, _texture2D, level, region);
+#elif PSS
+                _texture2D.SetPixels(level, data, _texture2D.Format, startIndex, w, x, y, w, h);
 #else
                 GL.BindTexture(TextureTarget.Texture2D, this.glTexture);
 
@@ -306,8 +321,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 Debug.Assert(GL.GetError() == ErrorCode.NoError);
 #endif
 
+#if !PSS
                 dataHandle.Free();
-
+#endif
 #if !WINRT
             }
             finally
@@ -331,6 +347,8 @@ namespace Microsoft.Xna.Framework.Graphics
         {
 #if IPHONE || ANDROID
 			throw new NotImplementedException();
+#elif PSS
+            throw new NotImplementedException();
 #elif WINRT
             throw new NotImplementedException();
 #else
@@ -452,6 +470,8 @@ namespace Microsoft.Xna.Framework.Graphics
             return texture;
 #elif WINRT
             return null;
+#elif PSS
+            return new Texture2D(graphicsDevice, stream);
 #else
             using (Bitmap image = (Bitmap)Bitmap.FromStream(stream))
             {

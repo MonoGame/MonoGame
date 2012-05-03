@@ -10,6 +10,7 @@ using MonoMac.OpenGL;
 using OpenTK.Graphics.OpenGL;
 #elif PSS
 using Sce.Pss.Core.Graphics;
+using PssVertexBuffer = Sce.Pss.Core.Graphics.VertexBuffer;
 #elif WINRT
 #else
 using OpenTK.Graphics.ES20;
@@ -29,6 +30,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 #if WINRT
         internal SharpDX.Direct3D11.Buffer _buffer;
+#elif PSS
+        internal PssVertexBuffer _buffer;
 #else
 		internal uint ibo;	
 #endif
@@ -58,6 +61,8 @@ namespace Microsoft.Xna.Framework.Graphics
                                                         0, // OptionFlags                                                          
                                                         0  // StructureSizeInBytes
                                                         );
+#elif PSS
+            _buffer = new PssVertexBuffer(0, indexCount);
 #else
             Threading.Begin();
             try
@@ -100,6 +105,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new NotSupportedException("This IndexBuffer was created with a usage type of BufferUsage.WriteOnly. Calling GetData on a resource that was created with BufferUsage.WriteOnly is not supported.");
 
 #if WINRT
+#elif PSS
+            throw new NotImplementedException();
 #else        
             Threading.Begin();
             try
@@ -182,6 +189,20 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 dataHandle.Free();
             }
+#elif PSS
+            if (typeof(T) == typeof(ushort))
+            {
+#warning This is a terrible way to achieve what I want to do
+                _buffer.SetIndices((ushort[])(object)data, 0, 0, elementCount); 
+            }
+            else
+            {
+                ushort[] clone = new ushort[data.Length];
+                for (int i = 0; i < data.Length; i++)
+#warning This is a terrible way to achieve what I want to do
+                    clone[i] = (ushort)(object)data[i];
+                _buffer.SetIndices(clone, 0, 0, elementCount);
+            }
 #else
             Threading.Begin();
             try
@@ -215,7 +236,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		public override void Dispose()
 		{
-#if WINRT
+#if WINRT || PSS
             if (_buffer != null)
             {
                 _buffer.Dispose();
