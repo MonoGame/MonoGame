@@ -6,7 +6,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGameContentProcessors",
 		{7CC59D82-06E1-4BA7-8644-2552CBC34316} = {7CC59D82-06E1-4BA7-8644-2552CBC34316}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PVRTexLibC", "..\..\Tools\PVRTexLibC\PVRTexLibC\PVRTexLibC.vcxproj", "{7CC59D82-06E1-4BA7-8644-2552CBC34316}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PVRTexLibC", "..\..\Tools\PVRTexLibC\PVRTexLibC.vcxproj", "{7CC59D82-06E1-4BA7-8644-2552CBC34316}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
