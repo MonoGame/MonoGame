@@ -45,18 +45,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-#if IPHONE || ANDROID
-using OpenTK.Graphics.ES20;
-using ShaderType = OpenTK.Graphics.ES20.All;
-using ActiveUniformType = OpenTK.Graphics.ES20.All;
-using ProgramParameter = OpenTK.Graphics.ES20.All;
-using ShaderParameter = OpenTK.Graphics.ES20.All;
-#elif MONOMAC
-using MonoMac.OpenGL;
-#elif PSS
-using Sce.Pss.Core.Graphics;
-#elif !WINRT
-using OpenTK.Graphics.OpenGL;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
