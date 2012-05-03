@@ -159,7 +159,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new ArgumentNullException("data");
 
 #if DIRECTX
-            var elementSizeInBytes = IndexElementSize == Graphics.IndexElementSize.SixteenBits ? 2 : 4;
+
+            var elementSizeInBytes = Marshal.SizeOf(typeof(T));
             var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
             var startBytes = startIndex * elementSizeInBytes;
             var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
