@@ -284,6 +284,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #if WINRT
                 var box = new SharpDX.DataBox(dataPtr, w * elementSizeInByte, 0);
 
+                // TODO: should this be in bytes and not pixels?
                 var region = new SharpDX.Direct3D11.ResourceRegion();
                 region.Top = y;
                 region.Front = 0;
