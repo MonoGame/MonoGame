@@ -8,10 +8,10 @@ using Microsoft.Xna.Content.Pipeline.Processors;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 {
-    [ContentProcessor(DisplayName = "PVRTC SpriteFont Processor")]
-    public class PVRSpriteFontDescriptionProcessor : FontDescriptionProcessor
+    [ContentProcessor(DisplayName = "MG SpriteFont Processor")]
+    public class MGSpriteFontDescriptionProcessor : FontDescriptionProcessor
     {
-        public PVRSpriteFontDescriptionProcessor()
+        public MGSpriteFontDescriptionProcessor()
             : base()
         {
         }
@@ -48,7 +48,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             else
                 texture.ConvertBitmapType(typeof(PixelBitmapContent<Color>));
 
-            PVRTextureProcessor.ConvertToPVRTC(texture, 1, true, PVRCompressionMode.FourBitsPerPixel);
+            MGTextureProcessor.ConvertToPVRTC(texture, 1, true, MGCompressionMode.PVRTCFourBitsPerPixel);
 
             return content; 
 

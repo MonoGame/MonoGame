@@ -13,18 +13,18 @@ namespace Microsoft.Xna.Content.Pipeline.Processors
     using System.Collections.ObjectModel;
     
 
-    [ContentProcessor(DisplayName = "PVRTexture")]
-    public class PVRTextureProcessor : TextureProcessor
+    [ContentProcessor(DisplayName = "MGTexture")]
+    public class MGTextureProcessor : TextureProcessor
     {
         [DllImport("PVRTexLibC.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr CompressTexture(byte[] data, int height, int width, int mipLevels, bool preMultiplied, bool pvrtc4bppCompression, ref IntPtr dataSizes);
 
-        private PVRCompressionMode compressionMode = PVRCompressionMode.FourBitsPerPixel;
+        private MGCompressionMode compressionMode = MGCompressionMode.PVRTCFourBitsPerPixel;
 
-        [DisplayName("PVR Compression Mode")]
+        [DisplayName("Compression Mode")]
         [Description("Specifies the type of compression to use, if any.")]
-        [DefaultValue(PVRCompressionMode.FourBitsPerPixel)]
-        public PVRCompressionMode CompressionMode
+        [DefaultValue(MGCompressionMode.PVRTCFourBitsPerPixel)]
+        public MGCompressionMode CompressionMode
         {
             get { return this.compressionMode; }
             set { this.compressionMode = value; }
@@ -54,9 +54,9 @@ namespace Microsoft.Xna.Content.Pipeline.Processors
             var invalidBounds = height != width || !(isPowerOfTwo(height) && isPowerOfTwo(width));
 
             // Only PVR compress square, power of two textures.
-            if (invalidBounds || compressionMode == PVRCompressionMode.NoCompression)
+            if (invalidBounds || compressionMode == MGCompressionMode.NoCompression)
             {
-                if (compressionMode != PVRCompressionMode.NoCompression)
+                if (compressionMode != MGCompressionMode.NoCompression)
                 {
                     context.Logger.LogImportantMessage("WARNING: PVR Texture {0} must be a square, power of two texture. Skipping Compression.",
                                                         Path.GetFileName(context.OutputFilename));
@@ -84,7 +84,7 @@ namespace Microsoft.Xna.Content.Pipeline.Processors
             return input;
         }
 
-        public static void ConvertToPVRTC(TextureContent sourceContent, int mipLevels, bool premultipliedAlpha, PVRCompressionMode bpp)
+        public static void ConvertToPVRTC(TextureContent sourceContent, int mipLevels, bool premultipliedAlpha, MGCompressionMode bpp)
         {
             IntPtr dataSizesPtr = IntPtr.Zero;
 
@@ -93,7 +93,7 @@ namespace Microsoft.Xna.Content.Pipeline.Processors
                                             sourceContent.Faces[0][0].Width, 
                                             mipLevels, 
                                             premultipliedAlpha,
-                                            bpp == PVRCompressionMode.FourBitsPerPixel,
+                                            bpp == MGCompressionMode.PVRTCFourBitsPerPixel,
                                             ref dataSizesPtr);
 
             // Store the size of each mipLevel
@@ -118,7 +118,7 @@ namespace Microsoft.Xna.Content.Pipeline.Processors
                 var levelWidth = Math.Max(sourceWidth  >> x, 1);
                 var levelHeight = Math.Max(sourceHeight >> x, 1);
 
-                sourceContent.Faces[0].Add(new PvrtcBitmapContent(levelData, levelWidth, levelHeight, bpp));
+                sourceContent.Faces[0].Add(new MGBitmapContent(levelData, levelWidth, levelHeight, bpp));
 
                 texDataPtr = IntPtr.Add(texDataPtr, levelSize);
             }

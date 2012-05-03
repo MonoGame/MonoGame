@@ -10,8 +10,8 @@ using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Content.Pipeline.Processors;
 
 
-[ContentProcessor(DisplayName = "PVRMaterialProcessor")]
-public class PVRMaterialProcessor : MaterialProcessor
+[ContentProcessor(DisplayName = "MGMaterialProcessor")]
+public class MGMaterialProcessor : MaterialProcessor
 {
 
     protected override ExternalReference<TextureContent>  BuildTexture(string textureName, ExternalReference<TextureContent> texture, ContentProcessorContext context)
@@ -28,7 +28,7 @@ public class PVRMaterialProcessor : MaterialProcessor
         processorParameters.Add("ResizeToPowerOfTwo", this.ResizeTexturesToPowerOfTwo);
         processorParameters.Add("PremultiplyAlpha", this.PremultiplyTextureAlpha);
 
-        return context.BuildAsset<TextureContent, TextureContent>(texture, typeof(PVRTextureProcessor).Name, processorParameters, null, null);
+        return context.BuildAsset<TextureContent, TextureContent>(texture, typeof(MGTextureProcessor).Name, processorParameters, null, null);
 
     }
 

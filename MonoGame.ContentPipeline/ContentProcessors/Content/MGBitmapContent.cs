@@ -8,21 +8,21 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
-    public enum PVRCompressionMode
+    public enum MGCompressionMode
     {
-        TwoBitsPerPixel,
-        FourBitsPerPixel,
+        PVRTCTwoBitsPerPixel,
+        PVRTCFourBitsPerPixel,
         NoCompression
     }
 
-    class PvrtcBitmapContent : BitmapContent
+    class MGBitmapContent : BitmapContent
     {
-        private PVRCompressionMode _bpp;
+        private MGCompressionMode _bpp;
         private byte[] _pixelData;
 
-        public PvrtcBitmapContent() { }
+        public MGBitmapContent() { }
 
-        public PvrtcBitmapContent(byte[] pData, int width, int height, PVRCompressionMode bpp) :
+        public MGBitmapContent(byte[] pData, int width, int height, MGCompressionMode bpp) :
             base(width, height)
         {
             _pixelData = pData;
@@ -63,13 +63,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
             switch(_bpp)
             {
-                case PVRCompressionMode.FourBitsPerPixel:
+                case MGCompressionMode.PVRTCFourBitsPerPixel:
                     format = SurfaceFormat.Dxt5;
                     break;
-                case PVRCompressionMode.TwoBitsPerPixel:
+                case MGCompressionMode.PVRTCTwoBitsPerPixel:
                     format = SurfaceFormat.Dxt3;
                     break;
-                case PVRCompressionMode.NoCompression:
+                case MGCompressionMode.NoCompression:
                     format = SurfaceFormat.Color;
                     break;
 
