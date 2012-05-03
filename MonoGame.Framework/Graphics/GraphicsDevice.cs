@@ -44,6 +44,7 @@ using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Input.Touch;
+using System.Diagnostics;
 
 #if MONOMAC
 using MonoMac.OpenGL;
@@ -54,7 +55,6 @@ using SharpDX;
 using SharpDX.Direct3D;
 using Windows.Graphics.Display;
 using Windows.UI.Core;
-using System.Diagnostics;
 #elif GLES
 using OpenTK.Graphics.ES20;
 using BeginMode = OpenTK.Graphics.ES20.All;

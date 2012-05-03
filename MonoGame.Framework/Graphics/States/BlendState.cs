@@ -64,9 +64,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		public ColorWriteChannels ColorWriteChannels2 { get; set; }
 		public ColorWriteChannels ColorWriteChannels3 { get; set; }
 		public int MultiSampleMask { get; set; }
-		
-		static BlendState additiveState;
-		
+
 		public static readonly BlendState Additive;
 		public static readonly BlendState AlphaBlend;
 		public static readonly BlendState NonPremultiplied;
