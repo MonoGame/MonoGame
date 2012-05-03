@@ -47,11 +47,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #elif DIRECTX
 
-        private InputLayout _inputLayout;
-
         private VertexShader _vertexShader;
 
         private PixelShader _pixelShader;
+
+        private byte[] _shaderBytecode;
 
 #endif
 
@@ -118,7 +118,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #elif DIRECTX
             _pixelShader = cloneSource._pixelShader;
             _vertexShader = cloneSource._vertexShader;
-            _inputLayout = cloneSource._inputLayout;
+            _shaderBytecode = cloneSource._shaderBytecode;
 #endif
             _symbols = cloneSource._symbols;
             _samplers = cloneSource._samplers;
@@ -253,14 +253,9 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 _vertexShader = new VertexShader(d3dDevice, shaderBytecode, null);
 
-                var elements = new InputElement[_attributes.Length];
-                for (var i=0; i < _attributes.Length; i++)
-                {
-                    var attrib = _attributes[i];
-                    elements[i] = new InputElement(attrib.name, 0, (Format)attrib.format, attrib.index * 4, 0);
-                }
-
-                _inputLayout = new InputLayout(d3dDevice, shaderBytecode, elements);
+                // We need the bytecode later for allocating the
+                // input layout from the vertex declaration.
+                _shaderBytecode = shaderBytecode;
             }
             else
                 _pixelShader = new PixelShader(d3dDevice, shaderBytecode);
@@ -384,8 +379,11 @@ namespace Microsoft.Xna.Framework.Graphics
                 d3dContext.PixelShader.Set(_pixelShader);
             else
             {
-                d3dContext.VertexShader.Set(_vertexShader );
-                d3dContext.InputAssembler.InputLayout = _inputLayout;
+                d3dContext.VertexShader.Set(_vertexShader);
+
+                // Give the shader bytecode to the device so it
+                // can generate the input layout at draw time.
+                graphicsDevice._vertexShaderBytecode = _shaderBytecode;
             }
 
 #elif OPENGL

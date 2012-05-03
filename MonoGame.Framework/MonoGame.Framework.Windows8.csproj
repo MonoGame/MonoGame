@@ -73,6 +73,7 @@
     <Compile Include="Graphics\CubeMapFace.cs" />
     <Compile Include="Graphics\DisplayMode.cs" />
     <Compile Include="Graphics\Effect\AlphaTestEffect.cs" />
+    <Compile Include="Graphics\Effect\ConstantBuffer.cs" />
     <Compile Include="Graphics\Effect\DualTextureEffect.cs" />
     <Compile Include="Graphics\Effect\DXShader.cs" />
     <Compile Include="Graphics\Effect\Effect.cs" />
@@ -338,10 +339,6 @@
   <ItemGroup>
     <Reference Include="SharpDX">
       <HintPath>..\ThirdParty\Libs\SharpDX\Windows 8 Metro\SharpDX.dll</HintPath>
-    </Reference>
-    <Reference Include="SharpDX.D3DCompiler, Version=2.0.4.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\ThirdParty\Libs\SharpDX\Windows 8 Metro\SharpDX.D3DCompiler.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.Direct2D1">
       <HintPath>..\ThirdParty\Libs\SharpDX\Windows 8 Metro\SharpDX.Direct2D1.dll</HintPath>
