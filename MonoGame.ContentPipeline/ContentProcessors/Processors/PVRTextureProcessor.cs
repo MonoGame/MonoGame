@@ -19,11 +19,11 @@ namespace Microsoft.Xna.Content.Pipeline.Processors
         [DllImport("PVRTexLibC.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr CompressTexture(byte[] data, int height, int width, int mipLevels, bool preMultiplied, bool pvrtc4bppCompression, ref IntPtr dataSizes);
 
-        private PVRCompressionMode compressionMode = PVRCompressionMode.NoCompression;
+        private PVRCompressionMode compressionMode = PVRCompressionMode.FourBitsPerPixel;
 
         [DisplayName("PVR Compression Mode")]
         [Description("Specifies the type of compression to use, if any.")]
-        [DefaultValue(PVRCompressionMode.NoCompression)]
+        [DefaultValue(PVRCompressionMode.FourBitsPerPixel)]
         public PVRCompressionMode CompressionMode
         {
             get { return this.compressionMode; }

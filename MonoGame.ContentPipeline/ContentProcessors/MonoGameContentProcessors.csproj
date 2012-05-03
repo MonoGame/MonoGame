@@ -8,8 +8,8 @@
     <ProjectGuid>{2C23E01D-DE2D-4671-85B0-1085857C6D25}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ContentPipeline</RootNamespace>
-    <AssemblyName>ContentPipeline</AssemblyName>
+    <RootNamespace>MonoGameContentProcessors</RootNamespace>
+    <AssemblyName>MonoGameContentProcessors</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -48,12 +48,6 @@
     <Compile Include="Processors\PVRSpriteFontDescriptionProcessor.cs" />
     <Compile Include="Processors\PVRTextureProcessor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\Tools\PVRTexLibC\PVRTexLibC\PVRTexLibC.vcxproj">
-      <Project>{7CC59D82-06E1-4BA7-8644-2552CBC34316}</Project>
-      <Name>PVRTexLibC</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

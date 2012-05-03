@@ -60,10 +60,23 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         {
             //TODO: Return the correct SurfaceFormat for proper MonoGame processing.
             //format = SurfaceFormat.RgbaPvrtc4Bpp;
-            if (_bpp == PVRCompressionMode.FourBitsPerPixel)
-                format = SurfaceFormat.Dxt5;
-            else
-                format = SurfaceFormat.Dxt3;
+
+            switch(_bpp)
+            {
+                case PVRCompressionMode.FourBitsPerPixel:
+                    format = SurfaceFormat.Dxt5;
+                    break;
+                case PVRCompressionMode.TwoBitsPerPixel:
+                    format = SurfaceFormat.Dxt3;
+                    break;
+                case PVRCompressionMode.NoCompression:
+                    format = SurfaceFormat.Color;
+                    break;
+
+                default:
+                    format = SurfaceFormat.Dxt5;
+                    break;
+            }
 
             return true;
         }
