@@ -197,9 +197,6 @@ namespace Microsoft.Xna.Framework
         {
             _coreWindow = coreWindow;
 
-            if (Mouse.Window == null)
-                Mouse.Window = coreWindow;
-
             _coreWindow.SizeChanged += Window_SizeChanged;
             _coreWindow.Closed += Window_Closed;
 
