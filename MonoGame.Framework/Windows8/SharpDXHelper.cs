@@ -32,7 +32,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 case SurfaceFormat.Color:
                 default:
-                    return SharpDX.DXGI.Format.B8G8R8A8_UNorm;
+                    return SharpDX.DXGI.Format.R8G8B8A8_UNorm;
 
                 case SurfaceFormat.Bgr565:
                     return SharpDX.DXGI.Format.B5G6R5_UNorm;
