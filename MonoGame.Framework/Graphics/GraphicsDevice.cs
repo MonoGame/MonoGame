@@ -977,6 +977,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 _d3dContext.InputAssembler.SetVertexBuffers(0, _vertexBuffer._binding);
             else
                 _d3dContext.InputAssembler.SetVertexBuffers(0, null);
+#elif PSS
+            _graphics.SetVertexBuffer(0, vertexBuffer._buffer);
 #elif OPENGL
             if (_vertexBuffer != null)
                 GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBuffer.vbo);
@@ -1080,6 +1082,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			_vertexBuffer.VertexDeclaration.Apply();
 
 #if WINRT
+#elif PSS
+            _graphics.DrawArrays(Sce.Pss.Core.Graphics.DrawMode.Triangles, vertexStart, primitiveCount * 3);
 #elif OPENGL
 			GL.DrawArrays(PrimitiveTypeGL(primitiveType),
 			              vertexStart,

@@ -31,7 +31,7 @@ namespace Microsoft.Xna.Framework.Graphics
         internal SharpDX.Direct3D11.VertexBufferBinding _binding;
         private SharpDX.Direct3D11.Buffer _buffer;
 #elif PSS
-        private PssVertexBuffer _buffer;
+        internal PssVertexBuffer _buffer;
 #else
 		//internal uint vao;
 		internal uint vbo;
@@ -70,7 +70,7 @@ namespace Microsoft.Xna.Framework.Graphics
             VertexFormat[] vertexFormat = new VertexFormat[vertexDeclaration._elements.Length];
             for (int i = 0; i < vertexFormat.Length; i++)
                 vertexFormat[i] = PSSHelper.ToVertexFormat(vertexDeclaration._elements[i].VertexElementFormat);
-            _buffer = new PssVertexBuffer(vertexCount, 0, vertexFormat);
+            _buffer = new PssVertexBuffer(vertexCount, vertexFormat);
 #else
             Threading.Begin();
             try
@@ -182,9 +182,11 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new InvalidOperationException("The array specified in the data parameter is not the correct size for the amount of data requested.");
             if ((vertexStride > (VertexCount * VertexDeclaration.VertexStride)) || (vertexStride < VertexDeclaration.VertexStride))
                 throw new ArgumentOutOfRangeException("One of the following conditions is true:\nThe vertex stride is larger than the vertex buffer.\nThe vertex stride is too small for the type of data requested.");
-
+   
+#if !PSS
             var elementSizeInByte = Marshal.SizeOf(typeof(T));
             var sizeInBytes = elementSizeInByte * elementCount;
+#endif
 
 #if WINRT
             //using(var stream = new SharpDX.DataStream(sizeInBytes, false, true))
@@ -211,8 +213,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 dataHandle.Free();
             }
 #elif PSS
-#warning This is almost 100% certainly wrong
-            _buffer.SetVertices(data, startIndex, offsetInBytes / elementSizeInByte, vertexStride);
+            _buffer.SetVertices(data, offsetInBytes, startIndex, elementCount);
 #else
             Threading.Begin();
             try

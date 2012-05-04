@@ -9,7 +9,7 @@ namespace Microsoft.Xna.Framework.Graphics
 	{
 		public static PssPixelFormat ToFormat(SurfaceFormat format)
 		{
-#warning This is not fully implemented. Do something like SharpDXHelper.ToFormat
+#warning This is not fully implemented at all! TODO: Do something like SharpDXHelper.ToFormat
 			return PssPixelFormat.Rgba;
 		}
         
@@ -20,8 +20,9 @@ namespace Microsoft.Xna.Framework.Graphics
             case VertexElementFormat.Vector3:
                 return PssVertexFormat.Float3;
             case VertexElementFormat.Color:
-                return PssVertexFormat.UByte4N; //FIXME: The samples all take Float4 but the actual data is uint/Byte4
+                return PssVertexFormat.UByte4N;
             default:
+#warning Plenty more formats still to implement
                 throw new NotImplementedException();
             }
         }
