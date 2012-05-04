@@ -54,7 +54,7 @@ namespace Microsoft.Xna.Framework.Graphics
                                                         vertexDeclaration.VertexStride * vertexCount,
                                                         dynamic ? SharpDX.Direct3D11.ResourceUsage.Dynamic : SharpDX.Direct3D11.ResourceUsage.Default,
                                                         SharpDX.Direct3D11.BindFlags.VertexBuffer,
-                                                        SharpDX.Direct3D11.CpuAccessFlags.None,
+                                                        dynamic ? SharpDX.Direct3D11.CpuAccessFlags.Write : SharpDX.Direct3D11.CpuAccessFlags.None,
                                                         0, // OptionFlags                                                          
                                                         0  // StructureSizeInBytes
                                                         );
@@ -179,7 +179,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new ArgumentOutOfRangeException("One of the following conditions is true:\nThe vertex stride is larger than the vertex buffer.\nThe vertex stride is too small for the type of data requested.");
 
             var elementSizeInBytes = Marshal.SizeOf(typeof(T));
-            var sizeInBytes = elementSizeInBytes * elementCount;
 
 #if DIRECTX
 
@@ -187,7 +186,7 @@ namespace Microsoft.Xna.Framework.Graphics
             var startBytes = startIndex * elementSizeInBytes;
             var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
 
-            var box = new SharpDX.DataBox(dataPtr, elementSizeInBytes, 0);
+            var box = new SharpDX.DataBox(dataPtr, 1, 0);
 
             var region = new SharpDX.Direct3D11.ResourceRegion();
             region.Top = 0;
@@ -204,11 +203,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #elif PSS
 #warning This is almost 100% certainly wrong
-            _buffer.SetVertices(data, startIndex, offsetInBytes / elementSizeInByte, vertexStride);
+            var elementSizeInBytes = Marshal.SizeOf(typeof(T));
+            _buffer.SetVertices(data, startIndex, offsetInBytes / elementSizeInBytes, vertexStride);
 #else
             Threading.Begin();
             try
             {
+                var sizeInBytes = elementSizeInBytes * elementCount;
                 GL.BindBuffer(BufferTarget.ArrayBuffer, vbo);
                 GL.BufferSubData<T>(BufferTarget.ArrayBuffer, new IntPtr(offsetInBytes), new IntPtr(sizeInBytes), data);
             }
@@ -217,7 +218,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 Threading.End();
             }
 #endif
-		}
+        }
 		
 		public void SetData<T>(T[] data, int startIndex, int elementCount) where T : struct
         {
