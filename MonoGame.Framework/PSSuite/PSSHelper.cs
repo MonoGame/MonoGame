@@ -1,5 +1,6 @@
 using System;
 
+using PssMatrix4 = Sce.Pss.Core.Matrix4;
 using PssPixelFormat = Sce.Pss.Core.Graphics.PixelFormat;
 using PssVertexFormat = Sce.Pss.Core.Graphics.VertexFormat;
 
@@ -25,6 +26,14 @@ namespace Microsoft.Xna.Framework.Graphics
 #warning Plenty more formats still to implement
                 throw new NotImplementedException();
             }
+        }
+        
+        /// <summary>
+        /// Transforms a float[] (As inside EffectParameters["WorldViewProj"].Data) into a PssMatrix4
+        /// </summary>
+        public static PssMatrix4 ToPssMatrix4(float[] flatMatrix)
+        {
+            return new PssMatrix4(flatMatrix[0], flatMatrix[1], flatMatrix[2], flatMatrix[3], flatMatrix[4], flatMatrix[5], flatMatrix[6], flatMatrix[7], flatMatrix[8], flatMatrix[9], flatMatrix[10], flatMatrix[11], flatMatrix[12], flatMatrix[13], flatMatrix[14], flatMatrix[15]);
         }
 	}
 }
