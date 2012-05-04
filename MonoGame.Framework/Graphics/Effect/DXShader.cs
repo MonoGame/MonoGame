@@ -376,7 +376,21 @@ namespace Microsoft.Xna.Framework.Graphics
 
             var d3dContext = graphicsDevice._d3dContext;
             if (_pixelShader != null)
+            {
+                // TODO: Replace this with really setting the correct sampler
+                // stages with the correct textures.
+
+                foreach (var param in parameters)
+                {
+                    if (param.ParameterType == EffectParameterType.Texture2D)
+                    {
+                        var texture = param.Data as Texture2D;
+                        graphicsDevice.Textures[0] = texture;
+                    }
+                }
+
                 d3dContext.PixelShader.Set(_pixelShader);
+            }
             else
             {
                 d3dContext.VertexShader.Set(_vertexShader);

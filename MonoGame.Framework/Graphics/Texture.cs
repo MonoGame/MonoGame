@@ -59,7 +59,11 @@ namespace Microsoft.Xna.Framework.Graphics
 		protected SurfaceFormat format;
 		protected int levelCount;
 
-#if WINRT
+#if DIRECTX
+
+        protected SharpDX.Direct3D11.Resource _texture;
+
+        private SharpDX.Direct3D11.ShaderResourceView _resourceView;
 
 #elif OPENGL
 		internal int glTexture = -1;
@@ -77,17 +81,41 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 		
 		
+#if OPENGL
 		internal virtual void Activate()
-		{
-#if WINRT
-#elif OPENGL
+        {
 			GL.BindTexture(glTarget, this.glTexture);
+        }
 #endif
+
+#if DIRECTX
+
+        internal SharpDX.Direct3D11.ShaderResourceView GetShaderResourceView()
+        {
+            if (_resourceView == null)
+                _resourceView = new SharpDX.Direct3D11.ShaderResourceView(graphicsDevice._d3dDevice, _texture);
+
+            return _resourceView;
         }
 
-		public override void Dispose()
+#endif
+
+        public override void Dispose()
 		{
-#if WINRT
+#if DIRECTX
+
+            if (_resourceView != null)
+            {
+                _resourceView.Dispose();
+                _resourceView = null;
+            }
+
+            if (_texture != null)
+            {
+                _texture.Dispose();
+                _texture = null;
+            }
+
 #elif OPENGL
 			GL.DeleteTextures(1, ref glTexture);
 #endif

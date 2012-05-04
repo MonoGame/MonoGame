@@ -233,7 +233,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // Update the constant buffers.
             foreach (var param in _effect.Parameters)
             {
-                if ( param.BufferOffset == -1 )
+                if (param.BufferOffset == -1)
                     continue;
 
                 var buffer = _effect.ConstantBuffers[param.BufferIndex];

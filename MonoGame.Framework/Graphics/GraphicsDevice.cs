@@ -80,7 +80,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private Viewport _viewport;
 
         private bool _isDisposed = false;
-        public TextureCollection Textures { get; set; }
+        public TextureCollection Textures { get; private set; }
         private BlendState _blendState = BlendState.Opaque;
         private DepthStencilState _depthStencilState = DepthStencilState.Default;
 		private RasterizerState _rasterizerState = RasterizerState.CullCounterClockwise;
@@ -243,7 +243,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			                         DisplayMode.Width, DisplayMode.Height);
             _viewport.MinDepth = 0.0f;
             _viewport.MaxDepth = 1.0f;
-            Textures = new TextureCollection();
+            Textures = new TextureCollection(16);
 
             PresentationParameters = new PresentationParameters();
         }
@@ -1051,6 +1051,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if DIRECTX
 
+            Textures.SetTextures(this);
+
             _d3dContext.InputAssembler.InputLayout = _vertexBuffer.VertexDeclaration.GetInputLayout(this, _vertexShaderBytecode);
             _d3dContext.InputAssembler.PrimitiveTopology = ToPrimitiveTopology(primitiveType);
 
@@ -1132,9 +1134,13 @@ namespace Microsoft.Xna.Framework.Graphics
             var vertexCount = GetElementCountArray(primitiveType, primitiveCount);
 
 #if DIRECTX
+
+            Textures.SetTextures(this);
+
             _d3dContext.InputAssembler.InputLayout = _vertexBuffer.VertexDeclaration.GetInputLayout(this, _vertexShaderBytecode);
             _d3dContext.InputAssembler.PrimitiveTopology = ToPrimitiveTopology(primitiveType);
             _d3dContext.Draw(vertexCount, vertexStart);
+
 #elif OPENGL
 
 			_vertexBuffer.VertexDeclaration.Apply();
