@@ -63,7 +63,6 @@
     <Compile Include="Content\ContentReaders\TextureReader.cs" />
     <Compile Include="Content\ContentReaders\VertexBufferReader.cs" />
     <Compile Include="Content\ContentReaders\VertexDeclarationReader.cs" />
-    <Compile Include="Desktop\Input\Mouse.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="GamePlatform.cs" />
     <Compile Include="GamerServices\MessageBoxIcon.cs">
@@ -132,6 +131,9 @@
     <Compile Include="Input\KeyboardState.cs" />
     <Compile Include="Input\Keys.cs" />
     <Compile Include="Input\KeyState.cs" />
+    <Compile Include="Input\Mouse.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Input\MouseState.cs" />
     <Compile Include="Input\ThumbStickDefinition.cs" />
     <Compile Include="Input\Touch\GestureSample.cs" />
@@ -352,6 +354,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Desktop\Input\" />
     <Folder Include="Windows\Input\" />
   </ItemGroup>
   <ItemGroup>

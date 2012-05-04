@@ -159,7 +159,11 @@ namespace Microsoft.Xna.Framework
 		{			
 			// Set "full screen"  as default
 			_graphicsDevice.PresentationParameters.IsFullScreen = true;
-
+            //TODO: This is here on the Windows version, why is it not on the generic?
+#if PSS
+            _graphicsDevice.Initialize();
+#endif
+#if !PSS
 			if (_preferMultiSampling)
 			{
 				_graphicsDevice.PreferedFilter = All.Linear;
@@ -168,6 +172,7 @@ namespace Microsoft.Xna.Framework
 			{
 				_graphicsDevice.PreferedFilter = All.Nearest;
 			}
+#endif
 		}
 		
         public void ToggleFullScreen()
@@ -226,6 +231,7 @@ namespace Microsoft.Xna.Framework
 				_preferMultiSampling = value;
 				if ( _graphicsDevice != null )
 				{
+#if !PSS
 					if (_preferMultiSampling) 
 					{
 						_graphicsDevice.PreferedFilter = All.Linear;
@@ -234,6 +240,7 @@ namespace Microsoft.Xna.Framework
 					{
 						_graphicsDevice.PreferedFilter = All.Nearest;
 					}
+#endif
 				}
             }
         }

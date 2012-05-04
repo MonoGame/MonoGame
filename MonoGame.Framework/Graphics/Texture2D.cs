@@ -120,6 +120,7 @@ namespace Microsoft.Xna.Framework.Graphics
             this.levelCount = 1;
 
 #if DIRECTX
+
             // TODO: Move this to SetData() if we want to make Immutable textures!
             var desc = new SharpDX.Direct3D11.Texture2DDescription();
             desc.Width = width;
@@ -135,7 +136,11 @@ namespace Microsoft.Xna.Framework.Graphics
             desc.OptionFlags = SharpDX.Direct3D11.ResourceOptionFlags.None;
 
             _texture = new SharpDX.Direct3D11.Texture2D(graphicsDevice._d3dDevice, desc);
+
+#elif PSS
+			_texture2D = new Sce.Pss.Core.Graphics.Texture2D(width, height, mipmap, PSSHelper.ToFormat(format));
 #else
+
             this.glTarget = TextureTarget.Texture2D;
             
             Threading.Begin();
@@ -226,6 +231,15 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 #endif
         }
+        
+#if PSS
+        private Texture2D(GraphicsDevice graphicsDevice, Stream stream)
+        {
+            byte[] bytes = new byte[stream.Length];
+            stream.Read(bytes, 0, (int)stream.Length);
+            _texture2D = new PssTexture2D(bytes, false);
+        }
+#endif
 				
 		public Texture2D(GraphicsDevice graphicsDevice, int width, int height) : 
 			this(graphicsDevice, width, height, false, SurfaceFormat.Color)
@@ -259,10 +273,12 @@ namespace Microsoft.Xna.Framework.Graphics
             try
             {
 #endif
+#if !PSS
                 var elementSizeInByte = Marshal.SizeOf(typeof(T));
                 var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
                 var startBytes = startIndex * elementSizeInByte;
                 var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
+#endif
                 int x, y, w, h;
                 if (rect.HasValue)
                 {
@@ -293,7 +309,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 // TODO: We need to deal with threaded contexts here!
                 graphicsDevice._d3dContext.UpdateSubresource(box, _texture, level, region);
-#else
+
+#elif PSS
+                _texture2D.SetPixels(level, data, _texture2D.Format, startIndex, w, x, y, w, h);
+
+#elif OPENGL
                 GL.BindTexture(TextureTarget.Texture2D, this.glTexture);
 
                 if (glFormat == (GLPixelFormat)All.CompressedTextureFormats)
@@ -310,9 +330,12 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
 
                 Debug.Assert(GL.GetError() == ErrorCode.NoError);
-#endif
 
+#endif // OPENGL
+
+#if !PSS
                 dataHandle.Free();
+#endif
 
 #if !DIRECTX
             }
@@ -337,6 +360,9 @@ namespace Microsoft.Xna.Framework.Graphics
         {
 #if IPHONE || ANDROID
 			throw new NotImplementedException();
+
+#elif PSS
+            throw new NotImplementedException();
 #elif DIRECTX
             throw new NotImplementedException();
 #else
@@ -456,8 +482,11 @@ namespace Microsoft.Xna.Framework.Graphics
                 Threading.End();
             }
             return texture;
+
 #elif DIRECTX
             throw new NotImplementedException();
+#elif PSS
+            return new Texture2D(graphicsDevice, stream);
 #else
             using (Bitmap image = (Bitmap)Bitmap.FromStream(stream))
             {

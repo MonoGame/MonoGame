@@ -16,6 +16,7 @@ using BufferTarget = OpenTK.Graphics.ES20.All;
 using BufferUsageHint = OpenTK.Graphics.ES20.All;
 #endif
 
+
 namespace Microsoft.Xna.Framework.Graphics
 {
 	public class VertexBuffer : GraphicsResource
@@ -23,6 +24,8 @@ namespace Microsoft.Xna.Framework.Graphics
 #if DIRECTX
         internal SharpDX.Direct3D11.VertexBufferBinding _binding;
         private SharpDX.Direct3D11.Buffer _buffer;
+#elif PSS
+        private PssVertexBuffer _buffer;
 #else
 		//internal uint vao;
 		internal uint vbo;
@@ -57,6 +60,11 @@ namespace Microsoft.Xna.Framework.Graphics
                                                         );
 
             _binding = new SharpDX.Direct3D11.VertexBufferBinding(_buffer, VertexDeclaration.VertexStride, 0);
+#elif PSS
+            VertexFormat[] vertexFormat = new VertexFormat[vertexDeclaration._elements.Length];
+            for (int i = 0; i < vertexFormat.Length; i++)
+                vertexFormat[i] = PSSHelper.ToVertexFormat(vertexDeclaration._elements[i].VertexElementFormat);
+            _buffer = new PssVertexBuffer(vertexCount, 0, vertexFormat);
 #else
             Threading.Begin();
             try
@@ -102,6 +110,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new ArgumentOutOfRangeException("One of the following conditions is true:\nThe vertex stride is larger than the vertex buffer.\nThe vertex stride is too small for the type of data requested.");
 
 #if DIRECTX
+            throw new NotImplementedException();
+#elif PSS
             throw new NotImplementedException();
 #else
             Threading.Begin();
@@ -192,6 +202,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
             dataHandle.Free();
 
+#elif PSS
+#warning This is almost 100% certainly wrong
+            _buffer.SetVertices(data, startIndex, offsetInBytes / elementSizeInByte, vertexStride);
 #else
             Threading.Begin();
             try
@@ -218,7 +231,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		public override void Dispose()
         {
-#if DIRECTX
+#if DIRECTX || PSS
             if (_buffer != null)
             {
                 _buffer.Dispose();
