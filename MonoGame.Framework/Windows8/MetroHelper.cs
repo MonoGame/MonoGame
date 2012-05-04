@@ -12,19 +12,23 @@ namespace Microsoft.Xna.Framework
     {
         static public bool AppDataFileExists(string fileName)
         {
-            try
-            {
-                var localFolder = ApplicationData.Current.LocalFolder;
-                var task = localFolder.GetFileAsync(fileName);
-                if (task != null && task.GetResults() != null)
-                    return true;
-                else
+            var result = Task.Run( async () => {
+
+                try
+                {
+                    var localFolder = ApplicationData.Current.LocalFolder;
+                    var storageFile = await localFolder.GetFileAsync(fileName);
+                }
+                catch (FileNotFoundException ex)
+                {
                     return false;
-            }
-            catch (FileNotFoundException ex)
-            {
-                return false;
-            }
+                }
+
+                return true;
+
+            }).Result;
+
+            return result;
         }
     }
 }
