@@ -46,7 +46,6 @@ namespace Microsoft.Xna.Framework.Graphics
         public DXShader(byte[] byteCode, SharpDX.Direct3D11.EffectShaderVariable variable, int sharedIndex)
         {
             var shaderDesc = variable.GetShaderDescription(0);
-            var shaderVar = variable.AsShader();
 
             if (variable.TypeInfo.Description.Type != SharpDX.D3DCompiler.ShaderVariableType.Vertexshader)
             {
@@ -72,7 +71,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 var offset = 0;
                 for (var i = 0; i < _attributes.Length; i++)
                 {
-                    var element = shaderVar.GetInputSignatureElementDescription(0, i);
+                    var element = variable.GetInputSignatureElementDescription(0, i);
 
                     _attributes[i].name = element.SemanticName;
                     _attributes[i].index = offset;
@@ -135,13 +134,51 @@ namespace Microsoft.Xna.Framework.Graphics
                     _attributes[i].format = (short)format;
                 }
             }
-            
+
             SharedIndex = sharedIndex;
+
+            // Store the original bytecode here for comparison.
             Bytecode = byteCode;
-            ShaderCode = byteCode;
+
+            // Strip the bytecode we're gonna save!
+            const SharpDX.D3DCompiler.StripFlags stripFlags =   SharpDX.D3DCompiler.StripFlags.CompilerStripDebugInformation | 
+                                                                SharpDX.D3DCompiler.StripFlags.CompilerStripReflectionData | 
+                                                                SharpDX.D3DCompiler.StripFlags.CompilerStripTestBlobs;
+
+            using (var original = new SharpDX.D3DCompiler.ShaderBytecode(byteCode))
+            {
+                // Strip the bytecode for saving to disk.
+                using (var stripped = original.Strip(stripFlags))
+                {
+                    ShaderCode = new byte[stripped.BufferSize];
+                    stripped.Data.Read(ShaderCode, 0, ShaderCode.Length);
+                }
+
+                // Use reflection to get details of the shader.
+                using (var refelect = new SharpDX.D3DCompiler.ShaderReflection(original))
+                {
+
+                    var samplers = new List<Sampler>();
+                    for (var i = 0; i < refelect.Description.BoundResources; i++)
+                    {
+                        var rdesc = refelect.GetResourceBindingDescription(i);
+                        if (rdesc.Type == SharpDX.D3DCompiler.ShaderInputType.Texture)
+                        {
+                            samplers.Add(new Sampler 
+                            { 
+                                index = rdesc.BindPoint, 
+                                name = rdesc.Name, 
+                                parameter = string.Empty,
+                                type = MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_2D 
+                            });
+                        }
+                    }
+
+                    _samplers = samplers.ToArray();
+                }
+            }
 
             _symbols = new MojoShader.MOJOSHADER_symbol[0];
-            _samplers = new Sampler[0];
         }
 
         public DXShader(byte[] byteCode, int sharedIndex)

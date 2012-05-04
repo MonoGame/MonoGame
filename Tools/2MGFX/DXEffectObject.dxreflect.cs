@@ -2,11 +2,20 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
     partial class DXEffectObject
     {
+        public class ConstantBuffer
+        {
+            public IntPtr NativePointer;
+            public int Size;
+        };
+
+        public List<ConstantBuffer> ConstantBuffers { get; private set; }
+        
         private DXEffectObject()
         {
         }
@@ -21,14 +30,22 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 var desc = dxeffect.Description;
 
+                effect.ConstantBuffers = new List<ConstantBuffer>();
                 for (var i = 0; i < desc.ConstantBufferCount; i++)
                 {
                     var cbuffer = dxeffect.GetConstantBufferByIndex(i);
+                    effect.ConstantBuffers.Add( new ConstantBuffer 
+                    {
+                        NativePointer = cbuffer.NativePointer, 
+                        Size = cbuffer.TypeInfo.Description.UnpackedSize 
+                    } );
                 }
+
+                // We don't use this!
+                //effect.Objects = new d3dx_parameter[0];
 
                 effect.Shaders = new List<DXShader>();
 
-                effect.Objects = new d3dx_parameter[0];
                 effect.Parameters = new d3dx_parameter[desc.GlobalVariableCount];
                 for (var i = 0; i < desc.GlobalVariableCount; i++)
                     effect.Parameters[i] = effect.GetParameter( dxeffect.GetVariableByIndex(i) );
@@ -115,12 +132,23 @@ namespace Microsoft.Xna.Framework.Graphics
             param.rows = (uint)typeDesc.Rows;
             param.columns = (uint)typeDesc.Columns;
 
+            var constantBuffer = variable.ParentConstantBuffer;
+            if (constantBuffer.IsValid)
+            {
+                // This is the offset to the data within the buffer.
+                param.bufferOffset = variable.Description.BufferOffset;
+
+                // Store the buffer index.
+                param.bufferIndex = ConstantBuffers.FindIndex(c => c.NativePointer == constantBuffer.NativePointer);
+                Debug.Assert(param.bufferIndex != -1, "Got bad constant buffer index!");        
+            }
+
             switch (param.type)
             {
                 case D3DXPARAMETER_TYPE.PIXELSHADER:
                 case D3DXPARAMETER_TYPE.VERTEXSHADER:
                 {
-                    var shaderIndex = CreateShader(variable as SharpDX.Direct3D11.EffectShaderVariable);
+                    var shaderIndex = CreateShader(variable.AsShader());
                     param.data = shaderIndex;
 					break;
                 }
@@ -153,8 +181,10 @@ namespace Microsoft.Xna.Framework.Graphics
                     if (param.rows == 0 || param.columns == 0)
                         break;
 
-                    var size = param.rows * param.columns;
-                    var buffer = new byte[size * 4];
+                    var size = (int)(param.rows * param.columns) * 4;
+                    var buffer = new byte[size];                    
+                    var raw = variable.GetRawValue(size);
+                    raw.Read(buffer, 0, size);                    
                     param.data = buffer;
 
                     break;
@@ -190,6 +220,11 @@ namespace Microsoft.Xna.Framework.Graphics
             // Create a new shader.
             var dxShader = new DXShader(bytecode, variable, Shaders.Count);
             Shaders.Add(dxShader);
+
+            var assmbly = desc.Bytecode.Disassemble();
+
+            //var buffer = reflection.GetConstantBuffer(0);
+
             return dxShader.SharedIndex;
         }
 
@@ -209,7 +244,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 state.type = STATE_TYPE.PARAMETER;
 
                 state.parameter = new d3dx_parameter();
-                state.parameter.object_id = 1;
             }
             else if (dxshader != null)
             {
@@ -220,7 +254,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 state.operation = variable.TypeInfo.Description.Type == SharpDX.D3DCompiler.ShaderVariableType.Vertexshader ? (uint)146 : (uint)147;
 
                 state.parameter = GetParameter(variable);
-                //state.parameter.object_id = 1;
             }
 
             return state;
