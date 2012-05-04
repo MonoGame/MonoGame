@@ -836,7 +836,10 @@ namespace Microsoft.Xna.Framework.Graphics
 		public void SetRenderTarget (RenderTarget2D renderTarget)
 		{
 			if (renderTarget == null)
-				this.SetRenderTargets(null);
+            {
+                SetRenderTargets(null);
+                Viewport = savedViewport;
+            }
 			else
 				this.SetRenderTargets(new RenderTargetBinding(renderTarget));
 		}
@@ -908,6 +911,9 @@ namespace Microsoft.Xna.Framework.Graphics
 					}
 					throw new InvalidOperationException(message);
 				}
+                
+                savedViewport = Viewport;
+                
 				this.Viewport = new Viewport(0, 0, renderTarget.Width, renderTarget.Height);
 #endif
             }
