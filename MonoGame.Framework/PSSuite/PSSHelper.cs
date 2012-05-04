@@ -15,8 +15,15 @@ namespace Microsoft.Xna.Framework.Graphics
         
         public static PssVertexFormat ToVertexFormat(VertexElementFormat format)
         {
-#warning Not Implemented
-            throw new NotImplementedException();
+            switch (format)
+            {
+            case VertexElementFormat.Vector3:
+                return PssVertexFormat.Float3;
+            case VertexElementFormat.Color:
+                return PssVertexFormat.UByte4N; //FIXME: The samples all take Float4 but the actual data is uint/Byte4
+            default:
+                throw new NotImplementedException();
+            }
         }
 	}
 }
