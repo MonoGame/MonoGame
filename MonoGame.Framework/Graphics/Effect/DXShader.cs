@@ -377,16 +377,12 @@ namespace Microsoft.Xna.Framework.Graphics
             var d3dContext = graphicsDevice._d3dContext;
             if (_pixelShader != null)
             {
-                // TODO: Replace this with really setting the correct sampler
-                // stages with the correct textures.
 
-                foreach (var param in parameters)
+                foreach (var sampler in _samplers)
                 {
-                    if (param.ParameterType == EffectParameterType.Texture2D)
-                    {
-                        var texture = param.Data as Texture2D;
-                        graphicsDevice.Textures[0] = texture;
-                    }
+                    var param = parameters[sampler.name];
+                    var texture = param.Data as Texture;
+                    graphicsDevice.Textures[sampler.index] = texture;
                 }
 
                 d3dContext.PixelShader.Set(_pixelShader);
