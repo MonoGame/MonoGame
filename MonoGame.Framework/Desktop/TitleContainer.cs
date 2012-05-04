@@ -43,23 +43,71 @@ using System.IO;
 
 #if WINRT
 using Windows.Storage;
+using System.Threading.Tasks;
 #endif
 
 namespace Microsoft.Xna.Framework
 {
     public static class TitleContainer
     {
+#if WINRT
+
+        private static async Task<Stream> OpenStreamAsync(string name)
+        {
+            var package = Windows.ApplicationModel.Package.Current;
+
+            Stream stream;
+            ulong length;
+            try
+            {
+                var storageFile = await package.InstalledLocation.GetFileAsync(name);
+                var randomAccessStream = await storageFile.OpenReadAsync();
+                length = randomAccessStream.Size;
+                stream = randomAccessStream.AsStreamForRead();
+            }
+            catch (IOException)
+            {
+                // The file must not exist... return a null stream.
+                return null;
+            }
+
+            // HACK: Currently the returned stream will randomly throw
+            // exceptions if we try to read it from the UI thread. See...
+            //
+            // http://stackoverflow.com/questions/8554982/deserialization-and-async-await
+            // http://social.msdn.microsoft.com/Forums/pl-PL/async/thread/3f192a81-073a-47ea-92e2-5ce02bf5ad33
+            //
+            // This is a known issue which should be fixed before final.  
+            //
+            // Till then we load the whole file into a memory stream and
+            // return that to the caller to get things to behave as 
+            // they should.
+            //
+
+            var buffer = new byte[length];
+            await stream.ReadAsync(buffer, 0, (int)length);
+            var memoryStream = new MemoryStream(buffer, false);
+
+            return memoryStream;
+        }
+
         public static Stream OpenStream(string name)
         {
-#if WINRT
-            var package = Windows.ApplicationModel.Package.Current;
-            var file = package.InstalledLocation.GetFileAsync(name).GetResults();
-            var stream = file.OpenReadAsync().GetResults();
-            return stream.AsStreamForRead();
-#else
-            return File.OpenRead(GetFilename(name));
-#endif
+            var stream = Task.Run( () => OpenStreamAsync(name).Result ).Result;
+            if (stream == null)
+                throw new FileNotFoundException();
+
+            return stream;
         }
+
+#else // !WINRT
+
+        public static Stream OpenStream(string name)
+        {
+            return File.OpenRead(GetFilename(name));
+        }
+
+#endif
 
         internal static string GetFilename(string name)
         {
