@@ -46,26 +46,65 @@ using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-	// Collection of SamplerState objects. 
-	// http://msdn.microsoft.com/en-us/library/microsoft.xna.framework.graphics.samplerstatecollection.aspx
-	public sealed class SamplerStateCollection
+
+    public sealed class SamplerStateCollection
 	{
-		// Since I am not sure how these get initialized
-		//  for now I will just allocate a max amount so 
-		//  there are no exceptions
-		List<SamplerState> _samplers = new List<SamplerState> (20);
+        private SamplerState[] _samplers;
+
+        private bool _isDirty;
+
+		internal SamplerStateCollection( int maxSamplers )
+        {
+            _samplers = new SamplerState[maxSamplers];
+
+            for (var i = 0; i < maxSamplers; i++)
+                _samplers[i] = SamplerState.LinearWrap;
+
+            _isDirty = true;
+        }
 		
-		internal SamplerStateCollection () : this(20) {}
-		
-		internal SamplerStateCollection (int initMax)
-		{
-			for (int x = 0; x<initMax; x++) {
-				_samplers.Add(SamplerState.LinearWrap);
-			}
+		public SamplerState this [int index] 
+        {
+			get 
+            { 
+                return _samplers[index]; 
+            }
+
+			set 
+            {
+                if (_samplers[index] == value)
+                    return;
+
+                _samplers[index] = value;
+                _isDirty = true;
+            }
 		}
-		public SamplerState this [int index] {
-			get { return _samplers [index]; }
-			set { _samplers [index] = value; }
-		}
+
+#if DIRECTX
+
+        internal void SetSamplers(GraphicsDevice device)
+        {
+            // Skip out if nothing has changed.
+            if (!_isDirty)
+                return;
+
+            var pixelShaderStage = device._d3dContext.PixelShader;
+            for (var i = 0; i < _samplers.Length; i++)
+            {
+                if (_samplers[i] == null)
+                {
+                    pixelShaderStage.SetSampler(i, null);
+                    continue;
+                }
+
+                var state = _samplers[i].GetState(device);
+                pixelShaderStage.SetSampler(i, state);
+            }
+
+            // Clear the dirty flag.
+            _isDirty = false;
+        }
+
+#endif
 	}
 }

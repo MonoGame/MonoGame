@@ -76,21 +76,23 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public class GraphicsDevice : IDisposable
     {
-        private int _activeTexture = -1;
         private Viewport _viewport;
 
         private bool _isDisposed = false;
-        public TextureCollection Textures { get; private set; }
+
         private BlendState _blendState = BlendState.Opaque;
         private DepthStencilState _depthStencilState = DepthStencilState.Default;
 		private RasterizerState _rasterizerState = RasterizerState.CullCounterClockwise;
-        private SamplerStateCollection _samplerStates = new SamplerStateCollection();
 
         internal List<IntPtr> _pointerCache = new List<IntPtr>();
         private VertexBuffer _vertexBuffer = null;
         private IndexBuffer _indexBuffer = null;
 
-        private RenderTargetBinding[] currentRenderTargetBindings;		
+        private RenderTargetBinding[] currentRenderTargetBindings;
+
+        public TextureCollection Textures { get; private set; }
+
+        public SamplerStateCollection SamplerStates { get; private set; }
 
 #if DIRECTX
 
@@ -122,7 +124,9 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         internal byte[] _vertexShaderBytecode;
 
-#elif OPENGL
+#endif // DIRECTX
+
+#if OPENGL
 
 		// OpenGL ES2.0 attribute locations
 		internal static int attributePosition = 0; //there can be a couple positions binded
@@ -136,7 +140,9 @@ namespace Microsoft.Xna.Framework.Graphics
         private uint VboIdElement;
         private All _preferedFilter;
 
-#endif
+        private int _activeTexture = -1;
+
+#endif // OPENGL
 
 
 #if GLES
@@ -162,8 +168,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		const RenderbufferStorage GLDepth24Stencil8 = RenderbufferStorage.Depth24Stencil8;
 		const FramebufferErrorCode GLFramebufferComplete = FramebufferErrorCode.FramebufferComplete;
 #endif
-		
-		// TODO Graphics Device events need implementing
+
+        // TODO Graphics Device events need implementing
 		public event EventHandler<EventArgs> DeviceLost;
 		public event EventHandler<EventArgs> DeviceReset;
 		public event EventHandler<EventArgs> DeviceResetting;
@@ -174,7 +180,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal int glFramebuffer;
 
-#if WINRT
+#if DIRECTX
 
         internal float Dpi
         {
@@ -192,7 +198,10 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-#elif OPENGL
+#endif // DIRECTX
+
+
+#if OPENGL
 
         internal All PreferedFilter
         {
@@ -206,7 +215,6 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
         }
-#endif
 
         internal int ActiveTexture
         {
@@ -219,6 +227,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 _activeTexture = value;
             }
         }
+
+#endif
 
         public bool IsDisposed
         {
@@ -243,7 +253,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			                         DisplayMode.Width, DisplayMode.Height);
             _viewport.MinDepth = 0.0f;
             _viewport.MaxDepth = 1.0f;
+
             Textures = new TextureCollection(16);
+            SamplerStates = new SamplerStateCollection(16);
 
             PresentationParameters = new PresentationParameters();
         }
@@ -545,14 +557,6 @@ namespace Microsoft.Xna.Framework.Graphics
 #elif OPENGL
 				GLStateManager.SetDepthStencilState(value);
 #endif
-            }
-        }
-
-        public SamplerStateCollection SamplerStates
-        {
-            get
-            {
-                return _samplerStates;
             }
         }
 
@@ -1051,6 +1055,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if DIRECTX
 
+            SamplerStates.SetSamplers(this);
             Textures.SetTextures(this);
 
             _d3dContext.InputAssembler.InputLayout = _vertexBuffer.VertexDeclaration.GetInputLayout(this, _vertexShaderBytecode);
@@ -1135,6 +1140,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if DIRECTX
 
+            SamplerStates.SetSamplers(this);
             Textures.SetTextures(this);
 
             _d3dContext.InputAssembler.InputLayout = _vertexBuffer.VertexDeclaration.GetInputLayout(this, _vertexShaderBytecode);
