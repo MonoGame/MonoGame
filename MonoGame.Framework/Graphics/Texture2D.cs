@@ -296,9 +296,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
 
 #if DIRECTX
-                var box = new SharpDX.DataBox(dataPtr, w * elementSizeInByte, 0);
 
-                // TODO: should this be in bytes and not pixels?
+                var box = new SharpDX.DataBox(dataPtr, GetPitch(w), 0);
+
                 var region = new SharpDX.Direct3D11.ResourceRegion();
                 region.Top = y;
                 region.Front = 0;
