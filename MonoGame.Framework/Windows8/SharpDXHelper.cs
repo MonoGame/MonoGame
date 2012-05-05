@@ -43,9 +43,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 case SurfaceFormat.Dxt1:
                     return SharpDX.DXGI.Format.BC1_UNorm;
                 case SurfaceFormat.Dxt3:
-                    return SharpDX.DXGI.Format.BC3_UNorm;
+                    return SharpDX.DXGI.Format.BC2_UNorm;
                 case SurfaceFormat.Dxt5:
-                    return SharpDX.DXGI.Format.BC5_UNorm;
+                    return SharpDX.DXGI.Format.BC3_UNorm;
                 case SurfaceFormat.NormalizedByte2:
                     return SharpDX.DXGI.Format.R8G8_SNorm;
                 case SurfaceFormat.NormalizedByte4:
