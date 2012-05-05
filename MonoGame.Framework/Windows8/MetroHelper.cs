@@ -19,7 +19,7 @@ namespace Microsoft.Xna.Framework
                     var localFolder = ApplicationData.Current.LocalFolder;
                     var storageFile = await localFolder.GetFileAsync(fileName);
                 }
-                catch (FileNotFoundException ex)
+                catch (FileNotFoundException)
                 {
                     return false;
                 }
