@@ -51,7 +51,7 @@ namespace Microsoft.Xna.Framework.Graphics
 	{
         private SamplerState[] _samplers;
 
-        private bool _isDirty;
+        private int _dirty;
 
 		internal SamplerStateCollection( int maxSamplers )
         {
@@ -60,7 +60,7 @@ namespace Microsoft.Xna.Framework.Graphics
             for (var i = 0; i < maxSamplers; i++)
                 _samplers[i] = SamplerState.LinearWrap;
 
-            _isDirty = true;
+            _dirty = int.MaxValue;
         }
 		
 		public SamplerState this [int index] 
@@ -76,7 +76,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     return;
 
                 _samplers[index] = value;
-                _isDirty = true;
+                _dirty |= 1 << index;
             }
 		}
 
@@ -85,24 +85,28 @@ namespace Microsoft.Xna.Framework.Graphics
         internal void SetSamplers(GraphicsDevice device)
         {
             // Skip out if nothing has changed.
-            if (!_isDirty)
+            if (_dirty == 0)
                 return;
 
             var pixelShaderStage = device._d3dContext.PixelShader;
             for (var i = 0; i < _samplers.Length; i++)
             {
-                if (_samplers[i] == null)
-                {
-                    pixelShaderStage.SetSampler(i, null);
+                var mask = 1 << i;
+                if ((_dirty & mask) == 0)
                     continue;
-                }
 
-                var state = _samplers[i].GetState(device);
+                SharpDX.Direct3D11.SamplerState state = null;
+                if (_samplers[i] != null)
+                    state = _samplers[i].GetState(device);
+
                 pixelShaderStage.SetSampler(i, state);
+
+                _dirty &= ~mask;
+                if (_dirty == 0)
+                    break;
             }
 
-            // Clear the dirty flag.
-            _isDirty = false;
+            _dirty = 0;
         }
 
 #endif

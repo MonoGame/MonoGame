@@ -9,12 +9,12 @@ namespace Microsoft.Xna.Framework.Graphics
     {
         private readonly Texture[] _textures;
 
-        private bool _isDirty;
+        private int _dirty;
 
         internal TextureCollection(int maxTextures)
         {
             _textures = new Texture[maxTextures];
-            _isDirty = false;
+            _dirty = int.MaxValue;
         }
 
         public Texture this[int index]
@@ -26,7 +26,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     return;
 
                 _textures[index] = value;
-                _isDirty = true;
+                _dirty |= 1 << index;
             }
         }
 
@@ -35,7 +35,7 @@ namespace Microsoft.Xna.Framework.Graphics
             for (var i = 0; i < _textures.Length; i++)
                 _textures[i] = null;
 
-            _isDirty = true;
+            _dirty = int.MaxValue;
         }
 
 #if DIRECTX
@@ -43,20 +43,27 @@ namespace Microsoft.Xna.Framework.Graphics
         internal void SetTextures(GraphicsDevice device)
         {
             // Skip out if nothing has changed.
-            if (!_isDirty)
+            if (_dirty == 0)
                 return;
 
             var pixelShaderStage = device._d3dContext.PixelShader;
             for (var i = 0; i < _textures.Length; i++)
             {
+                var mask = 1 << i;
+                if ((_dirty & mask) == 0)
+                    continue;
+
                 if (_textures[i] == null)
                     pixelShaderStage.SetShaderResource(i, null);
                 else
                     pixelShaderStage.SetShaderResource(i, _textures[i].GetShaderResourceView());
+
+                _dirty &= ~mask;
+                if (_dirty == 0)
+                    break;
             }
 
-            // Clear the dirty flag.
-            _isDirty = false;
+            _dirty = 0;
         }
 
 #endif
