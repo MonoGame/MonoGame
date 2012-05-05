@@ -14,7 +14,7 @@ namespace Microsoft.Xna.Framework.Content
         {
 #if WINRT
             var typeInfo = type.GetTypeInfo();
-            var ctor = typeInfo.DeclaredConstructors.FirstOrDefault(c => c.GetParameters().Length == 0);
+            var ctor = typeInfo.DeclaredConstructors.FirstOrDefault(c => !c.IsStatic && c.GetParameters().Length == 0);
             return ctor;
 #else
             var attrs = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance;
