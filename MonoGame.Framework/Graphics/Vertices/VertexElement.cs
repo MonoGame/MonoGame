@@ -151,28 +151,33 @@ namespace Microsoft.Xna.Framework.Graphics
                     element.Format = SharpDX.DXGI.Format.R8G8B8A8_UNorm;
                     break;
 
-                /*
                 case VertexElementFormat.Byte4:
-                    element.Format =  SharpDX.DXGI.Format.R8_UNorm;
+                    element.Format = SharpDX.DXGI.Format.R8G8B8A8_UInt;
+                    break;
 
                 case VertexElementFormat.Short2:
-                    element.Format =  SharpDX.DXGI.Format.R8_UNorm;
+                    element.Format =  SharpDX.DXGI.Format.R16G16_SInt;
+                    break;
 
                 case VertexElementFormat.Short4:
-                    element.Format =  SharpDX.DXGI.Format.R8_UNorm;
+                    element.Format =  SharpDX.DXGI.Format.R16G16B16A16_SInt;
+                    break;
 
                 case VertexElementFormat.NormalizedShort2:
-                    element.Format =  SharpDX.DXGI.Format.R8_UNorm;
+                    element.Format =  SharpDX.DXGI.Format.R16G16_SNorm;
+                    break;
 
                 case VertexElementFormat.NormalizedShort4:
-                    element.Format =  SharpDX.DXGI.Format.R8_UNorm;
+                    element.Format =  SharpDX.DXGI.Format.R16G16B16A16_SNorm;
+                    break;
 
                 case VertexElementFormat.HalfVector2:
-                    element.Format =  SharpDX.DXGI.Format.R8_UNorm;
+                    element.Format =  SharpDX.DXGI.Format.R16G16_Float;
+                    break;
 
                 case VertexElementFormat.HalfVector4:
-                    element.Format =  SharpDX.DXGI.Format.R8_UNorm;
-                */
+                    element.Format =  SharpDX.DXGI.Format.R16G16B16A16_Float;
+                    break;
                 
                 default:
                     throw new NotImplementedException("Unknown vertex element format!");
