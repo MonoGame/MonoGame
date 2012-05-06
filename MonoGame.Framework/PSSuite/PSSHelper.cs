@@ -3,6 +3,7 @@ using System;
 using PssMatrix4 = Sce.Pss.Core.Matrix4;
 using PssPixelFormat = Sce.Pss.Core.Graphics.PixelFormat;
 using PssVertexFormat = Sce.Pss.Core.Graphics.VertexFormat;
+using PssDrawMode = Sce.Pss.Core.Graphics.DrawMode;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -13,6 +14,23 @@ namespace Microsoft.Xna.Framework.Graphics
 #warning This is not fully implemented at all! TODO: Do something like SharpDXHelper.ToFormat
 			return PssPixelFormat.Rgba;
 		}
+        
+        public static PssDrawMode ToDrawMode(PrimitiveType primitiveType)
+        {
+            switch (primitiveType)
+            {
+                case PrimitiveType.LineList:
+                    return PssDrawMode.Lines;
+                case PrimitiveType.LineStrip:
+                    return PssDrawMode.LineStrip;
+                case PrimitiveType.TriangleList:
+                    return PssDrawMode.Triangles;
+                case PrimitiveType.TriangleStrip:
+                    return PssDrawMode.TriangleStrip;
+            }
+
+            throw new NotImplementedException();
+        }
         
         public static PssVertexFormat ToVertexFormat(VertexElementFormat format)
         {

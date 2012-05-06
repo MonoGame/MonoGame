@@ -1083,7 +1083,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if WINRT
 #elif PSS
-            _graphics.DrawArrays(Sce.Pss.Core.Graphics.DrawMode.Triangles, vertexStart, primitiveCount * 3);
+            _graphics.DrawArrays(PSSHelper.ToDrawMode(primitiveType), vertexStart, GetElementCountArray(primitiveType, primitiveCount));
 #elif OPENGL
 			GL.DrawArrays(PrimitiveTypeGL(primitiveType),
 			              vertexStart,
