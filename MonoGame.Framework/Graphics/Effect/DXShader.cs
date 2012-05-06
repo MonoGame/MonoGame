@@ -103,6 +103,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal DXShader(DXShader cloneSource)
         {
+#if PSS
+#warning PSS is hacking around DXShader currently.
+            return;
+#endif
             // Share all the immutable types.
 #if OPENGL
             ShaderType = cloneSource.ShaderType;

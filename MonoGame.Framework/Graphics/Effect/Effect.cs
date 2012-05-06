@@ -45,6 +45,9 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
+#if PSS
+using Sce.Pss.Core.Graphics;
+#endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -55,7 +58,11 @@ namespace Microsoft.Xna.Framework.Graphics
         public EffectTechniqueCollection Techniques { get; private set; }
 
         public EffectTechnique CurrentTechnique { get; set; }
-
+  
+#if PSS
+        internal ShaderProgram _shaderProgram;
+#endif
+        
         internal Effect(GraphicsDevice graphicsDevice)
 		{
 			if (graphicsDevice == null)
@@ -127,6 +134,9 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="cloneSource">The source effect to clone from.</param>
         private void Clone(Effect cloneSource)
         {
+#if PSS
+            _shaderProgram = cloneSource._shaderProgram;
+#endif
             // Copy the mutable members of the effect.
             Parameters = new EffectParameterCollection(cloneSource.Parameters);
             Techniques = new EffectTechniqueCollection(this, cloneSource.Techniques);
@@ -197,6 +207,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </remarks>
         private const int Version = 1;
 
+#if !PSS
         internal void ReadEffect(BinaryReader reader)
         {
             // Check the header to make sure the file and version is correct!
@@ -339,7 +350,75 @@ namespace Microsoft.Xna.Framework.Graphics
 
             return collection;
         }
+#else //PSS
+        internal void ReadEffect(BinaryReader reader)
+        {
+            _shaderProgram = new ShaderProgram(reader.ReadBytes((int)reader.BaseStream.Length));
+            
+            Parameters = new EffectParameterCollection();
+            for (int i = 0; i < _shaderProgram.UniformCount; i++)
+            {
+                Parameters.Add(EffectParameterForUniform(i));
+            }
+#warning Hacks for BasicEffect as we don't have these parameters yet
+            Parameters.Add (new EffectParameter(
+                EffectParameterClass.Vector, EffectParameterType.Single, "SpecularColor",
+                3, 1, "float3",
+                new EffectAnnotationCollection(), new EffectParameterCollection(), new EffectParameterCollection(), new float[3]));
+            Parameters.Add (new EffectParameter(
+                EffectParameterClass.Scalar, EffectParameterType.Single, "SpecularPower",
+                1, 1, "float",
+                new EffectAnnotationCollection(), new EffectParameterCollection(), new EffectParameterCollection(), 0.0f));
+            Parameters.Add (new EffectParameter(
+                EffectParameterClass.Vector, EffectParameterType.Single, "FogVector",
+                4, 1, "float4",
+                new EffectAnnotationCollection(), new EffectParameterCollection(), new EffectParameterCollection(), new float[4]));
+            Parameters.Add (new EffectParameter(
+                EffectParameterClass.Vector, EffectParameterType.Single, "DiffuseColor",
+                4, 1, "float4",
+                new EffectAnnotationCollection(), new EffectParameterCollection(), new EffectParameterCollection(), new float[4]));
+            
+            
+            _shaderProgram.SetUniformBinding(0, "WorldViewProj");
+            _shaderProgram.SetAttributeBinding(0, "a_Position");
+            _shaderProgram.SetAttributeBinding(1, "a_Color0");
+            
+            Techniques = new EffectTechniqueCollection();
+            var effectPassCollection = new EffectPassCollection();
+            effectPassCollection.Add(new EffectPass(this, "Pass", null, null, BlendState.AlphaBlend, DepthStencilState.Default, RasterizerState.CullNone, new EffectAnnotationCollection()));
+            Techniques.Add(new EffectTechnique(this, "Name", effectPassCollection, new EffectAnnotationCollection()));
+       
+            CurrentTechnique = Techniques[0];
+        }
+        
+        internal EffectParameter EffectParameterForUniform(int index)
+        {
+            //var b = _shaderProgram.GetUniformBinding(i);
+            var name = _shaderProgram.GetUniformName(index);
+            //var s = _shaderProgram.GetUniformSize(i);
+            //var x = _shaderProgram.GetUniformTexture(i);
+            var type = _shaderProgram.GetUniformType(index);
+            
+            //EffectParameter.Semantic => COLOR0 / POSITION0 etc
 
+            switch (type)
+            {
+            case ShaderUniformType.Float4x4:
+                return new EffectParameter(
+                    EffectParameterClass.Matrix, EffectParameterType.Single, name,
+                    4, 4, "float4x4",
+                    new EffectAnnotationCollection(), new EffectParameterCollection(), new EffectParameterCollection(), new float[4 * 4]);
+            case ShaderUniformType.Float4:
+                return new EffectParameter(
+                    EffectParameterClass.Vector, EffectParameterType.Single, name,
+                    4, 1, "float4",
+                    new EffectAnnotationCollection(), new EffectParameterCollection(), new EffectParameterCollection(), new float[4]);
+            default:
+                throw new Exception("Uniform Type " + type + " Not yet implemented (" + name + ")");
+            }
+        }
+        
+#endif
         #endregion // Effect File Reader
 
 
