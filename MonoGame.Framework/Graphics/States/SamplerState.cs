@@ -152,7 +152,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 // TODO: How do i do these?
                 desc.MaximumLod = float.MaxValue;
-                desc.MinimumLod = 0;
+                desc.MinimumLod = -float.MaxValue;
                 desc.BorderColor = new SharpDX.Color4(0, 0, 0, 0);
                 desc.ComparisonFunction = SharpDX.Direct3D11.Comparison.Never;
 
