@@ -51,11 +51,12 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		internal static TouchCollection Collection = new TouchCollection();
 		internal static Queue<GestureSample> GestureList = new Queue<GestureSample>();
 		internal static event EventHandler EnabledGesturesChanged;
-		
+        internal static TouchPanelCapabilities Capabilities = new TouchPanelCapabilities();
+
         public static TouchPanelCapabilities GetCapabilities()
         {
-			// Go off and create an updated TouchPanelCapabilities with the latest state			
-            return new TouchPanelCapabilities(false,true,8);;
+            Capabilities.Initialize();
+            return Capabilities;
         }
 
         public static TouchCollection GetState()
