@@ -164,7 +164,6 @@
     <Compile Include="Graphics\States\BlendState.cs" />
     <Compile Include="Graphics\Effect\EffectParameterCollection.cs" />
     <Compile Include="Graphics\Effect\EffectPassCollection.cs" />
-    <Compile Include="Graphics\Effect\EffectPool.cs" />
     <Compile Include="Graphics\Effect\EffectTechnique.cs" />
     <Compile Include="Graphics\Effect\EffectTechniqueCollection.cs" />
     <Compile Include="Graphics\States\CompareFunction.cs" />
@@ -303,7 +302,6 @@
     <Compile Include="Graphics\PresentationParameters.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="Graphics\Effect\EffectAnnotationCollection.cs" />
-    <Compile Include="Graphics\Effect\DXEffectObject.cs" />
     <Compile Include="Graphics\Effect\EffectAnnotation.cs" />
     <Compile Include="Graphics\Vertices\VertexDeclaration.cs" />
     <Compile Include="Graphics\RenderTarget2D.cs" />
@@ -320,10 +318,6 @@
     <Compile Include="Graphics\PresentInterval.cs" />
     <Compile Include="Graphics\SpriteBatcher.cs" />
     <Compile Include="Graphics\CubeMapFace.cs" />
-    <Compile Include="Graphics\Effect\DXEffectObject.runtime.cs" />
-    <Compile Include="Graphics\Effect\DXPreshader.cs" />
-    <Compile Include="Graphics\Effect\DXPreshader.runtime.cs" />
-    <Compile Include="Graphics\Effect\MojoShader.cs" />
     <Compile Include="Storage\StorageDeviceHelper.cs" />
     <Compile Include="Content\ContentReaders\BasicEffectReader.cs" />
     <Compile Include="Content\ContentReaders\BoundingBoxReader.cs" />
@@ -342,10 +336,11 @@
     <Compile Include="Content\ContentReaders\VertexBufferReader.cs" />
     <Compile Include="Graphics\Effect\BasicEffect.cs" />
     <Compile Include="Threading.cs" />
-    <Compile Include="Graphics\Effect\DXExpression.cs" />
     <Compile Include="Graphics\GraphicsExtensions.cs" />
     <Compile Include="Content\ContentExtensions.cs" />
     <Compile Include="Content\ContentReaders\EffectReader.cs" />
+    <Compile Include="PSSuite\PSSHelper.cs" />
+    <Compile Include="PSSuite\PSSExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="PSSuite\" />
@@ -366,4 +361,15 @@
       <Name>Lidgren.Network.PSSuite</Name>
     </ProjectReference>
   </ItemGroup>
+  <ProjectExtensions>
+    <MonoDevelop>
+      <Properties>
+        <Policies>
+          <TextStylePolicy inheritsSet="null" scope="text/x-csharp" />
+          <CSharpFormattingPolicy inheritsSet="Mono" inheritsScope="text/x-csharp" scope="text/x-csharp" />
+          <TextStylePolicy FileWidth="120" inheritsSet="VisualStudio" inheritsScope="text/plain" scope="text/plain" />
+        </Policies>
+      </Properties>
+    </MonoDevelop>
+  </ProjectExtensions>
 </Project>
