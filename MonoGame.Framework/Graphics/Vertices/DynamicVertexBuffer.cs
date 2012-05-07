@@ -58,7 +58,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void SetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, SetDataOptions options) where T : struct
         {
-#if DIRECTX
+#if false
             SharpDX.Direct3D11.MapMode mode = 0;
             if (options == SetDataOptions.None)
                 mode = SharpDX.Direct3D11.MapMode.Write;
