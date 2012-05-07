@@ -79,7 +79,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Set the constant buffer.
             d3dContext.VertexShader.SetConstantBuffer(0, _cbuffer);
-            //d3dContext.PixelShader.SetConstantBuffer(0, _cbuffer);
+            d3dContext.PixelShader.SetConstantBuffer(0, _cbuffer);
 #endif
         }
     }
