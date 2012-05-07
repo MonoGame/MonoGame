@@ -23,7 +23,7 @@ namespace Microsoft.Xna.Framework.Graphics
     {
 #if DIRECTX
         internal SharpDX.Direct3D11.VertexBufferBinding _binding;
-        private SharpDX.Direct3D11.Buffer _buffer;
+        protected SharpDX.Direct3D11.Buffer _buffer;
 #elif PSS
         private PssVertexBuffer _buffer;
 #else
@@ -50,12 +50,23 @@ namespace Microsoft.Xna.Framework.Graphics
             // TODO: To use Immutable resources we would need to delay creation of 
             // the Buffer until SetData() and recreate them if set more than once.
 
+            SharpDX.Direct3D11.CpuAccessFlags accessflags = SharpDX.Direct3D11.CpuAccessFlags.None;
+            SharpDX.Direct3D11.ResourceUsage usage = SharpDX.Direct3D11.ResourceUsage.Default;
+
+            if (dynamic)
+            {
+                accessflags |= SharpDX.Direct3D11.CpuAccessFlags.Write;
+                usage = SharpDX.Direct3D11.ResourceUsage.Dynamic;
+            }
+
+            if (bufferUsage != Graphics.BufferUsage.WriteOnly)
+                accessflags |= SharpDX.Direct3D11.CpuAccessFlags.Read;
+
             _buffer = new SharpDX.Direct3D11.Buffer(    graphicsDevice._d3dDevice,
                                                         vertexDeclaration.VertexStride * vertexCount,
-                                                        dynamic ? SharpDX.Direct3D11.ResourceUsage.Dynamic : SharpDX.Direct3D11.ResourceUsage.Default,
+                                                        usage,
                                                         SharpDX.Direct3D11.BindFlags.VertexBuffer,
-                                                        dynamic ? SharpDX.Direct3D11.CpuAccessFlags.Write : SharpDX.Direct3D11.CpuAccessFlags.None,
-                                                        0, // OptionFlags                                                          
+                                                        accessflags,SharpDX.Direct3D11.ResourceOptionFlags.None,
                                                         0  // StructureSizeInBytes
                                                         );
 
@@ -196,7 +207,6 @@ namespace Microsoft.Xna.Framework.Graphics
             region.Left = offsetInBytes;
             region.Right = offsetInBytes + (elementCount * elementSizeInBytes);
 
-            // TODO: We need to deal with threaded contexts here!
             graphicsDevice._d3dContext.UpdateSubresource(box, _buffer, 0, region);
 
             dataHandle.Free();
