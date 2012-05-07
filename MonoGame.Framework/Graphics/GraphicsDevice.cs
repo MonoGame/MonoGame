@@ -86,6 +86,10 @@ namespace Microsoft.Xna.Framework.Graphics
         private DepthStencilState _depthStencilState = DepthStencilState.Default;
 		private RasterizerState _rasterizerState = RasterizerState.CullCounterClockwise;
 
+        private bool _blendStateDirty;
+        private bool _depthStencilStateDirty;
+        private bool _rasterizerStateDirty;
+
         internal List<IntPtr> _pointerCache = new List<IntPtr>();
         private VertexBuffer _vertexBuffer = null;
         private IndexBuffer _indexBuffer = null;
@@ -302,9 +306,7 @@ namespace Microsoft.Xna.Framework.Graphics
             VboIdElement = 0;
 #endif
             // Force set the default render states.
-            _blendState = null;
-            _depthStencilState = null;
-            _rasterizerState = null;
+            _blendStateDirty = _depthStencilStateDirty = _rasterizerStateDirty = true;
             BlendState = BlendState.Opaque;
             DepthStencilState = DepthStencilState.Default;
             RasterizerState = RasterizerState.CullCounterClockwise;
@@ -518,11 +520,9 @@ namespace Microsoft.Xna.Framework.Graphics
                     return;
 
                 _rasterizerState = value;
+                _rasterizerStateDirty = true;
 
-#if DIRECTX
-                if (_d3dContext != null)
-                    _rasterizerState.ApplyState(this);
-#elif OPENGL
+#if OPENGL
 				GLStateManager.SetRasterizerStates(value, GetRenderTargets().Length > 0);
 #endif
             }
@@ -539,10 +539,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
 				// ToDo check for invalid state
 				_blendState = value;
-#if DIRECTX
-                if (_d3dContext != null)
-                    _blendState.ApplyState(this);
-#elif OPENGL
+                _blendStateDirty = true;
+
+#if OPENGL
 				GLStateManager.SetBlendStates(value);
 #endif
             }
@@ -558,10 +557,8 @@ namespace Microsoft.Xna.Framework.Graphics
                     return;
 
                 _depthStencilState = value;
-#if DIRECTX
-                if (_d3dContext != null)
-                    _depthStencilState.ApplyState(this);
-#elif OPENGL
+                _depthStencilStateDirty = true;
+#if OPENGL
 				GLStateManager.SetDepthStencilState(value);
 #endif
             }
@@ -740,7 +737,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 // frames that will never be displayed to the screen.
                 _swapChain.Present(1, SharpDX.DXGI.PresentFlags.None, parameters);
             }
-            catch (SharpDX.SharpDXException ex)
+            catch (SharpDX.SharpDXException)
             {
                 // TODO: How should we deal with a device lost case here?
 
@@ -1068,6 +1065,27 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public bool ResourcesLost { get; set; }
 
+        private void ApplyState()
+        {
+#if DIRECTX
+            Debug.Assert(_d3dContext != null, "The d3d context is null!");
+
+            if ( _blendStateDirty)
+                _blendState.ApplyState(this);
+            if ( _depthStencilStateDirty )
+                _depthStencilState.ApplyState(this);
+            if ( _rasterizerStateDirty )
+                _rasterizerState.ApplyState(this);
+
+            _blendStateDirty = _depthStencilStateDirty = _rasterizerStateDirty = false;
+
+            SamplerStates.SetSamplers(this);
+            Textures.SetTextures(this);
+
+            _d3dContext.InputAssembler.InputLayout = _vertexBuffer.VertexDeclaration.GetInputLayout(this, _vertexShaderBytecode);
+#endif
+        }
+
         public void DrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int minVertexIndex, int numbVertices, int startIndex, int primitiveCount)
         {
             Debug.Assert(_vertexBuffer != null, "The vertex buffer is null!");
@@ -1076,12 +1094,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			if (minVertexIndex > 0)
 				throw new NotImplementedException ("minVertexIndex > 0 is supported");
 
+            ApplyState();
+
 #if DIRECTX
-
-            SamplerStates.SetSamplers(this);
-            Textures.SetTextures(this);
-
-            _d3dContext.InputAssembler.InputLayout = _vertexBuffer.VertexDeclaration.GetInputLayout(this, _vertexShaderBytecode);
             _d3dContext.InputAssembler.PrimitiveTopology = ToPrimitiveTopology(primitiveType);
 
             var vertexCount = GetElementCountArray(primitiveType, primitiveCount);
@@ -1108,8 +1123,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void DrawUserPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int primitiveCount) where T : struct, IVertexType
         {
+            ApplyState();
+
 #if DIRECTX
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
 #elif OPENGL
             // Unbind the VBOs
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
@@ -1161,12 +1178,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
             var vertexCount = GetElementCountArray(primitiveType, primitiveCount);
 
+            ApplyState();
+
 #if DIRECTX
 
-            SamplerStates.SetSamplers(this);
-            Textures.SetTextures(this);
-
-            _d3dContext.InputAssembler.InputLayout = _vertexBuffer.VertexDeclaration.GetInputLayout(this, _vertexShaderBytecode);
             _d3dContext.InputAssembler.PrimitiveTopology = ToPrimitiveTopology(primitiveType);
             _d3dContext.Draw(vertexCount, vertexStart);
 
@@ -1185,8 +1200,10 @@ namespace Microsoft.Xna.Framework.Graphics
             Debug.Assert(_vertexBuffer != null, "The vertex buffer is null!");
             Debug.Assert(_indexBuffer != null, "The index buffer is null!");
 
+            ApplyState();
+
 #if DIRECTX
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
 #elif OPENGL
             // Unbind the VBOs
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
@@ -1252,8 +1269,10 @@ namespace Microsoft.Xna.Framework.Graphics
             Debug.Assert(_vertexBuffer != null, "The vertex buffer is null!");
             Debug.Assert(_indexBuffer != null, "The index buffer is null!");
 
+            ApplyState();
+
 #if DIRECTX
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
 #elif OPENGL
             // Unbind the VBOs
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
