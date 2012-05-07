@@ -49,14 +49,35 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		private bool hasPressure;
 		private bool isConnected;
 		private int maximumTouchCount;
-		
-		public TouchPanelCapabilities ( bool aHasPressure, bool aIsConnected, int aMaximumTouchCount )
-		{
-			hasPressure = aHasPressure;
-		    isConnected = aIsConnected;
-		    maximumTouchCount = aMaximumTouchCount;
+        private bool initialized;
+
+        internal void Initialize()
+        {
+            if (!initialized)
+            {
+                initialized = true;
+
+                // There does not appear to be a way of finding out if a touch device supports pressure.
+                // XNA does not expose a pressure value, so let's assume it doesn't support it.
+                hasPressure = false;
+
+#if WINRT
+                // Is a touch device present?
+                var caps = new Windows.Devices.Input.TouchCapabilities();
+                isConnected = caps.TouchPresent != 0;
+
+                // Iterate through all pointer devices and find the maximum number of concurrent touches possible
+                maximumTouchCount = 0;
+                var pointerDevices = Windows.Devices.Input.PointerDevice.GetPointerDevices();
+                foreach (var pointerDevice in pointerDevices)
+                    maximumTouchCount = Math.Max(maximumTouchCount, (int)pointerDevice.MaxContacts);
+#else
+		        isConnected = true;
+		        maximumTouchCount = 8;
+#endif
+            }
 		}
-		
+
         public bool HasPressure
         {
             get
@@ -80,6 +101,5 @@ namespace Microsoft.Xna.Framework.Input.Touch
                 return maximumTouchCount;
             }
         }
-        
     }
 }

@@ -49,17 +49,15 @@ using Microsoft.Xna.Framework.Input;
 using Windows.UI.Core;
 using System.Runtime.InteropServices;
 using Windows.Graphics.Display;
-using Microsoft.Xna.Framework.Input.Touch;
 #endregion Using Statements
 
 namespace Microsoft.Xna.Framework
 {
-    public class MetroGameWindow : GameWindow
+    public partial class MetroGameWindow : GameWindow
     {
         private CoreWindow _coreWindow;
         protected Game game;
         private readonly List<Keys> _keys;
-
         private Rectangle _clientBounds;
 
         #region Internal Properties
@@ -101,7 +99,7 @@ namespace Microsoft.Xna.Framework
 
         public MetroGameWindow()
         {
-            _keys = new List<Keys>();   
+            _keys = new List<Keys>();
         }
 
         #region Restricted Methods
@@ -131,54 +129,6 @@ namespace Microsoft.Xna.Framework
 
             if (!_keys.Contains(xnaKey))
                 _keys.Add(xnaKey);
-        }
-
-        void _coreWindow_PointerMoved(CoreWindow sender, PointerEventArgs args)
-        {
-            Vector2 pos = new Vector2((float)args.CurrentPoint.Position.X, (float)args.CurrentPoint.Position.Y);
-            bool isTouch = args.CurrentPoint.PointerDevice.PointerDeviceType == Windows.Devices.Input.PointerDeviceType.Touch;
-            if (isTouch)
-            {
-                // Touch panel event
-                TouchPanel.Collection.Update((int)args.CurrentPoint.PointerId, TouchLocationState.Moved, pos);
-            }
-            if (!isTouch || args.CurrentPoint.Properties.IsPrimary)
-            {
-                // Mouse or stylus event or the primary touch event (simulated as mouse input)
-                Mouse.State.Update(args);
-            }
-        }
-
-        void _coreWindow_PointerReleased(CoreWindow sender, PointerEventArgs args)
-        {
-            Vector2 pos = new Vector2((float)args.CurrentPoint.Position.X, (float)args.CurrentPoint.Position.Y);
-            bool isTouch = args.CurrentPoint.PointerDevice.PointerDeviceType == Windows.Devices.Input.PointerDeviceType.Touch;
-            if (isTouch)
-            {
-                // Touch panel event
-                TouchPanel.Collection.Update((int)args.CurrentPoint.PointerId, TouchLocationState.Released, pos);
-            }
-            if (!isTouch || args.CurrentPoint.Properties.IsPrimary)
-            {
-                // Mouse or stylus event or the primary touch event (simulated as mouse input)
-                Mouse.State.Update(args);
-            }
-        }
-
-        void _coreWindow_PointerPressed(CoreWindow sender, PointerEventArgs args)
-        {
-            Vector2 pos = new Vector2((float)args.CurrentPoint.Position.X, (float)args.CurrentPoint.Position.Y);
-            bool isTouch = args.CurrentPoint.PointerDevice.PointerDeviceType == Windows.Devices.Input.PointerDeviceType.Touch;
-            if (isTouch)
-            {
-                // Touch panel event
-                TouchPanel.Collection.Add((int)args.CurrentPoint.PointerId, pos);
-            }
-            if (!isTouch || args.CurrentPoint.Properties.IsPrimary)
-            {
-                // Mouse or stylus event or the primary touch event (simulated as mouse input)
-                Mouse.State.Update(args);
-            }
         }
 
         #endregion
@@ -211,10 +161,7 @@ namespace Microsoft.Xna.Framework
             // Set the window icon.
             //window.Icon = Icon.ExtractAssociatedIcon(Assembly.GetEntryAssembly().Location);
 
-            // Receives mouse, touch and stylus input events
-            _coreWindow.PointerPressed += _coreWindow_PointerPressed;
-            _coreWindow.PointerReleased += _coreWindow_PointerReleased;
-            _coreWindow.PointerMoved += _coreWindow_PointerMoved;
+            InitializeTouch();
         }
 
         private void Window_Closed(CoreWindow sender, CoreWindowEventArgs args)
