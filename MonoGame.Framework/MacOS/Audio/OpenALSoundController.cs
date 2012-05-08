@@ -31,6 +31,14 @@ namespace Microsoft.Xna.Framework.Audio
 
 		private OpenALSoundController ()
 		{
+#if IPHONE
+			AudioSession.Initialize();
+
+			if (AudioSession.OtherAudioIsPlaying)
+				AudioSession.Category = AudioSessionCategory.AmbientSound;
+			else
+				AudioSession.Category = AudioSessionCategory.SoloAmbientSound;
+#endif
 			alcMacOSXMixerOutputRate(PREFERRED_MIX_RATE);
 			_device = Alc.OpenDevice (string.Empty);
 			CheckALError ("Could not open AL device");
@@ -59,9 +67,6 @@ namespace Microsoft.Xna.Framework.Audio
 				availableSourcesCollection.Add (allSourcesArray [x]);
 			}
 #if IPHONE			
-			AudioSession.Initialize();
-			AudioSession.Category = AudioSessionCategory.SoloAmbientSound;
-			
 			AudioSession.Interrupted += (sender, e) => Alc.MakeContextCurrent(ContextHandle.Zero);
 			AudioSession.Resumed+= (sender, e) => Alc.MakeContextCurrent(_context);	
 #endif
