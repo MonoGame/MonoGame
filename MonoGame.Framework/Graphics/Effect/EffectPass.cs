@@ -182,7 +182,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if PSS
 #warning We are only setting one hardcoded parameter here. Need to do this properly by iterating _effect.Parameters (Happens in DXShader)
-            float[] data = (float[])_effect.Parameters["WorldViewProj"].Data;
+            float[] data;
+            if (_effect.Parameters["WorldViewProj"] != null) 
+                data = (float[])_effect.Parameters["WorldViewProj"].Data;
+            else
+                data = (float[])_effect.Parameters["MatrixTransform"].Data;
             Sce.Pss.Core.Matrix4 matrix4 = PSSHelper.ToPssMatrix4(data);
             _effect._shaderProgram.SetUniformValue(0, ref matrix4);
 #elif OPENGL

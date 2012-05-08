@@ -376,5 +376,7 @@
   <ItemGroup>
     <EmbeddedShaderProgram Include="PSSuite\Graphics\Resources\BasicEffect.fcg" />
     <EmbeddedShaderProgram Include="PSSuite\Graphics\Resources\BasicEffect.vcg" />
+    <EmbeddedShaderProgram Include="PSSuite\Graphics\Resources\Texture.fcg" />
+    <EmbeddedShaderProgram Include="PSSuite\Graphics\Resources\Texture.vcg" />
   </ItemGroup>
 </Project>

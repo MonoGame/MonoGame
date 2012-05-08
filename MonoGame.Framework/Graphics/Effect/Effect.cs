@@ -400,15 +400,17 @@ namespace Microsoft.Xna.Framework.Graphics
                 new EffectAnnotationCollection(), new EffectParameterCollection(), new EffectParameterCollection(), new float[4]));
             
             
-            _shaderProgram.SetUniformBinding(0, "WorldViewProj");
-            _shaderProgram.SetAttributeBinding(0, "a_Position");
-            _shaderProgram.SetAttributeBinding(1, "a_Color0");
+            //_shaderProgram.SetUniformBinding(0, "WorldViewProj");
+            //_shaderProgram.SetAttributeBinding(0, "a_Position");
+            //_shaderProgram.SetAttributeBinding(1, "a_Color0");
             
             Techniques = new EffectTechniqueCollection();
             var effectPassCollection = new EffectPassCollection();
             effectPassCollection.Add(new EffectPass(this, "Pass", null, null, BlendState.AlphaBlend, DepthStencilState.Default, RasterizerState.CullNone, new EffectAnnotationCollection()));
             Techniques.Add(new EffectTechnique(this, "Name", effectPassCollection, new EffectAnnotationCollection()));
        
+            ConstantBuffers = new ConstantBuffer[0];
+            
             CurrentTechnique = Techniques[0];
         }
         
@@ -435,6 +437,11 @@ namespace Microsoft.Xna.Framework.Graphics
                     EffectParameterClass.Vector, EffectParameterType.Single, name,
                     4, 1, index, 0, "float4",
                     new EffectAnnotationCollection(), new EffectParameterCollection(), new EffectParameterCollection(), new float[4]);
+            case ShaderUniformType.Sampler2D:
+                return new EffectParameter(
+                    EffectParameterClass.Object, EffectParameterType.Texture2D, name,
+                    1, 1, index, 0, "texture2d",
+                    new EffectAnnotationCollection(), new EffectParameterCollection(), new EffectParameterCollection(), null);
             default:
                 throw new Exception("Uniform Type " + type + " Not yet implemented (" + name + ")");
             }
