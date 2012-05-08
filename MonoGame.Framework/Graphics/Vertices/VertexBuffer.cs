@@ -10,6 +10,7 @@ using MonoMac.OpenGL;
 using OpenTK.Graphics.OpenGL;
 #elif PSS
 using Sce.Pss.Core.Graphics;
+using PssVertexBuffer = Sce.Pss.Core.Graphics.VertexBuffer;
 #elif GLES
 using OpenTK.Graphics.ES20;
 using BufferTarget = OpenTK.Graphics.ES20.All;
@@ -73,9 +74,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             _binding = new SharpDX.Direct3D11.VertexBufferBinding(_buffer, VertexDeclaration.VertexStride, 0);
 #elif PSS
-            VertexFormat[] vertexFormat = new VertexFormat[vertexDeclaration._elements.Length];
-            for (int i = 0; i < vertexFormat.Length; i++)
-                vertexFormat[i] = PSSHelper.ToVertexFormat(vertexDeclaration._elements[i].VertexElementFormat);
+            VertexFormat[] vertexFormat = vertexDeclaration.GetVertexFormat();
             _buffer = new PssVertexBuffer(vertexCount, vertexFormat);
 #else
             Threading.Begin();
@@ -192,7 +191,6 @@ namespace Microsoft.Xna.Framework.Graphics
    
 #if !PSS
             var elementSizeInBytes = Marshal.SizeOf(typeof(T));
-#endif
 #endif
 
 #if DIRECTX

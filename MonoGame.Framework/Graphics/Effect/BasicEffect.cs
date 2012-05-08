@@ -77,7 +77,6 @@ namespace Microsoft.Xna.Framework.Graphics
             "Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect.mgfx"
 #endif
         );
-#endif
 
         #endregion
         

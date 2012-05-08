@@ -384,19 +384,19 @@ namespace Microsoft.Xna.Framework.Graphics
 #warning Hacks for BasicEffect as we don't have these parameters yet
             Parameters.Add (new EffectParameter(
                 EffectParameterClass.Vector, EffectParameterType.Single, "SpecularColor",
-                3, 1, "float3",
+                3, 1, 0, 0, "float3",
                 new EffectAnnotationCollection(), new EffectParameterCollection(), new EffectParameterCollection(), new float[3]));
             Parameters.Add (new EffectParameter(
                 EffectParameterClass.Scalar, EffectParameterType.Single, "SpecularPower",
-                1, 1, "float",
+                1, 1, 0, 0, "float",
                 new EffectAnnotationCollection(), new EffectParameterCollection(), new EffectParameterCollection(), 0.0f));
             Parameters.Add (new EffectParameter(
                 EffectParameterClass.Vector, EffectParameterType.Single, "FogVector",
-                4, 1, "float4",
+                4, 1, 0, 0, "float4",
                 new EffectAnnotationCollection(), new EffectParameterCollection(), new EffectParameterCollection(), new float[4]));
             Parameters.Add (new EffectParameter(
                 EffectParameterClass.Vector, EffectParameterType.Single, "DiffuseColor",
-                4, 1, "float4",
+                4, 1, 0, 0, "float4",
                 new EffectAnnotationCollection(), new EffectParameterCollection(), new EffectParameterCollection(), new float[4]));
             
             
@@ -421,18 +421,19 @@ namespace Microsoft.Xna.Framework.Graphics
             var type = _shaderProgram.GetUniformType(index);
             
             //EffectParameter.Semantic => COLOR0 / POSITION0 etc
-
+   
+            //FIXME: bufferOffset in below lines is 0 but should probably be something else
             switch (type)
             {
             case ShaderUniformType.Float4x4:
                 return new EffectParameter(
                     EffectParameterClass.Matrix, EffectParameterType.Single, name,
-                    4, 4, "float4x4",
+                    4, 4, index, 0, "float4x4",
                     new EffectAnnotationCollection(), new EffectParameterCollection(), new EffectParameterCollection(), new float[4 * 4]);
             case ShaderUniformType.Float4:
                 return new EffectParameter(
                     EffectParameterClass.Vector, EffectParameterType.Single, name,
-                    4, 1, "float4",
+                    4, 1, index, 0, "float4",
                     new EffectAnnotationCollection(), new EffectParameterCollection(), new EffectParameterCollection(), new float[4]);
             default:
                 throw new Exception("Uniform Type " + type + " Not yet implemented (" + name + ")");

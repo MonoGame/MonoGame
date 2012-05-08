@@ -341,6 +341,7 @@
     <Compile Include="Content\ContentReaders\EffectReader.cs" />
     <Compile Include="PSSuite\PSSHelper.cs" />
     <Compile Include="PSSuite\PSSExtensions.cs" />
+    <Compile Include="Graphics\Effect\ConstantBuffer.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="PSSuite\" />
