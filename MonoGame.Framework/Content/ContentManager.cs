@@ -240,7 +240,7 @@ namespace Microsoft.Xna.Framework.Content
 				//try load it traditionally
 				stream = OpenStream(assetName);
 				loadXnb = true;
-			} catch (ContentLoadException ex) {
+			} catch (ContentLoadException) {
 				//MonoGame try to load as a non-content file
 				
 				assetName = TitleContainer.GetFilename(Path.Combine (_rootDirectory, assetName));
@@ -501,7 +501,7 @@ namespace Microsoft.Xna.Framework.Content
 				stream = OpenStream(assetName);
 				stream.Dispose();
 			}
-			catch (ContentLoadException ex)
+			catch (ContentLoadException)
 			{
 				//MonoGame try to load as a non-content file
 

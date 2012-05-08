@@ -59,6 +59,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public EffectTechnique CurrentTechnique { get; set; }
   
+        internal ConstantBuffer[] ConstantBuffers { get; private set; }
+
 #if PSS
         internal ShaderProgram _shaderProgram;
 #endif
@@ -141,6 +143,11 @@ namespace Microsoft.Xna.Framework.Graphics
             Parameters = new EffectParameterCollection(cloneSource.Parameters);
             Techniques = new EffectTechniqueCollection(this, cloneSource.Techniques);
 
+            // Make a copy of the immutable constant buffers.
+            ConstantBuffers = new ConstantBuffer[cloneSource.ConstantBuffers.Length];
+            for (var i = 0; i < cloneSource.ConstantBuffers.Length; i++)
+                ConstantBuffers[i] = new ConstantBuffer(cloneSource.ConstantBuffers[i]);
+
             // Find and set the current technique.
             for (var i = 0; i < cloneSource.Techniques.Count; i++)
             {
@@ -219,12 +226,22 @@ namespace Microsoft.Xna.Framework.Graphics
             // TODO: Maybe we should be reading in a string 
             // table here to save some bytes in the file.
 
+            // Read in all the constant buffers.
+            var buffers = (int)reader.ReadByte();
+            ConstantBuffers = new ConstantBuffer[buffers];
+            for (var c = 0; c < buffers; c++)
+            {
+                var size = (int)reader.ReadInt16();
+                var buffer = new ConstantBuffer(graphicsDevice, size);
+                ConstantBuffers[c] = buffer;
+            }
+
             // Read in all the shader objects.
             var shaderList = new List<DXShader>();
             var shaders = (int)reader.ReadByte();
             for (var s = 0; s < shaders; s++)
             {
-                var shader = new DXShader(reader);
+                var shader = new DXShader(graphicsDevice, reader);
                 shaderList.Add(shader);
             }
 
@@ -309,6 +326,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 var rowCount = (int)reader.ReadByte();
                 var columnCount = (int)reader.ReadByte();
 
+                var bufferIndex = (int)reader.ReadByte();
+                var bufferOffset = (int)reader.ReadInt16();
+
                 var elements = ReadParameters(reader);
                 var structMembers = ReadParameters(reader);
 
@@ -343,7 +363,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 var param = new EffectParameter(
                     class_, type, name, rowCount, columnCount,
-                    semantic, annotations, elements, structMembers, data);
+                    bufferIndex, bufferOffset, semantic, annotations, 
+                    elements, structMembers, data);
 
                 collection.Add(param);
             }

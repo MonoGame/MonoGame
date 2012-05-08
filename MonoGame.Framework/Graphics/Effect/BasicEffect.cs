@@ -68,10 +68,15 @@ namespace Microsoft.Xna.Framework.Graphics
 
         EffectDirtyFlags dirtyFlags = EffectDirtyFlags.All;
 
-#if PSS
-        static readonly byte[] Bytecode = LoadEffectResource("MonoGame.Framework.PSSuite.PSSuite.Graphics.Resources.BasicEffect.cgx"); //FIXME: This shader is totally incomplete
+        static readonly byte[] Bytecode = LoadEffectResource(
+#if DIRECTX
+            "Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect.dx11.mgfxo"
+#elif PSS 
+            "MonoGame.Framework.PSSuite.PSSuite.Graphics.Resources.BasicEffect.cgx" //FIXME: This shader is totally incomplete
 #else
-        static readonly byte[] Bytecode = LoadEffectResource("Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect.mgfx");
+            "Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect.mgfx"
+#endif
+        );
 #endif
 
         #endregion

@@ -17,9 +17,12 @@ namespace Microsoft.Xna.Framework.Graphics
 {
 	public class VertexDeclaration : GraphicsResource
 	{
-		// Fields
-		internal VertexElement[] _elements;
-		internal int _vertexStride;
+#if DIRECTX
+        private SharpDX.Direct3D11.InputLayout _inputLayout;
+#endif
+
+		private VertexElement[] _elements;
+        private int _vertexStride;
 
 		public VertexDeclaration(params VertexElement[] elements)
 		{
@@ -95,17 +98,30 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			return vertexDeclaration;
 		}
-		
+        
+        public VertexElement[] GetVertexElements()
+		{
+			return (VertexElement[]) this._elements.Clone();
+		}
+
+		// Properties
+		public int VertexStride
+		{
+			get
+			{
+				return this._vertexStride;
+			}
+		}
+
+
+#if OPENGL
 		internal void Apply()
 		{
-			Apply (IntPtr.Zero);
-		}
+            Apply(IntPtr.Zero);
+        }
 
 		internal void Apply(IntPtr offset)
 		{
-#if WINRT
-
-#elif OPENGL
 
             // TODO: This is executed on every draw call... can we not
             // allocate a vertex declaration once and just re-apply it?
@@ -138,21 +154,34 @@ namespace Microsoft.Xna.Framework.Graphics
 			for (int i=0; i<16; i++) {
 				GLStateManager.VertexAttribArray(i, enabledAttributes[i]);
 			}
+		}
+#endif // OPENGL
+
+#if DIRECTX
+
+        internal SharpDX.Direct3D11.InputLayout GetInputLayout(GraphicsDevice device, byte[] vertexShaderBytecode)
+        {                     
+            if (_inputLayout == null)
+            {
+                // TODO: We should be registering this GraphicsResource
+                // for disposal/cleanup here somehow right?
+
+                var d3dDevice = device._d3dDevice;
+
+                var inputs = new SharpDX.Direct3D11.InputElement[_elements.Length];
+                for (var i = 0; i < _elements.Length; i++)
+                    inputs[i] = _elements[i].GetInputElement();
+
+                // NOTE: We do not try to cache input layouts and share them
+                // across similar vertex declarations... this is up to the user
+                // to cache them (usually thru static declarations).
+
+                _inputLayout = new SharpDX.Direct3D11.InputLayout(d3dDevice, vertexShaderBytecode, inputs);
+            }
+
+            return _inputLayout;
+        }
+
 #endif
-		}
-
-		public VertexElement[] GetVertexElements()
-		{
-			return (VertexElement[]) this._elements.Clone();
-		}
-
-		// Properties
-		public int VertexStride
-		{
-			get
-			{
-				return this._vertexStride;
-			}
-		}
 	}
 }

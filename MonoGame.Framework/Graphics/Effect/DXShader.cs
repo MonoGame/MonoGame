@@ -47,11 +47,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #elif DIRECTX
 
-        private InputLayout _inputLayout;
-
         private VertexShader _vertexShader;
 
         private PixelShader _pixelShader;
+
+        private byte[] _shaderBytecode;
 
 #endif
 
@@ -95,6 +95,7 @@ namespace Microsoft.Xna.Framework.Graphics
             public VertexElementUsage usage;
             public int index;
             public string name;
+            public short format;
         }
 
         private readonly Symbol[] _symbols;
@@ -117,6 +118,11 @@ namespace Microsoft.Xna.Framework.Graphics
 #if DEBUG 
             _glslCode = cloneSource._glslCode;
 #endif
+
+#elif DIRECTX
+            _pixelShader = cloneSource._pixelShader;
+            _vertexShader = cloneSource._vertexShader;
+            _shaderBytecode = cloneSource._shaderBytecode;
 #endif
             _symbols = cloneSource._symbols;
             _samplers = cloneSource._samplers;
@@ -128,7 +134,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _uniforms_bool = (int[])cloneSource._uniforms_bool.Clone();
         }
 
-        internal DXShader(BinaryReader reader)
+        internal DXShader(GraphicsDevice device, BinaryReader reader)
         {
             var isVertexShader = reader.ReadBoolean();
 
@@ -151,13 +157,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #endif
 
-            // Read in the shader code.
-#if OPENGL
-            var glslCode = reader.ReadString();
-#elif DIRECTX
-
             var shaderLength = (int)reader.ReadUInt16();
             var shaderBytecode = reader.ReadBytes(shaderLength);
+
+#if OPENGL
+            var glslCode = System.Text.Encoding.ASCII.GetString(shaderBytecode);
 #endif
 
             var bool_count = (int)reader.ReadByte();
@@ -195,6 +199,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 _attributes[a].name = reader.ReadString();
                 _attributes[a].usage = (VertexElementUsage)reader.ReadByte();
                 _attributes[a].index = reader.ReadByte();
+                _attributes[a].format = reader.ReadInt16();
             }
 
 #if OPENGL
@@ -246,25 +251,19 @@ namespace Microsoft.Xna.Framework.Graphics
                 Threading.End();
             }
 #elif DIRECTX
-            /*
-            var d3dDevice = GraphicsDevice.Current._d3dDevice;
+
+            var d3dDevice = device._d3dDevice;
             if (isVertexShader)
             {
                 _vertexShader = new VertexShader(d3dDevice, shaderBytecode, null);
 
-                // TODO: We need the specifics about the input format for DX!
-                var elements = new InputElement[_attributes.Length];
-                for (var i=0; i < _attributes.Length; i++)
-                {
-                    var attrib = _attributes[i];
-                    elements[i] = new InputElement(attrib.name, 0, Format.R32G32B32A32_Float, attrib.index, 0);
-                }
-
-                _inputLayout = new InputLayout(d3dDevice, shaderBytecode, elements);
+                // We need the bytecode later for allocating the
+                // input layout from the vertex declaration.
+                _shaderBytecode = shaderBytecode;
             }
             else
                 _pixelShader = new PixelShader(d3dDevice, shaderBytecode);
-            */
+
 #endif
         }
 
@@ -307,11 +306,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		public void Apply(  int program, 
                             EffectParameterCollection parameters,
 		                    GraphicsDevice graphicsDevice) 
-        {			
-			var vp = graphicsDevice.Viewport;
-			var textures = graphicsDevice.Textures;
-			var samplerStates = graphicsDevice.SamplerStates;
-					
+        {							
 			// TODO: It would be much better if we kept track
             // of dirty states and only update those parameters.
 
@@ -381,7 +376,35 @@ namespace Microsoft.Xna.Framework.Graphics
 
             } // foreach (var symbol in _symbols)
 			
-#if OPENGL
+#if DIRECTX
+
+            var d3dContext = graphicsDevice._d3dContext;
+            if (_pixelShader != null)
+            {
+
+                foreach (var sampler in _samplers)
+                {
+                    var param = parameters[sampler.name];
+                    var texture = param.Data as Texture;
+                    graphicsDevice.Textures[sampler.index] = texture;
+                }
+
+                d3dContext.PixelShader.Set(_pixelShader);
+            }
+            else
+            {
+                d3dContext.VertexShader.Set(_vertexShader);
+
+                // Give the shader bytecode to the device so it
+                // can generate the input layout at draw time.
+                graphicsDevice._vertexShaderBytecode = _shaderBytecode;
+            }
+
+#elif OPENGL
+
+            var textures = graphicsDevice.Textures;
+			var samplerStates = graphicsDevice.SamplerStates;
+
 			// Upload the uniforms.				
             if (_uniforms_float4.Length > 0)
             {

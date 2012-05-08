@@ -62,11 +62,9 @@ using GLPixelFormat = MonoMac.OpenGL.PixelFormat;
 using System.Drawing.Imaging;
 using OpenTK.Graphics.OpenGL;
 using GLPixelFormat = OpenTK.Graphics.OpenGL.PixelFormat;
-#elif WINRT
-// TODO
 #elif PSS
 using PssTexture2D = Sce.Pss.Core.Graphics.Texture2D;
-#else
+#elif GLSL
 using OpenTK.Graphics.ES20;
 using GLPixelFormat = OpenTK.Graphics.ES20.All;
 using TextureTarget = OpenTK.Graphics.ES20.All;
@@ -91,11 +89,11 @@ namespace Microsoft.Xna.Framework.Graphics
 		protected int width;
 		protected int height;
 
-#if WINRT
-        internal SharpDX.Direct3D11.Texture2D _texture2D;
-#elif PSS
+#if PSS
 		internal PssTexture2D _texture2D;
-#else
+
+#elif OPENGL
+
 		PixelInternalFormat glInternalFormat;
 		GLPixelFormat glFormat;
 		PixelType glType;
@@ -121,18 +119,28 @@ namespace Microsoft.Xna.Framework.Graphics
             this.format = format;
             this.levelCount = 1;
 
-#if WINRT
+#if DIRECTX
+
             // TODO: Move this to SetData() if we want to make Immutable textures!
             var desc = new SharpDX.Direct3D11.Texture2DDescription();
             desc.Width = width;
             desc.Height = height;
-            desc.MipLevels = 0;
+            desc.MipLevels = mipmap ? 0 : 1;
+            desc.ArraySize = 1;
             desc.Format = SharpDXHelper.ToFormat(format);
+            desc.BindFlags = SharpDX.Direct3D11.BindFlags.ShaderResource;
+            desc.CpuAccessFlags = SharpDX.Direct3D11.CpuAccessFlags.None;
+            desc.SampleDescription.Count = 1;
+            desc.SampleDescription.Quality = 0;
+            desc.Usage = SharpDX.Direct3D11.ResourceUsage.Default;
+            desc.OptionFlags = SharpDX.Direct3D11.ResourceOptionFlags.None;
 
-            _texture2D = new SharpDX.Direct3D11.Texture2D(graphicsDevice._d3dDevice, desc);
+            _texture = new SharpDX.Direct3D11.Texture2D(graphicsDevice._d3dDevice, desc);
+
 #elif PSS
 			_texture2D = new Sce.Pss.Core.Graphics.Texture2D(width, height, mipmap, PSSHelper.ToFormat(format));
 #else
+
             this.glTarget = TextureTarget.Texture2D;
             
             Threading.Begin();
@@ -259,7 +267,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (data == null)
 				throw new ArgumentNullException("data");
 
-#if !WINRT
+#if !DIRECTX
             // WTF is this? Document your code people!
             Threading.Begin();
             try
@@ -287,8 +295,9 @@ namespace Microsoft.Xna.Framework.Graphics
                     h = Math.Max(height >> level, 1);
                 }
 
-#if WINRT
-                var box = new SharpDX.DataBox(dataPtr, w * elementSizeInByte, 0);
+#if DIRECTX
+
+                var box = new SharpDX.DataBox(dataPtr, GetPitch(w), 0);
 
                 var region = new SharpDX.Direct3D11.ResourceRegion();
                 region.Top = y;
@@ -299,10 +308,12 @@ namespace Microsoft.Xna.Framework.Graphics
                 region.Right = x + w;
 
                 // TODO: We need to deal with threaded contexts here!
-                graphicsDevice._d3dContext.UpdateSubresource(box, _texture2D, level, region);
+                graphicsDevice._d3dContext.UpdateSubresource(box, _texture, level, region);
+
 #elif PSS
                 _texture2D.SetPixels(level, data, _texture2D.Format, startIndex, w, x, y, w, h);
-#else
+
+#elif OPENGL
                 GL.BindTexture(TextureTarget.Texture2D, this.glTexture);
 
                 if (glFormat == (GLPixelFormat)All.CompressedTextureFormats)
@@ -319,12 +330,14 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
 
                 Debug.Assert(GL.GetError() == ErrorCode.NoError);
-#endif
+
+#endif // OPENGL
 
 #if !PSS
                 dataHandle.Free();
 #endif
-#if !WINRT
+
+#if !DIRECTX
             }
             finally
             {
@@ -347,9 +360,10 @@ namespace Microsoft.Xna.Framework.Graphics
         {
 #if IPHONE || ANDROID
 			throw new NotImplementedException();
+
 #elif PSS
             throw new NotImplementedException();
-#elif WINRT
+#elif DIRECTX
             throw new NotImplementedException();
 #else
 
@@ -468,8 +482,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 Threading.End();
             }
             return texture;
-#elif WINRT
-            return null;
+
+#elif DIRECTX
+            throw new NotImplementedException();
 #elif PSS
             return new Texture2D(graphicsDevice, stream);
 #else
@@ -512,20 +527,6 @@ namespace Microsoft.Xna.Framework.Graphics
 		internal void Reload(Stream textureStream)
 		{
 		}
-
-        public override void Dispose()
-        {
-#if WINRT
-            if (_texture2D != null)
-            {
-                _texture2D.Dispose();
-                _texture2D = null;
-            }
-#endif
-
-            base.Dispose();
-        }
-
 	}
 }
 

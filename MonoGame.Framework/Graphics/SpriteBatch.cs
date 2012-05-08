@@ -42,9 +42,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			this.graphicsDevice = graphicsDevice;
 
             // Use a custom SpriteEffect so we can control the transformation matrix
-            spriteEffect = new Effect(this.graphicsDevice, SpriteEffect.Bytecode);
+            spriteEffect = new Effect(graphicsDevice, SpriteEffect.Bytecode);
 
-            _batcher = new SpriteBatcher();
+            _batcher = new SpriteBatcher(graphicsDevice);
 		}
 
 		public void Begin ()
@@ -94,11 +94,12 @@ namespace Microsoft.Xna.Framework.Graphics
 				Setup ();
 			}
 			Flush ();
-			
-			// clear out the textures
-			graphicsDevice.Textures._textures.Clear ();
-			
+					
 #if OPENGL
+
+			// clear out the textures
+			graphicsDevice.Textures.Clear ();
+
 			// unbinds shader
 			if (_effect != null) 
             {
@@ -107,7 +108,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 #endif
 
-		}
+        }
 		
 		void Setup () 
         {
@@ -229,9 +230,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			SpriteBatchItem item = _batcher.CreateBatchItem ();
 
 			item.Depth = depth;
-#if !WINRT && !PSS
-			item.TextureID = texture.glTexture;
-#endif
+			item.Texture = texture;
 
 			if (sourceRectangle.HasValue) {
 				tempRect = sourceRectangle.Value;

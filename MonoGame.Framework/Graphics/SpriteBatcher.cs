@@ -68,16 +68,47 @@ namespace Microsoft.Xna.Framework.Graphics
 		private const int InitialVertexArraySize = 256;
 		List<SpriteBatchItem> _batchItemList;
 		Queue<SpriteBatchItem> _freeBatchItemQueue;
+
+        GraphicsDevice _device;
+
+#if DIRECTX
+        VertexPositionColorTexture[] _vertexArray;
+        DynamicVertexBuffer _vertexBuffer;
+        IndexBuffer _indexBuffer;
+#elif OPENGL
 		VertexPosition2ColorTexture[] _vertexArray;
 		ushort[] _index;
 		GCHandle _vertexHandle;
 		GCHandle _indexHandle;
-		
-		public SpriteBatcher ()
+#endif
+
+		public SpriteBatcher (GraphicsDevice device)
 		{
+            _device = device;
+
 			_batchItemList = new List<SpriteBatchItem>(InitialBatchSize);
 			_freeBatchItemQueue = new Queue<SpriteBatchItem>(InitialBatchSize);
 
+#if DIRECTX
+
+            _vertexArray = new VertexPositionColorTexture[InitialVertexArraySize * 4];
+            _vertexBuffer = new DynamicVertexBuffer(_device, VertexPositionColorTexture.VertexDeclaration, InitialVertexArraySize * 4, BufferUsage.WriteOnly);
+            _indexBuffer = new IndexBuffer(_device, IndexElementSize.SixteenBits, InitialVertexArraySize * 6, BufferUsage.WriteOnly);
+
+            var index = new ushort[6 * InitialVertexArraySize];
+            for (int i = 0; i < InitialVertexArraySize; i++)
+            {
+                index[i * 6 + 0] = (ushort)(i * 4);
+                index[i * 6 + 1] = (ushort)(i * 4 + 1);
+                index[i * 6 + 2] = (ushort)(i * 4 + 2);
+                index[i * 6 + 3] = (ushort)(i * 4 + 1);
+                index[i * 6 + 4] = (ushort)(i * 4 + 3);
+                index[i * 6 + 5] = (ushort)(i * 4 + 2);
+            }
+
+            _indexBuffer.SetData(index);
+
+#elif OPENGL
 			_vertexArray = new VertexPosition2ColorTexture[4*InitialVertexArraySize];
 			_index = new ushort[6*InitialVertexArraySize];
 			_vertexHandle = GCHandle.Alloc(_vertexArray,GCHandleType.Pinned);
@@ -92,7 +123,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				_index[i*6+4] = (ushort)(i*4+3);
 				_index[i*6+5] = (ushort)(i*4+2);
 			}
-			
+#endif
 		}
 		
 		public SpriteBatchItem CreateBatchItem()
@@ -108,7 +139,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		int CompareTexture ( SpriteBatchItem a, SpriteBatchItem b )
 		{
-			return a.TextureID.CompareTo(b.TextureID);
+            return ReferenceEquals( a.Texture, b.Texture ) ? 0 : 1;
 		}
 		
 		int CompareDepth ( SpriteBatchItem a, SpriteBatchItem b )
@@ -141,9 +172,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				break;
 			}
 			
-#if WINRT
-
-#elif OPENGL
+#if OPENGL
 
 			//Unbind VBOs
 			GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
@@ -181,31 +210,37 @@ namespace Microsoft.Xna.Framework.Graphics
 			// setup the vertexArray array
 			int startIndex = 0;
 			int index = 0;
-			int texID = -1;
+			Texture2D tex = null;
 
 			// make sure the vertexArray has enough space
 			if ( _batchItemList.Count*4 > _vertexArray.Length )
 				ExpandVertexArray( _batchItemList.Count );
 			
-			foreach ( SpriteBatchItem item in _batchItemList )
+#if DIRECTX
+            _device.SetVertexBuffer(_vertexBuffer);
+            _device.Indices = _indexBuffer;
+#endif
+
+			foreach ( var item in _batchItemList )
 			{
 				// if the texture changed, we need to flush and bind the new texture
-				bool shouldFlush = item.TextureID != texID;
+				bool shouldFlush = item.Texture != tex;
 				if ( shouldFlush )
 				{
 					FlushVertexArray( startIndex, index );
 					startIndex = index;
-					texID = item.TextureID;
+                    tex = item.Texture;
 					
-#if WINRT
-			
+#if DIRECTX
+                    _device.Textures[0] = tex;	  
 #elif OPENGL
 					GL.ActiveTexture(TextureUnit.Texture0);
-					GL.BindTexture ( TextureTarget.Texture2D, texID );
+					GL.BindTexture ( TextureTarget.Texture2D, tex.glTexture );
 
 					samplerState.Activate(TextureTarget.Texture2D);
 #endif
                 }
+
 				// store the SpriteBatchItem data in our vertexArray
 				_vertexArray[index++] = item.vertexTL;
 				_vertexArray[index++] = item.vertexTR;
@@ -214,6 +249,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				
 				_freeBatchItemQueue.Enqueue ( item );
 			}
+
 			// flush the remaining vertexArray data
 			FlushVertexArray(startIndex, index);
 			
@@ -223,12 +259,36 @@ namespace Microsoft.Xna.Framework.Graphics
 		void ExpandVertexArray( int batchSize )
 		{
 			// increase the size of the vertexArray
-			int newCount = _vertexArray.Length / 4;
+			var newCount = _vertexArray.Length / 4;
 			
 			while ( batchSize*4 > newCount )
 				newCount += 128;
 			
-			_vertexHandle.Free();			
+#if DIRECTX
+
+            _vertexBuffer.Dispose();
+            _indexBuffer.Dispose();
+
+            _vertexArray = new VertexPositionColorTexture[4 * newCount];
+            _vertexBuffer = new DynamicVertexBuffer(_device, VertexPositionColorTexture.VertexDeclaration, newCount * 4, BufferUsage.WriteOnly);
+
+            _indexBuffer = new IndexBuffer(_device, IndexElementSize.SixteenBits, InitialVertexArraySize * 6, BufferUsage.WriteOnly);
+
+            var index = new ushort[6 * InitialVertexArraySize];
+            for (int i = 0; i < InitialVertexArraySize; i++)
+            {
+                index[i * 6 + 0] = (ushort)(i * 4);
+                index[i * 6 + 1] = (ushort)(i * 4 + 1);
+                index[i * 6 + 2] = (ushort)(i * 4 + 2);
+                index[i * 6 + 3] = (ushort)(i * 4 + 1);
+                index[i * 6 + 4] = (ushort)(i * 4 + 3);
+                index[i * 6 + 5] = (ushort)(i * 4 + 2);
+            }
+
+            _indexBuffer.SetData(index);
+
+#elif OPENGL
+			_vertexHandle.Free();
 			_indexHandle.Free();			
 			
 			_vertexArray = new VertexPosition2ColorTexture[4*newCount];
@@ -245,21 +305,23 @@ namespace Microsoft.Xna.Framework.Graphics
 				_index[i*6+4] = (ushort)(i*4+3);
 				_index[i*6+5] = (ushort)(i*4+2);
 			}
+#endif
 		}
 
 		void FlushVertexArray ( int start, int end )
 		{
-#if WINRT
+            if ( start == end )
+                return;
 
+#if WINRT
+            var vertexCount = end - start;
+            _vertexBuffer.SetData(start * _vertexBuffer.VertexDeclaration.VertexStride, _vertexArray, start, vertexCount, _vertexBuffer.VertexDeclaration.VertexStride);
+            _device.DrawIndexedPrimitives(PrimitiveType.TriangleList, start, 0, vertexCount, 0, (vertexCount / 4) * 2);
 #elif OPENGL
-			// draw stuff
-			if ( start != end )
-            {
-				GL.DrawElements( BeginMode.Triangles,
-				                 (end-start)/2*3,
-				                 DrawElementsType.UnsignedShort,
-				                 (IntPtr)(_indexHandle.AddrOfPinnedObject().ToInt64()+(start/2*3*sizeof(short))) );
-			}
+			GL.DrawElements( BeginMode.Triangles,
+				                (end-start)/2*3,
+				                DrawElementsType.UnsignedShort,
+				                (IntPtr)(_indexHandle.AddrOfPinnedObject().ToInt64()+(start/2*3*sizeof(short))) );
 #endif
 		}
 	}

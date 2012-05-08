@@ -40,8 +40,9 @@ namespace Microsoft.Xna.Framework.Content
 		
 		static ContentTypeReaderManager()
 		{
-            // TODO: I need another design to make this work for WinRT.
-#if !WINRT
+#if WINRT
+            assemblyName = typeof(ContentTypeReaderManager).GetTypeInfo().Assembly.FullName;
+#else
 			assemblyName = Assembly.GetExecutingAssembly().FullName;
 #endif
         }
@@ -122,11 +123,11 @@ namespace Microsoft.Xna.Framework.Content
 				
 				
 
-				Type l_readerType = Type.GetType(readerTypeString);
+				var l_readerType = Type.GetType(readerTypeString);
                 if (l_readerType != null)
-						contentReaders[i] = (ContentTypeReader)Activator.CreateInstance(l_readerType,true);
-            	else
-					throw new ContentLoadException("Could not find matching content reader of type " + originalReaderTypeString + " (" + readerTypeString + ")");
+                    contentReaders[i] = l_readerType.GetDefaultConstructor().Invoke(null) as ContentTypeReader;
+                else
+                    throw new ContentLoadException("Could not find matching content reader of type " + originalReaderTypeString + " (" + readerTypeString + ")");
 
 				// I think the next 4 bytes refer to the "Version" of the type reader,
                 // although it always seems to be zero

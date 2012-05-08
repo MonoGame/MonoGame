@@ -16,7 +16,12 @@ namespace Microsoft.Xna.Framework.Graphics
             writer.Write(Header.ToCharArray());
             writer.Write((byte)Version);
 
-            // Write all the shared shaders.
+            // Write all the constant buffers.
+            writer.Write((byte)ConstantBuffers.Count);
+            foreach (var buffer in ConstantBuffers)
+                writer.Write((short)buffer.Size);
+
+            // Write all the shaders.
             writer.Write((byte)Shaders.Count);
             foreach (var shader in Shaders)
                 shader.Write(writer);
@@ -71,6 +76,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
             writer.Write((byte)param.rows);
             writer.Write((byte)param.columns);
+
+            writer.Write((byte)param.bufferIndex);
+            writer.Write((short)param.bufferOffset);
 
             // Write the elements or struct members.
             WriteParameters(writer, param.member_handles, (int)param.element_count);

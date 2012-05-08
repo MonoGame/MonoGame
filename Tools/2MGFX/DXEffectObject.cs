@@ -278,7 +278,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			EXPRESSIONINDEX,
 		}
 
-        [DebuggerDisplay("{class_} {type} {name}")]
 		public class d3dx_parameter
 		{
 			public string name;
@@ -294,11 +293,19 @@ namespace Microsoft.Xna.Framework.Graphics
 			public uint flags;
 			public uint bytes;
 
-            // Only used during serialization.
-            public int object_id = -1;
+            public int bufferIndex = -1;
+            public int bufferOffset = -1;
 
 			public d3dx_parameter[] annotation_handles;
 			public d3dx_parameter[] member_handles;
+
+            public override string ToString()
+            {
+                if (rows > 0 || columns > 0)
+                    return string.Format("{0} {1}{2}x{3} {4} : cb{5},{6}", class_, type, rows, columns, name, bufferIndex, bufferOffset);
+                else
+                    return string.Format("{0} {1} {2}", class_, type, name);
+            }
 		}
 		
 		public class d3dx_state

@@ -77,6 +77,9 @@ namespace Microsoft.Xna.Framework.Graphics
             // Initialize the list of unique shaders.
             Shaders = new List<DXShader>();
 
+            // Not used yet... but will be!
+            ConstantBuffers = new List<ConstantBuffer>();
+
 			using (var stream = new MemoryStream(effectCode, (int)baseOffset, (int)(effectCode.Length-baseOffset)))
             using (var reader = new BinaryReader(stream))
             {

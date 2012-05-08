@@ -39,6 +39,7 @@
 // #endregion License
 // 
 using System;
+using System.Diagnostics;
 
 #if MONOMAC
 using MonoMac.OpenGL;
@@ -57,50 +58,55 @@ namespace Microsoft.Xna.Framework.Graphics
 {
 	public class SamplerState : GraphicsResource
 	{
-		static SamplerState () {
-			AnisotropicClamp = new SamplerState () {
-				Filter = TextureFilter.Anisotropic,
+#if DIRECTX
+        private SharpDX.Direct3D11.SamplerState _state;
+#endif
 
+		static SamplerState () 
+        {
+			AnisotropicClamp = new SamplerState () 
+            {
+				Filter = TextureFilter.Anisotropic,
 				AddressU = TextureAddressMode.Clamp,
 				AddressV = TextureAddressMode.Clamp,
 				AddressW = TextureAddressMode.Clamp,
 			};
 			
-			AnisotropicWrap = new SamplerState () {
+			AnisotropicWrap = new SamplerState () 
+            {
 				Filter = TextureFilter.Anisotropic,
-
 				AddressU = TextureAddressMode.Wrap,
 				AddressV = TextureAddressMode.Wrap,
 				AddressW = TextureAddressMode.Wrap,
 			};
 			
-			LinearClamp = new SamplerState () {
+			LinearClamp = new SamplerState () 
+            {
 				Filter = TextureFilter.Linear,
-
 				AddressU = TextureAddressMode.Clamp,
 				AddressV = TextureAddressMode.Clamp,
 				AddressW = TextureAddressMode.Clamp,
 			};
 			
-			LinearWrap = new SamplerState () {
+			LinearWrap = new SamplerState () 
+            {
 				Filter = TextureFilter.Linear,
-
 				AddressU = TextureAddressMode.Wrap,
 				AddressV = TextureAddressMode.Wrap,
 				AddressW = TextureAddressMode.Wrap,
 			};
 			
-			PointClamp = new SamplerState () {
+			PointClamp = new SamplerState () 
+            {
 				Filter = TextureFilter.Point,
-
 				AddressU = TextureAddressMode.Clamp,
 				AddressV = TextureAddressMode.Clamp,
 				AddressW = TextureAddressMode.Clamp,
 			};
 			
-			PointWrap = new SamplerState () {
+			PointWrap = new SamplerState () 
+            {
 				Filter = TextureFilter.Point,
-
 				AddressU = TextureAddressMode.Wrap,
 				AddressV = TextureAddressMode.Wrap,
 				AddressW = TextureAddressMode.Wrap,
@@ -123,9 +129,101 @@ namespace Microsoft.Xna.Framework.Graphics
 		public int MaxMipLevel { get; set; }
 		public float MipMapLevelOfDetailBias { get; set; }
 		
-#if WINRT
+#if DIRECTX
 
-#elif OPENGL
+        internal SharpDX.Direct3D11.SamplerState GetState(GraphicsDevice device)
+        {
+            if (_state == null)
+            {
+                // We're now bound to a device... no one should
+                // be changing the state of this object now!
+                graphicsDevice = device;
+
+                // Build the description.
+                var desc = new SharpDX.Direct3D11.SamplerStateDescription();
+
+                desc.AddressU = GetAddressMode(AddressU);
+                desc.AddressV = GetAddressMode(AddressV);
+                desc.AddressW = GetAddressMode(AddressW);
+
+                desc.Filter = GetFilter(Filter);
+                desc.MaximumAnisotropy = MaxAnisotropy;
+                desc.MipLodBias = MipMapLevelOfDetailBias;
+
+                // TODO: How do i do these?
+                desc.MaximumLod = float.MaxValue;
+                desc.MinimumLod = -float.MaxValue;
+                desc.BorderColor = new SharpDX.Color4(0, 0, 0, 0);
+                desc.ComparisonFunction = SharpDX.Direct3D11.Comparison.Never;
+
+                // Create the state.
+                _state = new SharpDX.Direct3D11.SamplerState(graphicsDevice._d3dDevice, ref desc);
+            }
+
+            Debug.Assert(graphicsDevice == device, "The state was created for a different device!");
+
+            return _state;
+        }
+
+        private static SharpDX.Direct3D11.Filter GetFilter(TextureFilter filter)
+        {
+            switch (filter)
+            {
+                case TextureFilter.Anisotropic:
+                    return SharpDX.Direct3D11.Filter.Anisotropic;
+
+                case TextureFilter.Linear:
+                    return SharpDX.Direct3D11.Filter.MinMagMipLinear;
+
+                case TextureFilter.LinearMipPoint:
+                    return SharpDX.Direct3D11.Filter.MinMagLinearMipPoint;
+
+                case TextureFilter.MinLinearMagPointMipLinear:
+                    return SharpDX.Direct3D11.Filter.MinLinearMagPointMipLinear;
+
+                case TextureFilter.MinLinearMagPointMipPoint:
+                    return SharpDX.Direct3D11.Filter.MinLinearMagMipPoint;
+
+                case TextureFilter.MinPointMagLinearMipLinear:
+                    return SharpDX.Direct3D11.Filter.MinPointMagMipLinear;
+
+                case TextureFilter.MinPointMagLinearMipPoint:
+                    return SharpDX.Direct3D11.Filter.MinPointMagLinearMipPoint;
+
+                case TextureFilter.Point:
+                    return SharpDX.Direct3D11.Filter.MinMagMipPoint;
+
+                case TextureFilter.PointMipLinear:
+                    return SharpDX.Direct3D11.Filter.MinMagPointMipLinear;
+
+                default:
+                    throw new NotImplementedException("Invalid texture filter!");
+            }
+        }
+
+        private static SharpDX.Direct3D11.TextureAddressMode GetAddressMode(TextureAddressMode mode)
+        {
+            switch (mode)
+            {
+                case TextureAddressMode.Clamp:
+                    return SharpDX.Direct3D11.TextureAddressMode.Clamp;
+
+                case TextureAddressMode.Mirror:
+                    return SharpDX.Direct3D11.TextureAddressMode.Mirror;
+
+                case TextureAddressMode.Wrap:
+                    return SharpDX.Direct3D11.TextureAddressMode.Wrap;
+
+                default:
+                    throw new NotImplementedException("Invalid texture address mode!");
+            }
+        }
+
+#endif // DIRECTX
+
+
+#if OPENGL
+
 		internal void Activate(TextureTarget target, bool useMipmaps = false)
 		{
 			switch(Filter)
@@ -166,8 +264,9 @@ namespace Microsoft.Xna.Framework.Graphics
 				throw new NotImplementedException("No support for " + textureAddressMode);
 			}
 		}
-#endif
 
-	}
+#endif // OPENGL
+
+    }
 }
 

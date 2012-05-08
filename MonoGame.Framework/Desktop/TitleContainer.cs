@@ -93,6 +93,7 @@ namespace Microsoft.Xna.Framework
 
         public static Stream OpenStream(string name)
         {
+            name = name.Replace('/', '\\');
             var stream = Task.Run( () => OpenStreamAsync(name).Result ).Result;
             if (stream == null)
                 throw new FileNotFoundException();
