@@ -76,9 +76,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		// Ericcson Texture Compression (Android)
 		RgbEtc1 = 60,
-		// ETC1 does not normally support alpha, but this example from ARM describes how
-		// http://www.malideveloper.com/developer-resources/sample-code/index.php
-		RgbaEtc1 = 61,
     }
     
     public enum SurfaceFormat_Legacy

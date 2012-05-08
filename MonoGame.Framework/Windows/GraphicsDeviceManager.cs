@@ -160,6 +160,10 @@ namespace Microsoft.Xna.Framework
 
         private void Initialize()
         {
+            //_graphicsDevice.PresentationParameters.BackBufferFormat = _preferredBackBufferWidth;
+            _graphicsDevice.PresentationParameters.BackBufferWidth = _preferredBackBufferWidth;
+            _graphicsDevice.PresentationParameters.BackBufferHeight = _preferredBackBufferHeight;
+
             _graphicsDevice.PresentationParameters.IsFullScreen = false;
             _graphicsDevice.PresentationParameters.DeviceWindowHandle = _game.Window.Handle;
             _graphicsDevice.Initialize();

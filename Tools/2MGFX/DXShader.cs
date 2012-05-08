@@ -2,6 +2,7 @@ using System;
 using System.Runtime.InteropServices;
 using System.IO;
 using System.Collections.Generic;
+using System.Text;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -13,10 +14,6 @@ namespace Microsoft.Xna.Framework.Graphics
         public int SharedIndex { get; private set; }
 
         private bool IsVertexShader;
-
-        private readonly DXPreshader _preshader;
-
-        private readonly string _glslCode;
 
         private readonly int _uniforms_float4_count = 0;
         private readonly int _uniforms_int4_count = 0;
@@ -30,11 +27,12 @@ namespace Microsoft.Xna.Framework.Graphics
             public string parameter;
         }
 
-        private struct Attribute
+        public struct Attribute
         {
-            public VertexElementUsage usage;
             public int index;
             public string name;
+            public VertexElementUsage usage;
+            public short format;
         }
 
         private readonly MojoShader.MOJOSHADER_symbol[] _symbols;
@@ -43,15 +41,144 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public byte[] Bytecode { get; private set; }
 
-        public DXShader(byte[] byteCode, bool isVertexShader, int sharedIndex)
+        public byte[] ShaderCode { get; private set; }
+
+        public DXShader(byte[] byteCode, SharpDX.Direct3D11.EffectShaderVariable variable, int sharedIndex)
         {
-            IsVertexShader = isVertexShader;
+            var shaderDesc = variable.GetShaderDescription(0);
+
+            if (variable.TypeInfo.Description.Type != SharpDX.D3DCompiler.ShaderVariableType.Vertexshader)
+            {
+                IsVertexShader = false;
+                _attributes = new Attribute[0];
+            }
+            else
+            {
+                IsVertexShader = true;
+
+                var componentX = SharpDX.D3DCompiler.RegisterComponentMaskFlags.ComponentX;
+                var componentXY = SharpDX.D3DCompiler.RegisterComponentMaskFlags.ComponentX |
+                                    SharpDX.D3DCompiler.RegisterComponentMaskFlags.ComponentY;
+                var componentXYZ = SharpDX.D3DCompiler.RegisterComponentMaskFlags.ComponentX |
+                                    SharpDX.D3DCompiler.RegisterComponentMaskFlags.ComponentY |
+                                    SharpDX.D3DCompiler.RegisterComponentMaskFlags.ComponentZ;
+                var componentXYZW = SharpDX.D3DCompiler.RegisterComponentMaskFlags.ComponentX |
+                                    SharpDX.D3DCompiler.RegisterComponentMaskFlags.ComponentY |
+                                    SharpDX.D3DCompiler.RegisterComponentMaskFlags.ComponentZ |
+                                    SharpDX.D3DCompiler.RegisterComponentMaskFlags.ComponentW;
+
+                _attributes = new DXShader.Attribute[shaderDesc.InputParameterCount];
+                var offset = 0;
+                for (var i = 0; i < _attributes.Length; i++)
+                {
+                    var element = variable.GetInputSignatureElementDescription(0, i);
+
+                    _attributes[i].name = element.SemanticName;
+                    _attributes[i].index = offset;
+                    //_attributes[i].usage = ???
+
+                    var isX = (element.UsageMask & componentX) == componentX;
+                    var isXY = (element.UsageMask & componentXY) == componentXY;
+                    var isXYZ = (element.UsageMask & componentXYZ) == componentXYZ;
+                    var isXYZW = (element.UsageMask & componentXYZW) == componentXYZW;
+
+                    // Increment the offset.
+                    offset += isXYZW ? 4 : isXYZ ? 3 : isXY ? 2 : 1;
+
+                    SharpDX.DXGI.Format format;
+                    switch (element.ComponentType)
+                    {
+                        case SharpDX.D3DCompiler.RegisterComponentType.Float32:
+                            if (isXYZW)
+                                format = SharpDX.DXGI.Format.R32G32B32A32_Float;
+                            else if (isXYZ)
+                                format = SharpDX.DXGI.Format.R32G32B32_Float;
+                            else if (isXY)
+                                format = SharpDX.DXGI.Format.R32G32_Float;
+                            else if (isX)
+                                format = SharpDX.DXGI.Format.R32_Float;
+                            else
+                                throw new NotImplementedException("Got unknown vertex shader input!");
+                            break;
+
+                        case SharpDX.D3DCompiler.RegisterComponentType.Sint32:
+                            if (isXYZW)
+                                format = SharpDX.DXGI.Format.R32G32B32A32_SInt;
+                            else if (isXYZ)
+                                format = SharpDX.DXGI.Format.R32G32B32_SInt;
+                            else if (isXY)
+                                format = SharpDX.DXGI.Format.R32G32_SInt;
+                            else if (isX)
+                                format = SharpDX.DXGI.Format.R32_SInt;
+                            else
+                                throw new NotImplementedException("Got unknown vertex shader input!");
+                            break;
+
+                        case SharpDX.D3DCompiler.RegisterComponentType.Uint32:
+                            if (isXYZW)
+                                format = SharpDX.DXGI.Format.R32G32B32A32_UInt;
+                            else if (isXYZ)
+                                format = SharpDX.DXGI.Format.R32G32B32_UInt;
+                            else if (isXY)
+                                format = SharpDX.DXGI.Format.R32G32_UInt;
+                            else if (isX)
+                                format = SharpDX.DXGI.Format.R32_UInt;
+                            else
+                                throw new NotImplementedException("Got unknown vertex shader input!");
+                            break;
+
+                        default:
+                            throw new NotImplementedException("Got unknown vertex shader input!");
+                    }
+
+                    _attributes[i].format = (short)format;
+                }
+            }
+
             SharedIndex = sharedIndex;
+
+            // Store the original bytecode here for comparison.
             Bytecode = byteCode;
 
+            // Strip the bytecode we're gonna save!
+            const SharpDX.D3DCompiler.StripFlags stripFlags =   SharpDX.D3DCompiler.StripFlags.CompilerStripDebugInformation | 
+                                                                SharpDX.D3DCompiler.StripFlags.CompilerStripReflectionData | 
+                                                                SharpDX.D3DCompiler.StripFlags.CompilerStripTestBlobs;
+
+            using (var original = new SharpDX.D3DCompiler.ShaderBytecode(byteCode))
+            {
+                // Strip the bytecode for saving to disk.
+                using (var stripped = original.Strip(stripFlags))
+                {
+                    ShaderCode = new byte[stripped.BufferSize];
+                    stripped.Data.Read(ShaderCode, 0, ShaderCode.Length);
+                }
+
+                // Use reflection to get details of the shader.
+                using (var refelect = new SharpDX.D3DCompiler.ShaderReflection(original))
+                {
+
+                    var samplers = new List<Sampler>();
+                    for (var i = 0; i < refelect.Description.BoundResources; i++)
+                    {
+                        var rdesc = refelect.GetResourceBindingDescription(i);
+                        if (rdesc.Type == SharpDX.D3DCompiler.ShaderInputType.Texture)
+                        {
+                            samplers.Add(new Sampler 
+                            { 
+                                index = rdesc.BindPoint, 
+                                name = rdesc.Name, 
+                                parameter = string.Empty,
+                                type = MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_2D 
+                            });
+                        }
+                    }
+
+                    _samplers = samplers.ToArray();
+                }
+            }
+
             _symbols = new MojoShader.MOJOSHADER_symbol[0];
-            _samplers = new Sampler[0];
-            _attributes = new Attribute[0];
         }
 
         public DXShader(byte[] byteCode, int sharedIndex)
@@ -75,12 +202,6 @@ namespace Microsoft.Xna.Framework.Graphics
 				var errors = DXHelper.UnmarshalArray<MojoShader.MOJOSHADER_error>(parseData.errors, parseData.error_count);
 				throw new Exception(errors[0].error);
 			}
-
-            if (parseData.preshader != IntPtr.Zero)
-            {
-                var preshader = DXHelper.Unmarshal<MojoShader.MOJOSHADER_preshader>(parseData.preshader);
-                _preshader = DXPreshader.CreatePreshader(preshader);
-            }
 
             switch (parseData.shader_type)
             {
@@ -185,24 +306,27 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
             }
 		
-			_glslCode = parseData.output;
+			var glslCode = parseData.output;
 			
 #if GLSLOPTIMIZER
-			//_glslCode = GLSLOptimizer.Optimize(_glslCode, ShaderType);
+			//glslCode = GLSLOptimizer.Optimize(glslCode, ShaderType);
 #endif
 
             // TODO: This sort of sucks... why does MojoShader not produce
             // code valid for GLES out of the box?
 
             // GLES platforms do not like this.
-            _glslCode = _glslCode.Replace("#version 110\r\n", "");
+            glslCode = glslCode.Replace("#version 110\r\n", "");
 
             // Add the required precision specifiers for GLES.
-            _glslCode = "#ifdef GL_ES\r\n" +
+            glslCode = "#ifdef GL_ES\r\n" +
                         "precision highp float;\r\n" +
                         "precision mediump int;\r\n" +
                         "#endif\r\n" +
-                        _glslCode;
+                        glslCode;
+
+            // Store the code for serialization.
+            ShaderCode = Encoding.ASCII.GetBytes(glslCode);
 		}
 
         public void SetSamplerParameters(Dictionary<string, DXEffectObject.d3dx_parameter> parameters)
@@ -238,17 +362,8 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             writer.Write(IsVertexShader);
 
-            //writer.Write(_preshader != null);
-            //if (_preshader != null)
-                //_preshader.Write(writer);
-
-            if (IsDirectX)
-            {
-                writer.Write((ushort)Bytecode.Length);
-                writer.Write(Bytecode);
-            }
-            else
-                writer.Write(_glslCode);
+            writer.Write((ushort)ShaderCode.Length);
+            writer.Write(ShaderCode);
 
             writer.Write((byte)_uniforms_bool_count);
             writer.Write((byte)_uniforms_int4_count);
@@ -278,7 +393,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 writer.Write(attrib.name);
                 writer.Write((byte)attrib.usage);
                 writer.Write((byte)attrib.index);
-            }            
+                writer.Write(attrib.format);
+            }
         }
 	}
 }

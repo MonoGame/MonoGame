@@ -151,15 +151,24 @@ namespace Microsoft.Xna.Framework.Content
             if (!String.IsNullOrEmpty(externalReference))
             {
 #if WINRT
-                return contentManager.Load<T>(externalReference);
+                var notSeparator = '/';
+                var separator = '\\';
+
+                externalReference = externalReference.Replace(notSeparator, separator);
+
+                var fullAssetName = assetName.Replace(notSeparator, separator);
+                var pathDirectory = Path.GetDirectoryName(fullAssetName);
+                var fullAssetPath = Path.Combine(pathDirectory, externalReference);
+
+                return contentManager.Load<T>(fullAssetPath);
 #else
-                externalReference = externalReference.Replace('\\', Path.DirectorySeparatorChar);
+                externalReference = externalReference.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
 
                 // Use Path.GetFullPath to help resolve relative directories
                 string fullRootPath = Path.GetFullPath(contentManager.RootDirectory);
 				
 				// iOS won't find the right name if the \'s are facing the wrong way. be certian we're good here.
-				var fullAssetName = Path.Combine(fullRootPath, assetName.Replace('\\', Path.DirectorySeparatorChar)); 
+				var fullAssetName = Path.Combine(fullRootPath, assetName.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar)); 
 				var pathDirectory = Path.GetDirectoryName(fullAssetName);
 				var dirExtCombined = Path.Combine(pathDirectory, externalReference);
 				

@@ -10,26 +10,20 @@ using MonoMac.OpenGL;
 using OpenTK.Graphics.OpenGL;
 #elif PSS
 using Sce.Pss.Core.Graphics;
-using PssVertexBuffer = Sce.Pss.Core.Graphics.VertexBuffer;
-#elif WINRT
-//Nothing
-#else
+#elif GLES
 using OpenTK.Graphics.ES20;
-#if IPHONE || ANDROID
 using BufferTarget = OpenTK.Graphics.ES20.All;
 using BufferUsageHint = OpenTK.Graphics.ES20.All;
-#else
-using BufferUsageHint = OpenTK.Graphics.ES20.BufferUsage;
 #endif
-#endif
+
 
 namespace Microsoft.Xna.Framework.Graphics
 {
 	public class VertexBuffer : GraphicsResource
-	{			
-#if WINRT
+    {
+#if DIRECTX
         internal SharpDX.Direct3D11.VertexBufferBinding _binding;
-        private SharpDX.Direct3D11.Buffer _buffer;
+        protected SharpDX.Direct3D11.Buffer _buffer;
 #elif PSS
         private PssVertexBuffer _buffer;
 #else
@@ -52,16 +46,28 @@ namespace Microsoft.Xna.Framework.Graphics
             this.VertexCount = vertexCount;
             this.BufferUsage = bufferUsage;
 
-#if WINRT
+#if DIRECTX
             // TODO: To use Immutable resources we would need to delay creation of 
             // the Buffer until SetData() and recreate them if set more than once.
+            dynamic = false;
 
-            _buffer = new SharpDX.Direct3D11.Buffer(    graphicsDevice._d3dDevice, 
+            SharpDX.Direct3D11.CpuAccessFlags accessflags = SharpDX.Direct3D11.CpuAccessFlags.None;
+            SharpDX.Direct3D11.ResourceUsage usage = SharpDX.Direct3D11.ResourceUsage.Default;
+
+            if (dynamic)
+            {
+                accessflags |= SharpDX.Direct3D11.CpuAccessFlags.Write;
+                usage = SharpDX.Direct3D11.ResourceUsage.Dynamic;
+            }
+
+            if (bufferUsage != Graphics.BufferUsage.WriteOnly)
+                accessflags |= SharpDX.Direct3D11.CpuAccessFlags.Read;
+
+            _buffer = new SharpDX.Direct3D11.Buffer(    graphicsDevice._d3dDevice,
                                                         vertexDeclaration.VertexStride * vertexCount,
-                                                        dynamic ? SharpDX.Direct3D11.ResourceUsage.Dynamic : SharpDX.Direct3D11.ResourceUsage.Default,
+                                                        usage,
                                                         SharpDX.Direct3D11.BindFlags.VertexBuffer,
-                                                        0, // CpuAccessFlags
-                                                        0, // OptionFlags                                                          
+                                                        accessflags,SharpDX.Direct3D11.ResourceOptionFlags.None,
                                                         0  // StructureSizeInBytes
                                                         );
 
@@ -115,7 +121,8 @@ namespace Microsoft.Xna.Framework.Graphics
             if ((vertexStride > (VertexCount * VertexDeclaration.VertexStride)) || (vertexStride < VertexDeclaration.VertexStride))
                 throw new ArgumentOutOfRangeException("One of the following conditions is true:\nThe vertex stride is larger than the vertex buffer.\nThe vertex stride is too small for the type of data requested.");
 
-#if WINRT
+#if DIRECTX
+            throw new NotImplementedException();
 #elif PSS
             throw new NotImplementedException();
 #else
@@ -183,40 +190,37 @@ namespace Microsoft.Xna.Framework.Graphics
             if ((vertexStride > (VertexCount * VertexDeclaration.VertexStride)) || (vertexStride < VertexDeclaration.VertexStride))
                 throw new ArgumentOutOfRangeException("One of the following conditions is true:\nThe vertex stride is larger than the vertex buffer.\nThe vertex stride is too small for the type of data requested.");
 
-            var elementSizeInByte = Marshal.SizeOf(typeof(T));
-            var sizeInBytes = elementSizeInByte * elementCount;
+            var elementSizeInBytes = Marshal.SizeOf(typeof(T));
 
-#if WINRT
-            //using(var stream = new SharpDX.DataStream(sizeInBytes, false, true))
-            {
-                var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-                var startBytes = startIndex * elementSizeInByte;
-                var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
+#if DIRECTX
 
-                //stream.WriteRange(data, 0, elementCount);
-                //var box = new SharpDX.DataBox(stream.DataPointer, elementSizeInByte, 0);
-                var box = new SharpDX.DataBox(dataPtr, elementSizeInByte, 0);
+            var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+            var startBytes = startIndex * elementSizeInBytes;
+            var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
 
-                var region = new SharpDX.Direct3D11.ResourceRegion();
-                region.Top = 0;
-                region.Front = 0;
-                region.Back = 1;
-                region.Bottom = 1;
-                region.Left = offsetInBytes / elementSizeInByte;
-                region.Right = elementCount;
+            var box = new SharpDX.DataBox(dataPtr, 1, 0);
 
-                // TODO: We need to deal with threaded contexts here!
-                graphicsDevice._d3dContext.UpdateSubresource(box, _buffer, 0, region);
+            var region = new SharpDX.Direct3D11.ResourceRegion();
+            region.Top = 0;
+            region.Front = 0;
+            region.Back = 1;
+            region.Bottom = 1;
+            region.Left = offsetInBytes;
+            region.Right = offsetInBytes + (elementCount * elementSizeInBytes);
 
-                dataHandle.Free();
-            }
+            graphicsDevice._d3dContext.UpdateSubresource(box, _buffer, 0, region);
+
+            dataHandle.Free();
+
 #elif PSS
 #warning This is almost 100% certainly wrong
-            _buffer.SetVertices(data, startIndex, offsetInBytes / elementSizeInByte, vertexStride);
+            var elementSizeInBytes = Marshal.SizeOf(typeof(T));
+            _buffer.SetVertices(data, startIndex, offsetInBytes / elementSizeInBytes, vertexStride);
 #else
             Threading.Begin();
             try
             {
+                var sizeInBytes = elementSizeInBytes * elementCount;
                 GL.BindBuffer(BufferTarget.ArrayBuffer, vbo);
                 GL.BufferSubData<T>(BufferTarget.ArrayBuffer, new IntPtr(offsetInBytes), new IntPtr(sizeInBytes), data);
             }
@@ -225,7 +229,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 Threading.End();
             }
 #endif
-		}
+        }
 		
 		public void SetData<T>(T[] data, int startIndex, int elementCount) where T : struct
         {
@@ -238,8 +242,8 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 		
 		public override void Dispose()
-		{
-#if WINRT || PSS
+        {
+#if DIRECTX || PSS
             if (_buffer != null)
             {
                 _buffer.Dispose();

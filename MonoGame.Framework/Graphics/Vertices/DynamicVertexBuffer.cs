@@ -58,12 +58,37 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void SetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, SetDataOptions options) where T : struct
         {
+#if false
+            SharpDX.Direct3D11.MapMode mode = 0;
+            if (options == SetDataOptions.None)
+                mode = SharpDX.Direct3D11.MapMode.Write;
+            else
+            {
+                if ((options & SetDataOptions.Discard) == SetDataOptions.Discard)
+                    mode |= SharpDX.Direct3D11.MapMode.WriteDiscard;
+                if ((options & SetDataOptions.NoOverwrite) == SetDataOptions.NoOverwrite)
+                    mode |= SharpDX.Direct3D11.MapMode.WriteNoOverwrite;
+            }
+
+            SharpDX.DataStream stream;
+            graphicsDevice._d3dContext.MapSubresource(
+                _buffer,
+                mode,
+                SharpDX.Direct3D11.MapFlags.None,
+                out stream);
+
+            stream.Position = offsetInBytes;
+            stream.WriteRange(data, startIndex, elementCount);
+            graphicsDevice._d3dContext.UnmapSubresource(_buffer, 0);     
+
+#else
             base.SetData<T>(offsetInBytes, data, startIndex, elementCount, VertexDeclaration.VertexStride);
+#endif
         }
 
         public void SetData<T>(T[] data, int startIndex, int elementCount, SetDataOptions options) where T : struct
         {
-            base.SetData<T>(0, data, startIndex, elementCount, VertexDeclaration.VertexStride);
+            SetData(0, data, startIndex, elementCount, options);
         }
     }
 }

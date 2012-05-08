@@ -175,10 +175,12 @@ namespace Microsoft.Xna.Framework.Graphics
             if (_depthStencilState != null)
                 device.DepthStencilState = _depthStencilState;
 
+            Debug.Assert(_vertexShader != null, "Got a null vertex shader!");
+            Debug.Assert(_pixelShader != null, "Got a null vertex shader!");
+
 #if OPENGL
 
-            // We better have a vertex shader by now!
-            Debug.Assert(_vertexShader != null, "Got a null vertex shader!");
+            // Apply the vertex shader.
             _vertexShader.Apply(_shaderProgram, _effect.Parameters, device);
 
             // Apply vertex shader fix:
@@ -221,11 +223,40 @@ namespace Microsoft.Xna.Framework.Graphics
             var posFixupLoc = GL.GetUniformLocation(_shaderProgram, "posFixup"); // TODO: Look this up on link!
             GL.Uniform4(posFixupLoc, 1, _posFixup);
 
-            Debug.Assert(_pixelShader != null, "Got a null pixel shader!");
+            // Apply the pixel shader.
             _pixelShader.Apply(_shaderProgram, _effect.Parameters, device);
 
 #elif DIRECTX
-            
+
+            // TODO: We should be doing dirty state testing!
+
+            // Update the constant buffers.
+            foreach (var param in _effect.Parameters)
+            {
+                if (param.BufferOffset == -1)
+                    continue;
+
+                var buffer = _effect.ConstantBuffers[param.BufferIndex];
+                
+                switch ( param.ParameterType )
+                {
+                    case EffectParameterType.Single:
+                        buffer.SetData(param.BufferOffset, param.RowCount, param.ColumnCount, param.Data);
+                        break;
+
+                    default:
+                        throw new NotImplementedException("Not supported!");
+                }
+            }
+
+            // Apply the shaders.
+            _vertexShader.Apply(-1, _effect.Parameters, device);
+            _pixelShader.Apply(-1, _effect.Parameters, device);
+
+            // Set the constant buffers.
+            foreach (var buffer in _effect.ConstantBuffers)
+                buffer.Apply();
+
 #endif
         }
 		

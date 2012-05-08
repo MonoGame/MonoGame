@@ -45,7 +45,7 @@ namespace Microsoft.Xna.Framework.Graphics
 	{
 		private bool disposed;
 		
-		internal GraphicsDevice graphicsDevice;
+		protected GraphicsDevice graphicsDevice;
 		
 		protected virtual void DoDisposing(EventArgs e) 
 		{

@@ -83,6 +83,10 @@ namespace Utilities
         {
             if (arg.StartsWith("/"))
             {
+                // After the first escaped argument we can no
+                // longer read non-escaped arguments.
+                _requiredOptions.Clear();
+
                 // Parse an optional argument.
                 char[] separators = { ':' };
 
@@ -101,21 +105,20 @@ namespace Utilities
 
                 return SetOption(field, value);
             }
-            else
+            else if ( _requiredOptions.Count > 0 )
             {
-                // Parse a required argument.
-                if (_requiredOptions.Count == 0)
-                {
-                    ShowError("Too many arguments");
-                    return false;
-                }
-
+                // Parse the next non escaped argument.
                 var field = _requiredOptions.Peek();
 
                 if (!IsList(field))
                     _requiredOptions.Dequeue();
 
                 return SetOption(field, arg);
+            }
+            else
+            {
+                ShowError("Too many arguments");
+                return false;
             }
         }
 
@@ -185,11 +188,17 @@ namespace Utilities
                 return field.Name;
         }
 
+        public string Title { get; set; }
 
         void ShowError(string message, params object[] args)
         {
             var name = Path.GetFileNameWithoutExtension(Process.GetCurrentProcess().ProcessName);
 
+            if (!string.IsNullOrEmpty(Title))
+            {
+                Console.Error.WriteLine(Title);
+                Console.Error.WriteLine();
+            }
             Console.Error.WriteLine(message, args);
             Console.Error.WriteLine();
             Console.Error.WriteLine("Usage: {0} {1}", name, string.Join(" ", _requiredUsageHelp));
@@ -214,9 +223,8 @@ namespace Utilities
         // Used on optionsObject fields to indicate which options are required.
         [AttributeUsage(AttributeTargets.Field)]
         public sealed class RequiredAttribute : Attribute
-        { 
+        {
         }
-
 
         // Used on an optionsObject field to rename the corresponding commandline option.
         [AttributeUsage(AttributeTargets.Field)]

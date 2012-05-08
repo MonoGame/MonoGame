@@ -14,6 +14,8 @@ namespace Microsoft.Xna.Framework.Graphics
                                     string name, 
                                     int rowCount, 
                                     int columnCount, 
+                                    int bufferIndex,
+                                    int bufferOffset,
                                     string semantic, 
                                     EffectAnnotationCollection annotations,
                                     EffectParameterCollection elements,
@@ -29,6 +31,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
             RowCount = rowCount;
 			ColumnCount = columnCount;
+
+            BufferIndex = bufferIndex;
+            BufferOffset = bufferOffset;
 
             Elements = elements;
             StructureMembers = structMembers;
@@ -46,7 +51,9 @@ namespace Microsoft.Xna.Framework.Graphics
             Annotations = cloneSource.Annotations;
             RowCount = cloneSource.RowCount;
             ColumnCount = cloneSource.ColumnCount;
-            
+            BufferIndex = cloneSource.BufferIndex;
+            BufferOffset = cloneSource.BufferOffset;
+
             // Clone the mutable types.
             Elements = new EffectParameterCollection(cloneSource.Elements);
             StructureMembers = new EffectParameterCollection(cloneSource.StructureMembers);
@@ -73,6 +80,11 @@ namespace Microsoft.Xna.Framework.Graphics
         public EffectParameterCollection StructureMembers { get; private set; }
 
         public EffectAnnotationCollection Annotations { get; private set; }
+
+
+        internal int BufferIndex { get; private set; }
+
+        internal int BufferOffset { get; private set; }
 
         // TODO: Using object adds alot of boxing/unboxing overhead
         // and garbage generation.  We should consider a templated
@@ -202,7 +214,6 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
             var vecInfo = (float[])Data;
 			return new Vector3(vecInfo[0],vecInfo[1],vecInfo[2]);
-
 		}
 
 		public Vector3[] GetValueVector3Array ()

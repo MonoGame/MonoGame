@@ -69,7 +69,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
         EffectDirtyFlags dirtyFlags = EffectDirtyFlags.All;
 
-        static readonly byte[] Bytecode = LoadEffectResource("Microsoft.Xna.Framework.Graphics.Effect.Resources.SkinnedEffect.mgfx");
+        static readonly byte[] Bytecode = LoadEffectResource(
+#if DIRECTX
+            "Microsoft.Xna.Framework.Graphics.Effect.Resources.SkinnedEffect.dx11.mgfxo"
+#else
+            "Microsoft.Xna.Framework.Graphics.Effect.Resources.SkinnedEffect.mgfx"
+#endif
+        );            
 
         #endregion
 
