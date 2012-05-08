@@ -44,6 +44,7 @@ This is what players had to say about the Google Chrome version of the game...
 
 Firstly, go over to github and register. Then fork the main repo found at https://github.com/mono/MonoGame
 This will allow you to make changes to your own repo and send us patches and enhancements, thus benefiting everyone.
+Once you've done a *git clone [your forked repo]*, if you are interested in the associated sub-modules like Samples and Starterkits, you will need to execute the *git submodule init* and *git submodule update* commands, to pull them all down.
 
 You can also join the active community of developers on IRC at irc.gnome.org on the #monogame channel, where the day-to-day improvements are being discussed in real time.
 If you release a game using MonoGame, please let us know so we can update our released games page, and mention MonoGame in your tweet.

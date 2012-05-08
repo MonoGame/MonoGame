@@ -10,6 +10,8 @@
     <OutputType>Library</OutputType>
     <RootNamespace>Microsoft.Xna.Framework</RootNamespace>
     <AssemblyName>MonoGame.Framework.MacOS</AssemblyName>
+    <ReleaseVersion>2.5.0.0</ReleaseVersion>
+    <SynchReleaseVersion>false</SynchReleaseVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -394,7 +396,7 @@
     <Folder Include="MacOS\Storage\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.MacOS.csproj">
+    <ProjectReference Include="..\..\CartBlanche\MonoGame\ThirdParty\Lidgren.Network\Lidgren.Network.MacOS.csproj">
       <Project>{AE483C29-042E-4226-BA52-D247CE7676DA}</Project>
       <Name>Lidgren.Network.MacOS</Name>
     </ProjectReference>

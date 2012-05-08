@@ -10,6 +10,8 @@
     <OutputType>Library</OutputType>
     <RootNamespace>Lidgren.Network.iOS</RootNamespace>
     <AssemblyName>Lidgren.Network.iOS</AssemblyName>
+    <ReleaseVersion>2.5.0.0</ReleaseVersion>
+    <SynchReleaseVersion>false</SynchReleaseVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
