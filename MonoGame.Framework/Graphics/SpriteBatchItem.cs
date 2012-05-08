@@ -12,7 +12,7 @@ namespace Microsoft.Xna.Framework.Graphics
         public VertexPositionColorTexture vertexTR;
         public VertexPositionColorTexture vertexBL;
         public VertexPositionColorTexture vertexBR;
-#elif OPENGL
+#elif OPENGL || PSS
         public VertexPosition2ColorTexture vertexTL;
 		public VertexPosition2ColorTexture vertexTR;
 		public VertexPosition2ColorTexture vertexBL;
@@ -25,7 +25,7 @@ namespace Microsoft.Xna.Framework.Graphics
             vertexTR = new VertexPositionColorTexture();
             vertexBL = new VertexPositionColorTexture();
             vertexBR = new VertexPositionColorTexture();   
-#elif OPENGL
+#elif OPENGL || PSS
 			vertexTL = new VertexPosition2ColorTexture();
             vertexTR = new VertexPosition2ColorTexture();
             vertexBL = new VertexPosition2ColorTexture();
