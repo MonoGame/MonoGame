@@ -132,6 +132,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #endif // DIRECTX
 
+#if ANDROID
+    	internal GamePlatform platform;
+#endif
+
 #if OPENGL
 
 		// OpenGL ES2.0 attribute locations
@@ -1152,7 +1156,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // Bind the VBO
             GL.BindBuffer(BufferTarget.ArrayBuffer, VboIdArray);
             ////Clear previous data
-            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vd.VertexStride * vertexData.Length - vertexOffset * vd.VertexStride), (IntPtr)null, BufferUsageHint.StreamDraw);
+            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vd.VertexStride * vertexData.Length - vertexOffset * vd.VertexStride), IntPtr.Zero, BufferUsageHint.StreamDraw);
 
             //Pin data
             var handle = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
@@ -1234,8 +1238,8 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.BindBuffer(BufferTarget.ArrayBuffer, VboIdArray);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, VboIdElement);
             ////Clear previous data
-            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vd.VertexStride * vertexData.Length - vertexOffset * vd.VertexStride), (IntPtr)null, BufferUsageHint.StreamDraw);
-            GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(sizeof(ushort) * indexData.Length), (IntPtr)null, BufferUsageHint.StreamDraw);
+            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vd.VertexStride * vertexData.Length - vertexOffset * vd.VertexStride), IntPtr.Zero, BufferUsageHint.StreamDraw);
+			GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(sizeof(ushort) * indexData.Length), IntPtr.Zero, BufferUsageHint.StreamDraw);
 
             //Pin data
             var handle = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
@@ -1303,8 +1307,8 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.BindBuffer(BufferTarget.ArrayBuffer, VboIdArray);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, VboIdElement);
             ////Clear previous data
-            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vd.VertexStride * vertexData.Length - vertexOffset * vd.VertexStride), (IntPtr)null, BufferUsageHint.StreamDraw);
-            GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(sizeof(uint) * indexData.Length), (IntPtr)null, BufferUsageHint.StreamDraw);
+			GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vd.VertexStride * vertexData.Length - vertexOffset * vd.VertexStride), IntPtr.Zero, BufferUsageHint.StreamDraw);
+			GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(sizeof(uint) * indexData.Length), IntPtr.Zero, BufferUsageHint.StreamDraw);
 
             //Pin data
             var handle = GCHandle.Alloc(vertexData, GCHandleType.Pinned);

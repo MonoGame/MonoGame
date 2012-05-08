@@ -11,14 +11,14 @@ using Sce.Pss.Core.Graphics;
 // TODO
 #else
 using OpenTK.Graphics.ES20;
- #if IPHONE || ANDROID
+#if IPHONE || ANDROID
 using PixelInternalFormat = OpenTK.Graphics.ES20.All;
 using PixelFormat = OpenTK.Graphics.ES20.All;
 using PixelType = OpenTK.Graphics.ES20.All;
 using TextureTarget = OpenTK.Graphics.ES20.All;
 using TextureParameterName = OpenTK.Graphics.ES20.All;
 using TextureMinFilter = OpenTK.Graphics.ES20.All;
- #endif
+#endif
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
