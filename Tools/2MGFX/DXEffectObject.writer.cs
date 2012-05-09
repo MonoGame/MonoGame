@@ -25,7 +25,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // Write all the constant buffers.
             writer.Write((byte)ConstantBuffers.Count);
             foreach (var cbuffer in ConstantBuffers)
-                cbuffer.Write(writer);
+                cbuffer.Write(writer, options);
 
             // Write all the shaders.
             writer.Write((byte)Shaders.Count);

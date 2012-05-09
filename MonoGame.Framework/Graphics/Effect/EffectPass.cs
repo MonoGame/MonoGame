@@ -179,7 +179,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #if OPENGL
 
             // Apply the vertex shader.
-            _vertexShader.Apply(_shaderProgram, _effect.Parameters, device);
+            _vertexShader.Apply(device, _shaderProgram, _effect.Parameters, _effect.ConstantBuffers);
 
             // Apply vertex shader fix:
             // The following two lines are appended to the end of vertex shaders
@@ -222,7 +222,7 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.Uniform4(posFixupLoc, 1, _posFixup);
 
             // Apply the pixel shader.
-            _pixelShader.Apply(_shaderProgram, _effect.Parameters, device);
+            _pixelShader.Apply(device, _shaderProgram, _effect.Parameters, _effect.ConstantBuffers);
 
 #elif DIRECTX
 

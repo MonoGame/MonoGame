@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+using TwoMGFX;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -12,11 +13,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public int Size { get; private set; }
 
-        public List<DXEffectObject.d3dx_parameter> Parameters { get; private set; }
-
         public List<int> ParameterIndex { get; private set; }
 
         public List<int> ParameterOffset { get; private set; }
+
+        public List<DXEffectObject.d3dx_parameter> Parameters { get; private set; }
 
         public ConstantBuffer(SharpDX.D3DCompiler.ConstantBuffer cb)
         {
@@ -27,7 +28,7 @@ namespace Microsoft.Xna.Framework.Graphics
             ParameterOffset = new List<int>();
 
             // Gather all the parameters.
-            var paramters = new List<DXEffectObject.d3dx_parameter>();
+            var parameters = new List<DXEffectObject.d3dx_parameter>();
             for (var i = 0; i < cb.Description.VariableCount; i++)
             {
                 var vdesc = cb.GetVariable(i);
@@ -42,11 +43,52 @@ namespace Microsoft.Xna.Framework.Graphics
                 else
                     param.data = new byte[param.columns * param.rows * 4];
 
-                paramters.Add(param);
+                parameters.Add(param);
             }
 
-            // Sort the parameters by the buffer offset.
-            Parameters = paramters.OrderBy(e => e.bufferOffset).ToList();
+            // Sort them by the offset for some consistant results.
+            Parameters = parameters.OrderBy(e => e.bufferOffset).ToList();
+        }
+
+        public ConstantBuffer(  string name,
+                                MojoShader.MOJOSHADER_symbolRegisterSet set, 
+                                MojoShader.MOJOSHADER_symbol[] symbols,
+                                List<DXEffectObject.d3dx_parameter> parameters)
+        {
+            Name = name;
+
+            ParameterIndex = new List<int>();
+            ParameterOffset = new List<int>();
+            Parameters = new List<DXEffectObject.d3dx_parameter>();
+
+            int minRegister = short.MaxValue;
+            int maxRegister = 0;
+
+            var registerSize = (set == MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_BOOL ? 1 : 4 ) * 4;
+
+            foreach (var symbol in symbols)
+            {
+                if (symbol.register_set != set)
+                    continue;
+
+                // Look up the parameter index.
+                var match = parameters.FindIndex( e => e.name == symbol.name );
+                if (match == -1)
+                    throw new Exception( "No parameter was found for shader symbol" );
+
+                var offset = (int)symbol.register_index * registerSize;
+                parameters[match].bufferOffset = offset;
+
+                Parameters.Add( parameters[match] );
+
+                ParameterIndex.Add(match);
+                ParameterOffset.Add(offset);
+
+                minRegister = Math.Min(minRegister, (int)symbol.register_index);
+                maxRegister = Math.Max(maxRegister, (int)(symbol.register_index + symbol.register_count));
+            }
+
+            Size = Math.Max(maxRegister - minRegister, 0) * registerSize;
         }
 
         private static DXEffectObject.d3dx_parameter GetParameterFromType(SharpDX.D3DCompiler.ShaderReflectionType type)
@@ -143,8 +185,11 @@ namespace Microsoft.Xna.Framework.Graphics
             return true;
         }
 
-        public void Write(BinaryWriter writer)
+        public void Write(BinaryWriter writer, Options options)
         {
+            if (!options.DX11Profile)
+                writer.Write(Name);
+
             writer.Write((ushort)Size);
 
             writer.Write((byte)ParameterIndex.Count);

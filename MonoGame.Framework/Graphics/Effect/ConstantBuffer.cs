@@ -5,6 +5,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+#if MONOMAC
+using MonoMac.OpenGL;
+#elif WINDOWS || LINUX
+using OpenTK.Graphics.OpenGL;
+#elif GLES
+using OpenTK.Graphics.ES20;
+#endif
+
 namespace Microsoft.Xna.Framework.Graphics
 {
     internal class ConstantBuffer : GraphicsResource
@@ -15,6 +23,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private readonly int[] _offsets;
 
+        private readonly string _name;
+
 #if DIRECTX
         private SharpDX.Direct3D11.Buffer _cbuffer;
 #endif
@@ -24,6 +34,7 @@ namespace Microsoft.Xna.Framework.Graphics
             graphicsDevice = cloneSource.graphicsDevice;
 
             // Share the immutable types.
+            _name = cloneSource._name;
             _parameters = cloneSource._parameters;
             _offsets = cloneSource._offsets;
 
@@ -36,6 +47,9 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             graphicsDevice = device;
 
+#if OPENGL
+            _name = reader.ReadString();               
+#endif
             // Create the backing system memory buffer.
             var size = (int)reader.ReadInt16();
             _buffer = new byte[size];
@@ -92,7 +106,11 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+#if DIRECTX
         public void Apply(bool vertexStage, int slot, EffectParameterCollection parameters)
+#elif OPENGL
+        public void Apply(int program, EffectParameterCollection parameters)
+#endif
         {
             // TODO:  We should be doing some sort of dirty state 
             // testing here.
@@ -108,7 +126,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 var index = _parameters[p];
                 var offset = _offsets[p];
-                var param = parameters[p];
+                var param = parameters[index];
 
                 switch (param.ParameterType)
                 {
@@ -136,6 +154,13 @@ namespace Microsoft.Xna.Framework.Graphics
             else
                 d3dContext.PixelShader.SetConstantBuffer(slot, _cbuffer);
 
+#endif
+
+#if OPENGL
+            var location = GL.GetUniformLocation(program, _name);
+            var _bufferf = new float[_buffer.Length/4];
+            Buffer.BlockCopy(_buffer, 0, _bufferf, 0, _buffer.Length);
+            GL.Uniform4(location, _bufferf.Length / 4, _bufferf);
 #endif
         }
     }

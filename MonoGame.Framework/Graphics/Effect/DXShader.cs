@@ -41,30 +41,6 @@ namespace Microsoft.Xna.Framework.Graphics
         private readonly string _glslCode;
 #endif
 
-        private readonly string _uniforms_float4_name;
-        private readonly string _uniforms_int4_name;
-        private readonly string _uniforms_bool_name;
-
-        private readonly float[] _uniforms_float4;
-        private readonly int[] _uniforms_int4;
-        private readonly int[] _uniforms_bool;
-
-        private enum RegisterSet
-        {
-            Bool,
-            Int4,
-            Float4,
-            Sampler,
-        }
-
-        private struct Symbol
-        {
-            public string name;
-            public RegisterSet register_set;
-            public int register_index;
-            public int register_count;
-        }
-
         private struct Attribute
         {
             public VertexElementUsage usage;
@@ -73,7 +49,6 @@ namespace Microsoft.Xna.Framework.Graphics
             public short format;
         }
 
-        private readonly Symbol[] _symbols;
         private readonly Attribute[] _attributes;
 
 #elif DIRECTX
@@ -114,20 +89,10 @@ namespace Microsoft.Xna.Framework.Graphics
             // Share all the immutable types.
             ShaderType = cloneSource.ShaderType;
             ShaderHandle = cloneSource.ShaderHandle;
-            _uniforms_float4_name = cloneSource._uniforms_float4_name;
-            _uniforms_int4_name = cloneSource._uniforms_int4_name;
-            _uniforms_bool_name = cloneSource._uniforms_bool_name;
-            _symbols = cloneSource._symbols;
             _attributes = cloneSource._attributes;
 #if DEBUG 
             _glslCode = cloneSource._glslCode;
 #endif
-
-            // Clone the mutable types.
-            _uniforms_float4 = (float[])cloneSource._uniforms_float4.Clone();
-            _uniforms_int4 = (int[])cloneSource._uniforms_int4.Clone();
-            _uniforms_bool = (int[])cloneSource._uniforms_bool.Clone();
-
 #endif
 
 #if DIRECTX
@@ -148,19 +113,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if OPENGL
             if (isVertexShader)
-            {
                 ShaderType = ShaderType.VertexShader;
-                _uniforms_float4_name = "vs_uniforms_vec4";
-                _uniforms_int4_name = "vs_uniforms_ivec4";
-                _uniforms_bool_name = "vs_uniforms_bool";
-            }
             else
-            {
                 ShaderType = ShaderType.FragmentShader;
-                _uniforms_float4_name = "ps_uniforms_vec4";
-                _uniforms_int4_name = "ps_uniforms_ivec4";
-                _uniforms_bool_name = "ps_uniforms_bool";
-            }
 #endif // OPENGL
 
             var shaderLength = (int)reader.ReadUInt16();
@@ -201,24 +156,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if OPENGL
             var glslCode = System.Text.Encoding.ASCII.GetString(shaderBytecode);
-
-            var bool_count = (int)reader.ReadByte();
-            var int4_count = (int)reader.ReadByte();
-            var float4_count = (int)reader.ReadByte();
-
-            _uniforms_bool = new int[bool_count];
-            _uniforms_int4 = new int[int4_count * 4];
-            _uniforms_float4 = new float[float4_count * 4];
-
-            var symbolCount = (int)reader.ReadByte();
-            _symbols = new Symbol[symbolCount];
-            for (var s = 0; s < symbolCount; s++)
-            {
-                _symbols[s].name = reader.ReadString();
-                _symbols[s].register_set = (RegisterSet)reader.ReadByte();
-                _symbols[s].register_index = reader.ReadByte();
-                _symbols[s].register_count = reader.ReadByte();
-            }
 
             var attributeCount = (int)reader.ReadByte();
             _attributes = new Attribute[attributeCount];
@@ -319,100 +256,14 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 
 
-        public void Apply(  int program, 
+        public void Apply(  GraphicsDevice graphicsDevice,
+                            int program, 
                             EffectParameterCollection parameters,
-		                    GraphicsDevice graphicsDevice) 
-        {							
-			// TODO: It would be much better if we kept track
-            // of dirty states and only update those parameters.
-
-            foreach (var symbol in _symbols) 
-            {
-                var parameter = parameters[symbol.name];
-
-				switch (symbol.register_set) 
-                {
-                    case RegisterSet.Bool:
-                    {
-                        if (parameter.Elements.Count > 0)
-                            throw new NotImplementedException();
-                        _uniforms_bool[symbol.register_index * 4] = (int)parameter.Data;
-
-                        break;
-                    }
-
-                    case RegisterSet.Float4:
-                    {
-                        var data = parameter.GetValueSingleArray();
-                        switch (parameter.ParameterClass)
-                        {
-                            case EffectParameterClass.Scalar:
-                                if (parameter.Elements.Count > 0)
-                                    throw new NotImplementedException();
-
-                                for (int i = 0; i < data.Length; i++)
-                                    _uniforms_float4[symbol.register_index * 4 + i] = (float)data[i];
-                                break;
-                            case EffectParameterClass.Vector:
-                            case EffectParameterClass.Matrix:
-                                var rows = Math.Min(symbol.register_count, parameter.RowCount);
-                                if (parameter.Elements.Count > 0)
-                                {
-                                    //rows = Math.Min (symbol.register_count, parameter.Elements.Count*parameter.RowCount);
-                                    if (symbol.register_count * 4 != data.Length)
-                                        throw new NotImplementedException();
-
-                                    for (var i = 0; i < data.Length; i++)
-                                        _uniforms_float4[symbol.register_index * 4 + i] = data[i];
-                                }
-                                else
-                                {
-                                    for (var y = 0; y < rows; y++)
-                                        for (int x = 0; x < parameter.ColumnCount; x++)
-                                            _uniforms_float4[(symbol.register_index + y) * 4 + x] = (float)data[y * parameter.ColumnCount + x];
-                                }
-                                break;
-
-                            default:
-                                throw new NotImplementedException();
-                        }
-
-                        break;
-                    }
-
-                    // We deal with samplers a little further down.
-                    case RegisterSet.Sampler:
-					    break;
-
-                    case RegisterSet.Int4:
-                    default:
-					    throw new NotImplementedException();
-
-                } // switch (symbol.register_set)
-
-            } // foreach (var symbol in _symbols)
-			
-        
+		                    ConstantBuffer[] cbuffers) 
+        {							        
             var textures = graphicsDevice.Textures;
 			var samplerStates = graphicsDevice.SamplerStates;
 
-			// Upload the uniforms.				
-            if (_uniforms_float4.Length > 0)
-            {
-                var vec4_loc = GL.GetUniformLocation(program, _uniforms_float4_name);
-                GL.Uniform4(vec4_loc, _uniforms_float4.Length / 4, _uniforms_float4);
-			}
-            if (_uniforms_int4_name.Length > 0) 
-            {
-                var int4_loc = GL.GetUniformLocation(program, _uniforms_int4_name);
-                GL.Uniform4(int4_loc, _uniforms_int4.Length / 4, _uniforms_int4);
-			}
-            if (_uniforms_bool.Length > 0) 
-            {
-                var bool_loc = GL.GetUniformLocation(program, _uniforms_bool_name);
-                GL.Uniform1(bool_loc, _uniforms_bool.Length, _uniforms_bool);
-			}
-			
 			if (ShaderType == ShaderType.FragmentShader) 
             {
                 // Activate the textures.
@@ -451,6 +302,13 @@ namespace Microsoft.Xna.Framework.Graphics
 					samplerStates[sampler.index].Activate(tex.glTarget, tex.LevelCount > 1);
 				}
 			}
+
+            // Update and set the constants.
+            for (var c = 0; c < _cbuffers.Length; c++)
+            {
+                var cb = cbuffers[_cbuffers[c]];
+                cb.Apply(program, parameters);
+            }
         }
 
 #endif // OPENGL
