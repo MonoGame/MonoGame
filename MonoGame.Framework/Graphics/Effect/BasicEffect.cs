@@ -34,7 +34,7 @@ namespace Microsoft.Xna.Framework.Graphics
         EffectParameter worldInverseTransposeParam;
         EffectParameter worldViewProjParam;
 
-        int _shaderIndex;
+        int _shaderIndex = -1;
 
         #endregion
 
