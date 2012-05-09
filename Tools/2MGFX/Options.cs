@@ -5,7 +5,7 @@ using System.Text;
 
 namespace TwoMGFX
 {
-    class Options
+    public class Options
     {
         [Utilities.CommandLineParser.Required]
         public string SourceFile;

@@ -202,7 +202,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// We should avoid supporting old versions for very long as
         /// users should be rebuilding content when packaging their game.
         /// </remarks>
-        private const int Version = 1;
+        private const int Version = 2;
 
         internal void ReadEffect(BinaryReader reader)
         {
@@ -212,6 +212,14 @@ namespace Microsoft.Xna.Framework.Graphics
             if (header != Header || version != Version)
                 throw new Exception("Unsupported MGFX format!");
 
+            var profile = reader.ReadByte();
+#if DIRECTX
+            if (profile != 1)
+#else
+            if (profile != 0)
+#endif
+                throw new Exception("The effect is the profile for this platform!");
+
             // TODO: Maybe we should be reading in a string 
             // table here to save some bytes in the file.
 
@@ -220,8 +228,7 @@ namespace Microsoft.Xna.Framework.Graphics
             ConstantBuffers = new ConstantBuffer[buffers];
             for (var c = 0; c < buffers; c++)
             {
-                var size = (int)reader.ReadInt16();
-                var buffer = new ConstantBuffer(graphicsDevice, size);
+                var buffer = new ConstantBuffer(graphicsDevice, reader);
                 ConstantBuffers[c] = buffer;
             }
 
@@ -315,9 +322,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 var rowCount = (int)reader.ReadByte();
                 var columnCount = (int)reader.ReadByte();
 
-                var bufferIndex = (int)reader.ReadByte();
-                var bufferOffset = (int)reader.ReadInt16();
-
                 var elements = ReadParameters(reader);
                 var structMembers = ReadParameters(reader);
 
@@ -351,9 +355,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
 
                 var param = new EffectParameter(
-                    class_, type, name, rowCount, columnCount,
-                    bufferIndex, bufferOffset, semantic, annotations, 
-                    elements, structMembers, data);
+                    class_, type, name, rowCount, columnCount, semantic, 
+                    annotations, elements, structMembers, data);
 
                 collection.Add(param);
             }

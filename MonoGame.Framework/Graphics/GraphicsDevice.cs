@@ -860,7 +860,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 _scissorRectangle = value;
 
 #if DIRECTX
-				throw new NotImplementedException();
+				//throw new NotImplementedException();
 #elif OPENGL		
 				GLStateManager.SetScissor(_scissorRectangle);				
 				_scissorRectangle.Y = _viewport.Height - _scissorRectangle.Y - _scissorRectangle.Height;

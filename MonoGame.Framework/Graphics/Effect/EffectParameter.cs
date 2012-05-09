@@ -13,9 +13,7 @@ namespace Microsoft.Xna.Framework.Graphics
                                     EffectParameterType type, 
                                     string name, 
                                     int rowCount, 
-                                    int columnCount, 
-                                    int bufferIndex,
-                                    int bufferOffset,
+                                    int columnCount,
                                     string semantic, 
                                     EffectAnnotationCollection annotations,
                                     EffectParameterCollection elements,
@@ -31,9 +29,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
             RowCount = rowCount;
 			ColumnCount = columnCount;
-
-            BufferIndex = bufferIndex;
-            BufferOffset = bufferOffset;
 
             Elements = elements;
             StructureMembers = structMembers;
@@ -51,8 +46,6 @@ namespace Microsoft.Xna.Framework.Graphics
             Annotations = cloneSource.Annotations;
             RowCount = cloneSource.RowCount;
             ColumnCount = cloneSource.ColumnCount;
-            BufferIndex = cloneSource.BufferIndex;
-            BufferOffset = cloneSource.BufferOffset;
 
             // Clone the mutable types.
             Elements = new EffectParameterCollection(cloneSource.Elements);
@@ -81,10 +74,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public EffectAnnotationCollection Annotations { get; private set; }
 
-
-        internal int BufferIndex { get; private set; }
-
-        internal int BufferOffset { get; private set; }
 
         // TODO: Using object adds alot of boxing/unboxing overhead
         // and garbage generation.  We should consider a templated

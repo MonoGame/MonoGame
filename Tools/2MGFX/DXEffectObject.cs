@@ -669,7 +669,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private const string Header = "MGFX";
 
-        private const int Version = 1;
+        private const int Version = 2;
 	}
 }
 

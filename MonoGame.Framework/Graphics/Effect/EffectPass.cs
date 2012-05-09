@@ -162,8 +162,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if OPENGL
             GL.UseProgram(_shaderProgram);
-#elif DIRECTX
-
 #endif
 
             var device = _effect.GraphicsDevice;
@@ -228,34 +226,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #elif DIRECTX
 
-            // TODO: We should be doing dirty state testing!
-
-            // Update the constant buffers.
-            foreach (var param in _effect.Parameters)
-            {
-                if (param.BufferOffset == -1)
-                    continue;
-
-                var buffer = _effect.ConstantBuffers[param.BufferIndex];
-                
-                switch ( param.ParameterType )
-                {
-                    case EffectParameterType.Single:
-                        buffer.SetData(param.BufferOffset, param.RowCount, param.ColumnCount, param.Data);
-                        break;
-
-                    default:
-                        throw new NotImplementedException("Not supported!");
-                }
-            }
-
-            // Apply the shaders.
-            _vertexShader.Apply(-1, _effect.Parameters, device);
-            _pixelShader.Apply(-1, _effect.Parameters, device);
-
-            // Set the constant buffers.
-            foreach (var buffer in _effect.ConstantBuffers)
-                buffer.Apply();
+            // Apply the shaders which will in turn set the 
+            // constant buffers and texture samplers.
+            _vertexShader.Apply(device, _effect.Parameters, _effect.ConstantBuffers);
+            _pixelShader.Apply(device, _effect.Parameters, _effect.ConstantBuffers);
 
 #endif
         }

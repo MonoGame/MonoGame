@@ -45,16 +45,6 @@ namespace Microsoft.Xna.Framework.Graphics
         private readonly string _uniforms_int4_name;
         private readonly string _uniforms_bool_name;
 
-#elif DIRECTX
-
-        private VertexShader _vertexShader;
-
-        private PixelShader _pixelShader;
-
-        private byte[] _shaderBytecode;
-
-#endif
-
         private readonly float[] _uniforms_float4;
         private readonly int[] _uniforms_int4;
         private readonly int[] _uniforms_bool;
@@ -65,21 +55,6 @@ namespace Microsoft.Xna.Framework.Graphics
             Int4,
             Float4,
             Sampler,
-        }
-
-        public enum SamplerType
-        {
-            Sampler2D,
-            SamplerCube,
-            SamplerVolume,
-        }
-
-        private struct Sampler
-        {
-            public SamplerType type;
-            public int index;
-            public string name;
-            public string parameter;
         }
 
         private struct Symbol
@@ -99,35 +74,72 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         private readonly Symbol[] _symbols;
-        private readonly Sampler[] _samplers;
         private readonly Attribute[] _attributes;
+
+#elif DIRECTX
+
+        private VertexShader _vertexShader;
+
+        private PixelShader _pixelShader;
+
+        private byte[] _shaderBytecode;
+
+#endif
+
+        public enum SamplerType
+        {
+            Sampler2D,
+            SamplerCube,
+            SamplerVolume,
+        }
+
+        private struct Sampler
+        {
+            public SamplerType type;
+            public int index;
+            public int parameter;
+
+#if OPENGL
+            public string name;
+#endif
+        }
+
+        private readonly Sampler[] _samplers;
+
+        private readonly int[] _cbuffers;
 
         internal DXShader(DXShader cloneSource)
         {
-            // Share all the immutable types.
 #if OPENGL
+            // Share all the immutable types.
             ShaderType = cloneSource.ShaderType;
             ShaderHandle = cloneSource.ShaderHandle;
             _uniforms_float4_name = cloneSource._uniforms_float4_name;
             _uniforms_int4_name = cloneSource._uniforms_int4_name;
             _uniforms_bool_name = cloneSource._uniforms_bool_name;
+            _symbols = cloneSource._symbols;
+            _attributes = cloneSource._attributes;
 #if DEBUG 
             _glslCode = cloneSource._glslCode;
 #endif
-
-#elif DIRECTX
-            _pixelShader = cloneSource._pixelShader;
-            _vertexShader = cloneSource._vertexShader;
-            _shaderBytecode = cloneSource._shaderBytecode;
-#endif
-            _symbols = cloneSource._symbols;
-            _samplers = cloneSource._samplers;
-            _attributes = cloneSource._attributes;
 
             // Clone the mutable types.
             _uniforms_float4 = (float[])cloneSource._uniforms_float4.Clone();
             _uniforms_int4 = (int[])cloneSource._uniforms_int4.Clone();
             _uniforms_bool = (int[])cloneSource._uniforms_bool.Clone();
+
+#endif
+
+#if DIRECTX
+            // Share all the immutable types.
+            _pixelShader = cloneSource._pixelShader;
+            _vertexShader = cloneSource._vertexShader;
+            _shaderBytecode = cloneSource._shaderBytecode;
+#endif
+
+            // Share all the immutable types.
+            _cbuffers = cloneSource._cbuffers;
+            _samplers = cloneSource._samplers;
         }
 
         internal DXShader(GraphicsDevice device, BinaryReader reader)
@@ -149,16 +161,46 @@ namespace Microsoft.Xna.Framework.Graphics
                 _uniforms_int4_name = "ps_uniforms_ivec4";
                 _uniforms_bool_name = "ps_uniforms_bool";
             }
-#elif DIRECTX
-
-#endif
+#endif // OPENGL
 
             var shaderLength = (int)reader.ReadUInt16();
             var shaderBytecode = reader.ReadBytes(shaderLength);
 
+            var samplerCount = (int)reader.ReadByte();
+            _samplers = new Sampler[samplerCount];
+            for (var s = 0; s < samplerCount; s++)
+            {
+                _samplers[s].type = (SamplerType)reader.ReadByte();
+                _samplers[s].index = reader.ReadByte();
+#if OPENGL
+                _samplers[s].name = reader.ReadString();
+#endif
+                _samplers[s].parameter = (int)reader.ReadByte();
+            }
+
+            var cbufferCount = (int)reader.ReadByte();
+            _cbuffers = new int[cbufferCount];
+            for (var c = 0; c < cbufferCount; c++)
+                _cbuffers[c] = (int)reader.ReadByte();
+
+#if DIRECTX
+
+            var d3dDevice = device._d3dDevice;
+            if (isVertexShader)
+            {
+                _vertexShader = new VertexShader(d3dDevice, shaderBytecode, null);
+
+                // We need the bytecode later for allocating the
+                // input layout from the vertex declaration.
+                _shaderBytecode = shaderBytecode;
+            }
+            else
+                _pixelShader = new PixelShader(d3dDevice, shaderBytecode);
+
+#endif // DIRECTX
+
 #if OPENGL
             var glslCode = System.Text.Encoding.ASCII.GetString(shaderBytecode);
-#endif
 
             var bool_count = (int)reader.ReadByte();
             var int4_count = (int)reader.ReadByte();
@@ -178,16 +220,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 _symbols[s].register_count = reader.ReadByte();
             }
 
-            var samplerCount = (int)reader.ReadByte();
-            _samplers = new Sampler[samplerCount];
-            for (var s = 0; s < samplerCount; s++)
-            {
-                _samplers[s].name = reader.ReadString();
-                _samplers[s].parameter = reader.ReadString();
-                _samplers[s].type = (SamplerType)reader.ReadByte();
-                _samplers[s].index = reader.ReadByte();
-            }
-
             var attributeCount = (int)reader.ReadByte();
             _attributes = new Attribute[attributeCount];
             for (var a = 0; a < attributeCount; a++)
@@ -198,7 +230,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 _attributes[a].format = reader.ReadInt16();
             }
 
-#if OPENGL
+            
             Threading.Begin();
             try
             {
@@ -246,26 +278,14 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 Threading.End();
             }
-#elif DIRECTX
 
-            var d3dDevice = device._d3dDevice;
-            if (isVertexShader)
-            {
-                _vertexShader = new VertexShader(d3dDevice, shaderBytecode, null);
-
-                // We need the bytecode later for allocating the
-                // input layout from the vertex declaration.
-                _shaderBytecode = shaderBytecode;
-            }
-            else
-                _pixelShader = new PixelShader(d3dDevice, shaderBytecode);
-
-#endif
+#endif // OPENGL
         }
 
-		public void OnLink(int program) 
-        {
 #if OPENGL
+        
+        public void OnLink(int program) 
+        {
             if (ShaderType != ShaderType.VertexShader)
                 return;
 
@@ -296,10 +316,10 @@ namespace Microsoft.Xna.Framework.Graphics
 					    throw new NotImplementedException();
 				}
 			}
-#endif
 		}
-		
-		public void Apply(  int program, 
+
+
+        public void Apply(  int program, 
                             EffectParameterCollection parameters,
 		                    GraphicsDevice graphicsDevice) 
         {							
@@ -372,32 +392,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             } // foreach (var symbol in _symbols)
 			
-#if DIRECTX
-
-            var d3dContext = graphicsDevice._d3dContext;
-            if (_pixelShader != null)
-            {
-
-                foreach (var sampler in _samplers)
-                {
-                    var param = parameters[sampler.name];
-                    var texture = param.Data as Texture;
-                    graphicsDevice.Textures[sampler.index] = texture;
-                }
-
-                d3dContext.PixelShader.Set(_pixelShader);
-            }
-            else
-            {
-                d3dContext.VertexShader.Set(_vertexShader);
-
-                // Give the shader bytecode to the device so it
-                // can generate the input layout at draw time.
-                graphicsDevice._vertexShaderBytecode = _shaderBytecode;
-            }
-
-#elif OPENGL
-
+        
             var textures = graphicsDevice.Textures;
 			var samplerStates = graphicsDevice.SamplerStates;
 
@@ -435,7 +430,7 @@ namespace Microsoft.Xna.Framework.Graphics
                         continue;
 
 					Texture tex = null;
-                    if (sampler.parameter.Length > 0) 
+                    if (sampler.parameter >= 0) 
                     {
                         var textureParameter = parameters[sampler.parameter];
                         tex = textureParameter.Data as Texture;
@@ -456,9 +451,52 @@ namespace Microsoft.Xna.Framework.Graphics
 					samplerStates[sampler.index].Activate(tex.glTarget, tex.LevelCount > 1);
 				}
 			}
+        }
+
 #endif // OPENGL
+
+#if DIRECTX
+
+        public void Apply(  GraphicsDevice graphicsDevice, 
+                            EffectParameterCollection parameters,
+                            ConstantBuffer[] cbuffers )
+        {							
+
+            // TODO: We should be doing dirty state testing!
+
+
+
+            var d3dContext = graphicsDevice._d3dContext;
+            if (_pixelShader != null)
+            {
+
+                foreach (var sampler in _samplers)
+                {
+                    var param = parameters[sampler.parameter];
+                    var texture = param.Data as Texture;
+                    graphicsDevice.Textures[sampler.index] = texture;
+                }
+
+                d3dContext.PixelShader.Set(_pixelShader);
+            }
+            else
+            {
+                d3dContext.VertexShader.Set(_vertexShader);
+
+                // Give the shader bytecode to the device so it
+                // can generate the input layout at draw time.
+                graphicsDevice._vertexShaderBytecode = _shaderBytecode;
+            }
+
+            // Update and set the constants.
+            for (var c = 0; c < _cbuffers.Length; c++)
+            {
+                var cb = cbuffers[_cbuffers[c]];
+                cb.Apply(_vertexShader != null, c, parameters);
+            }
         }
 		
+#endif // DIRECTX
 	}
 }
 
