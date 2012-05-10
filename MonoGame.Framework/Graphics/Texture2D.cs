@@ -64,7 +64,7 @@ using OpenTK.Graphics.OpenGL;
 using GLPixelFormat = OpenTK.Graphics.OpenGL.PixelFormat;
 #elif PSS
 using PssTexture2D = Sce.Pss.Core.Graphics.Texture2D;
-#elif GLSL
+#elif GLES
 using OpenTK.Graphics.ES20;
 using GLPixelFormat = OpenTK.Graphics.ES20.All;
 using TextureTarget = OpenTK.Graphics.ES20.All;
