@@ -51,8 +51,8 @@ namespace Microsoft.Xna.Framework.Graphics
             _name = reader.ReadString();               
 #endif
             // Create the backing system memory buffer.
-            var size = (int)reader.ReadInt16();
-            _buffer = new byte[size];
+            var sizeInBytes = (int)reader.ReadInt16();
+            _buffer = new byte[sizeInBytes];
 
             // Read the parameter index values.
             _parameters = new int[reader.ReadByte()];
@@ -90,6 +90,8 @@ namespace Microsoft.Xna.Framework.Graphics
             // Take care of a single data type.
             if (rows == 1 && columns == 1)
             {
+                // TODO: Consider storing all data in arrays to avoid
+                // having to generate this temp array on every set.
                 var bytes = BitConverter.GetBytes((float)data);
                 Buffer.BlockCopy(bytes, 0, _buffer, offset, elementSize);
             }
@@ -100,16 +102,18 @@ namespace Microsoft.Xna.Framework.Graphics
 
             else
             {
+                var source = data as Array;
+
                 var stride = (columns * elementSize);
                 for (var y = 0; y < rows; y++)
-                    Buffer.BlockCopy(data as Array, stride * y, _buffer, offset + (rowSize * y), columns * elementSize);
+                    Buffer.BlockCopy(source, stride * y, _buffer, offset + (rowSize * y), columns * elementSize);
             }
         }
 
 #if DIRECTX
         public void Apply(bool vertexStage, int slot, EffectParameterCollection parameters)
 #elif OPENGL
-        public void Apply(int program, EffectParameterCollection parameters)
+        public unsafe void Apply(int program, EffectParameterCollection parameters)
 #endif
         {
             // TODO:  We should be doing some sort of dirty state 
@@ -158,9 +162,14 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if OPENGL
             var location = GL.GetUniformLocation(program, _name);
-            var _bufferf = new float[_buffer.Length/4];
-            Buffer.BlockCopy(_buffer, 0, _bufferf, 0, _buffer.Length);
-            GL.Uniform4(location, _bufferf.Length / 4, _bufferf);
+            fixed (byte* bytePtr = _buffer)
+            {
+                // TODO: We need to know the type of buffer float/int/bool
+                // and cast this correctly... else it doesn't work as i guess
+                // GL is checking the type of the uniform.
+
+                GL.Uniform4(location, _buffer.Length / 16, (float*)bytePtr);
+            }
 #endif
         }
     }
