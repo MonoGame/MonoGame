@@ -134,7 +134,11 @@ namespace Microsoft.Xna.Framework
                 // 
                 // I guess the OS changes it and doesn't restore it?
                 var binding = device.GetRenderTargets();
-                device.SetRenderTargets(binding);
+                var viewport = device.Viewport;
+                var scissor = device.ScissorRectangle;
+                device.ApplyRenderTargets(binding);
+                device.Viewport = viewport;
+                device.ScissorRectangle = scissor;
             }
 
             return true;
