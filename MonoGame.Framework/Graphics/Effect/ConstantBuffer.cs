@@ -25,6 +25,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private readonly string _name;
 
+        private ulong _stateKey;
+
 #if DIRECTX
         private SharpDX.Direct3D11.Buffer _cbuffer;
 #endif
@@ -124,13 +126,24 @@ namespace Microsoft.Xna.Framework.Graphics
             // as that is why you should use multiple constant
             // buffers.
 
+            // If our state key becomes larger than the 
+            // next state key then the keys have rolled 
+            // over and we need to reset.
+            if (_stateKey > EffectParameter.NextStateKey)
+                _stateKey = 0;
+
             var dirty = false;
 
             for (var p = 0; p < _parameters.Length; p++)
             {
                 var index = _parameters[p];
-                var offset = _offsets[p];
                 var param = parameters[index];
+
+                if (param.StateKey < _stateKey)
+                    continue;
+
+                var offset = _offsets[p];
+                dirty = true;
 
                 switch (param.ParameterType)
                 {
@@ -141,15 +154,15 @@ namespace Microsoft.Xna.Framework.Graphics
                     default:
                         throw new NotImplementedException("Not supported!");
                 }
-
-                dirty = true;
             }
+
+            _stateKey = EffectParameter.NextStateKey;
 
 #if DIRECTX
             var d3dContext = graphicsDevice._d3dContext;
 
             // Update the hardware buffer.
-            if ( dirty )
+            if (dirty)
                 d3dContext.UpdateSubresource(_buffer, _cbuffer);
 
             // Set the constant buffer.
@@ -157,7 +170,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 d3dContext.VertexShader.SetConstantBuffer(slot, _cbuffer);
             else
                 d3dContext.PixelShader.SetConstantBuffer(slot, _cbuffer);
-
 #endif
 
 #if OPENGL
