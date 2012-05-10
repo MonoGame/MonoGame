@@ -193,7 +193,7 @@ namespace Microsoft.Xna.Framework {
 						else if (_savedPinchTouches[1] == null || _savedPinchTouches[1].Value.Id == touch.Id)
 						{
 							_savedPinchTouches[1] = touch;
-							ProcessPinch(_savedTouches);
+							ProcessPinch(_savedPinchTouches);
 						}
 						
 						break;
