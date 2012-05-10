@@ -132,7 +132,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 #elif PSS
             _vertexArray = new VertexPosition2ColorTexture[4*InitialVertexArraySize];
-            _vertexBuffer = new PssVertexBuffer(InitialVertexArraySize, 6 * InitialVertexArraySize, VertexFormat.Float2, VertexFormat.Byte4N, VertexFormat.Float2);
+            _vertexBuffer = new PssVertexBuffer(InitialVertexArraySize, 6 * InitialVertexArraySize, VertexFormat.Float2, VertexFormat.Byte4, VertexFormat.Float2);
             _index = new ushort[6*InitialVertexArraySize];
 
             for ( int i = 0; i < InitialVertexArraySize; i++ )
@@ -361,10 +361,15 @@ namespace Microsoft.Xna.Framework.Graphics
 				                DrawElementsType.UnsignedShort,
 				                (IntPtr)(_indexHandle.AddrOfPinnedObject().ToInt64()+(start/2*3*sizeof(short))) );
 #elif PSS
+#warning this should be applied somewhere else
+            _device._graphics.Enable(EnableMode.Blend);
+            _device._graphics.SetBlendFunc(BlendFuncMode.Add, BlendFuncFactor.SrcAlpha, BlendFuncFactor.OneMinusSrcAlpha);
+            
             var vertexCount = end - start;
             _vertexBuffer.SetVertices(_vertexArray, 0, start, vertexCount);
             _vertexBuffer.SetIndices(_index);
-            _device._graphics.DrawArrays(DrawMode.Triangles, start, vertexCount);
+            _device._graphics.SetVertexBuffer(0, _vertexBuffer);
+            _device._graphics.DrawArrays(DrawMode.Triangles, start, vertexCount / 2 * 3);
 #endif
 		}
 	}

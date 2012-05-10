@@ -188,6 +188,7 @@ namespace Microsoft.Xna.Framework.Graphics
             else
                 data = (float[])_effect.Parameters["MatrixTransform"].Data;
             Sce.Pss.Core.Matrix4 matrix4 = PSSHelper.ToPssMatrix4(data);
+            matrix4 = matrix4.Transpose (); //When .Data is set the matrix is transposed, we need to do it again to undo it
             _effect._shaderProgram.SetUniformValue(0, ref matrix4);
 #elif OPENGL
 

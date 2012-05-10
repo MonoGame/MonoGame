@@ -399,11 +399,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 4, 1, 0, 0, "float4",
                 new EffectAnnotationCollection(), new EffectParameterCollection(), new EffectParameterCollection(), new float[4]));
             
-            
-            //_shaderProgram.SetUniformBinding(0, "WorldViewProj");
-            //_shaderProgram.SetAttributeBinding(0, "a_Position");
-            //_shaderProgram.SetAttributeBinding(1, "a_Color0");
-            
             Techniques = new EffectTechniqueCollection();
             var effectPassCollection = new EffectPassCollection();
             effectPassCollection.Add(new EffectPass(this, "Pass", null, null, BlendState.AlphaBlend, DepthStencilState.Default, RasterizerState.CullNone, new EffectAnnotationCollection()));
