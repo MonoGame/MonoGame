@@ -313,10 +313,25 @@ namespace Microsoft.Xna.Framework.Graphics
             if ( start == end )
                 return;
 
-#if WINRT
+#if DIRECTX
+
+            // How many verts are we rendering?
             var vertexCount = end - start;
-            _vertexBuffer.SetData(start * _vertexBuffer.VertexDeclaration.VertexStride, _vertexArray, start, vertexCount, _vertexBuffer.VertexDeclaration.VertexStride);
+
+            // If we're at the start of the vertex buffer just discard
+            // the content as we're starting a new pass.
+            if (start == 0)
+                _vertexBuffer.SetData(0, _vertexArray, start, vertexCount, SetDataOptions.Discard);
+            else
+            {
+                // We've been rendering with this VB, so promise not to
+                // overwrite the data being used for previous draws.
+                var offsetInBytes = start * _vertexBuffer.VertexDeclaration.VertexStride;
+                _vertexBuffer.SetData(offsetInBytes, _vertexArray, start, vertexCount, SetDataOptions.NoOverwrite);
+            }
+
             _device.DrawIndexedPrimitives(PrimitiveType.TriangleList, start, 0, vertexCount, 0, (vertexCount / 4) * 2);
+
 #elif OPENGL
 			GL.DrawElements( BeginMode.Triangles,
 				                (end-start)/2*3,

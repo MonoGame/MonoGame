@@ -21,6 +21,8 @@ namespace Microsoft.Xna.Framework.Graphics
 {
 	public class VertexBuffer : GraphicsResource
     {
+        protected bool _isDynamic;
+
 #if DIRECTX
         internal SharpDX.Direct3D11.VertexBufferBinding _binding;
         protected SharpDX.Direct3D11.Buffer _buffer;
@@ -38,18 +40,18 @@ namespace Microsoft.Xna.Framework.Graphics
 		protected VertexBuffer(GraphicsDevice graphicsDevice, VertexDeclaration vertexDeclaration, int vertexCount, BufferUsage bufferUsage, bool dynamic)
 		{
 			if (graphicsDevice == null)
-            {
                 throw new ArgumentNullException("Graphics Device Cannot Be Null");
-            }
-			this.graphicsDevice = graphicsDevice;
+
+            this.graphicsDevice = graphicsDevice;
             this.VertexDeclaration = vertexDeclaration;
             this.VertexCount = vertexCount;
             this.BufferUsage = bufferUsage;
 
+            _isDynamic = dynamic;
+
 #if DIRECTX
             // TODO: To use Immutable resources we would need to delay creation of 
             // the Buffer until SetData() and recreate them if set more than once.
-            dynamic = false;
 
             SharpDX.Direct3D11.CpuAccessFlags accessflags = SharpDX.Direct3D11.CpuAccessFlags.None;
             SharpDX.Direct3D11.ResourceUsage usage = SharpDX.Direct3D11.ResourceUsage.Default;
@@ -180,8 +182,23 @@ namespace Microsoft.Xna.Framework.Graphics
             var elementSizeInByte = Marshal.SizeOf(typeof(T));
             this.GetData<T>(0, data, 0, data.Count(), elementSizeInByte);
         }
+
+        public void SetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride) where T : struct
+        {
+            SetData<T>(0, data, startIndex, elementCount, VertexDeclaration.VertexStride, SetDataOptions.None);
+        }
+        		
+		public void SetData<T>(T[] data, int startIndex, int elementCount) where T : struct
+        {
+            SetData<T>(0, data, startIndex, elementCount, VertexDeclaration.VertexStride, SetDataOptions.None);
+		}
 		
-		public void SetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride) where T : struct
+        public void SetData<T>(T[] data) where T : struct
+        {
+            SetData<T>(0, data, 0, data.Length, VertexDeclaration.VertexStride, SetDataOptions.None);
+        }
+
+        protected void SetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride, SetDataOptions options) where T : struct
         {
             if (data == null)
                 throw new ArgumentNullException("data is null");
@@ -189,28 +206,52 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new InvalidOperationException("The array specified in the data parameter is not the correct size for the amount of data requested.");
             if ((vertexStride > (VertexCount * VertexDeclaration.VertexStride)) || (vertexStride < VertexDeclaration.VertexStride))
                 throw new ArgumentOutOfRangeException("One of the following conditions is true:\nThe vertex stride is larger than the vertex buffer.\nThe vertex stride is too small for the type of data requested.");
+            if (_isDynamic && options == SetDataOptions.None)
+                throw new ArgumentException("You must set either the Discard or NoOverwrite flag when updating a dynamic vertex buffer!");
 
             var elementSizeInBytes = Marshal.SizeOf(typeof(T));
 
 #if DIRECTX
 
-            var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-            var startBytes = startIndex * elementSizeInBytes;
-            var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
+            if (!_isDynamic)
+            {
+                var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+                var startBytes = startIndex * elementSizeInBytes;
+                var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
 
-            var box = new SharpDX.DataBox(dataPtr, 1, 0);
+                var box = new SharpDX.DataBox(dataPtr, 1, 0);
 
-            var region = new SharpDX.Direct3D11.ResourceRegion();
-            region.Top = 0;
-            region.Front = 0;
-            region.Back = 1;
-            region.Bottom = 1;
-            region.Left = offsetInBytes;
-            region.Right = offsetInBytes + (elementCount * elementSizeInBytes);
+                var region = new SharpDX.Direct3D11.ResourceRegion();
+                region.Top = 0;
+                region.Front = 0;
+                region.Back = 1;
+                region.Bottom = 1;
+                region.Left = offsetInBytes;
+                region.Right = offsetInBytes + (elementCount * elementSizeInBytes);
 
-            graphicsDevice._d3dContext.UpdateSubresource(box, _buffer, 0, region);
+                graphicsDevice._d3dContext.UpdateSubresource(box, _buffer, 0, region);
 
-            dataHandle.Free();
+                dataHandle.Free();
+            }
+            else
+            {
+                var mode = SharpDX.Direct3D11.MapMode.Write;
+                if ((options & SetDataOptions.Discard) == SetDataOptions.Discard)
+                    mode = SharpDX.Direct3D11.MapMode.WriteDiscard;
+                else if ((options & SetDataOptions.NoOverwrite) == SetDataOptions.NoOverwrite)
+                    mode = SharpDX.Direct3D11.MapMode.WriteNoOverwrite;
+
+                SharpDX.DataStream stream;
+                graphicsDevice._d3dContext.MapSubresource(
+                    _buffer,
+                    mode,
+                    SharpDX.Direct3D11.MapFlags.None,
+                    out stream);
+
+                stream.Position = offsetInBytes;
+                stream.WriteRange(data, startIndex, elementCount);
+                graphicsDevice._d3dContext.UnmapSubresource(_buffer, 0);     
+            }
 
 #elif PSS
 #warning This is almost 100% certainly wrong
@@ -230,17 +271,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 #endif
         }
-		
-		public void SetData<T>(T[] data, int startIndex, int elementCount) where T : struct
-        {
-            SetData<T>(0, data, startIndex, elementCount, VertexDeclaration.VertexStride);
-		}
-		
-        public void SetData<T>(T[] data) where T : struct
-        {
-            SetData<T>(0, data, 0, data.Length, VertexDeclaration.VertexStride);
-        }
-		
+
 		public override void Dispose()
         {
 #if DIRECTX || PSS
