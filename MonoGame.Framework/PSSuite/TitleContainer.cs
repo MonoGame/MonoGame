@@ -49,7 +49,7 @@ namespace Microsoft.Xna.Framework
 	{
 		public static Stream OpenStream (string name)
 		{
-			return File.OpenRead (name);
+			return File.OpenRead (Path.Combine("/Application", name));
 		}
 		
 		internal static string GetFilename(string name)
