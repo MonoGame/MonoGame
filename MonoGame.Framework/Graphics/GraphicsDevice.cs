@@ -136,6 +136,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private readonly Dictionary<ulong, SharpDX.Direct3D11.InputLayout> _inputLayouts = new Dictionary<ulong, SharpDX.Direct3D11.InputLayout>();
 
+        private readonly Dictionary<int, DynamicVertexBuffer> _userVertexBuffers = new Dictionary<int, DynamicVertexBuffer>();
+
+        private readonly Dictionary<IndexElementSize, DynamicIndexBuffer> _userIndexBuffers = new Dictionary<IndexElementSize, DynamicIndexBuffer>();
+
+
 #endif // DIRECTX
 
 #if OPENGL
@@ -1145,6 +1150,42 @@ namespace Microsoft.Xna.Framework.Graphics
             return layout;
         }
 
+        private DynamicVertexBuffer GetUserBuffer(VertexDeclaration decl, int vertexCount)
+        {
+            DynamicVertexBuffer buffer;
+
+            if (!_userVertexBuffers.TryGetValue(decl.HashKey, out buffer) || buffer.VertexCount < vertexCount)
+            {
+                // Dispose the previous buffer if we have one.
+                if (buffer != null)
+                    buffer.Dispose();
+
+                vertexCount = Math.Max(vertexCount, 2000);
+
+                buffer = new DynamicVertexBuffer(this, decl, vertexCount, BufferUsage.WriteOnly);
+                _userVertexBuffers[decl.HashKey] = buffer;
+            }
+
+            return buffer;
+        }
+
+        private DynamicIndexBuffer GetUserIndexBuffer(IndexElementSize indexSize, int indexCount)
+        {
+            DynamicIndexBuffer buffer;
+
+            if (!_userIndexBuffers.TryGetValue(indexSize, out buffer) || buffer.IndexCount < indexCount)
+            {
+                indexCount = Math.Max(indexCount, 6000);
+
+                if (buffer != null)
+                    buffer.Dispose();
+
+                buffer = new DynamicIndexBuffer(this, indexSize, indexCount, BufferUsage.WriteOnly);
+                _userIndexBuffers[indexSize] = buffer;
+            }
+
+            return buffer;
+        }
 #endif
 
         public void DrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int minVertexIndex, int numbVertices, int startIndex, int primitiveCount)
@@ -1183,11 +1224,35 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         public void DrawUserPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int primitiveCount) where T : struct, IVertexType
-        {
-            //ApplyState();
+        {            
+            Debug.Assert(vertexData != null && vertexData.Length > 0, "The vertexData must not be null or zero length!");
+
+            var vertexCount = GetElementCountArray(primitiveType, primitiveCount);
+            var vertexDecl = VertexDeclaration.FromType(typeof(T));
 
 #if DIRECTX
-            //throw new NotImplementedException();
+
+            var buffer = GetUserBuffer(vertexDecl, vertexCount);
+            var copyCount = vertexCount - vertexOffset;
+            if ((copyCount + buffer.UserOffset) < buffer.VertexCount)
+                buffer.SetData(buffer.UserOffset * vertexDecl.VertexStride, vertexData, vertexOffset, copyCount, SetDataOptions.NoOverwrite);
+            else
+            {
+                buffer.UserOffset = 0;
+                buffer.SetData(vertexData, vertexOffset, copyCount, SetDataOptions.Discard);
+            }
+
+            SetVertexBuffer(buffer);
+#endif
+
+            ApplyState();
+
+#if DIRECTX
+
+            _d3dContext.InputAssembler.PrimitiveTopology = ToPrimitiveTopology(primitiveType);
+            _d3dContext.Draw(vertexCount, buffer.UserOffset);
+            buffer.UserOffset += copyCount;
+
 #elif OPENGL
             // Unbind the VBOs
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
@@ -1201,8 +1266,6 @@ namespace Microsoft.Xna.Framework.Graphics
             if (VboIdArray == 0)
                 GL.GenBuffers(1, out VboIdArray);
 #endif
-            //Get VertexDeclaration
-            var vd = VertexDeclaration.FromType(typeof(T));
 
             // Bind the VBO
             GL.BindBuffer(BufferTarget.ArrayBuffer, VboIdArray);
@@ -1224,7 +1287,7 @@ namespace Microsoft.Xna.Framework.Graphics
             //Draw
             GL.DrawArrays(PrimitiveTypeGL(primitiveType),
                           vertexOffset,
-                          GetElementCountArray(primitiveType, primitiveCount));
+                          vertexCount);
 
             // Free resources
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
@@ -1256,15 +1319,52 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
         }
 
-        public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int vertexCount, short[] indexData, int indexOffset, int primitiveCount) where T : struct, IVertexType
+        public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, short[] indexData, int indexOffset, int primitiveCount) where T : struct, IVertexType
         {
-            Debug.Assert(_vertexBuffer != null, "The vertex buffer is null!");
-            Debug.Assert(_indexBuffer != null, "The index buffer is null!");
+            var vertexDecl = VertexDeclaration.FromType(typeof(T));
+            DrawUserIndexedPrimitives<T>(primitiveType, vertexData, vertexOffset, numVertices, indexData, indexOffset, primitiveCount, vertexDecl);
+        }
+
+        public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, short[] indexData, int indexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct, IVertexType
+        {
+            Debug.Assert(vertexData != null && vertexData.Length > 0, "The vertexData must not be null or zero length!");
+            Debug.Assert(indexData != null && indexData.Length > 0, "The indexData must not be null or zero length!");
+
+            var indexCount = GetElementCountArray(primitiveType, primitiveCount);
+
+#if DIRECTX
+
+            var buffer = GetUserBuffer(vertexDeclaration, numVertices);
+            var copyCount = numVertices - vertexOffset;
+            if ((copyCount + buffer.UserOffset) < buffer.VertexCount)
+                buffer.SetData(buffer.UserOffset * vertexDeclaration.VertexStride, vertexData, vertexOffset, copyCount, SetDataOptions.NoOverwrite);
+            else
+            {
+                buffer.UserOffset = 0;
+                buffer.SetData(vertexData, vertexOffset, copyCount, SetDataOptions.Discard);
+            }
+            SetVertexBuffer(buffer);
+
+            var indexBuffer = GetUserIndexBuffer(IndexElementSize.SixteenBits, indexCount);
+            copyCount = indexCount - indexOffset;
+            if ((copyCount + indexBuffer.UserOffset) < indexBuffer.IndexCount)
+                indexBuffer.SetData(indexBuffer.UserOffset * 2, indexData, indexOffset, copyCount, SetDataOptions.NoOverwrite);
+            else
+            {
+                indexBuffer.UserOffset = 0;
+                indexBuffer.SetData(indexData, indexOffset, copyCount, SetDataOptions.Discard);
+            }
+            Indices = indexBuffer;
+
+#endif
 
             ApplyState();
 
 #if DIRECTX
-            //throw new NotImplementedException();
+
+            _d3dContext.InputAssembler.PrimitiveTopology = ToPrimitiveTopology(primitiveType);
+            _d3dContext.DrawIndexed(indexCount, indexOffset, vertexOffset);
+
 #elif OPENGL
             // Unbind the VBOs
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
@@ -1325,10 +1425,16 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
         }
 
-        public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int vertexCount, int[] indexData, int indexOffset, int primitiveCount) where T : struct, IVertexType
+        public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, int[] indexData, int indexOffset, int primitiveCount) where T : struct, IVertexType
         {
-            Debug.Assert(_vertexBuffer != null, "The vertex buffer is null!");
-            Debug.Assert(_indexBuffer != null, "The index buffer is null!");
+            var vertexDecl = VertexDeclaration.FromType(typeof(T));
+            DrawUserIndexedPrimitives<T>(primitiveType, vertexData, vertexOffset, numVertices, indexData, indexOffset, primitiveCount, vertexDecl);
+        }
+
+        public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int vertexCount, int[] indexData, int indexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct, IVertexType
+        {
+            Debug.Assert(vertexData != null && vertexData.Length > 0, "The vertexData must not be null or zero length!");
+            Debug.Assert(indexData != null && indexData.Length > 0, "The indexData must not be null or zero length!");
 
             //ApplyState();
 
