@@ -7,8 +7,9 @@ using MonoMac.OpenGL;
 using OpenTK.Graphics.OpenGL;
 #elif PSS
 using Sce.Pss.Core.Graphics;
-#elif WINRT
+#elif DIRECTX
 using System.Reflection;
+using System.Collections.Generic;
 #else
 using OpenTK.Graphics.ES20;
 #endif
@@ -18,7 +19,7 @@ namespace Microsoft.Xna.Framework.Graphics
 	public class VertexDeclaration : GraphicsResource
 	{
 #if DIRECTX
-        private SharpDX.Direct3D11.InputLayout _inputLayout;
+        private readonly Dictionary<DXShader, SharpDX.Direct3D11.InputLayout> _inputLayouts = new Dictionary<DXShader, SharpDX.Direct3D11.InputLayout>();
 #endif
 
 		private VertexElement[] _elements;
@@ -27,27 +28,23 @@ namespace Microsoft.Xna.Framework.Graphics
 		public VertexDeclaration(params VertexElement[] elements)
 		{
 			if ((elements == null) || (elements.Length == 0))
-			{
 				throw new ArgumentNullException("elements", "Elements cannot be empty");
-			}
 			else
 			{
 				VertexElement[] elementArray = (VertexElement[]) elements.Clone();
 				this._elements = elementArray;
-				this._vertexStride = getVertexStride(elementArray);
+                this._vertexStride = GetVertexStride(elementArray);
 			}
 		}
 
-		private static int getVertexStride(VertexElement[] elements)
+		private static int GetVertexStride(VertexElement[] elements)
 		{
 			int max = 0;
-			for (int i = 0; i < elements.Length; i++)
+			for (var i = 0; i < elements.Length; i++)
 			{
-				int start = elements[i].Offset + elements[i].VertexElementFormat.GetTypeSize();
+                var start = elements[i].Offset + elements[i].VertexElementFormat.GetTypeSize();
 				if (max < start)
-				{
 					max = start;
-				}
 			}
 
 			return max;
@@ -56,23 +53,19 @@ namespace Microsoft.Xna.Framework.Graphics
 		public VertexDeclaration(int vertexStride, params VertexElement[] elements)
 		{
 			if ((elements == null) || (elements.Length == 0))
-			{
 				throw new ArgumentNullException("elements", "Elements cannot be empty");
-			}
 			else
 			{
-				VertexElement[] elementArray = (VertexElement[]) elements.Clone();
-				this._elements = elementArray;
-				this._vertexStride = vertexStride;
+                var elementArray = (VertexElement[])elements.Clone();
+				_elements = elementArray;
+				_vertexStride = vertexStride;
 			}
 		}
 
 		internal static VertexDeclaration FromType(Type vertexType)
 		{
 			if (vertexType == null)
-			{
 				throw new ArgumentNullException("vertexType", "Cannot be null");
-			}
 
 #if WINRT
             if (!vertexType.GetTypeInfo().IsValueType)
@@ -80,19 +73,19 @@ namespace Microsoft.Xna.Framework.Graphics
             if (!vertexType.IsValueType)
 #endif
             {
-				object[] args = new object[] { vertexType };
+                var args = new object[] { vertexType };
 				throw new ArgumentException("vertexType", "Must be value type");
 			}
-			IVertexType type = Activator.CreateInstance(vertexType) as IVertexType;
+            var type = Activator.CreateInstance(vertexType) as IVertexType;
 			if (type == null)
 			{
-				object[] objArray3 = new object[] { vertexType };
+                var objArray3 = new object[] { vertexType };
 				throw new ArgumentException("vertexData does not inherit IVertexType");
 			}
-			VertexDeclaration vertexDeclaration = type.VertexDeclaration;
+            var vertexDeclaration = type.VertexDeclaration;
 			if (vertexDeclaration == null)
 			{
-				object[] objArray2 = new object[] { vertexType };
+                var objArray2 = new object[] { vertexType };
 				throw new Exception("VertexDeclaration cannot be null");
 			}
 
@@ -101,15 +94,14 @@ namespace Microsoft.Xna.Framework.Graphics
         
         public VertexElement[] GetVertexElements()
 		{
-			return (VertexElement[]) this._elements.Clone();
+			return (VertexElement[])_elements.Clone();
 		}
 
-		// Properties
 		public int VertexStride
 		{
 			get
 			{
-				return this._vertexStride;
+				return _vertexStride;
 			}
 		}
 
@@ -159,9 +151,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if DIRECTX
 
-        internal SharpDX.Direct3D11.InputLayout GetInputLayout(GraphicsDevice device, byte[] vertexShaderBytecode)
-        {                     
-            if (_inputLayout == null)
+        internal SharpDX.Direct3D11.InputLayout GetInputLayout(GraphicsDevice device, DXShader vertexShader)
+        {
+            SharpDX.Direct3D11.InputLayout layout;
+            if (!_inputLayouts.TryGetValue(vertexShader, out layout))
             {
                 // TODO: We should be registering this GraphicsResource
                 // for disposal/cleanup here somehow right?
@@ -176,10 +169,11 @@ namespace Microsoft.Xna.Framework.Graphics
                 // across similar vertex declarations... this is up to the user
                 // to cache them (usually thru static declarations).
 
-                _inputLayout = new SharpDX.Direct3D11.InputLayout(d3dDevice, vertexShaderBytecode, inputs);
+                layout = new SharpDX.Direct3D11.InputLayout(d3dDevice, vertexShader.Bytecode, inputs);
+                _inputLayouts.Add(vertexShader, layout);
             }
 
-            return _inputLayout;
+            return layout;
         }
 
 #endif

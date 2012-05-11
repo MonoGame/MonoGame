@@ -57,11 +57,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private PixelShader _pixelShader;
 
-        private byte[] _shaderBytecode;
+        public byte[] Bytecode { get; private set; }
 
 #endif
 
-        public enum SamplerType
+        private enum SamplerType
         {
             Sampler2D,
             SamplerCube,
@@ -82,30 +82,6 @@ namespace Microsoft.Xna.Framework.Graphics
         private readonly Sampler[] _samplers;
 
         private readonly int[] _cbuffers;
-
-        internal DXShader(DXShader cloneSource)
-        {
-#if OPENGL
-            // Share all the immutable types.
-            ShaderType = cloneSource.ShaderType;
-            ShaderHandle = cloneSource.ShaderHandle;
-            _attributes = cloneSource._attributes;
-#if DEBUG 
-            _glslCode = cloneSource._glslCode;
-#endif
-#endif
-
-#if DIRECTX
-            // Share all the immutable types.
-            _pixelShader = cloneSource._pixelShader;
-            _vertexShader = cloneSource._vertexShader;
-            _shaderBytecode = cloneSource._shaderBytecode;
-#endif
-
-            // Share all the immutable types.
-            _cbuffers = cloneSource._cbuffers;
-            _samplers = cloneSource._samplers;
-        }
 
         internal DXShader(GraphicsDevice device, BinaryReader reader)
         {
@@ -147,7 +123,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 // We need the bytecode later for allocating the
                 // input layout from the vertex declaration.
-                _shaderBytecode = shaderBytecode;
+                Bytecode = shaderBytecode;
             }
             else
                 _pixelShader = new PixelShader(d3dDevice, shaderBytecode);
@@ -318,16 +294,10 @@ namespace Microsoft.Xna.Framework.Graphics
         public void Apply(  GraphicsDevice graphicsDevice, 
                             EffectParameterCollection parameters,
                             ConstantBuffer[] cbuffers )
-        {							
-
-            // TODO: We should be doing dirty state testing!
-
-
-
+        {
             var d3dContext = graphicsDevice._d3dContext;
             if (_pixelShader != null)
             {
-
                 foreach (var sampler in _samplers)
                 {
                     var param = parameters[sampler.parameter];
@@ -341,9 +311,9 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 d3dContext.VertexShader.Set(_vertexShader);
 
-                // Give the shader bytecode to the device so it
-                // can generate the input layout at draw time.
-                graphicsDevice._vertexShaderBytecode = _shaderBytecode;
+                // Set the shader on the device so it can 
+                // apply the correct input layout at draw time.
+                graphicsDevice._vertexShader = this;
             }
 
             // Update and set the constants.

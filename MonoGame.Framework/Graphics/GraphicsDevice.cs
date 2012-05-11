@@ -130,10 +130,9 @@ namespace Microsoft.Xna.Framework.Graphics
         protected float _dpi;
 
         /// <summary>
-        /// The shader bytecode of the active vertex shader used
-        /// to generate the input layout from the vertex declaration.
+        /// The active vertex shader.
         /// </summary>
-        internal byte[] _vertexShaderBytecode;
+        internal DXShader _vertexShader;
 
 #endif // DIRECTX
 
@@ -1123,7 +1122,7 @@ namespace Microsoft.Xna.Framework.Graphics
             SamplerStates.SetSamplers(this);
             Textures.SetTextures(this);
 
-            _d3dContext.InputAssembler.InputLayout = _vertexBuffer.VertexDeclaration.GetInputLayout(this, _vertexShaderBytecode);
+            _d3dContext.InputAssembler.InputLayout = _vertexBuffer.VertexDeclaration.GetInputLayout(this, _vertexShader);
 #endif
         }
 
@@ -1164,7 +1163,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void DrawUserPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int primitiveCount) where T : struct, IVertexType
         {
-            ApplyState();
+            //ApplyState();
 
 #if DIRECTX
             //throw new NotImplementedException();
@@ -1310,7 +1309,7 @@ namespace Microsoft.Xna.Framework.Graphics
             Debug.Assert(_vertexBuffer != null, "The vertex buffer is null!");
             Debug.Assert(_indexBuffer != null, "The index buffer is null!");
 
-            ApplyState();
+            //ApplyState();
 
 #if DIRECTX
             //throw new NotImplementedException();

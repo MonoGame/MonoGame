@@ -90,13 +90,11 @@ namespace Microsoft.Xna.Framework.Graphics
             _depthStencilState = cloneSource._depthStencilState;
             _rasterizerState = cloneSource._rasterizerState;
             Annotations = cloneSource.Annotations;
+            _vertexShader = cloneSource._vertexShader;
+            _pixelShader = cloneSource._pixelShader;
 #if OPENGL
             _shaderProgram = cloneSource._shaderProgram;
 #endif
-
-            // Clone the mutable types.
-            _vertexShader = new DXShader(cloneSource._vertexShader);
-            _pixelShader = new DXShader(cloneSource._pixelShader);
         }
 
         private void Initialize()
