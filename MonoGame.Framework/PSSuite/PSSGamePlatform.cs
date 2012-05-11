@@ -73,8 +73,10 @@ using System.Text;
 
 using Sce.Pss.Core;
 using Sce.Pss.Core.Environment;
+using Sce.Pss.Core.Input;
 
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Media;
 
@@ -93,7 +95,9 @@ namespace Microsoft.Xna.Framework
 
         private bool _initialized;
         public static bool IsPlayingVdeo { get; set; }
-
+  
+        private int _frameBufferWidth, _frameBufferHeight;
+        
         public override void Exit()
         {
             //TODO: Fix this
@@ -115,7 +119,6 @@ namespace Microsoft.Xna.Framework
 			while (_loop) //TODO: Will need a much smarter run loop
 			{
 				SystemEvents.CheckEvents();
-				//TODO: Update TouchPanel
 				Window.OnUpdateFrame();
 				Window.OnRenderFrame();
 			}
@@ -131,8 +134,10 @@ namespace Microsoft.Xna.Framework
             if (!_initialized)
             {
                 Game.DoInitialize();
-                _initialized = true;				
+                _initialized = true;
             }
+            
+            UpdateTouches();
 
             return true;
         }
@@ -146,9 +151,6 @@ namespace Microsoft.Xna.Framework
         {
             // Get the Accelerometer going
             Accelerometer.SetupAccelerometer();
-
-            //Window.Run(1 / Game.TargetElapsedTime.TotalSeconds);
-            //Window.Pause();
 
             return true;
         }
@@ -176,8 +178,10 @@ namespace Microsoft.Xna.Framework
         public override void Present ()
         {
             _game.GraphicsDevice.Present();
+            _frameBufferWidth = _game.GraphicsDevice._graphics.GetFrameBuffer().Width;
+            _frameBufferHeight = _game.GraphicsDevice._graphics.GetFrameBuffer().Height;
         }
-		//TODO: Will need something to listen to SystemEvents.???(Pause)??? And SystemEvents.OnRestored when they are properly implemented
+		//TODO: Will need something to listen to SystemEvents.???(Pause)??? And SystemEvents.OnRestored when they are properly implemented in PSS
 
         public override GameRunBehavior DefaultRunBehavior
         {
@@ -196,5 +200,29 @@ namespace Microsoft.Xna.Framework
 			this.Window.ResetElapsedTime();
 		}
 		
+        private Dictionary<int, TouchLocation> _previousTouches = new Dictionary<int, TouchLocation>();
+        
+        private void UpdateTouches()
+        {
+            var collection = TouchPanel.Collection;
+            
+            var pssTouches = Touch.GetData(0);
+            foreach (var touch in pssTouches)
+            {
+                Vector2 position = new Vector2((touch.X + 0.5f) * _frameBufferWidth, (touch.Y + 0.5f) * _frameBufferHeight);
+                if (touch.Status == TouchStatus.Down)
+                {
+                    collection.Add(touch.ID, position);
+                }
+                else
+                {
+                    TouchLocationState state = TouchLocationState.Released;
+                    if (touch.Status == TouchStatus.Move)
+                        state = TouchLocationState.Moved;
+                        
+                    collection.Update (touch.ID, state, position);
+                }
+            }
+        }
     }
 }
