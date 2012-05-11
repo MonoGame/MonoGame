@@ -21,7 +21,7 @@ using BufferUsageHint = OpenTK.Graphics.ES20.All;
 namespace Microsoft.Xna.Framework.Graphics
 {
 	public class VertexBuffer : GraphicsResource
-	{			
+    {
 #if DIRECTX
         internal SharpDX.Direct3D11.VertexBufferBinding _binding;
         protected SharpDX.Direct3D11.Buffer _buffer;
@@ -195,23 +195,23 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if DIRECTX
 
-                var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+            var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
             var startBytes = startIndex * elementSizeInBytes;
-                var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
+            var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
 
             var box = new SharpDX.DataBox(dataPtr, 1, 0);
 
-                var region = new SharpDX.Direct3D11.ResourceRegion();
-                region.Top = 0;
-                region.Front = 0;
-                region.Back = 1;
-                region.Bottom = 1;
+            var region = new SharpDX.Direct3D11.ResourceRegion();
+            region.Top = 0;
+            region.Front = 0;
+            region.Back = 1;
+            region.Bottom = 1;
             region.Left = offsetInBytes;
             region.Right = offsetInBytes + (elementCount * elementSizeInBytes);
 
-                graphicsDevice._d3dContext.UpdateSubresource(box, _buffer, 0, region);
+            graphicsDevice._d3dContext.UpdateSubresource(box, _buffer, 0, region);
 
-                dataHandle.Free();
+            dataHandle.Free();
 
 #elif PSS
             _buffer.SetVertices(data, offsetInBytes, startIndex, elementCount);
@@ -228,7 +228,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 Threading.End();
             }
 #endif
-		}
+        }
 		
 		public void SetData<T>(T[] data, int startIndex, int elementCount) where T : struct
         {
@@ -241,7 +241,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 		
 		public override void Dispose()
-		{
+        {
 #if DIRECTX || PSS
             if (_buffer != null)
             {

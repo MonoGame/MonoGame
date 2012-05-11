@@ -95,7 +95,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private IndexBuffer _indexBuffer = null;
 
         private RenderTargetBinding[] currentRenderTargetBindings;
-		
+
         public TextureCollection Textures { get; private set; }
 
         public SamplerStateCollection SamplerStates { get; private set; }
@@ -536,7 +536,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
 			get { return _blendState; }
 			set 
-            { 
+            {
                 // Don't set the same state twice!
                 if (_blendState == value)
                     return;
@@ -872,7 +872,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-		public void SetRenderTarget (RenderTarget2D renderTarget)
+		public void SetRenderTarget(RenderTarget2D renderTarget)
 		{
 			if (renderTarget == null)
             {
@@ -895,7 +895,7 @@ namespace Microsoft.Xna.Framework.Graphics
         //  Depth and Stencil formats	- To be determined
         Viewport savedViewport;
 
-		public void SetRenderTargets (params RenderTargetBinding[] renderTargets) 
+		public void SetRenderTargets(params RenderTargetBinding[] renderTargets) 
 		{			
 			var previousRenderTargetBindings = this.currentRenderTargetBindings;
 			this.currentRenderTargetBindings = renderTargets;
