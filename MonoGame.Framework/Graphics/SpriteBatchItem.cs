@@ -12,7 +12,7 @@ namespace Microsoft.Xna.Framework.Graphics
         public VertexPositionColorTexture vertexTR;
         public VertexPositionColorTexture vertexBL;
         public VertexPositionColorTexture vertexBR;
-#elif OPENGL
+#elif OPENGL || PSS
         public VertexPosition2ColorTexture vertexTL;
 		public VertexPosition2ColorTexture vertexTR;
 		public VertexPosition2ColorTexture vertexBL;
@@ -25,7 +25,7 @@ namespace Microsoft.Xna.Framework.Graphics
             vertexTR = new VertexPositionColorTexture();
             vertexBL = new VertexPositionColorTexture();
             vertexBR = new VertexPositionColorTexture();   
-#elif OPENGL
+#elif OPENGL || PSS
 			vertexTL = new VertexPosition2ColorTexture();
             vertexTR = new VertexPosition2ColorTexture();
             vertexBL = new VertexPosition2ColorTexture();
@@ -39,7 +39,7 @@ namespace Microsoft.Xna.Framework.Graphics
             vertexTL.Position.Y = y;
 #if DIRECTX
 			vertexTL.Color = color;
-#elif OPENGL
+#elif OPENGL || PSS
             vertexTL.Color = color.PackedValue;
 #endif
             vertexTL.TextureCoordinate.X = texCoordTL.X;
@@ -49,7 +49,7 @@ namespace Microsoft.Xna.Framework.Graphics
             vertexTR.Position.Y = y;
 #if DIRECTX
             vertexTR.Color = color;
-#elif OPENGL
+#elif OPENGL || PSS
             vertexTR.Color = color.PackedValue;
 #endif
             vertexTR.TextureCoordinate.X = texCoordBR.X;
@@ -59,7 +59,7 @@ namespace Microsoft.Xna.Framework.Graphics
             vertexBL.Position.Y = y+h;
 #if DIRECTX
             vertexBL.Color = color;
-#elif OPENGL
+#elif OPENGL || PSS
             vertexBL.Color = color.PackedValue;
 #endif
 			vertexBL.TextureCoordinate.X = texCoordTL.X;
@@ -69,7 +69,7 @@ namespace Microsoft.Xna.Framework.Graphics
             vertexBR.Position.Y = y+h;
 #if DIRECTX
             vertexBR.Color = color;
-#elif OPENGL
+#elif OPENGL || PSS
             vertexBR.Color = color.PackedValue;
 #endif
 			vertexBR.TextureCoordinate.X = texCoordBR.X;
@@ -82,7 +82,7 @@ namespace Microsoft.Xna.Framework.Graphics
             vertexTL.Position.Y = y+dx*sin+dy*cos;
 #if DIRECTX
             vertexTL.Color = color;
-#elif OPENGL
+#elif OPENGL || PSS
             vertexTL.Color = color.PackedValue;
 #endif
             vertexTL.TextureCoordinate.X = texCoordTL.X;
@@ -92,7 +92,7 @@ namespace Microsoft.Xna.Framework.Graphics
             vertexTR.Position.Y = y+(dx+w)*sin+dy*cos;
 #if DIRECTX
             vertexTR.Color = color;
-#elif OPENGL
+#elif OPENGL || PSS
             vertexTR.Color = color.PackedValue;
 #endif
             vertexTR.TextureCoordinate.X = texCoordBR.X;
@@ -102,7 +102,7 @@ namespace Microsoft.Xna.Framework.Graphics
             vertexBL.Position.Y = y+dx*sin+(dy+h)*cos;
 #if DIRECTX
             vertexBL.Color = color;
-#elif OPENGL
+#elif OPENGL || PSS
             vertexBL.Color = color.PackedValue;
 #endif
             vertexBL.TextureCoordinate.X = texCoordTL.X;
@@ -112,7 +112,7 @@ namespace Microsoft.Xna.Framework.Graphics
             vertexBR.Position.Y = y+(dx+w)*sin+(dy+h)*cos;
 #if DIRECTX
             vertexBR.Color = color;
-#elif OPENGL
+#elif OPENGL || PSS
             vertexBR.Color = color.PackedValue;
 #endif
             vertexBR.TextureCoordinate.X = texCoordBR.X;
