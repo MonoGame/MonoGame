@@ -371,7 +371,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         // Modified FNV Hash in C#
         // http://stackoverflow.com/a/468084
-        private static int ComputeHash(params byte[] data)
+        internal static int ComputeHash(params byte[] data)
         {
             unchecked
             {

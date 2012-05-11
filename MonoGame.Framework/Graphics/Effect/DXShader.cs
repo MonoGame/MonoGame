@@ -61,6 +61,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #endif
 
+        /// <summary>
+        /// A hash value which can be used to compare shaders.
+        /// </summary>
+        internal int HashKey { get; private set; }
+
         private enum SamplerType
         {
             Sampler2D,
@@ -124,6 +129,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 // We need the bytecode later for allocating the
                 // input layout from the vertex declaration.
                 Bytecode = shaderBytecode;
+                
+                HashKey = Effect.ComputeHash(Bytecode);
             }
             else
                 _pixelShader = new PixelShader(d3dDevice, shaderBytecode);

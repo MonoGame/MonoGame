@@ -134,6 +134,8 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         internal DXShader _vertexShader;
 
+        private readonly Dictionary<ulong, SharpDX.Direct3D11.InputLayout> _inputLayouts = new Dictionary<ulong, SharpDX.Direct3D11.InputLayout>();
+
 #endif // DIRECTX
 
 #if OPENGL
@@ -1122,9 +1124,28 @@ namespace Microsoft.Xna.Framework.Graphics
             SamplerStates.SetSamplers(this);
             Textures.SetTextures(this);
 
-            _d3dContext.InputAssembler.InputLayout = _vertexBuffer.VertexDeclaration.GetInputLayout(this, _vertexShader);
+            _d3dContext.InputAssembler.InputLayout = GetInputLayout(_vertexShader, _vertexBuffer.VertexDeclaration);
 #endif
         }
+
+#if DIRECTX
+
+        private SharpDX.Direct3D11.InputLayout GetInputLayout(DXShader shader, VertexDeclaration decl)
+        {
+            SharpDX.Direct3D11.InputLayout layout;
+
+            // Lookup the layout using the shader and declaration as the key.
+            var key = (ulong)decl.HashKey << 32 | (uint)shader.HashKey;           
+            if (!_inputLayouts.TryGetValue(key, out layout))
+            {
+                layout = new SharpDX.Direct3D11.InputLayout(_d3dDevice, shader.Bytecode, decl.GetInputLayout());
+                _inputLayouts.Add(key, layout);
+            }
+
+            return layout;
+        }
+
+#endif
 
         public void DrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int minVertexIndex, int numbVertices, int startIndex, int primitiveCount)
         {

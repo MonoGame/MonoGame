@@ -18,24 +18,40 @@ namespace Microsoft.Xna.Framework.Graphics
 {
 	public class VertexDeclaration : GraphicsResource
 	{
-#if DIRECTX
-        private readonly Dictionary<DXShader, SharpDX.Direct3D11.InputLayout> _inputLayouts = new Dictionary<DXShader, SharpDX.Direct3D11.InputLayout>();
-#endif
-
 		private VertexElement[] _elements;
         private int _vertexStride;
 
+        /// <summary>
+        /// A hash value which can be used to compare declarations.
+        /// </summary>
+        internal int HashKey { get; private set; }
+
+
 		public VertexDeclaration(params VertexElement[] elements)
+            : this( GetVertexStride(elements), elements)
 		{
-			if ((elements == null) || (elements.Length == 0))
-				throw new ArgumentNullException("elements", "Elements cannot be empty");
-			else
-			{
-				VertexElement[] elementArray = (VertexElement[]) elements.Clone();
-				this._elements = elementArray;
-                this._vertexStride = GetVertexStride(elementArray);
-			}
 		}
+
+        public VertexDeclaration(int vertexStride, params VertexElement[] elements)
+        {
+            if ((elements == null) || (elements.Length == 0))
+                throw new ArgumentNullException("elements", "Elements cannot be empty");
+
+            var elementArray = (VertexElement[])elements.Clone();
+            _elements = elementArray;
+            _vertexStride = vertexStride;
+
+            // TODO: Is there a faster/better way to generate a
+            // unique hashkey for the same vertex layouts?
+            {
+                var signature = string.Empty;
+                foreach (var element in _elements)
+                    signature += element;
+
+                var bytes = System.Text.Encoding.UTF8.GetBytes(signature);
+                HashKey = Effect.ComputeHash(bytes);
+            }
+        }
 
 		private static int GetVertexStride(VertexElement[] elements)
 		{
@@ -48,18 +64,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 
 			return max;
-		}
-
-		public VertexDeclaration(int vertexStride, params VertexElement[] elements)
-		{
-			if ((elements == null) || (elements.Length == 0))
-				throw new ArgumentNullException("elements", "Elements cannot be empty");
-			else
-			{
-                var elementArray = (VertexElement[])elements.Clone();
-				_elements = elementArray;
-				_vertexStride = vertexStride;
-			}
 		}
 
 		internal static VertexDeclaration FromType(Type vertexType)
@@ -76,12 +80,14 @@ namespace Microsoft.Xna.Framework.Graphics
                 var args = new object[] { vertexType };
 				throw new ArgumentException("vertexType", "Must be value type");
 			}
+
             var type = Activator.CreateInstance(vertexType) as IVertexType;
 			if (type == null)
 			{
                 var objArray3 = new object[] { vertexType };
 				throw new ArgumentException("vertexData does not inherit IVertexType");
 			}
+
             var vertexDeclaration = type.VertexDeclaration;
 			if (vertexDeclaration == null)
 			{
@@ -104,7 +110,6 @@ namespace Microsoft.Xna.Framework.Graphics
 				return _vertexStride;
 			}
 		}
-
 
 #if OPENGL
 		internal void Apply()
@@ -151,29 +156,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if DIRECTX
 
-        internal SharpDX.Direct3D11.InputLayout GetInputLayout(GraphicsDevice device, DXShader vertexShader)
+        internal SharpDX.Direct3D11.InputElement[] GetInputLayout()
         {
-            SharpDX.Direct3D11.InputLayout layout;
-            if (!_inputLayouts.TryGetValue(vertexShader, out layout))
-            {
-                // TODO: We should be registering this GraphicsResource
-                // for disposal/cleanup here somehow right?
+            var inputs = new SharpDX.Direct3D11.InputElement[_elements.Length];
+            for (var i = 0; i < _elements.Length; i++)
+                inputs[i] = _elements[i].GetInputElement();
 
-                var d3dDevice = device._d3dDevice;
-
-                var inputs = new SharpDX.Direct3D11.InputElement[_elements.Length];
-                for (var i = 0; i < _elements.Length; i++)
-                    inputs[i] = _elements[i].GetInputElement();
-
-                // NOTE: We do not try to cache input layouts and share them
-                // across similar vertex declarations... this is up to the user
-                // to cache them (usually thru static declarations).
-
-                layout = new SharpDX.Direct3D11.InputLayout(d3dDevice, vertexShader.Bytecode, inputs);
-                _inputLayouts.Add(vertexShader, layout);
-            }
-
-            return layout;
+            return inputs;
         }
 
 #endif

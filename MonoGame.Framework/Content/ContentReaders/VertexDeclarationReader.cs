@@ -57,6 +57,15 @@ namespace Microsoft.Xna.Framework.Content
 				var usageIndex = reader.ReadInt32();
 				elements[i] = new VertexElement(offset, elementFormat, elementUsage, usageIndex);
 			}
+
+
+            // TODO: This process generates alot of duplicate VertexDeclarations
+            // which in turn complicates other systems trying to share GPU resources
+            // like DX11 vertex input layouts.
+            //
+            // We should consider caching vertex declarations here and returning
+            // previously created declarations when they are in our cache.
+
 			return new VertexDeclaration(vertexStride, elements);
 		}
 	}
