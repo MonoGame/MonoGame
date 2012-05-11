@@ -66,9 +66,30 @@ namespace Microsoft.Xna.Framework.Audio
 			for (int x=0; x < MAX_NUMBER_OF_SOURCES; x++) {
 				availableSourcesCollection.Add (allSourcesArray [x]);
 			}
-#if IPHONE			
-			AudioSession.Interrupted += (sender, e) => Alc.MakeContextCurrent(ContextHandle.Zero);
-			AudioSession.Resumed+= (sender, e) => Alc.MakeContextCurrent(_context);	
+#if IPHONE
+
+			AudioSession.Interrupted += (sender, e) =>
+			{
+				AudioSession.SetActive(false);
+
+				Alc.MakeContextCurrent(ContextHandle.Zero);
+				Alc.SuspendContext(_context);
+			};
+
+			AudioSession.Resumed += (sender, e) =>
+			{
+				// That is, without this, the code wont work :(
+				// It will fail on the next line of code
+				// Maybe you could ask for an explanation
+				// to someone at xamarin
+				System.Threading.Thread.Sleep(100);
+				
+				AudioSession.SetActive(true);
+				AudioSession.Category = AudioSessionCategory.SoloAmbientSound;
+
+				Alc.MakeContextCurrent(_context);
+				Alc.ProcessContext(_context);
+			};
 #endif
 		}
 
