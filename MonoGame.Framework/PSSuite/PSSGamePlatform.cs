@@ -105,12 +105,14 @@ namespace Microsoft.Xna.Framework
             catch
             {
             }
+            
+            _loop = false;
         }
 
+        private bool _loop = true;
         public override void RunLoop()
         {
-			bool loop = true;
-			while (loop) //TODO: Will need a much smarter run loop
+			while (_loop) //TODO: Will need a much smarter run loop
 			{
 				SystemEvents.CheckEvents();
 				//TODO: Update TouchPanel
