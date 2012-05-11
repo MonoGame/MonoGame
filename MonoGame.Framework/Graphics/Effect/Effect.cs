@@ -61,10 +61,6 @@ namespace Microsoft.Xna.Framework.Graphics
   
         internal ConstantBuffer[] ConstantBuffers { get; private set; }
 
-#if PSS
-        internal ShaderProgram _shaderProgram;
-#endif
-        
         internal Effect(GraphicsDevice graphicsDevice)
 		{
 			if (graphicsDevice == null)
@@ -136,9 +132,6 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="cloneSource">The source effect to clone from.</param>
         private void Clone(Effect cloneSource)
         {
-#if PSS
-            _shaderProgram = cloneSource._shaderProgram;
-#endif
             // Copy the mutable members of the effect.
             Parameters = new EffectParameterCollection(cloneSource.Parameters);
             Techniques = new EffectTechniqueCollection(this, cloneSource.Techniques);
@@ -374,12 +367,14 @@ namespace Microsoft.Xna.Framework.Graphics
 #else //PSS
         internal void ReadEffect(BinaryReader reader)
         {
-            _shaderProgram = new ShaderProgram(reader.ReadBytes((int)reader.BaseStream.Length));
+            var shader = new DXShader(GraphicsDevice, reader);
+            var effectPass = new EffectPass(this, "Pass", shader, shader, BlendState.AlphaBlend, DepthStencilState.Default, RasterizerState.CullNone, new EffectAnnotationCollection());
+            var shaderProgram = effectPass._shaderProgram;
             
             Parameters = new EffectParameterCollection();
-            for (int i = 0; i < _shaderProgram.UniformCount; i++)
+            for (int i = 0; i < shaderProgram.UniformCount; i++)
             {
-                Parameters.Add(EffectParameterForUniform(i));
+                Parameters.Add(EffectParameterForUniform(shaderProgram, i));
             }
 #warning Hacks for BasicEffect as we don't have these parameters yet
             Parameters.Add (new EffectParameter(
@@ -401,7 +396,7 @@ namespace Microsoft.Xna.Framework.Graphics
             
             Techniques = new EffectTechniqueCollection();
             var effectPassCollection = new EffectPassCollection();
-            effectPassCollection.Add(new EffectPass(this, "Pass", null, null, BlendState.AlphaBlend, DepthStencilState.Default, RasterizerState.CullNone, new EffectAnnotationCollection()));
+            effectPassCollection.Add(effectPass);
             Techniques.Add(new EffectTechnique(this, "Name", effectPassCollection, new EffectAnnotationCollection()));
        
             ConstantBuffers = new ConstantBuffer[0];
@@ -409,13 +404,13 @@ namespace Microsoft.Xna.Framework.Graphics
             CurrentTechnique = Techniques[0];
         }
         
-        internal EffectParameter EffectParameterForUniform(int index)
+        internal EffectParameter EffectParameterForUniform(ShaderProgram shaderProgram, int index)
         {
-            //var b = _shaderProgram.GetUniformBinding(i);
-            var name = _shaderProgram.GetUniformName(index);
-            //var s = _shaderProgram.GetUniformSize(i);
-            //var x = _shaderProgram.GetUniformTexture(i);
-            var type = _shaderProgram.GetUniformType(index);
+            //var b = shaderProgram.GetUniformBinding(i);
+            var name = shaderProgram.GetUniformName(index);
+            //var s = shaderProgram.GetUniformSize(i);
+            //var x = shaderProgram.GetUniformTexture(i);
+            var type = shaderProgram.GetUniformType(index);
             
             //EffectParameter.Semantic => COLOR0 / POSITION0 etc
    

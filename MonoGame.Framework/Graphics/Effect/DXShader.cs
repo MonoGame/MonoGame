@@ -53,6 +53,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private byte[] _shaderBytecode;
 
+#elif PSS
+
+        internal byte[] _shaderCode;
 #endif
 
         private readonly float[] _uniforms_float4;
@@ -104,10 +107,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal DXShader(DXShader cloneSource)
         {
-#if PSS
-#warning PSS is hacking around DXShader currently.
-            return;
-#endif
             // Share all the immutable types.
 #if OPENGL
             ShaderType = cloneSource.ShaderType;
@@ -123,6 +122,8 @@ namespace Microsoft.Xna.Framework.Graphics
             _pixelShader = cloneSource._pixelShader;
             _vertexShader = cloneSource._vertexShader;
             _shaderBytecode = cloneSource._shaderBytecode;
+#elif PSS
+            _shaderCode = cloneSource._shaderCode;
 #endif
             _symbols = cloneSource._symbols;
             _samplers = cloneSource._samplers;
@@ -136,6 +137,15 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal DXShader(GraphicsDevice device, BinaryReader reader)
         {
+#if PSS
+#warning PSS Doesn't currently use .mgfx files, so we cludge this a bit
+            _shaderCode = reader.ReadBytes((int)reader.BaseStream.Length);
+            _uniforms_float4 = new float[0];
+            _uniforms_int4 = new int[0];
+            _uniforms_bool = new int[0];
+            return;
+#endif
+
             var isVertexShader = reader.ReadBoolean();
 
 #if OPENGL

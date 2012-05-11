@@ -47,6 +47,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #endif // OPENGL
 
+#if PSS
+        internal ShaderProgram _shaderProgram;
+#endif
+
         internal EffectPass(    Effect effect, 
                                 string name,
                                 DXShader vertexShader, 
@@ -90,7 +94,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _depthStencilState = cloneSource._depthStencilState;
             _rasterizerState = cloneSource._rasterizerState;
             Annotations = cloneSource.Annotations;
-#if OPENGL
+#if OPENGL || PSS
             _shaderProgram = cloneSource._shaderProgram;
 #endif
 
@@ -143,6 +147,8 @@ namespace Microsoft.Xna.Framework.Graphics
 #elif DIRECTX
 
 
+#elif PSS
+            _shaderProgram = new ShaderProgram(_vertexShader._shaderCode);
 #endif
         }
 
@@ -163,7 +169,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #if OPENGL
             GL.UseProgram(_shaderProgram);
 #elif PSS
-            _effect.GraphicsDevice._graphics.SetShaderProgram(_effect._shaderProgram);
+            _effect.GraphicsDevice._graphics.SetShaderProgram(_shaderProgram);
 #elif DIRECTX
 
 #endif
@@ -189,7 +195,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 data = (float[])_effect.Parameters["MatrixTransform"].Data;
             Sce.Pss.Core.Matrix4 matrix4 = PSSHelper.ToPssMatrix4(data);
             matrix4 = matrix4.Transpose (); //When .Data is set the matrix is transposed, we need to do it again to undo it
-            _effect._shaderProgram.SetUniformValue(0, ref matrix4);
+            _shaderProgram.SetUniformValue(0, ref matrix4);
 #elif OPENGL
 
             // Apply the vertex shader.
