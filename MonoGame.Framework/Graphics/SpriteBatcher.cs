@@ -132,7 +132,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 #elif PSS
             _vertexArray = new VertexPosition2ColorTexture[4*InitialVertexArraySize];
-            _vertexBuffer = new PssVertexBuffer(InitialVertexArraySize, 6 * InitialVertexArraySize, VertexFormat.Float2, VertexFormat.Byte4, VertexFormat.Float2);
+            _vertexBuffer = new PssVertexBuffer(InitialVertexArraySize, 6 * InitialVertexArraySize, VertexFormat.Float2, VertexFormat.UByte4N, VertexFormat.Float2);
             _index = new ushort[6*InitialVertexArraySize];
 
             for ( int i = 0; i < InitialVertexArraySize; i++ )
@@ -330,7 +330,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 #elif PSS
             _vertexBuffer.Dispose();
-            _vertexBuffer = new PssVertexBuffer(newCount, 6 * newCount, VertexFormat.Float2, VertexFormat.Byte4N, VertexFormat.Float2);
+            _vertexBuffer = new PssVertexBuffer(newCount, 6 * newCount, VertexFormat.Float2, VertexFormat.UByte4N, VertexFormat.Float2);
             
             _vertexArray = new VertexPosition2ColorTexture[4*newCount];
             _index = new ushort[6*newCount];
