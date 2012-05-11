@@ -367,8 +367,8 @@ namespace Microsoft.Xna.Framework.Graphics
 #else //PSS
         internal void ReadEffect(BinaryReader reader)
         {
-            var shader = new DXShader(GraphicsDevice, reader);
-            var effectPass = new EffectPass(this, "Pass", shader, shader, BlendState.AlphaBlend, DepthStencilState.Default, RasterizerState.CullNone, new EffectAnnotationCollection());
+            var effectPass = new EffectPass(this, "Pass", null, null, BlendState.AlphaBlend, DepthStencilState.Default, RasterizerState.CullNone, new EffectAnnotationCollection());
+            effectPass._shaderProgram = new ShaderProgram(reader.ReadBytes((int)reader.BaseStream.Length));
             var shaderProgram = effectPass._shaderProgram;
             
             Parameters = new EffectParameterCollection();

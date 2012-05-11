@@ -98,9 +98,11 @@ namespace Microsoft.Xna.Framework.Graphics
             _shaderProgram = cloneSource._shaderProgram;
 #endif
 
+#if !PSS
             // Clone the mutable types.
             _vertexShader = new DXShader(cloneSource._vertexShader);
             _pixelShader = new DXShader(cloneSource._pixelShader);
+#endif
         }
 
         private void Initialize()
@@ -146,9 +148,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #elif DIRECTX
 
-
-#elif PSS
-            _shaderProgram = new ShaderProgram(_vertexShader._shaderCode);
 #endif
         }
 
