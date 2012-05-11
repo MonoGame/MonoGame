@@ -1266,9 +1266,10 @@ namespace Microsoft.Xna.Framework.Graphics
         {            
             Debug.Assert(vertexData != null && vertexData.Length > 0, "The vertexData must not be null or zero length!");
 
+            var vertexCount = GetElementCountArray(primitiveType, primitiveCount);
+
 #if DIRECTX
 
-            var vertexCount = GetElementCountArray(primitiveType, primitiveCount);
             var startVertex = SetUserVertexBuffer(vertexData, vertexOffset, vertexCount, vertexDeclaration);
 
             ApplyState();
@@ -1293,19 +1294,19 @@ namespace Microsoft.Xna.Framework.Graphics
             // Bind the VBO
             GL.BindBuffer(BufferTarget.ArrayBuffer, VboIdArray);
             ////Clear previous data
-            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vd.VertexStride * vertexData.Length - vertexOffset * vd.VertexStride), (IntPtr)null, BufferUsageHint.StreamDraw);
+            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vertexDeclaration.VertexStride * vertexData.Length - vertexOffset * vertexDeclaration.VertexStride), (IntPtr)null, BufferUsageHint.StreamDraw);
 
             //Pin data
             var handle = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
 
             //Buffer data to VBO; This should use stream when we move to ES2.0
             GL.BufferData(BufferTarget.ArrayBuffer,
-                            (IntPtr)(vd.VertexStride * vertexData.Length - vertexOffset * vd.VertexStride),
-                            new IntPtr(handle.AddrOfPinnedObject().ToInt64() + vertexOffset * vd.VertexStride),
+                            (IntPtr)(vertexDeclaration.VertexStride * vertexData.Length - vertexOffset * vertexDeclaration.VertexStride),
+                            new IntPtr(handle.AddrOfPinnedObject().ToInt64() + vertexOffset * vertexDeclaration.VertexStride),
                             BufferUsageHint.StreamDraw);
 
             //Setup VertexDeclaration
-            vd.Apply();
+            vertexDeclaration.Apply();
 
             //Draw
             GL.DrawArrays(PrimitiveTypeGL(primitiveType),
@@ -1323,12 +1324,13 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             Debug.Assert(_vertexBuffer != null, "The vertex buffer is null!");
 
+            var vertexCount = GetElementCountArray(primitiveType, primitiveCount);
+
 #if DIRECTX
 
             ApplyState();
 
             _d3dContext.InputAssembler.PrimitiveTopology = ToPrimitiveTopology(primitiveType);
-            var vertexCount = GetElementCountArray(primitiveType, primitiveCount);
             _d3dContext.Draw(vertexCount, vertexStart);
 
 #elif OPENGL
