@@ -1468,14 +1468,12 @@ namespace Microsoft.Xna.Framework.Graphics
             if (VboIdElement == 0)
                 GL.GenBuffers(1, out VboIdElement);
 #endif
-            //Get VertexDeclaration
-            var vd = VertexDeclaration.FromType(typeof(T));
 
             // Bind the VBO
             GL.BindBuffer(BufferTarget.ArrayBuffer, VboIdArray);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, VboIdElement);
             ////Clear previous data
-			GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vd.VertexStride * vertexData.Length - vertexOffset * vd.VertexStride), IntPtr.Zero, BufferUsageHint.StreamDraw);
+            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vertexDeclaration.VertexStride * vertexData.Length - vertexOffset * vertexDeclaration.VertexStride), IntPtr.Zero, BufferUsageHint.StreamDraw);
 			GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(sizeof(uint) * indexData.Length), IntPtr.Zero, BufferUsageHint.StreamDraw);
 
             //Pin data
@@ -1485,8 +1483,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
             //Buffer data to VBO; This should use stream when we move to ES2.0
             GL.BufferData(BufferTarget.ArrayBuffer,
-                            (IntPtr)(vd.VertexStride * vertexData.Length - vertexOffset * vd.VertexStride),
-                            new IntPtr(handle.AddrOfPinnedObject().ToInt64() + vertexOffset * vd.VertexStride),
+                            (IntPtr)(vertexDeclaration.VertexStride * vertexData.Length - vertexOffset * vertexDeclaration.VertexStride),
+                            new IntPtr(handle.AddrOfPinnedObject().ToInt64() + vertexOffset * vertexDeclaration.VertexStride),
                             BufferUsageHint.StreamDraw);
 
             GL.BufferData(BufferTarget.ElementArrayBuffer,
@@ -1494,7 +1492,7 @@ namespace Microsoft.Xna.Framework.Graphics
                             indexData, BufferUsageHint.DynamicDraw);
 
             //Setup VertexDeclaration
-            vd.Apply();
+            vertexDeclaration.Apply();
 
             //Draw
             GL.DrawElements(PrimitiveTypeGL(primitiveType),
