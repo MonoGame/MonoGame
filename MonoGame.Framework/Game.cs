@@ -78,21 +78,15 @@ using System.Reflection;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
-#if WINRT
-using Windows.ApplicationModel.Core;
-using Windows.UI.Core;
-#else
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
+#if !WINRT
 using Microsoft.Xna.Framework.GamerServices;
 #endif
 
 namespace Microsoft.Xna.Framework
 {
     public class Game : IDisposable
-#if WINRT
-        , IFrameworkView
-#endif
     {
         private const float DefaultTargetFramesPerSecond = 60.0f;
 
@@ -164,25 +158,6 @@ namespace Microsoft.Xna.Framework
         {
             Dispose(false);
         }
-
-#if WINRT
-        public void Initialize(CoreApplicationView applicationView)
-        {
-        }
-
-        public void Load(string entryPoint)
-        {
-        }
-
-        public void SetWindow(CoreWindow window)
-        {
-            (Window as MetroGameWindow).Initialize(window);
-        }
-
-        public void Uninitialize()
-        {
-        }
-#endif
 
 		[System.Diagnostics.Conditional("DEBUG")]
 		internal void Log(string Message)
