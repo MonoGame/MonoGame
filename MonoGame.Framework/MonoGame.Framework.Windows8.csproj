@@ -52,6 +52,7 @@
     <Compile Include="Content\ContentReaders\EnvironmentMapEffectReader.cs" />
     <Compile Include="Content\ContentReaders\ModelReader.cs" />
     <Compile Include="Content\ContentReaders\SkinnedEffectReader.cs" />
+    <Compile Include="Content\ContentReaders\SoundEffectReader.cs" />
     <Compile Include="Content\ContentReaders\SpriteFontReader.cs" />
     <Compile Include="Content\ContentReaders\AlphaTestEffectReader.cs" />
     <Compile Include="Content\ContentReaders\BasicEffectReader.cs" />
