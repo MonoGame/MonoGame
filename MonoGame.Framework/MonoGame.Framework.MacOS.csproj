@@ -364,6 +364,7 @@
     <Compile Include="LaunchParameters.cs" />
     <Compile Include="MacOS\MacGamePlatform+Synchronous.cs" />
     <Compile Include="Graphics\Vertices\VertexDeclaration.cs" />
+    <Compile Include="Graphics\Vertices\VertexDeclarationCache.cs" />    
     <Compile Include="Content\ContentReaders\IndexBufferReader.cs" />
     <Compile Include="Content\ContentReaders\BasicEffectReader.cs" />
     <Compile Include="Content\ContentReaders\BoundingBoxReader.cs" />

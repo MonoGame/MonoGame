@@ -1258,8 +1258,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void DrawUserPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int primitiveCount) where T : struct, IVertexType
         {
-            var vertexDecl = VertexDeclaration.FromType(typeof(T));
-            DrawUserPrimitives<T>(primitiveType, vertexData, vertexOffset, primitiveCount, vertexDecl);
+            DrawUserPrimitives<T>(primitiveType, vertexData, vertexOffset, primitiveCount, VertexDeclarationCache<T>.VertexDeclaration);
         }
 
         public void DrawUserPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct, IVertexType
@@ -1345,8 +1344,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, short[] indexData, int indexOffset, int primitiveCount) where T : struct, IVertexType
         {
-            var vertexDecl = VertexDeclaration.FromType(typeof(T));
-            DrawUserIndexedPrimitives<T>(primitiveType, vertexData, vertexOffset, numVertices, indexData, indexOffset, primitiveCount, vertexDecl);
+            DrawUserIndexedPrimitives<T>(primitiveType, vertexData, vertexOffset, numVertices, indexData, indexOffset, primitiveCount, VertexDeclarationCache<T>.VertexDeclaration);
         }
 
         public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, short[] indexData, int indexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct, IVertexType
@@ -1382,16 +1380,15 @@ namespace Microsoft.Xna.Framework.Graphics
             if (VboIdElement == 0)
                 GL.GenBuffers(1, out VboIdElement);
 #endif
-            //Get VertexDeclaration
-            var vd = VertexDeclaration.FromType(typeof(T));
-
             // Bind the VBO
             GL.BindBuffer(BufferTarget.ArrayBuffer, VboIdArray);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, VboIdElement);
             ////Clear previous data
-            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vd.VertexStride * vertexData.Length - vertexOffset * vd.VertexStride), (IntPtr)null, BufferUsageHint.StreamDraw);
+            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vertexDeclaration.VertexStride * vertexData.Length - vertexOffset * vertexDeclaration.VertexStride), (IntPtr)null, BufferUsageHint.StreamDraw);
             GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(sizeof(ushort) * indexData.Length), (IntPtr)null, BufferUsageHint.StreamDraw);
 
+            // TODO: Why two handles when we only need one?
+            //
             //Pin data
             var handle = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
             var handle2 = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
@@ -1399,8 +1396,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
             //Buffer data to VBO; This should use stream when we move to ES2.0
             GL.BufferData(BufferTarget.ArrayBuffer,
-                            (IntPtr)(vd.VertexStride * vertexData.Length - vertexOffset * vd.VertexStride),
-                            new IntPtr(handle.AddrOfPinnedObject().ToInt64() + vertexOffset * vd.VertexStride),
+                            (IntPtr)(vertexDeclaration.VertexStride * vertexData.Length - vertexOffset * vertexDeclaration.VertexStride),
+                            new IntPtr(handle.AddrOfPinnedObject().ToInt64() + vertexOffset * vertexDeclaration.VertexStride),
                             BufferUsageHint.StreamDraw);
 
             GL.BufferData(BufferTarget.ElementArrayBuffer,
@@ -1408,7 +1405,7 @@ namespace Microsoft.Xna.Framework.Graphics
                             indexData, BufferUsageHint.DynamicDraw);
 
             //Setup VertexDeclaration
-            vd.Apply();
+            vertexDeclaration.Apply();
 
             //Draw
             GL.DrawElements(PrimitiveTypeGL(primitiveType),
@@ -1427,8 +1424,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, int[] indexData, int indexOffset, int primitiveCount) where T : struct, IVertexType
         {
-            var vertexDecl = VertexDeclaration.FromType(typeof(T));
-            DrawUserIndexedPrimitives<T>(primitiveType, vertexData, vertexOffset, numVertices, indexData, indexOffset, primitiveCount, vertexDecl);
+            DrawUserIndexedPrimitives<T>(primitiveType, vertexData, vertexOffset, numVertices, indexData, indexOffset, primitiveCount, VertexDeclarationCache<T>.VertexDeclaration);
         }
 
         public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, int[] indexData, int indexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct, IVertexType

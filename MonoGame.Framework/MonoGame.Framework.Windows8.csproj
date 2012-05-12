@@ -113,6 +113,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Graphics\Vertices\VertexDeclaration.cs" />
+    <Compile Include="Graphics\Vertices\VertexDeclarationCache.cs" />
     <Compile Include="Graphics\Vertices\VertexPositionColorTexture.cs" />
     <Compile Include="Input\AccelerometerCapabilities.cs" />
     <Compile Include="Input\AccelerometerState.cs" />

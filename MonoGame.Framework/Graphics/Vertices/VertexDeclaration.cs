@@ -66,6 +66,15 @@ namespace Microsoft.Xna.Framework.Graphics
 			return max;
 		}
 
+        /// <summary>
+        /// Returns the VertexDeclaration for Type.
+        /// </summary>
+        /// <param name="vertexType">A value type which implements the IVertexType interface.</param>
+        /// <returns>The VertexDeclaration.</returns>
+        /// <remarks>
+        /// Prefer to use VertexDeclarationCache when the declaration lookup
+        /// can be performed with a templated type.
+        /// </remarks>
 		internal static VertexDeclaration FromType(Type vertexType)
 		{
 			if (vertexType == null)

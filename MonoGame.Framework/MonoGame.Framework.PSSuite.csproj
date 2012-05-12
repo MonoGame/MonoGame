@@ -304,6 +304,7 @@
     <Compile Include="Graphics\Effect\EffectAnnotationCollection.cs" />
     <Compile Include="Graphics\Effect\EffectAnnotation.cs" />
     <Compile Include="Graphics\Vertices\VertexDeclaration.cs" />
+    <Compile Include="Graphics\Vertices\VertexDeclarationCache.cs" />    
     <Compile Include="Graphics\RenderTarget2D.cs" />
     <Compile Include="Audio\AudioCategory.cs" />
     <Compile Include="Graphics\SpriteBatch.cs" />
