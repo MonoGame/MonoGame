@@ -258,7 +258,7 @@
     <Compile Include="Graphics\PackedVector\HalfVector2.cs" />
     <Compile Include="Graphics\PackedVector\NormalizedShort2.cs" />
     <Compile Include="Graphics\PackedVector\NormalizedShort4.cs" />
-    <Compile Include="Graphics\PresentationParameters.cs" />	
+    <Compile Include="Graphics\PresentationParameters.cs" />
     <Compile Include="Graphics\SamplerStateCollection.cs" />
     <Compile Include="Content\ContentSerializerAttribute.cs" />
     <Compile Include="Content\ContentSerializerIgnoreAttribute.cs" />
@@ -396,6 +396,7 @@
     <Compile Include="Content\ContentReaders\AlphaTestEffectReader.cs" />
     <Compile Include="Graphics\Texture2D.cs" />
     <Compile Include="Graphics\SpriteFont.cs" />
+    <Compile Include="Graphics\Effect\ConstantBuffer.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />

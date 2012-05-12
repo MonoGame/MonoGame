@@ -47,6 +47,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #endif // OPENGL
 
+#if PSS
+        internal ShaderProgram _shaderProgram;
+#endif
+
         internal EffectPass(    Effect effect, 
                                 string name,
                                 DXShader vertexShader, 
@@ -92,7 +96,7 @@ namespace Microsoft.Xna.Framework.Graphics
             Annotations = cloneSource.Annotations;
             _vertexShader = cloneSource._vertexShader;
             _pixelShader = cloneSource._pixelShader;
-#if OPENGL
+#if OPENGL || PSS
             _shaderProgram = cloneSource._shaderProgram;
 #endif
         }
@@ -140,7 +144,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #elif DIRECTX
 
-
 #endif
         }
 
@@ -160,6 +163,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if OPENGL
             GL.UseProgram(_shaderProgram);
+#elif PSS
+            _effect.GraphicsDevice._graphics.SetShaderProgram(_shaderProgram);
 #endif
 
             var device = _effect.GraphicsDevice;
@@ -174,7 +179,17 @@ namespace Microsoft.Xna.Framework.Graphics
             Debug.Assert(_vertexShader != null, "Got a null vertex shader!");
             Debug.Assert(_pixelShader != null, "Got a null vertex shader!");
 
-#if OPENGL
+#if PSS
+#warning We are only setting one hardcoded parameter here. Need to do this properly by iterating _effect.Parameters (Happens in DXShader)
+            float[] data;
+            if (_effect.Parameters["WorldViewProj"] != null) 
+                data = (float[])_effect.Parameters["WorldViewProj"].Data;
+            else
+                data = (float[])_effect.Parameters["MatrixTransform"].Data;
+            Sce.Pss.Core.Matrix4 matrix4 = PSSHelper.ToPssMatrix4(data);
+            matrix4 = matrix4.Transpose (); //When .Data is set the matrix is transposed, we need to do it again to undo it
+            _shaderProgram.SetUniformValue(0, ref matrix4);
+#elif OPENGL
 
             // Apply the vertex shader.
             _vertexShader.Apply(device, _shaderProgram, _effect.Parameters, _effect.ConstantBuffers);

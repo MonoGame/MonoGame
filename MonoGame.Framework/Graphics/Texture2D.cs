@@ -93,7 +93,6 @@ namespace Microsoft.Xna.Framework.Graphics
 		internal PssTexture2D _texture2D;
 
 #elif OPENGL
-
 		PixelInternalFormat glInternalFormat;
 		GLPixelFormat glFormat;
 		PixelType glType;
@@ -238,6 +237,10 @@ namespace Microsoft.Xna.Framework.Graphics
             byte[] bytes = new byte[stream.Length];
             stream.Read(bytes, 0, (int)stream.Length);
             _texture2D = new PssTexture2D(bytes, false);
+            width = _texture2D.Width;
+            height = _texture2D.Height;
+            this.format = SurfaceFormat.Color; //FIXME HACK
+            this.levelCount = 1;
         }
 #endif
 				

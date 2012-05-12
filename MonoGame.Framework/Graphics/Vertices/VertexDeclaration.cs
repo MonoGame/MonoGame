@@ -18,6 +18,10 @@ namespace Microsoft.Xna.Framework.Graphics
 {
 	public class VertexDeclaration : GraphicsResource
 	{
+#if PSS
+        private VertexFormat[] _vertexFormat;
+#endif
+
 		private VertexElement[] _elements;
         private int _vertexStride;
 
@@ -174,6 +178,20 @@ namespace Microsoft.Xna.Framework.Graphics
             return inputs;
         }
 
+#endif
+        
+#if PSS
+        internal VertexFormat[] GetVertexFormat()
+        {
+            if (_vertexFormat == null)
+            {
+                _vertexFormat = new VertexFormat[_elements.Length];
+                for (int i = 0; i < _vertexFormat.Length; i++)
+                    _vertexFormat[i] = PSSHelper.ToVertexFormat(_elements[i].VertexElementFormat);
+            }
+            
+            return _vertexFormat;
+        }
 #endif
 	}
 }

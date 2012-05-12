@@ -163,30 +163,60 @@ namespace Microsoft.Xna.Framework {
 
 			var location = ((UITouch) touches.AnyObject).LocationInView (this);
 			RollTouchBuffer (GetOffsetPosition (new Vector2 (location.X, location.Y), true));
+			
+			updateGestures();
 		}
 		
+		// For pinch, we'll need to "save" a touch so we can
+		// send both at the same time
+		private TouchLocation?[] _savedPinchTouches = new TouchLocation?[2];
+		private bool _pinchComplete = false;
+		
 		private void updateGestures()
-		{			
+		{				
 			for(int x = 0; x < TouchPanel.Collection.Count; x++)
 			{
 				var touch = TouchPanel.Collection[x];
 				
 				switch(touch.State)
 				{
-					// Pressed. Can be a tap, or the start of a hold.
-					case TouchLocationState.Pressed:
-						break;
-					
-					// Moved. Can be a FreeDrag, Flick, H/V drag or pinch
+					case TouchLocationState.Pressed:					
 					case TouchLocationState.Moved:
-						if (ProcessDrag(touch))
-							break;
-						else
-							break;
+					// Any time that two fingers are detected in XNA, it's considered a pinch
+					// Save the touch and combine it with the next one to create a pinch gesture
+					if (GestureIsEnabled(GestureType.Pinch) &&
+					    TouchPanel.Collection.Count > 1 &&
+					    !_pinchComplete)
+					{
+						if (_savedPinchTouches[0] == null || _savedPinchTouches[0].Value.Id == touch.Id)
+							_savedPinchTouches[0] = touch;
+						else if (_savedPinchTouches[1] == null || _savedPinchTouches[1].Value.Id == touch.Id)
+						{
+							_savedPinchTouches[1] = touch;
+							ProcessPinch(_savedPinchTouches);
+						}
+						
+						break;
+					}
+					else if (touch.State == TouchLocationState.Moved)
+						ProcessDrag(touch);
+					
+					break;
 					
 					// Released. Can be a tap/Doubletap, or the end of a
 					// previous gesture.
 					case TouchLocationState.Released:
+					case TouchLocationState.Invalid:
+						if (_savedPinchTouches[0] != null && 
+					    	_savedPinchTouches[1] != null &&
+					    	(touch.Id == _savedPinchTouches[0].Value.Id ||
+						    touch.Id == _savedPinchTouches[1].Value.Id))
+						{
+							ProcessPinchComplete();
+							_pinchComplete = true;
+							break;
+						}
+					
 						if (touch.PrevState == TouchLocationState.Pressed)
 						{
 							if (ProcessTap(touch))
@@ -200,14 +230,15 @@ namespace Microsoft.Xna.Framework {
 							if (ProcessDragComplete(touch))
 								break;
 						}
-					
 						break;
 					
-					// What do we do here...?
-					case TouchLocationState.Invalid:
-							break;
-					
 				}
+			}
+			
+			if (_pinchComplete)
+			{
+				_savedPinchTouches[0] = _savedPinchTouches[1] = null;
+				_pinchComplete = false;
 			}
 		}
 
@@ -374,6 +405,9 @@ namespace Microsoft.Xna.Framework {
 			if (!GestureIsEnabled(GestureType.DragComplete))
 				return false;
 			
+			if (touch.PrevState != TouchLocationState.Moved)
+				return false;
+			
 			TouchPanel.GestureList.Enqueue (new GestureSample (
 			GestureType.DragComplete, new TimeSpan (DateTime.Now.Ticks),
 			Vector2.Zero, Vector2.Zero,
@@ -420,42 +454,47 @@ namespace Microsoft.Xna.Framework {
 			return true;
 		}
 
-		private readonly Vector2? [] _previousPinchPositions = new Vector2?[2];
 		
-		//TODO: Reimplement
-		[Export]
-		public void OnPinchGesture (UIPinchGestureRecognizer sender)
+		private bool ProcessPinch(TouchLocation? [] touches)
 		{
-			var location0 = sender.LocationOfTouch (0, sender.View);
-			var position0 = GetOffsetPosition (new Vector2 (location0.X, location0.Y), true);
-
-			PointF location1;
-			Vector2 position1;
-			if (sender.NumberOfTouches > 1) {
-				location1 = sender.LocationOfTouch (1, sender.View);
-				position1 = GetOffsetPosition (new Vector2 (location1.X, location1.Y), true);
-			} else {
-				location1 = location0;
-				position1 = position0;
-			}
-
-			var delta0 = position0 - _previousPinchPositions [0].GetValueOrDefault (position0);
-			var delta1 = position1 - _previousPinchPositions [1].GetValueOrDefault (position1);
-
+			if (!GestureIsEnabled(GestureType.Pinch))
+				return false;
+			
+			var touch0 = touches[0].Value;
+			var touch1 = touches[1].Value;
+			
+			TouchLocation prevPos0;
+			TouchLocation prevPos1;
+			
+			if (!touch0.TryGetPreviousLocation(out prevPos0))
+				prevPos0 = touch0;
+			
+			if (!touch1.TryGetPreviousLocation(out prevPos1))
+				prevPos1 = touch1;
+			
+			var delta0 = touch0.Position - prevPos0.Position;
+			var delta1 = touch1.Position - prevPos1.Position;
+			
 			TouchPanel.GestureList.Enqueue (new GestureSample (
 				GestureType.Pinch, new TimeSpan (DateTime.Now.Ticks),
-				position0, position1,
+				touch0.Position, touch1.Position,
 				delta0, delta1));
-
-			if (sender.State == UIGestureRecognizerState.Ended ||
-			    sender.State == UIGestureRecognizerState.Cancelled ||
-			    sender.State == UIGestureRecognizerState.Failed) {
-				_previousPinchPositions [0] = null;
-				_previousPinchPositions [1] = null;
-			} else {
-				_previousPinchPositions [0] = position0;
-				_previousPinchPositions [1] = position1;
-			}
+			
+			return true;
+		}
+		
+		private bool ProcessPinchComplete()
+		{
+			if (!GestureIsEnabled(GestureType.PinchComplete))
+				return false;
+			
+			TouchPanel.GestureList.Enqueue (new GestureSample (
+				GestureType.PinchComplete, new TimeSpan (DateTime.Now.Ticks),
+				Vector2.Zero, Vector2.Zero,
+				Vector2.Zero, Vector2.Zero));
+			
+			return true;
+			
 		}
 
 		#endregion Gestures
