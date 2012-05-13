@@ -438,21 +438,7 @@ namespace Microsoft.Xna.Framework
 
         protected virtual void Initialize()
         {
-            // In an original XNA game the GraphicsDevice property is null
-            // during initialization but before the Game's Initialize method is
-            // called the property is available so we can only assume that it
-            // should be created somewhere in here.  We cannot set the viewport
-            // values correctly based on the Preferred settings which is causing
-            // some problems on some Microsoft samples which we are not handling
-            // correctly.
-
-            // TODO: We need to straighten out device initialization... there is
-            // only one correct place to do it.  WinRT is correct... the other platforms
-			// are not at the moment.
-#if WINRT
-			graphicsDeviceManager.CreateDevice();
-#endif
-
+            // TODO: We shouldn't need to do this here.
             applyChanges(graphicsDeviceManager);
 
             // According to the information given on MSDN (see link below), all
