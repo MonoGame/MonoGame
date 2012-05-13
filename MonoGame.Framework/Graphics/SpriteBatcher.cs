@@ -131,9 +131,9 @@ namespace Microsoft.Xna.Framework.Graphics
 				_index[i*6+5] = (ushort)(i*4+2);
 			}
 #elif PSS
-            _vertexArray = new VertexPosition2ColorTexture[4*InitialVertexArraySize];
-            _vertexBuffer = new PssVertexBuffer(InitialVertexArraySize, 6 * InitialVertexArraySize, VertexFormat.Float2, VertexFormat.UByte4N, VertexFormat.Float2);
-            _index = new ushort[6*InitialVertexArraySize];
+            _vertexArray = new VertexPosition2ColorTexture[4 * InitialVertexArraySize];
+            _vertexBuffer = new PssVertexBuffer(4 * InitialVertexArraySize, 6 * InitialVertexArraySize, VertexFormat.Float2, VertexFormat.UByte4N, VertexFormat.Float2);
+            _index = new ushort[6 * InitialVertexArraySize];
 
             for ( int i = 0; i < InitialVertexArraySize; i++ )
          {
@@ -330,7 +330,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 #elif PSS
             _vertexBuffer.Dispose();
-            _vertexBuffer = new PssVertexBuffer(newCount, 6 * newCount, VertexFormat.Float2, VertexFormat.UByte4N, VertexFormat.Float2);
+            _vertexBuffer = new PssVertexBuffer(4 * newCount, 6 * newCount, VertexFormat.Float2, VertexFormat.UByte4N, VertexFormat.Float2);
             
             _vertexArray = new VertexPosition2ColorTexture[4*newCount];
             _index = new ushort[6*newCount];
@@ -366,10 +366,10 @@ namespace Microsoft.Xna.Framework.Graphics
             _device._graphics.SetBlendFunc(BlendFuncMode.Add, BlendFuncFactor.SrcAlpha, BlendFuncFactor.OneMinusSrcAlpha);
             
             var vertexCount = end - start;
-            _vertexBuffer.SetVertices(_vertexArray, 0, start, vertexCount);
-            _vertexBuffer.SetIndices(_index);
+            _vertexBuffer.SetVertices(_vertexArray, start, start, vertexCount);
+            _vertexBuffer.SetIndices(_index, start / 2 * 3, start / 2 * 3, vertexCount / 2 * 3);
             _device._graphics.SetVertexBuffer(0, _vertexBuffer);
-            _device._graphics.DrawArrays(DrawMode.Triangles, start, vertexCount / 2 * 3);
+            _device._graphics.DrawArrays(DrawMode.Triangles, start / 2 * 3, vertexCount / 2 * 3);
 #endif
 		}
 	}
