@@ -48,10 +48,12 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             effect.Parameters = parameters.ToArray();
 
-            // Fix up the samplers in the shaders to 
-            // include the parameter name.
+            // Fix up the samplers and constant buffers.
             foreach (var shader in effect.Shaders)
-                shader.SetSamplerParameters(samplers);
+            {
+                shader.SetSamplerParameters(samplers, parameters);
+                shader.CreateConstantBuffer(parameters, effect.ConstantBuffers);
+            }
 
             return effect;
         }

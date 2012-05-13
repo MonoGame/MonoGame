@@ -78,21 +78,15 @@ using System.Reflection;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
-#if WINRT
-using Windows.ApplicationModel.Core;
-using Windows.UI.Core;
-#else
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
+#if !WINRT
 using Microsoft.Xna.Framework.GamerServices;
 #endif
 
 namespace Microsoft.Xna.Framework
 {
     public class Game : IDisposable
-#if WINRT
-        , IFrameworkView
-#endif
     {
         private const float DefaultTargetFramesPerSecond = 60.0f;
 
@@ -164,25 +158,6 @@ namespace Microsoft.Xna.Framework
         {
             Dispose(false);
         }
-
-#if WINRT
-        public void Initialize(CoreApplicationView applicationView)
-        {
-        }
-
-        public void Load(string entryPoint)
-        {
-        }
-
-        public void SetWindow(CoreWindow window)
-        {
-            (Window as MetroGameWindow).Initialize(window);
-        }
-
-        public void Uninitialize()
-        {
-        }
-#endif
 
 		[System.Diagnostics.Conditional("DEBUG")]
 		internal void Log(string Message)
@@ -463,21 +438,7 @@ namespace Microsoft.Xna.Framework
 
         protected virtual void Initialize()
         {
-            // In an original XNA game the GraphicsDevice property is null
-            // during initialization but before the Game's Initialize method is
-            // called the property is available so we can only assume that it
-            // should be created somewhere in here.  We cannot set the viewport
-            // values correctly based on the Preferred settings which is causing
-            // some problems on some Microsoft samples which we are not handling
-            // correctly.
-
-            // TODO: We need to straighten out device initialization... there is
-            // only one correct place to do it.  WinRT is correct... the other platforms
-			// are not at the moment.
-#if WINRT
-			graphicsDeviceManager.CreateDevice();
-#endif
-
+            // TODO: We shouldn't need to do this here.
             applyChanges(graphicsDeviceManager);
 
             // According to the information given on MSDN (see link below), all
