@@ -59,7 +59,6 @@ using System.Linq;
 		private static int _numSongsInQueuePlayed = 0;
 		private static MediaState _mediaState = MediaState.Stopped;
 		private static float _volume = 1.0f;
-		private static bool _looping = true;
 		private static bool _isMuted = false;
 		private static MediaQueue _queue = new MediaQueue();
 		
@@ -169,13 +168,27 @@ using System.Linq;
 			
 			_queue.Add(song);
 			
+			playSong(song);
+        }
+		
+		public static void Play(SongCollection collection, int index = 0)
+		{
+			foreach(var song in collection)
+				Queue.Add(song);
+			
+			_queue.ActiveSongIndex = index;
+			
+			playSong(Queue[index]);
+		}
+		
+		private static void playSong(Song song)
+		{
 			song.SetEventHandler(OnSongFinishedPlaying);
 			
 			song.Volume = _isMuted ? 0.0f : _volume;
-			//song.Loop = _looping;
 			song.Play();
 			_mediaState = MediaState.Playing;
-        }
+		}
 		
 		internal static void OnSongFinishedPlaying (object sender, EventArgs args)
 		{
@@ -192,7 +205,7 @@ using System.Linq;
 				}
 			}
 			
-			nextSong(1);
+			MoveNext();
 		}
 
         public static void Resume()
@@ -209,7 +222,10 @@ using System.Linq;
 			if (_queue.ActiveSong == null)
 				return;
 			
-			_queue.ActiveSong.Stop();
+			// Loop through so that we reset the PlayCount as well
+			foreach(var song in Queue)
+				_queue.ActiveSong.Stop();
+			
 			_mediaState = MediaState.Stopped;
 		}
 		

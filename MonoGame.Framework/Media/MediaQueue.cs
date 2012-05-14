@@ -13,7 +13,6 @@ namespace Microsoft.Xna.Framework.Media
 			
 		}
 		
-		
 		public Song ActiveSong
 		{
 			get
@@ -35,15 +34,8 @@ namespace Microsoft.Xna.Framework.Media
 		{
 			if (shuffle)
 				_activeSongIndex = random.Next(this.Count);
-			else
-			{
-				_activeSongIndex += direction;
-				
-				if (_activeSongIndex >= Count)
-					_activeSongIndex = 0;
-				else if (_activeSongIndex < 0)
-					_activeSongIndex = Count - 1;
-			}
+			else			
+				_activeSongIndex = (int)MathHelper.Clamp(_activeSongIndex + direction, 0, Count - 1);
 			
 			return this[_activeSongIndex];
 		}
@@ -51,17 +43,12 @@ namespace Microsoft.Xna.Framework.Media
 		internal new void Clear ()
 		{
 			Song song;
-			for( int x = 0; x < this.Count; x++ )
+			for(; this.Count > 0; )
 			{
-				song = this[x];
+				song = this[0];
 				song.Stop();
 				this.Remove(song);
 			}	
-		}
-		
-		internal void queueSong(Song song)
-		{
-			this.Add(song);
 		}
 	}
 }

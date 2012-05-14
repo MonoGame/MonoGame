@@ -69,27 +69,13 @@ namespace Microsoft.Xna.Framework.Media
 			_name = fileName;
 			
 #if IPHONE
-			SongData = NSData.FromFile(fileName);
-			_sound = AVAudioPlayer.FromData(SongData);
+			_sound = AVAudioPlayer.FromUrl(NSUrl.FromFilename(fileName));
 			_sound.NumberOfLoops = 0;
 #else
 			_sound = new SoundEffect(_name).CreateInstance();
 #endif
 			_sound.FinishedPlaying += OnFinishedPlaying;
 		}
-		
-#if IPHONE
-		
-		internal Song(string fileName, Stream dataStream)
-		{
-			_name = fileName;
-
-			SongData = NSData.FromStream(dataStream);
-			_sound = AVAudioPlayer.FromData(SongData);
-			_sound.NumberOfLoops = 0;
-			_sound.FinishedPlaying += OnFinishedPlaying;
-		}
-#endif
 		
 		internal void OnFinishedPlaying (object sender, EventArgs args)
 		{
@@ -114,8 +100,6 @@ namespace Microsoft.Xna.Framework.Media
 		{
 			get { return _name; }
 		}
-		
-		public NSData SongData { get; private set; }
 		
 		public void Dispose()
         {
@@ -189,39 +173,12 @@ namespace Microsoft.Xna.Framework.Media
 		
 		internal void Stop()
 		{
-			if ( _sound != null )
+			if ( _sound == null )
 				return;
 			
 			_sound.Stop();
-		}
-		
-		internal bool Loop
-		{
-			get
-			{
-				if ( _sound == null )
-					return false;
-				
-#if IPHONE
-				return _sound.NumberOfLoops > 0;
-#else
-				return _sound.IsLooped;
-#endif
-					
-			}
-			set 
-			{
-				if ( _sound == null )
-					return;
-#if IPHONE
-				_sound.NumberOfLoops = value ? int.MaxValue : 0;
-#else
-				if ( _sound.IsLooped == value )
-					return;
-				
-				_sound.IsLooped = value;
-#endif
-			}
+			
+			_playCount = 0;
 		}
 		
 		internal float Volume
@@ -229,27 +186,19 @@ namespace Microsoft.Xna.Framework.Media
 			get
 			{
 				if (_sound != null)
-				{
 					return _sound.Volume;
-				}
 				else
-				{
 					return 0.0f;
-				}
 			}
 			
 			set
 			{
-				if ( _sound != null )
-				{
-					if ( _sound.Volume != value )
-					{
-						_sound.Volume = value;
-					}
-				}
+				if ( _sound != null && _sound.Volume != value )
+					_sound.Volume = value;
 			}			
 		}
 		
+		// TODO: Implement
         public TimeSpan Duration
         {
             get
@@ -267,6 +216,7 @@ namespace Microsoft.Xna.Framework.Media
             }
         }
 		
+		// TODO: Implement
 		public TimeSpan Position
         {
             get

@@ -66,14 +66,10 @@ namespace Microsoft.Xna.Framework.Content
 			// Songs don't have the full directory path in their .xnb. Build it.
 			path = Path.Combine (input.ContentManager.RootDirectory, input.ContentManager.CurrentAssetDirectory, path);
 			path = TitleContainer.GetFilename(path);
-			
-			Song song;
-			using (var fs = TitleContainer.OpenStream(path))
-				song = new Song(path, fs);
 
 			/*int durationMS =*/ input.ReadObject<int>();
 			
-			return song; 
+			return new Song(path); 
 		}
 	}
 }
