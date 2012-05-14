@@ -90,6 +90,11 @@ namespace Microsoft.Xna.Framework.Graphics
                 desc.IsDepthEnabled = DepthBufferEnable;
                 desc.DepthComparison = GetComparison(DepthBufferFunction);
 
+                if (DepthBufferWriteEnable)
+                    desc.DepthWriteMask = SharpDX.Direct3D11.DepthWriteMask.All;
+                else
+                    desc.DepthWriteMask = SharpDX.Direct3D11.DepthWriteMask.Zero;
+
                 desc.IsStencilEnabled = StencilEnable;
                 desc.StencilReadMask = (byte)StencilMask; // TODO: Should this instead grab the upper 8bits?
                 desc.StencilWriteMask = (byte)StencilWriteMask;
@@ -103,10 +108,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 desc.FrontFace.DepthFailOperation = GetStencilOp(StencilDepthBufferFail);
                 desc.FrontFace.FailOperation = GetStencilOp(StencilFail);
                 desc.FrontFace.PassOperation = GetStencilOp(StencilPass);
-
-                // These are new DX11 features we should consider exposing
-                // as part of the extended MonoGame API.
-                desc.DepthWriteMask = SharpDX.Direct3D11.DepthWriteMask.All;
 
                 // Create the state.
                 _state = new SharpDX.Direct3D11.DepthStencilState(graphicsDevice._d3dDevice, ref desc);

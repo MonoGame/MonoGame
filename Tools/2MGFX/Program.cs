@@ -94,7 +94,7 @@ namespace TwoMGFX
             {
                 using (var stream = new FileStream(options.OutputFile, FileMode.Create, FileAccess.Write))
                 using (var writer = new BinaryWriter(stream))
-                    effect.Write(writer);
+                    effect.Write(writer, options);
             }
             catch (Exception ex)
             {
