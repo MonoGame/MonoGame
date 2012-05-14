@@ -11,6 +11,7 @@
 
 	<Runtime>
 		<Import file = "templates/MonoGameAndroidProject.xpt.xml"/>
+		<Import file = "templates/MonoGameiOSProject.xpt.xml"/>
 		<Import file = "templates/MonoGameWindowsProject.xpt.xml"/>
 		<Import file = "templates/MonoGameLinuxProject.xpt.xml"/>
         <Import file = "MonoDevelop.MonoGame.dll"/>
@@ -40,10 +41,15 @@
     </Extension>  
     
     <Extension path = "/MonoDevelop/Ide/ProjectTemplates">
-        <ProjectTemplate id = "MonoGameForAndroidProject" file = "templates/MonoGameAndroidProject.xpt.xml"/>                
+        <ProjectTemplate id = "MonoGameForAndroidProject" file = "templates/MonoGameAndroidProject.xpt.xml"/> 
+		<ProjectTemplate id = "MonoGameForiOSProject" file = "templates/MonoGameiOSProject.xpt.xml"/> 
         <ProjectTemplate id = "MonoGameForWindowsProject" file = "templates/MonoGameWindowsProject.xpt.xml"/>                
         <ProjectTemplate id = "MonoGameForLinuxProject" file = "templates/MonoGameLinuxProject.xpt.xml"/> 
     </Extension>
 
+	<Extension path = "/MonoDevelop/Ide/FileTemplates">
+        <FileTemplate id = "MonoGameAndroidClass" resource = "MonoGameAndroidClass.xft.xml"/>
+		<FileTemplate id = "MonoGameiOSClass" resource = "MonoGameiOSClass.xft.xml"/>
+    </Extension>	
 	
 </Addin>
