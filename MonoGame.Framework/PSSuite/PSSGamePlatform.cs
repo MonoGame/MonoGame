@@ -119,6 +119,7 @@ namespace Microsoft.Xna.Framework
 			while (_loop) //TODO: Will need a much smarter run loop
 			{
 				SystemEvents.CheckEvents();
+                UpdateTouches();
 				Window.OnUpdateFrame();
 				Window.OnRenderFrame();
 			}
@@ -137,8 +138,6 @@ namespace Microsoft.Xna.Framework
                 _initialized = true;
             }
             
-            UpdateTouches();
-
             return true;
         }
 
