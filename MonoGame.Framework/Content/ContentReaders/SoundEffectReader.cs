@@ -63,9 +63,9 @@ namespace Microsoft.Xna.Framework.Content
 		{                    
 			byte[] header = input.ReadBytes(input.ReadInt32());
 			byte[] data = input.ReadBytes(input.ReadInt32());
-			int loopStart = input.ReadInt32();
-			int loopLength = input.ReadInt32();
-			int num = input.ReadInt32();
+			/*int loopStart =*/ input.ReadInt32();
+			/*int loopLength =*/ input.ReadInt32();
+			/*int num =*/ input.ReadInt32();
 			
 			MemoryStream mStream = new MemoryStream(20+header.Length+8+data.Length);
 			BinaryWriter writer = new BinaryWriter(mStream);
@@ -83,7 +83,7 @@ namespace Microsoft.Xna.Framework.Content
 			writer.Write((int)data.Length);
 			writer.Write(data);
 			
-			writer.Dispose();
+			writer.Close();
             mStream.Dispose();
 			
 			return new SoundEffect(input.AssetName, mStream.ToArray());
