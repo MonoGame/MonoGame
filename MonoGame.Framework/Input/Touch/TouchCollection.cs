@@ -82,27 +82,45 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		
 		internal void Update()
 		{
-			//Console.WriteLine(">>> Touches: {0}", Count);
+			TouchLocation t;
+			// First update active touches 
 			for (int i = this.Count - 1; i >= 0; --i)
 			{
-				TouchLocation t = this[i];
+				t = this[i];
+				t.PressedStateProcessed = true;
+				
 				switch (t.State)
 				{
 					case TouchLocationState.Pressed:
 						t.PrevPosition = t.Position;
-						this[i] = t;
 					break;
 					case TouchLocationState.Moved:
 						t.PrevState = TouchLocationState.Moved;
-						this[i] = t;
-					break;
-					case TouchLocationState.Released:
-					case TouchLocationState.Invalid:
-						RemoveAt(i);
 					break;
 				}
+				
+				this[i] = t;
 			}
-			//Console.WriteLine("<<< Touches: {0}", Count);
+			
+#if IPHONE
+			iOSGameView.UpdateGestures();
+#endif
+			
+			// Remove dead touches
+			for (int i = this.Count - 1; i >= 0 && i < this.Count;)
+			{
+				t = this[i];
+				if (t.State == TouchLocationState.Invalid || 
+				    t.State == TouchLocationState.Released)
+				{
+					RemoveAt(i);
+					
+					if(i != this.Count)
+						continue;
+				}
+				
+				i--;
+			}
 		}
 
 		public bool FindById(int id, out TouchLocation touchLocation)
@@ -147,10 +165,27 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			if (state == TouchLocationState.Pressed)
 				throw new ArgumentException("Argument 'state' cannot be TouchLocationState.Pressed.");
 
-			for (int i = 0; i < Count; i++) {
-				if (this[i].Id == id) {
+			for (int i = 0; i < Count; i++)
+			{
+				if (this[i].Id == id)
+				{				
 					var touchLocation = this[i];
 					touchLocation.Position = position;
+					
+					// Some OS's can give us moved/released updates before we have a chance to process pressed
+					// Give the app a chance to respond to pressed
+					if ( !this[i].PressedStateProcessed )
+					{
+						if (state == TouchLocationState.Moved)
+							return;
+						
+						if (state == TouchLocationState.Invalid || state == TouchLocationState.Released)
+						{
+							RemoveAt(i);
+							return;
+						}
+					}
+					
 					touchLocation.State = state;
 					this[i] = touchLocation;
 					return;
