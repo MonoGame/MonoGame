@@ -23,9 +23,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
     public class IndexBuffer : GraphicsResource
     {
-		public BufferUsage BufferUsage { get; private set; }
-		public int IndexCount { get; private set; }
-		public IndexElementSize IndexElementSize { get; private set; }
+        private bool _isDynamic;
 
 #if DIRECTX
         internal SharpDX.Direct3D11.Buffer _buffer;
@@ -34,6 +32,10 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
 		internal uint ibo;	
 #endif
+
+        public BufferUsage BufferUsage { get; private set; }
+        public int IndexCount { get; private set; }
+        public IndexElementSize IndexElementSize { get; private set; }
 
 		protected IndexBuffer(GraphicsDevice graphicsDevice, IndexElementSize indexElementSize, int indexCount, BufferUsage bufferUsage, bool dynamic)
         {
@@ -48,17 +50,31 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			var sizeInBytes = indexCount * (this.IndexElementSize == IndexElementSize.SixteenBits ? 2 : 4);
 
+            _isDynamic = dynamic;
+            
 #if DIRECTX
 
             // TODO: To use true Immutable resources we would need to delay creation of 
             // the Buffer until SetData() and recreate them if set more than once.
 
+            SharpDX.Direct3D11.CpuAccessFlags accessflags = SharpDX.Direct3D11.CpuAccessFlags.None;
+            SharpDX.Direct3D11.ResourceUsage usage = SharpDX.Direct3D11.ResourceUsage.Default;
+
+            if (dynamic)
+            {
+                accessflags |= SharpDX.Direct3D11.CpuAccessFlags.Write;
+                usage = SharpDX.Direct3D11.ResourceUsage.Dynamic;
+            }
+
+            if (bufferUsage != Graphics.BufferUsage.WriteOnly)
+                accessflags |= SharpDX.Direct3D11.CpuAccessFlags.Read;
+
             _buffer = new SharpDX.Direct3D11.Buffer(    graphicsDevice._d3dDevice,
                                                         sizeInBytes,
-                                                        dynamic ? SharpDX.Direct3D11.ResourceUsage.Dynamic : SharpDX.Direct3D11.ResourceUsage.Default,
+                                                        usage,
                                                         SharpDX.Direct3D11.BindFlags.IndexBuffer,
-                                                        SharpDX.Direct3D11.CpuAccessFlags.None,
-                                                        0, // OptionFlags                                                          
+                                                        accessflags,
+                                                        SharpDX.Direct3D11.ResourceOptionFlags.None,
                                                         0  // StructureSizeInBytes
                                                         );
 #elif PSS
@@ -149,33 +165,69 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             this.GetData<T>(0, data, 0, data.Length);
         }
-		
-		public void SetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount) where T : struct
+
+        public void SetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount) where T : struct
         {
-			if (data == null) 
+            SetData<T>(0, data, startIndex, elementCount, SetDataOptions.Discard);
+        }
+        		
+		public void SetData<T>(T[] data, int startIndex, int elementCount) where T : struct
+        {
+            SetData<T>(0, data, startIndex, elementCount, SetDataOptions.Discard);
+		}
+		
+        public void SetData<T>(T[] data) where T : struct
+        {
+            SetData<T>(0, data, 0, data.Length, SetDataOptions.Discard);
+        }
+
+        protected void SetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, SetDataOptions options) where T : struct
+        {
+            if (data == null)
                 throw new ArgumentNullException("data");
 
 #if DIRECTX
 
-            var elementSizeInBytes = Marshal.SizeOf(typeof(T));
-            var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-            var startBytes = startIndex * elementSizeInBytes;
-            var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
+            if (_isDynamic)
+            {
+                // We assume discard by default.
+                var mode = SharpDX.Direct3D11.MapMode.WriteDiscard;
+                if ((options & SetDataOptions.NoOverwrite) == SetDataOptions.NoOverwrite)
+                    mode = SharpDX.Direct3D11.MapMode.WriteNoOverwrite;
 
-            var box = new SharpDX.DataBox(dataPtr, 1, 0);
+                SharpDX.DataStream stream;
+                graphicsDevice._d3dContext.MapSubresource(
+                    _buffer,
+                    mode,
+                    SharpDX.Direct3D11.MapFlags.None,
+                    out stream);
 
-            var region = new SharpDX.Direct3D11.ResourceRegion();
-            region.Top = 0;
-            region.Front = 0;
-            region.Back = 1;
-            region.Bottom = 1;
-            region.Left = offsetInBytes;
-            region.Right = offsetInBytes + (elementCount * elementSizeInBytes);
+                stream.Position = offsetInBytes;
+                stream.WriteRange(data, startIndex, elementCount);
+                graphicsDevice._d3dContext.UnmapSubresource(_buffer, 0);
+            }
+            else
+            {
+                var elementSizeInBytes = Marshal.SizeOf(typeof(T));
+                var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+                var startBytes = startIndex * elementSizeInBytes;
+                var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
 
-            // TODO: We need to deal with threaded contexts here!
-            graphicsDevice._d3dContext.UpdateSubresource(box, _buffer, 0, region);
+                var box = new SharpDX.DataBox(dataPtr, 1, 0);
 
-            dataHandle.Free();
+                var region = new SharpDX.Direct3D11.ResourceRegion();
+                region.Top = 0;
+                region.Front = 0;
+                region.Back = 1;
+                region.Bottom = 1;
+                region.Left = offsetInBytes;
+                region.Right = offsetInBytes + (elementCount * elementSizeInBytes);
+
+                // TODO: We need to deal with threaded contexts here!
+                graphicsDevice._d3dContext.UpdateSubresource(box, _buffer, 0, region);
+
+                dataHandle.Free();
+            }
 
 #elif PSS
             if (typeof(T) == typeof(ushort))
@@ -205,18 +257,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 dataHandle.Free();
             });
 #endif
-		}
-		
-		public void SetData<T>(T[] data, int startIndex, int elementCount) where T : struct
-        {
-            SetData<T>(0, data, startIndex, elementCount);
-		}
-		
-        public void SetData<T>(T[] data) where T : struct
-        {
-            SetData<T>(0, data, 0, data.Length);
         }
-		
+
 		public override void Dispose()
         {
 #if DIRECTX || PSS

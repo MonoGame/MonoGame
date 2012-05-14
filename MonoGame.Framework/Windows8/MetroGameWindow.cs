@@ -97,7 +97,14 @@ namespace Microsoft.Xna.Framework
 
         #endregion
 
-        public MetroGameWindow()
+        static public MetroGameWindow Instance { get; private set; }
+
+        static MetroGameWindow()
+        {
+            Instance = new MetroGameWindow();
+        }
+
+        private MetroGameWindow()
         {
             _keys = new List<Keys>();
         }

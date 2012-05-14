@@ -94,14 +94,10 @@ namespace Microsoft.Xna.Framework.Graphics
             _depthStencilState = cloneSource._depthStencilState;
             _rasterizerState = cloneSource._rasterizerState;
             Annotations = cloneSource.Annotations;
+            _vertexShader = cloneSource._vertexShader;
+            _pixelShader = cloneSource._pixelShader;
 #if OPENGL || PSS
             _shaderProgram = cloneSource._shaderProgram;
-#endif
-
-#if !PSS
-            // Clone the mutable types.
-            _vertexShader = new DXShader(cloneSource._vertexShader);
-            _pixelShader = new DXShader(cloneSource._pixelShader);
 #endif
         }
 
@@ -164,8 +160,6 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.UseProgram(_shaderProgram);
 #elif PSS
             _effect.GraphicsDevice._graphics.SetShaderProgram(_shaderProgram);
-#elif DIRECTX
-
 #endif
 
             var device = _effect.GraphicsDevice;
@@ -193,7 +187,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #elif OPENGL
 
             // Apply the vertex shader.
-            _vertexShader.Apply(_shaderProgram, _effect.Parameters, device);
+            _vertexShader.Apply(device, _shaderProgram, _effect.Parameters, _effect.ConstantBuffers);
 
             // Apply vertex shader fix:
             // The following two lines are appended to the end of vertex shaders
@@ -236,38 +230,14 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.Uniform4(posFixupLoc, 1, _posFixup);
 
             // Apply the pixel shader.
-            _pixelShader.Apply(_shaderProgram, _effect.Parameters, device);
+            _pixelShader.Apply(device, _shaderProgram, _effect.Parameters, _effect.ConstantBuffers);
 
 #elif DIRECTX
-            
-            // TODO: We should be doing dirty state testing!
 
-            // Update the constant buffers.
-            foreach (var param in _effect.Parameters)
-            {
-                if (param.BufferOffset == -1)
-                    continue;
-
-                var buffer = _effect.ConstantBuffers[param.BufferIndex];
-                
-                switch ( param.ParameterType )
-                {
-                    case EffectParameterType.Single:
-                        buffer.SetData(param.BufferOffset, param.RowCount, param.ColumnCount, param.Data);
-                        break;
-
-                    default:
-                        throw new NotImplementedException("Not supported!");
-                }
-            }
-
-            // Apply the shaders.
-            _vertexShader.Apply(-1, _effect.Parameters, device);
-            _pixelShader.Apply(-1, _effect.Parameters, device);
-
-            // Set the constant buffers.
-            foreach (var buffer in _effect.ConstantBuffers)
-                buffer.Apply();
+            // Apply the shaders which will in turn set the 
+            // constant buffers and texture samplers.
+            _vertexShader.Apply(device, _effect.Parameters, _effect.ConstantBuffers);
+            _pixelShader.Apply(device, _effect.Parameters, _effect.ConstantBuffers);
 
 #endif
         }
