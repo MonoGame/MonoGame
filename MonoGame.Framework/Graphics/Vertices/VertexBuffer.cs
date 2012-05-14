@@ -10,6 +10,7 @@ using MonoMac.OpenGL;
 using OpenTK.Graphics.OpenGL;
 #elif PSS
 using Sce.Pss.Core.Graphics;
+using PssVertexBuffer = Sce.Pss.Core.Graphics.VertexBuffer;
 #elif GLES
 using OpenTK.Graphics.ES20;
 using BufferTarget = OpenTK.Graphics.ES20.All;
@@ -25,7 +26,7 @@ namespace Microsoft.Xna.Framework.Graphics
         internal SharpDX.Direct3D11.VertexBufferBinding _binding;
         protected SharpDX.Direct3D11.Buffer _buffer;
 #elif PSS
-        private PssVertexBuffer _buffer;
+        internal PssVertexBuffer _buffer;
 #else
 		//internal uint vao;
 		internal uint vbo;
@@ -63,7 +64,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (bufferUsage != Graphics.BufferUsage.WriteOnly)
                 accessflags |= SharpDX.Direct3D11.CpuAccessFlags.Read;
 
-            _buffer = new SharpDX.Direct3D11.Buffer(    graphicsDevice._d3dDevice,
+            _buffer = new SharpDX.Direct3D11.Buffer(    graphicsDevice._d3dDevice, 
                                                         vertexDeclaration.VertexStride * vertexCount,
                                                         usage,
                                                         SharpDX.Direct3D11.BindFlags.VertexBuffer,
@@ -73,10 +74,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
             _binding = new SharpDX.Direct3D11.VertexBufferBinding(_buffer, VertexDeclaration.VertexStride, 0);
 #elif PSS
-            VertexFormat[] vertexFormat = new VertexFormat[vertexDeclaration._elements.Length];
-            for (int i = 0; i < vertexFormat.Length; i++)
-                vertexFormat[i] = PSSHelper.ToVertexFormat(vertexDeclaration._elements[i].VertexElementFormat);
-            _buffer = new PssVertexBuffer(vertexCount, 0, vertexFormat);
+            VertexFormat[] vertexFormat = vertexDeclaration.GetVertexFormat();
+            _buffer = new PssVertexBuffer(vertexCount, vertexFormat);
 #else
             Threading.BlockOnUIThread(() =>
             {
@@ -179,8 +178,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new InvalidOperationException("The array specified in the data parameter is not the correct size for the amount of data requested.");
             if ((vertexStride > (VertexCount * VertexDeclaration.VertexStride)) || (vertexStride < VertexDeclaration.VertexStride))
                 throw new ArgumentOutOfRangeException("One of the following conditions is true:\nThe vertex stride is larger than the vertex buffer.\nThe vertex stride is too small for the type of data requested.");
-
+   
+#if !PSS
             var elementSizeInBytes = Marshal.SizeOf(typeof(T));
+#endif
 
 #if DIRECTX
 
@@ -203,9 +204,7 @@ namespace Microsoft.Xna.Framework.Graphics
             dataHandle.Free();
 
 #elif PSS
-#warning This is almost 100% certainly wrong
-            var elementSizeInBytes = Marshal.SizeOf(typeof(T));
-            _buffer.SetVertices(data, startIndex, offsetInBytes / elementSizeInBytes, vertexStride);
+            _buffer.SetVertices(data, offsetInBytes, startIndex, elementCount);
 #else
             Threading.BlockOnUIThread(() =>
             {

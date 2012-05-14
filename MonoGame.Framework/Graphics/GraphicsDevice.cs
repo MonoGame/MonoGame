@@ -153,7 +153,7 @@ namespace Microsoft.Xna.Framework.Graphics
         internal GraphicsContext _graphics;
 
 #endif
-        
+
 #if GLES
 		const FramebufferTarget GLFramebuffer = FramebufferTarget.Framebuffer;
 		const RenderbufferTarget GLRenderbuffer = RenderbufferTarget.Renderbuffer;
@@ -177,8 +177,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		const RenderbufferStorage GLDepth24Stencil8 = RenderbufferStorage.Depth24Stencil8;
 		const FramebufferErrorCode GLFramebufferComplete = FramebufferErrorCode.FramebufferComplete;
 #endif
-
-        // TODO Graphics Device events need implementing
+		
+		// TODO Graphics Device events need implementing
 		public event EventHandler<EventArgs> DeviceLost;
 		public event EventHandler<EventArgs> DeviceReset;
 		public event EventHandler<EventArgs> DeviceResetting;
@@ -1045,6 +1045,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 _d3dContext.InputAssembler.SetVertexBuffers(0, _vertexBuffer._binding);
             else
                 _d3dContext.InputAssembler.SetVertexBuffers(0, null);
+#elif PSS
+            _graphics.SetVertexBuffer(0, vertexBuffer._buffer);
 #elif OPENGL
             if (_vertexBuffer != null)
                 GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBuffer.vbo);
@@ -1198,6 +1200,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			GL.DrawArrays(PrimitiveTypeGL(primitiveType),
 			              vertexStart,
 			              vertexCount);
+#elif PSS
+            _graphics.DrawArrays(PSSHelper.ToDrawMode(primitiveType), vertexStart, vertexCount);
 #endif
         }
 

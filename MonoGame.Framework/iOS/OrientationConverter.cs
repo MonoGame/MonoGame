@@ -80,8 +80,10 @@ namespace Microsoft.Xna.Framework
             case UIDeviceOrientation.FaceDown: return DisplayOrientation.FaceDown;
             case UIDeviceOrientation.FaceUp: return DisplayOrientation.FaceUp;
             default:
-            case UIDeviceOrientation.LandscapeLeft: return DisplayOrientation.LandscapeLeft;
-            case UIDeviceOrientation.LandscapeRight: return DisplayOrientation.LandscapeRight;
+			// NOTE: in XNA, Orientation Left is a 90 degree rotation counterclockwise, while on iOS
+			// it is a 90 degree rotation CLOCKWISE. They are BACKWARDS! 
+            case UIDeviceOrientation.LandscapeLeft: return DisplayOrientation.LandscapeRight;
+            case UIDeviceOrientation.LandscapeRight: return DisplayOrientation.LandscapeLeft;
             case UIDeviceOrientation.Portrait: return DisplayOrientation.Portrait;
             case UIDeviceOrientation.PortraitUpsideDown: return DisplayOrientation.PortraitUpsideDown;
             }
@@ -92,8 +94,10 @@ namespace Microsoft.Xna.Framework
             switch (orientation)
             {
             default:
-            case UIInterfaceOrientation.LandscapeLeft: return DisplayOrientation.LandscapeLeft;
-            case UIInterfaceOrientation.LandscapeRight: return DisplayOrientation.LandscapeRight;
+			// NOTE: in XNA, Orientation Left is a 90 degree rotation counterclockwise, while on iOS
+			// it is a 90 degree rotation CLOCKWISE. They are BACKWARDS! 
+            case UIInterfaceOrientation.LandscapeLeft: return DisplayOrientation.LandscapeRight;
+            case UIInterfaceOrientation.LandscapeRight: return DisplayOrientation.LandscapeLeft;
             case UIInterfaceOrientation.Portrait: return DisplayOrientation.Portrait;
             case UIInterfaceOrientation.PortraitUpsideDown: return DisplayOrientation.PortraitUpsideDown;
             }

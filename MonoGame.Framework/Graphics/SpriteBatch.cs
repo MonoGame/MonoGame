@@ -120,9 +120,14 @@ namespace Microsoft.Xna.Framework.Graphics
 			if (_effect == null) 
             {
 				Viewport vp = graphicsDevice.Viewport;
-				Matrix projection = Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, 0, 1);
+                Matrix projection = Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, 0, 1);
+#if PSS
+                //PSS doesn't need the half pixel offset
+                Matrix transform = _matrix * projection;
+#else
 				Matrix halfPixelOffset = Matrix.CreateTranslation(-0.5f, -0.5f, 0);
 				Matrix transform = _matrix * (halfPixelOffset * projection);
+#endif
 				spriteEffect.Parameters["MatrixTransform"].SetValue (transform);
 				
 				spriteEffect.CurrentTechnique.Passes[0].Apply();
