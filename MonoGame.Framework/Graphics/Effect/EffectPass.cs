@@ -102,8 +102,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private void Initialize()
         {
 #if OPENGL
-            Threading.Begin();
-            try
+            Threading.BlockOnUIThread(() =>
             {
                 // TODO: Shouldn't we be calling GL.DeleteProgram() somewhere?
 
@@ -134,11 +133,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
                     throw new InvalidOperationException("Unable to link effect program");
                 }
-            }
-            finally
-            {
-                Threading.End();
-            }
+            });
 
 #elif DIRECTX
 

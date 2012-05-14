@@ -81,6 +81,8 @@ namespace Microsoft.Xna.Framework
         double updateFrameLast;
         double renderFrameLast;
         public GraphicsContext BackgroundContext;
+        // Work-around for FrameEventArgs.Time being unusable as it is being modified by a background thread constantly
+        System.Diagnostics.Stopwatch frameTime = new System.Diagnostics.Stopwatch();
 
         public AndroidGameWindow(Context context, Game game) : base(context)
         {
@@ -153,9 +155,6 @@ namespace Microsoft.Xna.Framework
 		
 		protected override void CreateFrameBuffer()
 		{
-            // Allow threaded resource loading
-            OpenTK.Graphics.GraphicsContext.ShareContexts = true;
-
 #if true			
 			try
             {
@@ -174,25 +173,13 @@ namespace Microsoft.Xna.Framework
 
             if (!GraphicsContext.IsCurrent)
                 MakeCurrent();
-
-            // Create a context for the background loading
-            GraphicsContextFlags flags = GraphicsContextFlags.Default;
-#if DEBUG
-            //flags |= GraphicsContextFlags.Debug;
-#endif
-            GraphicsMode mode = new GraphicsMode();
-            BackgroundContext = new GraphicsContext(mode, WindowInfo, 2, 0, flags);
-            Threading.BackgroundContext = BackgroundContext;
-            Threading.WindowInfo = WindowInfo;
 		}
 
         protected override void OnLoad(EventArgs e)
         {
-            // FIXME: Uncomment this line when moving to Mono for Android 4.0.5
-            //MakeCurrent();
-
             // Make sure an Update is called before a Draw
             updateFrameElapsed = _game.TargetElapsedTime.TotalSeconds;
+            frameTime.Start();
 
             base.OnLoad(e);
         }
@@ -210,10 +197,13 @@ namespace Microsoft.Xna.Framework
             if (!GraphicsContext.IsCurrent)
                 MakeCurrent();
 
+            Threading.Run();
+
             if (_game != null)
             {
                 double targetElapsed = _game.TargetElapsedTime.TotalSeconds;
-                renderFrameElapsed += e.Time;
+                //renderFrameElapsed += e.Time;
+                renderFrameElapsed = frameTime.Elapsed.TotalSeconds;
                 if (renderFrameElapsed < (renderFrameLast + targetElapsed))
                     return;
 
@@ -238,10 +228,13 @@ namespace Microsoft.Xna.Framework
 		{			
 			base.OnUpdateFrame(e);
 
-			if (_game != null )
+            Threading.Run();
+            
+            if (_game != null)
 			{
                 double targetElapsed = _game.TargetElapsedTime.TotalSeconds;
-                updateFrameElapsed += e.Time;
+                //updateFrameElapsed += e.Time;
+                updateFrameElapsed = frameTime.Elapsed.TotalSeconds;
                 if (updateFrameElapsed < (updateFrameLast + targetElapsed))
                     return;
 

@@ -132,10 +132,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #endif // DIRECTX
 
-#if ANDROID
-    	internal GamePlatform platform;
-#endif
-
 #if OPENGL
 
 		// OpenGL ES2.0 attribute locations
@@ -759,7 +755,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #elif PSS
             _graphics.SwapBuffers();
 #elif ANDROID
-			platform.Present();
+			Game.Instance.Platform.Present();
 #elif OPENGL
 			GL.Flush ();
 #endif

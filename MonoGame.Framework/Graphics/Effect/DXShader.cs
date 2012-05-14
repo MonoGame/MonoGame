@@ -34,11 +34,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public readonly ShaderType ShaderType;
 
-        public readonly int ShaderHandle;
+        public int ShaderHandle;
 
 #if DEBUG
         // We only keep around the GLSL code for debugging.
-        private readonly string _glslCode;
+        private string _glslCode;
 #endif
 
         private readonly string _uniforms_float4_name;
@@ -199,8 +199,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
 #if OPENGL
-            Threading.Begin();
-            try
+            Threading.BlockOnUIThread(() =>
             {
                 ShaderHandle = GL.CreateShader(ShaderType);
 #if GLES
@@ -241,11 +240,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     GL.DeleteShader(ShaderHandle);
                     throw new InvalidOperationException("Shader Compilation Failed");
                 }
-            }
-            finally
-            {
-                Threading.End();
-            }
+            });
 #elif DIRECTX
 
             var d3dDevice = device._d3dDevice;

@@ -64,8 +64,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #elif PSS
             _buffer = new PssVertexBuffer(0, indexCount);
 #else
-            Threading.Begin();
-            try
+            Threading.BlockOnUIThread(() =>
             {
 #if IPHONE || ANDROID
                 GL.GenBuffers(1, ref ibo);
@@ -75,11 +74,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 GL.BindBuffer(BufferTarget.ElementArrayBuffer, ibo);
                 GL.BufferData(BufferTarget.ElementArrayBuffer,
                               (IntPtr)sizeInBytes, IntPtr.Zero, dynamic ? BufferUsageHint.StreamDraw : BufferUsageHint.StaticDraw);
-            }
-            finally
-            {
-                Threading.End();
-            }
+            });
 #endif
 		}
 		
@@ -109,8 +104,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #elif PSS
             throw new NotImplementedException();
 #else        
-            Threading.Begin();
-            try
+            Threading.BlockOnUIThread(() =>
             {
                 GL.BindBuffer(BufferTarget.ArrayBuffer, ibo);
                 var elementSizeInByte = Marshal.SizeOf(typeof(T));
@@ -142,11 +136,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
                 GL.UnmapBuffer(BufferTarget.ArrayBuffer);
 #endif
-            }
-            finally
-            {
-                Threading.End();
-            }
+            });
 #endif
         }
 
@@ -202,8 +192,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 _buffer.SetIndices(clone, 0, 0, elementCount);
             }
 #else
-            Threading.Begin();
-            try
+            Threading.BlockOnUIThread(() =>
             {
                 var elementSizeInByte = Marshal.SizeOf(typeof(T));
                 var sizeInBytes = elementSizeInByte * elementCount;
@@ -214,11 +203,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 GL.BufferSubData(BufferTarget.ElementArrayBuffer, (IntPtr)offsetInBytes, (IntPtr)sizeInBytes, dataPtr);
 
                 dataHandle.Free();
-            }
-            finally
-            {
-                Threading.End();
-            }
+            });
 #endif
 		}
 		

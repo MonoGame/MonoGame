@@ -161,8 +161,8 @@ namespace Microsoft.Xna.Framework
             // Get the Accelerometer going
             Accelerometer.SetupAccelerometer();
 
-            Window.Run(1.0 / Game.TargetElapsedTime.TotalSeconds);
-            //Window.Pause();
+            // Run it as fast as we can to allow for more response on threaded GPU resource creation
+            Window.Run();
 
             return false;
         }

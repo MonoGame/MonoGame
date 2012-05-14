@@ -78,8 +78,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 vertexFormat[i] = PSSHelper.ToVertexFormat(vertexDeclaration._elements[i].VertexElementFormat);
             _buffer = new PssVertexBuffer(vertexCount, 0, vertexFormat);
 #else
-            Threading.Begin();
-            try
+            Threading.BlockOnUIThread(() =>
             {
                 //GLExt.Oes.GenVertexArrays(1, out this.vao);
                 //GLExt.Oes.BindVertexArray(this.vao);
@@ -92,11 +91,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 GL.BufferData(BufferTarget.ArrayBuffer,
                               new IntPtr(vertexDeclaration.VertexStride * vertexCount), IntPtr.Zero,
                               dynamic ? BufferUsageHint.StreamDraw : BufferUsageHint.StaticDraw);
-            }
-            finally
-            {
-                Threading.End();
-            }
+            });
 #endif
 		}
 
@@ -126,8 +121,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #elif PSS
             throw new NotImplementedException();
 #else
-            Threading.Begin();
-            try
+            Threading.BlockOnUIThread(() =>
             {
                 GL.BindBuffer(BufferTarget.ArrayBuffer, vbo);
                 var elementSizeInByte = Marshal.SizeOf(typeof(T));
@@ -161,11 +155,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
                 GL.UnmapBuffer(BufferTarget.ArrayBuffer);
 #endif
-            }
-            finally
-            {
-                Threading.End();
-            }
+            });
 #endif
         }
 
@@ -217,17 +207,12 @@ namespace Microsoft.Xna.Framework.Graphics
             var elementSizeInBytes = Marshal.SizeOf(typeof(T));
             _buffer.SetVertices(data, startIndex, offsetInBytes / elementSizeInBytes, vertexStride);
 #else
-            Threading.Begin();
-            try
+            Threading.BlockOnUIThread(() =>
             {
                 var sizeInBytes = elementSizeInBytes * elementCount;
                 GL.BindBuffer(BufferTarget.ArrayBuffer, vbo);
                 GL.BufferSubData<T>(BufferTarget.ArrayBuffer, new IntPtr(offsetInBytes), new IntPtr(sizeInBytes), data);
-            }
-            finally
-            {
-                Threading.End();
-            }
+            });
 #endif
         }
 		

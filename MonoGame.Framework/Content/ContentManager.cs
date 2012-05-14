@@ -162,37 +162,45 @@ namespace Microsoft.Xna.Framework.Content
             }
 
             T result = default(T);
-            // Serialize access to loadedAssets with a lock
-            lock (ContentManagerLock)
+
+            // Check for a previously loaded asset first
+            object asset = null;
+            if (loadedAssets.TryGetValue(assetName, out asset))
             {
-                // Check for a previously loaded asset first
-                object asset = null;
-                if (loadedAssets.TryGetValue(assetName, out asset))
+                if (asset is T)
                 {
-                    if (asset is T)
-                    {
-                        return (T)asset;
-                    }
-                }
-
-                // Load the asset.
-                result = ReadAsset<T>(assetName, null);
-
-                // Cache the result.
-                if (!loadedAssets.ContainsKey(assetName))
-                {
-                    loadedAssets.Add(assetName, result);
+                    return (T)asset;
                 }
             }
-			return result;
+
+            // Load the asset.
+            result = ReadAsset<T>(assetName, null);
+
+            // Cache the result.
+            if (!loadedAssets.ContainsKey(assetName))
+            {
+                loadedAssets.Add(assetName, result);
+            }
+
+            return result;
 		}
 		
 		protected virtual Stream OpenStream(string assetName)
 		{
 			Stream stream;
-			try {
-				string assetPath = Path.Combine (_rootDirectory, assetName)+".xnb";
+			try
+            {
+				string assetPath = Path.Combine(_rootDirectory, assetName) + ".xnb";
                 stream = TitleContainer.OpenStream(assetPath);
+#if ANDROID
+                // Read the asset into memory in one go. This results in a ~50% reduction
+                // in load times on Android due to slow Android asset streams.
+                MemoryStream memStream = new MemoryStream();
+                stream.CopyTo(memStream);
+                memStream.Seek(0, SeekOrigin.Begin);
+                stream.Close();
+                stream = memStream;
+#endif
 			}
 			catch (FileNotFoundException fileNotFound)
 			{
@@ -236,11 +244,14 @@ namespace Microsoft.Xna.Framework.Content
 			
 			Stream stream = null;
 			bool loadXnb = false;
-			try {
+			try
+            {
 				//try load it traditionally
 				stream = OpenStream(assetName);
 				loadXnb = true;
-			} catch (ContentLoadException) {
+			}
+            catch (ContentLoadException)
+            {
 				//MonoGame try to load as a non-content file
 				
 				assetName = TitleContainer.GetFilename(Path.Combine (_rootDirectory, assetName));
