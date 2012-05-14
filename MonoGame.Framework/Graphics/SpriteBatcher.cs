@@ -131,19 +131,20 @@ namespace Microsoft.Xna.Framework.Graphics
 				_index[i*6+5] = (ushort)(i*4+2);
 			}
 #elif PSS
-            _vertexArray = new VertexPosition2ColorTexture[4 * InitialVertexArraySize];
-            _vertexBuffer = new PssVertexBuffer(4 * InitialVertexArraySize, 6 * InitialVertexArraySize, VertexFormat.Float2, VertexFormat.UByte4N, VertexFormat.Float2);
-            _index = new ushort[6 * InitialVertexArraySize];
+        _vertexArray = new VertexPosition2ColorTexture[4 * InitialVertexArraySize];
+        _vertexBuffer = new PssVertexBuffer(4 * InitialVertexArraySize, 6 * InitialVertexArraySize, VertexFormat.Float2, VertexFormat.UByte4N, VertexFormat.Float2);
+        _index = new ushort[6 * InitialVertexArraySize];
 
-            for ( int i = 0; i < InitialVertexArraySize; i++ )
-         {
-             _index[i*6+0] = (ushort)(i*4);
-             _index[i*6+1] = (ushort)(i*4+1);
-             _index[i*6+2] = (ushort)(i*4+2);
-             _index[i*6+3] = (ushort)(i*4+1);
-             _index[i*6+4] = (ushort)(i*4+3);
-             _index[i*6+5] = (ushort)(i*4+2);
-         }
+        for ( int i = 0; i < InitialVertexArraySize; i++ )
+        {
+            _index[i*6+0] = (ushort)(i*4);
+            _index[i*6+1] = (ushort)(i*4+1);
+            _index[i*6+2] = (ushort)(i*4+2);
+            _index[i*6+3] = (ushort)(i*4+1);
+            _index[i*6+4] = (ushort)(i*4+3);
+            _index[i*6+5] = (ushort)(i*4+2);
+        }
+        _vertexBuffer.SetIndices(_index, 0, 0, 6 * InitialVertexArraySize);
 #endif
 		}
 		
@@ -343,6 +344,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 _index[i*6+4] = (ushort)(i*4+3);
                 _index[i*6+5] = (ushort)(i*4+2);
             }
+            _vertexBuffer.SetIndices(_index, 0, 0, 6 * newCount);
 #endif
 		}
 
@@ -367,7 +369,6 @@ namespace Microsoft.Xna.Framework.Graphics
             
             var vertexCount = end - start;
             _vertexBuffer.SetVertices(_vertexArray, start, start, vertexCount);
-            _vertexBuffer.SetIndices(_index, start / 2 * 3, start / 2 * 3, vertexCount / 2 * 3);
             _device._graphics.SetVertexBuffer(0, _vertexBuffer);
             _device._graphics.DrawArrays(DrawMode.Triangles, start / 2 * 3, vertexCount / 2 * 3);
 #endif
