@@ -241,10 +241,8 @@ namespace Microsoft.Xna.Framework
             Vector2 pos = new Vector2((float)args.CurrentPoint.Position.X, (float)args.CurrentPoint.Position.Y) * dipFactor;
             bool isTouch = args.CurrentPoint.PointerDevice.PointerDeviceType == Windows.Devices.Input.PointerDeviceType.Touch;
             if (isTouch)
-            {
-                // Touch panel event
-                TouchPanel.Collection.Update((int)args.CurrentPoint.PointerId, TouchLocationState.Moved, pos);
-            }
+                TouchPanel.AddEvent(new TouchLocation((int)args.CurrentPoint.PointerId, TouchLocationState.Moved, pos));
+
             if (!isTouch || args.CurrentPoint.Properties.IsPrimary)
             {
                 // Mouse or stylus event or the primary touch event (simulated as mouse input)
@@ -258,10 +256,8 @@ namespace Microsoft.Xna.Framework
             Vector2 pos = new Vector2((float)args.CurrentPoint.Position.X, (float)args.CurrentPoint.Position.Y) * dipFactor;
             bool isTouch = args.CurrentPoint.PointerDevice.PointerDeviceType == Windows.Devices.Input.PointerDeviceType.Touch;
             if (isTouch)
-            {
-                // Touch panel event
-                TouchPanel.Collection.Update((int)args.CurrentPoint.PointerId, TouchLocationState.Released, pos);
-            }
+                TouchPanel.AddEvent(new TouchLocation((int)args.CurrentPoint.PointerId, TouchLocationState.Released, pos));
+
             if (!isTouch || args.CurrentPoint.Properties.IsPrimary)
             {
                 // Mouse or stylus event or the primary touch event (simulated as mouse input)
@@ -275,10 +271,8 @@ namespace Microsoft.Xna.Framework
             Vector2 pos = new Vector2((float)args.CurrentPoint.Position.X, (float)args.CurrentPoint.Position.Y) * dipFactor;
             bool isTouch = args.CurrentPoint.PointerDevice.PointerDeviceType == Windows.Devices.Input.PointerDeviceType.Touch;
             if (isTouch)
-            {
-                // Touch panel event
-                TouchPanel.Collection.Add((int)args.CurrentPoint.PointerId, pos);
-            }
+                TouchPanel.AddEvent(new TouchLocation((int)args.CurrentPoint.PointerId, TouchLocationState.Pressed, pos));
+
             if (!isTouch || args.CurrentPoint.Properties.IsPrimary)
             {
                 // Mouse or stylus event or the primary touch event (simulated as mouse input)

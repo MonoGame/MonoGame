@@ -42,14 +42,29 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 #endregion Using clause
 
 namespace Microsoft.Xna.Framework.Input.Touch
 {
     public static class TouchPanel
     {
-		internal static TouchCollection Collection = new TouchCollection();
-		internal static Queue<GestureSample> GestureList = new Queue<GestureSample>();
+        /// <summary>
+        /// The currently touch state.
+        /// </summary>
+        private static Dictionary<int, TouchLocation> _state = new Dictionary<int, TouchLocation>();
+
+        /// <summary>
+        /// The touch events to be processed and added to the current state.
+        /// </summary>
+        private static List<TouchLocation> _events = new List<TouchLocation>();
+
+        /// <summary>
+        /// Scratch list used to remove touch state.
+        /// </summary>
+        private static List<int> _removeId = new List<int>();
+
+        internal static Queue<GestureSample> GestureList = new Queue<GestureSample>();
 		internal static event EventHandler EnabledGesturesChanged;
         internal static TouchPanelCapabilities Capabilities = new TouchPanelCapabilities();
 
@@ -61,16 +76,62 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
         public static TouchCollection GetState()
         {
-			TouchCollection result = new TouchCollection(Collection);		
-			Collection.Update();
-			return result;
-        }       
-		
-		public static void Reset()
-		{
-			Collection.Clear();
-		}
-		
+            // Remove the previously released states.
+            foreach (var keyLoc in _state)
+            {
+                if (keyLoc.Value.State == TouchLocationState.Released)
+                    _removeId.Add(keyLoc.Key);
+            }
+            foreach (var id in _removeId)
+                _state.Remove(id);
+
+            // Update the existing states.
+            for (var i = 0; i < _events.Count; )
+            {
+                var loc = _events[i];
+
+                TouchLocation prev;
+                if (_state.TryGetValue(loc.Id, out prev))
+                {
+                    prev.Position = loc.Position;
+                    prev.State = loc.State;
+                    _state[loc.Id] = prev;
+
+                    _events.RemoveAt(i);
+                    continue;
+                }
+
+                i++;
+            }
+            
+            // Add any new pressed events.
+            for (var i = 0; i < _events.Count; )
+            {
+                var loc = _events[i];
+
+                if (loc.State == TouchLocationState.Pressed)
+                {
+                    _state.Add(loc.Id, loc);
+                    _events.RemoveAt(i);
+                    continue;
+                }
+
+                i++;
+            }
+            
+            // Build the new touch collection.
+            var state = new TouchCollection();
+            foreach (var keyLoc in _state)
+                state.Add(keyLoc.Value);
+
+            return state;
+        }
+
+        internal static void AddEvent(TouchLocation location)
+        {
+            _events.Add(location);
+        }
+
 		public static GestureSample ReadGesture()
         {
 			return GestureList.Dequeue();			
