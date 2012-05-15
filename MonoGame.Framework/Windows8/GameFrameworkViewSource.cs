@@ -1,14 +1,15 @@
 ﻿
 using Windows.ApplicationModel.Core;
+using Microsoft.Xna.Framework;
 
 namespace MonoGame.Framework
 {
     public class GameFrameworkViewSource<T> : IFrameworkViewSource
-        where T : IFrameworkView, new()
+        where T : Game, new()
     {
         public IFrameworkView CreateView()
         {
-            return new T();
+            return new MetroFrameworkView<T>();
         }
     }
 }

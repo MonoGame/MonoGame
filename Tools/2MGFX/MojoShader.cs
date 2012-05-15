@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-	internal class MojoShader
+	public class MojoShader
     {
 #if WINDOWS
         const string mojoshader_dll = "libmojoshader_32.dll";
