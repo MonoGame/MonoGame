@@ -43,54 +43,128 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 #endregion Using clause
 
 namespace Microsoft.Xna.Framework.Input.Touch
-{	
-	public class TouchCollection : List<TouchLocation>
+{
+    public struct TouchCollection : IList<TouchLocation>
 	{
-		/// <summary>
-		/// Attributes 
-		/// </summary>
-		private bool isConnected;
-		
+        private TouchLocation[] _collection;
+
+        private bool _isConnected;
+
 		#region Properties
 
-		public bool IsConnected
-		{
-			get
-			{
-				return this.isConnected;
-			}
-		}
-
-		public bool IsReadOnly
-		{
-			get
-			{
-				return true;
-			}
-		}
+		public bool IsConnected { get { return _isConnected; } }
 
 		#endregion
-		
-		public TouchCollection()
-		{
-		}
 
-		public bool FindById(int id, out TouchLocation touchLocation)
+        public TouchCollection(TouchLocation[] touches)
+        {
+            _isConnected = true;
+            _collection = touches;
+        }
+
+        public bool FindById(int id, out TouchLocation touchLocation)
 		{
-            for (var i = 0; i < this.Count; i++)
+            for (var i = 0; i < _collection.Length; i++)
             {
-                var location = this[i];
+                var location = _collection[i];
                 if (location.Id == id)
                 {
                     touchLocation = location;
                     return true;
                 }
             }
+
             touchLocation = default(TouchLocation);
             return false;
 		}
-	}
+
+        #region IList<TouchLocation>
+
+        public bool IsReadOnly
+        {
+            get { return true; }
+        }
+
+        public int IndexOf(TouchLocation item)
+        {
+            for (var i = 0; i < _collection.Length; i++)
+            {
+                if (item == _collection[i])
+                    return i;
+            }
+
+            return -1;
+        }
+
+        public void Insert(int index, TouchLocation item)
+        {
+            throw new NotSupportedException();
+        }
+
+        public void RemoveAt(int index)
+        {
+            throw new NotSupportedException();
+        }
+
+        public TouchLocation this[int index]
+        {
+            get { return _collection[index]; }
+            set
+            {
+                throw new NotSupportedException();
+            }
+        }
+
+        public void Add(TouchLocation item)
+        {
+            throw new NotSupportedException();
+        }
+
+        public void Clear()
+        {
+            throw new NotSupportedException();
+        }
+
+        public bool Contains(TouchLocation item)
+        {
+            for (var i = 0; i < _collection.Length; i++)
+            {
+                if (item == _collection[i])
+                    return true;
+            }
+
+            return false;
+        }
+
+        public void CopyTo(TouchLocation[] array, int arrayIndex)
+        {
+            _collection.CopyTo(array, arrayIndex);
+        }
+
+        public int Count
+        {
+            get { return _collection.Length; }
+        }
+
+        public bool Remove(TouchLocation item)
+        {
+            throw new NotSupportedException();
+        }
+
+        public IEnumerator<TouchLocation> GetEnumerator()
+        {
+            return _collection.AsEnumerable().GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return _collection.GetEnumerator();
+        }
+
+        #endregion // IList<TouchLocation>
+    }
 }

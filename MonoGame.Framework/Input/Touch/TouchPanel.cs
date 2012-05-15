@@ -43,6 +43,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 #endregion Using clause
 
 namespace Microsoft.Xna.Framework.Input.Touch
@@ -93,10 +94,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
                 TouchLocation prev;
                 if (_state.TryGetValue(loc.Id, out prev))
                 {
-                    prev.Position = loc.Position;
-                    prev.State = loc.State;
-                    _state[loc.Id] = prev;
-
+                    _state[loc.Id] = new TouchLocation(loc.Id, loc.State, loc.Position, prev.State, prev.Position);
                     _events.RemoveAt(i);
                     continue;
                 }
@@ -119,12 +117,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
                 i++;
             }
             
-            // Build the new touch collection.
-            var state = new TouchCollection();
-            foreach (var keyLoc in _state)
-                state.Add(keyLoc.Value);
-
-            return state;
+            // Return the new state.
+            return new TouchCollection(_state.Values.ToArray());
         }
 
         internal static void AddEvent(TouchLocation location)
