@@ -73,8 +73,12 @@ namespace Microsoft.Xna.Framework.Graphics
 		Queue<SpriteBatchItem> _freeBatchItemQueue;
 
         GraphicsDevice _device;
-
+  
+#if PSS
+        ushort[] _index;
+#else
         short[] _index;
+#endif
 
 #if DIRECTX
         VertexPositionColorTexture[] _vertexArray;
@@ -85,7 +89,6 @@ namespace Microsoft.Xna.Framework.Graphics
 #elif PSS
         PssVertexBuffer _vertexBuffer;
         VertexPosition2ColorTexture[] _vertexArray;
-        ushort[] _index;
 #endif
 
 		public SpriteBatcher (GraphicsDevice device)
@@ -95,6 +98,18 @@ namespace Microsoft.Xna.Framework.Graphics
 			_batchItemList = new List<SpriteBatchItem>(InitialBatchSize);
 			_freeBatchItemQueue = new Queue<SpriteBatchItem>(InitialBatchSize);
 
+#if PSS
+            _index = new ushort[6 * InitialVertexArraySize];
+            for (int i = 0; i < InitialVertexArraySize; i++)
+            {
+                _index[i * 6 + 0] = (ushort)(i * 4);
+                _index[i * 6 + 1] = (ushort)(i * 4 + 1);
+                _index[i * 6 + 2] = (ushort)(i * 4 + 2);
+                _index[i * 6 + 3] = (ushort)(i * 4 + 1);
+                _index[i * 6 + 4] = (ushort)(i * 4 + 3);
+                _index[i * 6 + 5] = (ushort)(i * 4 + 2);
+            }
+#else
             _index = new short[6 * InitialVertexArraySize];
             for (int i = 0; i < InitialVertexArraySize; i++)
             {
@@ -105,6 +120,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 _index[i * 6 + 4] = (short)(i * 4 + 3);
                 _index[i * 6 + 5] = (short)(i * 4 + 2);
             }
+#endif
 
 #if DIRECTX
             _vertexArray = new VertexPositionColorTexture[InitialVertexArraySize * 4];
@@ -113,20 +129,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			_vertexHandle = GCHandle.Alloc(_vertexArray,GCHandleType.Pinned);
 			_indexHandle = GCHandle.Alloc(_index,GCHandleType.Pinned);
 #elif PSS
-        _vertexArray = new VertexPosition2ColorTexture[4 * InitialVertexArraySize];
-        _vertexBuffer = new PssVertexBuffer(4 * InitialVertexArraySize, 6 * InitialVertexArraySize, VertexFormat.Float2, VertexFormat.UByte4N, VertexFormat.Float2);
-        _index = new ushort[6 * InitialVertexArraySize];
-
-        for ( int i = 0; i < InitialVertexArraySize; i++ )
-        {
-            _index[i*6+0] = (ushort)(i*4);
-            _index[i*6+1] = (ushort)(i*4+1);
-            _index[i*6+2] = (ushort)(i*4+2);
-            _index[i*6+3] = (ushort)(i*4+1);
-            _index[i*6+4] = (ushort)(i*4+3);
-            _index[i*6+5] = (ushort)(i*4+2);
-        }
-        _vertexBuffer.SetIndices(_index, 0, 0, 6 * InitialVertexArraySize);
+            _vertexArray = new VertexPosition2ColorTexture[4 * InitialVertexArraySize];
+            _vertexBuffer = new PssVertexBuffer(4 * InitialVertexArraySize, 6 * InitialVertexArraySize, VertexFormat.Float2, VertexFormat.UByte4N, VertexFormat.Float2);
+            _vertexBuffer.SetIndices(_index, 0, 0, 6 * InitialVertexArraySize);
 #endif
 		}
 		
@@ -293,8 +298,20 @@ namespace Microsoft.Xna.Framework.Graphics
 			while ( batchSize*4 > newCount )
 				newCount += 128;
 			
+#if PSS
+            _index = new ushort[6 * newCount];
+            for (int i = 0; i < newCount; i++)
+            {
+                _index[i * 6 + 0] = (ushort)(i * 4);
+                _index[i * 6 + 1] = (ushort)(i * 4 + 1);
+                _index[i * 6 + 2] = (ushort)(i * 4 + 2);
+                _index[i * 6 + 3] = (ushort)(i * 4 + 1);
+                _index[i * 6 + 4] = (ushort)(i * 4 + 3);
+                _index[i * 6 + 5] = (ushort)(i * 4 + 2);
+            }
+#else
             _index = new short[6 * newCount];
-            for (var i = 0; i < newCount; i++)
+            for (int i = 0; i < newCount; i++)
             {
                 _index[i * 6 + 0] = (short)(i * 4);
                 _index[i * 6 + 1] = (short)(i * 4 + 1);
@@ -303,6 +320,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 _index[i * 6 + 4] = (short)(i * 4 + 3);
                 _index[i * 6 + 5] = (short)(i * 4 + 2);
             }
+#endif
 
 #if DIRECTX
             _vertexArray = new VertexPositionColorTexture[4 * newCount];
