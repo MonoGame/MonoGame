@@ -94,8 +94,26 @@ namespace Microsoft.Xna.Framework.Input.Touch
                 TouchLocation prev;
                 if (_state.TryGetValue(loc.Id, out prev))
                 {
-                    _state[loc.Id] = new TouchLocation(loc.Id, loc.State, loc.Position, prev.State, prev.Position);
+                    // Remove this event.
                     _events.RemoveAt(i);
+                    
+                    // Remove any pending events of this type.
+                    for (var j = i; j < _events.Count;)
+                    {
+                        if (_events[j].Id == loc.Id)
+                        {
+                            loc = _events[j];
+                            _events.RemoveAt(j);
+                            continue;
+                        }
+
+                        j++;
+                    }
+                    
+                    // Set the new state.
+                    _state[loc.Id] = new TouchLocation( loc.Id, 
+                                                        loc.State, loc.Position, loc.Pressure, 
+                                                        prev.State, prev.Position, prev.Pressure);
                     continue;
                 }
 

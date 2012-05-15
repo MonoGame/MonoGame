@@ -55,10 +55,10 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		private TouchLocationState state;
 		private TouchLocationState previousState;
 		
+        // TODO: Lets try to remove these.
 		internal long? timeTouchBegan;
 		internal Vector2 startingPosition;
-		
-		
+				
 		// Only used in Android, for now
 		private float pressure;
 		private float previousPressure;
@@ -67,21 +67,17 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		public int Id 
 		{ 
 			get
-	        	{
-	            	return id;
-	        	}
+	        {
+	            return id;
+	        }
 		}
 
         public Vector2 Position 
 		{ 
 			get
-	        	{
-	            	return position;
-	        	} 
-			set {
-				previousPosition = position;
-				position = value;
-			}
+	        {
+	            return position;
+	        }
 		}
 		
 		public float Pressure 
@@ -91,63 +87,31 @@ namespace Microsoft.Xna.Framework.Input.Touch
             	return pressure;
         	}
 		}
-		
-		internal long Lifetime
-		{
-			get 
-			{
-				var curTime = DateTime.Now.Ticks;
-				var beginningOfLife = timeTouchBegan.GetValueOrDefault(curTime);
-				var difference = curTime - beginningOfLife;
-				
-				return difference;
-			}
-		}
-		
-		public float PrevPressure 
-		{ 
-			get
-        	{
-            	return previousPressure;
-        	}
-		}
-		
-		public Vector2 PrevPosition
-		{
-			get{
-				return previousPosition;
-			}
-			set{
-				previousPosition = value;
-			}
-		}
-		
+								
         public TouchLocationState State 
 		{ 
 			get
-	        	{
-	            	return state;
-	        	} 
-			set
-			{
-				previousState = state;
-				state = value;
-			}
+	        {
+	            return state;
+	        } 
 		}
-		public TouchLocationState PrevState
-		{
-			get
-			{
-				return previousState;
-			}
-			set{
-				previousState = value;
-			}
-		}
+
+        internal long Lifetime
+        {
+            get
+            {
+                var curTime = DateTime.Now.Ticks;
+                var beginningOfLife = timeTouchBegan.GetValueOrDefault(curTime);
+                var difference = curTime - beginningOfLife;
+
+                return difference;
+            }
+        }
 		
 		#endregion
 		
 		#region Constructors
+
 		public TouchLocation(int aId, TouchLocationState aState, Vector2 aPosition,
 		                     TouchLocationState aPreviousState, Vector2 aPreviousPosition)
         {
