@@ -248,7 +248,6 @@ namespace Microsoft.Xna.Framework {
 			if (touches.Count == 0)
 				return;
 
-			TouchCollection collection = TouchPanel.Collection;
 			var touchesArray = touches.ToArray<UITouch> ();
 			for (int i = 0; i < touchesArray.Length; ++i) {
 				var touch = touchesArray [i];
@@ -258,17 +257,11 @@ namespace Microsoft.Xna.Framework {
 				var position = GetOffsetPosition (new Vector2 (location.X, location.Y), true);
 				var id = touch.Handle.ToInt32 ();
 
-				switch (touch.Phase) {
+				switch (touch.Phase) 
+                {
 				//case UITouchPhase.Stationary:
 				case UITouchPhase.Moved:
-					
-					TouchLocation loc;
-					// Don't process a "moved" if we didn't!
-					if (collection.FindIndexById(id, out loc) == -1 || loc.Position == position)
-						break;
-					
-					collection.Update(id, TouchLocationState.Moved, position);
-					
+					TouchPanel.AddEvent(new TouchLocation(id, TouchLocationState.Moved, position));					
 					if (i == 0) 
 					{
 						Mouse.State.X = (int) position.X;
@@ -276,24 +269,25 @@ namespace Microsoft.Xna.Framework {
 					}
 					break;
 				case UITouchPhase.Began:
-					collection.Add (id, position);
-					if (i == 0) {
+                    TouchPanel.AddEvent(new TouchLocation(id, TouchLocationState.Pressed, position));
+					if (i == 0) 
+                    {
 						Mouse.State.X = (int) position.X;
 						Mouse.State.Y = (int) position.Y;
 						Mouse.State.LeftButton = ButtonState.Pressed;
 					}
 					break;
 				case UITouchPhase.Ended	:
-					collection.Update (id, TouchLocationState.Released, position);
-
-					if (i == 0) {
+                    TouchPanel.AddEvent(new TouchLocation(id, TouchLocationState.Released, position));
+					if (i == 0) 
+                    {
 						Mouse.State.X = (int) position.X;
 						Mouse.State.Y = (int) position.Y;
 						Mouse.State.LeftButton = ButtonState.Released;
 					}
 					break;
 				case UITouchPhase.Cancelled:
-					collection.Update (id, TouchLocationState.Invalid, position);
+                    TouchPanel.AddEvent(new TouchLocation(id, TouchLocationState.Released, position));
 					break;
 				default:
 					break;
