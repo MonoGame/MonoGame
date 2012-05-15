@@ -179,7 +179,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			// nothing to do
 			if ( _batchItemList.Count == 0 )
 				return;
-			
 			// sort the batch items
 			switch ( sortMode )
 			{
@@ -241,11 +240,14 @@ namespace Microsoft.Xna.Framework.Graphics
 #if DIRECTX
             _device.SetVertexBuffer(_vertexBuffer);
             _device.Indices = _indexBuffer;
+#elif PSS
+            _device._graphics.SetVertexBuffer(0, _vertexBuffer);
 #endif
-
-			foreach ( var item in _batchItemList )
+            for (int i = 0; i < _batchItemList.Count; i++)
 			{
+                var item = _batchItemList[i];
 				// if the texture changed, we need to flush and bind the new texture
+#if !PSS
 				bool shouldFlush = item.Texture != tex;
 				if ( shouldFlush )
 				{
@@ -260,10 +262,9 @@ namespace Microsoft.Xna.Framework.Graphics
 					GL.BindTexture ( TextureTarget.Texture2D, tex.glTexture );
 
 					samplerState.Activate(TextureTarget.Texture2D);
-#elif PSS
-                    _device._graphics.SetTexture(0, tex._texture2D);
 #endif
                 }
+#endif
 
 				// store the SpriteBatchItem data in our vertexArray
 				_vertexArray[index++] = item.vertexTL;
@@ -273,6 +274,27 @@ namespace Microsoft.Xna.Framework.Graphics
 				
 				_freeBatchItemQueue.Enqueue ( item );
 			}
+
+#if PSS
+            _vertexBuffer.SetVertices(_vertexArray, 0, 0, index);
+            startIndex = index = 0;
+            
+            for (int i = 0; i < _batchItemList.Count; i++)
+            {
+                var item = _batchItemList[i];
+                // if the texture changed, we need to flush and bind the new texture
+                bool shouldFlush = item.Texture != tex;
+                if ( shouldFlush )
+                {
+                    FlushVertexArray( startIndex, index );
+                    startIndex = index;
+                    tex = item.Texture;
+                    
+                    _device._graphics.SetTexture(0, tex._texture2D);
+                }
+                index += 4;
+            }
+#endif
 
 			// flush the remaining vertexArray data
 			FlushVertexArray(startIndex, index);
@@ -368,8 +390,6 @@ namespace Microsoft.Xna.Framework.Graphics
             _device._graphics.SetBlendFunc(BlendFuncMode.Add, BlendFuncFactor.SrcAlpha, BlendFuncFactor.OneMinusSrcAlpha);
             
             var vertexCount = end - start;
-            _vertexBuffer.SetVertices(_vertexArray, start, start, vertexCount);
-            _device._graphics.SetVertexBuffer(0, _vertexBuffer);
             _device._graphics.DrawArrays(DrawMode.Triangles, start / 2 * 3, vertexCount / 2 * 3);
 #endif
 		}
