@@ -62,11 +62,14 @@ namespace Microsoft.Xna.Framework.Content
 		protected internal override Song Read(ContentReader input, Song existingInstance)
 		{
 			string path = input.ReadString();
-			path = Path.Combine (input.ContentManager.RootDirectory, path);
+			
+			// Songs don't have the full directory path in their .xnb. Build it.
+			path = Path.Combine (input.ContentManager.RootDirectory, input.ContentManager.CurrentAssetDirectory, path);
 			path = TitleContainer.GetFilename(path);
 
 			/*int durationMS =*/ input.ReadObject<int>();
-			return new Song(path);
+			
+			return new Song(path); 
 		}
 	}
 }

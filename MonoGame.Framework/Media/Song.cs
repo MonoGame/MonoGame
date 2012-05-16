@@ -42,19 +42,63 @@ using System;
 using System.IO;
 
 using Microsoft.Xna.Framework.Audio;
+
+#if IPHONE
+using MonoTouch.Foundation;
+using MonoTouch.AVFoundation;
+#endif
 ﻿
 namespace Microsoft.Xna.Framework.Media
 {
     public class Song : IEquatable<Song>, IDisposable
     {
+#if IPHONE
+		private AVAudioPlayer _sound;
+#else
 		private SoundEffectInstance _sound;
+#endif
+		
 		private string _name;
 		private int _playCount;
+		
+		public delegate void FinishedPlayingHandler(object sender, EventArgs args);
+		public event FinishedPlayingHandler DonePlaying;
 		
 		internal Song(string fileName)
 		{			
 			_name = fileName;
+			
+#if IPHONE
+			_sound = AVAudioPlayer.FromUrl(NSUrl.FromFilename(fileName));
+			_sound.NumberOfLoops = 0;
+#else
 			_sound = new SoundEffect(_name).CreateInstance();
+#endif
+			_sound.FinishedPlaying += OnFinishedPlaying;
+		}
+		
+		internal void OnFinishedPlaying (object sender, EventArgs args)
+		{
+			if (DonePlaying == null)
+				return;
+			
+			DonePlaying(sender, args);
+		}
+		
+		/// <summary>
+		/// Set the event handler for "Finished Playing". Done this way to prevent multiple bindings.
+		/// </summary>
+		public void SetEventHandler(FinishedPlayingHandler handler)
+		{
+			if (DonePlaying != null)
+				return;
+			
+			DonePlaying += handler;
+		}
+		
+		public string FilePath
+		{
+			get { return _name; }
 		}
 		
 		public void Dispose()
@@ -99,60 +143,42 @@ namespace Microsoft.Xna.Framework.Media
 		
 		internal void Play()
 		{			
-			if ( _sound != null )
-			{
-				_sound.Play();
-				_playCount++;
-			}
+			if ( _sound == null )
+				return;
+			
+			_sound.Play();
+			_playCount++;
         }
 
 		internal void Resume()
 		{
-			if ( _sound != null )
-			{
-				_sound.Resume();
-			}
+			if (_sound == null)
+				return;
+			
+#if IPHONE
+			_sound.Play();
+#else
+			_sound.Resume();
+#endif
+
 		}
 		
 		internal void Pause()
 		{			
-			if ( _sound != null )
-			{
-				_sound.Pause();
-			}
+			if ( _sound == null )
+				return;
+			
+			_sound.Pause();
         }
 		
 		internal void Stop()
 		{
-			if ( _sound != null )
-			{
-				_sound.Stop();
-			}
-		}
-		
-		internal bool Loop
-		{
-			get
-			{
-				if ( _sound != null )
-				{
-					return _sound.IsLooped;
-				}
-				else
-				{
-				 	return false;	
-				}
-			}
-			set 
-			{
-				if ( _sound != null )
-				{
-					if ( _sound.IsLooped != value )
-					{
-						_sound.IsLooped = value;
-					}
-				}
-			}
+			if ( _sound == null )
+				return;
+			
+			_sound.Stop();
+			
+			_playCount = 0;
 		}
 		
 		internal float Volume
@@ -160,27 +186,19 @@ namespace Microsoft.Xna.Framework.Media
 			get
 			{
 				if (_sound != null)
-				{
 					return _sound.Volume;
-				}
 				else
-				{
 					return 0.0f;
-				}
 			}
 			
 			set
 			{
-				if ( _sound != null )
-				{
-					if ( _sound.Volume != value )
-					{
-						_sound.Volume = value;
-					}
-				}
+				if ( _sound != null && _sound.Volume != value )
+					_sound.Volume = value;
 			}			
 		}
 		
+		// TODO: Implement
         public TimeSpan Duration
         {
             get
@@ -198,6 +216,7 @@ namespace Microsoft.Xna.Framework.Media
             }
         }
 		
+		// TODO: Implement
 		public TimeSpan Position
         {
             get
