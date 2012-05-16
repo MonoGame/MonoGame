@@ -55,7 +55,15 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		private TouchLocationState state;
 		private TouchLocationState previousState;
 		
+		// On some platforms, events can come in quicker than they
+		// are processed. This can allow for a touch to enter it's "moved"
+		// or even "released" state before "pressed". This flag forces
+		// us to give time to process a pressed touch
 		internal bool pressedStateProcessed;
+		
+		// Flag to let the system know that the released
+		// state has been processed and can safely be removed
+		internal bool releasedStateProcessed;
 		internal long? timeTouchBegan;
 		internal Vector2 startingPosition;
 		
@@ -147,16 +155,6 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			}
 		}
 		
-		// On some platforms, events can come in quicker than they
-		// are processed. This can allow for a touch to enter it's "moved"
-		// or even "released" state before "pressed". This flag forces
-		// us to give time to process a pressed touch
-		internal bool PressedStateProcessed 
-		{ 
-			get { return pressedStateProcessed; } 
-			set { pressedStateProcessed = value; }
-		}
-		
 		#endregion
 		
 		#region Constructors
@@ -172,6 +170,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			previousPressure = 0.0f;
 			timeTouchBegan = DateTime.Now.Ticks;
 			pressedStateProcessed = false;
+			releasedStateProcessed = false;
         }
 
         public TouchLocation(int aId, TouchLocationState aState, Vector2 aPosition)
@@ -185,6 +184,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			previousPressure = 0.0f;
 			timeTouchBegan = DateTime.Now.Ticks;
 			pressedStateProcessed = false;
+			releasedStateProcessed = false;
         }
 		
 		// Only for Android
@@ -200,6 +200,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			previousPressure = aPreviousPressure;
 			timeTouchBegan = DateTime.Now.Ticks;
 			pressedStateProcessed = false;
+			releasedStateProcessed = false;
         }
 		
 		public TouchLocation(int aId, TouchLocationState aState, Vector2 aPosition, float aPressure)
@@ -213,6 +214,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			previousPressure = 0.0f;
 			timeTouchBegan = DateTime.Now.Ticks;
 			pressedStateProcessed = false;
+			releasedStateProcessed = false;
         }
 		#endregion
 		
@@ -256,6 +258,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 				aPreviousLocation.previousPressure = 0.0f;
 				aPreviousLocation.timeTouchBegan = null;
 				aPreviousLocation.pressedStateProcessed = false;
+				aPreviousLocation.releasedStateProcessed = false;
 				return false;
 			}
 			else
@@ -270,6 +273,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 				aPreviousLocation.previousPressure = 0.0f;
 				aPreviousLocation.timeTouchBegan = this.timeTouchBegan;
 				aPreviousLocation.pressedStateProcessed = this.pressedStateProcessed;
+				aPreviousLocation.releasedStateProcessed = this.releasedStateProcessed;
 				return true;
 			}
         }

@@ -81,6 +81,7 @@ namespace Microsoft.Xna.Framework {
 	partial class iOSGameView {
 		
 		private const long _maxTicksToProcessFlick = 1500000;
+		private const long _maxTicksToProcessTap = 900000;
 		
 		private const int _minVelocityToCompleteSwipe = 50;
 		
@@ -208,14 +209,11 @@ namespace Microsoft.Xna.Framework {
 							_pinchComplete = true;
 							break;
 						}
-					
-						if (touch.PrevState == TouchLocationState.Pressed)
+						else
 						{
 							if (ProcessTap(touch))
 								break;
-						}
-						else if (touch.PrevState == TouchLocationState.Moved)
-						{
+						
 							if (ProcessFlick(touch))
 								break;
 						
@@ -310,19 +308,20 @@ namespace Microsoft.Xna.Framework {
 			if (!GestureIsEnabled(GestureType.Tap))
 				return false;
 			
+			var distanceTraveled = touch.Position - touch.startingPosition;
+			if (distanceTraveled.Length() > 5)
+				return false;
+			
+			if (touch.Lifetime > _maxTicksToProcessTap)
+				return false;
+			
 			// TODO: Use a timer to cancel/catch a double tap?
-			if (touch.State == TouchLocationState.Released && 
-			    touch.PrevState == TouchLocationState.Pressed )
-			{
 				TouchPanel.GestureList.Enqueue (new GestureSample (
 				GestureType.Tap, new TimeSpan (DateTime.Now.Ticks),
 				touch.Position, Vector2.Zero,
 				Vector2.Zero, Vector2.Zero));
 					
 				return true;
-			}
-			
-			return false;
 		}
 		
 		private static bool ProcessDrag(TouchLocation touch)
@@ -345,6 +344,10 @@ namespace Microsoft.Xna.Framework {
 									touch.PrevPosition : touch.Position;
 			
 			var delta = touch.Position - prevPosition;
+			
+			// TODO: Find XNA's drag tolerance.
+			if (delta == Vector2.Zero)
+				return false;
 			
 			// Free drag takes priority over a directional one.
 			GestureType gestureType = GestureType.FreeDrag;

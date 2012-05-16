@@ -80,22 +80,40 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			
 		}
 		
+		static TouchLocation t;
 		internal void Update()
 		{
-			TouchLocation t;
+			
 			// First update active touches 
 			for (int i = this.Count - 1; i >= 0; --i)
 			{
 				t = this[i];
-				t.PressedStateProcessed = true;
 				
 				switch (t.State)
 				{
 					case TouchLocationState.Pressed:
 						t.PrevPosition = t.Position;
-					break;
+						if (!t.pressedStateProcessed)
+							t.pressedStateProcessed = true;	
+						else
+							t.State = TouchLocationState.Moved;
+					
+						break;
+					
 					case TouchLocationState.Moved:
 						t.PrevState = TouchLocationState.Moved;
+						break;
+					
+					case TouchLocationState.Released:
+					case TouchLocationState.Invalid:
+					if (t.releasedStateProcessed)
+					{
+						RemoveAt(i);
+						continue; // Avoid going out of range by accessing this[i]
+					}
+					else
+						t.releasedStateProcessed = true;
+					
 					break;
 				}
 				
@@ -105,22 +123,6 @@ namespace Microsoft.Xna.Framework.Input.Touch
 #if IPHONE
 			iOSGameView.UpdateGestures();
 #endif
-			
-			// Remove dead touches
-			for (int i = this.Count - 1; i >= 0 && i < this.Count;)
-			{
-				t = this[i];
-				if (t.State == TouchLocationState.Invalid || 
-				    t.State == TouchLocationState.Released)
-				{
-					RemoveAt(i);
-					
-					if(i != this.Count)
-						continue;
-				}
-				
-				i--;
-			}
 		}
 
 		public bool FindById(int id, out TouchLocation touchLocation)
@@ -174,7 +176,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 					
 					// Some OS's can give us moved/released updates before we have a chance to process pressed
 					// Give the app a chance to respond to pressed
-					if ( !this[i].PressedStateProcessed )
+					if ( !this[i].pressedStateProcessed )
 					{
 						if (state == TouchLocationState.Moved)
 							return;
