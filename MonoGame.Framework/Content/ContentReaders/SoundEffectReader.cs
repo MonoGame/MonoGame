@@ -83,7 +83,7 @@ namespace Microsoft.Xna.Framework.Content
 			writer.Write((int)data.Length);
 			writer.Write(data);
 			
-			writer.Close();
+			writer.Dispose();
             mStream.Dispose();
 			
 			return new SoundEffect(input.AssetName, mStream.ToArray());
