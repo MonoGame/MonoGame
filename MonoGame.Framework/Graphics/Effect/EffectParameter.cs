@@ -9,13 +9,17 @@ namespace Microsoft.Xna.Framework.Graphics
     [DebuggerDisplay("{ParameterClass} {ParameterType} {Name} : {Semantic}")]
 	public class EffectParameter
 	{
+        /// <summary>
+        /// The next state key used when an effect parameter
+        /// is updated by any of the 'set' methods.
+        /// </summary>
+        internal static ulong NextStateKey { get; private set; }
+
         internal EffectParameter(   EffectParameterClass class_, 
                                     EffectParameterType type, 
                                     string name, 
                                     int rowCount, 
-                                    int columnCount, 
-                                    int bufferIndex,
-                                    int bufferOffset,
+                                    int columnCount,
                                     string semantic, 
                                     EffectAnnotationCollection annotations,
                                     EffectParameterCollection elements,
@@ -32,13 +36,11 @@ namespace Microsoft.Xna.Framework.Graphics
             RowCount = rowCount;
 			ColumnCount = columnCount;
 
-            BufferIndex = bufferIndex;
-            BufferOffset = bufferOffset;
-
             Elements = elements;
             StructureMembers = structMembers;
 
             Data = data;
+            StateKey = unchecked(NextStateKey++);
 		}
 
         internal EffectParameter(EffectParameter cloneSource)
@@ -51,8 +53,6 @@ namespace Microsoft.Xna.Framework.Graphics
             Annotations = cloneSource.Annotations;
             RowCount = cloneSource.RowCount;
             ColumnCount = cloneSource.ColumnCount;
-            BufferIndex = cloneSource.BufferIndex;
-            BufferOffset = cloneSource.BufferOffset;
 
             // Clone the mutable types.
             Elements = new EffectParameterCollection(cloneSource.Elements);
@@ -61,6 +61,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // Data is mutable, but a new copy happens during
             // boxing/unboxing so we can just assign it.
             Data = cloneSource.Data;
+            StateKey = unchecked(NextStateKey++);
         }
 
 		public string Name { get; private set; }
@@ -82,16 +83,17 @@ namespace Microsoft.Xna.Framework.Graphics
         public EffectAnnotationCollection Annotations { get; private set; }
 
 
-        internal int BufferIndex { get; private set; }
-
-        internal int BufferOffset { get; private set; }
-
         // TODO: Using object adds alot of boxing/unboxing overhead
         // and garbage generation.  We should consider a templated
         // type implementation to fix this!
 
         internal object Data { get; private set; }
 
+        /// <summary>
+        /// The current state key which is used to detect
+		/// if the parameter value has been changed.
+        /// </summary>
+        internal ulong StateKey { get; private set; }
 
 		public void SetValue (object value)
 		{
@@ -245,6 +247,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		public void SetValue (int value)
 		{
 			Data = value;
+            StateKey = unchecked(NextStateKey++);
 		}
 
 		public void SetValue (int[] value)
@@ -260,12 +263,16 @@ namespace Microsoft.Xna.Framework.Graphics
 				for (var x=0; x<ColumnCount; x++)
 					((float[])Data)[y*ColumnCount+x] = matrixData[y*4+x];
 			}
+
+            StateKey = unchecked(NextStateKey++);
 		}
 
 		public void SetValue (Matrix[] value)
 		{
             for (var i = 0; i < value.Length; i++)
 				Elements[i].SetValue (value[i]);
+
+            StateKey = unchecked(NextStateKey++);
 		}
 
 		public void SetValue (Quaternion value)
@@ -292,12 +299,16 @@ namespace Microsoft.Xna.Framework.Graphics
 			default:
 				throw new NotImplementedException();
 			}
+
+            StateKey = unchecked(NextStateKey++);
 		}
 
 		public void SetValue (Single[] value)
 		{
 			for (var i=0; i<value.Length; i++)
 				Elements[i].SetValue (value[i]);
+
+            StateKey = unchecked(NextStateKey++);
 		}
 		
 		public void SetValue (string value)
@@ -308,39 +319,46 @@ namespace Microsoft.Xna.Framework.Graphics
 		public void SetValue (Texture value)
 		{
 			Data = value;
+            StateKey = unchecked(NextStateKey++);
 		}
 
 		public void SetValue (Vector2 value)
 		{
 			Data = new float[2] { value.X, value.Y };
+            StateKey = unchecked(NextStateKey++);
 		}
 
 		public void SetValue (Vector2[] value)
 		{
             for (var i = 0; i < value.Length; i++)
 				Elements[i].SetValue (value[i]);
+            StateKey = unchecked(NextStateKey++);
 		}
 
 		public void SetValue (Vector3 value)
 		{
 			Data = new float[3] { value.X, value.Y, value.Z };
+            StateKey = unchecked(NextStateKey++);
 		}
 
 		public void SetValue (Vector3[] value)
 		{
             for (var i = 0; i < value.Length; i++)
 				Elements[i].SetValue (value[i]);
+            StateKey = unchecked(NextStateKey++);
 		}
 
 		public void SetValue (Vector4 value)
 		{
 			Data = new float[4] { value.X, value.Y, value.Z, value.W };
+            StateKey = unchecked(NextStateKey++);
 		}
 
 		public void SetValue (Vector4[] value)
 		{
             for (var i = 0; i < value.Length; i++)
 				Elements[i].SetValue (value[i]);
+            StateKey = unchecked(NextStateKey++);
 		}
 	}
 }

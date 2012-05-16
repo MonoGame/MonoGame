@@ -72,6 +72,7 @@
   <ItemGroup>
     <Compile Include="CommandLineParser.cs" />
     <Compile Include="CompilerInclude.cs" />
+    <Compile Include="ConstantBuffer.cs" />
     <Compile Include="DXEffectObject.cs" />
     <Compile Include="DXEffectObject.dxreflect.cs">
       <SubType>Code</SubType>

@@ -47,6 +47,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #endif // OPENGL
 
+#if PSS
+        internal ShaderProgram _shaderProgram;
+#endif
+
         internal EffectPass(    Effect effect, 
                                 string name,
                                 DXShader vertexShader, 
@@ -90,13 +94,11 @@ namespace Microsoft.Xna.Framework.Graphics
             _depthStencilState = cloneSource._depthStencilState;
             _rasterizerState = cloneSource._rasterizerState;
             Annotations = cloneSource.Annotations;
-#if OPENGL
+            _vertexShader = cloneSource._vertexShader;
+            _pixelShader = cloneSource._pixelShader;
+#if OPENGL || PSS
             _shaderProgram = cloneSource._shaderProgram;
 #endif
-
-            // Clone the mutable types.
-            _vertexShader = new DXShader(cloneSource._vertexShader);
-            _pixelShader = new DXShader(cloneSource._pixelShader);
         }
 
         private void Initialize()
@@ -142,7 +144,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #elif DIRECTX
 
-
 #endif
         }
 
@@ -162,8 +163,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if OPENGL
             GL.UseProgram(_shaderProgram);
-#elif DIRECTX
-
+#elif PSS
+            _effect.GraphicsDevice._graphics.SetShaderProgram(_shaderProgram);
 #endif
 
             var device = _effect.GraphicsDevice;
@@ -178,10 +179,20 @@ namespace Microsoft.Xna.Framework.Graphics
             Debug.Assert(_vertexShader != null, "Got a null vertex shader!");
             Debug.Assert(_pixelShader != null, "Got a null vertex shader!");
 
-#if OPENGL
+#if PSS
+#warning We are only setting one hardcoded parameter here. Need to do this properly by iterating _effect.Parameters (Happens in DXShader)
+            float[] data;
+            if (_effect.Parameters["WorldViewProj"] != null) 
+                data = (float[])_effect.Parameters["WorldViewProj"].Data;
+            else
+                data = (float[])_effect.Parameters["MatrixTransform"].Data;
+            Sce.Pss.Core.Matrix4 matrix4 = PSSHelper.ToPssMatrix4(data);
+            matrix4 = matrix4.Transpose (); //When .Data is set the matrix is transposed, we need to do it again to undo it
+            _shaderProgram.SetUniformValue(0, ref matrix4);
+#elif OPENGL
 
             // Apply the vertex shader.
-            _vertexShader.Apply(_shaderProgram, _effect.Parameters, device);
+            _vertexShader.Apply(device, _shaderProgram, _effect.Parameters, _effect.ConstantBuffers);
 
             // Apply vertex shader fix:
             // The following two lines are appended to the end of vertex shaders
@@ -224,38 +235,14 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.Uniform4(posFixupLoc, 1, _posFixup);
 
             // Apply the pixel shader.
-            _pixelShader.Apply(_shaderProgram, _effect.Parameters, device);
+            _pixelShader.Apply(device, _shaderProgram, _effect.Parameters, _effect.ConstantBuffers);
 
 #elif DIRECTX
 
-            // TODO: We should be doing dirty state testing!
-
-            // Update the constant buffers.
-            foreach (var param in _effect.Parameters)
-            {
-                if (param.BufferOffset == -1)
-                    continue;
-
-                var buffer = _effect.ConstantBuffers[param.BufferIndex];
-                
-                switch ( param.ParameterType )
-                {
-                    case EffectParameterType.Single:
-                        buffer.SetData(param.BufferOffset, param.RowCount, param.ColumnCount, param.Data);
-                        break;
-
-                    default:
-                        throw new NotImplementedException("Not supported!");
-                }
-            }
-
-            // Apply the shaders.
-            _vertexShader.Apply(-1, _effect.Parameters, device);
-            _pixelShader.Apply(-1, _effect.Parameters, device);
-
-            // Set the constant buffers.
-            foreach (var buffer in _effect.ConstantBuffers)
-                buffer.Apply();
+            // Apply the shaders which will in turn set the 
+            // constant buffers and texture samplers.
+            _vertexShader.Apply(device, _effect.Parameters, _effect.ConstantBuffers);
+            _pixelShader.Apply(device, _effect.Parameters, _effect.ConstantBuffers);
 
 #endif
         }

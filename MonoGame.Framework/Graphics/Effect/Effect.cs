@@ -45,6 +45,9 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
+#if PSS
+using Sce.Pss.Core.Graphics;
+#endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -55,7 +58,7 @@ namespace Microsoft.Xna.Framework.Graphics
         public EffectTechniqueCollection Techniques { get; private set; }
 
         public EffectTechnique CurrentTechnique { get; set; }
-
+  
         internal ConstantBuffer[] ConstantBuffers { get; private set; }
 
         internal Effect(GraphicsDevice graphicsDevice)
@@ -202,8 +205,9 @@ namespace Microsoft.Xna.Framework.Graphics
         /// We should avoid supporting old versions for very long as
         /// users should be rebuilding content when packaging their game.
         /// </remarks>
-        private const int Version = 1;
+        private const int Version = 2;
 
+#if !PSS
         internal void ReadEffect(BinaryReader reader)
         {
             // Check the header to make sure the file and version is correct!
@@ -211,6 +215,14 @@ namespace Microsoft.Xna.Framework.Graphics
             var version = (int)reader.ReadByte();
             if (header != Header || version != Version)
                 throw new Exception("Unsupported MGFX format!");
+
+            var profile = reader.ReadByte();
+#if DIRECTX
+            if (profile != 1)
+#else
+            if (profile != 0)
+#endif
+                throw new Exception("The effect is the profile for this platform!");
 
             // TODO: Maybe we should be reading in a string 
             // table here to save some bytes in the file.
@@ -220,8 +232,7 @@ namespace Microsoft.Xna.Framework.Graphics
             ConstantBuffers = new ConstantBuffer[buffers];
             for (var c = 0; c < buffers; c++)
             {
-                var size = (int)reader.ReadInt16();
-                var buffer = new ConstantBuffer(graphicsDevice, size);
+                var buffer = new ConstantBuffer(graphicsDevice, reader);
                 ConstantBuffers[c] = buffer;
             }
 
@@ -315,9 +326,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 var rowCount = (int)reader.ReadByte();
                 var columnCount = (int)reader.ReadByte();
 
-                var bufferIndex = (int)reader.ReadByte();
-                var bufferOffset = (int)reader.ReadInt16();
-
                 var elements = ReadParameters(reader);
                 var structMembers = ReadParameters(reader);
 
@@ -351,16 +359,88 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
 
                 var param = new EffectParameter(
-                    class_, type, name, rowCount, columnCount,
-                    bufferIndex, bufferOffset, semantic, annotations, 
-                    elements, structMembers, data);
+                    class_, type, name, rowCount, columnCount, semantic, 
+                    annotations, elements, structMembers, data);
 
                 collection.Add(param);
             }
 
             return collection;
         }
-
+#else //PSS
+        internal void ReadEffect(BinaryReader reader)
+        {
+            var effectPass = new EffectPass(this, "Pass", null, null, BlendState.AlphaBlend, DepthStencilState.Default, RasterizerState.CullNone, new EffectAnnotationCollection());
+            effectPass._shaderProgram = new ShaderProgram(reader.ReadBytes((int)reader.BaseStream.Length));
+            var shaderProgram = effectPass._shaderProgram;
+            
+            Parameters = new EffectParameterCollection();
+            for (int i = 0; i < shaderProgram.UniformCount; i++)
+            {
+                Parameters.Add(EffectParameterForUniform(shaderProgram, i));
+            }
+#warning Hacks for BasicEffect as we don't have these parameters yet
+            Parameters.Add (new EffectParameter(
+                EffectParameterClass.Vector, EffectParameterType.Single, "SpecularColor",
+                3, 1, 0, 0, "float3",
+                new EffectAnnotationCollection(), new EffectParameterCollection(), new EffectParameterCollection(), new float[3]));
+            Parameters.Add (new EffectParameter(
+                EffectParameterClass.Scalar, EffectParameterType.Single, "SpecularPower",
+                1, 1, 0, 0, "float",
+                new EffectAnnotationCollection(), new EffectParameterCollection(), new EffectParameterCollection(), 0.0f));
+            Parameters.Add (new EffectParameter(
+                EffectParameterClass.Vector, EffectParameterType.Single, "FogVector",
+                4, 1, 0, 0, "float4",
+                new EffectAnnotationCollection(), new EffectParameterCollection(), new EffectParameterCollection(), new float[4]));
+            Parameters.Add (new EffectParameter(
+                EffectParameterClass.Vector, EffectParameterType.Single, "DiffuseColor",
+                4, 1, 0, 0, "float4",
+                new EffectAnnotationCollection(), new EffectParameterCollection(), new EffectParameterCollection(), new float[4]));
+            
+            Techniques = new EffectTechniqueCollection();
+            var effectPassCollection = new EffectPassCollection();
+            effectPassCollection.Add(effectPass);
+            Techniques.Add(new EffectTechnique(this, "Name", effectPassCollection, new EffectAnnotationCollection()));
+       
+            ConstantBuffers = new ConstantBuffer[0];
+            
+            CurrentTechnique = Techniques[0];
+        }
+        
+        internal EffectParameter EffectParameterForUniform(ShaderProgram shaderProgram, int index)
+        {
+            //var b = shaderProgram.GetUniformBinding(i);
+            var name = shaderProgram.GetUniformName(index);
+            //var s = shaderProgram.GetUniformSize(i);
+            //var x = shaderProgram.GetUniformTexture(i);
+            var type = shaderProgram.GetUniformType(index);
+            
+            //EffectParameter.Semantic => COLOR0 / POSITION0 etc
+   
+            //FIXME: bufferOffset in below lines is 0 but should probably be something else
+            switch (type)
+            {
+            case ShaderUniformType.Float4x4:
+                return new EffectParameter(
+                    EffectParameterClass.Matrix, EffectParameterType.Single, name,
+                    4, 4, index, 0, "float4x4",
+                    new EffectAnnotationCollection(), new EffectParameterCollection(), new EffectParameterCollection(), new float[4 * 4]);
+            case ShaderUniformType.Float4:
+                return new EffectParameter(
+                    EffectParameterClass.Vector, EffectParameterType.Single, name,
+                    4, 1, index, 0, "float4",
+                    new EffectAnnotationCollection(), new EffectParameterCollection(), new EffectParameterCollection(), new float[4]);
+            case ShaderUniformType.Sampler2D:
+                return new EffectParameter(
+                    EffectParameterClass.Object, EffectParameterType.Texture2D, name,
+                    1, 1, index, 0, "texture2d",
+                    new EffectAnnotationCollection(), new EffectParameterCollection(), new EffectParameterCollection(), null);
+            default:
+                throw new Exception("Uniform Type " + type + " Not yet implemented (" + name + ")");
+            }
+        }
+        
+#endif
         #endregion // Effect File Reader
 
 
@@ -368,7 +448,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         // Modified FNV Hash in C#
         // http://stackoverflow.com/a/468084
-        private static int ComputeHash(params byte[] data)
+        internal static int ComputeHash(params byte[] data)
         {
             unchecked
             {
