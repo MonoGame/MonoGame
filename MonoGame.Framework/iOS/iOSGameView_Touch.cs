@@ -81,6 +81,7 @@ namespace Microsoft.Xna.Framework {
 	partial class iOSGameView {
 		
 		private const long _maxTicksToProcessFlick = 1500000;
+		private const long _maxTicksToProcessTap = 900000;
 		
 		private const int _minVelocityToCompleteSwipe = 50;
 		
@@ -127,8 +128,6 @@ namespace Microsoft.Xna.Framework {
 
 			ClearTouchBuffer ();
 			RollTouchBuffer (GetOffsetPosition (new Vector2 (location.X, location.Y), true));
-			
-			updateGestures();
 		}
 
 		public override void TouchesEnded (NSSet touches, UIEvent evt)
@@ -139,8 +138,6 @@ namespace Microsoft.Xna.Framework {
 
 			var location = ((UITouch) touches.AnyObject).LocationInView (this);
 			RollTouchBuffer (GetOffsetPosition (new Vector2 (location.X, location.Y), true));
-			
-			updateGestures();
 		}
 
 		public override void TouchesMoved (NSSet touches, UIEvent evt)
@@ -151,8 +148,6 @@ namespace Microsoft.Xna.Framework {
 
 			var location = ((UITouch) touches.AnyObject).LocationInView (this);
 			RollTouchBuffer (GetOffsetPosition (new Vector2 (location.X, location.Y), true));
-			
-			updateGestures();
 		}
 
 		public override void TouchesCancelled (NSSet touches, UIEvent evt)
@@ -163,16 +158,14 @@ namespace Microsoft.Xna.Framework {
 
 			var location = ((UITouch) touches.AnyObject).LocationInView (this);
 			RollTouchBuffer (GetOffsetPosition (new Vector2 (location.X, location.Y), true));
-			
-			updateGestures();
 		}
 		
 		// For pinch, we'll need to "save" a touch so we can
 		// send both at the same time
-		private TouchLocation?[] _savedPinchTouches = new TouchLocation?[2];
-		private bool _pinchComplete = false;
+		private static TouchLocation?[] _savedPinchTouches = new TouchLocation?[2];
+		private static bool _pinchComplete = false;
 		
-		private void updateGestures()
+		public static void UpdateGestures()
 		{				
 			for(int x = 0; x < TouchPanel.Collection.Count; x++)
 			{
@@ -216,14 +209,11 @@ namespace Microsoft.Xna.Framework {
 							_pinchComplete = true;
 							break;
 						}
-					
-						if (touch.PrevState == TouchLocationState.Pressed)
+						else
 						{
 							if (ProcessTap(touch))
 								break;
-						}
-						else if (touch.PrevState == TouchLocationState.Moved)
-						{
+						
 							if (ProcessFlick(touch))
 								break;
 						
@@ -313,27 +303,28 @@ namespace Microsoft.Xna.Framework {
 
 		#region Gestures
 		
-		private bool ProcessTap(TouchLocation touch)
+		private static bool ProcessTap(TouchLocation touch)
 		{
 			if (!GestureIsEnabled(GestureType.Tap))
 				return false;
 			
+			var distanceTraveled = touch.Position - touch.startingPosition;
+			if (distanceTraveled.Length() > 5)
+				return false;
+			
+			if (touch.Lifetime > _maxTicksToProcessTap)
+				return false;
+			
 			// TODO: Use a timer to cancel/catch a double tap?
-			if (touch.State == TouchLocationState.Released && 
-			    touch.PrevState == TouchLocationState.Pressed )
-			{
 				TouchPanel.GestureList.Enqueue (new GestureSample (
 				GestureType.Tap, new TimeSpan (DateTime.Now.Ticks),
 				touch.Position, Vector2.Zero,
 				Vector2.Zero, Vector2.Zero));
 					
 				return true;
-			}
-			
-			return false;
 		}
 		
-		private bool ProcessDrag(TouchLocation touch)
+		private static bool ProcessDrag(TouchLocation touch)
 		{
 			if (!GestureIsEnabled(GestureType.HorizontalDrag) && 
 			    !GestureIsEnabled(GestureType.VerticalDrag) && 
@@ -353,6 +344,10 @@ namespace Microsoft.Xna.Framework {
 									touch.PrevPosition : touch.Position;
 			
 			var delta = touch.Position - prevPosition;
+			
+			// TODO: Find XNA's drag tolerance.
+			if (delta == Vector2.Zero)
+				return false;
 			
 			// Free drag takes priority over a directional one.
 			GestureType gestureType = GestureType.FreeDrag;
@@ -400,7 +395,7 @@ namespace Microsoft.Xna.Framework {
 			
 		}
 		
-		private bool ProcessDragComplete(TouchLocation touch)
+		private static bool ProcessDragComplete(TouchLocation touch)
 		{
 			if (!GestureIsEnabled(GestureType.DragComplete))
 				return false;
@@ -416,7 +411,7 @@ namespace Microsoft.Xna.Framework {
 			return true;
 		}
 		
-		private bool ProcessHold(TouchLocation touch)
+		private static bool ProcessHold(TouchLocation touch)
 		{
 			if (!GestureIsEnabled(GestureType.Hold))
 				return false;
@@ -429,7 +424,7 @@ namespace Microsoft.Xna.Framework {
 			return true;
 		}
 		
-		private bool ProcessFlick(TouchLocation touch)
+		private static bool ProcessFlick(TouchLocation touch)
 		{
 			if (!GestureIsEnabled(GestureType.Flick))
 			    return false;
@@ -455,7 +450,7 @@ namespace Microsoft.Xna.Framework {
 		}
 
 		
-		private bool ProcessPinch(TouchLocation? [] touches)
+		private static bool ProcessPinch(TouchLocation? [] touches)
 		{
 			if (!GestureIsEnabled(GestureType.Pinch))
 				return false;
@@ -483,7 +478,7 @@ namespace Microsoft.Xna.Framework {
 			return true;
 		}
 		
-		private bool ProcessPinchComplete()
+		private static bool ProcessPinchComplete()
 		{
 			if (!GestureIsEnabled(GestureType.PinchComplete))
 				return false;
