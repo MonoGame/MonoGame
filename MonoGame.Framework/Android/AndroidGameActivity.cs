@@ -73,7 +73,7 @@ namespace Microsoft.Xna.Framework
 	{
 		AndroidGameActivity activity;
 		
-		public OrientationListener(AndroidGameActivity activity) : base(activity, 1)
+		public OrientationListener(AndroidGameActivity activity) : base(activity, Android.Hardware.SensorDelay.Game)
 		{
 			this.activity = activity;
 		}
