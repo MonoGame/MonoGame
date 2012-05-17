@@ -30,6 +30,25 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
+    <CodeAnalysisFailOnMissingRules>true</CodeAnalysisFailOnMissingRules>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Xna.Framework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
     <Reference Include="Microsoft.Xna.Framework.Content.Pipeline, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
@@ -45,9 +64,25 @@
   <ItemGroup>
     <Compile Include="Content\MGBitmapContent.cs" />
     <Compile Include="Processors\MGMaterialProcessor.cs" />
+    <Compile Include="Processors\MGSongProcessor.cs" />
+    <Compile Include="Processors\MGSoundEffectProcessor.cs" />
     <Compile Include="Processors\MGSpriteFontDescriptionProcessor.cs" />
     <Compile Include="Processors\MGTextureProcessor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Tools\MP3Compression\yeti.mmedia\yeti.mmedia.csproj">
+      <Project>{315EE7BF-EAE2-42C0-BFC6-CCA9160F3CFE}</Project>
+      <Name>yeti.mmedia</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Tools\MP3Compression\yeti.mp3\yeti.mp3.csproj">
+      <Project>{B564FD33-FA50-46B2-B669-2D83DE3AF5E4}</Project>
+      <Name>yeti.mp3</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Tools\MP3Compression\yeti.wmfsdk\yeti.wmfsdk.csproj">
+      <Project>{FECB5BEB-AB05-454A-BB14-6A554E897274}</Project>
+      <Name>yeti.wmfsdk</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
