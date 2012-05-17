@@ -71,10 +71,10 @@ namespace Microsoft.Xna.Framework.Media
 #if IPHONE
 			_sound = AVAudioPlayer.FromUrl(NSUrl.FromFilename(fileName));
 			_sound.NumberOfLoops = 0;
+            _sound.FinishedPlaying += OnFinishedPlaying;
 #else
-			_sound = new SoundEffect(_name).CreateInstance();
+            _sound = new SoundEffect(_name).CreateInstance();
 #endif
-			_sound.FinishedPlaying += OnFinishedPlaying;
 		}
 		
 		internal void OnFinishedPlaying (object sender, EventArgs args)
