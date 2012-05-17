@@ -64,6 +64,7 @@
   <ItemGroup>
     <Compile Include="Content\MGBitmapContent.cs" />
     <Compile Include="Processors\MGMaterialProcessor.cs" />
+    <Compile Include="Processors\MGSongProcessor.cs" />
     <Compile Include="Processors\MGSoundEffectProcessor.cs" />
     <Compile Include="Processors\MGSpriteFontDescriptionProcessor.cs" />
     <Compile Include="Processors\MGTextureProcessor.cs" />
