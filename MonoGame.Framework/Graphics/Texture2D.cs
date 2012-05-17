@@ -142,8 +142,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             this.glTarget = TextureTarget.Texture2D;
             
-            Threading.Begin();
-            try
+            Threading.BlockOnUIThread(() =>
             {
 #if IPHONE || ANDROID
                 GL.GenTextures(1, ref this.glTexture);
@@ -223,11 +222,7 @@ namespace Microsoft.Xna.Framework.Graphics
                         this.levelCount++;
                     }
                 }
-            }
-            finally
-            {
-                Threading.End();
-            }
+            });
 #endif
         }
         
@@ -270,10 +265,8 @@ namespace Microsoft.Xna.Framework.Graphics
             if (data == null)
 				throw new ArgumentNullException("data");
 
-#if !DIRECTX
-            // WTF is this? Document your code people!
-            Threading.Begin();
-            try
+#if OPENGL
+            Threading.BlockOnUIThread(() =>
             {
 #endif
 #if !PSS
@@ -340,12 +333,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 dataHandle.Free();
 #endif
 
-#if !DIRECTX
-            }
-            finally
-            {
-                Threading.End();
-            }
+#if OPENGL
+            });
 #endif
         }
 		
@@ -426,16 +415,11 @@ namespace Microsoft.Xna.Framework.Graphics
 				colorSpace.Dispose();
 				
                 Texture2D texture = null;
-                Threading.Begin();
-                try
+                Threading.BlockOnUIThread(() =>
                 {
 				    texture = new Texture2D(graphicsDevice, width, height, false, SurfaceFormat.Color);			
     				texture.SetData(data);
-                }
-                finally
-                {
-                    Threading.End();
-                }
+                });
 			
 				return texture;
 			}
@@ -474,16 +458,12 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 
             Texture2D texture = null;
-            Threading.Begin();
-            try
+            Threading.BlockOnUIThread(() =>
             {
                 texture = new Texture2D(graphicsDevice, width, height, false, SurfaceFormat.Color);
                 texture.SetData<int>(pixels);
-            }
-            finally
-            {
-                Threading.End();
-            }
+            });
+
             return texture;
 
 #elif DIRECTX
@@ -505,16 +485,11 @@ namespace Microsoft.Xna.Framework.Graphics
                 image.UnlockBits(bitmapData);
 
                 Texture2D texture = null;
-                Threading.Begin();
-                try
+                Threading.BlockOnUIThread(() =>
                 {
                     texture = new Texture2D(graphicsDevice, image.Width, image.Height);
                     texture.SetData(data);
-                }
-                finally
-                {
-                    Threading.End();
-                }
+                });
 
                 return texture;
             }

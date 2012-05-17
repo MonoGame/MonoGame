@@ -64,10 +64,6 @@ namespace Microsoft.Xna.Framework
                 return;
             (deviceManager as GraphicsDeviceManager).ForceSetFullScreen();
             Game.Window.RequestFocus();
-            if (Game.GraphicsDevice != null)
-            {
-                Game.GraphicsDevice.platform = Game.Platform;
-            }
         }
 
     }
