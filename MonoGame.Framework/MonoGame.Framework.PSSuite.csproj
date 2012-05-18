@@ -24,12 +24,13 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
-    <Optimize>false</Optimize>
+    <Optimize>true</Optimize>
     <OutputPath>bin\Release</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DefineConstants>PSS</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -304,7 +305,7 @@
     <Compile Include="Graphics\Effect\EffectAnnotationCollection.cs" />
     <Compile Include="Graphics\Effect\EffectAnnotation.cs" />
     <Compile Include="Graphics\Vertices\VertexDeclaration.cs" />
-    <Compile Include="Graphics\Vertices\VertexDeclarationCache.cs" />    
+    <Compile Include="Graphics\Vertices\VertexDeclarationCache.cs" />
     <Compile Include="Graphics\RenderTarget2D.cs" />
     <Compile Include="Audio\AudioCategory.cs" />
     <Compile Include="Graphics\SpriteBatch.cs" />
@@ -317,7 +318,6 @@
     <Compile Include="GameWindow.cs" />
     <Compile Include="GraphicsDeviceManager.cs" />
     <Compile Include="Graphics\PresentInterval.cs" />
-    <Compile Include="Graphics\SpriteBatcher.cs" />
     <Compile Include="Graphics\CubeMapFace.cs" />
     <Compile Include="Storage\StorageDeviceHelper.cs" />
     <Compile Include="Content\ContentReaders\BasicEffectReader.cs" />
@@ -343,6 +343,7 @@
     <Compile Include="PSSuite\PSSHelper.cs" />
     <Compile Include="PSSuite\PSSExtensions.cs" />
     <Compile Include="Graphics\Effect\ConstantBuffer.cs" />
+    <Compile Include="PSSuite\Graphics\SpriteBatcher.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="PSSuite\" />

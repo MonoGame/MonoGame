@@ -77,7 +77,7 @@ namespace Microsoft.Xna.Framework
             if (action == null)
                 throw new ArgumentNullException("action cannot be null");
 
-#if DIRECTX
+#if DIRECTX || PSS
             action();
 #else
             // If we are already on the UI thread, just call the action and be done with it

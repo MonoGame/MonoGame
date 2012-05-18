@@ -11,6 +11,8 @@ using MonoMac.OpenGL;
 using OpenTK.Graphics.OpenGL;
 #elif GLES
 using OpenTK.Graphics.ES20;
+#elif PSS
+using Sce.Pss.Core.Graphics;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -116,6 +118,8 @@ namespace Microsoft.Xna.Framework.Graphics
         public void Apply(bool vertexStage, int slot, EffectParameterCollection parameters)
 #elif OPENGL
         public unsafe void Apply(int program, EffectParameterCollection parameters)
+#elif PSS
+        public void Apply(ShaderProgram program, EffectParameterCollection parameters)
 #endif
         {
             // TODO:  We should be doing some sort of dirty state 
@@ -182,6 +186,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 GL.Uniform4(location, _buffer.Length / 16, (float*)bytePtr);
             }
+#endif
+
+#if PSS
+            #warning Unimplemented
+            //TODO
 #endif
         }
     }
