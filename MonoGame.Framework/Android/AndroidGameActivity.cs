@@ -5,6 +5,7 @@ using System.Text;
 
 using Android.App;
 using Android.Content;
+using Android.Hardware;
 using Android.OS;
 using Android.Runtime;
 using Android.Views;
@@ -72,7 +73,7 @@ namespace Microsoft.Xna.Framework
 	{
 		AndroidGameActivity activity;
 		
-		public OrientationListener(AndroidGameActivity activity) : base(activity, 1)
+		public OrientationListener(AndroidGameActivity activity) : base(activity, SensorDelay.Game)
 		{
 			this.activity = activity;
 		}
