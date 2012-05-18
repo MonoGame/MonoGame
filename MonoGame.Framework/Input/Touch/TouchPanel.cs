@@ -60,10 +60,9 @@ namespace Microsoft.Xna.Framework.Input.Touch
         }
 
         public static TouchCollection GetState()
-        {
-			TouchCollection result = new TouchCollection(Collection);		
+        {	
 			Collection.Update();
-			return result;
+			return Collection;
         }       
 		
 		public static void Reset()

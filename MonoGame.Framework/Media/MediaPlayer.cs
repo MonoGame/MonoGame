@@ -41,165 +41,216 @@ purpose and non-infringement.
 using System;
 using Microsoft.Xna.Framework.Audio;
 
+#if IPHONE
+using MonoTouch.AudioToolbox;
+using MonoTouch.AVFoundation;
+using MonoTouch.Foundation;
+using MonoTouch.MediaPlayer;
+#endif
+
+using System.Linq;
+
 ﻿namespace Microsoft.Xna.Framework.Media
 {
     public static class MediaPlayer
     {
-		private static Song _song = null;
+		// Need to hold onto this to keep track of how many songs
+		// have played when in shuffle mode
+		private static int _numSongsInQueuePlayed = 0;
 		private static MediaState _mediaState = MediaState.Stopped;
 		private static float _volume = 1.0f;
-		private static bool _looping = true;
+		private static bool _isMuted = false;
+		private static MediaQueue _queue = new MediaQueue();
 		
-        public static void Pause()
+		#region Properties
+		
+		public static MediaQueue Queue { get { return _queue; } }
+		
+		public static bool IsMuted
         {
-			if (_song != null)
-			{
-				_song.Pause();
-				_mediaState = MediaState.Paused;
-			}			
-        }
-
-        public static void Play(Song song)
-        {
-			if ( song != null )
-			{
-				_song = song;
-				_song.Volume = _volume;
-				_song.Loop = _looping;
-				_song.Play();
-				_mediaState = MediaState.Playing;
-			}
-        }
-
-        public static void Resume()
-        {
-			if (_song != null)
-			{
-				_song.Resume();
-				_mediaState = MediaState.Playing;
-			}					
-        }
-
-        public static void Stop()
-        {
-			if (_song != null)
-			{
-				_song.Stop();
-				_mediaState = MediaState.Stopped;
-			}
-        }
-
-        public static bool IsMuted
-        {
-            get
-            {
-				if (_song != null)
-				{
-					return _song.Volume == 0.0f;
-				}
-				else
-				{
-					return false;
-				}
-            }
+            get { return _isMuted; }
             set
             {
-				if (_song != null) 
-				{
-					if (value)
-					{
-						_song.Volume = 0.0f;
-					}
-					else 
-					{
-						_song.Volume = _volume;
-					}
-				}
+				_isMuted = value;
+				
+				if (_queue.Count == 0)
+					return;
+				
+				var newVolume = value ? 0.0f : _volume;
+				
+				for (int x = 0; x < _queue.Count; x++)
+					_queue[x].Volume = newVolume;
             }
         }
 
-        public static bool IsRepeating
-        {
-            get
-            {
-				if (_song != null)
-				{
-					return _song.Loop;
-				}
-				else
-				{
-					return false;
-				}
-            }
-            set
-            {
-				_looping = value;
-				if(_song != null) _song.Loop = value;
-            }
-        }
+        public static bool IsRepeating { get; set; }
 
-        public static bool IsShuffled
-        {
-            get
-            {
-				return false;
-            }
-        }
+        public static bool IsShuffled { get; set; }
 
-        public static bool IsVisualizationEnabled
-        {
-            get
-            {
-				return false;
-            }
-        }
+        public static bool IsVisualizationEnabled { get { return false; } }
 
         public static TimeSpan PlayPosition
         {
             get
             {
-				if (_song != null)
-				{
-					return _song.Position;
-				}
-				else
-				{
-					return new TimeSpan(0);
-				}
-            }
-        }
-
-        public static MediaState State
-        {
-            get
-            {
-				return _mediaState;
+				if (_queue.ActiveSong == null)
+					return TimeSpan.Zero;
+				
+				return _queue.ActiveSong.Position;
             }
         }
 		
-		public static bool GameHasControl
-        {
-            get
-            {
-            	return true;
-			}
+        public static MediaState State { get { return _mediaState; } }
+		
+#if IPHONE
+		public static bool GameHasControl 
+		{ 
+			get 
+			{ 
+				var musicPlayer = MPMusicPlayerController.iPodMusicPlayer;
+				
+				if (musicPlayer == null)
+					return true;
+				
+				// TODO: Research the Interrupted state and see if it's valid to
+				// have control at that time.
+				
+				// Note: This will throw a bunch of warnings/output to the console
+				// if running in the simulator. This is a known issue:
+				// http://forums.macrumors.com/showthread.php?t=689102
+				if (musicPlayer.PlaybackState == MPMusicPlaybackState.Playing || 
+				 	musicPlayer.PlaybackState == MPMusicPlaybackState.SeekingForward ||
+				    musicPlayer.PlaybackState == MPMusicPlaybackState.SeekingBackward)
+				return false;
+				
+				return true;
+			} 
 		}
+#else
+		public static bool GameHasControl { get { return true; } }
+#endif
+		
 
         public static float Volume
         {
-            get
-            {
-            	return _volume;
-			}
-            set
-            {         
-				if (_song != null)
-				{
-					_volume = value;
-					_song.Volume = value;
-				}
+            get { return _volume; }
+			set 
+			{       
+				_volume = value;
+				
+				if (_queue.ActiveSong == null)
+					return;
+			
+				for (int x = 0; x < _queue.Count; x++)
+					_queue[x].Volume = _volume;
 			}
         }
+		
+		#endregion
+		
+        public static void Pause()
+        {
+			if (_queue.ActiveSong == null)
+				return;
+		
+			_queue.ActiveSong.Pause();
+			_mediaState = MediaState.Paused;
+        }
+		
+		/// <summary>
+		/// Play clears the current playback queue, and then queues up the specified song for playback. 
+		/// Playback starts immediately at the beginning of the song.
+		/// </summary>
+        public static void Play(Song song)
+        {			
+			_queue.Clear();
+			_numSongsInQueuePlayed = 0;
+			
+			_queue.Add(song);
+			
+			playSong(song);
+        }
+		
+		public static void Play(SongCollection collection, int index = 0)
+		{
+			foreach(var song in collection)
+				Queue.Add(song);
+			
+			_queue.ActiveSongIndex = index;
+			
+			playSong(Queue[index]);
+		}
+		
+		private static void playSong(Song song)
+		{
+			song.SetEventHandler(OnSongFinishedPlaying);
+			
+			song.Volume = _isMuted ? 0.0f : _volume;
+			song.Play();
+			_mediaState = MediaState.Playing;
+		}
+		
+		internal static void OnSongFinishedPlaying (object sender, EventArgs args)
+		{
+			// TODO: Check args to see if song sucessfully played
+			_numSongsInQueuePlayed++;
+			
+			if (_numSongsInQueuePlayed >= _queue.Count)
+			{
+				_numSongsInQueuePlayed = 0;
+				if (!IsRepeating)
+				{
+					_mediaState = MediaState.Stopped;
+					return;
+				}
+			}
+			
+			MoveNext();
+		}
+
+        public static void Resume()
+        {
+			if (_queue.ActiveSong == null)
+				return;
+			
+			_queue.ActiveSong.Resume();
+			_mediaState = MediaState.Playing;
+        }
+
+        public static void Stop()
+        {
+			if (_queue.ActiveSong == null)
+				return;
+			
+			// Loop through so that we reset the PlayCount as well
+			foreach(var song in Queue)
+				_queue.ActiveSong.Stop();
+			
+			_mediaState = MediaState.Stopped;
+		}
+		
+		public static void MoveNext()
+		{
+			nextSong(1);
+		}
+		
+		public static void MovePrevious()
+		{
+			nextSong(-1);
+		}
+		
+		private static void nextSong(int direction)
+		{
+			var nextSong = _queue.getNextSong(direction, IsShuffled);
+			
+			if (nextSong == null)
+			{
+				_mediaState = MediaState.Stopped;
+				return;
+			}
+			
+			nextSong.Play();
+		}
     }
 }
 
