@@ -50,7 +50,7 @@ using MonoTouch.AVFoundation;
 ﻿
 namespace Microsoft.Xna.Framework.Media
 {
-    public class Song : IEquatable<Song>, IDisposable
+    public sealed class Song : IEquatable<Song>, IDisposable
     {
 #if IPHONE
 		private AVAudioPlayer _sound;
@@ -60,9 +60,9 @@ namespace Microsoft.Xna.Framework.Media
 		
 		private string _name;
 		private int _playCount;
-		
-		public delegate void FinishedPlayingHandler(object sender, EventArgs args);
-		public event FinishedPlayingHandler DonePlaying;
+    
+		internal delegate void FinishedPlayingHandler(object sender, EventArgs args);
+		event FinishedPlayingHandler DonePlaying;
 		
 		internal Song(string fileName)
 		{			
@@ -103,9 +103,23 @@ namespace Microsoft.Xna.Framework.Media
 		
 		public void Dispose()
         {
-			_sound.Dispose();
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
-		
+        
+        void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (_sound != null)
+                {
+                    _sound.FinishedPlaying -= OnFinishedPlaying;
+                    _sound.Dispose();
+                    _sound = null;
+                }
+            }
+        }
+        
 		public bool Equals(Song song) 
 		{
 			return ((object)song != null) && (Name == song.Name);
