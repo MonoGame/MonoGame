@@ -354,8 +354,8 @@ namespace Microsoft.Xna.Framework
             switch (e.ActionMasked)
             {
                 // DOWN                
-                case 0:
-                case 5:
+                case MotionEventActions.Down:
+                case MotionEventActions.PointerDown:
                     index = collection.FindIndexById(id, out tlocation);
                     if (index < 0)
                     {
@@ -364,8 +364,8 @@ namespace Microsoft.Xna.Framework
                     }
                     break;
                 // UP                
-                case 1:
-                case 6:
+                case MotionEventActions.Up:
+                case MotionEventActions.PointerUp:
                     index = collection.FindIndexById(id, out tlocation);
                     if (index >= 0)
                     {
@@ -374,7 +374,7 @@ namespace Microsoft.Xna.Framework
                     }	
 				    break;
                 // MOVE                
-                case 2:
+                case MotionEventActions.Move:
                     for (int i = 0; i < e.PointerCount; i++)
                     {
                         id = e.GetPointerId(i);
@@ -391,8 +391,8 @@ namespace Microsoft.Xna.Framework
                     }
 					break;
                 // CANCEL, OUTSIDE                
-                case 3:
-                case 4:
+                case MotionEventActions.Cancel:
+                case MotionEventActions.Outside:
                     index = collection.FindIndexById(id, out tlocation);
                     if (index >= 0)
                     {
@@ -459,14 +459,11 @@ namespace Microsoft.Xna.Framework
                 {
                     _currentOrientation = value;
 
-                    if (_currentOrientation == DisplayOrientation.Portrait || _currentOrientation == DisplayOrientation.PortraitUpsideDown)
-				    {
-                        Game.Activity.SetRequestedOrientation(ScreenOrientation.Portrait);						
-				    }
-                    else if (_currentOrientation == DisplayOrientation.LandscapeLeft || _currentOrientation == DisplayOrientation.LandscapeRight)
-				    {
-                        Game.Activity.SetRequestedOrientation(ScreenOrientation.Landscape);						
-				    }	
+                    // MfA 4.2 no longer has Activity.SetRequestedOrientation
+                    //if (_currentOrientation == DisplayOrientation.Portrait || _currentOrientation == DisplayOrientation.PortraitUpsideDown)
+                    //    Game.Activity.SetRequestedOrientation(ScreenOrientation.Portrait);						
+                    //else if (_currentOrientation == DisplayOrientation.LandscapeLeft || _currentOrientation == DisplayOrientation.LandscapeRight)
+                    //    Game.Activity.SetRequestedOrientation(ScreenOrientation.Landscape);						
 
                     if (OrientationChanged != null)
                     {

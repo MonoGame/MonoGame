@@ -77,9 +77,8 @@ using System.Linq;
 					return;
 				
 				var newVolume = value ? 0.0f : _volume;
-				
-				for (int x = 0; x < _queue.Count; x++)
-					_queue[x].Volume = newVolume;
+
+                _queue.SetVolume(newVolume);
             }
         }
 
@@ -140,9 +139,8 @@ using System.Linq;
 				
 				if (_queue.ActiveSong == null)
 					return;
-			
-				for (int x = 0; x < _queue.Count; x++)
-					_queue[x].Volume = _volume;
+
+                _queue.SetVolume(_volume);
 			}
         }
 		
@@ -168,20 +166,20 @@ using System.Linq;
 			
 			_queue.Add(song);
 			
-			playSong(song);
+			PlaySong(song);
         }
 		
 		public static void Play(SongCollection collection, int index = 0)
 		{
 			foreach(var song in collection)
-				Queue.Add(song);
+				_queue.Add(song);
 			
 			_queue.ActiveSongIndex = index;
 			
-			playSong(Queue[index]);
+			PlaySong(_queue.ActiveSong);
 		}
 		
-		private static void playSong(Song song)
+		private static void PlaySong(Song song)
 		{
 			song.SetEventHandler(OnSongFinishedPlaying);
 			
@@ -223,7 +221,7 @@ using System.Linq;
 				return;
 			
 			// Loop through so that we reset the PlayCount as well
-			foreach(var song in Queue)
+			foreach(var song in Queue.Songs)
 				_queue.ActiveSong.Stop();
 			
 			_mediaState = MediaState.Stopped;
@@ -231,17 +229,17 @@ using System.Linq;
 		
 		public static void MoveNext()
 		{
-			nextSong(1);
+			NextSong(1);
 		}
 		
 		public static void MovePrevious()
 		{
-			nextSong(-1);
+			NextSong(-1);
 		}
 		
-		private static void nextSong(int direction)
+		private static void NextSong(int direction)
 		{
-			var nextSong = _queue.getNextSong(direction, IsShuffled);
+			var nextSong = _queue.GetNextSong(direction, IsShuffled);
 			
 			if (nextSong == null)
 			{

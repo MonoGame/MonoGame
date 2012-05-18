@@ -3,12 +3,13 @@ using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Media
 {
-	public class MediaQueue : List<Song>
+	public sealed class MediaQueue
 	{
+        List<Song> songs = new List<Song>();
 		private int _activeSongIndex = 0;
 		private Random random = new Random();
 		
-		public MediaQueue () : base()
+		public MediaQueue()
 		{
 			
 		}
@@ -17,10 +18,10 @@ namespace Microsoft.Xna.Framework.Media
 		{
 			get
 			{
-				if (this.Count == 0)
+				if (songs.Count == 0)
 					return null;
 				
-				return this[_activeSongIndex];
+				return songs[_activeSongIndex];
 			}
 		}
 		
@@ -29,27 +30,62 @@ namespace Microsoft.Xna.Framework.Media
 			get { return _activeSongIndex; }
 			set { _activeSongIndex = value; }
 		}
-		
-		internal Song getNextSong(int direction, bool shuffle)
+
+        internal int Count
+        {
+            get
+            {
+                return songs.Count;
+            }
+        }
+
+        internal IEnumerable<Song> Songs
+        {
+            get
+            {
+                return songs;
+            }
+        }
+
+		internal Song GetNextSong(int direction, bool shuffle)
 		{
 			if (shuffle)
-				_activeSongIndex = random.Next(this.Count);
+				_activeSongIndex = random.Next(songs.Count);
 			else			
-				_activeSongIndex = (int)MathHelper.Clamp(_activeSongIndex + direction, 0, Count - 1);
+				_activeSongIndex = (int)MathHelper.Clamp(_activeSongIndex + direction, 0, songs.Count - 1);
 			
-			return this[_activeSongIndex];
+			return songs[_activeSongIndex];
 		}
 		
-		internal new void Clear ()
+		internal void Clear()
 		{
 			Song song;
-			for(; this.Count > 0; )
+			for(; songs.Count > 0; )
 			{
-				song = this[0];
+				song = songs[0];
 				song.Stop();
-				this.Remove(song);
+				songs.Remove(song);
 			}	
 		}
+
+        internal void SetVolume(float volume)
+        {
+            int count = songs.Count;
+            for (int i = 0; i < count; ++i)
+                songs[i].Volume = volume;
+        }
+
+        internal void Add(Song song)
+        {
+            songs.Add(song);
+        }
+
+        internal void Stop()
+        {
+            int count = songs.Count;
+            for (int i = 0; i < count; ++i)
+                songs[i].Stop();
+        }
 	}
 }
 
