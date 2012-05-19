@@ -376,8 +376,6 @@ namespace Microsoft.Xna.Framework
 
         public void Tick()
         {
-            //TargetElapsedTime = TimeSpan.FromSeconds(1.0f / 57.0f);
-
             // Advance the accumulated elapsed time.
             //
             // TODO: We should consider switching to StopWatch which
@@ -398,10 +396,19 @@ namespace Microsoft.Xna.Framework
 
             if (IsFixedTimeStep)
             {
-                // If not enough time has elapsed to do a single update
-                // then return and wait for the next tick. 
-                if ( _accumulatedElapsedTime < TargetElapsedTime )
+                // If not enough time has elapsed to perform an update we
+                // sleep off the the remaining time to save battery life
+                // and/or free CPU time for other threads and processes.
+                if (_accumulatedElapsedTime < TargetElapsedTime)
+                {
+                    var sleepTime = (int)(TargetElapsedTime - _accumulatedElapsedTime).TotalMilliseconds;
+#if WINRT
+                    Task.Delay(sleepTime).Wait();
+#else
+                    System.Threading.Thread.Sleep(sleepTime);
+#endif
                     return;
+                }
 
                 // Perform as many full fixed length time steps as we can.
                 while (_accumulatedElapsedTime >= TargetElapsedTime)
@@ -433,22 +440,6 @@ namespace Microsoft.Xna.Framework
                 _gameTime.ElapsedGameTime = tickElapsedTime;
                 DoDraw(_gameTime);
                 Platform.Present();
-            }
-
-            if (IsFixedTimeStep)
-            {
-                // We sleep off the time till the next tick to save 
-                // battery life and/or CPU time for other processes.
-                //var sleepTime = (int)(TargetElapsedTime - _accumulatedElapsedTime).TotalMilliseconds;
-                var sleepTime = (int)(TargetElapsedTime - ((DateTime.Now - _lastTickTime) + _accumulatedElapsedTime)).TotalMilliseconds;
-                if (sleepTime > 0)
-                {
-#if WINRT
-                    Task.Delay(sleepTime).Wait();
-#else
-                    System.Threading.Thread.Sleep(sleepTime);
-#endif
-                }
             }
         }
 
