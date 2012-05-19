@@ -216,7 +216,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			      depth);
 		}
 
-		private void Draw (Texture2D texture,
+		internal void Draw (Texture2D texture,
 			Vector4 destinationRectangle,
 			Rectangle? sourceRectangle,
 			Color color,
@@ -228,11 +228,15 @@ namespace Microsoft.Xna.Framework.Graphics
 			if (texture == null) {
 				throw new ArgumentException ("texture");
 			}
-			
-			// texture 0 is the texture beeing draw
+
+            // texture 0 is the texture beeing draw
+            //
+            // TODO: Why are we doing this... we should be setting the
+            // texture on the batch item... it has no point here!
+            //
 			graphicsDevice.Textures [0] = texture;			
 			
-			SpriteBatchItem item = _batcher.CreateBatchItem ();
+			var item = _batcher.CreateBatchItem ();
 
 			item.Depth = depth;
 			item.Texture = texture;

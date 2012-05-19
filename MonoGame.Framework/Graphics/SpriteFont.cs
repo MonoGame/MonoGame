@@ -83,9 +83,9 @@ namespace Microsoft.Xna.Framework.Graphics
 				"Text contains characters that cannot be resolved by this SpriteFont.";
 		}
 
-		private Dictionary<char, Glyph> _glyphs;
+		private readonly Dictionary<char, Glyph> _glyphs;
 		
-		private Texture2D _texture;
+		private readonly Texture2D _texture;
 
 		internal SpriteFont (
 			Texture2D texture, List<Rectangle> glyphBounds, List<Rectangle> cropping, List<char> characters,
@@ -103,10 +103,15 @@ namespace Microsoft.Xna.Framework.Graphics
             {
 				var glyph = new Glyph 
                 {
-					BoundsInTexture = glyphBounds [i],
-					Cropping = cropping [i],
-					Kerning = kerning [i],
-					Character = characters [i]
+					BoundsInTexture = glyphBounds[i],
+					Cropping = cropping[i],
+                    Character = characters[i],
+
+                    LeftSideBearing = kerning[i].X,
+                    Width = kerning[i].Y,
+                    RightSideBearing = kerning[i].Z,
+
+                    WidthIncludingBearings = kerning[i].X + kerning[i].Y + kerning[i].Z
 				};
 				_glyphs.Add (glyph.Character, glyph);
 			}
@@ -174,6 +179,11 @@ namespace Microsoft.Xna.Framework.Graphics
 				return;
 			}
 
+            // Get the default glyph here once.
+            Glyph? defaultGlyph = null;
+            if ( DefaultCharacter.HasValue )
+                defaultGlyph = _glyphs[DefaultCharacter.Value];
+
 			var width = 0.0f;
 			var finalLineHeight = (float)LineSpacing;
 			var fullLineCount = 0;
@@ -204,10 +214,15 @@ namespace Microsoft.Xna.Framework.Graphics
                 if (hasCurrentGlyph)
                     offset.X += Spacing + currentGlyph.WidthIncludingBearings;
 
-                hasCurrentGlyph =   _glyphs.TryGetValue(c, out currentGlyph) ||
-                                    ( DefaultCharacter.HasValue && _glyphs.TryGetValue(DefaultCharacter.Value, out currentGlyph) );
+                hasCurrentGlyph = _glyphs.TryGetValue(c, out currentGlyph);
                 if (!hasCurrentGlyph)
-                    throw new ArgumentException(Errors.TextContainsUnresolvableCharacters, "text");
+                {
+                    if (!defaultGlyph.HasValue)
+                        throw new ArgumentException(Errors.TextContainsUnresolvableCharacters, "text");
+
+                    currentGlyph = defaultGlyph.Value;
+                    hasCurrentGlyph = true;                        
+                }
 
                 var proposedWidth = offset.X + currentGlyph.WidthIncludingBearings;
                 if (proposedWidth > width)
@@ -249,6 +264,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
             }
 
+            // TODO: This looks excessive... i suspect we could do most
+            // of this with simple vector math and avoid this much matrix work.
+
             Matrix transformation, temp;
             Matrix.CreateTranslation(-origin.X, -origin.Y, 0f, out transformation);
             Matrix.CreateScale(scale.X, scale.Y, 1f, out temp);
@@ -260,9 +278,11 @@ namespace Microsoft.Xna.Framework.Graphics
             Matrix.CreateTranslation(position.X, position.Y, 0f, out temp);
             Matrix.Multiply(ref transformation, ref temp, out transformation);
 
-            var width = 0.0f;
-            var finalLineHeight = (float)LineSpacing;
-            var fullLineCount = 0;
+            // Get the default glyph here once.
+            Glyph? defaultGlyph = null;
+            if (DefaultCharacter.HasValue)
+                defaultGlyph = _glyphs[DefaultCharacter.Value];
+
             var currentGlyph = Glyph.Empty;
             var offset = Vector2.Zero;
             var hasCurrentGlyph = false;
@@ -278,11 +298,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 if (c == '\n')
                 {
-                    fullLineCount++;
-                    finalLineHeight = LineSpacing;
-
                     offset.X = 0;
-                    offset.Y = LineSpacing * fullLineCount;
+                    offset.Y += LineSpacing;
                     hasCurrentGlyph = false;
                     continue;
                 }
@@ -290,17 +307,15 @@ namespace Microsoft.Xna.Framework.Graphics
                 if (hasCurrentGlyph)
                     offset.X += Spacing + currentGlyph.WidthIncludingBearings;
 
-                hasCurrentGlyph =   _glyphs.TryGetValue(c, out currentGlyph) ||
-                                    (DefaultCharacter.HasValue && _glyphs.TryGetValue(DefaultCharacter.Value, out currentGlyph));
+                hasCurrentGlyph = _glyphs.TryGetValue(c, out currentGlyph);
                 if (!hasCurrentGlyph)
-                    throw new ArgumentException(Errors.TextContainsUnresolvableCharacters, "text");
+                {
+                    if (!defaultGlyph.HasValue)
+                        throw new ArgumentException(Errors.TextContainsUnresolvableCharacters, "text");
 
-                var proposedWidth = offset.X + currentGlyph.WidthIncludingBearings;
-                if (proposedWidth > width)
-                    width = proposedWidth;
-
-                if (currentGlyph.Cropping.Height > finalLineHeight)
-                    finalLineHeight = currentGlyph.Cropping.Height;
+                    currentGlyph = defaultGlyph.Value;
+                    hasCurrentGlyph = true;
+                }
 
                 var p = offset;
 
@@ -314,9 +329,18 @@ namespace Microsoft.Xna.Framework.Graphics
 
 				Vector2.Transform(ref p, ref transformation, out p);
 
+                var destRect = new Vector4( p.X, p.Y, 
+                                            currentGlyph.BoundsInTexture.Width * scale.X,
+                                            currentGlyph.BoundsInTexture.Height * scale.Y);
+
+                // TODO: We're passing SpriteEffects thru here unchanged, but
+                // it seems we're applyting the flips ourselves above.
+                //
+                // This just might be a bug!
+
 				spriteBatch.Draw(
-                    _texture, p, currentGlyph.BoundsInTexture,
-					color, rotation, Vector2.Zero, scale, effect, depth);
+                    _texture, destRect, currentGlyph.BoundsInTexture,
+					color, rotation, Vector2.Zero, effect, depth);
 			}
 		}
 
@@ -356,54 +380,19 @@ namespace Microsoft.Xna.Framework.Graphics
 			public char Character;
 			public Rectangle BoundsInTexture;
 			public Rectangle Cropping;
-			public Vector3 Kerning;
+            public float LeftSideBearing;
+            public float RightSideBearing;
+            public float Width;
+            public float WidthIncludingBearings;
 
-			private static readonly Glyph _empty = new Glyph ();
-
-			public static Glyph Empty { get { return _empty; } }
-
-			public float LeftSideBearing { get { return Kerning.X; } }
-
-			public float RightSideBearing { get { return Kerning.Z; } }
-
-			public float Width { get { return Kerning.Y; } }
-
-			public float WidthIncludingBearings 
-            {
-				get { return Kerning.X + Kerning.Y + Kerning.Z; }
-			}
+			public static readonly Glyph Empty = new Glyph();
 
 			public override string ToString ()
 			{
 				return string.Format(
-					"CharacterIndex={0}, Glyph={1}, Cropping={2}, Kerning={3}",
-					Character, BoundsInTexture, Cropping, Kerning);
+					"CharacterIndex={0}, Glyph={1}, Cropping={2}, Kerning={3},{4},{5}",
+                    Character, BoundsInTexture, Cropping, LeftSideBearing, Width, RightSideBearing);
 			}
 		}
-
-		#region Deprecated
-
-		[Obsolete ("AssetName does not seem to be in use.", true)]
-		internal string AssetName;
-
-		[Obsolete ("SpriteFont.FontSize does not exist in XNA and is deprecated.")]
-		public double FontSize
-		{
-			get { return 11; }
-		}
-
-		[Obsolete ("SpriteFont.Bold does not exist in XNA and is deprecated.")]
-		public bool Bold
-		{
-			get { return false; }
-		}
-
-		[Obsolete ("SpriteFont.Italic does not exist in XNA and is deprecated.")]
-		public bool Italic
-		{
-			get { return false; }
-		}
-
-		#endregion Deprecated
 	}
 }
