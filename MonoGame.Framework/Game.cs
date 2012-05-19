@@ -74,15 +74,17 @@ using System.Drawing;
 #endif
 using System.IO;
 using System.Reflection;
+#if WINRT
+using System.Threading.Tasks;
+#endif
 
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
-#if !WINRT
 using Microsoft.Xna.Framework.GamerServices;
-#endif
+
 
 namespace Microsoft.Xna.Framework
 {
@@ -120,9 +122,13 @@ namespace Microsoft.Xna.Framework
 
         private TimeSpan _targetElapsedTime = TimeSpan.FromSeconds(1 / DefaultTargetFramesPerSecond);
 
+        private readonly TimeSpan _maxElapsedTime = TimeSpan.FromMilliseconds(500);
+
         private int previousDisplayWidth;
         private int previousDisplayHeight;
 
+        private bool _suppressDraw;
+        
         public Game()
         {
             _instance = this;
@@ -322,8 +328,14 @@ namespace Microsoft.Xna.Framework
         public void ResetElapsedTime()
         {
             Platform.ResetElapsedTime();
-            _lastUpdate = DateTime.Now;
-            _gameTime.ResetElapsedTime();
+            _lastTickTime = DateTime.Now;
+            _accumulatedElapsedTime = TimeSpan.Zero;
+            _gameTime.ElapsedGameTime = TimeSpan.Zero;
+        }
+
+        public void SuppressDraw()
+        {
+            _suppressDraw = true;
         }
 
         public void Run()
@@ -358,66 +370,83 @@ namespace Microsoft.Xna.Framework
             }
         }
 
-        private DateTime _now;
-        private DateTime _lastUpdate = DateTime.Now;
+        private DateTime _lastTickTime = DateTime.Now;
+        private TimeSpan _accumulatedElapsedTime;
         private readonly GameTime _gameTime = new GameTime();
-        private readonly GameTime _fixedTimeStepTime = new GameTime();
-        private TimeSpan _totalTime = TimeSpan.Zero;
 
         public void Tick()
         {
-            bool doDraw = false;
+            //TargetElapsedTime = TimeSpan.FromSeconds(1.0f / 57.0f);
 
-            _now = DateTime.Now;
+            // Advance the accumulated elapsed time.
+            //
+            // TODO: We should consider switching to StopWatch which
+            // is designed for high accuracy timing. 
+            //
+            var nowTime = DateTime.Now;
+            _accumulatedElapsedTime += nowTime - _lastTickTime;
+            _lastTickTime = nowTime;
 
-            _gameTime.Update(_now - _lastUpdate);
-            _lastUpdate = _now;
+            // Do not allow any update to take longer than our maximum.
+            if (_accumulatedElapsedTime > _maxElapsedTime)
+                _accumulatedElapsedTime = _maxElapsedTime;
+
+            var tickElapsedTime = TimeSpan.Zero;
+
+            // TODO: We should be calculating IsRunningSlowly
+            // somewhere around here!
 
             if (IsFixedTimeStep)
             {
-                _totalTime += _gameTime.ElapsedGameTime;
-                int max = (500/TargetElapsedTime.Milliseconds);    //Only do updates for half a second worth of updates
-                int iterations = 0;
+                // If not enough time has elapsed to do a single update
+                // then return and wait for the next tick. 
+                if ( _accumulatedElapsedTime < TargetElapsedTime )
+                    return;
 
-                max = max <= 0 ? 1 : max;   //Make sure at least 1 update is called
-
-                while (_totalTime >= TargetElapsedTime)
+                // Perform as many full fixed length time steps as we can.
+                while (_accumulatedElapsedTime >= TargetElapsedTime)
                 {
-                    _fixedTimeStepTime.Update(TargetElapsedTime);
-                    _totalTime -= TargetElapsedTime;
-                    DoUpdate(_fixedTimeStepTime);
-                    doDraw = true;
-                        
-                    iterations++;
-                    if (iterations >= max)  //Reset catchup if to many updates have been called
-                    {
-                        _totalTime = TimeSpan.Zero;
-                    }
+                    _gameTime.ElapsedGameTime = TargetElapsedTime;
+                    _gameTime.TotalGameTime += TargetElapsedTime;
+                    tickElapsedTime += TargetElapsedTime;
+                    _accumulatedElapsedTime -= TargetElapsedTime;
+
+                    DoUpdate(_gameTime);
                 }
             }
             else
             {
+                // Perform a single update.
+                _gameTime.ElapsedGameTime = _accumulatedElapsedTime;
+                _gameTime.TotalGameTime += _accumulatedElapsedTime;
+                tickElapsedTime = _accumulatedElapsedTime;
+                _accumulatedElapsedTime = TimeSpan.Zero;
+
                 DoUpdate(_gameTime);
-                doDraw = true;
             }
 
-            if (doDraw)
+            // Draw unless the update suppressed it.
+            if (_suppressDraw)
+                _suppressDraw = false;
+            else
             {
+                _gameTime.ElapsedGameTime = tickElapsedTime;
                 DoDraw(_gameTime);
                 Platform.Present();
             }
 
             if (IsFixedTimeStep)
             {
-                var currentTime = (DateTime.Now - _lastUpdate) + _totalTime;
-
-                if (currentTime < TargetElapsedTime)
+                // We sleep off the time till the next tick to save 
+                // battery life and/or CPU time for other processes.
+                //var sleepTime = (int)(TargetElapsedTime - _accumulatedElapsedTime).TotalMilliseconds;
+                var sleepTime = (int)(TargetElapsedTime - ((DateTime.Now - _lastTickTime) + _accumulatedElapsedTime)).TotalMilliseconds;
+                if (sleepTime > 0)
                 {
-                    var sleepMs = (TargetElapsedTime - currentTime).Milliseconds;
 #if WINRT
-                    new System.Threading.ManualResetEvent(false).WaitOne(sleepMs);
+                    Task.Delay(sleepTime).Wait();
 #else
-                    System.Threading.Thread.Sleep(sleepMs);
+                    System.Threading.Thread.Sleep(sleepTime);
 #endif
                 }
             }
