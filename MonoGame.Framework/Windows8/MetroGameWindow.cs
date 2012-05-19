@@ -113,13 +113,6 @@ namespace Microsoft.Xna.Framework
 
         #region Delegates
 
-        /*
-        private void OpenTkGameWindow_Closing(object sender, CancelEventArgs e)
-        {
-            Game.Exit();
-        }
-        */
-
         private void Keyboard_KeyUp(CoreWindow sender, KeyEventArgs args)
         {
             // VirtualKey maps pretty much to XNA keys.
@@ -140,14 +133,6 @@ namespace Microsoft.Xna.Framework
 
         #endregion
 
-        private void HandleInput()
-        {
-            // mouse doesn't need to be treated here, Mouse class does it alone
-
-            // keyboard
-            Keyboard.State = new KeyboardState(_keys.ToArray());
-        }
-
         #endregion
 
         public void Initialize(CoreWindow coreWindow)
@@ -157,23 +142,18 @@ namespace Microsoft.Xna.Framework
             _coreWindow.SizeChanged += Window_SizeChanged;
             _coreWindow.Closed += Window_Closed;
 
-            //window.Closing += new EventHandler<CancelEventArgs>(OpenTkGameWindow_Closing);
-            //window.Resize += OnResize;
             _coreWindow.KeyDown += Keyboard_KeyDown;
             _coreWindow.KeyUp += Keyboard_KeyUp;
 
             var bounds = _coreWindow.Bounds;
             SetClientBounds(bounds.Width, bounds.Height);
 
-            // Set the window icon.
-            //window.Icon = Icon.ExtractAssociatedIcon(Assembly.GetEntryAssembly().Location);
-
             InitializeTouch();
         }
 
         private void Window_Closed(CoreWindow sender, CoreWindowEventArgs args)
         {
-            throw new NotImplementedException();
+            Game.Exit();
         }
 
         private void SetClientBounds(double width, double height)
@@ -193,7 +173,8 @@ namespace Microsoft.Xna.Framework
 
         protected override void SetTitle(string title)
         {
-            //window.Title = title;
+            // NOTE: There seems to be no concept of a
+            // window title in a Metro application.
         }
 
         internal void SetCursor(bool visible)
@@ -217,12 +198,13 @@ namespace Microsoft.Xna.Framework
                 // Process events incoming to the window.
                 _coreWindow.Dispatcher.ProcessEvents(CoreProcessEventsOption.ProcessAllIfPresent);
 
-                // Process the game.
+                // Apply the keyboard state gathered from
+                // the key events since the last tick.
+                Keyboard.State = new KeyboardState(_keys.ToArray());
+
+                // Update and render the game.
                 if (Game != null)
-                {
-                    HandleInput();
                     Game.Tick();
-                }
 
                 if (IsExiting)
                     break;
