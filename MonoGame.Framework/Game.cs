@@ -74,6 +74,7 @@ using System.Drawing;
 #endif
 using System.IO;
 using System.Reflection;
+using System.Diagnostics;
 #if WINRT
 using System.Threading.Tasks;
 #endif
@@ -328,7 +329,7 @@ namespace Microsoft.Xna.Framework
         public void ResetElapsedTime()
         {
             Platform.ResetElapsedTime();
-            _lastTickTime = DateTime.Now;
+            _gameTimer.Restart();
             _accumulatedElapsedTime = TimeSpan.Zero;
             _gameTime.ElapsedGameTime = TimeSpan.Zero;
         }
@@ -370,63 +371,72 @@ namespace Microsoft.Xna.Framework
             }
         }
 
-        private DateTime _lastTickTime = DateTime.Now;
         private TimeSpan _accumulatedElapsedTime;
         private readonly GameTime _gameTime = new GameTime();
+        private Stopwatch _gameTimer = Stopwatch.StartNew();
 
         public void Tick()
         {
+            // NOTE: This code is very sensitive and can break very badly
+            // with even what looks like a safe change.  Be sure to test 
+            // any change fully in both the fixed and variable timestep 
+            // modes across multiple devices and platforms.
+
+        RetryTick:
+
             // Advance the accumulated elapsed time.
-            //
-            // TODO: We should consider switching to StopWatch which
-            // is designed for high accuracy timing. 
-            //
-            var nowTime = DateTime.Now;
-            _accumulatedElapsedTime += nowTime - _lastTickTime;
-            _lastTickTime = nowTime;
+            _accumulatedElapsedTime += _gameTimer.Elapsed;
+            _gameTimer.Restart();
+
+            // If we're in the fixed timestep mode and not enough time has elapsed
+            // to perform an update we sleep off the the remaining time to save battery
+            // life and/or release CPU time to other threads and processes.
+            if (IsFixedTimeStep && _accumulatedElapsedTime < TargetElapsedTime)
+            {
+                var sleepTime = (int)(TargetElapsedTime - _accumulatedElapsedTime).TotalMilliseconds;
+
+                // NOTE: While sleep can be inaccurate in general it is 
+                // accurate enough for frame limiting purposes if some
+                // fluctuation is an acceptable result.
+#if WINRT
+                Task.Delay(sleepTime).Wait();
+#else
+                System.Threading.Thread.Sleep(sleepTime);
+#endif
+                goto RetryTick;
+            }
 
             // Do not allow any update to take longer than our maximum.
             if (_accumulatedElapsedTime > _maxElapsedTime)
                 _accumulatedElapsedTime = _maxElapsedTime;
-
-            var tickElapsedTime = TimeSpan.Zero;
 
             // TODO: We should be calculating IsRunningSlowly
             // somewhere around here!
 
             if (IsFixedTimeStep)
             {
-                // If not enough time has elapsed to perform an update we
-                // sleep off the the remaining time to save battery life
-                // and/or free CPU time for other threads and processes.
-                if (_accumulatedElapsedTime < TargetElapsedTime)
-                {
-                    var sleepTime = (int)(TargetElapsedTime - _accumulatedElapsedTime).TotalMilliseconds;
-#if WINRT
-                    Task.Delay(sleepTime).Wait();
-#else
-                    System.Threading.Thread.Sleep(sleepTime);
-#endif
-                    return;
-                }
+                _gameTime.ElapsedGameTime = TargetElapsedTime;
+                var stepCount = 0;
 
                 // Perform as many full fixed length time steps as we can.
                 while (_accumulatedElapsedTime >= TargetElapsedTime)
                 {
-                    _gameTime.ElapsedGameTime = TargetElapsedTime;
                     _gameTime.TotalGameTime += TargetElapsedTime;
-                    tickElapsedTime += TargetElapsedTime;
                     _accumulatedElapsedTime -= TargetElapsedTime;
+                    ++stepCount;
 
                     DoUpdate(_gameTime);
                 }
+
+                // Draw needs to know the total elapsed time
+                // that occured for the fixed length updates.
+                _gameTime.ElapsedGameTime = TimeSpan.FromTicks(TargetElapsedTime.Ticks * stepCount);
             }
             else
             {
-                // Perform a single update.
+                // Perform a single variable length update.
                 _gameTime.ElapsedGameTime = _accumulatedElapsedTime;
                 _gameTime.TotalGameTime += _accumulatedElapsedTime;
-                tickElapsedTime = _accumulatedElapsedTime;
                 _accumulatedElapsedTime = TimeSpan.Zero;
 
                 DoUpdate(_gameTime);
@@ -437,7 +447,6 @@ namespace Microsoft.Xna.Framework
                 _suppressDraw = false;
             else
             {
-                _gameTime.ElapsedGameTime = tickElapsedTime;
                 DoDraw(_gameTime);
                 Platform.Present();
             }
