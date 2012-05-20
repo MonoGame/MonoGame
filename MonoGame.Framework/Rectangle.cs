@@ -203,10 +203,10 @@ namespace Microsoft.Xna.Framework
 
         public bool Intersects(Rectangle r2)
         {
-            return !(r2.Left > Right
-                     || r2.Right < Left
-                     || r2.Top > Bottom
-                     || r2.Bottom < Top
+            return !(r2.Left >= Right
+                     || r2.Right <= Left
+                     || r2.Top >= Bottom
+                     || r2.Bottom <= Top
                     );
 
         }
@@ -214,10 +214,10 @@ namespace Microsoft.Xna.Framework
 
         public void Intersects(ref Rectangle value, out bool result)
         {
-            result = !(value.Left > Right
-                     || value.Right < Left
-                     || value.Top > Bottom
-                     || value.Bottom < Top
+            result = !(value.Left >= Right
+                     || value.Right <= Left
+                     || value.Top >= Bottom
+                     || value.Bottom <= Top
                     );
 
         }
