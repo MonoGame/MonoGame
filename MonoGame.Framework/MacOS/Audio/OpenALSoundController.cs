@@ -34,10 +34,18 @@ namespace Microsoft.Xna.Framework.Audio
 #if IPHONE
 			AudioSession.Initialize();
 
-			if (AudioSession.OtherAudioIsPlaying)
-				AudioSession.Category = AudioSessionCategory.AmbientSound;
-			else
-				AudioSession.Category = AudioSessionCategory.SoloAmbientSound;
+			// NOTE: iOS 5.1 simulator throws an exception when setting the category
+			// to SoloAmbientSound.  This could be removed if that bug gets fixed.
+			try
+			{
+				if (AudioSession.OtherAudioIsPlaying)
+					AudioSession.Category = AudioSessionCategory.AmbientSound;
+				else
+				{
+					AudioSession.Category = AudioSessionCategory.SoloAmbientSound;
+				}
+			}
+			catch (AudioSessionException) { }
 #endif
 			alcMacOSXMixerOutputRate(PREFERRED_MIX_RATE);
 			_device = Alc.OpenDevice (string.Empty);
