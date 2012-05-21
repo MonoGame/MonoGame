@@ -146,8 +146,17 @@ namespace Microsoft.Xna.Framework
 
         private void OnResize(object sender, EventArgs e)
         {
-            //Game.GraphicsDevice.SizeChanged(window.ClientRectangle.Width, window.ClientRectangle.Height);
-            Game.GraphicsDevice.Viewport = new Viewport(0, 0, window.ClientRectangle.Width, window.ClientRectangle.Height);
+            var winWidth = window.ClientRectangle.Width;
+            var winHeight = window.ClientRectangle.Height;
+            var winRect = new Rectangle(0, 0, winWidth, winHeight);
+            
+            ChangeClientBounds(winRect);
+            
+            Game.GraphicsDevice.Viewport = new Viewport(0, 0, winWidth, winHeight);
+            
+            Game.GraphicsDevice.PresentationParameters.BackBufferWidth = winWidth;
+            Game.GraphicsDevice.PresentationParameters.BackBufferHeight = winHeight;
+            
             OnClientSizeChanged();
         }
 
