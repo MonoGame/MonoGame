@@ -352,8 +352,6 @@
     <Compile Include="Content\ContentReaders\Texture2DReader.cs" />
     <Compile Include="Graphics\SpriteBatch.cs" />
     <Compile Include="Graphics\GraphicsDevice.cs" />
-    <Compile Include="MacOS\Audio\OALSoundBuffer.cs" />
-    <Compile Include="MacOS\Audio\OpenALSoundController.cs" />
     <Compile Include="MacOS\Audio\OpenALSupport.cs" />
     <Compile Include="MacOS\Audio\SoundEffect.cs" />
     <Compile Include="MacOS\Audio\SoundEffectInstance.cs" />
@@ -364,7 +362,7 @@
     <Compile Include="LaunchParameters.cs" />
     <Compile Include="MacOS\MacGamePlatform+Synchronous.cs" />
     <Compile Include="Graphics\Vertices\VertexDeclaration.cs" />
-    <Compile Include="Graphics\Vertices\VertexDeclarationCache.cs" />    
+    <Compile Include="Graphics\Vertices\VertexDeclarationCache.cs" />
     <Compile Include="Content\ContentReaders\IndexBufferReader.cs" />
     <Compile Include="Content\ContentReaders\BasicEffectReader.cs" />
     <Compile Include="Content\ContentReaders\BoundingBoxReader.cs" />
@@ -397,12 +395,17 @@
     <Compile Include="Graphics\Texture2D.cs" />
     <Compile Include="Graphics\SpriteFont.cs" />
     <Compile Include="Graphics\Effect\ConstantBuffer.cs" />
+    <Compile Include="Media\MediaQueue.cs" />
+    <Compile Include="Media\Playlist.cs" />
+    <Compile Include="Media\PlaylistCollection.cs" />
+    <Compile Include="Media\SongCollection.cs" />
+    <Compile Include="Desktop\Audio\OALSoundBuffer.cs" />
+    <Compile Include="Desktop\Audio\OpenALSoundController.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />
     <Folder Include="Graphics\" />
     <Folder Include="Graphics\Vertices\" />
-    <Folder Include="MacOS\Graphics\" />
     <Folder Include="Content\ContentReaders\" />
     <Folder Include="GamerServices\" />
     <Folder Include="MacOS\Audio\" />
@@ -411,6 +414,7 @@
     <Folder Include="MacOS\Input\" />
     <Folder Include="MacOS\GamerServices\" />
     <Folder Include="MacOS\Storage\" />
+    <Folder Include="Desktop\Audio\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="MonoGame.Framework.MacOS.dll.config">

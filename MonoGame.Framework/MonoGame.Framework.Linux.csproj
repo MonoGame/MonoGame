@@ -357,7 +357,7 @@
     <Compile Include="Graphics\Vertices\IndexElementSize.cs" />
     <Compile Include="Graphics\Vertices\VertexBuffer.cs" />
     <Compile Include="Graphics\Vertices\VertexDeclaration.cs" />
-    <Compile Include="Graphics\Vertices\VertexDeclarationCache.cs" />    
+    <Compile Include="Graphics\Vertices\VertexDeclarationCache.cs" />
     <Compile Include="Graphics\BatchItem.cs" />
     <Compile Include="Graphics\CompareFunction.cs" />
     <Compile Include="Graphics\CubeMapFace.cs" />
@@ -386,6 +386,11 @@
     <Compile Include="Input\MouseState.cs" />
     <Compile Include="Desktop\TitleContainer.cs" />
     <Compile Include="Input\Keyboard.cs" />
+    <Compile Include="Media\MediaQueue.cs" />
+    <Compile Include="Media\Playlist.cs" />
+    <Compile Include="Media\PlaylistCollection.cs" />
+    <Compile Include="Media\SongCollection.cs" />
+    <Compile Include="Graphics\Effect\ConstantBuffer.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.Linux.csproj">
