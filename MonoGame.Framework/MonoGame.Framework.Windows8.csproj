@@ -150,6 +150,7 @@
     <Compile Include="Media\MediaPlayer.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Media\MediaQueue.cs" />
     <Compile Include="Media\MediaSourceType.cs">
       <SubType>Code</SubType>
     </Compile>
