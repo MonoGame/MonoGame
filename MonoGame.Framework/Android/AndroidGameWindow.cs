@@ -81,6 +81,8 @@ namespace Microsoft.Xna.Framework
         double updateFrameLast;
         double renderFrameLast;
         public GraphicsContext BackgroundContext;
+        // Work-around for FrameEventArgs.Time being unusable as it is being modified by a background thread constantly
+        System.Diagnostics.Stopwatch frameTime = new System.Diagnostics.Stopwatch();
 
         public AndroidGameWindow(Context context, Game game) : base(context)
         {
@@ -153,9 +155,6 @@ namespace Microsoft.Xna.Framework
 		
 		protected override void CreateFrameBuffer()
 		{
-            // Allow threaded resource loading
-            OpenTK.Graphics.GraphicsContext.ShareContexts = true;
-
 #if true			
 			try
             {
@@ -174,25 +173,13 @@ namespace Microsoft.Xna.Framework
 
             if (!GraphicsContext.IsCurrent)
                 MakeCurrent();
-
-            // Create a context for the background loading
-            GraphicsContextFlags flags = GraphicsContextFlags.Default;
-#if DEBUG
-            //flags |= GraphicsContextFlags.Debug;
-#endif
-            GraphicsMode mode = new GraphicsMode();
-            BackgroundContext = new GraphicsContext(mode, WindowInfo, 2, 0, flags);
-            Threading.BackgroundContext = BackgroundContext;
-            Threading.WindowInfo = WindowInfo;
 		}
 
         protected override void OnLoad(EventArgs e)
         {
-            // FIXME: Uncomment this line when moving to Mono for Android 4.0.5
-            //MakeCurrent();
-
             // Make sure an Update is called before a Draw
             updateFrameElapsed = _game.TargetElapsedTime.TotalSeconds;
+            frameTime.Start();
 
             base.OnLoad(e);
         }
@@ -210,10 +197,13 @@ namespace Microsoft.Xna.Framework
             if (!GraphicsContext.IsCurrent)
                 MakeCurrent();
 
+            Threading.Run();
+
             if (_game != null)
             {
                 double targetElapsed = _game.TargetElapsedTime.TotalSeconds;
-                renderFrameElapsed += e.Time;
+                //renderFrameElapsed += e.Time;
+                renderFrameElapsed = frameTime.Elapsed.TotalSeconds;
                 if (renderFrameElapsed < (renderFrameLast + targetElapsed))
                     return;
 
@@ -238,10 +228,13 @@ namespace Microsoft.Xna.Framework
 		{			
 			base.OnUpdateFrame(e);
 
-			if (_game != null )
+            Threading.Run();
+            
+            if (_game != null)
 			{
                 double targetElapsed = _game.TargetElapsedTime.TotalSeconds;
-                updateFrameElapsed += e.Time;
+                //updateFrameElapsed += e.Time;
+                updateFrameElapsed = frameTime.Elapsed.TotalSeconds;
                 if (updateFrameElapsed < (updateFrameLast + targetElapsed))
                     return;
 
@@ -360,19 +353,19 @@ namespace Microsoft.Xna.Framework
             switch (e.ActionMasked)
             {
                 // DOWN                
-                case 0:
-                case 5:
+                case MotionEventActions.Down:
+                case MotionEventActions.PointerDown:
                     TouchPanel.AddEvent(new TouchLocation(id, TouchLocationState.Pressed, position));
                     break;
 
                 // UP                
-                case 1:
-                case 6:
+                case MotionEventActions.Up:
+                case MotionEventActions.PointerUp:
                     TouchPanel.AddEvent(new TouchLocation(id, TouchLocationState.Released, position));
 				    break;
 
                 // MOVE                
-                case 2:
+                case MotionEventActions.Move:
                     for (int i = 0; i < e.PointerCount; i++)
                     {
                         id = e.GetPointerId(i);
@@ -382,9 +375,10 @@ namespace Microsoft.Xna.Framework
                         TouchPanel.AddEvent(new TouchLocation(id, TouchLocationState.Moved, position));
                     }
 					break;
+
                 // CANCEL, OUTSIDE                
-                case 3:
-                case 4:
+                case MotionEventActions.Cancel:
+                case MotionEventActions.Outside:
                     TouchPanel.AddEvent(new TouchLocation(id, TouchLocationState.Released, position));
                     break;
             }
@@ -446,14 +440,11 @@ namespace Microsoft.Xna.Framework
                 {
                     _currentOrientation = value;
 
-                    if (_currentOrientation == DisplayOrientation.Portrait || _currentOrientation == DisplayOrientation.PortraitUpsideDown)
-				    {
-                        Game.Activity.SetRequestedOrientation(ScreenOrientation.Portrait);						
-				    }
-                    else if (_currentOrientation == DisplayOrientation.LandscapeLeft || _currentOrientation == DisplayOrientation.LandscapeRight)
-				    {
-                        Game.Activity.SetRequestedOrientation(ScreenOrientation.Landscape);						
-				    }	
+                    // MfA 4.2 no longer has Activity.SetRequestedOrientation
+                    //if (_currentOrientation == DisplayOrientation.Portrait || _currentOrientation == DisplayOrientation.PortraitUpsideDown)
+                    //    Game.Activity.SetRequestedOrientation(ScreenOrientation.Portrait);						
+                    //else if (_currentOrientation == DisplayOrientation.LandscapeLeft || _currentOrientation == DisplayOrientation.LandscapeRight)
+                    //    Game.Activity.SetRequestedOrientation(ScreenOrientation.Landscape);						
 
                     if (OrientationChanged != null)
                     {

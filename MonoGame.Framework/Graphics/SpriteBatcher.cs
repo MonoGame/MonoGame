@@ -58,9 +58,6 @@ using TextureTarget = OpenTK.Graphics.ES20.All;
 using DrawElementsType = OpenTK.Graphics.ES20.All;
 using BufferTarget = OpenTK.Graphics.ES20.All;
 using BeginMode = OpenTK.Graphics.ES20.All;
-#elif PSS
-using Sce.Pss.Core.Graphics;
-using PssVertexBuffer = Sce.Pss.Core.Graphics.VertexBuffer;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -82,10 +79,6 @@ namespace Microsoft.Xna.Framework.Graphics
 		VertexPosition2ColorTexture[] _vertexArray;
 		GCHandle _vertexHandle;
 		GCHandle _indexHandle;
-#elif PSS
-        PssVertexBuffer _vertexBuffer;
-        VertexPosition2ColorTexture[] _vertexArray;
-        ushort[] _index;
 #endif
 
 		public SpriteBatcher (GraphicsDevice device)
@@ -112,9 +105,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			_vertexArray = new VertexPosition2ColorTexture[4*InitialVertexArraySize];
 			_vertexHandle = GCHandle.Alloc(_vertexArray,GCHandleType.Pinned);
 			_indexHandle = GCHandle.Alloc(_index,GCHandleType.Pinned);		
-#elif PSS
-            _vertexArray = new VertexPosition2ColorTexture[4*InitialVertexArraySize];
-            _vertexBuffer = new PssVertexBuffer(InitialVertexArraySize, 6 * InitialVertexArraySize, VertexFormat.Float2, VertexFormat.UByte4N, VertexFormat.Float2);
 #endif
 		}
 		
@@ -226,8 +216,6 @@ namespace Microsoft.Xna.Framework.Graphics
 					GL.BindTexture ( TextureTarget.Texture2D, tex.glTexture );
 
 					samplerState.Activate(TextureTarget.Texture2D);
-#elif PSS
-                    _device._graphics.SetTexture(0, tex._texture2D);
 #endif
                 }
 
@@ -273,12 +261,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			_vertexArray = new VertexPosition2ColorTexture[4*newCount];
 			_vertexHandle = GCHandle.Alloc(_vertexArray,GCHandleType.Pinned);
-			_indexHandle = GCHandle.Alloc(_index,GCHandleType.Pinned);			
-#elif PSS
-            _vertexBuffer.Dispose();
-            _vertexBuffer = new PssVertexBuffer(newCount, 6 * newCount, VertexFormat.Float2, VertexFormat.UByte4N, VertexFormat.Float2);
-            
-            _vertexArray = new VertexPosition2ColorTexture[4*newCount];
+			_indexHandle = GCHandle.Alloc(_index,GCHandleType.Pinned);
 #endif
 		}
 
@@ -305,15 +288,6 @@ namespace Microsoft.Xna.Framework.Graphics
 				                vertexCount/2*3,
 				                DrawElementsType.UnsignedShort,
 				                (IntPtr)(_indexHandle.AddrOfPinnedObject().ToInt64()+(start/2*3*sizeof(short))) );
-#elif PSS
-#warning this should be applied somewhere else
-            _device._graphics.Enable(EnableMode.Blend);
-            _device._graphics.SetBlendFunc(BlendFuncMode.Add, BlendFuncFactor.SrcAlpha, BlendFuncFactor.OneMinusSrcAlpha);
-            
-            _vertexBuffer.SetVertices(_vertexArray, 0, start, vertexCount);
-            _vertexBuffer.SetIndices(_index);
-            _device._graphics.SetVertexBuffer(0, _vertexBuffer);
-            _device._graphics.DrawArrays(DrawMode.Triangles, start, vertexCount / 2 * 3);
 #endif
 		}
 	}

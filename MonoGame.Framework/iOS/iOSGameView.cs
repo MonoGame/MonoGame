@@ -179,7 +179,6 @@ namespace Microsoft.Xna.Framework {
 			}
 
 			__renderbuffergraphicsContext.MakeCurrent (null);
-			__renderbuffergraphicsContext.LoadAll ();
 		}
 
 		private void DestroyContext ()
