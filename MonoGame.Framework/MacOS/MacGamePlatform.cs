@@ -76,6 +76,7 @@ using MonoMac.Foundation;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.GamerServices;
 
 namespace Microsoft.Xna.Framework
@@ -256,6 +257,10 @@ namespace Microsoft.Xna.Framework
 
             if (AreUpdatingAndDrawingSuspended || IsPlayingVideo || Guide.isVisible)
                 return false;
+
+            // Let the touch panel update states.
+            TouchPanel.UpdateState();
+
             return true;
         }
 

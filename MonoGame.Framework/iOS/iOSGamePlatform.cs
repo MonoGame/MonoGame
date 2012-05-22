@@ -254,6 +254,10 @@ namespace Microsoft.Xna.Framework
         {
             if (IsPlayingVideo)
                 return false;
+
+            // Let the touch panel update states.
+            TouchPanel.UpdateState();
+
             return true;
         }
 

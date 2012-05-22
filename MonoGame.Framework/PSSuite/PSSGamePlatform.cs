@@ -137,6 +137,9 @@ namespace Microsoft.Xna.Framework
                 Game.DoInitialize();
                 _initialized = true;
             }
+
+            // Let the touch panel update states.
+            TouchPanel.UpdateState();
             
             return true;
         }

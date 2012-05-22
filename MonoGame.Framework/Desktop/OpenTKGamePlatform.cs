@@ -71,10 +71,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-#if !WINRT
 using Microsoft.Xna.Framework.Audio;
-#endif
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input.Touch;
 
 namespace Microsoft.Xna.Framework
 {
@@ -123,7 +122,11 @@ namespace Microsoft.Xna.Framework
         public override bool BeforeUpdate(GameTime gameTime)
         {
 			// Update our OpenAL sound buffer pools
-			soundControllerInstance.Update();			
+			soundControllerInstance.Update();
+
+            // Let the touch panel update states.
+            TouchPanel.UpdateState();
+
             return true;
         }
 
