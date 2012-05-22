@@ -88,7 +88,7 @@ namespace Microsoft.Xna.Framework.Media
 		/// <summary>
 		/// Set the event handler for "Finished Playing". Done this way to prevent multiple bindings.
 		/// </summary>
-		public void SetEventHandler(FinishedPlayingHandler handler)
+		internal void SetEventHandler(FinishedPlayingHandler handler)
 		{
 			if (DonePlaying != null)
 				return;
@@ -113,7 +113,9 @@ namespace Microsoft.Xna.Framework.Media
             {
                 if (_sound != null)
                 {
+#if IPHONE
                     _sound.FinishedPlaying -= OnFinishedPlaying;
+#endif
                     _sound.Dispose();
                     _sound = null;
                 }
