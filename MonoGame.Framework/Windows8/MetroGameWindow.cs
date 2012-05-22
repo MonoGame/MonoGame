@@ -38,18 +38,19 @@ purpose and non-infringement.
 */
 #endregion License
 
-#region Using Statements
 using System;
 using System.ComponentModel;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Reflection;
+using System.Runtime.InteropServices;
+
+using Windows.UI.Core;
+using Windows.Graphics.Display;
+
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Windows.UI.Core;
-using System.Runtime.InteropServices;
-using Windows.Graphics.Display;
-#endregion Using Statements
+
 
 namespace Microsoft.Xna.Framework
 {

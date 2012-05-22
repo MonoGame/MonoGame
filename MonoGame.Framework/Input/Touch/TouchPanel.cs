@@ -53,7 +53,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// <summary>
         /// The currently touch state.
         /// </summary>
-        private static Dictionary<int, TouchLocation> _state = new Dictionary<int, TouchLocation>();
+        private static Dictionary<int, TouchLocation> _touchLocations = new Dictionary<int, TouchLocation>();
 
         /// <summary>
         /// The touch events to be processed and added to the current state.
@@ -64,6 +64,17 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// Scratch list used to remove touch state.
         /// </summary>
         private static List<int> _removeId = new List<int>();
+
+        /// <summary>
+        /// The current touch state.
+        /// </summary>
+        private static TouchCollection _state = new TouchCollection();
+
+        /// <summary>
+        /// If true an update to the touch state should occur
+        /// on the next call to GetState.
+        /// </summary>
+        private static bool _updateState = true;
 
         internal static Queue<GestureSample> GestureList = new Queue<GestureSample>();
 		internal static event EventHandler EnabledGesturesChanged;
@@ -77,28 +88,33 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
         public static TouchCollection GetState()
         {
-            // Remove the previously released states.
-            foreach (var keyLoc in _state)
+            // If the state isn't dirty then just
+            // return the current state.
+            if (!_updateState)
+                return _state;
+
+            // Remove the previously released touch locations.
+            foreach (var keyLoc in _touchLocations)
             {
                 if (keyLoc.Value.State == TouchLocationState.Released)
                     _removeId.Add(keyLoc.Key);
             }
             foreach (var id in _removeId)
-                _state.Remove(id);
+                _touchLocations.Remove(id);
 
-            // Update the existing states.
+            // Update the existing touch locations.
             for (var i = 0; i < _events.Count; )
             {
                 var loc = _events[i];
 
                 TouchLocation prev;
-                if (_state.TryGetValue(loc.Id, out prev))
+                if (_touchLocations.TryGetValue(loc.Id, out prev))
                 {
                     // Remove this event.
                     _events.RemoveAt(i);
-                    
+
                     // Remove any pending events of this type.
-                    for (var j = i; j < _events.Count;)
+                    for (var j = i; j < _events.Count; )
                     {
                         if (_events[j].Id == loc.Id)
                         {
@@ -109,17 +125,17 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
                         j++;
                     }
-                    
-                    // Set the new state.
-                    _state[loc.Id] = new TouchLocation( loc.Id, 
-                                                        loc.State, loc.Position, loc.Pressure, 
-                                                        prev.State, prev.Position, prev.Pressure);
+
+                    // Set the new touch location state.
+                    _touchLocations[loc.Id] = new TouchLocation(loc.Id,
+                                                                    loc.State, loc.Position, loc.Pressure,
+                                                                    prev.State, prev.Position, prev.Pressure);
                     continue;
                 }
 
                 i++;
             }
-            
+
             // Add any new pressed events.
             for (var i = 0; i < _events.Count; )
             {
@@ -127,21 +143,34 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
                 if (loc.State == TouchLocationState.Pressed)
                 {
-                    _state.Add(loc.Id, loc);
+                    _touchLocations.Add(loc.Id, loc);
                     _events.RemoveAt(i);
                     continue;
                 }
 
                 i++;
             }
-            
-            // Return the new state.
-            return new TouchCollection(_state.Values.ToArray());
-        }
 
+            // Set the new state.
+            _state = new TouchCollection(_touchLocations.Values.ToArray());
+
+            // Don't update again till the next frame.
+            _updateState = false;
+            
+            // Return the state.
+            return _state;
+        }
+        
         internal static void AddEvent(TouchLocation location)
         {
             _events.Add(location);
+        }
+
+        internal static void UpdateState()
+        {
+            // Just tell the next call to GetState() that
+            // it is time for it to update.
+            _updateState = true;
         }
 
 		public static GestureSample ReadGesture()
