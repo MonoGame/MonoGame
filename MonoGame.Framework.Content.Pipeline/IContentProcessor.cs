@@ -42,12 +42,27 @@ using System;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline
 {
+    /// <summary>
+    /// Provides methods and properties for accessing a statically typed ContentProcessor subclass, using dynamically typed object data.
+    /// </summary>
     public interface IContentProcessor
     {
-        public Type InputType { get; }
+        /// <summary>
+        /// Gets the expected object type of the input parameter to IContentProcessor.Process.
+        /// </summary>
+        Type InputType { get; }
 
-        public Type OutputType { get; }
+        /// <summary>
+        /// Gets the object type returned by IContentProcessor.Process.
+        /// </summary>
+        Type OutputType { get; }
 
-        public Object Process(Object input, ContentProcessorContext context);
+        /// <summary>
+        /// Processes the specified input data and returns the result.
+        /// </summary>
+        /// <param name="input">Existing content object being processed.</param>
+        /// <param name="context">Contains any required custom process parameters.</param>
+        /// <returns>An object representing the processed input.</returns>
+        Object Process(Object input, ContentProcessorContext context);
     }
 }

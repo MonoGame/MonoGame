@@ -49,16 +49,21 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
     public class VideoContent : ContentItem, IDisposable
     {
         bool disposed;
+        int bitsPerSecond;
+        TimeSpan duration;
+        float framesPerSecond;
+        int height;
+        int width;
 
         /// <summary>
         /// Gets the bit rate for this video.
         /// </summary>
-        public int BitsPerSecond { get; }
+        public int BitsPerSecond { get { return bitsPerSecond; } }
 
         /// <summary>
         /// Gets the duration of this video.
         /// </summary>
-        public TimeSpan Duration { get; }
+        public TimeSpan Duration { get { return duration; } }
 
         /// <summary>
         /// Gets or sets the file name for this video.
@@ -69,12 +74,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// <summary>
         /// Gets the frame rate for this video.
         /// </summary>
-        public float FramesPerSecond { get; }
+        public float FramesPerSecond { get { return framesPerSecond; } }
 
         /// <summary>
         /// Gets the height of this video.
         /// </summary>
-        public int Height { get; }
+        public int Height { get { return height; } }
 
         /// <summary>
         /// Gets or sets the type of soundtrack accompanying the video.
@@ -85,7 +90,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// <summary>
         /// Gets the width of this video.
         /// </summary>
-        public int Width { get; }
+        public int Width { get { return width; } }
 
         /// <summary>
         /// Initializes a new copy of the VideoContent class for the specified video file.
@@ -95,6 +100,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             string filename
             )
         {
+            Filename = filename;
             // TODO: Open video and fill in properties
             // ...
         }
