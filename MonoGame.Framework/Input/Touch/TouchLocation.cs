@@ -56,8 +56,9 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		private TouchLocationState previousState;
 		
         // TODO: Lets try to remove these.
-		internal long? timeTouchBegan;
-		internal Vector2 startingPosition;
+		// internals required for gesture recognition.
+		internal DateTime timeTouchBegan;
+		internal Vector2 startingPosition; // TODO: Change this into totalDistanceMoved
 				
 		// Only used in Android, for now
 		private float pressure;
@@ -96,12 +97,12 @@ namespace Microsoft.Xna.Framework.Input.Touch
 	        } 
 		}
 
-        internal long Lifetime
+        internal TimeSpan Lifetime
         {
             get
             {
-                var curTime = DateTime.Now.Ticks;
-                var beginningOfLife = timeTouchBegan.GetValueOrDefault(curTime);
+                var curTime = DateTime.Now;
+                var beginningOfLife = timeTouchBegan == null ? curTime : timeTouchBegan;
                 var difference = curTime - beginningOfLife;
 
                 return difference;
@@ -122,7 +123,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			previousState = aPreviousState;	
 			pressure = 0.0f;
 			previousPressure = 0.0f;
-			timeTouchBegan = DateTime.Now.Ticks;
+			timeTouchBegan = DateTime.Now;
         }
 
         public TouchLocation(int aId, TouchLocationState aState, Vector2 aPosition)
@@ -134,7 +135,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			previousState = TouchLocationState.Invalid;	
 			pressure = 0.0f;
 			previousPressure = 0.0f;
-			timeTouchBegan = DateTime.Now.Ticks;
+			timeTouchBegan = DateTime.Now;
         }
 		
 		// Only for Android
@@ -148,7 +149,22 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			previousState = aPreviousState;	
 			pressure = aPressure;
 			previousPressure = aPreviousPressure;
-			timeTouchBegan = DateTime.Now.Ticks;
+			timeTouchBegan = DateTime.Now;
+        }
+		
+		public TouchLocation(int aId, TouchLocationState aState, Vector2 aPosition, float aPressure,
+		                     TouchLocationState aPreviousState, Vector2 aPreviousPosition, float aPreviousPressure, 
+		                     DateTime aTimeBegan, Vector2 aStartingPosition)
+        {
+            id = aId;
+			position = aPosition;
+			startingPosition = aStartingPosition;
+			previousPosition = aPreviousPosition;
+			state = aState;
+			previousState = aPreviousState;	
+			pressure = aPressure;
+			previousPressure = aPreviousPressure;
+			timeTouchBegan = aTimeBegan;
         }
 		
 		public TouchLocation(int aId, TouchLocationState aState, Vector2 aPosition, float aPressure)
@@ -160,7 +176,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			previousState = TouchLocationState.Invalid;
 			pressure = aPressure;
 			previousPressure = 0.0f;
-			timeTouchBegan = DateTime.Now.Ticks;
+			timeTouchBegan = DateTime.Now;
         }
 		#endregion
 		
@@ -202,7 +218,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 				aPreviousLocation.previousPosition = Vector2.Zero; 
 				aPreviousLocation.pressure = 0.0f;
 				aPreviousLocation.previousPressure = 0.0f;
-				aPreviousLocation.timeTouchBegan = null;
+				aPreviousLocation.timeTouchBegan = DateTime.MinValue;
 				return false;
 			}
 			else
