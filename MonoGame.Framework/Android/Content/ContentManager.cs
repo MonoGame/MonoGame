@@ -54,7 +54,18 @@ namespace Microsoft.Xna.Framework.Content
         protected virtual Stream OpenStream(string assetName)
         {
             Stream stream = Game.Activity.Assets.Open(assetName);
-            return stream;
+			try
+			{
+				MemoryStream memStream = new MemoryStream();
+            	stream.CopyTo(memStream);
+            	memStream.Seek(0, SeekOrigin.Begin);
+				return memStream;
+			}
+			finally
+			{
+            	stream.Close();
+			}
+            
         }
     }
 }
