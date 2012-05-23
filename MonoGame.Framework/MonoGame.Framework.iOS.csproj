@@ -325,12 +325,8 @@
     <Compile Include="iOS\iOSGamePlatform.cs" />
     <Compile Include="iOS\iOSGameViewController.cs" />
     <Compile Include="iOS\OrientationConverter.cs" />
-    <Compile Include="MacOS\Audio\OALSoundBuffer.cs">
-      <Link>iOS\Audio\OALSoundBuffer.cs</Link>
-    </Compile>
-    <Compile Include="MacOS\Audio\OpenALSoundController.cs">
-      <Link>iOS\Audio\OpenALSoundController.cs</Link>
-    </Compile>
+    <Compile Include="Desktop\Audio\OALSoundBuffer.cs"/>
+    <Compile Include="Desktop\Audio\OpenALSoundController.cs"/>
     <Compile Include="MacOS\Audio\OpenALSupport.cs">
       <Link>iOS\Audio\OpenALSupport.cs</Link>
     </Compile>
