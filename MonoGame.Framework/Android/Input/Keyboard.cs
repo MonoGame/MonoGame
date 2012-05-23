@@ -46,8 +46,8 @@ using Android.Views;
 
 namespace Microsoft.Xna.Framework.Input
 {
-	public static class Keyboard
-	{
+    public static class Keyboard
+    {
         private static List<Keys> keys = new List<Keys>();
 
         private static readonly IDictionary<Keycode, Keys> KeyMap = LoadKeyMap();
@@ -55,19 +55,20 @@ namespace Microsoft.Xna.Framework.Input
         public static void KeyDown(Keycode keyCode)
         {
             Keys key = KeyMap[keyCode];
-            if (!keys.Contains(key)) keys.Add(key);            
+            if (!keys.Contains(key)) keys.Add(key);
         }
 
         public static void KeyUp(Keycode keyCode)
         {
             Keys key = KeyMap[keyCode];
-            if (keys.Contains(key)) keys.Remove(key);            
+            if (keys.Contains(key)) keys.Remove(key);
         }
 
+        //Updated by TopHatHacker
         private static IDictionary<Keycode, Keys> LoadKeyMap()
         {
             // create a map for every Keycode and default it to none so that every possible key is mapped
-            var maps = Enum.GetValues(typeof (Keycode))
+            var maps = Enum.GetValues(typeof(Keycode))
                 .Cast<Keycode>()
                 .ToDictionary(key => key, key => Keys.None);
 
@@ -76,18 +77,49 @@ namespace Microsoft.Xna.Framework.Input
             maps[Keycode.DpadRight] = Keys.Right;
             maps[Keycode.DpadUp] = Keys.Up;
             maps[Keycode.DpadDown] = Keys.Down;
-			maps[Keycode.DpadCenter] = Keys.Enter;
-			maps[Keycode.A] = Keys.A;
-			maps[Keycode.Y] = Keys.Y;
-			maps[Keycode.X] = Keys.X;
-			maps[Keycode.B] = Keys.B;
-			maps[Keycode.S] = Keys.S;
-			maps[Keycode.W] = Keys.W;
-			maps[Keycode.D] = Keys.D;
-			maps[Keycode.Back] = Keys.Escape;
+            maps[Keycode.DpadCenter] = Keys.Enter;
+            maps[Keycode.Num0] = Keys.D0;
+            maps[Keycode.Num1] = Keys.D1;
+            maps[Keycode.Num2] = Keys.D2;
+            maps[Keycode.Num3] = Keys.D3;
+            maps[Keycode.Num4] = Keys.D4;
+            maps[Keycode.Num5] = Keys.D5;
+            maps[Keycode.Num6] = Keys.D6;
+            maps[Keycode.Num7] = Keys.D7;
+            maps[Keycode.Num8] = Keys.D8;
+            maps[Keycode.Num9] = Keys.D9;
+            maps[Keycode.A] = Keys.A;
+            maps[Keycode.B] = Keys.B;
+            maps[Keycode.C] = Keys.C;
+            maps[Keycode.D] = Keys.D;
+            maps[Keycode.E] = Keys.E;
+            maps[Keycode.F] = Keys.F;
+            maps[Keycode.G] = Keys.G;
+            maps[Keycode.H] = Keys.H;
+            maps[Keycode.I] = Keys.I;
+            maps[Keycode.J] = Keys.J;
+            maps[Keycode.K] = Keys.K;
+            maps[Keycode.L] = Keys.L;
+            maps[Keycode.M] = Keys.M;
+            maps[Keycode.N] = Keys.N;
+            maps[Keycode.O] = Keys.O;
+            maps[Keycode.P] = Keys.P;
+            maps[Keycode.Q] = Keys.Q;
+            maps[Keycode.R] = Keys.R;
+            maps[Keycode.S] = Keys.S;
+            maps[Keycode.T] = Keys.T;
+            maps[Keycode.U] = Keys.U;
+            maps[Keycode.V] = Keys.V;
+            maps[Keycode.W] = Keys.W;
+            maps[Keycode.X] = Keys.X;
+            maps[Keycode.Y] = Keys.Y;
+            maps[Keycode.Z] = Keys.Z;
+            maps[Keycode.Back] = Keys.Escape;
             maps[Keycode.Back] = Keys.Back;
             maps[Keycode.Home] = Keys.Home;
-			maps[Keycode.Enter] = Keys.Enter;
+            maps[Keycode.Enter] = Keys.Enter;
+            maps[Keycode.Period] = Keys.OemPeriod;
+            maps[Keycode.Comma] = Keys.OemComma;
             // TODO: put in all the other mappings
             maps[Keycode.Menu] = Keys.Help;
             maps[Keycode.Search] = Keys.BrowserSearch;
@@ -96,14 +128,14 @@ namespace Microsoft.Xna.Framework.Input
             return maps;
         }
 
-	    public static KeyboardState GetState()
-		{
-			return new KeyboardState(keys.ToArray()); // TODO Not used on iPhone or Zune
-		}
-		
-		public static KeyboardState GetState(PlayerIndex playerIndex)
-		{
+        public static KeyboardState GetState()
+        {
+            return new KeyboardState(keys.ToArray()); // TODO Not used on iPhone or Zune
+        }
+
+        public static KeyboardState GetState(PlayerIndex playerIndex)
+        {
             return new KeyboardState(keys.ToArray());  // TODO Not used on iPhone or Zune
-		}
-	}
+        }
+    }
 }
