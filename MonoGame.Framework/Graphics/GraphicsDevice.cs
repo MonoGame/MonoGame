@@ -394,7 +394,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _d2dContext = new SharpDX.Direct2D1.DeviceContext(_d2dDevice, SharpDX.Direct2D1.DeviceContextOptions.None);
         }
 
-        protected void CreateSizeDependentResources()
+        internal void CreateSizeDependentResources()
         {
             if (PresentationParameters == null || PresentationParameters.DeviceWindowHandle == IntPtr.Zero)
                 return;

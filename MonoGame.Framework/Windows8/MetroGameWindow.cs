@@ -50,6 +50,7 @@ using Windows.Graphics.Display;
 
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Windows.UI.ViewManagement;
 
 
 namespace Microsoft.Xna.Framework
@@ -145,11 +146,19 @@ namespace Microsoft.Xna.Framework
 
             _coreWindow.KeyDown += Keyboard_KeyDown;
             _coreWindow.KeyUp += Keyboard_KeyUp;
+            
+            ApplicationView.GetForCurrentView().ViewStateChanged += Application_ViewStateChanged;
 
             var bounds = _coreWindow.Bounds;
             SetClientBounds(bounds.Width, bounds.Height);
 
             InitializeTouch();
+        }
+
+        private void Application_ViewStateChanged(ApplicationView sender, ApplicationViewStateChangedEventArgs args)
+        {
+            // TODO: We may want to expose this event via GameWindow
+            // only in WinRT builds....  not sure yet.
         }
 
         private void Window_Closed(CoreWindow sender, CoreWindowEventArgs args)
@@ -169,6 +178,17 @@ namespace Microsoft.Xna.Framework
         private void Window_SizeChanged(CoreWindow sender, WindowSizeChangedEventArgs args)
         {
             SetClientBounds( args.Size.Width, args.Size.Height );
+
+            // If we have a valid client bounds then regenerate the back buffer.
+            if (_clientBounds.Width > 0 && _clientBounds.Height > 0)
+            {
+                var device = Game.GraphicsDevice;
+                device.Viewport = new Viewport(0, 0, _clientBounds.Width, _clientBounds.Height);
+                device.PresentationParameters.BackBufferWidth = _clientBounds.Width;
+                device.PresentationParameters.BackBufferHeight = _clientBounds.Height;
+                device.CreateSizeDependentResources();
+            }
+
             OnClientSizeChanged();
         }
 
