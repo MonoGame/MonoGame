@@ -96,7 +96,16 @@ namespace Yeti.MMedia
 		    }
 	    }
       closed = true;
+
       base.Close ();
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (this.BaseStream is FileStream)
+            base.Dispose(disposing);
+        else
+            base.Dispose(false);
     }
   
     public override void Write(byte[] buffer, int index, int count)
