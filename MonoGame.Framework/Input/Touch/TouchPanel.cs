@@ -102,7 +102,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
             foreach (var id in _removeId)
 			{
                 _touchLocations.Remove(id);
-				//_heldEventsProcessed.Remove(id);
+				_heldEventsProcessed.Remove(id);
+                _processedDoubleTaps.Remove(id);
 			}
 
             // Update the existing touch locations.
@@ -131,9 +132,9 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
                     // Set the new touch location state.
                     _touchLocations[loc.Id] = new TouchLocation(loc.Id,
-                                                                    loc.State, loc.Position, loc.Pressure,
-                                                                    prev.State, prev.Position, prev.Pressure, prev.timeTouchBegan,
-					                                            	prev.startingPosition);
+                                                                loc.State, loc.Position, loc.Pressure,
+                                                                prev.State, prev.Position, prev.Pressure, prev.timeTouchBegan,
+				                                            	prev.startingPosition);
                     continue;
                 }
 
@@ -248,7 +249,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		#region Gesture Recognition
 		
 		private const long _maxTicksToProcessHold = 10250000;
-		private const long _maxTicksToProcessDoubleTap = 4300000;
+		private const long _maxTicksToProcessDoubleTap = 1300000;
 		private const int _minVelocityToCompleteSwipe = 35;
 		
 		// For pinch, we'll need to "save" a touch so we can
@@ -261,7 +262,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		{
 			return (EnabledGestures & gestureType) != 0;
 		}
-		
+
+        static GestureSample? _tempTap; // Use a member variable rather than initialize a new GestureSample every time this is called.
 		private static void UpdateGestures()
 		{			
 			var touchLocState = _state;
@@ -273,6 +275,13 @@ namespace Microsoft.Xna.Framework.Input.Touch
 				{
 					case TouchLocationState.Pressed:
 					case TouchLocationState.Moved:
+                    
+                    if(touch.State == TouchLocationState.Pressed)
+                    {
+                        if (ProcessDoubleTap(touch))
+                            break;
+                    }
+                    
 					// Any time that two fingers are detected in XNA, it's considered a pinch
 					// Save the touch and combine it with the next one to create a pinch gesture
 					if (GestureIsEnabled(GestureType.Pinch) &&
@@ -329,21 +338,20 @@ namespace Microsoft.Xna.Framework.Input.Touch
 				}
 			}
 			
-			/*// Fire off any tap gestures that are ready.
-			GestureSample tap;
-			for (int x = 0; x < pendingTaps.Count;)
+			// Fire off any tap gestures that are ready.
+			for (int x = 0; x < _pendingTaps.Count;)
 			{
-				tap = pendingTaps[x];
+				_tempTap = _pendingTaps[x];
 				
-				if (DateTime.Now.Ticks - tap.Timestamp.Ticks >= _maxTicksToProcessDoubleTap)
+				if (DateTime.Now.Ticks - _tempTap.Value.Timestamp.Ticks >= _maxTicksToProcessDoubleTap)
 				{
-					GestureList.Enqueue(tap);
-					pendingTaps.RemoveAt(x);
+					GestureList.Enqueue(_tempTap.Value);
+					_pendingTaps.RemoveAt(x);
 					continue;
 				}
 				
 				x++;
-			}*/
+			}
 			
 			if (_pinchComplete)
 			{
@@ -376,81 +384,83 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			return true;
 				
 		}
-		
-		static List<GestureSample> pendingTaps = new List<GestureSample>();
+        
+        static List<int> _processedDoubleTaps = new List<int>();
+        private static bool ProcessDoubleTap(TouchLocation touch)
+        {
+            if (!GestureIsEnabled(GestureType.DoubleTap))
+                return false;
+            
+            // Another tap must be pending in order to properly
+            // process a double tap.
+            if (_pendingTaps.Count == 0)
+                return false;
+            
+            // Using a member variable rather than initializing a new GestureSample each call.
+            _tempTap = null;
+            foreach (var tap in _pendingTaps)
+            {
+                var diff = tap.Position - touch.Position;
+                
+                // Check that the distance between the two isn't too great.
+                if (diff.Length() > 35)
+                    continue;
+                
+                // Also check that this tap happened within a certain threshold
+                var lifetime = touch.Lifetime - tap.Timestamp;
+                if (lifetime.Ticks > _maxTicksToProcessDoubleTap)
+                    continue;
+                
+                //Otherwise, we are ready to "convert" this tap into a doubletap.
+                _tempTap = tap;
+            }
+            
+            // Check that the test passed
+            if (_tempTap == null)
+                return false;
+            
+            // Remove/cancel the original tap event.
+            _pendingTaps.Remove(_tempTap.Value);
+            
+            // "Replace" it with a doubletap.
+            TouchPanel.GestureList.Enqueue(new GestureSample(
+                           GestureType.DoubleTap, new TimeSpan (DateTime.Now.Ticks),
+                           touch.Position, Vector2.Zero,
+                           Vector2.Zero, Vector2.Zero));
+            
+            // This touch will eventually enter a "released" state. When it does, because
+            // it was part of a doubletap, we don't want to process a third tap at the end.
+            // Save it's ID to prevent this from showing up in the future.
+            _processedDoubleTaps.Add(touch.Id);
+            
+            return true;
+        }
+        static List<GestureSample> _pendingTaps = new List<GestureSample>();
 		private static bool ProcessTap(TouchLocation touch)
 		{
-			if (!GestureIsEnabled(GestureType.Tap)) //&& !GestureIsEnabled(GestureType.DoubleTap))
+			if (!GestureIsEnabled(GestureType.Tap))
 				return false;
 			
 			if (touch.TryGetPreviousLocation(out _previousTouchLoc) && 
 			    _previousTouchLoc.State != TouchLocationState.Pressed)
 				return false;
-			
-			var lifeTime = touch.Lifetime.Ticks;
-			if (lifeTime > _maxTicksToProcessHold)
+
+			if (touch.Lifetime.Ticks > _maxTicksToProcessHold)
 				return false;
-			
-			// TODO: Use a timer to cancel/catch a double tap?
-				TouchPanel.GestureList.Enqueue (new GestureSample (
-				GestureType.Tap, new TimeSpan (DateTime.Now.Ticks),
-				touch.Position, Vector2.Zero,
-				Vector2.Zero, Vector2.Zero));
-			
-			return true;
-			
-			/*// XNA doesn't process a tap event if it happened outside of the
-			// window in which a hold event could be generated.
-			var curLifetime = touch.Lifetime.Ticks;
-			if (curLifetime > _maxTicksToProcessHold)
-				return false;
-			
-			pendingTaps.Add(new GestureSample (
-				GestureType.Tap, new TimeSpan (DateTime.Now.Ticks),
-				touch.Position, Vector2.Zero,
-				Vector2.Zero, Vector2.Zero));
-			
-			
-			// Now we have to decide if we meet the conditions of a doubletap.
-			
-			GestureSample? pendingTap = null;
-			foreach (var tap in pendingTaps)
-			{
-				var diff = tap.Position - touch.Position;
-				
-				// Check that the distance between the two isn't too great.
-				if (diff.Length() > 5)
-					continue;
-				
-				if (Math.Abs((touch.Lifetime - tap.Timestamp).Ticks) > _maxTicksToProcessDoubleTap)
-					continue;
-				
-				//Otherwise, we are ready to "convert" this tap into a doubletap.
-				pendingTap = tap;
-			}
-			
-			// We found an appropriate situation to generate a doubletap.
-			if (pendingTap != null)
-			{
-				// Remove/cancel the original tap event.
-				pendingTaps.Remove(pendingTap.Value);
-				
-				// Replace it with a doubletap.
-				TouchPanel.GestureList.Enqueue(new GestureSample(
-							   GestureType.DoubleTap, new TimeSpan (DateTime.Now.Ticks),
-							   touch.Position, Vector2.Zero,
-							   Vector2.Zero, Vector2.Zero));
-				
-			}
-			else // Otherwise, queue the tap up.
-			{
-				pendingTaps.Add(new GestureSample (
-				GestureType.Tap, new TimeSpan (DateTime.Now.Ticks),
-				touch.Position, Vector2.Zero,
-				Vector2.Zero, Vector2.Zero));
-			}
+            
+            // Check that this touch isn't the end of a previously
+            // processed doubletap.
+            if (_processedDoubleTaps.Contains(touch.Id))
+                return false;
+
+            // Queue up the tap. Because of how DoubleTap works, we can't
+            // just send this off to the GesturePanel right away.
+			_pendingTaps.Add(new GestureSample (
+			GestureType.Tap, new TimeSpan (DateTime.Now.Ticks),
+			touch.Position, Vector2.Zero,
+			Vector2.Zero, Vector2.Zero));
 					
-			return true;*/
+			return true;
 		}		
 		
 		private static bool ProcessDrag(TouchLocation touch)
