@@ -250,7 +250,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		
 		private const long _maxTicksToProcessHold = 10250000;
 		private const long _maxTicksToProcessDoubleTap = 1300000;
-		private const int _minVelocityToCompleteSwipe = 35;
+		private const int _minVelocityToCompleteSwipe = 30;
 		
 		// For pinch, we'll need to "save" a touch so we can
 		// send both at the same time
@@ -539,22 +539,37 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			
 			return true;
 		}
-		
+
+        static List<TouchLocation> _prevTouchBuffer = new List<TouchLocation>();
 		private static bool ProcessFlick(TouchLocation touch)
 		{
 			if (!GestureIsEnabled(GestureType.Flick))
 			    return false;
+            
+            // Attempt to get a "total distance traveled" by the last couple of updates.
+            _prevTouchBuffer.Clear();
+            
+            int counter = 0;
+            while (counter < 5)
+            {
+                // Break if we can't get a previous touch location.
+                if (!touch.TryGetPreviousLocation(out _previousTouchLoc))
+                    break;
+                    
+                _prevTouchBuffer.Add(_previousTouchLoc);
+                
+                counter++;
+            }
+            
+            float totalDistance = 0;
+            foreach(var touchLoc in _prevTouchBuffer)
+                totalDistance+= Vector2.Distance(touch.Position, touchLoc.Position);
 			
-			//TODO: Get a better flick velocity. Consider using the touch buffer.		
-			var prevPosition = touch.TryGetPreviousLocation(out _previousTouchLoc) ? _previousTouchLoc.Position : touch.Position;
-			
-			var fakeVelocity = touch.Position - prevPosition;
-			
-			if ( fakeVelocity.Length() < _minVelocityToCompleteSwipe )
-				return false;
+			if ( totalDistance < _minVelocityToCompleteSwipe )
+                return false;
 			
 			//Magical hack. This was here before.
-			fakeVelocity *= 8;
+			var fakeVelocity = (touch.Position - _prevTouchBuffer[0].Position) * 8;
 			
 			TouchPanel.GestureList.Enqueue (new GestureSample (
 				GestureType.Flick, new TimeSpan (DateTime.Now.Ticks),
