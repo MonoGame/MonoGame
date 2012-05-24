@@ -23,6 +23,8 @@ namespace WaveLib
 
 		private WaveFormat m_Format;
 
+        public Stream BaseStream { get { return m_Stream; } }
+
 		public WaveFormat Format
 		{
 			get { return m_Format; }
@@ -35,8 +37,10 @@ namespace WaveLib
 			return System.Text.Encoding.ASCII.GetString(ch);
 		}
 
-		private void ReadHeader()
+		public void ReadHeader()
 		{
+            Position = 0;
+
 			BinaryReader Reader = new BinaryReader(m_Stream);
             var errorCaused = ReadChunk(Reader);
             if (errorCaused != "RIFF")
@@ -77,6 +81,11 @@ namespace WaveLib
 
 			Position = 0;
 		}
+
+        public WaveStream() : base()
+        {
+            m_Stream = new MemoryStream();
+        }
 
 		public WaveStream(string fileName) : this(new FileStream(fileName, FileMode.Open))
 		{
