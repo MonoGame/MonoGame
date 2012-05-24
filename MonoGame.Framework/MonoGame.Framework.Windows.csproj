@@ -442,7 +442,4 @@
       <Name>Lidgren.Network.Windows</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="MonoGame.snk" />
-  </ItemGroup>
 </Project>
