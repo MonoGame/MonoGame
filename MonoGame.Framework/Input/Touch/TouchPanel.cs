@@ -102,7 +102,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
             foreach (var id in _removeId)
 			{
                 _touchLocations.Remove(id);
-				_heldEventsProcessed.Remove(id);
+				//_heldEventsProcessed.Remove(id);
 			}
 
             // Update the existing touch locations.
