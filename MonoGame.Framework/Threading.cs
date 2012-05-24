@@ -102,8 +102,10 @@ namespace Microsoft.Xna.Framework
             Add(() =>
 #endif
             {
+#if ANDROID
                 if (!Game.Instance.Window.GraphicsContext.IsCurrent)
                     Game.Instance.Window.MakeCurrent();
+#endif
                 action();
                 resetEvent.Set();
             });

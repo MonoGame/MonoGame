@@ -205,9 +205,7 @@ namespace Microsoft.Xna.Framework
         private Dictionary<int, TouchLocation> _previousTouches = new Dictionary<int, TouchLocation>();
         
         private void UpdateTouches()
-        {
-            var collection = TouchPanel.Collection;
-            
+        {           
             var pssTouches = Touch.GetData(0);
             foreach (var touch in pssTouches)
             {

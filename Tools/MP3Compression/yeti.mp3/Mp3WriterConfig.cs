@@ -57,6 +57,11 @@ namespace Yeti.MMedia.Mp3
     {
     }
 
+    public Mp3WriterConfig(WaveFormat InFormat, uint outputBitRate)
+        : this(InFormat, new Lame.BE_CONFIG(InFormat, outputBitRate))
+    {
+    }
+
     public Mp3WriterConfig()
       :this(new WaveLib.WaveFormat(44100, 16, 2))
 		{

@@ -144,6 +144,14 @@ namespace Yeti.MMedia.Mp3
       closed = true;
       base.Close ();
     }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (BaseStream is FileStream)
+            base.Dispose(disposing);
+        else
+            base.Dispose(false);
+    }
   
   
     /// <summary>
