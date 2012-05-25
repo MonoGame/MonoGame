@@ -112,7 +112,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
             if (!_updateState)
                 return _state;
 
-            var myPPI = PixelsPerInch;
+            //var myPPI = PixelsPerInch;
 
             // Remove the previously released touch locations.
             foreach (var keyLoc in _touchLocations)
