@@ -323,6 +323,13 @@ namespace Microsoft.Xna.Framework.Graphics
             DepthStencilState = DepthStencilState.Default;
             RasterizerState = RasterizerState.CullCounterClockwise;
 
+#if OPENGL
+            // Force the GLStateManager to set these render states
+            GLStateManager.SetRasterizerStates(RasterizerState, GetRenderTargets().Length > 0);
+            GLStateManager.SetBlendStates(BlendState);
+            GLStateManager.SetDepthStencilState(DepthStencilState);
+#endif
+
             // Set the default render target.
             SetRenderTarget(null);
 

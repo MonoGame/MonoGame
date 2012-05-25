@@ -325,15 +325,11 @@
     <Compile Include="iOS\iOSGamePlatform.cs" />
     <Compile Include="iOS\iOSGameViewController.cs" />
     <Compile Include="iOS\OrientationConverter.cs" />
-    <Compile Include="MacOS\Audio\OpenALSupport.cs">
-      <Link>iOS\Audio\OpenALSupport.cs</Link>
-    </Compile>
-    <Compile Include="MacOS\Audio\SoundEffect.cs">
-      <Link>iOS\Audio\SoundEffect.cs</Link>
-    </Compile>
-    <Compile Include="MacOS\Audio\SoundEffectInstance.cs">
-      <Link>iOS\Audio\SoundEffectInstance.cs</Link>
-    </Compile>
+    <Compile Include="Desktop\Audio\OALSoundBuffer.cs"/>
+    <Compile Include="Desktop\Audio\OpenALSoundController.cs"/>
+    <Compile Include="MacOS\Audio\OpenALSupport.cs"/>
+    <Compile Include="MacOS\Audio\SoundEffect.cs"/>
+    <Compile Include="MacOS\Audio\SoundEffectInstance.cs"/>
     <Compile Include="Graphics\Effect\AlphaTestEffect.cs" />
     <Compile Include="Graphics\Effect\DXShader.cs" />
     <Compile Include="Graphics\Effect\EffectAnnotation.cs" />
@@ -433,12 +429,6 @@
     <Compile Include="iOS\iOSGameWindow.cs" />
     <Compile Include="Graphics\Effect\ConstantBuffer.cs" />
     <Compile Include="Media\MediaQueue.cs" />
-    <Compile Include="Desktop\Audio\OALSoundBuffer.cs">
-      <Link>iOS\Audio\OALSoundBuffer.cs</Link>
-    </Compile>
-    <Compile Include="Desktop\Audio\OpenALSoundController.cs">
-      <Link>iOS\Audio\OpenALSoundController.cs</Link>
-    </Compile>
     <Compile Include="Input\Touch\TouchInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
