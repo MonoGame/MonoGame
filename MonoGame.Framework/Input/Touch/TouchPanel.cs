@@ -268,7 +268,9 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		
 		#region Gesture Recognition
 		
-        private static readonly TimeSpan _flickMovementThreshold = TimeSpan.FromMilliseconds(40);
+        // Tolerance to prevent small movements from cancelling a touch/held recognition.
+        private const int _tapJitterTolerance = 10;
+        private static readonly TimeSpan _flickMovementThreshold = TimeSpan.FromMilliseconds(55);
 		private const long _maxTicksToProcessHold = 10250000;
 		private const long _maxTicksToProcessDoubleTap = 1300000;
 		private const int _minVelocityToCompleteSwipe = 15;
@@ -461,9 +463,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		{
 			if (!GestureIsEnabled(GestureType.Tap))
 				return false;
-			
-			if (touch.TryGetPreviousLocation(out _previousTouchLoc) && 
-			    _previousTouchLoc.State != TouchLocationState.Pressed)
+
+            if (touch.TouchHistory.TotalDistanceMoved > _tapJitterTolerance)
 				return false;
 
 			if (touch.TouchHistory.Lifetime.Ticks > _maxTicksToProcessHold)
