@@ -44,6 +44,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using MonoGame.Framework.Touch;
 #endregion Using clause
 
 namespace Microsoft.Xna.Framework.Input.Touch
@@ -112,8 +113,6 @@ namespace Microsoft.Xna.Framework.Input.Touch
             if (!_updateState)
                 return _state;
 
-            var myPPI = PixelsPerInch;
-
             // Remove the previously released touch locations.
             foreach (var keyLoc in _touchLocations)
             {
@@ -154,8 +153,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
                     // Set the new touch location state.
                     _touchLocations[loc.Id] = new TouchLocation(loc.Id,
                                                                 loc.State, loc.Position, loc.Pressure,
-                                                                prev.State, prev.Position, prev.Pressure, prev.timeTouchBegan,
-				                                            	prev.startingPosition);
+                                                                prev.State, prev.Position, prev.Pressure, prev.TouchHistory);
                     continue;
                 }
 
@@ -170,6 +168,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
                 if (loc.State == TouchLocationState.Pressed)
                 {
                     _touchLocations.Add(loc.Id, loc);
+                    loc.TouchHistory = new TouchInfo(loc.Id, loc.Position);
                     _events.RemoveAt(i);
                     continue;
                 }
@@ -269,9 +268,10 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		
 		#region Gesture Recognition
 		
+        private static readonly TimeSpan _flickMovementThreshold = TimeSpan.FromMilliseconds(40);
 		private const long _maxTicksToProcessHold = 10250000;
 		private const long _maxTicksToProcessDoubleTap = 1300000;
-		private const int _minVelocityToCompleteSwipe = 30;
+		private const int _minVelocityToCompleteSwipe = 15;
 		
 		// For pinch, we'll need to "save" a touch so we can
 		// send both at the same time
@@ -387,7 +387,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			if (!GestureIsEnabled(GestureType.Hold))
 				return false;
 			
-			if (touch.Lifetime.Ticks < _maxTicksToProcessHold)
+			if (touch.TouchHistory.Lifetime.Ticks < _maxTicksToProcessHold)
 				return false;
 			
 			// Only a single held event gets sent per touch.
@@ -428,7 +428,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
                     continue;
                 
                 // Also check that this tap happened within a certain threshold
-                var lifetime = touch.Lifetime - tap.Timestamp;
+                var lifetime = touch.TouchHistory.Lifetime - tap.Timestamp;
                 if (lifetime.Ticks > _maxTicksToProcessDoubleTap)
                     continue;
                 
@@ -466,7 +466,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			    _previousTouchLoc.State != TouchLocationState.Pressed)
 				return false;
 
-			if (touch.Lifetime.Ticks > _maxTicksToProcessHold)
+			if (touch.TouchHistory.Lifetime.Ticks > _maxTicksToProcessHold)
 				return false;
             
             // Check that this touch isn't the end of a previously
@@ -568,34 +568,50 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			    return false;
             
             // Attempt to get a "total distance traveled" by the last couple of updates.
-            _prevTouchBuffer.Clear();
-            
-            int counter = 0;
-            while (counter < 10)
+            var prevPositions = touch.TouchHistory.PreviousPositions;
+            var totalDistance = 0.0f;
+            var counter = 0;
+            var averageDirection = Vector2.Zero;
+            var prevDirection = Vector2.Zero;
+
+            // Check our last couple of positions and see if we are good to build
+            // a flick gesture from the input
+            for (int x = prevPositions.Count - 1; x != 0; x--)
             {
-                // Break if we can't get a previous touch location.
-                if (!touch.TryGetPreviousLocation(out _previousTouchLoc))
+                // Check that this touch happened within an appropriate amount of time of the last.
+                // if not, break early because the other touches will only be older.
+                var timeOfTouch = prevPositions[x-1].Item2;
+
+                var difTime = prevPositions[x].Item2 - timeOfTouch;
+                if (difTime > _flickMovementThreshold)
                     break;
-                    
-                _prevTouchBuffer.Add(_previousTouchLoc);
-                
+                var distanceBetweenVecs = prevPositions[x].Item1 - prevPositions[x-1].Item1;
+
+                // Check that the angle between them isn't too great. Only generate flicks from
+                // smooth, continuous motions.
+                if (prevDirection != Vector2.Zero)
+                {
+                    if (angleBetweenVectors(prevDirection, distanceBetweenVecs) > Math.PI / 4)
+                        break;
+                }
+
+                averageDirection += distanceBetweenVecs;
+                prevDirection = distanceBetweenVecs;
+                totalDistance += distanceBetweenVecs.Length();
                 counter++;
             }
-            
-            float totalDistance = 0;
 
-            for (int x = _prevTouchBuffer.Count - 1; x != 0; x--)
-                totalDistance += Vector2.Distance(_prevTouchBuffer[x].Position, _prevTouchBuffer[x-1].Position);
+            // Bail early if we didn't find any valid touches to build a flick..
+            if (counter == 0)
+                return false;
 
-
-            //foreach(var touchLoc in _prevTouchBuffer)
-                //totalDistance+= Vector2.Distance(touch.Position, touchLoc.Position);
-			
-			if ( totalDistance < (_minVelocityToCompleteSwipe * (_prevTouchBuffer.Count / 10)) )
+            // Check that the "average distance per move" is enough to pass the threshold.
+            var avgDistance = totalDistance / counter;
+			if ( avgDistance < _minVelocityToCompleteSwipe )
                 return false;
 			
-			//Magical hack. This was here before.
-			var fakeVelocity = (touch.Position - _prevTouchBuffer[0].Position) * 8;
+			//TODO: Calculate a better flick velocity
+			var fakeVelocity = Vector2.Normalize(averageDirection) * avgDistance * 20;
 			
 			TouchPanel.GestureList.Enqueue (new GestureSample (
 				GestureType.Flick, new TimeSpan (DateTime.Now.Ticks),
@@ -646,6 +662,11 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			return true;
 			
 		}
+
+        private static float angleBetweenVectors(Vector2 v1, Vector2 v2)
+        {
+            return (float)Math.Abs(Math.Acos(Vector2.Dot(Vector2.Normalize(v1), Vector2.Normalize(v2))));
+        }
 
 		#endregion
     }

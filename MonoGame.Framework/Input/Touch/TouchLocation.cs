@@ -42,6 +42,8 @@
 using System;
 #endregion Using clause
 
+using MonoGame.Framework.Touch;
+
 namespace Microsoft.Xna.Framework.Input.Touch
 {
     public struct TouchLocation : IEquatable<TouchLocation>
@@ -57,14 +59,21 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		
         // TODO: Lets try to remove these.
 		// internals required for gesture recognition.
-		internal DateTime timeTouchBegan;
-		internal Vector2 startingPosition; // TODO: Change this into totalDistanceMoved
+
+        internal TouchInfo _touchHistory;
 				
 		// Only used in Android, for now
 		private float pressure;
 		private float previousPressure;
 		
 		#region Properties
+
+        internal TouchInfo TouchHistory
+        {
+            get { return _touchHistory; }
+            set { _touchHistory = value; }
+        }
+
 		public int Id 
 		{ 
 			get
@@ -96,18 +105,6 @@ namespace Microsoft.Xna.Framework.Input.Touch
 	            return state;
 	        } 
 		}
-
-        internal TimeSpan Lifetime
-        {
-            get
-            {
-                var curTime = DateTime.Now;
-                var beginningOfLife = timeTouchBegan == null ? curTime : timeTouchBegan;
-                var difference = curTime - beginningOfLife;
-
-                return difference;
-            }
-        }
 		
 		#endregion
 		
@@ -117,25 +114,25 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		                     TouchLocationState aPreviousState, Vector2 aPreviousPosition)
         {
             id = aId;
-			position = startingPosition = aPosition;
+			position = aPosition;
 			previousPosition = aPreviousPosition;
 			state = aState;
 			previousState = aPreviousState;	
 			pressure = 0.0f;
 			previousPressure = 0.0f;
-			timeTouchBegan = DateTime.Now;
+            _touchHistory = new TouchInfo(id, position);
         }
 
         public TouchLocation(int aId, TouchLocationState aState, Vector2 aPosition)
         {
             id = aId;
-			position = startingPosition = aPosition;
+			position = aPosition;
 			previousPosition = Vector2.Zero;		
 			state = aState;
 			previousState = TouchLocationState.Invalid;	
 			pressure = 0.0f;
 			previousPressure = 0.0f;
-			timeTouchBegan = DateTime.Now;
+            _touchHistory = new TouchInfo(id, position);
         }
 		
 		// Only for Android
@@ -143,40 +140,42 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		                     TouchLocationState aPreviousState, Vector2 aPreviousPosition, float aPreviousPressure)
         {
             id = aId;
-			position = startingPosition = aPosition;
+			position = aPosition;
 			previousPosition = aPreviousPosition;
 			state = aState;
 			previousState = aPreviousState;	
 			pressure = aPressure;
 			previousPressure = aPreviousPressure;
-			timeTouchBegan = DateTime.Now;
+            _touchHistory = new TouchInfo(id, position);
         }
 		
+        // We are "updating" a touch location by creating a new one and filling in it's appropriate states.
 		public TouchLocation(int aId, TouchLocationState aState, Vector2 aPosition, float aPressure,
-		                     TouchLocationState aPreviousState, Vector2 aPreviousPosition, float aPreviousPressure, 
-		                     DateTime aTimeBegan, Vector2 aStartingPosition)
+		                     TouchLocationState aPreviousState, Vector2 aPreviousPosition, float aPreviousPressure, TouchInfo aPrevTouchInfo)
         {
             id = aId;
 			position = aPosition;
-			startingPosition = aStartingPosition;
 			previousPosition = aPreviousPosition;
 			state = aState;
 			previousState = aPreviousState;	
 			pressure = aPressure;
 			previousPressure = aPreviousPressure;
-			timeTouchBegan = aTimeBegan;
+
+            // Update the history object.
+            _touchHistory = aPrevTouchInfo;
+            _touchHistory.LogPosition(aPosition);
         }
 		
 		public TouchLocation(int aId, TouchLocationState aState, Vector2 aPosition, float aPressure)
         {
             id = aId;
-			position = startingPosition = aPosition;
+			position = aPosition;
 			previousPosition = Vector2.Zero;		
 			state = aState;
 			previousState = TouchLocationState.Invalid;
 			pressure = aPressure;
 			previousPressure = 0.0f;
-			timeTouchBegan = DateTime.Now;
+            _touchHistory = new TouchInfo(id, position);
         }
 		#endregion
 		
@@ -213,25 +212,24 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			{
 				aPreviousLocation.id = -1;
 				aPreviousLocation.state = TouchLocationState.Invalid;
-				aPreviousLocation.position = aPreviousLocation.startingPosition = Vector2.Zero;
+                aPreviousLocation.position = Vector2.Zero;
 				aPreviousLocation.previousState = TouchLocationState.Invalid;
 				aPreviousLocation.previousPosition = Vector2.Zero; 
 				aPreviousLocation.pressure = 0.0f;
 				aPreviousLocation.previousPressure = 0.0f;
-				aPreviousLocation.timeTouchBegan = DateTime.MinValue;
+                aPreviousLocation._touchHistory = new TouchInfo(-1, Vector2.Zero);
 				return false;
 			}
 			else
 			{
 				aPreviousLocation.id = this.id;
 				aPreviousLocation.state = this.previousState;
-				aPreviousLocation.startingPosition = this.startingPosition;
 				aPreviousLocation.position = this.previousPosition;
 				aPreviousLocation.previousState = TouchLocationState.Invalid;
 				aPreviousLocation.previousPosition = Vector2.Zero;
 				aPreviousLocation.pressure = this.previousPressure;
 				aPreviousLocation.previousPressure = 0.0f;
-				aPreviousLocation.timeTouchBegan = this.timeTouchBegan;
+                aPreviousLocation._touchHistory = this.TouchHistory;
 				return true;
 			}
         }
@@ -242,8 +240,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			        (value1.state == value2.state) &&
 			        (value1.position == value2.position) &&
 			        (value1.previousState == value2.previousState) &&
-			        (value1.previousPosition == value2.previousPosition) &&
-			        (value1.timeTouchBegan == value2.timeTouchBegan)));
+			        (value1.previousPosition == value2.previousPosition)));
         }
 
         public static bool operator ==(TouchLocation value1, TouchLocation value2)
@@ -252,8 +249,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			        (value1.state == value2.state) &&
 			        (value1.position == value2.position) &&
 			        (value1.previousState == value2.previousState) &&
-			        (value1.previousPosition == value2.previousPosition) &&
-			        (value1.timeTouchBegan == value2.timeTouchBegan));
+			        (value1.previousPosition == value2.previousPosition));
         }
 
        

@@ -439,6 +439,7 @@
     <Compile Include="Desktop\Audio\OpenALSoundController.cs">
       <Link>iOS\Audio\OpenALSoundController.cs</Link>
     </Compile>
+    <Compile Include="Input\Touch\TouchInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
