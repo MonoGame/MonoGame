@@ -86,12 +86,33 @@ namespace Microsoft.Xna.Framework.Input.Touch
             return Capabilities;
         }
 
+        /*private static int PixelsPerInch
+        {
+            get 
+            {
+                var gd = Game.Instance.GraphicsDevice;
+                var screenWidth = gd.DisplayMode.Width;
+                var screenHeight = gd.DisplayMode.Height;
+                var screenDiagonal = Math.Sqrt( (screenWidth * screenWidth) + ( screenHeight * screenHeight) );
+
+                var resWidth = gd.PresentationParameters.BackBufferWidth;
+                var resHeight = gd.PresentationParameters.BackBufferHeight;
+                var resDiagonal = Math.Sqrt( (resWidth * resWidth) + ( resHeight * resHeight) );
+
+                var ppi = resDiagonal / screenDiagonal;
+
+                return (int)ppi;
+            }
+        }*/
+
         public static TouchCollection GetState()
         {
             // If the state isn't dirty then just
             // return the current state.
             if (!_updateState)
                 return _state;
+
+            var myPPI = PixelsPerInch;
 
             // Remove the previously released touch locations.
             foreach (var keyLoc in _touchLocations)
@@ -550,7 +571,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
             _prevTouchBuffer.Clear();
             
             int counter = 0;
-            while (counter < 5)
+            while (counter < 10)
             {
                 // Break if we can't get a previous touch location.
                 if (!touch.TryGetPreviousLocation(out _previousTouchLoc))
@@ -562,10 +583,15 @@ namespace Microsoft.Xna.Framework.Input.Touch
             }
             
             float totalDistance = 0;
-            foreach(var touchLoc in _prevTouchBuffer)
-                totalDistance+= Vector2.Distance(touch.Position, touchLoc.Position);
+
+            for (int x = _prevTouchBuffer.Count - 1; x != 0; x--)
+                totalDistance += Vector2.Distance(_prevTouchBuffer[x].Position, _prevTouchBuffer[x-1].Position);
+
+
+            //foreach(var touchLoc in _prevTouchBuffer)
+                //totalDistance+= Vector2.Distance(touch.Position, touchLoc.Position);
 			
-			if ( totalDistance < _minVelocityToCompleteSwipe )
+			if ( totalDistance < (_minVelocityToCompleteSwipe * (_prevTouchBuffer.Count / 10)) )
                 return false;
 			
 			//Magical hack. This was here before.
