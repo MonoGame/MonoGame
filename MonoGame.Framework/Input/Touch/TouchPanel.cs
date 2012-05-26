@@ -269,7 +269,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		#region Gesture Recognition
 		
         // Tolerance to prevent small movements from cancelling a touch/held recognition.
-        private const int _tapJitterTolerance = 10;
+        private const int _tapJitterTolerance = 5;
         private static readonly TimeSpan _flickMovementThreshold = TimeSpan.FromMilliseconds(55);
 		private const long _maxTicksToProcessHold = 10250000;
 		private const long _maxTicksToProcessDoubleTap = 1300000;
@@ -322,9 +322,6 @@ namespace Microsoft.Xna.Framework.Input.Touch
 						break;
 					}
 					
-					// TODO: Swap the order of these and introduce a 
-					// "totalDistanceMoved" property, so we can prevent small jitters
-					// from triggering a drag rather than a hold.
 					if (touch.State == TouchLocationState.Moved)
 						ProcessDrag(touch);
 					else
@@ -346,15 +343,19 @@ namespace Microsoft.Xna.Framework.Input.Touch
 							break;
 						}
 						else
-						{						
-							if (ProcessTap(touch))
-								break;
-						
+						{
+                            // Once a drag has began, that touch can no longer
+                            // generate a tap event.
+                            if (!_processedDrags.Contains(touch.Id))
+                            {
+                                if (ProcessTap(touch))
+                                    break;
+                            }						
 							if (ProcessFlick(touch))
 								break;
-						
-							if (ProcessDragComplete(touch))
-								break;
+
+                            if (ProcessDragComplete(touch))
+                                break;
 						}
 						break;
 					
@@ -483,8 +484,9 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			Vector2.Zero, Vector2.Zero));
 					
 			return true;
-		}		
-		
+		}
+
+        static List<int> _processedDrags = new List<int>();
 		private static bool ProcessDrag(TouchLocation touch)
 		{
 			if (touch.State != TouchLocationState.Moved)
@@ -495,18 +497,9 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			    !GestureIsEnabled(GestureType.FreeDrag))
 				return false;
 			
-			// If pinch is enabled, WP7 considers any 2 touches on screen a pinch.
-			// Regardless of what either one is doing.
-			// TODO: Move "pinch" priority higher than most.
-			if (GestureIsEnabled(GestureType.Pinch) && 
-			    _state.Count > 1)
-				return false;
-			
 			// Make sure that our previous location was valid. If not, we are still
 			// dragging, but we need a delta of 0.
-			
 			var prevPosition = touch.TryGetPreviousLocation(out _previousTouchLoc) ? _previousTouchLoc.Position : touch.Position;
-			
 			var delta = touch.Position - prevPosition;
 			
 			// TODO: Find XNA's drag tolerance.
@@ -536,6 +529,11 @@ namespace Microsoft.Xna.Framework.Input.Touch
 				}
 			}	
 			
+            // Save this ID as having processed a drag so that its release will never be processed
+            // as a flick or tap.
+            if(!_processedDrags.Contains(touch.Id))
+                _processedDrags.Add(touch.Id);
+
 			TouchPanel.GestureList.Enqueue(new GestureSample(
 										   gestureType, new TimeSpan (DateTime.Now.Ticks),
 										   touch.Position, Vector2.Zero,
@@ -558,6 +556,9 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			GestureType.DragComplete, new TimeSpan (DateTime.Now.Ticks),
 			Vector2.Zero, Vector2.Zero,
 			Vector2.Zero, Vector2.Zero));
+
+            // Remove this touch id from the list of processed drags.
+            _processedDrags.Remove(touch.Id);
 			
 			return true;
 		}
@@ -586,6 +587,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
                 var difTime = prevPositions[x].Item2 - timeOfTouch;
                 if (difTime > _flickMovementThreshold)
                     break;
+
                 var distanceBetweenVecs = prevPositions[x].Item1 - prevPositions[x-1].Item1;
 
                 // Check that the angle between them isn't too great. Only generate flicks from
