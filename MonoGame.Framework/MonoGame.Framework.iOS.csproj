@@ -233,7 +233,7 @@
     <Compile Include="Graphics\Vertices\DynamicVertexBuffer.cs" />
     <Compile Include="Graphics\Vertices\VertexColorTexture.cs" />
     <Compile Include="Graphics\Vertices\VertexDeclaration.cs" />
-    <Compile Include="Graphics\Vertices\VertexDeclarationCache.cs" />    
+    <Compile Include="Graphics\Vertices\VertexDeclarationCache.cs" />
     <Compile Include="Graphics\Vertices\VertexElement.cs" />
     <Compile Include="Graphics\Vertices\VertexElementDeclaration.cs" />
     <Compile Include="Graphics\Vertices\VertexElementFormat.cs" />
@@ -327,15 +327,9 @@
     <Compile Include="iOS\OrientationConverter.cs" />
     <Compile Include="Desktop\Audio\OALSoundBuffer.cs"/>
     <Compile Include="Desktop\Audio\OpenALSoundController.cs"/>
-    <Compile Include="MacOS\Audio\OpenALSupport.cs">
-      <Link>iOS\Audio\OpenALSupport.cs</Link>
-    </Compile>
-    <Compile Include="MacOS\Audio\SoundEffect.cs">
-      <Link>iOS\Audio\SoundEffect.cs</Link>
-    </Compile>
-    <Compile Include="MacOS\Audio\SoundEffectInstance.cs">
-      <Link>iOS\Audio\SoundEffectInstance.cs</Link>
-    </Compile>
+    <Compile Include="MacOS\Audio\OpenALSupport.cs"/>
+    <Compile Include="MacOS\Audio\SoundEffect.cs"/>
+    <Compile Include="MacOS\Audio\SoundEffectInstance.cs"/>
     <Compile Include="Graphics\Effect\AlphaTestEffect.cs" />
     <Compile Include="Graphics\Effect\DXShader.cs" />
     <Compile Include="Graphics\Effect\EffectAnnotation.cs" />
@@ -435,6 +429,7 @@
     <Compile Include="iOS\iOSGameWindow.cs" />
     <Compile Include="Graphics\Effect\ConstantBuffer.cs" />
     <Compile Include="Media\MediaQueue.cs" />
+    <Compile Include="Input\Touch\TouchInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
@@ -442,6 +437,9 @@
       <Properties>
         <Policies>
           <StandardHeader Text="" IncludeInNewFiles="False" />
+          <TextStylePolicy FileWidth="120" NoTabsAfterNonTabs="True" inheritsSet="VisualStudio" inheritsScope="text/plain" scope="text/x-csharp" />
+          <CSharpFormattingPolicy inheritsSet="Mono" inheritsScope="text/x-csharp" scope="text/x-csharp" />
+          <TextStylePolicy FileWidth="120" RemoveTrailingWhitespace="False" inheritsSet="VisualStudio" inheritsScope="text/plain" scope="text/plain" />
         </Policies>
       </Properties>
     </MonoDevelop>

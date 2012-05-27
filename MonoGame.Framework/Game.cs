@@ -74,15 +74,18 @@ using System.Drawing;
 #endif
 using System.IO;
 using System.Reflection;
+using System.Diagnostics;
+#if WINRT
+using System.Threading.Tasks;
+#endif
 
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
-#if !WINRT
 using Microsoft.Xna.Framework.GamerServices;
-#endif
+
 
 namespace Microsoft.Xna.Framework
 {
@@ -120,9 +123,13 @@ namespace Microsoft.Xna.Framework
 
         private TimeSpan _targetElapsedTime = TimeSpan.FromSeconds(1 / DefaultTargetFramesPerSecond);
 
+        private readonly TimeSpan _maxElapsedTime = TimeSpan.FromMilliseconds(500);
+
         private int previousDisplayWidth;
         private int previousDisplayHeight;
 
+        private bool _suppressDraw;
+        
         public Game()
         {
             _instance = this;
@@ -322,8 +329,14 @@ namespace Microsoft.Xna.Framework
         public void ResetElapsedTime()
         {
             Platform.ResetElapsedTime();
-            _lastUpdate = DateTime.Now;
-            _gameTime.ResetElapsedTime();
+            _gameTimer.Restart();
+            _accumulatedElapsedTime = TimeSpan.Zero;
+            _gameTime.ElapsedGameTime = TimeSpan.Zero;
+        }
+
+        public void SuppressDraw()
+        {
+            _suppressDraw = true;
         }
 
         public void Run()
@@ -358,68 +371,84 @@ namespace Microsoft.Xna.Framework
             }
         }
 
-        private DateTime _now;
-        private DateTime _lastUpdate = DateTime.Now;
+        private TimeSpan _accumulatedElapsedTime;
         private readonly GameTime _gameTime = new GameTime();
-        private readonly GameTime _fixedTimeStepTime = new GameTime();
-        private TimeSpan _totalTime = TimeSpan.Zero;
+        private Stopwatch _gameTimer = Stopwatch.StartNew();
 
         public void Tick()
         {
-            bool doDraw = false;
+            // NOTE: This code is very sensitive and can break very badly
+            // with even what looks like a safe change.  Be sure to test 
+            // any change fully in both the fixed and variable timestep 
+            // modes across multiple devices and platforms.
 
-            _now = DateTime.Now;
+        RetryTick:
 
-            _gameTime.Update(_now - _lastUpdate);
-            _lastUpdate = _now;
+            // Advance the accumulated elapsed time.
+            _accumulatedElapsedTime += _gameTimer.Elapsed;
+            _gameTimer.Restart();
+
+            // If we're in the fixed timestep mode and not enough time has elapsed
+            // to perform an update we sleep off the the remaining time to save battery
+            // life and/or release CPU time to other threads and processes.
+            if (IsFixedTimeStep && _accumulatedElapsedTime < TargetElapsedTime)
+            {
+                var sleepTime = (int)(TargetElapsedTime - _accumulatedElapsedTime).TotalMilliseconds;
+
+                // NOTE: While sleep can be inaccurate in general it is 
+                // accurate enough for frame limiting purposes if some
+                // fluctuation is an acceptable result.
+#if WINRT
+                Task.Delay(sleepTime).Wait();
+#else
+                System.Threading.Thread.Sleep(sleepTime);
+#endif
+                goto RetryTick;
+            }
+
+            // Do not allow any update to take longer than our maximum.
+            if (_accumulatedElapsedTime > _maxElapsedTime)
+                _accumulatedElapsedTime = _maxElapsedTime;
+
+            // TODO: We should be calculating IsRunningSlowly
+            // somewhere around here!
 
             if (IsFixedTimeStep)
             {
-                _totalTime += _gameTime.ElapsedGameTime;
-                int max = (500/TargetElapsedTime.Milliseconds);    //Only do updates for half a second worth of updates
-                int iterations = 0;
+                _gameTime.ElapsedGameTime = TargetElapsedTime;
+                var stepCount = 0;
 
-                max = max <= 0 ? 1 : max;   //Make sure at least 1 update is called
-
-                while (_totalTime >= TargetElapsedTime)
+                // Perform as many full fixed length time steps as we can.
+                while (_accumulatedElapsedTime >= TargetElapsedTime)
                 {
-                    _fixedTimeStepTime.Update(TargetElapsedTime);
-                    _totalTime -= TargetElapsedTime;
-                    DoUpdate(_fixedTimeStepTime);
-                    doDraw = true;
-                        
-                    iterations++;
-                    if (iterations >= max)  //Reset catchup if to many updates have been called
-                    {
-                        _totalTime = TimeSpan.Zero;
-                    }
+                    _gameTime.TotalGameTime += TargetElapsedTime;
+                    _accumulatedElapsedTime -= TargetElapsedTime;
+                    ++stepCount;
+
+                    DoUpdate(_gameTime);
                 }
+
+                // Draw needs to know the total elapsed time
+                // that occured for the fixed length updates.
+                _gameTime.ElapsedGameTime = TimeSpan.FromTicks(TargetElapsedTime.Ticks * stepCount);
             }
             else
             {
+                // Perform a single variable length update.
+                _gameTime.ElapsedGameTime = _accumulatedElapsedTime;
+                _gameTime.TotalGameTime += _accumulatedElapsedTime;
+                _accumulatedElapsedTime = TimeSpan.Zero;
+
                 DoUpdate(_gameTime);
-                doDraw = true;
             }
 
-            if (doDraw)
+            // Draw unless the update suppressed it.
+            if (_suppressDraw)
+                _suppressDraw = false;
+            else
             {
                 DoDraw(_gameTime);
                 Platform.Present();
-            }
-
-            if (IsFixedTimeStep)
-            {
-                var currentTime = (DateTime.Now - _lastUpdate) + _totalTime;
-
-                if (currentTime < TargetElapsedTime)
-                {
-                    var sleepMs = (TargetElapsedTime - currentTime).Milliseconds;
-#if WINRT
-                    new System.Threading.ManualResetEvent(false).WaitOne(sleepMs);
-#else
-                    System.Threading.Thread.Sleep(sleepMs);
-#endif
-                }
             }
         }
 

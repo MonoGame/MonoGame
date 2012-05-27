@@ -173,6 +173,11 @@ namespace Microsoft.Xna.Framework
             if (!GraphicsContext.CurrentContext.IsCurrent)
                 window.MakeCurrent();
 
+            UpdateWindowState();
+        }
+
+        private void UpdateWindowState()
+        {
             // we should wait until window's not fullscreen to resize
             if (updateClientBounds && window.WindowState == WindowState.Normal)
             {
@@ -188,6 +193,8 @@ namespace Microsoft.Xna.Framework
 
         private void OnUpdateFrame(object sender, FrameEventArgs e)
         {
+            UpdateWindowState();
+
             if (Game != null)
             {
                 HandleInput();

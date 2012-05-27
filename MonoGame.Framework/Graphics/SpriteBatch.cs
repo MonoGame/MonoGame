@@ -216,7 +216,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			      depth);
 		}
 
-		private void Draw (Texture2D texture,
+		internal void Draw (Texture2D texture,
 			Vector4 destinationRectangle,
 			Rectangle? sourceRectangle,
 			Color color,
@@ -228,11 +228,15 @@ namespace Microsoft.Xna.Framework.Graphics
 			if (texture == null) {
 				throw new ArgumentException ("texture");
 			}
-			
-			// texture 0 is the texture beeing draw
+
+            // texture 0 is the texture beeing draw
+            //
+            // TODO: Why are we doing this... we should be setting the
+            // texture on the batch item... it has no point here!
+            //
 			graphicsDevice.Textures [0] = texture;			
 			
-			SpriteBatchItem item = _batcher.CreateBatchItem ();
+			var item = _batcher.CreateBatchItem ();
 
 			item.Depth = depth;
 			item.Texture = texture;
@@ -307,8 +311,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			if (spriteFont == null)
 				throw new ArgumentNullException ("spriteFont");
 
+            var source = new SpriteFont.CharacterSource(text);
 			spriteFont.DrawInto (
-				this, text, position, color, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0f);
+                this, ref source, position, color, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0f);
 		}
 
 		public void DrawString (
@@ -318,8 +323,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			if (spriteFont == null)
 				throw new ArgumentNullException ("spriteFont");
 
-			var scaleVec = new Vector2 (scale, scale);
-			spriteFont.DrawInto (this, text, position, color, rotation, origin, scaleVec, effects, depth);
+			var scaleVec = new Vector2(scale, scale);
+            var source = new SpriteFont.CharacterSource(text);
+            spriteFont.DrawInto(this, ref source, position, color, rotation, origin, scaleVec, effects, depth);
 		}
 
 		public void DrawString (
@@ -329,7 +335,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			if (spriteFont == null)
 				throw new ArgumentNullException ("spriteFont");
 
-			spriteFont.DrawInto (this, text, position, color, rotation, origin, scale, effect, depth);
+            var source = new SpriteFont.CharacterSource(text);
+            spriteFont.DrawInto(this, ref source, position, color, rotation, origin, scale, effect, depth);
 		}
 
 		public void DrawString (SpriteFont spriteFont, StringBuilder text, Vector2 position, Color color)
@@ -337,8 +344,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			if (spriteFont == null)
 				throw new ArgumentNullException ("spriteFont");
 
-			spriteFont.DrawInto (
-				this, text, position, color, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0f);
+            var source = new SpriteFont.CharacterSource(text);
+			spriteFont.DrawInto(this, ref source, position, color, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0f);
 		}
 
 		public void DrawString (
@@ -349,7 +356,8 @@ namespace Microsoft.Xna.Framework.Graphics
 				throw new ArgumentNullException ("spriteFont");
 
 			var scaleVec = new Vector2 (scale, scale);
-			spriteFont.DrawInto (this, text, position, color, rotation, origin, scaleVec, effects, depth);
+            var source = new SpriteFont.CharacterSource(text);
+            spriteFont.DrawInto(this, ref source, position, color, rotation, origin, scaleVec, effects, depth);
 		}
 
 		public void DrawString (
@@ -359,7 +367,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			if (spriteFont == null)
 				throw new ArgumentNullException ("spriteFont");
 
-			spriteFont.DrawInto (this, text, position, color, rotation, origin, scale, effect, depth);
+            var source = new SpriteFont.CharacterSource(text);
+            spriteFont.DrawInto(this, ref source, position, color, rotation, origin, scale, effect, depth);
 		}
 	}
 }

@@ -344,7 +344,6 @@ namespace Microsoft.Xna.Framework
         public override bool OnTouchEvent(MotionEvent e)
         {			
             TouchLocation tlocation;
-            TouchCollection collection = TouchPanel.Collection;            
             Vector2 position = Vector2.Zero;            
             position.X = e.GetX(e.ActionIndex);            
             position.Y = e.GetY(e.ActionIndex);     
@@ -356,23 +355,15 @@ namespace Microsoft.Xna.Framework
                 // DOWN                
                 case MotionEventActions.Down:
                 case MotionEventActions.PointerDown:
-                    index = collection.FindIndexById(id, out tlocation);
-                    if (index < 0)
-                    {
-                        tlocation = new TouchLocation(id, TouchLocationState.Pressed, position);
-                        collection.Add(tlocation);
-                    }
+                    TouchPanel.AddEvent(new TouchLocation(id, TouchLocationState.Pressed, position));
                     break;
+
                 // UP                
                 case MotionEventActions.Up:
                 case MotionEventActions.PointerUp:
-                    index = collection.FindIndexById(id, out tlocation);
-                    if (index >= 0)
-                    {
-                        tlocation.State = TouchLocationState.Released;
-                        collection[index] = tlocation;
-                    }	
+                    TouchPanel.AddEvent(new TouchLocation(id, TouchLocationState.Released, position));
 				    break;
+
                 // MOVE                
                 case MotionEventActions.Move:
                     for (int i = 0; i < e.PointerCount; i++)
@@ -381,24 +372,14 @@ namespace Microsoft.Xna.Framework
                         position.X = e.GetX(i);
                         position.Y = e.GetY(i);
                         UpdateTouchPosition(ref position);
-                        index = collection.FindIndexById(id, out tlocation);
-                        if (index >= 0)
-                        {
-                            tlocation.State = TouchLocationState.Moved;
-                            tlocation.Position = position;
-                            collection[index] = tlocation;
-                        }
+                        TouchPanel.AddEvent(new TouchLocation(id, TouchLocationState.Moved, position));
                     }
 					break;
+
                 // CANCEL, OUTSIDE                
                 case MotionEventActions.Cancel:
                 case MotionEventActions.Outside:
-                    index = collection.FindIndexById(id, out tlocation);
-                    if (index >= 0)
-                    {
-                        tlocation.State = TouchLocationState.Invalid;
-                        collection[index] = tlocation;
-                    }
+                    TouchPanel.AddEvent(new TouchLocation(id, TouchLocationState.Released, position));
                     break;
             }
 			
