@@ -179,6 +179,7 @@
     <Compile Include="Input\GamePadDeadZone.cs" />
     <Compile Include="Input\Keyboard.cs" />
     <Compile Include="Input\MouseState.cs" />
+    <Compile Include="Input\Touch\TouchInfo.cs" />
     <Compile Include="LaunchParameters.cs" />
     <Compile Include="Media\MediaQueue.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
