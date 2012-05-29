@@ -86,7 +86,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 					osVersion = parts[0] + "." + parts[1];
 				}
 				
-				if (double.Parse(osVersion) > 4.1)
+				if (double.Parse(osVersion, System.Globalization.CultureInfo.InvariantCulture) > 4.1)
 				{
 					
 					lp = GKLocalPlayer.LocalPlayer;
