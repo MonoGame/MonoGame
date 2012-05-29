@@ -137,6 +137,9 @@ namespace Microsoft.Xna.Framework
                 Game.DoInitialize();
                 _initialized = true;
             }
+
+            // Let the touch panel update states.
+            TouchPanel.UpdateState();
             
             return true;
         }
@@ -202,25 +205,17 @@ namespace Microsoft.Xna.Framework
         private Dictionary<int, TouchLocation> _previousTouches = new Dictionary<int, TouchLocation>();
         
         private void UpdateTouches()
-        {
-            var collection = TouchPanel.Collection;
-            
+        {           
             var pssTouches = Touch.GetData(0);
             foreach (var touch in pssTouches)
             {
                 Vector2 position = new Vector2((touch.X + 0.5f) * _frameBufferWidth, (touch.Y + 0.5f) * _frameBufferHeight);
                 if (touch.Status == TouchStatus.Down)
-                {
-                    collection.Add(touch.ID, position);
-                }
+                    TouchPanel.AddEvent(new TouchLocation(touch.ID, TouchLocationState.Pressed, position));
+                else if (touch.Status == TouchStatus.Move)
+                    TouchPanel.AddEvent(new TouchLocation(touch.ID, TouchLocationState.Moved, position));
                 else
-                {
-                    TouchLocationState state = TouchLocationState.Released;
-                    if (touch.Status == TouchStatus.Move)
-                        state = TouchLocationState.Moved;
-                        
-                    collection.Update (touch.ID, state, position);
-                }
+                    TouchPanel.AddEvent(new TouchLocation(touch.ID, TouchLocationState.Released, position));
             }
         }
     }

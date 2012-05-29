@@ -161,7 +161,7 @@ namespace Microsoft.Xna.Framework
         {
             base.BeforeInitialize ();
             _viewController.View.MakeCurrent ();
-            TouchPanel.Reset();
+            //TouchPanel.Reset();
 
             // HACK: Because GraphicsDevice doesn't know anything, we need to
             //       tell it the current viewport size.  Once GraphicsDevice is
@@ -254,6 +254,10 @@ namespace Microsoft.Xna.Framework
         {
             if (IsPlayingVideo)
                 return false;
+
+            // Let the touch panel update states.
+            TouchPanel.UpdateState();
+			
             return true;
         }
 
@@ -321,7 +325,7 @@ namespace Microsoft.Xna.Framework
         private void Application_DidBecomeActive(NSNotification notification)
         {
             IsActive = true;
-            TouchPanel.Reset();
+            //TouchPanel.Reset();
         }
 
         private void Application_WillResignActive(NSNotification notification)
