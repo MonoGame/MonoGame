@@ -8,7 +8,7 @@
 #ifdef SM4
 
 #define TECHNIQUE(name, vsname, psname ) \
-	technique10 name { pass { VertexShader = compile vs_4_0 vsname (); PixelShader = compile ps_4_0 psname(); } }
+	technique10 name { pass { VertexShader = compile vs_4_0_level_9_3 vsname (); PixelShader = compile ps_4_0_level_9_3 psname(); } }
 
 // Macros for targetting shader model 4.0 (DX11)
 
