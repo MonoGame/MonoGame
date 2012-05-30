@@ -139,14 +139,33 @@ namespace Microsoft.Xna.Framework.Graphics
             param.element_count = (uint)type.Description.ElementCount;
             param.member_count = (uint)type.Description.MemberCount;
 
-            var count = Math.Max(param.element_count, param.member_count);
-
-            param.member_handles = new DXEffectObject.d3dx_parameter[count];
-            for (var i=0; i < count; i++)
+            if (param.member_count > 0)
             {
-                var mparam = GetParameterFromType(type.GetMemberType(i));
-                mparam.name = type.GetMemberTypeName(i) ?? string.Empty;
-                param.member_handles[i] = mparam;
+                param.member_handles = new DXEffectObject.d3dx_parameter[param.member_count];
+                for (var i = 0; i < param.member_count; i++)
+                {
+                    var mparam = GetParameterFromType(type.GetMemberType(i));
+                    mparam.name = type.GetMemberTypeName(i) ?? string.Empty;
+                    param.member_handles[i] = mparam;
+                }
+            }
+            else
+            {
+                param.member_handles = new DXEffectObject.d3dx_parameter[param.element_count];
+                for (var i = 0; i < param.element_count; i++)
+                {
+                    var mparam = new DXEffectObject.d3dx_parameter();
+
+                    mparam.name = string.Empty;
+                    mparam.semantic = string.Empty;
+                    mparam.type = param.type;
+                    mparam.class_ = param.class_;
+                    mparam.rows = param.rows;
+                    mparam.columns = param.columns;
+                    mparam.data = new byte[param.columns * param.rows * 4];
+
+                    param.member_handles[i] = mparam;
+                }
             }
 
             return param;
