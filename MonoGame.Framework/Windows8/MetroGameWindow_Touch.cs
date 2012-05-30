@@ -58,9 +58,16 @@ namespace Microsoft.Xna.Framework
             _coreWindow.PointerPressed += CoreWindow_PointerPressed;
             _coreWindow.PointerReleased += CoreWindow_PointerReleased;
             _coreWindow.PointerMoved += CoreWindow_PointerMoved;
+            _coreWindow.PointerWheelChanged += CoreWindow_PointerWheelChanged;
 
             // To convert from DIPs (that all touch and pointer events are returned in) to pixels (that XNA APIs expect)
             _dipFactor = DisplayProperties.LogicalDpi / 96.0f;
+        }
+
+        private void CoreWindow_PointerWheelChanged(CoreWindow sender, PointerEventArgs args)
+        {
+            // Wheel events always go to the mouse state.
+            Mouse.State.Update(args);
         }
         
         void CoreWindow_PointerMoved(CoreWindow sender, PointerEventArgs args)
