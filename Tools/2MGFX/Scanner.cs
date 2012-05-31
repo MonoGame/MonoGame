@@ -93,7 +93,7 @@ namespace TwoMGFX
             Patterns.Add(TokenType.COMPILE, regex);
             Tokens.Add(TokenType.COMPILE);
 
-            regex = new Regex(@"(vs_|ps_)(2_0|3_0|4_0|5_0)", RegexOptions.Compiled);
+            regex = new Regex(@"(vs_|ps_)(2_0|3_0|4_0|5_0)((_level_)(9_1|9_2|9_3))?", RegexOptions.Compiled);
             Patterns.Add(TokenType.SHADERMODEL, regex);
             Tokens.Add(TokenType.SHADERMODEL);
 
