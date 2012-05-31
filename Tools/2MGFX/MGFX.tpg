@@ -1,0 +1,88 @@
+// MonoGame Effect Parser
+//
+// For use with "Tiny Parser Generator"
+// http://www.codeproject.com/Articles/28294/a-Tiny-Parser-Generator-v1-2
+//
+
+<% @TinyPG Namespace="TwoMGFX" Language="C#"%>
+
+[Skip] COMMENT -> @"/\*([^*]|\*[^/])*\*/";
+[Skip] COMMENTCPP -> @"//[^\n\r]*";
+[Skip] WHITESPACE -> @"[ \t\n\r]+";
+
+// TOKENS
+IDENTIFIER -> @"[A-Za-z_][A-Za-z0-9_]*";
+PASS -> @"pass";
+TECHNIQUE -> @"technique";
+VERTEXSHADER -> @"VertexShader";
+PIXELSHADER -> @"PixelShader";
+BROPEN -> @"{";
+BRCLOSE -> @"}";
+EQUALS -> @"=";
+SEMICOLON -> @";";
+EMPTY_ARGS -> @"\(\s*\)";
+COMPILE -> @"compile";
+SHADERMODEL -> @"(vs_|ps_)(2_0|3_0|4_0|5_0)";
+CODE -> @".";
+STRING -> @"@?\""(\""\""|[^\""])*\""";
+EOF -> @"^$";
+
+// Productions
+Start -> ( CODE | Technique_Declaration )* EOF
+{ 
+   ShaderInfo shader = new ShaderInfo();
+
+   foreach (ParseNode node in Nodes)
+   {
+      var technique = node.Eval(tree, shader) as TechniqueInfo;
+      if ( technique != null )
+         shader.Techniques.Add(technique);
+   }
+
+   return shader; 
+};
+
+Technique_Declaration -> TECHNIQUE IDENTIFIER? BROPEN Pass_Declaration+ BRCLOSE 
+{
+   TechniqueInfo technique = new TechniqueInfo();
+   technique.name = $IDENTIFIER as string ?? string.Empty;
+   technique.startPos = Token.StartPos;
+   technique.length = Token.Length;
+
+   foreach (ParseNode node in Nodes)
+   {
+      var pass = node.Eval(tree, technique) as PassInfo;
+      if ( pass != null )
+         technique.Passes.Add(pass);
+   }
+
+   return technique;
+};
+
+Pass_Declaration ->	PASS IDENTIFIER? BROPEN (VertexShader_Pass_Expression | PixelShader_Pass_Expression)* BRCLOSE 
+{ 
+   PassInfo pass = new PassInfo();
+   pass.name = $IDENTIFIER as string ?? string.Empty;
+
+   foreach (ParseNode node in Nodes)
+      node.Eval(tree, pass);
+
+   return pass;
+};
+
+VertexShader_Pass_Expression -> VERTEXSHADER EQUALS COMPILE SHADERMODEL IDENTIFIER EMPTY_ARGS SEMICOLON
+{
+   PassInfo pass = paramlist[0] as PassInfo;
+   pass.vsModel = $SHADERMODEL as string;
+   pass.vsFunction = $IDENTIFIER as string;
+   return null;
+};
+
+PixelShader_Pass_Expression -> PIXELSHADER EQUALS COMPILE SHADERMODEL IDENTIFIER EMPTY_ARGS SEMICOLON
+{
+   PassInfo pass = paramlist[0] as PassInfo;
+   pass.psModel = $SHADERMODEL as string;
+   pass.psFunction = $IDENTIFIER as string;
+   return null;
+};
+

@@ -74,10 +74,7 @@
     <Compile Include="CompilerInclude.cs" />
     <Compile Include="ConstantBuffer.cs" />
     <Compile Include="DXEffectObject.cs" />
-    <Compile Include="DXEffectObject.dxreflect.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="DXEffectObject.fxparser.cs" />
+    <Compile Include="DXEffectObject.hlsl.cs" />
     <Compile Include="DXEffectObject.writer.cs" />
     <Compile Include="DXExpression.cs">
       <SubType>Code</SubType>
@@ -91,8 +88,12 @@
     <Compile Include="GLSLOptimizer.cs" />
     <Compile Include="MojoShader.cs" />
     <Compile Include="Options.cs" />
+    <Compile Include="Parser.cs" />
+    <Compile Include="ParseTree.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Scanner.cs" />
+    <Compile Include="ShaderInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.0,Profile=Client">
@@ -127,6 +128,7 @@
       <Link>libmojoshader_32.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="MGFX.tpg" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\ThirdParty\Libs\SharpDX\Windows\sharpdx_direct3d11_effects_x86.dll">
