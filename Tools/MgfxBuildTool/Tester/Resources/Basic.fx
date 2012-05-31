@@ -23,7 +23,7 @@ struct VertexShaderInput
 struct VertexShaderOutput
 {
     float4 Position : POSITION0;
-	float4 Color : COLOR0;
+	float4 Color : COLOR0;asdfasd
 
     // TODO: add vertex shader outputs such as colors and texture
     // coordinates here. These values will automatically be interpolated

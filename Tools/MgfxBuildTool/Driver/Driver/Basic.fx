@@ -45,11 +45,15 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 	return float4(1,1,1,1);
     return input.Color;
 }
+
+//THIS TEXT SHOULD CAUSE AN ERROR TO APPEAR IN THE VISUAL STUDIO ERROR LIST
+
 technique Technique1
 {
     pass pass0
     {
-
+		/// these state settings will cause the current rev of 2MGFX to fail, since it doesn't support them.
+		/// this is as-intended for testing
 		FillMode=WIREFRAME;
 		CullMode=CCW;
         VertexShader = compile vs_3_0 VertexShaderFunction();

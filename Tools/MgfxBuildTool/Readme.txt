@@ -9,7 +9,8 @@ REQUIREMENTS:
 - MonoGame develop3d branch. If you're reading this, you should already have that installed.
 
 - VISUAL STUDIO 2010 SP1 SDK
-This tool relies on assemblies from the SDK and the Microsoft license is unclear on whether or not these items can be redistributed.
+This tool relies on assemblies from the SDK and the Microsoft license is unclear on whether or not 
+these items can be redistributed.
 
 Microsoft.VisualStudio.OLE.Interop
 Microsoft.VisualStudio.Shell.Interop

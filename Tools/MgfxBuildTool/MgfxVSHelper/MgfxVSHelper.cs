@@ -26,7 +26,22 @@ namespace MgfxVSHelper
         /// <returns></returns>
         public byte[] GenerateCodeWrapper(string inputFileName, string inputFileContent)
         {
+
+            if (!File.Exists(inputFileName) && !string.IsNullOrEmpty(inputFileContent))
+            {
+                var fn = Path.GetTempFileName();
+                File.Delete(fn);
+
+                using (var writer = new StreamWriter(fn))
+                {
+                    writer.Write(inputFileContent);
+                }
+
+                inputFileName = fn;
+            }
+
             return GenerateCode(inputFileName, inputFileContent);
+
         }
 #endif
 
@@ -77,9 +92,16 @@ namespace MgfxVSHelper
                     }
                     else
                     {
-                        /// force Visual Studio to open the error list if we ran into problems.
-                        ErrorList.BringToFront();
-                        ErrorList.ForceShowErrors();
+                        try
+                        {
+                            /// force Visual Studio to open the error list if we ran into problems.
+                            ErrorList.BringToFront();
+                            ErrorList.ForceShowErrors();
+                        }
+                        catch (ArgumentNullException ex)
+                        {
+                            Debug.WriteLine("Error attempting to access Visual Studio error list windows. This is expected to happen when using the MgfxVSHelper object outside of visual studio.");
+                        }
 
 
                         var errors = sb.ToString().Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
