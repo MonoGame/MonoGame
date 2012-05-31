@@ -21,7 +21,7 @@ namespace TwoMGFX
             // Validate the input file exits.
             if (!File.Exists(options.SourceFile))
             {
-                Console.WriteLine("The input file '{0}' was not found!", options.SourceFile);
+                Console.Error.WriteLine("The input file '{0}' was not found!", options.SourceFile);
                 return 1;
             }
 
@@ -61,8 +61,8 @@ namespace TwoMGFX
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Failed to compile the input file '{0}'!", options.SourceFile);
-                Console.WriteLine(ex.Message);
+                Console.Error.WriteLine("Failed to compile the input file '{0}'!", options.SourceFile);
+                Console.Error.WriteLine(ex.Message);
                 return 1;
             }
 
@@ -80,8 +80,8 @@ namespace TwoMGFX
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Fatal exception when parsing the compiled Microsoft Effect!");
-                Console.WriteLine(ex.ToString());
+                Console.Error.WriteLine("Fatal exception when parsing the compiled Microsoft Effect!");
+                Console.Error.WriteLine(ex.ToString());
                 return 1;
             }
 
@@ -98,8 +98,8 @@ namespace TwoMGFX
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Failed to write the output file '{0}'!", options.OutputFile);
-                Console.WriteLine(ex.Message);
+                Console.Error.WriteLine("Failed to write the output file '{0}'!", options.OutputFile);
+                Console.Error.WriteLine(ex.Message);
                 return 1;
             }
 
