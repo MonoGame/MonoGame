@@ -33,81 +33,81 @@ namespace TwoMGFX
             Skipped = new List<Token>();
 
             SkipList = new List<TokenType>();
-            SkipList.Add(TokenType.COMMENT);
-            SkipList.Add(TokenType.COMMENTCPP);
-            SkipList.Add(TokenType.WHITESPACE);
+            SkipList.Add(TokenType.BlockComment);
+            SkipList.Add(TokenType.Comment);
+            SkipList.Add(TokenType.Whitespace);
 
             regex = new Regex(@"/\*([^*]|\*[^/])*\*/", RegexOptions.Compiled);
-            Patterns.Add(TokenType.COMMENT, regex);
-            Tokens.Add(TokenType.COMMENT);
+            Patterns.Add(TokenType.BlockComment, regex);
+            Tokens.Add(TokenType.BlockComment);
 
             regex = new Regex(@"//[^\n\r]*", RegexOptions.Compiled);
-            Patterns.Add(TokenType.COMMENTCPP, regex);
-            Tokens.Add(TokenType.COMMENTCPP);
+            Patterns.Add(TokenType.Comment, regex);
+            Tokens.Add(TokenType.Comment);
 
             regex = new Regex(@"[ \t\n\r]+", RegexOptions.Compiled);
-            Patterns.Add(TokenType.WHITESPACE, regex);
-            Tokens.Add(TokenType.WHITESPACE);
+            Patterns.Add(TokenType.Whitespace, regex);
+            Tokens.Add(TokenType.Whitespace);
 
             regex = new Regex(@"[A-Za-z_][A-Za-z0-9_]*", RegexOptions.Compiled);
-            Patterns.Add(TokenType.IDENTIFIER, regex);
-            Tokens.Add(TokenType.IDENTIFIER);
+            Patterns.Add(TokenType.Identifier, regex);
+            Tokens.Add(TokenType.Identifier);
 
             regex = new Regex(@"pass", RegexOptions.Compiled);
-            Patterns.Add(TokenType.PASS, regex);
-            Tokens.Add(TokenType.PASS);
+            Patterns.Add(TokenType.Pass, regex);
+            Tokens.Add(TokenType.Pass);
 
             regex = new Regex(@"technique", RegexOptions.Compiled);
-            Patterns.Add(TokenType.TECHNIQUE, regex);
-            Tokens.Add(TokenType.TECHNIQUE);
+            Patterns.Add(TokenType.Technique, regex);
+            Tokens.Add(TokenType.Technique);
 
             regex = new Regex(@"VertexShader", RegexOptions.Compiled);
-            Patterns.Add(TokenType.VERTEXSHADER, regex);
-            Tokens.Add(TokenType.VERTEXSHADER);
+            Patterns.Add(TokenType.VertexShader, regex);
+            Tokens.Add(TokenType.VertexShader);
 
             regex = new Regex(@"PixelShader", RegexOptions.Compiled);
-            Patterns.Add(TokenType.PIXELSHADER, regex);
-            Tokens.Add(TokenType.PIXELSHADER);
+            Patterns.Add(TokenType.PixelShader, regex);
+            Tokens.Add(TokenType.PixelShader);
 
             regex = new Regex(@"{", RegexOptions.Compiled);
-            Patterns.Add(TokenType.BROPEN, regex);
-            Tokens.Add(TokenType.BROPEN);
+            Patterns.Add(TokenType.OpenBracket, regex);
+            Tokens.Add(TokenType.OpenBracket);
 
             regex = new Regex(@"}", RegexOptions.Compiled);
-            Patterns.Add(TokenType.BRCLOSE, regex);
-            Tokens.Add(TokenType.BRCLOSE);
+            Patterns.Add(TokenType.CloseBracket, regex);
+            Tokens.Add(TokenType.CloseBracket);
 
             regex = new Regex(@"=", RegexOptions.Compiled);
-            Patterns.Add(TokenType.EQUALS, regex);
-            Tokens.Add(TokenType.EQUALS);
+            Patterns.Add(TokenType.Equals, regex);
+            Tokens.Add(TokenType.Equals);
 
             regex = new Regex(@";", RegexOptions.Compiled);
-            Patterns.Add(TokenType.SEMICOLON, regex);
-            Tokens.Add(TokenType.SEMICOLON);
+            Patterns.Add(TokenType.Semicolon, regex);
+            Tokens.Add(TokenType.Semicolon);
 
-            regex = new Regex(@"\(\s*\)", RegexOptions.Compiled);
-            Patterns.Add(TokenType.EMPTY_ARGS, regex);
-            Tokens.Add(TokenType.EMPTY_ARGS);
+            regex = new Regex(@"\(", RegexOptions.Compiled);
+            Patterns.Add(TokenType.OpenParenthesis, regex);
+            Tokens.Add(TokenType.OpenParenthesis);
+
+            regex = new Regex(@"\)", RegexOptions.Compiled);
+            Patterns.Add(TokenType.CloseParenthesis, regex);
+            Tokens.Add(TokenType.CloseParenthesis);
 
             regex = new Regex(@"compile", RegexOptions.Compiled);
-            Patterns.Add(TokenType.COMPILE, regex);
-            Tokens.Add(TokenType.COMPILE);
+            Patterns.Add(TokenType.Compile, regex);
+            Tokens.Add(TokenType.Compile);
 
             regex = new Regex(@"(vs_|ps_)(2_0|3_0|4_0|5_0)((_level_)(9_1|9_2|9_3))?", RegexOptions.Compiled);
-            Patterns.Add(TokenType.SHADERMODEL, regex);
-            Tokens.Add(TokenType.SHADERMODEL);
+            Patterns.Add(TokenType.ShaderModel, regex);
+            Tokens.Add(TokenType.ShaderModel);
 
             regex = new Regex(@".", RegexOptions.Compiled);
-            Patterns.Add(TokenType.CODE, regex);
-            Tokens.Add(TokenType.CODE);
-
-            regex = new Regex(@"@?\""(\""\""|[^\""])*\""", RegexOptions.Compiled);
-            Patterns.Add(TokenType.STRING, regex);
-            Tokens.Add(TokenType.STRING);
+            Patterns.Add(TokenType.Code, regex);
+            Tokens.Add(TokenType.Code);
 
             regex = new Regex(@"^$", RegexOptions.Compiled);
-            Patterns.Add(TokenType.EOF, regex);
-            Tokens.Add(TokenType.EOF);
+            Patterns.Add(TokenType.EndOfFile, regex);
+            Tokens.Add(TokenType.EndOfFile);
 
 
         }
@@ -240,24 +240,24 @@ namespace TwoMGFX
             PixelShader_Pass_Expression= 6,
 
             //Terminal tokens:
-            COMMENT = 7,
-            COMMENTCPP= 8,
-            WHITESPACE= 9,
-            IDENTIFIER= 10,
-            PASS    = 11,
-            TECHNIQUE= 12,
-            VERTEXSHADER= 13,
-            PIXELSHADER= 14,
-            BROPEN  = 15,
-            BRCLOSE = 16,
-            EQUALS  = 17,
-            SEMICOLON= 18,
-            EMPTY_ARGS= 19,
-            COMPILE = 20,
-            SHADERMODEL= 21,
-            CODE    = 22,
-            STRING  = 23,
-            EOF     = 24
+            BlockComment= 7,
+            Comment = 8,
+            Whitespace= 9,
+            Identifier= 10,
+            Pass    = 11,
+            Technique= 12,
+            VertexShader= 13,
+            PixelShader= 14,
+            OpenBracket= 15,
+            CloseBracket= 16,
+            Equals  = 17,
+            Semicolon= 18,
+            OpenParenthesis= 19,
+            CloseParenthesis= 20,
+            Compile = 21,
+            ShaderModel= 22,
+            Code    = 23,
+            EndOfFile= 24
     }
 
     public class Token

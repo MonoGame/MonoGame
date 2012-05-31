@@ -6,29 +6,29 @@
 
 <% @TinyPG Namespace="TwoMGFX" Language="C#"%>
 
-[Skip] COMMENT -> @"/\*([^*]|\*[^/])*\*/";
-[Skip] COMMENTCPP -> @"//[^\n\r]*";
-[Skip] WHITESPACE -> @"[ \t\n\r]+";
+[Skip] BlockComment -> @"/\*([^*]|\*[^/])*\*/";
+[Skip] Comment -> @"//[^\n\r]*";
+[Skip] Whitespace -> @"[ \t\n\r]+";
 
 // TOKENS
-IDENTIFIER -> @"[A-Za-z_][A-Za-z0-9_]*";
-PASS -> @"pass";
-TECHNIQUE -> @"technique";
-VERTEXSHADER -> @"VertexShader";
-PIXELSHADER -> @"PixelShader";
-BROPEN -> @"{";
-BRCLOSE -> @"}";
-EQUALS -> @"=";
-SEMICOLON -> @";";
-EMPTY_ARGS -> @"\(\s*\)";
-COMPILE -> @"compile";
-SHADERMODEL -> @"(vs_|ps_)(2_0|3_0|4_0|5_0)((_level_)(9_1|9_2|9_3))?";
-CODE -> @".";
-STRING -> @"@?\""(\""\""|[^\""])*\""";
-EOF -> @"^$";
+Identifier -> @"[A-Za-z_][A-Za-z0-9_]*";
+Pass -> @"pass";
+Technique -> @"technique";
+VertexShader -> @"VertexShader";
+PixelShader -> @"PixelShader";
+OpenBracket -> @"{";
+CloseBracket -> @"}";
+Equals -> @"=";
+Semicolon -> @";";
+OpenParenthesis -> @"\(";
+CloseParenthesis -> @"\)";
+Compile -> @"compile";
+ShaderModel -> @"(vs_|ps_)(2_0|3_0|4_0|5_0)((_level_)(9_1|9_2|9_3))?";
+Code -> @".";
+EndOfFile -> @"^$";
 
 // Productions
-Start -> ( CODE | Technique_Declaration )* EOF
+Start -> ( Code | Technique_Declaration )* EndOfFile
 { 
    ShaderInfo shader = new ShaderInfo();
 
@@ -42,10 +42,10 @@ Start -> ( CODE | Technique_Declaration )* EOF
    return shader; 
 };
 
-Technique_Declaration -> TECHNIQUE IDENTIFIER? BROPEN Pass_Declaration+ BRCLOSE 
+Technique_Declaration -> Technique Identifier? OpenBracket Pass_Declaration+ CloseBracket 
 {
    TechniqueInfo technique = new TechniqueInfo();
-   technique.name = $IDENTIFIER as string ?? string.Empty;
+   technique.name = $Identifier as string ?? string.Empty;
    technique.startPos = Token.StartPos;
    technique.length = Token.Length;
 
@@ -59,10 +59,10 @@ Technique_Declaration -> TECHNIQUE IDENTIFIER? BROPEN Pass_Declaration+ BRCLOSE
    return technique;
 };
 
-Pass_Declaration ->	PASS IDENTIFIER? BROPEN (VertexShader_Pass_Expression | PixelShader_Pass_Expression)* BRCLOSE 
+Pass_Declaration ->	Pass Identifier? OpenBracket (VertexShader_Pass_Expression | PixelShader_Pass_Expression)* CloseBracket 
 { 
    PassInfo pass = new PassInfo();
-   pass.name = $IDENTIFIER as string ?? string.Empty;
+   pass.name = $Identifier as string ?? string.Empty;
 
    foreach (ParseNode node in Nodes)
       node.Eval(tree, pass);
@@ -70,19 +70,19 @@ Pass_Declaration ->	PASS IDENTIFIER? BROPEN (VertexShader_Pass_Expression | Pixe
    return pass;
 };
 
-VertexShader_Pass_Expression -> VERTEXSHADER EQUALS COMPILE SHADERMODEL IDENTIFIER EMPTY_ARGS SEMICOLON
+VertexShader_Pass_Expression -> VertexShader Equals Compile ShaderModel Identifier OpenParenthesis CloseParenthesis Semicolon
 {
    PassInfo pass = paramlist[0] as PassInfo;
-   pass.vsModel = $SHADERMODEL as string;
-   pass.vsFunction = $IDENTIFIER as string;
+   pass.vsModel = $ShaderModel as string;
+   pass.vsFunction = $Identifier as string;
    return null;
 };
 
-PixelShader_Pass_Expression -> PIXELSHADER EQUALS COMPILE SHADERMODEL IDENTIFIER EMPTY_ARGS SEMICOLON
+PixelShader_Pass_Expression -> PixelShader Equals Compile ShaderModel Identifier OpenParenthesis CloseParenthesis Semicolon
 {
    PassInfo pass = paramlist[0] as PassInfo;
-   pass.psModel = $SHADERMODEL as string;
-   pass.psFunction = $IDENTIFIER as string;
+   pass.psModel = $ShaderModel as string;
+   pass.psFunction = $Identifier as string;
    return null;
 };
 

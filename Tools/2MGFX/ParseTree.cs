@@ -207,7 +207,7 @@ namespace TwoMGFX
         protected virtual object EvalTechnique_Declaration(ParseTree tree, params object[] paramlist)
         {
             TechniqueInfo technique = new TechniqueInfo();
-           technique.name = this.GetValue(tree, TokenType.IDENTIFIER, 0) as string ?? string.Empty;
+           technique.name = this.GetValue(tree, TokenType.Identifier, 0) as string ?? string.Empty;
            technique.startPos = Token.StartPos;
            technique.length = Token.Length;
         
@@ -224,7 +224,7 @@ namespace TwoMGFX
         protected virtual object EvalPass_Declaration(ParseTree tree, params object[] paramlist)
         {
             PassInfo pass = new PassInfo();
-           pass.name = this.GetValue(tree, TokenType.IDENTIFIER, 0) as string ?? string.Empty;
+           pass.name = this.GetValue(tree, TokenType.Identifier, 0) as string ?? string.Empty;
         
            foreach (ParseNode node in Nodes)
               node.Eval(tree, pass);
@@ -235,16 +235,16 @@ namespace TwoMGFX
         protected virtual object EvalVertexShader_Pass_Expression(ParseTree tree, params object[] paramlist)
         {
             PassInfo pass = paramlist[0] as PassInfo;
-           pass.vsModel = this.GetValue(tree, TokenType.SHADERMODEL, 0) as string;
-           pass.vsFunction = this.GetValue(tree, TokenType.IDENTIFIER, 0) as string;
+           pass.vsModel = this.GetValue(tree, TokenType.ShaderModel, 0) as string;
+           pass.vsFunction = this.GetValue(tree, TokenType.Identifier, 0) as string;
            return null;
         }
 
         protected virtual object EvalPixelShader_Pass_Expression(ParseTree tree, params object[] paramlist)
         {
             PassInfo pass = paramlist[0] as PassInfo;
-           pass.psModel = this.GetValue(tree, TokenType.SHADERMODEL, 0) as string;
-           pass.psFunction = this.GetValue(tree, TokenType.IDENTIFIER, 0) as string;
+           pass.psModel = this.GetValue(tree, TokenType.ShaderModel, 0) as string;
+           pass.psFunction = this.GetValue(tree, TokenType.Identifier, 0) as string;
            return null;
         }
 
