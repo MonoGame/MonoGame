@@ -7,9 +7,9 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace TwoMGFX
 {
-    static class Program
+    public static class Program
     {
-        static int Main(string[] args)
+        public static int Main(string[] args)
         {
             var options = new Options();
             var parser = new Utilities.CommandLineParser(options);

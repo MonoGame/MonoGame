@@ -49,17 +49,21 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MonoGame.Framework.Windows, Version=2.5.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\MonoGame.Framework\bin\Debug\MonoGame.Framework.Windows.dll</HintPath>
+    </Reference>
     <Reference Include="SharpDX">
-      <HintPath>..\..\ThirdParty\Libs\SharpDX\Windows\SharpDX.dll</HintPath>
+      <HintPath>..\..\..\MonoGame-Dependencies\SharpDX\Windows\SharpDX.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.D3DCompiler">
-      <HintPath>..\..\ThirdParty\Libs\SharpDX\Windows\SharpDX.D3DCompiler.dll</HintPath>
+      <HintPath>..\..\..\MonoGame-Dependencies\SharpDX\Windows\SharpDX.D3DCompiler.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.Direct3D11">
-      <HintPath>..\..\ThirdParty\Libs\SharpDX\Windows\SharpDX.Direct3D11.dll</HintPath>
+      <HintPath>..\..\..\MonoGame-Dependencies\SharpDX\Windows\SharpDX.Direct3D11.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.DXGI">
-      <HintPath>..\..\ThirdParty\Libs\SharpDX\Windows\SharpDX.DXGI.dll</HintPath>
+      <HintPath>..\..\..\MonoGame-Dependencies\SharpDX\Windows\SharpDX.DXGI.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -117,22 +121,12 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\MonoGame.Framework\MonoGame.Framework.Windows.csproj">
-      <Project>{7DE47032-A904-4C29-BD22-2D235E8D91BA}</Project>
-      <Name>MonoGame.Framework.Windows</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\ThirdParty\Libs\libmojoshader_32.dll">
+    <Content Include="..\..\..\MonoGame-Dependencies\libmojoshader_32.dll">
       <Link>libmojoshader_32.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\ThirdParty\Libs\SharpDX\Windows\sharpdx_direct3d11_effects_x86.dll">
+    </Content>
+    <Content Include="..\..\..\MonoGame-Dependencies\SharpDX\Windows\sharpdx_direct3d11_effects_x86.dll">
       <Link>sharpdx_direct3d11_effects_x86.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
