@@ -397,6 +397,17 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             else
             {
+
+                // CHECK TO ENSURE THAT THE textureData VARIABLE IS INITIALIZED 
+
+                if (textureData == null) {
+
+                    // COPIED INITIALIZATION FROM generateOpenGLTexture
+
+                    textureData = new Byte[_width * _height * 4];
+
+                }
+
                 // we now have a texture not based on an outside image source
                 // now we check what type was passed
                 if (typeof(T) == typeof(Color))

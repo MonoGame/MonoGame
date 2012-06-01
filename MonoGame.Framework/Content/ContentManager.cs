@@ -382,8 +382,26 @@ namespace Microsoft.Xna.Framework.Content
                 }
                 else if ((typeof(T) == typeof(SpriteFont)))
                 {
-                    //result = new SpriteFont(Texture2D.FromFile(graphicsDeviceService.GraphicsDevice,assetName), null, null, null, 0, 0.0f, null, null);
-                    throw new NotImplementedException();
+
+                    if (assetName.ToLower ().EndsWith (".png")) {
+
+                        // BITMAP FONT IN PNG FORMAT, LOAD TEXTURE USING ORIGINAL LOAD METHOD
+
+                        Texture2D fontTexture = Load<Texture2D> (originalAssetName); 
+
+                        result = new SpriteFontReader ().ReadFromTexture (fontTexture);
+
+                    }
+
+                    else {
+
+                        // RETAIN ORIGINAL EXCEPTION LOGIC 
+
+                        //result = new SpriteFont(Texture2D.FromFile(graphicsDeviceService.GraphicsDevice,assetName), null, null, null, 0, 0.0f, null, null);
+                        throw new NotImplementedException ();
+
+                    }
+
                 }
                 else if ((typeof(T) == typeof(Song)))
                 {
