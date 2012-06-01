@@ -256,7 +256,6 @@
     <Compile Include="Content\ContentReaders\RectangleReader.cs" />
     <Compile Include="Content\ContentReaders\StringReader.cs" />
     <Compile Include="Content\ContentReaders\Vector3Reader.cs" />
-    <Compile Include="Graphics\BatchItem.cs" />
     <Compile Include="Graphics\ClearOptions.cs" />
     <Compile Include="Graphics\CompilerOptions.cs" />
     <Compile Include="Graphics\DeviceType.cs" />
