@@ -115,10 +115,27 @@ namespace Microsoft.Xna.Framework
 
         #region Delegates
 
+        private static Keys KeyTranslate(Windows.System.VirtualKey inkey)
+        {
+            switch (inkey)
+            {
+                // XNA does not have have 'handless' key values.
+                // So, we arebitrarily map those to the 'Left' version.                 
+                case Windows.System.VirtualKey.Control:
+                    return Keys.LeftControl;
+                case Windows.System.VirtualKey.Shift:
+                    return Keys.LeftControl;           
+                // Note that the Alt key is now refered to as Menu.
+                case Windows.System.VirtualKey.Menu:
+                    return Keys.LeftAlt;
+                default:                    
+                    return (Keys)inkey;
+            }
+        }
+
         private void Keyboard_KeyUp(CoreWindow sender, KeyEventArgs args)
         {
-            // VirtualKey maps pretty much to XNA keys.
-            var xnaKey = (Keys)args.VirtualKey;
+            var xnaKey = KeyTranslate(args.VirtualKey);
 
             if (_keys.Contains(xnaKey))
                 _keys.Remove(xnaKey);
@@ -126,8 +143,7 @@ namespace Microsoft.Xna.Framework
 
         private void Keyboard_KeyDown(CoreWindow sender, KeyEventArgs args)
         {
-            // VirtualKey maps directly to XNA keys.
-            var xnaKey = (Keys)args.VirtualKey;
+            var xnaKey = KeyTranslate(args.VirtualKey);
 
             if (!_keys.Contains(xnaKey))
                 _keys.Add(xnaKey);
@@ -147,7 +163,8 @@ namespace Microsoft.Xna.Framework
             _coreWindow.KeyDown += Keyboard_KeyDown;
             _coreWindow.KeyUp += Keyboard_KeyUp;
             
-            ApplicationView.GetForCurrentView().ViewStateChanged += Application_ViewStateChanged;
+            // TODO: Fix for latest WinSDK changes.
+            //ApplicationView.Value.ViewStateChanged += Application_ViewStateChanged;
 
             var bounds = _coreWindow.Bounds;
             SetClientBounds(bounds.Width, bounds.Height);
@@ -155,11 +172,13 @@ namespace Microsoft.Xna.Framework
             InitializeTouch();
         }
 
+        /*
         private void Application_ViewStateChanged(ApplicationView sender, ApplicationViewStateChangedEventArgs args)
         {
             // TODO: We may want to expose this event via GameWindow
             // only in WinRT builds....  not sure yet.
         }
+        */
 
         private void Window_Closed(CoreWindow sender, CoreWindowEventArgs args)
         {
