@@ -146,7 +146,6 @@
     <Compile Include="Input\Touch\TouchLocationState.cs" />
     <Compile Include="Input\Touch\TouchPanel.cs" />
     <Compile Include="Input\Touch\TouchPanelCapabilities.cs" />
-    <Compile Include="IServiceProvider.cs" />
     <Compile Include="LaunchParameters.cs" />
     <Compile Include="Media\MediaPlayer.cs">
       <SubType>Code</SubType>
