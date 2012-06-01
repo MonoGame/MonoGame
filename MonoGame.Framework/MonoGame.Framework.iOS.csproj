@@ -460,11 +460,11 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect.mgfx" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect.mgfx" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\DualTextureEffect.mgfx" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\EnvironmentMapEffect.mgfx" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\SkinnedEffect.mgfx" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\SpriteEffect.mgfx" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect.ogl.mgfxo" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect.ogl.mgfxo" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\DualTextureEffect.ogl.mgfxo" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\EnvironmentMapEffect.ogl.mgfxo" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\SkinnedEffect.ogl.mgfxo" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\SpriteEffect.ogl.mgfxo" />
   </ItemGroup>
 </Project>

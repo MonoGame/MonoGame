@@ -74,7 +74,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #if DIRECTX
             "Microsoft.Xna.Framework.Graphics.Effect.Resources.AlphaTestEffect.dx11.mgfxo"
 #else
-            "Microsoft.Xna.Framework.Graphics.Effect.Resources.AlphaTestEffect.mgfx"
+            "Microsoft.Xna.Framework.Graphics.Effect.Resources.AlphaTestEffect.ogl.mgfxo"
 #endif
         );
 
