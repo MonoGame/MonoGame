@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MgfxVSHelper", "MgfxVSHelper\MgfxVSHelper.csproj", "{921FA840-C792-42CD-800C-A30A61489F2C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MgfxGenerator", "MgfxGenerator\MgfxGenerator.csproj", "{921FA840-C792-42CD-800C-A30A61489F2C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tester", "Tester\Tester.csproj", "{CAE72CC7-F7DF-4A0A-9A90-2416E975EEBD}"
 EndProject

@@ -8,8 +8,8 @@
     <ProjectGuid>{921FA840-C792-42CD-800C-A30A61489F2C}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>MgfxVSHelper</RootNamespace>
-    <AssemblyName>MgfxVSHelper</AssemblyName>
+    <RootNamespace>MonoGame.Tools.VisualStudio</RootNamespace>
+    <AssemblyName>MonoGame.Tools.VisualStudio.MgfxGenerator</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -37,16 +37,6 @@
       <ExecutableExtension>.exe</ExecutableExtension>
       <HintPath>..\..\2MGFX\bin\Debug\2MGFX.exe</HintPath>
     </Reference>
-    <Reference Include="Microsoft.VisualStudio.OLE.Interop, Version=7.1.40304.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-    <Reference Include="Microsoft.VisualStudio.Shell.Interop, Version=7.1.40304.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-    <Reference Include="Microsoft.VisualStudio.Shell.Interop.10.0, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.Shell.Interop.8.0, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-    <Reference Include="Microsoft.VisualStudio.TextTemplating.VSHost.10.0, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Program Files (x86)\Microsoft Visual Studio 2010 SDK SP1\VisualStudioIntegration\Common\Assemblies\v4.0\Microsoft.VisualStudio.TextTemplating.VSHost.10.0.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Windows.Forms" />
@@ -57,7 +47,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MgfxVSHelper.cs" />
+    <Compile Include="Microsoft\VisualStudio\Extensibility\BaseCodeGenerator.cs" />
+    <Compile Include="Microsoft\VisualStudio\Extensibility\BaseCodeGeneratorWithSite.cs" />
+    <Compile Include="Microsoft\VisualStudio\Extensibility\IObjectWithSite.cs" />
+    <Compile Include="MgfxGenerator.cs" />
+    <Compile Include="Microsoft\VisualStudio\Extensibility\IOleServiceProvider.cs" />
+    <Compile Include="Microsoft\VisualStudio\OLE\Interop\IServiceProvider.cs" />
+    <Compile Include="Microsoft\VisualStudio\Shell\Interop\IVsErrorList.cs" />
+    <Compile Include="Microsoft\VisualStudio\Extensibility\IVsGeneratorProgress.cs" />
+    <Compile Include="Microsoft\VisualStudio\Shell\Interop\IVsHierarchy.cs" />
+    <Compile Include="Microsoft\VisualStudio\Extensibility\IVsSingleFileGenerator.cs" />
+    <Compile Include="Microsoft\VisualStudio\Shell\Interop\IVsHierarchyEvents.cs" />
+    <Compile Include="Microsoft\VisualStudio\TextTemplating\NativeMethods.cs" />
+    <Compile Include="Microsoft\VisualStudio\Extensibility\ServiceProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -66,8 +68,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="MgfxVSHelper32.reg" />
-    <None Include="MgfxVSHelper64.reg" />
     <None Include="Properties\Settings.settings">
       <Generator>PublicSettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("MgfxCompiler")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Visual Studio custom tool to generate MonoGame MGFX effect files from DirectX/XNA FX source")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("MgfxCompiler")]

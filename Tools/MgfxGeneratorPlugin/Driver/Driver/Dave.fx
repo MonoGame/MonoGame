@@ -1,4 +1,4 @@
-#ifndef GLOBAL_MATRICES
+﻿#ifndef GLOBAL_MATRICES
 #define GLOBAL_MATRICES
 
 float4x4 World;
@@ -19,12 +19,12 @@ struct VertexShaderInput
     // coordinates and vertex colors here.
 };
 
-struct VertexShaderOutput
+struct VertexShaderOutput 
 {
     float4 Position : POSITION0;
 	float4 Color : COLOR0;
 
-    // TODO: add vertex shader outputs such as colors and texture
+    // TODO: add vertex shader outputs such as colors and textureasdfasd
     // coordinates here. These values will automatically be interpolated
     // over the triangle, and provided as input to your pixel shader.
 };
@@ -39,14 +39,12 @@ VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
     return output;
 }
 
-float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
+float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0 
 {
-    // TODO: add your pixel shader code here.
+    // TODO: add your pixel shader code here.asdfasd
 	return float4(1,1,1,1);
     return input.Color;
 }
-
-//THIS TEXT SHOULD CAUSE AN ERROR TO APPEAR IN THE VISUAL STUDIO ERROR LIST
 
 technique Technique1
 {
@@ -54,8 +52,8 @@ technique Technique1
     {
 		/// these state settings will cause the current rev of 2MGFX to fail, since it doesn't support them.
 		/// this is as-intended for testing
-		FillMode=WIREFRAME;
-		CullMode=CCW;
+		/*FillMode=WIREFRAME;
+		CullMode=CCW;*/
         VertexShader = compile vs_3_0 VertexShaderFunction();
         PixelShader = compile ps_3_0 PixelShaderFunction();
     }

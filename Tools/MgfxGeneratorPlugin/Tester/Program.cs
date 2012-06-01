@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using Tester.Properties;
+using MonoGame.Tools.VisualStudio;
 
 namespace CustomToolTest
 {
@@ -30,7 +31,8 @@ namespace CustomToolTest
             {
                 /// simple test effect
                 var effectSource = Resources.SimpleEffect;
-                var g = new MgfxVSHelper.MgfxVSHelper();
+                var g = new MgfxGenerator();
+
 
                 var result = g.GenerateCodeWrapper(null,effectSource);
 

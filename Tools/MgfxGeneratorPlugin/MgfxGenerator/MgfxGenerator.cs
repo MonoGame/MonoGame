@@ -4,18 +4,18 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
-using Microsoft.VisualStudio.TextTemplating.VSHost;
+using Microsoft.VisualStudio.Extensibility;
 
 
-namespace MgfxVSHelper
+namespace MonoGame.Tools.VisualStudio
 {
     /// <summary>
     /// Implements a Visual Studio custom tool that builds MonoGame MGFX effect files from XNA FX files.
     /// </summary>
     [Guid("2AD954E2-F7EC-4E5E-A4B5-C6E0E826E31F")]
     [ComVisible(true)]
-    [ProgId("MgfxVSHelper.MgfxVSHelper")]
-    public class MgfxVSHelper : BaseCodeGeneratorWithSite
+    [ProgId("MonoGame.MgfxGenerator")]
+    public class MgfxGenerator : BaseCodeGeneratorWithSite
     {
 #if DEBUG
         /// <summary>
@@ -45,6 +45,10 @@ namespace MgfxVSHelper
         }
 #endif
 
+        public override string GetDefaultExtension()
+        {
+            return ".mgfx";
+        }
 
         /// <summary>
         /// Generates an MGFX effect file from the input.
@@ -92,16 +96,13 @@ namespace MgfxVSHelper
                     }
                     else
                     {
-                        try
-                        {
-                            /// force Visual Studio to open the error list if we ran into problems.
-                            ErrorList.BringToFront();
-                            ErrorList.ForceShowErrors();
-                        }
-                        catch (ArgumentNullException ex)
-                        {
-                            Debug.WriteLine("Error attempting to access Visual Studio error list windows. This is expected to happen when using the MgfxVSHelper object outside of visual studio.");
-                        }
+                        /// force Visual Studio to open the error list if we ran into problems.
+                        /// TODO:
+                        /// Get the error list panel to show without having to import a ton of shell interop code.
+                        /*
+                        ErrorList.BringToFront();
+                        ErrorList.ForceShowErrors();
+                         */
 
 
                         var errors = sb.ToString().Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
@@ -161,10 +162,6 @@ namespace MgfxVSHelper
 
 
 
-        public override string GetDefaultExtension()
-        {
-            return ".mgfx";
-        }
     }
 
 }
