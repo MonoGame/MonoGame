@@ -26,6 +26,23 @@ namespace Microsoft.Xna.Framework.Graphics
             return effect;
         }
 
+        static public SharpDX.DXGI.Format ToFormat(DepthFormat format)
+        {
+            switch (format)
+            {
+                default:
+                case DepthFormat.None:
+                    return SharpDX.DXGI.Format.Unknown;
+
+                case DepthFormat.Depth16:
+                    return SharpDX.DXGI.Format.D16_UNorm;
+
+                case DepthFormat.Depth24:
+                case DepthFormat.Depth24Stencil8:
+                    return SharpDX.DXGI.Format.D24_UNorm_S8_UInt;
+            }
+        }
+
         static public SharpDX.DXGI.Format ToFormat(SurfaceFormat format)
         {
             switch (format)
