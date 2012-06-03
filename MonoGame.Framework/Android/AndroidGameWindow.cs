@@ -354,13 +354,11 @@ namespace Microsoft.Xna.Framework
 
         public override bool OnTouchEvent(MotionEvent e)
         {			
-            TouchLocation tlocation;
             Vector2 position = Vector2.Zero;            
             position.X = e.GetX(e.ActionIndex);            
             position.Y = e.GetY(e.ActionIndex);     
 			UpdateTouchPosition(ref position);
-			int id = e.GetPointerId(e.ActionIndex);            
-            int index;
+			int id = e.GetPointerId(e.ActionIndex);
             switch (e.ActionMasked)
             {
                 // DOWN                
