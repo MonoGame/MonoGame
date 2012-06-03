@@ -125,6 +125,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 				_heldEventsProcessed.Remove(id);
                 _processedDoubleTaps.Remove(id);
 			}
+            _removeId.Clear();
 
             // Update the existing touch locations.
             for (var i = 0; i < _events.Count; )
