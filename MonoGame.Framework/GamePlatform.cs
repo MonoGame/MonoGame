@@ -316,6 +316,12 @@ namespace Microsoft.Xna.Framework
         /// Game.TargetElapsedTime has been set.
         /// </summary>
         public virtual void TargetElapsedTimeChanged() {}
+
+        /// <summary>
+        /// MSDN: Use this method if your game is recovering from a slow-running state, and ElapsedGameTime is too large to be useful.
+        /// Frame timing is generally handled by the Game class, but some platforms still handle it elsewhere. Once all platforms
+        /// rely on the Game class's functionality, this method and any overrides should be removed.
+        /// </summary>
         public virtual void ResetElapsedTime() {}
 
         protected virtual void OnIsMouseVisibleChanged() {}

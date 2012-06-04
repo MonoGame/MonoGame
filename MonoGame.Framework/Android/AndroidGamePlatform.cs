@@ -229,11 +229,6 @@ namespace Microsoft.Xna.Framework
 #endif
 		}
 		
-		public override void ResetElapsedTime ()
-		{
-			this.Window.ResetElapsedTime();			
-		}
-
         public override void Present()
         {
             try
