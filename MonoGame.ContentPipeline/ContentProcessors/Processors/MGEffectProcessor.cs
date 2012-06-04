@@ -5,13 +5,12 @@ using System.Text;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Content.Pipeline.Processors;
-using Microsoft.Xna.Content.Pipeline.Processors;
 using Microsoft.Xna.Framework.Graphics;
 using TwoMGFX;
 using System.IO;
 using System.Collections;
 
-namespace MonoGameContentProcessors.Processors.Effect
+namespace MonoGameContentProcessors.Processors
 {
     [ContentProcessor(DisplayName = "MonoGame Effect")]
     class MGEffectProcessor : EffectProcessor

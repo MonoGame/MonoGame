@@ -1,18 +1,17 @@
-namespace Microsoft.Xna.Content.Pipeline.Processors
+using System;
+using System.ComponentModel;
+using System.IO;
+using System.Collections.Generic;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content.Pipeline;
+using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
+using Microsoft.Xna.Framework.Content.Pipeline.Processors;
+using System.Runtime.InteropServices;
+using System.Collections.ObjectModel;
+using MonoGameContentProcessors.Content;
+
+namespace MonoGameContentProcessors.Processors
 {
-    using System;
-    using System.ComponentModel;
-    using System.IO;
-    using System.Collections.Generic;
-
-    using Microsoft.Xna.Framework;
-    using Microsoft.Xna.Framework.Content.Pipeline;
-    using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
-    using Microsoft.Xna.Framework.Content.Pipeline.Processors;
-    using System.Runtime.InteropServices;
-    using System.Collections.ObjectModel;
-    
-
     [ContentProcessor(DisplayName = "MonoGame Texture")]
     public class MGTextureProcessor : TextureProcessor
     {
@@ -32,8 +31,9 @@ namespace Microsoft.Xna.Content.Pipeline.Processors
 
         public override TextureContent Process(TextureContent input, ContentProcessorContext context)
         {
-            // Bail out early if we aren't building content for IOS
-            if (!context.BuildConfiguration.ToUpper().Contains("IOS"))
+            // Fallback if we aren't buiding for iOS.
+            var platform = ContentHelper.GetMonoGamePlatform();
+            if (platform != MonoGamePlatform.iOS)
                 return base.Process(input, context);
 
             // Only go this path if we are compressing the texture

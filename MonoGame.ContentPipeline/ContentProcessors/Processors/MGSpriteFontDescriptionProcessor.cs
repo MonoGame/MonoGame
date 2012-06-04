@@ -4,21 +4,21 @@ using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using System.Reflection;
-using Microsoft.Xna.Content.Pipeline.Processors;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content.Pipeline;
+using Microsoft.Xna.Framework.Content.Pipeline.Processors;
+using MonoGameContentProcessors.Content;
 
-namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
+namespace MonoGameContentProcessors.Processors
 {
     [ContentProcessor(DisplayName = "MonoGame SpriteFont")]
     public class MGSpriteFontDescriptionProcessor : FontDescriptionProcessor
     {
-        public MGSpriteFontDescriptionProcessor()
-            : base()
-        {
-        }
-
         public override SpriteFontContent Process(FontDescription input, ContentProcessorContext context)
         {
-            if (!context.BuildConfiguration.ToUpper().Contains("IOS"))
+            // Fallback if we aren't buiding for iOS.
+            var platform = ContentHelper.GetMonoGamePlatform();
+            if (platform != MonoGamePlatform.iOS)
                 return base.Process(input, context);
 
             SpriteFontContent content = base.Process(input, context);

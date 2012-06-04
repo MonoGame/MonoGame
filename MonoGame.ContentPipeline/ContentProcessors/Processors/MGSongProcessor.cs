@@ -8,7 +8,6 @@ using Microsoft.Xna.Framework.Content.Pipeline.Audio;
 using System.Reflection;
 using System.Collections.ObjectModel;
 using System.IO;
-using MonoGameContentProcessors.Utilities;
 
 namespace MonoGameContentProcessors.Processors
 {
@@ -17,7 +16,9 @@ namespace MonoGameContentProcessors.Processors
     {
         public override SongContent Process(AudioContent input, ContentProcessorContext context)
         {
-            if (!context.BuildConfiguration.ToUpper().Contains("IOS"))
+            // Fallback if we aren't buiding for iOS.
+            var platform = ContentHelper.GetMonoGamePlatform();
+            if (platform != MonoGamePlatform.iOS)
                 return base.Process(input, context);
 
             //TODO: If quality isn't best and it's a .wma, don't compress to MP3. Leave it as a .wav instead

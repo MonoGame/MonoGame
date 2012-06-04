@@ -13,7 +13,7 @@ using NAudio.Wave;
 using NAudio.WindowsMediaFormat;
 using Microsoft.Xna.Framework.Content.Pipeline.Audio;
 
-namespace MonoGameContentProcessors.Utilities
+namespace MonoGameContentProcessors
 {
     public static class AudioConverter
     {
