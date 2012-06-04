@@ -9,24 +9,27 @@ namespace Microsoft.Xna.Framework.Media
 {
     public class Song : IEquatable<Song>, IDisposable
     {
-		static internal Bgm _bgm;
-    	static internal BgmPlayer _bgmPlayer;
+        static internal Song _currentSong;
+        static internal BgmPlayer _bgmPlayer;
         
+        private Bgm _bgm;
         private string _name;
         private int _playCount;
 
         internal Song(string fileName)
         {
             _name = fileName;
-			_bgm = new Bgm(_name);
-            _bgmPlayer = _bgm.CreatePlayer();
+            _bgm = new Bgm(_name);
         }
 
         public void Dispose()
         {
-			_bgmPlayer.Stop();
-			_bgmPlayer.Dispose();
-			_bgm.Dispose();
+            if (_currentSong == this && _bgmPlayer != null)
+            {
+                _bgmPlayer.Stop();
+                _bgmPlayer.Dispose();
+            }
+            _bgm.Dispose();
         }
 
         private void Prepare()
@@ -71,16 +74,23 @@ namespace Microsoft.Xna.Framework.Media
 
         internal void Play()
         {
-            if (_bgmPlayer != null)
+            if (_currentSong != this) //If needed switch up the current song
             {
-                _bgmPlayer.Play();
-                _playCount++;
+                if (_bgmPlayer != null)
+                {
+                    _bgmPlayer.Stop();
+                    _bgmPlayer.Dispose();
+                }
+                _bgmPlayer = _bgm.CreatePlayer();
+                _currentSong = this;
             }
+            _bgmPlayer.Play();
+            _playCount++;
         }
 
         internal void Resume()
         {
-            if (_bgmPlayer != null)
+            if (_bgmPlayer != null && _currentSong == this)
             {
                 _bgmPlayer.Resume();
             }
@@ -88,7 +98,7 @@ namespace Microsoft.Xna.Framework.Media
 
         internal void Pause()
         {
-            if (_bgmPlayer != null)
+            if (_bgmPlayer != null && _currentSong == this)
             {
                 _bgmPlayer.Pause();
             }
@@ -96,7 +106,7 @@ namespace Microsoft.Xna.Framework.Media
 
         internal void Stop()
         {
-            if (_bgmPlayer != null)
+            if (_bgmPlayer != null && _currentSong == this)
             {
                 _bgmPlayer.Stop();
             }

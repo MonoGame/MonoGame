@@ -116,12 +116,14 @@ namespace Microsoft.Xna.Framework
         private bool _loop = true;
         public override void RunLoop()
         {
-			while (_loop) //TODO: Will need a much smarter run loop
+			while (_loop)
 			{
 				SystemEvents.CheckEvents();
                 UpdateTouches();
-				Window.OnUpdateFrame();
-				Window.OnRenderFrame();
+                
+                // Update and render the game.
+                if (Game != null)
+                    Game.Tick();
 			}
         }
 
