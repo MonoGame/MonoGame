@@ -6,9 +6,7 @@ namespace Microsoft.Xna.Framework.Graphics
 {
 	public class MojoShader
     {
-#if WINDOWS
         const string mojoshader_dll = "libmojoshader_32.dll";
-#endif
 
 		public partial class NativeConstants {
 		    

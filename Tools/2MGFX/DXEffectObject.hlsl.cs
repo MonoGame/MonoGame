@@ -146,7 +146,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 shaderFlags |= SharpDX.D3DCompiler.ShaderFlags.OptimizationLevel3;
                 //shaderFlags |= SharpDX.D3DCompiler.ShaderFlags.NoPreshader;
                 //shaderFlags |= SharpDX.D3DCompiler.ShaderFlags.PackMatrixRowMajor;
-                shaderFlags |= SharpDX.D3DCompiler.ShaderFlags.WarningsAreErrors;
+                //shaderFlags |= SharpDX.D3DCompiler.ShaderFlags.WarningsAreErrors;
                 //shaderFlags |= SharpDX.D3DCompiler.ShaderFlags.EnableBackwardsCompatibility;
                 //shaderFlags |= SharpDX.D3DCompiler.ShaderFlags.SkipValidation;
                 shaderFlags |= SharpDX.D3DCompiler.ShaderFlags.Debug;
