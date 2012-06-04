@@ -12,7 +12,7 @@ using MonoGameContentProcessors.Utilities;
 
 namespace MonoGameContentProcessors.Processors
 {
-    [ContentProcessor(DisplayName = "MGSongProcessor")]
+    [ContentProcessor(DisplayName = "MonoGame Song")]
     public class MGSongProcessor : SongProcessor
     {
         public override SongContent Process(AudioContent input, ContentProcessorContext context)

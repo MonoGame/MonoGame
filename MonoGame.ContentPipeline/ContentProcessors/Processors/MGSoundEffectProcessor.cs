@@ -12,7 +12,7 @@ using NAudio.Wave;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 {
-    [ContentProcessor(DisplayName = "MGSoundEffectProcessor")]
+    [ContentProcessor(DisplayName = "MonoGame SoundEffect")]
     public class MGSoundEffectProcessor : SoundEffectProcessor
     {
         public override SoundEffectContent Process(Audio.AudioContent input, ContentProcessorContext context)

@@ -10,7 +10,7 @@ using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Content.Pipeline.Processors;
 
 
-[ContentProcessor(DisplayName = "MGMaterialProcessor")]
+[ContentProcessor(DisplayName = "MonoGame Material")]
 public class MGMaterialProcessor : MaterialProcessor
 {
 

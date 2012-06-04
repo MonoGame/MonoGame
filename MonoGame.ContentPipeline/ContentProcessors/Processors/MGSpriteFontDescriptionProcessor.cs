@@ -8,7 +8,7 @@ using Microsoft.Xna.Content.Pipeline.Processors;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 {
-    [ContentProcessor(DisplayName = "MG SpriteFont Processor")]
+    [ContentProcessor(DisplayName = "MonoGame SpriteFont")]
     public class MGSpriteFontDescriptionProcessor : FontDescriptionProcessor
     {
         public MGSpriteFontDescriptionProcessor()

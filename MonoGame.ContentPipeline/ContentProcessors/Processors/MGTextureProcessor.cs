@@ -13,7 +13,7 @@ namespace Microsoft.Xna.Content.Pipeline.Processors
     using System.Collections.ObjectModel;
     
 
-    [ContentProcessor(DisplayName = "MGTexture")]
+    [ContentProcessor(DisplayName = "MonoGame Texture")]
     public class MGTextureProcessor : TextureProcessor
     {
         [DllImport("PVRTexLibC.dll", CallingConvention = CallingConvention.Cdecl)]
