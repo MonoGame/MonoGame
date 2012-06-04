@@ -18,14 +18,14 @@
     
       <!-- Set a user level environment variable that the content processors can pick up. -->
       <Message Importance="high" Text="MonoGame Platform $(MonoGamePlatform)"/>
-      <Exec Command='SETX MONOGAME_PLATFORM "$(MonoGamePlatform)" > null'/>
+      <Exec Command='SETX MONOGAME_PLATFORM "$(MonoGamePlatform)" > NUL'/>
     
   </Target>
   
   <Target Name="MonoGamePlatformCleanup" AfterTargets="BuildContentProjects">
     
     <!-- Clear the previously set user environment variable. -->
-    <Exec Command='SETX MONOGAME_PLATFORM "" > null'/>
+    <Exec Command='SETX MONOGAME_PLATFORM "" > NUL'/>
     
   </Target>
   
