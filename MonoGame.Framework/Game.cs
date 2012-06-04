@@ -329,7 +329,8 @@ namespace Microsoft.Xna.Framework
         public void ResetElapsedTime()
         {
             Platform.ResetElapsedTime();
-            _gameTimer.Restart();
+            _gameTimer.Reset();
+            _gameTimer.Start();
             _accumulatedElapsedTime = TimeSpan.Zero;
             _gameTime.ElapsedGameTime = TimeSpan.Zero;
         }
@@ -386,7 +387,8 @@ namespace Microsoft.Xna.Framework
 
             // Advance the accumulated elapsed time.
             _accumulatedElapsedTime += _gameTimer.Elapsed;
-            _gameTimer.Restart();
+            _gameTimer.Reset();
+            _gameTimer.Start();
 
             // If we're in the fixed timestep mode and not enough time has elapsed
             // to perform an update we sleep off the the remaining time to save battery
