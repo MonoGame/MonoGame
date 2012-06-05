@@ -74,7 +74,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #if DIRECTX
             "Microsoft.Xna.Framework.Graphics.Effect.Resources.SkinnedEffect.dx11.mgfxo"
 #else
-            "Microsoft.Xna.Framework.Graphics.Effect.Resources.SkinnedEffect.mgfx"
+            "Microsoft.Xna.Framework.Graphics.Effect.Resources.SkinnedEffect.ogl.mgfxo"
 #endif
         );            
 

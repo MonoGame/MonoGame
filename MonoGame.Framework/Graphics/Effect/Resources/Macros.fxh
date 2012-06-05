@@ -7,10 +7,10 @@
 
 #ifdef SM4
 
-#define TECHNIQUE(name, vsname, psname ) \
-	technique10 name { pass { VertexShader = compile vs_4_0_level_9_3 vsname (); PixelShader = compile ps_4_0_level_9_3 psname(); } }
-
 // Macros for targetting shader model 4.0 (DX11)
+
+#define TECHNIQUE(name, vsname, psname ) \
+	technique name { pass { VertexShader = compile vs_4_0_level_9_3 vsname (); PixelShader = compile ps_4_0_level_9_3 psname(); } }
 
 #define BEGIN_CONSTANTS     cbuffer Parameters : register(b0) {
 #define MATRIX_CONSTANTS
@@ -49,15 +49,13 @@
 #define _cb(r)
 
 #define DECLARE_TEXTURE(Name, index) \
-    texture2D Name; \
-    sampler Name##Sampler : register(s##index) = sampler_state { Texture = (Name); };
+    sampler2D Name : register(s##index);
 
 #define DECLARE_CUBEMAP(Name, index) \
-    textureCUBE Name; \
-    sampler Name##Sampler : register(s##index) = sampler_state { Texture = (Name); };
+    samplerCUBE Name : register(s##index);
 
-#define SAMPLE_TEXTURE(Name, texCoord)  tex2D(Name##Sampler, texCoord)
-#define SAMPLE_CUBEMAP(Name, texCoord)  texCUBE(Name##Sampler, texCoord)
+#define SAMPLE_TEXTURE(Name, texCoord)  tex2D(Name, texCoord)
+#define SAMPLE_CUBEMAP(Name, texCoord)  texCUBE(Name, texCoord)
 
 
 #endif

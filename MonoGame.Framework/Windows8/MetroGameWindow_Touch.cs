@@ -74,10 +74,11 @@ namespace Microsoft.Xna.Framework
         {
             var pos = new Vector2((float)args.CurrentPoint.Position.X, (float)args.CurrentPoint.Position.Y) * _dipFactor;
             var isTouch = args.CurrentPoint.PointerDevice.PointerDeviceType == Windows.Devices.Input.PointerDeviceType.Touch;
-            if (isTouch)
+            var touchIsDown = args.CurrentPoint.IsInContact;
+            if (isTouch && touchIsDown)
                 TouchPanel.AddEvent(new TouchLocation((int)args.CurrentPoint.PointerId, TouchLocationState.Moved, pos));
 
-            if (!isTouch || args.CurrentPoint.Properties.IsPrimary)
+            if (!isTouch || args.CurrentPoint.Properties.IsPrimary && touchIsDown)
             {
                 // Mouse or stylus event or the primary touch event (simulated as mouse input)
                 Mouse.State.Update(args);
