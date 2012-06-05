@@ -48,7 +48,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #elif PSS
             "MonoGame.Framework.PSSuite.PSSuite.Graphics.Resources.Texture.cgx" //FIXME: This shader is totally incomplete
 #else
-            "Microsoft.Xna.Framework.Graphics.Effect.Resources.SpriteEffect.mgfx"
+            "Microsoft.Xna.Framework.Graphics.Effect.Resources.SpriteEffect.ogl.mgfxo"
 #endif
         );
 

@@ -1,23 +1,25 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Reflection;
 using System.Collections.ObjectModel;
+using Microsoft.Xna.Framework.Content.Pipeline;
+using Microsoft.Xna.Framework.Content.Pipeline.Processors;
 using Microsoft.Xna.Framework.Content.Pipeline.Audio;
-using MonoGameContentProcessors.Utilities;
-using System.IO;
-
 using NAudio.Wave;
 
-namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
+namespace MonoGameContentProcessors.Processors
 {
-    [ContentProcessor(DisplayName = "MGSoundEffectProcessor")]
+    [ContentProcessor(DisplayName = "MonoGame SoundEffect")]
     public class MGSoundEffectProcessor : SoundEffectProcessor
     {
-        public override SoundEffectContent Process(Audio.AudioContent input, ContentProcessorContext context)
+        public override SoundEffectContent Process(AudioContent input, ContentProcessorContext context)
         {
-            if (!context.BuildConfiguration.ToUpper().Contains("IOS"))
+            // Fallback if we aren't buiding for iOS.
+            var platform = ContentHelper.GetMonoGamePlatform();
+            if (platform != MonoGamePlatform.iOS)
                 return base.Process(input, context);
 
             var targetSampleRate = input.Format.SampleRate;

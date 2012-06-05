@@ -49,6 +49,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.Xna.Framework.Graphics, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
     <Reference Include="SharpDX">
       <HintPath>..\..\ThirdParty\Libs\SharpDX\Windows\SharpDX.dll</HintPath>
     </Reference>
@@ -64,9 +65,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
@@ -74,10 +73,7 @@
     <Compile Include="CompilerInclude.cs" />
     <Compile Include="ConstantBuffer.cs" />
     <Compile Include="DXEffectObject.cs" />
-    <Compile Include="DXEffectObject.dxreflect.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="DXEffectObject.fxparser.cs" />
+    <Compile Include="DXEffectObject.hlsl.cs" />
     <Compile Include="DXEffectObject.writer.cs" />
     <Compile Include="DXExpression.cs">
       <SubType>Code</SubType>
@@ -91,8 +87,12 @@
     <Compile Include="GLSLOptimizer.cs" />
     <Compile Include="MojoShader.cs" />
     <Compile Include="Options.cs" />
+    <Compile Include="Parser.cs" />
+    <Compile Include="ParseTree.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Scanner.cs" />
+    <Compile Include="ShaderInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.0,Profile=Client">
@@ -117,16 +117,11 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\MonoGame.Framework\MonoGame.Framework.Windows.csproj">
-      <Project>{7DE47032-A904-4C29-BD22-2D235E8D91BA}</Project>
-      <Name>MonoGame.Framework.Windows</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="..\..\ThirdParty\Libs\libmojoshader_32.dll">
       <Link>libmojoshader_32.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="MGFX.tpg" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\ThirdParty\Libs\SharpDX\Windows\sharpdx_direct3d11_effects_x86.dll">
