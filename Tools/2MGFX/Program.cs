@@ -4,9 +4,9 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace TwoMGFX
 {
-    static class Program
+    public static class Program
     {
-        static int Main(string[] args)
+        public static int Main(string[] args)
         {
             var options = new Options();
             var parser = new Utilities.CommandLineParser(options);
@@ -18,7 +18,7 @@ namespace TwoMGFX
             // Validate the input file exits.
             if (!File.Exists(options.SourceFile))
             {
-                Console.WriteLine("The input file '{0}' was not found!", options.SourceFile);
+                Console.Error.WriteLine("The input file '{0}' was not found!", options.SourceFile);
                 return 1;
             }
             
@@ -35,8 +35,8 @@ namespace TwoMGFX
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Failed to parse the input file '{0}'!", options.SourceFile);
-                Console.WriteLine(ex.Message);
+                Console.Error.WriteLine("Failed to parse the input file '{0}'!", options.SourceFile);
+                Console.Error.WriteLine(ex.Message);
                 return 1;
             }
 
@@ -48,8 +48,8 @@ namespace TwoMGFX
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Fatal exception when creating the effect!");
-                Console.WriteLine(ex.ToString());
+                Console.Error.WriteLine("Fatal exception when creating the effect!");
+                Console.Error.WriteLine(ex.ToString());
                 return 1;
             }
             
@@ -66,8 +66,8 @@ namespace TwoMGFX
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Failed to write the output file '{0}'!", options.OutputFile);
-                Console.WriteLine(ex.Message);
+                Console.Error.WriteLine("Failed to write the output file '{0}'!", options.OutputFile);
+                Console.Error.WriteLine(ex.Message);
                 return 1;
             }
 
