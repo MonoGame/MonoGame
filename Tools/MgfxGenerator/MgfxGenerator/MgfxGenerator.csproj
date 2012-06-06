@@ -1,0 +1,90 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{921FA840-C792-42CD-800C-A30A61489F2C}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>MonoGame.Tools.VisualStudio</RootNamespace>
+    <AssemblyName>MonoGame.Tools.VisualStudio.MgfxGenerator</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <RegisterForComInterop>false</RegisterForComInterop>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MgfxGenerator.cs" />
+    <Compile Include="Microsoft\VisualStudio\Extensibility\BaseCodeGenerator.cs" />
+    <Compile Include="Microsoft\VisualStudio\Extensibility\BaseCodeGeneratorWithSite.cs" />
+    <Compile Include="Microsoft\VisualStudio\Extensibility\IObjectWithSite.cs" />
+    <Compile Include="Microsoft\VisualStudio\Extensibility\IOleServiceProvider.cs" />
+    <Compile Include="Microsoft\VisualStudio\Extensibility\IVsGeneratorProgress.cs" />
+    <Compile Include="Microsoft\VisualStudio\Extensibility\IVsSingleFileGenerator.cs" />
+    <Compile Include="Microsoft\VisualStudio\Extensibility\ServiceProvider.cs" />
+    <Compile Include="Microsoft\VisualStudio\OLE\Interop\IServiceProvider.cs" />
+    <Compile Include="Microsoft\VisualStudio\Shell\Interop\IVsErrorList.cs" />
+    <Compile Include="Microsoft\VisualStudio\Shell\Interop\IVsHierarchy.cs" />
+    <Compile Include="Microsoft\VisualStudio\Shell\Interop\IVsHierarchyEvents.cs" />
+    <Compile Include="Microsoft\VisualStudio\TextTemplating\NativeMethods.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Properties\Settings.settings">
+      <Generator>PublicSettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\2MGFX\2MGFX.csproj">
+      <Project>{6362E6BD-4656-4216-B404-9C959C5B3825}</Project>
+      <Name>2MGFX</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy "$(TargetDir)*.dll" "$(SolutionDir)..\bin\Windows\*.*" /Y /F /I
+xcopy "$(TargetDir)*.exe" "$(SolutionDir)..\bin\Windows\*.*" /Y /F /I</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
