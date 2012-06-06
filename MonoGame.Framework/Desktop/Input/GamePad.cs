@@ -1,9 +1,47 @@
-﻿using System;
+﻿#region License
+/*
+Microsoft Public License (Ms-PL)
+MonoGame - Copyright © 2009 The MonoGame Team
+
+All rights reserved.
+
+This license governs use of the accompanying software. If you use the software, you accept this license. If you do not
+accept the license, do not use the software.
+
+1. Definitions
+The terms "reproduce," "reproduction," "derivative works," and "distribution" have the same meaning here as under 
+U.S. copyright law.
+
+A "contribution" is the original software, or any additions or changes to the software.
+A "contributor" is any person that distributes its contribution under this license.
+"Licensed patents" are a contributor's patent claims that read directly on its contribution.
+
+2. Grant of Rights
+(A) Copyright Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
+each contributor grants you a non-exclusive, worldwide, royalty-free copyright license to reproduce its contribution, prepare derivative works of its contribution, and distribute its contribution or any derivative works that you create.
+(B) Patent Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
+each contributor grants you a non-exclusive, worldwide, royalty-free license under its licensed patents to make, have made, use, sell, offer for sale, import, and/or otherwise dispose of its contribution in the software or derivative works of the contribution in the software.
+
+3. Conditions and Limitations
+(A) No Trademark License- This license does not grant you rights to use any contributors' name, logo, or trademarks.
+(B) If you bring a patent claim against any contributor over patents that you claim are infringed by the software, 
+your patent license from such contributor to the software ends automatically.
+(C) If you distribute any portion of the software, you must retain all copyright, patent, trademark, and attribution 
+notices that are present in the software.
+(D) If you distribute any portion of the software in source code form, you may do so only under this license by including 
+a complete copy of this license with your distribution. If you distribute any portion of the software in compiled or object 
+code form, you may only do so under a license that complies with this license.
+(E) The software is licensed "as-is." You bear the risk of using it. The contributors give no express warranties, guarantees
+or conditions. You may have additional consumer rights under your local laws which this license cannot change. To the extent
+permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular
+purpose and non-infringement.
+*/
+#endregion License
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
-using GamepadConfigLib;
 using Tao.Sdl;
 using System.Xml.Serialization;
 
@@ -16,8 +54,9 @@ namespace Microsoft.Xna.Framework.Input
     //     code samples.
     public static class GamePad
     {
-		static bool running;
-		static bool sdl;
+		static bool running;		
+        static bool sdl;
+
         static Settings settings;
         static Settings Settings
         {
@@ -27,16 +66,16 @@ namespace Microsoft.Xna.Framework.Input
             }
         }
 
-		static void AutoConfig () {
-						Init();
-				if (!sdl)
-					return;
+		static void AutoConfig () 
+        {
+		        Init();
+				if (!sdl) return;
 				Console.WriteLine("Number of joysticks: " + Sdl.SDL_NumJoysticks());
 					int numSticks = Sdl.SDL_NumJoysticks();
 					for (int x = 0; x < numSticks; x++) {
 
 						PadConfig pc = new PadConfig(Sdl.SDL_JoystickName(x), 0);
-						devices[x] = Sdl.SDL_JoystickOpen (pc.ID);
+						devices[x] = Sdl.SDL_JoystickOpen (pc.Index);
 
 						int numbuttons = Sdl.SDL_JoystickNumButtons(devices[x]);
 						Console.WriteLine("Number of buttons for joystick: " + x + " - " + numbuttons);
@@ -225,11 +264,8 @@ namespace Microsoft.Xna.Framework.Input
         {
             if (settings == null)
             {
-                settings = LoadConfigs("Settings.xml");
-                if (settings == null) {
                     settings = new Settings();
-					AutoConfig();
-		}
+					AutoConfig();		
             }
             else if (!running)
             {
@@ -240,48 +276,30 @@ namespace Microsoft.Xna.Framework.Input
                 Init();
             return settings;
         }
-        static Settings LoadConfigs(string filename)
-        {
-            Settings e;
-            try
-            {
-                using (Stream s = File.OpenRead(filename))
-                {
-                    XmlSerializer x = new XmlSerializer(typeof(Settings));
-                    e = (Settings)x.Deserialize(s);
-                }
-            }
-            catch
-            {
-                return null;
-            }
-            //for (int i = 0; i < 4; i++)
-              //  if (e[i] == null)
-                //    e[i] = new PadConfig(true);
-            return e;
-        }
+        
 
         static IntPtr[] devices = new IntPtr[4];
         //Inits SDL and grabs the sticks
         static void Init ()
         {
         	running = true;
-		try {
-        	Joystick.Init ();
+		    try 
+            {
+         	    Joystick.Init ();
 				sdl = true;
 			}
-			catch (Exception exc) {
+			catch (Exception) 
+            {
 
 			}
-
         	for (int i = 0; i < 4; i++)
-            	{
+            {
         		PadConfig pc = settings[i];
         		if (pc != null)
-                	{
-        			devices[i] = Sdl.SDL_JoystickOpen (pc.ID);
-			}
-		}
+                {
+        			devices[i] = Sdl.SDL_JoystickOpen (pc.Index);
+			    }
+		    }
 
 
         }
@@ -317,6 +335,7 @@ namespace Microsoft.Xna.Framework.Input
 
             return b;
         }
+
         static Buttons ReadButtons(IntPtr device, PadConfig c, float deadZoneSize)
         {
             short DeadZone = (short)(deadZoneSize * short.MaxValue);
@@ -366,7 +385,6 @@ namespace Microsoft.Xna.Framework.Input
 
             return b;
         }
-
         static GamePadState ReadState(PlayerIndex index, GamePadDeadZone deadZone)
         {
             const float DeadZoneSize = 0.27f;
