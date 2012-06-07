@@ -1075,10 +1075,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
             return _currentRenderTargetBindings;
 		}
-		
-        public void ResolveBackBuffer(ResolveTexture2D resolveTexture)
-        {
-        }
 
 #if OPENGL
         internal BeginMode PrimitiveTypeGL(PrimitiveType primitiveType)

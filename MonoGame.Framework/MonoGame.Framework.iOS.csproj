@@ -207,7 +207,6 @@
     <Compile Include="GamerServices\FriendCollection.cs" />
     <Compile Include="GamerServices\FriendGamer.cs" />
     <Compile Include="Graphics\GraphicsResource.cs" />
-    <Compile Include="Graphics\ResolveTexture2D.cs" />
     <Compile Include="GamerServices\MessageBoxIcon.cs" />
     <Compile Include="Graphics\SpriteBatch.cs" />
     <Compile Include="Graphics\SpriteBatcher.cs" />
