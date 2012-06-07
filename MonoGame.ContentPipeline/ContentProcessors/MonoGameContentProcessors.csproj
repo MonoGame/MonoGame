@@ -60,6 +60,12 @@
     <Reference Include="NAudio.WindowsMediaFormat">
       <HintPath>..\..\ThirdParty\Libs\NAudio\NAudio.WindowsMediaFormat.dll</HintPath>
     </Reference>
+    <Reference Include="SharpDX">
+      <HintPath>..\..\ThirdParty\Libs\SharpDX\Windows\SharpDX.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.D3DCompiler">
+      <HintPath>..\..\ThirdParty\Libs\SharpDX\Windows\SharpDX.D3DCompiler.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -69,16 +75,77 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\Tools\2MGFX\CommandLineParser.cs">
+      <Link>Processors\Effect\CommandLineParser.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Tools\2MGFX\CompilerInclude.cs">
+      <Link>Processors\Effect\CompilerInclude.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Tools\2MGFX\ConstantBuffer.cs">
+      <Link>Processors\Effect\ConstantBuffer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Tools\2MGFX\DXEffectObject.cs">
+      <Link>Processors\Effect\DXEffectObject.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Tools\2MGFX\DXEffectObject.hlsl.cs">
+      <Link>Processors\Effect\DXEffectObject.hlsl.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Tools\2MGFX\DXEffectObject.writer.cs">
+      <Link>Processors\Effect\DXEffectObject.writer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Tools\2MGFX\DXExpression.cs">
+      <Link>Processors\Effect\DXExpression.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Tools\2MGFX\DXHelper.cs">
+      <Link>Processors\Effect\DXHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Tools\2MGFX\DXPreshader.cs">
+      <Link>Processors\Effect\DXPreshader.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Tools\2MGFX\DXPreshader.writer.cs">
+      <Link>Processors\Effect\DXPreshader.writer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Tools\2MGFX\DXShader.cs">
+      <Link>Processors\Effect\DXShader.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Tools\2MGFX\GLSLOptimizer.cs">
+      <Link>Processors\Effect\GLSLOptimizer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Tools\2MGFX\MojoShader.cs">
+      <Link>Processors\Effect\MojoShader.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Tools\2MGFX\Options.cs">
+      <Link>Processors\Effect\Options.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Tools\2MGFX\Parser.cs">
+      <Link>Processors\Effect\Parser.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Tools\2MGFX\ParseTree.cs">
+      <Link>Processors\Effect\ParseTree.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Tools\2MGFX\Scanner.cs">
+      <Link>Processors\Effect\Scanner.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Tools\2MGFX\ShaderInfo.cs">
+      <Link>Processors\Effect\ShaderInfo.cs</Link>
+    </Compile>
     <Compile Include="AudioConverter.cs" />
+    <Compile Include="ContentHelper.cs" />
     <Compile Include="Content\MGBitmapContent.cs" />
+    <Compile Include="Processors\MGEffectProcessor.cs" />
     <Compile Include="Processors\MGMaterialProcessor.cs" />
     <Compile Include="Processors\MGSongProcessor.cs" />
     <Compile Include="Processors\MGSoundEffectProcessor.cs" />
     <Compile Include="Processors\MGSpriteFontDescriptionProcessor.cs" />
     <Compile Include="Processors\MGTextureProcessor.cs" />
+    <Compile Include="MonoGamePlatform.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\ThirdParty\Libs\libmojoshader_32.dll">
+      <Link>libmojoshader_32.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <ProjectReference Include="..\..\Tools\MP3Compression\yeti.mmedia\yeti.mmedia.csproj">
       <Project>{315EE7BF-EAE2-42C0-BFC6-CCA9160F3CFE}</Project>
       <Name>yeti.mmedia</Name>

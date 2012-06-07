@@ -1279,6 +1279,63 @@ namespace Microsoft.Xna.Framework
 			result.M44 = 1;
         }
 
+        public static Matrix CreateReflection(Plane value)
+        {
+            Matrix matrix;
+            value.Normalize();
+            float x = value.Normal.X;
+            float y = value.Normal.Y;
+            float z = value.Normal.Z;
+            float num3 = -2f * x;
+            float num2 = -2f * y;
+            float num = -2f * z;
+            matrix.M11 = (num3 * x) + 1f;
+            matrix.M12 = num2 * x;
+            matrix.M13 = num * x;
+            matrix.M14 = 0f;
+            matrix.M21 = num3 * y;
+            matrix.M22 = (num2 * y) + 1f;
+            matrix.M23 = num * y;
+            matrix.M24 = 0f;
+            matrix.M31 = num3 * z;
+            matrix.M32 = num2 * z;
+            matrix.M33 = (num * z) + 1f;
+            matrix.M34 = 0f;
+            matrix.M41 = num3 * value.D;
+            matrix.M42 = num2 * value.D;
+            matrix.M43 = num * value.D;
+            matrix.M44 = 1f;
+            return matrix;
+        }
+
+        public static void CreateReflection(ref Plane value, out Matrix result)
+        {
+            Plane plane;
+            Plane.Normalize(ref value, out plane);
+            value.Normalize();
+            float x = plane.Normal.X;
+            float y = plane.Normal.Y;
+            float z = plane.Normal.Z;
+            float num3 = -2f * x;
+            float num2 = -2f * y;
+            float num = -2f * z;
+            result.M11 = (num3 * x) + 1f;
+            result.M12 = num2 * x;
+            result.M13 = num * x;
+            result.M14 = 0f;
+            result.M21 = num3 * y;
+            result.M22 = (num2 * y) + 1f;
+            result.M23 = num * y;
+            result.M24 = 0f;
+            result.M31 = num3 * z;
+            result.M32 = num2 * z;
+            result.M33 = (num * z) + 1f;
+            result.M34 = 0f;
+            result.M41 = num3 * plane.D;
+            result.M42 = num2 * plane.D;
+            result.M43 = num * plane.D;
+            result.M44 = 1f;
+        }
 
         public static Matrix CreateWorld(Vector3 position, Vector3 forward, Vector3 up)
         {

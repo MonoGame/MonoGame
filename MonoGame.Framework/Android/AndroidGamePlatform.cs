@@ -79,6 +79,7 @@ using Android.Views;
 using Android.Widget;
 
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Media;
 
@@ -130,6 +131,9 @@ namespace Microsoft.Xna.Framework
                 Game.DoInitialize();
                 _initialized = true;				
             }
+
+            // Let the touch panel update states.
+            TouchPanel.UpdateState();
 
             return true;
         }
@@ -225,11 +229,6 @@ namespace Microsoft.Xna.Framework
 #endif
 		}
 		
-		public override void ResetElapsedTime ()
-		{
-			this.Window.ResetElapsedTime();			
-		}
-
         public override void Present()
         {
             try

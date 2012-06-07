@@ -179,6 +179,7 @@
     <Compile Include="Input\GamePadDeadZone.cs" />
     <Compile Include="Input\Keyboard.cs" />
     <Compile Include="Input\MouseState.cs" />
+    <Compile Include="Input\Touch\TouchInfo.cs" />
     <Compile Include="LaunchParameters.cs" />
     <Compile Include="Media\MediaQueue.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -399,7 +400,6 @@
     <Compile Include="Content\ContentReaders\PlaneReader.cs" />
     <Compile Include="Content\ContentReaders\QuaternionReader.cs" />
     <Compile Include="Content\ContentReaders\Vector4Reader.cs" />
-    <Compile Include="Graphics\BatchItem.cs" />
     <Compile Include="Graphics\States\Blend.cs" />
     <Compile Include="Graphics\States\BlendFunction.cs" />
     <Compile Include="Graphics\States\BlendState.cs" />
@@ -467,11 +467,11 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect.mgfx" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect.mgfx" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\SpriteEffect.mgfx" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\DualTextureEffect.mgfx" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\EnvironmentMapEffect.mgfx" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\SkinnedEffect.mgfx" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect.ogl.mgfxo" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect.ogl.mgfxo" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\SpriteEffect.ogl.mgfxo" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\DualTextureEffect.ogl.mgfxo" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\EnvironmentMapEffect.ogl.mgfxo" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\SkinnedEffect.ogl.mgfxo" />
   </ItemGroup>
 </Project>

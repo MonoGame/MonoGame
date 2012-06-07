@@ -38,18 +38,20 @@ purpose and non-infringement.
 */
 #endregion License
 
-#region Using Statements
 using System;
 using System.ComponentModel;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Reflection;
+using System.Runtime.InteropServices;
+
+using Windows.UI.Core;
+using Windows.Graphics.Display;
+
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Windows.UI.Core;
-using System.Runtime.InteropServices;
-using Windows.Graphics.Display;
-#endregion Using Statements
+using Windows.UI.ViewManagement;
+
 
 namespace Microsoft.Xna.Framework
 {
@@ -113,17 +115,27 @@ namespace Microsoft.Xna.Framework
 
         #region Delegates
 
-        /*
-        private void OpenTkGameWindow_Closing(object sender, CancelEventArgs e)
+        private static Keys KeyTranslate(Windows.System.VirtualKey inkey)
         {
-            Game.Exit();
+            switch (inkey)
+            {
+                // XNA does not have have 'handless' key values.
+                // So, we arebitrarily map those to the 'Left' version.                 
+                case Windows.System.VirtualKey.Control:
+                    return Keys.LeftControl;
+                case Windows.System.VirtualKey.Shift:
+                    return Keys.LeftControl;           
+                // Note that the Alt key is now refered to as Menu.
+                case Windows.System.VirtualKey.Menu:
+                    return Keys.LeftAlt;
+                default:                    
+                    return (Keys)inkey;
+            }
         }
-        */
 
         private void Keyboard_KeyUp(CoreWindow sender, KeyEventArgs args)
         {
-            // VirtualKey maps pretty much to XNA keys.
-            var xnaKey = (Keys)args.VirtualKey;
+            var xnaKey = KeyTranslate(args.VirtualKey);
 
             if (_keys.Contains(xnaKey))
                 _keys.Remove(xnaKey);
@@ -131,22 +143,13 @@ namespace Microsoft.Xna.Framework
 
         private void Keyboard_KeyDown(CoreWindow sender, KeyEventArgs args)
         {
-            // VirtualKey maps directly to XNA keys.
-            var xnaKey = (Keys)args.VirtualKey;
+            var xnaKey = KeyTranslate(args.VirtualKey);
 
             if (!_keys.Contains(xnaKey))
                 _keys.Add(xnaKey);
         }
 
         #endregion
-
-        private void HandleInput()
-        {
-            // mouse doesn't need to be treated here, Mouse class does it alone
-
-            // keyboard
-            Keyboard.State = new KeyboardState(_keys.ToArray());
-        }
 
         #endregion
 
@@ -157,23 +160,29 @@ namespace Microsoft.Xna.Framework
             _coreWindow.SizeChanged += Window_SizeChanged;
             _coreWindow.Closed += Window_Closed;
 
-            //window.Closing += new EventHandler<CancelEventArgs>(OpenTkGameWindow_Closing);
-            //window.Resize += OnResize;
             _coreWindow.KeyDown += Keyboard_KeyDown;
             _coreWindow.KeyUp += Keyboard_KeyUp;
+            
+            // TODO: Fix for latest WinSDK changes.
+            //ApplicationView.Value.ViewStateChanged += Application_ViewStateChanged;
 
             var bounds = _coreWindow.Bounds;
             SetClientBounds(bounds.Width, bounds.Height);
 
-            // Set the window icon.
-            //window.Icon = Icon.ExtractAssociatedIcon(Assembly.GetEntryAssembly().Location);
-
             InitializeTouch();
         }
 
+        /*
+        private void Application_ViewStateChanged(ApplicationView sender, ApplicationViewStateChangedEventArgs args)
+        {
+            // TODO: We may want to expose this event via GameWindow
+            // only in WinRT builds....  not sure yet.
+        }
+        */
+
         private void Window_Closed(CoreWindow sender, CoreWindowEventArgs args)
         {
-            throw new NotImplementedException();
+            Game.Exit();
         }
 
         private void SetClientBounds(double width, double height)
@@ -188,12 +197,24 @@ namespace Microsoft.Xna.Framework
         private void Window_SizeChanged(CoreWindow sender, WindowSizeChangedEventArgs args)
         {
             SetClientBounds( args.Size.Width, args.Size.Height );
+
+            // If we have a valid client bounds then regenerate the back buffer.
+            if (_clientBounds.Width > 0 && _clientBounds.Height > 0)
+            {
+                var device = Game.GraphicsDevice;
+                device.Viewport = new Viewport(0, 0, _clientBounds.Width, _clientBounds.Height);
+                device.PresentationParameters.BackBufferWidth = _clientBounds.Width;
+                device.PresentationParameters.BackBufferHeight = _clientBounds.Height;
+                device.CreateSizeDependentResources();
+            }
+
             OnClientSizeChanged();
         }
 
         protected override void SetTitle(string title)
         {
-            //window.Title = title;
+            // NOTE: There seems to be no concept of a
+            // window title in a Metro application.
         }
 
         internal void SetCursor(bool visible)
@@ -217,12 +238,13 @@ namespace Microsoft.Xna.Framework
                 // Process events incoming to the window.
                 _coreWindow.Dispatcher.ProcessEvents(CoreProcessEventsOption.ProcessAllIfPresent);
 
-                // Process the game.
+                // Apply the keyboard state gathered from
+                // the key events since the last tick.
+                Keyboard.State = new KeyboardState(_keys.ToArray());
+
+                // Update and render the game.
                 if (Game != null)
-                {
-                    HandleInput();
                     Game.Tick();
-                }
 
                 if (IsExiting)
                     break;

@@ -116,29 +116,6 @@ namespace Microsoft.Xna.Framework
 			//
 		}
 		
-
-        #region AndroidGameView Methods
-
-        internal void OnRenderFrame()
-        {
-            if (_game != null)
-            {
-                _drawGameTime.Update(_now - _lastUpdate);                
-                _game.DoDraw(_drawGameTime);
-				_lastUpdate = _now;
-            }
-        }
-
-        internal void OnUpdateFrame()
-		{
-			if (_game != null )
-			{
-				_game.Tick();
-			}
-		}
-		
-		#endregion
-		
 		#region GameWindow Overrides
 		protected internal override void SetSupportedOrientations(DisplayOrientation orientations)
 		{

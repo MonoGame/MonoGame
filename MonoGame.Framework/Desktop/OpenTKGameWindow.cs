@@ -56,10 +56,6 @@ namespace Microsoft.Xna.Framework
 {
     public class OpenTKGameWindow : GameWindow
     {
-        private GameTime _updateGameTime;
-        private GameTime _drawGameTime;
-        private DateTime _lastUpdate;
-        private DateTime _now;
         private bool _allowUserResizing;
         private DisplayOrientation _currentOrientation;
         private IntPtr _windowHandle = IntPtr.Zero;
@@ -173,6 +169,11 @@ namespace Microsoft.Xna.Framework
             if (!GraphicsContext.CurrentContext.IsCurrent)
                 window.MakeCurrent();
 
+            UpdateWindowState();
+        }
+
+        private void UpdateWindowState()
+        {
             // we should wait until window's not fullscreen to resize
             if (updateClientBounds && window.WindowState == WindowState.Normal)
             {
@@ -188,6 +189,8 @@ namespace Microsoft.Xna.Framework
 
         private void OnUpdateFrame(object sender, FrameEventArgs e)
         {
+            UpdateWindowState();
+
             if (Game != null)
             {
                 HandleInput();
@@ -240,13 +243,6 @@ namespace Microsoft.Xna.Framework
 #else
             Mouse.setWindows(window);
 #endif
-
-            // Initialize GameTime
-            _updateGameTime = new GameTime();
-            _drawGameTime = new GameTime();
-
-            // Initialize _lastUpdate
-            _lastUpdate = DateTime.Now;
 
             //Default no resizing
             AllowUserResizing = false;

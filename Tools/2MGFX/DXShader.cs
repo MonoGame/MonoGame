@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using System.IO;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 using TwoMGFX;
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -15,7 +16,8 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             public MojoShader.MOJOSHADER_samplerType type;
             public int index;
-            public string name;
+            public string samplerName;
+            public string parameterName;
             public int parameter;
         }
 
@@ -33,9 +35,9 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         private int[] _cbuffers;
 
-        public readonly Sampler[] _samplers;
+        public Sampler[] _samplers;
 
-        private readonly Attribute[] _attributes;
+        private Attribute[] _attributes;
 
         public byte[] ShaderCode { get; private set; }
 
@@ -47,27 +49,20 @@ namespace Microsoft.Xna.Framework.Graphics
         // The index of the shader in the shared list.
         public int SharedIndex { get; private set; }
 
-        private readonly MojoShader.MOJOSHADER_symbol[] _symbols;
+        private MojoShader.MOJOSHADER_symbol[] _symbols;
 
 #endregion // Non-Serialized Stuff
 
-        public DXShader(byte[] byteCode, SharpDX.Direct3D11.EffectShaderVariable variable, List<ConstantBuffer> cbuffers, int sharedIndex)
+        public static DXShader CreateHLSL(byte[] byteCode, bool isVertexShader, List<ConstantBuffer> cbuffers, int sharedIndex)
         {
-            var shaderDesc = variable.GetShaderDescription(0);
-
-            if (variable.TypeInfo.Description.Type != SharpDX.D3DCompiler.ShaderVariableType.Vertexshader)
-                IsVertexShader = false;
-            else
-                IsVertexShader = true;
-
-            SharedIndex = sharedIndex;
-
-            // Store the original bytecode here for comparison.
-            Bytecode = byteCode;
+            var dxshader = new DXShader();
+            dxshader.IsVertexShader = isVertexShader;
+            dxshader.SharedIndex = sharedIndex;
+            dxshader.Bytecode = (byte[])byteCode.Clone();
 
             // Strip the bytecode we're gonna save!
-            const SharpDX.D3DCompiler.StripFlags stripFlags =   SharpDX.D3DCompiler.StripFlags.CompilerStripDebugInformation | 
-                                                                SharpDX.D3DCompiler.StripFlags.CompilerStripReflectionData | 
+            const SharpDX.D3DCompiler.StripFlags stripFlags =   SharpDX.D3DCompiler.StripFlags.CompilerStripDebugInformation |
+                                                                SharpDX.D3DCompiler.StripFlags.CompilerStripReflectionData |
                                                                 SharpDX.D3DCompiler.StripFlags.CompilerStripTestBlobs;
 
             using (var original = new SharpDX.D3DCompiler.ShaderBytecode(byteCode))
@@ -75,8 +70,25 @@ namespace Microsoft.Xna.Framework.Graphics
                 // Strip the bytecode for saving to disk.
                 using (var stripped = original.Strip(stripFlags))
                 {
-                    ShaderCode = new byte[stripped.BufferSize];
-                    stripped.Data.Read(ShaderCode, 0, ShaderCode.Length);
+                    // Only SM4 and above works with strip... so this can return null!
+                    if (stripped != null)
+                    {
+                        var shaderCode = new byte[stripped.BufferSize];
+                        stripped.Data.Read(shaderCode, 0, shaderCode.Length);
+                        dxshader.ShaderCode = shaderCode;
+                    }
+                    else
+                    {
+                        // TODO: There is a way to strip SM3 and below
+                        // but we have to write the method ourselves.
+                        // 
+                        // If we need to support it then consider porting
+                        // this code over...
+                        //
+                        // http://entland.homelinux.com/blog/2009/01/15/stripping-comments-from-shader-bytecodes/
+                        //
+                        dxshader.ShaderCode = (byte[])dxshader.Bytecode.Clone();
+                    }
                 }
 
                 // Use reflection to get details of the shader.
@@ -89,31 +101,31 @@ namespace Microsoft.Xna.Framework.Graphics
                         var rdesc = refelect.GetResourceBindingDescription(i);
                         if (rdesc.Type == SharpDX.D3DCompiler.ShaderInputType.Texture)
                         {
-                            samplers.Add(new Sampler 
-                            { 
-                                index = rdesc.BindPoint, 
-                                name = rdesc.Name,
+                            samplers.Add(new Sampler
+                            {
+                                index = rdesc.BindPoint,
+                                parameterName = rdesc.Name,
 
                                 // TODO: Detect the sampler type for realz.
-                                type = MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_2D 
+                                type = MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_2D
                             });
                         }
                     }
-                    _samplers = samplers.ToArray();
+                    dxshader._samplers = samplers.ToArray();
 
                     // Gather all the constant buffers used by this shader.
-                    _cbuffers = new int[refelect.Description.ConstantBuffers];
+                    dxshader._cbuffers = new int[refelect.Description.ConstantBuffers];
                     for (var i = 0; i < refelect.Description.ConstantBuffers; i++)
                     {
                         var cb = new ConstantBuffer(refelect.GetConstantBuffer(i));
-                        
+
                         // Look for a duplicate cbuffer in the list.
                         for (var c = 0; c < cbuffers.Count; c++)
                         {
                             if (cb.SameAs(cbuffers[c]))
                             {
                                 cb = null;
-                                _cbuffers[i] = c;
+                                dxshader._cbuffers[i] = c;
                                 break;
                             }
                         }
@@ -121,20 +133,24 @@ namespace Microsoft.Xna.Framework.Graphics
                         // Add a new cbuffer.
                         if (cb != null)
                         {
-                            _cbuffers[i] = cbuffers.Count;
+                            dxshader._cbuffers[i] = cbuffers.Count;
                             cbuffers.Add(cb);
                         }
                     }
                 }
             }
 
-            _symbols = new MojoShader.MOJOSHADER_symbol[0];
+            return dxshader;
         }
 
-        public DXShader(byte[] byteCode, int sharedIndex)
+        public static DXShader CreateGLSL(byte[] byteCode, bool isVertexShader, List<ConstantBuffer> cbuffers, int sharedIndex)
         {
-            SharedIndex = sharedIndex;
-            Bytecode = byteCode;
+            var dxshader = new DXShader();
+            dxshader.IsVertexShader = isVertexShader;
+            dxshader.SharedIndex = sharedIndex;
+            dxshader.Bytecode = (byte[])byteCode.Clone();
+
+            // Use MojoShader to convert the HLSL bytecode to GLSL.
 
             var parseDataPtr = MojoShader.NativeMethods.MOJOSHADER_parse(
                     "glsl",
@@ -153,54 +169,29 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new Exception(errors[0].error);
             }
 
-            switch (parseData.shader_type)
-            {
-                case MojoShader.MOJOSHADER_shaderType.MOJOSHADER_TYPE_PIXEL:
-                    IsVertexShader = false;
-                    break;
-
-                case MojoShader.MOJOSHADER_shaderType.MOJOSHADER_TYPE_VERTEX:
-                    IsVertexShader = true;
-                    break;
-
-                default:
-                    throw new NotSupportedException();
-            }
-
-
-            // Convert the samplers.
-            {
-                var samplers = DXHelper.UnmarshalArray<MojoShader.MOJOSHADER_sampler>(
-                        parseData.samplers, parseData.sampler_count);
-                _samplers = new Sampler[samplers.Length];
-                for (var i = 0; i < samplers.Length; i++)
-                {
-                    _samplers[i].name = samplers[i].name;
-                    _samplers[i].type = samplers[i].type;
-                    _samplers[i].index = samplers[i].index;
-                }
-            }
-
             // Conver the attributes.
+            //
+            // TODO: Could this be done using DX shader reflection?
+            //
             {
                 var attributes = DXHelper.UnmarshalArray<MojoShader.MOJOSHADER_attribute>(
                         parseData.attributes, parseData.attribute_count);
 
-                _attributes = new Attribute[attributes.Length];
+                dxshader._attributes = new Attribute[attributes.Length];
                 for (var i = 0; i < attributes.Length; i++)
                 {
-                    _attributes[i].name = attributes[i].name;
-                    _attributes[i].index = attributes[i].index;
-                    _attributes[i].usage = DXEffectObject.ToVertexElementUsage(attributes[i].usage);
+                    dxshader._attributes[i].name = attributes[i].name;
+                    dxshader._attributes[i].index = attributes[i].index;
+                    dxshader._attributes[i].usage = DXEffectObject.ToVertexElementUsage(attributes[i].usage);
                 }
             }
 
-            _symbols = DXHelper.UnmarshalArray<MojoShader.MOJOSHADER_symbol>(
+            var symbols = DXHelper.UnmarshalArray<MojoShader.MOJOSHADER_symbol>(
                     parseData.symbols, parseData.symbol_count);
 
             //try to put the symbols in the order they are eventually packed into the uniform arrays
             //this /should/ be done by pulling the info from mojoshader
-            Array.Sort(_symbols, delegate(MojoShader.MOJOSHADER_symbol a, MojoShader.MOJOSHADER_symbol b)
+            Array.Sort(symbols, delegate(MojoShader.MOJOSHADER_symbol a, MojoShader.MOJOSHADER_symbol b)
             {
                 uint va = a.register_index;
                 if (a.info.elements == 1) va += 1024; //hax. mojoshader puts array objects first
@@ -209,7 +200,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 return va.CompareTo(vb);
             });//(a, b) => ((int)(a.info.elements > 1))a.register_index.CompareTo(b.register_index));
 
-
             // For whatever reason the register indexing is 
             // incorrect from MojoShader.
             {
@@ -217,28 +207,75 @@ namespace Microsoft.Xna.Framework.Graphics
                 uint float4_index = 0;
                 uint int4_index = 0;
 
-                for (var i = 0; i < _symbols.Length; i++)
+                for (var i = 0; i < symbols.Length; i++)
                 {
-                    switch (_symbols[i].register_set)
+                    switch (symbols[i].register_set)
                     {
                         case MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_BOOL:
-                            _symbols[i].register_index = bool_index;
-                            bool_index += _symbols[i].register_count;
+                            symbols[i].register_index = bool_index;
+                            bool_index += symbols[i].register_count;
                             break;
 
                         case MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_FLOAT4:
-                            _symbols[i].register_index = float4_index;
-                            float4_index += _symbols[i].register_count;
+                            symbols[i].register_index = float4_index;
+                            float4_index += symbols[i].register_count;
                             break;
 
                         case MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_INT4:
-                            _symbols[i].register_index = int4_index;
-                            int4_index += _symbols[i].register_count;
+                            symbols[i].register_index = int4_index;
+                            int4_index += symbols[i].register_count;
                             break;
                     }
                 }
             }
-            
+
+            // Get the samplers.
+            var samplers = DXHelper.UnmarshalArray<MojoShader.MOJOSHADER_sampler>(
+                    parseData.samplers, parseData.sampler_count);
+            dxshader._samplers = new Sampler[samplers.Length];
+            for (var i = 0; i < samplers.Length; i++)
+            {
+                // GLSL needs the sampler name.
+                dxshader._samplers[i].samplerName = samplers[i].name;
+
+                // We need the parameter name for creating the parameter
+                // listing for the effect... look for that in the symbols.
+                dxshader._samplers[i].parameterName =
+                    symbols.First(e =>  e.register_set == MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_SAMPLER &&
+                                        e.register_index == samplers[i].index).name;
+
+                // Set the rest of the sampler info.
+                dxshader._samplers[i].type = samplers[i].type;
+                dxshader._samplers[i].index = samplers[i].index;                    
+            }
+
+            // Gather all the parameters used by this shader.
+            var symbol_types = new [] { 
+                new { name = isVertexShader ? "vs_uniforms_bool" : "ps_uniforms_bool", set = MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_BOOL, },
+                new { name = isVertexShader ? "vs_uniforms_ivec4" : "ps_uniforms_ivec4", set = MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_INT4, },
+                new { name = isVertexShader ? "vs_uniforms_vec4" : "ps_uniforms_vec4", set = MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_FLOAT4, },
+            };
+
+            var cbuffer_index = new List<int>();
+            for (var i = 0; i < symbol_types.Length; i++)
+            {
+                var cbuffer = new ConstantBuffer(   symbol_types[i].name,
+                                                    symbol_types[i].set,
+                                                    symbols);
+                if (cbuffer.Size == 0)
+                    continue;
+
+                var match = cbuffers.FindIndex(e => e.SameAs(cbuffer));
+                if (match == -1)
+                {
+                    cbuffer_index.Add(cbuffers.Count);
+                    cbuffers.Add(cbuffer);
+                }
+                else
+                    cbuffer_index.Add(match);
+            }
+            dxshader._cbuffers = cbuffer_index.ToArray();
+
             var glslCode = parseData.output;
 
 #if GLSLOPTIMIZER
@@ -259,94 +296,9 @@ namespace Microsoft.Xna.Framework.Graphics
                         glslCode;
 
             // Store the code for serialization.
-            ShaderCode = Encoding.ASCII.GetBytes(glslCode);
-        }
+            dxshader.ShaderCode = Encoding.ASCII.GetBytes(glslCode);
 
-        public void CreateConstantBuffer(List<DXEffectObject.d3dx_parameter> parameters, List<ConstantBuffer> cbuffers)
-        {
-            // Build a constant buffer for each register set.
-            var cbs = new List<int>();
-
-            var cbuffer = new ConstantBuffer(   IsVertexShader ? "vs_uniforms_bool" : "ps_uniforms_bool", 
-                                                MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_BOOL, 
-                                                _symbols,
-                                                parameters);
-            if (cbuffer.Size > 0)
-            {
-                var match = cbuffers.FindIndex(e => e.SameAs(cbuffer));
-                if (match == -1)
-                {
-                    cbs.Add(cbuffers.Count);
-                    cbuffers.Add(cbuffer);
-                }
-                else
-                    cbs.Add(match);
-            }
-
-            cbuffer = new ConstantBuffer(   IsVertexShader ? "vs_uniforms_ivec4" : "ps_uniforms_ivec4", 
-                                            MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_INT4,
-                                            _symbols,
-                                            parameters);
-            if (cbuffer.Size > 0)
-            {
-                var match = cbuffers.FindIndex(e => e.SameAs(cbuffer));
-                if (match == -1)
-                {
-                    cbs.Add(cbuffers.Count);
-                    cbuffers.Add(cbuffer);
-                }
-                else
-                    cbs.Add(match);
-            }
-
-            cbuffer = new ConstantBuffer(   IsVertexShader ? "vs_uniforms_vec4" : "ps_uniforms_vec4", 
-                                            MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_FLOAT4, 
-                                            _symbols,
-                                            parameters);
-            if (cbuffer.Size > 0)
-            {
-                var match = cbuffers.FindIndex(e => e.SameAs(cbuffer));
-                if (match == -1)
-                {
-                    cbs.Add(cbuffers.Count);
-                    cbuffers.Add(cbuffer);
-                }
-                else
-                    cbs.Add(match);
-            }
-
-            _cbuffers = cbs.ToArray();
-        }
-
-        public void SetSamplerParameters(Dictionary<string, DXEffectObject.d3dx_parameter> samplers, List<DXEffectObject.d3dx_parameter> parameters)
-        {
-            for (var i = 0; i < _samplers.Length; i++ )
-            {
-                MojoShader.MOJOSHADER_symbol? samplerSymbol = null;
-                foreach (var symbol in _symbols)
-                {
-                    if (symbol.register_set ==
-                            MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_SAMPLER &&
-                        symbol.register_index == _samplers[i].index)
-                    {
-                        samplerSymbol = symbol;
-                        break;
-                    }
-                }
-
-                DXEffectObject.d3dx_parameter param;
-                if (samplerSymbol.HasValue && samplers.TryGetValue(samplerSymbol.Value.name, out param))
-                {
-                    var samplerState = (DXEffectObject.d3dx_sampler)param.data;
-                    if (samplerState != null && samplerState.state_count > 0)
-                    {
-                        var textureName = samplerState.states[0].parameter.name;
-                        var index = parameters.FindIndex(e => e.name == textureName);
-                        if (index != -1)
-                            _samplers[i].parameter = index;
-                    }
-                }
-            }
+            return dxshader;
         }
 
         public void Write(BinaryWriter writer, Options options)
@@ -363,7 +315,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 writer.Write((byte)sampler.index);
 
                 if (!options.DX11Profile)
-                    writer.Write(sampler.name);
+                    writer.Write(sampler.samplerName);
 
                 writer.Write((byte)sampler.parameter);
             }

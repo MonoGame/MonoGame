@@ -72,7 +72,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #if DIRECTX
             "Microsoft.Xna.Framework.Graphics.Effect.Resources.EnvironmentMapEffect.dx11.mgfxo"
 #else
-            "Microsoft.Xna.Framework.Graphics.Effect.Resources.EnvironmentMapEffect.mgfx"
+            "Microsoft.Xna.Framework.Graphics.Effect.Resources.EnvironmentMapEffect.ogl.mgfxo"
 #endif
         );
 
