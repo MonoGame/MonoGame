@@ -611,12 +611,24 @@ namespace Microsoft.Xna.Framework.Graphics
         public void Clear(Color color)
         {
 			ClearOptions options = ClearOptions.Target;
-			if (true) { //TODO: Clear only if current backbuffer has a depth component
-				options |= ClearOptions.DepthBuffer;
-			}
-			if (true) { //TODO: Clear only if current backbuffer has a stencil component
-				options |= ClearOptions.Stencil;
-			}
+
+#if DIRECTX
+
+            if (_currentDepthStencilView != null)
+            {
+                options |= ClearOptions.DepthBuffer;
+
+                if (_currentDepthStencilView.Description.Format == SharpDX.DXGI.Format.D24_UNorm_S8_UInt)
+                    options |= ClearOptions.Stencil;
+            }
+
+#else
+            // TODO: We need to figure out how to detect if
+            // we have a depth stencil buffer or not!
+            options |= ClearOptions.DepthBuffer;
+            options |= ClearOptions.Stencil;
+#endif
+
             Clear (options, color.ToVector4(), _viewport.MaxDepth, 0);
         }
 
