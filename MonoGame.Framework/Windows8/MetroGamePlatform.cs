@@ -116,6 +116,14 @@ namespace Microsoft.Xna.Framework
             }
         }
 
+        public override void BeforeInitialize()
+        {
+            base.BeforeInitialize();
+
+            // Metro apps are always full screen.
+            Game.graphicsDeviceManager.IsFullScreen = true;
+        }
+
         public override bool BeforeUpdate(GameTime gameTime)
         {
 			// Update our OpenAL sound buffer pools
