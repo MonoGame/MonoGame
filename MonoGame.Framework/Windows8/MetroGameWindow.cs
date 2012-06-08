@@ -189,6 +189,8 @@ namespace Microsoft.Xna.Framework
 
             _coreWindow.KeyDown += Keyboard_KeyDown;
             _coreWindow.KeyUp += Keyboard_KeyUp;
+
+            _coreWindow.Activated += Window_FocusChanged;
             
             // TODO: Fix for latest WinSDK changes.
             //ApplicationView.Value.ViewStateChanged += Application_ViewStateChanged;
@@ -206,6 +208,14 @@ namespace Microsoft.Xna.Framework
             // only in WinRT builds....  not sure yet.
         }
         */
+
+        private void Window_FocusChanged(CoreWindow sender, WindowActivatedEventArgs args)
+        {
+            if (args.WindowActivationState == CoreWindowActivationState.Deactivated)
+                Game.Platform.IsActive = false;
+            else
+                Game.Platform.IsActive = true;
+        }
 
         private void Window_Closed(CoreWindow sender, CoreWindowEventArgs args)
         {

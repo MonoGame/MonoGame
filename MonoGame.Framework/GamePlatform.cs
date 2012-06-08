@@ -129,7 +129,7 @@ namespace Microsoft.Xna.Framework
         public bool IsActive
         {
             get { return _isActive; }
-            protected set
+            internal set
             {
                 if (_isActive != value)
                 {
