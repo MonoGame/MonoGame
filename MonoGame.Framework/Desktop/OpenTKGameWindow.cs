@@ -56,10 +56,6 @@ namespace Microsoft.Xna.Framework
 {
     public class OpenTKGameWindow : GameWindow
     {
-        private GameTime _updateGameTime;
-        private GameTime _drawGameTime;
-        private DateTime _lastUpdate;
-        private DateTime _now;
         private bool _allowUserResizing;
         private DisplayOrientation _currentOrientation;
         private IntPtr _windowHandle = IntPtr.Zero;
@@ -247,13 +243,6 @@ namespace Microsoft.Xna.Framework
 #else
             Mouse.setWindows(window);
 #endif
-
-            // Initialize GameTime
-            _updateGameTime = new GameTime();
-            _drawGameTime = new GameTime();
-
-            // Initialize _lastUpdate
-            _lastUpdate = DateTime.Now;
 
             //Default no resizing
             AllowUserResizing = false;

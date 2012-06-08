@@ -105,6 +105,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public SamplerStateCollection SamplerStates { get; private set; }
 
+        private static Color DiscardColor = new Color(68, 34, 136, 255);
+
 #if DIRECTX
 
         // Declare Direct2D Objects
@@ -337,7 +339,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 
             // Set the default render target.
-            SetRenderTarget(null);
+            ApplyRenderTargets(null);
 
             // Set the default scissor rect.
             _scissorRectangleDirty = true;
@@ -609,12 +611,24 @@ namespace Microsoft.Xna.Framework.Graphics
         public void Clear(Color color)
         {
 			ClearOptions options = ClearOptions.Target;
-			if (true) { //TODO: Clear only if current backbuffer has a depth component
-				options |= ClearOptions.DepthBuffer;
-			}
-			if (true) { //TODO: Clear only if current backbuffer has a stencil component
-				options |= ClearOptions.Stencil;
-			}
+
+#if DIRECTX
+
+            if (_currentDepthStencilView != null)
+            {
+                options |= ClearOptions.DepthBuffer;
+
+                if (_currentDepthStencilView.Description.Format == SharpDX.DXGI.Format.D24_UNorm_S8_UInt)
+                    options |= ClearOptions.Stencil;
+            }
+
+#else
+            // TODO: We need to figure out how to detect if
+            // we have a depth stencil buffer or not!
+            options |= ClearOptions.DepthBuffer;
+            options |= ClearOptions.Stencil;
+#endif
+
             Clear (options, color.ToVector4(), _viewport.MaxDepth, 0);
         }
 
@@ -960,6 +974,8 @@ namespace Microsoft.Xna.Framework.Graphics
             var previousRenderTargetBindings = _currentRenderTargetBindings;
             _currentRenderTargetBindings = renderTargets;
 		
+            var clearTarget = false;
+
             if (_currentRenderTargetBindings == null || _currentRenderTargetBindings.Length == 0)
 			{
 #if DIRECTX
@@ -970,17 +986,21 @@ namespace Microsoft.Xna.Framework.Graphics
                 _currentRenderTargets[3] = null;
                 _currentDepthStencilView = _depthStencilView;
 
-                _d3dContext.OutputMerger.SetTargets(_currentDepthStencilView, _currentRenderTargets);
-
+                _d3dContext.OutputMerger.SetTargets(_currentDepthStencilView, _currentRenderTargets);                
 #elif OPENGL
 				GL.BindFramebuffer(GLFramebuffer, 0);
 #endif
+
+                clearTarget = true;
+
                 Viewport = new Viewport(0, 0,
-					this.PresentationParameters.BackBufferWidth, 
-					this.PresentationParameters.BackBufferHeight);
+					PresentationParameters.BackBufferWidth, 
+					PresentationParameters.BackBufferHeight);
 			}
 			else
 			{
+                var renderTarget = _currentRenderTargetBindings[0].RenderTarget as RenderTarget2D;
+
 #if DIRECTX
                 // Set the new render targets.
                 _currentRenderTargets[0] = null;
@@ -1002,8 +1022,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 // Set the targets.
                 _d3dContext.OutputMerger.SetTargets(_currentDepthStencilView, _currentRenderTargets);
 
-                var firstTarget = _currentRenderTargetBindings[0]._renderTarget as RenderTarget2D;
-                Viewport = new Viewport(0, 0, firstTarget.Width, firstTarget.Height);
 #elif OPENGL
 				if (this.glFramebuffer == 0)
 				{
@@ -1014,7 +1032,6 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 				}
 
-                var renderTarget = _currentRenderTargetBindings[0].RenderTarget as RenderTarget2D;
 				GL.BindFramebuffer(GLFramebuffer, this.glFramebuffer);
 				GL.FramebufferTexture2D(GLFramebuffer, GLColorAttachment0, TextureTarget.Texture2D, renderTarget.glTexture, 0);
 				if (renderTarget.DepthStencilFormat != DepthFormat.None)
@@ -1040,10 +1057,20 @@ namespace Microsoft.Xna.Framework.Graphics
 					throw new InvalidOperationException(message);
 				}
                                 
-				this.Viewport = new Viewport(0, 0, renderTarget.Width, renderTarget.Height);
 #endif
+                // Set the viewport to the size of the first render target.
+                Viewport = new Viewport(0, 0, renderTarget.Width, renderTarget.Height);
+
+                // We clear the render target if asked.
+                clearTarget = renderTarget.RenderTargetUsage != RenderTargetUsage.DiscardContents;
             }
-			
+
+            // In XNA 4, because of hardware limitations on Xbox, when
+            // a render target doesn't have PreserveContents as its usage
+            // it is cleared before being rendered to.
+            if (clearTarget)
+                Clear(DiscardColor);
+
 			if (previousRenderTargetBindings != null)
 			{
 				for (var i = 0; i < previousRenderTargetBindings.Length; ++i)
@@ -1068,17 +1095,21 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
         }
 
-		public RenderTargetBinding[] GetRenderTargets ()
+#if WINRT
+        internal void ResetRenderTargets()
+        {
+            if ( _d3dContext != null )
+                _d3dContext.OutputMerger.SetTargets(_currentDepthStencilView, _currentRenderTargets);                
+        }
+#endif
+
+		public RenderTargetBinding[] GetRenderTargets()
 		{
             if (_currentRenderTargetBindings == null)
                 return EmptyRenderTargetBinding;
 
             return _currentRenderTargetBindings;
 		}
-		
-        public void ResolveBackBuffer(ResolveTexture2D resolveTexture)
-        {
-        }
 
 #if OPENGL
         internal BeginMode PrimitiveTypeGL(PrimitiveType primitiveType)

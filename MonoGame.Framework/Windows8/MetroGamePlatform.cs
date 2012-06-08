@@ -136,12 +136,7 @@ namespace Microsoft.Xna.Framework
                 // render target before every draw.  
                 // 
                 // I guess the OS changes it and doesn't restore it?
-                var binding = device.GetRenderTargets();
-                var viewport = device.Viewport;
-                var scissor = device.ScissorRectangle;
-                device.ApplyRenderTargets(binding);
-                device.Viewport = viewport;
-                device.ScissorRectangle = scissor;
+                device.ResetRenderTargets();
             }
 
             return true;
