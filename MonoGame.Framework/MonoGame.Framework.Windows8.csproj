@@ -249,7 +249,6 @@
     <Compile Include="Windows8\MetroHelper.cs" />
     <Compile Include="Windows8\MetroGameWindow_Touch.cs" />
     <Compile Include="Windows8\SharpDXHelper.cs" />
-    <Compile Include="Windows\Audio\Sound.cs" />
     <Compile Include="Windows\Content\ContentReaders\SoundEffectReader.cs" />
     <Compile Include="BatteryChargeStatus.cs" />
     <Compile Include="BoundingBox.cs" />
@@ -354,6 +353,9 @@
     <Reference Include="SharpDX.DXGI, Version=2.0.4.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\ThirdParty\Libs\SharpDX\Windows 8 Metro\SharpDX.DXGI.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.XAudio2">
+      <HintPath>..\ThirdParty\Libs\SharpDX\Windows 8 Metro\SharpDX.XAudio2.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

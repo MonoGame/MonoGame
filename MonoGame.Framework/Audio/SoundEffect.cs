@@ -46,23 +46,35 @@ using Microsoft.Xna;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 
+#if WINRT
+using SharpDX;
+using SharpDX.XAudio2;
+using SharpDX.Multimedia;
+#endif
+
 namespace Microsoft.Xna.Framework.Audio
 {
     public sealed class SoundEffect : IDisposable
     {
+#if WINRT
+        internal DataStream _dataStream;
+        internal AudioBuffer _buffer;
+        internal AudioBuffer _loopedBuffer;
+        internal WaveFormat _format;
+#else
 		private Sound _sound;
-		private string _name = "";
-		private string _filename = "";
-		private byte[] _data;
         private SoundEffectInstance _instance;
-		
-		internal float Rate { get; set; }
+#endif
 
-		//internal ALFormat Format { get; set; }
-
-		internal int Size { get; set; }
-		
-		internal SoundEffect(string fileName)
+        private string _name;
+		private string _filename = "";		
+        private byte[] _data;
+#if WINRT
+        internal SoundEffect()
+        {
+        }
+#else
+        internal SoundEffect(string fileName)
 		{
 			_filename = fileName;		
 			
@@ -82,12 +94,19 @@ namespace Microsoft.Xna.Framework.Audio
 			_name = name;
 			_sound = new Sound(_data, 1.0f, false);
 		}
-		
-		public SoundEffect(byte[] buffer, int sampleRate, AudioChannels channels)
+#endif
+
+        public SoundEffect(byte[] buffer, int sampleRate, AudioChannels channels)
 		{
+#if WINRT
+            // We don't really know if it is ADPCM or PCM...
+            Initialize(new WaveFormatAdpcm(sampleRate, (int)channels), buffer, 0, buffer.Length, 0, buffer.Length);
+#else
 			//buffer should contain 16-bit PCM wave data
 			short bitsPerSample = 16;
-			
+
+            _name = "";
+
 			using (var mStream = new MemoryStream(44+buffer.Length))
             using (var writer = new BinaryWriter(mStream))
             {
@@ -106,23 +125,73 @@ namespace Microsoft.Xna.Framework.Audio
                 writer.Write((short)bitsPerSample);
 
                 writer.Write("data".ToCharArray()); //chunk id
-                writer.Write((int)buffer.Length); //data size
+                writer.Write((int)buffer.Length); //data size 	MonoGame.Framework.Windows8.DLL!Microsoft.Xna.Framework.Audio.Sound.Sound(byte[] audiodata, float volume, bool looping) Line 199	C#
+
                 writer.Write(buffer);
 
                 _data = mStream.ToArray();
             }
 
-			_name = "";
 			_sound = new Sound(_data, 1.0f, false);
-		}
+#endif
+        }
+
+        public SoundEffect(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
+        {            
+#if WINRT
+            // We don't really know if it is ADPCM or PCM...
+            Initialize(new WaveFormatAdpcm(sampleRate, (int)channels), buffer, offset, count, loopStart, loopLength);
+#else
+            throw new NotImplementedException();
+#endif
+        }
+
+#if WINRT
+        public void Initialize(WaveFormat format, byte[] buffer, int offset, int count, int loopStart, int loopLength)
+        {
+            _format = format;
+
+            _dataStream = DataStream.Create<byte>(buffer, true, false);
+
+            // Use the loopStart and loopLength also as the range
+            // when playing this SoundEffect a single time / unlooped.
+            _buffer = new AudioBuffer()
+            {
+                Stream = _dataStream,
+                AudioBytes = count,
+                Flags = BufferFlags.EndOfStream,
+                PlayBegin = loopStart,
+                PlayLength = loopLength,
+                Context = new IntPtr(42),
+            };
+
+            _loopedBuffer = new AudioBuffer()
+            {
+                Stream = _dataStream,
+                AudioBytes = count,
+                Flags = BufferFlags.EndOfStream,
+                LoopBegin = loopStart,
+                LoopLength = loopLength,
+                LoopCount = AudioBuffer.LoopInfinite,
+                Context = new IntPtr(42),
+            };            
+        }
+#endif
 		
         public bool Play()
         {				
+#if WINRT
+            throw new NotImplementedException();   
+#else
 			return Play(MasterVolume, 0.0f, 0.0f);
+#endif
         }
 
         public bool Play(float volume, float pitch, float pan)
         {
+#if WINRT
+            throw new NotImplementedException();   
+#else
 			if ( MasterVolume > 0.0f )
 			{
                 if(_instance == null)
@@ -134,12 +203,16 @@ namespace Microsoft.Xna.Framework.Audio
 				return _instance.Sound.Playing;
 			}
 			return false;
+#endif
         }
 		
 		public TimeSpan Duration 
 		{ 
 			get
 			{
+#if WINRT                
+                return TimeSpan.FromMilliseconds(_buffer.PlayLength);
+#else
 				if ( _sound != null )
 				{
 					return new TimeSpan(0,0,(int)_sound.Duration);
@@ -148,6 +221,7 @@ namespace Microsoft.Xna.Framework.Audio
 				{
 					return new TimeSpan(0);
 				}
+#endif
 			}
 		}
 
@@ -157,28 +231,39 @@ namespace Microsoft.Xna.Framework.Audio
             {
 				return _name;
             }
-			set {
+			set 
+            {
 				_name = value;
 			}
         }
-		
-		public SoundEffectInstance CreateInstance ()
+
+		public SoundEffectInstance CreateInstance()
 		{
-			var instance = new SoundEffectInstance();
-			instance.Sound = _sound;
-			return instance;
+            var instance = new SoundEffectInstance();
+#if WINRT
+            instance._effect = this;
+            instance._voice = new SourceVoice(SoundEffect.Device, _format);            
+#else			
+			instance.Sound = _sound;			
+#endif
+            return instance;
 		}
 		
 		#region IDisposable Members
 
         public void Dispose()
         {
+#if WINRT
+            _dataStream.Dispose();               
+#else
 			_sound.Dispose();
+#endif
         }
 
         #endregion
-		
-		static float _masterVolume = 1.0f;
+
+        #region Static Members
+        static float _masterVolume = 1.0f;
 		public static float MasterVolume 
 		{ 
 			get
@@ -187,7 +272,7 @@ namespace Microsoft.Xna.Framework.Audio
 			}
 			set
 			{
-				_masterVolume = value;	
+                _masterVolume = value;	
 			}
 		}
 
@@ -231,7 +316,33 @@ namespace Microsoft.Xna.Framework.Audio
 			set {
 				speedOfSound = value;
 			}
-		}						
+        }
+
+#if WINRT
+        public static XAudio2 Device;
+        public static MasteringVoice MasterVoice;
+
+        static SoundEffect()
+        {
+            Device = new XAudio2();
+            if (Device.StartEngine() != Result.Ok)
+                throw new Exception("XAudio2.StartEngine has failed.");
+
+            MasterVoice = new MasteringVoice(Device);
+        }
+
+        // Does someone actually need to call this if it only happens when the whole
+        // game closes? And if so, who would make the call?
+        internal static void Shutdown()
+        {            
+            MasterVoice.DestroyVoice();
+            MasterVoice.Dispose();
+
+            Device.StopEngine();
+            Device.Dispose();         
+        }
+#endif
+        #endregion
     }
 }
 

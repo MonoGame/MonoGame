@@ -44,6 +44,10 @@ using System.IO;
 
 using Microsoft.Xna.Framework.Audio;
 
+#if WINRT
+using SharpDX.XAudio2;
+#endif
+
 namespace Microsoft.Xna.Framework.Content
 {
 	internal class SoundEffectReader : ContentTypeReader<SoundEffect>
@@ -60,13 +64,55 @@ namespace Microsoft.Xna.Framework.Content
         }
 
 		protected internal override SoundEffect Read(ContentReader input, SoundEffect existingInstance)
-		{                    
+		{         
+             // NXB format for SoundEffect...
+            //            
+            // Byte [format size]	Format	WAVEFORMATEX structure
+            // UInt32	Data size	
+            // Byte [data size]	Data	Audio waveform data
+            // Int32	Loop start	In bytes (start must be format block aligned)
+            // Int32	Loop length	In bytes (length must be format block aligned)
+            // Int32	Duration	In milliseconds
+
+            // WAVEFORMATEX structure...
+            //
+            //typedef struct {
+            //  WORD  wFormatTag;       // byte[0]  +2
+            //  WORD  nChannels;        // byte[2]  +2
+            //  DWORD nSamplesPerSec;   // byte[4]  +4
+            //  DWORD nAvgBytesPerSec;  // byte[8]  +4
+            //  WORD  nBlockAlign;      // byte[12] +2
+            //  WORD  wBitsPerSample;   // byte[14] +2
+            //  WORD  cbSize;           // byte[16] +2
+            //} WAVEFORMATEX;
+            
 			byte[] header = input.ReadBytes(input.ReadInt32());
 			byte[] data = input.ReadBytes(input.ReadInt32());
 			int loopStart = input.ReadInt32();
 			int loopLength = input.ReadInt32();
 			int num = input.ReadInt32();
 
+#if WINRT            
+            var count = data.Length;
+            var format = (int)BitConverter.ToUInt16(header, 0);
+            var sampleRate = (int)BitConverter.ToUInt16(header, 4);
+            var channels = BitConverter.ToUInt16(header, 2);
+            //var avgBPS = (int)BitConverter.ToUInt16(header, 8);
+            var blockAlignment = (int)BitConverter.ToUInt16(header, 12);
+            //var bps = (int)BitConverter.ToUInt16(header, 14);
+
+            SharpDX.Multimedia.WaveFormat waveFormat;
+            if (format == 1)
+                waveFormat = new SharpDX.Multimedia.WaveFormat(sampleRate, channels);
+            else if (format == 2)
+                waveFormat = new SharpDX.Multimedia.WaveFormatAdpcm(sampleRate, channels, blockAlignment);
+            else
+                throw new NotImplementedException("Unsupported wave format!");
+           
+            var sfx = new SoundEffect();
+            sfx.Initialize(waveFormat, data, 0, count, loopStart, loopLength);
+            return sfx;
+#else
             byte[] soundData = null;
             // Proper use of "using" corectly disposes of BinaryWriter which in turn disposes the underlying stream
             MemoryStream mStream = new MemoryStream(20 + header.Length + 8 + data.Length);
@@ -91,6 +137,7 @@ namespace Microsoft.Xna.Framework.Content
             if (soundData == null)
                 throw new ContentLoadException("Failed to load SoundEffect");
 			return new SoundEffect(input.AssetName, soundData);
+#endif
 		}
 	}
 }
