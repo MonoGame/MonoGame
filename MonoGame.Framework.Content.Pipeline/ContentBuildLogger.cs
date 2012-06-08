@@ -39,6 +39,8 @@
 #endregion License
 
 using System;
+using System.Collections.Generic;
+using System.IO;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline
 {
@@ -48,6 +50,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
     /// </summary>
     public abstract class ContentBuildLogger
     {
+        Stack<string> filenames = new Stack<string>();
+
         /// <summary>
         /// Gets or sets the base reference path used when reporting errors during the content build process.
         /// </summary>
@@ -61,6 +65,21 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         }
 
         /// <summary>
+        /// Returns the relative path to the filename from the root directory.
+        /// </summary>
+        /// <param name="filename">The target filename.</param>
+        /// <param name="rootDirectory">The root directory. If not specified, the current directory is used.</param>
+        /// <returns>The relative path.</returns>
+        string GetRelativePath(string filename, string rootDirectory)
+        {
+            rootDirectory = Path.GetFullPath(string.IsNullOrEmpty(rootDirectory) ? "." : rootDirectory);
+            filename = Path.GetFullPath(filename);
+            if (filename.StartsWith(rootDirectory))
+                return filename.Substring(rootDirectory.Length);
+            return filename;
+        }
+
+        /// <summary>
         /// Gets the filename currently being processed, for use in warning and error messages.
         /// </summary>
         /// <param name="contentIdentity">Identity of a content item. If specified, GetCurrentFilename uses this value to refine the search. If no value is specified, the current PushFile state is used.</param>
@@ -69,6 +88,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             ContentIdentity contentIdentity
             )
         {
+            if ((contentIdentity != null) && !string.IsNullOrEmpty(contentIdentity.SourceFilename))
+                return GetRelativePath(contentIdentity.SourceFilename, LoggerRootDirectory);
+            if (filenames.Count > 0)
+                return GetRelativePath(filenames.Peek(), LoggerRootDirectory);
+            return null;
         }
 
         /// <summary>
@@ -79,9 +103,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         public abstract void LogImportantMessage(
             string message,
             params Object[] messageArgs
-            )
-        {
-        }
+            );
 
         /// <summary>
         /// Outputs a low priority status message from a content importer or processor.
@@ -91,9 +113,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         public abstract void LogMessage(
             string message,
             params Object[] messageArgs
-            )
-        {
-        }
+            );
 
         /// <summary>
         /// Outputs a warning message from a content importer or processor.
@@ -107,15 +127,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             ContentIdentity contentIdentity,
             string message,
             params Object[] messageArgs
-            )
-        {
-        }
+            );
 
         /// <summary>
         /// Outputs a message indicating that a content asset has completed processing.
         /// </summary>
         public void PopFile()
         {
+            filenames.Pop();
         }
 
         /// <summary>
@@ -125,6 +144,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// <param name="filename">Name of the file containing future messages.</param>
         public void PushFile(string filename)
         {
+            filenames.Push(filename);
         }
     }
 }

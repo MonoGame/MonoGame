@@ -40,6 +40,7 @@
 
 using System;
 using System.Collections.ObjectModel;
+using System.Reflection;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline
 {
@@ -49,6 +50,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
     [SerializableAttribute]
     public sealed class ProcessorParameter
     {
+        PropertyInfo propInfo;
+        ReadOnlyCollection<string> enumValues;
+
         /// <summary>
         /// Default value of the processor parameter.
         /// </summary>
@@ -67,21 +71,56 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// <summary>
         /// Gets a value indicating whether the parameter is an enumeration.
         /// </summary>
-        public bool IsEnum { get; }
+        public bool IsEnum
+        {
+            get
+            {
+                return enumValues != null;
+            }
+        }
 
         /// <summary>
         /// Available options for enumerated type parameters. For parameters of other types, this value is null.
         /// </summary>
-        public ReadOnlyCollection<string> PossibleEnumValues { get; }
+        public ReadOnlyCollection<string> PossibleEnumValues
+        {
+            get
+            {
+                return enumValues;
+            }
+        }
 
         /// <summary>
         /// Name of the property, as defined in the C# code.
         /// </summary>
-        public string PropertyName { get; }
+        public string PropertyName
+        {
+            get
+            {
+                return propInfo.Name;
+            }
+        }
 
         /// <summary>
         /// Type of the parameter.
         /// </summary>
-        public string PropertyType { get; }
+        public string PropertyType
+        {
+            get
+            {
+                return propInfo.PropertyType.Name;
+            }
+        }
+
+        /// <summary>
+        /// Constructs a ProcessorParameter instance.
+        /// </summary>
+        /// <param name="propertyInfo">The info for the property.</param>
+        internal ProcessorParameter(PropertyInfo propertyInfo)
+        {
+            propInfo = propertyInfo;
+            if (propInfo.PropertyType.IsEnum)
+                enumValues = new ReadOnlyCollection<string>(propInfo.PropertyType.GetEnumNames());
+        }
     }
 }
