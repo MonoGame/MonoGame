@@ -270,7 +270,6 @@
     <Compile Include="Graphics\RenderTarget.cs" />
     <Compile Include="Graphics\RenderTarget2D.cs" />
     <Compile Include="Graphics\RenderTargetUsage.cs" />
-    <Compile Include="Graphics\ResolveTexture2D.cs" />
     <Compile Include="Graphics\ResourceType.cs" />
     <Compile Include="Graphics\SetDataOptions.cs" />
     <Compile Include="Graphics\SpriteBatch.cs" />
