@@ -422,6 +422,15 @@ namespace Microsoft.Xna.Framework.Graphics
             if (_bitmapTarget != null)
                 _bitmapTarget.Dispose();
 
+			// Clear the current render targets.
+            _currentDepthStencilView = null;
+            _currentRenderTargets[0] = null;
+            _currentRenderTargets[1] = null;
+            _currentRenderTargets[2] = null;
+            _currentRenderTargets[3] = null;
+            _currentDepthStencilView = null;
+            _currentRenderTargetBindings = null;
+            
             var multisampleDesc = new SharpDX.DXGI.SampleDescription(1, 0);
             if ( PresentationParameters.MultiSampleCount > 1 )
             {
