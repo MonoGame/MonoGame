@@ -57,6 +57,7 @@ namespace Microsoft.Xna.Framework
 {
     public partial class MetroGameWindow : GameWindow
     {
+        private DisplayOrientation _orientation;
         private CoreWindow _coreWindow;
         protected Game game;
         private readonly List<Keys> _keys;
@@ -89,12 +90,35 @@ namespace Microsoft.Xna.Framework
 
         public override DisplayOrientation CurrentOrientation
         {
-            get { return DisplayOrientation.LandscapeLeft; }
+            get { return _orientation; }
         }
 
         protected internal override void SetSupportedOrientations(DisplayOrientation orientations)
         {
-            // Do nothing.  Desktop platforms don't do orientation.
+            var supported = DisplayOrientations.None;
+
+            if (orientations == DisplayOrientation.Default)
+            {
+                // Make the decision based on the preferred backbuffer dimensions.
+                var manager = Game.graphicsDeviceManager;
+                if (manager.PreferredBackBufferWidth > manager.PreferredBackBufferHeight)
+                    supported = DisplayOrientations.Landscape | DisplayOrientations.LandscapeFlipped;
+                else
+                    supported = DisplayOrientations.Portrait | DisplayOrientations.PortraitFlipped;                    
+            }
+            else
+            {
+                if ((orientations & DisplayOrientation.LandscapeLeft) != 0)
+                    supported |= DisplayOrientations.Landscape;
+                if ((orientations & DisplayOrientation.LandscapeRight) != 0)
+                    supported |= DisplayOrientations.LandscapeFlipped;
+                if ((orientations & DisplayOrientation.Portrait) != 0)
+                    supported |= DisplayOrientations.Portrait;
+                if ((orientations & DisplayOrientation.PortraitUpsideDown) != 0)
+                    supported |= DisplayOrientations.PortraitFlipped;
+            }
+
+            DisplayProperties.AutoRotationPreferences = supported;
         }
 
         #endregion
@@ -157,6 +181,9 @@ namespace Microsoft.Xna.Framework
         {
             _coreWindow = coreWindow;
 
+            _orientation = ToOrientation(DisplayProperties.CurrentOrientation);
+            DisplayProperties.OrientationChanged += DisplayProperties_OrientationChanged;
+
             _coreWindow.SizeChanged += Window_SizeChanged;
             _coreWindow.Closed += Window_Closed;
 
@@ -208,17 +235,91 @@ namespace Microsoft.Xna.Framework
         {
             SetClientBounds( args.Size.Width, args.Size.Height );
 
-            // If we have a valid client bounds then regenerate the back buffer.
+            // If we have a valid client bounds then update the graphics device.
             if (_clientBounds.Width > 0 && _clientBounds.Height > 0)
-            {
-                var device = Game.GraphicsDevice;
-                device.Viewport = new Viewport(0, 0, _clientBounds.Width, _clientBounds.Height);
-                device.PresentationParameters.BackBufferWidth = _clientBounds.Width;
-                device.PresentationParameters.BackBufferHeight = _clientBounds.Height;
-                device.CreateSizeDependentResources();
-            }
+                UpdateGraphicsDevice();
 
             OnClientSizeChanged();
+        }
+
+
+        private static DisplayOrientation ToOrientation(DisplayOrientations orientation)
+        {
+            DisplayOrientation result = (DisplayOrientation)0;
+
+            if (DisplayProperties.NativeOrientation == orientation)
+                result |= DisplayOrientation.Default;
+
+            switch (orientation)
+            {
+                default:
+                case DisplayOrientations.None:
+                    result |= DisplayOrientation.Default;
+                    break;
+
+                case DisplayOrientations.Landscape:
+                    result |= DisplayOrientation.LandscapeLeft;
+                    break;
+
+                case DisplayOrientations.LandscapeFlipped:
+                    result |= DisplayOrientation.LandscapeRight;
+                    break;
+
+                case DisplayOrientations.Portrait:
+                    result |= DisplayOrientation.Portrait;
+                    break;
+
+                case DisplayOrientations.PortraitFlipped:
+                    result |= DisplayOrientation.PortraitUpsideDown;
+                    break;
+            }
+
+            return result;
+        }
+
+        private void DisplayProperties_OrientationChanged(object sender)
+        {
+            // Set the new orientation.
+            _orientation = ToOrientation(DisplayProperties.CurrentOrientation);
+
+            // If we have a valid client bounds then update the graphics device.
+            if (_clientBounds.Width > 0 && _clientBounds.Height > 0)
+                UpdateGraphicsDevice();
+
+            // Call the user callback.
+            OnOrientationChanged();
+        }
+
+        private void UpdateGraphicsDevice()
+        {
+            // Is the orientation landscape and is landscape the default?
+            var isLandscape = (_orientation & (DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight)) != 0;
+            var isDefaultLandscape = DisplayProperties.NativeOrientation == DisplayOrientations.Landscape;
+
+            // Get the new width and height considering that the 
+            // orientation changes how we read the client bounds.
+            // 
+            // TODO: Is the Win8 Simulator broken or is this really correct?
+            //
+            int newWidth, newHeight;
+            if (true) //isLandscape == isDefaultLandscape)
+            {
+                newWidth = _clientBounds.Width;
+                newHeight = _clientBounds.Height;
+            }
+            else
+            {
+                newWidth = _clientBounds.Height;
+                newHeight = _clientBounds.Width;
+            }
+
+            // Update the graphics device.
+            var device = Game.GraphicsDevice;
+            device.Viewport = new Viewport(0, 0, newWidth, newHeight);
+            device.PresentationParameters.BackBufferWidth = newWidth;
+            device.PresentationParameters.BackBufferHeight = newHeight;
+            device.CreateSizeDependentResources();
+            device.ApplyRenderTargets(null);
         }
 
         protected override void SetTitle(string title)
