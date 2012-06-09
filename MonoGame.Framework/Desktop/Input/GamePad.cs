@@ -84,7 +84,7 @@ namespace Microsoft.Xna.Framework.Input
 							//pc
 						}
 						
-						if (Sdl.SDL_JoystickName(x).Contains("Microsoft") &&
+						if (Sdl.SDL_JoystickName(x).Contains("Microsoft") ||
 							(Sdl.SDL_JoystickName(x).Contains("X-Box") || Sdl.SDL_JoystickName(x).Contains("Xbox")))
 						{
 							pc.Button_A.ID = 0;
