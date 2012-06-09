@@ -44,7 +44,7 @@ using System.Text;
 
 namespace Microsoft.Xna.Framework.Input
 {
-    public enum InputType { PovUp = 0, Button = 16, Axis = 32, PovDown = 4, PovLeft = 8, PovRight = 2, None = -1 };
+    public enum InputType { PovUp = 1, Button = 16, Axis = 32, PovDown = 4, PovLeft = 8, PovRight = 2, None = -1 };
 
     public class Input
     {
