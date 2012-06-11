@@ -62,6 +62,7 @@ namespace Microsoft.Xna.Framework
         protected Game game;
         private readonly List<Keys> _keys;
         private Rectangle _clientBounds;
+        private ApplicationViewState _currentViewState;
 
         #region Internal Properties
 
@@ -92,6 +93,8 @@ namespace Microsoft.Xna.Framework
         {
             get { return _orientation; }
         }
+
+        private MetroGamePlatform Platform { get { return Game.Instance.Platform as MetroGamePlatform; } }
 
         protected internal override void SetSupportedOrientations(DisplayOrientation orientations)
         {
@@ -191,9 +194,11 @@ namespace Microsoft.Xna.Framework
             _coreWindow.KeyUp += Keyboard_KeyUp;
 
             _coreWindow.Activated += Window_FocusChanged;
-            
+
             // TODO: Fix for latest WinSDK changes.
             //ApplicationView.Value.ViewStateChanged += Application_ViewStateChanged;
+
+            _currentViewState = ApplicationView.Value;
 
             var bounds = _coreWindow.Bounds;
             SetClientBounds(bounds.Width, bounds.Height);
@@ -212,9 +217,9 @@ namespace Microsoft.Xna.Framework
         private void Window_FocusChanged(CoreWindow sender, WindowActivatedEventArgs args)
         {
             if (args.WindowActivationState == CoreWindowActivationState.Deactivated)
-                Game.Platform.IsActive = false;
+                Platform.IsActive = false;
             else
-                Game.Platform.IsActive = true;
+                Platform.IsActive = true;
         }
 
         private void Window_Closed(CoreWindow sender, CoreWindowEventArgs args)
@@ -240,6 +245,8 @@ namespace Microsoft.Xna.Framework
                 UpdateGraphicsDevice();
 
             OnClientSizeChanged();
+
+            Platform.ViewState = ApplicationView.Value;
         }
 
 
@@ -320,6 +327,8 @@ namespace Microsoft.Xna.Framework
             device.PresentationParameters.BackBufferHeight = newHeight;
             device.CreateSizeDependentResources();
             device.ApplyRenderTargets(null);
+
+            OnClientSizeChanged();
         }
 
         protected override void SetTitle(string title)
@@ -379,6 +388,16 @@ namespace Microsoft.Xna.Framework
         }
 
         #endregion
+    }
+
+    public class ViewStateChangedEventArgs : EventArgs
+    {
+        public readonly ApplicationViewState ViewState;
+
+        public ViewStateChangedEventArgs(ApplicationViewState newViewstate)
+        {
+            ViewState = newViewstate;
+        }
     }
 }
 
