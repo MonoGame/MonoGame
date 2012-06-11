@@ -109,9 +109,7 @@ namespace Microsoft.Xna.Framework.Content
             else
                 throw new NotImplementedException("Unsupported wave format!");
            
-            var sfx = new SoundEffect();
-            sfx.Initialize(waveFormat, data, 0, count, loopStart, loopLength);
-            return sfx;
+            return new SoundEffect(waveFormat, data, 0, count, loopStart, loopLength);
 #else
             byte[] soundData = null;
             // Proper use of "using" corectly disposes of BinaryWriter which in turn disposes the underlying stream

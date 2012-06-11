@@ -98,9 +98,8 @@ namespace Microsoft.Xna.Framework.Audio
 
         public SoundEffect(byte[] buffer, int sampleRate, AudioChannels channels)
 		{
-#if WINRT
-            // We don't really know if it is ADPCM or PCM...
-            Initialize(new WaveFormatAdpcm(sampleRate, (int)channels), buffer, 0, buffer.Length, 0, buffer.Length);
+#if WINRT            
+            Initialize(new WaveFormat(sampleRate, (int)channels), buffer, 0, buffer.Length, 0, buffer.Length);
 #else
 			//buffer should contain 16-bit PCM wave data
 			short bitsPerSample = 16;
@@ -139,15 +138,21 @@ namespace Microsoft.Xna.Framework.Audio
         public SoundEffect(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
         {            
 #if WINRT
-            // We don't really know if it is ADPCM or PCM...
-            Initialize(new WaveFormatAdpcm(sampleRate, (int)channels), buffer, offset, count, loopStart, loopLength);
+            Initialize(new WaveFormat(sampleRate, (int)channels), buffer, offset, count, loopStart, loopLength);
 #else
             throw new NotImplementedException();
 #endif
         }
 
 #if WINRT
-        public void Initialize(WaveFormat format, byte[] buffer, int offset, int count, int loopStart, int loopLength)
+
+        // Extended constructor which supports custom formats / compression.
+        internal SoundEffect(WaveFormat format, byte[] buffer, int offset, int count, int loopStart, int loopLength)
+        {
+            Initialize(format, buffer, offset, count, loopStart, loopLength);
+        }
+
+        private void Initialize(WaveFormat format, byte[] buffer, int offset, int count, int loopStart, int loopLength)
         {
             _format = format;
 
