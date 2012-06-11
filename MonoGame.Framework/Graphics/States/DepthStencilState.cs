@@ -115,6 +115,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
             Debug.Assert(graphicsDevice == device, "The state was created for a different device!");
 
+            // NOTE: We make the assumption here that the caller has
+            // locked the d3dContext for us to use.
+
             // Apply the state!
             device._d3dContext.OutputMerger.DepthStencilState = _state;
         }

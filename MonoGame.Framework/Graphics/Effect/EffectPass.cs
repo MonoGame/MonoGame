@@ -234,10 +234,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #elif DIRECTX
 
-            // Apply the shaders which will in turn set the 
-            // constant buffers and texture samplers.
-            _vertexShader.Apply(device, _effect.Parameters, _effect.ConstantBuffers);
-            _pixelShader.Apply(device, _effect.Parameters, _effect.ConstantBuffers);
+            lock (device._d3dContext)
+            {
+                // Apply the shaders which will in turn set the 
+                // constant buffers and texture samplers.
+                _vertexShader.Apply(device, _effect.Parameters, _effect.ConstantBuffers);
+                _pixelShader.Apply(device, _effect.Parameters, _effect.ConstantBuffers);
+            }
 
 #endif
         }
