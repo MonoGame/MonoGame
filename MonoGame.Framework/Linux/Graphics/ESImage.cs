@@ -120,7 +120,13 @@ namespace Microsoft.Xna.Framework.Graphics
 			texture = new ESTexture2D(image,filter);
             Initialize(imageScale);
 		}
-				
+
+		public void Dispose()
+		{
+			if (texture != null)
+				texture.Dispose();
+		}
+
 		public int TextureOffsetX 
 		{
 			get 
