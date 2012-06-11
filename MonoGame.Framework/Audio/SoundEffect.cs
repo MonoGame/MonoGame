@@ -215,8 +215,11 @@ namespace Microsoft.Xna.Framework.Audio
 		{ 
 			get
 			{
-#if WINRT                
-                return TimeSpan.FromMilliseconds(_buffer.PlayLength);
+#if WINRT                    
+                var sampleCount = _buffer.PlayLength;
+                var avgBPS = _format.AverageBytesPerSecond;
+                
+                return TimeSpan.FromSeconds((float)sampleCount / (float)avgBPS);
 #else
 				if ( _sound != null )
 				{
@@ -277,7 +280,12 @@ namespace Microsoft.Xna.Framework.Audio
 			}
 			set
 			{
-                _masterVolume = value;	
+                if ( _masterVolume != value )
+                    _masterVolume = value;
+
+#if WINRT
+                MasterVoice.SetVolume(_masterVolume, 0);
+#endif
 			}
 		}
 
@@ -334,6 +342,7 @@ namespace Microsoft.Xna.Framework.Audio
                 throw new Exception("XAudio2.StartEngine has failed.");
 
             MasterVoice = new MasteringVoice(Device);
+            MasterVoice.SetVolume(_masterVolume, 0);
         }
 
         // Does someone actually need to call this if it only happens when the whole
