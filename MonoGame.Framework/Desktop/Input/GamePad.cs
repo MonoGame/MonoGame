@@ -320,22 +320,6 @@ namespace Microsoft.Xna.Framework.Input
             return Settings[(int)index];
         }
 
-        static Buttons StickToButtons(Vector2 stick, float DeadZoneSize)
-        {
-            Buttons b = (Buttons)0;
-
-            if (stick.X > DeadZoneSize)
-                b |= Buttons.LeftThumbstickRight;
-            if (stick.X < -DeadZoneSize)
-                b |= Buttons.LeftThumbstickLeft;
-            if (stick.Y > DeadZoneSize)
-                b |= Buttons.LeftThumbstickUp;
-            if (stick.Y < -DeadZoneSize)
-                b |= Buttons.LeftThumbstickDown;
-
-            return b;
-        }
-
         static Buttons ReadButtons(IntPtr device, PadConfig c, float deadZoneSize)
         {
             short DeadZone = (short)(deadZoneSize * short.MaxValue);
@@ -376,15 +360,33 @@ namespace Microsoft.Xna.Framework.Input
 
             return b;
         }
-        static Buttons ReadButtons(IntPtr device, PadConfig c, float deadZoneSize, Vector2 leftStick, Vector2 rightStick)
-        {
-            Buttons b = ReadButtons(device, c, deadZoneSize);
+		
+		static Buttons StickToButtons( Vector2 stick, Buttons left, Buttons right, Buttons up , Buttons down, float DeadZoneSize )
+		{
+			Buttons b = (Buttons)0;
 
-            b |= StickToButtons(leftStick, deadZoneSize);
-            b |= StickToButtons(rightStick, deadZoneSize);
+			if ( stick.X > DeadZoneSize )
+				b |= right;
+			if ( stick.X < -DeadZoneSize )
+				b |= left;
+			if ( stick.Y > DeadZoneSize )
+				b |= up;
+			if ( stick.Y < -DeadZoneSize )
+				b |= down;
+			
+			return b;
+		}
+		
+		static Buttons TriggerToButton( float trigger, Buttons button, float DeadZoneSize )
+		{
+			Buttons b = (Buttons)0;
 
-            return b;
-        }
+			if ( trigger > DeadZoneSize )
+				b |= button;
+
+			return b;
+		}
+		
         static GamePadState ReadState(PlayerIndex index, GamePadDeadZone deadZone)
         {
             const float DeadZoneSize = 0.27f;
@@ -398,7 +400,12 @@ namespace Microsoft.Xna.Framework.Input
             GamePadThumbSticks sticks = new GamePadThumbSticks(new Vector2(leftStick.X, leftStick.Y), new Vector2(rightStick.X, rightStick.Y));
             sticks.ApplyDeadZone(deadZone, DeadZoneSize);
             GamePadTriggers triggers = new GamePadTriggers(c.LeftTrigger.ReadFloat(device), c.RightTrigger.ReadFloat(device));
-            GamePadButtons buttons = new GamePadButtons(ReadButtons(device, c, DeadZoneSize));
+			Buttons buttonState = ReadButtons(device, c, DeadZoneSize);
+			buttonState |= StickToButtons(sticks.Left, Buttons.LeftThumbstickLeft, Buttons.LeftThumbstickRight, Buttons.LeftThumbstickUp, Buttons.LeftThumbstickDown, DeadZoneSize);
+			buttonState |= StickToButtons(sticks.Right, Buttons.RightThumbstickLeft, Buttons.RightThumbstickRight, Buttons.RightThumbstickUp, Buttons.RightThumbstickDown, DeadZoneSize);
+			buttonState |= TriggerToButton(triggers.Left, Buttons.LeftTrigger, DeadZoneSize);
+			buttonState |= TriggerToButton(triggers.Right, Buttons.RightTrigger, DeadZoneSize);
+            GamePadButtons buttons = new GamePadButtons(buttonState);
             GamePadDPad dpad = new GamePadDPad(buttons.buttons);
 
             GamePadState g = new GamePadState(sticks, triggers, buttons, dpad);
