@@ -108,8 +108,11 @@ namespace Microsoft.Xna.Framework.Content
                 waveFormat = new SharpDX.Multimedia.WaveFormatAdpcm(sampleRate, channels, blockAlignment);
             else
                 throw new NotImplementedException("Unsupported wave format!");
-           
-            return new SoundEffect(waveFormat, data, 0, count, loopStart, loopLength);
+
+            return new SoundEffect(waveFormat, data, 0, count, loopStart, loopLength)
+            {
+                Name = input.AssetName,
+            };
 #else
             byte[] soundData = null;
             // Proper use of "using" corectly disposes of BinaryWriter which in turn disposes the underlying stream

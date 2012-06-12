@@ -92,8 +92,11 @@ namespace Microsoft.Xna.Framework.Audio
 		}
 		
 		public void Apply3D (AudioListener listener, AudioEmitter emitter)
-		{                        
-			//throw new NotImplementedException();
+		{
+#if WINRT		
+		    // Temporary / naive implementation until X3DAudio is functional.
+            _voice.SetVolume(1.0f / (Vector3.Distance(listener.Position, emitter.Position) / SoundEffect.DistanceScale), 0);
+#endif
 		}
 		
 		public void Apply3D (AudioListener[] listeners,AudioEmitter emitter)
@@ -212,12 +215,12 @@ namespace Microsoft.Xna.Framework.Audio
 #endif
 			}
 		}
-		
+		        
 		public float Pan 
 		{ 
 			get
 			{
-#if WINRT
+#if WINRT                
                 throw new NotImplementedException();
 #else
                 if ( _sound != null )
@@ -234,6 +237,9 @@ namespace Microsoft.Xna.Framework.Audio
 			set
 			{
 #if WINRT
+                // According to XNA documentation:
+                // "Panning, ranging from -1.0f (full left) to 1.0f (full right). 0.0f is centered."
+				// ...Requires X3DAudio
                 throw new NotImplementedException();
 #else
                 if ( _sound != null )
