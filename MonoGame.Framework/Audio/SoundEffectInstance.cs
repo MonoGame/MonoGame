@@ -40,6 +40,9 @@
 
 #region Using Statements
 using System;
+#if WINRT
+using SharpDX.XAudio2;
+#endif
 #endregion Statements
 
 namespace Microsoft.Xna.Framework.Audio
@@ -48,39 +51,90 @@ namespace Microsoft.Xna.Framework.Audio
 	{
 		private bool isDisposed = false;
 		private SoundState soundState = SoundState.Stopped;
-		
-		public SoundEffectInstance ()
-		{
+
+#if WINRT        
+        internal SourceVoice _voice { get; set; }
+        internal SoundEffect _effect { get; set; }
+
+        private bool _paused;
+        private bool _loop;
+#else
+        private Sound _sound;
+		internal Sound Sound 
+		{ 
+			get
+			{
+				return _sound;
+			} 
 			
+			set
+			{
+				_sound = value;
+			} 
+		}
+#endif
+
+        internal SoundEffectInstance()
+		{			
 		}
 		
 		public void Dispose()
 		{
+#if WINRT
+            _voice.DestroyVoice();
+            _voice.Dispose();
+            _voice = null;
+            _effect = null;
+#else
 			_sound.Dispose();
+#endif
 			isDisposed = true;
 		}
 		
 		public void Apply3D (AudioListener listener, AudioEmitter emitter)
 		{
-			throw new NotImplementedException();
+#if WINRT		
+		    // Temporary / naive implementation until X3DAudio is functional.
+            _voice.SetVolume(1.0f / (Vector3.Distance(listener.Position, emitter.Position) / SoundEffect.DistanceScale), 0);
+#endif
 		}
 		
 		public void Apply3D (AudioListener[] listeners,AudioEmitter emitter)
 		{
-			throw new NotImplementedException();
+            //throw new NotImplementedException();
 		}		
 		
 		public void Pause ()
 		{
+#if WINRT            
+            _voice.Stop();
+            _paused = true;
+#else
             if ( _sound != null )
 			{
 				_sound.Pause();
 				soundState = SoundState.Paused;
 			}
+#endif
 		}
 		
 		public void Play ()
 		{
+#if WINRT              
+            // Choose the correct buffer depending on if we are looped.            
+            var buffer = _loop ? _effect._loopedBuffer : _effect._buffer;
+
+            if (_voice.State.BuffersQueued > 0)
+            {
+                _voice.Stop();
+                _voice.FlushSourceBuffers();
+            }
+
+            _voice.SubmitSourceBuffer(buffer, null);
+            _voice.Start();
+
+            _paused = false;
+#else
 			if ( _sound != null )
 			{
 				if (soundState == SoundState.Paused)
@@ -89,26 +143,36 @@ namespace Microsoft.Xna.Framework.Audio
 					_sound.Play();
 				soundState = SoundState.Playing;
 			}
+#endif
 		}
 		
-		public void Resume ()
+		public void Resume()
 		{
-			Play();
+#if WINRT
+            _voice.Start();
+            _paused = false;
+#else
+#endif
 		}
 		
-		public void Stop ()
+		public void Stop()
 		{
-			if ( _sound != null )
-			{
-				_sound.Stop();
-				soundState = SoundState.Stopped;
-			}
-		}
-		
-		public void Stop (bool immediate)
-		{
-			Stop();
-		}
+#if WINRT
+            _voice.Stop(0);
+            _voice.FlushSourceBuffers();
+            _paused = false;
+#else
+#endif
+        }
+
+        public void Stop(bool immediate)
+        {
+#if WINRT            
+            _voice.Stop( immediate ? 0 : (int)PlayFlags.Tails );
+            _paused = false;
+#else
+#endif
+        }		
 		
 		public bool IsDisposed 
 		{ 
@@ -122,6 +186,9 @@ namespace Microsoft.Xna.Framework.Audio
 		{ 
 			get
 			{
+#if WINRT
+                return _loop;
+#else
 				if ( _sound != null )
 				{
 					return _sound.Looping;
@@ -130,10 +197,14 @@ namespace Microsoft.Xna.Framework.Audio
 				{
 					return false;
 				}
+#endif
 			}
 			
 			set
 			{
+#if WINRT
+                _loop = value;
+#else
 				if ( _sound != null )
 				{
 					if ( _sound.Looping != value )
@@ -141,13 +212,17 @@ namespace Microsoft.Xna.Framework.Audio
 						_sound.Looping = value;
 					}
 				}
+#endif
 			}
 		}
-		
+		        
 		public float Pan 
 		{ 
 			get
 			{
+#if WINRT                
+                throw new NotImplementedException();
+#else
                 if ( _sound != null )
 				{
 					return _sound.Pan;
@@ -156,10 +231,17 @@ namespace Microsoft.Xna.Framework.Audio
 				{
 					return 0.0f;
 				}
+#endif
 			}
 			
 			set
 			{
+#if WINRT
+                // According to XNA documentation:
+                // "Panning, ranging from -1.0f (full left) to 1.0f (full right). 0.0f is centered."
+				// ...Requires X3DAudio
+                throw new NotImplementedException();
+#else
                 if ( _sound != null )
 				{
 					if ( _sound.Pan != value )
@@ -167,50 +249,62 @@ namespace Microsoft.Xna.Framework.Audio
 						_sound.Pan = value;
 					}
 				}
-			}
+#endif
+            }
 		}
 		
 		public float Pitch         
 		{             
 	            get
-	            {
+	            {                    
+#if WINRT
+                    return XAudio2.FrequencyRatioToSemitones(_voice.FrequencyRatio) * 12.0f;
+#else
 					if ( _sound != null)
 				    {
 	                   return _sound.Rate;
 				    }
 				    return 0.0f;
+#endif
 	            }
 	            set
 	            {
+                    // According to XNA documentation a value of 1.0 adjusts pitch upwards by an octave,
+                    // therefore the scale of this Pitch property is 1.0f Pitch = 12 semitones;                    
+#if WINRT
+                    _voice.SetFrequencyRatio(XAudio2.SemitonesToFrequencyRatio(value * 12.0f));                    
+#else
 				    if ( _sound != null && _sound.Rate != value)
 				    {
 	                   _sound.Rate = value;
 				    } 
+#endif
 	            }        
-		 }
-		
-		private Sound _sound;
-		internal Sound Sound 
-		{ 
-			get
-			{
-				return _sound;
-			} 
-			
-			set
-			{
-				_sound = value;
-			} 
-		}
+		 }				
 		
 		public SoundState State 
 		{ 
 			get
 			{
+#if WINRT           
+                // If no buffers queued the sound is stopped.
+                if (_voice.State.BuffersQueued == 0)
+                {
+                    return SoundState.Stopped;
+                }
+                
+                // Because XAudio2 does not actually provide if a SourceVoice is Started / Stopped
+                // we have to save the "paused" state ourself.
+                if (_paused)
+                    return SoundState.Paused;
+
+                return SoundState.Playing;                                
+#else
 				if (_sound != null && soundState == SoundState.Playing && !_sound.Playing) {
 					soundState = SoundState.Stopped;
 				}
 				return soundState;
+#endif
 			} 
 		}
 		
@@ -218,6 +312,9 @@ namespace Microsoft.Xna.Framework.Audio
 		{ 
 			get
 			{
+#if WINRT
+                return _voice.Volume;
+#else
 				if (_sound != null)
 				{
 					return _sound.Volume;
@@ -226,10 +323,14 @@ namespace Microsoft.Xna.Framework.Audio
 				{
 					return 0.0f;
 				}
+#endif
 			}
 			
 			set
 			{
+#if WINRT
+                _voice.SetVolume(value, XAudio2.CommitNow);
+#else
 				if ( _sound != null )
 				{
 					if ( _sound.Volume != value )
@@ -237,6 +338,7 @@ namespace Microsoft.Xna.Framework.Audio
 						_sound.Volume = value;
 					}
 				}
+#endif
 			}
 		}	
 		
