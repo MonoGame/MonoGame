@@ -50,8 +50,6 @@ namespace Microsoft.Xna.Framework
 {
     public partial class MetroGameWindow : GameWindow
     {
-        private float _dipFactor;
-
         void InitializeTouch()
         {
             // Receives mouse, touch and stylus input events
@@ -59,9 +57,6 @@ namespace Microsoft.Xna.Framework
             _coreWindow.PointerReleased += CoreWindow_PointerReleased;
             _coreWindow.PointerMoved += CoreWindow_PointerMoved;
             _coreWindow.PointerWheelChanged += CoreWindow_PointerWheelChanged;
-
-            // To convert from DIPs (that all touch and pointer events are returned in) to pixels (that XNA APIs expect)
-            _dipFactor = DisplayProperties.LogicalDpi / 96.0f;
         }
 
         private void CoreWindow_PointerWheelChanged(CoreWindow sender, PointerEventArgs args)
@@ -72,7 +67,11 @@ namespace Microsoft.Xna.Framework
         
         void CoreWindow_PointerMoved(CoreWindow sender, PointerEventArgs args)
         {
-            var pos = new Vector2((float)args.CurrentPoint.Position.X, (float)args.CurrentPoint.Position.Y) * _dipFactor;
+            // To convert from DIPs (that all touch and pointer events are returned 
+            // in) to pixels (that XNA APIs expect)
+            var dipFactor = DisplayProperties.LogicalDpi / 96.0f;
+            var pos = new Vector2((float)args.CurrentPoint.Position.X, (float)args.CurrentPoint.Position.Y) * dipFactor;
+
             var isTouch = args.CurrentPoint.PointerDevice.PointerDeviceType == Windows.Devices.Input.PointerDeviceType.Touch;
             var touchIsDown = args.CurrentPoint.IsInContact;
             if (isTouch && touchIsDown)
@@ -87,7 +86,11 @@ namespace Microsoft.Xna.Framework
 
         void CoreWindow_PointerReleased(CoreWindow sender, PointerEventArgs args)
         {
-            var pos = new Vector2((float)args.CurrentPoint.Position.X, (float)args.CurrentPoint.Position.Y) * _dipFactor;
+            // To convert from DIPs (that all touch and pointer events are returned 
+            // in) to pixels (that XNA APIs expect)
+            var dipFactor = DisplayProperties.LogicalDpi / 96.0f;
+            var pos = new Vector2((float)args.CurrentPoint.Position.X, (float)args.CurrentPoint.Position.Y) * dipFactor;
+
             var isTouch = args.CurrentPoint.PointerDevice.PointerDeviceType == Windows.Devices.Input.PointerDeviceType.Touch;
             if (isTouch)
                 TouchPanel.AddEvent(new TouchLocation((int)args.CurrentPoint.PointerId, TouchLocationState.Released, pos));
@@ -101,7 +104,11 @@ namespace Microsoft.Xna.Framework
 
         void CoreWindow_PointerPressed(CoreWindow sender, PointerEventArgs args)
         {
-            var pos = new Vector2((float)args.CurrentPoint.Position.X, (float)args.CurrentPoint.Position.Y) * _dipFactor;
+            // To convert from DIPs (that all touch and pointer events are returned 
+            // in) to pixels (that XNA APIs expect)
+            var dipFactor = DisplayProperties.LogicalDpi / 96.0f;
+            var pos = new Vector2((float)args.CurrentPoint.Position.X, (float)args.CurrentPoint.Position.Y) * dipFactor;
+
             var isTouch = args.CurrentPoint.PointerDevice.PointerDeviceType == Windows.Devices.Input.PointerDeviceType.Touch;
             if (isTouch)
                 TouchPanel.AddEvent(new TouchLocation((int)args.CurrentPoint.PointerId, TouchLocationState.Pressed, pos));

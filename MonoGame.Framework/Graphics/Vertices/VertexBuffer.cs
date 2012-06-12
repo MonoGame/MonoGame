@@ -211,15 +211,19 @@ namespace Microsoft.Xna.Framework.Graphics
                     mode = SharpDX.Direct3D11.MapMode.WriteNoOverwrite;
 
                 SharpDX.DataStream stream;
-                graphicsDevice._d3dContext.MapSubresource(
-                    _buffer,
-                    mode,
-                    SharpDX.Direct3D11.MapFlags.None,
-                    out stream);
+                lock (graphicsDevice._d3dContext)
+                {
+                    graphicsDevice._d3dContext.MapSubresource(
+                        _buffer,
+                        mode,
+                        SharpDX.Direct3D11.MapFlags.None,
+                        out stream);
 
-                stream.Position = offsetInBytes;
-                stream.WriteRange(data, startIndex, elementCount);
-                graphicsDevice._d3dContext.UnmapSubresource(_buffer, 0);     
+                    stream.Position = offsetInBytes;
+                    stream.WriteRange(data, startIndex, elementCount);
+
+                    graphicsDevice._d3dContext.UnmapSubresource(_buffer, 0);
+                }
             }
             else
             {
@@ -237,7 +241,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 region.Left = offsetInBytes;
                 region.Right = offsetInBytes + (elementCount * elementSizeInBytes);
 
-                graphicsDevice._d3dContext.UpdateSubresource(box, _buffer, 0, region);
+                lock (graphicsDevice._d3dContext)
+                    graphicsDevice._d3dContext.UpdateSubresource(box, _buffer, 0, region);
 
                 dataHandle.Free();
             }

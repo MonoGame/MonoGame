@@ -88,6 +88,9 @@ namespace Microsoft.Xna.Framework.Graphics
             if (_dirty == 0)
                 return;
 
+            // NOTE: We make the assumption here that the caller has
+            // locked the d3dContext for us to use.
+
             var pixelShaderStage = device._d3dContext.PixelShader;
             for (var i = 0; i < _samplers.Length; i++)
             {
