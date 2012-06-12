@@ -103,6 +103,8 @@ namespace Microsoft.Xna.Framework.Graphics
             _height = texture.ImageHeight;
             _format = texture.Format;
             _textureId = (int)theImage.Name;
+
+            textureData = new byte[(_width * _height) * 4];
         }
 
         public Texture2D(GraphicsDevice graphicsDevice, int width, int height) :
