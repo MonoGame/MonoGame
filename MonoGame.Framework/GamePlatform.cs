@@ -68,6 +68,10 @@ non-infringement.
 
 using System;
 
+#if WINRT
+using Windows.UI.ViewManagement;
+#endif
+
 namespace Microsoft.Xna.Framework
 {
     abstract class GamePlatform : IDisposable
@@ -129,7 +133,7 @@ namespace Microsoft.Xna.Framework
         public bool IsActive
         {
             get { return _isActive; }
-            protected set
+            internal set
             {
                 if (_isActive != value)
                 {
@@ -152,6 +156,23 @@ namespace Microsoft.Xna.Framework
                 }
             }
         }
+
+#if WINRT
+        private ApplicationViewState _viewState;
+        public ApplicationViewState ViewState
+        {
+            get { return _viewState; }
+            set
+            {
+                if (_viewState == value)
+                    return;
+
+                Raise(ViewStateChanged, new ViewStateChangedEventArgs(value));
+
+                _viewState = value;
+            }
+        }
+#endif
 
 #if ANDROID
         public AndroidGameWindow Window
@@ -177,6 +198,10 @@ namespace Microsoft.Xna.Framework
         public event EventHandler<EventArgs> AsyncRunLoopEnded;
         public event EventHandler<EventArgs> Activated;
         public event EventHandler<EventArgs> Deactivated;
+
+#if WINRT
+        public event EventHandler<ViewStateChangedEventArgs> ViewStateChanged;
+#endif
 
         private void Raise<TEventArgs>(EventHandler<TEventArgs> handler, TEventArgs e)
             where TEventArgs : EventArgs

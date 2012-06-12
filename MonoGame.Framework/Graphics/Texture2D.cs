@@ -318,7 +318,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 region.Right = x + w;
 
                 // TODO: We need to deal with threaded contexts here!
-                graphicsDevice._d3dContext.UpdateSubresource(box, _texture, level, region);
+                lock (graphicsDevice._d3dContext)
+                    graphicsDevice._d3dContext.UpdateSubresource(box, _texture, level, region);
 
 #elif PSS
                 _texture2D.SetPixels(level, data, _texture2D.Format, startIndex, w, x, y, w, h);
@@ -390,6 +391,7 @@ namespace Microsoft.Xna.Framework.Graphics
             desc.OptionFlags = SharpDX.Direct3D11.ResourceOptionFlags.None;
 
             using (var stagingTex = new SharpDX.Direct3D11.Texture2D(graphicsDevice._d3dDevice, desc))
+            lock (graphicsDevice._d3dContext)
             {
                 // Copy the data from the GPU to the staging texture.
                 if (rect.HasValue)

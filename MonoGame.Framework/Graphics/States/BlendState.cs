@@ -174,6 +174,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
             Debug.Assert(graphicsDevice == device, "The state was created for a different device!");
 
+            // NOTE: We make the assumption here that the caller has
+            // locked the d3dContext for us to use.
+
             // Apply the state!
             var d3dContext = device._d3dContext;
             d3dContext.OutputMerger.BlendFactor = new SharpDX.Color4(BlendFactor.R / 255.0f, BlendFactor.G / 255.0f, BlendFactor.B / 255.0f, BlendFactor.A / 255.0f);
