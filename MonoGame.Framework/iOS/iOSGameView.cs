@@ -255,7 +255,8 @@ namespace Microsoft.Xna.Framework {
 				gds.GraphicsDevice.glFramebuffer = _framebuffer;
 			}
 
-            Threading.BackgroundContext = new MonoTouch.OpenGLES.EAGLContext(ctx.EAGLContext.API, ctx.EAGLContext.ShareGroup);
+            if (Threading.BackgroundContext == null)
+                Threading.BackgroundContext = new MonoTouch.OpenGLES.EAGLContext(ctx.EAGLContext.API, ctx.EAGLContext.ShareGroup);
 		}
 
 		private void DestroyFramebuffer ()
