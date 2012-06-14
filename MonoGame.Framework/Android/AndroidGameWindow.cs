@@ -269,7 +269,6 @@ namespace Microsoft.Xna.Framework
                 case MotionEventActions.PointerUp:
                     TouchPanel.AddEvent(new TouchLocation(id, TouchLocationState.Released, position));
 				    break;
-
                 // MOVE                
                 case MotionEventActions.Move:
                     for (int i = 0; i < e.PointerCount; i++)

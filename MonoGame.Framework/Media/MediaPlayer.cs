@@ -39,6 +39,11 @@ purpose and non-infringement.
 #endregion License
 
 using System;
+
+#if IPHONE
+using MonoTouch.AudioToolbox;
+#endif
+
 using Microsoft.Xna.Framework.Audio;
 
 #if IPHONE

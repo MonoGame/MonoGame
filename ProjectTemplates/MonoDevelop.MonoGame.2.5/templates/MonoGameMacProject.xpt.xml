@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<Template>
+	<TemplateConfiguration>
+		<_Name>MonoGame Mac Application</_Name>
+		<_Category>C#/MonoGame</_Category>
+		<Icon>monogame-project</Icon>
+		<LanguageName>C#</LanguageName>
+		<_Description>Creates a MonoGame Application for Mac</_Description>
+	</TemplateConfiguration>
+	
+	<Actions>
+		<Open filename = "${ProjectName}Game.cs"/>
+	</Actions>
+	
+	<Combine name = "${ProjectName}" directory = ".">
+		<Options>
+			<StartupProject>${ProjectName}</StartupProject>
+		</Options>
+		
+		<Project name = "${ProjectName}" directory = "." type = "MonoMac">
+			<Options />
+			<References>
+				<Reference type="Gac" refto="System" />
+				<Reference type="Gac" refto="System.Xml" />
+				<Reference type="Gac" refto="System.Core" />
+				<Reference type="Gac" refto="System.Xml.Linq" />
+				<Reference type="Gac" refto="System.Drawing" />
+				<Reference type="Gac" refto="MonoMac" SpecificVersion="false" />
+
+				<Reference type="Project" refto="MonoGame.Framework.MacOS" />
+				<Reference type="Project" refto="Lidgren.Network.MacOS" />
+			</References>
+			<Files>
+				<File name="${ProjectName}Game.cs" AddStandardHeader="True" src="MonoGameApplication/MacGame.cs" />
+				<File name="Main.cs" AddStandardHeader="True" src="MonoGameApplication/MacMain.cs" />
+				<File name="Info.plist" AddStandardHeader="False" src="MonoGameApplication/MacInfo.plist" />
+				<Directory name="Content">
+					<RawFile name="logo.png" src="MonoGameApplication/Icon-hd.png" />
+				</Directory>
+				<Directory name="Properties">
+					<File name="AssemblyInfo.cs" AddStandardHeader="True" src="MonoGameApplication/AssemblyInfo.cs" />
+				</Directory>
+			</Files>
+		</Project>
+	</Combine>
+</Template>
