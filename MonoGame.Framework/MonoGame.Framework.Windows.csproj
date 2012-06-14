@@ -81,12 +81,6 @@
     <DefineConstants>TRACE;WINDOWS;OPENGL</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="GamepadBridge">
-      <HintPath>..\ThirdParty\GamepadConfig\GamepadBridge.dll</HintPath>
-    </Reference>
-    <Reference Include="GamepadConfigControls">
-      <HintPath>..\ThirdParty\GamepadConfig\GamepadConfigControls.dll</HintPath>
-    </Reference>
     <Reference Include="OpenTK, Version=1.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
       <HintPath>..\ThirdParty\Libs\OpenTK.dll</HintPath>
     </Reference>
@@ -98,7 +92,8 @@
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Drawing" />
-    <Reference Include="Tao.Sdl">
+    <Reference Include="Tao.Sdl, Version=1.2.13.0, Culture=neutral, PublicKeyToken=9c7a200e36c0094e, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\ThirdParty\GamepadConfig\Tao.Sdl.dll</HintPath>
     </Reference>
   </ItemGroup>
@@ -124,8 +119,16 @@
     <Compile Include="Content\ContentReaders\VertexDeclarationReader.cs" />
     <Compile Include="Content\ResourceContentManager.cs" />
     <Compile Include="Desktop\Audio\SoundEffectInstance.cs" />
+    <Compile Include="Desktop\Input\Axis.cs" />
+    <Compile Include="Desktop\Input\Capabilities.cs" />
+    <Compile Include="Desktop\Input\DPad.cs" />
     <Compile Include="Desktop\Input\GamePad.cs" />
+    <Compile Include="Desktop\Input\Input.cs" />
+    <Compile Include="Desktop\Input\Joystick.cs" />
     <Compile Include="Desktop\Input\Mouse.cs" />
+    <Compile Include="Desktop\Input\PadConfig.cs" />
+    <Compile Include="Desktop\Input\Settings.cs" />
+    <Compile Include="Desktop\Input\Stick.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="GamePlatform.cs" />
     <Compile Include="GamerServices\GamerServicesDispatcher.cs" />
@@ -181,7 +184,6 @@
     <Compile Include="Input\MouseState.cs" />
     <Compile Include="Input\Touch\TouchInfo.cs" />
     <Compile Include="LaunchParameters.cs" />
-    <Compile Include="Media\MediaQueue.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Audio\AudioChannels.cs" />
     <Compile Include="Audio\AudioEmitter.cs" />
@@ -287,6 +289,7 @@
     <Compile Include="Graphics\Vertices\VertexPositionNormalTexture.cs" />
     <Compile Include="Graphics\Vertices\VertexPositionTexture.cs" />
     <Compile Include="Media\MediaPlayer.cs" />
+    <Compile Include="Media\MediaQueue.cs" />
     <Compile Include="Media\MediaSourceType.cs" />
     <Compile Include="Media\MediaState.cs" />
     <Compile Include="Media\Playlist.cs" />
