@@ -321,7 +321,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 				if (flippedHorz)
                     p.X += currentGlyph.BoundsInTexture.Width;
-                p.X += currentGlyph.LeftSideBearing;
+                p.X += currentGlyph.Cropping.X;
 
 				if (flippedVert)
                     p.Y += currentGlyph.BoundsInTexture.Height - LineSpacing;
