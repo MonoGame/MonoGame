@@ -101,6 +101,7 @@ namespace Microsoft.Xna.Framework.Audio
 
 		public void Dispose ()
 		{
+			this.Stop(true);
 			soundBuffer.Reserved -= HandleSoundBufferReserved;
 			soundBuffer.Recycled -= HandleSoundBufferRecycled;
 			soundBuffer.Dispose ();
@@ -192,7 +193,7 @@ namespace Microsoft.Xna.Framework.Audio
 
 		public void Stop ()
 		{
-			if (hasSourceId) {
+			if (hasSourceId && soundBuffer != null) {
 				controller.StopSound (soundBuffer);
 			}
 			soundState = SoundState.Stopped;

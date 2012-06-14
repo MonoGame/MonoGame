@@ -137,6 +137,7 @@
     <Compile Include="Storage\StorageDevice.cs" />
     <Compile Include="Audio\AudioChannels.cs" />
     <Compile Include="Media\MediaPlayer.cs" />
+    <Compile Include="Media\MediaQueue.cs" />
     <Compile Include="Media\Song.cs" />
     <Compile Include="Media\MediaState.cs" />
     <Compile Include="Media\MediaSourceType.cs" />
@@ -179,7 +180,7 @@
     <Compile Include="Input\Touch\TouchLocationState.cs" />
     <Compile Include="Input\Touch\TouchPanelCapabilities.cs" />
     <Compile Include="Input\Touch\TouchPanel.cs" />
-    <Compile Include="Input\Touch\TouchInfo.cs" />    
+    <Compile Include="Input\Touch\TouchInfo.cs" />
     <Compile Include="Input\Touch\GestureSample.cs" />
     <Compile Include="GameComponentCollection.cs" />
     <Compile Include="Graphics\SpriteBatchItem.cs" />
@@ -230,7 +231,15 @@
     <Compile Include="MacOS\KeyUtil.cs" />
     <Compile Include="Graphics\States\TextureAddressMode.cs" />
     <Compile Include="Graphics\States\TextureFilter.cs" />
+    <Compile Include="Desktop\Input\Axis.cs" />
+    <Compile Include="Desktop\Input\Capabilities.cs" />
+    <Compile Include="Desktop\Input\DPad.cs" />
     <Compile Include="Desktop\Input\GamePad.cs" />
+    <Compile Include="Desktop\Input\Input.cs" />
+    <Compile Include="Desktop\Input\Joystick.cs" />
+    <Compile Include="Desktop\Input\PadConfig.cs" />
+    <Compile Include="Desktop\Input\Settings.cs" />
+    <Compile Include="Desktop\Input\Stick.cs" />
     <Compile Include="Input\ButtonDefinition.cs" />
     <Compile Include="Input\ThumbStickDefinition.cs" />
     <Compile Include="MacOS\GamerServices\SignedInGamer.cs" />
@@ -395,7 +404,6 @@
     <Compile Include="Graphics\Texture2D.cs" />
     <Compile Include="Graphics\SpriteFont.cs" />
     <Compile Include="Graphics\Effect\ConstantBuffer.cs" />
-    <Compile Include="Media\MediaQueue.cs" />
     <Compile Include="Media\Playlist.cs" />
     <Compile Include="Media\PlaylistCollection.cs" />
     <Compile Include="Media\SongCollection.cs" />
