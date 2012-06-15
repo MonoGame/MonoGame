@@ -47,25 +47,20 @@ namespace Microsoft.Xna.Framework.Graphics
             Initialize();
         }
 
-        public ConstantBuffer(GraphicsDevice device, BinaryReader reader)
+        public ConstantBuffer(GraphicsDevice device, 
+		                      int sizeInBytes,
+		                      int[] parameterIndexes,
+		                      int[] parameterOffsets,
+		                      string name)
         {
             graphicsDevice = device;
 
-#if OPENGL
-            _name = reader.ReadString();               
-#endif
-            // Create the backing system memory buffer.
-            var sizeInBytes = (int)reader.ReadInt16();
-            _buffer = new byte[sizeInBytes];
+			_buffer = new byte[sizeInBytes];
 
-            // Read the parameter index values.
-            _parameters = new int[reader.ReadByte()];
-            _offsets = new int[_parameters.Length];
-            for (var i = 0; i < _parameters.Length; i++)
-            {
-                _parameters[i] = (int)reader.ReadByte();
-                _offsets[i] = (int)reader.ReadUInt16();
-            }
+			_parameters = parameterIndexes;
+			_offsets = parameterOffsets;
+
+			_name = name;
 
             Initialize();
         }

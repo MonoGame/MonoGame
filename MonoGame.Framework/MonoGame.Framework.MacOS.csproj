@@ -21,6 +21,10 @@
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <EnableCodeSigning>false</EnableCodeSigning>
+    <CreatePackage>false</CreatePackage>
+    <EnablePackageSigning>false</EnablePackageSigning>
+    <IncludeMonoRuntime>false</IncludeMonoRuntime>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
@@ -31,6 +35,10 @@
     <ConsolePause>false</ConsolePause>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DefineConstants>MONOMAC;OPENGL</DefineConstants>
+    <EnableCodeSigning>false</EnableCodeSigning>
+    <CreatePackage>false</CreatePackage>
+    <EnablePackageSigning>false</EnablePackageSigning>
+    <IncludeMonoRuntime>false</IncludeMonoRuntime>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Distribution|AnyCPU' ">
     <DebugType>none</DebugType>
@@ -39,6 +47,10 @@
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DefineConstants>MONOMAC;OPENGL</DefineConstants>
+    <EnableCodeSigning>false</EnableCodeSigning>
+    <CreatePackage>false</CreatePackage>
+    <EnablePackageSigning>false</EnablePackageSigning>
+    <IncludeMonoRuntime>false</IncludeMonoRuntime>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -348,7 +360,6 @@
     <Compile Include="Content\ContentReaders\EffectReader.cs" />
     <Compile Include="Graphics\Effect\EffectAnnotation.cs" />
     <Compile Include="Graphics\Effect\EffectAnnotationCollection.cs" />
-    <Compile Include="Graphics\Effect\DXShader.cs" />
     <Compile Include="Graphics\Effect\BasicEffect.cs" />
     <Compile Include="GamerServices\GuideAlreadyVisibleException.cs" />
     <Compile Include="GamerServices\GamerServicesDispatcher.cs" />
@@ -403,12 +414,41 @@
     <Compile Include="Content\ContentReaders\AlphaTestEffectReader.cs" />
     <Compile Include="Graphics\Texture2D.cs" />
     <Compile Include="Graphics\SpriteFont.cs" />
-    <Compile Include="Graphics\Effect\ConstantBuffer.cs" />
     <Compile Include="Media\Playlist.cs" />
     <Compile Include="Media\PlaylistCollection.cs" />
     <Compile Include="Media\SongCollection.cs" />
     <Compile Include="Desktop\Audio\OALSoundBuffer.cs" />
     <Compile Include="Desktop\Audio\OpenALSoundController.cs" />
+    <Compile Include="Graphics\Effect\MGFXShader.cs" />
+    <Compile Include="Graphics\Effect\Shader.cs" />
+    <Compile Include="Graphics\Effect\Shader.ogl.cs" />
+    <Compile Include="..\Tools\2MGFX\DXEffectObject.cs">
+      <Link>Graphics\Effect\DXEffectObject.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\DXEffectObject.fxparser.cs">
+      <Link>Graphics\Effect\DXEffectObject.fxparser.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\DXHelper.cs">
+      <Link>Graphics\Effect\DXHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\MojoShader.cs">
+      <Link>Graphics\Effect\MojoShader.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\DXShaderData.cs">
+      <Link>Graphics\Effect\DXShaderData.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\DXShaderData.mojo.cs">
+      <Link>Graphics\Effect\DXShaderData.mojo.cs</Link>
+    </Compile>
+    <Compile Include="Graphics\Effect\ConstantBuffer.cs" />
+    <Compile Include="..\Tools\2MGFX\DXConstantBufferData.cs">
+      <Link>Graphics\Effect\DXConstantBufferData.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\DXConstantBufferData.mojo.cs">
+      <Link>Graphics\Effect\DXConstantBufferData.mojo.cs</Link>
+    </Compile>
+    <Compile Include="Graphics\Effect\FXShader.cs" />
+    <Compile Include="Graphics\Effect\PassthroughVertexShader.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />
@@ -426,6 +466,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="MonoGame.Framework.MacOS.dll.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Libs\libmojoshader.dylib">
+      <Link>libmojoshader.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

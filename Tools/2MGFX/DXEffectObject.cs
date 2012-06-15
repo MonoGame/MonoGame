@@ -5,7 +5,7 @@ using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-	public partial class DXEffectObject
+	internal partial class DXEffectObject
 	{
 		public enum D3DRENDERSTATETYPE
         {
@@ -556,7 +556,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			new state_info(STATE_CLASS.SETSAMPLER, 0, "Sampler"),
 		};
 
-        static public EffectParameterClass ToParameterClass( D3DXPARAMETER_CLASS class_ )
+        static public EffectParameterClass ToXNAParameterClass( D3DXPARAMETER_CLASS class_ )
         {
 			switch (class_) 
             {
@@ -576,7 +576,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
         }
 
-        static public EffectParameterType ToParameterType(D3DXPARAMETER_TYPE type)
+        static public EffectParameterType ToXNAParameterType(D3DXPARAMETER_TYPE type)
         {
 			switch (type) 
             {
@@ -606,7 +606,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
         }
 
-        static internal VertexElementUsage ToVertexElementUsage(MojoShader.MOJOSHADER_usage usage)
+        static internal VertexElementUsage ToXNAVertexElementUsage(MojoShader.MOJOSHADER_usage usage)
         {
             switch (usage)
             {
@@ -642,6 +642,34 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        static internal EffectParameter ToXNAParameter (d3dx_parameter parameter)
+		{
+			var elements = new EffectParameterCollection ();
+			for (int i=0; i<parameter.element_count; i++) {
+				elements.Add (ToXNAParameter (parameter.member_handles [i]));
+			}
+			var members = new EffectParameterCollection ();
+			for (int i=0; i<parameter.member_count; i++) {
+				members.Add (ToXNAParameter (parameter.member_handles [i]));
+			}
+			var annotations = new EffectAnnotationCollection ();
+			for (int i=0; i<parameter.annotation_count; i++) {
+				annotations.Add (new EffectAnnotation (ToXNAParameter (parameter.annotation_handles [i])));
+        	}
+
+        	return new EffectParameter(
+        		ToXNAParameterClass(parameter.class_),
+        		ToXNAParameterType(parameter.type),
+        		parameter.name,
+        		(int)parameter.rows,
+        		(int)parameter.columns,
+        		parameter.semantic,
+        		annotations,
+        		elements,
+        		members,
+        		parameter.data);
+        }
+
         internal static int GetShaderIndex(DXEffectObject.STATE_CLASS type, d3dx_state[] states)
         {
             foreach (var state in states)
@@ -665,11 +693,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public d3dx_technique[] Techniques { get; private set; }
 
-        public List<DXShader> Shaders { get; private set; }
+        public List<DXShaderData> Shaders { get; private set; }
 
-        private const string Header = "MGFX";
-
-        private const int Version = 2;
+        public List<DXConstantBufferData> ConstantBuffers { get; private set; }
 	}
 }
 

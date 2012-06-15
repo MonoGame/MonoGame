@@ -6,7 +6,13 @@ namespace Microsoft.Xna.Framework.Graphics
 {
 	public class MojoShader
     {
-        const string mojoshader_dll = "libmojoshader_32.dll";
+#if IPHONE
+		const string mojoshader_dll = "__Internal";
+#elif ANDROID
+		const string mojoshader_dll = "libmojoshader.so";
+#else
+		const string mojoshader_dll = "libmojoshader.dll";
+#endif
 
 		public partial class NativeConstants {
 		    
