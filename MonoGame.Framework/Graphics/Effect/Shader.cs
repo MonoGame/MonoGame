@@ -7,10 +7,10 @@ namespace Microsoft.Xna.Framework.Graphics
 	internal partial class Shader
 	{
 
-        /// <summary>
-        /// A hash value which can be used to compare shaders.
-        /// </summary>
-        public int HashKey { get; protected set; }
+		/// <summary>
+		/// A hash value which can be used to compare shaders.
+		/// </summary>
+		public int HashKey { get; protected set; }
 
 	}
 }

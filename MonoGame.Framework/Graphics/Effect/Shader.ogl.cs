@@ -20,51 +20,51 @@ namespace Microsoft.Xna.Framework.Graphics
 #if OPENGL
 		public ShaderType ShaderType { get; protected set; }
 
-        public int ShaderHandle;
+		public int ShaderHandle;
 
 #if DEBUG
-        // We only keep around the GLSL code for debugging.
-        private string _glslCode;
+		// We only keep around the GLSL code for debugging.
+		private string _glslCode;
 #endif
 
-        protected struct Attribute
-        {
-            public VertexElementUsage usage;
-            public int index;
-            public string name;
-            public short format;
+		protected struct Attribute
+		{
+			public VertexElementUsage usage;
+			public int index;
+			public string name;
+			public short format;
 
 			public Attribute(VertexElementUsage usage_,
-			                 int index_,
-			                 string name_,
-			                 short format_)
+							 int index_,
+							 string name_,
+							 short format_)
 			{
 				usage = usage_;
 				index = index_;
 				name = name_;
 				format = format_;
 			}
-        }
+		}
 
-        protected Attribute[] _attributes;
+		protected Attribute[] _attributes;
 		
 		protected enum SamplerType
-        {
-            Sampler2D,
-            SamplerCube,
-            SamplerVolume,
-        }
+		{
+			Sampler2D,
+			SamplerCube,
+			SamplerVolume,
+		}
 
-        protected struct Sampler
-        {
-            public SamplerType type;
-            public int index;
-            public int parameter;
+		protected struct Sampler
+		{
+			public SamplerType type;
+			public int index;
+			public int parameter;
 
-            public string name;
-        }
+			public string name;
+		}
 
-        protected Sampler[] _samplers;
+		protected Sampler[] _samplers;
 
 		protected int[] _cbuffers;
 
@@ -76,7 +76,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			{
 				ShaderHandle = GL.CreateShader (ShaderType);
 #if GLES
-            	GL.ShaderSource(ShaderHandle, 1, new string[] { glslCode }, (int[])null);
+				GL.ShaderSource(ShaderHandle, 1, new string[] { glslCode }, (int[])null);
 #else
 				GL.ShaderSource (ShaderHandle, glslCode);
 #endif
@@ -89,21 +89,21 @@ namespace Microsoft.Xna.Framework.Graphics
 
 				var compiled = 0;
 #if GLES
-                GL.GetShader(ShaderHandle, ShaderParameter.CompileStatus, ref compiled);
+				GL.GetShader(ShaderHandle, ShaderParameter.CompileStatus, ref compiled);
 #else
 				GL.GetShader (ShaderHandle, ShaderParameter.CompileStatus, out compiled);
 #endif
 				if (compiled == (int)All.False) {
 #if GLES
-                    string log = "";
-                    int length = 0;
-                    GL.GetShader(ShaderHandle, ShaderParameter.InfoLogLength, ref length);
-                    if (length > 0)
-                    {
-                        var logBuilder = new StringBuilder(length);
-                        GL.GetShaderInfoLog(ShaderHandle, length, ref length, logBuilder);
-                        log = logBuilder.ToString();
-                    }
+					string log = "";
+					int length = 0;
+					GL.GetShader(ShaderHandle, ShaderParameter.InfoLogLength, ref length);
+					if (length > 0)
+					{
+						var logBuilder = new StringBuilder(length);
+						GL.GetShaderInfoLog(ShaderHandle, length, ref length, logBuilder);
+						log = logBuilder.ToString();
+					}
 #else
 					var log = GL.GetShaderInfoLog (ShaderHandle);
 #endif
@@ -115,46 +115,46 @@ namespace Microsoft.Xna.Framework.Graphics
 			});
 		}
 		
-        public virtual void OnLink(int program) 
-        {
-            if (ShaderType != ShaderType.VertexShader)
-                return;
+		public virtual void OnLink (int program)
+		{
+			if (ShaderType != ShaderType.VertexShader)
+				return;
 
 			// Bind the vertex attributes to the shader program.
 			foreach (var attrb in _attributes) 
-            {
+			{
 				switch (attrb.usage) 
-                {
-                    case VertexElementUsage.Color:
-					    GL.BindAttribLocation(program, GraphicsDevice.attributeColor, attrb.name);
-    					break;
-                    case VertexElementUsage.Position:
-	    				GL.BindAttribLocation(program, GraphicsDevice.attributePosition + attrb.index, attrb.name);
-		    			break;
-                    case VertexElementUsage.TextureCoordinate:
-			    		GL.BindAttribLocation(program, GraphicsDevice.attributeTexCoord + attrb.index, attrb.name);
-				    	break;
-				    case VertexElementUsage.Normal:
-    					GL.BindAttribLocation(program, GraphicsDevice.attributeNormal, attrb.name);
-	    				break;
-                    case VertexElementUsage.BlendIndices:
-					    GL.BindAttribLocation(program, GraphicsDevice.attributeBlendIndicies, attrb.name);
-					    break;
-                    case VertexElementUsage.BlendWeight:
-					    GL.BindAttribLocation(program, GraphicsDevice.attributeBlendWeight, attrb.name);
-					    break;
-				    default:
-					    throw new NotImplementedException();
+				{
+					case VertexElementUsage.Color:
+						GL.BindAttribLocation(program, GraphicsDevice.attributeColor, attrb.name);
+						break;
+					case VertexElementUsage.Position:
+						GL.BindAttribLocation(program, GraphicsDevice.attributePosition + attrb.index, attrb.name);
+						break;
+					case VertexElementUsage.TextureCoordinate:
+						GL.BindAttribLocation(program, GraphicsDevice.attributeTexCoord + attrb.index, attrb.name);
+						break;
+					case VertexElementUsage.Normal:
+						GL.BindAttribLocation(program, GraphicsDevice.attributeNormal, attrb.name);
+						break;
+					case VertexElementUsage.BlendIndices:
+						GL.BindAttribLocation(program, GraphicsDevice.attributeBlendIndicies, attrb.name);
+						break;
+					case VertexElementUsage.BlendWeight:
+						GL.BindAttribLocation(program, GraphicsDevice.attributeBlendWeight, attrb.name);
+						break;
+					default:
+						throw new NotImplementedException();
 				}
 			}
 		}
 
 
-        public virtual void Apply (GraphicsDevice graphicsDevice,
-                            int program, 
-                            EffectParameterCollection parameters,
-		                    ConstantBuffer[] cbuffers)
-		{							        
+		public virtual void Apply (GraphicsDevice graphicsDevice,
+							int program, 
+							EffectParameterCollection parameters,
+							ConstantBuffer[] cbuffers)
+		{									
 			var textures = graphicsDevice.Textures;
 			var samplerStates = graphicsDevice.SamplerStates;
 
@@ -170,7 +170,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 					// TODO: Fix 3D and Volume samplers!
 					if (sampler.type != SamplerType.Sampler2D)
-						throw new NotImplementedException();
+						throw new NotImplementedException ();
 
 					Texture tex = null;
 					if (sampler.parameter >= 0) {
@@ -239,7 +239,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				var posFixupLoc = GL.GetUniformLocation (program, "posFixup"); // TODO: Look this up on link!
 				GL.Uniform4 (posFixupLoc, 1, _posFixup);
 			}
-        }
+		}
 
 #endif // OPENGL
 

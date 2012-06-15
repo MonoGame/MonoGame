@@ -31,7 +31,7 @@ namespace Microsoft.Xna.Framework.Graphics
 	internal class MGFXShader : Shader
 	{
 
-        internal MGFXShader (GraphicsDevice device, BinaryReader reader)
+		internal MGFXShader (GraphicsDevice device, BinaryReader reader)
 		{
 			var isVertexShader = reader.ReadBoolean ();
 
@@ -63,19 +63,19 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if DIRECTX
 
-            var d3dDevice = device._d3dDevice;
-            if (isVertexShader)
-            {
-                _vertexShader = new VertexShader(d3dDevice, shaderBytecode, null);
+			var d3dDevice = device._d3dDevice;
+			if (isVertexShader)
+			{
+				_vertexShader = new VertexShader(d3dDevice, shaderBytecode, null);
 
-                // We need the bytecode later for allocating the
-                // input layout from the vertex declaration.
-                Bytecode = shaderBytecode;
-                
-                HashKey = Effect.ComputeHash(Bytecode);
-            }
-            else
-                _pixelShader = new PixelShader(d3dDevice, shaderBytecode);
+				// We need the bytecode later for allocating the
+				// input layout from the vertex declaration.
+				Bytecode = shaderBytecode;
+				
+				HashKey = Effect.ComputeHash(Bytecode);
+			}
+			else
+				_pixelShader = new PixelShader(d3dDevice, shaderBytecode);
 
 #endif // DIRECTX
 
@@ -91,14 +91,14 @@ namespace Microsoft.Xna.Framework.Graphics
 				_attributes [a].format = reader.ReadInt16 ();
 			}
 
-            
+			
 			Threading.BlockOnUIThread (() =>
 			{
 				SetGLSL (glslCode);
-            });
+			});
 
 #endif // OPENGL
-        }
+		}
 	}
 }
 
