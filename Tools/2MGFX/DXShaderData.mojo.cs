@@ -187,15 +187,14 @@ namespace Microsoft.Xna.Framework.Graphics
 										 List<DXEffectObject.d3dx_parameter> parameters)
 		{
 			for (int i=0; i<_samplers.Length; i++) {
-				var sampler = _samplers [i];
 				DXEffectObject.d3dx_parameter param;
-				if (samplers.TryGetValue (sampler.parameterName, out param)) {
+				if (samplers.TryGetValue (_samplers[i].parameterName, out param)) {
 					var samplerState = (DXEffectObject.d3dx_sampler)param.data;
 					if (samplerState != null && samplerState.state_count > 0) {
 						var textureName = samplerState.states [0].parameter.name;
 						var index = parameters.FindIndex (e => e.name == textureName);
 						if (index != -1)
-							sampler.parameter = index;
+							_samplers[i].parameter = index;
 					}
 				}
 			}
