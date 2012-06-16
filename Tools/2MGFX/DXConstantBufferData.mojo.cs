@@ -8,33 +8,33 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     internal partial class DXConstantBufferData
     {
-        public DXConstantBufferData(string name,
+        public DXConstantBufferData (string name,
                                 MojoShader.MOJOSHADER_symbolRegisterSet set, 
                                 MojoShader.MOJOSHADER_symbol[] symbols)
-        {
-            Name = name ?? string.Empty;
+		{
+			Name = name ?? string.Empty;
 
-            ParameterIndex = new List<int>();
-            ParameterOffset = new List<int>();
-            Parameters = new List<DXEffectObject.d3dx_parameter>();
+			ParameterIndex = new List<int> ();
+			ParameterOffset = new List<int> ();
+			Parameters = new List<DXEffectObject.d3dx_parameter> ();
 
-            int minRegister = short.MaxValue;
-            int maxRegister = 0;
+			int minRegister = short.MaxValue;
+			int maxRegister = 0;
 
-            var registerSize = (set == MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_BOOL ? 1 : 4 ) * 4;
+			var registerSize = (set == MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_BOOL ? 1 : 4) * 4;
 
-            foreach (var symbol in symbols)
-            {
-                if (symbol.register_set != set)
-                    continue;
+			foreach (var symbol in symbols) {
+				if (symbol.register_set != set)
+					continue;
 
-                // Create the parameter.
-                var parm = GetParameterFromSymbol(symbol);
+				// Create the parameter.
+				var parm = GetParameterFromSymbol (symbol);
 
-                var offset = (int)symbol.register_index * registerSize;
-                parm.bufferOffset = offset;
+				var offset = (int)symbol.register_index * registerSize;
+				parm.bufferOffset = offset;
 
-                Parameters.Add(parm);
+				ParameterIndex.Add (Parameters.Count);
+				Parameters.Add (parm);
                 ParameterOffset.Add(offset);
 
                 minRegister = Math.Min(minRegister, (int)symbol.register_index);

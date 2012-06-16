@@ -34,8 +34,9 @@ namespace Microsoft.Xna.Framework.Graphics
 				if (param.type > D3DXPARAMETER_TYPE.TEXTURECUBE) {
 					// Store the samplers so we can fix up the shaders.
 					if (param.type >= D3DXPARAMETER_TYPE.SAMPLER &&
-						param.type <= D3DXPARAMETER_TYPE.SAMPLERCUBE)
+						param.type <= D3DXPARAMETER_TYPE.SAMPLERCUBE) {
 						samplerNameLookup.Add (param.name, param);
+					}
 
 					// These extended types we do not
 					// store as parameters!
@@ -46,11 +47,20 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 			effect.Parameters = parameters.ToArray ();
 
-			// Fix up the samplers and constant buffers.
+			// Fix up the samplers
 			foreach (var shader in effect.Shaders) {
 				shader.SetSamplerParameters (samplerNameLookup, parameters);
-			//	shader.CreateConstantBuffer(parameters, effect.ConstantBuffers);
 
+				//	shader.CreateConstantBuffer(parameters, effect.ConstantBuffers);
+			}
+
+			//Fix the shader constant buffers to point to global effect parameters
+			foreach (var buffer in effect.ConstantBuffers) {
+				for (int i=0; i<buffer.Parameters.Count; i++) {
+					int newIndex = parameters.FindIndex (e => e.name == buffer.Parameters [i].name);
+					buffer.ParameterIndex [i] = newIndex;
+					buffer.Parameters [i] = parameters [newIndex];
+				}
 			}
 
 			return effect;
@@ -404,10 +414,45 @@ namespace Microsoft.Xna.Framework.Graphics
 			} else {
 				switch (param.class_) {
 				case D3DXPARAMETER_CLASS.SCALAR:
+					switch (param.type) {
+					case D3DXPARAMETER_TYPE.INT:
+						param.data = BitConverter.ToInt32 (data, 0);
+						break;
+					case D3DXPARAMETER_TYPE.BOOL:
+						param.data = BitConverter.ToBoolean (data, 0);
+						break;
+					case D3DXPARAMETER_TYPE.FLOAT:
+						param.data = BitConverter.ToSingle (data, 0);
+						break;
+					default:
+						throw new NotImplementedException ();
+					}
+					break;
 				case D3DXPARAMETER_CLASS.VECTOR:
 				case D3DXPARAMETER_CLASS.MATRIX_ROWS:
 				case D3DXPARAMETER_CLASS.MATRIX_COLUMNS:
-					param.data = data;
+					switch (param.type) {
+					case D3DXPARAMETER_TYPE.INT:
+						param.data = new int[param.rows * param.columns];
+						for (int i=0; i<((int[])param.data).Length; i++) {
+							((int[])param.data) [i] = BitConverter.ToInt32 (data, i * 4);
+						}
+						break;
+					case D3DXPARAMETER_TYPE.BOOL:
+						param.data = new bool[param.rows * param.columns];
+						for (int i=0; i<((bool[])param.data).Length; i++) {
+							((bool[])param.data) [i] = BitConverter.ToBoolean (data, i * 4);
+						}
+						break;
+					case D3DXPARAMETER_TYPE.FLOAT:
+						param.data = new float[param.rows * param.columns];
+						for (int i=0; i<((float[])param.data).Length; i++) {
+							((float[])param.data) [i] = BitConverter.ToSingle (data, i * 4);
+						}
+						break;
+					default:
+						throw new NotImplementedException ();
+					}
 					break;
 				
 				case D3DXPARAMETER_CLASS.STRUCT:
@@ -447,6 +492,8 @@ namespace Microsoft.Xna.Framework.Graphics
 					}
 					
 					break;
+				default:
+					throw new NotImplementedException ();
 				}
 			}
 		}
@@ -499,27 +546,25 @@ namespace Microsoft.Xna.Framework.Graphics
 			return ret;
 		}
 
-		private d3dx_state parse_state(BinaryReader reader)
+		private d3dx_state parse_state (BinaryReader reader)
 		{
-			var ret = new d3dx_state();
-			ret.parameter = new d3dx_parameter();
+			var ret = new d3dx_state ();
+			ret.parameter = new d3dx_parameter ();
 
 			ret.type = STATE_TYPE.CONSTANT;
-			ret.operation = reader.ReadUInt32();
-			ret.index = reader.ReadUInt32();
+			ret.operation = reader.ReadUInt32 ();
+			ret.index = reader.ReadUInt32 ();
 
-			var typedefOffset = reader.ReadInt32();
-			parse_effect_typedef(reader, typedefOffset, ret.parameter, null, 0);
+			var typedefOffset = reader.ReadInt32 ();
+			parse_effect_typedef (reader, typedefOffset, ret.parameter, null, 0);
 
-			var valueOffset = reader.ReadInt32();
-			parse_init_value(reader, valueOffset, ret.parameter);
+			var valueOffset = reader.ReadInt32 ();
+			parse_init_value (reader, valueOffset, ret.parameter);
 
-			var operation = state_table[ret.operation];
-			if (operation.class_ == STATE_CLASS.RENDERSTATE) 
-			{
+			var operation = state_table [ret.operation];
+			if (operation.class_ == STATE_CLASS.RENDERSTATE) {
 				//parse the render parameter
-				switch (operation.op) 
-				{
+				switch (operation.op) {
 				case (uint)D3DRENDERSTATETYPE.STENCILENABLE:
 				case (uint)D3DRENDERSTATETYPE.ALPHABLENDENABLE:
 				case (uint)D3DRENDERSTATETYPE.SCISSORTESTENABLE:
@@ -529,84 +574,153 @@ namespace Microsoft.Xna.Framework.Graphics
 					ret.parameter.data = (ColorWriteChannels)BitConverter.ToInt32 ((byte[])ret.parameter.data, 0);
 					break;
 				case (uint)D3DRENDERSTATETYPE.BLENDOP:
-					switch (BitConverter.ToInt32((byte[])ret.parameter.data, 0)) 
-					{
-					case 1: ret.parameter.data = BlendFunction.Add; break;
-					case 2: ret.parameter.data = BlendFunction.Subtract; break;
-					case 3: ret.parameter.data = BlendFunction.ReverseSubtract; break;
-					case 4: ret.parameter.data = BlendFunction.Min; break;
-					case 5: ret.parameter.data = BlendFunction.Max; break;
+					switch (BitConverter.ToInt32 ((byte[])ret.parameter.data, 0)) {
+					case 1:
+						ret.parameter.data = BlendFunction.Add;
+						break;
+					case 2:
+						ret.parameter.data = BlendFunction.Subtract;
+						break;
+					case 3:
+						ret.parameter.data = BlendFunction.ReverseSubtract;
+						break;
+					case 4:
+						ret.parameter.data = BlendFunction.Min;
+						break;
+					case 5:
+						ret.parameter.data = BlendFunction.Max;
+						break;
 					default:
-						throw new NotSupportedException();
+						throw new NotSupportedException ();
 					}
 					break;
 				case (uint)D3DRENDERSTATETYPE.SRCBLEND:
 				case (uint)D3DRENDERSTATETYPE.DESTBLEND:
-					switch (BitConverter.ToInt32((byte[])ret.parameter.data, 0)) 
-					{
-					case 1: ret.parameter.data = Blend.Zero; break;
-					case 2: ret.parameter.data = Blend.One; break;
-					case 3: ret.parameter.data = Blend.SourceColor; break;
-					case 4: ret.parameter.data = Blend.InverseSourceColor; break;
-					case 5: ret.parameter.data = Blend.SourceAlpha; break;
-					case 6: ret.parameter.data = Blend.InverseSourceAlpha; break;
-					case 7: ret.parameter.data = Blend.DestinationAlpha; break;
-					case 8: ret.parameter.data = Blend.InverseDestinationAlpha; break;
-					case 9: ret.parameter.data = Blend.DestinationColor; break;
-					case 10: ret.parameter.data = Blend.InverseDestinationColor; break;
-					case 11: ret.parameter.data = Blend.SourceAlphaSaturation; break;
-					case 14: ret.parameter.data = Blend.BlendFactor; break;
-					case 15: ret.parameter.data = Blend.InverseDestinationAlpha; break;
+					switch (BitConverter.ToInt32 ((byte[])ret.parameter.data, 0)) {
+					case 1:
+						ret.parameter.data = Blend.Zero;
+						break;
+					case 2:
+						ret.parameter.data = Blend.One;
+						break;
+					case 3:
+						ret.parameter.data = Blend.SourceColor;
+						break;
+					case 4:
+						ret.parameter.data = Blend.InverseSourceColor;
+						break;
+					case 5:
+						ret.parameter.data = Blend.SourceAlpha;
+						break;
+					case 6:
+						ret.parameter.data = Blend.InverseSourceAlpha;
+						break;
+					case 7:
+						ret.parameter.data = Blend.DestinationAlpha;
+						break;
+					case 8:
+						ret.parameter.data = Blend.InverseDestinationAlpha;
+						break;
+					case 9:
+						ret.parameter.data = Blend.DestinationColor;
+						break;
+					case 10:
+						ret.parameter.data = Blend.InverseDestinationColor;
+						break;
+					case 11:
+						ret.parameter.data = Blend.SourceAlphaSaturation;
+						break;
+					case 14:
+						ret.parameter.data = Blend.BlendFactor;
+						break;
+					case 15:
+						ret.parameter.data = Blend.InverseDestinationAlpha;
+						break;
 					default:
-						throw new NotSupportedException();
+						throw new NotSupportedException ();
 					}
 					break;
 				case (uint)D3DRENDERSTATETYPE.CULLMODE:
-					switch (BitConverter.ToInt32 ((byte[])ret.parameter.data, 0)) 
-					{
-					case 1: ret.parameter.data = CullMode.None; break;
-					case 2: ret.parameter.data = CullMode.CullClockwiseFace; break;
-					case 3: ret.parameter.data = CullMode.CullCounterClockwiseFace; break;
+					switch (BitConverter.ToInt32 ((byte[])ret.parameter.data, 0)) {
+					case 1:
+						ret.parameter.data = CullMode.None;
+						break;
+					case 2:
+						ret.parameter.data = CullMode.CullClockwiseFace;
+						break;
+					case 3:
+						ret.parameter.data = CullMode.CullCounterClockwiseFace;
+						break;
 					default:
-						throw new NotSupportedException();
+						throw new NotSupportedException ();
 					}
 					break;
 				case (uint)D3DRENDERSTATETYPE.STENCILFUNC:
-					switch (BitConverter.ToInt32 ((byte[])ret.parameter.data, 0)) 
-					{
-					case 1: ret.parameter.data = CompareFunction.Never; break;
-					case 2: ret.parameter.data = CompareFunction.Less; break;
-					case 3: ret.parameter.data = CompareFunction.Equal; break;
-					case 4: ret.parameter.data = CompareFunction.LessEqual; break;
-					case 5: ret.parameter.data = CompareFunction.Greater; break;
-					case 6: ret.parameter.data = CompareFunction.NotEqual; break;
-					case 7: ret.parameter.data = CompareFunction.GreaterEqual; break;
-					case 8: ret.parameter.data = CompareFunction.Always; break;
+					switch (BitConverter.ToInt32 ((byte[])ret.parameter.data, 0)) {
+					case 1:
+						ret.parameter.data = CompareFunction.Never;
+						break;
+					case 2:
+						ret.parameter.data = CompareFunction.Less;
+						break;
+					case 3:
+						ret.parameter.data = CompareFunction.Equal;
+						break;
+					case 4:
+						ret.parameter.data = CompareFunction.LessEqual;
+						break;
+					case 5:
+						ret.parameter.data = CompareFunction.Greater;
+						break;
+					case 6:
+						ret.parameter.data = CompareFunction.NotEqual;
+						break;
+					case 7:
+						ret.parameter.data = CompareFunction.GreaterEqual;
+						break;
+					case 8:
+						ret.parameter.data = CompareFunction.Always;
+						break;
 					default:
-						throw new NotSupportedException();
+						throw new NotSupportedException ();
 					}
 					break;
 				case (uint)D3DRENDERSTATETYPE.STENCILFAIL:
 				case (uint)D3DRENDERSTATETYPE.STENCILPASS:
-					switch (BitConverter.ToInt32 ((byte[])ret.parameter.data, 0)) 
-					{
-					case 1: ret.parameter.data = StencilOperation.Keep; break;
-					case 2: ret.parameter.data = StencilOperation.Zero; break;
-					case 3: ret.parameter.data = StencilOperation.Replace; break;
-					case 4: ret.parameter.data = StencilOperation.IncrementSaturation; break;
-					case 5: ret.parameter.data = StencilOperation.DecrementSaturation; break;
-					case 6: ret.parameter.data = StencilOperation.Invert; break;
-					case 7: ret.parameter.data = StencilOperation.Increment; break;
-					case 8: ret.parameter.data = StencilOperation.Decrement; break;
+					switch (BitConverter.ToInt32 ((byte[])ret.parameter.data, 0)) {
+					case 1:
+						ret.parameter.data = StencilOperation.Keep;
+						break;
+					case 2:
+						ret.parameter.data = StencilOperation.Zero;
+						break;
+					case 3:
+						ret.parameter.data = StencilOperation.Replace;
+						break;
+					case 4:
+						ret.parameter.data = StencilOperation.IncrementSaturation;
+						break;
+					case 5:
+						ret.parameter.data = StencilOperation.DecrementSaturation;
+						break;
+					case 6:
+						ret.parameter.data = StencilOperation.Invert;
+						break;
+					case 7:
+						ret.parameter.data = StencilOperation.Increment;
+						break;
+					case 8:
+						ret.parameter.data = StencilOperation.Decrement;
+						break;
 					default:
-						throw new NotSupportedException();
+						throw new NotSupportedException ();
 					}
 					break;
 				case (uint)D3DRENDERSTATETYPE.STENCILREF:
 					ret.parameter.data = BitConverter.ToInt32 ((byte[])ret.parameter.data, 0);
 					break;
 				default:
-					throw new NotImplementedException()
+					throw new NotImplementedException ();
 				}
 			}
 						
