@@ -168,8 +168,9 @@ namespace Microsoft.Xna.Framework.Graphics
 					var loc = GL.GetUniformLocation (program, sampler.name);
 					GL.Uniform1 (loc, sampler.index);
 
-					// TODO: Fix 3D and Volume samplers!
-					if (sampler.type != SamplerType.Sampler2D)
+					// TODO: Fix Volume samplers!
+					// (are they really broken?)
+					if (sampler.type == SamplerType.SamplerVolume)
 						throw new NotImplementedException ();
 
 					Texture tex = null;
