@@ -80,8 +80,6 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif // DIRECTX
 
 #if OPENGL
-			var glslCode = System.Text.Encoding.ASCII.GetString (shaderBytecode);
-
 			var attributeCount = (int)reader.ReadByte ();
 			_attributes = new Attribute[attributeCount];
 			for (var a = 0; a < attributeCount; a++) {
@@ -91,12 +89,8 @@ namespace Microsoft.Xna.Framework.Graphics
 				_attributes [a].format = reader.ReadInt16 ();
 			}
 
-			
-			Threading.BlockOnUIThread (() =>
-			{
-				SetGLSL (glslCode);
-			});
-
+			var glslCode = System.Text.Encoding.ASCII.GetString (shaderBytecode);
+			SetGLSL (glslCode);
 #endif // OPENGL
 		}
 	}
