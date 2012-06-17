@@ -2,7 +2,7 @@ SetCompressor /SOLID /FINAL lzma
 
 !define FrameworkPath "C:\Sandbox\MonoGame\"
 !define VERSION "2.5"
-!define REVISION "0.0"
+!define REVISION "1.0"
 !define INSTALLERFILENAME "MonoGame"
 !define APPNAME "MonoGame"
 
