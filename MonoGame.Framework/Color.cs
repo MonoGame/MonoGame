@@ -29,10 +29,17 @@ using System;
 
 namespace Microsoft.Xna.Framework
 {
-	[Serializable]
+    #if WINRT
+    [DataContract]
+    #else
+    [Serializable]
+    #endif
     public struct Color : IEquatable<Color>
     {
 		// ARGB
+#if WINRT
+        [DataMember]
+#endif
         private uint _packedValue;
 		
         private Color(uint packedValue)

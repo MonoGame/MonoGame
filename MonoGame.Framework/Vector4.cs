@@ -30,7 +30,11 @@ using System.Text;
 
 namespace Microsoft.Xna.Framework
 {
+    #if WINRT
+    [DataContract]
+    #else
     [Serializable]
+    #endif
     public struct Vector4 : IEquatable<Vector4>
     {
         #region Private Fields
@@ -46,10 +50,21 @@ namespace Microsoft.Xna.Framework
 
 
         #region Public Fields
-
+#if WINRT
+        [DataMember]
+#endif
         public float X;
+#if WINRT
+        [DataMember]
+#endif
         public float Y;
+#if WINRT
+        [DataMember]
+#endif
         public float Z;
+#if WINRT
+        [DataMember]
+#endif
         public float W;
 
         #endregion Public Fields
