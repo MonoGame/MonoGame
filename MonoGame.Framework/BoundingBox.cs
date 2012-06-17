@@ -34,7 +34,11 @@ using System.ComponentModel;
 
 namespace Microsoft.Xna.Framework
 {
-	[Serializable]
+    #if WINRT
+    [DataContract]
+    #else
+    [Serializable]
+    #endif
     public struct BoundingBox : IEquatable<BoundingBox>
     {
 
