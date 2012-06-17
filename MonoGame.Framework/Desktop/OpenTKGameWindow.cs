@@ -181,10 +181,11 @@ namespace Microsoft.Xna.Framework
                                      clientBounds.Y, clientBounds.Width, clientBounds.Height);
 
                 updateClientBounds = false;
+                if (window.WindowState != windowState)
+                    window.WindowState = windowState;
             }
 
-            if (window.WindowState != windowState)
-                window.WindowState = windowState;
+
         }
 
         private void OnUpdateFrame(object sender, FrameEventArgs e)

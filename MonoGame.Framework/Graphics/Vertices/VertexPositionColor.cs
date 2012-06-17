@@ -2,9 +2,20 @@ using System;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
+    #if WINRT
+    [DataContract]
+    #else
+    [Serializable]
+    #endif
 	public struct VertexPositionColor : IVertexType
 	{
+#if WINRT
+        [DataMember]
+#endif
 		public Vector3 Position;
+#if WINRT
+        [DataMember]
+#endif
 		public VertexElementColor Color;
 		public static readonly VertexDeclaration VertexDeclaration;
 

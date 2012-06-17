@@ -2,11 +2,28 @@ using System;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
+    #if WINRT
+    [DataContract]
+    #else
+    [Serializable]
+    #endif
 	public struct VertexElementColor
 	{
+#if WINRT
+        [DataMember]
+#endif
 		byte R;
+#if WINRT
+        [DataMember]
+#endif
 		byte G;
+#if WINRT
+        [DataMember]
+#endif
 		byte B;
+#if WINRT
+        [DataMember]
+#endif
 		byte A;
 
 		public VertexElementColor (Color color)
