@@ -28,6 +28,9 @@ SOFTWARE.
 using System;
 using System.Text;
 using System.Globalization;
+#if WINRT
+using System.Runtime.Serialization;
+#endif
 
 namespace Microsoft.Xna.Framework
 {

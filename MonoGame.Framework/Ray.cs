@@ -27,6 +27,9 @@ SOFTWARE.
 
 using System;
 using System.ComponentModel;
+#if WINRT
+using System.Runtime.Serialization;
+#endif
 
 namespace Microsoft.Xna.Framework
 {
