@@ -29,11 +29,28 @@ using System;
 
 namespace Microsoft.Xna.Framework
 {
+    #if WINRT
+    [DataContract]
+    #else
+    [Serializable]
+    #endif
     public struct Quaternion : IEquatable<Quaternion>
     {
+#if WINRT
+        [DataMember]
+#endif
         public float X;
+#if WINRT
+        [DataMember]
+#endif
         public float Y;
+#if WINRT
+        [DataMember]
+#endif
         public float Z;
+#if WINRT
+        [DataMember]
+#endif
         public float W;
         static Quaternion identity = new Quaternion(0, 0, 0, 1);
 
