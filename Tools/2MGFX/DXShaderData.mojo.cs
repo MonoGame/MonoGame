@@ -27,6 +27,8 @@ namespace Microsoft.Xna.Framework.Graphics
 				IntPtr.Zero,
 				0,
 				IntPtr.Zero,
+				0,
+				IntPtr.Zero,
 				IntPtr.Zero,
 				IntPtr.Zero);
 
