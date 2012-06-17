@@ -107,8 +107,11 @@ namespace Microsoft.Xna.Framework
 
             InitializeMainWindow();
 
-            // We set the current directory to the ResourcePath on Mac
-            Directory.SetCurrentDirectory(NSBundle.MainBundle.ResourcePath);
+            var path = NSBundle.MainBundle.ResourcePath;
+            if (Directory.Exists(path)) {
+                // We set the current directory to the ResourcePath on Mac
+                Directory.SetCurrentDirectory(NSBundle.MainBundle.ResourcePath);
+            }
         }
 
         private void InitializeMainWindow()
