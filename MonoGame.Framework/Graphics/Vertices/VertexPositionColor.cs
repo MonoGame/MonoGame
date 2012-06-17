@@ -2,6 +2,7 @@ using System;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
+	[Serializable]
 	public struct VertexPositionColor : IVertexType
 	{
 		public Vector3 Position;

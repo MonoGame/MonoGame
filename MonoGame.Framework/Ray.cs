@@ -30,6 +30,7 @@ using System.ComponentModel;
 
 namespace Microsoft.Xna.Framework
 {
+    [Serializable]
     public struct Ray : IEquatable<Ray>
     {
         #region Public Fields

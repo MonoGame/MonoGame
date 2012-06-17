@@ -34,6 +34,7 @@ using System.ComponentModel;
 
 namespace Microsoft.Xna.Framework
 {
+	[Serializable]
     public struct BoundingBox : IEquatable<BoundingBox>
     {
 

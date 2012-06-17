@@ -29,6 +29,7 @@ using System;
 
 namespace Microsoft.Xna.Framework
 {
+	[Serializable]
     public struct Quaternion : IEquatable<Quaternion>
     {
         public float X;

@@ -30,6 +30,7 @@ using System.Text;
 
 namespace Microsoft.Xna.Framework
 {
+    [Serializable]
     public struct Vector4 : IEquatable<Vector4>
     {
         #region Private Fields

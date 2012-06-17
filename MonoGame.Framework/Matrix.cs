@@ -29,6 +29,7 @@ using System;
 
 namespace Microsoft.Xna.Framework
 {
+    [Serializable]
     public struct Matrix : IEquatable<Matrix>
     {
         #region Public Constructors

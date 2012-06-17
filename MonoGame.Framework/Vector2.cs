@@ -31,6 +31,7 @@ using System.Globalization;
 
 namespace Microsoft.Xna.Framework
 {
+    [Serializable]
     public struct Vector2 : IEquatable<Vector2>
     {
         #region Private Fields
