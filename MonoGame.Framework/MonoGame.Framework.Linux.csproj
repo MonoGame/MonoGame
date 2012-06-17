@@ -401,10 +401,6 @@
       <Project>{AE483C29-042E-4226-BA52-D247CE7676DA}</Project>
       <Name>Lidgren.Network.Linux</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\opentk\Source\OpenTK\OpenTK.csproj">
-      <Project>{A37A7E14-0000-0000-0000-000000000000}</Project>
-      <Name>OpenTK</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect.ogl.mgfxo" />
