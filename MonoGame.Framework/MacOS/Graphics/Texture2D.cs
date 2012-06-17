@@ -610,10 +610,10 @@ namespace Microsoft.Xna.Framework.Graphics
 				{
 					final[i] = (uint)
 					(
-						colors[i].R << 24 |
-						colors[i].G << 16 |
-						colors[i].B << 8 |
-						colors[i].A
+						colors[i].A << 24 |
+						colors[i].B << 16 |
+						colors[i].G << 8 |
+						colors[i].R
 					);
 				}
 			}
