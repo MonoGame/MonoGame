@@ -2,7 +2,7 @@ SetCompressor /SOLID /FINAL lzma
 
 !define FrameworkPath "C:\Sandbox\MonoGame\"
 !define VERSION "2.5"
-!define REVISION "0.0"
+!define REVISION "1.0"
 !define INSTALLERFILENAME "MonoGame"
 !define APPNAME "MonoGame"
 
@@ -13,7 +13,7 @@ SetCompressor /SOLID /FINAL lzma
 !include "InstallOptions.nsh"
 
 Name '${APPNAME} ${VERSION} for MonoDevelop'
-OutFile '${INSTALLERFILENAME}-${VERSION}.exe'
+OutFile '${INSTALLERFILENAME}-${VERSION}.${REVISION}.exe'
 InstallDir '$PROGRAMFILES64\${APPNAME}'
 VIProductVersion "${VERSION}.${REVISION}"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "${APPNAME} for MonoDevelop"
@@ -124,7 +124,7 @@ Section "Visual Studio 2010 Templates"
     SetOutPath "$DOCUMENTS\Visual Studio 2010\Templates\ProjectTemplates\Visual C#\MonoGame"
 
     ; install the Templates for MonoDevelop
-    File /r '..\..\ProjectTemplates\VisualStudio2010.MonoGame.${VERSION}\*.*'
+    File /r '..\..\ProjectTemplates\VisualStudio2010.MonoGame.${VERSION}\*.zip'
     GOTO EndTemplates
   CannotInstallTemplates:
   

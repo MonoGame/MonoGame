@@ -258,10 +258,26 @@ namespace Microsoft.Xna.Framework.Graphics
         public static Texture2D FromFile(GraphicsDevice graphicsDevice, string filename, int width, int height)
         {
 			UIImage image;
-			if(filename.Contains(".pdf"))
+
+			if (filename.Contains(".pdf"))
+			{
 				image = Extender.FromPdf(filename,width,height);
+			} 
 			else
-				image = UIImage.FromBundle(filename);
+			{
+				// If we are loading graphics from the Content folder then we can take advantage of the FromBundle methods ability
+				// to automatically cope with @2x graphics for high resolution devices.  If we are loading from somewhere else (e.g.
+				// the documents folder for our app) then FromBundle will not work and so we must call FromFile.
+				if (filename.StartsWith("Content/", StringComparison.OrdinalIgnoreCase) == true) 
+				{
+					image = UIImage.FromBundle(filename);
+				}
+				else 
+				{
+					image = UIImage.FromFile(filename);
+				}
+			}
+			
 			if (image == null)
 			{
 				throw new ContentLoadException("Error loading file: " + filename);
@@ -278,6 +294,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				var small = image.Scale (new SizeF (width, height));
 				theTexture = new ESImage(small, graphicsDevice.PreferedFilter);
 			}
+			
 			Texture2D result = new Texture2D(theTexture);
 			// result.Name = Path.GetFileNameWithoutExtension(filename);
 			result.Name = filename;
@@ -597,6 +614,91 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.TexParameter(All.Texture2D, All.TextureWrapT,
                             (float)TextureWrapMode.Repeat);
         }
+		
+		private CGImage CreateRGBImageFromBufferData(int mByteWidth, int mWidth, int mHeight)
+		{
+			CGColorSpace cgColorSpace = CGColorSpace.CreateDeviceRGB();
+
+			CGImageAlphaInfo alphaInfo = (CGImageAlphaInfo)((int)CGImageAlphaInfo.PremultipliedLast | (int)CGBitmapFlags.ByteOrderDefault);
+
+			CGBitmapContext bitmap;
+			byte[] mData = GetImageData(0);
+			
+			try 
+			{
+				unsafe 
+				{
+					fixed (byte* ptr = mData) 
+					{
+						bitmap = new CGBitmapContext ((IntPtr)ptr, mWidth, mHeight, 8, mByteWidth, cgColorSpace, alphaInfo);
+					}
+				}
+			} 
+			catch 
+			{
+			}
+
+			CGImage image = bitmap.ToImage ();
+
+			return image;
+		}
+		
+		public void SaveAsJpeg(string filename, int width, int height)
+		{
+			using (FileStream outStream = File.OpenWrite(filename))
+			{
+				SaveAsJpeg(outStream, width, height);
+			}
+		}
+		
+		public void SaveAsJpeg(Stream outStream, int width, int height)
+		{
+			int mByteWidth = width * 4;         // Assume 4 bytes/pixel for now
+			mByteWidth = (mByteWidth + 3) & ~3;    // Align to 4 bytes
+
+			CGImage cgImage = CreateRGBImageFromBufferData (mByteWidth, width, height);
+				
+			using (UIImage uiImage = UIImage.FromImage(cgImage))
+			{
+            	NSData data = uiImage.AsJPEG();
+				WriteNSDataToStream(data, outStream);
+			}
+		}
+
+		public void SaveAsPng(string filename, int width, int height)
+		{
+			using (FileStream outStream = File.OpenWrite(filename))
+			{
+				SaveAsPng(outStream, width, height);
+			}
+		}
+		
+		public void SaveAsPng(Stream outStream, int width, int height)
+		{		
+			int mByteWidth = width * 4;         // Assume 4 bytes/pixel for now
+			mByteWidth = (mByteWidth + 3) & ~3;    // Align to 4 bytes
+
+			CGImage cgImage = CreateRGBImageFromBufferData (mByteWidth, width, height);
+	
+			using (UIImage uiImage = UIImage.FromImage(cgImage))
+			{
+	            NSData data = uiImage.AsPNG();
+				WriteNSDataToStream(data, outStream);
+			}
+		}
+		
+		private void WriteNSDataToStream(NSData data, Stream outStream)
+		{
+			// Ideally we would just call data.AsStream() to get the stream of graphics data, however that throws the exception...
+			// Wrapper for NSMutableData is not supported, call new UnmanagedMemoryStream ((Byte*) mutableData.Bytes, mutableData.Length) instead
+			unsafe 
+			{
+				using (UnmanagedMemoryStream imageStream = new UnmanagedMemoryStream((byte*)data.Bytes, data.Length))
+				{
+					imageStream.CopyTo(outStream);
+				}
+			}
+		}
 	}
 }
 

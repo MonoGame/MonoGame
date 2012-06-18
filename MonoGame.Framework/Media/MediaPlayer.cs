@@ -39,6 +39,11 @@ purpose and non-infringement.
 #endregion License
 
 using System;
+
+#if IPHONE
+using MonoTouch.AudioToolbox;
+#endif
+
 using Microsoft.Xna.Framework.Audio;
 
 ﻿namespace Microsoft.Xna.Framework.Media
@@ -61,6 +66,7 @@ using Microsoft.Xna.Framework.Audio;
 
         public static void Play(Song song)
         {
+        		Stop ();
 			if ( song != null )
 			{
 				_song = song;
@@ -181,7 +187,11 @@ using Microsoft.Xna.Framework.Audio;
         {
             get
             {
+#if IPHONE
+				return !AudioSession.OtherAudioIsPlaying;
+#else
             	return true;
+#endif
 			}
 		}
 
