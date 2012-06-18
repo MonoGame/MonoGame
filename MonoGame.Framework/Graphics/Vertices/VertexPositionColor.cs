@@ -1,4 +1,7 @@
 using System;
+#if WINRT
+using System.Runtime.Serialization;
+#endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -17,6 +20,7 @@ namespace Microsoft.Xna.Framework.Graphics
         [DataMember]
 #endif
 		public VertexElementColor Color;
+
 		public static readonly VertexDeclaration VertexDeclaration;
 
 		public VertexPositionColor (Vector3 position, Color color)

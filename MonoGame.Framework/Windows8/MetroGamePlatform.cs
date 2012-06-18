@@ -81,15 +81,35 @@ namespace Microsoft.Xna.Framework
     class MetroGamePlatform : GamePlatform
     {
 		//private OpenALSoundController soundControllerInstance = null;
+        internal static string LaunchParameters;
 
         public MetroGamePlatform(Game game)
             : base(game)
         {
             MetroGameWindow.Instance.Game = game;
             this.Window = MetroGameWindow.Instance;
+
+            setLaunchParameters();
 			
-			// Setup our OpenALSoundController to handle our SoundBuffer pools
-			//soundControllerInstance = OpenALSoundController.GetInstance;			
+            // Setup our OpenALSoundController to handle our SoundBuffer pools
+            // soundControllerInstance = OpenALSoundController.GetInstance;
+        }
+
+        private void setLaunchParameters()
+        {
+            var arguments = LaunchParameters.Split(' ');
+
+            foreach (var arg in arguments)
+            {
+                if (arg.Contains("="))
+                {
+                    var keyVal = arg.Split('=');
+                    Game.LaunchParameters.Add(keyVal[0], keyVal[1]);
+
+                }
+                else if (arg != string.Empty)
+                    Game.LaunchParameters.Add(arg, string.Empty);
+            }
         }
 
         public override GameRunBehavior DefaultRunBehavior

@@ -31,6 +31,9 @@ SOFTWARE.
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+#if WINRT
+using System.Runtime.Serialization;
+#endif
 
 namespace Microsoft.Xna.Framework
 {
@@ -52,9 +55,7 @@ namespace Microsoft.Xna.Framework
         [DataMember]
 #endif
         public Vector3 Max;
-#if WINRT
-        [DataMember]
-#endif
+
         public const int CornerCount = 8;
 
         #endregion Public Fields
