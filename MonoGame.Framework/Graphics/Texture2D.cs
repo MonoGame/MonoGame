@@ -129,6 +129,16 @@ namespace Microsoft.Xna.Framework.Graphics
             this.format = format;
             this.levelCount = 1;
 
+            if (mipmap)
+            {
+                int size = Math.Max(this.width, this.height);
+                while (size > 1)
+                {
+                    size = size / 2;
+                    this.levelCount++;
+                }
+            }
+
 #if DIRECTX
 
             // TODO: Move this to SetData() if we want to make Immutable textures!
@@ -217,16 +227,6 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
                         this.width, this.height, 0,
                         glFormat, glType, IntPtr.Zero);
-                }
-
-                if (mipmap)
-                {
-                    int size = Math.Max(this.width, this.height);
-                    while (size > 1)
-                    {
-                        size = size / 2;
-                        this.levelCount++;
-                    }
                 }
             });
 #endif
@@ -319,11 +319,18 @@ namespace Microsoft.Xna.Framework.Graphics
 #elif OPENGL
                 GL.BindTexture(TextureTarget.Texture2D, this.glTexture);
 
+#if GLES
                 if (glFormat == (GLPixelFormat)All.CompressedTextureFormats)
                     GL.CompressedTexImage2D(TextureTarget.Texture2D, level, (GLPixelFormat)glInternalFormat, w, h, 0, data.Length - startBytes, dataPtr);
                 else
                     GL.TexImage2D(TextureTarget.Texture2D, level, (int)glInternalFormat, w, h, 0, glFormat, glType, dataPtr);
+#else
+                if (glFormat == (GLPixelFormat)All.CompressedTextureFormats)
+                    GL.CompressedTexImage2D(TextureTarget.Texture2D, level, glInternalFormat, w, h, 0, data.Length - startBytes, dataPtr);
+                else
+                    GL.TexImage2D(TextureTarget.Texture2D, level, glInternalFormat, w, h, 0, glFormat, glType, dataPtr);
 
+#endif // GLES
                 Debug.Assert(GL.GetError() == ErrorCode.NoError);
 
 #endif // OPENGL
