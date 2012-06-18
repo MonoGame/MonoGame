@@ -316,21 +316,20 @@ namespace Microsoft.Xna.Framework.Graphics
 #elif PSS
                 _texture2D.SetPixels(level, data, _texture2D.Format, startIndex, w, x, y, w, h);
 
+
 #elif OPENGL
                 GL.BindTexture(TextureTarget.Texture2D, this.glTexture);
-
-#if GLES
-                if (glFormat == (GLPixelFormat)All.CompressedTextureFormats)
-                    GL.CompressedTexImage2D(TextureTarget.Texture2D, level, (GLPixelFormat)glInternalFormat, w, h, 0, data.Length - startBytes, dataPtr);
-                else
-                    GL.TexImage2D(TextureTarget.Texture2D, level, (int)glInternalFormat, w, h, 0, glFormat, glType, dataPtr);
-#else
                 if (glFormat == (GLPixelFormat)All.CompressedTextureFormats)
                     GL.CompressedTexImage2D(TextureTarget.Texture2D, level, glInternalFormat, w, h, 0, data.Length - startBytes, dataPtr);
                 else
-                    GL.TexImage2D(TextureTarget.Texture2D, level, glInternalFormat, w, h, 0, glFormat, glType, dataPtr);
+                    GL.TexImage2D(TextureTarget.Texture2D, level,
+#if GLES
+                                  (int)glInternalFormat,
+#else
+                                  glInternalFormat,
+#endif
+                                  w, h, 0, glFormat, glType, dataPtr);
 
-#endif // GLES
                 Debug.Assert(GL.GetError() == ErrorCode.NoError);
 
 #endif // OPENGL
