@@ -348,7 +348,7 @@ namespace Microsoft.Xna.Framework
         }
 
         private DateTime _now;
-        private DateTime _lastUpdate = DateTime.Now;
+        private DateTime _lastUpdate = DateTime.UtcNow;
         private readonly GameTime _gameTime = new GameTime();
         private readonly GameTime _fixedTimeStepTime = new GameTime();
         private TimeSpan _totalTime = TimeSpan.Zero;
@@ -357,7 +357,7 @@ namespace Microsoft.Xna.Framework
         {
             bool doDraw = false;
 
-            _now = DateTime.Now;
+            _now = DateTime.UtcNow;
 
             _gameTime.Update(_now - _lastUpdate);
             _lastUpdate = _now;
@@ -398,7 +398,7 @@ namespace Microsoft.Xna.Framework
 
             if (IsFixedTimeStep)
             {
-                var currentTime = (DateTime.Now - _lastUpdate) + _totalTime;
+                var currentTime = (DateTime.UtcNow - _lastUpdate) + _totalTime;
 
                 if (currentTime < TargetElapsedTime)
                 {

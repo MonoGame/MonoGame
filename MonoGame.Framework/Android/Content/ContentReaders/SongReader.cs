@@ -43,7 +43,7 @@ using System;
 using System.IO;
 using System.Linq;
 
-namespace Microsoft.Xna.Framework
+namespace Microsoft.Xna.Framework.Content
 {
 	internal class SongReader
 	{
