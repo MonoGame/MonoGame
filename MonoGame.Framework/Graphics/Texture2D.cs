@@ -320,15 +320,32 @@ namespace Microsoft.Xna.Framework.Graphics
 #elif OPENGL
                 GL.BindTexture(TextureTarget.Texture2D, this.glTexture);
                 if (glFormat == (GLPixelFormat)All.CompressedTextureFormats)
-                    GL.CompressedTexImage2D(TextureTarget.Texture2D, level, glInternalFormat, w, h, 0, data.Length - startBytes, dataPtr);
+                {
+                    if (rect.HasValue)
+                        GL.CompressedTexSubImage2D(TextureTarget.Texture2D, level, x, y, w, h, glInternalFormat, data.Length - startBytes, dataPtr);
+                    else
+                        GL.CompressedTexImage2D(TextureTarget.Texture2D, level, glInternalFormat, w, h, 0, data.Length - startBytes, dataPtr);
+                }
                 else
-                    GL.TexImage2D(TextureTarget.Texture2D, level,
+                {
+                    if (rect.HasValue)
+                    {
+                        GL.TexSubImage2D(TextureTarget.Texture2D, level,
+                                        x, y, w, h,
+                                        glFormat, glType, dataPtr);
+                    }
+                    else
+                    {
+                        GL.TexImage2D(TextureTarget.Texture2D, level,
 #if GLES
                                   (int)glInternalFormat,
 #else
                                   glInternalFormat,
 #endif
                                   w, h, 0, glFormat, glType, dataPtr);
+                    }
+
+                }
 
                 Debug.Assert(GL.GetError() == ErrorCode.NoError);
 
