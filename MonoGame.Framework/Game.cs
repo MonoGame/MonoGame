@@ -331,6 +331,7 @@ namespace Microsoft.Xna.Framework
 
         public void Exit()
         {
+            UnloadContent();
             Platform.Exit();
         }
 
