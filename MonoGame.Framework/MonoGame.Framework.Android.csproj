@@ -190,6 +190,7 @@
     <Compile Include="MathHelper.cs" />
     <Compile Include="Matrix.cs" />
     <Compile Include="Media\MediaPlayer.cs" />
+    <Compile Include="Media\MediaQueue.cs" />
     <Compile Include="Media\MediaSourceType.cs" />
     <Compile Include="Media\MediaState.cs" />
     <Compile Include="Media\Playlist.cs" />

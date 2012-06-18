@@ -120,6 +120,14 @@ namespace Microsoft.Xna.Framework.Graphics
 			generateOpenGLTexture ();
 		}
 		
+		protected override void DoDisposing(EventArgs e)
+		{
+			base.DoDisposing(e);
+			if (texture != null)
+				texture.Dispose();
+			texture = null;
+		}
+
 		private void generateOpenGLTexture ()
 		{
 			// modeled after this

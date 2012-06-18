@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 #if IPHONE
 using OpenTK.Audio.OpenAL;
 using OpenTK;
+using MonoTouch.AudioToolbox;
 #elif MONOMAC
 using MonoMac.OpenAL;
 #endif
@@ -30,6 +31,22 @@ namespace Microsoft.Xna.Framework.Audio
 
 		private OpenALSoundController ()
 		{
+#if IPHONE
+			AudioSession.Initialize();
+
+			// NOTE: iOS 5.1 simulator throws an exception when setting the category
+			// to SoloAmbientSound.  This could be removed if that bug gets fixed.
+			try
+			{
+				if (AudioSession.OtherAudioIsPlaying)
+					AudioSession.Category = AudioSessionCategory.AmbientSound;
+				else
+				{
+					AudioSession.Category = AudioSessionCategory.SoloAmbientSound;
+				}
+			}
+			catch (AudioSessionException) { }
+#endif
 			alcMacOSXMixerOutputRate(PREFERRED_MIX_RATE);
 			_device = Alc.OpenDevice (string.Empty);
 			CheckALError ("Could not open AL device");
@@ -57,6 +74,31 @@ namespace Microsoft.Xna.Framework.Audio
 			for (int x=0; x < MAX_NUMBER_OF_SOURCES; x++) {
 				availableSourcesCollection.Add (allSourcesArray [x]);
 			}
+#if IPHONE
+
+			AudioSession.Interrupted += (sender, e) =>
+			{
+				AudioSession.SetActive(false);
+
+				Alc.MakeContextCurrent(ContextHandle.Zero);
+				Alc.SuspendContext(_context);
+			};
+
+			AudioSession.Resumed += (sender, e) =>
+			{
+				// That is, without this, the code wont work :(
+				// It will fail on the next line of code
+				// Maybe you could ask for an explanation
+				// to someone at xamarin
+				System.Threading.Thread.Sleep(100);
+				
+				AudioSession.SetActive(true);
+				AudioSession.Category = AudioSessionCategory.SoloAmbientSound;
+
+				Alc.MakeContextCurrent(_context);
+				Alc.ProcessContext(_context);
+			};
+#endif
 		}
 
 		public static OpenALSoundController GetInstance {

@@ -52,6 +52,29 @@ namespace MonoDevelop.MonoGame
 			else
 				return base.SupportsFramework (framework);
 		}
+
+		protected override void PopulateSupportFileList (MonoDevelop.Projects.FileCopySet list, ConfigurationSelector solutionConfiguration)
+		{
+			base.PopulateSupportFileList (list, solutionConfiguration);
+
+			//HACK: workaround for MD not local-copying package references
+			foreach (var projectReference in References) {
+				if (projectReference.Package != null && projectReference.Package.Name == "monogame") {
+					if (projectReference.ReferenceType == ReferenceType.Gac) {
+						foreach (var assem in projectReference.Package.Assemblies) {
+							list.Add (assem.Location);
+							var cfg = (MonoGameProjectConfiguration)solutionConfiguration.GetConfiguration (this);
+							if (cfg.DebugMode) {
+								var mdbFile = TargetRuntime.GetAssemblyDebugInfoFile (assem.Location);
+								if (System.IO.File.Exists (mdbFile))
+									list.Add (mdbFile);
+							}
+						}
+					}
+					break;
+				}
+			}
+		}
 	}
 	
 	public class MonoGameProjectBinding : IProjectBinding
