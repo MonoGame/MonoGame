@@ -296,14 +296,17 @@ namespace Microsoft.Xna.Framework.Graphics
             // Setup extensions.
 #if OPENGL
 #if GLES
-			extensions.AddRange(GL.GetString(RenderbufferStorage.Extensions).Split(' '));
+            string[] extstring = GL.GetString(RenderbufferStorage.Extensions).Split(' ');            			
 #else
-			extensions.AddRange(GL.GetString(StringName.Extensions).Split(' '));	
+            string[] extstring = GL.GetString(StringName.Extensions).Split(' ');	
 #endif
-
-			System.Diagnostics.Debug.WriteLine("Supported extensions:");
-			foreach (string extension in extensions)
-				System.Diagnostics.Debug.WriteLine(extension);
+            if (extstring != null)
+            {
+                extensions.AddRange(extstring);
+                System.Diagnostics.Debug.WriteLine("Supported extensions:");
+                foreach (string extension in extensions)
+                    System.Diagnostics.Debug.WriteLine(extension);
+            }
 
 #endif // OPENGL
 

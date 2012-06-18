@@ -1,11 +1,26 @@
 using System;
+#if WINRT
+using System.Runtime.Serialization;
+#endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
+    #if WINRT
+    [DataContract]
+    #else
+    [Serializable]
+    #endif
 	public struct VertexPositionColor : IVertexType
 	{
+#if WINRT
+        [DataMember]
+#endif
 		public Vector3 Position;
+#if WINRT
+        [DataMember]
+#endif
 		public VertexElementColor Color;
+
 		public static readonly VertexDeclaration VertexDeclaration;
 
 		public VertexPositionColor (Vector3 position, Color color)
