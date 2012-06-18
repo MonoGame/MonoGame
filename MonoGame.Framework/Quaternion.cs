@@ -26,6 +26,9 @@ SOFTWARE.
 #endregion License
 
 using System;
+#if WINRT
+using System.Runtime.Serialization;
+#endif
 
 namespace Microsoft.Xna.Framework
 {
@@ -52,6 +55,7 @@ namespace Microsoft.Xna.Framework
         [DataMember]
 #endif
         public float W;
+
         static Quaternion identity = new Quaternion(0, 0, 0, 1);
 
         
