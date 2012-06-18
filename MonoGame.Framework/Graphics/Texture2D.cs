@@ -221,14 +221,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 if (mipmap)
                 {
-#if IPHONE || ANDROID
-                    GL.GenerateMipmap(TextureTarget.Texture2D);
-#else
-				    GL.TexParameter (TextureTarget.Texture2D,
-					    TextureParameterName.GenerateMipmap,
-					    (int)All.True);
-#endif
-
                     int size = Math.Max(this.width, this.height);
                     while (size > 1)
                     {
@@ -328,17 +320,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 GL.BindTexture(TextureTarget.Texture2D, this.glTexture);
 
                 if (glFormat == (GLPixelFormat)All.CompressedTextureFormats)
-                {
-                    GL.CompressedTexSubImage2D(TextureTarget.Texture2D, level,
-                                               x, y, w, h,
-                                               (GLPixelFormat)glInternalFormat, data.Length - startBytes, dataPtr);
-                }
+                    GL.CompressedTexImage2D(TextureTarget.Texture2D, level, (GLPixelFormat)glInternalFormat, w, h, 0, data.Length - startBytes, dataPtr);
                 else
-                {
-                    GL.TexSubImage2D(TextureTarget.Texture2D, level,
-                                 x, y, w, h,
-                                 glFormat, glType, dataPtr);
-                }
+                    GL.TexImage2D(TextureTarget.Texture2D, level, (int)glInternalFormat, w, h, 0, glFormat, glType, dataPtr);
 
                 Debug.Assert(GL.GetError() == ErrorCode.NoError);
 
