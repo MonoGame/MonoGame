@@ -121,6 +121,23 @@ namespace Microsoft.Xna.Framework.Graphics
 			};
 		}
 
+        public override string ToString ()
+        {
+            string blendStateName;
+
+            if(this == BlendState.Additive)
+                blendStateName = "Additive";
+            else if (this == BlendState.AlphaBlend)
+                blendStateName = "AlphaBlend";
+            else if (this == BlendState.NonPremultiplied)
+                blendStateName = "NonPremultiplied";
+            else
+                blendStateName = "Opaque";
+
+
+            return string.Format("{0}.{1}", base.ToString(), blendStateName);
+        }
+
 
 #if DIRECTX
 
