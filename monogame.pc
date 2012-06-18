@@ -1,0 +1,9 @@
+prefix=${pcfiledir}/../..
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib/monogame
+
+Name: MonoGame
+Description: Free implementation of XNA
+Version: 2.5
+Requires: opentk tao-sdl
+Libs: -r:${libdir}/MonoGame.Framework.Linux.dll -r:${libdir}/Lidgren.Network.dll

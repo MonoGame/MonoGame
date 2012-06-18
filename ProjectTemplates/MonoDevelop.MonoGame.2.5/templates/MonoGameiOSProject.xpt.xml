@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<Template>
+	<TemplateConfiguration>
+		<_Name>MonoGame iOS Application</_Name>
+		<_Category>C#/MonoGame</_Category>
+		<Icon>monogame-project</Icon>
+		<LanguageName>C#</LanguageName>
+		<_Description>Creates a MonoGame Application for iOS</_Description>
+	</TemplateConfiguration>
+	
+	<Actions>
+		<Open filename = "${ProjectName}Game.cs"/>
+	</Actions>
+	
+	<Combine name = "${ProjectName}" directory = ".">
+		<Options>
+			<StartupProject>${ProjectName}</StartupProject>
+		</Options>
+		
+		<Project name = "${ProjectName}" directory = "." type = "IPhone">
+			<Options />
+			<References>
+				<Reference type="Gac" refto="System, Version=2.0.5.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+				<Reference type="Gac" refto="System.Xml, Version=2.0.5.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+				<Reference type="Gac" refto="System.Core, Version=2.0.5.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />				
+				<Reference type="Gac" refto="monotouch" />
+				<Reference type="Gac" refto="OpenTK" />
+
+				<Reference type="Project" refto="MonoGame.Framework.iOS" />
+				<Reference type="Project" refto="Lidgren.Network.iOS" />
+			</References>
+			<Files>
+				<File name="${ProjectName}Game.cs" AddStandardHeader="True" src="MonoGameApplication/iOSGame.cs" />
+				<File name="Main.cs" AddStandardHeader="True" src="MonoGameApplication/iOSMain.cs" />
+				<File name="Info.plist" AddStandardHeader="False" src="MonoGameApplication/iOSInfo.plist" />
+				<RawFile name="Default.png" src="MonoGameApplication/iOSDefault.png" />
+				<RawFile name="GameThumbnail.png" src="MonoGameApplication/iOSGameThumbnail.png" />
+				<Directory name="Content">
+					<RawFile name="logo.png" src="MonoGameApplication/Icon-hd.png" />
+				</Directory>
+				<Directory name="Properties">
+					<File name="AssemblyInfo.cs" AddStandardHeader="True" src="MonoGameApplication/iOSAssemblyInfo.cs" />
+				</Directory>
+			</Files>
+		</Project>
+	</Combine>
+</Template>

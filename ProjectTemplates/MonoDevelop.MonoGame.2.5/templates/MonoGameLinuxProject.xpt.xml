@@ -26,9 +26,7 @@
 				<Reference type="Gac" refto="OpenTK" />
 				<Reference type="Gac" refto="MonoGame.Framework.Linux" />
 				<Reference type="Gac" refto="Lidgren.Network" />
-				<Reference type="Gac" refto="GamepadBridge.dll" />
-				<Reference type="Gac" refto="GamepadConfigControls.dll" />
-				<Reference type="Gac" refto="Tao.Sdl.dll" />
+				<Reference type="Gac" refto="Tao.Sdl" />
 			</References>
 			<Files>
 				<File name="Game1.cs" src="MonoGameApplication/Game1.cs" />
