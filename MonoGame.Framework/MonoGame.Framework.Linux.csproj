@@ -7,6 +7,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{35253CE1-C864-4CD3-8249-4D1319748E8F}</ProjectGuid>
     <OutputType>Library</OutputType>
+    <CodePage>65001</CodePage>
     <RootNamespace>MonoGame.Framework.Linux</RootNamespace>
     <AssemblyName>MonoGame.Framework.Linux</AssemblyName>
   </PropertyGroup>
