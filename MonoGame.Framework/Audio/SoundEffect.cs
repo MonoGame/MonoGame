@@ -340,7 +340,6 @@ namespace Microsoft.Xna.Framework.Audio
         private static Speakers _speakers = Speakers.Stereo;
 
         // XNA does not expose this, but it exists in X3DAudio.
-        // I do not know if 'Stereo' is a correct default value in all cases.
         public static Speakers Speakers
         {
             get
@@ -380,13 +379,12 @@ namespace Microsoft.Xna.Framework.Audio
             if (Device.StartEngine() != Result.Ok)
                 throw new Exception("XAudio2.StartEngine has failed.");
 
-            // Should we be specifying a channel count for MasterVoice
-            // based on the speaker configuration? I don't know.
-            MasterVoice = new MasteringVoice(Device, XAudio2.DefaultChannels, XAudio2.DefaultSampleRate);
-            //MasterVoice = new MasteringVoice(Device, 4, XAudio2.DefaultSampleRate);
+            // Let windows autodetect number of channels and sample rate.
+            MasterVoice = new MasteringVoice(Device, XAudio2.DefaultChannels, XAudio2.DefaultSampleRate);            
             MasterVoice.SetVolume(_masterVolume, 0);
 
-            var device3d = new X3DAudio(_speakers);
+            // The autodetected value of MasterVoice.ChannelMask corresponds to the speaker layout.
+            Speakers = (Speakers)MasterVoice.ChannelMask;
         }
 
         // Does someone actually need to call this if it only happens when the whole

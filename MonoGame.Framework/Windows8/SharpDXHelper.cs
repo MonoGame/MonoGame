@@ -126,14 +126,16 @@ namespace Microsoft.Xna.Framework
             //  and on the z-axis from near to far. 
             //  Azimuths are measured clockwise from a given reference direction. 
             //
-            // Also:
+            // From MSDN:
             //  The XNA Framework uses a right-handed coordinate system, 
             //  with the positive z-axis pointing toward the observer when the positive x-axis is pointing to the right, 
             //  and the positive y-axis is pointing up. 
+            //
+            // Programmer Notes:         
+            //  According to this description the z-axis (forward vector) is inverted between these two coordinate systems.
+            //  Therefore, we need to negate the z component of any position/velocity values, and negate any forward vectors.
 
-            // Therefore, we have to convert the right-handed xna orientation to be left-handed as X3DAudio expects,
-            // else our left/right channels will be inverted.
-            up *= -1.0f;
+            forward *= -1.0f;
             pos.Z *= -1.0f;
             vel.Z *= -1.0f;
 
@@ -155,25 +157,24 @@ namespace Microsoft.Xna.Framework
             var forward = listener.Forward;
             var up = listener.Up;
 
-
-
             // From MSDN:
             //  X3DAudio uses a left-handed Cartesian coordinate system, 
             //  with values on the x-axis increasing from left to right, on the y-axis from bottom to top, 
             //  and on the z-axis from near to far. 
             //  Azimuths are measured clockwise from a given reference direction. 
             //
-            // Also:
+            // From MSDN:
             //  The XNA Framework uses a right-handed coordinate system, 
             //  with the positive z-axis pointing toward the observer when the positive x-axis is pointing to the right, 
             //  and the positive y-axis is pointing up. 
+            //
+            // Programmer Notes:         
+            //  According to this description the z-axis (forward vector) is inverted between these two coordinate systems.
+            //  Therefore, we need to negate the z component of any position/velocity values, and negate any forward vectors.
 
-            // Therefore, we have to convert the right-handed xna orientation to be left-handed as X3DAudio expects,
-            // else our left/right channels will be inverted.
-            up *= -1.0f;
+            forward *= -1.0f;
             pos.Z *= -1.0f;
             vel.Z *= -1.0f;
-
 
             return new SharpDX.X3DAudio.Listener()
             {

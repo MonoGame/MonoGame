@@ -115,14 +115,10 @@ namespace Microsoft.Xna.Framework.Audio
             // XNA supports distance attenuation and doppler.            
             var dpsSettings = SoundEffect.Device3D.Calculate(l, e, CalculateFlags.Matrix | CalculateFlags.Doppler, srcChannelCount, dstChannelCount);
 
-            // Apply Volume settings...
+            // Apply Volume settings (from distance attenuation) ...
             _voice.SetOutputMatrix(SoundEffect.MasterVoice, srcChannelCount, dstChannelCount, dpsSettings.MatrixCoefficients, 0);
 
-            // Apply Pitch settings...
-            if (dpsSettings.DopplerFactor != 1.0f)
-            {
-            }
-
+            // Apply Pitch settings (from doppler) ...
             _voice.SetFrequencyRatio(dpsSettings.DopplerFactor);
 #endif
 		}
@@ -310,7 +306,7 @@ namespace Microsoft.Xna.Framework.Audio
                 // Since XNA does not appear to expose any 'master' voice channel mask / speaker configuration,
                 // I assume the mappings listed above should be used.
                 //
-                // Assuming it is correct to applying left/right pan to all channels (read: front and back).
+                // Assuming it is correct to pan all channels which have a left/right component.
 
                 var lVal = 1.0f - _pan;
                 var rVal = 1.0f + _pan;
