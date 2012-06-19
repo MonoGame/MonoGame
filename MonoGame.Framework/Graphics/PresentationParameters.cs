@@ -40,6 +40,10 @@ purpose and non-infringement.
 
 using System;
 
+#if WINRT 
+using Windows.UI.Xaml.Controls;
+#endif
+
 #if MONOMAC
 using MonoMac.AppKit;
 #elif IPHONE
@@ -118,6 +122,10 @@ namespace Microsoft.Xna.Framework.Graphics
             set { deviceWindowHandle = value; }
         }
 		
+#if WINRT 
+        public SwapChainBackgroundPanel SwapChainPanel { get; set; }
+#endif 
+
         public DepthFormat DepthStencilFormat
         {
             get { return depthStencilFormat; }

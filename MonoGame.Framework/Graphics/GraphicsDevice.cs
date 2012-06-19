@@ -414,7 +414,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void CreateSizeDependentResources()
         {
-            if (PresentationParameters == null || PresentationParameters.DeviceWindowHandle == IntPtr.Zero)
+            if (    PresentationParameters == null || 
+                    (PresentationParameters.DeviceWindowHandle == IntPtr.Zero && PresentationParameters.SwapChainPanel == null) )
                 return;
 
             _d2dContext.Target = null;
@@ -480,10 +481,21 @@ namespace Microsoft.Xna.Framework.Graphics
                 using (var dxgiAdapter = dxgiDevice2.Adapter)
                 using (var dxgiFactory2 = dxgiAdapter.GetParent<SharpDX.DXGI.Factory2>())
                 {
-                    // Creates a SwapChain from a CoreWindow pointer.
-                    var coreWindow = Marshal.GetObjectForIUnknown(PresentationParameters.DeviceWindowHandle) as CoreWindow;
-                    using (var comWindow = new ComObject(coreWindow))
-                        _swapChain = dxgiFactory2.CreateSwapChainForCoreWindow(_d3dDevice, comWindow, ref desc, null);
+                    if (PresentationParameters.DeviceWindowHandle != IntPtr.Zero)
+                    {
+                        // Creates a SwapChain from a CoreWindow pointer.
+                        var coreWindow = Marshal.GetObjectForIUnknown(PresentationParameters.DeviceWindowHandle) as CoreWindow;
+                        using (var comWindow = new ComObject(coreWindow))
+                            _swapChain = dxgiFactory2.CreateSwapChainForCoreWindow(_d3dDevice, comWindow, ref desc, null);
+                    }
+                    else
+                    {
+                        using (var nativePanel = ComObject.As<SharpDX.DXGI.ISwapChainBackgroundPanelNative>(PresentationParameters.SwapChainPanel))
+                        {
+                            _swapChain = dxgiFactory2.CreateSwapChainForComposition(_d3dDevice, ref desc, null);
+                            nativePanel.SwapChain = _swapChain;
+                        }
+                    }
 
                     // Ensure that DXGI does not queue more than one frame at a time. This both reduces 
                     // latency and ensures that the application will only render after each VSync, minimizing 
