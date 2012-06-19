@@ -121,8 +121,8 @@ namespace Microsoft.Xna.Framework.Graphics
             {
 				Viewport vp = graphicsDevice.Viewport;
                 Matrix projection = Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, 0, 1);
-#if PSS
-                //PSS doesn't need the half pixel offset
+
+#if PSS || DIRECTX
                 Matrix transform = _matrix * projection;
 #else
 				Matrix halfPixelOffset = Matrix.CreateTranslation(-0.5f, -0.5f, 0);

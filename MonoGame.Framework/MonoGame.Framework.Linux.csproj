@@ -24,7 +24,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <DebugType>none</DebugType>
-    <Optimize>false</Optimize>
+    <Optimize>true</Optimize>
     <OutputPath>bin\Release</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -39,9 +39,6 @@
     <Reference Include="System.Drawing" />
     <Reference Include="Tao.Sdl, Version=1.2.13.0, Culture=neutral, PublicKeyToken=9c7a200e36c0094e">
       <HintPath>..\ThirdParty\GamepadConfig\Tao.Sdl.dll</HintPath>
-    </Reference>
-    <Reference Include="GamepadBridge, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\ThirdParty\GamepadConfig\GamepadBridge.dll</HintPath>
     </Reference>
     <Reference Include="OpenTK">
       <HintPath>..\ThirdParty\Libs\OpenTK.dll</HintPath>
@@ -174,7 +171,7 @@
     <Compile Include="Input\Touch\TouchLocationState.cs" />
     <Compile Include="Input\Touch\TouchPanelCapabilities.cs" />
     <Compile Include="Input\Touch\TouchPanel.cs" />
-    <Compile Include="Input\Touch\TouchInfo.cs" />    
+    <Compile Include="Input\Touch\TouchInfo.cs" />
     <Compile Include="Input\Touch\GestureSample.cs" />
     <Compile Include="GameComponentCollection.cs" />
     <Compile Include="Graphics\SpriteBatchItem.cs" />
@@ -306,8 +303,16 @@
     <Compile Include="Graphics\Vertices\VertexElementColor.cs" />
     <Compile Include="Audio\XactClip.cs" />
     <Compile Include="Audio\XactSound.cs" />
+    <Compile Include="Desktop\Input\Axis.cs" />
+    <Compile Include="Desktop\Input\Capabilities.cs" />
+    <Compile Include="Desktop\Input\DPad.cs" />
     <Compile Include="Desktop\Input\GamePad.cs" />
+    <Compile Include="Desktop\Input\Input.cs" />
+    <Compile Include="Desktop\Input\Joystick.cs" />
     <Compile Include="Desktop\Input\Mouse.cs" />
+    <Compile Include="Desktop\Input\PadConfig.cs" />
+    <Compile Include="Desktop\Input\Settings.cs" />
+    <Compile Include="Desktop\Input\Stick.cs" />
     <Compile Include="LaunchParameters.cs" />
     <Compile Include="Desktop\OpenTKGamePlatform.cs" />
     <Compile Include="Desktop\OpenTKGameWindow.cs" />
@@ -410,4 +415,17 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Linux\Graphics\" />
+  </ItemGroup>
+  <ProjectExtensions>
+    <MonoDevelop>
+      <Properties>
+        <Policies>
+          <TextStylePolicy FileWidth="120" NoTabsAfterNonTabs="True" inheritsSet="VisualStudio" inheritsScope="text/plain" scope="text/x-csharp" />
+          <CSharpFormattingPolicy inheritsSet="Mono" inheritsScope="text/x-csharp" scope="text/x-csharp" />
+        </Policies>
+      </Properties>
+    </MonoDevelop>
+  </ProjectExtensions>
 </Project>

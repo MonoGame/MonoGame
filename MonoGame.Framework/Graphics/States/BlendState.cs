@@ -121,6 +121,23 @@ namespace Microsoft.Xna.Framework.Graphics
 			};
 		}
 
+        public override string ToString ()
+        {
+            string blendStateName;
+
+            if(this == BlendState.Additive)
+                blendStateName = "Additive";
+            else if (this == BlendState.AlphaBlend)
+                blendStateName = "AlphaBlend";
+            else if (this == BlendState.NonPremultiplied)
+                blendStateName = "NonPremultiplied";
+            else
+                blendStateName = "Opaque";
+
+
+            return string.Format("{0}.{1}", base.ToString(), blendStateName);
+        }
+
 
 #if DIRECTX
 
@@ -173,6 +190,9 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
             Debug.Assert(graphicsDevice == device, "The state was created for a different device!");
+
+            // NOTE: We make the assumption here that the caller has
+            // locked the d3dContext for us to use.
 
             // Apply the state!
             var d3dContext = device._d3dContext;

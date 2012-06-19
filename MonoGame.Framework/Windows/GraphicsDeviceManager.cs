@@ -162,6 +162,8 @@ namespace Microsoft.Xna.Framework
 
         private void Initialize()
         {
+            _game.Window.SetSupportedOrientations(_supportedOrientations);
+
             //_graphicsDevice.PresentationParameters.BackBufferFormat = _preferredBackBufferWidth;
             _graphicsDevice.PresentationParameters.BackBufferWidth = _preferredBackBufferWidth;
             _graphicsDevice.PresentationParameters.BackBufferHeight = _preferredBackBufferHeight;

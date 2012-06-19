@@ -14,7 +14,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\..\..\..\..\Program Files (x86)\MonoDevelop\AddIns\MonoDevelop.MonoGame</OutputPath>
+    <OutputPath>..\..\</OutputPath>
     <DefineConstants>DEBUG;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -23,7 +23,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\..\</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
@@ -32,6 +32,7 @@
     <Reference Include="System" />
     <Reference Include="MonoDevelop.Core">
       <HintPath>..\..\..\..\..\..\Program Files %28x86%29\MonoDevelop\bin\MonoDevelop.Core.dll</HintPath>
+      <Package>monodevelop</Package>
     </Reference>
     <Reference Include="System.Xml" />
   </ItemGroup>

@@ -143,6 +143,10 @@ namespace Microsoft.Xna.Framework
             Platform.Deactivated += Platform_Deactivated;
             _services.AddService(typeof(GamePlatform), Platform);
 
+#if WINRT
+            Platform.ViewStateChanged += Platform_ApplicationViewChanged;
+#endif //WINRT
+
 #if MONOMAC || WINDOWS || LINUX
             // Set the window title.
             // TODO: Get the title from the WindowsPhoneManifest.xml for WP7 projects.
@@ -317,6 +321,10 @@ namespace Microsoft.Xna.Framework
         public event EventHandler<EventArgs> Disposed;
         public event EventHandler<EventArgs> Exiting;
 
+#if WINRT
+        public event EventHandler<ViewStateChangedEventArgs> ApplicationViewChanged;
+#endif
+
         #endregion
 
         #region Public Methods
@@ -365,6 +373,7 @@ namespace Microsoft.Xna.Framework
                 Platform.RunLoop();
                 EndRun();
                 OnExiting(this, EventArgs.Empty);
+                UnloadContent();
                 break;
             default:
                 throw new NotImplementedException(string.Format(
@@ -563,7 +572,16 @@ namespace Microsoft.Xna.Framework
             platform.AsyncRunLoopEnded -= Platform_AsyncRunLoopEnded;
             EndRun();
             OnExiting(this, EventArgs.Empty);
+            UnloadContent();
         }
+
+#if WINRT
+        private void Platform_ApplicationViewChanged(object sender, ViewStateChangedEventArgs e)
+        {
+            AssertNotDisposed();
+            Raise(ApplicationViewChanged, e);
+        }
+#endif
 
         private void Platform_Activated(object sender, EventArgs e)
         {

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
+using Windows.ApplicationModel.Activation;
 
 namespace Microsoft.Xna.Framework
 {
@@ -17,12 +18,24 @@ namespace Microsoft.Xna.Framework
         public void Initialize(CoreApplicationView applicationView)
         {
             _applicationView = applicationView;
+
+            _applicationView.Activated += ViewActivated;
+        }
+
+        private void ViewActivated(CoreApplicationView sender, IActivatedEventArgs args)
+        {
+            if (args.Kind == ActivationKind.Launch)
+            {
+                // Save any launch parameters to be parsed by the platform.
+                MetroGamePlatform.LaunchParameters = ((LaunchActivatedEventArgs)args).Arguments;
+
+                // Construct the game.
+                _game = new T();
+            }
         }
 
         public void Load(string entryPoint)
         {
-            // Construct the game.
-            _game = new T();
         }
 
         public void Run()

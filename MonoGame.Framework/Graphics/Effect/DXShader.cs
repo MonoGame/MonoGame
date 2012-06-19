@@ -297,6 +297,9 @@ namespace Microsoft.Xna.Framework.Graphics
                             EffectParameterCollection parameters,
                             ConstantBuffer[] cbuffers )
         {
+            // NOTE: We make the assumption here that the caller has
+            // locked the d3dContext for us to use.
+
             var d3dContext = graphicsDevice._d3dContext;
             if (_pixelShader != null)
             {

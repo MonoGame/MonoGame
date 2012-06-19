@@ -163,6 +163,9 @@ namespace Microsoft.Xna.Framework.Graphics
             _stateKey = EffectParameter.NextStateKey;
 
 #if DIRECTX
+
+            // NOTE: We make the assumption here that the caller has
+            // locked the d3dContext for us to use.
             var d3dContext = graphicsDevice._d3dContext;
 
             // Update the hardware buffer.
