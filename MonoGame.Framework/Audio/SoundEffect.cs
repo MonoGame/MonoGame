@@ -50,6 +50,7 @@ using Microsoft.Xna.Framework.Audio;
 using SharpDX;
 using SharpDX.XAudio2;
 using SharpDX.Multimedia;
+using SharpDX.X3DAudio;
 #endif
 
 namespace Microsoft.Xna.Framework.Audio
@@ -331,9 +332,47 @@ namespace Microsoft.Xna.Framework.Audio
 			}
         }
 
-#if WINRT
-        public static XAudio2 Device;
+#if WINRT        
+        public static XAudio2 Device;        
         public static MasteringVoice MasterVoice;
+
+        private static bool _device3DDirty = true;
+        private static Speakers _speakers = Speakers.Stereo;
+
+        // XNA does not expose this, but it exists in X3DAudio.
+        // I do not know if 'Stereo' is a correct default value in all cases.
+        public static Speakers Speakers
+        {
+            get
+            {
+                return _speakers;
+            }
+
+            set
+            {
+                if (_speakers != value)
+                {
+                    _speakers = value;
+                    _device3DDirty = true;
+                }
+            }
+        }
+
+        private static X3DAudio _device3D;
+
+        public static X3DAudio Device3D
+        {
+            get
+            {
+                if (_device3DDirty)
+                {
+                    _device3DDirty = false;
+                    _device3D = new X3DAudio(_speakers);
+                }
+
+                return _device3D;
+            }
+        }
 
         static SoundEffect()
         {
@@ -341,8 +380,13 @@ namespace Microsoft.Xna.Framework.Audio
             if (Device.StartEngine() != Result.Ok)
                 throw new Exception("XAudio2.StartEngine has failed.");
 
-            MasterVoice = new MasteringVoice(Device);
+            // Should we be specifying a channel count for MasterVoice
+            // based on the speaker configuration? I don't know.
+            MasterVoice = new MasteringVoice(Device, XAudio2.DefaultChannels, XAudio2.DefaultSampleRate);
+            //MasterVoice = new MasteringVoice(Device, 4, XAudio2.DefaultSampleRate);
             MasterVoice.SetVolume(_masterVolume, 0);
+
+            var device3d = new X3DAudio(_speakers);
         }
 
         // Does someone actually need to call this if it only happens when the whole
@@ -353,7 +397,7 @@ namespace Microsoft.Xna.Framework.Audio
             MasterVoice.Dispose();
 
             Device.StopEngine();
-            Device.Dispose();         
+            Device.Dispose();                     
         }
 #endif
         #endregion
