@@ -11,10 +11,13 @@ namespace Microsoft.Xna.Framework
 {
     public sealed class GameTimer : IDisposable
     {
+        static List<GameTimer> _allTimers = new List<GameTimer>();
+
         static List<GameTimer> _frameTimers = new List<GameTimer>();
         static List<GameTimer> _updateTimers = new List<GameTimer>();
         static List<GameTimer> _drawTimers = new List<GameTimer>();
 
+        static bool _resort;
         
         static int DefaultOrder = 0;
 
@@ -50,6 +53,8 @@ namespace Microsoft.Xna.Framework
 
         public GameTimer()
         {
+            _allTimers.Add(this);
+
             DrawOrder = DefaultOrder;
             FrameActionOrder = DefaultOrder;
             UpdateOrder = DefaultOrder;
@@ -59,16 +64,32 @@ namespace Microsoft.Xna.Framework
 
         public void Start()
         {
+            // TODO: Throw an exception on start without stop?
+
+            // Updates have to happen as they
+            // control if we draw or not.
             if (!_updateTimers.Contains(this))
-            {
-                _frameTimers.Add(this);
                 _updateTimers.Add(this);
+
+            // We only add the timers to the frame and draw
+            // lists if they actually have events to process.
+
+            if (FrameAction == null)
+                _frameTimers.Remove(this);
+            else
+                _frameTimers.Add(this);
+
+            if (Draw == null)
+                _drawTimers.Remove(this);
+            else
                 _drawTimers.Add(this);
-            }
+
+            _resort = true;
         }
 
         public void Stop()
         {
+            // Remove the timer from all the lists.
             _frameTimers.Remove(this);
             _updateTimers.Remove(this);
             _drawTimers.Remove(this);
@@ -76,20 +97,41 @@ namespace Microsoft.Xna.Framework
 
         public static void ResetElapsedTime()
         {
+            _gameTimer.Reset();
+            _gameTimer.Start();
+
+            foreach (var timer in _allTimers)
+            {
+                timer._accumulatedElapsedTime = TimeSpan.Zero;
+                timer._gameTime.ElapsedGameTime = TimeSpan.Zero;
+            }
         }
 
         public static void SuppressFrame()
         {
+            foreach (var timer in _drawTimers)
+                timer._suppressDraw = true;
         }
 
-        private bool _doDraw;
+        private bool _suppressDraw;
 
+        private bool _doDraw;
         private TimeSpan _accumulatedElapsedTime;
         private readonly GameTime _gameTime = new GameTime();
-        private Stopwatch _gameTimer = Stopwatch.StartNew();
+
+        private static Stopwatch _gameTimer = Stopwatch.StartNew();
 
         static private void OnTick()
         {
+            // Resort the timer update lists if they have been changed.
+            if (_resort)
+            {
+                _frameTimers.Sort((f, s) => f.FrameActionOrder - s.FrameActionOrder);
+                _drawTimers.Sort((f, s) => f.DrawOrder - s.DrawOrder);
+                _updateTimers.Sort((f, s) => f.UpdateOrder - s.UpdateOrder);
+                _resort = false;
+            }
+
             // First call all the frame events... we do this
             // every frame regardless of the elapsed time.
             foreach (var timer in _frameTimers)
@@ -99,14 +141,17 @@ namespace Microsoft.Xna.Framework
             }
 
             // Next do update events.
+            var elapsed = _gameTimer.Elapsed;
+            _gameTimer.Reset();
+            _gameTimer.Start();
             foreach (var timer in _updateTimers)
-                timer.DoUpdate();
+                timer.DoUpdate(elapsed);
 
             // Timers that have been updated can now draw.
-            if (    SharedGraphicsDeviceManager.Current != null &&
-                    SharedGraphicsDeviceManager.Current.GraphicsDevice != null)
+            var deviceManager = SharedGraphicsDeviceManager.Current;
+            if (deviceManager != null && deviceManager.GraphicsDevice != null)
             {
-                var present = false;
+                var doPresent = false;
 
                 foreach (var timer in _drawTimers)
                 {
@@ -115,18 +160,19 @@ namespace Microsoft.Xna.Framework
 
                     if (timer.Draw != null)
                         timer.Draw(timer, new GameTimerEventArgs(timer._gameTime.TotalGameTime, timer._gameTime.ElapsedGameTime));
-                
-                    present = true;
+
+                    doPresent = true;
                     timer._doDraw = false;
                 }
 
-                // Present the frame if we draw anything.
-                if (present)
-                    SharedGraphicsDeviceManager.Current.GraphicsDevice.Present();
+                // If nothing was drawn then we don't present and
+                // the swap chain will contain whatever was last rendered.
+                if (doPresent)
+                    deviceManager.GraphicsDevice.Present();
             }
         }
 
-        private void DoUpdate()
+        private void DoUpdate(TimeSpan elapsed)
         {
             // NOTE: This code is very sensitive and can break very badly
             // with even what looks like a safe change.  Be sure to test 
@@ -134,9 +180,7 @@ namespace Microsoft.Xna.Framework
             // modes across multiple devices and platforms.
 
             // Advance the accumulated elapsed time.
-            _accumulatedElapsedTime += _gameTimer.Elapsed;
-            _gameTimer.Reset();
-            _gameTimer.Start();
+            _accumulatedElapsedTime += elapsed;
 
             // If we're in the fixed timestep mode and not enough time has elapsed
             // to perform an update we sleep off the the remaining time to save battery
@@ -187,15 +231,16 @@ namespace Microsoft.Xna.Framework
             */
 
             // Draw unless the update suppressed it.
-            //if (_suppressDraw)
-                //_suppressDraw = false;
-            //else
+            if (_suppressDraw)
+                _suppressDraw = false;
+            else
                 _doDraw = true;
         }
 
         public void Dispose()
         {
             Stop();
+            _allTimers.Remove(this);
         }
     }
 }
