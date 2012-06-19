@@ -51,7 +51,7 @@ using Sce.Pss.Core.Graphics;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-	public class Effect : GraphicsResource
+	public partial class Effect : GraphicsResource
     {
         public EffectParameterCollection Parameters { get; private set; }
 
@@ -109,14 +109,16 @@ namespace Microsoft.Xna.Framework.Graphics
 			if (!EffectCache.TryGetValue (effectKey, out cloneSource)) {
 				// Create one.
 				cloneSource = new Effect (graphicsDevice);
-
+#if MONOMAC
 				uint tag = BitConverter.ToUInt32 (effectCode, 0);
 				if (tag == 0xBCF00BCF || tag == 0xFEFF0901) { //fx magics
 					cloneSource.ReadFXEffect (effectCode);
-				} else {
+				} else
+#endif
+				{
 					using (var stream = new MemoryStream(effectCode))
 					using (var reader = new BinaryReader(stream))
-						cloneSource.ReadMGFXEffect (reader);
+						cloneSource.ReadEffect (reader);
 				}
 
                 // Cache the effect for later in its original unmodified state.
@@ -197,72 +199,6 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-		internal void ReadFXEffect (byte[] effectCode)
-		{
-			DXEffectObject effectObject = DXEffectObject.FromCompiledD3DXEffect (effectCode);
-
-			ConstantBuffers = new ConstantBuffer[effectObject.ConstantBuffers.Count];
-			for (int i=0; i<ConstantBuffers.Length; i++) {
-				ConstantBuffers [i] = new ConstantBuffer (graphicsDevice,
-				                                        effectObject.ConstantBuffers [i].Size,
-				                                        effectObject.ConstantBuffers [i].ParameterIndex.ToArray (),
-				                                        effectObject.ConstantBuffers [i].ParameterOffset.ToArray (),
-				                                        effectObject.ConstantBuffers [i].Name);
-			}
-
-
-			Parameters = new EffectParameterCollection ();
-			foreach (var parameter in effectObject.Parameters) {
-				Parameters.Add (DXEffectObject.ToXNAParameter (parameter));
-			}
-
-			var shaderList = new List<Shader> ();
-			foreach (var shader in effectObject.Shaders) {
-				shaderList.Add (new FXShader (graphicsDevice, shader));
-			}
-
-			Techniques = new EffectTechniqueCollection ();
-			foreach (var technique in effectObject.Techniques) {
-				var passes = new EffectPassCollection ();
-				foreach (var pass in technique.pass_handles) {
-					Shader vertexShader = null;
-					Shader pixelShader = null;
-					foreach (var state in pass.states) {
-						if (state.type != DXEffectObject.STATE_TYPE.CONSTANT) {
-							throw new NotImplementedException ();
-						}
-						var operation = DXEffectObject.state_table [state.operation];
-						if (operation.class_ == DXEffectObject.STATE_CLASS.PIXELSHADER) {
-							pixelShader = shaderList [(int)state.parameter.data];
-						} else if (operation.class_ == DXEffectObject.STATE_CLASS.VERTEXSHADER) {
-							vertexShader = shaderList [(int)state.parameter.data];
-						} else {
-							throw new NotImplementedException ();
-						}
-					}
-
-					if (vertexShader == null) {
-						vertexShader = new PassthroughVertexShader ();
-					}
-					if (pixelShader == null) {
-						throw new NotImplementedException ();
-					}
-
-					passes.Add (new EffectPass (this,
-					                          pass.name,
-					                          vertexShader,
-					                          pixelShader,
-					                          null, null, null,
-					                          new EffectAnnotationCollection ())
-					);
-				}
-
-				Techniques.Add (new EffectTechnique (this, technique.name, passes, null));
-			}
-
-			CurrentTechnique = Techniques [0];
-		}
-
         /// <summary>
         /// The MonoGame Effect file format header identifier.
         /// </summary>
@@ -280,7 +216,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if !PSS
 
-		internal void ReadMGFXEffect (BinaryReader reader)
+		private void ReadEffect (BinaryReader reader)
 		{
 			// Check the header to make sure the file and version is correct!
 			var header = new string (reader.ReadChars (MGFXHeader.Length));
@@ -339,7 +275,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
             // Read in the parameters.
-            Parameters = ReadMGFXParameters(reader);
+            Parameters = ReadParameters(reader);
 
             // Read the techniques.
             Techniques = new EffectTechniqueCollection();
@@ -348,9 +284,9 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 var name = reader.ReadString();
 
-                var annotations = ReadMGFXAnnotations(reader);
+                var annotations = ReadAnnotations(reader);
 
-                var passes = ReadMGFXPasses(reader, this, shaderList);
+                var passes = ReadPasses(reader, this, shaderList);
 
                 var technique = new EffectTechnique(this, name, passes, annotations);
                 Techniques.Add(technique);
@@ -359,7 +295,7 @@ namespace Microsoft.Xna.Framework.Graphics
             CurrentTechnique = Techniques[0];
         }
 
-        private static EffectAnnotationCollection ReadMGFXAnnotations(BinaryReader reader)
+        private static EffectAnnotationCollection ReadAnnotations(BinaryReader reader)
         {
             var collection = new EffectAnnotationCollection();
 
@@ -372,7 +308,7 @@ namespace Microsoft.Xna.Framework.Graphics
             return collection;
         }
 
-        private static EffectPassCollection ReadMGFXPasses(BinaryReader reader, Effect effect, List<Shader> shaders)
+        private static EffectPassCollection ReadPasses(BinaryReader reader, Effect effect, List<Shader> shaders)
         {
             var collection = new EffectPassCollection();
 
@@ -381,7 +317,7 @@ namespace Microsoft.Xna.Framework.Graphics
             for (var i = 0; i < count; i++)
             {
                 var name = reader.ReadString();
-                var annotations = ReadMGFXAnnotations(reader);
+                var annotations = ReadAnnotations(reader);
 
                 // Get the vertex shader.
                 var shaderIndex = (int)reader.ReadByte();
@@ -400,7 +336,7 @@ namespace Microsoft.Xna.Framework.Graphics
             return collection;
         }
 
-        private static EffectParameterCollection ReadMGFXParameters(BinaryReader reader)
+        private static EffectParameterCollection ReadParameters(BinaryReader reader)
         {
             var collection = new EffectParameterCollection();
             var count = (int)reader.ReadByte();
@@ -414,13 +350,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 var name = reader.ReadString();
                 var semantic = reader.ReadString();
-                var annotations = ReadMGFXAnnotations(reader);
+                var annotations = ReadAnnotations(reader);
 
                 var rowCount = (int)reader.ReadByte();
                 var columnCount = (int)reader.ReadByte();
 
-                var elements = ReadMGFXParameters(reader);
-                var structMembers = ReadMGFXParameters(reader);
+                var elements = ReadParameters(reader);
+                var structMembers = ReadParameters(reader);
 
                 object data = null;
                 if (elements.Count == 0 && structMembers.Count == 0)
@@ -461,7 +397,7 @@ namespace Microsoft.Xna.Framework.Graphics
             return collection;
         }
 #else //PSS
-        internal void ReadMGFXEffect(BinaryReader reader)
+        internal void ReadEffect(BinaryReader reader)
         {
             var effectPass = new EffectPass(this, "Pass", null, null, BlendState.AlphaBlend, DepthStencilState.Default, RasterizerState.CullNone, new EffectAnnotationCollection());
             effectPass._shaderProgram = new ShaderProgram(reader.ReadBytes((int)reader.BaseStream.Length));

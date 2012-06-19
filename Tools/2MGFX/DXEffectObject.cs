@@ -642,34 +642,6 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        static internal EffectParameter ToXNAParameter (d3dx_parameter parameter)
-		{
-			var elements = new EffectParameterCollection ();
-			for (int i=0; i<parameter.element_count; i++) {
-				elements.Add (ToXNAParameter (parameter.member_handles [i]));
-			}
-			var members = new EffectParameterCollection ();
-			for (int i=0; i<parameter.member_count; i++) {
-				members.Add (ToXNAParameter (parameter.member_handles [i]));
-			}
-			var annotations = new EffectAnnotationCollection ();
-			for (int i=0; i<parameter.annotation_count; i++) {
-				annotations.Add (new EffectAnnotation (ToXNAParameter (parameter.annotation_handles [i])));
-        	}
-
-        	return new EffectParameter(
-        		ToXNAParameterClass(parameter.class_),
-        		ToXNAParameterType(parameter.type),
-        		parameter.name,
-        		(int)parameter.rows,
-        		(int)parameter.columns,
-        		parameter.semantic,
-        		annotations,
-        		elements,
-        		members,
-        		parameter.data);
-        }
-
         internal static int GetShaderIndex(DXEffectObject.STATE_CLASS type, d3dx_state[] states)
         {
             foreach (var state in states)

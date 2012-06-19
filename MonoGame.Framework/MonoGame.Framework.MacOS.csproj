@@ -453,6 +453,7 @@
     <Compile Include="Graphics\Effect\EffectMaterial.cs" />
     <Compile Include="Content\ContentReaders\ExternalReferenceReader.cs" />
     <Compile Include="Graphics\OcclusionQuery.cs" />
+    <Compile Include="Graphics\Effect\Effect.fx.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />
