@@ -82,6 +82,8 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Media;
 
+using GL11 = OpenTK.Graphics.ES11.GL;
+
 namespace Microsoft.Xna.Framework
 {
     class AndroidGamePlatform : GamePlatform
@@ -95,9 +97,13 @@ namespace Microsoft.Xna.Framework
             AndroidGameActivity.Resumed += Activity_Resumed;
 
             Window = new AndroidGameWindow(Game.Activity, game);
+
+			string model = Android.OS.Build.Model;
+			runningOnEmulator = string.IsNullOrEmpty(model) ? false : model.Contains("sdk");
         }
 
         private bool _initialized;
+		private bool runningOnEmulator = false;
         public static bool IsPlayingVdeo { get; set; }
 
         public override void Exit()
@@ -231,7 +237,21 @@ namespace Microsoft.Xna.Framework
         {
             try
             {
-                Window.SwapBuffers();
+				if (this.Window.GLContextVersion == OpenTK.Graphics.GLContextVersion.Gles2_0)
+				{
+					Window.SwapBuffers();
+				}
+				else
+				{
+					if (!runningOnEmulator)
+					{
+						Window.SwapBuffers();
+					}
+					else
+					{
+					   GL11.Flush();
+					}
+				}
             }
             catch (Exception ex)
             {
