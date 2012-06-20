@@ -249,7 +249,6 @@ namespace Microsoft.Xna.Framework
             Platform.ViewState = ApplicationView.Value;
         }
 
-
         private static DisplayOrientation ToOrientation(DisplayOrientations orientation)
         {
             DisplayOrientation result = (DisplayOrientation)0;

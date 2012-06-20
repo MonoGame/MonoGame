@@ -23,7 +23,7 @@ namespace Microsoft.Xna.Framework
 
         static TimeSpan DefaultUpdateInterval = TimeSpan.FromTicks(333333);
 
-        static TimeSpan MaximumUpdateInterval = TimeSpan.FromDays(30);
+        static TimeSpan MaximumUpdateInterval = TimeSpan.FromMilliseconds(500);
 
         static TimeSpan VariableStepIncrement = TimeSpan.FromTicks(1);
 
@@ -44,10 +44,12 @@ namespace Microsoft.Xna.Framework
         static GameTimer()
         {
 #if WINRT
-            CompositionTarget.Rendering += (o, a) =>
-            {
-                OnTick();
-            };
+
+            // This looks to be a safe way to update the game timers
+            // as the XAML/DirectX 3D Shoooing Game sample also updates
+            // the gameplay state during the render callback.
+
+            CompositionTarget.Rendering += (o, a) => OnTick();
 #endif
         }
 
@@ -64,8 +66,6 @@ namespace Microsoft.Xna.Framework
 
         public void Start()
         {
-            // TODO: Throw an exception on start without stop?
-
             // Updates have to happen as they
             // control if we draw or not.
             if (!_updateTimers.Contains(this))
@@ -76,14 +76,15 @@ namespace Microsoft.Xna.Framework
 
             if (FrameAction == null)
                 _frameTimers.Remove(this);
-            else
+            else if (!_frameTimers.Contains(this))
                 _frameTimers.Add(this);
 
             if (Draw == null)
                 _drawTimers.Remove(this);
-            else
+            else if (!_drawTimers.Contains(this))
                 _drawTimers.Add(this);
 
+            // The lists need to be resorted now.
             _resort = true;
         }
 
@@ -103,7 +104,7 @@ namespace Microsoft.Xna.Framework
             foreach (var timer in _allTimers)
             {
                 timer._accumulatedElapsedTime = TimeSpan.Zero;
-                timer._gameTime.ElapsedGameTime = TimeSpan.Zero;
+                timer._gameTime.ElapsedTime = TimeSpan.Zero;
             }
         }
 
@@ -117,7 +118,7 @@ namespace Microsoft.Xna.Framework
 
         private bool _doDraw;
         private TimeSpan _accumulatedElapsedTime;
-        private readonly GameTime _gameTime = new GameTime();
+        private readonly GameTimerEventArgs _gameTime = new GameTimerEventArgs();
 
         private static Stopwatch _gameTimer = Stopwatch.StartNew();
 
@@ -135,10 +136,7 @@ namespace Microsoft.Xna.Framework
             // First call all the frame events... we do this
             // every frame regardless of the elapsed time.
             foreach (var timer in _frameTimers)
-            {
-                if (timer.FrameAction != null)
-                    timer.FrameAction(timer, EventArgs.Empty);
-            }
+                timer.FrameAction(timer, EventArgs.Empty);
 
             // Next do update events.
             var elapsed = _gameTimer.Elapsed;
@@ -151,6 +149,10 @@ namespace Microsoft.Xna.Framework
             var deviceManager = SharedGraphicsDeviceManager.Current;
             if (deviceManager != null && deviceManager.GraphicsDevice != null)
             {
+                // We gotta reapply the render targets on update
+                // for some reason...  i guess the OS changes them?
+                deviceManager.GraphicsDevice.ResetRenderTargets();
+
                 var doPresent = false;
 
                 foreach (var timer in _drawTimers)
@@ -158,8 +160,7 @@ namespace Microsoft.Xna.Framework
                     if (!timer._doDraw)
                         continue;
 
-                    if (timer.Draw != null)
-                        timer.Draw(timer, new GameTimerEventArgs(timer._gameTime.TotalGameTime, timer._gameTime.ElapsedGameTime));
+                    timer.Draw(timer, timer._gameTime);
 
                     doPresent = true;
                     timer._doDraw = false;
@@ -174,18 +175,13 @@ namespace Microsoft.Xna.Framework
 
         private void DoUpdate(TimeSpan elapsed)
         {
-            // NOTE: This code is very sensitive and can break very badly
-            // with even what looks like a safe change.  Be sure to test 
-            // any change fully in both the fixed and variable timestep 
-            // modes across multiple devices and platforms.
-
             // Advance the accumulated elapsed time.
             _accumulatedElapsedTime += elapsed;
 
-            // If we're in the fixed timestep mode and not enough time has elapsed
-            // to perform an update we sleep off the the remaining time to save battery
-            // life and/or release CPU time to other threads and processes.
-            if (_accumulatedElapsedTime < UpdateInterval)
+            // If not enough time has elapsed to perform an update we will 
+            // try again on the next update call.
+            if (    _accumulatedElapsedTime == TimeSpan.Zero || 
+                    _accumulatedElapsedTime < UpdateInterval )
                 return;
 
             // Do not allow any update to take longer than our maximum.
@@ -195,9 +191,10 @@ namespace Microsoft.Xna.Framework
             // TODO: We should be calculating IsRunningSlowly
             // somewhere around here!
 
-            //if (IsFixedTimeStep)
+            // If we have an interval then we're working in fixed timestep mode.
+            if (UpdateInterval > TimeSpan.Zero)
             {
-                _gameTime.ElapsedGameTime = UpdateInterval;
+                _gameTime.ElapsedTime = UpdateInterval;
                 var stepCount = 0;
 
                 if (FrameAction != null)
@@ -206,29 +203,28 @@ namespace Microsoft.Xna.Framework
                 // Perform as many full fixed length time steps as we can.
                 while (_accumulatedElapsedTime >= UpdateInterval)
                 {
-                    _gameTime.TotalGameTime += UpdateInterval;
+                    _gameTime.TotalTime += UpdateInterval;
                     _accumulatedElapsedTime -= UpdateInterval;
                     ++stepCount;
 
                     if (Update != null)
-                        Update(this, new GameTimerEventArgs(_gameTime.TotalGameTime, _gameTime.ElapsedGameTime));
+                        Update(this, _gameTime);
                 }
 
                 // Draw needs to know the total elapsed time
                 // that occured for the fixed length updates.
-                _gameTime.ElapsedGameTime = TimeSpan.FromTicks(UpdateInterval.Ticks * stepCount);
+                _gameTime.ElapsedTime = TimeSpan.FromTicks(UpdateInterval.Ticks * stepCount);
             }
-            /*
             else
             {
                 // Perform a single variable length update.
-                _gameTime.ElapsedGameTime = _accumulatedElapsedTime;
-                _gameTime.TotalGameTime += _accumulatedElapsedTime;
+                _gameTime.ElapsedTime = _accumulatedElapsedTime;
+                _gameTime.TotalTime += _accumulatedElapsedTime;
                 _accumulatedElapsedTime = TimeSpan.Zero;
 
-                DoUpdate(_gameTime);
+                if (Update != null)
+                    Update(this, _gameTime);
             }
-            */
 
             // Draw unless the update suppressed it.
             if (_suppressDraw)
@@ -239,7 +235,10 @@ namespace Microsoft.Xna.Framework
 
         public void Dispose()
         {
-            Stop();
+            // Remove us from all timers.
+            _frameTimers.Remove(this);
+            _updateTimers.Remove(this);
+            _drawTimers.Remove(this);
             _allTimers.Remove(this);
         }
     }

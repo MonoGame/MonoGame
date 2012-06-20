@@ -18,8 +18,8 @@ namespace Microsoft.Xna.Framework
             ElapsedTime = elapsedTime;
         }
 
-        public TimeSpan ElapsedTime { get; private set; }
+        public TimeSpan ElapsedTime { get; internal set; }
 
-        public TimeSpan TotalTime { get; private set; }
+        public TimeSpan TotalTime { get; internal set; }
     }
 }
