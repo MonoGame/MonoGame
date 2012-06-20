@@ -42,6 +42,8 @@
 using System;
 #if WINRT
 using SharpDX.XAudio2;
+using SharpDX.X3DAudio;
+using SharpDX.Multimedia;
 #endif
 #endregion Statements
 
@@ -94,14 +96,37 @@ namespace Microsoft.Xna.Framework.Audio
 		public void Apply3D (AudioListener listener, AudioEmitter emitter)
 		{
 #if WINRT		
-		    // Temporary / naive implementation until X3DAudio is functional.
-            _voice.SetVolume(1.0f / (Vector3.Distance(listener.Position, emitter.Position) / SoundEffect.DistanceScale), 0);
+            // Convert from XNA Emitter to a SharpDX Emitter
+            var e = emitter.ToEmitter();
+            e.CurveDistanceScaler = SoundEffect.DistanceScale;
+            e.DopplerScaler = SoundEffect.DopplerScale;
+            e.ChannelCount = _effect._format.Channels;
+
+            // Convert from XNA Listener to a SharpDX Listener
+            var l = listener.ToListener();                        
+            
+            // Number of channels in the sound being played.
+            // Not actually sure if XNA supported 3D attenuation of sterio sounds, but X3DAudio does.
+            var srcChannelCount = _effect._format.Channels;            
+
+            // Number of output channels.
+            var dstChannelCount = SoundEffect.MasterVoice.VoiceDetails.InputChannelCount;
+
+            // XNA supports distance attenuation and doppler.            
+            var dpsSettings = SoundEffect.Device3D.Calculate(l, e, CalculateFlags.Matrix | CalculateFlags.Doppler, srcChannelCount, dstChannelCount);
+
+            // Apply Volume settings (from distance attenuation) ...
+            _voice.SetOutputMatrix(SoundEffect.MasterVoice, srcChannelCount, dstChannelCount, dpsSettings.MatrixCoefficients, 0);
+
+            // Apply Pitch settings (from doppler) ...
+            _voice.SetFrequencyRatio(dpsSettings.DopplerFactor);
 #endif
 		}
 		
 		public void Apply3D (AudioListener[] listeners,AudioEmitter emitter)
 		{
-            //throw new NotImplementedException();
+            foreach ( var l in listeners )
+                Apply3D(l, emitter);            
 		}		
 		
 		public void Pause ()
@@ -216,12 +241,17 @@ namespace Microsoft.Xna.Framework.Audio
 			}
 		}
 		        
+#if WINRT
+        private float _pan;
+        private static float[] _panMatrix;
+#endif
+
 		public float Pan 
 		{ 
 			get
 			{
 #if WINRT                
-                throw new NotImplementedException();
+                return _pan;
 #else
                 if ( _sound != null )
 				{
@@ -236,11 +266,90 @@ namespace Microsoft.Xna.Framework.Audio
 			
 			set
 			{
-#if WINRT
+#if WINRT                
                 // According to XNA documentation:
                 // "Panning, ranging from -1.0f (full left) to 1.0f (full right). 0.0f is centered."
-				// ...Requires X3DAudio
-                throw new NotImplementedException();
+                _pan = MathHelper.Clamp(value, -1.0f, 1.0f);
+                
+                var srcChannelCount = _effect._format.Channels;
+                var dstChannelCount = SoundEffect.MasterVoice.VoiceDetails.InputChannelCount;
+                
+                if ( _panMatrix == null || _panMatrix.Length < dstChannelCount )
+                    _panMatrix = new float[Math.Max(dstChannelCount,8)];                
+
+                // Default to full volume for all channels/destinations   
+                for (var i = 0; i < _panMatrix.Length; i++)
+                    _panMatrix[i] = 1.0f;
+
+                // From X3DAudio documentation:
+                /*
+                    For submix and mastering voices, and for source voices without a channel mask or a channel mask of 0, 
+                       XAudio2 assumes default speaker positions according to the following table. 
+
+                    Channels
+
+                    Implicit Channel Positions
+
+                    1 Always maps to FrontLeft and FrontRight at full scale in both speakers (special case for mono sounds) 
+                    2 FrontLeft, FrontRight (basic stereo configuration) 
+                    3 FrontLeft, FrontRight, LowFrequency (2.1 configuration) 
+                    4 FrontLeft, FrontRight, BackLeft, BackRight (quadraphonic) 
+                    5 FrontLeft, FrontRight, FrontCenter, SideLeft, SideRight (5.0 configuration) 
+                    6 FrontLeft, FrontRight, FrontCenter, LowFrequency, SideLeft, SideRight (5.1 configuration) (see the following remarks) 
+                    7 FrontLeft, FrontRight, FrontCenter, LowFrequency, SideLeft, SideRight, BackCenter (6.1 configuration) 
+                    8 FrontLeft, FrontRight, FrontCenter, LowFrequency, BackLeft, BackRight, SideLeft, SideRight (7.1 configuration) 
+                    9 or more No implicit positions (one-to-one mapping)                      
+                 */
+
+                // Notes:
+                //
+                // Since XNA does not appear to expose any 'master' voice channel mask / speaker configuration,
+                // I assume the mappings listed above should be used.
+                //
+                // Assuming it is correct to pan all channels which have a left/right component.
+
+                var lVal = 1.0f - _pan;
+                var rVal = 1.0f + _pan;
+                                
+                switch (SoundEffect.MasterVoice.ChannelMask)
+                {
+                    case ((int)Speakers.Stereo):
+                    case ((int)Speakers.TwoPointOne):
+                    case ((int)Speakers.Surround):
+                        _panMatrix[0] = lVal;
+                        _panMatrix[1] = rVal;
+                        break;
+
+                    case ((int)Speakers.Quad):
+                        _panMatrix[0] = _panMatrix[2] = lVal;
+                        _panMatrix[1] = _panMatrix[3] = rVal;
+                        break;
+
+                    case ((int)Speakers.FourPointOne):
+                        _panMatrix[0] = _panMatrix[3] = lVal;
+                        _panMatrix[1] = _panMatrix[4] = rVal;
+                        break;
+
+                    case ((int)Speakers.FivePointOne):
+                    case ((int)Speakers.SevenPointOne):
+                    case ((int)Speakers.FivePointOneSurround):
+                        _panMatrix[0] = _panMatrix[4] = lVal;
+                        _panMatrix[1] = _panMatrix[5] = rVal;
+                        break;
+
+                    case ((int)Speakers.SevenPointOneSurround):
+                        _panMatrix[0] = _panMatrix[4] = _panMatrix[6] = lVal;
+                        _panMatrix[1] = _panMatrix[5] = _panMatrix[7] = rVal;
+                        break;
+
+                    case ((int)Speakers.Mono):
+                    default:
+                        // don't do any panning here   
+                        break;
+                }
+
+                _voice.SetOutputMatrix(srcChannelCount, dstChannelCount, _panMatrix);
+
 #else
                 if ( _sound != null )
 				{
