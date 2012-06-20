@@ -62,6 +62,12 @@ namespace Microsoft.Xna.Framework.Audio
         internal AudioBuffer _buffer;
         internal AudioBuffer _loopedBuffer;
         internal WaveFormat _format;
+        
+        // These three fields are used for keeping track of instances created
+        // internally when Play is called directly on SoundEffect.
+        private List<SoundEffectInstance> _playingInstances;
+        private List<SoundEffectInstance> _availableInstances;
+        private List<SoundEffectInstance> _toBeRecycledInstances;
 #else
 		private Sound _sound;
         private SoundEffectInstance _instance;
@@ -186,17 +192,66 @@ namespace Microsoft.Xna.Framework.Audio
 		
         public bool Play()
         {				
-#if WINRT
-            throw new NotImplementedException();   
-#else
-			return Play(MasterVolume, 0.0f, 0.0f);
-#endif
+            return Play(1.0f, 0.0f, 0.0f);
         }
 
         public bool Play(float volume, float pitch, float pan)
         {
 #if WINRT
-            throw new NotImplementedException();   
+            if (MasterVolume > 0.0f)
+            {
+                if (_playingInstances == null)
+                {
+                    // Allocate lists first time we need them.
+                    _playingInstances = new List<SoundEffectInstance>();
+                    _availableInstances = new List<SoundEffectInstance>();
+                    _toBeRecycledInstances = new List<SoundEffectInstance>();
+                }
+                else
+                {
+                    // Cleanup instances which have finished playing.                    
+                    foreach (var inst in _playingInstances)
+                    {
+                        if (inst.State == SoundState.Stopped)
+                        {
+                            _toBeRecycledInstances.Add(inst);
+                        }
+                    }                    
+                }
+
+                // Locate a SoundEffectInstance either one already
+                // allocated and not in use or allocate a new one.
+                SoundEffectInstance instance = null;
+                if (_toBeRecycledInstances.Count > 0)
+                {
+                    foreach (var inst in _toBeRecycledInstances)
+                    {
+                        _availableInstances.Add(inst);
+                        _playingInstances.Remove(inst);
+                    }
+                    _toBeRecycledInstances.Clear();
+                }
+                if (_availableInstances.Count > 0)
+                {
+                    instance = _availableInstances[0];
+                    _playingInstances.Add(instance);
+                    _availableInstances.Remove(instance);
+                }
+                else
+                {
+                    instance = CreateInstance();
+                    _playingInstances.Add(instance);
+                }
+
+                instance.Volume = volume;
+                instance.Pitch = pitch;
+                instance.Pan = pan;
+                instance.Play();
+            }
+
+            // XNA documentation says this method returns false if the sound limit
+            // has been reached. However, there is no limit on PC.
+            return true;
 #else
 			if ( MasterVolume > 0.0f )
 			{
