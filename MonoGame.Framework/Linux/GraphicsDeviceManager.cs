@@ -240,6 +240,7 @@ namespace Microsoft.Xna.Framework
 				throw new NotImplementedException ();
 			}
 			set {
+                _game.Platform.VSyncEnabled = value;
 			}
 		}
 

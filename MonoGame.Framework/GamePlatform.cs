@@ -190,7 +190,27 @@ namespace Microsoft.Xna.Framework
             get; protected set;
         }
 #endif
+  
+        public bool VSyncEnabled
+        {
 
+            get
+            {
+#if LINUX || WINDOWS
+                return ((OpenTKGameWindow)Window).Window.VSync == OpenTK.VSyncMode.On ? true : false;
+#else
+                throw new NotImplementedException (); // TODO
+#endif
+            }
+            set
+            {
+#if LINUX || WINDOWS
+                ((OpenTKGameWindow)Window).Window.VSync = value ? OpenTK.VSyncMode.On : OpenTK.VSyncMode.Off;
+#else
+#endif
+            }
+    
+        }
         #endregion
 
         #region Events
