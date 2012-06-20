@@ -4,6 +4,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Input.Touch;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Media;
 
@@ -122,6 +124,8 @@ namespace Microsoft.Xna.Framework
 
         private static Stopwatch _gameTimer = Stopwatch.StartNew();
 
+        private static MetroCoreWindowEvents _windowEvents;
+
         static private void OnTick()
         {
             // Resort the timer update lists if they have been changed.
@@ -132,6 +136,12 @@ namespace Microsoft.Xna.Framework
                 _updateTimers.Sort((f, s) => f.UpdateOrder - s.UpdateOrder);
                 _resort = false;
             }
+
+            // Do we need to initialize the window event handlers?
+            if (_windowEvents == null && Window.Current != null)
+                _windowEvents = new MetroCoreWindowEvents(Window.Current.CoreWindow);
+            if (_windowEvents != null)
+                _windowEvents.UpdateState();
 
             // First call all the frame events... we do this
             // every frame regardless of the elapsed time.

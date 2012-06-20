@@ -192,6 +192,19 @@ namespace Microsoft.Xna.Framework.Input.Touch
         
         internal static void AddEvent(TouchLocation location)
         {
+#if WINRT
+            // TODO:
+            //
+            // As of 6/20/2012 the WinRT Simulator will generate duplicate
+            // touch location ids... filter these out for now.
+            //
+            // Lets be sure to remove this once that is fixed... this safety
+            // here is inefficient and unnessasary.
+            //
+            if (    location.State == TouchLocationState.Pressed &&
+                    _events.FindIndex(e => e.Id == location.Id) != -1)
+                return;
+#endif
             _events.Add(location);
         }
 
@@ -463,6 +476,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
         static List<GestureSample> _pendingTaps = new List<GestureSample>();
 		private static bool ProcessTap(TouchLocation touch)
 		{
+            // TODO: This check means that double taps won't work unless
+            // the tap event is enabled as well... is this correct behavior?
 			if (!GestureIsEnabled(GestureType.Tap))
 				return false;
 
