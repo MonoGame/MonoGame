@@ -87,25 +87,6 @@ namespace Microsoft.Xna.Framework.Input.Touch
             return Capabilities;
         }
 
-        /*private static int PixelsPerInch
-        {
-            get 
-            {
-                var gd = Game.Instance.GraphicsDevice;
-                var screenWidth = gd.DisplayMode.Width;
-                var screenHeight = gd.DisplayMode.Height;
-                var screenDiagonal = Math.Sqrt( (screenWidth * screenWidth) + ( screenHeight * screenHeight) );
-
-                var resWidth = gd.PresentationParameters.BackBufferWidth;
-                var resHeight = gd.PresentationParameters.BackBufferHeight;
-                var resDiagonal = Math.Sqrt( (resWidth * resWidth) + ( resHeight * resHeight) );
-
-                var ppi = resDiagonal / screenDiagonal;
-
-                return (int)ppi;
-            }
-        }*/
-
         public static TouchCollection GetState()
         {
             // If the state isn't dirty then just
@@ -217,6 +198,10 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
 		public static GestureSample ReadGesture()
         {
+            // Make sure we have updated touch state.
+            GetState();
+
+            // Return the next gesture.
 			return GestureList.Dequeue();			
         }
 
@@ -276,6 +261,9 @@ namespace Microsoft.Xna.Framework.Input.Touch
         {
             get
             {
+                // Make sure we have updated touch state.
+                GetState();
+
 				return ( GestureList.Count > 0 );				
             }
         }
