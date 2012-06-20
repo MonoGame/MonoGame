@@ -151,7 +151,7 @@ namespace Microsoft.Xna.Framework
                 case Windows.System.VirtualKey.Control:
                     return Keys.LeftControl;
                 case Windows.System.VirtualKey.Shift:
-                    return Keys.LeftControl;           
+                    return Keys.LeftShift;
                 // Note that the Alt key is now refered to as Menu.
                 case Windows.System.VirtualKey.Menu:
                     return Keys.LeftAlt;
