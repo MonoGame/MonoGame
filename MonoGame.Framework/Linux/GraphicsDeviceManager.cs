@@ -237,7 +237,7 @@ namespace Microsoft.Xna.Framework
 
 		public bool SynchronizeWithVerticalRetrace {
 			get {
-				throw new NotImplementedException ();
+                return _game.Platform.VSyncEnabled;
 			}
 			set {
                 _game.Platform.VSyncEnabled = value;
