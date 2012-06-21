@@ -38,57 +38,34 @@
  */
 #endregion License
 
-using System;
-using System.IO;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline
 {
     /// <summary>
-    /// Specifies external references to a data file for the content item.
+    /// Implements a file format importer for use with game assets.
     /// 
-    /// While the object model is instantiated, reference file names are absolute. When the file containing the external reference is serialized to disk, file names are relative to the file. This allows movement of the content tree to a different location without breaking internal links.
+    /// Importers, either provided by the framework or written by a developer, must derive from ContentImporter, as well as being marked with a ContentImporterAttribute.
+    /// 
+    /// An importer should produce results in the standard intermediate object model. If an asset has information not supported by the object model, the importer should output it as opaque data (key/value attributes attached to the relevant object). By following this procedure, a content pipeline can access specialized digital content creation (DCC) tool information, even when that information has not been fully standardized into the official object model.
+    /// 
+    /// You can also design custom importers that accept and import types containing specific third-party extensions to the object model.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    public class ExternalReference<T> : ContentItem
+    public abstract class ContentImporter<T> : IContentImporter
     {
         /// <summary>
-        /// Gets and sets the file name of an ExternalReference.
+        /// Initializes a new instance of ContentImporter.
         /// </summary>
-        public string Filename { get; set; }
-
-        /// <summary>
-        /// Initializes a new instance of ExternalReference.
-        /// </summary>
-        public ExternalReference()
+        protected ContentImporter()
         {
-            Filename = string.Empty;
+
         }
 
         /// <summary>
-        /// Initializes a new instance of ExternalReference.
+        /// Called by the framework when importing a game asset. This is the method called by XNA when an asset is to be imported into an object that can be recognized by the Content Pipeline.
         /// </summary>
-        /// <param name="filename">The name of the referenced file.</param>
-        public ExternalReference(string filename)
-        {
-            if (string.IsNullOrEmpty(filename))
-                throw new ArgumentNullException("filename");
-            Filename = filename;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of ExternalReference, specifying the file path relative to another content item.
-        /// </summary>
-        /// <param name="filename">The name of the referenced file.</param>
-        /// <param name="relativeToContent">The content that the path specified in filename is relative to.</param>
-        public ExternalReference(string filename, ContentIdentity relativeToContent)
-        {
-            if (string.IsNullOrEmpty(filename))
-                throw new ArgumentNullException("filename");
-            if (relativeToContent == null)
-                throw new ArgumentNullException("relativeToContent");
-            if (string.IsNullOrEmpty(relativeToContent.SourceFilename))
-                throw new ArgumentNullException("relativeToContent.SourceFilename");
-            Filename = Path.Combine(relativeToContent.SourceFilename, filename);
-        }
+        /// <param name="filename">Name of a game asset file.</param>
+        /// <param name="context">Contains information for importing a game asset, such as a logger interface.</param>
+        /// <returns>Resulting game asset.</returns>
+        public abstract T Import(string filename, ContentImporterContext context);
     }
 }

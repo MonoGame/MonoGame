@@ -39,56 +39,32 @@
 #endregion License
 
 using System;
-using System.IO;
+using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline
 {
     /// <summary>
-    /// Specifies external references to a data file for the content item.
-    /// 
-    /// While the object model is instantiated, reference file names are absolute. When the file containing the external reference is serialized to disk, file names are relative to the file. This allows movement of the content tree to a different location without breaking internal links.
+    /// Provides methods for reading effect (.fx) files for use in the Content Pipeline.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    public class ExternalReference<T> : ContentItem
+    public class EffectImporter : ContentImporter<EffectContent>
     {
         /// <summary>
-        /// Gets and sets the file name of an ExternalReference.
+        /// Initializes a new instance of EffectImporter.
         /// </summary>
-        public string Filename { get; set; }
-
-        /// <summary>
-        /// Initializes a new instance of ExternalReference.
-        /// </summary>
-        public ExternalReference()
+        public EffectImporter()
         {
-            Filename = string.Empty;
+            throw new NotImplementedException();
         }
 
         /// <summary>
-        /// Initializes a new instance of ExternalReference.
+        /// Called by the XNA Framework when importing an .fx file to be used as a game asset. This is the method called by the XNA Framework when an asset is to be imported into an object that can be recognized by the Content Pipeline.
         /// </summary>
-        /// <param name="filename">The name of the referenced file.</param>
-        public ExternalReference(string filename)
+        /// <param name="filename">Name of a game asset file.</param>
+        /// <param name="context">Contains information for importing a game asset, such as a logger interface.</param>
+        /// <returns>Resulting game asset.</returns>
+        public override EffectContent Import(string filename, ContentImporterContext context)
         {
-            if (string.IsNullOrEmpty(filename))
-                throw new ArgumentNullException("filename");
-            Filename = filename;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of ExternalReference, specifying the file path relative to another content item.
-        /// </summary>
-        /// <param name="filename">The name of the referenced file.</param>
-        /// <param name="relativeToContent">The content that the path specified in filename is relative to.</param>
-        public ExternalReference(string filename, ContentIdentity relativeToContent)
-        {
-            if (string.IsNullOrEmpty(filename))
-                throw new ArgumentNullException("filename");
-            if (relativeToContent == null)
-                throw new ArgumentNullException("relativeToContent");
-            if (string.IsNullOrEmpty(relativeToContent.SourceFilename))
-                throw new ArgumentNullException("relativeToContent.SourceFilename");
-            Filename = Path.Combine(relativeToContent.SourceFilename, filename);
+            throw new NotImplementedException();
         }
     }
 }

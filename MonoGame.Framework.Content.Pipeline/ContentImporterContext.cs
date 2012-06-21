@@ -38,57 +38,41 @@
  */
 #endregion License
 
-using System;
-using System.IO;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline
 {
     /// <summary>
-    /// Specifies external references to a data file for the content item.
-    /// 
-    /// While the object model is instantiated, reference file names are absolute. When the file containing the external reference is serialized to disk, file names are relative to the file. This allows movement of the content tree to a different location without breaking internal links.
+    /// Provides properties that define logging behavior for the importer.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    public class ExternalReference<T> : ContentItem
+    public abstract class ContentImporterContext
     {
         /// <summary>
-        /// Gets and sets the file name of an ExternalReference.
+        /// The absolute path to the root of the build intermediate (object) directory.
         /// </summary>
-        public string Filename { get; set; }
+        public abstract string IntermediateDirectory { get; }
 
         /// <summary>
-        /// Initializes a new instance of ExternalReference.
+        /// Gets the logger for an importer.
         /// </summary>
-        public ExternalReference()
+        public abstract ContentBuildLogger Logger { get; }
+
+        /// <summary>
+        /// The absolute path to the root of the build output (binaries) directory.
+        /// </summary>
+        public abstract string OutputDirectory { get; }
+
+        /// <summary>
+        /// Initializes a new instance of ContentImporterContext.
+        /// </summary>
+        public ContentImporterContext()
         {
-            Filename = string.Empty;
+
         }
 
         /// <summary>
-        /// Initializes a new instance of ExternalReference.
+        /// Adds a dependency to the specified file. This causes a rebuild of the file, when modified, on subsequent incremental builds.
         /// </summary>
-        /// <param name="filename">The name of the referenced file.</param>
-        public ExternalReference(string filename)
-        {
-            if (string.IsNullOrEmpty(filename))
-                throw new ArgumentNullException("filename");
-            Filename = filename;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of ExternalReference, specifying the file path relative to another content item.
-        /// </summary>
-        /// <param name="filename">The name of the referenced file.</param>
-        /// <param name="relativeToContent">The content that the path specified in filename is relative to.</param>
-        public ExternalReference(string filename, ContentIdentity relativeToContent)
-        {
-            if (string.IsNullOrEmpty(filename))
-                throw new ArgumentNullException("filename");
-            if (relativeToContent == null)
-                throw new ArgumentNullException("relativeToContent");
-            if (string.IsNullOrEmpty(relativeToContent.SourceFilename))
-                throw new ArgumentNullException("relativeToContent.SourceFilename");
-            Filename = Path.Combine(relativeToContent.SourceFilename, filename);
-        }
+        /// <param name="filename">Name of an asset file.</param>
+        public abstract void AddDependency(string filename);
     }
 }

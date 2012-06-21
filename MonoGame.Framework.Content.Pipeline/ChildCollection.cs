@@ -39,56 +39,79 @@
 #endregion License
 
 using System;
-using System.IO;
+using System.Collections.ObjectModel;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline
 {
     /// <summary>
-    /// Specifies external references to a data file for the content item.
+    /// Provides a collection of child objects for a content item.
     /// 
-    /// While the object model is instantiated, reference file names are absolute. When the file containing the external reference is serialized to disk, file names are relative to the file. This allows movement of the content tree to a different location without breaking internal links.
+    /// Links from a child object to its parent are maintained as the collection contents are modified.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    public class ExternalReference<T> : ContentItem
+    /// <typeparam name="TParent"></typeparam>
+    /// <typeparam name="TChild"></typeparam>
+    public abstract class ChildCollection<TParent, TChild> : Collection<TChild>
+        where TParent : class
+        where TChild : class
     {
         /// <summary>
-        /// Gets and sets the file name of an ExternalReference.
+        /// Creates an instance of ChildCollection.
         /// </summary>
-        public string Filename { get; set; }
-
-        /// <summary>
-        /// Initializes a new instance of ExternalReference.
-        /// </summary>
-        public ExternalReference()
+        /// <param name="parent">Parent object of the child objects returned in the collection.</param>
+        protected ChildCollection(TParent parent)
         {
-            Filename = string.Empty;
+            throw new NotImplementedException();
         }
 
         /// <summary>
-        /// Initializes a new instance of ExternalReference.
+        /// Removes all children from the collection.
         /// </summary>
-        /// <param name="filename">The name of the referenced file.</param>
-        public ExternalReference(string filename)
+        protected override void ClearItems()
         {
-            if (string.IsNullOrEmpty(filename))
-                throw new ArgumentNullException("filename");
-            Filename = filename;
+            throw new NotImplementedException();
         }
 
         /// <summary>
-        /// Initializes a new instance of ExternalReference, specifying the file path relative to another content item.
+        /// Gets the parent of a child object.
         /// </summary>
-        /// <param name="filename">The name of the referenced file.</param>
-        /// <param name="relativeToContent">The content that the path specified in filename is relative to.</param>
-        public ExternalReference(string filename, ContentIdentity relativeToContent)
+        /// <param name="child">The child of the parent being retrieved.</param>
+        /// <returns>The parent of the child object.</returns>
+        protected abstract TParent GetParent(TChild child);
+
+        /// <summary>
+        /// Inserts a child object into the collection at the specified location.
+        /// </summary>
+        /// <param name="index">The position in the collection.</param>
+        /// <param name="item">The child object being inserted.</param>
+        protected override void InsertItem(int index, TChild item)
         {
-            if (string.IsNullOrEmpty(filename))
-                throw new ArgumentNullException("filename");
-            if (relativeToContent == null)
-                throw new ArgumentNullException("relativeToContent");
-            if (string.IsNullOrEmpty(relativeToContent.SourceFilename))
-                throw new ArgumentNullException("relativeToContent.SourceFilename");
-            Filename = Path.Combine(relativeToContent.SourceFilename, filename);
+            throw new NotImplementedException();
         }
+
+        /// <summary>
+        /// Removes a child object from the collection.
+        /// </summary>
+        /// <param name="index">The index of the item being removed.</param>
+        protected override void RemoveItem(int index)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Modifies the value of the child object at the specified location.
+        /// </summary>
+        /// <param name="index">The index of the child object being modified.</param>
+        /// <param name="item">The new value for the child object.</param>
+        protected override void SetItem(int index, TChild item)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Modifies the value of the parent object of the specified child object.
+        /// </summary>
+        /// <param name="child">The child of the parent being modified.</param>
+        /// <param name="parent">The new value for the parent object.</param>
+        protected abstract void SetParent(TChild child, TParent parent);
     }
 }

@@ -38,57 +38,28 @@
  */
 #endregion License
 
-using System;
-using System.IO;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline
 {
     /// <summary>
-    /// Specifies external references to a data file for the content item.
-    /// 
-    /// While the object model is instantiated, reference file names are absolute. When the file containing the external reference is serialized to disk, file names are relative to the file. This allows movement of the content tree to a different location without breaking internal links.
+    /// Provides a base class to use when developing custom processor components. All processors must derive from this class.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    public class ExternalReference<T> : ContentItem
+    public abstract class ContentProcessor<TInput, TOutput> : IContentProcessor
     {
         /// <summary>
-        /// Gets and sets the file name of an ExternalReference.
+        /// Initializes a new instance of the ContentProcessor class.
         /// </summary>
-        public string Filename { get; set; }
-
-        /// <summary>
-        /// Initializes a new instance of ExternalReference.
-        /// </summary>
-        public ExternalReference()
+        protected ContentProcessor()
         {
-            Filename = string.Empty;
+
         }
 
         /// <summary>
-        /// Initializes a new instance of ExternalReference.
+        /// Processes the specified input data and returns the result.
         /// </summary>
-        /// <param name="filename">The name of the referenced file.</param>
-        public ExternalReference(string filename)
-        {
-            if (string.IsNullOrEmpty(filename))
-                throw new ArgumentNullException("filename");
-            Filename = filename;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of ExternalReference, specifying the file path relative to another content item.
-        /// </summary>
-        /// <param name="filename">The name of the referenced file.</param>
-        /// <param name="relativeToContent">The content that the path specified in filename is relative to.</param>
-        public ExternalReference(string filename, ContentIdentity relativeToContent)
-        {
-            if (string.IsNullOrEmpty(filename))
-                throw new ArgumentNullException("filename");
-            if (relativeToContent == null)
-                throw new ArgumentNullException("relativeToContent");
-            if (string.IsNullOrEmpty(relativeToContent.SourceFilename))
-                throw new ArgumentNullException("relativeToContent.SourceFilename");
-            Filename = Path.Combine(relativeToContent.SourceFilename, filename);
-        }
+        /// <param name="input">Existing content object being processed.</param>
+        /// <param name="context">Contains any required custom process parameters.</param>
+        /// <returns>A typed object representing the processed input.</returns>
+        public abstract TOutput Process(TInput input, ContentProcessorContext context);
     }
 }
