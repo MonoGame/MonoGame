@@ -222,7 +222,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
             if (profile != 0)
 #endif
-                throw new Exception("The effect is the profile for this platform!");
+                throw new Exception("The MGFX effect is the wrong profile for this platform!");
 
             // TODO: Maybe we should be reading in a string 
             // table here to save some bytes in the file.
