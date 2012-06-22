@@ -1,0 +1,89 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{B950DE10-AC5D-4BD9-B817-51247C4A732D}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Microsoft.Xna.Framework.Content.Pipeline</RootNamespace>
+    <AssemblyName>MonoGame.Framework.Content.Pipeline</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Build.Framework" />
+    <Reference Include="Microsoft.Build.Utilities.v4.0" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ChildCollection.cs" />
+    <Compile Include="ContentBuildLogger.cs" />
+    <Compile Include="ContentIdentity.cs" />
+    <Compile Include="ContentImporter.cs" />
+    <Compile Include="ContentImporterAttribute.cs" />
+    <Compile Include="ContentImporterContext.cs" />
+    <Compile Include="ContentItem.cs" />
+    <Compile Include="ContentProcessor.cs" />
+    <Compile Include="ContentProcessorAttribute.cs" />
+    <Compile Include="ContentProcessorContext.cs" />
+    <Compile Include="EffectImporter.cs" />
+    <Compile Include="ExternalReference.cs" />
+    <Compile Include="Graphics\EffectContent.cs" />
+    <Compile Include="IContentImporter.cs" />
+    <Compile Include="IContentProcessor.cs" />
+    <Compile Include="InvalidContentException.cs" />
+    <Compile Include="NamedValueDictionary.cs" />
+    <Compile Include="OpaqueDataDictionary.cs" />
+    <Compile Include="PipelineComponentScanner.cs" />
+    <Compile Include="PipelineException.cs" />
+    <Compile Include="ProcessorParameter.cs" />
+    <Compile Include="ProcessorParameterCollection.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TargetPlatform.cs" />
+    <Compile Include="Tasks\BuildContent.cs" />
+    <Compile Include="Tasks\CleanContent.cs" />
+    <Compile Include="Tasks\GetLastOutputs.cs" />
+    <Compile Include="VideoContent.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.Windows.csproj">
+      <Project>{7DE47032-A904-4C29-BD22-2D235E8D91BA}</Project>
+      <Name>MonoGame.Framework.Windows</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
