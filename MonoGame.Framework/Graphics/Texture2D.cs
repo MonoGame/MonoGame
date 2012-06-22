@@ -322,13 +322,14 @@ namespace Microsoft.Xna.Framework.Graphics
                 if (glFormat == (GLPixelFormat)All.CompressedTextureFormats)
                 {
                     if (rect.HasValue)
-                        GL.CompressedTexSubImage2D(TextureTarget.Texture2D, level, x, y, w, h,
+                        GL.CompressedTexSubImage2D(TextureTarget.Texture2D, 
+                                                   level, x, y, w, h,
 #if GLES
-                            glInternalFormat,
+                                                   glInternalFormat,
 #else
-                            glFormat,
+                                                   glFormat,
 #endif
-                            data.Length - startBytes, dataPtr);
+                                                   data.Length - startBytes, dataPtr);
                     else
                         GL.CompressedTexImage2D(TextureTarget.Texture2D, level, glInternalFormat, w, h, 0, data.Length - startBytes, dataPtr);
                 }
