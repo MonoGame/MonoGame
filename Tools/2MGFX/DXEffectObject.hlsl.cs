@@ -8,8 +8,6 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     partial class DXEffectObject
     {
-        public List<ConstantBuffer> ConstantBuffers { get; private set; }
-        
         private DXEffectObject()
         {
         }
@@ -20,7 +18,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // These are filled out as we process stuff.
             effect.ConstantBuffers = new List<ConstantBuffer>();
-            effect.Shaders = new List<DXShader>();
+            effect.Shaders = new List<DXShaderData>();
 
             // Go thru the techniques and that will find all the 
             // shaders and constant buffers.
@@ -183,7 +181,7 @@ namespace Microsoft.Xna.Framework.Graphics
             shaderByteCode.Data.Read(bytecode, 0, bytecode.Length);
 
             // First look to see if we already created this same shader.
-            DXShader dxShader = null;
+            DXShaderData dxShader = null;
             foreach (var shader in Shaders)
             {
                 if (bytecode.SequenceEqual(shader.Bytecode))
@@ -197,9 +195,9 @@ namespace Microsoft.Xna.Framework.Graphics
             if ( dxShader == null )
             {
                 if (shaderInfo.DX11Profile)
-                    dxShader = DXShader.CreateHLSL(bytecode, isVertexShader, ConstantBuffers, Shaders.Count);
+                    dxShader = DXShaderData.CreateHLSL(bytecode, isVertexShader, ConstantBuffers, Shaders.Count);
                 else
-                    dxShader = DXShader.CreateGLSL(bytecode, isVertexShader, ConstantBuffers, Shaders.Count);
+                    dxShader = DXShaderData.CreateGLSL(bytecode, isVertexShader, ConstantBuffers, Shaders.Count);
 
                 Shaders.Add(dxShader);
             }

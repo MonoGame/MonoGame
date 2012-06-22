@@ -47,25 +47,20 @@ namespace Microsoft.Xna.Framework.Graphics
             Initialize();
         }
 
-        public ConstantBuffer(GraphicsDevice device, BinaryReader reader)
+        public ConstantBuffer(GraphicsDevice device, 
+		                      int sizeInBytes,
+		                      int[] parameterIndexes,
+		                      int[] parameterOffsets,
+		                      string name)
         {
             graphicsDevice = device;
 
-#if OPENGL
-            _name = reader.ReadString();               
-#endif
-            // Create the backing system memory buffer.
-            var sizeInBytes = (int)reader.ReadInt16();
-            _buffer = new byte[sizeInBytes];
+			_buffer = new byte[sizeInBytes];
 
-            // Read the parameter index values.
-            _parameters = new int[reader.ReadByte()];
-            _offsets = new int[_parameters.Length];
-            for (var i = 0; i < _parameters.Length; i++)
-            {
-                _parameters[i] = (int)reader.ReadByte();
-                _offsets[i] = (int)reader.ReadUInt16();
-            }
+			_parameters = parameterIndexes;
+			_offsets = parameterOffsets;
+
+			_name = name;
 
             Initialize();
         }
@@ -114,6 +109,30 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+		void SetParameter (int offset, EffectParameter param)
+		{
+			int elementSize = 4;
+			var rowSize = elementSize * 4;
+
+			if (param.Elements.Count > 0) {
+				foreach (var subparam in param.Elements) {
+					SetParameter (offset, subparam);
+					//TODO: Sometimes directx decides to transpose matricies
+					//to fit in fewer registers.
+					offset += subparam.RowCount * rowSize;
+				}
+			} else {
+				switch (param.ParameterType) {
+				case EffectParameterType.Single:
+					SetData (offset, param.RowCount, param.ColumnCount, param.Data);                        
+					break;
+	
+				default:
+					throw new NotImplementedException ("Not supported!");
+				}
+			}
+		}
+
 #if DIRECTX
         public void Apply(bool vertexStage, int slot, EffectParameterCollection parameters)
 #elif OPENGL
@@ -149,15 +168,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 var offset = _offsets[p];
                 dirty = true;
 
-                switch (param.ParameterType)
-                {
-                    case EffectParameterType.Single:
-                        SetData(offset, param.RowCount, param.ColumnCount, param.Data);                        
-                        break;
-
-                    default:
-                        throw new NotImplementedException("Not supported!");
-                }
+				SetParameter(offset, param);
             }
 
             _stateKey = EffectParameter.NextStateKey;

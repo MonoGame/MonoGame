@@ -52,7 +52,7 @@ namespace Microsoft.Xna.Framework.Content
 
             var buffer = new IndexBuffer(input.GraphicsDevice, 
                 sixteenBits ? IndexElementSize.SixteenBits : IndexElementSize.ThirtyTwoBits, 
-                dataSize / ( sixteenBits ? 2 : 4 ), BufferUsage.WriteOnly);
+                dataSize / ( sixteenBits ? 2 : 4 ), BufferUsage.None);
 
             buffer.SetData(data);
             return buffer;

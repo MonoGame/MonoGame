@@ -4,9 +4,15 @@ using System.Runtime.InteropServices;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-	public class MojoShader
+	internal class MojoShader
     {
-        const string mojoshader_dll = "libmojoshader_32.dll";
+#if IPHONE
+		const string mojoshader_dll = "__Internal";
+#elif ANDROID
+		const string mojoshader_dll = "libmojoshader.so";
+#else
+		const string mojoshader_dll = "libmojoshader.dll";
+#endif
 
 		public partial class NativeConstants {
 		    
@@ -20,11 +26,11 @@ namespace Microsoft.Xna.Framework.Graphics
 		    ///Parameter name: node
 		    public const string _INCL_MOJOSHADER_VERSION_H_ = "";
 		    
-		    /// MOJOSHADER_VERSION -> 1068
-		    public const int MOJOSHADER_VERSION = 1068;
+		    /// MOJOSHADER_VERSION -> 1111
+		    public const int MOJOSHADER_VERSION = 1111;
 		    
-		    /// MOJOSHADER_CHANGESET -> "hg-1068:89f0be59ad5d"
-		    public const string MOJOSHADER_CHANGESET = "hg-1068:89f0be59ad5d";
+		    /// MOJOSHADER_CHANGESET -> "hg-1111:91a6af79b5e4"
+		    public const string MOJOSHADER_CHANGESET = "hg-1111:91a6af79b5e4";
 		    
 		    /// MOJOSHADER_POSITION_NONE -> (-3)
 		    public const int MOJOSHADER_POSITION_NONE = -3;
@@ -90,20 +96,10 @@ namespace Microsoft.Xna.Framework.Graphics
 		    public const int MOJOSHADER_AST_DATATYPE_CONST = (1) << (31);
 		}
 		
-		/// Return Type: void*
-		///bytes: int
-		///data: void*
-		public delegate IntPtr MOJOSHADER_malloc(int bytes, IntPtr data);
-		
-		/// Return Type: void
-		///ptr: void*
-		///data: void*
-		public delegate void MOJOSHADER_free(IntPtr ptr, IntPtr data);
-		
 		[StructLayoutAttribute(LayoutKind.Sequential)]
 		public struct MOJOSHADER_uniform {
 		    
-		    /// MOJOSHADER_uniformType->Anonymous_ae9bbb62_7e35_4bc4_a072_275e4cf76d5c
+		    /// MOJOSHADER_uniformType->Anonymous_cf91fd71_65e4_4c31_a6d5_9488d7f3d32a
 		    public MOJOSHADER_uniformType type;
 		    
 		    /// int
@@ -123,20 +119,20 @@ namespace Microsoft.Xna.Framework.Graphics
 		[StructLayoutAttribute(LayoutKind.Sequential)]
 		public struct MOJOSHADER_constant {
 		    
-		    /// MOJOSHADER_uniformType->Anonymous_ae9bbb62_7e35_4bc4_a072_275e4cf76d5c
+		    /// MOJOSHADER_uniformType->Anonymous_cf91fd71_65e4_4c31_a6d5_9488d7f3d32a
 		    public MOJOSHADER_uniformType type;
 		    
 		    /// int
 		    public int index;
 		    
-		    /// Anonymous_62d99b02_9525_48b9_8e24_2ef7c8884ab9
-		    public Anonymous_62d99b02_9525_48b9_8e24_2ef7c8884ab9 value;
+		    /// Anonymous_5371dd6a_e42a_47c1_91d1_a2af9a8283be
+		    public Anonymous_5371dd6a_e42a_47c1_91d1_a2af9a8283be value;
 		}
 		
 		[StructLayoutAttribute(LayoutKind.Sequential)]
 		public struct MOJOSHADER_sampler {
 		    
-		    /// MOJOSHADER_samplerType->Anonymous_a8aef311_ca01_4594_9b89_c489f699ec44
+		    /// MOJOSHADER_samplerType->Anonymous_a752a39b_b479_42b0_9502_e39ba7d86100
 		    public MOJOSHADER_samplerType type;
 		    
 		    /// int
@@ -145,12 +141,25 @@ namespace Microsoft.Xna.Framework.Graphics
 		    /// char*
 		    [MarshalAsAttribute(UnmanagedType.LPStr)]
 		    public string name;
+		    
+		    /// int
+		    public int texbem;
+		}
+		
+		[StructLayoutAttribute(LayoutKind.Sequential)]
+		public struct MOJOSHADER_samplerMap {
+		    
+		    /// int
+		    public int index;
+		    
+		    /// MOJOSHADER_samplerType->Anonymous_a752a39b_b479_42b0_9502_e39ba7d86100
+		    public MOJOSHADER_samplerType type;
 		}
 		
 		[StructLayoutAttribute(LayoutKind.Sequential)]
 		public struct MOJOSHADER_attribute {
 		    
-		    /// MOJOSHADER_usage->Anonymous_40f3f781_23ce_43a1_85f7_07947636aee7
+		    /// MOJOSHADER_usage->Anonymous_9c01433d_7bb5_4c50_bf77_e65cef0661b5
 		    public MOJOSHADER_usage usage;
 		    
 		    /// int
@@ -164,7 +173,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		[StructLayoutAttribute(LayoutKind.Sequential, CharSet=CharSet.Ansi)]
 		public struct MOJOSHADER_swizzle {
 		    
-		    /// MOJOSHADER_usage->Anonymous_40f3f781_23ce_43a1_85f7_07947636aee7
+		    /// MOJOSHADER_usage->Anonymous_9c01433d_7bb5_4c50_bf77_e65cef0661b5
 		    public MOJOSHADER_usage usage;
 		    
 		    /// unsigned int
@@ -178,10 +187,10 @@ namespace Microsoft.Xna.Framework.Graphics
 		[StructLayoutAttribute(LayoutKind.Sequential)]
 		public struct MOJOSHADER_symbolTypeInfo {
 		    
-		    /// MOJOSHADER_symbolClass->Anonymous_b4d474fd_22f3_449b_b890_7dfd034076ef
+		    /// MOJOSHADER_symbolClass->Anonymous_681c4b26_94f7_4142_a8e9_b970fe0b60df
 		    public MOJOSHADER_symbolClass parameter_class;
 		    
-		    /// MOJOSHADER_symbolType->Anonymous_94930ce9_6468_45eb_be49_90ca1b6c3eab
+		    /// MOJOSHADER_symbolType->Anonymous_d8534f21_7f44_465d_8843_40a435dbb54a
 		    public MOJOSHADER_symbolType parameter_type;
 		    
 		    /// unsigned int
@@ -218,7 +227,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    [MarshalAsAttribute(UnmanagedType.LPStr)]
 		    public string name;
 		    
-		    /// MOJOSHADER_symbolRegisterSet->Anonymous_c1f0a1a2_29d0_4044_b55d_20912fad16c6
+		    /// MOJOSHADER_symbolRegisterSet->Anonymous_9ff7ac54_131c_43b0_a295_9830d24ac76b
 		    public MOJOSHADER_symbolRegisterSet register_set;
 		    
 		    /// unsigned int
@@ -324,15 +333,20 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		public enum MOJOSHADER_preshaderOperandType {
 		    
+		    /// MOJOSHADER_PRESHADEROPERAND_LITERAL -> 1
 		    MOJOSHADER_PRESHADEROPERAND_LITERAL = 1,
 		    
+		    /// MOJOSHADER_PRESHADEROPERAND_INPUT -> 2
 		    MOJOSHADER_PRESHADEROPERAND_INPUT = 2,
 		    
+		    /// MOJOSHADER_PRESHADEROPERAND_OUTPUT -> 4
 		    MOJOSHADER_PRESHADEROPERAND_OUTPUT = 4,
 		    
+		    /// MOJOSHADER_PRESHADEROPERAND_TEMP -> 7
 		    MOJOSHADER_PRESHADEROPERAND_TEMP = 7,
-			
-			MOJOSHADER_PRESHADEROPERAND_UNKN = 0xff
+		    
+		    /// MOJOSHADER_PRESHADEROPERAND_UNKN -> 0xff
+		    MOJOSHADER_PRESHADEROPERAND_UNKN = 255,
 		}
 		
 		[StructLayoutAttribute(LayoutKind.Sequential)]
@@ -343,10 +357,12 @@ namespace Microsoft.Xna.Framework.Graphics
 		    
 		    /// unsigned int
 		    public uint index;
-
-            public int indexingType;
-
-            public uint indexingIndex;
+		    
+		    /// int
+		    public int indexingType;
+		    
+		    /// unsigned int
+		    public uint indexingIndex;
 		}
 		
 		[StructLayoutAttribute(LayoutKind.Sequential)]
@@ -414,7 +430,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    /// int
 		    public int instruction_count;
 		    
-		    /// MOJOSHADER_shaderType->Anonymous_cb045d1a_42aa_4c79_8706_255b4ceba853
+		    /// MOJOSHADER_shaderType->Anonymous_96517ad6_cc69_4542_8537_054e63919d54
 		    public MOJOSHADER_shaderType shader_type;
 		    
 		    /// int
@@ -587,10 +603,10 @@ namespace Microsoft.Xna.Framework.Graphics
 		    public IntPtr shaders;
 		    
 		    /// MOJOSHADER_malloc
-		    public MOJOSHADER_malloc malloc;
+		    public IntPtr malloc;
 		    
 		    /// MOJOSHADER_free
-		    public MOJOSHADER_free free;
+		    public IntPtr free;
 		    
 		    /// void*
 		    public IntPtr malloc_data;
@@ -625,17 +641,17 @@ namespace Microsoft.Xna.Framework.Graphics
 		    public int output_len;
 		    
 		    /// MOJOSHADER_malloc
-		    public MOJOSHADER_malloc malloc;
+		    public IntPtr malloc;
 		    
 		    /// MOJOSHADER_free
-		    public MOJOSHADER_free free;
+		    public IntPtr free;
 		    
 		    /// void*
 		    public IntPtr malloc_data;
 		}
 		
 		/// Return Type: int
-		///inctype: MOJOSHADER_includeType->Anonymous_40a627df_9bac_4391_b30c_94e23454e7d1
+		///inctype: MOJOSHADER_includeType->Anonymous_f1eed39d_7d1b_46d4_972e_a3229d15c26e
 		///fname: char*
 		///parent: char*
 		///outdata: char**
@@ -643,14 +659,14 @@ namespace Microsoft.Xna.Framework.Graphics
 		///m: MOJOSHADER_malloc
 		///f: MOJOSHADER_free
 		///d: void*
-		public delegate int MOJOSHADER_includeOpen(MOJOSHADER_includeType inctype, [InAttribute()] [MarshalAsAttribute(UnmanagedType.LPStr)] string fname, [InAttribute()] [MarshalAsAttribute(UnmanagedType.LPStr)] string parent, ref IntPtr outdata, ref uint outbytes, MOJOSHADER_malloc m, MOJOSHADER_free f, IntPtr d);
+		public delegate int MOJOSHADER_includeOpen(MOJOSHADER_includeType inctype, [InAttribute()] [MarshalAsAttribute(UnmanagedType.LPStr)] string fname, [InAttribute()] [MarshalAsAttribute(UnmanagedType.LPStr)] string parent, ref IntPtr outdata, ref uint outbytes, IntPtr m, IntPtr f, IntPtr d);
 		
 		/// Return Type: void
 		///data: char*
 		///m: MOJOSHADER_malloc
 		///f: MOJOSHADER_free
 		///d: void*
-		public delegate void MOJOSHADER_includeClose([InAttribute()] [MarshalAsAttribute(UnmanagedType.LPStr)] string data, MOJOSHADER_malloc m, MOJOSHADER_free f, IntPtr d);
+		public delegate void MOJOSHADER_includeClose([InAttribute()] [MarshalAsAttribute(UnmanagedType.LPStr)] string data, IntPtr m, IntPtr f, IntPtr d);
 		
 		public enum MOJOSHADER_astDataTypeType {
 		    
@@ -2034,10 +2050,10 @@ namespace Microsoft.Xna.Framework.Graphics
 		    public IntPtr ast;
 		    
 		    /// MOJOSHADER_malloc
-		    public MOJOSHADER_malloc malloc;
+		    public IntPtr malloc;
 		    
 		    /// MOJOSHADER_free
-		    public MOJOSHADER_free free;
+		    public IntPtr free;
 		    
 		    /// void*
 		    public IntPtr malloc_data;
@@ -2181,8 +2197,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		    /// MOJOSHADER_irExprInfo
 		    public MOJOSHADER_irExprInfo info;
 		    
-		    /// Anonymous_4985d482_55d7_4ea7_8906_0670097eb62c
-		    public Anonymous_4985d482_55d7_4ea7_8906_0670097eb62c value;
+		    /// Anonymous_3a13e6d2_72d8_4c86_b5bf_9aff36c73111
+		    public Anonymous_3a13e6d2_72d8_4c86_b5bf_9aff36c73111 value;
 		}
 		
 		[StructLayoutAttribute(LayoutKind.Sequential)]
@@ -2553,10 +2569,10 @@ namespace Microsoft.Xna.Framework.Graphics
 		    public IntPtr symbols;
 		    
 		    /// MOJOSHADER_malloc
-		    public MOJOSHADER_malloc malloc;
+		    public IntPtr malloc;
 		    
 		    /// MOJOSHADER_free
-		    public MOJOSHADER_free free;
+		    public IntPtr free;
 		    
 		    /// void*
 		    public IntPtr malloc_data;
@@ -2568,7 +2584,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		public delegate IntPtr MOJOSHADER_glGetProcAddress([InAttribute()] [MarshalAsAttribute(UnmanagedType.LPStr)] string fnname, IntPtr data);
 		
 		[StructLayoutAttribute(LayoutKind.Explicit)]
-		public struct Anonymous_62d99b02_9525_48b9_8e24_2ef7c8884ab9 {
+		public struct Anonymous_5371dd6a_e42a_47c1_91d1_a2af9a8283be {
 		    
 		    /// float[4]
 		    [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst=4, ArraySubType=UnmanagedType.R4)]
@@ -2586,7 +2602,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 		
 		[StructLayoutAttribute(LayoutKind.Explicit)]
-		public struct Anonymous_4985d482_55d7_4ea7_8906_0670097eb62c {
+		public struct Anonymous_3a13e6d2_72d8_4c86_b5bf_9aff36c73111 {
 		    
 		    /// int[16]
 		    [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst=16, ArraySubType=UnmanagedType.I4)]
@@ -2779,7 +2795,6 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		public partial class NativeMethods {
 		    
-
 		    /// Return Type: int
 		    [DllImportAttribute(mojoshader_dll, EntryPoint="MOJOSHADER_version")]
 		public static extern  int MOJOSHADER_version() ;
@@ -2795,14 +2810,24 @@ namespace Microsoft.Xna.Framework.Graphics
 		    [DllImportAttribute(mojoshader_dll, EntryPoint="MOJOSHADER_maxShaderModel")]
 		public static extern  int MOJOSHADER_maxShaderModel([InAttribute()] [MarshalAsAttribute(UnmanagedType.LPStr)] string profile) ;
 		
-			
-			
-			
-			[DllImportAttribute(mojoshader_dll, EntryPoint="MOJOSHADER_parseExpression")]
-		public static extern  IntPtr MOJOSHADER_parseExpression([InAttribute()] byte[] tokenbuf, int bufsize, IntPtr/*MOJOSHADER_malloc*/ m, IntPtr/*MOJOSHADER_free*/ f, IntPtr d) ;
-			
-			[DllImportAttribute(mojoshader_dll, EntryPoint="MOJOSHADER_runPreshader")]
-		public static extern void MOJOSHADER_runPreshader(ref MOJOSHADER_preshader preshader, [InAttribute()] float[] inregs, float[] outregs);
+		    
+		    /// Return Type: MOJOSHADER_parseData*
+		    ///tokenbuf: char*
+		    ///bufsize: int
+		    ///m: MOJOSHADER_malloc
+		    ///f: MOJOSHADER_free
+		    ///d: void*
+		    [DllImportAttribute(mojoshader_dll, EntryPoint="MOJOSHADER_parseExpression")]
+		public static extern  IntPtr MOJOSHADER_parseExpression([InAttribute()] byte[] tokenbuf, int bufsize, IntPtr m, IntPtr f, IntPtr d) ;
+		
+		    
+		    /// Return Type: void
+		    ///param0: MOJOSHADER_preshader*
+		    ///param1: float*
+		    ///param2: float*
+		    [DllImportAttribute(mojoshader_dll, EntryPoint="MOJOSHADER_runPreshader")]
+		public static extern  void MOJOSHADER_runPreshader(ref MOJOSHADER_preshader param0, ref float param1, ref float param2) ;
+		
 		    
 		    /// Return Type: MOJOSHADER_parseData*
 		    ///profile: char*
@@ -2810,17 +2835,19 @@ namespace Microsoft.Xna.Framework.Graphics
 		    ///bufsize: int
 		    ///swiz: MOJOSHADER_swizzle*
 		    ///swizcount: int
+		    ///smap: MOJOSHADER_samplerMap*
+		    ///smapcount: int
 		    ///m: MOJOSHADER_malloc
 		    ///f: MOJOSHADER_free
 		    ///d: void*
 		    [DllImportAttribute(mojoshader_dll, EntryPoint="MOJOSHADER_parse")]
-		public static extern  IntPtr MOJOSHADER_parse([InAttribute()] [MarshalAsAttribute(UnmanagedType.LPStr)] string profile, [InAttribute()] byte[] tokenbuf, int bufsize, IntPtr/*ref MOJOSHADER_swizzle*/ swiz, int swizcount, IntPtr/*MOJOSHADER_malloc*/ m, IntPtr/*MOJOSHADER_free*/ f, IntPtr d) ;
+		public static extern  IntPtr MOJOSHADER_parse([InAttribute()] [MarshalAsAttribute(UnmanagedType.LPStr)] string profile, [InAttribute()] byte[] tokenbuf, int bufsize, IntPtr swiz, int swizcount, IntPtr smap, int smapcount, IntPtr m, IntPtr f, IntPtr d) ;
 		
 		    
 		    /// Return Type: void
 		    ///data: MOJOSHADER_parseData*
 		    [DllImportAttribute(mojoshader_dll, EntryPoint="MOJOSHADER_freeParseData")]
-		public static extern  void MOJOSHADER_freeParseData(IntPtr /*ref MOJOSHADER_parseData*/ data) ;
+		public static extern  void MOJOSHADER_freeParseData(ref MOJOSHADER_parseData data) ;
 		
 		    
 		    /// Return Type: MOJOSHADER_effect*
@@ -2829,11 +2856,13 @@ namespace Microsoft.Xna.Framework.Graphics
 		    ///_len: int
 		    ///swiz: MOJOSHADER_swizzle*
 		    ///swizcount: int
+		    ///smap: MOJOSHADER_samplerMap*
+		    ///smapcount: int
 		    ///m: MOJOSHADER_malloc
 		    ///f: MOJOSHADER_free
 		    ///d: void*
 		    [DllImportAttribute(mojoshader_dll, EntryPoint="MOJOSHADER_parseEffect")]
-		public static extern  IntPtr MOJOSHADER_parseEffect([InAttribute()] [MarshalAsAttribute(UnmanagedType.LPStr)] string profile, [InAttribute()] [MarshalAsAttribute(UnmanagedType.LPStr)] string buf, int _len, ref MOJOSHADER_swizzle swiz, int swizcount, MOJOSHADER_malloc m, MOJOSHADER_free f, IntPtr d) ;
+		public static extern  IntPtr MOJOSHADER_parseEffect([InAttribute()] [MarshalAsAttribute(UnmanagedType.LPStr)] string profile, [InAttribute()] [MarshalAsAttribute(UnmanagedType.LPStr)] string buf, int _len, ref MOJOSHADER_swizzle swiz, int swizcount, ref MOJOSHADER_samplerMap smap, int smapcount, IntPtr m, IntPtr f, IntPtr d) ;
 		
 		    
 		    /// Return Type: void
@@ -2854,7 +2883,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    ///f: MOJOSHADER_free
 		    ///d: void*
 		    [DllImportAttribute(mojoshader_dll, EntryPoint="MOJOSHADER_preprocess")]
-		public static extern  IntPtr MOJOSHADER_preprocess([InAttribute()] [MarshalAsAttribute(UnmanagedType.LPStr)] string filename, [InAttribute()] [MarshalAsAttribute(UnmanagedType.LPStr)] string source, uint sourcelen, ref MOJOSHADER_preprocessorDefine defines, uint define_count, MOJOSHADER_includeOpen include_open, MOJOSHADER_includeClose include_close, MOJOSHADER_malloc m, MOJOSHADER_free f, IntPtr d) ;
+		public static extern  IntPtr MOJOSHADER_preprocess([InAttribute()] [MarshalAsAttribute(UnmanagedType.LPStr)] string filename, [InAttribute()] [MarshalAsAttribute(UnmanagedType.LPStr)] string source, uint sourcelen, ref MOJOSHADER_preprocessorDefine defines, uint define_count, MOJOSHADER_includeOpen include_open, MOJOSHADER_includeClose include_close, IntPtr m, IntPtr f, IntPtr d) ;
 		
 		    
 		    /// Return Type: void
@@ -2879,7 +2908,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    ///f: MOJOSHADER_free
 		    ///d: void*
 		    [DllImportAttribute(mojoshader_dll, EntryPoint="MOJOSHADER_assemble")]
-		public static extern  IntPtr MOJOSHADER_assemble([InAttribute()] [MarshalAsAttribute(UnmanagedType.LPStr)] string filename, [InAttribute()] [MarshalAsAttribute(UnmanagedType.LPStr)] string source, uint sourcelen, ref IntPtr comments, uint comment_count, ref MOJOSHADER_symbol symbols, uint symbol_count, ref MOJOSHADER_preprocessorDefine defines, uint define_count, MOJOSHADER_includeOpen include_open, MOJOSHADER_includeClose include_close, MOJOSHADER_malloc m, MOJOSHADER_free f, IntPtr d) ;
+		public static extern  IntPtr MOJOSHADER_assemble([InAttribute()] [MarshalAsAttribute(UnmanagedType.LPStr)] string filename, [InAttribute()] [MarshalAsAttribute(UnmanagedType.LPStr)] string source, uint sourcelen, ref IntPtr comments, uint comment_count, ref MOJOSHADER_symbol symbols, uint symbol_count, ref MOJOSHADER_preprocessorDefine defines, uint define_count, MOJOSHADER_includeOpen include_open, MOJOSHADER_includeClose include_close, IntPtr m, IntPtr f, IntPtr d) ;
 		
 		    
 		    /// Return Type: MOJOSHADER_astData*
@@ -2895,7 +2924,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    ///f: MOJOSHADER_free
 		    ///d: void*
 		    [DllImportAttribute(mojoshader_dll, EntryPoint="MOJOSHADER_parseAst")]
-		public static extern  IntPtr MOJOSHADER_parseAst([InAttribute()] [MarshalAsAttribute(UnmanagedType.LPStr)] string srcprofile, [InAttribute()] [MarshalAsAttribute(UnmanagedType.LPStr)] string filename, [InAttribute()] [MarshalAsAttribute(UnmanagedType.LPStr)] string source, uint sourcelen, ref MOJOSHADER_preprocessorDefine defs, uint define_count, MOJOSHADER_includeOpen include_open, MOJOSHADER_includeClose include_close, MOJOSHADER_malloc m, MOJOSHADER_free f, IntPtr d) ;
+		public static extern  IntPtr MOJOSHADER_parseAst([InAttribute()] [MarshalAsAttribute(UnmanagedType.LPStr)] string srcprofile, [InAttribute()] [MarshalAsAttribute(UnmanagedType.LPStr)] string filename, [InAttribute()] [MarshalAsAttribute(UnmanagedType.LPStr)] string source, uint sourcelen, ref MOJOSHADER_preprocessorDefine defs, uint define_count, MOJOSHADER_includeOpen include_open, MOJOSHADER_includeClose include_close, IntPtr m, IntPtr f, IntPtr d) ;
 		
 		    
 		    /// Return Type: void
@@ -2917,7 +2946,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    ///f: MOJOSHADER_free
 		    ///d: void*
 		    [DllImportAttribute(mojoshader_dll, EntryPoint="MOJOSHADER_compile")]
-		public static extern  IntPtr MOJOSHADER_compile([InAttribute()] [MarshalAsAttribute(UnmanagedType.LPStr)] string srcprofile, [InAttribute()] [MarshalAsAttribute(UnmanagedType.LPStr)] string filename, [InAttribute()] [MarshalAsAttribute(UnmanagedType.LPStr)] string source, uint sourcelen, ref MOJOSHADER_preprocessorDefine defs, uint define_count, MOJOSHADER_includeOpen include_open, MOJOSHADER_includeClose include_close, MOJOSHADER_malloc m, MOJOSHADER_free f, IntPtr d) ;
+		public static extern  IntPtr MOJOSHADER_compile([InAttribute()] [MarshalAsAttribute(UnmanagedType.LPStr)] string srcprofile, [InAttribute()] [MarshalAsAttribute(UnmanagedType.LPStr)] string filename, [InAttribute()] [MarshalAsAttribute(UnmanagedType.LPStr)] string source, uint sourcelen, ref MOJOSHADER_preprocessorDefine defs, uint define_count, MOJOSHADER_includeOpen include_open, MOJOSHADER_includeClose include_close, IntPtr m, IntPtr f, IntPtr d) ;
 		
 		    
 		    /// Return Type: void
@@ -2948,7 +2977,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		    
 		    /// Return Type: int
-		    ///shader_type: MOJOSHADER_shaderType->Anonymous_cb045d1a_42aa_4c79_8706_255b4ceba853
+		    ///shader_type: MOJOSHADER_shaderType->Anonymous_96517ad6_cc69_4542_8537_054e63919d54
 		    [DllImportAttribute(mojoshader_dll, EntryPoint="MOJOSHADER_glMaxUniforms")]
 		public static extern  int MOJOSHADER_glMaxUniforms(MOJOSHADER_shaderType shader_type) ;
 		
@@ -3050,10 +3079,22 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		    
 		    /// Return Type: void
-		    ///usage: MOJOSHADER_usage->Anonymous_40f3f781_23ce_43a1_85f7_07947636aee7
+		    ///sampler: unsigned int
+		    ///mat00: float
+		    ///mat01: float
+		    ///mat10: float
+		    ///mat11: float
+		    ///lscale: float
+		    ///loffset: float
+		    [DllImportAttribute(mojoshader_dll, EntryPoint="MOJOSHADER_glSetLegacyBumpMapEnv")]
+		public static extern  void MOJOSHADER_glSetLegacyBumpMapEnv(uint sampler, float mat00, float mat01, float mat10, float mat11, float lscale, float loffset) ;
+		
+		    
+		    /// Return Type: void
+		    ///usage: MOJOSHADER_usage->Anonymous_9c01433d_7bb5_4c50_bf77_e65cef0661b5
 		    ///index: int
 		    ///size: unsigned int
-		    ///type: MOJOSHADER_attributeType->Anonymous_d557db84_b124_4973_bc03_18320eb7a8ea
+		    ///type: MOJOSHADER_attributeType->Anonymous_2f2591e6_1657_418c_9f54_80f3acd43cbe
 		    ///normalized: int
 		    ///stride: unsigned int
 		    ///ptr: void*
