@@ -146,12 +146,6 @@ namespace Microsoft.Xna.Framework
 
         public override bool BeforeUpdate(GameTime gameTime)
         {
-			// Update our OpenAL sound buffer pools
-			//soundControllerInstance.Update();		
-
-            // Let the touch panel update states.
-            TouchPanel.UpdateState();
-
             return true;
         }
 

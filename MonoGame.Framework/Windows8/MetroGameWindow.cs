@@ -60,9 +60,9 @@ namespace Microsoft.Xna.Framework
         private DisplayOrientation _orientation;
         private CoreWindow _coreWindow;
         protected Game game;
-        private readonly List<Keys> _keys;
         private Rectangle _clientBounds;
         private ApplicationViewState _currentViewState;
+        private MetroCoreWindowEvents _windowEvents;
 
         #region Internal Properties
 
@@ -133,65 +133,16 @@ namespace Microsoft.Xna.Framework
             Instance = new MetroGameWindow();
         }
 
-        private MetroGameWindow()
-        {
-            _keys = new List<Keys>();
-        }
-
-        #region Restricted Methods
-
-        #region Delegates
-
-        private static Keys KeyTranslate(Windows.System.VirtualKey inkey)
-        {
-            switch (inkey)
-            {
-                // XNA does not have have 'handless' key values.
-                // So, we arebitrarily map those to the 'Left' version.                 
-                case Windows.System.VirtualKey.Control:
-                    return Keys.LeftControl;
-                case Windows.System.VirtualKey.Shift:
-                    return Keys.LeftShift;
-                // Note that the Alt key is now refered to as Menu.
-                case Windows.System.VirtualKey.Menu:
-                    return Keys.LeftAlt;
-                default:                    
-                    return (Keys)inkey;
-            }
-        }
-
-        private void Keyboard_KeyUp(CoreWindow sender, KeyEventArgs args)
-        {
-            var xnaKey = KeyTranslate(args.VirtualKey);
-
-            if (_keys.Contains(xnaKey))
-                _keys.Remove(xnaKey);
-        }
-
-        private void Keyboard_KeyDown(CoreWindow sender, KeyEventArgs args)
-        {
-            var xnaKey = KeyTranslate(args.VirtualKey);
-
-            if (!_keys.Contains(xnaKey))
-                _keys.Add(xnaKey);
-        }
-
-        #endregion
-
-        #endregion
-
         public void Initialize(CoreWindow coreWindow)
         {
             _coreWindow = coreWindow;
+            _windowEvents = new MetroCoreWindowEvents(_coreWindow);
 
             _orientation = ToOrientation(DisplayProperties.CurrentOrientation);
             DisplayProperties.OrientationChanged += DisplayProperties_OrientationChanged;
 
             _coreWindow.SizeChanged += Window_SizeChanged;
             _coreWindow.Closed += Window_Closed;
-
-            _coreWindow.KeyDown += Keyboard_KeyDown;
-            _coreWindow.KeyUp += Keyboard_KeyUp;
 
             _coreWindow.Activated += Window_FocusChanged;
 
@@ -201,9 +152,7 @@ namespace Microsoft.Xna.Framework
             _currentViewState = ApplicationView.Value;
 
             var bounds = _coreWindow.Bounds;
-            SetClientBounds(bounds.Width, bounds.Height);
-
-            InitializeTouch();
+            SetClientBounds(bounds.Width, bounds.Height);            
         }
 
         /*
@@ -248,7 +197,6 @@ namespace Microsoft.Xna.Framework
 
             Platform.ViewState = ApplicationView.Value;
         }
-
 
         private static DisplayOrientation ToOrientation(DisplayOrientations orientation)
         {
@@ -358,9 +306,8 @@ namespace Microsoft.Xna.Framework
                 // Process events incoming to the window.
                 _coreWindow.Dispatcher.ProcessEvents(CoreProcessEventsOption.ProcessAllIfPresent);
 
-                // Apply the keyboard state gathered from
-                // the key events since the last tick.
-                Keyboard.State = new KeyboardState(_keys.ToArray());
+                // Update state based on window events.
+                _windowEvents.UpdateState();
 
                 // Update and render the game.
                 if (Game != null)

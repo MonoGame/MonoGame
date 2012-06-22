@@ -39,6 +39,7 @@ purpose and non-infringement.
 #endregion License
 
 using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
 using Windows.Devices.Input;
@@ -48,15 +49,30 @@ using Windows.UI.Input;
 
 namespace Microsoft.Xna.Framework
 {
-    public partial class MetroGameWindow : GameWindow
+    class MetroCoreWindowEvents
     {
-        void InitializeTouch()
+        private readonly List<Keys> _keys = new List<Keys>();
+
+        public MetroCoreWindowEvents(CoreWindow window)
         {
+            // Capture key events.
+            window.KeyDown += Keyboard_KeyDown;
+            window.KeyUp += Keyboard_KeyUp;
+            
             // Receives mouse, touch and stylus input events
-            _coreWindow.PointerPressed += CoreWindow_PointerPressed;
-            _coreWindow.PointerReleased += CoreWindow_PointerReleased;
-            _coreWindow.PointerMoved += CoreWindow_PointerMoved;
-            _coreWindow.PointerWheelChanged += CoreWindow_PointerWheelChanged;
+            window.PointerPressed += CoreWindow_PointerPressed;
+            window.PointerReleased += CoreWindow_PointerReleased;
+            window.PointerMoved += CoreWindow_PointerMoved;
+            window.PointerWheelChanged += CoreWindow_PointerWheelChanged;
+        }
+
+        public void UpdateState()
+        {
+            // Update the keyboard state.
+            Keyboard.State = new KeyboardState(_keys.ToArray());
+
+            // Update the touch state.
+            TouchPanel.UpdateState();
         }
 
         private void CoreWindow_PointerWheelChanged(CoreWindow sender, PointerEventArgs args)
@@ -64,8 +80,8 @@ namespace Microsoft.Xna.Framework
             // Wheel events always go to the mouse state.
             Mouse.State.Update(args);
         }
-        
-        void CoreWindow_PointerMoved(CoreWindow sender, PointerEventArgs args)
+
+        private void CoreWindow_PointerMoved(CoreWindow sender, PointerEventArgs args)
         {
             // To convert from DIPs (that all touch and pointer events are returned 
             // in) to pixels (that XNA APIs expect)
@@ -84,7 +100,7 @@ namespace Microsoft.Xna.Framework
             }
         }
 
-        void CoreWindow_PointerReleased(CoreWindow sender, PointerEventArgs args)
+        private void CoreWindow_PointerReleased(CoreWindow sender, PointerEventArgs args)
         {
             // To convert from DIPs (that all touch and pointer events are returned 
             // in) to pixels (that XNA APIs expect)
@@ -102,7 +118,7 @@ namespace Microsoft.Xna.Framework
             }
         }
 
-        void CoreWindow_PointerPressed(CoreWindow sender, PointerEventArgs args)
+        private void CoreWindow_PointerPressed(CoreWindow sender, PointerEventArgs args)
         {
             // To convert from DIPs (that all touch and pointer events are returned 
             // in) to pixels (that XNA APIs expect)
@@ -119,6 +135,39 @@ namespace Microsoft.Xna.Framework
                 Mouse.State.Update(args);
             }
         }
+        
+        private static Keys KeyTranslate(Windows.System.VirtualKey inkey)
+        {
+            switch (inkey)
+            {
+                // XNA does not have have 'handless' key values.
+                // So, we arebitrarily map those to the 'Left' version.                 
+                case Windows.System.VirtualKey.Control:
+                    return Keys.LeftControl;
+                case Windows.System.VirtualKey.Shift:
+                    return Keys.LeftShift;
+                // Note that the Alt key is now refered to as Menu.
+                case Windows.System.VirtualKey.Menu:
+                    return Keys.LeftAlt;
+                default:
+                    return (Keys)inkey;
+            }
+        }
 
+        private void Keyboard_KeyUp(CoreWindow sender, KeyEventArgs args)
+        {
+            var xnaKey = KeyTranslate(args.VirtualKey);
+
+            if (_keys.Contains(xnaKey))
+                _keys.Remove(xnaKey);
+        }
+
+        private void Keyboard_KeyDown(CoreWindow sender, KeyEventArgs args)
+        {
+            var xnaKey = KeyTranslate(args.VirtualKey);
+
+            if (!_keys.Contains(xnaKey))
+                _keys.Add(xnaKey);
+        }
     }
 }

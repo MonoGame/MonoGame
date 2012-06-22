@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -69,6 +69,8 @@
     <Compile Include="GamerServices\MessageBoxIcon.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="GameTimer.cs" />
+    <Compile Include="GameTimerEventArgs.cs" />
     <Compile Include="Graphics\CompareFunction.cs" />
     <Compile Include="Graphics\CubeMapFace.cs" />
     <Compile Include="Graphics\DisplayMode.cs" />
@@ -241,13 +243,14 @@
     <Compile Include="Graphics\Vertices\VertexPositionColor.cs" />
     <Compile Include="Graphics\Vertices\VertexPositionNormalTexture.cs" />
     <Compile Include="Graphics\Vertices\VertexPositionTexture.cs" />
+    <Compile Include="SharedGraphicsDeviceManager.cs" />
     <Compile Include="Storage\StorageDeviceHelper.cs" />
     <Compile Include="Windows8\GameFrameworkViewSource.cs" />
+    <Compile Include="Windows8\MetroCoreWindowEvents.cs" />
     <Compile Include="Windows8\MetroFrameworkView.cs" />
     <Compile Include="Windows8\MetroGamePlatform.cs" />
     <Compile Include="Windows8\MetroGameWindow.cs" />
     <Compile Include="Windows8\MetroHelper.cs" />
-    <Compile Include="Windows8\MetroGameWindow_Touch.cs" />
     <Compile Include="Windows8\SharpDXHelper.cs" />
     <Compile Include="Windows\Content\ContentReaders\SoundEffectReader.cs" />
     <Compile Include="BatteryChargeStatus.cs" />
