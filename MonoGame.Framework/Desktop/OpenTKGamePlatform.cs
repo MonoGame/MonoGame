@@ -82,6 +82,20 @@ namespace Microsoft.Xna.Framework
         private OpenTKGameWindow _view;
 		private OpenALSoundController soundControllerInstance = null;
         
+        
+        public override bool VSyncEnabled
+        {
+            get
+            {
+                return _view.Window.VSync == OpenTK.VSyncMode.On ? true : false;
+            }
+            
+            set
+            {
+                _view.Window.VSync = value ? OpenTK.VSyncMode.On : OpenTK.VSyncMode.Off;
+            }
+        }
+        
 		public OpenTKGamePlatform(Game game)
             : base(game)
         {

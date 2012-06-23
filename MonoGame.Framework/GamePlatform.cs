@@ -190,7 +190,17 @@ namespace Microsoft.Xna.Framework
             get; protected set;
         }
 #endif
-
+  
+        public virtual bool VSyncEnabled
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+            set {
+            }
+        }
+        
         #endregion
 
         #region Events
