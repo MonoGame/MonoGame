@@ -78,6 +78,13 @@ using ErrorCode = OpenTK.Graphics.ES20.All;
 using Microsoft.Xna.Framework.Content;
 using System.Diagnostics;
 
+#if WINRT
+using Windows.Graphics.Imaging;
+using Windows.UI.Xaml.Media.Imaging;
+using Windows.Storage.Streams;
+using System.Threading.Tasks;
+#endif
+
 #if ANDROID
 using Android.Graphics;
 #endif
@@ -105,18 +112,32 @@ namespace Microsoft.Xna.Framework.Graphics
 				return new Rectangle(0, 0, this.width, this.height);
             }
         }
+
+        public Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipmap, SurfaceFormat format)
+            : this(graphicsDevice, width, height, mipmap, format, false)
+        {
+        }
 		
-		public Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipmap, SurfaceFormat format)
+		internal Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipmap, SurfaceFormat format, bool renderTarget)
 		{
             if (graphicsDevice == null)
-            {
                 throw new ArgumentNullException("Graphics Device Cannot Be Null");
-            }
+
             this.graphicsDevice = graphicsDevice;
             this.width = width;
             this.height = height;
             this.format = format;
             this.levelCount = 1;
+
+            if (mipmap)
+            {
+                int size = Math.Max(this.width, this.height);
+                while (size > 1)
+                {
+                    size = size / 2;
+                    this.levelCount++;
+                }
+            }
 
 #if DIRECTX
 
@@ -133,6 +154,9 @@ namespace Microsoft.Xna.Framework.Graphics
             desc.SampleDescription.Quality = 0;
             desc.Usage = SharpDX.Direct3D11.ResourceUsage.Default;
             desc.OptionFlags = SharpDX.Direct3D11.ResourceOptionFlags.None;
+
+            if (renderTarget)
+                desc.BindFlags |= SharpDX.Direct3D11.BindFlags.RenderTarget;
 
             _texture = new SharpDX.Direct3D11.Texture2D(graphicsDevice._d3dDevice, desc);
 
@@ -204,24 +228,6 @@ namespace Microsoft.Xna.Framework.Graphics
                         this.width, this.height, 0,
                         glFormat, glType, IntPtr.Zero);
                 }
-
-                if (mipmap)
-                {
-#if IPHONE || ANDROID
-                    GL.GenerateMipmap(TextureTarget.Texture2D);
-#else
-				    GL.TexParameter (TextureTarget.Texture2D,
-					    TextureParameterName.GenerateMipmap,
-					    (int)All.True);
-#endif
-
-                    int size = Math.Max(this.width, this.height);
-                    while (size > 1)
-                    {
-                        size = size / 2;
-                        this.levelCount++;
-                    }
-                }
             });
 #endif
         }
@@ -239,8 +245,8 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 #endif
 				
-		public Texture2D(GraphicsDevice graphicsDevice, int width, int height) : 
-			this(graphicsDevice, width, height, false, SurfaceFormat.Color)
+		public Texture2D(GraphicsDevice graphicsDevice, int width, int height)
+            : this(graphicsDevice, width, height, false, SurfaceFormat.Color, false)
 		{			
 		}
 
@@ -304,25 +310,48 @@ namespace Microsoft.Xna.Framework.Graphics
                 region.Right = x + w;
 
                 // TODO: We need to deal with threaded contexts here!
-                graphicsDevice._d3dContext.UpdateSubresource(box, _texture, level, region);
+                lock (graphicsDevice._d3dContext)
+                    graphicsDevice._d3dContext.UpdateSubresource(box, _texture, level, region);
 
 #elif PSS
                 _texture2D.SetPixels(level, data, _texture2D.Format, startIndex, w, x, y, w, h);
 
+
 #elif OPENGL
                 GL.BindTexture(TextureTarget.Texture2D, this.glTexture);
-
                 if (glFormat == (GLPixelFormat)All.CompressedTextureFormats)
                 {
-                    GL.CompressedTexSubImage2D(TextureTarget.Texture2D, level,
-                                               x, y, w, h,
-                                               (GLPixelFormat)glInternalFormat, data.Length - startBytes, dataPtr);
+                    if (rect.HasValue)
+                        GL.CompressedTexSubImage2D(TextureTarget.Texture2D, 
+                                                   level, x, y, w, h,
+#if GLES
+                                                   glInternalFormat,
+#else
+                                                   glFormat,
+#endif
+                                                   data.Length - startBytes, dataPtr);
+                    else
+                        GL.CompressedTexImage2D(TextureTarget.Texture2D, level, glInternalFormat, w, h, 0, data.Length - startBytes, dataPtr);
                 }
                 else
                 {
-                    GL.TexSubImage2D(TextureTarget.Texture2D, level,
-                                 x, y, w, h,
-                                 glFormat, glType, dataPtr);
+                    if (rect.HasValue)
+                    {
+                        GL.TexSubImage2D(TextureTarget.Texture2D, level,
+                                        x, y, w, h,
+                                        glFormat, glType, dataPtr);
+                    }
+                    else
+                    {
+                        GL.TexImage2D(TextureTarget.Texture2D, level,
+#if GLES
+                                  (int)glInternalFormat,
+#else
+                                  glInternalFormat,
+#endif
+                                  w, h, 0, glFormat, glType, dataPtr);
+                    }
+
                 }
 
                 Debug.Assert(GL.GetError() == ErrorCode.NoError);
@@ -356,7 +385,44 @@ namespace Microsoft.Xna.Framework.Graphics
 #elif PSS
             throw new NotImplementedException();
 #elif DIRECTX
-            throw new NotImplementedException();
+
+            // Create a temp staging resource for copying the data.
+            // 
+            // TODO: We should probably be pooling these staging resources
+            // and not creating a new one each time.
+            //
+            var desc = new SharpDX.Direct3D11.Texture2DDescription();
+            desc.Width = width;
+            desc.Height = height;
+            desc.MipLevels = 1;
+            desc.ArraySize = 1;
+            desc.Format = SharpDXHelper.ToFormat(format);
+            desc.BindFlags = SharpDX.Direct3D11.BindFlags.None;
+            desc.CpuAccessFlags = SharpDX.Direct3D11.CpuAccessFlags.Read;
+            desc.SampleDescription.Count = 1;
+            desc.SampleDescription.Quality = 0;
+            desc.Usage = SharpDX.Direct3D11.ResourceUsage.Staging;
+            desc.OptionFlags = SharpDX.Direct3D11.ResourceOptionFlags.None;
+
+            using (var stagingTex = new SharpDX.Direct3D11.Texture2D(graphicsDevice._d3dDevice, desc))
+            lock (graphicsDevice._d3dContext)
+            {
+                // Copy the data from the GPU to the staging texture.
+                if (rect.HasValue)
+                {
+                    // TODO: Need to deal with subregion copies!
+                    throw new NotImplementedException();
+                }
+                else
+                    graphicsDevice._d3dContext.CopySubresourceRegion(_texture, level, null, stagingTex, 0, 0, 0, 0);
+
+                // Copy the data to the array.
+                SharpDX.DataStream stream;
+                graphicsDevice._d3dContext.MapSubresource(stagingTex, 0, SharpDX.Direct3D11.MapMode.Read, SharpDX.Direct3D11.MapFlags.None, out stream);
+                stream.ReadRange(data, startIndex, elementCount);
+                stream.Dispose();
+            }
+
 #else
 
 			GL.BindTexture(TextureTarget.Texture2D, this.glTexture);
@@ -498,8 +564,48 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void SaveAsJpeg(Stream stream, int width, int height)
         {
+#if WINRT
+            SaveAsImage(BitmapEncoder.JpegEncoderId, stream, width, height);
+#else
             throw new NotImplementedException();
+#endif
         }
+
+        public void SaveAsPng(Stream stream, int width, int height)
+        {
+#if WINRT
+            SaveAsImage(BitmapEncoder.PngEncoderId, stream, width, height);
+#else
+            throw new NotImplementedException();
+#endif
+        }
+
+#if WINRT
+        private void SaveAsImage(Guid encoderId, Stream stream, int width, int height)
+        {
+            var pixelData = new byte[Width * Height * GraphicsExtensions.Size(Format)];
+            GetData(pixelData);
+
+            // TODO: We need to convert from Format to R8G8B8A8!
+
+            // TODO: We should implement async SaveAsPng() for WinRT.
+            Task.Run(async () =>
+            {
+                // Create a temporary memory stream for writing the png.
+                var memstream = new InMemoryRandomAccessStream();
+
+                // Write the png.
+                var encoder = await BitmapEncoder.CreateAsync(encoderId, memstream);
+                encoder.SetPixelData(BitmapPixelFormat.Rgba8, BitmapAlphaMode.Ignore, (uint)width, (uint)height, 96, 96, pixelData);
+                await encoder.FlushAsync();
+
+                // Copy the memory stream into the real output stream.
+                memstream.Seek(0);
+                memstream.AsStreamForRead().CopyTo(stream);
+
+            }).Wait();
+        }
+#endif // WINRT
 
         //What was this for again?
 		internal void Reload(Stream textureStream)

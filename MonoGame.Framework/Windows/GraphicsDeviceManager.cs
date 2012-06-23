@@ -53,25 +53,23 @@ namespace Microsoft.Xna.Framework
         private int _preferredBackBufferHeight;
         private int _preferredBackBufferWidth;
         private bool _preferMultiSampling;
+        private DepthFormat _preferredDepthStencilFormat;
         private DisplayOrientation _supportedOrientations;
 
         public GraphicsDeviceManager(Game game)
         {
             if (game == null)
-            {
                 throw new ArgumentNullException("Game Cannot Be Null");
-            }
 
             _game = game;
 
             _supportedOrientations = DisplayOrientation.Default;
             _preferredBackBufferHeight = PresentationParameters._defaultBackBufferHeight;
             _preferredBackBufferWidth = PresentationParameters._defaultBackBufferWidth;
+            _preferredDepthStencilFormat = DepthFormat.None;
 
             if (game.Services.GetService(typeof(IGraphicsDeviceManager)) != null)
-            {
                 throw new ArgumentException("Graphics Device Manager Already Present");
-            }
 
             game.Services.AddService(typeof(IGraphicsDeviceManager), this);
             game.Services.AddService(typeof(IGraphicsDeviceService), this);
@@ -160,9 +158,12 @@ namespace Microsoft.Xna.Framework
 
         private void Initialize()
         {
+            _game.Window.SetSupportedOrientations(_supportedOrientations);
+
             //_graphicsDevice.PresentationParameters.BackBufferFormat = _preferredBackBufferWidth;
             _graphicsDevice.PresentationParameters.BackBufferWidth = _preferredBackBufferWidth;
             _graphicsDevice.PresentationParameters.BackBufferHeight = _preferredBackBufferHeight;
+            _graphicsDevice.PresentationParameters.DepthStencilFormat = _preferredDepthStencilFormat;
 
             _graphicsDevice.PresentationParameters.IsFullScreen = false;
             _graphicsDevice.PresentationParameters.DeviceWindowHandle = _game.Window.Handle;
@@ -262,10 +263,11 @@ namespace Microsoft.Xna.Framework
         {
             get
             {
-                throw new NotImplementedException();
+                return _preferredDepthStencilFormat;
             }
             set
             {
+                _preferredDepthStencilFormat = value;
             }
         }
 

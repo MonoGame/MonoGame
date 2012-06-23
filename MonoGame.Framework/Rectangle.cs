@@ -106,11 +106,6 @@ namespace Microsoft.Xna.Framework
             return ((((this.X <= x) && (x < (this.X + this.Width))) && (this.Y <= y)) && (y < (this.Y + this.Height)));
         }
 		
-		public bool Contains(Vector2 value)
-        {
-            return ((((this.X <= value.X) && (value.X < (this.X + this.Width))) && (this.Y <= value.Y)) && (value.Y < (this.Y + this.Height)));
-        }
-
         public bool Contains(Point value)
         {
             return ((((this.X <= value.X) && (value.X < (this.X + this.Width))) && (this.Y <= value.Y)) && (value.Y < (this.Y + this.Height)));
@@ -201,25 +196,21 @@ namespace Microsoft.Xna.Framework
             return (this.X ^ this.Y ^ this.Width ^ this.Height);
         }
 
-        public bool Intersects(Rectangle r2)
+        public bool Intersects(Rectangle value)
         {
-            return !(r2.Left > Right
-                     || r2.Right < Left
-                     || r2.Top > Bottom
-                     || r2.Bottom < Top
-                    );
-
+            return value.Left < Right       && 
+                   Left       < value.Right && 
+                   value.Top  < Bottom      &&
+                   Top        < value.Bottom;            
         }
 
 
         public void Intersects(ref Rectangle value, out bool result)
         {
-            result = !(value.Left > Right
-                     || value.Right < Left
-                     || value.Top > Bottom
-                     || value.Bottom < Top
-                    );
-
+            result = value.Left < Right       && 
+                     Left       < value.Right && 
+                     value.Top  < Bottom      &&
+                     Top        < value.Bottom;
         }
 
         public static Rectangle Intersect(Rectangle value1, Rectangle value2)

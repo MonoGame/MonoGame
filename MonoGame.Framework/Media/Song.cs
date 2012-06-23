@@ -72,7 +72,7 @@ namespace Microsoft.Xna.Framework.Media
 			_sound = AVAudioPlayer.FromUrl(NSUrl.FromFilename(fileName));
 			_sound.NumberOfLoops = 0;
             _sound.FinishedPlaying += OnFinishedPlaying;
-#else
+#elif !WINRT
             _sound = new SoundEffect(_name).CreateInstance();
 #endif
 		}

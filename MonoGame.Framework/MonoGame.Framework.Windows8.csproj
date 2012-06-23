@@ -69,6 +69,8 @@
     <Compile Include="GamerServices\MessageBoxIcon.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="GameTimer.cs" />
+    <Compile Include="GameTimerEventArgs.cs" />
     <Compile Include="Graphics\CompareFunction.cs" />
     <Compile Include="Graphics\CubeMapFace.cs" />
     <Compile Include="Graphics\DisplayMode.cs" />
@@ -241,15 +243,15 @@
     <Compile Include="Graphics\Vertices\VertexPositionColor.cs" />
     <Compile Include="Graphics\Vertices\VertexPositionNormalTexture.cs" />
     <Compile Include="Graphics\Vertices\VertexPositionTexture.cs" />
+    <Compile Include="SharedGraphicsDeviceManager.cs" />
     <Compile Include="Storage\StorageDeviceHelper.cs" />
     <Compile Include="Windows8\GameFrameworkViewSource.cs" />
+    <Compile Include="Windows8\MetroCoreWindowEvents.cs" />
     <Compile Include="Windows8\MetroFrameworkView.cs" />
     <Compile Include="Windows8\MetroGamePlatform.cs" />
     <Compile Include="Windows8\MetroGameWindow.cs" />
     <Compile Include="Windows8\MetroHelper.cs" />
-    <Compile Include="Windows8\MetroGameWindow_Touch.cs" />
     <Compile Include="Windows8\SharpDXHelper.cs" />
-    <Compile Include="Windows\Audio\Sound.cs" />
     <Compile Include="Windows\Content\ContentReaders\SoundEffectReader.cs" />
     <Compile Include="BatteryChargeStatus.cs" />
     <Compile Include="BoundingBox.cs" />
@@ -303,7 +305,6 @@
     <Compile Include="Content\ContentReaders\PlaneReader.cs" />
     <Compile Include="Content\ContentReaders\QuaternionReader.cs" />
     <Compile Include="Content\ContentReaders\Vector4Reader.cs" />
-    <Compile Include="Graphics\BatchItem.cs" />
     <Compile Include="Graphics\States\Blend.cs" />
     <Compile Include="Graphics\States\BlendFunction.cs" />
     <Compile Include="Graphics\States\BlendState.cs" />
@@ -318,7 +319,6 @@
     <Compile Include="Graphics\IGraphicsDeviceService.cs" />
     <Compile Include="Graphics\MultiSampleType.cs" />
     <Compile Include="Graphics\RenderTargetUsage.cs" />
-    <Compile Include="Graphics\ResolveTexture2D.cs" />
     <Compile Include="Graphics\ResourceType.cs" />
     <Compile Include="Graphics\SetDataOptions.cs" />
     <Compile Include="Graphics\SpriteBatchItem.cs" />
@@ -355,6 +355,9 @@
     <Reference Include="SharpDX.DXGI, Version=2.0.4.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\ThirdParty\Libs\SharpDX\Windows 8 Metro\SharpDX.DXGI.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.XAudio2">
+      <HintPath>..\ThirdParty\Libs\SharpDX\Windows 8 Metro\SharpDX.XAudio2.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

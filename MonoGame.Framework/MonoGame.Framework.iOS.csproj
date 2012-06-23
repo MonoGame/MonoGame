@@ -154,6 +154,7 @@
     <Compile Include="Audio\AudioChannels.cs" />
     <Compile Include="Audio\SoundState.cs" />
     <Compile Include="Media\MediaPlayer.cs" />
+    <Compile Include="Media\MediaQueue.cs" />
     <Compile Include="Media\MediaState.cs" />
     <Compile Include="Media\Song.cs" />
     <Compile Include="Media\MediaSourceType.cs" />
@@ -207,10 +208,8 @@
     <Compile Include="GamerServices\FriendCollection.cs" />
     <Compile Include="GamerServices\FriendGamer.cs" />
     <Compile Include="Graphics\GraphicsResource.cs" />
-    <Compile Include="Graphics\ResolveTexture2D.cs" />
     <Compile Include="GamerServices\MessageBoxIcon.cs" />
     <Compile Include="Graphics\SpriteBatch.cs" />
-    <Compile Include="Graphics\BatchItem.cs" />
     <Compile Include="Graphics\SpriteBatcher.cs" />
     <Compile Include="Graphics\SpriteBatchItem.cs" />
     <Compile Include="Graphics\GraphicsDeviceInformation.cs" />
@@ -460,11 +459,11 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect.mgfx" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect.mgfx" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\DualTextureEffect.mgfx" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\EnvironmentMapEffect.mgfx" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\SkinnedEffect.mgfx" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\SpriteEffect.mgfx" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect.ogl.mgfxo" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect.ogl.mgfxo" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\DualTextureEffect.ogl.mgfxo" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\EnvironmentMapEffect.ogl.mgfxo" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\SkinnedEffect.ogl.mgfxo" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\SpriteEffect.ogl.mgfxo" />
   </ItemGroup>
 </Project>
