@@ -124,7 +124,6 @@
     <Compile Include="Graphics\StencilOperation.cs" />
     <Compile Include="Graphics\Texture2D.cs" />
     <Compile Include="Graphics\TextureCube.cs" />
-    <Compile Include="Media\MediaQueue.cs" />
     <Compile Include="PrimaryThreadLoader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Android\AndroidGameActivity.cs" />
