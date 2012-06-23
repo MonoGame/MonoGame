@@ -116,7 +116,7 @@ namespace Microsoft.Xna.Framework
         public override void RunLoop()
         {
             ResetWindowBounds(false);
-            _view.Window.Run(1 / Game.TargetElapsedTime.TotalSeconds);
+            _view.Window.Run(0);
         }
 
         public override void StartRunLoop()
