@@ -414,9 +414,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void CreateSizeDependentResources()
         {
-            if (PresentationParameters == null || PresentationParameters.DeviceWindowHandle == IntPtr.Zero)
-                return;
-
             _d2dContext.Target = null;
             if (_renderTargetView != null)
                 _renderTargetView.Dispose();
@@ -433,7 +430,19 @@ namespace Microsoft.Xna.Framework.Graphics
             _currentRenderTargets[3] = null;
             _currentDepthStencilView = null;
             _currentRenderTargetBindings = null;
-            
+
+            if (    PresentationParameters == null ||
+                    (PresentationParameters.DeviceWindowHandle == IntPtr.Zero && PresentationParameters.SwapChainPanel == null))
+            {
+                if (_swapChain != null)
+                {
+                    _swapChain.Dispose();
+                    _swapChain = null;
+                }
+
+                return;
+            }
+
             var multisampleDesc = new SharpDX.DXGI.SampleDescription(1, 0);
             if ( PresentationParameters.MultiSampleCount > 1 )
             {
@@ -445,17 +454,24 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // If the swap chain already exists... update it.
             if (_swapChain != null)
-                _swapChain.ResizeBuffers(   2,
-                                            PresentationParameters.BackBufferWidth, 
+            {
+                _swapChain.ResizeBuffers(2,
+                                            PresentationParameters.BackBufferWidth,
                                             PresentationParameters.BackBufferHeight,
                                             format,
                                             0); // SharpDX.DXGI.SwapChainFlags
 
+                if (PresentationParameters.SwapChainPanel != null)
+                {
+                    using (var nativePanel = ComObject.As<SharpDX.DXGI.ISwapChainBackgroundPanelNative>(PresentationParameters.SwapChainPanel))
+                        nativePanel.SwapChain = _swapChain;
+                }
+            }
             // Otherwise, create a new swap chain.
             else
             {
                 // SwapChain description
-                var desc =  new SharpDX.DXGI.SwapChainDescription1()
+                var desc = new SharpDX.DXGI.SwapChainDescription1()
                 {
                     // Automatic sizing
                     Width = PresentationParameters.BackBufferWidth,
@@ -464,7 +480,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     Stereo = false,
                     SampleDescription = multisampleDesc,
                     Usage = SharpDX.DXGI.Usage.RenderTargetOutput,
-                    BufferCount = 2,                    
+                    BufferCount = 2,
                     SwapEffect = SharpDXHelper.ToSwapEffect(PresentationParameters),
 
                     // By default we scale the backbuffer to the window 
@@ -480,10 +496,21 @@ namespace Microsoft.Xna.Framework.Graphics
                 using (var dxgiAdapter = dxgiDevice2.Adapter)
                 using (var dxgiFactory2 = dxgiAdapter.GetParent<SharpDX.DXGI.Factory2>())
                 {
-                    // Creates a SwapChain from a CoreWindow pointer.
-                    var coreWindow = Marshal.GetObjectForIUnknown(PresentationParameters.DeviceWindowHandle) as CoreWindow;
-                    using (var comWindow = new ComObject(coreWindow))
-                        _swapChain = dxgiFactory2.CreateSwapChainForCoreWindow(_d3dDevice, comWindow, ref desc, null);
+                    if (PresentationParameters.DeviceWindowHandle != IntPtr.Zero)
+                    {
+                        // Creates a SwapChain from a CoreWindow pointer.
+                        var coreWindow = Marshal.GetObjectForIUnknown(PresentationParameters.DeviceWindowHandle) as CoreWindow;
+                        using (var comWindow = new ComObject(coreWindow))
+                            _swapChain = dxgiFactory2.CreateSwapChainForCoreWindow(_d3dDevice, comWindow, ref desc, null);
+                    }
+                    else
+                    {
+                        using (var nativePanel = ComObject.As<SharpDX.DXGI.ISwapChainBackgroundPanelNative>(PresentationParameters.SwapChainPanel))
+                        {
+                            _swapChain = dxgiFactory2.CreateSwapChainForComposition(_d3dDevice, ref desc, null);
+                            nativePanel.SwapChain = _swapChain;
+                        }
+                    }
 
                     // Ensure that DXGI does not queue more than one frame at a time. This both reduces 
                     // latency and ensures that the application will only render after each VSync, minimizing 

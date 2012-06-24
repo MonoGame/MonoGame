@@ -87,25 +87,6 @@ namespace Microsoft.Xna.Framework.Input.Touch
             return Capabilities;
         }
 
-        /*private static int PixelsPerInch
-        {
-            get 
-            {
-                var gd = Game.Instance.GraphicsDevice;
-                var screenWidth = gd.DisplayMode.Width;
-                var screenHeight = gd.DisplayMode.Height;
-                var screenDiagonal = Math.Sqrt( (screenWidth * screenWidth) + ( screenHeight * screenHeight) );
-
-                var resWidth = gd.PresentationParameters.BackBufferWidth;
-                var resHeight = gd.PresentationParameters.BackBufferHeight;
-                var resDiagonal = Math.Sqrt( (resWidth * resWidth) + ( resHeight * resHeight) );
-
-                var ppi = resDiagonal / screenDiagonal;
-
-                return (int)ppi;
-            }
-        }*/
-
         public static TouchCollection GetState()
         {
             // If the state isn't dirty then just
@@ -192,6 +173,19 @@ namespace Microsoft.Xna.Framework.Input.Touch
         
         internal static void AddEvent(TouchLocation location)
         {
+#if WINRT
+            // TODO:
+            //
+            // As of 6/20/2012 the WinRT Simulator will generate duplicate
+            // touch location ids... filter these out for now.
+            //
+            // Lets be sure to remove this once that is fixed... this safety
+            // here is inefficient and unnessasary.
+            //
+            if (    location.State == TouchLocationState.Pressed &&
+                    _events.FindIndex(e => e.Id == location.Id) != -1)
+                return;
+#endif
             _events.Add(location);
         }
 
@@ -204,6 +198,10 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
 		public static GestureSample ReadGesture()
         {
+            // Make sure we have updated touch state.
+            GetState();
+
+            // Return the next gesture.
 			return GestureList.Dequeue();			
         }
 
@@ -263,6 +261,9 @@ namespace Microsoft.Xna.Framework.Input.Touch
         {
             get
             {
+                // Make sure we have updated touch state.
+                GetState();
+
 				return ( GestureList.Count > 0 );				
             }
         }
@@ -463,6 +464,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
         static List<GestureSample> _pendingTaps = new List<GestureSample>();
 		private static bool ProcessTap(TouchLocation touch)
 		{
+            // TODO: This check means that double taps won't work unless
+            // the tap event is enabled as well... is this correct behavior?
 			if (!GestureIsEnabled(GestureType.Tap))
 				return false;
 
