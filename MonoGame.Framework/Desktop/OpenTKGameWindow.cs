@@ -149,7 +149,11 @@ namespace Microsoft.Xna.Framework
             // If window size is zero, leave bounds unchanged
             if (winWidth == 0 || winHeight == 0)
                 return;
-            
+
+            //If we've already got a pending change, do nothing
+            if (updateClientBounds)
+                return;
+
             ChangeClientBounds(winRect);
             
             Game.GraphicsDevice.Viewport = new Viewport(0, 0, winWidth, winHeight);

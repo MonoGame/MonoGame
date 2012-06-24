@@ -109,7 +109,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			if (!EffectCache.TryGetValue (effectKey, out cloneSource)) {
 				// Create one.
 				cloneSource = new Effect (graphicsDevice);
-#if MONOMAC
+#if MONOMAC || LINUX
 				uint tag = BitConverter.ToUInt32 (effectCode, 0);
 				if (tag == 0xBCF00BCF || tag == 0xFEFF0901) { //fx magics
 					cloneSource.ReadFXEffect (effectCode);
