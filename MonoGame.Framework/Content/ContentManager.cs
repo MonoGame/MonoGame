@@ -259,7 +259,7 @@ namespace Microsoft.Xna.Framework.Content
 				
 				assetName = TitleContainer.GetFilename(Path.Combine (_rootDirectory, assetName));
 
-                if (typeof(T) == typeof(Texture2D) || typeof(T) == typeof(Texture))
+				if (typeof(T) == typeof(Texture2D) || typeof(T) == typeof(Texture))
 				{
 					assetName = Texture2DReader.Normalize(assetName);
 				}
@@ -291,7 +291,7 @@ namespace Microsoft.Xna.Framework.Content
 					throw new ContentLoadException("Could not load " + originalAssetName + " asset!");
 				}
 
-                if (typeof(T) == typeof(Texture2D) || typeof(T) == typeof(Texture))
+				if (typeof(T) == typeof(Texture2D) || typeof(T) == typeof(Texture))
 				{
 					using (Stream assetStream = TitleContainer.OpenStream(assetName))
 					{

@@ -47,7 +47,7 @@ namespace Microsoft.Xna.Framework.Content
 #if ANDROID
 		// Keep this static so we only call Game.Activity.Assets.List() once
 		// No need to call it for each file if the list will never change.
-        // We do need one file list per folder though.
+		// We do need one file list per folder though.
 		static Dictionary<string, string[]> filesInFolders = new Dictionary<string,string[]>();
 #endif
 
@@ -103,11 +103,11 @@ namespace Microsoft.Xna.Framework.Content
                 path = fileName.Substring(0, index);
             }
 
-			// Only read the assets file list once
+            // Only read the assets file list once
             string[] files = null;
             if (!filesInFolders.TryGetValue(path, out files))
             {
-				files = Game.Activity.Assets.List(path);
+                files = Game.Activity.Assets.List(path);
                 filesInFolders[path] = files;
             }
 
