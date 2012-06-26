@@ -414,6 +414,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void CreateSizeDependentResources()
         {
+            _d3dContext.OutputMerger.SetTargets((SharpDX.Direct3D11.DepthStencilView)null, 
+                                                (SharpDX.Direct3D11.RenderTargetView)null);  
+
             _d2dContext.Target = null;
             if (_renderTargetView != null)
                 _renderTargetView.Dispose();
@@ -461,12 +464,15 @@ namespace Microsoft.Xna.Framework.Graphics
                                             format,
                                             0); // SharpDX.DXGI.SwapChainFlags
 
+                /*
                 if (PresentationParameters.SwapChainPanel != null)
                 {
                     using (var nativePanel = ComObject.As<SharpDX.DXGI.ISwapChainBackgroundPanelNative>(PresentationParameters.SwapChainPanel))
                         nativePanel.SwapChain = _swapChain;
                 }
+                */
             }
+
             // Otherwise, create a new swap chain.
             else
             {
