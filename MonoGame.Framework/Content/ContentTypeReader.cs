@@ -30,6 +30,7 @@ using System.IO;
 
 #if ANDROID
 using System.Linq;
+using System.Collections.Generic;
 #endif
 
 #if WINRT
@@ -45,8 +46,9 @@ namespace Microsoft.Xna.Framework.Content
         private Type targetType;
 #if ANDROID
 		// Keep this static so we only call Game.Activity.Assets.List() once
-		// No need to call it for each file if the list will never change
-		static string[] files = null;
+		// No need to call it for each file if the list will never change.
+		// We do need one file list per folder though.
+		static Dictionary<string, string[]> filesInFolders = new Dictionary<string,string[]>();
 #endif
 
         #endregion Private Member Variables
@@ -101,9 +103,13 @@ namespace Microsoft.Xna.Framework.Content
                 path = fileName.Substring(0, index);
             }
 
-			// Only read the assets file list once
-			if (files == null)
-				files = Game.Activity.Assets.List(path);
+            // Only read the assets file list once
+            string[] files = null;
+            if (!filesInFolders.TryGetValue(path, out files))
+            {
+                files = Game.Activity.Assets.List(path);
+                filesInFolders[path] = files;
+            }
 
             if (files.Any(s => s == file))
                 return fileName;
