@@ -18,12 +18,12 @@ namespace MonoGameContentProcessors.Processors
         {
             // Fallback if we aren't buiding for iOS.
             var platform = ContentHelper.GetMonoGamePlatform();
-            if (platform != MonoGamePlatform.iOS)
+            if (platform != MonoGamePlatform.iOS && platform != MonoGamePlatform.Linux)
                 return base.Process(input, context);
 
             //TODO: If quality isn't best and it's a .wma, don't compress to MP3. Leave it as a .wav instead
-
-            string outputFilename = Path.ChangeExtension(context.OutputFilename, "mp3");
+            string outputType = (platform == MonoGamePlatform.iOS) ? "mp3" : "wav";
+            string outputFilename = Path.ChangeExtension(context.OutputFilename, outputType);
             string directoryName = Path.GetDirectoryName(outputFilename);
             if (!Directory.Exists(directoryName))
                 Directory.CreateDirectory(directoryName);
@@ -49,24 +49,18 @@ namespace MonoGameContentProcessors.Processors
                     break;
             }
 
+            AudioFileType target = (platform == MonoGamePlatform.iOS) ? AudioFileType.Mp3 : AudioFileType.Wav;
             // Create a new file if we need to.
-            FileStream outputStream = input.FileType != AudioFileType.Mp3 ? new FileStream(outputFilename, FileMode.Create) : null;
-            // If the file's not already an mp3, encode it to .wav
-            switch (input.FileType)
-            {
-                // File was already an .mp3. Don't do lossy compression twice.
-                case AudioFileType.Mp3:
-                    File.Copy(inputFilename, outputFilename, true);
-                    break;
+            FileStream outputStream = input.FileType != target ? new FileStream(outputFilename, FileMode.Create) : null;
+            
+            if (input.FileType != target)
+                AudioConverter.ConvertFile(inputFilename, outputStream, target, desiredOutputBitRate,
+                            input.Format.BitsPerSample, input.Format.ChannelCount);
+            else
+                File.Copy(inputFilename, outputFilename, true);
 
-                case AudioFileType.Wav:
-                case AudioFileType.Wma:
-                    AudioConverter.ConvertFile(inputFilename, outputStream, AudioFileType.Mp3, desiredOutputBitRate, 
-                                                input.Format.BitsPerSample, input.Format.ChannelCount);
-                    break;
-            }
-
-            outputStream.Close();
+            if (outputStream != null)
+                outputStream.Close();
 
             context.AddOutputFile(outputFilename);
 
