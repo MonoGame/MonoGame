@@ -848,10 +848,10 @@ namespace Microsoft.Xna.Framework
 			matrix.M33 = 1.0f - 2.0f * (x2 + y2);
 			matrix.M34 = 0.0f;
 
-			matrix.M41 = 2.0f * (xz - wy);
-			matrix.M42 = 2.0f * (yz + wx);
-			matrix.M43 = 1.0f - 2.0f * (x2 + y2);
-			matrix.M44 = 0.0f;
+			matrix.M41 = 0.0f;
+			matrix.M42 = 0.0f;
+			matrix.M43 = 0.0f;
+			matrix.M44 = 1.0f;
 
 			//return Matrix4( 1.0f - 2.0f * (y2 + z2), 2.0f * (xy - wz), 2.0f * (xz + wy), 0.0f,
 			//		2.0f * (xy + wz), 1.0f - 2.0f * (x2 + z2), 2.0f * (yz - wx), 0.0f,
