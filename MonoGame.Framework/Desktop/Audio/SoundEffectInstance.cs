@@ -68,11 +68,14 @@ namespace Microsoft.Xna.Framework.Audio
 
 		bool hasSourceId = false;
 		int sourceId;
+        
+        public event EventHandler<EventArgs> FinishedPlaying;
 
 		public SoundEffectInstance (SoundEffect parent)
 		{
 			this.soundEffect = parent;
 			InitializeSound ();
+            controller.AddStateChangeHandler(soundBuffer, StateChangedHandler);
 		}
 
 		private void InitializeSound ()
@@ -82,7 +85,6 @@ namespace Microsoft.Xna.Framework.Audio
 			soundBuffer.BindDataBuffer (soundEffect._data, soundEffect.Format, soundEffect.Size, (int)soundEffect.Rate);
 			soundBuffer.Reserved += HandleSoundBufferReserved;
 			soundBuffer.Recycled += HandleSoundBufferRecycled;
-
 		}
 
 		void HandleSoundBufferRecycled (object sender, EventArgs e)
@@ -100,6 +102,7 @@ namespace Microsoft.Xna.Framework.Audio
 
 		public void Dispose ()
 		{
+            controller.RemoveStateChangeHandler(soundBuffer);
 			soundBuffer.Reserved -= HandleSoundBufferReserved;
 			soundBuffer.Recycled -= HandleSoundBufferRecycled;
 			soundBuffer.Dispose ();
@@ -157,6 +160,7 @@ namespace Microsoft.Xna.Framework.Audio
                 alPitch = 1 + pitch;
             return alPitch;
         }
+
 		private void ApplyState ()
 		{
 			if (!hasSourceId)
@@ -186,7 +190,7 @@ namespace Microsoft.Xna.Framework.Audio
 
 			AL.Source (soundBuffer.SourceId, ALSourcei.Buffer, bufferId);
 			ApplyState ();
-
+            controller.AddStateChangeHandler(soundBuffer, StateChangedHandler);
 			controller.PlaySound (soundBuffer);
 			//Console.WriteLine ("playing: " + sourceId + " : " + soundEffect.Name);
 			soundState = SoundState.Playing;
@@ -205,6 +209,18 @@ namespace Microsoft.Xna.Framework.Audio
 			}
 			soundState = SoundState.Stopped;
 		}
+        
+        void StateChangedHandler(ALSourceState state)
+        {
+            if (state == ALSourceState.Stopped)
+                soundState = SoundState.Stopped;
+            else if (state == ALSourceState.Playing)
+                soundState = SoundState.Playing;
+            else if (state == ALSourceState.Paused)
+                soundState = SoundState.Paused;
+            if (FinishedPlaying != null && soundState == SoundState.Stopped)
+                FinishedPlaying(this, EventArgs.Empty);
+        }
 
 		public void Stop (bool immediate)
 		{

@@ -105,6 +105,7 @@ using System.Linq;
         }
 		
         public static MediaState State { get { return _mediaState; } }
+        public static event EventHandler<EventArgs> MediaStateChanged;
 		
 #if IPHONE
 		public static bool GameHasControl 
@@ -158,6 +159,7 @@ using System.Linq;
 		
 			_queue.ActiveSong.Pause();
 			_mediaState = MediaState.Paused;
+            if (MediaStateChanged != null) MediaStateChanged(null, EventArgs.Empty);
         }
 		
 		/// <summary>
@@ -191,6 +193,7 @@ using System.Linq;
 			song.Volume = _isMuted ? 0.0f : _volume;
 			song.Play();
 			_mediaState = MediaState.Playing;
+            if (MediaStateChanged != null) MediaStateChanged(null, EventArgs.Empty);
 		}
 		
 		internal static void OnSongFinishedPlaying (object sender, EventArgs args)
@@ -204,6 +207,7 @@ using System.Linq;
 				if (!IsRepeating)
 				{
 					_mediaState = MediaState.Stopped;
+                    if (MediaStateChanged != null) MediaStateChanged(null, EventArgs.Empty);
 					return;
 				}
 			}
@@ -218,6 +222,7 @@ using System.Linq;
 			
 			_queue.ActiveSong.Resume();
 			_mediaState = MediaState.Playing;
+            if (MediaStateChanged != null) MediaStateChanged(null, EventArgs.Empty);
         }
 
         public static void Stop()
@@ -230,6 +235,7 @@ using System.Linq;
 				_queue.ActiveSong.Stop();
 			
 			_mediaState = MediaState.Stopped;
+            if (MediaStateChanged != null) MediaStateChanged(null, EventArgs.Empty);
 		}
 		
 		public static void MoveNext()
@@ -249,7 +255,8 @@ using System.Linq;
 			if (nextSong == null)
 			{
 				_mediaState = MediaState.Stopped;
-				return;
+                if (MediaStateChanged != null) MediaStateChanged(null, EventArgs.Empty);
+                return;
 			}
 			
 			nextSong.Play();

@@ -13,6 +13,8 @@ using MonoMac.OpenAL;
 
 namespace Microsoft.Xna.Framework.Audio
 {
+    public delegate void StateChangedHandler(ALSourceState state);
+    
 	internal sealed class OpenALSoundController : IDisposable
 	{
 		static OpenALSoundController _instance = null;
@@ -27,6 +29,8 @@ namespace Microsoft.Xna.Framework.Audio
 		HashSet<int> availableSourcesCollection;
 		HashSet<OALSoundBuffer> inUseSourcesCollection;
 		HashSet<OALSoundBuffer> playingSourcesCollection;
+        Dictionary<OALSoundBuffer, StateChangedHandler> stateChangedHandlers;
+        Dictionary<OALSoundBuffer, ALSourceState> lastStates;
 
 		private OpenALSoundController ()
 		{
@@ -59,6 +63,8 @@ namespace Microsoft.Xna.Framework.Audio
 			for (int x=0; x < MAX_NUMBER_OF_SOURCES; x++) {
 				availableSourcesCollection.Add (allSourcesArray [x]);
 			}
+            stateChangedHandlers = new Dictionary<OALSoundBuffer, StateChangedHandler>();
+            lastStates = new Dictionary<OALSoundBuffer, ALSourceState>();
 		}
 
 		public static OpenALSoundController GetInstance {
@@ -162,6 +168,18 @@ namespace Microsoft.Xna.Framework.Audio
 
 			return false;
 		}
+        
+        public void AddStateChangeHandler(OALSoundBuffer b, StateChangedHandler h)
+        {
+            if (!stateChangedHandlers.ContainsKey(b))
+                stateChangedHandlers.Add(b, h);
+        }
+        
+        public void RemoveStateChangeHandler(OALSoundBuffer b)
+        {
+            stateChangedHandlers.Remove(b);
+            lastStates.Remove(b);
+        }
 
 		public double SourceCurrentPosition (int sourceId)
 		{
@@ -173,13 +191,26 @@ namespace Microsoft.Xna.Framework.Audio
 		public void Update ()
 		{
 			HashSet<OALSoundBuffer> purgeMe = new HashSet<OALSoundBuffer> ();
-
+            List<KeyValuePair<StateChangedHandler, ALSourceState>> callMe = new List<KeyValuePair<StateChangedHandler, ALSourceState>>();
 			ALSourceState state;
 			foreach (var soundBuffer in playingSourcesCollection) {
 
 				state = AL.GetSourceState (soundBuffer.SourceId);
-
-				if (state == ALSourceState.Stopped) {
+                if (stateChangedHandlers.ContainsKey(soundBuffer))
+                {
+                    if (!lastStates.ContainsKey(soundBuffer))
+                    {
+                        lastStates.Add(soundBuffer, ALSourceState.Initial);
+                        stateChangedHandlers[soundBuffer](ALSourceState.Initial);
+                    }
+                    if (lastStates[soundBuffer] != state)
+                    {
+                        callMe.Add(new KeyValuePair<StateChangedHandler, ALSourceState>(stateChangedHandlers[soundBuffer], state));
+                        lastStates[soundBuffer] = state;
+                    }
+                }
+                
+                if (state == ALSourceState.Stopped) {
 
 					AL.Source (soundBuffer.SourceId, ALSourcei.Buffer, 0);
 					purgeMe.Add (soundBuffer);
@@ -189,10 +220,16 @@ namespace Microsoft.Xna.Framework.Audio
 			}
 
 			foreach (var soundBuffer in purgeMe) {
-
 				playingSourcesCollection.Remove (soundBuffer);
 				RecycleSource (soundBuffer);
 			}
+            
+            // we make the updates after the main play-update because we might want to change the playingSourceCollection
+            // while updating. It also happens after purging so the same sound can be played again on a stop-event
+            foreach (var caller in callMe) {
+                caller.Key(caller.Value);
+            }
+            
 		}
 
 #if MACOSX || IPHONE
