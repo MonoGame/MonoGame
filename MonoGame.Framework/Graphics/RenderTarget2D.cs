@@ -78,6 +78,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		public int MultiSampleCount { get; private set; }
 		
 		public RenderTargetUsage RenderTargetUsage { get; private set; }
+        
+        public bool IsContentLost { get { return false; } }
 		
 		public RenderTarget2D (GraphicsDevice graphicsDevice, int width, int height, bool mipMap, SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage)
 			:base (graphicsDevice, width, height, mipMap, preferredFormat, true)
