@@ -266,11 +266,6 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        public bool IsContentLost
-        {
-            get { return false; }
-        }
-
         public void SetData<T>(int level, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct 
         {
             if (data == null)
