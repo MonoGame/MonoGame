@@ -314,7 +314,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     graphicsDevice._d3dContext.UpdateSubresource(box, _texture, level, region);
 
 #elif PSS
-                _texture2D.SetPixels(level, data, _texture2D.Format, startIndex, w, x, y, w, h);
+                _texture2D.SetPixels(level, data, _texture2D.Format, startIndex, 0, x, y, w, h);
 
 
 #elif OPENGL
