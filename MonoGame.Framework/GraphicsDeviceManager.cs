@@ -311,6 +311,7 @@ namespace Microsoft.Xna.Framework
 			set
 			{
 				_supportedOrientations = value;
+				_game.Window.SetSupportedOrientations(_supportedOrientations);
 			}
 		}
 
