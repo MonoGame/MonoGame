@@ -507,6 +507,7 @@ namespace Microsoft.Xna.Framework.Graphics
 					matProjection = Matrix.CreateOrthographic(this.graphicsDevice.Viewport.Width,
 								this.graphicsDevice.Viewport.Height,
 								-1f,1f);
+#if !ANDROID
 					if (graphicsDevice.PresentationParameters.DisplayOrientation == DisplayOrientation.LandscapeRight)
 					{
 						// flip the viewport	
@@ -514,7 +515,7 @@ namespace Microsoft.Xna.Framework.Graphics
 								-this.graphicsDevice.Viewport.Height,
 								-1f,1f);
 					}
-						
+#endif
 					matWVPScreen = _matrix * matViewScreen * matProjection;								    
 			}
 			
