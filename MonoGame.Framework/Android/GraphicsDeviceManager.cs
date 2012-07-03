@@ -354,6 +354,7 @@ namespace Microsoft.Xna.Framework
 			{
 				this._preferredBackBufferSetByUser = false;
 				_supportedOrientations = value;
+				_game.Window.SetSupportedOrientations(_supportedOrientations);
 			}
 		}
 

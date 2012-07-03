@@ -507,14 +507,7 @@ namespace Microsoft.Xna.Framework.Graphics
 					matProjection = Matrix.CreateOrthographic(this.graphicsDevice.Viewport.Width,
 								this.graphicsDevice.Viewport.Height,
 								-1f,1f);
-					if (graphicsDevice.PresentationParameters.DisplayOrientation == DisplayOrientation.LandscapeRight)
-					{
-						// flip the viewport	
-						matProjection = Matrix.CreateOrthographic(-this.graphicsDevice.Viewport.Width,
-								-this.graphicsDevice.Viewport.Height,
-								-1f,1f);
-					}
-						
+
 					matWVPScreen = _matrix * matViewScreen * matProjection;								    
 			}
 			
