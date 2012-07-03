@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -56,6 +56,8 @@
     <Compile Include="Android\AndroidCompatibility.cs" />
     <Compile Include="Android\AndroidGamePlatform.cs" />
     <Compile Include="Android\Input\Mouse.cs" />
+    <Compile Include="Android\OrientationListener.cs" />
+    <Compile Include="Android\TitleContainer.cs" />
     <Compile Include="Content\ContentManager.cs" />
     <Compile Include="Content\ContentReaders\ArrayReader.cs" />
     <Compile Include="Content\ContentReaders\BoundingFrustumReader.cs" />
@@ -335,7 +337,6 @@
     <Compile Include="Net\CommandGamerLeft.cs" />
     <Compile Include="Net\CommandGamerStateChange.cs" />
     <Compile Include="Storage\StorageDeviceHelper.cs" />
-    <Compile Include="Android\TitleContainer.cs" />
     <Compile Include="Content\LzxDecoder.cs" />
     <Compile Include="Android\Content\ContentManager.cs" />
     <Compile Include="Graphics\States\SamplerState.ES.cs" />
