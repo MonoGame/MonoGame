@@ -45,7 +45,10 @@ namespace Microsoft.Xna.Framework
             base.OnPause();
             if (Paused != null)
                 Paused(this, EventArgs.Empty);
-            Game.GraphicsDevice.ResourcesLost = true;
+
+            if (Game.GraphicsDevice != null)
+                Game.GraphicsDevice.ResourcesLost = true;
+
 			if (Game.Window != null && Game.Window.Parent != null && (Game.Window.Parent is FrameLayout))
 			{				
               ((FrameLayout)Game.Window.Parent).RemoveAllViews();
@@ -66,58 +69,7 @@ namespace Microsoft.Xna.Framework
             Game.Window.RequestFocus();
             Game.GraphicsDevice.Initialize(Game.Platform);
         }
-
     }
-	
-	internal class OrientationListener : OrientationEventListener
-	{
-		AndroidGameActivity activity;
-		
-		public OrientationListener(AndroidGameActivity activity) : base(activity, Android.Hardware.SensorDelay.Game)
-		{
-			this.activity = activity;
-		}
-		
-		private bool inprogress = false;
-		
-		 public override void OnOrientationChanged (int orientation)
-		{
-			if (!inprogress) 
-			{			
-				inprogress = true;
-				// Divide by 90 into an int to round, then multiply out to one of 5 positions, either 0,90,180,270,360. 
-				int ort = (90*(int)Math.Round(orientation/90f)) % 360;
-				
-				// Convert 360 to 0
-				if(ort == 360)
-				{
-				    ort = 0;
-				}
-										
-				var disporientation = DisplayOrientation.Unknown;
-				
-				switch (ort) {
-					case 90 : disporientation = DisplayOrientation.LandscapeRight;
-						break;
-			    	case 270 : disporientation = DisplayOrientation.LandscapeLeft;
-						break;
-			    	case 0 : disporientation = DisplayOrientation.Portrait;
-						break;
-					default:
-						disporientation = DisplayOrientation.LandscapeLeft;
-						break;
-				}
-				
-				if (AndroidGameActivity.Game.Window.CurrentOrientation != disporientation)
-				{
-				AndroidGameActivity.Game.Window.SetOrientation(disporientation);
-				}
-				inprogress = false;
-			}
-			
-
-		}
-	}
 	
 	public static class ActivityExtensions
     {
