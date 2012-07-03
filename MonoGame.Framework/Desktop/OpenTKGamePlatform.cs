@@ -204,7 +204,7 @@ namespace Microsoft.Xna.Framework
 
             // we only change window bounds if we are not fullscreen
             // or if fullscreen mode was just entered
-            if (!graphicsDeviceManager.IsFullScreen)
+            if (!graphicsDeviceManager.IsFullScreen || toggleFullScreen)
                 _view.ChangeClientBounds(bounds);
 
             IsActive = wasActive;
