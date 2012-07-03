@@ -181,7 +181,7 @@ namespace Microsoft.Xna.Framework {
 			}
 
 			_graphicsContext.MakeCurrent (null);
-			_graphicsContext.LoadAll ();
+			// Should not be required any more _graphicsContext.LoadAll ();
 
 			// FIXME: These static methods on GraphicsDevice need
 			// to go away someday.

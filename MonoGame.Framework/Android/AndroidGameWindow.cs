@@ -278,8 +278,8 @@ namespace Microsoft.Xna.Framework
             switch (e.ActionMasked)
             {
                 // DOWN                
-                case 0:
-                case 5:
+                case MotionEventActions.Down:
+                case MotionEventActions.PointerDown:
                     index = collection.FindIndexById(e.GetPointerId(e.ActionIndex), out tlocation);
                     if (index < 0)
                     {
@@ -293,8 +293,8 @@ namespace Microsoft.Xna.Framework
                     }
                     break;
                 // UP                
-                case 1:
-                case 6:
+                case MotionEventActions.Up:
+                case MotionEventActions.PointerUp:
                     index = collection.FindIndexById(e.GetPointerId(e.ActionIndex), out tlocation);
                     if (index >= 0)
                     {
@@ -303,7 +303,7 @@ namespace Microsoft.Xna.Framework
                     }	
 				break;
                 // MOVE                
-                case 2:
+                case MotionEventActions.Move:
                     for (int i = 0; i < e.PointerCount; i++)
                     {
                         id = e.GetPointerId(i);
@@ -320,8 +320,8 @@ namespace Microsoft.Xna.Framework
                     }
 					break;
                 // CANCEL, OUTSIDE                
-                case 3:
-                case 4:
+                case MotionEventActions.Cancel:
+                case  MotionEventActions.Outside:
                     index = collection.FindIndexById(id, out tlocation);
                     if (index >= 0)
                     {

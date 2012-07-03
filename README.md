@@ -2,9 +2,9 @@
 MonoGame is an OpenSource, OpenGL implementation of Microsoft's XNA 4 APIs that allows developers to build games that run on Android, iPhone, iPad, MacOS, Linux and soon PlayStation Suite and Windows Metro, all reusing their existing XNA code that runs on Xbox 360 or Windows Phone 7.
 
 # LATEST NEWS
-[Infinite Flight](http://itunes.apple.com/us/app/infinite-flight/id471341991?ls=1&mt=8), MonoGame's first 3D powered game, has been released.
+v2.5.1 has been released and is now available for public consumption.
 
-v2.5 is nearing public release. Stay tuned.
+[Infinite Flight](http://itunes.apple.com/us/app/infinite-flight/id471341991?ls=1&mt=8), MonoGame's first 3D powered game, has been released.
 
 # FEATURED GAMES
 ### [Infinite Flight](http://itunes.apple.com/us/app/infinite-flight/id471341991?ls=1&mt=8)
@@ -72,6 +72,8 @@ cadahl
 CircleOf14
 vostok4
 viyano
+directhex
+danzel
 
 [Team Xamarin](http://www.xamarin.com) for their support and continued great work on all things Mono
 and everyone else that submitted patches/fixes and enhancements. Without your contributions this release would not have been possible.

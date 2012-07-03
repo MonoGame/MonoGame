@@ -4,6 +4,10 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public class DynamicVertexBuffer : VertexBuffer
     {
+		internal int UserOffset;
+
+		public bool IsContentLost { get { return false; } }
+
         public DynamicVertexBuffer(GraphicsDevice graphics, Type type, int vertexCount, BufferUsage bufferUsage)
             : base(graphics, type, vertexCount, bufferUsage)
         {
@@ -14,14 +18,14 @@ namespace Microsoft.Xna.Framework.Graphics
         {
         }
 
-        public void SetData<T>(T[] data, int startIndex, int elementCount, SetDataOptions options) where T : struct
+		public void SetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, SetDataOptions options) where T : struct
         {
-            throw new NotImplementedException();
+            base.SetData<T>(offsetInBytes, data, startIndex, elementCount, VertexDeclaration.VertexStride, options);
         }
 
-        public void SetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, SetDataOptions options) where T : struct
+        public void SetData<T>(T[] data, int startIndex, int elementCount, SetDataOptions options) where T : struct
         {
-            throw new NotImplementedException();
+			base.SetData<T>(0, data, startIndex, elementCount, VertexDeclaration.VertexStride, options);
         }
     }
 }

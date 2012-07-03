@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Runtime.InteropServices;
 
 #if MONOMAC
@@ -24,6 +26,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		internal uint _bufferStore;
 
 		// TODO: Remove this VB limit!
+		internal uint vbo;
         internal static int _bufferCount;
         internal static VertexBuffer[] _allBuffers = new VertexBuffer[50];
 		internal static List<Action> _delayedBufferDelegates = new List<Action>();
@@ -95,46 +98,45 @@ namespace Microsoft.Xna.Framework.Graphics
                 vertices[i] = tbuff[i];
         }
 
-        public void SetData<T>(T[] vertices) where T : struct
+        public void SetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride) where T : struct
         {
-            // TODO: This is fundimentally broken in that it is not 
-            // assured that the incoming vertex array will exist unmodified
-            // long enough for the delayed buffer creation to occur. 
-            //
-            // We either need to remove the concept of delayed buffer 
-            // creation or copy the data here for safe keeping.
-
-			//the creation of the buffer should mb be moved to the constructor and then glMapBuffer and Unmap should be used to update it
-			//glMapBuffer - sets data
-			//glUnmapBuffer - finished setting data
-			
-            _buffer = vertices;
-            _bufferPtr = GCHandle.Alloc(_buffer, GCHandleType.Pinned).AddrOfPinnedObject();			
-			
-			_bufferIndex = _bufferCount + 1;
-			_allBuffers[_bufferIndex] = this;
-			
-			_delayedBufferDelegates.Add(GenerateBuffer<T>);
-			
-            _bufferCount++;
-            // TODO: Kill buffers in PhoneOSGameView.DestroyFrameBuffer()
+            SetData<T>(0, data, startIndex, elementCount, VertexDeclaration.VertexStride, SetDataOptions.Discard);
         }
-
-        public void SetData<T> (T[] data, int startIndex, int elementCount) where T : struct
+        		
+		public void SetData<T>(T[] data, int startIndex, int elementCount) where T : struct
         {
-            throw new NotImplementedException();           
-        }
-
-		public void SetData<T> (
-			int offsetInBytes,
-			T[] data,
-			int startIndex,
-			int elementCount,
-			int vertexStride
-            ) where T : struct
-		{
-			throw new NotImplementedException();
+            SetData<T>(0, data, startIndex, elementCount, VertexDeclaration.VertexStride, SetDataOptions.Discard);
 		}
+
+        public void SetData<T>(T[] data) where T : struct
+        {
+            SetData<T>(0, data, 0, data.Length, VertexDeclaration.VertexStride, SetDataOptions.Discard);
+        }
+
+		protected void SetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride, SetDataOptions options) where T : struct
+        {
+            if (data == null)
+                throw new ArgumentNullException("data is null");
+            if (data.Length < (startIndex + elementCount))
+                throw new InvalidOperationException("The array specified in the data parameter is not the correct size for the amount of data requested.");
+            if ((vertexStride > (VertexCount * VertexDeclaration.VertexStride)) || (vertexStride < VertexDeclaration.VertexStride))
+                throw new ArgumentOutOfRangeException("One of the following conditions is true:\nThe vertex stride is larger than the vertex buffer.\nThe vertex stride is too small for the type of data requested.");
+   
+			var elementSizeInBytes = Marshal.SizeOf(typeof(T));
+
+			//Threading.BlockOnUIThread(() =>
+            //{
+                var sizeInBytes = elementSizeInBytes * elementCount;
+#if MONOMAC
+                GL.BindBuffer(BufferTarget.ArrayBuffer, vbo);
+                GL.BufferSubData<T>(BufferTarget.ArrayBuffer, new IntPtr(offsetInBytes), new IntPtr(sizeInBytes), data);
+#else
+				GL11.BindBuffer(All11.ArrayBuffer, vbo);
+                GL11.BufferSubData<T>(All11.ArrayBuffer, new IntPtr(offsetInBytes), new IntPtr(sizeInBytes), data);
+#endif
+
+            //});
+        }
 
 		public override void Dispose ()
 		{

@@ -646,7 +646,7 @@ namespace Microsoft.Xna.Framework.Net
 				netPeer.DiscoverLocalPeers (port);
 			}
 
-			DateTime now = DateTime.Now;
+			DateTime now = DateTime.UtcNow;
 
 			discoveryMsgs = new List<NetIncomingMessage> ();
 
@@ -682,7 +682,7 @@ namespace Microsoft.Xna.Framework.Net
 						break;
 					}
 				}
-			} while ((DateTime.Now - now).Seconds <= 2);
+			} while ((DateTime.UtcNow - now).Seconds <= 2);
 
 			netPeer.Shutdown ("Find shutting down");
 		}

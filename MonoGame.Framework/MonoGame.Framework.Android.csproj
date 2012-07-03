@@ -58,7 +58,6 @@
     <Compile Include="Android\Input\Mouse.cs" />
     <Compile Include="Android\OrientationListener.cs" />
     <Compile Include="Android\TitleContainer.cs" />
-    <Compile Include="Audio\AudioCategory.cs" />
     <Compile Include="Content\ContentManager.cs" />
     <Compile Include="Content\ContentReaders\ArrayReader.cs" />
     <Compile Include="Content\ContentReaders\BoundingFrustumReader.cs" />
@@ -191,6 +190,7 @@
     <Compile Include="MathHelper.cs" />
     <Compile Include="Matrix.cs" />
     <Compile Include="Media\MediaPlayer.cs" />
+    <Compile Include="Media\MediaQueue.cs" />
     <Compile Include="Media\MediaSourceType.cs" />
     <Compile Include="Media\MediaState.cs" />
     <Compile Include="Media\Playlist.cs" />
@@ -337,7 +337,6 @@
     <Compile Include="Net\CommandGamerLeft.cs" />
     <Compile Include="Net\CommandGamerStateChange.cs" />
     <Compile Include="Storage\StorageDeviceHelper.cs" />
-    <Compile Include="Android\TitleContainer.cs" />
     <Compile Include="Content\LzxDecoder.cs" />
     <Compile Include="Android\Content\ContentManager.cs" />
     <Compile Include="Graphics\States\SamplerState.ES.cs" />
