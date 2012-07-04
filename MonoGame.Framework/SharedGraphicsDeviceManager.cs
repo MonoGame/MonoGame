@@ -94,7 +94,10 @@ namespace Microsoft.Xna.Framework
             if (createDevice)
                 GraphicsDevice.Initialize();
             else
+            {
                 GraphicsDevice.CreateSizeDependentResources();
+                GraphicsDevice.ApplyRenderTargets(null);
+            }
         }
 
         public void Dispose()
