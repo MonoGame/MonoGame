@@ -419,11 +419,20 @@ namespace Microsoft.Xna.Framework.Graphics
 
             _d2dContext.Target = null;
             if (_renderTargetView != null)
+            {
                 _renderTargetView.Dispose();
+                _renderTargetView = null;
+            }
             if (_depthStencilView != null)
+            {
                 _depthStencilView.Dispose();
+                _depthStencilView = null;
+            }
             if (_bitmapTarget != null)
+            {
                 _bitmapTarget.Dispose();
+                _bitmapTarget = null;
+            }
 
 			// Clear the current render targets.
             _currentDepthStencilView = null;
