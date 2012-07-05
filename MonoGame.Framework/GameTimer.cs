@@ -124,7 +124,7 @@ namespace Microsoft.Xna.Framework
 
         private static Stopwatch _gameTimer = Stopwatch.StartNew();
 
-        private static MetroCoreWindowEvents _windowEvents;
+        private static MetroFrameworkElementEvents _windowEvents;
 
         static private void OnTick()
         {
@@ -139,7 +139,7 @@ namespace Microsoft.Xna.Framework
 
             // Do we need to initialize the window event handlers?
             if (_windowEvents == null && Window.Current != null)
-                _windowEvents = new MetroCoreWindowEvents(Window.Current.CoreWindow);
+                _windowEvents = new MetroFrameworkElementEvents(SharedGraphicsDeviceManager.Current.SwapChainPanel);
             if (_windowEvents != null)
                 _windowEvents.UpdateState();
 
