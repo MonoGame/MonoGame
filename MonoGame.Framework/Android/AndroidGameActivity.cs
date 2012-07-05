@@ -46,7 +46,10 @@ namespace Microsoft.Xna.Framework
             base.OnPause();
             if (Paused != null)
                 Paused(this, EventArgs.Empty);
-            Game.GraphicsDevice.ResourcesLost = true;
+
+            if (Game.GraphicsDevice != null)
+                Game.GraphicsDevice.ResourcesLost = true;
+
 			if (Game.Window != null && Game.Window.Parent != null && (Game.Window.Parent is FrameLayout))
 			{				
               ((FrameLayout)Game.Window.Parent).RemoveAllViews();
