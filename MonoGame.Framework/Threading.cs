@@ -40,6 +40,7 @@ purpose and non-infringement.
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 #if IPHONE
 using MonoTouch.Foundation;
@@ -49,6 +50,10 @@ using OpenTK.Graphics.ES11;
 #else
 using OpenTK.Graphics.ES20;
 #endif
+#elif WINDOWS || LINUX
+using OpenTK.Graphics;
+using OpenTK.Platform;
+using OpenTK;
 #endif
 
 namespace Microsoft.Xna.Framework
@@ -56,16 +61,78 @@ namespace Microsoft.Xna.Framework
     internal class Threading
     {
         static int mainThreadId;
-#if ANDROID || LINUX || WINDOWS
+#if ANDROID
         static List<Action> actions = new List<Action>();
         static Mutex actionsMutex = new Mutex();
 #elif IPHONE
         public static EAGLContext BackgroundContext;
+#elif WINDOWS || LINUX
+        static Queue<Action> actions = new Queue<Action>();
+        static Thread actionThread;
+        static AutoResetEvent doWorkEvent;
+        static AutoResetEvent workDoneEvent;
 #endif
         static Threading()
         {
             mainThreadId = Thread.CurrentThread.ManagedThreadId;
         }
+
+#if WINDOWS || LINUX
+        // Thread locking based on http://www.albahari.com/threading/part4.aspx
+        static void ActionWorker()
+        {
+            INativeWindow window = new NativeWindow();
+            IGraphicsContext context = new GraphicsContext(GraphicsMode.Default, window.WindowInfo);
+            context.MakeCurrent(window.WindowInfo);
+
+            while (true)
+            {
+                Debug.WriteLine("Waiting for doWorkEvent signal");
+                doWorkEvent.WaitOne();
+                Debug.WriteLine("Received doWorkEvent signal");
+                Action action = null;
+                lock (actions)
+                {
+                    if (actions.Count > 0)
+                        action = actions.Dequeue();
+                }
+                if (action == null)
+                    break;
+                action();
+                Debug.WriteLine("Signalling workDoneEvent");
+                workDoneEvent.Set();
+            }
+
+            context.Dispose();
+            window.Dispose();
+        }
+
+        static public void Initialize()
+        {
+            doWorkEvent = new AutoResetEvent(false);
+            workDoneEvent = new AutoResetEvent(false);
+            actionThread = new Thread(ActionWorker);
+            actionThread.Start();
+        }
+
+        static public void Deinitialize()
+        {
+            // Signal the thread to finish
+            EnqueueItem(null);
+            // Wait for the thread to terminate
+            actionThread.Join();
+            doWorkEvent.Dispose();
+            workDoneEvent.Dispose();
+        }
+
+        static void EnqueueItem(Action action)
+        {
+            lock(actions)
+                actions.Enqueue(action);
+            Debug.WriteLine("Signalling doWorkEvent");
+            doWorkEvent.Set();
+        }
+#endif
 
         /// <summary>
         /// Runs the given action on the UI thread and blocks the current thread while the action is running.
@@ -75,7 +142,7 @@ namespace Microsoft.Xna.Framework
         internal static void BlockOnUIThread(Action action)
         {
             if (action == null)
-                throw new ArgumentNullException("action cannot be null");
+                throw new ArgumentNullException("action");
 
 #if DIRECTX || PSS
             action();
@@ -94,8 +161,14 @@ namespace Microsoft.Xna.Framework
                     EAGLContext.SetCurrentContext(BackgroundContext);
                 action();
             }
+#elif WINDOWS || LINUX
+            // Add the action to the queue and wait for it to be completed
+            EnqueueItem(action);
+            Debug.WriteLine("Waiting for workDoneEvent signal");
+            workDoneEvent.WaitOne();
+            Debug.WriteLine("Received workDoneEvent signal");
 #else
-            System.Threading.ManualResetEventSlim resetEvent = new System.Threading.ManualResetEventSlim(false);
+            ManualResetEventSlim resetEvent = new ManualResetEventSlim(false);
 #if MONOMAC
             MonoMac.AppKit.NSApplication.SharedApplication.BeginInvokeOnMainThread(() =>
 #else
@@ -114,7 +187,7 @@ namespace Microsoft.Xna.Framework
 #endif
         }
 
-#if ANDROID || LINUX || WINDOWS
+#if ANDROID
         static void Add(Action action)
         {
             lock (actions)

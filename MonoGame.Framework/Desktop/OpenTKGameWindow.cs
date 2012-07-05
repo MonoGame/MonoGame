@@ -62,6 +62,7 @@ namespace Microsoft.Xna.Framework
         private OpenTK.GameWindow window;
         protected Game game;
         private List<Microsoft.Xna.Framework.Input.Keys> keys;
+        private OpenTK.Graphics.GraphicsContext backgroundContext;
 
         // we need this variables to make changes beetween threads
         private WindowState windowState;
@@ -218,7 +219,7 @@ namespace Microsoft.Xna.Framework
             window.Resize += OnResize;
             window.Keyboard.KeyDown += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyDown);
             window.Keyboard.KeyUp += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyUp);
-
+            
             // Set the window icon.
             window.Icon = Icon.ExtractAssociatedIcon(Assembly.GetEntryAssembly().Location);
 
@@ -234,6 +235,8 @@ namespace Microsoft.Xna.Framework
                 _windowHandle = (IntPtr)propertyInfo.GetValue(window.WindowInfo, null);
             }
 #endif
+
+            Threading.Initialize();
 
             keys = new List<Keys>();
 
@@ -280,6 +283,7 @@ namespace Microsoft.Xna.Framework
         public void Dispose()
         {
             window.Dispose();
+            Threading.Deinitialize();
         }
 
         public override void BeginScreenDeviceChange(bool willBeFullScreen)
