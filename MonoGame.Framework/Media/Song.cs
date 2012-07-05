@@ -74,6 +74,7 @@ namespace Microsoft.Xna.Framework.Media
             _sound.FinishedPlaying += OnFinishedPlaying;
 #elif !WINRT
             _sound = new SoundEffect(_name).CreateInstance();
+            _sound.FinishedPlaying += OnFinishedPlaying;
 #endif
 		}
 		
@@ -113,7 +114,7 @@ namespace Microsoft.Xna.Framework.Media
             {
                 if (_sound != null)
                 {
-#if IPHONE
+#if IPHONE || LINUX
                     _sound.FinishedPlaying -= OnFinishedPlaying;
 #endif
                     _sound.Dispose();
