@@ -54,15 +54,12 @@ namespace Microsoft.Xna.Framework.Media
     {
 #if IPHONE
 		private AVAudioPlayer _sound;
-#else
+#elif !WINRT
 		private SoundEffectInstance _sound;
 #endif
 		
 		private string _name;
-		private int _playCount;
-    
-		internal delegate void FinishedPlayingHandler(object sender, EventArgs args);
-		event FinishedPlayingHandler DonePlaying;
+		private int _playCount;   
 		
 		internal Song(string fileName)
 		{			
@@ -72,31 +69,12 @@ namespace Microsoft.Xna.Framework.Media
 			_sound = AVAudioPlayer.FromUrl(NSUrl.FromFilename(fileName));
 			_sound.NumberOfLoops = 0;
             _sound.FinishedPlaying += OnFinishedPlaying;
-#elif !WINRT
+#elif !WINRT       
             _sound = new SoundEffect(_name).CreateInstance();
 #endif
 		}
-		
-		internal void OnFinishedPlaying (object sender, EventArgs args)
-		{
-			if (DonePlaying == null)
-				return;
-			
-			DonePlaying(sender, args);
-		}
-		
-		/// <summary>
-		/// Set the event handler for "Finished Playing". Done this way to prevent multiple bindings.
-		/// </summary>
-		internal void SetEventHandler(FinishedPlayingHandler handler)
-		{
-			if (DonePlaying != null)
-				return;
-			
-			DonePlaying += handler;
-		}
-		
-		public string FilePath
+				
+        public string FilePath
 		{
 			get { return _name; }
 		}
@@ -109,6 +87,7 @@ namespace Microsoft.Xna.Framework.Media
         
         void Dispose(bool disposing)
         {
+#if !WINRT
             if (disposing)
             {
                 if (_sound != null)
@@ -120,11 +99,16 @@ namespace Microsoft.Xna.Framework.Media
                     _sound = null;
                 }
             }
+#endif
         }
         
-		public bool Equals(Song song) 
-		{
+		public bool Equals(Song song) 		
+        {
+#if WINRT
+            return song != null && song.FilePath == FilePath;
+#else
 			return ((object)song != null) && (Name == song.Name);
+#endif
 		}
 		
 		public override int GetHashCode ()
@@ -156,31 +140,53 @@ namespace Microsoft.Xna.Framework.Media
 		{
 		  return ! (song1 == song2);
 		}
-		
+
+#if !WINRT
+        internal delegate void FinishedPlayingHandler(object sender, EventArgs args);
+		event FinishedPlayingHandler DonePlaying;
+
+		internal void OnFinishedPlaying (object sender, EventArgs args)
+		{
+			if (DonePlaying == null)
+				return;
+			
+			DonePlaying(sender, args);
+		}
+
+		/// <summary>
+		/// Set the event handler for "Finished Playing". Done this way to prevent multiple bindings.
+		/// </summary>
+		internal void SetEventHandler(FinishedPlayingHandler handler)
+		{
+			if (DonePlaying != null)
+				return;
+			
+			DonePlaying += handler;
+		}
+
 		internal void Play()
-		{			
+		{	
 			if ( _sound == null )
 				return;
 			
 			_sound.Play();
-			_playCount++;
+
+            _playCount++;
         }
 
 		internal void Resume()
 		{
 			if (_sound == null)
-				return;
-			
-#if IPHONE
+				return;			
+    #if IPHONE
 			_sound.Play();
-#else
+    #else
 			_sound.Resume();
-#endif
-
+    #endif
 		}
 		
 		internal void Pause()
-		{			
+		{			            
 			if ( _sound == null )
 				return;
 			
@@ -193,10 +199,9 @@ namespace Microsoft.Xna.Framework.Media
 				return;
 			
 			_sound.Stop();
-			
 			_playCount = 0;
 		}
-		
+
 		internal float Volume
 		{
 			get
@@ -213,22 +218,14 @@ namespace Microsoft.Xna.Framework.Media
 					_sound.Volume = value;
 			}			
 		}
-		
-		// TODO: Implement
+#endif // !WINRT
+
+        // TODO: Implement
         public TimeSpan Duration
         {
             get
             {
-				if ( _sound != null )
-				{
-					//return new TimeSpan(0,0,(int)_sound.Duration);
-					return new TimeSpan(0);
-				}
-				else
-				{
-					return new TimeSpan(0);
-				}
-				
+                return new TimeSpan(0);
             }
         }
 		
@@ -237,15 +234,7 @@ namespace Microsoft.Xna.Framework.Media
         {
             get
             {
-				if ( _sound != null )
-				{
-					//return new TimeSpan(0,0,(int)_sound.CurrentPosition);
-					return new TimeSpan(0);
-				}
-				else
-				{
-					return new TimeSpan(0);
-				}
+                return new TimeSpan(0);				
             }
         }
 
