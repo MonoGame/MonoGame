@@ -65,8 +65,11 @@ namespace Microsoft.Xna.Framework
             }
            
 			_game = game;
-			_preferredBackBufferHeight = game.Window.ClientBounds.Height;
-			_preferredBackBufferWidth = game.Window.ClientBounds.Width;
+
+			// Preferred buffer width/height is used to determine default supported orientations,
+			// so set the default values to match Xna behaviour of landscape only by default.
+			_preferredBackBufferWidth = Math.Max(game.Window.ClientBounds.Height, game.Window.ClientBounds.Width);
+			_preferredBackBufferHeight = Math.Min(game.Window.ClientBounds.Height, game.Window.ClientBounds.Width);
 			_supportedOrientations = DisplayOrientation.Default;
 			
             if (game.Services.GetService(typeof(IGraphicsDeviceManager)) != null)
@@ -262,9 +265,8 @@ namespace Microsoft.Xna.Framework
             }
             set
             {
-				_preferredBackBufferSetByUser = true;
-				_preferredBackBufferHeight = value;
-                ResetClientBounds();
+                _preferredBackBufferSetByUser = true;
+                _preferredBackBufferHeight = value;
             }
         }
 
@@ -276,9 +278,8 @@ namespace Microsoft.Xna.Framework
             }
             set
             {
-				_preferredBackBufferSetByUser = true;
-				_preferredBackBufferWidth = value;				
-                ResetClientBounds();
+                _preferredBackBufferSetByUser = true;
+                _preferredBackBufferWidth = value;
             }
         }
 
