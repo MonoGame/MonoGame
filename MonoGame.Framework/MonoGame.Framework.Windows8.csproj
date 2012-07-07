@@ -247,6 +247,7 @@
     <Compile Include="Storage\StorageDeviceHelper.cs" />
     <Compile Include="Windows8\GameFrameworkViewSource.cs" />
     <Compile Include="Windows8\MetroCoreWindowEvents.cs" />
+    <Compile Include="Windows8\MetroFrameElementEvents.cs" />
     <Compile Include="Windows8\MetroFrameworkView.cs" />
     <Compile Include="Windows8\MetroGamePlatform.cs" />
     <Compile Include="Windows8\MetroGameWindow.cs" />
