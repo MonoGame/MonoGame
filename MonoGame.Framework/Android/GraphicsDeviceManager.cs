@@ -55,7 +55,6 @@ namespace Microsoft.Xna.Framework
 		private int _preferredBackBufferWidth;
 		private bool _preferMultiSampling;
 		private DisplayOrientation _supportedOrientations;
-		private bool _preferredBackBufferSetByUser = false;
 
         public GraphicsDeviceManager(Game game)
         {
@@ -190,11 +189,6 @@ namespace Microsoft.Xna.Framework
 			IsFullScreen = !IsFullScreen;
         }
 		
-		internal bool PreferredBackBufferSetByUser
-		{
-			get {return _preferredBackBufferSetByUser; }
-		}
-		
         public Microsoft.Xna.Framework.Graphics.GraphicsDevice GraphicsDevice
         {
             get
@@ -265,7 +259,6 @@ namespace Microsoft.Xna.Framework
             }
             set
             {
-                _preferredBackBufferSetByUser = true;
                 _preferredBackBufferHeight = value;
             }
         }
@@ -278,49 +271,48 @@ namespace Microsoft.Xna.Framework
             }
             set
             {
-                _preferredBackBufferSetByUser = true;
                 _preferredBackBufferWidth = value;
             }
         }
 
         internal void ResetClientBounds()
         {
-            var clientBounds = Game.Instance.Window.ClientBounds;
-			
-			if (_preferredBackBufferSetByUser)
-			{
+            float preferredAspectRatio = (float)_preferredBackBufferWidth / (float)_preferredBackBufferHeight;
+            float displayAspectRatio = GraphicsDevice.DisplayMode.AspectRatio;
 
-            var aspectRatio = (float)_preferredBackBufferWidth/_preferredBackBufferHeight;
+            if ((preferredAspectRatio > 1.0f && displayAspectRatio < 1.0f) ||
+                (preferredAspectRatio < 1.0f && displayAspectRatio > 1.0f))
+            {
+                // Invert preferred aspect ratio if it's orientation differs from the display mode orientation.
+                // This occurs when user sets preferredBackBufferWidth/Height and also allows multiple supported orientations
+                preferredAspectRatio = 1.0f / preferredAspectRatio;
+            }
 
-            if (GraphicsDevice.DisplayMode.AspectRatio > aspectRatio)
+            const float EPSILON = 0.00001f;
+            if (displayAspectRatio > (preferredAspectRatio + EPSILON))
             {
                 var newClientBounds = new Rectangle();
 
                 newClientBounds.Height = GraphicsDevice.DisplayMode.Height;
-                newClientBounds.Width = (int) (newClientBounds.Height*aspectRatio);
+                newClientBounds.Width = (int) (newClientBounds.Height * preferredAspectRatio);
                 newClientBounds.X = (GraphicsDevice.DisplayMode.Width - newClientBounds.Width)/2;
 
                 Game.Instance.Window.ClientBounds = newClientBounds;
             }
-            else if (GraphicsDevice.DisplayMode.AspectRatio < aspectRatio)
+            else if (displayAspectRatio < (preferredAspectRatio - EPSILON))
             {
                 var newClientBounds = new Rectangle();
 
                 newClientBounds.Width = GraphicsDevice.DisplayMode.Width;
-                newClientBounds.Height = (int)(newClientBounds.Width / aspectRatio);
+                newClientBounds.Height = (int)(newClientBounds.Width / preferredAspectRatio);
                 newClientBounds.Y = (GraphicsDevice.DisplayMode.Height - newClientBounds.Height) / 2;
 
                 Game.Instance.Window.ClientBounds = newClientBounds;
             }
             else
             {
-                Game.Instance.Window.ClientBounds = new Rectangle(0, 0, _preferredBackBufferWidth, _preferredBackBufferHeight);
+                Game.Instance.Window.ClientBounds = new Rectangle(0, 0, GraphicsDevice.DisplayMode.Width, GraphicsDevice.DisplayMode.Height);
             }
-			}
-			else
-			{
-				   Game.Instance.Window.ClientBounds = new Rectangle(0, 0, GraphicsDevice.DisplayMode.Width, GraphicsDevice.DisplayMode.Height);
-			}
         }
 
         public DepthFormat PreferredDepthStencilFormat
@@ -353,7 +345,6 @@ namespace Microsoft.Xna.Framework
 			}
 			set
 			{
-				this._preferredBackBufferSetByUser = false;
 				_supportedOrientations = value;
 				_game.Window.SetSupportedOrientations(_supportedOrientations);
 			}
