@@ -295,7 +295,7 @@ namespace Microsoft.Xna.Framework
 
         public void Exit()
         {
-            Platform.Exit();
+			Platform.Exit();
         }
 
         public void ResetElapsedTime()
@@ -339,7 +339,7 @@ namespace Microsoft.Xna.Framework
             case GameRunBehavior.Synchronous:
                 Platform.RunLoop();
                 EndRun();
-                OnExiting(this, EventArgs.Empty);
+				DoExiting();
                 break;
             default:
                 throw new NotImplementedException(string.Format(
@@ -512,7 +512,7 @@ namespace Microsoft.Xna.Framework
             var platform = (GamePlatform)sender;
             platform.AsyncRunLoopEnded -= Platform_AsyncRunLoopEnded;
             EndRun();
-            OnExiting(this, EventArgs.Empty);
+			DoExiting();
         }
 
         private void Platform_Activated(object sender, EventArgs e)
@@ -587,6 +587,11 @@ namespace Microsoft.Xna.Framework
             Platform.BeforeInitialize();
             Initialize();
         }
+
+		internal void DoExiting()
+		{
+			OnExiting(this, EventArgs.Empty);
+		}
 
 #if LINUX
         internal void ResizeWindow(bool changed)
