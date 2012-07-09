@@ -71,11 +71,12 @@ namespace Microsoft.Xna.Framework
         private DisplayOrientation supportedOrientations = DisplayOrientation.Default;
         private DisplayOrientation _currentOrientation;
 		private GestureDetector gesture = null;
+		private bool exiting = false;
 
         public AndroidGameWindow(Context context, Game game) : base(context)
         {
             _game = game;
-            Initialize();							
+            Initialize();	
         }		
 						
         private void Initialize()
@@ -97,15 +98,27 @@ namespace Microsoft.Xna.Framework
 		}
 		
 		void GameWindow_Closed(object sender,EventArgs e)
-        {        
-			try
+        {   
+			if (!exiting)
 			{
-        		_game.Exit();
+				exiting = true;
+				_game.DoExiting();
+			}
+			try
+			{					
+				_game.Exit();
 			}
 			catch(NullReferenceException)
 			{
 				// just in case the game is null
 			}
+
+		}
+
+		protected override void OnLoad (EventArgs e)
+		{
+			base.OnLoad (e);			
+			MakeCurrent();
 		}
 
         public override bool OnKeyDown(Keycode keyCode, KeyEvent e)
@@ -188,9 +201,17 @@ namespace Microsoft.Xna.Framework
             if (!GraphicsContext.IsCurrent)
                 MakeCurrent();
 
-            if (_game != null ) //Only call draw if an update has occured
+            if (_game != null)
             {
-                _game.Tick();
+				if ( _game.Platform.IsActive && !ScreenReceiver.ScreenLocked) //Only call draw if an update has occured
+				{
+					_game.Tick();
+				}
+				else
+				{ 
+					_game.GraphicsDevice.Clear(Color.Black);
+					_game.GraphicsDevice.Present();
+				}
             }
         }
 

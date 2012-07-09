@@ -198,11 +198,13 @@ namespace Microsoft.Xna.Framework
         {
             if (!IsActive)
             {
-                IsActive = true;
+				IsActive = true;
                 Window.Resume();
                 Accelerometer.Resume();
                 Sound.ResumeAll();
                 MediaPlayer.Resume();
+				if(!Window.IsFocused)
+		           Window.RequestFocus();
             }
         }
 
@@ -211,8 +213,9 @@ namespace Microsoft.Xna.Framework
         {
             if (IsActive)
             {
-                IsActive = false;
+				IsActive = false;
                 Window.Pause();
+				Window.ClearFocus();
                 Accelerometer.Pause();
                 Sound.PauseAll();
                 MediaPlayer.Pause();
@@ -226,7 +229,7 @@ namespace Microsoft.Xna.Framework
 		
 		public override void Log(string Message) 
 		{
-#if LOGGING
+#if !LOGGING
 			Android.Util.Log.Debug("MonoGameDebug", Message);
 #endif
 		}
