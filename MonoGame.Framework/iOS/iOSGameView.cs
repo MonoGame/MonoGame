@@ -245,10 +245,14 @@ namespace Microsoft.Xna.Framework {
 
 			if (gds != null && gds.GraphicsDevice != null)
 			{
+                var pp = gds.GraphicsDevice.PresentationParameters;
+                pp.BackBufferHeight = (int) (unscaledViewportHeight * Layer.ContentsScale);
+                pp.BackBufferWidth = (int)(unscaledViewportWidth * Layer.ContentsScale);
+
 				gds.GraphicsDevice.Viewport = new Viewport (
 					0, 0,
-					(int) (unscaledViewportWidth * Layer.ContentsScale),
-					(int) (unscaledViewportHeight * Layer.ContentsScale));
+					pp.BackBufferWidth,
+					pp.BackBufferHeight);
 				
 				// FIXME: These static methods on GraphicsDevice need
 				//        to go away someday.
@@ -302,7 +306,7 @@ namespace Microsoft.Xna.Framework {
 			ctx.EAGLContext.PresentRenderBuffer ((uint) All.Renderbuffer);
 		}
 
-		// FIXME: This functionality belongs in GraphicsDevice.
+		// FIXME: This functionality belongs iMakeCurrentn GraphicsDevice.
 		[Obsolete("Move the functionality of iOSGameView.MakeCurrent into GraphicsDevice")]
 		public void MakeCurrent ()
 		{
@@ -315,6 +319,12 @@ namespace Microsoft.Xna.Framework {
 		public override void LayoutSubviews ()
 		{
 			base.LayoutSubviews ();
+
+            var gds = (IGraphicsDeviceService) _platform.Game.Services.GetService (
+                typeof (IGraphicsDeviceService));
+
+            if (gds == null || gds.GraphicsDevice == null)
+                return;
 
 			if (_framebuffer + _colorbuffer + _depthbuffer != 0)
 				DestroyFramebuffer ();
