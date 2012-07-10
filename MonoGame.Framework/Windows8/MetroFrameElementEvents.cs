@@ -55,8 +55,12 @@ namespace Microsoft.Xna.Framework
     {
         private readonly List<Keys> _keys = new List<Keys>();
 
+        private FrameworkElement _element;
+
         public MetroFrameworkElementEvents(FrameworkElement element)
         {
+            _element = element;
+
             // The key events are tied to the window as those will
             // only arrive here if some other control hasn't gotten it.
             Window.Current.CoreWindow.KeyDown += Keyboard_KeyDown;
@@ -108,6 +112,9 @@ namespace Microsoft.Xna.Framework
 
         private void CoreWindow_PointerReleased(object sender, PointerRoutedEventArgs args)
         {
+			// Release the captured pointer.
+            _element.ReleasePointerCapture(args.Pointer);
+
             var currentPoint = args.GetCurrentPoint(null);
 
             // To convert from DIPs (that all touch and pointer events are returned 
@@ -128,6 +135,9 @@ namespace Microsoft.Xna.Framework
 
         private void CoreWindow_PointerPressed(object sender, PointerRoutedEventArgs args)
         {
+			// Capture future pointer events until a release.		
+            _element.CapturePointer(args.Pointer);
+
             var currentPoint = args.GetCurrentPoint(null);
 
             // To convert from DIPs (that all touch and pointer events are returned 
