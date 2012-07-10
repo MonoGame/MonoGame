@@ -348,7 +348,7 @@ namespace Microsoft.Xna.Framework
         }
 
         private DateTime _now;
-        private DateTime _lastUpdate = DateTime.UtcNow;
+        private DateTime _lastUpdate = DateTime.Now;
         private readonly GameTime _gameTime = new GameTime();
         private readonly GameTime _fixedTimeStepTime = new GameTime();
         private TimeSpan _totalTime = TimeSpan.Zero;
@@ -357,7 +357,7 @@ namespace Microsoft.Xna.Framework
         {
             bool doDraw = false;
 
-            _now = DateTime.UtcNow;
+            _now = DateTime.Now;
 
             _gameTime.Update(_now - _lastUpdate);
             _lastUpdate = _now;
@@ -398,7 +398,7 @@ namespace Microsoft.Xna.Framework
 
             if (IsFixedTimeStep)
             {
-                var currentTime = (DateTime.UtcNow - _lastUpdate) + _totalTime;
+                var currentTime = (DateTime.Now - _lastUpdate) + _totalTime;
 
                 if (currentTime < TargetElapsedTime)
                 {
@@ -543,21 +543,19 @@ namespace Microsoft.Xna.Framework
             else
                 Platform.ExitFullScreen();
 
-            // FIXME: Is this the correct/best way to set the viewport?  There
-            //        are/were several snippets like this through the project.
-            var viewport = new Viewport();
+			int width;
+			int height;
 
-            viewport.X = 0;
-            viewport.Y = 0;
 #if WINDOWS || LINUX
-            viewport.Width = manager.PreferredBackBufferWidth;// GraphicsDevice.PresentationParameters.BackBufferWidth;
-            viewport.Height = manager.PreferredBackBufferHeight;// GraphicsDevice.PresentationParameters.BackBufferHeight;
+            width = manager.PreferredBackBufferWidth;// GraphicsDevice.PresentationParameters.BackBufferWidth;
+            height = manager.PreferredBackBufferHeight;// GraphicsDevice.PresentationParameters.BackBufferHeight;
 #else
-            viewport.Width = GraphicsDevice.PresentationParameters.BackBufferWidth;
-            viewport.Height = GraphicsDevice.PresentationParameters.BackBufferHeight;
+            width = GraphicsDevice.PresentationParameters.BackBufferWidth;
+            height = GraphicsDevice.PresentationParameters.BackBufferHeight;
 #endif
 
-            GraphicsDevice.Viewport = viewport;
+			GraphicsDevice.Viewport = new Viewport(0, 0, width, height);
+
 			Platform.EndScreenDeviceChange(string.Empty, viewport.Width, viewport.Height);
         }
 
