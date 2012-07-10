@@ -40,7 +40,7 @@
 
 using System;
 
-﻿namespace Microsoft.Xna.Framework
+namespace Microsoft.Xna.Framework
 {
     public class GameComponentCollectionEventArgs : EventArgs
     {
