@@ -55,7 +55,7 @@ using MonoTouch.MediaPlayer;
 
 using System.Linq;
 
-﻿namespace Microsoft.Xna.Framework.Media
+namespace Microsoft.Xna.Framework.Media
 {
     public static class MediaPlayer
     {
