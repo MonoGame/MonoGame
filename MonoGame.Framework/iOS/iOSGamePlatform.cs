@@ -78,6 +78,7 @@ using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
+using Microsoft.Xna.Framework.GamerServices;
 
 namespace Microsoft.Xna.Framework
 {
@@ -118,6 +119,8 @@ namespace Microsoft.Xna.Framework
             _mainWindow.Add (_viewController.View);
 
             _viewController.InterfaceOrientationChanged += ViewController_InterfaceOrientationChanged;
+
+            Guide.Initialise(game);
         }
 
         public override GameRunBehavior DefaultRunBehavior
