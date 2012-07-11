@@ -47,7 +47,7 @@ using Microsoft.Xna.Framework.Audio;
 using MonoTouch.Foundation;
 using MonoTouch.AVFoundation;
 #endif
-﻿
+
 namespace Microsoft.Xna.Framework.Media
 {
     public sealed class Song : IEquatable<Song>, IDisposable
