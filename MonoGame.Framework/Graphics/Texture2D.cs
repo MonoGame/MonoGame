@@ -264,7 +264,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 return height;
             }
-		}
+        }
 
         public void SetData<T>(int level, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct 
         {
