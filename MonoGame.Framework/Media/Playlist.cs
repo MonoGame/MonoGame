@@ -38,7 +38,7 @@ purpose and non-infringement.
 */
 #endregion License
 
-using System;﻿
+using System;
 
 namespace Microsoft.Xna.Framework.Media
 {
