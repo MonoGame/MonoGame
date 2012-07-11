@@ -191,19 +191,6 @@ namespace Microsoft.Xna.Framework.Media
         }
 		
 		#endregion
-        
-        // for Linux/SDL, some initialization is required
-        static MediaPlayer()
-        {
-            // for Linux/SDL, some initialization is required
-#if LINUX
-            //Load Audio Support. If one of these functions fails, we will not get any background music (but that should rarely happen)
-            Tao.Sdl.Sdl.SDL_InitSubSystem(Tao.Sdl.Sdl.SDL_INIT_AUDIO);
-            // these are just default values and will be set correctly from the audio file in Song.Play()
-            Tao.Sdl.SdlMixer.Mix_OpenAudio(44100, (short)Tao.Sdl.Sdl.AUDIO_S16SYS, 2, 1024);
-#endif
-        }
-            
 		
         public static void Pause()
         {
