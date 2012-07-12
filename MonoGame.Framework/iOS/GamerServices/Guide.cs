@@ -119,6 +119,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 		private static GKAchievementViewController achievementController;
 		private static GKPeerPickerController peerPickerController;
 		private static GKMatchmakerViewController matchmakerViewController;
+        private static KeyboardInputViewController keyboardViewController;
 		private static GuideViewController viewController = null;
 		private static GestureType prevGestures;
 
@@ -206,6 +207,9 @@ namespace Microsoft.Xna.Framework.GamerServices
 		{
 			AssertInitialised ();
 
+            if (keyboardViewController != null)
+                return null;
+
 			int requestCount = Interlocked.Increment (ref _showKeyboardInputRequestCount);
 			if (requestCount != 1) {
 				Interlocked.Decrement (ref _showKeyboardInputRequestCount);
@@ -214,26 +218,33 @@ namespace Microsoft.Xna.Framework.GamerServices
 			}
 
 			isVisible = true;
-			var viewController = new KeyboardInputViewController(
+
+			keyboardViewController = new KeyboardInputViewController(
 				title, description, defaultText, usePasswordMode);
-			_gameViewController.PresentViewController (viewController, true, () => {});
 
-			viewController.View.InputAccepted += (sender, e) => {
-				_gameViewController.DismissViewController (true, () => {});
+            (_gameViewController.View as iOSGameView).PreserveFrameBuffer = true;
+
+			_gameViewController.PresentModalViewController (keyboardViewController, true);
+
+			keyboardViewController.View.InputAccepted += (sender, e) => {
+                _gameViewController.DismissModalViewControllerAnimated(true);
 				Interlocked.Decrement (ref _showKeyboardInputRequestCount);
 			};
 
-			viewController.View.InputCanceled += (sender, e) => {
-				_gameViewController.DismissViewController (true, () => {});
+			keyboardViewController.View.InputCanceled += (sender, e) => {
+                _gameViewController.DismissModalViewControllerAnimated(true);
 				Interlocked.Decrement (ref _showKeyboardInputRequestCount);
 			};
 
-			return new KeyboardInputAsyncResult (viewController, callback, state);
+			return new KeyboardInputAsyncResult (keyboardViewController, callback, state);
 		}
 
 		public static string EndShowKeyboardInput (IAsyncResult result)
 		{
 			AssertInitialised ();
+
+            (_gameViewController.View as iOSGameView).PreserveFrameBuffer = false;
+            keyboardViewController = null;
 
 			if (!(result is KeyboardInputAsyncResult))
 				throw new ArgumentException ("result");
