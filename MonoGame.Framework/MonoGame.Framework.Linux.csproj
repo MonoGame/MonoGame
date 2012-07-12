@@ -414,6 +414,10 @@
     <None Include="MonoGame.Framework.Linux.dll.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="..\ThirdParty\GamepadConfig\Tao.Sdl.dll.config">
+      <Link>Tao.Sdl.dll.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Linux\Graphics\" />
