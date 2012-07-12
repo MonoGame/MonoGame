@@ -1,6 +1,25 @@
 using System;
 using System.Diagnostics;
 
+
+#if GLES
+using OpenTK.Graphics.ES20;
+using EnableCap = OpenTK.Graphics.ES20.All;
+using FrontFaceDirection = OpenTK.Graphics.ES20.All;
+using BlendEquationMode = OpenTK.Graphics.ES20.All;
+using CullFaceMode = OpenTK.Graphics.ES20.All;
+using StencilFunc = OpenTK.Graphics.ES20.All;
+using StencilOp = OpenTK.Graphics.ES20.All;
+using BlendingFactorSrc = OpenTK.Graphics.ES20.All;
+using BlendingFactorDest = OpenTK.Graphics.ES20.All;
+using DepthFunction = OpenTK.Graphics.ES20.All;
+#elif MONOMAC
+using MonoMac.OpenGL;
+#elif WINDOWS || LINUX
+using OpenTK.Graphics.OpenGL;
+
+#endif
+
 namespace Microsoft.Xna.Framework.Graphics
 {
 	public class DepthStencilState : GraphicsResource
@@ -74,10 +93,111 @@ namespace Microsoft.Xna.Framework.Graphics
 			};
 		}
 
-#if DIRECTX
-
         internal void ApplyState(GraphicsDevice device)
         {
+            var prevState = device.prevDepthStencilState;
+#if OPENGL
+
+            if (DepthBufferEnable)
+            {
+                if (!prevState.DepthBufferEnable)
+                    GL.Enable( EnableCap.DepthTest);
+
+                if (prevState.DepthBufferFunction != DepthBufferFunction)
+                {
+                    DepthFunction func = DepthFunction.Always;
+                    switch (DepthBufferFunction)
+                    {
+                        case CompareFunction.Always:
+                            func = DepthFunction.Always;
+                            break;
+                        case CompareFunction.Equal:
+                            func = DepthFunction.Equal;
+                            break;
+                        case CompareFunction.Greater:
+                            func = DepthFunction.Greater;
+                            break;
+                        case CompareFunction.GreaterEqual:
+                            func = DepthFunction.Gequal;
+                            break;
+                        case CompareFunction.Less:
+                            func = DepthFunction.Less;
+                            break;
+                        case CompareFunction.LessEqual:
+                            func = DepthFunction.Lequal;
+                            break;
+                        case CompareFunction.Never:
+                            func = DepthFunction.Never;
+                            break;
+                        case CompareFunction.NotEqual:
+                            func = DepthFunction.Notequal;
+                            break;
+                    }
+
+                    GL.DepthFunc(func);
+                }
+
+                if (prevState.DepthBufferWriteEnable != DepthBufferWriteEnable)
+                    GL.DepthMask (DepthBufferWriteEnable);
+            }
+            else if (prevState.DepthBufferEnable)
+                GL.Disable (EnableCap.DepthTest);
+
+            if (StencilEnable)
+            {
+                if (!prevState.StencilEnable)
+                    GL.Enable( EnableCap.StencilTest);
+
+                StencilFunc func = StencilFunc.Always;
+                switch (StencilFunction)
+                {
+                    case CompareFunction.Always:
+                        func = StencilFunc.Always;
+                        break;
+                    case CompareFunction.Equal:
+                        func = StencilFunc.Equal;
+                        break;
+                    case CompareFunction.Greater:
+                        func = StencilFunc.Greater;
+                        break;
+                    case CompareFunction.GreaterEqual:
+                        func = StencilFunc.Gequal;
+                        break;
+                    case CompareFunction.Less:
+                        func = StencilFunc.Less;
+                        break;
+                    case CompareFunction.LessEqual:
+                        func = StencilFunc.Lequal;
+                        break;
+                    case CompareFunction.Never:
+                        func = StencilFunc.Never;
+                        break;
+                    case CompareFunction.NotEqual:
+                        func = StencilFunc.Notequal;
+                        break;
+                }
+                if (prevState.StencilFunction != StencilFunction ||
+                    prevState.ReferenceStencil != ReferenceStencil ||
+                    prevState.StencilMask != StencilMask )
+                {
+                    GL.StencilFunc(func, ReferenceStencil, StencilMask);
+                }
+                if (prevState.StencilFail != StencilFail ||
+                    prevState.StencilDepthBufferFail != StencilDepthBufferFail ||
+                    prevState.StencilPass != StencilPass )
+                {
+                    GL.StencilOp(getStencilOp(StencilFail), getStencilOp(StencilDepthBufferFail), getStencilOp(StencilPass));
+                }
+
+            }
+            else if (prevState.StencilEnable)
+            {
+                GL.Disable (EnableCap.StencilTest);
+            }
+
+#endif
+
+#if DIRECTX
             if (_state == null)
             {
                 // We're now bound to a device... no one should
@@ -120,7 +240,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Apply the state!
             device._d3dContext.OutputMerger.DepthStencilState = _state;
+#endif
         }
+
+#if DIRECTX
 
         static private SharpDX.Direct3D11.Comparison GetComparison( CompareFunction compare)
         {
@@ -189,6 +312,34 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
 #endif // DIRECTX
+
+#if OPENGL
+        private StencilOp getStencilOp (StencilOperation operation)
+        {
+
+            switch (operation)
+            {
+                case StencilOperation.Keep:
+                    return StencilOp.Keep;
+                case StencilOperation.Decrement:
+                    return StencilOp.Decr;
+                case StencilOperation.DecrementSaturation:
+                    return StencilOp.DecrWrap;
+                case StencilOperation.IncrementSaturation:
+                    return StencilOp.IncrWrap;
+                case StencilOperation.Increment:
+                    return StencilOp.Incr;
+                case StencilOperation.Invert:
+                    return StencilOp.Invert;
+                case StencilOperation.Replace:
+                    return StencilOp.Replace;
+                case StencilOperation.Zero:
+                    return StencilOp.Zero;
+                default:
+                    return StencilOp.Keep;
+            }
+        }       
+#endif
 		
 	}
 }

@@ -2,6 +2,24 @@ using System;
 using System.Diagnostics;
 
 
+#if GLES
+using OpenTK.Graphics.ES20;
+using EnableCap = OpenTK.Graphics.ES20.All;
+using FrontFaceDirection = OpenTK.Graphics.ES20.All;
+using BlendEquationMode = OpenTK.Graphics.ES20.All;
+using CullFaceMode = OpenTK.Graphics.ES20.All;
+using StencilFunction = OpenTK.Graphics.ES20.All;
+using StencilOp = OpenTK.Graphics.ES20.All;
+using BlendingFactorSrc = OpenTK.Graphics.ES20.All;
+using BlendingFactorDest = OpenTK.Graphics.ES20.All;
+using DepthFunction = OpenTK.Graphics.ES20.All;
+#elif MONOMAC
+using MonoMac.OpenGL;
+#elif WINDOWS || LINUX
+using OpenTK.Graphics.OpenGL;
+#endif
+
+
 namespace Microsoft.Xna.Framework.Graphics
 {
 	public class RasterizerState : GraphicsResource
@@ -19,6 +37,8 @@ namespace Microsoft.Xna.Framework.Graphics
         public bool MultiSampleAntiAlias { get; set; }
         public bool ScissorTestEnable { get; set; }
         public float SlopeScaleDepthBias { get; set; }
+
+        private bool offscreenCull = false;
 
 		public static readonly RasterizerState CullClockwise;		
 		public static readonly RasterizerState CullCounterClockwise;
@@ -47,10 +67,86 @@ namespace Microsoft.Xna.Framework.Graphics
 			};
 		}
 
-#if DIRECTX
-
         internal void ApplyState( GraphicsDevice device )
         {
+            var prevState = device.prevRasterizerState;
+            offscreenCull = device.GetRenderTargets().Length > 0;
+
+            if (CullMode != prevState.CullMode || 
+                offscreenCull != prevState.offscreenCull)
+            {
+                if (CullMode == Microsoft.Xna.Framework.Graphics.CullMode.None &&
+                    prevState.CullMode != CullMode)
+                {
+                    GL.Disable(EnableCap.CullFace);
+                }
+                else if (CullMode != CullMode.None)
+                {
+                    // Have to do this check again. Could be moving between offscreen surfaces
+                    // and not need to re-enable cullFace.
+                   if (CullMode != prevState.CullMode)
+                    {
+                        GL.Enable(EnableCap.CullFace);
+                        // set it to Back
+                        GL.CullFace(CullFaceMode.Back);
+                    }
+
+                    if ( CullMode == Microsoft.Xna.Framework.Graphics.CullMode.CullCounterClockwiseFace )
+                    {
+                        // I know this seems weird and maybe it is but based
+                        //  on the samples these seem to be reversed in OpenGL and DirectX
+                        //Also reversed again if we render offscreen, since we flip all the verticies
+                        if (offscreenCull)
+                        {
+                            GL.FrontFace(FrontFaceDirection.Ccw);
+                        }
+                        else
+                        {
+                            GL.FrontFace(FrontFaceDirection.Cw);
+                        }
+                    }
+                    else
+                    {
+                        // I know this seems weird and maybe it is but based
+                        //  on the samples these seem to be reversed in OpenGL and DirectX
+
+                        //Also reversed again if we render offscreen, since we flip all the verticies
+                        if (offscreenCull)
+                        {
+                            GL.FrontFace(FrontFaceDirection.Cw);
+                        }
+                        else
+                        {
+                            GL.FrontFace(FrontFaceDirection.Ccw);
+                        }
+                    }
+                }
+            }
+
+
+            // Set Fill Mode.
+
+#if MONOMAC || WINDOWS || LINUX
+            switch (FillMode)
+            {
+                case FillMode.Solid:
+                    GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
+                    break;
+                case FillMode.WireFrame:
+                    GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
+                    break;
+            }
+#else
+            if (FillMode != FillMode.Solid)
+                throw new NotImplementedException();
+#endif
+
+            if (ScissorTestEnable && !prevState.ScissorTestEnable )
+                GL.Enable (EnableCap.ScissorTest);
+            else if (prevState.ScissorTestEnable)
+                GL.Disable(EnableCap.ScissorTest);
+
+#if DIRECTX
             if (_state == null)
             {
                 // We're now bound to a device... no one should
@@ -103,9 +199,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Apply the state!
             device._d3dContext.Rasterizer.State = _state;
+#endif // DIRECTX
         }
 
-#endif // DIRECTX
+
 
     }
 }

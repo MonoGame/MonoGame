@@ -41,6 +41,25 @@
 using System;
 using System.Diagnostics;
 
+
+#if GLES
+using OpenTK.Graphics.ES20;
+using EnableCap = OpenTK.Graphics.ES20.All;
+using FrontFaceDirection = OpenTK.Graphics.ES20.All;
+using BlendEquationMode = OpenTK.Graphics.ES20.All;
+using CullFaceMode = OpenTK.Graphics.ES20.All;
+using StencilFunction = OpenTK.Graphics.ES20.All;
+using StencilOp = OpenTK.Graphics.ES20.All;
+using BlendingFactorSrc = OpenTK.Graphics.ES20.All;
+using BlendingFactorDest = OpenTK.Graphics.ES20.All;
+using DepthFunction = OpenTK.Graphics.ES20.All;
+
+#elif MONOMAC
+using MonoMac.OpenGL;
+#elif WINDOWS || LINUX
+using OpenTK.Graphics.OpenGL;
+#endif
+
 namespace Microsoft.Xna.Framework.Graphics
 {
 	public class BlendState : GraphicsResource
@@ -138,11 +157,34 @@ namespace Microsoft.Xna.Framework.Graphics
             return string.Format("{0}.{1}", base.ToString(), blendStateName);
         }
 
-
-#if DIRECTX
-
         internal void ApplyState(GraphicsDevice device)
         {
+#if OPENGL
+            var prevState = device.prevBlendState;
+
+            if (prevState.ColorBlendFunction != ColorBlendFunction)
+            {
+                BlendEquationMode blendMode = ColorBlendFunction.GetBlendEquationMode();
+                GL.BlendEquation(blendMode);
+            }
+
+            if (prevState.ColorSourceBlend != ColorSourceBlend || 
+                prevState.ColorDestinationBlend != ColorDestinationBlend)
+            {
+                BlendingFactorSrc bfs = ColorSourceBlend.GetBlendFactorSrc();
+                BlendingFactorDest bfd = ColorDestinationBlend.GetBlendFactorDest();
+#if IPHONE
+                GL.BlendFunc ((All)bfs, (All)bfd);
+#else
+                GL.BlendFunc (bfs, bfd);
+#endif
+            }
+
+            //TODO: Remove this...?
+            GL.Enable (EnableCap.Blend);
+#endif
+
+#if DIRECTX
             if (_state == null)
             {
                 // We're now bound to a device... no one should
@@ -198,8 +240,10 @@ namespace Microsoft.Xna.Framework.Graphics
             var d3dContext = device._d3dContext;
             d3dContext.OutputMerger.BlendFactor = new SharpDX.Color4(BlendFactor.R / 255.0f, BlendFactor.G / 255.0f, BlendFactor.B / 255.0f, BlendFactor.A / 255.0f);
             d3dContext.OutputMerger.BlendState = _state;
+#endif
         }
 
+#if DIRECTX
         static private SharpDX.Direct3D11.BlendOperation GetBlendOperation(BlendFunction blend)
         {
             switch (blend)

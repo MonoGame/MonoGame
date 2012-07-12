@@ -86,6 +86,11 @@ namespace Microsoft.Xna.Framework.Graphics
         private DepthStencilState _depthStencilState = DepthStencilState.Default;
 		private RasterizerState _rasterizerState = RasterizerState.CullCounterClockwise;
 
+        private static List<int> activeVertIndices = new List<int>();
+        internal DepthStencilState prevDepthStencilState = DepthStencilState.Default;
+        internal BlendState prevBlendState = BlendState.Opaque;
+        internal RasterizerState prevRasterizerState = RasterizerState.CullNone;
+
         private bool _blendStateDirty;
         private bool _depthStencilStateDirty;
         private bool _rasterizerStateDirty;
@@ -334,13 +339,6 @@ namespace Microsoft.Xna.Framework.Graphics
             DepthStencilState = DepthStencilState.Default;
             RasterizerState = RasterizerState.CullCounterClockwise;
 
-#if OPENGL
-            // Force the GLStateManager to set these render states
-            GLStateManager.SetRasterizerStates(RasterizerState, GetRenderTargets().Length > 0);
-            GLStateManager.SetBlendStates(BlendState);
-            GLStateManager.SetDepthStencilState(DepthStencilState);
-#endif
-
             // Set the default render target.
             ApplyRenderTargets(null);
 
@@ -348,6 +346,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _scissorRectangleDirty = true;
             ScissorRectangle = _viewport.Bounds;
         }
+
 
 #if DIRECTX
 
@@ -604,6 +603,29 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #endif // WINRT
 
+#if OPENGL
+
+        internal static void SetVertexAttribArray(bool[] enabledAttribs)
+        {
+            bool enable;
+            for (int i=0; i<16; i++)
+            {
+                enable = enabledAttribs[i];
+
+                if (enable && !activeVertIndices.Contains(i))
+                {
+                    activeVertIndices.Add(i);
+                    GL.EnableVertexAttribArray(i);
+                }
+                else if (!enable && activeVertIndices.Contains(i))
+                {
+                    activeVertIndices.Remove(i);
+                    GL.DisableVertexAttribArray(i);
+                }
+            }
+        }
+#endif
+
         public RasterizerState RasterizerState
         {
             get
@@ -617,12 +639,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 if (_rasterizerState == value)
                     return;
 
+                prevRasterizerState = _rasterizerState;
                 _rasterizerState = value;
                 _rasterizerStateDirty = true;
-
-#if OPENGL
-				GLStateManager.SetRasterizerStates(value, GetRenderTargets().Length > 0);
-#endif
             }
         }
 
@@ -636,12 +655,9 @@ namespace Microsoft.Xna.Framework.Graphics
                     return;
 
 				// ToDo check for invalid state
+                prevBlendState = _blendState;
 				_blendState = value;
                 _blendStateDirty = true;
-
-#if OPENGL
-				GLStateManager.SetBlendStates(value);
-#endif
             }
 		}
 
@@ -654,11 +670,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 if (_depthStencilState == value)
                     return;
 
+                prevDepthStencilState = _depthStencilState;
                 _depthStencilState = value;
-                _depthStencilStateDirty = true;
-#if OPENGL
-				GLStateManager.SetDepthStencilState(value);
-#endif
+                _depthStencilStateDirty = true; 
             }
         }
 
@@ -980,12 +994,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 _scissorRectangle = value;
                 _scissorRectangleDirty = true;
-
-#if OPENGL
-                var glScissorRectangle = _scissorRectangle;
-                glScissorRectangle.Y = _viewport.Height - glScissorRectangle.Y - glScissorRectangle.Height;
-                GLStateManager.SetScissor(glScissorRectangle);				
-#endif
             }
         }
 
@@ -1150,7 +1158,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #if OPENGL
 			//Reset the cull mode, because we flip verticies when rendering offscreen
 			//and thus flip the cull direction
-			GLStateManager.Cull (RasterizerState, GetRenderTargets().Length > 0);
+            _rasterizerStateDirty = true;
 #endif
         }
 
@@ -1255,35 +1263,47 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public bool ResourcesLost { get; set; }
 
-#if DIRECTX
 
-        private void ApplyState()
+
+        internal void ApplyState()
         {
+#if DIRECTX
             Debug.Assert(_d3dContext != null, "The d3d context is null!");
 
             // NOTE: This code assumes _d3dContext has been locked by the caller.
 
-            if ( _scissorRectangleDirty )
-	        {
-	            _d3dContext.Rasterizer.SetScissorRectangle(_scissorRectangle.X, _scissorRectangle.Y, _scissorRectangle.Right, _scissorRectangle.Bottom);
-	            _scissorRectangleDirty = false;
-	        }
 
-	        if ( _blendStateDirty)
-	            _blendState.ApplyState(this);
-	        if ( _depthStencilStateDirty )
-	            _depthStencilState.ApplyState(this);
-	        if ( _rasterizerStateDirty )
+            if ( _scissorRectangleDirty )
+                _d3dContext.Rasterizer.SetScissorRectangle(_scissorRectangle.X, _scissorRectangle.Y, _scissorRectangle.Right, _scissorRectangle.Bottom);
+#endif
+
+            if ( _scissorRectangleDirty )
+            {
+                var glScissorRectangle = _scissorRectangle;
+                glScissorRectangle.Y = _viewport.Height - glScissorRectangle.Y - glScissorRectangle.Height;
+                GL.Scissor(glScissorRectangle.X, glScissorRectangle.Y, glScissorRectangle.Width, glScissorRectangle.Height );     
+            }
+
+            if ( _blendStateDirty)
+                _blendState.ApplyState(this);
+            if ( _depthStencilStateDirty )
+                _depthStencilState.ApplyState(this);
+            if ( _rasterizerStateDirty )
 	            _rasterizerState.ApplyState(this);
 
-	        _blendStateDirty = _depthStencilStateDirty = _rasterizerStateDirty = false;
+	        _blendStateDirty = _scissorRectangleDirty = _depthStencilStateDirty = _rasterizerStateDirty = false;
 
+
+#if DIRECTX
 	        SamplerStates.SetSamplers(this);
 	        Textures.SetTextures(this);
 
+
             _d3dContext.InputAssembler.InputLayout = GetInputLayout(_vertexShader, _vertexBuffer.VertexDeclaration);
+#endif
         }
 
+#if DIRECTX
         private SharpDX.Direct3D11.InputLayout GetInputLayout(DXShader shader, VertexDeclaration decl)
         {
             SharpDX.Direct3D11.InputLayout layout;
@@ -1393,6 +1413,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 #elif OPENGL
 
+
 			var indexElementType = DrawElementsType.UnsignedShort;
 			var indexElementSize = 2;
 			var indexOffsetInBytes = (IntPtr)(startIndex * indexElementSize);
@@ -1402,6 +1423,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
 
 			_vertexBuffer.VertexDeclaration.Apply (vertexOffset);
+            ApplyState();
+
 
 			GL.DrawElements (target,
 			                 indexElementCount,
@@ -1434,6 +1457,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
 #elif OPENGL
+
             // Unbind the VBOs
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
@@ -1447,6 +1471,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 GL.GenBuffers(1, out VboIdArray);
 #endif
 
+            ApplyState();
             // Bind the VBO
             GL.BindBuffer(BufferTarget.ArrayBuffer, VboIdArray);
             ////Clear previous data
@@ -1460,6 +1485,8 @@ namespace Microsoft.Xna.Framework.Graphics
                             (IntPtr)(vertexDeclaration.VertexStride * vertexData.Length - vertexOffset * vertexDeclaration.VertexStride),
                             new IntPtr(handle.AddrOfPinnedObject().ToInt64() + vertexOffset * vertexDeclaration.VertexStride),
                             BufferUsageHint.StreamDraw);
+
+
 
             //Setup VertexDeclaration
             vertexDeclaration.Apply();
@@ -1493,8 +1520,10 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
 #elif OPENGL
-
+            ApplyState();
 			_vertexBuffer.VertexDeclaration.Apply();
+
+
 
 			GL.DrawArrays(PrimitiveTypeGL(primitiveType),
 			              vertexStart,
@@ -1529,6 +1558,9 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
 #elif OPENGL
+
+            ApplyState();
+
             // Unbind the VBOs
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
@@ -1545,6 +1577,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (VboIdElement == 0)
                 GL.GenBuffers(1, out VboIdElement);
 #endif
+
             // Bind the VBO
             GL.BindBuffer(BufferTarget.ArrayBuffer, VboIdArray);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, VboIdElement);
@@ -1552,11 +1585,15 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vertexDeclaration.VertexStride * vertexData.Length - vertexOffset * vertexDeclaration.VertexStride), IntPtr.Zero, BufferUsageHint.StreamDraw);
             GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(sizeof(ushort) * indexData.Length), IntPtr.Zero, BufferUsageHint.StreamDraw);
 
+
+
             // TODO: Why two handles when we only need one?
             //
             //Pin data
             var handle = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
             var handle2 = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
+
+
 
 
             //Buffer data to VBO; This should use stream when we move to ES2.0
@@ -1571,6 +1608,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
             //Setup VertexDeclaration
             vertexDeclaration.Apply();
+
+
 
             //Draw
             GL.DrawElements(PrimitiveTypeGL(primitiveType),
@@ -1612,6 +1651,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
 #elif OPENGL
+
             // Unbind the VBOs
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
@@ -1636,6 +1676,7 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vertexDeclaration.VertexStride * vertexData.Length - vertexOffset * vertexDeclaration.VertexStride), IntPtr.Zero, BufferUsageHint.StreamDraw);
 			GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(sizeof(uint) * indexData.Length), IntPtr.Zero, BufferUsageHint.StreamDraw);
 
+            ApplyState();
             //Pin data
             var handle = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
             var handle2 = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
@@ -1653,6 +1694,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             //Setup VertexDeclaration
             vertexDeclaration.Apply();
+
 
             //Draw
             GL.DrawElements(PrimitiveTypeGL(primitiveType),

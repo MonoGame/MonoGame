@@ -22,6 +22,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private VertexFormat[] _vertexFormat;
 #endif
 
+        private bool[] enabledAttributes;
 		private VertexElement[] _elements;
         private int _vertexStride;
 
@@ -160,10 +161,10 @@ namespace Microsoft.Xna.Framework.Graphics
 				                       elementOffset);
 				enabledAttributes[attributeLocation] = true;
 			}
-			
-			for (int i=0; i<16; i++) {
-				GLStateManager.VertexAttribArray(i, enabledAttributes[i]);
-			}
+
+            // TODO: Gross that this is static. Why is GraphicsResource's
+            // reference null?
+            GraphicsDevice.SetVertexAttribArray(enabledAttributes);
 		}
 #endif // OPENGL
 
