@@ -105,7 +105,12 @@ namespace Microsoft.Xna.Framework
 			
 			// Setup our OpenALSoundController to handle our SoundBuffer pools
 			soundControllerInstance = OpenALSoundController.GetInstance;
-			
+            
+#if LINUX
+            // also set up SdlMixer to play background music. If one of these functions fails, we will not get any background music (but that should rarely happen)
+            Tao.Sdl.Sdl.SDL_InitSubSystem(Tao.Sdl.Sdl.SDL_INIT_AUDIO);
+            Tao.Sdl.SdlMixer.Mix_OpenAudio(44100, (short)Tao.Sdl.Sdl.AUDIO_S16SYS, 2, 1024);			
+#endif
         }
 
         public override GameRunBehavior DefaultRunBehavior
@@ -131,6 +136,9 @@ namespace Microsoft.Xna.Framework
                 Net.NetworkSession.Exit();
                 _view.Window.Exit();
             }
+#if LINUX
+            Tao.Sdl.SdlMixer.Mix_CloseAudio();
+#endif
         }
 
         public override bool BeforeUpdate(GameTime gameTime)

@@ -129,7 +129,6 @@
     <Compile Include="Audio\AudioChannels.cs" />
     <Compile Include="Linux\Audio\Sound.cs" />
     <Compile Include="Media\MediaPlayer.cs" />
-    <Compile Include="Media\Song.cs" />
     <Compile Include="Media\MediaState.cs" />
     <Compile Include="Media\MediaSourceType.cs" />
     <Compile Include="Content\ContentReader.cs" />
@@ -395,6 +394,7 @@
     <Compile Include="Media\PlaylistCollection.cs" />
     <Compile Include="Media\SongCollection.cs" />
     <Compile Include="Graphics\Effect\ConstantBuffer.cs" />
+    <Compile Include="Linux\Media\Song.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.Linux.csproj">
@@ -412,6 +412,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="MonoGame.Framework.Linux.dll.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\GamepadConfig\Tao.Sdl.dll.config">
+      <Link>Tao.Sdl.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
