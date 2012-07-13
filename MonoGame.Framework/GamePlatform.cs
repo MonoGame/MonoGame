@@ -245,8 +245,8 @@ namespace Microsoft.Xna.Framework
             IsActive = true;
             if (this.Game.GraphicsDevice == null) 
             {
-               var graphicsDeviceManager = (GraphicsDeviceManager)Game.Services.GetService(typeof(IGraphicsDeviceManager));			   
-               graphicsDeviceManager.CreateDevice();
+                var graphicsDeviceManager = Game.Services.GetService(typeof(IGraphicsDeviceManager)) as IGraphicsDeviceManager;			   
+                graphicsDeviceManager.CreateDevice();
             }
         }
 

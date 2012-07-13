@@ -40,7 +40,7 @@ purpose and non-infringement.
 
 using System;
 
-﻿namespace Microsoft.Xna.Framework.Graphics
+namespace Microsoft.Xna.Framework.Graphics
 {
     [Flags]
     public enum SpriteEffects
