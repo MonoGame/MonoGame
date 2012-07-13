@@ -175,14 +175,22 @@ namespace Microsoft.Xna.Framework
         private void UpdateWindowState()
         {
             // we should wait until window's not fullscreen to resize
-            if (updateClientBounds && window.WindowState == WindowState.Normal)
+            if (updateClientBounds)
             {
                 window.ClientRectangle = new System.Drawing.Rectangle(clientBounds.X,
                                      clientBounds.Y, clientBounds.Width, clientBounds.Height);
 
                 updateClientBounds = false;
-                if (window.WindowState != windowState)
-                    window.WindowState = windowState;
+                
+                // if the window-state is set from the outside (maximized button pressed) we have to update it here.
+                // if it was set from the inside (.IsFullScreen changed), we have to change the window.
+                // this code might not cover all corner cases
+                // window was maximized
+                if ((windowState == WindowState.Normal && window.WindowState == WindowState.Maximized) ||
+                    (windowState == WindowState.Maximized && window.WindowState == WindowState.Normal))
+                    windowState = window.WindowState; // maximize->normal and normal->maximize are usually set from the outside
+                else
+                    window.WindowState = windowState; // usually fullscreen-stuff is set from the code
             }
 
 
