@@ -155,11 +155,12 @@ namespace Microsoft.Xna.Framework
             _game.Window.SetSupportedOrientations(_supportedOrientations);
         }
 
-		private void Initialize()
-		{			
-			// Set "full screen"  as default
-			_graphicsDevice.PresentationParameters.IsFullScreen = true;
-
+        private void Initialize()
+        {
+            // Set "full screen"  as default
+            _graphicsDevice.PresentationParameters.IsFullScreen = true;
+            _graphicsDevice.PresentationParameters.BackBufferHeight = _preferredBackBufferHeight;
+            _graphicsDevice.PresentationParameters.BackBufferWidth = _preferredBackBufferWidth;
             _graphicsDevice.Initialize();
 
 #if !PSS
@@ -310,6 +311,7 @@ namespace Microsoft.Xna.Framework
 			set
 			{
 				_supportedOrientations = value;
+				_game.Window.SetSupportedOrientations(_supportedOrientations);
 			}
 		}
 
