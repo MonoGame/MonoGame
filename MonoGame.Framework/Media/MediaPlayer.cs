@@ -140,6 +140,8 @@ namespace Microsoft.Xna.Framework.Media
 #endif
 		
         public static MediaState State { get { return _mediaState; } }
+        public static event EventHandler<EventArgs> MediaStateChanged;
+        
 		
 #if IPHONE
 		public static bool GameHasControl 
@@ -201,6 +203,7 @@ namespace Microsoft.Xna.Framework.Media
 			_queue.ActiveSong.Pause();
 #endif
 			_mediaState = MediaState.Paused;
+            if (MediaStateChanged != null) MediaStateChanged(null, EventArgs.Empty);
         }
 		
 		/// <summary>
@@ -247,6 +250,7 @@ namespace Microsoft.Xna.Framework.Media
 			song.Play();
 #endif
 			_mediaState = MediaState.Playing;
+            if (MediaStateChanged != null) MediaStateChanged(null, EventArgs.Empty);
 		}
 		
 		internal static void OnSongFinishedPlaying (object sender, EventArgs args)
@@ -260,6 +264,7 @@ namespace Microsoft.Xna.Framework.Media
 				if (!IsRepeating)
 				{
 					_mediaState = MediaState.Stopped;
+                    if (MediaStateChanged != null) MediaStateChanged(null, EventArgs.Empty);
 					return;
 				}
 			}
@@ -278,6 +283,7 @@ namespace Microsoft.Xna.Framework.Media
 			_queue.ActiveSong.Resume();
 #endif
 			_mediaState = MediaState.Playing;
+            if (MediaStateChanged != null) MediaStateChanged(null, EventArgs.Empty);
         }
 
         public static void Stop()
@@ -293,6 +299,7 @@ namespace Microsoft.Xna.Framework.Media
 				_queue.ActiveSong.Stop();
 #endif
 			_mediaState = MediaState.Stopped;
+            if (MediaStateChanged != null) MediaStateChanged(null, EventArgs.Empty);
 		}
 		
 		public static void MoveNext()
