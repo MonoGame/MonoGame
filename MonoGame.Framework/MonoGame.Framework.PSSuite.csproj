@@ -151,7 +151,7 @@
     <Compile Include="Input\Touch\TouchLocationState.cs" />
     <Compile Include="Input\Touch\TouchPanelCapabilities.cs" />
     <Compile Include="Input\Touch\TouchPanel.cs" />
-    <Compile Include="Input\Touch\TouchInfo.cs" />    
+    <Compile Include="Input\Touch\TouchInfo.cs" />
     <Compile Include="Input\Touch\GestureSample.cs" />
     <Compile Include="GameComponentCollection.cs" />
     <Compile Include="Graphics\SpriteBatchItem.cs" />
@@ -284,7 +284,6 @@
     <Compile Include="PSSuite\GamerServices\Guide.cs" />
     <Compile Include="PSSuite\GamerServices\MonoGameGamerServicesHelper.cs" />
     <Compile Include="PSSuite\GamerServices\SignedInGamer.cs" />
-    <Compile Include="PSSuite\Media\Song.cs" />
     <Compile Include="PSSuite\Media\Video.cs" />
     <Compile Include="PSSuite\Input\Touch\GestureListener.cs" />
     <Compile Include="PSSuite\Input\Accelerometer.cs" />
@@ -344,6 +343,10 @@
     <Compile Include="PSSuite\PSSExtensions.cs" />
     <Compile Include="Graphics\Effect\ConstantBuffer.cs" />
     <Compile Include="PSSuite\Graphics\SpriteBatcher.cs" />
+    <Compile Include="Media\MediaQueue.cs" />
+    <Compile Include="Media\SongCollection.cs" />
+    <Compile Include="Media\Song.cs" />
+    <Compile Include="PSSuite\Media\PSSuiteSong.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="PSSuite\" />
@@ -358,12 +361,6 @@
     <Folder Include="PSSuite\GamerServices\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Sce\Sce.Pss.CSharp.targets" />
-  <ItemGroup>
-    <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.PSSuite.csproj">
-      <Project>{167676EE-E2D5-440A-BB2B-EFBD02BC8493}</Project>
-      <Name>Lidgren.Network.PSSuite</Name>
-    </ProjectReference>
-  </ItemGroup>
   <ProjectExtensions>
     <MonoDevelop>
       <Properties>
@@ -380,5 +377,11 @@
     <EmbeddedShaderProgram Include="PSSuite\Graphics\Resources\BasicEffect.vcg" />
     <EmbeddedShaderProgram Include="PSSuite\Graphics\Resources\Texture.fcg" />
     <EmbeddedShaderProgram Include="PSSuite\Graphics\Resources\Texture.vcg" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.PSSuite.csproj">
+      <Project>{167676EE-E2D5-440A-BB2B-EFBD02BC8493}</Project>
+      <Name>Lidgren.Network.PSSuite</Name>
+    </ProjectReference>
   </ItemGroup>
 </Project>

@@ -89,6 +89,7 @@ namespace Microsoft.Xna.Framework.Audio
 
             this.Looping = looping;
             this.Volume = volume;
+            this.Rate = 1.0f;
         }
 
         public Sound(byte[] audiodata, float volume, bool looping)
@@ -98,6 +99,7 @@ namespace Microsoft.Xna.Framework.Audio
 
             this.Looping = looping;
             this.Volume = volume;
-        }        
+            this.Rate = 1.0f;
+        }
     }
 }

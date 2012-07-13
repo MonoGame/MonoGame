@@ -54,6 +54,8 @@ namespace Microsoft.Xna.Framework.Media
     {
 #if IPHONE
 		private AVAudioPlayer _sound;
+#elif PSS
+        private PSSuiteSong _sound;
 #elif !WINRT
 		private SoundEffectInstance _sound;
 #endif
@@ -69,6 +71,8 @@ namespace Microsoft.Xna.Framework.Media
 			_sound = AVAudioPlayer.FromUrl(NSUrl.FromFilename(fileName));
 			_sound.NumberOfLoops = 0;
             _sound.FinishedPlaying += OnFinishedPlaying;
+#elif PSS
+            _sound = new PSSuiteSong(_name);
 #elif !WINRT       
             _sound = new SoundEffect(_name).CreateInstance();
 #endif
