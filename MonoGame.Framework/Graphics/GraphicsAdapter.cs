@@ -106,6 +106,9 @@ namespace Microsoft.Xna.Framework.Graphics
                        SurfaceFormat.Color);
 #elif ANDROID
                 return new DisplayMode(_view.Width, _view.Height, 60, SurfaceFormat.Color);
+#elif WINDOWS || LINUX
+
+                return new DisplayMode(OpenTK.DisplayDevice.Default.Width, OpenTK.DisplayDevice.Default.Height, (int)OpenTK.DisplayDevice.Default.RefreshRate, SurfaceFormat.Color);
 #else
                 return new DisplayMode(800, 600, 60, SurfaceFormat.Color);
 #endif
@@ -240,12 +243,49 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new NotImplementedException();
             }
         }
+
+        private DisplayModeCollection supportedDisplayModes = null;
         
         public DisplayModeCollection SupportedDisplayModes
         {
             get
             {
-                return new DisplayModeCollection(new List<DisplayMode>(new DisplayMode[]{ CurrentDisplayMode, }));
+
+                if (supportedDisplayModes == null)
+                {
+                    List<DisplayMode> modes = new List<DisplayMode>(new DisplayMode[] { CurrentDisplayMode, });
+#if WINDOWS || LINUX
+                    IList<OpenTK.DisplayDevice> displays = OpenTK.DisplayDevice.AvailableDisplays;
+                    if (displays.Count > 0)
+                    {
+                        modes.Clear();
+                        foreach (OpenTK.DisplayDevice display in displays)
+                        {
+                            foreach (OpenTK.DisplayResolution resolution in display.AvailableResolutions)
+                            {                                
+                                SurfaceFormat format = SurfaceFormat.Color;
+                                switch (resolution.BitsPerPixel)
+                                {
+                                    case 32: format = SurfaceFormat.Color; break;
+                                    case 16: format = SurfaceFormat.Bgr565; break;
+                                    case 8: format = SurfaceFormat.Bgr565; break;
+                                    default:
+                                        break;
+                                }
+                                // Just report the 32 bit surfaces for now
+                                // Need to decide what to do about other surface formats
+                                if (format == SurfaceFormat.Color)
+                                {
+                                    modes.Add(new DisplayMode(resolution.Width, resolution.Height, (int)resolution.RefreshRate, format));
+                                }
+                            }
+
+                        }
+                    }
+#endif
+                    supportedDisplayModes = new DisplayModeCollection(modes);
+                }
+                return supportedDisplayModes;
             }
         }
 
