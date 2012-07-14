@@ -47,7 +47,7 @@ namespace Microsoft.Xna.Framework.Media
 	public class SongCollection : ICollection<Song>, IEnumerable<Song>, IEnumerable, IDisposable
 	{
 		private bool isReadOnly = false;
-		private List<Song> innerlist;
+		private List<Song> innerlist = new List<Song>();
 		
 		public void Dispose()
         {
