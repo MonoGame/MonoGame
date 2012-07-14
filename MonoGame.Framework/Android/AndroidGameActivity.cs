@@ -20,7 +20,15 @@ namespace Microsoft.Xna.Framework
         public static Game Game { get; set; }
 		
 		private OrientationListener o;		
-		
+		private ScreenReceiver screenReceiver;
+
+		/// <summary>
+		/// OnCreate called when the activity is launched from cold or after the app
+		/// has been killed due to a higher priority app needing the memory
+		/// </summary>
+		/// <param name='savedInstanceState'>
+		/// Saved instance state.
+		/// </param>
 		protected override void OnCreate (Bundle savedInstanceState)
 		{
 			base.OnCreate (savedInstanceState);
@@ -29,6 +37,14 @@ namespace Microsoft.Xna.Framework
 			{
 				o.Enable();				
 			}					
+
+			IntentFilter filter = new IntentFilter();
+		    filter.AddAction(Intent.ActionScreenOff);
+		    filter.AddAction(Intent.ActionScreenOn);
+		    filter.AddAction(Intent.ActionUserPresent);
+		    
+		    screenReceiver = new ScreenReceiver();
+		    RegisterReceiver(screenReceiver, filter);
 
             RequestWindowFeature(WindowFeatures.NoTitle);
 		}
@@ -47,13 +63,13 @@ namespace Microsoft.Xna.Framework
             if (Paused != null)
                 Paused(this, EventArgs.Empty);
 
-            if (Game.GraphicsDevice != null)
-                Game.GraphicsDevice.ResourcesLost = true;
+            //if (Game.GraphicsDevice != null)
+            //   Game.GraphicsDevice.ResourcesLost = true;
 
-			if (Game.Window != null && Game.Window.Parent != null && (Game.Window.Parent is FrameLayout))
-			{				
-              ((FrameLayout)Game.Window.Parent).RemoveAllViews();
-			}
+			//if (Game.Window != null && Game.Window.Parent != null && (Game.Window.Parent is FrameLayout))
+			//{				
+            //  ((FrameLayout)Game.Window.Parent).RemoveAllViews();
+			//}
         }
 
         public static event EventHandler Resumed;
@@ -67,7 +83,7 @@ namespace Microsoft.Xna.Framework
             if (deviceManager == null)
                 return;
             (deviceManager as GraphicsDeviceManager).ForceSetFullScreen();
-            Game.Window.RequestFocus();
+            //Game.Window.RequestFocus();
         }
     }
 	

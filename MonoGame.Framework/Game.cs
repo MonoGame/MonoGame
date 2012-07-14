@@ -372,8 +372,7 @@ namespace Microsoft.Xna.Framework
             case GameRunBehavior.Synchronous:
                 Platform.RunLoop();
                 EndRun();
-                OnExiting(this, EventArgs.Empty);
-                UnloadContent();
+				DoExiting();
                 break;
             default:
                 throw new NotImplementedException(string.Format(
@@ -571,8 +570,7 @@ namespace Microsoft.Xna.Framework
             var platform = (GamePlatform)sender;
             platform.AsyncRunLoopEnded -= Platform_AsyncRunLoopEnded;
             EndRun();
-            OnExiting(this, EventArgs.Empty);
-            UnloadContent();
+			DoExiting();
         }
 
 #if WINRT
@@ -646,6 +644,10 @@ namespace Microsoft.Xna.Framework
             Initialize();
         }
 
+		internal void DoExiting()
+		{
+			OnExiting(this, EventArgs.Empty);
+		}
         internal void ResizeWindow(bool changed)
         {
 #if WINRT

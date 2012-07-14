@@ -204,6 +204,8 @@ namespace Microsoft.Xna.Framework
                 Accelerometer.Resume();
                 Sound.ResumeAll();
                 MediaPlayer.Resume();
+				if(!Window.IsFocused)
+		           Window.RequestFocus();
             }
         }
 
@@ -214,6 +216,7 @@ namespace Microsoft.Xna.Framework
             {
                 IsActive = false;
                 Window.Pause();
+				Window.ClearFocus();
                 Accelerometer.Pause();
                 Sound.PauseAll();
                 MediaPlayer.Pause();

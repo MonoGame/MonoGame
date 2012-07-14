@@ -70,10 +70,12 @@ namespace Microsoft.Xna.Framework
             }
             
 			_game = game;
-			
-			_supportedOrientations = DisplayOrientation.Default;
-			_preferredBackBufferHeight = game.Window.ClientBounds.Height;
-			_preferredBackBufferWidth = game.Window.ClientBounds.Width;
+
+            // Preferred buffer width/height is used to determine default supported orientations,
+            // so set the default values to match Xna behaviour of landscape only by default.
+            _preferredBackBufferWidth = Math.Max(game.Window.ClientBounds.Height, game.Window.ClientBounds.Width);
+            _preferredBackBufferHeight = Math.Min(game.Window.ClientBounds.Height, game.Window.ClientBounds.Width);
+            _supportedOrientations = DisplayOrientation.Default;
 			
             if (game.Services.GetService(typeof(IGraphicsDeviceManager)) != null)
             {
@@ -317,7 +319,44 @@ namespace Microsoft.Xna.Framework
 
         internal void ResetClientBounds()
         {
-            // do nothing for now
+#if ANDROID
+            float preferredAspectRatio = (float)_preferredBackBufferWidth / (float)_preferredBackBufferHeight;
+            float displayAspectRatio = (float)GraphicsDevice.DisplayMode.Width / (float)GraphicsDevice.DisplayMode.Height;
+
+            if ((preferredAspectRatio > 1.0f && displayAspectRatio < 1.0f) ||
+                (preferredAspectRatio < 1.0f && displayAspectRatio > 1.0f))
+            {
+                // Invert preferred aspect ratio if it's orientation differs from the display mode orientation.
+                // This occurs when user sets preferredBackBufferWidth/Height and also allows multiple supported orientations
+                preferredAspectRatio = 1.0f / preferredAspectRatio;
+            }
+
+            const float EPSILON = 0.00001f;
+            var newClientBounds = new Rectangle();
+            if (displayAspectRatio > (preferredAspectRatio + EPSILON))
+            {
+                newClientBounds.Height = GraphicsDevice.DisplayMode.Height;
+                newClientBounds.Width = (int) (newClientBounds.Height * preferredAspectRatio);
+                newClientBounds.X = (GraphicsDevice.DisplayMode.Width - newClientBounds.Width)/2;
+
+                Game.Instance.Window.ClientBounds = newClientBounds;
+            }
+            else if (displayAspectRatio < (preferredAspectRatio - EPSILON))
+            {
+                newClientBounds.Width = GraphicsDevice.DisplayMode.Width;
+                newClientBounds.Height = (int)(newClientBounds.Width / preferredAspectRatio);
+                newClientBounds.Y = (GraphicsDevice.DisplayMode.Height - newClientBounds.Height) / 2;
+
+                Game.Instance.Window.ClientBounds = newClientBounds;
+            }
+            else
+            {
+                newClientBounds.Width = GraphicsDevice.DisplayMode.Width;
+                newClientBounds.Height = GraphicsDevice.DisplayMode.Height;
+                Game.Instance.Window.ClientBounds = new Rectangle(0, 0, GraphicsDevice.DisplayMode.Width, GraphicsDevice.DisplayMode.Height);
+            }
+            GraphicsDevice.Viewport = new Viewport(0, 0, newClientBounds.Width, newClientBounds.Height);
+#endif
         }
 
     }
