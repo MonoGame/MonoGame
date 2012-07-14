@@ -67,6 +67,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public static void SetBlendStates (BlendState state)
 		{
+            // TODO: These all show up as highly redundent state
+            // changes... we should be caching at the XNA BlendState
+            // level and not here!
+
 			// Set blending mode
 			BlendEquationMode blendMode = state.ColorBlendFunction.GetBlendEquationMode();
 

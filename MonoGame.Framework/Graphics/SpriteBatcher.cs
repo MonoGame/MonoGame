@@ -212,6 +212,14 @@ namespace Microsoft.Xna.Framework.Graphics
                     startIndex = index = 0;
                     _device.Textures[0] = tex;	  
 #elif OPENGL
+                    // TODO: This shows up as highly redundant state change.  We should
+                    // remove this instead do:
+                    //
+                    // GraphicsDevice.Textures[0] = tex;
+                    //
+                    // And fix TextureCollection.SetTextures() to work with GL.  This
+                    // then is unified with the DX path and removes all redundent texture
+                    // state changes.
 					GL.ActiveTexture(TextureUnit.Texture0);
 					GL.BindTexture ( TextureTarget.Texture2D, tex.glTexture );
 

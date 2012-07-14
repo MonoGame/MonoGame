@@ -275,6 +275,15 @@ namespace Microsoft.Xna.Framework.Graphics
 						tex = (Texture)textures [sampler.index];
 					}
 
+                    // TODO: This shows up as highly redundant state change.  We should
+                    // remove this instead do:
+                    //
+                    // GraphicsDevice.Textures[0] = tex;
+                    //
+                    // And fix TextureCollection.SetTextures() to work with GL.  This
+                    // then is unified with the DX path and removes all redundent texture
+                    // state changes.
+                    //
 					GL.ActiveTexture( (TextureUnit)((int)TextureUnit.Texture0 + sampler.index) );
 					tex.Activate();						
 					samplerStates[sampler.index].Activate(tex.glTarget, tex.LevelCount > 1);
