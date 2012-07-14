@@ -33,28 +33,24 @@ using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-    public class DisplayModeCollection : IEnumerable<DisplayMode>
+    public class DisplayModeCollection : IEnumerable<DisplayMode>, IEnumerable
     {
         private List<DisplayMode> modes;
         
-        public static bool operator !=(DisplayModeCollection l, DisplayModeCollection r)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static bool operator ==(DisplayModeCollection l, DisplayModeCollection r)
-        {
-            throw new NotImplementedException();
-        }
-
         public IEnumerable<DisplayMode> this[SurfaceFormat format]
         {
-            get { throw new NotImplementedException(); }
-        }
+            get {
+                List<DisplayMode> list = new List<DisplayMode>();
+                foreach (DisplayMode mode in this.modes)
+                {
+                    if (mode.Format == format)
+                    {
+                        list.Add(mode);
+                    }
+                }
+                return list;
 
-        public override bool Equals(object obj)
-        {
-            throw new NotImplementedException();
+            }
         }
 
         public IEnumerator<DisplayMode> GetEnumerator()
