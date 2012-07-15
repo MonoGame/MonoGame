@@ -237,11 +237,11 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
             // Read in all the shader objects.
-            var shaderList = new List<DXShader>();
+            var shaderList = new List<Shader>();
             var shaders = (int)reader.ReadByte();
             for (var s = 0; s < shaders; s++)
             {
-                var shader = new DXShader(graphicsDevice, reader);
+                var shader = new Shader(graphicsDevice, reader);
                 shaderList.Add(shader);
             }
 
@@ -279,7 +279,7 @@ namespace Microsoft.Xna.Framework.Graphics
             return collection;
         }
 
-        private static EffectPassCollection ReadPasses(BinaryReader reader, Effect effect, List<DXShader> shaders)
+        private static EffectPassCollection ReadPasses(BinaryReader reader, Effect effect, List<Shader> shaders)
         {
             var collection = new EffectPassCollection();
 

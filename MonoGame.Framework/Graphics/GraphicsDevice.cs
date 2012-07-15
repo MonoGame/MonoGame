@@ -140,7 +140,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// The active vertex shader.
         /// </summary>
-        internal DXShader _vertexShader;
+        internal Shader _vertexShader;
 
         private readonly Dictionary<ulong, SharpDX.Direct3D11.InputLayout> _inputLayouts = new Dictionary<ulong, SharpDX.Direct3D11.InputLayout>();
 
@@ -1284,7 +1284,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _d3dContext.InputAssembler.InputLayout = GetInputLayout(_vertexShader, _vertexBuffer.VertexDeclaration);
         }
 
-        private SharpDX.Direct3D11.InputLayout GetInputLayout(DXShader shader, VertexDeclaration decl)
+        private SharpDX.Direct3D11.InputLayout GetInputLayout(Shader shader, VertexDeclaration decl)
         {
             SharpDX.Direct3D11.InputLayout layout;
 
