@@ -44,8 +44,8 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public enum SpriteSortMode
     {
-        Immediate = 0,
-        Deferred = 1,
+        Deferred = 0,
+        Immediate = 1,
         Texture = 2,
         BackToFront = 3,
         FrontToBack = 4
