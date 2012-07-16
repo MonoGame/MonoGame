@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.InteropServices;
+using System.Collections.Generic;
 
 #if MONOMAC
 using MonoMac.OpenGL;
@@ -24,6 +25,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		private VertexElement[] _elements;
         private int _vertexStride;
+
+        private static List<int> _enabledVertexAttributes = new List<int>();
 
         /// <summary>
         /// A hash value which can be used to compare declarations.
@@ -133,7 +136,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		internal void Apply(IntPtr offset)
 		{
 
-            // TODO: This is executed on every draw call... can we not
+            // TODO: This is executed on every dr_enabledVertexAttributesaw call... can we not
             // allocate a vertex declaration once and just re-apply it?
 
 			var enabledAttributes = new bool[16];
@@ -163,10 +166,16 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			for (var i=0; i<16; i++) 
             {
-    			if (enabledAttributes[i])
+    			if (enabledAttributes[i] && !_enabledVertexAttributes.Contains(i))
+                {
+                    _enabledVertexAttributes.Add(i);
 				    GL.EnableVertexAttribArray(i);
-			    else
+                }
+			    else if (!enabledAttributes[i] && _enabledVertexAttributes.Contains(i))
+                {
+                    _enabledVertexAttributes.Remove(i);
 				    GL.DisableVertexAttribArray(i);
+                }
 			}
 		}
 
