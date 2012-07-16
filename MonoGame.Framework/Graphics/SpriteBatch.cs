@@ -102,9 +102,10 @@ namespace Microsoft.Xna.Framework.Graphics
 			graphicsDevice.Textures[0] = null;
 
 			// unbinds shader
-			if (_effect != null) 
+			if (_effect != null && graphicsDevice.ShaderProgram != 0) 
             {
                 GL.UseProgram(0);
+                graphicsDevice.ShaderProgram = 0;
 				_effect = null;
 			}
 #endif

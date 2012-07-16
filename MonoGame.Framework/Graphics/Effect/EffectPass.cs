@@ -156,14 +156,17 @@ namespace Microsoft.Xna.Framework.Graphics
                 return;
             }
 
+            var device = _effect.GraphicsDevice;
+
 #if OPENGL
-            GL.UseProgram(_shaderProgram);
+            if (device.ShaderProgram != _shaderProgram)
+            {
+                GL.UseProgram(_shaderProgram);
+                device.ShaderProgram = _shaderProgram;
+            }
 #elif PSS
             _effect.GraphicsDevice._graphics.SetShaderProgram(_shaderProgram);
 #endif
-
-            var device = _effect.GraphicsDevice;
-
             if (_rasterizerState != null)
                 device.RasterizerState = _rasterizerState;
             if (_blendState != null)

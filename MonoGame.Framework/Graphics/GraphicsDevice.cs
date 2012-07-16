@@ -864,7 +864,6 @@ namespace Microsoft.Xna.Framework.Graphics
             catch (SharpDX.SharpDXException)
             {
                 // TODO: How should we deal with a device lost case here?
-
                 /*               
                 // If the device was removed either by a disconnect or a driver upgrade, we 
                 // must completely reinitialize the renderer.
@@ -1280,6 +1279,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 _pixelShaderDirty = true;
             }
         }
+
+#if OPENGL
+        internal int ShaderProgram = -1;
+#endif
 
         public bool ResourcesLost { get; set; }
 
