@@ -1,10 +1,18 @@
 ﻿using System;
 using System.IO;
+using System.Collections.Generic;
 
 namespace TwoMGFX
 {
     class CompilerInclude : SharpDX.D3DCompiler.Include
     {
+        string _rootPath;
+
+        public CompilerInclude(string rootPath)
+        {
+            _rootPath = rootPath;
+        }
+
         public void Close(Stream stream)
         {
             stream.Close();
@@ -14,6 +22,9 @@ namespace TwoMGFX
         {
             try
             {
+                if (!Path.IsPathRooted(fileName))
+                    fileName = Path.Combine(_rootPath, fileName);
+
                 var stream = new FileStream(fileName, FileMode.Open, FileAccess.Read);
                 return stream;
             }

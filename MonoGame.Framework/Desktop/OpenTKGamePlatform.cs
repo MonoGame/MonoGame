@@ -82,6 +82,20 @@ namespace Microsoft.Xna.Framework
         private OpenTKGameWindow _view;
 		private OpenALSoundController soundControllerInstance = null;
         
+        
+        public override bool VSyncEnabled
+        {
+            get
+            {
+                return _view.Window.VSync == OpenTK.VSyncMode.On ? true : false;
+            }
+            
+            set
+            {
+                _view.Window.VSync = value ? OpenTK.VSyncMode.On : OpenTK.VSyncMode.Off;
+            }
+        }
+        
 		public OpenTKGamePlatform(Game game)
             : base(game)
         {
@@ -91,7 +105,12 @@ namespace Microsoft.Xna.Framework
 			
 			// Setup our OpenALSoundController to handle our SoundBuffer pools
 			soundControllerInstance = OpenALSoundController.GetInstance;
-			
+            
+#if LINUX
+            // also set up SdlMixer to play background music. If one of these functions fails, we will not get any background music (but that should rarely happen)
+            Tao.Sdl.Sdl.SDL_InitSubSystem(Tao.Sdl.Sdl.SDL_INIT_AUDIO);
+            Tao.Sdl.SdlMixer.Mix_OpenAudio(44100, (short)Tao.Sdl.Sdl.AUDIO_S16SYS, 2, 1024);			
+#endif
         }
 
         public override GameRunBehavior DefaultRunBehavior
@@ -102,7 +121,7 @@ namespace Microsoft.Xna.Framework
         public override void RunLoop()
         {
             ResetWindowBounds(false);
-            _view.Window.Run(1 / Game.TargetElapsedTime.TotalSeconds);
+            _view.Window.Run(0);
         }
 
         public override void StartRunLoop()
@@ -117,6 +136,9 @@ namespace Microsoft.Xna.Framework
                 Net.NetworkSession.Exit();
                 _view.Window.Exit();
             }
+#if LINUX
+            Tao.Sdl.SdlMixer.Mix_CloseAudio();
+#endif
         }
 
         public override bool BeforeUpdate(GameTime gameTime)
@@ -163,15 +185,28 @@ namespace Microsoft.Xna.Framework
 
             if (graphicsDeviceManager.IsFullScreen)
             {
-                bounds = new Rectangle(0, 0,
-                                       OpenTK.DisplayDevice.Default.Width,
-                                       OpenTK.DisplayDevice.Default.Height);
+                bounds = new Rectangle(0, 0,graphicsDeviceManager.PreferredBackBufferWidth,graphicsDeviceManager.PreferredBackBufferHeight);
+
+                if (OpenTK.DisplayDevice.Default.Width != graphicsDeviceManager.PreferredBackBufferWidth ||
+                    OpenTK.DisplayDevice.Default.Height != graphicsDeviceManager.PreferredBackBufferHeight)
+                {
+                    OpenTK.DisplayDevice.Default.ChangeResolution(graphicsDeviceManager.PreferredBackBufferWidth,
+                            graphicsDeviceManager.PreferredBackBufferHeight,
+                            OpenTK.DisplayDevice.Default.BitsPerPixel,
+                            OpenTK.DisplayDevice.Default.RefreshRate);
+                }
             }
             else
             {
+                
+                // switch back to the normal screen resolution
+                OpenTK.DisplayDevice.Default.RestoreResolution();
+                // now update the bounds 
                 bounds.Width = graphicsDeviceManager.PreferredBackBufferWidth;
                 bounds.Height = graphicsDeviceManager.PreferredBackBufferHeight;
             }
+
+            
 
             // Now we set our Presentation Parameters
             var device = (GraphicsDevice)graphicsDeviceManager.GraphicsDevice;
@@ -189,7 +224,8 @@ namespace Microsoft.Xna.Framework
                 _view.ToggleFullScreen();
 
             // we only change window bounds if we are not fullscreen
-            if (!graphicsDeviceManager.IsFullScreen)
+            // or if fullscreen mode was just entered
+            if (!graphicsDeviceManager.IsFullScreen || toggleFullScreen)
                 _view.ChangeClientBounds(bounds);
 
             IsActive = wasActive;

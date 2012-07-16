@@ -28,8 +28,8 @@ namespace Microsoft.Xna.Framework.Graphics
     {
         private Effect _effect;
 
-		private DXShader _pixelShader;
-        private DXShader _vertexShader;
+		private Shader _pixelShader;
+        private Shader _vertexShader;
 
         private BlendState _blendState;
         private DepthStencilState _depthStencilState;
@@ -53,8 +53,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal EffectPass(    Effect effect, 
                                 string name,
-                                DXShader vertexShader, 
-                                DXShader pixelShader, 
+                                Shader vertexShader, 
+                                Shader pixelShader, 
                                 BlendState blendState, 
                                 DepthStencilState depthStencilState, 
                                 RasterizerState rasterizerState,
@@ -175,7 +175,7 @@ namespace Microsoft.Xna.Framework.Graphics
             Debug.Assert(_pixelShader != null, "Got a null vertex shader!");
 
 #if PSS
-#warning We are only setting one hardcoded parameter here. Need to do this properly by iterating _effect.Parameters (Happens in DXShader)
+#warning We are only setting one hardcoded parameter here. Need to do this properly by iterating _effect.Parameters (Happens in Shader)
             float[] data;
             if (_effect.Parameters["WorldViewProj"] != null) 
                 data = (float[])_effect.Parameters["WorldViewProj"].Data;
@@ -233,6 +233,8 @@ namespace Microsoft.Xna.Framework.Graphics
             _pixelShader.Apply(device, _shaderProgram, _effect.Parameters, _effect.ConstantBuffers);
 
 #elif DIRECTX
+
+            // TODO: This can be much simpler now!
 
             lock (device._d3dContext)
             {

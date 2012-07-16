@@ -107,6 +107,18 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private static Color DiscardColor = new Color(68, 34, 136, 255);
 
+        /// <summary>
+        /// The active vertex shader.
+        /// </summary>
+        private Shader _vertexShader;
+        private bool _vertexShaderDirty;
+
+        /// <summary>
+        /// The active pixel shader.
+        /// </summary>
+        private Shader _pixelShader;
+        private bool _pixelShaderDirty;
+
 #if DIRECTX
 
         // Declare Direct2D Objects
@@ -135,12 +147,7 @@ namespace Microsoft.Xna.Framework.Graphics
         // The active depth view.
         protected SharpDX.Direct3D11.DepthStencilView _currentDepthStencilView;
 
-        protected float _dpi;
-
-        /// <summary>
-        /// The active vertex shader.
-        /// </summary>
-        internal DXShader _vertexShader;
+        protected float _dpi; 
 
         private readonly Dictionary<ulong, SharpDX.Direct3D11.InputLayout> _inputLayouts = new Dictionary<ulong, SharpDX.Direct3D11.InputLayout>();
 
@@ -334,13 +341,6 @@ namespace Microsoft.Xna.Framework.Graphics
             DepthStencilState = DepthStencilState.Default;
             RasterizerState = RasterizerState.CullCounterClockwise;
 
-#if OPENGL
-            // Force the GLStateManager to set these render states
-            GLStateManager.SetRasterizerStates(RasterizerState, GetRenderTargets().Length > 0);
-            GLStateManager.SetBlendStates(BlendState);
-            GLStateManager.SetDepthStencilState(DepthStencilState);
-#endif
-
             // Set the default render target.
             ApplyRenderTargets(null);
 
@@ -414,16 +414,25 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void CreateSizeDependentResources()
         {
-            if (PresentationParameters == null || PresentationParameters.DeviceWindowHandle == IntPtr.Zero)
-                return;
+            _d3dContext.OutputMerger.SetTargets((SharpDX.Direct3D11.DepthStencilView)null, 
+                                                (SharpDX.Direct3D11.RenderTargetView)null);  
 
             _d2dContext.Target = null;
             if (_renderTargetView != null)
+            {
                 _renderTargetView.Dispose();
+                _renderTargetView = null;
+            }
             if (_depthStencilView != null)
+            {
                 _depthStencilView.Dispose();
+                _depthStencilView = null;
+            }
             if (_bitmapTarget != null)
+            {
                 _bitmapTarget.Dispose();
+                _bitmapTarget = null;
+            }
 
 			// Clear the current render targets.
             _currentDepthStencilView = null;
@@ -433,7 +442,19 @@ namespace Microsoft.Xna.Framework.Graphics
             _currentRenderTargets[3] = null;
             _currentDepthStencilView = null;
             _currentRenderTargetBindings = null;
-            
+
+            if (    PresentationParameters == null ||
+                    (PresentationParameters.DeviceWindowHandle == IntPtr.Zero && PresentationParameters.SwapChainPanel == null))
+            {
+                if (_swapChain != null)
+                {
+                    _swapChain.Dispose();
+                    _swapChain = null;
+                }
+
+                return;
+            }
+
             var multisampleDesc = new SharpDX.DXGI.SampleDescription(1, 0);
             if ( PresentationParameters.MultiSampleCount > 1 )
             {
@@ -445,17 +466,27 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // If the swap chain already exists... update it.
             if (_swapChain != null)
-                _swapChain.ResizeBuffers(   2,
-                                            PresentationParameters.BackBufferWidth, 
+            {
+                _swapChain.ResizeBuffers(2,
+                                            PresentationParameters.BackBufferWidth,
                                             PresentationParameters.BackBufferHeight,
                                             format,
                                             0); // SharpDX.DXGI.SwapChainFlags
+
+                /*
+                if (PresentationParameters.SwapChainPanel != null)
+                {
+                    using (var nativePanel = ComObject.As<SharpDX.DXGI.ISwapChainBackgroundPanelNative>(PresentationParameters.SwapChainPanel))
+                        nativePanel.SwapChain = _swapChain;
+                }
+                */
+            }
 
             // Otherwise, create a new swap chain.
             else
             {
                 // SwapChain description
-                var desc =  new SharpDX.DXGI.SwapChainDescription1()
+                var desc = new SharpDX.DXGI.SwapChainDescription1()
                 {
                     // Automatic sizing
                     Width = PresentationParameters.BackBufferWidth,
@@ -464,7 +495,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     Stereo = false,
                     SampleDescription = multisampleDesc,
                     Usage = SharpDX.DXGI.Usage.RenderTargetOutput,
-                    BufferCount = 2,                    
+                    BufferCount = 2,
                     SwapEffect = SharpDXHelper.ToSwapEffect(PresentationParameters),
 
                     // By default we scale the backbuffer to the window 
@@ -480,10 +511,21 @@ namespace Microsoft.Xna.Framework.Graphics
                 using (var dxgiAdapter = dxgiDevice2.Adapter)
                 using (var dxgiFactory2 = dxgiAdapter.GetParent<SharpDX.DXGI.Factory2>())
                 {
-                    // Creates a SwapChain from a CoreWindow pointer.
-                    var coreWindow = Marshal.GetObjectForIUnknown(PresentationParameters.DeviceWindowHandle) as CoreWindow;
-                    using (var comWindow = new ComObject(coreWindow))
-                        _swapChain = dxgiFactory2.CreateSwapChainForCoreWindow(_d3dDevice, comWindow, ref desc, null);
+                    if (PresentationParameters.DeviceWindowHandle != IntPtr.Zero)
+                    {
+                        // Creates a SwapChain from a CoreWindow pointer.
+                        var coreWindow = Marshal.GetObjectForIUnknown(PresentationParameters.DeviceWindowHandle) as CoreWindow;
+                        using (var comWindow = new ComObject(coreWindow))
+                            _swapChain = dxgiFactory2.CreateSwapChainForCoreWindow(_d3dDevice, comWindow, ref desc, null);
+                    }
+                    else
+                    {
+                        using (var nativePanel = ComObject.As<SharpDX.DXGI.ISwapChainBackgroundPanelNative>(PresentationParameters.SwapChainPanel))
+                        {
+                            _swapChain = dxgiFactory2.CreateSwapChainForComposition(_d3dDevice, ref desc, null);
+                            nativePanel.SwapChain = _swapChain;
+                        }
+                    }
 
                     // Ensure that DXGI does not queue more than one frame at a time. This both reduces 
                     // latency and ensures that the application will only render after each VSync, minimizing 
@@ -577,10 +619,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 _rasterizerState = value;
                 _rasterizerStateDirty = true;
-
-#if OPENGL
-				GLStateManager.SetRasterizerStates(value, GetRenderTargets().Length > 0);
-#endif
             }
         }
 
@@ -596,10 +634,6 @@ namespace Microsoft.Xna.Framework.Graphics
 				// ToDo check for invalid state
 				_blendState = value;
                 _blendStateDirty = true;
-
-#if OPENGL
-				GLStateManager.SetBlendStates(value);
-#endif
             }
 		}
 
@@ -614,9 +648,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 _depthStencilState = value;
                 _depthStencilStateDirty = true;
-#if OPENGL
-				GLStateManager.SetDepthStencilState(value);
-#endif
             }
         }
 
@@ -641,7 +672,7 @@ namespace Microsoft.Xna.Framework.Graphics
             options |= ClearOptions.Stencil;
 #endif
 
-            Clear (options, color.ToVector4(), _viewport.MaxDepth, 0);
+            Clear(options, color.ToVector4(), _viewport.MaxDepth, 0);
         }
 
         public void Clear(ClearOptions options, Color color, float depth, int stencil)
@@ -649,13 +680,13 @@ namespace Microsoft.Xna.Framework.Graphics
             Clear (options, color.ToVector4 (), depth, stencil);
         }
 
-		public void Clear (ClearOptions options, Vector4 color, float depth, int stencil)
+		public void Clear(ClearOptions options, Vector4 color, float depth, int stencil)
 		{
 #if DIRECTX
             lock (_d3dContext)
             {
                 // Clear the diffuse render buffer.
-                if ((options & ClearOptions.Target) != 0)
+                if (options.HasFlag(ClearOptions.Target))
                 {
                     foreach (var view in _currentRenderTargets)
                     {
@@ -666,9 +697,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 // Clear the depth/stencil render buffer.
                 SharpDX.Direct3D11.DepthStencilClearFlags flags = 0;
-                if ((options & ClearOptions.DepthBuffer) != 0)
+                if (options.HasFlag(ClearOptions.DepthBuffer))
                     flags |= SharpDX.Direct3D11.DepthStencilClearFlags.Depth;
-                if ((options & ClearOptions.Stencil) != 0)
+                if (options.HasFlag(ClearOptions.Stencil))
                     flags |= SharpDX.Direct3D11.DepthStencilClearFlags.Stencil;
 
                 if (flags != 0 && _currentDepthStencilView != null)
@@ -682,26 +713,43 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #elif OPENGL
 
-			GL.ClearColor (color.X, color.Y, color.Z, color.W);
+            GL.ClearColor(color.X, color.Y, color.Z, color.W);
 
 			ClearBufferMask bufferMask = 0;
-			if (options.HasFlag(ClearOptions.Target)) {
-				bufferMask = bufferMask | ClearBufferMask.ColorBufferBit;
-			}
-			if (options.HasFlag(ClearOptions.Stencil)) {
-				GL.ClearStencil (stencil);
+            if (options.HasFlag(ClearOptions.Target))
+            {
+                // GL will only clear color if color writes are 
+                // enabled, so we force it on here.
+
+                bufferMask = bufferMask | ClearBufferMask.ColorBufferBit;
+            }
+			if (options.HasFlag(ClearOptions.Stencil))
+            {
+				GL.ClearStencil(stencil);
 				bufferMask = bufferMask | ClearBufferMask.StencilBufferBit;
 			}
-			if (options.HasFlag(ClearOptions.DepthBuffer)) {
-				GL.ClearDepth (depth);
+			if (options.HasFlag(ClearOptions.DepthBuffer)) 
+            {
+                // GL will only clear depth if depth writing 
+                // is enabled, so we force it on here.
+                GL.DepthMask(true);
+
+				GL.ClearDepth(depth);
 				bufferMask = bufferMask | ClearBufferMask.DepthBufferBit;
 			}
 
 #if GLES
-			GL.Clear ((uint)bufferMask);
+			GL.Clear((uint)bufferMask);
 #else
-			GL.Clear (bufferMask);
+			GL.Clear(bufferMask);
 #endif
+            // Restore the color write flag.
+
+            // Restore the depth write flag.
+            if (    options.HasFlag(ClearOptions.DepthBuffer) &&
+                    !_depthStencilStateDirty)
+                GL.DepthMask(_depthStencilState.DepthBufferWriteEnable);
+
 #endif // OPENGL
         }
 		
@@ -833,7 +881,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #elif ANDROID
 			Game.Instance.Platform.Present();
 #elif OPENGL
-			GL.Flush ();
+			GL.Flush();
 #endif
         }
 
@@ -912,7 +960,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 lock (_d3dContext) 
                     _d3dContext.Rasterizer.SetViewports(viewport);
 #elif OPENGL
-				GL.Viewport (value.X, value.Y, value.Width, value.Height);
+				GL.Viewport(value.X, value.Y, value.Width, value.Height);
 				GL.DepthRange(value.MinDepth, value.MaxDepth);
 #endif
             }
@@ -938,12 +986,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 _scissorRectangle = value;
                 _scissorRectangleDirty = true;
-
-#if OPENGL
-                var glScissorRectangle = _scissorRectangle;
-                glScissorRectangle.Y = _viewport.Height - glScissorRectangle.Y - glScissorRectangle.Height;
-                GLStateManager.SetScissor(glScissorRectangle);				
-#endif
             }
         }
 
@@ -1106,9 +1148,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 
 #if OPENGL
-			//Reset the cull mode, because we flip verticies when rendering offscreen
-			//and thus flip the cull direction
-			GLStateManager.Cull (RasterizerState, GetRenderTargets().Length > 0);
+			// Reset the raster state because we flip verticies
+            // when rendering offscreen and hence the cull direction.
+            _rasterizerStateDirty = true;
 #endif
         }
 
@@ -1211,19 +1253,56 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public IndexBuffer Indices { set { SetIndexBuffer(value); } }
 
+        internal Shader VertexShader
+        {
+            get { return _vertexShader; }
+
+            set
+            {
+                if (_vertexShader == value)
+                    return;
+
+                _vertexShader = value;
+                _vertexShaderDirty = true;
+            }
+        }
+
+        internal Shader PixelShader
+        {
+            get { return _pixelShader; }
+
+            set
+            {
+                if (_pixelShader == value)
+                    return;
+
+                _pixelShader = value;
+                _pixelShaderDirty = true;
+            }
+        }
+
         public bool ResourcesLost { get; set; }
 
-#if DIRECTX
-
-        private void ApplyState()
+        internal void ApplyState()
         {
-            Debug.Assert(_d3dContext != null, "The d3d context is null!");
-
+#if DIRECTX
             // NOTE: This code assumes _d3dContext has been locked by the caller.
+            Debug.Assert(_d3dContext != null, "The d3d context is null!");
+#endif
 
             if ( _scissorRectangleDirty )
 	        {
-	            _d3dContext.Rasterizer.SetScissorRectangle(_scissorRectangle.X, _scissorRectangle.Y, _scissorRectangle.Right, _scissorRectangle.Bottom);
+#if DIRECTX
+	            _d3dContext.Rasterizer.SetScissorRectangle(
+                    _scissorRectangle.X, 
+                    _scissorRectangle.Y, 
+                    _scissorRectangle.Right, 
+                    _scissorRectangle.Bottom);
+#elif OPENGL
+                var scissorRect = _scissorRectangle;
+                scissorRect.Y = _viewport.Height - scissorRect.Y - scissorRect.Height;
+                GL.Scissor(scissorRect.X, scissorRect.Y, scissorRect.Width, scissorRect.Height);
+#endif
 	            _scissorRectangleDirty = false;
 	        }
 
@@ -1236,13 +1315,33 @@ namespace Microsoft.Xna.Framework.Graphics
 
 	        _blendStateDirty = _depthStencilStateDirty = _rasterizerStateDirty = false;
 
-	        SamplerStates.SetSamplers(this);
-	        Textures.SetTextures(this);
+            Textures.SetTextures(this);
+            SamplerStates.SetSamplers(this);
 
-            _d3dContext.InputAssembler.InputLayout = GetInputLayout(_vertexShader, _vertexBuffer.VertexDeclaration);
+            if (_vertexShaderDirty)
+            {
+                Debug.Assert(_vertexShader != null, "The vertex shader is null!");
+#if DIRECTX            
+                _d3dContext.InputAssembler.InputLayout = GetInputLayout(_vertexShader, _vertexBuffer.VertexDeclaration);
+                _d3dContext.VertexShader.Set(_vertexShader._vertexShader);                
+#endif
+            }
+
+            if (_pixelShaderDirty)
+            {
+                Debug.Assert(_pixelShader != null, "The pixel shader is null!");
+
+#if DIRECTX       
+                _d3dContext.PixelShader.Set(_pixelShader._pixelShader);
+#endif
+            }
+
+            _vertexShaderDirty = _pixelShaderDirty = false;
         }
 
-        private SharpDX.Direct3D11.InputLayout GetInputLayout(DXShader shader, VertexDeclaration decl)
+#if DIRECTX
+
+        private SharpDX.Direct3D11.InputLayout GetInputLayout(Shader shader, VertexDeclaration decl)
         {
             SharpDX.Direct3D11.InputLayout layout;
 
@@ -1350,6 +1449,8 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 			
 #elif OPENGL
+              
+            ApplyState();
 
 			var indexElementType = DrawElementsType.UnsignedShort;
 			var indexElementSize = 2;
@@ -1392,6 +1493,9 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
 #elif OPENGL
+
+            ApplyState();
+
             // Unbind the VBOs
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
@@ -1452,6 +1556,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #elif OPENGL
 
+            ApplyState();
+
 			_vertexBuffer.VertexDeclaration.Apply();
 
 			GL.DrawArrays(PrimitiveTypeGL(primitiveType),
@@ -1487,6 +1593,9 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
 #elif OPENGL
+
+            ApplyState();
+
             // Unbind the VBOs
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
@@ -1570,6 +1679,9 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
 #elif OPENGL
+
+            ApplyState();
+
             // Unbind the VBOs
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);

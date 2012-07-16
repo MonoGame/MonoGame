@@ -151,31 +151,25 @@ namespace Microsoft.Xna.Framework.Graphics
                 //shaderFlags |= SharpDX.D3DCompiler.ShaderFlags.SkipValidation;
                 shaderFlags |= SharpDX.D3DCompiler.ShaderFlags.Debug;
 
-                // First compile the effect into bytecode.                
-                using (var includer = new TwoMGFX.CompilerInclude())
-                {
-                    var result = SharpDX.D3DCompiler.ShaderBytecode.Compile(
-                        shaderInfo.fileContent, 
-                        shaderFunction, 
-                        shaderProfile, 
-                        shaderFlags, 
-                        0, 
-                        null, 
-                        includer,
-                        shaderInfo.fileName);
+                // Compile the shader into bytecode.                
+                var result = SharpDX.D3DCompiler.ShaderBytecode.Compile(
+                    shaderInfo.fileContent, 
+                    shaderFunction, 
+                    shaderProfile, 
+                    shaderFlags, 
+                    0, 
+                    null, 
+                    null,
+                    shaderInfo.fileName);
 
-                    if (result.HasErrors)
-                        throw new Exception(result.Message);
+                if (result.HasErrors)
+                    throw new Exception(result.Message);
 
-                    shaderByteCode = result.Bytecode;
-                }
+                shaderByteCode = result.Bytecode;
             }
             catch (Exception ex)
             {
                 throw ex;
-                //Console.WriteLine("Failed to compile the input file '{0}'!", shaderFileName);
-                //Console.WriteLine(ex.Message);
-                //return 1;
             }
 
             // Get the shader bytecode.

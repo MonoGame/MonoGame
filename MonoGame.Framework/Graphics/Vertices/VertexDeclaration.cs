@@ -136,7 +136,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // TODO: This is executed on every draw call... can we not
             // allocate a vertex declaration once and just re-apply it?
 
-			bool[] enabledAttributes = new bool[16];
+			var enabledAttributes = new bool[16];
 			foreach (var ve in this.GetVertexElements())
 			{
 				IntPtr elementOffset = (IntPtr)(offset.ToInt64 () + ve.Offset);
@@ -161,10 +161,15 @@ namespace Microsoft.Xna.Framework.Graphics
 				enabledAttributes[attributeLocation] = true;
 			}
 			
-			for (int i=0; i<16; i++) {
-				GLStateManager.VertexAttribArray(i, enabledAttributes[i]);
+			for (var i=0; i<16; i++) 
+            {
+    			if (enabledAttributes[i])
+				    GL.EnableVertexAttribArray(i);
+			    else
+				    GL.DisableVertexAttribArray(i);
 			}
 		}
+
 #endif // OPENGL
 
 #if DIRECTX
