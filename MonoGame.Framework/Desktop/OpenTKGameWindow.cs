@@ -212,6 +212,8 @@ namespace Microsoft.Xna.Framework
 
         private void Initialize()
         {
+            GraphicsContext.ShareContexts = true;
+
             window = new OpenTK.GameWindow();
             window.RenderFrame += OnRenderFrame;
             window.UpdateFrame += OnUpdateFrame;
@@ -235,8 +237,9 @@ namespace Microsoft.Xna.Framework
                 _windowHandle = (IntPtr)propertyInfo.GetValue(window.WindowInfo, null);
             }
 #endif
-
-            Threading.Initialize();
+            // Provide the graphics context for background loading
+            Threading.BackgroundContext = new GraphicsContext(GraphicsMode.Default, window.WindowInfo);
+            Threading.WindowInfo = window.WindowInfo;
 
             keys = new List<Keys>();
 
@@ -282,8 +285,10 @@ namespace Microsoft.Xna.Framework
 
         public void Dispose()
         {
+            Threading.BackgroundContext.Dispose();
+            Threading.BackgroundContext = null;
+            Threading.WindowInfo = null;
             window.Dispose();
-            Threading.Deinitialize();
         }
 
         public override void BeginScreenDeviceChange(bool willBeFullScreen)
