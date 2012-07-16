@@ -363,6 +363,9 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 
 #if OPENGL
+                // Required to make sure that any texture uploads on a thread are completed
+                // before the main thread tries to use the texture.
+                GL.Finish();
             });
 #endif
         }
@@ -674,11 +677,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 image.UnlockBits(bitmapData);
 
                 Texture2D texture = null;
-                Threading.BlockOnUIThread(() =>
-                {
-                    texture = new Texture2D(graphicsDevice, image.Width, image.Height);
-                    texture.SetData(data);
-                });
+                texture = new Texture2D(graphicsDevice, image.Width, image.Height);
+                texture.SetData(data);
 
                 return texture;
             }
