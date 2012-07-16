@@ -53,9 +53,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #elif DIRECTX
 
-        private VertexShader _vertexShader;
+        internal VertexShader _vertexShader;
 
-        private PixelShader _pixelShader;
+        internal PixelShader _pixelShader;
 
         public byte[] Bytecode { get; private set; }
 
@@ -238,12 +238,11 @@ namespace Microsoft.Xna.Framework.Graphics
                             int program, 
                             EffectParameterCollection parameters,
 		                    ConstantBuffer[] cbuffers) 
-        {							        
-            var textures = graphicsDevice.Textures;
-			var samplerStates = graphicsDevice.SamplerStates;
-
+        {
 			if (ShaderType == ShaderType.FragmentShader) 
             {
+                graphicsDevice.PixelShader = this;
+
                 // Activate the textures.
 				foreach (var sampler in _samplers) 
                 {
@@ -258,37 +257,27 @@ namespace Microsoft.Xna.Framework.Graphics
                     if (sampler.type != SamplerType.Sampler2D)
                         continue;
 
-					Texture tex = null;
                     if (sampler.parameter >= 0) 
                     {
                         var textureParameter = parameters[sampler.parameter];
-                        tex = textureParameter.Data as Texture;
+                        
+                        // TODO: The texture could be NULL here if we're using SpriteBatch
+                        // which in that case we are making more work by setting this to
+                        // NULL then setting it back to possibly the same texture.
+                        //
+                        // Maybe we should not set the texture if it is null?  But in
+                        // that case then maybe we would be breaking state?  Null texture
+                        // rendering is undefined right?  Does it hurt then?
+
+                        var texture = textureParameter.Data as Texture;
+                        graphicsDevice.Textures[sampler.index] = texture;
 					}
-
-					if (tex == null) 
-                    {
-						//texutre 0 will be set in drawbatch :/
-						if (sampler.index == 0)
-							continue;
-
-						//are smapler indexes always normal texture indexes?
-						tex = (Texture)textures [sampler.index];
-					}
-
-                    // TODO: This shows up as highly redundant state change.  We should
-                    // remove this instead do:
-                    //
-                    // GraphicsDevice.Textures[0] = tex;
-                    //
-                    // And fix TextureCollection.SetTextures() to work with GL.  This
-                    // then is unified with the DX path and removes all redundent texture
-                    // state changes.
-                    //
-					GL.ActiveTexture( (TextureUnit)((int)TextureUnit.Texture0 + sampler.index) );
-					tex.Activate();						
-					samplerStates[sampler.index].Activate(tex.glTarget, tex.LevelCount > 1);
 				}
 			}
+            else
+            {
+                graphicsDevice.VertexShader = this;
+            }
 
             // Update and set the constants.
             for (var c = 0; c < _cbuffers.Length; c++)
@@ -306,29 +295,25 @@ namespace Microsoft.Xna.Framework.Graphics
                             EffectParameterCollection parameters,
                             ConstantBuffer[] cbuffers )
         {
-            // NOTE: We make the assumption here that the caller has
-            // locked the d3dContext for us to use.
-
-            var d3dContext = graphicsDevice._d3dContext;
             if (_pixelShader != null)
             {
+                graphicsDevice.PixelShader = this;
+
                 foreach (var sampler in _samplers)
                 {
                     var param = parameters[sampler.parameter];
                     var texture = param.Data as Texture;
                     graphicsDevice.Textures[sampler.index] = texture;
                 }
-
-                d3dContext.PixelShader.Set(_pixelShader);
             }
             else
             {
-                d3dContext.VertexShader.Set(_vertexShader);
-
-                // Set the shader on the device so it can 
-                // apply the correct input layout at draw time.
-                graphicsDevice._vertexShader = this;
+                graphicsDevice.VertexShader = this;
             }
+
+            // TODO: This has to be deferred like setting shaders 
+            // and be done from the GraphicsDevice.ApplyState.  This
+            // also forces us to come up with a ConstantBuffer API.
 
             // Update and set the constants.
             for (var c = 0; c < _cbuffers.Length; c++)

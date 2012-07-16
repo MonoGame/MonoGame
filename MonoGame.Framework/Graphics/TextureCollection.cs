@@ -3,6 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+#if MONOMAC
+using MonoMac.OpenGL;
+#elif WINDOWS || LINUX
+using OpenTK.Graphics.OpenGL;
+#elif GLES
+using OpenTK.Graphics.ES20;
+using TextureUnit = OpenTK.Graphics.ES20.All;
+using TextureTarget = OpenTK.Graphics.ES20.All;
+#endif
+
 namespace Microsoft.Xna.Framework.Graphics
 {
     public sealed class TextureCollection
@@ -38,28 +48,38 @@ namespace Microsoft.Xna.Framework.Graphics
             _dirty = int.MaxValue;
         }
 
-#if DIRECTX
-
         internal void SetTextures(GraphicsDevice device)
         {
             // Skip out if nothing has changed.
             if (_dirty == 0)
                 return;
 
+
+#if DIRECTX
             // NOTE: We make the assumption here that the caller has
             // locked the d3dContext for us to use.
-
             var pixelShaderStage = device._d3dContext.PixelShader;
+#endif
+
             for (var i = 0; i < _textures.Length; i++)
             {
                 var mask = 1 << i;
                 if ((_dirty & mask) == 0)
                     continue;
 
+                var tex = _textures[i];
+#if OPENGL
+                if (tex != null)
+                {
+                    GL.ActiveTexture(TextureUnit.Texture0 + i);
+                    GL.BindTexture(tex.glTarget, tex.glTexture);
+                }
+#elif DIRECTX
                 if (_textures[i] == null)
                     pixelShaderStage.SetShaderResource(i, null);
                 else
                     pixelShaderStage.SetShaderResource(i, _textures[i].GetShaderResourceView());
+#endif
 
                 _dirty &= ~mask;
                 if (_dirty == 0)
@@ -69,6 +89,5 @@ namespace Microsoft.Xna.Framework.Graphics
             _dirty = 0;
         }
 
-#endif
     }
 }

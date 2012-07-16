@@ -234,6 +234,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #elif DIRECTX
 
+            // TODO: This can be much simpler now!
+
             lock (device._d3dContext)
             {
                 // Apply the shaders which will in turn set the 

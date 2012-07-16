@@ -134,7 +134,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			return b.Depth.CompareTo(a.Depth);
 		}
 		
-		public void DrawBatch ( SpriteSortMode sortMode, SamplerState samplerState)
+		public void DrawBatch(SpriteSortMode sortMode)
 		{
 			// nothing to do
 			if ( _batchItemList.Count == 0 )
@@ -206,24 +206,9 @@ namespace Microsoft.Xna.Framework.Graphics
 				{
 					FlushVertexArray( startIndex, index );
 					startIndex = index;
-                    tex = item.Texture;
-					
+                    _device.Textures[0] = tex = item.Texture;
 #if DIRECTX
                     startIndex = index = 0;
-                    _device.Textures[0] = tex;	  
-#elif OPENGL
-                    // TODO: This shows up as highly redundant state change.  We should
-                    // remove this instead do:
-                    //
-                    // GraphicsDevice.Textures[0] = tex;
-                    //
-                    // And fix TextureCollection.SetTextures() to work with GL.  This
-                    // then is unified with the DX path and removes all redundent texture
-                    // state changes.
-					GL.ActiveTexture(TextureUnit.Texture0);
-					GL.BindTexture ( TextureTarget.Texture2D, tex.glTexture );
-
-					samplerState.Activate(TextureTarget.Texture2D);
 #endif
                 }
 
@@ -232,7 +217,9 @@ namespace Microsoft.Xna.Framework.Graphics
 				_vertexArray[index++] = item.vertexTR;
 				_vertexArray[index++] = item.vertexBL;
 				_vertexArray[index++] = item.vertexBR;
-				
+
+                // Release the texture and return the item to the queue.
+                item.Texture = null;
 				_freeBatchItemQueue.Enqueue( item );
 			}
 
@@ -292,7 +279,13 @@ namespace Microsoft.Xna.Framework.Graphics
                 VertexPositionColorTexture.VertexDeclaration);
 
 #elif OPENGL
-			GL.DrawElements( BeginMode.Triangles,
+
+            // TODO: We should be using the same code here
+            // as DirectX and not working around GraphicsDevice.
+
+            _device.ApplyState();
+
+			GL.DrawElements(    BeginMode.Triangles,
 				                vertexCount/2*3,
 				                DrawElementsType.UnsignedShort,
 				                (IntPtr)(_indexHandle.AddrOfPinnedObject().ToInt64()+(start/2*3*sizeof(short))) );

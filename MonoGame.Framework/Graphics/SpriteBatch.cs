@@ -90,15 +90,16 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void End ()
 		{	
-			if (_sortMode != SpriteSortMode.Immediate) {
-				Setup ();
-			}
-			Flush ();
+			if (_sortMode != SpriteSortMode.Immediate)
+				Setup();
+
+            _batcher.DrawBatch(_sortMode);
 					
 #if OPENGL
 
-			// clear out the textures
-			graphicsDevice.Textures.Clear ();
+            // TODO: Is this needed... does XNA really null out
+            // the texture used during batching?
+			graphicsDevice.Textures[0] = null;
 
 			// unbinds shader
 			if (_effect != null) 
@@ -110,7 +111,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         }
 		
-		void Setup () 
+		void Setup() 
         {
 			graphicsDevice.BlendState = _blendState;
 			graphicsDevice.DepthStencilState = _depthStencilState;
@@ -139,11 +140,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 		
-		void Flush() 
-        {
-			_batcher.DrawBatch (_sortMode, graphicsDevice.SamplerStates[0]);
-		}
-
 		public void Draw (Texture2D texture,
 				Vector2 position,
 				Rectangle? sourceRectangle,
@@ -225,18 +221,10 @@ namespace Microsoft.Xna.Framework.Graphics
 			SpriteEffects effect,
 			float depth)
 		{
-			if (texture == null) {
+			if (texture == null)
 				throw new ArgumentException ("texture");
-			}
 
-            // texture 0 is the texture beeing draw
-            //
-            // TODO: Why are we doing this... we should be setting the
-            // texture on the batch item... it has no point here!
-            //
-			graphicsDevice.Textures [0] = texture;			
-			
-			var item = _batcher.CreateBatchItem ();
+			var item = _batcher.CreateBatchItem();
 
 			item.Depth = depth;
 			item.Texture = texture;
@@ -278,10 +266,8 @@ namespace Microsoft.Xna.Framework.Graphics
 					texCoordTL, 
 					texCoordBR);			
 			
-			if (_sortMode == SpriteSortMode.Immediate) {
-				Flush ();
-			}
-			
+			if (_sortMode == SpriteSortMode.Immediate)
+                _batcher.DrawBatch(_sortMode);
 		}
 
 		public void Draw (Texture2D texture, Vector2 position, Rectangle? sourceRectangle, Color color)

@@ -41,6 +41,18 @@
 using System;
 using System.Diagnostics;
 
+#if MONOMAC
+using MonoMac.OpenGL;
+#elif WINDOWS || LINUX
+using OpenTK.Graphics.OpenGL;
+#elif GLES
+using OpenTK.Graphics.ES20;
+using EnableCap = OpenTK.Graphics.ES20.All;
+using BlendEquationMode = OpenTK.Graphics.ES20.All;
+using BlendingFactorSrc = OpenTK.Graphics.ES20.All;
+using BlendingFactorDest = OpenTK.Graphics.ES20.All;
+#endif
+
 namespace Microsoft.Xna.Framework.Graphics
 {
 	public class BlendState : GraphicsResource
@@ -139,7 +151,26 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
 
-#if DIRECTX
+#if OPENGL
+        internal void ApplyState(GraphicsDevice device)
+        {
+            GL.Enable(EnableCap.Blend);
+
+            // Set blending mode
+            var blendMode = ColorBlendFunction.GetBlendEquationMode();
+            GL.BlendEquation(blendMode);
+
+            // Set blending function
+            var bfs = ColorSourceBlend.GetBlendFactorSrc();
+            var bfd = ColorDestinationBlend.GetBlendFactorDest();
+#if IPHONE
+			GL.BlendFunc ((All)bfs, (All)bfd);
+#else
+            GL.BlendFunc(bfs, bfd);
+#endif
+        }
+
+#elif DIRECTX
 
         internal void ApplyState(GraphicsDevice device)
         {
