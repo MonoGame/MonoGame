@@ -78,6 +78,7 @@ using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
+using Microsoft.Xna.Framework.GamerServices;
 
 namespace Microsoft.Xna.Framework
 {
@@ -111,12 +112,15 @@ namespace Microsoft.Xna.Framework
             game.Services.AddService (typeof(UIWindow), _mainWindow);
 
             _viewController = new iOSGameViewController(this);
-            _viewController.InterfaceOrientationChanged += ViewController_InterfaceOrientationChanged;
             game.Services.AddService (typeof(UIViewController), _viewController);
             Window = new iOSGameWindow (_viewController);
 
             _mainWindow.RootViewController = _viewController;
             _mainWindow.Add (_viewController.View);
+
+            _viewController.InterfaceOrientationChanged += ViewController_InterfaceOrientationChanged;
+
+            Guide.Initialise(game);
         }
 
         public override GameRunBehavior DefaultRunBehavior
@@ -160,18 +164,8 @@ namespace Microsoft.Xna.Framework
         public override void BeforeInitialize()
         {
             base.BeforeInitialize ();
-            _viewController.View.MakeCurrent ();
-            //TouchPanel.Reset();
 
-            // HACK: Because GraphicsDevice doesn't know anything, we need to
-            //       tell it the current viewport size.  Once GraphicsDevice is
-            //       capable of querying PresentationParameters
-            //       DeviceWindowHandle for the size, this will no longer be
-            //       needed.
-            var gds = (IGraphicsDeviceService)Game.Services.GetService(typeof(IGraphicsDeviceService));
-            if (gds != null && gds.GraphicsDevice != null) {
-                gds.GraphicsDevice.Viewport = new Viewport(0, 0, Window.ClientBounds.Width, Window.ClientBounds.Height);
-            }
+            _viewController.View.LayoutSubviews();
         }
 
         public override void RunLoop()

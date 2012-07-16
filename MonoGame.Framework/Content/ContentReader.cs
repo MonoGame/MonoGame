@@ -183,7 +183,7 @@ namespace Microsoft.Xna.Framework.Content
 				
                 string fullAssetPath = Path.GetFullPath(dirExtCombined);
 
-#if ANDROID
+#if ANDROID || PSS
                 string externalAssetName = fullAssetPath.Substring(fullRootPath.Length);
 #else				
                 string externalAssetName = fullAssetPath.Substring(fullRootPath.Length + 1);

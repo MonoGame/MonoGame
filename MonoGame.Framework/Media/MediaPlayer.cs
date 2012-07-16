@@ -53,9 +53,15 @@ using MonoTouch.Foundation;
 using MonoTouch.MediaPlayer;
 #endif
 
+#if WINRT
+using SharpDX.MediaFoundation;
+using SharpDX;
+using Windows.Storage;
+#endif
+
 using System.Linq;
 
-﻿namespace Microsoft.Xna.Framework.Media
+namespace Microsoft.Xna.Framework.Media
 {
     public static class MediaPlayer
     {
@@ -66,7 +72,32 @@ using System.Linq;
 		private static float _volume = 1.0f;
 		private static bool _isMuted = false;
 		private static MediaQueue _queue = new MediaQueue();
-		
+
+#if WINRT
+        private static MediaEngine _mediaEngineEx;
+
+        static MediaPlayer()
+        {            
+            MediaManager.Startup(true);
+
+            using (var factory = new MediaEngineClassFactory())
+            {
+                var mediaEngine = new MediaEngine(factory, null, MediaEngineCreateflags.Audioonly);
+                _mediaEngineEx = mediaEngine.QueryInterface<MediaEngineEx>();
+            }
+            
+            _mediaEngineEx.PlaybackEvent += MediaEngineExOnPlaybackEvent;            
+        }
+
+        private static void MediaEngineExOnPlaybackEvent(MediaEngineEvent mediaEvent, long param1, int param2)
+        {
+            if (mediaEvent == MediaEngineEvent.Ended)
+            {
+                OnSongFinishedPlaying(null, null);
+            }
+        }
+#endif
+
 		#region Properties
 		
 		public static MediaQueue Queue { get { return _queue; } }
@@ -77,22 +108,42 @@ using System.Linq;
             set
             {
 				_isMuted = value;
-				
+
+#if WINRT
+                _mediaEngineEx.Muted = value;
+#else
 				if (_queue.Count == 0)
 					return;
 				
 				var newVolume = value ? 0.0f : _volume;
-
                 _queue.SetVolume(newVolume);
+#endif
             }
         }
 
-        public static bool IsRepeating { get; set; }
+        private static bool _isRepeating;
+
+        public static bool IsRepeating 
+        {
+            get
+            {
+                return _isRepeating;
+            }
+
+            set
+            {
+                _isRepeating = value;
+
+#if WINRT
+                _mediaEngineEx.Loop = value;
+#endif
+            }
+        }
 
         public static bool IsShuffled { get; set; }
 
         public static bool IsVisualizationEnabled { get { return false; } }
-
+#if !WINRT
         public static TimeSpan PlayPosition
         {
             get
@@ -103,8 +154,11 @@ using System.Linq;
 				return _queue.ActiveSong.Position;
             }
         }
+#endif
 		
         public static MediaState State { get { return _mediaState; } }
+        public static event EventHandler<EventArgs> MediaStateChanged;
+        
 		
 #if IPHONE
 		public static bool GameHasControl 
@@ -142,22 +196,31 @@ using System.Linq;
 			{       
 				_volume = value;
 				
+#if WINRT
+                _mediaEngineEx.Volume = value;       
+#else
 				if (_queue.ActiveSong == null)
 					return;
 
-                _queue.SetVolume(_volume);
-			}
+                _queue.SetVolume(_isMuted ? 0.0f : value);
+#endif
+            }
         }
 		
 		#endregion
 		
         public static void Pause()
         {
+#if WINRT
+            _mediaEngineEx.Pause();
+#else
 			if (_queue.ActiveSong == null)
 				return;
 		
 			_queue.ActiveSong.Pause();
+#endif
 			_mediaState = MediaState.Paused;
+            if (MediaStateChanged != null) MediaStateChanged(null, EventArgs.Empty);
         }
 		
 		/// <summary>
@@ -165,17 +228,19 @@ using System.Linq;
 		/// Playback starts immediately at the beginning of the song.
 		/// </summary>
         public static void Play(Song song)
-        {			
-			_queue.Clear();
-			_numSongsInQueuePlayed = 0;
-			
-			_queue.Add(song);
-			
-			PlaySong(song);
+        {                        
+            _queue.Clear();
+            _numSongsInQueuePlayed = 0;
+            _queue.Add(song);
+            
+            PlaySong(song);
         }
 		
 		public static void Play(SongCollection collection, int index = 0)
 		{
+            _queue.Clear();
+            _numSongsInQueuePlayed = 0;
+
 			foreach(var song in collection)
 				_queue.Add(song);
 			
@@ -186,11 +251,23 @@ using System.Linq;
 		
 		private static void PlaySong(Song song)
 		{
-			song.SetEventHandler(OnSongFinishedPlaying);
-			
+#if WINRT
+            var folder = Windows.ApplicationModel.Package.Current.InstalledLocation.Path;
+            var path = folder + "\\" + song.FilePath;
+            var uri = new Uri(path);
+            var converted = uri.AbsoluteUri;
+
+            _mediaEngineEx.Source = converted;            
+            _mediaEngineEx.Load();
+            _mediaEngineEx.Play();
+
+#else
+			song.SetEventHandler(OnSongFinishedPlaying);			
 			song.Volume = _isMuted ? 0.0f : _volume;
 			song.Play();
+#endif
 			_mediaState = MediaState.Playing;
+            if (MediaStateChanged != null) MediaStateChanged(null, EventArgs.Empty);
 		}
 		
 		internal static void OnSongFinishedPlaying (object sender, EventArgs args)
@@ -204,6 +281,7 @@ using System.Linq;
 				if (!IsRepeating)
 				{
 					_mediaState = MediaState.Stopped;
+                    if (MediaStateChanged != null) MediaStateChanged(null, EventArgs.Empty);
 					return;
 				}
 			}
@@ -213,23 +291,32 @@ using System.Linq;
 
         public static void Resume()
         {
+#if WINRT
+            _mediaEngineEx.Play();            
+#else
 			if (_queue.ActiveSong == null)
 				return;
 			
 			_queue.ActiveSong.Resume();
+#endif
 			_mediaState = MediaState.Playing;
+            if (MediaStateChanged != null) MediaStateChanged(null, EventArgs.Empty);
         }
 
         public static void Stop()
         {
+#if WINRT
+            _mediaEngineEx.Source = null;
+#else
 			if (_queue.ActiveSong == null)
 				return;
 			
 			// Loop through so that we reset the PlayCount as well
 			foreach(var song in Queue.Songs)
 				_queue.ActiveSong.Stop();
-			
+#endif
 			_mediaState = MediaState.Stopped;
+            if (MediaStateChanged != null) MediaStateChanged(null, EventArgs.Empty);
 		}
 		
 		public static void MoveNext()
@@ -245,14 +332,11 @@ using System.Linq;
 		private static void NextSong(int direction)
 		{
 			var nextSong = _queue.GetNextSong(direction, IsShuffled);
-			
-			if (nextSong == null)
-			{
-				_mediaState = MediaState.Stopped;
-				return;
-			}
-			
-			nextSong.Play();
+
+            if (nextSong == null)
+                Stop();
+            else            
+                Play(nextSong);                            
 		}
     }
 }
