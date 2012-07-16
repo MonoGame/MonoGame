@@ -58,7 +58,7 @@ namespace Microsoft.Xna.Framework.Audio
 			if (_soundPlayer != null )
 			{
 				_soundPlayer.Volume = this.Volume;
-				_soundPlayer.PlaybackRate = this.Rate;
+				_soundPlayer.PlaybackRate = this.Rate + 1.0f;
 				_soundPlayer.Pan = this.Pan;
 				_soundPlayer.Loop = this.Looping;
 				_soundPlayer.Play();
@@ -89,7 +89,6 @@ namespace Microsoft.Xna.Framework.Audio
 
             this.Looping = looping;
             this.Volume = volume;
-            this.Rate = 1.0f;
         }
 
         public Sound(byte[] audiodata, float volume, bool looping)
@@ -99,7 +98,6 @@ namespace Microsoft.Xna.Framework.Audio
 
             this.Looping = looping;
             this.Volume = volume;
-            this.Rate = 1.0f;
         }
     }
 }
