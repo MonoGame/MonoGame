@@ -63,13 +63,6 @@ namespace Microsoft.Xna.Framework
             if (Paused != null)
                 Paused(this, EventArgs.Empty);
 
-            //if (Game.GraphicsDevice != null)
-            //   Game.GraphicsDevice.ResourcesLost = true;
-
-			//if (Game.Window != null && Game.Window.Parent != null && (Game.Window.Parent is FrameLayout))
-			//{				
-            //  ((FrameLayout)Game.Window.Parent).RemoveAllViews();
-			//}
         }
 
         public static event EventHandler Resumed;
@@ -83,7 +76,7 @@ namespace Microsoft.Xna.Framework
             if (deviceManager == null)
                 return;
             (deviceManager as GraphicsDeviceManager).ForceSetFullScreen();
-            //Game.Window.RequestFocus();
+            Game.Window.RequestFocus();
         }
     }
 	

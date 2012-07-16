@@ -63,7 +63,7 @@ using Microsoft.Xna.Framework.Input.Touch;
 
 namespace Microsoft.Xna.Framework
 {
-    public class AndroidGameWindow : AndroidGameView , Android.Views.View.IOnTouchListener
+    public class AndroidGameWindow : AndroidGameView , Android.Views.View.IOnTouchListener, ISurfaceHolderCallback
     {
 		private Rectangle clientBounds;
 		private Game _game;
@@ -232,7 +232,7 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Updates the screen orientation. Filters out requests for unsupported orientations.
         /// </summary>
-        internal void SetOrientation(DisplayOrientation newOrientation)
+        internal void SetOrientation(DisplayOrientation newOrientation, bool applyGraphicsChanges)
         {
             DisplayOrientation supported = GetEffectiveSupportedOrientations();
 
@@ -247,12 +247,13 @@ namespace Microsoft.Xna.Framework
                     newOrientation = DisplayOrientation.Portrait;
             }
 
+            DisplayOrientation oldOrientation = CurrentOrientation;
+
             CurrentOrientation = newOrientation;
-            if (_game.GraphicsDevice != null)
-            {
-                _game.GraphicsDevice.PresentationParameters.DisplayOrientation = newOrientation;
-            }
             TouchPanel.DisplayOrientation = newOrientation;
+
+            if (applyGraphicsChanges && oldOrientation != CurrentOrientation && _game.graphicsDeviceManager != null)
+                _game.graphicsDeviceManager.ApplyChanges();
         }
 
         private Dictionary<IntPtr, TouchLocation> _previousTouches = new Dictionary<IntPtr, TouchLocation>();
@@ -450,6 +451,21 @@ namespace Microsoft.Xna.Framework
 		public event EventHandler ClientSizeChanged;
 		public event EventHandler ScreenDeviceNameChanged;
 
+
+        void ISurfaceHolderCallback.SurfaceChanged(ISurfaceHolder holder, Android.Graphics.Format format, int width, int height)
+        {
+            base.SurfaceChanged(holder, format, width, height);
+            Android.Util.Log.Debug("MonoGame", "AndroidGameWindow.SurfaceChanged: format = " + format + ", width = " + width + ", height = " + height);
+
+            if (_game.GraphicsDevice != null)
+                _game.graphicsDeviceManager.ResetClientBounds();
+        }
+
+        void ISurfaceHolderCallback.SurfaceCreated(ISurfaceHolder holder)
+        {
+            base.SurfaceCreated(holder);
+            Android.Util.Log.Debug("MonoGame", "AndroidGameWindow.SurfaceCreated: surfaceFrame = " + holder.SurfaceFrame.ToString());
+        }
     }
 }
 

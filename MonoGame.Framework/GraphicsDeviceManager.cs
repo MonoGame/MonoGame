@@ -73,6 +73,7 @@ namespace Microsoft.Xna.Framework
 
             // Preferred buffer width/height is used to determine default supported orientations,
             // so set the default values to match Xna behaviour of landscape only by default.
+            // Note also that it's using the device window dimensions.
             _preferredBackBufferWidth = Math.Max(game.Window.ClientBounds.Height, game.Window.ClientBounds.Width);
             _preferredBackBufferHeight = Math.Min(game.Window.ClientBounds.Height, game.Window.ClientBounds.Width);
             _supportedOrientations = DisplayOrientation.Default;
@@ -92,7 +93,8 @@ namespace Microsoft.Xna.Framework
 
 			Initialize();
 			ApplyChanges();
-			
+            ResetClientBounds();
+
 			OnDeviceCreated(EventArgs.Empty);
 		}
 
@@ -154,15 +156,30 @@ namespace Microsoft.Xna.Framework
 
         public void ApplyChanges()
         {
-            _game.Window.SetSupportedOrientations(_supportedOrientations);
+            if (GraphicsDevice != null)
+            {
+                GraphicsDevice.PresentationParameters.DisplayOrientation = _game.Window.CurrentOrientation;
+
+                // Set the presentation parameters' actual buffer size to match the orientation
+                bool isLandscape = (0 != (_game.Window.CurrentOrientation & (DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight)));
+                int w = PreferredBackBufferWidth;
+                int h = PreferredBackBufferHeight;
+
+                GraphicsDevice.PresentationParameters.BackBufferWidth = isLandscape ? Math.Max(w, h) : Math.Min(w, h);
+                GraphicsDevice.PresentationParameters.BackBufferHeight = isLandscape ? Math.Min(w, h) : Math.Max(w, h);
+
+                // Trigger a change in orientation in case the supported orientations have changed
+                _game.Window.SetOrientation(_game.Window.CurrentOrientation, false);
+            }
         }
 
         private void Initialize()
         {
             // Set "full screen"  as default
             _graphicsDevice.PresentationParameters.IsFullScreen = true;
-            _graphicsDevice.PresentationParameters.BackBufferHeight = _preferredBackBufferHeight;
-            _graphicsDevice.PresentationParameters.BackBufferWidth = _preferredBackBufferWidth;
+
+            ApplyChanges();
+
             _graphicsDevice.Initialize();
 
 #if !PSS
@@ -320,8 +337,10 @@ namespace Microsoft.Xna.Framework
         internal void ResetClientBounds()
         {
 #if ANDROID
-            float preferredAspectRatio = (float)_preferredBackBufferWidth / (float)_preferredBackBufferHeight;
-            float displayAspectRatio = (float)GraphicsDevice.DisplayMode.Width / (float)GraphicsDevice.DisplayMode.Height;
+            float preferredAspectRatio = (float)GraphicsDevice.PresentationParameters.BackBufferWidth / 
+                                         (float)GraphicsDevice.PresentationParameters.BackBufferHeight;
+            float displayAspectRatio = (float)GraphicsDevice.DisplayMode.Width / 
+                                       (float)GraphicsDevice.DisplayMode.Height;
 
             if ((preferredAspectRatio > 1.0f && displayAspectRatio < 1.0f) ||
                 (preferredAspectRatio < 1.0f && displayAspectRatio > 1.0f))
@@ -339,7 +358,7 @@ namespace Microsoft.Xna.Framework
                 newClientBounds.Width = (int) (newClientBounds.Height * preferredAspectRatio);
                 newClientBounds.X = (GraphicsDevice.DisplayMode.Width - newClientBounds.Width)/2;
 
-                Game.Instance.Window.ClientBounds = newClientBounds;
+                _game.Window.ClientBounds = newClientBounds;
             }
             else if (displayAspectRatio < (preferredAspectRatio - EPSILON))
             {
@@ -347,15 +366,16 @@ namespace Microsoft.Xna.Framework
                 newClientBounds.Height = (int)(newClientBounds.Width / preferredAspectRatio);
                 newClientBounds.Y = (GraphicsDevice.DisplayMode.Height - newClientBounds.Height) / 2;
 
-                Game.Instance.Window.ClientBounds = newClientBounds;
+                _game.Window.ClientBounds = newClientBounds;
             }
             else
             {
                 newClientBounds.Width = GraphicsDevice.DisplayMode.Width;
                 newClientBounds.Height = GraphicsDevice.DisplayMode.Height;
-                Game.Instance.Window.ClientBounds = new Rectangle(0, 0, GraphicsDevice.DisplayMode.Width, GraphicsDevice.DisplayMode.Height);
+                _game.Window.ClientBounds = new Rectangle(0, 0, GraphicsDevice.DisplayMode.Width, GraphicsDevice.DisplayMode.Height);
             }
-            GraphicsDevice.Viewport = new Viewport(0, 0, newClientBounds.Width, newClientBounds.Height);
+            GraphicsDevice.Viewport = new Viewport(newClientBounds.X, newClientBounds.Y, newClientBounds.Width, newClientBounds.Height);
+            Android.Util.Log.Debug("MonoGame", "GraphicsDeviceManager.ResetClientBounds: newClientBounds=" + newClientBounds.ToString());
 #endif
         }
 
