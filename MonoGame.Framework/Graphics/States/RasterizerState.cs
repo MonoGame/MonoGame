@@ -93,7 +93,7 @@ namespace Microsoft.Xna.Framework.Graphics
             else
 				GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
 #else
-            if (state.FillMode != FillMode.Solid)
+            if (FillMode != FillMode.Solid)
                 throw new NotImplementedException();
 #endif
 
