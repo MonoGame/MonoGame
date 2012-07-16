@@ -40,6 +40,7 @@ purpose and non-infringement.
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 #if IPHONE
 using MonoTouch.Foundation;
@@ -49,6 +50,10 @@ using OpenTK.Graphics.ES11;
 #else
 using OpenTK.Graphics.ES20;
 #endif
+#elif WINDOWS || LINUX
+using OpenTK.Graphics;
+using OpenTK.Platform;
+using OpenTK;
 #endif
 
 namespace Microsoft.Xna.Framework
@@ -56,11 +61,14 @@ namespace Microsoft.Xna.Framework
     internal class Threading
     {
         static int mainThreadId;
-#if ANDROID || LINUX || WINDOWS
+#if ANDROID
         static List<Action> actions = new List<Action>();
         static Mutex actionsMutex = new Mutex();
 #elif IPHONE
         public static EAGLContext BackgroundContext;
+#elif WINDOWS || LINUX
+        public static IGraphicsContext BackgroundContext;
+        public static IWindowInfo WindowInfo;
 #endif
         static Threading()
         {
@@ -75,7 +83,7 @@ namespace Microsoft.Xna.Framework
         internal static void BlockOnUIThread(Action action)
         {
             if (action == null)
-                throw new ArgumentNullException("action cannot be null");
+                throw new ArgumentNullException("action");
 
 #if DIRECTX || PSS
             action();
@@ -94,8 +102,15 @@ namespace Microsoft.Xna.Framework
                     EAGLContext.SetCurrentContext(BackgroundContext);
                 action();
             }
+#elif WINDOWS || LINUX
+            lock (BackgroundContext)
+            {
+                if (GraphicsContext.CurrentContext != BackgroundContext)
+                    BackgroundContext.MakeCurrent(WindowInfo);
+                action();
+            }
 #else
-            System.Threading.ManualResetEventSlim resetEvent = new System.Threading.ManualResetEventSlim(false);
+            ManualResetEventSlim resetEvent = new ManualResetEventSlim(false);
 #if MONOMAC
             MonoMac.AppKit.NSApplication.SharedApplication.BeginInvokeOnMainThread(() =>
 #else
@@ -114,7 +129,7 @@ namespace Microsoft.Xna.Framework
 #endif
         }
 
-#if ANDROID || LINUX || WINDOWS
+#if ANDROID
         static void Add(Action action)
         {
             lock (actions)
