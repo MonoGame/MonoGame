@@ -186,7 +186,19 @@ namespace Microsoft.Xna.Framework
         protected virtual void Dispose(bool disposing)
         {
             if (disposing)
+            {
                 Platform.Dispose();
+
+                // Dispose loaded game components
+                var array = new IGameComponent[_components.Count];
+                _components.CopyTo(array, 0);
+                for (int i = 0; i < array.Length; i++)
+                {
+                    var disposable = array[i] as IDisposable;
+                    if (disposable != null)
+                        disposable.Dispose();
+                }
+            }
 
             _isDisposed = true;
         }
