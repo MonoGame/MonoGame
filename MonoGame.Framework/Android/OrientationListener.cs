@@ -62,7 +62,7 @@ namespace Microsoft.Xna.Framework
                 if ((AndroidGameActivity.Game.Window.GetEffectiveSupportedOrientations() & disporientation) != 0 &&
                      disporientation != AndroidGameActivity.Game.Window.CurrentOrientation)
                 {
-                    AndroidGameActivity.Game.Window.SetOrientation(disporientation);
+                    AndroidGameActivity.Game.Window.SetOrientation(disporientation, true);
                 }
                 inprogress = false;
             }

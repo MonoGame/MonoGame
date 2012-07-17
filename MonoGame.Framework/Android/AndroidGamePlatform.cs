@@ -140,6 +140,7 @@ namespace Microsoft.Xna.Framework
 
         public override bool BeforeDraw(GameTime gameTime)
         {
+            PrimaryThreadLoader.DoLoads();
             return !IsPlayingVdeo;
         }
 
@@ -151,13 +152,13 @@ namespace Microsoft.Xna.Framework
             switch (Window.Context.Resources.Configuration.Orientation)
             {
                 case Android.Content.Res.Orientation.Portrait:
-                    Window.SetOrientation(DisplayOrientation.Portrait);				
+                    Window.SetOrientation(DisplayOrientation.Portrait, false);				
                     break;
                 case Android.Content.Res.Orientation.Landscape:
-                    Window.SetOrientation(DisplayOrientation.LandscapeLeft);
+                    Window.SetOrientation(DisplayOrientation.LandscapeLeft, false);
                     break;
                 default:
-                    Window.SetOrientation(DisplayOrientation.LandscapeLeft);
+                    Window.SetOrientation(DisplayOrientation.LandscapeLeft, false);
                     break;
             }			
             base.BeforeInitialize();
@@ -204,6 +205,8 @@ namespace Microsoft.Xna.Framework
                 Accelerometer.Resume();
                 Sound.ResumeAll();
                 MediaPlayer.Resume();
+				if(!Window.IsFocused)
+		           Window.RequestFocus();
             }
         }
 
@@ -214,6 +217,7 @@ namespace Microsoft.Xna.Framework
             {
                 IsActive = false;
                 Window.Pause();
+				Window.ClearFocus();
                 Accelerometer.Pause();
                 Sound.PauseAll();
                 MediaPlayer.Pause();
