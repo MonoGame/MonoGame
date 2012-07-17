@@ -310,8 +310,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #endif // OPENGL
 
-            PresentationParameters.DisplayOrientation = TouchPanel.DisplayOrientation;
-
 #if DIRECTX
 
             CreateDeviceIndependentResources();
