@@ -82,11 +82,11 @@ namespace Microsoft.Xna.Framework.Input
 
             // analog controls
             ret.HasRightTrigger = gamepad.LeftTrigger > 0;
-            ret.HasRightXThumbStick = gamepad.RightThumbX > 0;
-            ret.HasRightYThumbStick = gamepad.RightThumbY > 0;
+            ret.HasRightXThumbStick = gamepad.RightThumbX != 0;
+            ret.HasRightYThumbStick = gamepad.RightThumbY != 0;
             ret.HasLeftTrigger = gamepad.LeftTrigger > 0;
-            ret.HasLeftXThumbStick = gamepad.LeftThumbX > 0;
-            ret.HasLeftYThumbStick = gamepad.LeftThumbY > 0;
+            ret.HasLeftXThumbStick = gamepad.LeftThumbX != 0;
+            ret.HasLeftYThumbStick = gamepad.LeftThumbY != 0;
             
             // vibration
             bool hasForceFeedback = capabilities.Flags.HasFlag(SharpDX.XInput.CapabilityFlags.FfbSupported);
