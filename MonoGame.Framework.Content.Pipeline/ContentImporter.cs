@@ -38,6 +38,7 @@
  */
 #endregion License
 
+using System;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline
 {
@@ -67,5 +68,20 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// <param name="context">Contains information for importing a game asset, such as a logger interface.</param>
         /// <returns>Resulting game asset.</returns>
         public abstract T Import(string filename, ContentImporterContext context);
+
+        /// <summary>
+        /// Called by the framework when importing a game asset. This is the method called by XNA when an asset is to be imported into an object that can be recognized by the Content Pipeline.
+        /// </summary>
+        /// <param name="filename">Name of a game asset file.</param>
+        /// <param name="context">Contains information for importing a game asset, such as a logger interface.</param>
+        /// <returns>Resulting game asset.</returns>
+        object IContentImporter.Import(string filename, ContentImporterContext context)
+        {
+            if (filename == null)
+                throw new ArgumentNullException("filename");
+            if (context == null)
+                throw new ArgumentNullException("context");
+            return Import(filename, context);
+        }
     }
 }

@@ -39,45 +39,49 @@
 #endregion License
 
 using System;
-using Microsoft.Build.Framework;
-using Microsoft.Build.Utilities;
 
-namespace Microsoft.Xna.Framework.Content.Pipeline.Tasks
+namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
     /// <summary>
-    /// Provides methods and properties for getting the names of all output content files from the content pipeline's cache file.
+    /// Provides properties for maintaining an animation.
     /// </summary>
-    public class GetLastOutputs : Task
+    public class AnimationContent : ContentItem
     {
-        /// <summary>
-        /// Gets or sets the directory containing the cache file to be retrieved.
-        /// </summary>
-        /// <value>Path of the retrieved cache file.</value>
-        [RequiredAttribute]
-        public string IntermediateDirectory { get; set; }
+        AnimationChannelDictionary channels;
+        TimeSpan duration;
 
         /// <summary>
-        /// Gets the names of the output content files. This information may be out of date if a recent build was not completed. The collection is empty if there were no outputs or no cached information was found.
+        /// Gets the collection of animation data channels. Each channel describes the movement of a single bone or rigid object.
         /// </summary>
-        /// <value>Collection of cache file names.</value>
-        [OutputAttribute]
-        public ITaskItem[] OutputContentFiles { get; internal set; }
-
-        /// <summary>
-        /// Creates a new instance of GetLastOutputs.
-        /// </summary>
-        public GetLastOutputs()
+        public AnimationChannelDictionary Channels
         {
-
+            get
+            {
+                return Channels;
+            }
         }
 
         /// <summary>
-        /// Executes the related task using MSBuild.
+        /// Gets or sets the total length of the animation.
         /// </summary>
-        /// <returns>true if the task completed successfully; false otherwise.</returns>
-        public override bool Execute()
+        public TimeSpan Duration
         {
-            throw new NotImplementedException();
+            get
+            {
+                return duration;
+            }
+            set
+            {
+                duration = value;
+            }
+        }
+
+        /// <summary>
+        /// Initializes a new instance of AnimationContent.
+        /// </summary>
+        public AnimationContent()
+        {
+            channels = new AnimationChannelDictionary();
         }
     }
 }

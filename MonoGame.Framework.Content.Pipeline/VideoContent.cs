@@ -103,6 +103,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             Filename = filename;
             // TODO: Open video and fill in properties
             // ...
+            bitsPerSecond = 0;
+            duration = TimeSpan.Zero;
+            framesPerSecond = 0.0f;
+            height = 0;
+            width = 0;
         }
 
         ~VideoContent()
