@@ -214,6 +214,7 @@
     <Compile Include="Input\ButtonState.cs" />
     <Compile Include="Input\GamePadButtons.cs" />
     <Compile Include="Input\GamePadCapabilities.cs" />
+    <Compile Include="Input\GamePadType.cs" />
     <Compile Include="Input\GamePadDPad.cs" />
     <Compile Include="Input\GamePadState.cs" />
     <Compile Include="Input\GamePadThumbSticks.cs" />
