@@ -56,6 +56,7 @@
     <Compile Include="Android\AndroidGamePlatform.cs" />
     <Compile Include="Android\Input\Mouse.cs" />
     <Compile Include="Android\OrientationListener.cs" />
+    <Compile Include="Android\ScreenReciever.cs" />
     <Compile Include="Android\TitleContainer.cs" />
     <Compile Include="Audio\AudioCategory.cs" />
     <Compile Include="Content\ContentManager.cs" />

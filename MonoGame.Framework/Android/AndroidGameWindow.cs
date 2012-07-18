@@ -63,13 +63,14 @@ using Microsoft.Xna.Framework.Input.Touch;
 
 namespace Microsoft.Xna.Framework
 {
-    public class AndroidGameWindow : AndroidGameView , Android.Views.View.IOnTouchListener
+    public class AndroidGameWindow : AndroidGameView , Android.Views.View.IOnTouchListener, ISurfaceHolderCallback
     {
 		private Rectangle clientBounds;
 		private Game _game;
         private DisplayOrientation supportedOrientations = DisplayOrientation.Default;
         private DisplayOrientation _currentOrientation;
 		private GestureDetector gesture = null;
+		private bool exiting = false;
 
         public AndroidGameWindow(Context context, Game game) : base(context)
         {
@@ -92,7 +93,12 @@ namespace Microsoft.Xna.Framework
         }
 		
 		void GameWindow_Closed(object sender,EventArgs e)
-        {        
+        {   
+			if (!exiting)
+			{
+				exiting = true;
+				_game.DoExiting();
+			}
 			try
 			{
         		_game.Exit();
@@ -101,6 +107,13 @@ namespace Microsoft.Xna.Framework
 			{
 				// just in case the game is null
 			}
+
+		}
+
+		protected override void OnLoad (EventArgs e)
+		{
+			base.OnLoad (e);			
+			MakeCurrent();
 		}
 
         public override bool OnKeyDown(Keycode keyCode, KeyEvent e)
@@ -169,14 +182,24 @@ namespace Microsoft.Xna.Framework
         }
 
         protected override void OnUpdateFrame(FrameEventArgs e)
-		{			
-			base.OnUpdateFrame(e);
+        {
+            base.OnUpdateFrame(e);
 
             Threading.Run();
 
             if (_game != null)
-			    _game.Tick();
-		}
+            {
+				if ( _game.Platform.IsActive && !ScreenReceiver.ScreenLocked) //Only call draw if an update has occured
+				{
+					_game.Tick();
+				}
+				else
+				{ 
+					_game.GraphicsDevice.Clear(Color.Black);
+					_game.GraphicsDevice.Present();
+				}
+            }
+        }
 		
 		#endregion
 		
@@ -218,7 +241,7 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Updates the screen orientation. Filters out requests for unsupported orientations.
         /// </summary>
-        internal void SetOrientation(DisplayOrientation newOrientation)
+        internal void SetOrientation(DisplayOrientation newOrientation, bool applyGraphicsChanges)
         {
             DisplayOrientation supported = GetEffectiveSupportedOrientations();
 
@@ -233,12 +256,13 @@ namespace Microsoft.Xna.Framework
                     newOrientation = DisplayOrientation.Portrait;
             }
 
+            DisplayOrientation oldOrientation = CurrentOrientation;
+
             CurrentOrientation = newOrientation;
-            if (_game.GraphicsDevice != null)
-            {
-                _game.GraphicsDevice.PresentationParameters.DisplayOrientation = newOrientation;
-            }
             TouchPanel.DisplayOrientation = newOrientation;
+
+            if (applyGraphicsChanges && oldOrientation != CurrentOrientation && _game.graphicsDeviceManager != null)
+                _game.graphicsDeviceManager.ApplyChanges();
         }
 
         private Dictionary<IntPtr, TouchLocation> _previousTouches = new Dictionary<IntPtr, TouchLocation>();
@@ -436,6 +460,21 @@ namespace Microsoft.Xna.Framework
 		public event EventHandler ClientSizeChanged;
 		public event EventHandler ScreenDeviceNameChanged;
 
+
+        void ISurfaceHolderCallback.SurfaceChanged(ISurfaceHolder holder, Android.Graphics.Format format, int width, int height)
+        {
+            base.SurfaceChanged(holder, format, width, height);
+            Android.Util.Log.Debug("MonoGame", "AndroidGameWindow.SurfaceChanged: format = " + format + ", width = " + width + ", height = " + height);
+
+            if (_game.GraphicsDevice != null)
+                _game.graphicsDeviceManager.ResetClientBounds();
+        }
+
+        void ISurfaceHolderCallback.SurfaceCreated(ISurfaceHolder holder)
+        {
+            base.SurfaceCreated(holder);
+            Android.Util.Log.Debug("MonoGame", "AndroidGameWindow.SurfaceCreated: surfaceFrame = " + holder.SurfaceFrame.ToString());
+        }
     }
 }
 
