@@ -76,6 +76,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #if DIRECTX
         VertexPositionColorTexture[] _vertexArray;
 #elif OPENGL
+        private bool[] enabledAttributes;
 		VertexPosition2ColorTexture[] _vertexArray;
 		GCHandle _vertexHandle;
 		GCHandle _indexHandle;
@@ -104,7 +105,12 @@ namespace Microsoft.Xna.Framework.Graphics
 #elif OPENGL
 			_vertexArray = new VertexPosition2ColorTexture[4*InitialVertexArraySize];
 			_vertexHandle = GCHandle.Alloc(_vertexArray,GCHandleType.Pinned);
-			_indexHandle = GCHandle.Alloc(_index,GCHandleType.Pinned);		
+			_indexHandle = GCHandle.Alloc(_index,GCHandleType.Pinned);
+
+            enabledAttributes = new bool[16];
+            enabledAttributes[GraphicsDevice.attributePosition] = true;
+            enabledAttributes[GraphicsDevice.attributeTexCoord] = true;
+            enabledAttributes[GraphicsDevice.attributeColor] = true;
 #endif
 		}
 		
@@ -160,9 +166,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
 			GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
 			
-			GL.EnableVertexAttribArray(GraphicsDevice.attributePosition);
-			GL.EnableVertexAttribArray(GraphicsDevice.attributeTexCoord);
-			GL.EnableVertexAttribArray(GraphicsDevice.attributeColor);
+            _device.SetVertexAttributeArray(enabledAttributes);
 			
 			int size = VertexPosition2ColorTexture.GetSize();
 			GL.VertexAttribPointer(GraphicsDevice.attributePosition,

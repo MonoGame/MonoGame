@@ -26,8 +26,6 @@ namespace Microsoft.Xna.Framework.Graphics
 		private VertexElement[] _elements;
         private int _vertexStride;
 
-        private static List<int> _enabledVertexAttributes = new List<int>();
-
         /// <summary>
         /// A hash value which can be used to compare declarations.
         /// </summary>
@@ -58,6 +56,15 @@ namespace Microsoft.Xna.Framework.Graphics
                 var bytes = System.Text.Encoding.UTF8.GetBytes(signature);
                 HashKey = Effect.ComputeHash(bytes);
             }
+
+            // Set the graphics device.
+            var gds = (IGraphicsDeviceService) Game.Instance.Services.GetService (
+                                                typeof (IGraphicsDeviceService));
+
+            System.Diagnostics.Debug.Assert(gds != null && gds.GraphicsDevice != null, 
+                                            "VertexDeclaration could not get the GraphicsDevice.");
+
+            graphicsDevice = gds.GraphicsDevice;
         }
 
 		private static int GetVertexStride(VertexElement[] elements)
@@ -164,19 +171,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				enabledAttributes[attributeLocation] = true;
 			}
 			
-			for (var i=0; i<16; i++) 
-            {
-    			if (enabledAttributes[i] && !_enabledVertexAttributes.Contains(i))
-                {
-                    _enabledVertexAttributes.Add(i);
-				    GL.EnableVertexAttribArray(i);
-                }
-			    else if (!enabledAttributes[i] && _enabledVertexAttributes.Contains(i))
-                {
-                    _enabledVertexAttributes.Remove(i);
-				    GL.DisableVertexAttribArray(i);
-                }
-			}
+            graphicsDevice.SetVertexAttributeArray(enabledAttributes);
 		}
 
 #endif // OPENGL

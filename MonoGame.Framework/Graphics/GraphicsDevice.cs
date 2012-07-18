@@ -160,6 +160,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if OPENGL
 
+        internal static readonly List<int> _enabledVertexAttributes = new List<int>();
+
 		// OpenGL ES2.0 attribute locations
 		internal static int attributePosition = 0; //there can be a couple positions binded
 		internal static int attributeColor = 3;
@@ -260,6 +262,23 @@ namespace Microsoft.Xna.Framework.Graphics
             set
             {
                 _activeTexture = value;
+            }
+        }
+
+        internal void SetVertexAttributeArray(bool[] attrs)
+        {
+            for(int x = 0; x < attrs.Length; x++)
+            {
+                if (attrs[x] && !_enabledVertexAttributes.Contains(x))
+                {
+                    _enabledVertexAttributes.Add(x);
+                    GL.EnableVertexAttribArray(x);
+                }
+                else if (!attrs[x] && _enabledVertexAttributes.Contains(x))
+                {
+                    _enabledVertexAttributes.Remove(x);
+                    GL.DisableVertexAttribArray(x);
+                }
             }
         }
 
