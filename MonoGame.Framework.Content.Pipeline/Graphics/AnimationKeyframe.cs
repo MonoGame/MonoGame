@@ -39,45 +39,67 @@
 #endregion License
 
 using System;
-using Microsoft.Build.Framework;
-using Microsoft.Build.Utilities;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
-namespace Microsoft.Xna.Framework.Content.Pipeline.Tasks
+namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
     /// <summary>
-    /// Provides methods and properties for getting the names of all output content files from the content pipeline's cache file.
+    /// Provides methods and properties for managing a keyframe. A keyframe describes the position of an animation channel at a single point in time.
     /// </summary>
-    public class GetLastOutputs : Task
+    public sealed class AnimationKeyframe : IComparable<AnimationKeyframe>
     {
-        /// <summary>
-        /// Gets or sets the directory containing the cache file to be retrieved.
-        /// </summary>
-        /// <value>Path of the retrieved cache file.</value>
-        [RequiredAttribute]
-        public string IntermediateDirectory { get; set; }
+        TimeSpan time;
+        Matrix transform;
 
         /// <summary>
-        /// Gets the names of the output content files. This information may be out of date if a recent build was not completed. The collection is empty if there were no outputs or no cached information was found.
+        /// Gets the time offset from the start of the animation to the position described by this keyframe.
         /// </summary>
-        /// <value>Collection of cache file names.</value>
-        [OutputAttribute]
-        public ITaskItem[] OutputContentFiles { get; internal set; }
-
-        /// <summary>
-        /// Creates a new instance of GetLastOutputs.
-        /// </summary>
-        public GetLastOutputs()
+        public TimeSpan Time
         {
-
+            get
+            {
+                return time;
+            }
         }
 
         /// <summary>
-        /// Executes the related task using MSBuild.
+        /// Gets or sets the position described by this keyframe.
         /// </summary>
-        /// <returns>true if the task completed successfully; false otherwise.</returns>
-        public override bool Execute()
+        public Matrix Transform
         {
-            throw new NotImplementedException();
+            get
+            {
+                return transform;
+            }
+            set
+            {
+                transform = value;
+            }
+        }
+
+        /// <summary>
+        /// Initializes a new instance of AnimationKeyframe with the specified time offsetand transform.
+        /// </summary>
+        /// <param name="time">Time offset of the keyframe.</param>
+        /// <param name="transform">Position of the keyframe.</param>
+        public AnimationKeyframe(TimeSpan time, Matrix transform)
+        {
+            this.time = time;
+            this.transform = transform;
+        }
+
+        /// <summary>
+        /// Compares this instance of a keyframe to another.
+        /// </summary>
+        /// <param name="other">Keyframe being compared to.</param>
+        /// <returns>Indication of their relative values.</returns>
+        public int CompareTo(AnimationKeyframe other)
+        {
+            // No sense in comparing the transform, so compare the time.
+            // This would be used for sorting keyframes in time order.
+            return time.CompareTo(other.time);
         }
     }
 }
