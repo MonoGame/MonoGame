@@ -190,11 +190,9 @@ namespace Microsoft.Xna.Framework
                 Platform.Dispose();
 
                 // Dispose loaded game components
-                var array = new IGameComponent[_components.Count];
-                _components.CopyTo(array, 0);
-                for (int i = 0; i < array.Length; i++)
+                for (int i = 0; i < _components.Count; i++)
                 {
-                    var disposable = array[i] as IDisposable;
+                    var disposable = _components[i] as IDisposable;
                     if (disposable != null)
                         disposable.Dispose();
                 }
