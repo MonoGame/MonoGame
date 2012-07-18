@@ -38,46 +38,91 @@
  */
 #endregion License
 
-using System;
-using Microsoft.Build.Framework;
-using Microsoft.Build.Utilities;
-
-namespace Microsoft.Xna.Framework.Content.Pipeline.Tasks
+namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
     /// <summary>
-    /// Provides methods and properties for getting the names of all output content files from the content pipeline's cache file.
+    /// Provides a base class for graphics types that define local coordinate systems.
     /// </summary>
-    public class GetLastOutputs : Task
+    public class NodeContent : ContentItem
     {
-        /// <summary>
-        /// Gets or sets the directory containing the cache file to be retrieved.
-        /// </summary>
-        /// <value>Path of the retrieved cache file.</value>
-        [RequiredAttribute]
-        public string IntermediateDirectory { get; set; }
+        Matrix transform;
+        NodeContent parent;
+        NodeContentCollection children;
+        AnimationContentDictionary animations;
 
         /// <summary>
-        /// Gets the names of the output content files. This information may be out of date if a recent build was not completed. The collection is empty if there were no outputs or no cached information was found.
+        /// Gets the value of the local Transform property, multiplied by the AbsoluteTransform of the parent.
         /// </summary>
-        /// <value>Collection of cache file names.</value>
-        [OutputAttribute]
-        public ITaskItem[] OutputContentFiles { get; internal set; }
-
-        /// <summary>
-        /// Creates a new instance of GetLastOutputs.
-        /// </summary>
-        public GetLastOutputs()
+        public Matrix AbsoluteTransform
         {
-
+            get
+            {
+                if (parent != null)
+                    return transform * parent.AbsoluteTransform;
+                return transform;
+            }
         }
 
         /// <summary>
-        /// Executes the related task using MSBuild.
+        /// Gets the set of animations belonging to this node.
         /// </summary>
-        /// <returns>true if the task completed successfully; false otherwise.</returns>
-        public override bool Execute()
+        public AnimationContentDictionary Animations
         {
-            throw new NotImplementedException();
+            get
+            {
+                return animations;
+            }
+        }
+
+        /// <summary>
+        /// Gets the children of the NodeContent object.
+        /// </summary>
+        public NodeContentCollection Children
+        {
+            get
+            {
+                return children;
+            }
+        }
+
+        /// <summary>
+        /// Gets the parent of this NodeContent object.
+        /// </summary>
+        public NodeContent Parent
+        {
+            get
+            {
+                return parent;
+            }
+            set
+            {
+                parent = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets the transform matrix of the scene.
+        /// The transform matrix defines a local coordinate system for the content in addition to any children of this object.
+        /// </summary>
+        public Matrix Transform
+        {
+            get
+            {
+                return transform;
+            }
+            set
+            {
+                transform = value;
+            }
+        }
+
+        /// <summary>
+        /// Creates an instance of NodeContent.
+        /// </summary>
+        public NodeContent()
+        {
+            children = new NodeContentCollection(this);
+            animations = new AnimationContentDictionary();
         }
     }
 }
