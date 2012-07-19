@@ -59,7 +59,11 @@
     <Compile Include="Graphics\AnimationContent.cs" />
     <Compile Include="Graphics\AnimationContentDictionary.cs" />
     <Compile Include="Graphics\AnimationKeyframe.cs" />
+    <Compile Include="Graphics\BoneContent.cs" />
+    <Compile Include="Graphics\BoneWeight.cs" />
+    <Compile Include="Graphics\BoneWeightCollection.cs" />
     <Compile Include="Graphics\EffectContent.cs" />
+    <Compile Include="Graphics\FontDescription.cs" />
     <Compile Include="Graphics\NodeContent.cs" />
     <Compile Include="Graphics\NodeContentCollection.cs" />
     <Compile Include="IContentImporter.cs" />
