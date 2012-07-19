@@ -262,6 +262,24 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 #endif
 		}
+
+        private bool _isDisposed = false;
+        public void Dispose()
+        {
+            if (_isDisposed)
+                return;
+#if OPENGL
+
+            if (_indexHandle.IsAllocated)
+                _indexHandle.Free();
+
+            if (_vertexHandle.IsAllocated)
+                _vertexHandle.Free();
+#endif
+            _isDisposed = true;
+        }
+
+
 	}
 }
 

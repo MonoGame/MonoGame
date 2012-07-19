@@ -367,6 +367,22 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			spriteFont.DrawInto (this, text, position, color, rotation, origin, scale, effect, depth);
 		}
+
+        private bool _isDisposed = false;
+        public override void Dispose()
+        {
+            if (_isDisposed)
+                return;
+
+            _batcher.Dispose();
+
+            spriteEffect.Dispose();
+            spriteEffect = null;
+
+            _isDisposed = true;
+
+            base.Dispose();
+        }
 	}
 }
 
