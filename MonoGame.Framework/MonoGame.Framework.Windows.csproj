@@ -37,6 +37,7 @@
     <WarningLevel>4</WarningLevel>
     <DefineConstants>TRACE;WINDOWS;OPENGL</DefineConstants>
     <PlatformTarget>x86</PlatformTarget>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -80,12 +81,6 @@
     <DefineConstants>TRACE;WINDOWS;OPENGL</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="GamepadBridge">
-      <HintPath>..\ThirdParty\GamepadConfig\GamepadBridge.dll</HintPath>
-    </Reference>
-    <Reference Include="GamepadConfigControls">
-      <HintPath>..\ThirdParty\GamepadConfig\GamepadConfigControls.dll</HintPath>
-    </Reference>
     <Reference Include="OpenTK, Version=1.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
       <HintPath>..\ThirdParty\Libs\OpenTK.dll</HintPath>
     </Reference>
@@ -97,7 +92,8 @@
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Drawing" />
-    <Reference Include="Tao.Sdl">
+    <Reference Include="Tao.Sdl, Version=1.2.13.0, Culture=neutral, PublicKeyToken=9c7a200e36c0094e, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\ThirdParty\GamepadConfig\Tao.Sdl.dll</HintPath>
     </Reference>
   </ItemGroup>
@@ -123,8 +119,16 @@
     <Compile Include="Content\ContentReaders\VertexDeclarationReader.cs" />
     <Compile Include="Content\ResourceContentManager.cs" />
     <Compile Include="Desktop\Audio\SoundEffectInstance.cs" />
+    <Compile Include="Desktop\Input\Axis.cs" />
+    <Compile Include="Desktop\Input\Capabilities.cs" />
+    <Compile Include="Desktop\Input\DPad.cs" />
     <Compile Include="Desktop\Input\GamePad.cs" />
+    <Compile Include="Desktop\Input\Input.cs" />
+    <Compile Include="Desktop\Input\Joystick.cs" />
     <Compile Include="Desktop\Input\Mouse.cs" />
+    <Compile Include="Desktop\Input\PadConfig.cs" />
+    <Compile Include="Desktop\Input\Settings.cs" />
+    <Compile Include="Desktop\Input\Stick.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="GamePlatform.cs" />
     <Compile Include="GamerServices\GamerServicesDispatcher.cs" />
@@ -132,20 +136,15 @@
     <Compile Include="Graphics\CubeMapFace.cs" />
     <Compile Include="Graphics\DisplayMode.cs" />
     <Compile Include="Graphics\Effect\AlphaTestEffect.cs" />
+    <Compile Include="Graphics\Effect\ConstantBuffer.cs" />
     <Compile Include="Graphics\Effect\DualTextureEffect.cs" />
-    <Compile Include="Graphics\Effect\DXEffectObject.cs" />
-    <Compile Include="Graphics\Effect\DXExpression.cs" />
-    <Compile Include="Graphics\Effect\DXHelper.cs" />
-    <Compile Include="Graphics\Effect\DXPreshader.cs" />
-    <Compile Include="Graphics\Effect\DXShader.cs" />
+    <Compile Include="Graphics\Effect\Shader.cs" />
     <Compile Include="Graphics\Effect\Effect.cs" />
     <Compile Include="Graphics\Effect\EffectAnnotation.cs" />
     <Compile Include="Graphics\Effect\EffectAnnotationCollection.cs" />
     <Compile Include="Graphics\Effect\EffectHelpers.cs" />
     <Compile Include="Graphics\Effect\EffectPass.cs" />
     <Compile Include="Graphics\Effect\EnvironmentMapEffect.cs" />
-    <Compile Include="Graphics\Effect\GLSLOptimizer.cs" />
-    <Compile Include="Graphics\Effect\MojoShader.cs" />
     <Compile Include="Graphics\Effect\SkinnedEffect.cs" />
     <Compile Include="Graphics\GraphicsAdapter.cs" />
     <Compile Include="Graphics\GraphicsDevice.cs" />
@@ -168,7 +167,6 @@
     <Compile Include="Graphics\RenderTarget2D.cs" />
     <Compile Include="Graphics\SpriteBatch.cs" />
     <Compile Include="Graphics\SpriteBatcher.cs" />
-    <Compile Include="Graphics\States\GLStateManager.cs" />
     <Compile Include="Graphics\StencilOperation.cs" />
     <Compile Include="Graphics\Texture2D.cs" />
     <Compile Include="Graphics\TextureCube.cs" />
@@ -178,11 +176,14 @@
     <Compile Include="Graphics\Vertices\IndexElementSize.cs" />
     <Compile Include="Graphics\Vertices\VertexBuffer.cs" />
     <Compile Include="Graphics\Vertices\VertexDeclaration.cs" />
+    <Compile Include="Graphics\Vertices\VertexDeclarationCache.cs" />
     <Compile Include="Graphics\Vertices\VertexPositionColorTexture.cs" />
     <Compile Include="Input\GamePadDeadZone.cs" />
     <Compile Include="Input\Keyboard.cs" />
     <Compile Include="Input\MouseState.cs" />
+    <Compile Include="Input\Touch\TouchInfo.cs" />
     <Compile Include="LaunchParameters.cs" />
+    <Compile Include="Media\VideoSoundtrackType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Audio\AudioChannels.cs" />
     <Compile Include="Audio\AudioEmitter.cs" />
@@ -254,12 +255,9 @@
     <Compile Include="Graphics\Effect\EffectParameterCollection.cs" />
     <Compile Include="Graphics\Effect\EffectParameterType.cs" />
     <Compile Include="Graphics\Effect\EffectPassCollection.cs" />
-    <Compile Include="Graphics\Effect\EffectPool.cs" />
     <Compile Include="Graphics\Effect\EffectTechnique.cs" />
     <Compile Include="Graphics\Effect\EffectTechniqueCollection.cs" />
     <Compile Include="Graphics\Effect\SpriteEffect.cs" />
-    <Compile Include="Graphics\Effect\GLSLEffectObject.cs" />
-    <Compile Include="Graphics\Effect\GLSLShader.cs" />
     <Compile Include="Graphics\ImageEx.cs" />
     <Compile Include="Graphics\PackedVector\IPackedVector.cs" />
     <Compile Include="Graphics\PackedVector\Short2.cs" />
@@ -291,6 +289,7 @@
     <Compile Include="Graphics\Vertices\VertexPositionNormalTexture.cs" />
     <Compile Include="Graphics\Vertices\VertexPositionTexture.cs" />
     <Compile Include="Media\MediaPlayer.cs" />
+    <Compile Include="Media\MediaQueue.cs" />
     <Compile Include="Media\MediaSourceType.cs" />
     <Compile Include="Media\MediaState.cs" />
     <Compile Include="Media\Playlist.cs" />
@@ -404,7 +403,6 @@
     <Compile Include="Content\ContentReaders\PlaneReader.cs" />
     <Compile Include="Content\ContentReaders\QuaternionReader.cs" />
     <Compile Include="Content\ContentReaders\Vector4Reader.cs" />
-    <Compile Include="Graphics\BatchItem.cs" />
     <Compile Include="Graphics\States\Blend.cs" />
     <Compile Include="Graphics\States\BlendFunction.cs" />
     <Compile Include="Graphics\States\BlendState.cs" />
@@ -419,7 +417,6 @@
     <Compile Include="Graphics\IGraphicsDeviceService.cs" />
     <Compile Include="Graphics\MultiSampleType.cs" />
     <Compile Include="Graphics\RenderTargetUsage.cs" />
-    <Compile Include="Graphics\ResolveTexture2D.cs" />
     <Compile Include="Graphics\ResourceType.cs" />
     <Compile Include="Graphics\SetDataOptions.cs" />
     <Compile Include="Graphics\SpriteBatchItem.cs" />
@@ -472,67 +469,11 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Graphics\Effect\AlphaTestEffect.bin" />
-    <EmbeddedResource Include="Graphics\Effect\BasicEffect.bin" />
-    <EmbeddedResource Include="Graphics\Effect\DualTextureEffect.bin" />
-    <EmbeddedResource Include="Graphics\Effect\EnvironmentMapEffect.bin" />
-    <EmbeddedResource Include="Graphics\Effect\SkinnedEffect.bin" />
-    <EmbeddedResource Include="Graphics\Effect\SpriteEffect.bin" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\PSBasic.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\PSBasicNoFog.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\PSBasicPixelLighting.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\PSBasicPixelLightingTx.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\PSBasicTx.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\PSBasicTxNoFog.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\PSBasicVertexLighting.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\PSBasicVertexLightingNoFog.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\PSBasicVertexLightingTx.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\PSBasicVertexLightingTxNoFog.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\VSBasic.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\VSBasicNoFog.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\VSBasicOneLight.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\VSBasicOneLightTx.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\VSBasicOneLightTxVc.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\VSBasicOneLightVc.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\VSBasicPixelLighting.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\VSBasicPixelLightingTx.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\VSBasicPixelLightingTxVc.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\VSBasicPixelLightingVc.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\VSBasicTx.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\VSBasicTxNoFog.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\VSBasicTxVc.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\VSBasicTxVcNoFog.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\VSBasicVc.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\VSBasicVcNoFog.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\VSBasicVertexLighting.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\VSBasicVertexLightingTx.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\VSBasicVertexLightingTxVc.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect\VSBasicVertexLightingVc.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\DualTextureEffect\PSDualTexture.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\DualTextureEffect\PSDualTextureNoFog.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\DualTextureEffect\VSDualTexture.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\DualTextureEffect\VSDualTextureNoFog.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\DualTextureEffect\VSDualTextureVc.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\DualTextureEffect\VSDualTextureVcNoFog.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\SpriteEffect\PSSprite.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\SpriteEffect\VSSprite.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect\PSAlphaTestEqNe.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect\PSAlphaTestEqNeNoFog.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect\PSAlphaTestLtGt.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect\PSAlphaTestLtGtNoFog.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect\VSAlphaTest.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect\VSAlphaTestNoFog.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect\VSAlphaTestVc.glsl" />
-    <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect\VSAlphaTestVcNoFog.glsl" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\ThirdParty\Libs\libmojoshader_64.dll">
-      <Link>libmojoshader_64.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-	<None Include="..\ThirdParty\Libs\libmojoshader_32.dll">
-      <Link>libmojoshader_32.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect.ogl.mgfxo" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect.ogl.mgfxo" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\SpriteEffect.ogl.mgfxo" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\DualTextureEffect.ogl.mgfxo" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\EnvironmentMapEffect.ogl.mgfxo" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\SkinnedEffect.ogl.mgfxo" />
   </ItemGroup>
 </Project>

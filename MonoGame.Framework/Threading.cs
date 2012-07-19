@@ -40,15 +40,20 @@ purpose and non-infringement.
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
-#if ANDROID
-using OpenTK.Graphics;
-using OpenTK.Platform;
-#endif
 #if IPHONE
 using MonoTouch.Foundation;
 using MonoTouch.OpenGLES;
+#if ES11
+using OpenTK.Graphics.ES11;
+#else
 using OpenTK.Graphics.ES20;
+#endif
+#elif WINDOWS || LINUX
+using OpenTK.Graphics;
+using OpenTK.Platform;
+using OpenTK;
 #endif
 
 namespace Microsoft.Xna.Framework
@@ -56,47 +61,98 @@ namespace Microsoft.Xna.Framework
     internal class Threading
     {
         static int mainThreadId;
-#if IPHONE
-		public static EAGLContext BackgroundContext;
-#elif ANDROID
-        public static GraphicsContext BackgroundContext;
+#if ANDROID
+        static List<Action> actions = new List<Action>();
+        static Mutex actionsMutex = new Mutex();
+#elif IPHONE
+        public static EAGLContext BackgroundContext;
+#elif WINDOWS || LINUX
+        public static IGraphicsContext BackgroundContext;
         public static IWindowInfo WindowInfo;
 #endif
-        static Mutex contextMutex = new Mutex();
-
         static Threading()
         {
             mainThreadId = Thread.CurrentThread.ManagedThreadId;
         }
 
         /// <summary>
-        /// To be called prior to any GL calls that may happen on a secondary thread. If called on a A shared context
+        /// Runs the given action on the UI thread and blocks the current thread while the action is running.
+        /// If the current thread is the UI thread, the action will run immediately.
         /// </summary>
-        internal static void Begin()
+        /// <param name="action">The action to be run on the UI thread</param>
+        internal static void BlockOnUIThread(Action action)
         {
-            if (mainThreadId != Thread.CurrentThread.ManagedThreadId)
-            {
-                contextMutex.WaitOne();
-#if IPHONE
-			    if (EAGLContext.CurrentContext != BackgroundContext)
-				    EAGLContext.SetCurrentContext(BackgroundContext);
-#elif ANDROID
-                // FIXME: To be implemented
-                throw new NotImplementedException("Threaded creation of GPU resources is not currently supported on Android");
+            if (action == null)
+                throw new ArgumentNullException("action");
+
+#if DIRECTX || PSS
+            action();
 #else
-                // FIXME: To be implemented
-                throw new NotImplementedException("Threaded creation of GPU resources is not currently supported on this platform");
+            // If we are already on the UI thread, just call the action and be done with it
+            if (mainThreadId == Thread.CurrentThread.ManagedThreadId)
+            {
+                action();
+                return;
+            }
+
+#if IPHONE
+            lock (BackgroundContext)
+            {
+                if (EAGLContext.CurrentContext != BackgroundContext)
+                    EAGLContext.SetCurrentContext(BackgroundContext);
+                action();
+            }
+#elif WINDOWS || LINUX
+            lock (BackgroundContext)
+            {
+                if (GraphicsContext.CurrentContext != BackgroundContext)
+                    BackgroundContext.MakeCurrent(WindowInfo);
+                action();
+            }
+#else
+            ManualResetEventSlim resetEvent = new ManualResetEventSlim(false);
+#if MONOMAC
+            MonoMac.AppKit.NSApplication.SharedApplication.BeginInvokeOnMainThread(() =>
+#else
+            Add(() =>
 #endif
+            {
+#if ANDROID
+                if (!Game.Instance.Window.GraphicsContext.IsCurrent)
+                    Game.Instance.Window.MakeCurrent();
+#endif
+                action();
+                resetEvent.Set();
+            });
+            resetEvent.Wait();
+#endif
+#endif
+        }
+
+#if ANDROID
+        static void Add(Action action)
+        {
+            lock (actions)
+            {
+                actions.Add(action);
             }
         }
 
         /// <summary>
-        /// To be called after the GL calls that may happen on a secondary thread.
+        /// Runs all pending actions.  Must be called from the UI thread.
         /// </summary>
-        internal static void End()
+        internal static void Run()
         {
-            if (mainThreadId != Thread.CurrentThread.ManagedThreadId)
-                contextMutex.ReleaseMutex();
+            System.Diagnostics.Debug.Assert(mainThreadId == Thread.CurrentThread.ManagedThreadId, "Threading.Run must be called from the UI thread");
+            lock (actions)
+            {
+                foreach (Action action in actions)
+                {
+                    action();
+                }
+                actions.Clear();
+            }
         }
+#endif
     }
 }

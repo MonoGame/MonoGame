@@ -39,167 +39,305 @@ purpose and non-infringement.
 #endregion License
 
 using System;
+
+#if IPHONE
+using MonoTouch.AudioToolbox;
+#endif
+
 using Microsoft.Xna.Framework.Audio;
 
-﻿namespace Microsoft.Xna.Framework.Media
+#if IPHONE
+using MonoTouch.AudioToolbox;
+using MonoTouch.AVFoundation;
+using MonoTouch.Foundation;
+using MonoTouch.MediaPlayer;
+#endif
+
+#if WINRT
+using SharpDX.MediaFoundation;
+using SharpDX;
+using Windows.Storage;
+#endif
+
+using System.Linq;
+
+namespace Microsoft.Xna.Framework.Media
 {
     public static class MediaPlayer
     {
-		private static Song _song = null;
+		// Need to hold onto this to keep track of how many songs
+		// have played when in shuffle mode
+		private static int _numSongsInQueuePlayed = 0;
 		private static MediaState _mediaState = MediaState.Stopped;
 		private static float _volume = 1.0f;
-		private static bool _looping = true;
+		private static bool _isMuted = false;
+		private static MediaQueue _queue = new MediaQueue();
+
+#if WINRT
+        private static MediaEngine _mediaEngineEx;
+
+        static MediaPlayer()
+        {            
+            MediaManager.Startup(true);
+
+            using (var factory = new MediaEngineClassFactory())
+            {
+                var mediaEngine = new MediaEngine(factory, null, MediaEngineCreateflags.Audioonly);
+                _mediaEngineEx = mediaEngine.QueryInterface<MediaEngineEx>();
+            }
+            
+            _mediaEngineEx.PlaybackEvent += MediaEngineExOnPlaybackEvent;            
+        }
+
+        private static void MediaEngineExOnPlaybackEvent(MediaEngineEvent mediaEvent, long param1, int param2)
+        {
+            if (mediaEvent == MediaEngineEvent.Ended)
+            {
+                OnSongFinishedPlaying(null, null);
+            }
+        }
+#endif
+
+		#region Properties
 		
-        public static void Pause()
+		public static MediaQueue Queue { get { return _queue; } }
+		
+		public static bool IsMuted
         {
-			if (_song != null)
-			{
-				_song.Pause();
-				_mediaState = MediaState.Paused;
-			}			
-        }
-
-        public static void Play(Song song)
-        {
-			if ( song != null )
-			{
-				_song = song;
-				_song.Volume = _volume;
-				_song.Loop = _looping;
-				_song.Play();
-				_mediaState = MediaState.Playing;
-			}
-        }
-
-        public static void Resume()
-        {
-			if (_song != null)
-			{
-				_song.Resume();
-				_mediaState = MediaState.Playing;
-			}					
-        }
-
-        public static void Stop()
-        {
-			if (_song != null)
-			{
-				_song.Stop();
-				_mediaState = MediaState.Stopped;
-			}
-        }
-
-        public static bool IsMuted
-        {
-            get
-            {
-				if (_song != null)
-				{
-					return _song.Volume == 0.0f;
-				}
-				else
-				{
-					return false;
-				}
-            }
+            get { return _isMuted; }
             set
             {
-				if (_song != null) 
-				{
-					if (value)
-					{
-						_song.Volume = 0.0f;
-					}
-					else 
-					{
-						_song.Volume = _volume;
-					}
-				}
+				_isMuted = value;
+
+#if WINRT
+                _mediaEngineEx.Muted = value;
+#else
+				if (_queue.Count == 0)
+					return;
+				
+				var newVolume = value ? 0.0f : _volume;
+                _queue.SetVolume(newVolume);
+#endif
             }
         }
 
-        public static bool IsRepeating
+        private static bool _isRepeating;
+
+        public static bool IsRepeating 
         {
             get
             {
-				if (_song != null)
-				{
-					return _song.Loop;
-				}
-				else
-				{
-					return false;
-				}
+                return _isRepeating;
             }
+
             set
             {
-				_looping = value;
-				if(_song != null) _song.Loop = value;
+                _isRepeating = value;
+
+#if WINRT
+                _mediaEngineEx.Loop = value;
+#endif
             }
         }
 
-        public static bool IsShuffled
-        {
-            get
-            {
-				return false;
-            }
-        }
+        public static bool IsShuffled { get; set; }
 
-        public static bool IsVisualizationEnabled
-        {
-            get
-            {
-				return false;
-            }
-        }
-
+        public static bool IsVisualizationEnabled { get { return false; } }
+#if !WINRT
         public static TimeSpan PlayPosition
         {
             get
             {
-				if (_song != null)
-				{
-					return _song.Position;
-				}
-				else
-				{
-					return new TimeSpan(0);
-				}
+				if (_queue.ActiveSong == null)
+					return TimeSpan.Zero;
+				
+				return _queue.ActiveSong.Position;
             }
         }
-
-        public static MediaState State
-        {
-            get
-            {
-				return _mediaState;
-            }
-        }
+#endif
 		
-		public static bool GameHasControl
-        {
-            get
-            {
-            	return true;
-			}
+        public static MediaState State { get { return _mediaState; } }
+        public static event EventHandler<EventArgs> MediaStateChanged;
+        
+		
+#if IPHONE
+		public static bool GameHasControl 
+		{ 
+			get 
+			{ 
+				var musicPlayer = MPMusicPlayerController.iPodMusicPlayer;
+				
+				if (musicPlayer == null)
+					return true;
+				
+				// TODO: Research the Interrupted state and see if it's valid to
+				// have control at that time.
+				
+				// Note: This will throw a bunch of warnings/output to the console
+				// if running in the simulator. This is a known issue:
+				// http://forums.macrumors.com/showthread.php?t=689102
+				if (musicPlayer.PlaybackState == MPMusicPlaybackState.Playing || 
+				 	musicPlayer.PlaybackState == MPMusicPlaybackState.SeekingForward ||
+				    musicPlayer.PlaybackState == MPMusicPlaybackState.SeekingBackward)
+				return false;
+				
+				return true;
+			} 
 		}
+#else
+		public static bool GameHasControl { get { return true; } }
+#endif
+		
 
         public static float Volume
         {
-            get
-            {
-            	return _volume;
-			}
-            set
-            {         
-				if (_song != null)
+            get { return _volume; }
+			set 
+			{       
+				_volume = value;
+				
+#if WINRT
+                _mediaEngineEx.Volume = value;       
+#else
+				if (_queue.ActiveSong == null)
+					return;
+
+                _queue.SetVolume(_isMuted ? 0.0f : value);
+#endif
+            }
+        }
+		
+		#endregion
+		
+        public static void Pause()
+        {
+#if WINRT
+            _mediaEngineEx.Pause();
+#else
+			if (_queue.ActiveSong == null)
+				return;
+		
+			_queue.ActiveSong.Pause();
+#endif
+			_mediaState = MediaState.Paused;
+            if (MediaStateChanged != null) MediaStateChanged(null, EventArgs.Empty);
+        }
+		
+		/// <summary>
+		/// Play clears the current playback queue, and then queues up the specified song for playback. 
+		/// Playback starts immediately at the beginning of the song.
+		/// </summary>
+        public static void Play(Song song)
+        {                        
+            _queue.Clear();
+            _numSongsInQueuePlayed = 0;
+            _queue.Add(song);
+            
+            PlaySong(song);
+        }
+		
+		public static void Play(SongCollection collection, int index = 0)
+		{
+            _queue.Clear();
+            _numSongsInQueuePlayed = 0;
+
+			foreach(var song in collection)
+				_queue.Add(song);
+			
+			_queue.ActiveSongIndex = index;
+			
+			PlaySong(_queue.ActiveSong);
+		}
+		
+		private static void PlaySong(Song song)
+		{
+#if WINRT
+            var folder = Windows.ApplicationModel.Package.Current.InstalledLocation.Path;
+            var path = folder + "\\" + song.FilePath;
+            var uri = new Uri(path);
+            var converted = uri.AbsoluteUri;
+
+            _mediaEngineEx.Source = converted;            
+            _mediaEngineEx.Load();
+            _mediaEngineEx.Play();
+
+#else
+			song.SetEventHandler(OnSongFinishedPlaying);			
+			song.Volume = _isMuted ? 0.0f : _volume;
+			song.Play();
+#endif
+			_mediaState = MediaState.Playing;
+            if (MediaStateChanged != null) MediaStateChanged(null, EventArgs.Empty);
+		}
+		
+		internal static void OnSongFinishedPlaying (object sender, EventArgs args)
+		{
+			// TODO: Check args to see if song sucessfully played
+			_numSongsInQueuePlayed++;
+			
+			if (_numSongsInQueuePlayed >= _queue.Count)
+			{
+				_numSongsInQueuePlayed = 0;
+				if (!IsRepeating)
 				{
-					_volume = value;
-					_song.Volume = value;
+					_mediaState = MediaState.Stopped;
+                    if (MediaStateChanged != null) MediaStateChanged(null, EventArgs.Empty);
+					return;
 				}
 			}
+			
+			MoveNext();
+		}
+
+        public static void Resume()
+        {
+#if WINRT
+            _mediaEngineEx.Play();            
+#else
+			if (_queue.ActiveSong == null)
+				return;
+			
+			_queue.ActiveSong.Resume();
+#endif
+			_mediaState = MediaState.Playing;
+            if (MediaStateChanged != null) MediaStateChanged(null, EventArgs.Empty);
         }
+
+        public static void Stop()
+        {
+#if WINRT
+            _mediaEngineEx.Source = null;
+#else
+			if (_queue.ActiveSong == null)
+				return;
+			
+			// Loop through so that we reset the PlayCount as well
+			foreach(var song in Queue.Songs)
+				_queue.ActiveSong.Stop();
+#endif
+			_mediaState = MediaState.Stopped;
+            if (MediaStateChanged != null) MediaStateChanged(null, EventArgs.Empty);
+		}
+		
+		public static void MoveNext()
+		{
+			NextSong(1);
+		}
+		
+		public static void MovePrevious()
+		{
+			NextSong(-1);
+		}
+		
+		private static void NextSong(int direction)
+		{
+			var nextSong = _queue.GetNextSong(direction, IsShuffled);
+
+            if (nextSong == null)
+                Stop();
+            else            
+                Play(nextSong);                            
+		}
     }
 }
 

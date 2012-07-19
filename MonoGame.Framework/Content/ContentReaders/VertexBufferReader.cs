@@ -38,7 +38,7 @@ namespace Microsoft.Xna.Framework.Content
             var vertexCount = (int)input.ReadUInt32();
             var data = input.ReadBytes(vertexCount * declaration.VertexStride);
 
-            var buffer = new VertexBuffer( input.GraphicsDevice, declaration, vertexCount, BufferUsage.WriteOnly );
+            var buffer = new VertexBuffer( input.GraphicsDevice, declaration, vertexCount, BufferUsage.None );
             buffer.SetData( data );
             return buffer;
         }

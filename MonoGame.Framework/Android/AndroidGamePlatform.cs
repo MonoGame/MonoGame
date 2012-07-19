@@ -79,6 +79,7 @@ using Android.Views;
 using Android.Widget;
 
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Media;
 
@@ -131,26 +132,33 @@ namespace Microsoft.Xna.Framework
                 _initialized = true;				
             }
 
+            // Let the touch panel update states.
+            TouchPanel.UpdateState();
+
             return true;
         }
 
         public override bool BeforeDraw(GameTime gameTime)
         {
+            PrimaryThreadLoader.DoLoads();
             return !IsPlayingVdeo;
         }
 
         public override void BeforeInitialize()
         {
+            // TODO: Determine whether device natural orientation is Portrait or Landscape for OrientationListener
+            //SurfaceOrientation currentOrient = Game.Activity.WindowManager.DefaultDisplay.Rotation;
+
             switch (Window.Context.Resources.Configuration.Orientation)
             {
                 case Android.Content.Res.Orientation.Portrait:
-                    Window.SetOrientation(DisplayOrientation.Portrait);				
+                    Window.SetOrientation(DisplayOrientation.Portrait, false);				
                     break;
                 case Android.Content.Res.Orientation.Landscape:
-                    Window.SetOrientation(DisplayOrientation.LandscapeLeft);
+                    Window.SetOrientation(DisplayOrientation.LandscapeLeft, false);
                     break;
                 default:
-                    Window.SetOrientation(DisplayOrientation.LandscapeLeft);
+                    Window.SetOrientation(DisplayOrientation.LandscapeLeft, false);
                     break;
             }			
             base.BeforeInitialize();
@@ -161,8 +169,8 @@ namespace Microsoft.Xna.Framework
             // Get the Accelerometer going
             Accelerometer.SetupAccelerometer();
 
-            Window.Run(1.0 / Game.TargetElapsedTime.TotalSeconds);
-            //Window.Pause();
+            // Run it as fast as we can to allow for more response on threaded GPU resource creation
+            Window.Run();
 
             return false;
         }
@@ -197,6 +205,8 @@ namespace Microsoft.Xna.Framework
                 Accelerometer.Resume();
                 Sound.ResumeAll();
                 MediaPlayer.Resume();
+				if(!Window.IsFocused)
+		           Window.RequestFocus();
             }
         }
 
@@ -207,6 +217,7 @@ namespace Microsoft.Xna.Framework
             {
                 IsActive = false;
                 Window.Pause();
+				Window.ClearFocus();
                 Accelerometer.Pause();
                 Sound.PauseAll();
                 MediaPlayer.Pause();
@@ -225,11 +236,6 @@ namespace Microsoft.Xna.Framework
 #endif
 		}
 		
-		public override void ResetElapsedTime ()
-		{
-			this.Window.ResetElapsedTime();			
-		}
-
         public override void Present()
         {
             try

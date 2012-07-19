@@ -46,26 +46,76 @@ using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-	// Collection of SamplerState objects. 
-	// http://msdn.microsoft.com/en-us/library/microsoft.xna.framework.graphics.samplerstatecollection.aspx
-	public sealed class SamplerStateCollection
+
+    public sealed class SamplerStateCollection
 	{
-		// Since I am not sure how these get initialized
-		//  for now I will just allocate a max amount so 
-		//  there are no exceptions
-		List<SamplerState> _samplers = new List<SamplerState> (20);
+        private SamplerState[] _samplers;
+
+        private int _dirty;
+
+		internal SamplerStateCollection( int maxSamplers )
+        {
+            _samplers = new SamplerState[maxSamplers];
+
+            for (var i = 0; i < maxSamplers; i++)
+                _samplers[i] = SamplerState.LinearWrap;
+
+            _dirty = int.MaxValue;
+        }
 		
-		internal SamplerStateCollection () : this(20) {}
-		
-		internal SamplerStateCollection (int initMax)
-		{
-			for (int x = 0; x<initMax; x++) {
-				_samplers.Add(SamplerState.LinearWrap);
-			}
+		public SamplerState this [int index] 
+        {
+			get 
+            { 
+                return _samplers[index]; 
+            }
+
+			set 
+            {
+                if (_samplers[index] == value)
+                    return;
+
+                _samplers[index] = value;
+                _dirty |= 1 << index;
+            }
 		}
-		public SamplerState this [int index] {
-			get { return _samplers [index]; }
-			set { _samplers [index] = value; }
-		}
+
+        internal void SetSamplers(GraphicsDevice device)
+        {
+            // Skip out if nothing has changed.
+            if (_dirty == 0)
+                return;
+
+#if DIRECTX
+            // NOTE: We make the assumption here that the caller has
+            // locked the d3dContext for us to use.
+            var pixelShaderStage = device._d3dContext.PixelShader;
+#endif
+            for (var i = 0; i < _samplers.Length; i++)
+            {
+                var mask = 1 << i;
+                if ((_dirty & mask) == 0)
+                    continue;
+
+                var sampler = _samplers[i];
+#if OPENGL
+                var texture = device.Textures[i];
+                if (sampler != null && texture != null)
+                    sampler.Activate(texture.glTarget, texture.LevelCount > 1);
+#elif DIRECTX
+                SharpDX.Direct3D11.SamplerState state = null;
+                if (sampler != null)
+                    state = sampler.GetState(device);
+
+                pixelShaderStage.SetSampler(i, state);
+#endif
+
+                _dirty &= ~mask;
+                if (_dirty == 0)
+                    break;
+            }
+
+            _dirty = 0;
+        }
 	}
 }

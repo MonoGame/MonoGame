@@ -69,28 +69,27 @@ non-infringement.
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+#if !PSS
 using System.Drawing;
+#endif
 using System.IO;
 using System.Reflection;
+using System.Diagnostics;
+#if WINRT
+using System.Threading.Tasks;
+#endif
 
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
-#if WINRT
-using Windows.ApplicationModel.Core;
-using Windows.UI.Core;
-#else
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.GamerServices;
-#endif
+
 
 namespace Microsoft.Xna.Framework
 {
     public class Game : IDisposable
-#if WINRT
-        , IFrameworkView
-#endif
     {
         private const float DefaultTargetFramesPerSecond = 60.0f;
 
@@ -124,9 +123,11 @@ namespace Microsoft.Xna.Framework
 
         private TimeSpan _targetElapsedTime = TimeSpan.FromSeconds(1 / DefaultTargetFramesPerSecond);
 
-        private int previousDisplayWidth;
-        private int previousDisplayHeight;
+        private readonly TimeSpan _maxElapsedTime = TimeSpan.FromMilliseconds(500);
 
+
+        private bool _suppressDraw;
+        
         public Game()
         {
             _instance = this;
@@ -139,6 +140,10 @@ namespace Microsoft.Xna.Framework
             Platform.Activated += Platform_Activated;
             Platform.Deactivated += Platform_Deactivated;
             _services.AddService(typeof(GamePlatform), Platform);
+
+#if WINRT
+            Platform.ViewStateChanged += Platform_ApplicationViewChanged;
+#endif //WINRT
 
 #if MONOMAC || WINDOWS || LINUX
             // Set the window title.
@@ -163,25 +168,6 @@ namespace Microsoft.Xna.Framework
             Dispose(false);
         }
 
-#if WINRT
-        public void Initialize(CoreApplicationView applicationView)
-        {
-        }
-
-        public void Load(string entryPoint)
-        {
-        }
-
-        public void SetWindow(CoreWindow window)
-        {
-            (Window as MetroGameWindow).Initialize(window);
-        }
-
-        public void Uninitialize()
-        {
-        }
-#endif
-
 		[System.Diagnostics.Conditional("DEBUG")]
 		internal void Log(string Message)
 		{
@@ -200,7 +186,17 @@ namespace Microsoft.Xna.Framework
         protected virtual void Dispose(bool disposing)
         {
             if (disposing)
+            {
                 Platform.Dispose();
+
+                // Dispose loaded game components
+                for (int i = 0; i < _components.Count; i++)
+                {
+                    var disposable = _components[i] as IDisposable;
+                    if (disposable != null)
+                        disposable.Dispose();
+                }
+            }
 
             _isDisposed = true;
         }
@@ -333,6 +329,10 @@ namespace Microsoft.Xna.Framework
         public event EventHandler<EventArgs> Disposed;
         public event EventHandler<EventArgs> Exiting;
 
+#if WINRT
+        public event EventHandler<ViewStateChangedEventArgs> ApplicationViewChanged;
+#endif
+
         #endregion
 
         #region Public Methods
@@ -345,8 +345,15 @@ namespace Microsoft.Xna.Framework
         public void ResetElapsedTime()
         {
             Platform.ResetElapsedTime();
-            _lastUpdate = DateTime.Now;
-            _gameTime.ResetElapsedTime();
+            _gameTimer.Reset();
+            _gameTimer.Start();
+            _accumulatedElapsedTime = TimeSpan.Zero;
+            _gameTime.ElapsedGameTime = TimeSpan.Zero;
+        }
+
+        public void SuppressDraw()
+        {
+            _suppressDraw = true;
         }
 
         public void Run()
@@ -373,7 +380,7 @@ namespace Microsoft.Xna.Framework
             case GameRunBehavior.Synchronous:
                 Platform.RunLoop();
                 EndRun();
-                OnExiting(this, EventArgs.Empty);
+				DoExiting();
                 break;
             default:
                 throw new NotImplementedException(string.Format(
@@ -381,68 +388,85 @@ namespace Microsoft.Xna.Framework
             }
         }
 
-        private DateTime _now;
-        private DateTime _lastUpdate = DateTime.Now;
+        private TimeSpan _accumulatedElapsedTime;
         private readonly GameTime _gameTime = new GameTime();
-        private readonly GameTime _fixedTimeStepTime = new GameTime();
-        private TimeSpan _totalTime = TimeSpan.Zero;
+        private Stopwatch _gameTimer = Stopwatch.StartNew();
 
         public void Tick()
         {
-            bool doDraw = false;
+            // NOTE: This code is very sensitive and can break very badly
+            // with even what looks like a safe change.  Be sure to test 
+            // any change fully in both the fixed and variable timestep 
+            // modes across multiple devices and platforms.
 
-            _now = DateTime.Now;
+        RetryTick:
 
-            _gameTime.Update(_now - _lastUpdate);
-            _lastUpdate = _now;
+            // Advance the accumulated elapsed time.
+            _accumulatedElapsedTime += _gameTimer.Elapsed;
+            _gameTimer.Reset();
+            _gameTimer.Start();
+
+            // If we're in the fixed timestep mode and not enough time has elapsed
+            // to perform an update we sleep off the the remaining time to save battery
+            // life and/or release CPU time to other threads and processes.
+            if (IsFixedTimeStep && _accumulatedElapsedTime < TargetElapsedTime)
+            {
+                var sleepTime = (int)(TargetElapsedTime - _accumulatedElapsedTime).TotalMilliseconds;
+
+                // NOTE: While sleep can be inaccurate in general it is 
+                // accurate enough for frame limiting purposes if some
+                // fluctuation is an acceptable result.
+#if WINRT
+                Task.Delay(sleepTime).Wait();
+#else
+                System.Threading.Thread.Sleep(sleepTime);
+#endif
+                goto RetryTick;
+            }
+
+            // Do not allow any update to take longer than our maximum.
+            if (_accumulatedElapsedTime > _maxElapsedTime)
+                _accumulatedElapsedTime = _maxElapsedTime;
+
+            // TODO: We should be calculating IsRunningSlowly
+            // somewhere around here!
 
             if (IsFixedTimeStep)
             {
-                _totalTime += _gameTime.ElapsedGameTime;
-                int max = (500/TargetElapsedTime.Milliseconds);    //Only do updates for half a second worth of updates
-                int iterations = 0;
+                _gameTime.ElapsedGameTime = TargetElapsedTime;
+                var stepCount = 0;
 
-                max = max <= 0 ? 1 : max;   //Make sure at least 1 update is called
-
-                while (_totalTime >= TargetElapsedTime)
+                // Perform as many full fixed length time steps as we can.
+                while (_accumulatedElapsedTime >= TargetElapsedTime)
                 {
-                    _fixedTimeStepTime.Update(TargetElapsedTime);
-                    _totalTime -= TargetElapsedTime;
-                    DoUpdate(_fixedTimeStepTime);
-                    doDraw = true;
-                        
-                    iterations++;
-                    if (iterations >= max)  //Reset catchup if to many updates have been called
-                    {
-                        _totalTime = TimeSpan.Zero;
-                    }
+                    _gameTime.TotalGameTime += TargetElapsedTime;
+                    _accumulatedElapsedTime -= TargetElapsedTime;
+                    ++stepCount;
+
+                    DoUpdate(_gameTime);
                 }
+
+                // Draw needs to know the total elapsed time
+                // that occured for the fixed length updates.
+                _gameTime.ElapsedGameTime = TimeSpan.FromTicks(TargetElapsedTime.Ticks * stepCount);
             }
             else
             {
+                // Perform a single variable length update.
+                _gameTime.ElapsedGameTime = _accumulatedElapsedTime;
+                _gameTime.TotalGameTime += _accumulatedElapsedTime;
+                _accumulatedElapsedTime = TimeSpan.Zero;
+
                 DoUpdate(_gameTime);
-                doDraw = true;
             }
 
-            if (doDraw)
+            // Draw unless the update suppressed it.
+            if (_suppressDraw)
+                _suppressDraw = false;
+            else
             {
                 DoDraw(_gameTime);
                 Platform.Present();
-            }
-
-            if (IsFixedTimeStep)
-            {
-                var currentTime = (DateTime.Now - _lastUpdate) + _totalTime;
-
-                if (currentTime < TargetElapsedTime)
-                {
-                    var sleepMs = (TargetElapsedTime - currentTime).Milliseconds;
-#if WINRT
-                    new System.Threading.ManualResetEvent(false).WaitOne(sleepMs);
-#else
-                    System.Threading.Thread.Sleep(sleepMs);
-#endif
-                }
             }
         }
 
@@ -461,18 +485,7 @@ namespace Microsoft.Xna.Framework
 
         protected virtual void Initialize()
         {
-            // In an original XNA game the GraphicsDevice property is null
-            // during initialization but before the Game's Initialize method is
-            // called the property is available so we can only assume that it
-            // should be created somewhere in here.  We cannot set the viewport
-            // values correctly based on the Preferred settings which is causing
-            // some problems on some Microsoft samples which we are not handling
-            // correctly.
-
-			//graphicsDeviceManager.CreateDevice();
-			//Or not, we definitely create the device in BeforeInitialize now...
-
-
+            // TODO: We shouldn't need to do this here.
             applyChanges(graphicsDeviceManager);
 
             // According to the information given on MSDN (see link below), all
@@ -508,21 +521,7 @@ namespace Microsoft.Xna.Framework
 
         protected virtual void Draw(GameTime gameTime)
         {
-#if ANDROID
-            // TODO: It should be possible to move this call to
-            //       PrimaryThreadLoader.DoLoads into
-            //       AndroidGamePlatform.BeforeDraw and remove the need for the
-            //       #if ANDROID check.
-            PrimaryThreadLoader.DoLoads();
-#endif
-            if (GraphicsDevice.DisplayMode.Width != previousDisplayWidth ||
-                GraphicsDevice.DisplayMode.Height != previousDisplayHeight)
-            {
-                previousDisplayHeight = GraphicsDevice.DisplayMode.Height;
-                previousDisplayWidth = GraphicsDevice.DisplayMode.Width;
-                graphicsDeviceManager.ResetClientBounds();
-            }
-            
+
             _drawables.ForEachFilteredItem(DrawAction, gameTime);
         }
 
@@ -565,8 +564,16 @@ namespace Microsoft.Xna.Framework
             var platform = (GamePlatform)sender;
             platform.AsyncRunLoopEnded -= Platform_AsyncRunLoopEnded;
             EndRun();
-            OnExiting(this, EventArgs.Empty);
+			DoExiting();
         }
+
+#if WINRT
+        private void Platform_ApplicationViewChanged(object sender, ViewStateChangedEventArgs e)
+        {
+            AssertNotDisposed();
+            Raise(ApplicationViewChanged, e);
+        }
+#endif
 
         private void Platform_Activated(object sender, EventArgs e)
         {
@@ -631,6 +638,10 @@ namespace Microsoft.Xna.Framework
             Initialize();
         }
 
+		internal void DoExiting()
+		{
+			OnExiting(this, EventArgs.Empty);
+		}
         internal void ResizeWindow(bool changed)
         {
 #if WINRT

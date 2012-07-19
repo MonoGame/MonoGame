@@ -72,18 +72,20 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text;
 
-namespace Microsoft.Xna.Framework.Graphics {
-	public sealed class SpriteFont {
-		static class Errors {
+namespace Microsoft.Xna.Framework.Graphics 
+{
+
+	public sealed class SpriteFont 
+    {
+		static class Errors 
+        {
 			public const string TextContainsUnresolvableCharacters =
 				"Text contains characters that cannot be resolved by this SpriteFont.";
 		}
 
-		[ThreadStatic]
-		private static Typesetter PerThreadTypesetter;
-
-		private Dictionary<char, Glyph> _glyphs;
-		private Texture2D _texture;
+		private readonly Dictionary<char, Glyph> _glyphs;
+		
+		private readonly Texture2D _texture;
 
 		internal SpriteFont (
 			Texture2D texture, List<Rectangle> glyphBounds, List<Rectangle> cropping, List<char> characters,
@@ -95,19 +97,28 @@ namespace Microsoft.Xna.Framework.Graphics {
 			Spacing = spacing;
 			DefaultCharacter = defaultCharacter;
 
-			_glyphs = new Dictionary<char, Glyph> (characters.Count);
-			for (int i = 0; i < characters.Count; i++) {
-				Glyph glyph = new Glyph {
-					BoundsInTexture = glyphBounds [i],
-					Cropping = cropping [i],
-					Kerning = kerning [i],
-					Character = characters [i]
+			_glyphs = new Dictionary<char, Glyph>(characters.Count);
+
+			for (var i = 0; i < characters.Count; i++) 
+            {
+				var glyph = new Glyph 
+                {
+					BoundsInTexture = glyphBounds[i],
+					Cropping = cropping[i],
+                    Character = characters[i],
+
+                    LeftSideBearing = kerning[i].X,
+                    Width = kerning[i].Y,
+                    RightSideBearing = kerning[i].Z,
+
+                    WidthIncludingBearings = kerning[i].X + kerning[i].Y + kerning[i].Z
 				};
 				_glyphs.Add (glyph.Character, glyph);
 			}
 		}
 
 		private ReadOnlyCollection<char> _characters;
+
 		/// <summary>
 		/// Gets a collection of the characters in the font.
 		/// </summary>
@@ -137,11 +148,11 @@ namespace Microsoft.Xna.Framework.Graphics {
 		/// <param name="text">The text to measure.</param>
 		/// <returns>The size, in pixels, of 'text' when rendered in
 		/// this font.</returns>
-		public Vector2 MeasureString (string text)
+		public Vector2 MeasureString(string text)
 		{
-			var source = new CharacterSource (text);
+			var source = new CharacterSource(text);
 			Vector2 size;
-			MeasureString (ref source, out size);
+			MeasureString(ref source, out size);
 			return size;
 		}
 
@@ -152,138 +163,200 @@ namespace Microsoft.Xna.Framework.Graphics {
 		/// <param name="text">The text to measure.</param>
 		/// <returns>The size, in pixels, of 'text' when rendered in
 		/// this font.</returns>
-		public Vector2 MeasureString (StringBuilder text)
+		public Vector2 MeasureString(StringBuilder text)
 		{
-			var source = new CharacterSource (text);
+			var source = new CharacterSource(text);
 			Vector2 size;
-			MeasureString (ref source, out size);
+			MeasureString(ref source, out size);
 			return size;
 		}
 
-		private void MeasureString (ref CharacterSource text, out Vector2 size)
+		private void MeasureString(ref CharacterSource text, out Vector2 size)
 		{
-			if (text.Length == 0) {
+			if (text.Length == 0)
+            {
 				size = Vector2.Zero;
 				return;
 			}
 
-			PerThreadTypesetter.Reset (this);
-			for (int i = 0; i < text.Length; ++i)
-				PerThreadTypesetter.Input (text [i]);
-			PerThreadTypesetter.GetSize (out size);
+            // Get the default glyph here once.
+            Glyph? defaultGlyph = null;
+            if ( DefaultCharacter.HasValue )
+                defaultGlyph = _glyphs[DefaultCharacter.Value];
+
+			var width = 0.0f;
+			var finalLineHeight = (float)LineSpacing;
+			var fullLineCount = 0;
+            var currentGlyph = Glyph.Empty;
+			var offset = Vector2.Zero;
+            var hasCurrentGlyph = false;
+
+            for (var i = 0; i < text.Length; ++i)
+            {
+                var c = text[i];
+                if (c == '\r')
+                {
+                    hasCurrentGlyph = false;
+                    continue;
+                }
+
+                if (c == '\n')
+                {
+                    fullLineCount++;
+                    finalLineHeight = LineSpacing;
+
+                    offset.X = 0;
+                    offset.Y = LineSpacing * fullLineCount;
+                    hasCurrentGlyph = false;
+                    continue;
+                }
+
+                if (hasCurrentGlyph)
+                    offset.X += Spacing + currentGlyph.WidthIncludingBearings;
+
+                hasCurrentGlyph = _glyphs.TryGetValue(c, out currentGlyph);
+                if (!hasCurrentGlyph)
+                {
+                    if (!defaultGlyph.HasValue)
+                        throw new ArgumentException(Errors.TextContainsUnresolvableCharacters, "text");
+
+                    currentGlyph = defaultGlyph.Value;
+                    hasCurrentGlyph = true;                        
+                }
+
+                var proposedWidth = offset.X + currentGlyph.WidthIncludingBearings;
+                if (proposedWidth > width)
+                    width = proposedWidth;
+
+                if (currentGlyph.Cropping.Height > finalLineHeight)
+                    finalLineHeight = currentGlyph.Cropping.Height;
+            }
+
+            size.X = width;
+            size.Y = fullLineCount * LineSpacing + finalLineHeight;
 		}
 
-		internal void DrawInto (
-			SpriteBatch spriteBatch, string text, Vector2 position, Color color,
-			float rotation, Vector2 origin, Vector2 scale, SpriteEffects effect, float depth)
+        internal void DrawInto( SpriteBatch spriteBatch, ref CharacterSource text, Vector2 position, Color color,
+			                    float rotation, Vector2 origin, Vector2 scale, SpriteEffects effect, float depth)
 		{
-			var source = new CharacterSource (text);
-			DrawInto (spriteBatch, ref source, position, color, rotation, origin, scale, effect, depth);
-		}
+            var flipAdjustment = Vector2.Zero;
 
-		internal void DrawInto (
-			SpriteBatch spriteBatch, StringBuilder text, Vector2 position, Color color,
-			float rotation, Vector2 origin, Vector2 scale, SpriteEffects effect, float depth)
-		{
-			var source = new CharacterSource (text);
-			DrawInto (spriteBatch, ref source, position, color, rotation, origin, scale, effect, depth);
-		}
+            var flippedVert = (effect & SpriteEffects.FlipVertically) == SpriteEffects.FlipVertically;
+            var flippedHorz = (effect & SpriteEffects.FlipHorizontally) == SpriteEffects.FlipHorizontally;
 
-		private void DrawInto (
-			SpriteBatch spriteBatch, ref CharacterSource text, Vector2 position, Color color,
-			float rotation, Vector2 origin, Vector2 scale, SpriteEffects effect, float depth)
-		{
-			Matrix transformation;
-			CreateTransformationFromDrawParameters (
-				ref text, position, rotation, origin, scale, effect, out transformation);
+            if (flippedVert || flippedHorz)
+            {
+                Vector2 size;
+                MeasureString(ref text, out size);
 
-			var flippedVert = (effect & SpriteEffects.FlipVertically) == SpriteEffects.FlipVertically;
-			var flippedHorz = (effect & SpriteEffects.FlipHorizontally) == SpriteEffects.FlipHorizontally;
+                if (flippedHorz)
+                {
+                    origin.X *= -1;
+                    scale.X *= -1;
+                    flipAdjustment.X = -size.X;
+                }
 
-			PerThreadTypesetter.Reset (this);
-			for (int i = 0; i < text.Length; ++i) {
-				PerThreadTypesetter.Input (text [i]);
-				if (!PerThreadTypesetter.HasCurrentGlyph)
-					continue;
+                if (flippedVert)
+                {
+                    origin.Y *= -1;
+                    scale.Y *= -1;
+                    flipAdjustment.Y = LineSpacing - size.Y;
+                }
+            }
 
-				var p = PerThreadTypesetter.Offset;
+            // TODO: This looks excessive... i suspect we could do most
+            // of this with simple vector math and avoid this much matrix work.
+
+            Matrix transformation, temp;
+            Matrix.CreateTranslation(-origin.X, -origin.Y, 0f, out transformation);
+            Matrix.CreateScale(scale.X, scale.Y, 1f, out temp);
+            Matrix.Multiply(ref transformation, ref temp, out transformation);
+            Matrix.CreateTranslation(flipAdjustment.X, flipAdjustment.Y, 0, out temp);
+            Matrix.Multiply(ref temp, ref transformation, out transformation);
+            Matrix.CreateRotationZ(rotation, out temp);
+            Matrix.Multiply(ref transformation, ref temp, out transformation);
+            Matrix.CreateTranslation(position.X, position.Y, 0f, out temp);
+            Matrix.Multiply(ref transformation, ref temp, out transformation);
+
+            // Get the default glyph here once.
+            Glyph? defaultGlyph = null;
+            if (DefaultCharacter.HasValue)
+                defaultGlyph = _glyphs[DefaultCharacter.Value];
+
+            var currentGlyph = Glyph.Empty;
+            var offset = Vector2.Zero;
+            var hasCurrentGlyph = false;
+
+			for (var i = 0; i < text.Length; ++i)
+            {
+                var c = text[i];
+                if (c == '\r')
+                {
+                    hasCurrentGlyph = false;
+                    continue;
+                }
+
+                if (c == '\n')
+                {
+                    offset.X = 0;
+                    offset.Y += LineSpacing;
+                    hasCurrentGlyph = false;
+                    continue;
+                }
+
+                if (hasCurrentGlyph)
+                    offset.X += Spacing + currentGlyph.WidthIncludingBearings;
+
+                hasCurrentGlyph = _glyphs.TryGetValue(c, out currentGlyph);
+                if (!hasCurrentGlyph)
+                {
+                    if (!defaultGlyph.HasValue)
+                        throw new ArgumentException(Errors.TextContainsUnresolvableCharacters, "text");
+
+                    currentGlyph = defaultGlyph.Value;
+                    hasCurrentGlyph = true;
+                }
+
+                var p = offset;
 
 				if (flippedHorz)
-					p.X += PerThreadTypesetter.CurrentGlyph.BoundsInTexture.Width;
-				p.X += PerThreadTypesetter.CurrentGlyph.LeftSideBearing;
+                    p.X += currentGlyph.BoundsInTexture.Width;
+                p.X += currentGlyph.Cropping.X;
 
 				if (flippedVert)
-					p.Y += PerThreadTypesetter.CurrentGlyph.BoundsInTexture.Height - LineSpacing;
-				p.Y += PerThreadTypesetter.CurrentGlyph.Cropping.Y;
+                    p.Y += currentGlyph.BoundsInTexture.Height - LineSpacing;
+                p.Y += currentGlyph.Cropping.Y;
 
-				Vector2.Transform (ref p, ref transformation, out p);
-				spriteBatch.Draw (
-					_texture, p, PerThreadTypesetter.CurrentGlyph.BoundsInTexture,
-					color, rotation, Vector2.Zero, scale, effect, depth);
+				Vector2.Transform(ref p, ref transformation, out p);
+
+                var destRect = new Vector4( p.X, p.Y, 
+                                            currentGlyph.BoundsInTexture.Width * scale.X,
+                                            currentGlyph.BoundsInTexture.Height * scale.Y);
+
+                // TODO: We're passing SpriteEffects thru here unchanged, but
+                // it seems we're applyting the flips ourselves above.
+                //
+                // This just might be a bug!
+
+				spriteBatch.Draw(
+                    _texture, destRect, currentGlyph.BoundsInTexture,
+					color, rotation, Vector2.Zero, effect, depth);
 			}
 		}
 
-		private void CreateTransformationFromDrawParameters (
-			ref CharacterSource text, Vector2 position, float rotation, Vector2 origin, Vector2 scale,
-			SpriteEffects effect, out Matrix transformation)
-		{
-			Vector2 flipAdjustment = Vector2.Zero;
-			if ((effect & (SpriteEffects.FlipHorizontally | SpriteEffects.FlipVertically)) != 0) {
-				Vector2 size;
-				MeasureString (ref text, out size);
-
-				if ((effect & SpriteEffects.FlipHorizontally) == SpriteEffects.FlipHorizontally) {
-					origin.X *= -1;
-					scale.X *= -1;
-					flipAdjustment.X = -size.X;
-				}
-
-				if ((effect & SpriteEffects.FlipVertically) == SpriteEffects.FlipVertically) {
-					origin.Y *= -1;
-					scale.Y *= -1;
-					flipAdjustment.Y = LineSpacing - size.Y;
-				}
-			}
-
-			Matrix temp;
-			Matrix.CreateTranslation (-origin.X, -origin.Y, 0f, out transformation);
-			Matrix.CreateScale (scale.X, scale.Y, 1f, out temp);
-			Matrix.Multiply (ref transformation, ref temp, out transformation);
-
-			Matrix.CreateTranslation (flipAdjustment.X, flipAdjustment.Y, 0, out temp);
-			Matrix.Multiply (ref temp, ref transformation, out transformation);
-
-			Matrix.CreateRotationZ (rotation, out temp);
-			Matrix.Multiply (ref transformation, ref temp, out transformation);
-
-			Matrix.CreateTranslation (position.X, position.Y, 0f, out temp);
-			Matrix.Multiply (ref transformation, ref temp, out transformation);
-		}
-
-		private bool ResolveGlyphWithFallback (char c, out Glyph glyph)
-		{
-			if (_glyphs.TryGetValue (c, out glyph))
-				return true;
-
-			if (DefaultCharacter.HasValue && _glyphs.TryGetValue (DefaultCharacter.Value, out glyph))
-				return true;
-
-			glyph = Glyph.Empty;
-			return false;
-		}
-
-		struct CharacterSource {
+        internal struct CharacterSource 
+        {
 			private readonly string _string;
 			private readonly StringBuilder _builder;
 
-			public CharacterSource (string s)
+			public CharacterSource(string s)
 			{
 				_string = s;
 				_builder = null;
 				Length = s.Length;
 			}
 
-			public CharacterSource (StringBuilder builder)
+			public CharacterSource(StringBuilder builder)
 			{
 				_builder = builder;
 				_string = null;
@@ -291,132 +364,35 @@ namespace Microsoft.Xna.Framework.Graphics {
 			}
 
 			public readonly int Length;
-			public char this [int index] {
-				get {
+			public char this [int index] 
+            {
+				get 
+                {
 					if (_string != null)
-						return _string [index];
-					return _builder [index];
+						return _string[index];
+					return _builder[index];
 				}
 			}
 		}
 
-		struct Glyph {
+		struct Glyph 
+        {
 			public char Character;
 			public Rectangle BoundsInTexture;
 			public Rectangle Cropping;
-			public Vector3 Kerning;
+            public float LeftSideBearing;
+            public float RightSideBearing;
+            public float Width;
+            public float WidthIncludingBearings;
 
-			private static readonly Glyph _empty = new Glyph ();
-			public static Glyph Empty { get { return _empty; } }
-
-			public float LeftSideBearing { get { return Kerning.X; } }
-			public float RightSideBearing { get { return Kerning.Z; } }
-			public float Width { get { return Kerning.Y; } }
-			public float WidthIncludingBearings {
-				get { return Kerning.X + Kerning.Y + Kerning.Z; }
-			}
+			public static readonly Glyph Empty = new Glyph();
 
 			public override string ToString ()
 			{
-				return string.Format (
-					"CharacterIndex={0}, Glyph={1}, Cropping={2}, Kerning={3}",
-					Character, BoundsInTexture, Cropping, Kerning);
+				return string.Format(
+					"CharacterIndex={0}, Glyph={1}, Cropping={2}, Kerning={3},{4},{5}",
+                    Character, BoundsInTexture, Cropping, LeftSideBearing, Width, RightSideBearing);
 			}
 		}
-
-		struct Typesetter {
-			private SpriteFont _font;
-			private float _width;
-			private float _finalLineHeight;
-			private int _fullLineCount;
-
-			public bool HasCurrentGlyph;
-			public Glyph CurrentGlyph;
-			public Vector2 Offset;
-
-			public void GetSize (out Vector2 size)
-			{
-				size.X = _width;
-				size.Y = _fullLineCount * _font.LineSpacing + _finalLineHeight;
-			}
-
-			public void Reset (SpriteFont font)
-			{
-				_font = font;
-				Offset.X = 0;
-				Offset.Y = 0;
-				_width = 0;
-				_finalLineHeight = font.LineSpacing;
-				_fullLineCount = 0;
-				HasCurrentGlyph = false;
-			}
-
-			public void Input (char c)
-			{
-				if (c == '\r') {
-					HasCurrentGlyph = false;
-					return;
-				}
-
-				if (c == '\n') {
-					_fullLineCount++;
-					_finalLineHeight = _font.LineSpacing;
-					HasCurrentGlyph = false;
-
-					Offset.X = 0;
-					Offset.Y = _font.LineSpacing * _fullLineCount;
-					return;
-				}
-
-				if (HasCurrentGlyph)
-					Offset.X += _font.Spacing + CurrentGlyph.WidthIncludingBearings;
-
-				HasCurrentGlyph = _font.ResolveGlyphWithFallback (c, out CurrentGlyph);
-				if (!HasCurrentGlyph)
-					throw new ArgumentException (
-						Errors.TextContainsUnresolvableCharacters, "text");
-
-				UpdateWidth ();
-				UpdateCurrentLineHeight ();
-			}
-
-			private void UpdateWidth ()
-			{
-				float proposedWidth = Offset.X + CurrentGlyph.WidthIncludingBearings;
-				if (proposedWidth > _width)
-					_width = proposedWidth;
-			}
-
-			private void UpdateCurrentLineHeight ()
-			{
-				if (CurrentGlyph.Cropping.Height > _finalLineHeight)
-					_finalLineHeight = CurrentGlyph.Cropping.Height;
-			}
-		}
-
-		#region Deprecated
-
-		[Obsolete ("AssetName does not seem to be in use.", true)]
-		internal string AssetName;
-
-		[Obsolete ("SpriteFont.FontSize does not exist in XNA and is deprecated.")]
-		public double FontSize
-		{
-			get { return 11; }
-		}
-
-		[Obsolete ("SpriteFont.Bold does not exist in XNA and is deprecated.")]
-		public bool Bold
-		{
-			get { return false; }
-		}
-
-		[Obsolete ("SpriteFont.Italic does not exist in XNA and is deprecated.")]
-		public bool Italic
-		{
-			get { return false; }
-		}
-
-		#endregion Deprecated
 	}
 }

@@ -43,23 +43,52 @@ using System.IO;
 
 #if WINRT
 using Windows.Storage;
+using System.Threading.Tasks;
 #endif
 
 namespace Microsoft.Xna.Framework
 {
     public static class TitleContainer
     {
+#if WINRT
+
+        private static async Task<Stream> OpenStreamAsync(string name)
+        {
+            var package = Windows.ApplicationModel.Package.Current;
+
+            ulong length;
+            try
+            {
+                var storageFile = await package.InstalledLocation.GetFileAsync(name);
+                var randomAccessStream = await storageFile.OpenReadAsync();
+                length = randomAccessStream.Size;
+                return randomAccessStream.AsStreamForRead();
+            }
+            catch (IOException)
+            {
+                // The file must not exist... return a null stream.
+                return null;
+            }
+        }
+
         public static Stream OpenStream(string name)
         {
-#if WINRT
-            var package = Windows.ApplicationModel.Package.Current;
-            var file = package.InstalledLocation.GetFileAsync(name).GetResults();
-            var stream = file.OpenReadAsync().GetResults();
-            return stream.AsStreamForRead();
-#else
-            return File.OpenRead(GetFilename(name));
-#endif
+            name = name.Replace('/', '\\');
+            var stream = Task.Run( () => OpenStreamAsync(name).Result ).Result;
+            if (stream == null)
+                throw new FileNotFoundException();
+
+            return stream;
         }
+
+#else // !WINRT
+
+        public static Stream OpenStream(string name)
+        {
+            return File.OpenRead(GetFilename(name));
+        }
+
+#endif
 
         internal static string GetFilename(string name)
         {

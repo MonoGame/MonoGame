@@ -56,15 +56,13 @@ namespace Microsoft.Xna.Framework
 {
     public class OpenTKGameWindow : GameWindow
     {
-        private GameTime _updateGameTime;
-        private GameTime _drawGameTime;
-        private DateTime _lastUpdate;
-        private DateTime _now;
         private bool _allowUserResizing;
         private DisplayOrientation _currentOrientation;
+        private IntPtr _windowHandle = IntPtr.Zero;
         private OpenTK.GameWindow window;
         protected Game game;
         private List<Microsoft.Xna.Framework.Input.Keys> keys;
+        private OpenTK.Graphics.GraphicsContext backgroundContext;
 
         // we need this variables to make changes beetween threads
         private WindowState windowState;
@@ -81,7 +79,7 @@ namespace Microsoft.Xna.Framework
 
         #region Public Properties
 
-        public override IntPtr Handle { get { return IntPtr.Zero; } }
+        public override IntPtr Handle { get { return _windowHandle; } }
 
         public override string ScreenDeviceName { get { return window.Title; } }
 
@@ -140,43 +138,27 @@ namespace Microsoft.Xna.Framework
             Keys xnaKey = KeyboardUtil.ToXna(e.Key);
             if (!keys.Contains(xnaKey)) keys.Add(xnaKey);
         }
-
-        protected void OnActivated() { }
-
-        protected void OnClientSizeChanged()
-        {
-            if (ClientSizeChanged != null)
-            {
-                ClientSizeChanged(this, EventArgs.Empty);
-            }
-        }
-
-        protected void OnDeactivated() { }
-
-        protected void OnOrientationChanged()
-        {
-            if (OrientationChanged != null)
-            {
-                OrientationChanged(this, EventArgs.Empty);
-            }
-        }
-
-        protected void OnPaint() { }
-
-        protected void OnScreenDeviceNameChanged()
-        {
-            if (ScreenDeviceNameChanged != null)
-            {
-                ScreenDeviceNameChanged(this, EventArgs.Empty);
-            }
-        }
-
+        
         #endregion
 
         private void OnResize(object sender, EventArgs e)
         {
-            //Game.GraphicsDevice.SizeChanged(window.ClientRectangle.Width, window.ClientRectangle.Height);
-            Game.GraphicsDevice.Viewport = new Viewport(0, 0, window.ClientRectangle.Width, window.ClientRectangle.Height);
+            var winWidth = ClientBounds.Width;
+            var winHeight = ClientBounds.Height;
+            var winRect = new Rectangle(0, 0, winWidth, winHeight);
+            
+            // If window size is zero, leave bounds unchanged
+            if (winWidth == 0 || winHeight == 0)
+                return;
+
+
+            Game.GraphicsDevice.Viewport = new Viewport(0, 0, winWidth, winHeight);
+
+            Game.GraphicsDevice.PresentationParameters.BackBufferWidth = winWidth;
+            Game.GraphicsDevice.PresentationParameters.BackBufferHeight = winHeight;
+
+            ChangeClientBounds(winRect);
+                                    
             OnClientSizeChanged();
         }
 
@@ -189,21 +171,37 @@ namespace Microsoft.Xna.Framework
             if (!GraphicsContext.CurrentContext.IsCurrent)
                 window.MakeCurrent();
 
+            UpdateWindowState();
+        }
+
+        private void UpdateWindowState()
+        {
             // we should wait until window's not fullscreen to resize
-            if (updateClientBounds && window.WindowState == WindowState.Normal)
+            if (updateClientBounds)
             {
                 window.ClientRectangle = new System.Drawing.Rectangle(clientBounds.X,
                                      clientBounds.Y, clientBounds.Width, clientBounds.Height);
 
                 updateClientBounds = false;
+                
+                // if the window-state is set from the outside (maximized button pressed) we have to update it here.
+                // if it was set from the inside (.IsFullScreen changed), we have to change the window.
+                // this code might not cover all corner cases
+                // window was maximized
+                if ((windowState == WindowState.Normal && window.WindowState == WindowState.Maximized) ||
+                    (windowState == WindowState.Maximized && window.WindowState == WindowState.Normal))
+                    windowState = window.WindowState; // maximize->normal and normal->maximize are usually set from the outside
+                else
+                    window.WindowState = windowState; // usually fullscreen-stuff is set from the code
             }
 
-            if (window.WindowState != windowState)
-                window.WindowState = windowState;
+
         }
 
         private void OnUpdateFrame(object sender, FrameEventArgs e)
         {
+            UpdateWindowState();
+
             if (Game != null)
             {
                 HandleInput();
@@ -223,6 +221,8 @@ namespace Microsoft.Xna.Framework
 
         private void Initialize()
         {
+            GraphicsContext.ShareContexts = true;
+
             window = new OpenTK.GameWindow();
             window.RenderFrame += OnRenderFrame;
             window.UpdateFrame += OnUpdateFrame;
@@ -230,7 +230,7 @@ namespace Microsoft.Xna.Framework
             window.Resize += OnResize;
             window.Keyboard.KeyDown += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyDown);
             window.Keyboard.KeyUp += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyUp);
-
+            
             // Set the window icon.
             window.Icon = Icon.ExtractAssociatedIcon(Assembly.GetEntryAssembly().Location);
 
@@ -238,6 +238,17 @@ namespace Microsoft.Xna.Framework
             clientBounds = new Rectangle(window.ClientRectangle.X, window.ClientRectangle.Y,
                                          window.ClientRectangle.Width, window.ClientRectangle.Height);
             windowState = window.WindowState;
+
+#if WINDOWS
+            {
+                var windowInfoType = window.WindowInfo.GetType();
+                var propertyInfo = windowInfoType.GetProperty("WindowHandle");
+                _windowHandle = (IntPtr)propertyInfo.GetValue(window.WindowInfo, null);
+            }
+#endif
+            // Provide the graphics context for background loading
+            Threading.BackgroundContext = new GraphicsContext(GraphicsMode.Default, window.WindowInfo);
+            Threading.WindowInfo = window.WindowInfo;
 
             keys = new List<Keys>();
 
@@ -249,15 +260,8 @@ namespace Microsoft.Xna.Framework
             Mouse.setWindows(window);
 #endif
 
-            // Initialize GameTime
-            _updateGameTime = new GameTime();
-            _drawGameTime = new GameTime();
-
-            // Initialize _lastUpdate
-            _lastUpdate = DateTime.Now;
-
             //Default no resizing
-            AllowUserResizing = false;            
+            AllowUserResizing = false;
         }
 
         protected override void SetTitle(string title)
@@ -290,6 +294,9 @@ namespace Microsoft.Xna.Framework
 
         public void Dispose()
         {
+            Threading.BackgroundContext.Dispose();
+            Threading.BackgroundContext = null;
+            Threading.WindowInfo = null;
             window.Dispose();
         }
 
@@ -301,14 +308,6 @@ namespace Microsoft.Xna.Framework
         {
 
         }
-
-        #endregion
-
-        #region Events
-
-        public event EventHandler<EventArgs> ClientSizeChanged;
-        public event EventHandler<EventArgs> OrientationChanged;
-        public event EventHandler<EventArgs> ScreenDeviceNameChanged;
 
         #endregion
     }

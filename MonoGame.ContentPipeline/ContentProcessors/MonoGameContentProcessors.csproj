@@ -1,0 +1,170 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{2C23E01D-DE2D-4671-85B0-1085857C6D25}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>MonoGameContentProcessors</RootNamespace>
+    <AssemblyName>MonoGameContentProcessors</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
+    <CodeAnalysisFailOnMissingRules>true</CodeAnalysisFailOnMissingRules>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Xna.Framework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
+    <Reference Include="Microsoft.Xna.Framework.Content.Pipeline, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
+    <Reference Include="Microsoft.Xna.Framework.Graphics, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
+    <Reference Include="NAudio, Version=1.5.4.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\ThirdParty\Libs\NAudio\NAudio.dll</HintPath>
+    </Reference>
+    <Reference Include="NAudio.WindowsMediaFormat">
+      <HintPath>..\..\ThirdParty\Libs\NAudio\NAudio.WindowsMediaFormat.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX">
+      <HintPath>..\..\ThirdParty\Libs\SharpDX\Windows\SharpDX.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.D3DCompiler">
+      <HintPath>..\..\ThirdParty\Libs\SharpDX\Windows\SharpDX.D3DCompiler.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\Tools\2MGFX\CommandLineParser.cs">
+      <Link>Processors\Effect\CommandLineParser.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Tools\2MGFX\CompilerInclude.cs">
+      <Link>Processors\Effect\CompilerInclude.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Tools\2MGFX\ConstantBuffer.cs">
+      <Link>Processors\Effect\ConstantBuffer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Tools\2MGFX\DXEffectObject.cs">
+      <Link>Processors\Effect\DXEffectObject.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Tools\2MGFX\DXEffectObject.hlsl.cs">
+      <Link>Processors\Effect\DXEffectObject.hlsl.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Tools\2MGFX\DXEffectObject.writer.cs">
+      <Link>Processors\Effect\DXEffectObject.writer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Tools\2MGFX\DXExpression.cs">
+      <Link>Processors\Effect\DXExpression.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Tools\2MGFX\DXHelper.cs">
+      <Link>Processors\Effect\DXHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Tools\2MGFX\DXPreshader.cs">
+      <Link>Processors\Effect\DXPreshader.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Tools\2MGFX\DXPreshader.writer.cs">
+      <Link>Processors\Effect\DXPreshader.writer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Tools\2MGFX\DXShader.cs">
+      <Link>Processors\Effect\DXShader.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Tools\2MGFX\GLSLOptimizer.cs">
+      <Link>Processors\Effect\GLSLOptimizer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Tools\2MGFX\MojoShader.cs">
+      <Link>Processors\Effect\MojoShader.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Tools\2MGFX\Options.cs">
+      <Link>Processors\Effect\Options.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Tools\2MGFX\Parser.cs">
+      <Link>Processors\Effect\Parser.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Tools\2MGFX\ParseTree.cs">
+      <Link>Processors\Effect\ParseTree.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Tools\2MGFX\Scanner.cs">
+      <Link>Processors\Effect\Scanner.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Tools\2MGFX\ShaderInfo.cs">
+      <Link>Processors\Effect\ShaderInfo.cs</Link>
+    </Compile>
+    <Compile Include="AudioConverter.cs" />
+    <Compile Include="ContentHelper.cs" />
+    <Compile Include="Content\MGBitmapContent.cs" />
+    <Compile Include="Processors\MGEffectProcessor.cs" />
+    <Compile Include="Processors\MGMaterialProcessor.cs" />
+    <Compile Include="Processors\MGSongProcessor.cs" />
+    <Compile Include="Processors\MGSoundEffectProcessor.cs" />
+    <Compile Include="Processors\MGSpriteFontDescriptionProcessor.cs" />
+    <Compile Include="Processors\MGTextureProcessor.cs" />
+    <Compile Include="MonoGamePlatform.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\ThirdParty\Libs\libmojoshader_32.dll">
+      <Link>libmojoshader_32.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <ProjectReference Include="..\..\Tools\MP3Compression\yeti.mmedia\yeti.mmedia.csproj">
+      <Project>{315EE7BF-EAE2-42C0-BFC6-CCA9160F3CFE}</Project>
+      <Name>yeti.mmedia</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Tools\MP3Compression\yeti.mp3\yeti.mp3.csproj">
+      <Project>{B564FD33-FA50-46B2-B669-2D83DE3AF5E4}</Project>
+      <Name>yeti.mp3</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Tools\MP3Compression\yeti.wmfsdk\yeti.wmfsdk.csproj">
+      <Project>{FECB5BEB-AB05-454A-BB14-6A554E897274}</Project>
+      <Name>yeti.wmfsdk</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

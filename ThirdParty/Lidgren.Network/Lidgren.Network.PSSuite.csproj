@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>10.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{167676EE-E2D5-440A-BB2B-EFBD02BC8493}</ProjectGuid>
+    <ProjectTypeGuids>{69878862-DA7D-4DC6-B0A1-50D8FAB4242F};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Lidgren.Network.PSSuite</RootNamespace>
+    <AssemblyName>Lidgren.Network.PSSuite</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;PSS</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <DefineConstants>PSS</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="Sce.Pss.Core" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Encryption\INetEncryption.cs" />
+    <Compile Include="Encryption\NetBlockEncryptionBase.cs" />
+    <Compile Include="Encryption\NetXorEncryption.cs" />
+    <Compile Include="Encryption\NetXteaEncryption.cs" />
+    <Compile Include="NamespaceDoc.cs" />
+    <Compile Include="NetBigInteger.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="NetBitVector.cs" />
+    <Compile Include="NetBitWriter.cs" />
+    <Compile Include="NetClient.cs" />
+    <Compile Include="NetConnection.cs" />
+    <Compile Include="NetConnection.Handshake.cs" />
+    <Compile Include="NetConnection.Latency.cs" />
+    <Compile Include="NetConnectionStatistics.cs" />
+    <Compile Include="NetConnectionStatus.cs" />
+    <Compile Include="NetConstants.cs" />
+    <Compile Include="NetDeliveryMethod.cs" />
+    <Compile Include="Encryption\NetAESEncryption.cs" />
+    <Compile Include="NetException.cs" />
+    <Compile Include="Encryption\NetDESEncryption.cs" />
+    <Compile Include="Encryption\NetRC2Encryption.cs" />
+    <Compile Include="NetConnection.MTU.cs" />
+    <Compile Include="NetFragmentationHelper.cs" />
+    <Compile Include="Encryption\NetTripleDESEncryption.cs" />
+    <Compile Include="NetIncomingMessage.cs" />
+    <Compile Include="NetIncomingMessage.Peek.cs" />
+    <Compile Include="NetIncomingMessage.Read.cs" />
+    <Compile Include="NetIncomingMessage.Read.Reflection.cs" />
+    <Compile Include="NetIncomingMessage.Write.cs" />
+    <Compile Include="NetIncomingMessageType.cs" />
+    <Compile Include="NetMessageType.cs" />
+    <Compile Include="NetNatIntroduction.cs" />
+    <Compile Include="NetOutgoingMessage.cs" />
+    <Compile Include="NetOutgoingMessage.Write.cs" />
+    <Compile Include="NetOutgoingMessage.Write.Reflection.cs" />
+    <Compile Include="NetPeer.cs" />
+    <Compile Include="NetPeer.Discovery.cs" />
+    <Compile Include="NetPeer.Fragmentation.cs" />
+    <Compile Include="NetPeer.Internal.cs" />
+    <Compile Include="NetPeer.LatencySimulation.cs" />
+    <Compile Include="NetPeer.Logging.cs" />
+    <Compile Include="NetPeer.MessagePools.cs" />
+    <Compile Include="NetPeer.Send.cs" />
+    <Compile Include="NetPeerConfiguration.cs" />
+    <Compile Include="NetPeerStatistics.cs" />
+    <Compile Include="NetPeerStatus.cs" />
+    <Compile Include="NetQueue.cs" />
+    <Compile Include="NetRandom.cs" />
+    <Compile Include="NetReceiverChannelBase.cs" />
+    <Compile Include="NetReliableOrderedReceiver.cs" />
+    <Compile Include="NetReliableSenderChannel.cs" />
+    <Compile Include="NetReliableSequencedReceiver.cs" />
+    <Compile Include="NetReliableUnorderedReceiver.cs" />
+    <Compile Include="NetSenderChannelBase.cs" />
+    <Compile Include="NetSendResult.cs" />
+    <Compile Include="NetServer.cs" />
+    <Compile Include="NetSRP.cs" />
+    <Compile Include="NetStoredReliableMessage.cs" />
+    <Compile Include="NetTime.cs" />
+    <Compile Include="NetTuple.cs" />
+    <Compile Include="NetUnreliableSenderChannel.cs" />
+    <Compile Include="NetUnreliableSequencedReceiver.cs" />
+    <Compile Include="NetUnreliableUnorderedReceiver.cs" />
+    <Compile Include="NetUPnP.cs" />
+    <Compile Include="NetUtility.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SenderChannelBase.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Sce\Sce.Pss.CSharp.targets" />
+</Project>

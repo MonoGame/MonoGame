@@ -37,7 +37,7 @@ permitted under your local laws, the contributors exclude the implied warranties
 purpose and non-infringement.
 */
 #endregion License
-﻿
+
 using System;
 
 #if WINRT
@@ -62,7 +62,7 @@ namespace Microsoft.Xna.Framework.Input
 #endif
 
 #if WINRT
-        // Nothing to do!
+        static internal CoreWindow Window;
 #elif WINDOWS
         static OpenTK.GameWindow Window;
         internal static void setWindows(OpenTK.GameWindow window)
@@ -97,8 +97,7 @@ namespace Microsoft.Xna.Framework.Input
 #endif
 	
 #if WINRT
-            var window = Window.Current.CoreWindow;
-            var pos = window.PointerPosition;
+            var pos = Window.PointerPosition;
 
             // TODO: Probably the wrong way to convert to pixels!
             var ms = new MouseState((int)pos.X, (int)pos.Y);
@@ -114,9 +113,9 @@ namespace Microsoft.Xna.Framework.Input
 #endif   
     
 #if WINRT
-            ms.LeftButton = window.GetAsyncKeyState(VirtualKey.LeftButton) == CoreVirtualKeyStates.Down ? ButtonState.Pressed : ButtonState.Released;
-            ms.RightButton = window.GetAsyncKeyState(VirtualKey.RightButton) == CoreVirtualKeyStates.Down ? ButtonState.Pressed : ButtonState.Released;
-            ms.MiddleButton = window.GetAsyncKeyState(VirtualKey.MiddleButton) == CoreVirtualKeyStates.Down ? ButtonState.Pressed : ButtonState.Released;
+            ms.LeftButton = Window.GetAsyncKeyState(VirtualKey.LeftButton) == CoreVirtualKeyStates.Down ? ButtonState.Pressed : ButtonState.Released;
+            ms.RightButton = Window.GetAsyncKeyState(VirtualKey.RightButton) == CoreVirtualKeyStates.Down ? ButtonState.Pressed : ButtonState.Released;
+            ms.MiddleButton = Window.GetAsyncKeyState(VirtualKey.MiddleButton) == CoreVirtualKeyStates.Down ? ButtonState.Pressed : ButtonState.Released;
             ms.ScrollWheelValue = 0; // TODO: How do i get the scroll wheel state?
 #else
             ms.LeftButton = _mouse[OpenTK.Input.MouseButton.Left] ? ButtonState.Pressed : ButtonState.Released;

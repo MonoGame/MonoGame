@@ -37,7 +37,7 @@ permitted under your local laws, the contributors exclude the implied warranties
 purpose and non-infringement.
 */
 #endregion License
-﻿
+
 using System;
 using System.IO;
 
@@ -76,7 +76,7 @@ namespace Microsoft.Xna.Framework.Audio
             ALFormat format;
             int size;
             int freq;
-            byte[] data;
+            //byte[] data;
             Stream s;
 
             try
@@ -88,7 +88,7 @@ namespace Microsoft.Xna.Framework.Audio
                 throw new Content.ContentLoadException("Could not load audio data", e);
             }
 
-            data = LoadAudioStream(s, 1.0f, false);
+            _data = LoadAudioStream(s, 1.0f, false);
 
             s.Close();			
 		}
@@ -179,7 +179,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         public bool Play()
         {
-            return Play(MasterVolume, 1.0f, 0.0f);
+            return Play(MasterVolume, 0.0f, 0.0f);
         }
 
         public bool Play(float volume, float pitch, float pan)

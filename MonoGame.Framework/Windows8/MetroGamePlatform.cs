@@ -74,23 +74,42 @@ using System.Diagnostics;
 
 //using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input.Touch;
 
 namespace Microsoft.Xna.Framework
 {
     class MetroGamePlatform : GamePlatform
     {
-        private MetroGameWindow _window;
 		//private OpenALSoundController soundControllerInstance = null;
+        internal static string LaunchParameters;
 
         public MetroGamePlatform(Game game)
             : base(game)
         {
-            _window = new MetroGameWindow();
-            _window.Game = game;
-            this.Window = _window;
+            MetroGameWindow.Instance.Game = game;
+            this.Window = MetroGameWindow.Instance;
+
+            setLaunchParameters();
 			
-			// Setup our OpenALSoundController to handle our SoundBuffer pools
-			//soundControllerInstance = OpenALSoundController.GetInstance;			
+            // Setup our OpenALSoundController to handle our SoundBuffer pools
+            // soundControllerInstance = OpenALSoundController.GetInstance;
+        }
+
+        private void setLaunchParameters()
+        {
+            var arguments = LaunchParameters.Split(' ');
+
+            foreach (var arg in arguments)
+            {
+                if (arg.Contains("="))
+                {
+                    var keyVal = arg.Split('=');
+                    Game.LaunchParameters.Add(keyVal[0], keyVal[1]);
+
+                }
+                else if (arg != string.Empty)
+                    Game.LaunchParameters.Add(arg, string.Empty);
+            }
         }
 
         public override GameRunBehavior DefaultRunBehavior
@@ -100,7 +119,7 @@ namespace Microsoft.Xna.Framework
 
         public override void RunLoop()
         {
-            _window.RunLoop();
+            MetroGameWindow.Instance.RunLoop();
         }
 
         public override void StartRunLoop()
@@ -110,22 +129,38 @@ namespace Microsoft.Xna.Framework
         
         public override void Exit()
         {
-            if (!_window.IsExiting)
+            if (!MetroGameWindow.Instance.IsExiting)
             {
                 //Net.NetworkSession.Exit();
-                _window.IsExiting = true;
+                MetroGameWindow.Instance.IsExiting = true;
             }
+        }
+
+        public override void BeforeInitialize()
+        {
+            base.BeforeInitialize();
+
+            // Metro apps are always full screen.
+            Game.graphicsDeviceManager.IsFullScreen = true;
         }
 
         public override bool BeforeUpdate(GameTime gameTime)
         {
-			// Update our OpenAL sound buffer pools
-			//soundControllerInstance.Update();			
             return true;
         }
 
         public override bool BeforeDraw(GameTime gameTime)
         {
+            var device = Game.GraphicsDevice;
+            if (device != null)
+            {
+                // For a Metro app we need to re-apply the
+                // render target before every draw.  
+                // 
+                // I guess the OS changes it and doesn't restore it?
+                device.ResetRenderTargets();
+            }
+
             return true;
         }
 
@@ -161,7 +196,7 @@ namespace Microsoft.Xna.Framework
 
         protected override void OnIsMouseVisibleChanged() 
         {
-            _window.SetCursor(Game.IsMouseVisible);
+            MetroGameWindow.Instance.SetCursor(Game.IsMouseVisible);
         }
 		
         protected override void Dispose(bool disposing)
@@ -171,7 +206,7 @@ namespace Microsoft.Xna.Framework
             if (graphicsDeviceManager != null)
                 graphicsDeviceManager.Dispose();
 
-            _window.Dispose();
+            MetroGameWindow.Instance.Dispose();
 			
 			base.Dispose(disposing);
         }

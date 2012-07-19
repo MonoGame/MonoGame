@@ -21,6 +21,8 @@ using OpenTK.Graphics.ES20;
 using ActiveUniformType = OpenTK.Graphics.ES20.All;
 #elif MONOMAC
 using MonoMac.OpenGL;
+#elif PSS
+using Sce.Pss.Core.Graphics;
 #elif !WINRT
 using OpenTK.Graphics.OpenGL;
 #endif
@@ -40,51 +42,26 @@ namespace Microsoft.Xna.Framework.Graphics
 
         #endregion
 
+        static internal readonly byte[] Bytecode = LoadEffectResource(
+#if DIRECTX
+            "Microsoft.Xna.Framework.Graphics.Effect.Resources.SpriteEffect.dx11.mgfxo"
+#elif PSS
+            "MonoGame.Framework.PSSuite.PSSuite.Graphics.Resources.Texture.cgx" //FIXME: This shader is totally incomplete
+#else
+            "Microsoft.Xna.Framework.Graphics.Effect.Resources.SpriteEffect.ogl.mgfxo"
+#endif
+        );
+
         #region Methods
 
-#if NOMOJO
-
-        public static readonly string[] vertexShaderFilenames = new string[] 
-		{
-			"Microsoft.Xna.Framework.Graphics.Effect.Resources.SpriteEffect.VSSprite.glsl"
-		};
-
-        public static readonly string[] fragmentShaderFilenames = new string[]
-		{
-			"Microsoft.Xna.Framework.Graphics.Effect.Resources.SpriteEffect.PSSprite.glsl"
-		};
-
-        static readonly int[] vertexShaderIndices = new int[] { 0 };
-        static readonly int[] fragmentShaderIndices = new int[] { 0 };
-
-        public static readonly Tuple<int, int>[] programIndices = new Tuple<int, int>[]
-		{
-			new Tuple<int, int>(0, 0)
-		};
-
-
-        public SpriteEffect(GraphicsDevice device)
-            : base(device,
-                SpriteEffect.vertexShaderFilenames,
-                SpriteEffect.fragmentShaderFilenames,
-                SpriteEffect.programIndices)
-        {
-            Initialize();
-
-            CacheEffectParameters();
-
-            Techniques.Add(new EffectTechnique(this));
-        }
-#else
         /// <summary>
         /// Creates a new SpriteEffect.
         /// </summary>
         public SpriteEffect(GraphicsDevice device)
-            : base(device, Effect.LoadEffectResource("SpriteEffect"))
+            : base(device, Bytecode)
         {
             CacheEffectParameters();
         }
-#endif
 
         /// <summary>
         /// Creates a new SpriteEffect by cloning parameter settings from an existing instance.
@@ -113,25 +90,19 @@ namespace Microsoft.Xna.Framework.Graphics
             matrixParam = Parameters["MatrixTransform"];
         }
 
-        internal override void Initialize()
-        {
-#if !WINRT
-            matrixParam = new EffectParameter(ActiveUniformType.FloatMat4, "MatrixTransform");
-            Parameters.Add(matrixParam);
-#endif
-        }
-
         /// <summary>
         /// Lazily computes derived parameter values immediately before applying the effect.
         /// </summary>
-        protected internal override void OnApply()
+        protected internal override bool OnApply()
         {
-            Viewport viewport = GraphicsDevice.Viewport;
+            var viewport = GraphicsDevice.Viewport;
 
-            Matrix projection = Matrix.CreateOrthographicOffCenter(0, viewport.Width, viewport.Height, 0, 0, 1);
-            Matrix halfPixelOffset = Matrix.CreateTranslation(-0.5f, -0.5f, 0);
+            var projection = Matrix.CreateOrthographicOffCenter(0, viewport.Width, viewport.Height, 0, 0, 1);
+            var halfPixelOffset = Matrix.CreateTranslation(-0.5f, -0.5f, 0);
 
             matrixParam.SetValue(halfPixelOffset * projection);
+
+            return false;
         }
 
 

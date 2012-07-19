@@ -8,8 +8,10 @@ using System.Runtime.InteropServices;
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
-#elif WINRT
-#else
+#elif PSS
+using Sce.Pss.Core.Graphics;
+using PssVertexBuffer = Sce.Pss.Core.Graphics.VertexBuffer;
+#elif GLES
 using OpenTK.Graphics.ES20;
 using BufferTarget = OpenTK.Graphics.ES20.All;
 using BufferUsageHint = OpenTK.Graphics.ES20.All;
@@ -21,16 +23,20 @@ namespace Microsoft.Xna.Framework.Graphics
 
     public class IndexBuffer : GraphicsResource
     {
-		public BufferUsage BufferUsage { get; private set; }
-		public int IndexCount { get; private set; }
-		public IndexElementSize IndexElementSize { get; private set; }
-		
-#if WINRT
+        private bool _isDynamic;
+
+#if DIRECTX
         internal SharpDX.Direct3D11.Buffer _buffer;
+#elif PSS
+        internal PssVertexBuffer _buffer;
 #else
 		internal uint ibo;	
 #endif
-	
+
+        public BufferUsage BufferUsage { get; private set; }
+        public int IndexCount { get; private set; }
+        public IndexElementSize IndexElementSize { get; private set; }
+
 		protected IndexBuffer(GraphicsDevice graphicsDevice, IndexElementSize indexElementSize, int indexCount, BufferUsage bufferUsage, bool dynamic)
         {
 			if (graphicsDevice == null)
@@ -44,21 +50,37 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			var sizeInBytes = indexCount * (this.IndexElementSize == IndexElementSize.SixteenBits ? 2 : 4);
 
-#if WINRT
-            // TODO: To use Immutable resources we would need to delay creation of 
+            _isDynamic = dynamic;
+            
+#if DIRECTX
+
+            // TODO: To use true Immutable resources we would need to delay creation of 
             // the Buffer until SetData() and recreate them if set more than once.
+
+            SharpDX.Direct3D11.CpuAccessFlags accessflags = SharpDX.Direct3D11.CpuAccessFlags.None;
+            SharpDX.Direct3D11.ResourceUsage usage = SharpDX.Direct3D11.ResourceUsage.Default;
+
+            if (dynamic)
+            {
+                accessflags |= SharpDX.Direct3D11.CpuAccessFlags.Write;
+                usage = SharpDX.Direct3D11.ResourceUsage.Dynamic;
+            }
+
+            if (bufferUsage != Graphics.BufferUsage.WriteOnly)
+                accessflags |= SharpDX.Direct3D11.CpuAccessFlags.Read;
 
             _buffer = new SharpDX.Direct3D11.Buffer(    graphicsDevice._d3dDevice,
                                                         sizeInBytes,
-                                                        dynamic ? SharpDX.Direct3D11.ResourceUsage.Dynamic : SharpDX.Direct3D11.ResourceUsage.Default,
+                                                        usage,
                                                         SharpDX.Direct3D11.BindFlags.IndexBuffer,
-                                                        0, // CpuAccessFlags
-                                                        0, // OptionFlags                                                          
+                                                        accessflags,
+                                                        SharpDX.Direct3D11.ResourceOptionFlags.None,
                                                         0  // StructureSizeInBytes
                                                         );
+#elif PSS
+            _buffer = new PssVertexBuffer(0, indexCount);
 #else
-            Threading.Begin();
-            try
+            Threading.BlockOnUIThread(() =>
             {
 #if IPHONE || ANDROID
                 GL.GenBuffers(1, ref ibo);
@@ -68,11 +90,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 GL.BindBuffer(BufferTarget.ElementArrayBuffer, ibo);
                 GL.BufferData(BufferTarget.ElementArrayBuffer,
                               (IntPtr)sizeInBytes, IntPtr.Zero, dynamic ? BufferUsageHint.StreamDraw : BufferUsageHint.StaticDraw);
-            }
-            finally
-            {
-                Threading.End();
-            }
+            });
 #endif
 		}
 		
@@ -97,10 +115,12 @@ namespace Microsoft.Xna.Framework.Graphics
             if (BufferUsage == BufferUsage.WriteOnly)
                 throw new NotSupportedException("This IndexBuffer was created with a usage type of BufferUsage.WriteOnly. Calling GetData on a resource that was created with BufferUsage.WriteOnly is not supported.");
 
-#if WINRT
+#if DIRECTX
+            throw new NotImplementedException();
+#elif PSS
+            throw new NotImplementedException();
 #else        
-            Threading.Begin();
-            try
+            Threading.BlockOnUIThread(() =>
             {
                 GL.BindBuffer(BufferTarget.ArrayBuffer, ibo);
                 var elementSizeInByte = Marshal.SizeOf(typeof(T));
@@ -132,11 +152,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
                 GL.UnmapBuffer(BufferTarget.ArrayBuffer);
 #endif
-            }
-            finally
-            {
-                Threading.End();
-            }
+            });
 #endif
         }
 
@@ -149,40 +165,91 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             this.GetData<T>(0, data, 0, data.Length);
         }
-		
-		public void SetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount) where T : struct
+
+        public void SetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount) where T : struct
         {
-			if (data == null) 
+            SetData<T>(0, data, startIndex, elementCount, SetDataOptions.Discard);
+        }
+        		
+		public void SetData<T>(T[] data, int startIndex, int elementCount) where T : struct
+        {
+            SetData<T>(0, data, startIndex, elementCount, SetDataOptions.Discard);
+		}
+		
+        public void SetData<T>(T[] data) where T : struct
+        {
+            SetData<T>(0, data, 0, data.Length, SetDataOptions.Discard);
+        }
+
+        protected void SetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, SetDataOptions options) where T : struct
+        {
+            if (data == null)
                 throw new ArgumentNullException("data");
 
-#if WINRT
-            //using(var stream = new SharpDX.DataStream(sizeInBytes, false, true))
+#if DIRECTX
+
+            if (_isDynamic)
             {
-                var elementSizeInBytes = IndexElementSize == Graphics.IndexElementSize.SixteenBits ? 2 : 4;
+                // We assume discard by default.
+                var mode = SharpDX.Direct3D11.MapMode.WriteDiscard;
+                if ((options & SetDataOptions.NoOverwrite) == SetDataOptions.NoOverwrite)
+                    mode = SharpDX.Direct3D11.MapMode.WriteNoOverwrite;
+
+                SharpDX.DataStream stream;
+                lock (graphicsDevice._d3dContext)
+                {
+                    graphicsDevice._d3dContext.MapSubresource(
+                        _buffer,
+                        mode,
+                        SharpDX.Direct3D11.MapFlags.None,
+                        out stream);
+
+                    stream.Position = offsetInBytes;
+                    stream.WriteRange(data, startIndex, elementCount);
+
+                    graphicsDevice._d3dContext.UnmapSubresource(_buffer, 0);
+                }
+            }
+            else
+            {
+                var elementSizeInBytes = Marshal.SizeOf(typeof(T));
                 var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
                 var startBytes = startIndex * elementSizeInBytes;
                 var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
 
-                //stream.WriteRange(data, 0, elementCount);
-                //var box = new SharpDX.DataBox(stream.DataPointer, elementSizeInByte, 0);
-                var box = new SharpDX.DataBox(dataPtr, elementSizeInBytes, 0);
+                var box = new SharpDX.DataBox(dataPtr, 1, 0);
 
                 var region = new SharpDX.Direct3D11.ResourceRegion();
                 region.Top = 0;
                 region.Front = 0;
                 region.Back = 1;
                 region.Bottom = 1;
-                region.Left = offsetInBytes / elementSizeInBytes;
-                region.Right = elementCount;
+                region.Left = offsetInBytes;
+                region.Right = offsetInBytes + (elementCount * elementSizeInBytes);
 
                 // TODO: We need to deal with threaded contexts here!
-                graphicsDevice._d3dContext.UpdateSubresource(box, _buffer, 0, region);
+                lock (graphicsDevice._d3dContext)
+                    graphicsDevice._d3dContext.UpdateSubresource(box, _buffer, 0, region);
 
                 dataHandle.Free();
             }
+
+#elif PSS
+            if (typeof(T) == typeof(ushort))
+            {
+#warning This is a terrible way to achieve what I want to do
+                _buffer.SetIndices((ushort[])(object)data, 0, 0, elementCount); 
+            }
+            else
+            {
+                ushort[] clone = new ushort[data.Length];
+                for (int i = 0; i < data.Length; i++)
+#warning This is a terrible way to achieve what I want to do
+                    clone[i] = (ushort)(object)data[i];
+                _buffer.SetIndices(clone, 0, 0, elementCount);
+            }
 #else
-            Threading.Begin();
-            try
+            Threading.BlockOnUIThread(() =>
             {
                 var elementSizeInByte = Marshal.SizeOf(typeof(T));
                 var sizeInBytes = elementSizeInByte * elementCount;
@@ -193,27 +260,14 @@ namespace Microsoft.Xna.Framework.Graphics
                 GL.BufferSubData(BufferTarget.ElementArrayBuffer, (IntPtr)offsetInBytes, (IntPtr)sizeInBytes, dataPtr);
 
                 dataHandle.Free();
-            }
-            finally
-            {
-                Threading.End();
-            }
+            });
 #endif
-		}
-		
-		public void SetData<T>(T[] data, int startIndex, int elementCount) where T : struct
-        {
-            SetData<T>(0, data, startIndex, elementCount);
-		}
-		
-        public void SetData<T>(T[] data) where T : struct
-        {
-            SetData<T>(0, data, 0, data.Length);
         }
-		
+
 		public override void Dispose()
-		{
-#if WINRT
+        {
+#if DIRECTX || PSS
+
             if (_buffer != null)
             {
                 _buffer.Dispose();

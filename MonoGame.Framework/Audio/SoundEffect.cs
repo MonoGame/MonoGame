@@ -46,23 +46,42 @@ using Microsoft.Xna;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 
+#if WINRT
+using SharpDX;
+using SharpDX.XAudio2;
+using SharpDX.Multimedia;
+using SharpDX.X3DAudio;
+#endif
+
 namespace Microsoft.Xna.Framework.Audio
 {
     public sealed class SoundEffect : IDisposable
     {
+#if WINRT
+        internal DataStream _dataStream;
+        internal AudioBuffer _buffer;
+        internal AudioBuffer _loopedBuffer;
+        internal WaveFormat _format;
+        
+        // These three fields are used for keeping track of instances created
+        // internally when Play is called directly on SoundEffect.
+        private List<SoundEffectInstance> _playingInstances;
+        private List<SoundEffectInstance> _availableInstances;
+        private List<SoundEffectInstance> _toBeRecycledInstances;
+#else
 		private Sound _sound;
-		private string _name = "";
-		private string _filename = "";
-		private byte[] _data;
         private SoundEffectInstance _instance;
-		
-		internal float Rate { get; set; }
+#endif
 
-		//internal ALFormat Format { get; set; }
-
-		internal int Size { get; set; }
-		
-		internal SoundEffect(string fileName)
+        private string _name;
+		private string _filename = "";		
+        private byte[] _data;
+#if WINRT
+        internal SoundEffect()
+        {
+        }
+#else
+        internal SoundEffect(string fileName)
 		{
 			_filename = fileName;		
 			
@@ -82,12 +101,18 @@ namespace Microsoft.Xna.Framework.Audio
 			_name = name;
 			_sound = new Sound(_data, 1.0f, false);
 		}
-		
-		public SoundEffect(byte[] buffer, int sampleRate, AudioChannels channels)
+#endif
+
+        public SoundEffect(byte[] buffer, int sampleRate, AudioChannels channels)
 		{
+#if WINRT            
+            Initialize(new WaveFormat(sampleRate, (int)channels), buffer, 0, buffer.Length, 0, buffer.Length);
+#else
 			//buffer should contain 16-bit PCM wave data
 			short bitsPerSample = 16;
-			
+
+            _name = "";
+
 			using (var mStream = new MemoryStream(44+buffer.Length))
             using (var writer = new BinaryWriter(mStream))
             {
@@ -106,23 +131,128 @@ namespace Microsoft.Xna.Framework.Audio
                 writer.Write((short)bitsPerSample);
 
                 writer.Write("data".ToCharArray()); //chunk id
-                writer.Write((int)buffer.Length); //data size
+                writer.Write((int)buffer.Length); //data size 	MonoGame.Framework.Windows8.DLL!Microsoft.Xna.Framework.Audio.Sound.Sound(byte[] audiodata, float volume, bool looping) Line 199	C#
+
                 writer.Write(buffer);
 
                 _data = mStream.ToArray();
             }
 
-			_name = "";
 			_sound = new Sound(_data, 1.0f, false);
-		}
+#endif
+        }
+
+        public SoundEffect(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
+        {            
+#if WINRT
+            Initialize(new WaveFormat(sampleRate, (int)channels), buffer, offset, count, loopStart, loopLength);
+#else
+            throw new NotImplementedException();
+#endif
+        }
+
+#if WINRT
+
+        // Extended constructor which supports custom formats / compression.
+        internal SoundEffect(WaveFormat format, byte[] buffer, int offset, int count, int loopStart, int loopLength)
+        {
+            Initialize(format, buffer, offset, count, loopStart, loopLength);
+        }
+
+        private void Initialize(WaveFormat format, byte[] buffer, int offset, int count, int loopStart, int loopLength)
+        {
+            _format = format;
+
+            _dataStream = DataStream.Create<byte>(buffer, true, false);
+
+            // Use the loopStart and loopLength also as the range
+            // when playing this SoundEffect a single time / unlooped.
+            _buffer = new AudioBuffer()
+            {
+                Stream = _dataStream,
+                AudioBytes = count,
+                Flags = BufferFlags.EndOfStream,
+                PlayBegin = loopStart,
+                PlayLength = loopLength,
+                Context = new IntPtr(42),
+            };
+
+            _loopedBuffer = new AudioBuffer()
+            {
+                Stream = _dataStream,
+                AudioBytes = count,
+                Flags = BufferFlags.EndOfStream,
+                LoopBegin = loopStart,
+                LoopLength = loopLength,
+                LoopCount = AudioBuffer.LoopInfinite,
+                Context = new IntPtr(42),
+            };            
+        }
+#endif
 		
         public bool Play()
         {				
-			return Play(MasterVolume, 0.0f, 0.0f);
+            return Play(1.0f, 0.0f, 0.0f);
         }
 
         public bool Play(float volume, float pitch, float pan)
         {
+#if WINRT
+            if (MasterVolume > 0.0f)
+            {
+                if (_playingInstances == null)
+                {
+                    // Allocate lists first time we need them.
+                    _playingInstances = new List<SoundEffectInstance>();
+                    _availableInstances = new List<SoundEffectInstance>();
+                    _toBeRecycledInstances = new List<SoundEffectInstance>();
+                }
+                else
+                {
+                    // Cleanup instances which have finished playing.                    
+                    foreach (var inst in _playingInstances)
+                    {
+                        if (inst.State == SoundState.Stopped)
+                        {
+                            _toBeRecycledInstances.Add(inst);
+                        }
+                    }                    
+                }
+
+                // Locate a SoundEffectInstance either one already
+                // allocated and not in use or allocate a new one.
+                SoundEffectInstance instance = null;
+                if (_toBeRecycledInstances.Count > 0)
+                {
+                    foreach (var inst in _toBeRecycledInstances)
+                    {
+                        _availableInstances.Add(inst);
+                        _playingInstances.Remove(inst);
+                    }
+                    _toBeRecycledInstances.Clear();
+                }
+                if (_availableInstances.Count > 0)
+                {
+                    instance = _availableInstances[0];
+                    _playingInstances.Add(instance);
+                    _availableInstances.Remove(instance);
+                }
+                else
+                {
+                    instance = CreateInstance();
+                    _playingInstances.Add(instance);
+                }
+
+                instance.Volume = volume;
+                instance.Pitch = pitch;
+                instance.Pan = pan;
+                instance.Play();
+            }
+
+            // XNA documentation says this method returns false if the sound limit
+            // has been reached. However, there is no limit on PC.
+            return true;
+#else
 			if ( MasterVolume > 0.0f )
 			{
                 if(_instance == null)
@@ -134,12 +264,19 @@ namespace Microsoft.Xna.Framework.Audio
 				return _instance.Sound.Playing;
 			}
 			return false;
+#endif
         }
 		
 		public TimeSpan Duration 
 		{ 
 			get
 			{
+#if WINRT                    
+                var sampleCount = _buffer.PlayLength;
+                var avgBPS = _format.AverageBytesPerSecond;
+                
+                return TimeSpan.FromSeconds((float)sampleCount / (float)avgBPS);
+#else
 				if ( _sound != null )
 				{
 					return new TimeSpan(0,0,(int)_sound.Duration);
@@ -148,6 +285,7 @@ namespace Microsoft.Xna.Framework.Audio
 				{
 					return new TimeSpan(0);
 				}
+#endif
 			}
 		}
 
@@ -157,28 +295,39 @@ namespace Microsoft.Xna.Framework.Audio
             {
 				return _name;
             }
-			set {
+			set 
+            {
 				_name = value;
 			}
         }
-		
-		public SoundEffectInstance CreateInstance ()
+
+		public SoundEffectInstance CreateInstance()
 		{
-			var instance = new SoundEffectInstance();
-			instance.Sound = _sound;
-			return instance;
+            var instance = new SoundEffectInstance();
+#if WINRT
+            instance._effect = this;
+            instance._voice = new SourceVoice(SoundEffect.Device, _format);            
+#else			
+			instance.Sound = _sound;			
+#endif
+            return instance;
 		}
 		
 		#region IDisposable Members
 
         public void Dispose()
         {
+#if WINRT
+            _dataStream.Dispose();               
+#else
 			_sound.Dispose();
+#endif
         }
 
         #endregion
-		
-		static float _masterVolume = 1.0f;
+
+        #region Static Members
+        static float _masterVolume = 1.0f;
 		public static float MasterVolume 
 		{ 
 			get
@@ -187,7 +336,12 @@ namespace Microsoft.Xna.Framework.Audio
 			}
 			set
 			{
-				_masterVolume = value;	
+                if ( _masterVolume != value )
+                    _masterVolume = value;
+
+#if WINRT
+                MasterVoice.SetVolume(_masterVolume, 0);
+#endif
 			}
 		}
 
@@ -231,7 +385,75 @@ namespace Microsoft.Xna.Framework.Audio
 			set {
 				speedOfSound = value;
 			}
-		}						
+        }
+
+#if WINRT        
+        public static XAudio2 Device;        
+        public static MasteringVoice MasterVoice;
+
+        private static bool _device3DDirty = true;
+        private static Speakers _speakers = Speakers.Stereo;
+
+        // XNA does not expose this, but it exists in X3DAudio.
+        public static Speakers Speakers
+        {
+            get
+            {
+                return _speakers;
+            }
+
+            set
+            {
+                if (_speakers != value)
+                {
+                    _speakers = value;
+                    _device3DDirty = true;
+                }
+            }
+        }
+
+        private static X3DAudio _device3D;
+
+        public static X3DAudio Device3D
+        {
+            get
+            {
+                if (_device3DDirty)
+                {
+                    _device3DDirty = false;
+                    _device3D = new X3DAudio(_speakers);
+                }
+
+                return _device3D;
+            }
+        }
+
+        static SoundEffect()
+        {
+            Device = new XAudio2();
+            if (Device.StartEngine() != Result.Ok)
+                throw new Exception("XAudio2.StartEngine has failed.");
+
+            // Let windows autodetect number of channels and sample rate.
+            MasterVoice = new MasteringVoice(Device, XAudio2.DefaultChannels, XAudio2.DefaultSampleRate);            
+            MasterVoice.SetVolume(_masterVolume, 0);
+
+            // The autodetected value of MasterVoice.ChannelMask corresponds to the speaker layout.
+            Speakers = (Speakers)MasterVoice.ChannelMask;
+        }
+
+        // Does someone actually need to call this if it only happens when the whole
+        // game closes? And if so, who would make the call?
+        internal static void Shutdown()
+        {            
+            MasterVoice.DestroyVoice();
+            MasterVoice.Dispose();
+
+            Device.StopEngine();
+            Device.Dispose();                     
+        }
+#endif
+        #endregion
     }
 }
 

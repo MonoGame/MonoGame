@@ -233,14 +233,14 @@ using System.Collections.Generic;
         private bool CheckButtonHit(ButtonDefinition theButton, Vector2 location)
         {
             Rectangle buttonRect = new Rectangle((int)theButton.Position.X, (int)theButton.Position.Y, theButton.TextureRect.Width, theButton.TextureRect.Height);
-            return buttonRect.Contains(location);
+            return buttonRect.Contains(new Point((int)location.X, (int)location.Y));
         }
 
         private bool CheckThumbStickHit(ThumbStickDefinition theStick, Vector2 location)
         {
             Vector2 stickPosition = theStick.Position + theStick.Offset;
             Rectangle thumbRect = new Rectangle((int)stickPosition.X, (int)stickPosition.Y, theStick.TextureRect.Width, theStick.TextureRect.Height);
-            return thumbRect.Contains(location);
+            return thumbRect.Contains(new Point((int)location.X, (int)location.Y));
         }
 
         private bool UpdateButton(ButtonDefinition button, Vector2 location)

@@ -9,8 +9,6 @@ namespace Microsoft.Xna.Framework.Content
 {
     internal class EffectReader : ContentTypeReader<Effect>
     {
-        private static EffectPool effectpool;
-
         public EffectReader()
         {
         }
@@ -35,16 +33,10 @@ namespace Microsoft.Xna.Framework.Content
         {
             int count = input.ReadInt32();
             
-#if NOMOJO
-            // We currently do not support effect files
-            // when MojoShader is disabled!
-            throw new NotImplementedException();
-#else
-            Effect effect = new Effect(input.GraphicsDevice,input.ReadBytes(count));
+            var effect = new Effect(input.GraphicsDevice,input.ReadBytes(count));
             effect.Name = input.AssetName;
             
             return effect;
-#endif
         }
     }
 }

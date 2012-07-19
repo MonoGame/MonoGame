@@ -162,37 +162,45 @@ namespace Microsoft.Xna.Framework.Content
             }
 
             T result = default(T);
-            // Serialize access to loadedAssets with a lock
-            lock (ContentManagerLock)
+
+            // Check for a previously loaded asset first
+            object asset = null;
+            if (loadedAssets.TryGetValue(assetName, out asset))
             {
-                // Check for a previously loaded asset first
-                object asset = null;
-                if (loadedAssets.TryGetValue(assetName, out asset))
+                if (asset is T)
                 {
-                    if (asset is T)
-                    {
-                        return (T)asset;
-                    }
-                }
-
-                // Load the asset.
-                result = ReadAsset<T>(assetName, null);
-
-                // Cache the result.
-                if (!loadedAssets.ContainsKey(assetName))
-                {
-                    loadedAssets.Add(assetName, result);
+                    return (T)asset;
                 }
             }
-			return result;
+
+            // Load the asset.
+            result = ReadAsset<T>(assetName, null);
+
+            // Cache the result.
+            if (!loadedAssets.ContainsKey(assetName))
+            {
+                loadedAssets.Add(assetName, result);
+            }
+
+            return result;
 		}
 		
 		protected virtual Stream OpenStream(string assetName)
 		{
 			Stream stream;
-			try {
-				string assetPath = Path.Combine (_rootDirectory, assetName)+".xnb";
+			try
+            {
+				string assetPath = Path.Combine(_rootDirectory, assetName) + ".xnb";
                 stream = TitleContainer.OpenStream(assetPath);
+#if ANDROID
+                // Read the asset into memory in one go. This results in a ~50% reduction
+                // in load times on Android due to slow Android asset streams.
+                MemoryStream memStream = new MemoryStream();
+                stream.CopyTo(memStream);
+                memStream.Seek(0, SeekOrigin.Begin);
+                stream.Close();
+                stream = memStream;
+#endif
 			}
 			catch (FileNotFoundException fileNotFound)
 			{
@@ -222,6 +230,9 @@ namespace Microsoft.Xna.Framework.Content
 				throw new ObjectDisposedException("ContentManager");
 			}
 			
+			var lastPathSeparatorIndex = Math.Max(assetName.LastIndexOf('\\'), assetName.LastIndexOf('/'));
+			CurrentAssetDirectory = lastPathSeparatorIndex == -1 ? RootDirectory : assetName.Substring(0, lastPathSeparatorIndex);
+			
 			string originalAssetName = assetName;
 			object result = null;
 
@@ -236,16 +247,19 @@ namespace Microsoft.Xna.Framework.Content
 			
 			Stream stream = null;
 			bool loadXnb = false;
-			try {
+			try
+            {
 				//try load it traditionally
 				stream = OpenStream(assetName);
 				loadXnb = true;
-			} catch (ContentLoadException ex) {
+			}
+            catch (ContentLoadException)
+            {
 				//MonoGame try to load as a non-content file
 				
 				assetName = TitleContainer.GetFilename(Path.Combine (_rootDirectory, assetName));
-				
-                if ((typeof(T) == typeof(Texture2D)))
+
+				if (typeof(T) == typeof(Texture2D) || typeof(T) == typeof(Texture))
 				{
 					assetName = Texture2DReader.Normalize(assetName);
 				}
@@ -276,8 +290,8 @@ namespace Microsoft.Xna.Framework.Content
 				{
 					throw new ContentLoadException("Could not load " + originalAssetName + " asset!");
 				}
-			
-				if ((typeof(T) == typeof(Texture2D)))
+
+				if (typeof(T) == typeof(Texture2D) || typeof(T) == typeof(Texture))
 				{
 					using (Stream assetStream = TitleContainer.OpenStream(assetName))
 					{
@@ -308,18 +322,12 @@ namespace Microsoft.Xna.Framework.Content
 #endif
                 else if ((typeof(T) == typeof(Effect)))
 				{
-#if NOMOJO
-                    // We currently do not support effect files
-                    // when MojoShader is disabled!
-                    throw new NotImplementedException();
-#else
 					using (Stream assetStream = TitleContainer.OpenStream(assetName))
 					{
 						var data = new byte[assetStream.Length];
 						assetStream.Read (data, 0, (int)assetStream.Length);
 						result = new Effect(this.graphicsDeviceService.GraphicsDevice, data);
                     }
-#endif
                 }
 			}
 			
@@ -466,6 +474,8 @@ namespace Microsoft.Xna.Framework.Content
 				else
 					disposableAssets.Add(result as IDisposable);
 			}
+			
+			CurrentAssetDirectory = null;
 			    
 			return (T)result;
 		}
@@ -507,7 +517,7 @@ namespace Microsoft.Xna.Framework.Content
 				stream = OpenStream(assetName);
 				stream.Dispose();
 			}
-			catch (ContentLoadException ex)
+			catch (ContentLoadException)
 			{
 				//MonoGame try to load as a non-content file
 
@@ -589,6 +599,8 @@ namespace Microsoft.Xna.Framework.Content
 				_rootDirectory = value;
 			}
 		}
+		
+		public string CurrentAssetDirectory { get; set; }
 
 		public IServiceProvider ServiceProvider
 		{

@@ -41,7 +41,7 @@ purpose and non-infringement.
 using System;
 using System.Collections;
 using System.Collections.Generic;
-﻿
+
 namespace Microsoft.Xna.Framework.Media
 {
 

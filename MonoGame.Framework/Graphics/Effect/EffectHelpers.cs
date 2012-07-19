@@ -77,14 +77,12 @@ namespace Microsoft.Xna.Framework.Graphics
             if ((dirtyFlags & EffectDirtyFlags.WorldViewProj) != 0)
             {
                 Matrix worldViewProj;
-
+                
                 Matrix.Multiply(ref world, ref view, out worldView);
                 Matrix.Multiply(ref worldView, ref projection, out worldViewProj);
                 
-                //worldViewProjParam.SetValue(worldViewProj);
-				worldViewProjParam.SetValue(worldViewProj);
-
-                //System.Console.WriteLine("Helper");
+                worldViewProjParam.SetValue(worldViewProj);
+                
                 dirtyFlags &= ~EffectDirtyFlags.WorldViewProj;
             }
 
@@ -213,7 +211,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (lightingEnabled)
             {
                 Vector4 diffuse = new Vector4();
-                Vector3 emissive = new Vector3(); 
+                Vector3 emissive = new Vector3();
                 
                 diffuse.X = diffuseColor.X * alpha;
                 diffuse.Y = diffuseColor.Y * alpha;

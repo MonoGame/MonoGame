@@ -44,8 +44,6 @@ using System;
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
-#elif WINRT
-// TODO
 #elif GLES
 using OpenTK.Graphics.ES20;
 using RenderbufferTarget = OpenTK.Graphics.ES20.All;
@@ -68,11 +66,12 @@ namespace Microsoft.Xna.Framework.Graphics
 		const RenderbufferStorage GLDepth24Stencil8 = RenderbufferStorage.Depth24Stencil8;
 #endif
 
-#if WINRT
-        protected SharpDX.Direct3D11.RenderTargetView _renderTargetView;
-        protected SharpDX.Direct3D11.DepthStencilView _depthStencilView;
+#if DIRECTX
+        internal SharpDX.Direct3D11.RenderTargetView _renderTargetView;
+        internal SharpDX.Direct3D11.DepthStencilView _depthStencilView;
 #elif OPENGL
 		internal uint glDepthStencilBuffer;
+        internal uint glFramebuffer;
 #endif
 
 		public DepthFormat DepthStencilFormat { get; private set; }
@@ -80,18 +79,56 @@ namespace Microsoft.Xna.Framework.Graphics
 		public int MultiSampleCount { get; private set; }
 		
 		public RenderTargetUsage RenderTargetUsage { get; private set; }
+        
+        public bool IsContentLost { get { return false; } }
 		
 		public RenderTarget2D (GraphicsDevice graphicsDevice, int width, int height, bool mipMap, SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage)
-			:base (graphicsDevice, width, height, mipMap, preferredFormat)
+			:base (graphicsDevice, width, height, mipMap, preferredFormat, true)
 		{
-			this.DepthStencilFormat = preferredDepthFormat;
-			this.MultiSampleCount = preferredMultiSampleCount;
-			this.RenderTargetUsage = usage;
+			DepthStencilFormat = preferredDepthFormat;
+			MultiSampleCount = preferredMultiSampleCount;
+			RenderTargetUsage = usage;
 
+#if DIRECTX
+            // Create a view interface on the rendertarget to use on bind.
+            _renderTargetView = new SharpDX.Direct3D11.RenderTargetView(graphicsDevice._d3dDevice, _texture);
+#endif
+
+            // If we don't need a depth buffer then we're done.
             if (preferredDepthFormat == DepthFormat.None)
                 return;
 
-#if WINRT
+#if DIRECTX
+
+            // Setup the multisampling description.
+            var multisampleDesc = new SharpDX.DXGI.SampleDescription(1, 0);
+            if ( preferredMultiSampleCount > 1 )
+            {
+                multisampleDesc.Count = preferredMultiSampleCount;
+                multisampleDesc.Quality = (int)SharpDX.Direct3D11.StandardMultisampleQualityLevels.StandardMultisamplePattern;
+            }
+
+            // Create a descriptor for the depth/stencil buffer.
+            // Allocate a 2-D surface as the depth/stencil buffer.
+            // Create a DepthStencil view on this surface to use on bind.
+            using (var depthBuffer = new SharpDX.Direct3D11.Texture2D(graphicsDevice._d3dDevice, new SharpDX.Direct3D11.Texture2DDescription()
+            {
+                Format = SharpDXHelper.ToFormat(preferredDepthFormat),
+                ArraySize = 1,
+                MipLevels = 1,
+                Width = width,
+                Height = height,
+                SampleDescription = multisampleDesc,
+                BindFlags = SharpDX.Direct3D11.BindFlags.DepthStencil,
+            }))
+
+            // Create the view for binding to the device.
+            _depthStencilView = new SharpDX.Direct3D11.DepthStencilView(graphicsDevice._d3dDevice, depthBuffer,
+                new SharpDX.Direct3D11.DepthStencilViewDescription() 
+                { 
+                    Format = SharpDXHelper.ToFormat(preferredDepthFormat),
+                    Dimension = SharpDX.Direct3D11.DepthStencilViewDimension.Texture2D 
+                });
 
 #elif OPENGL
 
@@ -110,19 +147,19 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 			GL.RenderbufferStorage(GLRenderbuffer, glDepthStencilFormat, this.width, this.height);
 #endif
-		}
+        }
 		
-		public RenderTarget2D (GraphicsDevice graphicsDevice, int width, int height, bool mipMap, SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat)
+		public RenderTarget2D(GraphicsDevice graphicsDevice, int width, int height, bool mipMap, SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat)
 			:this (graphicsDevice, width, height, mipMap, preferredFormat, preferredDepthFormat, 0, RenderTargetUsage.DiscardContents) 
 		{}
 		
-		public RenderTarget2D (GraphicsDevice graphicsDevice, int width, int height)
+		public RenderTarget2D(GraphicsDevice graphicsDevice, int width, int height)
 			: this(graphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.DiscardContents) 
 		{}
 
 		public override void Dispose ()
 		{
-#if WINRT
+#if DIRECTX
             if (_renderTargetView != null)
             {
                 _renderTargetView.Dispose();
@@ -135,6 +172,10 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 #elif OPENGL
 			GL.DeleteRenderbuffers(1, ref this.glDepthStencilBuffer);
+
+			if(this.glFramebuffer > 0)
+				GL.DeleteFramebuffers(1, ref this.glFramebuffer);
+
 #endif
             base.Dispose();
 		}

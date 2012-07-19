@@ -40,10 +40,15 @@ purpose and non-infringement.
 
 using System;
 
+#if WINRT 
+using Windows.UI.Xaml.Controls;
+#endif
+
 #if MONOMAC
 using MonoMac.AppKit;
 #elif IPHONE
 using MonoTouch.UIKit;
+using Microsoft.Xna.Framework.Input.Touch;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -117,6 +122,10 @@ namespace Microsoft.Xna.Framework.Graphics
             set { deviceWindowHandle = value; }
         }
 		
+#if WINRT 
+        public SwapChainBackgroundPanel SwapChainPanel { get; set; }
+#endif 
+
         public DepthFormat DepthStencilFormat
         {
             get { return depthStencilFormat; }
@@ -164,8 +173,20 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             backBufferFormat = SurfaceFormat.Color;
 #if IPHONE
-			backBufferWidth = (int)(UIScreen.MainScreen.Bounds.Width * UIScreen.MainScreen.Scale);
-            backBufferHeight = (int)(UIScreen.MainScreen.Bounds.Height * UIScreen.MainScreen.Scale);
+			// Mainscreen.Bounds does not account for the device's orientation. it ALWAYS assumes portrait
+			var width = (int)(UIScreen.MainScreen.Bounds.Width * UIScreen.MainScreen.Scale);
+			var height = (int)(UIScreen.MainScreen.Bounds.Height * UIScreen.MainScreen.Scale);
+			
+			// Flip the dimentions if we need to.
+			if (TouchPanel.DisplayOrientation == DisplayOrientation.LandscapeLeft ||
+			    TouchPanel.DisplayOrientation == DisplayOrientation.LandscapeRight)
+			{
+				width = height;
+				height = (int)(UIScreen.MainScreen.Bounds.Width * UIScreen.MainScreen.Scale);
+			}
+			
+			backBufferWidth = width;
+            backBufferHeight = height;
 #else
 			backBufferWidth = _defaultBackBufferWidth;
             backBufferHeight = _defaultBackBufferHeight;     

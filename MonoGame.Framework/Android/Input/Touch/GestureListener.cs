@@ -112,8 +112,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			
 			switch (e.ActionMasked)
             {
-				case 1:
-                case 6:				
+				case MotionEventActions.Up:
+                case MotionEventActions.PointerUp:
                     if ((dragging && (TouchPanel.EnabledGestures & GestureType.DragComplete) != 0))
 					{				
 						var gs = new GestureSample(GestureType.DragComplete, AndroidGameActivity.Game.TargetElapsedTime, 

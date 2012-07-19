@@ -41,22 +41,15 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			this.graphicsDevice = graphicsDevice;
 
-#if NOMOJO
-            spriteEffect = new SpriteEffect(this.graphicsDevice);
-#else
             // Use a custom SpriteEffect so we can control the transformation matrix
-            spriteEffect = new Effect(this.graphicsDevice, Effect.LoadEffectResource("SpriteEffect"));
-#endif
-            _batcher = new SpriteBatcher();
+            spriteEffect = new Effect(graphicsDevice, SpriteEffect.Bytecode);
+
+            _batcher = new SpriteBatcher(graphicsDevice);
 		}
 
 		public void Begin ()
 		{
-#if NOMOJO
-            Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, spriteEffect, Matrix.Identity);	
-#else
             Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Matrix.Identity);	
-#endif
 		}
 
 		public void Begin (SpriteSortMode sortMode, BlendState blendState, SamplerState samplerState, DepthStencilState depthStencilState, RasterizerState rasterizerState, Effect effect, Matrix transformMatrix)
@@ -97,29 +90,29 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void End ()
 		{	
-			if (_sortMode != SpriteSortMode.Immediate) {
-				Setup ();
-			}
-			Flush ();
-			
-			// clear out the textures
-			graphicsDevice.Textures._textures.Clear ();
-			
+			if (_sortMode != SpriteSortMode.Immediate)
+				Setup();
+
+            _batcher.DrawBatch(_sortMode);
+					
 #if OPENGL
+
+            // TODO: Is this needed... does XNA really null out
+            // the texture used during batching?
+			graphicsDevice.Textures[0] = null;
+
 			// unbinds shader
-			if (_effect != null) {
-#if NOMOJO
-				_effect.CurrentProgram = 0;
-#else
+			if (_effect != null && graphicsDevice.ShaderProgram != 0) 
+            {
                 GL.UseProgram(0);
-#endif// NOMOJO
+                graphicsDevice.ShaderProgram = 0;
 				_effect = null;
 			}
 #endif
 
-		}
+        }
 		
-		void Setup () 
+		void Setup() 
         {
 			graphicsDevice.BlendState = _blendState;
 			graphicsDevice.DepthStencilState = _depthStencilState;
@@ -129,9 +122,14 @@ namespace Microsoft.Xna.Framework.Graphics
 			if (_effect == null) 
             {
 				Viewport vp = graphicsDevice.Viewport;
-				Matrix projection = Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, 0, 1);
+                Matrix projection = Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, 0, 1);
+
+#if PSS || DIRECTX
+                Matrix transform = _matrix * projection;
+#else
 				Matrix halfPixelOffset = Matrix.CreateTranslation(-0.5f, -0.5f, 0);
 				Matrix transform = _matrix * (halfPixelOffset * projection);
+#endif
 				spriteEffect.Parameters["MatrixTransform"].SetValue (transform);
 				
 				spriteEffect.CurrentTechnique.Passes[0].Apply();
@@ -143,11 +141,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 		
-		void Flush() 
-        {
-			_batcher.DrawBatch (_sortMode, graphicsDevice.SamplerStates[0]);
-		}
-
 		public void Draw (Texture2D texture,
 				Vector2 position,
 				Rectangle? sourceRectangle,
@@ -220,7 +213,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			      depth);
 		}
 
-		private void Draw (Texture2D texture,
+		internal void Draw (Texture2D texture,
 			Vector4 destinationRectangle,
 			Rectangle? sourceRectangle,
 			Color color,
@@ -229,19 +222,13 @@ namespace Microsoft.Xna.Framework.Graphics
 			SpriteEffects effect,
 			float depth)
 		{
-			if (texture == null) {
+			if (texture == null)
 				throw new ArgumentException ("texture");
-			}
-			
-			// texture 0 is the texture beeing draw
-			graphicsDevice.Textures [0] = texture;			
-			
-			SpriteBatchItem item = _batcher.CreateBatchItem ();
+
+			var item = _batcher.CreateBatchItem();
 
 			item.Depth = depth;
-#if !WINRT
-			item.TextureID = texture.glTexture;
-#endif
+			item.Texture = texture;
 
 			if (sourceRectangle.HasValue) {
 				tempRect = sourceRectangle.Value;
@@ -280,10 +267,8 @@ namespace Microsoft.Xna.Framework.Graphics
 					texCoordTL, 
 					texCoordBR);			
 			
-			if (_sortMode == SpriteSortMode.Immediate) {
-				Flush ();
-			}
-			
+			if (_sortMode == SpriteSortMode.Immediate)
+                _batcher.DrawBatch(_sortMode);
 		}
 
 		public void Draw (Texture2D texture, Vector2 position, Rectangle? sourceRectangle, Color color)
@@ -313,8 +298,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			if (spriteFont == null)
 				throw new ArgumentNullException ("spriteFont");
 
+            var source = new SpriteFont.CharacterSource(text);
 			spriteFont.DrawInto (
-				this, text, position, color, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0f);
+                this, ref source, position, color, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0f);
 		}
 
 		public void DrawString (
@@ -324,8 +310,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			if (spriteFont == null)
 				throw new ArgumentNullException ("spriteFont");
 
-			var scaleVec = new Vector2 (scale, scale);
-			spriteFont.DrawInto (this, text, position, color, rotation, origin, scaleVec, effects, depth);
+			var scaleVec = new Vector2(scale, scale);
+            var source = new SpriteFont.CharacterSource(text);
+            spriteFont.DrawInto(this, ref source, position, color, rotation, origin, scaleVec, effects, depth);
 		}
 
 		public void DrawString (
@@ -335,7 +322,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			if (spriteFont == null)
 				throw new ArgumentNullException ("spriteFont");
 
-			spriteFont.DrawInto (this, text, position, color, rotation, origin, scale, effect, depth);
+            var source = new SpriteFont.CharacterSource(text);
+            spriteFont.DrawInto(this, ref source, position, color, rotation, origin, scale, effect, depth);
 		}
 
 		public void DrawString (SpriteFont spriteFont, StringBuilder text, Vector2 position, Color color)
@@ -343,8 +331,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			if (spriteFont == null)
 				throw new ArgumentNullException ("spriteFont");
 
-			spriteFont.DrawInto (
-				this, text, position, color, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0f);
+            var source = new SpriteFont.CharacterSource(text);
+			spriteFont.DrawInto(this, ref source, position, color, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0f);
 		}
 
 		public void DrawString (
@@ -355,7 +343,8 @@ namespace Microsoft.Xna.Framework.Graphics
 				throw new ArgumentNullException ("spriteFont");
 
 			var scaleVec = new Vector2 (scale, scale);
-			spriteFont.DrawInto (this, text, position, color, rotation, origin, scaleVec, effects, depth);
+            var source = new SpriteFont.CharacterSource(text);
+            spriteFont.DrawInto(this, ref source, position, color, rotation, origin, scaleVec, effects, depth);
 		}
 
 		public void DrawString (
@@ -365,7 +354,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			if (spriteFont == null)
 				throw new ArgumentNullException ("spriteFont");
 
-			spriteFont.DrawInto (this, text, position, color, rotation, origin, scale, effect, depth);
+            var source = new SpriteFont.CharacterSource(text);
+            spriteFont.DrawInto(this, ref source, position, color, rotation, origin, scale, effect, depth);
 		}
 
         private bool _isDisposed = false;

@@ -27,11 +27,18 @@ SOFTWARE.
 
 using System;
 using System.Text;
-using System.Drawing;
 using System.Globalization;
+#if WINRT
+using System.Runtime.Serialization;
+#endif
 
 namespace Microsoft.Xna.Framework
 {
+    #if WINRT
+    [DataContract]
+    #else
+    [Serializable]
+    #endif
     public struct Vector2 : IEquatable<Vector2>
     {
         #region Private Fields
@@ -45,8 +52,13 @@ namespace Microsoft.Xna.Framework
 
 
         #region Public Fields
-
+#if WINRT
+        [DataMember]
+#endif
         public float X;
+#if WINRT
+        [DataMember]
+#endif
         public float Y;
 
         #endregion Public Fields

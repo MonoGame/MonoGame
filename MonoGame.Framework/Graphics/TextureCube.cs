@@ -5,18 +5,20 @@ using System.Runtime.InteropServices;
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
+#elif PSS
+using Sce.Pss.Core.Graphics;
 #elif WINRT
 // TODO
 #else
 using OpenTK.Graphics.ES20;
- #if IPHONE || ANDROID
+#if IPHONE || ANDROID
 using PixelInternalFormat = OpenTK.Graphics.ES20.All;
 using PixelFormat = OpenTK.Graphics.ES20.All;
 using PixelType = OpenTK.Graphics.ES20.All;
 using TextureTarget = OpenTK.Graphics.ES20.All;
 using TextureParameterName = OpenTK.Graphics.ES20.All;
 using TextureMinFilter = OpenTK.Graphics.ES20.All;
- #endif
+#endif
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -35,6 +37,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 #if WINRT
 
+#elif PSS
+		//TODO
 #else
 		PixelInternalFormat glInternalFormat;
 		PixelFormat glFormat;
@@ -49,6 +53,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if WINRT
 
+#elif PSS
+			//TODO
 #else
 			this.glTarget = TextureTarget.TextureCubeMap;
 
@@ -148,6 +154,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 #if WINRT
 
+#elif PSS
+			//TODO
 #else
 			GL.BindTexture (TextureTarget.TextureCubeMap, this.glTexture);
 			
@@ -161,7 +169,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			dataHandle.Free ();
 		}
 		
-#if !WINRT
+#if !WINRT && !PSS
 		private TextureTarget GetGLCubeFace(CubeMapFace face) {
 			switch (face) {
 			case CubeMapFace.PositiveX: return TextureTarget.TextureCubeMapPositiveX;

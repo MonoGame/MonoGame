@@ -1,7 +1,7 @@
 #region License
 /*
 MIT License
-Copyright © 2006 The Mono.Xna Team
+Copyright ? 2006 The Mono.Xna Team
 
 All rights reserved.
 
@@ -26,19 +26,6 @@ SOFTWARE.
 #endregion License
 
 using System;
-using System.IO;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Drawing;
-
-#if MONOMAC
-using MonoMac.OpenGL;
-#elif WINDOWS
-using OpenTK.Graphics.OpenGL;
-#elif WINRT
-#elif GLES
-using OpenTK.Graphics.ES20;
-#endif
 
 using Microsoft.Xna;
 using Microsoft.Xna.Framework;
@@ -101,7 +88,18 @@ namespace Microsoft.Xna.Framework.Content
 			SurfaceFormat convertedFormat = surfaceFormat;
 			switch (surfaceFormat)
 			{
-#if IPHONE || ANDROID
+#if IPHONE
+		        // At the moment. If a DXT Texture comes in on iOS, it's really a PVR compressed
+				// texture. We need to use this hack until the content pipeline is implemented.
+				// For now DXT5 means we're using 4bpp PVRCompression and DXT3 means 2bpp. Look at
+				// PvrtcBitmapContent.cs for more information.:
+				case SurfaceFormat.Dxt3:
+					convertedFormat = SurfaceFormat.RgbaPvrtc2Bpp;
+					break;
+				case SurfaceFormat.Dxt5:
+					convertedFormat = SurfaceFormat.RgbaPvrtc4Bpp;
+					break;
+#elif ANDROID || PSS
 				case SurfaceFormat.Dxt1:
 				case SurfaceFormat.Dxt3:
 				case SurfaceFormat.Dxt5:
@@ -124,7 +122,7 @@ namespace Microsoft.Xna.Framework.Content
 				//Convert the image data if required
 				switch (surfaceFormat)
 				{
-#if IPHONE || ANDROID
+#if ANDROID || PSS
 					//no Dxt in OpenGL ES
 					case SurfaceFormat.Dxt1:
 						levelData = DxtUtil.DecompressDxt1(levelData, levelWidth, levelHeight);

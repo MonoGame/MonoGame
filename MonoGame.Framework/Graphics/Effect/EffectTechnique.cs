@@ -3,57 +3,28 @@ namespace Microsoft.Xna.Framework.Graphics
 {
 	public class EffectTechnique
 	{
-        internal static int id = 0;
-        internal Effect _effect;
+        public EffectPassCollection Passes { get; private set; }
 
-        public EffectPassCollection Passes { get; set; }
-		public EffectAnnotationCollection Annotations { get; set; }
+        public EffectAnnotationCollection Annotations { get; private set; }
 
         public string Name { get; private set; }
 
-#if NOMOJO
-
-        public EffectTechnique(Effect effect)
+        internal EffectTechnique(Effect effect, EffectTechnique cloneSource)
         {
-            _effect = effect;
-            Passes = new EffectPassCollection(this);
-            Annotations = new EffectAnnotationCollection();
+            // Share all the immutable types.
+            Name = cloneSource.Name;
+            Annotations = cloneSource.Annotations;
 
-            Name = string.Format("{0}.Technique{1}", effect.Name, ++id);
-            
-            Passes._passes.Add(new EffectPass(this));
+            // Clone the mutable types.
+            Passes = new EffectPassCollection(effect, cloneSource.Passes);
         }
 
-#else
-
-        public EffectTechnique(Effect effect, DXEffectObject.d3dx_technique technique)
+        internal EffectTechnique(Effect effect, string name, EffectPassCollection passes, EffectAnnotationCollection annotations)
         {
-            Passes = new EffectPassCollection(this);
-			Annotations = new EffectAnnotationCollection();
-            _effect = effect;
-			
-			Name = technique.name;
-			
-			for (int i=0; i<technique.pass_count; i++) {
-				Passes._passes.Add (new EffectPass(this, technique.pass_handles[i]));
-			}
+            Name = name;
+            Passes = passes;
+            Annotations = annotations;
         }
-
-        public EffectTechnique(Effect effect, GLSLEffectObject.glslTechnique technique)
-        {
-            Passes = new EffectPassCollection(this);
-			Annotations = new EffectAnnotationCollection();
-            _effect = effect;
-			
-			Name = technique.name;
-			
-			for (int i=0; i<technique.pass_count; i++) {
-				Passes._passes.Add (new EffectPass(this, technique.pass_handles[i]));
-			}
-        }
-		
-#endif
-
     }
 
 

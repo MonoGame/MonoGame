@@ -80,55 +80,18 @@ using Microsoft.Xna.Framework.Input.Touch;
 namespace Microsoft.Xna.Framework {
 	partial class iOSGameView {
 		
-		private const long _maxTicksToProcessFlick = 1500000;
-		
-		private const int _minVelocityToCompleteSwipe = 50;
-		
 		static GestureType EnabledGestures
 		{
 			get { return TouchPanel.EnabledGestures; }
 		}
 		
-		private static bool GestureIsEnabled(GestureType gestureType)
-		{
-			return (EnabledGestures & gestureType) != 0;
-		}
-		
 		#region Touches
-
-		// Some gestures need to calculate deltas (e.g. Flick), so we
-		// record where the most recent set of touches began and ended.
-		//private readonly Vector2? [] _touchBuffer = new Vector2?[2];
-		
-		Vector2? _currentTouch;
-		Vector2? _previousTouch;
-
-		private void ClearTouchBuffer ()
-		{
-			_currentTouch = _previousTouch = null;
-		}
-
-		private void RollTouchBuffer (Vector2 position)
-		{
-			if (position == _previousTouch)
-				return;
-			
-			_previousTouch = _currentTouch;
-			_currentTouch = position;
-		}
 
 		public override void TouchesBegan (NSSet touches, UIEvent evt)
 		{
 			base.TouchesBegan (touches, evt);
 			FillTouchCollection (touches);
 			GamePad.Instance.TouchesBegan (touches, evt, this);
-
-			var location = ((UITouch) touches.AnyObject).LocationInView (this);
-
-			ClearTouchBuffer ();
-			RollTouchBuffer (GetOffsetPosition (new Vector2 (location.X, location.Y), true));
-			
-			updateGestures();
 		}
 
 		public override void TouchesEnded (NSSet touches, UIEvent evt)
@@ -136,11 +99,6 @@ namespace Microsoft.Xna.Framework {
 			base.TouchesEnded (touches, evt);
 			FillTouchCollection (touches);
 			GamePad.Instance.TouchesEnded (touches, evt, this);
-
-			var location = ((UITouch) touches.AnyObject).LocationInView (this);
-			RollTouchBuffer (GetOffsetPosition (new Vector2 (location.X, location.Y), true));
-			
-			updateGestures();
 		}
 
 		public override void TouchesMoved (NSSet touches, UIEvent evt)
@@ -148,11 +106,6 @@ namespace Microsoft.Xna.Framework {
 			base.TouchesMoved (touches, evt);
 			FillTouchCollection (touches);
 			GamePad.Instance.TouchesMoved (touches, evt, this);
-
-			var location = ((UITouch) touches.AnyObject).LocationInView (this);
-			RollTouchBuffer (GetOffsetPosition (new Vector2 (location.X, location.Y), true));
-			
-			updateGestures();
 		}
 
 		public override void TouchesCancelled (NSSet touches, UIEvent evt)
@@ -160,64 +113,14 @@ namespace Microsoft.Xna.Framework {
 			base.TouchesCancelled (touches, evt);
 			FillTouchCollection (touches);
 			GamePad.Instance.TouchesCancelled (touches, evt);
-
-			var location = ((UITouch) touches.AnyObject).LocationInView (this);
-			RollTouchBuffer (GetOffsetPosition (new Vector2 (location.X, location.Y), true));
 		}
 		
-		private void updateGestures()
-		{			
-			for(int x = 0; x < TouchPanel.Collection.Count; x++)
-			{
-				var touch = TouchPanel.Collection[x];
-				
-				switch(touch.State)
-				{
-					// Pressed. Can be a tap, or the start of a hold.
-					case TouchLocationState.Pressed:
-						break;
-					
-					// Moved. Can be a FreeDrag, Flick, H/V drag or pinch
-					case TouchLocationState.Moved:
-						if (ProcessDrag(touch))
-							break;
-						else
-							break;
-					
-					// Released. Can be a tap/Doubletap, or the end of a
-					// previous gesture.
-					case TouchLocationState.Released:
-						if (touch.PrevState == TouchLocationState.Pressed)
-						{
-							if (ProcessTap(touch))
-								break;
-						}
-						else if (touch.PrevState == TouchLocationState.Moved)
-						{
-							if (ProcessFlick(touch))
-								break;
-						
-							if (ProcessDragComplete(touch))
-								break;
-						}
-					
-						break;
-					
-					// What do we do here...?
-					case TouchLocationState.Invalid:
-							break;
-					
-				}
-			}
-		}
-
 		// TODO: Review FillTouchCollection
 		private void FillTouchCollection (NSSet touches)
 		{
 			if (touches.Count == 0)
 				return;
 
-			TouchCollection collection = TouchPanel.Collection;
 			var touchesArray = touches.ToArray<UITouch> ();
 			for (int i = 0; i < touchesArray.Length; ++i) {
 				var touch = touchesArray [i];
@@ -227,17 +130,11 @@ namespace Microsoft.Xna.Framework {
 				var position = GetOffsetPosition (new Vector2 (location.X, location.Y), true);
 				var id = touch.Handle.ToInt32 ();
 
-				switch (touch.Phase) {
+				switch (touch.Phase) 
+                {
 				//case UITouchPhase.Stationary:
 				case UITouchPhase.Moved:
-					
-					TouchLocation loc;
-					// Don't process a "moved" if we didn't!
-					if (collection.FindIndexById(id, out loc) == -1 || loc.Position == position)
-						break;
-					
-					collection.Update(id, TouchLocationState.Moved, position);
-					
+					TouchPanel.AddEvent(new TouchLocation(id, TouchLocationState.Moved, position));					
 					if (i == 0) 
 					{
 						Mouse.State.X = (int) position.X;
@@ -245,24 +142,25 @@ namespace Microsoft.Xna.Framework {
 					}
 					break;
 				case UITouchPhase.Began:
-					collection.Add (id, position);
-					if (i == 0) {
+                    TouchPanel.AddEvent(new TouchLocation(id, TouchLocationState.Pressed, position));
+					if (i == 0) 
+                    {
 						Mouse.State.X = (int) position.X;
 						Mouse.State.Y = (int) position.Y;
 						Mouse.State.LeftButton = ButtonState.Pressed;
 					}
 					break;
 				case UITouchPhase.Ended	:
-					collection.Update (id, TouchLocationState.Released, position);
-
-					if (i == 0) {
+                    TouchPanel.AddEvent(new TouchLocation(id, TouchLocationState.Released, position));
+					if (i == 0) 
+                    {
 						Mouse.State.X = (int) position.X;
 						Mouse.State.Y = (int) position.Y;
 						Mouse.State.LeftButton = ButtonState.Released;
 					}
 					break;
 				case UITouchPhase.Cancelled:
-					collection.Update (id, TouchLocationState.Invalid, position);
+                    TouchPanel.AddEvent(new TouchLocation(id, TouchLocationState.Released, position));
 					break;
 				default:
 					break;
@@ -279,185 +177,5 @@ namespace Microsoft.Xna.Framework {
 		}
 
 		#endregion Touches
-
-		#region Gestures
-		
-		private bool ProcessTap(TouchLocation touch)
-		{
-			if (!GestureIsEnabled(GestureType.Tap))
-				return false;
-			
-			// TODO: Use a timer to cancel/catch a double tap?
-			if (touch.State == TouchLocationState.Released && 
-			    touch.PrevState == TouchLocationState.Pressed )
-			{
-				TouchPanel.GestureList.Enqueue (new GestureSample (
-				GestureType.Tap, new TimeSpan (DateTime.Now.Ticks),
-				touch.Position, Vector2.Zero,
-				Vector2.Zero, Vector2.Zero));
-					
-				return true;
-			}
-			
-			return false;
-		}
-		
-		private bool ProcessDrag(TouchLocation touch)
-		{
-			if (!GestureIsEnabled(GestureType.HorizontalDrag) && 
-			    !GestureIsEnabled(GestureType.VerticalDrag) && 
-			    !GestureIsEnabled(GestureType.FreeDrag))
-				return false;
-			
-			// If pinch is enabled, WP7 considers any 2 touches on screen a pinch.
-			// Regardless of what either one is doing.
-			// TODO: Move "pinch" priority higher than most.
-			if (GestureIsEnabled(GestureType.Pinch) && 
-			    TouchPanel.Collection.Count > 1)
-				return false;
-			
-			// Make sure that our previous location was valid. If not, we are still
-			// dragging, but we need a delta of 0.
-			var prevPosition = touch.PrevPosition.LengthSquared() > 0 ? 
-									touch.PrevPosition : touch.Position;
-			
-			var delta = touch.Position - prevPosition;
-			
-			// Free drag takes priority over a directional one.
-			GestureType gestureType = GestureType.FreeDrag;
-			if (!GestureIsEnabled(GestureType.FreeDrag))
-			{
-				// Horizontal drag takes precedence over a vertical one.
-				if (GestureIsEnabled(GestureType.HorizontalDrag))
-				{
-					// Direction delta come back with it's 'other' component set to 0.
-					if (Math.Abs(delta.X) >= Math.Abs(delta.Y))
-					{
-						delta.Y = 0;
-						gestureType = GestureType.HorizontalDrag;
-					}
-					else if (GestureIsEnabled(GestureType.VerticalDrag))
-					{
-						delta.X = 0;
-						gestureType = GestureType.VerticalDrag;
-					}
-					else
-						return false;
-				}
-			}	
-			
-			
-			var gestureSample = new GestureSample(
-			gestureType, new TimeSpan (DateTime.Now.Ticks),
-			touch.Position, Vector2.Zero,
-			delta, Vector2.Zero);
-			
-			// TODO: iOS events come in quicker than we can process them, leading to
-			// multiple gestures eventually overflowing the queue. They need to be merged,
-			// but for now we are throwing away the extra inputs. needs to be fixed before shipping.
-			
-			//TODO: Handle this better later.
-			foreach (var gesture in TouchPanel.GestureList)
-			{
-				if (gesture.GestureType == gestureType)
-					return false;
-			}
-			
-			TouchPanel.GestureList.Enqueue(gestureSample);
-			
-			return true;
-			
-		}
-		
-		private bool ProcessDragComplete(TouchLocation touch)
-		{
-			if (!GestureIsEnabled(GestureType.DragComplete))
-				return false;
-			
-			TouchPanel.GestureList.Enqueue (new GestureSample (
-			GestureType.DragComplete, new TimeSpan (DateTime.Now.Ticks),
-			Vector2.Zero, Vector2.Zero,
-			Vector2.Zero, Vector2.Zero));
-			
-			return true;
-		}
-		
-		private bool ProcessHold(TouchLocation touch)
-		{
-			if (!GestureIsEnabled(GestureType.Hold))
-				return false;
-			
-			TouchPanel.GestureList.Enqueue (new GestureSample (
-			GestureType.Tap, new TimeSpan (DateTime.Now.Ticks),
-			touch.Position, Vector2.Zero,
-			Vector2.Zero, Vector2.Zero));
-			
-			return true;
-		}
-		
-		private bool ProcessFlick(TouchLocation touch)
-		{
-			if (!GestureIsEnabled(GestureType.Flick))
-			    return false;
-			
-			if (touch.Lifetime > _maxTicksToProcessFlick)
-				return false;
-			
-			//TODO: Get a better flick velocity. Consider using the touch buffer.		
-			var velocity = (touch.Position - touch.startingPosition);
-			
-			if ( velocity.Length() < _minVelocityToCompleteSwipe )
-				return false;
-			
-			//Magical hack. This was here before.
-			velocity *= 8;
-			
-			TouchPanel.GestureList.Enqueue (new GestureSample (
-				GestureType.Flick, new TimeSpan (DateTime.Now.Ticks),
-				Vector2.Zero, Vector2.Zero,
-				velocity, Vector2.Zero));
-			
-			return true;
-		}
-
-		private readonly Vector2? [] _previousPinchPositions = new Vector2?[2];
-		
-		//TODO: Reimplement
-		[Export]
-		public void OnPinchGesture (UIPinchGestureRecognizer sender)
-		{
-			var location0 = sender.LocationOfTouch (0, sender.View);
-			var position0 = GetOffsetPosition (new Vector2 (location0.X, location0.Y), true);
-
-			PointF location1;
-			Vector2 position1;
-			if (sender.NumberOfTouches > 1) {
-				location1 = sender.LocationOfTouch (1, sender.View);
-				position1 = GetOffsetPosition (new Vector2 (location1.X, location1.Y), true);
-			} else {
-				location1 = location0;
-				position1 = position0;
-			}
-
-			var delta0 = position0 - _previousPinchPositions [0].GetValueOrDefault (position0);
-			var delta1 = position1 - _previousPinchPositions [1].GetValueOrDefault (position1);
-
-			TouchPanel.GestureList.Enqueue (new GestureSample (
-				GestureType.Pinch, new TimeSpan (DateTime.Now.Ticks),
-				position0, position1,
-				delta0, delta1));
-
-			if (sender.State == UIGestureRecognizerState.Ended ||
-			    sender.State == UIGestureRecognizerState.Cancelled ||
-			    sender.State == UIGestureRecognizerState.Failed) {
-				_previousPinchPositions [0] = null;
-				_previousPinchPositions [1] = null;
-			} else {
-				_previousPinchPositions [0] = position0;
-				_previousPinchPositions [1] = position1;
-			}
-		}
-
-		#endregion Gestures
 	}
 }

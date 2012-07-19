@@ -18,6 +18,8 @@ using OpenTK.Graphics.ES20;
 using ActiveUniformType = OpenTK.Graphics.ES20.All;
 #elif MONOMAC
 using MonoMac.OpenGL;
+#elif PSS
+using Sce.Pss.Core.Graphics;
 #elif !WINRT
 using OpenTK.Graphics.OpenGL;
 
@@ -40,36 +42,8 @@ namespace Microsoft.Xna.Framework.Graphics
         EffectParameter fogVectorParam;
         EffectParameter worldViewProjParam;
 
-#if NOMOJO
-        static readonly string[] vertexShaderFilenames = new string[] 
-		{
-			"Microsoft.Xna.Framework.Graphics.Effect.Resources.AlphaTestEffect.VSAlphaTest.glsl",
-			"Microsoft.Xna.Framework.Graphics.Effect.Resources.AlphaTestEffect.VSAlphaTestNoFog.glsl",
-			"Microsoft.Xna.Framework.Graphics.Effect.Resources.AlphaTestEffect.VSAlphaTestVc.glsl",
-			"Microsoft.Xna.Framework.Graphics.Effect.Resources.AlphaTestEffect.VSAlphaTestVcNoFog.glsl"
-		};
+        int _shaderIndex;
 
-        static readonly string[] fragmentShaderFilenames = new string[]
-		{
-			"Microsoft.Xna.Framework.Graphics.Effect.Resources.AlphaTestEffect.PSAlphaTestLtGt.glsl",
-			"Microsoft.Xna.Framework.Graphics.Effect.Resources.AlphaTestEffect.PSAlphaTestLtGtNoFog.glsl",
-            "Microsoft.Xna.Framework.Graphics.Effect.Resources.AlphaTestEffect.PSAlphaTestEqNe.glsl",
-			"Microsoft.Xna.Framework.Graphics.Effect.Resources.AlphaTestEffect.PSAlphaTestEqNeNoFog.glsl"
-		};
-
-        static readonly Tuple<int, int>[] programIndices = new Tuple<int, int>[]
-		{
-			new Tuple<int, int>(0, 0),
-			new Tuple<int, int>(1, 1),
-			new Tuple<int, int>(2, 0),
-			new Tuple<int, int>(3, 1),
-			new Tuple<int, int>(0, 2),
-			new Tuple<int, int>(1, 3),
-			new Tuple<int, int>(2, 2),
-			new Tuple<int, int>(3, 3)
-		};
-
-#endif
         #endregion
 
         #region Fields
@@ -95,6 +69,14 @@ namespace Microsoft.Xna.Framework.Graphics
         bool isEqNe;
 
         EffectDirtyFlags dirtyFlags = EffectDirtyFlags.All;
+
+        static readonly byte[] Bytecode = LoadEffectResource(
+#if DIRECTX
+            "Microsoft.Xna.Framework.Graphics.Effect.Resources.AlphaTestEffect.dx11.mgfxo"
+#else
+            "Microsoft.Xna.Framework.Graphics.Effect.Resources.AlphaTestEffect.ogl.mgfxo"
+#endif
+        );
 
         #endregion
 
@@ -296,33 +278,14 @@ namespace Microsoft.Xna.Framework.Graphics
 
         #region Methods
 
-#if NOMOJO
         /// <summary>
         /// Creates a new AlphaTestEffect with default parameter settings.
         /// </summary>
         public AlphaTestEffect(GraphicsDevice device)
-            : base(device, AlphaTestEffect.vertexShaderFilenames,
-                           AlphaTestEffect.fragmentShaderFilenames, 
-                           AlphaTestEffect.programIndices)
-        {
-            CacheEffectParameters();
-
-            Techniques.Add(new EffectTechnique(this));
-
-            Initialize();
-
-        }
-#else
-        /// <summary>
-        /// Creates a new AlphaTestEffect with default parameter settings.
-        /// </summary>
-        public AlphaTestEffect(GraphicsDevice device)
-            : base(device, Effect.LoadEffectResource("AlphaTestEffect"))
+            : base(device, Bytecode)
         {
             CacheEffectParameters();
         }
-#endif
-
 
         /// <summary>
         /// Creates a new AlphaTestEffect by cloning parameter settings from an existing instance.
@@ -351,7 +314,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
         }
 
-
         /// <summary>
         /// Creates a clone of the current AlphaTestEffect instance.
         /// </summary>
@@ -359,7 +321,6 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             return new AlphaTestEffect(this);
         }
-
 
         /// <summary>
         /// Looks up shortcut references to our effect parameters.
@@ -372,32 +333,12 @@ namespace Microsoft.Xna.Framework.Graphics
             fogColorParam       = Parameters["FogColor"];
             fogVectorParam      = Parameters["FogVector"];
             worldViewProjParam  = Parameters["WorldViewProj"];
-            shaderIndexParam    = Parameters["ShaderIndex"];
         }
-
-        internal override void Initialize()
-        {
-#if !WINRT
-            textureParam = new EffectParameter(ActiveUniformType.Sampler2D, "Texture");
-            Parameters.Add(textureParam);
-            diffuseColorParam = new EffectParameter(ActiveUniformType.FloatVec4, "DiffuseColor");
-            Parameters.Add(diffuseColorParam);
-            alphaTestParam = new EffectParameter(ActiveUniformType.FloatVec4, "AlphaTest");
-            Parameters.Add(alphaTestParam);
-            fogColorParam = new EffectParameter(ActiveUniformType.FloatVec3, "FogColor");
-            Parameters.Add(fogColorParam);
-            fogVectorParam = new EffectParameter(ActiveUniformType.FloatVec3, "FogVector");
-            Parameters.Add(fogVectorParam);
-            worldViewProjParam = new EffectParameter(ActiveUniformType.FloatMat4, "WorldViewProj");
-            Parameters.Add(worldViewProjParam);
-#endif
-        }
-
-
+        
         /// <summary>
         /// Lazily computes derived parameter values immediately before applying the effect.
         /// </summary>
-        protected internal override void OnApply()
+        protected internal override bool OnApply()
         {
             // Recompute the world+view+projection matrix or fog vector?
             dirtyFlags = EffectHelpers.SetWorldViewProjAndFog(dirtyFlags, ref world, ref view, ref projection, ref worldView, fogEnabled, fogStart, fogEnd, worldViewProjParam, fogVectorParam);
@@ -510,11 +451,18 @@ namespace Microsoft.Xna.Framework.Graphics
                 
                 if (isEqNe)
                     shaderIndex += 4;
-                
-                shaderIndexParam.SetValue(shaderIndex);
 
                 dirtyFlags &= ~EffectDirtyFlags.ShaderIndex;
+
+                if (_shaderIndex != shaderIndex)
+                {
+                    _shaderIndex = shaderIndex;
+                    CurrentTechnique = Techniques[_shaderIndex];
+                    return true;
+                }
             }
+
+            return false;
         }
 
 

@@ -8,6 +8,7 @@ namespace Microsoft.Xna.Framework.Graphics
         internal VertexElementFormat _format;
         internal VertexElementUsage _usage;
         internal int _usageIndex;
+
         public int Offset
         {
             get
@@ -19,6 +20,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 this._offset = value;
             }
         }
+
         public VertexElementFormat VertexElementFormat
         {
             get
@@ -30,6 +32,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 this._format = value;
             }
         }
+
         public VertexElementUsage VertexElementUsage
         {
             get
@@ -95,5 +98,97 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             return !(left == right);
         }
+
+        #if DIRECTX
+
+        internal SharpDX.Direct3D11.InputElement GetInputElement()
+        {
+            var element = new SharpDX.Direct3D11.InputElement();
+
+            switch (_usage)
+            {
+                case Graphics.VertexElementUsage.Position:
+                    element.SemanticName = "SV_Position";
+                    break;
+
+                case Graphics.VertexElementUsage.Color:
+                    element.SemanticName = "COLOR";
+                    break;
+
+                case Graphics.VertexElementUsage.Normal:
+                    element.SemanticName = "NORMAL";
+                    break;
+
+                case Graphics.VertexElementUsage.TextureCoordinate:
+                    element.SemanticName = "TEXCOORD";
+                    break;
+
+                default:
+                    throw new NotImplementedException("Unknown vertex element usage!");
+            }
+
+            element.SemanticIndex = _usageIndex;
+
+            switch (_format)
+            {
+                case VertexElementFormat.Single:
+                    element.Format = SharpDX.DXGI.Format.R32_Float;
+                    break;
+
+                case VertexElementFormat.Vector2:
+                    element.Format = SharpDX.DXGI.Format.R32G32_Float;
+                    break;
+
+                case VertexElementFormat.Vector3:
+                    element.Format = SharpDX.DXGI.Format.R32G32B32_Float;
+                    break;
+
+                case VertexElementFormat.Vector4:
+                    element.Format = SharpDX.DXGI.Format.R32G32B32A32_Float;
+                    break;
+
+                case VertexElementFormat.Color:
+                    element.Format = SharpDX.DXGI.Format.R8G8B8A8_UNorm;
+                    break;
+
+                case VertexElementFormat.Byte4:
+                    element.Format = SharpDX.DXGI.Format.R8G8B8A8_UInt;
+                    break;
+
+                case VertexElementFormat.Short2:
+                    element.Format =  SharpDX.DXGI.Format.R16G16_SInt;
+                    break;
+
+                case VertexElementFormat.Short4:
+                    element.Format =  SharpDX.DXGI.Format.R16G16B16A16_SInt;
+                    break;
+
+                case VertexElementFormat.NormalizedShort2:
+                    element.Format =  SharpDX.DXGI.Format.R16G16_SNorm;
+                    break;
+
+                case VertexElementFormat.NormalizedShort4:
+                    element.Format =  SharpDX.DXGI.Format.R16G16B16A16_SNorm;
+                    break;
+
+                case VertexElementFormat.HalfVector2:
+                    element.Format =  SharpDX.DXGI.Format.R16G16_Float;
+                    break;
+
+                case VertexElementFormat.HalfVector4:
+                    element.Format =  SharpDX.DXGI.Format.R16G16B16A16_Float;
+                    break;
+                
+                default:
+                    throw new NotImplementedException("Unknown vertex element format!");
+            }
+
+            element.AlignedByteOffset = _offset;
+            element.Slot = 0;
+
+            return element;
+        }
+
+        #endif
     }
 }

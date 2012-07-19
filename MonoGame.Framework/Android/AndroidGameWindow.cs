@@ -1,7 +1,7 @@
 #region License
 /*
 Microsoft Public License (Ms-PL)
-XnaTouch - Copyright © 2009 The XnaTouch Team
+MonoGame - Copyright © 2009 The MonoGame Team
 
 All rights reserved.
 
@@ -63,24 +63,14 @@ using Microsoft.Xna.Framework.Input.Touch;
 
 namespace Microsoft.Xna.Framework
 {
-    public class AndroidGameWindow : AndroidGameView , Android.Views.View.IOnTouchListener
+    public class AndroidGameWindow : AndroidGameView , Android.Views.View.IOnTouchListener, ISurfaceHolderCallback
     {
 		private Rectangle clientBounds;
 		private Game _game;
-		private GameTime _updateGameTime;
-        private GameTime _drawGameTime;
         private DisplayOrientation supportedOrientations = DisplayOrientation.Default;
         private DisplayOrientation _currentOrientation;
 		private GestureDetector gesture = null;
-		private bool resetUpdateElapsedTime = false;
-        private bool resetRenderElapsedTime = false;
-        double updateFrameElapsed;
-        double renderFrameElapsed;
-        double updateFrameTotal;
-        double renderFrameTotal;
-        double updateFrameLast;
-        double renderFrameLast;
-        public GraphicsContext BackgroundContext;
+		private bool exiting = false;
 
         public AndroidGameWindow(Context context, Game game) : base(context)
         {
@@ -94,10 +84,6 @@ namespace Microsoft.Xna.Framework
             this.Closed +=	new EventHandler<EventArgs>(GameWindow_Closed);            
 			clientBounds = new Rectangle(0, 0, Context.Resources.DisplayMetrics.WidthPixels, Context.Resources.DisplayMetrics.HeightPixels);
 
-            // Initialize GameTime
-            _updateGameTime = new GameTime();
-            _drawGameTime = new GameTime();
-
 			gesture = new GestureDetector(new GestureListener((AndroidGameActivity)this.Context));
 			
             this.RequestFocus();
@@ -105,15 +91,14 @@ namespace Microsoft.Xna.Framework
 
             this.SetOnTouchListener(this);
         }
-
-		public void ResetElapsedTime ()
-		{
-			resetUpdateElapsedTime = true;
-            resetRenderElapsedTime = true;
-		}
 		
 		void GameWindow_Closed(object sender,EventArgs e)
-        {        
+        {   
+			if (!exiting)
+			{
+				exiting = true;
+				_game.DoExiting();
+			}
 			try
 			{
         		_game.Exit();
@@ -122,6 +107,13 @@ namespace Microsoft.Xna.Framework
 			{
 				// just in case the game is null
 			}
+
+		}
+
+		protected override void OnLoad (EventArgs e)
+		{
+			base.OnLoad (e);			
+			MakeCurrent();
 		}
 
         public override bool OnKeyDown(Keycode keyCode, KeyEvent e)
@@ -153,9 +145,6 @@ namespace Microsoft.Xna.Framework
 		
 		protected override void CreateFrameBuffer()
 		{
-            // Allow threaded resource loading
-            OpenTK.Graphics.GraphicsContext.ShareContexts = true;
-
 #if true			
 			try
             {
@@ -174,35 +163,14 @@ namespace Microsoft.Xna.Framework
 
             if (!GraphicsContext.IsCurrent)
                 MakeCurrent();
-
-            // Create a context for the background loading
-            GraphicsContextFlags flags = GraphicsContextFlags.Default;
-#if DEBUG
-            //flags |= GraphicsContextFlags.Debug;
-#endif
-            GraphicsMode mode = new GraphicsMode();
-            BackgroundContext = new GraphicsContext(mode, WindowInfo, 2, 0, flags);
-            Threading.BackgroundContext = BackgroundContext;
-            Threading.WindowInfo = WindowInfo;
 		}
-
-        protected override void OnLoad(EventArgs e)
-        {
-            // FIXME: Uncomment this line when moving to Mono for Android 4.0.5
-            //MakeCurrent();
-
-            // Make sure an Update is called before a Draw
-            updateFrameElapsed = _game.TargetElapsedTime.TotalSeconds;
-
-            base.OnLoad(e);
-        }
 
         #region AndroidGameView Methods
 
         protected override void OnRenderFrame(FrameEventArgs e)
         {
             base.OnRenderFrame(e);
-            
+
             if (GraphicsContext == null || GraphicsContext.IsDisposed)
                 return;
 
@@ -210,72 +178,28 @@ namespace Microsoft.Xna.Framework
             if (!GraphicsContext.IsCurrent)
                 MakeCurrent();
 
-            if (_game != null)
-            {
-                double targetElapsed = _game.TargetElapsedTime.TotalSeconds;
-                renderFrameElapsed += e.Time;
-                if (renderFrameElapsed < (renderFrameLast + targetElapsed))
-                    return;
-
-                if (resetRenderElapsedTime)
-                {
-                    renderFrameElapsed = renderFrameLast + targetElapsed;
-                    resetRenderElapsedTime = false;
-                }
-
-                double delta = renderFrameElapsed - renderFrameLast;
-                _drawGameTime.Update(TimeSpan.FromSeconds(delta));
-                // If the elapsed time is more than the target elapsed time, the game is running slowly
-                _drawGameTime.IsRunningSlowly = delta > targetElapsed;
-                _game.DoDraw(_drawGameTime);
-                renderFrameLast = renderFrameElapsed;
-            }
-
-            _game.Tick();
+            Threading.Run();
         }
 
         protected override void OnUpdateFrame(FrameEventArgs e)
-		{			
-			base.OnUpdateFrame(e);
+        {
+            base.OnUpdateFrame(e);
 
-			if (_game != null )
-			{
-                double targetElapsed = _game.TargetElapsedTime.TotalSeconds;
-                updateFrameElapsed += e.Time;
-                if (updateFrameElapsed < (updateFrameLast + targetElapsed))
-                    return;
+            Threading.Run();
 
-				if (resetUpdateElapsedTime)
-                {
-                    updateFrameElapsed = updateFrameLast + targetElapsed;
-					resetUpdateElapsedTime = false;
+            if (_game != null)
+            {
+				if ( _game.Platform.IsActive && !ScreenReceiver.ScreenLocked) //Only call draw if an update has occured
+				{
+					_game.Tick();
 				}
-
-                double delta = updateFrameElapsed - updateFrameLast;
-                if (_game.IsFixedTimeStep)
-                {
-                    // If we will be calling Update two or more times, the game is running slowly
-                    _updateGameTime.IsRunningSlowly = updateFrameElapsed >= updateFrameLast + (targetElapsed * 2.0);
-                    double start = updateFrameLast;
-                    while ((delta >= targetElapsed) && ((updateFrameLast - start) < 0.5))
-                    {
-                        _updateGameTime.Update(TimeSpan.FromSeconds(targetElapsed));
-                        _game.DoUpdate(_updateGameTime);
-                        delta -= targetElapsed;
-                        updateFrameLast += targetElapsed;
-                    }
-                }
-                else
-                {
-                    // No fixed step, so just update once with a potentially large elapsed time
-                    _updateGameTime.Update(TimeSpan.FromSeconds(delta));
-                    // If the elapsed time is more than the target elapsed time, the game is running slowly
-                    _updateGameTime.IsRunningSlowly = delta > targetElapsed;
-                    _game.DoUpdate(_updateGameTime);
-                    updateFrameLast = updateFrameElapsed;
-                }
-			}
-		}
+				else
+				{ 
+					_game.GraphicsDevice.Clear(Color.Black);
+					_game.GraphicsDevice.Present();
+				}
+            }
+        }
 		
 		#endregion
 		
@@ -285,21 +209,41 @@ namespace Microsoft.Xna.Framework
             supportedOrientations = orientations;
         }
 
-        internal void SetOrientation(DisplayOrientation newOrientation)
+        /// <summary>
+        /// In Xna, setting SupportedOrientations = DisplayOrientation.Default (which is the default value)
+        /// has the effect of setting SupportedOrientations to landscape only or portrait only, based on the
+        /// aspect ratio of PreferredBackBufferWidth / PreferredBackBufferHeight
+        /// </summary>
+        /// <returns></returns>
+        internal DisplayOrientation GetEffectiveSupportedOrientations()
         {
-            DisplayOrientation supported = supportedOrientations;
-            // Calculate supported orientations if it has been left as "default" and only default
-            if (supported == DisplayOrientation.Default)
+            if (supportedOrientations == DisplayOrientation.Default)
             {
-                var deviceManagerIntf = (IGraphicsDeviceManager)_game.Services.GetService(typeof(IGraphicsDeviceManager));
-                if (deviceManagerIntf == null)
-                    return;
-                GraphicsDeviceManager deviceManager = deviceManagerIntf as GraphicsDeviceManager;
+                var deviceManager = (_game.Services.GetService(typeof(IGraphicsDeviceManager)) as GraphicsDeviceManager);
+                if (deviceManager == null)
+                    return DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight;
+
                 if (deviceManager.PreferredBackBufferWidth > deviceManager.PreferredBackBufferHeight)
-                    supported = DisplayOrientation.Portrait;
+                {
+                    return DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight;
+                }
                 else
-                    supported = DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight;
+                {
+                    return DisplayOrientation.Portrait | DisplayOrientation.PortraitUpsideDown;
+                }
             }
+            else
+            {
+                return supportedOrientations;
+            }
+        }
+
+        /// <summary>
+        /// Updates the screen orientation. Filters out requests for unsupported orientations.
+        /// </summary>
+        internal void SetOrientation(DisplayOrientation newOrientation, bool applyGraphicsChanges)
+        {
+            DisplayOrientation supported = GetEffectiveSupportedOrientations();
 
             // If the new orientation is not supported, force a supported orientation
             if ((supported & newOrientation) == 0)
@@ -311,13 +255,14 @@ namespace Microsoft.Xna.Framework
                 else if ((supported & DisplayOrientation.Portrait) != 0)
                     newOrientation = DisplayOrientation.Portrait;
             }
-			
-			CurrentOrientation = newOrientation;
-            if (_game.GraphicsDevice != null)
-            {
-                _game.GraphicsDevice.PresentationParameters.DisplayOrientation = newOrientation;
-            }
+
+            DisplayOrientation oldOrientation = CurrentOrientation;
+
+            CurrentOrientation = newOrientation;
             TouchPanel.DisplayOrientation = newOrientation;
+
+            if (applyGraphicsChanges && oldOrientation != CurrentOrientation && _game.graphicsDeviceManager != null)
+                _game.graphicsDeviceManager.ApplyChanges();
         }
 
         private Dictionary<IntPtr, TouchLocation> _previousTouches = new Dictionary<IntPtr, TouchLocation>();
@@ -331,13 +276,6 @@ namespace Microsoft.Xna.Framework
 
         internal void UpdateTouchPosition(ref Vector2 position)
         {
-            if (this._game.Window.CurrentOrientation == DisplayOrientation.LandscapeRight)
-            {
-                // we need to fudge the position
-                position.X = this.Width - position.X;
-                position.Y = this.Height - position.Y;
-            }
-
             //Fix for ClientBounds
             position.X -= ClientBounds.X;
             position.Y -= ClientBounds.Y;
@@ -350,62 +288,40 @@ namespace Microsoft.Xna.Framework
 
         public override bool OnTouchEvent(MotionEvent e)
         {			
-            TouchLocation tlocation;
-            TouchCollection collection = TouchPanel.Collection;            
             Vector2 position = Vector2.Zero;            
             position.X = e.GetX(e.ActionIndex);            
             position.Y = e.GetY(e.ActionIndex);     
 			UpdateTouchPosition(ref position);
-			int id = e.GetPointerId(e.ActionIndex);            
-            int index;
+			int id = e.GetPointerId(e.ActionIndex);
             switch (e.ActionMasked)
             {
                 // DOWN                
-                case 0:
-                case 5:
-                    index = collection.FindIndexById(id, out tlocation);
-                    if (index < 0)
-                    {
-                        tlocation = new TouchLocation(id, TouchLocationState.Pressed, position);
-                        collection.Add(tlocation);
-                    }
+                case MotionEventActions.Down:
+                case MotionEventActions.PointerDown:
+                    TouchPanel.AddEvent(new TouchLocation(id, TouchLocationState.Pressed, position));
                     break;
+
                 // UP                
-                case 1:
-                case 6:
-                    index = collection.FindIndexById(id, out tlocation);
-                    if (index >= 0)
-                    {
-                        tlocation.State = TouchLocationState.Released;
-                        collection[index] = tlocation;
-                    }	
+                case MotionEventActions.Up:
+                case MotionEventActions.PointerUp:
+                    TouchPanel.AddEvent(new TouchLocation(id, TouchLocationState.Released, position));
 				    break;
                 // MOVE                
-                case 2:
+                case MotionEventActions.Move:
                     for (int i = 0; i < e.PointerCount; i++)
                     {
                         id = e.GetPointerId(i);
                         position.X = e.GetX(i);
                         position.Y = e.GetY(i);
                         UpdateTouchPosition(ref position);
-                        index = collection.FindIndexById(id, out tlocation);
-                        if (index >= 0)
-                        {
-                            tlocation.State = TouchLocationState.Moved;
-                            tlocation.Position = position;
-                            collection[index] = tlocation;
-                        }
+                        TouchPanel.AddEvent(new TouchLocation(id, TouchLocationState.Moved, position));
                     }
 					break;
+
                 // CANCEL, OUTSIDE                
-                case 3:
-                case 4:
-                    index = collection.FindIndexById(id, out tlocation);
-                    if (index >= 0)
-                    {
-                        tlocation.State = TouchLocationState.Invalid;
-                        collection[index] = tlocation;
-                    }
+                case MotionEventActions.Cancel:
+                case MotionEventActions.Outside:
+                    TouchPanel.AddEvent(new TouchLocation(id, TouchLocationState.Released, position));
                     break;
             }
 			
@@ -453,7 +369,26 @@ namespace Microsoft.Xna.Framework
 				// Do nothing; Ignore rather than raising and exception
 			}
 		}
-        
+
+        // A copy of ScreenOrientation from Android 2.3
+        // This allows us to continue to support 2.2 whilst
+        // utilising the 2.3 improved orientation support.
+        enum ScreenOrientationAll
+        {
+            Unspecified = -1,
+            Landscape = 0,
+            Portrait = 1,
+            User = 2,
+            Behind = 3,
+            Sensor = 4,
+            Nosensor = 5,
+            SensorLandscape = 6,
+            SensorPortrait = 7,
+            ReverseLandscape = 8,
+            ReversePortrait = 9,
+            FullSensor = 10,
+        }
+
 		public DisplayOrientation CurrentOrientation 
 		{
             get
@@ -464,18 +399,56 @@ namespace Microsoft.Xna.Framework
             {
                 if (value != _currentOrientation)
                 {
-                    _currentOrientation = value;
+                    DisplayOrientation supported = GetEffectiveSupportedOrientations();
 
-                    if (_currentOrientation == DisplayOrientation.Portrait || _currentOrientation == DisplayOrientation.PortraitUpsideDown)
-				    {
-                        Game.Activity.SetRequestedOrientation(ScreenOrientation.Portrait);						
-				    }
-                    else if (_currentOrientation == DisplayOrientation.LandscapeLeft || _currentOrientation == DisplayOrientation.LandscapeRight)
-				    {
-                        Game.Activity.SetRequestedOrientation(ScreenOrientation.Landscape);						
-				    }	
+                    bool didOrientationChange = false;
+                    // Android 2.3 and above support reverse orientations
+                    int sdkVer = (int)Android.OS.Build.VERSION.SdkInt;
+                    if (sdkVer >= 10)
+                    {
+                        // Check if the requested orientation is supported. Default means all are supported.
+                        if ((supported & value) != 0)
+                        {
+                            didOrientationChange = true;
+                            _currentOrientation = value;
+                            switch (value)
+                            {
+                                case DisplayOrientation.LandscapeLeft:
+                                    Game.Activity.RequestedOrientation = (ScreenOrientation)ScreenOrientationAll.Landscape;
+                                    break;
+                                case DisplayOrientation.LandscapeRight:
+                                    Game.Activity.RequestedOrientation = (ScreenOrientation)ScreenOrientationAll.ReverseLandscape;
+                                    break;
+                                case DisplayOrientation.Portrait:
+                                    Game.Activity.RequestedOrientation = (ScreenOrientation)ScreenOrientationAll.Portrait;
+                                    break;
+                                case DisplayOrientation.PortraitUpsideDown:
+                                    Game.Activity.RequestedOrientation = (ScreenOrientation)ScreenOrientationAll.ReversePortrait;
+                                    break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // Check if the requested orientation is either of the landscape orientations and any landscape orientation is supported.
+                        if ((value == DisplayOrientation.LandscapeLeft || value == DisplayOrientation.LandscapeRight) &&
+                           ((supported & (DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight)) != 0))
+                        {
+                            didOrientationChange = true;
+                            _currentOrientation = DisplayOrientation.LandscapeLeft;
+                            Game.Activity.RequestedOrientation = ScreenOrientation.Landscape;
+                        }
+                        // Check if the requested orientation is either of the portrain orientations and any portrait orientation is supported.
+                        else if ((value == DisplayOrientation.Portrait || value == DisplayOrientation.PortraitUpsideDown) &&
+                                ((supported & (DisplayOrientation.Portrait | DisplayOrientation.PortraitUpsideDown)) != 0))
+                        {
+                            didOrientationChange = true;
+                            _currentOrientation = DisplayOrientation.Portrait;
+                            Game.Activity.RequestedOrientation = ScreenOrientation.Portrait;
+                        }
+                    }
 
-                    if (OrientationChanged != null)
+                    if (didOrientationChange && OrientationChanged != null)
                     {
                         OrientationChanged(this, EventArgs.Empty);
                     }
@@ -487,6 +460,21 @@ namespace Microsoft.Xna.Framework
 		public event EventHandler ClientSizeChanged;
 		public event EventHandler ScreenDeviceNameChanged;
 
+
+        void ISurfaceHolderCallback.SurfaceChanged(ISurfaceHolder holder, Android.Graphics.Format format, int width, int height)
+        {
+            base.SurfaceChanged(holder, format, width, height);
+            Android.Util.Log.Debug("MonoGame", "AndroidGameWindow.SurfaceChanged: format = " + format + ", width = " + width + ", height = " + height);
+
+            if (_game.GraphicsDevice != null)
+                _game.graphicsDeviceManager.ResetClientBounds();
+        }
+
+        void ISurfaceHolderCallback.SurfaceCreated(ISurfaceHolder holder)
+        {
+            base.SurfaceCreated(holder);
+            Android.Util.Log.Debug("MonoGame", "AndroidGameWindow.SurfaceCreated: surfaceFrame = " + holder.SurfaceFrame.ToString());
+        }
     }
 }
 

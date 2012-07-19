@@ -115,7 +115,8 @@ namespace Microsoft.Xna.Framework.Content
         {
             PropertyInfo property = member as PropertyInfo;
             FieldInfo field = member as FieldInfo;
-            if (property != null && property.CanWrite == false)
+            // properties must have public get and set
+            if (property != null && (property.CanWrite == false || property.CanRead == false))
                 return;
 #if WINRT
             Attribute attr = member.GetCustomAttribute(typeof(ContentSerializerIgnoreAttribute));

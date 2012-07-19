@@ -219,52 +219,52 @@ namespace Microsoft.Xna.Framework.Graphics
 					switch (alphaIndex)
 					{
 						case 0:
-							a = (byte)((a0 & 0xF0) | ((a0 & 0xF0) >> 4));
-							break;
-						case 1:
 							a = (byte)((a0 & 0x0F) | ((a0 & 0x0F) << 4));
 							break;
-						case 2:
-							a = (byte)((a1 & 0xF0) | ((a1 & 0xF0) >> 4));
+						case 1:
+							a = (byte)((a0 & 0xF0) | ((a0 & 0xF0) >> 4));
 							break;
-						case 3:
+						case 2:
 							a = (byte)((a1 & 0x0F) | ((a1 & 0x0F) << 4));
 							break;
-						case 4:
-							a = (byte)((a2 & 0xF0) | ((a2 & 0xF0) >> 4));
+						case 3:
+							a = (byte)((a1 & 0xF0) | ((a1 & 0xF0) >> 4));
 							break;
-						case 5:
+						case 4:
 							a = (byte)((a2 & 0x0F) | ((a2 & 0x0F) << 4));
 							break;
-						case 6:
-							a = (byte)((a3 & 0xF0) | ((a3 & 0xF0) >> 4));
+						case 5:
+							a = (byte)((a2 & 0xF0) | ((a2 & 0xF0) >> 4));
 							break;
-						case 7:
+						case 6:
 							a = (byte)((a3 & 0x0F) | ((a3 & 0x0F) << 4));
 							break;
-						case 8:
-							a = (byte)((a4 & 0xF0) | ((a4 & 0xF0) >> 4));
+						case 7:
+							a = (byte)((a3 & 0xF0) | ((a3 & 0xF0) >> 4));
 							break;
-						case 9:
+						case 8:
 							a = (byte)((a4 & 0x0F) | ((a4 & 0x0F) << 4));
 							break;
-						case 10:
-							a = (byte)((a5 & 0xF0) | ((a5 & 0xF0) >> 4));
+						case 9:
+							a = (byte)((a4 & 0xF0) | ((a4 & 0xF0) >> 4));
 							break;
-						case 11:
+						case 10:
 							a = (byte)((a5 & 0x0F) | ((a5 & 0x0F) << 4));
 							break;
-						case 12:
-							a = (byte)((a6 & 0xF0) | ((a6 & 0xF0) >> 4));
+						case 11:
+							a = (byte)((a5 & 0xF0) | ((a5 & 0xF0) >> 4));
 							break;
-						case 13:
+						case 12:
 							a = (byte)((a6 & 0x0F) | ((a6 & 0x0F) << 4));
 							break;
+						case 13:
+							a = (byte)((a6 & 0xF0) | ((a6 & 0xF0) >> 4));
+							break;
 						case 14:
-							a = (byte)((a7 & 0xF0) | ((a7 & 0xF0) >> 4));
+							a = (byte)((a7 & 0x0F) | ((a7 & 0x0F) << 4));
 							break;
 						case 15:
-							a = (byte)((a7 & 0x0F) | ((a7 & 0x0F) << 4));
+							a = (byte)((a7 & 0xF0) | ((a7 & 0xF0) >> 4));
 							break;
 					}
 					++alphaIndex;

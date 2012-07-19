@@ -13,7 +13,9 @@ namespace Microsoft.Xna.Framework.Content
         public static ConstructorInfo GetDefaultConstructor(this Type type)
         {
 #if WINRT
-            return TypeBuilder.GetConstructor(type, null);
+            var typeInfo = type.GetTypeInfo();
+            var ctor = typeInfo.DeclaredConstructors.FirstOrDefault(c => !c.IsStatic && c.GetParameters().Length == 0);
+            return ctor;
 #else
             var attrs = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance;
             return type.GetConstructor(attrs, null, new Type[0], null);

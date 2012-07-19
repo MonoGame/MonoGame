@@ -46,8 +46,8 @@ namespace Microsoft.Xna.Framework.Graphics
     public enum SetDataOptions
     { 
         None = 0,
-        NoOverwrite = 4096,
-		Discard = 8192
+		Discard = 1,
+        NoOverwrite = 2
     }
 }
 
