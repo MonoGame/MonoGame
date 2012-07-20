@@ -13,6 +13,9 @@ namespace Microsoft.Xna.Framework.Input
         public static Microsoft.Xna.Framework.Input.GamePadCapabilities GetCapabilities(PlayerIndex playerIndex)
         {
             var controller = GetController(playerIndex);
+            if (!controller.IsConnected)
+                return new Microsoft.Xna.Framework.Input.GamePadCapabilities(); // GamePadCapabilities.IsConnected = false by default
+
             var capabilities = controller.GetCapabilities(SharpDX.XInput.DeviceQueryType.Any);
             var ret = new Microsoft.Xna.Framework.Input.GamePadCapabilities();
             switch (capabilities.SubType)
@@ -87,7 +90,7 @@ namespace Microsoft.Xna.Framework.Input
             ret.HasLeftTrigger = gamepad.LeftTrigger > 0;
             ret.HasLeftXThumbStick = gamepad.LeftThumbX != 0;
             ret.HasLeftYThumbStick = gamepad.LeftThumbY != 0;
-            
+
             // vibration
             bool hasForceFeedback = capabilities.Flags.HasFlag(SharpDX.XInput.CapabilityFlags.FfbSupported);
             ret.HasLeftVibrationMotor = hasForceFeedback && capabilities.Vibration.LeftMotorSpeed > 0;
@@ -115,6 +118,9 @@ namespace Microsoft.Xna.Framework.Input
             Microsoft.Xna.Framework.Input.GamePadDeadZone deadZoneMode)
         {
             var controller = GetController(playerIndex);
+            if (!controller.IsConnected)
+                return new GamePadState(); // GamePadState.IsConnected = false by default
+
             var gamepad = controller.GetState().Gamepad;
 
             Microsoft.Xna.Framework.Input.GamePadThumbSticks thumbSticks = new Microsoft.Xna.Framework.Input.GamePadThumbSticks(
