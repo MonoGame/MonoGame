@@ -148,30 +148,20 @@ namespace Microsoft.Xna.Framework.Media
             SdlMixer.Mix_HookMusicFinished(OnFinishedPlaying);
             SdlMixer.Mix_PlayMusic(_audioData, 0);
 			_playCount++;
-            //SdlMixer.Mix_CloseAudio();
         }
 
 		internal void Resume()
 		{
-			if (_audioData == IntPtr.Zero)
-				return;
-			
             SdlMixer.Mix_ResumeMusic();
 		}
 		
 		internal void Pause()
 		{			
-			if (_audioData == IntPtr.Zero)
-				return;
-			
             SdlMixer.Mix_PauseMusic();
         }
 		
 		internal void Stop()
 		{
-			if (_audioData == IntPtr.Zero)
-				return;
-
             SdlMixer.Mix_HaltMusic();			
 			_playCount = 0;
 		}
@@ -181,21 +171,13 @@ namespace Microsoft.Xna.Framework.Media
             // sdl volume goes from 0 to 128 instead of 0 to 1
 			get
 			{
-				if (_audioData == IntPtr.Zero)
-					return 0f;
-				else
-                {
-					return _volume / 128f;
-                }
+                return _volume / 128f;
 			}
 			
 			set
 			{
-				if (_audioData != IntPtr.Zero && _volume != value)
-                {
-                    _volume = (int)(value * 128);
-                    SdlMixer.Mix_VolumeMusic(_volume);
-                }
+                _volume = (int)(value * 128);
+                SdlMixer.Mix_VolumeMusic(_volume);
 			}			
 		}
 		
