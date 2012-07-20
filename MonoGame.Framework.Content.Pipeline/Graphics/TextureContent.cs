@@ -38,91 +38,64 @@
  */
 #endregion License
 
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
+using System;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
     /// <summary>
-    /// Collection of bone weights of a vertex.
+    /// Provides a base class for all texture objects.
     /// </summary>
-    public sealed class BoneWeightCollection : Collection<BoneWeight>
+    public abstract class TextureContent : ContentItem
     {
+        MipmapChainCollection faces;
+
         /// <summary>
-        /// Initializes a new instance of BoneWeightCollection.
+        /// Collection of image faces that hold a single mipmap chain for a regular 2D texture, six chains for a cube map, or an arbitrary number for volume and array textures.
         /// </summary>
-        public BoneWeightCollection()
+        public MipmapChainCollection Faces
         {
+            get
+            {
+                return faces;
+            }
         }
 
         /// <summary>
-        /// Normalizes the contents of the weights list.
+        /// Initializes a new instance of TextureContent with the specified face collection.
         /// </summary>
-        public void NormalizeWeights()
+        /// <param name="faces">Mipmap chain containing the face collection.</param>
+        protected TextureContent(MipmapChainCollection faces)
         {
-            // Normalization does the following:
-            //
-            // - Sorts weights such that the most significant weight is first.
-            // - Removes zero-value entries.
-            // - Adjusts values so the sum equals one.
-            //
-            // Throws InvalidContentException if all weights are zero.
-            NormalizeWeights(int.MaxValue);
+            this.faces = faces;
         }
 
         /// <summary>
-        /// Normalizes the contents of the bone weights list.
+        /// Converts all bitmaps for this texture to a different format.
         /// </summary>
-        /// <param name="maxWeights">Maximum number of weights allowed.</param>
-        public void NormalizeWeights(int maxWeights)
+        /// <param name="newBitmapType">Type being converted to. The new type must be a subclass of BitmapContent, such as PixelBitmapContent or DxtBitmapContent.</param>
+        public void ConvertBitmapType(Type newBitmapType)
         {
-            // Normalization does the following:
-            //
-            // - Sorts weights such that the most significant weight is first.
-            // - Removes zero-value entries.
-            // - Discards weights with the smallest value until there are maxWeights or less in the list.
-            // - Adjusts values so the sum equals one.
-            //
-            // Throws InvalidContentException if all weights are zero.
+            throw new NotImplementedException();
+        }
 
-            List<BoneWeight> weights = new List<BoneWeight>(this.Items);
+        /// <summary>
+        /// Generates a full set of mipmaps for the texture.
+        /// </summary>
+        /// <param name="overwriteExistingMipmaps">true if the existing mipmap set is replaced with the new set; false otherwise.</param>
+        public virtual void GenerateMipmaps(bool overwriteExistingMipmaps)
+        {
+            throw new NotImplementedException();
+        }
 
-            // Sort into descending order
-            weights.Sort((b1, b2) => { return b2.Weight.CompareTo(b1.Weight); });
-
-            // Find the sum to validate we have weights and to normalize the weights
-            float sum = 0.0f;
-            int index = 0;
-            // Cannot use a foreach or for because the index may not always increment and the length of the list may change.
-            while (index < weights.Count)
-            {
-                float weight = weights[index].Weight;
-                if ((weight > 0.0f) && (index < maxWeights))
-                {
-                    sum += weight;
-                    ++index;
-                }
-                else
-                {
-                    // Discard any zero weights or if we have exceeded the maximum number of weights
-                    weights.RemoveAt(index);
-                }
-            }
-
-            if (sum == 0.0f)
-                throw new InvalidContentException("Total bone weights in a collection must not be zero");
-
-            // Normalize each weight
-            int count = weights.Count();
-            // Old-school trick. Multiplication is faster than division, so multiply by the inverse.
-            float invSum = 1.0f / sum;
-            for (index = 0; index < count; ++index)
-            {
-                BoneWeight bw = weights[index];
-                bw.Weight *= invSum;
-                weights[index] = bw;
-            }
+        /// <summary>
+        /// Verifies that all contents of this texture are present, correct and match the capabilities of the device.
+        /// </summary>
+        /// <param name="targetProfile">The profile identifier that defines the capabilities of the device.</param>
+        public abstract void Validate(Nullable<GraphicsProfile> targetProfile)
+        {
+            // If texture verification fails, InvalidContentException is thrown.
+            throw new NotImplementedException();
         }
     }
 }

@@ -40,8 +40,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
@@ -55,6 +53,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         string fontName;
         float size;
         float spacing;
+        FontDescriptionStyle style;
+        bool useKerning;
 
         /// <summary>
         /// Gets the collection of characters provided by this FontDescription.
@@ -133,6 +133,78 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     throw new ArgumentOutOfRangeException("Spacing is less than or equal to zero. Specify a value for this property that is greater than zero.");
                 spacing = value;
             }
+        }
+
+        /// <summary>
+        /// Gets or sets the style of the font, expressed as a combination of one or more FontDescriptionStyle flags.
+        /// </summary>
+        public FontDescriptionStyle Style
+        {
+            get
+            {
+                return style;
+            }
+            set
+            {
+                style = value;
+            }
+        }
+
+        /// <summary>
+        /// Indicates if kerning information is used when drawing characters.
+        /// </summary>
+        [ContentSerializerAttribute]
+        public bool UseKerning
+        {
+            get
+            {
+                return useKerning;
+            }
+            set
+            {
+                useKerning = value;
+            }
+        }
+
+        /// <summary>
+        /// Initializes a new instance of FontDescription and initializes its members to the specified font, size, and spacing, using FontDescriptionStyle.Regular as the default value for Style.
+        /// </summary>
+        /// <param name="fontName">The name of the font, such as Times New Roman.</param>
+        /// <param name="size">The size, in points, of the font.</param>
+        /// <param name="spacing">The amount of space, in pixels, to insert between letters in a string.</param>
+        public FontDescription(string fontName, float size, float spacing)
+            : this(fontName, size, spacing, FontDescriptionStyle.Regular, true)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of FontDescription and initializes its members to the specified font, size, spacing, and style.
+        /// </summary>
+        /// <param name="fontName">The name of the font, such as Times New Roman.</param>
+        /// <param name="size">The size, in points, of the font.</param>
+        /// <param name="spacing">The amount of space, in pixels, to insert between letters in a string.</param>
+        /// <param name="fontStyle">The font style for the font.</param>
+        public FontDescription(string fontName, float size, float spacing, FontDescriptionStyle fontStyle)
+            : this(fontName, size, spacing, fontStyle, true)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of FontDescription using the specified values.
+        /// </summary>
+        /// <param name="fontName">The name of the font, such as Times New Roman.</param>
+        /// <param name="size">The size, in points, of the font.</param>
+        /// <param name="spacing">The amount of space, in pixels, to insert between letters in a string.</param>
+        /// <param name="fontStyle">The font style for the font.</param>
+        /// <param name="useKerning">true if kerning information is used when drawing characters; false otherwise.</param>
+        public FontDescription(string fontName, float size, float spacing, FontDescriptionStyle fontStyle, bool useKerning)
+        {
+            // Write to the properties so the validation is run
+            FontName = fontName;
+            Size = size;
+            Spacing = spacing;
+            Style = fontStyle;
+            UseKerning = useKerning;
         }
     }
 }

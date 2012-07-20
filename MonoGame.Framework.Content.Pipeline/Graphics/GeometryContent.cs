@@ -38,91 +38,77 @@
  */
 #endregion License
 
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
     /// <summary>
-    /// Collection of bone weights of a vertex.
+    /// Provides properties that define various aspects of a geometry batch.
     /// </summary>
-    public sealed class BoneWeightCollection : Collection<BoneWeight>
+    public class GeometryContent : ContentItem
     {
+        IndexCollection indices;
+        MaterialContent material;
+        MeshContent parent;
+        VertexContent vertices;
+
         /// <summary>
-        /// Initializes a new instance of BoneWeightCollection.
+        /// Gets the list of triangle indices for this geometry batch. Geometry is stored as an indexed triangle list, where each group of three indices defines a single triangle.
         /// </summary>
-        public BoneWeightCollection()
+        public IndexCollection Indices
         {
+            get
+            {
+                return indices;
+            }
         }
 
         /// <summary>
-        /// Normalizes the contents of the weights list.
+        /// Gets or sets the material of the parent mesh.
         /// </summary>
-        public void NormalizeWeights()
+        public MaterialContent Material
         {
-            // Normalization does the following:
-            //
-            // - Sorts weights such that the most significant weight is first.
-            // - Removes zero-value entries.
-            // - Adjusts values so the sum equals one.
-            //
-            // Throws InvalidContentException if all weights are zero.
-            NormalizeWeights(int.MaxValue);
+            get
+            {
+                return material;
+            }
+            set
+            {
+                material = value;
+            }
         }
 
         /// <summary>
-        /// Normalizes the contents of the bone weights list.
+        /// Gets or sets the parent MeshContent for this object.
         /// </summary>
-        /// <param name="maxWeights">Maximum number of weights allowed.</param>
-        public void NormalizeWeights(int maxWeights)
+        public MeshContent Parent
         {
-            // Normalization does the following:
-            //
-            // - Sorts weights such that the most significant weight is first.
-            // - Removes zero-value entries.
-            // - Discards weights with the smallest value until there are maxWeights or less in the list.
-            // - Adjusts values so the sum equals one.
-            //
-            // Throws InvalidContentException if all weights are zero.
-
-            List<BoneWeight> weights = new List<BoneWeight>(this.Items);
-
-            // Sort into descending order
-            weights.Sort((b1, b2) => { return b2.Weight.CompareTo(b1.Weight); });
-
-            // Find the sum to validate we have weights and to normalize the weights
-            float sum = 0.0f;
-            int index = 0;
-            // Cannot use a foreach or for because the index may not always increment and the length of the list may change.
-            while (index < weights.Count)
+            get
             {
-                float weight = weights[index].Weight;
-                if ((weight > 0.0f) && (index < maxWeights))
-                {
-                    sum += weight;
-                    ++index;
-                }
-                else
-                {
-                    // Discard any zero weights or if we have exceeded the maximum number of weights
-                    weights.RemoveAt(index);
-                }
+                return parent;
             }
-
-            if (sum == 0.0f)
-                throw new InvalidContentException("Total bone weights in a collection must not be zero");
-
-            // Normalize each weight
-            int count = weights.Count();
-            // Old-school trick. Multiplication is faster than division, so multiply by the inverse.
-            float invSum = 1.0f / sum;
-            for (index = 0; index < count; ++index)
+            set
             {
-                BoneWeight bw = weights[index];
-                bw.Weight *= invSum;
-                weights[index] = bw;
+                parent = value;
             }
+        }
+
+        /// <summary>
+        /// Gets the set of vertex batches for the geometry batch.
+        /// </summary>
+        public VertexContent Vertices
+        {
+            get
+            {
+                return vertices;
+            }
+        }
+
+        /// <summary>
+        /// Creates an instance of GeometryContent.
+        /// </summary>
+        public GeometryContent()
+        {
+            indices = new IndexCollection();
+            vertices = new VertexContent();
         }
     }
 }

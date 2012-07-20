@@ -38,91 +38,39 @@
  */
 #endregion License
 
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
     /// <summary>
-    /// Collection of bone weights of a vertex.
+    /// Provides methods for accessing a mipmap chain.
     /// </summary>
-    public sealed class BoneWeightCollection : Collection<BoneWeight>
+    public sealed class MipmapChain : Collection<BitmapContent>
     {
         /// <summary>
-        /// Initializes a new instance of BoneWeightCollection.
+        /// Initializes a new instance of MipmapChain.
         /// </summary>
-        public BoneWeightCollection()
+        public MipmapChain()
         {
         }
 
         /// <summary>
-        /// Normalizes the contents of the weights list.
+        /// Initializes a new instance of MipmapChain with the specified mipmap.
         /// </summary>
-        public void NormalizeWeights()
+        /// <param name="bitmap"></param>
+        public MipmapChain(BitmapContent bitmap)
         {
-            // Normalization does the following:
-            //
-            // - Sorts weights such that the most significant weight is first.
-            // - Removes zero-value entries.
-            // - Adjusts values so the sum equals one.
-            //
-            // Throws InvalidContentException if all weights are zero.
-            NormalizeWeights(int.MaxValue);
+            Add(bitmap);
         }
 
         /// <summary>
-        /// Normalizes the contents of the bone weights list.
+        /// Constructs a new mipmap chain containing the specified bitmap.
         /// </summary>
-        /// <param name="maxWeights">Maximum number of weights allowed.</param>
-        public void NormalizeWeights(int maxWeights)
+        /// <param name="bitmap">Bitmap used for the mipmap chain.</param>
+        /// <returns>Resultant mipmap chain.</returns>
+        public static MipmapChain op_Implicit(BitmapContent bitmap)
         {
-            // Normalization does the following:
-            //
-            // - Sorts weights such that the most significant weight is first.
-            // - Removes zero-value entries.
-            // - Discards weights with the smallest value until there are maxWeights or less in the list.
-            // - Adjusts values so the sum equals one.
-            //
-            // Throws InvalidContentException if all weights are zero.
-
-            List<BoneWeight> weights = new List<BoneWeight>(this.Items);
-
-            // Sort into descending order
-            weights.Sort((b1, b2) => { return b2.Weight.CompareTo(b1.Weight); });
-
-            // Find the sum to validate we have weights and to normalize the weights
-            float sum = 0.0f;
-            int index = 0;
-            // Cannot use a foreach or for because the index may not always increment and the length of the list may change.
-            while (index < weights.Count)
-            {
-                float weight = weights[index].Weight;
-                if ((weight > 0.0f) && (index < maxWeights))
-                {
-                    sum += weight;
-                    ++index;
-                }
-                else
-                {
-                    // Discard any zero weights or if we have exceeded the maximum number of weights
-                    weights.RemoveAt(index);
-                }
-            }
-
-            if (sum == 0.0f)
-                throw new InvalidContentException("Total bone weights in a collection must not be zero");
-
-            // Normalize each weight
-            int count = weights.Count();
-            // Old-school trick. Multiplication is faster than division, so multiply by the inverse.
-            float invSum = 1.0f / sum;
-            for (index = 0; index < count; ++index)
-            {
-                BoneWeight bw = weights[index];
-                bw.Weight *= invSum;
-                weights[index] = bw;
-            }
+            return new MipmapChain(bitmap);
         }
     }
 }
