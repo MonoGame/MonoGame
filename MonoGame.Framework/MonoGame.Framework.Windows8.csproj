@@ -340,7 +340,7 @@
     <Compile Include="Graphics\DirectionalLight.cs" />
     <Compile Include="Color.cs" />
     <Compile Include="Windows\GamerServices\Guide.cs" />
-    <Compile Include="Windows\GraphicsDeviceManager.cs" />
+    <Compile Include="GraphicsDeviceManager.cs" />
     <Compile Include="Desktop\TitleContainer.cs" />
     <Compile Include="Content\ContentReaders\CurveReader.cs" />
     <Compile Include="Graphics\Vertices\VertexElementColor.cs" />
