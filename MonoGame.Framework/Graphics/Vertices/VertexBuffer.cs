@@ -63,9 +63,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 usage = SharpDX.Direct3D11.ResourceUsage.Dynamic;
             }
 
-            if (bufferUsage != Graphics.BufferUsage.WriteOnly)
-                accessflags |= SharpDX.Direct3D11.CpuAccessFlags.Read;
-
             _buffer = new SharpDX.Direct3D11.Buffer(    graphicsDevice._d3dDevice, 
                                                         vertexDeclaration.VertexStride * vertexCount,
                                                         usage,

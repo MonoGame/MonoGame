@@ -11,26 +11,26 @@
     <AssemblyName>MonoGame.Framework.Linux</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-    <DebugSymbols>true</DebugSymbols>
+    <DebugSymbols>True</DebugSymbols>
     <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
+    <Optimize>False</Optimize>
     <OutputPath>bin\Debug</OutputPath>
     <DefineConstants>DEBUG;LINUX;OPENGL</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
-    <ConsolePause>false</ConsolePause>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <ConsolePause>False</ConsolePause>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <DebugType>none</DebugType>
-    <Optimize>false</Optimize>
+    <Optimize>True</Optimize>
     <OutputPath>bin\Release</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
-    <ConsolePause>false</ConsolePause>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <ConsolePause>False</ConsolePause>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <DefineConstants>LINUX;OPENGL</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
@@ -171,7 +171,7 @@
     <Compile Include="Input\Touch\TouchLocationState.cs" />
     <Compile Include="Input\Touch\TouchPanelCapabilities.cs" />
     <Compile Include="Input\Touch\TouchPanel.cs" />
-    <Compile Include="Input\Touch\TouchInfo.cs" />    
+    <Compile Include="Input\Touch\TouchInfo.cs" />
     <Compile Include="Input\Touch\GestureSample.cs" />
     <Compile Include="GameComponentCollection.cs" />
     <Compile Include="Graphics\SpriteBatchItem.cs" />
@@ -303,7 +303,6 @@
     <Compile Include="Graphics\Vertices\VertexElementColor.cs" />
     <Compile Include="Audio\XactClip.cs" />
     <Compile Include="Audio\XactSound.cs" />
-    <Compile Include="Linux\Graphics\RenderTarget2D.cs" />
     <Compile Include="Desktop\Input\Axis.cs" />
     <Compile Include="Desktop\Input\Capabilities.cs" />
     <Compile Include="Desktop\Input\DPad.cs" />
@@ -311,7 +310,6 @@
     <Compile Include="Desktop\Input\Input.cs" />
     <Compile Include="Desktop\Input\Joystick.cs" />
     <Compile Include="Desktop\Input\Mouse.cs" />
-    <Compile Include="Desktop\Input\MouseState.cs" />
     <Compile Include="Desktop\Input\PadConfig.cs" />
     <Compile Include="Desktop\Input\Settings.cs" />
     <Compile Include="Desktop\Input\Stick.cs" />
@@ -343,7 +341,6 @@
     <Compile Include="Graphics\Effect\AlphaTestEffect.cs" />
     <Compile Include="Graphics\Effect\BasicEffect.cs" />
     <Compile Include="Graphics\Effect\DualTextureEffect.cs" />
-    <Compile Include="Graphics\Effect\DXShader.cs" />
     <Compile Include="Graphics\Effect\Effect.cs" />
     <Compile Include="Graphics\Effect\EffectAnnotation.cs" />
     <Compile Include="Graphics\Effect\EffectAnnotationCollection.cs" />
@@ -397,6 +394,40 @@
     <Compile Include="Media\PlaylistCollection.cs" />
     <Compile Include="Media\SongCollection.cs" />
     <Compile Include="Graphics\Effect\ConstantBuffer.cs" />
+    <Compile Include="Graphics\Effect\MGFXShader.cs" />
+    <Compile Include="Graphics\Effect\Shader.cs" />
+    <Compile Include="Graphics\Effect\Shader.dx11.cs" />
+    <Compile Include="Graphics\Effect\Shader.ogl.cs" />
+    <Compile Include="Graphics\Effect\Effect.fx.cs" />
+    <Compile Include="Graphics\Effect\FXShader.cs" />
+    <Compile Include="Graphics\Effect\PassthroughVertexShader.cs" />
+    <Compile Include="..\Tools\2MGFX\DXConstantBufferData.cs">
+      <Link>Graphics\Effect\DXConstantBufferData.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\DXConstantBufferData.mojo.cs">
+      <Link>Graphics\Effect\DXConstantBufferData.mojo.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\DXEffectObject.cs">
+      <Link>Graphics\Effect\DXEffectObject.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\DXEffectObject.fxparser.cs">
+      <Link>Graphics\Effect\DXEffectObject.fxparser.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\DXShaderData.cs">
+      <Link>Graphics\Effect\DXShaderData.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\DXShaderData.mojo.cs">
+      <Link>Graphics\Effect\DXShaderData.mojo.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\MojoShader.cs">
+      <Link>Graphics\Effect\MojoShader.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\DXHelper.cs">
+      <Link>Graphics\Effect\DXHelper.cs</Link>
+    </Compile>
+    <Compile Include="Content\ContentReaders\EffectMaterialReader.cs" />
+    <Compile Include="Content\ContentReaders\ExternalReferenceReader.cs" />
+    <Compile Include="Graphics\Effect\EffectMaterial.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.Linux.csproj">
@@ -416,5 +447,26 @@
     <None Include="MonoGame.Framework.Linux.dll.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="..\ThirdParty\Libs\libmojoshader_32.so">
+      <Link>libmojoshader_32.so</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Libs\libmojoshader_64.so">
+      <Link>libmojoshader_64.so</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Linux\Graphics\" />
+  </ItemGroup>
+  <ProjectExtensions>
+    <MonoDevelop>
+      <Properties>
+        <Policies>
+          <TextStylePolicy FileWidth="120" NoTabsAfterNonTabs="True" inheritsSet="VisualStudio" inheritsScope="text/plain" scope="text/x-csharp" />
+          <CSharpFormattingPolicy inheritsSet="Mono" inheritsScope="text/x-csharp" scope="text/x-csharp" />
+        </Policies>
+      </Properties>
+    </MonoDevelop>
+  </ProjectExtensions>
 </Project>

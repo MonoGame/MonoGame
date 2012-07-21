@@ -27,8 +27,17 @@ SOFTWARE.
 
 using System;
 
+#if WINRT
+using System.Runtime.Serialization;
+#endif
+
 namespace Microsoft.Xna.Framework
 {
+    #if WINRT
+    [DataContract]
+    #else
+    [Serializable]
+    #endif
     public struct Color : IEquatable<Color>
     {
 		// ARGB
@@ -122,6 +131,9 @@ namespace Microsoft.Xna.Framework
             A = (byte)MathHelper.Clamp(alpha * 255, Byte.MinValue, Byte.MaxValue);
         }
 
+#if WINRT
+        [DataMember]
+#endif
         public byte B
         {
             get
@@ -134,6 +146,9 @@ namespace Microsoft.Xna.Framework
             }
         }
 
+#if WINRT
+        [DataMember]
+#endif
         public byte G
         {
             get
@@ -145,6 +160,10 @@ namespace Microsoft.Xna.Framework
                 this._packedValue = (this._packedValue & 0xffff00ff) | ((uint)(value << 8));
             }
         }
+
+#if WINRT
+        [DataMember]
+#endif
         public byte R
         {
             get
@@ -156,6 +175,10 @@ namespace Microsoft.Xna.Framework
                 this._packedValue = (this._packedValue & 0xffffff00) | value;
             }
         }
+
+#if WINRT
+        [DataMember]
+#endif
         public byte A
         {
             get
