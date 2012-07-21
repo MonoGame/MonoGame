@@ -121,30 +121,34 @@ namespace Microsoft.Xna.Framework.Graphics
 				return;
 
 			// Bind the vertex attributes to the shader program.
-			foreach (var attrb in _attributes) 
-			{
-				switch (attrb.usage) 
-				{
-					case VertexElementUsage.Color:
-						GL.BindAttribLocation(program, GraphicsDevice.attributeColor, attrb.name);
-						break;
-					case VertexElementUsage.Position:
-						GL.BindAttribLocation(program, GraphicsDevice.attributePosition + attrb.index, attrb.name);
-						break;
-					case VertexElementUsage.TextureCoordinate:
-						GL.BindAttribLocation(program, GraphicsDevice.attributeTexCoord + attrb.index, attrb.name);
-						break;
-					case VertexElementUsage.Normal:
-						GL.BindAttribLocation(program, GraphicsDevice.attributeNormal, attrb.name);
-						break;
-					case VertexElementUsage.BlendIndices:
-						GL.BindAttribLocation(program, GraphicsDevice.attributeBlendIndicies, attrb.name);
-						break;
-					case VertexElementUsage.BlendWeight:
-						GL.BindAttribLocation(program, GraphicsDevice.attributeBlendWeight, attrb.name);
-						break;
-					default:
-						throw new NotImplementedException();
+			foreach (var attrb in _attributes) {
+				switch (attrb.usage) {
+				case VertexElementUsage.Color:
+					GL.BindAttribLocation (program, GraphicsDevice.attributeColor, attrb.name);
+					break;
+				case VertexElementUsage.Position:
+					GL.BindAttribLocation (program, GraphicsDevice.attributePosition + attrb.index, attrb.name);
+					break;
+				case VertexElementUsage.TextureCoordinate:
+					GL.BindAttribLocation (program, GraphicsDevice.attributeTexCoord + attrb.index, attrb.name);
+					break;
+				case VertexElementUsage.Normal:
+					GL.BindAttribLocation (program, GraphicsDevice.attributeNormal, attrb.name);
+					break;
+				case VertexElementUsage.BlendIndices:
+					GL.BindAttribLocation (program, GraphicsDevice.attributeBlendIndicies, attrb.name);
+					break;
+				case VertexElementUsage.BlendWeight:
+					GL.BindAttribLocation (program, GraphicsDevice.attributeBlendWeight, attrb.name);
+					break;
+				case VertexElementUsage.Binormal:
+					GL.BindAttribLocation (program, GraphicsDevice.attributeBinormal, attrb.name);
+					break;
+				case VertexElementUsage.Tangent:
+					GL.BindAttribLocation (program, GraphicsDevice.attributeBlendWeight, attrb.name);
+					break;
+				default:
+					throw new NotImplementedException();
 				}
 			}
 		}
@@ -188,9 +192,11 @@ namespace Microsoft.Xna.Framework.Graphics
 						tex = (Texture)textures [sampler.index];
 					}
 
-					GL.ActiveTexture ((TextureUnit)((int)TextureUnit.Texture0 + sampler.index));
-					tex.Activate ();						
-					samplerStates [sampler.index].Activate (tex.glTarget, tex.LevelCount > 1);
+					if (tex != null) {
+						GL.ActiveTexture ((TextureUnit)((int)TextureUnit.Texture0 + sampler.index));
+						tex.Activate ();						
+						samplerStates [sampler.index].Activate (tex.glTarget, tex.LevelCount > 1);
+					}
 				}
 			}
 
