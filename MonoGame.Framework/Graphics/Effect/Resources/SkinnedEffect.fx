@@ -217,7 +217,7 @@ VSOutputPixelLightingTx VSSkinnedPixelLightingFourBones(VSInputNmTxWeights vin)
 
 
 // Pixel shader: vertex lighting.
-float4 PSSkinnedVertexLighting(PSInputTx pin) : SV_Target0
+float4 PSSkinnedVertexLighting(VSOutputTx pin) : SV_Target0
 {
     float4 color = SAMPLE_TEXTURE(Texture, pin.TexCoord) * pin.Diffuse;
     
@@ -229,7 +229,7 @@ float4 PSSkinnedVertexLighting(PSInputTx pin) : SV_Target0
 
 
 // Pixel shader: vertex lighting, no fog.
-float4 PSSkinnedVertexLightingNoFog(PSInputTx pin) : SV_Target0
+float4 PSSkinnedVertexLightingNoFog(VSOutputTx pin) : SV_Target0
 {
     float4 color = SAMPLE_TEXTURE(Texture, pin.TexCoord) * pin.Diffuse;
     
@@ -240,7 +240,7 @@ float4 PSSkinnedVertexLightingNoFog(PSInputTx pin) : SV_Target0
 
 
 // Pixel shader: pixel lighting.
-float4 PSSkinnedPixelLighting(PSInputPixelLightingTx pin) : SV_Target0
+float4 PSSkinnedPixelLighting(VSOutputPixelLightingTx pin) : SV_Target0
 {
     float4 color = SAMPLE_TEXTURE(Texture, pin.TexCoord) * pin.Diffuse;
     

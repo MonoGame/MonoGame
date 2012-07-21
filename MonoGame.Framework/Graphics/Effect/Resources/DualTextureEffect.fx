@@ -92,7 +92,7 @@ VSOutputTx2NoFog VSDualTextureVcNoFog(VSInputTx2Vc vin)
 
 
 // Pixel shader: basic.
-float4 PSDualTexture(PSInputTx2 pin) : SV_Target0
+float4 PSDualTexture(VSOutputTx2 pin) : SV_Target0
 {
     float4 color = SAMPLE_TEXTURE(Texture, pin.TexCoord);
     float4 overlay = SAMPLE_TEXTURE(Texture2, pin.TexCoord2);
@@ -107,7 +107,7 @@ float4 PSDualTexture(PSInputTx2 pin) : SV_Target0
 
 
 // Pixel shader: no fog.
-float4 PSDualTextureNoFog(PSInputTx2NoFog pin) : SV_Target0
+float4 PSDualTextureNoFog(VSOutputTx2NoFog pin) : SV_Target0
 {
     float4 color = SAMPLE_TEXTURE(Texture, pin.TexCoord);
     float4 overlay = SAMPLE_TEXTURE(Texture2, pin.TexCoord2);
