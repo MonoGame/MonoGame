@@ -19,9 +19,9 @@ MATRIX_CONSTANTS
 END_CONSTANTS
 
 
-void SpriteVertexShader(inout float4 color    : COLOR0,
-                        inout float2 texCoord : TEXCOORD0,
-                        inout float4 position : SV_Position)
+void SpriteVertexShader(inout float4 position : SV_Position,
+						inout float4 color    : COLOR0,
+                        inout float2 texCoord : TEXCOORD0)
 {
     position = mul(position, MatrixTransform);
 }
