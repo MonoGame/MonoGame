@@ -88,7 +88,7 @@ VSOutputTxNoFog VSAlphaTestVcNoFog(VSInputTxVc vin)
 
 
 // Pixel shader: less/greater compare function.
-float4 PSAlphaTestLtGt(PSInputTx pin) : SV_Target0
+float4 PSAlphaTestLtGt(VSOutputTx pin) : SV_Target0
 {
     float4 color = SAMPLE_TEXTURE(Texture, pin.TexCoord) * pin.Diffuse;
 
@@ -101,7 +101,7 @@ float4 PSAlphaTestLtGt(PSInputTx pin) : SV_Target0
 
 
 // Pixel shader: less/greater compare function, no fog.
-float4 PSAlphaTestLtGtNoFog(PSInputTxNoFog pin) : SV_Target0
+float4 PSAlphaTestLtGtNoFog(VSOutputTxNoFog pin) : SV_Target0
 {
     float4 color = SAMPLE_TEXTURE(Texture, pin.TexCoord) * pin.Diffuse;
     
@@ -112,7 +112,7 @@ float4 PSAlphaTestLtGtNoFog(PSInputTxNoFog pin) : SV_Target0
 
 
 // Pixel shader: equal/notequal compare function.
-float4 PSAlphaTestEqNe(PSInputTx pin) : SV_Target0
+float4 PSAlphaTestEqNe(VSOutputTx pin) : SV_Target0
 {
     float4 color = SAMPLE_TEXTURE(Texture, pin.TexCoord) * pin.Diffuse;
     
@@ -125,7 +125,7 @@ float4 PSAlphaTestEqNe(PSInputTx pin) : SV_Target0
 
 
 // Pixel shader: equal/notequal compare function, no fog.
-float4 PSAlphaTestEqNeNoFog(PSInputTxNoFog pin) : SV_Target0
+float4 PSAlphaTestEqNeNoFog(VSOutputTxNoFog pin) : SV_Target0
 {
     float4 color = SAMPLE_TEXTURE(Texture, pin.TexCoord) * pin.Diffuse;
     

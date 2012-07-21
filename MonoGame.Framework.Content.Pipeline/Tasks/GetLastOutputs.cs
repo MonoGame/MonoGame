@@ -61,7 +61,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Tasks
         /// </summary>
         /// <value>Collection of cache file names.</value>
         [OutputAttribute]
-        public ITaskItem[] OutputContentFiles { get; }
+        public ITaskItem[] OutputContentFiles { get; internal set; }
 
         /// <summary>
         /// Creates a new instance of GetLastOutputs.

@@ -19,18 +19,28 @@ MATRIX_CONSTANTS
 END_CONSTANTS
 
 
-void SpriteVertexShader(inout float4 color    : COLOR0,
-                        inout float2 texCoord : TEXCOORD0,
-                        inout float4 position : SV_Position)
+struct VSOutput
 {
-    position = mul(position, MatrixTransform);
+	float4 position		: SV_Position;
+	float4 color		: COLOR0;
+    float2 texCoord		: TEXCOORD0;
+};
+
+VSOutput SpriteVertexShader(	float4 position	: SV_Position,
+								float4 color	: COLOR0,
+								float2 texCoord	: TEXCOORD0)
+{
+	VSOutput output;
+    output.position = mul(position, MatrixTransform);
+	output.color = color;
+	output.texCoord = texCoord;
+	return output;
 }
 
 
-float4 SpritePixelShader(float4 color : COLOR0,
-                         float2 texCoord : TEXCOORD0) : SV_Target0
+float4 SpritePixelShader(VSOutput input) : SV_Target0
 {
-    return SAMPLE_TEXTURE(Texture, texCoord) * color;
+    return SAMPLE_TEXTURE(Texture, input.texCoord) * input.color;
 }
 
 TECHNIQUE( SpriteBatch, SpriteVertexShader, SpritePixelShader );
