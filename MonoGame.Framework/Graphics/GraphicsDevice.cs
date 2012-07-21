@@ -388,14 +388,26 @@ namespace Microsoft.Xna.Framework.Graphics
             if (_d2dContext != null)
                 _d2dContext.Dispose();
 
-            // Retrieve the Direct3D 11.1 device amd device context
+            // Windows requires BGRA support out of DX.
             var creationFlags = SharpDX.Direct3D11.DeviceCreationFlags.BgraSupport;
 #if DEBUG
             creationFlags |= SharpDX.Direct3D11.DeviceCreationFlags.Debug;
 #endif
 
+            // TODO: Maybe this should be changed based on Reach/HiDef profile?
+            var featureLevels = new []
+            {
+                FeatureLevel.Level_11_1,
+                FeatureLevel.Level_11_0,
+                FeatureLevel.Level_10_1,
+                FeatureLevel.Level_10_0,
+                FeatureLevel.Level_9_3,
+                FeatureLevel.Level_9_2,
+                FeatureLevel.Level_9_1,
+            };
+
             // Create the Direct3D device.
-            using (var defaultDevice = new SharpDX.Direct3D11.Device(DriverType.Hardware, creationFlags))
+            using (var defaultDevice = new SharpDX.Direct3D11.Device(DriverType.Hardware, creationFlags, featureLevels))
                 _d3dDevice = defaultDevice.QueryInterface<SharpDX.Direct3D11.Device1>();
             _featureLevel = _d3dDevice.FeatureLevel;
 
@@ -441,6 +453,9 @@ namespace Microsoft.Xna.Framework.Graphics
             _currentDepthStencilView = null;
             _currentRenderTargetBindings = null;
 
+			// Make sure all pending rendering commands are flushed.
+            _d3dContext.Flush();
+
             if (    PresentationParameters == null ||
                     (PresentationParameters.DeviceWindowHandle == IntPtr.Zero && PresentationParameters.SwapChainPanel == null))
             {
@@ -460,7 +475,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 multisampleDesc.Quality = (int)SharpDX.Direct3D11.StandardMultisampleQualityLevels.StandardMultisamplePattern;
             }
 
-            var format = SharpDXHelper.ToFormat(PresentationParameters.BackBufferFormat);
+            // Use BGRA for the swap chain.
+            var format = PresentationParameters.BackBufferFormat == SurfaceFormat.Color ? 
+                            SharpDX.DXGI.Format.B8G8R8A8_UNorm : 
+                            SharpDXHelper.ToFormat(PresentationParameters.BackBufferFormat);
 
             // If the swap chain already exists... update it.
             if (_swapChain != null)
@@ -532,6 +550,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
             }
 
+            _swapChain.Rotation = SharpDX.DXGI.DisplayModeRotation.Identity;
+
             // Obtain the backbuffer for this window which will be the final 3D rendertarget.
             Point targetSize;
             using (var backBuffer = SharpDX.Direct3D11.Texture2D.FromSwapChain<SharpDX.Direct3D11.Texture2D>(_swapChain, 0))
@@ -547,25 +567,23 @@ namespace Microsoft.Xna.Framework.Graphics
             // Create the depth buffer if we need it.
             if (PresentationParameters.DepthStencilFormat != DepthFormat.None)
             {
+                var depthFormat = SharpDXHelper.ToFormat(PresentationParameters.DepthStencilFormat);
+
                 // Allocate a 2-D surface as the depth/stencil buffer.
                 using (var depthBuffer = new SharpDX.Direct3D11.Texture2D(_d3dDevice, new SharpDX.Direct3D11.Texture2DDescription()
                 {
-                    Format = SharpDXHelper.ToFormat(PresentationParameters.DepthStencilFormat),
+                    Format = depthFormat,
                     ArraySize = 1,
                     MipLevels = 1,
                     Width = targetSize.X,
                     Height = targetSize.Y,
                     SampleDescription = multisampleDesc,
+                    Usage = SharpDX.Direct3D11.ResourceUsage.Default,
                     BindFlags = SharpDX.Direct3D11.BindFlags.DepthStencil,
                 }))
 
                 // Create a DepthStencil view on this surface to use on bind.
-                _depthStencilView = new SharpDX.Direct3D11.DepthStencilView(_d3dDevice, depthBuffer,
-                    new SharpDX.Direct3D11.DepthStencilViewDescription()
-                    {
-                        Format = SharpDXHelper.ToFormat(PresentationParameters.DepthStencilFormat),
-                        Dimension = SharpDX.Direct3D11.DepthStencilViewDimension.Texture2D
-                    });
+                _depthStencilView = new SharpDX.Direct3D11.DepthStencilView(_d3dDevice, depthBuffer);
             }
 
             // Set the current viewport.
