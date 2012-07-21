@@ -153,6 +153,10 @@ namespace Microsoft.Xna.Framework
 
 		public void ApplyChanges ()
 		{
+			if (_graphicsDevice == null) {
+				CreateDevice ();
+			}
+
             _graphicsDevice.PresentationParameters.IsFullScreen = wantFullScreen;
 
 			if (_preferMultiSampling) {
