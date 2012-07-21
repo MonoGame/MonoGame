@@ -73,71 +73,73 @@ namespace Microsoft.Xna.Framework.GamerServices
 			MonoGameGamerServicesHelper.Initialise(game);        
         }
 
-	    delegate string ShowKeyboardInputDelegate(
-		 PlayerIndex player,           
+        delegate string ShowKeyboardInputDelegate(
+          PlayerIndex player,           
          string title,
          string description,
          string defaultText,
-		 bool usePasswordMode);
+          bool usePasswordMode);
 
-		public static string ShowKeyboardInput(
-		 PlayerIndex player,           
+         public static string ShowKeyboardInput(
+          PlayerIndex player,           
          string title,
          string description,
          string defaultText,
-		 bool usePasswordMode)
-		{
-			string result = defaultText; 
-			if (!isKeyboardInputShowing)
-			{
-				isKeyboardInputShowing = true;				
-	
-			}
-			
-			isVisible = isKeyboardInputShowing;
+          bool usePasswordMode)
+         {
+            string result = defaultText; 
+            if (!isKeyboardInputShowing)
+            {
+                isKeyboardInputShowing = true;
+            }
 
-		    var alert = new AlertDialog.Builder(Game.Activity);
+            isVisible = isKeyboardInputShowing;
 
-		    alert.SetTitle(title);
-		    alert.SetMessage(description);
+            Game.Activity.RunOnUiThread(() => 
+                {
+                    var alert = new AlertDialog.Builder(Game.Activity);
 
-		    var input = new EditText(Game.Activity) {Text = defaultText};
-		    alert.SetView(input);
+                    alert.SetTitle(title);
+                    alert.SetMessage(description);
 
-		    alert.SetPositiveButton("Ok", (dialog, whichButton) =>
-		                                      {
-		                                          result = input.Text;
-		                                          isVisible = false;
-		                                      });
+                    var input = new EditText(Game.Activity) { Text = defaultText };
+                    alert.SetView(input);
 
-		    alert.SetNegativeButton("Cancel", (dialog, whichButton) =>
-		                                          {
-		                                              result = null;
-                                                      isVisible = false;
-                                                  });
+                    alert.SetPositiveButton("Ok", (dialog, whichButton) =>
+                        {
+                            result = input.Text;
+                            isVisible = false;
+                        });
 
-            Game.Activity.RunOnUiThread(() => alert.Show());
+                    alert.SetNegativeButton("Cancel", (dialog, whichButton) =>
+                        {
+                            result = null;
+                            isVisible = false;
+                        });
+                    
+                    alert.Show();
+                });
 
-		    while (isVisible)
-		    {
-		        Thread.Sleep(1);
-		    }
+            while (isVisible)
+            {
+                Thread.Sleep(1);
+            }
 
             return result;
-		}
+        }
 
-		public static IAsyncResult BeginShowKeyboardInput (
+        public static IAsyncResult BeginShowKeyboardInput (
          PlayerIndex player,
          string title,
          string description,
          string defaultText,
          AsyncCallback callback,
          Object state)
-		{
-			return BeginShowKeyboardInput(player, title, description, defaultText, callback, state, false );
-		}
+        {
+            return BeginShowKeyboardInput(player, title, description, defaultText, callback, state, false );
+        }
 
-		public static IAsyncResult BeginShowKeyboardInput (
+        public static IAsyncResult BeginShowKeyboardInput (
          PlayerIndex player,
          string title,
          string description,
