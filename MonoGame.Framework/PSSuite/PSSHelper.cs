@@ -1,9 +1,9 @@
 using System;
 
-using PssMatrix4 = Sce.Pss.Core.Matrix4;
-using PssPixelFormat = Sce.Pss.Core.Graphics.PixelFormat;
-using PssVertexFormat = Sce.Pss.Core.Graphics.VertexFormat;
-using PssDrawMode = Sce.Pss.Core.Graphics.DrawMode;
+using PssMatrix4 = Sce.PlayStation.Core.Matrix4;
+using PssPixelFormat = Sce.PlayStation.Core.Graphics.PixelFormat;
+using PssVertexFormat = Sce.PlayStation.Core.Graphics.VertexFormat;
+using PssDrawMode = Sce.PlayStation.Core.Graphics.DrawMode;
 
 namespace Microsoft.Xna.Framework.Graphics
 {

@@ -56,7 +56,8 @@ using SharpDX.Direct3D;
 using Windows.Graphics.Display;
 using Windows.UI.Core;
 #elif PSS
-using Sce.Pss.Core.Graphics;
+using Sce.PlayStation.Core.Graphics;
+using PssVertexBuffer = Sce.PlayStation.Core.Graphics.VertexBuffer;
 #elif GLES
 using OpenTK.Graphics.ES20;
 using BeginMode = OpenTK.Graphics.ES20.All;
@@ -170,7 +171,8 @@ namespace Microsoft.Xna.Framework.Graphics
 #elif PSS
 
         internal GraphicsContext _graphics;
-
+        internal List<PssVertexBuffer> _availableVertexBuffers = new List<PssVertexBuffer>();
+        internal List<PssVertexBuffer> _usedVertexBuffers = new List<PssVertexBuffer>();
 #endif
 
 #if GLES
@@ -888,6 +890,8 @@ namespace Microsoft.Xna.Framework.Graphics
 						
 #elif PSS
             _graphics.SwapBuffers();
+            _availableVertexBuffers.AddRange(_usedVertexBuffers);
+            _usedVertexBuffers.Clear();
 #elif ANDROID
 			Game.Instance.Platform.Present();
 #elif OPENGL
@@ -1242,8 +1246,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 else
                     _d3dContext.InputAssembler.SetVertexBuffers(0, null);
             }
-#elif PSS
-            _graphics.SetVertexBuffer(0, vertexBuffer._buffer);
 #elif OPENGL
             if (_vertexBuffer != null)
                 GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBuffer.vbo);
@@ -1423,6 +1425,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			                 indexElementCount,
 			                 indexElementType,
 			                 indexOffsetInBytes);
+#elif PSS
+            BindVertexBuffer(true);
+            _graphics.DrawArrays(PSSHelper.ToDrawMode(primitiveType), startIndex, GetElementCountArray(primitiveType, primitiveCount));
 #endif
         }
 
@@ -1516,6 +1521,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			              vertexStart,
 			              vertexCount);
 #elif PSS
+            BindVertexBuffer(false);
             _graphics.DrawArrays(PSSHelper.ToDrawMode(primitiveType), vertexStart, vertexCount);
 #endif
         }
@@ -1684,6 +1690,86 @@ namespace Microsoft.Xna.Framework.Graphics
             handle2.Free();
 #endif
         }
+
+#if PSS
+        internal PssVertexBuffer GetVertexBuffer(VertexFormat[] vertexFormat, int requiredVertexLength, int requiredIndexLength)
+        {
+            int bestMatchIndex = -1;
+            PssVertexBuffer bestMatch = null;
+            
+            //Search for a good one
+            for (int i = _availableVertexBuffers.Count - 1; i >= 0; i--)
+            {
+                var buf = _availableVertexBuffers[i];
+                
+#region Check there is enough space
+                if (buf.VertexCount < requiredVertexLength)
+                    continue;
+                if (requiredIndexLength == 0 && buf.IndexCount != 0)
+                    continue;
+                if (requiredIndexLength > 0 && buf.IndexCount < requiredIndexLength)
+                    continue;
+#endregion
+                
+#region Check VertexFormat is the same
+                var bufFormats = buf.Formats;
+                if (vertexFormat.Length != bufFormats.Length)
+                    continue;
+                bool allEqual = true;
+                for (int j = 0; j < bufFormats.Length; j++)
+                {
+                    if (vertexFormat[j] != bufFormats[j])
+                    {
+                        allEqual = false;
+                        break;
+                    }
+                }
+                if (!allEqual)
+                    continue;
+#endregion
+                
+                //this one is acceptable
+                
+                //No current best or this one is smaller than the current best
+                if (bestMatch == null || (buf.IndexCount + buf.VertexCount) < (bestMatch.IndexCount + bestMatch.VertexCount))
+                {
+                    bestMatch = buf;
+                    bestMatchIndex = i;
+                }
+            }
+            
+            if (bestMatch != null)
+            {
+                _availableVertexBuffers.RemoveAt(bestMatchIndex);
+            }
+            else
+            {
+                //Create one
+                bestMatch = new PssVertexBuffer(requiredVertexLength, requiredIndexLength, vertexFormat);
+            }
+            _usedVertexBuffers.Add(bestMatch);
+            
+            return bestMatch;
+        }
+        
+        /// <summary>
+        /// Set the current _graphics VertexBuffer based on _vertexBuffer and _indexBuffer, reusing an existing VertexBuffer if possible
+        /// </summary>
+        private void BindVertexBuffer(bool bindIndexBuffer)
+        {
+            int requiredVertexLength = _vertexBuffer.VertexCount;
+            int requiredIndexLength = (!bindIndexBuffer || _indexBuffer == null) ? 0 : _indexBuffer.IndexCount;
+            
+            var vertexFormat = _vertexBuffer.VertexDeclaration.GetVertexFormat();
+            
+            var vertexBuffer = GetVertexBuffer(vertexFormat, requiredVertexLength, requiredIndexLength);
+            
+            vertexBuffer.SetVertices(_vertexBuffer._vertexArray);
+            if (requiredIndexLength > 0)
+                vertexBuffer.SetIndices(_indexBuffer._buffer);
+            _graphics.SetVertexBuffer(0, vertexBuffer);
+        }
+#endif
 
         internal int GetElementCountArray(PrimitiveType primitiveType, int primitiveCount)
         {
