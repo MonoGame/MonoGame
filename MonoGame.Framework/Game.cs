@@ -125,8 +125,6 @@ namespace Microsoft.Xna.Framework
 
         private readonly TimeSpan _maxElapsedTime = TimeSpan.FromMilliseconds(500);
 
-        private int previousDisplayWidth;
-        private int previousDisplayHeight;
 
         private bool _suppressDraw;
         
@@ -188,7 +186,17 @@ namespace Microsoft.Xna.Framework
         protected virtual void Dispose(bool disposing)
         {
             if (disposing)
+            {
                 Platform.Dispose();
+
+                // Dispose loaded game components
+                for (int i = 0; i < _components.Count; i++)
+                {
+                    var disposable = _components[i] as IDisposable;
+                    if (disposable != null)
+                        disposable.Dispose();
+                }
+            }
 
             _isDisposed = true;
         }
@@ -372,8 +380,7 @@ namespace Microsoft.Xna.Framework
             case GameRunBehavior.Synchronous:
                 Platform.RunLoop();
                 EndRun();
-                OnExiting(this, EventArgs.Empty);
-                UnloadContent();
+				DoExiting();
                 break;
             default:
                 throw new NotImplementedException(string.Format(
@@ -514,21 +521,7 @@ namespace Microsoft.Xna.Framework
 
         protected virtual void Draw(GameTime gameTime)
         {
-#if ANDROID
-            // TODO: It should be possible to move this call to
-            //       PrimaryThreadLoader.DoLoads into
-            //       AndroidGamePlatform.BeforeDraw and remove the need for the
-            //       #if ANDROID check.
-            PrimaryThreadLoader.DoLoads();
-#endif
-            if (GraphicsDevice.DisplayMode.Width != previousDisplayWidth ||
-                GraphicsDevice.DisplayMode.Height != previousDisplayHeight)
-            {
-                previousDisplayHeight = GraphicsDevice.DisplayMode.Height;
-                previousDisplayWidth = GraphicsDevice.DisplayMode.Width;
-                graphicsDeviceManager.ResetClientBounds();
-            }
-            
+
             _drawables.ForEachFilteredItem(DrawAction, gameTime);
         }
 
@@ -571,8 +564,7 @@ namespace Microsoft.Xna.Framework
             var platform = (GamePlatform)sender;
             platform.AsyncRunLoopEnded -= Platform_AsyncRunLoopEnded;
             EndRun();
-            OnExiting(this, EventArgs.Empty);
-            UnloadContent();
+			DoExiting();
         }
 
 #if WINRT
@@ -646,6 +638,10 @@ namespace Microsoft.Xna.Framework
             Initialize();
         }
 
+		internal void DoExiting()
+		{
+			OnExiting(this, EventArgs.Empty);
+		}
         internal void ResizeWindow(bool changed)
         {
 #if WINRT

@@ -93,7 +93,6 @@ namespace Microsoft.Xna.Framework
             _game = game;
         }
 
-        private bool _initialized;
         public static bool IsPlayingVdeo { get; set; }
   
         private int _frameBufferWidth, _frameBufferHeight;
@@ -134,12 +133,6 @@ namespace Microsoft.Xna.Framework
 
         public override bool BeforeUpdate(GameTime gameTime)
         {
-            if (!_initialized)
-            {
-                Game.DoInitialize();
-                _initialized = true;
-            }
-
             // Let the touch panel update states.
             TouchPanel.UpdateState();
             

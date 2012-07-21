@@ -142,14 +142,24 @@ namespace Microsoft.Xna.Framework.Graphics
             try
             {
                 SharpDX.D3DCompiler.ShaderFlags shaderFlags = 0;
-                shaderFlags |= SharpDX.D3DCompiler.ShaderFlags.EnableBackwardsCompatibility;
-                shaderFlags |= SharpDX.D3DCompiler.ShaderFlags.OptimizationLevel3;
+
+                // While we never allow preshaders, this flag is invalid for
+                // the DX11 shader compiler which doesn't allow preshaders
+                // in the first place.
                 //shaderFlags |= SharpDX.D3DCompiler.ShaderFlags.NoPreshader;
-                //shaderFlags |= SharpDX.D3DCompiler.ShaderFlags.PackMatrixRowMajor;
-                //shaderFlags |= SharpDX.D3DCompiler.ShaderFlags.WarningsAreErrors;
-                //shaderFlags |= SharpDX.D3DCompiler.ShaderFlags.EnableBackwardsCompatibility;
-                //shaderFlags |= SharpDX.D3DCompiler.ShaderFlags.SkipValidation;
-                shaderFlags |= SharpDX.D3DCompiler.ShaderFlags.Debug;
+
+                if (shaderInfo.DX11Profile)
+                    shaderFlags |= SharpDX.D3DCompiler.ShaderFlags.EnableBackwardsCompatibility;
+
+                if (shaderInfo.Debug)
+                {
+                    shaderFlags |= SharpDX.D3DCompiler.ShaderFlags.SkipOptimization;
+                    shaderFlags |= SharpDX.D3DCompiler.ShaderFlags.Debug;
+                }
+                else
+                {
+                    shaderFlags |= SharpDX.D3DCompiler.ShaderFlags.OptimizationLevel3;
+                }
 
                 // First compile the effect into bytecode.                
                 using (var includer = new TwoMGFX.CompilerInclude())
@@ -168,14 +178,13 @@ namespace Microsoft.Xna.Framework.Graphics
                         throw new Exception(result.Message);
 
                     shaderByteCode = result.Bytecode;
+
+                    //var source = shaderByteCode.Disassemble();
                 }
             }
             catch (Exception ex)
             {
                 throw ex;
-                //Console.WriteLine("Failed to compile the input file '{0}'!", shaderFileName);
-                //Console.WriteLine(ex.Message);
-                //return 1;
             }
 
             // Get the shader bytecode.
@@ -197,7 +206,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if ( dxShader == null )
             {
                 if (shaderInfo.DX11Profile)
-                    dxShader = DXShader.CreateHLSL(bytecode, isVertexShader, ConstantBuffers, Shaders.Count);
+                    dxShader = DXShader.CreateHLSL(bytecode, isVertexShader, ConstantBuffers, Shaders.Count, shaderInfo.Debug);
                 else
                     dxShader = DXShader.CreateGLSL(bytecode, isVertexShader, ConstantBuffers, Shaders.Count);
 

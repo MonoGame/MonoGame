@@ -90,73 +90,73 @@ struct VSInputNmTxWeights
 
 struct VSOutput
 {
+    float4 PositionPS : SV_Position;
     float4 Diffuse    : COLOR0;
     float4 Specular   : COLOR1;
-    float4 PositionPS : SV_Position;
 };
 
 struct VSOutputNoFog
 {
-    float4 Diffuse    : COLOR0;
     float4 PositionPS : SV_Position;
+    float4 Diffuse    : COLOR0;
 };
 
 struct VSOutputTx
 {
+    float4 PositionPS : SV_Position;
     float4 Diffuse    : COLOR0;
     float4 Specular   : COLOR1;
     float2 TexCoord   : TEXCOORD0;
-    float4 PositionPS : SV_Position;
 };
 
 struct VSOutputTxNoFog
 {
+    float4 PositionPS : SV_Position;
     float4 Diffuse    : COLOR0;
     float2 TexCoord   : TEXCOORD0;
-    float4 PositionPS : SV_Position;
 };
 
 struct VSOutputPixelLighting
 {
+    float4 PositionPS : SV_Position;
     float4 PositionWS : TEXCOORD0;
     float3 NormalWS   : TEXCOORD1;
     float4 Diffuse    : COLOR0;
-    float4 PositionPS : SV_Position;
 };
 
 struct VSOutputPixelLightingTx
 {
+    float4 PositionPS : SV_Position;
     float2 TexCoord   : TEXCOORD0;
     float4 PositionWS : TEXCOORD1;
     float3 NormalWS   : TEXCOORD2;
     float4 Diffuse    : COLOR0;
-    float4 PositionPS : SV_Position;
 };
 
 struct VSOutputTx2
 {
+    float4 PositionPS : SV_Position;
     float4 Diffuse    : COLOR0;
     float4 Specular   : COLOR1;
     float2 TexCoord   : TEXCOORD0;
     float2 TexCoord2  : TEXCOORD1;
-    float4 PositionPS : SV_Position;
 };
 
 struct VSOutputTx2NoFog
 {
+    float4 PositionPS : SV_Position;
     float4 Diffuse    : COLOR0;
     float2 TexCoord   : TEXCOORD0;
     float2 TexCoord2  : TEXCOORD1;
-    float4 PositionPS : SV_Position;
 };
 
 struct VSOutputTxEnvMap
 {
+    float4 PositionPS : SV_Position;
     float4 Diffuse    : COLOR0;
     float4 Specular   : COLOR1;
     float2 TexCoord   : TEXCOORD0;
     float3 EnvCoord   : TEXCOORD1;
-    float4 PositionPS : SV_Position;
 };
 
 

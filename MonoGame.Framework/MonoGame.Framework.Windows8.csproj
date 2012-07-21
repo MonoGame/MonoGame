@@ -247,6 +247,7 @@
     <Compile Include="SharedGraphicsDeviceManager.cs" />
     <Compile Include="Storage\StorageDeviceHelper.cs" />
     <Compile Include="Windows8\GameFrameworkViewSource.cs" />
+    <Compile Include="Windows8\GamePad.cs" />
     <Compile Include="Windows8\MetroCoreWindowEvents.cs" />
     <Compile Include="Windows8\MetroFrameElementEvents.cs" />
     <Compile Include="Windows8\MetroFrameworkView.cs" />
@@ -363,6 +364,9 @@
     </Reference>
     <Reference Include="SharpDX.XAudio2">
       <HintPath>..\ThirdParty\Libs\SharpDX\Windows 8 Metro\SharpDX.XAudio2.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.XInput">
+      <HintPath>..\ThirdParty\Libs\SharpDX\Windows 8 Metro\SharpDX.XInput.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

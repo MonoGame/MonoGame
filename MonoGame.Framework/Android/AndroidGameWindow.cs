@@ -1,7 +1,7 @@
 #region License
 /*
 Microsoft Public License (Ms-PL)
-XnaTouch - Copyright © 2009 The XnaTouch Team
+MonoGame - Copyright © 2009 The MonoGame Team
 
 All rights reserved.
 
@@ -63,13 +63,14 @@ using Microsoft.Xna.Framework.Input.Touch;
 
 namespace Microsoft.Xna.Framework
 {
-    public class AndroidGameWindow : AndroidGameView , Android.Views.View.IOnTouchListener
+    public class AndroidGameWindow : AndroidGameView , Android.Views.View.IOnTouchListener, ISurfaceHolderCallback
     {
 		private Rectangle clientBounds;
 		private Game _game;
         private DisplayOrientation supportedOrientations = DisplayOrientation.Default;
         private DisplayOrientation _currentOrientation;
 		private GestureDetector gesture = null;
+		private bool exiting = false;
 
         public AndroidGameWindow(Context context, Game game) : base(context)
         {
@@ -92,7 +93,12 @@ namespace Microsoft.Xna.Framework
         }
 		
 		void GameWindow_Closed(object sender,EventArgs e)
-        {        
+        {   
+			if (!exiting)
+			{
+				exiting = true;
+				_game.DoExiting();
+			}
 			try
 			{
         		_game.Exit();
@@ -101,6 +107,13 @@ namespace Microsoft.Xna.Framework
 			{
 				// just in case the game is null
 			}
+
+		}
+
+		protected override void OnLoad (EventArgs e)
+		{
+			base.OnLoad (e);			
+			MakeCurrent();
 		}
 
         public override bool OnKeyDown(Keycode keyCode, KeyEvent e)
@@ -169,14 +182,24 @@ namespace Microsoft.Xna.Framework
         }
 
         protected override void OnUpdateFrame(FrameEventArgs e)
-		{			
-			base.OnUpdateFrame(e);
+        {
+            base.OnUpdateFrame(e);
 
             Threading.Run();
 
             if (_game != null)
-			    _game.Tick();
-		}
+            {
+				if ( _game.Platform.IsActive && !ScreenReceiver.ScreenLocked) //Only call draw if an update has occured
+				{
+					_game.Tick();
+				}
+				else
+				{ 
+					_game.GraphicsDevice.Clear(Color.Black);
+					_game.GraphicsDevice.Present();
+				}
+            }
+        }
 		
 		#endregion
 		
@@ -186,21 +209,41 @@ namespace Microsoft.Xna.Framework
             supportedOrientations = orientations;
         }
 
-        internal void SetOrientation(DisplayOrientation newOrientation)
+        /// <summary>
+        /// In Xna, setting SupportedOrientations = DisplayOrientation.Default (which is the default value)
+        /// has the effect of setting SupportedOrientations to landscape only or portrait only, based on the
+        /// aspect ratio of PreferredBackBufferWidth / PreferredBackBufferHeight
+        /// </summary>
+        /// <returns></returns>
+        internal DisplayOrientation GetEffectiveSupportedOrientations()
         {
-            DisplayOrientation supported = supportedOrientations;
-            // Calculate supported orientations if it has been left as "default" and only default
-            if (supported == DisplayOrientation.Default)
+            if (supportedOrientations == DisplayOrientation.Default)
             {
-                var deviceManagerIntf = (IGraphicsDeviceManager)_game.Services.GetService(typeof(IGraphicsDeviceManager));
-                if (deviceManagerIntf == null)
-                    return;
-                GraphicsDeviceManager deviceManager = deviceManagerIntf as GraphicsDeviceManager;
+                var deviceManager = (_game.Services.GetService(typeof(IGraphicsDeviceManager)) as GraphicsDeviceManager);
+                if (deviceManager == null)
+                    return DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight;
+
                 if (deviceManager.PreferredBackBufferWidth > deviceManager.PreferredBackBufferHeight)
-                    supported = DisplayOrientation.Portrait;
+                {
+                    return DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight;
+                }
                 else
-                    supported = DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight;
+                {
+                    return DisplayOrientation.Portrait | DisplayOrientation.PortraitUpsideDown;
+                }
             }
+            else
+            {
+                return supportedOrientations;
+            }
+        }
+
+        /// <summary>
+        /// Updates the screen orientation. Filters out requests for unsupported orientations.
+        /// </summary>
+        internal void SetOrientation(DisplayOrientation newOrientation, bool applyGraphicsChanges)
+        {
+            DisplayOrientation supported = GetEffectiveSupportedOrientations();
 
             // If the new orientation is not supported, force a supported orientation
             if ((supported & newOrientation) == 0)
@@ -212,13 +255,14 @@ namespace Microsoft.Xna.Framework
                 else if ((supported & DisplayOrientation.Portrait) != 0)
                     newOrientation = DisplayOrientation.Portrait;
             }
-			
-			CurrentOrientation = newOrientation;
-            if (_game.GraphicsDevice != null)
-            {
-                _game.GraphicsDevice.PresentationParameters.DisplayOrientation = newOrientation;
-            }
+
+            DisplayOrientation oldOrientation = CurrentOrientation;
+
+            CurrentOrientation = newOrientation;
             TouchPanel.DisplayOrientation = newOrientation;
+
+            if (applyGraphicsChanges && oldOrientation != CurrentOrientation && _game.graphicsDeviceManager != null)
+                _game.graphicsDeviceManager.ApplyChanges();
         }
 
         private Dictionary<IntPtr, TouchLocation> _previousTouches = new Dictionary<IntPtr, TouchLocation>();
@@ -232,13 +276,6 @@ namespace Microsoft.Xna.Framework
 
         internal void UpdateTouchPosition(ref Vector2 position)
         {
-            if (this._game.Window.CurrentOrientation == DisplayOrientation.LandscapeRight)
-            {
-                // we need to fudge the position
-                position.X = this.Width - position.X;
-                position.Y = this.Height - position.Y;
-            }
-
             //Fix for ClientBounds
             position.X -= ClientBounds.X;
             position.Y -= ClientBounds.Y;
@@ -332,7 +369,26 @@ namespace Microsoft.Xna.Framework
 				// Do nothing; Ignore rather than raising and exception
 			}
 		}
-        
+
+        // A copy of ScreenOrientation from Android 2.3
+        // This allows us to continue to support 2.2 whilst
+        // utilising the 2.3 improved orientation support.
+        enum ScreenOrientationAll
+        {
+            Unspecified = -1,
+            Landscape = 0,
+            Portrait = 1,
+            User = 2,
+            Behind = 3,
+            Sensor = 4,
+            Nosensor = 5,
+            SensorLandscape = 6,
+            SensorPortrait = 7,
+            ReverseLandscape = 8,
+            ReversePortrait = 9,
+            FullSensor = 10,
+        }
+
 		public DisplayOrientation CurrentOrientation 
 		{
             get
@@ -343,15 +399,56 @@ namespace Microsoft.Xna.Framework
             {
                 if (value != _currentOrientation)
                 {
-                    _currentOrientation = value;
+                    DisplayOrientation supported = GetEffectiveSupportedOrientations();
 
-                    // MfA 4.2 no longer has Activity.SetRequestedOrientation
-                    //if (_currentOrientation == DisplayOrientation.Portrait || _currentOrientation == DisplayOrientation.PortraitUpsideDown)
-                    //    Game.Activity.SetRequestedOrientation(ScreenOrientation.Portrait);						
-                    //else if (_currentOrientation == DisplayOrientation.LandscapeLeft || _currentOrientation == DisplayOrientation.LandscapeRight)
-                    //    Game.Activity.SetRequestedOrientation(ScreenOrientation.Landscape);						
+                    bool didOrientationChange = false;
+                    // Android 2.3 and above support reverse orientations
+                    int sdkVer = (int)Android.OS.Build.VERSION.SdkInt;
+                    if (sdkVer >= 10)
+                    {
+                        // Check if the requested orientation is supported. Default means all are supported.
+                        if ((supported & value) != 0)
+                        {
+                            didOrientationChange = true;
+                            _currentOrientation = value;
+                            switch (value)
+                            {
+                                case DisplayOrientation.LandscapeLeft:
+                                    Game.Activity.RequestedOrientation = (ScreenOrientation)ScreenOrientationAll.Landscape;
+                                    break;
+                                case DisplayOrientation.LandscapeRight:
+                                    Game.Activity.RequestedOrientation = (ScreenOrientation)ScreenOrientationAll.ReverseLandscape;
+                                    break;
+                                case DisplayOrientation.Portrait:
+                                    Game.Activity.RequestedOrientation = (ScreenOrientation)ScreenOrientationAll.Portrait;
+                                    break;
+                                case DisplayOrientation.PortraitUpsideDown:
+                                    Game.Activity.RequestedOrientation = (ScreenOrientation)ScreenOrientationAll.ReversePortrait;
+                                    break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // Check if the requested orientation is either of the landscape orientations and any landscape orientation is supported.
+                        if ((value == DisplayOrientation.LandscapeLeft || value == DisplayOrientation.LandscapeRight) &&
+                           ((supported & (DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight)) != 0))
+                        {
+                            didOrientationChange = true;
+                            _currentOrientation = DisplayOrientation.LandscapeLeft;
+                            Game.Activity.RequestedOrientation = ScreenOrientation.Landscape;
+                        }
+                        // Check if the requested orientation is either of the portrain orientations and any portrait orientation is supported.
+                        else if ((value == DisplayOrientation.Portrait || value == DisplayOrientation.PortraitUpsideDown) &&
+                                ((supported & (DisplayOrientation.Portrait | DisplayOrientation.PortraitUpsideDown)) != 0))
+                        {
+                            didOrientationChange = true;
+                            _currentOrientation = DisplayOrientation.Portrait;
+                            Game.Activity.RequestedOrientation = ScreenOrientation.Portrait;
+                        }
+                    }
 
-                    if (OrientationChanged != null)
+                    if (didOrientationChange && OrientationChanged != null)
                     {
                         OrientationChanged(this, EventArgs.Empty);
                     }
@@ -363,6 +460,21 @@ namespace Microsoft.Xna.Framework
 		public event EventHandler ClientSizeChanged;
 		public event EventHandler ScreenDeviceNameChanged;
 
+
+        void ISurfaceHolderCallback.SurfaceChanged(ISurfaceHolder holder, Android.Graphics.Format format, int width, int height)
+        {
+            base.SurfaceChanged(holder, format, width, height);
+            Android.Util.Log.Debug("MonoGame", "AndroidGameWindow.SurfaceChanged: format = " + format + ", width = " + width + ", height = " + height);
+
+            if (_game.GraphicsDevice != null)
+                _game.graphicsDeviceManager.ResetClientBounds();
+        }
+
+        void ISurfaceHolderCallback.SurfaceCreated(ISurfaceHolder holder)
+        {
+            base.SurfaceCreated(holder);
+            Android.Util.Log.Debug("MonoGame", "AndroidGameWindow.SurfaceCreated: surfaceFrame = " + holder.SurfaceFrame.ToString());
+        }
     }
 }
 

@@ -71,6 +71,7 @@ namespace Microsoft.Xna.Framework.Graphics
         internal SharpDX.Direct3D11.DepthStencilView _depthStencilView;
 #elif OPENGL
 		internal uint glDepthStencilBuffer;
+        internal uint glFramebuffer;
 #endif
 
 		public DepthFormat DepthStencilFormat { get; private set; }
@@ -78,6 +79,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		public int MultiSampleCount { get; private set; }
 		
 		public RenderTargetUsage RenderTargetUsage { get; private set; }
+        
+        public bool IsContentLost { get { return false; } }
 		
 		public RenderTarget2D (GraphicsDevice graphicsDevice, int width, int height, bool mipMap, SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage)
 			:base (graphicsDevice, width, height, mipMap, preferredFormat, true)
@@ -169,6 +172,10 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 #elif OPENGL
 			GL.DeleteRenderbuffers(1, ref this.glDepthStencilBuffer);
+
+			if(this.glFramebuffer > 0)
+				GL.DeleteFramebuffers(1, ref this.glFramebuffer);
+
 #endif
             base.Dispose();
 		}

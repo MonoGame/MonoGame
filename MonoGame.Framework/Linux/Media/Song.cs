@@ -40,45 +40,45 @@ purpose and non-infringement.
 
 using System;
 using System.IO;
+using Tao.Sdl;
 
 using Microsoft.Xna.Framework.Audio;
 
-#if IPHONE
-using MonoTouch.Foundation;
-using MonoTouch.AVFoundation;
-#endif
+
 
 namespace Microsoft.Xna.Framework.Media
 {
     public sealed class Song : IEquatable<Song>, IDisposable
     {
-#if IPHONE
-		private AVAudioPlayer _sound;
-#elif PSS
-        private PSSuiteSong _sound;
-#elif !WINRT
-		private SoundEffectInstance _sound;
-#endif
+		private IntPtr _audioData;
 		
 		private string _name;
-		private int _playCount;   
+		private int _playCount;
+        private int _volume; // in SDL units from 0 to 128
+    
+        internal delegate void FinishedPlayingHandler(object sender, EventArgs args);
 		
 		internal Song(string fileName)
 		{			
 			_name = fileName;
-			
-#if IPHONE
-			_sound = AVAudioPlayer.FromUrl(NSUrl.FromFilename(fileName));
-			_sound.NumberOfLoops = 0;
-            _sound.FinishedPlaying += OnFinishedPlaying;
-#elif PSS
-            _sound = new PSSuiteSong(_name);
-#elif !WINRT       
-            _sound = new SoundEffect(_name).CreateInstance();
-#endif
+
+            _audioData = Tao.Sdl.SdlMixer.Mix_LoadMUS(fileName);
 		}
-				
-        public string FilePath
+		
+		internal void OnFinishedPlaying ()
+		{
+            MediaPlayer.OnSongFinishedPlaying(null, null);
+		}
+		
+		/// <summary>
+		/// Set the event handler for "Finished Playing". Done this way to prevent multiple bindings.
+		/// </summary>
+		internal void SetEventHandler(FinishedPlayingHandler handler)
+		{
+			return;
+		}
+		
+		public string FilePath
 		{
 			get { return _name; }
 		}
@@ -91,28 +91,18 @@ namespace Microsoft.Xna.Framework.Media
         
         void Dispose(bool disposing)
         {
-#if !WINRT
             if (disposing)
             {
-                if (_sound != null)
+                if (_audioData != IntPtr.Zero)
                 {
-#if IPHONE
-                    _sound.FinishedPlaying -= OnFinishedPlaying;
-#endif
-                    _sound.Dispose();
-                    _sound = null;
+                    SdlMixer.Mix_FreeMusic(_audioData);
                 }
             }
-#endif
         }
         
-		public bool Equals(Song song) 		
-        {
-#if WINRT
-            return song != null && song.FilePath == FilePath;
-#else
+		public bool Equals(Song song) 
+		{
 			return ((object)song != null) && (Name == song.Name);
-#endif
 		}
 		
 		public override int GetHashCode ()
@@ -144,91 +134,77 @@ namespace Microsoft.Xna.Framework.Media
 		{
 		  return ! (song1 == song2);
 		}
-
-#if !WINRT
-        internal delegate void FinishedPlayingHandler(object sender, EventArgs args);
-		event FinishedPlayingHandler DonePlaying;
-
-		internal void OnFinishedPlaying (object sender, EventArgs args)
-		{
-			if (DonePlaying == null)
-				return;
-			
-			DonePlaying(sender, args);
-		}
-
-		/// <summary>
-		/// Set the event handler for "Finished Playing". Done this way to prevent multiple bindings.
-		/// </summary>
-		internal void SetEventHandler(FinishedPlayingHandler handler)
-		{
-			if (DonePlaying != null)
-				return;
-			
-			DonePlaying += handler;
-		}
-
+		
 		internal void Play()
-		{	
-			if ( _sound == null )
+		{			
+			if (_audioData == IntPtr.Zero)
 				return;
-			
-			_sound.Play();
 
-            _playCount++;
+            // according to MSDN and http://forums.create.msdn.com/forums/p/85718/614272.aspx
+            // songs can only be played with the MediaPlayer class. And this class can only play one song at a time.
+            // this means that we can easily use the MusicFinished event here without the risk of receiving an event multiple times.
+            // also, the DonePlaying handler of this class will only be set while the song is actually played in MediaPlayer.
+            // when the next song starts playing, this will then be overwritten, which shouldn't be a problem
+            SdlMixer.Mix_HookMusicFinished(OnFinishedPlaying);
+            SdlMixer.Mix_PlayMusic(_audioData, 0);
+			_playCount++;
+            //SdlMixer.Mix_CloseAudio();
         }
 
 		internal void Resume()
 		{
-			if (_sound == null)
-				return;			
-    #if IPHONE
-			_sound.Play();
-    #else
-			_sound.Resume();
-    #endif
+			if (_audioData == IntPtr.Zero)
+				return;
+			
+            SdlMixer.Mix_ResumeMusic();
 		}
 		
 		internal void Pause()
-		{			            
-			if ( _sound == null )
+		{			
+			if (_audioData == IntPtr.Zero)
 				return;
 			
-			_sound.Pause();
+            SdlMixer.Mix_PauseMusic();
         }
 		
 		internal void Stop()
 		{
-			if ( _sound == null )
+			if (_audioData == IntPtr.Zero)
 				return;
-			
-			_sound.Stop();
+
+            SdlMixer.Mix_HaltMusic();			
 			_playCount = 0;
 		}
-
+		
 		internal float Volume
 		{
+            // sdl volume goes from 0 to 128 instead of 0 to 1
 			get
 			{
-				if (_sound != null)
-					return _sound.Volume;
+				if (_audioData == IntPtr.Zero)
+					return 0f;
 				else
-					return 0.0f;
+                {
+					return _volume / 128f;
+                }
 			}
 			
 			set
 			{
-				if ( _sound != null && _sound.Volume != value )
-					_sound.Volume = value;
+				if (_audioData != IntPtr.Zero && _volume != value)
+                {
+                    _volume = (int)(value * 128);
+                    SdlMixer.Mix_VolumeMusic(_volume);
+                }
 			}			
 		}
-#endif // !WINRT
-
-        // TODO: Implement
+		
+		// TODO: Implement
         public TimeSpan Duration
         {
             get
             {
+                // sdl doesn't seem to provide this..
                 return new TimeSpan(0);
             }
         }
@@ -238,8 +214,9 @@ namespace Microsoft.Xna.Framework.Media
         {
             get
             {
-                return new TimeSpan(0);				
-            }
+                // not implemented in sdl?
+                return new TimeSpan(0);
+			}
         }
 
         public bool IsProtected
