@@ -145,7 +145,7 @@ namespace Microsoft.Xna.Framework.Graphics
             var desc = new SharpDX.Direct3D11.Texture2DDescription();
             desc.Width = width;
             desc.Height = height;
-            desc.MipLevels = mipmap ? 0 : 1;
+            desc.MipLevels = levelCount;
             desc.ArraySize = 1;
             desc.Format = SharpDXHelper.ToFormat(format);
             desc.BindFlags = SharpDX.Direct3D11.BindFlags.ShaderResource;
