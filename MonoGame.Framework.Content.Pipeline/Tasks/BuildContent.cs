@@ -77,7 +77,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Tasks
         /// </summary>
         /// <value>Array of file names produced by the content build.</value>
         [OutputAttribute]
-        public ITaskItem[] IntermediateFiles { get; }
+        public ITaskItem[] IntermediateFiles { get; internal set; }
 
         /// <summary>
         /// Gets or sets the base reference path used when reporting errors during the content build process.
@@ -90,7 +90,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Tasks
         /// </summary>
         /// <value>Array of file names produced by the content build.</value>
         [OutputAttribute]
-        public ITaskItem[] OutputContentFiles { get; }
+        public ITaskItem[] OutputContentFiles { get; internal set; }
 
         /// <summary>
         /// Gets or sets the output directory for the final build results.
@@ -124,7 +124,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Tasks
         /// </summary>
         /// <value>Array of file names modified by an incremental rebuild.</value>
         [OutputAttribute]
-        public ITaskItem[] RebuiltContentFiles { get; }
+        public ITaskItem[] RebuiltContentFiles { get; internal set; }
 
         /// <summary>
         /// Gets or sets the base path for the entire content build process.

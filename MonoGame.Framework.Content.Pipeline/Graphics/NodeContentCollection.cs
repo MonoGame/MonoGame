@@ -38,46 +38,37 @@
  */
 #endregion License
 
-using System;
-using Microsoft.Build.Framework;
-using Microsoft.Build.Utilities;
-
-namespace Microsoft.Xna.Framework.Content.Pipeline.Tasks
+namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
-    /// <summary>
-    /// Provides methods and properties for getting the names of all output content files from the content pipeline's cache file.
-    /// </summary>
-    public class GetLastOutputs : Task
+    public class NodeContentCollection : ChildCollection<NodeContent, NodeContent>
     {
         /// <summary>
-        /// Gets or sets the directory containing the cache file to be retrieved.
+        /// Creates an instance of NodeContentCollection.
         /// </summary>
-        /// <value>Path of the retrieved cache file.</value>
-        [RequiredAttribute]
-        public string IntermediateDirectory { get; set; }
-
-        /// <summary>
-        /// Gets the names of the output content files. This information may be out of date if a recent build was not completed. The collection is empty if there were no outputs or no cached information was found.
-        /// </summary>
-        /// <value>Collection of cache file names.</value>
-        [OutputAttribute]
-        public ITaskItem[] OutputContentFiles { get; internal set; }
-
-        /// <summary>
-        /// Creates a new instance of GetLastOutputs.
-        /// </summary>
-        public GetLastOutputs()
+        /// <param name="parent">Parent object of the child objects returned in the collection.</param>
+        internal NodeContentCollection(NodeContent parent)
+            : base(parent)
         {
-
         }
 
         /// <summary>
-        /// Executes the related task using MSBuild.
+        /// Gets the parent of a child object.
         /// </summary>
-        /// <returns>true if the task completed successfully; false otherwise.</returns>
-        public override bool Execute()
+        /// <param name="child">The child of the parent being retrieved.</param>
+        /// <returns>The parent of the child object.</returns>
+        protected override NodeContent GetParent(NodeContent child)
         {
-            throw new NotImplementedException();
+            return child.Parent;
+        }
+
+        /// <summary>
+        /// Modifies the value of the parent object of the specified child object.
+        /// </summary>
+        /// <param name="child">The child of the parent being modified.</param>
+        /// <param name="parent">The new value for the parent object.</param>
+        protected override void SetParent(NodeContent child, NodeContent parent)
+        {
+            child.Parent = parent;
         }
     }
 }
