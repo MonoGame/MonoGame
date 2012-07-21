@@ -313,8 +313,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #endif // OPENGL
 
-            PresentationParameters.DisplayOrientation = TouchPanel.DisplayOrientation;
-
 #if DIRECTX
 
             CreateDeviceIndependentResources();
@@ -393,14 +391,26 @@ namespace Microsoft.Xna.Framework.Graphics
             if (_d2dContext != null)
                 _d2dContext.Dispose();
 
-            // Retrieve the Direct3D 11.1 device amd device context
+            // Windows requires BGRA support out of DX.
             var creationFlags = SharpDX.Direct3D11.DeviceCreationFlags.BgraSupport;
 #if DEBUG
             creationFlags |= SharpDX.Direct3D11.DeviceCreationFlags.Debug;
 #endif
 
+            // TODO: Maybe this should be changed based on Reach/HiDef profile?
+            var featureLevels = new []
+            {
+                FeatureLevel.Level_11_1,
+                FeatureLevel.Level_11_0,
+                FeatureLevel.Level_10_1,
+                FeatureLevel.Level_10_0,
+                FeatureLevel.Level_9_3,
+                FeatureLevel.Level_9_2,
+                FeatureLevel.Level_9_1,
+            };
+
             // Create the Direct3D device.
-            using (var defaultDevice = new SharpDX.Direct3D11.Device(DriverType.Hardware, creationFlags))
+            using (var defaultDevice = new SharpDX.Direct3D11.Device(DriverType.Hardware, creationFlags, featureLevels))
                 _d3dDevice = defaultDevice.QueryInterface<SharpDX.Direct3D11.Device1>();
             _featureLevel = _d3dDevice.FeatureLevel;
 
@@ -417,16 +427,25 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void CreateSizeDependentResources()
         {
-            if (PresentationParameters == null || PresentationParameters.DeviceWindowHandle == IntPtr.Zero)
-                return;
+            _d3dContext.OutputMerger.SetTargets((SharpDX.Direct3D11.DepthStencilView)null, 
+                                                (SharpDX.Direct3D11.RenderTargetView)null);  
 
             _d2dContext.Target = null;
             if (_renderTargetView != null)
+            {
                 _renderTargetView.Dispose();
+                _renderTargetView = null;
+            }
             if (_depthStencilView != null)
+            {
                 _depthStencilView.Dispose();
+                _depthStencilView = null;
+            }
             if (_bitmapTarget != null)
+            {
                 _bitmapTarget.Dispose();
+                _bitmapTarget = null;
+            }
 
 			// Clear the current render targets.
             _currentDepthStencilView = null;
@@ -436,7 +455,22 @@ namespace Microsoft.Xna.Framework.Graphics
             _currentRenderTargets[3] = null;
             _currentDepthStencilView = null;
             _currentRenderTargetBindings = null;
-            
+
+			// Make sure all pending rendering commands are flushed.
+            _d3dContext.Flush();
+
+            if (    PresentationParameters == null ||
+                    (PresentationParameters.DeviceWindowHandle == IntPtr.Zero && PresentationParameters.SwapChainPanel == null))
+            {
+                if (_swapChain != null)
+                {
+                    _swapChain.Dispose();
+                    _swapChain = null;
+                }
+
+                return;
+            }
+
             var multisampleDesc = new SharpDX.DXGI.SampleDescription(1, 0);
             if ( PresentationParameters.MultiSampleCount > 1 )
             {
@@ -444,21 +478,34 @@ namespace Microsoft.Xna.Framework.Graphics
                 multisampleDesc.Quality = (int)SharpDX.Direct3D11.StandardMultisampleQualityLevels.StandardMultisamplePattern;
             }
 
-            var format = SharpDXHelper.ToFormat(PresentationParameters.BackBufferFormat);
+            // Use BGRA for the swap chain.
+            var format = PresentationParameters.BackBufferFormat == SurfaceFormat.Color ? 
+                            SharpDX.DXGI.Format.B8G8R8A8_UNorm : 
+                            SharpDXHelper.ToFormat(PresentationParameters.BackBufferFormat);
 
             // If the swap chain already exists... update it.
             if (_swapChain != null)
-                _swapChain.ResizeBuffers(   2,
-                                            PresentationParameters.BackBufferWidth, 
+            {
+                _swapChain.ResizeBuffers(2,
+                                            PresentationParameters.BackBufferWidth,
                                             PresentationParameters.BackBufferHeight,
                                             format,
                                             0); // SharpDX.DXGI.SwapChainFlags
+
+                /*
+                if (PresentationParameters.SwapChainPanel != null)
+                {
+                    using (var nativePanel = ComObject.As<SharpDX.DXGI.ISwapChainBackgroundPanelNative>(PresentationParameters.SwapChainPanel))
+                        nativePanel.SwapChain = _swapChain;
+                }
+                */
+            }
 
             // Otherwise, create a new swap chain.
             else
             {
                 // SwapChain description
-                var desc =  new SharpDX.DXGI.SwapChainDescription1()
+                var desc = new SharpDX.DXGI.SwapChainDescription1()
                 {
                     // Automatic sizing
                     Width = PresentationParameters.BackBufferWidth,
@@ -467,7 +514,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     Stereo = false,
                     SampleDescription = multisampleDesc,
                     Usage = SharpDX.DXGI.Usage.RenderTargetOutput,
-                    BufferCount = 2,                    
+                    BufferCount = 2,
                     SwapEffect = SharpDXHelper.ToSwapEffect(PresentationParameters),
 
                     // By default we scale the backbuffer to the window 
@@ -483,10 +530,21 @@ namespace Microsoft.Xna.Framework.Graphics
                 using (var dxgiAdapter = dxgiDevice2.Adapter)
                 using (var dxgiFactory2 = dxgiAdapter.GetParent<SharpDX.DXGI.Factory2>())
                 {
-                    // Creates a SwapChain from a CoreWindow pointer.
-                    var coreWindow = Marshal.GetObjectForIUnknown(PresentationParameters.DeviceWindowHandle) as CoreWindow;
-                    using (var comWindow = new ComObject(coreWindow))
-                        _swapChain = dxgiFactory2.CreateSwapChainForCoreWindow(_d3dDevice, comWindow, ref desc, null);
+                    if (PresentationParameters.DeviceWindowHandle != IntPtr.Zero)
+                    {
+                        // Creates a SwapChain from a CoreWindow pointer.
+                        var coreWindow = Marshal.GetObjectForIUnknown(PresentationParameters.DeviceWindowHandle) as CoreWindow;
+                        using (var comWindow = new ComObject(coreWindow))
+                            _swapChain = dxgiFactory2.CreateSwapChainForCoreWindow(_d3dDevice, comWindow, ref desc, null);
+                    }
+                    else
+                    {
+                        using (var nativePanel = ComObject.As<SharpDX.DXGI.ISwapChainBackgroundPanelNative>(PresentationParameters.SwapChainPanel))
+                        {
+                            _swapChain = dxgiFactory2.CreateSwapChainForComposition(_d3dDevice, ref desc, null);
+                            nativePanel.SwapChain = _swapChain;
+                        }
+                    }
 
                     // Ensure that DXGI does not queue more than one frame at a time. This both reduces 
                     // latency and ensures that the application will only render after each VSync, minimizing 
@@ -494,6 +552,8 @@ namespace Microsoft.Xna.Framework.Graphics
                     dxgiDevice2.MaximumFrameLatency = 1;
                 }
             }
+
+            _swapChain.Rotation = SharpDX.DXGI.DisplayModeRotation.Identity;
 
             // Obtain the backbuffer for this window which will be the final 3D rendertarget.
             Point targetSize;
@@ -510,25 +570,23 @@ namespace Microsoft.Xna.Framework.Graphics
             // Create the depth buffer if we need it.
             if (PresentationParameters.DepthStencilFormat != DepthFormat.None)
             {
+                var depthFormat = SharpDXHelper.ToFormat(PresentationParameters.DepthStencilFormat);
+
                 // Allocate a 2-D surface as the depth/stencil buffer.
                 using (var depthBuffer = new SharpDX.Direct3D11.Texture2D(_d3dDevice, new SharpDX.Direct3D11.Texture2DDescription()
                 {
-                    Format = SharpDXHelper.ToFormat(PresentationParameters.DepthStencilFormat),
+                    Format = depthFormat,
                     ArraySize = 1,
                     MipLevels = 1,
                     Width = targetSize.X,
                     Height = targetSize.Y,
                     SampleDescription = multisampleDesc,
+                    Usage = SharpDX.Direct3D11.ResourceUsage.Default,
                     BindFlags = SharpDX.Direct3D11.BindFlags.DepthStencil,
                 }))
 
                 // Create a DepthStencil view on this surface to use on bind.
-                _depthStencilView = new SharpDX.Direct3D11.DepthStencilView(_d3dDevice, depthBuffer,
-                    new SharpDX.Direct3D11.DepthStencilViewDescription()
-                    {
-                        Format = SharpDXHelper.ToFormat(PresentationParameters.DepthStencilFormat),
-                        Dimension = SharpDX.Direct3D11.DepthStencilViewDimension.Texture2D
-                    });
+                _depthStencilView = new SharpDX.Direct3D11.DepthStencilView(_d3dDevice, depthBuffer);
             }
 
             // Set the current viewport.
@@ -1007,7 +1065,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 lock (_d3dContext) 
                     _d3dContext.OutputMerger.SetTargets(_currentDepthStencilView, _currentRenderTargets);                
 #elif OPENGL
-				GL.BindFramebuffer(GLFramebuffer, 0);
+				GL.BindFramebuffer(GLFramebuffer, this.glFramebuffer);
 #endif
 
                 clearTarget = true;
@@ -1043,16 +1101,16 @@ namespace Microsoft.Xna.Framework.Graphics
                     _d3dContext.OutputMerger.SetTargets(_currentDepthStencilView, _currentRenderTargets);
 
 #elif OPENGL
-				if (this.glFramebuffer == 0)
+				if (renderTarget.glFramebuffer == 0)
 				{
 #if GLES
-					GL.GenFramebuffers(1, ref this.glFramebuffer);
+					GL.GenFramebuffers(1, ref renderTarget.glFramebuffer);
 #else
-					GL.GenFramebuffers(1, out this.glFramebuffer);
+					GL.GenFramebuffers(1, out renderTarget.glFramebuffer);
 #endif
 				}
 
-				GL.BindFramebuffer(GLFramebuffer, this.glFramebuffer);
+				GL.BindFramebuffer(GLFramebuffer, renderTarget.glFramebuffer);
 				GL.FramebufferTexture2D(GLFramebuffer, GLColorAttachment0, TextureTarget.Texture2D, renderTarget.glTexture, 0);
 				if (renderTarget.DepthStencilFormat != DepthFormat.None)
 				{

@@ -37,7 +37,7 @@ permitted under your local laws, the contributors exclude the implied warranties
 purpose and non-infringement.
 */
 #endregion License
-﻿
+
 using System;
 using System.IO;
 
@@ -179,7 +179,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         public bool Play()
         {
-            return Play(MasterVolume, 1.0f, 0.0f);
+            return Play(MasterVolume, 0.0f, 0.0f);
         }
 
         public bool Play(float volume, float pitch, float pan)

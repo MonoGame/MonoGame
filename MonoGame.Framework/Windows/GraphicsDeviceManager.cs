@@ -59,9 +59,7 @@ namespace Microsoft.Xna.Framework
         public GraphicsDeviceManager(Game game)
         {
             if (game == null)
-            {
                 throw new ArgumentNullException("Game Cannot Be Null");
-            }
 
             _game = game;
 
@@ -71,9 +69,7 @@ namespace Microsoft.Xna.Framework
             _preferredDepthStencilFormat = DepthFormat.None;
 
             if (game.Services.GetService(typeof(IGraphicsDeviceManager)) != null)
-            {
                 throw new ArgumentException("Graphics Device Manager Already Present");
-            }
 
             game.Services.AddService(typeof(IGraphicsDeviceManager), this);
             game.Services.AddService(typeof(IGraphicsDeviceService), this);

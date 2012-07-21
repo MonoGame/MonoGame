@@ -46,7 +46,11 @@ using System.Linq;
 using System.Threading;
 using Microsoft.Xna.Framework.Storage;
 
-#if !WINRT
+#if WINRT
+using Windows.ApplicationModel.Store;
+using System.Threading.Tasks;
+using Windows.ApplicationModel;    
+#else
 using System.Runtime.Remoting.Messaging;
 using Microsoft.Xna.Framework.Net;
 #endif
@@ -63,6 +67,25 @@ namespace Microsoft.Xna.Framework.GamerServices
 		private static bool isTrialMode;
 		private static bool isVisible;
 		private static bool simulateTrialMode;		
+
+        static Guide()
+        {
+#if WINRT
+
+#if DEBUG
+            var licenseInformation = CurrentAppSimulator.LicenseInformation;
+#else
+            var licenseInformation = CurrentApp.LicenseInformation;
+#endif
+
+            licenseInformation.LicenseChanged += () => 
+                isTrialMode = !licenseInformation.IsActive || licenseInformation.IsTrial;
+
+            isTrialMode = !licenseInformation.IsActive || licenseInformation.IsTrial;
+
+#endif // WINRT
+
+        }
 
 		delegate string ShowKeyboardInputDelegate(
 		 PlayerIndex player,           
@@ -205,9 +228,12 @@ namespace Microsoft.Xna.Framework.GamerServices
 		}
 
 
-		public static void ShowMarketplace (PlayerIndex player )
+		public static void ShowMarketplace(PlayerIndex player)
 		{
-			
+#if WINRT
+            var uri = new Uri(@"ms-windows-store:PDP?PFN=" + Package.Current.Id.FamilyName);
+            Task.Run(async () => await Windows.System.Launcher.LaunchUriAsync(uri)).Wait();	
+#endif
 		}
 
 		public static void Show ()
@@ -332,8 +358,11 @@ namespace Microsoft.Xna.Framework.GamerServices
 		{ 
 			get
 			{
-				return isTrialMode;
+				// If simulate trial mode is enabled then 
+				// we're in the trial mode.
+				return simulateTrialMode || isTrialMode;
 			}
+
 			set
 			{
 				isTrialMode = value;

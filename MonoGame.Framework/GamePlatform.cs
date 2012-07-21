@@ -190,7 +190,17 @@ namespace Microsoft.Xna.Framework
             get; protected set;
         }
 #endif
-
+  
+        public virtual bool VSyncEnabled
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+            set {
+            }
+        }
+        
         #endregion
 
         #region Events
@@ -235,8 +245,8 @@ namespace Microsoft.Xna.Framework
             IsActive = true;
             if (this.Game.GraphicsDevice == null) 
             {
-               var graphicsDeviceManager = (GraphicsDeviceManager)Game.Services.GetService(typeof(IGraphicsDeviceManager));			   
-               graphicsDeviceManager.CreateDevice();
+                var graphicsDeviceManager = Game.Services.GetService(typeof(IGraphicsDeviceManager)) as IGraphicsDeviceManager;			   
+                graphicsDeviceManager.CreateDevice();
             }
         }
 

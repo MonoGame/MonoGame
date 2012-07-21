@@ -12,7 +12,7 @@
     <RootNamespace>Microsoft.Xna.Framework</RootNamespace>
     <AssemblyName>MonoGame.Framework.Android</AssemblyName>
     <FileAlignment>512</FileAlignment>
-    <AndroidSupportedAbis>armeabi%3barmeabi-v7a</AndroidSupportedAbis>
+    <AndroidSupportedAbis>armeabi%3barmeabi-v7a%3bx86</AndroidSupportedAbis>
     <AndroidStoreUncompressedFileExtensions />
     <MandroidI18n />
     <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>
@@ -55,6 +55,8 @@
     <Compile Include="Android\AndroidCompatibility.cs" />
     <Compile Include="Android\AndroidGamePlatform.cs" />
     <Compile Include="Android\Input\Mouse.cs" />
+    <Compile Include="Android\OrientationListener.cs" />
+    <Compile Include="Android\ScreenReciever.cs" />
     <Compile Include="Android\TitleContainer.cs" />
     <Compile Include="Audio\AudioCategory.cs" />
     <Compile Include="Content\ContentManager.cs" />
@@ -124,7 +126,6 @@
     <Compile Include="Graphics\StencilOperation.cs" />
     <Compile Include="Graphics\Texture2D.cs" />
     <Compile Include="Graphics\TextureCube.cs" />
-    <Compile Include="Media\MediaQueue.cs" />
     <Compile Include="PrimaryThreadLoader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Android\AndroidGameActivity.cs" />
@@ -179,7 +180,6 @@
     <Compile Include="Android\Media\Video.cs" />
     <Compile Include="Android\Media\VideoPlayer.cs" />
     <Compile Include="Android\PowerStatus.cs" />
-    <Compile Include="Android\XnaGameWindowImpl.cs" />
     <Compile Include="Audio\AudioEmitter.cs" />
     <Compile Include="Audio\AudioListener.cs" />
     <Compile Include="Audio\SoundEffectInstance.cs" />
@@ -214,6 +214,7 @@
     <Compile Include="Input\ButtonState.cs" />
     <Compile Include="Input\GamePadButtons.cs" />
     <Compile Include="Input\GamePadCapabilities.cs" />
+    <Compile Include="Input\GamePadType.cs" />
     <Compile Include="Input\GamePadDPad.cs" />
     <Compile Include="Input\GamePadState.cs" />
     <Compile Include="Input\GamePadThumbSticks.cs" />
@@ -290,7 +291,7 @@
     <Compile Include="Input\Touch\TouchLocationState.cs" />
     <Compile Include="Input\Touch\TouchPanel.cs" />
     <Compile Include="Input\Touch\TouchPanelCapabilities.cs" />
-    <Compile Include="Input\Touch\TouchInfo.cs" />    
+    <Compile Include="Input\Touch\TouchInfo.cs" />
     <Compile Include="Storage\StorageContainer.cs" />
     <Compile Include="Storage\StorageDevice.cs" />
     <Compile Include="Graphics\Effect\IEffectFog.cs" />

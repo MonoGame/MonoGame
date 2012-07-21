@@ -184,6 +184,7 @@
     <Compile Include="Input\MouseState.cs" />
     <Compile Include="Input\Touch\TouchInfo.cs" />
     <Compile Include="LaunchParameters.cs" />
+    <Compile Include="Media\VideoSoundtrackType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Audio\AudioChannels.cs" />
     <Compile Include="Audio\AudioEmitter.cs" />
@@ -365,6 +366,7 @@
     <Compile Include="Input\ButtonState.cs" />
     <Compile Include="Input\GamePadButtons.cs" />
     <Compile Include="Input\GamePadCapabilities.cs" />
+    <Compile Include="Input\GamePadType.cs" />
     <Compile Include="Input\GamePadDPad.cs" />
     <Compile Include="Input\GamePadState.cs" />
     <Compile Include="Input\GamePadThumbSticks.cs" />

@@ -107,6 +107,7 @@
     <Compile Include="Input\GamePadThumbSticks.cs" />
     <Compile Include="Input\Buttons.cs" />
     <Compile Include="Input\GamePadCapabilities.cs" />
+    <Compile Include="Input\GamePadType.cs" />
     <Compile Include="Input\GamePadDPad.cs" />
     <Compile Include="Input\GamePadTriggers.cs" />
     <Compile Include="Input\GamePadButtons.cs" />
@@ -129,7 +130,6 @@
     <Compile Include="Audio\AudioChannels.cs" />
     <Compile Include="Linux\Audio\Sound.cs" />
     <Compile Include="Media\MediaPlayer.cs" />
-    <Compile Include="Media\Song.cs" />
     <Compile Include="Media\MediaState.cs" />
     <Compile Include="Media\MediaSourceType.cs" />
     <Compile Include="Content\ContentReader.cs" />
@@ -428,6 +428,7 @@
     <Compile Include="Content\ContentReaders\EffectMaterialReader.cs" />
     <Compile Include="Content\ContentReaders\ExternalReferenceReader.cs" />
     <Compile Include="Graphics\Effect\EffectMaterial.cs" />
+    <Compile Include="Linux\Media\Song.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.Linux.csproj">
@@ -447,12 +448,17 @@
     <None Include="MonoGame.Framework.Linux.dll.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+<<<<<<< HEAD
     <None Include="..\ThirdParty\Libs\libmojoshader_32.so">
       <Link>libmojoshader_32.so</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="..\ThirdParty\Libs\libmojoshader_64.so">
       <Link>libmojoshader_64.so</Link>
+=======
+    <None Include="..\ThirdParty\GamepadConfig\Tao.Sdl.dll.config">
+      <Link>Tao.Sdl.dll.config</Link>
+>>>>>>> origin/develop3d
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

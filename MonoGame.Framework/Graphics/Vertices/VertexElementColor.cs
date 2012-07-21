@@ -64,7 +64,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			c.R = typ.R;
 			c.G = typ.G;
 			c.B = typ.B;
-			c.R = typ.A;
+			c.A = typ.A;
 			return c;
 		}
 
