@@ -167,6 +167,7 @@ namespace Microsoft.Xna.Framework
 
             _graphicsDevice.PresentationParameters.IsFullScreen = false;
             _graphicsDevice.PresentationParameters.DeviceWindowHandle = _game.Window.Handle;
+            _graphicsDevice.GraphicsProfile = GraphicsProfile;
             _graphicsDevice.Initialize();
 
             PreferMultiSampling = _preferMultiSampling;
@@ -178,9 +179,10 @@ namespace Microsoft.Xna.Framework
         }
         
         internal void ResetClientBounds()
-        {
-            
+        {            
         }
+
+        public GraphicsProfile GraphicsProfile { get; set; }
 
         public Microsoft.Xna.Framework.Graphics.GraphicsDevice GraphicsDevice
         {
