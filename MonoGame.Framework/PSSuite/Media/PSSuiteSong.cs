@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 
-using Sce.Pss.Core.Audio;
+using Sce.PlayStation.Core.Audio;
 
 using Microsoft.Xna.Framework.Audio;
 ﻿

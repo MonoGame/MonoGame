@@ -67,6 +67,7 @@ namespace Microsoft.Xna.Framework
             _preferredBackBufferHeight = PresentationParameters._defaultBackBufferHeight;
             _preferredBackBufferWidth = PresentationParameters._defaultBackBufferWidth;
             _preferredDepthStencilFormat = DepthFormat.None;
+            SynchronizeWithVerticalRetrace = true;
 
             if (game.Services.GetService(typeof(IGraphicsDeviceManager)) != null)
                 throw new ArgumentException("Graphics Device Manager Already Present");
@@ -167,6 +168,7 @@ namespace Microsoft.Xna.Framework
 
             _graphicsDevice.PresentationParameters.IsFullScreen = false;
             _graphicsDevice.PresentationParameters.DeviceWindowHandle = _game.Window.Handle;
+            _graphicsDevice.GraphicsProfile = GraphicsProfile;
             _graphicsDevice.Initialize();
 
             PreferMultiSampling = _preferMultiSampling;
@@ -178,9 +180,10 @@ namespace Microsoft.Xna.Framework
         }
         
         internal void ResetClientBounds()
-        {
-            
+        {            
         }
+
+        public GraphicsProfile GraphicsProfile { get; set; }
 
         public Microsoft.Xna.Framework.Graphics.GraphicsDevice GraphicsDevice
         {
@@ -271,16 +274,7 @@ namespace Microsoft.Xna.Framework
             }
         }
 
-        public bool SynchronizeWithVerticalRetrace
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-            set
-            {
-            }
-        }
+        public bool SynchronizeWithVerticalRetrace { get; set; }
 
         public DisplayOrientation SupportedOrientations
         {
@@ -293,6 +287,5 @@ namespace Microsoft.Xna.Framework
                 _supportedOrientations = value;
             }
         }
-
     }
 }

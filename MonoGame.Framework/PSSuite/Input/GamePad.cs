@@ -43,11 +43,11 @@ purpose and non-infringement.
 using System;
 using System.Collections.Generic;
 
-using Sce.Pss.Core.Input;
-using Sce.Pss.Core.Graphics;
+using Sce.PlayStation.Core.Input;
+using Sce.PlayStation.Core.Graphics;
 
-using PssGamePad = Sce.Pss.Core.Input.GamePad;
-using PssGamePadButtons = Sce.Pss.Core.Input.GamePadButtons;
+using PssGamePad = Sce.PlayStation.Core.Input.GamePad;
+using PssGamePadButtons = Sce.PlayStation.Core.Input.GamePadButtons;
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;

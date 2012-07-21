@@ -63,7 +63,7 @@ using System.Drawing.Imaging;
 using OpenTK.Graphics.OpenGL;
 using GLPixelFormat = OpenTK.Graphics.OpenGL.PixelFormat;
 #elif PSS
-using PssTexture2D = Sce.Pss.Core.Graphics.Texture2D;
+using PssTexture2D = Sce.PlayStation.Core.Graphics.Texture2D;
 #elif GLES
 using OpenTK.Graphics.ES20;
 using GLPixelFormat = OpenTK.Graphics.ES20.All;
@@ -161,7 +161,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _texture = new SharpDX.Direct3D11.Texture2D(graphicsDevice._d3dDevice, desc);
 
 #elif PSS
-			_texture2D = new Sce.Pss.Core.Graphics.Texture2D(width, height, mipmap, PSSHelper.ToFormat(format));
+			_texture2D = new Sce.PlayStation.Core.Graphics.Texture2D(width, height, mipmap, PSSHelper.ToFormat(format));
 #else
 
             this.glTarget = TextureTarget.Texture2D;
