@@ -48,8 +48,8 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
 
-using Sce.Pss.Core;
-using Sce.Pss.Core.Graphics;
+using Sce.PlayStation.Core;
+using Sce.PlayStation.Core.Graphics;
 #endregion Using Statements
 
 namespace Microsoft.Xna.Framework

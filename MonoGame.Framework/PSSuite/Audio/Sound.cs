@@ -1,7 +1,7 @@
 using System;
 
-using PssSound = Sce.Pss.Core.Audio.Sound;
-using Sce.Pss.Core.Audio;
+using PssSound = Sce.PlayStation.Core.Audio.Sound;
+using Sce.PlayStation.Core.Audio;
 
 namespace Microsoft.Xna.Framework.Audio
 {

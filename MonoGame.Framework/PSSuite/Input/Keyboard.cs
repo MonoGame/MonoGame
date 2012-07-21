@@ -43,7 +43,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using Sce.Pss.Core.Input;
+using Sce.PlayStation.Core.Input;
 
 namespace Microsoft.Xna.Framework.Input
 {
