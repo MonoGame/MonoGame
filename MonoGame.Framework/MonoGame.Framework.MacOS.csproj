@@ -454,6 +454,7 @@
     <Compile Include="Content\ContentReaders\ExternalReferenceReader.cs" />
     <Compile Include="Graphics\OcclusionQuery.cs" />
     <Compile Include="Graphics\Effect\Effect.fx.cs" />
+    <Compile Include="Graphics\Texture3D.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />
