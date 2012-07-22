@@ -133,14 +133,11 @@ namespace Microsoft.Xna.Framework.Graphics
 			int startIndex = 0;
 			int index = 0;
 			Texture2D tex = null;
-   
 
-            
 			// make sure the vertexArray has enough space
 			if ( _batchItemList.Count*4 > _vertexArray.Length )
 				ExpandVertexArray( _batchItemList.Count );
-			
-/*
+
             //Populate the vertexArray
             for (int i = 0; i < _batchItemList.Count; i++)
 			{
@@ -180,13 +177,12 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
                 index += 4;
             }
-*/
+/*
             //--------------------------------------------------------------
-            // SiENcE: new variant
+            // new variant does not work correct
             foreach ( var item in _batchItemList )
              {
-            
-                // if the texture changed, we need to flush and bind the new texture
+                 // if the texture changed, we need to flush and bind the new texture
                  bool shouldFlush = item.Texture != tex;
                  if ( shouldFlush )
                  {
@@ -197,7 +193,7 @@ namespace Microsoft.Xna.Framework.Graphics
                      _device._graphics.SetTexture(0, tex._texture2D);
                  }
                 
-                // store the SpriteBatchItem data in our vertexArray
+                 // store the SpriteBatchItem data in our vertexArray
                  _vertexArray[index++] = item.vertexTL;
                  _vertexArray[index++] = item.vertexTR;
                  _vertexArray[index++] = item.vertexBL;
@@ -205,10 +201,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 
                  _freeBatchItemQueue.Enqueue( item );
              }
-            //--------------------------------------------------------------
             FlushVertexArray(index);
-            
-			// flush the remaining vertexArray data
+            //--------------------------------------------------------------
+*/
+            // flush the remaining vertexArray data
 			DrawVertexArray(startIndex, index);
 			
 			_batchItemList.Clear();
