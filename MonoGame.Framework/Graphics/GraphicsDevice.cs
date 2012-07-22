@@ -94,9 +94,13 @@ namespace Microsoft.Xna.Framework.Graphics
         private Rectangle _scissorRectangle;
         private bool _scissorRectangleDirty;
 
-        internal List<IntPtr> _pointerCache = new List<IntPtr>();
+        internal List<IntPtr> _pointerCache = new List<IntPtr>();      
+  
         private VertexBuffer _vertexBuffer = null;
+        private bool _vertexBufferDirty;
+
         private IndexBuffer _indexBuffer = null;
+        private bool _indexBufferDirty;
 
         private RenderTargetBinding[] _currentRenderTargetBindings;
 
@@ -1252,40 +1256,20 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void SetVertexBuffer(VertexBuffer vertexBuffer)
         {
-            // TODO: Should be be protecting against setting the
-            // same VB twice or is that the caller's job?
+            if (_vertexBuffer == vertexBuffer)
+                return;
 
             _vertexBuffer = vertexBuffer;
-			
-#if DIRECTX
-            lock (_d3dContext)
-            {
-                if (_vertexBuffer != null)
-                    _d3dContext.InputAssembler.SetVertexBuffers(0, _vertexBuffer._binding);
-                else
-                    _d3dContext.InputAssembler.SetVertexBuffers(0, null);
-            }
-#elif OPENGL
-            if (_vertexBuffer != null)
-                GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBuffer.vbo);
-#endif
+            _vertexBufferDirty = true;
         }
 
         private void SetIndexBuffer(IndexBuffer indexBuffer)
         {
-            _indexBuffer = indexBuffer;
-            if (_indexBuffer == null)
+            if (_indexBuffer == indexBuffer)
                 return;
-
-#if DIRECTX
-            lock(_d3dContext)
-                _d3dContext.InputAssembler.SetIndexBuffer(
-                    _indexBuffer._buffer, 
-                    _indexBuffer.IndexElementSize == IndexElementSize.SixteenBits ? SharpDX.DXGI.Format.R16_UInt : SharpDX.DXGI.Format.R32_UInt,
-                    0 );
-#elif OPENGL
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, _indexBuffer.ibo);
-#endif
+            
+            _indexBuffer = indexBuffer;
+            _indexBufferDirty = true;
         }
 
         public IndexBuffer Indices { set { SetIndexBuffer(value); } }
@@ -1347,25 +1331,65 @@ namespace Microsoft.Xna.Framework.Graphics
 	            _scissorRectangleDirty = false;
 	        }
 
-	        if ( _blendStateDirty)
-	            _blendState.ApplyState(this);
+            if (_blendStateDirty)
+            {
+                _blendState.ApplyState(this);
+                _blendStateDirty = false;
+            }
 	        if ( _depthStencilStateDirty )
+            {
 	            _depthStencilState.ApplyState(this);
+                _depthStencilStateDirty = false;
+            }
 	        if ( _rasterizerStateDirty )
+            {
 	            _rasterizerState.ApplyState(this);
+	            _rasterizerStateDirty = false;
+            }
 
-	        _blendStateDirty = _depthStencilStateDirty = _rasterizerStateDirty = false;
+            if (_indexBufferDirty)
+            {
+#if DIRECTX
+                Debug.Assert(_indexBuffer != null, "The index buffer is null!");
 
-            Textures.SetTextures(this);
-            SamplerStates.SetSamplers(this);
+                _d3dContext.InputAssembler.SetIndexBuffer(
+                    _indexBuffer._buffer,
+                    _indexBuffer.IndexElementSize == IndexElementSize.SixteenBits ? 
+                        SharpDX.DXGI.Format.R16_UInt : SharpDX.DXGI.Format.R32_UInt,
+                    0);
+#elif OPENGL
+                if (_indexBuffer != null)
+                    GL.BindBuffer(BufferTarget.ElementArrayBuffer, _indexBuffer.ibo);
+#endif
+                _indexBufferDirty = false;
+            }
+
+            if (_vertexBufferDirty)
+            {
+#if DIRECTX
+                Debug.Assert(_vertexBuffer != null, "The vertex buffer is null!");
+
+                _d3dContext.InputAssembler.SetVertexBuffers(0, _vertexBuffer._binding);
+#elif OPENGL
+                if (_vertexBuffer != null)
+                    GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBuffer.vbo);
+#endif
+            }
 
             if (_vertexShaderDirty)
             {
                 Debug.Assert(_vertexShader != null, "The vertex shader is null!");
 #if DIRECTX            
-                _d3dContext.InputAssembler.InputLayout = GetInputLayout(_vertexShader, _vertexBuffer.VertexDeclaration);
                 _d3dContext.VertexShader.Set(_vertexShader._vertexShader);                
 #endif
+            }
+
+            if (_vertexShaderDirty || _vertexBufferDirty)
+            {
+#if DIRECTX     
+                _d3dContext.InputAssembler.InputLayout = GetInputLayout(_vertexShader, _vertexBuffer.VertexDeclaration);
+#endif
+                _vertexShaderDirty = _vertexBufferDirty = false;
             }
 
             if (_pixelShaderDirty)
@@ -1375,9 +1399,11 @@ namespace Microsoft.Xna.Framework.Graphics
 #if DIRECTX       
                 _d3dContext.PixelShader.Set(_pixelShader._pixelShader);
 #endif
+                _pixelShaderDirty = false;
             }
 
-            _vertexShaderDirty = _pixelShaderDirty = false;
+            Textures.SetTextures(this);
+            SamplerStates.SetSamplers(this);
         }
 
 #if DIRECTX
@@ -1568,6 +1594,8 @@ namespace Microsoft.Xna.Framework.Graphics
                             BufferUsageHint.StreamDraw);
 
             //Setup VertexDeclaration
+            if (vertexDeclaration.GraphicsDevice != this)
+                vertexDeclaration.GraphicsDevice = this;
             vertexDeclaration.Apply();
 
             //Draw
@@ -1682,6 +1710,8 @@ namespace Microsoft.Xna.Framework.Graphics
                             indexData, BufferUsageHint.DynamicDraw);
 
             //Setup VertexDeclaration
+            if (vertexDeclaration.GraphicsDevice != this)
+                vertexDeclaration.GraphicsDevice = this;
             vertexDeclaration.Apply();
 
             //Draw
@@ -1767,6 +1797,8 @@ namespace Microsoft.Xna.Framework.Graphics
                             indexData, BufferUsageHint.DynamicDraw);
 
             //Setup VertexDeclaration
+            if (vertexDeclaration.GraphicsDevice != this)
+                vertexDeclaration.GraphicsDevice = this;
             vertexDeclaration.Apply();
 
             //Draw
