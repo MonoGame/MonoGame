@@ -126,6 +126,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
             GL.GetTexImage<T>(target, 0, PixelFormat.Bgra,
                 PixelType.UnsignedByte, data);
+#else
+			throw new NotImplementedException();
 #endif
         }
 
