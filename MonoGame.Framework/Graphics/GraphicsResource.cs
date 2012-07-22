@@ -68,6 +68,11 @@ namespace Microsoft.Xna.Framework.Graphics
 			{
 				return graphicsDevice;
 			}
+
+            internal set
+            {
+                graphicsDevice = value;
+            }
 		}
 		
 		public bool IsDisposed

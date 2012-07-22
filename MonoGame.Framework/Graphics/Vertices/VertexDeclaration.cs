@@ -56,15 +56,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 var bytes = System.Text.Encoding.UTF8.GetBytes(signature);
                 HashKey = Effect.ComputeHash(bytes);
             }
-
-            // Set the graphics device.
-            var gds = (IGraphicsDeviceService) Game.Instance.Services.GetService (
-                                                typeof (IGraphicsDeviceService));
-
-            System.Diagnostics.Debug.Assert(gds != null && gds.GraphicsDevice != null, 
-                                            "VertexDeclaration could not get the GraphicsDevice.");
-
-            graphicsDevice = gds.GraphicsDevice;
         }
 
 		private static int GetVertexStride(VertexElement[] elements)
