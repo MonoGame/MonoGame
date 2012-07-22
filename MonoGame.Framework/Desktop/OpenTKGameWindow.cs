@@ -307,9 +307,12 @@ namespace Microsoft.Xna.Framework
 
         public void Dispose()
         {
-            Threading.BackgroundContext.Dispose();
-            Threading.BackgroundContext = null;
-            Threading.WindowInfo = null;
+            if (Threading.BackgroundContext != null)
+            {
+                Threading.BackgroundContext.Dispose();
+                Threading.BackgroundContext = null;
+                Threading.WindowInfo = null;
+            }
             window.Dispose();
         }
 
