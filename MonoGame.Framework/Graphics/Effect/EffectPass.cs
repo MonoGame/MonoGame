@@ -136,9 +136,6 @@ namespace Microsoft.Xna.Framework.Graphics
                     throw new InvalidOperationException("Unable to link effect program");
                 }
             });
-
-#elif DIRECTX
-
 #endif
         }
 

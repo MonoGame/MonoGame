@@ -32,9 +32,7 @@ namespace Microsoft.Xna.Framework.Graphics
 	{
 #if OPENGL
 
-        public readonly ShaderType ShaderType;
-
-        public int ShaderHandle;
+        internal int ShaderHandle;
 
 #if DEBUG
         // We only keep around the GLSL code for debugging.
@@ -91,13 +89,7 @@ namespace Microsoft.Xna.Framework.Graphics
         internal Shader(GraphicsDevice device, BinaryReader reader)
         {
             var isVertexShader = reader.ReadBoolean();
-
-#if OPENGL
-            if (isVertexShader)
-                ShaderType = ShaderType.VertexShader;
-            else
-                ShaderType = ShaderType.FragmentShader;
-#endif // OPENGL
+            Stage = isVertexShader ? ShaderStage.Vertex : ShaderStage.Pixel;
 
             var shaderLength = (int)reader.ReadUInt16();
             var shaderBytecode = reader.ReadBytes(shaderLength);
@@ -153,7 +145,7 @@ namespace Microsoft.Xna.Framework.Graphics
             
             Threading.BlockOnUIThread(() =>
             {
-                ShaderHandle = GL.CreateShader(ShaderType);
+                ShaderHandle = GL.CreateShader(Stage == ShaderStage.Vertex ? ShaderType.VertexShader : ShaderType.FragmentShader);
 #if GLES
                 GL.ShaderSource(ShaderHandle, 1, new string[] { glslCode }, (int[])null);
 #else
@@ -197,11 +189,13 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif // OPENGL
         }
 
+        public ShaderStage Stage { get; private set; }
+
 #if OPENGL
         
         public void OnLink(int program) 
         {
-            if (ShaderType != ShaderType.VertexShader)
+            if (Stage != ShaderStage.Vertex)
                 return;
 
 			// Bind the vertex attributes to the shader program.
@@ -239,7 +233,7 @@ namespace Microsoft.Xna.Framework.Graphics
                             EffectParameterCollection parameters,
 		                    ConstantBuffer[] cbuffers) 
         {
-			if (ShaderType == ShaderType.FragmentShader) 
+			if (Stage == ShaderStage.Pixel) 
             {
                 graphicsDevice.PixelShader = this;
 

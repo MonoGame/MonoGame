@@ -330,7 +330,9 @@
     <Compile Include="MacOS\Audio\SoundEffect.cs"/>
     <Compile Include="MacOS\Audio\SoundEffectInstance.cs"/>
     <Compile Include="Graphics\Effect\AlphaTestEffect.cs" />
-    <Compile Include="Graphics\Effect\Shader.cs" />
+    <Compile Include="Graphics\Shader\ConstantBuffer.cs" />
+    <Compile Include="Graphics\Shader\Shader.cs" />
+    <Compile Include="Graphics\Shader\ShaderStage.cs" />
     <Compile Include="Graphics\Effect\EffectAnnotation.cs" />
     <Compile Include="Graphics\Effect\EffectAnnotationCollection.cs" />
     <Compile Include="Graphics\Effect\EffectHelpers.cs" />
@@ -426,7 +428,6 @@
     <Compile Include="iOS\GamerServices\KeyboardInputView.cs" />
     <Compile Include="iOS\GamerServices\KeyboardInputAsyncResult.cs" />
     <Compile Include="iOS\iOSGameWindow.cs" />
-    <Compile Include="Graphics\Effect\ConstantBuffer.cs" />
     <Compile Include="Media\MediaQueue.cs" />
     <Compile Include="Input\Touch\TouchInfo.cs" />
   </ItemGroup>
