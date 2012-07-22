@@ -287,7 +287,7 @@ namespace Microsoft.Xna.Framework.Audio
 				_volume = value;
 				if (hasSourceId) {
 					// Volume
-					AL.Source (sourceId, ALSourcef.Gain, _volume);
+					AL.Source (sourceId, ALSourcef.Gain, _volume * SoundEffect.MasterVolume);
 				}
 
 			}
