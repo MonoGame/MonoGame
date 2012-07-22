@@ -457,6 +457,7 @@
     <Compile Include="Graphics\Texture3D.cs" />
     <Compile Include="Media\MediaLibrary.cs" />
     <Compile Include="Media\MediaSource.cs" />
+    <Compile Include="FrameworkDispatcher.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />
