@@ -187,7 +187,7 @@ namespace Microsoft.Xna.Framework.Audio
             if (MasterVolume > 0.0f)
             {
                 SoundEffectInstance instance = CreateInstance();
-                instance.Volume = volume * MasterVolume;
+                instance.Volume = volume;
                 instance.Pitch = pitch;
                 instance.Pan = pan;
                 instance.Play();
