@@ -177,33 +177,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
                 index += 4;
             }
-/*
-            //--------------------------------------------------------------
-            // new variant does not work correct
-            foreach ( var item in _batchItemList )
-             {
-                 // if the texture changed, we need to flush and bind the new texture
-                 bool shouldFlush = item.Texture != tex;
-                 if ( shouldFlush )
-                 {
-                     DrawVertexArray( startIndex, index );
-                     startIndex = index;
-                     tex = item.Texture;
-                     
-                     _device._graphics.SetTexture(0, tex._texture2D);
-                 }
-                
-                 // store the SpriteBatchItem data in our vertexArray
-                 _vertexArray[index++] = item.vertexTL;
-                 _vertexArray[index++] = item.vertexTR;
-                 _vertexArray[index++] = item.vertexBL;
-                 _vertexArray[index++] = item.vertexBR;
-                
-                 _freeBatchItemQueue.Enqueue( item );
-             }
-            FlushVertexArray(index);
-            //--------------------------------------------------------------
-*/
+
             // flush the remaining vertexArray data
 			DrawVertexArray(startIndex, index);
 			
@@ -231,15 +205,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
             _vertexArray = new VertexPosition2ColorTexture[4 * newCount];
 		}
-        
-        void FlushVertexArray(int count)
-        {
-            //Get and fill the PssVertexBuffer
-            var vertexBuffer = _device.GetVertexBuffer(_vertexFormat, 4 * InitialVertexArraySize, 6 * InitialVertexArraySize);
-            vertexBuffer.SetIndices(_index, 0, 0, 6 * InitialVertexArraySize);
-            _device._graphics.SetVertexBuffer(0, vertexBuffer);
-            vertexBuffer.SetVertices(_vertexArray, 0, 0, count);
-        }
         
 		void DrawVertexArray ( int start, int end )
 		{
