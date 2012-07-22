@@ -1,7 +1,7 @@
 using System;
 
-using PssSound = Sce.Pss.Core.Audio.Sound;
-using Sce.Pss.Core.Audio;
+using PssSound = Sce.PlayStation.Core.Audio.Sound;
+using Sce.PlayStation.Core.Audio;
 
 namespace Microsoft.Xna.Framework.Audio
 {
@@ -21,7 +21,9 @@ namespace Microsoft.Xna.Framework.Audio
         public void Dispose()
         {
             _soundPlayer.Stop();
-			_soundPlayer.Dispose();
+            
+            // gives Error when Soundplayer is reused
+//			_soundPlayer.Dispose();
             _sound.Dispose();
         }
 

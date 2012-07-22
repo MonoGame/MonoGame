@@ -41,8 +41,8 @@
 
 using System;
 
-using Sce.Pss.Core.Environment;
-using Sce.Pss.Core.Input;
+using Sce.PlayStation.Core.Environment;
+using Sce.PlayStation.Core.Input;
 
 namespace Microsoft.Xna.Framework.Input
 {

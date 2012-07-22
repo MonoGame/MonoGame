@@ -53,7 +53,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #endregion // Non-Serialized Stuff
 
-        public static DXShader CreateHLSL(byte[] byteCode, bool isVertexShader, List<ConstantBuffer> cbuffers, int sharedIndex)
+        public static DXShader CreateHLSL(byte[] byteCode, bool isVertexShader, List<ConstantBuffer> cbuffers, int sharedIndex, bool debug)
         {
             var dxshader = new DXShader();
             dxshader.IsVertexShader = isVertexShader;
@@ -61,9 +61,11 @@ namespace Microsoft.Xna.Framework.Graphics
             dxshader.Bytecode = (byte[])byteCode.Clone();
 
             // Strip the bytecode we're gonna save!
-            const SharpDX.D3DCompiler.StripFlags stripFlags =   SharpDX.D3DCompiler.StripFlags.CompilerStripDebugInformation |
-                                                                SharpDX.D3DCompiler.StripFlags.CompilerStripReflectionData |
-                                                                SharpDX.D3DCompiler.StripFlags.CompilerStripTestBlobs;
+            var stripFlags = SharpDX.D3DCompiler.StripFlags.CompilerStripReflectionData |
+                             SharpDX.D3DCompiler.StripFlags.CompilerStripTestBlobs;
+
+            if (!debug)
+                stripFlags |= SharpDX.D3DCompiler.StripFlags.CompilerStripDebugInformation;
 
             using (var original = new SharpDX.D3DCompiler.ShaderBytecode(byteCode))
             {

@@ -121,7 +121,7 @@ VSOutputTxEnvMap VSEnvMapOneLightFresnel(VSInputNmTx vin)
 
 
 // Pixel shader: basic.
-float4 PSEnvMap(PSInputTxEnvMap pin) : SV_Target0
+float4 PSEnvMap(VSOutputTxEnvMap pin) : SV_Target0
 {
     float4 color = SAMPLE_TEXTURE(Texture, pin.TexCoord) * pin.Diffuse;
     float4 envmap = SAMPLE_CUBEMAP(EnvironmentMap, pin.EnvCoord) * color.a;
@@ -135,7 +135,7 @@ float4 PSEnvMap(PSInputTxEnvMap pin) : SV_Target0
 
 
 // Pixel shader: no fog.
-float4 PSEnvMapNoFog(PSInputTxEnvMap pin) : SV_Target0
+float4 PSEnvMapNoFog(VSOutputTxEnvMap pin) : SV_Target0
 {
     float4 color = SAMPLE_TEXTURE(Texture, pin.TexCoord) * pin.Diffuse;
     float4 envmap = SAMPLE_CUBEMAP(EnvironmentMap, pin.EnvCoord) * color.a;
@@ -147,7 +147,7 @@ float4 PSEnvMapNoFog(PSInputTxEnvMap pin) : SV_Target0
 
 
 // Pixel shader: specular.
-float4 PSEnvMapSpecular(PSInputTxEnvMap pin) : SV_Target0
+float4 PSEnvMapSpecular(VSOutputTxEnvMap pin) : SV_Target0
 {
     float4 color = SAMPLE_TEXTURE(Texture, pin.TexCoord) * pin.Diffuse;
     float4 envmap = SAMPLE_CUBEMAP(EnvironmentMap, pin.EnvCoord) * color.a;
@@ -162,7 +162,7 @@ float4 PSEnvMapSpecular(PSInputTxEnvMap pin) : SV_Target0
 
 
 // Pixel shader: specular, no fog.
-float4 PSEnvMapSpecularNoFog(PSInputTxEnvMap pin) : SV_Target0
+float4 PSEnvMapSpecularNoFog(VSOutputTxEnvMap pin) : SV_Target0
 {
     float4 color = SAMPLE_TEXTURE(Texture, pin.TexCoord) * pin.Diffuse;
     float4 envmap = SAMPLE_CUBEMAP(EnvironmentMap, pin.EnvCoord) * color.a;

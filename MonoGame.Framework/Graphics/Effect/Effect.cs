@@ -46,7 +46,7 @@ using System.Linq;
 using System.Reflection;
 
 #if PSS
-using Sce.Pss.Core.Graphics;
+using Sce.PlayStation.Core.Graphics;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics

@@ -167,9 +167,10 @@ namespace Microsoft.Xna.Framework
 
                 GraphicsDevice.PresentationParameters.BackBufferWidth = isLandscape ? Math.Max(w, h) : Math.Min(w, h);
                 GraphicsDevice.PresentationParameters.BackBufferHeight = isLandscape ? Math.Min(w, h) : Math.Max(w, h);
-
+#if !PSS
                 // Trigger a change in orientation in case the supported orientations have changed
                 _game.Window.SetOrientation(_game.Window.CurrentOrientation, false);
+#endif
             }
         }
 

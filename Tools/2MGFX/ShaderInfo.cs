@@ -27,11 +27,13 @@ namespace TwoMGFX
     }
 
     public class ShaderInfo
-    {        
-        public string fileName;
-        public string fileContent;
+    {
+        public string fileName { get; private set; }
+        public string fileContent { get; private set; }
 
-        public bool DX11Profile;
+        public bool DX11Profile { get; private set; }
+
+        public bool Debug { get; private set; }
 
         public List<TechniqueInfo> Techniques = new List<TechniqueInfo>();
 
@@ -53,6 +55,10 @@ namespace TwoMGFX
                 macros.Add(new SharpDX.Direct3D.ShaderMacro("HLSL", 1));
                 macros.Add(new SharpDX.Direct3D.ShaderMacro("SM4", 1));
             }
+
+            // If we're building shaders for debug set that flag too.
+            if (options.Debug)
+                macros.Add(new SharpDX.Direct3D.ShaderMacro("DEBUG", 1));
 
             // Use the D3DCompiler to pre-process the file resolving 
             // all #includes and macros.... this even works for GLSL.
@@ -100,6 +106,8 @@ namespace TwoMGFX
             */
 
             result.DX11Profile = options.DX11Profile;
+            result.Debug = options.Debug;
+
             return result;
         }
 

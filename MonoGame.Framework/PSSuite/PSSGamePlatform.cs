@@ -71,9 +71,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-using Sce.Pss.Core;
-using Sce.Pss.Core.Environment;
-using Sce.Pss.Core.Input;
+using Sce.PlayStation.Core;
+using Sce.PlayStation.Core.Environment;
+using Sce.PlayStation.Core.Input;
 
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
