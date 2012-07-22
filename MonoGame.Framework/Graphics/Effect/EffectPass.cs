@@ -164,6 +164,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #elif PSS
             _effect.GraphicsDevice._graphics.SetShaderProgram(_shaderProgram);
 #endif
+            // Set the render states if we have some.
             if (_rasterizerState != null)
                 device.RasterizerState = _rasterizerState;
             if (_blendState != null)
@@ -234,15 +235,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #elif DIRECTX
 
-            // TODO: This can be much simpler now!
-
-            lock (device._d3dContext)
-            {
-                // Apply the shaders which will in turn set the 
-                // constant buffers and texture samplers.
-                _vertexShader.Apply(device, _effect.Parameters, _effect.ConstantBuffers);
-                _pixelShader.Apply(device, _effect.Parameters, _effect.ConstantBuffers);
-            }
+            // Apply the shaders which will in turn set the 
+            // constant buffers and texture samplers.
+            _vertexShader.Apply(device, _effect.Parameters, _effect.ConstantBuffers);
+            _pixelShader.Apply(device, _effect.Parameters, _effect.ConstantBuffers);
 
 #endif
         }

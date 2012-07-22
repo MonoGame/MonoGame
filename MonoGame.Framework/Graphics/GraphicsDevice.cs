@@ -124,6 +124,10 @@ namespace Microsoft.Xna.Framework.Graphics
         private Shader _pixelShader;
         private bool _pixelShaderDirty;
 
+
+        private ConstantBuffer[] _vertexConstantBuffers = new ConstantBuffer[16];
+        private ConstantBuffer[] _pixelConstantBuffers = new ConstantBuffer[16];
+
 #if DIRECTX
 
         // Declare Direct2D Objects
@@ -1302,6 +1306,14 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        internal void SetConstantBuffer(ShaderStage stage, int slot, ConstantBuffer buffer)
+        {
+            if (stage == ShaderStage.Vertex)
+                _vertexConstantBuffers[slot] = buffer;
+            else
+                _pixelConstantBuffers[slot] = buffer;
+        }
+
 #if OPENGL
         internal int ShaderProgram = -1;
 #endif
@@ -1400,6 +1412,33 @@ namespace Microsoft.Xna.Framework.Graphics
                 _d3dContext.PixelShader.Set(_pixelShader._pixelShader);
 #endif
                 _pixelShaderDirty = false;
+            }
+
+            if (true)
+            {
+                for (var i = 0; i < _vertexConstantBuffers.Length; i++)
+                {
+                    var buffer = _vertexConstantBuffers[i];
+                    if (buffer == null)
+                        break;
+#if DIRECTX
+                    buffer.Apply(this, ShaderStage.Vertex, i);
+#elif OPENGL
+                    buffer.Apply(this, ShaderProgram);
+#endif
+                }
+
+                for (var i = 0; i < _pixelConstantBuffers.Length; i++)
+                {
+                    var buffer = _pixelConstantBuffers[i];
+                    if (buffer == null)
+                        break;
+#if DIRECTX
+                    buffer.Apply(this, ShaderStage.Pixel, i);
+#elif OPENGL
+                    buffer.Apply(this, ShaderProgram);
+#endif
+                }
             }
 
             Textures.SetTextures(this);

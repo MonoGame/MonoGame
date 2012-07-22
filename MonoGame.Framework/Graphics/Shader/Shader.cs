@@ -273,11 +273,13 @@ namespace Microsoft.Xna.Framework.Graphics
                 graphicsDevice.VertexShader = this;
             }
 
-            // Update and set the constants.
+            // Update the constant buffers with the parameter state
+            // and then set them on the graphics device.
             for (var c = 0; c < _cbuffers.Length; c++)
             {
                 var cb = cbuffers[_cbuffers[c]];
-                cb.Apply(program, parameters);
+                cb.Update(parameters);
+                graphicsDevice.SetConstantBuffer(Stage, c, cb);
             }
         }
 
@@ -293,6 +295,9 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 graphicsDevice.PixelShader = this;
 
+                // TODO: We can move the samplers info out to the 
+                // EffectPass as they are effect specific and have 
+                // nothing to do with the shader.
                 foreach (var sampler in _samplers)
                 {
                     var param = parameters[sampler.parameter];
@@ -305,15 +310,20 @@ namespace Microsoft.Xna.Framework.Graphics
                 graphicsDevice.VertexShader = this;
             }
 
-            // TODO: This has to be deferred like setting shaders 
-            // and be done from the GraphicsDevice.ApplyState.  This
-            // also forces us to come up with a ConstantBuffer API.
-
-            // Update and set the constants.
+            // Update the constant buffers with the parameter state
+            // and then set them on the graphics device.
             for (var c = 0; c < _cbuffers.Length; c++)
             {
+                // TODO: Like the sampler info above i think we should
+                // move the constant buffer info out to EffectPass.  
+                // 
+                // Eventually all we should have in Shader is an optional
+                // and light reflection API for constants and that is it.
+                //
+
                 var cb = cbuffers[_cbuffers[c]];
-                cb.Apply(_vertexShader != null, c, parameters);
+                cb.Update(parameters);
+                graphicsDevice.SetConstantBuffer(Stage, c, cb);
             }
         }
 		

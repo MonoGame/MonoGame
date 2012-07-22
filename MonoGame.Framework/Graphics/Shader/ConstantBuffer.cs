@@ -29,8 +29,17 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private ulong _stateKey;
 
+        private bool _dirty;
+
 #if DIRECTX
+
         private SharpDX.Direct3D11.Buffer _cbuffer;
+
+#elif OPENGL
+
+        private int _program = -1;
+        private int _location;
+
 #endif
 
         public ConstantBuffer(ConstantBuffer cloneSource)
@@ -81,7 +90,6 @@ namespace Microsoft.Xna.Framework.Graphics
             desc.BindFlags = SharpDX.Direct3D11.BindFlags.ConstantBuffer;
             desc.CpuAccessFlags = SharpDX.Direct3D11.CpuAccessFlags.None;
             _cbuffer = new SharpDX.Direct3D11.Buffer(graphicsDevice._d3dDevice, desc);
-
 #endif
         }
 
@@ -114,13 +122,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-#if DIRECTX
-        public void Apply(bool vertexStage, int slot, EffectParameterCollection parameters)
-#elif OPENGL
-        public unsafe void Apply(int program, EffectParameterCollection parameters)
-#elif PSS
-        public void Apply(ShaderProgram program, EffectParameterCollection parameters)
-#endif
+        public void Update(EffectParameterCollection parameters)
         {
             // TODO:  We should be doing some sort of dirty state 
             // testing here.
@@ -135,9 +137,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // over and we need to reset.
             if (_stateKey > EffectParameter.NextStateKey)
                 _stateKey = 0;
-
-            var dirty = false;
-
+            
             for (var p = 0; p < _parameters.Length; p++)
             {
                 var index = _parameters[p];
@@ -147,7 +147,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     continue;
 
                 var offset = _offsets[p];
-                dirty = true;
+                _dirty = true;
 
                 switch (param.ParameterType)
                 {
@@ -161,40 +161,60 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
             _stateKey = EffectParameter.NextStateKey;
+        }
 
 #if DIRECTX
+        internal void Apply(GraphicsDevice device, ShaderStage stage, int slot)
+#elif OPENGL
+        public unsafe void Apply(GraphicsDevice device, int program)
+#elif PSS
+        public void Apply(GraphicsDevice device, ShaderProgram program)
+#endif
+        {
 
+#if DIRECTX
             // NOTE: We make the assumption here that the caller has
             // locked the d3dContext for us to use.
             var d3dContext = graphicsDevice._d3dContext;
 
             // Update the hardware buffer.
-            if (dirty)
+            if (_dirty)
                 d3dContext.UpdateSubresource(_buffer, _cbuffer);
 
-            // Set the constant buffer.
-            if (vertexStage)
+            if (stage == ShaderStage.Vertex)
                 d3dContext.VertexShader.SetConstantBuffer(slot, _cbuffer);
             else
                 d3dContext.PixelShader.SetConstantBuffer(slot, _cbuffer);
-#endif
 
-#if OPENGL
-            var location = GL.GetUniformLocation(program, _name);
+#elif OPENGL
+
+            if (_program != program)
+            {
+                var location = GL.GetUniformLocation(program, _name);
+                if (location == -1)
+                    return;
+
+                _program = program;
+                _location = location;
+            }
+
             fixed (byte* bytePtr = _buffer)
             {
                 // TODO: We need to know the type of buffer float/int/bool
                 // and cast this correctly... else it doesn't work as i guess
                 // GL is checking the type of the uniform.
 
-                GL.Uniform4(location, _buffer.Length / 16, (float*)bytePtr);
+                GL.Uniform4(_location, _buffer.Length / 16, (float*)bytePtr);
             }
-#endif
 
-#if PSS
-            #warning Unimplemented
+#elif PSS
+#warning Unimplemented
             //TODO
 #endif
+
+            // Clear the dirty flag.
+            _dirty = false;
         }
+
     }
 }
