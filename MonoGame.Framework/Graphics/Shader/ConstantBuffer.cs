@@ -164,30 +164,36 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
 #if DIRECTX
-        internal void Apply(GraphicsDevice device, ShaderStage stage, int slot)
-#elif OPENGL
-        public unsafe void Apply(GraphicsDevice device, int program)
-#elif PSS
-        public void Apply(GraphicsDevice device, ShaderProgram program)
-#endif
-        {
 
-#if DIRECTX
+        internal void Apply(GraphicsDevice device, ShaderStage stage, int slot)
+        {
             // NOTE: We make the assumption here that the caller has
             // locked the d3dContext for us to use.
             var d3dContext = graphicsDevice._d3dContext;
 
             // Update the hardware buffer.
             if (_dirty)
+            {
                 d3dContext.UpdateSubresource(_buffer, _cbuffer);
-
+                _dirty = false;
+            }
+            
+            // Set the buffer to the right stage.
             if (stage == ShaderStage.Vertex)
                 d3dContext.VertexShader.SetConstantBuffer(slot, _cbuffer);
             else
                 d3dContext.PixelShader.SetConstantBuffer(slot, _cbuffer);
+        }
 
 #elif OPENGL
 
+        public unsafe void Apply(GraphicsDevice device, int program)
+        {
+            // NOTE: We assume here the program has 
+            // already been set on the device.
+
+            // If the program changed then lookup the
+            // uniform again and apply the state.
             if (_program != program)
             {
                 var location = GL.GetUniformLocation(program, _name);
@@ -196,7 +202,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 _program = program;
                 _location = location;
+                _dirty = true;
             }
+
+            // If the buffer content hasn't changed then we're
+            // done... use the previously set uniform state.
+            if (!_dirty)
+                return;
 
             fixed (byte* bytePtr = _buffer)
             {
@@ -207,14 +219,11 @@ namespace Microsoft.Xna.Framework.Graphics
                 GL.Uniform4(_location, _buffer.Length / 16, (float*)bytePtr);
             }
 
-#elif PSS
-#warning Unimplemented
-            //TODO
-#endif
-
             // Clear the dirty flag.
             _dirty = false;
         }
+
+#endif
 
     }
 }
