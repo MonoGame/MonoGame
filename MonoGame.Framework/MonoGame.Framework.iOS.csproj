@@ -304,8 +304,8 @@
     <Compile Include="iOS\iOSGameView_GLAbstraction.cs" />
     <Compile Include="iOS\iOSGameView_Touch.cs" />
     <Compile Include="iOS\PowerStatus.cs" />
-    <Compile Include="iOS\Media\MediaSource.cs" />
-    <Compile Include="iOS\Media\MediaLibrary.cs" />
+    <Compile Include="Media\MediaSource.cs" />
+    <Compile Include="Media\MediaLibrary.cs" />
     <Compile Include="iOS\Input\Accelerometer.cs" />
     <Compile Include="iOS\Media\Video.cs" />
     <Compile Include="iOS\Media\VideoPlayer.cs" />

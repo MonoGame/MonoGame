@@ -455,6 +455,8 @@
     <Compile Include="Graphics\OcclusionQuery.cs" />
     <Compile Include="Graphics\Effect\Effect.fx.cs" />
     <Compile Include="Graphics\Texture3D.cs" />
+    <Compile Include="Media\MediaLibrary.cs" />
+    <Compile Include="Media\MediaSource.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />

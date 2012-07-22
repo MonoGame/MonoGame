@@ -1,4 +1,4 @@
- #region License
+#region License
 // /*
 // Microsoft Public License (Ms-PL)
 // MonoGame - Copyright © 2009 The MonoGame Team
@@ -36,82 +36,57 @@
 // permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular
 // purpose and non-infringement.
 // */
-#endregion License 
+#endregion
 
 using System;
 using System.Collections.Generic;
 using System.IO;
 
+#if IPHONE
 using MonoTouch.MediaPlayer;
+#endif
 
 namespace Microsoft.Xna.Framework.Media
 {
-	public sealed class MediaLibrary : IDisposable
-    {
-		private PlaylistCollection _playLists;
-
-        public MediaLibrary()
-        {
-        }
-
-        public MediaLibrary(MediaSource mediaSource)
-        {
-	
-        }
-
-        public void Dispose()
-        {
-        }
-
-        public void SavePicture(string name, byte[] imageBuffer)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void SavePicture(string name, Stream source)
-        {
-            throw new NotImplementedException();
-        }
-
-/*        public AlbumCollection Albums
-        {
-            get
-            {
-            }
-        }
-
-        public ArtistCollection Artists
-        {
-            get
-            {
-            }
-        }
-
-        public GenreCollection Genres
-        {
-            get
-            {
-            }
-        }
-
-        public Microsoft.Xna.Framework.Media.MediaSource MediaSource
-        {
-            get
-            {
-            }
-        }
-
-        public PictureCollection Pictures
-        {
-            get
-            {
-            }
-        }*/
-
-        public PlaylistCollection Playlists
-        {
-            get
-            {				
+	public class MediaLibrary : IDisposable
+	{
+		public MediaLibrary ()
+		{
+		}
+		
+		public MediaLibrary (MediaSource mediaSource)
+		{
+		}
+		
+		public void Dispose()
+		{
+		}
+		
+		public void SavePicture (string name, byte[] imageBuffer)
+		{
+#if IPHONE || ANDROID
+			throw new NotImplementedException();
+#else
+			//only is relivant on mobile devices...
+			throw new NotSupportedException ();
+#endif
+		}
+		
+		public void SavePicture (string name, Stream source)
+		{
+#if IPHONE || ANDROID
+			throw new NotImplementedException();
+#else
+			//only is relivant on mobile devices...
+			throw new NotSupportedException ();
+#endif
+		}
+		
+#if IPHONE
+		public PlaylistCollection Playlists
+		{
+			get
+			{				
 				if (_playLists == null)
 				{
 					_playLists = new PlaylistCollection();
@@ -132,22 +107,19 @@ namespace Microsoft.Xna.Framework.Media
 					}
 				}
 				return _playLists;
-            }
-        }
-
-        /*public PictureAlbum RootPictureAlbum
-        {
-            get
-            {
-            }
-        }*/
-
-        public SongCollection Songs
-        {
-            get
-            {
+			}
+		}
+#endif
+		
+		public SongCollection Songs
+		{
+			get
+			{
 				return new SongCollection();
-            }
-        }
-    }
+			}
+		}
+		
+		
+	}
 }
+
