@@ -355,6 +355,26 @@ namespace Microsoft.Xna.Framework
         {
             _suppressDraw = true;
         }
+        
+        public void RunOneFrame()
+        {
+            AssertNotDisposed();
+            if (!Platform.BeforeRun())
+                return;
+
+            if (!_initialized) {
+                DoInitialize ();
+                _initialized = true;
+            }
+
+            BeginRun();
+
+            //Not quite right..
+            Tick ();
+
+            EndRun ();
+
+        }
 
         public void Run()
         {
@@ -367,8 +387,10 @@ namespace Microsoft.Xna.Framework
             if (!Platform.BeforeRun())
                 return;
 
-            DoInitialize();
-            _initialized = true;
+            if (!_initialized) {
+                DoInitialize ();
+                _initialized = true;
+            }
 
             BeginRun();
             switch (runBehavior)
