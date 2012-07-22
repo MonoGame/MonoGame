@@ -641,6 +641,7 @@ namespace Microsoft.Xna.Framework
 		internal void DoExiting()
 		{
 			OnExiting(this, EventArgs.Empty);
+			UnloadContent();
 		}
         internal void ResizeWindow(bool changed)
         {
