@@ -38,68 +38,74 @@ purpose and non-infringement.
 */
 #endregion License
 
+using System.Drawing;
+using System.Runtime.InteropServices;
+
+using MonoMac.Foundation;
+using MonoMac.AppKit;
 
 ﻿
 namespace Microsoft.Xna.Framework.Input
 {
 	public static class Mouse
 	{
-		private static int _x, _y;
-		private static float _scrollWheelValue;
-		private static ButtonState _leftButton = ButtonState.Released;
-		private static ButtonState _rightButton = ButtonState.Released;
-		private static ButtonState _middleButton = ButtonState.Released;
+		internal static int X, Y;
+		internal static float ScrollWheelValue;
+		internal static ButtonState LeftButton = ButtonState.Released;
+		internal static ButtonState RightButton = ButtonState.Released;
+		internal static ButtonState MiddleButton = ButtonState.Released;
+		
+		internal static GameWindow Window;
 		
 		public static MouseState GetState ()
 		{
-			MouseState ms = new MouseState(_x,_y);
-			ms.LeftButton = _leftButton;
-			ms.RightButton = _rightButton;
-			ms.MiddleButton = _middleButton;
-			ms.ScrollWheelValue = (int)_scrollWheelValue;
+			MouseState ms = new MouseState(X, Y);
+			ms.LeftButton = LeftButton;
+			ms.RightButton = RightButton;
+			ms.MiddleButton = MiddleButton;
+			ms.ScrollWheelValue = (int)ScrollWheelValue;
 			
 			return ms;
 		}
 
 		public static void SetPosition (int x, int y)
 		{
-			_x = x;
-			_y = y;
+			X = x;
+			Y = y;
+			
+			var mousePt = NSEvent.CurrentMouseLocation;
+			NSScreen currentScreen = null;
+			foreach (var screen in NSScreen.Screens) {
+				if (screen.Frame.Contains(mousePt)) {
+					currentScreen = screen;
+					break;
+				}
+			}
+			
+			var point = new PointF(x, Window.ClientBounds.Height-y);
+			var windowPt = Window.ConvertPointToView(point, null);
+			var screenPt = Window.Window.ConvertBaseToScreen(windowPt);
+			var flippedPt = new PointF(screenPt.X, currentScreen.Frame.Size.Height-screenPt.Y);
+			flippedPt.Y += currentScreen.Frame.Location.Y;
+			
+			
+			CGSetLocalEventsSuppressionInterval(0.0);
+			CGWarpMouseCursorPosition(flippedPt);
+			CGSetLocalEventsSuppressionInterval(0.25);
 		}
 
 		internal static void ResetMouse () {
-			_leftButton = ButtonState.Released;
-			_rightButton = ButtonState.Released;
-			_middleButton = ButtonState.Released;
+			LeftButton = ButtonState.Released;
+			RightButton = ButtonState.Released;
+			MiddleButton = ButtonState.Released;
 		}
+		
+		[DllImport (MonoMac.Constants.CoreGraphicsLibrary)]
+		extern static void CGWarpMouseCursorPosition(PointF newCursorPosition);
+		
+		[DllImport (MonoMac.Constants.CoreGraphicsLibrary)]
+		extern static void CGSetLocalEventsSuppressionInterval(double seconds);
 
-		internal static ButtonState LeftButton { 
-			get {
-				return _leftButton;
-			}
-			set { _leftButton = value; }
-		}
-
-		internal static ButtonState MiddleButton { 
-			get {
-				return _middleButton;
-			}
-			set { _middleButton = value; }			
-		}
-
-		internal static ButtonState RightButton { 
-			get {
-				return _rightButton;
-			}
-			set { _rightButton = value; }
-		}
-
-		internal static float ScrollWheelValue { 
-			get {
-				return _scrollWheelValue;
-			}
-			set { _scrollWheelValue = value; }
-		}
 	}
 }
 
