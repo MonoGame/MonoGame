@@ -46,6 +46,7 @@ Global
 		{B950DE10-AC5D-4BD9-B817-51247C4A732D}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
 		{B950DE10-AC5D-4BD9-B817-51247C4A732D}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
 		{B950DE10-AC5D-4BD9-B817-51247C4A732D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B950DE10-AC5D-4BD9-B817-51247C4A732D}.Debug|x86.Build.0 = Debug|Any CPU
 		{B950DE10-AC5D-4BD9-B817-51247C4A732D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B950DE10-AC5D-4BD9-B817-51247C4A732D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B950DE10-AC5D-4BD9-B817-51247C4A732D}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU

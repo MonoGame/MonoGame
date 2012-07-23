@@ -54,7 +54,14 @@
     <Compile Include="ContentProcessorContext.cs" />
     <Compile Include="EffectImporter.cs" />
     <Compile Include="ExternalReference.cs" />
+    <Compile Include="Graphics\AnimationChannel.cs" />
+    <Compile Include="Graphics\AnimationChannelDictionary.cs" />
+    <Compile Include="Graphics\AnimationContent.cs" />
+    <Compile Include="Graphics\AnimationContentDictionary.cs" />
+    <Compile Include="Graphics\AnimationKeyframe.cs" />
     <Compile Include="Graphics\EffectContent.cs" />
+    <Compile Include="Graphics\NodeContent.cs" />
+    <Compile Include="Graphics\NodeContentCollection.cs" />
     <Compile Include="IContentImporter.cs" />
     <Compile Include="IContentProcessor.cs" />
     <Compile Include="InvalidContentException.cs" />

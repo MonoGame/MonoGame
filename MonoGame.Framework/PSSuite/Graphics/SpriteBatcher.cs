@@ -44,8 +44,8 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.Xna.Framework;
 
-using Sce.Pss.Core.Graphics;
-using PssVertexBuffer = Sce.Pss.Core.Graphics.VertexBuffer;
+using Sce.PlayStation.Core.Graphics;
+using PssVertexBuffer = Sce.PlayStation.Core.Graphics.VertexBuffer;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -59,9 +59,10 @@ namespace Microsoft.Xna.Framework.Graphics
         GraphicsDevice _device;
   
         ushort[] _index;
-        PssVertexBuffer _vertexBuffer;
         VertexPosition2ColorTexture[] _vertexArray;
-
+  
+        static readonly VertexFormat[] _vertexFormat = new VertexFormat[] { VertexFormat.Float2, VertexFormat.UByte4N, VertexFormat.Float2 };
+        
 		public SpriteBatcher (GraphicsDevice device)
 		{
             _device = device;
@@ -81,8 +82,6 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
             _vertexArray = new VertexPosition2ColorTexture[4 * InitialVertexArraySize];
-            _vertexBuffer = new PssVertexBuffer(4 * InitialVertexArraySize, 6 * InitialVertexArraySize, VertexFormat.Float2, VertexFormat.UByte4N, VertexFormat.Float2);
-            _vertexBuffer.SetIndices(_index, 0, 0, 6 * InitialVertexArraySize);
 		}
 		
 		public SpriteBatchItem CreateBatchItem()
@@ -138,8 +137,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			// make sure the vertexArray has enough space
 			if ( _batchItemList.Count*4 > _vertexArray.Length )
 				ExpandVertexArray( _batchItemList.Count );
-			
-            _device._graphics.SetVertexBuffer(0, _vertexBuffer);
 
             //Populate the vertexArray
             for (int i = 0; i < _batchItemList.Count; i++)
@@ -155,7 +152,13 @@ namespace Microsoft.Xna.Framework.Graphics
 				_freeBatchItemQueue.Enqueue ( item );
 			}
 
-            FlushVertexArray(index);
+            //Get and fill the PssVertexBuffer
+            var vertexBuffer = _device.GetVertexBuffer(_vertexFormat, 4 * InitialVertexArraySize, 6 * InitialVertexArraySize);
+            vertexBuffer.SetIndices(_index, 0, 0, 6 * InitialVertexArraySize);
+            _device._graphics.SetVertexBuffer(0, vertexBuffer);
+            vertexBuffer.SetVertices(_vertexArray, 0, 0, index);
+            
+            
             startIndex = index = 0;
             
             //Draw each batch in the sprite batch (based on texture changes)
@@ -175,7 +178,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 index += 4;
             }
 
-			// flush the remaining vertexArray data
+            // flush the remaining vertexArray data
 			DrawVertexArray(startIndex, index);
 			
 			_batchItemList.Clear();
@@ -200,17 +203,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 _index[i * 6 + 5] = (ushort)(i * 4 + 2);
             }
 
-            _vertexBuffer.Dispose();
-            _vertexBuffer = new PssVertexBuffer(4 * newCount, 6 * newCount, VertexFormat.Float2, VertexFormat.UByte4N, VertexFormat.Float2);
-            
             _vertexArray = new VertexPosition2ColorTexture[4 * newCount];
-            _vertexBuffer.SetIndices(_index, 0, 0, 6 * newCount);
 		}
-  
-        void FlushVertexArray(int count)
-        {
-            _vertexBuffer.SetVertices(_vertexArray, 0, 0, count);
-        }
         
 		void DrawVertexArray ( int start, int end )
 		{

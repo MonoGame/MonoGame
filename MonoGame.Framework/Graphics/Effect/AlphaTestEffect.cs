@@ -19,7 +19,7 @@ using ActiveUniformType = OpenTK.Graphics.ES20.All;
 #elif MONOMAC
 using MonoMac.OpenGL;
 #elif PSS
-using Sce.Pss.Core.Graphics;
+using Sce.PlayStation.Core;
 #elif !WINRT
 using OpenTK.Graphics.OpenGL;
 

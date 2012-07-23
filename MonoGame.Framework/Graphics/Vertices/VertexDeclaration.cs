@@ -6,7 +6,7 @@ using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
 #elif PSS
-using Sce.Pss.Core.Graphics;
+using Sce.PlayStation.Core.Graphics;
 #elif DIRECTX
 using System.Reflection;
 using System.Collections.Generic;

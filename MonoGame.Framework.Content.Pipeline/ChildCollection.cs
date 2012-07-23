@@ -54,13 +54,18 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         where TParent : class
         where TChild : class
     {
+        TParent parent;
+
         /// <summary>
         /// Creates an instance of ChildCollection.
         /// </summary>
         /// <param name="parent">Parent object of the child objects returned in the collection.</param>
         protected ChildCollection(TParent parent)
+            : base()
         {
-            throw new NotImplementedException();
+            if (parent == null)
+                throw new ArgumentNullException("parent");
+            this.parent = parent;
         }
 
         /// <summary>
@@ -68,7 +73,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// </summary>
         protected override void ClearItems()
         {
-            throw new NotImplementedException();
+            // Remove parent reference from each child before clearing
+            foreach (TChild child in this)
+                SetParent(child, default(TParent));
+            base.ClearItems();
         }
 
         /// <summary>
@@ -85,7 +93,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// <param name="item">The child object being inserted.</param>
         protected override void InsertItem(int index, TChild item)
         {
-            throw new NotImplementedException();
+            // Make sure we have a 
+            if (item == null)
+                throw new ArgumentNullException("child");
+            if (GetParent(item) != null)
+                throw new InvalidOperationException("Child already has a parent");
+            SetParent(item, parent);
+            base.InsertItem(index, item);
         }
 
         /// <summary>
@@ -94,7 +108,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// <param name="index">The index of the item being removed.</param>
         protected override void RemoveItem(int index)
         {
-            throw new NotImplementedException();
+            TChild child = this[index];
+            SetParent(child, default(TParent));
+            base.RemoveItem(index);
         }
 
         /// <summary>
@@ -104,7 +120,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// <param name="item">The new value for the child object.</param>
         protected override void SetItem(int index, TChild item)
         {
-            throw new NotImplementedException();
+            if (item == null)
+                throw new ArgumentNullException("child");
+            if (GetParent(item) != null)
+                throw new InvalidOperationException("Child already has a parent");
+            TChild child = this[index];
+            SetParent(child, default(TParent));
+            SetParent(item, parent);
+            base.InsertItem(index, item);
         }
 
         /// <summary>

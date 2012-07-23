@@ -1,6 +1,6 @@
 using System;
 
-using PssVector4 = Sce.Pss.Core.Vector4;
+using PssVector4 = Sce.PlayStation.Core.Vector4;
 
 namespace Microsoft.Xna.Framework
 {

@@ -12,7 +12,7 @@ using OpenTK.Graphics.OpenGL;
 #elif GLES
 using OpenTK.Graphics.ES20;
 #elif PSS
-using Sce.Pss.Core.Graphics;
+using Sce.PlayStation.Core.Graphics;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics

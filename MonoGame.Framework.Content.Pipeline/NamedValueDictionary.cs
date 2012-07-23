@@ -140,7 +140,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// Adds an item to the collection.
         /// </summary>
         /// <param name="item">The item to add to the collection.</param>
-        private void Add(KeyValuePair<string, T> item)
+        void ICollection<KeyValuePair<string, T>>.Add(KeyValuePair<string, T> item)
         {
             ((ICollection<KeyValuePair<string, T>>)dict).Add(item);
         }
@@ -158,7 +158,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// </summary>
         /// <param name="item">The object to locate in the collection.</param>
         /// <returns>true if the collection contains the object; false otherwise.</returns>
-        private bool Contains(KeyValuePair<string, T> item)
+        bool ICollection<KeyValuePair<string, T>>.Contains(KeyValuePair<string, T> item)
         {
             return ((ICollection<KeyValuePair<string, T>>)dict).Contains(item);
         }
@@ -168,7 +168,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// </summary>
         /// <param name="array">The destination array.</param>
         /// <param name="arrayIndex">The index at which to begin the copy.</param>
-        private void CopyTo(KeyValuePair<string, T>[] array, int arrayIndex)
+        void ICollection<KeyValuePair<string, T>>.CopyTo(KeyValuePair<string, T>[] array, int arrayIndex)
         {
             ((ICollection<KeyValuePair<string, T>>)dict).CopyTo(array, arrayIndex);
         }
@@ -184,7 +184,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// <summary>
         /// Gets a value indicating if this object is read-only.
         /// </summary>
-        public bool IsReadOnly
+        bool ICollection<KeyValuePair<string, T>>.IsReadOnly
         {
             get { return false; }
         }
@@ -194,9 +194,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// </summary>
         /// <param name="item">The item to remove from the collection.</param>
         /// <returns>true if the item was successfully removed from the collection; false otherwise.</returns>
-        private bool Remove(KeyValuePair<string, T> item)
+        bool ICollection<KeyValuePair<string, T>>.Remove(KeyValuePair<string, T> item)
         {
-            return Remove(item);
+            return ((ICollection<KeyValuePair<string, T>>)dict).Remove(item);
         }
 
         /// <summary>

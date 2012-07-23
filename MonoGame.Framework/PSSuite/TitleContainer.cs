@@ -41,7 +41,7 @@
 using System;
 using System.IO;
 
-using Sce.Pss.Core;
+using Sce.PlayStation.Core;
 
 namespace Microsoft.Xna.Framework
 {

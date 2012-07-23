@@ -57,25 +57,48 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// Windows Phone
         /// </summary>
         WindowsPhone,
+
+        // MonoGame-specific platforms listed below
+
         /// <summary>
         /// Apple iOS-based devices (iPod Touch, iPhone, iPad)
+        /// (MonoGame)
         /// </summary>
         iOS,
         /// <summary>
         /// Android-based devices
+        /// (MonoGame)
         /// </summary>
         Android,
         /// <summary>
         /// Linux-based PCs
+        /// (MonoGame)
         /// </summary>
         Linux,
         /// <summary>
         /// Apple Mac OSX-based devices (iMac, MacBook, MacBook Air, etc)
+        /// (MonoGame)
         /// </summary>
         MacOSX,
         /// <summary>
         /// Windows 8 Metro apps
+        /// (MonoGame)
         /// </summary>
         Metro,
+        /// <summary>
+        /// Google Chrome Native Client
+        /// (MonoGame)
+        /// </summary>
+        NativeClient,
+        /// <summary>
+        /// Ouya video game console, a variation of Android
+        /// (MonoGame)
+        /// </summary>
+        Ouya,
+        /// <summary>
+        /// Sony PlayStation Mobile (PS Vita)
+        /// (MonoGame)
+        /// </summary>
+        PlayStationMobile,
     }
 }
