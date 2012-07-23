@@ -121,7 +121,10 @@ namespace Microsoft.Xna.Framework.Input
             ms.LeftButton = _mouse[OpenTK.Input.MouseButton.Left] ? ButtonState.Pressed : ButtonState.Released;
 			ms.RightButton = _mouse[OpenTK.Input.MouseButton.Right] ? ButtonState.Pressed : ButtonState.Released;
 			ms.MiddleButton = _mouse[OpenTK.Input.MouseButton.Middle] ? ButtonState.Pressed : ButtonState.Released;;
-			ms.ScrollWheelValue = _mouse.Wheel;
+
+			// WheelPrecise is divided by 120 (WHEEL_DELTA) in OpenTK (WinGLNative.cs)
+			// We need to counteract it to get the same value XNA provides
+			ms.ScrollWheelValue = (int)( _mouse.WheelPrecise * 120 );
 #endif			
 
 			return ms;
