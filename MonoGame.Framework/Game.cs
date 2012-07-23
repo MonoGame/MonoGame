@@ -149,7 +149,7 @@ namespace Microsoft.Xna.Framework
             // Set the window title.
             // TODO: Get the title from the WindowsPhoneManifest.xml for WP7 projects.
             string windowTitle = string.Empty;
-            var assembly = Assembly.GetCallingAssembly();
+            var assembly = Assembly.GetEntryAssembly();
 
             //Use the Title attribute of the Assembly if possible.
             var assemblyTitleAtt = ((AssemblyTitleAttribute)AssemblyTitleAttribute.GetCustomAttribute(assembly, typeof(AssemblyTitleAttribute)));
@@ -641,6 +641,7 @@ namespace Microsoft.Xna.Framework
 		internal void DoExiting()
 		{
 			OnExiting(this, EventArgs.Empty);
+			UnloadContent();
 		}
         internal void ResizeWindow(bool changed)
         {

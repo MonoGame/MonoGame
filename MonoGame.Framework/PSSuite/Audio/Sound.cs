@@ -21,7 +21,9 @@ namespace Microsoft.Xna.Framework.Audio
         public void Dispose()
         {
             _soundPlayer.Stop();
-			_soundPlayer.Dispose();
+            
+            // gives Error when Soundplayer is reused
+//			_soundPlayer.Dispose();
             _sound.Dispose();
         }
 

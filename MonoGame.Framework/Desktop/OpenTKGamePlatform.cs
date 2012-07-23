@@ -250,12 +250,16 @@ namespace Microsoft.Xna.Framework
         {
             base.Present();
 
-            _view.Window.SwapBuffers();
+            if (_view != null) _view.Window.SwapBuffers();
         }
 		
         protected override void Dispose(bool disposing)
         {
-            _view.Dispose ();
+            if (_view != null)
+            {
+                _view.Dispose();
+                _view = null;
+            }
 			
 			base.Dispose(disposing);
         }
