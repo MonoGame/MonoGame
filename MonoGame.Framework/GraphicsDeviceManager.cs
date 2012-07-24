@@ -371,9 +371,14 @@ namespace Microsoft.Xna.Framework
             }
             else
             {
-                newClientBounds.Width = GraphicsDevice.DisplayMode.Width;
-                newClientBounds.Height = GraphicsDevice.DisplayMode.Height;
-                _game.Window.ClientBounds = new Rectangle(0, 0, GraphicsDevice.DisplayMode.Width, GraphicsDevice.DisplayMode.Height);
+                // Set the ClientBounds to match the DisplayMode but swapped if necessary to match current orientation
+                bool isLandscape = preferredAspectRatio > 1.0f;
+                int w = GraphicsDevice.DisplayMode.Width;
+                int h = GraphicsDevice.DisplayMode.Height;
+
+                newClientBounds.Width = isLandscape ? Math.Max(w, h) : Math.Min(w, h);
+                newClientBounds.Height = isLandscape ? Math.Min(w, h) : Math.Max(w, h);
+                _game.Window.ClientBounds = new Rectangle(0, 0, newClientBounds.Width, newClientBounds.Height);
             }
             GraphicsDevice.Viewport = new Viewport(newClientBounds.X, newClientBounds.Y, newClientBounds.Width, newClientBounds.Height);
             Android.Util.Log.Debug("MonoGame", "GraphicsDeviceManager.ResetClientBounds: newClientBounds=" + newClientBounds.ToString());

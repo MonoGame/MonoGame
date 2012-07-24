@@ -55,6 +55,7 @@
     <Compile Include="Android\AndroidCompatibility.cs" />
     <Compile Include="Android\AndroidGamePlatform.cs" />
     <Compile Include="Android\Input\Mouse.cs" />
+    <Compile Include="Android\Input\Touch\AndroidTouchEventManager.cs" />
     <Compile Include="Android\OrientationListener.cs" />
     <Compile Include="Android\ScreenReciever.cs" />
     <Compile Include="Android\TitleContainer.cs" />
@@ -382,7 +383,6 @@
     <Compile Include="Input\KeyboardState.cs" />
     <Compile Include="Graphics\Vertices\VertexElementColor.cs" />
     <Compile Include="Audio\XactClip.cs" />
-    <Compile Include="Android\Input\Touch\GestureListener.cs" />
     <Compile Include="Audio\XactSound.cs" />
     <Compile Include="Android\Media\Song.cs" />
     <Compile Include="Audio\NoAudioHardwareException.cs" />
