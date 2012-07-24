@@ -74,6 +74,11 @@
     <Compile Include="Graphics\NodeContentCollection.cs" />
     <Compile Include="Graphics\TextureContent.cs" />
     <Compile Include="Graphics\TextureReferenceDictionary.cs" />
+    <Compile Include="Graphics\VertexChannel.cs" />
+    <Compile Include="Graphics\VertexChannelCollection.cs" />
+    <Compile Include="Graphics\VertexChannelGeneric.cs" />
+    <Compile Include="Graphics\VertexChannelNames.cs" />
+    <Compile Include="Graphics\VertexContent.cs" />
     <Compile Include="IContentImporter.cs" />
     <Compile Include="IContentProcessor.cs" />
     <Compile Include="InvalidContentException.cs" />
