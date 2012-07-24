@@ -92,7 +92,10 @@ namespace Microsoft.Xna.Framework
             GraphicsDevice.PresentationParameters.SwapChainPanel = SwapChainPanel;
 
             if (createDevice)
+            {
+                GraphicsDevice.GraphicsProfile = GraphicsProfile;
                 GraphicsDevice.Initialize();
+            }
             else
             {
                 GraphicsDevice.CreateSizeDependentResources();
