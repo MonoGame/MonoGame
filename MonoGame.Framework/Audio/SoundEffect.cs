@@ -306,7 +306,7 @@ namespace Microsoft.Xna.Framework.Audio
             var instance = new SoundEffectInstance();
 #if WINRT
             instance._effect = this;
-            instance._voice = new SourceVoice(SoundEffect.Device, _format);            
+            instance._voice = new SourceVoice(SoundEffect.Device, _format, VoiceFlags.None, XAudio2.MaximumFrequencyRatio);            
 #else			
 			instance.Sound = _sound;			
 #endif
