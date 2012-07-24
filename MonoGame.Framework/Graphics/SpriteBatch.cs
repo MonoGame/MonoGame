@@ -66,12 +66,11 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			_matrix = transformMatrix;
 			
+			
 			if (sortMode == SpriteSortMode.Immediate) {
 				//setup things now so a user can chage them
 				Setup();
 			}
-            else
-                graphicsDevice.ApplyState();
 		}
 
 		public void Begin (SpriteSortMode sortMode, BlendState blendState)
