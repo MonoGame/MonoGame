@@ -101,9 +101,22 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
         }
 
+        internal static List<EffectPass> AllEffectPasses = new List<EffectPass>();
+
+
+        internal static void InitializeAll()
+        {
+            // Dispose all the cached effects.
+            foreach (var pass in AllEffectPasses)
+                pass.Initialize();
+        }
+
         private void Initialize()
         {
 #if OPENGL
+            if (!AllEffectPasses.Contains(this))
+                AllEffectPasses.Add(this);
+
             Threading.BlockOnUIThread(() =>
             {
                 // TODO: Shouldn't we be calling GL.DeleteProgram() somewhere?

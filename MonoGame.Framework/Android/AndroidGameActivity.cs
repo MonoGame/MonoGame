@@ -72,11 +72,39 @@ namespace Microsoft.Xna.Framework
             if (Resumed != null)
                 Resumed(this, EventArgs.Empty);
 
+            if (restarting)
+            {
+                if (Game.Window.GraphicsContext == null || Game.Window.GraphicsContext.IsDisposed)
+                {
+                    //Game.Window.GraphicsContext = new OpenTK.Graphics.GraphicsContext(Game.Window.GraphicsMode, Game.Window.WindowInfo);
+                }
+            }
+            restarting = false;
+
             var deviceManager = (IGraphicsDeviceManager)Game.Services.GetService(typeof(IGraphicsDeviceManager));
             if (deviceManager == null)
                 return;
             (deviceManager as GraphicsDeviceManager).ForceSetFullScreen();
             Game.Window.RequestFocus();
+        }
+
+        bool restarting = false;
+        protected override void OnRestart()
+        {
+            base.OnRestart();
+            Game.Window.OnRestart();
+
+            restarting = true;
+        }
+
+        protected override void OnStart()
+        {
+            base.OnStart();
+        }
+
+        protected override void OnStop()
+        {
+            base.OnStop();
         }
     }
 	

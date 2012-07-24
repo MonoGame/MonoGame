@@ -92,6 +92,11 @@ namespace Microsoft.Xna.Framework.Content
 
         internal object ReadAsset<T>()
         {
+            return ReadAsset<T>(null);
+        }
+
+        internal object ReadAsset<T>(object existingInstance)
+        {
             object result = null;
 
             typeReaderManager = new ContentTypeReaderManager(this);
@@ -109,7 +114,7 @@ namespace Microsoft.Xna.Framework.Content
             if (index > 0)
             {
                 ContentTypeReader contentReader = typeReaders[index - 1];
-                result = ReadObject<T>(contentReader);
+                result = ReadObject<T>(contentReader, (T)existingInstance);
             }
 
             // Read shared resources

@@ -142,7 +142,19 @@ namespace Microsoft.Xna.Framework
 		{
 			//
 		}
-		
+
+        bool contextWasLost = false;
+        internal void OnRestart()
+        {
+            contextWasLost = GraphicsContext == null || GraphicsContext.IsDisposed;
+        }
+
+        protected override void DestroyFrameBuffer()
+        {
+            base.DestroyFrameBuffer();
+            Android.Util.Log.Debug("MonoGame", "AndroidGameWindow.DestroyFrameBuffer");
+        }
+
 		protected override void CreateFrameBuffer()
 		{
 #if true			
@@ -150,15 +162,18 @@ namespace Microsoft.Xna.Framework
             {
                 GLContextVersion = GLContextVersion.Gles2_0;
 				base.CreateFrameBuffer();
+                Android.Util.Log.Debug("MonoGame", "AndroidGameWindow.CreateFrameBuffer");
 		    } 
 			catch (Exception) 
 #endif			
 			{
                 throw new NotSupportedException("Could not create OpenGLES 2.0 frame buffer");
 		    }
-            if (_game.GraphicsDevice != null)
+            if (_game.GraphicsDevice != null && contextWasLost)
             {
                 _game.GraphicsDevice.Initialize();
+                //EffectPass.InitializeAll();
+                Microsoft.Xna.Framework.Content.ContentManager.ReloadAllContent();
             }
 
             if (!GraphicsContext.IsCurrent)
