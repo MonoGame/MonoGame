@@ -948,7 +948,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             get
             {
-                throw new NotImplementedException();
+                return GraphicsDeviceStatus.Normal;
             }
         }
 
