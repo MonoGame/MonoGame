@@ -41,16 +41,12 @@ purpose and non-infringement.
 using System;
 using Microsoft.Xna.Framework.Graphics;
 
-#if LINUX || (WINDOWS && !WINRT)
-using OpenTK.Graphics.OpenGL;
-#endif
-
 #if MONOMAC
 using MonoMac.OpenGL;
-#endif
-
-#if OPENGL
+#elif GLES
 using OpenTK.Graphics.ES20;
+#elif OPENGL
+using OpenTK.Graphics.OpenGL;
 #endif
 
 #if ANDROID
