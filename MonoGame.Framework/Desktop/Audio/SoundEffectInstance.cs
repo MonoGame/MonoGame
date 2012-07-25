@@ -167,7 +167,7 @@ namespace Microsoft.Xna.Framework.Audio
 			// Pan
 			AL.Source (sourceId, ALSource3f.Position, _pan, 0, 0.1f);
 			// Volume
-			AL.Source (sourceId, ALSourcef.Gain, _volume);
+			AL.Source (sourceId, ALSourcef.Gain, _volume * SoundEffect.MasterVolume);
 			// Looping
 			AL.Source (sourceId, ALSourceb.Looping, IsLooped);
 			// Pitch
@@ -287,7 +287,7 @@ namespace Microsoft.Xna.Framework.Audio
 				_volume = value;
 				if (hasSourceId) {
 					// Volume
-					AL.Source (sourceId, ALSourcef.Gain, _volume);
+					AL.Source (sourceId, ALSourcef.Gain, _volume * SoundEffect.MasterVolume);
 				}
 
 			}
