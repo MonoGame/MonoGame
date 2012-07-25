@@ -203,6 +203,11 @@ namespace Microsoft.Xna.Framework
                     windowState = window.WindowState; // maximize->normal and normal->maximize are usually set from the outside
                 else
                     window.WindowState = windowState; // usually fullscreen-stuff is set from the code
+                
+                // fixes issue on linux (and windows?) that AllowUserResizing is not set any more when exiting fullscreen mode
+                WindowBorder desired = AllowUserResizing ? WindowBorder.Resizable : WindowBorder.Fixed;
+                if (desired != window.WindowBorder && window.WindowState != WindowState.Fullscreen)
+                    window.WindowBorder = desired;
             }
 
 
@@ -259,6 +264,7 @@ namespace Microsoft.Xna.Framework
             // Provide the graphics context for background loading
             Threading.BackgroundContext = new GraphicsContext(GraphicsMode.Default, window.WindowInfo);
             Threading.WindowInfo = window.WindowInfo;
+            Threading.BackgroundContext.MakeCurrent( Threading.WindowInfo );
 
             keys = new List<Keys>();
 
