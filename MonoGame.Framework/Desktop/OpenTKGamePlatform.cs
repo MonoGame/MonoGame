@@ -139,12 +139,15 @@ namespace Microsoft.Xna.Framework
 #if LINUX
             Tao.Sdl.SdlMixer.Mix_CloseAudio();
 #endif
+            OpenTK.DisplayDevice.Default.RestoreResolution();
         }
 
         public override bool BeforeUpdate(GameTime gameTime)
         {
-			// Update our OpenAL sound buffer pools
-			soundControllerInstance.Update();
+            IsActive = _view.Window.Focused;
+            
+            // Update our OpenAL sound buffer pools
+            soundControllerInstance.Update();
 
             // Let the touch panel update states.
             TouchPanel.UpdateState();
