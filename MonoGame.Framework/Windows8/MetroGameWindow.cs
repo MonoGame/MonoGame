@@ -189,11 +189,11 @@ namespace Microsoft.Xna.Framework
         {
             SetClientBounds( args.Size.Width, args.Size.Height );
 
+            OnClientSizeChanged();
+
             // If we have a valid client bounds then update the graphics device.
             if (_clientBounds.Width > 0 && _clientBounds.Height > 0)
                 UpdateGraphicsDevice();
-
-            OnClientSizeChanged();
 
             Platform.ViewState = ApplicationView.Value;
         }
@@ -237,12 +237,12 @@ namespace Microsoft.Xna.Framework
             // Set the new orientation.
             _orientation = ToOrientation(DisplayProperties.CurrentOrientation);
 
+            // Call the user callback.
+            OnOrientationChanged();
+
             // If we have a valid client bounds then update the graphics device.
             if (_clientBounds.Width > 0 && _clientBounds.Height > 0)
                 UpdateGraphicsDevice();
-
-            // Call the user callback.
-            OnOrientationChanged();
         }
 
         private void UpdateGraphicsDevice()
@@ -257,16 +257,8 @@ namespace Microsoft.Xna.Framework
             // TODO: Is the Win8 Simulator broken or is this really correct?
             //
             int newWidth, newHeight;
-            if (true) //isLandscape == isDefaultLandscape)
-            {
-                newWidth = _clientBounds.Width;
-                newHeight = _clientBounds.Height;
-            }
-            else
-            {
-                newWidth = _clientBounds.Height;
-                newHeight = _clientBounds.Width;
-            }
+            newWidth = Game.graphicsDeviceManager.PreferredBackBufferWidth;
+            newHeight = Game.graphicsDeviceManager.PreferredBackBufferHeight;
 
             // Update the graphics device.
             var device = Game.GraphicsDevice;
