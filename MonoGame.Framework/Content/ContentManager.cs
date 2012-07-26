@@ -118,7 +118,7 @@ namespace Microsoft.Xna.Framework.Content
 				throw new ArgumentNullException("serviceProvider");
 			}
 			this.serviceProvider = serviceProvider;
-            ContentManagers.Add(this);
+            AddContentManager(this);
 		}
 
 		public ContentManager(IServiceProvider serviceProvider, string rootDirectory)
@@ -133,7 +133,7 @@ namespace Microsoft.Xna.Framework.Content
 			}
 			this.RootDirectory = rootDirectory;
 			this.serviceProvider = serviceProvider;
-            ContentManagers.Add(this);
+            AddContentManager(this);
 		}
 
 		public void Dispose()
@@ -143,7 +143,7 @@ namespace Microsoft.Xna.Framework.Content
 			// since all the cleanup will already be done.
 			GC.SuppressFinalize(this);
             // Once disposed, content manager wont be used again
-            ContentManagers.Remove(this);
+            RemoveContentManager(this);
 		}
 
 		// If disposing is true, it was called explicitly.
@@ -580,7 +580,6 @@ namespace Microsoft.Xna.Framework.Content
 		        if (disposable != null)
 		            disposable.Dispose();
 		    }
-		    RemoveContentManager(this);
 			disposableAssets.Clear();
 		    loadedAssets.Clear();
 		}
