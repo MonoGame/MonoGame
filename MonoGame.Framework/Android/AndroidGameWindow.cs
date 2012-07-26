@@ -153,12 +153,6 @@ namespace Microsoft.Xna.Framework
             contextWasLost = GraphicsContext == null || GraphicsContext.IsDisposed;
         }
 
-        protected override void DestroyFrameBuffer()
-        {
-            base.DestroyFrameBuffer();
-            Android.Util.Log.Debug("MonoGame", "AndroidGameWindow.DestroyFrameBuffer");
-        }
-
 		protected override void CreateFrameBuffer()
 		{
             Android.Util.Log.Debug("MonoGame", "AndroidGameWindow.CreateFrameBuffer");
@@ -177,13 +171,14 @@ namespace Microsoft.Xna.Framework
             if (_game.GraphicsDevice != null && contextWasLost)
             {
                 _game.GraphicsDevice.Initialize();
-                //EffectPass.InitializeAll();
+                EffectPass.RecompileAll();
                 Microsoft.Xna.Framework.Content.ContentManager.ReloadAllContent();
             }
 
             if (!GraphicsContext.IsCurrent)
                 MakeCurrent();
 		}
+
         protected override void DestroyFrameBuffer()
         {
             Android.Util.Log.Debug("MonoGame", "AndroidGameWindow.DestroyFrameBuffer");

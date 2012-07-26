@@ -45,6 +45,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
         static readonly float[] _posFixup = new float[4];
 
+
+
 #endif // OPENGL
 
 #if PSS
@@ -103,12 +105,14 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal static List<EffectPass> AllEffectPasses = new List<EffectPass>();
 
-
-        internal static void InitializeAll()
+        internal static void RecompileAll()
         {
-            // Dispose all the cached effects.
             foreach (var pass in AllEffectPasses)
+            {
+                pass._vertexShader.CompileShader();
+                pass._pixelShader.CompileShader();
                 pass.Initialize();
+            }
         }
 
         private void Initialize()
