@@ -77,6 +77,7 @@ using System.Reflection;
 using System.Diagnostics;
 #if WINRT
 using System.Threading.Tasks;
+using Windows.ApplicationModel.Activation;
 #endif
 
 using Microsoft.Xna.Framework.Content;
@@ -331,6 +332,7 @@ namespace Microsoft.Xna.Framework
 
 #if WINRT
         public event EventHandler<ViewStateChangedEventArgs> ApplicationViewChanged;
+        public ApplicationExecutionState PreviousExecutionState { get; internal set; }
 #endif
 
         #endregion
