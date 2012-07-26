@@ -1,4 +1,4 @@
-#region License
+﻿#region License
 /*
 Microsoft Public License (Ms-PL)
 MonoGame - Copyright © 2009 The MonoGame Team
@@ -39,110 +39,149 @@ purpose and non-infringement.
 #endregion License
 
 using System;
+using Microsoft.Xna.Framework.Graphics;
 
-#if OPENGL
+#if MONOMAC
+using MonoMac.OpenGL;
+#elif GLES
 using OpenTK.Graphics.ES20;
+#elif OPENGL
+using OpenTK.Graphics.OpenGL;
 #endif
 
 #if ANDROID
 using Android.Views;
 #endif
 
-using Microsoft.Xna.Framework.Graphics;
-
 namespace Microsoft.Xna.Framework
 {
     public class GraphicsDeviceManager : IGraphicsDeviceService, IDisposable, IGraphicsDeviceManager
     {
-		private Game _game;
-		private GraphicsDevice _graphicsDevice;
-		private int _preferredBackBufferHeight;
-		private int _preferredBackBufferWidth;
-		private bool _preferMultiSampling;
-		private DisplayOrientation _supportedOrientations;
-		private bool wantFullScreen = true;
+        private Game _game;
+        private GraphicsDevice _graphicsDevice;
+        private int _preferredBackBufferHeight;
+        private int _preferredBackBufferWidth;
+        private bool _preferMultiSampling;
+        private DisplayOrientation _supportedOrientations;
+#if !LINUX
+        private bool wantFullScreen = true;
+#endif
+#if WINDOWS || WINRT
+        private DepthFormat _preferredDepthStencilFormat;
+#endif
+#if MONOMAC
+		private bool synchronizedWithVerticalRefresh = true;
+#endif
 
         public GraphicsDeviceManager(Game game)
         {
             if (game == null)
-            {
                 throw new ArgumentNullException("Game Cannot Be Null");
-            }
-            
-			_game = game;
 
+            _game = game;
+
+            _supportedOrientations = DisplayOrientation.Default;
+
+#if WINDOWS || MONOMAC || WINRT
+            _preferredBackBufferHeight = PresentationParameters._defaultBackBufferHeight;
+            _preferredBackBufferWidth = PresentationParameters._defaultBackBufferWidth;
+#else
             // Preferred buffer width/height is used to determine default supported orientations,
             // so set the default values to match Xna behaviour of landscape only by default.
             // Note also that it's using the device window dimensions.
             _preferredBackBufferWidth = Math.Max(game.Window.ClientBounds.Height, game.Window.ClientBounds.Width);
             _preferredBackBufferHeight = Math.Min(game.Window.ClientBounds.Height, game.Window.ClientBounds.Width);
-            _supportedOrientations = DisplayOrientation.Default;
-			
+#endif
+
+#if WINDOWS || WINRT
+            _preferredDepthStencilFormat = DepthFormat.None;
+            SynchronizeWithVerticalRetrace = true;
+#endif
+
             if (game.Services.GetService(typeof(IGraphicsDeviceManager)) != null)
-            {
                 throw new ArgumentException("Graphics Device Manager Already Present");
-            }
-			
+
             game.Services.AddService(typeof(IGraphicsDeviceManager), this);
             game.Services.AddService(typeof(IGraphicsDeviceService), this);
+
+#if (WINDOWS && !WINRT) || LINUX
+            // TODO: This should not occur here... it occurs during Game.Initialize().
+            CreateDevice();
+#endif
         }
-		
-		public void CreateDevice()
-		{
-			_graphicsDevice = new GraphicsDevice();
 
-			Initialize();
-			ApplyChanges();
+        public void CreateDevice()
+        {
+            _graphicsDevice = new GraphicsDevice();
+
+#if LINUX
+			_preferredBackBufferHeight = _graphicsDevice.PresentationParameters.BackBufferHeight;
+			_preferredBackBufferWidth = _graphicsDevice.PresentationParameters.BackBufferWidth;
+#endif
+
+            Initialize();
+
+            // Is this really correct?
+#if !(WINDOWS || WINRT) && !MONOMAC && !LINUX
+            ApplyChanges();
             ResetClientBounds();
+#endif
 
-			OnDeviceCreated(EventArgs.Empty);
-		}
+            OnDeviceCreated(EventArgs.Empty);
+        }
 
-		public bool BeginDraw ()
-		{
-			throw new NotImplementedException();
-		}
+        public bool BeginDraw()
+        {
+            throw new NotImplementedException();
+        }
 
-		public void EndDraw ()
-		{
-			throw new NotImplementedException();
-		}
-		
-		 #region IGraphicsDeviceService Members
+        public void EndDraw()
+        {
+            throw new NotImplementedException();
+        }
+
+        #region IGraphicsDeviceService Members
 
         public event EventHandler<EventArgs> DeviceCreated;
         public event EventHandler<EventArgs> DeviceDisposing;
         public event EventHandler<EventArgs> DeviceReset;
-        public event EventHandler<EventArgs> DeviceResetting;		
-		public event EventHandler<PreparingDeviceSettingsEventArgs> PreparingDeviceSettings;
-		
-		internal void OnDeviceDisposing (EventArgs e)
-		{
-			var h = DeviceDisposing;
-			if (h != null)
-				h (this, e);
-		}
-		
-		internal void OnDeviceCreated (EventArgs e)
-		{
-			var h = DeviceCreated;
-			if (h != null)
-				h (this, e);
-		}
-		
-		internal void OnDeviceResetting (EventArgs e)
-		{
-			var h = DeviceResetting;
-			if (h != null)
-				h (this, e);
-		}
+        public event EventHandler<EventArgs> DeviceResetting;
+        public event EventHandler<PreparingDeviceSettingsEventArgs> PreparingDeviceSettings;
 
-		internal void OnDeviceReset (EventArgs e)
-		{
-			var h = DeviceReset;
-			if (h != null)
-				h (this, e);
-		}		
+        // FIXME: Why does the GraphicsDeviceManager not know enough about the
+        //        GraphicsDevice to raise these events without help?
+        internal void OnDeviceDisposing(EventArgs e)
+        {
+            Raise(DeviceDisposing, e);
+        }
+
+        // FIXME: Why does the GraphicsDeviceManager not know enough about the
+        //        GraphicsDevice to raise these events without help?
+        internal void OnDeviceResetting(EventArgs e)
+        {
+            Raise(DeviceResetting, e);
+        }
+
+        // FIXME: Why does the GraphicsDeviceManager not know enough about the
+        //        GraphicsDevice to raise these events without help?
+        internal void OnDeviceReset(EventArgs e)
+        {
+            Raise(DeviceReset, e);
+        }
+
+        // FIXME: Why does the GraphicsDeviceManager not know enough about the
+        //        GraphicsDevice to raise these events without help?
+        internal void OnDeviceCreated(EventArgs e)
+        {
+            Raise(DeviceCreated, e);
+        }
+
+        private void Raise<TEventArgs>(EventHandler<TEventArgs> handler, TEventArgs e)
+            where TEventArgs : EventArgs
+        {
+            if (handler != null)
+                handler(this, e);
+        }
 
         #endregion
 
@@ -150,12 +189,32 @@ namespace Microsoft.Xna.Framework
 
         public void Dispose()
         {
+#if WINDOWS || WINRT
+            if (_graphicsDevice != null)
+            {
+                _graphicsDevice.Dispose();
+                _graphicsDevice = null;
+            }
+#endif
         }
 
         #endregion
 
         public void ApplyChanges()
         {
+#if WINDOWS || LINUX || WINRT
+            _game.ResizeWindow(false);
+#elif MONOMAC
+            _graphicsDevice.PresentationParameters.IsFullScreen = wantFullScreen;
+
+			if (_preferMultiSampling) {
+				_graphicsDevice.PreferedFilter = All.Linear;
+			} else {
+				_graphicsDevice.PreferedFilter = All.Nearest;
+			}
+
+			_game.applyChanges(this);
+#else
             if (GraphicsDevice != null)
             {
                 GraphicsDevice.PresentationParameters.DisplayOrientation = _game.Window.CurrentOrientation;
@@ -167,39 +226,70 @@ namespace Microsoft.Xna.Framework
 
                 GraphicsDevice.PresentationParameters.BackBufferWidth = isLandscape ? Math.Max(w, h) : Math.Min(w, h);
                 GraphicsDevice.PresentationParameters.BackBufferHeight = isLandscape ? Math.Min(w, h) : Math.Max(w, h);
-#if !PSS
+#if !PSS && !IPHONE
                 // Trigger a change in orientation in case the supported orientations have changed
                 _game.Window.SetOrientation(_game.Window.CurrentOrientation, false);
 #endif
             }
+#endif
         }
 
         private void Initialize()
         {
+#if WINDOWS || WINRT
+            _game.Window.SetSupportedOrientations(_supportedOrientations);
+
+            //_graphicsDevice.PresentationParameters.BackBufferFormat = _preferredBackBufferWidth;
+            _graphicsDevice.PresentationParameters.BackBufferWidth = _preferredBackBufferWidth;
+            _graphicsDevice.PresentationParameters.BackBufferHeight = _preferredBackBufferHeight;
+            _graphicsDevice.PresentationParameters.DepthStencilFormat = _preferredDepthStencilFormat;
+
+            _graphicsDevice.PresentationParameters.IsFullScreen = false;
+            _graphicsDevice.PresentationParameters.DeviceWindowHandle = _game.Window.Handle;
+            _graphicsDevice.GraphicsProfile = GraphicsProfile;
+            _graphicsDevice.Initialize();
+
+            PreferMultiSampling = _preferMultiSampling;
+#else
+
+#if MONOMAC
+            _graphicsDevice.PresentationParameters.IsFullScreen = wantFullScreen;
+#elif LINUX
+            _graphicsDevice.PresentationParameters.IsFullScreen = false;
+#else
             // Set "full screen"  as default
             _graphicsDevice.PresentationParameters.IsFullScreen = true;
+#endif // MONOMAC
 
-            ApplyChanges();
+#if !PSS
+            if (_preferMultiSampling)
+            {
+                _graphicsDevice.PreferedFilter = All.Linear;
+            }
+            else
+            {
+                _graphicsDevice.PreferedFilter = All.Nearest;
+            }
+#endif
 
             _graphicsDevice.Initialize();
 
-#if !PSS
-			if (_preferMultiSampling)
-			{
-				_graphicsDevice.PreferedFilter = All.Linear;
-			}
-			else 
-			{
-				_graphicsDevice.PreferedFilter = All.Nearest;
-			}
+#if !MONOMAC
+            ApplyChanges();
 #endif
-		}
-		
+
+#endif // WINDOWS || WINRT
+        }
+
         public void ToggleFullScreen()
         {
-			IsFullScreen = !IsFullScreen;
+            IsFullScreen = !IsFullScreen;
         }
-		
+
+#if WINDOWS || WINRT
+        public GraphicsProfile GraphicsProfile { get; set; }
+#endif
+
         public Microsoft.Xna.Framework.Graphics.GraphicsDevice GraphicsDevice
         {
             get
@@ -212,21 +302,32 @@ namespace Microsoft.Xna.Framework
         {
             get
             {
-				if (_graphicsDevice != null)
-					return _graphicsDevice.PresentationParameters.IsFullScreen;
-				else
-					return wantFullScreen;				 
+#if WINDOWS || LINUX || WINRT
+                return _graphicsDevice.PresentationParameters.IsFullScreen;
+#else
+                if (_graphicsDevice != null)
+                    return _graphicsDevice.PresentationParameters.IsFullScreen;
+                else
+                    return wantFullScreen;
+#endif
             }
             set
             {
-				wantFullScreen = value;
-				if (_graphicsDevice != null) 
-				{
-					_graphicsDevice.PresentationParameters.IsFullScreen = value;
+#if WINDOWS || LINUX || WINRT
+                bool changed = value != _graphicsDevice.PresentationParameters.IsFullScreen;
+                _graphicsDevice.PresentationParameters.IsFullScreen = value;
+
+                _game.ResizeWindow(changed);
+#else
+                wantFullScreen = value;
+                if (_graphicsDevice != null)
+                {
+                    _graphicsDevice.PresentationParameters.IsFullScreen = value;
 #if ANDROID
                     ForceSetFullScreen();
 #endif
-				}
+                }
+#endif
             }
         }
 
@@ -248,20 +349,20 @@ namespace Microsoft.Xna.Framework
             }
             set
             {
-				_preferMultiSampling = value;
-				if ( _graphicsDevice != null )
-				{
-#if !PSS
-					if (_preferMultiSampling) 
-					{
-						_graphicsDevice.PreferedFilter = All.Linear;
-					}
-					else 
-					{
-						_graphicsDevice.PreferedFilter = All.Nearest;
-					}
+                _preferMultiSampling = value;
+#if !PSS && !WINRT
+                if (_graphicsDevice != null)
+                {
+                    if (_preferMultiSampling)
+                    {
+                        _graphicsDevice.PreferedFilter = All.Linear;
+                    }
+                    else
+                    {
+                        _graphicsDevice.PreferedFilter = All.Nearest;
+                    }
+                }
 #endif
-				}
             }
         }
 
@@ -284,7 +385,7 @@ namespace Microsoft.Xna.Framework
             }
             set
             {
-				_preferredBackBufferHeight = value;
+                _preferredBackBufferHeight = value;
             }
         }
 
@@ -296,7 +397,7 @@ namespace Microsoft.Xna.Framework
             }
             set
             {
-				_preferredBackBufferWidth = value;				
+                _preferredBackBufferWidth = value;
             }
         }
 
@@ -304,36 +405,61 @@ namespace Microsoft.Xna.Framework
         {
             get
             {
+#if WINDOWS || WINRT
+                return _preferredDepthStencilFormat;
+#else
                 throw new NotImplementedException();
+#endif
             }
             set
             {
+#if WINDOWS || WINRT
+                _preferredDepthStencilFormat = value;
+#endif
             }
         }
 
+#if WINDOWS || WINRT
+        public bool SynchronizeWithVerticalRetrace { get; set; }
+#else
         public bool SynchronizeWithVerticalRetrace
         {
             get
             {
+#if MONOMAC
+                return synchronizedWithVerticalRefresh;
+#elif LINUX
+                return _game.Platform.VSyncEnabled;
+#else
                 throw new NotImplementedException();
+#endif
             }
             set
             {
+#if MONOMAC
+                synchronizedWithVerticalRefresh = value;
+#elif LINUX
+                _game.Platform.VSyncEnabled = value;
+#endif
             }
         }
-		
-		public DisplayOrientation SupportedOrientations 
-		{ 
-			get
-			{
-				return _supportedOrientations;
-			}
-			set
-			{
-				_supportedOrientations = value;
-				_game.Window.SetSupportedOrientations(_supportedOrientations);
-			}
-		}
+#endif // WINDOWS || WINRT
+
+        public DisplayOrientation SupportedOrientations
+        {
+            get
+            {
+                return _supportedOrientations;
+            }
+            set
+            {
+                _supportedOrientations = value;
+                // Is this really correct?
+#if !(WINDOWS || WINRT) && !MONOMAC && !LINUX
+                _game.Window.SetSupportedOrientations(_supportedOrientations);
+#endif
+            }
+        }
 
         internal void ResetClientBounds()
         {
@@ -371,9 +497,14 @@ namespace Microsoft.Xna.Framework
             }
             else
             {
-                newClientBounds.Width = GraphicsDevice.DisplayMode.Width;
-                newClientBounds.Height = GraphicsDevice.DisplayMode.Height;
-                _game.Window.ClientBounds = new Rectangle(0, 0, GraphicsDevice.DisplayMode.Width, GraphicsDevice.DisplayMode.Height);
+                // Set the ClientBounds to match the DisplayMode but swapped if necessary to match current orientation
+                bool isLandscape = preferredAspectRatio > 1.0f;
+                int w = GraphicsDevice.DisplayMode.Width;
+                int h = GraphicsDevice.DisplayMode.Height;
+
+                newClientBounds.Width = isLandscape ? Math.Max(w, h) : Math.Min(w, h);
+                newClientBounds.Height = isLandscape ? Math.Min(w, h) : Math.Max(w, h);
+                _game.Window.ClientBounds = new Rectangle(0, 0, newClientBounds.Width, newClientBounds.Height);
             }
             GraphicsDevice.Viewport = new Viewport(newClientBounds.X, newClientBounds.Y, newClientBounds.Width, newClientBounds.Height);
             Android.Util.Log.Debug("MonoGame", "GraphicsDeviceManager.ResetClientBounds: newClientBounds=" + newClientBounds.ToString());
@@ -382,4 +513,3 @@ namespace Microsoft.Xna.Framework
 
     }
 }
-

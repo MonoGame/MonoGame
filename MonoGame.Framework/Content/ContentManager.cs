@@ -60,10 +60,9 @@ namespace Microsoft.Xna.Framework.Content
 		private string _rootDirectory = string.Empty;
 		private IServiceProvider serviceProvider;
 		private IGraphicsDeviceService graphicsDeviceService;
-		protected Dictionary<string, object> loadedAssets = new Dictionary<string, object>();
-
-		List<IDisposable> disposableAssets = new List<IDisposable>();
-		bool disposed;
+        private Dictionary<string, object> loadedAssets = new Dictionary<string, object>();
+		private List<IDisposable> disposableAssets = new List<IDisposable>();
+        private bool disposed;
 		
 		private static object ContentManagerLock = new object();
         private static List<ContentManager> ContentManagers = new List<ContentManager>();
@@ -368,7 +367,12 @@ namespace Microsoft.Xna.Framework.Content
 				else
 					disposableAssets.Add(result as IDisposable);
 			}
-			
+
+			if (result == null)
+			{
+				throw new ContentLoadException("Could not load " + originalAssetName + " asset!");
+			}
+		
 			CurrentAssetDirectory = null;
 			
             // Store the full path for later
@@ -487,7 +491,19 @@ namespace Microsoft.Xna.Framework.Content
             }
             return reader;
         }
-		
+
+        internal void RecordDisposable(IDisposable disposable)
+        {
+            Debug.Assert(disposable != null, "The disposable is null!");
+
+            // Be sure the system isn't accidentally recording
+            // disposable objects twice!
+            Debug.Assert(!disposableAssets.Contains(disposable), "The disposable has already been recorded!");
+
+            // Store it for disposal later.
+            disposableAssets.Add(disposable);
+        }
+
 		protected void ReloadContent()
         {
             foreach (var asset in loadedAssets)

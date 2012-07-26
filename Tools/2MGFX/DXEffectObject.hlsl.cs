@@ -161,26 +161,21 @@ namespace Microsoft.Xna.Framework.Graphics
                     shaderFlags |= SharpDX.D3DCompiler.ShaderFlags.OptimizationLevel3;
                 }
 
-                // First compile the effect into bytecode.                
-                using (var includer = new TwoMGFX.CompilerInclude())
-                {
-                    var result = SharpDX.D3DCompiler.ShaderBytecode.Compile(
-                        shaderInfo.fileContent, 
-                        shaderFunction, 
-                        shaderProfile, 
-                        shaderFlags, 
-                        0, 
-                        null, 
-                        includer,
-                        shaderInfo.fileName);
+                // Compile the shader into bytecode.                
+                var result = SharpDX.D3DCompiler.ShaderBytecode.Compile(
+                    shaderInfo.fileContent, 
+                    shaderFunction, 
+                    shaderProfile, 
+                    shaderFlags, 
+                    0, 
+                    null, 
+                    null,
+                    shaderInfo.fileName);
 
-                    if (result.HasErrors)
-                        throw new Exception(result.Message);
+                if (result.HasErrors)
+                    throw new Exception(result.Message);
 
-                    shaderByteCode = result.Bytecode;
-
-                    //var source = shaderByteCode.Disassemble();
-                }
+                shaderByteCode = result.Bytecode;
             }
             catch (Exception ex)
             {
