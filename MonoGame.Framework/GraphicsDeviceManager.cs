@@ -314,10 +314,7 @@ namespace Microsoft.Xna.Framework
             set
             {
 #if WINDOWS || LINUX || WINRT
-                bool changed = value != _graphicsDevice.PresentationParameters.IsFullScreen;
                 _graphicsDevice.PresentationParameters.IsFullScreen = value;
-
-                _game.ResizeWindow(changed);
 #else
                 wantFullScreen = value;
                 if (_graphicsDevice != null)
