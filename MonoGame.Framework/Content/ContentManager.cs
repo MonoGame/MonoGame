@@ -47,6 +47,7 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Path = System.IO.Path;
+using System.Diagnostics;
 
 #if !WINRT
 using Microsoft.Xna.Framework.Audio;
@@ -261,7 +262,7 @@ namespace Microsoft.Xna.Framework.Content
                 {
                     using (BinaryReader xnbReader = new BinaryReader(stream))
                     {
-                        using (ContentReader reader = GetContentReaderFromXnb(assetName, ref stream, xnbReader))
+                        using (ContentReader reader = GetContentReaderFromXnb(assetName, ref stream, xnbReader, recordDisposableObject))
                         {
                             result = reader.ReadAsset<T>();
                             if (result is GraphicsResource)
@@ -381,7 +382,7 @@ namespace Microsoft.Xna.Framework.Content
 			return (T)result;
 		}
 
-        private ContentReader GetContentReaderFromXnb(string originalAssetName, ref Stream stream, BinaryReader xnbReader)
+        private ContentReader GetContentReaderFromXnb(string originalAssetName, ref Stream stream, BinaryReader xnbReader, Action<IDisposable> recordDisposableObject)
         {
             // The first 4 bytes should be the "XNB" header. i use that to detect an invalid file
             byte x = xnbReader.ReadByte();
@@ -483,11 +484,13 @@ namespace Microsoft.Xna.Framework.Content
                 }
 
                 decompressedStream.Seek(0, SeekOrigin.Begin);
-                reader = new ContentReader(this, decompressedStream, this.graphicsDeviceService.GraphicsDevice, originalAssetName, version);
+                reader = new ContentReader(this, decompressedStream, this.graphicsDeviceService.GraphicsDevice,
+                                                            originalAssetName, version, recordDisposableObject);
             }
             else
             {
-                reader = new ContentReader(this, stream, this.graphicsDeviceService.GraphicsDevice, originalAssetName, version);
+                reader = new ContentReader(this, stream, this.graphicsDeviceService.GraphicsDevice,
+                                                            originalAssetName, version, recordDisposableObject);
             }
             return reader;
         }
@@ -551,7 +554,7 @@ namespace Microsoft.Xna.Framework.Content
                 {
                     using (BinaryReader xnbReader = new BinaryReader(stream))
                     {
-                        using (ContentReader reader = GetContentReaderFromXnb(assetName, ref stream, xnbReader))
+                        using (ContentReader reader = GetContentReaderFromXnb(assetName, ref stream, xnbReader, null))
                         {
                             reader.ReadAsset<T>(currentAsset);
                         }
