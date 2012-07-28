@@ -6,7 +6,7 @@ using TwoMGFX;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-	public partial class DXEffectObject
+	internal partial class DXEffectObject
 	{
 
         private const string Header = "MGFX";

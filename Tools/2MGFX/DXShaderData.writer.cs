@@ -1,7 +1,9 @@
+using System.IO;
+using TwoMGFX;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-    public partial class DXShaderData
+    internal partial class DXShaderData
     {
         public void Write(BinaryWriter writer, Options options)
         {

@@ -17,7 +17,7 @@ namespace Microsoft.Xna.Framework.Graphics
             var effect = new DXEffectObject();
 
             // These are filled out as we process stuff.
-            effect.ConstantBuffers = new List<ConstantBuffer>();
+            effect.ConstantBuffers = new List<DXConstantBufferData>();
             effect.Shaders = new List<DXShaderData>();
 
             // Go thru the techniques and that will find all the 
@@ -201,7 +201,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 if (shaderInfo.DX11Profile)
                     dxShader = DXShaderData.CreateHLSL(bytecode, isVertexShader, ConstantBuffers, Shaders.Count, shaderInfo.Debug);
                 else
-                    dxShader = DXShaderData.CreateGLSL(bytecode, isVertexShader, ConstantBuffers, Shaders.Count);
+                    dxShader = DXShaderData.CreateGLSL(bytecode, ConstantBuffers, Shaders.Count);
 
                 Shaders.Add(dxShader);
             }

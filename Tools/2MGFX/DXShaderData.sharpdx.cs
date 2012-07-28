@@ -1,9 +1,11 @@
+using System.Collections.Generic;
+using TwoMGFX;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-    public partial class DXShader
+    internal partial class DXShaderData
     {
-        public static DXShader CreateHLSL(byte[] byteCode, bool isVertexShader, List<ConstantBuffer> cbuffers, int sharedIndex, bool debug)
+        public static DXShaderData CreateHLSL(byte[] byteCode, bool isVertexShader, List<DXConstantBufferData> cbuffers, int sharedIndex, bool debug)
         {
             var dxshader = new DXShaderData();
             dxshader.IsVertexShader = isVertexShader;
