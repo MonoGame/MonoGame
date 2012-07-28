@@ -68,8 +68,6 @@ namespace Microsoft.Xna.Framework.Content
 		private static object ContentManagerLock = new object();
         private static List<ContentManager> ContentManagers = new List<ContentManager>();
 
-        private Dictionary<string, string> loadedAssetPaths = new Dictionary<string, string>();
-
         private static void AddContentManager(ContentManager contentManager)
         {
             lock (ContentManagerLock)
@@ -193,15 +191,8 @@ namespace Microsoft.Xna.Framework.Content
 			Stream stream;
 			try
             {
-				string assetPath;
-                if (!loadedAssetPaths.TryGetValue(assetName, out assetPath))
-                {
-                    assetPath = Path.Combine(_rootDirectory, assetName) + ".xnb";
-                }
+                string assetPath = Path.Combine(_rootDirectory, assetName) + ".xnb";
                 stream = TitleContainer.OpenStream(assetPath);
-
-                // The stream was opened without exception so the path must be valid
-                loadedAssetPaths[assetName] = assetPath;
 
 #if ANDROID
                 // Read the asset into memory in one go. This results in a ~50% reduction
