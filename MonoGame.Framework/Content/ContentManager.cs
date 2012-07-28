@@ -501,12 +501,10 @@ namespace Microsoft.Xna.Framework.Content
         {
             Debug.Assert(disposable != null, "The disposable is null!");
 
-            // Be sure the system isn't accidentally recording
-            // disposable objects twice!
-            Debug.Assert(!disposableAssets.Contains(disposable), "The disposable has already been recorded!");
-
-            // Store it for disposal later.
-            disposableAssets.Add(disposable);
+            // Avoid recording disposable objects twice. ReloadAsset will try to record the disposables again.
+            // We don't know which asset recorded which disposable so just guard against storing multiple of the same instance.
+            if (!disposableAssets.Contains(disposable))
+                disposableAssets.Add(disposable);
         }
 
         /// <summary>
@@ -575,7 +573,9 @@ namespace Microsoft.Xna.Framework.Content
                     {
                         using (ContentReader reader = GetContentReaderFromXnb(assetName, ref stream, xnbReader, null))
                         {
+                            reader.InitializeTypeReaders();
                             reader.ReadObject<T>(currentAsset);
+                            reader.ReadSharedResources();
                         }
                     }
                 }
