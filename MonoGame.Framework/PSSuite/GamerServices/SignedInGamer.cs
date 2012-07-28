@@ -41,7 +41,7 @@ purpose and non-infringement.
 #region Statement
 ﻿using System;
 
-using Sce.Pss.Core.Environment;
+using Sce.PlayStation.Core.Environment;
 
 #endregion Statement
 

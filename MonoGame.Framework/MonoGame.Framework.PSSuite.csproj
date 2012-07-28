@@ -36,7 +36,7 @@
     <Reference Include="System" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
-    <Reference Include="Sce.Pss.Core" />
+    <Reference Include="Sce.PlayStation.Core" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BatteryChargeStatus.cs" />
@@ -272,7 +272,6 @@
     <Compile Include="Content\ContentManager.cs" />
     <Compile Include="Content\ContentReaders\CurveReader.cs" />
     <Compile Include="Input\GamePadDeadZone.cs" />
-    <Compile Include="Input\GamePadType.cs" />
     <Compile Include="Graphics\Vertices\VertexElementColor.cs" />
     <Compile Include="Graphics\Vertices\IndexElementSize.cs" />
     <Compile Include="Audio\XactSound.cs" />
@@ -361,7 +360,7 @@
     <Folder Include="PSSuite\Input\" />
     <Folder Include="PSSuite\GamerServices\" />
   </ItemGroup>
-  <Import Project="$(MSBuildExtensionsPath)\Sce\Sce.Pss.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath)\Sce\Sce.Psm.CSharp.targets" />
   <ProjectExtensions>
     <MonoDevelop>
       <Properties>

@@ -9,8 +9,8 @@ using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
 #elif PSS
-using Sce.Pss.Core.Graphics;
-using PssVertexBuffer = Sce.Pss.Core.Graphics.VertexBuffer;
+using Sce.PlayStation.Core.Graphics;
+using PssVertexBuffer = Sce.PlayStation.Core.Graphics.VertexBuffer;
 #elif GLES
 using OpenTK.Graphics.ES20;
 using BufferTarget = OpenTK.Graphics.ES20.All;
@@ -28,7 +28,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #if DIRECTX
         internal SharpDX.Direct3D11.Buffer _buffer;
 #elif PSS
-        internal PssVertexBuffer _buffer;
+        internal ushort[] _buffer;
 #else
 		internal uint ibo;	
 #endif
@@ -78,7 +78,9 @@ namespace Microsoft.Xna.Framework.Graphics
                                                         0  // StructureSizeInBytes
                                                         );
 #elif PSS
-            _buffer = new PssVertexBuffer(0, indexCount);
+            if (indexElementSize != IndexElementSize.SixteenBits)
+                throw new NotImplementedException("PSS Currently only supports ushort (SixteenBits) index elements");
+            _buffer = new ushort[indexCount];
 #else
             Threading.BlockOnUIThread(() =>
             {
@@ -237,16 +239,17 @@ namespace Microsoft.Xna.Framework.Graphics
 #elif PSS
             if (typeof(T) == typeof(ushort))
             {
-#warning This is a terrible way to achieve what I want to do
-                _buffer.SetIndices((ushort[])(object)data, 0, 0, elementCount); 
+                Array.Copy(data, offsetInBytes / sizeof(ushort), _buffer, startIndex, elementCount);
             }
             else
             {
-                ushort[] clone = new ushort[data.Length];
-                for (int i = 0; i < data.Length; i++)
-#warning This is a terrible way to achieve what I want to do
-                    clone[i] = (ushort)(object)data[i];
-                _buffer.SetIndices(clone, 0, 0, elementCount);
+                throw new NotImplementedException("PSS Currently only supports ushort (SixteenBits) index elements");
+                //Something like as follows probably works if you really need this, but really just make a ushort array!
+                /*
+                int indexOffset = offsetInBytes / sizeof(T);
+                for (int i = 0; i < elementCount; i++)
+                    _buffer[i + startIndex] = (ushort)(object)data[i + indexOffset];
+                */
             }
 #else
             Threading.BlockOnUIThread(() =>
@@ -266,13 +269,16 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public override void Dispose()
         {
-#if DIRECTX || PSS
+#if DIRECTX
 
             if (_buffer != null)
             {
                 _buffer.Dispose();
                 _buffer = null;
             }
+#elif PSS
+            //Do nothing
+            _buffer = null;
 #else
 			GL.DeleteBuffers(1, ref ibo);
 #endif

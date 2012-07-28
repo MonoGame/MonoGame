@@ -41,6 +41,7 @@ namespace Microsoft.Xna.Framework.Content
     public sealed class ContentReader : BinaryReader
     {
         private ContentManager contentManager;
+        private Action<IDisposable> recordDisposableObject;
         private ContentTypeReaderManager typeReaderManager;
         private GraphicsDevice graphicsDevice;
         private string assetName;
@@ -65,10 +66,11 @@ namespace Microsoft.Xna.Framework.Content
             }
         }
 
-        internal ContentReader(ContentManager manager, Stream stream, GraphicsDevice graphicsDevice, string assetName, int version)
+        internal ContentReader(ContentManager manager, Stream stream, GraphicsDevice graphicsDevice, string assetName, int version, Action<IDisposable> recordDisposableObject)
             : base(stream)
         {
             this.graphicsDevice = graphicsDevice;
+            this.recordDisposableObject = recordDisposableObject;
             this.contentManager = manager;
             this.assetName = assetName;
 			this.version = version;
@@ -217,6 +219,18 @@ namespace Microsoft.Xna.Framework.Content
             return result;
         }
             
+        private void RecordDisposable<T>(T result)
+        {
+            var disposable = result as IDisposable;
+            if (disposable == null)
+                return;
+
+            if (recordDisposableObject != null)
+                recordDisposableObject(disposable);
+            else
+                contentManager.RecordDisposable(disposable);
+        }
+
         public T ReadObject<T>()
         {			
             int typeReaderIndex = Read7BitEncodedInt();
@@ -224,22 +238,33 @@ namespace Microsoft.Xna.Framework.Content
             if (typeReaderIndex == 0) 
                 return default(T);
                             
-            return (T)typeReaders[typeReaderIndex - 1].Read(this, default(T));
+            var result = (T)typeReaders[typeReaderIndex - 1].Read(this, default(T));
+
+            RecordDisposable(result);
+
+            return result;
         }
 
         public T ReadObject<T>(ContentTypeReader typeReader)
         {
-            return (T)typeReader.Read(this, default(T));
+            var result = (T)typeReader.Read(this, default(T));
+            
+            RecordDisposable(result);
+
+            return result;
         }
 
         public T ReadObject<T>(T existingInstance)
         {
             ContentTypeReader typeReader = typeReaderManager.GetTypeReader(typeof(T));
-            if (typeReader != null)
-            {
-                return (T)typeReader.Read(this, existingInstance);
-            }
-            throw new ContentLoadException(String.Format("Could not read object type " + typeof(T).Name));
+            if (typeReader == null)
+                throw new ContentLoadException(String.Format("Could not read object type " + typeof(T).Name));
+
+            var result = (T)typeReader.Read(this, existingInstance);
+
+            RecordDisposable(result);
+
+            return result;
         }
 
         public T ReadObject<T>(ContentTypeReader typeReader, T existingInstance)
@@ -250,7 +275,12 @@ namespace Microsoft.Xna.Framework.Content
             if (!typeReader.TargetType.IsValueType)
 #endif
                 return (T)ReadObject<object>();
-            return (T)typeReader.Read(this, existingInstance);
+
+            var result = (T)typeReader.Read(this, existingInstance);
+
+            RecordDisposable(result);
+
+            return result;
         }
 
         public Quaternion ReadQuaternion()
@@ -270,7 +300,7 @@ namespace Microsoft.Xna.Framework.Content
 
         public T ReadRawObject<T>(ContentTypeReader typeReader)
         {
-            throw new NotImplementedException();
+            return (T)ReadRawObject<T>(typeReader, default(T));
         }
 
         public T ReadRawObject<T>(T existingInstance)

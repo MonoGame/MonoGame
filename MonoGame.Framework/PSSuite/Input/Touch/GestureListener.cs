@@ -1,6 +1,6 @@
 using System;
 
-using Sce.Pss.Core.Input;
+using Sce.PlayStation.Core.Input;
 	
 	
 namespace Microsoft.Xna.Framework.Input.Touch
