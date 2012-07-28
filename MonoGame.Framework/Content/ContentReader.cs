@@ -94,11 +94,6 @@ namespace Microsoft.Xna.Framework.Content
 
         internal object ReadAsset<T>()
         {
-            return ReadAsset<T>(null);
-        }
-
-        internal object ReadAsset<T>(object existingInstance)
-        {
             object result = null;
 
             typeReaderManager = new ContentTypeReaderManager(this);
@@ -116,7 +111,7 @@ namespace Microsoft.Xna.Framework.Content
             if (index > 0)
             {
                 ContentTypeReader contentReader = typeReaders[index - 1];
-                result = ReadObject<T>(contentReader, (T)existingInstance);
+                result = ReadObject<T>(contentReader);
             }
 
             // Read shared resources
@@ -261,10 +256,18 @@ namespace Microsoft.Xna.Framework.Content
 
         public T ReadObject<T>(T existingInstance)
         {
-            ContentTypeReader typeReader = typeReaderManager.GetTypeReader(typeof(T));
-            if (typeReader == null)
+            typeReaderManager = new ContentTypeReaderManager(this);
+            typeReaders = typeReaderManager.LoadAssetReaders();
+            foreach (ContentTypeReader r in typeReaders)
+            {
+                r.Initialize(typeReaderManager);
+            }
+
+            int typeReaderIndex = base.Read7BitEncodedInt();
+            if (typeReaderIndex >= this.typeReaders.Length || this.typeReaders[typeReaderIndex] == null)
                 throw new ContentLoadException(String.Format("Could not read object type " + typeof(T).Name));
 
+            ContentTypeReader typeReader = this.typeReaders[typeReaderIndex];
             var result = (T)typeReader.Read(this, existingInstance);
 
             RecordDisposable(result);

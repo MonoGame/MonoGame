@@ -74,7 +74,8 @@ namespace Microsoft.Xna.Framework.Content
         {
             lock (ContentManagerLock)
             {
-                ContentManagers.Add(contentManager);
+                if (!ContentManagers.Contains(contentManager))
+                    ContentManagers.Add(contentManager);
             }
         }
 
@@ -198,6 +199,10 @@ namespace Microsoft.Xna.Framework.Content
                     assetPath = Path.Combine(_rootDirectory, assetName) + ".xnb";
                 }
                 stream = TitleContainer.OpenStream(assetPath);
+
+                // The stream was opened without exception so the path must be valid
+                loadedAssetPaths[assetName] = assetPath;
+
 #if ANDROID
                 // Read the asset into memory in one go. This results in a ~50% reduction
                 // in load times on Android due to slow Android asset streams.
@@ -376,9 +381,6 @@ namespace Microsoft.Xna.Framework.Content
 		
 			CurrentAssetDirectory = null;
 			
-            // Store the full path for later
-            loadedAssetPaths[originalAssetName] = assetName;
-
 			return (T)result;
 		}
 
@@ -507,22 +509,39 @@ namespace Microsoft.Xna.Framework.Content
             disposableAssets.Add(disposable);
         }
 
-		protected void ReloadContent()
+        /// <summary>
+        /// Virtual property to allow a derived ContentManager to have it's assets reloaded
+        /// </summary>
+        protected virtual Dictionary<string, object> LoadedAssets
         {
-            foreach (var asset in loadedAssets)
+            get { return loadedAssets; }
+        }
+
+		protected virtual void ReloadContent()
+        {
+            foreach (var asset in LoadedAssets)
             {
                 if (asset.Value is Texture2D)
                 {
                     ReloadAsset<Texture2D>(asset.Key, asset.Value as Texture2D);
                 }
+                else if (asset.Value is SpriteFont)
+                {
+                    ReloadAsset<SpriteFont>(asset.Key, asset.Value as SpriteFont);
+                }
                 else if (asset.Value is Model)
                 {
                     ReloadAsset<Model>(asset.Key, asset.Value as Model);
                 }
+                // Not requried as we are reloading all effect anyways?
+                //else if (asset.Value is Effect)
+                //{
+                //    ReloadAsset<Effect>(asset.Key, asset.Value as Effect);
+                //}
             }
         }
-        
-        protected void ReloadAsset<T>(string originalAssetName, T currentAsset)
+
+        protected virtual void ReloadAsset<T>(string originalAssetName, T currentAsset)
         {
 			string assetName = originalAssetName;
 			if (string.IsNullOrEmpty(assetName))
@@ -556,7 +575,7 @@ namespace Microsoft.Xna.Framework.Content
                     {
                         using (ContentReader reader = GetContentReaderFromXnb(assetName, ref stream, xnbReader, null))
                         {
-                            reader.ReadAsset<T>(currentAsset);
+                            reader.ReadObject<T>(currentAsset);
                         }
                     }
                 }
