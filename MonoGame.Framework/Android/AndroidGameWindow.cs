@@ -71,6 +71,7 @@ namespace Microsoft.Xna.Framework
         private DisplayOrientation _currentOrientation;
         private AndroidTouchEventManager _touchManager = null;
 		private bool exiting = false;
+        private bool _contextWasLost = false;
 
         public bool TouchEnabled
         {
@@ -147,10 +148,12 @@ namespace Microsoft.Xna.Framework
 			//
 		}
 
-        bool contextWasLost = false;
         internal void OnRestart()
         {
-            contextWasLost = GraphicsContext == null || GraphicsContext.IsDisposed;
+            // If restarting, check if the context was lost. It appears that it always is,
+            // but I suspect that it's possible to avoid this case as some games don't need
+            // to reload their textures after switching back from another app.
+            _contextWasLost = GraphicsContext == null || GraphicsContext.IsDisposed;
         }
 
 		protected override void CreateFrameBuffer()
@@ -168,11 +171,15 @@ namespace Microsoft.Xna.Framework
 			{
                 throw new NotSupportedException("Could not create OpenGLES 2.0 frame buffer");
 		    }
-            if (_game.GraphicsDevice != null && contextWasLost)
+            if (_game.GraphicsDevice != null && _contextWasLost)
             {
+                _contextWasLost = false;
                 _game.GraphicsDevice.Initialize();
                 EffectPass.RecompileAll();
-                Microsoft.Xna.Framework.Content.ContentManager.ReloadAllContent();
+                Microsoft.Xna.Framework.Content.ContentManager.ReloadGraphicsContent();
+
+                _game.graphicsDeviceManager.OnDeviceReset(EventArgs.Empty);
+                _game.GraphicsDevice.OnDeviceReset();
             }
 
             if (!GraphicsContext.IsCurrent)

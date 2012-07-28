@@ -88,13 +88,13 @@ namespace Microsoft.Xna.Framework.Content
             }
         }
 
-        internal static void ReloadAllContent()
+        internal static void ReloadGraphicsContent()
         {
             lock (ContentManagerLock)
             {
                 foreach (var contentManager in ContentManagers)
                 {
-                    contentManager.ReloadContent();
+                    contentManager.ReloadGraphicsAssets();
                 }
             }
         }
@@ -515,7 +515,7 @@ namespace Microsoft.Xna.Framework.Content
             get { return loadedAssets; }
         }
 
-		protected virtual void ReloadContent()
+		protected virtual void ReloadGraphicsAssets()
         {
             foreach (var asset in LoadedAssets)
             {
@@ -531,7 +531,7 @@ namespace Microsoft.Xna.Framework.Content
                 {
                     ReloadAsset<Model>(asset.Key, asset.Value as Model);
                 }
-                // Not requried as we are reloading all effect anyways?
+                // Not requried as we are recompiling them from cached source anyway - see EffectPass.RecompileAll().
                 //else if (asset.Value is Effect)
                 //{
                 //    ReloadAsset<Effect>(asset.Key, asset.Value as Effect);
@@ -589,7 +589,7 @@ namespace Microsoft.Xna.Framework.Content
 			}
 			catch (ContentLoadException)
 			{
-				// Try to reload as a non-content file.
+				// Try to reload as a non-xnb file.
                 // Just textures supported for now.
 
 				assetName = TitleContainer.GetFilename(Path.Combine (_rootDirectory, assetName));
