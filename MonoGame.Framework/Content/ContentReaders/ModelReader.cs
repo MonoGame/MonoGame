@@ -160,7 +160,11 @@ namespace Microsoft.Xna.Framework.Content
 
                 for (uint j = 0; j < partCount; j++)
                 {
-                    ModelMeshPart part = new ModelMeshPart();
+                    ModelMeshPart part;
+                    if (existingInstance != null)
+                        part = existingInstance.Meshes[i].MeshParts[(int)j];
+                    else
+                        part = new ModelMeshPart();
 
 					part.VertexOffset = reader.ReadInt32();
                     part.NumVertices = reader.ReadInt32();
@@ -188,12 +192,24 @@ namespace Microsoft.Xna.Framework.Content
 
 					
                 }
+
+                if (existingInstance != null)
+                    continue;
+
 				ModelMesh mesh = new ModelMesh(reader.GraphicsDevice, parts);
 				mesh.Name = name;
 				mesh.ParentBone = bones[parentBoneIndex];
 				mesh.ParentBone.AddMesh(mesh);
 				mesh.BoundingSphere = boundingSphere;
 				meshes.Add(mesh);
+            }
+
+            if (existingInstance != null)
+            {
+                // Read past remaining data and return existing instance
+                ReadBoneReference(reader, boneCount);
+                reader.ReadObject<object>();
+                return existingInstance;
             }
 
             // Read the final pieces of model data.
