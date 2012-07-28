@@ -203,7 +203,7 @@ namespace Microsoft.Xna.Framework
 				{
 					_game.Tick();
 				}
-				else
+				else if (_game.GraphicsDevice != null)
 				{ 
 					_game.GraphicsDevice.Clear(Color.Black);
 					_game.GraphicsDevice.Present();
