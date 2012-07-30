@@ -260,10 +260,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		public static Texture2D FromStream(GraphicsDevice graphicsDevice, Stream stream)
 		{
-			var image = (Bitmap)Bitmap.FromStream(stream);
-			var theTexture = new ESImage(image, graphicsDevice.PreferedFilter);
-			var result = new Texture2D(theTexture);
-			return result;
+			return FromFile (graphicsDevice, stream);
 		}
 		
 		public static Texture2D FromStream(GraphicsDevice graphicsDevice, Stream stream, int width, int height, bool zoom)
