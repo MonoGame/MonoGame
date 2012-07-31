@@ -258,6 +258,17 @@ namespace Microsoft.Xna.Framework.Graphics
 			return FromFile( graphicsDevice, filename, 0, 0 );
         }
 		
+		public static Texture2D FromStream(GraphicsDevice graphicsDevice, Stream stream)
+		{
+			return FromFile (graphicsDevice, stream);
+		}
+		
+		public static Texture2D FromStream(GraphicsDevice graphicsDevice, Stream stream, int width, int height, bool zoom)
+		{
+			// TODO resize
+			throw new NotImplementedException("Resizing not yet supported");
+		}
+		
 		private void generateOpenGLTexture ()
 		{
 			// modeled after this
