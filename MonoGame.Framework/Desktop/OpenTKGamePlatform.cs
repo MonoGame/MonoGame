@@ -81,6 +81,8 @@ namespace Microsoft.Xna.Framework
     {
         private OpenTKGameWindow _view;
 		private OpenALSoundController soundControllerInstance = null;
+        // stored the current screen state, so we can check if it has changed.
+        private bool isCurrentlyFullScreen = false;
         
         
         public override bool VSyncEnabled
@@ -205,7 +207,6 @@ namespace Microsoft.Xna.Framework
                 bounds.Width = graphicsDeviceManager.PreferredBackBufferWidth;
                 bounds.Height = graphicsDeviceManager.PreferredBackBufferHeight;
             }
-
             
 
             // Now we set our Presentation Parameters
@@ -220,13 +221,18 @@ namespace Microsoft.Xna.Framework
                 parms.BackBufferWidth = (int)bounds.Width;
             }
 
-            if (toggleFullScreen)
+            if (graphicsDeviceManager.IsFullScreen != isCurrentlyFullScreen)
+            {                
                 _view.ToggleFullScreen();
+            }
 
             // we only change window bounds if we are not fullscreen
             // or if fullscreen mode was just entered
-            if (!graphicsDeviceManager.IsFullScreen || toggleFullScreen)
+            if (!graphicsDeviceManager.IsFullScreen || (graphicsDeviceManager.IsFullScreen != isCurrentlyFullScreen))
                 _view.ChangeClientBounds(bounds);
+
+            // store the current fullscreen state
+            isCurrentlyFullScreen = graphicsDeviceManager.IsFullScreen;
 
             IsActive = wasActive;
         }
