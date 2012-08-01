@@ -911,17 +911,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void Reset()
         {
-            _viewport.Width = DisplayMode.Width;
-            _viewport.Height = DisplayMode.Height;
-
-            if (ResourcesLost)
-            {
-                ContentManager.ReloadAllContent();
-                ResourcesLost = false;
-            }
-
-            if(DeviceReset != null)
-                DeviceReset(null, new EventArgs());
+            // Manually resetting the device is not currently supported.
+            throw new NotImplementedException();
         }
 
         public void Reset(Microsoft.Xna.Framework.Graphics.PresentationParameters presentationParameters)
@@ -932,6 +923,16 @@ namespace Microsoft.Xna.Framework.Graphics
         public void Reset(Microsoft.Xna.Framework.Graphics.PresentationParameters presentationParameters, GraphicsAdapter graphicsAdapter)
         {
             throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Trigger the DeviceReset event to allow games to be notified of a device reset.
+        /// Currently internal to allow the various platforms to send the event at the appropriate time.
+        /// </summary>
+        internal void OnDeviceReset()
+        {
+            if (DeviceReset != null)
+                DeviceReset(this, EventArgs.Empty);
         }
 
         public Microsoft.Xna.Framework.Graphics.DisplayMode DisplayMode

@@ -45,6 +45,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
         static readonly float[] _posFixup = new float[4];
 
+
+
 #endif // OPENGL
 
 #if PSS
@@ -101,9 +103,24 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
         }
 
+        internal static List<EffectPass> AllEffectPasses = new List<EffectPass>();
+
+        internal static void RecompileAll()
+        {
+            foreach (var pass in AllEffectPasses)
+            {
+                pass._vertexShader.CompileShader();
+                pass._pixelShader.CompileShader();
+                pass.Initialize();
+            }
+        }
+
         private void Initialize()
         {
 #if OPENGL
+            if (!AllEffectPasses.Contains(this))
+                AllEffectPasses.Add(this);
+
             Threading.BlockOnUIThread(() =>
             {
                 // TODO: Shouldn't we be calling GL.DeleteProgram() somewhere?

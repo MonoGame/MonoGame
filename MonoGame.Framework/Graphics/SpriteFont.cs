@@ -85,7 +85,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		private readonly Dictionary<char, Glyph> _glyphs;
 		
-		private readonly Texture2D _texture;
+		internal readonly Texture2D _texture;
 
 		internal SpriteFont (
 			Texture2D texture, List<Rectangle> glyphBounds, List<Rectangle> cropping, List<char> characters,
