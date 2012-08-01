@@ -112,11 +112,36 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         }
 
         /// <summary>
-        /// Returns the index of the channel with the specified name.
+        /// Adds a new vertex channel to the end of the collection.
         /// </summary>
-        /// <param name="name">Name of the channel to find.</param>
-        /// <returns>Index of the channel, or -1 if not found.</returns>
-        int IndexOf(string name)
+        /// <typeparam name="ElementType">Type of the channel.</typeparam>
+        /// <param name="name">Name of the new channel.</param>
+        /// <param name="channelData">Initial data for the new channel. If null, the channel is filled with the default value for that type.</param>
+        /// <returns>The newly added vertex channel.</returns>
+        public VertexChannel<ElementType> Add<ElementType>(string name, IEnumerable<ElementType> channelData)
+        {
+            return (VertexChannel<ElementType>)Add(name, typeof(ElementType), channelData);
+        }
+
+        /// <summary>
+        /// Adds a new vertex channel to the end of the collection.
+        /// </summary>
+        /// <param name="name">Name of the new channel.</param>
+        /// <param name="elementType">Type of data to be contained in the new channel.</param>
+        /// <param name="channelData">Initial data for the new channel. If null, the channel is filled with the default value for that type.</param>
+        /// <returns>The newly added vertex channel.</returns>
+        public VertexChannel Add(string name, Type elementType, IEnumerable channelData)
+        {
+            VertexChannel channel = new VertexChannel();
+
+        }
+
+        /// <summary>
+        /// Determines the index of a vertex channel with the specified name.
+        /// </summary>
+        /// <param name="name">Name of the vertex channel being searched for.</param>
+        /// <returns>Index of the vertex channel.</returns>
+        public int IndexOf(string name)
         {
             for (int i = 0; i < channels.Count; ++i)
             {
@@ -124,6 +149,16 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     return i;
             }
             return -1;
+        }
+
+        /// <summary>
+        /// Determines the index of the specified vertex channel.
+        /// </summary>
+        /// <param name="item">Vertex channel being searched for.</param>
+        /// <returns>Index of the vertex channel.</returns>
+        public int IndexOf(VertexChannel item)
+        {
+            return channels.IndexOf(item);
         }
     }
 }
