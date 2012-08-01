@@ -169,7 +169,9 @@ namespace Microsoft.Xna.Framework
                 GraphicsDevice.PresentationParameters.BackBufferHeight = isLandscape ? Math.Min(w, h) : Math.Max(w, h);
 
                 // Trigger a change in orientation in case the supported orientations have changed
+#if !IPHONE
                 _game.Window.SetOrientation(_game.Window.CurrentOrientation, false);
+#endif
             }
         }
 

@@ -62,6 +62,7 @@ namespace Microsoft.Xna.Framework
     internal class Threading
     {
         static int mainThreadId;
+        static int currentThreadId;
 #if ANDROID
         static List<Action> actions = new List<Action>();
         static Mutex actionsMutex = new Mutex();
@@ -99,9 +100,13 @@ namespace Microsoft.Xna.Framework
 #if IPHONE
             lock (BackgroundContext)
             {
-                if (EAGLContext.CurrentContext != BackgroundContext)
+                // Make the context current on this thread if it is not already
+                if (!Object.ReferenceEquals(EAGLContext.CurrentContext, BackgroundContext))
                     EAGLContext.SetCurrentContext(BackgroundContext);
+                // Execute the action
                 action();
+                // Must flush the GL calls so the GPU asset is ready for the main context to use it
+                GL.Flush();
             }
 #elif WINDOWS || LINUX
             lock (BackgroundContext)
