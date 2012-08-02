@@ -90,7 +90,7 @@ namespace Microsoft.Xna.Framework
             var isTouch = args.CurrentPoint.PointerDevice.PointerDeviceType == Windows.Devices.Input.PointerDeviceType.Touch;
             var touchIsDown = args.CurrentPoint.IsInContact;
             if (isTouch && touchIsDown)
-                TouchPanel.AddEvent(new TouchLocation((int)args.CurrentPoint.PointerId, TouchLocationState.Moved, pos));
+                TouchPanel.AddEvent((int)args.CurrentPoint.PointerId, TouchLocationState.Moved, pos);
 
             if (!isTouch || args.CurrentPoint.Properties.IsPrimary && touchIsDown)
             {
@@ -107,7 +107,7 @@ namespace Microsoft.Xna.Framework
 
             var isTouch = args.CurrentPoint.PointerDevice.PointerDeviceType == Windows.Devices.Input.PointerDeviceType.Touch;
             if (isTouch)
-                TouchPanel.AddEvent(new TouchLocation((int)args.CurrentPoint.PointerId, TouchLocationState.Released, pos));
+                TouchPanel.AddEvent((int)args.CurrentPoint.PointerId, TouchLocationState.Released, pos);
 
             if (!isTouch || args.CurrentPoint.Properties.IsPrimary)
             {
@@ -124,7 +124,7 @@ namespace Microsoft.Xna.Framework
 
             var isTouch = args.CurrentPoint.PointerDevice.PointerDeviceType == Windows.Devices.Input.PointerDeviceType.Touch;
             if (isTouch)
-                TouchPanel.AddEvent(new TouchLocation((int)args.CurrentPoint.PointerId, TouchLocationState.Pressed, pos));
+                TouchPanel.AddEvent((int)args.CurrentPoint.PointerId, TouchLocationState.Pressed, pos);
 
             if (!isTouch || args.CurrentPoint.Properties.IsPrimary)
             {

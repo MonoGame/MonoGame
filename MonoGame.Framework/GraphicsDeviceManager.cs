@@ -40,6 +40,7 @@ purpose and non-infringement.
 
 using System;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input.Touch;
 
 #if MONOMAC
 using MonoMac.OpenGL;
@@ -240,6 +241,15 @@ namespace Microsoft.Xna.Framework
 #endif
             }
 #endif
+
+            // Set the new display size on the touch panel.
+            //
+            // TODO: In XNA this seems to be done as part of the 
+            // GraphicsDevice.DeviceReset event... we need to get 
+            // those working.
+            //
+            TouchPanel.DisplayWidth = _graphicsDevice.PresentationParameters.BackBufferWidth;
+            TouchPanel.DisplayHeight = _graphicsDevice.PresentationParameters.BackBufferHeight;
         }
 
         private void Initialize()
@@ -281,6 +291,15 @@ namespace Microsoft.Xna.Framework
 #endif
 
 #endif // WINDOWS || WINRT
+
+            // Set the new display size on the touch panel.
+            //
+            // TODO: In XNA this seems to be done as part of the 
+            // GraphicsDevice.DeviceReset event... we need to get 
+            // those working.
+            //
+            TouchPanel.DisplayWidth = _graphicsDevice.PresentationParameters.BackBufferWidth;
+            TouchPanel.DisplayHeight = _graphicsDevice.PresentationParameters.BackBufferHeight;
         }
 
         public void ToggleFullScreen()
