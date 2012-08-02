@@ -100,6 +100,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             {
                 return name;
             }
+            internal set
+            {
+                name = value;
+            }
         }
 
         /// <summary>

@@ -112,6 +112,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         }
 
         /// <summary>
+        /// Creates an instance of VertexChannelCollection.
+        /// </summary>
+        internal VertexChannelCollection()
+        {
+            channels = new List<VertexChannel>();
+        }
+
+        /// <summary>
         /// Adds a new vertex channel to the end of the collection.
         /// </summary>
         /// <typeparam name="ElementType">Type of the channel.</typeparam>
@@ -120,7 +128,22 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <returns>The newly added vertex channel.</returns>
         public VertexChannel<ElementType> Add<ElementType>(string name, IEnumerable<ElementType> channelData)
         {
-            return (VertexChannel<ElementType>)Add(name, typeof(ElementType), channelData);
+            // Instantiate an instance of VertexChannel<> with the given elementType
+            // The backtick represents the type parameter in the generic class
+            var d1 = Type.GetType(typeof(VertexChannel).FullName + "`1");
+            Type[] typeArgs = { typeof(ElementType) };
+            var makeme = d1.MakeGenericType(typeArgs);
+            VertexChannel<ElementType> channel = (VertexChannel<ElementType>)Activator.CreateInstance(makeme);
+            if (channelData == null)
+            {
+                ((ICollection<ElementType>)channel).Add(default(ElementType));
+            }
+            else
+            {
+                foreach (ElementType element in channelData)
+                    ((ICollection<ElementType>)channel).Add(element);
+            }
+            return channel;
         }
 
         /// <summary>
@@ -132,8 +155,36 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <returns>The newly added vertex channel.</returns>
         public VertexChannel Add(string name, Type elementType, IEnumerable channelData)
         {
-            VertexChannel channel = new VertexChannel();
+            // Call the generic version of this method
+            return (VertexChannel)GetType().GetMethod("Add").MakeGenericMethod(elementType).Invoke(this, new object[] { name, channelData });
+        }
 
+        /// <summary>
+        /// Removes all vertex channels from the collection.
+        /// </summary>
+        public void Clear()
+        {
+            channels.Clear();
+        }
+
+        /// <summary>
+        /// Determines whether the collection contains the specified vertex channel.
+        /// </summary>
+        /// <param name="name">Name of the channel being searched for.</param>
+        /// <returns>true if the channel was found; false otherwise.</returns>
+        public bool Contains(string name)
+        {
+            return channels.Exists(c => { return c.Name == name; });
+        }
+
+        /// <summary>
+        /// Determines whether the collection contains the specified vertex channel.
+        /// </summary>
+        /// <param name="item">The channel being searched for.</param>
+        /// <returns>true if the channel was found; false otherwise.</returns>
+        public bool Contains(VertexChannel item)
+        {
+            return channels.Contains(item);
         }
 
         /// <summary>
