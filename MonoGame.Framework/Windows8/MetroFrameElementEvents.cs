@@ -93,8 +93,7 @@ namespace Microsoft.Xna.Framework
         {
             var currentPoint = args.GetCurrentPoint(null);
 
-            // To convert from DIPs (that all touch and pointer events are returned 
-            // in) to pixels (that XNA APIs expect)
+            // To convert from DIPs (device independent pixels) to actual screen resolution pixels.
             var dipFactor = DisplayProperties.LogicalDpi / 96.0f;
             var pos = new Vector2((float)currentPoint.Position.X, (float)currentPoint.Position.Y) * dipFactor;
 
@@ -117,8 +116,7 @@ namespace Microsoft.Xna.Framework
 
             var currentPoint = args.GetCurrentPoint(null);
 
-            // To convert from DIPs (that all touch and pointer events are returned 
-            // in) to pixels (that XNA APIs expect)
+            // To convert from DIPs (device independent pixels) to screen resolution pixels.
             var dipFactor = DisplayProperties.LogicalDpi / 96.0f;
             var pos = new Vector2((float)currentPoint.Position.X, (float)currentPoint.Position.Y) * dipFactor;
 
@@ -140,8 +138,7 @@ namespace Microsoft.Xna.Framework
 
             var currentPoint = args.GetCurrentPoint(null);
 
-            // To convert from DIPs (that all touch and pointer events are returned 
-            // in) to pixels (that XNA APIs expect)
+            // To convert from DIPs (device independent pixels) to screen resolution pixels.
             var dipFactor = DisplayProperties.LogicalDpi / 96.0f;
             var pos = new Vector2((float)currentPoint.Position.X, (float)currentPoint.Position.Y) * dipFactor;
 

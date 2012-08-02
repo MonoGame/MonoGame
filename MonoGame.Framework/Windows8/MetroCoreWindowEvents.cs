@@ -83,8 +83,7 @@ namespace Microsoft.Xna.Framework
 
         private void CoreWindow_PointerMoved(CoreWindow sender, PointerEventArgs args)
         {
-            // To convert from DIPs (that all touch and pointer events are returned 
-            // in) to pixels (that XNA APIs expect)
+            // To convert from DIPs (device independent pixels) to screen resolution pixels.
             var dipFactor = DisplayProperties.LogicalDpi / 96.0f;
             var pos = new Vector2((float)args.CurrentPoint.Position.X, (float)args.CurrentPoint.Position.Y) * dipFactor;
 
@@ -102,8 +101,7 @@ namespace Microsoft.Xna.Framework
 
         private void CoreWindow_PointerReleased(CoreWindow sender, PointerEventArgs args)
         {
-            // To convert from DIPs (that all touch and pointer events are returned 
-            // in) to pixels (that XNA APIs expect)
+            // To convert from DIPs (device independent pixels) to screen resolution pixels.
             var dipFactor = DisplayProperties.LogicalDpi / 96.0f;
             var pos = new Vector2((float)args.CurrentPoint.Position.X, (float)args.CurrentPoint.Position.Y) * dipFactor;
 
@@ -120,8 +118,7 @@ namespace Microsoft.Xna.Framework
 
         private void CoreWindow_PointerPressed(CoreWindow sender, PointerEventArgs args)
         {
-            // To convert from DIPs (that all touch and pointer events are returned 
-            // in) to pixels (that XNA APIs expect)
+            // To convert from DIPs (device independent pixels) to screen resolution pixels.
             var dipFactor = DisplayProperties.LogicalDpi / 96.0f;
             var pos = new Vector2((float)args.CurrentPoint.Position.X, (float)args.CurrentPoint.Position.Y) * dipFactor;
 
