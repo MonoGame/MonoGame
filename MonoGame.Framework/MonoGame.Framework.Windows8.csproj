@@ -72,7 +72,6 @@
     </Compile>
     <Compile Include="GameTimer.cs" />
     <Compile Include="GameTimerEventArgs.cs" />
-    <Compile Include="Graphics\CompareFunction.cs" />
     <Compile Include="Graphics\CubeMapFace.cs" />
     <Compile Include="Graphics\DisplayMode.cs" />
     <Compile Include="Graphics\Effect\AlphaTestEffect.cs" />
@@ -104,7 +103,6 @@
     <Compile Include="Graphics\RenderTarget2D.cs" />
     <Compile Include="Graphics\SpriteBatch.cs" />
     <Compile Include="Graphics\SpriteBatcher.cs" />
-    <Compile Include="Graphics\StencilOperation.cs" />
     <Compile Include="Graphics\Texture2D.cs" />
     <Compile Include="Graphics\TextureCube.cs" />
     <Compile Include="Graphics\Vertices\DynamicIndexBuffer.cs" />
