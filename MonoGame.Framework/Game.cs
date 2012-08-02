@@ -645,11 +645,10 @@ namespace Microsoft.Xna.Framework
 			OnExiting(this, EventArgs.Empty);
 			UnloadContent();
 		}
+
         internal void ResizeWindow(bool changed)
         {
-#if WINRT
-
-#elif LINUX || WINDOWS
+#if LINUX || WINDOWS
             ((OpenTKGamePlatform)Platform).ResetWindowBounds(changed);
 #endif
         }
