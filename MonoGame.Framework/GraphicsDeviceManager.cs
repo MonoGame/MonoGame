@@ -61,30 +61,28 @@ namespace Microsoft.Xna.Framework
         private GraphicsDevice _graphicsDevice;
         private int _preferredBackBufferHeight;
         private int _preferredBackBufferWidth;
+        private SurfaceFormat _preferredBackBufferFormat;
+        private DepthFormat _preferredDepthStencilFormat;
         private bool _preferMultiSampling;
         private DisplayOrientation _supportedOrientations;
-#if !LINUX
-        private bool wantFullScreen = true;
-#endif
-#if WINDOWS || WINRT
-        private DepthFormat _preferredDepthStencilFormat;
-#endif
-#if MONOMAC
-		private bool synchronizedWithVerticalRefresh = true;
-#endif
+        private bool _synchronizedWithVerticalRetrace = true;
+        private bool _wantFullScreen = true;
+
+        public static readonly int DefaultBackBufferHeight = 480;
+        public static readonly int DefaultBackBufferWidth = 800;
 
         public GraphicsDeviceManager(Game game)
         {
             if (game == null)
-                throw new ArgumentNullException("Game Cannot Be Null");
+                throw new ArgumentNullException("The game cannot be null!");
 
             _game = game;
 
             _supportedOrientations = DisplayOrientation.Default;
 
-#if WINDOWS || MONOMAC || WINRT
-            _preferredBackBufferHeight = PresentationParameters._defaultBackBufferHeight;
-            _preferredBackBufferWidth = PresentationParameters._defaultBackBufferWidth;
+#if WINDOWS || MONOMAC || LINUX
+            _preferredBackBufferHeight = DefaultBackBufferHeight;
+            _preferredBackBufferWidth = DefaultBackBufferWidth;
 #else
             // Preferred buffer width/height is used to determine default supported orientations,
             // so set the default values to match Xna behaviour of landscape only by default.
@@ -93,10 +91,9 @@ namespace Microsoft.Xna.Framework
             _preferredBackBufferHeight = Math.Min(game.Window.ClientBounds.Height, game.Window.ClientBounds.Width);
 #endif
 
-#if WINDOWS || WINRT
+            _preferredBackBufferFormat = SurfaceFormat.Color;
             _preferredDepthStencilFormat = DepthFormat.None;
-            SynchronizeWithVerticalRetrace = true;
-#endif
+            _synchronizedWithVerticalRetrace = true;
 
             if (game.Services.GetService(typeof(IGraphicsDeviceManager)) != null)
                 throw new ArgumentException("Graphics Device Manager Already Present");
@@ -114,15 +111,10 @@ namespace Microsoft.Xna.Framework
         {
             _graphicsDevice = new GraphicsDevice();
 
-#if LINUX
-			_preferredBackBufferHeight = _graphicsDevice.PresentationParameters.BackBufferHeight;
-			_preferredBackBufferWidth = _graphicsDevice.PresentationParameters.BackBufferWidth;
-#endif
-
             Initialize();
 
             // Is this really correct?
-#if !(WINDOWS || WINRT) && !MONOMAC && !LINUX
+#if !WINDOWS && !WINRT && !MONOMAC && !LINUX
             ApplyChanges();
             ResetClientBounds();
 #endif
@@ -189,23 +181,39 @@ namespace Microsoft.Xna.Framework
 
         public void Dispose()
         {
-#if WINDOWS || WINRT
             if (_graphicsDevice != null)
             {
                 _graphicsDevice.Dispose();
                 _graphicsDevice = null;
             }
-#endif
         }
 
         #endregion
 
         public void ApplyChanges()
         {
-#if WINDOWS || LINUX || WINRT
+#if WINRT
+            // TODO:  Does this need to occur here?
+            _game.Window.SetSupportedOrientations(_supportedOrientations);
+
+            _graphicsDevice.PresentationParameters.BackBufferFormat = _preferredBackBufferFormat;
+            _graphicsDevice.PresentationParameters.BackBufferWidth = _preferredBackBufferWidth;
+            _graphicsDevice.PresentationParameters.BackBufferHeight = _preferredBackBufferHeight;
+            _graphicsDevice.PresentationParameters.DepthStencilFormat = _preferredDepthStencilFormat;
+            _graphicsDevice.PresentationParameters.IsFullScreen = false;
+            
+            // TODO: We probably should be resetting the whole device
+            // if this changes as we are targeting a different 
+            // hardware feature level.
+            _graphicsDevice.GraphicsProfile = GraphicsProfile;
+
+            // Update the 
+            _graphicsDevice.CreateSizeDependentResources();
+
+#elif WINDOWS || LINUX
             _game.ResizeWindow(false);
 #elif MONOMAC
-            _graphicsDevice.PresentationParameters.IsFullScreen = wantFullScreen;
+            _graphicsDevice.PresentationParameters.IsFullScreen = _wantFullScreen;
 
 			if (_preferMultiSampling) {
 				_graphicsDevice.PreferedFilter = All.Linear;
@@ -228,7 +236,6 @@ namespace Microsoft.Xna.Framework
                 GraphicsDevice.PresentationParameters.BackBufferHeight = isLandscape ? Math.Min(w, h) : Math.Max(w, h);
 #if !PSS && !IPHONE
                 // Trigger a change in orientation in case the supported orientations have changed
-#if !IPHONE
                 _game.Window.SetOrientation(_game.Window.CurrentOrientation, false);
 #endif
             }
@@ -240,7 +247,7 @@ namespace Microsoft.Xna.Framework
 #if WINDOWS || WINRT
             _game.Window.SetSupportedOrientations(_supportedOrientations);
 
-            //_graphicsDevice.PresentationParameters.BackBufferFormat = _preferredBackBufferWidth;
+            _graphicsDevice.PresentationParameters.BackBufferFormat = _preferredBackBufferFormat;
             _graphicsDevice.PresentationParameters.BackBufferWidth = _preferredBackBufferWidth;
             _graphicsDevice.PresentationParameters.BackBufferHeight = _preferredBackBufferHeight;
             _graphicsDevice.PresentationParameters.DepthStencilFormat = _preferredDepthStencilFormat;
@@ -249,12 +256,10 @@ namespace Microsoft.Xna.Framework
             _graphicsDevice.PresentationParameters.DeviceWindowHandle = _game.Window.Handle;
             _graphicsDevice.GraphicsProfile = GraphicsProfile;
             _graphicsDevice.Initialize();
-
-            PreferMultiSampling = _preferMultiSampling;
 #else
 
 #if MONOMAC
-            _graphicsDevice.PresentationParameters.IsFullScreen = wantFullScreen;
+            _graphicsDevice.PresentationParameters.IsFullScreen = _wantFullScreen;
 #elif LINUX
             _graphicsDevice.PresentationParameters.IsFullScreen = false;
 #else
@@ -264,13 +269,9 @@ namespace Microsoft.Xna.Framework
 
 #if !PSS
             if (_preferMultiSampling)
-            {
                 _graphicsDevice.PreferedFilter = All.Linear;
-            }
             else
-            {
                 _graphicsDevice.PreferedFilter = All.Nearest;
-            }
 #endif
 
             _graphicsDevice.Initialize();
@@ -287,11 +288,9 @@ namespace Microsoft.Xna.Framework
             IsFullScreen = !IsFullScreen;
         }
 
-#if WINDOWS || WINRT
         public GraphicsProfile GraphicsProfile { get; set; }
-#endif
 
-        public Microsoft.Xna.Framework.Graphics.GraphicsDevice GraphicsDevice
+        public GraphicsDevice GraphicsDevice
         {
             get
             {
@@ -309,7 +308,7 @@ namespace Microsoft.Xna.Framework
                 if (_graphicsDevice != null)
                     return _graphicsDevice.PresentationParameters.IsFullScreen;
                 else
-                    return wantFullScreen;
+                    return _wantFullScreen;
 #endif
             }
             set
@@ -317,7 +316,7 @@ namespace Microsoft.Xna.Framework
 #if WINDOWS || LINUX || WINRT
                 _graphicsDevice.PresentationParameters.IsFullScreen = value;
 #else
-                wantFullScreen = value;
+                _wantFullScreen = value;
                 if (_graphicsDevice != null)
                 {
                     _graphicsDevice.PresentationParameters.IsFullScreen = value;
@@ -348,6 +347,8 @@ namespace Microsoft.Xna.Framework
             set
             {
                 _preferMultiSampling = value;
+
+                // TODO: I'm pretty sure this shouldn't occur until ApplyChanges().
 #if !PSS && !WINRT
                 if (_graphicsDevice != null)
                 {
@@ -368,10 +369,11 @@ namespace Microsoft.Xna.Framework
         {
             get
             {
-                throw new NotImplementedException();
+                return _preferredBackBufferFormat;
             }
             set
             {
+                _preferredBackBufferFormat = value;
             }
         }
 
@@ -403,45 +405,34 @@ namespace Microsoft.Xna.Framework
         {
             get
             {
-#if WINDOWS || WINRT
                 return _preferredDepthStencilFormat;
-#else
-                throw new NotImplementedException();
-#endif
             }
             set
             {
-#if WINDOWS || WINRT
                 _preferredDepthStencilFormat = value;
-#endif
             }
         }
 
-#if WINDOWS || WINRT
-        public bool SynchronizeWithVerticalRetrace { get; set; }
-#else
         public bool SynchronizeWithVerticalRetrace
         {
             get
             {
-#if MONOMAC
-                return synchronizedWithVerticalRefresh;
-#elif LINUX
+#if LINUX
                 return _game.Platform.VSyncEnabled;
 #else
-                throw new NotImplementedException();
+                return _synchronizedWithVerticalRetrace;
 #endif
             }
             set
             {
-#if MONOMAC
-                synchronizedWithVerticalRefresh = value;
-#elif LINUX
+#if LINUX
+                // TODO: I'm pretty sure this shouldn't occur until ApplyChanges().
                 _game.Platform.VSyncEnabled = value;
+#else
+                _synchronizedWithVerticalRetrace = value;
 #endif
             }
         }
-#endif // WINDOWS || WINRT
 
         public DisplayOrientation SupportedOrientations
         {
@@ -452,8 +443,8 @@ namespace Microsoft.Xna.Framework
             set
             {
                 _supportedOrientations = value;
-                // Is this really correct?
-#if !(WINDOWS || WINRT) && !MONOMAC && !LINUX
+
+#if !MONOMAC && !LINUX
                 _game.Window.SetSupportedOrientations(_supportedOrientations);
 #endif
             }
