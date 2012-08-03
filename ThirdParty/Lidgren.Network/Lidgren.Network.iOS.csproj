@@ -105,6 +105,7 @@
     <Compile Include="NetUnreliableSequencedReceiver.cs" />
     <Compile Include="NetUnreliableUnorderedReceiver.cs" />
     <Compile Include="NetUtility.cs" />
+    <Compile Include="PlatformSocket.cs" />
     <Compile Include="SenderChannelBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
