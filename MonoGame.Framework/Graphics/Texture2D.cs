@@ -518,8 +518,16 @@ namespace Microsoft.Xna.Framework.Graphics
             // and not creating a new one each time.
             //
             var desc = new SharpDX.Direct3D11.Texture2DDescription();
-            desc.Width = width;
-            desc.Height = height;
+            if (rect.HasValue)
+            {
+                desc.Width = rect.Value.Width;
+                desc.Height = rect.Value.Height;
+            }
+            else
+            {
+                desc.Width = width;
+                desc.Height = height;
+            }
             desc.MipLevels = 1;
             desc.ArraySize = 1;
             desc.Format = SharpDXHelper.ToFormat(format);
@@ -536,8 +544,17 @@ namespace Microsoft.Xna.Framework.Graphics
                 // Copy the data from the GPU to the staging texture.
                 if (rect.HasValue)
                 {
-                    // TODO: Need to deal with subregion copies!
-                    throw new NotImplementedException();
+                    var sourceRegion = new SharpDX.Direct3D11.ResourceRegion()
+                    {
+                        Top = rect.Value.Top,
+                        Left = rect.Value.Left,
+                        Bottom = rect.Value.Bottom,
+                        Right = rect.Value.Right,
+                        Front = 0,
+                        Back = 1,
+                    };
+
+                    graphicsDevice._d3dContext.CopySubresourceRegion(_texture, level, sourceRegion, stagingTex, 0, 0, 0, 0);
                 }
                 else
                     graphicsDevice._d3dContext.CopySubresourceRegion(_texture, level, null, stagingTex, 0, 0, 0, 0);
