@@ -187,6 +187,11 @@ namespace Microsoft.Xna.Framework.Audio
             _voice.FlushSourceBuffers();
             _paused = false;
 #else
+			if ( _sound != null )
+			{
+				_sound.Stop();
+				soundState = SoundState.Stopped;
+			}
 #endif
         }
 
@@ -196,6 +201,11 @@ namespace Microsoft.Xna.Framework.Audio
             _voice.Stop( immediate ? 0 : (int)PlayFlags.Tails );
             _paused = false;
 #else
+			if ( _sound != null )
+			{
+				_sound.Stop();
+				soundState = SoundState.Stopped;
+			}
 #endif
         }		
 		

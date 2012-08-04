@@ -325,11 +325,11 @@
     <Compile Include="iOS\iOSGamePlatform.cs" />
     <Compile Include="iOS\iOSGameViewController.cs" />
     <Compile Include="iOS\OrientationConverter.cs" />
-    <Compile Include="Desktop\Audio\OALSoundBuffer.cs"/>
-    <Compile Include="Desktop\Audio\OpenALSoundController.cs"/>
-    <Compile Include="MacOS\Audio\OpenALSupport.cs"/>
-    <Compile Include="MacOS\Audio\SoundEffect.cs"/>
-    <Compile Include="MacOS\Audio\SoundEffectInstance.cs"/>
+    <Compile Include="Desktop\Audio\OALSoundBuffer.cs" />
+    <Compile Include="Desktop\Audio\OpenALSoundController.cs" />
+    <Compile Include="MacOS\Audio\OpenALSupport.cs" />
+    <Compile Include="MacOS\Audio\SoundEffect.cs" />
+    <Compile Include="MacOS\Audio\SoundEffectInstance.cs" />
     <Compile Include="Graphics\Effect\AlphaTestEffect.cs" />
     <Compile Include="Graphics\Effect\DXShader.cs" />
     <Compile Include="Graphics\Effect\EffectAnnotation.cs" />
@@ -356,8 +356,6 @@
     <Compile Include="Graphics\ModelMeshPartCollection.cs" />
     <Compile Include="Graphics\CubeMapFace.cs" />
     <Compile Include="Graphics\Texture2D.cs" />
-    <Compile Include="Graphics\CompareFunction.cs" />
-    <Compile Include="Graphics\StencilOperation.cs" />
     <Compile Include="Graphics\PackedVector\NormalizedShort2.cs" />
     <Compile Include="Content\ContentExtensions.cs" />
     <Compile Include="Content\ContentLoadException.cs" />
@@ -428,7 +426,6 @@
     <Compile Include="iOS\GamerServices\KeyboardInputAsyncResult.cs" />
     <Compile Include="iOS\iOSGameWindow.cs" />
     <Compile Include="Graphics\Effect\ConstantBuffer.cs" />
-    <Compile Include="Media\MediaQueue.cs" />
     <Compile Include="Input\Touch\TouchInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
