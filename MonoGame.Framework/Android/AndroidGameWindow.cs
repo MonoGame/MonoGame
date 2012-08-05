@@ -175,7 +175,6 @@ namespace Microsoft.Xna.Framework
             {
                 _contextWasLost = false;
                 _game.GraphicsDevice.Initialize();
-                EffectPass.RecompileAll();
                 Microsoft.Xna.Framework.Content.ContentManager.ReloadGraphicsContent();
 
                 _game.graphicsDeviceManager.OnDeviceReset(EventArgs.Empty);

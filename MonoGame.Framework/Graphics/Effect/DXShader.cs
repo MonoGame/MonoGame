@@ -151,9 +151,16 @@ namespace Microsoft.Xna.Framework.Graphics
             CompileShader();
 
 #endif // OPENGL
+
+            device.DeviceReset += new EventHandler<EventArgs>(GraphicsDevice_DeviceReset);
         }
 
-        internal void CompileShader()
+        void GraphicsDevice_DeviceReset(object sender, EventArgs e)
+        {
+            CompileShader();
+        }
+
+        private void CompileShader()
         {
             Threading.BlockOnUIThread(() =>
             {

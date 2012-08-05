@@ -81,6 +81,8 @@ namespace Microsoft.Xna.Framework.Graphics
             Annotations = annotations;
 
             Initialize();
+
+            _effect.GraphicsDevice.DeviceReset += new EventHandler<EventArgs>(GraphicsDevice_DeviceReset);
         }
 
         internal EffectPass(Effect effect, EffectPass cloneSource)
@@ -101,26 +103,17 @@ namespace Microsoft.Xna.Framework.Graphics
 #if OPENGL || PSS
             _shaderProgram = cloneSource._shaderProgram;
 #endif
+            _effect.GraphicsDevice.DeviceReset += new EventHandler<EventArgs>(GraphicsDevice_DeviceReset);
         }
 
-        internal static List<EffectPass> AllEffectPasses = new List<EffectPass>();
-
-        internal static void RecompileAll()
+        void GraphicsDevice_DeviceReset(object sender, EventArgs e)
         {
-            foreach (var pass in AllEffectPasses)
-            {
-                pass._vertexShader.CompileShader();
-                pass._pixelShader.CompileShader();
-                pass.Initialize();
-            }
+            Initialize();
         }
 
         private void Initialize()
         {
 #if OPENGL
-            if (!AllEffectPasses.Contains(this))
-                AllEffectPasses.Add(this);
-
             Threading.BlockOnUIThread(() =>
             {
                 // TODO: Shouldn't we be calling GL.DeleteProgram() somewhere?

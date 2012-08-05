@@ -291,10 +291,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void Initialize()
         {
-            // Clear the effect cache since the
-            // device context is going to be reset.
-            Effect.FlushCache();
-
             // Setup extensions.
 #if OPENGL
 #if GLES

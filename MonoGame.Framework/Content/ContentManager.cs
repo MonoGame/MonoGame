@@ -522,7 +522,7 @@ namespace Microsoft.Xna.Framework.Content
                 {
                     ReloadAsset<Model>(asset.Key, asset.Value as Model);
                 }
-                // Not requried as we are recompiling them from cached source anyway - see EffectPass.RecompileAll().
+                // Not requried as we are recompiling them from cached source in response to DeviceReset event
                 //else if (asset.Value is Effect)
                 //{
                 //    ReloadAsset<Effect>(asset.Key, asset.Value as Effect);
