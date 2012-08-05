@@ -65,15 +65,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private DepthFormat depthStencilFormat;
         private SurfaceFormat backBufferFormat;
-        private int backBufferHeight = _defaultBackBufferHeight;
-        private int backBufferWidth = _defaultBackBufferWidth;
+        private int backBufferHeight = GraphicsDeviceManager.DefaultBackBufferHeight;
+        private int backBufferWidth = GraphicsDeviceManager.DefaultBackBufferWidth;
         private IntPtr deviceWindowHandle;
         private bool isFullScreen;
         private int multiSampleCount;
-        private bool disposed;
-        
-        internal static readonly int _defaultBackBufferHeight = 480;
-        internal static readonly int _defaultBackBufferWidth = 800;		
+        private bool disposed;       	
 
         #endregion Private Fields
 
@@ -188,8 +185,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			backBufferWidth = width;
             backBufferHeight = height;
 #else
-			backBufferWidth = _defaultBackBufferWidth;
-            backBufferHeight = _defaultBackBufferHeight;     
+            backBufferWidth = GraphicsDeviceManager.DefaultBackBufferWidth;
+            backBufferHeight = GraphicsDeviceManager.DefaultBackBufferHeight;     
 #endif
             deviceWindowHandle = IntPtr.Zero;
 #if IPHONE
