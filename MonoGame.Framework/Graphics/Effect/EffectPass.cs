@@ -83,8 +83,9 @@ namespace Microsoft.Xna.Framework.Graphics
             Initialize();
 
             _effect.GraphicsDevice.DeviceReset += new EventHandler<EventArgs>(GraphicsDevice_DeviceReset);
+            _effect.Disposing += new EventHandler<EventArgs>(Effect_Disposing);
         }
-
+        
         internal EffectPass(Effect effect, EffectPass cloneSource)
         {
             Debug.Assert(effect != null, "Got a null effect!");
@@ -109,6 +110,12 @@ namespace Microsoft.Xna.Framework.Graphics
         void GraphicsDevice_DeviceReset(object sender, EventArgs e)
         {
             Initialize();
+        }
+
+        void Effect_Disposing(object sender, EventArgs e)
+        {
+            _effect.GraphicsDevice.DeviceReset -= GraphicsDevice_DeviceReset;
+            _effect.Disposing -= Effect_Disposing;
         }
 
         private void Initialize()

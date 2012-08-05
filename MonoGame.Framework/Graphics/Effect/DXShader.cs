@@ -59,6 +59,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #endif
 
+        private Effect _effect;
+
         /// <summary>
         /// A hash value which can be used to compare shaders.
         /// </summary>
@@ -86,8 +88,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private readonly int[] _cbuffers;
         
-        internal DXShader(GraphicsDevice device, BinaryReader reader)
+        internal DXShader(Effect effect, BinaryReader reader)
         {
+            _effect = effect;
+
             var isVertexShader = reader.ReadBoolean();
 
 #if OPENGL
@@ -119,7 +123,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if DIRECTX
 
-            var d3dDevice = device._d3dDevice;
+            var d3dDevice = _effect.GraphicsDevice._d3dDevice;
             if (isVertexShader)
             {
                 _vertexShader = new VertexShader(d3dDevice, shaderBytecode, null);
@@ -152,7 +156,14 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #endif // OPENGL
 
-            device.DeviceReset += new EventHandler<EventArgs>(GraphicsDevice_DeviceReset);
+            _effect.GraphicsDevice.DeviceReset += new EventHandler<EventArgs>(GraphicsDevice_DeviceReset);
+            _effect.Disposing += new EventHandler<EventArgs>(Effect_Disposing);
+        }
+
+        void Effect_Disposing(object sender, EventArgs e)
+        {
+            _effect.GraphicsDevice.DeviceReset -= GraphicsDevice_DeviceReset;
+            _effect.Disposing -= Effect_Disposing;
         }
 
         void GraphicsDevice_DeviceReset(object sender, EventArgs e)
