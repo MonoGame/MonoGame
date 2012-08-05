@@ -39,6 +39,9 @@ namespace Microsoft.Xna.Framework.Graphics
         // We keep this around for recompiling on context lost and debugging.
         private string _glslCode;
 
+        // Flag whether the shader needs to be recompiled
+        internal bool NeedsRecompile = false;
+
         private struct Attribute
         {
             public VertexElementUsage usage;
@@ -58,8 +61,6 @@ namespace Microsoft.Xna.Framework.Graphics
         public byte[] Bytecode { get; private set; }
 
 #endif
-
-        private Effect _effect;
 
         /// <summary>
         /// A hash value which can be used to compare shaders.
@@ -88,10 +89,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private readonly int[] _cbuffers;
         
-        internal DXShader(Effect effect, BinaryReader reader)
+        internal DXShader(GraphicsDevice device, BinaryReader reader)
         {
-            _effect = effect;
-
             var isVertexShader = reader.ReadBoolean();
 
 #if OPENGL
@@ -123,7 +122,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if DIRECTX
 
-            var d3dDevice = _effect.GraphicsDevice._d3dDevice;
+            var d3dDevice = device._d3dDevice;
             if (isVertexShader)
             {
                 _vertexShader = new VertexShader(d3dDevice, shaderBytecode, null);
@@ -155,23 +154,9 @@ namespace Microsoft.Xna.Framework.Graphics
             CompileShader();
 
 #endif // OPENGL
-
-            _effect.GraphicsDevice.DeviceReset += new EventHandler<EventArgs>(GraphicsDevice_DeviceReset);
-            _effect.Disposing += new EventHandler<EventArgs>(Effect_Disposing);
         }
 
-        void Effect_Disposing(object sender, EventArgs e)
-        {
-            _effect.GraphicsDevice.DeviceReset -= GraphicsDevice_DeviceReset;
-            _effect.Disposing -= Effect_Disposing;
-        }
-
-        void GraphicsDevice_DeviceReset(object sender, EventArgs e)
-        {
-            CompileShader();
-        }
-
-        private void CompileShader()
+        internal void CompileShader()
         {
             Threading.BlockOnUIThread(() =>
             {

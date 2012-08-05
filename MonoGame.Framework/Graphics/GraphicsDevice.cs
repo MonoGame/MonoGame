@@ -291,6 +291,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void Initialize()
         {
+            // TODO: This line should not be necessary as Effects are being recompiled
+            // in DeviceReset. There seems to be an issue related to static
+            // initialisation order and removing it breaks drawing in 3d.
+            Effect.FlushCache();
+
             // Setup extensions.
 #if OPENGL
 #if GLES
@@ -919,6 +924,16 @@ namespace Microsoft.Xna.Framework.Graphics
         public void Reset(Microsoft.Xna.Framework.Graphics.PresentationParameters presentationParameters, GraphicsAdapter graphicsAdapter)
         {
             throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Trigger the DeviceResetting event
+        /// Currently internal to allow the various platforms to send the event at the appropriate time.
+        /// </summary>
+        internal void OnDeviceResetting()
+        {
+            if (DeviceResetting != null)
+                DeviceResetting(this, EventArgs.Empty);
         }
 
         /// <summary>

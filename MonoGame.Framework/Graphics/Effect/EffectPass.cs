@@ -81,9 +81,6 @@ namespace Microsoft.Xna.Framework.Graphics
             Annotations = annotations;
 
             Initialize();
-
-            _effect.GraphicsDevice.DeviceReset += new EventHandler<EventArgs>(GraphicsDevice_DeviceReset);
-            _effect.Disposing += new EventHandler<EventArgs>(Effect_Disposing);
         }
         
         internal EffectPass(Effect effect, EffectPass cloneSource)
@@ -104,21 +101,9 @@ namespace Microsoft.Xna.Framework.Graphics
 #if OPENGL || PSS
             _shaderProgram = cloneSource._shaderProgram;
 #endif
-            _effect.GraphicsDevice.DeviceReset += new EventHandler<EventArgs>(GraphicsDevice_DeviceReset);
         }
 
-        void GraphicsDevice_DeviceReset(object sender, EventArgs e)
-        {
-            Initialize();
-        }
-
-        void Effect_Disposing(object sender, EventArgs e)
-        {
-            _effect.GraphicsDevice.DeviceReset -= GraphicsDevice_DeviceReset;
-            _effect.Disposing -= Effect_Disposing;
-        }
-
-        private void Initialize()
+        internal void Initialize()
         {
 #if OPENGL
             Threading.BlockOnUIThread(() =>

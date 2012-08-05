@@ -173,12 +173,18 @@ namespace Microsoft.Xna.Framework
 		    }
             if (_game.GraphicsDevice != null && _contextWasLost)
             {
-                _contextWasLost = false;
+                // DeviceResetting events
+                _game.graphicsDeviceManager.OnDeviceResetting(EventArgs.Empty);
+                _game.GraphicsDevice.OnDeviceResetting();
+
                 _game.GraphicsDevice.Initialize();
                 Microsoft.Xna.Framework.Content.ContentManager.ReloadGraphicsContent();
 
+                // DeviceReset events
                 _game.graphicsDeviceManager.OnDeviceReset(EventArgs.Empty);
                 _game.GraphicsDevice.OnDeviceReset();
+
+                _contextWasLost = false;
             }
 
             if (!GraphicsContext.IsCurrent)
