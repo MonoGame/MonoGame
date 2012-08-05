@@ -687,6 +687,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void FillTextureFromStream(Stream stream)
         {
+#if ANDROID
             // Work-around for "The program 'Mono' has exited with code 255 (0xff)."
             // Based on http://stackoverflow.com/questions/7535503/mono-for-android-exit-code-255-on-bitmapfactory-decodestream
             //Bitmap image = BitmapFactory.DecodeStream(stream);
@@ -710,6 +711,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             
             this.SetData<int>(pixels);
+#endif
         }
 
         public void SaveAsJpeg(Stream stream, int width, int height)
