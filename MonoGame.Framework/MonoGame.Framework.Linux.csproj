@@ -446,17 +446,16 @@
     <None Include="MonoGame.Framework.Linux.dll.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-<<<<<<< HEAD
     <None Include="..\ThirdParty\Libs\libmojoshader_32.so">
       <Link>libmojoshader_32.so</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="..\ThirdParty\Libs\libmojoshader_64.so">
       <Link>libmojoshader_64.so</Link>
-=======
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="..\ThirdParty\GamepadConfig\Tao.Sdl.dll.config">
       <Link>Tao.Sdl.dll.config</Link>
->>>>>>> origin/develop3d
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
