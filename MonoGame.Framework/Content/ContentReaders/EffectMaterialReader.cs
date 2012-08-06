@@ -45,9 +45,9 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Microsoft.Xna.Framework.Content
 {
-    internal class EffectMaterialReader : ContentTypeReader<EffectMaterial>
-    {
-        protected internal override EffectMaterial Read (ContentReader input, EffectMaterial existingInstance)
+	internal class EffectMaterialReader : ContentTypeReader<EffectMaterial>
+	{
+		protected internal override EffectMaterial Read (ContentReader input, EffectMaterial existingInstance)
 		{
 			var effect = input.ReadExternalReference<Effect> ();
 			var effectMaterial = new EffectMaterial (effect);
@@ -70,7 +70,7 @@ namespace Microsoft.Xna.Framework.Content
 			}
 
 
-            return effectMaterial;
-        }
-    }
+			return effectMaterial;
+		}
+	}
 }

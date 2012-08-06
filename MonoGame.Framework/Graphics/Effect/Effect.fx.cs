@@ -84,20 +84,20 @@ namespace Microsoft.Xna.Framework.Graphics
 			var annotations = new EffectAnnotationCollection ();
 			for (int i=0; i<parameter.annotation_count; i++) {
 				annotations.Add (new EffectAnnotation (ReadXNAParameter (parameter.annotation_handles [i])));
-        	}
+		}
 
-        	return new EffectParameter(
-        		DXEffectObject.ToXNAParameterClass(parameter.class_),
-        		DXEffectObject.ToXNAParameterType(parameter.type),
-        		parameter.name,
-        		(int)parameter.rows,
-        		(int)parameter.columns,
-        		parameter.semantic,
-        		annotations,
-        		elements,
-        		members,
-        		parameter.data);
-        }
+			return new EffectParameter(
+				DXEffectObject.ToXNAParameterClass(parameter.class_),
+				DXEffectObject.ToXNAParameterType(parameter.type),
+				parameter.name,
+				(int)parameter.rows,
+				(int)parameter.columns,
+				parameter.semantic,
+				annotations,
+				elements,
+				members,
+				parameter.data);
+		}
 	}
 }
 
