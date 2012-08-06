@@ -66,7 +66,7 @@ namespace Microsoft.Xna.Framework
         private bool _preferMultiSampling;
         private DisplayOrientation _supportedOrientations;
         private bool _synchronizedWithVerticalRetrace = true;
-        private bool _wantFullScreen = true;
+        private bool _wantFullScreen = false;
 
         public static readonly int DefaultBackBufferHeight = 480;
         public static readonly int DefaultBackBufferWidth = 800;
@@ -192,6 +192,10 @@ namespace Microsoft.Xna.Framework
 
         public void ApplyChanges()
         {
+            if (_graphicsDevice == null) {
+                CreateDevice();
+            }
+
 #if WINRT
             // TODO:  Does this need to occur here?
             _game.Window.SetSupportedOrientations(_supportedOrientations);
