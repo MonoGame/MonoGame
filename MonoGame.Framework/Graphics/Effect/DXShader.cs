@@ -164,7 +164,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #if GLES
                 GL.ShaderSource(ShaderHandle, 1, new string[] { _glslCode }, (int[])null);
 #else
-                GL.ShaderSource(ShaderHandle, glslCode);
+                GL.ShaderSource(ShaderHandle, _glslCode);
 #endif
                 GL.CompileShader(ShaderHandle);
 
