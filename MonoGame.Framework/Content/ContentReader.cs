@@ -94,8 +94,19 @@ namespace Microsoft.Xna.Framework.Content
 
         internal object ReadAsset<T>()
         {
-            object result = null;
+            InitializeTypeReaders();
 
+            // Read primary object
+            object result = ReadObject<T>();
+
+            // Read shared resources
+            ReadSharedResources();
+            
+            return result;
+        }
+
+        internal void InitializeTypeReaders()
+        {
             typeReaderManager = new ContentTypeReaderManager(this);
             typeReaders = typeReaderManager.LoadAssetReaders();
             foreach (ContentTypeReader r in typeReaders)
@@ -105,26 +116,13 @@ namespace Microsoft.Xna.Framework.Content
 
             sharedResourceCount = Read7BitEncodedInt();
             sharedResourceFixups = new List<KeyValuePair<int, Action<object>>>();
-
-            // Read primary object
-            int index = Read7BitEncodedInt();
-            if (index > 0)
-            {
-                ContentTypeReader contentReader = typeReaders[index - 1];
-                result = ReadObject<T>(contentReader);
-            }
-
-            // Read shared resources
-            if (sharedResourceCount > 0)
-            {
-                ReadSharedResources(sharedResourceCount);
-            }
-
-            return result;
         }
 
-        void ReadSharedResources(int sharedResourceCount)
+        internal void ReadSharedResources()
         {
+            if (sharedResourceCount <= 0)
+                return;
+
             object[] sharedResources = new object[sharedResourceCount];
             for (int i = 0; i < sharedResourceCount; ++i)
             {
@@ -256,11 +254,12 @@ namespace Microsoft.Xna.Framework.Content
 
         public T ReadObject<T>(T existingInstance)
         {
-            ContentTypeReader typeReader = typeReaderManager.GetTypeReader(typeof(T));
-            if (typeReader == null)
-                throw new ContentLoadException(String.Format("Could not read object type " + typeof(T).Name));
+            int typeReaderIndex = Read7BitEncodedInt();
 
-            var result = (T)typeReader.Read(this, existingInstance);
+            if (typeReaderIndex == 0)
+                return default(T);
+
+            var result = (T)typeReaders[typeReaderIndex - 1].Read(this, existingInstance);
 
             RecordDisposable(result);
 

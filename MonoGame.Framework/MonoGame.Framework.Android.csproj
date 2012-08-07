@@ -97,7 +97,6 @@
     <Compile Include="Game.cs" />
     <Compile Include="GamePlatform.cs" />
     <Compile Include="GraphicsDeviceManager.cs" />
-    <Compile Include="Graphics\CompareFunction.cs" />
     <Compile Include="Graphics\CubeMapFace.cs" />
     <Compile Include="Graphics\DisplayMode.cs" />
     <Compile Include="Graphics\Effect\ConstantBuffer.cs" />
@@ -124,7 +123,6 @@
     <Compile Include="Graphics\PresentationParameters.cs" />
     <Compile Include="Graphics\PresentInterval.cs" />
     <Compile Include="Graphics\States\SamplerState.cs" />
-    <Compile Include="Graphics\StencilOperation.cs" />
     <Compile Include="Graphics\Texture2D.cs" />
     <Compile Include="Graphics\TextureCube.cs" />
     <Compile Include="PrimaryThreadLoader.cs" />

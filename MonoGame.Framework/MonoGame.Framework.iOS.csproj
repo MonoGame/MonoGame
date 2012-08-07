@@ -356,8 +356,6 @@
     <Compile Include="Graphics\ModelMeshPartCollection.cs" />
     <Compile Include="Graphics\CubeMapFace.cs" />
     <Compile Include="Graphics\Texture2D.cs" />
-    <Compile Include="Graphics\CompareFunction.cs" />
-    <Compile Include="Graphics\StencilOperation.cs" />
     <Compile Include="Graphics\PackedVector\NormalizedShort2.cs" />
     <Compile Include="Content\ContentExtensions.cs" />
     <Compile Include="Content\ContentLoadException.cs" />
