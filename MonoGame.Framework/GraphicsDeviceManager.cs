@@ -196,19 +196,22 @@ namespace Microsoft.Xna.Framework
             // TODO:  Does this need to occur here?
             _game.Window.SetSupportedOrientations(_supportedOrientations);
 
-            _graphicsDevice.PresentationParameters.BackBufferFormat = _preferredBackBufferFormat;
-            _graphicsDevice.PresentationParameters.BackBufferWidth = _preferredBackBufferWidth;
-            _graphicsDevice.PresentationParameters.BackBufferHeight = _preferredBackBufferHeight;
-            _graphicsDevice.PresentationParameters.DepthStencilFormat = _preferredDepthStencilFormat;
-            _graphicsDevice.PresentationParameters.IsFullScreen = false;
-            
-            // TODO: We probably should be resetting the whole device
-            // if this changes as we are targeting a different 
-            // hardware feature level.
-            _graphicsDevice.GraphicsProfile = GraphicsProfile;
+            if (GraphicsDevice != null)
+            {
+                _graphicsDevice.PresentationParameters.BackBufferFormat = _preferredBackBufferFormat;
+                _graphicsDevice.PresentationParameters.BackBufferWidth = _preferredBackBufferWidth;
+                _graphicsDevice.PresentationParameters.BackBufferHeight = _preferredBackBufferHeight;
+                _graphicsDevice.PresentationParameters.DepthStencilFormat = _preferredDepthStencilFormat;
+                _graphicsDevice.PresentationParameters.IsFullScreen = false;
 
-            // Update the 
-            _graphicsDevice.CreateSizeDependentResources();
+                // TODO: We probably should be resetting the whole device
+                // if this changes as we are targeting a different 
+                // hardware feature level.
+                _graphicsDevice.GraphicsProfile = GraphicsProfile;
+
+                // Update the 
+                _graphicsDevice.CreateSizeDependentResources();
+            }
 
 #elif WINDOWS || LINUX
             _game.ResizeWindow(false);
