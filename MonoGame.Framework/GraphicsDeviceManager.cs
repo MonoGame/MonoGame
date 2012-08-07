@@ -192,6 +192,9 @@ namespace Microsoft.Xna.Framework
 
         public void ApplyChanges()
         {
+            // Calling ApplyChanges() before CreateDevice() should have no effect
+            if (_graphicsDevice == null)
+                return;
 #if WINRT
             // TODO:  Does this need to occur here?
             _game.Window.SetSupportedOrientations(_supportedOrientations);
@@ -223,22 +226,20 @@ namespace Microsoft.Xna.Framework
 
 			_game.applyChanges(this);
 #else
-            if (GraphicsDevice != null)
-            {
-                GraphicsDevice.PresentationParameters.DisplayOrientation = _game.Window.CurrentOrientation;
+            _graphicsDevice.PresentationParameters.DisplayOrientation = _game.Window.CurrentOrientation;
 
-                // Set the presentation parameters' actual buffer size to match the orientation
-                bool isLandscape = (0 != (_game.Window.CurrentOrientation & (DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight)));
-                int w = PreferredBackBufferWidth;
-                int h = PreferredBackBufferHeight;
+            // Set the presentation parameters' actual buffer size to match the orientation
+            bool isLandscape = (0 != (_game.Window.CurrentOrientation & (DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight)));
+            int w = PreferredBackBufferWidth;
+            int h = PreferredBackBufferHeight;
 
-                GraphicsDevice.PresentationParameters.BackBufferWidth = isLandscape ? Math.Max(w, h) : Math.Min(w, h);
-                GraphicsDevice.PresentationParameters.BackBufferHeight = isLandscape ? Math.Min(w, h) : Math.Max(w, h);
+            _graphicsDevice.PresentationParameters.BackBufferWidth = isLandscape ? Math.Max(w, h) : Math.Min(w, h);
+            _graphicsDevice.PresentationParameters.BackBufferHeight = isLandscape ? Math.Min(w, h) : Math.Max(w, h);
+
 #if !PSS && !IPHONE
-                // Trigger a change in orientation in case the supported orientations have changed
-                _game.Window.SetOrientation(_game.Window.CurrentOrientation, false);
+            // Trigger a change in orientation in case the supported orientations have changed
+            _game.Window.SetOrientation(_game.Window.CurrentOrientation, false);
 #endif
-            }
 #endif
         }
 
