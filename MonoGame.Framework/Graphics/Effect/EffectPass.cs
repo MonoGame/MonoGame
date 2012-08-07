@@ -45,6 +45,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
         static readonly float[] _posFixup = new float[4];
 
+
+
 #endif // OPENGL
 
 #if PSS
@@ -80,7 +82,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             Initialize();
         }
-
+        
         internal EffectPass(Effect effect, EffectPass cloneSource)
         {
             Debug.Assert(effect != null, "Got a null effect!");
@@ -101,7 +103,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
         }
 
-        private void Initialize()
+        internal void Initialize()
         {
 #if OPENGL
             Threading.BlockOnUIThread(() =>
