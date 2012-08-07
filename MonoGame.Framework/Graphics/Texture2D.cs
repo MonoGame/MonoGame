@@ -762,6 +762,7 @@ namespace Microsoft.Xna.Framework.Graphics
         //What was this for again?
 		internal void Reload(Stream textureStream)
 		{
+#if OPENGL
             if (!GL.IsTexture(this.glTexture))
             {
 #if IPHONE || ANDROID
@@ -772,6 +773,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
             FillTextureFromStream(textureStream);
+#endif
 		}
 
 #if ANDROID

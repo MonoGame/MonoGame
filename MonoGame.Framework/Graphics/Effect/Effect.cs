@@ -77,14 +77,15 @@ namespace Microsoft.Xna.Framework.Graphics
 
         void graphicsDevice_DeviceResetting(object sender, EventArgs e)
         {
+#if OPENGL
             foreach (var shader in _shaderList)
-            {
                 shader.NeedsRecompile = true;
-            }
+#endif
         }
 
         void graphicsDevice_DeviceReset(object sender, EventArgs e)
         {
+#if OPENGL
             foreach (var shader in _shaderList)
             {
                 if (shader.NeedsRecompile)
@@ -101,6 +102,8 @@ namespace Microsoft.Xna.Framework.Graphics
                     pass.Initialize();
                 }
             }
+
+#endif // OPENGL
         }
 			
 		protected Effect(Effect cloneSource)
