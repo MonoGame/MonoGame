@@ -59,8 +59,8 @@ namespace Microsoft.Xna.Framework.Graphics
 				_attributes [i].format = shaderData._attributes [i].format;
 			}
 
-			var glslCode = System.Text.Encoding.ASCII.GetString (shaderData.ShaderCode);
-			SetGLSL (glslCode);
+			_glslCode = System.Text.Encoding.ASCII.GetString (shaderData.ShaderCode);
+			Compile ();
 
 		}
 	}

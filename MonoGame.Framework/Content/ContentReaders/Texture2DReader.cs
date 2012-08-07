@@ -111,7 +111,10 @@ namespace Microsoft.Xna.Framework.Content
 					break;
 			}
 			
-			texture = new Texture2D(reader.GraphicsDevice, width, height, levelCount > 1, convertedFormat);
+            if (existingInstance == null)
+			    texture = new Texture2D(reader.GraphicsDevice, width, height, levelCount > 1, convertedFormat);
+            else
+                texture = existingInstance;
 			
 			for (int level=0; level<levelCount; level++)
 			{

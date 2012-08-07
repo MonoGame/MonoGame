@@ -22,10 +22,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public int ShaderHandle;
 
-#if DEBUG
-		// We only keep around the GLSL code for debugging.
-		private string _glslCode;
-#endif
+		// We keep this around for recompiling on context lost and debugging.
+		protected string _glslCode;
+
+		// Flag whether the shader needs to be recompiled
+		internal bool NeedsRecompile = false;
 
 		protected struct Attribute
 		{
@@ -70,22 +71,17 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		static readonly float[] _posFixup = new float[4];
 		
-		protected void SetGLSL (string glslCode)
+		public void Compile()
 		{
 			Threading.BlockOnUIThread (() =>
 			{
 				ShaderHandle = GL.CreateShader (ShaderType);
 #if GLES
-				GL.ShaderSource(ShaderHandle, 1, new string[] { glslCode }, (int[])null);
+				GL.ShaderSource(ShaderHandle, 1, new string[] { _glslCode }, (int[])null);
 #else
-				GL.ShaderSource (ShaderHandle, glslCode);
+				GL.ShaderSource (ShaderHandle, _glslCode);
 #endif
 				GL.CompileShader (ShaderHandle);
-
-#if DEBUG
-				// When debugging store this for later inspection.
-				_glslCode = glslCode;
-#endif
 
 				var compiled = 0;
 #if GLES

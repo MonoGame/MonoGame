@@ -30,7 +30,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			};
 			_attributes = attributes;
 
-			var src = @"
+			_glslCode = @"
 				uniform mat4 transformMatrix;
 				uniform vec4 posFixup;
 
@@ -49,7 +49,7 @@ namespace Microsoft.Xna.Framework.Graphics
 					gl_Position.y = gl_Position.y * posFixup.y;
 					gl_Position.xy += posFixup.zw * gl_Position.ww;
 				}";
-			SetGLSL (src);
+			Compile ();
 		}
 
 		public override void Apply (GraphicsDevice graphicsDevice,
