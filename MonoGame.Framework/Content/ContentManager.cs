@@ -72,7 +72,8 @@ namespace Microsoft.Xna.Framework.Content
         {
             lock (ContentManagerLock)
             {
-                ContentManagers.Add(contentManager);
+                if (!ContentManagers.Contains(contentManager))
+                    ContentManagers.Add(contentManager);
             }
         }
 
@@ -85,13 +86,13 @@ namespace Microsoft.Xna.Framework.Content
             }
         }
 
-        internal static void ReloadAllContent()
+        internal static void ReloadGraphicsContent()
         {
             lock (ContentManagerLock)
             {
                 foreach (var contentManager in ContentManagers)
                 {
-                    contentManager.ReloadContent();
+                    contentManager.ReloadGraphicsAssets();
                 }
             }
         }
@@ -116,6 +117,7 @@ namespace Microsoft.Xna.Framework.Content
 				throw new ArgumentNullException("serviceProvider");
 			}
 			this.serviceProvider = serviceProvider;
+            AddContentManager(this);
 		}
 
 		public ContentManager(IServiceProvider serviceProvider, string rootDirectory)
@@ -130,6 +132,7 @@ namespace Microsoft.Xna.Framework.Content
 			}
 			this.RootDirectory = rootDirectory;
 			this.serviceProvider = serviceProvider;
+            AddContentManager(this);
 		}
 
 		public void Dispose()
@@ -138,6 +141,8 @@ namespace Microsoft.Xna.Framework.Content
 			// Tell the garbage collector not to call the finalizer
 			// since all the cleanup will already be done.
 			GC.SuppressFinalize(this);
+            // Once disposed, content manager wont be used again
+            RemoveContentManager(this);
 		}
 
 		// If disposing is true, it was called explicitly.
@@ -177,12 +182,7 @@ namespace Microsoft.Xna.Framework.Content
             // Load the asset.
             result = ReadAsset<T>(assetName, null);
 
-            // Cache the result.
-            if (!loadedAssets.ContainsKey(assetName))
-            {
-                loadedAssets.Add(assetName, result);
-            }
-
+            loadedAssets[assetName] = result;
             return result;
 		}
 		
@@ -191,8 +191,9 @@ namespace Microsoft.Xna.Framework.Content
 			Stream stream;
 			try
             {
-				string assetPath = Path.Combine(_rootDirectory, assetName) + ".xnb";
+                string assetPath = Path.Combine(_rootDirectory, assetName) + ".xnb";
                 stream = TitleContainer.OpenStream(assetPath);
+
 #if ANDROID
                 // Read the asset into memory in one go. This results in a ~50% reduction
                 // in load times on Android due to slow Android asset streams.
@@ -247,13 +248,32 @@ namespace Microsoft.Xna.Framework.Content
 			}
 			
 			Stream stream = null;
-			bool loadXnb = false;
 			try
             {
 				//try load it traditionally
 				stream = OpenStream(assetName);
-				loadXnb = true;
-			}
+
+                // Try to load as XNB file
+                try
+                {
+                    using (BinaryReader xnbReader = new BinaryReader(stream))
+                    {
+                        using (ContentReader reader = GetContentReaderFromXnb(assetName, ref stream, xnbReader, recordDisposableObject))
+                        {
+                            result = reader.ReadAsset<T>();
+                            if (result is GraphicsResource)
+                                ((GraphicsResource)result).Name = originalAssetName;
+                        }
+                    }
+                }
+                finally
+                {
+                    if (stream != null)
+                    {
+                        stream.Dispose();
+                    }
+                }
+            }
             catch (ContentLoadException)
             {
 				//MonoGame try to load as a non-content file
@@ -330,139 +350,19 @@ namespace Microsoft.Xna.Framework.Content
 						result = new Effect(this.graphicsDeviceService.GraphicsDevice, data);
                     }
                 }
+			}			
+            
+			if (result == null)
+			{
+				throw new ContentLoadException("Could not load " + originalAssetName + " asset!");
 			}
-			
-			if (loadXnb) {
-				// Try to load as XNB file
-                try
-                {
-					using(BinaryReader xnbReader = new BinaryReader(stream))
-					{
-						// The first 4 bytes should be the "XNB" header. i use that to detect an invalid file
-						byte x = xnbReader.ReadByte();
-						byte n = xnbReader.ReadByte();
-						byte b = xnbReader.ReadByte();
-						byte platform = xnbReader.ReadByte();
-	
-						if (x != 'X' || n != 'N' || b != 'B' ||
-							!(platform == 'w' || platform == 'x' || platform == 'm'))
-						{
-							throw new ContentLoadException("Asset does not appear to be a valid XNB file. Did you process your content for Windows?");
-						}
-	
-						byte version = xnbReader.ReadByte();
-						byte flags = xnbReader.ReadByte();
-	
-						bool compressed = (flags & 0x80) != 0;
-						if (version != 5 && version != 4)
-						{
-							throw new ContentLoadException("Invalid XNB version");
-						}
-	
-						// The next int32 is the length of the XNB file
-						int xnbLength = xnbReader.ReadInt32();
-	
-						ContentReader reader;
-						if (compressed)
-						{
-							//decompress the xnb
-							//thanks to ShinAli (https://bitbucket.org/alisci01/xnbdecompressor)
-							int compressedSize = xnbLength - 14;
-							int decompressedSize = xnbReader.ReadInt32();
-							int newFileSize = decompressedSize + 10;
-	
-							MemoryStream decompressedStream = new MemoryStream(decompressedSize);
-	
-							// default window size for XNB encoded files is 64Kb (need 16 bits to represent it)
-							LzxDecoder dec = new LzxDecoder(16);
-							int decodedBytes = 0;
-							long startPos = stream.Position;
-							long pos = startPos;
-							
-#if ANDROID
-                            // Android native stream does not support the Position property. LzxDecoder.Decompress also uses
-                            // Seek.  So we read the entirity of the stream into a memory stream and replace stream with the
-                            // memory stream.
-                            MemoryStream memStream = new MemoryStream();
-                            stream.CopyTo(memStream);
-                            memStream.Seek(0, SeekOrigin.Begin);
-                            stream.Dispose();
-                            stream = memStream;
-                            pos = -14;
-#endif
-	
-							while (pos-startPos < compressedSize)
-							{
-								// the compressed stream is seperated into blocks that will decompress
-								// into 32Kb or some other size if specified.
-								// normal, 32Kb output blocks will have a short indicating the size
-								// of the block before the block starts
-								// blocks that have a defined output will be preceded by a byte of value
-								// 0xFF (255), then a short indicating the output size and another
-								// for the block size
-								// all shorts for these cases are encoded in big endian order
-								int hi = stream.ReadByte();
-								int lo = stream.ReadByte();
-								int block_size = (hi << 8) | lo;
-								int frame_size = 0x8000; // frame size is 32Kb by default
-								// does this block define a frame size?
-								if (hi == 0xFF)
-								{
-									hi = lo;
-									lo = (byte)stream.ReadByte();
-									frame_size = (hi << 8) | lo;
-									hi = (byte)stream.ReadByte();
-									lo = (byte)stream.ReadByte();
-									block_size = (hi << 8) | lo;
-									pos += 5;
-								}
-								else
-									pos += 2;
-								
-								// either says there is nothing to decode
-								if (block_size == 0 || frame_size == 0)
-									break;
-	
-								int lzxRet = dec.Decompress(stream, block_size, decompressedStream, frame_size);
-								pos += block_size;
-								decodedBytes += frame_size;
-								
-								// reset the position of the input just incase the bit buffer
-								// read in some unused bytes
-								stream.Seek(pos, SeekOrigin.Begin);
-							}
-	
-							if (decompressedStream.Position != decompressedSize)
-							{
-								throw new ContentLoadException("Decompression of " + originalAssetName + " failed. ");
-							}
-	
-							decompressedStream.Seek(0, SeekOrigin.Begin);
-							reader = new ContentReader( this, decompressedStream, this.graphicsDeviceService.GraphicsDevice, 
-                                                            originalAssetName, version, recordDisposableObject);
-						}
-						else
-						{
-							reader = new ContentReader( this, stream, this.graphicsDeviceService.GraphicsDevice, 
-                                                            originalAssetName, version, recordDisposableObject);
-						}
-	
-						using(reader)
-						{
-							result = reader.ReadAsset<T>();
-                            if (result is GraphicsResource)
-                                ((GraphicsResource)result).Name = originalAssetName;
-						}
-					}
-				}
-				finally
-                {
-                    if (stream != null)
-                    {
-                        stream.Dispose();
-                    }
-                }
 
+			if (result is IDisposable)
+			{
+				if (recordDisposableObject != null)
+					recordDisposableObject(result as IDisposable);
+				else
+					disposableAssets.Add(result as IDisposable);
 			}
 
 			if (result == null)
@@ -471,31 +371,166 @@ namespace Microsoft.Xna.Framework.Content
 			}
 		
 			CurrentAssetDirectory = null;
-			    
+			
 			return (T)result;
 		}
+
+        private ContentReader GetContentReaderFromXnb(string originalAssetName, ref Stream stream, BinaryReader xnbReader, Action<IDisposable> recordDisposableObject)
+        {
+            // The first 4 bytes should be the "XNB" header. i use that to detect an invalid file
+            byte x = xnbReader.ReadByte();
+            byte n = xnbReader.ReadByte();
+            byte b = xnbReader.ReadByte();
+            byte platform = xnbReader.ReadByte();
+
+            if (x != 'X' || n != 'N' || b != 'B' ||
+                !(platform == 'w' || platform == 'x' || platform == 'm'))
+            {
+                throw new ContentLoadException("Asset does not appear to be a valid XNB file. Did you process your content for Windows?");
+            }
+
+            byte version = xnbReader.ReadByte();
+            byte flags = xnbReader.ReadByte();
+
+            bool compressed = (flags & 0x80) != 0;
+            if (version != 5 && version != 4)
+            {
+                throw new ContentLoadException("Invalid XNB version");
+            }
+
+            // The next int32 is the length of the XNB file
+            int xnbLength = xnbReader.ReadInt32();
+
+            ContentReader reader;
+            if (compressed)
+            {
+                //decompress the xnb
+                //thanks to ShinAli (https://bitbucket.org/alisci01/xnbdecompressor)
+                int compressedSize = xnbLength - 14;
+                int decompressedSize = xnbReader.ReadInt32();
+                int newFileSize = decompressedSize + 10;
+
+                MemoryStream decompressedStream = new MemoryStream(decompressedSize);
+
+                // default window size for XNB encoded files is 64Kb (need 16 bits to represent it)
+                LzxDecoder dec = new LzxDecoder(16);
+                int decodedBytes = 0;
+                long startPos = stream.Position;
+                long pos = startPos;
+
+#if ANDROID
+                // Android native stream does not support the Position property. LzxDecoder.Decompress also uses
+                // Seek.  So we read the entirity of the stream into a memory stream and replace stream with the
+                // memory stream.
+                MemoryStream memStream = new MemoryStream();
+                stream.CopyTo(memStream);
+                memStream.Seek(0, SeekOrigin.Begin);
+                stream.Dispose();
+                stream = memStream;
+                pos = -14;
+#endif
+
+                while (pos - startPos < compressedSize)
+                {
+                    // the compressed stream is seperated into blocks that will decompress
+                    // into 32Kb or some other size if specified.
+                    // normal, 32Kb output blocks will have a short indicating the size
+                    // of the block before the block starts
+                    // blocks that have a defined output will be preceded by a byte of value
+                    // 0xFF (255), then a short indicating the output size and another
+                    // for the block size
+                    // all shorts for these cases are encoded in big endian order
+                    int hi = stream.ReadByte();
+                    int lo = stream.ReadByte();
+                    int block_size = (hi << 8) | lo;
+                    int frame_size = 0x8000; // frame size is 32Kb by default
+                    // does this block define a frame size?
+                    if (hi == 0xFF)
+                    {
+                        hi = lo;
+                        lo = (byte)stream.ReadByte();
+                        frame_size = (hi << 8) | lo;
+                        hi = (byte)stream.ReadByte();
+                        lo = (byte)stream.ReadByte();
+                        block_size = (hi << 8) | lo;
+                        pos += 5;
+                    }
+                    else
+                        pos += 2;
+
+                    // either says there is nothing to decode
+                    if (block_size == 0 || frame_size == 0)
+                        break;
+
+                    int lzxRet = dec.Decompress(stream, block_size, decompressedStream, frame_size);
+                    pos += block_size;
+                    decodedBytes += frame_size;
+
+                    // reset the position of the input just incase the bit buffer
+                    // read in some unused bytes
+                    stream.Seek(pos, SeekOrigin.Begin);
+                }
+
+                if (decompressedStream.Position != decompressedSize)
+                {
+                    throw new ContentLoadException("Decompression of " + originalAssetName + " failed. ");
+                }
+
+                decompressedStream.Seek(0, SeekOrigin.Begin);
+                reader = new ContentReader(this, decompressedStream, this.graphicsDeviceService.GraphicsDevice,
+                                                            originalAssetName, version, recordDisposableObject);
+            }
+            else
+            {
+                reader = new ContentReader(this, stream, this.graphicsDeviceService.GraphicsDevice,
+                                                            originalAssetName, version, recordDisposableObject);
+            }
+            return reader;
+        }
 
         internal void RecordDisposable(IDisposable disposable)
         {
             Debug.Assert(disposable != null, "The disposable is null!");
 
-            // Be sure the system isn't accidentally recording
-            // disposable objects twice!
-            Debug.Assert(!disposableAssets.Contains(disposable), "The disposable has already been recorded!");
-
-            // Store it for disposal later.
-            disposableAssets.Add(disposable);
+            // Avoid recording disposable objects twice. ReloadAsset will try to record the disposables again.
+            // We don't know which asset recorded which disposable so just guard against storing multiple of the same instance.
+            if (!disposableAssets.Contains(disposable))
+                disposableAssets.Add(disposable);
         }
 
-		protected void ReloadContent()
+        /// <summary>
+        /// Virtual property to allow a derived ContentManager to have it's assets reloaded
+        /// </summary>
+        protected virtual Dictionary<string, object> LoadedAssets
         {
-            foreach (var asset in loadedAssets)
+            get { return loadedAssets; }
+        }
+
+		protected virtual void ReloadGraphicsAssets()
+        {
+            foreach (var asset in LoadedAssets)
             {
-                ReloadAsset(asset.Key, asset.Value);
+                if (asset.Value is Texture2D)
+                {
+                    ReloadAsset<Texture2D>(asset.Key, asset.Value as Texture2D);
+                }
+                else if (asset.Value is SpriteFont)
+                {
+                    ReloadAsset<SpriteFont>(asset.Key, asset.Value as SpriteFont);
+                }
+                else if (asset.Value is Model)
+                {
+                    ReloadAsset<Model>(asset.Key, asset.Value as Model);
+                }
+                // Not requried as we are recompiling them from cached source in response to DeviceReset event
+                //else if (asset.Value is Effect)
+                //{
+                //    ReloadAsset<Effect>(asset.Key, asset.Value as Effect);
+                //}
             }
         }
-        
-        protected void ReloadAsset(string originalAssetName, object currentAsset)
+
+        protected virtual void ReloadAsset<T>(string originalAssetName, T currentAsset)
         {
 			string assetName = originalAssetName;
 			if (string.IsNullOrEmpty(assetName))
@@ -517,16 +552,36 @@ namespace Microsoft.Xna.Framework.Content
 			}
 			
 			Stream stream = null;
-			//bool loadXnb = false;
 			try
 			{
-				//try load it traditionally
-				stream = OpenStream(assetName);
-				stream.Dispose();
+                //try load it traditionally
+                stream = OpenStream(assetName);
+
+                // Try to load as XNB file
+                try
+                {
+                    using (BinaryReader xnbReader = new BinaryReader(stream))
+                    {
+                        using (ContentReader reader = GetContentReaderFromXnb(assetName, ref stream, xnbReader, null))
+                        {
+                            reader.InitializeTypeReaders();
+                            reader.ReadObject<T>(currentAsset);
+                            reader.ReadSharedResources();
+                        }
+                    }
+                }
+                finally
+                {
+                    if (stream != null)
+                    {
+                        stream.Dispose();
+                    }
+                }
 			}
 			catch (ContentLoadException)
 			{
-				//MonoGame try to load as a non-content file
+				// Try to reload as a non-xnb file.
+                // Just textures supported for now.
 
 				assetName = TitleContainer.GetFilename(Path.Combine (_rootDirectory, assetName));
 				
@@ -534,51 +589,15 @@ namespace Microsoft.Xna.Framework.Content
                 {
                     assetName = Texture2DReader.Normalize(assetName);
                 }
-                else if ((currentAsset is SpriteFont))
+
+                if (currentAsset is Texture2D)
                 {
-                    assetName = SpriteFontReader.Normalize(assetName);
-                }
-#if !WINRT
-                else if ((currentAsset is Song))
-                {
-                    assetName = SongReader.Normalize(assetName);
-                }
-                else if ((currentAsset is SoundEffect))
-                {
-                    assetName = SoundEffectReader.Normalize(assetName);
-                }
-                else if ((currentAsset is Video))
-                {
-                    assetName = Video.Normalize(assetName);
-                }
-#endif
-                if (string.IsNullOrEmpty(assetName))
-                {
-                    throw new ContentLoadException("Could not load " + originalAssetName + " asset!");
-                }
-			
-                if ((currentAsset is Texture2D))
-                {
-                    using (Stream assetStream = OpenStream(assetName))
+                    using (Stream assetStream = TitleContainer.OpenStream(assetName))
                     {
                         var asset = currentAsset as Texture2D;
                         asset.Reload(assetStream);
                     }
                 }
-                else if ((currentAsset is SpriteFont))
-                {
-                }
-#if !WINRT
-                else if ((currentAsset is Song))
-                {
-                }
-                else if ((currentAsset is SoundEffect))
-                {
-                }
-                else if ((currentAsset is Video))
-                {
-                }
-#endif
             }
 		}
 
@@ -590,7 +609,6 @@ namespace Microsoft.Xna.Framework.Content
 		        if (disposable != null)
 		            disposable.Dispose();
 		    }
-		    RemoveContentManager(this);
 			disposableAssets.Clear();
 		    loadedAssets.Clear();
 		}

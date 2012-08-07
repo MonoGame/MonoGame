@@ -685,6 +685,35 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
         }
 
+        private void FillTextureFromStream(Stream stream)
+        {
+#if ANDROID
+            // Work-around for "The program 'Mono' has exited with code 255 (0xff)."
+            // Based on http://stackoverflow.com/questions/7535503/mono-for-android-exit-code-255-on-bitmapfactory-decodestream
+            //Bitmap image = BitmapFactory.DecodeStream(stream);
+            Bitmap image = null;
+            using (MemoryStream memStream = new MemoryStream())
+            {
+                stream.CopyTo(memStream);
+                image = BitmapFactory.DecodeByteArray(memStream.GetBuffer(), 0, (int)memStream.Length);
+            }
+            var width = image.Width;
+            var height = image.Height;
+
+            int[] pixels = new int[width * height];
+            image.GetPixels(pixels, 0, width, 0, 0, width, height);
+
+            // Convert from ARGB to ABGR
+            for (int i = 0; i < width * height; ++i)
+            {
+                uint pixel = (uint)pixels[i];
+                pixels[i] = (int)((pixel & 0xFF00FF00) | ((pixel & 0x00FF0000) >> 16) | ((pixel & 0x000000FF) << 16));
+            }
+            
+            this.SetData<int>(pixels);
+#endif
+        }
+
         public void SaveAsJpeg(Stream stream, int width, int height)
         {
 #if WINRT
@@ -733,6 +762,16 @@ namespace Microsoft.Xna.Framework.Graphics
         //What was this for again?
 		internal void Reload(Stream textureStream)
 		{
+            if (!GL.IsTexture(this.glTexture))
+            {
+#if IPHONE || ANDROID
+                GL.GenTextures(1, ref this.glTexture);
+#else
+                GL.GenTextures(1, out this.glTexture);
+#endif
+            }
+
+            FillTextureFromStream(textureStream);
 		}
 
 #if ANDROID
