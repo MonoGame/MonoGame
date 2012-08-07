@@ -291,8 +291,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void Initialize()
         {
-            // Clear the effect cache since the
-            // device context is going to be reset.
+            // TODO: This line should not be necessary as Effects are being recompiled
+            // in DeviceReset. There seems to be an issue related to static
+            // initialisation order and removing it breaks drawing in 3d.
             Effect.FlushCache();
 
             // Setup extensions.
@@ -396,22 +397,27 @@ namespace Microsoft.Xna.Framework.Graphics
             creationFlags |= SharpDX.Direct3D11.DeviceCreationFlags.Debug;
 #endif
 
-            // TODO: Maybe this should be changed based on Reach/HiDef profile?
-            var featureLevels = new []
+            // Pass the preferred feature levels based on the
+            // target profile that may have been set by the user.
+            var featureLevels = new List<FeatureLevel>();
+            if (GraphicsProfile == GraphicsProfile.HiDef)
             {
-                FeatureLevel.Level_11_1,
-                FeatureLevel.Level_11_0,
-                FeatureLevel.Level_10_1,
-                FeatureLevel.Level_10_0,
-                FeatureLevel.Level_9_3,
-                FeatureLevel.Level_9_2,
-                FeatureLevel.Level_9_1,
-            };
+                featureLevels.Add(FeatureLevel.Level_11_1);
+                featureLevels.Add(FeatureLevel.Level_11_0);
+                featureLevels.Add(FeatureLevel.Level_10_1);
+                featureLevels.Add(FeatureLevel.Level_10_0);
+            }
+            featureLevels.Add(FeatureLevel.Level_9_3);
+            featureLevels.Add(FeatureLevel.Level_9_2);
+            featureLevels.Add(FeatureLevel.Level_9_1);
 
             // Create the Direct3D device.
-            using (var defaultDevice = new SharpDX.Direct3D11.Device(DriverType.Hardware, creationFlags, featureLevels))
+            using (var defaultDevice = new SharpDX.Direct3D11.Device(DriverType.Hardware, creationFlags, featureLevels.ToArray()))
                 _d3dDevice = defaultDevice.QueryInterface<SharpDX.Direct3D11.Device1>();
+
+            // Set the correct profile based on the feature level.
             _featureLevel = _d3dDevice.FeatureLevel;
+            GraphicsProfile = _featureLevel <= FeatureLevel.Level_9_3 ? GraphicsProfile.Reach : GraphicsProfile.HiDef;
 
             // Get Direct3D 11.1 context
             _d3dContext = _d3dDevice.ImmediateContext.QueryInterface<SharpDX.Direct3D11.DeviceContext1>();
@@ -906,17 +912,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void Reset()
         {
-            _viewport.Width = DisplayMode.Width;
-            _viewport.Height = DisplayMode.Height;
-
-            if (ResourcesLost)
-            {
-                ContentManager.ReloadAllContent();
-                ResourcesLost = false;
-            }
-
-            if(DeviceReset != null)
-                DeviceReset(null, new EventArgs());
+            // Manually resetting the device is not currently supported.
+            throw new NotImplementedException();
         }
 
         public void Reset(Microsoft.Xna.Framework.Graphics.PresentationParameters presentationParameters)
@@ -927,6 +924,26 @@ namespace Microsoft.Xna.Framework.Graphics
         public void Reset(Microsoft.Xna.Framework.Graphics.PresentationParameters presentationParameters, GraphicsAdapter graphicsAdapter)
         {
             throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Trigger the DeviceResetting event
+        /// Currently internal to allow the various platforms to send the event at the appropriate time.
+        /// </summary>
+        internal void OnDeviceResetting()
+        {
+            if (DeviceResetting != null)
+                DeviceResetting(this, EventArgs.Empty);
+        }
+
+        /// <summary>
+        /// Trigger the DeviceReset event to allow games to be notified of a device reset.
+        /// Currently internal to allow the various platforms to send the event at the appropriate time.
+        /// </summary>
+        internal void OnDeviceReset()
+        {
+            if (DeviceReset != null)
+                DeviceReset(this, EventArgs.Empty);
         }
 
         public Microsoft.Xna.Framework.Graphics.DisplayMode DisplayMode
@@ -980,11 +997,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        public Microsoft.Xna.Framework.Graphics.GraphicsProfile GraphicsProfile
-        {
-            get;
-            set;
-        }
+        public GraphicsProfile GraphicsProfile { get; set; }
 
         public Rectangle ScissorRectangle
         {

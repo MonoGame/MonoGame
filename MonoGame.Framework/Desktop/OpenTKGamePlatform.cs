@@ -74,6 +74,7 @@ using System.Text;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input.Touch;
+using Microsoft.Xna.Framework.Input;
 
 namespace Microsoft.Xna.Framework
 {
@@ -81,6 +82,8 @@ namespace Microsoft.Xna.Framework
     {
         private OpenTKGameWindow _view;
 		private OpenALSoundController soundControllerInstance = null;
+        // stored the current screen state, so we can check if it has changed.
+        private bool isCurrentlyFullScreen = false;
         
         
         public override bool VSyncEnabled
@@ -139,12 +142,15 @@ namespace Microsoft.Xna.Framework
 #if LINUX
             Tao.Sdl.SdlMixer.Mix_CloseAudio();
 #endif
+            OpenTK.DisplayDevice.Default.RestoreResolution();
         }
 
         public override bool BeforeUpdate(GameTime gameTime)
         {
-			// Update our OpenAL sound buffer pools
-			soundControllerInstance.Update();
+            IsActive = _view.Window.Focused;
+            
+            // Update our OpenAL sound buffer pools
+            soundControllerInstance.Update();
 
             // Let the touch panel update states.
             TouchPanel.UpdateState();
@@ -205,7 +211,6 @@ namespace Microsoft.Xna.Framework
                 bounds.Width = graphicsDeviceManager.PreferredBackBufferWidth;
                 bounds.Height = graphicsDeviceManager.PreferredBackBufferHeight;
             }
-
             
 
             // Now we set our Presentation Parameters
@@ -220,13 +225,18 @@ namespace Microsoft.Xna.Framework
                 parms.BackBufferWidth = (int)bounds.Width;
             }
 
-            if (toggleFullScreen)
+            if (graphicsDeviceManager.IsFullScreen != isCurrentlyFullScreen)
+            {                
                 _view.ToggleFullScreen();
+            }
 
             // we only change window bounds if we are not fullscreen
             // or if fullscreen mode was just entered
-            if (!graphicsDeviceManager.IsFullScreen || toggleFullScreen)
+            if (!graphicsDeviceManager.IsFullScreen || (graphicsDeviceManager.IsFullScreen != isCurrentlyFullScreen))
                 _view.ChangeClientBounds(bounds);
+
+            // store the current fullscreen state
+            isCurrentlyFullScreen = graphicsDeviceManager.IsFullScreen;
 
             IsActive = wasActive;
         }
@@ -240,7 +250,16 @@ namespace Microsoft.Xna.Framework
         {
             
         }
-
+  
+        protected override void OnIsMouseVisibleChanged()
+        {
+            MouseState oldState = Mouse.GetState();
+            _view.Window.CursorVisible = IsMouseVisible;
+            // IsMouseVisible changes the location of the cursor on Linux (and Windows?) and we have to manually set it back to the correct position
+            System.Drawing.Point mousePos = _view.Window.PointToScreen(new System.Drawing.Point(oldState.X, oldState.Y));
+            OpenTK.Input.Mouse.SetPosition(mousePos.X, mousePos.Y);
+        }
+        
         public override void Log(string Message)
         {
             Console.WriteLine(Message);
@@ -250,12 +269,16 @@ namespace Microsoft.Xna.Framework
         {
             base.Present();
 
-            _view.Window.SwapBuffers();
+            if (_view != null) _view.Window.SwapBuffers();
         }
 		
         protected override void Dispose(bool disposing)
         {
-            _view.Dispose ();
+            if (_view != null)
+            {
+                _view.Dispose();
+                _view = null;
+            }
 			
 			base.Dispose(disposing);
         }

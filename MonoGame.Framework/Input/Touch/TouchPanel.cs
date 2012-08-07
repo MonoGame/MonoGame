@@ -122,7 +122,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
                     // Remove any pending events of this type.
                     for (var j = i; j < _events.Count; )
                     {
-                        if (_events[j].Id == loc.Id)
+                        if (_events[j].Id == loc.Id &&
+                            _events[j].State == loc.State)
                         {
                             loc = _events[j];
                             _events.RemoveAt(j);
@@ -209,11 +210,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
         {
             get
             {
-#if ANDROID				
-				return (int)Game.Activity.Resources.DisplayMetrics.HeightPixels;
-#else
                 return Game.Instance.Window.ClientBounds.Height;
-#endif
             }
             set
             {
@@ -230,11 +227,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
         {
             get
             {
-#if ANDROID				
-				return (int)Game.Activity.Resources.DisplayMetrics.WidthPixels;
-#else
                 return Game.Instance.Window.ClientBounds.Width;
-#endif				
             }
             set
             {
