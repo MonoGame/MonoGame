@@ -156,6 +156,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif // OPENGL
         }
 
+#if OPENGL
         internal void CompileShader()
         {
             Threading.BlockOnUIThread(() =>
@@ -196,8 +197,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
             });
         }
-
-#if OPENGL
         
         public void OnLink(int program) 
         {
