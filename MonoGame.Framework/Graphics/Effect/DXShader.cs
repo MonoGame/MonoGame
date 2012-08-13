@@ -156,6 +156,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif // OPENGL
         }
 
+#if OPENGL
         internal void CompileShader()
         {
             Threading.BlockOnUIThread(() =>
@@ -164,7 +165,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #if GLES
                 GL.ShaderSource(ShaderHandle, 1, new string[] { _glslCode }, (int[])null);
 #else
-                GL.ShaderSource(ShaderHandle, glslCode);
+                GL.ShaderSource(ShaderHandle, _glslCode);
 #endif
                 GL.CompileShader(ShaderHandle);
 
@@ -196,8 +197,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
             });
         }
-
-#if OPENGL
         
         public void OnLink(int program) 
         {
