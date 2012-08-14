@@ -759,7 +759,11 @@ namespace Microsoft.Xna.Framework.Graphics
 				bufferMask = bufferMask | ClearBufferMask.StencilBufferBit;
 			}
 			if (options.HasFlag(ClearOptions.DepthBuffer)) {
-				GL.ClearDepth (depth);
+#if GLES
+                GL.ClearDepth (depth);
+#else
+                GL.ClearDepth ((double)depth);
+#endif
 				bufferMask = bufferMask | ClearBufferMask.DepthBufferBit;
 			}
 
@@ -992,7 +996,11 @@ namespace Microsoft.Xna.Framework.Graphics
                     _d3dContext.Rasterizer.SetViewports(viewport);
 #elif OPENGL
 				GL.Viewport (value.X, value.Y, value.Width, value.Height);
-				GL.DepthRange(value.MinDepth, value.MaxDepth);
+#if GLES
+                GL.DepthRange(value.MinDepth, value.MaxDepth);
+#else
+                GL.DepthRange((double)value.MinDepth, (double)value.MaxDepth);
+#endif
 #endif
             }
         }
