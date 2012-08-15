@@ -135,29 +135,12 @@ namespace Microsoft.Xna.Framework {
 				//case UITouchPhase.Stationary:
 				case UITouchPhase.Moved:
 					TouchPanel.AddEvent(new TouchLocation(id, TouchLocationState.Moved, position));					
-					if (i == 0) 
-					{
-						Mouse.State.X = (int) position.X;
-						Mouse.State.Y = (int) position.Y;
-					}
 					break;
 				case UITouchPhase.Began:
                     TouchPanel.AddEvent(new TouchLocation(id, TouchLocationState.Pressed, position));
-					if (i == 0) 
-                    {
-						Mouse.State.X = (int) position.X;
-						Mouse.State.Y = (int) position.Y;
-						Mouse.State.LeftButton = ButtonState.Pressed;
-					}
 					break;
 				case UITouchPhase.Ended	:
                     TouchPanel.AddEvent(new TouchLocation(id, TouchLocationState.Released, position));
-					if (i == 0) 
-                    {
-						Mouse.State.X = (int) position.X;
-						Mouse.State.Y = (int) position.Y;
-						Mouse.State.LeftButton = ButtonState.Released;
-					}
 					break;
 				case UITouchPhase.Cancelled:
                     TouchPanel.AddEvent(new TouchLocation(id, TouchLocationState.Released, position));

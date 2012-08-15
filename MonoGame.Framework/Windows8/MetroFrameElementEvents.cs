@@ -99,12 +99,14 @@ namespace Microsoft.Xna.Framework
 
             var isTouch = currentPoint.PointerDevice.PointerDeviceType == Windows.Devices.Input.PointerDeviceType.Touch;
             var touchIsDown = currentPoint.IsInContact;
-            if (isTouch && touchIsDown)
-                TouchPanel.AddEvent((int)currentPoint.PointerId, TouchLocationState.Moved, pos);
-
-            if (!isTouch || currentPoint.Properties.IsPrimary && touchIsDown)
+            if (isTouch)
             {
-                // Mouse or stylus event or the primary touch event (simulated as mouse input)
+                if (touchIsDown)
+                    TouchPanel.AddEvent((int)currentPoint.PointerId, TouchLocationState.Moved, pos);
+            }
+            else
+            {
+                // Mouse or stylus event.
                 Mouse.State.Update(args);
             }
         }
@@ -123,10 +125,9 @@ namespace Microsoft.Xna.Framework
             var isTouch = currentPoint.PointerDevice.PointerDeviceType == Windows.Devices.Input.PointerDeviceType.Touch;
             if (isTouch)
                 TouchPanel.AddEvent((int)currentPoint.PointerId, TouchLocationState.Released, pos);
-
-            if (!isTouch || currentPoint.Properties.IsPrimary)
+            else
             {
-                // Mouse or stylus event or the primary touch event (simulated as mouse input)
+                // Mouse or stylus event.
                 Mouse.State.Update(args);
             }
         }
@@ -145,10 +146,9 @@ namespace Microsoft.Xna.Framework
             var isTouch = currentPoint.PointerDevice.PointerDeviceType == Windows.Devices.Input.PointerDeviceType.Touch;
             if (isTouch)
                 TouchPanel.AddEvent((int)currentPoint.PointerId, TouchLocationState.Pressed, pos);
-
-            if (!isTouch || currentPoint.Properties.IsPrimary)
+            else
             {
-                // Mouse or stylus event or the primary touch event (simulated as mouse input)
+                // Mouse or stylus event.
                 Mouse.State.Update(args);
             }
         }
