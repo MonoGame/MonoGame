@@ -85,6 +85,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.GamerServices;
+using OpenTK.Graphics.OpenGL;
 
 
 namespace Microsoft.Xna.Framework
@@ -391,6 +392,14 @@ namespace Microsoft.Xna.Framework
         private TimeSpan _accumulatedElapsedTime;
         private readonly GameTime _gameTime = new GameTime();
         private Stopwatch _gameTimer = Stopwatch.StartNew();
+
+        public static void GetGLError()
+        {
+            var error = GL.GetError();
+
+            if (error != ErrorCode.NoError)
+                error = error;
+        }
 
         public void Tick()
         {

@@ -9,7 +9,7 @@ using System.IO;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 {
-    [ContentProcessor(DisplayName = "Sprite Font Processor")]
+    [ContentProcessor(DisplayName = "MonoGame Sprite Font Processor")]
     class FontDescriptionProcessor : ContentProcessor<SpriteFontContent, SpriteFontContent>
     {
         public override SpriteFontContent Process(SpriteFontContent input,

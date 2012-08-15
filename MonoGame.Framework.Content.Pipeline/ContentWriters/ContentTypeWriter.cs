@@ -36,7 +36,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
 
         public virtual string GetRuntimeType(TargetPlatform targetPlatform)
         {
-            throw new NotSupportedException();
             return String.Empty;
         }
 

@@ -146,7 +146,9 @@ namespace Microsoft.Xna.Framework.Graphics
 #if OPENGL
 		internal virtual void Activate()
         {
+            Game.GetGLError();
 			GL.BindTexture(glTarget, this.glTexture);
+            Game.GetGLError();
         }
 #endif
 
@@ -179,7 +181,9 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
 #elif OPENGL
-			GL.DeleteTextures(1, ref glTexture);
+            GL.DeleteTextures(1, ref glTexture);
+            //Threading.BlockOnUIThread(() => {  });
+			
 #endif
             base.Dispose();
 		}

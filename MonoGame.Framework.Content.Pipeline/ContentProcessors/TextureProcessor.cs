@@ -14,13 +14,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         NoChange
     }
 
-    [ContentProcessorAttribute]
+    [ContentProcessor(DisplayName="MonoGame Texture Processor")]
     public class TextureProcessor : ContentProcessor<TextureContent, TextureContent>
     {
-        public TextureProcessor()
-        {
-
-        }
+        public TextureProcessor() { }
 
         public virtual Color ColorKeyColor { get; set; }
 
@@ -37,7 +34,25 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
         public override TextureContent Process(TextureContent input, ContentProcessorContext context)
         {
-            throw new NotImplementedException();
+            if (PremultiplyAlpha)
+                GraphicsUtil.PremultiplyAlpha(input);
+
+            if (ColorKeyEnabled)
+                throw new NotImplementedException();
+
+            if (GenerateMipmaps)
+                throw new NotImplementedException();
+
+            if (ResizeToPowerOfTwo)
+                throw new NotImplementedException();
+
+            if (TextureFormat == TextureProcessorOutputFormat.NoChange)
+                return input;
+
+            if (TextureFormat != TextureProcessorOutputFormat.Color)
+                throw new NotImplementedException();
+
+            return input;
         }
 
 
