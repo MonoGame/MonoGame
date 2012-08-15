@@ -250,6 +250,11 @@ namespace Microsoft.Xna.Framework.Input.Touch
             // TODO: We need to unify the Mouse code in order to get
             // the fake mouse events to work properly across all devices.
 
+            // TODO: Another way to do this is to have Mouse.GetState() query
+            // TouchPanel to build state on demand.
+            //
+            // Android does it that way... is it better?
+
             // Does this device has a mouse connected?
 #if IPHONE
             var isMouseConnected = false;
