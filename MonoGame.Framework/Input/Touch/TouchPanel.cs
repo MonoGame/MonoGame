@@ -247,11 +247,12 @@ namespace Microsoft.Xna.Framework.Input.Touch
             // Apply the touch scale to the new location.
             _events.Add(new TouchLocation(id, state, position * _touchScale));
 
+            // TODO: We need to unify the Mouse code in order to get
+            // the fake mouse events to work properly across all devices.
+
             // Does this device has a mouse connected?
-#if IPHONE || ANDROID || PSS
+#if IPHONE
             var isMouseConnected = false;
-#elif WINDOWS || MONOMAC || LINUX 
-            var isMouseConnected = true;
 #elif WINRT
             // NOTE: Some WinRT devices have a mouse driver installed even when
             // there is no physical mouse connected to the device.  You can fix 
@@ -259,7 +260,9 @@ namespace Microsoft.Xna.Framework.Input.Touch
             var mouseCapabilities = new Windows.Devices.Input.MouseCapabilities();
             var isMouseConnected = mouseCapabilities.MousePresent != 0;
 #endif
-            
+
+#if IPHONE || WINRT
+
             // If we don't have a mouse then send fake mouse
             // events using the touch state.
             if (!isMouseConnected && (_mouseTouchId == -1 || _mouseTouchId == id))
@@ -278,6 +281,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
                     _mouseTouchId = id;
                 }
             }
+#endif
         }
 
         internal static void UpdateState()
