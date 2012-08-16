@@ -224,7 +224,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
                 // Get the window size.
                 //
                 // TODO: This will be alot smoother once we get XAML working with Game.
-                Vector2 windowSize;
+                Vector2 windowSize = Vector2.One;
                 if (Game.Instance != null)
                     windowSize = new Vector2(   Game.Instance.Window.ClientBounds.Width,
                                                 Game.Instance.Window.ClientBounds.Height);
