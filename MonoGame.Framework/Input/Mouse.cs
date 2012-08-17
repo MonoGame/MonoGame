@@ -40,24 +40,156 @@ purpose and non-infringement.
 
 using System;
 
+#if WINDOWS || MONOMAC || LINUX
+using MouseInfo = OpenTK.Input.Mouse;
+#else
+using Microsoft.Xna.Framework.Input.Touch;
+#endif
+
 namespace Microsoft.Xna.Framework.Input
 {
     public static class Mouse
     {
-		internal static MouseState State;
+		private static MouseState _state;
+
+#if WINDOWS || MONOMAC || LINUX
+		private static OpenTK.Input.MouseDevice _mouse = null;			
+#endif
+
+#if WINDOWS
+
+        static OpenTK.GameWindow Window;
+
+        internal static void setWindows(OpenTK.GameWindow window)
+        {
+            Window = window;
+            _mouse = window.Mouse;        
+        }
+
+#elif MONOMAC || LINUX
+
+        internal static void UpdateMouseInfo(OpenTK.Input.MouseDevice mouse)
+		{
+			_mouse = mouse;
+			_mouse.Move += HandleWindowMouseMove;
+		}
+
+        internal static void HandleWindowMouseMove (object sender, OpenTK.Input.MouseMoveEventArgs e)
+		{
+			SetPosition(e.X, e.Y);
+		}
+
+#endif
+
+        #region Public interface
 
         public static IntPtr WindowHandle { get; set; }
 		
         public static MouseState GetState()
         {
-            return State;
+#if WINDOWS || MONOMAC || LINUX
+
+			// maybe someone is tring to get mouse before initialize
+			if (_mouse == null)
+                return _state;
+
+#if WINDOWS
+            var p = new POINT();
+            GetCursorPos(out p);
+            var pc = Window.PointToClient(p.ToPoint());
+            _state.X = pc.X;
+            _state.Y = pc.Y;
+#endif
+
+            _state.LeftButton = _mouse[OpenTK.Input.MouseButton.Left] ? ButtonState.Pressed : ButtonState.Released;
+			_state.RightButton = _mouse[OpenTK.Input.MouseButton.Right] ? ButtonState.Pressed : ButtonState.Released;
+			_state.MiddleButton = _mouse[OpenTK.Input.MouseButton.Middle] ? ButtonState.Pressed : ButtonState.Released;;
+
+			// WheelPrecise is divided by 120 (WHEEL_DELTA) in OpenTK (WinGLNative.cs)
+			// We need to counteract it to get the same value XNA provides
+			_state.ScrollWheelValue = (int)( _mouse.WheelPrecise * 120 );
+
+#else // Android, iOS, PSS, Win8
+
+            var state = TouchPanel.GetState();
+            if (state.Count > 0)
+            {
+                var middlePosition = Vector2.Zero;
+                var currentNumberOfTouches = 0;
+                for (var i = 0; i < state.Count; i++)
+                {
+                    if (state[i].State != TouchLocationState.Pressed && 
+                        state[i].State != TouchLocationState.Moved)
+                        continue;
+
+                    middlePosition += state[i].Position;
+                    currentNumberOfTouches++;
+                    break;
+                }
+
+                if (currentNumberOfTouches > 1)
+                    middlePosition /= currentNumberOfTouches;
+
+                if (middlePosition != Vector2.Zero)
+                {
+                    _state.X = (int) middlePosition.X;
+                    _state.Y = (int) middlePosition.Y;
+                }
+            }
+#endif
+
+            return _state;
         }
 
         public static void SetPosition(int x, int y)
         {
-            State.X = x;
-            State.Y = y;
+            _state.X = x;
+            _state.Y = y;
+			
+#if WINDOWS
+            ///correcting the coordinate system
+            ///Only way to set the mouse position !!!
+            System.Drawing.Point pt = Window.PointToScreen(new System.Drawing.Point(x, y));
+            SetCursorPos(pt.X, pt.Y);
+#elif MONOMAC || LINUX
+			// TODO propagate change to opentk mouse object (requires opentk 1.1)
+			//throw new NotImplementedException("Feature not implemented.");
+#endif			
         }
+
+        #endregion // Public interface
+
+#if WINDOWS
+
+        [System.Runtime.InteropServices.DllImportAttribute("user32.dll", EntryPoint = "SetCursorPos")]
+        [return: System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.Bool)]
+        public static extern bool SetCursorPos(int X, int Y);
+
+        /// <summary>
+        /// Struct representing a point.
+        /// </summary>
+        [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
+        public struct POINT
+        {
+            public int X;
+            public int Y;
+
+            public System.Drawing.Point ToPoint()
+            {
+                return new System.Drawing.Point(X, Y);
+            }
+
+        }
+
+        /// <summary>
+        /// Retrieves the cursor's position, in screen coordinates.
+        /// </summary>
+        /// <see>See MSDN documentation for further information.</see>
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        public static extern bool GetCursorPos(out POINT lpPoint);
+      
+#endif
+
     }
 }
 
