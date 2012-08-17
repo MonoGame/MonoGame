@@ -67,8 +67,9 @@ namespace Microsoft.Xna.Framework
         private bool _preferMultiSampling;
         private DisplayOrientation _supportedOrientations;
         private bool _synchronizedWithVerticalRetrace = true;
+#if !(WINDOWS || LINUX || WINRT)
         private bool _wantFullScreen = true;
-
+#endif
         public static readonly int DefaultBackBufferHeight = 480;
         public static readonly int DefaultBackBufferWidth = 800;
 
@@ -93,7 +94,7 @@ namespace Microsoft.Xna.Framework
 #endif
 
             _preferredBackBufferFormat = SurfaceFormat.Color;
-            _preferredDepthStencilFormat = DepthFormat.None;
+            _preferredDepthStencilFormat = DepthFormat.Depth24;
             _synchronizedWithVerticalRetrace = true;
 
             if (game.Services.GetService(typeof(IGraphicsDeviceManager)) != null)

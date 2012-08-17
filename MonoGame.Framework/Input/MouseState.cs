@@ -99,6 +99,18 @@ namespace Microsoft.Xna.Framework.Input
 			return !(left == right);
 		}
 
+        public override bool Equals(object obj)
+        {
+            if (obj is MouseState)
+                return this == (MouseState)obj;
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+
 		public int X {
 			get {
 				return _x;
