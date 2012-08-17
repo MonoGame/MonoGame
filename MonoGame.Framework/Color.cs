@@ -39,7 +39,7 @@ namespace Microsoft.Xna.Framework
     #else
     [Serializable]
     #endif
-    public struct Color : IEquatable<Color>, ITemporaryName<Color>
+    public struct Color : IEquatable<Color>
     {
 		// ARGB
         private uint _packedValue;
@@ -1272,15 +1272,6 @@ namespace Microsoft.Xna.Framework
         public bool Equals(Color other)
         {
 			return this.PackedValue == other.PackedValue;
-        }
-
-        #endregion
-
-        #region IPackedVectorConverter
-
-        public Color SetPixel(byte[] data, int startIndex, SurfaceFormat format)
-        {
-            return new Color();
         }
 
         #endregion

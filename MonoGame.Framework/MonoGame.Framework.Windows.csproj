@@ -183,7 +183,6 @@
     <Compile Include="Input\Keyboard.cs" />
     <Compile Include="Input\MouseState.cs" />
     <Compile Include="Input\Touch\TouchInfo.cs" />
-    <Compile Include="ITemporaryName.cs" />
     <Compile Include="LaunchParameters.cs" />
     <Compile Include="Media\VideoSoundtrackType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

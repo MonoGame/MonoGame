@@ -27,7 +27,6 @@ SOFTWARE.
 
 using System;
 using System.Text;
-using Microsoft.Xna.Framework.Graphics;
 #if WINRT
 using System.Runtime.Serialization;
 #endif

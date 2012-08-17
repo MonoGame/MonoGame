@@ -34,7 +34,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Microsoft.Xna.Framework.Content
 {
-    public class SpriteFontReader : ContentTypeReader<SpriteFont>
+    internal class SpriteFontReader : ContentTypeReader<SpriteFont>
     {
         internal SpriteFontReader()
         {

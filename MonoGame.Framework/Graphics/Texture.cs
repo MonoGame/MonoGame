@@ -146,9 +146,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #if OPENGL
 		internal virtual void Activate()
         {
-            Game.GetGLError();
 			GL.BindTexture(glTarget, this.glTexture);
-            Game.GetGLError();
         }
 #endif
 

@@ -393,14 +393,6 @@ namespace Microsoft.Xna.Framework
         private readonly GameTime _gameTime = new GameTime();
         private Stopwatch _gameTimer = Stopwatch.StartNew();
 
-        public static void GetGLError()
-        {
-            var error = GL.GetError();
-
-            if (error != ErrorCode.NoError)
-                error = error;
-        }
-
         public void Tick()
         {
             // NOTE: This code is very sensitive and can break very badly

@@ -532,6 +532,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 case SurfaceFormat.Alpha8:
                     return 1;
 				case SurfaceFormat.NormalizedByte4:
+                    return 4;
                 default:
                     throw new NotImplementedException();
             }
