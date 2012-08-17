@@ -208,7 +208,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		List<string> extensions = new List<string>();
 
+#if OPENGL
         internal int glFramebuffer;
+#endif
 
 #if DIRECTX
 
@@ -1265,7 +1267,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 if (_vertexBuffer != null)
                     _d3dContext.InputAssembler.SetVertexBuffers(0, _vertexBuffer._binding);
                 else
-                    _d3dContext.InputAssembler.SetVertexBuffers(0, null);
+                    _d3dContext.InputAssembler.SetVertexBuffers(0);
             }
 #elif OPENGL
             if (_vertexBuffer != null)
