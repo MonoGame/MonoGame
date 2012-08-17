@@ -52,7 +52,9 @@ namespace Microsoft.Xna.Framework.Audio
 	public sealed class SoundEffectInstance : IDisposable
 	{
 		private bool isDisposed = false;
+#if !WINRT
 		private SoundState soundState = SoundState.Stopped;
+#endif
 
 #if WINRT        
         internal SourceVoice _voice { get; set; }
