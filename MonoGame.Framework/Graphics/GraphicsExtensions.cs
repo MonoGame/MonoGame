@@ -521,6 +521,7 @@ namespace Microsoft.Xna.Framework.Graphics
             switch (surfaceFormat)
             {
                 case SurfaceFormat.Color:
+                case SurfaceFormat.Vector4:
                     return 4;
                 case SurfaceFormat.Dxt3:
                     return 4;
@@ -531,7 +532,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 case SurfaceFormat.Alpha8:
                     return 1;
 				case SurfaceFormat.NormalizedByte4:
-					return 4;
+                    return 4;
                 default:
                     throw new NotImplementedException();
             }

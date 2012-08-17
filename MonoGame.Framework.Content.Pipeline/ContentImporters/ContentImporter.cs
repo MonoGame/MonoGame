@@ -43,20 +43,45 @@ using System;
 namespace Microsoft.Xna.Framework.Content.Pipeline
 {
     /// <summary>
-    /// Gets any existing content processor components.
+    /// Implements a file format importer for use with game assets.
+    /// 
+    /// Importers, either provided by the framework or written by a developer, must derive from ContentImporter, as well as being marked with a ContentImporterAttribute.
+    /// 
+    /// An importer should produce results in the standard intermediate object model. If an asset has information not supported by the object model, the importer should output it as opaque data (key/value attributes attached to the relevant object). By following this procedure, a content pipeline can access specialized digital content creation (DCC) tool information, even when that information has not been fully standardized into the official object model.
+    /// 
+    /// You can also design custom importers that accept and import types containing specific third-party extensions to the object model.
     /// </summary>
-    public class ContentProcessorAttribute : Attribute
-    {
+    public abstract class ContentImporter<T> : IContentImporter
+        {
         /// <summary>
-        /// Gets or sets the string representing the processor in a user interface. This name is not used by the content pipeline and should not be passed to the BuildAssets task (a custom MSBuild task used by XNA Game Studio). It is used for display purposes only.
+        /// Initializes a new instance of ContentImporter.
         /// </summary>
-        public virtual string DisplayName { get; set; }
+        protected ContentImporter()
+        {
+
+        }
 
         /// <summary>
-        /// Initializes an instance of ContentProcessorAttribute.
+        /// Called by the framework when importing a game asset. This is the method called by XNA when an asset is to be imported into an object that can be recognized by the Content Pipeline.
         /// </summary>
-        public ContentProcessorAttribute()
+        /// <param name="filename">Name of a game asset file.</param>
+        /// <param name="context">Contains information for importing a game asset, such as a logger interface.</param>
+        /// <returns>Resulting game asset.</returns>
+        public abstract T Import(string filename, ContentImporterContext context);
+
+        /// <summary>
+        /// Called by the framework when importing a game asset. This is the method called by XNA when an asset is to be imported into an object that can be recognized by the Content Pipeline.
+        /// </summary>
+        /// <param name="filename">Name of a game asset file.</param>
+        /// <param name="context">Contains information for importing a game asset, such as a logger interface.</param>
+        /// <returns>Resulting game asset.</returns>
+        object IContentImporter.Import(string filename, ContentImporterContext context)
         {
+            if (filename == null)
+                throw new ArgumentNullException("filename");
+            if (context == null)
+                throw new ArgumentNullException("context");
+            return Import(filename, context);
         }
     }
 }

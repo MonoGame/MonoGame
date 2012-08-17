@@ -26,6 +26,7 @@ SOFTWARE.
 #endregion License
 
 using System;
+using Microsoft.Xna.Framework.Graphics;
 
 #if WINRT
 using System.Runtime.Serialization;
