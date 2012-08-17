@@ -260,6 +260,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
             var isMouseConnected = mouseCapabilities.MousePresent != 0;
 #endif
             
+#if !ANDROID && !WINDOWS
             // If we don't have a mouse then send fake mouse
             // events using the touch state.
             if (!isMouseConnected && (_mouseTouchId == -1 || _mouseTouchId == id))
@@ -278,6 +279,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
                     _mouseTouchId = id;
                 }
             }
+#endif
         }
 
         internal static void UpdateState()
