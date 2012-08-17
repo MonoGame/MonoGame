@@ -74,8 +74,11 @@ namespace Microsoft.Xna.Framework.Audio
 #endif
 
         private string _name;
-		private string _filename = "";		
+#if !WINRT
+		private string _filename = "";
         private byte[] _data;
+#endif
+
 #if WINRT
         internal SoundEffect()
         {
