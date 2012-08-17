@@ -65,7 +65,13 @@ using GLPixelFormat = OpenTK.Graphics.OpenGL.PixelFormat;
 #elif PSS
 using PssTexture2D = Sce.PlayStation.Core.Graphics.Texture2D;
 #elif GLES
+#if EMBEDDED
+using System.Drawing.Imaging;
+#endif
 using OpenTK.Graphics.ES20;
+#if EMBEDDED
+using GLPixelFormat = OpenTK.Graphics.ES20.PixelFormat;
+#else
 using GLPixelFormat = OpenTK.Graphics.ES20.All;
 using TextureTarget = OpenTK.Graphics.ES20.All;
 using TextureParameterName = OpenTK.Graphics.ES20.All;
@@ -73,6 +79,7 @@ using TextureMinFilter = OpenTK.Graphics.ES20.All;
 using PixelInternalFormat = OpenTK.Graphics.ES20.All;
 using PixelType = OpenTK.Graphics.ES20.All;
 using ErrorCode = OpenTK.Graphics.ES20.All;
+#endif
 #endif
 
 using Microsoft.Xna.Framework.Content;
@@ -324,7 +331,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     if (rect.HasValue)
                         GL.CompressedTexSubImage2D(TextureTarget.Texture2D, 
                                                    level, x, y, w, h,
-#if GLES
+#if GLES && !EMBEDDED
                                                    glInternalFormat,
 #else
                                                    glFormat,
@@ -344,7 +351,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     else
                     {
                         GL.TexImage2D(TextureTarget.Texture2D, level,
-#if GLES
+#if GLES && !EMBEDDED
                                   (int)glInternalFormat,
 #else
                                   glInternalFormat,
@@ -384,7 +391,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
 #if IPHONE 
 			throw new NotImplementedException();
-#elif ANDROID
+#elif ANDROID || EMBEDDED
 			if (data == null)
             {
                 throw new ArgumentException("data cannot be null");
@@ -565,6 +572,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #endif
         }
+
+#if EMBEDDED
+        private byte[] GetTextureData(int p)
+        {
+            throw new NotImplementedException();
+        }
+#endif
 
 		public void GetData<T>(T[] data, int startIndex, int elementCount) where T : struct
 		{

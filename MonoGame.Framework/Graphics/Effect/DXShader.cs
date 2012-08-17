@@ -20,10 +20,17 @@ enum ShaderType //FIXME: Major Hack
 #elif GLES
 using System.Text;
 using OpenTK.Graphics.ES20;
+#if EMBEDDED
+using ShaderType = OpenTK.Graphics.ES20.ShaderType;
+using ShaderParameter = OpenTK.Graphics.ES20.ShaderParameter;
+using TextureUnit = OpenTK.Graphics.ES20.TextureUnit;
+using TextureTarget = OpenTK.Graphics.ES20.TextureTarget;
+#else
 using ShaderType = OpenTK.Graphics.ES20.All;
 using ShaderParameter = OpenTK.Graphics.ES20.All;
 using TextureUnit = OpenTK.Graphics.ES20.All;
 using TextureTarget = OpenTK.Graphics.ES20.All;
+#endif
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -170,14 +177,14 @@ namespace Microsoft.Xna.Framework.Graphics
                 GL.CompileShader(ShaderHandle);
 
                 var compiled = 0;
-#if GLES
+#if GLES && !EMBEDDED
                 GL.GetShader(ShaderHandle, ShaderParameter.CompileStatus, ref compiled);
 #else
                 GL.GetShader(ShaderHandle, ShaderParameter.CompileStatus, out compiled);
 #endif
                 if (compiled == (int)All.False)
                 {
-#if GLES
+#if GLES && !EMBEDDED
                     string log = "";
                     int length = 0;
                     GL.GetShader(ShaderHandle, ShaderParameter.InfoLogLength, ref length);

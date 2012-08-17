@@ -49,7 +49,11 @@ using OpenTK.Graphics.OpenGL;
 // TODO
 #elif GLES
 using OpenTK.Graphics.ES20;
+#if EMBEDDED
+using TextureTarget = OpenTK.Graphics.ES20.TextureTarget;
+#else
 using TextureTarget = OpenTK.Graphics.ES20.All;
+#endif
 #endif
 
 

@@ -237,7 +237,7 @@ namespace Microsoft.Xna.Framework
             _graphicsDevice.PresentationParameters.BackBufferWidth = isLandscape ? Math.Max(w, h) : Math.Min(w, h);
             _graphicsDevice.PresentationParameters.BackBufferHeight = isLandscape ? Math.Min(w, h) : Math.Max(w, h);
 
-#if !PSS && !IPHONE
+#if !PSS && !IPHONE && !EMBEDDED
             // Trigger a change in orientation in case the supported orientations have changed
             _game.Window.SetOrientation(_game.Window.CurrentOrientation, false);
 #endif
@@ -246,7 +246,8 @@ namespace Microsoft.Xna.Framework
 
         private void Initialize()
         {
-#if WINDOWS || WINRT
+#if WINDOWS || WINRT || EMBEDDED
+
             _game.Window.SetSupportedOrientations(_supportedOrientations);
 
             _graphicsDevice.PresentationParameters.BackBufferFormat = _preferredBackBufferFormat;

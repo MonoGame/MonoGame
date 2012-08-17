@@ -10,6 +10,8 @@ using MonoMac.OpenGL;
 using OpenTK.Graphics.OpenGL;
 #elif GLES
 using OpenTK.Graphics.ES20;
+#if EMBEDDED
+#else
 using EnableCap = OpenTK.Graphics.ES20.All;
 using FrontFaceDirection = OpenTK.Graphics.ES20.All;
 using BlendEquationMode = OpenTK.Graphics.ES20.All;
@@ -19,6 +21,7 @@ using StencilOp = OpenTK.Graphics.ES20.All;
 using BlendingFactorSrc = OpenTK.Graphics.ES20.All;
 using BlendingFactorDest = OpenTK.Graphics.ES20.All;
 using DepthFunction = OpenTK.Graphics.ES20.All;
+#endif
 #endif
 
 

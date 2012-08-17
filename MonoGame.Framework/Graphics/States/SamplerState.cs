@@ -49,9 +49,15 @@ using OpenTK.Graphics.OpenGL;
 // TODO
 #elif GLES
 using OpenTK.Graphics.ES20;
+#if EMBEDDED
+using TextureTarget = OpenTK.Graphics.ES20.TextureTarget;
+using TextureMinFilter = OpenTK.Graphics.ES20.TextureMinFilter;
+using TextureParameterName = OpenTK.Graphics.ES20.TextureParameterName;
+#else
 using TextureTarget = OpenTK.Graphics.ES20.All;
 using TextureMinFilter = OpenTK.Graphics.ES20.All;
 using TextureParameterName = OpenTK.Graphics.ES20.All;
+#endif
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics

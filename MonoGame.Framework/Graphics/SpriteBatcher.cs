@@ -52,12 +52,15 @@ using OpenTK.Graphics.OpenGL;
 // TODO
 #elif GLES
 using OpenTK.Graphics.ES20;
+#if EMBEDDED
+#else
 using VertexAttribPointerType = OpenTK.Graphics.ES20.All;
 using TextureUnit = OpenTK.Graphics.ES20.All;
 using TextureTarget = OpenTK.Graphics.ES20.All;
 using DrawElementsType = OpenTK.Graphics.ES20.All;
 using BufferTarget = OpenTK.Graphics.ES20.All;
 using BeginMode = OpenTK.Graphics.ES20.All;
+#endif
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics

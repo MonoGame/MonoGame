@@ -60,6 +60,9 @@ using Sce.PlayStation.Core.Graphics;
 using PssVertexBuffer = Sce.PlayStation.Core.Graphics.VertexBuffer;
 #elif GLES
 using OpenTK.Graphics.ES20;
+#if EMBEDDED
+using BufferUsageHint = OpenTK.Graphics.ES20.BufferUsage;
+#else
 using BeginMode = OpenTK.Graphics.ES20.All;
 using EnableCap = OpenTK.Graphics.ES20.All;
 using TextureTarget = OpenTK.Graphics.ES20.All;
@@ -72,6 +75,7 @@ using FramebufferTarget = OpenTK.Graphics.ES20.All;
 using FramebufferAttachment = OpenTK.Graphics.ES20.All;
 using RenderbufferTarget = OpenTK.Graphics.ES20.All;
 using RenderbufferStorage = OpenTK.Graphics.ES20.All;
+#endif
 #endif
 
 
@@ -178,6 +182,12 @@ namespace Microsoft.Xna.Framework.Graphics
 #if GLES
 		const FramebufferTarget GLFramebuffer = FramebufferTarget.Framebuffer;
 		const RenderbufferTarget GLRenderbuffer = RenderbufferTarget.Renderbuffer;
+#if EMBEDDED
+        const FramebufferSlot GLColorAttachment0 = FramebufferSlot.ColorAttachment0;
+        const FramebufferSlot GLDepthAttachment = FramebufferSlot.DepthAttachment;
+        const FramebufferSlot GLStencilAttachment = FramebufferSlot.StencilAttachment;
+        const FramebufferErrorCode GLFramebufferComplete = FramebufferErrorCode.FramebufferComplete;
+#else
 		const FramebufferAttachment GLDepthAttachment = FramebufferAttachment.DepthAttachment;
 		const FramebufferAttachment GLStencilAttachment = FramebufferAttachment.StencilAttachment;
 		const FramebufferAttachment GLColorAttachment0 = FramebufferAttachment.ColorAttachment0;
@@ -186,6 +196,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		const RenderbufferStorage GLDepthComponent24 = RenderbufferStorage.DepthComponent24Oes;
 		const RenderbufferStorage GLDepth24Stencil8 = RenderbufferStorage.Depth24Stencil8Oes;
 		const FramebufferErrorCode GLFramebufferComplete = FramebufferErrorCode.FramebufferComplete;
+#endif
 #elif OPENGL
 		const FramebufferTarget GLFramebuffer = FramebufferTarget.FramebufferExt;
 		const RenderbufferTarget GLRenderbuffer = RenderbufferTarget.RenderbufferExt;
@@ -300,13 +311,14 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Setup extensions.
 #if OPENGL
-#if GLES
-            string[] extstring = GL.GetString(RenderbufferStorage.Extensions).Split(' ');            			
+#if GLES && !EMBEDDED
+            string ext = GL.GetString(RenderbufferStorage.Extensions);            			
 #else
-            string[] extstring = GL.GetString(StringName.Extensions).Split(' ');	
-#endif
-            if (extstring != null)
+            string ext = GL.GetString(StringName.Extensions);	
+#endif            
+            if (ext != null)
             {
+                string[] extstring = ext.Split(' ');
                 extensions.AddRange(extstring);
                 System.Diagnostics.Debug.WriteLine("Supported extensions:");
                 foreach (string extension in extensions)
@@ -769,7 +781,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				bufferMask = bufferMask | ClearBufferMask.DepthBufferBit;
 			}
 
-#if GLES
+#if GLES && !EMBEDDED
 			GL.Clear ((uint)bufferMask);
 #else
 			GL.Clear (bufferMask);
@@ -1127,7 +1139,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #elif OPENGL
 				if (renderTarget.glFramebuffer == 0)
 				{
-#if GLES
+#if GLES && !EMBEDDED
 					GL.GenFramebuffers(1, ref renderTarget.glFramebuffer);
 #else
 					GL.GenFramebuffers(1, out renderTarget.glFramebuffer);
@@ -1483,7 +1495,7 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
 
             //Create VBO if not created already
-#if GLES
+#if GLES && !EMBEDDED
             if (VboIdArray == 0)
                 GL.GenBuffers(1, ref VboIdArray);
 #else
@@ -1579,7 +1591,7 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
 
             //Create VBO if not created already
-#if GLES
+#if GLES && !EMBEDDED
 			if (VboIdArray == 0)
                 GL.GenBuffers(1, ref VboIdArray);
             if (VboIdElement == 0)
@@ -1662,7 +1674,7 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
 
             //Create VBO if not created already
-#if GLES
+#if GLES && !EMBEDDED
 			if (VboIdArray == 0)
                 GL.GenBuffers(1, ref VboIdArray);
             if (VboIdElement == 0)
@@ -1702,7 +1714,11 @@ namespace Microsoft.Xna.Framework.Graphics
             //Draw
             GL.DrawElements(PrimitiveTypeGL(primitiveType),
                             GetElementCountArray(primitiveType, primitiveCount),
+#if EMBEDDED
+                            DrawElementsType.UnsignedShort,
+#else
                             DrawElementsType.UnsignedInt/* .UnsignedInt248Oes*/,
+#endif
                             (IntPtr)(indexOffset * sizeof(uint)));
 
 

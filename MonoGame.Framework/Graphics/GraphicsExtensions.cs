@@ -10,6 +10,19 @@ using OpenTK.Graphics.OpenGL;
 #elif WINRT
 #elif GLES
 using OpenTK.Graphics.ES20;
+#if EMBEDDED
+using BlendEquationMode = OpenTK.Graphics.ES20.BlendEquationMode;
+using BlendingFactorSrc = OpenTK.Graphics.ES20.BlendingFactorSrc;
+using BlendingFactorDest = OpenTK.Graphics.ES20.BlendingFactorDest;
+using VertexAttribPointerType = OpenTK.Graphics.ES20.VertexAttribPointerType;
+using PixelInternalFormat = OpenTK.Graphics.ES20.PixelInternalFormat;
+using PixelType = OpenTK.Graphics.ES20.PixelType;
+using PixelFormat = OpenTK.Graphics.ES20.PixelFormat;
+using VertexPointerType = OpenTK.Graphics.ES20.All;
+using ColorPointerType = OpenTK.Graphics.ES20.All;
+using NormalPointerType = OpenTK.Graphics.ES20.All;
+using TexCoordPointerType = OpenTK.Graphics.ES20.All;
+#else
 using BlendEquationMode = OpenTK.Graphics.ES20.All;
 using BlendingFactorSrc = OpenTK.Graphics.ES20.All;
 using BlendingFactorDest = OpenTK.Graphics.ES20.All;
@@ -21,6 +34,7 @@ using VertexPointerType = OpenTK.Graphics.ES20.All;
 using ColorPointerType = OpenTK.Graphics.ES20.All;
 using NormalPointerType = OpenTK.Graphics.ES20.All;
 using TexCoordPointerType = OpenTK.Graphics.ES20.All;
+#endif
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -458,7 +472,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				glType = PixelType.UnsignedShort565;
 				break;
 			case SurfaceFormat.Bgra4444:
-#if IPHONE
+#if IPHONE || EMBEDDED
 				glInternalFormat = PixelInternalFormat.Rgba;
 #else
 				glInternalFormat = PixelInternalFormat.Rgba4;
@@ -476,7 +490,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				glFormat = PixelFormat.Luminance;
 				glType = PixelType.UnsignedByte;
 				break;
-#if !IPHONE && !ANDROID
+#if !IPHONE && !ANDROID && !EMBEDDED
 			case SurfaceFormat.Dxt1:
 				glInternalFormat = PixelInternalFormat.CompressedRgbaS3tcDxt1Ext;
 				glFormat = (PixelFormat)All.CompressedTextureFormats;

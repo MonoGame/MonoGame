@@ -92,7 +92,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			if (mipMap)
 			{
-#if IPHONE || ANDROID
+#if IPHONE || ANDROID || EMBEDDED
 				GL.GenerateMipmap(TextureTarget.TextureCubeMap);
 #else
 				GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.GenerateMipmap, (int)All.True);

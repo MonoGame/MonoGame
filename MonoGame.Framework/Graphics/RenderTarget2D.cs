@@ -46,8 +46,11 @@ using MonoMac.OpenGL;
 using OpenTK.Graphics.OpenGL;
 #elif GLES
 using OpenTK.Graphics.ES20;
+#if EMBEDDED
+#else
 using RenderbufferTarget = OpenTK.Graphics.ES20.All;
 using RenderbufferStorage = OpenTK.Graphics.ES20.All;
+#endif
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -56,9 +59,15 @@ namespace Microsoft.Xna.Framework.Graphics
 	{
 #if GLES
 		const RenderbufferTarget GLRenderbuffer = RenderbufferTarget.Renderbuffer;
+#if EMBEDDED       
+        const RenderbufferInternalFormat GLDepthComponent16 = RenderbufferInternalFormat.DepthComponent16;
+        const RenderbufferInternalFormat GLDepthComponent24 = RenderbufferInternalFormat.DepthComponent16;
+        const RenderbufferInternalFormat GLDepth24Stencil8 = RenderbufferInternalFormat.StencilIndex8;
+#else
 		const RenderbufferStorage GLDepthComponent16 = RenderbufferStorage.DepthComponent16;
 		const RenderbufferStorage GLDepthComponent24 = RenderbufferStorage.DepthComponent24Oes;
 		const RenderbufferStorage GLDepth24Stencil8 = RenderbufferStorage.Depth24Stencil8Oes;
+#endif
 #elif OPENGL
 		const RenderbufferTarget GLRenderbuffer = RenderbufferTarget.RenderbufferExt;
 		const RenderbufferStorage GLDepthComponent16 = RenderbufferStorage.DepthComponent16;
@@ -132,11 +141,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #elif OPENGL
 
-#if GLES
+#if GLES && !EMBEDDED
 			GL.GenRenderbuffers(1, ref glDepthStencilBuffer);
 #else
 			GL.GenRenderbuffers(1, out glDepthStencilBuffer);
-#endif
+#endif            
 			GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, this.glDepthStencilBuffer);
 			var glDepthStencilFormat = GLDepthComponent16;
 			switch (preferredDepthFormat)

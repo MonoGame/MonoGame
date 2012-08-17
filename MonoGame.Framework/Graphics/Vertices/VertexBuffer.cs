@@ -12,8 +12,12 @@ using OpenTK.Graphics.OpenGL;
 using Sce.PlayStation.Core.Graphics;
 #elif GLES
 using OpenTK.Graphics.ES20;
+#if EMBEDDED
+using BufferUsageHint = OpenTK.Graphics.ES20.BufferUsage;
+#else
 using BufferTarget = OpenTK.Graphics.ES20.All;
 using BufferUsageHint = OpenTK.Graphics.ES20.All;
+#endif
 #endif
 
 
@@ -122,7 +126,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 GL.BindBuffer(BufferTarget.ArrayBuffer, vbo);
                 var elementSizeInByte = Marshal.SizeOf(typeof(T));
-#if IPHONE || ANDROID
+#if IPHONE || ANDROID || EMBEDDED
                 // I think the access parameter takes zero for read only or read/write.
                 // The glMapBufferOES extension spec and gl2ext.h both only mention GL_WRITE_ONLY
                 IntPtr ptr = GL.Oes.MapBuffer(All.ArrayBuffer, (All)0);
@@ -147,7 +151,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     // Copy from the temporary buffer to the destination array
                     Buffer.BlockCopy(buffer, 0, data, startIndex * elementSizeInByte, elementCount * elementSizeInByte);
                 }
-#if IPHONE || ANDROID
+#if IPHONE || ANDROID || EMBEDDED
                 GL.Oes.UnmapBuffer(All.ArrayBuffer);
 #else
                 GL.UnmapBuffer(BufferTarget.ArrayBuffer);

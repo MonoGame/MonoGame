@@ -63,7 +63,7 @@ namespace Microsoft.Xna.Framework
     {
         static int mainThreadId;
         static int currentThreadId;
-#if ANDROID
+#if ANDROID || EMBEDDED
         static List<Action> actions = new List<Action>();
         static Mutex actionsMutex = new Mutex();
 #elif IPHONE
@@ -140,7 +140,7 @@ namespace Microsoft.Xna.Framework
 #endif
         }
 
-#if ANDROID
+#if ANDROID || EMBEDDED
         static void Add(Action action)
         {
             lock (actions)

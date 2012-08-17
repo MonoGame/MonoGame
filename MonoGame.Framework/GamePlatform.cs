@@ -96,6 +96,8 @@ namespace Microsoft.Xna.Framework
 			return new PSSGamePlatform(game);
 #elif WINRT
             return new MetroGamePlatform(game);
+#elif EMBEDDED
+            return new OpenTKGamePlatform(game);
 #endif
         }
 

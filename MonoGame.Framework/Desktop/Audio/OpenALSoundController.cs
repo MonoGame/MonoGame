@@ -4,7 +4,7 @@ using System.Linq;
 using System.IO;
 using System.Runtime.InteropServices;
 
-#if IPHONE || WINDOWS || LINUX
+#if IPHONE || WINDOWS || LINUX || EMBEDDED
 using OpenTK.Audio.OpenAL;
 using OpenTK;
 #elif MONOMAC
