@@ -39,6 +39,12 @@ purpose and non-infringement.
 #endregion License
 using System;
 
+#if WINRT
+using Windows.UI.Core;
+using Windows.UI.Xaml.Input;
+using Windows.Graphics.Display;
+#endif
+
 namespace Microsoft.Xna.Framework.Input
 {    
 	public struct MouseState
@@ -92,6 +98,18 @@ namespace Microsoft.Xna.Framework.Input
 		{
 			return !(left == right);
 		}
+
+        public override bool Equals(object obj)
+        {
+            if (obj is MouseState)
+                return this == (MouseState)obj;
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
 
 		public int X {
 			get {
@@ -153,25 +171,33 @@ namespace Microsoft.Xna.Framework.Input
 
 #if WINRT
 
-        internal void Update(Windows.UI.Xaml.Input.PointerRoutedEventArgs args)
+        internal void Update(PointerRoutedEventArgs args)
         {
             var point = args.GetCurrentPoint(null);
 
             _leftButton = point.Properties.IsLeftButtonPressed ? ButtonState.Pressed : ButtonState.Released;
             _rightButton = point.Properties.IsRightButtonPressed ? ButtonState.Pressed : ButtonState.Released;
             _middleButton = point.Properties.IsMiddleButtonPressed ? ButtonState.Pressed : ButtonState.Released;
-            _x = (int)point.Position.X;
-            _y = (int)point.Position.Y;
+
+            // To convert from DIPs (device independent pixels) to screen resolution pixels.
+            var dipFactor = DisplayProperties.LogicalDpi / 96.0f;
+            _x = (int)(point.Position.X * dipFactor);
+            _y = (int)(point.Position.Y * dipFactor);
+
             _scrollWheelValue += point.Properties.MouseWheelDelta;
         }
         
-        internal void Update(Windows.UI.Core.PointerEventArgs args)
+        internal void Update(PointerEventArgs args)
         {
             _leftButton = args.CurrentPoint.Properties.IsLeftButtonPressed ? ButtonState.Pressed : ButtonState.Released;
             _rightButton = args.CurrentPoint.Properties.IsRightButtonPressed ? ButtonState.Pressed : ButtonState.Released;
             _middleButton = args.CurrentPoint.Properties.IsMiddleButtonPressed ? ButtonState.Pressed : ButtonState.Released;
-            _x = (int)args.CurrentPoint.Position.X;
-            _y = (int)args.CurrentPoint.Position.Y;
+
+            // To convert from DIPs (device independent pixels) to screen resolution pixels.
+            var dipFactor = DisplayProperties.LogicalDpi / 96.0f;
+            _x = (int)(args.CurrentPoint.Position.X * dipFactor);
+            _y = (int)(args.CurrentPoint.Position.Y * dipFactor);
+
             _scrollWheelValue += args.CurrentPoint.Properties.MouseWheelDelta;
         }
 #endif

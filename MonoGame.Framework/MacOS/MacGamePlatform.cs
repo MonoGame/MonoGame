@@ -115,8 +115,8 @@ namespace Microsoft.Xna.Framework
         {
             RectangleF frame = new RectangleF(
                 0, 0,
-                PresentationParameters._defaultBackBufferWidth,
-                PresentationParameters._defaultBackBufferHeight);
+                GraphicsDeviceManager.DefaultBackBufferWidth,
+                GraphicsDeviceManager.DefaultBackBufferHeight);
 
             _mainWindow = new MacGameNSWindow(
                 frame, NSWindowStyle.Titled | NSWindowStyle.Closable,

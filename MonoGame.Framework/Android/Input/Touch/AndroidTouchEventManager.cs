@@ -97,7 +97,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
                                     break;
                                 }
                             }
-                            TouchPanel.AddEvent(new TouchLocation(releaseTouchId, TouchLocationState.Released, lastTouchPos));
+                            TouchPanel.AddEvent(releaseTouchId, TouchLocationState.Released, lastTouchPos);
                         }
                     }
                 }
@@ -124,12 +124,12 @@ namespace Microsoft.Xna.Framework.Input.Touch
                 // DOWN                
                 case MotionEventActions.Down:
                 case MotionEventActions.PointerDown:
-                    TouchPanel.AddEvent(new TouchLocation(BeginTouch(id), TouchLocationState.Pressed, position));
+                    TouchPanel.AddEvent(BeginTouch(id), TouchLocationState.Pressed, position);
                     break;
                 // UP                
                 case MotionEventActions.Up:
                 case MotionEventActions.PointerUp:
-                    TouchPanel.AddEvent(new TouchLocation(EndTouch(id), TouchLocationState.Released, position));
+                    TouchPanel.AddEvent(EndTouch(id), TouchLocationState.Released, position);
                     break;
                 // MOVE                
                 case MotionEventActions.Move:
@@ -139,14 +139,14 @@ namespace Microsoft.Xna.Framework.Input.Touch
                         position.X = e.GetX(i);
                         position.Y = e.GetY(i);
                         UpdateTouchPosition(ref position);
-                        TouchPanel.AddEvent(new TouchLocation(GetTouch(id), TouchLocationState.Moved, position));
+                        TouchPanel.AddEvent(GetTouch(id), TouchLocationState.Moved, position);
                     }
                     break;
 
                 // CANCEL, OUTSIDE                
                 case MotionEventActions.Cancel:
                 case MotionEventActions.Outside:
-                    TouchPanel.AddEvent(new TouchLocation(EndTouch(id), TouchLocationState.Released, position));
+                    TouchPanel.AddEvent(EndTouch(id), TouchLocationState.Released, position);
                     break;
             }
         }
