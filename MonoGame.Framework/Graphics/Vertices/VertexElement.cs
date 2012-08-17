@@ -123,6 +123,14 @@ namespace Microsoft.Xna.Framework.Graphics
                     element.SemanticName = "TEXCOORD";
                     break;
 
+                case Graphics.VertexElementUsage.BlendIndices:
+                    element.SemanticName = "BLENDINDICES";
+                    break;
+
+                case Graphics.VertexElementUsage.BlendWeight:
+                    element.SemanticName = "BLENDWEIGHT";
+                    break;
+
                 default:
                     throw new NotImplementedException("Unknown vertex element usage!");
             }
