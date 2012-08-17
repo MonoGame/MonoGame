@@ -86,6 +86,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.GamerServices;
+using OpenTK.Graphics.OpenGL;
 
 
 namespace Microsoft.Xna.Framework
