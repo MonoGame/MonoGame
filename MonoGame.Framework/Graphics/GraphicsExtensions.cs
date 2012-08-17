@@ -521,7 +521,6 @@ namespace Microsoft.Xna.Framework.Graphics
             switch (surfaceFormat)
             {
                 case SurfaceFormat.Color:
-                case SurfaceFormat.Vector4:
                     return 4;
                 case SurfaceFormat.Dxt3:
                     return 4;

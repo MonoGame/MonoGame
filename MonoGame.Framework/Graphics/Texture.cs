@@ -179,9 +179,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
 #elif OPENGL
-            GL.DeleteTextures(1, ref glTexture);
-            //Threading.BlockOnUIThread(() => {  });
-			
+            GL.DeleteTextures(1, ref glTexture);		
 #endif
             base.Dispose();
 		}
