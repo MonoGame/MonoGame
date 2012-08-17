@@ -67,8 +67,9 @@ namespace Microsoft.Xna.Framework
         private bool _preferMultiSampling;
         private DisplayOrientation _supportedOrientations;
         private bool _synchronizedWithVerticalRetrace = true;
+#if !(WINDOWS || LINUX || WINRT)
         private bool _wantFullScreen = true;
-
+#endif
         public static readonly int DefaultBackBufferHeight = 480;
         public static readonly int DefaultBackBufferWidth = 800;
 

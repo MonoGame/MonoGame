@@ -77,10 +77,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			Debug.WriteLine("{0}:{1}", s, node.Name);
 		}
 		
-		float dt = 0;
-		float timer = 0;
-		int modelPart = 0;
-		
 		public void Draw(Matrix world, Matrix view, Matrix projection) 
 		{       			
 			// Look up combined bone matrices for the entire model.
