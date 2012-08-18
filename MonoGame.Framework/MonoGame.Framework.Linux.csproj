@@ -309,7 +309,7 @@
     <Compile Include="Desktop\Input\GamePad.cs" />
     <Compile Include="Desktop\Input\Input.cs" />
     <Compile Include="Desktop\Input\Joystick.cs" />
-    <Compile Include="Desktop\Input\Mouse.cs" />
+    <Compile Include="Input\Mouse.cs" />
     <Compile Include="Desktop\Input\PadConfig.cs" />
     <Compile Include="Desktop\Input\Settings.cs" />
     <Compile Include="Desktop\Input\Stick.cs" />
