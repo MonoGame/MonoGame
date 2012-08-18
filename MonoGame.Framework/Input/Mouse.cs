@@ -57,11 +57,13 @@ namespace Microsoft.Xna.Framework.Input
 		internal static MouseState State;
 
 #if WINRT
-        private static MouseCapabilities _mouseCapabilities = new MouseCapabilities();
+        private static readonly MouseCapabilities _mouseCapabilities = new MouseCapabilities();
 #endif
 
 #if WINDOWS || MONOMAC || LINUX
 		private static OpenTK.Input.MouseDevice _mouse = null;			
+#else
+        private static int _mouseTouchId = -1;
 #endif
 
 #if WINDOWS
@@ -129,35 +131,38 @@ namespace Microsoft.Xna.Framework.Input
                 return State;
 #endif
 
-            var middlePosition = Vector2.Zero;
-            var touchCount = 0;
-            var touchState = TouchPanel.GetState();
+            // Release all the buttons.
+            State.LeftButton = ButtonState.Released;
+            State.RightButton = ButtonState.Released;
+            State.MiddleButton = ButtonState.Released;
 
+            // Look for a new or previous touch point.
+            var touchState = TouchPanel.GetState();
             foreach (var touch in touchState)
             {
-                if (touch.State != TouchLocationState.Pressed &&
-                    touch.State != TouchLocationState.Moved)
+                // Skip released touch points.
+                if (    touch.State != TouchLocationState.Pressed &&
+                        touch.State != TouchLocationState.Moved)
                     continue;
 
-                middlePosition += touch.Position;
-                touchCount++;
-                break;
+                // Look for a new touch or the last touch point.
+                if (_mouseTouchId == -1 || touch.Id == _mouseTouchId)
+                {
+                    // Store the touch point for the next pass.
+                    _mouseTouchId = touch.Id;
+
+                    // Set the touch state.
+                    State.X = (int)touch.Position.X;
+                    State.Y = (int)touch.Position.Y;
+                    State.LeftButton = ButtonState.Pressed;
+                    break;
+                }
             }
 
-            if (touchCount > 0)
-            {
-                middlePosition /= touchCount;
-                State.X = (int)middlePosition.X;
-                State.Y = (int)middlePosition.Y;
-                State.LeftButton = ButtonState.Pressed;
-            }
-            else
-            {
-                // Make sure we don't leave any pressed buttons.
-                State.LeftButton = ButtonState.Released;
-                State.RightButton = ButtonState.Released;
-                State.MiddleButton = ButtonState.Released;                    
-            }
+            // If we didn't find the touch then 
+            // look for a new one next time.
+            if (State.LeftButton == ButtonState.Released)
+                _mouseTouchId = -1;
 
 #endif
 
