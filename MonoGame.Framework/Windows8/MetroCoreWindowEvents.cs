@@ -79,6 +79,9 @@ namespace Microsoft.Xna.Framework
         {
             // Wheel events always go to the mouse state.
             UpdateMouse(args);
+
+            // We handled this event.
+            args.Handled = true;
         }
 
         private void CoreWindow_PointerMoved(CoreWindow sender, PointerEventArgs args)
@@ -99,6 +102,9 @@ namespace Microsoft.Xna.Framework
                 // Mouse or stylus event.
                 UpdateMouse(args);
             }
+
+            // We handled this event.
+            args.Handled = true;
         }
 
         private void CoreWindow_PointerReleased(CoreWindow sender, PointerEventArgs args)
@@ -115,6 +121,9 @@ namespace Microsoft.Xna.Framework
                 // Mouse or stylus event.
                 UpdateMouse(args);
             }
+
+            // We handled this event.
+            args.Handled = true;
         }
 
         private void CoreWindow_PointerPressed(CoreWindow sender, PointerEventArgs args)
@@ -131,6 +140,9 @@ namespace Microsoft.Xna.Framework
                 // Mouse or stylus event.
                 UpdateMouse(args);
             }
+
+            // We handled this event.
+            args.Handled = true;
         }
 
         private static void UpdateMouse(PointerEventArgs args)

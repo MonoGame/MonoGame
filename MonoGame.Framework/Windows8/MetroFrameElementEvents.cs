@@ -87,6 +87,9 @@ namespace Microsoft.Xna.Framework
         {
             // Wheel events always go to the mouse state.
             UpdateMouse(args);
+
+            // We handled this event.
+            args.Handled = true;
         }
 
         private void CoreWindow_PointerMoved(object sender, PointerRoutedEventArgs args)
@@ -109,13 +112,13 @@ namespace Microsoft.Xna.Framework
                 // Mouse or stylus event.
                 UpdateMouse(args);
             }
+
+            // We handled this event.
+            args.Handled = true;
         }
 
         private void CoreWindow_PointerReleased(object sender, PointerRoutedEventArgs args)
         {
-			// Release the captured pointer.
-            _element.ReleasePointerCapture(args.Pointer);
-
             var currentPoint = args.GetCurrentPoint(null);
 
             // To convert from DIPs (device independent pixels) to screen resolution pixels.
@@ -129,14 +132,17 @@ namespace Microsoft.Xna.Framework
             {
                 // Mouse or stylus event.
                 UpdateMouse(args);
+
+                // Release the captured pointer.
+                _element.ReleasePointerCapture(args.Pointer);
             }
+
+            // We handled this event.
+            args.Handled = true;
         }
 
         private void CoreWindow_PointerPressed(object sender, PointerRoutedEventArgs args)
         {
-			// Capture future pointer events until a release.		
-            _element.CapturePointer(args.Pointer);
-
             var currentPoint = args.GetCurrentPoint(null);
 
             // To convert from DIPs (device independent pixels) to screen resolution pixels.
@@ -150,7 +156,13 @@ namespace Microsoft.Xna.Framework
             {
                 // Mouse or stylus event.
                 UpdateMouse(args);
+
+                // Capture future pointer events until a release.		
+                _element.CapturePointer(args.Pointer);
             }
+
+            // We handled this event.
+            args.Handled = true;
         }
 
         private static void UpdateMouse(PointerRoutedEventArgs args)
