@@ -16,7 +16,7 @@ namespace Lidgren.Network
 	{
 		private NetPeerStatus m_status;
 		private Thread m_networkThread;
-		private Socket m_socket;
+        private PlatformSocket m_socket;
 		internal byte[] m_sendBuffer;
 		internal byte[] m_receiveBuffer;
 		internal NetIncomingMessage m_readHelperMessage;
@@ -41,7 +41,7 @@ namespace Lidgren.Network
 		/// <summary>
 		/// Gets the socket, if Start() has been called
 		/// </summary>
-		public Socket Socket { get { return m_socket; } }
+		public PlatformSocket Socket { get { return m_socket; } }
 
 		/// <summary>
 		/// Call this to register a callback for when a new message arrives
@@ -99,11 +99,12 @@ namespace Lidgren.Network
 				iep = new IPEndPoint(m_configuration.LocalAddress, m_configuration.Port);
 				EndPoint ep = (EndPoint)iep;
 
-				m_socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+                m_socket = new PlatformSocket();
 				m_socket.ReceiveBufferSize = m_configuration.ReceiveBufferSize;
 				m_socket.SendBufferSize = m_configuration.SendBufferSize;
 				m_socket.Blocking = false;
 				m_socket.Bind(ep);
+                m_socket.Setup();
 
 				IPEndPoint boundEp = m_socket.LocalEndPoint as IPEndPoint;
 				LogDebug("Socket bound to " + boundEp + ": " + m_socket.IsBound);
@@ -140,7 +141,12 @@ namespace Lidgren.Network
 				byte[] combined = new byte[epBytes.Length + macBytes.Length];
 				Array.Copy(epBytes, 0, combined, 0, epBytes.Length);
 				Array.Copy(macBytes, 0, combined, epBytes.Length, macBytes.Length);
-				m_uniqueIdentifier = BitConverter.ToInt64(SHA1.Create().ComputeHash(combined), 0);
+#if WINDOWS_PHONE
+                SHA1 s = new SHA1Managed();
+                m_uniqueIdentifier = BitConverter.ToInt64(s.ComputeHash(combined), 0);
+#else
+                m_uniqueIdentifier = BitConverter.ToInt64(SHA1.Create().ComputeHash(combined), 0);
+#endif
 
 				m_status = NetPeerStatus.Running;
 			}
@@ -336,7 +342,7 @@ namespace Lidgren.Network
 			if (m_socket == null)
 				return;
 
-			if (!m_socket.Poll(1000, SelectMode.SelectRead)) // wait up to 1 ms for data to arrive
+			if (!m_socket.Poll(1000)) // wait up to 1 ms for data to arrive
 				return;
 
 			//if (m_socket == null || m_socket.Available < 1)
@@ -347,7 +353,7 @@ namespace Lidgren.Network
 				int bytesReceived = 0;
 				try
 				{
-					bytesReceived = m_socket.ReceiveFrom(m_receiveBuffer, 0, m_receiveBuffer.Length, SocketFlags.None, ref m_senderRemote);
+					bytesReceived = m_socket.ReceiveFrom(m_receiveBuffer, 0, m_receiveBuffer.Length, ref m_senderRemote);
 				}
 				catch (SocketException sx)
 				{

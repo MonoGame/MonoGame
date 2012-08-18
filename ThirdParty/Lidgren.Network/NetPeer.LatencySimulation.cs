@@ -121,10 +121,10 @@ namespace Lidgren.Network
                     
                     // HACK for Local Networks
                     target.Address = m_configuration.BroadcastAddress;
-                    m_socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, true);
+                    m_socket.Broadcast = true;
                 }
 
-				int bytesSent = m_socket.SendTo(data, 0, numBytes, SocketFlags.None, target);
+				int bytesSent = m_socket.SendTo(data, 0, numBytes, target);
 				if (numBytes != bytesSent)
 					LogWarning("Failed to send the full " + numBytes + "; only " + bytesSent + " bytes sent in packet!");
 
@@ -153,7 +153,7 @@ namespace Lidgren.Network
 			finally
 			{
 				if (target.Address == IPAddress.Broadcast)
-					m_socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, false);
+					m_socket.Broadcast = false;
 			}
 			return true;
 		}
@@ -163,7 +163,7 @@ namespace Lidgren.Network
 			try
 			{
 				m_socket.DontFragment = true;
-				int bytesSent = m_socket.SendTo(m_sendBuffer, 0, numBytes, SocketFlags.None, target);
+				int bytesSent = m_socket.SendTo(m_sendBuffer, 0, numBytes, target);
 				if (numBytes != bytesSent)
 					LogWarning("Failed to send the full " + numBytes + "; only " + bytesSent + " bytes sent in packet!");
 			
@@ -199,7 +199,7 @@ namespace Lidgren.Network
 			try
 			{
 				m_socket.DontFragment = true;
-				int bytesSent = m_socket.SendTo(m_sendBuffer, 0, numBytes, SocketFlags.None, target);
+				int bytesSent = m_socket.SendTo(m_sendBuffer, 0, numBytes, target);
 				if (numBytes != bytesSent)
 					LogWarning("Failed to send the full " + numBytes + "; only " + bytesSent + " bytes sent in packet!");
 			}
@@ -237,10 +237,10 @@ namespace Lidgren.Network
 			try
 			{
 				// TODO: refactor this check outta here
-				if (target.Address == IPAddress.Broadcast)
-					m_socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, true);
+                if (target.Address == IPAddress.Broadcast)
+                    m_socket.Broadcast = true;
 
-				int bytesSent = m_socket.SendTo(m_sendBuffer, 0, numBytes, SocketFlags.None, target);
+				int bytesSent = m_socket.SendTo(m_sendBuffer, 0, numBytes, target);
 				if (numBytes != bytesSent)
 					LogWarning("Failed to send the full " + numBytes + "; only " + bytesSent + " bytes sent in packet!");
 			}
@@ -266,8 +266,8 @@ namespace Lidgren.Network
 			}
 			finally
 			{
-				if (target.Address == IPAddress.Broadcast)
-					m_socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, false);
+                if (target.Address == IPAddress.Broadcast)
+                    m_socket.Broadcast = false;
 			}
 			return;
 		}
