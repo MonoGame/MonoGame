@@ -39,12 +39,6 @@ purpose and non-infringement.
 #endregion License
 using System;
 
-#if WINRT
-using Windows.UI.Core;
-using Windows.UI.Xaml.Input;
-using Windows.Graphics.Display;
-#endif
-
 namespace Microsoft.Xna.Framework.Input
 {    
 	public struct MouseState
