@@ -46,11 +46,19 @@ using MouseInfo = OpenTK.Input.Mouse;
 using Microsoft.Xna.Framework.Input.Touch;
 #endif
 
+#if WINRT
+using Windows.Devices.Input;
+#endif
+
 namespace Microsoft.Xna.Framework.Input
 {
     public static class Mouse
     {
-		private static MouseState _state;
+		internal static MouseState State;
+
+#if WINRT
+        private static MouseCapabilities _mouseCapabilities = new MouseCapabilities();
+#endif
 
 #if WINDOWS || MONOMAC || LINUX
 		private static OpenTK.Input.MouseDevice _mouse = null;			
@@ -91,60 +99,75 @@ namespace Microsoft.Xna.Framework.Input
 
 			// maybe someone is tring to get mouse before initialize
 			if (_mouse == null)
-                return _state;
+                return State;
 
 #if WINDOWS
             var p = new POINT();
             GetCursorPos(out p);
             var pc = Window.PointToClient(p.ToPoint());
-            _state.X = pc.X;
-            _state.Y = pc.Y;
+            State.X = pc.X;
+            State.Y = pc.Y;
 #endif
 
-            _state.LeftButton = _mouse[OpenTK.Input.MouseButton.Left] ? ButtonState.Pressed : ButtonState.Released;
-			_state.RightButton = _mouse[OpenTK.Input.MouseButton.Right] ? ButtonState.Pressed : ButtonState.Released;
-			_state.MiddleButton = _mouse[OpenTK.Input.MouseButton.Middle] ? ButtonState.Pressed : ButtonState.Released;;
+            State.LeftButton = _mouse[OpenTK.Input.MouseButton.Left] ? ButtonState.Pressed : ButtonState.Released;
+			State.RightButton = _mouse[OpenTK.Input.MouseButton.Right] ? ButtonState.Pressed : ButtonState.Released;
+			State.MiddleButton = _mouse[OpenTK.Input.MouseButton.Middle] ? ButtonState.Pressed : ButtonState.Released;;
 
 			// WheelPrecise is divided by 120 (WHEEL_DELTA) in OpenTK (WinGLNative.cs)
 			// We need to counteract it to get the same value XNA provides
-			_state.ScrollWheelValue = (int)( _mouse.WheelPrecise * 120 );
+			State.ScrollWheelValue = (int)( _mouse.WheelPrecise * 120 );
 
-#else // Android, iOS, PSS, Win8
+#else
 
-            var state = TouchPanel.GetState();
-            if (state.Count > 0)
-            {
-                var middlePosition = Vector2.Zero;
-                var currentNumberOfTouches = 0;
-                for (var i = 0; i < state.Count; i++)
-                {
-                    if (state[i].State != TouchLocationState.Pressed && 
-                        state[i].State != TouchLocationState.Moved)
-                        continue;
+#if WINRT
+            // NOTE: Some WinRT devices have a mouse driver installed even when
+            // there is no physical mouse connected to the device.  You can fix 
+            // this by disabling the mouse in the Device Manager.
 
-                    middlePosition += state[i].Position;
-                    currentNumberOfTouches++;
-                    break;
-                }
-
-                if (currentNumberOfTouches > 1)
-                    middlePosition /= currentNumberOfTouches;
-
-                if (middlePosition != Vector2.Zero)
-                {
-                    _state.X = (int) middlePosition.X;
-                    _state.Y = (int) middlePosition.Y;
-                }
-            }
+            // If we have a mouse then don't bother faking events.
+            if (_mouseCapabilities.MousePresent != 0)
+                return State;
 #endif
 
-            return _state;
+            var middlePosition = Vector2.Zero;
+            var touchCount = 0;
+            var touchState = TouchPanel.GetState();
+
+            foreach (var touch in touchState)
+            {
+                if (touch.State != TouchLocationState.Pressed &&
+                    touch.State != TouchLocationState.Moved)
+                    continue;
+
+                middlePosition += touch.Position;
+                touchCount++;
+                break;
+            }
+
+            if (touchCount > 0)
+            {
+                middlePosition /= touchCount;
+                State.X = (int)middlePosition.X;
+                State.Y = (int)middlePosition.Y;
+                State.LeftButton = ButtonState.Pressed;
+            }
+            else
+            {
+                // Make sure we don't leave any pressed buttons.
+                State.LeftButton = ButtonState.Released;
+                State.RightButton = ButtonState.Released;
+                State.MiddleButton = ButtonState.Released;                    
+            }
+
+#endif
+
+            return State;
         }
 
         public static void SetPosition(int x, int y)
         {
-            _state.X = x;
-            _state.Y = y;
+            State.X = x;
+            State.Y = y;
 			
 #if WINDOWS
             ///correcting the coordinate system

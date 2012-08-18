@@ -86,7 +86,7 @@ namespace Microsoft.Xna.Framework
         private void CoreWindow_PointerWheelChanged(object sender, PointerRoutedEventArgs args)
         {
             // Wheel events always go to the mouse state.
-            Mouse.State.Update(args);
+            UpdateMouse(args);
         }
 
         private void CoreWindow_PointerMoved(object sender, PointerRoutedEventArgs args)
@@ -97,7 +97,7 @@ namespace Microsoft.Xna.Framework
             var dipFactor = DisplayProperties.LogicalDpi / 96.0f;
             var pos = new Vector2((float)currentPoint.Position.X, (float)currentPoint.Position.Y) * dipFactor;
 
-            var isTouch = currentPoint.PointerDevice.PointerDeviceType == Windows.Devices.Input.PointerDeviceType.Touch;
+            var isTouch = currentPoint.PointerDevice.PointerDeviceType == PointerDeviceType.Touch;
             var touchIsDown = currentPoint.IsInContact;
             if (isTouch)
             {
@@ -107,7 +107,7 @@ namespace Microsoft.Xna.Framework
             else
             {
                 // Mouse or stylus event.
-                Mouse.State.Update(args);
+                UpdateMouse(args);
             }
         }
 
@@ -122,13 +122,13 @@ namespace Microsoft.Xna.Framework
             var dipFactor = DisplayProperties.LogicalDpi / 96.0f;
             var pos = new Vector2((float)currentPoint.Position.X, (float)currentPoint.Position.Y) * dipFactor;
 
-            var isTouch = currentPoint.PointerDevice.PointerDeviceType == Windows.Devices.Input.PointerDeviceType.Touch;
+            var isTouch = currentPoint.PointerDevice.PointerDeviceType == PointerDeviceType.Touch;
             if (isTouch)
                 TouchPanel.AddEvent((int)currentPoint.PointerId, TouchLocationState.Released, pos);
             else
             {
                 // Mouse or stylus event.
-                Mouse.State.Update(args);
+                UpdateMouse(args);
             }
         }
 
@@ -143,16 +143,35 @@ namespace Microsoft.Xna.Framework
             var dipFactor = DisplayProperties.LogicalDpi / 96.0f;
             var pos = new Vector2((float)currentPoint.Position.X, (float)currentPoint.Position.Y) * dipFactor;
 
-            var isTouch = currentPoint.PointerDevice.PointerDeviceType == Windows.Devices.Input.PointerDeviceType.Touch;
+            var isTouch = currentPoint.PointerDevice.PointerDeviceType == PointerDeviceType.Touch;
             if (isTouch)
                 TouchPanel.AddEvent((int)currentPoint.PointerId, TouchLocationState.Pressed, pos);
             else
             {
                 // Mouse or stylus event.
-                Mouse.State.Update(args);
+                UpdateMouse(args);
             }
         }
-        
+
+        private static void UpdateMouse(PointerRoutedEventArgs args)
+        {
+            var point = args.GetCurrentPoint(null);
+
+            // To convert from DIPs (device independent pixels) to screen resolution pixels.
+            var dipFactor = DisplayProperties.LogicalDpi / 96.0f;
+            var x = (int)(point.Position.X * dipFactor);
+            var y = (int)(point.Position.Y * dipFactor);
+
+            var state = point.Properties;
+
+            Mouse.State.X = x;
+            Mouse.State.Y = y;
+            Mouse.State.ScrollWheelValue += state.MouseWheelDelta;
+            Mouse.State.LeftButton = state.IsLeftButtonPressed ? ButtonState.Pressed : ButtonState.Released;
+            Mouse.State.RightButton = state.IsRightButtonPressed ? ButtonState.Pressed : ButtonState.Released;
+            Mouse.State.MiddleButton = state.IsMiddleButtonPressed ? ButtonState.Pressed : ButtonState.Released;
+        }
+
         private static Keys KeyTranslate(Windows.System.VirtualKey inkey)
         {
             switch (inkey)

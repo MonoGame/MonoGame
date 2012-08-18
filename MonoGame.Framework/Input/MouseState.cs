@@ -55,18 +55,6 @@ namespace Microsoft.Xna.Framework.Input
 		ButtonState _rightButton;
 		ButtonState _middleButton;
 		
-		internal MouseState (int x,int y)
-		{
-			_x = x;
-			_y = y;
-			
-			_scrollWheelValue = 0;
-			
-			_leftButton = ButtonState.Released;
-			_rightButton = ButtonState.Released;
-			_middleButton = ButtonState.Released;
-		}
-		
 		public MouseState (
 			int x,
 			int y,
@@ -168,39 +156,6 @@ namespace Microsoft.Xna.Framework.Input
 				return ButtonState.Released;
 			}
 		}
-
-#if WINRT
-
-        internal void Update(PointerRoutedEventArgs args)
-        {
-            var point = args.GetCurrentPoint(null);
-
-            _leftButton = point.Properties.IsLeftButtonPressed ? ButtonState.Pressed : ButtonState.Released;
-            _rightButton = point.Properties.IsRightButtonPressed ? ButtonState.Pressed : ButtonState.Released;
-            _middleButton = point.Properties.IsMiddleButtonPressed ? ButtonState.Pressed : ButtonState.Released;
-
-            // To convert from DIPs (device independent pixels) to screen resolution pixels.
-            var dipFactor = DisplayProperties.LogicalDpi / 96.0f;
-            _x = (int)(point.Position.X * dipFactor);
-            _y = (int)(point.Position.Y * dipFactor);
-
-            _scrollWheelValue += point.Properties.MouseWheelDelta;
-        }
-        
-        internal void Update(PointerEventArgs args)
-        {
-            _leftButton = args.CurrentPoint.Properties.IsLeftButtonPressed ? ButtonState.Pressed : ButtonState.Released;
-            _rightButton = args.CurrentPoint.Properties.IsRightButtonPressed ? ButtonState.Pressed : ButtonState.Released;
-            _middleButton = args.CurrentPoint.Properties.IsMiddleButtonPressed ? ButtonState.Pressed : ButtonState.Released;
-
-            // To convert from DIPs (device independent pixels) to screen resolution pixels.
-            var dipFactor = DisplayProperties.LogicalDpi / 96.0f;
-            _x = (int)(args.CurrentPoint.Position.X * dipFactor);
-            _y = (int)(args.CurrentPoint.Position.Y * dipFactor);
-
-            _scrollWheelValue += args.CurrentPoint.Properties.MouseWheelDelta;
-        }
-#endif
 	}
 }
 

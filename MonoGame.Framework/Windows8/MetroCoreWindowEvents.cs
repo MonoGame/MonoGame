@@ -78,7 +78,7 @@ namespace Microsoft.Xna.Framework
         private void CoreWindow_PointerWheelChanged(CoreWindow sender, PointerEventArgs args)
         {
             // Wheel events always go to the mouse state.
-            Mouse.State.Update(args);
+            UpdateMouse(args);
         }
 
         private void CoreWindow_PointerMoved(CoreWindow sender, PointerEventArgs args)
@@ -97,7 +97,7 @@ namespace Microsoft.Xna.Framework
             else
             {
                 // Mouse or stylus event.
-                Mouse.State.Update(args);
+                UpdateMouse(args);
             }
         }
 
@@ -113,7 +113,7 @@ namespace Microsoft.Xna.Framework
             else
             {
                 // Mouse or stylus event.
-                Mouse.State.Update(args);
+                UpdateMouse(args);
             }
         }
 
@@ -129,10 +129,27 @@ namespace Microsoft.Xna.Framework
             else            
             {
                 // Mouse or stylus event.
-                Mouse.State.Update(args);
+                UpdateMouse(args);
             }
         }
-        
+
+        private static void UpdateMouse(PointerEventArgs args)
+        {
+            // To convert from DIPs (device independent pixels) to screen resolution pixels.
+            var dipFactor = DisplayProperties.LogicalDpi / 96.0f;
+            var x = (int)(args.CurrentPoint.Position.X * dipFactor);
+            var y = (int)(args.CurrentPoint.Position.Y * dipFactor);
+
+            var state = args.CurrentPoint.Properties;
+
+            Mouse.State.X = x;
+            Mouse.State.Y = y;
+            Mouse.State.ScrollWheelValue += state.MouseWheelDelta;
+            Mouse.State.LeftButton = state.IsLeftButtonPressed ? ButtonState.Pressed : ButtonState.Released;
+            Mouse.State.RightButton = state.IsRightButtonPressed ? ButtonState.Pressed : ButtonState.Released;
+            Mouse.State.MiddleButton = state.IsMiddleButtonPressed ? ButtonState.Pressed : ButtonState.Released;
+        }
+
         private static Keys KeyTranslate(Windows.System.VirtualKey inkey)
         {
             switch (inkey)
