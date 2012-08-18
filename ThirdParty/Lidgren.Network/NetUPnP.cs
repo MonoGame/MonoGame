@@ -37,9 +37,9 @@ namespace Lidgren.Network
 
 			byte[] arr = System.Text.Encoding.UTF8.GetBytes(str);
 
-			peer.Socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, true);
+			peer.Socket.Broadcast = true;
 			peer.RawSend(arr, 0, arr.Length, new IPEndPoint(IPAddress.Broadcast, 1900));
-			peer.Socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, false);
+            peer.Socket.Broadcast = false;
 
 			// allow some extra time for router to respond
 			// System.Threading.Thread.Sleep(50);

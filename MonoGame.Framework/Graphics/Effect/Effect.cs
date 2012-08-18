@@ -61,13 +61,50 @@ namespace Microsoft.Xna.Framework.Graphics
   
         internal ConstantBuffer[] ConstantBuffers { get; private set; }
 
+        // A list of shaders that need to be recompiled on device reset.
+        internal List<Shader> _shaderList = new List<Shader>();
+
         internal Effect(GraphicsDevice graphicsDevice)
 		{
 			if (graphicsDevice == null)
 				throw new ArgumentNullException ("Graphics Device Cannot Be Null");
 
 			this.graphicsDevice = graphicsDevice;
+
+            this.graphicsDevice.DeviceResetting += new EventHandler<EventArgs>(graphicsDevice_DeviceResetting);
+            this.graphicsDevice.DeviceReset += new EventHandler<EventArgs>(graphicsDevice_DeviceReset);
 		}
+
+        void graphicsDevice_DeviceResetting(object sender, EventArgs e)
+        {
+#if OPENGL
+            foreach (var shader in _shaderList)
+                shader.NeedsRecompile = true;
+#endif
+        }
+
+        void graphicsDevice_DeviceReset(object sender, EventArgs e)
+        {
+#if OPENGL
+            foreach (var shader in _shaderList)
+            {
+                if (shader.NeedsRecompile)
+                {
+                    shader.CompileShader();
+                    shader.NeedsRecompile = false;
+                }
+            }
+
+            foreach (var technique in Techniques)
+            {
+                foreach (var pass in technique.Passes)
+                {
+                    pass.Initialize();
+                }
+            }
+
+#endif // OPENGL
+        }
 			
 		protected Effect(Effect cloneSource)
             : this(cloneSource.graphicsDevice)
@@ -150,6 +187,9 @@ namespace Microsoft.Xna.Framework.Graphics
                     break;
                 }
             }
+
+            // Take a reference to the original shader list.
+            _shaderList = cloneSource._shaderList;
         }
 
         /// <summary>
@@ -173,6 +213,15 @@ namespace Microsoft.Xna.Framework.Graphics
         protected internal virtual bool OnApply()
         {
             return false;
+        }
+
+        public override void Dispose()
+        {
+            base.Dispose();
+
+            // Unregister events
+            graphicsDevice.DeviceResetting -= graphicsDevice_DeviceResetting;
+            graphicsDevice.DeviceReset -= graphicsDevice_DeviceReset;
         }
 
         #region Effect File Reader
@@ -237,12 +286,12 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
             // Read in all the shader objects.
-            var shaderList = new List<Shader>();
+            _shaderList = new List<Shader>();
             var shaders = (int)reader.ReadByte();
             for (var s = 0; s < shaders; s++)
             {
                 var shader = new Shader(graphicsDevice, reader);
-                shaderList.Add(shader);
+                _shaderList.Add(shader);
             }
 
             // Read in the parameters.
@@ -257,7 +306,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 var annotations = ReadAnnotations(reader);
 
-                var passes = ReadPasses(reader, this, shaderList);
+                var passes = ReadPasses(reader, this, _shaderList);
 
                 var technique = new EffectTechnique(this, name, passes, annotations);
                 Techniques.Add(technique);

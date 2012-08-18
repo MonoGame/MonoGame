@@ -71,7 +71,17 @@ namespace Microsoft.Xna.Framework
 
         #region Internal Properties
 
-        internal Game Game { get; set; }
+        internal Game Game 
+        {
+            get { return game; }
+            set
+            {
+                if (game != value)
+                {
+                    game = value;                   
+                }
+            }
+        }
 
         internal OpenTK.GameWindow Window { get { return window; } }
 
@@ -143,8 +153,8 @@ namespace Microsoft.Xna.Framework
 
         private void OnResize(object sender, EventArgs e)
         {
-            var winWidth = ClientBounds.Width;
-            var winHeight = ClientBounds.Height;
+            var winWidth = window.ClientRectangle.Width;
+            var winHeight = window.ClientRectangle.Height;
             var winRect = new Rectangle(0, 0, winWidth, winHeight);
             
             // If window size is zero, leave bounds unchanged
@@ -193,6 +203,11 @@ namespace Microsoft.Xna.Framework
                     windowState = window.WindowState; // maximize->normal and normal->maximize are usually set from the outside
                 else
                     window.WindowState = windowState; // usually fullscreen-stuff is set from the code
+                
+                // fixes issue on linux (and windows?) that AllowUserResizing is not set any more when exiting fullscreen mode
+                WindowBorder desired = AllowUserResizing ? WindowBorder.Resizable : WindowBorder.Fixed;
+                if (desired != window.WindowBorder && window.WindowState != WindowState.Fullscreen)
+                    window.WindowBorder = desired;
             }
 
 
@@ -229,7 +244,7 @@ namespace Microsoft.Xna.Framework
             window.Closing += new EventHandler<CancelEventArgs>(OpenTkGameWindow_Closing);
             window.Resize += OnResize;
             window.Keyboard.KeyDown += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyDown);
-            window.Keyboard.KeyUp += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyUp);
+            window.Keyboard.KeyUp += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyUp);            
             
             // Set the window icon.
             window.Icon = Icon.ExtractAssociatedIcon(Assembly.GetEntryAssembly().Location);
@@ -237,7 +252,7 @@ namespace Microsoft.Xna.Framework
             updateClientBounds = false;
             clientBounds = new Rectangle(window.ClientRectangle.X, window.ClientRectangle.Y,
                                          window.ClientRectangle.Width, window.ClientRectangle.Height);
-            windowState = window.WindowState;
+            windowState = window.WindowState;            
 
 #if WINDOWS
             {
@@ -249,6 +264,7 @@ namespace Microsoft.Xna.Framework
             // Provide the graphics context for background loading
             Threading.BackgroundContext = new GraphicsContext(GraphicsMode.Default, window.WindowInfo);
             Threading.WindowInfo = window.WindowInfo;
+            Threading.BackgroundContext.MakeCurrent( Threading.WindowInfo );
 
             keys = new List<Keys>();
 
@@ -284,8 +300,11 @@ namespace Microsoft.Xna.Framework
 
         internal void ChangeClientBounds(Rectangle clientBounds)
         {
-            updateClientBounds = true;
-            this.clientBounds = clientBounds;
+            if (!updateClientBounds)
+            {
+                updateClientBounds = true;
+                this.clientBounds = clientBounds;
+            }
         }
 
         #endregion
@@ -294,9 +313,12 @@ namespace Microsoft.Xna.Framework
 
         public void Dispose()
         {
-            Threading.BackgroundContext.Dispose();
-            Threading.BackgroundContext = null;
-            Threading.WindowInfo = null;
+            if (Threading.BackgroundContext != null)
+            {
+                Threading.BackgroundContext.Dispose();
+                Threading.BackgroundContext = null;
+                Threading.WindowInfo = null;
+            }
             window.Dispose();
         }
 

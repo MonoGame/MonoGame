@@ -170,20 +170,20 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void SetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount) where T : struct
         {
-            SetData<T>(0, data, startIndex, elementCount, SetDataOptions.Discard);
+            SetDataInternal<T>(0, data, startIndex, elementCount, SetDataOptions.Discard);
         }
         		
 		public void SetData<T>(T[] data, int startIndex, int elementCount) where T : struct
         {
-            SetData<T>(0, data, startIndex, elementCount, SetDataOptions.Discard);
+            SetDataInternal<T>(0, data, startIndex, elementCount, SetDataOptions.Discard);
 		}
 		
         public void SetData<T>(T[] data) where T : struct
         {
-            SetData<T>(0, data, 0, data.Length, SetDataOptions.Discard);
+            SetDataInternal<T>(0, data, 0, data.Length, SetDataOptions.Discard);
         }
 
-        protected void SetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, SetDataOptions options) where T : struct
+        protected void SetDataInternal<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, SetDataOptions options) where T : struct
         {
             if (data == null)
                 throw new ArgumentNullException("data");

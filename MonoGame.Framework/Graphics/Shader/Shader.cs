@@ -34,10 +34,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal int ShaderHandle;
 
-#if DEBUG
-        // We only keep around the GLSL code for debugging.
+        // We keep this around for recompiling on context lost and debugging.
         private string _glslCode;
-#endif
+
+        // Flag whether the shader needs to be recompiled
+        internal bool NeedsRecompile = false;
 
         private struct Attribute
         {
@@ -85,7 +86,9 @@ namespace Microsoft.Xna.Framework.Graphics
         private readonly Sampler[] _samplers;
 
         private readonly int[] _cbuffers;
-
+        
+        public ShaderStage Stage { get; private set; }
+		
         internal Shader(GraphicsDevice device, BinaryReader reader)
         {
             var isVertexShader = reader.ReadBoolean();
@@ -130,7 +133,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif // DIRECTX
 
 #if OPENGL
-            var glslCode = System.Text.Encoding.ASCII.GetString(shaderBytecode);
+            _glslCode = System.Text.Encoding.ASCII.GetString(shaderBytecode);
 
             var attributeCount = (int)reader.ReadByte();
             _attributes = new Attribute[attributeCount];
@@ -142,21 +145,23 @@ namespace Microsoft.Xna.Framework.Graphics
                 _attributes[a].format = reader.ReadInt16();
             }
 
-            
+            CompileShader();
+
+#endif // OPENGL
+        }
+
+#if OPENGL
+        internal void CompileShader()
+        {
             Threading.BlockOnUIThread(() =>
             {
                 ShaderHandle = GL.CreateShader(Stage == ShaderStage.Vertex ? ShaderType.VertexShader : ShaderType.FragmentShader);
 #if GLES
-                GL.ShaderSource(ShaderHandle, 1, new string[] { glslCode }, (int[])null);
+                GL.ShaderSource(ShaderHandle, 1, new string[] { _glslCode }, (int[])null);
 #else
-                GL.ShaderSource(ShaderHandle, glslCode);
+                GL.ShaderSource(ShaderHandle, _glslCode);
 #endif
                 GL.CompileShader(ShaderHandle);
-
-#if DEBUG
-                // When debugging store this for later inspection.
-                _glslCode = glslCode;
-#endif
 
                 var compiled = 0;
 #if GLES
@@ -185,13 +190,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     throw new InvalidOperationException("Shader Compilation Failed");
                 }
             });
-
-#endif // OPENGL
         }
-
-        public ShaderStage Stage { get; private set; }
-
-#if OPENGL
         
         public void OnLink(int program) 
         {

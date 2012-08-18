@@ -75,6 +75,7 @@ using System.Diagnostics;
 //using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input.Touch;
+using Windows.ApplicationModel.Activation;
 
 namespace Microsoft.Xna.Framework
 {
@@ -83,6 +84,8 @@ namespace Microsoft.Xna.Framework
 		//private OpenALSoundController soundControllerInstance = null;
         internal static string LaunchParameters;
 
+        internal static ApplicationExecutionState PreviousExecutionState { get; set; }
+
         public MetroGamePlatform(Game game)
             : base(game)
         {
@@ -90,6 +93,7 @@ namespace Microsoft.Xna.Framework
             this.Window = MetroGameWindow.Instance;
 
             setLaunchParameters();
+            Game.PreviousExecutionState = PreviousExecutionState;
 			
             // Setup our OpenALSoundController to handle our SoundBuffer pools
             // soundControllerInstance = OpenALSoundController.GetInstance;
@@ -210,6 +214,5 @@ namespace Microsoft.Xna.Framework
 			
 			base.Dispose(disposing);
         }
-			
     }
 }

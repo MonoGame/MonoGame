@@ -79,6 +79,43 @@ namespace MonoGameContentProcessors.Processors
                 }
             }
 
+            if (PremultiplyAlpha)
+            {
+                var colorTex = input.Faces[0][0] as PixelBitmapContent<Color>;
+                if (colorTex != null)
+                {
+                    for (int x = 0; x < colorTex.Height; x++)
+                    {
+                        var row = colorTex.GetRow(x);
+                        for (int y = 0; y < row.Length; y++)
+                        {
+                            if (row[y].A < 0xff)
+                                row[y] = Color.FromNonPremultiplied(row[y].R, row[y].G, row[y].B, row[y].A);
+                        }
+                    }
+                }
+                else
+                {
+                    var vec4Tex = input.Faces[0][0] as PixelBitmapContent<Vector4>;
+                    if (vec4Tex == null)
+                        throw new NotSupportedException();
+
+                    for (int x = 0; x < vec4Tex.Height; x++)
+                    {
+                        var row = vec4Tex.GetRow(x);
+                        for (int y = 0; y < row.Length; y++)
+                        {
+                            if (row[y].W < 1.0f)
+                            {
+                                row[y].X *= row[y].W;
+                                row[y].Y *= row[y].W;
+                                row[y].Z *= row[y].W;
+                            }
+                        }
+                    }
+                }
+            }
+
             ConvertToPVRTC(input, mipLevels, PremultiplyAlpha, compressionMode);
 
             return input;

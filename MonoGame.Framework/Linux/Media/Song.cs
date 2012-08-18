@@ -48,26 +48,26 @@ using Microsoft.Xna.Framework.Audio;
 
 namespace Microsoft.Xna.Framework.Media
 {
-    public sealed class Song : IEquatable<Song>, IDisposable
-    {
+	public sealed class Song : IEquatable<Song>, IDisposable
+	{
 		private IntPtr _audioData;
 		
 		private string _name;
 		private int _playCount;
-        private int _volume; // in SDL units from 0 to 128
-    
-        internal delegate void FinishedPlayingHandler(object sender, EventArgs args);
+		private int _volume; // in SDL units from 0 to 128
+
+		internal delegate void FinishedPlayingHandler(object sender, EventArgs args);
 		
 		internal Song(string fileName)
 		{			
 			_name = fileName;
 
-            _audioData = Tao.Sdl.SdlMixer.Mix_LoadMUS(fileName);
+			_audioData = Tao.Sdl.SdlMixer.Mix_LoadMUS(fileName);
 		}
 		
 		internal void OnFinishedPlaying ()
 		{
-            MediaPlayer.OnSongFinishedPlaying(null, null);
+			MediaPlayer.OnSongFinishedPlaying(null, null);
 		}
 		
 		/// <summary>
@@ -84,22 +84,20 @@ namespace Microsoft.Xna.Framework.Media
 		}
 		
 		public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-        
-        void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                if (_audioData != IntPtr.Zero)
-                {
-                    SdlMixer.Mix_FreeMusic(_audioData);
-                }
-            }
-        }
-        
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
+
+		void Dispose(bool disposing)
+		{
+			if (disposing)
+			{
+				if (_audioData != IntPtr.Zero)
+					SdlMixer.Mix_FreeMusic(_audioData);
+			}
+		}
+
 		public bool Equals(Song song) 
 		{
 			return ((object)song != null) && (Name == song.Name);
@@ -140,132 +138,89 @@ namespace Microsoft.Xna.Framework.Media
 			if (_audioData == IntPtr.Zero)
 				return;
 
-            // according to MSDN and http://forums.create.msdn.com/forums/p/85718/614272.aspx
-            // songs can only be played with the MediaPlayer class. And this class can only play one song at a time.
-            // this means that we can easily use the MusicFinished event here without the risk of receiving an event multiple times.
-            // also, the DonePlaying handler of this class will only be set while the song is actually played in MediaPlayer.
-            // when the next song starts playing, this will then be overwritten, which shouldn't be a problem
-            SdlMixer.Mix_HookMusicFinished(OnFinishedPlaying);
-            SdlMixer.Mix_PlayMusic(_audioData, 0);
+			// according to MSDN and http://forums.create.msdn.com/forums/p/85718/614272.aspx
+			// songs can only be played with the MediaPlayer class. And this class can only play one song at a time.
+			// this means that we can easily use the MusicFinished event here without the risk of receiving an event multiple times.
+			// also, the DonePlaying handler of this class will only be set while the song is actually played in MediaPlayer.
+			// when the next song starts playing, this will then be overwritten, which shouldn't be a problem
+			SdlMixer.Mix_HookMusicFinished(OnFinishedPlaying);
+			SdlMixer.Mix_PlayMusic(_audioData, 0);
 			_playCount++;
-            //SdlMixer.Mix_CloseAudio();
-        }
+		}
 
 		internal void Resume()
 		{
-			if (_audioData == IntPtr.Zero)
-				return;
-			
-            SdlMixer.Mix_ResumeMusic();
+			SdlMixer.Mix_ResumeMusic();
 		}
 		
 		internal void Pause()
 		{			
-			if (_audioData == IntPtr.Zero)
-				return;
-			
-            SdlMixer.Mix_PauseMusic();
-        }
+			SdlMixer.Mix_PauseMusic();
+		}
 		
 		internal void Stop()
 		{
-			if (_audioData == IntPtr.Zero)
-				return;
-
-            SdlMixer.Mix_HaltMusic();			
+			SdlMixer.Mix_HaltMusic();			
 			_playCount = 0;
 		}
 		
 		internal float Volume
 		{
-            // sdl volume goes from 0 to 128 instead of 0 to 1
-			get
-			{
-				if (_audioData == IntPtr.Zero)
-					return 0f;
-				else
-                {
-					return _volume / 128f;
-                }
-			}
-			
-			set
-			{
-				if (_audioData != IntPtr.Zero && _volume != value)
-                {
-                    _volume = (int)(value * 128);
-                    SdlMixer.Mix_VolumeMusic(_volume);
-                }
+			// sdl volume goes from 0 to 128 instead of 0 to 1
+			get { return _volume / 128f; }
+			set {
+				_volume = (int)(value * 128);
+				SdlMixer.Mix_VolumeMusic(_volume);
 			}			
 		}
 		
 		// TODO: Implement
-        public TimeSpan Duration
-        {
-            get
-            {
-                // sdl doesn't seem to provide this..
-                return new TimeSpan(0);
-            }
-        }
+		public TimeSpan Duration
+		{
+			get {
+				// sdl doesn't seem to provide this..
+				return new TimeSpan(0);
+			}
+		}
 		
 		// TODO: Implement
 		public TimeSpan Position
-        {
-            get
-            {
-                // not implemented in sdl?
-                return new TimeSpan(0);
+		{
+			get {
+				// not implemented in sdl?
+				return new TimeSpan(0);
 			}
-        }
+		}
 
-        public bool IsProtected
-        {
-            get
-            {
-				return false;
-            }
-        }
+		public bool IsProtected
+		{
+			get { return false; }
+		}
 
-        public bool IsRated
-        {
-            get
-            {
-				return false;
-            }
-        }
+		public bool IsRated
+		{
+			get { return false; }
+		}
 
-        public string Name
-        {
-            get
-            {
-				return Path.GetFileNameWithoutExtension(_name);
-            }
-        }
+		public string Name
+		{
+			get { return Path.GetFileNameWithoutExtension(_name); }
+		}
 
-        public int PlayCount
-        {
-            get
-            {
-				return _playCount;
-            }
-        }
+		public int PlayCount
+		{
+			get { return _playCount; }
+		}
 
-        public int Rating
-        {
-            get
-            {
-				return 0;
-            }
-        }
+		public int Rating
+		{
+			get { return 0; }
+		}
 
-        public int TrackNumber
-        {
-            get
-            {
-				return 0;
-            }
-        }
-    }
+		public int TrackNumber
+		{
+			get { return 0; }
+		}
+	}
 }
 
