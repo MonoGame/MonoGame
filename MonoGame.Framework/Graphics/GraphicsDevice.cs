@@ -301,13 +301,13 @@ namespace Microsoft.Xna.Framework.Graphics
             // Setup extensions.
 #if OPENGL
 #if GLES
-            string[] extstring = GL.GetString(RenderbufferStorage.Extensions).Split(' ');            			
+            string extstring = GL.GetString(RenderbufferStorage.Extensions);            			
 #else
-            string[] extstring = GL.GetString(StringName.Extensions).Split(' ');	
+            string extstring = GL.GetString(StringName.Extensions);	
 #endif
-            if (extstring != null)
+            if (!string.IsNullOrEmpty(extstring))
             {
-                extensions.AddRange(extstring);
+                extensions.AddRange(extstring.Split(' '));
                 System.Diagnostics.Debug.WriteLine("Supported extensions:");
                 foreach (string extension in extensions)
                     System.Diagnostics.Debug.WriteLine(extension);
