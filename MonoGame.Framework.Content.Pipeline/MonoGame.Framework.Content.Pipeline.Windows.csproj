@@ -30,11 +30,32 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Build.Framework" />
     <Reference Include="Microsoft.Build.Utilities.v4.0" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -45,25 +66,51 @@
     <Compile Include="ChildCollection.cs" />
     <Compile Include="ContentBuildLogger.cs" />
     <Compile Include="ContentIdentity.cs" />
-    <Compile Include="ContentImporter.cs" />
-    <Compile Include="ContentImporterAttribute.cs" />
-    <Compile Include="ContentImporterContext.cs" />
+    <Compile Include="ContentImporters\ContentImporter.cs" />
+    <Compile Include="ContentImporters\ContentImporterAttribute.cs" />
+    <Compile Include="ContentImporters\ContentImporterContext.cs" />
+    <Compile Include="ContentImporters\TextureImporter.cs" />
     <Compile Include="ContentItem.cs" />
-    <Compile Include="ContentProcessor.cs" />
-    <Compile Include="ContentProcessorAttribute.cs" />
-    <Compile Include="ContentProcessorContext.cs" />
-    <Compile Include="EffectImporter.cs" />
+    <Compile Include="ContentProcessors\ContentProcessor.cs" />
+    <Compile Include="ContentProcessors\ContentProcessorAttribute.cs" />
+    <Compile Include="ContentProcessors\ContentProcessorContext.cs" />
+    <Compile Include="ContentProcessors\TextureProcessor.cs" />
+    <Compile Include="ContentWriters\ContentCompiler.cs" />
+    <Compile Include="ContentWriters\ContentTypeWriter.cs" />
+    <Compile Include="ContentWriters\ContentTypeWriterAttribute.cs" />
+    <Compile Include="ContentWriters\ContentWriter.cs" />
+    <Compile Include="ContentWriters\TextureContentWriter.cs" />
+    <Compile Include="ContentImporters\EffectImporter.cs" />
     <Compile Include="ExternalReference.cs" />
     <Compile Include="Graphics\AnimationChannel.cs" />
     <Compile Include="Graphics\AnimationChannelDictionary.cs" />
     <Compile Include="Graphics\AnimationContent.cs" />
     <Compile Include="Graphics\AnimationContentDictionary.cs" />
     <Compile Include="Graphics\AnimationKeyframe.cs" />
+    <Compile Include="Graphics\BitmapContent.cs" />
+    <Compile Include="Graphics\Font\SpriteFontDescriptionContent.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ContentProcessors\SpriteFontDescriptionProcessor.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Graphics\Font\SpriteFontImporter.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Graphics\Font\SpriteFontWriter.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Graphics\GraphicsUtil.cs" />
+    <Compile Include="Graphics\MipmapChain.cs" />
+    <Compile Include="Graphics\MipmapChainCollection.cs" />
+    <Compile Include="Graphics\PixelBitmapContent.cs" />
+    <Compile Include="Graphics\TextureContent.cs" />
     <Compile Include="Graphics\EffectContent.cs" />
     <Compile Include="Graphics\NodeContent.cs" />
     <Compile Include="Graphics\NodeContentCollection.cs" />
-    <Compile Include="IContentImporter.cs" />
-    <Compile Include="IContentProcessor.cs" />
+    <Compile Include="Graphics\Texture2DContent.cs" />
+    <Compile Include="ContentImporters\IContentImporter.cs" />
+    <Compile Include="ContentProcessors\IContentProcessor.cs" />
     <Compile Include="InvalidContentException.cs" />
     <Compile Include="NamedValueDictionary.cs" />
     <Compile Include="OpaqueDataDictionary.cs" />

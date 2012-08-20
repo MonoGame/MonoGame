@@ -38,6 +38,7 @@
     <Reference Include="System.Core" />
     <Reference Include="monotouch" />
   </ItemGroup>
+  <Import Project="$(ProgramFiles)\MSBuild\MonoTouch\Novell.MonoTouch.Common.targets" Condition="'$(windir)' != '' " />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Compile Include="Encryption\INetEncryption.cs" />
@@ -105,6 +106,7 @@
     <Compile Include="NetUnreliableSequencedReceiver.cs" />
     <Compile Include="NetUnreliableUnorderedReceiver.cs" />
     <Compile Include="NetUtility.cs" />
+    <Compile Include="PlatformSocket.cs" />
     <Compile Include="SenderChannelBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

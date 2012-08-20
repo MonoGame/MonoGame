@@ -93,19 +93,20 @@ namespace Microsoft.Xna.Framework
         {
             var currentPoint = args.GetCurrentPoint(null);
 
-            // To convert from DIPs (that all touch and pointer events are returned 
-            // in) to pixels (that XNA APIs expect)
+            // To convert from DIPs (device independent pixels) to actual screen resolution pixels.
             var dipFactor = DisplayProperties.LogicalDpi / 96.0f;
             var pos = new Vector2((float)currentPoint.Position.X, (float)currentPoint.Position.Y) * dipFactor;
 
             var isTouch = currentPoint.PointerDevice.PointerDeviceType == Windows.Devices.Input.PointerDeviceType.Touch;
             var touchIsDown = currentPoint.IsInContact;
-            if (isTouch && touchIsDown)
-                TouchPanel.AddEvent(new TouchLocation((int)currentPoint.PointerId, TouchLocationState.Moved, pos));
-
-            if (!isTouch || currentPoint.Properties.IsPrimary && touchIsDown)
+            if (isTouch)
             {
-                // Mouse or stylus event or the primary touch event (simulated as mouse input)
+                if (touchIsDown)
+                    TouchPanel.AddEvent((int)currentPoint.PointerId, TouchLocationState.Moved, pos);
+            }
+            else
+            {
+                // Mouse or stylus event.
                 Mouse.State.Update(args);
             }
         }
@@ -117,18 +118,16 @@ namespace Microsoft.Xna.Framework
 
             var currentPoint = args.GetCurrentPoint(null);
 
-            // To convert from DIPs (that all touch and pointer events are returned 
-            // in) to pixels (that XNA APIs expect)
+            // To convert from DIPs (device independent pixels) to screen resolution pixels.
             var dipFactor = DisplayProperties.LogicalDpi / 96.0f;
             var pos = new Vector2((float)currentPoint.Position.X, (float)currentPoint.Position.Y) * dipFactor;
 
             var isTouch = currentPoint.PointerDevice.PointerDeviceType == Windows.Devices.Input.PointerDeviceType.Touch;
             if (isTouch)
-                TouchPanel.AddEvent(new TouchLocation((int)currentPoint.PointerId, TouchLocationState.Released, pos));
-
-            if (!isTouch || currentPoint.Properties.IsPrimary)
+                TouchPanel.AddEvent((int)currentPoint.PointerId, TouchLocationState.Released, pos);
+            else
             {
-                // Mouse or stylus event or the primary touch event (simulated as mouse input)
+                // Mouse or stylus event.
                 Mouse.State.Update(args);
             }
         }
@@ -140,18 +139,16 @@ namespace Microsoft.Xna.Framework
 
             var currentPoint = args.GetCurrentPoint(null);
 
-            // To convert from DIPs (that all touch and pointer events are returned 
-            // in) to pixels (that XNA APIs expect)
+            // To convert from DIPs (device independent pixels) to screen resolution pixels.
             var dipFactor = DisplayProperties.LogicalDpi / 96.0f;
             var pos = new Vector2((float)currentPoint.Position.X, (float)currentPoint.Position.Y) * dipFactor;
 
             var isTouch = currentPoint.PointerDevice.PointerDeviceType == Windows.Devices.Input.PointerDeviceType.Touch;
             if (isTouch)
-                TouchPanel.AddEvent(new TouchLocation((int)currentPoint.PointerId, TouchLocationState.Pressed, pos));
-
-            if (!isTouch || currentPoint.Properties.IsPrimary)
+                TouchPanel.AddEvent((int)currentPoint.PointerId, TouchLocationState.Pressed, pos);
+            else
             {
-                // Mouse or stylus event or the primary touch event (simulated as mouse input)
+                // Mouse or stylus event.
                 Mouse.State.Update(args);
             }
         }
