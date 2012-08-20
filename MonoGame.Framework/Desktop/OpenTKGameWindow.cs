@@ -166,14 +166,13 @@ namespace Microsoft.Xna.Framework
             if (winWidth == 0 || winHeight == 0)
                 return;
 
-
-            Game.GraphicsDevice.Viewport = new Viewport(0, 0, winWidth, winHeight);
-
             Game.GraphicsDevice.PresentationParameters.BackBufferWidth = winWidth;
             Game.GraphicsDevice.PresentationParameters.BackBufferHeight = winHeight;
 
+            Game.GraphicsDevice.Viewport = new Viewport(0, 0, winWidth, winHeight);
+
             ChangeClientBounds(winRect);
-                                    
+
             OnClientSizeChanged();
         }
 
