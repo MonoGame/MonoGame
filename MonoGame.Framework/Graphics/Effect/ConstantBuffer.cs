@@ -96,7 +96,13 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 // TODO: Consider storing all data in arrays to avoid
                 // having to generate this temp array on every set.
-                var bytes = BitConverter.GetBytes((float)data);
+                byte[] bytes;
+
+                if(data is float)
+                    bytes = BitConverter.GetBytes((float)data);
+                else
+                    bytes = BitConverter.GetBytes(((float[])data)[0]);
+
                 Buffer.BlockCopy(bytes, 0, _buffer, offset, elementSize);
             }
 
