@@ -174,7 +174,11 @@ namespace Microsoft.Xna.Framework.Content
                 externalReference = externalReference.Replace('\\', Path.DirectorySeparatorChar);
 
                 // Use Path.GetFullPath to help resolve relative directories
-                string fullRootPath = Path.GetFullPath(contentManager.RootDirectory);
+                var rootDirectory = contentManager.RootDirectory;
+                if (String.IsNullOrEmpty(rootDirectory))
+                    rootDirectory = Environment.CurrentDirectory;
+
+                string fullRootPath = Path.GetFullPath(rootDirectory);
 				
 				// iOS won't find the right name if the \'s are facing the wrong way. be certian we're good here.
 				var fullAssetName = Path.Combine(fullRootPath, assetName.Replace('\\', Path.DirectorySeparatorChar)); 
