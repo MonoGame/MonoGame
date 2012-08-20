@@ -43,7 +43,12 @@ namespace Microsoft.Xna.Framework.Graphics
             get { return _passes.Count; }
         }
 
-        public IEnumerator<EffectPass> GetEnumerator()
+        public List<EffectPass>.Enumerator GetEnumerator()
+        {
+            return this._passes.GetEnumerator();
+        }
+
+        IEnumerator<EffectPass> System.Collections.Generic.IEnumerable<EffectPass>.GetEnumerator()
         {
             return _passes.GetEnumerator();
         }
