@@ -9,7 +9,7 @@ using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
 #elif PSS
-using Sce.Pss.Core.Graphics;
+using Sce.PlayStation.Core.Graphics;
 #elif WINRT
 
 #else
@@ -44,6 +44,8 @@ namespace Microsoft.Xna.Framework.Graphics
         private int _shaderProgram;
 
         static readonly float[] _posFixup = new float[4];
+
+
 
 #endif // OPENGL
 
@@ -80,7 +82,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             Initialize();
         }
-
+        
         internal EffectPass(Effect effect, EffectPass cloneSource)
         {
             Debug.Assert(effect != null, "Got a null effect!");
@@ -101,7 +103,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
         }
 
-        private void Initialize()
+        internal void Initialize()
         {
 #if OPENGL
             Threading.BlockOnUIThread(() =>
@@ -181,7 +183,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 data = (float[])_effect.Parameters["WorldViewProj"].Data;
             else
                 data = (float[])_effect.Parameters["MatrixTransform"].Data;
-            Sce.Pss.Core.Matrix4 matrix4 = PSSHelper.ToPssMatrix4(data);
+            Sce.PlayStation.Core.Matrix4 matrix4 = PSSHelper.ToPssMatrix4(data);
             matrix4 = matrix4.Transpose (); //When .Data is set the matrix is transposed, we need to do it again to undo it
             _shaderProgram.SetUniformValue(0, ref matrix4);
 #elif OPENGL

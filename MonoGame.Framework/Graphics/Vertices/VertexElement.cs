@@ -123,6 +123,14 @@ namespace Microsoft.Xna.Framework.Graphics
                     element.SemanticName = "TEXCOORD";
                     break;
 
+                case Graphics.VertexElementUsage.BlendIndices:
+                    element.SemanticName = "BLENDINDICES";
+                    break;
+
+                case Graphics.VertexElementUsage.BlendWeight:
+                    element.SemanticName = "BLENDWEIGHT";
+                    break;
+
                 default:
                     throw new NotImplementedException("Unknown vertex element usage!");
             }
@@ -183,8 +191,13 @@ namespace Microsoft.Xna.Framework.Graphics
                     throw new NotImplementedException("Unknown vertex element format!");
             }
 
-            element.AlignedByteOffset = _offset;
             element.Slot = 0;
+            element.AlignedByteOffset = _offset;
+            
+            // Note that instancing is only supported in 
+            // feature level 9.3 and above.
+            element.Classification = SharpDX.Direct3D11.InputClassification.PerVertexData;
+            element.InstanceDataStepRate = 0;
 
             return element;
         }

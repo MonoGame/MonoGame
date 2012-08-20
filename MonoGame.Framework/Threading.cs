@@ -54,6 +54,7 @@ using OpenTK.Graphics.ES20;
 using OpenTK.Graphics;
 using OpenTK.Platform;
 using OpenTK;
+using OpenTK.Graphics.OpenGL;
 #endif
 
 namespace Microsoft.Xna.Framework
@@ -61,6 +62,7 @@ namespace Microsoft.Xna.Framework
     internal class Threading
     {
         static int mainThreadId;
+        static int currentThreadId;
 #if ANDROID
         static List<Action> actions = new List<Action>();
         static Mutex actionsMutex = new Mutex();
@@ -98,16 +100,25 @@ namespace Microsoft.Xna.Framework
 #if IPHONE
             lock (BackgroundContext)
             {
-                if (EAGLContext.CurrentContext != BackgroundContext)
+                // Make the context current on this thread if it is not already
+                if (!Object.ReferenceEquals(EAGLContext.CurrentContext, BackgroundContext))
                     EAGLContext.SetCurrentContext(BackgroundContext);
+                // Execute the action
                 action();
+                // Must flush the GL calls so the GPU asset is ready for the main context to use it
+                GL.Flush();
             }
 #elif WINDOWS || LINUX
             lock (BackgroundContext)
             {
-                if (GraphicsContext.CurrentContext != BackgroundContext)
-                    BackgroundContext.MakeCurrent(WindowInfo);
+                // Make the context current on this thread
+                BackgroundContext.MakeCurrent(WindowInfo);
+                // Execute the action
                 action();
+                // Must flush the GL calls so the texture is ready for the main context to use
+                GL.Flush();
+                // Must make the context not current on this thread or the next thread will get error 170 from the MakeCurrent call
+                BackgroundContext.MakeCurrent(null);
             }
 #else
             ManualResetEventSlim resetEvent = new ManualResetEventSlim(false);

@@ -56,7 +56,8 @@ using SharpDX.Direct3D;
 using Windows.Graphics.Display;
 using Windows.UI.Core;
 #elif PSS
-using Sce.Pss.Core.Graphics;
+using Sce.PlayStation.Core.Graphics;
+using PssVertexBuffer = Sce.PlayStation.Core.Graphics.VertexBuffer;
 #elif GLES
 using OpenTK.Graphics.ES20;
 using BeginMode = OpenTK.Graphics.ES20.All;
@@ -170,7 +171,8 @@ namespace Microsoft.Xna.Framework.Graphics
 #elif PSS
 
         internal GraphicsContext _graphics;
-
+        internal List<PssVertexBuffer> _availableVertexBuffers = new List<PssVertexBuffer>();
+        internal List<PssVertexBuffer> _usedVertexBuffers = new List<PssVertexBuffer>();
 #endif
 
 #if GLES
@@ -206,7 +208,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		List<string> extensions = new List<string>();
 
+#if OPENGL
         internal int glFramebuffer;
+#endif
 
 #if DIRECTX
 
@@ -289,20 +293,21 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void Initialize()
         {
-            // Clear the effect cache since the
-            // device context is going to be reset.
+            // TODO: This line should not be necessary as Effects are being recompiled
+            // in DeviceReset. There seems to be an issue related to static
+            // initialisation order and removing it breaks drawing in 3d.
             Effect.FlushCache();
 
             // Setup extensions.
 #if OPENGL
 #if GLES
-            string[] extstring = GL.GetString(RenderbufferStorage.Extensions).Split(' ');            			
+            string extstring = GL.GetString(RenderbufferStorage.Extensions);            			
 #else
-            string[] extstring = GL.GetString(StringName.Extensions).Split(' ');	
+            string extstring = GL.GetString(StringName.Extensions);	
 #endif
-            if (extstring != null)
+            if (!string.IsNullOrEmpty(extstring))
             {
-                extensions.AddRange(extstring);
+                extensions.AddRange(extstring.Split(' '));
                 System.Diagnostics.Debug.WriteLine("Supported extensions:");
                 foreach (string extension in extensions)
                     System.Diagnostics.Debug.WriteLine(extension);
@@ -388,16 +393,33 @@ namespace Microsoft.Xna.Framework.Graphics
             if (_d2dContext != null)
                 _d2dContext.Dispose();
 
-            // Retrieve the Direct3D 11.1 device amd device context
+            // Windows requires BGRA support out of DX.
             var creationFlags = SharpDX.Direct3D11.DeviceCreationFlags.BgraSupport;
 #if DEBUG
             creationFlags |= SharpDX.Direct3D11.DeviceCreationFlags.Debug;
 #endif
 
+            // Pass the preferred feature levels based on the
+            // target profile that may have been set by the user.
+            var featureLevels = new List<FeatureLevel>();
+            if (GraphicsProfile == GraphicsProfile.HiDef)
+            {
+                featureLevels.Add(FeatureLevel.Level_11_1);
+                featureLevels.Add(FeatureLevel.Level_11_0);
+                featureLevels.Add(FeatureLevel.Level_10_1);
+                featureLevels.Add(FeatureLevel.Level_10_0);
+            }
+            featureLevels.Add(FeatureLevel.Level_9_3);
+            featureLevels.Add(FeatureLevel.Level_9_2);
+            featureLevels.Add(FeatureLevel.Level_9_1);
+
             // Create the Direct3D device.
-            using (var defaultDevice = new SharpDX.Direct3D11.Device(DriverType.Hardware, creationFlags))
+            using (var defaultDevice = new SharpDX.Direct3D11.Device(DriverType.Hardware, creationFlags, featureLevels.ToArray()))
                 _d3dDevice = defaultDevice.QueryInterface<SharpDX.Direct3D11.Device1>();
+
+            // Set the correct profile based on the feature level.
             _featureLevel = _d3dDevice.FeatureLevel;
+            GraphicsProfile = _featureLevel <= FeatureLevel.Level_9_3 ? GraphicsProfile.Reach : GraphicsProfile.HiDef;
 
             // Get Direct3D 11.1 context
             _d3dContext = _d3dDevice.ImmediateContext.QueryInterface<SharpDX.Direct3D11.DeviceContext1>();
@@ -441,6 +463,9 @@ namespace Microsoft.Xna.Framework.Graphics
             _currentDepthStencilView = null;
             _currentRenderTargetBindings = null;
 
+			// Make sure all pending rendering commands are flushed.
+            _d3dContext.Flush();
+
             if (    PresentationParameters == null ||
                     (PresentationParameters.DeviceWindowHandle == IntPtr.Zero && PresentationParameters.SwapChainPanel == null))
             {
@@ -460,7 +485,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 multisampleDesc.Quality = (int)SharpDX.Direct3D11.StandardMultisampleQualityLevels.StandardMultisamplePattern;
             }
 
-            var format = SharpDXHelper.ToFormat(PresentationParameters.BackBufferFormat);
+            // Use BGRA for the swap chain.
+            var format = PresentationParameters.BackBufferFormat == SurfaceFormat.Color ? 
+                            SharpDX.DXGI.Format.B8G8R8A8_UNorm : 
+                            SharpDXHelper.ToFormat(PresentationParameters.BackBufferFormat);
 
             // If the swap chain already exists... update it.
             if (_swapChain != null)
@@ -532,6 +560,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
             }
 
+            _swapChain.Rotation = SharpDX.DXGI.DisplayModeRotation.Identity;
+
             // Obtain the backbuffer for this window which will be the final 3D rendertarget.
             Point targetSize;
             using (var backBuffer = SharpDX.Direct3D11.Texture2D.FromSwapChain<SharpDX.Direct3D11.Texture2D>(_swapChain, 0))
@@ -547,25 +577,23 @@ namespace Microsoft.Xna.Framework.Graphics
             // Create the depth buffer if we need it.
             if (PresentationParameters.DepthStencilFormat != DepthFormat.None)
             {
+                var depthFormat = SharpDXHelper.ToFormat(PresentationParameters.DepthStencilFormat);
+
                 // Allocate a 2-D surface as the depth/stencil buffer.
                 using (var depthBuffer = new SharpDX.Direct3D11.Texture2D(_d3dDevice, new SharpDX.Direct3D11.Texture2DDescription()
                 {
-                    Format = SharpDXHelper.ToFormat(PresentationParameters.DepthStencilFormat),
+                    Format = depthFormat,
                     ArraySize = 1,
                     MipLevels = 1,
                     Width = targetSize.X,
                     Height = targetSize.Y,
                     SampleDescription = multisampleDesc,
+                    Usage = SharpDX.Direct3D11.ResourceUsage.Default,
                     BindFlags = SharpDX.Direct3D11.BindFlags.DepthStencil,
                 }))
 
                 // Create a DepthStencil view on this surface to use on bind.
-                _depthStencilView = new SharpDX.Direct3D11.DepthStencilView(_d3dDevice, depthBuffer,
-                    new SharpDX.Direct3D11.DepthStencilViewDescription()
-                    {
-                        Format = SharpDXHelper.ToFormat(PresentationParameters.DepthStencilFormat),
-                        Dimension = SharpDX.Direct3D11.DepthStencilViewDimension.Texture2D
-                    });
+                _depthStencilView = new SharpDX.Direct3D11.DepthStencilView(_d3dDevice, depthBuffer);
             }
 
             // Set the current viewport.
@@ -733,7 +761,11 @@ namespace Microsoft.Xna.Framework.Graphics
 				bufferMask = bufferMask | ClearBufferMask.StencilBufferBit;
 			}
 			if (options.HasFlag(ClearOptions.DepthBuffer)) {
-				GL.ClearDepth (depth);
+#if GLES
+                GL.ClearDepth (depth);
+#else
+                GL.ClearDepth ((double)depth);
+#endif
 				bufferMask = bufferMask | ClearBufferMask.DepthBufferBit;
 			}
 
@@ -870,6 +902,8 @@ namespace Microsoft.Xna.Framework.Graphics
 						
 #elif PSS
             _graphics.SwapBuffers();
+            _availableVertexBuffers.AddRange(_usedVertexBuffers);
+            _usedVertexBuffers.Clear();
 #elif ANDROID
 			Game.Instance.Platform.Present();
 #elif OPENGL
@@ -884,17 +918,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void Reset()
         {
-            _viewport.Width = DisplayMode.Width;
-            _viewport.Height = DisplayMode.Height;
-
-            if (ResourcesLost)
-            {
-                ContentManager.ReloadAllContent();
-                ResourcesLost = false;
-            }
-
-            if(DeviceReset != null)
-                DeviceReset(null, new EventArgs());
+            // Manually resetting the device is not currently supported.
+            throw new NotImplementedException();
         }
 
         public void Reset(Microsoft.Xna.Framework.Graphics.PresentationParameters presentationParameters)
@@ -905,6 +930,26 @@ namespace Microsoft.Xna.Framework.Graphics
         public void Reset(Microsoft.Xna.Framework.Graphics.PresentationParameters presentationParameters, GraphicsAdapter graphicsAdapter)
         {
             throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Trigger the DeviceResetting event
+        /// Currently internal to allow the various platforms to send the event at the appropriate time.
+        /// </summary>
+        internal void OnDeviceResetting()
+        {
+            if (DeviceResetting != null)
+                DeviceResetting(this, EventArgs.Empty);
+        }
+
+        /// <summary>
+        /// Trigger the DeviceReset event to allow games to be notified of a device reset.
+        /// Currently internal to allow the various platforms to send the event at the appropriate time.
+        /// </summary>
+        internal void OnDeviceReset()
+        {
+            if (DeviceReset != null)
+                DeviceReset(this, EventArgs.Empty);
         }
 
         public Microsoft.Xna.Framework.Graphics.DisplayMode DisplayMode
@@ -953,16 +998,16 @@ namespace Microsoft.Xna.Framework.Graphics
                     _d3dContext.Rasterizer.SetViewports(viewport);
 #elif OPENGL
 				GL.Viewport (value.X, value.Y, value.Width, value.Height);
-				GL.DepthRange(value.MinDepth, value.MaxDepth);
+#if GLES
+                GL.DepthRange(value.MinDepth, value.MaxDepth);
+#else
+                GL.DepthRange((double)value.MinDepth, (double)value.MaxDepth);
+#endif
 #endif
             }
         }
 
-        public Microsoft.Xna.Framework.Graphics.GraphicsProfile GraphicsProfile
-        {
-            get;
-            set;
-        }
+        public GraphicsProfile GraphicsProfile { get; set; }
 
         public Rectangle ScissorRectangle
         {
@@ -1222,10 +1267,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 if (_vertexBuffer != null)
                     _d3dContext.InputAssembler.SetVertexBuffers(0, _vertexBuffer._binding);
                 else
-                    _d3dContext.InputAssembler.SetVertexBuffers(0, null);
+                    _d3dContext.InputAssembler.SetVertexBuffers(0);
             }
-#elif PSS
-            _graphics.SetVertexBuffer(0, vertexBuffer._buffer);
 #elif OPENGL
             if (_vertexBuffer != null)
                 GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBuffer.vbo);
@@ -1405,6 +1448,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			                 indexElementCount,
 			                 indexElementType,
 			                 indexOffsetInBytes);
+#elif PSS
+            BindVertexBuffer(true);
+            _graphics.DrawArrays(PSSHelper.ToDrawMode(primitiveType), startIndex, GetElementCountArray(primitiveType, primitiveCount));
 #endif
         }
 
@@ -1498,6 +1544,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			              vertexStart,
 			              vertexCount);
 #elif PSS
+            BindVertexBuffer(false);
             _graphics.DrawArrays(PSSHelper.ToDrawMode(primitiveType), vertexStart, vertexCount);
 #endif
         }
@@ -1666,6 +1713,86 @@ namespace Microsoft.Xna.Framework.Graphics
             handle2.Free();
 #endif
         }
+
+#if PSS
+        internal PssVertexBuffer GetVertexBuffer(VertexFormat[] vertexFormat, int requiredVertexLength, int requiredIndexLength)
+        {
+            int bestMatchIndex = -1;
+            PssVertexBuffer bestMatch = null;
+            
+            //Search for a good one
+            for (int i = _availableVertexBuffers.Count - 1; i >= 0; i--)
+            {
+                var buf = _availableVertexBuffers[i];
+                
+#region Check there is enough space
+                if (buf.VertexCount < requiredVertexLength)
+                    continue;
+                if (requiredIndexLength == 0 && buf.IndexCount != 0)
+                    continue;
+                if (requiredIndexLength > 0 && buf.IndexCount < requiredIndexLength)
+                    continue;
+#endregion
+                
+#region Check VertexFormat is the same
+                var bufFormats = buf.Formats;
+                if (vertexFormat.Length != bufFormats.Length)
+                    continue;
+                bool allEqual = true;
+                for (int j = 0; j < bufFormats.Length; j++)
+                {
+                    if (vertexFormat[j] != bufFormats[j])
+                    {
+                        allEqual = false;
+                        break;
+                    }
+                }
+                if (!allEqual)
+                    continue;
+#endregion
+                
+                //this one is acceptable
+                
+                //No current best or this one is smaller than the current best
+                if (bestMatch == null || (buf.IndexCount + buf.VertexCount) < (bestMatch.IndexCount + bestMatch.VertexCount))
+                {
+                    bestMatch = buf;
+                    bestMatchIndex = i;
+                }
+            }
+            
+            if (bestMatch != null)
+            {
+                _availableVertexBuffers.RemoveAt(bestMatchIndex);
+            }
+            else
+            {
+                //Create one
+                bestMatch = new PssVertexBuffer(requiredVertexLength, requiredIndexLength, vertexFormat);
+            }
+            _usedVertexBuffers.Add(bestMatch);
+            
+            return bestMatch;
+        }
+        
+        /// <summary>
+        /// Set the current _graphics VertexBuffer based on _vertexBuffer and _indexBuffer, reusing an existing VertexBuffer if possible
+        /// </summary>
+        private void BindVertexBuffer(bool bindIndexBuffer)
+        {
+            int requiredVertexLength = _vertexBuffer.VertexCount;
+            int requiredIndexLength = (!bindIndexBuffer || _indexBuffer == null) ? 0 : _indexBuffer.IndexCount;
+            
+            var vertexFormat = _vertexBuffer.VertexDeclaration.GetVertexFormat();
+            
+            var vertexBuffer = GetVertexBuffer(vertexFormat, requiredVertexLength, requiredIndexLength);
+            
+            vertexBuffer.SetVertices(_vertexBuffer._vertexArray);
+            if (requiredIndexLength > 0)
+                vertexBuffer.SetIndices(_indexBuffer._buffer);
+            _graphics.SetVertexBuffer(0, vertexBuffer);
+        }
+#endif
 
         internal int GetElementCountArray(PrimitiveType primitiveType, int primitiveCount)
         {

@@ -15,5 +15,8 @@ namespace TwoMGFX
 
         [Utilities.CommandLineParser.Name("DX11")]
         public bool DX11Profile;
+
+        [Utilities.CommandLineParser.Name("DEBUG")]
+        public bool Debug;
     }
 }

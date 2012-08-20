@@ -52,7 +52,9 @@ namespace Microsoft.Xna.Framework.Audio
 	public sealed class SoundEffectInstance : IDisposable
 	{
 		private bool isDisposed = false;
+#if !WINRT
 		private SoundState soundState = SoundState.Stopped;
+#endif
 
 #if WINRT        
         internal SourceVoice _voice { get; set; }
@@ -187,6 +189,11 @@ namespace Microsoft.Xna.Framework.Audio
             _voice.FlushSourceBuffers();
             _paused = false;
 #else
+			if ( _sound != null )
+			{
+				_sound.Stop();
+				soundState = SoundState.Stopped;
+			}
 #endif
         }
 
@@ -196,6 +203,11 @@ namespace Microsoft.Xna.Framework.Audio
             _voice.Stop( immediate ? 0 : (int)PlayFlags.Tails );
             _paused = false;
 #else
+			if ( _sound != null )
+			{
+				_sound.Stop();
+				soundState = SoundState.Stopped;
+			}
 #endif
         }		
 		
@@ -367,7 +379,14 @@ namespace Microsoft.Xna.Framework.Audio
 	            get
 	            {                    
 #if WINRT
-                    return XAudio2.FrequencyRatioToSemitones(_voice.FrequencyRatio) * 12.0f;
+                    // NOTE: This is copy of what XAudio2.FrequencyRatioToSemitones() does
+                    // which avoids the native call and is actually more accurate.
+                    var pitch = 39.86313713864835 * Math.Log10(_voice.FrequencyRatio);
+
+                    // Convert from semitones to octaves.
+                    pitch /= 12.0;
+
+                    return (float)pitch;
 #else
 					if ( _sound != null)
 				    {
@@ -378,10 +397,11 @@ namespace Microsoft.Xna.Framework.Audio
 	            }
 	            set
 	            {
-                    // According to XNA documentation a value of 1.0 adjusts pitch upwards by an octave,
-                    // therefore the scale of this Pitch property is 1.0f Pitch = 12 semitones;                    
 #if WINRT
-                    _voice.SetFrequencyRatio(XAudio2.SemitonesToFrequencyRatio(value * 12.0f));                    
+                    // NOTE: This is copy of what XAudio2.SemitonesToFrequencyRatio() does
+                    // which avoids the native call and is actually more accurate.
+                    var ratio = Math.Pow(2.0, value);
+                    _voice.SetFrequencyRatio((float)ratio);                  
 #else
 				    if ( _sound != null && _sound.Rate != value)
 				    {

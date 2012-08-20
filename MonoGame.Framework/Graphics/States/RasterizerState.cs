@@ -88,9 +88,12 @@ namespace Microsoft.Xna.Framework.Graphics
                 // These are new DX11 features we should consider exposing
                 // as part of the extended MonoGame API.
                 desc.IsFrontCounterClockwise = false;
-                desc.DepthBiasClamp = desc.DepthBias;
-                desc.IsDepthClipEnabled = true;
                 desc.IsAntialiasedLineEnabled = false;
+
+                // To support feature level 9.1 these must 
+                // be set to these exact values.
+                desc.DepthBiasClamp = 0.0f;
+                desc.IsDepthClipEnabled = true;
 
                 // Create the state.
                 _state = new SharpDX.Direct3D11.RasterizerState(graphicsDevice._d3dDevice, ref desc);

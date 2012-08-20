@@ -9,8 +9,7 @@ using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
 #elif PSS
-using Sce.Pss.Core.Graphics;
-using PssVertexBuffer = Sce.Pss.Core.Graphics.VertexBuffer;
+using Sce.PlayStation.Core.Graphics;
 #elif GLES
 using OpenTK.Graphics.ES20;
 using BufferTarget = OpenTK.Graphics.ES20.All;
@@ -28,7 +27,7 @@ namespace Microsoft.Xna.Framework.Graphics
         internal SharpDX.Direct3D11.VertexBufferBinding _binding;
         protected SharpDX.Direct3D11.Buffer _buffer;
 #elif PSS
-        internal PssVertexBuffer _buffer;
+        internal Array _vertexArray;
 #else
 		//internal uint vao;
 		internal uint vbo;
@@ -74,8 +73,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             _binding = new SharpDX.Direct3D11.VertexBufferBinding(_buffer, VertexDeclaration.VertexStride, 0);
 #elif PSS
-            VertexFormat[] vertexFormat = vertexDeclaration.GetVertexFormat();
-            _buffer = new PssVertexBuffer(vertexCount, vertexFormat);
+            //Do nothing, we cannot create the storage array yet
 #else
             Threading.BlockOnUIThread(() =>
             {
@@ -245,7 +243,9 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
 #elif PSS
-            _buffer.SetVertices(data, offsetInBytes, startIndex, elementCount);
+            if (_vertexArray == null)
+                _vertexArray = new T[VertexCount];
+            Array.Copy(data, offsetInBytes / vertexStride, _vertexArray, startIndex, elementCount);
 #else
             Threading.BlockOnUIThread(() =>
             {
@@ -258,12 +258,15 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public override void Dispose()
         {
-#if DIRECTX || PSS
+#if DIRECTX
             if (_buffer != null)
             {
                 _buffer.Dispose();
                 _buffer = null;
             }
+#elif PSS
+            //Do nothing
+            _vertexArray = null;
 #else
 			GL.DeleteBuffers(1, ref vbo);
 #endif

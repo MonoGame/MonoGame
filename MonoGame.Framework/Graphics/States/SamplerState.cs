@@ -151,9 +151,12 @@ namespace Microsoft.Xna.Framework.Graphics
                 desc.MipLodBias = MipMapLevelOfDetailBias;
 
                 // TODO: How do i do these?
-                desc.MaximumLod = float.MaxValue;
-                desc.MinimumLod = -float.MaxValue;
+                desc.MinimumLod = 0.0f;
                 desc.BorderColor = new SharpDX.Color4(0, 0, 0, 0);
+
+                // To support feature level 9.1 these must 
+                // be set to these exact values.
+                desc.MaximumLod = float.MaxValue;
                 desc.ComparisonFunction = SharpDX.Direct3D11.Comparison.Never;
 
                 // Create the state.

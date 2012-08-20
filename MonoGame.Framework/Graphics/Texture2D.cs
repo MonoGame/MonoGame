@@ -63,7 +63,7 @@ using System.Drawing.Imaging;
 using OpenTK.Graphics.OpenGL;
 using GLPixelFormat = OpenTK.Graphics.OpenGL.PixelFormat;
 #elif PSS
-using PssTexture2D = Sce.Pss.Core.Graphics.Texture2D;
+using PssTexture2D = Sce.PlayStation.Core.Graphics.Texture2D;
 #elif GLES
 using OpenTK.Graphics.ES20;
 using GLPixelFormat = OpenTK.Graphics.ES20.All;
@@ -145,7 +145,7 @@ namespace Microsoft.Xna.Framework.Graphics
             var desc = new SharpDX.Direct3D11.Texture2DDescription();
             desc.Width = width;
             desc.Height = height;
-            desc.MipLevels = mipmap ? 0 : 1;
+            desc.MipLevels = levelCount;
             desc.ArraySize = 1;
             desc.Format = SharpDXHelper.ToFormat(format);
             desc.BindFlags = SharpDX.Direct3D11.BindFlags.ShaderResource;
@@ -161,7 +161,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _texture = new SharpDX.Direct3D11.Texture2D(graphicsDevice._d3dDevice, desc);
 
 #elif PSS
-			_texture2D = new Sce.Pss.Core.Graphics.Texture2D(width, height, mipmap, PSSHelper.ToFormat(format));
+			_texture2D = new Sce.PlayStation.Core.Graphics.Texture2D(width, height, mipmap, PSSHelper.ToFormat(format));
 #else
 
             this.glTarget = TextureTarget.Texture2D;
@@ -685,6 +685,35 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
         }
 
+        private void FillTextureFromStream(Stream stream)
+        {
+#if ANDROID
+            // Work-around for "The program 'Mono' has exited with code 255 (0xff)."
+            // Based on http://stackoverflow.com/questions/7535503/mono-for-android-exit-code-255-on-bitmapfactory-decodestream
+            //Bitmap image = BitmapFactory.DecodeStream(stream);
+            Bitmap image = null;
+            using (MemoryStream memStream = new MemoryStream())
+            {
+                stream.CopyTo(memStream);
+                image = BitmapFactory.DecodeByteArray(memStream.GetBuffer(), 0, (int)memStream.Length);
+            }
+            var width = image.Width;
+            var height = image.Height;
+
+            int[] pixels = new int[width * height];
+            image.GetPixels(pixels, 0, width, 0, 0, width, height);
+
+            // Convert from ARGB to ABGR
+            for (int i = 0; i < width * height; ++i)
+            {
+                uint pixel = (uint)pixels[i];
+                pixels[i] = (int)((pixel & 0xFF00FF00) | ((pixel & 0x00FF0000) >> 16) | ((pixel & 0x000000FF) << 16));
+            }
+            
+            this.SetData<int>(pixels);
+#endif
+        }
+
         public void SaveAsJpeg(Stream stream, int width, int height)
         {
 #if WINRT
@@ -733,6 +762,18 @@ namespace Microsoft.Xna.Framework.Graphics
         //What was this for again?
 		internal void Reload(Stream textureStream)
 		{
+#if OPENGL
+            if (!GL.IsTexture(this.glTexture))
+            {
+#if IPHONE || ANDROID
+                GL.GenTextures(1, ref this.glTexture);
+#else
+                GL.GenTextures(1, out this.glTexture);
+#endif
+            }
+
+            FillTextureFromStream(textureStream);
+#endif
 		}
 
 #if ANDROID

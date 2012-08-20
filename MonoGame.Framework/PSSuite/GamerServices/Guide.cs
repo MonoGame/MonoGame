@@ -46,7 +46,7 @@ using System.Linq;
 using System.Threading;
 using System.Runtime.Remoting.Messaging;
 
-using Sce.Pss.Core.Input;
+using Sce.PlayStation.Core.Input;
 
 using Microsoft.Xna.Framework.Net;
 using Microsoft.Xna.Framework.Storage;

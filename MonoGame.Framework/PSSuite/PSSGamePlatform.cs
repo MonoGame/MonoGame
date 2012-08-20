@@ -71,9 +71,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-using Sce.Pss.Core;
-using Sce.Pss.Core.Environment;
-using Sce.Pss.Core.Input;
+using Sce.PlayStation.Core;
+using Sce.PlayStation.Core.Environment;
+using Sce.PlayStation.Core.Input;
 
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
@@ -206,11 +206,11 @@ namespace Microsoft.Xna.Framework
             {
                 Vector2 position = new Vector2((touch.X + 0.5f) * _frameBufferWidth, (touch.Y + 0.5f) * _frameBufferHeight);
                 if (touch.Status == TouchStatus.Down)
-                    TouchPanel.AddEvent(new TouchLocation(touch.ID, TouchLocationState.Pressed, position));
+                    TouchPanel.AddEvent(touch.ID, TouchLocationState.Pressed, position);
                 else if (touch.Status == TouchStatus.Move)
-                    TouchPanel.AddEvent(new TouchLocation(touch.ID, TouchLocationState.Moved, position));
+                    TouchPanel.AddEvent(touch.ID, TouchLocationState.Moved, position);
                 else
-                    TouchPanel.AddEvent(new TouchLocation(touch.ID, TouchLocationState.Released, position));
+                    TouchPanel.AddEvent(touch.ID, TouchLocationState.Released, position);
             }
         }
     }

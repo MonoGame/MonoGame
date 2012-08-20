@@ -331,7 +331,7 @@ VSOutputPixelLightingTx VSBasicPixelLightingTxVc(VSInputNmTxVc vin)
 
 
 // Pixel shader: basic.
-float4 PSBasic(PSInput pin) : SV_Target0
+float4 PSBasic(VSOutput pin) : SV_Target0
 {
     float4 color = pin.Diffuse;
     
@@ -342,14 +342,14 @@ float4 PSBasic(PSInput pin) : SV_Target0
 
 
 // Pixel shader: no fog.
-float4 PSBasicNoFog(PSInputNoFog pin) : SV_Target0
+float4 PSBasicNoFog(VSOutputNoFog pin) : SV_Target0
 {
     return pin.Diffuse;
 }
 
 
 // Pixel shader: texture.
-float4 PSBasicTx(PSInputTx pin) : SV_Target0
+float4 PSBasicTx(VSOutputTx pin) : SV_Target0
 {
     float4 color = SAMPLE_TEXTURE(Texture, pin.TexCoord) * pin.Diffuse;
     
@@ -360,14 +360,14 @@ float4 PSBasicTx(PSInputTx pin) : SV_Target0
 
 
 // Pixel shader: texture, no fog.
-float4 PSBasicTxNoFog(PSInputTxNoFog pin) : SV_Target0
+float4 PSBasicTxNoFog(VSOutputTxNoFog pin) : SV_Target0
 {
     return SAMPLE_TEXTURE(Texture, pin.TexCoord) * pin.Diffuse;
 }
 
 
 // Pixel shader: vertex lighting.
-float4 PSBasicVertexLighting(PSInput pin) : SV_Target0
+float4 PSBasicVertexLighting(VSOutput pin) : SV_Target0
 {
     float4 color = pin.Diffuse;
 
@@ -379,7 +379,7 @@ float4 PSBasicVertexLighting(PSInput pin) : SV_Target0
 
 
 // Pixel shader: vertex lighting, no fog.
-float4 PSBasicVertexLightingNoFog(PSInput pin) : SV_Target0
+float4 PSBasicVertexLightingNoFog(VSOutput pin) : SV_Target0
 {
     float4 color = pin.Diffuse;
     
@@ -390,7 +390,7 @@ float4 PSBasicVertexLightingNoFog(PSInput pin) : SV_Target0
 
 
 // Pixel shader: vertex lighting + texture.
-float4 PSBasicVertexLightingTx(PSInputTx pin) : SV_Target0
+float4 PSBasicVertexLightingTx(VSOutputTx pin) : SV_Target0
 {
     float4 color = SAMPLE_TEXTURE(Texture, pin.TexCoord) * pin.Diffuse;
     
@@ -402,7 +402,7 @@ float4 PSBasicVertexLightingTx(PSInputTx pin) : SV_Target0
 
 
 // Pixel shader: vertex lighting + texture, no fog.
-float4 PSBasicVertexLightingTxNoFog(PSInputTx pin) : SV_Target0
+float4 PSBasicVertexLightingTxNoFog(VSOutputTx pin) : SV_Target0
 {
     float4 color = SAMPLE_TEXTURE(Texture, pin.TexCoord) * pin.Diffuse;
     
@@ -413,7 +413,7 @@ float4 PSBasicVertexLightingTxNoFog(PSInputTx pin) : SV_Target0
 
 
 // Pixel shader: pixel lighting.
-float4 PSBasicPixelLighting(PSInputPixelLighting pin) : SV_Target0
+float4 PSBasicPixelLighting(VSOutputPixelLighting pin) : SV_Target0
 {
     float4 color = pin.Diffuse;
 
@@ -432,7 +432,7 @@ float4 PSBasicPixelLighting(PSInputPixelLighting pin) : SV_Target0
 
 
 // Pixel shader: pixel lighting + texture.
-float4 PSBasicPixelLightingTx(PSInputPixelLightingTx pin) : SV_Target0
+float4 PSBasicPixelLightingTx(VSOutputPixelLightingTx pin) : SV_Target0
 {
     float4 color = SAMPLE_TEXTURE(Texture, pin.TexCoord) * pin.Diffuse;
     
