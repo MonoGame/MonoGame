@@ -40,6 +40,11 @@ namespace Microsoft.Xna.Framework.Graphics
         private int _program = -1;
         private int _location;
 
+        /// <summary>
+        /// A hash value which can be used to compare constant buffers.
+        /// </summary>
+        internal int HashKey { get; private set; }
+
 #endif
 
         public ConstantBuffer(ConstantBuffer cloneSource)
@@ -90,6 +95,13 @@ namespace Microsoft.Xna.Framework.Graphics
             desc.BindFlags = SharpDX.Direct3D11.BindFlags.ConstantBuffer;
             desc.CpuAccessFlags = SharpDX.Direct3D11.CpuAccessFlags.None;
             _cbuffer = new SharpDX.Direct3D11.Buffer(graphicsDevice._d3dDevice, desc);
+#elif OPENGL 
+            byte[] data = new byte[_parameters.Length];
+            for (var i = 0; i < _parameters.Length; i++)
+            {
+                data[i] = (byte)_parameters[i];
+            }
+            HashKey = ShaderProgramCache.Hash(data);
 #endif
         }
 

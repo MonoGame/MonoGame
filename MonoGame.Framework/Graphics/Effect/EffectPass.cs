@@ -105,40 +105,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void Initialize()
         {
-#if OPENGL
-            Threading.BlockOnUIThread(() =>
+            int? programid = ShaderProgramCache.GetProgram(_vertexShader, _pixelShader, _effect.ConstantBuffers[0]);
+            if (!programid.HasValue)
             {
-                // TODO: Shouldn't we be calling GL.DeleteProgram() somewhere?
+                throw new InvalidOperationException("Could not Create Program in ShaderProgramCache");
+            }
+            _shaderProgram = programid.Value;
 
-                // TODO: We could cache the various program combinations 
-                // of vertex/pixel shaders and share them across effects.
-
-                _shaderProgram = GL.CreateProgram();
-
-                GL.AttachShader(_shaderProgram, _vertexShader.ShaderHandle);
-                GL.AttachShader(_shaderProgram, _pixelShader.ShaderHandle);
-
-                _vertexShader.OnLink(_shaderProgram);
-                _pixelShader.OnLink(_shaderProgram);
-                GL.LinkProgram(_shaderProgram);
-
-                var linked = 0;
-
-#if GLES
-    			GL.GetProgram(_shaderProgram, ProgramParameter.LinkStatus, ref linked);
-#else
-                GL.GetProgram(_shaderProgram, ProgramParameter.LinkStatus, out linked);
-#endif
-                if (linked == 0)
-                {
-#if !GLES
-                    string log = GL.GetProgramInfoLog(_shaderProgram);
-                    Console.WriteLine(log);
-#endif
-                    throw new InvalidOperationException("Unable to link effect program");
-                }
-            });
-#endif
         }
 
         public void Apply()

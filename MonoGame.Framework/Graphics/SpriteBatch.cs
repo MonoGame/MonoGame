@@ -131,11 +131,24 @@ namespace Microsoft.Xna.Framework.Graphics
 				Matrix transform = _matrix * (halfPixelOffset * projection);
 #endif
 				spriteEffect.Parameters["MatrixTransform"].SetValue (transform);
-				
+				                
 				spriteEffect.CurrentTechnique.Passes[0].Apply();
 			} 
             else 
             {
+                if (_effect.Parameters["MatrixTransform"] != null)
+                {
+                    Viewport vp = graphicsDevice.Viewport;
+                    Matrix projection = Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, 0, 1);
+
+#if PSS || DIRECTX
+                Matrix transform = _matrix * projection;
+#else
+                    Matrix halfPixelOffset = Matrix.CreateTranslation(-0.5f, -0.5f, 0);
+                    Matrix transform = _matrix * (halfPixelOffset * projection);
+#endif
+                    _effect.Parameters["MatrixTransform"].SetValue(transform);
+                }
 				// apply the custom effect if there is one
 				_effect.CurrentTechnique.Passes[0].Apply ();
 			}

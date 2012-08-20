@@ -40,15 +40,27 @@ namespace Microsoft.Xna.Framework.Graphics
 
                     var pass = new d3dx_pass();
                     pass.name = pinfo.name ?? string.Empty;
-                    pass.states = new d3dx_state[2];
-                    pass.state_count = 2;
+                    pass.state_count = 0;
+                    d3dx_state[] tempstate = new d3dx_state[2];
+                    
 
-                    // Create the shaders.
-                    if (string.IsNullOrEmpty(pinfo.psFunction) || string.IsNullOrEmpty(pinfo.vsFunction))
-                        throw new Exception("Passed must have a vertex and pixel shader assigned!");
+                    if (!string.IsNullOrEmpty(pinfo.psFunction))
+                    {
+                        pass.state_count += 1;
+                        tempstate[pass.state_count -1] = effect.CreateShader(shaderInfo, pinfo.psFunction, pinfo.psModel, false);
+                    }
 
-                    pass.states[0] = effect.CreateShader(shaderInfo, pinfo.psFunction, pinfo.psModel, false);
-                    pass.states[1] = effect.CreateShader(shaderInfo, pinfo.vsFunction, pinfo.vsModel, true);
+                    if (!string.IsNullOrEmpty(pinfo.vsFunction))
+                    {
+                        pass.state_count += 1;
+                        tempstate[pass.state_count - 1] = effect.CreateShader(shaderInfo, pinfo.vsFunction, pinfo.vsModel, true);
+                    }
+
+                    pass.states = new d3dx_state[pass.state_count];
+                    for (int idx = 0; idx < pass.state_count; idx++)
+                    {
+                        pass.states[i] = tempstate[i];
+                    }
 
                     technique.pass_handles[p] = pass;
                 }

@@ -135,6 +135,8 @@ namespace Microsoft.Xna.Framework.Graphics
 #if OPENGL
             _glslCode = System.Text.Encoding.ASCII.GetString(shaderBytecode);
 
+            HashKey = ShaderProgramCache.Hash(shaderBytecode);
+
             var attributeCount = (int)reader.ReadByte();
             _attributes = new Attribute[attributeCount];
             for (var a = 0; a < attributeCount; a++)

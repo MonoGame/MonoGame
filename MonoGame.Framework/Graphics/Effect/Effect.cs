@@ -64,6 +64,9 @@ namespace Microsoft.Xna.Framework.Graphics
         // A list of shaders that need to be recompiled on device reset.
         internal List<Shader> _shaderList = new List<Shader>();
 
+        internal static Effect defaultEffect;
+        internal static bool defaultLoading = false;
+
         internal Effect(GraphicsDevice graphicsDevice)
 		{
 			if (graphicsDevice == null)
@@ -73,6 +76,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
             this.graphicsDevice.DeviceResetting += new EventHandler<EventArgs>(graphicsDevice_DeviceResetting);
             this.graphicsDevice.DeviceReset += new EventHandler<EventArgs>(graphicsDevice_DeviceReset);
+
+            if (defaultEffect == null && !defaultLoading) 
+            {
+                defaultLoading = true;
+                defaultEffect = new Effect(graphicsDevice, SpriteEffect.Bytecode);
+            }
 		}
 
         void graphicsDevice_DeviceResetting(object sender, EventArgs e)
@@ -310,7 +319,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 var technique = new EffectTechnique(this, name, passes, annotations);
                 Techniques.Add(technique);
-            }
+            }            
 
             CurrentTechnique = Techniques[0];
         }
@@ -330,6 +339,24 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private static EffectPassCollection ReadPasses(BinaryReader reader, Effect effect, List<Shader> shaders)
         {
+            Shader vertexShader = null;
+            Shader pixelShader = null;
+
+            if (defaultEffect != null)
+            {
+                for (int i = 0; i < defaultEffect._shaderList.Count; i++)
+                {
+                    if (defaultEffect._shaderList[i].Stage == ShaderStage.Pixel)
+                    {
+                        pixelShader = defaultEffect._shaderList[i];
+                    }
+                    if (defaultEffect._shaderList[i].Stage == ShaderStage.Vertex)
+                    {
+                        vertexShader = defaultEffect._shaderList[i];
+                    }
+                }
+            }
+
             var collection = new EffectPassCollection();
 
             var count = (int)reader.ReadByte();
@@ -339,18 +366,28 @@ namespace Microsoft.Xna.Framework.Graphics
                 var name = reader.ReadString();
                 var annotations = ReadAnnotations(reader);
 
+                
+                // Assign these to the default shaders at this point? or do that in the effect pass.
                 // Get the vertex shader.
                 var shaderIndex = (int)reader.ReadByte();
-                var vertexShader = shaders[shaderIndex];
+                if (shaderIndex != 255)
+                {
+                    vertexShader = shaders[shaderIndex];
+                }
 
                 // Get the pixel shader.
                 shaderIndex = (int)reader.ReadByte();
-                var pixelShader = shaders[shaderIndex];
+                if (shaderIndex != 255)
+                {
+                    pixelShader = shaders[shaderIndex];
+                }
 
                 // TODO: Add the state objects to the format!
 
                 var pass = new EffectPass(effect, name, vertexShader, pixelShader, null, null, null, annotations);
                 collection.Add(pass);
+
+                // need to fix up the                 
             }
 
             return collection;
