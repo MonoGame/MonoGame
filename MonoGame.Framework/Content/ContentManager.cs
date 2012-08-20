@@ -191,7 +191,7 @@ namespace Microsoft.Xna.Framework.Content
 			Stream stream;
 			try
             {
-                string assetPath = Path.Combine(_rootDirectory, assetName) + ".xnb";
+                string assetPath = Path.Combine(RootDirectoryFullPath, assetName) + ".xnb";
                 stream = TitleContainer.OpenStream(assetPath);
 
 #if ANDROID
@@ -277,8 +277,8 @@ namespace Microsoft.Xna.Framework.Content
             catch (ContentLoadException)
             {
 				//MonoGame try to load as a non-content file
-				
-				assetName = TitleContainer.GetFilename(Path.Combine (_rootDirectory, assetName));
+
+                assetName = TitleContainer.GetFilename(Path.Combine(RootDirectoryFullPath, assetName));
 
                 assetName = Normalize<T>(assetName);
 	
@@ -595,7 +595,7 @@ namespace Microsoft.Xna.Framework.Content
 				// Try to reload as a non-xnb file.
                 // Just textures supported for now.
 
-				assetName = TitleContainer.GetFilename(Path.Combine (_rootDirectory, assetName));
+                assetName = TitleContainer.GetFilename(Path.Combine(RootDirectoryFullPath, assetName));
 
                 assetName = Normalize<T>(assetName);
 
@@ -638,6 +638,18 @@ namespace Microsoft.Xna.Framework.Content
 				_rootDirectory = value;
 			}
 		}
+
+        private string RootDirectoryFullPath
+        {
+            get
+            {
+#if WINDOWS || LINUX || MACOS
+				return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, RootDirectory);
+#else
+                return RootDirectory;
+#endif
+            }
+        }
 		
 		public string CurrentAssetDirectory { get; set; }
 
