@@ -62,7 +62,7 @@ namespace Microsoft.Xna.Framework.Graphics
         internal ConstantBuffer[] ConstantBuffers { get; private set; }
 
         // A list of shaders that need to be recompiled on device reset.
-        internal List<DXShader> _shaderList = new List<DXShader>();
+        internal List<Shader> _shaderList = new List<Shader>();
 
         internal Effect(GraphicsDevice graphicsDevice)
 		{
@@ -286,11 +286,11 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
             // Read in all the shader objects.
-            _shaderList = new List<DXShader>();
+            _shaderList = new List<Shader>();
             var shaders = (int)reader.ReadByte();
             for (var s = 0; s < shaders; s++)
             {
-                var shader = new DXShader(graphicsDevice, reader);
+                var shader = new Shader(graphicsDevice, reader);
                 _shaderList.Add(shader);
             }
 
@@ -328,7 +328,7 @@ namespace Microsoft.Xna.Framework.Graphics
             return collection;
         }
 
-        private static EffectPassCollection ReadPasses(BinaryReader reader, Effect effect, List<DXShader> shaders)
+        private static EffectPassCollection ReadPasses(BinaryReader reader, Effect effect, List<Shader> shaders)
         {
             var collection = new EffectPassCollection();
 

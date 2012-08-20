@@ -76,6 +76,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #if DIRECTX
         VertexPositionColorTexture[] _vertexArray;
 #elif OPENGL
+        private bool[] enabledAttributes;
 		VertexPosition2ColorTexture[] _vertexArray;
 		GCHandle _vertexHandle;
 		GCHandle _indexHandle;
@@ -104,7 +105,12 @@ namespace Microsoft.Xna.Framework.Graphics
 #elif OPENGL
 			_vertexArray = new VertexPosition2ColorTexture[4*InitialVertexArraySize];
 			_vertexHandle = GCHandle.Alloc(_vertexArray,GCHandleType.Pinned);
-			_indexHandle = GCHandle.Alloc(_index,GCHandleType.Pinned);		
+			_indexHandle = GCHandle.Alloc(_index,GCHandleType.Pinned);
+
+            enabledAttributes = new bool[16];
+            enabledAttributes[GraphicsDevice.attributePosition] = true;
+            enabledAttributes[GraphicsDevice.attributeTexCoord] = true;
+            enabledAttributes[GraphicsDevice.attributeColor] = true;
 #endif
 		}
 		
@@ -134,7 +140,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			return b.Depth.CompareTo(a.Depth);
 		}
 		
-		public void DrawBatch ( SpriteSortMode sortMode, SamplerState samplerState)
+		public void DrawBatch(SpriteSortMode sortMode)
 		{
 			// nothing to do
 			if ( _batchItemList.Count == 0 )
@@ -160,9 +166,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
 			GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
 			
-			GL.EnableVertexAttribArray(GraphicsDevice.attributePosition);
-			GL.EnableVertexAttribArray(GraphicsDevice.attributeTexCoord);
-			GL.EnableVertexAttribArray(GraphicsDevice.attributeColor);
+            _device.SetVertexAttributeArray(enabledAttributes);
 			
 			int size = VertexPosition2ColorTexture.GetSize();
 			GL.VertexAttribPointer(GraphicsDevice.attributePosition,
@@ -206,16 +210,9 @@ namespace Microsoft.Xna.Framework.Graphics
 				{
 					FlushVertexArray( startIndex, index );
 					startIndex = index;
-                    tex = item.Texture;
-					
+                    _device.Textures[0] = tex = item.Texture;
 #if DIRECTX
                     startIndex = index = 0;
-                    _device.Textures[0] = tex;	  
-#elif OPENGL
-					GL.ActiveTexture(TextureUnit.Texture0);
-					GL.BindTexture ( TextureTarget.Texture2D, tex.glTexture );
-
-					samplerState.Activate(TextureTarget.Texture2D);
 #endif
                 }
 
@@ -224,7 +221,9 @@ namespace Microsoft.Xna.Framework.Graphics
 				_vertexArray[index++] = item.vertexTR;
 				_vertexArray[index++] = item.vertexBL;
 				_vertexArray[index++] = item.vertexBR;
-				
+
+                // Release the texture and return the item to the queue.
+                item.Texture = null;
 				_freeBatchItemQueue.Enqueue( item );
 			}
 
@@ -284,12 +283,36 @@ namespace Microsoft.Xna.Framework.Graphics
                 VertexPositionColorTexture.VertexDeclaration);
 
 #elif OPENGL
-			GL.DrawElements( BeginMode.Triangles,
+
+            // TODO: We should be using the same code here
+            // as DirectX and not working around GraphicsDevice.
+
+            _device.ApplyState();
+
+			GL.DrawElements(    BeginMode.Triangles,
 				                vertexCount/2*3,
 				                DrawElementsType.UnsignedShort,
 				                (IntPtr)(_indexHandle.AddrOfPinnedObject().ToInt64()+(start/2*3*sizeof(short))) );
 #endif
 		}
+
+        private bool _isDisposed = false;
+        public void Dispose()
+        {
+            if (_isDisposed)
+                return;
+#if OPENGL
+
+            if (_indexHandle.IsAllocated)
+                _indexHandle.Free();
+
+            if (_vertexHandle.IsAllocated)
+                _vertexHandle.Free();
+#endif
+            _isDisposed = true;
+        }
+
+
 	}
 }
 

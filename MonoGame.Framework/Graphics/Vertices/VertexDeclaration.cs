@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.InteropServices;
+using System.Collections.Generic;
 
 #if MONOMAC
 using MonoMac.OpenGL;
@@ -133,10 +134,10 @@ namespace Microsoft.Xna.Framework.Graphics
 		internal void Apply(IntPtr offset)
 		{
 
-            // TODO: This is executed on every draw call... can we not
+            // TODO: This is executed on every dr_enabledVertexAttributesaw call... can we not
             // allocate a vertex declaration once and just re-apply it?
 
-			bool[] enabledAttributes = new bool[16];
+			var enabledAttributes = new bool[16];
 			foreach (var ve in this.GetVertexElements())
 			{
 				IntPtr elementOffset = (IntPtr)(offset.ToInt64 () + ve.Offset);
@@ -161,10 +162,9 @@ namespace Microsoft.Xna.Framework.Graphics
 				enabledAttributes[attributeLocation] = true;
 			}
 			
-			for (int i=0; i<16; i++) {
-				GLStateManager.VertexAttribArray(i, enabledAttributes[i]);
-			}
+            graphicsDevice.SetVertexAttributeArray(enabledAttributes);
 		}
+
 #endif // OPENGL
 
 #if DIRECTX

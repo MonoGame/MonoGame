@@ -28,13 +28,11 @@ using TextureTarget = OpenTK.Graphics.ES20.All;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-	internal class DXShader
+	internal class Shader
 	{
 #if OPENGL
 
-        public readonly ShaderType ShaderType;
-
-        public int ShaderHandle;
+        internal int ShaderHandle;
 
         // We keep this around for recompiling on context lost and debugging.
         private string _glslCode;
@@ -54,9 +52,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #elif DIRECTX
 
-        private VertexShader _vertexShader;
+        internal VertexShader _vertexShader;
 
-        private PixelShader _pixelShader;
+        internal PixelShader _pixelShader;
 
         public byte[] Bytecode { get; private set; }
 
@@ -89,16 +87,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private readonly int[] _cbuffers;
         
-        internal DXShader(GraphicsDevice device, BinaryReader reader)
+        public ShaderStage Stage { get; private set; }
+		
+        internal Shader(GraphicsDevice device, BinaryReader reader)
         {
             var isVertexShader = reader.ReadBoolean();
-
-#if OPENGL
-            if (isVertexShader)
-                ShaderType = ShaderType.VertexShader;
-            else
-                ShaderType = ShaderType.FragmentShader;
-#endif // OPENGL
+            Stage = isVertexShader ? ShaderStage.Vertex : ShaderStage.Pixel;
 
             var shaderLength = (int)reader.ReadUInt16();
             var shaderBytecode = reader.ReadBytes(shaderLength);
@@ -161,7 +155,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             Threading.BlockOnUIThread(() =>
             {
-                ShaderHandle = GL.CreateShader(ShaderType);
+                ShaderHandle = GL.CreateShader(Stage == ShaderStage.Vertex ? ShaderType.VertexShader : ShaderType.FragmentShader);
 #if GLES
                 GL.ShaderSource(ShaderHandle, 1, new string[] { _glslCode }, (int[])null);
 #else
@@ -200,7 +194,7 @@ namespace Microsoft.Xna.Framework.Graphics
         
         public void OnLink(int program) 
         {
-            if (ShaderType != ShaderType.VertexShader)
+            if (Stage != ShaderStage.Vertex)
                 return;
 
 			// Bind the vertex attributes to the shader program.
@@ -237,12 +231,11 @@ namespace Microsoft.Xna.Framework.Graphics
                             int program, 
                             EffectParameterCollection parameters,
 		                    ConstantBuffer[] cbuffers) 
-        {							        
-            var textures = graphicsDevice.Textures;
-			var samplerStates = graphicsDevice.SamplerStates;
-
-			if (ShaderType == ShaderType.FragmentShader) 
+        {
+			if (Stage == ShaderStage.Pixel) 
             {
+                graphicsDevice.PixelShader = this;
+
                 // Activate the textures.
 				foreach (var sampler in _samplers) 
                 {
@@ -257,34 +250,35 @@ namespace Microsoft.Xna.Framework.Graphics
                     if (sampler.type != SamplerType.Sampler2D)
                         continue;
 
-					Texture tex = null;
                     if (sampler.parameter >= 0) 
                     {
                         var textureParameter = parameters[sampler.parameter];
-                        tex = textureParameter.Data as Texture;
+                        
+                        // TODO: The texture could be NULL here if we're using SpriteBatch
+                        // which in that case we are making more work by setting this to
+                        // NULL then setting it back to possibly the same texture.
+                        //
+                        // Maybe we should not set the texture if it is null?  But in
+                        // that case then maybe we would be breaking state?  Null texture
+                        // rendering is undefined right?  Does it hurt then?
+
+                        var texture = textureParameter.Data as Texture;
+                        graphicsDevice.Textures[sampler.index] = texture;
 					}
-
-					if (tex == null) 
-                    {
-						//texutre 0 will be set in drawbatch :/
-						if (sampler.index == 0)
-							continue;
-
-						//are smapler indexes always normal texture indexes?
-						tex = (Texture)textures [sampler.index];
-					}
-
-					GL.ActiveTexture( (TextureUnit)((int)TextureUnit.Texture0 + sampler.index) );
-					tex.Activate();						
-					samplerStates[sampler.index].Activate(tex.glTarget, tex.LevelCount > 1);
 				}
 			}
+            else
+            {
+                graphicsDevice.VertexShader = this;
+            }
 
-            // Update and set the constants.
+            // Update the constant buffers with the parameter state
+            // and then set them on the graphics device.
             for (var c = 0; c < _cbuffers.Length; c++)
             {
                 var cb = cbuffers[_cbuffers[c]];
-                cb.Apply(program, parameters);
+                cb.Update(parameters);
+                graphicsDevice.SetConstantBuffer(Stage, c, cb);
             }
         }
 
@@ -296,35 +290,39 @@ namespace Microsoft.Xna.Framework.Graphics
                             EffectParameterCollection parameters,
                             ConstantBuffer[] cbuffers )
         {
-            // NOTE: We make the assumption here that the caller has
-            // locked the d3dContext for us to use.
-
-            var d3dContext = graphicsDevice._d3dContext;
             if (_pixelShader != null)
             {
+                graphicsDevice.PixelShader = this;
+
+                // TODO: We can move the samplers info out to the 
+                // EffectPass as they are effect specific and have 
+                // nothing to do with the shader.
                 foreach (var sampler in _samplers)
                 {
                     var param = parameters[sampler.parameter];
                     var texture = param.Data as Texture;
                     graphicsDevice.Textures[sampler.index] = texture;
                 }
-
-                d3dContext.PixelShader.Set(_pixelShader);
             }
             else
             {
-                d3dContext.VertexShader.Set(_vertexShader);
-
-                // Set the shader on the device so it can 
-                // apply the correct input layout at draw time.
-                graphicsDevice._vertexShader = this;
+                graphicsDevice.VertexShader = this;
             }
 
-            // Update and set the constants.
+            // Update the constant buffers with the parameter state
+            // and then set them on the graphics device.
             for (var c = 0; c < _cbuffers.Length; c++)
             {
+                // TODO: Like the sampler info above i think we should
+                // move the constant buffer info out to EffectPass.  
+                // 
+                // Eventually all we should have in Shader is an optional
+                // and light reflection API for constants and that is it.
+                //
+
                 var cb = cbuffers[_cbuffers[c]];
-                cb.Apply(_vertexShader != null, c, parameters);
+                cb.Update(parameters);
+                graphicsDevice.SetConstantBuffer(Stage, c, cb);
             }
         }
 		

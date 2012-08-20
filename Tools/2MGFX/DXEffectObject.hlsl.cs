@@ -176,6 +176,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     throw new Exception(result.Message);
 
                 shaderByteCode = result.Bytecode;
+                //var source = shaderByteCode.Disassemble();
             }
             catch (Exception ex)
             {

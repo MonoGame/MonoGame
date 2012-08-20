@@ -28,8 +28,8 @@ namespace Microsoft.Xna.Framework.Graphics
     {
         private Effect _effect;
 
-		private DXShader _pixelShader;
-        private DXShader _vertexShader;
+		private Shader _pixelShader;
+        private Shader _vertexShader;
 
         private BlendState _blendState;
         private DepthStencilState _depthStencilState;
@@ -55,8 +55,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal EffectPass(    Effect effect, 
                                 string name,
-                                DXShader vertexShader, 
-                                DXShader pixelShader, 
+                                Shader vertexShader, 
+                                Shader pixelShader, 
                                 BlendState blendState, 
                                 DepthStencilState depthStencilState, 
                                 RasterizerState rasterizerState,
@@ -138,9 +138,6 @@ namespace Microsoft.Xna.Framework.Graphics
                     throw new InvalidOperationException("Unable to link effect program");
                 }
             });
-
-#elif DIRECTX
-
 #endif
         }
 
@@ -158,14 +155,18 @@ namespace Microsoft.Xna.Framework.Graphics
                 return;
             }
 
+            var device = _effect.GraphicsDevice;
+
 #if OPENGL
-            GL.UseProgram(_shaderProgram);
+            if (device.ShaderProgram != _shaderProgram)
+            {
+                GL.UseProgram(_shaderProgram);
+                device.ShaderProgram = _shaderProgram;
+            }
 #elif PSS
             _effect.GraphicsDevice._graphics.SetShaderProgram(_shaderProgram);
 #endif
-
-            var device = _effect.GraphicsDevice;
-
+            // Set the render states if we have some.
             if (_rasterizerState != null)
                 device.RasterizerState = _rasterizerState;
             if (_blendState != null)
@@ -177,7 +178,7 @@ namespace Microsoft.Xna.Framework.Graphics
             Debug.Assert(_pixelShader != null, "Got a null vertex shader!");
 
 #if PSS
-#warning We are only setting one hardcoded parameter here. Need to do this properly by iterating _effect.Parameters (Happens in DXShader)
+#warning We are only setting one hardcoded parameter here. Need to do this properly by iterating _effect.Parameters (Happens in Shader)
             float[] data;
             if (_effect.Parameters["WorldViewProj"] != null) 
                 data = (float[])_effect.Parameters["WorldViewProj"].Data;
@@ -236,13 +237,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #elif DIRECTX
 
-            lock (device._d3dContext)
-            {
-                // Apply the shaders which will in turn set the 
-                // constant buffers and texture samplers.
-                _vertexShader.Apply(device, _effect.Parameters, _effect.ConstantBuffers);
-                _pixelShader.Apply(device, _effect.Parameters, _effect.ConstantBuffers);
-            }
+            // Apply the shaders which will in turn set the 
+            // constant buffers and texture samplers.
+            _vertexShader.Apply(device, _effect.Parameters, _effect.ConstantBuffers);
+            _pixelShader.Apply(device, _effect.Parameters, _effect.ConstantBuffers);
 
 #endif
         }
