@@ -92,7 +92,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <summary>
         /// true if this object is read-only; false otherwise.
         /// </summary>
-        private bool ICollection<T>.IsReadOnly
+        bool ICollection<T>.IsReadOnly
         {
             get
             {
@@ -103,7 +103,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <summary>
         /// Creates an instance of VertexChannel.
         /// </summary>
-        internal VertexChannel()
+        /// <param name="name">Name of the channel.</param>
+        internal VertexChannel(string name)
+            : base(name)
         {
             items = new List<T>();
         }
@@ -148,6 +150,23 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         }
 
         /// <summary>
+        /// Inserts the range of values from the enumerable into the channel.
+        /// </summary>
+        /// <typeparam name="T">The type of the channel.</typeparam>
+        /// <param name="index">The zero-based index at which the new elements should be inserted.</param>
+        /// <param name="data">The data to insert into the channel.</param>
+        internal override void InsertRange(int index, IEnumerable data)
+        {
+            if ((index < 0) || (index > items.Count))
+                throw new ArgumentOutOfRangeException("index");
+            if (data == null)
+                throw new ArgumentNullException("data");
+            if (!(data is IEnumerable<T>))
+                throw new ArgumentException("data");
+            items.InsertRange(index, (IEnumerable<T>)data);
+        }
+
+        /// <summary>
         /// Reads channel content and automatically converts it to the specified vector format.
         /// </summary>
         /// <typeparam name="TargetType">Target vector format for the converted channel data.</typeparam>
@@ -168,10 +187,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// Adds a new element to the end of the collection.
         /// </summary>
         /// <param name="value">The element to add.</param>
-        /// <returns>Index of the element.</returns>
-        int ICollection<T>.Add(T value)
+        void ICollection<T>.Add(T value)
         {
-            return Items.Add(value);
+            ((ICollection<T>)Items).Add(value);
         }
 
         /// <summary>
@@ -186,9 +204,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// Removes a specified element from the collection.
         /// </summary>
         /// <param name="value">The element to remove.</param>
-        void ICollection<T>.Remove(T value)
+        /// <returns>true if the channel was removed; false otherwise.</returns>
+        bool ICollection<T>.Remove(T value)
         {
-            Items.Remove(value);
+            return ((ICollection<T>)Items).Remove(value);
         }
 
         /// <summary>

@@ -153,8 +153,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <summary>
         /// Creates an instance of VertexChannel.
         /// </summary>
-        internal VertexChannel()
+        /// <param name="name">Name of the channel.</param>
+        internal VertexChannel(string name)
         {
+            Name = name;
         }
 
         /// <summary>
@@ -230,6 +232,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         {
             Items.Insert(index, value);
         }
+
+        /// <summary>
+        /// Inserts the range of values from the enumerable into the channel.
+        /// </summary>
+        /// <param name="index">The zero-based index at which the new elements should be inserted.</param>
+        /// <param name="data">The data to insert into the channel.</param>
+        internal abstract void InsertRange(int index, IEnumerable data);
 
         /// <summary>
         /// Removes a specified element from the collection.

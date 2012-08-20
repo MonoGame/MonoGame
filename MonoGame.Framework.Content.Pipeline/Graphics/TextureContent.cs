@@ -92,10 +92,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// Verifies that all contents of this texture are present, correct and match the capabilities of the device.
         /// </summary>
         /// <param name="targetProfile">The profile identifier that defines the capabilities of the device.</param>
-        public abstract void Validate(Nullable<GraphicsProfile> targetProfile)
-        {
-            // If texture verification fails, InvalidContentException is thrown.
-            throw new NotImplementedException();
-        }
+        public abstract void Validate(Nullable<GraphicsProfile> targetProfile);
     }
 }

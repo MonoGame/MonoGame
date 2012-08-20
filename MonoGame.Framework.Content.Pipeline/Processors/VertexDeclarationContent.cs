@@ -38,36 +38,38 @@
  */
 #endregion License
 
-namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
+using System;
+using System.Collections.ObjectModel;
+using Microsoft.Xna.Framework.Graphics;
+
+namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 {
     /// <summary>
-    /// Provides methods for maintaining a collection of geometry batches that make up a mesh.
+    /// Provides methods and properties for maintaining the vertex declaration data of a VertexContent.
     /// </summary>
-    public sealed class GeometryContentCollection : ChildCollection<MeshContent, GeometryContent>
+    public class VertexDeclarationContent : ContentItem
     {
-        internal GeometryContentCollection(MeshContent parent)
-            : base(parent)
-        {
-        }
+        Collection<VertexElement> vertexElements;
+        Nullable<int> vertexStride;
 
         /// <summary>
-        /// Gets the parent of a child object.
+        /// Gets the VertexElement object of the vertex declaration.
         /// </summary>
-        /// <param name="child">The child of the parent being retrieved.</param>
-        /// <returns>The parent of the child object.</returns>
-        protected override MeshContent GetParent(GeometryContent child)
-        {
-            return child.Parent;
-        }
+        /// <value>The VertexElement object of the vertex declaration.</value>
+        public Collection<VertexElement> VertexElements { get { return vertexElements; } }
 
         /// <summary>
-        /// Sets the parent of the specified child object.
+        /// The number of bytes from one vertex to the next.
         /// </summary>
-        /// <param name="child">The child of the parent being set.</param>
-        /// <param name="parent">The parent of the child object.</param>
-        protected override void SetParent(GeometryContent child, MeshContent parent)
+        /// <value>The stride (in bytes).</value>
+        public Nullable<int> VertexStride { get; set; }
+
+        /// <summary>
+        /// Initializes a new instance of VertexDeclarationContent.
+        /// </summary>
+        public VertexDeclarationContent()
         {
-            child.Parent = parent;
+            vertexElements = new Collection<VertexElement>();
         }
     }
 }
