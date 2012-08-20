@@ -149,14 +149,21 @@ namespace Microsoft.Xna.Framework.Graphics
                 var offset = _offsets[p];
                 dirty = true;
 
-                switch (param.ParameterType)
+                /*
+                 * Good idea to ignore parameters which have not yet
+                 * been set ?
+                 * */
+                if (param.Data != null)
                 {
-                    case EffectParameterType.Single:
-                        SetData(offset, param.RowCount, param.ColumnCount, param.Data);                        
-                        break;
+                    switch (param.ParameterType)
+                    {
+                        case EffectParameterType.Single:
+                            SetData(offset, param.RowCount, param.ColumnCount, param.Data);
+                            break;
 
-                    default:
-                        throw new NotImplementedException("Not supported!");
+                        default:
+                            throw new NotImplementedException("Not supported!");
+                    }
                 }
             }
 
