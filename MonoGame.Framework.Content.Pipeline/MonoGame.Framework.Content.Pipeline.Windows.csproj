@@ -85,6 +85,7 @@
     <Compile Include="ContentWriters\ContentWriter.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="ContentWriters\TextureContentWriter.cs" />
     <Compile Include="EffectImporter.cs" />
     <Compile Include="ExternalReference.cs" />
     <Compile Include="Graphics\AnimationChannel.cs" />
@@ -101,6 +102,7 @@
     <Compile Include="Graphics\FontDescriptionStyle.cs" />
     <Compile Include="Graphics\GeometryContent.cs" />
     <Compile Include="Graphics\GeometryContentCollection.cs" />
+    <Compile Include="Graphics\GraphicsUtil.cs" />
     <Compile Include="Graphics\IndexCollection.cs" />
     <Compile Include="Graphics\IndirectPositionCollection.cs" />
     <Compile Include="Graphics\MaterialContent.cs" />
@@ -109,7 +111,9 @@
     <Compile Include="Graphics\MipmapChainCollection.cs" />
     <Compile Include="Graphics\NodeContent.cs" />
     <Compile Include="Graphics\NodeContentCollection.cs" />
+    <Compile Include="Graphics\PixelBitmapContent.cs" />
     <Compile Include="Graphics\PositionCollection.cs" />
+    <Compile Include="Graphics\Texture2DContent.cs" />
     <Compile Include="Graphics\TextureContent.cs" />
     <Compile Include="Graphics\TextureReferenceDictionary.cs" />
     <Compile Include="Graphics\VertexChannel.cs" />
@@ -126,6 +130,9 @@
     <Compile Include="PipelineException.cs" />
     <Compile Include="ProcessorParameter.cs" />
     <Compile Include="ProcessorParameterCollection.cs" />
+    <Compile Include="Processors\FontDescriptionProcessor.cs" />
+    <Compile Include="Processors\SpriteFontContent.cs" />
+    <Compile Include="Processors\TextureProcessor.cs" />
     <Compile Include="Processors\VertexBufferContent.cs" />
     <Compile Include="Processors\VertexDeclarationContent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
