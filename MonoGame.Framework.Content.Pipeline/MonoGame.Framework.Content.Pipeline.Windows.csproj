@@ -73,19 +73,6 @@
     <Compile Include="ContentProcessor.cs" />
     <Compile Include="ContentProcessorAttribute.cs" />
     <Compile Include="ContentProcessorContext.cs" />
-    <Compile Include="ContentWriters\ContentCompiler.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="ContentWriters\ContentTypeWriter.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="ContentWriters\ContentTypeWriterAttribute.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="ContentWriters\ContentWriter.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="ContentWriters\TextureContentWriter.cs" />
     <Compile Include="EffectImporter.cs" />
     <Compile Include="ExternalReference.cs" />
     <Compile Include="Graphics\AnimationChannel.cs" />
@@ -136,6 +123,11 @@
     <Compile Include="Processors\VertexBufferContent.cs" />
     <Compile Include="Processors\VertexDeclarationContent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Serialization\Compiler\ContentCompiler.cs" />
+    <Compile Include="Serialization\Compiler\ContentTypeWriter.cs" />
+    <Compile Include="Serialization\Compiler\ContentTypeWriterAttribute.cs" />
+    <Compile Include="Serialization\Compiler\ContentWriter.cs" />
+    <Compile Include="Serialization\Compiler\TextureContentWriter.cs" />
     <Compile Include="TargetPlatform.cs" />
     <Compile Include="Tasks\BuildContent.cs" />
     <Compile Include="Tasks\CleanContent.cs" />
