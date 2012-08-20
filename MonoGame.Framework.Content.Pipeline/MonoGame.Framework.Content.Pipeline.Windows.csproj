@@ -66,21 +66,26 @@
     <Compile Include="ChildCollection.cs" />
     <Compile Include="ContentBuildLogger.cs" />
     <Compile Include="ContentIdentity.cs" />
-    <Compile Include="ContentImporters\ContentImporter.cs" />
-    <Compile Include="ContentImporters\ContentImporterAttribute.cs" />
-    <Compile Include="ContentImporters\ContentImporterContext.cs" />
-    <Compile Include="ContentImporters\TextureImporter.cs" />
+    <Compile Include="ContentImporter.cs" />
+    <Compile Include="ContentImporterAttribute.cs" />
+    <Compile Include="ContentImporterContext.cs" />
     <Compile Include="ContentItem.cs" />
-    <Compile Include="ContentProcessors\ContentProcessor.cs" />
-    <Compile Include="ContentProcessors\ContentProcessorAttribute.cs" />
-    <Compile Include="ContentProcessors\ContentProcessorContext.cs" />
-    <Compile Include="ContentProcessors\TextureProcessor.cs" />
-    <Compile Include="ContentWriters\ContentCompiler.cs" />
-    <Compile Include="ContentWriters\ContentTypeWriter.cs" />
-    <Compile Include="ContentWriters\ContentTypeWriterAttribute.cs" />
-    <Compile Include="ContentWriters\ContentWriter.cs" />
-    <Compile Include="ContentWriters\TextureContentWriter.cs" />
-    <Compile Include="ContentImporters\EffectImporter.cs" />
+    <Compile Include="ContentProcessor.cs" />
+    <Compile Include="ContentProcessorAttribute.cs" />
+    <Compile Include="ContentProcessorContext.cs" />
+    <Compile Include="ContentWriters\ContentCompiler.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ContentWriters\ContentTypeWriter.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ContentWriters\ContentTypeWriterAttribute.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ContentWriters\ContentWriter.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="EffectImporter.cs" />
     <Compile Include="ExternalReference.cs" />
     <Compile Include="Graphics\AnimationChannel.cs" />
     <Compile Include="Graphics\AnimationChannelDictionary.cs" />
@@ -88,29 +93,32 @@
     <Compile Include="Graphics\AnimationContentDictionary.cs" />
     <Compile Include="Graphics\AnimationKeyframe.cs" />
     <Compile Include="Graphics\BitmapContent.cs" />
-    <Compile Include="Graphics\Font\SpriteFontDescriptionContent.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="ContentProcessors\SpriteFontDescriptionProcessor.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Graphics\Font\SpriteFontImporter.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Graphics\Font\SpriteFontWriter.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Graphics\GraphicsUtil.cs" />
+    <Compile Include="Graphics\BoneContent.cs" />
+    <Compile Include="Graphics\BoneWeight.cs" />
+    <Compile Include="Graphics\BoneWeightCollection.cs" />
+    <Compile Include="Graphics\EffectContent.cs" />
+    <Compile Include="Graphics\FontDescription.cs" />
+    <Compile Include="Graphics\FontDescriptionStyle.cs" />
+    <Compile Include="Graphics\GeometryContent.cs" />
+    <Compile Include="Graphics\GeometryContentCollection.cs" />
+    <Compile Include="Graphics\IndexCollection.cs" />
+    <Compile Include="Graphics\IndirectPositionCollection.cs" />
+    <Compile Include="Graphics\MaterialContent.cs" />
+    <Compile Include="Graphics\MeshContent.cs" />
     <Compile Include="Graphics\MipmapChain.cs" />
     <Compile Include="Graphics\MipmapChainCollection.cs" />
-    <Compile Include="Graphics\PixelBitmapContent.cs" />
-    <Compile Include="Graphics\TextureContent.cs" />
-    <Compile Include="Graphics\EffectContent.cs" />
     <Compile Include="Graphics\NodeContent.cs" />
     <Compile Include="Graphics\NodeContentCollection.cs" />
-    <Compile Include="Graphics\Texture2DContent.cs" />
-    <Compile Include="ContentImporters\IContentImporter.cs" />
-    <Compile Include="ContentProcessors\IContentProcessor.cs" />
+    <Compile Include="Graphics\PositionCollection.cs" />
+    <Compile Include="Graphics\TextureContent.cs" />
+    <Compile Include="Graphics\TextureReferenceDictionary.cs" />
+    <Compile Include="Graphics\VertexChannel.cs" />
+    <Compile Include="Graphics\VertexChannelCollection.cs" />
+    <Compile Include="Graphics\VertexChannelGeneric.cs" />
+    <Compile Include="Graphics\VertexChannelNames.cs" />
+    <Compile Include="Graphics\VertexContent.cs" />
+    <Compile Include="IContentImporter.cs" />
+    <Compile Include="IContentProcessor.cs" />
     <Compile Include="InvalidContentException.cs" />
     <Compile Include="NamedValueDictionary.cs" />
     <Compile Include="OpaqueDataDictionary.cs" />
@@ -118,6 +126,8 @@
     <Compile Include="PipelineException.cs" />
     <Compile Include="ProcessorParameter.cs" />
     <Compile Include="ProcessorParameterCollection.cs" />
+    <Compile Include="Processors\VertexBufferContent.cs" />
+    <Compile Include="Processors\VertexDeclarationContent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TargetPlatform.cs" />
     <Compile Include="Tasks\BuildContent.cs" />
