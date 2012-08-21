@@ -171,7 +171,10 @@ namespace Microsoft.Xna.Framework
     			
     			Microsoft.Xna.Framework.Graphics.Viewport _vp =
     			new Microsoft.Xna.Framework.Graphics.Viewport();
-    				
+    			
+    			_game.GraphicsDevice.PresentationParameters.BackBufferWidth = (int)Bounds.Width;
+    			_game.GraphicsDevice.PresentationParameters.BackBufferHeight = (int)Bounds.Height;
+
     			_vp.X = (int)Bounds.X;
     			_vp.Y = (int)Bounds.Y;
     			_vp.Width = (int)Bounds.Width;
