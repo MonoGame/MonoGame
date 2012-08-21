@@ -7,13 +7,6 @@ using System.ComponentModel;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 {
-    public enum TextureProcessorOutputFormat
-    {
-        Color,
-        DXTCompressed,
-        NoChange
-    }
-
     [ContentProcessor(DisplayName="Texture Processor")]
     public class TextureProcessor : ContentProcessor<TextureContent, TextureContent>
     {
