@@ -101,7 +101,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 data[i] = (byte)_parameters[i];
             }
-            HashKey = ShaderProgramCache.Hash(data);
+            HashKey = MonoGame.Utilities.Hash.ComputeHash(data);
 #endif
         }
 

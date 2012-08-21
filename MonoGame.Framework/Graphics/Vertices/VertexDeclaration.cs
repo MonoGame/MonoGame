@@ -54,7 +54,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     signature += element;
 
                 var bytes = System.Text.Encoding.UTF8.GetBytes(signature);
-                HashKey = Effect.ComputeHash(bytes);
+                HashKey = MonoGame.Utilities.Hash.ComputeHash(bytes);
             }
         }
 

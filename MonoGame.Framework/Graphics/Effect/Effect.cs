@@ -150,7 +150,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // the front of the effectCode instead of computing a fast
             // hash here at runtime.
             //
-            var effectKey = ComputeHash(effectCode);
+            var effectKey = MonoGame.Utilities.Hash.ComputeHash(effectCode);
             Effect cloneSource;
             if (!EffectCache.TryGetValue(effectKey, out cloneSource))
             {
@@ -530,28 +530,7 @@ namespace Microsoft.Xna.Framework.Graphics
         #endregion // Effect File Reader
 
 
-        #region Effect Cache
-
-        // Modified FNV Hash in C#
-        // http://stackoverflow.com/a/468084
-        internal static int ComputeHash(params byte[] data)
-        {
-            unchecked
-            {
-                const int p = 16777619;
-                int hash = (int)2166136261;
-
-                for (int i = 0; i < data.Length; i++)
-                    hash = (hash ^ data[i]) * p;
-
-                hash += hash << 13;
-                hash ^= hash >> 7;
-                hash += hash << 3;
-                hash ^= hash >> 17;
-                hash += hash << 5;
-                return hash;
-            }
-        }
+        #region Effect Cache        
 
         /// <summary>
         /// The cache of effects from unique byte streams.

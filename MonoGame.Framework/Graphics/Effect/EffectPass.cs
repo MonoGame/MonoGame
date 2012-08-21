@@ -41,9 +41,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if OPENGL
 
-        private int _shaderProgram;
-
-        static readonly float[] _posFixup = new float[4];
+       static readonly float[] _posFixup = new float[4];
 
 
 
@@ -81,6 +79,7 @@ namespace Microsoft.Xna.Framework.Graphics
             Annotations = annotations;
 
             Initialize();
+
         }
         
         internal EffectPass(Effect effect, EffectPass cloneSource)
@@ -98,22 +97,15 @@ namespace Microsoft.Xna.Framework.Graphics
             Annotations = cloneSource.Annotations;
             _vertexShader = cloneSource._vertexShader;
             _pixelShader = cloneSource._pixelShader;
-#if OPENGL || PSS
+#if PSS
             _shaderProgram = cloneSource._shaderProgram;
 #endif
         }
 
-        internal void Initialize()
+        public void Initialize()
         {
-            int? programid = ShaderProgramCache.GetProgram(_vertexShader, _pixelShader, _effect.ConstantBuffers[0]);
-            if (!programid.HasValue)
-            {
-                throw new InvalidOperationException("Could not Create Program in ShaderProgramCache");
-            }
-            _shaderProgram = programid.Value;
-
         }
-
+        
         public void Apply()
         {
             // Set/get the correct shader handle/cleanups.
@@ -131,11 +123,8 @@ namespace Microsoft.Xna.Framework.Graphics
             var device = _effect.GraphicsDevice;
 
 #if OPENGL
-            if (device.ShaderProgram != _shaderProgram)
-            {
-                GL.UseProgram(_shaderProgram);
-                device.ShaderProgram = _shaderProgram;
-            }
+            device.VertexShader = this._vertexShader;
+            device.PixelShader = this._pixelShader;                      
 #elif PSS
             _effect.GraphicsDevice._graphics.SetShaderProgram(_shaderProgram);
 #endif
@@ -163,7 +152,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #elif OPENGL
 
             // Apply the vertex shader.
-            _vertexShader.Apply(device, _shaderProgram, _effect.Parameters, _effect.ConstantBuffers);
+            _vertexShader.Apply(device, device.ShaderProgram, _effect.Parameters, _effect.ConstantBuffers);
 
             // Apply vertex shader fix:
             // The following two lines are appended to the end of vertex shaders
@@ -202,11 +191,11 @@ namespace Microsoft.Xna.Framework.Graphics
                 _posFixup[1] *= -1.0f;
                 _posFixup[3] *= -1.0f;
             }
-            var posFixupLoc = GL.GetUniformLocation(_shaderProgram, "posFixup"); // TODO: Look this up on link!
+            var posFixupLoc = GL.GetUniformLocation(device.ShaderProgram, "posFixup"); // TODO: Look this up on link!
             GL.Uniform4(posFixupLoc, 1, _posFixup);
 
             // Apply the pixel shader.
-            _pixelShader.Apply(device, _shaderProgram, _effect.Parameters, _effect.ConstantBuffers);
+            _pixelShader.Apply(device, device.ShaderProgram, _effect.Parameters, _effect.ConstantBuffers);
 
 #elif DIRECTX
 

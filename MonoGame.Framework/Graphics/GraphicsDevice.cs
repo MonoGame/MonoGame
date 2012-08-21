@@ -1340,7 +1340,32 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
 #if OPENGL
-        internal int ShaderProgram = -1;
+        private int shaderProgram = 0;
+
+        internal int ShaderProgram
+        {
+            get
+            {
+                Activate();
+                return shaderProgram;
+            }
+            set
+            {
+                // unbinds shader
+                GL.UseProgram(0);
+                shaderProgram = 0;                    
+            }
+        }
+
+        private void Activate()
+        {
+            int? _shaderProgram = ShaderProgramCache.GetProgram(this.VertexShader, this.PixelShader);
+            if (_shaderProgram.HasValue && shaderProgram != _shaderProgram.Value)
+            {
+                GL.UseProgram(_shaderProgram.Value);
+                shaderProgram = _shaderProgram.Value;
+            }
+        }
 #endif
 
         public bool ResourcesLost { get; set; }
