@@ -38,50 +38,36 @@
  */
 #endregion License
 
-using System;
-
-namespace Microsoft.Xna.Framework.Content.Pipeline
+namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
     /// <summary>
-    /// Implements a file format importer for use with game assets.
-    /// 
-    /// Importers, either provided by the framework or written by a developer, must derive from ContentImporter, as well as being marked with a ContentImporterAttribute.
-    /// 
-    /// An importer should produce results in the standard intermediate object model. If an asset has information not supported by the object model, the importer should output it as opaque data (key/value attributes attached to the relevant object). By following this procedure, a content pipeline can access specialized digital content creation (DCC) tool information, even when that information has not been fully standardized into the official object model.
-    /// 
-    /// You can also design custom importers that accept and import types containing specific third-party extensions to the object model.
+    /// Provides methods for maintaining a collection of geometry batches that make up a mesh.
     /// </summary>
-    public abstract class ContentImporter<T> : IContentImporter
+    public sealed class GeometryContentCollection : ChildCollection<MeshContent, GeometryContent>
+    {
+        internal GeometryContentCollection(MeshContent parent)
+            : base(parent)
         {
-        /// <summary>
-        /// Initializes a new instance of ContentImporter.
-        /// </summary>
-        protected ContentImporter()
-        {
-
         }
 
         /// <summary>
-        /// Called by the framework when importing a game asset. This is the method called by XNA when an asset is to be imported into an object that can be recognized by the Content Pipeline.
+        /// Gets the parent of a child object.
         /// </summary>
-        /// <param name="filename">Name of a game asset file.</param>
-        /// <param name="context">Contains information for importing a game asset, such as a logger interface.</param>
-        /// <returns>Resulting game asset.</returns>
-        public abstract T Import(string filename, ContentImporterContext context);
+        /// <param name="child">The child of the parent being retrieved.</param>
+        /// <returns>The parent of the child object.</returns>
+        protected override MeshContent GetParent(GeometryContent child)
+        {
+            return child.Parent;
+        }
 
         /// <summary>
-        /// Called by the framework when importing a game asset. This is the method called by XNA when an asset is to be imported into an object that can be recognized by the Content Pipeline.
+        /// Sets the parent of the specified child object.
         /// </summary>
-        /// <param name="filename">Name of a game asset file.</param>
-        /// <param name="context">Contains information for importing a game asset, such as a logger interface.</param>
-        /// <returns>Resulting game asset.</returns>
-        object IContentImporter.Import(string filename, ContentImporterContext context)
+        /// <param name="child">The child of the parent being set.</param>
+        /// <param name="parent">The parent of the child object.</param>
+        protected override void SetParent(GeometryContent child, MeshContent parent)
         {
-            if (filename == null)
-                throw new ArgumentNullException("filename");
-            if (context == null)
-                throw new ArgumentNullException("context");
-            return Import(filename, context);
+            child.Parent = parent;
         }
     }
 }
