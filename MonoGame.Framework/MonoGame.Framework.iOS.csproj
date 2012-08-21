@@ -426,6 +426,8 @@
     <Compile Include="iOS\GamerServices\KeyboardInputAsyncResult.cs" />
     <Compile Include="iOS\iOSGameWindow.cs" />
     <Compile Include="Input\Touch\TouchInfo.cs" />
+    <Compile Include="Graphics\Shader\ShaderProgramCache.cs" />
+    <Compile Include="Utilities\Hash.cs" />
   </ItemGroup>
   <Import Project="$(ProgramFiles)\MSBuild\MonoTouch\Novell.MonoTouch.Common.targets" Condition="'$(windir)' != '' " />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

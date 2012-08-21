@@ -343,6 +343,7 @@
     <Compile Include="Desktop\TitleContainer.cs" />
     <Compile Include="Content\ContentReaders\CurveReader.cs" />
     <Compile Include="Graphics\Vertices\VertexElementColor.cs" />
+    <Compile Include="Utilities\Hash.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="SharpDX">
