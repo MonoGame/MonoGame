@@ -39,14 +39,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public EffectAnnotationCollection Annotations { get; private set; }
 
-#if OPENGL
-
-       static readonly float[] _posFixup = new float[4];
-
-
-
-#endif // OPENGL
-
 #if PSS
         internal ShaderProgram _shaderProgram;
 #endif
@@ -122,9 +114,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
             var device = _effect.GraphicsDevice;
 
+            Debug.Assert(_vertexShader != null, "Got a null vertex shader!");
+            Debug.Assert(_pixelShader != null, "Got a null vertex shader!");
 #if OPENGL
             if (this._vertexShader != null) device.VertexShader = this._vertexShader;
-            if (this._pixelShader != null) device.PixelShader = this._pixelShader;                      
+            if (this._pixelShader != null) device.PixelShader = this._pixelShader;        
 #elif PSS
             _effect.GraphicsDevice._graphics.SetShaderProgram(_shaderProgram);
 #endif
@@ -135,10 +129,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 device.BlendState = _blendState;
             if (_depthStencilState != null)
                 device.DepthStencilState = _depthStencilState;
-
-            Debug.Assert(_vertexShader != null, "Got a null vertex shader!");
-            Debug.Assert(_pixelShader != null, "Got a null vertex shader!");
-
+            
 #if PSS
 #warning We are only setting one hardcoded parameter here. Need to do this properly by iterating _effect.Parameters (Happens in Shader)
             float[] data;
@@ -149,61 +140,15 @@ namespace Microsoft.Xna.Framework.Graphics
             Sce.PlayStation.Core.Matrix4 matrix4 = PSSHelper.ToPssMatrix4(data);
             matrix4 = matrix4.Transpose (); //When .Data is set the matrix is transposed, we need to do it again to undo it
             _shaderProgram.SetUniformValue(0, ref matrix4);
-#elif OPENGL
-
-            // Apply the vertex shader.
-            if (_vertexShader != null) _vertexShader.Apply(device, device.ShaderProgram, _effect.Parameters, _effect.ConstantBuffers);
-
-            // Apply vertex shader fix:
-            // The following two lines are appended to the end of vertex shaders
-            // to account for rendering differences between OpenGL and DirectX:
-            //
-            // gl_Position.y = gl_Position.y * posFixup.y;
-            // gl_Position.xy += posFixup.zw * gl_Position.ww;
-            //
-            // (the following paraphrased from wine, wined3d/state.c and wined3d/glsl_shader.c)
-            //
-            // - We need to flip along the y-axis in case of offscreen rendering.
-            // - D3D coordinates refer to pixel centers while GL coordinates refer
-            //   to pixel corners.
-            // - D3D has a top-left filling convention. We need to maintain this
-            //   even after the y-flip mentioned above.
-            // In order to handle the last two points, we translate by
-            // (63.0 / 128.0) / VPw and (63.0 / 128.0) / VPh. This is equivalent to
-            // translating slightly less than half a pixel. We want the difference to
-            // be large enough that it doesn't get lost due to rounding inside the
-            // driver, but small enough to prevent it from interfering with any
-            // anti-aliasing.
-            //
-            // OpenGL coordinates specify the center of the pixel while d3d coords specify
-            // the corner. The offsets are stored in z and w in posFixup. posFixup.y contains
-            // 1.0 or -1.0 to turn the rendering upside down for offscreen rendering. PosFixup.x
-            // contains 1.0 to allow a mad.
-
-            _posFixup[0] = 1.0f;
-            _posFixup[1] = 1.0f;
-            _posFixup[2] = (63.0f / 64.0f) / device.Viewport.Width;
-            _posFixup[3] = -(63.0f / 64.0f) / device.Viewport.Height;
-            //If we have a render target bound (rendering offscreen)
-            if (device.GetRenderTargets().Length > 0)
-            {
-                //flip vertically
-                _posFixup[1] *= -1.0f;
-                _posFixup[3] *= -1.0f;
-            }
-            var posFixupLoc = GL.GetUniformLocation(device.ShaderProgram, "posFixup"); // TODO: Look this up on link!
-            GL.Uniform4(posFixupLoc, 1, _posFixup);
-
-            // Apply the pixel shader.
-            if (_pixelShader != null) _pixelShader.Apply(device, device.ShaderProgram, _effect.Parameters, _effect.ConstantBuffers);
-
-#elif DIRECTX
-
+#else
             // Apply the shaders which will in turn set the 
             // constant buffers and texture samplers.
-            _vertexShader.Apply(device, _effect.Parameters, _effect.ConstantBuffers);
-            _pixelShader.Apply(device, _effect.Parameters, _effect.ConstantBuffers);
-
+            
+            // Apply the vertex shader.
+            if (_vertexShader != null) _vertexShader.Apply(device, _effect.Parameters, _effect.ConstantBuffers);
+            
+            // Apply the pixel shader.
+            if (_pixelShader != null) _pixelShader.Apply(device, _effect.Parameters, _effect.ConstantBuffers);            
 #endif
         }
 		

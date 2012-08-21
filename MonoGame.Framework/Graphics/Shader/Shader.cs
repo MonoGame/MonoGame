@@ -229,8 +229,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 
 
-        public void Apply(  GraphicsDevice graphicsDevice,
-                            int program, 
+        public void Apply(  GraphicsDevice graphicsDevice,                            
                             EffectParameterCollection parameters,
 		                    ConstantBuffer[] cbuffers) 
         {
@@ -245,7 +244,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     //
                     // TODO: This seems like it only needs to be done once!
                     //
-                    var loc = GL.GetUniformLocation(program, sampler.name);
+                    var loc = GL.GetUniformLocation(graphicsDevice.ShaderProgram, sampler.name);
 					GL.Uniform1(loc, sampler.index);
 
                     // TODO: Fix 3D and Volume samplers!
