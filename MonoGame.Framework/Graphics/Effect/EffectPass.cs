@@ -123,8 +123,8 @@ namespace Microsoft.Xna.Framework.Graphics
             var device = _effect.GraphicsDevice;
 
 #if OPENGL
-            device.VertexShader = this._vertexShader;
-            device.PixelShader = this._pixelShader;                      
+            if (this._vertexShader != null) device.VertexShader = this._vertexShader;
+            if (this._pixelShader != null) device.PixelShader = this._pixelShader;                      
 #elif PSS
             _effect.GraphicsDevice._graphics.SetShaderProgram(_shaderProgram);
 #endif
@@ -152,7 +152,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #elif OPENGL
 
             // Apply the vertex shader.
-            _vertexShader.Apply(device, device.ShaderProgram, _effect.Parameters, _effect.ConstantBuffers);
+            if (_vertexShader != null) _vertexShader.Apply(device, device.ShaderProgram, _effect.Parameters, _effect.ConstantBuffers);
 
             // Apply vertex shader fix:
             // The following two lines are appended to the end of vertex shaders
@@ -195,7 +195,7 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.Uniform4(posFixupLoc, 1, _posFixup);
 
             // Apply the pixel shader.
-            _pixelShader.Apply(device, device.ShaderProgram, _effect.Parameters, _effect.ConstantBuffers);
+            if (_pixelShader != null) _pixelShader.Apply(device, device.ShaderProgram, _effect.Parameters, _effect.ConstantBuffers);
 
 #elif DIRECTX
 

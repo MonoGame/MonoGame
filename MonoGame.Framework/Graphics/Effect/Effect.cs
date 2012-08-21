@@ -64,9 +64,6 @@ namespace Microsoft.Xna.Framework.Graphics
         // A list of shaders that need to be recompiled on device reset.
         internal List<Shader> _shaderList = new List<Shader>();
 
-        internal static Effect defaultEffect;
-        internal static bool defaultLoading = false;
-
         internal Effect(GraphicsDevice graphicsDevice)
 		{
 			if (graphicsDevice == null)
@@ -75,13 +72,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			this.graphicsDevice = graphicsDevice;
 
             this.graphicsDevice.DeviceResetting += new EventHandler<EventArgs>(graphicsDevice_DeviceResetting);
-            this.graphicsDevice.DeviceReset += new EventHandler<EventArgs>(graphicsDevice_DeviceReset);
-
-            if (defaultEffect == null && !defaultLoading) 
-            {
-                defaultLoading = true;
-                defaultEffect = new Effect(graphicsDevice, SpriteEffect.Bytecode);
-            }
+            this.graphicsDevice.DeviceReset += new EventHandler<EventArgs>(graphicsDevice_DeviceReset);            
 		}
 
         void graphicsDevice_DeviceResetting(object sender, EventArgs e)
@@ -341,21 +332,6 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             Shader vertexShader = null;
             Shader pixelShader = null;
-
-            if (defaultEffect != null)
-            {
-                for (int i = 0; i < defaultEffect._shaderList.Count; i++)
-                {
-                    if (defaultEffect._shaderList[i].Stage == ShaderStage.Pixel)
-                    {
-                        pixelShader = defaultEffect._shaderList[i];
-                    }
-                    if (defaultEffect._shaderList[i].Stage == ShaderStage.Vertex)
-                    {
-                        vertexShader = defaultEffect._shaderList[i];
-                    }
-                }
-            }
 
             var collection = new EffectPassCollection();
 

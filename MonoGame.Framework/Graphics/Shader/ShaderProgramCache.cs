@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if OPENGL
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -35,6 +36,14 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal static int? GetProgram(Shader vertexShader, Shader pixelShader)//, ConstantBuffer constantBuffer)
         {
+            if (vertexShader == null)
+            {
+                throw new ArgumentNullException("vertexShader");
+            }
+            if (pixelShader == null)
+            {
+                throw new ArgumentNullException("pixelShader");
+            }
             //
             int key = vertexShader.HashKey | pixelShader.HashKey;// +constantBuffer.HashKey;
             if (!ProgramCache.ContainsKey(key))
@@ -88,3 +97,4 @@ namespace Microsoft.Xna.Framework.Graphics
 
     }
 }
+#endif

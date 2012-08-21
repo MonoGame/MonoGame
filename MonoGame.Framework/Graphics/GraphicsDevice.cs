@@ -1342,6 +1342,10 @@ namespace Microsoft.Xna.Framework.Graphics
 #if OPENGL
         private int shaderProgram = 0;
 
+
+        /// <summary>
+        /// Looks up the Vertex/Pixel Shader combination in the ShaderProgramCache and returns it or creates a new program .
+        /// </summary>
         internal int ShaderProgram
         {
             get
@@ -1357,6 +1361,9 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        /// <summary>
+        /// Activates the Current Vertex/Pixel shader pair into a program.         
+        /// </summary>
         private void Activate()
         {
             int? _shaderProgram = ShaderProgramCache.GetProgram(this.VertexShader, this.PixelShader);
