@@ -40,16 +40,132 @@ purpose and non-infringement.
 
 using System;
 
+#if WINDOWS || MONOMAC || LINUX
+using MouseInfo = OpenTK.Input.Mouse;
+#else
+using Microsoft.Xna.Framework.Input.Touch;
+#endif
+
+#if WINRT
+using Windows.Devices.Input;
+#endif
+
 namespace Microsoft.Xna.Framework.Input
 {
     public static class Mouse
     {
 		internal static MouseState State;
 
+#if WINRT
+        private static readonly MouseCapabilities _mouseCapabilities = new MouseCapabilities();
+#endif
+
+#if WINDOWS || MONOMAC || LINUX
+		private static OpenTK.Input.MouseDevice _mouse = null;			
+#else
+        private static int _mouseTouchId = -1;
+#endif
+
+#if WINDOWS
+
+        static OpenTK.GameWindow Window;
+
+        internal static void setWindows(OpenTK.GameWindow window)
+        {
+            Window = window;
+            _mouse = window.Mouse;        
+        }
+
+#elif MONOMAC || LINUX
+
+        internal static void UpdateMouseInfo(OpenTK.Input.MouseDevice mouse)
+		{
+			_mouse = mouse;
+			_mouse.Move += HandleWindowMouseMove;
+		}
+
+        internal static void HandleWindowMouseMove (object sender, OpenTK.Input.MouseMoveEventArgs e)
+		{
+			SetPosition(e.X, e.Y);
+		}
+
+#endif
+
+        #region Public interface
+
         public static IntPtr WindowHandle { get; set; }
 		
         public static MouseState GetState()
         {
+#if WINDOWS || MONOMAC || LINUX
+
+			// maybe someone is tring to get mouse before initialize
+			if (_mouse == null)
+                return State;
+
+#if WINDOWS
+            var p = new POINT();
+            GetCursorPos(out p);
+            var pc = Window.PointToClient(p.ToPoint());
+            State.X = pc.X;
+            State.Y = pc.Y;
+#endif
+
+            State.LeftButton = _mouse[OpenTK.Input.MouseButton.Left] ? ButtonState.Pressed : ButtonState.Released;
+			State.RightButton = _mouse[OpenTK.Input.MouseButton.Right] ? ButtonState.Pressed : ButtonState.Released;
+			State.MiddleButton = _mouse[OpenTK.Input.MouseButton.Middle] ? ButtonState.Pressed : ButtonState.Released;;
+
+			// WheelPrecise is divided by 120 (WHEEL_DELTA) in OpenTK (WinGLNative.cs)
+			// We need to counteract it to get the same value XNA provides
+			State.ScrollWheelValue = (int)( _mouse.WheelPrecise * 120 );
+
+#else
+
+#if WINRT
+            // NOTE: Some WinRT devices have a mouse driver installed even when
+            // there is no physical mouse connected to the device.  You can fix 
+            // this by disabling the mouse in the Device Manager.
+
+            // If we have a mouse then don't bother faking events.
+            if (_mouseCapabilities.MousePresent != 0)
+                return State;
+#endif
+
+            // Release all the buttons.
+            State.LeftButton = ButtonState.Released;
+            State.RightButton = ButtonState.Released;
+            State.MiddleButton = ButtonState.Released;
+
+            // Look for a new or previous touch point.
+            var touchState = TouchPanel.GetState();
+            foreach (var touch in touchState)
+            {
+                // Skip released touch points.
+                if (    touch.State != TouchLocationState.Pressed &&
+                        touch.State != TouchLocationState.Moved)
+                    continue;
+
+                // Look for a new touch or the last touch point.
+                if (_mouseTouchId == -1 || touch.Id == _mouseTouchId)
+                {
+                    // Store the touch point for the next pass.
+                    _mouseTouchId = touch.Id;
+
+                    // Set the touch state.
+                    State.X = (int)touch.Position.X;
+                    State.Y = (int)touch.Position.Y;
+                    State.LeftButton = ButtonState.Pressed;
+                    break;
+                }
+            }
+
+            // If we didn't find the touch then 
+            // look for a new one next time.
+            if (State.LeftButton == ButtonState.Released)
+                _mouseTouchId = -1;
+
+#endif
+
             return State;
         }
 
@@ -57,7 +173,51 @@ namespace Microsoft.Xna.Framework.Input
         {
             State.X = x;
             State.Y = y;
+			
+#if WINDOWS
+            ///correcting the coordinate system
+            ///Only way to set the mouse position !!!
+            System.Drawing.Point pt = Window.PointToScreen(new System.Drawing.Point(x, y));
+            SetCursorPos(pt.X, pt.Y);
+#elif MONOMAC || LINUX
+			// TODO propagate change to opentk mouse object (requires opentk 1.1)
+			//throw new NotImplementedException("Feature not implemented.");
+#endif			
         }
+
+        #endregion // Public interface
+
+#if WINDOWS
+
+        [System.Runtime.InteropServices.DllImportAttribute("user32.dll", EntryPoint = "SetCursorPos")]
+        [return: System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.Bool)]
+        public static extern bool SetCursorPos(int X, int Y);
+
+        /// <summary>
+        /// Struct representing a point.
+        /// </summary>
+        [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
+        public struct POINT
+        {
+            public int X;
+            public int Y;
+
+            public System.Drawing.Point ToPoint()
+            {
+                return new System.Drawing.Point(X, Y);
+            }
+
+        }
+
+        /// <summary>
+        /// Retrieves the cursor's position, in screen coordinates.
+        /// </summary>
+        /// <see>See MSDN documentation for further information.</see>
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        public static extern bool GetCursorPos(out POINT lpPoint);
+      
+#endif
+
     }
 }
 
