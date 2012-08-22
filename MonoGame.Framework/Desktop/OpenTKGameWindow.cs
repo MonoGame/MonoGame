@@ -145,6 +145,11 @@ namespace Microsoft.Xna.Framework
 
         private void Keyboard_KeyDown(object sender, OpenTK.Input.KeyboardKeyEventArgs e)
         {
+            if (e.Key == OpenTK.Input.Key.F4 && e.Key.HasFlag(OpenTK.Input.Key.AltLeft))
+            {
+                window.Close();
+                return;
+            }
             Keys xnaKey = KeyboardUtil.ToXna(e.Key);
             if (!keys.Contains(xnaKey)) keys.Add(xnaKey);
         }
@@ -247,7 +252,7 @@ namespace Microsoft.Xna.Framework
             window.Closing += new EventHandler<CancelEventArgs>(OpenTkGameWindow_Closing);
             window.Resize += OnResize;
             window.Keyboard.KeyDown += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyDown);
-            window.Keyboard.KeyUp += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyUp);            
+            window.Keyboard.KeyUp += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyUp);                        
             
             // Set the window icon.
             window.Icon = Icon.ExtractAssociatedIcon(Assembly.GetEntryAssembly().Location);
@@ -285,7 +290,7 @@ namespace Microsoft.Xna.Framework
 
         protected override void SetTitle(string title)
         {
-            window.Title = title;
+            window.Title = title;            
         }
 
         internal void Run(double updateRate)

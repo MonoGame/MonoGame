@@ -45,6 +45,12 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using MonoGame.Framework.Touch;
+
+#if WINRT
+using Windows.Graphics.Display;
+using Windows.UI.Xaml;
+#endif
+
 #endregion Using clause
 
 namespace Microsoft.Xna.Framework.Input.Touch
@@ -76,6 +82,22 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// on the next call to GetState.
         /// </summary>
         private static bool _updateState = true;
+
+        /// <summary>
+        /// The positional scale to apply to touch input.
+        /// </summary>
+        private static Vector2 _touchScale = Vector2.One;
+
+        /// <summary>
+        /// The current size of the display.
+        /// </summary>
+        private static Point _displaySize = Point.Zero;
+
+        /// <summary>
+        /// Set when the display has changed and the touch scale
+        /// needs to be recalculated.
+        /// </summary>
+        private static bool _displayChanged = false;
 
         internal static Queue<GestureSample> GestureList = new Queue<GestureSample>();
 		internal static event EventHandler EnabledGesturesChanged;
@@ -172,7 +194,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
             return _state;
         }
         
-        internal static void AddEvent(TouchLocation location)
+        internal static void AddEvent(int id, TouchLocationState state, Vector2 position)
         {
 #if WINRT
             // TODO:
@@ -183,11 +205,42 @@ namespace Microsoft.Xna.Framework.Input.Touch
             // Lets be sure to remove this once that is fixed... this safety
             // here is inefficient and unnessasary.
             //
-            if (    location.State == TouchLocationState.Pressed &&
-                    _events.FindIndex(e => e.Id == location.Id) != -1)
+            if (    state == TouchLocationState.Pressed &&
+                    _events.FindIndex(e => e.Id == id) != -1)
                 return;
 #endif
-            _events.Add(location);
+           
+            // TODO: Maybe it is better if we apply touch
+            // scaling when we process the events and not
+            // as we get them?
+
+            if (_displayChanged)
+            {
+                // Get the window size.
+                //
+                // TODO: This will be alot smoother once we get XAML working with Game.
+                var windowSize = Vector2.One;
+                if (Game.Instance != null)
+                    windowSize = new Vector2(   Game.Instance.Window.ClientBounds.Width,
+                                                Game.Instance.Window.ClientBounds.Height);
+#if WINRT
+                else
+                {
+                    var dipFactor = DisplayProperties.LogicalDpi / 96.0f;
+                    windowSize = new Vector2(   (float)Window.Current.CoreWindow.Bounds.Width * dipFactor,
+                                                (float)Window.Current.CoreWindow.Bounds.Height * dipFactor);
+                }
+#endif
+
+                // Recalculate the touch scale.
+                _touchScale = new Vector2(  (float)DisplayWidth / windowSize.X,
+                                            (float)DisplayHeight / windowSize.Y);
+                
+                _displayChanged = false;
+            }
+
+            // Apply the touch scale to the new location.
+            _events.Add(new TouchLocation(id, state, position * _touchScale));
         }
 
         internal static void UpdateState()
@@ -206,14 +259,21 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			return GestureList.Dequeue();			
         }
 
+        public static IntPtr WindowHandle { get; set; }
+
         public static int DisplayHeight
         {
             get
             {
-                return Game.Instance.Window.ClientBounds.Height;
+                return _displaySize.Y;
             }
             set
             {
+                if (_displaySize.Y == value)
+                    return;
+
+                _displayChanged = true;
+                _displaySize.Y = value;
             }
         }
 
@@ -227,10 +287,15 @@ namespace Microsoft.Xna.Framework.Input.Touch
         {
             get
             {
-                return Game.Instance.Window.ClientBounds.Width;
+                return _displaySize.X;
             }
             set
             {
+                if (_displaySize.X == value)
+                    return;
+
+                _displayChanged = true;
+                _displaySize.X = value;
             }
         }
 		
@@ -282,6 +347,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		}
 
         static GestureSample? _tempTap; // Use a member variable rather than initialize a new GestureSample every time this is called.
+
 		private static void UpdateGestures()
 		{			
 			var touchLocState = _state;
@@ -380,6 +446,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		}
 		
 		static List<int> _heldEventsProcessed = new List<int>();
+
 		private static bool ProcessHold(TouchLocation touch)
 		{
 			if (!GestureIsEnabled(GestureType.Hold))
@@ -395,16 +462,18 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			
 			_heldEventsProcessed.Add(touch.Id);
 			
-			TouchPanel.GestureList.Enqueue (new GestureSample (
-			GestureType.Hold, new TimeSpan (DateTime.Now.Ticks),
-			touch.Position, Vector2.Zero,
-			Vector2.Zero, Vector2.Zero));
+			TouchPanel.GestureList.Enqueue(
+                new GestureSample(  GestureType.Hold, 
+                                    TimeSpan.FromTicks(DateTime.Now.Ticks),
+			                        touch.Position, Vector2.Zero,
+			                        Vector2.Zero, Vector2.Zero));
 			
 			return true;
 				
 		}
         
         static List<int> _processedDoubleTaps = new List<int>();
+
         private static bool ProcessDoubleTap(TouchLocation touch)
         {
             if (!GestureIsEnabled(GestureType.DoubleTap))
@@ -454,7 +523,9 @@ namespace Microsoft.Xna.Framework.Input.Touch
             
             return true;
         }
+
         static List<GestureSample> _pendingTaps = new List<GestureSample>();
+
 		private static bool ProcessTap(TouchLocation touch)
 		{
             // TODO: This check means that double taps won't work unless
@@ -484,6 +555,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		}
 
         static List<int> _processedDrags = new List<int>();
+
 		private static bool ProcessDrag(TouchLocation touch)
 		{
 			if (touch.State != TouchLocationState.Moved)
@@ -561,6 +633,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		}
 
         static List<TouchLocation> _prevTouchBuffer = new List<TouchLocation>();
+
 		private static bool ProcessFlick(TouchLocation touch)
 		{
 			if (!GestureIsEnabled(GestureType.Flick))
@@ -591,7 +664,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
                 // smooth, continuous motions.
                 if (prevDirection != Vector2.Zero)
                 {
-                    if (angleBetweenVectors(prevDirection, distanceBetweenVecs) > Math.PI / 4)
+                    var angle = (float)Math.Abs(Math.Acos(Vector2.Dot(Vector2.Normalize(prevDirection), Vector2.Normalize(distanceBetweenVecs))));
+                    if (angle > Math.PI / 4)
                         break;
                 }
 
@@ -662,11 +736,6 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			return true;
 			
 		}
-
-        private static float angleBetweenVectors(Vector2 v1, Vector2 v2)
-        {
-            return (float)Math.Abs(Math.Acos(Vector2.Dot(Vector2.Normalize(v1), Vector2.Normalize(v2))));
-        }
 
 		#endregion
     }

@@ -544,7 +544,7 @@ namespace Microsoft.Xna.Framework
 			UpdateMousePosition (loc);
 			switch (theEvent.Type) {
 			case NSEventType.LeftMouseDown:
-				Mouse.LeftButton = ButtonState.Pressed;
+				Mouse.State.LeftButton = ButtonState.Pressed;
 				break;
 			}
 		}
@@ -556,7 +556,7 @@ namespace Microsoft.Xna.Framework
 			switch (theEvent.Type) {
 
 			case NSEventType.LeftMouseUp:
-				Mouse.LeftButton = ButtonState.Released;
+				Mouse.State.LeftButton = ButtonState.Released;
 				break;
 			}
 		}
@@ -573,7 +573,7 @@ namespace Microsoft.Xna.Framework
 			UpdateMousePosition (loc);
 			switch (theEvent.Type) {
 			case NSEventType.RightMouseDown:
-				Mouse.RightButton = ButtonState.Pressed;
+				Mouse.State.RightButton = ButtonState.Pressed;
 				break;
 			}
 		}
@@ -584,7 +584,7 @@ namespace Microsoft.Xna.Framework
 			UpdateMousePosition (loc);
 			switch (theEvent.Type) {
 			case NSEventType.RightMouseUp:
-				Mouse.RightButton = ButtonState.Released;
+				Mouse.State.RightButton = ButtonState.Released;
 				break;
 			}
 		}
@@ -601,7 +601,7 @@ namespace Microsoft.Xna.Framework
 			UpdateMousePosition (loc);
 			switch (theEvent.Type) {
 			case NSEventType.OtherMouseDown:
-				Mouse.MiddleButton = ButtonState.Pressed;
+				Mouse.State.MiddleButton = ButtonState.Pressed;
 				break;
 			}
 		}
@@ -612,7 +612,7 @@ namespace Microsoft.Xna.Framework
 			UpdateMousePosition (loc);
 			switch (theEvent.Type) {
 			case NSEventType.OtherMouseUp:
-				Mouse.MiddleButton = ButtonState.Released;
+				Mouse.State.MiddleButton = ButtonState.Released;
 				break;
 			}
 		}
@@ -653,8 +653,8 @@ namespace Microsoft.Xna.Framework
 
 		private void UpdateMousePosition (PointF location)
 		{
-			Mouse.X = (int)location.X;
-			Mouse.Y = (int)(ClientBounds.Height - location.Y);
+			Mouse.State.X = (int)location.X;
+			Mouse.State.Y = (int)(ClientBounds.Height - location.Y);			
 		}
 
 	}

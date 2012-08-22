@@ -61,7 +61,7 @@ namespace Microsoft.Xna.Framework.Media
 #endif
 		
 		private string _name;
-		private int _playCount;   
+		private int _playCount = 0;   
 		
 		internal Song(string fileName)
 		{			

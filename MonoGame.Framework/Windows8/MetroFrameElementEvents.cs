@@ -86,76 +86,104 @@ namespace Microsoft.Xna.Framework
         private void CoreWindow_PointerWheelChanged(object sender, PointerRoutedEventArgs args)
         {
             // Wheel events always go to the mouse state.
-            Mouse.State.Update(args);
+            UpdateMouse(args);
+
+            // We handled this event.
+            args.Handled = true;
         }
 
         private void CoreWindow_PointerMoved(object sender, PointerRoutedEventArgs args)
         {
             var currentPoint = args.GetCurrentPoint(null);
 
-            // To convert from DIPs (that all touch and pointer events are returned 
-            // in) to pixels (that XNA APIs expect)
+            // To convert from DIPs (device independent pixels) to actual screen resolution pixels.
             var dipFactor = DisplayProperties.LogicalDpi / 96.0f;
             var pos = new Vector2((float)currentPoint.Position.X, (float)currentPoint.Position.Y) * dipFactor;
 
-            var isTouch = currentPoint.PointerDevice.PointerDeviceType == Windows.Devices.Input.PointerDeviceType.Touch;
+            var isTouch = currentPoint.PointerDevice.PointerDeviceType == PointerDeviceType.Touch;
             var touchIsDown = currentPoint.IsInContact;
-            if (isTouch && touchIsDown)
-                TouchPanel.AddEvent(new TouchLocation((int)currentPoint.PointerId, TouchLocationState.Moved, pos));
-
-            if (!isTouch || currentPoint.Properties.IsPrimary && touchIsDown)
+            if (isTouch)
             {
-                // Mouse or stylus event or the primary touch event (simulated as mouse input)
-                Mouse.State.Update(args);
+                if (touchIsDown)
+                    TouchPanel.AddEvent((int)currentPoint.PointerId, TouchLocationState.Moved, pos);
             }
+            else
+            {
+                // Mouse or stylus event.
+                UpdateMouse(args);
+            }
+
+            // We handled this event.
+            args.Handled = true;
         }
 
         private void CoreWindow_PointerReleased(object sender, PointerRoutedEventArgs args)
         {
-			// Release the captured pointer.
-            _element.ReleasePointerCapture(args.Pointer);
-
             var currentPoint = args.GetCurrentPoint(null);
 
-            // To convert from DIPs (that all touch and pointer events are returned 
-            // in) to pixels (that XNA APIs expect)
+            // To convert from DIPs (device independent pixels) to screen resolution pixels.
             var dipFactor = DisplayProperties.LogicalDpi / 96.0f;
             var pos = new Vector2((float)currentPoint.Position.X, (float)currentPoint.Position.Y) * dipFactor;
 
-            var isTouch = currentPoint.PointerDevice.PointerDeviceType == Windows.Devices.Input.PointerDeviceType.Touch;
+            var isTouch = currentPoint.PointerDevice.PointerDeviceType == PointerDeviceType.Touch;
             if (isTouch)
-                TouchPanel.AddEvent(new TouchLocation((int)currentPoint.PointerId, TouchLocationState.Released, pos));
-
-            if (!isTouch || currentPoint.Properties.IsPrimary)
+                TouchPanel.AddEvent((int)currentPoint.PointerId, TouchLocationState.Released, pos);
+            else
             {
-                // Mouse or stylus event or the primary touch event (simulated as mouse input)
-                Mouse.State.Update(args);
+                // Mouse or stylus event.
+                UpdateMouse(args);
+
+                // Release the captured pointer.
+                _element.ReleasePointerCapture(args.Pointer);
             }
+
+            // We handled this event.
+            args.Handled = true;
         }
 
         private void CoreWindow_PointerPressed(object sender, PointerRoutedEventArgs args)
         {
-			// Capture future pointer events until a release.		
-            _element.CapturePointer(args.Pointer);
-
             var currentPoint = args.GetCurrentPoint(null);
 
-            // To convert from DIPs (that all touch and pointer events are returned 
-            // in) to pixels (that XNA APIs expect)
+            // To convert from DIPs (device independent pixels) to screen resolution pixels.
             var dipFactor = DisplayProperties.LogicalDpi / 96.0f;
             var pos = new Vector2((float)currentPoint.Position.X, (float)currentPoint.Position.Y) * dipFactor;
 
-            var isTouch = currentPoint.PointerDevice.PointerDeviceType == Windows.Devices.Input.PointerDeviceType.Touch;
+            var isTouch = currentPoint.PointerDevice.PointerDeviceType == PointerDeviceType.Touch;
             if (isTouch)
-                TouchPanel.AddEvent(new TouchLocation((int)currentPoint.PointerId, TouchLocationState.Pressed, pos));
-
-            if (!isTouch || currentPoint.Properties.IsPrimary)
+                TouchPanel.AddEvent((int)currentPoint.PointerId, TouchLocationState.Pressed, pos);
+            else
             {
-                // Mouse or stylus event or the primary touch event (simulated as mouse input)
-                Mouse.State.Update(args);
+                // Mouse or stylus event.
+                UpdateMouse(args);
+
+                // Capture future pointer events until a release.		
+                _element.CapturePointer(args.Pointer);
             }
+
+            // We handled this event.
+            args.Handled = true;
         }
-        
+
+        private static void UpdateMouse(PointerRoutedEventArgs args)
+        {
+            var point = args.GetCurrentPoint(null);
+
+            // To convert from DIPs (device independent pixels) to screen resolution pixels.
+            var dipFactor = DisplayProperties.LogicalDpi / 96.0f;
+            var x = (int)(point.Position.X * dipFactor);
+            var y = (int)(point.Position.Y * dipFactor);
+
+            var state = point.Properties;
+
+            Mouse.State.X = x;
+            Mouse.State.Y = y;
+            Mouse.State.ScrollWheelValue += state.MouseWheelDelta;
+            Mouse.State.LeftButton = state.IsLeftButtonPressed ? ButtonState.Pressed : ButtonState.Released;
+            Mouse.State.RightButton = state.IsRightButtonPressed ? ButtonState.Pressed : ButtonState.Released;
+            Mouse.State.MiddleButton = state.IsMiddleButtonPressed ? ButtonState.Pressed : ButtonState.Released;
+        }
+
         private static Keys KeyTranslate(Windows.System.VirtualKey inkey)
         {
             switch (inkey)

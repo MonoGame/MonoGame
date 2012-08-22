@@ -210,7 +210,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		List<string> extensions = new List<string>();
 
+#if OPENGL
         internal int glFramebuffer;
+#endif
 
 #if DIRECTX
 
@@ -302,13 +304,13 @@ namespace Microsoft.Xna.Framework.Graphics
             // Setup extensions.
 #if OPENGL
 #if GLES
-            string[] extstring = GL.GetString(RenderbufferStorage.Extensions).Split(' ');            			
+            string extstring = GL.GetString(RenderbufferStorage.Extensions);            			
 #else
-            string[] extstring = GL.GetString(StringName.Extensions).Split(' ');	
+            string extstring = GL.GetString(StringName.Extensions);	
 #endif
-            if (extstring != null)
+            if (!string.IsNullOrEmpty(extstring))
             {
-                extensions.AddRange(extstring);
+                extensions.AddRange(extstring.Split(' '));
                 System.Diagnostics.Debug.WriteLine("Supported extensions:");
                 foreach (string extension in extensions)
                     System.Diagnostics.Debug.WriteLine(extension);
@@ -762,7 +764,11 @@ namespace Microsoft.Xna.Framework.Graphics
 				bufferMask = bufferMask | ClearBufferMask.StencilBufferBit;
 			}
 			if (options.HasFlag(ClearOptions.DepthBuffer)) {
-				GL.ClearDepth (depth);
+#if GLES
+                GL.ClearDepth (depth);
+#else
+                GL.ClearDepth ((double)depth);
+#endif
 				bufferMask = bufferMask | ClearBufferMask.DepthBufferBit;
 			}
 
@@ -995,7 +1001,11 @@ namespace Microsoft.Xna.Framework.Graphics
                     _d3dContext.Rasterizer.SetViewports(viewport);
 #elif OPENGL
 				GL.Viewport (value.X, value.Y, value.Width, value.Height);
-				GL.DepthRange(value.MinDepth, value.MaxDepth);
+#if GLES
+                GL.DepthRange(value.MinDepth, value.MaxDepth);
+#else
+                GL.DepthRange((double)value.MinDepth, (double)value.MaxDepth);
+#endif
 #endif
             }
         }
@@ -1260,7 +1270,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 if (_vertexBuffer != null)
                     _d3dContext.InputAssembler.SetVertexBuffers(0, _vertexBuffer._binding);
                 else
-                    _d3dContext.InputAssembler.SetVertexBuffers(0, null);
+                    _d3dContext.InputAssembler.SetVertexBuffers(0);
             }
 #elif OPENGL
             if (_vertexBuffer != null)

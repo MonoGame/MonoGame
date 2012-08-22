@@ -82,6 +82,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="OpenTK, Version=1.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\ThirdParty\Libs\OpenTK.dll</HintPath>
     </Reference>
     <Reference Include="System" />
@@ -125,7 +126,7 @@
     <Compile Include="Desktop\Input\GamePad.cs" />
     <Compile Include="Desktop\Input\Input.cs" />
     <Compile Include="Desktop\Input\Joystick.cs" />
-    <Compile Include="Desktop\Input\Mouse.cs" />
+    <Compile Include="Input\Mouse.cs" />
     <Compile Include="Desktop\Input\PadConfig.cs" />
     <Compile Include="Desktop\Input\Settings.cs" />
     <Compile Include="Desktop\Input\Stick.cs" />
