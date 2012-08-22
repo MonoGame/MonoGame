@@ -105,13 +105,14 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void Initialize()
         {
+#if OPENGL || PSS
             int? programid = ShaderProgramCache.GetProgram(_vertexShader, _pixelShader, _effect.ConstantBuffers[0]);
             if (!programid.HasValue)
             {
                 throw new InvalidOperationException("Could not Create Program in ShaderProgramCache");
             }
             _shaderProgram = programid.Value;
-
+#endif
         }
 
         public void Apply()
