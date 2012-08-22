@@ -125,7 +125,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 // input layout from the vertex declaration.
                 Bytecode = shaderBytecode;
                 
-                HashKey = Effect.ComputeHash(Bytecode);
+                HashKey = MonoGame.Utilities.Hash.ComputeHash(Bytecode);
             }
             else
                 _pixelShader = new PixelShader(d3dDevice, shaderBytecode);
