@@ -291,7 +291,7 @@
     <Compile Include="PSSuite\Input\AccelerometerState.cs" />
     <Compile Include="PSSuite\Input\GamePad.cs" />
     <Compile Include="PSSuite\Input\Keyboard.cs" />
-    <Compile Include="PSSuite\Input\Mouse.cs" />
+    <Compile Include="Input\Mouse.cs" />
     <Compile Include="Graphics\Texture2D.cs" />
     <Compile Include="Graphics\SpriteFont.cs" />
     <Compile Include="Graphics\Effect\EffectParameter.cs" />
