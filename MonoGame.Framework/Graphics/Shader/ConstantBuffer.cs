@@ -99,9 +99,9 @@ namespace Microsoft.Xna.Framework.Graphics
             byte[] data = new byte[_parameters.Length];
             for (var i = 0; i < _parameters.Length; i++)
             {
-                data[i] = (byte)_parameters[i];
+                data[i] = (byte)(_parameters[i] | _offsets[i]);
             }
-            HashKey = ShaderProgramCache.Hash(data);
+            HashKey = MonoGame.Utilities.Hash.ComputeHash(data);
 #endif
         }
 

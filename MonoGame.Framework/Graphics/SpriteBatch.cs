@@ -100,14 +100,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // TODO: Is this needed... does XNA really null out
             // the texture used during batching?
 			graphicsDevice.Textures[0] = null;
-
-			// unbinds shader
-			if (_effect != null && graphicsDevice.ShaderProgram != 0) 
-            {
-                GL.UseProgram(0);
-                graphicsDevice.ShaderProgram = 0;
-				_effect = null;
-			}
+            graphicsDevice.ShaderProgram = 0;			
 #endif
 
         }

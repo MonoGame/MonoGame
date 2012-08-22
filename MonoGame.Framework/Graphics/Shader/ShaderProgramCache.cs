@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if OPENGL
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -33,43 +34,31 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private static Dictionary<int, int> ProgramCache = new Dictionary<int, int>();
 
-        internal static int? GetProgram(Shader vertexShader, Shader pixelShader, ConstantBuffer constantBuffer)
+        internal static int? GetProgram(Shader vertexShader, Shader pixelShader)//, ConstantBuffer constantBuffer)
         {
+            if (vertexShader == null)
+            {
+                throw new ArgumentNullException("vertexShader");
+            }
+            if (pixelShader == null)
+            {
+                throw new ArgumentNullException("pixelShader");
+            }
             //
-            int key = vertexShader.HashKey + pixelShader.HashKey + constantBuffer.HashKey;
+            int key = vertexShader.HashKey | pixelShader.HashKey;// +constantBuffer.HashKey;
             if (!ProgramCache.ContainsKey(key))
             {
                 // the key does not exist so we need to link the programs
-                Link(vertexShader, pixelShader, constantBuffer);    
+                Link(vertexShader, pixelShader);    
             }            
             return ProgramCache[key];
-        }
+        }        
 
-        internal static int Hash(byte[] data)
-        {
-            // generate a hash for this constant buffer            
-            unchecked
-            {
-                const int p = 16777619;
-                int hash = (int)2166136261;
-
-                for (int i = 0; i < data.Length; i++)
-                    hash = (hash ^ data[i]) * p;
-
-                hash += hash << 13;
-                hash ^= hash >> 7;
-                hash += hash << 3;
-                hash ^= hash >> 17;
-                hash += hash << 5;
-                return hash;
-            }
-        }
-
-        private static void Link(Shader _vertexShader, Shader _pixelShader, ConstantBuffer _constantBuffer)
+        private static void Link(Shader _vertexShader, Shader _pixelShader)
         {
             #if OPENGL
-            Threading.BlockOnUIThread(() =>
-            {
+            //Threading.BlockOnUIThread(() =>
+            //{
                 // TODO: Shouldn't we be calling GL.DeleteProgram() somewhere?
 
                 // TODO: We could cache the various program combinations 
@@ -100,11 +89,12 @@ namespace Microsoft.Xna.Framework.Graphics
                     throw new InvalidOperationException("Unable to link effect program");
                 }
 
-                ProgramCache.Add(_vertexShader.HashKey + _pixelShader.HashKey + _constantBuffer.HashKey, _shaderProgram); 
-            });
+                ProgramCache.Add(_vertexShader.HashKey | _pixelShader.HashKey, _shaderProgram); 
+            //});
 #endif
             
         }
 
     }
 }
+#endif
