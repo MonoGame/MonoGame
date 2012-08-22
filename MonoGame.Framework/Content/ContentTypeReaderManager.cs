@@ -28,6 +28,7 @@ SOFTWARE.
 using System;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Content
 {
@@ -37,6 +38,9 @@ namespace Microsoft.Xna.Framework.Content
         ContentTypeReader[] contentReaders;		
 		
 		static string assemblyName;
+
+        public static Dictionary<string, Func<ContentTypeReader>> TypeNameToReaderMap
+            = new Dictionary<string, Func<ContentTypeReader>>(); 
 		
 		static ContentTypeReaderManager()
 		{
@@ -100,6 +104,12 @@ namespace Microsoft.Xna.Framework.Content
                 var hBasicEffectReader = new BasicEffectReader();
                 var hVertexBufferReader = new VertexBufferReader();
                 var hAlphaTestEffectReader = new AlphaTestEffectReader();
+                var hEnumSpriteEffectsReader = new EnumReader<Graphics.SpriteEffects>();
+                var hArrayFloatReader = new ArrayReader<float>();
+                var hArrayVector2Reader = new ArrayReader<Vector2>();
+                var hListVector2Reader = new ListReader<Vector2>();
+                var hArrayMatrixReader = new ArrayReader<Matrix>();
+                var hEnumBlendReader = new EnumReader<Graphics.Blend>();
             }
 #pragma warning restore 0219, 0649
 
@@ -116,19 +126,30 @@ namespace Microsoft.Xna.Framework.Content
                 // This string tells us what reader we need to decode the following data
                 // string readerTypeString = reader.ReadString();
 				string originalReaderTypeString = _reader.ReadString();
- 
-				// Need to resolve namespace differences
-				string readerTypeString = originalReaderTypeString;
-								
-				readerTypeString = PrepareType(readerTypeString);
-				
-				
 
-				var l_readerType = Type.GetType(readerTypeString);
-                if (l_readerType != null)
-                    contentReaders[i] = l_readerType.GetDefaultConstructor().Invoke(null) as ContentTypeReader;
+                Func<ContentTypeReader> readerFunc;
+                if (TypeNameToReaderMap.TryGetValue(originalReaderTypeString, out readerFunc))
+                {
+                    contentReaders[i] = readerFunc();
+                }
                 else
-                    throw new ContentLoadException("Could not find matching content reader of type " + originalReaderTypeString + " (" + readerTypeString + ")");
+                {
+                    System.Diagnostics.Debug.WriteLine(originalReaderTypeString);
+
+    				// Need to resolve namespace differences
+    				string readerTypeString = originalReaderTypeString;
+
+    				readerTypeString = PrepareType(readerTypeString);
+
+    				var l_readerType = Type.GetType(readerTypeString);
+                    if (l_readerType != null)
+                    {
+                        ConstructorInfo[] constructors = l_readerType.GetConstructors(BindingFlags.Public);
+                        contentReaders[i] = l_readerType.GetDefaultConstructor().Invoke(null) as ContentTypeReader;
+                    }
+                    else
+                        throw new ContentLoadException("Could not find matching content reader of type " + originalReaderTypeString + " (" + readerTypeString + ")");
+                }
 
 				// I think the next 4 bytes refer to the "Version" of the type reader,
                 // although it always seems to be zero
