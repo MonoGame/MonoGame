@@ -393,35 +393,8 @@
     <Compile Include="Graphics\Effect\ConstantBuffer.cs" />
     <Compile Include="Graphics\Effect\MGFXShader.cs" />
     <Compile Include="Graphics\Effect\Shader.cs" />
-    <Compile Include="Graphics\Effect\Shader.dx11.cs" />
     <Compile Include="Graphics\Effect\Shader.ogl.cs" />
-    <Compile Include="Graphics\Effect\Effect.fx.cs" />
-    <Compile Include="Graphics\Effect\FXShader.cs" />
     <Compile Include="Graphics\Effect\PassthroughVertexShader.cs" />
-    <Compile Include="..\Tools\2MGFX\DXConstantBufferData.cs">
-      <Link>Graphics\Effect\DXConstantBufferData.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\DXConstantBufferData.mojo.cs">
-      <Link>Graphics\Effect\DXConstantBufferData.mojo.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\DXEffectObject.cs">
-      <Link>Graphics\Effect\DXEffectObject.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\DXEffectObject.fxparser.cs">
-      <Link>Graphics\Effect\DXEffectObject.fxparser.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\DXShaderData.cs">
-      <Link>Graphics\Effect\DXShaderData.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\DXShaderData.mojo.cs">
-      <Link>Graphics\Effect\DXShaderData.mojo.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\MojoShader.cs">
-      <Link>Graphics\Effect\MojoShader.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\DXHelper.cs">
-      <Link>Graphics\Effect\DXHelper.cs</Link>
-    </Compile>
     <Compile Include="Content\ContentReaders\EffectMaterialReader.cs" />
     <Compile Include="Content\ContentReaders\ExternalReferenceReader.cs" />
     <Compile Include="Graphics\Effect\EffectMaterial.cs" />
