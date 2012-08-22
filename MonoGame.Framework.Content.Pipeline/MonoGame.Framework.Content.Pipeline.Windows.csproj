@@ -63,6 +63,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Audio\AudioFileType.cs" />
+    <Compile Include="Audio\AudioFormat.cs" />
+    <Compile Include="Audio\ConversionFormat.cs" />
+    <Compile Include="Audio\ConversionQuality.cs" />
     <Compile Include="ChildCollection.cs" />
     <Compile Include="ContentBuildLogger.cs" />
     <Compile Include="ContentIdentity.cs" />
@@ -123,6 +127,10 @@
     <Compile Include="Processors\FontDescriptionProcessor.cs" />
     <Compile Include="Processors\MaterialProcessor.cs" />
     <Compile Include="Processors\MaterialProcessorDefaultEffect.cs" />
+<<<<<<< HEAD
+=======
+    <Compile Include="Processors\SongContent.cs" />
+>>>>>>> upstream/develop3d
     <Compile Include="Processors\SpriteFontContent.cs" />
     <Compile Include="Processors\TextureProcessor.cs" />
     <Compile Include="Processors\TextureProcessorOutputFormat.cs" />
