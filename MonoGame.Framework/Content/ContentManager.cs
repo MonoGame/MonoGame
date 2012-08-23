@@ -639,7 +639,7 @@ namespace Microsoft.Xna.Framework.Content
 			}
 		}
 
-        private string RootDirectoryFullPath
+        internal string RootDirectoryFullPath
         {
             get
             {
