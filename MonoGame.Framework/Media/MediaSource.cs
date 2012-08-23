@@ -41,7 +41,9 @@
 
 using System;
 using System.Collections.Generic;
+#if IPHONE
 using MonoTouch.UIKit;
+#endif
 
 namespace Microsoft.Xna.Framework.Media
 {
@@ -73,7 +75,11 @@ namespace Microsoft.Xna.Framework.Media
 	
 		public static IList<MediaSource> GetAvailableMediaSources()
         {
+#if IPHONE
 			MediaSource[] result = { new MediaSource(UIDevice.CurrentDevice.SystemName, MediaSourceType.LocalDevice) };
+#else
+			MediaSource[] result = { new MediaSource("DummpMediaSource", MediaSourceType.LocalDevice) };
+#endif
 			return result;
         }
     }
