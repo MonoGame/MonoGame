@@ -6,12 +6,57 @@ using System.Reflection;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-	public class ModelMeshCollection : ReadOnlyCollection<ModelMesh>
+	// Summary:
+	//     Represents a collection of ModelMesh objects.
+	public sealed class ModelMeshCollection : ReadOnlyCollection<ModelMesh>
 	{
-		public ModelMeshCollection(IList<ModelMesh> list)
+		internal ModelMeshCollection(IList<ModelMesh> list)
 			: base(list)
 		{
 
+		}
+		
+	    // Summary:
+	    //     Retrieves a ModelMesh from the collection, given the name of the mesh.
+	    //
+	    // Parameters:
+	    //   meshName:
+	    //     The name of the mesh to retrieve.
+		public ModelMesh this[string meshName] {
+			get {
+				ModelMesh ret;
+				if (!this.TryGetValue(meshName, out ret)) {
+					throw new KeyNotFoundException();
+				}
+				return ret;
+			}
+		}
+		
+	    // Summary:
+	    //     Finds a mesh with a given name if it exists in the collection.
+	    //
+	    // Parameters:
+	    //   meshName:
+	    //     The name of the mesh to find.
+	    //
+	    //   value:
+	    //     [OutAttribute] The mesh named meshName, if found.
+	    public bool TryGetValue (string meshName, out ModelMesh value)
+		{
+			if (string.IsNullOrEmpty (meshName)) {
+				throw new ArgumentNullException ("meshName");
+			}
+			
+			foreach (var mesh in this) {
+				if (string.Compare(mesh.Name, meshName, StringComparison.Ordinal) == 0) {
+					value = mesh;
+					return true;
+				}
+			}
+			
+			value = null;
+			return false;
+			throw new NotImplementedException();
 		}
 
 	}

@@ -51,7 +51,7 @@ using Sce.PlayStation.Core.Graphics;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-	public class Effect : GraphicsResource
+	public partial class Effect : GraphicsResource
     {
         public EffectParameterCollection Parameters { get; private set; }
 
@@ -62,7 +62,7 @@ namespace Microsoft.Xna.Framework.Graphics
         internal ConstantBuffer[] ConstantBuffers { get; private set; }
 
         // A list of shaders that need to be recompiled on device reset.
-        internal List<DXShader> _shaderList = new List<DXShader>();
+        internal List<Shader> _shaderList = new List<Shader>();
 
         internal Effect(GraphicsDevice graphicsDevice)
 		{
@@ -90,7 +90,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 if (shader.NeedsRecompile)
                 {
-                    shader.CompileShader();
+                    shader.Compile();
                     shader.NeedsRecompile = false;
                 }
             }
@@ -112,44 +112,45 @@ namespace Microsoft.Xna.Framework.Graphics
             Clone(cloneSource);
 		}
 
-        public Effect(GraphicsDevice graphicsDevice, byte[] effectCode)
+        public Effect (GraphicsDevice graphicsDevice, byte[] effectCode)
             : this(graphicsDevice)
-        {
-            // By default we currently cache all unique byte streams
-            // and use cloning to populate the effect with parameters,
-            // techniques, and passes.
-            //
-            // This means all the immutable types in an effect:
-            //
-            //  - Shaders
-            //  - Annotations
-            //  - Names
-            //  - State Objects
-            //
-            // Are shared for every instance of an effect while the 
-            // parameter values and constant buffers are copied.
-            //
-            // This might need to change slightly if/when we support
-            // shared constant buffers as 'new' should return unique
-            // effects without any shared instance state.
+		{
+			// By default we currently cache all unique byte streams
+			// and use cloning to populate the effect with parameters,
+			// techniques, and passes.
+			//
+			// This means all the immutable types in an effect:
+			//
+			//  - Shaders
+			//  - Annotations
+			//  - Names
+			//  - State Objects
+			//
+			// Are shared for every instance of an effect while the 
+			// parameter values and constant buffers are copied.
+			//
+			// This might need to change slightly if/when we support
+			// shared constant buffers as 'new' should return unique
+			// effects without any shared instance state.
             
 
-            // First look for it in the cache.
-            //
-            // TODO: We could generate a strong and unique signature
-            // offline during content processing and just read it from 
-            // the front of the effectCode instead of computing a fast
-            // hash here at runtime.
-            //
-            var effectKey = ComputeHash(effectCode);
-            Effect cloneSource;
-            if (!EffectCache.TryGetValue(effectKey, out cloneSource))
-            {
-                // Create one.
-                cloneSource = new Effect(graphicsDevice);
-                using (var stream = new MemoryStream(effectCode))
-                using (var reader = new BinaryReader(stream))
-                    cloneSource.ReadEffect(reader);
+			// First look for it in the cache.
+			//
+			// TODO: We could generate a strong and unique signature
+			// offline during content processing and just read it from 
+			// the front of the effectCode instead of computing a fast
+			// hash here at runtime.
+			//
+			var effectKey = ComputeHash (effectCode);
+			Effect cloneSource;
+			if (!EffectCache.TryGetValue (effectKey, out cloneSource)) {
+				// Create one.
+				cloneSource = new Effect (graphicsDevice);
+				{
+					using (var stream = new MemoryStream(effectCode))
+					using (var reader = new BinaryReader(stream))
+						cloneSource.ReadEffect (reader);
+				}
 
                 // Cache the effect for later in its original unmodified state.
                 EffectCache.Add(effectKey, cloneSource);
@@ -244,7 +245,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// The MonoGame Effect file format header identifier.
         /// </summary>
-        private const string Header = "MGFX";
+        private const string MGFXHeader = "MGFX";
 
         /// <summary>
         /// The current MonoGame Effect file format versions
@@ -254,43 +255,65 @@ namespace Microsoft.Xna.Framework.Graphics
         /// We should avoid supporting old versions for very long as
         /// users should be rebuilding content when packaging their game.
         /// </remarks>
-        private const int Version = 2;
+        private const int MGFXVersion = 2;
 
 #if !PSS
-        internal void ReadEffect(BinaryReader reader)
-        {
-            // Check the header to make sure the file and version is correct!
-            var header = new string(reader.ReadChars(Header.Length));
-            var version = (int)reader.ReadByte();
-            if (header != Header || version != Version)
-                throw new Exception("Unsupported MGFX format!");
 
-            var profile = reader.ReadByte();
+		private void ReadEffect (BinaryReader reader)
+		{
+			// Check the header to make sure the file and version is correct!
+			var header = new string (reader.ReadChars (MGFXHeader.Length));
+			var version = (int)reader.ReadByte ();
+			if (header != MGFXHeader || version != MGFXVersion)
+				throw new Exception ("Unsupported MGFX format!");
+
+			var profile = reader.ReadByte ();
 #if DIRECTX
             if (profile != 1)
 #else
-            if (profile != 0)
+			if (profile != 0)
 #endif
-                throw new Exception("The MGFX effect is the wrong profile for this platform!");
+				throw new Exception("The MGFX effect is the wrong profile for this platform!");
 
-            // TODO: Maybe we should be reading in a string 
-            // table here to save some bytes in the file.
+			// TODO: Maybe we should be reading in a string 
+			// table here to save some bytes in the file.
 
-            // Read in all the constant buffers.
-            var buffers = (int)reader.ReadByte();
-            ConstantBuffers = new ConstantBuffer[buffers];
-            for (var c = 0; c < buffers; c++)
-            {
-                var buffer = new ConstantBuffer(graphicsDevice, reader);
+			// Read in all the constant buffers.
+			var buffers = (int)reader.ReadByte ();
+			ConstantBuffers = new ConstantBuffer[buffers];
+			for (var c = 0; c < buffers; c++) {
+				
+#if OPENGL
+				string name = reader.ReadString ();               
+#else
+				string name = null;
+#endif
+
+				// Create the backing system memory buffer.
+				var sizeInBytes = (int)reader.ReadInt16 ();
+
+				// Read the parameter index values.
+				int[] parameters = new int[reader.ReadByte ()];
+				int[] offsets = new int[parameters.Length];
+				for (var i = 0; i < parameters.Length; i++) {
+					parameters [i] = (int)reader.ReadByte ();
+					offsets [i] = (int)reader.ReadUInt16 ();
+				}
+
+                var buffer = new ConstantBuffer(graphicsDevice,
+				                                sizeInBytes,
+				                                parameters,
+				                                offsets,
+				                                name);
                 ConstantBuffers[c] = buffer;
             }
 
             // Read in all the shader objects.
-            _shaderList = new List<DXShader>();
+            _shaderList = new List<Shader>();
             var shaders = (int)reader.ReadByte();
             for (var s = 0; s < shaders; s++)
             {
-                var shader = new DXShader(graphicsDevice, reader);
+                var shader = new MGFXShader(graphicsDevice, reader);
                 _shaderList.Add(shader);
             }
 
@@ -328,7 +351,7 @@ namespace Microsoft.Xna.Framework.Graphics
             return collection;
         }
 
-        private static EffectPassCollection ReadPasses(BinaryReader reader, Effect effect, List<DXShader> shaders)
+        private static EffectPassCollection ReadPasses(BinaryReader reader, Effect effect, List<Shader> shaders)
         {
             var collection = new EffectPassCollection();
 
