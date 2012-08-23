@@ -160,7 +160,9 @@ namespace Microsoft.Xna.Framework.Graphics
 		internal static int attributeNormal = 4;
 		internal static int attributeBlendIndicies = 5;
 		internal static int attributeBlendWeight = 6;
-		internal static int attributeTexCoord = 7; //must be the last one, texture index locations are added to it
+		internal static int attributeBinormal = 7;
+		internal static int attributeTangent = 8;
+		internal static int attributeTexCoord = 9; //must be the last one, texture index locations are added to it
 
         private uint VboIdArray;
         private uint VboIdElement;
@@ -278,17 +280,18 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 
-        public GraphicsDevice()
-        {
-            // Initialize the main viewport
-            _viewport = new Viewport(0, 0,
+        public GraphicsDevice ()
+		{
+			// Initialize the main viewport
+			_viewport = new Viewport (0, 0,
 			                         DisplayMode.Width, DisplayMode.Height);
-            _viewport.MaxDepth = 1.0f;
+			_viewport.MaxDepth = 1.0f;
 
-            Textures = new TextureCollection(16);
-            SamplerStates = new SamplerStateCollection(16);
+			Textures = new TextureCollection (16);
+			SamplerStates = new SamplerStateCollection (16);
 
-            PresentationParameters = new PresentationParameters();
+			PresentationParameters = new PresentationParameters ();
+			PresentationParameters.DepthStencilFormat = DepthFormat.Depth24;
         }
 
         internal void Initialize()
@@ -972,7 +975,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             get
             {
-                throw new NotImplementedException();
+                return GraphicsDeviceStatus.Normal;
             }
         }
 
@@ -997,7 +1000,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 lock (_d3dContext) 
                     _d3dContext.Rasterizer.SetViewports(viewport);
 #elif OPENGL
-				GL.Viewport (value.X, value.Y, value.Width, value.Height);
+                GL.Viewport (value.X, PresentationParameters.BackBufferHeight - value.Y - value.Height, value.Width, value.Height);
 #if GLES
                 GL.DepthRange(value.MinDepth, value.MaxDepth);
 #else

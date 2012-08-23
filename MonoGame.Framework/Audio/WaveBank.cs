@@ -345,9 +345,9 @@ namespace Microsoft.Xna.Framework.Audio
                                         
                     writer.Close();
                     mStream.Close();
-					
-                    sounds[current_entry] = new SoundEffect(mStream.ToArray(), rate, AudioChannels.Mono).CreateInstance();
-					
+                    
+                    sounds[current_entry] = new SoundEffect(null, mStream.ToArray()).CreateInstance();
+                    
                 } else if (codec == MiniForamtTag_WMA) { //WMA or xWMA (or XMA2)
                     byte[] wmaSig = {0x30, 0x26, 0xb2, 0x75, 0x8e, 0x66, 0xcf, 0x11, 0xa6, 0xd9, 0x0, 0xaa, 0x0, 0x62, 0xce, 0x6c};
                     
@@ -391,9 +391,8 @@ namespace Microsoft.Xna.Framework.Audio
                         } else if (isM4a) {
                             filename = filename.Replace(".tmp", ".m4a");
                         }
-                        FileStream audioFile = new FileStream(filename, FileMode.Create, FileAccess.ReadWrite);
-                        audioFile.Write(audiodata, 0, audiodata.Length);
-                        audioFile.Close();
+                        using (var audioFile = File.Create(filename))
+                            audioFile.Write(audiodata, 0, audiodata.Length);
                         
                         sounds[current_entry] = new SoundEffect(filename).CreateInstance();
                     } else {
