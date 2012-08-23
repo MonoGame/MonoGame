@@ -12,11 +12,11 @@ namespace Microsoft.Xna.Framework.Graphics
 	internal partial class Shader
 	{
 #if DIRECTX
-		private VertexShader _vertexShader;
+		protected VertexShader _vertexShader;
 
-        private PixelShader _pixelShader;
+        protected PixelShader _pixelShader;
 
-        public byte[] Bytecode { get; private set; }
+        public byte[] Bytecode { get; protected set; }
 		
         public void Apply(  GraphicsDevice graphicsDevice, 
                             EffectParameterCollection parameters,
