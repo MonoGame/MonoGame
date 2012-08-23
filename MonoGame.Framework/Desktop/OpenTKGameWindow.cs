@@ -166,6 +166,10 @@ namespace Microsoft.Xna.Framework
             if (winWidth == 0 || winHeight == 0)
                 return;
 
+            //If we've already got a pending change, do nothing
+            if (updateClientBounds)
+                return;
+            
             Game.GraphicsDevice.PresentationParameters.BackBufferWidth = winWidth;
             Game.GraphicsDevice.PresentationParameters.BackBufferHeight = winHeight;
 

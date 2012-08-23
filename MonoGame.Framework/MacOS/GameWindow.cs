@@ -87,6 +87,8 @@ namespace Microsoft.Xna.Framework
 
 			// Enable multi-touch
 			//MultipleTouchEnabled = true;
+			
+			Mouse.Window = this;
 		}
 
 		public GameWindow(Game game, RectangleF frame, NSOpenGLContext context) :
@@ -457,7 +459,7 @@ namespace Microsoft.Xna.Framework
 			if (!_game.IsMouseVisible)
 				AddCursorRect(Frame, cursor);
 			else
-				AddCursorRect(Frame, NSCursor.CurrentSystemCursor);
+				AddCursorRect(Frame, NSCursor.ArrowCursor);
 
 		}
 
@@ -542,7 +544,7 @@ namespace Microsoft.Xna.Framework
 		public override void MouseDown (NSEvent theEvent)
 		{
 			PointF loc = theEvent.LocationInWindow;
-			SetMousePosition (loc);
+			UpdateMousePosition (loc);
 			switch (theEvent.Type) {
 			case NSEventType.LeftMouseDown:
 				Mouse.State.LeftButton = ButtonState.Pressed;
@@ -553,7 +555,7 @@ namespace Microsoft.Xna.Framework
 		public override void MouseUp (NSEvent theEvent)
 		{
 			PointF loc = theEvent.LocationInWindow;
-			SetMousePosition (loc);
+			UpdateMousePosition (loc);
 			switch (theEvent.Type) {
 
 			case NSEventType.LeftMouseUp:
@@ -565,13 +567,13 @@ namespace Microsoft.Xna.Framework
 		public override void MouseDragged (NSEvent theEvent)
 		{
 			PointF loc = theEvent.LocationInWindow;
-			SetMousePosition (loc);
+			UpdateMousePosition (loc);
 		}
 		
 		public override void RightMouseDown (NSEvent theEvent)
 		{
 			PointF loc = theEvent.LocationInWindow;
-			SetMousePosition (loc);
+			UpdateMousePosition (loc);
 			switch (theEvent.Type) {
 			case NSEventType.RightMouseDown:
 				Mouse.State.RightButton = ButtonState.Pressed;
@@ -582,7 +584,7 @@ namespace Microsoft.Xna.Framework
 		public override void RightMouseUp (NSEvent theEvent)
 		{
 			PointF loc = theEvent.LocationInWindow;
-			SetMousePosition (loc);
+			UpdateMousePosition (loc);
 			switch (theEvent.Type) {
 			case NSEventType.RightMouseUp:
 				Mouse.State.RightButton = ButtonState.Released;
@@ -593,13 +595,13 @@ namespace Microsoft.Xna.Framework
 		public override void RightMouseDragged (NSEvent theEvent)
 		{
 			PointF loc = theEvent.LocationInWindow;
-			SetMousePosition (loc);
+			UpdateMousePosition (loc);
 		}
 		
 		public override void OtherMouseDown (NSEvent theEvent)
 		{
 			PointF loc = theEvent.LocationInWindow;
-			SetMousePosition (loc);
+			UpdateMousePosition (loc);
 			switch (theEvent.Type) {
 			case NSEventType.OtherMouseDown:
 				Mouse.State.MiddleButton = ButtonState.Pressed;
@@ -610,7 +612,7 @@ namespace Microsoft.Xna.Framework
 		public override void OtherMouseUp (NSEvent theEvent)
 		{
 			PointF loc = theEvent.LocationInWindow;
-			SetMousePosition (loc);
+			UpdateMousePosition (loc);
 			switch (theEvent.Type) {
 			case NSEventType.OtherMouseUp:
 				Mouse.State.MiddleButton = ButtonState.Released;
@@ -621,20 +623,20 @@ namespace Microsoft.Xna.Framework
 		public override void OtherMouseDragged (NSEvent theEvent)
 		{
 			PointF loc = theEvent.LocationInWindow;
-			SetMousePosition (loc);
+			UpdateMousePosition (loc);
 		}
 		
 		public override void ScrollWheel (NSEvent theEvent)
 		{
 			PointF loc = theEvent.LocationInWindow;
-			SetMousePosition(loc);
+			UpdateMousePosition(loc);
 			
 			switch (theEvent.Type) {
 				case NSEventType.ScrollWheel:
 					if (theEvent.DeltaY > 0) {
-						Mouse.State.ScrollWheelValue += (theEvent.DeltaY*0.1f+0.09f)*1200;
+						Mouse.ScrollWheelValue += (theEvent.DeltaY*0.1f+0.09f)*1200;
 					} else {
-						Mouse.State.ScrollWheelValue += (theEvent.DeltaY*0.1f-0.09f)*1200;
+						Mouse.ScrollWheelValue += (theEvent.DeltaY*0.1f-0.09f)*1200;
 					}
 				break;
 			}	
@@ -643,7 +645,7 @@ namespace Microsoft.Xna.Framework
 		public override void MouseMoved (NSEvent theEvent)
 		{
 			PointF loc = theEvent.LocationInWindow;
-			SetMousePosition (loc);
+			UpdateMousePosition (loc);
 
 			switch (theEvent.Type) {
 				case NSEventType.MouseMoved:
@@ -652,7 +654,7 @@ namespace Microsoft.Xna.Framework
 			}			
 		}
 
-		private void SetMousePosition (PointF location)
+		private void UpdateMousePosition (PointF location)
 		{
 			Mouse.State.X = (int)location.X;
 			Mouse.State.Y = (int)(ClientBounds.Height - location.Y);			

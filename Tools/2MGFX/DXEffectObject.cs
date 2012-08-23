@@ -5,7 +5,7 @@ using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-	public partial class DXEffectObject
+	internal partial class DXEffectObject
 	{
 		public enum D3DRENDERSTATETYPE
         {
@@ -556,7 +556,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			new state_info(STATE_CLASS.SETSAMPLER, 0, "Sampler"),
 		};
 
-        static public EffectParameterClass ToParameterClass( D3DXPARAMETER_CLASS class_ )
+        static public EffectParameterClass ToXNAParameterClass( D3DXPARAMETER_CLASS class_ )
         {
 			switch (class_) 
             {
@@ -576,7 +576,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
         }
 
-        static public EffectParameterType ToParameterType(D3DXPARAMETER_TYPE type)
+        static public EffectParameterType ToXNAParameterType(D3DXPARAMETER_TYPE type)
         {
 			switch (type) 
             {
@@ -606,7 +606,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
         }
 
-        static internal VertexElementUsage ToVertexElementUsage(MojoShader.MOJOSHADER_usage usage)
+        static internal VertexElementUsage ToXNAVertexElementUsage(MojoShader.MOJOSHADER_usage usage)
         {
             switch (usage)
             {
@@ -665,11 +665,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public d3dx_technique[] Techniques { get; private set; }
 
-        public List<DXShader> Shaders { get; private set; }
+        public List<DXShaderData> Shaders { get; private set; }
 
-        private const string Header = "MGFX";
-
-        private const int Version = 2;
+        public List<DXConstantBufferData> ConstantBuffers { get; private set; }
 	}
 }
 

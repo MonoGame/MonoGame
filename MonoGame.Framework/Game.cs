@@ -138,8 +138,8 @@ namespace Microsoft.Xna.Framework
             Content = new ContentManager(_services);
 
             Platform = GamePlatform.Create(this);
-            Platform.Activated += Platform_Activated;
-            Platform.Deactivated += Platform_Deactivated;
+            Platform.Activated += OnActivated;
+            Platform.Deactivated += OnDeactivated;
             _services.AddService(typeof(GamePlatform), Platform);
 
 #if WINRT
@@ -357,6 +357,26 @@ namespace Microsoft.Xna.Framework
         {
             _suppressDraw = true;
         }
+        
+        public void RunOneFrame()
+        {
+            AssertNotDisposed();
+            if (!Platform.BeforeRun())
+                return;
+
+            if (!_initialized) {
+                DoInitialize ();
+                _initialized = true;
+            }
+
+            BeginRun();
+
+            //Not quite right..
+            Tick ();
+
+            EndRun ();
+
+        }
 
         public void Run()
         {
@@ -369,8 +389,10 @@ namespace Microsoft.Xna.Framework
             if (!Platform.BeforeRun())
                 return;
 
-            DoInitialize();
-            _initialized = true;
+            if (!_initialized) {
+                DoInitialize ();
+                _initialized = true;
+            }
 
             BeginRun();
             switch (runBehavior)
@@ -539,6 +561,18 @@ namespace Microsoft.Xna.Framework
         {
             Raise(Exiting, args);
         }
+		
+		protected virtual void OnActivated (object sender, EventArgs args)
+		{
+			AssertNotDisposed();
+			Raise(Activated, args);
+		}
+		
+		protected virtual void OnDeactivated (object sender, EventArgs args)
+		{
+			AssertNotDisposed();
+			Raise(Deactivated, args);
+		}
 
         #endregion Protected Methods
 
@@ -576,18 +610,6 @@ namespace Microsoft.Xna.Framework
             Raise(ApplicationViewChanged, e);
         }
 #endif
-
-        private void Platform_Activated(object sender, EventArgs e)
-        {
-            AssertNotDisposed();
-            Raise(Activated, e);
-        }
-
-        private void Platform_Deactivated(object sender, EventArgs e)
-        {
-            AssertNotDisposed();
-            Raise(Deactivated, e);
-        }
 
         #endregion Event Handlers
 
