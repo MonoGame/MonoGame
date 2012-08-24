@@ -49,17 +49,17 @@ namespace Microsoft.Xna.Framework.Audio
 		}
 		
 		//Defer loading because some programs load soundbanks before wavebanks
-		private void Load() 
-        {	
-			FileStream soundbankstream = new FileStream(filename, FileMode.Open);
-            BinaryReader soundbankreader = new BinaryReader(soundbankstream);
+		private void Load ()
+		{	
+			FileStream soundbankstream = new FileStream (filename, FileMode.Open);
+			BinaryReader soundbankreader = new BinaryReader (soundbankstream);
             
 			//Parse the SoundBank.
 			//Thanks to Liandril for "xactxtract" for some of the offsets
 			
 			uint magic = soundbankreader.ReadUInt32 ();
 			if (magic != 0x4B424453) { //"SDBK"
-				throw new Exception("Bad soundbank format");
+				throw new Exception ("Bad soundbank format");
 			}
 			
 			uint toolVersion = soundbankreader.ReadUInt16 ();
@@ -73,7 +73,8 @@ namespace Microsoft.Xna.Framework.Audio
 			uint crc = soundbankreader.ReadUInt16 ();
 			//TODO: Verify crc (FCS16)
 			
-			soundbankreader.ReadBytes(8); //unkn
+			uint lastModifiedLow = soundbankreader.ReadUInt32 ();
+			uint lastModifiedHigh = soundbankreader.ReadUInt32 ();
 			uint platform = soundbankreader.ReadByte(); //???
 			
 			uint numSimpleCues = soundbankreader.ReadUInt16 ();
@@ -115,7 +116,7 @@ namespace Microsoft.Xna.Framework.Audio
 				byte flags = soundbankreader.ReadByte ();
 				uint soundOffset = soundbankreader.ReadUInt32 ();
 				XactSound sound = new XactSound(this, soundbankreader, soundOffset);
-				Cue cue = new Cue(cueNames[i], sound);
+				Cue cue = new Cue(audioengine, cueNames[i], sound);
 				
 				cues.Add(cue.Name, cue);
 			}
@@ -131,7 +132,7 @@ namespace Microsoft.Xna.Framework.Audio
 					soundbankreader.ReadUInt32 (); //unkn
 					
 					XactSound sound = new XactSound(this, soundbankreader, soundOffset);
-					cue = new Cue(cueNames[numSimpleCues+i], sound);
+					cue = new Cue(audioengine, cueNames[numSimpleCues+i], sound);
 				} else {
 					uint variationTableOffset = soundbankreader.ReadUInt32 ();
 					uint transitionTableOffset = soundbankreader.ReadUInt32 ();

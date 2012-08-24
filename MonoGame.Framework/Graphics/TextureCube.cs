@@ -117,7 +117,7 @@ namespace Microsoft.Xna.Framework.Graphics
         public void GetData<T>(CubeMapFace cubeMapFace, T[] data) where T : struct
         {
             //FIXME Does not compile on Android or iOS
-/*
+#if MONOMAC
             TextureTarget target = GetGLCubeFace(cubeMapFace);
             GL.BindTexture(target, this.glTexture);
             // 4 bytes per pixel
@@ -126,8 +126,21 @@ namespace Microsoft.Xna.Framework.Graphics
 
             GL.GetTexImage<T>(target, 0, PixelFormat.Bgra,
                 PixelType.UnsignedByte, data);
- */
+#else
+			throw new NotImplementedException();
+#endif
         }
+
+		public void SetData<T> (CubeMapFace face, T[] data) where T : struct
+		{
+			SetData<T> (face, 0, null, data, 0, data.Length);
+		}
+
+		public void SetData<T> (CubeMapFace face, T[] data,
+								int startIndex, int elementCount) where T : struct
+		{
+			SetData<T> (face, 0, null, data, startIndex, elementCount);
+		}
 		
 		public void SetData<T>(CubeMapFace face, int level, Rectangle? rect,
 		                       T[] data, int startIndex, int elementCount) where T : struct

@@ -99,11 +99,6 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// </summary>
         private static bool _displayChanged = false;
 
-        /// <summary>
-        /// The touch event we're tracking for fake mouse input.
-        /// </summary>
-        private static int _mouseTouchId = -1;
-
         internal static Queue<GestureSample> GestureList = new Queue<GestureSample>();
 		internal static event EventHandler EnabledGesturesChanged;
         internal static TouchPanelCapabilities Capabilities = new TouchPanelCapabilities();
@@ -224,7 +219,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
                 // Get the window size.
                 //
                 // TODO: This will be alot smoother once we get XAML working with Game.
-                Vector2 windowSize = Vector2.One;
+                var windowSize = Vector2.One;
                 if (Game.Instance != null)
                     windowSize = new Vector2(   Game.Instance.Window.ClientBounds.Width,
                                                 Game.Instance.Window.ClientBounds.Height);
@@ -246,47 +241,6 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
             // Apply the touch scale to the new location.
             _events.Add(new TouchLocation(id, state, position * _touchScale));
-
-            // TODO: We need to unify the Mouse code in order to get
-            // the fake mouse events to work properly across all devices.
-
-            // TODO: Another way to do this is to have Mouse.GetState() query
-            // TouchPanel to build state on demand.
-            //
-            // Android does it that way... is it better?
-
-            // Does this device has a mouse connected?
-#if IPHONE
-            var isMouseConnected = false;
-#elif WINRT
-            // NOTE: Some WinRT devices have a mouse driver installed even when
-            // there is no physical mouse connected to the device.  You can fix 
-            // this by disabling the mouse in the Device Manager.
-            var mouseCapabilities = new Windows.Devices.Input.MouseCapabilities();
-            var isMouseConnected = mouseCapabilities.MousePresent != 0;
-#endif
-
-#if IPHONE || WINRT
-
-            // If we don't have a mouse then send fake mouse
-            // events using the touch state.
-            if (!isMouseConnected && (_mouseTouchId == -1 || _mouseTouchId == id))
-            {
-                Mouse.State.X = (int)(position.X * _touchScale.X);
-                Mouse.State.Y = (int)(position.Y * _touchScale.Y);
-
-                if (state == TouchLocationState.Released)
-                {
-                    Mouse.State.LeftButton = ButtonState.Released;
-                    _mouseTouchId = -1;
-                }
-                else
-                {
-                    Mouse.State.LeftButton = ButtonState.Pressed;
-                    _mouseTouchId = id;
-                }
-            }
-#endif
         }
 
         internal static void UpdateState()
