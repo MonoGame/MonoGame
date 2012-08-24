@@ -291,7 +291,7 @@
     <Compile Include="PSSuite\Input\AccelerometerState.cs" />
     <Compile Include="PSSuite\Input\GamePad.cs" />
     <Compile Include="PSSuite\Input\Keyboard.cs" />
-    <Compile Include="PSSuite\Input\Mouse.cs" />
+    <Compile Include="Input\Mouse.cs" />
     <Compile Include="Graphics\Texture2D.cs" />
     <Compile Include="Graphics\SpriteFont.cs" />
     <Compile Include="Graphics\Effect\EffectParameter.cs" />
@@ -309,7 +309,8 @@
     <Compile Include="Audio\AudioCategory.cs" />
     <Compile Include="Graphics\SpriteBatch.cs" />
     <Compile Include="Graphics\TextureCube.cs" />
-    <Compile Include="Graphics\Effect\DXShader.cs" />
+    <Compile Include="Graphics\Effect\MGFXShader.cs" />
+    <Compile Include="Graphics\Effect\Shader.cs" />
     <Compile Include="Graphics\Vertices\IndexBuffer.cs" />
     <Compile Include="Graphics\Vertices\VertexBuffer.cs" />
     <Compile Include="LaunchParameters.cs" />

@@ -63,6 +63,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Audio\AudioFileType.cs" />
+    <Compile Include="Audio\AudioFormat.cs" />
+    <Compile Include="Audio\ConversionFormat.cs" />
+    <Compile Include="Audio\ConversionQuality.cs" />
     <Compile Include="ChildCollection.cs" />
     <Compile Include="ContentBuildLogger.cs" />
     <Compile Include="ContentIdentity.cs" />
@@ -117,9 +121,16 @@
     <Compile Include="PipelineException.cs" />
     <Compile Include="ProcessorParameter.cs" />
     <Compile Include="ProcessorParameterCollection.cs" />
+    <Compile Include="Processors\CompiledEffectContent.cs" />
+    <Compile Include="Processors\EffectProcessor.cs" />
+    <Compile Include="Processors\EffectProcessorDebugMode.cs" />
     <Compile Include="Processors\FontDescriptionProcessor.cs" />
+    <Compile Include="Processors\MaterialProcessor.cs" />
+    <Compile Include="Processors\MaterialProcessorDefaultEffect.cs" />
+    <Compile Include="Processors\SongContent.cs" />
     <Compile Include="Processors\SpriteFontContent.cs" />
     <Compile Include="Processors\TextureProcessor.cs" />
+    <Compile Include="Processors\TextureProcessorOutputFormat.cs" />
     <Compile Include="Processors\VertexBufferContent.cs" />
     <Compile Include="Processors\VertexDeclarationContent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

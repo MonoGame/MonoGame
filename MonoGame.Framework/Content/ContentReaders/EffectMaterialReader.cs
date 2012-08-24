@@ -38,68 +38,39 @@ purpose and non-infringement.
 */
 #endregion License
 
+using System;
+using System.Collections.Generic;
 
-﻿
-namespace Microsoft.Xna.Framework.Input
+using Microsoft.Xna.Framework.Graphics;
+
+namespace Microsoft.Xna.Framework.Content
 {
-	public static class Mouse
+	internal class EffectMaterialReader : ContentTypeReader<EffectMaterial>
 	{
-		private static int _x, _y;
-		private static float _scrollWheelValue;
-		private static ButtonState _leftButton = ButtonState.Released;
-		private static ButtonState _rightButton = ButtonState.Released;
-		private static ButtonState _middleButton = ButtonState.Released;
-		
-		public static MouseState GetState ()
+		protected internal override EffectMaterial Read (ContentReader input, EffectMaterial existingInstance)
 		{
-			MouseState ms = new MouseState(_x,_y);
-			ms.LeftButton = _leftButton;
-			ms.RightButton = _rightButton;
-			ms.MiddleButton = _middleButton;
-			ms.ScrollWheelValue = (int)_scrollWheelValue;
-			
-			return ms;
-		}
+			var effect = input.ReadExternalReference<Effect> ();
+			var effectMaterial = new EffectMaterial (effect);
 
-		public static void SetPosition (int x, int y)
-		{
-			_x = x;
-			_y = y;
-		}
+			var dict = input.ReadObject<Dictionary<string, object>> ();
 
-		internal static void ResetMouse () {
-			_leftButton = ButtonState.Released;
-			_rightButton = ButtonState.Released;
-			_middleButton = ButtonState.Released;
-		}
-
-		internal static ButtonState LeftButton { 
-			get {
-				return _leftButton;
+			foreach (KeyValuePair<string, object> item in dict) {
+				var parameter = effectMaterial.Parameters [item.Key];
+				if (parameter != null) {
+					if (typeof(Texture).IsAssignableFrom (item.Value.GetType ())) {
+						parameter.SetValue ((Texture)item.Value);
+					} else {
+						throw new NotImplementedException ();
+					}
+				} else {
+#if DEBUG
+					Console.WriteLine ("No parameter " + item.Key);
+#endif
+				}
 			}
-			set { _leftButton = value; }
-		}
 
-		internal static ButtonState MiddleButton { 
-			get {
-				return _middleButton;
-			}
-			set { _middleButton = value; }			
-		}
 
-		internal static ButtonState RightButton { 
-			get {
-				return _rightButton;
-			}
-			set { _rightButton = value; }
-		}
-
-		internal static float ScrollWheelValue { 
-			get {
-				return _scrollWheelValue;
-			}
-			set { _scrollWheelValue = value; }
+			return effectMaterial;
 		}
 	}
 }
-
