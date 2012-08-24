@@ -83,6 +83,8 @@ namespace Microsoft.Xna.Framework.Media
 		}
 		
 #if IPHONE
+
+        private PlaylistCollection _playLists;
 		public PlaylistCollection Playlists
 		{
 			get
