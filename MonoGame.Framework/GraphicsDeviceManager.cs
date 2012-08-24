@@ -40,6 +40,7 @@ purpose and non-infringement.
 
 using System;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input.Touch;
 
 #if MONOMAC
 using MonoMac.OpenGL;
@@ -66,8 +67,10 @@ namespace Microsoft.Xna.Framework
         private bool _preferMultiSampling;
         private DisplayOrientation _supportedOrientations;
         private bool _synchronizedWithVerticalRetrace = true;
-        private bool _wantFullScreen = true;
 
+#if !(WINDOWS || LINUX || WINRT)
+        private bool _wantFullScreen = false;
+#endif
         public static readonly int DefaultBackBufferHeight = 480;
         public static readonly int DefaultBackBufferWidth = 800;
 
@@ -92,7 +95,7 @@ namespace Microsoft.Xna.Framework
 #endif
 
             _preferredBackBufferFormat = SurfaceFormat.Color;
-            _preferredDepthStencilFormat = DepthFormat.None;
+            _preferredDepthStencilFormat = DepthFormat.Depth24;
             _synchronizedWithVerticalRetrace = true;
 
             if (game.Services.GetService(typeof(IGraphicsDeviceManager)) != null)
@@ -241,6 +244,15 @@ namespace Microsoft.Xna.Framework
             _game.Window.SetOrientation(_game.Window.CurrentOrientation, false);
 #endif
 #endif
+
+            // Set the new display size on the touch panel.
+            //
+            // TODO: In XNA this seems to be done as part of the 
+            // GraphicsDevice.DeviceReset event... we need to get 
+            // those working.
+            //
+            TouchPanel.DisplayWidth = _graphicsDevice.PresentationParameters.BackBufferWidth;
+            TouchPanel.DisplayHeight = _graphicsDevice.PresentationParameters.BackBufferHeight;
         }
 
         private void Initialize()
@@ -282,6 +294,15 @@ namespace Microsoft.Xna.Framework
 #endif
 
 #endif // WINDOWS || WINRT
+
+            // Set the new display size on the touch panel.
+            //
+            // TODO: In XNA this seems to be done as part of the 
+            // GraphicsDevice.DeviceReset event... we need to get 
+            // those working.
+            //
+            TouchPanel.DisplayWidth = _graphicsDevice.PresentationParameters.BackBufferWidth;
+            TouchPanel.DisplayHeight = _graphicsDevice.PresentationParameters.BackBufferHeight;
         }
 
         public void ToggleFullScreen()

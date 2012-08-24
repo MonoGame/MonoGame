@@ -190,57 +190,29 @@ namespace Microsoft.Xna.Framework
             if (!Game.IsActive)
                 return;
 
-            try {
-                if (PerformPendingExit())
-                    return;
-                if (IsPlayingVideo)
-                    return;
+            if (IsPlayingVideo)
+                return;
 
-                // FIXME: Remove this call, and the whole Tick method, once
-                //        GraphicsDevice is where platform-specific Present
-                //        functionality is actually implemented.  At that
-                //        point, it should be possible to pass Game.Tick
-                //        directly to NSTimer.CreateRepeatingTimer.
-                _viewController.View.MakeCurrent();
-                Game.Tick ();
+            // FIXME: Remove this call, and the whole Tick method, once
+            //        GraphicsDevice is where platform-specific Present
+            //        functionality is actually implemented.  At that
+            //        point, it should be possible to pass Game.Tick
+            //        directly to NSTimer.CreateRepeatingTimer.
+            _viewController.View.MakeCurrent();
+            Game.Tick ();
 
-                if (!IsPlayingVideo)
-                    _viewController.View.Present ();
-
-                PerformPendingExit();
-            } catch (Exception ex) {
-#if DEBUG				
-                Console.WriteLine(
-                    "Error while processing the main game loop: {0}\n{1}",
-                    ex.Message, ex.StackTrace);
-#endif
-                Game.Exit ();
-            }
-        }
-
-        private bool PerformPendingExit()
-        {
-            if (!_isExitPending)
-                return false;
-
-            _isExitPending = false;
-            if (_runTimer != null) {
-                _runTimer.Invalidate ();
-                _runTimer.Dispose ();
-                _runTimer = null;
-            }
-            UIApplication.SharedApplication.SetStatusBarHidden(false, UIStatusBarAnimation.Fade);
-            StopObservingUIApplication ();
-            RaiseAsyncRunLoopEnded ();
-            return true;
+            if (!IsPlayingVideo)
+                _viewController.View.Present ();
         }
 
         public override bool BeforeDraw(GameTime gameTime)
         {
-		// Update our OpenAL sound buffer pools
-		soundControllerInstance.Update();
+    		// Update our OpenAL sound buffer pools
+    		soundControllerInstance.Update();
+
             if (IsPlayingVideo)
                 return false;
+
             return true;
         }
 
@@ -267,7 +239,7 @@ namespace Microsoft.Xna.Framework
 
         public override void Exit()
         {
-            _isExitPending = true;
+            // Do Nothing: iOS games do not "exit" or shut down.
         }
 
         private void BeginObservingUIApplication()
@@ -296,12 +268,6 @@ namespace Microsoft.Xna.Framework
 
             foreach (var entry in events)
                 _applicationObservers.Add(NSNotificationCenter.DefaultCenter.AddObserver(entry.Item1, entry.Item2));
-        }
-
-        private void StopObservingUIApplication()
-        {
-            NSNotificationCenter.DefaultCenter.RemoveObservers(_applicationObservers);
-            _applicationObservers.Clear();
         }
 
         #region Notification Handling

@@ -38,52 +38,17 @@ purpose and non-infringement.
 */
 #endregion License
 
-using System;
-using Microsoft.Xna.Framework.Input.Touch;
-
-namespace Microsoft.Xna.Framework.Input
+namespace Microsoft.Xna.Framework.Content
 {
-    public static class Mouse
-    {
-        private static int _x, _y;
+	internal class ExternalReferenceReader : ContentTypeReader
+	{
+		public ExternalReferenceReader() : base(null)
+		{
+		}
 
-        public static IntPtr WindowHandle { get; set; }
-		
-        public static MouseState GetState()
-        {
-            var state = TouchPanel.GetState();
-            if (state.Count > 0)
-            {
-                var middlePosition = Vector2.Zero;
-                var currentNumberOfTouches = 0;
-                for (int i = 0; i < state.Count; i++)
-                {
-                    if (state[i].State == TouchLocationState.Pressed ||
-                        state[i].State == TouchLocationState.Moved)
-                    {
-                        middlePosition += state[i].Position;
-                        currentNumberOfTouches++;
-                        break;
-                    }
-                }
-
-                if (currentNumberOfTouches > 1)
-                    middlePosition /= currentNumberOfTouches;
-
-                if (middlePosition != Vector2.Zero)
-                {
-                    _x = (int) middlePosition.X;
-                    _y = (int) middlePosition.Y;
-                }
-            }
-            return new MouseState(_x, _y);
-        }
-
-        public static void SetPosition(int x, int y)
-        {
-            _x = x;
-            _y = y;
-        }
-    }
+		protected internal override object Read (ContentReader input, object existingInstance)
+		{
+			return input.ReadExternalReference<object> ();
+		}
+	}
 }
-

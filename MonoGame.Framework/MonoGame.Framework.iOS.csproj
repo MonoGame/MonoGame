@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -304,8 +304,8 @@
     <Compile Include="iOS\iOSGameView_GLAbstraction.cs" />
     <Compile Include="iOS\iOSGameView_Touch.cs" />
     <Compile Include="iOS\PowerStatus.cs" />
-    <Compile Include="iOS\Media\MediaSource.cs" />
-    <Compile Include="iOS\Media\MediaLibrary.cs" />
+    <Compile Include="Media\MediaSource.cs" />
+    <Compile Include="Media\MediaLibrary.cs" />
     <Compile Include="iOS\Input\Accelerometer.cs" />
     <Compile Include="iOS\Media\Video.cs" />
     <Compile Include="iOS\Media\VideoPlayer.cs" />
@@ -331,7 +331,9 @@
     <Compile Include="MacOS\Audio\SoundEffect.cs" />
     <Compile Include="MacOS\Audio\SoundEffectInstance.cs" />
     <Compile Include="Graphics\Effect\AlphaTestEffect.cs" />
-    <Compile Include="Graphics\Effect\DXShader.cs" />
+    <Compile Include="Graphics\Effect\MGFXShader.cs" />
+    <Compile Include="Graphics\Effect\Shader.cs" />
+    <Compile Include="Graphics\Effect\Shader.ogl.cs" />
     <Compile Include="Graphics\Effect\EffectAnnotation.cs" />
     <Compile Include="Graphics\Effect\EffectAnnotationCollection.cs" />
     <Compile Include="Graphics\Effect\EffectHelpers.cs" />
@@ -428,6 +430,7 @@
     <Compile Include="Graphics\Effect\ConstantBuffer.cs" />
     <Compile Include="Input\Touch\TouchInfo.cs" />
   </ItemGroup>
+  <Import Project="$(ProgramFiles)\MSBuild\MonoTouch\Novell.MonoTouch.Common.targets" Condition="'$(windir)' != '' " />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
     <MonoDevelop>

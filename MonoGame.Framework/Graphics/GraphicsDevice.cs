@@ -141,7 +141,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// The active vertex shader.
         /// </summary>
-        internal DXShader _vertexShader;
+        internal Shader _vertexShader;
 
         private readonly Dictionary<ulong, SharpDX.Direct3D11.InputLayout> _inputLayouts = new Dictionary<ulong, SharpDX.Direct3D11.InputLayout>();
 
@@ -160,7 +160,9 @@ namespace Microsoft.Xna.Framework.Graphics
 		internal static int attributeNormal = 4;
 		internal static int attributeBlendIndicies = 5;
 		internal static int attributeBlendWeight = 6;
-		internal static int attributeTexCoord = 7; //must be the last one, texture index locations are added to it
+		internal static int attributeBinormal = 7;
+		internal static int attributeTangent = 8;
+		internal static int attributeTexCoord = 9; //must be the last one, texture index locations are added to it
 
         private uint VboIdArray;
         private uint VboIdElement;
@@ -208,7 +210,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		List<string> extensions = new List<string>();
 
+#if OPENGL
         internal int glFramebuffer;
+#endif
 
 #if DIRECTX
 
@@ -276,17 +280,18 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 
-        public GraphicsDevice()
-        {
-            // Initialize the main viewport
-            _viewport = new Viewport(0, 0,
+        public GraphicsDevice ()
+		{
+			// Initialize the main viewport
+			_viewport = new Viewport (0, 0,
 			                         DisplayMode.Width, DisplayMode.Height);
-            _viewport.MaxDepth = 1.0f;
+			_viewport.MaxDepth = 1.0f;
 
-            Textures = new TextureCollection(16);
-            SamplerStates = new SamplerStateCollection(16);
+			Textures = new TextureCollection (16);
+			SamplerStates = new SamplerStateCollection (16);
 
-            PresentationParameters = new PresentationParameters();
+			PresentationParameters = new PresentationParameters ();
+			PresentationParameters.DepthStencilFormat = DepthFormat.Depth24;
         }
 
         internal void Initialize()
@@ -299,13 +304,13 @@ namespace Microsoft.Xna.Framework.Graphics
             // Setup extensions.
 #if OPENGL
 #if GLES
-            string[] extstring = GL.GetString(RenderbufferStorage.Extensions).Split(' ');            			
+            string extstring = GL.GetString(RenderbufferStorage.Extensions);            			
 #else
-            string[] extstring = GL.GetString(StringName.Extensions).Split(' ');	
+            string extstring = GL.GetString(StringName.Extensions);	
 #endif
-            if (extstring != null)
+            if (!string.IsNullOrEmpty(extstring))
             {
-                extensions.AddRange(extstring);
+                extensions.AddRange(extstring.Split(' '));
                 System.Diagnostics.Debug.WriteLine("Supported extensions:");
                 foreach (string extension in extensions)
                     System.Diagnostics.Debug.WriteLine(extension);
@@ -759,7 +764,11 @@ namespace Microsoft.Xna.Framework.Graphics
 				bufferMask = bufferMask | ClearBufferMask.StencilBufferBit;
 			}
 			if (options.HasFlag(ClearOptions.DepthBuffer)) {
-				GL.ClearDepth (depth);
+#if GLES
+                GL.ClearDepth (depth);
+#else
+                GL.ClearDepth ((double)depth);
+#endif
 				bufferMask = bufferMask | ClearBufferMask.DepthBufferBit;
 			}
 
@@ -966,7 +975,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             get
             {
-                throw new NotImplementedException();
+                return GraphicsDeviceStatus.Normal;
             }
         }
 
@@ -991,8 +1000,12 @@ namespace Microsoft.Xna.Framework.Graphics
                 lock (_d3dContext) 
                     _d3dContext.Rasterizer.SetViewports(viewport);
 #elif OPENGL
-				GL.Viewport (value.X, value.Y, value.Width, value.Height);
-				GL.DepthRange(value.MinDepth, value.MaxDepth);
+                GL.Viewport (value.X, PresentationParameters.BackBufferHeight - value.Y - value.Height, value.Width, value.Height);
+#if GLES
+                GL.DepthRange(value.MinDepth, value.MaxDepth);
+#else
+                GL.DepthRange((double)value.MinDepth, (double)value.MaxDepth);
+#endif
 #endif
             }
         }
@@ -1257,7 +1270,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 if (_vertexBuffer != null)
                     _d3dContext.InputAssembler.SetVertexBuffers(0, _vertexBuffer._binding);
                 else
-                    _d3dContext.InputAssembler.SetVertexBuffers(0, null);
+                    _d3dContext.InputAssembler.SetVertexBuffers(0);
             }
 #elif OPENGL
             if (_vertexBuffer != null)
@@ -1315,7 +1328,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _d3dContext.InputAssembler.InputLayout = GetInputLayout(_vertexShader, _vertexBuffer.VertexDeclaration);
         }
 
-        private SharpDX.Direct3D11.InputLayout GetInputLayout(DXShader shader, VertexDeclaration decl)
+        private SharpDX.Direct3D11.InputLayout GetInputLayout(Shader shader, VertexDeclaration decl)
         {
             SharpDX.Direct3D11.InputLayout layout;
 
