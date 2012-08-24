@@ -77,7 +77,6 @@
     <Compile Include="DXConstantBufferData.writer.cs" />
     <Compile Include="DXEffectObject.cs" />
     <Compile Include="DXEffectObject.hlsl.cs" />
-    <Compile Include="DXEffectObject.fxparser.cs" />
     <Compile Include="DXEffectObject.writer.cs" />
     <Compile Include="DXExpression.cs">
       <SubType>Code</SubType>

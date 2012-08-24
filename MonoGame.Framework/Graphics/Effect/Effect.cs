@@ -90,7 +90,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 if (shader.NeedsRecompile)
                 {
-                    shader.Compile();
+                    shader.CompileShader();
                     shader.NeedsRecompile = false;
                 }
             }
