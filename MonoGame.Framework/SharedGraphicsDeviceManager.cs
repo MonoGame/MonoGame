@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input.Touch;
 
 #if WINRT
 using Windows.UI.Xaml.Controls;
@@ -92,12 +93,24 @@ namespace Microsoft.Xna.Framework
             GraphicsDevice.PresentationParameters.SwapChainPanel = SwapChainPanel;
 
             if (createDevice)
+            {
+                GraphicsDevice.GraphicsProfile = GraphicsProfile;
                 GraphicsDevice.Initialize();
+            }
             else
             {
                 GraphicsDevice.CreateSizeDependentResources();
                 GraphicsDevice.ApplyRenderTargets(null);
             }
+
+            // Set the new display size on the touch panel.
+            //
+            // TODO: In XNA this seems to be done as part of the 
+            // GraphicsDevice.DeviceReset event... we need to get 
+            // those working.
+            //
+            TouchPanel.DisplayWidth = GraphicsDevice.PresentationParameters.BackBufferWidth;
+            TouchPanel.DisplayHeight = GraphicsDevice.PresentationParameters.BackBufferHeight;
         }
 
         public void Dispose()

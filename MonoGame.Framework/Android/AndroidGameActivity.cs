@@ -78,6 +78,12 @@ namespace Microsoft.Xna.Framework
             (deviceManager as GraphicsDeviceManager).ForceSetFullScreen();
             Game.Window.RequestFocus();
         }
+
+        protected override void OnRestart()
+        {
+            base.OnRestart();
+            Game.Window.OnRestart();
+        }
     }
 	
 	public static class ActivityExtensions

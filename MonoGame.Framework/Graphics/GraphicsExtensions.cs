@@ -436,7 +436,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 		
 		
-		internal static void GetGLFormat(this SurfaceFormat format,
+		internal static void GetGLFormat (this SurfaceFormat format,
 		                                 out PixelInternalFormat glInternalFormat,
 		                                 out PixelFormat glFormat,
 		                                 out PixelType glType)
@@ -445,8 +445,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			glFormat = PixelFormat.Rgba;
 			glType = PixelType.UnsignedByte;
 			
-			switch (format)
-			{
+			switch (format) {
 			case SurfaceFormat.Color:
 				glInternalFormat = PixelInternalFormat.Rgba;
 				glFormat = PixelFormat.Rgba;
@@ -488,6 +487,12 @@ namespace Microsoft.Xna.Framework.Graphics
 			case SurfaceFormat.Dxt5:
 				glInternalFormat = PixelInternalFormat.CompressedRgbaS3tcDxt5Ext;
 				glFormat = (PixelFormat)All.CompressedTextureFormats;
+				break;
+			
+			case SurfaceFormat.Single:
+				glInternalFormat = PixelInternalFormat.R32f;
+				glFormat = PixelFormat.Red;
+				glType = PixelType.Float;
 				break;
 #endif
 				
@@ -531,7 +536,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 case SurfaceFormat.Alpha8:
                     return 1;
 				case SurfaceFormat.NormalizedByte4:
-					return 4;
+                    return 4;
                 default:
                     throw new NotImplementedException();
             }

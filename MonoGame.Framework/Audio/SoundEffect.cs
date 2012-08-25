@@ -74,8 +74,11 @@ namespace Microsoft.Xna.Framework.Audio
 #endif
 
         private string _name;
-		private string _filename = "";		
+#if !WINRT
+		private string _filename = "";
         private byte[] _data;
+#endif
+
 #if WINRT
         internal SoundEffect()
         {
@@ -306,7 +309,7 @@ namespace Microsoft.Xna.Framework.Audio
             var instance = new SoundEffectInstance();
 #if WINRT
             instance._effect = this;
-            instance._voice = new SourceVoice(SoundEffect.Device, _format);            
+            instance._voice = new SourceVoice(SoundEffect.Device, _format, VoiceFlags.None, XAudio2.MaximumFrequencyRatio);            
 #else			
 			instance.Sound = _sound;			
 #endif
@@ -431,8 +434,7 @@ namespace Microsoft.Xna.Framework.Audio
         static SoundEffect()
         {
             Device = new XAudio2();
-            if (Device.StartEngine() != Result.Ok)
-                throw new Exception("XAudio2.StartEngine has failed.");
+            Device.StartEngine();
 
             // Let windows autodetect number of channels and sample rate.
             MasterVoice = new MasteringVoice(Device, XAudio2.DefaultChannels, XAudio2.DefaultSampleRate);            

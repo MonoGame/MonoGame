@@ -141,7 +141,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// The active vertex shader.
         /// </summary>
-        internal DXShader _vertexShader;
+        internal Shader _vertexShader;
 
         private readonly Dictionary<ulong, SharpDX.Direct3D11.InputLayout> _inputLayouts = new Dictionary<ulong, SharpDX.Direct3D11.InputLayout>();
 
@@ -160,7 +160,9 @@ namespace Microsoft.Xna.Framework.Graphics
 		internal static int attributeNormal = 4;
 		internal static int attributeBlendIndicies = 5;
 		internal static int attributeBlendWeight = 6;
-		internal static int attributeTexCoord = 7; //must be the last one, texture index locations are added to it
+		internal static int attributeBinormal = 7;
+		internal static int attributeTangent = 8;
+		internal static int attributeTexCoord = 9; //must be the last one, texture index locations are added to it
 
         private uint VboIdArray;
         private uint VboIdElement;
@@ -208,7 +210,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		List<string> extensions = new List<string>();
 
+#if OPENGL
         internal int glFramebuffer;
+#endif
 
 #if DIRECTX
 
@@ -276,35 +280,37 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 
-        public GraphicsDevice()
-        {
-            // Initialize the main viewport
-            _viewport = new Viewport(0, 0,
+        public GraphicsDevice ()
+		{
+			// Initialize the main viewport
+			_viewport = new Viewport (0, 0,
 			                         DisplayMode.Width, DisplayMode.Height);
-            _viewport.MaxDepth = 1.0f;
+			_viewport.MaxDepth = 1.0f;
 
-            Textures = new TextureCollection(16);
-            SamplerStates = new SamplerStateCollection(16);
+			Textures = new TextureCollection (16);
+			SamplerStates = new SamplerStateCollection (16);
 
-            PresentationParameters = new PresentationParameters();
+			PresentationParameters = new PresentationParameters ();
+			PresentationParameters.DepthStencilFormat = DepthFormat.Depth24;
         }
 
         internal void Initialize()
         {
-            // Clear the effect cache since the
-            // device context is going to be reset.
+            // TODO: This line should not be necessary as Effects are being recompiled
+            // in DeviceReset. There seems to be an issue related to static
+            // initialisation order and removing it breaks drawing in 3d.
             Effect.FlushCache();
 
             // Setup extensions.
 #if OPENGL
 #if GLES
-            string[] extstring = GL.GetString(RenderbufferStorage.Extensions).Split(' ');            			
+            string extstring = GL.GetString(RenderbufferStorage.Extensions);            			
 #else
-            string[] extstring = GL.GetString(StringName.Extensions).Split(' ');	
+            string extstring = GL.GetString(StringName.Extensions);	
 #endif
-            if (extstring != null)
+            if (!string.IsNullOrEmpty(extstring))
             {
-                extensions.AddRange(extstring);
+                extensions.AddRange(extstring.Split(' '));
                 System.Diagnostics.Debug.WriteLine("Supported extensions:");
                 foreach (string extension in extensions)
                     System.Diagnostics.Debug.WriteLine(extension);
@@ -396,22 +402,27 @@ namespace Microsoft.Xna.Framework.Graphics
             creationFlags |= SharpDX.Direct3D11.DeviceCreationFlags.Debug;
 #endif
 
-            // TODO: Maybe this should be changed based on Reach/HiDef profile?
-            var featureLevels = new []
+            // Pass the preferred feature levels based on the
+            // target profile that may have been set by the user.
+            var featureLevels = new List<FeatureLevel>();
+            if (GraphicsProfile == GraphicsProfile.HiDef)
             {
-                FeatureLevel.Level_11_1,
-                FeatureLevel.Level_11_0,
-                FeatureLevel.Level_10_1,
-                FeatureLevel.Level_10_0,
-                FeatureLevel.Level_9_3,
-                FeatureLevel.Level_9_2,
-                FeatureLevel.Level_9_1,
-            };
+                featureLevels.Add(FeatureLevel.Level_11_1);
+                featureLevels.Add(FeatureLevel.Level_11_0);
+                featureLevels.Add(FeatureLevel.Level_10_1);
+                featureLevels.Add(FeatureLevel.Level_10_0);
+            }
+            featureLevels.Add(FeatureLevel.Level_9_3);
+            featureLevels.Add(FeatureLevel.Level_9_2);
+            featureLevels.Add(FeatureLevel.Level_9_1);
 
             // Create the Direct3D device.
-            using (var defaultDevice = new SharpDX.Direct3D11.Device(DriverType.Hardware, creationFlags, featureLevels))
+            using (var defaultDevice = new SharpDX.Direct3D11.Device(DriverType.Hardware, creationFlags, featureLevels.ToArray()))
                 _d3dDevice = defaultDevice.QueryInterface<SharpDX.Direct3D11.Device1>();
+
+            // Set the correct profile based on the feature level.
             _featureLevel = _d3dDevice.FeatureLevel;
+            GraphicsProfile = _featureLevel <= FeatureLevel.Level_9_3 ? GraphicsProfile.Reach : GraphicsProfile.HiDef;
 
             // Get Direct3D 11.1 context
             _d3dContext = _d3dDevice.ImmediateContext.QueryInterface<SharpDX.Direct3D11.DeviceContext1>();
@@ -753,7 +764,11 @@ namespace Microsoft.Xna.Framework.Graphics
 				bufferMask = bufferMask | ClearBufferMask.StencilBufferBit;
 			}
 			if (options.HasFlag(ClearOptions.DepthBuffer)) {
-				GL.ClearDepth (depth);
+#if GLES
+                GL.ClearDepth (depth);
+#else
+                GL.ClearDepth ((double)depth);
+#endif
 				bufferMask = bufferMask | ClearBufferMask.DepthBufferBit;
 			}
 
@@ -906,17 +921,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void Reset()
         {
-            _viewport.Width = DisplayMode.Width;
-            _viewport.Height = DisplayMode.Height;
-
-            if (ResourcesLost)
-            {
-                ContentManager.ReloadAllContent();
-                ResourcesLost = false;
-            }
-
-            if(DeviceReset != null)
-                DeviceReset(null, new EventArgs());
+            // Manually resetting the device is not currently supported.
+            throw new NotImplementedException();
         }
 
         public void Reset(Microsoft.Xna.Framework.Graphics.PresentationParameters presentationParameters)
@@ -927,6 +933,26 @@ namespace Microsoft.Xna.Framework.Graphics
         public void Reset(Microsoft.Xna.Framework.Graphics.PresentationParameters presentationParameters, GraphicsAdapter graphicsAdapter)
         {
             throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Trigger the DeviceResetting event
+        /// Currently internal to allow the various platforms to send the event at the appropriate time.
+        /// </summary>
+        internal void OnDeviceResetting()
+        {
+            if (DeviceResetting != null)
+                DeviceResetting(this, EventArgs.Empty);
+        }
+
+        /// <summary>
+        /// Trigger the DeviceReset event to allow games to be notified of a device reset.
+        /// Currently internal to allow the various platforms to send the event at the appropriate time.
+        /// </summary>
+        internal void OnDeviceReset()
+        {
+            if (DeviceReset != null)
+                DeviceReset(this, EventArgs.Empty);
         }
 
         public Microsoft.Xna.Framework.Graphics.DisplayMode DisplayMode
@@ -949,7 +975,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             get
             {
-                throw new NotImplementedException();
+                return GraphicsDeviceStatus.Normal;
             }
         }
 
@@ -974,17 +1000,17 @@ namespace Microsoft.Xna.Framework.Graphics
                 lock (_d3dContext) 
                     _d3dContext.Rasterizer.SetViewports(viewport);
 #elif OPENGL
-				GL.Viewport (value.X, value.Y, value.Width, value.Height);
-				GL.DepthRange(value.MinDepth, value.MaxDepth);
+                GL.Viewport (value.X, PresentationParameters.BackBufferHeight - value.Y - value.Height, value.Width, value.Height);
+#if GLES
+                GL.DepthRange(value.MinDepth, value.MaxDepth);
+#else
+                GL.DepthRange((double)value.MinDepth, (double)value.MaxDepth);
+#endif
 #endif
             }
         }
 
-        public Microsoft.Xna.Framework.Graphics.GraphicsProfile GraphicsProfile
-        {
-            get;
-            set;
-        }
+        public GraphicsProfile GraphicsProfile { get; set; }
 
         public Rectangle ScissorRectangle
         {
@@ -1244,7 +1270,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 if (_vertexBuffer != null)
                     _d3dContext.InputAssembler.SetVertexBuffers(0, _vertexBuffer._binding);
                 else
-                    _d3dContext.InputAssembler.SetVertexBuffers(0, null);
+                    _d3dContext.InputAssembler.SetVertexBuffers(0);
             }
 #elif OPENGL
             if (_vertexBuffer != null)
@@ -1302,7 +1328,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _d3dContext.InputAssembler.InputLayout = GetInputLayout(_vertexShader, _vertexBuffer.VertexDeclaration);
         }
 
-        private SharpDX.Direct3D11.InputLayout GetInputLayout(DXShader shader, VertexDeclaration decl)
+        private SharpDX.Direct3D11.InputLayout GetInputLayout(Shader shader, VertexDeclaration decl)
         {
             SharpDX.Direct3D11.InputLayout layout;
 

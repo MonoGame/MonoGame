@@ -28,6 +28,7 @@ namespace Microsoft.Xna.Framework
             {
                 // Save any launch parameters to be parsed by the platform.
                 MetroGamePlatform.LaunchParameters = ((LaunchActivatedEventArgs)args).Arguments;
+                MetroGamePlatform.PreviousExecutionState = ((LaunchActivatedEventArgs)args).PreviousExecutionState;
 
                 // Construct the game.
                 _game = new T();

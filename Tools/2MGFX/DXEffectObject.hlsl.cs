@@ -8,8 +8,6 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     partial class DXEffectObject
     {
-        public List<ConstantBuffer> ConstantBuffers { get; private set; }
-        
         private DXEffectObject()
         {
         }
@@ -19,8 +17,8 @@ namespace Microsoft.Xna.Framework.Graphics
             var effect = new DXEffectObject();
 
             // These are filled out as we process stuff.
-            effect.ConstantBuffers = new List<ConstantBuffer>();
-            effect.Shaders = new List<DXShader>();
+            effect.ConstantBuffers = new List<DXConstantBufferData>();
+            effect.Shaders = new List<DXShaderData>();
 
             // Go thru the techniques and that will find all the 
             // shaders and constant buffers.
@@ -161,26 +159,21 @@ namespace Microsoft.Xna.Framework.Graphics
                     shaderFlags |= SharpDX.D3DCompiler.ShaderFlags.OptimizationLevel3;
                 }
 
-                // First compile the effect into bytecode.                
-                using (var includer = new TwoMGFX.CompilerInclude())
-                {
-                    var result = SharpDX.D3DCompiler.ShaderBytecode.Compile(
-                        shaderInfo.fileContent, 
-                        shaderFunction, 
-                        shaderProfile, 
-                        shaderFlags, 
-                        0, 
-                        null, 
-                        includer,
-                        shaderInfo.fileName);
+                // Compile the shader into bytecode.                
+                var result = SharpDX.D3DCompiler.ShaderBytecode.Compile(
+                    shaderInfo.fileContent, 
+                    shaderFunction, 
+                    shaderProfile, 
+                    shaderFlags, 
+                    0, 
+                    null, 
+                    null,
+                    shaderInfo.fileName);
 
-                    if (result.HasErrors)
-                        throw new Exception(result.Message);
+                if (result.HasErrors)
+                    throw new Exception(result.Message);
 
-                    shaderByteCode = result.Bytecode;
-
-                    //var source = shaderByteCode.Disassemble();
-                }
+                shaderByteCode = result.Bytecode;
             }
             catch (Exception ex)
             {
@@ -192,7 +185,7 @@ namespace Microsoft.Xna.Framework.Graphics
             shaderByteCode.Data.Read(bytecode, 0, bytecode.Length);
 
             // First look to see if we already created this same shader.
-            DXShader dxShader = null;
+            DXShaderData dxShader = null;
             foreach (var shader in Shaders)
             {
                 if (bytecode.SequenceEqual(shader.Bytecode))
@@ -206,9 +199,9 @@ namespace Microsoft.Xna.Framework.Graphics
             if ( dxShader == null )
             {
                 if (shaderInfo.DX11Profile)
-                    dxShader = DXShader.CreateHLSL(bytecode, isVertexShader, ConstantBuffers, Shaders.Count, shaderInfo.Debug);
+                    dxShader = DXShaderData.CreateHLSL(bytecode, isVertexShader, ConstantBuffers, Shaders.Count, shaderInfo.Debug);
                 else
-                    dxShader = DXShader.CreateGLSL(bytecode, isVertexShader, ConstantBuffers, Shaders.Count);
+                    dxShader = DXShaderData.CreateGLSL(bytecode, ConstantBuffers, Shaders.Count);
 
                 Shaders.Add(dxShader);
             }
