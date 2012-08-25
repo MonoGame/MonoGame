@@ -165,8 +165,6 @@ namespace Microsoft.Xna.Framework.Input.Touch
                     _touchLocationsReal[loc.Id] = _touchLocations[loc.Id];
                     continue;
                 }
-                else
-                    loc.ToString ();
 
                 i++;
             }
