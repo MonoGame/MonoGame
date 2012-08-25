@@ -112,39 +112,23 @@ namespace Microsoft.Xna.Framework.Graphics
 			graphicsDevice.RasterizerState = _rasterizerState;
 			graphicsDevice.SamplerStates[0] = _samplerState;
 			
-			if (_effect == null) 
-            {
-				Viewport vp = graphicsDevice.Viewport;
-                Matrix projection = Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, 0, 1);
+            // Setup the default sprite effect.
+			var vp = graphicsDevice.Viewport;
+            var projection = Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, 0, 1);
 
 #if PSS || DIRECTX
-                Matrix transform = _matrix * projection;
+            var transform = _matrix * projection;
 #else
-				Matrix halfPixelOffset = Matrix.CreateTranslation(-0.5f, -0.5f, 0);
-				Matrix transform = _matrix * (halfPixelOffset * projection);
+			var halfPixelOffset = Matrix.CreateTranslation(-0.5f, -0.5f, 0);
+			var transform = _matrix * (halfPixelOffset * projection);
 #endif
-				spriteEffect.Parameters["MatrixTransform"].SetValue (transform);
-				                
-				spriteEffect.CurrentTechnique.Passes[0].Apply();
-			} 
-            else 
-            {
-                if (_effect.Parameters["MatrixTransform"] != null)
-                {
-                    Viewport vp = graphicsDevice.Viewport;
-                    Matrix projection = Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, 0, 1);
+			spriteEffect.Parameters["MatrixTransform"].SetValue(transform);				                
+			spriteEffect.CurrentTechnique.Passes[0].Apply();
 
-#if PSS || DIRECTX
-                Matrix transform = _matrix * projection;
-#else
-                    Matrix halfPixelOffset = Matrix.CreateTranslation(-0.5f, -0.5f, 0);
-                    Matrix transform = _matrix * (halfPixelOffset * projection);
-#endif
-                    _effect.Parameters["MatrixTransform"].SetValue(transform);
-                }
-				// apply the custom effect if there is one
-				_effect.CurrentTechnique.Passes[0].Apply ();
-			}
+			// If the user supplied a custom effect then apply
+            // it now to override the sprite effect.
+            if (_effect != null)
+			    _effect.CurrentTechnique.Passes[0].Apply();
 		}
 		
 		public void Draw (Texture2D texture,
