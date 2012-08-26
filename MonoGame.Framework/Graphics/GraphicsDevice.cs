@@ -752,6 +752,9 @@ namespace Microsoft.Xna.Framework.Graphics
             _graphics.Clear();
 
 #elif OPENGL
+            // Make sure scissor rect is set to the viewport bounds so previous scissor operations
+            // do not affect this clear.
+            ScissorRectangle = _viewport.Bounds;
 
 			GL.ClearColor (color.X, color.Y, color.Z, color.W);
 
@@ -780,16 +783,6 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif // OPENGL
         }
 		
-        public void Clear(ClearOptions options, Color color, float depth, int stencil, Rectangle[] regions)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Clear(ClearOptions options, Vector4 color, float depth, int stencil, Rectangle[] regions)
-        {
-            throw new NotImplementedException();
-        }
-
         public void Dispose()
         {
             Dispose(true);
