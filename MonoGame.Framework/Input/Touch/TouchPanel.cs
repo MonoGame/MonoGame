@@ -312,10 +312,13 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			}
             set
 			{
-				var prev=_enabledGestures;
-				_enabledGestures = value;
-				if (_enabledGestures!=prev && EnabledGesturesChanged!=null)
-					EnabledGesturesChanged(null, null);
+				
+				if (_enabledGestures != value)
+                {
+                    _enabledGestures = value;
+                    if (EnabledGesturesChanged != null)
+					    EnabledGesturesChanged(null, EventArgs.Empty);
+                }
 			}
         }
 
