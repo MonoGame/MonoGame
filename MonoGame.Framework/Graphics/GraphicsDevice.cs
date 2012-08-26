@@ -141,7 +141,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// The active vertex shader.
         /// </summary>
-        internal DXShader _vertexShader;
+        internal Shader _vertexShader;
 
         private readonly Dictionary<ulong, SharpDX.Direct3D11.InputLayout> _inputLayouts = new Dictionary<ulong, SharpDX.Direct3D11.InputLayout>();
 
@@ -752,6 +752,9 @@ namespace Microsoft.Xna.Framework.Graphics
             _graphics.Clear();
 
 #elif OPENGL
+            // Make sure scissor rect is set to the viewport bounds so previous scissor operations
+            // do not affect this clear.
+            ScissorRectangle = _viewport.Bounds;
 
 			GL.ClearColor (color.X, color.Y, color.Z, color.W);
 
@@ -780,16 +783,6 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif // OPENGL
         }
 		
-        public void Clear(ClearOptions options, Color color, float depth, int stencil, Rectangle[] regions)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Clear(ClearOptions options, Vector4 color, float depth, int stencil, Rectangle[] regions)
-        {
-            throw new NotImplementedException();
-        }
-
         public void Dispose()
         {
             Dispose(true);
@@ -1328,7 +1321,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _d3dContext.InputAssembler.InputLayout = GetInputLayout(_vertexShader, _vertexBuffer.VertexDeclaration);
         }
 
-        private SharpDX.Direct3D11.InputLayout GetInputLayout(DXShader shader, VertexDeclaration decl)
+        private SharpDX.Direct3D11.InputLayout GetInputLayout(Shader shader, VertexDeclaration decl)
         {
             SharpDX.Direct3D11.InputLayout layout;
 

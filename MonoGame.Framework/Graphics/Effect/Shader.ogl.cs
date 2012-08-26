@@ -47,27 +47,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 
-		protected Attribute[] _attributes;
-		
-		protected enum SamplerType
-		{
-			Sampler2D,
-			SamplerCube,
-			SamplerVolume,
-		}
-
-		protected struct Sampler
-		{
-			public SamplerType type;
-			public int index;
-			public int parameter;
-
-			public string name;
-		}
-
-		protected Sampler[] _samplers;
-
-		protected int[] _cbuffers;
+		protected Attribute[] _attributes;		
 
 		static readonly float[] _posFixup = new float[4];
 		
