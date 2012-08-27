@@ -429,8 +429,6 @@
     <Compile Include="iOS\iOSGameWindow.cs" />
     <Compile Include="Graphics\Effect\ConstantBuffer.cs" />
     <Compile Include="Input\Touch\TouchInfo.cs" />
-    <Compile Include="iOS\GamerServices\EmailComposeTask.cs" />
-    <Compile Include="iOS\GamerServices\WebBrowserTask.cs" />
   </ItemGroup>
   <Import Project="$(ProgramFiles)\MSBuild\MonoTouch\Novell.MonoTouch.Common.targets" Condition="'$(windir)' != '' " />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

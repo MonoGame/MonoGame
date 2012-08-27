@@ -121,7 +121,6 @@ namespace Microsoft.Xna.Framework
             _viewController.InterfaceOrientationChanged += ViewController_InterfaceOrientationChanged;
 
             Guide.Initialise(game);
-            EmailComposeTask.Initialise(game);
         }
 
         public override GameRunBehavior DefaultRunBehavior
