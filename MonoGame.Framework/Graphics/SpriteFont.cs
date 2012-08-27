@@ -305,7 +305,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
 
                 if (hasCurrentGlyph)
-                    offset.X += Spacing + currentGlyph.WidthIncludingBearings;
+                    offset.X += Spacing + currentGlyph.Width + currentGlyph.RightSideBearing;
 
                 hasCurrentGlyph = _glyphs.TryGetValue(c, out currentGlyph);
                 if (!hasCurrentGlyph)
@@ -316,7 +316,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     currentGlyph = defaultGlyph.Value;
                     hasCurrentGlyph = true;
                 }
-
+                offset.X += currentGlyph.LeftSideBearing;
                 var p = offset;
 
 				if (flippedHorz)
