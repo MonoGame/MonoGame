@@ -61,16 +61,12 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// The currently touch state.
         /// </summary>
         private static List<TouchLocation> _touchLocations = new List<TouchLocation>();
+        private static List<TouchLocation> _unhandledTouchLocations = new List<TouchLocation>();
 
         /// <summary>
         /// The touch events to be processed and added to the current state.
         /// </summary>
         private static List<TouchLocation> _events = new List<TouchLocation>();
-
-        /// <summary>
-        /// Scratch list used to remove touch state.
-        /// </summary>
-        private static List<int> _removeId = new List<int>();
 
         /// <summary>
         /// The current touch state.
@@ -87,15 +83,15 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// </summary>
         private static Point _displaySize = Point.Zero;
 
-        /// <summary>
-        /// Set when the display has changed and the touch scale
-        /// needs to be recalculated.
-        /// </summary>
-        private static bool _displayChanged = false;
-
+        internal static event EventHandler<EventArgs> DisplaySizeChanged;
         internal static Queue<GestureSample> GestureList = new Queue<GestureSample>();
 		internal static event EventHandler EnabledGesturesChanged;
         internal static TouchPanelCapabilities Capabilities = new TouchPanelCapabilities();
+
+        static TouchPanel()
+        {
+            TouchPanel.DisplaySizeChanged += UpdateTouchScale;
+        }
 
         public static TouchPanelCapabilities GetCapabilities()
         {
@@ -103,7 +99,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
             return Capabilities;
         }
 
-        public static TouchCollection GetState()
+        private static void RefreshState()
         {
             // Remove the previously released touch locations.
             for (int i = 0; i < _touchLocations.Count;)
@@ -155,18 +151,24 @@ namespace Microsoft.Xna.Framework.Input.Touch
                 if (loc.State == TouchLocationState.Pressed)
                 {
                     _touchLocations.Add(loc);
-                    loc.TouchHistory = new TouchInfo(loc.Id, loc.Position);
+                    loc.touchHistory = new TouchInfo(loc.Id, loc.Position);
                     _events.RemoveAt(i--);
                 }
             }
 
-            // Set the new state.
-            _state = new TouchCollection(_touchLocations.ToArray());
-			
-			//Update our gestures
-			UpdateGestures();
+            // Add the touchlocations to the list of unhandled touchlocations
+            _unhandledTouchLocations.AddRange(_touchLocations.ToArray());
+
+            //Update our gestures
+            UpdateGestures();
+        }
+
+        public static TouchCollection GetState()
+        {
+            RefreshState();
             
-            // Return the state.
+            _state = new TouchCollection(_unhandledTouchLocations.ToArray());
+            _unhandledTouchLocations.Clear();
             return _state;
         }
         
@@ -185,13 +187,13 @@ namespace Microsoft.Xna.Framework.Input.Touch
                     _events.FindIndex(e => e.Id == id) != -1)
                 return;
 #endif
-           
-            // TODO: Maybe it is better if we apply touch
-            // scaling when we process the events and not
-            // as we get them?
 
-            if (_displayChanged)
-            {
+            // Apply the touch scale to the new location.
+            _events.Add(new TouchLocation(id, state, position * _touchScale));
+        }
+
+        internal static void UpdateTouchScale (object sender, EventArgs args)
+        {
                 // Get the window size.
                 //
                 // TODO: This will be alot smoother once we get XAML working with Game.
@@ -211,20 +213,12 @@ namespace Microsoft.Xna.Framework.Input.Touch
                 // Recalculate the touch scale.
                 _touchScale = new Vector2(  (float)DisplayWidth / windowSize.X,
                                             (float)DisplayHeight / windowSize.Y);
-                
-                _displayChanged = false;
-            }
-
-            // Apply the touch scale to the new location.
-            _events.Add(new TouchLocation(id, state, position * _touchScale));
         }
 
         internal static void UpdateState()
         {
-            // Just tell the next call to GetState() that
-            // it is time for it to update.
-
-            // Should be removed now that it is no longer needed
+            // This function should be removed now that it is no longer needed
+            RefreshState();
         }
 
 		public static GestureSample ReadGesture()
@@ -243,18 +237,12 @@ namespace Microsoft.Xna.Framework.Input.Touch
             }
             set
             {
-                if (_displaySize.Y == value)
-                    return;
-
-                _displayChanged = true;
-                _displaySize.Y = value;
+                if (_displaySize.Y != value)
+                {
+                    _displaySize.Y = value;
+                    DisplaySizeChanged(null, EventArgs.Empty);
+                }
             }
-        }
-
-        public static DisplayOrientation DisplayOrientation
-        {
-            get;
-            set;
         }
 
         public static int DisplayWidth
@@ -265,13 +253,15 @@ namespace Microsoft.Xna.Framework.Input.Touch
             }
             set
             {
-                if (_displaySize.X == value)
-                    return;
-
-                _displayChanged = true;
-                _displaySize.X = value;
+                if (_displaySize.X != value)
+                {
+                    _displaySize.X = value;
+                    DisplaySizeChanged(null, EventArgs.Empty);
+                }
             }
         }
+
+        public static DisplayOrientation DisplayOrientation { get; set; }
 		
 		private static GestureType _enabledGestures = GestureType.None;
         public static GestureType EnabledGestures
@@ -282,7 +272,6 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			}
             set
 			{
-				
 				if (_enabledGestures != value)
                 {
                     _enabledGestures = value;
@@ -297,7 +286,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
             get
             {
                 // We update the gesture list so we don't have to update when a gesture is read
-                GetState();
+                RefreshState();
 
 				return ( GestureList.Count > 0 );				
             }
@@ -327,10 +316,10 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
 		private static void UpdateGestures()
 		{			
-			var touchLocState = _state;
-			for(int x = 0; x < touchLocState.Count; x++)
+            var touchLocations = _touchLocations;
+			for (int x = 0; x < touchLocations.Count; x++)
 			{
-				var touch = touchLocState[x];
+				var touch = touchLocations[x];
 				
 				switch(touch.State)
 				{
@@ -346,7 +335,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 					// Any time that two fingers are detected in XNA, it's considered a pinch
 					// Save the touch and combine it with the next one to create a pinch gesture
 					if (GestureIsEnabled(GestureType.Pinch) &&
-					    touchLocState.Count > 1 &&
+					    touchLocations.Count > 1 &&
 					    !_pinchComplete)
 					{
 						if (_savedPinchTouches[0] == null || _savedPinchTouches[0].Value.Id == touch.Id)
@@ -361,9 +350,12 @@ namespace Microsoft.Xna.Framework.Input.Touch
 					}
 					
 					if (touch.State == TouchLocationState.Moved)
-						ProcessDrag(touch);
-					else
-						ProcessHold(touch);
+                    {
+                        if (touch.TouchHistory.TotalDistanceMoved < _tapJitterTolerance)
+						    ProcessHold(touch);
+					    else
+						    ProcessDrag(touch);
+                    }
 					
 					break;
 					
@@ -608,8 +600,6 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			
 			return true;
 		}
-
-        static List<TouchLocation> _prevTouchBuffer = new List<TouchLocation>();
 
 		private static bool ProcessFlick(TouchLocation touch)
 		{
