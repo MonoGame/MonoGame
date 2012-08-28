@@ -752,8 +752,11 @@ namespace Microsoft.Xna.Framework.Graphics
             _graphics.Clear();
 
 #elif OPENGL
-            // Make sure scissor rect is set to the viewport bounds so previous scissor operations
-            // do not affect this clear.
+
+            // GL.Clear() obeys the scissor rectangle where as in XNA/DirectX
+            // it does not.  So make sure scissor rect is set to the viewport
+            // bounds before we do the clear.
+		    var prevScissorRect = ScissorRectangle;
             ScissorRectangle = _viewport.Bounds;
 
 			GL.ClearColor (color.X, color.Y, color.Z, color.W);
@@ -780,8 +783,12 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
 			GL.Clear (bufferMask);
 #endif
-#endif // OPENGL
-        }
+
+            // Restore the scissor rectangle.
+		    ScissorRectangle = prevScissorRect;
+#endif
+		    // OPENGL
+		}
 		
         public void Dispose()
         {
