@@ -60,8 +60,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// <summary>
         /// The currently touch state.
         /// </summary>
-        private static Dictionary<int, TouchLocation> _touchLocations = new Dictionary<int, TouchLocation>();
-        private static Dictionary<int, TouchLocation> _touchLocationsReal = new Dictionary<int, TouchLocation>();
+        private static List<TouchLocation> _touchLocations = new List<TouchLocation>();
 
         /// <summary>
         /// The touch events to be processed and added to the current state.
@@ -77,12 +76,6 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// The current touch state.
         /// </summary>
         private static TouchCollection _state = new TouchCollection();
-
-        /// <summary>
-        /// If true an update to the touch state should occur
-        /// on the next call to GetState.
-        /// </summary>
-        private static bool _updateState = true;
 
         /// <summary>
         /// The positional scale to apply to touch input.
@@ -112,84 +105,63 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
         public static TouchCollection GetState()
         {
-            // If the state isn't dirty then just
-            // return the current state.
-            if (!_updateState)
-                return _state;
-
-            _touchLocationsReal.Clear ();
-
             // Remove the previously released touch locations.
-            foreach (var keyLoc in _touchLocations)
+            for (int i = 0; i < _touchLocations.Count;)
             {
-                if (keyLoc.Value.State == TouchLocationState.Released)
-                    _removeId.Add(keyLoc.Key);
+                if (_touchLocations[i].State == TouchLocationState.Released)
+                {
+                    _heldEventsProcessed.Remove(_touchLocations[i].Id);
+                    _processedDoubleTaps.Remove(_touchLocations[i].Id);
+                    _touchLocations.RemoveAt(i);
+                }
+                else
+                    i++;
             }
-            foreach (var id in _removeId)
-			{
-                _touchLocations.Remove(id);
-				_heldEventsProcessed.Remove(id);
-                _processedDoubleTaps.Remove(id);
-			}
-            _removeId.Clear();
 
             // Update the existing touch locations.
-            for (var i = 0; i < _events.Count; )
+            for (int i = 0; i < _touchLocations.Count; i++)
             {
-                var loc = _events[i];
-
-                TouchLocation prev;
-                if (_touchLocations.TryGetValue(loc.Id, out prev))
+                TouchLocation prevTouch = _touchLocations[i];
+                TouchLocation? nextTouch = null;
+                for (int j = 0; j < _events.Count; j++)
                 {
-                    // Remove this event.
-                    _events.RemoveAt(i);
-
-                    // Remove any pending events of this type.
-                    for (var j = i; j < _events.Count; )
+                    if (_events[j].Id == prevTouch.Id)
                     {
-                        if (_events[j].Id == loc.Id &&
-                            _events[j].State == loc.State)
-                        {
-                            loc = _events[j];
-                            _events.RemoveAt(j);
-                            continue;
-                        }
-
-                        j++;
+                        nextTouch = _events[j];
+                        // Remove an event. If we hit multiple events for the same ID we remove them all, as we only need the last one for processing.
+                        _events.RemoveAt(j--);
                     }
-
-                    // Set the new touch location state.
-                    _touchLocations[loc.Id] = new TouchLocation(loc.Id,
-                                                                loc.State, loc.Position, loc.Pressure,
-                                                                prev.State, prev.Position, prev.Pressure, prev.TouchHistory);
-                    _touchLocationsReal[loc.Id] = _touchLocations[loc.Id];
-                    continue;
                 }
 
-                i++;
+                if (nextTouch.HasValue)
+                {
+                    // Set the new touch location state.
+                    _touchLocations[i] = new TouchLocation(nextTouch.Value.Id,
+                                                                nextTouch.Value.State, nextTouch.Value.Position, nextTouch.Value.Pressure,
+                                                                prevTouch.State, prevTouch.Position, prevTouch.Pressure, prevTouch.TouchHistory);
+                }
+                else
+                {
+                    _touchLocations[i] = new TouchLocation(prevTouch.Id,
+                                                                TouchLocationState.Moved, prevTouch.Position, prevTouch.Pressure,
+                                                                prevTouch.State, prevTouch.Position, prevTouch.Pressure, prevTouch.TouchHistory);
+                }
             }
 
             // Add any new pressed events.
-            for (var i = 0; i < _events.Count; )
+            for (var i = 0; i < _events.Count; i++)
             {
                 var loc = _events[i];
                 if (loc.State == TouchLocationState.Pressed)
                 {
-                    _touchLocations.Add(loc.Id, loc);
-                    _touchLocationsReal.Add(loc.Id, _touchLocations[loc.Id]);
+                    _touchLocations.Add(loc);
                     loc.TouchHistory = new TouchInfo(loc.Id, loc.Position);
-                    _events.RemoveAt(i);
-                    continue;
+                    _events.RemoveAt(i--);
                 }
-
-                i++;
             }
 
             // Set the new state.
-            _state = new TouchCollection(_touchLocationsReal.Values.ToArray());
-
-            // Don't update again till the next frame.
-            _updateState = false;
+            _state = new TouchCollection(_touchLocations.ToArray());
 			
 			//Update our gestures
 			UpdateGestures();
@@ -251,14 +223,12 @@ namespace Microsoft.Xna.Framework.Input.Touch
         {
             // Just tell the next call to GetState() that
             // it is time for it to update.
-            _updateState = true;
+
+            // Should be removed now that it is no longer needed
         }
 
 		public static GestureSample ReadGesture()
         {
-            // Make sure we have updated touch state.
-            GetState();
-
             // Return the next gesture.
 			return GestureList.Dequeue();			
         }
@@ -326,7 +296,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
         {
             get
             {
-                // Make sure we have updated touch state.
+                // We update the gesture list so we don't have to update when a gesture is read
                 GetState();
 
 				return ( GestureList.Count > 0 );				

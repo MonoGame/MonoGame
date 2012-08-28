@@ -178,7 +178,7 @@ namespace Microsoft.Xna.Framework
             // Show the window
             _mainWindow.MakeKeyAndVisible();
 
-            Accelerometer.SetupAccelerometer();
+            //Accelerometer.SetupAccelerometer();
             BeginObservingUIApplication();
 
             _viewController.View.BecomeFirstResponder();
@@ -220,9 +220,6 @@ namespace Microsoft.Xna.Framework
         {
             if (IsPlayingVideo)
                 return false;
-
-            // Let the touch panel update states.
-            TouchPanel.UpdateState();
 			
             return true;
         }
