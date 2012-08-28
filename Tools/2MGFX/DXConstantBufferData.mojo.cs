@@ -33,7 +33,6 @@ namespace Microsoft.Xna.Framework.Graphics
 				var offset = (int)symbol.register_index * registerSize;
 				parm.bufferOffset = offset;
 
-				ParameterIndex.Add (Parameters.Count);
 				Parameters.Add (parm);
                 ParameterOffset.Add(offset);
 
