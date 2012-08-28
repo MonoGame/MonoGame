@@ -303,7 +303,7 @@ namespace Microsoft.Xna.Framework.Content
             
 			if (result == null)
 				throw new ContentLoadException("Could not load " + originalAssetName + " asset!");
-		
+
 			CurrentAssetDirectory = null;
 			
 			return (T)result;
