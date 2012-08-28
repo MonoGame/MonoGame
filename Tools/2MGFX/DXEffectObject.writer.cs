@@ -100,11 +100,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     case EffectParameterType.Single:
                         writer.Write((byte[])param.data);
                         break;
-                    default:
-                        throw new NotImplementedException();
                 }
-            } else {
-                throw new NotImplementedException();
             }
         }
 
