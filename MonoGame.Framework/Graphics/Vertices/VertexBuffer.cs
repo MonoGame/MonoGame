@@ -102,50 +102,55 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
         }
 
-        public void GetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride) where T : struct
+        public void GetData<T> (int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride) where T : struct
         {
             if (data == null)
-                throw new ArgumentNullException("data is null");
+                throw new ArgumentNullException ("data is null");
             if (data.Length < (startIndex + elementCount))
-                throw new InvalidOperationException("The array specified in the data parameter is not the correct size for the amount of data requested.");
+                throw new InvalidOperationException ("The array specified in the data parameter is not the correct size for the amount of data requested.");
             if (BufferUsage == BufferUsage.WriteOnly)
-                throw new NotSupportedException("This VertexBuffer was created with a usage type of BufferUsage.WriteOnly. Calling GetData on a resource that was created with BufferUsage.WriteOnly is not supported.");
+                throw new NotSupportedException ("This VertexBuffer was created with a usage type of BufferUsage.WriteOnly. Calling GetData on a resource that was created with BufferUsage.WriteOnly is not supported.");
             if ((vertexStride > (VertexCount * VertexDeclaration.VertexStride)) || (vertexStride < VertexDeclaration.VertexStride))
-                throw new ArgumentOutOfRangeException("One of the following conditions is true:\nThe vertex stride is larger than the vertex buffer.\nThe vertex stride is too small for the type of data requested.");
+                throw new ArgumentOutOfRangeException ("One of the following conditions is true:\nThe vertex stride is larger than the vertex buffer.\nThe vertex stride is too small for the type of data requested.");
 
 #if DIRECTX
             throw new NotImplementedException();
 #elif PSS
             throw new NotImplementedException();
 #else
-            Threading.BlockOnUIThread(() =>
+            Threading.BlockOnUIThread (() =>
             {
-                GL.BindBuffer(BufferTarget.ArrayBuffer, vbo);
-                var elementSizeInByte = Marshal.SizeOf(typeof(T));
+                GL.BindBuffer (BufferTarget.ArrayBuffer, vbo);
+                var elementSizeInByte = Marshal.SizeOf (typeof(T));
 #if IPHONE || ANDROID
                 // I think the access parameter takes zero for read only or read/write.
                 // The glMapBufferOES extension spec and gl2ext.h both only mention GL_WRITE_ONLY
                 IntPtr ptr = GL.Oes.MapBuffer(All.ArrayBuffer, (All)0);
 #else
-                IntPtr ptr = GL.MapBuffer(BufferTarget.ArrayBuffer, BufferAccess.ReadOnly);
+                IntPtr ptr = GL.MapBuffer (BufferTarget.ArrayBuffer, BufferAccess.ReadOnly);
 #endif
                 // Pointer to the start of data to read in the index buffer
-                ptr = new IntPtr(ptr.ToInt64() + offsetInBytes);
-                if (data is byte[])
-                {
+                ptr = new IntPtr (ptr.ToInt64 () + offsetInBytes);
+                if (data is byte[]) {
                     byte[] buffer = data as byte[];
                     // If data is already a byte[] we can skip the temporary buffer
                     // Copy from the vertex buffer to the destination array
-                    Marshal.Copy(ptr, buffer, 0, buffer.Length);
-                }
-                else
-                {
+                    Marshal.Copy (ptr, buffer, 0, buffer.Length);
+                } else {
                     // Temporary buffer to store the copied section of data
                     byte[] buffer = new byte[elementCount * vertexStride];
                     // Copy from the vertex buffer to the temporary buffer
-                    Marshal.Copy(ptr, buffer, 0, buffer.Length);
+                    Marshal.Copy (ptr, buffer, 0, buffer.Length);
                     // Copy from the temporary buffer to the destination array
-                    Buffer.BlockCopy(buffer, 0, data, startIndex * elementSizeInByte, elementCount * elementSizeInByte);
+                    
+                    var dataHandle = GCHandle.Alloc (data, GCHandleType.Pinned);
+                    var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject ().ToInt64 () + startIndex * elementSizeInByte);
+
+                    Marshal.Copy (buffer, 0, dataPtr, buffer.Length);
+
+                    dataHandle.Free ();
+
+                    //Buffer.BlockCopy(buffer, 0, data, startIndex * elementSizeInByte, elementCount * elementSizeInByte);
                 }
 #if IPHONE || ANDROID
                 GL.Oes.UnmapBuffer(All.ArrayBuffer);

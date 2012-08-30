@@ -1,4 +1,4 @@
-// #region License
+﻿#region License
 // /*
 // Microsoft Public License (Ms-PL)
 // MonoGame - Copyright © 2009 The MonoGame Team
@@ -36,45 +36,93 @@
 // permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular
 // purpose and non-infringement.
 // */
-// #endregion License
-// 
+#endregion
 
 using System;
 using System.Collections.Generic;
-using MonoTouch.UIKit;
+using System.IO;
+
+#if IPHONE
+using MonoTouch.MediaPlayer;
+#endif
 
 namespace Microsoft.Xna.Framework.Media
 {
-	public sealed class MediaSource
-    {
-		private MediaSourceType _type;
-		private string _name;
-		internal MediaSource (string name, MediaSourceType type)
-		{
-			_name = name;
-			_type = type;
-		}
-				
-        public Microsoft.Xna.Framework.Media.MediaSourceType MediaSourceType
-        {
-            get
-            {
-				return _type;
-            }
-        }
+	public class MediaLibrary : IDisposable
+	{
+        private PlaylistCollection _playLists;
 
-        public string Name
-        {
-            get
-            {
-				return _name;
-            }
-        }
-	
-		public static IList<MediaSource> GetAvailableMediaSources()
-        {
-			MediaSource[] result = { new MediaSource(UIDevice.CurrentDevice.SystemName, MediaSourceType.LocalDevice) };
-			return result;
-        }
-    }
+		public MediaLibrary ()
+		{
+		}
+		
+		public MediaLibrary (MediaSource mediaSource)
+		{
+		}
+		
+		public void Dispose()
+		{
+		}
+		
+		public void SavePicture (string name, byte[] imageBuffer)
+		{
+#if IPHONE || ANDROID
+			throw new NotImplementedException();
+#else
+			//only is relivant on mobile devices...
+			throw new NotSupportedException ();
+#endif
+		}
+		
+		public void SavePicture (string name, Stream source)
+		{
+#if IPHONE || ANDROID
+			throw new NotImplementedException();
+#else
+			//only is relivant on mobile devices...
+			throw new NotSupportedException ();
+#endif
+		}
+		
+#if IPHONE
+
+		public PlaylistCollection Playlists
+		{
+			get
+			{				
+				if (_playLists == null)
+				{
+					_playLists = new PlaylistCollection();
+					
+					MPMediaQuery playlists = new MPMediaQuery();
+					playlists.GroupingType = MPMediaGrouping.Playlist; 
+					for (int i=0;i<playlists.Collections.Length;i++)
+					{
+						MPMediaItemCollection item = playlists.Collections[i];					
+						Playlist list = new Playlist();
+						list.Name = playlists.Items[i].ValueForProperty(MPMediaPlaylistProperty.Name).ToString();
+						for (int k=0;k<item.Items.Length;k++)
+						{
+							TimeSpan time = TimeSpan.Parse(item.Items[k].ValueForProperty(MPMediaItemProperty.PlaybackDuration).ToString());
+							list.Duration += time;
+						}
+						_playLists.Add(list);
+					}
+				}
+				return _playLists;
+			}
+		}
+#endif
+		
+		public SongCollection Songs
+		{
+			get
+			{
+				return new SongCollection();
+			}
+		}
+		
+		
+	}
 }
+

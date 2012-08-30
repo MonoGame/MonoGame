@@ -71,7 +71,10 @@
   <ItemGroup>
     <Compile Include="CommandLineParser.cs" />
     <Compile Include="CompilerInclude.cs" />
-    <Compile Include="ConstantBuffer.cs" />
+    <Compile Include="DXConstantBufferData.cs" />
+    <Compile Include="DXConstantBufferData.mojo.cs" />
+    <Compile Include="DXConstantBufferData.sharpdx.cs" />
+    <Compile Include="DXConstantBufferData.writer.cs" />
     <Compile Include="DXEffectObject.cs" />
     <Compile Include="DXEffectObject.hlsl.cs" />
     <Compile Include="DXEffectObject.writer.cs" />
@@ -81,9 +84,10 @@
     <Compile Include="DXHelper.cs" />
     <Compile Include="DXPreshader.cs" />
     <Compile Include="DXPreshader.writer.cs" />
-    <Compile Include="DXShader.cs">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="DXShaderData.cs" />
+    <Compile Include="DXShaderData.mojo.cs" />
+    <Compile Include="DXShaderData.sharpdx.cs" />
+    <Compile Include="DXShaderData.writer.cs" />
     <Compile Include="GLSLOptimizer.cs" />
     <Compile Include="MojoShader.cs" />
     <Compile Include="Options.cs" />

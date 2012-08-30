@@ -81,8 +81,17 @@
     <Compile Include="..\..\Tools\2MGFX\CompilerInclude.cs">
       <Link>Processors\Effect\CompilerInclude.cs</Link>
     </Compile>
-    <Compile Include="..\..\Tools\2MGFX\ConstantBuffer.cs">
-      <Link>Processors\Effect\ConstantBuffer.cs</Link>
+    <Compile Include="..\..\Tools\2MGFX\DXConstantBufferData.cs">
+      <Link>Processors\Effect\DXConstantBufferData.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Tools\2MGFX\DXConstantBufferData.mojo.cs">
+      <Link>Processors\Effect\DXConstantBufferData.mojo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Tools\2MGFX\DXConstantBufferData.sharpdx.cs">
+      <Link>Processors\Effect\DXConstantBufferData.sharpdx.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Tools\2MGFX\DXConstantBufferData.writer.cs">
+      <Link>Processors\Effect\DXConstantBufferData.writer.cs</Link>
     </Compile>
     <Compile Include="..\..\Tools\2MGFX\DXEffectObject.cs">
       <Link>Processors\Effect\DXEffectObject.cs</Link>
@@ -105,8 +114,17 @@
     <Compile Include="..\..\Tools\2MGFX\DXPreshader.writer.cs">
       <Link>Processors\Effect\DXPreshader.writer.cs</Link>
     </Compile>
-    <Compile Include="..\..\Tools\2MGFX\DXShader.cs">
-      <Link>Processors\Effect\DXShader.cs</Link>
+    <Compile Include="..\..\Tools\2MGFX\DXShaderData.cs">
+      <Link>Processors\Effect\DXShaderData.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Tools\2MGFX\DXShaderData.mojo.cs">
+      <Link>Processors\Effect\DXShaderData.mojo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Tools\2MGFX\DXShaderData.sharpdx.cs">
+      <Link>Processors\Effect\DXShaderData.sharpdx.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Tools\2MGFX\DXShaderData.writer.cs">
+      <Link>Processors\Effect\DXShaderData.writer.cs</Link>
     </Compile>
     <Compile Include="..\..\Tools\2MGFX\GLSLOptimizer.cs">
       <Link>Processors\Effect\GLSLOptimizer.cs</Link>
@@ -157,6 +175,10 @@
     <ProjectReference Include="..\..\Tools\MP3Compression\yeti.wmfsdk\yeti.wmfsdk.csproj">
       <Project>{FECB5BEB-AB05-454A-BB14-6A554E897274}</Project>
       <Name>yeti.wmfsdk</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Tools\PVRTexLibC\PVRTexLibC.vcxproj">
+      <Project>{7CC59D82-06E1-4BA7-8644-2552CBC34316}</Project>
+      <Name>PVRTexLibC</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
