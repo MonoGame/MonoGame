@@ -76,6 +76,7 @@ using System.Diagnostics;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input.Touch;
 using Windows.ApplicationModel.Activation;
+using Windows.UI.ViewManagement;
 
 namespace Microsoft.Xna.Framework
 {
@@ -89,20 +90,16 @@ namespace Microsoft.Xna.Framework
         public MetroGamePlatform(Game game)
             : base(game)
         {
+            // Set the starting view state so the Game class can
+            // query it during construction.
+            ViewState = ApplicationView.Value;
+
+            // Setup the game window.
+            Window = MetroGameWindow.Instance;
             MetroGameWindow.Instance.Game = game;
-            this.Window = MetroGameWindow.Instance;
 
-            setLaunchParameters();
-            Game.PreviousExecutionState = PreviousExecutionState;
-			
-            // Setup our OpenALSoundController to handle our SoundBuffer pools
-            // soundControllerInstance = OpenALSoundController.GetInstance;
-        }
-
-        private void setLaunchParameters()
-        {
+            // Setup the launch parameters.
             var arguments = LaunchParameters.Split(' ');
-
             foreach (var arg in arguments)
             {
                 if (arg.Contains("="))
@@ -114,6 +111,8 @@ namespace Microsoft.Xna.Framework
                 else if (arg != string.Empty)
                     Game.LaunchParameters.Add(arg, string.Empty);
             }
+
+            Game.PreviousExecutionState = PreviousExecutionState;
         }
 
         public override GameRunBehavior DefaultRunBehavior
@@ -138,14 +137,6 @@ namespace Microsoft.Xna.Framework
                 //Net.NetworkSession.Exit();
                 MetroGameWindow.Instance.IsExiting = true;
             }
-        }
-
-        public override void BeforeInitialize()
-        {
-            base.BeforeInitialize();
-
-            // Metro apps are always full screen.
-            Game.graphicsDeviceManager.IsFullScreen = true;
         }
 
         public override bool BeforeUpdate(GameTime gameTime)
