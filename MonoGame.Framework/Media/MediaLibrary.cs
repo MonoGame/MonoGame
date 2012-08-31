@@ -1,4 +1,4 @@
-#region License
+﻿#region License
 // /*
 // Microsoft Public License (Ms-PL)
 // MonoGame - Copyright © 2009 The MonoGame Team
@@ -50,6 +50,8 @@ namespace Microsoft.Xna.Framework.Media
 {
 	public class MediaLibrary : IDisposable
 	{
+        private PlaylistCollection _playLists;
+
 		public MediaLibrary ()
 		{
 		}
@@ -83,6 +85,7 @@ namespace Microsoft.Xna.Framework.Media
 		}
 		
 #if IPHONE
+
 		public PlaylistCollection Playlists
 		{
 			get
