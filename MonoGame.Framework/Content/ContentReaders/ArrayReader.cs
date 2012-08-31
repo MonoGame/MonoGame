@@ -32,11 +32,11 @@ using System.Reflection;
 
 namespace Microsoft.Xna.Framework.Content
 {
-    internal class ArrayReader<T> : ContentTypeReader<T[]>
+    public class ArrayReader<T> : ContentTypeReader<T[]>
     {
         ContentTypeReader elementReader;
 
-        internal ArrayReader()
+        public ArrayReader()
         {
         }
 

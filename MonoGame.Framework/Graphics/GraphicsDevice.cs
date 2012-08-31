@@ -1437,8 +1437,10 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 #elif OPENGL
 
-			var indexElementType = DrawElementsType.UnsignedShort;
-			var indexElementSize = 2;
+            var shortIndices = _indexBuffer.IndexElementSize == IndexElementSize.SixteenBits;
+
+			var indexElementType = shortIndices ? DrawElementsType.UnsignedShort : DrawElementsType.UnsignedInt;
+            var indexElementSize = shortIndices ? 2 : 4;
 			var indexOffsetInBytes = (IntPtr)(startIndex * indexElementSize);
 			var indexElementCount = GetElementCountArray(primitiveType, primitiveCount);
 			var target = PrimitiveTypeGL(primitiveType);
