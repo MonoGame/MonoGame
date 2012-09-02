@@ -224,6 +224,11 @@ namespace Microsoft.Xna.Framework.Audio
 
         #region IDisposable Members
 
+        public bool IsDisposed
+        {
+            get { return false; }
+        }
+
         public void Dispose()
         {
             //_sound.Dispose ();

@@ -118,6 +118,22 @@ namespace Microsoft.Xna.Framework.Content
             // properties must have public get and set
             if (property != null && (property.CanWrite == false || property.CanRead == false))
                 return;
+
+            if (property != null && property.Name == "Item")
+            {
+                var getMethod = property.GetGetMethod();
+                var setMethod = property.GetSetMethod();
+
+                if ((getMethod != null && getMethod.GetParameters().Length > 0) ||
+                    (setMethod != null && setMethod.GetParameters().Length > 0))
+                {
+                    /*
+                     * This is presumably a property like this[indexer] and this
+                     * should not get involved in the object deserialization
+                     * */
+                    return;
+                }
+            }
 #if WINRT
             Attribute attr = member.GetCustomAttribute(typeof(ContentSerializerIgnoreAttribute));
 #else
@@ -160,20 +176,32 @@ namespace Microsoft.Xna.Framework.Content
                 }
             }
             ContentTypeReader reader = null;
+
+            Type elementType = null;
+
             if (property != null)
             {
-                reader = manager.GetTypeReader(property.PropertyType);
+                reader = manager.GetTypeReader(elementType = property.PropertyType);
             }
             else
             {
-                reader = manager.GetTypeReader(field.FieldType);
+                reader = manager.GetTypeReader(elementType = field.FieldType);
             }
             if (!isSharedResource)
             {
                 object existingChildObject = CreateChildObject(property, field);
                 object obj2;
-				
-                obj2 = input.ReadObject(reader, existingChildObject);
+
+                if (reader == null && elementType == typeof(object))
+                {
+                    /* Reading elements serialized as "object" */
+                    obj2 = input.ReadObject<object>();
+                }
+                else
+                {
+                    /* Default */
+                    obj2 = input.ReadObject(reader, existingChildObject);
+                }
 				
                 if (property != null)
                 {
