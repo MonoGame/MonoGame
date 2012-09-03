@@ -50,6 +50,8 @@ namespace Microsoft.Xna.Framework.Content
 		internal int version;
 		internal int sharedResourceCount;
 
+        static char[] dirSeparatorChars = new char[] { Path.DirectorySeparatorChar };
+
         internal ContentTypeReader[] TypeReaders
         {
             get
@@ -172,21 +174,15 @@ namespace Microsoft.Xna.Framework.Content
                 return contentManager.Load<T>(fullAssetPath);
 #else
                 externalReference = externalReference.Replace('\\', Path.DirectorySeparatorChar);
-                
-                string fullRootPath = ContentManager.RootDirectoryFullPath;
-				
-				// iOS won't find the right name if the \'s are facing the wrong way. be certian we're good here.
-				var fullAssetName = Path.Combine(fullRootPath, assetName.Replace('\\', Path.DirectorySeparatorChar)); 
-				var pathDirectory = Path.GetDirectoryName(fullAssetName);
-				var dirExtCombined = Path.Combine(pathDirectory, externalReference);
-				
-                string fullAssetPath = Path.GetFullPath(dirExtCombined);
 
-#if ANDROID || PSS
-                string externalAssetName = fullAssetPath.Substring(fullRootPath.Length);
-#else				
-                string externalAssetName = fullAssetPath.Substring(fullRootPath.Length);
-#endif
+                string fullRootPath = ContentManager.RootDirectoryFullPath.TrimStart(dirSeparatorChars);
+
+                // iOS won't find the right name if the \'s are facing the wrong way. be certain we're good here.
+                var fullAssetName = Path.Combine(fullRootPath, assetName.Replace('\\', Path.DirectorySeparatorChar)); 
+                var dirExtCombined = Path.Combine(Path.GetDirectoryName(fullAssetName), externalReference);
+
+                string fullAssetPath = Path.GetFullPath(dirExtCombined).TrimStart(dirSeparatorChars);
+                string externalAssetName = fullAssetPath.Substring(fullRootPath.Length + 1);
                 return contentManager.Load<T>(externalAssetName);
 #endif
             }
