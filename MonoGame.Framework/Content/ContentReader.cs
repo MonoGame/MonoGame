@@ -172,9 +172,8 @@ namespace Microsoft.Xna.Framework.Content
                 return contentManager.Load<T>(fullAssetPath);
 #else
                 externalReference = externalReference.Replace('\\', Path.DirectorySeparatorChar);
-
-                // Use Path.GetFullPath to help resolve relative directories
-                string fullRootPath = Path.GetFullPath(contentManager.RootDirectory);
+                
+                string fullRootPath = ContentManager.RootDirectoryFullPath;
 				
 				// iOS won't find the right name if the \'s are facing the wrong way. be certian we're good here.
 				var fullAssetName = Path.Combine(fullRootPath, assetName.Replace('\\', Path.DirectorySeparatorChar)); 
@@ -186,7 +185,7 @@ namespace Microsoft.Xna.Framework.Content
 #if ANDROID || PSS
                 string externalAssetName = fullAssetPath.Substring(fullRootPath.Length);
 #else				
-                string externalAssetName = fullAssetPath.Substring(fullRootPath.Length + 1);
+                string externalAssetName = fullAssetPath.Substring(fullRootPath.Length);
 #endif
                 return contentManager.Load<T>(externalAssetName);
 #endif

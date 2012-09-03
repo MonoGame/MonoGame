@@ -28,6 +28,7 @@ SOFTWARE.
 using System;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Content
 {
@@ -100,6 +101,13 @@ namespace Microsoft.Xna.Framework.Content
                 var hBasicEffectReader = new BasicEffectReader();
                 var hVertexBufferReader = new VertexBufferReader();
                 var hAlphaTestEffectReader = new AlphaTestEffectReader();
+                var hEnumSpriteEffectsReader = new EnumReader<Graphics.SpriteEffects>();
+                var hArrayFloatReader = new ArrayReader<float>();
+                var hArrayVector2Reader = new ArrayReader<Vector2>();
+                var hListVector2Reader = new ListReader<Vector2>();
+                var hArrayMatrixReader = new ArrayReader<Matrix>();
+                var hEnumBlendReader = new EnumReader<Graphics.Blend>();
+                var hNullableRectReader = new NullableReader<Rectangle>();
             }
 #pragma warning restore 0219, 0649
 
@@ -116,19 +124,40 @@ namespace Microsoft.Xna.Framework.Content
                 // This string tells us what reader we need to decode the following data
                 // string readerTypeString = reader.ReadString();
 				string originalReaderTypeString = _reader.ReadString();
- 
-				// Need to resolve namespace differences
-				string readerTypeString = originalReaderTypeString;
-								
-				readerTypeString = PrepareType(readerTypeString);
-				
-				
 
-				var l_readerType = Type.GetType(readerTypeString);
-                if (l_readerType != null)
-                    contentReaders[i] = l_readerType.GetDefaultConstructor().Invoke(null) as ContentTypeReader;
+                Func<ContentTypeReader> readerFunc;
+                if (typeCreators.TryGetValue(originalReaderTypeString, out readerFunc))
+                {
+                    contentReaders[i] = readerFunc();
+                }
                 else
-                    throw new ContentLoadException("Could not find matching content reader of type " + originalReaderTypeString + " (" + readerTypeString + ")");
+                {
+                    System.Diagnostics.Debug.WriteLine(originalReaderTypeString);
+
+    				// Need to resolve namespace differences
+    				string readerTypeString = originalReaderTypeString;
+
+    				readerTypeString = PrepareType(readerTypeString);
+
+    				var l_readerType = Type.GetType(readerTypeString);
+                    if (l_readerType != null)
+                    {
+                        try
+                        {
+                            contentReaders[i] = l_readerType.GetDefaultConstructor().Invoke(null) as ContentTypeReader;
+                        }
+                        catch (TargetInvocationException ex)
+                        {
+                            // If you are getting here, the Mono runtime is most likely not able to JIT the type.
+                            // In particular, MonoTouch needs help instantiating types that are only defined in strings in Xnb files. 
+                            throw new InvalidOperationException(
+                                "Failed to get default constructor for ContentTypeReader. To work around, add a creation function to ContentTypeReaderManager.AddTypeCreator() " +
+                                "with the following failed type string: " + originalReaderTypeString);
+                        }
+                    }
+                    else
+                        throw new ContentLoadException("Could not find matching content reader of type " + originalReaderTypeString + " (" + readerTypeString + ")");
+                }
 
 				// I think the next 4 bytes refer to the "Version" of the type reader,
                 // although it always seems to be zero
@@ -172,5 +201,22 @@ namespace Microsoft.Xna.Framework.Content
 			
 			return preparedType;
 		}
+
+        // Static map of type names to creation functions. Required as iOS requires all types at compile time
+        private static Dictionary<string, Func<ContentTypeReader>> typeCreators = new Dictionary<string, Func<ContentTypeReader>>();
+
+        /// <summary>
+        /// Adds the type creator.
+        /// </summary>
+        /// <param name='typeString'>
+        /// Type string.
+        /// </param>
+        /// <param name='createFunction'>
+        /// Create function.
+        /// </param>
+        public static void AddTypeCreator(string typeString, Func<ContentTypeReader> createFunction)
+        {
+            typeCreators.Add(typeString, createFunction);
+        }
     }
 }
