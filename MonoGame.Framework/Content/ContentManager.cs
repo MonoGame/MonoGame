@@ -191,6 +191,9 @@ namespace Microsoft.Xna.Framework.Content
 			Stream stream;
 			try
             {
+                if (assetName[0] == '\\') {
+                    assetName = assetName.Substring(1);
+                }
                 string assetPath = Path.Combine(RootDirectoryFullPath, assetName) + ".xnb";
                 stream = TitleContainer.OpenStream(assetPath);
 
