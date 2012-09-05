@@ -170,7 +170,6 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
                 if (loc.State == TouchLocationState.Pressed)
                 {
-                    loc.TouchHistory = new TouchInfo(loc.Id, loc.Position);
                     _touchLocations.Add(loc);
                     _events.RemoveAt(i);
                     continue;
