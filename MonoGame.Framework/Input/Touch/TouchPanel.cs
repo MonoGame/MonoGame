@@ -60,17 +60,12 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// <summary>
         /// The currently touch state.
         /// </summary>
-        private static Dictionary<int, TouchLocation> _touchLocations = new Dictionary<int, TouchLocation>();
+        private static List<TouchLocation> _touchLocations = new List<TouchLocation>();
 
         /// <summary>
         /// The touch events to be processed and added to the current state.
         /// </summary>
         private static List<TouchLocation> _events = new List<TouchLocation>();
-
-        /// <summary>
-        /// Scratch list used to remove touch state.
-        /// </summary>
-        private static List<int> _removeId = new List<int>();
 
         /// <summary>
         /// The current touch state.
@@ -116,59 +111,67 @@ namespace Microsoft.Xna.Framework.Input.Touch
             if (!_updateState)
                 return _state;
 
-            // Remove the previously released touch locations.
-            foreach (var keyLoc in _touchLocations)
+            // Remove the previously released touch locations as these
+            // should have been processed by the caller by now.
+            for (var i=0; i < _touchLocations.Count;)
             {
-                if (keyLoc.Value.State == TouchLocationState.Released)
-                    _removeId.Add(keyLoc.Key);
+                var touch = _touchLocations[i];
 
-            }
-            foreach (var id in _removeId)
-			{
-                _touchLocations.Remove(id);
-				_heldEventsProcessed.Remove(id);
-                _processedDoubleTaps.Remove(id);
-			}
-            _removeId.Clear();
-           
-            // Update the existing touch locations.
-            var keys = _touchLocations.Keys.ToArray();
-            foreach(var key in keys)
-            {
-                var loc = _touchLocations[key];
-                var prev = loc;
-               
-                // Update existing pressed touches moved
-                var updatedState = TouchLocationState.Moved;
-
-                // Remove any pending events of this type.
-                for (var i = 0; i < _events.Count; )
+                if (touch.State == TouchLocationState.Released)
                 {
-                    if (_events[i].Id == loc.Id)
+                    _touchLocations.RemoveAt(i);
+
+                    // Also remove this touch touch location 
+                    // from the gesture recongnition code.
+                    _heldEventsProcessed.Remove(touch.Id);
+                    _processedDoubleTaps.Remove(touch.Id);
+                    continue;
+                }
+
+                i++;
+            }
+
+            // Update the existing touch locations.
+            for (var i=0; i < _touchLocations.Count; i++)
+            {
+                // Get the current touch state which will be 
+                // updated to a new state.
+                var prevTouch = _touchLocations[i];
+
+                // If no other events are found the default next touch state 
+                // will be the current state converted to a move event.
+                var nextTouch = new TouchLocation(prevTouch.Id, TouchLocationState.Moved, prevTouch.Position, prevTouch.Pressure);
+
+                // Remove all pending events of this type keeping
+                // the last one as the next new touch state.
+                for (var j = 0; j < _events.Count; )
+                {
+                    if (_events[j].Id == prevTouch.Id)
                     {
-                        loc = _events[i];
-                        updatedState = loc.State;
-                        _events.RemoveAt(i);
+                        nextTouch = _events[j];
+                        _events.RemoveAt(j);
                         continue;
                     }
                     
-                    i++;
+                    j++;
                 }
 
-                _touchLocations[key] = new TouchLocation(loc.Id,
-                                                         updatedState, loc.Position, loc.Pressure,
-                                                         prev.State, prev.Position, prev.Pressure, prev.TouchHistory);
+                // Set the new touch state preserving the previous state.
+                _touchLocations[i] = new TouchLocation( nextTouch.Id,
+                                                        nextTouch.State, nextTouch.Position, nextTouch.Pressure,
+                                                        prevTouch.State, prevTouch.Position, prevTouch.Pressure, prevTouch.TouchHistory);
             }
 
-            // Add any new pressed events.
+            // Add new pressed events last to ensure that they
+            // are seen once before becoming a move or release.
             for (var i = 0; i < _events.Count; )
             {
                 var loc = _events[i];
 
                 if (loc.State == TouchLocationState.Pressed)
                 {
-                    _touchLocations.Add(loc.Id, loc);
                     loc.TouchHistory = new TouchInfo(loc.Id, loc.Position);
+                    _touchLocations.Add(loc);
                     _events.RemoveAt(i);
                     continue;
                 }
@@ -177,7 +180,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
             }
 
             // Set the new state.
-            _state = new TouchCollection(_touchLocations.Values.ToArray());
+            _state = new TouchCollection(_touchLocations.ToArray());
 
             // Don't update again till the next frame.
             _updateState = false;
@@ -626,8 +629,6 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			
 			return true;
 		}
-
-        static List<TouchLocation> _prevTouchBuffer = new List<TouchLocation>();
 
 		private static bool ProcessFlick(TouchLocation touch)
 		{
