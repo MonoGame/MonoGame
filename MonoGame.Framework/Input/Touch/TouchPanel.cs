@@ -60,12 +60,12 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// <summary>
         /// The currently touch state.
         /// </summary>
-        private static List<TouchLocation> _touchLocations = new List<TouchLocation>();
+        private static readonly List<TouchLocation> _touchLocations = new List<TouchLocation>();
 
         /// <summary>
         /// The touch events to be processed and added to the current state.
         /// </summary>
-        private static List<TouchLocation> _events = new List<TouchLocation>();
+        private static readonly List<TouchLocation> _events = new List<TouchLocation>();
 
         /// <summary>
         /// The current touch state.
@@ -87,12 +87,6 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// The current size of the display.
         /// </summary>
         private static Point _displaySize = Point.Zero;
-
-        /// <summary>
-        /// Set when the display has changed and the touch scale
-        /// needs to be recalculated.
-        /// </summary>
-        private static bool _displayChanged = false;
 
         internal static Queue<GestureSample> GestureList = new Queue<GestureSample>();
 		internal static event EventHandler EnabledGesturesChanged;
@@ -206,13 +200,13 @@ namespace Microsoft.Xna.Framework.Input.Touch
                     _events.FindIndex(e => e.Id == id) != -1)
                 return;
 #endif
-           
-            // TODO: Maybe it is better if we apply touch
-            // scaling when we process the events and not
-            // as we get them?
 
-            if (_displayChanged)
-            {
+            // Apply the touch scale to the new location.
+            _events.Add(new TouchLocation(id, state, position * _touchScale));
+        }
+
+        private static void UpdateTouchScale()
+        {
                 // Get the window size.
                 //
                 // TODO: This will be alot smoother once we get XAML working with Game.
@@ -232,12 +226,6 @@ namespace Microsoft.Xna.Framework.Input.Touch
                 // Recalculate the touch scale.
                 _touchScale = new Vector2(  (float)DisplayWidth / windowSize.X,
                                             (float)DisplayHeight / windowSize.Y);
-                
-                _displayChanged = false;
-            }
-
-            // Apply the touch scale to the new location.
-            _events.Add(new TouchLocation(id, state, position * _touchScale));
         }
 
         internal static void UpdateState()
@@ -266,11 +254,11 @@ namespace Microsoft.Xna.Framework.Input.Touch
             }
             set
             {
-                if (_displaySize.Y == value)
-                    return;
-
-                _displayChanged = true;
-                _displaySize.Y = value;
+                if (_displaySize.Y != value)
+                {
+                    _displaySize.Y = value;
+					UpdateTouchScale();
+                }
             }
         }
 
@@ -288,11 +276,11 @@ namespace Microsoft.Xna.Framework.Input.Touch
             }
             set
             {
-                if (_displaySize.X == value)
-                    return;
-
-                _displayChanged = true;
-                _displaySize.X = value;
+                if (_displaySize.X != value)
+                {
+                    _displaySize.X = value;
+                    UpdateTouchScale();
+                }
             }
         }
 		
@@ -305,10 +293,12 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			}
             set
 			{
-				var prev=_enabledGestures;
-				_enabledGestures = value;
-				if (_enabledGestures!=prev && EnabledGesturesChanged!=null)
-					EnabledGesturesChanged(null, null);
+				if (_enabledGestures != value)
+                {
+                    _enabledGestures = value;
+                    if (EnabledGesturesChanged != null)
+					    EnabledGesturesChanged(null, EventArgs.Empty);
+                }
 			}
         }
 
