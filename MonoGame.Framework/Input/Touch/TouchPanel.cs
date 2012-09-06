@@ -99,10 +99,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
                     if (touch.State == TouchLocationState.Released)
                     {
-                        // Remove this touch location from the gesture arrays.
+                        // Remove this location from the gesture and the touch state.
                         _heldEventsProcessed.Remove(touch.Id);
-                        _processedDoubleTaps.Remove(touch.Id);
-
                         _touchLocations.RemoveAt(i);
                         continue;
                     }
@@ -396,22 +394,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 					
 				}
 			}
-			
-			// Fire off any tap gestures that are ready.
-			for (int x = 0; x < _pendingTaps.Count;)
-			{
-				_tempTap = _pendingTaps[x];
-				
-				if (DateTime.Now.Ticks - _tempTap.Value.Timestamp.Ticks >= _maxTicksToProcessDoubleTap)
-				{
-					GestureList.Enqueue(_tempTap.Value);
-					_pendingTaps.RemoveAt(x);
-					continue;
-				}
-				
-				x++;
-			}
-			
+
 			if (_pinchComplete)
 			{
 				_savedPinchTouches[0] = _savedPinchTouches[1] = null;
@@ -419,14 +402,15 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			}
 		}
 		
-		static List<int> _heldEventsProcessed = new List<int>();
+		static readonly List<int> _heldEventsProcessed = new List<int>();
 
 		private static bool ProcessHold(TouchLocation touch)
 		{
 			if (!GestureIsEnabled(GestureType.Hold))
 				return false;
-			
-			if (touch.TouchHistory.Lifetime.Ticks < _maxTicksToProcessHold)
+
+            var elapsed = DateTime.Now - touch.TouchHistory.TimeTouchStarted;
+            if (elapsed.Ticks < _maxTicksToProcessHold)
 				return false;
 			
 			// Only a single held event gets sent per touch.
@@ -444,47 +428,27 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			
 			return true;				
 		}
-        
-        static List<int> _processedDoubleTaps = new List<int>();
+
+        private static int _lastDoubleTapId;
 
         private static bool ProcessDoubleTap(TouchLocation touch)
         {
             if (!GestureIsEnabled(GestureType.DoubleTap))
                 return false;
-            
-            // Another tap must be pending in order to properly
-            // process a double tap.
-            if (_pendingTaps.Count == 0)
+                           
+            // If the new tap is too far away from the last then
+            // this cannot be a double tap event.
+            var diff = _lastTap.Position - touch.Position;
+            if (diff.Length() > 35) // TODO: Find the correct XNA tolerance!
                 return false;
-            
-            // Using a member variable rather than initializing a new GestureSample each call.
-            _tempTap = null;
-            foreach (var tap in _pendingTaps)
-            {
-                var diff = tap.Position - touch.Position;
                 
-                // Check that the distance between the two isn't too great.
-                if (diff.Length() > 35)
-                    continue;
-                
-                // Also check that this tap happened within a certain threshold
-                var lifetime = touch.TouchHistory.Lifetime - tap.Timestamp;
-                if (lifetime.Ticks > _maxTicksToProcessDoubleTap)
-                    continue;
-                
-                //Otherwise, we are ready to "convert" this tap into a doubletap.
-                _tempTap = tap;
-            }
-            
-            // Check that the test passed
-            if (_tempTap == null)
+            // Also check that this tap happened within a certain threshold
+            var elapsed = touch.TouchHistory.TimeTouchStarted - _lastTap.Timestamp;
+            if (elapsed.Ticks > _maxTicksToProcessDoubleTap)
                 return false;
-            
-            // Remove/cancel the original tap event.
-            _pendingTaps.Remove(_tempTap.Value);
-            
+                         
             // "Replace" it with a doubletap.
-            TouchPanel.GestureList.Enqueue(new GestureSample(
+            GestureList.Enqueue(new GestureSample(
                            GestureType.DoubleTap, new TimeSpan (DateTime.Now.Ticks),
                            touch.Position, Vector2.Zero,
                            Vector2.Zero, Vector2.Zero));
@@ -492,12 +456,12 @@ namespace Microsoft.Xna.Framework.Input.Touch
             // This touch will eventually enter a "released" state. When it does, because
             // it was part of a doubletap, we don't want to process a third tap at the end.
             // Save it's ID to prevent this from showing up in the future.
-            _processedDoubleTaps.Add(touch.Id);
-            
+            _lastDoubleTapId = touch.Id;
+
             return true;
         }
 
-        static List<GestureSample> _pendingTaps = new List<GestureSample>();
+        private static GestureSample _lastTap;
 
 		private static bool ProcessTap(TouchLocation touch)
 		{
@@ -509,21 +473,24 @@ namespace Microsoft.Xna.Framework.Input.Touch
             if (touch.TouchHistory.TotalDistanceMoved > _tapJitterTolerance)
 				return false;
 
-			if (touch.TouchHistory.Lifetime.Ticks > _maxTicksToProcessHold)
+            var elapsed = DateTime.Now - touch.TouchHistory.TimeTouchStarted;
+            if (elapsed.Ticks > _maxTicksToProcessHold)
 				return false;
             
             // Check that this touch isn't the end of a previously
             // processed doubletap.
-            if (_processedDoubleTaps.Contains(touch.Id))
+            if (_lastDoubleTapId == touch.Id)
                 return false;
+            
+            // Store the last tap for double tap processing.          
+		    _lastTap = new GestureSample(
+		        GestureType.Tap, new TimeSpan(DateTime.Now.Ticks),
+		        touch.Position, Vector2.Zero,
+		        Vector2.Zero, Vector2.Zero);
 
-            // Queue up the tap. Because of how DoubleTap works, we can't
-            // just send this off to the GesturePanel right away.
-			_pendingTaps.Add(new GestureSample (
-			GestureType.Tap, new TimeSpan (DateTime.Now.Ticks),
-			touch.Position, Vector2.Zero,
-			Vector2.Zero, Vector2.Zero));
-					
+            // Fire off the tap event immediately.
+            GestureList.Enqueue(_lastTap);
+
 			return true;
 		}
 
@@ -549,7 +516,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 				return false;
 			
 			// Free drag takes priority over a directional one.
-			GestureType gestureType = GestureType.FreeDrag;
+			var gestureType = GestureType.FreeDrag;
 			if (!GestureIsEnabled(GestureType.FreeDrag))
 			{
 				// Horizontal drag takes precedence over a vertical one.
