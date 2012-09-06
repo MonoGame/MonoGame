@@ -41,41 +41,126 @@
 
 using System;
 
-using MonoTouch.UIKit;
+using Microsoft.Xna.Framework;
+
+using MonoTouch.CoreMotion;
+using MonoTouch.Foundation;
 
 namespace Microsoft.Xna.Framework.Input
 {
-	public static class Accelerometer
-	{
-		private static AccelerometerState _state;
-		private static AccelerometerCapabilities _capabilities = new AccelerometerCapabilities();
-		private const int AccelerometerFrequency = 30;
-		private static Vector3 _accelerometerVector = new Vector3(0, 0, 0);
-		
-		public static void SetupAccelerometer()
-		{
-			UIAccelerometer.SharedAccelerometer.Acceleration += UIAccelerometerSharedAccelerometerAcceleration;				
-			UIAccelerometer.SharedAccelerometer.UpdateInterval = 1/AccelerometerFrequency;
-        }
+    public class SensorFailedException : Exception
+    {
+        public int ErrorId { get; protected set; }
+    }
 
-		static void UIAccelerometerSharedAccelerometerAcceleration (object sender, UIAccelerometerEventArgs e)
-		{
-			_accelerometerVector.X = (float)(e.Acceleration.X * 2);
-			_accelerometerVector.Y = (float)(e.Acceleration.Y * 2);
-			_accelerometerVector.Z = (float)(e.Acceleration.Z * 2);
-			_state.Acceleration = _accelerometerVector;				
-		}
+    public struct AccelerometerReading
+    {
+        public Vector3 Acceleration { get; internal set; }
+        public DateTimeOffset Timestamp { get; internal set; }
+    }
 
-		public static AccelerometerCapabilities GetCapabilities()
+    public class AccelerometerReadingEventArgs : EventArgs
+    {
+        public AccelerometerReading SensorReading { get; set; }
+        
+        public AccelerometerReadingEventArgs(AccelerometerReading sensorReading)
         {
-			return _capabilities;
+            this.SensorReading = sensorReading;
         }
-		
-		public static AccelerometerState GetState()
-		{
-			// For some reason, i need set this all the time to work..
-			//UIAccelerometer.SharedAccelerometer.Acceleration += UIAccelerometerSharedAccelerometerAcceleration;				
-			return _state;
-		}
-	}
+    }
+
+    public sealed class Accelerometer
+    {
+        // SensorBase
+        private TimeSpan timeBetweenUpdates;
+        public AccelerometerReading CurrentValue { get; private set; }
+        public bool IsDataValid { get; private set; }
+        public TimeSpan TimeBetweenUpdates
+        {
+            get { return this.timeBetweenUpdates; }
+            set
+            {
+                if (this.timeBetweenUpdates != value)
+                {
+                    this.timeBetweenUpdates = value;
+                    if (this.TimeBetweenUpdatesChanged != null)
+                        this.TimeBetweenUpdatesChanged(this, EventArgs.Empty);
+                }
+            }
+        }
+        
+        public event EventHandler<AccelerometerReadingEventArgs> CurrentValueChanged;
+        private event EventHandler<EventArgs> TimeBetweenUpdatesChanged;
+       
+        // Accelerometer
+        private static CMMotionManager motionManager = new CMMotionManager();
+        private static bool started = false;
+        
+        public static bool IsSupported
+        {
+            get { return motionManager.AccelerometerAvailable; }
+        }
+        
+        private static event CMAccelerometerHandler readingChanged;
+        
+        public Accelerometer()
+        {
+            this.TimeBetweenUpdates = TimeSpan.FromMilliseconds(2);
+
+            if (!IsSupported)
+                throw new SensorFailedException();
+            
+            this.TimeBetweenUpdatesChanged += this.UpdateInterval;
+            readingChanged += ReadingChangedHandler;
+            
+        }
+        
+        public void Start()
+        {
+            if (started == false)
+            {
+                motionManager.StartAccelerometerUpdates(NSOperationQueue.CurrentQueue, AccelerometerHandler);
+                started = true;
+            }
+        }
+        
+        public void Stop()
+        {
+            motionManager.StopAccelerometerUpdates();
+            started = false;
+        }
+        
+        private void AccelerometerHandler(CMAccelerometerData data, NSError error)
+        {
+            readingChanged(data, error);
+        }
+        
+        private void ReadingChangedHandler(CMAccelerometerData data, NSError error)
+        {
+            AccelerometerReading reading = new AccelerometerReading();
+            this.IsDataValid = error == null;
+            if (this.IsDataValid)
+            {
+                this.IsDataValid = true;
+                reading.Acceleration = new Vector3((float)data.Acceleration.X, (float)data.Acceleration.Y, (float)data.Acceleration.Z);
+                reading.Timestamp = DateTime.Now;
+                this.CurrentValue = reading;
+                this.IsDataValid = error == null;
+            }
+            FireOnCurrentValueChanged(this, new AccelerometerReadingEventArgs(reading));
+        }
+        
+        private void UpdateInterval(object sender, EventArgs args)
+        {
+            motionManager.AccelerometerUpdateInterval = this.TimeBetweenUpdates.TotalSeconds;
+        }
+
+        private void FireOnCurrentValueChanged(object sender, AccelerometerReadingEventArgs sample)
+        {
+            if (this.CurrentValueChanged != null)
+                this.CurrentValueChanged(this, sample);
+        }
+    }
 }
+
+
