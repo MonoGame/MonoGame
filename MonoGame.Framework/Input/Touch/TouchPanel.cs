@@ -58,7 +58,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
     public static class TouchPanel
     {
         /// <summary>
-        /// The currently touch state.
+        /// The currently touch locations for state.
         /// </summary>
         private static readonly List<TouchLocation> _touchLocations = new List<TouchLocation>();
 
@@ -66,17 +66,6 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// The touch events to be processed and added to the current state.
         /// </summary>
         private static readonly List<TouchLocation> _events = new List<TouchLocation>();
-
-        /// <summary>
-        /// The current touch state.
-        /// </summary>
-        private static TouchCollection _state = new TouchCollection();
-
-        /// <summary>
-        /// If true an update to the touch state should occur
-        /// on the next call to GetState.
-        /// </summary>
-        private static bool _updateState = true;
 
         /// <summary>
         /// The positional scale to apply to touch input.
@@ -98,45 +87,45 @@ namespace Microsoft.Xna.Framework.Input.Touch
             return Capabilities;
         }
 
-        public static TouchCollection GetState()
+        private static void RefreshState(bool clearReleased)
         {
-            // If the state isn't dirty then just
-            // return the current state.
-            if (!_updateState)
-                return _state;
-
-            // Remove the previously released touch locations as these
-            // should have been processed by the caller by now.
-            for (var i=0; i < _touchLocations.Count;)
+            if (clearReleased)
             {
-                var touch = _touchLocations[i];
-
-                if (touch.State == TouchLocationState.Released)
+                // Remove the previously released touch locations as these
+                // should have been processed by the caller by now.
+                for (var i = 0; i < _touchLocations.Count;)
                 {
-                    _touchLocations.RemoveAt(i);
+                    var touch = _touchLocations[i];
 
-                    // Also remove this touch touch location 
-                    // from the gesture recongnition code.
-                    _heldEventsProcessed.Remove(touch.Id);
-                    _processedDoubleTaps.Remove(touch.Id);
-                    continue;
+                    if (touch.State == TouchLocationState.Released)
+                    {
+                        // Remove this touch location from the gesture arrays.
+                        _heldEventsProcessed.Remove(touch.Id);
+                        _processedDoubleTaps.Remove(touch.Id);
+
+                        _touchLocations.RemoveAt(i);
+                        continue;
+                    }
+
+                    i++;
                 }
-
-                i++;
             }
 
             // Update the existing touch locations.
             for (var i=0; i < _touchLocations.Count; i++)
             {
-                // Get the current touch state which will be 
-                // updated to a new state.
+                // Get the next touch location for update.
                 var prevTouch = _touchLocations[i];
+
+                // If this location has been released then skip it.
+                if (prevTouch.State == TouchLocationState.Released)
+                    continue;
 
                 // If no other events are found the default next touch state 
                 // will be the current state converted to a move event.
                 var nextTouch = new TouchLocation(prevTouch.Id, TouchLocationState.Moved, prevTouch.Position, prevTouch.Pressure);
 
-                // Remove all pending events of this type keeping
+                // Remove all pending events with the same id keeping
                 // the last one as the next new touch state.
                 for (var j = 0; j < _events.Count; )
                 {
@@ -172,17 +161,16 @@ namespace Microsoft.Xna.Framework.Input.Touch
                 i++;
             }
 
-            // Set the new state.
-            _state = new TouchCollection(_touchLocations.ToArray());
-
-            // Don't update again till the next frame.
-            _updateState = false;
-			
-			//Update our gestures
+			// Update the gesture state.
 			UpdateGestures();
-            
-            // Return the state.
-            return _state;
+        }
+
+        public static TouchCollection GetState()
+        {
+            RefreshState(true);
+
+            var state = new TouchCollection(_touchLocations.ToArray());
+            return state;
         }
         
         internal static void AddEvent(int id, TouchLocationState state, Vector2 position)
@@ -228,18 +216,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
                                             (float)DisplayHeight / windowSize.Y);
         }
 
-        internal static void UpdateState()
-        {
-            // Just tell the next call to GetState() that
-            // it is time for it to update.
-            _updateState = true;
-        }
-
 		public static GestureSample ReadGesture()
         {
-            // Make sure we have updated touch state.
-            GetState();
-
             // Return the next gesture.
 			return GestureList.Dequeue();			
         }
@@ -306,10 +284,11 @@ namespace Microsoft.Xna.Framework.Input.Touch
         {
             get
             {
-                // Make sure we have updated touch state.
-                GetState();
+                // Gather more events if we've run out.
+                if (GestureList.Count == 0 && _events.Count > 0)
+                    RefreshState(false);
 
-				return ( GestureList.Count > 0 );				
+				return GestureList.Count > 0;				
             }
         }
 		
@@ -337,10 +316,9 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
 		private static void UpdateGestures()
 		{			
-			var touchLocState = _state;
-			for(int x = 0; x < touchLocState.Count; x++)
+            for (var x = 0; x < _touchLocations.Count; x++)
 			{
-				var touch = touchLocState[x];
+                var touch = _touchLocations[x];
 				
 				switch(touch.State)
 				{
@@ -356,7 +334,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 					// Any time that two fingers are detected in XNA, it's considered a pinch
 					// Save the touch and combine it with the next one to create a pinch gesture
 					if (GestureIsEnabled(GestureType.Pinch) &&
-					    touchLocState.Count > 1 &&
+                        _touchLocations.Count > 1 &&
 					    !_pinchComplete)
 					{
 						if (_savedPinchTouches[0] == null || _savedPinchTouches[0].Value.Id == touch.Id)
@@ -369,11 +347,14 @@ namespace Microsoft.Xna.Framework.Input.Touch
 						
 						break;
 					}
-					
-					if (touch.State == TouchLocationState.Moved)
-						ProcessDrag(touch);
-					else
-						ProcessHold(touch);
+
+                    if (touch.State == TouchLocationState.Moved)
+                    {
+                        if (touch.TouchHistory.TotalDistanceMoved < _tapJitterTolerance)
+                            ProcessHold(touch);
+                        else
+                            ProcessDrag(touch);
+                    }
 					
 					break;
 					
@@ -449,14 +430,13 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			
 			_heldEventsProcessed.Add(touch.Id);
 			
-			TouchPanel.GestureList.Enqueue(
+			GestureList.Enqueue(
                 new GestureSample(  GestureType.Hold, 
                                     TimeSpan.FromTicks(DateTime.Now.Ticks),
 			                        touch.Position, Vector2.Zero,
 			                        Vector2.Zero, Vector2.Zero));
 			
-			return true;
-				
+			return true;				
 		}
         
         static List<int> _processedDoubleTaps = new List<int>();
@@ -559,7 +539,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			var delta = touch.Position - prevPosition;
 			
 			// TODO: Find XNA's drag tolerance.
-			if (delta == Vector2.Zero)
+            if (touch.TouchHistory.TotalDistanceMoved < _tapJitterTolerance)
 				return false;
 			
 			// Free drag takes priority over a directional one.
