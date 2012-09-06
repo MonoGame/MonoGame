@@ -294,6 +294,12 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		
 		#region Gesture Recognition
 		
+
+        /// <summary>
+        /// The minimum drag distance required to tigger a free drag gesture.
+        /// </summary>
+        private const int _freeDragTolerance = 20;
+		
         // Tolerance to prevent small movements from cancelling a touch/held recognition.
         private const int _tapJitterTolerance = 5;
         private static readonly TimeSpan _flickMovementThreshold = TimeSpan.FromMilliseconds(55);
@@ -538,8 +544,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			var prevPosition = touch.TryGetPreviousLocation(out _previousTouchLoc) ? _previousTouchLoc.Position : touch.Position;
 			var delta = touch.Position - prevPosition;
 			
-			// TODO: Find XNA's drag tolerance.
-            if (touch.TouchHistory.TotalDistanceMoved < _tapJitterTolerance)
+            // Wait till we hit the drag tolerance.
+            if (touch.TouchHistory.TotalDistanceMoved < _freeDragTolerance)
 				return false;
 			
 			// Free drag takes priority over a directional one.
