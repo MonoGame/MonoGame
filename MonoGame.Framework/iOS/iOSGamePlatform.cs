@@ -178,7 +178,6 @@ namespace Microsoft.Xna.Framework
             // Show the window
             _mainWindow.MakeKeyAndVisible();
 
-            Accelerometer.SetupAccelerometer();
             BeginObservingUIApplication();
 
             _viewController.View.BecomeFirstResponder();
