@@ -61,7 +61,6 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// The currently touch state.
         /// </summary>
         private static Dictionary<int, TouchLocation> _touchLocations = new Dictionary<int, TouchLocation>();
-        private static Dictionary<int, TouchLocation> _touchLocationsReal = new Dictionary<int, TouchLocation>();
 
         /// <summary>
         /// The touch events to be processed and added to the current state.
@@ -117,8 +116,6 @@ namespace Microsoft.Xna.Framework.Input.Touch
             if (!_updateState)
                 return _state;
 
-            _touchLocationsReal.Clear ();
-
             // Remove the previously released touch locations.
             foreach (var keyLoc in _touchLocations)
             {
@@ -162,11 +159,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
                     _touchLocations[loc.Id] = new TouchLocation(loc.Id,
                                                                 loc.State, loc.Position, loc.Pressure,
                                                                 prev.State, prev.Position, prev.Pressure, prev.TouchHistory);
-                    _touchLocationsReal[loc.Id] = _touchLocations[loc.Id];
                     continue;
                 }
-                else
-                    loc.ToString ();
 
                 i++;
             }
@@ -178,7 +172,6 @@ namespace Microsoft.Xna.Framework.Input.Touch
                 if (loc.State == TouchLocationState.Pressed)
                 {
                     _touchLocations.Add(loc.Id, loc);
-                    _touchLocationsReal.Add(loc.Id, _touchLocations[loc.Id]);
                     loc.TouchHistory = new TouchInfo(loc.Id, loc.Position);
                     _events.RemoveAt(i);
                     continue;
@@ -188,7 +181,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
             }
 
             // Set the new state.
-            _state = new TouchCollection(_touchLocationsReal.Values.ToArray());
+            _state = new TouchCollection(_touchLocations.Values.ToArray());
 
             // Don't update again till the next frame.
             _updateState = false;
