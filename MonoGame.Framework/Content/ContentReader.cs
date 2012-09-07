@@ -145,55 +145,34 @@ namespace Microsoft.Xna.Framework.Content
         }
 
         public T ReadExternalReference<T>()
-		{
+        {
             var externalReference = ReadString();
-			
+
             if (!String.IsNullOrEmpty(externalReference))
             {
 #if WINRT
-                var notSeparator = '/';
-                var separator = '\\';
-
+                const char notSeparator = '/';
+                const char separator = '\\';
+#else
+                const char notSeparator = '\\';
+                var separator = Path.DirectorySeparatorChar;
+#endif
                 externalReference = externalReference.Replace(notSeparator, separator);
 
-                var fullAssetName = assetName.Replace(notSeparator, separator);
-                var pathDirectory = Path.GetDirectoryName(fullAssetName);
-                var fullAssetPath = Path.Combine(pathDirectory, externalReference);
+                // Get a uri for the asset path using the file:// schema and no host
+                var src = new Uri("file:///" + assetName.Replace(notSeparator, separator));
 
-                // HACK: This is the only way i can find of normalizing/canonicalizing paths
-                // in WinRT.  We should look for a better method in the upcoming updates.
-                {
-                    var package = Windows.ApplicationModel.Package.Current;
-                    fullAssetPath = Path.Combine(package.InstalledLocation.Path, fullAssetPath);
-                    fullAssetPath = new Uri(fullAssetPath).LocalPath;
-                    fullAssetPath = fullAssetPath.Substring(package.InstalledLocation.Path.Length + 1);
-                }
+                // Add the relative path to the external reference
+                var dst = new Uri(src, externalReference);
 
-                return contentManager.Load<T>(fullAssetPath);
-#else
-                externalReference = externalReference.Replace('\\', Path.DirectorySeparatorChar);
-                
-                string fullRootPath = ContentManager.RootDirectoryFullPath;
-				
-				// iOS won't find the right name if the \'s are facing the wrong way. be certian we're good here.
-				var fullAssetName = Path.Combine(fullRootPath, assetName.Replace('\\', Path.DirectorySeparatorChar)); 
-				var pathDirectory = Path.GetDirectoryName(fullAssetName);
-				var dirExtCombined = Path.Combine(pathDirectory, externalReference);
-				
-                string fullAssetPath = Path.GetFullPath(dirExtCombined);
-
-#if ANDROID || PSS
-                string externalAssetName = fullAssetPath.Substring(fullRootPath.Length);
-#else				
-                string externalAssetName = fullAssetPath.Substring(fullRootPath.Length);
-#endif
-                return contentManager.Load<T>(externalAssetName);
-#endif
+                // The uri now contains the path to the external reference within the content manager
+                // Get the local path and skip the first character (the path separator)
+                return contentManager.Load<T>(dst.LocalPath.Substring(1));
             }
 
             return default(T);
         }
-        
+
         public Matrix ReadMatrix()
         {
             Matrix result = new Matrix();
