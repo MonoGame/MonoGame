@@ -565,10 +565,10 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			    _previousTouchLoc.State != TouchLocationState.Moved)
 				return false;
 			
-			TouchPanel.GestureList.Enqueue (new GestureSample (
-			GestureType.DragComplete, touch.Timestamp,
-			Vector2.Zero, Vector2.Zero,
-			Vector2.Zero, Vector2.Zero));
+			GestureList.Enqueue (new GestureSample (
+			    GestureType.DragComplete, touch.Timestamp,
+			    Vector2.Zero, Vector2.Zero,
+			    Vector2.Zero, Vector2.Zero));
 
             // Remove this touch id from the list of processed drags.
             _processedDrags.Remove(touch.Id);
