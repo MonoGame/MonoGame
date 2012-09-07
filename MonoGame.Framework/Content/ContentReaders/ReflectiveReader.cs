@@ -121,8 +121,13 @@ namespace Microsoft.Xna.Framework.Content
 
             if (property != null && property.Name == "Item")
             {
+#if WINRT
+                var getMethod = property.GetMethod;
+                var setMethod = property.SetMethod;
+#else
                 var getMethod = property.GetGetMethod();
                 var setMethod = property.GetSetMethod();
+#endif
 
                 if ((getMethod != null && getMethod.GetParameters().Length > 0) ||
                     (setMethod != null && setMethod.GetParameters().Length > 0))
