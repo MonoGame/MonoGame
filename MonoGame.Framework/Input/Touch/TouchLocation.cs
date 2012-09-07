@@ -60,8 +60,6 @@ namespace Microsoft.Xna.Framework.Input.Touch
         // TODO: Lets try to remove these.
 		// internals required for gesture recognition.
 
-        internal TimeSpan TimeTouchStarted;
-
         internal TouchInfo _touchHistory;
 				
 		// Only used in Android, for now
@@ -69,6 +67,10 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		private float previousPressure;
 		
 		#region Properties
+
+        internal TimeSpan PressTimestamp { get; private set; }
+
+        internal TimeSpan Timestamp { get; private set; }
 
         internal TouchInfo TouchHistory
         {
@@ -112,20 +114,6 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		
 		#region Constructors
 
-		public TouchLocation(int aId, TouchLocationState aState, Vector2 aPosition,
-		                     TouchLocationState aPreviousState, Vector2 aPreviousPosition)
-        {
-            id = aId;
-			position = aPosition;
-			previousPosition = aPreviousPosition;
-			state = aState;
-			previousState = aPreviousState;	
-			pressure = 0.0f;
-			previousPressure = 0.0f;
-            _touchHistory = new TouchInfo(id, position);
-		    TimeTouchStarted = TimeSpan.FromTicks(DateTime.Now.Ticks);
-        }
-
         public TouchLocation(int aId, TouchLocationState aState, Vector2 aPosition)
         {
             id = aId;
@@ -136,56 +124,38 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			pressure = 0.0f;
 			previousPressure = 0.0f;
             _touchHistory = new TouchInfo(id, position);
-            TimeTouchStarted = TimeSpan.FromTicks(DateTime.Now.Ticks);
-        }
-		
-		// Only for Android
-		public TouchLocation(int aId, TouchLocationState aState, Vector2 aPosition, float aPressure,
-		                     TouchLocationState aPreviousState, Vector2 aPreviousPosition, float aPreviousPressure)
-        {
-            id = aId;
-			position = aPosition;
-			previousPosition = aPreviousPosition;
-			state = aState;
-			previousState = aPreviousState;	
-			pressure = aPressure;
-			previousPressure = aPreviousPressure;
-            _touchHistory = new TouchInfo(id, position);
-            TimeTouchStarted = TimeSpan.FromTicks(DateTime.Now.Ticks);
-        }
-		
-        // We are "updating" a touch location by creating a new one and filling in it's appropriate states.
-		public TouchLocation(int aId, TouchLocationState aState, Vector2 aPosition, float aPressure,
-		                     TouchLocationState aPreviousState, Vector2 aPreviousPosition, float aPreviousPressure, TouchInfo aPrevTouchInfo)
-        {
-            id = aId;
-			position = aPosition;
-			previousPosition = aPreviousPosition;
-			state = aState;
-			previousState = aPreviousState;	
-			pressure = aPressure;
-			previousPressure = aPreviousPressure;
 
-            // Update the history object.
-            _touchHistory = aPrevTouchInfo;
-            _touchHistory.LogPosition(aPosition);
-            TimeTouchStarted = TimeSpan.FromTicks(DateTime.Now.Ticks);
-        }
+            Timestamp = TimeSpan.FromTicks(DateTime.Now.Ticks);
+            PressTimestamp = aState == TouchLocationState.Pressed ? Timestamp : TimeSpan.Zero;
+        }		
 		
-		public TouchLocation(int aId, TouchLocationState aState, Vector2 aPosition, float aPressure)
-        {
-            id = aId;
-			position = aPosition;
-			previousPosition = Vector2.Zero;		
-			state = aState;
-			previousState = TouchLocationState.Invalid;
-			pressure = aPressure;
-			previousPressure = 0.0f;
-            _touchHistory = new TouchInfo(id, position);
-            TimeTouchStarted = TimeSpan.FromTicks(DateTime.Now.Ticks);
-        }
 		#endregion
-		
+
+
+        internal TouchLocation ToState(TouchLocationState aState)
+        {
+            var touch = this;
+            touch.state = aState;
+            return touch;
+        }
+
+        internal void ToState(TouchLocation nextTouch)
+        {
+            // Store the current state as the previous one.
+            previousPosition = position;
+            previousState = state;
+            previousPressure = pressure;
+
+            // Set the new state.
+            position = nextTouch.position;
+            state = nextTouch.state;
+            pressure = nextTouch.pressure;
+            Timestamp = nextTouch.Timestamp;
+
+            // Update the history with the new position.
+            _touchHistory.LogPosition(nextTouch.position);
+        }
+
         public override bool Equals(object obj)
         {
 			bool result = false;
@@ -225,7 +195,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 				aPreviousLocation.pressure = 0.0f;
 				aPreviousLocation.previousPressure = 0.0f;
                 aPreviousLocation._touchHistory = new TouchInfo(-1, Vector2.Zero);
-			    aPreviousLocation.TimeTouchStarted = TimeSpan.Zero;
+			    aPreviousLocation.Timestamp = TimeSpan.Zero;
 				return false;
 			}
 			else
@@ -238,7 +208,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 				aPreviousLocation.pressure = this.previousPressure;
 				aPreviousLocation.previousPressure = 0.0f;
                 aPreviousLocation._touchHistory = this.TouchHistory;
-			    aPreviousLocation.TimeTouchStarted = this.TimeTouchStarted;
+			    aPreviousLocation.Timestamp = this.Timestamp;
 				return true;
 			}
         }
