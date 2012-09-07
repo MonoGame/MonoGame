@@ -192,9 +192,9 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
         public bool Equals(TouchLocation other)
         {
-            return ( ( this.Id.Equals( other.Id ) ) && 
-			        ( this.Position.Equals( other.Position ) ) && 
-			        ( this._previousPosition.Equals ( other._previousPosition)));
+            return  _id.Equals(other._id) &&
+                    _position.Equals(other._position) &&
+                    _previousPosition.Equals(other._previousPosition);
         }
 
         public override int GetHashCode()
