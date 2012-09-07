@@ -13,7 +13,6 @@ namespace MonoGame.Framework.Touch
         {
             _touchLocId = id;
             _startingPosition = startingPos;
-            TimeTouchStarted = DateTime.Now;
             _totalDistanceMoved = 0;
 
             _prevPositions = new List<Tuple<Vector2, DateTime>>();
@@ -30,8 +29,6 @@ namespace MonoGame.Framework.Touch
 
         private List<Tuple<Vector2, DateTime>> _prevPositions;
         public List<Tuple<Vector2, DateTime>> PreviousPositions { get { return _prevPositions; } }
-
-        internal DateTime TimeTouchStarted;
 
         internal void LogPosition(Vector2 positionToAdd)
         {

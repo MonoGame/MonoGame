@@ -122,6 +122,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
                 // If no other events are found the default next touch state 
                 // will be the current state converted to a move event.
                 var nextTouch = new TouchLocation(prevTouch.Id, TouchLocationState.Moved, prevTouch.Position, prevTouch.Pressure);
+                nextTouch.TimeTouchStarted = prevTouch.TimeTouchStarted;
 
                 // Remove all pending events with the same id keeping
                 // the last one as the next new touch state.
@@ -138,9 +139,11 @@ namespace Microsoft.Xna.Framework.Input.Touch
                 }
 
                 // Set the new touch state preserving the previous state.
-                _touchLocations[i] = new TouchLocation( nextTouch.Id,
-                                                        nextTouch.State, nextTouch.Position, nextTouch.Pressure,
-                                                        prevTouch.State, prevTouch.Position, prevTouch.Pressure, prevTouch.TouchHistory);
+                var touch = new TouchLocation(  nextTouch.Id,
+                                                nextTouch.State, nextTouch.Position, nextTouch.Pressure,
+                                                prevTouch.State, prevTouch.Position, prevTouch.Pressure, prevTouch.TouchHistory);
+                touch.TimeTouchStarted = nextTouch.TimeTouchStarted;
+                _touchLocations[i] = touch;
             }
 
             // Add new pressed events last to ensure that they
@@ -302,7 +305,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
         private const int _tapJitterTolerance = 5;
         private static readonly TimeSpan _flickMovementThreshold = TimeSpan.FromMilliseconds(55);
 		private const long _maxTicksToProcessHold = 10250000;
-		private const long _maxTicksToProcessDoubleTap = 1300000;
+        private static readonly TimeSpan DoubleTapTime = TimeSpan.FromMilliseconds(300);
 		private const int _minVelocityToCompleteSwipe = 15;
 		
 		// For pinch, we'll need to "save" a touch so we can
@@ -371,7 +374,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 					    	(touch.Id == _savedPinchTouches[0].Value.Id ||
 						    touch.Id == _savedPinchTouches[1].Value.Id))
 						{
-							ProcessPinchComplete();
+                            ProcessPinchComplete(touch);
 							_pinchComplete = true;
 							break;
 						}
@@ -409,7 +412,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			if (!GestureIsEnabled(GestureType.Hold))
 				return false;
 
-            var elapsed = DateTime.Now - touch.TouchHistory.TimeTouchStarted;
+            var elapsed = DateTime.Now - touch.TimeTouchStarted;
             if (elapsed.Ticks < _maxTicksToProcessHold)
 				return false;
 			
@@ -422,7 +425,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			
 			GestureList.Enqueue(
                 new GestureSample(  GestureType.Hold, 
-                                    TimeSpan.FromTicks(DateTime.Now.Ticks),
+                                    touch.TimeTouchStarted,
 			                        touch.Position, Vector2.Zero,
 			                        Vector2.Zero, Vector2.Zero));
 			
@@ -443,13 +446,13 @@ namespace Microsoft.Xna.Framework.Input.Touch
                 return false;
                 
             // Also check that this tap happened within a certain threshold
-            var elapsed = touch.TouchHistory.TimeTouchStarted - _lastTap.Timestamp;
-            if (elapsed.Ticks > _maxTicksToProcessDoubleTap)
+            var elapsed = touch.TimeTouchStarted - _lastTap.TimeTouchStarted;
+            if (elapsed > DoubleTapTime)
                 return false;
                          
             // "Replace" it with a doubletap.
             GestureList.Enqueue(new GestureSample(
-                           GestureType.DoubleTap, new TimeSpan (DateTime.Now.Ticks),
+                           GestureType.DoubleTap, touch.TimeTouchStarted,
                            touch.Position, Vector2.Zero,
                            Vector2.Zero, Vector2.Zero));
             
@@ -461,7 +464,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
             return true;
         }
 
-        private static GestureSample _lastTap;
+        private static TouchLocation _lastTap;
 
 		private static bool ProcessTap(TouchLocation touch)
 		{
@@ -473,7 +476,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
             if (touch.TouchHistory.TotalDistanceMoved > _tapJitterTolerance)
 				return false;
 
-            var elapsed = DateTime.Now - touch.TouchHistory.TimeTouchStarted;
+            var elapsed = DateTime.Now - touch.TimeTouchStarted;
             if (elapsed.Ticks > _maxTicksToProcessHold)
 				return false;
             
@@ -482,15 +485,17 @@ namespace Microsoft.Xna.Framework.Input.Touch
             if (_lastDoubleTapId == touch.Id)
                 return false;
             
-            // Store the last tap for double tap processing.          
-		    _lastTap = new GestureSample(
-		        GestureType.Tap, new TimeSpan(DateTime.Now.Ticks),
-		        touch.Position, Vector2.Zero,
-		        Vector2.Zero, Vector2.Zero);
+            // Store the last tap for 
+            // double tap processing.          
+		    _lastTap = touch;
 
             // Fire off the tap event immediately.
-            GestureList.Enqueue(_lastTap);
-
+            var tap = new GestureSample(
+		        GestureType.Tap, touch.TimeTouchStarted,
+		        touch.Position, Vector2.Zero,
+		        Vector2.Zero, Vector2.Zero);
+            GestureList.Enqueue(tap);
+          
 			return true;
 		}
 
@@ -544,7 +549,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
                 _processedDrags.Add(touch.Id);
 
 			TouchPanel.GestureList.Enqueue(new GestureSample(
-										   gestureType, new TimeSpan (DateTime.Now.Ticks),
+                                           gestureType, touch.TimeTouchStarted,
 										   touch.Position, Vector2.Zero,
 										   delta, Vector2.Zero));
 			
@@ -562,7 +567,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 				return false;
 			
 			TouchPanel.GestureList.Enqueue (new GestureSample (
-			GestureType.DragComplete, new TimeSpan (DateTime.Now.Ticks),
+			GestureType.DragComplete, touch.TimeTouchStarted,
 			Vector2.Zero, Vector2.Zero,
 			Vector2.Zero, Vector2.Zero));
 
@@ -626,7 +631,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			var fakeVelocity = Vector2.Normalize(averageDirection) * avgDistance * 20;
 			
 			TouchPanel.GestureList.Enqueue (new GestureSample (
-				GestureType.Flick, new TimeSpan (DateTime.Now.Ticks),
+				GestureType.Flick, touch.TimeTouchStarted,
 				Vector2.Zero, Vector2.Zero,
 				fakeVelocity, Vector2.Zero));
 			
@@ -654,20 +659,21 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			var delta1 = touch1.Position - prevPos1.Position;
 			
 			TouchPanel.GestureList.Enqueue (new GestureSample (
-				GestureType.Pinch, new TimeSpan (DateTime.Now.Ticks),
+				GestureType.Pinch, 
+                touch0.TimeTouchStarted > touch1.TimeTouchStarted ? touch0.TimeTouchStarted : touch1.TimeTouchStarted,                
 				touch0.Position, touch1.Position,
 				delta0, delta1));
 			
 			return true;
 		}
 		
-		private static bool ProcessPinchComplete()
+		private static bool ProcessPinchComplete(TouchLocation touch)
 		{
 			if (!GestureIsEnabled(GestureType.PinchComplete))
 				return false;
 			
 			TouchPanel.GestureList.Enqueue (new GestureSample (
-				GestureType.PinchComplete, new TimeSpan (DateTime.Now.Ticks),
+				GestureType.PinchComplete, touch.TimeTouchStarted,
 				Vector2.Zero, Vector2.Zero,
 				Vector2.Zero, Vector2.Zero));
 			

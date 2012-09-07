@@ -60,6 +60,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
         // TODO: Lets try to remove these.
 		// internals required for gesture recognition.
 
+        internal TimeSpan TimeTouchStarted;
+
         internal TouchInfo _touchHistory;
 				
 		// Only used in Android, for now
@@ -121,6 +123,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			pressure = 0.0f;
 			previousPressure = 0.0f;
             _touchHistory = new TouchInfo(id, position);
+		    TimeTouchStarted = TimeSpan.FromTicks(DateTime.Now.Ticks);
         }
 
         public TouchLocation(int aId, TouchLocationState aState, Vector2 aPosition)
@@ -133,6 +136,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			pressure = 0.0f;
 			previousPressure = 0.0f;
             _touchHistory = new TouchInfo(id, position);
+            TimeTouchStarted = TimeSpan.FromTicks(DateTime.Now.Ticks);
         }
 		
 		// Only for Android
@@ -147,6 +151,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			pressure = aPressure;
 			previousPressure = aPreviousPressure;
             _touchHistory = new TouchInfo(id, position);
+            TimeTouchStarted = TimeSpan.FromTicks(DateTime.Now.Ticks);
         }
 		
         // We are "updating" a touch location by creating a new one and filling in it's appropriate states.
@@ -164,6 +169,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
             // Update the history object.
             _touchHistory = aPrevTouchInfo;
             _touchHistory.LogPosition(aPosition);
+            TimeTouchStarted = TimeSpan.FromTicks(DateTime.Now.Ticks);
         }
 		
 		public TouchLocation(int aId, TouchLocationState aState, Vector2 aPosition, float aPressure)
@@ -176,6 +182,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			pressure = aPressure;
 			previousPressure = 0.0f;
             _touchHistory = new TouchInfo(id, position);
+            TimeTouchStarted = TimeSpan.FromTicks(DateTime.Now.Ticks);
         }
 		#endregion
 		
@@ -218,6 +225,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 				aPreviousLocation.pressure = 0.0f;
 				aPreviousLocation.previousPressure = 0.0f;
                 aPreviousLocation._touchHistory = new TouchInfo(-1, Vector2.Zero);
+			    aPreviousLocation.TimeTouchStarted = TimeSpan.Zero;
 				return false;
 			}
 			else
@@ -230,6 +238,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 				aPreviousLocation.pressure = this.previousPressure;
 				aPreviousLocation.previousPressure = 0.0f;
                 aPreviousLocation._touchHistory = this.TouchHistory;
+			    aPreviousLocation.TimeTouchStarted = this.TimeTouchStarted;
 				return true;
 			}
         }
