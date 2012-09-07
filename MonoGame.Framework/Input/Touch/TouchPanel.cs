@@ -466,9 +466,10 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			if (!GestureIsEnabled(GestureType.Tap))
 				return false;
 
-            // TODO: Should be testing against the press location
-            // and not a distance moved.
-            if (touch.TouchHistory.TotalDistanceMoved > TapJitterTolerance)
+            // If the release is too far away from the press 
+            // position then this cannot be a tap event.
+            var dist = Vector2.Distance(touch.PressPosition, touch.Position);
+            if (dist > TapJitterTolerance)
 				return false;
 
             // If we pressed and held too long then don't 
