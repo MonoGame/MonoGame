@@ -45,6 +45,7 @@ namespace Microsoft.Xna.Framework.Audio
 {
 	public class Cue : IDisposable
 	{
+		AudioEngine engine;
 		string name;
 		XactSound[] sounds;
 		float[] probs;
@@ -84,8 +85,9 @@ namespace Microsoft.Xna.Framework.Audio
 			get { return name; }
 		}
 		
-		internal Cue(string cuename, XactSound sound)
+		internal Cue (AudioEngine engine, string cuename, XactSound sound)
 		{
+			this.engine = engine;
 			name = cuename;
 			sounds = new XactSound[1];
 			sounds[0] = sound;
@@ -139,7 +141,7 @@ namespace Microsoft.Xna.Framework.Audio
 			paused = false;
 		}
 		
-		public void SetVariable(string name, float value)
+		public void SetVariable (string name, float value)
 		{
 			if (name == "Volume") {
 				volume = value;
@@ -147,16 +149,16 @@ namespace Microsoft.Xna.Framework.Audio
 					curSound.Volume = value;
 				}
 			} else {
-				throw new NotImplementedException();
+				engine.SetGlobalVariable (name, value);
 			}
 		}
 		
-		public float GetVariable(string name, float value)
+		public float GetVariable (string name, float value)
 		{
 			if (name == "Volume") {
 				return volume;
 			} else {
-				throw new NotImplementedException();
+				return engine.GetGlobalVariable (name);
 			}
 		}
 		

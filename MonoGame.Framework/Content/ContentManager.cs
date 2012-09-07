@@ -288,26 +288,22 @@ namespace Microsoft.Xna.Framework.Content
 				}
 
                 result = ReadRawAsset<T>(assetName, originalAssetName);
+
+                // Because Raw Assets skip the ContentReader step, they need to have their
+                // disopsables recorded here. Doing it outside of this catch will 
+                // result in disposables being logged twice.
+                if (result is IDisposable)
+                {
+                    if (recordDisposableObject != null)
+                        recordDisposableObject(result as IDisposable);
+                    else
+                        disposableAssets.Add(result as IDisposable);
+                }
 			}			
             
 			if (result == null)
-			{
 				throw new ContentLoadException("Could not load " + originalAssetName + " asset!");
-			}
 
-			if (result is IDisposable)
-			{
-				if (recordDisposableObject != null)
-					recordDisposableObject(result as IDisposable);
-				else
-					disposableAssets.Add(result as IDisposable);
-			}
-
-			if (result == null)
-			{
-				throw new ContentLoadException("Could not load " + originalAssetName + " asset!");
-			}
-		
 			CurrentAssetDirectory = null;
 			
 			return (T)result;
@@ -639,7 +635,7 @@ namespace Microsoft.Xna.Framework.Content
 			}
 		}
 
-        private string RootDirectoryFullPath
+        internal string RootDirectoryFullPath
         {
             get
             {

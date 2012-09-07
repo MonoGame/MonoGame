@@ -1,4 +1,4 @@
- #region License
+// #region License
 // /*
 // Microsoft Public License (Ms-PL)
 // MonoGame - Copyright © 2009 The MonoGame Team
@@ -36,118 +36,51 @@
 // permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular
 // purpose and non-infringement.
 // */
-#endregion License 
+// #endregion License
+// 
 
 using System;
 using System.Collections.Generic;
-using System.IO;
-
-using MonoTouch.MediaPlayer;
+#if IPHONE
+using MonoTouch.UIKit;
+#endif
 
 namespace Microsoft.Xna.Framework.Media
 {
-	public sealed class MediaLibrary : IDisposable
+	public sealed class MediaSource
     {
-		private PlaylistCollection _playLists;
-
-        public MediaLibrary()
+		private MediaSourceType _type;
+		private string _name;
+		internal MediaSource (string name, MediaSourceType type)
+		{
+			_name = name;
+			_type = type;
+		}
+				
+        public Microsoft.Xna.Framework.Media.MediaSourceType MediaSourceType
         {
+            get
+            {
+				return _type;
+            }
         }
 
-        public MediaLibrary(MediaSource mediaSource)
+        public string Name
         {
+            get
+            {
+				return _name;
+            }
+        }
 	
-        }
-
-        public void Dispose()
+		public static IList<MediaSource> GetAvailableMediaSources()
         {
-        }
-
-        public void SavePicture(string name, byte[] imageBuffer)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void SavePicture(string name, Stream source)
-        {
-            throw new NotImplementedException();
-        }
-
-/*        public AlbumCollection Albums
-        {
-            get
-            {
-            }
-        }
-
-        public ArtistCollection Artists
-        {
-            get
-            {
-            }
-        }
-
-        public GenreCollection Genres
-        {
-            get
-            {
-            }
-        }
-
-        public Microsoft.Xna.Framework.Media.MediaSource MediaSource
-        {
-            get
-            {
-            }
-        }
-
-        public PictureCollection Pictures
-        {
-            get
-            {
-            }
-        }*/
-
-        public PlaylistCollection Playlists
-        {
-            get
-            {				
-				if (_playLists == null)
-				{
-					_playLists = new PlaylistCollection();
-					
-					MPMediaQuery playlists = new MPMediaQuery();
-					playlists.GroupingType = MPMediaGrouping.Playlist; 
-					for (int i=0;i<playlists.Collections.Length;i++)
-					{
-						MPMediaItemCollection item = playlists.Collections[i];					
-						Playlist list = new Playlist();
-						list.Name = playlists.Items[i].ValueForProperty(MPMediaPlaylistProperty.Name).ToString();
-						for (int k=0;k<item.Items.Length;k++)
-						{
-							TimeSpan time = TimeSpan.Parse(item.Items[k].ValueForProperty(MPMediaItemProperty.PlaybackDuration).ToString());
-							list.Duration += time;
-						}
-						_playLists.Add(list);
-					}
-				}
-				return _playLists;
-            }
-        }
-
-        /*public PictureAlbum RootPictureAlbum
-        {
-            get
-            {
-            }
-        }*/
-
-        public SongCollection Songs
-        {
-            get
-            {
-				return new SongCollection();
-            }
+#if IPHONE
+			MediaSource[] result = { new MediaSource(UIDevice.CurrentDevice.SystemName, MediaSourceType.LocalDevice) };
+#else
+			MediaSource[] result = { new MediaSource("DummpMediaSource", MediaSourceType.LocalDevice) };
+#endif
+			return result;
         }
     }
 }

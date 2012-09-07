@@ -6,8 +6,12 @@ using TwoMGFX;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-	public partial class DXEffectObject
+	internal partial class DXEffectObject
 	{
+
+        private const string Header = "MGFX";
+        private const int Version = 2;
+
         /// <summary>
         /// Writes the effect for loading later.
         /// </summary>
@@ -71,8 +75,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private static void WriteParameter(BinaryWriter writer, d3dx_parameter param)
         {
-            var class_ = ToParameterClass(param.class_);
-            var type = ToParameterType(param.type);
+            var class_ = ToXNAParameterClass(param.class_);
+            var type = ToXNAParameterType(param.type);
             writer.Write((byte)class_);
             writer.Write((byte)type);
 
