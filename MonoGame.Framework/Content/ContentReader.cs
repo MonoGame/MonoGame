@@ -145,46 +145,34 @@ namespace Microsoft.Xna.Framework.Content
         }
 
         public T ReadExternalReference<T>()
-		{
+        {
             var externalReference = ReadString();
-			
+
             if (!String.IsNullOrEmpty(externalReference))
             {
 #if WINRT
-                var notSeparator = '/';
-                var separator = '\\';
-
+                const char notSeparator = '/';
+                const char separator = '\\';
+#else
+                const char notSeparator = '\\';
+                var separator = Path.DirectorySeparatorChar;
+#endif
                 externalReference = externalReference.Replace(notSeparator, separator);
 
-                var fullAssetName = assetName.Replace(notSeparator, separator);
-                var pathDirectory = Path.GetDirectoryName(fullAssetName);
-                var fullAssetPath = Path.Combine(pathDirectory, externalReference);
-
-                // HACK: This is the only way i can find of normalizing/canonicalizing paths
-                // in WinRT.  We should look for a better method in the upcoming updates.
-                {
-                    var package = Windows.ApplicationModel.Package.Current;
-                    fullAssetPath = Path.Combine(package.InstalledLocation.Path, fullAssetPath);
-                    fullAssetPath = new Uri(fullAssetPath).LocalPath;
-                    fullAssetPath = fullAssetPath.Substring(package.InstalledLocation.Path.Length + 1);
-                }
-
-                return contentManager.Load<T>(fullAssetPath);
-#else
-                externalReference = externalReference.Replace('\\',Path.DirectorySeparatorChar);
                 // Get a uri for the asset path using the file:// schema and no host
-                Uri src = new Uri("file:///" + assetName.Replace('\\', Path.DirectorySeparatorChar));
+                var src = new Uri("file:///" + assetName.Replace(notSeparator, separator));
+
                 // Add the relative path to the external reference
-                Uri dst = new Uri(src, externalReference);
+                var dst = new Uri(src, externalReference);
+
                 // The uri now contains the path to the external reference within the content manager
                 // Get the local path and skip the first character (the path separator)
                 return contentManager.Load<T>(dst.LocalPath.Substring(1));
-#endif
             }
 
             return default(T);
         }
-        
+
         public Matrix ReadMatrix()
         {
             Matrix result = new Matrix();
