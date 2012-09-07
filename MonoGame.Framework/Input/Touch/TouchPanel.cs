@@ -349,7 +349,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
                     if (touch.State == TouchLocationState.Moved)
                     {
-                        var dist = Vector2.Distance(touch.Position, touch.TouchHistory.StartingPosition);
+                        var dist = Vector2.Distance(touch.Position, touch.PressPosition);
                         if (dist < TapJitterTolerance)
                             ProcessHold(touch);
                         else
@@ -515,7 +515,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			var delta = touch.Position - prevPosition;
 			
             // Wait till we hit the drag tolerance.
-            if (touch.TouchHistory.TotalDistanceMoved < TapJitterTolerance)
+            var dist = Vector2.Distance(touch.Position, touch.PressPosition);
+            if (dist < TapJitterTolerance)
 				return false;
 			
 			// Free drag takes priority over a directional one.

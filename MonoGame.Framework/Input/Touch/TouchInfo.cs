@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input.Touch;
 
 namespace MonoGame.Framework.Touch
 {
@@ -11,21 +10,8 @@ namespace MonoGame.Framework.Touch
 
         internal TouchInfo(int id, Vector2 startingPos)
         {
-            _touchLocId = id;
-            _startingPosition = startingPos;
-            _totalDistanceMoved = 0;
-
             _prevPositions = new List<Tuple<Vector2, DateTime>>();
         }
-
-        private int _touchLocId;
-        internal int TouchLocationID { get { return _touchLocId; } }
-
-        private Vector2 _startingPosition;
-        internal Vector2 StartingPosition { get { return _startingPosition; } }
-
-        private float _totalDistanceMoved;
-        internal float TotalDistanceMoved { get { return _totalDistanceMoved; } }
 
         private List<Tuple<Vector2, DateTime>> _prevPositions;
         public List<Tuple<Vector2, DateTime>> PreviousPositions { get { return _prevPositions; } }
@@ -43,8 +29,6 @@ namespace MonoGame.Framework.Touch
             {
                 // Update total distance moved
                 var lastLoggedPosition = _prevPositions[_prevPositions.Count - 1].Item1;
-
-                _totalDistanceMoved += Vector2.Distance(positionToAdd, lastLoggedPosition);
             }
 
             PreviousPositions.Add(new Tuple<Vector2, DateTime>(positionToAdd, DateTime.Now));
