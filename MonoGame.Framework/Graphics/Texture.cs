@@ -69,6 +69,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #elif OPENGL
 		internal int glTexture = -1;
 		internal TextureTarget glTarget;
+        internal TextureUnit glTextureUnit = TextureUnit.Texture0;
 #endif
 		
 		public SurfaceFormat Format
@@ -146,6 +147,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #if OPENGL
 		internal virtual void Activate()
         {
+            GL.ActiveTexture(glTextureUnit);
 			GL.BindTexture(glTarget, this.glTexture);
         }
 #endif
