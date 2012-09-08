@@ -388,8 +388,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		
 		// For pinch, we'll need to "save" a touch so we can
 		// send both at the same time
-		private static TouchLocation?[] _savedPinchTouches = new TouchLocation?[2];
-		private static bool _pinchComplete = false;
+		private static readonly TouchLocation?[] _savedPinchTouches = new TouchLocation?[2];
+		private static bool _pinchGestureStarted;
 		
 		private static bool GestureIsEnabled(GestureType gestureType)
 		{
@@ -411,9 +411,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
 		                // Any time more than one finger is down and pinch is enabled
                         // then we exclusively do pinch processing.
-                        if (    GestureIsEnabled(GestureType.Pinch) && 
-                                _touchLocations.Count > 1 && 
-                                !_pinchComplete)
+                        if (GestureIsEnabled(GestureType.Pinch) && _touchLocations.Count > 1)
                         {
                             if (_savedPinchTouches[0] == null || _savedPinchTouches[0].Value.Id == touch.Id)
                                 _savedPinchTouches[0] = touch;
@@ -452,8 +450,9 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		                                                Vector2.Zero, Vector2.Zero,
 		                                                Vector2.Zero, Vector2.Zero));
 
-		                    _pinchComplete = true;
                             _dragGestureStarted = false;
+                            _pinchGestureStarted = false;
+                            _savedPinchTouches[0] = _savedPinchTouches[1] = null;
 		                }
                         else if (_touchLocations.Count == 1)
 		                {
@@ -487,12 +486,6 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		                break;					
 		        }
 		    }
-
-		    if (_pinchComplete)
-			{
-				_savedPinchTouches[0] = _savedPinchTouches[1] = null;
-				_pinchComplete = false;
-			}
 		}
 
         static readonly List<int> _heldEventsProcessed = new List<int>();
@@ -666,6 +659,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
                 touch0.Timestamp > touch1.Timestamp ? touch0.Timestamp : touch1.Timestamp,                
 				touch0.Position, touch1.Position,
 				delta0, delta1));
+
+		    _pinchGestureStarted = true;
 
             // Make sure neither touch location can fire off a hold event.
             if (!_heldEventsProcessed.Contains(touch0.Id))
