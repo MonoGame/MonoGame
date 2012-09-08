@@ -229,8 +229,14 @@ namespace Microsoft.Xna.Framework.Input.Touch
                 return;
             }
 
+#if ANDROID
+            // HACK: Android has trouble using the standard XNA touch 
+            // location scaling... this will be fixed soon.
+            _events.Add(new TouchLocation(touchId, state, position));
+#else
             // Add the new touch event.
             _events.Add(new TouchLocation(touchId, state, position * _touchScale));
+#endif
 
             // If this is a release unmap the hardware id.
             if (state == TouchLocationState.Released)
