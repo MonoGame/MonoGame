@@ -67,11 +67,6 @@ namespace Microsoft.Xna.Framework.Input.Touch
         private static readonly List<TouchLocation> _events = new List<TouchLocation>();
 
         /// <summary>
-        /// The touch location being tracked for fake mouse input.
-        /// </summary>
-        private static int _mouseTouchId = -1;
-
-        /// <summary>
         /// The positional scale to apply to touch input.
         /// </summary>
         private static Vector2 _touchScale = Vector2.One;
@@ -99,15 +94,6 @@ namespace Microsoft.Xna.Framework.Input.Touch
         // TODO: Who is this for?  Is it used?
         internal static event EventHandler EnabledGesturesChanged;
 
-        static TouchPanel()
-        {
-#if !WINDOWS && !LINUX && !MONOMAC
-
-            // Enable fake mouse events on the 
-            // non-desktop platforms by default.
-            FakeMouseEnabled = true;
-#endif
-        }
 
         public static TouchPanelCapabilities GetCapabilities()
         {
@@ -196,12 +182,6 @@ namespace Microsoft.Xna.Framework.Input.Touch
             return state;
         }
 
-        /// <summary>
-        /// When true fake mouse events are sent for 
-        /// the first pressed finger.
-        /// </summary>
-        internal static bool FakeMouseEnabled { get; set; }
-
         internal static void AddEvent(int id, TouchLocationState state, Vector2 position)
         {
             // Different platforms return different touch identifiers
@@ -241,26 +221,6 @@ namespace Microsoft.Xna.Framework.Input.Touch
             // If this is a release unmap the hardware id.
             if (state == TouchLocationState.Released)
                 _touchIds.Remove(id);
-
-            /*
-            // Do fake mouse events if that feature is enabled.
-            if (!FakeMouseEnabled)
-                _mouseTouchId = -1;
-            else if (_mouseTouchId == -1 || id == _mouseTouchId)
-            {
-                if (state == TouchLocationState.Released)
-                {
-                    _mouseTouchId = -1;
-                    Mouse.SetTouchMouse(ButtonState.Released, (int)position.X, (int)position.Y);
-                }
-                else
-                {
-                    // Store the touch point to track and set the new state.
-                    _mouseTouchId = id;
-                    Mouse.SetTouchMouse(ButtonState.Pressed, (int)position.X, (int)position.Y);
-                }
-            }
-            */
         }
 
         /// <summary>
