@@ -219,8 +219,18 @@ namespace Microsoft.Xna.Framework.Input.Touch
             if (state == TouchLocationState.Pressed)
                 _touchIds[id] = _nextTouchId++;
 
+            // Try to find the touch id.
+            int touchId;
+            if (!_touchIds.TryGetValue(id, out touchId))
+            {
+                // If we got here that means either the device is sending
+                // us bad, out of order, or old touch events.  In any case
+                // just ignore them.
+                return;
+            }
+
             // Add the new touch event.
-            _events.Add(new TouchLocation(_touchIds[id], state, position * _touchScale));
+            _events.Add(new TouchLocation(touchId, state, position * _touchScale));
 
             // If this is a release unmap the hardware id.
             if (state == TouchLocationState.Released)
