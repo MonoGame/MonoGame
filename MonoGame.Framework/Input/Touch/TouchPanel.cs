@@ -67,6 +67,11 @@ namespace Microsoft.Xna.Framework.Input.Touch
         private static readonly List<TouchLocation> _events = new List<TouchLocation>();
 
         /// <summary>
+        /// The touch location being tracked for fake mouse input.
+        /// </summary>
+        private static int _mouseTouchId = -1;
+
+        /// <summary>
         /// The positional scale to apply to touch input.
         /// </summary>
         private static Vector2 _touchScale = Vector2.One;
@@ -79,6 +84,16 @@ namespace Microsoft.Xna.Framework.Input.Touch
         internal static Queue<GestureSample> GestureList = new Queue<GestureSample>();
 		internal static event EventHandler EnabledGesturesChanged;
         internal static TouchPanelCapabilities Capabilities = new TouchPanelCapabilities();
+
+        static TouchPanel()
+        {
+#if !WINDOWS && !LINUX && !MONOMAC
+
+            // Enable fake mouse events on the 
+            // non-desktop platforms by default.
+            FakeMouseEnabled = true;
+#endif
+        }
 
         public static TouchPanelCapabilities GetCapabilities()
         {
@@ -167,7 +182,13 @@ namespace Microsoft.Xna.Framework.Input.Touch
             var state = new TouchCollection(_touchLocations.ToArray());
             return state;
         }
-        
+
+        /// <summary>
+        /// When true fake mouse events are sent for 
+        /// the first pressed finger.
+        /// </summary>
+        internal static bool FakeMouseEnabled { get; set; }
+
         internal static void AddEvent(int id, TouchLocationState state, Vector2 position)
         {
 #if WINRT
@@ -186,6 +207,26 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
             // Apply the touch scale to the new location.
             _events.Add(new TouchLocation(id, state, position * _touchScale));
+
+            /*
+            // Do fake mouse events if that feature is enabled.
+            if (!FakeMouseEnabled)
+                _mouseTouchId = -1;
+            else if (_mouseTouchId == -1 || id == _mouseTouchId)
+            {
+                if (state == TouchLocationState.Released)
+                {
+                    _mouseTouchId = -1;
+                    Mouse.SetTouchMouse(ButtonState.Released, (int)position.X, (int)position.Y);
+                }
+                else
+                {
+                    // Store the touch point to track and set the new state.
+                    _mouseTouchId = id;
+                    Mouse.SetTouchMouse(ButtonState.Pressed, (int)position.X, (int)position.Y);
+                }
+            }
+            */
         }
 
         private static void UpdateTouchScale()
@@ -290,13 +331,12 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		#region Gesture Recognition
 		
         /// <summary>
-        /// Maximum distance a finger can move and still considered to have not moved.
+        /// Maximum distance a touch location can wiggle and 
+        /// not be considered to have moved.
         /// </summary>
         private const float TapJitterTolerance = 35.0f;
 
 		private static readonly TimeSpan _maxTicksToProcessHold = TimeSpan.FromMilliseconds(1024);
-        private static readonly TimeSpan DoubleTapTime = TimeSpan.FromMilliseconds(300);
-
 		
 		// For pinch, we'll need to "save" a touch so we can
 		// send both at the same time
@@ -435,9 +475,10 @@ namespace Microsoft.Xna.Framework.Input.Touch
             if (dist > TapJitterTolerance)
                 return false;
                 
-            // Also check that this tap happened within a certain threshold
+            // Check that this tap happened within the standard 
+            // double tap time threshold of 300 milliseconds.
             var elapsed = touch.Timestamp - _lastTap.Timestamp;
-            if (elapsed > DoubleTapTime)
+            if (elapsed.TotalMilliseconds > 300)
                 return false;
                          
             // "Replace" it with a doubletap.
