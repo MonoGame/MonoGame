@@ -44,7 +44,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using MonoGame.Framework.Touch;
 
 #if WINRT
 using Windows.Graphics.Display;
@@ -121,7 +120,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
                 // If no other events are found the default next touch state 
                 // will be the current state converted to a move event.
-                var nextTouch = prevTouch.ToState(TouchLocationState.Moved);
+                var nextTouch = prevTouch.AsMovedState();
 
                 // Remove all pending events with the same id keeping
                 // the last one as the next new touch state.
@@ -129,7 +128,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
                 {
                     if (_events[j].Id == prevTouch.Id)
                     {
-                        nextTouch.ToState(_events[j]);
+                        nextTouch.UpdateState(_events[j]);
                         _events.RemoveAt(j);
                         continue;
                     }
@@ -295,20 +294,18 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// </summary>
         private const float TapJitterTolerance = 35.0f;
 
-        private static readonly TimeSpan _flickMovementThreshold = TimeSpan.FromMilliseconds(55);
 		private static readonly TimeSpan _maxTicksToProcessHold = TimeSpan.FromMilliseconds(1024);
         private static readonly TimeSpan DoubleTapTime = TimeSpan.FromMilliseconds(300);
-		private const int _minVelocityToCompleteSwipe = 15;
+
 		
 		// For pinch, we'll need to "save" a touch so we can
 		// send both at the same time
 		private static TouchLocation?[] _savedPinchTouches = new TouchLocation?[2];
 		private static bool _pinchComplete = false;
-		private static TouchLocation _previousTouchLoc;
 		
 		private static bool GestureIsEnabled(GestureType gestureType)
 		{
-			return (EnabledGestures & gestureType) != 0;
+            return (_enabledGestures & gestureType) != 0;
 		}
 
         static GestureSample? _tempTap; // Use a member variable rather than initialize a new GestureSample every time this is called.
@@ -501,30 +498,28 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
 		private static bool ProcessDrag(TouchLocation touch)
 		{
-			if (touch.State != TouchLocationState.Moved)
+		    var dragH = GestureIsEnabled(GestureType.HorizontalDrag);
+		    var dragV = GestureIsEnabled(GestureType.VerticalDrag);
+		    var drag  = GestureIsEnabled(GestureType.FreeDrag);
+
+            if (!dragH && !dragV && !drag)
 				return false;
-			
-			if (!GestureIsEnabled(GestureType.HorizontalDrag) && 
-			    !GestureIsEnabled(GestureType.VerticalDrag) && 
-			    !GestureIsEnabled(GestureType.FreeDrag))
-				return false;
-			
-			// Make sure that our previous location was valid. If not, we are still
-			// dragging, but we need a delta of 0.
-			var prevPosition = touch.TryGetPreviousLocation(out _previousTouchLoc) ? _previousTouchLoc.Position : touch.Position;
-			var delta = touch.Position - prevPosition;
-			
-            // Wait till we hit the drag tolerance.
-            var dist = Vector2.Distance(touch.Position, touch.PressPosition);
-            if (dist < TapJitterTolerance)
-				return false;
-			
+
+            // Make sure this is a move event and that we have
+            // a previous touch location.
+            TouchLocation prevTouch;
+            if (    touch.State != TouchLocationState.Moved ||
+                    !touch.TryGetPreviousLocation(out prevTouch))
+                return false;
+		
+            var delta = touch.Position - prevTouch.Position;
+					
 			// Free drag takes priority over a directional one.
 			var gestureType = GestureType.FreeDrag;
-			if (!GestureIsEnabled(GestureType.FreeDrag))
+            if (!drag)
 			{
 				// Horizontal drag takes precedence over a vertical one.
-				if (GestureIsEnabled(GestureType.HorizontalDrag))
+                if (dragH)
 				{
 					// Direction delta come back with it's 'other' component set to 0.
 					if (Math.Abs(delta.X) >= Math.Abs(delta.Y))
@@ -532,7 +527,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 						delta.Y = 0;
 						gestureType = GestureType.HorizontalDrag;
 					}
-					else if (GestureIsEnabled(GestureType.VerticalDrag))
+                    else if (dragV)
 					{
 						delta.X = 0;
 						gestureType = GestureType.VerticalDrag;
@@ -560,9 +555,10 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		{
 			if (!GestureIsEnabled(GestureType.DragComplete))
 				return false;
-			
-			if (!touch.TryGetPreviousLocation(out _previousTouchLoc) || 
-			    _previousTouchLoc.State != TouchLocationState.Moved)
+
+            TouchLocation prevTouch;
+            if (!touch.TryGetPreviousLocation(out prevTouch) ||
+                prevTouch.State != TouchLocationState.Moved)
 				return false;
 			
 			GestureList.Enqueue (new GestureSample (
@@ -581,58 +577,15 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			if (!GestureIsEnabled(GestureType.Flick))
 			    return false;
             
-            // Attempt to get a "total distance traveled" by the last couple of updates.
-            var prevPositions = touch.TouchHistory.PreviousPositions;
-            var totalDistance = 0.0f;
-            var counter = 0;
-            var averageDirection = Vector2.Zero;
-            var prevDirection = Vector2.Zero;
-
-            // Check our last couple of positions and see if we are good to build
-            // a flick gesture from the input
-            for (int x = prevPositions.Count - 1; x != 0; x--)
-            {
-                // Check that this touch happened within an appropriate amount of time of the last.
-                // if not, break early because the other touches will only be older.
-                var timeOfTouch = prevPositions[x-1].Item2;
-
-                var difTime = prevPositions[x].Item2 - timeOfTouch;
-                if (difTime > _flickMovementThreshold)
-                    break;
-
-                var distanceBetweenVecs = prevPositions[x].Item1 - prevPositions[x-1].Item1;
-
-                // Check that the angle between them isn't too great. Only generate flicks from
-                // smooth, continuous motions.
-                if (prevDirection != Vector2.Zero)
-                {
-                    var angle = (float)Math.Abs(Math.Acos(Vector2.Dot(Vector2.Normalize(prevDirection), Vector2.Normalize(distanceBetweenVecs))));
-                    if (angle > Math.PI / 4)
-                        break;
-                }
-
-                averageDirection += distanceBetweenVecs;
-                prevDirection = distanceBetweenVecs;
-                totalDistance += distanceBetweenVecs.Length();
-                counter++;
-            }
-
-            // Bail early if we didn't find any valid touches to build a flick..
-            if (counter == 0)
-                return false;
-
-            // Check that the "average distance per move" is enough to pass the threshold.
-            var avgDistance = totalDistance / counter;
-			if ( avgDistance < _minVelocityToCompleteSwipe )
+            // From testing XNA it seems we need a velocity 
+            // of about 100 to classify this as a flick.
+			if (touch.Velocity.Length() < 100.0f)
                 return false;
 			
-			//TODO: Calculate a better flick velocity
-			var fakeVelocity = Vector2.Normalize(averageDirection) * avgDistance * 20;
-			
-			TouchPanel.GestureList.Enqueue (new GestureSample (
-				GestureType.Flick, touch.Timestamp,
-				Vector2.Zero, Vector2.Zero,
-				fakeVelocity, Vector2.Zero));
+			GestureList.Enqueue (new GestureSample (
+                GestureType.Flick, touch.Timestamp,
+                Vector2.Zero, Vector2.Zero,
+                touch.Velocity, Vector2.Zero));
 			
 			return true;
 		}
