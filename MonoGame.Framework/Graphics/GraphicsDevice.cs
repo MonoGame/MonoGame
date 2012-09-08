@@ -280,11 +280,11 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 
-        public bool IsRenderTargetBound
+        internal bool IsRenderTargetBound
         {
             get
             {
-                return _currentRenderTargetBindings == null || _currentRenderTargetBindings.Length == 0;
+                return _currentRenderTargetBindings != null && _currentRenderTargetBindings.Length > 0;
             }
         }
 
