@@ -429,7 +429,7 @@ namespace Microsoft.Xna.Framework
                         {
                             didOrientationChange = true;
                             _currentOrientation = DisplayOrientation.Portrait;
-                            Game.Activity.RequestedOrientation = ScreenOrientation.Portrait;
+                            requestedOrientation = ScreenOrientation.Portrait;
                             requestPortrait = true;
                         }
                     }
@@ -439,7 +439,9 @@ namespace Microsoft.Xna.Framework
                         // Disable touch only when switching between landscape and portrait.
                         // Flipping between landscape left and right does not cause a ISurfaceHolderCallback.SurfaceChanged
                         if (wasPortrait != requestPortrait)
-                            _touchManager.Enabled = false;
+                        {
+                            _touchManager.ClearTouches();
+                        }
 
                         Game.Activity.RequestedOrientation = requestedOrientation;
 
@@ -462,8 +464,6 @@ namespace Microsoft.Xna.Framework
 
             if (_game.GraphicsDevice != null)
                 _game.graphicsDeviceManager.ResetClientBounds();
-
-            _touchManager.Enabled = true;
         }
 
         void ISurfaceHolderCallback.SurfaceDestroyed(ISurfaceHolder holder)
