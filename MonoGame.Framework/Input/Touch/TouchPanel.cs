@@ -416,7 +416,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		                else if (touch.State == TouchLocationState.Moved)
 		                {
 		                    // If we're already processing drags then keep at it.
-		                    if (_dragGestureId != -1)
+                            if (_dragGestureStarted)
 		                        ProcessDrag(touch);                        
 		                    else
 		                    {
@@ -443,12 +443,12 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		                                                Vector2.Zero, Vector2.Zero));
 
 		                    _pinchComplete = true;
-		                    _dragGestureId = -1;
+                            _dragGestureStarted = false;
 		                }
                         else if (_touchLocations.Count == 1)
 		                {
 		                    // We can only process taps if a drag has not occured.
-		                    if (_dragGestureId == -1)
+                            if (!_dragGestureStarted)
 		                        ProcessTap(touch);
 
                             else
@@ -471,7 +471,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
                                                             Vector2.Zero, Vector2.Zero));
                                 }
 
-                                _dragGestureId = -1;
+                                _dragGestureStarted = false;
                             }                                
 		                }
 		                break;					
@@ -580,7 +580,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
             GestureList.Enqueue(tap);
 		}
 
-        private static int _dragGestureId = -1;
+        private static bool _dragGestureStarted;
 
 		private static void ProcessDrag(TouchLocation touch)
 		{
@@ -622,8 +622,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
 						return;
 				}
 			}
-            
-            _dragGestureId = touch.Id;
+
+            _dragGestureStarted = true;
 
 			GestureList.Enqueue(new GestureSample(
                                     gestureType, touch.Timestamp,
