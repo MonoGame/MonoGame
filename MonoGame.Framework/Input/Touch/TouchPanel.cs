@@ -248,6 +248,26 @@ namespace Microsoft.Xna.Framework.Input.Touch
             */
         }
 
+        /// <summary>
+        /// This will release all touch locations.  It should only be 
+        /// called on platforms where touch state is reset all at once.
+        /// </summary>
+        internal static void ReleaseAllTouches()
+        {
+            // Clear any pending events.
+            _events.Clear();
+
+            // Submit a new event for each non-released touch location.
+            foreach (var touch in _touchLocations)
+            {
+                if (touch.State != TouchLocationState.Released)
+                    _events.Add(new TouchLocation(touch.Id, TouchLocationState.Released, touch.Position));
+            }
+        
+            // Release all the touch id mappings.
+            _touchIds.Clear();
+        }
+
         private static void UpdateTouchScale()
         {
                 // Get the window size.
