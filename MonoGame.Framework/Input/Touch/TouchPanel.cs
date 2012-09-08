@@ -113,8 +113,6 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
                     if (touch.State == TouchLocationState.Released)
                     {
-                        // Remove this location from the gesture and the touch state.
-                        _heldEventsProcessed.Remove(touch.Id);
                         _touchLocations.RemoveAt(i);
                         continue;
                     }
@@ -363,9 +361,15 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		}
 
         /// <summary>
-        /// Used to disable emitting of tap and hold gestures.
+        /// Used to disable emitting of tap gestures.
         /// </summary>
-        private static bool _tabAndHoldDisabled;
+        static private bool _tapDisabled;
+
+        /// <summary>
+        /// Used to disable emitting of hold gestures.
+        /// </summary>
+        static private bool _holdDisabled;
+        
 
 		private static void UpdateGestures()
 		{
@@ -390,9 +394,12 @@ namespace Microsoft.Xna.Framework.Input.Touch
             // tap and hold gestures are disabled until all the 
             // points are released.
             if (heldLocations > 1)
-                _tabAndHoldDisabled = true;
+            {
+                _tapDisabled = true;
+                _holdDisabled = true;
+            }
 
-            // Process the touch locations for gestures.
+		    // Process the touch locations for gestures.
 		    foreach (var touch in _touchLocations)
 		    {
 		        switch(touch.State)
@@ -509,29 +516,23 @@ namespace Microsoft.Xna.Framework.Input.Touch
             // If all points are released then clear some states.
             if (heldLocations == 0)
             {
-                _tabAndHoldDisabled = false;
+                _tapDisabled = false;
+                _holdDisabled = false;
                 _dragGestureStarted = false;
             }
 		}
 
-        static readonly List<int> _heldEventsProcessed = new List<int>();
-
 		private static void ProcessHold(TouchLocation touch)
 		{
-            if (!GestureIsEnabled(GestureType.Hold) || _tabAndHoldDisabled)
+            if (!GestureIsEnabled(GestureType.Hold) || _holdDisabled)
 				return;
 
             var elapsed = TimeSpan.FromTicks(DateTime.Now.Ticks) - touch.PressTimestamp;
             if (elapsed < _maxTicksToProcessHold)
 				return;
-			
-			// Only a single held event gets sent per touch.
-			// Make sure we only send one.
-			if (_heldEventsProcessed.Contains(touch.Id))
-				return;
-			
-			_heldEventsProcessed.Add(touch.Id);
-			
+
+		    _holdDisabled = true;
+
 			GestureList.Enqueue(
                 new GestureSample(  GestureType.Hold, 
                                     touch.Timestamp,
@@ -543,7 +544,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
         private static bool ProcessDoubleTap(TouchLocation touch)
         {
-            if (!GestureIsEnabled(GestureType.DoubleTap) || _tabAndHoldDisabled)
+            if (!GestureIsEnabled(GestureType.DoubleTap) || _tapDisabled)
                 return false;
                            
             // If the new tap is too far away from the last then
@@ -575,7 +576,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
 		private static void ProcessTap(TouchLocation touch)
 		{
-            if (!GestureIsEnabled(GestureType.Tap) || _tabAndHoldDisabled)
+            if (!GestureIsEnabled(GestureType.Tap) || _tapDisabled)
 				return;
 
             // If the release is too far away from the press 
@@ -651,7 +652,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			}
 
             _dragGestureStarted = true;
-		    _tabAndHoldDisabled = true;
+            _tapDisabled = true;
+            _holdDisabled = true;
 
 			GestureList.Enqueue(new GestureSample(
                                     gestureType, touch.Timestamp,
@@ -699,13 +701,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
 				delta0, delta1));
 
 		    _pinchGestureStarted = true;
-            _tabAndHoldDisabled = true;
-
-            // Make sure neither touch location can fire off a hold event.
-            if (!_heldEventsProcessed.Contains(touch0.Id))
-                _heldEventsProcessed.Add(touch0.Id);
-            if (!_heldEventsProcessed.Contains(touch1.Id))
-                _heldEventsProcessed.Add(touch1.Id);
+            _tapDisabled = true;
+		    _holdDisabled = true;
 		}
 		
 		#endregion
