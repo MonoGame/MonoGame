@@ -126,14 +126,22 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		#region Constructors
 
         public TouchLocation(int id, TouchLocationState state, Vector2 position)
+            : this(id, state, position, TouchLocationState.Invalid, Vector2.Zero)
+        {
+        }
+
+        public TouchLocation(   int id, TouchLocationState state, Vector2 position, 
+                                TouchLocationState previousState, Vector2 previousPosition)
         {
             _id = id;
-			_position = position;
-			_previousPosition = Vector2.Zero;		
-			_state = state;
-			_previousState = TouchLocationState.Invalid;	
-			_pressure = 0.0f;
+            _state = state;
+            _position = position;
+            _pressure = 0.0f;
+
+            _previousState = previousState;
+            _previousPosition = previousPosition;				
 			_previousPressure = 0.0f;
+
             _timestamp = TimeSpan.FromTicks(DateTime.Now.Ticks);
             _velocity = Vector2.Zero;
 
