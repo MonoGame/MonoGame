@@ -369,6 +369,17 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
 		private static void UpdateGestures()
 		{
+            // These are observed XNA gesture rules which we follow below.  Please
+            // add to them if a new case is found.
+            //
+            //  - Tap occurs on release.
+            //  - DoubleTap occurs on the first press after a Tap.
+            //  - Tap, Double Tap, and Hold are disabled if a drag begins or more than one finger is pressed.
+            //  - Pinch occurs if 2 or more fingers are down.
+            //  - If you enter a Pinch during a drag a DragComplete is fired.
+            //  -  
+            //
+
             // First get a count of touch locations which 
             // are not in the released state.
 		    var heldLocations = 0;
