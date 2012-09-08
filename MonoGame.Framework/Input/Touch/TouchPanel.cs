@@ -81,9 +81,23 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// </summary>
         private static Point _displaySize = Point.Zero;
 
-        internal static Queue<GestureSample> GestureList = new Queue<GestureSample>();
-		internal static event EventHandler EnabledGesturesChanged;
-        internal static TouchPanelCapabilities Capabilities = new TouchPanelCapabilities();
+        /// <summary>
+        /// The next touch location identifier.
+        /// </summary>
+        private static int _nextTouchId = 1;
+
+        /// <summary>
+        /// The mapping between platform specific touch ids
+        /// and the touch ids we assign to touch locations.
+        /// </summary>
+        private static readonly Dictionary<int, int> _touchIds = new Dictionary<int, int>();
+
+        private static readonly Queue<GestureSample> GestureList = new Queue<GestureSample>();
+
+        private static TouchPanelCapabilities Capabilities = new TouchPanelCapabilities();
+
+        // TODO: Who is this for?  Is it used?
+        internal static event EventHandler EnabledGesturesChanged;
 
         static TouchPanel()
         {
@@ -191,22 +205,27 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
         internal static void AddEvent(int id, TouchLocationState state, Vector2 position)
         {
-#if WINRT
-            // TODO:
+            // Different platforms return different touch identifiers
+            // based on the specifics of their implementation and the
+            // system drivers.
             //
-            // As of 6/20/2012 the WinRT Simulator will generate duplicate
-            // touch location ids... filter these out for now.
+            // Sometimes these ids are suitable for our use, but other
+            // times it can recycle ids or do cute things like return
+            // the same id for double tap events.
             //
-            // Lets be sure to remove this once that is fixed... this safety
-            // here is inefficient and unnessasary.
-            //
-            if (    state == TouchLocationState.Pressed &&
-                    _events.FindIndex(e => e.Id == id) != -1)
-                return;
-#endif
+            // We instead provide consistent ids by generating them
+            // ourselves on the press and looking them up on move 
+            // and release events.
+            // 
+            if (state == TouchLocationState.Pressed)
+                _touchIds[id] = _nextTouchId++;
 
-            // Apply the touch scale to the new location.
-            _events.Add(new TouchLocation(id, state, position * _touchScale));
+            // Add the new touch event.
+            _events.Add(new TouchLocation(_touchIds[id], state, position * _touchScale));
+
+            // If this is a release unmap the hardware id.
+            if (state == TouchLocationState.Released)
+                _touchIds.Remove(id);
 
             /*
             // Do fake mouse events if that feature is enabled.
