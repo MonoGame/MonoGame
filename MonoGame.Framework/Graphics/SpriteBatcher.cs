@@ -191,9 +191,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
             var vertexCount = end - start;
             
+#if OPENGL
             // Activate the Texture before we draw. 
             // should this be to be moved into the GraphicsDevice?
             if (_device.Textures[0] != null) _device.Textures[0].Activate();            
+#endif
 
             _device.DrawUserIndexedPrimitives<VertexPosition2ColorTexture>(
                 PrimitiveType.TriangleList, 
