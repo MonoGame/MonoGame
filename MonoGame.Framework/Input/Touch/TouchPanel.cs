@@ -366,11 +366,18 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
 		private static readonly TimeSpan _maxTicksToProcessHold = TimeSpan.FromMilliseconds(1024);
 		
-		// For pinch, we'll need to "save" a touch so we can
-		// send both at the same time
-		private static readonly TouchLocation?[] _savedPinchTouches = new TouchLocation?[2];
+		/// <summary>
+		/// The pinch touch locations.
+		/// </summary>
+        private static readonly TouchLocation [] _pinchTouch = new TouchLocation[2];
+
+        /// <summary>
+        /// If true the pinch touch locations are valid and
+        /// a pinch gesture has begun.
+        /// </summary>
 		private static bool _pinchGestureStarted;
 		
+
 		private static bool GestureIsEnabled(GestureType gestureType)
 		{
             return (_enabledGestures & gestureType) != 0;
@@ -434,12 +441,14 @@ namespace Microsoft.Xna.Framework.Input.Touch
                         if (GestureIsEnabled(GestureType.Pinch) && heldLocations > 1)
                         {
                             // Save or update the first pinch point.
-                            if (_savedPinchTouches[0] == null || _savedPinchTouches[0].Value.Id == touch.Id)
-                                _savedPinchTouches[0] = touch;
+                            if (    _pinchTouch[0].State == TouchLocationState.Invalid || 
+                                    _pinchTouch[0].Id == touch.Id)
+                                _pinchTouch[0] = touch;
 
                             // Save or update the second pinch point.
-                            else if (_savedPinchTouches[1] == null || _savedPinchTouches[1].Value.Id == touch.Id)
-                                _savedPinchTouches[1] = touch;
+                            else if (   _pinchTouch[1].State == TouchLocationState.Invalid ||
+                                        _pinchTouch[1].Id == touch.Id)
+                                _pinchTouch[1] = touch;
 
                             // NOTE: Actual pinch processing happens outside and
                             // below this loop to ensure both points are updated
@@ -471,8 +480,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
                         // need to fire off the complete event and stop
                         // the pinch gesture operation.
                         if (    _pinchGestureStarted &&
-		                        (   touch.Id == _savedPinchTouches[0].Value.Id ||
-		                            touch.Id == _savedPinchTouches[1].Value.Id))
+		                        (   touch.Id == _pinchTouch[0].Id ||
+		                            touch.Id == _pinchTouch[1].Id))
 		                {
 		                    if (GestureIsEnabled(GestureType.PinchComplete))
 		                        GestureList.Enqueue(new GestureSample(
@@ -481,8 +490,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		                                                Vector2.Zero, Vector2.Zero));
 
                             _pinchGestureStarted = false;
-		                    _savedPinchTouches[0] = null;
-                            _savedPinchTouches[1] = null;
+		                    _pinchTouch[0] = TouchLocation.Invalid;
+                            _pinchTouch[1] = TouchLocation.Invalid;
 		                    break;
 		                }
 
@@ -525,15 +534,16 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
             // If we have two pinch points then update the pinch state.
             if (    GestureIsEnabled(GestureType.Pinch) && 
-                    _savedPinchTouches[0] != null && _savedPinchTouches[1] != null)
-                ProcessPinch(_savedPinchTouches);
+                    _pinchTouch[0].State != TouchLocationState.Invalid  &&
+                    _pinchTouch[1].State != TouchLocationState.Invalid)
+                ProcessPinch(_pinchTouch);
             else
             {
                 // Make sure a partial pinch state 
                 // is not left hanging around.
                 _pinchGestureStarted = false;
-                _savedPinchTouches[0] = null;
-                _savedPinchTouches[1] = null;
+                _pinchTouch[0] = TouchLocation.Invalid;
+                _pinchTouch[1] = TouchLocation.Invalid;
             }
 
             // If all points are released then clear some states.
@@ -675,25 +685,22 @@ namespace Microsoft.Xna.Framework.Input.Touch
 								    delta, Vector2.Zero));
 		}
 		
-		private static void ProcessPinch(TouchLocation? [] touches)
+		private static void ProcessPinch(TouchLocation [] touches)
 		{
-			var touch0 = touches[0].Value;
-			var touch1 = touches[1].Value;
-			
 			TouchLocation prevPos0;
 			TouchLocation prevPos1;
 			
-			if (!touch0.TryGetPreviousLocation(out prevPos0))
-				prevPos0 = touch0;
+			if (!touches[0].TryGetPreviousLocation(out prevPos0))
+				prevPos0 = touches[0];
 			
-			if (!touch1.TryGetPreviousLocation(out prevPos1))
-				prevPos1 = touch1;
+			if (!touches[1].TryGetPreviousLocation(out prevPos1))
+				prevPos1 = touches[1];
 			
-			var delta0 = touch0.Position - prevPos0.Position;
-			var delta1 = touch1.Position - prevPos1.Position;
+			var delta0 = touches[0].Position - prevPos0.Position;
+			var delta1 = touches[1].Position - prevPos1.Position;
 
             // Get the newest timestamp.
-		    var timestamp = touch0.Timestamp > touch1.Timestamp ? touch0.Timestamp : touch1.Timestamp;
+		    var timestamp = touches[0].Timestamp > touches[1].Timestamp ? touches[0].Timestamp : touches[1].Timestamp;
 
             // If we were already in a drag state then fire
             // off the drag completion event.
@@ -711,7 +718,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			GestureList.Enqueue (new GestureSample (
 				GestureType.Pinch,
                 timestamp,                
-				touch0.Position, touch1.Position,
+				touches[0].Position, touches[1].Position,
 				delta0, delta1));
 
 		    _pinchGestureStarted = true;

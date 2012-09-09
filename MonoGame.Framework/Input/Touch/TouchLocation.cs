@@ -67,6 +67,11 @@ namespace Microsoft.Xna.Framework.Input.Touch
         private TimeSpan _pressTimestamp;
         private TimeSpan _timestamp;
 
+        /// <summary>
+        /// Helper for assigning an invalid touch location.
+        /// </summary>
+        internal static readonly TouchLocation Invalid = new TouchLocation();
+
 		#region Properties
 
         internal Vector2 PressPosition
