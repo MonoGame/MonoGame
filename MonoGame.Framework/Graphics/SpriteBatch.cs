@@ -100,7 +100,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			if (_sortMode != SpriteSortMode.Immediate)
 				Setup();
 
-			Flush();
+            _batcher.DrawBatch(_sortMode);
 			
 #if OPENGL
 
@@ -138,11 +138,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			    _effect.CurrentTechnique.Passes[0].Apply();
 		}
 		
-		void Flush() 
-        {
-			_batcher.DrawBatch (_sortMode, graphicsDevice.SamplerStates[0]);
-		}
-
         void CheckValid(Texture2D texture)
         {
             if (texture == null)
