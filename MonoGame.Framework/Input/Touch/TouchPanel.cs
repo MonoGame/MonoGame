@@ -165,7 +165,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
                 // Set the new touch state.
                 _touchLocations[i] = touch;
-            }
+	       }
 
             // We add new pressed events last so they are not 
             // consumed before the touch state is returned.
