@@ -261,14 +261,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
             CheckValid(texture);
 
-            // texture 0 is the texture beeing draw
-            //
-            // TODO: Why are we doing this... we should be setting the
-            // texture on the batch item... it has no point here!
-            //
-			graphicsDevice.Textures [0] = texture;			
-			
-			var item = _batcher.CreateBatchItem ();
+            var item = _batcher.CreateBatchItem ();
 
 			item.Depth = depth;
 			item.Texture = texture;
