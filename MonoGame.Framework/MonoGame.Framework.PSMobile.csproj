@@ -8,8 +8,8 @@
     <ProjectGuid>{EA26E76F-FDFE-4A8C-B5A3-C3B5761E28F9}</ProjectGuid>
     <ProjectTypeGuids>{69878862-DA7D-4DC6-B0A1-50D8FAB4242F};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
-    <RootNamespace>MonoGame.Framework.PSSuite</RootNamespace>
-    <AssemblyName>MonoGame.Framework.PSSuite</AssemblyName>
+    <RootNamespace>MonoGame.Framework.PSMobile</RootNamespace>
+    <AssemblyName>MonoGame.Framework.PSMobile</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -348,6 +348,14 @@
     <Compile Include="Media\SongCollection.cs" />
     <Compile Include="Media\Song.cs" />
     <Compile Include="PSSuite\Media\PSSuiteSong.cs" />
+    <Compile Include="Graphics\Model.cs" />
+    <Compile Include="Graphics\ModelBone.cs" />
+    <Compile Include="Graphics\ModelBoneCollection.cs" />
+    <Compile Include="Graphics\ModelEffectCollection.cs" />
+    <Compile Include="Graphics\ModelMesh.cs" />
+    <Compile Include="Graphics\ModelMeshCollection.cs" />
+    <Compile Include="Graphics\ModelMeshPart.cs" />
+    <Compile Include="Graphics\ModelMeshPartCollection.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="PSSuite\" />
@@ -380,9 +388,9 @@
     <EmbeddedShaderProgram Include="PSSuite\Graphics\Resources\Texture.vcg" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.PSSuite.csproj">
+    <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.PSMobile.csproj">
       <Project>{167676EE-E2D5-440A-BB2B-EFBD02BC8493}</Project>
-      <Name>Lidgren.Network.PSSuite</Name>
+      <Name>Lidgren.Network.PSMobile</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>
