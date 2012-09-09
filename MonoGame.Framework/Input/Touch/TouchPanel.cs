@@ -563,8 +563,6 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			                        Vector2.Zero, Vector2.Zero));			
 		}
 
-        private static int _lastDoubleTapId;
-
         private static bool ProcessDoubleTap(TouchLocation touch)
         {
             if (!GestureIsEnabled(GestureType.DoubleTap) || _tapDisabled)
@@ -586,11 +584,9 @@ namespace Microsoft.Xna.Framework.Input.Touch
                            GestureType.DoubleTap, touch.Timestamp,
                            touch.Position, Vector2.Zero,
                            Vector2.Zero, Vector2.Zero));
-            
-            // This touch will eventually enter a "released" state. When it does, because
-            // it was part of a doubletap, we don't want to process a third tap at the end.
-            // Save it's ID to prevent this from showing up in the future.
-            _lastDoubleTapId = touch.Id;
+
+            // Disable taps until after the next release.
+            _tapDisabled = true;
 
             return true;
         }
@@ -612,12 +608,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
             // generate a tap event for it.
             var elapsed = TimeSpan.FromTicks(DateTime.Now.Ticks) - touch.PressTimestamp;
             if (elapsed > _maxTicksToProcessHold)
-				return;
-            
-            // Check that this touch isn't the end of a previously
-            // processed doubletap.
-            if (_lastDoubleTapId == touch.Id)
-                return;
+				return;            
             
             // Store the last tap for 
             // double tap processing.          
