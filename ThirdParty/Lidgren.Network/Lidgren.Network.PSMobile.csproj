@@ -8,8 +8,8 @@
     <ProjectGuid>{167676EE-E2D5-440A-BB2B-EFBD02BC8493}</ProjectGuid>
     <ProjectTypeGuids>{69878862-DA7D-4DC6-B0A1-50D8FAB4242F};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
-    <RootNamespace>Lidgren.Network.PSSuite</RootNamespace>
-    <AssemblyName>Lidgren.Network.PSSuite</AssemblyName>
+    <RootNamespace>Lidgren.Network.PSMobile</RootNamespace>
+    <AssemblyName>Lidgren.Network.PSMobile</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
