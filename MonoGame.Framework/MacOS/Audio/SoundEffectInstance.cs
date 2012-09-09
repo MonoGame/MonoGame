@@ -158,7 +158,7 @@ namespace Microsoft.Xna.Framework.Audio
 			// Pan
 			AL.Source (sourceId, ALSource3f.Position, _pan, 0, 0.1f);
 			// Volume
-			AL.Source (sourceId, ALSourcef.Gain, _volume);
+			AL.Source (sourceId, ALSourcef.Gain, _volume * SoundEffect.MasterVolume);
 			// Looping
 			AL.Source (sourceId, ALSourceb.Looping, IsLooped);
 			// Pitch
@@ -166,21 +166,23 @@ namespace Microsoft.Xna.Framework.Audio
 		}
 
 		public void Play ()
-		{
-			int bufferId = soundBuffer.OpenALDataBuffer;
-			if (hasSourceId) {
-				return;
-			}
-			bool isSourceAvailable = controller.ReserveSource (soundBuffer);
-			if (!isSourceAvailable)
-				return;
+        {
+            if (SoundEffect.MasterVolume > 0.0f)
+            {
+                int bufferId = soundBuffer.OpenALDataBuffer;
+                if (hasSourceId)
+                    return;
+                bool isSourceAvailable = controller.ReserveSource (soundBuffer);
+                if (!isSourceAvailable)
+                    return;
 
-			AL.Source (soundBuffer.SourceId, ALSourcei.Buffer, bufferId);
-			ApplyState ();
+                AL.Source (soundBuffer.SourceId, ALSourcei.Buffer, bufferId);
+                ApplyState ();
 
-			controller.PlaySound (soundBuffer);
-			//Console.WriteLine ("playing: " + sourceId + " : " + soundEffect.Name);
-			soundState = SoundState.Playing;
+                controller.PlaySound (soundBuffer);
+                //Console.WriteLine ("playing: " + sourceId + " : " + soundEffect.Name);
+                soundState = SoundState.Playing;
+            }
 		}
 
 		public void Resume ()

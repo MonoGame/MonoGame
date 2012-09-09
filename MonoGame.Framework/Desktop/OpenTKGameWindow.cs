@@ -278,10 +278,10 @@ namespace Microsoft.Xna.Framework
 
             // mouse
             // TODO review this when opentk 1.1 is released
-#if !WINDOWS
-            Mouse.UpdateMouseInfo(window.Mouse);
-#else
+#if WINDOWS || LINUX
             Mouse.setWindows(window);
+#else
+            Mouse.UpdateMouseInfo(window.Mouse);
 #endif
 
             //Default no resizing

@@ -61,20 +61,20 @@ namespace Microsoft.Xna.Framework.Graphics
             Initialize();
         }
 
-        public ConstantBuffer(GraphicsDevice device, 
-		                      int sizeInBytes,
-		                      int[] parameterIndexes,
-		                      int[] parameterOffsets,
-		                      string name)
+        public ConstantBuffer(GraphicsDevice device,
+                              int sizeInBytes,
+                              int[] parameterIndexes,
+                              int[] parameterOffsets,
+                              string name)
         {
             graphicsDevice = device;
 
-			_buffer = new byte[sizeInBytes];
+            _buffer = new byte[sizeInBytes];
 
-			_parameters = parameterIndexes;
-			_offsets = parameterOffsets;
+            _parameters = parameterIndexes;
+            _offsets = parameterOffsets;
 
-			_name = name;
+            _name = name;
 
             Initialize();
         }
@@ -111,7 +111,13 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 // TODO: Consider storing all data in arrays to avoid
                 // having to generate this temp array on every set.
-                var bytes = BitConverter.GetBytes((float)data);
+                byte[] bytes;
+
+                if (data is float)
+                    bytes = BitConverter.GetBytes((float)data);
+                else
+                    bytes = BitConverter.GetBytes(((float[])data)[0]);
+
                 Buffer.BlockCopy(bytes, 0, _buffer, offset, elementSize);
             }
 
@@ -129,29 +135,37 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-		void SetParameter (int offset, EffectParameter param)
-		{
-			int elementSize = 4;
-			var rowSize = elementSize * 4;
+        void SetParameter(int offset, EffectParameter param)
+        {
+            if (param.Data != null)
+            {
+                int elementSize = 4;
+                var rowSize = elementSize * 4;
 
-			if (param.Elements.Count > 0) {
-				foreach (var subparam in param.Elements) {
-					SetParameter (offset, subparam);
-					//TODO: Sometimes directx decides to transpose matricies
-					//to fit in fewer registers.
-					offset += subparam.RowCount * rowSize;
-				}
-			} else {
-				switch (param.ParameterType) {
-				case EffectParameterType.Single:
-					SetData (offset, param.RowCount, param.ColumnCount, param.Data);                        
-					break;
-	
-				default:
-					throw new NotImplementedException ("Not supported!");
-				}
-			}
-		}
+                if (param.Elements.Count > 0)
+                {
+                    foreach (var subparam in param.Elements)
+                    {
+                        SetParameter(offset, subparam);
+                        //TODO: Sometimes directx decides to transpose matricies
+                        //to fit in fewer registers.
+                        offset += subparam.RowCount * rowSize;
+                    }
+                }
+                else
+                {
+                    switch (param.ParameterType)
+                    {
+                        case EffectParameterType.Single:
+                            SetData(offset, param.RowCount, param.ColumnCount, param.Data);
+                            break;
+
+                        default:
+                            throw new NotImplementedException("Not supported!");
+                    }
+                }
+            }
+        }
 
         public void Update(EffectParameterCollection parameters)
         {
@@ -180,7 +194,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 var offset = _offsets[p];
                 _dirty = true;
 
-				SetParameter(offset, param);
+                SetParameter(offset, param);
             }
 
             _stateKey = EffectParameter.NextStateKey;
@@ -244,6 +258,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Clear the dirty flag.
             _dirty = false;
+
+#if PSS
+#warning Unimplemented
+#endif
         }
 
 #endif

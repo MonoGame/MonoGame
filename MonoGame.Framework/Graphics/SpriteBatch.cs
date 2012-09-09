@@ -24,7 +24,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		SamplerState _samplerState;
 		DepthStencilState _depthStencilState; 
 		RasterizerState _rasterizerState;		
-		Effect _effect;	
+		Effect _effect;
+        bool beginCalled;
 
 		Effect spriteEffect;
 
@@ -45,6 +46,8 @@ namespace Microsoft.Xna.Framework.Graphics
             spriteEffect = new Effect(graphicsDevice, SpriteEffect.Bytecode);
 
             _batcher = new SpriteBatcher(graphicsDevice);
+
+            beginCalled = false;
 		}
 
 		public void Begin ()
@@ -71,6 +74,8 @@ namespace Microsoft.Xna.Framework.Graphics
 				//setup things now so a user can chage them
 				Setup();
 			}
+
+            beginCalled = true;
 		}
 
 		public void Begin (SpriteSortMode sortMode, BlendState blendState)
@@ -90,11 +95,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void End ()
 		{	
+			beginCalled = false;
+
 			if (_sortMode != SpriteSortMode.Immediate)
 				Setup();
 
-            _batcher.DrawBatch(_sortMode);
-					
+			Flush();
+			
 #if OPENGL
 
             // TODO: Is this needed... does XNA really null out
@@ -131,6 +138,39 @@ namespace Microsoft.Xna.Framework.Graphics
 			    _effect.CurrentTechnique.Passes[0].Apply();
 		}
 		
+		void Flush() 
+        {
+			_batcher.DrawBatch (_sortMode, graphicsDevice.SamplerStates[0]);
+		}
+
+        void CheckValid(Texture2D texture)
+        {
+            if (texture == null)
+                throw new ArgumentNullException("texture");
+            if (!beginCalled)
+                throw new InvalidOperationException("Draw was called, but Begin has not yet been called. Begin must be called successfully before you can call Draw.");
+        }
+
+        void CheckValid(SpriteFont spriteFont, string text)
+        {
+            if (spriteFont == null)
+                throw new ArgumentNullException("spriteFont");
+            if (text == null)
+                throw new ArgumentNullException("text");
+            if (!beginCalled)
+                throw new InvalidOperationException("DrawString was called, but Begin has not yet been called. Begin must be called successfully before you can call DrawString.");
+        }
+
+        void CheckValid(SpriteFont spriteFont, StringBuilder text)
+        {
+            if (spriteFont == null)
+                throw new ArgumentNullException("spriteFont");
+            if (text == null)
+                throw new ArgumentNullException("text");
+            if (!beginCalled)
+                throw new InvalidOperationException("DrawString was called, but Begin has not yet been called. Begin must be called successfully before you can call DrawString.");
+        }
+
 		public void Draw (Texture2D texture,
 				Vector2 position,
 				Rectangle? sourceRectangle,
@@ -141,10 +181,9 @@ namespace Microsoft.Xna.Framework.Graphics
 				SpriteEffects effect,
 				float depth)
 		{
-			if (texture == null) {
-				throw new ArgumentException ("texture");
-			}
-			float w = texture.Width*scale.X;
+            CheckValid(texture);
+
+            float w = texture.Width*scale.X;
 			float h = texture.Height*scale.Y;
 			if (sourceRectangle.HasValue) {
 				w = sourceRectangle.Value.Width*scale.X;
@@ -212,8 +251,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			SpriteEffects effect,
 			float depth)
 		{
-			if (texture == null)
-				throw new ArgumentException ("texture");
+
+			CheckValid(texture);
 
 			var item = _batcher.CreateBatchItem();
 
@@ -271,9 +310,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			Draw (texture, destinationRectangle, sourceRectangle, color, 0, Vector2.Zero, SpriteEffects.None, 0f);
 		}
 
-		public void Draw (Texture2D texture,
-				Vector2 position,
-				Color color)
+		public void Draw (Texture2D texture, Vector2 position, Color color)
 		{
 			Draw (texture, position, null, color);
 		}
@@ -285,8 +322,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void DrawString (SpriteFont spriteFont, string text, Vector2 position, Color color)
 		{
-			if (spriteFont == null)
-				throw new ArgumentNullException ("spriteFont");
+            CheckValid(spriteFont, text);
 
             var source = new SpriteFont.CharacterSource(text);
 			spriteFont.DrawInto (
@@ -297,8 +333,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			SpriteFont spriteFont, string text, Vector2 position, Color color,
 			float rotation, Vector2 origin, float scale, SpriteEffects effects, float depth)
 		{
-			if (spriteFont == null)
-				throw new ArgumentNullException ("spriteFont");
+            CheckValid(spriteFont, text);
 
 			var scaleVec = new Vector2(scale, scale);
             var source = new SpriteFont.CharacterSource(text);
@@ -309,8 +344,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			SpriteFont spriteFont, string text, Vector2 position, Color color,
 			float rotation, Vector2 origin, Vector2 scale, SpriteEffects effect, float depth)
 		{
-			if (spriteFont == null)
-				throw new ArgumentNullException ("spriteFont");
+            CheckValid(spriteFont, text);
 
             var source = new SpriteFont.CharacterSource(text);
             spriteFont.DrawInto(this, ref source, position, color, rotation, origin, scale, effect, depth);
@@ -318,8 +352,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void DrawString (SpriteFont spriteFont, StringBuilder text, Vector2 position, Color color)
 		{
-			if (spriteFont == null)
-				throw new ArgumentNullException ("spriteFont");
+            CheckValid(spriteFont, text);
 
             var source = new SpriteFont.CharacterSource(text);
 			spriteFont.DrawInto(this, ref source, position, color, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0f);
@@ -329,8 +362,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			SpriteFont spriteFont, StringBuilder text, Vector2 position, Color color,
 			float rotation, Vector2 origin, float scale, SpriteEffects effects, float depth)
 		{
-			if (spriteFont == null)
-				throw new ArgumentNullException ("spriteFont");
+            CheckValid(spriteFont, text);
 
 			var scaleVec = new Vector2 (scale, scale);
             var source = new SpriteFont.CharacterSource(text);
@@ -341,8 +373,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			SpriteFont spriteFont, StringBuilder text, Vector2 position, Color color,
 			float rotation, Vector2 origin, Vector2 scale, SpriteEffects effect, float depth)
 		{
-			if (spriteFont == null)
-				throw new ArgumentNullException ("spriteFont");
+            CheckValid(spriteFont, text);
 
             var source = new SpriteFont.CharacterSource(text);
             spriteFont.DrawInto(this, ref source, position, color, rotation, origin, scale, effect, depth);
