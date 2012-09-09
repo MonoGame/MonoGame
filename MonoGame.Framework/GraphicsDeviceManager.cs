@@ -207,8 +207,9 @@ namespace Microsoft.Xna.Framework
             // hardware feature level.
             _graphicsDevice.GraphicsProfile = GraphicsProfile;
 
-            // Update the 
+            // Update the back buffer.
             _graphicsDevice.CreateSizeDependentResources();
+            _graphicsDevice.ApplyRenderTargets(null);
 
 #elif WINDOWS || LINUX
             _game.ResizeWindow(false);
