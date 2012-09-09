@@ -83,24 +83,36 @@ namespace Microsoft.Xna.Framework.Input
             Window = window;
             _mouse = window.Mouse;        
         }
+        
+#elif LINUX         
+        
+        static OpenTK.GameWindow Window;
 
-#elif LINUX
-
-        internal static void UpdateMouseInfo(OpenTK.Input.MouseDevice mouse)
+        internal static void setWindows(OpenTK.GameWindow window)
 		{
-			_mouse = mouse;
+            Window = window;
+            
+			_mouse = window.Mouse;
 			_mouse.Move += HandleWindowMouseMove;
 		}
 
         internal static void HandleWindowMouseMove (object sender, OpenTK.Input.MouseMoveEventArgs e)
-		{
-			SetPosition(e.X, e.Y);
+		{          
+			UpdateStatePosition(e.X, e.Y);
 		}
 
 #elif MONOMAC
         internal static GameWindow Window;
         internal static float ScrollWheelValue;
 #endif
+
+        /// <summary>
+        /// Gets an empty window handle. Purely for Xna compatibility.
+        /// </summary>
+        /// <value>
+        /// The a zero window handle.
+        /// </value>
+        public static IntPtr WindowHandle { get { return IntPtr.Zero; } }
 
         #region Public interface
 
@@ -183,17 +195,18 @@ namespace Microsoft.Xna.Framework.Input
 
         public static void SetPosition(int x, int y)
         {
-            State.X = x;
-            State.Y = y;
+            UpdateStatePosition(x, y);
 			
-#if WINDOWS
+#if WINDOWS || LINUX
             ///correcting the coordinate system
             ///Only way to set the mouse position !!!
             System.Drawing.Point pt = Window.PointToScreen(new System.Drawing.Point(x, y));
+#endif
+            
+#if WINDOWS
             SetCursorPos(pt.X, pt.Y);
 #elif LINUX
-			// TODO propagate change to opentk mouse object (requires opentk 1.1)
-			throw new NotImplementedException("Feature not implemented.");
+            OpenTK.Input.Mouse.SetPosition(pt.X, pt.Y);
 #elif MONOMAC
             var mousePt = NSEvent.CurrentMouseLocation;
             NSScreen currentScreen = null;
@@ -218,6 +231,12 @@ namespace Microsoft.Xna.Framework.Input
         }
 
         #endregion // Public interface
+    
+        private static void UpdateStatePosition(int x, int y)
+        {
+            State.X = x;
+            State.Y = y;
+        }
 
 #if WINDOWS
 
