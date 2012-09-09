@@ -495,27 +495,35 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		                    break;
 		                }
 
-                        // If all the touch points have been released then we
-                        // need to finalize the drag gesture.
-                        if (_dragGestureStarted && heldLocations == 0)
+                        // If there are still other pressed locations then there
+                        // is nothing more we can do with this release.
+                        if (heldLocations != 0)
+                            break;
+
+                        // From testing XNA it seems we need a velocity 
+                        // of about 100 to classify this as a flick.
+                        if (    touch.Velocity.Length() > 100.0f &&
+                                GestureIsEnabled(GestureType.Flick))
                         {
-                            // From testing XNA it seems we need a velocity 
-                            // of about 100 to classify this as a flick.
-                            if (    touch.Velocity.Length() > 100.0f &&
-                                    GestureIsEnabled(GestureType.Flick))
-                            {
-                                GestureList.Enqueue(new GestureSample(
-                                                        GestureType.Flick, touch.Timestamp,
-                                                        Vector2.Zero, Vector2.Zero,
-                                                        touch.Velocity, Vector2.Zero));
-                            }
-                            else if (GestureIsEnabled(GestureType.DragComplete))
-                            {
+                            GestureList.Enqueue(new GestureSample(
+                                                    GestureType.Flick, touch.Timestamp,
+                                                    Vector2.Zero, Vector2.Zero,
+                                                    touch.Velocity, Vector2.Zero));
+
+                            // If we got a flick then stop the drag operation
+                            // so that no DragComplete occurs.
+                            _dragGestureStarted = false;
+                            break;
+                        }
+
+                        // If a drag is active then we need to finalize it.
+                        if (_dragGestureStarted)
+                        {
+                            if (GestureIsEnabled(GestureType.DragComplete))
                                 GestureList.Enqueue(new GestureSample(
                                                         GestureType.DragComplete, touch.Timestamp,
                                                         Vector2.Zero, Vector2.Zero,
                                                         Vector2.Zero, Vector2.Zero));
-                            }
 
                             _dragGestureStarted = false;
                             break;
