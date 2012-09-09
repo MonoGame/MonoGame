@@ -67,6 +67,11 @@ namespace Microsoft.Xna.Framework.Input.Touch
         private TimeSpan _pressTimestamp;
         private TimeSpan _timestamp;
 
+        /// <summary>
+        /// Helper for assigning an invalid touch location.
+        /// </summary>
+        internal static readonly TouchLocation Invalid = new TouchLocation();
+
 		#region Properties
 
         internal Vector2 PressPosition
@@ -126,14 +131,22 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		#region Constructors
 
         public TouchLocation(int id, TouchLocationState state, Vector2 position)
+            : this(id, state, position, TouchLocationState.Invalid, Vector2.Zero)
+        {
+        }
+
+        public TouchLocation(   int id, TouchLocationState state, Vector2 position, 
+                                TouchLocationState previousState, Vector2 previousPosition)
         {
             _id = id;
-			_position = position;
-			_previousPosition = Vector2.Zero;		
-			_state = state;
-			_previousState = TouchLocationState.Invalid;	
-			_pressure = 0.0f;
+            _state = state;
+            _position = position;
+            _pressure = 0.0f;
+
+            _previousState = previousState;
+            _previousPosition = previousPosition;				
 			_previousPressure = 0.0f;
+
             _timestamp = TimeSpan.FromTicks(DateTime.Now.Ticks);
             _velocity = Vector2.Zero;
 
@@ -168,7 +181,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// Updates the touch location using the new event.
         /// </summary>
         /// <param name="touchEvent">The next event for this touch location.</param>
-        internal void UpdateState(TouchLocation touchEvent)
+        internal bool UpdateState(TouchLocation touchEvent)
         {
             Debug.Assert(Id == touchEvent.Id, "The touch event must have the same Id!");
             Debug.Assert(State != TouchLocationState.Released, "We shouldn't be changing state on a released location!");
@@ -198,6 +211,9 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
             // Set the new timestamp.
             _timestamp = touchEvent.Timestamp;
+
+            // Return true if the state actually changed.
+            return _state != _previousState || delta.LengthSquared() > 0.001f;
         }
 
         public override bool Equals(object obj)

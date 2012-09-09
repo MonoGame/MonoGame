@@ -125,21 +125,6 @@ namespace Microsoft.Xna.Framework.Input
 
             return State;
         }
-       
-        /// <summary>
-        /// Called by the TouchPanel to send fake mouse events.
-        /// </summary>
-        /// <param name="leftButton">The new left mouse button state.</param>
-        /// <param name="x">The new x position.</param>
-        /// <param name="y">The new y position.</param>
-        internal static void SetTouchMouse(ButtonState leftButton, int x, int y)
-        {
-            State.LeftButton = leftButton;
-            State.MiddleButton = ButtonState.Released;
-            State.RightButton = ButtonState.Released;
-            State.X = x;
-            State.Y = y;
-        }
 
         public static void SetPosition(int x, int y)
         {
