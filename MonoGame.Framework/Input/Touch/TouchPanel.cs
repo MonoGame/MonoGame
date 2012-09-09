@@ -121,7 +121,6 @@ namespace Microsoft.Xna.Framework.Input.Touch
             {
                 if (keyLoc.Value.State == TouchLocationState.Released)
                     _removeId.Add(keyLoc.Key);
-
             }
             foreach (var id in _removeId)
 			{
@@ -130,34 +129,40 @@ namespace Microsoft.Xna.Framework.Input.Touch
                 _processedDoubleTaps.Remove(id);
 			}
             _removeId.Clear();
-           
-            // Update the existing touch locations.
-            var keys = _touchLocations.Keys.ToArray();
-            foreach(var key in keys)
-            {
-                var loc = _touchLocations[key];
-                var prev = loc;
-               
-                // Update existing pressed touches moved
-                var updatedState = TouchLocationState.Moved;
 
-                // Remove any pending events of this type.
-                for (var i = 0; i < _events.Count; )
+            // Update the existing touch locations.
+            for (var i = 0; i < _events.Count; )
+            {
+                var loc = _events[i];
+
+                TouchLocation prev;
+                if (_touchLocations.TryGetValue(loc.Id, out prev))
                 {
-                    if (_events[i].Id == loc.Id)
+                    // Remove this event.
+                    _events.RemoveAt(i);
+
+                    // Remove any pending events of this type.
+                    for (var j = i; j < _events.Count; )
                     {
-                        loc = _events[i];
-                        updatedState = loc.State;
-                        _events.RemoveAt(i);
-                        continue;
+                        if (_events[j].Id == loc.Id &&
+                            _events[j].State == loc.State)
+                        {
+                            loc = _events[j];
+                            _events.RemoveAt(j);
+                            continue;
+                        }
+
+                        j++;
                     }
-                    
-                    i++;
+
+                    // Set the new touch location state.
+                    _touchLocations[loc.Id] = new TouchLocation(loc.Id,
+                                                                loc.State, loc.Position, loc.Pressure,
+                                                                prev.State, prev.Position, prev.Pressure, prev.TouchHistory);
+                    continue;
                 }
 
-                _touchLocations[key] = new TouchLocation(loc.Id,
-                                                         updatedState, loc.Position, loc.Pressure,
-                                                         prev.State, prev.Position, prev.Pressure, prev.TouchHistory);
+                i++;
             }
 
             // Add any new pressed events.
