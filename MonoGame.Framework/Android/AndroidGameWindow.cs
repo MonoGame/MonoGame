@@ -436,11 +436,11 @@ namespace Microsoft.Xna.Framework
 
                     if (didOrientationChange)
                     {
-                        // Disable touch only when switching between landscape and portrait.
-                        // Flipping between landscape left and right does not cause a ISurfaceHolderCallback.SurfaceChanged
+                        // Android doesn't fire Released events for existing touches
+                        // so we need to clear them out.
                         if (wasPortrait != requestPortrait)
                         {
-                            _touchManager.ClearTouches();
+                            TouchPanel.ReleaseAllTouches();
                         }
 
                         Game.Activity.RequestedOrientation = requestedOrientation;
