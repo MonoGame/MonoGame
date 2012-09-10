@@ -429,7 +429,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		        {
 		            case TouchLocationState.Pressed:
 		            case TouchLocationState.Moved:
-                    
+                    {
                         // The DoubleTap event is emitted on first press as
                         // opposed to Tap which happens on release.
 		                if( touch.State == TouchLocationState.Pressed &&
@@ -468,9 +468,10 @@ namespace Microsoft.Xna.Framework.Input.Touch
                         if (stateChanged)
                             ProcessDrag(touch);
 		                break;
+					}
 					
 		            case TouchLocationState.Released:
-
+                    {
                         // If the touch state hasn't changed then this
                         // is an old release event... skip it.
                         if (!stateChanged)
@@ -502,7 +503,9 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
                         // From testing XNA it seems we need a velocity 
                         // of about 100 to classify this as a flick.
-                        if (    touch.Velocity.Length() > 100.0f &&
+		                var dist = Vector2.Distance(touch.Position, touch.PressPosition);
+                        if (    dist > TapJitterTolerance && 
+                                touch.Velocity.Length() > 100.0f &&
                                 GestureIsEnabled(GestureType.Flick))
                         {
                             GestureList.Enqueue(new GestureSample(
@@ -532,6 +535,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
                         // If all else fails try to process it as a tap.
                         ProcessTap(touch);
 		                break;					
+                    }
 		        }
 		    }
 
