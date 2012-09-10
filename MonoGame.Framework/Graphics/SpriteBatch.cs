@@ -1,38 +1,26 @@
 using System;
 using System.Text;
-using System.Collections.Generic;
-
-#if MONOMAC
-using MonoMac.OpenGL;
-#elif WINDOWS || LINUX
-using OpenTK.Graphics.OpenGL;
-#elif WINRT
-// TODO
-#elif GLES
-using OpenTK.Graphics.ES20;
-#endif
-
-using Microsoft.Xna.Framework;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
 	public class SpriteBatch : GraphicsResource
 	{
-		SpriteBatcher _batcher;
+	    readonly SpriteBatcher _batcher;
+
 		SpriteSortMode _sortMode;
 		BlendState _blendState;
 		SamplerState _samplerState;
 		DepthStencilState _depthStencilState; 
 		RasterizerState _rasterizerState;		
 		Effect _effect;
-        bool beginCalled;
+        bool _beginCalled;
 
-		Effect spriteEffect;
+		Effect _spriteEffect;
 
 		Matrix _matrix;
-		Rectangle tempRect = new Rectangle (0,0,0,0);
-		Vector2 texCoordTL = new Vector2 (0,0);
-		Vector2 texCoordBR = new Vector2 (0,0);
+		Rectangle _tempRect = new Rectangle (0,0,0,0);
+		Vector2 _texCoordTL = new Vector2 (0,0);
+		Vector2 _texCoordBR = new Vector2 (0,0);
 
 		public SpriteBatch (GraphicsDevice graphicsDevice)
 		{
@@ -43,11 +31,11 @@ namespace Microsoft.Xna.Framework.Graphics
 			this.graphicsDevice = graphicsDevice;
 
             // Use a custom SpriteEffect so we can control the transformation matrix
-            spriteEffect = new Effect(graphicsDevice, SpriteEffect.Bytecode);
+            _spriteEffect = new Effect(graphicsDevice, SpriteEffect.Bytecode);
 
             _batcher = new SpriteBatcher(graphicsDevice);
 
-            beginCalled = false;
+            _beginCalled = false;
 		}
 
 		public void Begin ()
@@ -68,14 +56,12 @@ namespace Microsoft.Xna.Framework.Graphics
 			_effect = effect;
 			
 			_matrix = transformMatrix;
-			
-			
-			if (sortMode == SpriteSortMode.Immediate) {
-				//setup things now so a user can chage them
-				Setup();
-			}
 
-            beginCalled = true;
+            // Setup things now so a user can chage them.
+            if (sortMode == SpriteSortMode.Immediate)
+				Setup();
+
+            _beginCalled = true;
 		}
 
 		public void Begin (SpriteSortMode sortMode, BlendState blendState)
@@ -95,21 +81,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void End ()
 		{	
-			beginCalled = false;
+			_beginCalled = false;
 
 			if (_sortMode != SpriteSortMode.Immediate)
 				Setup();
 
             _batcher.DrawBatch(_sortMode);
-			
-#if OPENGL
-
-            // TODO: Is this needed... does XNA really null out
-            // the texture used during batching?
-			graphicsDevice.Textures[0] = null;
-            graphicsDevice.ShaderProgram = 0;			
-#endif
-
         }
 		
 		void Setup() 
@@ -123,14 +100,16 @@ namespace Microsoft.Xna.Framework.Graphics
 			var vp = graphicsDevice.Viewport;
             var projection = Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, 0, 1);
 
+            // GL requires a half pixel offset where as DirectX and PSS does not.
 #if PSS || DIRECTX
             var transform = _matrix * projection;
 #else
 			var halfPixelOffset = Matrix.CreateTranslation(-0.5f, -0.5f, 0);
 			var transform = _matrix * (halfPixelOffset * projection);
 #endif
-			spriteEffect.Parameters["MatrixTransform"].SetValue(transform);				                
-			spriteEffect.CurrentTechnique.Passes[0].Apply();
+
+			_spriteEffect.Parameters["MatrixTransform"].SetValue(transform);				                
+			_spriteEffect.CurrentTechnique.Passes[0].Apply();
 
 			// If the user supplied a custom effect then apply
             // it now to override the sprite effect.
@@ -142,7 +121,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (texture == null)
                 throw new ArgumentNullException("texture");
-            if (!beginCalled)
+            if (!_beginCalled)
                 throw new InvalidOperationException("Draw was called, but Begin has not yet been called. Begin must be called successfully before you can call Draw.");
         }
 
@@ -152,7 +131,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new ArgumentNullException("spriteFont");
             if (text == null)
                 throw new ArgumentNullException("text");
-            if (!beginCalled)
+            if (!_beginCalled)
                 throw new InvalidOperationException("DrawString was called, but Begin has not yet been called. Begin must be called successfully before you can call DrawString.");
         }
 
@@ -162,7 +141,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new ArgumentNullException("spriteFont");
             if (text == null)
                 throw new ArgumentNullException("text");
-            if (!beginCalled)
+            if (!_beginCalled)
                 throw new InvalidOperationException("DrawString was called, but Begin has not yet been called. Begin must be called successfully before you can call DrawString.");
         }
 
@@ -178,13 +157,15 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
             CheckValid(texture);
 
-            float w = texture.Width*scale.X;
-			float h = texture.Height*scale.Y;
-			if (sourceRectangle.HasValue) {
+            var w = texture.Width * scale.X;
+            var h = texture.Height * scale.Y;
+			if (sourceRectangle.HasValue)
+            {
 				w = sourceRectangle.Value.Width*scale.X;
 				h = sourceRectangle.Value.Height*scale.Y;
 			}
-			Draw (texture,
+
+            DrawInternal(texture,
 				new Vector4(position.X, position.Y, w, h),
 				sourceRectangle,
 				color,
@@ -204,13 +185,22 @@ namespace Microsoft.Xna.Framework.Graphics
 				SpriteEffects effect,
 				float depth)
 		{
-			Draw (texture,
-				position,
+            CheckValid(texture);
+
+            var w = texture.Width * scale;
+            var h = texture.Height * scale;
+            if (sourceRectangle.HasValue)
+            {
+                w = sourceRectangle.Value.Width * scale;
+                h = sourceRectangle.Value.Height * scale;
+            }
+
+            DrawInternal(texture,
+                new Vector4(position.X, position.Y, w, h),
 				sourceRectangle,
 				color,
 				rotation,
 				origin,
-				new Vector2(scale, scale),
 				effect,
 				depth);
 		}
@@ -224,7 +214,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			SpriteEffects effect,
 			float depth)
 		{
-			Draw (texture,
+            CheckValid(texture);
+
+            DrawInternal(texture,
 			      new Vector4(destinationRectangle.X,
 			                  destinationRectangle.Y,
 			                  destinationRectangle.Width,
@@ -237,7 +229,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			      depth);
 		}
 
-		internal void Draw (Texture2D texture,
+		internal void DrawInternal (Texture2D texture,
 			Vector4 destinationRectangle,
 			Rectangle? sourceRectangle,
 			Color color,
@@ -246,36 +238,34 @@ namespace Microsoft.Xna.Framework.Graphics
 			SpriteEffects effect,
 			float depth)
 		{
-			CheckValid(texture);
-
 			var item = _batcher.CreateBatchItem();
 
 			item.Depth = depth;
 			item.Texture = texture;
 
 			if (sourceRectangle.HasValue) {
-				tempRect = sourceRectangle.Value;
+				_tempRect = sourceRectangle.Value;
 			} else {
-				tempRect.X = 0;
-				tempRect.Y = 0;
-				tempRect.Width = texture.Width;
-				tempRect.Height = texture.Height;				
+				_tempRect.X = 0;
+				_tempRect.Y = 0;
+				_tempRect.Width = texture.Width;
+				_tempRect.Height = texture.Height;				
 			}
 			
-			texCoordTL.X = tempRect.X / (float)texture.Width;
-			texCoordTL.Y = tempRect.Y / (float)texture.Height;
-			texCoordBR.X = (tempRect.X + tempRect.Width) / (float)texture.Width;
-			texCoordBR.Y = (tempRect.Y + tempRect.Height) / (float)texture.Height;
+			_texCoordTL.X = _tempRect.X / (float)texture.Width;
+			_texCoordTL.Y = _tempRect.Y / (float)texture.Height;
+			_texCoordBR.X = (_tempRect.X + _tempRect.Width) / (float)texture.Width;
+			_texCoordBR.Y = (_tempRect.Y + _tempRect.Height) / (float)texture.Height;
 
 			if ((effect & SpriteEffects.FlipVertically) != 0) {
-				float temp = texCoordBR.Y;
-				texCoordBR.Y = texCoordTL.Y;
-				texCoordTL.Y = temp;
+                var temp = _texCoordBR.Y;
+				_texCoordBR.Y = _texCoordTL.Y;
+				_texCoordTL.Y = temp;
 			}
 			if ((effect & SpriteEffects.FlipHorizontally) != 0) {
-				float temp = texCoordBR.X;
-				texCoordBR.X = texCoordTL.X;
-				texCoordTL.X = temp;
+                var temp = _texCoordBR.X;
+				_texCoordBR.X = _texCoordTL.X;
+				_texCoordTL.X = temp;
 			}
 
 			item.Set (destinationRectangle.X,
@@ -287,8 +277,8 @@ namespace Microsoft.Xna.Framework.Graphics
 					(float)Math.Sin (rotation), 
 					(float)Math.Cos (rotation), 
 					color, 
-					texCoordTL, 
-					texCoordBR);			
+					_texCoordTL, 
+					_texCoordBR);			
 			
 			if (_sortMode == SpriteSortMode.Immediate)
                 _batcher.DrawBatch(_sortMode);
@@ -373,14 +363,15 @@ namespace Microsoft.Xna.Framework.Graphics
             spriteFont.DrawInto(this, ref source, position, color, rotation, origin, scale, effect, depth);
 		}
 
-        private bool _isDisposed = false;
+        private bool _isDisposed;
+
         public override void Dispose()
         {
             if (_isDisposed)
                 return;
 
-            spriteEffect.Dispose();
-            spriteEffect = null;
+            _spriteEffect.Dispose();
+            _spriteEffect = null;
 
             _isDisposed = true;
 
