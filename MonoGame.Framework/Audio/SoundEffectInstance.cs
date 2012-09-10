@@ -90,7 +90,9 @@ namespace Microsoft.Xna.Framework.Audio
             _voice = null;
             _effect = null;
 #else
-			_sound.Dispose();
+            // When disposing a SoundEffectInstance, the Sound should
+            // just be stopped as it will likely be reused later
+            _sound.Stop();
 #endif
 			isDisposed = true;
 		}
@@ -429,10 +431,16 @@ namespace Microsoft.Xna.Framework.Audio
 
                 return SoundState.Playing;                                
 #else
-				if (_sound != null && soundState == SoundState.Playing && !_sound.Playing) {
-					soundState = SoundState.Stopped;
-				}
-				return soundState;
+#if !ANDROID
+                // Since Android SoundPool doesn't yet support getting the state, it's better
+                // to rely on our instance state. At least it will be correct for looping sounds
+                return soundState;
+#endif
+                if (_sound != null && soundState == SoundState.Playing && !_sound.Playing) 
+                {
+                    soundState = SoundState.Stopped;
+                }
+
 #endif
 			} 
 		}
