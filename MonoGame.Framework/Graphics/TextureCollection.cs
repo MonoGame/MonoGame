@@ -19,12 +19,19 @@ namespace Microsoft.Xna.Framework.Graphics
     {
         private readonly Texture[] _textures;
 
+#if OPENGL
+        private readonly TextureTarget[] _targets;
+#endif
+
         private int _dirty;
 
         internal TextureCollection(int maxTextures)
         {
             _textures = new Texture[maxTextures];
             _dirty = int.MaxValue;
+#if OPENGL
+            _targets = new TextureTarget[maxTextures];
+#endif
         }
 
         public Texture this[int index]
@@ -54,7 +61,6 @@ namespace Microsoft.Xna.Framework.Graphics
             if (_dirty == 0)
                 return;
 
-
 #if DIRECTX
             // NOTE: We make the assumption here that the caller has
             // locked the d3dContext for us to use.
@@ -69,9 +75,16 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 var tex = _textures[i];
 #if OPENGL
+                GL.ActiveTexture(TextureUnit.Texture0 + i);
+
+                // Clear the previous binding if the 
+                // target is different from the new one.
+                if (_targets[i] != 0 && (tex == null || _targets[i] != tex.glTarget))
+                    GL.BindTexture(_targets[i], 0);
+
                 if (tex != null)
                 {
-                    GL.ActiveTexture(TextureUnit.Texture0 + i);
+                    _targets[i] = tex.glTarget;
                     GL.BindTexture(tex.glTarget, tex.glTexture);
                 }
 #elif DIRECTX
