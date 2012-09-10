@@ -185,8 +185,6 @@ namespace Microsoft.Xna.Framework.Graphics
         private uint VboIdElement;
         private All _preferedFilter;
 
-        private int _activeTexture = -1;
-
 #elif PSS
 
         internal GraphicsContext _graphics;
@@ -265,18 +263,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 _preferedFilter = value;
             }
 
-        }
-
-        internal int ActiveTexture
-        {
-            get
-            {
-                return _activeTexture;
-            }
-            set
-            {
-                _activeTexture = value;
-            }
         }
 
         internal void SetVertexAttributeArray(bool[] attrs)
@@ -1232,7 +1218,8 @@ namespace Microsoft.Xna.Framework.Graphics
 						GL.ActiveTexture(TextureUnit.Texture0);
 						GL.BindTexture(TextureTarget.Texture2D, renderTarget.ID);
 						GL.GenerateMipmap(TextureTarget.Texture2D);
-						GL.BindTexture(TextureTarget.Texture2D, 0);*/
+						GL.BindTexture(TextureTarget.Texture2D, 0);
+                        */
 					}
 				}
 			}
