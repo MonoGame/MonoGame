@@ -87,6 +87,7 @@ namespace Microsoft.Xna.Framework
 
 		protected override void OnDestroy ()
 		{
+            UnregisterReceiver(screenReceiver);
 			base.OnDestroy ();
 		}
     }
