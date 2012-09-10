@@ -48,7 +48,7 @@ using System.Reflection;
 namespace Microsoft.Xna.Framework.Content
 {
  
-	internal class DictionaryReader<TKey, TValue> : ContentTypeReader<Dictionary<TKey, TValue>>
+	public class DictionaryReader<TKey, TValue> : ContentTypeReader<Dictionary<TKey, TValue>>
     {
         ContentTypeReader keyReader;
 		ContentTypeReader valueReader;
@@ -56,7 +56,7 @@ namespace Microsoft.Xna.Framework.Content
 		Type keyType;
 		Type valueType;
 		
-        internal DictionaryReader()
+        public DictionaryReader()
         {
         }
 

@@ -116,12 +116,6 @@ namespace Microsoft.Xna.Framework
 
             Initialize();
 
-            // Is this really correct?
-#if !WINDOWS && !WINRT && !MONOMAC && !LINUX
-            ApplyChanges();
-            ResetClientBounds();
-#endif
-
             OnDeviceCreated(EventArgs.Empty);
         }
 
@@ -213,8 +207,9 @@ namespace Microsoft.Xna.Framework
             // hardware feature level.
             _graphicsDevice.GraphicsProfile = GraphicsProfile;
 
-            // Update the 
+            // Update the back buffer.
             _graphicsDevice.CreateSizeDependentResources();
+            _graphicsDevice.ApplyRenderTargets(null);
 
 #elif WINDOWS || LINUX
             _game.ResizeWindow(false);
@@ -229,6 +224,12 @@ namespace Microsoft.Xna.Framework
 
 			_game.applyChanges(this);
 #else
+
+#if ANDROID
+            // Trigger a change in orientation in case the supported orientations have changed
+            _game.Window.SetOrientation(_game.Window.CurrentOrientation, false);
+#endif
+            // Ensure the presentation parameter orientation and buffer size matches the window
             _graphicsDevice.PresentationParameters.DisplayOrientation = _game.Window.CurrentOrientation;
 
             // Set the presentation parameters' actual buffer size to match the orientation
@@ -239,10 +240,7 @@ namespace Microsoft.Xna.Framework
             _graphicsDevice.PresentationParameters.BackBufferWidth = isLandscape ? Math.Max(w, h) : Math.Min(w, h);
             _graphicsDevice.PresentationParameters.BackBufferHeight = isLandscape ? Math.Min(w, h) : Math.Max(w, h);
 
-#if !PSS && !IPHONE
-            // Trigger a change in orientation in case the supported orientations have changed
-            _game.Window.SetOrientation(_game.Window.CurrentOrientation, false);
-#endif
+            ResetClientBounds();
 #endif
 
             // Set the new display size on the touch panel.

@@ -51,6 +51,8 @@
     <BaseAddress>4194304</BaseAddress>
     <DefineConstants>TRACE;WINDOWS;OPENGL</DefineConstants>
     <PlatformTarget>AnyCPU</PlatformTarget>
+    <DocumentationFile>
+    </DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
@@ -100,10 +102,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Audio\AudioCategory.cs" />
+    <Compile Include="Audio\DynamicSoundEffectInstance.cs" />
     <Compile Include="Content\ContentExtensions.cs" />
     <Compile Include="Content\ContentReaders\DualTextureEffectReader.cs" />
     <Compile Include="Content\ContentReaders\EffectReader.cs" />
     <Compile Include="Content\ContentReaders\EnvironmentMapEffectReader.cs" />
+    <Compile Include="Content\ContentReaders\ExternalReferenceReader.cs" />
     <Compile Include="Content\ContentReaders\ModelReader.cs" />
     <Compile Include="Content\ContentReaders\SkinnedEffectReader.cs" />
     <Compile Include="Content\ContentReaders\SongReader.cs" />

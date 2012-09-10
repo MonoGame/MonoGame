@@ -280,6 +280,14 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 
+        internal bool IsRenderTargetBound
+        {
+            get
+            {
+                return _currentRenderTargetBindings != null && _currentRenderTargetBindings.Length > 0;
+            }
+        }
+
         public GraphicsDevice ()
 		{
 			// Initialize the main viewport
@@ -753,6 +761,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #elif OPENGL
 
+            // GL.Clear() obeys the scissor rectangle where as in XNA/DirectX
+            // it does not.  So make sure scissor rect is set to the viewport
+            // bounds before we do the clear.
+		    var prevScissorRect = ScissorRectangle;
+            ScissorRectangle = _viewport.Bounds;
+
 			GL.ClearColor (color.X, color.Y, color.Z, color.W);
 
 			ClearBufferMask bufferMask = 0;
@@ -777,19 +791,13 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
 			GL.Clear (bufferMask);
 #endif
-#endif // OPENGL
-        }
+
+            // Restore the scissor rectangle.
+		    ScissorRectangle = prevScissorRect;
+#endif
+		    // OPENGL
+		}
 		
-        public void Clear(ClearOptions options, Color color, float depth, int stencil, Rectangle[] regions)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Clear(ClearOptions options, Vector4 color, float depth, int stencil, Rectangle[] regions)
-        {
-            throw new NotImplementedException();
-        }
-
         public void Dispose()
         {
             Dispose(true);
@@ -1000,7 +1008,14 @@ namespace Microsoft.Xna.Framework.Graphics
                 lock (_d3dContext) 
                     _d3dContext.Rasterizer.SetViewports(viewport);
 #elif OPENGL
-                GL.Viewport (value.X, PresentationParameters.BackBufferHeight - value.Y - value.Height, value.Width, value.Height);
+                if (IsRenderTargetBound)
+                {
+                       GL.Viewport(value.X, value.Y, value.Width, value.Height);
+                }
+                else
+                {
+                    GL.Viewport(value.X, PresentationParameters.BackBufferHeight - value.Y - value.Height, value.Width, value.Height);
+                }
 #if GLES
                 GL.DepthRange(value.MinDepth, value.MaxDepth);
 #else
@@ -1029,7 +1044,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if OPENGL
                 var glScissorRectangle = _scissorRectangle;
-                glScissorRectangle.Y = _viewport.Height - glScissorRectangle.Y - glScissorRectangle.Height;
+                if (!IsRenderTargetBound)
+                {
+                    glScissorRectangle.Y = _viewport.Height - glScissorRectangle.Y - glScissorRectangle.Height;
+                }                
                 GLStateManager.SetScissor(glScissorRectangle);				
 #endif
             }
@@ -1211,7 +1229,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public RenderTargetBinding[] GetRenderTargets()
 		{
-            if (_currentRenderTargetBindings == null)
+            if (!IsRenderTargetBound)
                 return EmptyRenderTargetBinding;
 
             return _currentRenderTargetBindings;
@@ -1437,8 +1455,10 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 #elif OPENGL
 
-			var indexElementType = DrawElementsType.UnsignedShort;
-			var indexElementSize = 2;
+            var shortIndices = _indexBuffer.IndexElementSize == IndexElementSize.SixteenBits;
+
+			var indexElementType = shortIndices ? DrawElementsType.UnsignedShort : DrawElementsType.UnsignedInt;
+            var indexElementSize = shortIndices ? 2 : 4;
 			var indexOffsetInBytes = (IntPtr)(startIndex * indexElementSize);
 			var indexElementCount = GetElementCountArray(primitiveType, primitiveCount);
 			var target = PrimitiveTypeGL(primitiveType);

@@ -398,6 +398,7 @@
     <Compile Include="Content\ContentReaders\ExternalReferenceReader.cs" />
     <Compile Include="Graphics\Effect\EffectMaterial.cs" />
     <Compile Include="Linux\Media\Song.cs" />
+    <Compile Include="Content\ResourceContentManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.Linux.csproj">
