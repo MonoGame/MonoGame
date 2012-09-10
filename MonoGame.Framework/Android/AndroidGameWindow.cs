@@ -265,6 +265,8 @@ namespace Microsoft.Xna.Framework
                     newOrientation = DisplayOrientation.LandscapeRight;
                 else if ((supported & DisplayOrientation.Portrait) != 0)
                     newOrientation = DisplayOrientation.Portrait;
+                else if ((supported & DisplayOrientation.PortraitUpsideDown) != 0)
+                    newOrientation = DisplayOrientation.PortraitUpsideDown;
             }
 
             DisplayOrientation oldOrientation = CurrentOrientation;
