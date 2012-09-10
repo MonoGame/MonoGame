@@ -280,6 +280,14 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 
+        internal bool IsRenderTargetBound
+        {
+            get
+            {
+                return _currentRenderTargetBindings != null && _currentRenderTargetBindings.Length > 0;
+            }
+        }
+
         public GraphicsDevice ()
 		{
 			// Initialize the main viewport
@@ -963,14 +971,6 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        public Microsoft.Xna.Framework.Graphics.GraphicsDeviceCapabilities GraphicsDeviceCapabilities
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
-
         public Microsoft.Xna.Framework.Graphics.GraphicsDeviceStatus GraphicsDeviceStatus
         {
             get
@@ -1000,7 +1000,14 @@ namespace Microsoft.Xna.Framework.Graphics
                 lock (_d3dContext) 
                     _d3dContext.Rasterizer.SetViewports(viewport);
 #elif OPENGL
-                GL.Viewport (value.X, value.Y, value.Width, value.Height);
+                if (IsRenderTargetBound)
+                {
+                       GL.Viewport(value.X, value.Y, value.Width, value.Height);
+                }
+                else
+                {
+                    GL.Viewport(value.X, PresentationParameters.BackBufferHeight - value.Y - value.Height, value.Width, value.Height);
+                }
 #if GLES
                 GL.DepthRange(value.MinDepth, value.MaxDepth);
 #else
@@ -1029,7 +1036,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if OPENGL
                 var glScissorRectangle = _scissorRectangle;
-                glScissorRectangle.Y = _viewport.Height - glScissorRectangle.Y - glScissorRectangle.Height;
+                if (!IsRenderTargetBound)
+                {
+                    glScissorRectangle.Y = _viewport.Height - glScissorRectangle.Y - glScissorRectangle.Height;
+                }                
                 GLStateManager.SetScissor(glScissorRectangle);				
 #endif
             }
@@ -1211,7 +1221,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public RenderTargetBinding[] GetRenderTargets()
 		{
-            if (_currentRenderTargetBindings == null)
+            if (!IsRenderTargetBound)
                 return EmptyRenderTargetBinding;
 
             return _currentRenderTargetBindings;

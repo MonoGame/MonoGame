@@ -70,7 +70,6 @@ namespace Microsoft.Xna.Framework
         private DisplayOrientation supportedOrientations = DisplayOrientation.Default;
         private DisplayOrientation _currentOrientation;
         private AndroidTouchEventManager _touchManager = null;
-		private bool exiting = false;
         private bool _contextWasLost = false;
 
         public bool TouchEnabled
@@ -86,9 +85,7 @@ namespace Microsoft.Xna.Framework
         }		
 						
         private void Initialize()
-        {
-
-            this.Closed +=	new EventHandler<EventArgs>(GameWindow_Closed);            
+        {            
 			clientBounds = new Rectangle(0, 0, Context.Resources.DisplayMetrics.WidthPixels, Context.Resources.DisplayMetrics.HeightPixels);
 
             this.RequestFocus();
@@ -97,24 +94,6 @@ namespace Microsoft.Xna.Framework
             _touchManager = new AndroidTouchEventManager(_game);
         }
 		
-		void GameWindow_Closed(object sender,EventArgs e)
-        {   
-			if (!exiting)
-			{
-				exiting = true;
-				_game.DoExiting();
-			}
-			try
-			{
-        		_game.Exit();
-			}
-			catch(NullReferenceException)
-			{
-				// just in case the game is null
-			}
-
-		}
-
 		protected override void OnLoad (EventArgs e)
 		{
 			base.OnLoad (e);			
