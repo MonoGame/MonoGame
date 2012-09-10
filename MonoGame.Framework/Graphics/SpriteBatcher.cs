@@ -44,21 +44,6 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.Xna.Framework;
 
-#if MONOMAC
-using MonoMac.OpenGL;
-#elif WINDOWS || LINUX
-using OpenTK.Graphics.OpenGL;
-#elif WINRT
-// TODO
-#elif GLES
-using OpenTK.Graphics.ES20;
-using VertexAttribPointerType = OpenTK.Graphics.ES20.All;
-using TextureUnit = OpenTK.Graphics.ES20.All;
-using TextureTarget = OpenTK.Graphics.ES20.All;
-using DrawElementsType = OpenTK.Graphics.ES20.All;
-using BufferTarget = OpenTK.Graphics.ES20.All;
-using BeginMode = OpenTK.Graphics.ES20.All;
-#endif
 namespace Microsoft.Xna.Framework.Graphics
 {
 	internal class SpriteBatcher
@@ -159,13 +144,7 @@ namespace Microsoft.Xna.Framework.Graphics
 					FlushVertexArray( startIndex, index );
 					tex = item.Texture;
                     startIndex = index = 0;
-#if DIRECTX
-                    _device.Textures[0] = tex;	  
-#elif OPENGL
-					GL.ActiveTexture(TextureUnit.Texture0);
-					GL.BindTexture ( TextureTarget.Texture2D, tex.glTexture );
-					samplerState.Activate(TextureTarget.Texture2D);
-#endif
+                    _device.Textures[0] = tex;	                   
                 }
 
 				// store the SpriteBatchItem data in our vertexArray
@@ -211,6 +190,12 @@ namespace Microsoft.Xna.Framework.Graphics
                 return;
 
             var vertexCount = end - start;
+            
+#if OPENGL
+            // Activate the Texture before we draw. 
+            // should this be to be moved into the GraphicsDevice?
+            if (_device.Textures[0] != null) _device.Textures[0].Activate();            
+#endif
 
             _device.DrawUserIndexedPrimitives<VertexPosition2ColorTexture>(
                 PrimitiveType.TriangleList, 

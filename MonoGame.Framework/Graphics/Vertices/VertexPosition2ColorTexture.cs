@@ -12,7 +12,7 @@ namespace Microsoft.Xna.Framework.Graphics
     internal struct VertexPosition2ColorTexture : IVertexType
 	{
 		public Vector2 Position;
-		public uint Color;		
+		public Color Color;
 		public Vector2 TextureCoordinate;
 
         public static readonly VertexDeclaration VertexDeclaration;
@@ -20,7 +20,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		public VertexPosition2ColorTexture ( Vector2 position, Color color, Vector2 texCoord )
 		{
 			Position = position;
-			Color = color.PackedValue;
+			Color = color;
 			TextureCoordinate = texCoord;
 		}
 		
@@ -75,7 +75,7 @@ namespace Microsoft.Xna.Framework.Graphics
             var elements = new VertexElement[] 
             { 
                 new VertexElement(0, VertexElementFormat.Vector2, VertexElementUsage.Position, 0), 
-                new VertexElement(8, VertexElementFormat.Byte4, VertexElementUsage.Color, 0), 
+                new VertexElement(8, VertexElementFormat.Color, VertexElementUsage.Color, 0), 
                 new VertexElement(12, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 0) 
             };
             VertexDeclaration = new VertexDeclaration(elements);
