@@ -260,7 +260,7 @@ namespace Microsoft.Xna.Framework.Audio
 			{
                 if(_instance == null)
 				    _instance = CreateInstance();
-				_instance.Volume = volume;
+				_instance.Volume = volume * _masterVolume;
 				_instance.Pitch = pitch;
 				_instance.Pan = pan;
 				_instance.Play();
