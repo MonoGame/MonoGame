@@ -246,7 +246,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			SpriteEffects effect,
 			float depth)
 		{
-
 			CheckValid(texture);
 
 			var item = _batcher.CreateBatchItem();
@@ -379,8 +378,6 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (_isDisposed)
                 return;
-
-            _batcher.Dispose();
 
             spriteEffect.Dispose();
             spriteEffect = null;

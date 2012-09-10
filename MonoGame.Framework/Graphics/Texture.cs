@@ -50,6 +50,7 @@ using OpenTK.Graphics.OpenGL;
 #elif GLES
 using OpenTK.Graphics.ES20;
 using TextureTarget = OpenTK.Graphics.ES20.All;
+using TextureUnit = OpenTK.Graphics.ES20.All;
 #endif
 
 
@@ -69,6 +70,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #elif OPENGL
 		internal int glTexture = -1;
 		internal TextureTarget glTarget;
+        internal TextureUnit glTextureUnit = TextureUnit.Texture0;
 #endif
 		
 		public SurfaceFormat Format
@@ -142,6 +144,14 @@ namespace Microsoft.Xna.Framework.Graphics
 
             return pitch;
         }
+
+#if OPENGL
+		internal virtual void Activate()
+        {
+            GL.ActiveTexture(glTextureUnit);
+			GL.BindTexture(glTarget, this.glTexture);
+        }
+#endif
 
 #if DIRECTX
 
