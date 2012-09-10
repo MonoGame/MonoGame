@@ -84,6 +84,11 @@ namespace Microsoft.Xna.Framework
             base.OnRestart();
             Game.Window.OnRestart();
         }
+
+		protected override void OnDestroy ()
+		{
+			base.OnDestroy ();
+		}
     }
 	
 	public static class ActivityExtensions
