@@ -177,6 +177,14 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public static bool OpenGLVertexAttribNormalized(this VertexElement element)
         {
+            // TODO: This may or may not be the right behavor.  
+            //
+            // For instance the VertexElementFormat.Byte4 format is not supposed
+            // to be normalized, but this line makes it so.
+            //
+            // The question is in MS XNA are types normalized based on usage or
+            // normalized based to their format?
+            //
             if (element.VertexElementUsage == VertexElementUsage.Color)
                 return true;
 
@@ -208,7 +216,6 @@ namespace Microsoft.Xna.Framework.Graphics
                     return ColorPointerType.Float;
 
                 case VertexElementFormat.Color:
-                    //return ColorPointerType.UnsignedByte;
                     return ColorPointerType.UnsignedByte;
 
                 case VertexElementFormat.Byte4:

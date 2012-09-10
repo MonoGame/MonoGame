@@ -169,7 +169,6 @@ namespace Microsoft.Xna.Framework.Input.Touch
             for (var i = 0; i < _events.Count; )
             {
                 var loc = _events[i];
-
                 if (loc.State == TouchLocationState.Pressed)
                 {
                     _touchLocations.Add(loc.Id, loc);
