@@ -1478,41 +1478,43 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
             }
 
-#if OPENGL
-            ActivateShaderProgram();
-#endif
+            if (_vertexShader == null)
+                throw new InvalidOperationException("A vertex shader must be set!");
+            if (_pixelShader == null)
+                throw new InvalidOperationException("A pixel shader must not set!");
+
+#if DIRECTX 
 
             if (_vertexShaderDirty)
-            {
-                Debug.Assert(_vertexShader != null, "The vertex shader is null!");
-#if DIRECTX            
                 _d3dContext.VertexShader.Set(_vertexShader._vertexShader);                
-#endif
-            }
 
             if (_vertexShaderDirty || _vertexBufferDirty)
             {
-#if DIRECTX     
                 _d3dContext.InputAssembler.InputLayout = GetInputLayout(_vertexShader, _vertexBuffer.VertexDeclaration);
-#endif
                 _vertexShaderDirty = _vertexBufferDirty = false;
             }
 
             if (_pixelShaderDirty)
             {
-                Debug.Assert(_pixelShader != null, "The pixel shader is null!");
-
-#if DIRECTX       
                 _d3dContext.PixelShader.Set(_pixelShader._pixelShader);
-#endif
                 _pixelShaderDirty = false;
             }
+
+#elif OPENGL
+
+            if (_vertexShaderDirty || _pixelShaderDirty)
+            {
+                ActivateShaderProgram();
+                _vertexShaderDirty = _pixelShaderDirty = false;
+            }
+
+#endif
 
 #if DIRECTX
             _vertexConstantBuffers.SetConstantBuffers(this);
             _pixelConstantBuffers.SetConstantBuffers(this);
 #elif OPENGL
-            _vertexConstantBuffers.SetConstantBuffers(this,_shaderProgram);
+            _vertexConstantBuffers.SetConstantBuffers(this, _shaderProgram);
             _pixelConstantBuffers.SetConstantBuffers(this, _shaderProgram);
 #endif
 

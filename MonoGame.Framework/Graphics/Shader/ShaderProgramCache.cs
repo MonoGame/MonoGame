@@ -49,16 +49,13 @@ namespace Microsoft.Xna.Framework.Graphics
             _programCache.Clear();
         }
 
-        public ShaderProgramInfo GetProgramInfo(Shader vertexShader, Shader pixelShader)//, ConstantBuffer constantBuffer)
+        public ShaderProgramInfo GetProgramInfo(Shader vertexShader, Shader pixelShader)
         {
-            if (vertexShader == null)
-                throw new ArgumentNullException("vertexShader");
+            // TODO: We should be hashing in the mix of constant 
+            // buffers here as well.  This would allow us to optimize
+            // setting uniforms to only when a constant buffer changes.
 
-            if (pixelShader == null)
-                throw new ArgumentNullException("pixelShader");
-
-            //
-            var key = vertexShader.HashKey | pixelShader.HashKey;// +constantBuffer.HashKey;
+            var key = vertexShader.HashKey | pixelShader.HashKey;
             if (!_programCache.ContainsKey(key))
             {
                 // the key does not exist so we need to link the programs

@@ -44,7 +44,7 @@ namespace Microsoft.Xna.Framework.Graphics
         public int index;
         public string name;
 
-        // TODO: This should be moved to FffectPass.
+        // TODO: This should be moved to EffectPass.
         public int parameter;
     }
 
