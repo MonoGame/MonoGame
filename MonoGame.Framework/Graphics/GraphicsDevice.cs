@@ -368,12 +368,12 @@ namespace Microsoft.Xna.Framework.Graphics
             DepthStencilState = DepthStencilState.Default;
             RasterizerState = RasterizerState.CullCounterClockwise;
 
-            // Set the default render target.
-            ApplyRenderTargets(null);
-
             // Set the default scissor rect.
             _scissorRectangleDirty = true;
             ScissorRectangle = _viewport.Bounds;
+
+            // Set the default render target.
+            ApplyRenderTargets(null);
         }
 
 #if DIRECTX
@@ -681,7 +681,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 if (_blendState == value)
                     return;
 
-				// ToDo check for invalid state
 				_blendState = value;
                 _blendStateDirty = true;
             }
@@ -703,7 +702,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void Clear(Color color)
         {
-			ClearOptions options = ClearOptions.Target;
+			var options = ClearOptions.Target;
 
 #if DIRECTX
 
@@ -763,20 +762,28 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #elif OPENGL
 
-            // GL.Clear() obeys the scissor rectangle where as in XNA/DirectX
-            // it does not.  So make sure scissor rect is set to the viewport
-            // bounds before we do the clear.
+            // Unlike with XNA and DirectX...  GL.Clear() obeys several
+            // different render states:
+            //
+            //  - The color write flags.
+            //  - The scissor rectangle.
+            //  - The depth/stencil state.
+            //
+            // So overwrite these states with what is needed to perform
+            // the clear correctly and restore it afterwards.
+            //
 		    var prevScissorRect = ScissorRectangle;
+		    var prevDepthStencilState = DepthStencilState;
+            var prevBlendState = BlendState;
             ScissorRectangle = _viewport.Bounds;
-
-			GL.ClearColor (color.X, color.Y, color.Z, color.W);
+            DepthStencilState = DepthStencilState.Default;
+		    BlendState = BlendState.Opaque;
+            ApplyState(false);
 
 			ClearBufferMask bufferMask = 0;
             if (options.HasFlag(ClearOptions.Target))
             {
-                // GL will only clear color if color writes are 
-                // enabled, so we force it on here.
-
+                GL.ClearColor(color.X, color.Y, color.Z, color.W);
                 bufferMask = bufferMask | ClearBufferMask.ColorBufferBit;
             }
 			if (options.HasFlag(ClearOptions.Stencil))
@@ -787,10 +794,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			if (options.HasFlag(ClearOptions.DepthBuffer)) 
             {
-                // GL will only clear depth if depth writing 
-                // is enabled, so we force it on here.
-                GL.DepthMask(true);
-
 #if GLES
                 GL.ClearDepth (depth);
 #else
@@ -804,15 +807,11 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
 			GL.Clear(bufferMask);
 #endif
-			// Restore the color write flag.
-
-            // Restore the depth write flag.
-            if (    options.HasFlag(ClearOptions.DepthBuffer) &&
-                    !_depthStencilStateDirty)
-                GL.DepthMask(_depthStencilState.DepthBufferWriteEnable);
-			
-            // Restore the scissor rectangle.
+           		
+            // Restore the previous render state.
 		    ScissorRectangle = prevScissorRect;
+		    DepthStencilState = prevDepthStencilState;
+		    BlendState = prevBlendState;
 
 #endif // OPENGL
         }
@@ -1029,19 +1028,14 @@ namespace Microsoft.Xna.Framework.Graphics
                     _d3dContext.Rasterizer.SetViewports(viewport);
 #elif OPENGL
                 if (IsRenderTargetBound)
-                {
-                       GL.Viewport(value.X, value.Y, value.Width, value.Height);
-                }
+                    GL.Viewport(value.X, value.Y, value.Width, value.Height);
                 else
-                {
                     GL.Viewport(value.X, PresentationParameters.BackBufferHeight - value.Y - value.Height, value.Width, value.Height);
-                }
 #if GLES
                 GL.DepthRange(value.MinDepth, value.MaxDepth);
 #else
                 GL.DepthRange((double)value.MinDepth, (double)value.MaxDepth);
 #endif
-
 #endif
             }
         }
@@ -1406,6 +1400,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 _posFixup[1] = 1.0f;
                 _posFixup[2] = (63.0f / 64.0f) / Viewport.Width;
                 _posFixup[3] = -(63.0f / 64.0f) / Viewport.Height;
+
                 //If we have a render target bound (rendering offscreen)
                 if (GetRenderTargets().Length > 0)
                 {
@@ -1423,13 +1418,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public bool ResourcesLost { get; set; }
 
-        internal void ApplyState()
+        internal void ApplyState(bool applyShaders)
         {
 #if DIRECTX
             // NOTE: This code assumes _d3dContext has been locked by the caller.
             Debug.Assert(_d3dContext != null, "The d3d context is null!");
-#elif OPENGL
-            ActivateShaderProgram();
 #endif
 
             if ( _scissorRectangleDirty )
@@ -1465,6 +1458,10 @@ namespace Microsoft.Xna.Framework.Graphics
 	            _rasterizerStateDirty = false;
             }
 
+            // If we're not applying shaders then early out now.
+            if (!applyShaders)
+                return;
+
             if (_indexBufferDirty)
             {
 #if DIRECTX
@@ -1494,6 +1491,10 @@ namespace Microsoft.Xna.Framework.Graphics
                     GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBuffer.vbo);
 #endif
             }
+
+#if OPENGL
+            ActivateShaderProgram();
+#endif
 
             if (_vertexShaderDirty)
             {
@@ -1653,7 +1654,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             lock (_d3dContext)
             {
-                ApplyState();
+                ApplyState(true);
 
                 _d3dContext.InputAssembler.PrimitiveTopology = ToPrimitiveTopology(primitiveType);
 
@@ -1662,8 +1663,8 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 			
 #elif OPENGL
-              
-            ApplyState();
+
+            ApplyState(true);
 
             var shortIndices = _indexBuffer.IndexElementSize == IndexElementSize.SixteenBits;
 
@@ -1704,7 +1705,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             lock (_d3dContext)
             {
-                ApplyState();
+                ApplyState(true);
 
                 _d3dContext.InputAssembler.PrimitiveTopology = ToPrimitiveTopology(primitiveType);
                 _d3dContext.Draw(vertexCount, startVertex);
@@ -1712,7 +1713,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #elif OPENGL
 
-            ApplyState();
+            ApplyState(true);
 
             // Unbind the VBOs
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
@@ -1768,7 +1769,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             lock (_d3dContext)
             {
-                ApplyState();
+                ApplyState(true);
 
                 _d3dContext.InputAssembler.PrimitiveTopology = ToPrimitiveTopology(primitiveType);
                 _d3dContext.Draw(vertexCount, vertexStart);
@@ -1776,7 +1777,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #elif OPENGL
 
-            ApplyState();
+            ApplyState(true);
 
 			_vertexBuffer.VertexDeclaration.Apply();
 
@@ -1807,7 +1808,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             lock (_d3dContext)
             {
-                ApplyState();
+                ApplyState(true);
 
                 _d3dContext.InputAssembler.PrimitiveTopology = ToPrimitiveTopology(primitiveType);
                 _d3dContext.DrawIndexed(indexCount, startIndex, startVertex);
@@ -1815,7 +1816,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #elif OPENGL
 
-            ApplyState();
+            ApplyState(true);
 
             // Unbind the VBOs
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
@@ -1895,7 +1896,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             lock (_d3dContext)
             {
-                ApplyState();
+                ApplyState(true);
 
                 _d3dContext.InputAssembler.PrimitiveTopology = ToPrimitiveTopology(primitiveType);
                 _d3dContext.DrawIndexed(indexCount, startIndex, startVertex);
@@ -1903,7 +1904,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #elif OPENGL
 
-            ApplyState();
+            ApplyState(true);
 
             // Unbind the VBOs
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
