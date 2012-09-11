@@ -1330,17 +1330,6 @@ namespace Microsoft.Xna.Framework.Graphics
 #if OPENGL
 
         /// <summary>
-        /// Looks up the Vertex/Pixel Shader combination in the ShaderProgramCache and returns it or creates a new program .
-        /// </summary>
-        internal int ShaderProgram
-        {
-            get
-            {                
-                return _shaderProgram;
-            }
-        }
-
-        /// <summary>
         /// Activates the Current Vertex/Pixel shader pair into a program.         
         /// </summary>
         private void ActivateShaderProgram()
@@ -1512,7 +1501,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #if DIRECTX
                     buffer.Apply(this, ShaderStage.Vertex, i);
 #elif OPENGL
-                    buffer.Apply(this, ShaderProgram);
+                    buffer.Apply(this, _shaderProgram);
 #endif
                 }
 
@@ -1524,7 +1513,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #if DIRECTX
                     buffer.Apply(this, ShaderStage.Pixel, i);
 #elif OPENGL
-                    buffer.Apply(this, ShaderProgram);
+                    buffer.Apply(this, _shaderProgram);
 #endif
                 }
             }

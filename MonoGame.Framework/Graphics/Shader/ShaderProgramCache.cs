@@ -1,9 +1,7 @@
 ﻿#if OPENGL
+
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
 
 #if MONOMAC
 using MonoMac.OpenGL;
@@ -31,70 +29,65 @@ namespace Microsoft.Xna.Framework.Graphics
     /// </summary>
     internal class ShaderProgramCache
     {
-
-        private static Dictionary<int, int> ProgramCache = new Dictionary<int, int>();
+        private static readonly Dictionary<int, int> _programCache = new Dictionary<int, int>();
 
         internal static int? GetProgram(Shader vertexShader, Shader pixelShader)//, ConstantBuffer constantBuffer)
         {
             if (vertexShader == null)
-            {
                 throw new ArgumentNullException("vertexShader");
-            }
+
             if (pixelShader == null)
-            {
                 throw new ArgumentNullException("pixelShader");
-            }
+
             //
-            int key = vertexShader.HashKey | pixelShader.HashKey;// +constantBuffer.HashKey;
-            if (!ProgramCache.ContainsKey(key))
+            var key = vertexShader.HashKey | pixelShader.HashKey;// +constantBuffer.HashKey;
+            if (!_programCache.ContainsKey(key))
             {
                 // the key does not exist so we need to link the programs
                 Link(vertexShader, pixelShader);    
-            }            
-            return ProgramCache[key];
+            }
+
+            return _programCache[key];
         }        
 
-        private static void Link(Shader _vertexShader, Shader _pixelShader)
+        private static void Link(Shader vertexShader, Shader pixelShader)
         {
-            #if OPENGL
-            //Threading.BlockOnUIThread(() =>
-            //{
-                // TODO: Shouldn't we be calling GL.DeleteProgram() somewhere?
+            // TODO: Shouldn't we be calling GL.DeleteProgram() somewhere?
 
-                // TODO: We could cache the various program combinations 
-                // of vertex/pixel shaders and share them across effects.
+            // NOTE: No need to worry about background threads here
+            // as this is only called at draw time when we're in the
+            // main drawing thread.
 
-                int _shaderProgram = GL.CreateProgram();
+            var program = GL.CreateProgram();
 
-                GL.AttachShader(_shaderProgram, _vertexShader.ShaderHandle);
-                GL.AttachShader(_shaderProgram, _pixelShader.ShaderHandle);
+            GL.AttachShader(program, vertexShader.ShaderHandle);
+            GL.AttachShader(program, pixelShader.ShaderHandle);
 
-                _vertexShader.OnLink(_shaderProgram);
-                _pixelShader.OnLink(_shaderProgram);
-                GL.LinkProgram(_shaderProgram);
+            vertexShader.OnLink(program);
+            pixelShader.OnLink(program);
 
-                var linked = 0;
+            GL.LinkProgram(program);
+
+            var linked = 0;
 
 #if GLES
-    			GL.GetProgram(_shaderProgram, ProgramParameter.LinkStatus, ref linked);
+    		GL.GetProgram(_shaderProgram, ProgramParameter.LinkStatus, ref linked);
 #else
-                GL.GetProgram(_shaderProgram, ProgramParameter.LinkStatus, out linked);
+            GL.GetProgram(program, ProgramParameter.LinkStatus, out linked);
 #endif
-                if (linked == 0)
-                {
+            if (linked == 0)
+            {
 #if !GLES
-                    string log = GL.GetProgramInfoLog(_shaderProgram);
-                    Console.WriteLine(log);
+                var log = GL.GetProgramInfoLog(program);
+                Console.WriteLine(log);
 #endif
-                    throw new InvalidOperationException("Unable to link effect program");
-                }
+                throw new InvalidOperationException("Unable to link effect program");
+            }
 
-                ProgramCache.Add(_vertexShader.HashKey | _pixelShader.HashKey, _shaderProgram); 
-            //});
-#endif
-            
+            _programCache.Add(vertexShader.HashKey | pixelShader.HashKey, program);             
         }
 
     }
 }
-#endif
+
+#endif // OPENGL
