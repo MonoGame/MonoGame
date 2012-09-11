@@ -152,9 +152,6 @@ namespace Microsoft.Xna.Framework
             // Update our OpenAL sound buffer pools
             soundControllerInstance.Update();
 
-            // Let the touch panel update states.
-            TouchPanel.UpdateState();
-
             return true;
         }
 
