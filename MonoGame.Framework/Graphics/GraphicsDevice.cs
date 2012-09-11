@@ -81,7 +81,7 @@ namespace Microsoft.Xna.Framework.Graphics
     {
         private Viewport _viewport;
 
-        private bool _isDisposed = false;
+        private bool _isDisposed;
 
         private BlendState _blendState = BlendState.Opaque;
         private DepthStencilState _depthStencilState = DepthStencilState.Default;
@@ -93,24 +93,22 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private Rectangle _scissorRectangle;
         private bool _scissorRectangleDirty;
-
-        internal List<IntPtr> _pointerCache = new List<IntPtr>();      
   
-        private VertexBuffer _vertexBuffer = null;
+        private VertexBuffer _vertexBuffer;
         private bool _vertexBufferDirty;
 
-        private IndexBuffer _indexBuffer = null;
+        private IndexBuffer _indexBuffer;
         private bool _indexBufferDirty;
 
         private RenderTargetBinding[] _currentRenderTargetBindings;
 
-        private static RenderTargetBinding[] EmptyRenderTargetBinding = new RenderTargetBinding[0];
+        private static readonly RenderTargetBinding[] EmptyRenderTargetBinding = new RenderTargetBinding[0];
 
         public TextureCollection Textures { get; private set; }
 
         public SamplerStateCollection SamplerStates { get; private set; }
 
-        private static Color DiscardColor = new Color(68, 34, 136, 255);
+        private static readonly Color DiscardColor = new Color(68, 34, 136, 255);
 
         /// <summary>
         /// The active vertex shader.
@@ -125,8 +123,8 @@ namespace Microsoft.Xna.Framework.Graphics
         private bool _pixelShaderDirty;
 
 
-        private ConstantBuffer[] _vertexConstantBuffers = new ConstantBuffer[16];
-        private ConstantBuffer[] _pixelConstantBuffers = new ConstantBuffer[16];
+        private readonly ConstantBuffer[] _vertexConstantBuffers = new ConstantBuffer[16];
+        private readonly ConstantBuffer[] _pixelConstantBuffers = new ConstantBuffer[16];
 
 #if DIRECTX
 
@@ -169,6 +167,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if OPENGL
 
+        private int _shaderProgram;
+
+        static readonly float[] _posFixup = new float[4];
+
         internal static readonly List<int> _enabledVertexAttributes = new List<int>();
 
 		// OpenGL ES2.0 attribute locations
@@ -181,8 +183,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		internal static int attributeTangent = 8;
 		internal static int attributeTexCoord = 9; //must be the last one, texture index locations are added to it
 
-        private uint VboIdArray;
-        private uint VboIdElement;
+        private uint _vboIdArray;
+        private uint _vboIdElement;
         private All _preferedFilter;
 
 #elif PSS
@@ -223,7 +225,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		//public event EventHandler<ResourceCreatedEventArgs> ResourceCreated;
 		//public event EventHandler<ResourceDestroyedEventArgs> ResourceDestroyed;
 
-		List<string> extensions = new List<string>();
+        readonly List<string> _extensions = new List<string>();
 
 #if OPENGL
         internal int glFramebuffer;
@@ -262,7 +264,6 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 _preferedFilter = value;
             }
-
         }
 
         internal void SetVertexAttributeArray(bool[] attrs)
@@ -332,15 +333,15 @@ namespace Microsoft.Xna.Framework.Graphics
             // Setup extensions.
 #if OPENGL
 #if GLES
-            string extstring = GL.GetString(RenderbufferStorage.Extensions);            			
+            var extstring = GL.GetString(RenderbufferStorage.Extensions);            			
 #else
-            string extstring = GL.GetString(StringName.Extensions);	
+            var extstring = GL.GetString(StringName.Extensions);	
 #endif
             if (!string.IsNullOrEmpty(extstring))
             {
-                extensions.AddRange(extstring.Split(' '));
+                _extensions.AddRange(extstring.Split(' '));
                 System.Diagnostics.Debug.WriteLine("Supported extensions:");
-                foreach (string extension in extensions)
+                foreach (string extension in _extensions)
                     System.Diagnostics.Debug.WriteLine(extension);
             }
 
@@ -358,8 +359,8 @@ namespace Microsoft.Xna.Framework.Graphics
 #elif OPENGL
 
             _viewport = new Viewport(0, 0, PresentationParameters.BackBufferWidth, PresentationParameters.BackBufferHeight);
-            VboIdArray = 0;
-            VboIdElement = 0;
+            _vboIdArray = 0;
+            _vboIdElement = 0;
 #endif
 
             // Force set the default render states.
@@ -960,12 +961,12 @@ namespace Microsoft.Xna.Framework.Graphics
             throw new NotImplementedException();
         }
 
-        public void Reset(Microsoft.Xna.Framework.Graphics.PresentationParameters presentationParameters)
+        public void Reset(PresentationParameters presentationParameters)
         {
             throw new NotImplementedException();
         }
 
-        public void Reset(Microsoft.Xna.Framework.Graphics.PresentationParameters presentationParameters, GraphicsAdapter graphicsAdapter)
+        public void Reset(PresentationParameters presentationParameters, GraphicsAdapter graphicsAdapter)
         {
             throw new NotImplementedException();
         }
@@ -990,7 +991,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 DeviceReset(this, EventArgs.Empty);
         }
 
-        public Microsoft.Xna.Framework.Graphics.DisplayMode DisplayMode
+        public DisplayMode DisplayMode
         {
             get
             {
@@ -998,7 +999,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        public Microsoft.Xna.Framework.Graphics.GraphicsDeviceStatus GraphicsDeviceStatus
+        public GraphicsDeviceStatus GraphicsDeviceStatus
         {
             get
             {
@@ -1006,13 +1007,13 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        public Microsoft.Xna.Framework.Graphics.PresentationParameters PresentationParameters
+        public PresentationParameters PresentationParameters
         {
             get;
             private set;
         }
 
-        public Microsoft.Xna.Framework.Graphics.Viewport Viewport
+        public Viewport Viewport
         {
             get
             {
@@ -1243,7 +1244,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 
 #if OPENGL
-        internal BeginMode PrimitiveTypeGL(PrimitiveType primitiveType)
+
+        private static BeginMode PrimitiveTypeGL(PrimitiveType primitiveType)
         {
             switch (primitiveType)
             {
@@ -1262,7 +1264,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 #elif DIRECTX
 
-        internal PrimitiveTopology ToPrimitiveTopology(PrimitiveType primitiveType)
+        private static PrimitiveTopology ToPrimitiveTopology(PrimitiveType primitiveType)
         {
             switch (primitiveType)
             {
@@ -1339,9 +1341,6 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
 #if OPENGL
-        private int shaderProgram = 0;
-
-        static readonly float[] _posFixup = new float[4];
 
         /// <summary>
         /// Looks up the Vertex/Pixel Shader combination in the ShaderProgramCache and returns it or creates a new program .
@@ -1350,13 +1349,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             get
             {                
-                return shaderProgram;
-            }
-            set
-            {
-                // unbinds shader
-                GL.UseProgram(0);
-                shaderProgram = 0;                    
+                return _shaderProgram;
             }
         }
 
@@ -1365,10 +1358,10 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         private void ActivateShaderProgram()
         {
-            int? _shaderProgram = ShaderProgramCache.GetProgram(this.VertexShader, this.PixelShader);
-            if (_shaderProgram.HasValue && shaderProgram != _shaderProgram.Value)
+            int? program = ShaderProgramCache.GetProgram(VertexShader, PixelShader);
+            if (program.HasValue && _shaderProgram != program.Value)
             {
-                GL.UseProgram(_shaderProgram.Value);
+                GL.UseProgram(program.Value);
 
                 // Apply vertex shader fix:
                 // The following two lines are appended to the end of vertex shaders
@@ -1402,16 +1395,16 @@ namespace Microsoft.Xna.Framework.Graphics
                 _posFixup[3] = -(63.0f / 64.0f) / Viewport.Height;
 
                 //If we have a render target bound (rendering offscreen)
-                if (GetRenderTargets().Length > 0)
+                if (IsRenderTargetBound)
                 {
                     //flip vertically
                     _posFixup[1] *= -1.0f;
                     _posFixup[3] *= -1.0f;
                 }
-                var posFixupLoc = GL.GetUniformLocation(_shaderProgram.Value, "posFixup"); // TODO: Look this up on link!
+                var posFixupLoc = GL.GetUniformLocation(program.Value, "posFixup"); // TODO: Look this up on link!
                 GL.Uniform4(posFixupLoc, 1, _posFixup);
 
-                shaderProgram = _shaderProgram.Value;
+                _shaderProgram = program.Value;
             }
         }
 #endif
@@ -1675,8 +1668,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			var target = PrimitiveTypeGL(primitiveType);
 			var vertexOffset = (IntPtr)(_vertexBuffer.VertexDeclaration.VertexStride * baseVertex);
 
-
-			_vertexBuffer.VertexDeclaration.Apply (vertexOffset);
+			_vertexBuffer.VertexDeclaration.Apply(vertexOffset);
 
             GL.DrawElements(target,
                                      indexElementCount,
@@ -1690,7 +1682,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void DrawUserPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int primitiveCount) where T : struct, IVertexType
         {
-            DrawUserPrimitives<T>(primitiveType, vertexData, vertexOffset, primitiveCount, VertexDeclarationCache<T>.VertexDeclaration);
+            DrawUserPrimitives(primitiveType, vertexData, vertexOffset, primitiveCount, VertexDeclarationCache<T>.VertexDeclaration);
         }
 
         public void DrawUserPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct, IVertexType
@@ -1724,12 +1716,12 @@ namespace Microsoft.Xna.Framework.Graphics
             if (VboIdArray == 0)
                 GL.GenBuffers(1, ref VboIdArray);
 #else
-            if (VboIdArray == 0)
-                GL.GenBuffers(1, out VboIdArray);
+            if (_vboIdArray == 0)
+                GL.GenBuffers(1, out _vboIdArray);
 #endif
 
             // Bind the VBO
-            GL.BindBuffer(BufferTarget.ArrayBuffer, VboIdArray);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, _vboIdArray);
             ////Clear previous data
             GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vertexDeclaration.VertexStride * vertexData.Length - vertexOffset * vertexDeclaration.VertexStride), IntPtr.Zero, BufferUsageHint.StreamDraw);
 
@@ -1742,9 +1734,9 @@ namespace Microsoft.Xna.Framework.Graphics
                             new IntPtr(handle.AddrOfPinnedObject().ToInt64() + vertexOffset * vertexDeclaration.VertexStride),
                             BufferUsageHint.StreamDraw);
 
-            //Setup VertexDeclaration
-            if (vertexDeclaration.GraphicsDevice != this)
-                vertexDeclaration.GraphicsDevice = this;
+            // We must set the graphics device on the vertex decl
+            // here because we don't have a VB to do it.
+            vertexDeclaration.GraphicsDevice = this;
             vertexDeclaration.Apply();
 
             //Draw
@@ -1829,24 +1821,20 @@ namespace Microsoft.Xna.Framework.Graphics
             if (VboIdElement == 0)
                 GL.GenBuffers(1, ref VboIdElement);
 #else
-            if (VboIdArray == 0)
-                GL.GenBuffers(1, out VboIdArray);
-            if (VboIdElement == 0)
-                GL.GenBuffers(1, out VboIdElement);
+            if (_vboIdArray == 0)
+                GL.GenBuffers(1, out _vboIdArray);
+            if (_vboIdElement == 0)
+                GL.GenBuffers(1, out _vboIdElement);
 #endif
             // Bind the VBO
-            GL.BindBuffer(BufferTarget.ArrayBuffer, VboIdArray);
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, VboIdElement);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, _vboIdArray);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, _vboIdElement);
             ////Clear previous data
             GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vertexDeclaration.VertexStride * vertexData.Length - vertexOffset * vertexDeclaration.VertexStride), IntPtr.Zero, BufferUsageHint.StreamDraw);
             GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(sizeof(ushort) * indexData.Length), IntPtr.Zero, BufferUsageHint.StreamDraw);
 
-            // TODO: Why two handles when we only need one?
-            //
             //Pin data
             var handle = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
-            var handle2 = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
-
 
             //Buffer data to VBO; This should use stream when we move to ES2.0
             GL.BufferData(BufferTarget.ArrayBuffer,
@@ -1858,9 +1846,9 @@ namespace Microsoft.Xna.Framework.Graphics
                             (IntPtr)(sizeof(ushort) * indexData.Length),
                             indexData, BufferUsageHint.DynamicDraw);
 
-            //Setup VertexDeclaration
-            if (vertexDeclaration.GraphicsDevice != this)
-                vertexDeclaration.GraphicsDevice = this;
+            // We must set the graphics device on the vertex decl
+            // here because we don't have a VB to do it.
+            vertexDeclaration.GraphicsDevice = this;
             vertexDeclaration.Apply();
 
             //Draw
@@ -1874,7 +1862,6 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
             handle.Free();
-            handle2.Free();
 #endif
         }
 
@@ -1917,23 +1904,21 @@ namespace Microsoft.Xna.Framework.Graphics
             if (VboIdElement == 0)
                 GL.GenBuffers(1, ref VboIdElement);
 #else
-            if (VboIdArray == 0)
-                GL.GenBuffers(1, out VboIdArray);
-            if (VboIdElement == 0)
-                GL.GenBuffers(1, out VboIdElement);
+            if (_vboIdArray == 0)
+                GL.GenBuffers(1, out _vboIdArray);
+            if (_vboIdElement == 0)
+                GL.GenBuffers(1, out _vboIdElement);
 #endif
 
             // Bind the VBO
-            GL.BindBuffer(BufferTarget.ArrayBuffer, VboIdArray);
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, VboIdElement);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, _vboIdArray);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, _vboIdElement);
             ////Clear previous data
             GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vertexDeclaration.VertexStride * vertexData.Length - vertexOffset * vertexDeclaration.VertexStride), IntPtr.Zero, BufferUsageHint.StreamDraw);
 			GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(sizeof(uint) * indexData.Length), IntPtr.Zero, BufferUsageHint.StreamDraw);
 
             //Pin data
             var handle = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
-            var handle2 = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
-
 
             //Buffer data to VBO; This should use stream when we move to ES2.0
             GL.BufferData(BufferTarget.ArrayBuffer,
@@ -1945,9 +1930,9 @@ namespace Microsoft.Xna.Framework.Graphics
                             (IntPtr)(sizeof(uint) * indexData.Length),
                             indexData, BufferUsageHint.DynamicDraw);
 
-            //Setup VertexDeclaration
-            if (vertexDeclaration.GraphicsDevice != this)
-                vertexDeclaration.GraphicsDevice = this;
+            // We must set the graphics device on the vertex decl
+            // here because we don't have a VB to do it.
+            vertexDeclaration.GraphicsDevice = this;
             vertexDeclaration.Apply();
 
             //Draw
@@ -1961,7 +1946,6 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
             handle.Free();
-            handle2.Free();
 #endif
         }
 
@@ -2045,7 +2029,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 #endif
 
-        internal int GetElementCountArray(PrimitiveType primitiveType, int primitiveCount)
+        private static int GetElementCountArray(PrimitiveType primitiveType, int primitiveCount)
         {
             //TODO: Overview the calculation
             switch (primitiveType)
