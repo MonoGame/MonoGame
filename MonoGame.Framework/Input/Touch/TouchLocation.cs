@@ -40,9 +40,9 @@
 
 #region Using clause
 using System;
+using System.Diagnostics;
 #endregion Using clause
 
-using MonoGame.Framework.Touch;
 
 namespace Microsoft.Xna.Framework.Input.Touch
 {
@@ -51,34 +51,54 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		/// <summary>
 		///Attributes 
 		/// </summary>
-		private int id;
-		private Vector2 position;
-		private Vector2 previousPosition;
-		private TouchLocationState state;
-		private TouchLocationState previousState;
-		
-        // TODO: Lets try to remove these.
-		// internals required for gesture recognition.
+		private int _id;
+		private Vector2 _position;
+		private Vector2 _previousPosition;
+		private TouchLocationState _state;
+		private TouchLocationState _previousState;
 
-        internal TouchInfo _touchHistory;
-				
 		// Only used in Android, for now
-		private float pressure;
-		private float previousPressure;
-		
+		private float _pressure;
+		private float _previousPressure;
+
+        // Used for gesture recognition.
+        private Vector2 _velocity;
+        private Vector2 _pressPosition;
+        private TimeSpan _pressTimestamp;
+        private TimeSpan _timestamp;
+
+        /// <summary>
+        /// Helper for assigning an invalid touch location.
+        /// </summary>
+        internal static readonly TouchLocation Invalid = new TouchLocation();
+
 		#region Properties
 
-        internal TouchInfo TouchHistory
+        internal Vector2 PressPosition
         {
-            get { return _touchHistory; }
-            set { _touchHistory = value; }
+            get { return _pressPosition; }
+        }
+
+        internal TimeSpan PressTimestamp
+        {
+            get { return _pressTimestamp; }
+        }
+
+        internal TimeSpan Timestamp
+        {
+            get { return _timestamp; }
+        }
+
+        internal Vector2 Velocity
+        {
+            get { return _velocity; }
         }
 
 		public int Id 
 		{ 
 			get
 	        {
-	            return id;
+	            return _id;
 	        }
 		}
 
@@ -86,7 +106,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		{ 
 			get
 	        {
-	            return position;
+	            return _position;
 	        }
 		}
 		
@@ -94,7 +114,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		{ 
 			get
         	{
-            	return pressure;
+            	return _pressure;
         	}
 		}
 								
@@ -102,7 +122,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		{ 
 			get
 	        {
-	            return state;
+	            return _state;
 	        } 
 		}
 		
@@ -110,146 +130,165 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		
 		#region Constructors
 
-		public TouchLocation(int aId, TouchLocationState aState, Vector2 aPosition,
-		                     TouchLocationState aPreviousState, Vector2 aPreviousPosition)
+        public TouchLocation(int id, TouchLocationState state, Vector2 position)
+            : this(id, state, position, TouchLocationState.Invalid, Vector2.Zero)
         {
-            id = aId;
-			position = aPosition;
-			previousPosition = aPreviousPosition;
-			state = aState;
-			previousState = aPreviousState;	
-			pressure = 0.0f;
-			previousPressure = 0.0f;
-            _touchHistory = new TouchInfo(id, position);
         }
 
-        public TouchLocation(int aId, TouchLocationState aState, Vector2 aPosition)
+        public TouchLocation(   int id, TouchLocationState state, Vector2 position, 
+                                TouchLocationState previousState, Vector2 previousPosition)
         {
-            id = aId;
-			position = aPosition;
-			previousPosition = Vector2.Zero;		
-			state = aState;
-			previousState = TouchLocationState.Invalid;	
-			pressure = 0.0f;
-			previousPressure = 0.0f;
-            _touchHistory = new TouchInfo(id, position);
-        }
-		
-		// Only for Android
-		public TouchLocation(int aId, TouchLocationState aState, Vector2 aPosition, float aPressure,
-		                     TouchLocationState aPreviousState, Vector2 aPreviousPosition, float aPreviousPressure)
-        {
-            id = aId;
-			position = aPosition;
-			previousPosition = aPreviousPosition;
-			state = aState;
-			previousState = aPreviousState;	
-			pressure = aPressure;
-			previousPressure = aPreviousPressure;
-            _touchHistory = new TouchInfo(id, position);
-        }
-		
-        // We are "updating" a touch location by creating a new one and filling in it's appropriate states.
-		public TouchLocation(int aId, TouchLocationState aState, Vector2 aPosition, float aPressure,
-		                     TouchLocationState aPreviousState, Vector2 aPreviousPosition, float aPreviousPressure, TouchInfo aPrevTouchInfo)
-        {
-            id = aId;
-			position = aPosition;
-			previousPosition = aPreviousPosition;
-			state = aState;
-			previousState = aPreviousState;	
-			pressure = aPressure;
-			previousPressure = aPreviousPressure;
+            _id = id;
+            _state = state;
+            _position = position;
+            _pressure = 0.0f;
 
-            // Update the history object.
-            _touchHistory = aPrevTouchInfo;
-            _touchHistory.LogPosition(aPosition);
-        }
+            _previousState = previousState;
+            _previousPosition = previousPosition;				
+			_previousPressure = 0.0f;
+
+            _timestamp = TimeSpan.FromTicks(DateTime.Now.Ticks);
+            _velocity = Vector2.Zero;
+
+            // If this is a pressed location then store the 
+            // current position and timestamp as pressed.
+            if (state == TouchLocationState.Pressed)
+            {
+                _pressPosition = _position;
+                _pressTimestamp = _timestamp;
+            }
+            else
+            {
+                _pressPosition = Vector2.Zero;
+                _pressTimestamp = TimeSpan.Zero;
+            }
+        }		
 		
-		public TouchLocation(int aId, TouchLocationState aState, Vector2 aPosition, float aPressure)
-        {
-            id = aId;
-			position = aPosition;
-			previousPosition = Vector2.Zero;		
-			state = aState;
-			previousState = TouchLocationState.Invalid;
-			pressure = aPressure;
-			previousPressure = 0.0f;
-            _touchHistory = new TouchInfo(id, position);
-        }
 		#endregion
-		
+
+        /// <summary>
+        /// Returns a copy of the touch with the state changed to moved.
+        /// </summary>
+        /// <returns>The new touch location.</returns>
+        internal TouchLocation AsMovedState()
+        {
+            var touch = this;
+            touch._state = TouchLocationState.Moved;
+            return touch;
+        }
+
+        /// <summary>
+        /// Updates the touch location using the new event.
+        /// </summary>
+        /// <param name="touchEvent">The next event for this touch location.</param>
+        internal bool UpdateState(TouchLocation touchEvent)
+        {
+            Debug.Assert(Id == touchEvent.Id, "The touch event must have the same Id!");
+            Debug.Assert(State != TouchLocationState.Released, "We shouldn't be changing state on a released location!");
+            Debug.Assert(   touchEvent.State == TouchLocationState.Moved ||
+                            touchEvent.State == TouchLocationState.Released, "The new touch event should be a move or a release!");
+            Debug.Assert(touchEvent.Timestamp >= _timestamp, "The touch event is older than our timestamp!");
+
+            // Store the current state as the previous one.
+            _previousPosition = _position;
+            _previousState = _state;
+            _previousPressure = _pressure;
+
+            // Set the new state.
+            _position = touchEvent._position;
+            _state = touchEvent._state;
+            _pressure = touchEvent._pressure;
+
+            // If time has elapsed then update the velocity.
+            var delta = _position - _previousPosition;
+            var elapsed = touchEvent.Timestamp - _timestamp;
+            if (elapsed > TimeSpan.Zero)
+            {
+                // Use a simple low pass filter to accumulate velocity.
+                var velocity = delta / (float)elapsed.TotalSeconds;
+                _velocity += (velocity - _velocity) * 0.45f;
+            }
+
+            // Set the new timestamp.
+            _timestamp = touchEvent.Timestamp;
+
+            // Return true if the state actually changed.
+            return _state != _previousState || delta.LengthSquared() > 0.001f;
+        }
+
         public override bool Equals(object obj)
         {
-			bool result = false;
 			if (obj is TouchLocation)
-			{
-				result = Equals((TouchLocation) obj);
-			}
-			return result;
+				return Equals((TouchLocation)obj);
+
+			return false;
 		}
 
         public bool Equals(TouchLocation other)
         {
-            return ( ( this.Id.Equals( other.Id ) ) && 
-			        ( this.Position.Equals( other.Position ) ) && 
-			        ( this.previousPosition.Equals ( other.previousPosition)));
+            return  _id.Equals(other._id) &&
+                    _position.Equals(other._position) &&
+                    _previousPosition.Equals(other._previousPosition);
         }
 
         public override int GetHashCode()
         {
-            return id;
+            return _id;
         }
 
         public override string ToString()
         {
-            return "Touch id:"+id+" state:"+state + " position:" + position + " pressure:" + pressure +" prevState:"+previousState+" prevPosition:"+ previousPosition + " previousPressure:" + previousPressure;
+            return "Touch id:"+_id+" state:"+_state + " position:" + _position + " pressure:" + _pressure +" prevState:"+_previousState+" prevPosition:"+ _previousPosition + " previousPressure:" + _previousPressure;
         }
 
         public bool TryGetPreviousLocation(out TouchLocation aPreviousLocation)
         {
-			if ( previousState == TouchLocationState.Invalid )
+			if (_previousState == TouchLocationState.Invalid)
 			{
-				aPreviousLocation.id = -1;
-				aPreviousLocation.state = TouchLocationState.Invalid;
-                aPreviousLocation.position = Vector2.Zero;
-				aPreviousLocation.previousState = TouchLocationState.Invalid;
-				aPreviousLocation.previousPosition = Vector2.Zero; 
-				aPreviousLocation.pressure = 0.0f;
-				aPreviousLocation.previousPressure = 0.0f;
-                aPreviousLocation._touchHistory = new TouchInfo(-1, Vector2.Zero);
-				return false;
+				aPreviousLocation._id = -1;
+				aPreviousLocation._state = TouchLocationState.Invalid;
+                aPreviousLocation._position = Vector2.Zero;
+				aPreviousLocation._previousState = TouchLocationState.Invalid;
+				aPreviousLocation._previousPosition = Vector2.Zero; 
+				aPreviousLocation._pressure = 0.0f;
+				aPreviousLocation._previousPressure = 0.0f;
+			    aPreviousLocation._timestamp = TimeSpan.Zero;
+			    aPreviousLocation._pressPosition = Vector2.Zero;
+			    aPreviousLocation._pressTimestamp = TimeSpan.Zero;
+                aPreviousLocation._velocity = Vector2.Zero;
+                return false;
 			}
-			else
-			{
-				aPreviousLocation.id = this.id;
-				aPreviousLocation.state = this.previousState;
-				aPreviousLocation.position = this.previousPosition;
-				aPreviousLocation.previousState = TouchLocationState.Invalid;
-				aPreviousLocation.previousPosition = Vector2.Zero;
-				aPreviousLocation.pressure = this.previousPressure;
-				aPreviousLocation.previousPressure = 0.0f;
-                aPreviousLocation._touchHistory = this.TouchHistory;
-				return true;
-			}
+
+			aPreviousLocation._id = _id;
+			aPreviousLocation._state = _previousState;
+			aPreviousLocation._position = _previousPosition;
+			aPreviousLocation._previousState = TouchLocationState.Invalid;
+			aPreviousLocation._previousPosition = Vector2.Zero;
+			aPreviousLocation._pressure = _previousPressure;
+			aPreviousLocation._previousPressure = 0.0f;
+			aPreviousLocation._timestamp = _timestamp;
+            aPreviousLocation._pressPosition = _pressPosition;
+            aPreviousLocation._pressTimestamp = _pressTimestamp;
+            aPreviousLocation._velocity = _velocity;
+            return true;
         }
 
         public static bool operator !=(TouchLocation value1, TouchLocation value2)
         {
-			return ! (((value1.id == value2.id) && 
-			        (value1.state == value2.state) &&
-			        (value1.position == value2.position) &&
-			        (value1.previousState == value2.previousState) &&
-			        (value1.previousPosition == value2.previousPosition)));
+			return  value1._id != value2._id || 
+			        value1._state != value2._state ||
+			        value1._position != value2._position ||
+			        value1._previousState != value2._previousState ||
+			        value1._previousPosition != value2._previousPosition;
         }
 
         public static bool operator ==(TouchLocation value1, TouchLocation value2)
         {
-            return ((value1.id == value2.id) && 
-			        (value1.state == value2.state) &&
-			        (value1.position == value2.position) &&
-			        (value1.previousState == value2.previousState) &&
-			        (value1.previousPosition == value2.previousPosition));
+            return  value1._id == value2._id && 
+			        value1._state == value2._state &&
+			        value1._position == value2._position &&
+			        value1._previousState == value2._previousState &&
+			        value1._previousPosition == value2._previousPosition;
         }
 
        

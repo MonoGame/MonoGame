@@ -162,7 +162,6 @@
     <Compile Include="Graphics\DisplayMode.cs" />
     <Compile Include="Graphics\DisplayModeCollection.cs" />
     <Compile Include="Graphics\ClearOptions.cs" />
-    <Compile Include="Graphics\GraphicsDeviceCapabilities.cs" />
     <Compile Include="Graphics\GraphicsDeviceInformation.cs" />
     <Compile Include="Graphics\GraphicsDeviceStatus.cs" />
     <Compile Include="Graphics\SpriteBlendMode.cs" />
@@ -193,7 +192,6 @@
     <Compile Include="Input\Touch\TouchLocationState.cs" />
     <Compile Include="Input\Touch\TouchPanelCapabilities.cs" />
     <Compile Include="Input\Touch\TouchPanel.cs" />
-    <Compile Include="Input\Touch\TouchInfo.cs" />
     <Compile Include="Input\Touch\GestureSample.cs" />
     <Compile Include="GameComponentCollection.cs" />
     <Compile Include="Graphics\SpriteBatchItem.cs" />

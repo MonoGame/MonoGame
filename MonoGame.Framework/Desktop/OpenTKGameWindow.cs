@@ -272,7 +272,6 @@ namespace Microsoft.Xna.Framework
             // Provide the graphics context for background loading
             Threading.BackgroundContext = new GraphicsContext(GraphicsMode.Default, window.WindowInfo);
             Threading.WindowInfo = window.WindowInfo;
-            Threading.BackgroundContext.MakeCurrent( Threading.WindowInfo );
 
             keys = new List<Keys>();
 

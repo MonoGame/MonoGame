@@ -100,14 +100,21 @@ namespace Microsoft.Xna.Framework
 
         private bool _initialized;
         public static bool IsPlayingVdeo { get; set; }
+		private bool _exiting = false;
 
         public override void Exit()
         {
             //TODO: Fix this
             try
             {
-                Net.NetworkSession.Exit();
-                Window.Close();
+				if (!_exiting)
+				{
+					_exiting = true;
+					Game.DoExiting();
+                    Net.NetworkSession.Exit();
+               	    Game.Activity.Finish();
+				    Window.Close();
+				}
             }
             catch
             {
@@ -131,9 +138,6 @@ namespace Microsoft.Xna.Framework
                 Game.DoInitialize();
                 _initialized = true;				
             }
-
-            // Let the touch panel update states.
-            TouchPanel.UpdateState();
 
             return true;
         }
@@ -238,6 +242,7 @@ namespace Microsoft.Xna.Framework
 		
         public override void Present()
         {
+			if (_exiting) return;
             try
             {
                 Window.SwapBuffers();

@@ -132,10 +132,7 @@ namespace Microsoft.Xna.Framework
 		}
 
         public override bool BeforeUpdate(GameTime gameTime)
-        {
-            // Let the touch panel update states.
-            TouchPanel.UpdateState();
-            
+        {            
             return true;
         }
 

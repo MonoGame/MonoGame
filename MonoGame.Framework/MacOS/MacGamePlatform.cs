@@ -261,9 +261,6 @@ namespace Microsoft.Xna.Framework
             if (AreUpdatingAndDrawingSuspended || IsPlayingVideo || Guide.isVisible)
                 return false;
 
-            // Let the touch panel update states.
-            TouchPanel.UpdateState();
-
             return true;
         }
 
