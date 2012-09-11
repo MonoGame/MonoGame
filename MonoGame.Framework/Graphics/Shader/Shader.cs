@@ -28,6 +28,26 @@ using TextureTarget = OpenTK.Graphics.ES20.All;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
+    internal enum SamplerType
+    {
+        Sampler2D,
+        SamplerCube,
+        SamplerVolume,
+    }
+
+    // TODO: We should convert the sampler info below 
+    // into the start of a Shader reflection API.
+
+    internal struct SamplerInfo
+    {
+        public SamplerType type;
+        public int index;
+        public string name;
+
+        // TODO: This should be moved to FffectPass.
+        public int parameter;
+    }
+
 	internal class Shader
 	{
 #if OPENGL
@@ -35,7 +55,7 @@ namespace Microsoft.Xna.Framework.Graphics
         internal int ShaderHandle;
 
         // We keep this around for recompiling on context lost and debugging.
-        private string _glslCode;
+        private readonly string _glslCode;
 
         // Flag whether the shader needs to be recompiled
         internal bool NeedsRecompile = false;
@@ -65,28 +85,10 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         internal int HashKey { get; private set; }
 
-        private enum SamplerType
-        {
-            Sampler2D,
-            SamplerCube,
-            SamplerVolume,
-        }
+        public SamplerInfo[] Samplers { get; private set; }
 
-        private struct Sampler
-        {
-            public SamplerType type;
-            public int index;
-            public int parameter;
+	    public int[] CBuffers { get; private set; }
 
-#if OPENGL
-            public string name;
-#endif
-        }
-
-        private readonly Sampler[] _samplers;
-
-        private readonly int[] _cbuffers;
-        
         public ShaderStage Stage { get; private set; }
 		
         internal Shader(GraphicsDevice device, BinaryReader reader)
@@ -98,21 +100,21 @@ namespace Microsoft.Xna.Framework.Graphics
             var shaderBytecode = reader.ReadBytes(shaderLength);
 
             var samplerCount = (int)reader.ReadByte();
-            _samplers = new Sampler[samplerCount];
+            Samplers = new SamplerInfo[samplerCount];
             for (var s = 0; s < samplerCount; s++)
             {
-                _samplers[s].type = (SamplerType)reader.ReadByte();
-                _samplers[s].index = reader.ReadByte();
+                Samplers[s].type = (SamplerType)reader.ReadByte();
+                Samplers[s].index = reader.ReadByte();
 #if OPENGL
-                _samplers[s].name = reader.ReadString();
+                Samplers[s].name = reader.ReadString();
 #endif
-                _samplers[s].parameter = (int)reader.ReadByte();
+                Samplers[s].parameter = reader.ReadByte();
             }
 
             var cbufferCount = (int)reader.ReadByte();
-            _cbuffers = new int[cbufferCount];
+            CBuffers = new int[cbufferCount];
             for (var c = 0; c < cbufferCount; c++)
-                _cbuffers[c] = (int)reader.ReadByte();
+                CBuffers[c] = reader.ReadByte();
 
 #if DIRECTX
 
@@ -194,140 +196,54 @@ namespace Microsoft.Xna.Framework.Graphics
             });
         }
         
-        public void OnLink(int program) 
+        public void OnLink(int program)
         {
-            if (Stage != ShaderStage.Vertex)
-                return;
-
-			// Bind the vertex attributes to the shader program.
-			foreach (var attrb in _attributes) 
+            if (Stage == ShaderStage.Vertex)
             {
-				switch (attrb.usage) 
+                // Bind the vertex attributes to the shader program.
+                foreach (var attrb in _attributes)
                 {
-                    case VertexElementUsage.Color:
-					    GL.BindAttribLocation(program, GraphicsDevice.attributeColor, attrb.name);
-    					break;
-                    case VertexElementUsage.Position:
-	    				GL.BindAttribLocation(program, GraphicsDevice.attributePosition + attrb.index, attrb.name);
-		    			break;
-                    case VertexElementUsage.TextureCoordinate:
-			    		GL.BindAttribLocation(program, GraphicsDevice.attributeTexCoord + attrb.index, attrb.name);
-				    	break;
-				    case VertexElementUsage.Normal:
-    					GL.BindAttribLocation(program, GraphicsDevice.attributeNormal, attrb.name);
-	    				break;
-                    case VertexElementUsage.BlendIndices:
-					    GL.BindAttribLocation(program, GraphicsDevice.attributeBlendIndicies, attrb.name);
-					    break;
-                    case VertexElementUsage.BlendWeight:
-					    GL.BindAttribLocation(program, GraphicsDevice.attributeBlendWeight, attrb.name);
-					    break;
-				    default:
-					    throw new NotImplementedException();
-				}
-			}
-		}
+                    switch (attrb.usage)
+                    {
+                        case VertexElementUsage.Color:
+                            GL.BindAttribLocation(program, GraphicsDevice.attributeColor, attrb.name);
+                            break;
+                        case VertexElementUsage.Position:
+                            GL.BindAttribLocation(program, GraphicsDevice.attributePosition + attrb.index, attrb.name);
+                            break;
+                        case VertexElementUsage.TextureCoordinate:
+                            GL.BindAttribLocation(program, GraphicsDevice.attributeTexCoord + attrb.index, attrb.name);
+                            break;
+                        case VertexElementUsage.Normal:
+                            GL.BindAttribLocation(program, GraphicsDevice.attributeNormal, attrb.name);
+                            break;
+                        case VertexElementUsage.BlendIndices:
+                            GL.BindAttribLocation(program, GraphicsDevice.attributeBlendIndicies, attrb.name);
+                            break;
+                        case VertexElementUsage.BlendWeight:
+                            GL.BindAttribLocation(program, GraphicsDevice.attributeBlendWeight, attrb.name);
+                            break;
+                        default:
+                            throw new NotImplementedException();
+                    }
+                }
 
-
-        public void Apply(  GraphicsDevice graphicsDevice,                            
-                            EffectParameterCollection parameters,
-		                    ConstantBuffer[] cbuffers) 
-        {
-			if (Stage == ShaderStage.Pixel) 
+            }
+            else if (Stage == ShaderStage.Pixel)
             {
-                graphicsDevice.PixelShader = this;
-
-                // Activate the textures.
-				foreach (var sampler in _samplers) 
+                // Assign the sampler index to the texture uniform.
+                foreach (var sampler in Samplers)
                 {
                     // Set the sampler texture slot.
-                    //
-                    // TODO: This seems like it only needs to be done once!
-                    //
-                    var loc = GL.GetUniformLocation(graphicsDevice.ShaderProgram, sampler.name);
-					GL.Uniform1(loc, sampler.index);
-
-                    // TODO: Fix 3D and Volume samplers!
-                    if (sampler.type != SamplerType.Sampler2D)
-                        continue;
-
-                    if (sampler.parameter >= 0) 
-                    {
-                        var textureParameter = parameters[sampler.parameter];
-                        
-                        // TODO: The texture could be NULL here if we're using SpriteBatch
-                        // which in that case we are making more work by setting this to
-                        // NULL then setting it back to possibly the same texture.
-                        //
-                        // Maybe we should not set the texture if it is null?  But in
-                        // that case then maybe we would be breaking state?  Null texture
-                        // rendering is undefined right?  Does it hurt then?
-
-                        var texture = textureParameter.Data as Texture;
-                        graphicsDevice.Textures[sampler.index] = texture;
-					}
-				}
-			}
-            else
-            {
-                graphicsDevice.VertexShader = this;
-            }
-
-            // Update the constant buffers with the parameter state
-            // and then set them on the graphics device.
-            for (var c = 0; c < _cbuffers.Length; c++)
-            {
-                var cb = cbuffers[_cbuffers[c]];
-                cb.Update(parameters);
-                graphicsDevice.SetConstantBuffer(Stage, c, cb);
+                    var loc = GL.GetUniformLocation(program, sampler.name);
+                    if (loc != -1)
+                        GL.Uniform1(loc, sampler.index);
+                }
             }
         }
 
 #endif // OPENGL
 
-#if DIRECTX
-
-        public void Apply(  GraphicsDevice graphicsDevice, 
-                            EffectParameterCollection parameters,
-                            ConstantBuffer[] cbuffers )
-        {
-            if (_pixelShader != null)
-            {
-                graphicsDevice.PixelShader = this;
-
-                // TODO: We can move the samplers info out to the 
-                // EffectPass as they are effect specific and have 
-                // nothing to do with the shader.
-                foreach (var sampler in _samplers)
-                {
-                    var param = parameters[sampler.parameter];
-                    var texture = param.Data as Texture;
-                    graphicsDevice.Textures[sampler.index] = texture;
-                }
-            }
-            else
-            {
-                graphicsDevice.VertexShader = this;
-            }
-
-            // Update the constant buffers with the parameter state
-            // and then set them on the graphics device.
-            for (var c = 0; c < _cbuffers.Length; c++)
-            {
-                // TODO: Like the sampler info above i think we should
-                // move the constant buffer info out to EffectPass.  
-                // 
-                // Eventually all we should have in Shader is an optional
-                // and light reflection API for constants and that is it.
-                //
-
-                var cb = cbuffers[_cbuffers[c]];
-                cb.Update(parameters);
-                graphicsDevice.SetConstantBuffer(Stage, c, cb);
-            }
-        }
-		
-#endif // DIRECTX
 	}
 }
 

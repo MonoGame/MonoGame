@@ -114,14 +114,44 @@ namespace Microsoft.Xna.Framework.Graphics
 
             var device = _effect.GraphicsDevice;
 
-            Debug.Assert(_vertexShader != null, "Got a null vertex shader!");
-            Debug.Assert(_pixelShader != null, "Got a null vertex shader!");
-#if OPENGL
-            if (this._vertexShader != null) device.VertexShader = this._vertexShader;
-            if (this._pixelShader != null) device.PixelShader = this._pixelShader;        
-#elif PSS
-            _effect.GraphicsDevice._graphics.SetShaderProgram(_shaderProgram);
+#if OPENGL || DIRECTX
+
+            if (_vertexShader != null)
+            {
+                device.VertexShader = _vertexShader;
+
+                // Update the constant buffers.
+                for (var c = 0; c < _vertexShader.CBuffers.Length; c++)
+                {
+                    var cb = _effect.ConstantBuffers[_vertexShader.CBuffers[c]];
+                    cb.Update(_effect.Parameters);
+                    device.SetConstantBuffer(ShaderStage.Vertex, c, cb);
+                }
+            }
+
+            if (_pixelShader != null)
+            {
+                device.PixelShader = _pixelShader;
+
+                // Update the texture parameters.
+                foreach (var sampler in _pixelShader.Samplers)
+                {
+                    var param = _effect.Parameters[sampler.parameter];
+                    var texture = param.Data as Texture;
+                    device.Textures[sampler.index] = texture;
+                }
+                
+                // Update the constant buffers.
+                for (var c = 0; c < _pixelShader.CBuffers.Length; c++)
+                {
+                    var cb = _effect.ConstantBuffers[_pixelShader.CBuffers[c]];
+                    cb.Update(_effect.Parameters);
+                    device.SetConstantBuffer(ShaderStage.Pixel, c, cb);
+                }
+            }
+
 #endif
+
             // Set the render states if we have some.
             if (_rasterizerState != null)
                 device.RasterizerState = _rasterizerState;
@@ -131,7 +161,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 device.DepthStencilState = _depthStencilState;
             
 #if PSS
-#warning We are only setting one hardcoded parameter here. Need to do this properly by iterating _effect.Parameters (Happens in Shader)
+            _effect.GraphicsDevice._graphics.SetShaderProgram(_shaderProgram);
+
+            #warning We are only setting one hardcoded parameter here. Need to do this properly by iterating _effect.Parameters (Happens in Shader)
+
             float[] data;
             if (_effect.Parameters["WorldViewProj"] != null) 
                 data = (float[])_effect.Parameters["WorldViewProj"].Data;
@@ -140,15 +173,6 @@ namespace Microsoft.Xna.Framework.Graphics
             Sce.PlayStation.Core.Matrix4 matrix4 = PSSHelper.ToPssMatrix4(data);
             matrix4 = matrix4.Transpose (); //When .Data is set the matrix is transposed, we need to do it again to undo it
             _shaderProgram.SetUniformValue(0, ref matrix4);
-#else
-            // Apply the shaders which will in turn set the 
-            // constant buffers and texture samplers.
-            
-            // Apply the vertex shader.
-            if (_vertexShader != null) _vertexShader.Apply(device, _effect.Parameters, _effect.ConstantBuffers);
-            
-            // Apply the pixel shader.
-            if (_pixelShader != null) _pixelShader.Apply(device, _effect.Parameters, _effect.ConstantBuffers);            
 #endif
         }
 		
