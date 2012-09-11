@@ -22,6 +22,13 @@ using ProgramParameter = OpenTK.Graphics.ES20.All;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
+
+    internal struct ShaderProgramInfo
+    {
+        public int program;
+        public int posFixupLoc;
+    }
+
     /// <summary>
     /// This class is used to Cache the links between Vertex/Pixel Shaders and Constant Buffers.
     /// It will be responsible for linking the programs under OpenGL if they have not been linked
@@ -29,7 +36,7 @@ namespace Microsoft.Xna.Framework.Graphics
     /// </summary>
     internal class ShaderProgramCache
     {
-        private readonly Dictionary<int, int> _programCache = new Dictionary<int, int>();
+        private readonly Dictionary<int, ShaderProgramInfo> _programCache = new Dictionary<int, ShaderProgramInfo>();
 
         /// <summary>
         /// Clear the program cache releasing all shader programs.
@@ -37,12 +44,12 @@ namespace Microsoft.Xna.Framework.Graphics
         public void Clear()
         {
             foreach (var pair in _programCache)
-                GL.DeleteProgram(pair.Value);
+                GL.DeleteProgram(pair.Value.program);
 
             _programCache.Clear();
         }
 
-        public int GetProgram(Shader vertexShader, Shader pixelShader)//, ConstantBuffer constantBuffer)
+        public ShaderProgramInfo GetProgramInfo(Shader vertexShader, Shader pixelShader)//, ConstantBuffer constantBuffer)
         {
             if (vertexShader == null)
                 throw new ArgumentNullException("vertexShader");
@@ -95,7 +102,11 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new InvalidOperationException("Unable to link effect program");
             }
 
-            _programCache.Add(vertexShader.HashKey | pixelShader.HashKey, program);             
+            ShaderProgramInfo info;
+            info.program = program;
+            info.posFixupLoc = GL.GetUniformLocation(program, "posFixup");
+
+            _programCache.Add(vertexShader.HashKey | pixelShader.HashKey, info);             
         }
 
     }
