@@ -123,8 +123,8 @@ namespace Microsoft.Xna.Framework.Graphics
         private bool _pixelShaderDirty;
 
 
-        private readonly ConstantBuffer[] _vertexConstantBuffers = new ConstantBuffer[16];
-        private readonly ConstantBuffer[] _pixelConstantBuffers = new ConstantBuffer[16];
+        private readonly ConstantBufferCollection _vertexConstantBuffers = new ConstantBufferCollection(ShaderStage.Vertex, 16);
+        private readonly ConstantBufferCollection _pixelConstantBuffers = new ConstantBufferCollection(ShaderStage.Pixel, 16);
 
 #if DIRECTX
 
@@ -1508,32 +1508,13 @@ namespace Microsoft.Xna.Framework.Graphics
                 _pixelShaderDirty = false;
             }
 
-            if (true)
-            {
-                for (var i = 0; i < _vertexConstantBuffers.Length; i++)
-                {
-                    var buffer = _vertexConstantBuffers[i];
-                    if (buffer == null)
-                        break;
 #if DIRECTX
-                    buffer.Apply(this, ShaderStage.Vertex, i);
+            _vertexConstantBuffers.SetConstantBuffers(this);
+            _pixelConstantBuffers.SetConstantBuffers(this);
 #elif OPENGL
-                    buffer.Apply(this, _shaderProgram);
+            _vertexConstantBuffers.SetConstantBuffers(this,_shaderProgram);
+            _pixelConstantBuffers.SetConstantBuffers(this, _shaderProgram);
 #endif
-                }
-
-                for (var i = 0; i < _pixelConstantBuffers.Length; i++)
-                {
-                    var buffer = _pixelConstantBuffers[i];
-                    if (buffer == null)
-                        break;
-#if DIRECTX
-                    buffer.Apply(this, ShaderStage.Pixel, i);
-#elif OPENGL
-                    buffer.Apply(this, _shaderProgram);
-#endif
-                }
-            }
 
             Textures.SetTextures(this);
             SamplerStates.SetSamplers(this);

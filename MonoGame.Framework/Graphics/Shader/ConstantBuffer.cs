@@ -90,21 +90,25 @@ namespace Microsoft.Xna.Framework.Graphics
             desc.BindFlags = SharpDX.Direct3D11.BindFlags.ConstantBuffer;
             desc.CpuAccessFlags = SharpDX.Direct3D11.CpuAccessFlags.None;
             _cbuffer = new SharpDX.Direct3D11.Buffer(graphicsDevice._d3dDevice, desc);
+
 #elif OPENGL 
-            byte[] data = new byte[_parameters.Length];
+
+            var data = new byte[_parameters.Length];
             for (var i = 0; i < _parameters.Length; i++)
             {
                 data[i] = (byte)(_parameters[i] | _offsets[i]);
             }
+
             HashKey = MonoGame.Utilities.Hash.ComputeHash(data);
+
 #endif
         }
 
-        public void SetData(int offset, int rows, int columns, object data)
+        private void SetData(int offset, int rows, int columns, object data)
         {
             // TODO: Should i pass the element size in?
-            var elementSize = 4;
-            var rowSize = elementSize * 4;
+            const int elementSize = 4;
+            const int rowSize = elementSize * 4;
 
             // Take care of a single data type.
             if (rows == 1 && columns == 1)
@@ -135,34 +139,35 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        void SetParameter(int offset, EffectParameter param)
+        private void SetParameter(int offset, EffectParameter param)
         {
-            if (param.Data != null)
+            if (param.Data == null) 
+                return;
+
+            const int elementSize = 4;
+            const int rowSize = elementSize * 4;
+
+            if (param.Elements.Count > 0)
             {
-                int elementSize = 4;
-                var rowSize = elementSize * 4;
-
-                if (param.Elements.Count > 0)
+                foreach (var subparam in param.Elements)
                 {
-                    foreach (var subparam in param.Elements)
-                    {
-                        SetParameter(offset, subparam);
-                        //TODO: Sometimes directx decides to transpose matricies
-                        //to fit in fewer registers.
-                        offset += subparam.RowCount * rowSize;
-                    }
+                    SetParameter(offset, subparam);
+
+                    //TODO: Sometimes directx decides to transpose matricies
+                    //to fit in fewer registers.
+                    offset += subparam.RowCount * rowSize;
                 }
-                else
+            }
+            else
+            {
+                switch (param.ParameterType)
                 {
-                    switch (param.ParameterType)
-                    {
-                        case EffectParameterType.Single:
-                            SetData(offset, param.RowCount, param.ColumnCount, param.Data);
-                            break;
+                    case EffectParameterType.Single:
+                        SetData(offset, param.RowCount, param.ColumnCount, param.Data);
+                        break;
 
-                        default:
-                            throw new NotImplementedException("Not supported!");
-                    }
+                    default:
+                        throw new NotImplementedException("Not supported!");
                 }
             }
         }
