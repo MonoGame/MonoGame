@@ -519,7 +519,7 @@ namespace Microsoft.Xna.Framework
             }
 
             // Ensure viewport and buffer size are reported correctly
-            _graphicsDevice.Viewport = new Viewport(newClientBounds.X, newClientBounds.Y, newClientBounds.Width, newClientBounds.Height);
+            _graphicsDevice.Viewport = new Viewport(newClientBounds.X, -newClientBounds.Y, newClientBounds.Width, newClientBounds.Height);
             _graphicsDevice.PresentationParameters.BackBufferWidth = newClientBounds.Width;
             _graphicsDevice.PresentationParameters.BackBufferHeight = newClientBounds.Height;
 
