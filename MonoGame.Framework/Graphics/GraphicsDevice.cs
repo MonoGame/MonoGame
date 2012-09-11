@@ -185,7 +185,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private uint _vboIdArray;
         private uint _vboIdElement;
-        private All _preferedFilter;
 
 #elif PSS
 
@@ -253,18 +252,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
 
 #if OPENGL
-
-        internal All PreferedFilter
-        {
-            get
-            {
-                return _preferedFilter;
-            }
-            set
-            {
-                _preferedFilter = value;
-            }
-        }
 
         internal void SetVertexAttributeArray(bool[] attrs)
         {

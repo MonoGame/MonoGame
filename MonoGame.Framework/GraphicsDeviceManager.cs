@@ -216,11 +216,7 @@ namespace Microsoft.Xna.Framework
 #elif MONOMAC
             _graphicsDevice.PresentationParameters.IsFullScreen = _wantFullScreen;
 
-			if (_preferMultiSampling) {
-				_graphicsDevice.PreferedFilter = All.Linear;
-			} else {
-				_graphicsDevice.PreferedFilter = All.Nearest;
-			}
+            // TODO: Implement multisampling (aka anti-alising) for all platforms!
 
 			_game.applyChanges(this);
 #else
@@ -278,12 +274,7 @@ namespace Microsoft.Xna.Framework
             _graphicsDevice.PresentationParameters.IsFullScreen = true;
 #endif // MONOMAC
 
-#if !PSS
-            if (_preferMultiSampling)
-                _graphicsDevice.PreferedFilter = All.Linear;
-            else
-                _graphicsDevice.PreferedFilter = All.Nearest;
-#endif
+            // TODO: Implement multisampling (aka anti-alising) for all platforms!
 
             _graphicsDevice.Initialize();
 
@@ -367,21 +358,6 @@ namespace Microsoft.Xna.Framework
             set
             {
                 _preferMultiSampling = value;
-
-                // TODO: I'm pretty sure this shouldn't occur until ApplyChanges().
-#if !PSS && !WINRT
-                if (_graphicsDevice != null)
-                {
-                    if (_preferMultiSampling)
-                    {
-                        _graphicsDevice.PreferedFilter = All.Linear;
-                    }
-                    else
-                    {
-                        _graphicsDevice.PreferedFilter = All.Nearest;
-                    }
-                }
-#endif
             }
         }
 
