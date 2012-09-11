@@ -431,16 +431,15 @@ namespace Microsoft.Xna.Framework.Audio
 
                 return SoundState.Playing;                                
 #else
-#if !ANDROID
                 // Since Android SoundPool doesn't yet support getting the state, it's better
                 // to rely on our instance state. At least it will be correct for looping sounds
-                return soundState;
-#endif
+#if !ANDROID
                 if (_sound != null && soundState == SoundState.Playing && !_sound.Playing) 
                 {
                     soundState = SoundState.Stopped;
                 }
-
+#endif
+                return soundState;
 #endif
 			} 
 		}
