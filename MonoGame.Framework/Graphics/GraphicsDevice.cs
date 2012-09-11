@@ -1686,6 +1686,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // Unbind the VBOs
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
+            _vertexBufferDirty = _indexBufferDirty = true;
 
             //Create VBO if not created already
 #if GLES
@@ -1789,6 +1790,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // Unbind the VBOs
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
+            _vertexBufferDirty = _indexBufferDirty = true;
 
             //Create VBO if not created already
 #if GLES
@@ -1872,6 +1874,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // Unbind the VBOs
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
+            _vertexBufferDirty = _indexBufferDirty = true;
 
             //Create VBO if not created already
 #if GLES
