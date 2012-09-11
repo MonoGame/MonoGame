@@ -139,9 +139,6 @@ namespace Microsoft.Xna.Framework
                 _initialized = true;				
             }
 
-            // Let the touch panel update states.
-            TouchPanel.UpdateState();
-
             return true;
         }
 
