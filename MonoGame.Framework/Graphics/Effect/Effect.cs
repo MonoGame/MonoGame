@@ -40,6 +40,7 @@
 // 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using System.IO;
 using System.Linq;
@@ -51,7 +52,7 @@ using Sce.PlayStation.Core.Graphics;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-	public partial class Effect : GraphicsResource
+	public class Effect : GraphicsResource
     {
         public EffectParameterCollection Parameters { get; private set; }
 
@@ -61,8 +62,9 @@ namespace Microsoft.Xna.Framework.Graphics
   
         internal ConstantBuffer[] ConstantBuffers { get; private set; }
 
-        // A list of shaders that need to be recompiled on device reset.
-        internal List<Shader> _shaderList = new List<Shader>();
+        private List<Shader> _shaderList = new List<Shader>();
+
+	    private readonly bool _isClone;
 
         internal Effect(GraphicsDevice graphicsDevice)
 		{
@@ -70,45 +72,12 @@ namespace Microsoft.Xna.Framework.Graphics
 				throw new ArgumentNullException ("Graphics Device Cannot Be Null");
 
 			this.graphicsDevice = graphicsDevice;
-
-            this.graphicsDevice.DeviceResetting += new EventHandler<EventArgs>(graphicsDevice_DeviceResetting);
-            this.graphicsDevice.DeviceReset += new EventHandler<EventArgs>(graphicsDevice_DeviceReset);            
 		}
-
-        void graphicsDevice_DeviceResetting(object sender, EventArgs e)
-        {
-#if OPENGL
-            foreach (var shader in _shaderList)
-                shader.NeedsRecompile = true;
-#endif
-        }
-
-        void graphicsDevice_DeviceReset(object sender, EventArgs e)
-        {
-#if OPENGL
-            foreach (var shader in _shaderList)
-            {
-                if (shader.NeedsRecompile)
-                {
-                    shader.CompileShader();
-                    shader.NeedsRecompile = false;
-                }
-            }
-
-            foreach (var technique in Techniques)
-            {
-                foreach (var pass in technique.Passes)
-                {
-                    pass.Initialize();
-                }
-            }
-
-#endif // OPENGL
-        }
 			
 		protected Effect(Effect cloneSource)
             : this(cloneSource.graphicsDevice)
 		{
+            _isClone = true;
             Clone(cloneSource);
 		}
 
@@ -156,6 +125,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
             // Clone it.
+            _isClone = true;
             Clone(cloneSource);
         }
 
@@ -169,6 +139,8 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="cloneSource">The source effect to clone from.</param>
         private void Clone(Effect cloneSource)
         {
+            Debug.Assert(_isClone, "Cannot clone into non-cloned effect!");
+
             // Copy the mutable members of the effect.
             Parameters = new EffectParameterCollection(cloneSource.Parameters);
             Techniques = new EffectTechniqueCollection(this, cloneSource.Techniques);
@@ -217,11 +189,14 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public override void Dispose()
         {
-            base.Dispose();
+            if (!IsDisposed && !_isClone)
+            {
+                // Only the clone source can dispose the shaders.
+                foreach (var shader in _shaderList)
+                    shader.Dispose();
+            }
 
-            // Unregister events
-            graphicsDevice.DeviceResetting -= graphicsDevice_DeviceResetting;
-            graphicsDevice.DeviceReset -= graphicsDevice_DeviceReset;
+            base.Dispose();
         }
 
         #region Effect File Reader
@@ -234,7 +209,7 @@ namespace Microsoft.Xna.Framework.Graphics
             var assembly = typeof(Effect).Assembly;
 #endif
             var stream = assembly.GetManifestResourceStream(name);
-            using (MemoryStream ms = new MemoryStream())
+            using (var ms = new MemoryStream())
             {
                 stream.CopyTo(ms);
                 return ms.ToArray();

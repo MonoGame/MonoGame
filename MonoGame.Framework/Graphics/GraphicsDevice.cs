@@ -167,6 +167,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if OPENGL
 
+        private readonly ShaderProgramCache _programCache = new ShaderProgramCache();
+
         private int _shaderProgram;
 
         static readonly float[] _posFixup = new float[4];
@@ -884,6 +886,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #endif // DIRECTX
 
+#if OPENGL
+                // Free all the cached shader programs.
+                _programCache.Clear();
+#endif
+
 #if PSS
                 if (_graphics != null)
                 {
@@ -966,6 +973,11 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (DeviceResetting != null)
                 DeviceResetting(this, EventArgs.Empty);
+
+#if OPENGL
+            // Free all the cached shader programs. 
+            _programCache.Clear();
+#endif
         }
 
         /// <summary>
@@ -1334,10 +1346,11 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         private void ActivateShaderProgram()
         {
-            int? program = ShaderProgramCache.GetProgram(VertexShader, PixelShader);
-            if (program.HasValue && _shaderProgram != program.Value)
+            var program = _programCache.GetProgram(VertexShader, PixelShader);
+            if (program != -1 && _shaderProgram != program)
             {
-                GL.UseProgram(program.Value);
+                GL.UseProgram(program);
+                _shaderProgram = program;
 
                 // Apply vertex shader fix:
                 // The following two lines are appended to the end of vertex shaders
@@ -1377,10 +1390,8 @@ namespace Microsoft.Xna.Framework.Graphics
                     _posFixup[1] *= -1.0f;
                     _posFixup[3] *= -1.0f;
                 }
-                var posFixupLoc = GL.GetUniformLocation(program.Value, "posFixup"); // TODO: Look this up on link!
+                var posFixupLoc = GL.GetUniformLocation(program, "posFixup"); // TODO: Look this up on link!
                 GL.Uniform4(posFixupLoc, 1, _posFixup);
-
-                _shaderProgram = program.Value;
             }
         }
 #endif

@@ -29,9 +29,20 @@ namespace Microsoft.Xna.Framework.Graphics
     /// </summary>
     internal class ShaderProgramCache
     {
-        private static readonly Dictionary<int, int> _programCache = new Dictionary<int, int>();
+        private readonly Dictionary<int, int> _programCache = new Dictionary<int, int>();
 
-        internal static int? GetProgram(Shader vertexShader, Shader pixelShader)//, ConstantBuffer constantBuffer)
+        /// <summary>
+        /// Clear the program cache releasing all shader programs.
+        /// </summary>
+        public void Clear()
+        {
+            foreach (var pair in _programCache)
+                GL.DeleteProgram(pair.Value);
+
+            _programCache.Clear();
+        }
+
+        public int GetProgram(Shader vertexShader, Shader pixelShader)//, ConstantBuffer constantBuffer)
         {
             if (vertexShader == null)
                 throw new ArgumentNullException("vertexShader");
@@ -50,7 +61,7 @@ namespace Microsoft.Xna.Framework.Graphics
             return _programCache[key];
         }        
 
-        private static void Link(Shader vertexShader, Shader pixelShader)
+        private void Link(Shader vertexShader, Shader pixelShader)
         {
             // TODO: Shouldn't we be calling GL.DeleteProgram() somewhere?
 
@@ -60,8 +71,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
             var program = GL.CreateProgram();
 
-            GL.AttachShader(program, vertexShader.ShaderHandle);
-            GL.AttachShader(program, pixelShader.ShaderHandle);
+            GL.AttachShader(program, vertexShader.GetShaderHandle());
+            GL.AttachShader(program, pixelShader.GetShaderHandle());
 
             vertexShader.OnLink(program);
             pixelShader.OnLink(program);

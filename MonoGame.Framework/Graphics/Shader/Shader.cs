@@ -48,17 +48,15 @@ namespace Microsoft.Xna.Framework.Graphics
         public int parameter;
     }
 
-	internal class Shader
+    internal class Shader : GraphicsResource
 	{
 #if OPENGL
 
-        internal int ShaderHandle;
+        // The shader handle.
+	    private int _shaderHandle = -1;
 
         // We keep this around for recompiling on context lost and debugging.
         private readonly string _glslCode;
-
-        // Flag whether the shader needs to be recompiled
-        internal bool NeedsRecompile = false;
 
         private struct Attribute
         {
@@ -93,6 +91,9 @@ namespace Microsoft.Xna.Framework.Graphics
 		
         internal Shader(GraphicsDevice device, BinaryReader reader)
         {
+            graphicsDevice = device;
+            graphicsDevice.DeviceResetting += graphicsDevice_DeviceResetting;
+
             var isVertexShader = reader.ReadBoolean();
             Stage = isVertexShader ? ShaderStage.Vertex : ShaderStage.Pixel;
 
@@ -149,53 +150,57 @@ namespace Microsoft.Xna.Framework.Graphics
                 _attributes[a].format = reader.ReadInt16();
             }
 
-            CompileShader();
-
 #endif // OPENGL
         }
 
 #if OPENGL
-        internal void CompileShader()
+        internal int GetShaderHandle()
         {
-            Threading.BlockOnUIThread(() =>
+            // If the shader has already been created then return it.
+            if (_shaderHandle != -1)
+                return _shaderHandle;
+            
+            //
+            _shaderHandle = GL.CreateShader(Stage == ShaderStage.Vertex ? ShaderType.VertexShader : ShaderType.FragmentShader);
+#if GLES
+            GL.ShaderSource(ShaderHandle, 1, new string[] { _glslCode }, (int[])null);
+#else
+            GL.ShaderSource(_shaderHandle, _glslCode);
+#endif
+            GL.CompileShader(_shaderHandle);
+
+            var compiled = 0;
+#if GLES
+            GL.GetShader(ShaderHandle, ShaderParameter.CompileStatus, ref compiled);
+#else
+            GL.GetShader(_shaderHandle, ShaderParameter.CompileStatus, out compiled);
+#endif
+            if (compiled == (int)All.False)
             {
-                ShaderHandle = GL.CreateShader(Stage == ShaderStage.Vertex ? ShaderType.VertexShader : ShaderType.FragmentShader);
 #if GLES
-                GL.ShaderSource(ShaderHandle, 1, new string[] { _glslCode }, (int[])null);
-#else
-                GL.ShaderSource(ShaderHandle, _glslCode);
-#endif
-                GL.CompileShader(ShaderHandle);
-
-                var compiled = 0;
-#if GLES
-                GL.GetShader(ShaderHandle, ShaderParameter.CompileStatus, ref compiled);
-#else
-                GL.GetShader(ShaderHandle, ShaderParameter.CompileStatus, out compiled);
-#endif
-                if (compiled == (int)All.False)
+                string log = "";
+                int length = 0;
+                GL.GetShader(ShaderHandle, ShaderParameter.InfoLogLength, ref length);
+                if (length > 0)
                 {
-#if GLES
-                    string log = "";
-                    int length = 0;
-                    GL.GetShader(ShaderHandle, ShaderParameter.InfoLogLength, ref length);
-                    if (length > 0)
-                    {
-                        var logBuilder = new StringBuilder(length);
-                        GL.GetShaderInfoLog(ShaderHandle, length, ref length, logBuilder);
-                        log = logBuilder.ToString();
-                    }
-#else
-                    var log = GL.GetShaderInfoLog(ShaderHandle);
-#endif
-                    Console.WriteLine(log);
-
-                    GL.DeleteShader(ShaderHandle);
-                    throw new InvalidOperationException("Shader Compilation Failed");
+                    var logBuilder = new StringBuilder(length);
+                    GL.GetShaderInfoLog(ShaderHandle, length, ref length, logBuilder);
+                    log = logBuilder.ToString();
                 }
-            });
+#else
+                var log = GL.GetShaderInfoLog(_shaderHandle);
+#endif
+                Console.WriteLine(log);
+
+                GL.DeleteShader(_shaderHandle);
+                _shaderHandle = -1;
+
+                throw new InvalidOperationException("Shader Compilation Failed");
+            }
+
+            return _shaderHandle;
         }
-        
+
         public void OnLink(int program)
         {
             if (Stage == ShaderStage.Vertex)
@@ -244,6 +249,31 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #endif // OPENGL
 
+        void graphicsDevice_DeviceResetting(object sender, EventArgs e)
+        {
+#if OPENGL
+            if (_shaderHandle != -1)
+            {
+                GL.DeleteShader(_shaderHandle);
+                _shaderHandle = -1;
+            }
+#endif
+        }
+
+        public override void Dispose()
+        {
+            if (!IsDisposed)
+            {
+                graphicsDevice.DeviceResetting -= graphicsDevice_DeviceResetting;
+
+#if OPENGL
+                if (_shaderHandle != -1)
+                    GL.DeleteShader(_shaderHandle);
+#endif
+            }
+
+            base.Dispose();
+        }
 	}
 }
 
