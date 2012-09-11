@@ -50,23 +50,14 @@ using MouseInfo = OpenTK.Input.Mouse;
 #elif MONOMAC
 using MonoMac.Foundation;
 using MonoMac.AppKit;
-#else
-using Microsoft.Xna.Framework.Input.Touch;
 #endif
 
-#if WINRT
-using Windows.Devices.Input;
-#endif
 
 namespace Microsoft.Xna.Framework.Input
 {
     public static class Mouse
     {
 		internal static MouseState State;
-
-#if WINRT
-        private static readonly MouseCapabilities _mouseCapabilities = new MouseCapabilities();
-#endif
 
 #if WINDOWS || LINUX
 		private static OpenTK.Input.MouseDevice _mouse = null;			
@@ -142,52 +133,6 @@ namespace Microsoft.Xna.Framework.Input
 			// WheelPrecise is divided by 120 (WHEEL_DELTA) in OpenTK (WinGLNative.cs)
 			// We need to counteract it to get the same value XNA provides
 			State.ScrollWheelValue = (int)( _mouse.WheelPrecise * 120 );
-
-#else
-
-#if WINRT
-            // NOTE: Some WinRT devices have a mouse driver installed even when
-            // there is no physical mouse connected to the device.  You can fix 
-            // this by disabling the mouse in the Device Manager.
-
-            // If we have a mouse then don't bother faking events.
-            if (_mouseCapabilities.MousePresent != 0)
-                return State;
-#endif
-
-            // Release all the buttons.
-            State.LeftButton = ButtonState.Released;
-            State.RightButton = ButtonState.Released;
-            State.MiddleButton = ButtonState.Released;
-
-            // Look for a new or previous touch point.
-            var touchState = TouchPanel.GetState();
-            foreach (var touch in touchState)
-            {
-                // Skip released touch points.
-                if (    touch.State != TouchLocationState.Pressed &&
-                        touch.State != TouchLocationState.Moved)
-                    continue;
-
-                // Look for a new touch or the last touch point.
-                if (_mouseTouchId == -1 || touch.Id == _mouseTouchId)
-                {
-                    // Store the touch point for the next pass.
-                    _mouseTouchId = touch.Id;
-
-                    // Set the touch state.
-                    State.X = (int)touch.Position.X;
-                    State.Y = (int)touch.Position.Y;
-                    State.LeftButton = ButtonState.Pressed;
-                    break;
-                }
-            }
-
-            // If we didn't find the touch then 
-            // look for a new one next time.
-            if (State.LeftButton == ButtonState.Released)
-                _mouseTouchId = -1;
-
 #endif
 
             return State;
