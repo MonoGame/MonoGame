@@ -1104,6 +1104,12 @@ namespace Microsoft.Xna.Framework.Graphics
 		
             var clearTarget = false;
 
+#if OPENGL
+            // In OpenGL we have to re-apply the special "posFixup"
+            // vertex shader uniform if the render target changes.
+            _vertexShaderDirty = true;
+#endif
+
             if (_currentRenderTargetBindings == null || _currentRenderTargetBindings.Length == 0)
 			{
 #if DIRECTX
@@ -1349,12 +1355,15 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             // Lookup the shader program.
             var info = _programCache.GetProgramInfo(VertexShader, PixelShader);
-            if (info.program == -1 || _shaderProgram == info.program)
+            if (info.program == -1)
                 return;
 
-            // Set the new program.
-            GL.UseProgram(info.program);
-            _shaderProgram = info.program;
+            // Set the new program if it has changed.
+            if (_shaderProgram != info.program)
+            {
+                GL.UseProgram(info.program);
+                _shaderProgram = info.program;
+            }
 
             if (info.posFixupLoc == -1)
                 return;
