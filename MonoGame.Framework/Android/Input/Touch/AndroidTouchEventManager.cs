@@ -54,24 +54,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
     class AndroidTouchEventManager
     {
         Game _game;
-        bool _enabled;
 
-        public bool Enabled
-        {
-            get { return _enabled; }
-            set
-            {
-                _enabled = value;
-                if (!_enabled)
-                {
-                    // Touch events should be disabled when the surface becomes invalid, ie 
-                    // device not available or orientation changing.  When disabling, clear 
-                    // all existing touches as Android isn't guaranteed to fire Released 
-                    // events for them. 
-                    TouchPanel.ReleaseAllTouches();
-                }
-            }
-        }
+        public bool Enabled { get; set; }
 
         public AndroidTouchEventManager(Game game)
         {
@@ -80,7 +64,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
         public void OnTouchEvent(MotionEvent e)
         {
-            if (!_enabled)
+            if (!Enabled)
                 return;
 
             Vector2 position = Vector2.Zero;
@@ -122,21 +106,11 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
         void UpdateTouchPosition(ref Vector2 position)
         {
-            GraphicsDevice device = _game.GraphicsDevice;
             Rectangle clientBounds = _game.Window.ClientBounds;
 
             //Fix for ClientBounds
             position.X -= clientBounds.X;
             position.Y -= clientBounds.Y;
-
-            // Whilst this seems wrong, it is the simplest way to allow touch events to start
-            // before the device is created and continue afterwards
-            if (device == null)
-                return;
-                 
-            //Fix for Viewport
-            position.X = (position.X / clientBounds.Width) * device.Viewport.Width;
-            position.Y = (position.Y / clientBounds.Height) * device.Viewport.Height;
         }
     }
 }
