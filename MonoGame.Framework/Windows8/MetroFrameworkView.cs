@@ -33,6 +33,16 @@ namespace Microsoft.Xna.Framework
                 // Construct the game.
                 _game = new T();
             }
+            else if (args.Kind == ActivationKind.Protocol)
+            {
+                // Save any protocol launch parameters to be parsed by the platform.
+                var protocolArgs = args as ProtocolActivatedEventArgs;
+                MetroGamePlatform.LaunchParameters = protocolArgs.Uri.AbsoluteUri;
+                MetroGamePlatform.PreviousExecutionState = protocolArgs.PreviousExecutionState;
+
+                // Construct the game.
+                _game = new T();
+            }
         }
 
         public void Load(string entryPoint)
