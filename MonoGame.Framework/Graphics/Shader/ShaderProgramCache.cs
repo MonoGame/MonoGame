@@ -78,10 +78,11 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.AttachShader(program, vertexShader.GetShaderHandle());
             GL.AttachShader(program, pixelShader.GetShaderHandle());
 
-            vertexShader.OnLink(program);
-            pixelShader.OnLink(program);
+            vertexShader.BindVertexAttributes(program);
 
             GL.LinkProgram(program);
+
+            pixelShader.ApplySamplerTextureUnits(program);
 
             var linked = 0;
 

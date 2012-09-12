@@ -201,49 +201,44 @@ namespace Microsoft.Xna.Framework.Graphics
             return _shaderHandle;
         }
 
-        public void OnLink(int program)
+        internal void BindVertexAttributes(int program)
         {
-            if (Stage == ShaderStage.Vertex)
+            foreach (var attrb in _attributes)
             {
-                // Bind the vertex attributes to the shader program.
-                foreach (var attrb in _attributes)
+                switch (attrb.usage)
                 {
-                    switch (attrb.usage)
-                    {
-                        case VertexElementUsage.Color:
-                            GL.BindAttribLocation(program, GraphicsDevice.attributeColor, attrb.name);
-                            break;
-                        case VertexElementUsage.Position:
-                            GL.BindAttribLocation(program, GraphicsDevice.attributePosition + attrb.index, attrb.name);
-                            break;
-                        case VertexElementUsage.TextureCoordinate:
-                            GL.BindAttribLocation(program, GraphicsDevice.attributeTexCoord + attrb.index, attrb.name);
-                            break;
-                        case VertexElementUsage.Normal:
-                            GL.BindAttribLocation(program, GraphicsDevice.attributeNormal, attrb.name);
-                            break;
-                        case VertexElementUsage.BlendIndices:
-                            GL.BindAttribLocation(program, GraphicsDevice.attributeBlendIndicies, attrb.name);
-                            break;
-                        case VertexElementUsage.BlendWeight:
-                            GL.BindAttribLocation(program, GraphicsDevice.attributeBlendWeight, attrb.name);
-                            break;
-                        default:
-                            throw new NotImplementedException();
-                    }
+                    case VertexElementUsage.Color:
+                        GL.BindAttribLocation(program, GraphicsDevice.attributeColor, attrb.name);
+                        break;
+                    case VertexElementUsage.Position:
+                        GL.BindAttribLocation(program, GraphicsDevice.attributePosition + attrb.index, attrb.name);
+                        break;
+                    case VertexElementUsage.TextureCoordinate:
+                        GL.BindAttribLocation(program, GraphicsDevice.attributeTexCoord + attrb.index, attrb.name);
+                        break;
+                    case VertexElementUsage.Normal:
+                        GL.BindAttribLocation(program, GraphicsDevice.attributeNormal, attrb.name);
+                        break;
+                    case VertexElementUsage.BlendIndices:
+                        GL.BindAttribLocation(program, GraphicsDevice.attributeBlendIndicies, attrb.name);
+                        break;
+                    case VertexElementUsage.BlendWeight:
+                        GL.BindAttribLocation(program, GraphicsDevice.attributeBlendWeight, attrb.name);
+                        break;
+                    default:
+                        throw new NotImplementedException();
                 }
-
             }
-            else if (Stage == ShaderStage.Pixel)
+        }
+
+        internal void ApplySamplerTextureUnits(int program)
+        {
+            // Assign the texture unit index to the sampler uniforms.
+            foreach (var sampler in Samplers)
             {
-                // Assign the sampler index to the texture uniform.
-                foreach (var sampler in Samplers)
-                {
-                    // Set the sampler texture slot.
-                    var loc = GL.GetUniformLocation(program, sampler.name);
-                    if (loc != -1)
-                        GL.Uniform1(loc, sampler.index);
-                }
+                var loc = GL.GetUniformLocation(program, sampler.name);
+                if (loc != -1)
+                    GL.Uniform1(loc, sampler.index);
             }
         }
 
