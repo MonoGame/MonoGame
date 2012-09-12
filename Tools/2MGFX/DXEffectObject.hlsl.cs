@@ -23,9 +23,9 @@ namespace Microsoft.Xna.Framework.Graphics
             // Go thru the techniques and that will find all the 
             // shaders and constant buffers.
             effect.Techniques = new d3dx_technique[shaderInfo.Techniques.Count];
-            for (var i = 0; i < shaderInfo.Techniques.Count; i++)
+            for (var t = 0; t < shaderInfo.Techniques.Count; t++)
             {
-                var tinfo = shaderInfo.Techniques[i]; ;
+                var tinfo = shaderInfo.Techniques[t]; ;
 
                 var technique = new d3dx_technique();
                 technique.name = tinfo.name;
@@ -39,9 +39,8 @@ namespace Microsoft.Xna.Framework.Graphics
                     var pass = new d3dx_pass();
                     pass.name = pinfo.name ?? string.Empty;
                     pass.state_count = 0;
-                    d3dx_state[] tempstate = new d3dx_state[2];
+                    var tempstate = new d3dx_state[2];
                     
-
                     if (!string.IsNullOrEmpty(pinfo.psFunction))
                     {
                         pass.state_count += 1;
@@ -55,15 +54,13 @@ namespace Microsoft.Xna.Framework.Graphics
                     }
 
                     pass.states = new d3dx_state[pass.state_count];
-                    for (int idx = 0; idx < pass.state_count; idx++)
-                    {
-                        pass.states[i] = tempstate[i];
-                    }
+                    for (var s = 0; s < pass.state_count; s++)
+                        pass.states[s] = tempstate[s];
 
                     technique.pass_handles[p] = pass;
                 }
 
-                effect.Techniques[i] = technique;
+                effect.Techniques[t] = technique;
             }
                 
             // Make the list of parameters by combining all the
