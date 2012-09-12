@@ -138,7 +138,11 @@ namespace Microsoft.Xna.Framework.Graphics
                 {
                     var param = _effect.Parameters[sampler.parameter];
                     var texture = param.Data as Texture;
-                    device.Textures[sampler.index] = texture;
+										
+					// If there is no texture assigned then skip it
+					// and leave whatever set directly on the device.
+                    if (texture != null)
+                        device.Textures[sampler.index] = texture;
                 }
                 
                 // Update the constant buffers.
