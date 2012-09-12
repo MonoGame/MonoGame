@@ -1370,7 +1370,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
             var startVertex = buffer.UserOffset;
 
-            // Victor Chelaru September 21 2012
             // I don't know why we subtracted vertexOffset
             // but it was causing a lot of issues when rendering
             // with non-0 offsets.  Removing this fixes all problems.
