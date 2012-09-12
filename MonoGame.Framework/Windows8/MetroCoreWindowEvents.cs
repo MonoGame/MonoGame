@@ -70,9 +70,6 @@ namespace Microsoft.Xna.Framework
         {
             // Update the keyboard state.
             Keyboard.State = new KeyboardState(_keys.ToArray());
-
-            // Update the touch state.
-            TouchPanel.UpdateState();
         }
 
         private void CoreWindow_PointerWheelChanged(CoreWindow sender, PointerEventArgs args)

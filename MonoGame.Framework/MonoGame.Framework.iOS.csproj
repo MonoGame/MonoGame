@@ -96,7 +96,6 @@
     <Compile Include="Graphics\DisplayMode.cs" />
     <Compile Include="Graphics\DisplayModeCollection.cs" />
     <Compile Include="Graphics\GraphicsDevice.cs" />
-    <Compile Include="Graphics\GraphicsDeviceCapabilities.cs" />
     <Compile Include="Graphics\GraphicsDeviceStatus.cs" />
     <Compile Include="Graphics\IGraphicsDeviceService.cs" />
     <Compile Include="Graphics\MultiSampleType.cs" />
@@ -428,7 +427,6 @@
     <Compile Include="iOS\GamerServices\KeyboardInputAsyncResult.cs" />
     <Compile Include="iOS\iOSGameWindow.cs" />
     <Compile Include="Graphics\Effect\ConstantBuffer.cs" />
-    <Compile Include="Input\Touch\TouchInfo.cs" />
   </ItemGroup>
   <Import Project="$(ProgramFiles)\MSBuild\MonoTouch\Novell.MonoTouch.Common.targets" Condition="'$(windir)' != '' " />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

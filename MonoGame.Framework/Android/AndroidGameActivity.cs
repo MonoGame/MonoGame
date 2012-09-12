@@ -84,6 +84,12 @@ namespace Microsoft.Xna.Framework
             base.OnRestart();
             Game.Window.OnRestart();
         }
+
+		protected override void OnDestroy ()
+		{
+            UnregisterReceiver(screenReceiver);
+			base.OnDestroy ();
+		}
     }
 	
 	public static class ActivityExtensions

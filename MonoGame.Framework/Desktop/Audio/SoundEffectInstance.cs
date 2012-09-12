@@ -53,7 +53,7 @@ using Microsoft.Xna.Framework;
 
 namespace Microsoft.Xna.Framework.Audio
 {
-	public sealed class SoundEffectInstance : IDisposable
+	public class SoundEffectInstance : IDisposable
 	{
 		private bool isDisposed = false;
 		private SoundState soundState = SoundState.Stopped;
@@ -69,21 +69,30 @@ namespace Microsoft.Xna.Framework.Audio
 		bool hasSourceId = false;
 		int sourceId;
 
+        public SoundEffectInstance()
+        {
+            InitializeSound();
+        }
+
 		public SoundEffectInstance (SoundEffect parent)
 		{
 			this.soundEffect = parent;
 			InitializeSound ();
+            BindDataBuffer(soundEffect._data, soundEffect.Format, soundEffect.Size, (int)soundEffect.Rate);
 		}
 
 		private void InitializeSound ()
 		{
 			controller = OpenALSoundController.GetInstance;
-			soundBuffer = new OALSoundBuffer ();
-			soundBuffer.BindDataBuffer (soundEffect._data, soundEffect.Format, soundEffect.Size, (int)soundEffect.Rate);
+			soundBuffer = new OALSoundBuffer ();			
 			soundBuffer.Reserved += HandleSoundBufferReserved;
-			soundBuffer.Recycled += HandleSoundBufferRecycled;
-
+			soundBuffer.Recycled += HandleSoundBufferRecycled;                        
 		}
+
+        protected void BindDataBuffer(byte[] data, ALFormat format, int size, int rate)
+        {
+            soundBuffer.BindDataBuffer(data, format, size, rate);
+        }
 
 		void HandleSoundBufferRecycled (object sender, EventArgs e)
 		{
@@ -174,7 +183,7 @@ namespace Microsoft.Xna.Framework.Audio
 			AL.Source (sourceId, ALSourcef.Pitch, XnaPitchToAlPitch(_pitch));
 		}
 
-		public void Play ()
+		public virtual void Play ()
 		{
 			int bufferId = soundBuffer.OpenALDataBuffer;
 			if (hasSourceId) {
@@ -187,7 +196,7 @@ namespace Microsoft.Xna.Framework.Audio
 			AL.Source (soundBuffer.SourceId, ALSourcei.Buffer, bufferId);
 			ApplyState ();
 
-			controller.PlaySound (soundBuffer);
+			controller.PlaySound (soundBuffer);            
 			//Console.WriteLine ("playing: " + sourceId + " : " + soundEffect.Name);
 			soundState = SoundState.Playing;
 		}
@@ -217,7 +226,7 @@ namespace Microsoft.Xna.Framework.Audio
 			}
 		}
 
-		public bool IsLooped {
+		public virtual bool IsLooped {
 			get {
 				return _looped;
 			}
