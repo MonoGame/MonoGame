@@ -141,9 +141,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void SetParameter(int offset, EffectParameter param)
         {
-            if (param.Data == null) 
-                return;
-
             const int elementSize = 4;
             const int rowSize = elementSize * 4;
 
@@ -158,7 +155,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     offset += subparam.RowCount * rowSize;
                 }
             }
-            else
+            else if (param.Data != null)
             {
                 switch (param.ParameterType)
                 {
