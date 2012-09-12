@@ -1370,7 +1370,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
             var startVertex = buffer.UserOffset;
 
-            var copyCount = vertexCount - vertexOffset;
+            // Victor Chelaru September 21 2012
+            // I don't know why we subtracted vertexOffset
+            // but it was causing a lot of issues when rendering
+            // with non-0 offsets.  Removing this fixes all problems.
+            //var copyCount = vertexCount - vertexOffset;
+            var copyCount = vertexCount;
+
             if ((copyCount + buffer.UserOffset) < buffer.VertexCount)
             {
                 buffer.UserOffset += copyCount;
