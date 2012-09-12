@@ -1699,8 +1699,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
             //Create VBO if not created already
 #if GLES
-            if (VboIdArray == 0)
-                GL.GenBuffers(1, ref VboIdArray);
+			if (_vboIdArray == 0)
+				GL.GenBuffers(1, ref _vboIdArray);
 #else
             if (_vboIdArray == 0)
                 GL.GenBuffers(1, out _vboIdArray);
@@ -1803,10 +1803,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
             //Create VBO if not created already
 #if GLES
-			if (VboIdArray == 0)
-                GL.GenBuffers(1, ref VboIdArray);
-            if (VboIdElement == 0)
-                GL.GenBuffers(1, ref VboIdElement);
+			if (_vboIdArray == 0)
+				GL.GenBuffers(1, ref _vboIdArray);
+			if (_vboIdElement == 0)
+				GL.GenBuffers(1, ref _vboIdElement);
 #else
             if (_vboIdArray == 0)
                 GL.GenBuffers(1, out _vboIdArray);
@@ -1887,10 +1887,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
             //Create VBO if not created already
 #if GLES
-			if (VboIdArray == 0)
-                GL.GenBuffers(1, ref VboIdArray);
-            if (VboIdElement == 0)
-                GL.GenBuffers(1, ref VboIdElement);
+			if (_vboIdArray == 0)
+				GL.GenBuffers(1, ref _vboIdArray);
+			if (_vboIdElement == 0)
+				GL.GenBuffers(1, ref _vboIdElement);
 #else
             if (_vboIdArray == 0)
                 GL.GenBuffers(1, out _vboIdArray);

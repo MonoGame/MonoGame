@@ -163,7 +163,7 @@ namespace Microsoft.Xna.Framework.Graphics
             //
             _shaderHandle = GL.CreateShader(Stage == ShaderStage.Vertex ? ShaderType.VertexShader : ShaderType.FragmentShader);
 #if GLES
-            GL.ShaderSource(ShaderHandle, 1, new string[] { _glslCode }, (int[])null);
+			GL.ShaderSource(_shaderHandle, 1, new string[] { _glslCode }, (int[])null);
 #else
             GL.ShaderSource(_shaderHandle, _glslCode);
 #endif
@@ -171,7 +171,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             var compiled = 0;
 #if GLES
-            GL.GetShader(ShaderHandle, ShaderParameter.CompileStatus, ref compiled);
+			GL.GetShader(_shaderHandle, ShaderParameter.CompileStatus, ref compiled);
 #else
             GL.GetShader(_shaderHandle, ShaderParameter.CompileStatus, out compiled);
 #endif
@@ -180,11 +180,11 @@ namespace Microsoft.Xna.Framework.Graphics
 #if GLES
                 string log = "";
                 int length = 0;
-                GL.GetShader(ShaderHandle, ShaderParameter.InfoLogLength, ref length);
+				GL.GetShader(_shaderHandle, ShaderParameter.InfoLogLength, ref length);
                 if (length > 0)
                 {
                     var logBuilder = new StringBuilder(length);
-                    GL.GetShaderInfoLog(ShaderHandle, length, ref length, logBuilder);
+					GL.GetShaderInfoLog(_shaderHandle, length, ref length, logBuilder);
                     log = logBuilder.ToString();
                 }
 #else
