@@ -1198,7 +1198,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 Viewport = new Viewport(0, 0, renderTarget.Width, renderTarget.Height);
 
                 // We clear the render target if asked.
-                clearTarget = renderTarget.RenderTargetUsage != RenderTargetUsage.DiscardContents;
+                clearTarget = renderTarget.RenderTargetUsage == RenderTargetUsage.DiscardContents;
             }
 
             // In XNA 4, because of hardware limitations on Xbox, when
@@ -1723,7 +1723,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // We must set the graphics device on the vertex decl
             // here because we don't have a VB to do it.
             vertexDeclaration.GraphicsDevice = this;
-            vertexDeclaration.Apply();
+            vertexDeclaration.Apply(IntPtr.Zero);
 
             //Draw
             GL.DrawArrays(PrimitiveTypeGL(primitiveType),
@@ -1757,7 +1757,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             ApplyState(true);
 
-			_vertexBuffer.VertexDeclaration.Apply();
+            _vertexBuffer.VertexDeclaration.Apply(IntPtr.Zero);
 
 			GL.DrawArrays(PrimitiveTypeGL(primitiveType),
 			              vertexStart,
@@ -1836,7 +1836,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // We must set the graphics device on the vertex decl
             // here because we don't have a VB to do it.
             vertexDeclaration.GraphicsDevice = this;
-            vertexDeclaration.Apply();
+            vertexDeclaration.Apply(IntPtr.Zero);
 
             //Draw
             GL.DrawElements(PrimitiveTypeGL(primitiveType),
@@ -1921,7 +1921,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // We must set the graphics device on the vertex decl
             // here because we don't have a VB to do it.
             vertexDeclaration.GraphicsDevice = this;
-            vertexDeclaration.Apply();
+            vertexDeclaration.Apply(IntPtr.Zero);
 
             //Draw
             GL.DrawElements(PrimitiveTypeGL(primitiveType),

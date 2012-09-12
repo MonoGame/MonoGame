@@ -126,12 +126,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 
 #if OPENGL
-		internal void Apply()
-		{
-            Apply(IntPtr.Zero);
-        }
-
-		internal void Apply (IntPtr offset)
+		internal void Apply(IntPtr offset)
 		{
 
             // TODO: This is executed on every dr_enabledVertexAttributesaw call... can we not
