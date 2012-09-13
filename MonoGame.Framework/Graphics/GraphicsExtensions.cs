@@ -591,5 +591,16 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             return 0;
         }
+
+        public static int GetBoundTexture2D()
+        {
+            var prevTexture = 0;
+#if GLES
+            GL.GetInteger(GetPName.TextureBinding2D, ref prevTexture);
+#else
+            GL.GetInteger(GetPName.TextureBinding2D, out prevTexture);
+#endif
+            return prevTexture;
+        }
     }
 }
