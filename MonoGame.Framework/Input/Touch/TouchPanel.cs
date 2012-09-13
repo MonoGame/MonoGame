@@ -142,7 +142,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
                 if (foundEvent)
                     _touchLocations[i] = touch;
-                else if (touch.State == TouchLocationState.Pressed)
+                else
                     _touchLocations[i] = touch.AsMovedState();
             }
 
