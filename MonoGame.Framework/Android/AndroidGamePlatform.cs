@@ -189,14 +189,12 @@ namespace Microsoft.Xna.Framework
 
         public override void BeginScreenDeviceChange(bool willBeFullScreen)
         {
-            // FIXME: Can't throw NotImplemented if it is called as a standard part of graphics device creation
-            //throw new NotImplementedException();
         }
 
         public override void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight)
         {
-            // FIXME: Can't throw NotImplemented if it is called as a standard part of graphics device creation
-            //throw new NotImplementedException();
+            // Force the Viewport to be correctly set
+            Game.graphicsDeviceManager.ResetClientBounds();
         }
 
         // EnterForeground

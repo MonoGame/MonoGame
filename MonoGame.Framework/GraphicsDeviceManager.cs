@@ -473,8 +473,8 @@ namespace Microsoft.Xna.Framework
         internal void ResetClientBounds()
         {
 #if ANDROID
-            float preferredAspectRatio = (float)GraphicsDevice.PresentationParameters.BackBufferWidth / 
-                                         (float)GraphicsDevice.PresentationParameters.BackBufferHeight;
+            float preferredAspectRatio = (float)PreferredBackBufferWidth /
+                                         (float)PreferredBackBufferHeight;
             float displayAspectRatio = (float)GraphicsDevice.DisplayMode.Width / 
                                        (float)GraphicsDevice.DisplayMode.Height;
 
@@ -492,17 +492,17 @@ namespace Microsoft.Xna.Framework
             var newClientBounds = new Rectangle();
             if (displayAspectRatio > (adjustedAspectRatio + EPSILON))
             {
-                newClientBounds.Height = GraphicsDevice.DisplayMode.Height;
+                newClientBounds.Height = _graphicsDevice.DisplayMode.Height;
                 newClientBounds.Width = (int)(newClientBounds.Height * adjustedAspectRatio);
-                newClientBounds.X = (GraphicsDevice.DisplayMode.Width - newClientBounds.Width)/2;
+                newClientBounds.X = (_graphicsDevice.DisplayMode.Width - newClientBounds.Width) / 2;
 
                 _game.Window.ClientBounds = newClientBounds;
             }
             else if (displayAspectRatio < (adjustedAspectRatio - EPSILON))
             {
-                newClientBounds.Width = GraphicsDevice.DisplayMode.Width;
+                newClientBounds.Width = _graphicsDevice.DisplayMode.Width;
                 newClientBounds.Height = (int)(newClientBounds.Width / adjustedAspectRatio);
-                newClientBounds.Y = (GraphicsDevice.DisplayMode.Height - newClientBounds.Height) / 2;
+                newClientBounds.Y = (_graphicsDevice.DisplayMode.Height - newClientBounds.Height) / 2;
 
                 _game.Window.ClientBounds = newClientBounds;
             }
@@ -517,7 +517,16 @@ namespace Microsoft.Xna.Framework
                 newClientBounds.Height = isLandscape ? Math.Min(w, h) : Math.Max(w, h);
                 _game.Window.ClientBounds = new Rectangle(0, 0, newClientBounds.Width, newClientBounds.Height);
             }
-            GraphicsDevice.Viewport = new Viewport(newClientBounds.X, newClientBounds.Y, newClientBounds.Width, newClientBounds.Height);
+
+            // Ensure viewport and buffer size are reported correctly
+            _graphicsDevice.Viewport = new Viewport(newClientBounds.X, -newClientBounds.Y, newClientBounds.Width, newClientBounds.Height);
+            _graphicsDevice.PresentationParameters.BackBufferWidth = newClientBounds.Width;
+            _graphicsDevice.PresentationParameters.BackBufferHeight = newClientBounds.Height;
+
+            // Touch panel needs latest buffer size for scaling
+            TouchPanel.DisplayWidth = newClientBounds.Width;
+            TouchPanel.DisplayHeight = newClientBounds.Height;
+
             Android.Util.Log.Debug("MonoGame", "GraphicsDeviceManager.ResetClientBounds: newClientBounds=" + newClientBounds.ToString());
 #endif
         }
