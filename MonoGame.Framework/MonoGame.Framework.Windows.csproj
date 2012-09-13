@@ -187,7 +187,6 @@
     <Compile Include="Input\GamePadDeadZone.cs" />
     <Compile Include="Input\Keyboard.cs" />
     <Compile Include="Input\MouseState.cs" />
-    <Compile Include="Input\Touch\TouchInfo.cs" />
     <Compile Include="LaunchParameters.cs" />
     <Compile Include="Media\VideoSoundtrackType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -416,7 +415,6 @@
     <Compile Include="Graphics\ClearOptions.cs" />
     <Compile Include="Graphics\CompilerOptions.cs" />
     <Compile Include="Graphics\DeviceType.cs" />
-    <Compile Include="Graphics\GraphicsDeviceCapabilities.cs" />
     <Compile Include="Graphics\GraphicsDeviceInformation.cs" />
     <Compile Include="Graphics\GraphicsDeviceStatus.cs" />
     <Compile Include="Graphics\GraphicsProfile.cs" />

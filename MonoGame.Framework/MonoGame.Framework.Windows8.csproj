@@ -144,7 +144,6 @@
     <Compile Include="Input\Touch\GestureSample.cs" />
     <Compile Include="Input\Touch\GestureType.cs" />
     <Compile Include="Input\Touch\TouchCollection.cs" />
-    <Compile Include="Input\Touch\TouchInfo.cs" />
     <Compile Include="Input\Touch\TouchLocation.cs" />
     <Compile Include="Input\Touch\TouchLocationState.cs" />
     <Compile Include="Input\Touch\TouchPanel.cs" />
@@ -314,7 +313,6 @@
     <Compile Include="Graphics\ClearOptions.cs" />
     <Compile Include="Graphics\CompilerOptions.cs" />
     <Compile Include="Graphics\DeviceType.cs" />
-    <Compile Include="Graphics\GraphicsDeviceCapabilities.cs" />
     <Compile Include="Graphics\GraphicsDeviceInformation.cs" />
     <Compile Include="Graphics\GraphicsDeviceStatus.cs" />
     <Compile Include="Graphics\GraphicsProfile.cs" />
