@@ -183,7 +183,9 @@ namespace Microsoft.Xna.Framework.Graphics
         protected void SetDataInternal<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, SetDataOptions options) where T : struct
         {
             if (data == null)
-                throw new ArgumentNullException("data");
+                throw new ArgumentNullException("data is null");
+            if (data.Length < (startIndex + elementCount))
+                throw new InvalidOperationException("The array specified in the data parameter is not the correct size for the amount of data requested.");
 
 #if DIRECTX
 
@@ -253,13 +255,21 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 var elementSizeInByte = Marshal.SizeOf(typeof(T));
                 var sizeInBytes = elementSizeInByte * elementCount;
-                var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-                var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startIndex * elementSizeInByte);
+                var bufferSize = IndexCount * (IndexElementSize == IndexElementSize.SixteenBits ? 2 : 4);
 
                 GL.BindBuffer(BufferTarget.ElementArrayBuffer, ibo);
-                GL.BufferSubData(BufferTarget.ElementArrayBuffer, (IntPtr)offsetInBytes, (IntPtr)sizeInBytes, dataPtr);
 
-                dataHandle.Free();
+                if (options == SetDataOptions.Discard)
+                {
+                    // By assigning NULL data to the buffer this gives a hint
+                    // to the device to discard the previous content.
+                    GL.BufferData(  BufferTarget.ElementArrayBuffer,
+                                    (IntPtr)bufferSize,
+                                    IntPtr.Zero,
+                                    _isDynamic ? BufferUsageHint.StreamDraw : BufferUsageHint.StaticDraw);
+                }
+
+                GL.BufferSubData(BufferTarget.ElementArrayBuffer, (IntPtr)offsetInBytes, (IntPtr)sizeInBytes, data);
             });
 #endif
         }
