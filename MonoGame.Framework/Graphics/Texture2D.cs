@@ -375,7 +375,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 dataHandle.Free();
 #endif
 
-#if OPENGL                
+#if OPENGL
+                // Required to make sure that any texture uploads on a thread are completed
+                // before the main thread tries to use the texture.
+                GL.Finish();
             });
 #endif
         }
