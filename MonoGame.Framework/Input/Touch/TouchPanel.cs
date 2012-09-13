@@ -101,45 +101,10 @@ namespace Microsoft.Xna.Framework.Input.Touch
             return Capabilities;
         }
 
-        /// <summary>
-        /// Is true the touch state has been returned in GetState().
-        /// </summary>
-        private static bool _touchStateConsumed;
-
-        private static void RefreshState()
+        private static void RefreshState(bool consumeState)
         {
             // Track if the touch locations have changed.
             var stateChanged = false;
-
-            // If the touch state has been consumed then we can safely
-            // remove old release locations and promote presses to moves.
-            if (_touchStateConsumed)
-            {
-                for (var i = 0; i < _touchLocations.Count;)
-                {
-                    var touch = _touchLocations[i];
-
-                    // Remove previously released touch locations.
-                    if (touch.State == TouchLocationState.Released)
-                    {
-                        _touchLocations.RemoveAt(i);
-                        continue;
-                    }
-
-                    // Press locations are promoted to the moved state.
-                    if (touch.State == TouchLocationState.Pressed)
-                    {
-                        _touchLocations[i] = touch.AsMovedState();
-                        stateChanged = true;
-                    }
-
-                    i++;
-                }
-
-                // We don't do this again until the state
-                // is returned to the caller.
-                _touchStateConsumed = false;
-            }
 
             // Update the existing touch locations.
             for (var i=0; i < _touchLocations.Count; i++)
@@ -148,8 +113,19 @@ namespace Microsoft.Xna.Framework.Input.Touch
                 var touch = _touchLocations[i];
 
                 // If this location isn't in the move state yet then skip it.
-                if (touch.State != TouchLocationState.Moved)
+                if (!consumeState && touch.State != TouchLocationState.Moved)
                     continue;
+
+                // If the touch state has been consumed then we can
+                // remove old release locations.
+                if (consumeState && touch.State == TouchLocationState.Released)
+                {
+                    _touchLocations.RemoveAt(i);
+                    i--;
+                    continue;
+                }
+
+                var foundEvent = false;
 
                 // Remove the next pending event with the 
                 // same id and make it the new touch state.
@@ -158,14 +134,17 @@ namespace Microsoft.Xna.Framework.Input.Touch
                     if (_events[j].Id == touch.Id)
                     {
                         stateChanged |= touch.UpdateState(_events[j]);
+                        foundEvent = true;
                         _events.RemoveAt(j);
                         break;
                     }
                 }
 
-                // Set the new touch state.
-                _touchLocations[i] = touch;
-	       }
+                if (foundEvent)
+                    _touchLocations[i] = touch;
+                else
+                    _touchLocations[i] = touch.AsMovedState();
+            }
 
             // We add new pressed events last so they are not 
             // consumed before the touch state is returned.
@@ -174,7 +153,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
                 var loc = _events[i];
 
                 if (loc.State == TouchLocationState.Pressed)
-                {                    
+                {
                     _touchLocations.Add(loc);
                     _events.RemoveAt(i);
                     stateChanged = true;
@@ -191,8 +170,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
         public static TouchCollection GetState()
         {
             // Update the state and return it.
-            RefreshState();
-            _touchStateConsumed = true;
+            RefreshState(true);
             return new TouchCollection(_touchLocations.ToArray());
         }
 
@@ -338,7 +316,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
             {
                 // We process events and generate new 
                 // gestures if any state has changed.
-                RefreshState();
+                RefreshState(false);
 
                 return GestureList.Count > 0;				
             }

@@ -173,7 +173,15 @@ namespace Microsoft.Xna.Framework.Input.Touch
         internal TouchLocation AsMovedState()
         {
             var touch = this;
+
+            // Store the current state as the previous.
+            touch._previousState = touch._state;
+            touch._previousPosition = touch._position;
+            touch._previousPressure = touch._pressure;
+
+            // Set the new state.
             touch._state = TouchLocationState.Moved;
+            
             return touch;
         }
 
