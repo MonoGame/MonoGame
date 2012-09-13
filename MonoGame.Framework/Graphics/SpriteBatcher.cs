@@ -194,7 +194,11 @@ namespace Microsoft.Xna.Framework.Graphics
 #if OPENGL
             // Activate the Texture before we draw. 
             // should this be to be moved into the GraphicsDevice?
-            if (_device.Textures[0] != null) _device.Textures[0].Activate();            
+            if (_device.Textures[0] != null)
+            {
+                _device.Textures[0].Activate();
+                _device.SamplerStates[0].Activate(_device.Textures[0].glTarget, _device.Textures[0].LevelCount > 1);
+            }
 #endif
 
             _device.DrawUserIndexedPrimitives<VertexPosition2ColorTexture>(
