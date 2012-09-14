@@ -164,8 +164,6 @@ namespace Microsoft.Xna.Framework.Graphics
 		internal static int attributeTangent = 8;
 		internal static int attributeTexCoord = 9; //must be the last one, texture index locations are added to it
 
-        private uint VboIdArray;
-        private uint VboIdElement;
         private All _preferedFilter;
 
         private int _activeTexture = -1;
@@ -338,8 +336,6 @@ namespace Microsoft.Xna.Framework.Graphics
 #elif OPENGL
 
             _viewport = new Viewport(0, 0, PresentationParameters.BackBufferWidth, PresentationParameters.BackBufferHeight);
-            VboIdArray = 0;
-            VboIdElement = 0;
 #endif
 
             // Force set the default render states.
@@ -1493,45 +1489,24 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
 #elif OPENGL
-            // Unbind the VBOs
+
+            // Unbind current VBOs.
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
 
-            //Create VBO if not created already
-#if GLES
-            if (VboIdArray == 0)
-                GL.GenBuffers(1, ref VboIdArray);
-#else
-            if (VboIdArray == 0)
-                GL.GenBuffers(1, out VboIdArray);
-#endif
+            // Pin the buffers.
+            var vbHandle = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
 
-            // Bind the VBO
-            GL.BindBuffer(BufferTarget.ArrayBuffer, VboIdArray);
-            ////Clear previous data
-            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vertexDeclaration.VertexStride * vertexData.Length - vertexOffset * vertexDeclaration.VertexStride), IntPtr.Zero, BufferUsageHint.StreamDraw);
-
-            //Pin data
-            var handle = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
-
-            //Buffer data to VBO; This should use stream when we move to ES2.0
-            GL.BufferData(BufferTarget.ArrayBuffer,
-                            (IntPtr)(vertexDeclaration.VertexStride * vertexData.Length - vertexOffset * vertexDeclaration.VertexStride),
-                            new IntPtr(handle.AddrOfPinnedObject().ToInt64() + vertexOffset * vertexDeclaration.VertexStride),
-                            BufferUsageHint.StreamDraw);
-
-            //Setup VertexDeclaration
-            vertexDeclaration.Apply();
+            // Setup the vertex declaration to point at the VB data.
+            vertexDeclaration.Apply(vbHandle.AddrOfPinnedObject());
 
             //Draw
             GL.DrawArrays(PrimitiveTypeGL(primitiveType),
                           vertexOffset,
                           vertexCount);
 
-            // Free resources
-            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
-            handle.Free();
+            // Release the handles.
+            vbHandle.Free();
 #endif
         }
 
@@ -1589,61 +1564,28 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
 #elif OPENGL
-            // Unbind the VBOs
+
+            // Unbind current VBOs.
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
 
-            //Create VBO if not created already
-#if GLES
-			if (VboIdArray == 0)
-                GL.GenBuffers(1, ref VboIdArray);
-            if (VboIdElement == 0)
-                GL.GenBuffers(1, ref VboIdElement);
-#else
-            if (VboIdArray == 0)
-                GL.GenBuffers(1, out VboIdArray);
-            if (VboIdElement == 0)
-                GL.GenBuffers(1, out VboIdElement);
-#endif
-            // Bind the VBO
-            GL.BindBuffer(BufferTarget.ArrayBuffer, VboIdArray);
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, VboIdElement);
-            ////Clear previous data
-            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vertexDeclaration.VertexStride * vertexData.Length - vertexOffset * vertexDeclaration.VertexStride), IntPtr.Zero, BufferUsageHint.StreamDraw);
-            GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(sizeof(ushort) * indexData.Length), IntPtr.Zero, BufferUsageHint.StreamDraw);
+            // Pin the buffers.
+            var vbHandle = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
+            var ibHandle = GCHandle.Alloc(indexData, GCHandleType.Pinned);
 
-            // TODO: Why two handles when we only need one?
-            //
-            //Pin data
-            var handle = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
-            var handle2 = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
-
-
-            //Buffer data to VBO; This should use stream when we move to ES2.0
-            GL.BufferData(BufferTarget.ArrayBuffer,
-                            (IntPtr)(vertexDeclaration.VertexStride * vertexData.Length - vertexOffset * vertexDeclaration.VertexStride),
-                            new IntPtr(handle.AddrOfPinnedObject().ToInt64() + vertexOffset * vertexDeclaration.VertexStride),
-                            BufferUsageHint.StreamDraw);
-
-            GL.BufferData(BufferTarget.ElementArrayBuffer,
-                            (IntPtr)(sizeof(ushort) * indexData.Length),
-                            indexData, BufferUsageHint.DynamicDraw);
-
-            //Setup VertexDeclaration
-            vertexDeclaration.Apply();
+            // Setup the vertex declaration to point at the VB data.
+            vertexDeclaration.Apply(vbHandle.AddrOfPinnedObject());
 
             //Draw
-            GL.DrawElements(PrimitiveTypeGL(primitiveType),
-                            GetElementCountArray(primitiveType, primitiveCount),
-                            DrawElementsType.UnsignedShort/* .UnsignedInt248Oes*/,
-                            (IntPtr)(indexOffset * sizeof(ushort)));
+            GL.DrawElements(    PrimitiveTypeGL(primitiveType),
+                                GetElementCountArray(primitiveType, primitiveCount),
+                                DrawElementsType.UnsignedShort,
+                                (IntPtr)(ibHandle.AddrOfPinnedObject().ToInt64() + (indexOffset * sizeof(short))));
 
+            // Release the handles.
+            ibHandle.Free();
+            vbHandle.Free();
 
-            // Free resources
-            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
-            handle.Free();
-            handle2.Free();
 #endif
         }
 
@@ -1672,60 +1614,28 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
 #elif OPENGL
-            // Unbind the VBOs
+
+            // Unbind current VBOs.
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
 
-            //Create VBO if not created already
-#if GLES
-			if (VboIdArray == 0)
-                GL.GenBuffers(1, ref VboIdArray);
-            if (VboIdElement == 0)
-                GL.GenBuffers(1, ref VboIdElement);
-#else
-            if (VboIdArray == 0)
-                GL.GenBuffers(1, out VboIdArray);
-            if (VboIdElement == 0)
-                GL.GenBuffers(1, out VboIdElement);
-#endif
+            // Pin the buffers.
+            var vbHandle = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
+            var ibHandle = GCHandle.Alloc(indexData, GCHandleType.Pinned);
 
-            // Bind the VBO
-            GL.BindBuffer(BufferTarget.ArrayBuffer, VboIdArray);
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, VboIdElement);
-            ////Clear previous data
-            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vertexDeclaration.VertexStride * vertexData.Length - vertexOffset * vertexDeclaration.VertexStride), IntPtr.Zero, BufferUsageHint.StreamDraw);
-			GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(sizeof(uint) * indexData.Length), IntPtr.Zero, BufferUsageHint.StreamDraw);
-
-            //Pin data
-            var handle = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
-            var handle2 = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
-
-
-            //Buffer data to VBO; This should use stream when we move to ES2.0
-            GL.BufferData(BufferTarget.ArrayBuffer,
-                            (IntPtr)(vertexDeclaration.VertexStride * vertexData.Length - vertexOffset * vertexDeclaration.VertexStride),
-                            new IntPtr(handle.AddrOfPinnedObject().ToInt64() + vertexOffset * vertexDeclaration.VertexStride),
-                            BufferUsageHint.StreamDraw);
-
-            GL.BufferData(BufferTarget.ElementArrayBuffer,
-                            (IntPtr)(sizeof(uint) * indexData.Length),
-                            indexData, BufferUsageHint.DynamicDraw);
-
-            //Setup VertexDeclaration
-            vertexDeclaration.Apply();
+            // Setup the vertex declaration to point at the VB data.
+            vertexDeclaration.Apply(vbHandle.AddrOfPinnedObject());
 
             //Draw
-            GL.DrawElements(PrimitiveTypeGL(primitiveType),
-                            GetElementCountArray(primitiveType, primitiveCount),
-                            DrawElementsType.UnsignedInt/* .UnsignedInt248Oes*/,
-                            (IntPtr)(indexOffset * sizeof(uint)));
+            GL.DrawElements(    PrimitiveTypeGL(primitiveType),
+                                GetElementCountArray(primitiveType, primitiveCount),
+                                DrawElementsType.UnsignedInt,
+                                (IntPtr)(ibHandle.AddrOfPinnedObject().ToInt64() + (indexOffset * sizeof(int))));
 
+            // Release the handles.
+            ibHandle.Free();
+            vbHandle.Free();
 
-            // Free resources
-            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
-            handle.Free();
-            handle2.Free();
 #endif
         }
 
