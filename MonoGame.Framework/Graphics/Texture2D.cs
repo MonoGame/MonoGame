@@ -228,6 +228,9 @@ namespace Microsoft.Xna.Framework.Graphics
                         this.width, this.height, 0,
                         glFormat, glType, IntPtr.Zero);
                 }
+#if !ANDROID
+                GL.Finish();
+#endif
             });
 #endif
         }
@@ -363,9 +366,11 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 
 #if OPENGL
+#if !ANDROID
                 // Required to make sure that any texture uploads on a thread are completed
                 // before the main thread tries to use the texture.
                 GL.Finish();
+#endif
             });
 #endif
         }
