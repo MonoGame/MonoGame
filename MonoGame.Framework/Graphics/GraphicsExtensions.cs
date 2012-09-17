@@ -593,6 +593,8 @@ namespace Microsoft.Xna.Framework.Graphics
             return 0;
         }
 
+#if OPENGL
+
         public static int GetBoundTexture2D()
         {
             var prevTexture = 0;
@@ -603,5 +605,8 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
             return prevTexture;
         }
+
+#endif
+
     }
 }
