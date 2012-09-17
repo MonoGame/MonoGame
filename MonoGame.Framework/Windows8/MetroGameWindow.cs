@@ -51,6 +51,7 @@ using Windows.Graphics.Display;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Windows.UI.ViewManagement;
+using Windows.UI.Xaml;
 
 
 namespace Microsoft.Xna.Framework
@@ -63,7 +64,7 @@ namespace Microsoft.Xna.Framework
         protected Game game;
         private Rectangle _clientBounds;
         private ApplicationViewState _currentViewState;
-        private MetroCoreWindowEvents _windowEvents;
+        private InputEvents _windowEvents;
         private Vector2 _backBufferScale;
 
         #region Internal Properties
@@ -141,10 +142,10 @@ namespace Microsoft.Xna.Framework
             Instance = new MetroGameWindow();
         }
 
-        public void Initialize(CoreWindow coreWindow)
+        public void Initialize(CoreWindow coreWindow, UIElement inputElement)
         {
             _coreWindow = coreWindow;
-            _windowEvents = new MetroCoreWindowEvents(_coreWindow);
+            _windowEvents = new InputEvents(_coreWindow, inputElement);
 
             _orientation = ToOrientation(DisplayProperties.CurrentOrientation);
             DisplayProperties.OrientationChanged += DisplayProperties_OrientationChanged;
@@ -287,16 +288,21 @@ namespace Microsoft.Xna.Framework
                 // Process events incoming to the window.
                 _coreWindow.Dispatcher.ProcessEvents(CoreProcessEventsOption.ProcessAllIfPresent);
 
-                // Update state based on window events.
-                _windowEvents.UpdateState();
-
-                // Update and render the game.
-                if (Game != null)
-                    Game.Tick();
+                Tick();
 
                 if (IsExiting)
                     break;
             }
+        }
+
+        internal void Tick()
+        {
+            // Update state based on window events.
+            _windowEvents.UpdateState();
+
+            // Update and render the game.
+            if (Game != null)
+                Game.Tick();
         }
 
         #region Public Methods
