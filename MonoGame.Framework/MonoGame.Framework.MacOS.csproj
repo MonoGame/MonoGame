@@ -372,7 +372,7 @@
     <Compile Include="Graphics\GraphicsDevice.cs" />
     <Compile Include="MacOS\Audio\OpenALSupport.cs" />
     <Compile Include="MacOS\Audio\SoundEffect.cs" />
-    <Compile Include="MacOS\Audio\SoundEffectInstance.cs" />
+    <Compile Include="Desktop\Audio\SoundEffectInstance.cs" />
     <Compile Include="PrimaryThreadLoader.cs" />
     <Compile Include="Graphics\States\GLStateManager.cs" />
     <Compile Include="Graphics\Effect\EffectPass.cs" />
