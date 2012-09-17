@@ -55,6 +55,9 @@ namespace Microsoft.Xna.Framework.Audio
 #if !WINRT
 		private SoundState soundState = SoundState.Stopped;
 #endif
+#if ANDROID
+        private int _streamId = -1;
+#endif
 
 #if WINRT        
         internal SourceVoice _voice { get; set; }
@@ -89,6 +92,9 @@ namespace Microsoft.Xna.Framework.Audio
             _voice.Dispose();
             _voice = null;
             _effect = null;
+#elif ANDROID
+            if (_streamId >= 0)
+                _sound.Stop(_streamId);
 #else
             // When disposing a SoundEffectInstance, the Sound should
             // just be stopped as it will likely be reused later
@@ -141,8 +147,12 @@ namespace Microsoft.Xna.Framework.Audio
 #else
             if ( _sound != null )
 			{
+#if ANDROID
+				_sound.Pause(_streamId);
+#else
 				_sound.Pause();
-				soundState = SoundState.Paused;
+#endif
+                soundState = SoundState.Paused;
 			}
 #endif
 		}
@@ -166,10 +176,17 @@ namespace Microsoft.Xna.Framework.Audio
 #else
 			if ( _sound != null )
 			{
+#if ANDROID
+				if (soundState == SoundState.Paused)
+					_sound.Resume(_streamId);
+				else
+					_streamId = _sound.Play();
+#else
 				if (soundState == SoundState.Paused)
 					_sound.Resume();
 				else
 					_sound.Play();
+#endif
 				soundState = SoundState.Playing;
 			}
 #endif
@@ -181,6 +198,14 @@ namespace Microsoft.Xna.Framework.Audio
             _voice.Start();
             _paused = false;
 #else
+			if ( _sound != null )
+			{
+				if (soundState == SoundState.Paused)
+				{
+					_sound.Resume(_streamId);
+				}
+				soundState = SoundState.Playing;
+ 			}
 #endif
 		}
 		
@@ -193,7 +218,8 @@ namespace Microsoft.Xna.Framework.Audio
 #else
 			if ( _sound != null )
 			{
-				_sound.Stop();
+				_sound.Stop(_streamId);
+				_streamId = -1;
 				soundState = SoundState.Stopped;
 			}
 #endif
@@ -207,7 +233,8 @@ namespace Microsoft.Xna.Framework.Audio
 #else
 			if ( _sound != null )
 			{
-				_sound.Stop();
+				_sound.Stop(_streamId);
+				_streamId = -1;
 				soundState = SoundState.Stopped;
 			}
 #endif
