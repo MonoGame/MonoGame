@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace $safeprojectname$
@@ -6,12 +6,12 @@ namespace $safeprojectname$
     /// <summary>
     /// This is the main type for your game
     /// </summary>
-    public class $safeprojectname$Game : Game
+    public class Game1 : Game
     {
         GraphicsDeviceManager _graphics;
         SpriteBatch _spriteBatch;
 
-        public $safeprojectname$Game()
+        public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";

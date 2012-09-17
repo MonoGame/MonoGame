@@ -12,7 +12,7 @@ namespace $safeprojectname$
         /// </summary>
         static void Main()
         {
-            var factory = new MonoGame.Framework.GameFrameworkViewSource<$safeprojectname$Game>();
+            var factory = new MonoGame.Framework.GameFrameworkViewSource<Game1>();
             Windows.ApplicationModel.Core.CoreApplication.Run(factory);
         }
     }
