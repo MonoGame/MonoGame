@@ -132,7 +132,7 @@ namespace Microsoft.Xna.Framework.Content
                 }
                 else
                 {
-                    System.Diagnostics.Debug.WriteLine(originalReaderTypeString);
+                    //System.Diagnostics.Debug.WriteLine(originalReaderTypeString);
 
     				// Need to resolve namespace differences
     				string readerTypeString = originalReaderTypeString;
