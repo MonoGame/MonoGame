@@ -1,7 +1,13 @@
 using System;
 using System.Runtime.InteropServices;
 
+
+#if MAC
 using MonoMac.OpenGL;
+#elif OPENGL
+using OpenTK.Graphics.OpenGL;
+#elif GLES
+#endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -17,7 +23,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		public Texture3D (GraphicsDevice graphicsDevice, int width, int height, int depth, bool mipMap, SurfaceFormat format)
 		{
-			graphicsDevice = graphicsDevice;
+			this.graphicsDevice = graphicsDevice;
 			Width = width;
 			Height = height;
 			Depth = depth;
@@ -56,8 +62,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			var elementSizeInByte = Marshal.SizeOf(typeof(T));
 			var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
 			var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startIndex * elementSizeInByte);
-			
-			this.Activate ();
+
+            GL.BindTexture(glTarget, glTexture);
 			GL.TexSubImage3D(glTarget, level, left, top, front, right-left, bottom-top, back-front, glFormat, glType, dataPtr);
 			
 			dataHandle.Free ();

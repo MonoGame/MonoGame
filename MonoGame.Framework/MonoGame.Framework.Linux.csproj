@@ -145,7 +145,6 @@
     <Compile Include="Graphics\SpriteBlendMode.cs" />
     <Compile Include="Graphics\GraphicsProfile.cs" />
     <Compile Include="Graphics\SpriteSortMode.cs" />
-    <Compile Include="Graphics\RenderTarget.cs" />
     <Compile Include="Graphics\SurfaceFormat.cs" />
     <Compile Include="Graphics\MultiSampleType.cs" />
     <Compile Include="Graphics\RenderTargetUsage.cs" />
@@ -338,6 +337,10 @@
     <Compile Include="Graphics\Effect\AlphaTestEffect.cs" />
     <Compile Include="Graphics\Effect\BasicEffect.cs" />
     <Compile Include="Graphics\Effect\DualTextureEffect.cs" />
+    <Compile Include="Graphics\Shader\ConstantBufferCollection.cs" />
+    <Compile Include="Graphics\Shader\ConstantBuffer.cs" />
+    <Compile Include="Graphics\Shader\Shader.cs" />
+    <Compile Include="Graphics\Shader\ShaderStage.cs" />
     <Compile Include="Graphics\Effect\Effect.cs" />
     <Compile Include="Graphics\Effect\EffectAnnotation.cs" />
     <Compile Include="Graphics\Effect\EffectAnnotationCollection.cs" />
@@ -351,7 +354,6 @@
     <Compile Include="Graphics\PackedVector\HalfVector2.cs" />
     <Compile Include="Graphics\PackedVector\NormalizedShort2.cs" />
     <Compile Include="Graphics\PackedVector\NormalizedShort4.cs" />
-    <Compile Include="Graphics\States\GLStateManager.cs" />
     <Compile Include="Graphics\Vertices\DynamicIndexBuffer.cs" />
     <Compile Include="Graphics\Vertices\DynamicVertexBuffer.cs" />
     <Compile Include="Graphics\Vertices\IndexBuffer.cs" />
@@ -388,7 +390,6 @@
     <Compile Include="Media\Playlist.cs" />
     <Compile Include="Media\PlaylistCollection.cs" />
     <Compile Include="Media\SongCollection.cs" />
-    <Compile Include="Graphics\Effect\ConstantBuffer.cs" />
     <Compile Include="Graphics\Effect\MGFXShader.cs" />
     <Compile Include="Graphics\Effect\Shader.cs" />
     <Compile Include="Graphics\Effect\Shader.ogl.cs" />
@@ -396,6 +397,8 @@
     <Compile Include="Content\ContentReaders\ExternalReferenceReader.cs" />
     <Compile Include="Graphics\Effect\EffectMaterial.cs" />
     <Compile Include="Linux\Media\Song.cs" />
+    <Compile Include="Graphics\Shader\ShaderProgramCache.cs" />
+    <Compile Include="Utilities\Hash.cs" />
     <Compile Include="Content\ResourceContentManager.cs" />
   </ItemGroup>
   <ItemGroup>
