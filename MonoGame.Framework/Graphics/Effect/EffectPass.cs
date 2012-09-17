@@ -39,12 +39,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public EffectAnnotationCollection Annotations { get; private set; }
 
-#if OPENGL
-
-        private int _shaderProgram;
-
-#endif // OPENGL
-
 #if PSS
         internal ShaderProgram _shaderProgram;
 #endif
@@ -77,6 +71,7 @@ namespace Microsoft.Xna.Framework.Graphics
             Annotations = annotations;
 
             Initialize();
+
         }
         
         internal EffectPass(Effect effect, EffectPass cloneSource)
@@ -94,52 +89,15 @@ namespace Microsoft.Xna.Framework.Graphics
             Annotations = cloneSource.Annotations;
             _vertexShader = cloneSource._vertexShader;
             _pixelShader = cloneSource._pixelShader;
-#if OPENGL || PSS
+#if PSS
             _shaderProgram = cloneSource._shaderProgram;
 #endif
         }
 
-        internal void Initialize()
+        public void Initialize()
         {
-#if OPENGL
-            Threading.BlockOnUIThread(() =>
-            {
-                // TODO: Shouldn't we be calling GL.DeleteProgram() somewhere?
-
-                // TODO: We could cache the various program combinations 
-                // of vertex/pixel shaders and share them across effects.
-
-                _shaderProgram = GL.CreateProgram();
-
-                GL.AttachShader(_shaderProgram, _vertexShader.ShaderHandle);
-                GL.AttachShader(_shaderProgram, _pixelShader.ShaderHandle);
-
-                _vertexShader.OnLink(_shaderProgram);
-                _pixelShader.OnLink(_shaderProgram);
-                GL.LinkProgram(_shaderProgram);
-
-                var linked = 0;
-
-#if GLES
-    			GL.GetProgram(_shaderProgram, ProgramParameter.LinkStatus, ref linked);
-#else
-                GL.GetProgram(_shaderProgram, ProgramParameter.LinkStatus, out linked);
-#endif
-                if (linked == 0)
-                {
-#if !GLES
-                    string log = GL.GetProgramInfoLog(_shaderProgram);
-                    Console.WriteLine(log);
-#endif
-                    throw new InvalidOperationException("Unable to link effect program");
-                }
-            });
-
-#elif DIRECTX
-
-#endif
         }
-
+        
         public void Apply()
         {
             // Set/get the correct shader handle/cleanups.
@@ -154,26 +112,63 @@ namespace Microsoft.Xna.Framework.Graphics
                 return;
             }
 
-#if OPENGL
-            GL.UseProgram(_shaderProgram);
-#elif PSS
-            _effect.GraphicsDevice._graphics.SetShaderProgram(_shaderProgram);
-#endif
-
             var device = _effect.GraphicsDevice;
 
+#if OPENGL || DIRECTX
+
+            if (_vertexShader != null)
+            {
+                device.VertexShader = _vertexShader;
+
+                // Update the constant buffers.
+                for (var c = 0; c < _vertexShader.CBuffers.Length; c++)
+                {
+                    var cb = _effect.ConstantBuffers[_vertexShader.CBuffers[c]];
+                    cb.Update(_effect.Parameters);
+                    device.SetConstantBuffer(ShaderStage.Vertex, c, cb);
+                }
+            }
+
+            if (_pixelShader != null)
+            {
+                device.PixelShader = _pixelShader;
+
+                // Update the texture parameters.
+                foreach (var sampler in _pixelShader.Samplers)
+                {
+                    var param = _effect.Parameters[sampler.parameter];
+                    var texture = param.Data as Texture;
+										
+					// If there is no texture assigned then skip it
+					// and leave whatever set directly on the device.
+                    if (texture != null)
+                        device.Textures[sampler.index] = texture;
+                }
+                
+                // Update the constant buffers.
+                for (var c = 0; c < _pixelShader.CBuffers.Length; c++)
+                {
+                    var cb = _effect.ConstantBuffers[_pixelShader.CBuffers[c]];
+                    cb.Update(_effect.Parameters);
+                    device.SetConstantBuffer(ShaderStage.Pixel, c, cb);
+                }
+            }
+
+#endif
+
+            // Set the render states if we have some.
             if (_rasterizerState != null)
                 device.RasterizerState = _rasterizerState;
             if (_blendState != null)
                 device.BlendState = _blendState;
             if (_depthStencilState != null)
                 device.DepthStencilState = _depthStencilState;
-
-            Debug.Assert(_vertexShader != null, "Got a null vertex shader!");
-            Debug.Assert(_pixelShader != null, "Got a null vertex shader!");
-
+            
 #if PSS
-#warning We are only setting one hardcoded parameter here. Need to do this properly by iterating _effect.Parameters (Happens in DXShader)
+            _effect.GraphicsDevice._graphics.SetShaderProgram(_shaderProgram);
+
+            #warning We are only setting one hardcoded parameter here. Need to do this properly by iterating _effect.Parameters (Happens in Shader)
+
             float[] data;
             if (_effect.Parameters["WorldViewProj"] != null) 
                 data = (float[])_effect.Parameters["WorldViewProj"].Data;
@@ -182,24 +177,6 @@ namespace Microsoft.Xna.Framework.Graphics
             Sce.PlayStation.Core.Matrix4 matrix4 = PSSHelper.ToPssMatrix4(data);
             matrix4 = matrix4.Transpose (); //When .Data is set the matrix is transposed, we need to do it again to undo it
             _shaderProgram.SetUniformValue(0, ref matrix4);
-#elif OPENGL
-
-            // Apply the vertex shader.
-            _vertexShader.Apply(device, _shaderProgram, _effect.Parameters, _effect.ConstantBuffers);
-
-            // Apply the pixel shader.
-            _pixelShader.Apply(device, _shaderProgram, _effect.Parameters, _effect.ConstantBuffers);
-
-#elif DIRECTX
-
-            lock (device._d3dContext)
-            {
-                // Apply the shaders which will in turn set the 
-                // constant buffers and texture samplers.
-                _vertexShader.Apply(device, _effect.Parameters, _effect.ConstantBuffers);
-                _pixelShader.Apply(device, _effect.Parameters, _effect.ConstantBuffers);
-            }
-
 #endif
         }
 		

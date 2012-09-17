@@ -29,8 +29,22 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private ulong _stateKey;
 
+        private bool _dirty;
+
 #if DIRECTX
+
         private SharpDX.Direct3D11.Buffer _cbuffer;
+
+#elif OPENGL
+
+        private int _program = -1;
+        private int _location;
+
+        /// <summary>
+        /// A hash value which can be used to compare constant buffers.
+        /// </summary>
+        internal int HashKey { get; private set; }
+
 #endif
 
         public ConstantBuffer(ConstantBuffer cloneSource)
@@ -77,14 +91,24 @@ namespace Microsoft.Xna.Framework.Graphics
             desc.CpuAccessFlags = SharpDX.Direct3D11.CpuAccessFlags.None;
             _cbuffer = new SharpDX.Direct3D11.Buffer(graphicsDevice._d3dDevice, desc);
 
+#elif OPENGL 
+
+            var data = new byte[_parameters.Length];
+            for (var i = 0; i < _parameters.Length; i++)
+            {
+                data[i] = (byte)(_parameters[i] | _offsets[i]);
+            }
+
+            HashKey = MonoGame.Utilities.Hash.ComputeHash(data);
+
 #endif
         }
 
-        public void SetData(int offset, int rows, int columns, object data)
+        private void SetData(int offset, int rows, int columns, object data)
         {
             // TODO: Should i pass the element size in?
-            var elementSize = 4;
-            var rowSize = elementSize * 4;
+            const int elementSize = 4;
+            const int rowSize = elementSize * 4;
 
             // Take care of a single data type.
             if (rows == 1 && columns == 1)
@@ -115,45 +139,37 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        void SetParameter(int offset, EffectParameter param)
+        private void SetParameter(int offset, EffectParameter param)
         {
-            if (param.Data != null)
+            const int elementSize = 4;
+            const int rowSize = elementSize * 4;
+
+            if (param.Elements.Count > 0)
             {
-                int elementSize = 4;
-                var rowSize = elementSize * 4;
-
-                if (param.Elements.Count > 0)
+                foreach (var subparam in param.Elements)
                 {
-                    foreach (var subparam in param.Elements)
-                    {
-                        SetParameter(offset, subparam);
-                        //TODO: Sometimes directx decides to transpose matricies
-                        //to fit in fewer registers.
-                        offset += subparam.RowCount * rowSize;
-                    }
+                    SetParameter(offset, subparam);
+
+                    //TODO: Sometimes directx decides to transpose matricies
+                    //to fit in fewer registers.
+                    offset += subparam.RowCount * rowSize;
                 }
-                else
+            }
+            else if (param.Data != null)
+            {
+                switch (param.ParameterType)
                 {
-                    switch (param.ParameterType)
-                    {
-                        case EffectParameterType.Single:
-                            SetData(offset, param.RowCount, param.ColumnCount, param.Data);
-                            break;
+                    case EffectParameterType.Single:
+                        SetData(offset, param.RowCount, param.ColumnCount, param.Data);
+                        break;
 
-                        default:
-                            throw new NotImplementedException("Not supported!");
-                    }
+                    default:
+                        throw new NotImplementedException("Not supported!");
                 }
             }
         }
 
-#if DIRECTX
-        public void Apply(bool vertexStage, int slot, EffectParameterCollection parameters)
-#elif OPENGL
-        public unsafe void Apply(int program, EffectParameterCollection parameters)
-#elif PSS
-        public void Apply(ShaderProgram program, EffectParameterCollection parameters)
-#endif
+        public void Update(EffectParameterCollection parameters)
         {
             // TODO:  We should be doing some sort of dirty state 
             // testing here.
@@ -168,9 +184,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // over and we need to reset.
             if (_stateKey > EffectParameter.NextStateKey)
                 _stateKey = 0;
-
-            var dirty = false;
-
+            
             for (var p = 0; p < _parameters.Length; p++)
             {
                 var index = _parameters[p];
@@ -180,46 +194,79 @@ namespace Microsoft.Xna.Framework.Graphics
                     continue;
 
                 var offset = _offsets[p];
-                dirty = true;
+                _dirty = true;
 
                 SetParameter(offset, param);
             }
 
             _stateKey = EffectParameter.NextStateKey;
+        }
 
 #if DIRECTX
 
+        internal void Apply(GraphicsDevice device, ShaderStage stage, int slot)
+        {
             // NOTE: We make the assumption here that the caller has
             // locked the d3dContext for us to use.
             var d3dContext = graphicsDevice._d3dContext;
 
             // Update the hardware buffer.
-            if (dirty)
+            if (_dirty)
+            {
                 d3dContext.UpdateSubresource(_buffer, _cbuffer);
-
-            // Set the constant buffer.
-            if (vertexStage)
+                _dirty = false;
+            }
+            
+            // Set the buffer to the right stage.
+            if (stage == ShaderStage.Vertex)
                 d3dContext.VertexShader.SetConstantBuffer(slot, _cbuffer);
             else
                 d3dContext.PixelShader.SetConstantBuffer(slot, _cbuffer);
-#endif
+        }
 
-#if OPENGL
-            var location = GL.GetUniformLocation(program, _name);
+#elif OPENGL
+
+        public unsafe void Apply(GraphicsDevice device, int program)
+        {
+            // NOTE: We assume here the program has 
+            // already been set on the device.
+
+            // If the program changed then lookup the
+            // uniform again and apply the state.
+            if (_program != program)
+            {
+                var location = GL.GetUniformLocation(program, _name);
+                if (location == -1)
+                    return;
+
+                _program = program;
+                _location = location;
+                _dirty = true;
+            }
+
+            // If the buffer content hasn't changed then we're
+            // done... use the previously set uniform state.
+            if (!_dirty)
+                return;
+
             fixed (byte* bytePtr = _buffer)
             {
                 // TODO: We need to know the type of buffer float/int/bool
                 // and cast this correctly... else it doesn't work as i guess
                 // GL is checking the type of the uniform.
 
-                GL.Uniform4(location, _buffer.Length / 16, (float*)bytePtr);
+                GL.Uniform4(_location, _buffer.Length / 16, (float*)bytePtr);
             }
-#endif
+
+            // Clear the dirty flag.
+            _dirty = false;
 
 #if PSS
 #warning Unimplemented
-            //TODO
 #endif
         }
+
+#endif
+
     }
 }

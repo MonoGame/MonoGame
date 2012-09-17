@@ -40,12 +40,16 @@ namespace Microsoft.Xna.Framework.Graphics
 		protected VertexBuffer(GraphicsDevice graphicsDevice, VertexDeclaration vertexDeclaration, int vertexCount, BufferUsage bufferUsage, bool dynamic)
 		{
 			if (graphicsDevice == null)
-                throw new ArgumentNullException("Graphics Device Cannot Be Null");
+                throw new ArgumentNullException("Graphics Device Cannot Be null");
 
             this.graphicsDevice = graphicsDevice;
             this.VertexDeclaration = vertexDeclaration;
             this.VertexCount = vertexCount;
             this.BufferUsage = bufferUsage;
+
+            // Make sure the graphics device is assigned in the vertex declaration.
+            if (vertexDeclaration.GraphicsDevice != graphicsDevice)
+                vertexDeclaration.GraphicsDevice = graphicsDevice;
 
             _isDynamic = dynamic;
 
@@ -53,8 +57,8 @@ namespace Microsoft.Xna.Framework.Graphics
             // TODO: To use Immutable resources we would need to delay creation of 
             // the Buffer until SetData() and recreate them if set more than once.
 
-            SharpDX.Direct3D11.CpuAccessFlags accessflags = SharpDX.Direct3D11.CpuAccessFlags.None;
-            SharpDX.Direct3D11.ResourceUsage usage = SharpDX.Direct3D11.ResourceUsage.Default;
+            var accessflags = SharpDX.Direct3D11.CpuAccessFlags.None;
+            var usage = SharpDX.Direct3D11.ResourceUsage.Default;
 
             if (dynamic)
             {
