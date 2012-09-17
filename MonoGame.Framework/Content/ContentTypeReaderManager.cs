@@ -219,5 +219,11 @@ namespace Microsoft.Xna.Framework.Content
             if (!typeCreators.ContainsKey(typeString))
                 typeCreators.Add(typeString, createFunction);
         }
+
+        public static void ClearTypeCreators()
+        {
+            typeCreators.Clear();
+        }
+
     }
 }
