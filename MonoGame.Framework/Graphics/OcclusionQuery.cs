@@ -1,7 +1,12 @@
 using System;
 using System.Runtime.InteropServices;
 
+
+#if MAC
 using MonoMac.OpenGL;
+#elif OPENGL
+using OpenTK.Graphics.OpenGL;
+#endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
