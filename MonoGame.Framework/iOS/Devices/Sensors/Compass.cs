@@ -7,9 +7,6 @@ using MonoTouch.Foundation;
 
 namespace Microsoft.Devices.Sensors
 {
-    public class CalibrationEventArgs : EventArgs
-    { }
-
     public sealed class Compass : SensorBase<CompassReading>
     {
         private static CMMotionManager motionManager = new CMMotionManager();

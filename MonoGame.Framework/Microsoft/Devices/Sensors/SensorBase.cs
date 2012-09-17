@@ -5,6 +5,7 @@ namespace Microsoft.Devices.Sensors
 	public abstract class SensorBase<TSensorReading> : IDisposable
 		where TSensorReading : ISensorReading
 	{
+        bool disposed;
 		private TimeSpan timeBetweenUpdates;
 		public TSensorReading CurrentValue { get; protected set; }
 		public bool IsDataValid { get; protected set; }
@@ -24,13 +25,34 @@ namespace Microsoft.Devices.Sensors
 
 		public event EventHandler<SensorReadingEventArgs<TSensorReading>> CurrentValueChanged;
 		protected event EventHandler<EventArgs> TimeBetweenUpdatesChanged;
+        protected bool IsDisposed { get { return disposed; } }
 
 		public SensorBase()
 		{
 			this.TimeBetweenUpdates = TimeSpan.FromMilliseconds(2);
 		}
 
-		public virtual void Dispose() { }
+        ~SensorBase()
+        {
+            Dispose(false);
+        }
+
+		public void Dispose()
+        {
+            if (disposed)
+                throw new ObjectDisposedException(GetType().Name);
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Derived classes override this method to dispose of managed and unmanaged resources.
+        /// </summary>
+        /// <param name="disposing">True if unmanaged resources are to be disposed.</param>
+        protected virtual void Dispose(bool disposing)
+        {
+            disposed = true;
+        }
 
 		public abstract void Start();
 
