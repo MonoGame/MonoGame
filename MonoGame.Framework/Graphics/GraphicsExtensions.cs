@@ -21,6 +21,7 @@ using VertexPointerType = OpenTK.Graphics.ES20.All;
 using ColorPointerType = OpenTK.Graphics.ES20.All;
 using NormalPointerType = OpenTK.Graphics.ES20.All;
 using TexCoordPointerType = OpenTK.Graphics.ES20.All;
+using GetPName = OpenTK.Graphics.ES20.All;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -590,6 +591,17 @@ namespace Microsoft.Xna.Framework.Graphics
                     return 8;
             }
             return 0;
+        }
+
+        public static int GetBoundTexture2D()
+        {
+            var prevTexture = 0;
+#if GLES
+            GL.GetInteger(GetPName.TextureBinding2D, ref prevTexture);
+#else
+            GL.GetInteger(GetPName.TextureBinding2D, out prevTexture);
+#endif
+            return prevTexture;
         }
     }
 }
