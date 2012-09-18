@@ -48,6 +48,8 @@ using MonoMac.OpenGL;
 using OpenTK.Graphics.ES20;
 #elif OPENGL
 using OpenTK.Graphics.OpenGL;
+#elif WINRT
+using Windows.UI.Xaml.Controls;
 #endif
 
 #if ANDROID
@@ -223,6 +225,19 @@ namespace Microsoft.Xna.Framework
             // hardware feature level.
             _graphicsDevice.GraphicsProfile = GraphicsProfile;
 
+			// The graphics device can use a XAML panel or a window
+			// to created the default swapchain target.
+            if (SwapChainPanel != null)
+            {
+                _graphicsDevice.PresentationParameters.DeviceWindowHandle = IntPtr.Zero;
+                _graphicsDevice.PresentationParameters.SwapChainPanel = SwapChainPanel;
+            }
+            else
+            {
+                _graphicsDevice.PresentationParameters.DeviceWindowHandle = _game.Window.Handle;
+                _graphicsDevice.PresentationParameters.SwapChainPanel = null;
+            }
+
             // Update the back buffer.
             _graphicsDevice.CreateSizeDependentResources();
             _graphicsDevice.ApplyRenderTargets(null);
@@ -277,8 +292,21 @@ namespace Microsoft.Xna.Framework
             _graphicsDevice.PresentationParameters.DepthStencilFormat = _preferredDepthStencilFormat;
 
             _graphicsDevice.PresentationParameters.IsFullScreen = false;
-            _graphicsDevice.PresentationParameters.DeviceWindowHandle = _game.Window.Handle;
             _graphicsDevice.GraphicsProfile = GraphicsProfile;
+
+			// The graphics device can use a XAML panel or a window
+			// to created the default swapchain target.
+            if (SwapChainPanel != null)
+            {
+                _graphicsDevice.PresentationParameters.DeviceWindowHandle = IntPtr.Zero;
+                _graphicsDevice.PresentationParameters.SwapChainPanel = SwapChainPanel;
+            }
+            else
+            {
+                _graphicsDevice.PresentationParameters.DeviceWindowHandle = _game.Window.Handle;
+                _graphicsDevice.PresentationParameters.SwapChainPanel = null;
+            }
+
             _graphicsDevice.Initialize();
 #else
 
@@ -315,6 +343,10 @@ namespace Microsoft.Xna.Framework
         {
             IsFullScreen = !IsFullScreen;
         }
+
+#if WINRT
+        public SwapChainBackgroundPanel SwapChainPanel { get; set; }
+#endif 
 
         public GraphicsProfile GraphicsProfile { get; set; }
 
