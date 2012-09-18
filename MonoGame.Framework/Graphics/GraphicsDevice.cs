@@ -52,9 +52,11 @@ using MonoMac.OpenGL;
 using OpenTK.Graphics.OpenGL;
 #elif WINRT
 using SharpDX;
+using SharpDX.DXGI;
 using SharpDX.Direct3D;
 using Windows.Graphics.Display;
 using Windows.UI.Core;
+using Windows.UI.Xaml.Controls;
 #elif PSS
 using Sce.PlayStation.Core.Graphics;
 using PssVertexBuffer = Sce.PlayStation.Core.Graphics.VertexBuffer;
@@ -147,6 +149,7 @@ namespace Microsoft.Xna.Framework.Graphics
         protected SharpDX.Direct3D11.DepthStencilView _depthStencilView;
         protected SharpDX.Direct2D1.Bitmap1 _bitmapTarget;
         protected SharpDX.DXGI.SwapChain1 _swapChain;
+        protected SwapChainBackgroundPanel _swapChainPanel;
 
         // The active render targets.
         protected SharpDX.Direct3D11.RenderTargetView[] _currentRenderTargets = new SharpDX.Direct3D11.RenderTargetView[4];
@@ -474,6 +477,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			// Make sure all pending rendering commands are flushed.
             _d3dContext.Flush();
 
+            // We need presentation parameters to continue here.
             if (    PresentationParameters == null ||
                     (PresentationParameters.DeviceWindowHandle == IntPtr.Zero && PresentationParameters.SwapChainPanel == null))
             {
@@ -484,6 +488,17 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
 
                 return;
+            }
+
+            // Did we change swap panels?
+            if (PresentationParameters.SwapChainPanel != _swapChainPanel)
+            {
+                _swapChainPanel = null;
+                if (_swapChain != null)
+                {
+                    _swapChain.Dispose();
+                    _swapChain = null;
+                }                
             }
 
             var multisampleDesc = new SharpDX.DXGI.SampleDescription(1, 0);
@@ -501,19 +516,11 @@ namespace Microsoft.Xna.Framework.Graphics
             // If the swap chain already exists... update it.
             if (_swapChain != null)
             {
-                _swapChain.ResizeBuffers(2,
+                _swapChain.ResizeBuffers(   2,
                                             PresentationParameters.BackBufferWidth,
                                             PresentationParameters.BackBufferHeight,
-                                            format,
-                                            0); // SharpDX.DXGI.SwapChainFlags
-
-                /*
-                if (PresentationParameters.SwapChainPanel != null)
-                {
-                    using (var nativePanel = ComObject.As<SharpDX.DXGI.ISwapChainBackgroundPanelNative>(PresentationParameters.SwapChainPanel))
-                        nativePanel.SwapChain = _swapChain;
-                }
-                */
+                                            format, 
+                                            SwapChainFlags.None);
             }
 
             // Otherwise, create a new swap chain.
@@ -554,6 +561,8 @@ namespace Microsoft.Xna.Framework.Graphics
                     }
                     else
                     {
+                        _swapChainPanel = PresentationParameters.SwapChainPanel;
+
                         using (var nativePanel = ComObject.As<SharpDX.DXGI.ISwapChainBackgroundPanelNative>(PresentationParameters.SwapChainPanel))
                         {
                             _swapChain = dxgiFactory2.CreateSwapChainForComposition(_d3dDevice, ref desc, null);
