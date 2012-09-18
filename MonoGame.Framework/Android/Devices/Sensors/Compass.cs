@@ -1,8 +1,11 @@
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
 using System;
-using Microsoft.Xna.Framework;
 using Android.Content;
 using Android.Hardware;
-using System.Collections.Generic;
+using Microsoft.Xna.Framework;
 
 namespace Microsoft.Devices.Sensors
 {
@@ -19,7 +22,6 @@ namespace Microsoft.Devices.Sensors
         SensorState state;
         bool started = false;
         static int instanceCount;
-        static List<Compass> startedSensors = new List<Compass>(MaxSensorCount);
 
         /// <summary>
         /// Gets whether the device on which the application is running supports the compass sensor.
