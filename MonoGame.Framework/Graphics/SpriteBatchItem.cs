@@ -7,16 +7,16 @@ namespace Microsoft.Xna.Framework.Graphics
 		public Texture2D Texture;
 		public float Depth;
 
-        public VertexPosition2ColorTexture vertexTL;
-		public VertexPosition2ColorTexture vertexTR;
-		public VertexPosition2ColorTexture vertexBL;
-		public VertexPosition2ColorTexture vertexBR;
+        public VertexPositionColorTexture vertexTL;
+		public VertexPositionColorTexture vertexTR;
+		public VertexPositionColorTexture vertexBL;
+		public VertexPositionColorTexture vertexBR;
 		public SpriteBatchItem ()
 		{
-			vertexTL = new VertexPosition2ColorTexture();
-            vertexTR = new VertexPosition2ColorTexture();
-            vertexBL = new VertexPosition2ColorTexture();
-            vertexBR = new VertexPosition2ColorTexture();            
+			vertexTL = new VertexPositionColorTexture();
+            vertexTR = new VertexPositionColorTexture();
+            vertexBL = new VertexPositionColorTexture();
+            vertexBR = new VertexPositionColorTexture();            
 		}
 		
 		public void Set ( float x, float y, float w, float h, Color color, Vector2 texCoordTL, Vector2 texCoordBR )
