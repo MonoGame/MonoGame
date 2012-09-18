@@ -77,6 +77,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input.Touch;
 using Windows.ApplicationModel.Activation;
 using Windows.UI.ViewManagement;
+using Windows.UI.Xaml.Media;
 
 namespace Microsoft.Xna.Framework
 {
@@ -169,14 +170,16 @@ namespace Microsoft.Xna.Framework
 
         public override void StartRunLoop()
         {
-            throw new NotImplementedException();
+            CompositionTarget.Rendering += (o, a) =>
+            {
+                MetroGameWindow.Instance.Tick();
+            };
         }
         
         public override void Exit()
         {
             if (!MetroGameWindow.Instance.IsExiting)
             {
-                //Net.NetworkSession.Exit();
                 MetroGameWindow.Instance.IsExiting = true;
             }
         }

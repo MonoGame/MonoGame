@@ -338,7 +338,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 //
                 // This just might be a bug!
 
-				spriteBatch.Draw(
+				spriteBatch.DrawInternal(
                     _texture, destRect, currentGlyph.BoundsInTexture,
 					color, rotation, Vector2.Zero, effect, depth);
 			}
