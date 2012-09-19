@@ -56,7 +56,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         short[] _index;
 
-		VertexPosition2ColorTexture[] _vertexArray;
+		VertexPositionColorTexture[] _vertexArray;
 
 		public SpriteBatcher (GraphicsDevice device)
 		{
@@ -76,7 +76,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 _index[i * 6 + 5] = (short)(i * 4 + 2);
             }
 
-			_vertexArray = new VertexPosition2ColorTexture[4*InitialVertexArraySize];
+			_vertexArray = new VertexPositionColorTexture[4*InitialVertexArraySize];
 		}
 		
 		public SpriteBatchItem CreateBatchItem()
@@ -183,7 +183,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 _index[i * 6 + 5] = (short)(i * 4 + 2);
             }
 
-			_vertexArray = new VertexPosition2ColorTexture[4*newCount];
+			_vertexArray = new VertexPositionColorTexture[4*newCount];
 		}
 
 		void FlushVertexArray( int start, int end )
@@ -201,7 +201,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 _index, 
                 0, 
                 (vertexCount / 4) * 2, 
-                VertexPosition2ColorTexture.VertexDeclaration);
+                VertexPositionColorTexture.VertexDeclaration);
 		}
 	}
 }
