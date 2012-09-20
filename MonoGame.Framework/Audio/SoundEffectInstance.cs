@@ -202,8 +202,12 @@ namespace Microsoft.Xna.Framework.Audio
 			{
 				if (soundState == SoundState.Paused)
 				{
+#if ANDROID
 					_sound.Resume(_streamId);
-				}
+#else
+                    _sound.Resume();
+#endif
+                }
 				soundState = SoundState.Playing;
  			}
 #endif
@@ -218,9 +222,13 @@ namespace Microsoft.Xna.Framework.Audio
 #else
 			if ( _sound != null )
 			{
+#if ANDROID
 				_sound.Stop(_streamId);
 				_streamId = -1;
-				soundState = SoundState.Stopped;
+#else
+                _sound.Stop();
+#endif
+                soundState = SoundState.Stopped;
 			}
 #endif
         }
@@ -233,8 +241,12 @@ namespace Microsoft.Xna.Framework.Audio
 #else
 			if ( _sound != null )
 			{
-				_sound.Stop(_streamId);
-				_streamId = -1;
+#if ANDROID
+                _sound.Stop(_streamId);
+                _streamId = -1;
+#else
+                _sound.Stop();
+#endif
 				soundState = SoundState.Stopped;
 			}
 #endif
@@ -457,16 +469,24 @@ namespace Microsoft.Xna.Framework.Audio
                     return SoundState.Paused;
 
                 return SoundState.Playing;                                
+#elif ANDROID
+                // Android SoundPool can't tell us when a sound is finished playing.
+                // TODO: Remove this code when OpenAL for Android is implemented
+                if (_sound != null && IsLooped)
+                {
+                    // Looping sounds use our stored state
+                    return soundState;
+                }
+                else
+                {
+                    // Non looping sounds always return Stopped
+                    return SoundState.Stopped;
+                }
 #else
-                // Since Android SoundPool doesn't yet support getting the state, it's better
-                // to rely on our instance state. At least it will be correct for looping sounds
-#if !ANDROID
                 if (_sound != null && soundState == SoundState.Playing && !_sound.Playing) 
                 {
                     soundState = SoundState.Stopped;
                 }
-#endif
-                return soundState;
 #endif
 			} 
 		}
