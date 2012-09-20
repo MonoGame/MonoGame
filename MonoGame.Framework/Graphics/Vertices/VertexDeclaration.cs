@@ -126,54 +126,29 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 
 #if OPENGL
-		internal void Apply(IntPtr offset)
+		internal void Apply(Shader shader, IntPtr offset)
 		{
 
-            // TODO: This is executed on every dr_enabledVertexAttributesaw call... can we not
+            // TODO: This is executed on every draw call... can we not
             // allocate a vertex declaration once and just re-apply it?
 
 			var enabledAttributes = new bool[16];
             foreach (var ve in _elements) 
             {
 				var elementOffset = (IntPtr)(offset.ToInt64 () + ve.Offset);
-				var attributeLocation = -1;
-				
-				switch (ve.VertexElementUsage) 
+				var attributeLocation = shader.GetAttribLocation(ve.VertexElementUsage, ve.UsageIndex);
+                // XNA appears to ignore usages it can't find a match for, so we will do the same
+                if (attributeLocation >= 0)
                 {
-				case VertexElementUsage.Position:
-					attributeLocation = GraphicsDevice.attributePosition + ve.UsageIndex;
-					break;
-				case VertexElementUsage.Normal:
-					attributeLocation = GraphicsDevice.attributeNormal;
-					break;
-				case VertexElementUsage.Color:
-					attributeLocation = GraphicsDevice.attributeColor;
-					break;
-				case VertexElementUsage.BlendIndices:
-					attributeLocation = GraphicsDevice.attributeBlendIndicies;
-					break;
-				case VertexElementUsage.BlendWeight:
-					attributeLocation = GraphicsDevice.attributeBlendWeight;
-					break;
-				case VertexElementUsage.TextureCoordinate:
-					attributeLocation = GraphicsDevice.attributeTexCoord + ve.UsageIndex;
-					break;
-				case VertexElementUsage.Tangent:
-					attributeLocation = GraphicsDevice.attributeTangent;
-					break;
-				case VertexElementUsage.Binormal:
-					attributeLocation = GraphicsDevice.attributeBinormal;
-					break;
-				default:
-					throw new NotImplementedException();
-				}
-				GL.VertexAttribPointer(attributeLocation,
-				                       ve.VertexElementFormat.OpenGLNumberOfElements(),
-				                       ve.VertexElementFormat.OpenGLVertexAttribPointerType(),
-                                       ve.OpenGLVertexAttribNormalized(),
-				                       this.VertexStride,
-				                       elementOffset);
-				enabledAttributes[attributeLocation] = true;
+                    GL.VertexAttribPointer(attributeLocation,
+                                           ve.VertexElementFormat.OpenGLNumberOfElements(),
+                                           ve.VertexElementFormat.OpenGLVertexAttribPointerType(),
+                                           ve.OpenGLVertexAttribNormalized(),
+                                           this.VertexStride,
+                                           elementOffset);
+                    GraphicsExtensions.CheckGLError();
+                    enabledAttributes[attributeLocation] = true;
+                }
 			}
 			
             graphicsDevice.SetVertexAttributeArray(enabledAttributes);

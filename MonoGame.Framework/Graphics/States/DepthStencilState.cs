@@ -93,11 +93,15 @@ namespace Microsoft.Xna.Framework.Graphics
         internal void ApplyState(GraphicsDevice device)
         {
             if (!DepthBufferEnable)
+            {
                 GL.Disable(EnableCap.DepthTest);
+                GraphicsExtensions.CheckGLError();
+            }
             else
             {
                 // enable Depth Buffer
                 GL.Enable(EnableCap.DepthTest);
+                GraphicsExtensions.CheckGLError();
 
                 DepthFunction func;
                 switch (DepthBufferFunction)
@@ -130,16 +134,22 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
 
                 GL.DepthFunc(func);
+                GraphicsExtensions.CheckGLError();
             }
 
             GL.DepthMask(DepthBufferWriteEnable);
+            GraphicsExtensions.CheckGLError();
 
             if (!StencilEnable)
+            {
                 GL.Disable(EnableCap.StencilTest);
+                GraphicsExtensions.CheckGLError();
+            }
             else
             {
                 // enable Stencil
                 GL.Enable(EnableCap.StencilTest);
+                GraphicsExtensions.CheckGLError();
 
                 // Set color mask - not needed
                 //GL.ColorMask(false, false, false, false); //Disable drawing colors to the screen
@@ -175,10 +185,12 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
 
                 GL.StencilFunc(func, ReferenceStencil, StencilMask);
+                GraphicsExtensions.CheckGLError();
 
-                GL.StencilOp(   GetStencilOp(StencilFail), 
+                GL.StencilOp(GetStencilOp(StencilFail),
                                 GetStencilOp(StencilDepthBufferFail),
                                 GetStencilOp(StencilPass));
+                GraphicsExtensions.CheckGLError();
             }
         }
 

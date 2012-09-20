@@ -233,16 +233,22 @@ namespace Microsoft.Xna.Framework.Graphics
 			{
 			case TextureFilter.Point:
 				GL.TexParameter(target, TextureParameterName.TextureMinFilter, (int)(useMipmaps ? TextureMinFilter.NearestMipmapNearest : TextureMinFilter.Nearest));
+                GraphicsExtensions.CheckGLError();
 				GL.TexParameter(target, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
+                GraphicsExtensions.CheckGLError();
 				break;
 			case TextureFilter.Linear:
 				GL.TexParameter(target, TextureParameterName.TextureMinFilter, (int)(useMipmaps ? TextureMinFilter.LinearMipmapLinear : TextureMinFilter.Linear));
+                GraphicsExtensions.CheckGLError();
 				GL.TexParameter(target, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+                GraphicsExtensions.CheckGLError();
 				break;
 			case TextureFilter.Anisotropic:
 				// TODO: Requires EXT_texture_filter_anisotropic. Use linear filtering for now.
 				GL.TexParameter(target, TextureParameterName.TextureMinFilter, (int)(useMipmaps ? TextureMinFilter.LinearMipmapLinear : TextureMinFilter.Linear));
+                GraphicsExtensions.CheckGLError();
 				GL.TexParameter(target, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+                GraphicsExtensions.CheckGLError();
 				break;
 			default:
 				throw new NotImplementedException();
@@ -250,8 +256,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			// Set up texture addressing.
 			GL.TexParameter(target, TextureParameterName.TextureWrapS, (int)GetWrapMode(AddressU));
-			GL.TexParameter(target, TextureParameterName.TextureWrapT, (int)GetWrapMode(AddressV));
-		}
+            GraphicsExtensions.CheckGLError();
+            GL.TexParameter(target, TextureParameterName.TextureWrapT, (int)GetWrapMode(AddressV));
+            GraphicsExtensions.CheckGLError();
+        }
 
 		private int GetWrapMode(TextureAddressMode textureAddressMode)
 		{

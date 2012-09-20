@@ -236,6 +236,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (_program != program)
             {
                 var location = GL.GetUniformLocation(program, _name);
+                GraphicsExtensions.CheckGLError();
                 if (location == -1)
                     return;
 
@@ -256,6 +257,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 // GL is checking the type of the uniform.
 
                 GL.Uniform4(_location, _buffer.Length / 16, (float*)bytePtr);
+                GraphicsExtensions.CheckGLError();
             }
 
             // Clear the dirty flag.
