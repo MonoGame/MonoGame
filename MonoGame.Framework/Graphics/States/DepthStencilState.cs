@@ -7,6 +7,8 @@ using GLStencilFunction = MonoMac.OpenGL.StencilFunction;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
 using GLStencilFunction = OpenTK.Graphics.OpenGL.StencilFunction;
+#elif PSS
+using Sce.PlayStation.Core.Graphics;
 #elif GLES
 using OpenTK.Graphics.ES20;
 using EnableCap = OpenTK.Graphics.ES20.All;
@@ -322,7 +324,12 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
 #endif // DIRECTX
-		
+#if PSS
+        internal void ApplyState(GraphicsDevice device)
+        {
+            #warning Unimplemented
+        }
+#endif
 	}
 }
 

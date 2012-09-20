@@ -110,7 +110,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			return b.Depth.CompareTo(a.Depth);
 		}
 		
-		public void DrawBatch ( SpriteSortMode sortMode, SamplerState samplerState)
+		public void DrawBatch ( SpriteSortMode sortMode )
 		{
 			// nothing to do
 			if ( _batchItemList.Count == 0 )
