@@ -145,14 +145,6 @@ namespace Microsoft.Xna.Framework.Graphics
             return pitch;
         }
 
-#if OPENGL
-		internal virtual void Activate()
-        {
-            GL.ActiveTexture(glTextureUnit);
-			GL.BindTexture(glTarget, this.glTexture);
-        }
-#endif
-
 #if DIRECTX
 
         internal SharpDX.Direct3D11.ShaderResourceView GetShaderResourceView()
@@ -182,7 +174,8 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
 #elif OPENGL
-            GL.DeleteTextures(1, ref glTexture);		
+            GL.DeleteTextures(1, ref glTexture);
+            GraphicsExtensions.CheckGLError();
 #endif
             base.Dispose();
 		}
