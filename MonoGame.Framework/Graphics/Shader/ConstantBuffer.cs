@@ -224,10 +224,11 @@ namespace Microsoft.Xna.Framework.Graphics
                 d3dContext.PixelShader.SetConstantBuffer(slot, _cbuffer);
         }
 
-#elif OPENGL
+#elif OPENGL || PSS
 
         public unsafe void Apply(GraphicsDevice device, int program)
         {
+#if OPENGL
             // NOTE: We assume here the program has 
             // already been set on the device.
 
@@ -262,7 +263,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Clear the dirty flag.
             _dirty = false;
-
+#endif
+            
 #if PSS
 #warning Unimplemented
 #endif
