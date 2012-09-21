@@ -130,7 +130,6 @@
     <Compile Include="Graphics\SpriteBlendMode.cs" />
     <Compile Include="Graphics\GraphicsProfile.cs" />
     <Compile Include="Graphics\SpriteSortMode.cs" />
-    <Compile Include="Graphics\RenderTarget.cs" />
     <Compile Include="Graphics\SurfaceFormat.cs" />
     <Compile Include="Graphics\MultiSampleType.cs" />
     <Compile Include="Graphics\RenderTargetUsage.cs" />
@@ -307,8 +306,10 @@
     <Compile Include="Audio\AudioCategory.cs" />
     <Compile Include="Graphics\SpriteBatch.cs" />
     <Compile Include="Graphics\TextureCube.cs" />
-    <Compile Include="Graphics\Effect\MGFXShader.cs" />
-    <Compile Include="Graphics\Effect\Shader.cs" />
+    <Compile Include="Graphics\Shader\ConstantBuffer.cs" />
+    <Compile Include="Graphics\Shader\ConstantBufferCollection.cs" />
+    <Compile Include="Graphics\Shader\Shader.cs" />
+    <Compile Include="Graphics\Shader\ShaderStage.cs" />
     <Compile Include="Graphics\Vertices\IndexBuffer.cs" />
     <Compile Include="Graphics\Vertices\VertexBuffer.cs" />
     <Compile Include="LaunchParameters.cs" />
@@ -340,12 +341,13 @@
     <Compile Include="Content\ContentReaders\EffectReader.cs" />
     <Compile Include="PSSuite\PSSHelper.cs" />
     <Compile Include="PSSuite\PSSExtensions.cs" />
-    <Compile Include="Graphics\Effect\ConstantBuffer.cs" />
     <Compile Include="PSSuite\Graphics\SpriteBatcher.cs" />
     <Compile Include="Media\MediaQueue.cs" />
     <Compile Include="Media\SongCollection.cs" />
     <Compile Include="Media\Song.cs" />
     <Compile Include="PSSuite\Media\PSSuiteSong.cs" />
+    <Compile Include="Graphics\Shader\ShaderProgramCache.cs" />
+    <Compile Include="Utilities\Hash.cs" />
     <Compile Include="Graphics\Model.cs" />
     <Compile Include="Graphics\ModelBone.cs" />
     <Compile Include="Graphics\ModelBoneCollection.cs" />
@@ -382,13 +384,17 @@
   <ItemGroup>
     <EmbeddedShaderProgram Include="PSSuite\Graphics\Resources\BasicEffect.fcg" />
     <EmbeddedShaderProgram Include="PSSuite\Graphics\Resources\BasicEffect.vcg" />
-    <EmbeddedShaderProgram Include="PSSuite\Graphics\Resources\Texture.fcg" />
-    <EmbeddedShaderProgram Include="PSSuite\Graphics\Resources\Texture.vcg" />
+    <EmbeddedShaderProgram Include="PSSuite\Graphics\Resources\SpriteEffect.fcg" />
+    <EmbeddedShaderProgram Include="PSSuite\Graphics\Resources\SpriteEffect.vcg" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.PSMobile.csproj">
       <Project>{167676EE-E2D5-440A-BB2B-EFBD02BC8493}</Project>
       <Name>Lidgren.Network.PSMobile</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ShaderProgram Include="PSSuite\Graphics\Resources\AlphaTestEffect.fcg" />
+    <ShaderProgram Include="PSSuite\Graphics\Resources\AlphaTestEffect.vcg" />
   </ItemGroup>
 </Project>

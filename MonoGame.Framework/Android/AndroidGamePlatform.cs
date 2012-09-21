@@ -82,6 +82,7 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Media;
+using Android.Hardware;
 
 namespace Microsoft.Xna.Framework
 {
@@ -170,9 +171,6 @@ namespace Microsoft.Xna.Framework
 
         public override bool BeforeRun()
         {
-            // Get the Accelerometer going
-            Accelerometer.SetupAccelerometer();
-
             // Run it as fast as we can to allow for more response on threaded GPU resource creation
             Window.Run();
 
@@ -204,7 +202,6 @@ namespace Microsoft.Xna.Framework
             {
                 IsActive = true;
                 Window.Resume();
-                Accelerometer.Resume();
                 Sound.ResumeAll();
                 MediaPlayer.Resume();
 				if(!Window.IsFocused)
@@ -220,7 +217,6 @@ namespace Microsoft.Xna.Framework
                 IsActive = false;
                 Window.Pause();
 				Window.ClearFocus();
-                Accelerometer.Pause();
                 Sound.PauseAll();
                 MediaPlayer.Pause();
             }
