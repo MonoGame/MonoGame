@@ -277,6 +277,7 @@ namespace Microsoft.Xna.Framework
             _graphicsDevice.PresentationParameters.IsFullScreen = false;
             _graphicsDevice.GraphicsProfile = GraphicsProfile;
 
+#if WINRT
 			// The graphics device can use a XAML panel or a window
 			// to created the default swapchain target.
             if (SwapChainPanel != null)
@@ -289,6 +290,9 @@ namespace Microsoft.Xna.Framework
                 _graphicsDevice.PresentationParameters.DeviceWindowHandle = _game.Window.Handle;
                 _graphicsDevice.PresentationParameters.SwapChainPanel = null;
             }
+#else
+            _graphicsDevice.PresentationParameters.DeviceWindowHandle = _game.Window.Handle;
+#endif
 
             _graphicsDevice.Initialize();
 #else
