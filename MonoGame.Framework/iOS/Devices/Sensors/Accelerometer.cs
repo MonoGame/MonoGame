@@ -27,7 +27,7 @@ namespace Microsoft.Devices.Sensors
 		public Accelerometer()
 		{
 			if (!IsSupported)
-				throw new SensorFailedException();
+				throw new SensorFailedException("Accelerometer is not supported");
 
 			this.TimeBetweenUpdatesChanged += this.UpdateInterval;
 			readingChanged += ReadingChangedHandler;
@@ -43,7 +43,7 @@ namespace Microsoft.Devices.Sensors
 				state = SensorState.Ready;
 			}
 			else
-				throw new SensorFailedException();
+				throw new SensorFailedException("Accelerometer already started");
 		}
 
 		public override void Stop()

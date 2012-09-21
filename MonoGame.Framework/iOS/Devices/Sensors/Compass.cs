@@ -30,7 +30,7 @@ namespace Microsoft.Devices.Sensors
         public Compass()
         {
             if (!IsSupported)
-                throw new SensorFailedException();
+                throw new SensorFailedException("Compass not supported");
 
             this.TimeBetweenUpdatesChanged += this.UpdateInterval;
             readingChanged += ReadingChangedHandler;
@@ -46,7 +46,7 @@ namespace Microsoft.Devices.Sensors
                 state = SensorState.Ready;
             }
             else
-                throw new SensorFailedException();
+                throw new SensorFailedException("Compass already started");
         }
 
         public override void Stop()
