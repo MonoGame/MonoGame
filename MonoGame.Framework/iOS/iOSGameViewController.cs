@@ -111,12 +111,7 @@ namespace Microsoft.Xna.Framework {
 
 		public override bool ShouldAutorotateToInterfaceOrientation (UIInterfaceOrientation toInterfaceOrientation)
 		{
-			DisplayOrientation supportedOrientations;
-			if (SupportedOrientations == DisplayOrientation.Default) {
-				supportedOrientations = GetDefaultSupportedOrientations();
-			} else {
-				supportedOrientations = OrientationConverter.Normalize (SupportedOrientations);
-			}
+            DisplayOrientation supportedOrientations = OrientationConverter.Normalize (SupportedOrientations);
 			var toOrientation = OrientationConverter.ToDisplayOrientation (toInterfaceOrientation);
 			return (toOrientation & supportedOrientations) == toOrientation;
 		}
@@ -132,19 +127,24 @@ namespace Microsoft.Xna.Framework {
 
         public override UIInterfaceOrientationMask GetSupportedInterfaceOrientations ()
         {
-            return UIInterfaceOrientationMask.Landscape;
+            return OrientationConverter.ToUIInterfaceOrientationMask(this.SupportedOrientations);
         }
         
         public override bool ShouldAutorotate ()
         {
             return true;
         }
-        
-        public override UIInterfaceOrientation PreferredInterfaceOrientationForPresentation()
-        {
-            return UIInterfaceOrientation.LandscapeRight;
-        }
 
+        public override UIInterfaceOrientation PreferredInterfaceOrientationForPresentation ()
+        {
+            DisplayOrientation supportedOrientations = OrientationConverter.Normalize(SupportedOrientations);
+            if ((supportedOrientations & DisplayOrientation.LandscapeRight) != 0)
+                return UIInterfaceOrientation.LandscapeRight;
+            else if ((supportedOrientations & DisplayOrientation.LandscapeLeft) != 0)
+                return UIInterfaceOrientation.LandscapeLeft;
+            else
+                return UIInterfaceOrientation.Portrait;
+        }
 		
 		public override void TouchesBegan (NSSet touches, UIEvent evt)
 		{
