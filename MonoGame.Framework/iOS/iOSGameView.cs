@@ -251,8 +251,8 @@ namespace Microsoft.Xna.Framework {
 			if (gds != null && gds.GraphicsDevice != null)
 			{
                 var pp = gds.GraphicsDevice.PresentationParameters;
-                pp.BackBufferHeight = (int) (unscaledViewportHeight * Layer.ContentsScale);
-                pp.BackBufferWidth = (int)(unscaledViewportWidth * Layer.ContentsScale);
+                pp.BackBufferHeight = (int) (Math.Min (unscaledViewportHeight,unscaledViewportWidth) * Layer.ContentsScale);
+                pp.BackBufferWidth = (int)(Math.Max (unscaledViewportHeight,unscaledViewportWidth) * Layer.ContentsScale);
 
 				gds.GraphicsDevice.Viewport = new Viewport (
 					0, 0,

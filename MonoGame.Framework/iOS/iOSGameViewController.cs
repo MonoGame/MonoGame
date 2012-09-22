@@ -128,7 +128,23 @@ namespace Microsoft.Xna.Framework {
 			var handler = InterfaceOrientationChanged;
 			if (handler != null)
 				handler (this, EventArgs.Empty);
-		}
+        }       
+
+        public override UIInterfaceOrientationMask GetSupportedInterfaceOrientations ()
+        {
+            return UIInterfaceOrientationMask.Landscape;
+        }
+        
+        public override bool ShouldAutorotate ()
+        {
+            return true;
+        }
+        
+        public override UIInterfaceOrientation PreferredInterfaceOrientationForPresentation()
+        {
+            return UIInterfaceOrientation.LandscapeRight;
+        }
+
 		
 		public override void TouchesBegan (NSSet touches, UIEvent evt)
 		{
