@@ -1568,16 +1568,16 @@ namespace Microsoft.Xna.Framework.Graphics
 
             var startVertex = buffer.UserOffset;
 
-            var copyCount = vertexCount - vertexOffset;
-            if ((copyCount + buffer.UserOffset) < buffer.VertexCount)
+
+            if ((vertexCount + buffer.UserOffset) < buffer.VertexCount)
             {
-                buffer.UserOffset += copyCount;
-                buffer.SetData(startVertex * vertexDecl.VertexStride, vertexData, vertexOffset, copyCount, SetDataOptions.NoOverwrite);
+                buffer.UserOffset += vertexCount;
+                buffer.SetData(startVertex * vertexDecl.VertexStride, vertexData, vertexOffset, vertexCount, SetDataOptions.NoOverwrite);
             }
             else
             {
-                buffer.UserOffset = copyCount;
-                buffer.SetData(vertexData, vertexOffset, copyCount, SetDataOptions.Discard);
+                buffer.UserOffset = vertexCount;
+                buffer.SetData(vertexData, vertexOffset, vertexCount, SetDataOptions.Discard);
                 startVertex = 0;
             }
 
@@ -1604,17 +1604,16 @@ namespace Microsoft.Xna.Framework.Graphics
 
             var startIndex = buffer.UserOffset;
 
-            var copyCount = indexCount - indexOffset;
-            if ((copyCount + buffer.UserOffset) < buffer.IndexCount)
+            if ((indexCount + buffer.UserOffset) < buffer.IndexCount)
             {
-                buffer.UserOffset += copyCount;
-                buffer.SetData(startIndex * 2, indexData, indexOffset, copyCount, SetDataOptions.NoOverwrite);
+                buffer.UserOffset += indexCount;
+                buffer.SetData(startIndex * 2, indexData, indexOffset, indexCount, SetDataOptions.NoOverwrite);
             }
             else
             {
                 startIndex = 0;
-                buffer.UserOffset = copyCount;
-                buffer.SetData(indexData, indexOffset, copyCount, SetDataOptions.Discard);
+                buffer.UserOffset = indexCount;
+                buffer.SetData(indexData, indexOffset, indexCount, SetDataOptions.Discard);
             }
 
             Indices = buffer;
