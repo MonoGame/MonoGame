@@ -365,6 +365,9 @@ namespace Microsoft.Xna.Framework.Graphics
             // the state to be reapplied.
             Textures.Clear();
             SamplerStates.Clear();
+            
+            // Ensure the vertex attributes are reset
+            _enabledVertexAttributes.Clear();
 
             // Set the default scissor rect.
             _scissorRectangleDirty = true;
