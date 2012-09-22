@@ -167,7 +167,6 @@
     <Compile Include="Graphics\SpriteBlendMode.cs" />
     <Compile Include="Graphics\GraphicsProfile.cs" />
     <Compile Include="Graphics\SpriteSortMode.cs" />
-    <Compile Include="Graphics\RenderTarget.cs" />
     <Compile Include="Graphics\SurfaceFormat.cs" />
     <Compile Include="Graphics\MultiSampleType.cs" />
     <Compile Include="Graphics\RenderTargetUsage.cs" />
@@ -358,6 +357,10 @@
     <Compile Include="Content\ContentReaders\EffectReader.cs" />
     <Compile Include="Graphics\Effect\EffectAnnotation.cs" />
     <Compile Include="Graphics\Effect\EffectAnnotationCollection.cs" />
+	<Compile Include="Graphics\Shader\ConstantBufferCollection.cs" />
+    <Compile Include="Graphics\Shader\ConstantBuffer.cs" />
+    <Compile Include="Graphics\Shader\Shader.cs" />
+    <Compile Include="Graphics\Shader\ShaderStage.cs" />
     <Compile Include="Graphics\Effect\BasicEffect.cs" />
     <Compile Include="GamerServices\GuideAlreadyVisibleException.cs" />
     <Compile Include="GamerServices\GamerServicesDispatcher.cs" />
@@ -374,7 +377,6 @@
     <Compile Include="MacOS\Audio\SoundEffect.cs" />
     <Compile Include="MacOS\Audio\SoundEffectInstance.cs" />
     <Compile Include="PrimaryThreadLoader.cs" />
-    <Compile Include="Graphics\States\GLStateManager.cs" />
     <Compile Include="Graphics\Effect\EffectPass.cs" />
     <Compile Include="Graphics\GraphicsExtensions.cs" />
     <Compile Include="LaunchParameters.cs" />
@@ -417,10 +419,6 @@
     <Compile Include="Media\SongCollection.cs" />
     <Compile Include="Desktop\Audio\OALSoundBuffer.cs" />
     <Compile Include="Desktop\Audio\OpenALSoundController.cs" />
-    <Compile Include="Graphics\Effect\ConstantBuffer.cs" />
-    <Compile Include="Graphics\Effect\MGFXShader.cs" />
-    <Compile Include="Graphics\Effect\Shader.cs" />
-    <Compile Include="Graphics\Effect\Shader.ogl.cs" />
     <Compile Include="Content\ContentReaders\EffectMaterialReader.cs" />
     <Compile Include="Graphics\Effect\EffectMaterial.cs" />
     <Compile Include="Content\ContentReaders\ExternalReferenceReader.cs" />
@@ -429,6 +427,8 @@
     <Compile Include="Media\MediaLibrary.cs" />
     <Compile Include="Media\MediaSource.cs" />
     <Compile Include="FrameworkDispatcher.cs" />
+    <Compile Include="Graphics\Shader\ShaderProgramCache.cs" />
+    <Compile Include="Utilities\Hash.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />

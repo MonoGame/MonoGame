@@ -38,11 +38,8 @@
 // */
 // #endregion License
 // 
-using System;
-using System.Runtime.InteropServices;
+
 using System.Collections.Generic;
-using System.Text;
-using Microsoft.Xna.Framework;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -50,14 +47,16 @@ namespace Microsoft.Xna.Framework.Graphics
 	{
 		private const int InitialBatchSize = 256;
 		private const int InitialVertexArraySize = 256;
-		List<SpriteBatchItem> _batchItemList;
-		Queue<SpriteBatchItem> _freeBatchItemQueue;
 
-        GraphicsDevice _device;
+	    readonly List<SpriteBatchItem> _batchItemList;
+
+	    readonly Queue<SpriteBatchItem> _freeBatchItemQueue;
+
+	    readonly GraphicsDevice _device;
 
         short[] _index;
 
-		VertexPosition2ColorTexture[] _vertexArray;
+		VertexPositionColorTexture[] _vertexArray;
 
 		public SpriteBatcher (GraphicsDevice device)
 		{
@@ -67,7 +66,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			_freeBatchItemQueue = new Queue<SpriteBatchItem>(InitialBatchSize);
 
             _index = new short[6 * InitialVertexArraySize];
-            for (int i = 0; i < InitialVertexArraySize; i++)
+            for (var i = 0; i < InitialVertexArraySize; i++)
             {
                 _index[i * 6 + 0] = (short)(i * 4);
                 _index[i * 6 + 1] = (short)(i * 4 + 1);
@@ -77,7 +76,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 _index[i * 6 + 5] = (short)(i * 4 + 2);
             }
 
-			_vertexArray = new VertexPosition2ColorTexture[4*InitialVertexArraySize];
+			_vertexArray = new VertexPositionColorTexture[4*InitialVertexArraySize];
 		}
 		
 		public SpriteBatchItem CreateBatchItem()
@@ -90,23 +89,23 @@ namespace Microsoft.Xna.Framework.Graphics
 			_batchItemList.Add(item);
 			return item;
 		}
-		
-		int CompareTexture ( SpriteBatchItem a, SpriteBatchItem b )
+
+	    static int CompareTexture ( SpriteBatchItem a, SpriteBatchItem b )
 		{
             return ReferenceEquals( a.Texture, b.Texture ) ? 0 : 1;
 		}
-		
-		int CompareDepth ( SpriteBatchItem a, SpriteBatchItem b )
+
+	    static int CompareDepth ( SpriteBatchItem a, SpriteBatchItem b )
 		{
 			return a.Depth.CompareTo(b.Depth);
 		}
-		
-		int CompareReverseDepth ( SpriteBatchItem a, SpriteBatchItem b )
+
+	    static int CompareReverseDepth ( SpriteBatchItem a, SpriteBatchItem b )
 		{
 			return b.Depth.CompareTo(a.Depth);
 		}
 		
-		public void DrawBatch ( SpriteSortMode sortMode, SamplerState samplerState)
+		public void DrawBatch(SpriteSortMode sortMode)
 		{
 			// nothing to do
 			if ( _batchItemList.Count == 0 )
@@ -125,10 +124,10 @@ namespace Microsoft.Xna.Framework.Graphics
 				_batchItemList.Sort ( CompareReverseDepth );
 				break;
 			}
-			
+
 			// setup the vertexArray array
-			int startIndex = 0;
-			int index = 0;
+			var startIndex = 0;
+            var index = 0;
 			Texture2D tex = null;
 
 			// make sure the vertexArray has enough space
@@ -138,10 +137,11 @@ namespace Microsoft.Xna.Framework.Graphics
 			foreach ( var item in _batchItemList )
 			{
 				// if the texture changed, we need to flush and bind the new texture
-				bool shouldFlush = item.Texture != tex;
+				var shouldFlush = item.Texture != tex;
 				if ( shouldFlush )
 				{
 					FlushVertexArray( startIndex, index );
+
 					tex = item.Texture;
                     startIndex = index = 0;
                     _device.Textures[0] = tex;	                   
@@ -152,7 +152,9 @@ namespace Microsoft.Xna.Framework.Graphics
 				_vertexArray[index++] = item.vertexTR;
 				_vertexArray[index++] = item.vertexBL;
 				_vertexArray[index++] = item.vertexBR;
-				
+
+                // Release the texture and return the item to the queue.
+                item.Texture = null;
 				_freeBatchItemQueue.Enqueue( item );
 			}
 
@@ -181,7 +183,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 _index[i * 6 + 5] = (short)(i * 4 + 2);
             }
 
-			_vertexArray = new VertexPosition2ColorTexture[4*newCount];
+			_vertexArray = new VertexPositionColorTexture[4*newCount];
 		}
 
 		void FlushVertexArray( int start, int end )
@@ -190,18 +192,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 return;
 
             var vertexCount = end - start;
-            
-#if OPENGL
-            // Activate the Texture before we draw. 
-            // should this be to be moved into the GraphicsDevice?
-            if (_device.Textures[0] != null)
-            {
-                _device.Textures[0].Activate();
-                _device.SamplerStates[0].Activate(_device.Textures[0].glTarget, _device.Textures[0].LevelCount > 1);
-            }
-#endif
 
-            _device.DrawUserIndexedPrimitives<VertexPosition2ColorTexture>(
+            _device.DrawUserIndexedPrimitives(
                 PrimitiveType.TriangleList, 
                 _vertexArray, 
                 0,
@@ -209,7 +201,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 _index, 
                 0, 
                 (vertexCount / 4) * 2, 
-                VertexPosition2ColorTexture.VertexDeclaration);
+                VertexPositionColorTexture.VertexDeclaration);
 		}
 	}
 }

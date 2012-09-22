@@ -54,6 +54,8 @@
   <ItemGroup>
     <Compile Include="Android\AndroidCompatibility.cs" />
     <Compile Include="Android\AndroidGamePlatform.cs" />
+    <Compile Include="Android\Devices\Sensors\Accelerometer.cs" />
+    <Compile Include="Android\Devices\Sensors\Compass.cs" />
     <Compile Include="Input\Mouse.cs" />
     <Compile Include="Android\Input\Touch\AndroidTouchEventManager.cs" />
     <Compile Include="Android\OrientationListener.cs" />
@@ -99,14 +101,14 @@
     <Compile Include="GraphicsDeviceManager.cs" />
     <Compile Include="Graphics\CubeMapFace.cs" />
     <Compile Include="Graphics\DisplayMode.cs" />
-    <Compile Include="Graphics\Effect\ConstantBuffer.cs" />
+    <Compile Include="Graphics\Shader\ConstantBufferCollection.cs" />
+    <Compile Include="Graphics\Shader\ConstantBuffer.cs" />
+    <Compile Include="Graphics\Shader\Shader.cs" />
+    <Compile Include="Graphics\Shader\ShaderStage.cs" />
     <Compile Include="Graphics\Effect\DualTextureEffect.cs" />
     <Compile Include="Graphics\Effect\EffectAnnotation.cs" />
     <Compile Include="Graphics\Effect\EffectAnnotationCollection.cs" />
     <Compile Include="Graphics\Effect\EnvironmentMapEffect.cs" />
-    <Compile Include="Graphics\Effect\MGFXShader.cs" />
-    <Compile Include="Graphics\Effect\Shader.cs" />
-    <Compile Include="Graphics\Effect\Shader.ogl.cs" />
     <Compile Include="Graphics\Effect\SkinnedEffect.cs" />
     <Compile Include="Graphics\Effect\SpriteEffect.cs" />
     <Compile Include="Graphics\GraphicsAdapter.cs" />
@@ -127,6 +129,15 @@
     <Compile Include="Graphics\States\SamplerState.cs" />
     <Compile Include="Graphics\Texture2D.cs" />
     <Compile Include="Graphics\TextureCube.cs" />
+    <Compile Include="Microsoft\Devices\Sensors\AccelerometerFailedException.cs" />
+    <Compile Include="Microsoft\Devices\Sensors\AccelerometerReading.cs" />
+    <Compile Include="Microsoft\Devices\Sensors\CalibrationEventArgs.cs" />
+    <Compile Include="Microsoft\Devices\Sensors\CompassReading.cs" />
+    <Compile Include="Microsoft\Devices\Sensors\ISensorReading.cs" />
+    <Compile Include="Microsoft\Devices\Sensors\SensorBase.cs" />
+    <Compile Include="Microsoft\Devices\Sensors\SensorFailedException.cs" />
+    <Compile Include="Microsoft\Devices\Sensors\SensorReadingEventArgs.cs" />
+    <Compile Include="Microsoft\Devices\Sensors\SensorState.cs" />
     <Compile Include="PrimaryThreadLoader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Android\AndroidGameActivity.cs" />
@@ -149,7 +160,6 @@
     <Compile Include="Graphics\States\DepthFormat.cs" />
     <Compile Include="Graphics\States\DepthStencilState.cs" />
     <Compile Include="Graphics\States\FillMode.cs" />
-    <Compile Include="Graphics\States\GLStateManager.cs" />
     <Compile Include="Graphics\States\RasterizerState.cs" />
     <Compile Include="Graphics\States\SaveStateMode.cs" />
     <Compile Include="Graphics\States\StencilOperation.cs" />
@@ -174,9 +184,6 @@
     <Compile Include="Graphics\Vertices\VertexPositionNormalTexture.cs" />
     <Compile Include="Graphics\Vertices\VertexPositionTexture.cs" />
     <Compile Include="Android\Audio\Sound.cs" />
-    <Compile Include="Android\Input\Accelerometer.cs" />
-    <Compile Include="Android\Input\AccelerometerCapabilities.cs" />
-    <Compile Include="Android\Input\AccelerometerState.cs" />
     <Compile Include="Android\Input\GamePad.cs" />
     <Compile Include="Android\Media\Video.cs" />
     <Compile Include="Android\Media\VideoPlayer.cs" />
@@ -269,7 +276,6 @@
     <Compile Include="Graphics\GraphicsResource.cs" />
     <Compile Include="Graphics\IGraphicsDeviceService.cs" />
     <Compile Include="Graphics\MultiSampleType.cs" />
-    <Compile Include="Graphics\RenderTarget.cs" />
     <Compile Include="Graphics\RenderTarget2D.cs" />
     <Compile Include="Graphics\RenderTargetUsage.cs" />
     <Compile Include="Graphics\ResourceType.cs" />
@@ -396,6 +402,8 @@
     <Compile Include="Content\ContentReaders\AlphaTestEffectReader.cs" />
     <Compile Include="Graphics\Effect\AlphaTestEffect.cs" />
     <Compile Include="Graphics\Effect\EffectHelpers.cs" />
+    <Compile Include="Graphics\Shader\ShaderProgramCache.cs" />
+    <Compile Include="Utilities\Hash.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.Android.csproj">
