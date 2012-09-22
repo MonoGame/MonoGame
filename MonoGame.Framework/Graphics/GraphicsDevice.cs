@@ -361,6 +361,11 @@ namespace Microsoft.Xna.Framework.Graphics
             DepthStencilState = DepthStencilState.Default;
             RasterizerState = RasterizerState.CullCounterClockwise;
 
+            // Clear the texture and sampler collections forcing
+            // the state to be reapplied.
+            Textures.Clear();
+            SamplerStates.Clear();
+
             // Set the default scissor rect.
             _scissorRectangleDirty = true;
             ScissorRectangle = _viewport.Bounds;
