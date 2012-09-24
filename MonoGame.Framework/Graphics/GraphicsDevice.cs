@@ -321,7 +321,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			PresentationParameters.DepthStencilFormat = DepthFormat.Depth24;
         }
 
-        public void Initialize()
+        internal void Initialize()
         {
             // Setup extensions.
 #if OPENGL
