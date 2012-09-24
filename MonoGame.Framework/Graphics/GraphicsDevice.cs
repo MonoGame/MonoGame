@@ -220,6 +220,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if OPENGL
         internal int glFramebuffer;
+        internal int MaxVertexAttributes;
+        internal int MaxTextureSlots;
 #endif
 
 #if DIRECTX
@@ -297,13 +299,16 @@ namespace Microsoft.Xna.Framework.Graphics
 			                         DisplayMode.Width, DisplayMode.Height);
 			_viewport.MaxDepth = 1.0f;
 
-            int maxTextureSlots = 16;
+            MaxTextureSlots = 16;
 #if OPENGL
-            GL.GetInteger(All.MaxTextureImageUnits, ref maxTextureSlots);
+            GL.GetInteger(All.MaxTextureImageUnits, ref MaxTextureSlots);
+            GraphicsExtensions.CheckGLError();
+
+            GL.GetInteger(All.MaxVertexAttribs, ref MaxVertexAttributes);
             GraphicsExtensions.CheckGLError();
 #endif
-			Textures = new TextureCollection (maxTextureSlots);
-			SamplerStates = new SamplerStateCollection (maxTextureSlots);
+			Textures = new TextureCollection (MaxTextureSlots);
+			SamplerStates = new SamplerStateCollection (MaxTextureSlots);
 
 			PresentationParameters = new PresentationParameters ();
 			PresentationParameters.DepthStencilFormat = DepthFormat.Depth24;
