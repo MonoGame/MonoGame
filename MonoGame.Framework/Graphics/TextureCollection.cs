@@ -50,7 +50,10 @@ namespace Microsoft.Xna.Framework.Graphics
         internal void Clear()
         {
             for (var i = 0; i < _textures.Length; i++)
+            {
                 _textures[i] = null;
+                _targets[i] = TextureTarget.Zero;
+            }
 
             _dirty = int.MaxValue;
         }

@@ -309,13 +309,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			PresentationParameters.DepthStencilFormat = DepthFormat.Depth24;
         }
 
-        internal void Initialize()
+        public void Initialize()
         {
-            // TODO: This line should not be necessary as Effects are being recompiled
-            // in DeviceReset. There seems to be an issue related to static
-            // initialisation order and removing it breaks drawing in 3d.
-            Effect.FlushCache();
-
             // Setup extensions.
 #if OPENGL
 #if GLES
@@ -365,9 +360,15 @@ namespace Microsoft.Xna.Framework.Graphics
             // the state to be reapplied.
             Textures.Clear();
             SamplerStates.Clear();
-            
+
             // Ensure the vertex attributes are reset
             _enabledVertexAttributes.Clear();
+
+            // Force set the buffers and shaders on next ApplyState() call
+            _indexBufferDirty = true;
+            _vertexBufferDirty = true;
+            _vertexShaderDirty = true;
+            _pixelShaderDirty = true;
 
             // Set the default scissor rect.
             _scissorRectangleDirty = true;
@@ -375,6 +376,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Set the default render target.
             ApplyRenderTargets(null);
+
+            // Free all the cached shader programs. 
+            _programCache.Clear();
+            _shaderProgram = -1;
         }
 
 #if DIRECTX
