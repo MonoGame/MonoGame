@@ -55,7 +55,7 @@ using OpenTK.Platform.Android;
 using OpenTK;
 using OpenTK.Platform;
 using OpenTK.Graphics;
-//using OpenTK.Graphics.ES20;
+using OpenTK.Graphics.ES20;
 
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
@@ -138,15 +138,14 @@ namespace Microsoft.Xna.Framework
 		protected override void CreateFrameBuffer()
 		{
             Android.Util.Log.Debug("MonoGame", "AndroidGameWindow.CreateFrameBuffer");
-#if true			
 			try
             {
                 GLContextVersion = GLContextVersion.Gles2_0;
 				base.CreateFrameBuffer();
-                Android.Util.Log.Debug("MonoGame", "AndroidGameWindow.CreateFrameBuffer");
-		    } 
+                All status = GL.CheckFramebufferStatus(All.Framebuffer);
+                Android.Util.Log.Debug("MonoGame", "Framebuffer Status: " + status.ToString());
+            } 
 			catch (Exception) 
-#endif			
 			{
                 throw new NotSupportedException("Could not create OpenGLES 2.0 frame buffer");
 		    }
@@ -166,8 +165,7 @@ namespace Microsoft.Xna.Framework
                 _contextWasLost = false;
             }
 
-            if (!GraphicsContext.IsCurrent)
-                MakeCurrent();
+            MakeCurrent();
 		}
 
         protected override void DestroyFrameBuffer()
@@ -185,7 +183,6 @@ namespace Microsoft.Xna.Framework
             if (GraphicsContext == null || GraphicsContext.IsDisposed)
                 return;
 
-            //Should not happen at all..
             if (!GraphicsContext.IsCurrent)
                 MakeCurrent();
 
@@ -195,6 +192,9 @@ namespace Microsoft.Xna.Framework
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
             base.OnUpdateFrame(e);
+
+            if (!GraphicsContext.IsCurrent)
+                MakeCurrent();
 
             Threading.Run();
 

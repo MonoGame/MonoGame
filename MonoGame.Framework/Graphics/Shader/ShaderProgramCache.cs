@@ -44,12 +44,14 @@ namespace Microsoft.Xna.Framework.Graphics
         public void Clear()
         {
             foreach (var pair in _programCache)
+            {
 #if MONOMAC
                 GL.DeleteProgram(pair.Value.program, null);
 #else
 				GL.DeleteProgram(pair.Value.program);
 #endif
-
+                GraphicsExtensions.CheckGLError();
+            }
             _programCache.Clear();
         }
 
@@ -76,15 +78,23 @@ namespace Microsoft.Xna.Framework.Graphics
             // NOTE: No need to worry about background threads here
             // as this is only called at draw time when we're in the
             // main drawing thread.
-
             var program = GL.CreateProgram();
+            GraphicsExtensions.CheckGLError();
 
             GL.AttachShader(program, vertexShader.GetShaderHandle());
+            GraphicsExtensions.CheckGLError();
             GL.AttachShader(program, pixelShader.GetShaderHandle());
+            GraphicsExtensions.CheckGLError();
 
-            vertexShader.BindVertexAttributes(program);
+            //vertexShader.BindVertexAttributes(program);
 
             GL.LinkProgram(program);
+            GraphicsExtensions.CheckGLError();
+
+            GL.UseProgram(program);
+            GraphicsExtensions.CheckGLError();
+
+            vertexShader.GetVertexAttributeLocations(program);
 
             pixelShader.ApplySamplerTextureUnits(program);
 
@@ -95,6 +105,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
             GL.GetProgram(program, ProgramParameter.LinkStatus, out linked);
 #endif
+            GraphicsExtensions.CheckGLError();
             if (linked == 0)
             {
 #if !GLES

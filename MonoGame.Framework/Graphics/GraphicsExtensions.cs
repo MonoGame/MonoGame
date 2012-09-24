@@ -22,6 +22,7 @@ using ColorPointerType = OpenTK.Graphics.ES20.All;
 using NormalPointerType = OpenTK.Graphics.ES20.All;
 using TexCoordPointerType = OpenTK.Graphics.ES20.All;
 using GetPName = OpenTK.Graphics.ES20.All;
+using System.Diagnostics;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -603,9 +604,17 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
             GL.GetInteger(GetPName.TextureBinding2D, out prevTexture);
 #endif
+            GraphicsExtensions.CheckGLError();
             return prevTexture;
         }
 
+        [Conditional("DEBUG")]
+        public static void CheckGLError()
+        {
+            All error = GL.GetError();
+            if (error != All.False)
+                throw new Exception("GL.GetError() returned " + error.ToString());
+        }
 #endif
 
     }
