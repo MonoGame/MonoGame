@@ -64,9 +64,10 @@ namespace Microsoft.Xna.Framework.Graphics
             public int index;
             public string name;
             public short format;
+            public int location;
         }
 
-        private readonly Attribute[] _attributes;
+        private Attribute[] _attributes;
 
 #elif DIRECTX
 
@@ -162,12 +163,15 @@ namespace Microsoft.Xna.Framework.Graphics
             
             //
             _shaderHandle = GL.CreateShader(Stage == ShaderStage.Vertex ? ShaderType.VertexShader : ShaderType.FragmentShader);
+            GraphicsExtensions.CheckGLError();
 #if GLES
 			GL.ShaderSource(_shaderHandle, 1, new string[] { _glslCode }, (int[])null);
 #else
             GL.ShaderSource(_shaderHandle, _glslCode);
 #endif
+            GraphicsExtensions.CheckGLError();
             GL.CompileShader(_shaderHandle);
+            GraphicsExtensions.CheckGLError();
 
             var compiled = 0;
 #if GLES
@@ -175,16 +179,19 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
             GL.GetShader(_shaderHandle, ShaderParameter.CompileStatus, out compiled);
 #endif
+            GraphicsExtensions.CheckGLError();
             if (compiled == (int)All.False)
             {
 #if GLES
                 string log = "";
                 int length = 0;
 				GL.GetShader(_shaderHandle, ShaderParameter.InfoLogLength, ref length);
+                GraphicsExtensions.CheckGLError();
                 if (length > 0)
                 {
                     var logBuilder = new StringBuilder(length);
 					GL.GetShaderInfoLog(_shaderHandle, length, ref length, logBuilder);
+                    GraphicsExtensions.CheckGLError();
                     log = logBuilder.ToString();
                 }
 #else
@@ -193,6 +200,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 Console.WriteLine(log);
 
                 GL.DeleteShader(_shaderHandle);
+                GraphicsExtensions.CheckGLError();
                 _shaderHandle = -1;
 
                 throw new InvalidOperationException("Shader Compilation Failed");
@@ -201,34 +209,23 @@ namespace Microsoft.Xna.Framework.Graphics
             return _shaderHandle;
         }
 
-        internal void BindVertexAttributes(int program)
+        internal void GetVertexAttributeLocations(int program)
         {
-            foreach (var attrb in _attributes)
+            for (int i = 0; i < _attributes.Length; ++i)
             {
-                switch (attrb.usage)
-                {
-                    case VertexElementUsage.Color:
-                        GL.BindAttribLocation(program, GraphicsDevice.attributeColor, attrb.name);
-                        break;
-                    case VertexElementUsage.Position:
-                        GL.BindAttribLocation(program, GraphicsDevice.attributePosition + attrb.index, attrb.name);
-                        break;
-                    case VertexElementUsage.TextureCoordinate:
-                        GL.BindAttribLocation(program, GraphicsDevice.attributeTexCoord + attrb.index, attrb.name);
-                        break;
-                    case VertexElementUsage.Normal:
-                        GL.BindAttribLocation(program, GraphicsDevice.attributeNormal, attrb.name);
-                        break;
-                    case VertexElementUsage.BlendIndices:
-                        GL.BindAttribLocation(program, GraphicsDevice.attributeBlendIndicies, attrb.name);
-                        break;
-                    case VertexElementUsage.BlendWeight:
-                        GL.BindAttribLocation(program, GraphicsDevice.attributeBlendWeight, attrb.name);
-                        break;
-                    default:
-                        throw new NotImplementedException();
-                }
+                _attributes[i].location = GL.GetAttribLocation(program, _attributes[i].name);
+                GraphicsExtensions.CheckGLError();
             }
+        }
+
+        internal int GetAttribLocation(VertexElementUsage usage, int index)
+        {
+            for (int i = 0; i < _attributes.Length; ++i)
+            {
+                if (_attributes[i].usage == usage)
+                    return _attributes[i].location + index;
+            }
+            return -1;
         }
 
         internal void ApplySamplerTextureUnits(int program)
@@ -237,8 +234,12 @@ namespace Microsoft.Xna.Framework.Graphics
             foreach (var sampler in Samplers)
             {
                 var loc = GL.GetUniformLocation(program, sampler.name);
+                GraphicsExtensions.CheckGLError();
                 if (loc != -1)
+                {
                     GL.Uniform1(loc, sampler.index);
+                    GraphicsExtensions.CheckGLError();
+                }
             }
         }
 
@@ -250,6 +251,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (_shaderHandle != -1)
             {
                 GL.DeleteShader(_shaderHandle);
+                GraphicsExtensions.CheckGLError();
                 _shaderHandle = -1;
             }
 #endif
@@ -263,7 +265,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if OPENGL
                 if (_shaderHandle != -1)
+                {
                     GL.DeleteShader(_shaderHandle);
+                    GraphicsExtensions.CheckGLError();
+                }
 #endif
             }
 
