@@ -361,6 +361,10 @@ namespace Microsoft.Xna.Framework.Graphics
             Textures.Clear();
             SamplerStates.Clear();
 
+            // Clear constant buffers
+            _vertexConstantBuffers.Clear();
+            _pixelConstantBuffers.Clear();
+
             // Ensure the vertex attributes are reset
             _enabledVertexAttributes.Clear();
 
