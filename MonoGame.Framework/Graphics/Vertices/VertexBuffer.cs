@@ -88,10 +88,13 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
 			    GL.GenBuffers(1, out this.vbo);
 #endif
+                GraphicsExtensions.CheckGLError();
                 GL.BindBuffer(BufferTarget.ArrayBuffer, this.vbo);
+                GraphicsExtensions.CheckGLError();
                 GL.BufferData(BufferTarget.ArrayBuffer,
                               new IntPtr(vertexDeclaration.VertexStride * vertexCount), IntPtr.Zero,
                               dynamic ? BufferUsageHint.StreamDraw : BufferUsageHint.StaticDraw);
+                GraphicsExtensions.CheckGLError();
             });
 #endif
 		}
@@ -125,7 +128,8 @@ namespace Microsoft.Xna.Framework.Graphics
             Threading.BlockOnUIThread (() =>
             {
                 GL.BindBuffer (BufferTarget.ArrayBuffer, vbo);
-                var elementSizeInByte = Marshal.SizeOf (typeof(T));
+                GraphicsExtensions.CheckGLError();
+                var elementSizeInByte = Marshal.SizeOf(typeof(T));
 #if IPHONE || ANDROID
                 // I think the access parameter takes zero for read only or read/write.
                 // The glMapBufferOES extension spec and gl2ext.h both only mention GL_WRITE_ONLY
@@ -260,7 +264,9 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 var sizeInBytes = elementSizeInBytes * elementCount;
                 GL.BindBuffer(BufferTarget.ArrayBuffer, vbo);
+                GraphicsExtensions.CheckGLError();
                 GL.BufferSubData<T>(BufferTarget.ArrayBuffer, new IntPtr(offsetInBytes), new IntPtr(sizeInBytes), data);
+                GraphicsExtensions.CheckGLError();
             });
 #endif
         }
@@ -278,6 +284,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _vertexArray = null;
 #else
 			GL.DeleteBuffers(1, ref vbo);
+            GraphicsExtensions.CheckGLError();
 #endif
             base.Dispose();
 		}
