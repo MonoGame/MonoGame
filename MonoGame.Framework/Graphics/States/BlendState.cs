@@ -157,10 +157,12 @@ namespace Microsoft.Xna.Framework.Graphics
         internal void ApplyState(GraphicsDevice device)
         {
             GL.Enable(EnableCap.Blend);
+            GraphicsExtensions.CheckGLError();
 
             // Set blending mode
             var blendMode = ColorBlendFunction.GetBlendEquationMode();
             GL.BlendEquation(blendMode);
+            GraphicsExtensions.CheckGLError();
 
             // Set blending function
             var bfs = ColorSourceBlend.GetBlendFactorSrc();
@@ -170,6 +172,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
             GL.BlendFunc(bfs, bfd);
 #endif
+            GraphicsExtensions.CheckGLError();
         }
 
 #elif DIRECTX

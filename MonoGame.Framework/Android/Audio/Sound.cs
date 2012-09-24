@@ -11,7 +11,6 @@ namespace Microsoft.Xna.Framework.Audio
         private const int MAX_SIMULTANEOUS_SOUNDS = 10;
         private static SoundPool s_soundPool = new SoundPool(MAX_SIMULTANEOUS_SOUNDS, Stream.Music, 0);
         private int _soundId;
-        private int _streamId;
 		
 		internal static SoundPool SoundPool
 		{
@@ -44,12 +43,9 @@ namespace Microsoft.Xna.Framework.Audio
             }
         }
 
-        public void Resume()
+        public void Resume(int streamId)
         {
-            if (_soundId != 0)
-            {
-                s_soundPool.Resume(_soundId);
-            }
+            s_soundPool.Resume(streamId);
         }
 
         public float Volume { get; set; }
@@ -75,10 +71,10 @@ namespace Microsoft.Xna.Framework.Audio
             }
         }
 
-        public void Play()
+        public int Play()
         {
             if (_soundId == 0)
-                return;
+                return -1;
 
             AudioManager audioManager = (AudioManager)Game.Activity.GetSystemService(Context.AudioService);
 
@@ -86,23 +82,24 @@ namespace Microsoft.Xna.Framework.Audio
             float streamVolumeMax = audioManager.GetStreamMaxVolume(Stream.Music);
             float streamVolume = streamVolumeCurrent / streamVolumeMax;
             float panRatio = (this.Pan + 1.0f) / 2.0f;
-            float volumeLeft = Volume * streamVolume * (1.0f - panRatio);
-            float volumeRight = Volume * streamVolume * panRatio;
+            float volumeTotal = SoundEffect.MasterVolume * Volume * streamVolume;
+            float volumeLeft = volumeTotal * (1.0f - panRatio);
+            float volumeRight = volumeTotal * panRatio;
 
             float rate = (float)Math.Pow(2, Rate);
             rate = Math.Max(Math.Min(rate, 2.0f), 0.5f);
 
-            _streamId = s_soundPool.Play(_soundId, volumeLeft, volumeRight, 1, Looping ? -1 : 0, rate);
+            return s_soundPool.Play(_soundId, volumeLeft, volumeRight, 1, Looping ? -1 : 0, rate);
         }
 
-        public void Pause()
+        public void Pause(int streamId)
         {
-            s_soundPool.Pause(_streamId);
+            s_soundPool.Pause(streamId);
         }
-		
-        public void Stop()
+
+        public void Stop(int streamId)
         {
-            s_soundPool.Stop(_streamId);
+            s_soundPool.Stop(streamId);
         }
 
         public Sound(string filename, float volume, bool looping)

@@ -139,8 +139,10 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
 			GL.GenRenderbuffers(1, out glDepthStencilBuffer);
 #endif
-			GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, this.glDepthStencilBuffer);
-			var glDepthStencilFormat = GLDepthComponent16;
+            GraphicsExtensions.CheckGLError();
+            GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, this.glDepthStencilBuffer);
+            GraphicsExtensions.CheckGLError();
+            var glDepthStencilFormat = GLDepthComponent16;
 			switch (preferredDepthFormat)
 			{
 			case DepthFormat.Depth16: glDepthStencilFormat = GLDepthComponent16; break;
@@ -148,6 +150,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			case DepthFormat.Depth24Stencil8: glDepthStencilFormat = GLDepth24Stencil8; break;
 			}
 			GL.RenderbufferStorage(GLRenderbuffer, glDepthStencilFormat, this.width, this.height);
+            GraphicsExtensions.CheckGLError();
 #endif
         }
 		
@@ -174,10 +177,13 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 #elif OPENGL
 			GL.DeleteRenderbuffers(1, ref this.glDepthStencilBuffer);
+            GraphicsExtensions.CheckGLError();
 
-			if(this.glFramebuffer > 0)
-				GL.DeleteFramebuffers(1, ref this.glFramebuffer);
-
+            if (this.glFramebuffer > 0)
+            {
+                GL.DeleteFramebuffers(1, ref this.glFramebuffer);
+                GraphicsExtensions.CheckGLError();
+            }
 #endif
             base.Dispose();
 		}
