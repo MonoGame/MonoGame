@@ -55,6 +55,7 @@ using OpenTK.Graphics;
 using OpenTK.Platform;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
+using Microsoft.Xna.Framework.Graphics;
 #endif
 
 namespace Microsoft.Xna.Framework

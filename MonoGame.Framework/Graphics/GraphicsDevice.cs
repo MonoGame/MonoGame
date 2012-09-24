@@ -220,7 +220,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if OPENGL
         internal int glFramebuffer;
+        internal int MaxVertexAttributes;        
 #endif
+        
+        internal int MaxTextureSlots;
 
 #if DIRECTX
 
@@ -297,13 +300,22 @@ namespace Microsoft.Xna.Framework.Graphics
 			                         DisplayMode.Width, DisplayMode.Height);
 			_viewport.MaxDepth = 1.0f;
 
-            int maxTextureSlots = 16;
-#if OPENGL
-            GL.GetInteger(All.MaxTextureImageUnits, ref maxTextureSlots);
+            MaxTextureSlots = 16;
+#if GLES
+            GL.GetInteger(All.MaxTextureImageUnits, ref MaxTextureSlots);
             GraphicsExtensions.CheckGLError();
+
+            GL.GetInteger(All.MaxVertexAttribs, ref MaxVertexAttributes);
+            GraphicsExtensions.CheckGLError();            
+#elif OPENGL
+            GL.GetInteger(GetPName.MaxTextureImageUnits, out MaxTextureSlots);
+            GraphicsExtensions.CheckGLError();
+
+            GL.GetInteger(GetPName.MaxVertexAttribs, out MaxVertexAttributes);
+            GraphicsExtensions.CheckGLError();            
 #endif
-			Textures = new TextureCollection (maxTextureSlots);
-			SamplerStates = new SamplerStateCollection (maxTextureSlots);
+            Textures = new TextureCollection (MaxTextureSlots);
+			SamplerStates = new SamplerStateCollection (MaxTextureSlots);
 
 			PresentationParameters = new PresentationParameters ();
 			PresentationParameters.DepthStencilFormat = DepthFormat.Depth24;
@@ -1611,16 +1623,16 @@ namespace Microsoft.Xna.Framework.Graphics
 
             var startVertex = buffer.UserOffset;
 
-            var copyCount = vertexCount - vertexOffset;
-            if ((copyCount + buffer.UserOffset) < buffer.VertexCount)
+
+            if ((vertexCount + buffer.UserOffset) < buffer.VertexCount)
             {
-                buffer.UserOffset += copyCount;
-                buffer.SetData(startVertex * vertexDecl.VertexStride, vertexData, vertexOffset, copyCount, SetDataOptions.NoOverwrite);
+                buffer.UserOffset += vertexCount;
+                buffer.SetData(startVertex * vertexDecl.VertexStride, vertexData, vertexOffset, vertexCount, SetDataOptions.NoOverwrite);
             }
             else
             {
-                buffer.UserOffset = copyCount;
-                buffer.SetData(vertexData, vertexOffset, copyCount, SetDataOptions.Discard);
+                buffer.UserOffset = vertexCount;
+                buffer.SetData(vertexData, vertexOffset, vertexCount, SetDataOptions.Discard);
                 startVertex = 0;
             }
 
@@ -1647,17 +1659,16 @@ namespace Microsoft.Xna.Framework.Graphics
 
             var startIndex = buffer.UserOffset;
 
-            var copyCount = indexCount - indexOffset;
-            if ((copyCount + buffer.UserOffset) < buffer.IndexCount)
+            if ((indexCount + buffer.UserOffset) < buffer.IndexCount)
             {
-                buffer.UserOffset += copyCount;
-                buffer.SetData(startIndex * 2, indexData, indexOffset, copyCount, SetDataOptions.NoOverwrite);
+                buffer.UserOffset += indexCount;
+                buffer.SetData(startIndex * 2, indexData, indexOffset, indexCount, SetDataOptions.NoOverwrite);
             }
             else
             {
                 startIndex = 0;
-                buffer.UserOffset = copyCount;
-                buffer.SetData(indexData, indexOffset, copyCount, SetDataOptions.Discard);
+                buffer.UserOffset = indexCount;
+                buffer.SetData(indexData, indexOffset, indexCount, SetDataOptions.Discard);
             }
 
             Indices = buffer;

@@ -47,7 +47,11 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 if (GL.IsProgram(pair.Value.program))
                 {
+#if MONOMAC
+                    GL.DeleteProgram(pair.Value.program, null);
+#else
                     GL.DeleteProgram(pair.Value.program);
+#endif
                     GraphicsExtensions.CheckGLError();
                 }
             }

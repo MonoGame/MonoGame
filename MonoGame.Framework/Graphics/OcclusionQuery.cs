@@ -2,9 +2,9 @@ using System;
 using System.Runtime.InteropServices;
 
 
-#if MAC
+#if MONOMAC
 using MonoMac.OpenGL;
-#elif OPENGL
+#elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
 #endif
 
