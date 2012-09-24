@@ -45,7 +45,11 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             foreach (var pair in _programCache)
             {
-                GL.DeleteProgram(pair.Value.program);
+#if MONOMAC
+                GL.DeleteProgram(pair.Value.program, null);
+#else
+				GL.DeleteProgram(pair.Value.program);
+#endif
                 GraphicsExtensions.CheckGLError();
             }
             _programCache.Clear();
