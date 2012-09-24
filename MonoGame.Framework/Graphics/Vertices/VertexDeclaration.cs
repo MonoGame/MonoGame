@@ -215,10 +215,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 public int Offset;
                 public int AttributeLocation;
                 public int NumberOfElements;
-#if OPENGL
-                public VertexAttribPointerType VertexAttribPointerType;
-#elif GLES
+#if GLES
                 public All VertexAttribPointerType;
+#elif OPENGL
+                public VertexAttribPointerType VertexAttribPointerType;
 #endif
                 public bool Normalized;
             }

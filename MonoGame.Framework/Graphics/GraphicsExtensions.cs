@@ -611,13 +611,13 @@ namespace Microsoft.Xna.Framework.Graphics
         [System.Diagnostics.Conditional("DEBUG")]
         public static void CheckGLError()
         {
-#if OPENGL
+#if GLES
+            All error = GL.GetError();
+            if (error != All.False)                
+                throw new Exception("GL.GetError() returned " + error.ToString());
+#elif OPENGL
             ErrorCode error = GL.GetError();
             if (error != ErrorCode.NoError)
-                throw new Exception("GL.GetError() returned " + error.ToString());
-#else
-            All error = GL.GetError();
-            if (error != All.False)
                 throw new Exception("GL.GetError() returned " + error.ToString());
 #endif
 
