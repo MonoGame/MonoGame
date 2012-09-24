@@ -86,9 +86,12 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
                 GL.GenBuffers(1, out ibo);
 #endif
+                GraphicsExtensions.CheckGLError();
                 GL.BindBuffer(BufferTarget.ElementArrayBuffer, ibo);
+                GraphicsExtensions.CheckGLError();
                 GL.BufferData(BufferTarget.ElementArrayBuffer,
                               (IntPtr)sizeInBytes, IntPtr.Zero, dynamic ? BufferUsageHint.StreamDraw : BufferUsageHint.StaticDraw);
+                GraphicsExtensions.CheckGLError();
             });
 #endif
 		}
@@ -122,6 +125,7 @@ namespace Microsoft.Xna.Framework.Graphics
             Threading.BlockOnUIThread(() =>
             {
                 GL.BindBuffer(BufferTarget.ArrayBuffer, ibo);
+                GraphicsExtensions.CheckGLError();
                 var elementSizeInByte = Marshal.SizeOf(typeof(T));
 #if IPHONE || ANDROID
                 IntPtr ptr = GL.Oes.MapBuffer(All.ArrayBuffer, (All)0);
@@ -151,6 +155,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
                 GL.UnmapBuffer(BufferTarget.ArrayBuffer);
 #endif
+                GraphicsExtensions.CheckGLError();
             });
 #endif
         }
@@ -255,9 +260,12 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 var elementSizeInByte = Marshal.SizeOf(typeof(T));
                 var sizeInBytes = elementSizeInByte * elementCount;
+                var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+                var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startIndex * elementSizeInByte);
                 var bufferSize = IndexCount * (IndexElementSize == IndexElementSize.SixteenBits ? 2 : 4);
 
                 GL.BindBuffer(BufferTarget.ElementArrayBuffer, ibo);
+                GraphicsExtensions.CheckGLError();
 
                 if (options == SetDataOptions.Discard)
                 {
@@ -267,9 +275,13 @@ namespace Microsoft.Xna.Framework.Graphics
                                     (IntPtr)bufferSize,
                                     IntPtr.Zero,
                                     _isDynamic ? BufferUsageHint.StreamDraw : BufferUsageHint.StaticDraw);
+                    GraphicsExtensions.CheckGLError();
                 }
 
-                GL.BufferSubData(BufferTarget.ElementArrayBuffer, (IntPtr)offsetInBytes, (IntPtr)sizeInBytes, data);
+                GL.BufferSubData(BufferTarget.ElementArrayBuffer, (IntPtr)offsetInBytes, (IntPtr)sizeInBytes, dataPtr);
+                GraphicsExtensions.CheckGLError();
+
+                dataHandle.Free();
             });
 #endif
         }
@@ -288,6 +300,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _buffer = null;
 #else
 			GL.DeleteBuffers(1, ref ibo);
+            GraphicsExtensions.CheckGLError();
 #endif
             base.Dispose();
 		}

@@ -5,6 +5,8 @@ using System.Diagnostics;
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
+#elif PSS
+using Sce.PlayStation.Core.Graphics;
 #elif GLES
 using OpenTK.Graphics.ES20;
 using EnableCap = OpenTK.Graphics.ES20.All;
@@ -65,27 +67,34 @@ namespace Microsoft.Xna.Framework.Graphics
             var offscreen = device.GetRenderTargets().Length > 0;
 
             if (CullMode == CullMode.None)
-				GL.Disable(EnableCap.CullFace);
+            {
+                GL.Disable(EnableCap.CullFace);
+                GraphicsExtensions.CheckGLError();
+            }
             else
             {
-				GL.Enable(EnableCap.CullFace);
-    		    GL.CullFace(CullFaceMode.Back); 
+                GL.Enable(EnableCap.CullFace);
+                GraphicsExtensions.CheckGLError();
+                GL.CullFace(CullFaceMode.Back);
+                GraphicsExtensions.CheckGLError();
 
                 if (CullMode == CullMode.CullClockwiseFace)
                 {
-    				if (offscreen)
-	    				GL.FrontFace(FrontFaceDirection.Cw);
-		    		else
-			    		GL.FrontFace(FrontFaceDirection.Ccw);
+                    if (offscreen)
+                        GL.FrontFace(FrontFaceDirection.Cw);
+                    else
+                        GL.FrontFace(FrontFaceDirection.Ccw);
+                    GraphicsExtensions.CheckGLError();
                 }
                 else
                 {
-	    			if (offscreen)
-		    			GL.FrontFace(FrontFaceDirection.Ccw);
-			    	else
-				    	GL.FrontFace(FrontFaceDirection.Cw);
+                    if (offscreen)
+                        GL.FrontFace(FrontFaceDirection.Ccw);
+                    else
+                        GL.FrontFace(FrontFaceDirection.Cw);
+                    GraphicsExtensions.CheckGLError();
                 }
-			}
+            }
 
 #if MONOMAC || WINDOWS || LINUX
 			if (FillMode == FillMode.Solid) 
@@ -101,6 +110,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				GL.Enable(EnableCap.ScissorTest);
 			else
 				GL.Disable(EnableCap.ScissorTest);
+            GraphicsExtensions.CheckGLError();
 
             // TODO: What about DepthBias, SlopeScaleDepthBias, and
             // MultiSampleAntiAlias... we're not handling these!
@@ -168,6 +178,11 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
 #endif // DIRECTX
-
+#if PSS
+        internal void ApplyState(GraphicsDevice device)
+        {
+            #warning Unimplemented
+        }
+#endif
     }
 }

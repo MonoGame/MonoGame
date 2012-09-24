@@ -173,6 +173,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
 			    GL.GenTextures(1, out this.glTexture);
 #endif
+                GraphicsExtensions.CheckGLError();
                 // For best compatibility and to keep the default wrap mode of XNA, only set ClampToEdge if either
                 // dimension is not a power of two.
                 var wrap = TextureWrapMode.Repeat;
@@ -183,12 +184,17 @@ namespace Microsoft.Xna.Framework.Graphics
                 var prevTexture = GraphicsExtensions.GetBoundTexture2D();
 
                 GL.BindTexture(TextureTarget.Texture2D, this.glTexture);
+                GraphicsExtensions.CheckGLError();
                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter,
                                 mipmap ? (int)TextureMinFilter.LinearMipmapLinear : (int)TextureMinFilter.Linear);
+                GraphicsExtensions.CheckGLError();
                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter,
                                 (int)TextureMagFilter.Linear);
+                GraphicsExtensions.CheckGLError();
                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)wrap);
+                GraphicsExtensions.CheckGLError();
                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)wrap);
+                GraphicsExtensions.CheckGLError();
 
                 format.GetGLFormat(out glInternalFormat, out glFormat, out glType);
 
@@ -219,6 +225,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     GL.CompressedTexImage2D(TextureTarget.Texture2D, 0, glInternalFormat,
                                             this.width, this.height, 0,
                                             imageSize, IntPtr.Zero);
+                    GraphicsExtensions.CheckGLError();
                 }
                 else
                 {
@@ -230,10 +237,12 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
                         this.width, this.height, 0,
                         glFormat, glType, IntPtr.Zero);
+                    GraphicsExtensions.CheckGLError();
                 }
 
                 // Restore the bound texture.
                 GL.BindTexture(TextureTarget.Texture2D, prevTexture);
+                GraphicsExtensions.CheckGLError();
             });
 #endif
         }
@@ -329,19 +338,26 @@ namespace Microsoft.Xna.Framework.Graphics
                 var prevTexture = GraphicsExtensions.GetBoundTexture2D();
 
                 GL.BindTexture(TextureTarget.Texture2D, this.glTexture);
+                GraphicsExtensions.CheckGLError();
                 if (glFormat == (GLPixelFormat)All.CompressedTextureFormats)
                 {
                     if (rect.HasValue)
-                        GL.CompressedTexSubImage2D(TextureTarget.Texture2D, 
-                                                   level, x, y, w, h,
+                    {
+                        GL.CompressedTexSubImage2D(TextureTarget.Texture2D,
+                                                    level, x, y, w, h,
 #if GLES
-                                                   glInternalFormat,
+                                                    glInternalFormat,
 #else
-                                                   glFormat,
+                                                    glFormat,
 #endif
-                                                   data.Length - startBytes, dataPtr);
+                                                    data.Length - startBytes, dataPtr);
+                        GraphicsExtensions.CheckGLError();
+                    }
                     else
+                    {
                         GL.CompressedTexImage2D(TextureTarget.Texture2D, level, glInternalFormat, w, h, 0, data.Length - startBytes, dataPtr);
+                        GraphicsExtensions.CheckGLError();
+                    }
                 }
                 else
                 {
@@ -350,6 +366,7 @@ namespace Microsoft.Xna.Framework.Graphics
                         GL.TexSubImage2D(TextureTarget.Texture2D, level,
                                         x, y, w, h,
                                         glFormat, glType, dataPtr);
+                        GraphicsExtensions.CheckGLError();
                     }
                     else
                     {
@@ -360,14 +377,18 @@ namespace Microsoft.Xna.Framework.Graphics
                                   glInternalFormat,
 #endif
                                   w, h, 0, glFormat, glType, dataPtr);
+                        GraphicsExtensions.CheckGLError();
                     }
 
                 }
 
-                Debug.Assert(GL.GetError() == ErrorCode.NoError);
-
+#if !ANDROID
+                GL.Finish();
+                GraphicsExtensions.CheckGLError();
+#endif
                 // Restore the bound texture.
                 GL.BindTexture(TextureTarget.Texture2D, prevTexture);
+                GraphicsExtensions.CheckGLError();
 
 #endif // OPENGL
 
@@ -376,9 +397,11 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 
 #if OPENGL
+#if !ANDROID
                 // Required to make sure that any texture uploads on a thread are completed
                 // before the main thread tries to use the texture.
                 GL.Finish();
+#endif
             });
 #endif
         }
@@ -783,6 +806,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
                 GL.GenTextures(1, out this.glTexture);
 #endif
+                GraphicsExtensions.CheckGLError();
             }
 
             FillTextureFromStream(textureStream);
@@ -794,23 +818,31 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			int framebufferId = -1;
             int renderBufferID = -1;
+            
 			GL.GenFramebuffers(1, ref framebufferId);
-			GL.BindFramebuffer(All.Framebuffer, framebufferId);
-			//renderBufferIDs = new int[currentRenderTargets];
+            GraphicsExtensions.CheckGLError();
+            GL.BindFramebuffer(All.Framebuffer, framebufferId);
+            GraphicsExtensions.CheckGLError();
+            //renderBufferIDs = new int[currentRenderTargets];
             GL.GenRenderbuffers(1, ref renderBufferID);
+            GraphicsExtensions.CheckGLError();
 
             // attach the texture to FBO color attachment point
             GL.FramebufferTexture2D(All.Framebuffer, All.ColorAttachment0,
                 All.Texture2D, this.glTexture, 0);
+            GraphicsExtensions.CheckGLError();
 
             // create a renderbuffer object to store depth info
             GL.BindRenderbuffer(All.Renderbuffer, renderBufferID);
+            GraphicsExtensions.CheckGLError();
             GL.RenderbufferStorage(All.Renderbuffer, All.DepthComponent24Oes,
                 Width, Height);
+            GraphicsExtensions.CheckGLError();
 
             // attach the renderbuffer to depth attachment point
             GL.FramebufferRenderbuffer(All.Framebuffer, All.DepthAttachment,
                 All.Renderbuffer, renderBufferID);
+            GraphicsExtensions.CheckGLError();
 
             All status = GL.CheckFramebufferStatus(All.Framebuffer);
 
@@ -845,11 +877,16 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
 			GL.ReadPixels(0,0,Width, Height, All.Rgba, All.UnsignedByte, imageInfo);
-			GL.FramebufferRenderbuffer(All.Framebuffer, All.DepthAttachment, All.Renderbuffer, 0);
-			GL.DeleteRenderbuffers(1, ref renderBufferID);
-			GL.DeleteFramebuffers(1, ref framebufferId);
-			GL.BindFramebuffer(All.Framebuffer, 0);
-			return imageInfo;
+            GraphicsExtensions.CheckGLError();
+            GL.FramebufferRenderbuffer(All.Framebuffer, All.DepthAttachment, All.Renderbuffer, 0);
+            GraphicsExtensions.CheckGLError();
+            GL.DeleteRenderbuffers(1, ref renderBufferID);
+            GraphicsExtensions.CheckGLError();
+            GL.DeleteFramebuffers(1, ref framebufferId);
+            GraphicsExtensions.CheckGLError();
+            GL.BindFramebuffer(All.Framebuffer, 0);
+            GraphicsExtensions.CheckGLError();
+            return imageInfo;
 		}
 #endif
 	}

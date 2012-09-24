@@ -45,6 +45,8 @@ using System.Diagnostics;
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
+#elif PSS
+using Sce.PlayStation.Core.Graphics;
 #elif GLES
 using OpenTK.Graphics.ES20;
 using EnableCap = OpenTK.Graphics.ES20.All;
@@ -155,10 +157,12 @@ namespace Microsoft.Xna.Framework.Graphics
         internal void ApplyState(GraphicsDevice device)
         {
             GL.Enable(EnableCap.Blend);
+            GraphicsExtensions.CheckGLError();
 
             // Set blending mode
             var blendMode = ColorBlendFunction.GetBlendEquationMode();
             GL.BlendEquation(blendMode);
+            GraphicsExtensions.CheckGLError();
 
             // Set blending function
             var bfs = ColorSourceBlend.GetBlendFactorSrc();
@@ -168,6 +172,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
             GL.BlendFunc(bfs, bfd);
 #endif
+            GraphicsExtensions.CheckGLError();
         }
 
 #elif DIRECTX
@@ -312,7 +317,13 @@ namespace Microsoft.Xna.Framework.Graphics
                     ((mask & ColorWriteChannels.Alpha) != 0 ? SharpDX.Direct3D11.ColorWriteMaskFlags.Alpha : 0);
         }
 
-#endif // DIRECTX		
+#endif // DIRECTX	
+#if PSS
+        internal void ApplyState(GraphicsDevice device)
+        {
+            #warning Unimplemented
+        }
+#endif
 	}
 }
 

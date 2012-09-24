@@ -156,7 +156,7 @@ using Microsoft.Xna.Framework.Graphics;
         {
             var instance = GamePad.Instance;
 			instance.Update();
-            var state = new GamePadState(new GamePadThumbSticks(), new GamePadTriggers(), new GamePadButtons((Buttons)instance._buttons), new GamePadDPad((Buttons)instance._buttons));
+            var state = new GamePadState(new GamePadThumbSticks(instance._leftStick, instance._rightStick), new GamePadTriggers(), new GamePadButtons((Buttons)instance._buttons), new GamePadDPad((Buttons)instance._buttons));
             instance.Reset();
             return state;
         }
