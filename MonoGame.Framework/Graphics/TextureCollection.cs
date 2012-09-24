@@ -57,6 +57,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void SetTextures(GraphicsDevice device)
         {
+#if !WINRT
+            Threading.EnsureUIThread();
+#endif
+
             // Skip out if nothing has changed.
             if (_dirty == 0)
                 return;
@@ -76,16 +80,21 @@ namespace Microsoft.Xna.Framework.Graphics
                 var tex = _textures[i];
 #if OPENGL
                 GL.ActiveTexture(TextureUnit.Texture0 + i);
+                GraphicsExtensions.CheckGLError();
 
                 // Clear the previous binding if the 
                 // target is different from the new one.
                 if (_targets[i] != 0 && (tex == null || _targets[i] != tex.glTarget))
+                {
                     GL.BindTexture(_targets[i], 0);
+                    GraphicsExtensions.CheckGLError();
+                }
 
                 if (tex != null)
                 {
                     _targets[i] = tex.glTarget;
                     GL.BindTexture(tex.glTarget, tex.glTexture);
+                    GraphicsExtensions.CheckGLError();
                 }
 #elif DIRECTX
                 if (_textures[i] == null)

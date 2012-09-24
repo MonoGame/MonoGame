@@ -9,6 +9,8 @@ namespace Microsoft.Devices.Sensors
 {
 	public sealed class Accelerometer : SensorBase<AccelerometerReading>
 	{
+        static readonly int MaxSensorCount = 10;
+        static int instanceCount;
 		private static CMMotionManager motionManager = new CMMotionManager();
 		private static bool started = false;
 		private static SensorState state = IsSupported ? SensorState.Initializing : SensorState.NotSupported;
@@ -27,12 +29,32 @@ namespace Microsoft.Devices.Sensors
 		public Accelerometer()
 		{
 			if (!IsSupported)
-				throw new SensorFailedException();
+                throw new AccelerometerFailedException("Failed to start accelerometer data acquisition. No default sensor found.", -1);
+            else if (instanceCount >= MaxSensorCount)
+                throw new SensorFailedException("The limit of 10 simultaneous instances of the Accelerometer class per application has been exceeded.");
+
+            ++instanceCount;
 
 			this.TimeBetweenUpdatesChanged += this.UpdateInterval;
 			readingChanged += ReadingChangedHandler;
 
 		}
+
+        protected override void Dispose (bool disposing)
+        {
+            if (!IsDisposed)
+            {
+                if (disposing)
+                {
+                    if (started)
+                        Stop();
+                    --instanceCount;
+                    if (instanceCount == 0)
+                        Accelerometer.motionManager = null;
+                }
+            }
+            base.Dispose(disposing);
+        }
 
 		public override void Start()
 		{
@@ -43,7 +65,7 @@ namespace Microsoft.Devices.Sensors
 				state = SensorState.Ready;
 			}
 			else
-				throw new SensorFailedException();
+                throw new AccelerometerFailedException("Failed to start accelerometer data acquisition. Data acquisition already started.", -1);
 		}
 
 		public override void Stop()

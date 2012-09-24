@@ -327,7 +327,7 @@
     <Compile Include="MacOS\Audio\SoundEffect.cs" />
     <Compile Include="MacOS\Audio\SoundEffectInstance.cs" />
     <Compile Include="Graphics\Effect\AlphaTestEffect.cs" />
-	<Compile Include="Graphics\Shader\ConstantBufferCollection.cs" />
+    <Compile Include="Graphics\Shader\ConstantBufferCollection.cs" />
     <Compile Include="Graphics\Shader\ConstantBuffer.cs" />
     <Compile Include="Graphics\Shader\Shader.cs" />
     <Compile Include="Graphics\Shader\ShaderStage.cs" />
@@ -424,7 +424,6 @@
     <Compile Include="iOS\GamerServices\KeyboardInputView.cs" />
     <Compile Include="iOS\GamerServices\KeyboardInputAsyncResult.cs" />
     <Compile Include="iOS\iOSGameWindow.cs" />
-    <Compile Include="Input\Touch\TouchInfo.cs" />
     <Compile Include="Graphics\Shader\ShaderProgramCache.cs" />
     <Compile Include="Utilities\Hash.cs" />
     <Compile Include="iOS\Devices\Sensors\Accelerometer.cs" />
@@ -437,6 +436,7 @@
     <Compile Include="Microsoft\Devices\Sensors\SensorFailedException.cs" />
     <Compile Include="Microsoft\Devices\Sensors\SensorReadingEventArgs.cs" />
     <Compile Include="Microsoft\Devices\Sensors\SensorState.cs" />
+    <Compile Include="Microsoft\Devices\Sensors\AccelerometerFailedException.cs" />
   </ItemGroup>
   <Import Project="$(ProgramFiles)\MSBuild\MonoTouch\Novell.MonoTouch.Common.targets" Condition="'$(windir)' != '' " />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
