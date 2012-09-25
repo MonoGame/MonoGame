@@ -476,7 +476,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 				// Lazy load it
 				if ( matchmakerViewController == null )
 				{
-					matchmakerViewController = new GKMatchmakerViewController(new GKMatchRequest());
+					matchmakerViewController = new GKMatchmakerViewController();
 				}
 
 			    if (matchmakerViewController != null)		
