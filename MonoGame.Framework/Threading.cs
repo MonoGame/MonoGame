@@ -42,6 +42,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
+using Microsoft.Xna.Framework.Graphics;
 #if IPHONE
 using MonoTouch.Foundation;
 using MonoTouch.OpenGLES;
@@ -55,7 +56,6 @@ using OpenTK.Graphics;
 using OpenTK.Platform;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
-using Microsoft.Xna.Framework.Graphics;
 #endif
 
 namespace Microsoft.Xna.Framework
