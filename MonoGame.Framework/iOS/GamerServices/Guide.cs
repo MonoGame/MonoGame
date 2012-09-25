@@ -92,10 +92,29 @@ namespace Microsoft.Xna.Framework.GamerServices
 
 	class GuideViewController : UIViewController
 	{
+        #region Autorotation for iOS 5 or older
 		public override bool ShouldAutorotateToInterfaceOrientation (UIInterfaceOrientation toInterfaceOrientation)
 		{
 			return this.ParentViewController.ShouldAutorotateToInterfaceOrientation(toInterfaceOrientation);
 		}
+        #endregion
+
+        #region Autorotation for iOS 6 or newer
+        public override UIInterfaceOrientationMask GetSupportedInterfaceOrientations ()
+        {
+            return this.ParentViewController.GetSupportedInterfaceOrientations();
+        }
+        
+        public override bool ShouldAutorotate ()
+        {
+            return true;
+        }
+        
+        public override UIInterfaceOrientation PreferredInterfaceOrientationForPresentation ()
+        {
+            return this.ParentViewController.PreferredInterfaceOrientationForPresentation();
+        }
+        #endregion
 
 		public override void DidRotate (UIInterfaceOrientation fromInterfaceOrientation)
 		{
