@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -40,12 +40,18 @@
 	<Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="OpenTK" />
-    <Reference Include="MonoGame.Framework.Windows" />
-    <Reference Include="Lidgren.Network" />
-    <Reference Include="GamepadBridge"/>
-    <Reference Include="GamepadConfigControls"/>
-    <Reference Include="Tao.Sdl"/>
+    <Reference Include="OpenTK">
+       <HintPath>$(MSBuildExtensionsPath)\..\MonoGame\Assemblies\OpenTK.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoGame.Framework.Windows">
+       <HintPath>$(MSBuildExtensionsPath)\..\MonoGame\Assemblies\MonoGame.Framework.Windows.dll</HintPath>
+    </Reference>
+    <Reference Include="Lidgren.Network">
+       <HintPath>$(MSBuildExtensionsPath)\..\MonoGame\Assemblies\Lidgren.Network.dll</HintPath>
+    </Reference>
+    <Reference Include="Tao.Sdl">
+       <HintPath>$(MSBuildExtensionsPath)\..\MonoGame\Assemblies\Tao.Sdl.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Xml" />
   </ItemGroup>

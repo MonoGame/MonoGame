@@ -103,6 +103,9 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- A reference to the entire .Net Framework and Windows SDK are automatically included -->
+    <Reference Include="MonoGame.Framework.Windows8">
+       <HintPath>$(MSBuildExtensionsPath)\..\MonoGame\Assemblies\MonoGame.Framework.Windows8.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />

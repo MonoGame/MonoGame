@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using Android.App;
 using Android.Content;
@@ -15,6 +15,7 @@ namespace ${Namespace}
 	           MainLauncher = true,
 	           Icon = "@drawable/icon",
 	           Theme = "@style/Theme.Splash",
+                AlwaysRetainTaskState=true,
 	           LaunchMode=Android.Content.PM.LaunchMode.SingleInstance,
 	           ConfigurationChanges = Android.Content.PM.ConfigChanges.Orientation | 
 	                                  Android.Content.PM.ConfigChanges.KeyboardHidden | 
