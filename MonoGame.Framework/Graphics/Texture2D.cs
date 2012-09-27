@@ -789,7 +789,8 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 #endif // WINRT
 
-        //What was this for again?
+        // This method allows games that use Texture2D.FromStream 
+        // to reload their textures after the GL context is lost.
         internal void Reload(Stream textureStream)
         {
 #if OPENGL
