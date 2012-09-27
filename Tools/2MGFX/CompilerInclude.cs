@@ -6,9 +6,9 @@ namespace TwoMGFX
 {
     class CompilerInclude : SharpDX.D3DCompiler.Include
     {
-        string _rootPath;
+        readonly string _rootPath;
 
-        Dictionary<Stream, string> resolvedPaths = new Dictionary<Stream, string>();
+        readonly Dictionary<Stream, string> _resolvedPaths = new Dictionary<Stream, string>();
 
         public CompilerInclude(string rootPath)
         {
@@ -18,21 +18,21 @@ namespace TwoMGFX
         public void Close(Stream stream)
         {
             stream.Close();
-            resolvedPaths.Remove(stream);
+            _resolvedPaths.Remove(stream);
         }
 
         public Stream Open(SharpDX.D3DCompiler.IncludeType type, string fileName, Stream parentStream)
         {
             try
             {
-                string resolvedFile = fileName;
+                var resolvedFile = fileName;
 
                 if (!Path.IsPathRooted(resolvedFile))
                 {
-                    /* Search in the directory containing the calling file */
+                    // Search in the directory containing the calling file
                     string parentPath;
 
-                    if (parentStream != null && resolvedPaths.TryGetValue(parentStream, out parentPath))
+                    if (parentStream != null && _resolvedPaths.TryGetValue(parentStream, out parentPath))
                     {
                         var subFilePath = Path.Combine(Path.GetDirectoryName(parentPath), fileName);
                         if (File.Exists(subFilePath))
@@ -41,13 +41,13 @@ namespace TwoMGFX
 
                     if (!File.Exists(resolvedFile))
                     {
-                        /* Search in the root directory */
+                        // Search in the root directory
                         resolvedFile = Path.Combine(_rootPath, fileName);
                     }
 
                     if (!File.Exists(resolvedFile))
                     {
-                        /* Use the current directory */
+                        // Use the current directory
                         resolvedFile = fileName;
                     }
                 }
@@ -56,7 +56,7 @@ namespace TwoMGFX
 
                 var fullFileName = (new FileInfo(resolvedFile)).FullName;
 
-                resolvedPaths[stream] = fullFileName;
+                _resolvedPaths[stream] = fullFileName;
 
                 return stream;
             }

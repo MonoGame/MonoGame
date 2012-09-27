@@ -175,9 +175,12 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
                 // For best compatibility and to keep the default wrap mode of XNA, only set ClampToEdge if either
                 // dimension is not a power of two.
-                TextureWrapMode wrap = TextureWrapMode.Repeat;
+                var wrap = TextureWrapMode.Repeat;
                 if (((width & (width - 1)) != 0) || ((height & (height - 1)) != 0))
                     wrap = TextureWrapMode.ClampToEdge;
+
+                // Store the current bound texture.
+                var prevTexture = GraphicsExtensions.GetBoundTexture2D();
 
                 GL.BindTexture(TextureTarget.Texture2D, this.glTexture);
                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter,
@@ -228,6 +231,9 @@ namespace Microsoft.Xna.Framework.Graphics
                         this.width, this.height, 0,
                         glFormat, glType, IntPtr.Zero);
                 }
+
+                // Restore the bound texture.
+                GL.BindTexture(TextureTarget.Texture2D, prevTexture);
             });
 #endif
         }
@@ -318,6 +324,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
 
 #elif OPENGL
+
+                // Store the current bound texture.
+                var prevTexture = GraphicsExtensions.GetBoundTexture2D();
+
                 GL.BindTexture(TextureTarget.Texture2D, this.glTexture);
                 if (glFormat == (GLPixelFormat)All.CompressedTextureFormats)
                 {
@@ -355,6 +365,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
 
                 Debug.Assert(GL.GetError() == ErrorCode.NoError);
+
+                // Restore the bound texture.
+                GL.BindTexture(TextureTarget.Texture2D, prevTexture);
 
 #endif // OPENGL
 

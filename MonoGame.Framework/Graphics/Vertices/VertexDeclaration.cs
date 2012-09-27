@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.InteropServices;
+using System.Collections.Generic;
 
 #if MONOMAC
 using MonoMac.OpenGL;
@@ -53,7 +54,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     signature += element;
 
                 var bytes = System.Text.Encoding.UTF8.GetBytes(signature);
-                HashKey = Effect.ComputeHash(bytes);
+                HashKey = MonoGame.Utilities.Hash.ComputeHash(bytes);
             }
         }
 
@@ -125,16 +126,11 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 
 #if OPENGL
-		internal void Apply()
-		{
-            Apply(IntPtr.Zero);
-        }
-
-		internal void Apply (IntPtr offset)
+		internal void Apply(IntPtr offset)
 		{
 
-			// TODO: This is executed on every draw call... can we not
-			// allocate a vertex declaration once and just re-apply it?
+            // TODO: This is executed on every dr_enabledVertexAttributesaw call... can we not
+            // allocate a vertex declaration once and just re-apply it?
 
 			var enabledAttributes = new bool[16];
             foreach (var ve in _elements) 
@@ -180,10 +176,9 @@ namespace Microsoft.Xna.Framework.Graphics
 				enabledAttributes[attributeLocation] = true;
 			}
 			
-			for (int i=0; i<16; i++) {
-				GLStateManager.VertexAttribArray(i, enabledAttributes[i]);
-			}
+            graphicsDevice.SetVertexAttributeArray(enabledAttributes);
 		}
+
 #endif // OPENGL
 
 #if DIRECTX
