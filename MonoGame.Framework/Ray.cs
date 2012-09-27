@@ -199,7 +199,10 @@ namespace Microsoft.Xna.Framework
                 return;
             }
 
-            result = -Vector3.Dot(plane.Normal, Position) / den;
+            result = (-plane.D - Vector3.Dot(plane.Normal, Position)) / den;
+
+            if (Math.Abs(den) < -0.0001f )
+                result = null;
         }
 
         public void Intersects(ref BoundingSphere sphere, out float? result)
