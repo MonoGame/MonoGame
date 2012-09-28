@@ -201,8 +201,16 @@ namespace Microsoft.Xna.Framework
 
             result = (-plane.D - Vector3.Dot(plane.Normal, Position)) / den;
 
-            if (Math.Abs(den) < -0.0001f )
-                result = null;
+            if (result < 0.0f)
+            {
+                if (result < -0.0001f)
+                {
+                    result = null;
+                    return;
+                }
+
+                result = 0.0f;
+            }
         }
 
         public void Intersects(ref BoundingSphere sphere, out float? result)
