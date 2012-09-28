@@ -270,8 +270,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			item.Set (destinationRectangle.X,
 					destinationRectangle.Y, 
-					-origin.X * (float)(destinationRectangle.Z / texture.Width), 
-					-origin.Y * (float)(destinationRectangle.W / texture.Height),
+					-origin.X * (destinationRectangle.Z / texture.Width), 
+					-origin.Y * (destinationRectangle.W / texture.Height),
 					destinationRectangle.Z,
 					destinationRectangle.W,
 					(float)Math.Sin (rotation), 
