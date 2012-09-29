@@ -30,6 +30,10 @@ namespace Microsoft.Xna.Framework
 
         public override void OnOrientationChanged(int orientation)
         {
+            // Avoid changing orientation whilst the screen is locked
+            if (ScreenReceiver.ScreenLocked)
+                return;
+
             if (!inprogress)
             {
                 inprogress = true;

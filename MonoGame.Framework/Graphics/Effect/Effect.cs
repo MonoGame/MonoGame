@@ -72,6 +72,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				throw new ArgumentNullException ("Graphics Device Cannot Be Null");
 
 			this.graphicsDevice = graphicsDevice;
+            this.graphicsDevice.DeviceResetting += new EventHandler<EventArgs>(graphicsDevice_DeviceResetting);
 		}
 			
 		protected Effect(Effect cloneSource)
@@ -196,7 +197,15 @@ namespace Microsoft.Xna.Framework.Graphics
                     shader.Dispose();
             }
 
+            this.graphicsDevice.DeviceResetting -= graphicsDevice_DeviceResetting;
+
             base.Dispose();
+        }
+
+        void graphicsDevice_DeviceResetting(object sender, EventArgs e)
+        {
+            for (var i = 0; i < ConstantBuffers.Length; i++)
+                ConstantBuffers[i].Clear();
         }
 
         #region Effect File Reader

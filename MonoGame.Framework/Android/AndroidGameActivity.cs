@@ -79,12 +79,6 @@ namespace Microsoft.Xna.Framework
             Game.Window.RequestFocus();
         }
 
-        protected override void OnRestart()
-        {
-            base.OnRestart();
-            Game.Window.OnRestart();
-        }
-
 		protected override void OnDestroy ()
 		{
             UnregisterReceiver(screenReceiver);

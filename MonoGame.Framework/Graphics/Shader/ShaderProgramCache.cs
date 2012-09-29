@@ -45,12 +45,15 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             foreach (var pair in _programCache)
             {
+                if (GL.IsProgram(pair.Value.program))
+                {
 #if MONOMAC
-                GL.DeleteProgram(pair.Value.program, null);
+                    GL.DeleteProgram(pair.Value.program, null);
 #else
-				GL.DeleteProgram(pair.Value.program);
+                    GL.DeleteProgram(pair.Value.program);
 #endif
-                GraphicsExtensions.CheckGLError();
+                    GraphicsExtensions.CheckGLError();
+                }
             }
             _programCache.Clear();
         }
@@ -82,17 +85,18 @@ namespace Microsoft.Xna.Framework.Graphics
             GraphicsExtensions.CheckGLError();
 
             GL.AttachShader(program, vertexShader.GetShaderHandle());
-            GraphicsExtensions.CheckGLError();
+            GraphicsExtensions.LogGLError("VertexShaderCache.Link(), GL.AttachShader");
+
             GL.AttachShader(program, pixelShader.GetShaderHandle());
-            GraphicsExtensions.CheckGLError();
+            GraphicsExtensions.LogGLError("VertexShaderCache.Link(), GL.AttachShader");
 
             //vertexShader.BindVertexAttributes(program);
 
             GL.LinkProgram(program);
-            GraphicsExtensions.CheckGLError();
+            GraphicsExtensions.LogGLError("VertexShaderCache.Link(), GL.LinkProgram");
 
             GL.UseProgram(program);
-            GraphicsExtensions.CheckGLError();
+            GraphicsExtensions.LogGLError("VertexShaderCache.Link(), GL.UseProgram");
 
             vertexShader.GetVertexAttributeLocations(program);
 
@@ -105,7 +109,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
             GL.GetProgram(program, ProgramParameter.LinkStatus, out linked);
 #endif
-            GraphicsExtensions.CheckGLError();
+            GraphicsExtensions.LogGLError("VertexShaderCache.Link(), GL.GetProgram");
             if (linked == 0)
             {
 #if !GLES
