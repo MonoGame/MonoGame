@@ -613,8 +613,8 @@ namespace Microsoft.Xna.Framework.Graphics
         {
 #if GLES
             All error = GL.GetError();
-            if (error != All.False)                
-                throw new Exception("GL.GetError() returned " + error.ToString());
+            if (error != All.False)
+                throw new MonoGameGLException("GL.GetError() returned " + error.ToString());
 #elif OPENGL
             ErrorCode error = GL.GetError();
             if (error != ErrorCode.NoError)
@@ -624,5 +624,28 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 #endif
 
+        [System.Diagnostics.Conditional("DEBUG")]
+        public static void LogGLError(string location)
+        {
+            try
+            {
+                GraphicsExtensions.CheckGLError();
+            }
+            catch (MonoGameGLException ex)
+            {
+#if ANDROID
+                // Todo: Add generic MonoGame logging interface
+                Android.Util.Log.Debug("MonoGame", "MonoGameGLException at " + location + " - " + ex.Message);
+#endif
+            }
+        }
+    }
+
+    public class MonoGameGLException : Exception
+    {
+        public MonoGameGLException(string message)
+            : base(message)
+        {
+        }
     }
 }

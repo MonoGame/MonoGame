@@ -127,13 +127,6 @@ namespace Microsoft.Xna.Framework
 			//
 		}
 
-        internal void OnRestart()
-        {
-            // If restarting, check if the context was lost. It appears that it always is,
-            // but I suspect that it's possible to avoid this case as some games don't need
-            // to reload their textures after switching back from another app.
-            _contextWasLost = GraphicsContext == null || GraphicsContext.IsDisposed;
-        }
 
 		protected override void CreateFrameBuffer()
 		{
@@ -151,12 +144,10 @@ namespace Microsoft.Xna.Framework
 		    }
             if (_game.GraphicsDevice != null && _contextWasLost)
             {
-                // DeviceResetting events
-                _game.graphicsDeviceManager.OnDeviceResetting(EventArgs.Empty);
-                _game.GraphicsDevice.OnDeviceResetting();
-
                 _game.GraphicsDevice.Initialize();
+                Android.Util.Log.Debug("MonoGame", "Begin reloading graphics content");
                 Microsoft.Xna.Framework.Content.ContentManager.ReloadGraphicsContent();
+                Android.Util.Log.Debug("MonoGame", "End reloading graphics content");
 
                 // DeviceReset events
                 _game.graphicsDeviceManager.OnDeviceReset(EventArgs.Empty);
@@ -170,8 +161,15 @@ namespace Microsoft.Xna.Framework
 
         protected override void DestroyFrameBuffer()
         {
+            // DeviceResetting events
+            _game.graphicsDeviceManager.OnDeviceResetting(EventArgs.Empty);
+            _game.GraphicsDevice.OnDeviceResetting();
+
             Android.Util.Log.Debug("MonoGame", "AndroidGameWindow.DestroyFrameBuffer");
+
             base.DestroyFrameBuffer();
+
+            _contextWasLost = GraphicsContext == null || GraphicsContext.IsDisposed;
         }
 
         #region AndroidGameView Methods
@@ -192,6 +190,9 @@ namespace Microsoft.Xna.Framework
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
             base.OnUpdateFrame(e);
+
+            if (_contextWasLost)
+                return;
 
             if (!GraphicsContext.IsCurrent)
                 MakeCurrent();

@@ -199,8 +199,11 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
                 Console.WriteLine(log);
 
-                GL.DeleteShader(_shaderHandle);
-                GraphicsExtensions.CheckGLError();
+                if (GL.IsShader(_shaderHandle))
+                {
+                    GL.DeleteShader(_shaderHandle);
+                    GraphicsExtensions.CheckGLError();
+                }
                 _shaderHandle = -1;
 
                 throw new InvalidOperationException("Shader Compilation Failed");
@@ -250,8 +253,11 @@ namespace Microsoft.Xna.Framework.Graphics
 #if OPENGL
             if (_shaderHandle != -1)
             {
-                GL.DeleteShader(_shaderHandle);
-                GraphicsExtensions.CheckGLError();
+                if (GL.IsShader(_shaderHandle))
+                {
+                    GL.DeleteShader(_shaderHandle);
+                    GraphicsExtensions.CheckGLError();
+                }
                 _shaderHandle = -1;
             }
 #endif
@@ -266,8 +272,12 @@ namespace Microsoft.Xna.Framework.Graphics
 #if OPENGL
                 if (_shaderHandle != -1)
                 {
-                    GL.DeleteShader(_shaderHandle);
-                    GraphicsExtensions.CheckGLError();
+                    if (GL.IsShader(_shaderHandle))
+                    {
+                        GL.DeleteShader(_shaderHandle);
+                        GraphicsExtensions.CheckGLError();
+                    }
+                    _shaderHandle = -1;
                 }
 #endif
             }
