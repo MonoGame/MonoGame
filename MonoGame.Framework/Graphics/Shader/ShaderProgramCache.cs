@@ -85,17 +85,18 @@ namespace Microsoft.Xna.Framework.Graphics
             GraphicsExtensions.CheckGLError();
 
             GL.AttachShader(program, vertexShader.GetShaderHandle());
-            GraphicsExtensions.CheckGLError();
+            GraphicsExtensions.LogGLError("VertexShaderCache.Link(), GL.AttachShader");
+
             GL.AttachShader(program, pixelShader.GetShaderHandle());
-            GraphicsExtensions.CheckGLError();
+            GraphicsExtensions.LogGLError("VertexShaderCache.Link(), GL.AttachShader");
 
             //vertexShader.BindVertexAttributes(program);
 
             GL.LinkProgram(program);
-            GraphicsExtensions.CheckGLError();
+            GraphicsExtensions.LogGLError("VertexShaderCache.Link(), GL.LinkProgram");
 
             GL.UseProgram(program);
-            GraphicsExtensions.CheckGLError();
+            GraphicsExtensions.LogGLError("VertexShaderCache.Link(), GL.UseProgram");
 
             vertexShader.GetVertexAttributeLocations(program);
 
@@ -108,7 +109,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
             GL.GetProgram(program, ProgramParameter.LinkStatus, out linked);
 #endif
-            GraphicsExtensions.CheckGLError();
+            GraphicsExtensions.LogGLError("VertexShaderCache.Link(), GL.GetProgram");
             if (linked == 0)
             {
 #if !GLES
