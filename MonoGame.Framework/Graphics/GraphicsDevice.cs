@@ -393,9 +393,11 @@ namespace Microsoft.Xna.Framework.Graphics
             // Set the default render target.
             ApplyRenderTargets(null);
 
+#if OPENGL
             // Free all the cached shader programs. 
             _programCache.Clear();
             _shaderProgram = -1;
+#endif
         }
 
 #if DIRECTX
@@ -1016,12 +1018,6 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (DeviceResetting != null)
                 DeviceResetting(this, EventArgs.Empty);
-
-#if OPENGL
-            // Free all the cached shader programs. 
-            _programCache.Clear();
-            _shaderProgram = -1;
-#endif
         }
 
         /// <summary>
