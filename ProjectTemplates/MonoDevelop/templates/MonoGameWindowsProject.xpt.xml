@@ -26,8 +26,6 @@
 				<Reference type="Gac" refto="OpenTK" />
 				<Reference type="Gac" refto="MonoGame.Framework.Windows" />
 				<Reference type="Gac" refto="Lidgren.Network" />
-				<Reference type="Gac" refto="GamepadBridge.dll" />
-				<Reference type="Gac" refto="GamepadConfigControls.dll" />
 				<Reference type="Gac" refto="Tao.Sdl.dll" />
 			</References>
 			<Files>
