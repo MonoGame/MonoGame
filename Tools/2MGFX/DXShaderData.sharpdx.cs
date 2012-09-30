@@ -22,14 +22,12 @@ namespace Microsoft.Xna.Framework.Graphics
             using (var original = new SharpDX.D3DCompiler.ShaderBytecode(byteCode))
             {
                 // Strip the bytecode for saving to disk.
-                using (var stripped = original.Strip(stripFlags))
+                var stripped = original.Strip(stripFlags);
                 {
                     // Only SM4 and above works with strip... so this can return null!
                     if (stripped != null)
                     {
-                        var shaderCode = new byte[stripped.BufferSize];
-                        stripped.Data.Read(shaderCode, 0, shaderCode.Length);
-                        dxshader.ShaderCode = shaderCode;
+                        dxshader.ShaderCode = stripped;
                     }
                     else
                     {
@@ -46,7 +44,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
 
                 // Use reflection to get details of the shader.
-                using (var refelect = new SharpDX.D3DCompiler.ShaderReflection(original))
+                using (var refelect = new SharpDX.D3DCompiler.ShaderReflection(byteCode))
                 {
                     // Get the samplers.
                     var samplers = new List<Sampler>();
