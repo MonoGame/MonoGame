@@ -190,9 +190,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw ex;
             }
 
-            // Get the shader bytecode.
-            var bytecode = new byte[shaderByteCode.Data.Length];
-            shaderByteCode.Data.Read(bytecode, 0, bytecode.Length);
+            // Get a copy of the shader bytecode.
+            var bytecode = shaderByteCode.Data.ToArray();
 
             // First look to see if we already created this same shader.
             DXShaderData dxShader = null;
