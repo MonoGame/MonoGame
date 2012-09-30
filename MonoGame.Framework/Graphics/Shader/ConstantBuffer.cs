@@ -104,6 +104,14 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
         }
 
+        internal void Clear()
+        {
+#if OPENGL
+            // Force the uniform location to be looked up again
+            _program = -1;
+#endif
+        }
+
         private void SetData(int offset, int rows, int columns, object data)
         {
             // TODO: Should i pass the element size in?

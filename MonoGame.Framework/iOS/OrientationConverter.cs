@@ -103,6 +103,28 @@ namespace Microsoft.Xna.Framework
             }
         }
 
+        public static UIInterfaceOrientationMask ToUIInterfaceOrientationMask (DisplayOrientation orientation)
+        {
+            switch (Normalize(orientation))
+            {
+                case((DisplayOrientation)1):
+                case((DisplayOrientation)6):
+                    return UIInterfaceOrientationMask.Landscape;
+                case((DisplayOrientation)2):
+                    return UIInterfaceOrientationMask.LandscapeLeft;
+                case((DisplayOrientation)4):
+                    return UIInterfaceOrientationMask.LandscapeRight;
+                case((DisplayOrientation)16):
+                    return UIInterfaceOrientationMask.Portrait;
+                case((DisplayOrientation)32):
+                    return UIInterfaceOrientationMask.PortraitUpsideDown;
+                case((DisplayOrientation)14):
+                    return UIInterfaceOrientationMask.AllButUpsideDown;
+                default:
+                    return UIInterfaceOrientationMask.All;
+            }
+        }
+
         public static DisplayOrientation Normalize(DisplayOrientation orientation)
         {
             var normalized = orientation;
