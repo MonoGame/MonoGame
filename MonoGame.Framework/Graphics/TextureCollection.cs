@@ -52,7 +52,10 @@ namespace Microsoft.Xna.Framework.Graphics
             for (var i = 0; i < _textures.Length; i++)
             {
                 _textures[i] = null;
+#if GLES
+                // OpenGL on Windows doesnt seem to have TextureTarget.Zero
                 _targets[i] = TextureTarget.Zero;
+#endif
             }
 
             _dirty = int.MaxValue;
