@@ -251,8 +251,26 @@ namespace Microsoft.Xna.Framework {
 			if (gds != null && gds.GraphicsDevice != null)
 			{
                 var pp = gds.GraphicsDevice.PresentationParameters;
-                pp.BackBufferHeight = (int) (unscaledViewportHeight * Layer.ContentsScale);
-                pp.BackBufferWidth = (int)(unscaledViewportWidth * Layer.ContentsScale);
+                int height = (int)(unscaledViewportHeight * Layer.ContentsScale);
+                int width = (int)(unscaledViewportWidth * Layer.ContentsScale);
+
+                if (this.NextResponder is iOSGameViewController)
+                {
+                    DisplayOrientation supportedOrientations = OrientationConverter.Normalize((this.NextResponder as iOSGameViewController).SupportedOrientations);
+                    if ((supportedOrientations & DisplayOrientation.LandscapeRight) != 0 || (supportedOrientations & DisplayOrientation.LandscapeLeft) != 0)
+                    {
+                        height = (int)(Math.Min (unscaledViewportHeight,unscaledViewportWidth) * Layer.ContentsScale);
+                        width = (int)(Math.Max (unscaledViewportHeight,unscaledViewportWidth) * Layer.ContentsScale);
+                    }
+                    else
+                    {
+                        height = (int)(Math.Max (unscaledViewportHeight,unscaledViewportWidth) * Layer.ContentsScale);
+                        width = (int)(Math.Min (unscaledViewportHeight,unscaledViewportWidth) * Layer.ContentsScale);
+                    }
+                }
+
+                pp.BackBufferHeight = height;
+                pp.BackBufferWidth = width;
 
 				gds.GraphicsDevice.Viewport = new Viewport (
 					0, 0,

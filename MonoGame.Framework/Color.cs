@@ -1222,10 +1222,10 @@ namespace Microsoft.Xna.Framework
 		
 		public static Color Multiply( Color value, float scale)
 		{
-			byte Red = (byte)(value.R * scale);
-			byte Green = (byte)(value.G * scale);
-			byte Blue = (byte)(value.B * scale);
-			byte Alpha = (byte)(value.A * scale);
+            byte Red = (byte)(MathHelper.Clamp(value.R * scale, Byte.MinValue, Byte.MaxValue));
+            byte Green = (byte)(MathHelper.Clamp(value.G * scale, Byte.MinValue, Byte.MaxValue));
+            byte Blue = (byte)(MathHelper.Clamp(value.B * scale, Byte.MinValue, Byte.MaxValue));
+            byte Alpha = (byte)(MathHelper.Clamp(value.A * scale, Byte.MinValue, Byte.MaxValue));
 			
 			return new Color( Red, Green, Blue, Alpha );
 		}

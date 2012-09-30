@@ -323,11 +323,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void Initialize()
         {
-            // TODO: This line should not be necessary as Effects are being recompiled
-            // in DeviceReset. There seems to be an issue related to static
-            // initialisation order and removing it breaks drawing in 3d.
-            Effect.FlushCache();
-
             // Setup extensions.
 #if OPENGL
 #if GLES
@@ -373,12 +368,36 @@ namespace Microsoft.Xna.Framework.Graphics
             DepthStencilState = DepthStencilState.Default;
             RasterizerState = RasterizerState.CullCounterClockwise;
 
+            // Clear the texture and sampler collections forcing
+            // the state to be reapplied.
+            Textures.Clear();
+            SamplerStates.Clear();
+
+            // Clear constant buffers
+            _vertexConstantBuffers.Clear();
+            _pixelConstantBuffers.Clear();
+
+            // Ensure the vertex attributes are reset
+            _enabledVertexAttributes.Clear();
+
+            // Force set the buffers and shaders on next ApplyState() call
+            _indexBufferDirty = true;
+            _vertexBufferDirty = true;
+            _vertexShaderDirty = true;
+            _pixelShaderDirty = true;
+
             // Set the default scissor rect.
             _scissorRectangleDirty = true;
             ScissorRectangle = _viewport.Bounds;
 
             // Set the default render target.
             ApplyRenderTargets(null);
+
+#if OPENGL
+            // Free all the cached shader programs. 
+            _programCache.Clear();
+            _shaderProgram = -1;
+#endif
         }
 
 #if DIRECTX
@@ -999,12 +1018,6 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (DeviceResetting != null)
                 DeviceResetting(this, EventArgs.Empty);
-
-#if OPENGL
-            // Free all the cached shader programs. 
-            _programCache.Clear();
-            _shaderProgram = -1;
-#endif
         }
 
         /// <summary>
