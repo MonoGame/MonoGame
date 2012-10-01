@@ -691,7 +691,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #elif DIRECTX
             // Use WIC to decode the image into the output format
             using (var factory = new SharpDX.WIC.ImagingFactory2())
-            using (var decoder = new SharpDX.WIC.BitmapDecoder(factory, stream, SharpDX.WIC.DecodeOptions.CacheOnLoad)
+            using (var decoder = new SharpDX.WIC.BitmapDecoder(factory, stream, SharpDX.WIC.DecodeOptions.CacheOnLoad))
             using (var converter = new SharpDX.WIC.FormatConverter(factory))
             {
                 converter.Initialize(decoder.GetFrame(0),
