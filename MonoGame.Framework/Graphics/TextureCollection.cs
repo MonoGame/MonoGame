@@ -53,8 +53,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 _textures[i] = null;
 #if OPENGL
-                // OpenGL on Windows doesnt seem to have TextureTarget.Zero
-                _targets[i] = (TextureTarget)All.Zero;
+                _targets[i] = 0;
 #endif
             }
 
