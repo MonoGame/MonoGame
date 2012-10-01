@@ -224,8 +224,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			      sourceRectangle,
 			      color,
 			      rotation,
-			      new Vector2(origin.X * (destinationRectangle.Width / texture.Width),
-                              origin.Y * (destinationRectangle.Height / texture.Height)),
+			      new Vector2(origin.X * ((float)destinationRectangle.Width / (float)texture.Width),
+                              origin.Y * ((float)destinationRectangle.Height / (float)texture.Height)),
 			      effect,
 			      depth);
 		}
