@@ -52,7 +52,7 @@ namespace Microsoft.Xna.Framework.Graphics
             for (var i = 0; i < _textures.Length; i++)
             {
                 _textures[i] = null;
-                _targets[i] = TextureTarget.Zero;
+                _targets[i] = 0;
             }
 
             _dirty = int.MaxValue;
