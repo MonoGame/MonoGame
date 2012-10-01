@@ -689,7 +689,45 @@ namespace Microsoft.Xna.Framework.Graphics
             return texture;
 
 #elif DIRECTX
-            throw new NotImplementedException();
+            // Use WIC to decode the image into the output format
+            using (var factory = new SharpDX.WIC.ImagingFactory2())
+            using (var decoder = new SharpDX.WIC.BitmapDecoder(factory, stream, SharpDX.WIC.DecodeOptions.CacheOnLoad)
+            using (var converter = new SharpDX.WIC.FormatConverter(factory))
+            {
+                converter.Initialize(decoder.GetFrame(0),
+                                    SharpDX.WIC.PixelFormat.Format32bppRGBA,
+                                    SharpDX.WIC.BitmapDitherType.None,
+                                    null,
+                                    0,
+                                    SharpDX.WIC.BitmapPaletteType.Custom);
+
+                var outputDesc = new SharpDX.Direct3D11.Texture2DDescription
+                {
+                    Width = converter.Size.Width,
+                    Height = converter.Size.Height,
+                    ArraySize = 1,
+                    BindFlags = SharpDX.Direct3D11.BindFlags.ShaderResource,
+                    Usage = SharpDX.Direct3D11.ResourceUsage.Default,
+                    CpuAccessFlags = SharpDX.Direct3D11.CpuAccessFlags.None,
+                    Format = SharpDX.DXGI.Format.R8G8B8A8_UNorm,
+                    MipLevels = 1,
+                    OptionFlags = SharpDX.Direct3D11.ResourceOptionFlags.None,
+                    SampleDescription = new SharpDX.DXGI.SampleDescription(1, 0)
+                };
+
+                // Build a SharpDX stream and copy the converted pixel data to it
+                using (var dataStream = new SharpDX.DataStream(outputDesc.Height * outputDesc.Width * 4, true, true))
+                {
+                    var stride = converter.Size.Width * 4;
+                    converter.CopyPixels(stride, dataStream);
+                    var rect = new SharpDX.DataRectangle(dataStream.DataPointer, stride);
+
+                    return new Texture2D(graphicsDevice, outputDesc.Width, outputDesc.Height)
+                    {
+                        _texture = new SharpDX.Direct3D11.Texture2D(graphicsDevice._d3dDevice, outputDesc, rect)
+                    };
+                }
+            }
 #elif PSS
             return new Texture2D(graphicsDevice, stream);
 #else
