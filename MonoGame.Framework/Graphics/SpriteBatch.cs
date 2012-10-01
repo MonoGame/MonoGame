@@ -224,7 +224,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			      sourceRectangle,
 			      color,
 			      rotation,
-			      origin,
+			      new Vector2(origin.X * (destinationRectangle.Width / texture.Width),
+                              origin.Y * (destinationRectangle.Height / texture.Height)),
 			      effect,
 			      depth);
 		}
@@ -270,8 +271,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			item.Set (destinationRectangle.X,
 					destinationRectangle.Y, 
-					-origin.X * (destinationRectangle.Z / texture.Width), 
-					-origin.Y * (destinationRectangle.W / texture.Height),
+					-origin.X, 
+					-origin.Y,
 					destinationRectangle.Z,
 					destinationRectangle.W,
 					(float)Math.Sin (rotation), 
