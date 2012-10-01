@@ -92,10 +92,29 @@ namespace Microsoft.Xna.Framework.GamerServices
 
 	class GuideViewController : UIViewController
 	{
+        #region Autorotation for iOS 5 or older
 		public override bool ShouldAutorotateToInterfaceOrientation (UIInterfaceOrientation toInterfaceOrientation)
 		{
 			return this.ParentViewController.ShouldAutorotateToInterfaceOrientation(toInterfaceOrientation);
 		}
+        #endregion
+
+        #region Autorotation for iOS 6 or newer
+        public override UIInterfaceOrientationMask GetSupportedInterfaceOrientations ()
+        {
+            return this.ParentViewController.GetSupportedInterfaceOrientations();
+        }
+        
+        public override bool ShouldAutorotate ()
+        {
+            return true;
+        }
+        
+        public override UIInterfaceOrientation PreferredInterfaceOrientationForPresentation ()
+        {
+            return this.ParentViewController.PreferredInterfaceOrientationForPresentation();
+        }
+        #endregion
 
 		public override void DidRotate (UIInterfaceOrientation fromInterfaceOrientation)
 		{
@@ -132,6 +151,8 @@ namespace Microsoft.Xna.Framework.GamerServices
 		private static bool _isInitialised;
 		private static UIWindow _window;
 		private static UIViewController _gameViewController;
+
+        public static GKMatch Match { get; private set; }
 
 		internal static void Initialise(Game game)
 		{
@@ -446,9 +467,18 @@ namespace Microsoft.Xna.Framework.GamerServices
 			    }
 			}
 		}
-		
-		
-		public static void ShowMatchMaker()
+
+        /// <summary>
+        /// Displays the iOS matchmaker to the player.
+        /// </summary>
+        /// <remarks>
+        /// Note this is not overloaded in derived classes on purpose.  This is
+        /// only a reason this exists is for caching effects.
+        /// </remarks>
+        /// <param name="minPlayers">Minimum players to find</param>
+        /// <param name="maxPlayers">Maximum players to find</param>
+        /// <param name="playersToInvite">Players to invite/param>
+        public static void ShowMatchMaker(int minPlayers, int maxPlayers, string[] playersToInvite)
 		{
 			AssertInitialised ();
 
@@ -457,11 +487,15 @@ namespace Microsoft.Xna.Framework.GamerServices
 				// Lazy load it
 				if ( matchmakerViewController == null )
 				{
-					matchmakerViewController = new GKMatchmakerViewController();
+					matchmakerViewController = new GKMatchmakerViewController(new GKMatchRequest());
 				}
 
 			    if (matchmakerViewController != null)		
-			    {			
+			    {		
+                    matchmakerViewController.MatchRequest.MinPlayers = minPlayers;
+                    matchmakerViewController.MatchRequest.MaxPlayers = maxPlayers;
+                    matchmakerViewController.MatchRequest.PlayersToInvite = playersToInvite;
+
 					matchmakerViewController.DidFailWithError += delegate(object sender, GKErrorEventArgs e) {
 						matchmakerViewController.DismissModalViewControllerAnimated(true);
 						IsVisible = false;
@@ -469,7 +503,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 					};
 					
 					matchmakerViewController.DidFindMatch += delegate(object sender, GKMatchEventArgs e) {
-						
+                        Guide.Match = e.Match;
 					};
 						
 					matchmakerViewController.DidFindPlayers += delegate(object sender, GKPlayersEventArgs e) {
@@ -499,6 +533,20 @@ namespace Microsoft.Xna.Framework.GamerServices
 			    }
 			}
 		}
+
+        /// <summary>
+        /// Displays the iOS matchmaker to the player.
+        /// </summary>
+        /// <remarks>
+        /// Note this is not overloaded in derived classes on purpose.  This is
+        /// only a reason this exists is for caching effects.
+        /// </remarks>
+        /// <param name="minPlayers">Minimum players to find</param>
+        /// <param name="maxPlayers">Maximum players to find</param>
+        public static void ShowMatchMaker(int minPlayers, int maxPlayers)
+        {
+            ShowMatchMaker(minPlayers, maxPlayers, null);
+        }
 
 		public static IAsyncResult BeginShowStorageDeviceSelector( AsyncCallback callback, Object state )
 		{

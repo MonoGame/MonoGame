@@ -123,6 +123,8 @@ namespace Microsoft.Xna.Framework.Graphics
             if (graphicsDevice == null)
                 throw new ArgumentNullException("Graphics Device Cannot Be Null");
 
+            graphicsDevice.DeviceResetting += new EventHandler<EventArgs>(graphicsDevice_DeviceResetting);
+
             this.graphicsDevice = graphicsDevice;
             this.width = width;
             this.height = height;
@@ -168,33 +170,10 @@ namespace Microsoft.Xna.Framework.Graphics
             
             Threading.BlockOnUIThread(() =>
             {
-#if IPHONE || ANDROID
-                GL.GenTextures(1, ref this.glTexture);
-#else
-			    GL.GenTextures(1, out this.glTexture);
-#endif
-                GraphicsExtensions.CheckGLError();
-                // For best compatibility and to keep the default wrap mode of XNA, only set ClampToEdge if either
-                // dimension is not a power of two.
-                var wrap = TextureWrapMode.Repeat;
-                if (((width & (width - 1)) != 0) || ((height & (height - 1)) != 0))
-                    wrap = TextureWrapMode.ClampToEdge;
-
                 // Store the current bound texture.
                 var prevTexture = GraphicsExtensions.GetBoundTexture2D();
 
-                GL.BindTexture(TextureTarget.Texture2D, this.glTexture);
-                GraphicsExtensions.CheckGLError();
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter,
-                                mipmap ? (int)TextureMinFilter.LinearMipmapLinear : (int)TextureMinFilter.Linear);
-                GraphicsExtensions.CheckGLError();
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter,
-                                (int)TextureMagFilter.Linear);
-                GraphicsExtensions.CheckGLError();
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)wrap);
-                GraphicsExtensions.CheckGLError();
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)wrap);
-                GraphicsExtensions.CheckGLError();
+                GenerateGLTextureIfRequired();
 
                 format.GetGLFormat(out glInternalFormat, out glFormat, out glType);
 
@@ -246,7 +225,20 @@ namespace Microsoft.Xna.Framework.Graphics
             });
 #endif
         }
-        
+
+        void graphicsDevice_DeviceResetting(object sender, EventArgs e)
+        {
+#if OPENGL
+            this.glTexture = -1;
+#endif
+        }
+
+        public override void Dispose()
+        {
+            graphicsDevice.DeviceResetting -= graphicsDevice_DeviceResetting;
+            base.Dispose();
+        }
+
 #if PSS
         private Texture2D(GraphicsDevice graphicsDevice, Stream stream)
         {
@@ -336,6 +328,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 // Store the current bound texture.
                 var prevTexture = GraphicsExtensions.GetBoundTexture2D();
+
+                GenerateGLTextureIfRequired();
 
                 GL.BindTexture(TextureTarget.Texture2D, this.glTexture);
                 GraphicsExtensions.CheckGLError();
@@ -795,11 +789,20 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 #endif // WINRT
 
-        //What was this for again?
-		internal void Reload(Stream textureStream)
-		{
+        // This method allows games that use Texture2D.FromStream 
+        // to reload their textures after the GL context is lost.
+        internal void Reload(Stream textureStream)
+        {
 #if OPENGL
-            if (!GL.IsTexture(this.glTexture))
+            GenerateGLTextureIfRequired();
+            FillTextureFromStream(textureStream);
+#endif
+        }
+
+#if OPENGL
+        private void GenerateGLTextureIfRequired()
+        {
+            if (this.glTexture < 0)
             {
 #if IPHONE || ANDROID
                 GL.GenTextures(1, ref this.glTexture);
@@ -807,11 +810,28 @@ namespace Microsoft.Xna.Framework.Graphics
                 GL.GenTextures(1, out this.glTexture);
 #endif
                 GraphicsExtensions.CheckGLError();
-            }
 
-            FillTextureFromStream(textureStream);
+                // For best compatibility and to keep the default wrap mode of XNA, only set ClampToEdge if either
+                // dimension is not a power of two.
+                var wrap = TextureWrapMode.Repeat;
+                if (((width & (width - 1)) != 0) || ((height & (height - 1)) != 0))
+                    wrap = TextureWrapMode.ClampToEdge;
+
+                GL.BindTexture(TextureTarget.Texture2D, this.glTexture);
+                GraphicsExtensions.CheckGLError();
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter,
+                                (levelCount > 1) ? (int)TextureMinFilter.LinearMipmapLinear : (int)TextureMinFilter.Linear);
+                GraphicsExtensions.CheckGLError();
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter,
+                                (int)TextureMagFilter.Linear);
+                GraphicsExtensions.CheckGLError();
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)wrap);
+                GraphicsExtensions.CheckGLError();
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)wrap);
+                GraphicsExtensions.CheckGLError();
+            }
+        }
 #endif
-		}
 
 #if ANDROID
 		private byte[] GetTextureData(int ThreadPriorityLevel)
