@@ -604,7 +604,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
             GL.GetInteger(GetPName.TextureBinding2D, out prevTexture);
 #endif
-            GraphicsExtensions.CheckGLError();
+            GraphicsExtensions.LogGLError("GraphicsExtensions.GetBoundTexture2D() GL.GetInteger");
             return prevTexture;
         }
 
@@ -618,12 +618,13 @@ namespace Microsoft.Xna.Framework.Graphics
 #elif OPENGL
             ErrorCode error = GL.GetError();
             if (error != ErrorCode.NoError)
-                throw new Exception("GL.GetError() returned " + error.ToString());
+                throw new MonoGameGLException("GL.GetError() returned " + error.ToString());
 #endif
 
         }
 #endif
 
+#if OPENGL
         [System.Diagnostics.Conditional("DEBUG")]
         public static void LogGLError(string location)
         {
@@ -639,6 +640,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
             }
         }
+#endif
     }
 
     public class MonoGameGLException : Exception
