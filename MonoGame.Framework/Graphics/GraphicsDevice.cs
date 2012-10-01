@@ -1071,13 +1071,13 @@ namespace Microsoft.Xna.Framework.Graphics
                     GL.Viewport(value.X, value.Y, value.Width, value.Height);
                 else
                     GL.Viewport(value.X, PresentationParameters.BackBufferHeight - value.Y - value.Height, value.Width, value.Height);
-                GraphicsExtensions.CheckGLError();
+                GraphicsExtensions.LogGLError("GraphicsDevice.Viewport_set() GL.Viewport");
 #if GLES
                 GL.DepthRange(value.MinDepth, value.MaxDepth);
 #else
                 GL.DepthRange((double)value.MinDepth, (double)value.MaxDepth);
 #endif
-                GraphicsExtensions.CheckGLError();
+                GraphicsExtensions.LogGLError("GraphicsDevice.Viewport_set() GL.DepthRange");
 #endif
             }
         }
