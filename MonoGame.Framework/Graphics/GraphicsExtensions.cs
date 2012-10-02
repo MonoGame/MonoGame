@@ -624,14 +624,15 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 #endif
 
+#if OPENGL
         [System.Diagnostics.Conditional("DEBUG")]
         public static void LogGLError(string location)
         {
             try
             {
-#if OPENGL
+
                 GraphicsExtensions.CheckGLError();
-#endif
+
             }
             catch (MonoGameGLException ex)
             {
@@ -642,6 +643,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
     }
+#endif
 
     public class MonoGameGLException : Exception
     {
