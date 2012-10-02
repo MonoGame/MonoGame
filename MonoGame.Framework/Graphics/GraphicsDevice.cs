@@ -378,7 +378,9 @@ namespace Microsoft.Xna.Framework.Graphics
             _pixelConstantBuffers.Clear();
 
             // Ensure the vertex attributes are reset
+#if OPENGL
             _enabledVertexAttributes.Clear();
+#endif
 
             // Force set the buffers and shaders on next ApplyState() call
             _indexBufferDirty = true;

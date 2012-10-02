@@ -629,7 +629,9 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             try
             {
+#if OPENGL
                 GraphicsExtensions.CheckGLError();
+#endif
             }
             catch (MonoGameGLException ex)
             {
