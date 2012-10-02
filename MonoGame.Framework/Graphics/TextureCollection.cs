@@ -52,7 +52,9 @@ namespace Microsoft.Xna.Framework.Graphics
             for (var i = 0; i < _textures.Length; i++)
             {
                 _textures[i] = null;
-                _targets[i] = TextureTarget.Zero;
+#if OPENGL
+                _targets[i] = 0;
+#endif
             }
 
             _dirty = int.MaxValue;
