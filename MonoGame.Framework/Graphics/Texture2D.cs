@@ -91,7 +91,6 @@ using Android.Graphics;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-
     public class Texture2D : Texture
     {
 		protected int width;
@@ -660,26 +659,7 @@ namespace Microsoft.Xna.Framework.Graphics
             return texture;
 
 #elif DIRECTX
-
-    #if WINRT
-
-            // I'm not sure why there's a DirectX vs. WINRT precompile...but just in case they mean 2 things I'm going to isolate my
-            // code to WINRT
-            // For reference this implementation was ultimately found through this post:
-            // http://stackoverflow.com/questions/9602102/loading-textures-with-sharpdx-in-metro 
-            
-            var bitmap = LoadBitmap(stream);
-
-            SharpDX.Direct3D11.Texture2D sharpDxTexture = CreateTex2DFromBitmap(bitmap, graphicsDevice);
-
-            Texture2D toReturn = new Texture2D(graphicsDevice, bitmap.Size.Width, bitmap.Size.Height);
-
-            toReturn._texture = sharpDxTexture;
-
-            return toReturn;
-    #else
             throw new NotImplementedException();
-    #endif
 #elif PSS
             return new Texture2D(graphicsDevice, stream);
 #else
@@ -752,7 +732,6 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
         }
 
-
 #if WINRT
         private void SaveAsImage(Guid encoderId, Stream stream, int width, int height)
         {
@@ -778,59 +757,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
             }).Wait();
         }
-
-        public static SharpDX.Direct3D11.Texture2D CreateTex2DFromBitmap(SharpDX.WIC.BitmapSource bsource, GraphicsDevice device)
-        {
-
-            SharpDX.Direct3D11.Texture2DDescription desc;
-            desc.Width = bsource.Size.Width;
-            desc.Height = bsource.Size.Height;
-            desc.ArraySize = 1;
-            desc.BindFlags = SharpDX.Direct3D11.BindFlags.ShaderResource;
-            desc.Usage = SharpDX.Direct3D11.ResourceUsage.Default;
-            desc.CpuAccessFlags = SharpDX.Direct3D11.CpuAccessFlags.None;
-            desc.Format = SharpDX.DXGI.Format.R8G8B8A8_UNorm;
-            desc.MipLevels = 1;
-            desc.OptionFlags = SharpDX.Direct3D11.ResourceOptionFlags.None;
-            desc.SampleDescription.Count = 1;
-            desc.SampleDescription.Quality = 0;
-
-            SharpDX.DataStream s = new SharpDX.DataStream(bsource.Size.Height * bsource.Size.Width * 4, true, true);
-            bsource.CopyPixels(bsource.Size.Width * 4, s);
-
-            SharpDX.DataRectangle rect = new SharpDX.DataRectangle(s.DataPointer, bsource.Size.Width * 4);
-
-            SharpDX.Direct3D11.Texture2D t2d = new SharpDX.Direct3D11.Texture2D(device._d3dDevice, desc, rect);
-            return t2d;
-        }
-
-        static SharpDX.WIC.ImagingFactory imgfactory = null;
-        private static SharpDX.WIC.BitmapSource LoadBitmap(Stream stream)
-        {
-            if (imgfactory == null)
-            {
-                imgfactory = new SharpDX.WIC.ImagingFactory();
-            }
-            SharpDX.WIC.BitmapDecoder d = new SharpDX.WIC.BitmapDecoder(
-                imgfactory,
-                stream,
-                SharpDX.WIC.DecodeOptions.CacheOnDemand
-                );
-            SharpDX.WIC.FormatConverter fconv = new SharpDX.WIC.FormatConverter(imgfactory);
-
-            //Guid GUID_WICPixelFormat32bppPRGBA = new Guid((int)0x3cc4a650,
-            //    unchecked((short)0xa527), (short)0x4d37, (byte)0xa9, (byte)0x16, (byte)0x31,
-            //    (byte)0x42, (byte)0xc7, (byte)0xeb, (byte)0xed, (byte)0xba);
-
-            fconv.Initialize(
-                d.GetFrame(0),
-                SharpDX.WIC.PixelFormat.Format32bppPRGBA,
-               SharpDX.WIC.BitmapDitherType.None, null,
-               0.0, SharpDX.WIC.BitmapPaletteType.Custom);
-            return fconv;
-        }
-
-
 #endif // WINRT
 
         //What was this for again?
