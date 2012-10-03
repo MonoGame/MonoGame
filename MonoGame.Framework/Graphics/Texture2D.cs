@@ -690,7 +690,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #elif DIRECTX
     #if WINRT
-
             // I'm not sure why there's a DirectX vs. WINRT precompile...but just in case they mean 2 things I'm going to isolate my
             // code to WINRT
             // For reference this implementation was ultimately found through this post:
