@@ -109,17 +109,37 @@ namespace Microsoft.Xna.Framework {
 			get { return (iOSGameView) base.View; }
 		}
 
+        #region Autorotation for iOS 5 or older
 		public override bool ShouldAutorotateToInterfaceOrientation (UIInterfaceOrientation toInterfaceOrientation)
 		{
-			DisplayOrientation supportedOrientations;
-			if (SupportedOrientations == DisplayOrientation.Default) {
-				supportedOrientations = GetDefaultSupportedOrientations();
-			} else {
-				supportedOrientations = OrientationConverter.Normalize (SupportedOrientations);
-			}
+            DisplayOrientation supportedOrientations = OrientationConverter.Normalize (SupportedOrientations);
 			var toOrientation = OrientationConverter.ToDisplayOrientation (toInterfaceOrientation);
 			return (toOrientation & supportedOrientations) == toOrientation;
 		}
+        #endregion
+
+        #region Autorotation for iOS 6 or newer
+        public override UIInterfaceOrientationMask GetSupportedInterfaceOrientations ()
+        {
+            return OrientationConverter.ToUIInterfaceOrientationMask(this.SupportedOrientations);
+        }
+        
+        public override bool ShouldAutorotate ()
+        {
+            return true;
+        }
+        
+        public override UIInterfaceOrientation PreferredInterfaceOrientationForPresentation ()
+        {
+            DisplayOrientation supportedOrientations = OrientationConverter.Normalize(SupportedOrientations);
+            if ((supportedOrientations & DisplayOrientation.LandscapeRight) != 0)
+                return UIInterfaceOrientation.LandscapeRight;
+            else if ((supportedOrientations & DisplayOrientation.LandscapeLeft) != 0)
+                return UIInterfaceOrientation.LandscapeLeft;
+            else
+                return UIInterfaceOrientation.Portrait;
+        }
+        #endregion
 
 		public override void DidRotate (UIInterfaceOrientation fromInterfaceOrientation)
 		{
@@ -128,7 +148,7 @@ namespace Microsoft.Xna.Framework {
 			var handler = InterfaceOrientationChanged;
 			if (handler != null)
 				handler (this, EventArgs.Empty);
-		}
+        }       
 		
 		public override void TouchesBegan (NSSet touches, UIEvent evt)
 		{
@@ -149,47 +169,6 @@ namespace Microsoft.Xna.Framework {
 		public override void TouchesCancelled (NSSet touches, UIEvent evt)
 		{
 			base.TouchesCancelled (touches, evt);
-		}
-
-		private DisplayOrientation? _defaultSupportedOrientations;
-		/// <summary>
-		/// Gets the default supported orientations as specified in the
-		/// Info.plist for the application.
-		/// </summary>
-		private DisplayOrientation GetDefaultSupportedOrientations ()
-		{
-			if (_defaultSupportedOrientations.HasValue)
-				return _defaultSupportedOrientations.Value;
-
-			var key = new NSString ("UISupportedInterfaceOrientations");
-			NSObject arrayObj;
-			if (!NSBundle.MainBundle.InfoDictionary.TryGetValue (key, out arrayObj)) {
-				_defaultSupportedOrientations = OrientationConverter.Normalize (DisplayOrientation.Default);
-				return _defaultSupportedOrientations.Value;
-			}
-
-			DisplayOrientation orientations = (DisplayOrientation)0;
-			var supportedOrientationStrings = NSArray.ArrayFromHandle<NSString> (arrayObj.Handle);
-
-			foreach (var orientationString in supportedOrientationStrings) {
-				var s = (string)orientationString;
-				if (!s.StartsWith("UIInterfaceOrientation"))
-					continue;
-				s = s.Substring ("UIInterfaceOrientation".Length);
-
-				try {
-					var supportedOrientation = (UIInterfaceOrientation)Enum.Parse(
-						typeof(UIInterfaceOrientation), s);
-					orientations |= OrientationConverter.ToDisplayOrientation (supportedOrientation);
-				} catch {
-				}
-			}
-
-			if (orientations == (DisplayOrientation)0)
-				orientations = OrientationConverter.Normalize (DisplayOrientation.Default);
-
-			_defaultSupportedOrientations = orientations;
-			return _defaultSupportedOrientations.Value;
 		}
 	}
 }

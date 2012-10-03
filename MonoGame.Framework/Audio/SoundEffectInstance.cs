@@ -55,6 +55,9 @@ namespace Microsoft.Xna.Framework.Audio
 #if !WINRT
 		private SoundState soundState = SoundState.Stopped;
 #endif
+#if ANDROID
+        private int _streamId = -1;
+#endif
 
 #if WINRT        
         internal SourceVoice _voice { get; set; }
@@ -89,8 +92,13 @@ namespace Microsoft.Xna.Framework.Audio
             _voice.Dispose();
             _voice = null;
             _effect = null;
+#elif ANDROID
+            if (_streamId >= 0)
+                _sound.Stop(_streamId);
 #else
-			_sound.Dispose();
+            // When disposing a SoundEffectInstance, the Sound should
+            // just be stopped as it will likely be reused later
+            _sound.Stop();
 #endif
 			isDisposed = true;
 		}
@@ -139,8 +147,12 @@ namespace Microsoft.Xna.Framework.Audio
 #else
             if ( _sound != null )
 			{
+#if ANDROID
+				_sound.Pause(_streamId);
+#else
 				_sound.Pause();
-				soundState = SoundState.Paused;
+#endif
+                soundState = SoundState.Paused;
 			}
 #endif
 		}
@@ -164,10 +176,17 @@ namespace Microsoft.Xna.Framework.Audio
 #else
 			if ( _sound != null )
 			{
+#if ANDROID
+				if (soundState == SoundState.Paused)
+					_sound.Resume(_streamId);
+				else
+					_streamId = _sound.Play();
+#else
 				if (soundState == SoundState.Paused)
 					_sound.Resume();
 				else
 					_sound.Play();
+#endif
 				soundState = SoundState.Playing;
 			}
 #endif
@@ -179,6 +198,18 @@ namespace Microsoft.Xna.Framework.Audio
             _voice.Start();
             _paused = false;
 #else
+			if ( _sound != null )
+			{
+				if (soundState == SoundState.Paused)
+				{
+#if ANDROID
+					_sound.Resume(_streamId);
+#else
+                    _sound.Resume();
+#endif
+                }
+				soundState = SoundState.Playing;
+ 			}
 #endif
 		}
 		
@@ -191,8 +222,13 @@ namespace Microsoft.Xna.Framework.Audio
 #else
 			if ( _sound != null )
 			{
-				_sound.Stop();
-				soundState = SoundState.Stopped;
+#if ANDROID
+				_sound.Stop(_streamId);
+				_streamId = -1;
+#else
+                _sound.Stop();
+#endif
+                soundState = SoundState.Stopped;
 			}
 #endif
         }
@@ -205,7 +241,12 @@ namespace Microsoft.Xna.Framework.Audio
 #else
 			if ( _sound != null )
 			{
-				_sound.Stop();
+#if ANDROID
+                _sound.Stop(_streamId);
+                _streamId = -1;
+#else
+                _sound.Stop();
+#endif
 				soundState = SoundState.Stopped;
 			}
 #endif
@@ -428,11 +469,24 @@ namespace Microsoft.Xna.Framework.Audio
                     return SoundState.Paused;
 
                 return SoundState.Playing;                                
+#elif ANDROID
+                // Android SoundPool can't tell us when a sound is finished playing.
+                // TODO: Remove this code when OpenAL for Android is implemented
+                if (_sound != null && IsLooped)
+                {
+                    // Looping sounds use our stored state
+                    return soundState;
+                }
+                else
+                {
+                    // Non looping sounds always return Stopped
+                    return SoundState.Stopped;
+                }
 #else
-				if (_sound != null && soundState == SoundState.Playing && !_sound.Playing) {
-					soundState = SoundState.Stopped;
-				}
-				return soundState;
+                if (_sound != null && soundState == SoundState.Playing && !_sound.Playing) 
+                {
+                    soundState = SoundState.Stopped;
+                }
 #endif
 			} 
 		}

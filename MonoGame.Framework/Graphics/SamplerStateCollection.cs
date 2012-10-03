@@ -80,7 +80,13 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 		}
 
-#if DIRECTX
+        internal void Clear()
+        {
+            for (var i = 0; i < _samplers.Length; i++)
+                _samplers[i] = null;
+
+            _dirty = int.MaxValue;
+        }
 
         internal void SetSamplers(GraphicsDevice device)
         {
@@ -88,21 +94,29 @@ namespace Microsoft.Xna.Framework.Graphics
             if (_dirty == 0)
                 return;
 
+#if DIRECTX
             // NOTE: We make the assumption here that the caller has
             // locked the d3dContext for us to use.
-
             var pixelShaderStage = device._d3dContext.PixelShader;
+#endif
             for (var i = 0; i < _samplers.Length; i++)
             {
                 var mask = 1 << i;
                 if ((_dirty & mask) == 0)
                     continue;
 
+                var sampler = _samplers[i];
+#if OPENGL
+                var texture = device.Textures[i];
+                if (sampler != null && texture != null)
+                    sampler.Activate(texture.glTarget, texture.LevelCount > 1);
+#elif DIRECTX
                 SharpDX.Direct3D11.SamplerState state = null;
-                if (_samplers[i] != null)
-                    state = _samplers[i].GetState(device);
+                if (sampler != null)
+                    state = sampler.GetState(device);
 
                 pixelShaderStage.SetSampler(i, state);
+#endif
 
                 _dirty &= ~mask;
                 if (_dirty == 0)
@@ -111,7 +125,5 @@ namespace Microsoft.Xna.Framework.Graphics
 
             _dirty = 0;
         }
-
-#endif
 	}
 }

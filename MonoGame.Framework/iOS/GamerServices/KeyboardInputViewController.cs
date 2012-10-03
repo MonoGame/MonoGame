@@ -148,6 +148,7 @@ namespace Microsoft.Xna.Framework {
 			view.ScrollIndicatorInsets = UIEdgeInsets.Zero;
 		}
 
+        #region Autorotation for iOS 5 or older
 		public override bool ShouldAutorotateToInterfaceOrientation(UIInterfaceOrientation toInterfaceOrientation)
 		{
 			var delegateController = ParentViewController ?? PresentingViewController;
@@ -156,6 +157,32 @@ namespace Microsoft.Xna.Framework {
 					toInterfaceOrientation);
 			return toInterfaceOrientation == UIInterfaceOrientation.Portrait;
 		}
+        #endregion
+
+        #region Autorotation for iOS 6 or newer
+        public override UIInterfaceOrientationMask GetSupportedInterfaceOrientations ()
+        {
+            var delegateController = ParentViewController ?? PresentingViewController;
+            if (delegateController != null)
+                return delegateController.GetSupportedInterfaceOrientations();
+            else
+                return UIInterfaceOrientationMask.Portrait;
+        }
+        
+        public override bool ShouldAutorotate ()
+        {
+            return true;
+        }
+        
+        public override UIInterfaceOrientation PreferredInterfaceOrientationForPresentation ()
+        {
+            var delegateController = ParentViewController ?? PresentingViewController;
+            if (delegateController != null)
+                return delegateController.PreferredInterfaceOrientationForPresentation();
+            else
+                return UIInterfaceOrientation.Portrait;
+        }
+        #endregion
 
 		public override void WillRotate(UIInterfaceOrientation toInterfaceOrientation, double duration)
 		{

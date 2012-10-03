@@ -132,7 +132,7 @@ namespace Microsoft.Xna.Framework.Content
                 }
                 else
                 {
-                    System.Diagnostics.Debug.WriteLine(originalReaderTypeString);
+                    //System.Diagnostics.Debug.WriteLine(originalReaderTypeString);
 
     				// Need to resolve namespace differences
     				string readerTypeString = originalReaderTypeString;
@@ -216,7 +216,14 @@ namespace Microsoft.Xna.Framework.Content
         /// </param>
         public static void AddTypeCreator(string typeString, Func<ContentTypeReader> createFunction)
         {
-            typeCreators.Add(typeString, createFunction);
+            if (!typeCreators.ContainsKey(typeString))
+                typeCreators.Add(typeString, createFunction);
         }
+
+        public static void ClearTypeCreators()
+        {
+            typeCreators.Clear();
+        }
+
     }
 }

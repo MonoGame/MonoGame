@@ -21,6 +21,8 @@ using VertexPointerType = OpenTK.Graphics.ES20.All;
 using ColorPointerType = OpenTK.Graphics.ES20.All;
 using NormalPointerType = OpenTK.Graphics.ES20.All;
 using TexCoordPointerType = OpenTK.Graphics.ES20.All;
+using GetPName = OpenTK.Graphics.ES20.All;
+using System.Diagnostics;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -590,6 +592,62 @@ namespace Microsoft.Xna.Framework.Graphics
                     return 8;
             }
             return 0;
+        }
+
+#if OPENGL
+
+        public static int GetBoundTexture2D()
+        {
+            var prevTexture = 0;
+#if GLES
+            GL.GetInteger(GetPName.TextureBinding2D, ref prevTexture);
+#else
+            GL.GetInteger(GetPName.TextureBinding2D, out prevTexture);
+#endif
+            GraphicsExtensions.LogGLError("GraphicsExtensions.GetBoundTexture2D() GL.GetInteger");
+            return prevTexture;
+        }
+
+        [System.Diagnostics.Conditional("DEBUG")]
+        public static void CheckGLError()
+        {
+#if GLES
+            All error = GL.GetError();
+            if (error != All.False)
+                throw new MonoGameGLException("GL.GetError() returned " + error.ToString());
+#elif OPENGL
+            ErrorCode error = GL.GetError();
+            if (error != ErrorCode.NoError)
+                throw new MonoGameGLException("GL.GetError() returned " + error.ToString());
+#endif
+
+        }
+#endif
+
+#if OPENGL
+        [System.Diagnostics.Conditional("DEBUG")]
+        public static void LogGLError(string location)
+        {
+            try
+            {
+                GraphicsExtensions.CheckGLError();
+            }
+            catch (MonoGameGLException ex)
+            {
+#if ANDROID
+                // Todo: Add generic MonoGame logging interface
+                Android.Util.Log.Debug("MonoGame", "MonoGameGLException at " + location + " - " + ex.Message);
+#endif
+            }
+        }
+#endif
+    }
+
+    public class MonoGameGLException : Exception
+    {
+        public MonoGameGLException(string message)
+            : base(message)
+        {
         }
     }
 }
