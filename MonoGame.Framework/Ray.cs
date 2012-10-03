@@ -193,7 +193,7 @@ namespace Microsoft.Xna.Framework
         public void Intersects(ref Plane plane, out float? result)
         {
             var den = Vector3.Dot(Direction, plane.Normal);
-            if (Math.Abs(den) < 0.0001f)
+            if (Math.Abs(den) < 0.00001f)
             {
                 result = null;
                 return;
@@ -203,7 +203,7 @@ namespace Microsoft.Xna.Framework
 
             if (result < 0.0f)
             {
-                if (result < -0.0001f)
+                if (result < -0.00001f)
                 {
                     result = null;
                     return;
