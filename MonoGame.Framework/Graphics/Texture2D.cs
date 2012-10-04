@@ -689,7 +689,8 @@ namespace Microsoft.Xna.Framework.Graphics
             return texture;
 
 #elif DIRECTX
-    #if WINRT
+            throw new NotImplementedException();   
+#elif WINRT
 
             // I'm not sure why there's a DirectX vs. WINRT precompile...but just in case they mean 2 things I'm going to isolate my
             // code to WINRT
@@ -705,9 +706,6 @@ namespace Microsoft.Xna.Framework.Graphics
             toReturn._texture = sharpDxTexture;
 
             return toReturn;
-    #else
-            throw new NotImplementedException();
-    #endif
 #elif PSS
             return new Texture2D(graphicsDevice, stream);
 #else
