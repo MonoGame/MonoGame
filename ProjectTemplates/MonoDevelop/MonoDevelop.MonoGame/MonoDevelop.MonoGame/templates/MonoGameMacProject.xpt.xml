@@ -31,7 +31,7 @@
 				<Reference type="Project" refto="Lidgren.Network.MacOS" />
 			</References>
 			<Files>
-				<File name="${ProjectName}Game.cs" AddStandardHeader="True" src="MonoGameApplication/MacGame.cs" />
+				<File name="Game1.cs" AddStandardHeader="True" src="MonoGameApplication/MacGame.cs" />
 				<File name="Main.cs" AddStandardHeader="True" src="MonoGameApplication/MacMain.cs" />
 				<File name="Info.plist" AddStandardHeader="False" src="MonoGameApplication/MacInfo.plist" />
 				<Directory name="Content">

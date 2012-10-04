@@ -3,7 +3,7 @@
 	<TemplateConfiguration>
 		<_Name>MonoGame for Android Application</_Name>
 		<_Category>C#/MonoGame</_Category>
-		<Icon>monogame-project</Icon>
+		<Icon>monogame-project-android</Icon>
 		<LanguageName>C#</LanguageName>
 		<_Description>Creates an MonoGame for Android Project </_Description>
 	</TemplateConfiguration>
