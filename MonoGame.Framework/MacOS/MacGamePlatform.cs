@@ -494,8 +494,10 @@ namespace Microsoft.Xna.Framework
 
             public override void WillClose(NSNotification notification)
             {
-                NSApplication.SharedApplication.BeginInvokeOnMainThread(() =>
-                    _owner.State = MacGamePlatform.RunState.Exited);
+				NSApplication.SharedApplication.BeginInvokeOnMainThread( delegate {
+				    _owner.State = MacGamePlatform.RunState.Exited;
+				    _owner.Game.DoExiting();
+				});
             }
 
 			public override bool ShouldZoom (NSWindow window, RectangleF newFrame)
