@@ -37,8 +37,6 @@
 		<Import file="templates/MonoGameApplication/Resource.cs" />
 		<Import file="templates/MonoGameApplication/Splash.png" />
 		<Import file="templates/MonoGameApplication/Styles.xml" />
-		<Import file="OpenTK.dll" />
-		<Import file="Tao.Sdl.dll" />
 	</Runtime>
 	<Dependencies>
 		<Addin id="Core" version="3.0" />
