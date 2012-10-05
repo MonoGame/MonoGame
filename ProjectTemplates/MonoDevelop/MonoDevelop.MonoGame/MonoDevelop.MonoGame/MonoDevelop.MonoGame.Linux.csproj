@@ -40,7 +40,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="MonoDevelop.Core">    
+    <Reference Include="MonoDevelop.Core">  
+       <HintPath>bin/ReleaseLinux/MonoDevelop.Core.dll</HintPath>  
     </Reference>
     <Reference Include="System.Xml" />
   </ItemGroup>
