@@ -40,8 +40,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="MonoDevelop.Core">  
-       <HintPath>bin/ReleaseLinux/MonoDevelop.Core.dll</HintPath>  
+    <Reference Include="MonoDevelop.Core, Version=2.4.0.0, Culture=neutral">
+      <Package>monodevelop</Package>
+      <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="System.Xml" />
   </ItemGroup>
