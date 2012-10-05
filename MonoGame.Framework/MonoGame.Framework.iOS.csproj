@@ -325,7 +325,7 @@
     <Compile Include="Desktop\Audio\OpenALSoundController.cs" />
     <Compile Include="MacOS\Audio\OpenALSupport.cs" />
     <Compile Include="MacOS\Audio\SoundEffect.cs" />
-    <Compile Include="MacOS\Audio\SoundEffectInstance.cs" />
+    <Compile Include="Desktop\Audio\SoundEffectInstance.cs" />
     <Compile Include="Graphics\Effect\AlphaTestEffect.cs" />
     <Compile Include="Graphics\Shader\ConstantBufferCollection.cs" />
     <Compile Include="Graphics\Shader\ConstantBuffer.cs" />
