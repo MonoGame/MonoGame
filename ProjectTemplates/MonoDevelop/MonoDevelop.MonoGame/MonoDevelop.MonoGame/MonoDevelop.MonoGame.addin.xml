@@ -1,73 +1,72 @@
-<Addin id          = "MonoGame"
-       namespace   = "MonoDevelop"
-       name        = "MonoGame Project Templates"
-       author      = "Dean Ellis"
-       copyright   = "GPL"
-       url         = "http://monogame.codeplex.com/"
-       description = "C# Project and File templates for MonoGame"
-       category    = "Mono Game"
-       version     = "2.5.1">
-
-
+<Addin id="MonoGame" namespace="MonoDevelop" name="MonoGame Project Templates" author="Dean Ellis" copyright="GPL" url="http://monogame.codeplex.com/" description="C# Project and File templates for MonoGame" category="Mono Game" version="3.0.0">
 	<Runtime>
-		<Import file = "templates/MonoGameAndroidProject.xpt.xml"/>
-		<Import file = "templates/MonoGameiOSProject.xpt.xml"/>
-		<Import file = "templates/MonoGameWindowsProject.xpt.xml"/>
-		<Import file = "templates/MonoGameLinuxProject.xpt.xml"/>
-		<Import file = "templates/MonoGameMacProject.xpt.xml"/>
-        <Import file = "MonoDevelop.MonoGame.dll"/>
+		<Import file="icons/monogame-32.png" />
+		<Import file="icons/monogame-project-16.png" />
+		<Import file="icons/monogame-project-32.png" />
+		<Import file="icons/monogame-project-android-32.png" />
+		<Import file="icons/monogame-project-ios-32.png" />
+		<Import file="templates/MonoGameAndroidProject.xpt.xml" />
+		<Import file="templates/MonoGameiOSProject.xpt.xml" />
+		<Import file="templates/MonoGameWindowsProject.xpt.xml" />
+		<Import file="templates/MonoGameLinuxProject.xpt.xml" />
+		<Import file="templates/MonoGameMacProject.xpt.xml" />
+		<Import file="templates/MonoGameAndroidClass.xft.xml" />
+		<Import file="templates/MonoGameiOSClass.xft.xml" />
+		<Import file="templates/MonoGameMacClass.xft.xml" />
+		<Import file="MonoDevelop.MonoGame.dll" />
+		<Import file="templates/MonoGameApplication/AboutAssets.txt" />
+		<Import file="templates/MonoGameApplication/AboutContent.txt" />
+		<Import file="templates/MonoGameApplication/AboutResources.txt" />
+		<Import file="templates/MonoGameApplication/Activity1.cs" />
+		<Import file="templates/MonoGameApplication/AndroidAssemblyInfo.cs" />
+		<Import file="templates/MonoGameApplication/AssemblyInfo.cs" />
+		<Import file="templates/MonoGameApplication/Game1.cs" />
+		<Import file="templates/MonoGameApplication/Icon-hd.png" />
+		<Import file="templates/MonoGameApplication/Icon-ld.png" />
+		<Import file="templates/MonoGameApplication/Icon-md.png" />
+		<Import file="templates/MonoGameApplication/iOSAssemblyInfo.cs" />
+		<Import file="templates/MonoGameApplication/iOSDefault.png" />
+		<Import file="templates/MonoGameApplication/iOSGame.cs" />
+		<Import file="templates/MonoGameApplication/iOSGameThumbnail.png" />
+		<Import file="templates/MonoGameApplication/iOSInfo.plist" />
+		<Import file="templates/MonoGameApplication/iOSMain.cs" />
+		<Import file="templates/MonoGameApplication/MacGame.cs" />
+		<Import file="templates/MonoGameApplication/MacInfo.plist" />
+		<Import file="templates/MonoGameApplication/MacMain.cs" />
+		<Import file="templates/MonoGameApplication/Program.cs" />
+		<Import file="templates/MonoGameApplication/Resource.cs" />
+		<Import file="templates/MonoGameApplication/Splash.png" />
+		<Import file="templates/MonoGameApplication/Styles.xml" />
 	</Runtime>
-
 	<Dependencies>
-		<Addin id="Core" version="3.0"/>
-		<Addin id="Ide" version="3.0"/>
-		<Addin id="SourceEditor2" version="3.0"/>
-		<Addin id="Refactoring" version="3.0"/>
-		<Addin id="Autotools" version="3.0"/>
+		<Addin id="Core" version="3.0" />
+		<Addin id="Ide" version="3.0" />
+		<Addin id="SourceEditor2" version="3.0" />
+		<Addin id="Refactoring" version="3.0" />
+		<Addin id="Autotools" version="3.0" />
 	</Dependencies>
-    
-    <Extension path = "/MonoDevelop/Core/StockIcons">
-        <StockIcon stockid = "monogame-project" file = "icons/monogame-project-32.png" />
-     </Extension>
-	
-	<Extension path = "/MonoDevelop/ProjectModel/MSBuildItemTypes">
-		<DotNetProjectSubtype id="MonoGame"
-			guid="{9b831fef-f496-498f-9fe8-180da5cb4258}"
-			type="MonoDevelop.MonoGame.MonoGameProject">			
+	<Extension path="/MonoDevelop/Core/StockIcons">
+		<StockIcon stockid="monogame-project" file="icons/monogame-project-32.png" />
+		<StockIcon stockid="monogame-project-android" file="icons/monogame-project-android-32.png" />
+		<StockIcon stockid="monogame-project-ios" file="icons/monogame-project-iso-32.png" />
+	</Extension>
+	<Extension path="/MonoDevelop/ProjectModel/MSBuildItemTypes">
+		<DotNetProjectSubtype id="MonoGame" guid="{9b831fef-f496-498f-9fe8-180da5cb4258}" type="MonoDevelop.MonoGame.MonoGameProject">
 		</DotNetProjectSubtype>
 	</Extension>
-	
-	<Extension path = "/MonoDevelop/Core/MimeTypes">
-		<MimeType id="application/fx" _description="XNA 4.0 Effect File" isText="true">
-			<File pattern="*.fx" />
-		</MimeType>
-		<MimeType id="application/mgfx" _description="MonoGame Effect File" isText="true">
-			<File pattern="*.mgfx" />
-		</MimeType>
+	<Extension path="/MonoDevelop/ProjectModel/ProjectBindings">
+		<ProjectBinding id="MonoGame" class="MonoDevelop.MonoGame.MonoGameProjectBinding" />
 	</Extension>
-	
-	<Extension path = "/MonoDevelop/ProjectModel/ProjectServiceExtensions">
-		<Class class = "MonoDevelop.MonoGame.MonoGameBuildExtension" insertafter="FinalStep" />		
+	<Extension path="/MonoDevelop/Ide/ProjectTemplates">
+		<ProjectTemplate id="MonoGameForAndroidProject" file="templates/MonoGameAndroidProject.xpt.xml" />
+		<ProjectTemplate id="MonoGameForiOSProject" file="templates/MonoGameiOSProject.xpt.xml" />
+		<ProjectTemplate id="MonoGameForWindowsProject" file="templates/MonoGameWindowsProject.xpt.xml" />
+		<ProjectTemplate id="MonoGameForLinuxProject" file="templates/MonoGameLinuxProject.xpt.xml" />
+		<ProjectTemplate id="MonoGameForMacProject" file="templates/MonoGameMacProject.xpt.xml" />
 	</Extension>
-
-    <Extension path = "/MonoDevelop/ProjectModel/ProjectBindings">  
-        <ProjectBinding id = "MonoGame" class = "MonoDevelop.MonoGame.MonoGameProjectBinding" />  
-    </Extension>  
-    
-    <Extension path = "/MonoDevelop/Ide/ProjectTemplates">
-        <ProjectTemplate id = "MonoGameForAndroidProject" file = "templates/MonoGameAndroidProject.xpt.xml"/> 
-		<ProjectTemplate id = "MonoGameForiOSProject" file = "templates/MonoGameiOSProject.xpt.xml"/> 
-        <ProjectTemplate id = "MonoGameForWindowsProject" file = "templates/MonoGameWindowsProject.xpt.xml"/>                
-        <ProjectTemplate id = "MonoGameForLinuxProject" file = "templates/MonoGameLinuxProject.xpt.xml"/> 
-		<ProjectTemplate id = "MonoGameForMacProject" file = "templates/MonoGameMacProject.xpt.xml"/> 
-    </Extension>
-	
-	
-
-	<Extension path = "/MonoDevelop/Ide/FileTemplates">
-        <FileTemplate id = "MonoGameAndroidClass" resource = "MonoGameAndroidClass.xft.xml"/>
-		<FileTemplate id = "MonoGameiOSClass" resource = "MonoGameiOSClass.xft.xml"/>
-		<FileTemplate id = "MonoGameMacClass" resource = "MonoGameMacClass.xft.xml"/>
-    </Extension>	
-	
+	<Extension path="/MonoDevelop/Ide/FileTemplates">
+		<FileTemplate id="MonoGameAndroidClass" resource="MonoGameAndroidClass.xft.xml" />
+		<FileTemplate id="MonoGameiOSClass" resource="MonoGameiOSClass.xft.xml" />
+		<FileTemplate id="MonoGameMacClass" resource="MonoGameMacClass.xft.xml" />
+	</Extension>
 </Addin>

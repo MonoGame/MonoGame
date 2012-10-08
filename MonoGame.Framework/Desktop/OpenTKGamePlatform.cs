@@ -105,6 +105,8 @@ namespace Microsoft.Xna.Framework
             _view = new OpenTKGameWindow();
             _view.Game = game;
             this.Window = _view;
+
+            this.IsMouseVisible = true;
 			
 			// Setup our OpenALSoundController to handle our SoundBuffer pools
 			soundControllerInstance = OpenALSoundController.GetInstance;
