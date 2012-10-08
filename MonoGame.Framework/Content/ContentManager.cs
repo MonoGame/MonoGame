@@ -75,7 +75,7 @@ namespace Microsoft.Xna.Framework.Content
                 // Check if the list contains this content manager already. Also take
                 // the opportunity to prune the list of any finalized content managers.
                 bool contains = false;
-                for (int i = ContentManagers.Count - 1; i >= 0; ++i)
+                for (int i = ContentManagers.Count - 1; i >= 0; --i)
                 {
                     var contentRef = ContentManagers[i];
                     if (Object.ReferenceEquals(contentRef.Target, contentManager))
@@ -94,7 +94,7 @@ namespace Microsoft.Xna.Framework.Content
             {
                 // Check if the list contains this content manager and remove it. Also
                 // take the opportunity to prune the list of any finalized content managers.
-                for (int i = ContentManagers.Count - 1; i >= 0; ++i)
+                for (int i = ContentManagers.Count - 1; i >= 0; --i)
                 {
                     var contentRef = ContentManagers[i];
                     if (!contentRef.IsAlive || Object.ReferenceEquals(contentRef.Target, contentManager))
@@ -109,7 +109,7 @@ namespace Microsoft.Xna.Framework.Content
             {
                 // Reload the graphic assets of each content manager. Also take the
                 // opportunity to prune the list of any finalized content managers.
-                for (int i = ContentManagers.Count - 1; i >= 0; ++i)
+                for (int i = ContentManagers.Count - 1; i >= 0; --i)
                 {
                     var contentRef = ContentManagers[i];
                     if (contentRef.IsAlive)
