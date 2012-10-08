@@ -1509,21 +1509,20 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (_indexBufferDirty)
             {
-#if DIRECTX
-                Debug.Assert(_indexBuffer != null, "The index buffer is null!");
-
-                _d3dContext.InputAssembler.SetIndexBuffer(
-                    _indexBuffer._buffer,
-                    _indexBuffer.IndexElementSize == IndexElementSize.SixteenBits ? 
-                        SharpDX.DXGI.Format.R16_UInt : SharpDX.DXGI.Format.R32_UInt,
-                    0);
-#elif OPENGL
                 if (_indexBuffer != null)
                 {
+#if DIRECTX
+                    _d3dContext.InputAssembler.SetIndexBuffer(
+                        _indexBuffer._buffer,
+                        _indexBuffer.IndexElementSize == IndexElementSize.SixteenBits ? 
+                            SharpDX.DXGI.Format.R16_UInt : SharpDX.DXGI.Format.R32_UInt,
+                        0);
+#elif OPENGL
+
                     GL.BindBuffer(BufferTarget.ElementArrayBuffer, _indexBuffer.ibo);
                     GraphicsExtensions.CheckGLError();
-                }
 #endif
+                }
                 _indexBufferDirty = false;
             }
 
