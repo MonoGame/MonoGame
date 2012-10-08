@@ -3,7 +3,7 @@
 	<TemplateConfiguration>
 		<_Name>MonoGame iOS Application</_Name>
 		<_Category>C#/MonoGame</_Category>
-		<Icon>monogame-project</Icon>
+		<Icon>monogame-project-ios</Icon>
 		<LanguageName>C#</LanguageName>
 		<_Description>Creates a MonoGame Application for iOS</_Description>
 	</TemplateConfiguration>
@@ -30,7 +30,7 @@
 				<Reference type="Project" refto="Lidgren.Network.iOS" />
 			</References>
 			<Files>
-				<File name="${ProjectName}Game.cs" AddStandardHeader="True" src="MonoGameApplication/iOSGame.cs" />
+				<File name="Game1.cs" AddStandardHeader="True" src="MonoGameApplication/iOSGame.cs" />
 				<File name="Main.cs" AddStandardHeader="True" src="MonoGameApplication/iOSMain.cs" />
 				<File name="Info.plist" AddStandardHeader="False" src="MonoGameApplication/iOSInfo.plist" />
 				<RawFile name="Default.png" src="MonoGameApplication/iOSDefault.png" />
