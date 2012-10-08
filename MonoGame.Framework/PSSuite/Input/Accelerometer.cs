@@ -72,6 +72,7 @@ namespace Microsoft.Xna.Framework.Input
 		{
 			var motionData = Motion.GetData(0);
 			_accelerometerVector = new Vector3(motionData.Acceleration.X, motionData.Acceleration.Y, motionData.Acceleration.Z);
+			_state.Acceleration = _accelerometerVector;
 		}
     }
 }
