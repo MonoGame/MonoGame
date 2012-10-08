@@ -1,0 +1,7 @@
+﻿<AddinProject appVersion="3.0">
+	<Project platforms="Mac Linux Win32">
+		<AddinFile>MonoDevelop.MonoGame/bin/ReleaseLinux/MonoDevelop.MonoGame.dll</AddinFile>
+		<BuildFile>MonoDevelop.MonoGame.sln</BuildFile>
+		<BuildConfiguration>ReleaseLinux</BuildConfiguration>
+	</Project>	
+</AddinProject>
