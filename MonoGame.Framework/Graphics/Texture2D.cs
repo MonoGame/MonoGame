@@ -687,47 +687,25 @@ namespace Microsoft.Xna.Framework.Graphics
             });
 
             return texture;
+ 
+#elif WINRT
+            // For reference this implementation was ultimately found through this post:
+            // http://stackoverflow.com/questions/9602102/loading-textures-with-sharpdx-in-metro 
+            Texture2D toReturn = null;
+			SharpDX.WIC.BitmapDecoder decoder;
+			
+            using(var bitmap = LoadBitmap(stream, out decoder))
+			using (decoder)
+			{
+				SharpDX.Direct3D11.Texture2D sharpDxTexture = CreateTex2DFromBitmap(bitmap, graphicsDevice);
 
+				toReturn = new Texture2D(graphicsDevice, bitmap.Size.Width, bitmap.Size.Height);
+
+				toReturn._texture = sharpDxTexture;
+			}
+            return toReturn;
 #elif DIRECTX
-            // Use WIC to decode the image into the output format
-            using (var factory = new SharpDX.WIC.ImagingFactory2())
-            using (var decoder = new SharpDX.WIC.BitmapDecoder(factory, stream, SharpDX.WIC.DecodeOptions.CacheOnLoad))
-            using (var converter = new SharpDX.WIC.FormatConverter(factory))
-            {
-                converter.Initialize(decoder.GetFrame(0),
-                                    SharpDX.WIC.PixelFormat.Format32bppRGBA,
-                                    SharpDX.WIC.BitmapDitherType.None,
-                                    null,
-                                    0,
-                                    SharpDX.WIC.BitmapPaletteType.Custom);
-
-                var outputDesc = new SharpDX.Direct3D11.Texture2DDescription
-                {
-                    Width = converter.Size.Width,
-                    Height = converter.Size.Height,
-                    ArraySize = 1,
-                    BindFlags = SharpDX.Direct3D11.BindFlags.ShaderResource,
-                    Usage = SharpDX.Direct3D11.ResourceUsage.Default,
-                    CpuAccessFlags = SharpDX.Direct3D11.CpuAccessFlags.None,
-                    Format = SharpDX.DXGI.Format.R8G8B8A8_UNorm,
-                    MipLevels = 1,
-                    OptionFlags = SharpDX.Direct3D11.ResourceOptionFlags.None,
-                    SampleDescription = new SharpDX.DXGI.SampleDescription(1, 0)
-                };
-
-                // Build a SharpDX stream and copy the converted pixel data to it
-                using (var dataStream = new SharpDX.DataStream(outputDesc.Height * outputDesc.Width * 4, true, true))
-                {
-                    var stride = converter.Size.Width * 4;
-                    converter.CopyPixels(stride, dataStream);
-                    var rect = new SharpDX.DataRectangle(dataStream.DataPointer, stride);
-
-                    return new Texture2D(graphicsDevice, outputDesc.Width, outputDesc.Height)
-                    {
-                        _texture = new SharpDX.Direct3D11.Texture2D(graphicsDevice._d3dDevice, outputDesc, rect)
-                    };
-                }
-            }
+            throw new NotImplementedException(); 
 #elif PSS
             return new Texture2D(graphicsDevice, stream);
 #else
@@ -825,6 +803,66 @@ namespace Microsoft.Xna.Framework.Graphics
 
             }).Wait();
         }
+		
+		
+        public static SharpDX.Direct3D11.Texture2D CreateTex2DFromBitmap(SharpDX.WIC.BitmapSource bsource, GraphicsDevice device)
+        {
+
+            SharpDX.Direct3D11.Texture2DDescription desc;
+            desc.Width = bsource.Size.Width;
+            desc.Height = bsource.Size.Height;
+            desc.ArraySize = 1;
+            desc.BindFlags = SharpDX.Direct3D11.BindFlags.ShaderResource;
+            desc.Usage = SharpDX.Direct3D11.ResourceUsage.Default;
+            desc.CpuAccessFlags = SharpDX.Direct3D11.CpuAccessFlags.None;
+            desc.Format = SharpDX.DXGI.Format.R8G8B8A8_UNorm;
+            desc.MipLevels = 1;
+            desc.OptionFlags = SharpDX.Direct3D11.ResourceOptionFlags.None;
+            desc.SampleDescription.Count = 1;
+            desc.SampleDescription.Quality = 0;
+
+			SharpDX.Direct3D11.Texture2D dx11Texture;
+			
+            using(SharpDX.DataStream s = new SharpDX.DataStream(bsource.Size.Height * bsource.Size.Width * 4, true, true))
+			{
+				bsource.CopyPixels(bsource.Size.Width * 4, s);
+
+				SharpDX.DataRectangle rect = new SharpDX.DataRectangle(s.DataPointer, bsource.Size.Width * 4);
+
+				dx11Texture = new SharpDX.Direct3D11.Texture2D(device._d3dDevice, desc, rect);
+			}
+            
+			return dx11Texture;
+        }
+
+        static SharpDX.WIC.ImagingFactory imgfactory = null;
+        private static SharpDX.WIC.BitmapSource LoadBitmap(Stream stream, out SharpDX.WIC.BitmapDecoder decoder)
+        {
+            if (imgfactory == null)
+            {
+                imgfactory = new SharpDX.WIC.ImagingFactory();
+            }
+			
+			SharpDX.WIC.FormatConverter fconv = null;
+			
+            decoder = new SharpDX.WIC.BitmapDecoder(
+                imgfactory,
+                stream,
+                SharpDX.WIC.DecodeOptions.CacheOnDemand
+                );
+
+			fconv = new SharpDX.WIC.FormatConverter(imgfactory);
+
+			fconv.Initialize(
+				decoder.GetFrame(0),
+				SharpDX.WIC.PixelFormat.Format32bppPRGBA,
+				SharpDX.WIC.BitmapDitherType.None, null,
+				0.0, SharpDX.WIC.BitmapPaletteType.Custom);
+
+			return fconv;
+        }
+		
+		
 #endif // WINRT
 
         // This method allows games that use Texture2D.FromStream 
