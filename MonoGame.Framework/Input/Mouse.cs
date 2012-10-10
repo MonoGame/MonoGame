@@ -45,7 +45,7 @@ using System.Runtime.InteropServices;
 using System.Drawing;
 #endif
 
-#if WINDOWS || LINUX
+#if WINDOWS || LINUX || EMBEDDED
 using MouseInfo = OpenTK.Input.Mouse;
 #elif MONOMAC
 using MonoMac.Foundation;
@@ -59,7 +59,7 @@ namespace Microsoft.Xna.Framework.Input
     {
 		internal static MouseState State;
 
-#if WINDOWS || LINUX
+#if WINDOWS || LINUX || EMBEDDED
 		private static OpenTK.Input.MouseDevice _mouse = null;			
 #else
         private static int _mouseTouchId = -1;
@@ -75,7 +75,7 @@ namespace Microsoft.Xna.Framework.Input
             _mouse = window.Mouse;        
         }
         
-#elif LINUX         
+#elif LINUX || EMBEDDED        
         
         static OpenTK.GameWindow Window;
 
@@ -112,7 +112,7 @@ namespace Microsoft.Xna.Framework.Input
 #if MONOMAC
             //We need to maintain precision...
             State.ScrollWheelValue = (int)ScrollWheelValue;
-#elif WINDOWS || LINUX
+#elif WINDOWS || LINUX || EMBEDDED
 
 			// maybe someone is tring to get mouse before initialize
 			if (_mouse == null)
@@ -142,7 +142,7 @@ namespace Microsoft.Xna.Framework.Input
         {
             UpdateStatePosition(x, y);
 			
-#if WINDOWS || LINUX
+#if WINDOWS || LINUX || EMBEDDED
             ///correcting the coordinate system
             ///Only way to set the mouse position !!!
             System.Drawing.Point pt = Window.PointToScreen(new System.Drawing.Point(x, y));

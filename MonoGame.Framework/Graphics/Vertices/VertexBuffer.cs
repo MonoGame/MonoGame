@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 
 #if MONOMAC
 using MonoMac.OpenGL;
-#elif WINDOWS || LINUX
+#elif WINDOWS || LINUX || EMBEDDED
 using OpenTK.Graphics.OpenGL;
 #elif PSS
 using Sce.PlayStation.Core.Graphics;
@@ -134,7 +134,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 GL.BindBuffer (BufferTarget.ArrayBuffer, vbo);
                 GraphicsExtensions.CheckGLError();
                 var elementSizeInByte = Marshal.SizeOf(typeof(T));
-#if IPHONE || ANDROID || EMBEDDED
+#if IPHONE || ANDROID || !EMBEDDED
                 // I think the access parameter takes zero for read only or read/write.
                 // The glMapBufferOES extension spec and gl2ext.h both only mention GL_WRITE_ONLY
                 IntPtr ptr = GL.Oes.MapBuffer(All.ArrayBuffer, (All)0);
@@ -164,7 +164,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                     //Buffer.BlockCopy(buffer, 0, data, startIndex * elementSizeInByte, elementCount * elementSizeInByte);
                 }
-#if IPHONE || ANDROID || EMBEDDED
+#if IPHONE || ANDROID || !EMBEDDED
                 GL.Oes.UnmapBuffer(All.ArrayBuffer);
 #else
                 GL.UnmapBuffer(BufferTarget.ArrayBuffer);

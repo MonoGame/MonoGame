@@ -48,7 +48,7 @@ using System.Diagnostics;
 
 #if MONOMAC
 using MonoMac.OpenGL;
-#elif WINDOWS || LINUX
+#elif WINDOWS || LINUX || EMBEDDED
 using OpenTK.Graphics.OpenGL;
 #elif WINRT
 using SharpDX;
@@ -185,7 +185,7 @@ namespace Microsoft.Xna.Framework.Graphics
         internal List<PssVertexBuffer> _usedVertexBuffers = new List<PssVertexBuffer>();
 #endif
 
-#if GLES
+#if GLES && !EMBEDDED
         const FramebufferTarget GLFramebuffer = FramebufferTarget.Framebuffer;
 		const RenderbufferTarget GLRenderbuffer = RenderbufferTarget.Renderbuffer;
 		const FramebufferAttachment GLDepthAttachment = FramebufferAttachment.DepthAttachment;
@@ -301,7 +301,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			_viewport.MaxDepth = 1.0f;
 
             MaxTextureSlots = 16;
-#if GLES
+#if GLES && !EMBEDDED
             GL.GetInteger(All.MaxTextureImageUnits, ref MaxTextureSlots);
             GraphicsExtensions.CheckGLError();
 
@@ -325,7 +325,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             // Setup extensions.
 #if OPENGL
-#if GLES
+#if GLES && !EMBEDDED
             var extstring = GL.GetString(RenderbufferStorage.Extensions);            			
 #else
             var extstring = GL.GetString(StringName.Extensions);	
@@ -837,7 +837,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				bufferMask = bufferMask | ClearBufferMask.DepthBufferBit;
 			}
 
-#if GLES
+#if GLES && !EMBEDDED
 			GL.Clear((uint)bufferMask);
             GraphicsExtensions.CheckGLError();
 #else
@@ -1205,7 +1205,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #elif OPENGL
 				if (renderTarget.glFramebuffer == 0)
 				{
-#if GLES
+#if GLES && !EMBEDDED
 					GL.GenFramebuffers(1, ref renderTarget.glFramebuffer);
 #else
 					GL.GenFramebuffers(1, out renderTarget.glFramebuffer);

@@ -5,7 +5,7 @@ using System.Text;
 
 #if MONOMAC
 using MonoMac.OpenGL;
-#elif WINDOWS || LINUX
+#elif WINDOWS || LINUX || EMBEDDED
 using OpenTK.Graphics.OpenGL;
 #elif WINRT
 #elif GLES
@@ -394,7 +394,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			case Blend.InverseSourceAlpha:
 				return BlendingFactorSrc.OneMinusSrcAlpha;
 			case Blend.InverseSourceColor:
-#if MONOMAC || WINDOWS || LINUX
+#if MONOMAC || WINDOWS || LINUX || EMBEDDED
 				return (BlendingFactorSrc)All.OneMinusSrcColor;
 #else
 				return BlendingFactorSrc.OneMinusSrcColor;
@@ -406,7 +406,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			case Blend.SourceAlphaSaturation:
 				return BlendingFactorSrc.SrcAlphaSaturate;
 			case Blend.SourceColor:
-#if MONOMAC || WINDOWS || LINUX
+#if MONOMAC || WINDOWS || LINUX || EMBEDDED
 				return (BlendingFactorSrc)All.SrcColor;
 #else
 				return BlendingFactorSrc.SrcColor;
@@ -613,7 +613,7 @@ namespace Microsoft.Xna.Framework.Graphics
         public static int GetBoundTexture2D()
         {
             var prevTexture = 0;
-#if GLES
+#if GLES && !EMBEDDED
             GL.GetInteger(GetPName.TextureBinding2D, ref prevTexture);
 #else
             GL.GetInteger(GetPName.TextureBinding2D, out prevTexture);
@@ -625,7 +625,7 @@ namespace Microsoft.Xna.Framework.Graphics
         [System.Diagnostics.Conditional("DEBUG")]
         public static void CheckGLError()
         {
-#if GLES
+#if GLES && !EMBEDDED
             All error = GL.GetError();
             if (error != All.False)
                 throw new MonoGameGLException("GL.GetError() returned " + error.ToString());

@@ -4,7 +4,7 @@ using System.IO;
 
 #if MONOMAC
 using MonoMac.OpenGL;
-#elif WINDOWS || LINUX
+#elif WINDOWS || LINUX || EMBEDDED
 using OpenTK.Graphics.OpenGL;
 #elif WINRT
 using SharpDX;

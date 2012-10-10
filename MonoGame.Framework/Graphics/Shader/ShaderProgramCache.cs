@@ -104,7 +104,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             var linked = 0;
 
-#if GLES
+#if GLES && !EMBEDDED
 			GL.GetProgram(program, ProgramParameter.LinkStatus, ref linked);
 #else
             GL.GetProgram(program, ProgramParameter.LinkStatus, out linked);

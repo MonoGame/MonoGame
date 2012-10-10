@@ -4,7 +4,7 @@ using System.IO;
 
 #if MONOMAC
 using MonoMac.OpenGL;
-#elif WINDOWS || LINUX
+#elif WINDOWS || LINUX || EMBEDDED
 using OpenTK.Graphics.OpenGL;
 #elif WINRT
 using SharpDX;
@@ -164,7 +164,7 @@ namespace Microsoft.Xna.Framework.Graphics
             //
             _shaderHandle = GL.CreateShader(Stage == ShaderStage.Vertex ? ShaderType.VertexShader : ShaderType.FragmentShader);
             GraphicsExtensions.CheckGLError();
-#if GLES
+#if GLES && !EMBEDDED
 			GL.ShaderSource(_shaderHandle, 1, new string[] { _glslCode }, (int[])null);
 #else
             GL.ShaderSource(_shaderHandle, _glslCode);
@@ -174,7 +174,7 @@ namespace Microsoft.Xna.Framework.Graphics
             GraphicsExtensions.CheckGLError();
 
             var compiled = 0;
-#if GLES
+#if GLES && !EMBEDDED
 			GL.GetShader(_shaderHandle, ShaderParameter.CompileStatus, ref compiled);
 #else
             GL.GetShader(_shaderHandle, ShaderParameter.CompileStatus, out compiled);
@@ -182,7 +182,7 @@ namespace Microsoft.Xna.Framework.Graphics
             GraphicsExtensions.CheckGLError();
             if (compiled == (int)All.False)
             {
-#if GLES
+#if GLES && !EMBEDDED
                 string log = "";
                 int length = 0;
 				GL.GetShader(_shaderHandle, ShaderParameter.InfoLogLength, ref length);

@@ -58,7 +58,7 @@ using MonoTouch.Foundation;
 #if MONOMAC
 using MonoMac.OpenGL;
 using GLPixelFormat = MonoMac.OpenGL.PixelFormat;
-#elif WINDOWS || LINUX
+#elif WINDOWS || LINUX || EMBEDDED
 using System.Drawing.Imaging;
 using OpenTK.Graphics.OpenGL;
 using GLPixelFormat = OpenTK.Graphics.OpenGL.PixelFormat;
@@ -339,7 +339,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     {
                         GL.CompressedTexSubImage2D(TextureTarget.Texture2D,
                                                     level, x, y, w, h,
-#if GLES
+#if GLES && !EMBEDDED
                                                     glInternalFormat,
 #else
                                                     glFormat,
@@ -365,7 +365,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     else
                     {
                         GL.TexImage2D(TextureTarget.Texture2D, level,
-#if GLES
+#if GLES && !EMBEDDED
                                   (int)glInternalFormat,
 #else
                                   glInternalFormat,

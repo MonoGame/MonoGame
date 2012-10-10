@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 #if MONOMAC
 using MonoMac.OpenGL;
-#elif WINDOWS || LINUX
+#elif WINDOWS || LINUX || EMBEDDED
 using OpenTK.Graphics.OpenGL;
 #elif PSS
 using Sce.PlayStation.Core.Graphics;
@@ -215,7 +215,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 public int Offset;
                 public int AttributeLocation;
                 public int NumberOfElements;
-#if GLES
+#if GLES && !EMBEDDED
                 public All VertexAttribPointerType;
 #elif OPENGL
                 public VertexAttribPointerType VertexAttribPointerType;

@@ -42,7 +42,7 @@ using System;
 
 #if MONOMAC
 using MonoMac.OpenGL;
-#elif WINDOWS || LINUX
+#elif WINDOWS || LINUX || EMBEDDED
 using OpenTK.Graphics.OpenGL;
 #elif GLES
 using OpenTK.Graphics.ES20;
@@ -54,7 +54,7 @@ namespace Microsoft.Xna.Framework.Graphics
 {
 	public class RenderTarget2D : Texture2D
 	{
-#if GLES
+#if GLES && !EMBEDDED
 		const RenderbufferTarget GLRenderbuffer = RenderbufferTarget.Renderbuffer;
 		const RenderbufferStorage GLDepthComponent16 = RenderbufferStorage.DepthComponent16;
 		const RenderbufferStorage GLDepthComponent24 = RenderbufferStorage.DepthComponent24Oes;
@@ -134,7 +134,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #elif OPENGL
 
-#if GLES
+#if GLES && !EMBEDDED
 			GL.GenRenderbuffers(1, ref glDepthStencilBuffer);
 #else
 			GL.GenRenderbuffers(1, out glDepthStencilBuffer);

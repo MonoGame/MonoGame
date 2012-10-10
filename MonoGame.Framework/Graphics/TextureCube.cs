@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 #if MONOMAC
 using MonoMac.OpenGL;
-#elif WINDOWS || LINUX
+#elif WINDOWS || LINUX || EMBEDDED
 using OpenTK.Graphics.OpenGL;
 #elif PSS
 using Sce.PlayStation.Core.Graphics;
@@ -99,7 +99,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			if (mipMap)
 			{
-#if IPHONE || ANDROID || EMBEDDED
+#if IPHONE || ANDROID || !EMBEDDED
 				GL.GenerateMipmap(TextureTarget.TextureCubeMap);
 #else
 				GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.GenerateMipmap, (int)All.True);
