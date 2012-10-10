@@ -101,13 +101,11 @@ namespace Microsoft.Xna.Framework
 
             // Setup the launch parameters.
             // - Parameters can optionally start with a forward slash.
-            // - Keys can be separated from values by a colon or equals sign
+            // - Keys can be separated from values by a colon.
             // - Double quotes can be used to enclose spaces in a key or value.
             int pos = 0;
             int paramStart = 0;
             bool inQuotes = false;
-            var keySeperators = new char[] { ':', '=' };
-
             while (pos <= LaunchParameters.Length)
             {
                 string arg = string.Empty;
@@ -140,8 +138,7 @@ namespace Microsoft.Xna.Framework
 
                 if (arg.Length > keyStart)
                 {
-                    int keyEnd = arg.IndexOfAny(keySeperators, keyStart);
-
+                    int keyEnd = arg.IndexOf(':', keyStart);
                     if (keyEnd >= 0)
                     {
                         key = arg.Substring(keyStart, keyEnd - keyStart);
