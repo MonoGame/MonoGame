@@ -43,21 +43,30 @@ using System.Diagnostics;
 
 #if MONOMAC
 using MonoMac.OpenGL;
-#elif WINDOWS || LINUX || EMBEDDED
+#elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
+#elif EMBEDDED
+using OpenTK.Graphics.ES20;
+using GL = OpenTK.Graphics.ES20.GL;
+using BlendEquationMode = OpenTK.Graphics.ES20.BlendEquationMode;
+using BlendingFactorSrc = OpenTK.Graphics.ES20.BlendingFactorSrc;
+using BlendingFactorDest = OpenTK.Graphics.ES20.BlendingFactorDest;
+using VertexAttribPointerType = OpenTK.Graphics.ES20.VertexAttribPointerType;
+using PixelInternalFormat = OpenTK.Graphics.ES20.PixelInternalFormat;
+using PixelType = OpenTK.Graphics.ES20.PixelType;
+using PixelFormat = OpenTK.Graphics.ES20.PixelFormat;
+using VertexPointerType = OpenTK.Graphics.ES20.All;
+using ColorPointerType = OpenTK.Graphics.ES20.All;
+using NormalPointerType = OpenTK.Graphics.ES20.All;
+using TexCoordPointerType = OpenTK.Graphics.ES20.All;
+using TextureTarget = OpenTK.Graphics.ES20.TextureTarget;
 #elif WINRT
 // TODO
 #elif GLES
 using OpenTK.Graphics.ES20;
-#if EMBEDDED
-using TextureTarget = OpenTK.Graphics.ES20.TextureTarget;
-using TextureMinFilter = OpenTK.Graphics.ES20.TextureMinFilter;
-using TextureParameterName = OpenTK.Graphics.ES20.TextureParameterName;
-#else
 using TextureTarget = OpenTK.Graphics.ES20.All;
 using TextureMinFilter = OpenTK.Graphics.ES20.All;
 using TextureParameterName = OpenTK.Graphics.ES20.All;
-#endif
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics

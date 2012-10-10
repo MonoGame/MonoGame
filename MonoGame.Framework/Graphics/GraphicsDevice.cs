@@ -48,8 +48,11 @@ using System.Diagnostics;
 
 #if MONOMAC
 using MonoMac.OpenGL;
-#elif WINDOWS || LINUX || EMBEDDED
+#elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
+#elif EMBEDDED
+using OpenTK.Graphics.ES20;
+using GL = OpenTK.Graphics.ES20.GL;
 #elif WINRT
 using SharpDX;
 using SharpDX.DXGI;
@@ -185,7 +188,18 @@ namespace Microsoft.Xna.Framework.Graphics
         internal List<PssVertexBuffer> _usedVertexBuffers = new List<PssVertexBuffer>();
 #endif
 
-#if GLES && !EMBEDDED
+#if EMBEDDED
+        const FramebufferTarget GLFramebuffer = FramebufferTarget.Framebuffer;
+        const RenderbufferTarget GLRenderbuffer = RenderbufferTarget.Renderbuffer;
+        const FramebufferSlot GLDepthAttachment = FramebufferSlot.DepthAttachment;
+        const FramebufferSlot GLStencilAttachment = FramebufferSlot.StencilAttachment;
+        const FramebufferSlot GLColorAttachment0 = FramebufferSlot.ColorAttachment0;
+        const GetPName GLFramebufferBinding = GetPName.FramebufferBinding;
+        const OpenTK.Graphics.OpenGL.RenderbufferStorage GLDepthComponent16 = OpenTK.Graphics.OpenGL.RenderbufferStorage.DepthComponent16;
+        const OpenTK.Graphics.OpenGL.RenderbufferStorage GLDepthComponent24 = OpenTK.Graphics.OpenGL.RenderbufferStorage.DepthComponent24;
+        const OpenTK.Graphics.OpenGL.RenderbufferStorage GLDepth24Stencil8 = OpenTK.Graphics.OpenGL.RenderbufferStorage.Depth24Stencil8;
+        const FramebufferErrorCode GLFramebufferComplete = FramebufferErrorCode.FramebufferComplete;
+#elif GLES 
         const FramebufferTarget GLFramebuffer = FramebufferTarget.Framebuffer;
 		const RenderbufferTarget GLRenderbuffer = RenderbufferTarget.Renderbuffer;
 		const FramebufferAttachment GLDepthAttachment = FramebufferAttachment.DepthAttachment;
@@ -301,13 +315,20 @@ namespace Microsoft.Xna.Framework.Graphics
 			_viewport.MaxDepth = 1.0f;
 
             MaxTextureSlots = 16;
-#if GLES && !EMBEDDED
+#if EMBEDDED
+            GL.GetInteger(GetPName.MaxTextureImageUnits, out MaxTextureSlots);
+            GraphicsExtensions.CheckGLError();
+
+            GL.GetInteger(GetPName.MaxVertexAttribs, out MaxVertexAttributes);
+            GraphicsExtensions.CheckGLError();
+#elif GLES 
             GL.GetInteger(All.MaxTextureImageUnits, ref MaxTextureSlots);
             GraphicsExtensions.CheckGLError();
 
             GL.GetInteger(All.MaxVertexAttribs, ref MaxVertexAttributes);
-            GraphicsExtensions.CheckGLError();            
-#elif OPENGL
+            GraphicsExtensions.CheckGLError();
+
+#elif OPENGL            
             GL.GetInteger(GetPName.MaxTextureImageUnits, out MaxTextureSlots);
             GraphicsExtensions.CheckGLError();
 
@@ -1698,11 +1719,17 @@ namespace Microsoft.Xna.Framework.Graphics
 
             ApplyState(true);
 
-            var shortIndices = _indexBuffer.IndexElementSize == IndexElementSize.SixteenBits;
+            
 
+#if EMBEDDED
+            var indexElementType = DrawElementsType.UnsignedShort;
+            var indexElementSize = 2;
+#else
+            var shortIndices = _indexBuffer.IndexElementSize == IndexElementSize.SixteenBits;
 			var indexElementType = shortIndices ? DrawElementsType.UnsignedShort : DrawElementsType.UnsignedInt;
             var indexElementSize = shortIndices ? 2 : 4;
-			var indexOffsetInBytes = (IntPtr)(startIndex * indexElementSize);
+#endif
+            var indexOffsetInBytes = (IntPtr)(startIndex * indexElementSize);
 			var indexElementCount = GetElementCountArray(primitiveType, primitiveCount);
 			var target = PrimitiveTypeGL(primitiveType);
 			var vertexOffset = (IntPtr)(_vertexBuffer.VertexDeclaration.VertexStride * baseVertex);
@@ -1906,8 +1933,13 @@ namespace Microsoft.Xna.Framework.Graphics
             //Draw
             GL.DrawElements(    PrimitiveTypeGL(primitiveType),
                                 GetElementCountArray(primitiveType, primitiveCount),
+#if EMBEDDED
+                                DrawElementsType.UnsignedShort,
+                                (IntPtr)(ibHandle.AddrOfPinnedObject().ToInt64() + (indexOffset * sizeof(short))));
+#else
                                 DrawElementsType.UnsignedInt,
                                 (IntPtr)(ibHandle.AddrOfPinnedObject().ToInt64() + (indexOffset * sizeof(int))));
+#endif
             GraphicsExtensions.CheckGLError();
 
             // Release the handles.

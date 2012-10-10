@@ -43,8 +43,11 @@ using System.Diagnostics;
 
 #if MONOMAC
 using MonoMac.OpenGL;
-#elif WINDOWS || LINUX || EMBEDDED
+#elif WINDOWS || LINUX 
 using OpenTK.Graphics.OpenGL;
+#elif EMBEDDED
+using GL = OpenTK.Graphics.ES20.GL;
+using OpenTK.Graphics.ES20;
 #elif PSS
 using Sce.PlayStation.Core.Graphics;
 #elif GLES

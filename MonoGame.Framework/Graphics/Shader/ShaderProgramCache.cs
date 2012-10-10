@@ -7,6 +7,9 @@ using System.Collections.Generic;
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
+#elif EMBEDDED
+using OpenTK.Graphics.ES20;
+using GL = OpenTK.Graphics.ES20.GL;
 #elif PSS
 using Sce.PlayStation.Core.Graphics;
 #elif WINRT

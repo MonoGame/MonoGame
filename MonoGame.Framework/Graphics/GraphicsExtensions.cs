@@ -5,12 +5,11 @@ using System.Text;
 
 #if MONOMAC
 using MonoMac.OpenGL;
-#elif WINDOWS || LINUX || EMBEDDED
+#elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
-#elif WINRT
-#elif GLES
+#elif EMBEDDED
 using OpenTK.Graphics.ES20;
-#if EMBEDDED
+using GL = OpenTK.Graphics.ES20.GL;
 using BlendEquationMode = OpenTK.Graphics.ES20.BlendEquationMode;
 using BlendingFactorSrc = OpenTK.Graphics.ES20.BlendingFactorSrc;
 using BlendingFactorDest = OpenTK.Graphics.ES20.BlendingFactorDest;
@@ -22,7 +21,9 @@ using VertexPointerType = OpenTK.Graphics.ES20.All;
 using ColorPointerType = OpenTK.Graphics.ES20.All;
 using NormalPointerType = OpenTK.Graphics.ES20.All;
 using TexCoordPointerType = OpenTK.Graphics.ES20.All;
-#else
+#elif WINRT
+#elif GLES
+using OpenTK.Graphics.ES20;
 using BlendEquationMode = OpenTK.Graphics.ES20.All;
 using BlendingFactorSrc = OpenTK.Graphics.ES20.All;
 using BlendingFactorDest = OpenTK.Graphics.ES20.All;
@@ -36,7 +37,6 @@ using NormalPointerType = OpenTK.Graphics.ES20.All;
 using TexCoordPointerType = OpenTK.Graphics.ES20.All;
 using GetPName = OpenTK.Graphics.ES20.All;
 using System.Diagnostics;
-#endif
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -630,9 +630,9 @@ namespace Microsoft.Xna.Framework.Graphics
             if (error != All.False)
                 throw new MonoGameGLException("GL.GetError() returned " + error.ToString());
 #elif OPENGL
-            ErrorCode error = GL.GetError();
-            if (error != ErrorCode.NoError)
-                throw new MonoGameGLException("GL.GetError() returned " + error.ToString());
+            //ErrorCode error = GL.GetError();
+            //if (error != ErrorCode.NoError)
+            //    throw new MonoGameGLException("GL.GetError() returned " + error.ToString());
 #endif
 
         }
@@ -644,7 +644,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             try
             {
-                GraphicsExtensions.CheckGLError();
+                //GraphicsExtensions.CheckGLError();
             }
             catch (MonoGameGLException ex)
             {

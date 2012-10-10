@@ -58,10 +58,27 @@ using MonoTouch.Foundation;
 #if MONOMAC
 using MonoMac.OpenGL;
 using GLPixelFormat = MonoMac.OpenGL.PixelFormat;
-#elif WINDOWS || LINUX || EMBEDDED
+#elif WINDOWS || LINUX
 using System.Drawing.Imaging;
 using OpenTK.Graphics.OpenGL;
 using GLPixelFormat = OpenTK.Graphics.OpenGL.PixelFormat;
+#elif EMBEDDED
+using System.Drawing.Imaging;
+using OpenTK.Graphics.ES20;
+using GL = OpenTK.Graphics.ES20.GL;
+using BlendEquationMode = OpenTK.Graphics.ES20.BlendEquationMode;
+using BlendingFactorSrc = OpenTK.Graphics.ES20.BlendingFactorSrc;
+using BlendingFactorDest = OpenTK.Graphics.ES20.BlendingFactorDest;
+using VertexAttribPointerType = OpenTK.Graphics.ES20.VertexAttribPointerType;
+using PixelInternalFormat = OpenTK.Graphics.ES20.PixelInternalFormat;
+using PixelType = OpenTK.Graphics.ES20.PixelType;
+using PixelFormat = OpenTK.Graphics.ES20.PixelFormat;
+using VertexPointerType = OpenTK.Graphics.ES20.All;
+using ColorPointerType = OpenTK.Graphics.ES20.All;
+using NormalPointerType = OpenTK.Graphics.ES20.All;
+using TexCoordPointerType = OpenTK.Graphics.ES20.All;
+using TextureTarget = OpenTK.Graphics.ES20.TextureTarget;
+using GLPixelFormat = OpenTK.Graphics.ES20.PixelFormat;
 #elif PSS
 using PssTexture2D = Sce.PlayStation.Core.Graphics.Texture2D;
 #elif GLES
@@ -414,7 +431,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
 #if IPHONE 
 			throw new NotImplementedException();
-#elif ANDROID
+#elif ANDROID || EMBEDDED
 			if (data == null)
             {
                 throw new ArgumentException("data cannot be null");
@@ -984,6 +1001,81 @@ namespace Microsoft.Xna.Framework.Graphics
             GraphicsExtensions.CheckGLError();
             return imageInfo;
 		}
+#elif EMBEDDED
+        private byte[] GetTextureData(int ThreadPriorityLevel)
+        {
+            int framebufferId = -1;
+            int renderBufferID = -1;
+
+            GL.GenFramebuffers(1, out framebufferId);
+            GraphicsExtensions.CheckGLError();
+            GL.BindFramebuffer(FramebufferTarget.Framebuffer, framebufferId);
+            GraphicsExtensions.CheckGLError();
+            //renderBufferIDs = new int[currentRenderTargets];
+            GL.GenRenderbuffers(1, out renderBufferID);
+            GraphicsExtensions.CheckGLError();
+
+            // attach the texture to FBO color attachment point
+            GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferSlot.ColorAttachment0,
+                TextureTarget.Texture2D, this.glTexture, 0);
+            GraphicsExtensions.CheckGLError();
+
+            // create a renderbuffer object to store depth info
+            GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, renderBufferID);
+            GraphicsExtensions.CheckGLError();
+            GL.RenderbufferStorage(RenderbufferTarget.Renderbuffer, RenderbufferInternalFormat.DepthComponent16,
+                Width, Height);
+            GraphicsExtensions.CheckGLError();
+
+            // attach the renderbuffer to depth attachment point
+            GL.FramebufferRenderbuffer(FramebufferTarget.Framebuffer, FramebufferSlot.DepthAttachment,
+                RenderbufferTarget.Renderbuffer, renderBufferID);
+            GraphicsExtensions.CheckGLError();
+
+            FramebufferErrorCode status = GL.CheckFramebufferStatus(FramebufferTarget.Framebuffer);
+
+            if (status != FramebufferErrorCode.FramebufferComplete)
+                throw new Exception("Error creating framebuffer: " + status);
+            byte[] imageInfo;
+            int sz = 0;
+
+            switch (this.Format)
+            {
+                case SurfaceFormat.Color: //kTexture2DPixelFormat_RGBA8888
+                case SurfaceFormat.Dxt3:
+
+                    sz = 4;
+                    imageInfo = new byte[(Width * Height) * sz];
+                    break;
+                case SurfaceFormat.Bgra4444: //kTexture2DPixelFormat_RGBA4444
+                    sz = 2;
+                    imageInfo = new byte[(Width * Height) * sz];
+
+                    break;
+                case SurfaceFormat.Bgra5551: //kTexture2DPixelFormat_RGB5A1
+                    sz = 2;
+                    imageInfo = new byte[(Width * Height) * sz];
+                    break;
+                case SurfaceFormat.Alpha8:  // kTexture2DPixelFormat_A8 
+                    sz = 1;
+                    imageInfo = new byte[(Width * Height) * sz];
+                    break;
+                default:
+                    throw new NotSupportedException("Texture format");
+            }
+
+            GL.ReadPixels(0, 0, Width, Height, GLPixelFormat.Rgba, PixelType.UnsignedByte, imageInfo);
+            GraphicsExtensions.CheckGLError();
+            GL.FramebufferRenderbuffer(FramebufferTarget.Framebuffer, FramebufferSlot.DepthAttachment, RenderbufferTarget.Renderbuffer, 0);
+            GraphicsExtensions.CheckGLError();
+            GL.DeleteRenderbuffers(1, ref renderBufferID);
+            GraphicsExtensions.CheckGLError();
+            GL.DeleteFramebuffers(1, ref framebufferId);
+            GraphicsExtensions.CheckGLError();
+            GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+            GraphicsExtensions.CheckGLError();
+            return imageInfo;
+        }
 #endif
 	}
 }

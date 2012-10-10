@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
+#elif EMBEDDED
+using OpenTK.Graphics.ES20;
+using GL = OpenTK.Graphics.ES20.GL;
 #elif GLES
 using OpenTK.Graphics.ES20;
 #elif PSS

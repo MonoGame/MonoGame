@@ -4,8 +4,11 @@ using System.IO;
 
 #if MONOMAC
 using MonoMac.OpenGL;
-#elif WINDOWS || LINUX || EMBEDDED
+#elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
+#elif EMBEDDED
+using OpenTK.Graphics.ES20;
+using GL = OpenTK.Graphics.ES20.GL;
 #elif WINRT
 using SharpDX;
 using SharpDX.Direct3D;
