@@ -53,56 +53,9 @@ namespace Microsoft.Xna.Framework.Input.Touch
     /// </summary>
     class AndroidTouchEventManager
     {
-        /// <summary>
-        /// Represents the state of a single touch
-        /// </summary>
-        struct Touch
-        {
-            public int TouchID;
-            public bool Active;
-        }
-
-        const int MAX_FINGERS = 10;
-        Touch[] _touches = new Touch[MAX_FINGERS];
-        int _nextTouchId = 0;
-
         Game _game;
-        bool _enabled;
 
-        public bool Enabled
-        {
-            get { return _enabled; }
-            set
-            {
-                _enabled = value;
-                if (!_enabled)
-                {
-                    // Touch events should be disabled when the surface becomes invalid, ie device not available or orientation changing.
-                    // When disabling, clear all existing touches as Android isn't guaranteed to fire Released events for them. 
-                    // Also need to tell TouchPanel the touch is released or it will keep it around forever.
-                    TouchCollection touchState = TouchPanel.GetState();
-                    for (int i = 0; i < MAX_FINGERS; ++i)
-                    {
-                        if (_touches[i].Active)
-                        {
-                            int releaseTouchId = EndTouch(i);
-
-                            // Search for last position of this touch to release it at same position
-                            Vector2 lastTouchPos = Vector2.Zero;
-                            foreach (TouchLocation tl in touchState)
-                            {
-                                if (tl.Id == releaseTouchId)
-                                {
-                                    lastTouchPos = tl.Position;
-                                    break;
-                                }
-                            }
-                            TouchPanel.AddEvent(new TouchLocation(releaseTouchId, TouchLocationState.Released, lastTouchPos));
-                        }
-                    }
-                }
-            }
-        }
+        public bool Enabled { get; set; }
 
         public AndroidTouchEventManager(Game game)
         {
@@ -111,7 +64,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
         public void OnTouchEvent(MotionEvent e)
         {
-            if (!_enabled)
+            if (!Enabled)
                 return;
 
             Vector2 position = Vector2.Zero;
@@ -124,12 +77,12 @@ namespace Microsoft.Xna.Framework.Input.Touch
                 // DOWN                
                 case MotionEventActions.Down:
                 case MotionEventActions.PointerDown:
-                    TouchPanel.AddEvent(new TouchLocation(BeginTouch(id), TouchLocationState.Pressed, position));
+                    TouchPanel.AddEvent(id, TouchLocationState.Pressed, position);
                     break;
                 // UP                
                 case MotionEventActions.Up:
                 case MotionEventActions.PointerUp:
-                    TouchPanel.AddEvent(new TouchLocation(EndTouch(id), TouchLocationState.Released, position));
+                    TouchPanel.AddEvent(id, TouchLocationState.Released, position);
                     break;
                 // MOVE                
                 case MotionEventActions.Move:
@@ -139,61 +92,25 @@ namespace Microsoft.Xna.Framework.Input.Touch
                         position.X = e.GetX(i);
                         position.Y = e.GetY(i);
                         UpdateTouchPosition(ref position);
-                        TouchPanel.AddEvent(new TouchLocation(GetTouch(id), TouchLocationState.Moved, position));
+                        TouchPanel.AddEvent(id, TouchLocationState.Moved, position);
                     }
                     break;
 
                 // CANCEL, OUTSIDE                
                 case MotionEventActions.Cancel:
                 case MotionEventActions.Outside:
-                    TouchPanel.AddEvent(new TouchLocation(EndTouch(id), TouchLocationState.Released, position));
+                    TouchPanel.AddEvent(id, TouchLocationState.Released, position);
                     break;
             }
         }
 
-
-        int BeginTouch(int fingerId)
-        {
-            System.Diagnostics.Debug.Assert(!_touches[fingerId].Active);
-            int newTouchId = _nextTouchId++;
-            _touches[fingerId].TouchID = newTouchId;
-            _touches[fingerId].Active = true;
-            return newTouchId;
-        }
-
-        int EndTouch(int fingerId)
-        {
-            // Ideally this assert would be enabled, but it can occasionally be hit when
-            // setting Enabled to false clears a touch that subsequently does get a released event.
-            // In practice this only happens when changing device orientation with multiple touches down.
-            //System.Diagnostics.Debug.Assert(_touches[fingerId].Active);
-            _touches[fingerId].Active = false;
-            return _touches[fingerId].TouchID;
-        }
-
-        int GetTouch(int fingerId)
-        {
-            System.Diagnostics.Debug.Assert(_touches[fingerId].Active);
-            return _touches[fingerId].TouchID;
-        }
-
         void UpdateTouchPosition(ref Vector2 position)
         {
-            GraphicsDevice device = _game.GraphicsDevice;
             Rectangle clientBounds = _game.Window.ClientBounds;
 
             //Fix for ClientBounds
             position.X -= clientBounds.X;
             position.Y -= clientBounds.Y;
-
-            // Whilst this seems wrong, it is the simplest way to allow touch events to start
-            // before the device is created and continue afterwards
-            if (device == null)
-                return;
-                 
-            //Fix for Viewport
-            position.X = (position.X / clientBounds.Width) * device.Viewport.Width;
-            position.Y = (position.Y / clientBounds.Height) * device.Viewport.Height;
         }
     }
 }

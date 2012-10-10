@@ -66,14 +66,25 @@ namespace Microsoft.Xna.Framework.Content
         private bool disposed;
 		
 		private static object ContentManagerLock = new object();
-        private static List<ContentManager> ContentManagers = new List<ContentManager>();
+        private static List<WeakReference> ContentManagers = new List<WeakReference>();
 
         private static void AddContentManager(ContentManager contentManager)
         {
             lock (ContentManagerLock)
             {
-                if (!ContentManagers.Contains(contentManager))
-                    ContentManagers.Add(contentManager);
+                // Check if the list contains this content manager already. Also take
+                // the opportunity to prune the list of any finalized content managers.
+                bool contains = false;
+                for (int i = ContentManagers.Count - 1; i >= 0; --i)
+                {
+                    var contentRef = ContentManagers[i];
+                    if (Object.ReferenceEquals(contentRef.Target, contentManager))
+                        contains = true;
+                    if (!contentRef.IsAlive)
+                        ContentManagers.RemoveAt(i);
+                }
+                if (!contains)
+                    ContentManagers.Add(new WeakReference(contentManager));
             }
         }
 
@@ -81,8 +92,14 @@ namespace Microsoft.Xna.Framework.Content
         {
             lock (ContentManagerLock)
             {
-                if(ContentManagers.Contains(contentManager))
-                    ContentManagers.Remove(contentManager);
+                // Check if the list contains this content manager and remove it. Also
+                // take the opportunity to prune the list of any finalized content managers.
+                for (int i = ContentManagers.Count - 1; i >= 0; --i)
+                {
+                    var contentRef = ContentManagers[i];
+                    if (!contentRef.IsAlive || Object.ReferenceEquals(contentRef.Target, contentManager))
+                        ContentManagers.RemoveAt(i);
+                }
             }
         }
 
@@ -90,9 +107,21 @@ namespace Microsoft.Xna.Framework.Content
         {
             lock (ContentManagerLock)
             {
-                foreach (var contentManager in ContentManagers)
+                // Reload the graphic assets of each content manager. Also take the
+                // opportunity to prune the list of any finalized content managers.
+                for (int i = ContentManagers.Count - 1; i >= 0; --i)
                 {
-                    contentManager.ReloadGraphicsAssets();
+                    var contentRef = ContentManagers[i];
+                    if (contentRef.IsAlive)
+                    {
+                        var contentManager = (ContentManager)contentRef.Target;
+                        if (contentManager != null)
+                            contentManager.ReloadGraphicsAssets();
+                    }
+                    else
+                    {
+                        ContentManagers.RemoveAt(i);
+                    }
                 }
             }
         }
@@ -191,7 +220,7 @@ namespace Microsoft.Xna.Framework.Content
 			Stream stream;
 			try
             {
-                string assetPath = Path.Combine(_rootDirectory, assetName) + ".xnb";
+                string assetPath = Path.Combine(RootDirectoryFullPath, assetName) + ".xnb";
                 stream = TitleContainer.OpenStream(assetPath);
 
 #if ANDROID
@@ -277,8 +306,8 @@ namespace Microsoft.Xna.Framework.Content
             catch (ContentLoadException)
             {
 				//MonoGame try to load as a non-content file
-				
-				assetName = TitleContainer.GetFilename(Path.Combine (_rootDirectory, assetName));
+
+                assetName = TitleContainer.GetFilename(Path.Combine(RootDirectoryFullPath, assetName));
 
                 assetName = Normalize<T>(assetName);
 	
@@ -288,26 +317,22 @@ namespace Microsoft.Xna.Framework.Content
 				}
 
                 result = ReadRawAsset<T>(assetName, originalAssetName);
+
+                // Because Raw Assets skip the ContentReader step, they need to have their
+                // disopsables recorded here. Doing it outside of this catch will 
+                // result in disposables being logged twice.
+                if (result is IDisposable)
+                {
+                    if (recordDisposableObject != null)
+                        recordDisposableObject(result as IDisposable);
+                    else
+                        disposableAssets.Add(result as IDisposable);
+                }
 			}			
             
 			if (result == null)
-			{
 				throw new ContentLoadException("Could not load " + originalAssetName + " asset!");
-			}
 
-			if (result is IDisposable)
-			{
-				if (recordDisposableObject != null)
-					recordDisposableObject(result as IDisposable);
-				else
-					disposableAssets.Add(result as IDisposable);
-			}
-
-			if (result == null)
-			{
-				throw new ContentLoadException("Could not load " + originalAssetName + " asset!");
-			}
-		
 			CurrentAssetDirectory = null;
 			
 			return (T)result;
@@ -595,7 +620,7 @@ namespace Microsoft.Xna.Framework.Content
 				// Try to reload as a non-xnb file.
                 // Just textures supported for now.
 
-				assetName = TitleContainer.GetFilename(Path.Combine (_rootDirectory, assetName));
+                assetName = TitleContainer.GetFilename(Path.Combine(RootDirectoryFullPath, assetName));
 
                 assetName = Normalize<T>(assetName);
 
@@ -638,6 +663,18 @@ namespace Microsoft.Xna.Framework.Content
 				_rootDirectory = value;
 			}
 		}
+
+        internal string RootDirectoryFullPath
+        {
+            get
+            {
+#if WINDOWS || LINUX || MACOS
+				return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, RootDirectory);
+#else
+                return RootDirectory;
+#endif
+            }
+        }
 		
 		public string CurrentAssetDirectory { get; set; }
 

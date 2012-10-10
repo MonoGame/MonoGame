@@ -51,18 +51,21 @@ using Windows.Graphics.Display;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Windows.UI.ViewManagement;
+using Windows.UI.Xaml;
 
 
 namespace Microsoft.Xna.Framework
 {
     public partial class MetroGameWindow : GameWindow
     {
+        private DisplayOrientation _supportedOrientations;
         private DisplayOrientation _orientation;
         private CoreWindow _coreWindow;
         protected Game game;
         private Rectangle _clientBounds;
         private ApplicationViewState _currentViewState;
-        private MetroCoreWindowEvents _windowEvents;
+        private InputEvents _windowEvents;
+        private Vector2 _backBufferScale;
 
         #region Internal Properties
 
@@ -98,6 +101,12 @@ namespace Microsoft.Xna.Framework
 
         protected internal override void SetSupportedOrientations(DisplayOrientation orientations)
         {
+            // We don't want to trigger orientation changes 
+            // when no preference is being changed.
+            if (_supportedOrientations == orientations)
+                return;
+            
+            _supportedOrientations = orientations;
             var supported = DisplayOrientations.None;
 
             if (orientations == DisplayOrientation.Default)
@@ -133,10 +142,10 @@ namespace Microsoft.Xna.Framework
             Instance = new MetroGameWindow();
         }
 
-        public void Initialize(CoreWindow coreWindow)
+        public void Initialize(CoreWindow coreWindow, UIElement inputElement)
         {
             _coreWindow = coreWindow;
-            _windowEvents = new MetroCoreWindowEvents(_coreWindow);
+            _windowEvents = new InputEvents(_coreWindow, inputElement);
 
             _orientation = ToOrientation(DisplayProperties.CurrentOrientation);
             DisplayProperties.OrientationChanged += DisplayProperties_OrientationChanged;
@@ -146,22 +155,11 @@ namespace Microsoft.Xna.Framework
 
             _coreWindow.Activated += Window_FocusChanged;
 
-            // TODO: Fix for latest WinSDK changes.
-            //ApplicationView.Value.ViewStateChanged += Application_ViewStateChanged;
-
             _currentViewState = ApplicationView.Value;
 
             var bounds = _coreWindow.Bounds;
-            SetClientBounds(bounds.Width, bounds.Height);            
+            SetClientBounds(bounds.Width, bounds.Height);
         }
-
-        /*
-        private void Application_ViewStateChanged(ApplicationView sender, ApplicationViewStateChangedEventArgs args)
-        {
-            // TODO: We may want to expose this event via GameWindow
-            // only in WinRT builds....  not sure yet.
-        }
-        */
 
         private void Window_FocusChanged(CoreWindow sender, WindowActivatedEventArgs args)
         {
@@ -187,20 +185,43 @@ namespace Microsoft.Xna.Framework
 
         private void Window_SizeChanged(CoreWindow sender, WindowSizeChangedEventArgs args)
         {
-            SetClientBounds( args.Size.Width, args.Size.Height );
+            var manager = Game.graphicsDeviceManager;
 
+            // If we haven't calculated the back buffer scale then do it now.
+            if (_backBufferScale == Vector2.Zero)
+            {
+                _backBufferScale = new Vector2( manager.PreferredBackBufferWidth/(float)_clientBounds.Width, 
+                                                manager.PreferredBackBufferHeight/(float)_clientBounds.Height);
+            }
+
+            // Set the new client bounds.
+            SetClientBounds(args.Size.Width, args.Size.Height);
+
+            // Set the default new back buffer size and viewport, but this
+            // can be overloaded by the two events below.
+            
+            var newWidth = (int)((_backBufferScale.X * _clientBounds.Width) + 0.5f);
+            var newHeight = (int)((_backBufferScale.Y * _clientBounds.Height) + 0.5f);
+            manager.PreferredBackBufferWidth = newWidth;
+            manager.PreferredBackBufferHeight = newHeight;
+
+            manager.GraphicsDevice.Viewport = new Viewport(0, 0, newWidth, newHeight);            
+
+            // Set the new view state which will trigger the 
+            // Game.ApplicationViewChanged event and signal
+            // the client size changed event.
+            Platform.ViewState = ApplicationView.Value;
             OnClientSizeChanged();
 
-            // If we have a valid client bounds then update the graphics device.
+            // If we have a valid client bounds then 
+            // update the graphics device.
             if (_clientBounds.Width > 0 && _clientBounds.Height > 0)
-                UpdateGraphicsDevice();
-
-            Platform.ViewState = ApplicationView.Value;
+                manager.ApplyChanges();
         }
 
         private static DisplayOrientation ToOrientation(DisplayOrientations orientation)
         {
-            DisplayOrientation result = (DisplayOrientation)0;
+            var result = (DisplayOrientation)0;
 
             if (DisplayProperties.NativeOrientation == orientation)
                 result |= DisplayOrientation.Default;
@@ -242,39 +263,13 @@ namespace Microsoft.Xna.Framework
 
             // If we have a valid client bounds then update the graphics device.
             if (_clientBounds.Width > 0 && _clientBounds.Height > 0)
-                UpdateGraphicsDevice();
-        }
-
-        private void UpdateGraphicsDevice()
-        {
-            // Is the orientation landscape and is landscape the default?
-            var isLandscape = (_orientation & (DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight)) != 0;
-            var isDefaultLandscape = DisplayProperties.NativeOrientation == DisplayOrientations.Landscape;
-
-            // Get the new width and height considering that the 
-            // orientation changes how we read the client bounds.
-            // 
-            // TODO: Is the Win8 Simulator broken or is this really correct?
-            //
-            int newWidth, newHeight;
-            newWidth = Game.graphicsDeviceManager.PreferredBackBufferWidth;
-            newHeight = Game.graphicsDeviceManager.PreferredBackBufferHeight;
-
-            // Update the graphics device.
-            var device = Game.GraphicsDevice;
-            device.Viewport = new Viewport(0, 0, newWidth, newHeight);
-            device.PresentationParameters.BackBufferWidth = newWidth;
-            device.PresentationParameters.BackBufferHeight = newHeight;
-            device.CreateSizeDependentResources();
-            device.ApplyRenderTargets(null);
-
-            OnClientSizeChanged();
+                Game.graphicsDeviceManager.ApplyChanges();
         }
 
         protected override void SetTitle(string title)
         {
-            // NOTE: There seems to be no concept of a
-            // window title in a Metro application.
+            // NOTE: There is no concept of a window 
+            // title in a Metro application.
         }
 
         internal void SetCursor(bool visible)
@@ -298,16 +293,21 @@ namespace Microsoft.Xna.Framework
                 // Process events incoming to the window.
                 _coreWindow.Dispatcher.ProcessEvents(CoreProcessEventsOption.ProcessAllIfPresent);
 
-                // Update state based on window events.
-                _windowEvents.UpdateState();
-
-                // Update and render the game.
-                if (Game != null)
-                    Game.Tick();
+                Tick();
 
                 if (IsExiting)
                     break;
             }
+        }
+
+        internal void Tick()
+        {
+            // Update state based on window events.
+            _windowEvents.UpdateState();
+
+            // Update and render the game.
+            if (Game != null)
+                Game.Tick();
         }
 
         #region Public Methods

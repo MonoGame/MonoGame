@@ -34,6 +34,8 @@ using VertexPointerType = OpenTK.Graphics.ES20.All;
 using ColorPointerType = OpenTK.Graphics.ES20.All;
 using NormalPointerType = OpenTK.Graphics.ES20.All;
 using TexCoordPointerType = OpenTK.Graphics.ES20.All;
+using GetPName = OpenTK.Graphics.ES20.All;
+using System.Diagnostics;
 #endif
 #endif
 
@@ -191,6 +193,14 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public static bool OpenGLVertexAttribNormalized(this VertexElement element)
         {
+            // TODO: This may or may not be the right behavor.  
+            //
+            // For instance the VertexElementFormat.Byte4 format is not supposed
+            // to be normalized, but this line makes it so.
+            //
+            // The question is in MS XNA are types normalized based on usage or
+            // normalized based to their format?
+            //
             if (element.VertexElementUsage == VertexElementUsage.Color)
                 return true;
 
@@ -222,7 +232,6 @@ namespace Microsoft.Xna.Framework.Graphics
                     return ColorPointerType.Float;
 
                 case VertexElementFormat.Color:
-                    //return ColorPointerType.UnsignedByte;
                     return ColorPointerType.UnsignedByte;
 
                 case VertexElementFormat.Byte4:
@@ -450,7 +459,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 		
 		
-		internal static void GetGLFormat(this SurfaceFormat format,
+		internal static void GetGLFormat (this SurfaceFormat format,
 		                                 out PixelInternalFormat glInternalFormat,
 		                                 out PixelFormat glFormat,
 		                                 out PixelType glType)
@@ -459,8 +468,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			glFormat = PixelFormat.Rgba;
 			glType = PixelType.UnsignedByte;
 			
-			switch (format)
-			{
+			switch (format) {
 			case SurfaceFormat.Color:
 				glInternalFormat = PixelInternalFormat.Rgba;
 				glFormat = PixelFormat.Rgba;
@@ -502,6 +510,12 @@ namespace Microsoft.Xna.Framework.Graphics
 			case SurfaceFormat.Dxt5:
 				glInternalFormat = PixelInternalFormat.CompressedRgbaS3tcDxt5Ext;
 				glFormat = (PixelFormat)All.CompressedTextureFormats;
+				break;
+			
+			case SurfaceFormat.Single:
+				glInternalFormat = PixelInternalFormat.R32f;
+				glFormat = PixelFormat.Red;
+				glType = PixelType.Float;
 				break;
 #endif
 				
@@ -545,7 +559,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 case SurfaceFormat.Alpha8:
                     return 1;
 				case SurfaceFormat.NormalizedByte4:
-					return 4;
+                    return 4;
                 default:
                     throw new NotImplementedException();
             }
@@ -592,6 +606,62 @@ namespace Microsoft.Xna.Framework.Graphics
                     return 8;
             }
             return 0;
+        }
+
+#if OPENGL
+
+        public static int GetBoundTexture2D()
+        {
+            var prevTexture = 0;
+#if GLES
+            GL.GetInteger(GetPName.TextureBinding2D, ref prevTexture);
+#else
+            GL.GetInteger(GetPName.TextureBinding2D, out prevTexture);
+#endif
+            GraphicsExtensions.LogGLError("GraphicsExtensions.GetBoundTexture2D() GL.GetInteger");
+            return prevTexture;
+        }
+
+        [System.Diagnostics.Conditional("DEBUG")]
+        public static void CheckGLError()
+        {
+#if GLES
+            All error = GL.GetError();
+            if (error != All.False)
+                throw new MonoGameGLException("GL.GetError() returned " + error.ToString());
+#elif OPENGL
+            ErrorCode error = GL.GetError();
+            if (error != ErrorCode.NoError)
+                throw new MonoGameGLException("GL.GetError() returned " + error.ToString());
+#endif
+
+        }
+#endif
+
+#if OPENGL
+        [System.Diagnostics.Conditional("DEBUG")]
+        public static void LogGLError(string location)
+        {
+            try
+            {
+                GraphicsExtensions.CheckGLError();
+            }
+            catch (MonoGameGLException ex)
+            {
+#if ANDROID
+                // Todo: Add generic MonoGame logging interface
+                Android.Util.Log.Debug("MonoGame", "MonoGameGLException at " + location + " - " + ex.Message);
+#endif
+            }
+        }
+#endif
+    }
+
+    public class MonoGameGLException : Exception
+    {
+        public MonoGameGLException(string message)
+            : base(message)
+        {
         }
     }
 }

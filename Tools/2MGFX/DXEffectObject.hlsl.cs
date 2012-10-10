@@ -8,8 +8,6 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     partial class DXEffectObject
     {
-        public List<ConstantBuffer> ConstantBuffers { get; private set; }
-        
         private DXEffectObject()
         {
         }
@@ -19,15 +17,15 @@ namespace Microsoft.Xna.Framework.Graphics
             var effect = new DXEffectObject();
 
             // These are filled out as we process stuff.
-            effect.ConstantBuffers = new List<ConstantBuffer>();
-            effect.Shaders = new List<DXShader>();
+            effect.ConstantBuffers = new List<DXConstantBufferData>();
+            effect.Shaders = new List<DXShaderData>();
 
             // Go thru the techniques and that will find all the 
             // shaders and constant buffers.
             effect.Techniques = new d3dx_technique[shaderInfo.Techniques.Count];
-            for (var i = 0; i < shaderInfo.Techniques.Count; i++)
+            for (var t = 0; t < shaderInfo.Techniques.Count; t++)
             {
-                var tinfo = shaderInfo.Techniques[i]; ;
+                var tinfo = shaderInfo.Techniques[t]; ;
 
                 var technique = new d3dx_technique();
                 technique.name = tinfo.name;
@@ -40,20 +38,29 @@ namespace Microsoft.Xna.Framework.Graphics
 
                     var pass = new d3dx_pass();
                     pass.name = pinfo.name ?? string.Empty;
-                    pass.states = new d3dx_state[2];
-                    pass.state_count = 2;
+                    pass.state_count = 0;
+                    var tempstate = new d3dx_state[2];
+                    
+                    if (!string.IsNullOrEmpty(pinfo.psFunction))
+                    {
+                        pass.state_count += 1;
+                        tempstate[pass.state_count -1] = effect.CreateShader(shaderInfo, pinfo.psFunction, pinfo.psModel, false);
+                    }
 
-                    // Create the shaders.
-                    if (string.IsNullOrEmpty(pinfo.psFunction) || string.IsNullOrEmpty(pinfo.vsFunction))
-                        throw new Exception("Passed must have a vertex and pixel shader assigned!");
+                    if (!string.IsNullOrEmpty(pinfo.vsFunction))
+                    {
+                        pass.state_count += 1;
+                        tempstate[pass.state_count - 1] = effect.CreateShader(shaderInfo, pinfo.vsFunction, pinfo.vsModel, true);
+                    }
 
-                    pass.states[0] = effect.CreateShader(shaderInfo, pinfo.psFunction, pinfo.psModel, false);
-                    pass.states[1] = effect.CreateShader(shaderInfo, pinfo.vsFunction, pinfo.vsModel, true);
+                    pass.states = new d3dx_state[pass.state_count];
+                    for (var s = 0; s < pass.state_count; s++)
+                        pass.states[s] = tempstate[s];
 
                     technique.pass_handles[p] = pass;
                 }
 
-                effect.Techniques[i] = technique;
+                effect.Techniques[t] = technique;
             }
                 
             // Make the list of parameters by combining all the
@@ -176,18 +183,18 @@ namespace Microsoft.Xna.Framework.Graphics
                     throw new Exception(result.Message);
 
                 shaderByteCode = result.Bytecode;
+                //var source = shaderByteCode.Disassemble();
             }
             catch (Exception ex)
             {
                 throw ex;
             }
 
-            // Get the shader bytecode.
-            var bytecode = new byte[shaderByteCode.Data.Length];
-            shaderByteCode.Data.Read(bytecode, 0, bytecode.Length);
+            // Get a copy of the shader bytecode.
+            var bytecode = shaderByteCode.Data.ToArray();
 
             // First look to see if we already created this same shader.
-            DXShader dxShader = null;
+            DXShaderData dxShader = null;
             foreach (var shader in Shaders)
             {
                 if (bytecode.SequenceEqual(shader.Bytecode))
@@ -201,9 +208,9 @@ namespace Microsoft.Xna.Framework.Graphics
             if ( dxShader == null )
             {
                 if (shaderInfo.DX11Profile)
-                    dxShader = DXShader.CreateHLSL(bytecode, isVertexShader, ConstantBuffers, Shaders.Count, shaderInfo.Debug);
+                    dxShader = DXShaderData.CreateHLSL(bytecode, isVertexShader, ConstantBuffers, Shaders.Count, shaderInfo.Debug);
                 else
-                    dxShader = DXShader.CreateGLSL(bytecode, isVertexShader, ConstantBuffers, Shaders.Count);
+                    dxShader = DXShaderData.CreateGLSL(bytecode, ConstantBuffers, Shaders.Count);
 
                 Shaders.Add(dxShader);
             }

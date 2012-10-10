@@ -82,6 +82,7 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Media;
+using Android.Hardware;
 
 namespace Microsoft.Xna.Framework
 {
@@ -100,14 +101,21 @@ namespace Microsoft.Xna.Framework
 
         private bool _initialized;
         public static bool IsPlayingVdeo { get; set; }
+		private bool _exiting = false;
 
         public override void Exit()
         {
             //TODO: Fix this
             try
             {
-                Net.NetworkSession.Exit();
-                Window.Close();
+				if (!_exiting)
+				{
+					_exiting = true;
+					Game.DoExiting();
+                    Net.NetworkSession.Exit();
+               	    Game.Activity.Finish();
+				    Window.Close();
+				}
             }
             catch
             {
@@ -131,9 +139,6 @@ namespace Microsoft.Xna.Framework
                 Game.DoInitialize();
                 _initialized = true;				
             }
-
-            // Let the touch panel update states.
-            TouchPanel.UpdateState();
 
             return true;
         }
@@ -166,9 +171,6 @@ namespace Microsoft.Xna.Framework
 
         public override bool BeforeRun()
         {
-            // Get the Accelerometer going
-            Accelerometer.SetupAccelerometer();
-
             // Run it as fast as we can to allow for more response on threaded GPU resource creation
             Window.Run();
 
@@ -185,14 +187,12 @@ namespace Microsoft.Xna.Framework
 
         public override void BeginScreenDeviceChange(bool willBeFullScreen)
         {
-            // FIXME: Can't throw NotImplemented if it is called as a standard part of graphics device creation
-            //throw new NotImplementedException();
         }
 
         public override void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight)
         {
-            // FIXME: Can't throw NotImplemented if it is called as a standard part of graphics device creation
-            //throw new NotImplementedException();
+            // Force the Viewport to be correctly set
+            Game.graphicsDeviceManager.ResetClientBounds();
         }
 
         // EnterForeground
@@ -202,7 +202,6 @@ namespace Microsoft.Xna.Framework
             {
                 IsActive = true;
                 Window.Resume();
-                Accelerometer.Resume();
                 Sound.ResumeAll();
                 MediaPlayer.Resume();
 				if(!Window.IsFocused)
@@ -218,7 +217,6 @@ namespace Microsoft.Xna.Framework
                 IsActive = false;
                 Window.Pause();
 				Window.ClearFocus();
-                Accelerometer.Pause();
                 Sound.PauseAll();
                 MediaPlayer.Pause();
             }
@@ -238,6 +236,7 @@ namespace Microsoft.Xna.Framework
 		
         public override void Present()
         {
+			if (_exiting) return;
             try
             {
                 Window.SwapBuffers();

@@ -42,6 +42,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
+using Microsoft.Xna.Framework.Graphics;
 #if IPHONE
 using MonoTouch.Foundation;
 using MonoTouch.OpenGLES;
@@ -77,6 +78,16 @@ namespace Microsoft.Xna.Framework
             mainThreadId = Thread.CurrentThread.ManagedThreadId;
         }
 
+        public static void SetUIThread()
+        {
+        }
+
+        public static void EnsureUIThread()
+        {
+            if (mainThreadId != Thread.CurrentThread.ManagedThreadId)
+                throw new Exception(String.Format("Operation not called on UI thread. UI thread ID = {0}. This thread ID = {1}.", mainThreadId, Thread.CurrentThread.ManagedThreadId));
+        }
+
         /// <summary>
         /// Runs the given action on the UI thread and blocks the current thread while the action is running.
         /// If the current thread is the UI thread, the action will run immediately.
@@ -107,6 +118,7 @@ namespace Microsoft.Xna.Framework
                 action();
                 // Must flush the GL calls so the GPU asset is ready for the main context to use it
                 GL.Flush();
+                GraphicsExtensions.CheckGLError();
             }
 #elif WINDOWS || LINUX
             lock (BackgroundContext)
@@ -117,6 +129,7 @@ namespace Microsoft.Xna.Framework
                 action();
                 // Must flush the GL calls so the texture is ready for the main context to use
                 GL.Flush();
+                GraphicsExtensions.CheckGLError();
                 // Must make the context not current on this thread or the next thread will get error 170 from the MakeCurrent call
                 BackgroundContext.MakeCurrent(null);
             }
@@ -129,8 +142,8 @@ namespace Microsoft.Xna.Framework
 #endif
             {
 #if ANDROID
-                if (!Game.Instance.Window.GraphicsContext.IsCurrent)
-                    Game.Instance.Window.MakeCurrent();
+                //if (!Game.Instance.Window.GraphicsContext.IsCurrent)
+                Game.Instance.Window.MakeCurrent();
 #endif
                 action();
                 resetEvent.Set();
@@ -154,7 +167,8 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         internal static void Run()
         {
-            System.Diagnostics.Debug.Assert(mainThreadId == Thread.CurrentThread.ManagedThreadId, "Threading.Run must be called from the UI thread");
+            EnsureUIThread();
+
             lock (actions)
             {
                 foreach (Action action in actions)

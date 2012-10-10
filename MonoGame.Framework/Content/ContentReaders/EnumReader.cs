@@ -41,11 +41,11 @@
 using System;
 namespace Microsoft.Xna.Framework.Content
 {
-	internal class EnumReader<T> : ContentTypeReader<T>
+	public class EnumReader<T> : ContentTypeReader<T>
     {
         ContentTypeReader elementReader;
 
-        internal EnumReader()
+        public EnumReader()
         {
         }
 

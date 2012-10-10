@@ -61,17 +61,14 @@ namespace Microsoft.Xna.Framework.Graphics
             // TODO: To use true Immutable resources we would need to delay creation of 
             // the Buffer until SetData() and recreate them if set more than once.
 
-            SharpDX.Direct3D11.CpuAccessFlags accessflags = SharpDX.Direct3D11.CpuAccessFlags.None;
-            SharpDX.Direct3D11.ResourceUsage usage = SharpDX.Direct3D11.ResourceUsage.Default;
+            var accessflags = SharpDX.Direct3D11.CpuAccessFlags.None;
+            var usage = SharpDX.Direct3D11.ResourceUsage.Default;
 
             if (dynamic)
             {
                 accessflags |= SharpDX.Direct3D11.CpuAccessFlags.Write;
                 usage = SharpDX.Direct3D11.ResourceUsage.Dynamic;
             }
-
-            if (bufferUsage != Graphics.BufferUsage.WriteOnly)
-                accessflags |= SharpDX.Direct3D11.CpuAccessFlags.Read;
 
             _buffer = new SharpDX.Direct3D11.Buffer(    graphicsDevice._d3dDevice,
                                                         sizeInBytes,
@@ -93,9 +90,12 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
                 GL.GenBuffers(1, out ibo);
 #endif
+                GraphicsExtensions.CheckGLError();
                 GL.BindBuffer(BufferTarget.ElementArrayBuffer, ibo);
+                GraphicsExtensions.CheckGLError();
                 GL.BufferData(BufferTarget.ElementArrayBuffer,
                               (IntPtr)sizeInBytes, IntPtr.Zero, dynamic ? BufferUsageHint.StreamDraw : BufferUsageHint.StaticDraw);
+                GraphicsExtensions.CheckGLError();
             });
 #endif
 		}
@@ -129,6 +129,7 @@ namespace Microsoft.Xna.Framework.Graphics
             Threading.BlockOnUIThread(() =>
             {
                 GL.BindBuffer(BufferTarget.ArrayBuffer, ibo);
+                GraphicsExtensions.CheckGLError();
                 var elementSizeInByte = Marshal.SizeOf(typeof(T));
 #if IPHONE || ANDROID || EMBEDDED
                 IntPtr ptr = GL.Oes.MapBuffer(All.ArrayBuffer, (All)0);
@@ -158,6 +159,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
                 GL.UnmapBuffer(BufferTarget.ArrayBuffer);
 #endif
+                GraphicsExtensions.CheckGLError();
             });
 #endif
         }
@@ -190,7 +192,9 @@ namespace Microsoft.Xna.Framework.Graphics
         protected void SetDataInternal<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, SetDataOptions options) where T : struct
         {
             if (data == null)
-                throw new ArgumentNullException("data");
+                throw new ArgumentNullException("data is null");
+            if (data.Length < (startIndex + elementCount))
+                throw new InvalidOperationException("The array specified in the data parameter is not the correct size for the amount of data requested.");
 
 #if DIRECTX
 
@@ -262,9 +266,24 @@ namespace Microsoft.Xna.Framework.Graphics
                 var sizeInBytes = elementSizeInByte * elementCount;
                 var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
                 var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startIndex * elementSizeInByte);
+                var bufferSize = IndexCount * (IndexElementSize == IndexElementSize.SixteenBits ? 2 : 4);
 
                 GL.BindBuffer(BufferTarget.ElementArrayBuffer, ibo);
+                GraphicsExtensions.CheckGLError();
+
+                if (options == SetDataOptions.Discard)
+                {
+                    // By assigning NULL data to the buffer this gives a hint
+                    // to the device to discard the previous content.
+                    GL.BufferData(  BufferTarget.ElementArrayBuffer,
+                                    (IntPtr)bufferSize,
+                                    IntPtr.Zero,
+                                    _isDynamic ? BufferUsageHint.StreamDraw : BufferUsageHint.StaticDraw);
+                    GraphicsExtensions.CheckGLError();
+                }
+
                 GL.BufferSubData(BufferTarget.ElementArrayBuffer, (IntPtr)offsetInBytes, (IntPtr)sizeInBytes, dataPtr);
+                GraphicsExtensions.CheckGLError();
 
                 dataHandle.Free();
             });
@@ -285,6 +304,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _buffer = null;
 #else
 			GL.DeleteBuffers(1, ref ibo);
+            GraphicsExtensions.CheckGLError();
 #endif
             base.Dispose();
 		}

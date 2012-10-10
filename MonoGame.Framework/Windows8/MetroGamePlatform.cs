@@ -76,6 +76,8 @@ using System.Diagnostics;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input.Touch;
 using Windows.ApplicationModel.Activation;
+using Windows.UI.ViewManagement;
+using Windows.UI.Xaml.Media;
 
 namespace Microsoft.Xna.Framework
 {
@@ -89,31 +91,71 @@ namespace Microsoft.Xna.Framework
         public MetroGamePlatform(Game game)
             : base(game)
         {
+            // Set the starting view state so the Game class can
+            // query it during construction.
+            ViewState = ApplicationView.Value;
+
+            // Setup the game window.
+            Window = MetroGameWindow.Instance;
             MetroGameWindow.Instance.Game = game;
-            this.Window = MetroGameWindow.Instance;
 
-            setLaunchParameters();
-            Game.PreviousExecutionState = PreviousExecutionState;
-			
-            // Setup our OpenALSoundController to handle our SoundBuffer pools
-            // soundControllerInstance = OpenALSoundController.GetInstance;
-        }
-
-        private void setLaunchParameters()
-        {
-            var arguments = LaunchParameters.Split(' ');
-
-            foreach (var arg in arguments)
+            // Setup the launch parameters.
+            // - Parameters can optionally start with a forward slash.
+            // - Keys can be separated from values by a colon.
+            // - Double quotes can be used to enclose spaces in a key or value.
+            int pos = 0;
+            int paramStart = 0;
+            bool inQuotes = false;
+            while (pos <= LaunchParameters.Length)
             {
-                if (arg.Contains("="))
+                string arg = string.Empty;
+                if (pos < LaunchParameters.Length)
                 {
-                    var keyVal = arg.Split('=');
-                    Game.LaunchParameters.Add(keyVal[0], keyVal[1]);
-
+                    char c = LaunchParameters[pos];
+                    if (c == '"')
+                        inQuotes = !inQuotes;
+                    else if ((c == ' ') && !inQuotes)
+                    {
+                        arg = LaunchParameters.Substring(paramStart, pos - paramStart).Replace("\"", "");
+                        paramStart = pos + 1;
+                    }
                 }
-                else if (arg != string.Empty)
-                    Game.LaunchParameters.Add(arg, string.Empty);
+                else
+                {
+                    arg = LaunchParameters.Substring(paramStart).Replace("\"", "");
+                }
+                ++pos;
+
+                if (string.IsNullOrWhiteSpace(arg))
+                    continue;
+
+                string key = string.Empty;
+                string value = string.Empty;
+                int keyStart = 0;
+
+                if (arg.StartsWith("/"))
+                    keyStart = 1;
+
+                if (arg.Length > keyStart)
+                {
+                    int keyEnd = arg.IndexOf(':', keyStart);
+                    if (keyEnd >= 0)
+                    {
+                        key = arg.Substring(keyStart, keyEnd - keyStart);
+                        int valueStart = keyEnd + 1;
+                        if (valueStart < arg.Length)
+                            value = arg.Substring(valueStart);
+                    }
+                    else
+                    {
+                        key = arg.Substring(keyStart);
+                    }
+
+                    Game.LaunchParameters.Add(key, value);
+                }
             }
+
+            Game.PreviousExecutionState = PreviousExecutionState;
         }
 
         public override GameRunBehavior DefaultRunBehavior
@@ -128,24 +170,18 @@ namespace Microsoft.Xna.Framework
 
         public override void StartRunLoop()
         {
-            throw new NotImplementedException();
+            CompositionTarget.Rendering += (o, a) =>
+            {
+                MetroGameWindow.Instance.Tick();
+            };
         }
         
         public override void Exit()
         {
             if (!MetroGameWindow.Instance.IsExiting)
             {
-                //Net.NetworkSession.Exit();
                 MetroGameWindow.Instance.IsExiting = true;
             }
-        }
-
-        public override void BeforeInitialize()
-        {
-            base.BeforeInitialize();
-
-            // Metro apps are always full screen.
-            Game.graphicsDeviceManager.IsFullScreen = true;
         }
 
         public override bool BeforeUpdate(GameTime gameTime)

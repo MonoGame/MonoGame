@@ -153,8 +153,7 @@ namespace Microsoft.Xna.Framework
             soundControllerInstance.Update();
 
             // Let the touch panel update states.
-            TouchPanel.UpdateState();
-
+            
             return true;
         }
 

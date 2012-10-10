@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -10,14 +10,14 @@
     <OutputType>Library</OutputType>
     <Description>XNA implementation for MonoTouch</Description>
     <RootNamespace>Microsoft.Xna.Framework</RootNamespace>
-    <SynchReleaseVersion>false</SynchReleaseVersion>
+    <SynchReleaseVersion>False</SynchReleaseVersion>
     <ReleaseVersion>1.6</ReleaseVersion>
     <MtouchSdkVersion>3.0</MtouchSdkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhoneSimulator' ">
-    <DebugSymbols>true</DebugSymbols>
+    <DebugSymbols>True</DebugSymbols>
     <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
+    <Optimize>False</Optimize>
     <OutputPath>bin\iPhoneSimulator\Debug</OutputPath>
     <DefineConstants>DEBUG;IPHONE;GLES;OPENGL</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
@@ -27,44 +27,44 @@
         <Command type="Custom" />
       </CustomCommands>
     </CustomCommands>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <MtouchLink>None</MtouchLink>
-    <MtouchDebug>true</MtouchDebug>
+    <MtouchDebug>True</MtouchDebug>
     <AssemblyName>MonoGame.Framework.iOS</AssemblyName>
     <MtouchUseArmv7>false</MtouchUseArmv7>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
     <DebugType>none</DebugType>
-    <Optimize>true</Optimize>
+    <Optimize>True</Optimize>
     <OutputPath>bin\iPhoneSimulator\Release</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <DefineConstants>IPHONE;GLES;OPENGL</DefineConstants>
     <AssemblyName>MonoGame.Framework.iOS</AssemblyName>
     <MtouchUseArmv7>false</MtouchUseArmv7>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhone' ">
-    <DebugSymbols>true</DebugSymbols>
+    <DebugSymbols>True</DebugSymbols>
     <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
+    <Optimize>False</Optimize>
     <OutputPath>bin\iPhone\Debug</OutputPath>
     <DefineConstants>DEBUG;IPHONE;GLES;OPENGL</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <MtouchDebug>true</MtouchDebug>
+    <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <MtouchDebug>True</MtouchDebug>
     <AssemblyName>MonoGame.Framework</AssemblyName>
     <MtouchUseArmv7>false</MtouchUseArmv7>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
     <DebugType>none</DebugType>
-    <Optimize>true</Optimize>
+    <Optimize>True</Optimize>
     <OutputPath>bin\iPhone\Release</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <DefineConstants>IPHONE;GLES;OPENGL</DefineConstants>
     <AssemblyName>MonoGame.Framework</AssemblyName>
     <MtouchUseArmv7>false</MtouchUseArmv7>
@@ -96,7 +96,6 @@
     <Compile Include="Graphics\DisplayMode.cs" />
     <Compile Include="Graphics\DisplayModeCollection.cs" />
     <Compile Include="Graphics\GraphicsDevice.cs" />
-    <Compile Include="Graphics\GraphicsDeviceCapabilities.cs" />
     <Compile Include="Graphics\GraphicsDeviceStatus.cs" />
     <Compile Include="Graphics\IGraphicsDeviceService.cs" />
     <Compile Include="Graphics\MultiSampleType.cs" />
@@ -195,7 +194,6 @@
     <Compile Include="GamerServices\GamerDefaults.cs" />
     <Compile Include="GamerServices\GamerPresence.cs" />
     <Compile Include="GamerServices\GamerPresenceMode.cs" />
-    <Compile Include="Graphics\RenderTarget.cs" />
     <Compile Include="Graphics\RenderTarget2D.cs" />
     <Compile Include="CurveTangent.cs" />
     <Compile Include="Input\GamePadDPad.cs" />
@@ -220,7 +218,6 @@
     <Compile Include="Graphics\States\DepthFormat.cs" />
     <Compile Include="Graphics\States\DepthStencilState.cs" />
     <Compile Include="Graphics\States\FillMode.cs" />
-    <Compile Include="Graphics\States\GLStateManager.cs" />
     <Compile Include="Graphics\States\RasterizerState.cs" />
     <Compile Include="Graphics\States\SaveStateMode.cs" />
     <Compile Include="Graphics\States\StencilOperation.cs" />
@@ -304,9 +301,8 @@
     <Compile Include="iOS\iOSGameView_GLAbstraction.cs" />
     <Compile Include="iOS\iOSGameView_Touch.cs" />
     <Compile Include="iOS\PowerStatus.cs" />
-    <Compile Include="iOS\Media\MediaSource.cs" />
-    <Compile Include="iOS\Media\MediaLibrary.cs" />
-    <Compile Include="iOS\Input\Accelerometer.cs" />
+    <Compile Include="Media\MediaSource.cs" />
+    <Compile Include="Media\MediaLibrary.cs" />
     <Compile Include="iOS\Media\Video.cs" />
     <Compile Include="iOS\Media\VideoPlayer.cs" />
     <Compile Include="iOS\GamerServices\Guide.cs" />
@@ -329,9 +325,12 @@
     <Compile Include="Desktop\Audio\OpenALSoundController.cs" />
     <Compile Include="MacOS\Audio\OpenALSupport.cs" />
     <Compile Include="MacOS\Audio\SoundEffect.cs" />
-    <Compile Include="MacOS\Audio\SoundEffectInstance.cs" />
+    <Compile Include="Desktop\Audio\SoundEffectInstance.cs" />
     <Compile Include="Graphics\Effect\AlphaTestEffect.cs" />
-    <Compile Include="Graphics\Effect\DXShader.cs" />
+    <Compile Include="Graphics\Shader\ConstantBufferCollection.cs" />
+    <Compile Include="Graphics\Shader\ConstantBuffer.cs" />
+    <Compile Include="Graphics\Shader\Shader.cs" />
+    <Compile Include="Graphics\Shader\ShaderStage.cs" />
     <Compile Include="Graphics\Effect\EffectAnnotation.cs" />
     <Compile Include="Graphics\Effect\EffectAnnotationCollection.cs" />
     <Compile Include="Graphics\Effect\EffectHelpers.cs" />
@@ -425,9 +424,21 @@
     <Compile Include="iOS\GamerServices\KeyboardInputView.cs" />
     <Compile Include="iOS\GamerServices\KeyboardInputAsyncResult.cs" />
     <Compile Include="iOS\iOSGameWindow.cs" />
-    <Compile Include="Graphics\Effect\ConstantBuffer.cs" />
-    <Compile Include="Input\Touch\TouchInfo.cs" />
+    <Compile Include="Graphics\Shader\ShaderProgramCache.cs" />
+    <Compile Include="Utilities\Hash.cs" />
+    <Compile Include="iOS\Devices\Sensors\Accelerometer.cs" />
+    <Compile Include="Microsoft\Devices\Sensors\AccelerometerReading.cs" />
+    <Compile Include="iOS\Devices\Sensors\Compass.cs" />
+    <Compile Include="Microsoft\Devices\Sensors\CalibrationEventArgs.cs" />
+    <Compile Include="Microsoft\Devices\Sensors\CompassReading.cs" />
+    <Compile Include="Microsoft\Devices\Sensors\ISensorReading.cs" />
+    <Compile Include="Microsoft\Devices\Sensors\SensorBase.cs" />
+    <Compile Include="Microsoft\Devices\Sensors\SensorFailedException.cs" />
+    <Compile Include="Microsoft\Devices\Sensors\SensorReadingEventArgs.cs" />
+    <Compile Include="Microsoft\Devices\Sensors\SensorState.cs" />
+    <Compile Include="Microsoft\Devices\Sensors\AccelerometerFailedException.cs" />
   </ItemGroup>
+  <Import Project="$(ProgramFiles)\MSBuild\MonoTouch\Novell.MonoTouch.Common.targets" Condition="'$(windir)' != '' " />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
     <MonoDevelop>
@@ -449,6 +460,8 @@
     <Folder Include="iOS\Media\" />
     <Folder Include="iOS\Net\" />
     <Folder Include="Graphics\Effect\Resources\" />
+    <Folder Include="iOS\Devices\" />
+    <Folder Include="iOS\Devices\Sensors\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.iOS.csproj">

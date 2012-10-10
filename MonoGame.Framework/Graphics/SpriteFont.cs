@@ -305,7 +305,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
 
                 if (hasCurrentGlyph)
-                    offset.X += Spacing + currentGlyph.WidthIncludingBearings;
+                    offset.X += Spacing + currentGlyph.Width + currentGlyph.RightSideBearing;
 
                 hasCurrentGlyph = _glyphs.TryGetValue(c, out currentGlyph);
                 if (!hasCurrentGlyph)
@@ -316,7 +316,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     currentGlyph = defaultGlyph.Value;
                     hasCurrentGlyph = true;
                 }
-
+                offset.X += currentGlyph.LeftSideBearing;
                 var p = offset;
 
 				if (flippedHorz)
@@ -338,7 +338,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 //
                 // This just might be a bug!
 
-				spriteBatch.Draw(
+				spriteBatch.DrawInternal(
                     _texture, destRect, currentGlyph.BoundsInTexture,
 					color, rotation, Vector2.Zero, effect, depth);
 			}

@@ -46,11 +46,8 @@ using MonoMac.OpenGL;
 using OpenTK.Graphics.OpenGL;
 #elif GLES
 using OpenTK.Graphics.ES20;
-#if EMBEDDED
-#else
 using RenderbufferTarget = OpenTK.Graphics.ES20.All;
 using RenderbufferStorage = OpenTK.Graphics.ES20.All;
-#endif
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -59,15 +56,9 @@ namespace Microsoft.Xna.Framework.Graphics
 	{
 #if GLES
 		const RenderbufferTarget GLRenderbuffer = RenderbufferTarget.Renderbuffer;
-#if EMBEDDED       
-        const RenderbufferInternalFormat GLDepthComponent16 = RenderbufferInternalFormat.DepthComponent16;
-        const RenderbufferInternalFormat GLDepthComponent24 = RenderbufferInternalFormat.DepthComponent16;
-        const RenderbufferInternalFormat GLDepth24Stencil8 = RenderbufferInternalFormat.StencilIndex8;
-#else
 		const RenderbufferStorage GLDepthComponent16 = RenderbufferStorage.DepthComponent16;
 		const RenderbufferStorage GLDepthComponent24 = RenderbufferStorage.DepthComponent24Oes;
 		const RenderbufferStorage GLDepth24Stencil8 = RenderbufferStorage.Depth24Stencil8Oes;
-#endif
 #elif OPENGL
 		const RenderbufferTarget GLRenderbuffer = RenderbufferTarget.RenderbufferExt;
 		const RenderbufferStorage GLDepthComponent16 = RenderbufferStorage.DepthComponent16;
@@ -88,8 +79,10 @@ namespace Microsoft.Xna.Framework.Graphics
 		public int MultiSampleCount { get; private set; }
 		
 		public RenderTargetUsage RenderTargetUsage { get; private set; }
-        
-        public bool IsContentLost { get { return false; } }
+		
+		public bool IsContentLost { get { return false; } }
+		
+		public virtual event EventHandler<EventArgs> ContentLost;
 		
 		public RenderTarget2D (GraphicsDevice graphicsDevice, int width, int height, bool mipMap, SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage)
 			:base (graphicsDevice, width, height, mipMap, preferredFormat, true)
@@ -141,13 +134,15 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #elif OPENGL
 
-#if GLES && !EMBEDDED
+#if GLES
 			GL.GenRenderbuffers(1, ref glDepthStencilBuffer);
 #else
 			GL.GenRenderbuffers(1, out glDepthStencilBuffer);
-#endif            
-			GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, this.glDepthStencilBuffer);
-			var glDepthStencilFormat = GLDepthComponent16;
+#endif
+            GraphicsExtensions.CheckGLError();
+            GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, this.glDepthStencilBuffer);
+            GraphicsExtensions.CheckGLError();
+            var glDepthStencilFormat = GLDepthComponent16;
 			switch (preferredDepthFormat)
 			{
 			case DepthFormat.Depth16: glDepthStencilFormat = GLDepthComponent16; break;
@@ -155,6 +150,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			case DepthFormat.Depth24Stencil8: glDepthStencilFormat = GLDepth24Stencil8; break;
 			}
 			GL.RenderbufferStorage(GLRenderbuffer, glDepthStencilFormat, this.width, this.height);
+            GraphicsExtensions.CheckGLError();
 #endif
         }
 		
@@ -181,10 +177,13 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 #elif OPENGL
 			GL.DeleteRenderbuffers(1, ref this.glDepthStencilBuffer);
+            GraphicsExtensions.CheckGLError();
 
-			if(this.glFramebuffer > 0)
-				GL.DeleteFramebuffers(1, ref this.glFramebuffer);
-
+            if (this.glFramebuffer > 0)
+            {
+                GL.DeleteFramebuffers(1, ref this.glFramebuffer);
+                GraphicsExtensions.CheckGLError();
+            }
 #endif
             base.Dispose();
 		}

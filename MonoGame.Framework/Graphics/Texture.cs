@@ -53,6 +53,7 @@ using OpenTK.Graphics.ES20;
 using TextureTarget = OpenTK.Graphics.ES20.TextureTarget;
 #else
 using TextureTarget = OpenTK.Graphics.ES20.All;
+using TextureUnit = OpenTK.Graphics.ES20.All;
 #endif
 #endif
 
@@ -73,6 +74,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #elif OPENGL
 		internal int glTexture = -1;
 		internal TextureTarget glTarget;
+        internal TextureUnit glTextureUnit = TextureUnit.Texture0;
 #endif
 		
 		public SurfaceFormat Format
@@ -147,13 +149,6 @@ namespace Microsoft.Xna.Framework.Graphics
             return pitch;
         }
 
-#if OPENGL
-		internal virtual void Activate()
-        {
-			GL.BindTexture(glTarget, this.glTexture);
-        }
-#endif
-
 #if DIRECTX
 
         internal SharpDX.Direct3D11.ShaderResourceView GetShaderResourceView()
@@ -183,7 +178,8 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
 #elif OPENGL
-			GL.DeleteTextures(1, ref glTexture);
+            GL.DeleteTextures(1, ref glTexture);
+            GraphicsExtensions.CheckGLError();
 #endif
             base.Dispose();
 		}

@@ -40,6 +40,7 @@
 // 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using System.IO;
 using System.Linq;
@@ -61,8 +62,9 @@ namespace Microsoft.Xna.Framework.Graphics
   
         internal ConstantBuffer[] ConstantBuffers { get; private set; }
 
-        // A list of shaders that need to be recompiled on device reset.
-        internal List<DXShader> _shaderList = new List<DXShader>();
+        private List<Shader> _shaderList = new List<Shader>();
+
+	    private readonly bool _isClone;
 
         internal Effect(GraphicsDevice graphicsDevice)
 		{
@@ -70,68 +72,36 @@ namespace Microsoft.Xna.Framework.Graphics
 				throw new ArgumentNullException ("Graphics Device Cannot Be Null");
 
 			this.graphicsDevice = graphicsDevice;
-
             this.graphicsDevice.DeviceResetting += new EventHandler<EventArgs>(graphicsDevice_DeviceResetting);
-            this.graphicsDevice.DeviceReset += new EventHandler<EventArgs>(graphicsDevice_DeviceReset);
 		}
-
-        void graphicsDevice_DeviceResetting(object sender, EventArgs e)
-        {
-#if OPENGL
-            foreach (var shader in _shaderList)
-                shader.NeedsRecompile = true;
-#endif
-        }
-
-        void graphicsDevice_DeviceReset(object sender, EventArgs e)
-        {
-#if OPENGL
-            foreach (var shader in _shaderList)
-            {
-                if (shader.NeedsRecompile)
-                {
-                    shader.CompileShader();
-                    shader.NeedsRecompile = false;
-                }
-            }
-
-            foreach (var technique in Techniques)
-            {
-                foreach (var pass in technique.Passes)
-                {
-                    pass.Initialize();
-                }
-            }
-
-#endif // OPENGL
-        }
 			
 		protected Effect(Effect cloneSource)
             : this(cloneSource.graphicsDevice)
 		{
+            _isClone = true;
             Clone(cloneSource);
 		}
 
-        public Effect(GraphicsDevice graphicsDevice, byte[] effectCode)
+        public Effect (GraphicsDevice graphicsDevice, byte[] effectCode)
             : this(graphicsDevice)
-        {
-            // By default we currently cache all unique byte streams
-            // and use cloning to populate the effect with parameters,
-            // techniques, and passes.
-            //
-            // This means all the immutable types in an effect:
-            //
-            //  - Shaders
-            //  - Annotations
-            //  - Names
-            //  - State Objects
-            //
-            // Are shared for every instance of an effect while the 
-            // parameter values and constant buffers are copied.
-            //
-            // This might need to change slightly if/when we support
-            // shared constant buffers as 'new' should return unique
-            // effects without any shared instance state.
+		{
+			// By default we currently cache all unique byte streams
+			// and use cloning to populate the effect with parameters,
+			// techniques, and passes.
+			//
+			// This means all the immutable types in an effect:
+			//
+			//  - Shaders
+			//  - Annotations
+			//  - Names
+			//  - State Objects
+			//
+			// Are shared for every instance of an effect while the 
+			// parameter values and constant buffers are copied.
+			//
+			// This might need to change slightly if/when we support
+			// shared constant buffers as 'new' should return unique
+			// effects without any shared instance state.
             
 
             // First look for it in the cache.
@@ -141,7 +111,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // the front of the effectCode instead of computing a fast
             // hash here at runtime.
             //
-            var effectKey = ComputeHash(effectCode);
+            var effectKey = MonoGame.Utilities.Hash.ComputeHash(effectCode);
             Effect cloneSource;
             if (!EffectCache.TryGetValue(effectKey, out cloneSource))
             {
@@ -156,6 +126,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
             // Clone it.
+            _isClone = true;
             Clone(cloneSource);
         }
 
@@ -169,6 +140,8 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="cloneSource">The source effect to clone from.</param>
         private void Clone(Effect cloneSource)
         {
+            Debug.Assert(_isClone, "Cannot clone into non-cloned effect!");
+
             // Copy the mutable members of the effect.
             Parameters = new EffectParameterCollection(cloneSource.Parameters);
             Techniques = new EffectTechniqueCollection(this, cloneSource.Techniques);
@@ -217,11 +190,22 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public override void Dispose()
         {
-            base.Dispose();
+            if (!IsDisposed && !_isClone)
+            {
+                // Only the clone source can dispose the shaders.
+                foreach (var shader in _shaderList)
+                    shader.Dispose();
+            }
 
-            // Unregister events
-            graphicsDevice.DeviceResetting -= graphicsDevice_DeviceResetting;
-            graphicsDevice.DeviceReset -= graphicsDevice_DeviceReset;
+            this.graphicsDevice.DeviceResetting -= graphicsDevice_DeviceResetting;
+
+            base.Dispose();
+        }
+
+        void graphicsDevice_DeviceResetting(object sender, EventArgs e)
+        {
+            for (var i = 0; i < ConstantBuffers.Length; i++)
+                ConstantBuffers[i].Clear();
         }
 
         #region Effect File Reader
@@ -234,7 +218,7 @@ namespace Microsoft.Xna.Framework.Graphics
             var assembly = typeof(Effect).Assembly;
 #endif
             var stream = assembly.GetManifestResourceStream(name);
-            using (MemoryStream ms = new MemoryStream())
+            using (var ms = new MemoryStream())
             {
                 stream.CopyTo(ms);
                 return ms.ToArray();
@@ -244,7 +228,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// The MonoGame Effect file format header identifier.
         /// </summary>
-        private const string Header = "MGFX";
+        private const string MGFXHeader = "MGFX";
 
         /// <summary>
         /// The current MonoGame Effect file format versions
@@ -254,43 +238,65 @@ namespace Microsoft.Xna.Framework.Graphics
         /// We should avoid supporting old versions for very long as
         /// users should be rebuilding content when packaging their game.
         /// </remarks>
-        private const int Version = 2;
+        private const int MGFXVersion = 2;
 
 #if !PSS
-        internal void ReadEffect(BinaryReader reader)
-        {
-            // Check the header to make sure the file and version is correct!
-            var header = new string(reader.ReadChars(Header.Length));
-            var version = (int)reader.ReadByte();
-            if (header != Header || version != Version)
-                throw new Exception("Unsupported MGFX format!");
 
-            var profile = reader.ReadByte();
+		private void ReadEffect (BinaryReader reader)
+		{
+			// Check the header to make sure the file and version is correct!
+			var header = new string (reader.ReadChars (MGFXHeader.Length));
+			var version = (int)reader.ReadByte ();
+			if (header != MGFXHeader || version != MGFXVersion)
+				throw new Exception ("Unsupported MGFX format!");
+
+			var profile = reader.ReadByte ();
 #if DIRECTX
             if (profile != 1)
 #else
-            if (profile != 0)
+			if (profile != 0)
 #endif
-                throw new Exception("The MGFX effect is the wrong profile for this platform!");
+				throw new Exception("The MGFX effect is the wrong profile for this platform!");
 
-            // TODO: Maybe we should be reading in a string 
-            // table here to save some bytes in the file.
+			// TODO: Maybe we should be reading in a string 
+			// table here to save some bytes in the file.
 
-            // Read in all the constant buffers.
-            var buffers = (int)reader.ReadByte();
-            ConstantBuffers = new ConstantBuffer[buffers];
-            for (var c = 0; c < buffers; c++)
-            {
-                var buffer = new ConstantBuffer(graphicsDevice, reader);
+			// Read in all the constant buffers.
+			var buffers = (int)reader.ReadByte ();
+			ConstantBuffers = new ConstantBuffer[buffers];
+			for (var c = 0; c < buffers; c++) {
+				
+#if OPENGL
+				string name = reader.ReadString ();               
+#else
+				string name = null;
+#endif
+
+				// Create the backing system memory buffer.
+				var sizeInBytes = (int)reader.ReadInt16 ();
+
+				// Read the parameter index values.
+				int[] parameters = new int[reader.ReadByte ()];
+				int[] offsets = new int[parameters.Length];
+				for (var i = 0; i < parameters.Length; i++) {
+					parameters [i] = (int)reader.ReadByte ();
+					offsets [i] = (int)reader.ReadUInt16 ();
+				}
+
+                var buffer = new ConstantBuffer(graphicsDevice,
+				                                sizeInBytes,
+				                                parameters,
+				                                offsets,
+				                                name);
                 ConstantBuffers[c] = buffer;
             }
 
             // Read in all the shader objects.
-            _shaderList = new List<DXShader>();
+            _shaderList = new List<Shader>();
             var shaders = (int)reader.ReadByte();
             for (var s = 0; s < shaders; s++)
             {
-                var shader = new DXShader(graphicsDevice, reader);
+                var shader = new Shader(graphicsDevice, reader);
                 _shaderList.Add(shader);
             }
 
@@ -310,7 +316,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 var technique = new EffectTechnique(this, name, passes, annotations);
                 Techniques.Add(technique);
-            }
+            }            
 
             CurrentTechnique = Techniques[0];
         }
@@ -328,8 +334,11 @@ namespace Microsoft.Xna.Framework.Graphics
             return collection;
         }
 
-        private static EffectPassCollection ReadPasses(BinaryReader reader, Effect effect, List<DXShader> shaders)
+        private static EffectPassCollection ReadPasses(BinaryReader reader, Effect effect, List<Shader> shaders)
         {
+            Shader vertexShader = null;
+            Shader pixelShader = null;
+
             var collection = new EffectPassCollection();
 
             var count = (int)reader.ReadByte();
@@ -339,18 +348,28 @@ namespace Microsoft.Xna.Framework.Graphics
                 var name = reader.ReadString();
                 var annotations = ReadAnnotations(reader);
 
+                
+                // Assign these to the default shaders at this point? or do that in the effect pass.
                 // Get the vertex shader.
                 var shaderIndex = (int)reader.ReadByte();
-                var vertexShader = shaders[shaderIndex];
+                if (shaderIndex != 255)
+                {
+                    vertexShader = shaders[shaderIndex];
+                }
 
                 // Get the pixel shader.
                 shaderIndex = (int)reader.ReadByte();
-                var pixelShader = shaders[shaderIndex];
+                if (shaderIndex != 255)
+                {
+                    pixelShader = shaders[shaderIndex];
+                }
 
                 // TODO: Add the state objects to the format!
 
                 var pass = new EffectPass(effect, name, vertexShader, pixelShader, null, null, null, annotations);
                 collection.Add(pass);
+
+                // need to fix up the                 
             }
 
             return collection;
@@ -493,28 +512,7 @@ namespace Microsoft.Xna.Framework.Graphics
         #endregion // Effect File Reader
 
 
-        #region Effect Cache
-
-        // Modified FNV Hash in C#
-        // http://stackoverflow.com/a/468084
-        internal static int ComputeHash(params byte[] data)
-        {
-            unchecked
-            {
-                const int p = 16777619;
-                int hash = (int)2166136261;
-
-                for (int i = 0; i < data.Length; i++)
-                    hash = (hash ^ data[i]) * p;
-
-                hash += hash << 13;
-                hash ^= hash >> 7;
-                hash += hash << 3;
-                hash ^= hash >> 17;
-                hash += hash << 5;
-                return hash;
-            }
-        }
+        #region Effect Cache        
 
         /// <summary>
         /// The cache of effects from unique byte streams.

@@ -63,16 +63,22 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
 			GL.GenTextures(1, out this.glTexture);
 #endif
-			GL.BindTexture (TextureTarget.TextureCubeMap, this.glTexture);
-			GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureMinFilter,
+            GraphicsExtensions.CheckGLError();
+            GL.BindTexture(TextureTarget.TextureCubeMap, this.glTexture);
+            GraphicsExtensions.CheckGLError();
+            GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureMinFilter,
 			                mipMap ? (int)TextureMinFilter.LinearMipmapLinear : (int)TextureMinFilter.Linear);
-			GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureMagFilter,
+            GraphicsExtensions.CheckGLError();
+            GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureMagFilter,
 			                (int)TextureMagFilter.Linear);
-			GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureWrapS,
+            GraphicsExtensions.CheckGLError();
+            GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureWrapS,
 			                (int)TextureWrapMode.ClampToEdge);
-			GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureWrapT,
+            GraphicsExtensions.CheckGLError();
+            GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureWrapT,
 			                (int)TextureWrapMode.ClampToEdge);
-			
+            GraphicsExtensions.CheckGLError();
+
 
 			format.GetGLFormat (out glInternalFormat, out glFormat, out glType);
 			
@@ -87,7 +93,8 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
 					GL.TexImage2D (target, 0, glInternalFormat, size, size, 0, glFormat, glType, IntPtr.Zero);
 #endif
-				}
+                    GraphicsExtensions.CheckGLError();
+                }
 			}
 			
 			if (mipMap)
@@ -97,7 +104,8 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
 				GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.GenerateMipmap, (int)All.True);
 #endif
-				
+                GraphicsExtensions.CheckGLError();
+
 				int v = this.size;
 				while (v > 1)
 				{
@@ -117,7 +125,7 @@ namespace Microsoft.Xna.Framework.Graphics
         public void GetData<T>(CubeMapFace cubeMapFace, T[] data) where T : struct
         {
             //FIXME Does not compile on Android or iOS
-/*
+#if MONOMAC
             TextureTarget target = GetGLCubeFace(cubeMapFace);
             GL.BindTexture(target, this.glTexture);
             // 4 bytes per pixel
@@ -126,8 +134,21 @@ namespace Microsoft.Xna.Framework.Graphics
 
             GL.GetTexImage<T>(target, 0, PixelFormat.Bgra,
                 PixelType.UnsignedByte, data);
- */
+#else
+			throw new NotImplementedException();
+#endif
         }
+
+		public void SetData<T> (CubeMapFace face, T[] data) where T : struct
+		{
+			SetData<T> (face, 0, null, data, 0, data.Length);
+		}
+
+		public void SetData<T> (CubeMapFace face, T[] data,
+								int startIndex, int elementCount) where T : struct
+		{
+			SetData<T> (face, 0, null, data, startIndex, elementCount);
+		}
 		
 		public void SetData<T>(CubeMapFace face, int level, Rectangle? rect,
 		                       T[] data, int startIndex, int elementCount) where T : struct
@@ -158,13 +179,15 @@ namespace Microsoft.Xna.Framework.Graphics
 			//TODO
 #else
 			GL.BindTexture (TextureTarget.TextureCubeMap, this.glTexture);
-			
+            GraphicsExtensions.CheckGLError();
+
 			TextureTarget target = GetGLCubeFace(face);
 			if (glFormat == (PixelFormat)All.CompressedTextureFormats) {
 				throw new NotImplementedException();
 			} else {
 				GL.TexSubImage2D(target, level, xOffset, yOffset, width, height, glFormat, glType, dataPtr);
-			}
+                GraphicsExtensions.CheckGLError();
+            }
 #endif			
 			dataHandle.Free ();
 		}

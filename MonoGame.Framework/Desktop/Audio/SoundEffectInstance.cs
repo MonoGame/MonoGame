@@ -53,7 +53,7 @@ using Microsoft.Xna.Framework;
 
 namespace Microsoft.Xna.Framework.Audio
 {
-	public sealed class SoundEffectInstance : IDisposable
+	public class SoundEffectInstance : IDisposable
 	{
 		private bool isDisposed = false;
 		private SoundState soundState = SoundState.Stopped;
@@ -69,26 +69,36 @@ namespace Microsoft.Xna.Framework.Audio
 		bool hasSourceId = false;
 		int sourceId;
 
+        public SoundEffectInstance()
+        {
+            InitializeSound();
+        }
+
 		public SoundEffectInstance (SoundEffect parent)
 		{
 			this.soundEffect = parent;
 			InitializeSound ();
+            BindDataBuffer(soundEffect._data, soundEffect.Format, soundEffect.Size, (int)soundEffect.Rate);
 		}
 
 		private void InitializeSound ()
 		{
 			controller = OpenALSoundController.GetInstance;
-			soundBuffer = new OALSoundBuffer ();
-			soundBuffer.BindDataBuffer (soundEffect._data, soundEffect.Format, soundEffect.Size, (int)soundEffect.Rate);
+			soundBuffer = new OALSoundBuffer ();			
 			soundBuffer.Reserved += HandleSoundBufferReserved;
-			soundBuffer.Recycled += HandleSoundBufferRecycled;
-
+			soundBuffer.Recycled += HandleSoundBufferRecycled;                        
 		}
+
+        protected void BindDataBuffer(byte[] data, ALFormat format, int size, int rate)
+        {
+            soundBuffer.BindDataBuffer(data, format, size, rate);
+        }
 
 		void HandleSoundBufferRecycled (object sender, EventArgs e)
 		{
 			sourceId = 0;
 			hasSourceId = false;
+			soundState = SoundState.Stopped;
 			//Console.WriteLine ("recycled: " + soundEffect.Name);
 		}
 
@@ -100,6 +110,7 @@ namespace Microsoft.Xna.Framework.Audio
 
 		public void Dispose ()
 		{
+			this.Stop(true);
 			soundBuffer.Reserved -= HandleSoundBufferReserved;
 			soundBuffer.Recycled -= HandleSoundBufferRecycled;
 			soundBuffer.Dispose ();
@@ -150,13 +161,9 @@ namespace Microsoft.Xna.Framework.Audio
         {
             // pitch is different in XNA and OpenAL. XNA has a pitch between -1 and 1 for one octave down/up.
             // openAL uses 0.5 to 2 for one octave down/up, while 1 is the default. The default value of 0 would make it completely silent.
-            float alPitch = 1;
-            if (pitch < 0)
-                alPitch = 1 + 0.5f * pitch;
-            else if (pitch > 0)
-                alPitch = 1 + pitch;
-            return alPitch;
+            return (float)Math.Exp(0.69314718 * pitch);
         }
+
 		private void ApplyState ()
 		{
 			if (!hasSourceId)
@@ -174,7 +181,7 @@ namespace Microsoft.Xna.Framework.Audio
 			AL.Source (sourceId, ALSourcef.Pitch, XnaPitchToAlPitch(_pitch));
 		}
 
-		public void Play ()
+		public virtual void Play ()
 		{
 			int bufferId = soundBuffer.OpenALDataBuffer;
 			if (hasSourceId) {
@@ -187,7 +194,7 @@ namespace Microsoft.Xna.Framework.Audio
 			AL.Source (soundBuffer.SourceId, ALSourcei.Buffer, bufferId);
 			ApplyState ();
 
-			controller.PlaySound (soundBuffer);
+			controller.PlaySound (soundBuffer);            
 			//Console.WriteLine ("playing: " + sourceId + " : " + soundEffect.Name);
 			soundState = SoundState.Playing;
 		}
@@ -217,7 +224,7 @@ namespace Microsoft.Xna.Framework.Audio
 			}
 		}
 
-		public bool IsLooped {
+		public virtual bool IsLooped {
 			get {
 				return _looped;
 			}

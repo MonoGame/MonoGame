@@ -238,7 +238,7 @@ namespace Microsoft.Xna.Framework
         {
             GraphicsContext.ShareContexts = false;
 
-            window = new OpenTK.GameWindow(320, 200, GraphicsMode.Default, "", 0, DisplayDevice.Default, 2, 0, GraphicsContextFlags.Embedded);
+            window = new OpenTK.GameWindow(800, 600, new GraphicsMode(), "", 0, DisplayDevice.Default, 2, 0, GraphicsContextFlags.Embedded);
             window.RenderFrame += OnRenderFrame;
             window.UpdateFrame += OnUpdateFrame;
             window.Closing += new EventHandler<CancelEventArgs>(OpenTkGameWindow_Closing);
@@ -266,7 +266,7 @@ namespace Microsoft.Xna.Framework
 
             // mouse
             // TODO review this when opentk 1.1 is released
-#if !WINDOWS
+#if !WINDOWS && !EMBEDDED
             Mouse.UpdateMouseInfo(window.Mouse);
 #else
             Mouse.setWindows(window);
