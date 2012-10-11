@@ -178,16 +178,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal static readonly List<int> _enabledVertexAttributes = new List<int>();
 
-		// OpenGL ES2.0 attribute locations
-		internal static int attributePosition = 0; //there can be a couple positions binded
-		internal static int attributeColor = 3;
-		internal static int attributeNormal = 4;
-		internal static int attributeBlendIndicies = 5;
-		internal static int attributeBlendWeight = 6;
-		internal static int attributeBinormal = 7;
-		internal static int attributeTangent = 8;
-		internal static int attributeTexCoord = 9; //must be the last one, texture index locations are added to it
-
 #elif PSS
 
         internal GraphicsContext _graphics;
@@ -196,7 +186,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 
 #if GLES
-		const FramebufferTarget GLFramebuffer = FramebufferTarget.Framebuffer;
+        const FramebufferTarget GLFramebuffer = FramebufferTarget.Framebuffer;
 		const RenderbufferTarget GLRenderbuffer = RenderbufferTarget.Renderbuffer;
 		const FramebufferAttachment GLDepthAttachment = FramebufferAttachment.DepthAttachment;
 		const FramebufferAttachment GLStencilAttachment = FramebufferAttachment.StencilAttachment;
@@ -230,7 +220,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if OPENGL
         internal int glFramebuffer;
+        internal int MaxVertexAttributes;        
 #endif
+        
+        internal int MaxTextureSlots;
 
 #if DIRECTX
 
@@ -263,11 +256,13 @@ namespace Microsoft.Xna.Framework.Graphics
                 {
                     _enabledVertexAttributes.Add(x);
                     GL.EnableVertexAttribArray(x);
+                    GraphicsExtensions.CheckGLError();
                 }
                 else if (!attrs[x] && _enabledVertexAttributes.Contains(x))
                 {
                     _enabledVertexAttributes.Remove(x);
                     GL.DisableVertexAttribArray(x);
+                    GraphicsExtensions.CheckGLError();
                 }
             }
         }
@@ -305,8 +300,22 @@ namespace Microsoft.Xna.Framework.Graphics
 			                         DisplayMode.Width, DisplayMode.Height);
 			_viewport.MaxDepth = 1.0f;
 
-			Textures = new TextureCollection (16);
-			SamplerStates = new SamplerStateCollection (16);
+            MaxTextureSlots = 16;
+#if GLES
+            GL.GetInteger(All.MaxTextureImageUnits, ref MaxTextureSlots);
+            GraphicsExtensions.CheckGLError();
+
+            GL.GetInteger(All.MaxVertexAttribs, ref MaxVertexAttributes);
+            GraphicsExtensions.CheckGLError();            
+#elif OPENGL
+            GL.GetInteger(GetPName.MaxTextureImageUnits, out MaxTextureSlots);
+            GraphicsExtensions.CheckGLError();
+
+            GL.GetInteger(GetPName.MaxVertexAttribs, out MaxVertexAttributes);
+            GraphicsExtensions.CheckGLError();            
+#endif
+            Textures = new TextureCollection (MaxTextureSlots);
+			SamplerStates = new SamplerStateCollection (MaxTextureSlots);
 
 			PresentationParameters = new PresentationParameters ();
 			PresentationParameters.DepthStencilFormat = DepthFormat.Depth24;
@@ -314,11 +323,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void Initialize()
         {
-            // TODO: This line should not be necessary as Effects are being recompiled
-            // in DeviceReset. There seems to be an issue related to static
-            // initialisation order and removing it breaks drawing in 3d.
-            Effect.FlushCache();
-
             // Setup extensions.
 #if OPENGL
 #if GLES
@@ -326,12 +330,21 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
             var extstring = GL.GetString(StringName.Extensions);	
 #endif
+            GraphicsExtensions.CheckGLError();
             if (!string.IsNullOrEmpty(extstring))
             {
                 _extensions.AddRange(extstring.Split(' '));
+#if ANDROID
+                Android.Util.Log.Debug("MonoGame", "Supported extensions:");
+#else
                 System.Diagnostics.Debug.WriteLine("Supported extensions:");
+#endif
                 foreach (string extension in _extensions)
+#if ANDROID
+                    Android.Util.Log.Debug("MonoGame", extension);
+#else
                     System.Diagnostics.Debug.WriteLine(extension);
+#endif
             }
 
 #endif // OPENGL
@@ -355,12 +368,38 @@ namespace Microsoft.Xna.Framework.Graphics
             DepthStencilState = DepthStencilState.Default;
             RasterizerState = RasterizerState.CullCounterClockwise;
 
+            // Clear the texture and sampler collections forcing
+            // the state to be reapplied.
+            Textures.Clear();
+            SamplerStates.Clear();
+
+            // Clear constant buffers
+            _vertexConstantBuffers.Clear();
+            _pixelConstantBuffers.Clear();
+
+#if OPENGL
+            // Ensure the vertex attributes are reset
+            _enabledVertexAttributes.Clear();
+#endif
+
+            // Force set the buffers and shaders on next ApplyState() call
+            _indexBufferDirty = true;
+            _vertexBufferDirty = true;
+            _vertexShaderDirty = true;
+            _pixelShaderDirty = true;
+
             // Set the default scissor rect.
             _scissorRectangleDirty = true;
             ScissorRectangle = _viewport.Bounds;
 
             // Set the default render target.
             ApplyRenderTargets(null);
+
+#if OPENGL
+            // Free all the cached shader programs. 
+            _programCache.Clear();
+            _shaderProgram = -1;
+#endif
         }
 
 #if DIRECTX
@@ -773,22 +812,25 @@ namespace Microsoft.Xna.Framework.Graphics
 		    BlendState = BlendState.Opaque;
             ApplyState(false);
 
-			ClearBufferMask bufferMask = 0;
+            ClearBufferMask bufferMask = 0;
             if (options.HasFlag(ClearOptions.Target))
             {
                 GL.ClearColor(color.X, color.Y, color.Z, color.W);
+                GraphicsExtensions.CheckGLError();
                 bufferMask = bufferMask | ClearBufferMask.ColorBufferBit;
             }
 			if (options.HasFlag(ClearOptions.Stencil))
             {
 				GL.ClearStencil(stencil);
-				bufferMask = bufferMask | ClearBufferMask.StencilBufferBit;
+                GraphicsExtensions.CheckGLError();
+                bufferMask = bufferMask | ClearBufferMask.StencilBufferBit;
 			}
 
 			if (options.HasFlag(ClearOptions.DepthBuffer)) 
             {
 #if GLES
                 GL.ClearDepth (depth);
+                GraphicsExtensions.CheckGLError();
 #else
                 GL.ClearDepth ((double)depth);
 #endif
@@ -797,6 +839,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if GLES
 			GL.Clear((uint)bufferMask);
+            GraphicsExtensions.CheckGLError();
 #else
 			GL.Clear(bufferMask);
 #endif
@@ -944,6 +987,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			Game.Instance.Platform.Present();
 #elif OPENGL
 			GL.Flush();
+            GraphicsExtensions.CheckGLError();
 #endif
         }
 
@@ -976,12 +1020,6 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (DeviceResetting != null)
                 DeviceResetting(this, EventArgs.Empty);
-
-#if OPENGL
-            // Free all the cached shader programs. 
-            _programCache.Clear();
-            _shaderProgram = -1;
-#endif
         }
 
         /// <summary>
@@ -1035,11 +1073,13 @@ namespace Microsoft.Xna.Framework.Graphics
                     GL.Viewport(value.X, value.Y, value.Width, value.Height);
                 else
                     GL.Viewport(value.X, PresentationParameters.BackBufferHeight - value.Y - value.Height, value.Width, value.Height);
+                GraphicsExtensions.LogGLError("GraphicsDevice.Viewport_set() GL.Viewport");
 #if GLES
                 GL.DepthRange(value.MinDepth, value.MaxDepth);
 #else
                 GL.DepthRange((double)value.MinDepth, (double)value.MaxDepth);
 #endif
+                GraphicsExtensions.LogGLError("GraphicsDevice.Viewport_set() GL.DepthRange");
 #endif
             }
         }
@@ -1127,6 +1167,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     _d3dContext.OutputMerger.SetTargets(_currentDepthStencilView, _currentRenderTargets);                
 #elif OPENGL
 				GL.BindFramebuffer(GLFramebuffer, this.glFramebuffer);
+                GraphicsExtensions.CheckGLError();
 #endif
 
                 clearTarget = true;
@@ -1169,17 +1210,22 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
 					GL.GenFramebuffers(1, out renderTarget.glFramebuffer);
 #endif
-				}
+                    GraphicsExtensions.CheckGLError();
+                }
 
 				GL.BindFramebuffer(GLFramebuffer, renderTarget.glFramebuffer);
-				GL.FramebufferTexture2D(GLFramebuffer, GLColorAttachment0, TextureTarget.Texture2D, renderTarget.glTexture, 0);
-				if (renderTarget.DepthStencilFormat != DepthFormat.None)
+                GraphicsExtensions.CheckGLError();
+                GL.FramebufferTexture2D(GLFramebuffer, GLColorAttachment0, TextureTarget.Texture2D, renderTarget.glTexture, 0);
+                GraphicsExtensions.CheckGLError();
+                if (renderTarget.DepthStencilFormat != DepthFormat.None)
 				{
 					GL.FramebufferRenderbuffer(GLFramebuffer, GLDepthAttachment, GLRenderbuffer, renderTarget.glDepthStencilBuffer);
-					if (renderTarget.DepthStencilFormat == DepthFormat.Depth24Stencil8)
+                    GraphicsExtensions.CheckGLError();
+                    if (renderTarget.DepthStencilFormat == DepthFormat.Depth24Stencil8)
 					{
 						GL.FramebufferRenderbuffer(GLFramebuffer, GLStencilAttachment, GLRenderbuffer, renderTarget.glDepthStencilBuffer);
-					}
+                        GraphicsExtensions.CheckGLError();
+                    }
 				}
 
 				var status = GL.CheckFramebufferStatus(GLFramebuffer);
@@ -1360,11 +1406,11 @@ namespace Microsoft.Xna.Framework.Graphics
             var info = _programCache.GetProgramInfo(VertexShader, PixelShader);
             if (info.program == -1)
                 return;
-
             // Set the new program if it has changed.
             if (_shaderProgram != info.program)
             {
                 GL.UseProgram(info.program);
+                GraphicsExtensions.CheckGLError();
                 _shaderProgram = info.program;
             }
 
@@ -1411,6 +1457,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
             GL.Uniform4(info.posFixupLoc, 1, _posFixup);
+            GraphicsExtensions.CheckGLError();
         }
 #endif
 
@@ -1422,7 +1469,6 @@ namespace Microsoft.Xna.Framework.Graphics
             // NOTE: This code assumes _d3dContext has been locked by the caller.
             Debug.Assert(_d3dContext != null, "The d3d context is null!");
 #endif
-
             if ( _scissorRectangleDirty )
 	        {
 #if DIRECTX
@@ -1436,6 +1482,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 if (!IsRenderTargetBound)
                     scissorRect.Y = _viewport.Height - scissorRect.Y - scissorRect.Height;
                 GL.Scissor(scissorRect.X, scissorRect.Y, scissorRect.Width, scissorRect.Height);
+                GraphicsExtensions.CheckGLError();
 #endif
 	            _scissorRectangleDirty = false;
 	        }
@@ -1462,18 +1509,20 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (_indexBufferDirty)
             {
-#if DIRECTX
-                Debug.Assert(_indexBuffer != null, "The index buffer is null!");
-
-                _d3dContext.InputAssembler.SetIndexBuffer(
-                    _indexBuffer._buffer,
-                    _indexBuffer.IndexElementSize == IndexElementSize.SixteenBits ? 
-                        SharpDX.DXGI.Format.R16_UInt : SharpDX.DXGI.Format.R32_UInt,
-                    0);
-#elif OPENGL
                 if (_indexBuffer != null)
+                {
+#if DIRECTX
+                    _d3dContext.InputAssembler.SetIndexBuffer(
+                        _indexBuffer._buffer,
+                        _indexBuffer.IndexElementSize == IndexElementSize.SixteenBits ? 
+                            SharpDX.DXGI.Format.R16_UInt : SharpDX.DXGI.Format.R32_UInt,
+                        0);
+#elif OPENGL
+
                     GL.BindBuffer(BufferTarget.ElementArrayBuffer, _indexBuffer.ibo);
+                    GraphicsExtensions.CheckGLError();
 #endif
+                }
                 _indexBufferDirty = false;
             }
 
@@ -1486,7 +1535,10 @@ namespace Microsoft.Xna.Framework.Graphics
                     _d3dContext.InputAssembler.SetVertexBuffers(0);
 #elif OPENGL
                 if (_vertexBuffer != null)
+                {
                     GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBuffer.vbo);
+                    GraphicsExtensions.CheckGLError();
+                }
 #endif
             }
 
@@ -1568,16 +1620,16 @@ namespace Microsoft.Xna.Framework.Graphics
 
             var startVertex = buffer.UserOffset;
 
-            var copyCount = vertexCount - vertexOffset;
-            if ((copyCount + buffer.UserOffset) < buffer.VertexCount)
+
+            if ((vertexCount + buffer.UserOffset) < buffer.VertexCount)
             {
-                buffer.UserOffset += copyCount;
-                buffer.SetData(startVertex * vertexDecl.VertexStride, vertexData, vertexOffset, copyCount, SetDataOptions.NoOverwrite);
+                buffer.UserOffset += vertexCount;
+                buffer.SetData(startVertex * vertexDecl.VertexStride, vertexData, vertexOffset, vertexCount, SetDataOptions.NoOverwrite);
             }
             else
             {
-                buffer.UserOffset = copyCount;
-                buffer.SetData(vertexData, vertexOffset, copyCount, SetDataOptions.Discard);
+                buffer.UserOffset = vertexCount;
+                buffer.SetData(vertexData, vertexOffset, vertexCount, SetDataOptions.Discard);
                 startVertex = 0;
             }
 
@@ -1604,17 +1656,16 @@ namespace Microsoft.Xna.Framework.Graphics
 
             var startIndex = buffer.UserOffset;
 
-            var copyCount = indexCount - indexOffset;
-            if ((copyCount + buffer.UserOffset) < buffer.IndexCount)
+            if ((indexCount + buffer.UserOffset) < buffer.IndexCount)
             {
-                buffer.UserOffset += copyCount;
-                buffer.SetData(startIndex * 2, indexData, indexOffset, copyCount, SetDataOptions.NoOverwrite);
+                buffer.UserOffset += indexCount;
+                buffer.SetData(startIndex * 2, indexData, indexOffset, indexCount, SetDataOptions.NoOverwrite);
             }
             else
             {
                 startIndex = 0;
-                buffer.UserOffset = copyCount;
-                buffer.SetData(indexData, indexOffset, copyCount, SetDataOptions.Discard);
+                buffer.UserOffset = indexCount;
+                buffer.SetData(indexData, indexOffset, indexCount, SetDataOptions.Discard);
             }
 
             Indices = buffer;
@@ -1656,12 +1707,13 @@ namespace Microsoft.Xna.Framework.Graphics
 			var target = PrimitiveTypeGL(primitiveType);
 			var vertexOffset = (IntPtr)(_vertexBuffer.VertexDeclaration.VertexStride * baseVertex);
 
-			_vertexBuffer.VertexDeclaration.Apply(vertexOffset);
+			_vertexBuffer.VertexDeclaration.Apply(_vertexShader, vertexOffset);
 
             GL.DrawElements(target,
                                      indexElementCount,
                                      indexElementType,
-                                     indexOffsetInBytes);                        
+                                     indexOffsetInBytes);
+            GraphicsExtensions.CheckGLError();
 #elif PSS
             BindVertexBuffer(true);
             _graphics.DrawArrays(PSSHelper.ToDrawMode(primitiveType), startIndex, GetElementCountArray(primitiveType, primitiveCount));
@@ -1697,7 +1749,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Unbind current VBOs.
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+            GraphicsExtensions.CheckGLError();
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
+            GraphicsExtensions.CheckGLError();
             _vertexBufferDirty = _indexBufferDirty = true;
 
             // Pin the buffers.
@@ -1705,12 +1759,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Setup the vertex declaration to point at the VB data.
             vertexDeclaration.GraphicsDevice = this;
-            vertexDeclaration.Apply(vbHandle.AddrOfPinnedObject());
+            vertexDeclaration.Apply(_vertexShader, vbHandle.AddrOfPinnedObject());
 
             //Draw
             GL.DrawArrays(PrimitiveTypeGL(primitiveType),
                           vertexOffset,
                           vertexCount);
+            GraphicsExtensions.CheckGLError();
 
             // Release the handles.
             vbHandle.Free();
@@ -1737,11 +1792,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
             ApplyState(true);
 
-            _vertexBuffer.VertexDeclaration.Apply(IntPtr.Zero);
+            _vertexBuffer.VertexDeclaration.Apply(_vertexShader, IntPtr.Zero);
 
 			GL.DrawArrays(PrimitiveTypeGL(primitiveType),
 			              vertexStart,
 			              vertexCount);
+            GraphicsExtensions.CheckGLError();
 #elif PSS
             BindVertexBuffer(false);
             _graphics.DrawArrays(PSSHelper.ToDrawMode(primitiveType), vertexStart, vertexCount);
@@ -1778,7 +1834,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Unbind current VBOs.
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+            GraphicsExtensions.CheckGLError();
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
+            GraphicsExtensions.CheckGLError();
             _vertexBufferDirty = _indexBufferDirty = true;
 
             // Pin the buffers.
@@ -1787,13 +1845,14 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Setup the vertex declaration to point at the VB data.
             vertexDeclaration.GraphicsDevice = this;
-            vertexDeclaration.Apply(vbHandle.AddrOfPinnedObject());
+            vertexDeclaration.Apply(_vertexShader, vbHandle.AddrOfPinnedObject());
 
             //Draw
             GL.DrawElements(    PrimitiveTypeGL(primitiveType),
                                 GetElementCountArray(primitiveType, primitiveCount),
                                 DrawElementsType.UnsignedShort,
                                 (IntPtr)(ibHandle.AddrOfPinnedObject().ToInt64() + (indexOffset * sizeof(short))));
+            GraphicsExtensions.CheckGLError();
 
             // Release the handles.
             ibHandle.Free();
@@ -1831,7 +1890,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Unbind current VBOs.
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+            GraphicsExtensions.CheckGLError();
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
+            GraphicsExtensions.CheckGLError();
             _vertexBufferDirty = _indexBufferDirty = true;
 
             // Pin the buffers.
@@ -1840,13 +1901,14 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Setup the vertex declaration to point at the VB data.
             vertexDeclaration.GraphicsDevice = this;
-            vertexDeclaration.Apply(vbHandle.AddrOfPinnedObject());
+            vertexDeclaration.Apply(_vertexShader, vbHandle.AddrOfPinnedObject());
 
             //Draw
             GL.DrawElements(    PrimitiveTypeGL(primitiveType),
                                 GetElementCountArray(primitiveType, primitiveCount),
                                 DrawElementsType.UnsignedInt,
                                 (IntPtr)(ibHandle.AddrOfPinnedObject().ToInt64() + (indexOffset * sizeof(int))));
+            GraphicsExtensions.CheckGLError();
 
             // Release the handles.
             ibHandle.Free();

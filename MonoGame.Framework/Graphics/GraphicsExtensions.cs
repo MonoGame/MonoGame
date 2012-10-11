@@ -22,6 +22,7 @@ using ColorPointerType = OpenTK.Graphics.ES20.All;
 using NormalPointerType = OpenTK.Graphics.ES20.All;
 using TexCoordPointerType = OpenTK.Graphics.ES20.All;
 using GetPName = OpenTK.Graphics.ES20.All;
+using System.Diagnostics;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -603,10 +604,50 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
             GL.GetInteger(GetPName.TextureBinding2D, out prevTexture);
 #endif
+            GraphicsExtensions.LogGLError("GraphicsExtensions.GetBoundTexture2D() GL.GetInteger");
             return prevTexture;
         }
 
+        [System.Diagnostics.Conditional("DEBUG")]
+        public static void CheckGLError()
+        {
+#if GLES
+            All error = GL.GetError();
+            if (error != All.False)
+                throw new MonoGameGLException("GL.GetError() returned " + error.ToString());
+#elif OPENGL
+            ErrorCode error = GL.GetError();
+            if (error != ErrorCode.NoError)
+                throw new MonoGameGLException("GL.GetError() returned " + error.ToString());
 #endif
 
+        }
+#endif
+
+#if OPENGL
+        [System.Diagnostics.Conditional("DEBUG")]
+        public static void LogGLError(string location)
+        {
+            try
+            {
+                GraphicsExtensions.CheckGLError();
+            }
+            catch (MonoGameGLException ex)
+            {
+#if ANDROID
+                // Todo: Add generic MonoGame logging interface
+                Android.Util.Log.Debug("MonoGame", "MonoGameGLException at " + location + " - " + ex.Message);
+#endif
+            }
+        }
+#endif
+    }
+
+    public class MonoGameGLException : Exception
+    {
+        public MonoGameGLException(string message)
+            : base(message)
+        {
+        }
     }
 }

@@ -55,7 +55,7 @@ using OpenTK.Platform.Android;
 using OpenTK;
 using OpenTK.Platform;
 using OpenTK.Graphics;
-//using OpenTK.Graphics.ES20;
+using OpenTK.Graphics.ES20;
 
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
@@ -127,37 +127,27 @@ namespace Microsoft.Xna.Framework
 			//
 		}
 
-        internal void OnRestart()
-        {
-            // If restarting, check if the context was lost. It appears that it always is,
-            // but I suspect that it's possible to avoid this case as some games don't need
-            // to reload their textures after switching back from another app.
-            _contextWasLost = GraphicsContext == null || GraphicsContext.IsDisposed;
-        }
 
 		protected override void CreateFrameBuffer()
 		{
             Android.Util.Log.Debug("MonoGame", "AndroidGameWindow.CreateFrameBuffer");
-#if true			
 			try
             {
                 GLContextVersion = GLContextVersion.Gles2_0;
 				base.CreateFrameBuffer();
-                Android.Util.Log.Debug("MonoGame", "AndroidGameWindow.CreateFrameBuffer");
-		    } 
+                All status = GL.CheckFramebufferStatus(All.Framebuffer);
+                Android.Util.Log.Debug("MonoGame", "Framebuffer Status: " + status.ToString());
+            } 
 			catch (Exception) 
-#endif			
 			{
                 throw new NotSupportedException("Could not create OpenGLES 2.0 frame buffer");
 		    }
             if (_game.GraphicsDevice != null && _contextWasLost)
             {
-                // DeviceResetting events
-                _game.graphicsDeviceManager.OnDeviceResetting(EventArgs.Empty);
-                _game.GraphicsDevice.OnDeviceResetting();
-
                 _game.GraphicsDevice.Initialize();
+                Android.Util.Log.Debug("MonoGame", "Begin reloading graphics content");
                 Microsoft.Xna.Framework.Content.ContentManager.ReloadGraphicsContent();
+                Android.Util.Log.Debug("MonoGame", "End reloading graphics content");
 
                 // DeviceReset events
                 _game.graphicsDeviceManager.OnDeviceReset(EventArgs.Empty);
@@ -166,14 +156,20 @@ namespace Microsoft.Xna.Framework
                 _contextWasLost = false;
             }
 
-            if (!GraphicsContext.IsCurrent)
-                MakeCurrent();
+            MakeCurrent();
 		}
 
         protected override void DestroyFrameBuffer()
         {
+            // DeviceResetting events
+            _game.graphicsDeviceManager.OnDeviceResetting(EventArgs.Empty);
+            _game.GraphicsDevice.OnDeviceResetting();
+
             Android.Util.Log.Debug("MonoGame", "AndroidGameWindow.DestroyFrameBuffer");
+
             base.DestroyFrameBuffer();
+
+            _contextWasLost = GraphicsContext == null || GraphicsContext.IsDisposed;
         }
 
         #region AndroidGameView Methods
@@ -185,7 +181,6 @@ namespace Microsoft.Xna.Framework
             if (GraphicsContext == null || GraphicsContext.IsDisposed)
                 return;
 
-            //Should not happen at all..
             if (!GraphicsContext.IsCurrent)
                 MakeCurrent();
 
@@ -195,6 +190,12 @@ namespace Microsoft.Xna.Framework
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
             base.OnUpdateFrame(e);
+
+            if (_contextWasLost)
+                return;
+
+            if (!GraphicsContext.IsCurrent)
+                MakeCurrent();
 
             Threading.Run();
 

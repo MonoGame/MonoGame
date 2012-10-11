@@ -44,8 +44,17 @@ namespace Microsoft.Xna.Framework.Graphics
         public void Clear()
         {
             foreach (var pair in _programCache)
-                GL.DeleteProgram(pair.Value.program);
-
+            {
+                if (GL.IsProgram(pair.Value.program))
+                {
+#if MONOMAC
+                    GL.DeleteProgram(pair.Value.program, null);
+#else
+                    GL.DeleteProgram(pair.Value.program);
+#endif
+                    GraphicsExtensions.CheckGLError();
+                }
+            }
             _programCache.Clear();
         }
 
@@ -72,15 +81,24 @@ namespace Microsoft.Xna.Framework.Graphics
             // NOTE: No need to worry about background threads here
             // as this is only called at draw time when we're in the
             // main drawing thread.
-
             var program = GL.CreateProgram();
+            GraphicsExtensions.CheckGLError();
 
             GL.AttachShader(program, vertexShader.GetShaderHandle());
-            GL.AttachShader(program, pixelShader.GetShaderHandle());
+            GraphicsExtensions.LogGLError("VertexShaderCache.Link(), GL.AttachShader");
 
-            vertexShader.BindVertexAttributes(program);
+            GL.AttachShader(program, pixelShader.GetShaderHandle());
+            GraphicsExtensions.LogGLError("VertexShaderCache.Link(), GL.AttachShader");
+
+            //vertexShader.BindVertexAttributes(program);
 
             GL.LinkProgram(program);
+            GraphicsExtensions.LogGLError("VertexShaderCache.Link(), GL.LinkProgram");
+
+            GL.UseProgram(program);
+            GraphicsExtensions.LogGLError("VertexShaderCache.Link(), GL.UseProgram");
+
+            vertexShader.GetVertexAttributeLocations(program);
 
             pixelShader.ApplySamplerTextureUnits(program);
 
@@ -91,6 +109,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
             GL.GetProgram(program, ProgramParameter.LinkStatus, out linked);
 #endif
+            GraphicsExtensions.LogGLError("VertexShaderCache.Link(), GL.GetProgram");
             if (linked == 0)
             {
 #if !GLES
