@@ -107,11 +107,6 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
         private static TouchPanelCapabilities Capabilities = new TouchPanelCapabilities();
 
-        // TODO: Remove me...  used to be needed when we used 
-        // platform specific gesture recognizers.  We won't again.
-        internal static event EventHandler EnabledGesturesChanged;
-
-
         public static TouchPanelCapabilities GetCapabilities()
         {
             Capabilities.Initialize();
@@ -336,23 +331,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
             }
         }
 		
-		private static GestureType _enabledGestures = GestureType.None;
-        public static GestureType EnabledGestures
-        {
-            get
-			{ 
-				return _enabledGestures;
-			}
-            set
-			{
-				if (_enabledGestures != value)
-                {
-                    _enabledGestures = value;
-                    if (EnabledGesturesChanged != null)
-					    EnabledGesturesChanged(null, EventArgs.Empty);
-                }
-			}
-        }
+        public static GestureType EnabledGestures { get; set; }
 
         public static bool IsGestureAvailable
         {
@@ -390,7 +369,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
 		private static bool GestureIsEnabled(GestureType gestureType)
 		{
-            return (_enabledGestures & gestureType) != 0;
+            return (EnabledGestures & gestureType) != 0;
 		}
 
         /// <summary>

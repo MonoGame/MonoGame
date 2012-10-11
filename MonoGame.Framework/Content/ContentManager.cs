@@ -66,14 +66,25 @@ namespace Microsoft.Xna.Framework.Content
         private bool disposed;
 		
 		private static object ContentManagerLock = new object();
-        private static List<ContentManager> ContentManagers = new List<ContentManager>();
+        private static List<WeakReference> ContentManagers = new List<WeakReference>();
 
         private static void AddContentManager(ContentManager contentManager)
         {
             lock (ContentManagerLock)
             {
-                if (!ContentManagers.Contains(contentManager))
-                    ContentManagers.Add(contentManager);
+                // Check if the list contains this content manager already. Also take
+                // the opportunity to prune the list of any finalized content managers.
+                bool contains = false;
+                for (int i = ContentManagers.Count - 1; i >= 0; --i)
+                {
+                    var contentRef = ContentManagers[i];
+                    if (Object.ReferenceEquals(contentRef.Target, contentManager))
+                        contains = true;
+                    if (!contentRef.IsAlive)
+                        ContentManagers.RemoveAt(i);
+                }
+                if (!contains)
+                    ContentManagers.Add(new WeakReference(contentManager));
             }
         }
 
@@ -81,8 +92,14 @@ namespace Microsoft.Xna.Framework.Content
         {
             lock (ContentManagerLock)
             {
-                if(ContentManagers.Contains(contentManager))
-                    ContentManagers.Remove(contentManager);
+                // Check if the list contains this content manager and remove it. Also
+                // take the opportunity to prune the list of any finalized content managers.
+                for (int i = ContentManagers.Count - 1; i >= 0; --i)
+                {
+                    var contentRef = ContentManagers[i];
+                    if (!contentRef.IsAlive || Object.ReferenceEquals(contentRef.Target, contentManager))
+                        ContentManagers.RemoveAt(i);
+                }
             }
         }
 
@@ -90,9 +107,21 @@ namespace Microsoft.Xna.Framework.Content
         {
             lock (ContentManagerLock)
             {
-                foreach (var contentManager in ContentManagers)
+                // Reload the graphic assets of each content manager. Also take the
+                // opportunity to prune the list of any finalized content managers.
+                for (int i = ContentManagers.Count - 1; i >= 0; --i)
                 {
-                    contentManager.ReloadGraphicsAssets();
+                    var contentRef = ContentManagers[i];
+                    if (contentRef.IsAlive)
+                    {
+                        var contentManager = (ContentManager)contentRef.Target;
+                        if (contentManager != null)
+                            contentManager.ReloadGraphicsAssets();
+                    }
+                    else
+                    {
+                        ContentManagers.RemoveAt(i);
+                    }
                 }
             }
         }
