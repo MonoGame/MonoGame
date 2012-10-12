@@ -257,6 +257,11 @@ namespace Microsoft.Xna.Framework.Graphics
 		{			
 		}
 
+        ~Texture2D()
+        {
+            Dispose();
+        }
+
         public int Width
         {
             get
