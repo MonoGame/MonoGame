@@ -74,6 +74,11 @@ namespace Microsoft.Xna.Framework.Audio
             InitializeSound();
         }
 
+        ~SoundEffectInstance()
+        {
+            Dispose();
+        }
+
 		public SoundEffectInstance (SoundEffect parent)
 		{
 			this.soundEffect = parent;
@@ -109,13 +114,16 @@ namespace Microsoft.Xna.Framework.Audio
 		}
 
 		public void Dispose ()
-		{
-			this.Stop(true);
-			soundBuffer.Reserved -= HandleSoundBufferReserved;
-			soundBuffer.Recycled -= HandleSoundBufferRecycled;
-			soundBuffer.Dispose ();
-			soundBuffer = null;
-			isDisposed = true;
+        {
+            if (!isDisposed)
+            {
+                this.Stop(true);
+                soundBuffer.Reserved -= HandleSoundBufferReserved;
+                soundBuffer.Recycled -= HandleSoundBufferRecycled;
+                soundBuffer.Dispose();
+                soundBuffer = null;
+                isDisposed = true;
+            }
 		}
 		
 		public void Apply3D (AudioListener listener, AudioEmitter emitter)
