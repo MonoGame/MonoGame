@@ -44,7 +44,7 @@ namespace ${Namespace}
 			
 			Content.RootDirectory = "Content";
 
-			graphics.IsFullScreen = false;
+			graphics.IsFullScreen = true;
 		}
 
 		/// <summary>
