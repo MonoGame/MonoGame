@@ -452,13 +452,16 @@ namespace Microsoft.Xna.Framework
             if (_accumulatedElapsedTime > _maxElapsedTime)
                 _accumulatedElapsedTime = _maxElapsedTime;
 
-            // TODO: We should be calculating IsRunningSlowly
-            // somewhere around here!
+            // http://msdn.microsoft.com/en-us/library/microsoft.xna.framework.gametime.isrunningslowly.aspx
+            // Calculate IsRunningSlowly for the fixed time step, but only when the accumulated time
+            // exceeds the target time.
 
             if (IsFixedTimeStep)
             {
                 _gameTime.ElapsedGameTime = TargetElapsedTime;
                 var stepCount = 0;
+
+                _gameTime.IsRunningSlowly = (_accumulatedElapsedTime > TargetElapsedTime);
 
                 // Perform as many full fixed length time steps as we can.
                 while (_accumulatedElapsedTime >= TargetElapsedTime)

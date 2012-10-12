@@ -50,6 +50,8 @@ using Microsoft.Xna.Framework.Storage;
 using Windows.ApplicationModel.Store;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;    
+using Windows.UI.Core;
+using Windows.UI.Popups;
 #else
 using System.Runtime.Remoting.Messaging;
 using Microsoft.Xna.Framework.Net;
@@ -68,10 +70,13 @@ namespace Microsoft.Xna.Framework.GamerServices
 		private static bool isVisible;
 		private static bool simulateTrialMode;		
 
+#if WINRT
+	    private static readonly CoreDispatcher _dispatcher;
+#endif 
         static Guide()
         {
 #if WINRT
-
+            _dispatcher = Windows.UI.Core.CoreWindow.GetForCurrentThread().Dispatcher;
 #if DEBUG
             var licenseInformation = CurrentAppSimulator.LicenseInformation;
 #else
@@ -101,25 +106,14 @@ namespace Microsoft.Xna.Framework.GamerServices
          string defaultText,
 		 bool usePasswordMode)
 		{
-			string result = defaultText; 
-
-            //TextFieldAlertView myAlertView = new TextFieldAlertView(usePasswordMode, title, defaultText);
-
-
-            //myAlertView.Title = title;
-            //myAlertView.Message = description;
-
-            //myAlertView.Clicked += delegate(object sender, UIButtonEventArgs e)
-            //        {
-            //            if (e.ButtonIndex == 1)
-            //            {
-            //                    result = ((UIAlertView) sender).Subviews.OfType<UITextField>().Single().Text;
-            //            }
-            //        };
-            //myAlertView.Transform = MonoTouch.CoreGraphics.CGAffineTransform.MakeTranslation (0f, 110f);
-            //myAlertView.Show();
-
-			return result;
+#if WINRT
+            // At this time there is no way to popup the 
+            // software keyboard on a WinRT device unless 
+            // you use a XAML control.
+            throw new NotSupportedException();
+#else
+            throw new NotImplementedException();
+#endif
 		}
 
 		public static IAsyncResult BeginShowKeyboardInput (
@@ -175,11 +169,44 @@ namespace Microsoft.Xna.Framework.GamerServices
          int focusButton,
          MessageBoxIcon icon)
 		{
-			Nullable<int> result = null;
+            int? result = null;
 
-			
+#if WINRT
+            var dialog = new MessageDialog(text, title);
+		    var index = 0;
+            foreach (var b in buttons)
+            {
+                var cmd = new UICommand(b, null, index);
+                dialog.Commands.Add(cmd);
+                ++index;
+            }
+            
+            dialog.DefaultCommandIndex = (uint)focusButton;
 
-			return result;
+            // The message box must be popped up on the UI thread.
+		    Task<IUICommand> dialogResult = null;
+            _dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                // We'll get an exception if we try to open a dialog while 
+                // one is already up.  Catch the exception and ignore it.
+                try
+                {
+                    dialogResult = dialog.ShowAsync().AsTask();
+                }
+                catch (Exception)
+                {
+                }
+
+            }).AsTask().Wait();
+
+            if (dialogResult != null)
+            {
+                dialogResult.Wait();
+                result = (int)dialogResult.Result.Id;
+            }
+
+#endif
+		    return result;
 		}
 
 		public static IAsyncResult BeginShowMessageBox(

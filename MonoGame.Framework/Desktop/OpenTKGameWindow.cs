@@ -274,7 +274,11 @@ namespace Microsoft.Xna.Framework
             Threading.WindowInfo = window.WindowInfo;
 
             keys = new List<Keys>();
-
+   
+#if LINUX
+            Threading.BackgroundContext.MakeCurrent(Threading.WindowInfo);      
+#endif     
+            
             // mouse
             // TODO review this when opentk 1.1 is released
 #if WINDOWS || LINUX
