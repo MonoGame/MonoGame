@@ -394,6 +394,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
             //  - Drag occurs when one finger is down and actively moving.
             //  - Pinch occurs if 2 or more fingers are down and at least one is moving.
             //  - If you enter a Pinch during a drag a DragComplete is fired.
+            //  - Drags are classified as horizontal, vertical, free, or none and stay that way.
             //
 
             // First get a count of touch locations which 
@@ -447,7 +448,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
                         // If we're not dragging try to process a hold event.
 		                var dist = Vector2.Distance(touch.Position, touch.PressPosition);
-                        if (!_dragGestureStarted && dist < TapJitterTolerance)
+                        if (_dragGestureStarted == GestureType.None && dist < TapJitterTolerance)
                         {
                             ProcessHold(touch);
                             break;
@@ -504,12 +505,12 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
                             // If we got a flick then stop the drag operation
                             // so that no DragComplete occurs.
-                            _dragGestureStarted = false;
+                            _dragGestureStarted = GestureType.None;
                             break;
                         }
 
                         // If a drag is active then we need to finalize it.
-                        if (_dragGestureStarted)
+                        if (_dragGestureStarted != GestureType.None)
                         {
                             if (GestureIsEnabled(GestureType.DragComplete))
                                 GestureList.Enqueue(new GestureSample(
@@ -517,7 +518,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
                                                         Vector2.Zero, Vector2.Zero,
                                                         Vector2.Zero, Vector2.Zero));
 
-                            _dragGestureStarted = false;
+                            _dragGestureStarted = GestureType.None;
                             break;
                         }
 
@@ -552,7 +553,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
             {
                 _tapDisabled = false;
                 _holdDisabled = false;
-                _dragGestureStarted = false;
+                _dragGestureStarted = GestureType.None;
             }
 		}
 
@@ -633,15 +634,15 @@ namespace Microsoft.Xna.Framework.Input.Touch
             GestureList.Enqueue(tap);
 		}
 
-        private static bool _dragGestureStarted;
+        private static GestureType _dragGestureStarted = GestureType.None;
 
 		private static void ProcessDrag(TouchLocation touch)
 		{
 		    var dragH = GestureIsEnabled(GestureType.HorizontalDrag);
 		    var dragV = GestureIsEnabled(GestureType.VerticalDrag);
-		    var drag  = GestureIsEnabled(GestureType.FreeDrag);
+		    var dragF  = GestureIsEnabled(GestureType.FreeDrag);
 
-            if (!dragH && !dragV && !drag)
+            if (!dragH && !dragV && !dragF)
 				return;
 
             // Make sure this is a move event and that we have
@@ -652,36 +653,51 @@ namespace Microsoft.Xna.Framework.Input.Touch
                 return;
 		
             var delta = touch.Position - prevTouch.Position;
-					
-			// Free drag takes priority over a directional one.
-			var gestureType = GestureType.FreeDrag;
-            if (!drag)
-			{
-				// Horizontal drag takes precedence over a vertical one.
-                if (dragH)
-				{
-					// Direction delta come back with it's 'other' component set to 0.
-					if (Math.Abs(delta.X) >= Math.Abs(delta.Y))
-					{
-						delta.Y = 0;
-						gestureType = GestureType.HorizontalDrag;
-					}
-                    else if (dragV)
-					{
-						delta.X = 0;
-						gestureType = GestureType.VerticalDrag;
-					}
-					else
-						return;
-				}
-			}
 
-            _dragGestureStarted = true;
+            // If we're free dragging then stick to it.
+            if (_dragGestureStarted != GestureType.FreeDrag)
+            {
+		        var isHorizontalDelta = Math.Abs(delta.X) > Math.Abs(delta.Y * 2.0f);
+                var isVerticalDelta = Math.Abs(delta.Y) > Math.Abs(delta.X * 2.0f);
+                var classify = _dragGestureStarted == GestureType.None;
+
+                // Once we enter either vertical or horizontal drags
+                // we stick to it... regardless of the delta.
+                if (dragH && ((classify && isHorizontalDelta) || _dragGestureStarted == GestureType.HorizontalDrag))
+                {
+                    delta.Y = 0;
+                    _dragGestureStarted = GestureType.HorizontalDrag;
+                }
+                else if (dragV && ((classify && isVerticalDelta) || _dragGestureStarted == GestureType.VerticalDrag))
+                {
+                    delta.X = 0;
+                    _dragGestureStarted = GestureType.VerticalDrag;
+                }
+
+                // If the delta isn't either horizontal or vertical
+                //then it could be a free drag if not classified.
+                else if (dragF && classify)
+                {
+                    _dragGestureStarted = GestureType.FreeDrag;
+                }
+                else
+                {
+                    // If we couldn't classify the drag then
+                    // it is nothing... set it to complete.
+                    _dragGestureStarted = GestureType.DragComplete;
+                }
+            }
+
+            // If the drag could not be classified then no gesture.
+            if (    _dragGestureStarted == GestureType.None || 
+                    _dragGestureStarted == GestureType.DragComplete)
+                return;
+
             _tapDisabled = true;
             _holdDisabled = true;
 
 			GestureList.Enqueue(new GestureSample(
-                                    gestureType, touch.Timestamp,
+                                    _dragGestureStarted, touch.Timestamp,
 								    touch.Position, Vector2.Zero,
 								    delta, Vector2.Zero));
 		}
@@ -705,7 +721,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
             // If we were already in a drag state then fire
             // off the drag completion event.
-            if (_dragGestureStarted)
+            if (_dragGestureStarted != GestureType.None)
             {
                 if (GestureIsEnabled(GestureType.DragComplete))
                     GestureList.Enqueue(new GestureSample(
@@ -713,7 +729,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
                                             Vector2.Zero, Vector2.Zero,
                                             Vector2.Zero, Vector2.Zero));
 
-                _dragGestureStarted = false;
+                _dragGestureStarted = GestureType.None;
             }
 
 			GestureList.Enqueue (new GestureSample (
