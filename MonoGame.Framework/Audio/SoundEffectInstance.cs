@@ -1,4 +1,4 @@
-#region License
+﻿#region License
 // /*
 // Microsoft Public License (Ms-PL)
 // MonoGame - Copyright © 2009 The MonoGame Team
@@ -487,6 +487,8 @@ namespace Microsoft.Xna.Framework.Audio
                 {
                     soundState = SoundState.Stopped;
                 }
+
+                return soundState;
 #endif
 			} 
 		}
