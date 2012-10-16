@@ -95,7 +95,6 @@ namespace Microsoft.Xna.Framework.GamerServices
                         
     			        if (lp != null)
     					{
-    						Guide.IsVisible = true;
     						lp.Authenticate( delegate(NSError error) 
     						                	{  							              
     												try 
@@ -111,10 +110,6 @@ namespace Microsoft.Xna.Framework.GamerServices
     														
     													}
     												} 
-    												finally 
-    												{
-    													Guide.IsVisible = false;
-    												}
     											}
     						                );
     					}
