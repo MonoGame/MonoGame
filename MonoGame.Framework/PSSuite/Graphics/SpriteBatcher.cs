@@ -59,7 +59,7 @@ namespace Microsoft.Xna.Framework.Graphics
         GraphicsDevice _device;
   
         ushort[] _index;
-        VertexPosition2ColorTexture[] _vertexArray;
+        VertexPositionColorTexture[] _vertexArray;
   
         static readonly VertexFormat[] _vertexFormat = new VertexFormat[] { VertexFormat.Float2, VertexFormat.UByte4N, VertexFormat.Float2 };
         
@@ -81,7 +81,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 _index[i * 6 + 5] = (ushort)(i * 4 + 2);
             }
 
-            _vertexArray = new VertexPosition2ColorTexture[4 * InitialVertexArraySize];
+            _vertexArray = new VertexPositionColorTexture[4 * InitialVertexArraySize];
 		}
 		
 		public SpriteBatchItem CreateBatchItem()
@@ -203,7 +203,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 _index[i * 6 + 5] = (ushort)(i * 4 + 2);
             }
 
-            _vertexArray = new VertexPosition2ColorTexture[4 * newCount];
+            _vertexArray = new VertexPositionColorTexture[4 * newCount];
 		}
         
 		void DrawVertexArray ( int start, int end )
