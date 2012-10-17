@@ -56,8 +56,10 @@ Section "MonoGame Core Components" ;No components page, name is not important
   File /r '..\..\MonoGame.ContentPipeline\ContentProcessors\bin\Release\*.dll'
   File '..\..\MonoGame.ContentPipeline\*.targets'
   File '..\..\ThirdParty\Libs\NAudio\*.dll'
+  File '..\..\ThirdParty\Libs\SharpDX\Windows\*.*'
   File /nonfatal '..\..\ThirdParty\Libs\NAudio\*.xml'
   File /nonfatal '..\..\ThirdParty\Libs\NAudio\*.txt'
+  File '..\..\Tools\2MGFX\bin\Release\*.exe'
   
   File '..\..\ThirdParty\Libs\PVRTexLib\Windows_x86_32\Dll\PVRTexLib.dll'
   File /oname=libmojoshader.dll  '..\..\ThirdParty\Libs\libmojoshader_32.dll'
