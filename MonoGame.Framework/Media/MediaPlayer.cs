@@ -76,6 +76,8 @@ namespace Microsoft.Xna.Framework.Media
 #if WINRT
         private static MediaEngine _mediaEngineEx;
 
+        public static TimeSpan PlayPosition { get { return _queue.ActiveSong.Position; } }
+
         static MediaPlayer()
         {            
             MediaManager.Startup(true);

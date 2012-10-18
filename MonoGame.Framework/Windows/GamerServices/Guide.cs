@@ -77,12 +77,8 @@ namespace Microsoft.Xna.Framework.GamerServices
         {
 #if WINRT
             _dispatcher = Windows.UI.Core.CoreWindow.GetForCurrentThread().Dispatcher;
-#if DEBUG
-            var licenseInformation = CurrentAppSimulator.LicenseInformation;
-#else
+            
             var licenseInformation = CurrentApp.LicenseInformation;
-#endif
-
             licenseInformation.LicenseChanged += () => 
                 isTrialMode = !licenseInformation.IsActive || licenseInformation.IsTrial;
 
@@ -387,13 +383,12 @@ namespace Microsoft.Xna.Framework.GamerServices
 			{
 				// If simulate trial mode is enabled then 
 				// we're in the trial mode.
-				return simulateTrialMode || isTrialMode;
-			}
-
-			set
-			{
-				isTrialMode = value;
-			}
+#if DEBUG
+                return simulateTrialMode;
+#else
+                return simulateTrialMode || isTrialMode; // isTrialMode would be better
+#endif
+            }
 		}
 
 		public static bool IsVisible 
