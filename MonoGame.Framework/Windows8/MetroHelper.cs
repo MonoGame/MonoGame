@@ -16,16 +16,13 @@ namespace Microsoft.Xna.Framework
 
                 try
                 {
-                    var localFolder = ApplicationData.Current.LocalFolder;
-                    var storageFile = await localFolder.GetFileAsync(fileName);
+                    var file = await Windows.ApplicationModel.Package.Current.InstalledLocation.GetFileAsync(fileName);
+                    return file == null ? false : true;
                 }
                 catch (FileNotFoundException)
                 {
                     return false;
                 }
-
-                return true;
-
             }).Result;
 
             return result;

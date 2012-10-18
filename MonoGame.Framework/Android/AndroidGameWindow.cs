@@ -134,13 +134,22 @@ namespace Microsoft.Xna.Framework
 			try
             {
                 GLContextVersion = GLContextVersion.Gles2_0;
-				base.CreateFrameBuffer();
+				try
+				{
+					base.CreateFrameBuffer();
+				}
+				catch(Exception)
+				{
+					// try again using a more basic mode which hopefully the device will support
+					GraphicsMode = new AndroidGraphicsMode(0, 0, 0, 0, 0, false);
+					base.CreateFrameBuffer();
+				}
                 All status = GL.CheckFramebufferStatus(All.Framebuffer);
                 Android.Util.Log.Debug("MonoGame", "Framebuffer Status: " + status.ToString());
             } 
 			catch (Exception) 
 			{
-                throw new NotSupportedException("Could not create OpenGLES 2.0 frame buffer");
+				throw new NotSupportedException("Could not create OpenGLES 2.0 frame buffer");
 		    }
             if (_game.GraphicsDevice != null && _contextWasLost)
             {
