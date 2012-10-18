@@ -82,11 +82,9 @@ namespace Microsoft.Xna.Framework.Media
 
             using (var factory = new MediaEngineClassFactory())
             {
-                var mediaEngine = new MediaEngine(factory, null, MediaEngineCreateflags.Audioonly);
+                var mediaEngine = new MediaEngine(factory, null, MediaEngineCreateflags.Audioonly, MediaEngineExOnPlaybackEvent);
                 _mediaEngineEx = mediaEngine.QueryInterface<MediaEngineEx>();
             }
-            
-            _mediaEngineEx.PlaybackEvent += MediaEngineExOnPlaybackEvent;            
         }
 
         private static void MediaEngineExOnPlaybackEvent(MediaEngineEvent mediaEvent, long param1, int param2)
