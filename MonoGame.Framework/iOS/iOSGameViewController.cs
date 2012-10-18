@@ -126,7 +126,7 @@ namespace Microsoft.Xna.Framework {
         
         public override bool ShouldAutorotate ()
         {
-            return true;
+            return _platform.Game.Initialized;
         }
         
         public override UIInterfaceOrientation PreferredInterfaceOrientationForPresentation ()
