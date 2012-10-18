@@ -178,7 +178,7 @@ namespace Microsoft.Xna.Framework.Content
 		// If disposing is false, it was called by the finalizer.
 		protected virtual void Dispose(bool disposing)
 		{
-			if (disposing && !disposed)
+			if (!disposed)
 			{
 				Unload();
 				disposed = true;
