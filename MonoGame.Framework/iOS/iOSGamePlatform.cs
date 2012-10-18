@@ -325,6 +325,7 @@ namespace Microsoft.Xna.Framework
 				presentParams.DisplayOrientation = orientation;
 
 				// Recalculate our views.
+                gdm.ApplyChanges();
 				ViewController.View.LayoutSubviews();
 			}
 			TouchPanel.DisplayOrientation = orientation;
