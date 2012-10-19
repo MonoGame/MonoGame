@@ -61,7 +61,7 @@ namespace Microsoft.Xna.Framework.Graphics
         ushort[] _index;
         VertexPositionColorTexture[] _vertexArray;
   
-        static readonly VertexFormat[] _vertexFormat = new VertexFormat[] { VertexFormat.Float2, VertexFormat.UByte4N, VertexFormat.Float2 };
+        static readonly VertexFormat[] _vertexFormat = new VertexFormat[] { VertexFormat.Float3, VertexFormat.UByte4N, VertexFormat.Float2 };
         
 		public SpriteBatcher (GraphicsDevice device)
 		{
