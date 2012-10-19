@@ -84,8 +84,9 @@ namespace Microsoft.Xna.Framework.Input
 							//pc
 						}
 						
-						if (Sdl.SDL_JoystickName(x).Contains("Microsoft") ||
-							(Sdl.SDL_JoystickName(x).Contains("X-Box") || Sdl.SDL_JoystickName(x).Contains("Xbox")))
+						if (Sdl.SDL_JoystickName(x).Contains("Microsoft")
+                            || Sdl.SDL_JoystickName(x).Contains("潃瑮潲汬牥⠠托硯㌠〶圠物汥獥⁳敒散癩牥映牯圠湩潤獷)") 
+                            || (Sdl.SDL_JoystickName(x).Contains("X-Box") || Sdl.SDL_JoystickName(x).Contains("Xbox")))
 						{
 							pc.Button_A.ID = 0;
 							pc.Button_A.Type = InputType.Button;
@@ -111,34 +112,36 @@ namespace Microsoft.Xna.Framework.Input
 							pc.Button_RB.ID = 5;
 							pc.Button_RB.Type = InputType.Button;
 
-							pc.LeftStick.X.Negative.Type = InputType.Axis;
-							pc.LeftStick.X.Negative.Negative = true;
-							pc.LeftStick.X.Positive.Type = InputType.Axis;
-							pc.LeftStick.X.Positive.Negative = false;
+                            pc.LeftStick.X.Negative.Type = InputType.Axis;
+                            pc.LeftStick.X.Negative.Negative = true;
 
-							pc.LeftStick.Y.Negative.ID = 1;
-							pc.LeftStick.Y.Negative.Type = InputType.Axis;
-							pc.LeftStick.Y.Negative.Negative = true;
+                            pc.LeftStick.X.Positive.Type = InputType.Axis;
+                            pc.LeftStick.X.Positive.Negative = false;
 
-							pc.LeftStick.Y.Positive.ID = 1;
-							pc.LeftStick.Y.Positive.Type = InputType.Axis;
-							pc.LeftStick.Y.Positive.Negative = false;
+                            pc.LeftStick.Y.Negative.ID = 1;
+                            pc.LeftStick.Y.Negative.Type = InputType.Axis;
+                            pc.LeftStick.Y.Negative.Negative = true;
 
-							pc.RightStick.X.Negative.ID = 3;
-							pc.RightStick.X.Negative.Type = InputType.Axis;
-							pc.RightStick.X.Negative.Negative = true;
+                            pc.LeftStick.Y.Positive.ID = 1;
+                            pc.LeftStick.Y.Positive.Type = InputType.Axis;
+                            pc.LeftStick.Y.Positive.Negative = false;
 
-							pc.RightStick.X.Positive.ID = 3;
-							pc.RightStick.X.Positive.Type = InputType.Axis;
-							pc.RightStick.X.Positive.Negative = false;
 
-							pc.RightStick.Y.Negative.ID = 4;
-							pc.RightStick.Y.Negative.Type = InputType.Axis;
-							pc.RightStick.Y.Negative.Negative = true;
+                            pc.RightStick.Y.Negative.ID = 3;
+                            pc.RightStick.Y.Negative.Type = InputType.Axis;
+                            pc.RightStick.Y.Negative.Negative = true;
 
-							pc.RightStick.Y.Positive.ID = 4;
-							pc.RightStick.Y.Positive.Type = InputType.Axis;
-							pc.RightStick.Y.Positive.Negative = false;
+                            pc.RightStick.Y.Positive.ID = 3;
+                            pc.RightStick.Y.Positive.Type = InputType.Axis;
+                            pc.RightStick.Y.Positive.Negative = false;
+
+                            pc.RightStick.X.Negative.ID = 4;
+                            pc.RightStick.X.Negative.Type = InputType.Axis;
+                            pc.RightStick.X.Negative.Negative = true;
+
+                            pc.RightStick.X.Positive.ID = 4;
+                            pc.RightStick.X.Positive.Type = InputType.Axis;
+                            pc.RightStick.X.Positive.Negative = false;
 
 							pc.Dpad.Up.ID = 0;
 							pc.Dpad.Up.Type = InputType.PovUp;
