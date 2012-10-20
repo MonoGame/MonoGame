@@ -92,17 +92,23 @@ namespace Microsoft.Xna.Framework.GamerServices
 
 	class GuideViewController : UIViewController
 	{
+        UIViewController _parent;
+
+        public GuideViewController(UIViewController parent)
+        {
+            _parent = parent;
+        }
         #region Autorotation for iOS 5 or older
 		public override bool ShouldAutorotateToInterfaceOrientation (UIInterfaceOrientation toInterfaceOrientation)
 		{
-			return this.ParentViewController.ShouldAutorotateToInterfaceOrientation(toInterfaceOrientation);
+            return _parent.ShouldAutorotateToInterfaceOrientation(toInterfaceOrientation);
 		}
         #endregion
 
         #region Autorotation for iOS 6 or newer
         public override UIInterfaceOrientationMask GetSupportedInterfaceOrientations ()
         {
-            return this.ParentViewController.GetSupportedInterfaceOrientations();
+            return _parent.GetSupportedInterfaceOrientations();
         }
         
         public override bool ShouldAutorotate ()
@@ -112,7 +118,7 @@ namespace Microsoft.Xna.Framework.GamerServices
         
         public override UIInterfaceOrientation PreferredInterfaceOrientationForPresentation ()
         {
-            return this.ParentViewController.PreferredInterfaceOrientationForPresentation();
+            return _parent.PreferredInterfaceOrientationForPresentation();
         }
         #endregion
 
@@ -382,7 +388,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 					{						
 						if(viewController == null)
 						{
-							viewController = new GuideViewController();
+							viewController = new GuideViewController(_gameViewController);
 							_window.Add(viewController.View);
 							viewController.View.Hidden = true;
 						}
@@ -427,7 +433,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 					{
 						if(viewController == null)
 						{
-							viewController = new GuideViewController();
+							viewController = new GuideViewController(_gameViewController);
 							_window.Add(viewController.View);
 							viewController.View.Hidden = true;
 						}
@@ -520,7 +526,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 					{
 						if(viewController == null)
 						{
-							viewController = new GuideViewController();
+							viewController = new GuideViewController(_gameViewController);
 							_window.Add(viewController.View);
 							viewController.View.Hidden = true;
 						}
