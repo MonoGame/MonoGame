@@ -133,11 +133,19 @@ namespace Microsoft.Xna.Framework.Graphics
         {
 			get
             {
+#if WINRT
+                // Always return true for Windows 8
+                return true;
+#else
 				 return isFullScreen;
+#endif
             }
             set
             {
+#if !WINRT
+                // If we are not on windows 8 set the value otherwise ignore it.
 				isFullScreen = value;				
+#endif
 #if IPHONE
 				UIApplication.SharedApplication.StatusBarHidden = isFullScreen;
 #endif

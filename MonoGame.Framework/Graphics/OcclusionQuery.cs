@@ -61,8 +61,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				                 resultReady);
 #elif OPENGL
                 GL.GetQueryObject(glQueryId, GetQueryObjectParam.QueryResultAvailable, resultReady);
-#elif DIRECTX
-                throw NotImplementedException();
+#elif DIRECTX                
 #endif
 				return resultReady[0] != 0;
 			}
@@ -76,8 +75,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				                 result);
 #elif OPENGL
                 GL.GetQueryObject(glQueryId, GetQueryObjectParam.QueryResultAvailable, result);
-#elif DIRECTX
-                throw NotImplementedException();
+#elif DIRECTX             
 #endif
                 return result[0];
 			}
