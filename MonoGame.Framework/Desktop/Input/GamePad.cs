@@ -112,9 +112,11 @@ namespace Microsoft.Xna.Framework.Input
 							pc.Button_RB.ID = 5;
 							pc.Button_RB.Type = InputType.Button;
 
+                            pc.LeftStick.X.Negative.ID = 0;
                             pc.LeftStick.X.Negative.Type = InputType.Axis;
                             pc.LeftStick.X.Negative.Negative = true;
 
+                            pc.LeftStick.X.Positive.ID = 0;
                             pc.LeftStick.X.Positive.Type = InputType.Axis;
                             pc.LeftStick.X.Positive.Negative = false;
 
@@ -155,13 +157,13 @@ namespace Microsoft.Xna.Framework.Input
 							pc.Dpad.Right.ID = 0;
 							pc.Dpad.Right.Type = InputType.PovRight;
 
-							pc.LeftTrigger.ID = 2;
-							pc.LeftTrigger.Type = InputType.Axis;
-							// Only positive value
+                            pc.LeftTrigger.ID = 2;
+                            pc.LeftTrigger.Type = InputType.Axis;
+                            pc.LeftTrigger.Negative = false;
 
-							pc.RightTrigger.ID = 5;
-							pc.RightTrigger.Type = InputType.Axis;
-							// Only positive value
+							pc.RightTrigger.ID = 2;
+                            pc.RightTrigger.Type = InputType.Axis;
+                            pc.RightTrigger.Negative = true;
 							
 							// Suggestion: Xbox Guide button <=> BigButton
 							//pc.BigButton.ID = 8;
@@ -171,9 +173,8 @@ namespace Microsoft.Xna.Framework.Input
 							pc.LeftStick.Press.Type = InputType.Button;
 
 							pc.RightStick.Press.ID = 10;
-							pc.RightStick.Press.Type = InputType.Button;
+                            pc.RightStick.Press.Type = InputType.Button;
 						}
-						
 						else
 						{
 							//pc.Button_A = new Input();
@@ -383,7 +384,7 @@ namespace Microsoft.Xna.Framework.Input
 		static Buttons TriggerToButton( float trigger, Buttons button, float DeadZoneSize )
 		{
 			Buttons b = (Buttons)0;
-
+            
 			if ( trigger > DeadZoneSize )
 				b |= button;
 
