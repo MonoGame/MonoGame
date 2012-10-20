@@ -104,12 +104,9 @@ namespace Microsoft.Xna.Framework.GamerServices
 #if DEBUG									
     														Console.WriteLine(error);
 #endif
-    													}
-    													else
-    													{
-    														
-    													}
-    												} 
+                                                        }
+    												}
+                                                    catch { }
     											}
     						                );
     					}
