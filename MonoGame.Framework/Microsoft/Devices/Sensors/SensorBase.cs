@@ -10,7 +10,7 @@ namespace Microsoft.Devices.Sensors
 		where TSensorReading : ISensorReading
 	{
 #if IPHONE
-        protected static MonoTouch.CoreMotion.CMMotionManager motionManager = new MonoTouch.CoreMotion.CMMotionManager();
+        protected static readonly MonoTouch.CoreMotion.CMMotionManager motionManager = new MonoTouch.CoreMotion.CMMotionManager();
 #endif
         bool disposed;
 		private TimeSpan timeBetweenUpdates;
