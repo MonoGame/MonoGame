@@ -50,8 +50,6 @@ namespace Microsoft.Devices.Sensors
                     if (started)
                         Stop();
                     --instanceCount;
-                    if (instanceCount == 0)
-                        Compass.motionManager = null;
                 }
             }
             base.Dispose(disposing);
