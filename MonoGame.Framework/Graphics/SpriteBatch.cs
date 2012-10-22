@@ -98,12 +98,13 @@ namespace Microsoft.Xna.Framework.Graphics
 			
             // Setup the default sprite effect.
 			var vp = graphicsDevice.Viewport;
-            var projection = Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, 0, 1);
 
             // GL requires a half pixel offset where as DirectX and PSS does not.
 #if PSS || DIRECTX
+            var projection = Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, -1, 0);
             var transform = _matrix * projection;
 #else
+            var projection = Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, 0, 1);
 			var halfPixelOffset = Matrix.CreateTranslation(-0.5f, -0.5f, 0);
 			var transform = _matrix * (halfPixelOffset * projection);
 #endif
@@ -224,7 +225,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			      sourceRectangle,
 			      color,
 			      rotation,
-			      origin,
+			      new Vector2(origin.X * ((float)destinationRectangle.Width / (float)texture.Width),
+                              origin.Y * ((float)destinationRectangle.Height / (float)texture.Height)),
 			      effect,
 			      depth);
 		}
@@ -271,7 +273,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			item.Set (destinationRectangle.X,
 					destinationRectangle.Y, 
 					-origin.X, 
-					-origin.Y, 
+					-origin.Y,
 					destinationRectangle.Z,
 					destinationRectangle.W,
 					(float)Math.Sin (rotation), 

@@ -55,14 +55,13 @@ namespace Microsoft.Xna.Framework.Graphics
 		public bool IsComplete {
 			get {
 				int[] resultReady = {0};
-#if MACOSX               
+#if MONOMAC               
 				GetQueryObjectiv(glQueryId,
 				                 (int)GetQueryObjectParam.QueryResultAvailable,
 				                 resultReady);
 #elif OPENGL
                 GL.GetQueryObject(glQueryId, GetQueryObjectParam.QueryResultAvailable, resultReady);
-#elif DIRECTX
-                throw NotImplementedException();
+#elif DIRECTX                
 #endif
 				return resultReady[0] != 0;
 			}
@@ -70,20 +69,19 @@ namespace Microsoft.Xna.Framework.Graphics
 		public int PixelCount {
 			get {
 				int[] result = {0};
-#if MACOSX
+#if MONOMAC
 				GetQueryObjectiv(glQueryId,
 				                 (int)GetQueryObjectParam.QueryResult,
 				                 result);
 #elif OPENGL
                 GL.GetQueryObject(glQueryId, GetQueryObjectParam.QueryResultAvailable, result);
-#elif DIRECTX
-                throw NotImplementedException();
+#elif DIRECTX             
 #endif
                 return result[0];
 			}
         }
 
-#if MACOSX
+#if MONOMAC
 		//MonoMac doesn't export this. Grr.
 		const string OpenGLLibrary = "/System/Library/Frameworks/OpenGL.framework/OpenGL";
 

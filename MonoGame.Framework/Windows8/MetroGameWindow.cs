@@ -197,10 +197,15 @@ namespace Microsoft.Xna.Framework
             // Set the new client bounds.
             SetClientBounds(args.Size.Width, args.Size.Height);
 
-            // Set the default new back buffer size, but this
+            // Set the default new back buffer size and viewport, but this
             // can be overloaded by the two events below.
-            manager.PreferredBackBufferWidth = (int)((_backBufferScale.X * _clientBounds.Width) + 0.5f);
-            manager.PreferredBackBufferHeight = (int)((_backBufferScale.Y * _clientBounds.Height) + 0.5f);
+            
+            var newWidth = (int)((_backBufferScale.X * _clientBounds.Width) + 0.5f);
+            var newHeight = (int)((_backBufferScale.Y * _clientBounds.Height) + 0.5f);
+            manager.PreferredBackBufferWidth = newWidth;
+            manager.PreferredBackBufferHeight = newHeight;
+
+            manager.GraphicsDevice.Viewport = new Viewport(0, 0, newWidth, newHeight);            
 
             // Set the new view state which will trigger the 
             // Game.ApplicationViewChanged event and signal

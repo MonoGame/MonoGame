@@ -145,7 +145,7 @@ namespace Microsoft.Xna.Framework
 
         private void Keyboard_KeyDown(object sender, OpenTK.Input.KeyboardKeyEventArgs e)
         {
-            if (e.Key == OpenTK.Input.Key.F4 && e.Key.HasFlag(OpenTK.Input.Key.AltLeft))
+            if (e.Key == OpenTK.Input.Key.F4 && keys.Contains(Keys.LeftAlt))
             {
                 window.Close();
                 return;
@@ -274,7 +274,11 @@ namespace Microsoft.Xna.Framework
             Threading.WindowInfo = window.WindowInfo;
 
             keys = new List<Keys>();
-
+   
+#if LINUX
+            Threading.BackgroundContext.MakeCurrent(Threading.WindowInfo);      
+#endif     
+            
             // mouse
             // TODO review this when opentk 1.1 is released
 #if WINDOWS || LINUX

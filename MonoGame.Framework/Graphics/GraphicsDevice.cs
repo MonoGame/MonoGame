@@ -377,8 +377,10 @@ namespace Microsoft.Xna.Framework.Graphics
             _vertexConstantBuffers.Clear();
             _pixelConstantBuffers.Clear();
 
+#if OPENGL
             // Ensure the vertex attributes are reset
             _enabledVertexAttributes.Clear();
+#endif
 
             // Force set the buffers and shaders on next ApplyState() call
             _indexBufferDirty = true;
@@ -1071,13 +1073,13 @@ namespace Microsoft.Xna.Framework.Graphics
                     GL.Viewport(value.X, value.Y, value.Width, value.Height);
                 else
                     GL.Viewport(value.X, PresentationParameters.BackBufferHeight - value.Y - value.Height, value.Width, value.Height);
-                GraphicsExtensions.CheckGLError();
+                GraphicsExtensions.LogGLError("GraphicsDevice.Viewport_set() GL.Viewport");
 #if GLES
                 GL.DepthRange(value.MinDepth, value.MaxDepth);
 #else
                 GL.DepthRange((double)value.MinDepth, (double)value.MaxDepth);
 #endif
-                GraphicsExtensions.CheckGLError();
+                GraphicsExtensions.LogGLError("GraphicsDevice.Viewport_set() GL.DepthRange");
 #endif
             }
         }
@@ -1507,21 +1509,20 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (_indexBufferDirty)
             {
-#if DIRECTX
-                Debug.Assert(_indexBuffer != null, "The index buffer is null!");
-
-                _d3dContext.InputAssembler.SetIndexBuffer(
-                    _indexBuffer._buffer,
-                    _indexBuffer.IndexElementSize == IndexElementSize.SixteenBits ? 
-                        SharpDX.DXGI.Format.R16_UInt : SharpDX.DXGI.Format.R32_UInt,
-                    0);
-#elif OPENGL
                 if (_indexBuffer != null)
                 {
+#if DIRECTX
+                    _d3dContext.InputAssembler.SetIndexBuffer(
+                        _indexBuffer._buffer,
+                        _indexBuffer.IndexElementSize == IndexElementSize.SixteenBits ? 
+                            SharpDX.DXGI.Format.R16_UInt : SharpDX.DXGI.Format.R32_UInt,
+                        0);
+#elif OPENGL
+
                     GL.BindBuffer(BufferTarget.ElementArrayBuffer, _indexBuffer.ibo);
                     GraphicsExtensions.CheckGLError();
-                }
 #endif
+                }
                 _indexBufferDirty = false;
             }
 
