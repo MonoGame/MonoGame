@@ -84,9 +84,12 @@ namespace Microsoft.Xna.Framework.Input
 							//pc
 						}
 						
-						if (Sdl.SDL_JoystickName(x).Contains("Microsoft")
-                            || Sdl.SDL_JoystickName(x).Contains("潃瑮潲汬牥⠠托硯㌠〶圠物汥獥⁳敒散癩牥映牯圠湩潤獷)") 
-                            || (Sdl.SDL_JoystickName(x).Contains("X-Box") || Sdl.SDL_JoystickName(x).Contains("Xbox")))
+						var JoyStickName = Sdl.SDL_JoystickName(x);
+						if ((JoyStickName.Contains("Microsoft")
+							|| JoyStickName.Contains("潃瑮潲汬牥⠠托硯㌠〶圠物汥獥⁳敒散癩牥映牯圠湩潤獷)")
+							|| JoyStickName.Contains("䉘塏㌠〶䘠牯圠湩潤獷⠠潃瑮潲汬牥)ꨀ㠀熛")
+                            || JoyStickName.Contains("X-Box") 
+							|| JoyStickName.Contains("Xbox")))
 						{
 							pc.Button_A.ID = 0;
 							pc.Button_A.Type = InputType.Button;
