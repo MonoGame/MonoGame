@@ -174,7 +174,11 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
 #elif OPENGL
-            GL.DeleteTextures(1, ref glTexture);
+            if (glTexture != -1)
+            {
+                GL.DeleteTextures(1, ref glTexture);
+                glTexture = -1;
+            }
             GraphicsExtensions.CheckGLError();
 #endif
             base.Dispose();
