@@ -236,9 +236,14 @@ namespace Microsoft.Xna.Framework
 		
         public override void Present()
         {
-			if (_exiting) return;
+			if (_exiting)
+                return;
             try
             {
+                var device = Game.GraphicsDevice;
+                if (device != null)
+                    device.Present();
+                    
                 Window.SwapBuffers();
             }
             catch (Exception ex)

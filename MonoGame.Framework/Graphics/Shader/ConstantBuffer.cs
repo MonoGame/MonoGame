@@ -49,7 +49,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public ConstantBuffer(ConstantBuffer cloneSource)
         {
-            graphicsDevice = cloneSource.graphicsDevice;
+            GraphicsDevice = cloneSource.GraphicsDevice;
 
             // Share the immutable types.
             _name = cloneSource._name;
@@ -67,7 +67,7 @@ namespace Microsoft.Xna.Framework.Graphics
                               int[] parameterOffsets,
                               string name)
         {
-            graphicsDevice = device;
+            GraphicsDevice = device;
 
             _buffer = new byte[sizeInBytes];
 

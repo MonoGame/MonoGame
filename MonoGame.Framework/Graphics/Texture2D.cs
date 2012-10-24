@@ -123,9 +123,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (graphicsDevice == null)
                 throw new ArgumentNullException("Graphics Device Cannot Be Null");
 
-            graphicsDevice.DeviceResetting += new EventHandler<EventArgs>(graphicsDevice_DeviceResetting);
-
-            this.graphicsDevice = graphicsDevice;
+            this.GraphicsDevice = graphicsDevice;
             this.width = width;
             this.height = height;
             this.format = format;
@@ -226,19 +224,6 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
         }
 
-        void graphicsDevice_DeviceResetting(object sender, EventArgs e)
-        {
-#if OPENGL
-            this.glTexture = -1;
-#endif
-        }
-
-        public override void Dispose()
-        {
-            graphicsDevice.DeviceResetting -= graphicsDevice_DeviceResetting;
-            base.Dispose();
-        }
-
 #if PSS
         private Texture2D(GraphicsDevice graphicsDevice, Stream stream)
         {
@@ -256,11 +241,6 @@ namespace Microsoft.Xna.Framework.Graphics
             : this(graphicsDevice, width, height, false, SurfaceFormat.Color, false)
 		{			
 		}
-
-        ~Texture2D()
-        {
-            Dispose();
-        }
 
         public int Width
         {
