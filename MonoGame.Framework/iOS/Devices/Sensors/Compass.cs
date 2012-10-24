@@ -11,7 +11,6 @@ namespace Microsoft.Devices.Sensors
     {
         static readonly int MaxSensorCount = 10;
         static int instanceCount;
-        private static CMMotionManager motionManager = new CMMotionManager();
         private static bool started = false;
         private static SensorState state = IsSupported ? SensorState.Initializing : SensorState.NotSupported;
         private bool calibrate = false;
@@ -51,8 +50,6 @@ namespace Microsoft.Devices.Sensors
                     if (started)
                         Stop();
                     --instanceCount;
-                    if (instanceCount == 0)
-                        Compass.motionManager = null;
                 }
             }
             base.Dispose(disposing);
@@ -89,7 +86,7 @@ namespace Microsoft.Devices.Sensors
             this.IsDataValid = error == null;
             if (this.IsDataValid)
             {
-                reading.MagnetometerReading = new Vector3((float)data.MagneticField.Field.Y, (float)-data.MagneticField.Field.X, (float)data.MagneticField.Field.Z);
+                reading.MagnetometerReading = new Vector3((float)motionManager.DeviceMotion.MagneticField.Field.Y, (float)-motionManager.DeviceMotion.MagneticField.Field.X, (float)motionManager.DeviceMotion.MagneticField.Field.Z);
                 reading.TrueHeading = Math.Atan2(reading.MagnetometerReading.Y, reading.MagnetometerReading.X) / Math.PI * 180;
                 reading.MagneticHeading = reading.TrueHeading;
                 switch (data.MagneticField.Accuracy)
