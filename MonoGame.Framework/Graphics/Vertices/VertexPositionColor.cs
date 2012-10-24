@@ -2,6 +2,7 @@ using System;
 #if WINRT
 using System.Runtime.Serialization;
 #endif
+using System.Runtime.InteropServices;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -10,6 +11,7 @@ namespace Microsoft.Xna.Framework.Graphics
     #else
     [Serializable]
     #endif
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
 	public struct VertexPositionColor : IVertexType
 	{
 #if WINRT
