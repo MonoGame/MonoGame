@@ -76,13 +76,8 @@ namespace Microsoft.Xna.Framework.Audio
             if (_soundId == 0)
                 return -1;
 
-            AudioManager audioManager = (AudioManager)Game.Activity.GetSystemService(Context.AudioService);
-
-            float streamVolumeCurrent = audioManager.GetStreamVolume(Stream.Music);
-            float streamVolumeMax = audioManager.GetStreamMaxVolume(Stream.Music);
-            float streamVolume = streamVolumeCurrent / streamVolumeMax;
             float panRatio = (this.Pan + 1.0f) / 2.0f;
-            float volumeTotal = SoundEffect.MasterVolume * Volume * streamVolume;
+            float volumeTotal = SoundEffect.MasterVolume * this.Volume;
             float volumeLeft = volumeTotal * (1.0f - panRatio);
             float volumeRight = volumeTotal * panRatio;
 
