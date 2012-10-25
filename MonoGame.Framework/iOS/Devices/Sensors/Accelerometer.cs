@@ -11,7 +11,6 @@ namespace Microsoft.Devices.Sensors
 	{
         static readonly int MaxSensorCount = 10;
         static int instanceCount;
-		private static CMMotionManager motionManager = new CMMotionManager();
 		private static bool started = false;
 		private static SensorState state = IsSupported ? SensorState.Initializing : SensorState.NotSupported;
 
@@ -49,8 +48,6 @@ namespace Microsoft.Devices.Sensors
                     if (started)
                         Stop();
                     --instanceCount;
-                    if (instanceCount == 0)
-                        Accelerometer.motionManager = null;
                 }
             }
             base.Dispose(disposing);
@@ -87,7 +84,7 @@ namespace Microsoft.Devices.Sensors
             if (this.IsDataValid)
             {
                 this.IsDataValid = true;
-                reading.Acceleration = new Vector3((float)data.Acceleration.X, (float)data.Acceleration.Y, (float)data.Acceleration.Z);
+                reading.Acceleration = new Vector3((float)motionManager.AccelerometerData.Acceleration.X, (float)motionManager.AccelerometerData.Acceleration.Y, (float)motionManager.AccelerometerData.Acceleration.Z);
                 reading.Timestamp = DateTime.Now;
                 this.CurrentValue = reading;
                 this.IsDataValid = error == null;
