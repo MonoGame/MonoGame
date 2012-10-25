@@ -136,7 +136,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (!shaderAttributeInfo.TryGetValue(shaderHash, out attrInfo))
             {
                 // Get the vertex attribute info and cache it
-                attrInfo = new VertexDeclarationAttributeInfo(graphicsDevice.MaxVertexAttributes);
+                attrInfo = new VertexDeclarationAttributeInfo(GraphicsDevice.MaxVertexAttributes);
 
                 foreach (var ve in _elements)
                 {
@@ -170,7 +170,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     (IntPtr)(offset.ToInt64() + element.Offset));
                 GraphicsExtensions.CheckGLError();
             }
-            graphicsDevice.SetVertexAttributeArray(attrInfo.EnabledAttributes);
+            GraphicsDevice.SetVertexAttributeArray(attrInfo.EnabledAttributes);
 		}
 
 #endif // OPENGL

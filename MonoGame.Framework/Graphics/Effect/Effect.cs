@@ -71,12 +71,11 @@ namespace Microsoft.Xna.Framework.Graphics
 			if (graphicsDevice == null)
 				throw new ArgumentNullException ("Graphics Device Cannot Be Null");
 
-			this.graphicsDevice = graphicsDevice;
-            this.graphicsDevice.DeviceResetting += new EventHandler<EventArgs>(graphicsDevice_DeviceResetting);
+			this.GraphicsDevice = graphicsDevice;
 		}
 			
 		protected Effect(Effect cloneSource)
-            : this(cloneSource.graphicsDevice)
+            : this(cloneSource.GraphicsDevice)
 		{
             _isClone = true;
             Clone(cloneSource);
@@ -188,21 +187,22 @@ namespace Microsoft.Xna.Framework.Graphics
             return false;
         }
 
-        public override void Dispose()
+        protected override void Dispose(bool disposing)
         {
-            if (!IsDisposed && !_isClone)
+            if (!IsDisposed)
             {
-                // Only the clone source can dispose the shaders.
-                foreach (var shader in _shaderList)
-                    shader.Dispose();
+                if (!_isClone)
+                {
+                    // Only the clone source can dispose the shaders.
+                    foreach (var shader in _shaderList)
+                        shader.Dispose();
+                }
             }
 
-            this.graphicsDevice.DeviceResetting -= graphicsDevice_DeviceResetting;
-
-            base.Dispose();
+            base.Dispose(disposing);
         }
 
-        void graphicsDevice_DeviceResetting(object sender, EventArgs e)
+        internal protected virtual void GraphicsDeviceResetting()
         {
             for (var i = 0; i < ConstantBuffers.Length; i++)
                 ConstantBuffers[i].Clear();
@@ -283,7 +283,7 @@ namespace Microsoft.Xna.Framework.Graphics
 					offsets [i] = (int)reader.ReadUInt16 ();
 				}
 
-                var buffer = new ConstantBuffer(graphicsDevice,
+                var buffer = new ConstantBuffer(GraphicsDevice,
 				                                sizeInBytes,
 				                                parameters,
 				                                offsets,
@@ -296,7 +296,7 @@ namespace Microsoft.Xna.Framework.Graphics
             var shaders = (int)reader.ReadByte();
             for (var s = 0; s < shaders; s++)
             {
-                var shader = new Shader(graphicsDevice, reader);
+                var shader = new Shader(GraphicsDevice, reader);
                 _shaderList.Add(shader);
             }
 
