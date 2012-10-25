@@ -61,8 +61,9 @@ namespace Microsoft.Xna.Framework.Media
 #endif
 		
 		private string _name;
-		private int _playCount = 0;   
-		
+		private int _playCount = 0;
+        bool disposed;
+
 		internal Song(string fileName)
 		{			
 			_name = fileName;
@@ -77,7 +78,12 @@ namespace Microsoft.Xna.Framework.Media
             _sound = new SoundEffect(_name).CreateInstance();
 #endif
 		}
-				
+
+        ~Song()
+        {
+            Dispose(false);
+        }
+
         public string FilePath
 		{
 			get { return _name; }
@@ -91,19 +97,23 @@ namespace Microsoft.Xna.Framework.Media
         
         void Dispose(bool disposing)
         {
-#if !WINRT
-            if (disposing)
+            if (!disposed)
             {
-                if (_sound != null)
+#if !WINRT
+                if (disposing)
                 {
+                    if (_sound != null)
+                    {
 #if IPHONE
-                    _sound.FinishedPlaying -= OnFinishedPlaying;
+                       _sound.FinishedPlaying -= OnFinishedPlaying;
 #endif
-                    _sound.Dispose();
-                    _sound = null;
+                        _sound.Dispose();
+                        _sound = null;
+                    }
                 }
-            }
 #endif
+                disposed = true;
+            }
         }
         
 		public bool Equals(Song song) 		

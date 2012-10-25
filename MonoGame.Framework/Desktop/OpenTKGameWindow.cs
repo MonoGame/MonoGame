@@ -54,7 +54,7 @@ using OpenTK.Graphics;
 
 namespace Microsoft.Xna.Framework
 {
-    public class OpenTKGameWindow : GameWindow
+    public class OpenTKGameWindow : GameWindow, IDisposable
     {
         private bool _allowUserResizing;
         private DisplayOrientation _currentOrientation;
@@ -68,6 +68,7 @@ namespace Microsoft.Xna.Framework
         private WindowState windowState;
         private Rectangle clientBounds;
         private bool updateClientBounds;
+        bool disposed;
 
         #region Internal Properties
 
@@ -126,6 +127,11 @@ namespace Microsoft.Xna.Framework
             Initialize();
         }
 
+        ~OpenTKGameWindow()
+        {
+            Dispose(false);
+        }
+
         #region Restricted Methods
 
         #region OpenTK GameWindow Methods
@@ -145,7 +151,7 @@ namespace Microsoft.Xna.Framework
 
         private void Keyboard_KeyDown(object sender, OpenTK.Input.KeyboardKeyEventArgs e)
         {
-            if (e.Key == OpenTK.Input.Key.F4 && e.Key.HasFlag(OpenTK.Input.Key.AltLeft))
+            if (e.Key == OpenTK.Input.Key.F4 && keys.Contains(Keys.LeftAlt))
             {
                 window.Close();
                 return;
@@ -274,10 +280,10 @@ namespace Microsoft.Xna.Framework
             Threading.WindowInfo = window.WindowInfo;
 
             keys = new List<Keys>();
-   
-#if LINUX
-            Threading.BackgroundContext.MakeCurrent(Threading.WindowInfo);      
-#endif     
+
+            // Make the foreground context the current context
+            if (!GraphicsContext.CurrentContext.IsCurrent)
+                window.MakeCurrent();
             
             // mouse
             // TODO review this when opentk 1.1 is released
@@ -324,13 +330,30 @@ namespace Microsoft.Xna.Framework
 
         public void Dispose()
         {
-            if (Threading.BackgroundContext != null)
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposed)
             {
-                Threading.BackgroundContext.Dispose();
-                Threading.BackgroundContext = null;
-                Threading.WindowInfo = null;
+                if (disposing)
+                {
+                    // Dispose/release managed objects
+                    window.Dispose();
+                }
+
+                // Release native resources
+                if (Threading.BackgroundContext != null)
+                {
+                    Threading.BackgroundContext.Dispose();
+                    Threading.BackgroundContext = null;
+                    Threading.WindowInfo = null;
+                }
+
+                disposed = true;
             }
-            window.Dispose();
         }
 
         public override void BeginScreenDeviceChange(bool willBeFullScreen)

@@ -43,7 +43,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 throw new ArgumentNullException("Graphics Device Cannot Be Null");
             }
-			this.graphicsDevice = graphicsDevice;
+			this.GraphicsDevice = graphicsDevice;
 			this.IndexElementSize = indexElementSize;	
             this.IndexCount = indexCount;
             this.BufferUsage = bufferUsage;
@@ -286,23 +286,34 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
         }
 
-		public override void Dispose()
+		protected override void Dispose(bool disposing)
         {
-#if DIRECTX
-
-            if (_buffer != null)
+            if (!IsDisposed)
             {
-                _buffer.Dispose();
-                _buffer = null;
-            }
+#if DIRECTX
+                if (disposing)
+                {
+                    if (_buffer != null)
+                    {
+                        _buffer.Dispose();
+                        _buffer = null;
+                    }
+                }
 #elif PSS
-            //Do nothing
-            _buffer = null;
+                //Do nothing
+                _buffer = null;
 #else
-			GL.DeleteBuffers(1, ref ibo);
-            GraphicsExtensions.CheckGLError();
+                if ((GraphicsDevice != null) && !GraphicsDevice.IsDisposed)
+                {
+                    GraphicsDevice.AddDisposeAction(() =>
+                        {
+                            GL.DeleteBuffers(1, ref ibo);
+                            GraphicsExtensions.CheckGLError();
+                        });
+                }
 #endif
-            base.Dispose();
+            }
+            base.Dispose(disposing);
 		}
 	}
 }

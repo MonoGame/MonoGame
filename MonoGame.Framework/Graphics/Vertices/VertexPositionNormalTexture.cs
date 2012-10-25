@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Runtime.InteropServices;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct VertexPositionNormalTexture : IVertexType
     {
         public Vector3 Position;

@@ -10,6 +10,7 @@ namespace Microsoft.Xna.Framework.Media
         static internal Android.Media.MediaPlayer _androidPlayer = null;
         private string _name;
         private int _playCount;
+        bool disposed;
 
         internal delegate void FinishedPlayingHandler(object sender, EventArgs args);
         event FinishedPlayingHandler DonePlaying;
@@ -24,6 +25,11 @@ namespace Microsoft.Xna.Framework.Media
             }
         }
 
+        ~Song()
+        {
+            Dispose(false);
+        }
+
         public void Dispose()
         {
             Dispose(true);
@@ -32,9 +38,11 @@ namespace Microsoft.Xna.Framework.Media
 
         void Dispose(bool disposing)
         {
-            if (disposing)
+            if (!disposed)
             {
                 // ...
+
+                disposed = true;
             }
         }
 

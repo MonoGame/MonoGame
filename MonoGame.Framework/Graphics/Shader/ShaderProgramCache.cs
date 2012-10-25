@@ -34,9 +34,15 @@ namespace Microsoft.Xna.Framework.Graphics
     /// It will be responsible for linking the programs under OpenGL if they have not been linked
     /// before. If an existing link exists it will be resused.
     /// </summary>
-    internal class ShaderProgramCache
+    internal class ShaderProgramCache : IDisposable
     {
         private readonly Dictionary<int, ShaderProgramInfo> _programCache = new Dictionary<int, ShaderProgramInfo>();
+        bool disposed;
+
+        ~ShaderProgramCache()
+        {
+            Dispose(true);
+        }
 
         /// <summary>
         /// Clear the program cache releasing all shader programs.
@@ -126,6 +132,21 @@ namespace Microsoft.Xna.Framework.Graphics
             _programCache.Add(vertexShader.HashKey | pixelShader.HashKey, info);             
         }
 
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposed)
+            {
+                Clear();
+                disposed = true;
+            }
+        }
     }
 }
 
