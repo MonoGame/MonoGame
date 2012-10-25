@@ -134,7 +134,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 // Release native objects
                 // ...
 
-                if (Disposing != null)
+                // Do not trigger the event if called from the finalizer
+                if (disposing && Disposing != null)
                     Disposing(this, EventArgs.Empty);
 
                 // Remove from the global list of graphics resources
