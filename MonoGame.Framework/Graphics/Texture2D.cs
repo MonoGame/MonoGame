@@ -302,8 +302,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 region.Right = x + w;
 
                 // TODO: We need to deal with threaded contexts here!
-                lock (graphicsDevice._d3dContext)
-                    graphicsDevice._d3dContext.UpdateSubresource(box, _texture, level, region);
+                var d3dContext = GraphicsDevice._d3dContext;
+                lock (d3dContext)
+                    d3dContext.UpdateSubresource(box, _texture, level, region);
 
 #elif PSS
                 _texture2D.SetPixels(level, data, _texture2D.Format, startIndex, 0, x, y, w, h);
@@ -545,24 +546,25 @@ namespace Microsoft.Xna.Framework.Graphics
             desc.Usage = SharpDX.Direct3D11.ResourceUsage.Staging;
             desc.OptionFlags = SharpDX.Direct3D11.ResourceOptionFlags.None;
 
-            using (var stagingTex = new SharpDX.Direct3D11.Texture2D(graphicsDevice._d3dDevice, desc))
-            lock (graphicsDevice._d3dContext)
-            {
-                // Copy the data from the GPU to the staging texture.
-                if (rect.HasValue)
+		    var d3dContext = GraphicsDevice._d3dContext;
+            using (var stagingTex = new SharpDX.Direct3D11.Texture2D(GraphicsDevice._d3dDevice, desc))
+                lock (d3dContext)
                 {
-                    // TODO: Need to deal with subregion copies!
-                    throw new NotImplementedException();
-                }
-                else
-                    graphicsDevice._d3dContext.CopySubresourceRegion(_texture, level, null, stagingTex, 0, 0, 0, 0);
+                    // Copy the data from the GPU to the staging texture.
+                    if (rect.HasValue)
+                    {
+                        // TODO: Need to deal with subregion copies!
+                        throw new NotImplementedException();
+                    }
+                    else
+                        d3dContext.CopySubresourceRegion(_texture, level, null, stagingTex, 0, 0, 0, 0);
 
-                // Copy the data to the array.
-                SharpDX.DataStream stream;
-                graphicsDevice._d3dContext.MapSubresource(stagingTex, 0, SharpDX.Direct3D11.MapMode.Read, SharpDX.Direct3D11.MapFlags.None, out stream);
-                stream.ReadRange(data, startIndex, elementCount);
-                stream.Dispose();
-            }
+                    // Copy the data to the array.
+                    SharpDX.DataStream stream;
+                    d3dContext.MapSubresource(stagingTex, 0, SharpDX.Direct3D11.MapMode.Read, SharpDX.Direct3D11.MapFlags.None, out stream);
+                    stream.ReadRange(data, startIndex, elementCount);
+                    stream.Dispose();
+                }
 
 #else
 
