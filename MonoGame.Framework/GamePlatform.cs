@@ -76,9 +76,13 @@ namespace Microsoft.Xna.Framework
 {
     abstract class GamePlatform : IDisposable
     {
-        #region
+        #region Fields
+
         protected TimeSpan _inactiveSleepTime = TimeSpan.FromMilliseconds(20.0);
         protected bool _needsToResetElapsedTime = false;
+        bool disposed;
+        protected bool IsDisposed { get { return disposed; } }
+
         #endregion
 
         #region Construction/Destruction
@@ -375,9 +379,16 @@ namespace Microsoft.Xna.Framework
         public void Dispose()
         {
             Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
-        protected virtual void Dispose(bool disposing) {}
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposed)
+            {
+                disposed = true;
+            }
+        }
 		
 		/// <summary>
 		/// Log the specified Message.

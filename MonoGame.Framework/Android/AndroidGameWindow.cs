@@ -122,12 +122,6 @@ namespace Microsoft.Xna.Framework
             return true;
         }
 
-        ~AndroidGameWindow()
-		{
-			//
-		}
-
-
 		protected override void CreateFrameBuffer()
 		{
             Android.Util.Log.Debug("MonoGame", "AndroidGameWindow.CreateFrameBuffer");
@@ -217,7 +211,7 @@ namespace Microsoft.Xna.Framework
 				else if (_game.GraphicsDevice != null)
 				{ 
 					_game.GraphicsDevice.Clear(Color.Black);
-					_game.GraphicsDevice.Present();
+					_game.Platform.Present();
 				}
             }
         }
