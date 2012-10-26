@@ -71,6 +71,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		internal int glTexture = -1;
 		internal TextureTarget glTarget;
         internal TextureUnit glTextureUnit = TextureUnit.Texture0;
+        internal SamplerState glLastSamplerState = null;
 #endif
 		
 		public SurfaceFormat Format
@@ -192,6 +193,8 @@ namespace Microsoft.Xna.Framework.Graphics
                             GraphicsExtensions.CheckGLError();
                         });
                 }
+
+                glLastSamplerState = null;
 #endif
             }
             base.Dispose(disposing);
